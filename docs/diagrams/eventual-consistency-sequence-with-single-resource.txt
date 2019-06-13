@@ -1,0 +1,54 @@
+@startuml
+
+title
+ Handling Eventual Consistency
+ - Fetching a resource after creation -
+end title
+
+hide footbox
+skinparam Padding 3
+
+actor Client
+participant Api
+participant CommandHandler
+database SqlStreamStore
+collections Projections
+
+Client -> Api: **POST** /users\n{ id: "6789" }
+Api -> CommandHandler: Dispatch to
+CommandHandler -> SqlStreamStore: Store event in
+CommandHandler <- SqlStreamStore: Return position
+Api <- CommandHandler: Return position
+Client <[#0000FF]- Api: <font color=blue>**201 OK**</font>\n//ETag: "812"//\n//Location: /users/6789//
+SqlStreamStore <- Projections: Poll new events
+SqlStreamStore -> Projections: Pick up event "812"
+Projections -> Projections: Start processing "812"
+activate Projections
+
+note over Client: Client forgets\nto send If-Match
+Client -> Api: **GET** /users/6789\n
+Api -> Projections: Fetch user
+Api x- Projections: User not found
+Client <[#0000FF]- Api: <font color=blue>**404 NOT FOUND**</font>\n
+
+||50||
+
+note over Client: Now with If-Match
+Client -> Api: **GET** /users/6789\n//If-Match: "812"//
+Api -> Projections: Is ProjectionState >= "812" ?
+Api x- Projections: NO
+Client <[#0000FF]- Api: <font color=blue>**412 PRECONDITION FAILED**</font>\n//Retry-After: 1//
+
+||||
+
+
+Client -> Api: **GET** /users/6789\n//If-Match: "812"//
+deactivate Projections
+Api -> Projections: Is ProjectionState >= "812" ?
+Api <- Projections: YES
+Api -> Projections: Fetch user
+Api <- Projections: Return user
+Client <[#0000FF]- Api: <font color=blue>**200 OK**</font>\n//ETag: "812"//
+
+
+@enduml

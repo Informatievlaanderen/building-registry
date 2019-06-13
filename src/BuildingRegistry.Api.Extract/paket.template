@@ -1,0 +1,26 @@
+type file
+version 1.0.0
+
+id Be.Vlaanderen.Basisregisters.BuildingRegistry.Api.Extract
+title Be.Vlaanderen.Basisregisters.BuildingRegistry.Api.Extract
+
+authors Basisregisters.Vlaanderen
+owners Vlaamse overheid
+copyright Copyright (c) Vlaamse overheid
+requireLicenseAcceptance false
+projectUrl https://vlaanderen.be/informatie-vlaanderen
+
+description Building Registry.
+
+dependencies
+  framework: netstandard20
+    Be.Vlaanderen.Basisregisters.Shaperon >= LOCKEDVERSION
+
+files
+  BuildingRegistry.Api.Extract.dll => lib\netcoreapp2.2
+  BuildingRegistry.Api.Extract.pdb => lib\netcoreapp2.2
+  BuildingRegistry.Api.Extract.xml => lib\netcoreapp2.2
+  BuildingRegistry.Api.Extract.xml => content
+
+  BuildingRegistry.Projections.Extract.dll => lib\netcoreapp2.2
+  BuildingRegistry.Projections.Extract.pdb => lib\netcoreapp2.2

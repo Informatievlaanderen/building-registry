@@ -1,0 +1,113 @@
+namespace BuildingRegistry.Projections.LastChangedList
+{
+    using Be.Vlaanderen.Basisregisters.ProjectionHandling.LastChangedList;
+    using Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore;
+    using Building.Events;
+
+    public class BuildingUnitProjections : LastChangedListConnectedProjection
+    {
+        protected override string CacheKeyFormat => "legacy/buildingunit:{{0}}.{1}";
+        protected override string UriFormat => "/v1/gebouweenheden/{{0}}";
+
+        private static readonly AcceptType[] SupportedAcceptTypes = { AcceptType.Json, AcceptType.Xml };
+
+        public BuildingUnitProjections()
+            : base(SupportedAcceptTypes)
+        {
+            When<Envelope<BuildingUnitOsloIdWasAssigned>>(async (context, message, ct) =>
+            {
+                var attachedRecords = await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingUnitId.ToString(), message.Position, context, ct);
+
+                foreach (var record in attachedRecords)
+                {
+                    record.CacheKey = string.Format(record.CacheKey, message.Message.OsloId);
+                    record.Uri = string.Format(record.Uri, message.Message.OsloId);
+                }
+            });
+
+            When<Envelope<BuildingUnitAddressWasAttached>>(async (context, message, ct) =>
+                await GetLastChangedRecordsAndUpdatePosition(message.Message.To.ToString(), message.Position, context, ct));
+
+            When<Envelope<BuildingUnitAddressWasDetached>>(async (context, message, ct) =>
+                await GetLastChangedRecordsAndUpdatePosition(message.Message.From.ToString(), message.Position, context, ct));
+
+            When<Envelope<BuildingUnitBecameComplete>>(async (context, message, ct) =>
+                await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingUnitId.ToString(), message.Position, context, ct));
+
+            When<Envelope<BuildingUnitBecameIncomplete>>(async (context, message, ct) =>
+                await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingUnitId.ToString(), message.Position, context, ct));
+
+            When<Envelope<BuildingUnitOsloIdWasAssigned>>(async (context, message, ct) =>
+                await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingUnitId.ToString(), message.Position, context, ct));
+
+            When<Envelope<BuildingUnitPositionWasAppointedByAdministrator>>(async (context, message, ct) =>
+                await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingUnitId.ToString(), message.Position, context, ct));
+
+            When<Envelope<BuildingUnitPositionWasCorrectedToAppointedByAdministrator>>(async (context, message, ct) =>
+                await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingUnitId.ToString(), message.Position, context, ct));
+
+            When<Envelope<BuildingUnitPositionWasCorrectedToDerivedFromObject>>(async (context, message, ct) =>
+                await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingUnitId.ToString(), message.Position, context, ct));
+
+            When<Envelope<BuildingUnitPositionWasDerivedFromObject>>(async (context, message, ct) =>
+                await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingUnitId.ToString(), message.Position, context, ct));
+
+            When<Envelope<BuildingUnitStatusWasRemoved>>(async (context, message, ct) =>
+                await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingUnitId.ToString(), message.Position, context, ct));
+
+            When<Envelope<BuildingUnitWasAdded>>(async (context, message, ct) =>
+                await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingUnitId.ToString(), message.Position, context, ct));
+
+            When<Envelope<BuildingUnitWasAddedToRetiredBuilding>>(async (context, message, ct) =>
+                await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingUnitId.ToString(), message.Position, context, ct));
+
+            When<Envelope<BuildingUnitWasCorrectedToNotRealized>>(async (context, message, ct) =>
+                await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingUnitId.ToString(), message.Position, context, ct));
+
+            When<Envelope<BuildingUnitWasCorrectedToPlanned>>(async (context, message, ct) =>
+                await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingUnitId.ToString(), message.Position, context, ct));
+
+            When<Envelope<BuildingUnitWasCorrectedToRealized>>(async (context, message, ct) =>
+                await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingUnitId.ToString(), message.Position, context, ct));
+
+            When<Envelope<BuildingUnitWasCorrectedToRetired>>(async (context, message, ct) =>
+                await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingUnitId.ToString(), message.Position, context, ct));
+
+            When<Envelope<BuildingUnitWasNotRealized>>(async (context, message, ct) =>
+                await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingUnitId.ToString(), message.Position, context, ct));
+
+            When<Envelope<BuildingUnitWasNotRealizedByBuilding>>(async (context, message, ct) =>
+                await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingUnitId.ToString(), message.Position, context, ct));
+
+            When<Envelope<BuildingUnitWasNotRealizedByParent>>(async (context, message, ct) =>
+                await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingUnitId.ToString(), message.Position, context, ct));
+
+            When<Envelope<BuildingUnitWasPlanned>>(async (context, message, ct) =>
+                await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingUnitId.ToString(), message.Position, context, ct));
+
+            When<Envelope<BuildingUnitWasReaddedByOtherUnitRemoval>>(async (context, message, ct) =>
+                await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingUnitId.ToString(), message.Position, context, ct));
+
+            When<Envelope<BuildingUnitWasReaddressed>>(async (context, message, ct) =>
+                await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingUnitId.ToString(), message.Position, context, ct));
+
+            When<Envelope<BuildingUnitWasRealized>>(async (context, message, ct) =>
+                await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingUnitId.ToString(), message.Position, context, ct));
+
+            When<Envelope<BuildingUnitWasRemoved>>(async (context, message, ct) =>
+                await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingUnitId.ToString(), message.Position, context, ct));
+
+            When<Envelope<BuildingUnitWasRetired>>(async (context, message, ct) =>
+                await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingUnitId.ToString(), message.Position, context, ct));
+
+            When<Envelope<BuildingUnitWasRetiredByParent>>(async (context, message, ct) =>
+                await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingUnitId.ToString(), message.Position, context, ct));
+
+            When<Envelope<CommonBuildingUnitWasAdded>>(async (context, message, ct) =>
+                await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingUnitId.ToString(), message.Position, context, ct));
+
+            When<Envelope<BuildingUnitOsloIdWasAssigned>>(async (context, message, ct) =>
+                await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingUnitId.ToString(), message.Position, context, ct));
+        }
+    }
+}

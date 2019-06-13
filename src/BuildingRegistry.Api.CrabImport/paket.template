@@ -1,0 +1,22 @@
+type file
+version 1.0.0
+
+id Be.Vlaanderen.Basisregisters.BuildingRegistry.Api.CrabImport
+title Be.Vlaanderen.Basisregisters.BuildingRegistry.Api.CrabImport
+
+authors Basisregisters.Vlaanderen
+owners Vlaamse overheid
+copyright Copyright (c) Vlaamse overheid
+requireLicenseAcceptance false
+projectUrl https://vlaanderen.be/informatie-vlaanderen
+
+description Building Registry.
+
+files
+  BuildingRegistry.Api.CrabImport.dll => lib\netcoreapp2.2
+  BuildingRegistry.Api.CrabImport.pdb => lib\netcoreapp2.2
+  BuildingRegistry.Api.CrabImport.xml => lib\netcoreapp2.2
+  BuildingRegistry.Api.CrabImport.xml => content
+
+  BuildingRegistry.dll => lib\netcoreapp2.2
+  BuildingRegistry.pdb => lib\netcoreapp2.2

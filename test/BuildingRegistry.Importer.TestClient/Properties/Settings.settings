@@ -1,0 +1,24 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="BuildingRegistry.Importer.TestClient.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="BaseUrl" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">http://localhost:1094</Value>
+    </Setting>
+    <Setting Name="LogFileSizeLimitBytes" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">104857600</Value>
+    </Setting>
+    <Setting Name="ImportEndpoint" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">v1/crabimport</Value>
+    </Setting>
+    <Setting Name="HttpTimeoutInMinutes" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">80</Value>
+    </Setting>
+    <Setting Name="PortToListen" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">12345</Value>
+    </Setting>
+    <Setting Name="ImportBatchStatusEndpoint" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">v1/crabimport/batch/current</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>

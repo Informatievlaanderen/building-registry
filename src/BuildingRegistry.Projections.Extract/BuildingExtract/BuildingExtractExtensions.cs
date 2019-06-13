@@ -1,0 +1,31 @@
+namespace BuildingRegistry.Projections.Extract.BuildingExtract
+{
+    using System;
+    using System.Threading;
+    using System.Threading.Tasks;
+    using Be.Vlaanderen.Basisregisters.ProjectionHandling.Connector;
+
+    public static class BuildingExtractExtensions
+    {
+        public static async Task<BuildingExtractItem> FindAndUpdateBuildingExtract(
+            this ExtractContext context,
+            Guid buildingId,
+            Action<BuildingExtractItem> updateFunc,
+            CancellationToken ct)
+        {
+            var building = await context
+                .BuildingExtract
+                .FindAsync(buildingId, cancellationToken: ct);
+
+            if (building == null)
+                throw DatabaseItemNotFound(buildingId);
+
+            updateFunc(building);
+
+            return building;
+        }
+
+        private static ProjectionItemNotFoundException<BuildingExtractProjections> DatabaseItemNotFound(Guid buildingId)
+            => new ProjectionItemNotFoundException<BuildingExtractProjections>(buildingId.ToString("D"));
+    }
+}

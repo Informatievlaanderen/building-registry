@@ -1,0 +1,8 @@
+Microsoft.Extensions.Configuration
+
+Be.Vlaanderen.Basisregisters.AggregateSource.SqlStreamStore.Autofac
+
+Be.Vlaanderen.Basisregisters.DataDog.Tracing.SqlStreamStore
+
+SourceLink.Embed.AllSourceFiles
+SourceLink.Copy.PdbFiles

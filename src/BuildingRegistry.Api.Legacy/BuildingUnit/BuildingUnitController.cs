@@ -1,0 +1,203 @@
+namespace BuildingRegistry.Api.Legacy.BuildingUnit
+{
+    using Be.Vlaanderen.Basisregisters.Api;
+    using Be.Vlaanderen.Basisregisters.Api.Exceptions;
+    using Be.Vlaanderen.Basisregisters.Api.Search.Filtering;
+    using Be.Vlaanderen.Basisregisters.Api.Search.Pagination;
+    using Be.Vlaanderen.Basisregisters.Api.Search.Sorting;
+    using Be.Vlaanderen.Basisregisters.GrAr.Common;
+    using Be.Vlaanderen.Basisregisters.GrAr.Legacy;
+    using Be.Vlaanderen.Basisregisters.GrAr.Legacy.Gebouweenheid;
+    using Be.Vlaanderen.Basisregisters.GrAr.Legacy.SpatialTools;
+    using Building;
+    using Infrastructure.Options;
+    using Microsoft.AspNetCore.Http;
+    using Microsoft.AspNetCore.Mvc;
+    using Microsoft.EntityFrameworkCore;
+    using Microsoft.Extensions.Options;
+    using Newtonsoft.Json.Converters;
+    using Projections.Legacy;
+    using Projections.Syndication;
+    using Query;
+    using Responses;
+    using Swashbuckle.AspNetCore.Filters;
+    using System;
+    using System.Linq;
+    using System.Threading;
+    using System.Threading.Tasks;
+    using ValueObjects;
+
+    [ApiVersion("1.0")]
+    [AdvertiseApiVersions("1.0")]
+    [ApiRoute("gebouweenheden")]
+    [ApiExplorerSettings(GroupName = "Gebouweenheden")]
+    public class BuildingUnitController : ApiController
+    {
+        /// <summary>
+        /// Vraag een lijst met actieve gebouweenheden op.
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="syndicationContext"></param>
+        /// <param name="responseOptions"></param>
+        /// <param name="cancellationToken"></param>
+        /// <response code="200">Als de opvraging van een lijst met gebouweenheden gelukt is.</response>
+        /// <response code="500">Als er een interne fout is opgetreden.</response>
+        [HttpGet]
+        [ProducesResponseType(typeof(BuildingUnitListResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status412PreconditionFailed)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
+        [SwaggerResponseExample(StatusCodes.Status200OK, typeof(BuildingUnitListResponseExamples), jsonConverter: typeof(StringEnumConverter))]
+        [SwaggerResponseExample(StatusCodes.Status500InternalServerError, typeof(InternalServerErrorResponseExamples), jsonConverter: typeof(StringEnumConverter))]
+        public async Task<IActionResult> List(
+            [FromServices] LegacyContext context,
+            [FromServices] SyndicationContext syndicationContext,
+            [FromServices] IOptions<ResponseOptions> responseOptions,
+            CancellationToken cancellationToken = default)
+        {
+            var filtering = Request.ExtractFilteringRequest<BuildingUnitFilter>();
+            var sorting = Request.ExtractSortingRequest();
+            var pagination = Request.ExtractPaginationRequest();
+
+            var pagedBuildingUnits = new BuildingUnitListQuery(context, syndicationContext)
+                .Fetch(filtering,
+                    sorting,
+                    pagination);
+
+            Response.AddPaginationResponse(pagedBuildingUnits.PaginationInfo);
+            Response.AddSortingResponse(sorting.SortBy, sorting.SortOrder);
+
+            var units = await pagedBuildingUnits.Items
+                .Select(a => new
+                {
+                    a.OsloId,
+                    a.Version,
+                })
+                .ToListAsync(cancellationToken);
+
+            var listResponse = new BuildingUnitListResponse
+            {
+                Gebouweenheden = units
+                    .Select(x => new GebouweenheidCollectieItem(
+                        x.OsloId.Value,
+                        responseOptions.Value.GebouweenheidNaamruimte,
+                        responseOptions.Value.GebouweenheidDetailUrl,
+                        x.Version.ToBelgianDateTimeOffset()))
+                    .ToList(),
+                TotaalAantal = pagedBuildingUnits.PaginationInfo.TotalItems,
+                Volgende = BuildingController.BuildVolgendeUri(pagedBuildingUnits.PaginationInfo, responseOptions.Value.GebouweenheidVolgendeUrl)
+            };
+
+            return Ok(listResponse);
+        }
+
+        /// <summary>
+        /// Vraag een gebouweenheid op.
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="syndicationContext"></param>
+        /// <param name="responseOptions"></param>
+        /// <param name="gebouweenheidId"></param>
+        /// <param name="cancellationToken"></param>
+        /// <response code="200">Als de gebouweenheid gevonden is.</response>
+        /// <response code="404">Als de gebouweenheid niet gevonden kan worden.</response>
+        /// <response code="410">Als de gebouweenheid verwijderd werd.</response>
+        /// <response code="500">Als er een interne fout is opgetreden.</response>
+        [HttpGet("{gebouweenheidId}")]
+        [ProducesResponseType(typeof(BuildingUnitResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status410Gone)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
+        [SwaggerResponseExample(StatusCodes.Status200OK, typeof(BuildingUnitResponseExamples), jsonConverter: typeof(StringEnumConverter))]
+        [SwaggerResponseExample(StatusCodes.Status404NotFound, typeof(BuildingUnitNotFoundResponseExamples), jsonConverter: typeof(StringEnumConverter))]
+        [SwaggerResponseExample(StatusCodes.Status410Gone, typeof(BuildingUnitGoneResponseExamples), jsonConverter: typeof(StringEnumConverter))]
+        [SwaggerResponseExample(StatusCodes.Status500InternalServerError, typeof(InternalServerErrorResponseExamples), jsonConverter: typeof(StringEnumConverter))]
+        public async Task<IActionResult> Get(
+            [FromServices] LegacyContext context,
+            [FromServices] SyndicationContext syndicationContext,
+            [FromServices] IOptions<ResponseOptions> responseOptions,
+            [FromRoute] int gebouweenheidId,
+            CancellationToken cancellationToken = default)
+        {
+            var buildingUnit = await context
+                .BuildingUnitDetails
+                .Include(x => x.Addresses)
+                .AsNoTracking()
+                .SingleOrDefaultAsync(item => item.OsloId == gebouweenheidId, cancellationToken);
+
+            if (buildingUnit == null || !buildingUnit.IsComplete)
+                throw new ApiException("Onbestaande gebouweenheid.", StatusCodes.Status404NotFound);
+
+            if (buildingUnit.IsRemoved)
+                throw new ApiException("Gebouweenheid werd verwijderd.", StatusCodes.Status410Gone);
+
+            var addressIds = buildingUnit.Addresses.Select(x => x.AddressId).ToList();
+            var addressOsloIds = await syndicationContext
+                .AddressOsloIds
+                .Where(x => addressIds.Contains(x.AddressId))
+                .Select(x => x.OsloId)
+                .ToListAsync(cancellationToken);
+
+            var response = new BuildingUnitResponse(
+                buildingUnit.OsloId.Value,
+                responseOptions.Value.GebouwNaamruimte,
+                buildingUnit.Version.ToBelgianDateTimeOffset(),
+                GetBuildingUnitPoint(buildingUnit.Position),
+                MapBuildingUnitGeometryMethod(buildingUnit.PositionMethod.Value),
+                MapBuildingUnitStatus(buildingUnit.Status.Value),
+                MapBuildingUnitFunction(buildingUnit.Function),
+                new GebouweenheidDetailGebouw(buildingUnit.BuildingOsloId.Value.ToString(), string.Format(responseOptions.Value.GebouwDetailUrl, buildingUnit.BuildingOsloId.Value)),
+                addressOsloIds.Select(osloId => new GebouweenheidDetailAdres(osloId, string.Format(responseOptions.Value.AdresUrl, osloId))).ToList());
+
+            return Ok(response);
+        }
+
+        private static PositieGeometrieMethode MapBuildingUnitGeometryMethod(
+            BuildingUnitPositionGeometryMethod geometryMethod)
+        {
+            if (BuildingUnitPositionGeometryMethod.AppointedByAdministrator == geometryMethod)
+                return PositieGeometrieMethode.AangeduidDoorBeheerder;
+            else if (BuildingUnitPositionGeometryMethod.DerivedFromObject == geometryMethod)
+                return PositieGeometrieMethode.AfgeleidVanObject;
+
+            throw new ArgumentOutOfRangeException(nameof(geometryMethod), geometryMethod, null);
+        }
+
+        private static GebouweenheidStatus MapBuildingUnitStatus(
+            BuildingUnitStatus status)
+        {
+            if (BuildingUnitStatus.Planned == status)
+                return GebouweenheidStatus.Gepland;
+            else if (BuildingUnitStatus.NotRealized == status)
+                return GebouweenheidStatus.NietGerealiseerd;
+            else if (BuildingUnitStatus.Realized == status)
+                return GebouweenheidStatus.Gerealiseerd;
+            else if (BuildingUnitStatus.Retired == status)
+                return GebouweenheidStatus.Gehistoreerd;
+
+            throw new ArgumentOutOfRangeException(nameof(status), status, null);
+        }
+
+        private static GebouweenheidFunctie? MapBuildingUnitFunction(
+            BuildingUnitFunction? function)
+        {
+            if (function == null)
+                return null;
+            if (BuildingUnitFunction.Common == function)
+                return GebouweenheidFunctie.GemeenschappelijkDeel;
+            else if (BuildingUnitFunction.Unknown == function)
+                return GebouweenheidFunctie.NietGekend;
+
+            throw new ArgumentOutOfRangeException(nameof(function), function, null);
+        }
+
+        public static Point GetBuildingUnitPoint(byte[] geometry)
+        {
+            var point = WKBReaderFactory.Create().Read(geometry);
+            return new Point
+            {
+                XmlPoint = new GmlPoint { Pos = $"{point.Coordinate.X} {point.Coordinate.Y}" },
+                JsonPoint = new GeoJSONPoint { Coordinates = new[] { point.Coordinate.X, point.Coordinate.Y } }
+            };
+        }
+    }
+}

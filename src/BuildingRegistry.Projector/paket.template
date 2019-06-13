@@ -1,0 +1,28 @@
+type file
+version 1.0.0
+
+id Be.Vlaanderen.Basisregisters.BuildingRegistry.Projector
+title Be.Vlaanderen.Basisregisters.BuildingRegistry.Projector
+
+authors Basisregisters Vlaanderen
+owners agentschap Informatie Vlaanderen <https://vlaanderen.be/informatie-vlaanderen>
+copyright Copyright (c) agentschap Informatie Vlaanderen
+requireLicenseAcceptance false
+projectUrl https://github.com/Informatievlaanderen/building-registry
+iconUrl https://raw.githubusercontent.com/Informatievlaanderen/build-pipeline/master/logo.png
+licenseUrl https://opensource.org/licenses/EUPL-1.2
+
+description Building Registry Projector API.
+
+dependencies
+  framework: netstandard20
+    Be.Vlaanderen.Basisregisters.Api ~> 7.0
+    Be.Vlaanderen.Basisregisters.EventHandling.Autofac ~> 1.0
+    Be.Vlaanderen.Basisregisters.DataDog.Tracing.Autofac ~> 3.2
+    Be.Vlaanderen.Basisregisters.Projector ~> 3.1
+
+files
+  BuildingRegistry.Projector.dll => lib\netcoreapp2.2
+  BuildingRegistry.Projector.pdb => lib\netcoreapp2.2
+  BuildingRegistry.Projector.xml => lib\netcoreapp2.2
+  BuildingRegistry.Projector.xml => content

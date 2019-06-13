@@ -1,0 +1,5 @@
+Microsoft.EntityFrameworkCore.Design
+Microsoft.EntityFrameworkCore.SqlServer.NetTopologySuite
+
+SourceLink.Embed.AllSourceFiles
+SourceLink.Copy.PdbFiles
