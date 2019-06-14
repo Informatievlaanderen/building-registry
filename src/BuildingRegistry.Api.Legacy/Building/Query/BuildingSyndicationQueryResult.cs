@@ -8,6 +8,7 @@ namespace BuildingRegistry.Api.Legacy.Building.Query
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using GeoAPI.Geometries;
     using ValueObjects;
 
     public class BuildingSyndicationQueryResult
@@ -23,7 +24,7 @@ namespace BuildingRegistry.Api.Legacy.Building.Query
         public Instant LastChangedOn { get; }
         public BuildingStatus? Status { get; }
         public BuildingGeometryMethod? GeometryMethod { get; }
-        public byte[] Geometry { get; }
+        public IPolygon Geometry { get; }
         public bool IsComplete { get; }
         public Organisation? Organisation { get; }
         public string Reason { get; }
@@ -75,7 +76,7 @@ namespace BuildingRegistry.Api.Legacy.Building.Query
             int? osloId,
             BuildingStatus? status,
             BuildingGeometryMethod? geometryMethod,
-            byte[] geometry,
+            IPolygon geometry,
             string changeType,
             Instant recordCreateAt,
             Instant lastChangedOn,
@@ -104,7 +105,7 @@ namespace BuildingRegistry.Api.Legacy.Building.Query
                 x.Function,
                 x.Status,
                 x.PositionMethod,
-                x.PositionWkbHex.ToByteArray(),
+                x.PointPosition,
                 x.IsComplete,
                 x.Addresses,
                 x.Readdresses,
@@ -118,7 +119,7 @@ namespace BuildingRegistry.Api.Legacy.Building.Query
             int? osloId,
             BuildingStatus? status,
             BuildingGeometryMethod? geometryMethod,
-            byte[] geometry,
+            IPolygon geometry,
             string changeType,
             Instant recordCreateAt,
             Instant lastChangedOn,
@@ -155,7 +156,7 @@ namespace BuildingRegistry.Api.Legacy.Building.Query
         public BuildingUnitFunction? Function { get; }
         public BuildingUnitStatus? Status { get; }
         public BuildingUnitPositionGeometryMethod? GeometryMethod { get; }
-        public byte[] Geometry { get; }
+        public IPoint Geometry { get; }
         public bool IsComplete { get; }
         public Instant Version { get; }
         public IEnumerable<Guid> AddressIds { get; }
@@ -166,7 +167,7 @@ namespace BuildingRegistry.Api.Legacy.Building.Query
             BuildingUnitFunction? function,
             BuildingUnitStatus? status,
             BuildingUnitPositionGeometryMethod? geometryMethod,
-            byte[] geometry,
+            IPoint geometry,
             bool isComplete,
             IEnumerable<BuildingUnitAddressSyndicationItem> addresses,
             IEnumerable<BuildingUnitReaddressSyndicationItem> readdresses,

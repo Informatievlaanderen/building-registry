@@ -10,12 +10,19 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetail
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
+    using Be.Vlaanderen.Basisregisters.Utilities.HexByteConvertor;
+    using GeoAPI.Geometries;
+    using NetTopologySuite.IO;
     using ValueObjects;
 
     public class BuildingUnitDetailProjections : ConnectedProjection<LegacyContext>
     {
-        public BuildingUnitDetailProjections()
+        private readonly WKBReader _wkbReader;
+
+        public BuildingUnitDetailProjections(WKBReader wkbReader)
         {
+            _wkbReader = wkbReader;
+
             #region Building
             When<Envelope<BuildingWasRemoved>>(async (context, message, ct) =>
             {
@@ -231,32 +238,28 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetail
             When<Envelope<BuildingUnitPositionWasAppointedByAdministrator>>(async (context, message, ct) =>
             {
                 var buildingUnit = await context.BuildingUnitDetails.FindAsync(message.Message.BuildingUnitId, cancellationToken: ct);
-                buildingUnit.Position = new WkbGeometry(message.Message.Position);
-                buildingUnit.PositionMethod = BuildingUnitPositionGeometryMethod.AppointedByAdministrator;
+                SetGeometry(buildingUnit, message.Message.Position, BuildingUnitPositionGeometryMethod.AppointedByAdministrator);
                 SetVersion(buildingUnit, message.Message.Provenance.Timestamp);
             });
 
             When<Envelope<BuildingUnitPositionWasCorrectedToAppointedByAdministrator>>(async (context, message, ct) =>
             {
                 var buildingUnit = await context.BuildingUnitDetails.FindAsync(message.Message.BuildingUnitId, cancellationToken: ct);
-                buildingUnit.Position = new WkbGeometry(message.Message.Position);
-                buildingUnit.PositionMethod = BuildingUnitPositionGeometryMethod.AppointedByAdministrator;
+                SetGeometry(buildingUnit, message.Message.Position, BuildingUnitPositionGeometryMethod.AppointedByAdministrator);
                 SetVersion(buildingUnit, message.Message.Provenance.Timestamp);
             });
 
             When<Envelope<BuildingUnitPositionWasCorrectedToDerivedFromObject>>(async (context, message, ct) =>
             {
                 var buildingUnit = await context.BuildingUnitDetails.FindAsync(message.Message.BuildingUnitId, cancellationToken: ct);
-                buildingUnit.Position = new WkbGeometry(message.Message.Position);
-                buildingUnit.PositionMethod = BuildingUnitPositionGeometryMethod.DerivedFromObject;
+                SetGeometry(buildingUnit, message.Message.Position, BuildingUnitPositionGeometryMethod.DerivedFromObject);
                 SetVersion(buildingUnit, message.Message.Provenance.Timestamp);
             });
 
             When<Envelope<BuildingUnitPositionWasDerivedFromObject>>(async (context, message, ct) =>
             {
                 var buildingUnit = await context.BuildingUnitDetails.FindAsync(message.Message.BuildingUnitId, cancellationToken: ct);
-                buildingUnit.Position = new WkbGeometry(message.Message.Position);
-                buildingUnit.PositionMethod = BuildingUnitPositionGeometryMethod.DerivedFromObject;
+                SetGeometry(buildingUnit, message.Message.Position, BuildingUnitPositionGeometryMethod.DerivedFromObject);
                 SetVersion(buildingUnit, message.Message.Provenance.Timestamp);
             });
 
@@ -405,6 +408,17 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetail
             await context
                 .BuildingUnitDetails
                 .AddAsync(buildingUnitDetailItem, cancellationToken: ct);
+        }
+
+        private void SetGeometry(
+            BuildingUnitDetailItem buildingUnit,
+            string extendedWkb,
+            BuildingUnitPositionGeometryMethod method)
+        {
+            var geometry = (IPoint)_wkbReader.Read(extendedWkb.ToByteArray());
+
+            buildingUnit.PositionMethod = method;
+            buildingUnit.Position = geometry;
         }
     }
 }

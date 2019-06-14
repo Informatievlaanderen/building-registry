@@ -8,12 +8,19 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
     using System;
     using System.Linq;
     using System.Xml.Linq;
+    using Be.Vlaanderen.Basisregisters.Utilities.HexByteConvertor;
+    using GeoAPI.Geometries;
+    using NetTopologySuite.IO;
     using ValueObjects;
 
     public class BuildingSyndicationProjections : ConnectedProjection<LegacyContext>
     {
-        public BuildingSyndicationProjections()
+        private readonly WKBReader _wkbReader;
+
+        public BuildingSyndicationProjections(WKBReader wkbReader)
         {
+            _wkbReader = wkbReader;
+
             #region Building Events
 
             When<Envelope<BuildingWasRegistered>>(async (context, message, ct) =>
@@ -124,7 +131,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
                     x =>
                     {
                         x.GeometryMethod = null;
-                        x.GeometryWkbHex = null;
+                        x.Geometry = null;
                     });
 
                 newSyndicationItem.EventDataAsXml = GetEventDataAsXmlString(message.Message);
@@ -153,7 +160,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
                     x =>
                     {
                         x.GeometryMethod = BuildingGeometryMethod.MeasuredByGrb;
-                        x.GeometryWkbHex = message.Message.ExtendedWkb;
+                        x.Geometry = (IPolygon)_wkbReader.Read(message.Message.ExtendedWkb.ToByteArray());
                     });
 
                 newSyndicationItem.EventDataAsXml = GetEventDataAsXmlString(message.Message);
@@ -205,7 +212,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
                     x =>
                     {
                         x.GeometryMethod = BuildingGeometryMethod.Outlined;
-                        x.GeometryWkbHex = message.Message.ExtendedWkb;
+                        x.Geometry = (IPolygon)_wkbReader.Read(message.Message.ExtendedWkb.ToByteArray());
                     });
 
                 newSyndicationItem.EventDataAsXml = GetEventDataAsXmlString(message.Message);
@@ -408,7 +415,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
                     x =>
                     {
                         x.GeometryMethod = BuildingGeometryMethod.MeasuredByGrb;
-                        x.GeometryWkbHex = message.Message.ExtendedWkb;
+                        x.Geometry = (IPolygon)_wkbReader.Read(message.Message.ExtendedWkb.ToByteArray());
                     });
 
                 newSyndicationItem.EventDataAsXml = GetEventDataAsXmlString(message.Message);
@@ -462,7 +469,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
                     x =>
                     {
                         x.GeometryMethod = BuildingGeometryMethod.Outlined;
-                        x.GeometryWkbHex = message.Message.ExtendedWkb;
+                        x.Geometry = (IPolygon)_wkbReader.Read(message.Message.ExtendedWkb.ToByteArray());
                     });
 
                 newSyndicationItem.EventDataAsXml = GetEventDataAsXmlString(message.Message);
@@ -953,7 +960,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
                     {
                         var unit = x.BuildingUnits.Single(y => y.BuildingUnitId == message.Message.BuildingUnitId);
                         unit.PositionMethod = BuildingUnitPositionGeometryMethod.AppointedByAdministrator;
-                        unit.PositionWkbHex = message.Message.Position;
+                        unit.PointPosition = (IPoint)_wkbReader.Read(message.Message.Position.ToByteArray());
                         ApplyUnitVersion(unit, message.Message.Provenance.Timestamp);
                     });
 
@@ -983,7 +990,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
                     {
                         var unit = x.BuildingUnits.Single(y => y.BuildingUnitId == message.Message.BuildingUnitId);
                         unit.PositionMethod = BuildingUnitPositionGeometryMethod.AppointedByAdministrator;
-                        unit.PositionWkbHex = message.Message.Position;
+                        unit.PointPosition = (IPoint)_wkbReader.Read(message.Message.Position.ToByteArray());
                         ApplyUnitVersion(unit, message.Message.Provenance.Timestamp);
                     });
 
@@ -1013,7 +1020,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
                     {
                         var unit = x.BuildingUnits.Single(y => y.BuildingUnitId == message.Message.BuildingUnitId);
                         unit.PositionMethod = BuildingUnitPositionGeometryMethod.DerivedFromObject;
-                        unit.PositionWkbHex = message.Message.Position;
+                        unit.PointPosition = (IPoint)_wkbReader.Read(message.Message.Position.ToByteArray());
                         ApplyUnitVersion(unit, message.Message.Provenance.Timestamp);
                     });
 
@@ -1043,7 +1050,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
                     {
                         var unit = x.BuildingUnits.Single(y => y.BuildingUnitId == message.Message.BuildingUnitId);
                         unit.PositionMethod = BuildingUnitPositionGeometryMethod.DerivedFromObject;
-                        unit.PositionWkbHex = message.Message.Position;
+                        unit.PointPosition = (IPoint)_wkbReader.Read(message.Message.Position.ToByteArray());
                         ApplyUnitVersion(unit, message.Message.Provenance.Timestamp);
                     });
 

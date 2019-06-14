@@ -4,6 +4,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
     using System.Collections.ObjectModel;
     using System.Linq;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
+    using GeoAPI.Geometries;
     using Infrastructure;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -18,7 +19,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
         public int? OsloId { get; set; }
         public string ChangeType { get; set; }
 
-        public string GeometryWkbHex { get; set; }
+        public IPolygon Geometry { get; set; }
         public BuildingGeometryMethod? GeometryMethod { get; set; }
 
         public BuildingStatus? Status { get; set; }
@@ -69,7 +70,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
                 BuildingId = BuildingId,
                 OsloId = OsloId,
                 GeometryMethod = GeometryMethod,
-                GeometryWkbHex = GeometryWkbHex,
+                Geometry = Geometry,
                 Status = Status,
                 IsComplete = IsComplete,
                 RecordCreatedAt = RecordCreatedAt,
@@ -102,7 +103,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
             b.Property(x => x.BuildingId).IsRequired();
             b.Property(x => x.ChangeType);
 
-            b.Property(x => x.GeometryWkbHex);
+            b.Property(x => x.Geometry);
             b.Property(x => x.GeometryMethod);
 
             b.Property(x => x.Status);
