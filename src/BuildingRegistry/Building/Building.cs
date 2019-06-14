@@ -9,6 +9,7 @@ namespace BuildingRegistry.Building
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using ValueObjects;
     using ValueObjects.Crab;
 
@@ -487,7 +488,7 @@ namespace BuildingRegistry.Building
                                 _buildingId,
                                 assignBuildingUnitOsloId.OsloId,
                                 assignBuildingUnitOsloId.OsloAssignmentDate,
-                                "Due to duplication the common building unit with this OsloId should never have existed."));
+                                new Reason("Due to duplication the common building unit with this OsloId should never have existed.")));
                     }
 
                     foreach (var assignBuildingUnitOsloId in assignBuildingUnitOsloIdByUnit.OrderByDescending(x =>
@@ -528,7 +529,7 @@ namespace BuildingRegistry.Building
                                             _buildingId,
                                             assignBuildingUnitOsloId.OsloId,
                                             assignBuildingUnitOsloId.OsloAssignmentDate,
-                                            "The building unit with this OsloId should never have existed. Could not mark as duplicate as no candidate was found."));
+                                            new Reason("The building unit with this OsloId should never have existed. Could not mark as duplicate as no candidate was found.")));
                                     }
                                 }
                                 else
@@ -538,7 +539,7 @@ namespace BuildingRegistry.Building
                                         _buildingId,
                                         assignBuildingUnitOsloId.OsloId,
                                         assignBuildingUnitOsloId.OsloAssignmentDate,
-                                        "The building unit with this OsloId should never have existed. Could not mark as duplicate because multiple candidates were found."));
+                                        new Reason("The building unit with this OsloId should never have existed. Could not mark as duplicate because multiple candidates were found.")));
                                 }
                             }
                             else
@@ -548,7 +549,7 @@ namespace BuildingRegistry.Building
                                     _buildingId,
                                     assignBuildingUnitOsloId.OsloId,
                                     assignBuildingUnitOsloId.OsloAssignmentDate,
-                                    "The building unit with this OsloId should never have existed. Due to insufficient data it can not be marked as duplicate."));
+                                    new Reason("The building unit with this OsloId should never have existed. Due to insufficient data it can not be marked as duplicate.")));
                             }
                         }
                         //case 5
@@ -581,7 +582,7 @@ namespace BuildingRegistry.Building
                                     _buildingId,
                                     assignBuildingUnitOsloId.OsloId,
                                     assignBuildingUnitOsloId.OsloAssignmentDate,
-                                    "The building unit with this OsloId should never have existed. Could not mark as duplicate as no candidate was found."));
+                                    new Reason("The building unit with this OsloId should never have existed. Could not mark as duplicate as no candidate was found.")));
                             }
                         }
                         else if (!nonActiveUnitsWithoutOsloIdByKey.ContainsKey(buildingUnitKey))
@@ -590,7 +591,7 @@ namespace BuildingRegistry.Building
                                 _buildingId,
                                 assignBuildingUnitOsloId.OsloId,
                                 assignBuildingUnitOsloId.OsloAssignmentDate,
-                                "The building unit with this OsloId should never have existed due to readdressing. Could not mark as duplicate as no candidate was found."));
+                                new Reason("The building unit with this OsloId should never have existed due to readdressing. Could not mark as duplicate as no candidate was found.")));
                         }
                         else
                         {
@@ -603,7 +604,7 @@ namespace BuildingRegistry.Building
                                     _buildingId,
                                     assignBuildingUnitOsloId.OsloId,
                                     assignBuildingUnitOsloId.OsloAssignmentDate,
-                                    "Due to duplication, the building unit with this OsloId should never have existed. Could not mark as duplicate as no candidate was found."));
+                                    new Reason("Due to duplication, the building unit with this OsloId should never have existed. Could not mark as duplicate as no candidate was found.")));
 
                             ApplyBuildingUnitOsloIdWithDuplicateCheck(
                                 buildingUnit,

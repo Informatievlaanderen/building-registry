@@ -21,7 +21,6 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
             typeof(LocalDate),
             typeof(LocalDateTime),
             typeof(DateTimeOffset),
-            typeof(Reason),
             typeof(Organisation),
             typeof(Modification)
         };
