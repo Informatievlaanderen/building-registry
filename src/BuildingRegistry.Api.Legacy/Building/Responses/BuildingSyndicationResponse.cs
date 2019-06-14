@@ -336,7 +336,7 @@ namespace BuildingRegistry.Api.Legacy.Building.Responses
                         DateTimeOffset.Now,
                         true,
                         Organisation.Agiv,
-                        Reason.Unknown,
+                        Reason.CentralManagementCrab,
                         new List<BuildingUnitSyndicationContent>
                         {
                             new BuildingUnitSyndicationContent(
