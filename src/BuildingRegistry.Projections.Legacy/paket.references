@@ -9,4 +9,4 @@ Be.Vlaanderen.Basisregisters.GrAr.Legacy
 SourceLink.Embed.AllSourceFiles
 SourceLink.Copy.PdbFiles
 
-Microsoft.EntityFrameworkCore.Design
+Microsoft.EntityFrameworkCore.SqlServer.NetTopologySuite

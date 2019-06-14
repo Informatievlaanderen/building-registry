@@ -112,9 +112,9 @@ namespace BuildingRegistry.Projector.Infrastructure.Modules
                 .RegisterProjectionMigrator<LegacyContextMigrationFactory>(
                     _configuration,
                     _loggerFactory)
-                .RegisterProjections<BuildingDetailProjections, LegacyContext>()
+                .RegisterProjections<BuildingDetailProjections, LegacyContext>(() => new BuildingDetailProjections(WKBReaderFactory.Create()))
                 .RegisterProjections<BuildingSyndicationProjections, LegacyContext>()
-                .RegisterProjections<BuildingUnitDetailProjections, LegacyContext>();
+                .RegisterProjections<BuildingUnitDetailProjections, LegacyContext>(() => new BuildingUnitDetailProjections(WKBReaderFactory.Create()));
         }
 
         private void RegisterWmsProjections(ContainerBuilder builder)

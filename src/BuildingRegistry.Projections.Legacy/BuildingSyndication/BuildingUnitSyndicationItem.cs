@@ -6,6 +6,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
     using System;
     using System.Collections.ObjectModel;
     using System.Linq;
+    using GeoAPI.Geometries;
     using NodaTime;
     using ValueObjects;
 
@@ -14,7 +15,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
         public long Position { get; set; }
         public Guid BuildingUnitId { get; set; }
         public int? OsloId { get; set; }
-        public string PositionWkbHex { get; set; }
+        public IPoint PointPosition { get; set; }
         public bool IsComplete { get; set; }
 
         public BuildingUnitFunction? Function
@@ -63,7 +64,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
                 Position = position,
                 BuildingUnitId = BuildingUnitId,
                 OsloId = OsloId,
-                PositionWkbHex = PositionWkbHex,
+                PointPosition = PointPosition,
                 Function = Function,
                 PositionMethod = PositionMethod,
                 Status = Status,
@@ -90,7 +91,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
             b.Property(p => p.Position);
             b.Property(p => p.BuildingUnitId);
             b.Property(p => p.OsloId);
-            b.Property(p => p.PositionWkbHex);
+            b.Property(p => p.PointPosition);
 
             b.Ignore(p => p.Version);
             b.Property(p => p.VersionTimestampAsDateTimeOffset)

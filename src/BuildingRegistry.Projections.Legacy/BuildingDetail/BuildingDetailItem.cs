@@ -5,6 +5,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingDetail
     using Microsoft.EntityFrameworkCore.Metadata.Builders;
     using NodaTime;
     using System;
+    using GeoAPI.Geometries;
     using ValueObjects;
 
     public class BuildingDetailItem
@@ -14,7 +15,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingDetail
         public Guid BuildingId { get; set; }
         public int? OsloId { get; set; }
         public BuildingGeometryMethod? GeometryMethod { get; set; }
-        public byte[] Geometry { get; set; }
+        public IPolygon Geometry { get; set; }
         public BuildingStatus? Status { get; set; }
         public bool IsComplete { get; set; }
         public bool IsRemoved { get; set; }

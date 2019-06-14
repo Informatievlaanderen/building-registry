@@ -91,9 +91,8 @@ namespace BuildingRegistry.Api.Legacy.Building
                 .Select(x => x.OsloId)
                 .ToListAsync(cancellationToken);
 
-            var buildingGeometry = WKBReaderFactory.Create().Read(building.Geometry);
             var parcels = grbBuildingParcel
-                .GetUnderlyingParcels(buildingGeometry)
+                .GetUnderlyingParcels(building.Geometry)
                 .Select(s => CaPaKey.CreateFrom(s).VbrCaPaKey)
                 .Distinct();
 
@@ -109,7 +108,7 @@ namespace BuildingRegistry.Api.Legacy.Building
                 building.OsloId.Value,
                 responseOptions.Value.GebouwNaamruimte,
                 building.Version.ToBelgianDateTimeOffset(),
-                GetBuildingPolygon(buildingGeometry),
+                GetBuildingPolygon(building.Geometry),
                 MapGeometryMethod(building.GeometryMethod.Value),
                 MapBuildingStatus(building.Status.Value),
                 buildingUnits.Select(x => new GebouwDetailGebouweenheid(x.ToString(), string.Format(responseOptions.Value.GebouweenheidDetailUrl, x))).ToList(),
@@ -172,12 +171,12 @@ namespace BuildingRegistry.Api.Legacy.Building
             return Ok(listResponse);
         }
 
-        internal static Polygon GetBuildingPolygon(IGeometry geometry)
+        internal static Polygon GetBuildingPolygon(IPolygon geometry)
         {
             return new Polygon
             {
-                XmlPolygon = MapGmlPolygon(geometry as IPolygon),
-                JsonPolygon = MapToGeoJsonPolygon(geometry as IPolygon)
+                XmlPolygon = MapGmlPolygon(geometry),
+                JsonPolygon = MapToGeoJsonPolygon(geometry)
             };
         }
 

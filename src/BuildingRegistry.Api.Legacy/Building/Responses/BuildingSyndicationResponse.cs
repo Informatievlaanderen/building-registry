@@ -109,7 +109,7 @@ namespace BuildingRegistry.Api.Legacy.Building.Responses
                     building.GeometryMethod?.ConvertFromBuildingGeometryMethod(),
                     building.Geometry == null
                         ? null
-                        : BuildingController.GetBuildingPolygon(WkbReader.Read(building.Geometry)).XmlPolygon,
+                        : BuildingController.GetBuildingPolygon(building.Geometry).XmlPolygon,
                     building.LastChangedOn.ToBelgianDateTimeOffset(),
                     building.IsComplete,
                     building.Organisation,

@@ -25,6 +25,7 @@ namespace BuildingRegistry.Api.Legacy.BuildingUnit
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
+    using GeoAPI.Geometries;
     using ValueObjects;
 
     [ApiVersion("1.0")]
@@ -190,9 +191,8 @@ namespace BuildingRegistry.Api.Legacy.BuildingUnit
             throw new ArgumentOutOfRangeException(nameof(function), function, null);
         }
 
-        public static Point GetBuildingUnitPoint(byte[] geometry)
+        public static Point GetBuildingUnitPoint(IPoint point)
         {
-            var point = WKBReaderFactory.Create().Read(geometry);
             return new Point
             {
                 XmlPoint = new GmlPoint { Pos = $"{point.Coordinate.X} {point.Coordinate.Y}" },
