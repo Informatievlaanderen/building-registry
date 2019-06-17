@@ -1,3 +1,10 @@
+## [1.0.1](https://github.com/informatievlaanderen/building-registry/compare/v1.0.0...v1.0.1) (2019-06-17)
+
+
+### Bug Fixes
+
+* push projector package ([0b34f1a](https://github.com/informatievlaanderen/building-registry/commit/0b34f1a))
+
 # 1.0.0 (2019-06-17)
 
 
