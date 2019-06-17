@@ -38,7 +38,8 @@ namespace BuildingRegistry.Projections.Legacy.Migrations
                     b.Property<Guid>("BuildingId")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<IPolygon>("Geometry");
+                    b.Property<IPolygon>("Geometry")
+                        .HasColumnType("sys.geometry");
 
                     b.Property<int?>("GeometryMethod");
 
@@ -76,7 +77,8 @@ namespace BuildingRegistry.Projections.Legacy.Migrations
 
                     b.Property<string>("EventDataAsXml");
 
-                    b.Property<IPolygon>("Geometry");
+                    b.Property<IPolygon>("Geometry")
+                        .HasColumnType("sys.geometry");
 
                     b.Property<int?>("GeometryMethod");
 
@@ -158,7 +160,8 @@ namespace BuildingRegistry.Projections.Legacy.Migrations
 
                     b.Property<int?>("OsloId");
 
-                    b.Property<IPoint>("PointPosition");
+                    b.Property<IPoint>("PointPosition")
+                        .HasColumnType("sys.geometry");
 
                     b.Property<string>("PositionMethodAsString")
                         .HasColumnName("PositionMethod");
@@ -224,7 +227,8 @@ namespace BuildingRegistry.Projections.Legacy.Migrations
 
                     b.Property<int?>("OsloId");
 
-                    b.Property<IPoint>("Position");
+                    b.Property<IPoint>("Position")
+                        .HasColumnType("sys.geometry");
 
                     b.Property<string>("PositionMethodAsString")
                         .HasColumnName("PositionMethod");

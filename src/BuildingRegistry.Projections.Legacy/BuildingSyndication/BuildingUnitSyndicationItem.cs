@@ -91,7 +91,8 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
             b.Property(p => p.Position);
             b.Property(p => p.BuildingUnitId);
             b.Property(p => p.OsloId);
-            b.Property(p => p.PointPosition);
+            b.Property(p => p.PointPosition)
+                .HasColumnType("sys.geometry");
 
             b.Ignore(p => p.Version);
             b.Property(p => p.VersionTimestampAsDateTimeOffset)

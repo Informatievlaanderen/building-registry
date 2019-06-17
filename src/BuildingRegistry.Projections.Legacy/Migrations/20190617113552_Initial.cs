@@ -1,4 +1,5 @@
-using System;
+﻿using System;
+using GeoAPI.Geometries;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace BuildingRegistry.Projections.Legacy.Migrations
@@ -18,7 +19,7 @@ namespace BuildingRegistry.Projections.Legacy.Migrations
                     BuildingId = table.Column<Guid>(nullable: false),
                     OsloId = table.Column<int>(nullable: true),
                     GeometryMethod = table.Column<int>(nullable: true),
-                    Geometry = table.Column<byte[]>(nullable: true),
+                    Geometry = table.Column<IPolygon>(type: "sys.geometry", nullable: true),
                     Status = table.Column<int>(nullable: true),
                     IsComplete = table.Column<bool>(nullable: false),
                     IsRemoved = table.Column<bool>(nullable: false),
@@ -39,7 +40,7 @@ namespace BuildingRegistry.Projections.Legacy.Migrations
                     BuildingId = table.Column<Guid>(nullable: false),
                     OsloId = table.Column<int>(nullable: true),
                     ChangeType = table.Column<string>(nullable: true),
-                    GeometryWkbHex = table.Column<string>(nullable: true),
+                    Geometry = table.Column<IPolygon>(type: "sys.geometry", nullable: true),
                     GeometryMethod = table.Column<int>(nullable: true),
                     Status = table.Column<int>(nullable: true),
                     IsComplete = table.Column<bool>(nullable: false),
@@ -49,7 +50,8 @@ namespace BuildingRegistry.Projections.Legacy.Migrations
                     Modification = table.Column<int>(nullable: true),
                     Operator = table.Column<string>(nullable: true),
                     Organisation = table.Column<int>(nullable: true),
-                    Plan = table.Column<int>(nullable: true)
+                    Reason = table.Column<string>(nullable: true),
+                    EventDataAsXml = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
@@ -80,7 +82,7 @@ namespace BuildingRegistry.Projections.Legacy.Migrations
                     BuildingId = table.Column<Guid>(nullable: false),
                     OsloId = table.Column<int>(nullable: true),
                     BuildingOsloId = table.Column<int>(nullable: true),
-                    Position = table.Column<byte[]>(nullable: true),
+                    Position = table.Column<IPoint>(type: "sys.geometry", nullable: true),
                     IsComplete = table.Column<bool>(nullable: false),
                     IsRemoved = table.Column<bool>(nullable: false),
                     IsBuildingComplete = table.Column<bool>(nullable: false),
@@ -117,11 +119,12 @@ namespace BuildingRegistry.Projections.Legacy.Migrations
                     Position = table.Column<long>(nullable: false),
                     BuildingUnitId = table.Column<Guid>(nullable: false),
                     OsloId = table.Column<int>(nullable: true),
-                    PositionWkbHex = table.Column<string>(nullable: true),
+                    PointPosition = table.Column<IPoint>(type: "sys.geometry", nullable: true),
                     IsComplete = table.Column<bool>(nullable: false),
                     Function = table.Column<string>(nullable: true),
                     PositionMethod = table.Column<string>(nullable: true),
-                    Status = table.Column<string>(nullable: true)
+                    Status = table.Column<string>(nullable: true),
+                    Version = table.Column<DateTimeOffset>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -174,6 +177,30 @@ namespace BuildingRegistry.Projections.Legacy.Migrations
                         .Annotation("SqlServer:Clustered", false);
                     table.ForeignKey(
                         name: "FK_BuildingUnitAddressSyndication_BuildingUnitSyndication_Position_BuildingUnitId",
+                        columns: x => new { x.Position, x.BuildingUnitId },
+                        principalSchema: "BuildingRegistryLegacy",
+                        principalTable: "BuildingUnitSyndication",
+                        principalColumns: new[] { "Position", "BuildingUnitId" },
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "BuildingUnitReaddressSyndication",
+                schema: "BuildingRegistryLegacy",
+                columns: table => new
+                {
+                    Position = table.Column<long>(nullable: false),
+                    BuildingUnitId = table.Column<Guid>(nullable: false),
+                    OldAddressId = table.Column<Guid>(nullable: false),
+                    NewAddressId = table.Column<Guid>(nullable: false),
+                    ReaddressDate = table.Column<DateTime>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_BuildingUnitReaddressSyndication", x => new { x.Position, x.BuildingUnitId, x.OldAddressId })
+                        .Annotation("SqlServer:Clustered", false);
+                    table.ForeignKey(
+                        name: "FK_BuildingUnitReaddressSyndication_BuildingUnitSyndication_Position_BuildingUnitId",
                         columns: x => new { x.Position, x.BuildingUnitId },
                         principalSchema: "BuildingRegistryLegacy",
                         principalTable: "BuildingUnitSyndication",
@@ -238,6 +265,10 @@ namespace BuildingRegistry.Projections.Legacy.Migrations
 
             migrationBuilder.DropTable(
                 name: "BuildingUnitAddressSyndication",
+                schema: "BuildingRegistryLegacy");
+
+            migrationBuilder.DropTable(
+                name: "BuildingUnitReaddressSyndication",
                 schema: "BuildingRegistryLegacy");
 
             migrationBuilder.DropTable(

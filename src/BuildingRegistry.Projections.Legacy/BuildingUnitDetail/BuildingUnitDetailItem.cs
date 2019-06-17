@@ -71,7 +71,8 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetail
                 .ForSqlServerIsClustered(false);
 
             b.Property(p => p.BuildingId);
-            b.Property(p => p.Position);
+            b.Property(p => p.Position)
+                .HasColumnType("sys.geometry");
 
             b.Property(BuildingUnitDetailItem.VersionTimestampBackingPropertyName)
                 .HasColumnName("Version");
