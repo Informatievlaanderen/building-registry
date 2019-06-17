@@ -103,7 +103,8 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
             b.Property(x => x.BuildingId).IsRequired();
             b.Property(x => x.ChangeType);
 
-            b.Property(x => x.Geometry);
+            b.Property(x => x.Geometry)
+                .HasColumnType("sys.geometry");
             b.Property(x => x.GeometryMethod);
 
             b.Property(x => x.Status);

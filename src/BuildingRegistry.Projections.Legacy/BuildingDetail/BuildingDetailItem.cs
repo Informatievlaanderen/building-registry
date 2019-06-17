@@ -46,7 +46,8 @@ namespace BuildingRegistry.Projections.Legacy.BuildingDetail
 
             b.Property(p => p.BuildingId);
             b.Property(p => p.GeometryMethod);
-            b.Property(p => p.Geometry);
+            b.Property(p => p.Geometry)
+                .HasColumnType("sys.geometry");
             b.Property(p => p.Status);
             b.Property(p => p.IsComplete);
             b.Property(p => p.IsRemoved);

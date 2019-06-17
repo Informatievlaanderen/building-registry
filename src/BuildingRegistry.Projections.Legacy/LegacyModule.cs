@@ -25,6 +25,7 @@ namespace BuildingRegistry.Projections.Legacy
                     {
                         sqlServerOptions.EnableRetryOnFailure();
                         sqlServerOptions.MigrationsHistoryTable(MigrationTables.Legacy, Schema.Legacy);
+                        sqlServerOptions.UseNetTopologySuite();
                     }));
 
             logger.LogInformation(

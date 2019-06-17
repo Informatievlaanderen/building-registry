@@ -4,11 +4,16 @@ namespace BuildingRegistry.Projections.Legacy
     using BuildingDetail;
     using BuildingSyndication;
     using BuildingUnitDetail;
+    using Infrastructure;
     using Microsoft.EntityFrameworkCore;
+    using Microsoft.EntityFrameworkCore.Design;
+    using Microsoft.Extensions.Configuration;
+    using System;
+    using System.IO;
 
     public class LegacyContext : RunnerDbContext<LegacyContext>
     {
-        public override string ProjectionStateSchema => Infrastructure.Schema.Legacy;
+        public override string ProjectionStateSchema => Schema.Legacy;
 
         public DbSet<BuildingDetailItem> BuildingDetails { get; set; }
         public DbSet<BuildingSyndicationItem> BuildingSyndication { get; set; }
@@ -20,11 +25,35 @@ namespace BuildingRegistry.Projections.Legacy
 
         // This needs to be DbContextOptions<T> for Autofac!
         public LegacyContext(DbContextOptions<LegacyContext> options)
-            : base(options)
-        {
-        }
+            : base(options) { }
+    }
 
-        protected override void OnConfiguringOptionsBuilder(DbContextOptionsBuilder optionsBuilder)
-            => optionsBuilder.UseSqlServer(@"Server=(localdb)\mssqllocaldb;Database=EFProviders.InMemory.BuildingRegistry.BuildingRegistryContext;Trusted_Connection=True;");
+    public class ConfigBasedContextFactory : IDesignTimeDbContextFactory<LegacyContext>
+    {
+        public LegacyContext CreateDbContext(string[] args)
+        {
+            const string migrationConnectionStringName = "LegacyProjectionsAdmin";
+
+            var configuration = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: false)
+                .AddJsonFile($"appsettings.{Environment.MachineName.ToLowerInvariant()}.json", optional: true, reloadOnChange: false)
+                .AddEnvironmentVariables()
+                .Build();
+
+            var connectionString = configuration.GetConnectionString(migrationConnectionStringName);
+            if (string.IsNullOrEmpty(connectionString))
+                throw new InvalidOperationException($"Could not find a connection string with name '{migrationConnectionStringName}'");
+
+            var builder = new DbContextOptionsBuilder<LegacyContext>()
+                .UseSqlServer(connectionString, sqlServerOptions =>
+                {
+                    sqlServerOptions.EnableRetryOnFailure();
+                    sqlServerOptions.MigrationsHistoryTable(MigrationTables.Legacy, Schema.Legacy);
+                    sqlServerOptions.UseNetTopologySuite();
+                });
+
+            return new LegacyContext(builder.Options);
+        }
     }
 }

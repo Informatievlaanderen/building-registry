@@ -113,7 +113,7 @@ namespace BuildingRegistry.Projector.Infrastructure.Modules
                     _configuration,
                     _loggerFactory)
                 .RegisterProjections<BuildingDetailProjections, LegacyContext>(() => new BuildingDetailProjections(WKBReaderFactory.Create()))
-                .RegisterProjections<BuildingSyndicationProjections, LegacyContext>()
+                .RegisterProjections<BuildingSyndicationProjections, LegacyContext>(() => new BuildingSyndicationProjections(WKBReaderFactory.Create()))
                 .RegisterProjections<BuildingUnitDetailProjections, LegacyContext>(() => new BuildingUnitDetailProjections(WKBReaderFactory.Create()));
         }
 
