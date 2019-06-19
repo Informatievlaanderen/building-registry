@@ -184,7 +184,7 @@ namespace BuildingRegistry.Api.Legacy.Building.Responses
         /// De geometrie van het gebouw.
         /// </summary>
         [DataMember(Name = "GeometriePolygoon", Order = 5)]
-        public GmlPolygon Geometry { get; set; }
+        public SyndicationPolygon Geometry { get; set; }
 
         /// <summary>
         /// De gebouweenheden van het gebouw.
@@ -221,7 +221,7 @@ namespace BuildingRegistry.Api.Legacy.Building.Responses
             Identificator = new Identificator(naamruimte, osloId.HasValue ? osloId.ToString() : string.Empty, version);
             Status = status;
             GeometryMethod = geometryMethod;
-            Geometry = geometry;
+            Geometry = geometry == null ? null : new SyndicationPolygon { XmlPolygon = geometry };
             IsComplete = isComplete;
             BuildingUnits = buildingUnits;
 
@@ -260,7 +260,7 @@ namespace BuildingRegistry.Api.Legacy.Building.Responses
         /// De geometrie van de gebouweenheid.
         /// </summary>
         [DataMember(Name = "GeometriePunt", Order = 5)]
-        public GmlPoint Geometry { get; set; }
+        public SyndicationPoint Geometry { get; set; }
 
         /// <summary>
         /// De functie van de gebouweenheid.
@@ -296,7 +296,7 @@ namespace BuildingRegistry.Api.Legacy.Building.Responses
             Identificator = new Identificator(naamruimte, osloId.HasValue ? osloId.ToString() : string.Empty, version);
             Status = status;
             GeometryMethod = geometryMethod;
-            Geometry = geometry;
+            Geometry = geometry == null ? null : new SyndicationPoint { XmlPoint = geometry };
             Function = function;
             Addresses = addresses;
             IsComplete = isComplete;
