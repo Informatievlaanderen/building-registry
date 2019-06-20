@@ -24,6 +24,18 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetail
             _wkbReader = wkbReader;
 
             #region Building
+            When<Envelope<BuildingWasRegistered>>(async (context, message, ct) =>
+                {
+                    await context
+                        .BuildingUnitBuildings
+                        .AddAsync(
+                            new BuildingUnitBuildingItem
+                            {
+                                BuildingId = message.Message.BuildingId,
+                                IsRemoved = false
+                            }, ct);
+                });
+
             When<Envelope<BuildingWasRemoved>>(async (context, message, ct) =>
             {
                 // possible of ALOT of units, might exceed SQL server IN (...) limitation, thats why we first get id by BuildingId
@@ -43,30 +55,45 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetail
                         SetVersion(buildingUnitDetailItem, message.Message.Provenance.Timestamp);
                     }
                 }
+
+                var building = await context.BuildingUnitBuildings.FindAsync(message.Message.BuildingId, cancellationToken: ct);
+                building.IsRemoved = true;
             });
 
             When<Envelope<BuildingWasRetired>>(async (context, message, ct) =>
             {
                 var buildingUnits = await context.BuildingUnitDetails.Where(unit => unit.BuildingId == message.Message.BuildingId).ToListAsync(ct);
                 RetireUnitsByBuilding(buildingUnits, message.Message.BuildingUnitIdsToNotRealize, message.Message.BuildingUnitIdsToRetire, message.Message.Provenance.Timestamp);
+
+                var building = await context.BuildingUnitBuildings.FindAsync(message.Message.BuildingId, cancellationToken: ct);
+                building.BuildingRetiredStatus = BuildingStatus.Retired;
             });
 
             When<Envelope<BuildingWasCorrectedToRetired>>(async (context, message, ct) =>
             {
                 var buildingUnits = await context.BuildingUnitDetails.Where(unit => unit.BuildingId == message.Message.BuildingId).ToListAsync(ct);
                 RetireUnitsByBuilding(buildingUnits, message.Message.BuildingUnitIdsToNotRealize, message.Message.BuildingUnitIdsToRetire, message.Message.Provenance.Timestamp);
+
+                var building = await context.BuildingUnitBuildings.FindAsync(message.Message.BuildingId, cancellationToken: ct);
+                building.BuildingRetiredStatus = BuildingStatus.Retired;
             });
 
             When<Envelope<BuildingWasNotRealized>>(async (context, message, ct) =>
             {
                 var buildingUnits = await context.BuildingUnitDetails.Where(unit => unit.BuildingId == message.Message.BuildingId).ToListAsync(ct);
                 RetireUnitsByBuilding(buildingUnits, message.Message.BuildingUnitIdsToNotRealize, message.Message.BuildingUnitIdsToRetire, message.Message.Provenance.Timestamp);
+
+                var building = await context.BuildingUnitBuildings.FindAsync(message.Message.BuildingId, cancellationToken: ct);
+                building.BuildingRetiredStatus = BuildingStatus.NotRealized;
             });
 
             When<Envelope<BuildingWasCorrectedToNotRealized>>(async (context, message, ct) =>
             {
                 var buildingUnits = await context.BuildingUnitDetails.Where(unit => unit.BuildingId == message.Message.BuildingId).ToListAsync(ct);
                 RetireUnitsByBuilding(buildingUnits, message.Message.BuildingUnitIdsToNotRealize, message.Message.BuildingUnitIdsToRetire, message.Message.Provenance.Timestamp);
+
+                var building = await context.BuildingUnitBuildings.FindAsync(message.Message.BuildingId, cancellationToken: ct);
+                building.BuildingRetiredStatus = BuildingStatus.NotRealized;
             });
 
             When<Envelope<BuildingGeometryWasRemoved>>(async (context, message, ct) =>
@@ -88,6 +115,9 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetail
                     buildingUnit.IsBuildingComplete = true;
                     SetVersion(buildingUnit, message.Message.Provenance.Timestamp);
                 }
+
+                var building = await context.BuildingUnitBuildings.FindAsync(message.Message.BuildingId, cancellationToken: ct);
+                building.IsComplete = true;
             });
 
             When<Envelope<BuildingBecameIncomplete>>(async (context, message, ct) =>
@@ -98,17 +128,15 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetail
                     buildingUnit.IsBuildingComplete = false;
                     SetVersion(buildingUnit, message.Message.Provenance.Timestamp);
                 }
+
+                var building = await context.BuildingUnitBuildings.FindAsync(message.Message.BuildingId, cancellationToken: ct);
+                building.IsComplete = false;
             });
 
             When<Envelope<BuildingOsloIdWasAssigned>>(async (context, message, ct) =>
             {
-                await context
-                    .BuildingUnitBuildingOsloIds
-                    .AddAsync(new BuildingUnitBuildingOsloIdItem
-                    {
-                        BuildingId = message.Message.BuildingId,
-                        BuildingOsloId = message.Message.OsloId,
-                    }, cancellationToken: ct);
+                var building = await context.BuildingUnitBuildings.FindAsync(message.Message.BuildingId, cancellationToken: ct);
+                building.BuildingOsloId = message.Message.OsloId;
 
                 foreach (var buildingUnit in context
                     .BuildingUnitDetails
@@ -384,15 +412,16 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetail
             bool isCommon,
             CancellationToken ct)
         {
-            var buildingOsloId = await context
-                .BuildingUnitBuildingOsloIds
+            var building = await context
+                .BuildingUnitBuildings
                 .FindAsync(buildingId, cancellationToken: ct);
 
             var buildingUnitDetailItem = new BuildingUnitDetailItem
             {
                 BuildingUnitId = buildingUnitId,
                 BuildingId = buildingId,
-                BuildingOsloId = buildingOsloId?.BuildingOsloId,
+                BuildingOsloId = building?.BuildingOsloId,
+                IsBuildingComplete = building?.IsComplete ?? false,
                 Version = version,
                 Function = isCommon ? BuildingUnitFunction.Common : BuildingUnitFunction.Unknown,
             };
