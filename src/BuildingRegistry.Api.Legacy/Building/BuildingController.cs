@@ -88,6 +88,7 @@ namespace BuildingRegistry.Api.Legacy.Building
             var buildingUnits = await context
                 .BuildingUnitDetails
                 .Where(x => x.BuildingId == building.BuildingId)
+                .Where(x => x.IsComplete && !x.IsRemoved)
                 .Select(x => x.OsloId)
                 .ToListAsync(cancellationToken);
 

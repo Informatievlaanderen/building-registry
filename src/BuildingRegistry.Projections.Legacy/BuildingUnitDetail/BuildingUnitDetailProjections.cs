@@ -62,7 +62,8 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetail
 
             When<Envelope<BuildingWasRetired>>(async (context, message, ct) =>
             {
-                var buildingUnits = await context.BuildingUnitDetails.Where(unit => unit.BuildingId == message.Message.BuildingId).ToListAsync(ct);
+                var buildingUnits = (await context.BuildingUnitDetails.Where(unit => unit.BuildingId == message.Message.BuildingId).ToListAsync(ct))
+                    .Union(context.BuildingUnitDetails.Local.Where(unit => unit.BuildingId == message.Message.BuildingId));
                 RetireUnitsByBuilding(buildingUnits, message.Message.BuildingUnitIdsToNotRealize, message.Message.BuildingUnitIdsToRetire, message.Message.Provenance.Timestamp);
 
                 var building = await context.BuildingUnitBuildings.FindAsync(message.Message.BuildingId, cancellationToken: ct);
@@ -71,7 +72,8 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetail
 
             When<Envelope<BuildingWasCorrectedToRetired>>(async (context, message, ct) =>
             {
-                var buildingUnits = await context.BuildingUnitDetails.Where(unit => unit.BuildingId == message.Message.BuildingId).ToListAsync(ct);
+                var buildingUnits = (await context.BuildingUnitDetails.Where(unit => unit.BuildingId == message.Message.BuildingId).ToListAsync(ct))
+                    .Union(context.BuildingUnitDetails.Local.Where(unit => unit.BuildingId == message.Message.BuildingId));
                 RetireUnitsByBuilding(buildingUnits, message.Message.BuildingUnitIdsToNotRealize, message.Message.BuildingUnitIdsToRetire, message.Message.Provenance.Timestamp);
 
                 var building = await context.BuildingUnitBuildings.FindAsync(message.Message.BuildingId, cancellationToken: ct);
@@ -80,7 +82,8 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetail
 
             When<Envelope<BuildingWasNotRealized>>(async (context, message, ct) =>
             {
-                var buildingUnits = await context.BuildingUnitDetails.Where(unit => unit.BuildingId == message.Message.BuildingId).ToListAsync(ct);
+                var buildingUnits = (await context.BuildingUnitDetails.Where(unit => unit.BuildingId == message.Message.BuildingId).ToListAsync(ct))
+                    .Union(context.BuildingUnitDetails.Local.Where(unit => unit.BuildingId == message.Message.BuildingId));
                 RetireUnitsByBuilding(buildingUnits, message.Message.BuildingUnitIdsToNotRealize, message.Message.BuildingUnitIdsToRetire, message.Message.Provenance.Timestamp);
 
                 var building = await context.BuildingUnitBuildings.FindAsync(message.Message.BuildingId, cancellationToken: ct);
@@ -89,7 +92,8 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetail
 
             When<Envelope<BuildingWasCorrectedToNotRealized>>(async (context, message, ct) =>
             {
-                var buildingUnits = await context.BuildingUnitDetails.Where(unit => unit.BuildingId == message.Message.BuildingId).ToListAsync(ct);
+                var buildingUnits = (await context.BuildingUnitDetails.Where(unit => unit.BuildingId == message.Message.BuildingId).ToListAsync(ct))
+                    .Union(context.BuildingUnitDetails.Local.Where(unit => unit.BuildingId == message.Message.BuildingId));
                 RetireUnitsByBuilding(buildingUnits, message.Message.BuildingUnitIdsToNotRealize, message.Message.BuildingUnitIdsToRetire, message.Message.Provenance.Timestamp);
 
                 var building = await context.BuildingUnitBuildings.FindAsync(message.Message.BuildingId, cancellationToken: ct);
@@ -98,7 +102,8 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetail
 
             When<Envelope<BuildingGeometryWasRemoved>>(async (context, message, ct) =>
             {
-                var buildingUnits = await context.BuildingUnitDetails.Where(unit => unit.BuildingId == message.Message.BuildingId).ToListAsync(ct);
+                var buildingUnits = (await context.BuildingUnitDetails.Where(unit => unit.BuildingId == message.Message.BuildingId).ToListAsync(ct))
+                    .Union(context.BuildingUnitDetails.Local.Where(unit => unit.BuildingId == message.Message.BuildingId));
                 foreach (var buildingUnit in buildingUnits)
                 {
                     buildingUnit.PositionMethod = null;
@@ -109,7 +114,8 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetail
 
             When<Envelope<BuildingBecameComplete>>(async (context, message, ct) =>
             {
-                var buildingUnits = await context.BuildingUnitDetails.Where(unit => unit.BuildingId == message.Message.BuildingId).ToListAsync(ct);
+                var buildingUnits = (await context.BuildingUnitDetails.Where(unit => unit.BuildingId == message.Message.BuildingId).ToListAsync(ct))
+                    .Union(context.BuildingUnitDetails.Local.Where(unit => unit.BuildingId == message.Message.BuildingId));
                 foreach (var buildingUnit in buildingUnits)
                 {
                     buildingUnit.IsBuildingComplete = true;
@@ -122,7 +128,8 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetail
 
             When<Envelope<BuildingBecameIncomplete>>(async (context, message, ct) =>
             {
-                var buildingUnits = await context.BuildingUnitDetails.Where(unit => unit.BuildingId == message.Message.BuildingId).ToListAsync(ct);
+                var buildingUnits = (await context.BuildingUnitDetails.Where(unit => unit.BuildingId == message.Message.BuildingId).ToListAsync(ct))
+                    .Union(context.BuildingUnitDetails.Local.Where(unit => unit.BuildingId == message.Message.BuildingId));
                 foreach (var buildingUnit in buildingUnits)
                 {
                     buildingUnit.IsBuildingComplete = false;
@@ -138,12 +145,11 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetail
                 var building = await context.BuildingUnitBuildings.FindAsync(message.Message.BuildingId, cancellationToken: ct);
                 building.BuildingOsloId = message.Message.OsloId;
 
-                foreach (var buildingUnit in context
-                    .BuildingUnitDetails
-                    .Where(unit => unit.BuildingId == message.Message.BuildingId))
-                {
+                var buildingUnits = (await context.BuildingUnitDetails.Where(unit => unit.BuildingId == message.Message.BuildingId).ToListAsync(ct))
+                    .Union(context.BuildingUnitDetails.Local.Where(unit => unit.BuildingId == message.Message.BuildingId));
+
+                foreach (var buildingUnit in buildingUnits)
                     buildingUnit.BuildingOsloId = message.Message.OsloId;
-                }
             });
             #endregion
 

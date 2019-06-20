@@ -19,6 +19,7 @@ namespace BuildingRegistry.Api.CrabImport.CrabImport
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
+    using Be.Vlaanderen.Basisregisters.GrAr.Import.Processing.Api.Messages;
     using ApiController = Infrastructure.ApiController;
     using ProblemDetails = Be.Vlaanderen.Basisregisters.BasicApiProblem.ProblemDetails;
 
@@ -106,17 +107,19 @@ namespace BuildingRegistry.Api.CrabImport.CrabImport
             return Accepted(tags.Any() ? tags.Max() : null);
         }
 
-        [HttpGet("batch/current")]
+        [HttpGet("batch/{feed}")]
         public IActionResult GetBatchStatus(
-            [FromServices] CrabImportContext context)
+            [FromServices] CrabImportContext context,
+            [FromRoute] string feed)
         {
-            return Ok(context.LastBatch);
+            var status = context.LastBatchFor((ImportFeed)feed);
+            return Ok(status);
         }
 
-        [HttpPost("batch/current")]
+        [HttpPost("batch")]
         public IActionResult SetBatchStatus(
             [FromServices] CrabImportContext context,
-            [FromBody] ImportBatchStatus batchStatus)
+            [FromBody] BatchStatusUpdate batchStatus)
         {
             context.SetCurrent(batchStatus);
             context.SaveChanges();

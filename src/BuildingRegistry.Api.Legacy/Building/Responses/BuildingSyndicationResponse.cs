@@ -13,7 +13,6 @@ namespace BuildingRegistry.Api.Legacy.Building.Responses
     using Microsoft.Extensions.Options;
     using Microsoft.SyndicationFeed;
     using Microsoft.SyndicationFeed.Atom;
-    using NetTopologySuite.IO;
     using Query;
     using Swashbuckle.AspNetCore.Filters;
     using System;
@@ -28,8 +27,6 @@ namespace BuildingRegistry.Api.Legacy.Building.Responses
 
     public static class BuildingSyndicationResponse
     {
-        private static readonly WKBReader WkbReader = new WKBReader();
-
         public static async Task WriteBuilding(
             this ISyndicationFeedWriter writer,
             IOptions<ResponseOptions> responseOptions,
