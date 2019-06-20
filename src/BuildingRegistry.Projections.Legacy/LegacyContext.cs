@@ -18,7 +18,7 @@ namespace BuildingRegistry.Projections.Legacy
         public DbSet<BuildingDetailItem> BuildingDetails { get; set; }
         public DbSet<BuildingSyndicationItem> BuildingSyndication { get; set; }
         public DbSet<BuildingUnitDetailItem> BuildingUnitDetails { get; set; }
-        public DbSet<BuildingUnitBuildingOsloIdItem> BuildingUnitBuildingOsloIds { get; set; }
+        public DbSet<BuildingUnitBuildingItem> BuildingUnitBuildings { get; set; }
         public DbSet<BuildingUnitDetailAddressItem> BuildingUnitAddresses { get; set; }
 
         public LegacyContext() { }
