@@ -7,6 +7,7 @@ using System;
 using System.Configuration;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 
 namespace BuildingRegistry.Importer
 {
@@ -40,6 +41,7 @@ namespace BuildingRegistry.Importer
                     .UseHttpApiProxyConfig(settings)
                     .UseCommandProcessorConfig(settings)
                     .UseDefaultSerializerSettingsForCrabImports()
+                    .ConfigureImportFeedFromAssembly(Assembly.GetExecutingAssembly())
                     .Build();
 
                 WaitForStart();

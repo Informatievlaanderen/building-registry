@@ -32,7 +32,7 @@ namespace BuildingRegistry.Api.Legacy.BuildingUnit.Query
                 .Where(x => x.IsComplete && !x.IsRemoved && x.IsBuildingComplete)
                 .AsNoTracking();
 
-            if (!string.IsNullOrEmpty(filtering.Filter.AddressOsloId))
+            if (!string.IsNullOrEmpty(filtering.Filter?.AddressOsloId))
             {
                 var addressOsloIds = _syndicationContext
                     .AddressOsloIds
