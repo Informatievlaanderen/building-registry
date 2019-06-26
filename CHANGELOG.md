@@ -1,3 +1,15 @@
+# [1.2.0](https://github.com/informatievlaanderen/building-registry/compare/v1.1.0...v1.2.0) (2019-06-26)
+
+
+### Bug Fixes
+
+* build test client ([a95893e](https://github.com/informatievlaanderen/building-registry/commit/a95893e))
+
+
+### Features
+
+* upgrade packages ([5f3dc89](https://github.com/informatievlaanderen/building-registry/commit/5f3dc89))
+
 # [1.1.0](https://github.com/informatievlaanderen/building-registry/compare/v1.0.2...v1.1.0) (2019-06-20)
 
 
