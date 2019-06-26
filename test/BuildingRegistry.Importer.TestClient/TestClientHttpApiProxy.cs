@@ -27,7 +27,7 @@ namespace BuildingRegistry.Importer.TestClient
             _fromDateTime = fromDateTime;
             _key = key;
             _importMode = importMode;
-            _httpApiProxy = new HttpApiProxy(logger, serializer, config);
+            _httpApiProxy = new HttpApiProxy(logger, serializer, config, new ImportFeed());
         }
 
         public void ImportBatch<TKey>(IEnumerable<KeyImport<TKey>> imports)
