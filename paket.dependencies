@@ -84,8 +84,8 @@ nuget xunit 2.4.1
 nuget xunit.runner.visualstudio 2.4.1
 nuget xunit.categories 2.0.4
 nuget FluentAssertions 5.7.0
-nuget Moq 4.11.0
-nuget AutoFixture.Xunit2 4.9.0
+nuget Moq 4.12.0
+nuget AutoFixture.Xunit2 4.10.0
 
 // BUILD STUFF
 nuget FAKE 4.64.13 // Don't update to v5!
