@@ -25,7 +25,8 @@ namespace BuildingRegistry.Importer.TestClient
 
             Listener.Prefixes.Add($"http://+:{port}/grar/");
             Listener.Start();
-            Console.WriteLine("Listening... Press CTRL + C to exit.");
+            Console.WriteLine($"Listening on http://localhost:{port} ...");
+            Console.WriteLine("Press CTRL + C to exit.");
 
             while (Listener.IsListening)
             {
