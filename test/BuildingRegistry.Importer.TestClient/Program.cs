@@ -33,26 +33,34 @@ namespace BuildingRegistry.Importer.TestClient
                 var context = Listener.GetContext();
                 var idAsString = context.Request.QueryString.GetValues("id")?.FirstOrDefault();
                 var fromAsString = context.Request.QueryString.GetValues("from")?.FirstOrDefault();
-                var modeAsString = context.Request.QueryString.GetValues("mode")?.FirstOrDefault() ?? string.Empty;
 
-                if (string.IsNullOrEmpty(idAsString))
-                {
-                    WriteErrorResponse(context.Response, "Please specify an id");
-                    continue;
-                }
-
+                if (false == Enum.TryParse(context.Request.QueryString.GetValues("mode")?.FirstOrDefault(), true, out ImportMode mode))
+                    mode = ImportMode.Init;
+                
                 try
                 {
+                    if (string.IsNullOrEmpty(idAsString))
+                    {
+                        WriteErrorResponse(context.Response, "Please specify an 'id' parameter");
+                        continue;
+                    }
+
                     var terrainObjectId = new CrabTerrainObjectId(Convert.ToInt32(idAsString));
                     var generator = new CommandGenerator(VbrConnectionString, true);
                     var settings = new SettingsBasedConfig();
                     var fromDate = DateTime.MinValue;
-
-                    if (!string.IsNullOrEmpty(fromAsString))
-                        fromDate = DateTime.Parse(fromAsString);
-
-                    if (!string.IsNullOrEmpty(modeAsString) && modeAsString.Equals("init") && string.IsNullOrEmpty(fromAsString))
-                        fromDate = DateTime.MinValue;
+                    
+                    if (mode == ImportMode.Update)
+                    {
+                        if (false == DateTime.TryParse(fromAsString, out fromDate))
+                        {
+                            WriteErrorResponse(context.Response,
+                                string.IsNullOrWhiteSpace(fromAsString)
+                                    ? "Please specify 'from' parameter for an update"
+                                    : $"Cannot parse parameter 'from' with value '{fromAsString}'");
+                            continue;
+                        }
+                    }
 
                     var commandProcessor = new CommandProcessorBuilder<int>(generator)
                         .UseApiProxyFactory(logger =>
@@ -61,14 +69,14 @@ namespace BuildingRegistry.Importer.TestClient
                                 settings,
                                 fromDate,
                                 terrainObjectId,
-                                !string.IsNullOrEmpty(fromAsString) || modeAsString.Equals("update", StringComparison.OrdinalIgnoreCase) ? ImportMode.Update : ImportMode.Init))
+                                mode))
                         .UseProcessedKeysSet(new NonPersistentProcessedKeysSet<int>())
                         .UseCommandProcessorConfig(settings)
                         .UseDefaultSerializerSettingsForCrabImports()
                         .UseLoggerFactory(new LoggerFactory())
                         .Build();
 
-                    commandProcessor.Run(new ImportOptions(args, errors => { }), settings);
+                    commandProcessor.Run(null, settings);
 
                     var osloId = GetOsloId(terrainObjectId);
                     WriteResponse(context.Response, osloId);
