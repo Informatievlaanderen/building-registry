@@ -34,7 +34,7 @@ namespace BuildingRegistry.Importer.TestClient
                 var idAsString = context.Request.QueryString.GetValues("id")?.FirstOrDefault();
                 var fromAsString = context.Request.QueryString.GetValues("from")?.FirstOrDefault();
 
-                if (false == Enum.TryParse(context.Request.QueryString.GetValues("mode")?.FirstOrDefault(), true, out ImportMode mode))
+                if (!Enum.TryParse(context.Request.QueryString.GetValues("mode")?.FirstOrDefault(), true, out ImportMode mode))
                     mode = ImportMode.Init;
                 
                 try
@@ -50,16 +50,14 @@ namespace BuildingRegistry.Importer.TestClient
                     var settings = new SettingsBasedConfig();
                     var fromDate = DateTime.MinValue;
                     
-                    if (mode == ImportMode.Update)
+                    if (mode == ImportMode.Update && !DateTime.TryParse(fromAsString, out fromDate))
                     {
-                        if (false == DateTime.TryParse(fromAsString, out fromDate))
-                        {
-                            WriteErrorResponse(context.Response,
-                                string.IsNullOrWhiteSpace(fromAsString)
-                                    ? "Please specify 'from' parameter for an update"
-                                    : $"Cannot parse parameter 'from' with value '{fromAsString}'");
-                            continue;
-                        }
+                        WriteErrorResponse(context.Response,
+                            string.IsNullOrWhiteSpace(fromAsString)
+                                ? "Please specify 'from' parameter for an update"
+                                : $"Cannot parse parameter 'from' with value '{fromAsString}'");
+
+                        continue;
                     }
 
                     var commandProcessor = new CommandProcessorBuilder<int>(generator)
