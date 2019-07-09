@@ -44,6 +44,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="NonPersistentProcessedKeysSet.cs" />
     <Compile Include="SettingsBasedConfig.cs" />
     <Compile Include="SqlServerTypes\Loader.cs">
       <Paket>True</Paket>

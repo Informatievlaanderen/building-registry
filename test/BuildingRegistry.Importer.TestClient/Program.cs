@@ -62,6 +62,7 @@ namespace BuildingRegistry.Importer.TestClient
                                 fromDate,
                                 terrainObjectId,
                                 !string.IsNullOrEmpty(fromAsString) || modeAsString.Equals("update", StringComparison.OrdinalIgnoreCase) ? ImportMode.Update : ImportMode.Init))
+                        .UseProcessedKeysSet(new NonPersistentProcessedKeysSet<int>())
                         .UseCommandProcessorConfig(settings)
                         .UseDefaultSerializerSettingsForCrabImports()
                         .UseLoggerFactory(new LoggerFactory())
