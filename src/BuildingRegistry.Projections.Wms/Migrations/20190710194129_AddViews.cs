@@ -12,7 +12,7 @@ namespace BuildingRegistry.Projections.Wms.Migrations
             CREATE VIEW [{Schema.Wms}].[GebouwView]
             WITH SCHEMABINDING
             AS
-            SELECT        OsloId AS ObjectId, Id, Version, [Geometry] AS Geometry, GeometryMethod AS GeometrieMethode, Status
+            SELECT        PersistentLocalId AS ObjectId, Id, Version, [Geometry] AS Geometry, GeometryMethod AS GeometrieMethode, Status
             FROM            {Schema.Wms}.{Building.BuildingConfiguration.TableName}
             WHERE        (IsComplete = 1)
             GO
@@ -61,7 +61,7 @@ namespace BuildingRegistry.Projections.Wms.Migrations
             CREATE VIEW [{Schema.Wms}].[GebouweenheidView]
             WITH SCHEMABINDING
             AS
-            SELECT        Id, BuildingUnitOsloId AS ObjectId, Version AS VersieId, PositionMethod AS PositieGeometrieMethode, Status AS GebouweenheidStatus, [Function] AS Functie, BuildingOsloId AS GebouwObjectId, Position AS Geometrie
+            SELECT        Id, BuildingUnitPersistentLocalId AS ObjectId, Version AS VersieId, PositionMethod AS PositieGeometrieMethode, Status AS GebouweenheidStatus, [Function] AS Functie, BuildingPersistentLocalId AS GebouwObjectId, Position AS Geometrie
             FROM            {Schema.Wms}.{BuildingUnit.BuildingUnitConfiguration.TableName}
             WHERE        (IsComplete = 1) AND (IsBuildingComplete = 1)
             GO

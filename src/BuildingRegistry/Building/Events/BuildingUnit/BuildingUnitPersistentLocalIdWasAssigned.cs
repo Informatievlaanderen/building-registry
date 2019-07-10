@@ -6,37 +6,37 @@ namespace BuildingRegistry.Building.Events
     using NodaTime;
     using ValueObjects;
 
-    [EventName("BuildingUnitOsloIdWasAssigned")]
-    [EventDescription("De gebouweenheid kreeg een Oslo Id toegekend.")]
-    public class BuildingUnitOsloIdWasAssigned
+    [EventName("BuildingUnitPersistentLocalIdentifierWasAssigned")]
+    [EventDescription("De gebouweenheid kreeg een persistente lokale id toegekend.")]
+    public class BuildingUnitPersistentLocalIdWasAssigned
     {
         public Guid BuildingId { get; }
         public Guid BuildingUnitId { get; }
-        public int OsloId { get; }
+        public int PersistentLocalId { get; }
         public Instant AssignmentDate { get; }
 
-        public BuildingUnitOsloIdWasAssigned(
+        public BuildingUnitPersistentLocalIdWasAssigned(
             BuildingId buildingId,
             BuildingUnitId buildingUnitId,
-            OsloId osloId,
-            OsloAssignmentDate assignmentDate)
+            PersistentLocalId persistentLocalId,
+            PersistentLocalIdAssignmentDate assignmentDate)
         {
             BuildingId = buildingId;
             BuildingUnitId = buildingUnitId;
-            OsloId = osloId;
+            PersistentLocalId = persistentLocalId;
             AssignmentDate = assignmentDate;
         }
 
         [JsonConstructor]
-        private BuildingUnitOsloIdWasAssigned(
+        private BuildingUnitPersistentLocalIdWasAssigned(
             Guid buildingId,
             Guid buildingUnitId,
-            int osloId,
+            int persistentLocalId,
             Instant assignmentDate)
             : this(
                 new BuildingId(buildingId),
                 new BuildingUnitId(buildingUnitId),
-                new OsloId(osloId),
-                new OsloAssignmentDate(assignmentDate)) {}
+                new PersistentLocalId(persistentLocalId),
+                new PersistentLocalIdAssignmentDate(assignmentDate)) {}
     }
 }

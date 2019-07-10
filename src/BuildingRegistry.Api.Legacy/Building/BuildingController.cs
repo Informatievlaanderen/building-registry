@@ -50,13 +50,13 @@ namespace BuildingRegistry.Api.Legacy.Building
         /// <param name="syndicationContext"></param>
         /// <param name="responseOptions"></param>
         /// <param name="grbBuildingParcel"></param>
-        /// <param name="gebouwId"></param>
+        /// <param name="persistentLocalId"></param>
         /// <param name="cancellationToken"></param>
         /// <response code="200">Als het gebouw gevonden is.</response>
         /// <response code="404">Als het gebouw niet gevonden kan worden.</response>
         /// <response code="410">Als het gebouw verwijderd werd.</response>
         /// <response code="500">Als er een interne fout is opgetreden.</response>
-        [HttpGet("{gebouwId}")]
+        [HttpGet("{persistentLocalId}")]
         [ProducesResponseType(typeof(BuildingResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status410Gone)]
@@ -70,13 +70,13 @@ namespace BuildingRegistry.Api.Legacy.Building
             [FromServices] SyndicationContext syndicationContext,
             [FromServices] IOptions<ResponseOptions> responseOptions,
             [FromServices] IGrbBuildingParcel grbBuildingParcel,
-            [FromRoute] int gebouwId,
+            [FromRoute] int persistentLocalId,
             CancellationToken cancellationToken = default)
         {
             var building = await context
                 .BuildingDetails
                 .AsNoTracking()
-                .SingleOrDefaultAsync(item => item.OsloId == gebouwId, cancellationToken);
+                .SingleOrDefaultAsync(item => item.PersistentLocalId == persistentLocalId, cancellationToken);
 
             if (building == null || !building.IsComplete)
                 throw new ApiException("Onbestaand gebouw.", StatusCodes.Status404NotFound);
@@ -89,7 +89,7 @@ namespace BuildingRegistry.Api.Legacy.Building
                 .BuildingUnitDetails
                 .Where(x => x.BuildingId == building.BuildingId)
                 .Where(x => x.IsComplete && !x.IsRemoved)
-                .Select(x => x.OsloId)
+                .Select(x => x.PersistentLocalId)
                 .ToListAsync(cancellationToken);
 
             var parcels = grbBuildingParcel
@@ -106,7 +106,7 @@ namespace BuildingRegistry.Api.Legacy.Building
                 .ToListAsync(cancellationToken);
 
             var response = new BuildingResponse(
-                building.OsloId.Value,
+                building.PersistentLocalId.Value,
                 responseOptions.Value.GebouwNaamruimte,
                 building.Version.ToBelgianDateTimeOffset(),
                 GetBuildingPolygon(building.Geometry),
@@ -151,7 +151,7 @@ namespace BuildingRegistry.Api.Legacy.Building
             var buildings = await pagedBuildings.Items
                 .Select(a => new
                 {
-                    a.OsloId,
+                    PersistentLocalId = a.PersistentLocalId,
                     a.Version
                 })
                 .ToListAsync(cancellationToken);
@@ -160,7 +160,7 @@ namespace BuildingRegistry.Api.Legacy.Building
             {
                 Gebouwen = buildings
                     .Select(x => new GebouwCollectieItem(
-                        x.OsloId.Value,
+                        x.PersistentLocalId.Value,
                         responseOptions.Value.GebouwNaamruimte,
                         responseOptions.Value.GebouwDetailUrl,
                         x.Version.ToBelgianDateTimeOffset()))

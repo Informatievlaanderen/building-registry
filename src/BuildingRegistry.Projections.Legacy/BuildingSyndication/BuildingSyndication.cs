@@ -16,7 +16,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
         public long Position { get; set; }
 
         public Guid? BuildingId { get; set; }
-        public int? OsloId { get; set; }
+        public int? PersistentLocalId { get; set; }
         public string ChangeType { get; set; }
 
         public IPolygon Geometry { get; set; }
@@ -68,7 +68,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
                 LastChangedOn = lastChangedOn,
 
                 BuildingId = BuildingId,
-                OsloId = OsloId,
+                PersistentLocalId = PersistentLocalId,
                 GeometryMethod = GeometryMethod,
                 Geometry = Geometry,
                 Status = Status,
@@ -130,7 +130,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
             b.Ignore(x => x.LastChangedOn);
 
             b.HasIndex(x => x.BuildingId);
-            b.HasIndex(x => x.OsloId);
+            b.HasIndex(x => x.PersistentLocalId);
         }
     }
 }

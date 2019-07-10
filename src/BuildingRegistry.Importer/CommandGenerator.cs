@@ -21,16 +21,16 @@ namespace BuildingRegistry.Importer
     {
         private readonly string _vbrConnectionString;
         private readonly bool _singleUpdate;
-        private readonly Lazy<ILookup<int, AssignOsloIdForCrabTerrainObjectId>> _osloIdCommands;
+        private readonly Lazy<ILookup<int, AssignPersistentLocalIdForCrabTerrainObjectId>> _osloIdCommands;
 
         public CommandGenerator(string vbrConnectionString, bool singleUpdate = false)
         {
             _vbrConnectionString = vbrConnectionString;
             _singleUpdate = singleUpdate;
-            _osloIdCommands = new Lazy<ILookup<int, AssignOsloIdForCrabTerrainObjectId>>(() => GetOsloCommandsToPost().ToLookup(x => (int)x.TerrainObjectId, x => x));
+            _osloIdCommands = new Lazy<ILookup<int, AssignPersistentLocalIdForCrabTerrainObjectId>>(() => GetOsloCommandsToPost().ToLookup(x => (int)x.TerrainObjectId, x => x));
         }
 
-        private IEnumerable<AssignOsloIdForCrabTerrainObjectId> GetOsloCommandsToPost()
+        private IEnumerable<AssignPersistentLocalIdForCrabTerrainObjectId> GetOsloCommandsToPost()
         {
             using (var connection = new SqlConnection(_vbrConnectionString))
             {
@@ -41,12 +41,12 @@ namespace BuildingRegistry.Importer
                         "ORDER BY m.gebouweenheididinternal", commandTimeout: (60 * 5))
                     .GroupBy(x => x.TerreinObjectId)
                     .ToDictionary(x => x.Key, y => y
-                    .Select(mapping => new AssignBuildingUnitOsloIdForCrabTerrainObjectId(
+                    .Select(mapping => new AssignBuildingUnitPersistentLocalIdForCrabTerrainObjectId(
                         mapping.TerreinObjectHuisnummerId.HasValue ? new CrabTerrainObjectHouseNumberId(mapping.TerreinObjectHuisnummerId.Value) : null,
                         mapping.SubadresId.HasValue ? new CrabSubaddressId(mapping.SubadresId.Value) : null,
                         mapping.Index,
-                        new OsloId(mapping.ObjectId),
-                        new OsloAssignmentDate(Instant.FromDateTimeOffset(mapping.MappingCreatedTimestamp)))));
+                        new PersistentLocalId(mapping.ObjectId),
+                        new PersistentLocalIdAssignmentDate(Instant.FromDateTimeOffset(mapping.MappingCreatedTimestamp)))));
 
                 var crab2VbrTerrainObjectMappings = connection.Query<Crab2VbrTerrainObjectMapping>(
                     "SELECT o.ObjectID, m.CrabTerreinobjectID, m.MappingCreatedTimestamp " +
@@ -55,17 +55,17 @@ namespace BuildingRegistry.Importer
                     "ORDER BY m.CrabTerreinObjectID", commandTimeout: (60 * 5));
 
                 return crab2VbrTerrainObjectMappings
-                    .Select(mapping => new AssignOsloIdForCrabTerrainObjectId(
+                    .Select(mapping => new AssignPersistentLocalIdForCrabTerrainObjectId(
                         new CrabTerrainObjectId(mapping.CrabTerreinObjectId),
-                        new OsloId(mapping.ObjectId),
-                        new OsloAssignmentDate(Instant.FromDateTimeOffset(mapping.MappingCreatedTimestamp)),
+                        new PersistentLocalId(mapping.ObjectId),
+                        new PersistentLocalIdAssignmentDate(Instant.FromDateTimeOffset(mapping.MappingCreatedTimestamp)),
                         buildingUnitOsloIdsByTerrainObjectId.ContainsKey(mapping.CrabTerreinObjectId)
                             ? buildingUnitOsloIdsByTerrainObjectId[mapping.CrabTerreinObjectId].ToList()
-                            : new List<AssignBuildingUnitOsloIdForCrabTerrainObjectId>()));
+                            : new List<AssignBuildingUnitPersistentLocalIdForCrabTerrainObjectId>()));
             }
         }
 
-        private IEnumerable<AssignOsloIdForCrabTerrainObjectId> GetOsloCommandsToPost(int terreinObjectId)
+        private IEnumerable<AssignPersistentLocalIdForCrabTerrainObjectId> GetOsloCommandsToPost(int terreinObjectId)
         {
             using (var connection = new SqlConnection(_vbrConnectionString))
             {
@@ -77,12 +77,12 @@ namespace BuildingRegistry.Importer
                         "ORDER BY m.gebouweenheididinternal", new { terreinObjectId }, commandTimeout: (60 * 5))
                     .GroupBy(x => x.TerreinObjectId)
                     .ToDictionary(x => x.Key, y => y
-                    .Select(mapping => new AssignBuildingUnitOsloIdForCrabTerrainObjectId(
+                    .Select(mapping => new AssignBuildingUnitPersistentLocalIdForCrabTerrainObjectId(
                         mapping.TerreinObjectHuisnummerId.HasValue ? new CrabTerrainObjectHouseNumberId(mapping.TerreinObjectHuisnummerId.Value) : null,
                         mapping.SubadresId.HasValue ? new CrabSubaddressId(mapping.SubadresId.Value) : null,
                         mapping.Index,
-                        new OsloId(mapping.ObjectId),
-                        new OsloAssignmentDate(Instant.FromDateTimeOffset(mapping.MappingCreatedTimestamp)))));
+                        new PersistentLocalId(mapping.ObjectId),
+                        new PersistentLocalIdAssignmentDate(Instant.FromDateTimeOffset(mapping.MappingCreatedTimestamp)))));
 
                 var crab2VbrTerrainObjectMappings = connection.Query<Crab2VbrTerrainObjectMapping>(
                     "SELECT o.ObjectID, m.CrabTerreinobjectID, m.MappingCreatedTimestamp " +
@@ -92,13 +92,13 @@ namespace BuildingRegistry.Importer
                     "ORDER BY m.CrabTerreinObjectID", new { terreinObjectId }, commandTimeout: (60 * 5));
 
                 return crab2VbrTerrainObjectMappings
-                    .Select(mapping => new AssignOsloIdForCrabTerrainObjectId(
+                    .Select(mapping => new AssignPersistentLocalIdForCrabTerrainObjectId(
                         new CrabTerrainObjectId(mapping.CrabTerreinObjectId),
-                        new OsloId(mapping.ObjectId),
-                        new OsloAssignmentDate(Instant.FromDateTimeOffset(mapping.MappingCreatedTimestamp)),
+                        new PersistentLocalId(mapping.ObjectId),
+                        new PersistentLocalIdAssignmentDate(Instant.FromDateTimeOffset(mapping.MappingCreatedTimestamp)),
                         buildingUnitOsloIdsByTerrainObjectId.ContainsKey(mapping.CrabTerreinObjectId)
                             ? buildingUnitOsloIdsByTerrainObjectId[mapping.CrabTerreinObjectId].ToList()
-                            : new List<AssignBuildingUnitOsloIdForCrabTerrainObjectId>()));
+                            : new List<AssignBuildingUnitPersistentLocalIdForCrabTerrainObjectId>()));
             }
         }
 
@@ -122,7 +122,7 @@ namespace BuildingRegistry.Importer
         {
             var crabCommands = CreateCommandsInOrder(ImportMode.Update, key, from, until);
 
-            crabCommands.Add(new RequestOsloIdsForCrabTerrainObjectId(new CrabTerrainObjectId(key)));
+            crabCommands.Add(new RequestPersistentLocalIdsForCrabTerrainObjectId(new CrabTerrainObjectId(key)));
 
             return crabCommands;
         }

@@ -17,7 +17,7 @@ namespace BuildingRegistry.Api.Extract.Extracts
                 .BuildingUnitExtract
                 .AsNoTracking()
                 .Where(m => m.IsComplete)
-                .OrderBy(m => m.OsloId);
+                .OrderBy(m => m.PersistentLocalId);
 
             yield return ExtractBuilder.CreateDbfFile<BuildingUnitExtractItem, BuildingUnitDbaseRecord>(
                 ExtractController.BuildingUnitZipName,

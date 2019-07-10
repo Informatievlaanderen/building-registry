@@ -8,7 +8,7 @@ namespace BuildingRegistry.Projections.Extract.BuildingExtract
     public class BuildingExtractItem
     {
         public Guid BuildingId { get; set; }
-        public int? OsloId  { get; set; }
+        public int? PersistentLocalId  { get; set; }
         public bool IsComplete { get; set; }
         public byte[] DbaseRecord { get; set; }
         public byte[] ShapeRecordContent { get; set; }
@@ -29,7 +29,7 @@ namespace BuildingRegistry.Projections.Extract.BuildingExtract
                 .HasKey(p => p.BuildingId)
                 .ForSqlServerIsClustered(false);
 
-            builder.Property(p => p.OsloId);
+            builder.Property(p => p.PersistentLocalId);
             builder.Property(p => p.IsComplete);
             builder.Property(p => p.DbaseRecord);
             builder.Property(p => p.ShapeRecordContent);
@@ -39,7 +39,7 @@ namespace BuildingRegistry.Projections.Extract.BuildingExtract
             builder.Property(p => p.MinimumY);
             builder.Property(p => p.MaximumY);
 
-            builder.HasIndex(p => p.OsloId).ForSqlServerIsClustered();
+            builder.HasIndex(p => p.PersistentLocalId).ForSqlServerIsClustered();
         }
     }
 }

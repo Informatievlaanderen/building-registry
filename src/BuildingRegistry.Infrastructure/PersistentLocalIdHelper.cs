@@ -1,6 +1,6 @@
 namespace BuildingRegistry.Infrastructure
 {
-    public static class OsloHelper
+    public static class PersistentLocalIdHelper
     {
         private const string DataVlaanderenUrl = "https://data.vlaanderen.be/id";
 

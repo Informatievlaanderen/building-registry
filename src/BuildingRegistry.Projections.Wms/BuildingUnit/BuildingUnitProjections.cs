@@ -25,17 +25,17 @@ namespace BuildingRegistry.Projections.Wms.BuildingUnit
             _wkbReader = wkbReader;
 
             #region Building
-            When<Envelope<BuildingOsloIdWasAssigned>>(async (context, message, ct) =>
+            When<Envelope<BuildingPersistentLocalIdWasAssigned>>(async (context, message, ct) =>
             {
-                await context.BuildingUnitBuildingOsloIds.AddAsync(new BuildingUnitBuildingOsloId
+                await context.BuildingUnitBuildingPersistentLocalIds.AddAsync(new BuildingUnitBuildingPersistentLocalId
                 {
                     BuildingId = message.Message.BuildingId,
-                    BuildingOsloId = message.Message.OsloId.ToString()
+                    BuildingPersistentLocalId = message.Message.PersistentLocalId.ToString()
                 }, ct);
 
                 foreach (var unit in await context.BuildingUnits.GetByBuildingId(message.Message.BuildingId, ct))
                 {
-                    unit.BuildingOsloId = int.Parse(message.Message.OsloId.ToString());
+                    unit.BuildingPersistentLocalId = int.Parse(message.Message.PersistentLocalId.ToString());
                 }
             });
 
@@ -110,13 +110,13 @@ namespace BuildingRegistry.Projections.Wms.BuildingUnit
 
             #region BuildingUnit
 
-            When<Envelope<BuildingUnitOsloIdWasAssigned>>(async (context, message, ct) =>
+            When<Envelope<BuildingUnitPersistentLocalIdWasAssigned>>(async (context, message, ct) =>
             {
                 var buildingUnit = await context.BuildingUnits.FindAsync(message.Message.BuildingUnitId, cancellationToken: ct);
                 if (buildingUnit != null)
                 {
-                    buildingUnit.Id = OsloHelper.CreateBuildingUnitId(message.Message.OsloId);
-                    buildingUnit.BuildingUnitOsloId = int.Parse(message.Message.OsloId.ToString());
+                    buildingUnit.Id = PersistentLocalIdHelper.CreateBuildingUnitId(message.Message.PersistentLocalId);
+                    buildingUnit.BuildingUnitPersistentLocalId = int.Parse(message.Message.PersistentLocalId.ToString());
                 }
             });
 
@@ -367,12 +367,12 @@ namespace BuildingRegistry.Projections.Wms.BuildingUnit
             Instant version,
             CancellationToken ct)
         {
-            var buildingOsloId = await context.BuildingUnitBuildingOsloIds.FindAsync(buildingId, cancellationToken: ct);
+            var buildingPersistentLocalId = await context.BuildingUnitBuildingPersistentLocalIds.FindAsync(buildingId, cancellationToken: ct);
 
             await context.BuildingUnits.AddAsync(new BuildingUnit
             {
                 BuildingId = buildingId,
-                BuildingOsloId = buildingOsloId == null ? null : (int?)int.Parse(buildingOsloId.BuildingOsloId),
+                BuildingPersistentLocalId = buildingPersistentLocalId == null ? null : (int?)int.Parse(buildingPersistentLocalId.BuildingPersistentLocalId),
                 BuildingUnitId = buildingUnitId,
                 Version = version,
                 Function = MapFunction(function)

@@ -17,7 +17,7 @@ namespace BuildingRegistry.Projections.Syndication
         // This needs to be here to please EF
         public SyndicationContext() { }
 
-        public DbSet<AddressOlsoIdItem> AddressOsloIds { get; set; }
+        public DbSet<AddressPersistentLocalIdItem> AddressPersistentLocalIds { get; set; }
         public DbSet<BuildingParcelLatestItem> BuildingParcelLatestItems { get; set; }
 
         // This needs to be DbContextOptions<T> for Autofac!

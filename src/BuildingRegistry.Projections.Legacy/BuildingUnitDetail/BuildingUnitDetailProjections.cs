@@ -140,24 +140,24 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetail
                 building.IsComplete = false;
             });
 
-            When<Envelope<BuildingOsloIdWasAssigned>>(async (context, message, ct) =>
+            When<Envelope<BuildingPersistentLocalIdWasAssigned>>(async (context, message, ct) =>
             {
                 var building = await context.BuildingUnitBuildings.FindAsync(message.Message.BuildingId, cancellationToken: ct);
-                building.BuildingOsloId = message.Message.OsloId;
+                building.BuildingPersistentLocalId = message.Message.PersistentLocalId;
 
                 var buildingUnits = (await context.BuildingUnitDetails.Where(unit => unit.BuildingId == message.Message.BuildingId).ToListAsync(ct))
                     .Union(context.BuildingUnitDetails.Local.Where(unit => unit.BuildingId == message.Message.BuildingId));
 
                 foreach (var buildingUnit in buildingUnits)
-                    buildingUnit.BuildingOsloId = message.Message.OsloId;
+                    buildingUnit.BuildingPersistentLocalId = message.Message.PersistentLocalId;
             });
             #endregion
 
-            When<Envelope<BuildingUnitOsloIdWasAssigned>>(async (context, message, ct) =>
+            When<Envelope<BuildingUnitPersistentLocalIdWasAssigned>>(async (context, message, ct) =>
             {
                 var buildingUnit = await context.BuildingUnitDetails.FindAsync(message.Message.BuildingUnitId, cancellationToken: ct);
                 if (buildingUnit != null)
-                    buildingUnit.OsloId = message.Message.OsloId;
+                    buildingUnit.PersistentLocalId = message.Message.PersistentLocalId;
             });
 
             When<Envelope<BuildingUnitBecameComplete>>(async (context, message, ct) =>
@@ -426,7 +426,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetail
             {
                 BuildingUnitId = buildingUnitId,
                 BuildingId = buildingId,
-                BuildingOsloId = building?.BuildingOsloId,
+                BuildingPersistentLocalId = building?.BuildingPersistentLocalId,
                 IsBuildingComplete = building?.IsComplete ?? false,
                 Version = version,
                 Function = isCommon ? BuildingUnitFunction.Common : BuildingUnitFunction.Unknown,

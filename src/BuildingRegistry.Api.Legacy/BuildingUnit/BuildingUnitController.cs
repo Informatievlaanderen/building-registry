@@ -70,7 +70,7 @@ namespace BuildingRegistry.Api.Legacy.BuildingUnit
             var units = await pagedBuildingUnits.Items
                 .Select(a => new
                 {
-                    a.OsloId,
+                    PersistentLocalId = a.PersistentLocalId,
                     a.Version,
                 })
                 .ToListAsync(cancellationToken);
@@ -79,7 +79,7 @@ namespace BuildingRegistry.Api.Legacy.BuildingUnit
             {
                 Gebouweenheden = units
                     .Select(x => new GebouweenheidCollectieItem(
-                        x.OsloId.Value,
+                        x.PersistentLocalId.Value,
                         responseOptions.Value.GebouweenheidNaamruimte,
                         responseOptions.Value.GebouweenheidDetailUrl,
                         x.Version.ToBelgianDateTimeOffset()))
@@ -97,13 +97,13 @@ namespace BuildingRegistry.Api.Legacy.BuildingUnit
         /// <param name="context"></param>
         /// <param name="syndicationContext"></param>
         /// <param name="responseOptions"></param>
-        /// <param name="gebouweenheidId"></param>
+        /// <param name="persistentLocalId"></param>
         /// <param name="cancellationToken"></param>
         /// <response code="200">Als de gebouweenheid gevonden is.</response>
         /// <response code="404">Als de gebouweenheid niet gevonden kan worden.</response>
         /// <response code="410">Als de gebouweenheid verwijderd werd.</response>
         /// <response code="500">Als er een interne fout is opgetreden.</response>
-        [HttpGet("{gebouweenheidId}")]
+        [HttpGet("{persistentLocalId}")]
         [ProducesResponseType(typeof(BuildingUnitResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status410Gone)]
@@ -116,14 +116,14 @@ namespace BuildingRegistry.Api.Legacy.BuildingUnit
             [FromServices] LegacyContext context,
             [FromServices] SyndicationContext syndicationContext,
             [FromServices] IOptions<ResponseOptions> responseOptions,
-            [FromRoute] int gebouweenheidId,
+            [FromRoute] int persistentLocalId,
             CancellationToken cancellationToken = default)
         {
             var buildingUnit = await context
                 .BuildingUnitDetails
                 .Include(x => x.Addresses)
                 .AsNoTracking()
-                .SingleOrDefaultAsync(item => item.OsloId == gebouweenheidId, cancellationToken);
+                .SingleOrDefaultAsync(item => item.PersistentLocalId == persistentLocalId, cancellationToken);
 
             if (buildingUnit == null || !buildingUnit.IsComplete)
                 throw new ApiException("Onbestaande gebouweenheid.", StatusCodes.Status404NotFound);
@@ -132,22 +132,22 @@ namespace BuildingRegistry.Api.Legacy.BuildingUnit
                 throw new ApiException("Gebouweenheid werd verwijderd.", StatusCodes.Status410Gone);
 
             var addressIds = buildingUnit.Addresses.Select(x => x.AddressId).ToList();
-            var addressOsloIds = await syndicationContext
-                .AddressOsloIds
+            var addressPersistentLocalIds = await syndicationContext
+                .AddressPersistentLocalIds
                 .Where(x => addressIds.Contains(x.AddressId))
-                .Select(x => x.OsloId)
+                .Select(x => x.PersistentLocalId)
                 .ToListAsync(cancellationToken);
 
             var response = new BuildingUnitResponse(
-                buildingUnit.OsloId.Value,
+                buildingUnit.PersistentLocalId.Value,
                 responseOptions.Value.GebouwNaamruimte,
                 buildingUnit.Version.ToBelgianDateTimeOffset(),
                 GetBuildingUnitPoint(buildingUnit.Position),
                 MapBuildingUnitGeometryMethod(buildingUnit.PositionMethod.Value),
                 MapBuildingUnitStatus(buildingUnit.Status.Value),
                 MapBuildingUnitFunction(buildingUnit.Function),
-                new GebouweenheidDetailGebouw(buildingUnit.BuildingOsloId.Value.ToString(), string.Format(responseOptions.Value.GebouwDetailUrl, buildingUnit.BuildingOsloId.Value)),
-                addressOsloIds.Select(osloId => new GebouweenheidDetailAdres(osloId, string.Format(responseOptions.Value.AdresUrl, osloId))).ToList());
+                new GebouweenheidDetailGebouw(buildingUnit.BuildingPersistentLocalId.Value.ToString(), string.Format(responseOptions.Value.GebouwDetailUrl, buildingUnit.BuildingPersistentLocalId.Value)),
+                addressPersistentLocalIds.Select(id => new GebouweenheidDetailAdres(id, string.Format(responseOptions.Value.AdresUrl, id))).ToList());
 
             return Ok(response);
         }

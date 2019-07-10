@@ -22,13 +22,13 @@ namespace BuildingRegistry.Projections.Wms.Building
                 await context.Buildings.AddAsync(new Building { BuildingId = message.Message.BuildingId });
             });
 
-            When<Envelope<BuildingOsloIdWasAssigned>>(async (context, message, ct) =>
+            When<Envelope<BuildingPersistentLocalIdWasAssigned>>(async (context, message, ct) =>
             {
                 var building = await context.Buildings.FindAsync(message.Message.BuildingId, cancellationToken: ct);
                 if (building != null)
                 {
-                    building.Id = OsloHelper.CreateBuildingId(message.Message.OsloId);
-                    building.OsloId = int.Parse(message.Message.OsloId.ToString());
+                    building.Id = PersistentLocalIdHelper.CreateBuildingId(message.Message.PersistentLocalId);
+                    building.PersistentLocalId = int.Parse(message.Message.PersistentLocalId.ToString());
                 }
             });
 

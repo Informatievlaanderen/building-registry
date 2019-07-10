@@ -309,9 +309,9 @@ namespace BuildingRegistry.Building
             Apply(new BuildingUnitAddressWasAttached(_buildingId, addressId, BuildingUnitId));
         }
 
-        public void ApplyOsloId(OsloId osloId, OsloAssignmentDate assignmentDate)
+        public void ApplyPersistentLocalId(PersistentLocalId persistentLocalId, PersistentLocalIdAssignmentDate assignmentDate)
         {
-            Apply(new BuildingUnitOsloIdWasAssigned(_buildingId, BuildingUnitId, osloId, assignmentDate));
+            Apply(new BuildingUnitPersistentLocalIdWasAssigned(_buildingId, BuildingUnitId, persistentLocalId, assignmentDate));
         }
     }
 }

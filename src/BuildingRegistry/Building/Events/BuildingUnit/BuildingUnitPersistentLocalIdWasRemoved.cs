@@ -7,37 +7,37 @@ namespace BuildingRegistry.Building.Events
     using NodaTime;
     using ValueObjects;
 
-    [EventName("BuildingUnitOsloIdWasRemoved")]
-    [EventDescription("De gebouweenheid oslo id werd verwijderd.")]
-    public class BuildingUnitOsloIdWasRemoved
+    [EventName("BuildingUnitPersistentLocalIdentifierWasRemoved")]
+    [EventDescription("De persistente lokale id van de gebouweenheid werd verwijderd.")]
+    public class BuildingUnitPersistentLocalIdWasRemoved
     {
         public Guid BuildingId { get; set; }
-        public string OsloId { get; set; }
+        public string PersistentLocalId { get; set; }
         public Instant AssignmentDate { get; set; }
         public string Reason { get; set; }
 
-        public BuildingUnitOsloIdWasRemoved(
+        public BuildingUnitPersistentLocalIdWasRemoved(
             BuildingId buildingId,
-            OsloId osloId,
-            OsloAssignmentDate assignmentDate,
+            PersistentLocalId persistentLocalId,
+            PersistentLocalIdAssignmentDate assignmentDate,
             Reason reason)
         {
             BuildingId = buildingId;
-            OsloId = osloId;
+            PersistentLocalId = persistentLocalId;
             AssignmentDate = assignmentDate;
             Reason = reason;
         }
 
         [JsonConstructor]
-        private BuildingUnitOsloIdWasRemoved(
+        private BuildingUnitPersistentLocalIdWasRemoved(
             Guid buildingId,
-            int osloId,
+            int persistentLocalId,
             Instant assignmentDate,
             string reason)
             : this(
                 new BuildingId(buildingId),
-                new OsloId(osloId),
-                new OsloAssignmentDate(assignmentDate),
+                new PersistentLocalId(persistentLocalId),
+                new PersistentLocalIdAssignmentDate(assignmentDate),
                 new Reason(reason)) { }
     }
 }

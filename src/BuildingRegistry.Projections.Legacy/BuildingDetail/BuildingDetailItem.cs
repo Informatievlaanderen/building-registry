@@ -13,7 +13,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingDetail
         public static string VersionTimestampBackingPropertyName = nameof(VersionTimestampAsDateTimeOffset);
 
         public Guid BuildingId { get; set; }
-        public int? OsloId { get; set; }
+        public int? PersistentLocalId { get; set; }
         public BuildingGeometryMethod? GeometryMethod { get; set; }
         public IPolygon Geometry { get; set; }
         public BuildingStatus? Status { get; set; }
@@ -52,7 +52,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingDetail
             b.Property(p => p.IsComplete);
             b.Property(p => p.IsRemoved);
 
-            b.HasIndex(p => p.OsloId).IsUnique();
+            b.HasIndex(p => p.PersistentLocalId).IsUnique();
         }
     }
 }

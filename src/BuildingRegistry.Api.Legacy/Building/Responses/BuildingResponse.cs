@@ -52,7 +52,7 @@ namespace BuildingRegistry.Api.Legacy.Building.Responses
         public List<GebouwDetailPerceel> Parcels { get; set; }
 
         public BuildingResponse(
-            int osloId,
+            int persistentLocalId,
             string naamruimte,
             DateTimeOffset version,
             Polygon geometry,
@@ -61,7 +61,7 @@ namespace BuildingRegistry.Api.Legacy.Building.Responses
             List<GebouwDetailGebouweenheid> buildingUnits,
             List<GebouwDetailPerceel> parcels)
         {
-            Identificator = new Identificator(naamruimte, osloId.ToString(), version);
+            Identificator = new Identificator(naamruimte, persistentLocalId.ToString(), version);
             Polygon = geometry;
             GeometryMethod = geometryMethod;
             Status = status;

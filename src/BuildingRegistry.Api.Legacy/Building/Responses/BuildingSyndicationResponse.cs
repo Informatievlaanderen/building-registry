@@ -47,27 +47,27 @@ namespace BuildingRegistry.Api.Legacy.Building.Responses
                     responseOptions.Value.GebouweenheidNaamruimte)
             };
 
-            if (building.OsloId.HasValue)
+            if (building.PersistentLocalId.HasValue)
             {
                 item.AddLink(
                     new SyndicationLink(
-                        new Uri($"{responseOptions.Value.GebouwNaamruimte}/{building.OsloId}"),
+                        new Uri($"{responseOptions.Value.GebouwNaamruimte}/{building.PersistentLocalId}"),
                         AtomLinkTypes.Related));
 
                 item.AddLink(
                     new SyndicationLink(
-                        new Uri(string.Format(responseOptions.Value.GebouwDetailUrl, building.OsloId)),
+                        new Uri(string.Format(responseOptions.Value.GebouwDetailUrl, building.PersistentLocalId)),
                         AtomLinkTypes.Self));
 
                 item.AddLink(
                     new SyndicationLink(
-                            new Uri(string.Format($"{responseOptions.Value.GebouwDetailUrl}.xml", building.OsloId)),
+                            new Uri(string.Format($"{responseOptions.Value.GebouwDetailUrl}.xml", building.PersistentLocalId)),
                             AtomLinkTypes.Alternate)
                     { MediaType = MediaTypeNames.Application.Xml });
 
                 item.AddLink(
                     new SyndicationLink(
-                            new Uri(string.Format($"{responseOptions.Value.GebouwDetailUrl}.json", building.OsloId)),
+                            new Uri(string.Format($"{responseOptions.Value.GebouwDetailUrl}.json", building.PersistentLocalId)),
                             AtomLinkTypes.Alternate)
                     { MediaType = MediaTypeNames.Application.Json });
             }
@@ -101,7 +101,7 @@ namespace BuildingRegistry.Api.Legacy.Building.Responses
                 syndicationContent.Object = new BuildingSyndicationContent(
                     building.BuildingId,
                     naamruimte,
-                    building.OsloId,
+                    building.PersistentLocalId,
                     building.Status?.ConvertFromBuildingStatus(),
                     building.GeometryMethod?.ConvertFromBuildingGeometryMethod(),
                     building.Geometry == null
@@ -116,7 +116,7 @@ namespace BuildingRegistry.Api.Legacy.Building.Responses
                         .Select(unit => new BuildingUnitSyndicationContent(
                             unit.BuildingUnitId,
                             gebouweenheidNaamruimte,
-                            unit.OsloId,
+                            unit.PersistentLocalId,
                             unit.Status?.ConvertFromBuildingUnitStatus(),
                             unit.GeometryMethod?.ConvertFromBuildingUnitGeometryMethod(),
                             unit.Geometry == null
@@ -204,7 +204,7 @@ namespace BuildingRegistry.Api.Legacy.Building.Responses
         public BuildingSyndicationContent(
             Guid buildingId,
             string naamruimte,
-            int? osloId,
+            int? persistentLocalId,
             GebouwStatus? status,
             GeometrieMethode? geometryMethod,
             GmlPolygon geometry,
@@ -215,7 +215,7 @@ namespace BuildingRegistry.Api.Legacy.Building.Responses
             List<BuildingUnitSyndicationContent> buildingUnits)
         {
             BuildingId = buildingId;
-            Identificator = new Identificator(naamruimte, osloId.HasValue ? osloId.ToString() : string.Empty, version);
+            Identificator = new Identificator(naamruimte, persistentLocalId.HasValue ? persistentLocalId.ToString() : string.Empty, version);
             Status = status;
             GeometryMethod = geometryMethod;
             Geometry = geometry == null ? null : new SyndicationPolygon { XmlPolygon = geometry };
@@ -280,7 +280,7 @@ namespace BuildingRegistry.Api.Legacy.Building.Responses
         public BuildingUnitSyndicationContent(
             Guid buildingUnitId,
             string naamruimte,
-            int? osloId,
+            int? persistentLocalId,
             GebouweenheidStatus? status,
             PositieGeometrieMethode? geometryMethod,
             GmlPoint geometry,
@@ -290,7 +290,7 @@ namespace BuildingRegistry.Api.Legacy.Building.Responses
             bool isComplete)
         {
             BuildingUnitId = buildingUnitId;
-            Identificator = new Identificator(naamruimte, osloId.HasValue ? osloId.ToString() : string.Empty, version);
+            Identificator = new Identificator(naamruimte, persistentLocalId.HasValue ? persistentLocalId.ToString() : string.Empty, version);
             Status = status;
             GeometryMethod = geometryMethod;
             Geometry = geometry == null ? null : new SyndicationPoint { XmlPoint = geometry };

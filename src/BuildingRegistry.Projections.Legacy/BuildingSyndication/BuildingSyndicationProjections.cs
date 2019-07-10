@@ -172,7 +172,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
                     .AddAsync(newSyndicationItem, ct);
             });
 
-            When<Envelope<BuildingOsloIdWasAssigned>>(async (context, message, ct) =>
+            When<Envelope<BuildingPersistentLocalIdWasAssigned>>(async (context, message, ct) =>
             {
                 var syndicationItem = await context.LatestPosition(message.Message.BuildingId, ct);
 
@@ -186,7 +186,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
                     message.Position,
                     message.EventName,
                     Instant.FromDateTimeUtc(message.CreatedUtc.ToUniversalTime()),
-                    x => x.OsloId = message.Message.OsloId);
+                    x => x.PersistentLocalId = message.Message.PersistentLocalId);
 
                 newSyndicationItem.EventDataAsXml = GetEventDataAsXmlString(message.Message);
 
@@ -915,7 +915,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
                     .AddAsync(newSyndicationItem, ct);
             });
 
-            When<Envelope<BuildingUnitOsloIdWasAssigned>>(async (context, message, ct) =>
+            When<Envelope<BuildingUnitPersistentLocalIdWasAssigned>>(async (context, message, ct) =>
             {
                 var syndicationItem = await context.LatestPosition(message.Message.BuildingId, ct);
 
@@ -932,7 +932,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
                     x =>
                     {
                         if (x.BuildingUnits.Any(y => y.BuildingUnitId == message.Message.BuildingUnitId))
-                            x.BuildingUnits.Single(y => y.BuildingUnitId == message.Message.BuildingUnitId).OsloId = message.Message.OsloId;
+                            x.BuildingUnits.Single(y => y.BuildingUnitId == message.Message.BuildingUnitId).PersistentLocalId = message.Message.PersistentLocalId;
                     });
 
                 newSyndicationItem.EventDataAsXml = GetEventDataAsXmlString(message.Message);
@@ -1443,7 +1443,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
                     .AddAsync(newSyndicationItem, ct);
             });
 
-            When<Envelope<BuildingUnitOsloIdWasDuplicated>>(async (context, message, ct) =>
+            When<Envelope<BuildingUnitPersistentLocalIdWasDuplicated>>(async (context, message, ct) =>
             {
                 var syndicationItem = await context.LatestPosition(message.Message.BuildingId, ct);
 

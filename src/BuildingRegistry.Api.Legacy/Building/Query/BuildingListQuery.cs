@@ -35,10 +35,10 @@ namespace BuildingRegistry.Api.Legacy.Building.Query
     {
         public IEnumerable<string> SortableFields { get; } = new[]
         {
-            nameof(BuildingDetailItem.OsloId),
+            nameof(BuildingDetailItem.PersistentLocalId),
         };
 
-        public SortingHeader DefaultSortingHeader { get; } = new SortingHeader(nameof(BuildingDetailItem.OsloId), SortOrder.Ascending);
+        public SortingHeader DefaultSortingHeader { get; } = new SortingHeader(nameof(BuildingDetailItem.PersistentLocalId), SortOrder.Ascending);
     }
 
     public class BuildingFilter { }

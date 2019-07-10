@@ -16,7 +16,7 @@ namespace BuildingRegistry.Building
     public sealed class BuildingCommandHandlerModule : CommandHandlerModule
     {
         private readonly Func<IBuildings> _getBuildings;
-        private readonly IOsloIdGenerator _osloIdGenerator;
+        private readonly IPersistentLocalIdGenerator _persistentLocalIdGenerator;
 
         public BuildingCommandHandlerModule(
             Func<IBuildings> getBuildings,
@@ -24,11 +24,11 @@ namespace BuildingRegistry.Building
             Func<IStreamStore> getStreamStore,
             EventMapping eventMapping,
             EventSerializer eventSerializer,
-            IOsloIdGenerator osloIdGenerator,
+            IPersistentLocalIdGenerator persistentLocalIdGenerator,
             BuildingProvenanceFactory provenanceFactory)
         {
             _getBuildings = getBuildings;
-            _osloIdGenerator = osloIdGenerator;
+            _persistentLocalIdGenerator = persistentLocalIdGenerator;
 
             For<ImportTerrainObjectFromCrab>()
                 .AddSqlStreamStore(getStreamStore, getUnitOfWork, eventMapping, eventSerializer)
@@ -75,9 +75,9 @@ namespace BuildingRegistry.Building
                 .AddProvenance(getUnitOfWork, provenanceFactory)
                 .Handle(async (message, ct) => { await ImportSubaddressPosition(message, ct); });
 
-            For<AssignOsloIdForCrabTerrainObjectId>()
+            For<AssignPersistentLocalIdForCrabTerrainObjectId>()
                 .AddSqlStreamStore(getStreamStore, getUnitOfWork, eventMapping, eventSerializer)
-                .Handle(async (message, ct) => { await AssignOsloIdForCrabTerrainObjectId(message, ct); });
+                .Handle(async (message, ct) => { await AssignPersistentLocalIdForCrabTerrainObjectId(message, ct); });
 
             For<ImportReaddressingHouseNumberFromCrab>()
                 .AddSqlStreamStore(getStreamStore, getUnitOfWork, eventMapping, eventSerializer)
@@ -87,9 +87,9 @@ namespace BuildingRegistry.Building
                 .AddSqlStreamStore(getStreamStore, getUnitOfWork, eventMapping, eventSerializer)
                 .Handle(async (message, ct) => { await ImportReaddressingSubaddress(message, ct); });
 
-            For<RequestOsloIdsForCrabTerrainObjectId>()
+            For<RequestPersistentLocalIdsForCrabTerrainObjectId>()
                 .AddSqlStreamStore(getStreamStore, getUnitOfWork, eventMapping, eventSerializer)
-                .Handle(async (message, ct) => { await RequestOsloIdsForCrabTerrainObjectId(message, ct); });
+                .Handle(async (message, ct) => { await RequestPersistentLocalIdsForCrabTerrainObjectId(message, ct); });
         }
 
         public async Task ImportSubaddressPosition(CommandMessage<ImportSubaddressPositionFromCrab> message, CancellationToken ct)
@@ -272,18 +272,18 @@ namespace BuildingRegistry.Building
                 message.Command.Organisation);
         }
 
-        public async Task AssignOsloIdForCrabTerrainObjectId(CommandMessage<AssignOsloIdForCrabTerrainObjectId> message, CancellationToken ct)
+        public async Task AssignPersistentLocalIdForCrabTerrainObjectId(CommandMessage<AssignPersistentLocalIdForCrabTerrainObjectId> message, CancellationToken ct)
         {
             var buildings = _getBuildings();
             var buildingId = message.Command.TerrainObjectId.CreateDeterministicId();
             var building = await buildings.GetAsync(buildingId.ToString(), ct);
 
-            building.AssignOsloIdForCrabTerrainObjectId(
+            building.AssignPersistentLocalIdForCrabTerrainObjectId(
                 message.Command.TerrainObjectId,
-                message.Command.OsloId,
+                message.Command.PersistentLocalId,
                 message.Command.AssignmentDate,
-                message.Command.BuildingUnitOsloIds,
-                _osloIdGenerator);
+                message.Command.BuildingUnitPersistentLocalIds,
+                _persistentLocalIdGenerator);
         }
 
         public async Task ImportReaddressingHouseNumber(CommandMessage<ImportReaddressingHouseNumberFromCrab> message, CancellationToken ct)
@@ -322,14 +322,14 @@ namespace BuildingRegistry.Building
                 message.Command.NewSubaddressId);
         }
 
-        public async Task RequestOsloIdsForCrabTerrainObjectId(
-            CommandMessage<RequestOsloIdsForCrabTerrainObjectId> message, CancellationToken ct)
+        public async Task RequestPersistentLocalIdsForCrabTerrainObjectId(
+            CommandMessage<RequestPersistentLocalIdsForCrabTerrainObjectId> message, CancellationToken ct)
         {
             var buildings = _getBuildings();
             var buildingId = message.Command.TerrainObjectId.CreateDeterministicId();
             var building = await buildings.GetAsync(buildingId.ToString(), ct);
 
-            building.AssignOsloIds(_osloIdGenerator);
+            building.AssignPersistentLocalIds(_persistentLocalIdGenerator);
         }
     }
 }

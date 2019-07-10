@@ -108,23 +108,23 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
                 context.BuildingUnitExtract.Remove(item);
             });
 
-            When<Envelope<BuildingUnitOsloIdWasAssigned>>(async (context, message, ct) =>
+            When<Envelope<BuildingUnitPersistentLocalIdWasAssigned>>(async (context, message, ct) =>
             {
                 await context.FindAndUpdateBuildingUnitExtract(message.Message.BuildingUnitId,
                     item =>
                     {
-                        item.OsloId = message.Message.OsloId;
-                        UpdateId(item, message.Message.OsloId);
+                        item.PersistentLocalId = message.Message.PersistentLocalId;
+                        UpdateId(item, message.Message.PersistentLocalId);
                     }, ct);
             });
 
-            When<Envelope<BuildingOsloIdWasAssigned>>(async (context, message, ct) =>
+            When<Envelope<BuildingPersistentLocalIdWasAssigned>>(async (context, message, ct) =>
                 {
                     var units = context.BuildingUnitExtract.Local.Where(x => x.BuildingId == message.Message.BuildingId)
                         .Union(context.BuildingUnitExtract.Where(x => x.BuildingId == message.Message.BuildingId));
 
                     foreach (var unit in units)
-                        UpdateRecord(unit, item => { item.gebouwid.Value = message.Message.OsloId.ToString(); });
+                        UpdateRecord(unit, item => { item.gebouwid.Value = message.Message.PersistentLocalId.ToString(); });
                 });
 
             When<Envelope<BuildingUnitBecameComplete>>(async (context, message, ct) =>

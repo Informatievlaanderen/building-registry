@@ -30,7 +30,7 @@ namespace BuildingRegistry.Api.CrabImport.CrabImport
             Func<IStreamStore> getStreamStore,
             EventMapping eventMapping,
             EventSerializer eventSerializer,
-            IOsloIdGenerator osloIdGenerator,
+            IPersistentLocalIdGenerator persistentLocalIdGenerator,
             BuildingProvenanceFactory provenanceFactory)
         {
             _logger = logger;
@@ -43,7 +43,7 @@ namespace BuildingRegistry.Api.CrabImport.CrabImport
                 getStreamStore,
                 eventMapping,
                 eventSerializer,
-                osloIdGenerator,
+                persistentLocalIdGenerator,
                 provenanceFactory);
         }
 
@@ -119,16 +119,16 @@ namespace BuildingRegistry.Api.CrabImport.CrabImport
                     message = commandSubaddressPositionMessage;
                     break;
 
-                case AssignOsloIdForCrabTerrainObjectId command:
-                    var commandAssignOsloId = new CommandMessage<AssignOsloIdForCrabTerrainObjectId>(command.CreateCommandId(), command, metadata);
-                    await _buildingCommandHandlerModule.AssignOsloIdForCrabTerrainObjectId(commandAssignOsloId, cancellationToken);
-                    message = commandAssignOsloId;
+                case AssignPersistentLocalIdForCrabTerrainObjectId command:
+                    var commandAssignPersistentLocalId = new CommandMessage<AssignPersistentLocalIdForCrabTerrainObjectId>(command.CreateCommandId(), command, metadata);
+                    await _buildingCommandHandlerModule.AssignPersistentLocalIdForCrabTerrainObjectId(commandAssignPersistentLocalId, cancellationToken);
+                    message = commandAssignPersistentLocalId;
                     break;
 
-                case RequestOsloIdsForCrabTerrainObjectId command:
-                    var commandRequestOsloId = new CommandMessage<RequestOsloIdsForCrabTerrainObjectId>(command.CreateCommandId(), command, metadata);
-                    await _buildingCommandHandlerModule.RequestOsloIdsForCrabTerrainObjectId(commandRequestOsloId, cancellationToken);
-                    message = commandRequestOsloId;
+                case RequestPersistentLocalIdsForCrabTerrainObjectId command:
+                    var commandRequestPersistentLocalId = new CommandMessage<RequestPersistentLocalIdsForCrabTerrainObjectId>(command.CreateCommandId(), command, metadata);
+                    await _buildingCommandHandlerModule.RequestPersistentLocalIdsForCrabTerrainObjectId(commandRequestPersistentLocalId, cancellationToken);
+                    message = commandRequestPersistentLocalId;
                     break;
 
                 case ImportReaddressingHouseNumberFromCrab command:

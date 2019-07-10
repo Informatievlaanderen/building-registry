@@ -13,7 +13,7 @@ namespace BuildingRegistry.Projections.Wms.Building
         public static string VersionTimestampBackingPropertyName = nameof(VersionTimestampAsDateTimeOffset);
 
         public Guid BuildingId { get; set; }
-        public int? OsloId { get; set; }
+        public int? PersistentLocalId { get; set; }
         public string Id { get; set; }
 
         public IPolygon Geometry { get; set; }

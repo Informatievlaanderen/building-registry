@@ -61,7 +61,7 @@ namespace BuildingRegistry.Api.Legacy.BuildingUnit.Responses
         public List<GebouweenheidDetailAdres> Addresses { get; set; }
 
         public BuildingUnitResponse(
-            int osloId,
+            int persistentLocalId,
             string naamruimte,
             DateTimeOffset version,
             Point geometry,
@@ -71,7 +71,7 @@ namespace BuildingRegistry.Api.Legacy.BuildingUnit.Responses
             GebouweenheidDetailGebouw building,
             List<GebouweenheidDetailAdres> addresses)
         {
-            Identificator = new Identificator(naamruimte, osloId.ToString(), version);
+            Identificator = new Identificator(naamruimte, persistentLocalId.ToString(), version);
             Geometry = geometry;
             GeometryMethod = geometryMethod;
             Status = status;

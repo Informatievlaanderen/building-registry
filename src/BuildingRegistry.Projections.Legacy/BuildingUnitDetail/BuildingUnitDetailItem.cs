@@ -15,8 +15,8 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetail
 
         public Guid BuildingUnitId { get; set; }
         public Guid BuildingId { get; set; }
-        public int? OsloId { get; set; }
-        public int? BuildingOsloId { get; set; }
+        public int? PersistentLocalId { get; set; }
+        public int? BuildingPersistentLocalId { get; set; }
         public IPoint Position { get; set; }
         public bool IsComplete { get; set; }
         public bool IsRemoved { get; set; }
@@ -99,8 +99,8 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetail
                 .IsRequired()
                 .HasForeignKey(x => x.BuildingUnitId);
 
-            b.HasIndex(p => p.OsloId).IsUnique();
-            b.HasIndex(p => p.BuildingOsloId);
+            b.HasIndex(p => p.PersistentLocalId).IsUnique();
+            b.HasIndex(p => p.BuildingPersistentLocalId);
         }
     }
 }
