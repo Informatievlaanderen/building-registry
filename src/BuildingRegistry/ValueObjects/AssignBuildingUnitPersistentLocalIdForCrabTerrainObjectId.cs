@@ -4,26 +4,26 @@ namespace BuildingRegistry.ValueObjects
     using Be.Vlaanderen.Basisregisters.AggregateSource;
     using Be.Vlaanderen.Basisregisters.Crab;
 
-    public class AssignBuildingUnitOsloIdForCrabTerrainObjectId : ValueObject<AssignBuildingUnitOsloIdForCrabTerrainObjectId>
+    public class AssignBuildingUnitPersistentLocalIdForCrabTerrainObjectId : ValueObject<AssignBuildingUnitPersistentLocalIdForCrabTerrainObjectId>
     {
         public CrabTerrainObjectHouseNumberId CrabTerrainObjectHouseNumberId { get; }
         public CrabSubaddressId CrabSubaddressId { get; }
         public int Index { get; }
-        public OsloId OsloId { get; }
-        public OsloAssignmentDate OsloAssignmentDate { get; }
+        public PersistentLocalId PersistentLocalId { get; }
+        public PersistentLocalIdAssignmentDate PersistentLocalIdAssignmentDate { get; }
 
-        public AssignBuildingUnitOsloIdForCrabTerrainObjectId(
+        public AssignBuildingUnitPersistentLocalIdForCrabTerrainObjectId(
             CrabTerrainObjectHouseNumberId crabTerrainObjectHouseNumberId,
             CrabSubaddressId crabSubaddressId,
             int index,
-            OsloId osloId,
-            OsloAssignmentDate osloAssignmentDate)
+            PersistentLocalId persistentLocalId,
+            PersistentLocalIdAssignmentDate persistentLocalIdAssignmentDate)
         {
             CrabTerrainObjectHouseNumberId = crabTerrainObjectHouseNumberId;
             CrabSubaddressId = crabSubaddressId;
             Index = index;
-            OsloId = osloId;
-            OsloAssignmentDate = osloAssignmentDate;
+            PersistentLocalId = persistentLocalId;
+            PersistentLocalIdAssignmentDate = persistentLocalIdAssignmentDate;
         }
 
         protected override IEnumerable<object> Reflect()
@@ -31,8 +31,8 @@ namespace BuildingRegistry.ValueObjects
             yield return CrabTerrainObjectHouseNumberId;
             yield return CrabSubaddressId;
             yield return Index;
-            yield return OsloId;
-            yield return OsloAssignmentDate;
+            yield return PersistentLocalId;
+            yield return PersistentLocalIdAssignmentDate;
         }
     }
 }

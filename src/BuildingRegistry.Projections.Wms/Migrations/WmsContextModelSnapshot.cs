@@ -51,7 +51,7 @@ namespace BuildingRegistry.Projections.Wms.Migrations
 
                     b.Property<bool>("IsComplete");
 
-                    b.Property<int?>("OsloId");
+                    b.Property<int?>("PersistentLocalId");
 
                     b.Property<string>("StatusAsText")
                         .HasColumnName("Status");
@@ -72,9 +72,9 @@ namespace BuildingRegistry.Projections.Wms.Migrations
 
                     b.Property<Guid>("BuildingId");
 
-                    b.Property<int?>("BuildingOsloId");
+                    b.Property<int?>("BuildingPersistentLocalId");
 
-                    b.Property<int?>("BuildingUnitOsloId");
+                    b.Property<int?>("BuildingUnitPersistentLocalId");
 
                     b.Property<string>("Function")
                         .HasColumnType("varchar(21)")
@@ -107,19 +107,19 @@ namespace BuildingRegistry.Projections.Wms.Migrations
                     b.ToTable("BuildingUnits","wms");
                 });
 
-            modelBuilder.Entity("BuildingRegistry.Projections.Wms.BuildingUnit.BuildingUnitBuildingOsloId", b =>
+            modelBuilder.Entity("BuildingRegistry.Projections.Wms.BuildingUnit.BuildingUnitBuildingPersistentLocalId", b =>
                 {
                     b.Property<Guid>("BuildingId")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<string>("BuildingOsloId");
+                    b.Property<string>("BuildingPersistentLocalId");
 
                     b.HasKey("BuildingId")
                         .HasAnnotation("SqlServer:Clustered", false);
 
-                    b.HasIndex("BuildingOsloId");
+                    b.HasIndex("BuildingPersistentLocalId");
 
-                    b.ToTable("BuildingUnit_BuildingOsloIds","wms");
+                    b.ToTable("BuildingUnit_BuildingPersistentLocalIds","wms");
                 });
 #pragma warning restore 612, 618
         }

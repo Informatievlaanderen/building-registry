@@ -14,7 +14,7 @@ namespace BuildingRegistry.Building
         private BuildingId _buildingId;
         public BuildingGeometry Geometry { get; private set; }
 
-        private OsloId _osloId;
+        private PersistentLocalId _persistentLocalId;
         private BuildingStatus? _status;
 
         public bool IsRemoved { get; private set; }
@@ -51,7 +51,7 @@ namespace BuildingRegistry.Building
         {
             Register<BuildingWasRegistered>(When);
             Register<BuildingWasRemoved>(When);
-            Register<BuildingOsloIdWasAssigned>(When);
+            Register<BuildingPersistentLocalIdWasAssigned>(When);
 
             Register<BuildingGeometryWasImportedFromCrab>(When);
             Register<BuildingStatusWasImportedFromCrab>(When);
@@ -117,7 +117,7 @@ namespace BuildingRegistry.Building
             Register<BuildingUnitAddressWasDetached>(When);
             Register<BuildingUnitAddressWasAttached>(When);
             Register<BuildingUnitWasReaddressed>(When);
-            Register<BuildingUnitOsloIdWasAssigned>(When);
+            Register<BuildingUnitPersistentLocalIdWasAssigned>(When);
         }
 
         private void When(BuildingUnitWasReaddressed @event)
@@ -126,12 +126,12 @@ namespace BuildingRegistry.Building
             buildingUnit.Route(@event);
         }
 
-        private void When(BuildingOsloIdWasAssigned @event)
+        private void When(BuildingPersistentLocalIdWasAssigned @event)
         {
-            _osloId = new OsloId(@event.OsloId);
+            _persistentLocalId = new PersistentLocalId(@event.PersistentLocalId);
         }
 
-        private void When(BuildingUnitOsloIdWasAssigned @event)
+        private void When(BuildingUnitPersistentLocalIdWasAssigned @event)
         {
             var unit = _buildingUnitCollection.GetById(new BuildingUnitId(@event.BuildingUnitId));
             unit.Route(@event);

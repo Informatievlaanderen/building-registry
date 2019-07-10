@@ -5,18 +5,18 @@ namespace BuildingRegistry.Api.CrabImport.Infrastructure
     using Microsoft.EntityFrameworkCore;
     using ValueObjects;
 
-    public class SqlOsloIdGenerator : IOsloIdGenerator
+    public class SqlPersistentLocalIdGenerator : IPersistentLocalIdGenerator
     {
         private readonly SequenceContext _context;
 
-        public SqlOsloIdGenerator(SequenceContext context)
+        public SqlPersistentLocalIdGenerator(SequenceContext context)
         {
             _context = context;
         }
 
-        public OsloId GenerateNextOsloId()
+        public PersistentLocalId GenerateNextPersistentLocalId()
         {
-            var sqlStatement = $"SELECT NEXT VALUE FOR {Schema.Sequence}.{SequenceContext.BuildingOsloIdSequenceName}";
+            var sqlStatement = $"SELECT NEXT VALUE FOR {Schema.Sequence}.{SequenceContext.BuildingPersistentLocalIdSequenceName}";
 
             int nextNumber;
             using (var command = _context.Database.GetDbConnection().CreateCommand())
@@ -29,7 +29,7 @@ namespace BuildingRegistry.Api.CrabImport.Infrastructure
                 command.Connection.Close();
             }
 
-            return new OsloId(nextNumber);
+            return new PersistentLocalId(nextNumber);
         }
     }
 }

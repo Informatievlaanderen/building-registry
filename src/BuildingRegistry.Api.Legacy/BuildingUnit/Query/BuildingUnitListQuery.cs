@@ -32,17 +32,17 @@ namespace BuildingRegistry.Api.Legacy.BuildingUnit.Query
                 .Where(x => x.IsComplete && !x.IsRemoved && x.IsBuildingComplete)
                 .AsNoTracking();
 
-            if (!string.IsNullOrEmpty(filtering.Filter?.AddressOsloId))
+            if (!string.IsNullOrEmpty(filtering.Filter?.AddressPersistentLocalId))
             {
-                var addressOsloIds = _syndicationContext
-                    .AddressOsloIds
-                    .Where(x => x.OsloId == filtering.Filter.AddressOsloId)
+                var addressPersistentLocalIds = _syndicationContext
+                    .AddressPersistentLocalIds
+                    .Where(x => x.PersistentLocalId == filtering.Filter.AddressPersistentLocalId)
                     .Select(x => x.AddressId)
                     .ToList();
 
                 buildingUnits = _context
                     .BuildingUnitDetails
-                    .Where(unit => unit.Addresses.Any(address => addressOsloIds.Contains(address.AddressId)));
+                    .Where(unit => unit.Addresses.Any(address => addressPersistentLocalIds.Contains(address.AddressId)));
             }
 
             return buildingUnits;
@@ -53,14 +53,14 @@ namespace BuildingRegistry.Api.Legacy.BuildingUnit.Query
     {
         public IEnumerable<string> SortableFields { get; } = new[]
         {
-            nameof(BuildingUnitDetailItem.OsloId),
+            nameof(BuildingUnitDetailItem.PersistentLocalId),
         };
 
-        public SortingHeader DefaultSortingHeader { get; } = new SortingHeader(nameof(BuildingUnitDetailItem.OsloId), SortOrder.Ascending);
+        public SortingHeader DefaultSortingHeader { get; } = new SortingHeader(nameof(BuildingUnitDetailItem.PersistentLocalId), SortOrder.Ascending);
     }
 
     public class BuildingUnitFilter
     {
-        public string AddressOsloId { get; set; }
+        public string AddressPersistentLocalId { get; set; }
     }
 }

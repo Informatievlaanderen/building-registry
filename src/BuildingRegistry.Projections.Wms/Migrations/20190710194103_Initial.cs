@@ -17,7 +17,7 @@ namespace BuildingRegistry.Projections.Wms.Migrations
                 columns: table => new
                 {
                     BuildingId = table.Column<Guid>(nullable: false),
-                    OsloId = table.Column<int>(nullable: true),
+                    PersistentLocalId = table.Column<int>(nullable: true),
                     Id = table.Column<string>(type: "varchar(46)", maxLength: 46, nullable: true),
                     Geometry = table.Column<IPolygon>(type: "geometry", nullable: true),
                     GeometryMethod = table.Column<string>(type: "varchar(12)", maxLength: 12, nullable: true),
@@ -32,16 +32,16 @@ namespace BuildingRegistry.Projections.Wms.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "BuildingUnit_BuildingOsloIds",
+                name: "BuildingUnit_BuildingPersistentLocalIds",
                 schema: "wms",
                 columns: table => new
                 {
                     BuildingId = table.Column<Guid>(nullable: false),
-                    BuildingOsloId = table.Column<string>(nullable: true)
+                    BuildingPersistentLocalId = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_BuildingUnit_BuildingOsloIds", x => x.BuildingId)
+                    table.PrimaryKey("PK_BuildingUnit_BuildingPersistentLocalIds", x => x.BuildingId)
                         .Annotation("SqlServer:Clustered", false);
                 });
 
@@ -52,9 +52,9 @@ namespace BuildingRegistry.Projections.Wms.Migrations
                 {
                     BuildingUnitId = table.Column<Guid>(nullable: false),
                     Id = table.Column<string>(type: "varchar(53)", maxLength: 53, nullable: true),
-                    BuildingUnitOsloId = table.Column<int>(nullable: true),
+                    BuildingUnitPersistentLocalId = table.Column<int>(nullable: true),
                     BuildingId = table.Column<Guid>(nullable: false),
-                    BuildingOsloId = table.Column<int>(nullable: true),
+                    BuildingPersistentLocalId = table.Column<int>(nullable: true),
                     Position = table.Column<IPoint>(type: "geometry", nullable: true),
                     PositionMethod = table.Column<string>(type: "varchar(22)", maxLength: 22, nullable: true),
                     Function = table.Column<string>(type: "varchar(21)", maxLength: 21, nullable: true),
@@ -84,10 +84,10 @@ namespace BuildingRegistry.Projections.Wms.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_BuildingUnit_BuildingOsloIds_BuildingOsloId",
+                name: "IX_BuildingUnit_BuildingPersistentLocalIds_BuildingPersistentLocalId",
                 schema: "wms",
-                table: "BuildingUnit_BuildingOsloIds",
-                column: "BuildingOsloId");
+                table: "BuildingUnit_BuildingPersistentLocalIds",
+                column: "BuildingPersistentLocalId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -97,7 +97,7 @@ namespace BuildingRegistry.Projections.Wms.Migrations
                 schema: "wms");
 
             migrationBuilder.DropTable(
-                name: "BuildingUnit_BuildingOsloIds",
+                name: "BuildingUnit_BuildingPersistentLocalIds",
                 schema: "wms");
 
             migrationBuilder.DropTable(

@@ -9,7 +9,7 @@ namespace BuildingRegistry.Api.CrabImport.Infrastructure
 
     public class SequenceContext : DbContext
     {
-        public const string BuildingOsloIdSequenceName = "BuildingOsloIds";
+        public const string BuildingPersistentLocalIdSequenceName = "BuildingPersistentLocalIdSequence";
 
         public SequenceContext() { }
 

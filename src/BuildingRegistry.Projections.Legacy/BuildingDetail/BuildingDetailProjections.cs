@@ -29,11 +29,11 @@ namespace BuildingRegistry.Projections.Legacy.BuildingDetail
                         ct);
             });
 
-            When<Envelope<BuildingOsloIdWasAssigned>>(async (context, message, ct) =>
+            When<Envelope<BuildingPersistentLocalIdWasAssigned>>(async (context, message, ct) =>
             {
                 var item = await context.BuildingDetails.FindAsync(message.Message.BuildingId, cancellationToken: ct);
                 if (item != null)
-                    item.OsloId = message.Message.OsloId;
+                    item.PersistentLocalId = message.Message.PersistentLocalId;
             });
 
             When<Envelope<BuildingWasRemoved>>(async (context, message, ct) =>

@@ -14,10 +14,10 @@ namespace BuildingRegistry.Projections.Wms.BuildingUnit
 
         public Guid BuildingUnitId { get; set; }
         public string Id { get; set; }
-        public int? BuildingUnitOsloId { get; set; }
+        public int? BuildingUnitPersistentLocalId { get; set; }
 
         public Guid BuildingId { get; set; }
-        public int? BuildingOsloId { get; set; }
+        public int? BuildingPersistentLocalId { get; set; }
 
         public IPoint Position { get; set; }
         public string PositionMethod { get; set; }
@@ -61,7 +61,7 @@ namespace BuildingRegistry.Projections.Wms.BuildingUnit
             b.Ignore(x => x.Version);
 
             b.Property(p => p.BuildingId);
-            b.Property(p => p.BuildingOsloId);
+            b.Property(p => p.BuildingPersistentLocalId);
             b.Property(p => p.IsComplete);
             b.Property(p => p.IsBuildingComplete);
             b.Property(p => p.Function)

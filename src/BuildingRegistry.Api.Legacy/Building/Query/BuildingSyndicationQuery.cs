@@ -38,7 +38,7 @@ namespace BuildingRegistry.Api.Legacy.Building.Query
                     return x => new BuildingSyndicationQueryResult(
                         x.BuildingId.Value,
                         x.Position,
-                        x.OsloId,
+                        x.PersistentLocalId,
                         x.ChangeType,
                         x.RecordCreatedAt,
                         x.LastChangedOn,
@@ -50,7 +50,7 @@ namespace BuildingRegistry.Api.Legacy.Building.Query
                 return x => new BuildingSyndicationQueryResult(
                     x.BuildingId.Value,
                     x.Position,
-                    x.OsloId,
+                    x.PersistentLocalId,
                     x.ChangeType,
                     x.RecordCreatedAt,
                     x.LastChangedOn);
@@ -66,7 +66,7 @@ namespace BuildingRegistry.Api.Legacy.Building.Query
                 return new BuildingSyndicationQueryResult(
                     x.BuildingId.Value,
                     x.Position,
-                    x.OsloId,
+                    x.PersistentLocalId,
                     x.Status,
                     x.GeometryMethod,
                     x.Geometry,
@@ -82,7 +82,7 @@ namespace BuildingRegistry.Api.Legacy.Building.Query
             return new BuildingSyndicationQueryResult(
                 x.BuildingId.Value,
                 x.Position,
-                x.OsloId,
+                x.PersistentLocalId,
                 x.Status,
                 x.GeometryMethod,
                 x.Geometry,

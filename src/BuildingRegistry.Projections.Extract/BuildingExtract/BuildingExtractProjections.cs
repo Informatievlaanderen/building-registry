@@ -45,13 +45,13 @@ namespace BuildingRegistry.Projections.Extract.BuildingExtract
                     }, ct);
             });
 
-            When<Envelope<BuildingOsloIdWasAssigned>>(async (context, message, ct) =>
+            When<Envelope<BuildingPersistentLocalIdWasAssigned>>(async (context, message, ct) =>
             {
                 await context.FindAndUpdateBuildingExtract(message.Message.BuildingId,
                     item =>
                     {
-                        item.OsloId = message.Message.OsloId;
-                        UpdateId(item, message.Message.OsloId);
+                        item.PersistentLocalId = message.Message.PersistentLocalId;
+                        UpdateId(item, message.Message.PersistentLocalId);
                     }, ct);
             });
 

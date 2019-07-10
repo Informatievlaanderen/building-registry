@@ -14,7 +14,7 @@ namespace BuildingRegistry.Projections.Wms
 
         public DbSet<Building.Building> Buildings { get; set; }
         public DbSet<BuildingUnit.BuildingUnit> BuildingUnits { get; set; }
-        public DbSet<BuildingUnit.BuildingUnitBuildingOsloId> BuildingUnitBuildingOsloIds { get; set; }
+        public DbSet<BuildingUnit.BuildingUnitBuildingPersistentLocalId> BuildingUnitBuildingPersistentLocalIds { get; set; }
 
         public WmsContext() { }
 

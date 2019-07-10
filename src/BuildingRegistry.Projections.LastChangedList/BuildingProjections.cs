@@ -14,14 +14,14 @@ namespace BuildingRegistry.Projections.LastChangedList
         public BuildingProjections()
             : base(SupportedAcceptTypes)
         {
-            When<Envelope<BuildingOsloIdWasAssigned>>(async (context, message, ct) =>
+            When<Envelope<BuildingPersistentLocalIdWasAssigned>>(async (context, message, ct) =>
             {
                 var attachedRecords = await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingId.ToString(), message.Position, context, ct);
 
                 foreach (var record in attachedRecords)
                 {
-                    record.CacheKey = string.Format(record.CacheKey, message.Message.OsloId);
-                    record.Uri = string.Format(record.Uri, message.Message.OsloId);
+                    record.CacheKey = string.Format(record.CacheKey, message.Message.PersistentLocalId);
+                    record.Uri = string.Format(record.Uri, message.Message.PersistentLocalId);
                 }
             });
 
@@ -94,7 +94,7 @@ namespace BuildingRegistry.Projections.LastChangedList
             When<Envelope<BuildingUnitBecameIncomplete>>(async (context, message, ct) =>
                 await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingId.ToString(), message.Position, context, ct));
 
-            When<Envelope<BuildingUnitOsloIdWasAssigned>>(async (context, message, ct) =>
+            When<Envelope<BuildingUnitPersistentLocalIdWasAssigned>>(async (context, message, ct) =>
                 await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingId.ToString(), message.Position, context, ct));
 
             When<Envelope<BuildingUnitWasAdded>>(async (context, message, ct) =>

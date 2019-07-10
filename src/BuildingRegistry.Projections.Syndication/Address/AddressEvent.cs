@@ -4,7 +4,7 @@ namespace BuildingRegistry.Projections.Syndication.Address
     {
         AddressWasRegistered,
         AddressWasRemoved,
-        AddressOsloIdWasAssigned,
+        AddressPersistentLocalIdentifierWasAssigned,
 
         AddressBecameIncomplete,
         AddressBecameComplete

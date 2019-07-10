@@ -72,7 +72,7 @@ namespace BuildingRegistry.Tests
 
             containerBuilder.RegisterInstance(testOutputHelper);
             containerBuilder.RegisterType<XUnitLogger>().AsImplementedInterfaces();
-            containerBuilder.RegisterType<FakeOsloIdGenerator>().As<IOsloIdGenerator>();
+            containerBuilder.RegisterType<FakePersistentLocalIdGenerator>().As<IPersistentLocalIdGenerator>();
 
             _container = containerBuilder.Build();
         }

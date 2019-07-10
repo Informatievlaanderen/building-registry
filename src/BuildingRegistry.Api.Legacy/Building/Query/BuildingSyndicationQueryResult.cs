@@ -2,7 +2,6 @@ namespace BuildingRegistry.Api.Legacy.Building.Query
 {
     using Be.Vlaanderen.Basisregisters.GrAr.Common;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
-    using Be.Vlaanderen.Basisregisters.Utilities.HexByteConvertor;
     using NodaTime;
     using Projections.Legacy.BuildingSyndication;
     using System;
@@ -18,7 +17,7 @@ namespace BuildingRegistry.Api.Legacy.Building.Query
 
         public Guid BuildingId { get; }
         public long Position { get; }
-        public int? OsloId { get; }
+        public int? PersistentLocalId { get; }
         public string ChangeType { get; }
         public Instant RecordCreatedAt { get; }
         public Instant LastChangedOn { get; }
@@ -34,7 +33,7 @@ namespace BuildingRegistry.Api.Legacy.Building.Query
         public BuildingSyndicationQueryResult(
             Guid buildingId,
             long position,
-            int? osloId,
+            int? persistentLocalId,
             string changeType,
             Instant recordCreateAt,
             Instant lastChangedOn)
@@ -44,7 +43,7 @@ namespace BuildingRegistry.Api.Legacy.Building.Query
 
             BuildingId = buildingId;
             Position = position;
-            OsloId = osloId;
+            PersistentLocalId = persistentLocalId;
             ChangeType = changeType;
             RecordCreatedAt = recordCreateAt;
             LastChangedOn = lastChangedOn;
@@ -53,7 +52,7 @@ namespace BuildingRegistry.Api.Legacy.Building.Query
         public BuildingSyndicationQueryResult(
             Guid buildingId,
             long position,
-            int? osloId,
+            int? persistentLocalId,
             string changeType,
             Instant recordCreateAt,
             Instant lastChangedOn,
@@ -61,7 +60,7 @@ namespace BuildingRegistry.Api.Legacy.Building.Query
 
             : this(buildingId,
                 position,
-                osloId,
+                persistentLocalId,
                 changeType,
                 recordCreateAt,
                 lastChangedOn)
@@ -73,7 +72,7 @@ namespace BuildingRegistry.Api.Legacy.Building.Query
         public BuildingSyndicationQueryResult(
             Guid buildingId,
             long position,
-            int? osloId,
+            int? persistentLocalId,
             BuildingStatus? status,
             BuildingGeometryMethod? geometryMethod,
             IPolygon geometry,
@@ -86,7 +85,7 @@ namespace BuildingRegistry.Api.Legacy.Building.Query
             IEnumerable<BuildingUnitSyndicationItem> buildingUnits)
             : this(buildingId,
                 position,
-                osloId,
+                persistentLocalId,
                 changeType,
                 recordCreateAt,
                 lastChangedOn)
@@ -101,7 +100,7 @@ namespace BuildingRegistry.Api.Legacy.Building.Query
             Reason = reason;
             BuildingUnits = buildingUnits.Select(x => new BuildingUnitSyndicationQueryResult(
                 x.BuildingUnitId,
-                x.OsloId,
+                x.PersistentLocalId,
                 x.Function,
                 x.Status,
                 x.PositionMethod,
@@ -116,7 +115,7 @@ namespace BuildingRegistry.Api.Legacy.Building.Query
         public BuildingSyndicationQueryResult(
             Guid buildingId,
             long position,
-            int? osloId,
+            int? persistentLocalId,
             BuildingStatus? status,
             BuildingGeometryMethod? geometryMethod,
             IPolygon geometry,
@@ -130,7 +129,7 @@ namespace BuildingRegistry.Api.Legacy.Building.Query
             string eventDataAsXml)
             : this(buildingId,
                 position,
-                osloId,
+                persistentLocalId,
                 status,
                 geometryMethod,
                 geometry,
@@ -152,7 +151,7 @@ namespace BuildingRegistry.Api.Legacy.Building.Query
     public class BuildingUnitSyndicationQueryResult
     {
         public Guid BuildingUnitId { get; }
-        public int? OsloId { get; }
+        public int? PersistentLocalId { get; }
         public BuildingUnitFunction? Function { get; }
         public BuildingUnitStatus? Status { get; }
         public BuildingUnitPositionGeometryMethod? GeometryMethod { get; }
@@ -163,7 +162,7 @@ namespace BuildingRegistry.Api.Legacy.Building.Query
 
         public BuildingUnitSyndicationQueryResult(
             Guid buildingUnitId,
-            int? osloId,
+            int? persistentLocalId,
             BuildingUnitFunction? function,
             BuildingUnitStatus? status,
             BuildingUnitPositionGeometryMethod? geometryMethod,
@@ -175,7 +174,7 @@ namespace BuildingRegistry.Api.Legacy.Building.Query
             Instant version)
         {
             BuildingUnitId = buildingUnitId;
-            OsloId = osloId;
+            PersistentLocalId = persistentLocalId;
             Function = function;
             Status = status;
             GeometryMethod = geometryMethod;

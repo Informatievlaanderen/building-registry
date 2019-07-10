@@ -383,115 +383,110 @@ namespace BuildingRegistry.Building
                 throw new BuildingRemovedException($"Cannot change removed building for building id {_buildingId}");
         }
 
-        public void AssignOsloIdForCrabTerrainObjectId(
+        public void AssignPersistentLocalIdForCrabTerrainObjectId(
             CrabTerrainObjectId terrainObjectId,
-            OsloId osloId,
-            OsloAssignmentDate assignmentDate,
-            List<AssignBuildingUnitOsloIdForCrabTerrainObjectId> buildingUnitOsloIds,
-            IOsloIdGenerator osloIdGenerator)
+            PersistentLocalId persistentLocalId,
+            PersistentLocalIdAssignmentDate persistentLocalIdAssignmentDate,
+            List<AssignBuildingUnitPersistentLocalIdForCrabTerrainObjectId> buildingUnitPersistentLocalIds,
+            IPersistentLocalIdGenerator persistentLocalIdGenerator)
         {
-            if (_osloId != null)
+            if (_persistentLocalId != null)
                 return;
 
-            if (osloId == null)
+            if (persistentLocalId == null)
             {
-                ApplyChange(new BuildingOsloIdWasAssigned(_buildingId, new OsloId(osloIdGenerator.GenerateNextOsloId()), new OsloAssignmentDate(Instant.FromDateTimeOffset(DateTimeOffset.Now))));
+                ApplyChange(new BuildingPersistentLocalIdWasAssigned(_buildingId, new PersistentLocalId(persistentLocalIdGenerator.GenerateNextPersistentLocalId()), new PersistentLocalIdAssignmentDate(Instant.FromDateTimeOffset(DateTimeOffset.Now))));
             }
             else
             {
-                var deduplicatedCollection = new DeduplicatedBuildingUnitOsloIdCollection(buildingUnitOsloIds);
-                var usedIds = new List<AssignBuildingUnitOsloIdForCrabTerrainObjectId>();
+                var deduplicatedCollection = new DeduplicatedBuildingUnitPersistentLocalIdCollection(buildingUnitPersistentLocalIds);
+                var usedIds = new List<AssignBuildingUnitPersistentLocalIdForCrabTerrainObjectId>();
 
-                ApplyChange(new BuildingOsloIdWasAssigned(_buildingId, osloId, assignmentDate));
+                ApplyChange(new BuildingPersistentLocalIdWasAssigned(_buildingId, persistentLocalId, persistentLocalIdAssignmentDate));
 
                 if (_buildingUnitCollection.ActiveCommonBuildingUnit != null)
                 {
-                    var activeCommonUnitOsloId = deduplicatedCollection
+                    var activeCommonUnitPersistentLocalId = deduplicatedCollection
                         .Where(x => x.CrabTerrainObjectHouseNumberId == null && x.CrabSubaddressId == null)
                         .OrderByDescending(x => x.Index)
                         .First();
 
-                    ApplyBuildingUnitOsloIdWithDuplicateCheck(_buildingUnitCollection.ActiveCommonBuildingUnit,
-                        activeCommonUnitOsloId, deduplicatedCollection);
+                    ApplyBuildingUnitPersistentLocalIdWithDuplicateCheck(_buildingUnitCollection.ActiveCommonBuildingUnit,
+                        activeCommonUnitPersistentLocalId, deduplicatedCollection);
 
-                    usedIds.Add(activeCommonUnitOsloId);
+                    usedIds.Add(activeCommonUnitPersistentLocalId);
                 }
 
                 foreach (var activeUnit in _buildingUnitCollection.ActiveBuildingUnits.Where(x => !x.IsCommon))
                 {
                     //check if subaddress is readdressed, query might differ
-                    var osloQuery = deduplicatedCollection
+                    var persistentLocalIdQuery = deduplicatedCollection
                         .Where(x => x.CrabTerrainObjectHouseNumberId != null &&
                                     x.CrabTerrainObjectHouseNumberId == activeUnit.BuildingUnitKey.HouseNumber.Value);
 
                     if (_buildingUnitCollection.HasReaddressed(activeUnit.BuildingUnitKey))
                     {
-                        osloQuery = osloQuery.Union(deduplicatedCollection.Where(
+                        persistentLocalIdQuery = persistentLocalIdQuery.Union(deduplicatedCollection.Where(
                             x => x.CrabTerrainObjectHouseNumberId != null &&
                                  x.CrabTerrainObjectHouseNumberId == _buildingUnitCollection.GetReaddressedKey(activeUnit.BuildingUnitKey)));
                     }
 
                     if (activeUnit.BuildingUnitKey.Subaddress.HasValue)
-                        osloQuery = osloQuery.Where(x =>
+                        persistentLocalIdQuery = persistentLocalIdQuery.Where(x =>
                             x.CrabSubaddressId != null &&
                             x.CrabSubaddressId == activeUnit.BuildingUnitKey.Subaddress.Value);
                     else
-                        osloQuery = osloQuery.Where(x => x.CrabSubaddressId == null);
+                        persistentLocalIdQuery = persistentLocalIdQuery.Where(x => x.CrabSubaddressId == null);
 
-                    var activeUnitOsloId = osloQuery
+                    var activeUnitPersistentLocalId = persistentLocalIdQuery
                         .OrderByDescending(x => x.Index)
                         .FirstOrDefault();
 
-                    if (!activeUnit.BuildingUnitKey.Subaddress.HasValue && activeUnitOsloId == null)
+                    if (!activeUnit.BuildingUnitKey.Subaddress.HasValue && activeUnitPersistentLocalId == null)
                     {
                         //Possible only for housenumbers
                         //See https://vlaamseoverheid.atlassian.net/wiki/spaces/GR/pages/469074524/Gebouwenregister+-+Mapping+Olso+Id+s+oude+-+nieuwe+architectuur. case 4
                         continue;
                     }
-                    else if (activeUnitOsloId == null)
+                    else if (activeUnitPersistentLocalId == null)
                     {
-                        throw new InvalidOperationException("Cannot find oslo id for active subaddress");
+                        throw new InvalidOperationException("Cannot find persistent local id for active subaddress");
                     }
 
-                    ApplyBuildingUnitOsloIdWithDuplicateCheck(
+                    ApplyBuildingUnitPersistentLocalIdWithDuplicateCheck(
                         activeUnit,
-                        activeUnitOsloId,
+                        activeUnitPersistentLocalId,
                         deduplicatedCollection);
 
-                    usedIds.Add(activeUnitOsloId);
+                    usedIds.Add(activeUnitPersistentLocalId);
                 }
 
-                var nonActiveUnitsWithoutOsloIdByKey = _buildingUnitCollection.GetAllBuildingUnitsWithoutOsloId()
+                var nonActiveUnitsWithoutPersistentLocalIdByKey = _buildingUnitCollection.GetAllBuildingUnitsWithoutPersistentLocalId()
                     .Where(x => x.IsRemoved || x.HasRetiredState)
                     .GroupBy(x => x.BuildingUnitKey)
                     .ToDictionary(x => x.Key, x => x.ToList());
 
-                foreach (var assignBuildingUnitOsloIdByUnit in deduplicatedCollection
+                foreach (var assignBuildingUnitPersistentLocalIdByUnit in deduplicatedCollection
                     .Except(usedIds)
                     .GroupBy(x => new { x.CrabTerrainObjectHouseNumberId, x.CrabSubaddressId }))
                 {
                     var buildingUnitKey = BuildingUnitKey.Create(terrainObjectId,
-                        assignBuildingUnitOsloIdByUnit.Key.CrabTerrainObjectHouseNumberId,
-                        assignBuildingUnitOsloIdByUnit.Key.CrabSubaddressId);
-
-                    // less can only occurr for common units
-                    //if (buildingUnitKey.HouseNumber.HasValue &&
-                    //    (!nonActiveUnitsWithoutOsloIdByKey.ContainsKey(buildingUnitKey) || nonActiveUnitsWithoutOsloIdByKey[buildingUnitKey].Count < assignBuildingUnitOsloIdByUnit.Count()))
-                    //    throw new InvalidOperationException("Should not occurr, more retired in previous is impossible except bug related to duplicates");
+                        assignBuildingUnitPersistentLocalIdByUnit.Key.CrabTerrainObjectHouseNumberId,
+                        assignBuildingUnitPersistentLocalIdByUnit.Key.CrabSubaddressId);
 
                     // Only common units can have none occurances => skip
                     if (!buildingUnitKey.HouseNumber.HasValue &&
-                        !nonActiveUnitsWithoutOsloIdByKey.ContainsKey(buildingUnitKey))
+                        !nonActiveUnitsWithoutPersistentLocalIdByKey.ContainsKey(buildingUnitKey))
                     {
-                        foreach (var assignBuildingUnitOsloId in assignBuildingUnitOsloIdByUnit)
-                            ApplyChange(new BuildingUnitOsloIdWasRemoved(
+                        foreach (var assignBuildingUnitPersistentLocalId in assignBuildingUnitPersistentLocalIdByUnit)
+                            ApplyChange(new BuildingUnitPersistentLocalIdWasRemoved(
                                 _buildingId,
-                                assignBuildingUnitOsloId.OsloId,
-                                assignBuildingUnitOsloId.OsloAssignmentDate,
-                                new Reason("Due to duplication the common building unit with this OsloId should never have existed.")));
+                                assignBuildingUnitPersistentLocalId.PersistentLocalId,
+                                assignBuildingUnitPersistentLocalId.PersistentLocalIdAssignmentDate,
+                                new Reason("Due to duplication the common building unit with this PersistentLocalId should never have existed.")));
                     }
 
-                    foreach (var assignBuildingUnitOsloId in assignBuildingUnitOsloIdByUnit.OrderByDescending(x =>
+                    foreach (var assignBuildingUnitPersistentLocalId in assignBuildingUnitPersistentLocalIdByUnit.OrderByDescending(x =>
                         x.Index))
                     {
                         //https://vlaamseoverheid.atlassian.net/wiki/spaces/GR/pages/469074524/CRAB2VBR-mapping+OSLO+ID+s+oude+vs.+nieuwe+architectuur Case 5
@@ -516,45 +511,45 @@ namespace BuildingRegistry.Building
                                     var unit = _buildingUnitCollection.GetActiveOrLastRetiredByKey(newKey);
                                     if (unit != null)
                                     {
-                                        ApplyChange(new BuildingUnitOsloIdWasDuplicated(
+                                        ApplyChange(new BuildingUnitPersistentLocalIdWasDuplicated(
                                             _buildingId,
                                             unit.BuildingUnitId,
-                                            assignBuildingUnitOsloId.OsloId,
-                                            unit.OsloId,
-                                            assignBuildingUnitOsloId.OsloAssignmentDate));
+                                            assignBuildingUnitPersistentLocalId.PersistentLocalId,
+                                            unit.PersistentLocalId,
+                                            assignBuildingUnitPersistentLocalId.PersistentLocalIdAssignmentDate));
                                     }
                                     else
                                     {
-                                        ApplyChange(new BuildingUnitOsloIdWasRemoved(
+                                        ApplyChange(new BuildingUnitPersistentLocalIdWasRemoved(
                                             _buildingId,
-                                            assignBuildingUnitOsloId.OsloId,
-                                            assignBuildingUnitOsloId.OsloAssignmentDate,
-                                            new Reason("The building unit with this OsloId should never have existed. Could not mark as duplicate as no candidate was found.")));
+                                            assignBuildingUnitPersistentLocalId.PersistentLocalId,
+                                            assignBuildingUnitPersistentLocalId.PersistentLocalIdAssignmentDate,
+                                            new Reason("The building unit with this PersistentLocalId should never have existed. Could not mark as duplicate as no candidate was found.")));
                                     }
                                 }
                                 else
                                 {
                                     // cant determine which goes where if the address is connected by different terrainobject housenumbers
-                                    ApplyChange(new BuildingUnitOsloIdWasRemoved(
+                                    ApplyChange(new BuildingUnitPersistentLocalIdWasRemoved(
                                         _buildingId,
-                                        assignBuildingUnitOsloId.OsloId,
-                                        assignBuildingUnitOsloId.OsloAssignmentDate,
-                                        new Reason("The building unit with this OsloId should never have existed. Could not mark as duplicate because multiple candidates were found.")));
+                                        assignBuildingUnitPersistentLocalId.PersistentLocalId,
+                                        assignBuildingUnitPersistentLocalId.PersistentLocalIdAssignmentDate,
+                                        new Reason("The building unit with this PersistentLocalId should never have existed. Could not mark as duplicate because multiple candidates were found.")));
                                 }
                             }
                             else
                             {
                                 //no way to search as the address id (housenumberid) is not in key
-                                ApplyChange(new BuildingUnitOsloIdWasRemoved(
+                                ApplyChange(new BuildingUnitPersistentLocalIdWasRemoved(
                                     _buildingId,
-                                    assignBuildingUnitOsloId.OsloId,
-                                    assignBuildingUnitOsloId.OsloAssignmentDate,
-                                    new Reason("The building unit with this OsloId should never have existed. Due to insufficient data it can not be marked as duplicate.")));
+                                    assignBuildingUnitPersistentLocalId.PersistentLocalId,
+                                    assignBuildingUnitPersistentLocalId.PersistentLocalIdAssignmentDate,
+                                    new Reason("The building unit with this PersistentLocalId should never have existed. Due to insufficient data it can not be marked as duplicate.")));
                             }
                         }
                         //case 5
                         else if (buildingUnitKey.Subaddress.HasValue
-                            && !nonActiveUnitsWithoutOsloIdByKey.ContainsKey(buildingUnitKey)
+                            && !nonActiveUnitsWithoutPersistentLocalIdByKey.ContainsKey(buildingUnitKey)
                             && readdressedSubaddress.Key != null)
                         {
                             var newKey = BuildingUnitKey.Create(terrainObjectId,
@@ -564,94 +559,94 @@ namespace BuildingRegistry.Building
                             var unit = _buildingUnitCollection.GetActiveOrLastRetiredByKey(newKey);
                             if (unit != null)
                             {
-                                var oldOsloId = unit.OsloId;
-                                unit.ApplyOsloId(
-                                    assignBuildingUnitOsloId.OsloId,
-                                    assignBuildingUnitOsloId.OsloAssignmentDate);
+                                var oldPersistentLocalId = unit.PersistentLocalId;
+                                unit.ApplyPersistentLocalId(
+                                    assignBuildingUnitPersistentLocalId.PersistentLocalId,
+                                    assignBuildingUnitPersistentLocalId.PersistentLocalIdAssignmentDate);
 
-                                ApplyChange(new BuildingUnitOsloIdWasDuplicated(
+                                ApplyChange(new BuildingUnitPersistentLocalIdWasDuplicated(
                                     _buildingId,
                                     unit.BuildingUnitId,
-                                    oldOsloId,
-                                    unit.OsloId,
-                                    assignBuildingUnitOsloId.OsloAssignmentDate));
+                                    oldPersistentLocalId,
+                                    unit.PersistentLocalId,
+                                    assignBuildingUnitPersistentLocalId.PersistentLocalIdAssignmentDate));
                             }
                             else
                             {
-                                ApplyChange(new BuildingUnitOsloIdWasRemoved(
+                                ApplyChange(new BuildingUnitPersistentLocalIdWasRemoved(
                                     _buildingId,
-                                    assignBuildingUnitOsloId.OsloId,
-                                    assignBuildingUnitOsloId.OsloAssignmentDate,
-                                    new Reason("The building unit with this OsloId should never have existed. Could not mark as duplicate as no candidate was found.")));
+                                    assignBuildingUnitPersistentLocalId.PersistentLocalId,
+                                    assignBuildingUnitPersistentLocalId.PersistentLocalIdAssignmentDate,
+                                    new Reason("The building unit with this PersistentLocalId should never have existed. Could not mark as duplicate as no candidate was found.")));
                             }
                         }
-                        else if (!nonActiveUnitsWithoutOsloIdByKey.ContainsKey(buildingUnitKey))
+                        else if (!nonActiveUnitsWithoutPersistentLocalIdByKey.ContainsKey(buildingUnitKey))
                         {
-                            ApplyChange(new BuildingUnitOsloIdWasRemoved(
+                            ApplyChange(new BuildingUnitPersistentLocalIdWasRemoved(
                                 _buildingId,
-                                assignBuildingUnitOsloId.OsloId,
-                                assignBuildingUnitOsloId.OsloAssignmentDate,
-                                new Reason("The building unit with this OsloId should never have existed due to readdressing. Could not mark as duplicate as no candidate was found.")));
+                                assignBuildingUnitPersistentLocalId.PersistentLocalId,
+                                assignBuildingUnitPersistentLocalId.PersistentLocalIdAssignmentDate,
+                                new Reason("The building unit with this PersistentLocalId should never have existed due to readdressing. Could not mark as duplicate as no candidate was found.")));
                         }
                         else
                         {
-                            var buildingUnit = nonActiveUnitsWithoutOsloIdByKey[buildingUnitKey]
-                                .LastOrDefault(x => x.OsloId == null);
+                            var buildingUnit = nonActiveUnitsWithoutPersistentLocalIdByKey[buildingUnitKey]
+                                .LastOrDefault(x => x.PersistentLocalId == null);
 
                             // less can occurr
                             if (buildingUnit == null)
-                                ApplyChange(new BuildingUnitOsloIdWasRemoved(
+                                ApplyChange(new BuildingUnitPersistentLocalIdWasRemoved(
                                     _buildingId,
-                                    assignBuildingUnitOsloId.OsloId,
-                                    assignBuildingUnitOsloId.OsloAssignmentDate,
-                                    new Reason("Due to duplication, the building unit with this OsloId should never have existed. Could not mark as duplicate as no candidate was found.")));
+                                    assignBuildingUnitPersistentLocalId.PersistentLocalId,
+                                    assignBuildingUnitPersistentLocalId.PersistentLocalIdAssignmentDate,
+                                    new Reason("Due to duplication, the building unit with this PersistentLocalId should never have existed. Could not mark as duplicate as no candidate was found.")));
 
-                            ApplyBuildingUnitOsloIdWithDuplicateCheck(
+                            ApplyBuildingUnitPersistentLocalIdWithDuplicateCheck(
                                 buildingUnit,
-                                assignBuildingUnitOsloId,
+                                assignBuildingUnitPersistentLocalId,
                                 deduplicatedCollection);
                         }
                     }
                 }
             }
 
-            foreach (var buildingUnit in _buildingUnitCollection.GetAllBuildingUnitsWithoutOsloId())
+            foreach (var buildingUnit in _buildingUnitCollection.GetAllBuildingUnitsWithoutPersistentLocalId())
             {
                 var id = buildingUnit.BuildingUnitId;
-                ApplyChange(new BuildingUnitOsloIdWasAssigned(_buildingId, id, new OsloId(osloIdGenerator.GenerateNextOsloId()), new OsloAssignmentDate(Instant.FromDateTimeOffset(DateTimeOffset.Now))));
+                ApplyChange(new BuildingUnitPersistentLocalIdWasAssigned(_buildingId, id, new PersistentLocalId(persistentLocalIdGenerator.GenerateNextPersistentLocalId()), new PersistentLocalIdAssignmentDate(Instant.FromDateTimeOffset(DateTimeOffset.Now))));
             }
         }
 
-        private void ApplyBuildingUnitOsloIdWithDuplicateCheck(
+        private void ApplyBuildingUnitPersistentLocalIdWithDuplicateCheck(
             BuildingUnit buildingUnit,
-            AssignBuildingUnitOsloIdForCrabTerrainObjectId assignOsloId,
-            DeduplicatedBuildingUnitOsloIdCollection deduplicatedCollection)
+            AssignBuildingUnitPersistentLocalIdForCrabTerrainObjectId assignPersistentLocalId,
+            DeduplicatedBuildingUnitPersistentLocalIdCollection deduplicatedCollection)
         {
-            buildingUnit.ApplyOsloId(
-                assignOsloId.OsloId,
-                assignOsloId.OsloAssignmentDate);
+            buildingUnit.ApplyPersistentLocalId(
+                assignPersistentLocalId.PersistentLocalId,
+                assignPersistentLocalId.PersistentLocalIdAssignmentDate);
 
-            if (deduplicatedCollection.HasDuplicate(assignOsloId))
+            if (deduplicatedCollection.HasDuplicate(assignPersistentLocalId))
             {
-                var dupe = deduplicatedCollection.GetDuplicate(assignOsloId);
-                ApplyChange(new BuildingUnitOsloIdWasDuplicated(
+                var dupe = deduplicatedCollection.GetDuplicate(assignPersistentLocalId);
+                ApplyChange(new BuildingUnitPersistentLocalIdWasDuplicated(
                     _buildingId,
                     buildingUnit.BuildingUnitId,
-                    dupe.OsloId,
-                    assignOsloId.OsloId,
-                    dupe.OsloAssignmentDate));
+                    dupe.PersistentLocalId,
+                    assignPersistentLocalId.PersistentLocalId,
+                    dupe.PersistentLocalIdAssignmentDate));
             }
         }
 
-        public void AssignOsloIds(IOsloIdGenerator osloIdGenerator)
+        public void AssignPersistentLocalIds(IPersistentLocalIdGenerator persistentLocalIdGenerator)
         {
-            if(_osloId == null)
-                ApplyChange(new BuildingOsloIdWasAssigned(_buildingId, osloIdGenerator.GenerateNextOsloId(), new OsloAssignmentDate(Instant.FromDateTimeOffset(DateTimeOffset.Now))));
+            if(_persistentLocalId == null)
+                ApplyChange(new BuildingPersistentLocalIdWasAssigned(_buildingId, persistentLocalIdGenerator.GenerateNextPersistentLocalId(), new PersistentLocalIdAssignmentDate(Instant.FromDateTimeOffset(DateTimeOffset.Now))));
 
-            foreach (var buildingUnit in _buildingUnitCollection.GetAllBuildingUnitsWithoutOsloId())
+            foreach (var buildingUnit in _buildingUnitCollection.GetAllBuildingUnitsWithoutPersistentLocalId())
             {
                 var id = buildingUnit.BuildingUnitId;
-                ApplyChange(new BuildingUnitOsloIdWasAssigned(_buildingId, id, new OsloId(osloIdGenerator.GenerateNextOsloId()), new OsloAssignmentDate(Instant.FromDateTimeOffset(DateTimeOffset.Now))));
+                ApplyChange(new BuildingUnitPersistentLocalIdWasAssigned(_buildingId, id, new PersistentLocalId(persistentLocalIdGenerator.GenerateNextPersistentLocalId()), new PersistentLocalIdAssignmentDate(Instant.FromDateTimeOffset(DateTimeOffset.Now))));
 
             }
         }

@@ -4,14 +4,16 @@ using BuildingRegistry.Projections.Syndication;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace BuildingRegistry.Projections.Syndication.Migrations
 {
     [DbContext(typeof(SyndicationContext))]
-    partial class SyndicationContextModelSnapshot : ModelSnapshot
+    [Migration("20190710192025_RenameOsloId_PersistentLocalId")]
+    partial class RenameOsloId_PersistentLocalId
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

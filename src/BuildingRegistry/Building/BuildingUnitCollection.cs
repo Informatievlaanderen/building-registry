@@ -278,9 +278,9 @@ namespace BuildingRegistry.Building
                 buildingUnit.Route(@event);
         }
 
-        public IEnumerable<BuildingUnit> GetAllBuildingUnitsWithoutOsloId()
+        public IEnumerable<BuildingUnit> GetAllBuildingUnitsWithoutPersistentLocalId()
         {
-            return _allBuildingUnits.Where(x => x.OsloId == null);
+            return _allBuildingUnits.Where(x => x.PersistentLocalId == null);
         }
     }
 }

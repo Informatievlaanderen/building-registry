@@ -36,7 +36,7 @@ namespace BuildingRegistry.Building
         public AddressId PreviousAddressId { get; private set; }
         public BuildingGeometry BuildingGeometry { get; internal set; }
         public BuildingUnitPosition BuildingUnitPosition { get; private set; }
-        public OsloId OsloId { get; private set; }
+        public PersistentLocalId PersistentLocalId { get; private set; }
 
         public bool HasRetiredState => Status == BuildingUnitStatus.Retired || Status == BuildingUnitStatus.NotRealized;
 
@@ -58,7 +58,7 @@ namespace BuildingRegistry.Building
             //Register<BuildingWasNotRealized>(When);
             //Register<BuildingWasCorrectedToRetired>(When);
             //Register<BuildingWasCorrectedToNotRealized>(When);
-            Register<BuildingUnitOsloIdWasAssigned>(When);
+            Register<BuildingUnitPersistentLocalIdWasAssigned>(When);
 
             Register<BuildingWasMeasuredByGrb>(When);
             Register<BuildingWasOutlined>(When);
@@ -120,9 +120,9 @@ namespace BuildingRegistry.Building
             IsRemoved = true;
         }
 
-        private void When(BuildingUnitOsloIdWasAssigned @event)
+        private void When(BuildingUnitPersistentLocalIdWasAssigned @event)
         {
-            OsloId = new OsloId(@event.OsloId);
+            PersistentLocalId = new PersistentLocalId(@event.PersistentLocalId);
         }
 
         #region Unit Position
