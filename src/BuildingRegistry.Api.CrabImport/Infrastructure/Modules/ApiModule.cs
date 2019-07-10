@@ -88,8 +88,7 @@ namespace BuildingRegistry.Api.CrabImport.Infrastructure.Modules
 
             containerBuilder
                 .RegisterType<SqlOsloIdGenerator>()
-                .As<IOsloIdGenerator>()
-                .SingleInstance();
+                .As<IOsloIdGenerator>();
 
             containerBuilder.Populate(_services);
         }
