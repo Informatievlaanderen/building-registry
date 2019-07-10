@@ -13,6 +13,7 @@ namespace BuildingRegistry.Projector.Infrastructure.Modules
     using BuildingRegistry.Infrastructure;
     using BuildingRegistry.Projections.Extract;
     using BuildingRegistry.Projections.Extract.BuildingExtract;
+    using BuildingRegistry.Projections.Extract.BuildingUnitExtract;
     using BuildingRegistry.Projections.LastChangedList;
     using BuildingRegistry.Projections.Legacy;
     using BuildingRegistry.Projections.Legacy.BuildingDetail;
@@ -80,7 +81,9 @@ namespace BuildingRegistry.Projector.Infrastructure.Modules
                     _configuration,
                     _loggerFactory)
                 .RegisterProjections<BuildingExtractProjections, ExtractContext>(
-                    () => new BuildingExtractProjections(DbaseCodePage.Western_European_ANSI.ToEncoding(), WKBReaderFactory.Create()));
+                    () => new BuildingExtractProjections(DbaseCodePage.Western_European_ANSI.ToEncoding(), WKBReaderFactory.Create()))
+                .RegisterProjections<BuildingUnitExtractProjections, ExtractContext>(
+                () => new BuildingUnitExtractProjections(DbaseCodePage.Western_European_ANSI.ToEncoding(), WKBReaderFactory.Create()));
         }
 
         private void RegisterLastChangedProjections(ContainerBuilder builder)

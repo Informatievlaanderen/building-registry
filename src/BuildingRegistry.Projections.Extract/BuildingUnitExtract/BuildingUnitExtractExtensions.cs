@@ -7,7 +7,7 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
 
     public static class BuildingUnitExtractExtensions
     {
-        public static async Task<BuildingUnitExtractItem> FindAndUpdateBuildingUnitExtract(
+        public static async Task FindAndUpdateBuildingUnitExtract(
             this ExtractContext context,
             Guid buildingUnitId,
             Action<BuildingUnitExtractItem> updateFunc,
@@ -17,12 +17,10 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
                 .BuildingUnitExtract
                 .FindAsync(buildingUnitId, cancellationToken: ct);
 
-            if (buildingUnit == null)
-                throw DatabaseItemNotFound(buildingUnitId);
+            if (buildingUnit == null) //after building unit is removed, events can keep pouring in
+                return;
 
             updateFunc(buildingUnit);
-
-            return buildingUnit;
         }
 
         private static ProjectionItemNotFoundException<BuildingUnitExtractProjections> DatabaseItemNotFound(Guid buildingUnitId)
