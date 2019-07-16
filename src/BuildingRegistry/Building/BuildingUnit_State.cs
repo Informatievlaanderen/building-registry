@@ -145,11 +145,9 @@ namespace BuildingRegistry.Building
         {
             BuildingUnitPosition = new BuildingUnitPosition(new ExtendedWkbGeometry(@event.Position), BuildingUnitPositionGeometryMethod.DerivedFromObject);
         }
-
         #endregion
 
         #region Building Geometry
-
         private void When(BuildingGeometryWasRemoved @event)
         {
             BuildingGeometry = null;
@@ -175,7 +173,6 @@ namespace BuildingRegistry.Building
         {
             BuildingGeometry = new BuildingGeometry(new ExtendedWkbGeometry(@event.ExtendedWkb), BuildingGeometryMethod.MeasuredByGrb);
         }
-
         #endregion Building Geometry
 
         private void When(BuildingUnitAddressWasDetached @event)
@@ -210,7 +207,6 @@ namespace BuildingRegistry.Building
         }
 
         #region Status
-
         private void When(BuildingUnitWasCorrectedToNotRealized @event)
         {
             Status = BuildingUnitStatus.NotRealized;
@@ -284,7 +280,6 @@ namespace BuildingRegistry.Building
             Status = BuildingUnitStatus.NotRealized;
             IsRetiredByBuilding = true;
         }
-
         #endregion Status
 
         private void When(BuildingUnitWasRemoved @event)
