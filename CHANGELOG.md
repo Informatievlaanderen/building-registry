@@ -1,3 +1,11 @@
+## [1.4.3](https://github.com/informatievlaanderen/building-registry/compare/v1.4.2...v1.4.3) (2019-07-17)
+
+
+### Bug Fixes
+
+* do not hardcode logging to console ([aecff22](https://github.com/informatievlaanderen/building-registry/commit/aecff22))
+* do not hardcode logging to console ([7721371](https://github.com/informatievlaanderen/building-registry/commit/7721371))
+
 ## [1.4.2](https://github.com/informatievlaanderen/building-registry/compare/v1.4.1...v1.4.2) (2019-07-17)
 
 
