@@ -1,3 +1,10 @@
+## [1.4.2](https://github.com/informatievlaanderen/building-registry/compare/v1.4.1...v1.4.2) (2019-07-17)
+
+
+### Bug Fixes
+
+* push syndications to production ([f181e52](https://github.com/informatievlaanderen/building-registry/commit/f181e52))
+
 ## [1.4.1](https://github.com/informatievlaanderen/building-registry/compare/v1.4.0...v1.4.1) (2019-07-16)
 
 
