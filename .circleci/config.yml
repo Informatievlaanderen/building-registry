@@ -119,6 +119,10 @@ jobs:
             docker tag  $BUILD_DOCKER_REGISTRY/buildingregistry/projections:$SEMVER $BUILD_DOCKER_REGISTRY_PRD/building-registry/projector:$SEMVER
             docker push $BUILD_DOCKER_REGISTRY_PRD/building-registry/projector:$SEMVER
 
+            docker pull $BUILD_DOCKER_REGISTRY/buildingregistry/projections-syndication:$SEMVER
+            docker tag  $BUILD_DOCKER_REGISTRY/buildingregistry/projections-syndication:$SEMVER $BUILD_DOCKER_REGISTRY_PRD/building-registry/projections-syndication:$SEMVER
+            docker push $BUILD_DOCKER_REGISTRY_PRD/building-registry/projections-syndication:$SEMVER
+
 workflows:
   version: 2
   build_and_push_to_production:
