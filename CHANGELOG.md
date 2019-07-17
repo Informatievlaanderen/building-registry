@@ -1,3 +1,10 @@
+## [1.4.4](https://github.com/informatievlaanderen/building-registry/compare/v1.4.3...v1.4.4) (2019-07-17)
+
+
+### Bug Fixes
+
+* use serilog compact ([3a70557](https://github.com/informatievlaanderen/building-registry/commit/3a70557))
+
 ## [1.4.3](https://github.com/informatievlaanderen/building-registry/compare/v1.4.2...v1.4.3) (2019-07-17)
 
 
