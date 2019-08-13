@@ -13,6 +13,38 @@ namespace BuildingRegistry.Projections.Syndication.Address
             When(AddressEvent.AddressBecameIncomplete, AddSyndicationItemEntry);
             When(AddressEvent.AddressPersistentLocalIdentifierWasAssigned, AddSyndicationItemEntry);
             When(AddressEvent.AddressWasRemoved, RemoveSyndicationItemEntry);
+
+            When(AddressEvent.AddressBecameCurrent, DoNothing);
+            When(AddressEvent.AddressWasCorrectedToCurrent, DoNothing);
+            When(AddressEvent.AddressWasProposed, DoNothing);
+            When(AddressEvent.AddressWasCorrectedToProposed, DoNothing);
+            When(AddressEvent.AddressWasRetired, DoNothing);
+            When(AddressEvent.AddressWasCorrectedToRetired, DoNothing);
+            When(AddressEvent.AddressStatusWasRemoved, DoNothing);
+            When(AddressEvent.AddressStatusWasCorrectedToRemoved, DoNothing);
+            When(AddressEvent.AddressWasOfficiallyAssigned, DoNothing);
+            When(AddressEvent.AddressBecameNotOfficiallyAssigned, DoNothing);
+            When(AddressEvent.AddressWasCorrectedToOfficiallyAssigned, DoNothing);
+            When(AddressEvent.AddressWasCorrectedToNotOfficiallyAssigned, DoNothing);
+            When(AddressEvent.AddressOfficialAssignmentWasRemoved, DoNothing);
+
+            When(AddressEvent.AddressWasPositioned, DoNothing);
+            When(AddressEvent.AddressPositionWasCorrected, DoNothing);
+            When(AddressEvent.AddressPositionWasRemoved, DoNothing);
+
+            When(AddressEvent.AddressBoxNumberWasChanged, DoNothing);
+            When(AddressEvent.AddressBoxNumberWasCorrected, DoNothing);
+            When(AddressEvent.AddressBoxNumberWasRemoved, DoNothing);
+
+            When(AddressEvent.AddressHouseNumberWasChanged, DoNothing);
+            When(AddressEvent.AddressHouseNumberWasCorrected, DoNothing);
+
+            When(AddressEvent.AddressPostalCodeWasChanged, DoNothing);
+            When(AddressEvent.AddressPostalCodeWasCorrected, DoNothing);
+            When(AddressEvent.AddressPostalCodeWasRemoved, DoNothing);
+
+            When(AddressEvent.AddressStreetNameWasChanged, DoNothing);
+            When(AddressEvent.AddressStreetNameWasCorrected, DoNothing);
         }
 
         private static async Task AddSyndicationItemEntry(AtomEntry<SyndicationContent<Address>> entry, SyndicationContext context, CancellationToken ct)
@@ -57,5 +89,7 @@ namespace BuildingRegistry.Projections.Syndication.Address
             latestItem.IsComplete = entry.Content.Object.IsComplete;
             latestItem.IsRemoved = true;
         }
+
+        private static Task DoNothing(AtomEntry<SyndicationContent<Address>> entry, SyndicationContext context, CancellationToken ct) => Task.CompletedTask;
     }
 }

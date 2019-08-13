@@ -11,6 +11,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetail
     using System.Threading;
     using System.Threading.Tasks;
     using Be.Vlaanderen.Basisregisters.Utilities.HexByteConvertor;
+    using Building.Events.Crab;
     using GeoAPI.Geometries;
     using NetTopologySuite.IO;
     using ValueObjects;
@@ -151,7 +152,22 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetail
                 foreach (var buildingUnit in buildingUnits)
                     buildingUnit.BuildingPersistentLocalId = message.Message.PersistentLocalId;
             });
+
+            When<Envelope<BuildingBecameUnderConstruction>>(async (context, message, ct) => DoNothing());
+            When<Envelope<BuildingMeasurementByGrbWasCorrected>>(async (context, message, ct) => DoNothing());
+            When<Envelope<BuildingOutlineWasCorrected>>(async (context, message, ct) => DoNothing());
+            When<Envelope<BuildingStatusWasCorrectedToRemoved>>(async (context, message, ct) => DoNothing());
+            When<Envelope<BuildingStatusWasRemoved>>(async (context, message, ct) => DoNothing());
+            When<Envelope<BuildingWasCorrectedToPlanned>>(async (context, message, ct) => DoNothing());
+            When<Envelope<BuildingWasCorrectedToRealized>>(async (context, message, ct) => DoNothing());
+            When<Envelope<BuildingWasCorrectedToUnderConstruction>>(async (context, message, ct) => DoNothing());
+            When<Envelope<BuildingWasMeasuredByGrb>>(async (context, message, ct) => DoNothing());
+            When<Envelope<BuildingWasOutlined>>(async (context, message, ct) => DoNothing());
+            When<Envelope<BuildingWasPlanned>>(async (context, message, ct) => DoNothing());
+            When<Envelope<BuildingWasRealized>>(async (context, message, ct) => DoNothing());
             #endregion
+
+            //BuildingUnit
 
             When<Envelope<BuildingUnitPersistentLocalIdWasAssigned>>(async (context, message, ct) =>
             {
@@ -386,6 +402,24 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetail
             });
 
             #endregion
+
+            When<Envelope<BuildingUnitPersistentLocalIdWasDuplicated>>(async (context, message, ct) => DoNothing());
+            When<Envelope<BuildingUnitPersistentLocalIdWasRemoved>>(async (context, message, ct) => DoNothing());
+
+            //CRAB
+            When<Envelope<AddressHouseNumberPositionWasImportedFromCrab>>(async (context, message, ct) => DoNothing());
+            When<Envelope<AddressHouseNumberStatusWasImportedFromCrab>>(async (context, message, ct) => DoNothing());
+            When<Envelope<AddressHouseNumberWasImportedFromCrab>>(async (context, message, ct) => DoNothing());
+            When<Envelope<AddressSubaddressPositionWasImportedFromCrab>>(async (context, message, ct) => DoNothing());
+            When<Envelope<AddressSubaddressStatusWasImportedFromCrab>>(async (context, message, ct) => DoNothing());
+            When<Envelope<AddressSubaddressWasImportedFromCrab>>(async (context, message, ct) => DoNothing());
+            When<Envelope<BuildingGeometryWasImportedFromCrab>>(async (context, message, ct) => DoNothing());
+            When<Envelope<BuildingStatusWasImportedFromCrab>>(async (context, message, ct) => DoNothing());
+            When<Envelope<HouseNumberWasReaddressedFromCrab>>(async (context, message, ct) => DoNothing());
+            When<Envelope<SubaddressWasReaddressedFromCrab>>(async (context, message, ct) => DoNothing());
+            When<Envelope<TerrainObjectHouseNumberWasImportedFromCrab>>(async (context, message, ct) => DoNothing());
+            When<Envelope<TerrainObjectWasImportedFromCrab>>(async (context, message, ct) => DoNothing());
+
         }
 
         private static void SetVersion(BuildingUnitDetailItem buildingUnit, Instant timestamp)
@@ -455,5 +489,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetail
             buildingUnit.PositionMethod = method;
             buildingUnit.Position = geometry;
         }
+
+        private static void DoNothing() { }
     }
 }

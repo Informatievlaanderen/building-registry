@@ -100,7 +100,7 @@ namespace BuildingRegistry.Building
             ApplyStatusChangesFor(_houseNumberStatusChronicle, legacyEvent);
         }
 
-        internal void ApplyStatusChange(AddressSubadressStatusWasImportedFromCrab legacyEvent)
+        internal void ApplyStatusChange(AddressSubaddressStatusWasImportedFromCrab legacyEvent)
         {
             ApplyStatusChangesFor(_subaddressStatusChronicle, legacyEvent);
         }

@@ -7,9 +7,9 @@ namespace BuildingRegistry.Tests.WhenImportingCrabSubaddress
 
     public static class ImportSubaddressStatusFromCrabExtensions
     {
-        public static AddressSubadressStatusWasImportedFromCrab ToLegacyEvent(this ImportSubaddressStatusFromCrab command)
+        public static AddressSubaddressStatusWasImportedFromCrab ToLegacyEvent(this ImportSubaddressStatusFromCrab command)
         {
-            return new AddressSubadressStatusWasImportedFromCrab(
+            return new AddressSubaddressStatusWasImportedFromCrab(
                 command.TerrainObjectId,
                 command.TerrainObjectHouseNumberId,
                 command.SubaddressStatusId,

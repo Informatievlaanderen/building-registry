@@ -14,6 +14,9 @@ namespace BuildingRegistry.Projections.Syndication.Parcel
             When(ParcelEvent.ParcelWasCorrectedToRealized, AddSyndicationItemEntry);
             When(ParcelEvent.ParcelWasRetired, AddSyndicationItemEntry);
             When(ParcelEvent.ParcelWasCorrectedToRetired, AddSyndicationItemEntry);
+
+            When(ParcelEvent.ParcelAddressWasAttached, DoNothing);
+            When(ParcelEvent.ParcelAddressWasDetached, DoNothing);
         }
 
         private static async Task AddSyndicationItemEntry(AtomEntry<SyndicationContent<Parcel>> entry, SyndicationContext context, CancellationToken ct)
@@ -61,5 +64,7 @@ namespace BuildingRegistry.Projections.Syndication.Parcel
             latestItem.Status = entry.Content.Object.Status;
             latestItem.IsRemoved = true;
         }
+
+        private static Task DoNothing(AtomEntry<SyndicationContent<Parcel>> entry, SyndicationContext context, CancellationToken ct) => Task.CompletedTask;
     }
 }

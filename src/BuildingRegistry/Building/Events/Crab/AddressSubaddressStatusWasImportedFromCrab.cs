@@ -6,9 +6,9 @@ namespace BuildingRegistry.Building.Events.Crab
     using NodaTime;
     using ValueObjects.Crab;
 
-    [EventName("AddressSubadressStatusWasImportedFromCrab")]
+    [EventName("AddressSubaddressStatusWasImportedFromCrab")]
     [EventDescription("Legacy event om tblSubadresStatus en tblSubadresStatus_hist te importeren.")]
-    public class AddressSubadressStatusWasImportedFromCrab : ICrabEvent, IHasCrabAddressStatus, IHasCrabKey<int>
+    public class AddressSubaddressStatusWasImportedFromCrab : ICrabEvent, IHasCrabAddressStatus, IHasCrabKey<int>
     {
         public int TerrainObjectId { get; }
         public int TerrainObjectHouseNumberId { get; }
@@ -24,7 +24,7 @@ namespace BuildingRegistry.Building.Events.Crab
 
         public int Key => SubaddressStatusId;
 
-        public AddressSubadressStatusWasImportedFromCrab(
+        public AddressSubaddressStatusWasImportedFromCrab(
             CrabTerrainObjectId terrainObjectId,
             CrabTerrainObjectHouseNumberId terrainObjectHouseNumberId,
             CrabSubaddressStatusId subaddressStatusId,
@@ -50,7 +50,7 @@ namespace BuildingRegistry.Building.Events.Crab
         }
 
         [JsonConstructor]
-        private AddressSubadressStatusWasImportedFromCrab(
+        private AddressSubaddressStatusWasImportedFromCrab(
             int terrainObjectId,
             int terrainObjectHouseNumberId,
             int subaddressStatusId,
