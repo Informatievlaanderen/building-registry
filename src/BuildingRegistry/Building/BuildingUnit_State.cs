@@ -15,8 +15,8 @@ namespace BuildingRegistry.Building
 
         private Chronicle<AddressHouseNumberStatusWasImportedFromCrab, int> _houseNumberStatusChronicle
             = new Chronicle<AddressHouseNumberStatusWasImportedFromCrab, int>();
-        private Chronicle<AddressSubadressStatusWasImportedFromCrab, int> _subaddressStatusChronicle
-            = new Chronicle<AddressSubadressStatusWasImportedFromCrab, int>();
+        private Chronicle<AddressSubaddressStatusWasImportedFromCrab, int> _subaddressStatusChronicle
+            = new Chronicle<AddressSubaddressStatusWasImportedFromCrab, int>();
 
         private List<AddressHouseNumberPositionWasImportedFromCrab> _houseNumberPositionsFromCrab
             = new List<AddressHouseNumberPositionWasImportedFromCrab>();
@@ -99,7 +99,7 @@ namespace BuildingRegistry.Building
             Register<AddressHouseNumberPositionWasImportedFromCrab>(When);
             Register<AddressSubaddressPositionWasImportedFromCrab>(When);
             Register<AddressHouseNumberStatusWasImportedFromCrab>(When);
-            Register<AddressSubadressStatusWasImportedFromCrab>(When);
+            Register<AddressSubaddressStatusWasImportedFromCrab>(When);
             Register<AddressSubaddressWasImportedFromCrab>(When);
 
             AddressIds = new List<AddressId>();
@@ -357,7 +357,7 @@ namespace BuildingRegistry.Building
         }
 
         #region CRAB
-        private void When(AddressSubadressStatusWasImportedFromCrab @event)
+        private void When(AddressSubaddressStatusWasImportedFromCrab @event)
         {
             _subaddressStatusChronicle.Add(@event);
         }

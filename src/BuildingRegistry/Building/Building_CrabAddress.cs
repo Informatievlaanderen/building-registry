@@ -317,7 +317,7 @@ namespace BuildingRegistry.Building
                 foreach (var addressSubadressStatusWasImportedFromCrab in _legacySubaddressStatusEventsBySubadresId[subaddressId])
                     buildingUnit.Route(addressSubadressStatusWasImportedFromCrab);
 
-                buildingUnit.ApplyStatusChange((AddressSubadressStatusWasImportedFromCrab)null);
+                buildingUnit.ApplyStatusChange((AddressSubaddressStatusWasImportedFromCrab)null);
             }
         }
 
@@ -334,7 +334,7 @@ namespace BuildingRegistry.Building
             CrabOrganisation? organisation)
         {
             var buildingUnitKey = BuildingUnitKey.Create(terrainObjectId, terrainObjectHouseNumberId, subaddressId);
-            var legacyEvent = new AddressSubadressStatusWasImportedFromCrab(
+            var legacyEvent = new AddressSubaddressStatusWasImportedFromCrab(
                 terrainObjectId,
                 terrainObjectHouseNumberId,
                 subaddressStatusId,

@@ -6,14 +6,13 @@ namespace BuildingRegistry.Projections.Wms.BuildingUnit
     using BuildingRegistry.Building.Events;
     using GeoAPI.Geometries;
     using Infrastructure;
-    using Microsoft.EntityFrameworkCore;
     using NetTopologySuite.IO;
     using NodaTime;
     using System;
     using System.Collections.Generic;
-    using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
+    using BuildingRegistry.Building.Events.Crab;
     using ValueObjects;
 
     public class BuildingUnitProjections : ConnectedProjection<WmsContext>
@@ -106,6 +105,20 @@ namespace BuildingRegistry.Projections.Wms.BuildingUnit
                 var buildingUnits = await context.BuildingUnits.GetByBuildingId(message.Message.BuildingId, ct);
                 RetireUnitsByBuilding(buildingUnits, message.Message.BuildingUnitIdsToNotRealize, message.Message.BuildingUnitIdsToRetire, message.Message.Provenance.Timestamp);
             });
+
+            When<Envelope<BuildingBecameUnderConstruction>>(async (context, message, ct) => DoNothing());
+            When<Envelope<BuildingMeasurementByGrbWasCorrected>>(async (context, message, ct) => DoNothing());
+            When<Envelope<BuildingOutlineWasCorrected>>(async (context, message, ct) => DoNothing());
+            When<Envelope<BuildingStatusWasCorrectedToRemoved>>(async (context, message, ct) => DoNothing());
+            When<Envelope<BuildingStatusWasRemoved>>(async (context, message, ct) => DoNothing());
+            When<Envelope<BuildingWasCorrectedToPlanned>>(async (context, message, ct) => DoNothing());
+            When<Envelope<BuildingWasCorrectedToRealized>>(async (context, message, ct) => DoNothing());
+            When<Envelope<BuildingWasCorrectedToUnderConstruction>>(async (context, message, ct) => DoNothing());
+            When<Envelope<BuildingWasMeasuredByGrb>>(async (context, message, ct) => DoNothing());
+            When<Envelope<BuildingWasOutlined>>(async (context, message, ct) => DoNothing());
+            When<Envelope<BuildingWasPlanned>>(async (context, message, ct) => DoNothing());
+            When<Envelope<BuildingWasRealized>>(async (context, message, ct) => DoNothing());
+            When<Envelope<BuildingWasRegistered>>(async (context, message, ct) => DoNothing());
             #endregion Building
 
             #region BuildingUnit
@@ -335,6 +348,26 @@ namespace BuildingRegistry.Projections.Wms.BuildingUnit
             });
 
             #endregion
+
+            When<Envelope<BuildingUnitAddressWasAttached>>(async (context, message, ct) => DoNothing());
+            When<Envelope<BuildingUnitAddressWasDetached>>(async (context, message, ct) => DoNothing());
+            When<Envelope<BuildingUnitWasReaddressed>>(async (context, message, ct) => DoNothing());
+            When<Envelope<BuildingUnitPersistentLocalIdWasRemoved>>(async (context, message, ct) => DoNothing());
+            When<Envelope<BuildingUnitPersistentLocalIdWasDuplicated>>(async (context, message, ct) => DoNothing());
+
+            //CRAB
+            When<Envelope<AddressHouseNumberPositionWasImportedFromCrab>>(async (context, message, ct) => DoNothing());
+            When<Envelope<AddressHouseNumberStatusWasImportedFromCrab>>(async (context, message, ct) => DoNothing());
+            When<Envelope<AddressHouseNumberWasImportedFromCrab>>(async (context, message, ct) => DoNothing());
+            When<Envelope<AddressSubaddressPositionWasImportedFromCrab>>(async (context, message, ct) => DoNothing());
+            When<Envelope<AddressSubaddressStatusWasImportedFromCrab>>(async (context, message, ct) => DoNothing());
+            When<Envelope<AddressSubaddressWasImportedFromCrab>>(async (context, message, ct) => DoNothing());
+            When<Envelope<BuildingGeometryWasImportedFromCrab>>(async (context, message, ct) => DoNothing());
+            When<Envelope<BuildingStatusWasImportedFromCrab>>(async (context, message, ct) => DoNothing());
+            When<Envelope<HouseNumberWasReaddressedFromCrab>>(async (context, message, ct) => DoNothing());
+            When<Envelope<SubaddressWasReaddressedFromCrab>>(async (context, message, ct) => DoNothing());
+            When<Envelope<TerrainObjectHouseNumberWasImportedFromCrab>>(async (context, message, ct) => DoNothing());
+            When<Envelope<TerrainObjectWasImportedFromCrab>>(async (context, message, ct) => DoNothing());
         }
 
         private static void SetVersion(BuildingUnit unit, Instant timestamp)
@@ -393,5 +426,7 @@ namespace BuildingRegistry.Projections.Wms.BuildingUnit
             buildingUnit.PositionMethod = method;
             buildingUnit.Position = geometry;
         }
+
+        private static void DoNothing() { }
     }
 }

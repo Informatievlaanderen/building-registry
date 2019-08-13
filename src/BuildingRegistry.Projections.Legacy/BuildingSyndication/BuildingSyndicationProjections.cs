@@ -12,6 +12,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
     using GeoAPI.Geometries;
     using NetTopologySuite.IO;
     using ValueObjects;
+    using BuildingRegistry.Building.Events.Crab;
 
     public class BuildingSyndicationProjections : ConnectedProjection<LegacyContext>
     {
@@ -1466,7 +1467,44 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
                     .AddAsync(newSyndicationItem, ct);
             });
 
+            When<Envelope<BuildingUnitPersistentLocalIdWasRemoved>>(async (context, message, ct) =>
+            {
+                var syndicationItem = await context.LatestPosition(message.Message.BuildingId, ct);
+
+                if (syndicationItem == null)
+                    throw DatabaseItemNotFound(message.Message.BuildingId);
+
+                if (syndicationItem.Position >= message.Position)
+                    return;
+
+                var newSyndicationItem = syndicationItem.CloneAndApplyEventInfo(
+                    message.Position,
+                    message.EventName,
+                    Instant.FromDateTimeUtc(message.CreatedUtc.ToUniversalTime()),
+                    x => { });
+
+                newSyndicationItem.EventDataAsXml = GetEventDataAsXmlString(message.Message);
+
+                await context
+                    .BuildingSyndication
+                    .AddAsync(newSyndicationItem, ct);
+            });
+
             #endregion
+
+            //CRAB
+            When<Envelope<AddressHouseNumberPositionWasImportedFromCrab>>(async (context, message, ct) => DoNothing());
+            When<Envelope<AddressHouseNumberStatusWasImportedFromCrab>>(async (context, message, ct) => DoNothing());
+            When<Envelope<AddressHouseNumberWasImportedFromCrab>>(async (context, message, ct) => DoNothing());
+            When<Envelope<AddressSubaddressPositionWasImportedFromCrab>>(async (context, message, ct) => DoNothing());
+            When<Envelope<AddressSubaddressStatusWasImportedFromCrab>>(async (context, message, ct) => DoNothing());
+            When<Envelope<AddressSubaddressWasImportedFromCrab>>(async (context, message, ct) => DoNothing());
+            When<Envelope<BuildingGeometryWasImportedFromCrab>>(async (context, message, ct) => DoNothing());
+            When<Envelope<BuildingStatusWasImportedFromCrab>>(async (context, message, ct) => DoNothing());
+            When<Envelope<HouseNumberWasReaddressedFromCrab>>(async (context, message, ct) => DoNothing());
+            When<Envelope<SubaddressWasReaddressedFromCrab>>(async (context, message, ct) => DoNothing());
+            When<Envelope<TerrainObjectHouseNumberWasImportedFromCrab>>(async (context, message, ct) => DoNothing());
+            When<Envelope<TerrainObjectWasImportedFromCrab>>(async (context, message, ct) => DoNothing());
         }
 
         private static string GetEventDataAsXmlString<T>(T message)
@@ -1490,5 +1528,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
         {
             item.Version = version;
         }
+
+        private static void DoNothing() { }
     }
 }

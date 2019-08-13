@@ -33,8 +33,8 @@ namespace BuildingRegistry.Building
         private readonly Dictionary<Tuple<CrabTerrainObjectHouseNumberId, CrabHouseNumberId>, List<AddressSubaddressWasImportedFromCrab>> _legacySubaddressEventsByTerreinObjectHouseNumber
             = new Dictionary<Tuple<CrabTerrainObjectHouseNumberId, CrabHouseNumberId>, List<AddressSubaddressWasImportedFromCrab>>();
 
-        private readonly Dictionary<CrabSubaddressId, List<AddressSubadressStatusWasImportedFromCrab>> _legacySubaddressStatusEventsBySubadresId
-            = new Dictionary<CrabSubaddressId, List<AddressSubadressStatusWasImportedFromCrab>>();
+        private readonly Dictionary<CrabSubaddressId, List<AddressSubaddressStatusWasImportedFromCrab>> _legacySubaddressStatusEventsBySubadresId
+            = new Dictionary<CrabSubaddressId, List<AddressSubaddressStatusWasImportedFromCrab>>();
         private readonly Dictionary<CrabSubaddressId, List<AddressSubaddressPositionWasImportedFromCrab>> _legacySubaddressPositionEventsBySubadresId
             = new Dictionary<CrabSubaddressId, List<AddressSubaddressPositionWasImportedFromCrab>>();
 
@@ -60,7 +60,7 @@ namespace BuildingRegistry.Building
             Register<AddressHouseNumberPositionWasImportedFromCrab>(When);
             Register<AddressSubaddressPositionWasImportedFromCrab>(When);
             Register<AddressHouseNumberStatusWasImportedFromCrab>(When);
-            Register<AddressSubadressStatusWasImportedFromCrab>(When);
+            Register<AddressSubaddressStatusWasImportedFromCrab>(When);
             Register<HouseNumberWasReaddressedFromCrab>(When);
             Register<SubaddressWasReaddressedFromCrab>(When);
             Register<AddressHouseNumberWasImportedFromCrab>(@event => WhenCrabEventApplied());
@@ -467,7 +467,7 @@ namespace BuildingRegistry.Building
             WhenCrabEventApplied();
         }
 
-        private void When(AddressSubadressStatusWasImportedFromCrab @event)
+        private void When(AddressSubaddressStatusWasImportedFromCrab @event)
         {
             var crabSubaddressId = new CrabSubaddressId(@event.SubaddressId);
             var key = BuildingUnitKey.Create(new CrabTerrainObjectId(@event.TerrainObjectId),
@@ -479,7 +479,7 @@ namespace BuildingRegistry.Building
             _buildingUnitCollection.GetActiveOrLastRetiredByKey(key)?.Route(@event);
 
             if (!_legacySubaddressStatusEventsBySubadresId.ContainsKey(crabSubaddressId))
-                _legacySubaddressStatusEventsBySubadresId.Add(crabSubaddressId, new List<AddressSubadressStatusWasImportedFromCrab>());
+                _legacySubaddressStatusEventsBySubadresId.Add(crabSubaddressId, new List<AddressSubaddressStatusWasImportedFromCrab>());
 
             _legacySubaddressStatusEventsBySubadresId[crabSubaddressId].Add(@event);
             WhenCrabEventApplied();
