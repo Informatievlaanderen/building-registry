@@ -231,9 +231,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingDetail
 
         private void SetGeometry(BuildingDetailItem item, string extendedWkb, BuildingGeometryMethod method)
         {
-            var geometry = (IPolygon)_wkbReader.Read(extendedWkb.ToByteArray());
-
-            item.Geometry = geometry;
+            item.Geometry = extendedWkb.ToByteArray();
             item.GeometryMethod = method;
         }
 

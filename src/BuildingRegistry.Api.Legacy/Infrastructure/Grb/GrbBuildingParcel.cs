@@ -10,9 +10,11 @@ namespace BuildingRegistry.Api.Legacy.Infrastructure.Grb
 
         public GrbBuildingParcel(IGrbWfsClient wfsClient) => _wfsClient = wfsClient;
 
-        public IEnumerable<string> GetUnderlyingParcels(IGeometry buildingGeometry)
+        public IEnumerable<string> GetUnderlyingParcels(byte[] buildingGeometry)
         {
-            var features = _wfsClient.GetFeaturesInBoundingBox(GrbFeatureType.Parcel, buildingGeometry.EnvelopeInternal);
+            var geometry = WKBReaderFactory.Create().Read(buildingGeometry);
+
+            var features = _wfsClient.GetFeaturesInBoundingBox(GrbFeatureType.Parcel, geometry.EnvelopeInternal);
             var parcels = new Dictionary<string, IGeometry>();
             foreach (var feature in features)
             {
@@ -22,7 +24,7 @@ namespace BuildingRegistry.Api.Legacy.Infrastructure.Grb
 
             foreach (var perceel in parcels.ToList())
             {
-                if (!buildingGeometry.Intersects(perceel.Value))
+                if (!geometry.Intersects(perceel.Value))
                     parcels.Remove(perceel.Key);
             }
 
@@ -30,7 +32,7 @@ namespace BuildingRegistry.Api.Legacy.Infrastructure.Grb
 
             foreach (var parcelPair in parcels.ToList())
             {
-                var sufficientOverlap = buildingGeometry.Intersection(parcelPair.Value).Area / buildingGeometry.Area >= 0.8 / parcelCount;
+                var sufficientOverlap = geometry.Intersection(parcelPair.Value).Area / geometry.Area >= 0.8 / parcelCount;
 
                 if (!sufficientOverlap)
                     parcels.Remove(parcelPair.Key);

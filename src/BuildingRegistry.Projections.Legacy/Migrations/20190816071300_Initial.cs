@@ -1,5 +1,4 @@
 ﻿using System;
-using GeoAPI.Geometries;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace BuildingRegistry.Projections.Legacy.Migrations
@@ -17,9 +16,9 @@ namespace BuildingRegistry.Projections.Legacy.Migrations
                 columns: table => new
                 {
                     BuildingId = table.Column<Guid>(nullable: false),
-                    OsloId = table.Column<int>(nullable: true),
+                    PersistentLocalId = table.Column<int>(nullable: true),
                     GeometryMethod = table.Column<int>(nullable: true),
-                    Geometry = table.Column<IPolygon>(type: "sys.geometry", nullable: true),
+                    Geometry = table.Column<byte[]>(nullable: true),
                     Status = table.Column<int>(nullable: true),
                     IsComplete = table.Column<bool>(nullable: false),
                     IsRemoved = table.Column<bool>(nullable: false),
@@ -38,9 +37,9 @@ namespace BuildingRegistry.Projections.Legacy.Migrations
                 {
                     Position = table.Column<long>(nullable: false),
                     BuildingId = table.Column<Guid>(nullable: false),
-                    OsloId = table.Column<int>(nullable: true),
+                    PersistentLocalId = table.Column<int>(nullable: true),
                     ChangeType = table.Column<string>(nullable: true),
-                    Geometry = table.Column<IPolygon>(type: "sys.geometry", nullable: true),
+                    Geometry = table.Column<byte[]>(nullable: true),
                     GeometryMethod = table.Column<int>(nullable: true),
                     Status = table.Column<int>(nullable: true),
                     IsComplete = table.Column<bool>(nullable: false),
@@ -60,16 +59,19 @@ namespace BuildingRegistry.Projections.Legacy.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "BuildingUnit_BuildingOsloIds",
+                name: "BuildingUnit_Buildings",
                 schema: "BuildingRegistryLegacy",
                 columns: table => new
                 {
                     BuildingId = table.Column<Guid>(nullable: false),
-                    BuildingOsloId = table.Column<int>(nullable: true)
+                    BuildingPersistentLocalId = table.Column<int>(nullable: true),
+                    IsComplete = table.Column<bool>(nullable: true),
+                    IsRemoved = table.Column<bool>(nullable: false),
+                    BuildingRetiredStatus = table.Column<int>(nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_BuildingUnit_BuildingOsloIds", x => x.BuildingId)
+                    table.PrimaryKey("PK_BuildingUnit_Buildings", x => x.BuildingId)
                         .Annotation("SqlServer:Clustered", false);
                 });
 
@@ -80,9 +82,9 @@ namespace BuildingRegistry.Projections.Legacy.Migrations
                 {
                     BuildingUnitId = table.Column<Guid>(nullable: false),
                     BuildingId = table.Column<Guid>(nullable: false),
-                    OsloId = table.Column<int>(nullable: true),
-                    BuildingOsloId = table.Column<int>(nullable: true),
-                    Position = table.Column<IPoint>(type: "sys.geometry", nullable: true),
+                    PersistentLocalId = table.Column<int>(nullable: true),
+                    BuildingPersistentLocalId = table.Column<int>(nullable: true),
+                    Position = table.Column<byte[]>(nullable: true),
                     IsComplete = table.Column<bool>(nullable: false),
                     IsRemoved = table.Column<bool>(nullable: false),
                     IsBuildingComplete = table.Column<bool>(nullable: false),
@@ -118,8 +120,8 @@ namespace BuildingRegistry.Projections.Legacy.Migrations
                 {
                     Position = table.Column<long>(nullable: false),
                     BuildingUnitId = table.Column<Guid>(nullable: false),
-                    OsloId = table.Column<int>(nullable: true),
-                    PointPosition = table.Column<IPoint>(type: "sys.geometry", nullable: true),
+                    PersistentLocalId = table.Column<int>(nullable: true),
+                    PointPosition = table.Column<byte[]>(nullable: true),
                     IsComplete = table.Column<bool>(nullable: false),
                     Function = table.Column<string>(nullable: true),
                     PositionMethod = table.Column<string>(nullable: true),
@@ -209,12 +211,12 @@ namespace BuildingRegistry.Projections.Legacy.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_BuildingDetails_OsloId",
+                name: "IX_BuildingDetails_PersistentLocalId",
                 schema: "BuildingRegistryLegacy",
                 table: "BuildingDetails",
-                column: "OsloId",
+                column: "PersistentLocalId",
                 unique: true,
-                filter: "[OsloId] IS NOT NULL");
+                filter: "[PersistentLocalId] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
                 name: "IX_BuildingSyndication_BuildingId",
@@ -223,30 +225,30 @@ namespace BuildingRegistry.Projections.Legacy.Migrations
                 column: "BuildingId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_BuildingSyndication_OsloId",
+                name: "IX_BuildingSyndication_PersistentLocalId",
                 schema: "BuildingRegistryLegacy",
                 table: "BuildingSyndication",
-                column: "OsloId");
+                column: "PersistentLocalId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_BuildingUnit_BuildingOsloIds_BuildingOsloId",
+                name: "IX_BuildingUnit_Buildings_BuildingPersistentLocalId",
                 schema: "BuildingRegistryLegacy",
-                table: "BuildingUnit_BuildingOsloIds",
-                column: "BuildingOsloId");
+                table: "BuildingUnit_Buildings",
+                column: "BuildingPersistentLocalId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_BuildingUnitDetails_BuildingOsloId",
-                schema: "BuildingRegistryLegacy",
-                table: "BuildingUnitDetails",
-                column: "BuildingOsloId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_BuildingUnitDetails_OsloId",
+                name: "IX_BuildingUnitDetails_BuildingPersistentLocalId",
                 schema: "BuildingRegistryLegacy",
                 table: "BuildingUnitDetails",
-                column: "OsloId",
+                column: "BuildingPersistentLocalId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_BuildingUnitDetails_PersistentLocalId",
+                schema: "BuildingRegistryLegacy",
+                table: "BuildingUnitDetails",
+                column: "PersistentLocalId",
                 unique: true,
-                filter: "[OsloId] IS NOT NULL");
+                filter: "[PersistentLocalId] IS NOT NULL");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -256,7 +258,7 @@ namespace BuildingRegistry.Projections.Legacy.Migrations
                 schema: "BuildingRegistryLegacy");
 
             migrationBuilder.DropTable(
-                name: "BuildingUnit_BuildingOsloIds",
+                name: "BuildingUnit_Buildings",
                 schema: "BuildingRegistryLegacy");
 
             migrationBuilder.DropTable(

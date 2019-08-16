@@ -5,7 +5,6 @@ namespace BuildingRegistry.Projections.Legacy.BuildingDetail
     using Microsoft.EntityFrameworkCore.Metadata.Builders;
     using NodaTime;
     using System;
-    using GeoAPI.Geometries;
     using ValueObjects;
 
     public class BuildingDetailItem
@@ -15,7 +14,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingDetail
         public Guid BuildingId { get; set; }
         public int? PersistentLocalId { get; set; }
         public BuildingGeometryMethod? GeometryMethod { get; set; }
-        public IPolygon Geometry { get; set; }
+        public byte[] Geometry { get; set; }
         public BuildingStatus? Status { get; set; }
         public bool IsComplete { get; set; }
         public bool IsRemoved { get; set; }
@@ -46,8 +45,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingDetail
 
             b.Property(p => p.BuildingId);
             b.Property(p => p.GeometryMethod);
-            b.Property(p => p.Geometry)
-                .HasColumnType("sys.geometry");
+            b.Property(p => p.Geometry);
             b.Property(p => p.Status);
             b.Property(p => p.IsComplete);
             b.Property(p => p.IsRemoved);
