@@ -6,7 +6,6 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetail
     using NodaTime;
     using System;
     using System.Collections.ObjectModel;
-    using GeoAPI.Geometries;
     using ValueObjects;
 
     public class BuildingUnitDetailItem
@@ -17,7 +16,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetail
         public Guid BuildingId { get; set; }
         public int? PersistentLocalId { get; set; }
         public int? BuildingPersistentLocalId { get; set; }
-        public IPoint Position { get; set; }
+        public byte[] Position { get; set; }
         public bool IsComplete { get; set; }
         public bool IsRemoved { get; set; }
         public bool IsBuildingComplete { get; set; }
@@ -71,8 +70,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetail
                 .ForSqlServerIsClustered(false);
 
             b.Property(p => p.BuildingId);
-            b.Property(p => p.Position)
-                .HasColumnType("sys.geometry");
+            b.Property(p => p.Position);
 
             b.Property(BuildingUnitDetailItem.VersionTimestampBackingPropertyName)
                 .HasColumnName("Version");

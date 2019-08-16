@@ -6,7 +6,6 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
     using System;
     using System.Collections.ObjectModel;
     using System.Linq;
-    using GeoAPI.Geometries;
     using NodaTime;
     using ValueObjects;
 
@@ -15,7 +14,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
         public long Position { get; set; }
         public Guid BuildingUnitId { get; set; }
         public int? PersistentLocalId { get; set; }
-        public IPoint PointPosition { get; set; }
+        public byte[] PointPosition { get; set; }
         public bool IsComplete { get; set; }
 
         public BuildingUnitFunction? Function
@@ -91,8 +90,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
             b.Property(p => p.Position);
             b.Property(p => p.BuildingUnitId);
             b.Property(p => p.PersistentLocalId);
-            b.Property(p => p.PointPosition)
-                .HasColumnType("sys.geometry");
+            b.Property(p => p.PointPosition);
 
             b.Ignore(p => p.Version);
             b.Property(p => p.VersionTimestampAsDateTimeOffset)

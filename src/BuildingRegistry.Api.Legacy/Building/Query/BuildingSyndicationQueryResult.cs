@@ -23,7 +23,7 @@ namespace BuildingRegistry.Api.Legacy.Building.Query
         public Instant LastChangedOn { get; }
         public BuildingStatus? Status { get; }
         public BuildingGeometryMethod? GeometryMethod { get; }
-        public IPolygon Geometry { get; }
+        public byte[] Geometry { get; }
         public bool IsComplete { get; }
         public Organisation? Organisation { get; }
         public string Reason { get; }
@@ -75,7 +75,7 @@ namespace BuildingRegistry.Api.Legacy.Building.Query
             int? persistentLocalId,
             BuildingStatus? status,
             BuildingGeometryMethod? geometryMethod,
-            IPolygon geometry,
+            byte[] geometry,
             string changeType,
             Instant recordCreateAt,
             Instant lastChangedOn,
@@ -118,7 +118,7 @@ namespace BuildingRegistry.Api.Legacy.Building.Query
             int? persistentLocalId,
             BuildingStatus? status,
             BuildingGeometryMethod? geometryMethod,
-            IPolygon geometry,
+            byte[] geometry,
             string changeType,
             Instant recordCreateAt,
             Instant lastChangedOn,
@@ -155,7 +155,7 @@ namespace BuildingRegistry.Api.Legacy.Building.Query
         public BuildingUnitFunction? Function { get; }
         public BuildingUnitStatus? Status { get; }
         public BuildingUnitPositionGeometryMethod? GeometryMethod { get; }
-        public IPoint Geometry { get; }
+        public byte[] Geometry { get; }
         public bool IsComplete { get; }
         public Instant Version { get; }
         public IEnumerable<Guid> AddressIds { get; }
@@ -166,7 +166,7 @@ namespace BuildingRegistry.Api.Legacy.Building.Query
             BuildingUnitFunction? function,
             BuildingUnitStatus? status,
             BuildingUnitPositionGeometryMethod? geometryMethod,
-            IPoint geometry,
+            byte[] geometry,
             bool isComplete,
             IEnumerable<BuildingUnitAddressSyndicationItem> addresses,
             IEnumerable<BuildingUnitReaddressSyndicationItem> readdresses,

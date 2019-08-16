@@ -5,6 +5,6 @@ namespace BuildingRegistry.Api.Legacy.Infrastructure.Grb
 
     public interface IGrbBuildingParcel
     {
-        IEnumerable<string> GetUnderlyingParcels(IGeometry buildingGeometry);
+        IEnumerable<string> GetUnderlyingParcels(byte[] buildingGeometry);
     }
 }

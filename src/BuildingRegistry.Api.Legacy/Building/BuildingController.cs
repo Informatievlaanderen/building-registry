@@ -172,8 +172,9 @@ namespace BuildingRegistry.Api.Legacy.Building
             return Ok(listResponse);
         }
 
-        internal static Polygon GetBuildingPolygon(IPolygon geometry)
+        internal static Polygon GetBuildingPolygon(byte[] polygon)
         {
+            var geometry = (IPolygon)WKBReaderFactory.Create().Read(polygon);
             return new Polygon
             {
                 XmlPolygon = MapGmlPolygon(geometry),

@@ -484,10 +484,8 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetail
             string extendedWkb,
             BuildingUnitPositionGeometryMethod method)
         {
-            var geometry = (IPoint)_wkbReader.Read(extendedWkb.ToByteArray());
-
             buildingUnit.PositionMethod = method;
-            buildingUnit.Position = geometry;
+            buildingUnit.Position = extendedWkb.ToByteArray();
         }
 
         private static void DoNothing() { }

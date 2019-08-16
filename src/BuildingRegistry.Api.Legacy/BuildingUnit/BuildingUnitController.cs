@@ -191,12 +191,13 @@ namespace BuildingRegistry.Api.Legacy.BuildingUnit
             throw new ArgumentOutOfRangeException(nameof(function), function, null);
         }
 
-        public static Point GetBuildingUnitPoint(IPoint point)
+        public static Point GetBuildingUnitPoint(byte[] point)
         {
+            var geometry = WKBReaderFactory.Create().Read(point);
             return new Point
             {
-                XmlPoint = new GmlPoint { Pos = $"{point.Coordinate.X} {point.Coordinate.Y}" },
-                JsonPoint = new GeoJSONPoint { Coordinates = new[] { point.Coordinate.X, point.Coordinate.Y } }
+                XmlPoint = new GmlPoint { Pos = $"{geometry.Coordinate.X} {geometry.Coordinate.Y}" },
+                JsonPoint = new GeoJSONPoint { Coordinates = new[] { geometry.Coordinate.X, geometry.Coordinate.Y } }
             };
         }
     }

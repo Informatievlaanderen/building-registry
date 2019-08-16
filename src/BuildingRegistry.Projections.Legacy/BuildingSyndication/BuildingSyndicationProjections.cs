@@ -161,7 +161,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
                     x =>
                     {
                         x.GeometryMethod = BuildingGeometryMethod.MeasuredByGrb;
-                        x.Geometry = (IPolygon)_wkbReader.Read(message.Message.ExtendedWkb.ToByteArray());
+                        x.Geometry = message.Message.ExtendedWkb.ToByteArray();
                     });
 
                 newSyndicationItem.EventDataAsXml = GetEventDataAsXmlString(message.Message);
@@ -213,7 +213,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
                     x =>
                     {
                         x.GeometryMethod = BuildingGeometryMethod.Outlined;
-                        x.Geometry = (IPolygon)_wkbReader.Read(message.Message.ExtendedWkb.ToByteArray());
+                        x.Geometry = message.Message.ExtendedWkb.ToByteArray();
                     });
 
                 newSyndicationItem.EventDataAsXml = GetEventDataAsXmlString(message.Message);
@@ -416,7 +416,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
                     x =>
                     {
                         x.GeometryMethod = BuildingGeometryMethod.MeasuredByGrb;
-                        x.Geometry = (IPolygon)_wkbReader.Read(message.Message.ExtendedWkb.ToByteArray());
+                        x.Geometry = message.Message.ExtendedWkb.ToByteArray();
                     });
 
                 newSyndicationItem.EventDataAsXml = GetEventDataAsXmlString(message.Message);
@@ -470,7 +470,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
                     x =>
                     {
                         x.GeometryMethod = BuildingGeometryMethod.Outlined;
-                        x.Geometry = (IPolygon)_wkbReader.Read(message.Message.ExtendedWkb.ToByteArray());
+                        x.Geometry = message.Message.ExtendedWkb.ToByteArray();
                     });
 
                 newSyndicationItem.EventDataAsXml = GetEventDataAsXmlString(message.Message);
@@ -961,7 +961,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
                     {
                         var unit = x.BuildingUnits.Single(y => y.BuildingUnitId == message.Message.BuildingUnitId);
                         unit.PositionMethod = BuildingUnitPositionGeometryMethod.AppointedByAdministrator;
-                        unit.PointPosition = (IPoint)_wkbReader.Read(message.Message.Position.ToByteArray());
+                        unit.PointPosition = message.Message.Position.ToByteArray();
                         ApplyUnitVersion(unit, message.Message.Provenance.Timestamp);
                     });
 
@@ -991,7 +991,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
                     {
                         var unit = x.BuildingUnits.Single(y => y.BuildingUnitId == message.Message.BuildingUnitId);
                         unit.PositionMethod = BuildingUnitPositionGeometryMethod.AppointedByAdministrator;
-                        unit.PointPosition = (IPoint)_wkbReader.Read(message.Message.Position.ToByteArray());
+                        unit.PointPosition = message.Message.Position.ToByteArray();
                         ApplyUnitVersion(unit, message.Message.Provenance.Timestamp);
                     });
 
@@ -1021,7 +1021,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
                     {
                         var unit = x.BuildingUnits.Single(y => y.BuildingUnitId == message.Message.BuildingUnitId);
                         unit.PositionMethod = BuildingUnitPositionGeometryMethod.DerivedFromObject;
-                        unit.PointPosition = (IPoint)_wkbReader.Read(message.Message.Position.ToByteArray());
+                        unit.PointPosition = message.Message.Position.ToByteArray();
                         ApplyUnitVersion(unit, message.Message.Provenance.Timestamp);
                     });
 
@@ -1051,7 +1051,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
                     {
                         var unit = x.BuildingUnits.Single(y => y.BuildingUnitId == message.Message.BuildingUnitId);
                         unit.PositionMethod = BuildingUnitPositionGeometryMethod.DerivedFromObject;
-                        unit.PointPosition = (IPoint)_wkbReader.Read(message.Message.Position.ToByteArray());
+                        unit.PointPosition = message.Message.Position.ToByteArray();
                         ApplyUnitVersion(unit, message.Message.Provenance.Timestamp);
                     });
 
