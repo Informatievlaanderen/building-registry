@@ -17,6 +17,7 @@ namespace BuildingRegistry.Importer.TestClient
         public int BufferSize => 1;
         public int NrOfConsumers => 1;
         public int BatchSize => 1;
+        public bool WaitForUserInput => false;
         public TimeSpan TimeMargin => new TimeSpan(0, 0, 0);
 
         public override string ToString() => $"{Environment.NewLine}" +
