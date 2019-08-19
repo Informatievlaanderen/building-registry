@@ -1,12 +1,10 @@
 using Be.Vlaanderen.Basisregisters.GrAr.Import.Processing;
-using Be.Vlaanderen.Basisregisters.GrAr.Import.Processing.CommandLine;
 using Be.Vlaanderen.Basisregisters.GrAr.Import.Processing.Serilog;
 using Serilog;
 using Serilog.Events;
 using System;
 using System.Configuration;
 using System.Diagnostics;
-using System.Linq;
 using System.Reflection;
 
 namespace BuildingRegistry.Importer
@@ -18,13 +16,14 @@ namespace BuildingRegistry.Importer
 
         private static void Main(params string[] args)
         {
+            var settings = new SettingsBasedConfig();
+
             try
             {
                 var options = new ImportOptions(
                     args,
-                    errors => WaitForExit("Could not parse commandline options."));
+                    errors => WaitForExit(settings.WaitForUserInput, "Could not parse commandline options."));
 
-                var settings = new SettingsBasedConfig();
                 MapLogging.Log = s => _commandCounter++;
 
                 var commandProcessor = new CommandProcessorBuilder<int>(new CommandGenerator(ConfigurationManager.ConnectionStrings["Crab2Vbr"].ConnectionString))
@@ -44,19 +43,19 @@ namespace BuildingRegistry.Importer
                     .ConfigureImportFeedFromAssembly(Assembly.GetExecutingAssembly())
                     .Build();
 
-                WaitForStart();
+                WaitForStart(settings.WaitForUserInput);
 
                 commandProcessor.Run(options, settings);
 
-                WaitForExit();
+                WaitForExit(settings.WaitForUserInput);
             }
             catch (Exception exception)
             {
-                WaitForExit("General error occurred", exception);
+                WaitForExit(settings.WaitForUserInput, "General error occurred", exception);
             }
         }
 
-        private static void WaitForExit(string errorMessage = null, Exception exception = null)
+        private static void WaitForExit(bool waitForUserInput, string errorMessage = null, Exception exception = null)
         {
             if (!string.IsNullOrEmpty(errorMessage))
                 Console.Error.WriteLine(errorMessage);
@@ -73,8 +72,11 @@ namespace BuildingRegistry.Importer
                 Console.WriteLine(summary);
             }
 
-            Console.WriteLine("Done! Press ENTER key to exit...");
-            ConsoleExtensions.WaitFor(ConsoleKey.Enter);
+            if (waitForUserInput)
+            {
+                Console.WriteLine("Done! Press ENTER key to exit...");
+                ConsoleExtensions.WaitFor(ConsoleKey.Enter);
+            }
 
             if (!string.IsNullOrEmpty(errorMessage))
                 Environment.Exit(1);
@@ -82,10 +84,16 @@ namespace BuildingRegistry.Importer
             Environment.Exit(0);
         }
 
-        private static void WaitForStart()
+        private static void WaitForStart(bool waitForUserInput)
         {
-            Console.WriteLine("Press ENTER key to start the CRAB Import...");
-            ConsoleExtensions.WaitFor(ConsoleKey.Enter);
+            if (waitForUserInput)
+            {
+                Console.WriteLine("Press ENTER key to start the CRAB Import...");
+                ConsoleExtensions.WaitFor(ConsoleKey.Enter);
+            }
+            else
+                Console.WriteLine("Starting CRAB Import...");
+
             _stopwatch = Stopwatch.StartNew();
         }
     }

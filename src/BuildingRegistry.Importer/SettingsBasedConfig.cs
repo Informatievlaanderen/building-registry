@@ -17,6 +17,7 @@ namespace BuildingRegistry.Importer
         public int BufferSize => Settings.Default.BufferSize;
         public int NrOfConsumers => Settings.Default.NrOfConsumers;
         public int BatchSize => Settings.Default.BatchSize;
+        public bool WaitForUserInput => Settings.Default.WaitForUserInput;
         public TimeSpan TimeMargin => Settings.Default.TimeMarginBeforeNowInSeconds;
 
         public override string ToString() => $"{Environment.NewLine}" +
@@ -29,7 +30,8 @@ namespace BuildingRegistry.Importer
                                              $"NrOfProducers: {NrOfProducers}{Environment.NewLine}" +
                                              $"BufferSize: {BufferSize}{Environment.NewLine}" +
                                              $"NrOfConsumers: {NrOfConsumers}{Environment.NewLine}" +
-                                             $"BatchSize: {BatchSize}";//{Environment.NewLine}";
+                                             $"BatchSize: {BatchSize}" +
+                                             $"WaitForUserInput: {WaitForUserInput}";
 
         public int Deserialize(string key) => int.Parse(key);
     }
