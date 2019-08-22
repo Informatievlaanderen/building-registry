@@ -23,6 +23,7 @@ namespace BuildingRegistry.Projector.Infrastructure.Modules
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Logging;
+    using Microsoft.Extensions.Options;
 
     public class ApiModule : Module
     {
@@ -81,9 +82,9 @@ namespace BuildingRegistry.Projector.Infrastructure.Modules
                     _configuration,
                     _loggerFactory)
                 .RegisterProjections<BuildingExtractProjections, ExtractContext>(
-                    () => new BuildingExtractProjections(DbaseCodePage.Western_European_ANSI.ToEncoding(), WKBReaderFactory.Create()))
+                    context => new BuildingExtractProjections(context.Resolve<IOptions<ExtractConfig>>(), DbaseCodePage.Western_European_ANSI.ToEncoding(), WKBReaderFactory.Create()))
                 .RegisterProjections<BuildingUnitExtractProjections, ExtractContext>(
-                () => new BuildingUnitExtractProjections(DbaseCodePage.Western_European_ANSI.ToEncoding(), WKBReaderFactory.Create()));
+                    context => new BuildingUnitExtractProjections(context.Resolve<IOptions<ExtractConfig>>(), DbaseCodePage.Western_European_ANSI.ToEncoding(), WKBReaderFactory.Create()));
         }
 
         private void RegisterLastChangedProjections(ContainerBuilder builder)
