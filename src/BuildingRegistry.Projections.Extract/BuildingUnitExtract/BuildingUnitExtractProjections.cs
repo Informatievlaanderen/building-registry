@@ -13,6 +13,7 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
     using Be.Vlaanderen.Basisregisters.Utilities.HexByteConvertor;
     using Building.Events.Crab;
     using GeoAPI.Geometries;
+    using Microsoft.Extensions.Options;
 
     public class BuildingUnitExtractProjections : ConnectedProjection<ExtractContext>
     {
@@ -27,12 +28,12 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
         private const string DerivedFromObject = "AfgeleidVanObject";
         private const string AppointedByAdministrator = "AangeduidDoorBeheerder";
 
-        private const string IdUri = "https://data.vlaanderen.be/id/gebouweenheid";
-
+        private readonly ExtractConfig _extractConfig;
         private readonly Encoding _encoding;
 
-        public BuildingUnitExtractProjections(Encoding encoding, WKBReader wkbReader)
+        public BuildingUnitExtractProjections(IOptions<ExtractConfig> extractConfig, Encoding encoding, WKBReader wkbReader)
         {
+            _extractConfig = extractConfig.Value;
             _encoding = encoding ?? throw new ArgumentNullException(nameof(encoding));
 
             When<Envelope<BuildingPersistentLocalIdWasAssigned>>(async (context, message, ct) =>
@@ -383,7 +384,7 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
         private void UpdateId(BuildingUnitExtractItem buildingUnit, int id)
             => UpdateRecord(buildingUnit, record =>
             {
-                record.id.Value = $"{IdUri}/{id}";
+                record.id.Value = $"{_extractConfig.DataVlaanderenNamespaceBuildingUnit}/{id}";
                 record.gebouwehid.Value = id;
             });
 

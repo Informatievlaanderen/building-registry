@@ -11,6 +11,7 @@ namespace BuildingRegistry.Projections.Extract.BuildingExtract
     using System;
     using System.Text;
     using Building.Events.Crab;
+    using Microsoft.Extensions.Options;
 
     public class BuildingExtractProjections : ConnectedProjection<ExtractContext>
     {
@@ -23,12 +24,12 @@ namespace BuildingRegistry.Projections.Extract.BuildingExtract
         private const string MeasuredByGrb = "IngemetenGRB";
         private const string Outlined = "Ingeschetst";
 
-        private const string IdUri = "https://data.vlaanderen.be/id/gebouw";
-
+        private readonly ExtractConfig _extractConfig;
         private readonly Encoding _encoding;
 
-        public BuildingExtractProjections(Encoding encoding, WKBReader wkbReader)
+        public BuildingExtractProjections(IOptions<ExtractConfig> extractConfig, Encoding encoding, WKBReader wkbReader)
         {
+            _extractConfig = extractConfig.Value;
             _encoding = encoding ?? throw new ArgumentNullException(nameof(encoding));
 
             When<Envelope<BuildingWasRegistered>>(async (context, message, ct) =>
@@ -336,7 +337,7 @@ namespace BuildingRegistry.Projections.Extract.BuildingExtract
         private void UpdateId(BuildingExtractItem building, int id)
             => UpdateRecord(building, record =>
             {
-                record.id.Value = $"{IdUri}/{id}";
+                record.id.Value = $"{_extractConfig.DataVlaanderenNamespaceBuilding}/{id}";
                 record.gebouwid.Value = id;
             });
 
