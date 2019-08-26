@@ -160,7 +160,16 @@ namespace BuildingRegistry.Projector.Infrastructure
                     Api =
                     {
                         VersionProvider = apiVersionProvider,
-                        Info = groupName => $"Basisregisters.Vlaanderen - Building Information Registry API {groupName}"
+                        Info = groupName => $"Basisregisters.Vlaanderen - Building Information Registry API {groupName}",
+                        CSharpClientOptions =
+                        {
+                            ClassName = "BuildingRegistryProjector",
+                            Namespace = "Be.Vlaanderen.Basisregisters"
+                        },
+                        TypeScriptClientOptions =
+                        {
+                            ClassName = "BuildingRegistryProjector"
+                        }
                     },
                     Server =
                     {

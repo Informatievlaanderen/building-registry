@@ -145,7 +145,16 @@ namespace BuildingRegistry.Api.CrabImport.Infrastructure
                     Api =
                     {
                         VersionProvider = apiVersionProvider,
-                        Info = groupName => $"Basisregisters Vlaanderen - Building Registry API {groupName}"
+                        Info = groupName => $"Basisregisters Vlaanderen - Building Registry API {groupName}",
+                        CSharpClientOptions =
+                        {
+                            ClassName = "BuildingRegistryCrabImport",
+                            Namespace = "Be.Vlaanderen.Basisregisters"
+                        },
+                        TypeScriptClientOptions =
+                        {
+                            ClassName = "BuildingRegistryCrabImport"
+                        }
                     },
                     Server =
                     {

@@ -140,7 +140,16 @@ namespace BuildingRegistry.Api.Extract.Infrastructure
                     Api =
                     {
                         VersionProvider = apiVersionProvider,
-                        Info = groupName => $"Basisregisters Vlaanderen - Building Registry API {groupName}"
+                        Info = groupName => $"Basisregisters Vlaanderen - Building Registry API {groupName}",
+                        CSharpClientOptions =
+                        {
+                            ClassName = "BuildingRegistryExtract",
+                            Namespace = "Be.Vlaanderen.Basisregisters"
+                        },
+                        TypeScriptClientOptions =
+                        {
+                            ClassName = "BuildingRegistryExtract"
+                        }
                     },
                     Server =
                     {

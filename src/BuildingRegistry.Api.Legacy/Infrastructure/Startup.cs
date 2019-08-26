@@ -140,7 +140,16 @@ namespace BuildingRegistry.Api.Legacy.Infrastructure
                     Api =
                     {
                         VersionProvider = apiVersionProvider,
-                        Info = groupName => $"Basisregisters Vlaanderen - Building Registry API {groupName}"
+                        Info = groupName => $"Basisregisters Vlaanderen - Building Registry API {groupName}",
+                        CSharpClientOptions =
+                        {
+                            ClassName = "BuildingRegistry",
+                            Namespace = "Be.Vlaanderen.Basisregisters"
+                        },
+                        TypeScriptClientOptions =
+                        {
+                            ClassName = "BuildingRegistry"
+                        }
                     },
                     Server =
                     {
