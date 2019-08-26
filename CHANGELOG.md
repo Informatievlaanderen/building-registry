@@ -1,3 +1,10 @@
+## [1.9.1](https://github.com/informatievlaanderen/building-registry/compare/v1.9.0...v1.9.1) (2019-08-26)
+
+
+### Bug Fixes
+
+* fix swagger ([f81c57e](https://github.com/informatievlaanderen/building-registry/commit/f81c57e))
+
 # [1.9.0](https://github.com/informatievlaanderen/building-registry/compare/v1.8.0...v1.9.0) (2019-08-26)
 
 
