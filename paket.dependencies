@@ -17,9 +17,12 @@ nuget NETStandard.Library 2.0.3
 
 nuget Dapper 1.60.6
 nuget AsyncEnumerator 2.2.2
-nuget NetTopologySuite 1.15.3
+
 nuget AspNetCore.HealthChecks.SqlServer 2.2.1
+
 nuget Microsoft.Extensions.Http.Polly 2.2.0
+
+nuget NetTopologySuite 1.15.3
 nuget Microsoft.EntityFrameworkCore.SqlServer.NetTopologySuite 2.2.6
 
 nuget Microsoft.EntityFrameworkCore.Design 2.2.6
