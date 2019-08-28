@@ -2,6 +2,7 @@ namespace BuildingRegistry.Projections.Legacy
 {
     using System;
     using Autofac;
+    using Be.Vlaanderen.Basisregisters.ProjectionHandling.Runner.MigrationExtensions;
     using Infrastructure;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Configuration;
@@ -26,7 +27,8 @@ namespace BuildingRegistry.Projections.Legacy
                         sqlServerOptions.EnableRetryOnFailure();
                         sqlServerOptions.MigrationsHistoryTable(MigrationTables.Legacy, Schema.Legacy);
                         //sqlServerOptions.UseNetTopologySuite();
-                    }));
+                    })
+                    .UseExtendedSqlServerMigrations());
 
             logger.LogInformation(
                 "Added {Context} to services:" +

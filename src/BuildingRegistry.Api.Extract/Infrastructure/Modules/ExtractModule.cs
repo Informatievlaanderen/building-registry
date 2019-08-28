@@ -2,6 +2,7 @@ namespace BuildingRegistry.Api.Extract.Infrastructure.Modules
 {
     using System;
     using Autofac;
+    using Be.Vlaanderen.Basisregisters.ProjectionHandling.Runner.MigrationExtensions;
     using BuildingRegistry.Infrastructure;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Configuration;
@@ -27,7 +28,8 @@ namespace BuildingRegistry.Api.Extract.Infrastructure.Modules
                     {
                         sqlServerOptions.EnableRetryOnFailure();
                         sqlServerOptions.MigrationsHistoryTable(MigrationTables.Extract, Schema.Extract);
-                    }));
+                    })
+                    .UseExtendedSqlServerMigrations());
 
             logger.LogInformation(
                 "Added {Context} to services:" + Environment.NewLine +

@@ -7,6 +7,7 @@ namespace BuildingRegistry.Projections.Wms
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Logging;
     using System;
+    using Be.Vlaanderen.Basisregisters.ProjectionHandling.Runner.MigrationExtensions;
 
     public class WmsModule : Module
     {
@@ -26,7 +27,8 @@ namespace BuildingRegistry.Projections.Wms
                         sqlServerOptions.EnableRetryOnFailure();
                         sqlServerOptions.MigrationsHistoryTable(MigrationTables.Wms, Schema.Wms);
                         sqlServerOptions.UseNetTopologySuite();
-                    }));
+                    })
+                    .UseExtendedSqlServerMigrations());
 
             logger.LogInformation(
                 "Added {Context} to services:" +

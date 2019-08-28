@@ -10,6 +10,7 @@ namespace BuildingRegistry.Projections.Legacy
     using Microsoft.Extensions.Configuration;
     using System;
     using System.IO;
+    using Be.Vlaanderen.Basisregisters.ProjectionHandling.Runner.MigrationExtensions;
 
     public class LegacyContext : RunnerDbContext<LegacyContext>
     {
@@ -51,7 +52,8 @@ namespace BuildingRegistry.Projections.Legacy
                     sqlServerOptions.EnableRetryOnFailure();
                     sqlServerOptions.MigrationsHistoryTable(MigrationTables.Legacy, Schema.Legacy);
                     //sqlServerOptions.UseNetTopologySuite();
-                });
+                })
+                .UseExtendedSqlServerMigrations();
 
             return new LegacyContext(builder.Options);
         }

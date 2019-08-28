@@ -7,6 +7,7 @@ namespace BuildingRegistry.Projections.Wms
     using Microsoft.Extensions.Configuration;
     using System;
     using System.IO;
+    using Be.Vlaanderen.Basisregisters.ProjectionHandling.Runner.MigrationExtensions;
 
     public class WmsContext : RunnerDbContext<WmsContext>
     {
@@ -49,7 +50,8 @@ namespace BuildingRegistry.Projections.Wms
                     sqlServerOptions.EnableRetryOnFailure();
                     sqlServerOptions.MigrationsHistoryTable(MigrationTables.Wms, Schema.Wms);
                     sqlServerOptions.UseNetTopologySuite();
-                });
+                })
+                .UseExtendedSqlServerMigrations();
 
             return new WmsContext(builder.Options);
         }

@@ -3,6 +3,7 @@ namespace BuildingRegistry.Projections.Extract
     using System;
     using System.IO;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.Runner;
+    using Be.Vlaanderen.Basisregisters.ProjectionHandling.Runner.MigrationExtensions;
     using BuildingExtract;
     using BuildingUnitExtract;
     using Infrastructure;
@@ -47,7 +48,8 @@ namespace BuildingRegistry.Projections.Extract
                 {
                     sqlServerOptions.EnableRetryOnFailure();
                     sqlServerOptions.MigrationsHistoryTable(MigrationTables.Extract, Schema.Extract);
-                });
+                })
+                .UseExtendedSqlServerMigrations();
 
             return new ExtractContext(builder.Options);
         }
