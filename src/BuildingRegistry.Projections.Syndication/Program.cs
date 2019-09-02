@@ -17,12 +17,12 @@ namespace BuildingRegistry.Projections.Syndication
     using System.Threading;
     using System.Threading.Tasks;
 
-    class Program
+    public class Program
     {
         private static readonly AutoResetEvent Closing = new AutoResetEvent(false);
         private static readonly CancellationTokenSource CancellationTokenSource = new CancellationTokenSource();
 
-        static async Task Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var ct = CancellationTokenSource.Token;
 
@@ -64,7 +64,7 @@ namespace BuildingRegistry.Projections.Syndication
             }
             catch (Exception e)
             {
-                Console.Error.WriteLine(e.ToString());
+                Log.Fatal(e, "Encountered a fatal exception, exiting program.");
                 Log.CloseAndFlush();
 
                 // Allow some time for flushing before shutdown.
