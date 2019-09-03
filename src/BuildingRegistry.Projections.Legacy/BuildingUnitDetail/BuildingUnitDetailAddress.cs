@@ -14,7 +14,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetail
 
     public class BuildingUnitDetailAddressItemConfiguration : IEntityTypeConfiguration<BuildingUnitDetailAddressItem>
     {
-        public const string TableName = "BuildingUnitAddresses";
+        private const string TableName = "BuildingUnitAddresses";
 
         public void Configure(EntityTypeBuilder<BuildingUnitDetailAddressItem> b)
         {

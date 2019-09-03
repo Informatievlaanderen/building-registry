@@ -4,6 +4,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
     using System.Collections.ObjectModel;
     using System.Linq;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
+    using Be.Vlaanderen.Basisregisters.ProjectionHandling.Runner.MigrationExtensions;
     using Infrastructure;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -98,6 +99,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
                 .ForSqlServerIsClustered();
 
             b.Property(x => x.Position).ValueGeneratedNever();
+            b.HasIndex(x => x.Position).IsColumnStore($"CI_{TableName}_Position");
 
             b.Property(x => x.BuildingId).IsRequired();
             b.Property(x => x.ChangeType);

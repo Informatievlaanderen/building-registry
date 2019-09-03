@@ -30,7 +30,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingDetail
 
     public class BuildingDetailItemConfiguration : IEntityTypeConfiguration<BuildingDetailItem>
     {
-        public const string TableName = "BuildingDetails";
+        private const string TableName = "BuildingDetails";
 
         public void Configure(EntityTypeBuilder<BuildingDetailItem> b)
         {

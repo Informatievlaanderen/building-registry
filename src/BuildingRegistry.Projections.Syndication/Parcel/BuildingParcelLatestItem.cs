@@ -25,7 +25,7 @@ namespace BuildingRegistry.Projections.Syndication.Parcel
 
         public void Configure(EntityTypeBuilder<BuildingParcelLatestItem> b)
         {
-            b.ToTable(TableName, Schema.Legacy)
+            b.ToTable(TableName, Schema.Syndication)
                 .HasKey(x => x.ParcelId)
                 .ForSqlServerIsClustered();
 

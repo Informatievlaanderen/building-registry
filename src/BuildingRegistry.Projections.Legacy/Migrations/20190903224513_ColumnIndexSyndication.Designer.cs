@@ -4,14 +4,16 @@ using BuildingRegistry.Projections.Legacy;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace BuildingRegistry.Projections.Legacy.Migrations
 {
     [DbContext(typeof(LegacyContext))]
-    partial class LegacyContextModelSnapshot : ModelSnapshot
+    [Migration("20190903224513_ColumnIndexSyndication")]
+    partial class ColumnIndexSyndication
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -178,10 +180,6 @@ namespace BuildingRegistry.Projections.Legacy.Migrations
 
                     b.HasKey("Position", "BuildingUnitId")
                         .HasAnnotation("SqlServer:Clustered", false);
-
-                    b.HasIndex("Position", "BuildingUnitId")
-                        .HasName("CI_BuildingUnitSyndication_Position_BuildingUnitId")
-                        .HasAnnotation("SqlServer:ColumnStoreIndex", "");
 
                     b.ToTable("BuildingUnitSyndication","BuildingRegistryLegacy");
                 });

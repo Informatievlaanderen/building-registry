@@ -17,7 +17,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetail
 
     public class BuildingUnitBuildingPersistentLocalIdItemConfiguration : IEntityTypeConfiguration<BuildingUnitBuildingItem>
     {
-        public const string TableName = "BuildingUnit_Buildings";
+        private const string TableName = "BuildingUnit_Buildings";
 
         public void Configure(EntityTypeBuilder<BuildingUnitBuildingItem> b)
         {

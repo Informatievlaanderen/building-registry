@@ -12,7 +12,6 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetail
     using System.Threading.Tasks;
     using Be.Vlaanderen.Basisregisters.Utilities.HexByteConvertor;
     using Building.Events.Crab;
-    using GeoAPI.Geometries;
     using NetTopologySuite.IO;
     using ValueObjects;
 
@@ -476,10 +475,10 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetail
 
             await context
                 .BuildingUnitDetails
-                .AddAsync(buildingUnitDetailItem, cancellationToken: ct);
+                .AddAsync(buildingUnitDetailItem, ct);
         }
 
-        private void SetGeometry(
+        private static void SetGeometry(
             BuildingUnitDetailItem buildingUnit,
             string extendedWkb,
             BuildingUnitPositionGeometryMethod method)

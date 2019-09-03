@@ -5,19 +5,13 @@ namespace BuildingRegistry.Projections.Legacy.BuildingDetail
     using Be.Vlaanderen.Basisregisters.Utilities.HexByteConvertor;
     using Building.Events;
     using Building.Events.Crab;
-    using GeoAPI.Geometries;
-    using NetTopologySuite.IO;
     using NodaTime;
     using ValueObjects;
 
     public class BuildingDetailProjections : ConnectedProjection<LegacyContext>
     {
-        private readonly WKBReader _wkbReader;
-
-        public BuildingDetailProjections(WKBReader wkbReader)
+        public BuildingDetailProjections()
         {
-            _wkbReader = wkbReader;
-
             When<Envelope<BuildingWasRegistered>>(async (context, message, ct) =>
             {
                 await context

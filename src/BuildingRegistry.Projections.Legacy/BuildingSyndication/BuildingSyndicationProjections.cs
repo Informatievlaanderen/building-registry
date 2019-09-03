@@ -9,10 +9,9 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
     using System.Linq;
     using System.Xml.Linq;
     using Be.Vlaanderen.Basisregisters.Utilities.HexByteConvertor;
-    using GeoAPI.Geometries;
     using NetTopologySuite.IO;
     using ValueObjects;
-    using BuildingRegistry.Building.Events.Crab;
+    using Building.Events.Crab;
 
     public class BuildingSyndicationProjections : ConnectedProjection<LegacyContext>
     {

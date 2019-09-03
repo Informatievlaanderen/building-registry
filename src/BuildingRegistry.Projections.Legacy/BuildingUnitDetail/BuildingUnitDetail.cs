@@ -61,7 +61,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetail
 
     public class BuildingUnitDetailItemConfiguration : IEntityTypeConfiguration<BuildingUnitDetailItem>
     {
-        public const string TableName = "BuildingUnitDetails";
+        private const string TableName = "BuildingUnitDetails";
 
         public void Configure(EntityTypeBuilder<BuildingUnitDetailItem> b)
         {

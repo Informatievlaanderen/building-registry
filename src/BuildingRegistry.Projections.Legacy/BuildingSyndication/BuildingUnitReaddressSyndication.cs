@@ -37,7 +37,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
 
     public class BuildingUnitReaddressSyndicationItemConfiguration : IEntityTypeConfiguration<BuildingUnitReaddressSyndicationItem>
     {
-        public const string TableName = "BuildingUnitReaddressSyndication";
+        private const string TableName = "BuildingUnitReaddressSyndication";
 
         public void Configure(EntityTypeBuilder<BuildingUnitReaddressSyndicationItem> b)
         {

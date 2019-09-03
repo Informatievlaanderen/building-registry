@@ -6,6 +6,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
     using System;
     using System.Collections.ObjectModel;
     using System.Linq;
+    using Be.Vlaanderen.Basisregisters.ProjectionHandling.Runner.MigrationExtensions;
     using NodaTime;
     using ValueObjects;
 
@@ -79,7 +80,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
 
     public class BuildingUnitSyndicationItemConfiguration : IEntityTypeConfiguration<BuildingUnitSyndicationItem>
     {
-        public const string TableName = "BuildingUnitSyndication";
+        private const string TableName = "BuildingUnitSyndication";
 
         public void Configure(EntityTypeBuilder<BuildingUnitSyndicationItem> b)
         {
@@ -89,6 +90,9 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
 
             b.Property(p => p.Position);
             b.Property(p => p.BuildingUnitId);
+
+            b.HasIndex(p => new { p.Position, p.BuildingUnitId }).IsColumnStore($"CI_{TableName}_Position_BuildingUnitId");
+
             b.Property(p => p.PersistentLocalId);
             b.Property(p => p.PointPosition);
 
