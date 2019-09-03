@@ -15,7 +15,7 @@ nuget Microsoft.NETCore.DotNetHostResolver 2.2.6
 nuget Microsoft.NETCore.DotNetHostPolicy 2.2.6
 nuget NETStandard.Library 2.0.3
 
-nuget Dapper 1.60.6
+nuget Dapper 2.0.4
 nuget AsyncEnumerator 2.2.2
 
 nuget AspNetCore.HealthChecks.SqlServer 2.2.1
@@ -87,10 +87,10 @@ nuget xunit 2.4.1
 nuget xunit.runner.visualstudio 2.4.1
 nuget xunit.categories 2.0.4
 nuget FluentAssertions 5.9.0
-nuget Moq 4.12.0
+nuget Moq 4.13.0
 nuget AutoFixture.Xunit2 4.11.0
 
 // BUILD STUFF
-nuget FAKE 4.64.13 // Don't update to v5!
+nuget FAKE 4.64.17 // Don't update to v5!
 nuget SourceLink.Embed.AllSourceFiles 2.8.3 copy_local: true
 nuget SourceLink.Copy.PdbFiles 2.8.3 copy_local: true
