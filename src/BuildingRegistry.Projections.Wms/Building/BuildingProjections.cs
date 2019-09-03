@@ -18,6 +18,7 @@ namespace BuildingRegistry.Projections.Wms.Building
         public BuildingProjections(WKBReader wkbReader)
         {
             _wkbReader = wkbReader;
+
             When<Envelope<BuildingWasRegistered>>(async (context, message, ct) =>
             {
                 await context.Buildings.AddAsync(new Building { BuildingId = message.Message.BuildingId });

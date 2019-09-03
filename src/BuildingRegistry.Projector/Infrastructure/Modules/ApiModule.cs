@@ -44,6 +44,7 @@ namespace BuildingRegistry.Projector.Infrastructure.Modules
         protected override void Load(ContainerBuilder builder)
         {
             builder.RegisterModule(new DataDogModule(_configuration));
+
             RegisterProjectionSetup(builder);
 
             builder.Populate(_services);
@@ -51,18 +52,18 @@ namespace BuildingRegistry.Projector.Infrastructure.Modules
 
         private void RegisterProjectionSetup(ContainerBuilder builder)
         {
-            builder.RegisterModule(
-                new EventHandlingModule(
-                    typeof(DomainAssemblyMarker).Assembly,
-                    EventsJsonSerializerSettingsProvider.CreateSerializerSettings()
-                )
-            );
+            builder
+                .RegisterModule(
+                    new EventHandlingModule(
+                        typeof(DomainAssemblyMarker).Assembly,
+                        EventsJsonSerializerSettingsProvider.CreateSerializerSettings()))
 
-            builder.RegisterModule<EnvelopeModule>();
+                .RegisterModule<EnvelopeModule>()
 
-            builder.RegisterEventstreamModule(_configuration);
+                .RegisterEventstreamModule(_configuration)
 
-            builder.RegisterModule<ProjectorModule>();
+                .RegisterModule<ProjectorModule>();
+
             RegisterExtractProjections(builder);
             RegisterLastChangedProjections(builder);
             RegisterLegacyProjections(builder);
@@ -71,35 +72,48 @@ namespace BuildingRegistry.Projector.Infrastructure.Modules
 
         private void RegisterExtractProjections(ContainerBuilder builder)
         {
-            builder.RegisterModule(
-                new ExtractModule(
-                    _configuration,
-                    _services,
-                    _loggerFactory));
+            builder
+                .RegisterModule(
+                    new ExtractModule(
+                        _configuration,
+                        _services,
+                        _loggerFactory));
 
             builder
                 .RegisterProjectionMigrator<ExtractContextMigrationFactory>(
                     _configuration,
                     _loggerFactory)
+
                 .RegisterProjections<BuildingExtractProjections, ExtractContext>(
-                    context => new BuildingExtractProjections(context.Resolve<IOptions<ExtractConfig>>(), DbaseCodePage.Western_European_ANSI.ToEncoding(), WKBReaderFactory.Create()))
+                    context =>
+                        new BuildingExtractProjections(
+                            context.Resolve<IOptions<ExtractConfig>>(),
+                            DbaseCodePage.Western_European_ANSI.ToEncoding(),
+                            WKBReaderFactory.Create()))
+
                 .RegisterProjections<BuildingUnitExtractProjections, ExtractContext>(
-                    context => new BuildingUnitExtractProjections(context.Resolve<IOptions<ExtractConfig>>(), DbaseCodePage.Western_European_ANSI.ToEncoding(), WKBReaderFactory.Create()));
+                    context =>
+                        new BuildingUnitExtractProjections(
+                            context.Resolve<IOptions<ExtractConfig>>(),
+                            DbaseCodePage.Western_European_ANSI.ToEncoding(),
+                            WKBReaderFactory.Create()));
         }
 
         private void RegisterLastChangedProjections(ContainerBuilder builder)
         {
-            builder.RegisterModule(
-                new LastChangedListModule(
-                    _configuration.GetConnectionString("LastChangedList"),
-                    _configuration["DataDog:ServiceName"],
-                    _services,
-                    _loggerFactory));
+            builder
+                .RegisterModule(
+                    new LastChangedListModule(
+                        _configuration.GetConnectionString("LastChangedList"),
+                        _configuration["DataDog:ServiceName"],
+                        _services,
+                        _loggerFactory));
 
             builder
                 .RegisterProjectionMigrator<BuildingRegistry.Projections.LastChangedList.LastChangedListContextMigrationFactory>(
                     _configuration,
                     _loggerFactory)
+
                 .RegisterProjections<BuildingProjections, LastChangedListContext>()
                 .RegisterProjections<BuildingUnitProjections, LastChangedListContext>();
         }
@@ -116,9 +130,10 @@ namespace BuildingRegistry.Projector.Infrastructure.Modules
                 .RegisterProjectionMigrator<LegacyContextMigrationFactory>(
                     _configuration,
                     _loggerFactory)
-                .RegisterProjections<BuildingDetailProjections, LegacyContext>(() => new BuildingDetailProjections(WKBReaderFactory.Create()))
-                .RegisterProjections<BuildingSyndicationProjections, LegacyContext>(() => new BuildingSyndicationProjections(WKBReaderFactory.Create()))
-                .RegisterProjections<BuildingUnitDetailProjections, LegacyContext>(() => new BuildingUnitDetailProjections(WKBReaderFactory.Create()));
+
+                .RegisterProjections<BuildingDetailProjections, LegacyContext>(() => new BuildingDetailProjections())
+                .RegisterProjections<BuildingSyndicationProjections, LegacyContext>(() => new BuildingSyndicationProjections())
+                .RegisterProjections<BuildingUnitDetailProjections, LegacyContext>(() => new BuildingUnitDetailProjections());
         }
 
         private void RegisterWmsProjections(ContainerBuilder builder)
@@ -133,8 +148,10 @@ namespace BuildingRegistry.Projector.Infrastructure.Modules
                 .RegisterProjectionMigrator<WmsContextMigrationFactory>(
                     _configuration,
                     _loggerFactory)
+
                 .RegisterProjections<BuildingRegistry.Projections.Wms.Building.BuildingProjections, WmsContext>(() =>
                     new BuildingRegistry.Projections.Wms.Building.BuildingProjections(WKBReaderFactory.Create()))
+
                 .RegisterProjections<BuildingRegistry.Projections.Wms.BuildingUnit.BuildingUnitProjections, WmsContext>(() =>
                     new BuildingRegistry.Projections.Wms.BuildingUnit.BuildingUnitProjections(WKBReaderFactory.Create()));
         }

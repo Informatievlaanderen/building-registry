@@ -12,17 +12,12 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetail
     using System.Threading.Tasks;
     using Be.Vlaanderen.Basisregisters.Utilities.HexByteConvertor;
     using Building.Events.Crab;
-    using NetTopologySuite.IO;
     using ValueObjects;
 
     public class BuildingUnitDetailProjections : ConnectedProjection<LegacyContext>
     {
-        private readonly WKBReader _wkbReader;
-
-        public BuildingUnitDetailProjections(WKBReader wkbReader)
+        public BuildingUnitDetailProjections()
         {
-            _wkbReader = wkbReader;
-
             #region Building
             When<Envelope<BuildingWasRegistered>>(async (context, message, ct) =>
                 {

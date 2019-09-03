@@ -9,18 +9,13 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
     using System.Linq;
     using System.Xml.Linq;
     using Be.Vlaanderen.Basisregisters.Utilities.HexByteConvertor;
-    using NetTopologySuite.IO;
     using ValueObjects;
     using Building.Events.Crab;
 
     public class BuildingSyndicationProjections : ConnectedProjection<LegacyContext>
     {
-        private readonly WKBReader _wkbReader;
-
-        public BuildingSyndicationProjections(WKBReader wkbReader)
+        public BuildingSyndicationProjections()
         {
-            _wkbReader = wkbReader;
-
             #region Building Events
 
             When<Envelope<BuildingWasRegistered>>(async (context, message, ct) =>
