@@ -1,3 +1,10 @@
+## [1.9.9](https://github.com/informatievlaanderen/building-registry/compare/v1.9.8...v1.9.9) (2019-09-05)
+
+
+### Bug Fixes
+
+* initial jira version ([85e642e](https://github.com/informatievlaanderen/building-registry/commit/85e642e))
+
 ## [1.9.8](https://github.com/informatievlaanderen/building-registry/compare/v1.9.7...v1.9.8) (2019-09-05)
 
 
