@@ -1,3 +1,10 @@
+## [1.9.8](https://github.com/informatievlaanderen/building-registry/compare/v1.9.7...v1.9.8) (2019-09-05)
+
+
+### Bug Fixes
+
+* report correct version number ([25b3d35](https://github.com/informatievlaanderen/building-registry/commit/25b3d35))
+
 ## [1.9.7](https://github.com/informatievlaanderen/building-registry/compare/v1.9.6...v1.9.7) (2019-09-03)
 
 
