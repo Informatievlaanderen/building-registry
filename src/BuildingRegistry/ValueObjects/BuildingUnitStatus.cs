@@ -11,10 +11,7 @@ namespace BuildingRegistry.ValueObjects
 
         public string Status { get; }
 
-        private BuildingUnitStatus(string status)
-        {
-            Status = status;
-        }
+        private BuildingUnitStatus(string status) => Status = status;
 
         public static BuildingUnitStatus? Parse(string status)
         {
@@ -30,9 +27,6 @@ namespace BuildingRegistry.ValueObjects
             return new BuildingUnitStatus(status);
         }
 
-        public static implicit operator string(BuildingUnitStatus status)
-        {
-            return status.Status;
-        }
+        public static implicit operator string(BuildingUnitStatus status) => status.Status;
     }
 }

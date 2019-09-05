@@ -1,14 +1,13 @@
-namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
+namespace BuildingRegistry.Projections.Extract.BuildingExtract
 {
     using System;
     using Infrastructure;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-    public class BuildingUnitExtractItem
+    public class BuildingExtractItem
     {
-        public Guid BuildingUnitId { get; set; }
-        public Guid? BuildingId { get; set; }
+        public Guid BuildingId { get; set; }
         public int? PersistentLocalId  { get; set; }
         public bool IsComplete { get; set; }
         public byte[] DbaseRecord { get; set; }
@@ -20,18 +19,17 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
         public double MaximumY { get; set; }
     }
 
-    public class BuildingUnitExtractItemConfiguration : IEntityTypeConfiguration<BuildingUnitExtractItem>
+    public class BuildingExtractItemConfiguration : IEntityTypeConfiguration<BuildingExtractItem>
     {
-        public const string TableName = "BuildingUnit";
+        private const string TableName = "Building";
 
-        public void Configure(EntityTypeBuilder<BuildingUnitExtractItem> builder)
+        public void Configure(EntityTypeBuilder<BuildingExtractItem> builder)
         {
             builder.ToTable(TableName, Schema.Extract)
-                .HasKey(p => p.BuildingUnitId)
+                .HasKey(p => p.BuildingId)
                 .ForSqlServerIsClustered(false);
 
             builder.Property(p => p.PersistentLocalId);
-            builder.Property(p => p.BuildingId);
             builder.Property(p => p.IsComplete);
             builder.Property(p => p.DbaseRecord);
             builder.Property(p => p.ShapeRecordContent);
@@ -41,7 +39,7 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
             builder.Property(p => p.MinimumY);
             builder.Property(p => p.MaximumY);
 
-            builder.HasIndex(p => p.BuildingId).ForSqlServerIsClustered();
+            builder.HasIndex(p => p.PersistentLocalId).ForSqlServerIsClustered();
         }
     }
 }

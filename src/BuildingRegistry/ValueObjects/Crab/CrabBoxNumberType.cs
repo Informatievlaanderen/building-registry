@@ -5,6 +5,6 @@ namespace BuildingRegistry.ValueObjects.Crab
 
     public class CrabBoxNumberType : StringValueObject<CrabBoxNumberType>
     {
-        public CrabBoxNumberType([JsonProperty("value")]string boxNumberType) : base(boxNumberType) { }
+        public CrabBoxNumberType([JsonProperty("value")] string boxNumberType) : base(boxNumberType) { }
     }
 }

@@ -188,6 +188,7 @@ namespace BuildingRegistry.Building
                     buildingStatus == CrabBuildingStatus.PermitRequested ||
                     buildingStatus == CrabBuildingStatus.UnderConstruction)
                     return BuildingStatus.NotRealized;
+
                 if (buildingStatus == CrabBuildingStatus.InUse || buildingStatus == CrabBuildingStatus.OutOfUse)
                     return BuildingStatus.Retired;
             }
@@ -196,8 +197,10 @@ namespace BuildingRegistry.Building
                 if (buildingStatus == CrabBuildingStatus.BuildingPermitGranted ||
                     buildingStatus == CrabBuildingStatus.PermitRequested)
                     return BuildingStatus.Planned;
+
                 if (buildingStatus == CrabBuildingStatus.UnderConstruction)
                     return BuildingStatus.UnderConstruction;
+
                 if (buildingStatus == CrabBuildingStatus.InUse || buildingStatus == CrabBuildingStatus.OutOfUse)
                     return BuildingStatus.Realized;
             }
@@ -211,6 +214,7 @@ namespace BuildingRegistry.Building
             {
                 case CrabBuildingGeometryMethod.Outlined:
                     return BuildingGeometryMethod.Outlined;
+
                 case CrabBuildingGeometryMethod.Survey:
                 case CrabBuildingGeometryMethod.Grb:
                     return BuildingGeometryMethod.MeasuredByGrb;
@@ -224,25 +228,33 @@ namespace BuildingRegistry.Building
             switch (buildingStatus)
             {
                 case BuildingStatus.NotRealized:
-                    ApplyChange(new BuildingWasNotRealized(_buildingId,
-                        _buildingUnitCollection.GetActiveBuildingUnitIdsToRetire(),
-                        _buildingUnitCollection.GetActiveBuildingUnitIdsToNotRealized()));
+                    ApplyChange(
+                        new BuildingWasNotRealized(
+                            _buildingId,
+                            _buildingUnitCollection.GetActiveBuildingUnitIdsToRetire(),
+                            _buildingUnitCollection.GetActiveBuildingUnitIdsToNotRealized()));
                     break;
+
                 case BuildingStatus.Planned:
                     ApplyChange(new BuildingWasPlanned(_buildingId));
                     break;
-                case BuildingStatus.Retired:
-                    ApplyChange(new BuildingWasRetired(_buildingId,
-                        _buildingUnitCollection.GetActiveBuildingUnitIdsToRetire(),
-                        _buildingUnitCollection.GetActiveBuildingUnitIdsToNotRealized()));
 
+                case BuildingStatus.Retired:
+                    ApplyChange(
+                        new BuildingWasRetired(
+                            _buildingId,
+                            _buildingUnitCollection.GetActiveBuildingUnitIdsToRetire(),
+                            _buildingUnitCollection.GetActiveBuildingUnitIdsToNotRealized()));
                     break;
+
                 case BuildingStatus.Realized:
                     ApplyChange(new BuildingWasRealized(_buildingId));
                     break;
+
                 case BuildingStatus.UnderConstruction:
                     ApplyChange(new BuildingBecameUnderConstruction(_buildingId));
                     break;
+
                 case null:
                     ApplyChange(new BuildingStatusWasRemoved(_buildingId));
                     break;
@@ -254,24 +266,33 @@ namespace BuildingRegistry.Building
             switch (buildingStatus)
             {
                 case BuildingStatus.NotRealized:
-                    ApplyChange(new BuildingWasCorrectedToNotRealized(_buildingId,
-                        _buildingUnitCollection.GetActiveBuildingUnitIdsToRetire(),
-                        _buildingUnitCollection.GetActiveBuildingUnitIdsToNotRealized()));
+                    ApplyChange(
+                        new BuildingWasCorrectedToNotRealized(
+                            _buildingId,
+                            _buildingUnitCollection.GetActiveBuildingUnitIdsToRetire(),
+                            _buildingUnitCollection.GetActiveBuildingUnitIdsToNotRealized()));
                     break;
+
                 case BuildingStatus.Planned:
                     ApplyChange(new BuildingWasCorrectedToPlanned(_buildingId));
                     break;
+
                 case BuildingStatus.Retired:
-                    ApplyChange(new BuildingWasCorrectedToRetired(_buildingId,
-                        _buildingUnitCollection.GetActiveBuildingUnitIdsToRetire(),
-                        _buildingUnitCollection.GetActiveBuildingUnitIdsToNotRealized()));
+                    ApplyChange(
+                        new BuildingWasCorrectedToRetired(
+                            _buildingId,
+                            _buildingUnitCollection.GetActiveBuildingUnitIdsToRetire(),
+                            _buildingUnitCollection.GetActiveBuildingUnitIdsToNotRealized()));
                     break;
+
                 case BuildingStatus.Realized:
                     ApplyChange(new BuildingWasCorrectedToRealized(_buildingId));
                     break;
+
                 case BuildingStatus.UnderConstruction:
                     ApplyChange(new BuildingWasCorrectedToUnderConstruction(_buildingId));
                     break;
+
                 case null:
                     ApplyChange(new BuildingStatusWasCorrectedToRemoved(_buildingId));
                     break;
@@ -296,9 +317,7 @@ namespace BuildingRegistry.Building
                 {
                     ApplyChange(new BuildingGeometryWasRemoved(_buildingId));
                     foreach (var unit in _buildingUnitCollection.ActiveBuildingUnits)
-                    {
                         unit.CheckCompleteness();
-                    }
                 }
 
                 if (newGeometry != null && legacyEvent.Modification != CrabModification.Delete)
@@ -314,9 +333,7 @@ namespace BuildingRegistry.Building
                 }
 
                 foreach (var activeBuildingUnit in _buildingUnitCollection.ActiveBuildingUnits)
-                {
                     activeBuildingUnit.CheckAndCorrectPositionIfNeeded(legacyEvent.Modification == CrabModification.Correction);
-                }
 
                 foreach (var retiredBuildingUnit in _buildingUnitCollection.GetLastRetiredUnitPerKey())
                 {
@@ -486,8 +503,7 @@ namespace BuildingRegistry.Building
                                 new Reason("Due to duplication the common building unit with this PersistentLocalId should never have existed.")));
                     }
 
-                    foreach (var assignBuildingUnitPersistentLocalId in assignBuildingUnitPersistentLocalIdByUnit.OrderByDescending(x =>
-                        x.Index))
+                    foreach (var assignBuildingUnitPersistentLocalId in assignBuildingUnitPersistentLocalIdByUnit.OrderByDescending(x => x.Index))
                     {
                         //https://vlaamseoverheid.atlassian.net/wiki/spaces/GR/pages/469074524/CRAB2VBR-mapping+OSLO+ID+s+oude+vs.+nieuwe+architectuur Case 5
                         var readdressedSubaddress = _readdressedSubaddresses
@@ -640,15 +656,20 @@ namespace BuildingRegistry.Building
 
         public void AssignPersistentLocalIds(IPersistentLocalIdGenerator persistentLocalIdGenerator)
         {
-            if(_persistentLocalId == null)
-                ApplyChange(new BuildingPersistentLocalIdWasAssigned(_buildingId, persistentLocalIdGenerator.GenerateNextPersistentLocalId(), new PersistentLocalIdAssignmentDate(Instant.FromDateTimeOffset(DateTimeOffset.Now))));
+            if (_persistentLocalId == null)
+                ApplyChange(
+                    new BuildingPersistentLocalIdWasAssigned(
+                        _buildingId,
+                        persistentLocalIdGenerator.GenerateNextPersistentLocalId(),
+                        new PersistentLocalIdAssignmentDate(Instant.FromDateTimeOffset(DateTimeOffset.Now))));
 
             foreach (var buildingUnit in _buildingUnitCollection.GetAllBuildingUnitsWithoutPersistentLocalId())
-            {
-                var id = buildingUnit.BuildingUnitId;
-                ApplyChange(new BuildingUnitPersistentLocalIdWasAssigned(_buildingId, id, new PersistentLocalId(persistentLocalIdGenerator.GenerateNextPersistentLocalId()), new PersistentLocalIdAssignmentDate(Instant.FromDateTimeOffset(DateTimeOffset.Now))));
-
-            }
+                ApplyChange(
+                    new BuildingUnitPersistentLocalIdWasAssigned(
+                        _buildingId,
+                        buildingUnit.BuildingUnitId,
+                        new PersistentLocalId(persistentLocalIdGenerator.GenerateNextPersistentLocalId()),
+                        new PersistentLocalIdAssignmentDate(Instant.FromDateTimeOffset(DateTimeOffset.Now))));
         }
     }
 }

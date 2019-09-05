@@ -18,7 +18,7 @@ namespace BuildingRegistry.Building
           A |   4   | T5
 
           Indexes for each GE
-          A=1(duplicate A3 because C gets 1 on same T, where 1 was normally preserved for A), 4
+          A=1 (duplicate A3 because C gets 1 on same T, where 1 was normally preserved for A), 4
           B=2
           C=1
         */
@@ -60,9 +60,7 @@ namespace BuildingRegistry.Building
                             Add(original);
                             _duplicatesByOriginal.Add(original, duplicate);
                             foreach (var assignBuildingUnitPersistentLocalIdForCrabTerrainObjectId in allByKey.Skip(2))
-                            {
                                 Add(assignBuildingUnitPersistentLocalIdForCrabTerrainObjectId);
-                            }
                         }
                     }
                 }

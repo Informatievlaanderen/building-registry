@@ -25,7 +25,8 @@ namespace BuildingRegistry.Api.Legacy.BuildingUnit
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
-    using GeoAPI.Geometries;
+    using Be.Vlaanderen.Basisregisters.Api.Search;
+    using Infrastructure;
     using ValueObjects;
 
     [ApiVersion("1.0")]
@@ -60,17 +61,17 @@ namespace BuildingRegistry.Api.Legacy.BuildingUnit
             var pagination = Request.ExtractPaginationRequest();
 
             var pagedBuildingUnits = new BuildingUnitListQuery(context, syndicationContext)
-                .Fetch(filtering,
+                .Fetch(
+                    filtering,
                     sorting,
                     pagination);
 
-            Response.AddPaginationResponse(pagedBuildingUnits.PaginationInfo);
-            Response.AddSortingResponse(sorting.SortBy, sorting.SortOrder);
+            Response.AddPagedQueryResultHeaders(pagedBuildingUnits);
 
             var units = await pagedBuildingUnits.Items
                 .Select(a => new
                 {
-                    PersistentLocalId = a.PersistentLocalId,
+                    a.PersistentLocalId,
                     a.Version,
                 })
                 .ToListAsync(cancellationToken);
@@ -85,7 +86,7 @@ namespace BuildingRegistry.Api.Legacy.BuildingUnit
                         x.Version.ToBelgianDateTimeOffset()))
                     .ToList(),
                 TotaalAantal = pagedBuildingUnits.PaginationInfo.TotalItems,
-                Volgende = BuildingController.BuildVolgendeUri(pagedBuildingUnits.PaginationInfo, responseOptions.Value.GebouweenheidVolgendeUrl)
+                Volgende = pagedBuildingUnits.PaginationInfo.BuildNextUri(responseOptions.Value.GebouweenheidVolgendeUrl)
             };
 
             return Ok(listResponse);
@@ -157,7 +158,8 @@ namespace BuildingRegistry.Api.Legacy.BuildingUnit
         {
             if (BuildingUnitPositionGeometryMethod.AppointedByAdministrator == geometryMethod)
                 return PositieGeometrieMethode.AangeduidDoorBeheerder;
-            else if (BuildingUnitPositionGeometryMethod.DerivedFromObject == geometryMethod)
+
+            if (BuildingUnitPositionGeometryMethod.DerivedFromObject == geometryMethod)
                 return PositieGeometrieMethode.AfgeleidVanObject;
 
             throw new ArgumentOutOfRangeException(nameof(geometryMethod), geometryMethod, null);
@@ -168,11 +170,14 @@ namespace BuildingRegistry.Api.Legacy.BuildingUnit
         {
             if (BuildingUnitStatus.Planned == status)
                 return GebouweenheidStatus.Gepland;
-            else if (BuildingUnitStatus.NotRealized == status)
+
+            if (BuildingUnitStatus.NotRealized == status)
                 return GebouweenheidStatus.NietGerealiseerd;
-            else if (BuildingUnitStatus.Realized == status)
+
+            if (BuildingUnitStatus.Realized == status)
                 return GebouweenheidStatus.Gerealiseerd;
-            else if (BuildingUnitStatus.Retired == status)
+
+            if (BuildingUnitStatus.Retired == status)
                 return GebouweenheidStatus.Gehistoreerd;
 
             throw new ArgumentOutOfRangeException(nameof(status), status, null);
@@ -183,9 +188,11 @@ namespace BuildingRegistry.Api.Legacy.BuildingUnit
         {
             if (function == null)
                 return null;
+
             if (BuildingUnitFunction.Common == function)
                 return GebouweenheidFunctie.GemeenschappelijkDeel;
-            else if (BuildingUnitFunction.Unknown == function)
+
+            if (BuildingUnitFunction.Unknown == function)
                 return GebouweenheidFunctie.NietGekend;
 
             throw new ArgumentOutOfRangeException(nameof(function), function, null);

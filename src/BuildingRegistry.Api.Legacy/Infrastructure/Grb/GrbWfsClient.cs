@@ -50,16 +50,19 @@ namespace BuildingRegistry.Api.Legacy.Infrastructure.Grb
                     break;
 
                 default:
-                    throw new ArgumentException(string.Format("Name of GRB feature type [{0}] cannot be resolved.", Enum.GetName(typeof(GrbFeatureType), featureType)));
+                    throw new ArgumentException(
+                        $"Name of GRB feature type [{Enum.GetName(typeof(GrbFeatureType), featureType)}] cannot be resolved.");
             }
 
-            WebRequest wfsRequest = WebRequest.Create(GrbWfs); // TODO: put this in config?
+            var wfsRequest = WebRequest.Create(GrbWfs); // TODO: put this in config?
             wfsRequest.Method = HttpMethod.Post.Method;
             ((HttpWebRequest)wfsRequest).ContentType = "application/xml";
 
             using (var writer = new StreamWriter(wfsRequest.GetRequestStream()))
             {
-                string payload = string.Format("<wfs:GetFeature xmlns:wfs=\"http://www.opengis.net/wfs\" service=\"WFS\" version=\"1.0.0\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.opengis.net/wfs http://schemas.opengis.net/wfs/1.0.0/WFS-transaction.xsd\"><wfs:Query typeName=\"grb:{0}\" xmlns:grb=\"informatievlaanderen.be/grb\"><ogc:Filter xmlns:ogc=\"http://www.opengis.net/ogc\"><ogc:BBOX><ogc:PropertyName>SHAPE</ogc:PropertyName><gml:Box xmlns:gml=\"http://www.opengis.net/gml\" srsName=\"EPSG:31370\"><gml:coordinates decimal=\".\" cs=\",\" ts=\" \">{1},{2} {3},{4}</gml:coordinates></gml:Box></ogc:BBOX></ogc:Filter></wfs:Query></wfs:GetFeature>", featureName,
+                var payload = string.Format(
+                    "<wfs:GetFeature xmlns:wfs=\"http://www.opengis.net/wfs\" service=\"WFS\" version=\"1.0.0\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.opengis.net/wfs http://schemas.opengis.net/wfs/1.0.0/WFS-transaction.xsd\"><wfs:Query typeName=\"grb:{0}\" xmlns:grb=\"informatievlaanderen.be/grb\"><ogc:Filter xmlns:ogc=\"http://www.opengis.net/ogc\"><ogc:BBOX><ogc:PropertyName>SHAPE</ogc:PropertyName><gml:Box xmlns:gml=\"http://www.opengis.net/gml\" srsName=\"EPSG:31370\"><gml:coordinates decimal=\".\" cs=\",\" ts=\" \">{1},{2} {3},{4}</gml:coordinates></gml:Box></ogc:BBOX></ogc:Filter></wfs:Query></wfs:GetFeature>",
+                    featureName,
                     boundingBox.MinX.ToString(CultureInfo.InvariantCulture.NumberFormat),
                     boundingBox.MinY.ToString(CultureInfo.InvariantCulture.NumberFormat),
                     boundingBox.MaxX.ToString(CultureInfo.InvariantCulture.NumberFormat),

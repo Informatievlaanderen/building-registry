@@ -5,6 +5,6 @@ namespace BuildingRegistry.ValueObjects.Crab
 
     public class CrabAddressNature : StringValueObject<CrabAddressNature>
     {
-        public CrabAddressNature([JsonProperty("value")]string addressNature) : base(addressNature) { }
+        public CrabAddressNature([JsonProperty("value")] string addressNature) : base(addressNature) { }
     }
 }

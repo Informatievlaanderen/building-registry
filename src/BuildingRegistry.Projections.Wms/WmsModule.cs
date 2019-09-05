@@ -7,6 +7,8 @@ namespace BuildingRegistry.Projections.Wms
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Logging;
     using System;
+    using System.Data.SqlClient;
+    using Be.Vlaanderen.Basisregisters.DataDog.Tracing.Sql.EntityFrameworkCore;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.Runner.MigrationExtensions;
 
     public class WmsModule : Module
@@ -17,18 +19,13 @@ namespace BuildingRegistry.Projections.Wms
             ILoggerFactory loggerFactory)
         {
             var logger = loggerFactory.CreateLogger<WmsModule>();
-            var projectionsConnectionString = configuration.GetConnectionString("WmsProjections");
+            var connectionString = configuration.GetConnectionString("WmsProjections");
 
-            services
-                .AddDbContext<WmsContext>(options => options
-                    .UseLoggerFactory(loggerFactory)
-                    .UseSqlServer(projectionsConnectionString, sqlServerOptions =>
-                    {
-                        sqlServerOptions.EnableRetryOnFailure();
-                        sqlServerOptions.MigrationsHistoryTable(MigrationTables.Wms, Schema.Wms);
-                        sqlServerOptions.UseNetTopologySuite();
-                    })
-                    .UseExtendedSqlServerMigrations());
+            var hasConnectionString = !string.IsNullOrWhiteSpace(connectionString);
+            if (hasConnectionString)
+                RunOnSqlServer(configuration, services, loggerFactory, connectionString);
+            else
+                RunInMemoryDb(services, loggerFactory, logger);
 
             logger.LogInformation(
                 "Added {Context} to services:" +
@@ -37,6 +34,40 @@ namespace BuildingRegistry.Projections.Wms
                 Environment.NewLine +
                 "\tTableName: {TableName}",
                 nameof(WmsContext), Schema.Wms, MigrationTables.Wms);
+        }
+
+        private static void RunOnSqlServer(
+            IConfiguration configuration,
+            IServiceCollection services,
+            ILoggerFactory loggerFactory,
+            string backofficeProjectionsConnectionString)
+        {
+            services
+                .AddScoped(s => new TraceDbConnection(
+                    new SqlConnection(backofficeProjectionsConnectionString),
+                    configuration["DataDog:ServiceName"]))
+                .AddDbContext<WmsContext>((provider, options) => options
+                    .UseLoggerFactory(loggerFactory)
+                    .UseSqlServer(provider.GetRequiredService<TraceDbConnection>(), sqlServerOptions =>
+                    {
+                        sqlServerOptions.EnableRetryOnFailure();
+                        sqlServerOptions.MigrationsHistoryTable(MigrationTables.Wms, Schema.Wms);
+                        sqlServerOptions.UseNetTopologySuite();
+                    })
+                    .UseExtendedSqlServerMigrations());
+        }
+
+        private static void RunInMemoryDb(
+            IServiceCollection services,
+            ILoggerFactory loggerFactory,
+            ILogger logger)
+        {
+            services
+                .AddDbContext<WmsContext>(options => options
+                    .UseLoggerFactory(loggerFactory)
+                    .UseInMemoryDatabase(Guid.NewGuid().ToString(), sqlServerOptions => { }));
+
+            logger.LogWarning("Running InMemory for {Context}!", nameof(WmsContext));
         }
     }
 }

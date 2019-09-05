@@ -1,7 +1,7 @@
 namespace BuildingRegistry.Api.CrabImport.CrabImport.Requests
 {
     using System.ComponentModel.DataAnnotations;
-    using BuildingRegistry.Building;
+    using Building;
     using Newtonsoft.Json;
     using Swashbuckle.AspNetCore.Filters;
 
@@ -19,13 +19,11 @@ namespace BuildingRegistry.Api.CrabImport.CrabImport.Requests
     public class RegisterCrabImportRequestExample : IExamplesProvider
     {
         public object GetExamples()
-        {
-            return new RegisterCrabImportRequest
+            => new RegisterCrabImportRequest
             {
                 Type = "BuildingRegistry.Municipality.Commands.ImportMunicipalityNameFromCrab",
                 CrabItem = "{}"
             };
-        }
     }
 
     public static class RegisterCrabImportRequestMapping

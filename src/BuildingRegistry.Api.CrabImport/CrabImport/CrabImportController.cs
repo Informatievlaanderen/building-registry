@@ -130,9 +130,6 @@ namespace BuildingRegistry.Api.CrabImport.CrabImport
 
     public class RegisterCrabImportResponseExamples : IExamplesProvider
     {
-        public object GetExamples()
-        {
-            return new { };
-        }
+        public object GetExamples() => new { };
     }
 }

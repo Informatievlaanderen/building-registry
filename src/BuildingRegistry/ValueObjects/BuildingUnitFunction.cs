@@ -9,10 +9,7 @@ namespace BuildingRegistry.ValueObjects
 
         public string Function { get; }
 
-        private BuildingUnitFunction(string function)
-        {
-            Function = function;
-        }
+        private BuildingUnitFunction(string function) => Function = function;
 
         public static BuildingUnitFunction? Parse(string function)
         {
@@ -26,9 +23,6 @@ namespace BuildingRegistry.ValueObjects
             return new BuildingUnitFunction(function);
         }
 
-        public static implicit operator string(BuildingUnitFunction function)
-        {
-            return function.Function;
-        }
+        public static implicit operator string(BuildingUnitFunction function) => function.Function;
     }
 }

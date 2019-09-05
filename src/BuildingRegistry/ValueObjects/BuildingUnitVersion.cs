@@ -6,6 +6,6 @@ namespace BuildingRegistry.ValueObjects
 
     public class BuildingUnitVersion : InstantValueObject<BuildingUnitVersion>
     {
-        public BuildingUnitVersion([JsonProperty("value")]Instant versionTimestamp) : base(versionTimestamp) { }
+        public BuildingUnitVersion([JsonProperty("value")] Instant versionTimestamp) : base(versionTimestamp) { }
     }
 }

@@ -413,11 +413,7 @@ namespace BuildingRegistry.Projections.Wms.BuildingUnit
         }
 
         private static string MapFunction(BuildingUnitFunction function)
-        {
-            if (function == BuildingUnitFunction.Common)
-                return "GemeenschappelijkDeel";
-            return "NietGekend";
-        }
+            => function == BuildingUnitFunction.Common ? "GemeenschappelijkDeel" : "NietGekend";
 
         private void SetPosition(BuildingUnit buildingUnit, string extendedWkbPosition, string method)
         {

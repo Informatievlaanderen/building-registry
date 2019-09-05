@@ -9,10 +9,7 @@ namespace BuildingRegistry.Api.CrabImport.Infrastructure
     {
         private readonly SequenceContext _context;
 
-        public SqlPersistentLocalIdGenerator(SequenceContext context)
-        {
-            _context = context;
-        }
+        public SqlPersistentLocalIdGenerator(SequenceContext context) => _context = context;
 
         public PersistentLocalId GenerateNextPersistentLocalId()
         {

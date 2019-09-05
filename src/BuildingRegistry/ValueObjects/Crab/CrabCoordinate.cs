@@ -5,6 +5,6 @@ namespace BuildingRegistry.ValueObjects.Crab
 
     public class CrabCoordinate : DecimalValueObject<CrabCoordinate>
     {
-        public CrabCoordinate([JsonProperty("value")]decimal coordinate) : base(coordinate) { }
+        public CrabCoordinate([JsonProperty("value")] decimal coordinate) : base(coordinate) { }
     }
 }

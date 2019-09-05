@@ -17,11 +17,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BuildingRegistry.Projection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BuildingRegistry.Tests", "test\BuildingRegistry.Tests\BuildingRegistry.Tests.csproj", "{EEB4C34C-F22F-4397-9148-2DB97C58A704}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".paket", ".paket", "{DD75C91B-2117-4B00-8793-67D8E6B885B9}"
-	ProjectSection(SolutionItems) = preProject
-		paket.dependencies = paket.dependencies
-	EndProjectSection
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BuildingRegistry.Projections.Wms", "src\BuildingRegistry.Projections.Wms\BuildingRegistry.Projections.Wms.csproj", "{E00799A8-34FB-4FEC-91E9-2C60B15B8011}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{A636C8A3-81DB-4721-8A3C-B0CB89406116}"
@@ -35,6 +30,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		paket.dependencies = paket.dependencies
 		README.md = README.md
 		SEMVER.md = SEMVER.md
+		SolutionInfo.cs = SolutionInfo.cs
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "adr", "adr", "{AA7D4C33-B0AA-4BAA-BC72-94FFF7803B27}"

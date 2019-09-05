@@ -10,19 +10,8 @@ namespace BuildingRegistry.ValueObjects
     {
         public ReaddressingBeginDate([JsonProperty("value")] LocalDate readdressingBeginDate) : base(readdressingBeginDate)  { }
 
-        public override string ToString()
-        {
-            return this.Value.ToString("dd/MM/yyyy", (IFormatProvider)CultureInfo.InvariantCulture);
-        }
+        public override string ToString() => Value.ToString("dd/MM/yyyy", CultureInfo.InvariantCulture);
 
-        int IComparable.CompareTo(object obj)
-        {
-            if(obj is ReaddressingBeginDate date)
-                return this.Value.CompareTo(date);
-            else
-            {
-                return -1;
-            }
-        }
+        int IComparable.CompareTo(object obj) => obj is ReaddressingBeginDate date ? Value.CompareTo(date) : -1;
     }
 }

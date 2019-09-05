@@ -3,6 +3,7 @@ namespace BuildingRegistry.ValueObjects
     using NetTopologySuite.IO;
     using System.Collections.Generic;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
+    using Newtonsoft.Json;
 
     public class BuildingGeometry : ValueObject<BuildingGeometry>
     {
@@ -11,10 +12,12 @@ namespace BuildingRegistry.ValueObjects
         public ExtendedWkbGeometry Geometry { get; }
         public BuildingGeometryMethod Method { get; }
 
-        public BuildingGeometry(ExtendedWkbGeometry geometry, BuildingGeometryMethod method)
+        public BuildingGeometry(
+            [JsonProperty("geometry")] ExtendedWkbGeometry geometry,
+            [JsonProperty("geometryMethod")] BuildingGeometryMethod geometryMethod)
         {
             Geometry = geometry;
-            Method = method;
+            Method = geometryMethod;
         }
 
         public bool Contains(ExtendedWkbGeometry geometry)

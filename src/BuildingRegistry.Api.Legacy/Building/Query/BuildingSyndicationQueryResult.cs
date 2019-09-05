@@ -7,7 +7,6 @@ namespace BuildingRegistry.Api.Legacy.Building.Query
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using GeoAPI.Geometries;
     using ValueObjects;
 
     public class BuildingSyndicationQueryResult

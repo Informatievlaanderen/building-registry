@@ -62,7 +62,7 @@ namespace BuildingRegistry.Api.Legacy.Building.Query
             var addresses = x.BuildingUnits.SelectMany(a => a.Addresses).ToList();
             var readdresses = x.BuildingUnits.SelectMany(r => r.Readdresses).ToList();
 
-            if(withXml)
+            if (withXml)
                 return new BuildingSyndicationQueryResult(
                     x.BuildingId.Value,
                     x.Position,
@@ -112,7 +112,7 @@ namespace BuildingRegistry.Api.Legacy.Building.Query
         }
     }
 
-    internal class BuildingSyndicationSorting : ISorting
+    public class BuildingSyndicationSorting : ISorting
     {
         public IEnumerable<string> SortableFields { get; } = new[]
         {

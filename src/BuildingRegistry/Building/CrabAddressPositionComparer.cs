@@ -34,10 +34,13 @@ namespace BuildingRegistry.Building
         {
             if (!y.HasValue && !x.HasValue)
                 return 0;
+
             if (!y.HasValue)
                 return 1;
+
             if (!x.HasValue)
                 return -1;
+
             return _addressPositionQualityByOrigins[y.Value].CompareTo(_addressPositionQualityByOrigins[x.Value]);
         }
     }

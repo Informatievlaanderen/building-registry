@@ -5,6 +5,6 @@ namespace BuildingRegistry.ValueObjects.Crab
 
     public class CrabBuildingGeometryId : IntegerValueObject<CrabBuildingGeometryId>
     {
-        public CrabBuildingGeometryId([JsonProperty("value")]int buildingGeometryId) : base(buildingGeometryId) { }
+        public CrabBuildingGeometryId([JsonProperty("value")] int buildingGeometryId) : base(buildingGeometryId) { }
     }
 }

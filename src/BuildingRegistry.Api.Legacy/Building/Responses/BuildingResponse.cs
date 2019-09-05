@@ -1,16 +1,15 @@
 namespace BuildingRegistry.Api.Legacy.Building.Responses
 {
-    using Be.Vlaanderen.Basisregisters.Api.Exceptions;
+    using System;
+    using System.Collections.Generic;
+    using System.Runtime.Serialization;
+    using Be.Vlaanderen.Basisregisters.BasicApiProblem;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy.Gebouw;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy.SpatialTools;
     using Infrastructure.Options;
     using Microsoft.AspNetCore.Http;
     using Swashbuckle.AspNetCore.Filters;
-    using System;
-    using System.Collections.Generic;
-    using System.Runtime.Serialization;
-    using Be.Vlaanderen.Basisregisters.BasicApiProblem;
 
     [DataContract(Name = "GebouwDetail", Namespace = "")]
     public class BuildingResponse
@@ -85,7 +84,7 @@ namespace BuildingRegistry.Api.Legacy.Building.Responses
                 {
                     JsonPolygon = new GeoJSONPolygon
                     {
-                        Coordinates = new double[][][] { new double[][] { new double[] { 101673.0, 193520.0 }, new double[] { 101673.0, 193585.0 }, new double[] { 101732.0, 193585.0 }, new double[] { 101673.0, 193585.0 }, new double[] { 101673.0, 193520.0 } } },
+                        Coordinates = new[] { new[] { new[] { 101673.0, 193520.0 }, new[] { 101673.0, 193585.0 }, new[] { 101732.0, 193585.0 }, new[] { 101673.0, 193585.0 }, new[] { 101673.0, 193520.0 } } },
                         Type = "Polygon"
                     },
                     XmlPolygon = new GmlPolygon

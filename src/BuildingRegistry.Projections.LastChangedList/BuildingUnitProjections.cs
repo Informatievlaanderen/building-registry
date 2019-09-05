@@ -107,7 +107,7 @@ namespace BuildingRegistry.Projections.LastChangedList
             When<Envelope<BuildingUnitPersistentLocalIdWasDuplicated>>(async (context, message, ct) => DoNothing());
             When<Envelope<BuildingUnitPersistentLocalIdWasRemoved>>(async (context, message, ct) => DoNothing());
 
-            //Building
+            // Building
             When<Envelope<BuildingPersistentLocalIdWasAssigned>>(async (context, message, ct) => DoNothing());
             When<Envelope<BuildingBecameComplete>>(async (context, message, ct) => DoNothing());
             When<Envelope<BuildingBecameIncomplete>>(async (context, message, ct) => DoNothing());
@@ -132,8 +132,7 @@ namespace BuildingRegistry.Projections.LastChangedList
             When<Envelope<BuildingWasRetired>>(async (context, message, ct) => DoNothing());
 
 
-            //CRAB
-
+            // CRAB
             When<Envelope<AddressHouseNumberPositionWasImportedFromCrab>>(async (context, message, ct) => DoNothing());
             When<Envelope<AddressHouseNumberStatusWasImportedFromCrab>>(async (context, message, ct) => DoNothing());
             When<Envelope<AddressHouseNumberWasImportedFromCrab>>(async (context, message, ct) => DoNothing());

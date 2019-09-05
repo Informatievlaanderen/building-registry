@@ -42,7 +42,7 @@ namespace BuildingRegistry.Building
             }
             else
             {
-                bool doNothing = false;
+                var doNothing = false;
                 var addressId = AddressId.CreateFor(houseNumberId);
                 var predecessor = _buildingUnitCollection.GetActiveOrLastRetiredByKey(buildingUnitKey);
 
@@ -51,9 +51,8 @@ namespace BuildingRegistry.Building
                 if (lifetime.EndDateTime.HasValue && predecessor != null && IsRetired && predecessor.IsRetiredByBuilding)
                 {
                     foreach (var unit in _buildingUnitCollection.GetLastRetiredSubaddressBuildingUnitsByKeyParts(buildingUnitKey).Where(x => x.IsRetiredByBuilding))
-                    {
                         unit.ApplyRetiredFromParent(predecessor.BuildingUnitId);
-                    }
+
                     predecessor.ApplyRetired(modification == CrabModification.Correction);
                 }
                 else if (lifetime.EndDateTime.HasValue && predecessor != null && predecessor.HasRetiredState && !_buildingUnitCollection.IsAddressLinkedToCommonBuildingUnit(addressId))
@@ -71,7 +70,7 @@ namespace BuildingRegistry.Building
                     predecessor = _buildingUnitCollection.GetActiveOrLastRetiredByKey(buildingUnitKey);
                     foreach (var unit in _buildingUnitCollection.GetActiveSubaddressBuildingUnitsByKeyParts(buildingUnitKey))
                     {
-                        if(!IsSubaddressReaddressedAt(BuildingUnitKey.Create(terrainObjectId, terrainObjectHouseNumberId, new CrabSubaddressId(unit.BuildingUnitKey.Subaddress.Value)), timestamp))
+                        if (!IsSubaddressReaddressedAt(BuildingUnitKey.Create(terrainObjectId, terrainObjectHouseNumberId, new CrabSubaddressId(unit.BuildingUnitKey.Subaddress.Value)), timestamp))
                             unit.ApplyRetiredFromParent(predecessor.BuildingUnitId);
                     }
 

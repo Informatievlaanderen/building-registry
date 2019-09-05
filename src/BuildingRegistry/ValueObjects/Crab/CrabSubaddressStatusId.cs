@@ -5,6 +5,6 @@ namespace BuildingRegistry.ValueObjects.Crab
 
     public class CrabSubaddressStatusId : IntegerValueObject<CrabSubaddressStatusId>
     {
-        public CrabSubaddressStatusId([JsonProperty("value")]int subaddressStatusId) : base(subaddressStatusId) { }
+        public CrabSubaddressStatusId([JsonProperty("value")] int subaddressStatusId) : base(subaddressStatusId) { }
     }
 }

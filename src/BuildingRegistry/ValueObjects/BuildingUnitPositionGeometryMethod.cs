@@ -9,10 +9,7 @@ namespace BuildingRegistry.ValueObjects
 
         public string GeometryMethod { get; }
 
-        private BuildingUnitPositionGeometryMethod(string geometryMethod)
-        {
-            GeometryMethod = geometryMethod;
-        }
+        private BuildingUnitPositionGeometryMethod(string geometryMethod) => GeometryMethod = geometryMethod;
 
         public static BuildingUnitPositionGeometryMethod Parse(string geometryMethod)
         {
@@ -23,9 +20,6 @@ namespace BuildingRegistry.ValueObjects
             return new BuildingUnitPositionGeometryMethod(geometryMethod);
         }
 
-        public static implicit operator string(BuildingUnitPositionGeometryMethod positionGeometryMethod)
-        {
-            return positionGeometryMethod.GeometryMethod;
-        }
+        public static implicit operator string(BuildingUnitPositionGeometryMethod positionGeometryMethod) => positionGeometryMethod.GeometryMethod;
     }
 }

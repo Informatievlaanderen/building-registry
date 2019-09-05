@@ -17,7 +17,9 @@ namespace BuildingRegistry.Projections.Wms.BuildingUnit
             return dbSet
                     .Local
                     .Where(x => x.BuildingId == buildingId)
-                    .Union(await dbSet.Where(x => x.BuildingId == buildingId).ToListAsync(cancellationToken));
+                    .Union(await dbSet
+                        .Where(x => x.BuildingId == buildingId)
+                        .ToListAsync(cancellationToken));
         }
     }
 }

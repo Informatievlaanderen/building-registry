@@ -34,6 +34,8 @@ namespace BuildingRegistry.Api.Legacy.Building
     using System.Threading;
     using System.Threading.Tasks;
     using System.Xml;
+    using Be.Vlaanderen.Basisregisters.Api.Search;
+    using Infrastructure;
     using ValueObjects;
     using ProblemDetails = Be.Vlaanderen.Basisregisters.BasicApiProblem.ProblemDetails;
 
@@ -145,13 +147,12 @@ namespace BuildingRegistry.Api.Legacy.Building
                     sorting,
                     pagination);
 
-            Response.AddPaginationResponse(pagedBuildings.PaginationInfo);
-            Response.AddSortingResponse(sorting.SortBy, sorting.SortOrder);
+            Response.AddPagedQueryResultHeaders(pagedBuildings);
 
             var buildings = await pagedBuildings.Items
                 .Select(a => new
                 {
-                    PersistentLocalId = a.PersistentLocalId,
+                    a.PersistentLocalId,
                     a.Version
                 })
                 .ToListAsync(cancellationToken);
@@ -166,7 +167,7 @@ namespace BuildingRegistry.Api.Legacy.Building
                         x.Version.ToBelgianDateTimeOffset()))
                     .ToList(),
                 TotaalAantal = pagedBuildings.PaginationInfo.TotalItems,
-                Volgende = BuildVolgendeUri(pagedBuildings.PaginationInfo, responseOptions.Value.GebouwVolgendeUrl)
+                Volgende = pagedBuildings.PaginationInfo.BuildNextUri(responseOptions.Value.GebouwVolgendeUrl)
             };
 
             return Ok(listResponse);
@@ -187,7 +188,7 @@ namespace BuildingRegistry.Api.Legacy.Building
             var rings = polygon.InteriorRings.ToList();
             rings.Insert(0, polygon.ExteriorRing); //insert exterior ring as first item
 
-            double[][][] output = new double[rings.Count][][];
+            var output = new double[rings.Count][][];
             for (var i = 0; i < rings.Count; i++)
             {
                 output[i] = new double[rings[i].Coordinates.Length][];
@@ -205,14 +206,14 @@ namespace BuildingRegistry.Api.Legacy.Building
 
         private static GmlPolygon MapGmlPolygon(IPolygon polygon)
         {
-            var gmlPolygon = new GmlPolygon { Interior = new List<RingProperty>() };
-
-            gmlPolygon.Exterior = GetGmlRing(polygon.ExteriorRing as ILinearRing);
-
-            for (int i = 0; i < polygon.NumInteriorRings; i++)
+            var gmlPolygon = new GmlPolygon
             {
+                Interior = new List<RingProperty>(),
+                Exterior = GetGmlRing(polygon.ExteriorRing as ILinearRing)
+            };
+
+            for (var i = 0; i < polygon.NumInteriorRings; i++)
                 gmlPolygon.Interior.Add(GetGmlRing(polygon.InteriorRings[i] as ILinearRing));
-            }
 
             return gmlPolygon;
         }
@@ -221,9 +222,7 @@ namespace BuildingRegistry.Api.Legacy.Building
         {
             var posListBuilder = new StringBuilder();
             foreach (var coordinate in ring.Coordinates)
-            {
                 posListBuilder.Append($"{coordinate.X} {coordinate.Y} ");
-            }
 
             //remove last space
             posListBuilder.Length--;
@@ -238,8 +237,10 @@ namespace BuildingRegistry.Api.Legacy.Building
             {
                 case BuildingGeometryMethod.Outlined:
                     return GeometrieMethode.Ingeschetst;
+
                 case BuildingGeometryMethod.MeasuredByGrb:
                     return GeometrieMethode.IngemetenGRB;
+
                 default:
                     throw new ArgumentOutOfRangeException(nameof(geometryMethod), geometryMethod, null);
             }
@@ -251,29 +252,24 @@ namespace BuildingRegistry.Api.Legacy.Building
             {
                 case BuildingStatus.Planned:
                     return GebouwStatus.Gepland;
+
                 case BuildingStatus.UnderConstruction:
                     return GebouwStatus.InAanbouw;
+
                 case BuildingStatus.Realized:
                     return GebouwStatus.Gerealiseerd;
+
                 case BuildingStatus.Retired:
                     return GebouwStatus.Gehistoreerd;
+
                 case BuildingStatus.NotRealized:
                     return GebouwStatus.NietGerealiseerd;
+
                 default:
                     throw new ArgumentOutOfRangeException(nameof(status), status, null);
             }
         }
-
-        internal static Uri BuildVolgendeUri(PaginationInfo paginationInfo, string volgendeUrlBase)
-        {
-            var offset = paginationInfo.Offset;
-            var limit = paginationInfo.Limit;
-
-            return offset + limit < paginationInfo.TotalItems
-                ? new Uri(string.Format(volgendeUrlBase, offset + limit, limit))
-                : null;
-        }
-
+        
         /// <summary>
         /// Vraag een lijst met wijzigingen van gebouwen op.
         /// </summary>
@@ -306,8 +302,7 @@ namespace BuildingRegistry.Api.Legacy.Building
                 filtering.Filter?.ContainObject ?? false)
                 .Fetch(filtering, sorting, pagination);
 
-            Response.AddPaginationResponse(pagedBuildings.PaginationInfo);
-            Response.AddSortingResponse(sorting.SortBy, sorting.SortOrder);
+            Response.AddPagedQueryResultHeaders(pagedBuildings);
 
             return new ContentResult
             {
@@ -337,7 +332,7 @@ namespace BuildingRegistry.Api.Legacy.Building
                     new Uri(syndicationConfiguration["Self"]),
                     syndicationConfiguration.GetSection("Related").GetChildren().Select(c => c.Value).ToArray());
 
-                var nextUri = BuildVolgendeUri(pagedBuildings.PaginationInfo, syndicationConfiguration["NextUri"]);
+                var nextUri = pagedBuildings.PaginationInfo.BuildNextUri(syndicationConfiguration["NextUri"]);
                 if(nextUri != null)
                     await writer.Write(new SyndicationLink(nextUri, "next"));
 

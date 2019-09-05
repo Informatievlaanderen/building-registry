@@ -3,7 +3,6 @@ namespace BuildingRegistry.Building
     using Be.Vlaanderen.Basisregisters.AggregateSource;
     using Be.Vlaanderen.Basisregisters.CommandHandling;
     using Be.Vlaanderen.Basisregisters.EventHandling;
-    using Commands;
     using Commands.Crab;
     using SqlStreamStore;
     using System;

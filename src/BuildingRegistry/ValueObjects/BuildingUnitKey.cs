@@ -3,6 +3,7 @@ namespace BuildingRegistry.ValueObjects
     using System;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
     using Be.Vlaanderen.Basisregisters.Crab;
+    using Newtonsoft.Json;
 
     //public class BuildingUnitKey : GuidValueObject<BuildingUnitKey>
     //{
@@ -49,47 +50,41 @@ namespace BuildingRegistry.ValueObjects
 
     public struct BuildingUnitKeyType
     {
+        public int Building { get; }
+
+        public int? HouseNumber { get; }
+
+        public int? Subaddress { get; }
+
         public BuildingUnitKeyType(int building, int? houseNumber = null, int? subaddress = null)
         {
             Building = building;
             HouseNumber = houseNumber;
             Subaddress = subaddress;
         }
-        public int Building { get; }
-        public int? HouseNumber { get; }
-        public int? Subaddress { get; }
 
-        public override string ToString()
-        {
-            return $"{Building}_{HouseNumber}_{Subaddress}";
-        }
+        public override string ToString() => $"{Building}_{HouseNumber}_{Subaddress}";
     }
 
     public class BuildingUnitKey : StructDataTypeValueObject<BuildingUnitKey, BuildingUnitKeyType>
     {
-        public BuildingUnitKey(BuildingUnitKeyType value) : base(value)
+        public BuildingUnitKey([JsonProperty("value")] BuildingUnitKeyType value) : base(value)
         {
         }
 
         public static BuildingUnitKey Create(CrabTerrainObjectId terrainObjectId)
-        {
-            return new BuildingUnitKey(new BuildingUnitKeyType(terrainObjectId));
-        }
+            => new BuildingUnitKey(new BuildingUnitKeyType(terrainObjectId));
 
         public static BuildingUnitKey Create(
             CrabTerrainObjectId terrainObjectId,
             CrabTerrainObjectHouseNumberId terrainObjectHouseNumberId)
-        {
-            return new BuildingUnitKey(new BuildingUnitKeyType(terrainObjectId, terrainObjectHouseNumberId));
-        }
+            => new BuildingUnitKey(new BuildingUnitKeyType(terrainObjectId, terrainObjectHouseNumberId));
 
         public static BuildingUnitKey Create(
             CrabTerrainObjectId terrainObjectId,
             CrabTerrainObjectHouseNumberId terrainObjectHouseNumberId,
             CrabSubaddressId subaddressId)
-        {
-            return new BuildingUnitKey(new BuildingUnitKeyType(terrainObjectId, terrainObjectHouseNumberId, subaddressId));
-        }
+            => new BuildingUnitKey(new BuildingUnitKeyType(terrainObjectId, terrainObjectHouseNumberId, subaddressId));
 
         public int Building => Value.Building;
         public int? HouseNumber => Value.HouseNumber;
@@ -103,10 +98,7 @@ namespace BuildingRegistry.ValueObjects
             return Create(new CrabTerrainObjectId(Building), new CrabTerrainObjectHouseNumberId(HouseNumber.Value));
         }
 
-        public BuildingUnitKey ToBuildingKey()
-        {
-            return Create(new CrabTerrainObjectId(Building));
-        }
+        public BuildingUnitKey ToBuildingKey() => Create(new CrabTerrainObjectId(Building));
 
         public bool IsParentOf(BuildingUnitKey childKey)
         {

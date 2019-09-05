@@ -5,6 +5,6 @@ namespace BuildingRegistry.ValueObjects.Crab
 
     public class GrbNotation : StringValueObject<GrbNotation>
     {
-        public GrbNotation([JsonProperty("value")]string grbNotation) : base(grbNotation) { }
+        public GrbNotation([JsonProperty("value")] string grbNotation) : base(grbNotation) { }
     }
 }

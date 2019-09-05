@@ -11,7 +11,7 @@ namespace BuildingRegistry.ValueObjects
         public const int SridLambert72 = 31370;
 
         [JsonConstructor]
-        public WkbGeometry([JsonProperty("value")]byte[] wkbBytes) : base(wkbBytes) { }
+        public WkbGeometry([JsonProperty("value")] byte[] wkbBytes) : base(wkbBytes) { }
 
         public WkbGeometry(string wkbBytesHex) : base(wkbBytesHex.ToByteArray()) { }
 
@@ -23,7 +23,7 @@ namespace BuildingRegistry.ValueObjects
         private static readonly WKBReader WkbReader = WKBReaderFactory.Create();
 
         [JsonConstructor]
-        public ExtendedWkbGeometry([JsonProperty("value")]byte[] ewkbBytes) : base(ewkbBytes) { }
+        public ExtendedWkbGeometry([JsonProperty("value")] byte[] ewkbBytes) : base(ewkbBytes) { }
 
         public ExtendedWkbGeometry(string ewkbBytesHex) : base(ewkbBytesHex.ToByteArray()) { }
 

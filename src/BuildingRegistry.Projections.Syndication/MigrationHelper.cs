@@ -37,7 +37,7 @@ namespace BuildingRegistry.Projections.Syndication
                     logger?.LogInformation("Running EF Migrations.");
                     await RunInternal(connectionString, loggerFactory, ct);
                 },
-                    cancellationToken);
+                cancellationToken);
         }
 
         private static async Task RunInternal(string connectionString, ILoggerFactory loggerFactory, CancellationToken cancellationToken)

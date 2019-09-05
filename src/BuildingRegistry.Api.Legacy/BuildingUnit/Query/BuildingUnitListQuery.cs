@@ -49,7 +49,7 @@ namespace BuildingRegistry.Api.Legacy.BuildingUnit.Query
         }
     }
 
-    internal class BuildingUnitSorting : ISorting
+    public class BuildingUnitSorting : ISorting
     {
         public IEnumerable<string> SortableFields { get; } = new[]
         {

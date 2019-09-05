@@ -13,7 +13,7 @@ namespace BuildingRegistry.Projections.Wms.BuildingUnit
 
     public class BuildingUnitBuildingPersistentLocalIdConfiguration : IEntityTypeConfiguration<BuildingUnitBuildingPersistentLocalId>
     {
-        public const string TableName = "BuildingUnit_BuildingPersistentLocalIds";
+        private const string TableName = "BuildingUnit_BuildingPersistentLocalIds";
 
         public void Configure(EntityTypeBuilder<BuildingUnitBuildingPersistentLocalId> b)
         {

@@ -3,6 +3,7 @@ namespace BuildingRegistry.Api.CrabImport.Infrastructure
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.Net.Http.Headers;
     using System.Reflection;
+    using Be.Vlaanderen.Basisregisters.Api;
 
     [ApiVersionNeutral]
     [Route("")]
@@ -11,10 +12,8 @@ namespace BuildingRegistry.Api.CrabImport.Infrastructure
         [HttpGet]
         [ApiExplorerSettings(IgnoreApi = true)]
         public IActionResult Get()
-        {
-            return Request.Headers[HeaderNames.Accept].ToString().Contains("text/html")
+            => Request.Headers[HeaderNames.Accept].ToString().Contains("text/html")
                 ? (IActionResult)new RedirectResult("/docs")
-                : new OkObjectResult($"Welcome to the VBR Building Import Api v{Assembly.GetEntryAssembly().GetName().Version}.");
-        }
+                : new OkObjectResult($"Welcome to the Basisregisters Vlaanderen Building CrabImport Api {Assembly.GetEntryAssembly().GetVersionText()}.");
     }
 }

@@ -51,9 +51,9 @@ namespace BuildingRegistry.Api.CrabImport.CrabImport
             dynamic commandToProcess,
             IDictionary<string, object> metadata,
             int currentPosition,
-            CancellationToken cancellationToken = default(CancellationToken))
+            CancellationToken cancellationToken = default)
         {
-            CommandMessage message = null;
+            CommandMessage message;
             var stopwatch = Stopwatch.StartNew();
             switch (commandToProcess)
             {
@@ -105,6 +105,7 @@ namespace BuildingRegistry.Api.CrabImport.CrabImport
                     AddProvenancePipe.AddProvenance(() => _concurrentUnitOfWork, commandSubaddressMessage, _provenanceFactory, currentPosition);
                     message = commandSubaddressMessage;
                     break;
+
                 case ImportSubaddressStatusFromCrab command:
                     var commandSubaddressStatusMessage = new CommandMessage<ImportSubaddressStatusFromCrab>(command.CreateCommandId(), command, metadata);
                     await _buildingCommandHandlerModule.ImportSubaddressStatus(commandSubaddressStatusMessage, cancellationToken);

@@ -3,6 +3,7 @@ namespace BuildingRegistry.ValueObjects
     using System.Collections.Generic;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
     using Be.Vlaanderen.Basisregisters.Crab;
+    using Newtonsoft.Json;
 
     public class AssignBuildingUnitPersistentLocalIdForCrabTerrainObjectId : ValueObject<AssignBuildingUnitPersistentLocalIdForCrabTerrainObjectId>
     {
@@ -13,11 +14,11 @@ namespace BuildingRegistry.ValueObjects
         public PersistentLocalIdAssignmentDate PersistentLocalIdAssignmentDate { get; }
 
         public AssignBuildingUnitPersistentLocalIdForCrabTerrainObjectId(
-            CrabTerrainObjectHouseNumberId crabTerrainObjectHouseNumberId,
-            CrabSubaddressId crabSubaddressId,
-            int index,
-            PersistentLocalId persistentLocalId,
-            PersistentLocalIdAssignmentDate persistentLocalIdAssignmentDate)
+            [JsonProperty("crabTerrainObjectHouseNumberId")] CrabTerrainObjectHouseNumberId crabTerrainObjectHouseNumberId,
+            [JsonProperty("crabSubaddressId")] CrabSubaddressId crabSubaddressId,
+            [JsonProperty("index")] int index,
+            [JsonProperty("persistentLocalId")]  PersistentLocalId persistentLocalId,
+            [JsonProperty("persistentLocalIdAssignmentDate")]  PersistentLocalIdAssignmentDate persistentLocalIdAssignmentDate)
         {
             CrabTerrainObjectHouseNumberId = crabTerrainObjectHouseNumberId;
             CrabSubaddressId = crabSubaddressId;

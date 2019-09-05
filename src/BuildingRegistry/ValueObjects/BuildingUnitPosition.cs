@@ -2,6 +2,7 @@ namespace BuildingRegistry.ValueObjects
 {
     using System.Collections.Generic;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
+    using Newtonsoft.Json;
 
     public class BuildingUnitPosition : ValueObject<BuildingUnitPosition>
     {
@@ -9,8 +10,8 @@ namespace BuildingRegistry.ValueObjects
         public BuildingUnitPositionGeometryMethod GeometryMethod { get; }
 
         public BuildingUnitPosition(
-            ExtendedWkbGeometry geometry,
-            BuildingUnitPositionGeometryMethod geometryMethod)
+            [JsonProperty("geometry")] ExtendedWkbGeometry geometry,
+            [JsonProperty("geometryMethod")] BuildingUnitPositionGeometryMethod geometryMethod)
         {
             Geometry = geometry;
             GeometryMethod = geometryMethod;
