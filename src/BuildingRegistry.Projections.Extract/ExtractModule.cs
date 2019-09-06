@@ -56,7 +56,9 @@ namespace BuildingRegistry.Projections.Extract
                     .UseExtendedSqlServerMigrations());
         }
 
-        private static void RunInMemoryDb(IServiceCollection services, ILoggerFactory loggerFactory,
+        private static void RunInMemoryDb(
+            IServiceCollection services,
+            ILoggerFactory loggerFactory,
             ILogger<ExtractModule> logger)
         {
             services
