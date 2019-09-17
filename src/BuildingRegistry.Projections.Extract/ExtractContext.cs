@@ -1,15 +1,10 @@
 namespace BuildingRegistry.Projections.Extract
 {
-    using System;
-    using System.IO;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.Runner;
-    using Be.Vlaanderen.Basisregisters.ProjectionHandling.Runner.MigrationExtensions;
     using BuildingExtract;
     using BuildingUnitExtract;
     using Infrastructure;
     using Microsoft.EntityFrameworkCore;
-    using Microsoft.EntityFrameworkCore.Design;
-    using Microsoft.Extensions.Configuration;
 
     public class ExtractContext : RunnerDbContext<ExtractContext>
     {
@@ -24,34 +19,5 @@ namespace BuildingRegistry.Projections.Extract
         // This needs to be DbContextOptions<T> for Autofac!
         public ExtractContext(DbContextOptions<ExtractContext> options)
             : base(options) { }
-    }
-
-    public class ConfigBasedLegacyContextFactory : IDesignTimeDbContextFactory<ExtractContext>
-    {
-        public ExtractContext CreateDbContext(string[] args)
-        {
-            var migrationConnectionStringName = "ExtractProjectionsAdmin";
-
-            var configuration = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json")
-                .AddJsonFile($"appsettings.{Environment.MachineName}.json")
-                .AddEnvironmentVariables()
-                .Build();
-
-            var connectionString = configuration.GetConnectionString(migrationConnectionStringName);
-            if (string.IsNullOrEmpty(connectionString))
-                throw new InvalidOperationException($"Could not find a connection string with name '{migrationConnectionStringName}'");
-
-            var builder = new DbContextOptionsBuilder<ExtractContext>()
-                .UseSqlServer(connectionString, sqlServerOptions =>
-                {
-                    sqlServerOptions.EnableRetryOnFailure();
-                    sqlServerOptions.MigrationsHistoryTable(MigrationTables.Extract, Schema.Extract);
-                })
-                .UseExtendedSqlServerMigrations();
-
-            return new ExtractContext(builder.Options);
-        }
     }
 }
