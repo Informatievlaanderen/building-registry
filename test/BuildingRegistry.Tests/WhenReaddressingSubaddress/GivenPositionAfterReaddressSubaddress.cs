@@ -6,10 +6,10 @@ namespace BuildingRegistry.Tests.WhenReaddressingSubaddress
     using Be.Vlaanderen.Basisregisters.Crab;
     using Building.Commands.Crab;
     using Building.Events;
-    using GeoAPI.Geometries;
     using NetTopologySuite.IO;
     using NodaTime;
     using System;
+    using NetTopologySuite.Geometries;
     using ValueObjects;
     using ValueObjects.Crab;
     using WhenImportingCrabBuildingGeometry;
@@ -22,8 +22,8 @@ namespace BuildingRegistry.Tests.WhenReaddressingSubaddress
     public class GivenPositionAfterReaddressSubaddress : AutofacBasedTest
     {
         protected readonly IFixture Fixture;
-        private readonly IPoint _position;
-        private readonly IGeometry _geometry;
+        private readonly Point _position;
+        private readonly Geometry _geometry;
 
         private CrabTerrainObjectId Gebouw1CrabTerrainObjectId { get; }
         private CrabTerrainObjectHouseNumberId HuisNr16KoppelingId { get; }

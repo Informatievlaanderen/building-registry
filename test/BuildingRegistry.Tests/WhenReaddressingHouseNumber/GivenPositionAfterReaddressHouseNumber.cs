@@ -8,7 +8,7 @@ namespace BuildingRegistry.Tests.WhenReaddressingHouseNumber
     using Building.Events;
     using NodaTime;
     using System;
-    using GeoAPI.Geometries;
+    using NetTopologySuite.Geometries;
     using NetTopologySuite.IO;
     using ValueObjects;
     using ValueObjects.Crab;
@@ -21,8 +21,8 @@ namespace BuildingRegistry.Tests.WhenReaddressingHouseNumber
     public class GivenPositionAfterReaddressHouseNumber : AutofacBasedTest
     {
         protected readonly IFixture Fixture;
-        private readonly IPoint _position;
-        private readonly IGeometry _geometry;
+        private readonly Point _position;
+        private readonly Geometry _geometry;
 
         private CrabTerrainObjectId Gebouw1CrabTerrainObjectId { get; }
         private CrabTerrainObjectHouseNumberId OldHuisNr16KoppelingId { get; }

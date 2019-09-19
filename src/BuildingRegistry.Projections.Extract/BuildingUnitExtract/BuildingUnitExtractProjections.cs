@@ -12,8 +12,9 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
     using Be.Vlaanderen.Basisregisters.Shaperon;
     using Be.Vlaanderen.Basisregisters.Utilities.HexByteConvertor;
     using Building.Events.Crab;
-    using GeoAPI.Geometries;
     using Microsoft.Extensions.Options;
+    using NetTopologySuite.Geometries;
+    using Point = Be.Vlaanderen.Basisregisters.Shaperon.Point;
 
     public class BuildingUnitExtractProjections : ConnectedProjection<ExtractContext>
     {
@@ -363,16 +364,15 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
             When<Envelope<TerrainObjectWasImportedFromCrab>>(async (context, message, ct) => DoNothing());
         }
 
-        private static void UpdateGeometry(BuildingUnitExtractItem item, IGeometry geometry)
+        private static void UpdateGeometry(BuildingUnitExtractItem item, Geometry geometry)
         {
-            var pointShapeContent = new PointShapeContent(new PointM(geometry.Coordinate));
+            var pointShapeContent = new PointShapeContent(new Point(geometry.Coordinate.X, geometry.Coordinate.Y));
             item.ShapeRecordContent = pointShapeContent.ToBytes();
             item.ShapeRecordContentLength = pointShapeContent.ContentLength.ToInt32();
-            var env = EnvelopePartialRecord.From(pointShapeContent.Shape.EnvelopeInternal);
-            item.MinimumX = env.MinimumX;
-            item.MaximumX = env.MaximumX;
-            item.MinimumY = env.MinimumY;
-            item.MaximumY = env.MaximumY;
+            item.MinimumX = pointShapeContent.Shape.X;
+            item.MaximumX = pointShapeContent.Shape.X;
+            item.MinimumY = pointShapeContent.Shape.Y;
+            item.MaximumY = pointShapeContent.Shape.Y;
         }
 
         private void UpdateStatus(BuildingUnitExtractItem buildingUnit, string status)
