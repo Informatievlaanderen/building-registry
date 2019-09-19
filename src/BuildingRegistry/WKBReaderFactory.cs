@@ -1,6 +1,5 @@
 namespace BuildingRegistry
 {
-    using GeoAPI.Geometries;
     using NetTopologySuite;
     using NetTopologySuite.Geometries;
     using NetTopologySuite.Geometries.Implementation;

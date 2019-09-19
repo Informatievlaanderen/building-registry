@@ -9,7 +9,6 @@ namespace BuildingRegistry.Api.Legacy.Building
     using Be.Vlaanderen.Basisregisters.GrAr.Common;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy.Gebouw;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy.SpatialTools;
-    using GeoAPI.Geometries;
     using Infrastructure.Grb;
     using Infrastructure.Options;
     using Microsoft.AspNetCore.Http;
@@ -175,7 +174,7 @@ namespace BuildingRegistry.Api.Legacy.Building
 
         internal static Polygon GetBuildingPolygon(byte[] polygon)
         {
-            var geometry = (IPolygon)WKBReaderFactory.Create().Read(polygon);
+            var geometry = (NetTopologySuite.Geometries.Polygon)WKBReaderFactory.Create().Read(polygon);
             return new Polygon
             {
                 XmlPolygon = MapGmlPolygon(geometry),
@@ -183,7 +182,7 @@ namespace BuildingRegistry.Api.Legacy.Building
             };
         }
 
-        private static GeoJSONPolygon MapToGeoJsonPolygon(IPolygon polygon)
+        private static GeoJSONPolygon MapToGeoJsonPolygon(NetTopologySuite.Geometries.Polygon polygon)
         {
             var rings = polygon.InteriorRings.ToList();
             rings.Insert(0, polygon.ExteriorRing); //insert exterior ring as first item
@@ -204,21 +203,21 @@ namespace BuildingRegistry.Api.Legacy.Building
             return new GeoJSONPolygon { Coordinates = output };
         }
 
-        private static GmlPolygon MapGmlPolygon(IPolygon polygon)
+        private static GmlPolygon MapGmlPolygon(NetTopologySuite.Geometries.Polygon polygon)
         {
             var gmlPolygon = new GmlPolygon
             {
                 Interior = new List<RingProperty>(),
-                Exterior = GetGmlRing(polygon.ExteriorRing as ILinearRing)
+                Exterior = GetGmlRing(polygon.ExteriorRing as NetTopologySuite.Geometries.LinearRing)
             };
 
             for (var i = 0; i < polygon.NumInteriorRings; i++)
-                gmlPolygon.Interior.Add(GetGmlRing(polygon.InteriorRings[i] as ILinearRing));
+                gmlPolygon.Interior.Add(GetGmlRing(polygon.InteriorRings[i] as NetTopologySuite.Geometries.LinearRing));
 
             return gmlPolygon;
         }
 
-        private static RingProperty GetGmlRing(ILinearRing ring)
+        private static RingProperty GetGmlRing(NetTopologySuite.Geometries.LinearRing ring)
         {
             var posListBuilder = new StringBuilder();
             foreach (var coordinate in ring.Coordinates)
@@ -269,7 +268,7 @@ namespace BuildingRegistry.Api.Legacy.Building
                     throw new ArgumentOutOfRangeException(nameof(status), status, null);
             }
         }
-        
+
         /// <summary>
         /// Vraag een lijst met wijzigingen van gebouwen op.
         /// </summary>

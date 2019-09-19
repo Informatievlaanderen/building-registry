@@ -1,6 +1,6 @@
 namespace BuildingRegistry.Projections.Extract
 {
-    using GeoAPI.Geometries;
+    using NetTopologySuite.Geometries;
 
     public class EnvelopePartialRecord
     {

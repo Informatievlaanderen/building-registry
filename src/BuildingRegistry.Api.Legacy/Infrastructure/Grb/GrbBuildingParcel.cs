@@ -2,7 +2,7 @@ namespace BuildingRegistry.Api.Legacy.Infrastructure.Grb
 {
     using System.Collections.Generic;
     using System.Linq;
-    using GeoAPI.Geometries;
+    using NetTopologySuite.Geometries;
 
     public class GrbBuildingParcel : IGrbBuildingParcel
     {
@@ -15,7 +15,7 @@ namespace BuildingRegistry.Api.Legacy.Infrastructure.Grb
             var geometry = WKBReaderFactory.Create().Read(buildingGeometry);
 
             var features = _wfsClient.GetFeaturesInBoundingBox(GrbFeatureType.Parcel, geometry.EnvelopeInternal);
-            var parcels = new Dictionary<string, IGeometry>();
+            var parcels = new Dictionary<string, Geometry>();
             foreach (var feature in features)
             {
                 if (!parcels.ContainsKey(feature.Item2["CAPAKEY"]))

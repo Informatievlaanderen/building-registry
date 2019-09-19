@@ -2,11 +2,11 @@ namespace BuildingRegistry.Api.Legacy.Infrastructure.Grb
 {
     using System;
     using System.Collections.Generic;
-    using GeoAPI.Geometries;
+    using NetTopologySuite.Geometries;
 
     public interface IGrbWfsClient
     {
-        IEnumerable<Tuple<IGeometry, IReadOnlyDictionary<string, string>>> GetFeaturesInBoundingBox(GrbFeatureType featureType, Envelope boundingBox);
+        IEnumerable<Tuple<Geometry, IReadOnlyDictionary<string, string>>> GetFeaturesInBoundingBox(GrbFeatureType featureType, Envelope boundingBox);
     }
 
     public enum GrbFeatureType

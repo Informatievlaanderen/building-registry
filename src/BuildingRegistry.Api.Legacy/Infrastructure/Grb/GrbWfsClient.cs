@@ -11,7 +11,7 @@ namespace BuildingRegistry.Api.Legacy.Infrastructure.Grb
     using System.Xml;
     using System.Xml.Linq;
     using System.Xml.XPath;
-    using GeoAPI.Geometries;
+    using NetTopologySuite.Geometries;
     using NetTopologySuite.IO.GML2;
 
     public class GrbWfsClient : IGrbWfsClient
@@ -34,9 +34,9 @@ namespace BuildingRegistry.Api.Legacy.Infrastructure.Grb
             _namespaceManager.AddNamespace("grb", GrbNameSpace);
         }
 
-        public IEnumerable<Tuple<IGeometry, IReadOnlyDictionary<string, string>>> GetFeaturesInBoundingBox(GrbFeatureType featureType, Envelope boundingBox)
+        public IEnumerable<Tuple<Geometry, IReadOnlyDictionary<string, string>>> GetFeaturesInBoundingBox(GrbFeatureType featureType, Envelope boundingBox)
         {
-            var result = new List<Tuple<IGeometry, IReadOnlyDictionary<string, string>>>();
+            var result = new List<Tuple<Geometry, IReadOnlyDictionary<string, string>>>();
 
             string featureName;
             switch (featureType)

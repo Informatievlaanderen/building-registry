@@ -5,13 +5,16 @@ namespace BuildingRegistry.Projections.Extract.BuildingExtract
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore;
     using Be.Vlaanderen.Basisregisters.Utilities.HexByteConvertor;
     using Building.Events;
-    using NetTopologySuite.Geometries;
     using NetTopologySuite.IO;
     using NodaTime;
     using System;
+    using System.Collections.Generic;
+    using System.Linq;
     using System.Text;
+    using Be.Vlaanderen.Basisregisters.Shaperon;
     using Building.Events.Crab;
     using Microsoft.Extensions.Options;
+    using Polygon = NetTopologySuite.Geometries.Polygon;
 
     public class BuildingExtractProjections : ConnectedProjection<ExtractContext>
     {
@@ -318,10 +321,13 @@ namespace BuildingRegistry.Projections.Extract.BuildingExtract
 
         private static void UpdateGeometry(Polygon geometry, BuildingExtractItem item)
         {
-            var polygonShapeContent = new Be.Vlaanderen.Basisregisters.Shaperon.PolygonShapeContent(geometry);
+            var env = EnvelopePartialRecord.From(geometry.EnvelopeInternal);
+
+            var polygon = Be.Vlaanderen.Basisregisters.Shaperon.Geometries.GeometryTranslator.FromGeometryPolygon(geometry);
+            var polygonShapeContent = new PolygonShapeContent(polygon);
             item.ShapeRecordContent = polygonShapeContent.ToBytes();
             item.ShapeRecordContentLength = polygonShapeContent.ContentLength.ToInt32();
-            var env = EnvelopePartialRecord.From(polygonShapeContent.Shape.EnvelopeInternal);
+
             item.MinimumX = env.MinimumX;
             item.MaximumX = env.MaximumX;
             item.MinimumY = env.MinimumY;
