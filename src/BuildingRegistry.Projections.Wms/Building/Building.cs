@@ -1,6 +1,5 @@
 namespace BuildingRegistry.Projections.Wms.Building
 {
-    using GeoAPI.Geometries;
     using Infrastructure;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -16,7 +15,7 @@ namespace BuildingRegistry.Projections.Wms.Building
         public int? PersistentLocalId { get; set; }
         public string Id { get; set; }
 
-        public IPolygon Geometry { get; set; }
+        public byte[] Geometry { get; set; }
         public string GeometryMethod { get; set; }
         public bool IsComplete { get; set; }
 
@@ -62,8 +61,7 @@ namespace BuildingRegistry.Projections.Wms.Building
             b.Property(p => p.StatusAsText)
                 .HasColumnName("Status");
 
-            b.Property(p => p.Geometry)
-                .HasColumnType("geometry");
+            b.Property(p => p.Geometry);
 
             b.Ignore(p => p.Status);
         }

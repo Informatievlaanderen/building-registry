@@ -5,8 +5,8 @@ namespace BuildingRegistry.Projections.Wms.Building
     using Be.Vlaanderen.Basisregisters.Utilities.HexByteConvertor;
     using BuildingRegistry.Building.Events;
     using BuildingRegistry.Building.Events.Crab;
-    using GeoAPI.Geometries;
     using Infrastructure;
+    using NetTopologySuite.Geometries;
     using NetTopologySuite.IO;
     using NodaTime;
     using ValueObjects;
@@ -286,10 +286,10 @@ namespace BuildingRegistry.Projections.Wms.Building
 
         private void SetGeometry(Building building, string extendedWkbGeometry, string method)
         {
-            var geometry = (IPolygon)_wkbReader.Read(extendedWkbGeometry.ToByteArray());
+            var geometry = (Polygon)_wkbReader.Read(extendedWkbGeometry.ToByteArray());
 
             building.GeometryMethod = method;
-            building.Geometry = geometry;
+            building.Geometry = geometry.AsBinary();
         }
 
         private static void DoNothing() { }

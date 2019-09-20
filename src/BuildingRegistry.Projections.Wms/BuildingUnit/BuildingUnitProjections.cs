@@ -4,7 +4,6 @@ namespace BuildingRegistry.Projections.Wms.BuildingUnit
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore;
     using Be.Vlaanderen.Basisregisters.Utilities.HexByteConvertor;
     using BuildingRegistry.Building.Events;
-    using GeoAPI.Geometries;
     using Infrastructure;
     using NetTopologySuite.IO;
     using NodaTime;
@@ -13,6 +12,7 @@ namespace BuildingRegistry.Projections.Wms.BuildingUnit
     using System.Threading;
     using System.Threading.Tasks;
     using BuildingRegistry.Building.Events.Crab;
+    using NetTopologySuite.Geometries;
     using ValueObjects;
 
     public class BuildingUnitProjections : ConnectedProjection<WmsContext>
@@ -417,10 +417,10 @@ namespace BuildingRegistry.Projections.Wms.BuildingUnit
 
         private void SetPosition(BuildingUnit buildingUnit, string extendedWkbPosition, string method)
         {
-            var geometry = (IPoint)_wkbReader.Read(extendedWkbPosition.ToByteArray());
+            var geometry = (Point)_wkbReader.Read(extendedWkbPosition.ToByteArray());
 
             buildingUnit.PositionMethod = method;
-            buildingUnit.Position = geometry;
+            buildingUnit.Position = geometry.AsBinary();
         }
 
         private static void DoNothing() { }
