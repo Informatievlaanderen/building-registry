@@ -1,7 +1,6 @@
 namespace BuildingRegistry.Projections.Wms.BuildingUnit
 {
     using System;
-    using GeoAPI.Geometries;
     using Infrastructure;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -19,7 +18,7 @@ namespace BuildingRegistry.Projections.Wms.BuildingUnit
         public Guid BuildingId { get; set; }
         public int? BuildingPersistentLocalId { get; set; }
 
-        public IPoint Position { get; set; }
+        public byte[] Position { get; set; }
         public string PositionMethod { get; set; }
         public string Function { get; set; }
         public bool IsComplete { get; set; }
@@ -72,8 +71,7 @@ namespace BuildingRegistry.Projections.Wms.BuildingUnit
                 .HasColumnType("varchar(22)")
                 .HasMaxLength(22);
 
-            b.Property(p => p.Position)
-                .HasColumnType("geometry");
+            b.Property(p => p.Position);
 
             b.Property(p => p.StatusAsText)
                 .HasColumnName("Status");

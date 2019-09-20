@@ -1,5 +1,4 @@
 ﻿using System;
-using GeoAPI.Geometries;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace BuildingRegistry.Projections.Wms.Migrations
@@ -19,7 +18,7 @@ namespace BuildingRegistry.Projections.Wms.Migrations
                     BuildingId = table.Column<Guid>(nullable: false),
                     PersistentLocalId = table.Column<int>(nullable: true),
                     Id = table.Column<string>(type: "varchar(46)", maxLength: 46, nullable: true),
-                    Geometry = table.Column<IPolygon>(type: "geometry", nullable: true),
+                    Geometry = table.Column<byte[]>(nullable: true),
                     GeometryMethod = table.Column<string>(type: "varchar(12)", maxLength: 12, nullable: true),
                     IsComplete = table.Column<bool>(nullable: false),
                     Status = table.Column<string>(nullable: true),
@@ -55,7 +54,7 @@ namespace BuildingRegistry.Projections.Wms.Migrations
                     BuildingUnitPersistentLocalId = table.Column<int>(nullable: true),
                     BuildingId = table.Column<Guid>(nullable: false),
                     BuildingPersistentLocalId = table.Column<int>(nullable: true),
-                    Position = table.Column<IPoint>(type: "geometry", nullable: true),
+                    Position = table.Column<byte[]>(nullable: true),
                     PositionMethod = table.Column<string>(type: "varchar(22)", maxLength: 22, nullable: true),
                     Function = table.Column<string>(type: "varchar(21)", maxLength: 21, nullable: true),
                     IsComplete = table.Column<bool>(nullable: false),
@@ -75,7 +74,9 @@ namespace BuildingRegistry.Projections.Wms.Migrations
                 columns: table => new
                 {
                     Name = table.Column<string>(nullable: false),
-                    Position = table.Column<long>(nullable: false)
+                    Position = table.Column<long>(nullable: false),
+                    DesiredState = table.Column<string>(nullable: true),
+                    DesiredStateChangedAt = table.Column<DateTimeOffset>(nullable: true)
                 },
                 constraints: table =>
                 {

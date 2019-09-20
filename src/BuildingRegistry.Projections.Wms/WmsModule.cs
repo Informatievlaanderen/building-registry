@@ -52,7 +52,6 @@ namespace BuildingRegistry.Projections.Wms
                     {
                         sqlServerOptions.EnableRetryOnFailure();
                         sqlServerOptions.MigrationsHistoryTable(MigrationTables.Wms, Schema.Wms);
-                        sqlServerOptions.UseNetTopologySuite();
                     })
                     .UseExtendedSqlServerMigrations());
         }
