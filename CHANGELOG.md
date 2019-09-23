@@ -1,3 +1,10 @@
+## [1.12.1](https://github.com/informatievlaanderen/building-registry/compare/v1.12.0...v1.12.1) (2019-09-23)
+
+
+### Bug Fixes
+
+* use ioptions for examples ([e83adde](https://github.com/informatievlaanderen/building-registry/commit/e83adde))
+
 # [1.12.0](https://github.com/informatievlaanderen/building-registry/compare/v1.11.0...v1.12.0) (2019-09-20)
 
 
