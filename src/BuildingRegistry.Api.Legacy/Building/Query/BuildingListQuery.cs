@@ -24,7 +24,7 @@ namespace BuildingRegistry.Api.Legacy.Building.Query
         {
             var buildings = _context
                 .BuildingDetails
-                .Where(x => x.IsComplete && !x.IsRemoved)
+                .Where(x => x.IsComplete && !x.IsRemoved && x.PersistentLocalId.HasValue)
                 .AsNoTracking();
 
             return buildings;
