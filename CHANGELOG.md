@@ -1,3 +1,11 @@
+## [1.12.2](https://github.com/informatievlaanderen/building-registry/compare/v1.12.1...v1.12.2) (2019-09-23)
+
+
+### Bug Fixes
+
+* tweak logging ([9e01824](https://github.com/informatievlaanderen/building-registry/commit/9e01824))
+* tweak logging ([1c4df98](https://github.com/informatievlaanderen/building-registry/commit/1c4df98))
+
 ## [1.12.1](https://github.com/informatievlaanderen/building-registry/compare/v1.12.0...v1.12.1) (2019-09-23)
 
 
