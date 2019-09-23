@@ -10,6 +10,7 @@ namespace BuildingRegistry.Api.Legacy.BuildingUnit.Responses
     using System.Collections.Generic;
     using System.Runtime.Serialization;
     using Be.Vlaanderen.Basisregisters.BasicApiProblem;
+    using Microsoft.Extensions.Options;
 
     [DataContract(Name = "GebouweenheidDetail", Namespace = "")]
     public class BuildingUnitResponse
@@ -83,15 +84,15 @@ namespace BuildingRegistry.Api.Legacy.BuildingUnit.Responses
 
     public class BuildingUnitResponseExamples : IExamplesProvider
     {
-        private readonly ResponseOptions _options;
+        private readonly ResponseOptions _responseOptions;
 
-        public BuildingUnitResponseExamples(ResponseOptions options) => _options = options;
+        public BuildingUnitResponseExamples(IOptions<ResponseOptions> responseOptionsProvider) => _responseOptions = responseOptionsProvider.Value;
 
         public object GetExamples()
             => new BuildingUnitResponse
             (
                 6,
-                _options.GebouweenheidNaamruimte,
+                _responseOptions.GebouweenheidNaamruimte,
                 DateTimeOffset.Now,
                 new Point
                 {

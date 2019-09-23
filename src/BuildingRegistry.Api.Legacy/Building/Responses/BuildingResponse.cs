@@ -9,6 +9,7 @@ namespace BuildingRegistry.Api.Legacy.Building.Responses
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy.SpatialTools;
     using Infrastructure.Options;
     using Microsoft.AspNetCore.Http;
+    using Microsoft.Extensions.Options;
     using Swashbuckle.AspNetCore.Filters;
 
     [DataContract(Name = "GebouwDetail", Namespace = "")]
@@ -71,14 +72,14 @@ namespace BuildingRegistry.Api.Legacy.Building.Responses
 
     public class BuildingResponseExamples : IExamplesProvider
     {
-        private readonly ResponseOptions _options;
+        private readonly ResponseOptions _responseOptions;
 
-        public BuildingResponseExamples(ResponseOptions options) => _options = options;
+        public BuildingResponseExamples(IOptions<ResponseOptions> responseOptionsProvider) => _responseOptions = responseOptionsProvider.Value;
 
         public object GetExamples()
             => new BuildingResponse(
                 6,
-                _options.GebouwNaamruimte,
+                _responseOptions.GebouwNaamruimte,
                 DateTimeOffset.Now,
                 new Polygon
                 {

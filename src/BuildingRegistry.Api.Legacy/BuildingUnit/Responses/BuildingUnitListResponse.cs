@@ -6,6 +6,7 @@ namespace BuildingRegistry.Api.Legacy.BuildingUnit.Responses
     using System;
     using System.Collections.Generic;
     using System.Runtime.Serialization;
+    using Microsoft.Extensions.Options;
 
     [DataContract(Name = "GebouweenheidCollectie", Namespace = "")]
     public class BuildingUnitListResponse
@@ -58,7 +59,7 @@ namespace BuildingRegistry.Api.Legacy.BuildingUnit.Responses
     {
         private readonly ResponseOptions _responseOptions;
 
-        public BuildingUnitListResponseExamples(ResponseOptions responseOptions) => _responseOptions = responseOptions;
+        public BuildingUnitListResponseExamples(IOptions<ResponseOptions> responseOptionsProvider) => _responseOptions = responseOptionsProvider.Value;
 
         public object GetExamples()
             => new BuildingUnitListResponse

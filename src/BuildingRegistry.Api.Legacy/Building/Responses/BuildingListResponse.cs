@@ -6,6 +6,7 @@ namespace BuildingRegistry.Api.Legacy.Building.Responses
     using System.Collections.Generic;
     using System.Runtime.Serialization;
     using Infrastructure.Options;
+    using Microsoft.Extensions.Options;
 
     [DataContract(Name = "GebouwCollectie", Namespace = "")]
     public class BuildingListResponse
@@ -59,7 +60,7 @@ namespace BuildingRegistry.Api.Legacy.Building.Responses
     {
         private readonly ResponseOptions _responseOptions;
 
-        public BuildingListResponseExamples(ResponseOptions responseOptions) => _responseOptions = responseOptions;
+        public BuildingListResponseExamples(IOptions<ResponseOptions> responseOptionsProvider) => _responseOptions = responseOptionsProvider.Value;
 
         public object GetExamples()
             => new BuildingListResponse
