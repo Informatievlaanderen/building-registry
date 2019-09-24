@@ -616,11 +616,11 @@ namespace BuildingRegistry.Building
                                     assignBuildingUnitPersistentLocalId.PersistentLocalId,
                                     assignBuildingUnitPersistentLocalId.PersistentLocalIdAssignmentDate,
                                     new Reason("Due to duplication, the building unit with this PersistentLocalId should never have existed. Could not mark as duplicate as no candidate was found.")));
-
-                            ApplyBuildingUnitPersistentLocalIdWithDuplicateCheck(
-                                buildingUnit,
-                                assignBuildingUnitPersistentLocalId,
-                                deduplicatedCollection);
+                            else
+                                ApplyBuildingUnitPersistentLocalIdWithDuplicateCheck(
+                                    buildingUnit,
+                                    assignBuildingUnitPersistentLocalId,
+                                    deduplicatedCollection);
                         }
                     }
                 }

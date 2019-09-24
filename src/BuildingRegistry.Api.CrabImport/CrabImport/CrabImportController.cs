@@ -89,10 +89,11 @@ namespace BuildingRegistry.Api.CrabImport.CrabImport
                 {
                     throw new ApiException("Ongeldig verzoek id", StatusCodes.Status400BadRequest);
                 }
-                catch
+                catch (Exception ex)
                 {
                     var x = registerCrabImports.Select(RegisterCrabImportRequestMapping.Map).ToList();
                     Console.WriteLine($"Boom, {x.First()}");
+                    logger.LogError(ex, "Import error for id {TerrainObjectId}", new List<dynamic> { x.First().TerrainObjectId });
                     throw;
                 }
 
