@@ -5,7 +5,6 @@ namespace BuildingRegistry.Projector.Infrastructure
     using Be.Vlaanderen.Basisregisters.Api;
     using Be.Vlaanderen.Basisregisters.DataDog.Tracing.Autofac;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.LastChangedList;
-    using Be.Vlaanderen.Basisregisters.Projector.ConnectedProjections;
     using BuildingRegistry.Projections.Extract;
     using BuildingRegistry.Projections.Legacy;
     using BuildingRegistry.Projections.Wms;
@@ -22,6 +21,7 @@ namespace BuildingRegistry.Projector.Infrastructure
     using System;
     using System.Linq;
     using System.Reflection;
+    using Be.Vlaanderen.Basisregisters.Projector;
 
     /// <summary>Represents the startup process for the application.</summary>
     public class Startup
@@ -180,20 +180,16 @@ namespace BuildingRegistry.Projector.Infrastructure
                     {
                         AfterMiddleware = x => x.UseMiddleware<AddNoCacheHeadersMiddleware>()
                     }
+                })
+
+                .UseProjectionsManager(new ProjectionsManagerOptions
+                {
+                    Common =
+                    {
+                        ServiceProvider = serviceProvider,
+                        ApplicationLifetime = appLifetime
+                    }
                 });
-
-            var projectionsManager = serviceProvider.GetRequiredService<IConnectedProjectionsManager>();
-
-            try
-            {
-                projectionsManager.Start();
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                throw;
-            }
-
         }
 
         private static string GetApiLeadingText(ApiVersionDescription description)
