@@ -1,3 +1,10 @@
+## [1.13.1](https://github.com/informatievlaanderen/building-registry/compare/v1.13.0...v1.13.1) (2019-09-26)
+
+
+### Bug Fixes
+
+* update asset to fix importer ([db246c1](https://github.com/informatievlaanderen/building-registry/commit/db246c1))
+
 # [1.13.0](https://github.com/informatievlaanderen/building-registry/compare/v1.12.4...v1.13.0) (2019-09-26)
 
 
