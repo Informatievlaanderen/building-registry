@@ -441,11 +441,11 @@ namespace BuildingRegistry.Building
                         .Where(x => x.CrabTerrainObjectHouseNumberId != null &&
                                     x.CrabTerrainObjectHouseNumberId == activeUnit.BuildingUnitKey.HouseNumber.Value);
 
-                    if (_buildingUnitCollection.HasReaddressed(activeUnit.BuildingUnitKey))
+                    if (_buildingUnitCollection.HasReaddressed(activeUnit.BuildingUnitKey.ToHouseNumberKey()))
                     {
                         persistentLocalIdQuery = persistentLocalIdQuery.Union(deduplicatedCollection.Where(
                             x => x.CrabTerrainObjectHouseNumberId != null &&
-                                 x.CrabTerrainObjectHouseNumberId == _buildingUnitCollection.GetReaddressedKey(activeUnit.BuildingUnitKey)));
+                                 x.CrabTerrainObjectHouseNumberId == _buildingUnitCollection.GetReaddressedKey(activeUnit.BuildingUnitKey.ToHouseNumberKey()).HouseNumber));
                     }
 
                     if (activeUnit.BuildingUnitKey.Subaddress.HasValue)
