@@ -73,7 +73,7 @@ namespace BuildingRegistry.Building
             if (assignBuildingUnitPersistentLocalIds.Any())
             {
                 // Certain buildings start from index 2 so if 8 - (2 - 1) = 7
-                var max = assignBuildingUnitPersistentLocalIds.Max(x => x.Index);
+                var max = this.Max(x => x.Index);
                 var min = assignBuildingUnitPersistentLocalIds.Min(x => x.Index) - 1;
 
                 if ((max - min) != Count)

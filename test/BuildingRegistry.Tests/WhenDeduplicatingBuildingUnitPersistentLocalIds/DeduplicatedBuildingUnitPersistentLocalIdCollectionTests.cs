@@ -126,15 +126,62 @@ namespace BuildingRegistry.Tests.WhenDeduplicatingBuildingUnitPersistentLocalIds
             sut.Should().BeEquivalentTo(expected);
         }
 
+        [Fact]
+        public void Given_single_entry_last_index_is_duplicate_Then_should_not_be_added()
+        {
+            //real case: select * from crab.GebouweenheidMapping where TerreinobjectID = 11938486 order by[Index], MappingCreatedTimestamp
+
+            var a = CreateBuildingUnitPersistentLocalIdAssignment(1, 1, 1, DateTime.UtcNow);
+            var b = CreateBuildingUnitPersistentLocalIdAssignment(1, 2, 2, DateTime.UtcNow);
+            var c = CreateBuildingUnitPersistentLocalIdAssignment(1, 3, 3, DateTime.UtcNow);
+            var d = CreateBuildingUnitPersistentLocalIdAssignment(1, 4, 4, DateTime.UtcNow);
+            var e = CreateBuildingUnitPersistentLocalIdAssignment(null, null, 5, DateTime.UtcNow);
+            var f = CreateBuildingUnitPersistentLocalIdAssignment(1, null, 6, DateTime.UtcNow);
+            var g = CreateBuildingUnitPersistentLocalIdAssignment(2, 1, 7, DateTime.UtcNow);
+            var h = CreateBuildingUnitPersistentLocalIdAssignment(2, 2, 8, DateTime.UtcNow);
+            var i = CreateBuildingUnitPersistentLocalIdAssignment(2, 3, 9, DateTime.UtcNow);
+            var j = CreateBuildingUnitPersistentLocalIdAssignment(null, null, 10, DateTime.UtcNow);
+            var k = CreateBuildingUnitPersistentLocalIdAssignment(3, 1, 11, DateTime.UtcNow.AddDays(1));
+            var f2 = CreateBuildingUnitPersistentLocalIdAssignment(1, null, 11, DateTime.UtcNow.AddDays(2));
+            var l = CreateBuildingUnitPersistentLocalIdAssignment(3, 2, 12, DateTime.UtcNow.AddDays(1));
+            var k2 = CreateBuildingUnitPersistentLocalIdAssignment(3, 1, 12, DateTime.UtcNow.AddDays(2));
+            var m = CreateBuildingUnitPersistentLocalIdAssignment(3, 3, 13, DateTime.UtcNow.AddDays(1));
+            var l2 = CreateBuildingUnitPersistentLocalIdAssignment(3, 2, 13, DateTime.UtcNow.AddDays(2));
+            var n = CreateBuildingUnitPersistentLocalIdAssignment(2, null, 14, DateTime.UtcNow.AddDays(1));
+            var m2 = CreateBuildingUnitPersistentLocalIdAssignment(3, 3, 14, DateTime.UtcNow.AddDays(2));
+            var o = CreateBuildingUnitPersistentLocalIdAssignment(4, 1, 15, DateTime.UtcNow.AddDays(1));
+            var n2 = CreateBuildingUnitPersistentLocalIdAssignment(2, null, 15, DateTime.UtcNow.AddDays(2));
+            var p = CreateBuildingUnitPersistentLocalIdAssignment(4, 2, 16, DateTime.UtcNow.AddDays(1));
+            var o2 = CreateBuildingUnitPersistentLocalIdAssignment(4, 1, 16, DateTime.UtcNow.AddDays(2));
+            var q = CreateBuildingUnitPersistentLocalIdAssignment(4, 3, 17, DateTime.UtcNow.AddDays(1));
+            var p2 = CreateBuildingUnitPersistentLocalIdAssignment(4, 2, 17, DateTime.UtcNow.AddDays(2));
+            var r = CreateBuildingUnitPersistentLocalIdAssignment(4, null, 18, DateTime.UtcNow.AddDays(1));
+            var q2 = CreateBuildingUnitPersistentLocalIdAssignment(4, 3, 18, DateTime.UtcNow.AddDays(2));
+            var r2 = CreateBuildingUnitPersistentLocalIdAssignment(4, null, 19, DateTime.UtcNow.AddDays(2));
+
+            var testData = new List<AssignBuildingUnitPersistentLocalIdForCrabTerrainObjectId>
+            {
+                a, b, c, d, e, f, g, h, i, j, k, f2, l, k2, m, l2, n, m2, o, n2, p, o2, q, p2, r, q2, r2
+            };
+
+            var expected = new List<AssignBuildingUnitPersistentLocalIdForCrabTerrainObjectId>
+            {
+                a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r
+            };
+
+            var sut = new DeduplicatedBuildingUnitPersistentLocalIdCollection(testData);
+            sut.Should().BeEquivalentTo(expected);
+        }
+
         private static AssignBuildingUnitPersistentLocalIdForCrabTerrainObjectId CreateBuildingUnitPersistentLocalIdAssignment(
-            int terrainObjectHouseNumberId,
-            int subaddressId,
+            int? terrainObjectHouseNumberId,
+            int? subaddressId,
             int index,
             DateTime assignmentDate)
         {
             return new AssignBuildingUnitPersistentLocalIdForCrabTerrainObjectId(
-                new CrabTerrainObjectHouseNumberId(terrainObjectHouseNumberId),
-                new CrabSubaddressId(subaddressId),
+                terrainObjectHouseNumberId.HasValue ? new CrabTerrainObjectHouseNumberId(terrainObjectHouseNumberId.Value) : null,
+                subaddressId.HasValue ? new CrabSubaddressId(subaddressId.Value) : null,
                 index,
                 new PersistentLocalId(1),
                 new PersistentLocalIdAssignmentDate(Instant.FromDateTimeUtc(assignmentDate)));
