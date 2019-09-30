@@ -79,11 +79,11 @@ namespace BuildingRegistry.Api.Legacy.Building
                 .AsNoTracking()
                 .SingleOrDefaultAsync(item => item.PersistentLocalId == persistentLocalId, cancellationToken);
 
+            if (building != null && building.IsRemoved)
+                throw new ApiException("Gebouw werd verwijderd.", StatusCodes.Status410Gone);
+
             if (building == null || !building.IsComplete)
                 throw new ApiException("Onbestaand gebouw.", StatusCodes.Status404NotFound);
-
-            if (building.IsRemoved)
-                throw new ApiException("Gebouw werd verwijderd.", StatusCodes.Status410Gone);
 
             //TODO: improvement getting buildingunits and parcels in parallel.
             var buildingUnits = await context

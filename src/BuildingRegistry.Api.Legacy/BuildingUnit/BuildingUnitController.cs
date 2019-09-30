@@ -126,11 +126,11 @@ namespace BuildingRegistry.Api.Legacy.BuildingUnit
                 .AsNoTracking()
                 .SingleOrDefaultAsync(item => item.PersistentLocalId == persistentLocalId, cancellationToken);
 
+            if (buildingUnit != null && buildingUnit.IsRemoved)
+                throw new ApiException("Gebouweenheid werd verwijderd.", StatusCodes.Status410Gone);
+
             if (buildingUnit == null || !buildingUnit.IsComplete)
                 throw new ApiException("Onbestaande gebouweenheid.", StatusCodes.Status404NotFound);
-
-            if (buildingUnit.IsRemoved)
-                throw new ApiException("Gebouweenheid werd verwijderd.", StatusCodes.Status410Gone);
 
             var addressIds = buildingUnit.Addresses.Select(x => x.AddressId).ToList();
             var addressPersistentLocalIds = await syndicationContext
