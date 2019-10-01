@@ -22,12 +22,29 @@ namespace BuildingRegistry.Importer
         private readonly string _vbrConnectionString;
         private readonly bool _singleUpdate;
         private readonly Lazy<ILookup<int, AssignPersistentLocalIdForCrabTerrainObjectId>> _osloIdCommands;
+        private readonly List<int> _terrainObjectIdsWhichNeedNewPersistentId;
 
         public CommandGenerator(string vbrConnectionString, bool singleUpdate = false)
         {
             _vbrConnectionString = vbrConnectionString;
             _singleUpdate = singleUpdate;
             _osloIdCommands = new Lazy<ILookup<int, AssignPersistentLocalIdForCrabTerrainObjectId>>(() => GetOsloCommandsToPost().ToLookup(x => (int)x.TerrainObjectId, x => x));
+            _terrainObjectIdsWhichNeedNewPersistentId = GetCorruptedTerrainObjectIdsWhichNeedNewPersistentLocalId();
+        }
+
+        private List<int> GetCorruptedTerrainObjectIdsWhichNeedNewPersistentLocalId()
+        {
+            //Get the terrain object id's of buildings with more than one duplicate of same building unit
+            //These will be processed differently.
+            using (var connection = new SqlConnection(_vbrConnectionString))
+            {
+                return connection.Query<int>(
+                    "select distinct TerreinobjectID from (" +
+                    "select TerreinobjectID, [index] from crab.gebouweenheidmapping " +
+                    "group by TerreinobjectID, [index] " +
+                    "having count(*) > 2" +
+                    ") a").ToList();
+            }
         }
 
         private IEnumerable<AssignPersistentLocalIdForCrabTerrainObjectId> GetOsloCommandsToPost()
@@ -111,9 +128,12 @@ namespace BuildingRegistry.Importer
         {
             var crabCommands = CreateCommandsInOrder(ImportMode.Init, key, from, until);
 
-            crabCommands.Add(!_singleUpdate
-                ? _osloIdCommands.Value[key].Single()
-                : GetOsloCommandsToPost(key).Single());
+            if (_terrainObjectIdsWhichNeedNewPersistentId.Contains(key))
+                crabCommands.Add(new RequestPersistentLocalIdsForCrabTerrainObjectId(new CrabTerrainObjectId(key)));
+            else
+                crabCommands.Add(!_singleUpdate
+                    ? _osloIdCommands.Value[key].Single()
+                    : GetOsloCommandsToPost(key).Single());
 
             return crabCommands;
         }
