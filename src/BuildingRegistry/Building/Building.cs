@@ -426,12 +426,16 @@ namespace BuildingRegistry.Building
                     var activeCommonUnitPersistentLocalId = deduplicatedCollection
                         .Where(x => x.CrabTerrainObjectHouseNumberId == null && x.CrabSubaddressId == null)
                         .OrderByDescending(x => x.Index)
-                        .First();
+                        .FirstOrDefault();
 
-                    ApplyBuildingUnitPersistentLocalIdWithDuplicateCheck(_buildingUnitCollection.ActiveCommonBuildingUnit,
-                        activeCommonUnitPersistentLocalId, deduplicatedCollection);
+                    if (activeCommonUnitPersistentLocalId != null)
+                    {
+                        ApplyBuildingUnitPersistentLocalIdWithDuplicateCheck(_buildingUnitCollection.ActiveCommonBuildingUnit,
+                            activeCommonUnitPersistentLocalId, deduplicatedCollection);
 
-                    usedIds.Add(activeCommonUnitPersistentLocalId);
+                        usedIds.Add(activeCommonUnitPersistentLocalId);
+                    }
+                    //else: old production really has gone to shit...
                 }
 
                 foreach (var activeUnit in _buildingUnitCollection.ActiveBuildingUnits.Where(x => !x.IsCommon))
@@ -439,21 +443,29 @@ namespace BuildingRegistry.Building
                     //check if subaddress is readdressed, query might differ
                     var persistentLocalIdQuery = deduplicatedCollection
                         .Where(x => x.CrabTerrainObjectHouseNumberId != null &&
-                                    x.CrabTerrainObjectHouseNumberId == activeUnit.BuildingUnitKey.HouseNumber.Value);
+                                    x.CrabTerrainObjectHouseNumberId == activeUnit.BuildingUnitKey.HouseNumber.Value)
+                        .ToList();
+
+                    if(!persistentLocalIdQuery.Any())
+                        continue; //shit really hit the fan... (terreinobjectid: 6683870 (see old prod))
 
                     if (_buildingUnitCollection.HasReaddressed(activeUnit.BuildingUnitKey.ToHouseNumberKey()))
                     {
                         persistentLocalIdQuery = persistentLocalIdQuery.Union(deduplicatedCollection.Where(
                             x => x.CrabTerrainObjectHouseNumberId != null &&
-                                 x.CrabTerrainObjectHouseNumberId == _buildingUnitCollection.GetReaddressedKey(activeUnit.BuildingUnitKey.ToHouseNumberKey()).HouseNumber));
+                                 x.CrabTerrainObjectHouseNumberId == _buildingUnitCollection.GetReaddressedKey(activeUnit.BuildingUnitKey.ToHouseNumberKey()).HouseNumber))
+                            .ToList();
                     }
 
                     if (activeUnit.BuildingUnitKey.Subaddress.HasValue)
                         persistentLocalIdQuery = persistentLocalIdQuery.Where(x =>
                             x.CrabSubaddressId != null &&
-                            x.CrabSubaddressId == activeUnit.BuildingUnitKey.Subaddress.Value);
+                            x.CrabSubaddressId == activeUnit.BuildingUnitKey.Subaddress.Value)
+                            .ToList();
                     else
-                        persistentLocalIdQuery = persistentLocalIdQuery.Where(x => x.CrabSubaddressId == null);
+                        persistentLocalIdQuery = persistentLocalIdQuery
+                            .Where(x => x.CrabSubaddressId == null)
+                            .ToList();
 
                     var activeUnitPersistentLocalId = persistentLocalIdQuery
                         .OrderByDescending(x => x.Index)
