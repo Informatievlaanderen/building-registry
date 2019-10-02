@@ -173,6 +173,30 @@ namespace BuildingRegistry.Tests.WhenDeduplicatingBuildingUnitPersistentLocalIds
             sut.Should().BeEquivalentTo(expected);
         }
 
+        [Fact]
+        public void GivenDuplicateIsOnSingleIndex_ThenReturnsExpectedSet()
+        {
+            var a = CreateBuildingUnitPersistentLocalIdAssignment(1, null, 1, DateTime.UtcNow);
+            var b = CreateBuildingUnitPersistentLocalIdAssignment(2, null, 2, DateTime.UtcNow);
+            var c = CreateBuildingUnitPersistentLocalIdAssignment(3, null, 3, DateTime.UtcNow);
+            var c2 = CreateBuildingUnitPersistentLocalIdAssignment(3, null, 4, DateTime.UtcNow.AddDays(1));
+            var d = CreateBuildingUnitPersistentLocalIdAssignment(null, null, 3, DateTime.UtcNow.AddDays(1));
+            var d2 = CreateBuildingUnitPersistentLocalIdAssignment(null, null, 5, DateTime.UtcNow.AddDays(1));
+
+            var testData = new List<AssignBuildingUnitPersistentLocalIdForCrabTerrainObjectId>
+            {
+                a, b, c, d, c2, d2
+            };
+
+            var expected = new List<AssignBuildingUnitPersistentLocalIdForCrabTerrainObjectId>
+            {
+                a, b, c, d
+            };
+
+            var sut = new DeduplicatedBuildingUnitPersistentLocalIdCollection(testData);
+            sut.Should().BeEquivalentTo(expected);
+        }
+
         private static AssignBuildingUnitPersistentLocalIdForCrabTerrainObjectId CreateBuildingUnitPersistentLocalIdAssignment(
             int? terrainObjectHouseNumberId,
             int? subaddressId,
