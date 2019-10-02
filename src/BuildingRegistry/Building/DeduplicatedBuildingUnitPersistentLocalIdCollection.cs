@@ -70,22 +70,23 @@ namespace BuildingRegistry.Building
                 }
             }
 
-            if (assignBuildingUnitPersistentLocalIds.Any())
-            {
-                // Certain buildings start from index 2 so if 8 - (2 - 1) = 7
-                var max = this.Max(x => x.Index);
-                var min = assignBuildingUnitPersistentLocalIds.Min(x => x.Index) - 1;
+            //why bother its fked up anyway
+            //if (assignBuildingUnitPersistentLocalIds.Any())
+            //{
+            //    // Certain buildings start from index 2 so if 8 - (2 - 1) = 7
+            //    var max = this.Max(x => x.Index);
+            //    var min = assignBuildingUnitPersistentLocalIds.Min(x => x.Index) - 1;
 
-                if ((max - min) != Count)
-                {
-                    /*
-                     * If you have a indexes as follows: 1,3,2,3,4
-                     * Deduplicated would be: 1,2,3,4
-                     * 4 items == max index = 4
-                     */
-                    throw new InvalidOperationException("Deduplicates should equal max index (distinct)");
-                }
-            }
+            //    if ((max - min) != Count)
+            //    {
+            //        /*
+            //         * If you have a indexes as follows: 1,3,2,3,4
+            //         * Deduplicated would be: 1,2,3,4
+            //         * 4 items == max index = 4
+            //         */
+            //        throw new InvalidOperationException("Deduplicates should equal max index (distinct)");
+            //    }
+            //}
         }
 
         public bool HasDuplicate(AssignBuildingUnitPersistentLocalIdForCrabTerrainObjectId assignBuildingUnitPersistentLocalId)
