@@ -1,5 +1,6 @@
 namespace BuildingRegistry.Tests.Cases
 {
+    using System;
     using Be.Vlaanderen.Basisregisters.AggregateSource.Testing;
     using Be.Vlaanderen.Basisregisters.Crab;
     using Autofixture;
@@ -7,6 +8,7 @@ namespace BuildingRegistry.Tests.Cases
     using Building.Commands.Crab;
     using Building.Events;
     using NetTopologySuite.IO;
+    using NodaTime;
     using ValueObjects;
     using ValueObjects.Crab;
     using WhenImportingCrabSubaddress;
@@ -146,6 +148,7 @@ namespace BuildingRegistry.Tests.Cases
         public IEventCentricTestSpecificationBuilder ImportSubaddressOnNewHouseNumber()
         {
             var importSubaddressFromCrab = Fixture.Create<ImportSubaddressFromCrab>()
+                .WithTimestamp(new CrabTimestamp(Instant.FromDateTimeOffset(DateTimeOffset.Now.AddDays(1))))
                 .WithSubaddressId(_.SubaddressNr16Bus1Id)
                 .WithHouseNumberId(_.HuisNr18Id)
                 .WithTerrainObjectHouseNumberId(_.HuisNr16KoppelingId);
