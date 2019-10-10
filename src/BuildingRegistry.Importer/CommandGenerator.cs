@@ -193,6 +193,16 @@ namespace BuildingRegistry.Importer
 
                 importTerrainObjectHouseNumberCommands.AddRange(importTerrainObjectHouseNumberFromCrab);
                 importTerrainObjectHouseNumberCommands.AddRange(importTerrainObjectHouseNumberFromCrabHist);
+
+                try
+                {
+                    importTerrainObjectHouseNumberCommands =
+                        CorrectRetiredRelations(importTerrainObjectHouseNumberCommands);
+                }
+                catch
+                {
+                    throw new InvalidOperationException($"{terreinobjectId} terrain object housenumber relations could not be corrected");
+                }
             }
 
             CRABEntities CrabEntitiesFactory() => new CRABEntities();
@@ -309,6 +319,68 @@ namespace BuildingRegistry.Importer
                     commands.Add(command.Item1);
 
             return commands;
+        }
+
+        private List<ImportTerrainObjectHouseNumberFromCrab> CorrectRetiredRelations(IEnumerable<ImportTerrainObjectHouseNumberFromCrab> importTerrainObjectHouseNumberCommands)
+        {
+            //if(!importTerrainObjectHouseNumberCommands.Any())
+            //    return;
+
+            var orderedCommands = importTerrainObjectHouseNumberCommands.OrderBy(x => x.Timestamp).ToList();
+            var activeHouseNumberByRelation = new Dictionary<int, int>();
+
+            var newCommands = new List<ImportTerrainObjectHouseNumberFromCrab>();
+            var skipCommands = new List<ImportTerrainObjectHouseNumberFromCrab>();
+
+            foreach (var importTerrainObjectHouseNumberFromCrab in orderedCommands)
+            {
+                if(skipCommands.Contains(importTerrainObjectHouseNumberFromCrab))
+                    continue;
+
+                var crabTerrainObjectHouseNumberId = importTerrainObjectHouseNumberFromCrab.TerrainObjectHouseNumberId;
+                var houseNumberId = importTerrainObjectHouseNumberFromCrab.HouseNumberId;
+
+                if (activeHouseNumberByRelation.ContainsValue(houseNumberId))
+                {
+                    var terrainObjectHouseNrId = activeHouseNumberByRelation.Single(x => x.Value == houseNumberId).Key;
+                    if (terrainObjectHouseNrId != crabTerrainObjectHouseNumberId &&
+                        importTerrainObjectHouseNumberFromCrab.Modification != CrabModification.Delete &&
+                        !importTerrainObjectHouseNumberFromCrab.Lifetime.EndDateTime.HasValue)
+                    {
+                        var nextCommandForCurrentTerrainObjectHouseNumberFromCrab = orderedCommands.First(x =>
+                            x.TerrainObjectHouseNumberId == terrainObjectHouseNrId &&
+                            (Instant)x.Timestamp > importTerrainObjectHouseNumberFromCrab.Timestamp);
+
+                        var newTimestamp = new CrabTimestamp(((Instant) importTerrainObjectHouseNumberFromCrab.Timestamp).Minus(Duration.FromSeconds(1)));
+
+                        activeHouseNumberByRelation.Remove(nextCommandForCurrentTerrainObjectHouseNumberFromCrab.TerrainObjectHouseNumberId);
+
+                        skipCommands.Add(nextCommandForCurrentTerrainObjectHouseNumberFromCrab);
+                        newCommands.Add(new ImportTerrainObjectHouseNumberFromCrab(
+                            nextCommandForCurrentTerrainObjectHouseNumberFromCrab.TerrainObjectHouseNumberId,
+                            nextCommandForCurrentTerrainObjectHouseNumberFromCrab.TerrainObjectId,
+                            nextCommandForCurrentTerrainObjectHouseNumberFromCrab.HouseNumberId,
+                            nextCommandForCurrentTerrainObjectHouseNumberFromCrab.Lifetime,
+                            newTimestamp,
+                            nextCommandForCurrentTerrainObjectHouseNumberFromCrab.Operator,
+                            nextCommandForCurrentTerrainObjectHouseNumberFromCrab.Modification,
+                            nextCommandForCurrentTerrainObjectHouseNumberFromCrab.Organisation));
+                    }
+                }
+
+                if (!activeHouseNumberByRelation.ContainsKey(crabTerrainObjectHouseNumberId))
+                    activeHouseNumberByRelation.Add(crabTerrainObjectHouseNumberId, houseNumberId);
+                else if (activeHouseNumberByRelation[crabTerrainObjectHouseNumberId] != houseNumberId)
+                    activeHouseNumberByRelation[crabTerrainObjectHouseNumberId] = houseNumberId;
+
+                if (activeHouseNumberByRelation.ContainsKey(crabTerrainObjectHouseNumberId) && (
+                    importTerrainObjectHouseNumberFromCrab.Modification == CrabModification.Delete || importTerrainObjectHouseNumberFromCrab.Lifetime.EndDateTime.HasValue))
+                    activeHouseNumberByRelation.Remove(crabTerrainObjectHouseNumberId);
+
+                newCommands.Add(importTerrainObjectHouseNumberFromCrab);
+            }
+
+            return newCommands;
         }
 
         public string Name => GetType().FullName;

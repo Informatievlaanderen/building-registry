@@ -1,5 +1,6 @@
 namespace BuildingRegistry.Tests.Cases
 {
+    using System;
     using Autofixture;
     using AutoFixture;
     using Be.Vlaanderen.Basisregisters.AggregateSource.Testing;
@@ -7,6 +8,7 @@ namespace BuildingRegistry.Tests.Cases
     using Building.Commands.Crab;
     using Building.Events;
     using NetTopologySuite.IO;
+    using NodaTime;
     using ValueObjects;
     using WhenImportingCrabSubaddress;
     using WhenImportingCrabTerrainObjectHouseNumber;
@@ -148,6 +150,7 @@ namespace BuildingRegistry.Tests.Cases
         public IEventCentricTestSpecificationBuilder ImportNewHouseNumber()
         {
             var importTerrainObjectHouseNumberFromCrab = Fixture.Create<ImportTerrainObjectHouseNumberFromCrab>()
+                .WithTimestamp(new CrabTimestamp(Instant.FromDateTimeOffset(DateTimeOffset.UtcNow.AddDays(1))))
                 .WithTerrainObjectHouseNumberId(_.HuisNr16KoppelingId)
                 .WithHouseNumberId(_.HuisNr18Id); //koppel huisnr 18
 
@@ -165,6 +168,7 @@ namespace BuildingRegistry.Tests.Cases
         public IEventCentricTestSpecificationBuilder ImportSubaddressOnNewHouseNumber()
         {
             var importSubaddressFromCrab = Fixture.Create<ImportSubaddressFromCrab>()
+                .WithTimestamp(new CrabTimestamp(Instant.FromDateTimeOffset(DateTimeOffset.UtcNow.AddDays(1))))
                 .WithSubaddressId(_.SubaddressNr16Bus1Id)
                 .WithHouseNumberId(_.HuisNr18Id)
                 .WithTerrainObjectHouseNumberId(_.HuisNr16KoppelingId);
@@ -231,6 +235,7 @@ namespace BuildingRegistry.Tests.Cases
         public IEventCentricTestSpecificationBuilder PreImportSubaddressOnNewHouseNumber()
         {
             var importSubaddressFromCrab = Fixture.Create<ImportSubaddressFromCrab>()
+                .WithTimestamp(new CrabTimestamp(Instant.FromDateTimeOffset(DateTimeOffset.UtcNow.AddDays(1))))
                 .WithSubaddressId(_.SubaddressNr16Bus1Id)
                 .WithHouseNumberId(_.HuisNr18Id)
                 .WithTerrainObjectHouseNumberId(_.HuisNr16KoppelingId);
@@ -245,6 +250,7 @@ namespace BuildingRegistry.Tests.Cases
         public IEventCentricTestSpecificationBuilder PreImportSubaddress2OnNewHouseNumber()
         {
             var importSubaddressFromCrab = Fixture.Create<ImportSubaddressFromCrab>()
+                .WithTimestamp(new CrabTimestamp(Instant.FromDateTimeOffset(DateTimeOffset.UtcNow.AddDays(1))))
                 .WithSubaddressId(_.SubaddressNr16Bus2Id)
                 .WithHouseNumberId(_.HuisNr18Id)
                 .WithTerrainObjectHouseNumberId(_.HuisNr16KoppelingId);
@@ -259,6 +265,7 @@ namespace BuildingRegistry.Tests.Cases
         public IEventCentricTestSpecificationBuilder ImportNewHouseNumberWithPreImportedSubaddresses()
         {
             var importTerrainObjectHouseNumberFromCrab = Fixture.Create<ImportTerrainObjectHouseNumberFromCrab>()
+                .WithTimestamp(new CrabTimestamp(Instant.FromDateTimeOffset(DateTimeOffset.UtcNow.AddDays(1))))
                 .WithTerrainObjectHouseNumberId(_.HuisNr16KoppelingId)
                 .WithHouseNumberId(_.HuisNr18Id); //koppel huisnr 18
 

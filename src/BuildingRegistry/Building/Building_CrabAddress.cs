@@ -103,6 +103,16 @@ namespace BuildingRegistry.Building
                             new CrabLifetime(importedSubaddress.BeginDateTime, importedSubaddress.EndDateTime),
                             timestamp,
                             importedSubaddress.Modification);
+
+                        var subaddressLaterImported = _legacySubaddressEventsByTerreinObjectHouseNumber.Values
+                            .SelectMany(x => x)
+                            .Any(x =>
+                                x.Timestamp > importedSubaddress.Timestamp &&
+                                x.SubaddressId == importedSubaddress.SubaddressId);
+
+                        var buildingUnitKeySubaddress = BuildingUnitKey.Create(terrainObjectId, terrainObjectHouseNumberId, new CrabSubaddressId(importedSubaddress.SubaddressId));
+                        if (subaddressLaterImported)
+                            RemoveBuildingUnit(buildingUnitKeySubaddress, timestamp);
                     }
 
                     addedBuildingUnit.ApplyStatusChange((AddressHouseNumberStatusWasImportedFromCrab)null);
@@ -598,8 +608,7 @@ namespace BuildingRegistry.Building
             CrabTimestamp timestamp,
             bool isRetired)
         {
-            if (!_buildingUnitCollection.HasActiveUnitByKey(buildingUnitKey) &&
-                !_buildingUnitCollection.IsAddressLinkedToCommonBuildingUnit(addressId))
+            if (!_buildingUnitCollection.HasActiveUnitByKey(buildingUnitKey))
             {
                 var buildingUnitId = _buildingUnitCollection.GetNextBuildingUnitIdFor(buildingUnitKey, true);
 
