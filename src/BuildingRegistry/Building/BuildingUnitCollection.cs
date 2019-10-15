@@ -20,8 +20,11 @@ namespace BuildingRegistry.Building
         public bool HasBeenReaddressed(BuildingUnitKey buildingUnitKey)
             => _readdressedKeys.ContainsValue(buildingUnitKey);
 
-        public BuildingUnitKey GetReaddressedKey(BuildingUnitKey buildingUnitKey)
+        public BuildingUnitKey GetNewReaddressedKeyByUnitKey(BuildingUnitKey buildingUnitKey)
             => _readdressedKeys[buildingUnitKey];
+
+        public BuildingUnitKey GetOldReaddressedKeyByUnitKey(BuildingUnitKey buildingUnitKey)
+            => _readdressedKeys.Single(x => x.Value == buildingUnitKey).Key;
 
         public bool HasReaddressed(BuildingUnitKey buildingUnitKey)
             => _readdressedKeys.ContainsKey(buildingUnitKey);

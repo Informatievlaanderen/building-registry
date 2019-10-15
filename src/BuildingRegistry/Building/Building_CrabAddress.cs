@@ -522,8 +522,12 @@ namespace BuildingRegistry.Building
         {
             foreach (var activeBuildingUnit in _buildingUnitCollection.GetActiveBuildingUnitsByKeyAndChildKeys(buildingUnitKey).OrderByDescending(x => x.BuildingUnitKey.Subaddress.HasValue))
             {
+                var keyToMoveAddressFrom = activeBuildingUnit.BuildingUnitKey;
+                if (_buildingUnitCollection.HasBeenReaddressed(activeBuildingUnit.BuildingUnitKey))
+                    keyToMoveAddressFrom = _buildingUnitCollection.GetOldReaddressedKeyByUnitKey(activeBuildingUnit.BuildingUnitKey);
+
                 activeBuildingUnit.ApplyRemove();
-                ApplyAddressMoveFromCommonIfNeeded(activeBuildingUnit.BuildingUnitKey, new BuildingUnitVersion(timestamp), !buildingUnitKey.Subaddress.HasValue);
+                ApplyAddressMoveFromCommonIfNeeded(keyToMoveAddressFrom, new BuildingUnitVersion(timestamp), !buildingUnitKey.Subaddress.HasValue);
                 ApplyCommonBuildingUnitRemoveIfNeeded();
             }
 
@@ -585,8 +589,8 @@ namespace BuildingRegistry.Building
 
             if (unit != null && _buildingUnitCollection.HasReaddressed(buildingUnitKey))
             {
-                var readdressedToKey = _buildingUnitCollection.GetReaddressedKey(buildingUnitKey);
-                var readdressedEvent = _readdressedHouseNumbers[unit.BuildingUnitKey];
+                var readdressedToKey = _buildingUnitCollection.GetNewReaddressedKeyByUnitKey(buildingUnitKey);
+                var readdressedEvent = _readdressedHouseNumbers[readdressedToKey];
                 if (readdressedToKey?.HouseNumber != unit.BuildingUnitKey.HouseNumber || (readdressedToKey.HouseNumber == unit.BuildingUnitKey.HouseNumber && houseNumberId == readdressedEvent.NewHouseNumberId))
                     return;
             }

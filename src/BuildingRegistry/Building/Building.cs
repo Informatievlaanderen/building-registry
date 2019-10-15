@@ -453,7 +453,7 @@ namespace BuildingRegistry.Building
                     {
                         persistentLocalIdQuery = persistentLocalIdQuery.Union(deduplicatedCollection.Where(
                             x => x.CrabTerrainObjectHouseNumberId != null &&
-                                 x.CrabTerrainObjectHouseNumberId == _buildingUnitCollection.GetReaddressedKey(activeUnit.BuildingUnitKey.ToHouseNumberKey()).HouseNumber))
+                                 x.CrabTerrainObjectHouseNumberId == _buildingUnitCollection.GetNewReaddressedKeyByUnitKey(activeUnit.BuildingUnitKey.ToHouseNumberKey()).HouseNumber))
                             .ToList();
                     }
 
