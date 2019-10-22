@@ -95,6 +95,17 @@ namespace BuildingRegistry.Building
                             .OrderBy(x => x.Timestamp)
                             .Last();
 
+                        var addressIdForSubaddress = AddressId.CreateFor(new CrabSubaddressId(importedSubaddress.SubaddressId));
+                        var subaddressLaterImported = _legacySubaddressEventsByTerreinObjectHouseNumber.Values
+                            .SelectMany(x => x)
+                            .Any(x =>
+                                x.Timestamp > importedSubaddress.Timestamp &&
+                                x.SubaddressId == importedSubaddress.SubaddressId);
+
+                        var buildingUnitKeySubaddress = BuildingUnitKey.Create(terrainObjectId, terrainObjectHouseNumberId, new CrabSubaddressId(importedSubaddress.SubaddressId));
+                        if (subaddressLaterImported && _buildingUnitCollection.ActiveBuildingUnits.Any(x => x.AddressIds.Contains(addressIdForSubaddress)))
+                            continue;
+
                         ImportSubaddressFromCrab(
                             new CrabTerrainObjectId(importedSubaddress.TerrainObjectId),
                             new CrabTerrainObjectHouseNumberId(importedSubaddress.TerrainObjectHouseNumberId),
@@ -103,16 +114,6 @@ namespace BuildingRegistry.Building
                             new CrabLifetime(importedSubaddress.BeginDateTime, importedSubaddress.EndDateTime),
                             timestamp,
                             importedSubaddress.Modification);
-
-                        var subaddressLaterImported = _legacySubaddressEventsByTerreinObjectHouseNumber.Values
-                            .SelectMany(x => x)
-                            .Any(x =>
-                                x.Timestamp > importedSubaddress.Timestamp &&
-                                x.SubaddressId == importedSubaddress.SubaddressId);
-
-                        var buildingUnitKeySubaddress = BuildingUnitKey.Create(terrainObjectId, terrainObjectHouseNumberId, new CrabSubaddressId(importedSubaddress.SubaddressId));
-                        if (subaddressLaterImported)
-                            RemoveBuildingUnit(buildingUnitKeySubaddress, timestamp);
                     }
 
                     addedBuildingUnit.ApplyStatusChange((AddressHouseNumberStatusWasImportedFromCrab)null);

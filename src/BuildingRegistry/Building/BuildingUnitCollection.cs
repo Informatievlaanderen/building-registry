@@ -191,7 +191,11 @@ namespace BuildingRegistry.Building
 
             if (buildingUnitKey.HouseNumber.HasValue)
             {
-                if ((_allBuildingUnitsByKey.ContainsKey(buildingUnitKey) && _allBuildingUnitsByKey[buildingUnitKey].Any(x => x.IsRemoved) && !canBeDeleted))
+                if ((_allBuildingUnitsByKey.ContainsKey(buildingUnitKey)
+                     && _allBuildingUnitsByKey[buildingUnitKey].Any(x => x.IsRemoved)
+                     && !canBeDeleted
+                     && ActiveBuildingUnits.Where(x => x.BuildingUnitKey.HouseNumber.HasValue)
+                                            .All(x => x.BuildingUnitKey.ToHouseNumberKey() != buildingUnitKey.ToHouseNumberKey())))
                     throw new InvalidOperationException("Cannot get next building unit id for removed building unit");
 
                 var version = 1;

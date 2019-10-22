@@ -446,9 +446,6 @@ namespace BuildingRegistry.Building
                                     x.CrabTerrainObjectHouseNumberId == activeUnit.BuildingUnitKey.HouseNumber.Value)
                         .ToList();
 
-                    if(!persistentLocalIdQuery.Any())
-                        continue; //shit really hit the fan... (terreinobjectid: 6683870 (see old prod))
-
                     if (_buildingUnitCollection.HasReaddressed(activeUnit.BuildingUnitKey.ToHouseNumberKey()))
                     {
                         persistentLocalIdQuery = persistentLocalIdQuery.Union(deduplicatedCollection.Where(
@@ -457,17 +454,30 @@ namespace BuildingRegistry.Building
                             .ToList();
                     }
 
+                    if (!persistentLocalIdQuery.Any())
+                        continue; //shit really hit the fan... (terreinobjectid: 6683870 (see old prod))
+
+                    var filtered = persistentLocalIdQuery;
                     if (activeUnit.BuildingUnitKey.Subaddress.HasValue)
-                        persistentLocalIdQuery = persistentLocalIdQuery.Where(x =>
-                            x.CrabSubaddressId != null &&
-                            x.CrabSubaddressId == activeUnit.BuildingUnitKey.Subaddress.Value)
+                    {
+                        filtered = persistentLocalIdQuery.Where(x =>
+                                x.CrabSubaddressId != null &&
+                                x.CrabSubaddressId == activeUnit.BuildingUnitKey.Subaddress.Value)
                             .ToList();
+
+                        if(_buildingUnitCollection.HasReaddressed(activeUnit.BuildingUnitKey))
+                            filtered = filtered.Union(persistentLocalIdQuery.Where(x =>
+                                        x.CrabSubaddressId != null &&
+                                        x.CrabSubaddressId == _buildingUnitCollection.GetNewReaddressedKeyByUnitKey(activeUnit.BuildingUnitKey).Subaddress)
+                                    .ToList())
+                                .ToList();
+                    }
                     else
-                        persistentLocalIdQuery = persistentLocalIdQuery
+                        filtered = persistentLocalIdQuery
                             .Where(x => x.CrabSubaddressId == null)
                             .ToList();
 
-                    var activeUnitPersistentLocalId = persistentLocalIdQuery
+                    var activeUnitPersistentLocalId = filtered
                         .OrderByDescending(x => x.Index)
                         .FirstOrDefault();
 
