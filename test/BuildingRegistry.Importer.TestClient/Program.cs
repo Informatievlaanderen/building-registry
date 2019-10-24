@@ -36,7 +36,7 @@ namespace BuildingRegistry.Importer.TestClient
 
                 if (!Enum.TryParse(context.Request.QueryString.GetValues("mode")?.FirstOrDefault(), true, out ImportMode mode))
                     mode = ImportMode.Init;
-                
+
                 try
                 {
                     if (string.IsNullOrEmpty(idAsString))
@@ -49,7 +49,7 @@ namespace BuildingRegistry.Importer.TestClient
                     var generator = new CommandGenerator(VbrConnectionString, true);
                     var settings = new SettingsBasedConfig();
                     var fromDate = DateTime.MinValue;
-                    
+
                     if (mode == ImportMode.Update && !DateTime.TryParse(fromAsString, out fromDate))
                     {
                         WriteErrorResponse(context.Response,
@@ -109,9 +109,9 @@ namespace BuildingRegistry.Importer.TestClient
             using (var connection = new SqlConnection(EventsConnectionString))
             {
                 return connection.QueryFirstOrDefault<string>(@"
-select JSON_VALUE(JsonData, '$.osloId') as osloid from buildingregistry.Messages m
+select JSON_VALUE(JsonData, '$.persistentLocalId') as osloid from buildingregistry.Messages m
 inner join BuildingRegistry.Streams s on m.StreamIdInternal = s.IdInternal
-where s.IdOriginal = @streamId AND [Type] = 'BuildingOsloIdWasAssigned'",
+where s.IdOriginal = @streamId AND [Type] = 'BuildingPersistentLocalIdentifierWasAssigned'",
                     new { streamId });
             }
         }
