@@ -239,7 +239,7 @@ namespace BuildingRegistry.Api.Legacy.Building.Responses
         /// De identificator van de gebouweenheid.
         /// </summary>
         [DataMember(Name = "Identificator", Order = 2)]
-        public GebouwEenheidIdentificator Identificator { get; set; }
+        public GebouweenheidIdentificator Identificator { get; set; }
 
         /// <summary>
         /// De fase in het leven van de gebouweenheid.
@@ -290,7 +290,7 @@ namespace BuildingRegistry.Api.Legacy.Building.Responses
             bool isComplete)
         {
             BuildingUnitId = buildingUnitId;
-            Identificator = new GebouwEenheidIdentificator(naamruimte, persistentLocalId.HasValue ? persistentLocalId.ToString() : string.Empty, version);
+            Identificator = new GebouweenheidIdentificator(naamruimte, persistentLocalId.HasValue ? persistentLocalId.ToString() : string.Empty, version);
             Status = status;
             GeometryMethod = geometryMethod;
             Geometry = geometry == null ? null : new SyndicationPoint { XmlPoint = geometry };
