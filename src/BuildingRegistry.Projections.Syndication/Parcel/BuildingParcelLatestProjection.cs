@@ -30,7 +30,7 @@ namespace BuildingRegistry.Projections.Syndication.Parcel
                 latestItem = new BuildingParcelLatestItem
                 {
                     ParcelId = entry.Content.Object.ParcelId,
-                    Version = entry.Content.Object.Identificator?.Versie.Value,
+                    Version = entry.Content.Object.Identificator?.Versie,
                     Position = long.Parse(entry.FeedEntry.Id),
                     CaPaKey = entry.Content.Object.Identificator?.ObjectId,
                     IsComplete = entry.Content.Object.IsComplete,
@@ -43,7 +43,7 @@ namespace BuildingRegistry.Projections.Syndication.Parcel
             }
             else
             {
-                latestItem.Version = entry.Content.Object.Identificator?.Versie.Value;
+                latestItem.Version = entry.Content.Object.Identificator?.Versie;
                 latestItem.Position = long.Parse(entry.FeedEntry.Id);
                 latestItem.CaPaKey = entry.Content.Object.Identificator?.ObjectId;
                 latestItem.IsComplete = entry.Content.Object.IsComplete;
@@ -57,7 +57,7 @@ namespace BuildingRegistry.Projections.Syndication.Parcel
                 .BuildingParcelLatestItems
                 .FindAsync(entry.Content.Object.ParcelId);
 
-            latestItem.Version = entry.Content.Object.Identificator?.Versie.Value;
+            latestItem.Version = entry.Content.Object.Identificator?.Versie;
             latestItem.Position = long.Parse(entry.FeedEntry.Id);
             latestItem.CaPaKey = entry.Content.Object.Identificator?.ObjectId;
             latestItem.IsComplete = entry.Content.Object.IsComplete;
