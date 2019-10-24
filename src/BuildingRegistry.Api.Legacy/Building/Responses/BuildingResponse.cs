@@ -19,7 +19,7 @@ namespace BuildingRegistry.Api.Legacy.Building.Responses
         /// De identificator van het gebouw.
         /// </summary>
         [DataMember(Name = "Identificator", Order = 1)]
-        public Identificator Identificator { get; set; }
+        public GebouwIdentificator Identificator { get; set; }
 
         /// <summary>
         /// the building geometry (a simple polygon with Lambert-72 coordinates)
@@ -61,7 +61,7 @@ namespace BuildingRegistry.Api.Legacy.Building.Responses
             List<GebouwDetailGebouweenheid> buildingUnits,
             List<GebouwDetailPerceel> parcels)
         {
-            Identificator = new Identificator(naamruimte, persistentLocalId.ToString(), version);
+            Identificator = new GebouwIdentificator(naamruimte, persistentLocalId.ToString(), version);
             Polygon = geometry;
             GeometryMethod = geometryMethod;
             Status = status;

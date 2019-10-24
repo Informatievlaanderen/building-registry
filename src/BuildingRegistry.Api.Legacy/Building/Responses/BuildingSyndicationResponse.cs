@@ -163,7 +163,7 @@ namespace BuildingRegistry.Api.Legacy.Building.Responses
         /// De identificator van het gebouw.
         /// </summary>
         [DataMember(Name = "Identificator", Order = 2)]
-        public Identificator Identificator { get; set; }
+        public GebouwIdentificator Identificator { get; set; }
 
         /// <summary>
         /// De fase in het leven van het gebouw.
@@ -215,7 +215,7 @@ namespace BuildingRegistry.Api.Legacy.Building.Responses
             List<BuildingUnitSyndicationContent> buildingUnits)
         {
             BuildingId = buildingId;
-            Identificator = new Identificator(naamruimte, persistentLocalId.HasValue ? persistentLocalId.ToString() : string.Empty, version);
+            Identificator = new GebouwIdentificator(naamruimte, persistentLocalId.HasValue ? persistentLocalId.ToString() : string.Empty, version);
             Status = status;
             GeometryMethod = geometryMethod;
             Geometry = geometry == null ? null : new SyndicationPolygon { XmlPolygon = geometry };
@@ -239,7 +239,7 @@ namespace BuildingRegistry.Api.Legacy.Building.Responses
         /// De identificator van de gebouweenheid.
         /// </summary>
         [DataMember(Name = "Identificator", Order = 2)]
-        public Identificator Identificator { get; set; }
+        public GebouwEenheidIdentificator Identificator { get; set; }
 
         /// <summary>
         /// De fase in het leven van de gebouweenheid.
@@ -290,7 +290,7 @@ namespace BuildingRegistry.Api.Legacy.Building.Responses
             bool isComplete)
         {
             BuildingUnitId = buildingUnitId;
-            Identificator = new Identificator(naamruimte, persistentLocalId.HasValue ? persistentLocalId.ToString() : string.Empty, version);
+            Identificator = new GebouwEenheidIdentificator(naamruimte, persistentLocalId.HasValue ? persistentLocalId.ToString() : string.Empty, version);
             Status = status;
             GeometryMethod = geometryMethod;
             Geometry = geometry == null ? null : new SyndicationPoint { XmlPoint = geometry };

@@ -19,7 +19,7 @@ namespace BuildingRegistry.Api.Legacy.BuildingUnit.Responses
         /// De identificator van de gebouweenheid.
         /// </summary>
         [DataMember(Name = "Identificator", Order = 1)]
-        public Identificator Identificator { get; set; }
+        public GebouwEenheidIdentificator Identificator { get; set; }
 
         /// <summary>
         /// The building unit geometry (a point with Lambert-72 coordinates)
@@ -72,7 +72,7 @@ namespace BuildingRegistry.Api.Legacy.BuildingUnit.Responses
             GebouweenheidDetailGebouw building,
             List<GebouweenheidDetailAdres> addresses)
         {
-            Identificator = new Identificator(naamruimte, persistentLocalId.ToString(), version);
+            Identificator = new GebouwEenheidIdentificator(naamruimte, persistentLocalId.ToString(), version);
             Geometry = geometry;
             GeometryMethod = geometryMethod;
             Status = status;
