@@ -1,3 +1,11 @@
+## [1.13.10](https://github.com/informatievlaanderen/building-registry/compare/v1.13.9...v1.13.10) (2019-10-24)
+
+
+### Bug Fixes
+
+* push to correct repo ([8301bf1](https://github.com/informatievlaanderen/building-registry/commit/8301bf1))
+* upgrade grar common ([686b16b](https://github.com/informatievlaanderen/building-registry/commit/686b16b))
+
 ## [1.13.9](https://github.com/informatievlaanderen/building-registry/compare/v1.13.8...v1.13.9) (2019-10-10)
 
 
