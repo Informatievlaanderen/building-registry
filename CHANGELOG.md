@@ -1,3 +1,10 @@
+## [1.13.12](https://github.com/informatievlaanderen/building-registry/compare/v1.13.11...v1.13.12) (2019-10-25)
+
+
+### Bug Fixes
+
+* map point and function in response ([203c879](https://github.com/informatievlaanderen/building-registry/commit/203c879))
+
 ## [1.13.11](https://github.com/informatievlaanderen/building-registry/compare/v1.13.10...v1.13.11) (2019-10-24)
 
 
