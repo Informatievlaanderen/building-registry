@@ -25,8 +25,6 @@ namespace BuildingRegistry.Api.Legacy.BuildingUnit.Responses
         /// The building unit geometry (a point with Lambert-72 coordinates)
         /// </summary>
         [DataMember(Name = "GeometriePunt", Order = 2)]
-        public Point Point { get; set; }
-
         public Point Geometry { get; }
 
         /// <summary>
@@ -47,8 +45,6 @@ namespace BuildingRegistry.Api.Legacy.BuildingUnit.Responses
         [DataMember(Name = "Functie", Order = 5)]
         public GebouweenheidFunctie? Function { get; set; }
 
-        public GebouweenheidFunctie? Functie { get; }
-
         /// <summary>
         /// building wherein the building unit resides
         /// </summary>
@@ -68,7 +64,7 @@ namespace BuildingRegistry.Api.Legacy.BuildingUnit.Responses
             Point geometry,
             PositieGeometrieMethode geometryMethod,
             GebouweenheidStatus status,
-            GebouweenheidFunctie? functie,
+            GebouweenheidFunctie? function,
             GebouweenheidDetailGebouw building,
             List<GebouweenheidDetailAdres> addresses)
         {
@@ -76,7 +72,7 @@ namespace BuildingRegistry.Api.Legacy.BuildingUnit.Responses
             Geometry = geometry;
             GeometryMethod = geometryMethod;
             Status = status;
-            Functie = functie;
+            Function = function;
             Building = building;
             Addresses = addresses;
         }
@@ -99,7 +95,7 @@ namespace BuildingRegistry.Api.Legacy.BuildingUnit.Responses
                     JsonPoint = new GeoJSONPoint
                     {
                         Type = "point",
-                        Coordinates = new double[] { 140252.76, 198794.27 }
+                        Coordinates = new[] { 140252.76, 198794.27 }
                     },
                     XmlPoint = new GmlPoint
                     {
