@@ -25,16 +25,16 @@ namespace BuildingRegistry.Api.Legacy.BuildingUnit.Responses
         /// The building unit geometry (a point with Lambert-72 coordinates)
         /// </summary>
         [DataMember(Name = "GeometriePunt", Order = 2)]
-        public Point Geometry { get; }
+        public Point Geometry { get; set; }
 
         /// <summary>
-        /// the method used to provide the position
+        /// De gebruikte methode om de positie te bepalen.
         /// </summary>
         [DataMember(Name = "PositieGeometrieMethode", Order = 3)]
         public PositieGeometrieMethode GeometryMethod { get; set; }
 
         /// <summary>
-        /// the current phase in the lifecycle of the building unit
+        /// De fase in het leven van een gebouweenheid.
         /// </summary>
         [DataMember(Name = "GebouweenheidStatus", Order = 4)]
         public GebouweenheidStatus Status { get; set; }
@@ -52,7 +52,7 @@ namespace BuildingRegistry.Api.Legacy.BuildingUnit.Responses
         public GebouweenheidDetailGebouw Building { get; set; }
 
         /// <summary>
-        /// a collection of addresses that are coupled to the building unit
+        /// De aan de gebouweenheid gelinkte adressen.
         /// </summary>
         [DataMember(Name = "Adressen", Order = 7)]
         public List<GebouweenheidDetailAdres> Addresses { get; set; }
