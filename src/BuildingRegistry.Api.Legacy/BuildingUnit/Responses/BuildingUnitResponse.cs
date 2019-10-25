@@ -27,8 +27,6 @@ namespace BuildingRegistry.Api.Legacy.BuildingUnit.Responses
         [DataMember(Name = "GeometriePunt", Order = 2)]
         public Point Point { get; set; }
 
-        public Point Geometry { get; }
-
         /// <summary>
         /// the method used to provide the position
         /// </summary>
@@ -46,8 +44,6 @@ namespace BuildingRegistry.Api.Legacy.BuildingUnit.Responses
         /// </summary>
         [DataMember(Name = "Functie", Order = 5)]
         public GebouweenheidFunctie? Function { get; set; }
-
-        public GebouweenheidFunctie? Functie { get; }
 
         /// <summary>
         /// building wherein the building unit resides
@@ -73,10 +69,10 @@ namespace BuildingRegistry.Api.Legacy.BuildingUnit.Responses
             List<GebouweenheidDetailAdres> addresses)
         {
             Identificator = new Identificator(naamruimte, persistentLocalId.ToString(), version);
-            Geometry = geometry;
+            Point = geometry;
             GeometryMethod = geometryMethod;
             Status = status;
-            Functie = functie;
+            Function = functie;
             Building = building;
             Addresses = addresses;
         }
