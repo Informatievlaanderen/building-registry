@@ -101,7 +101,8 @@ namespace BuildingRegistry.Tests.WhenImportingCrabBuildingGeometry
             Assert(new Scenario()
                 .Given(_fixture.Create<BuildingId>(),
                     _fixture.Create<BuildingWasRegistered>(),
-                    _fixture.Create<BuildingWasMeasuredByGrb>())
+                    _fixture.Create<BuildingWasMeasuredByGrb>()
+                        .WithGeometry(new WkbGeometry(GeometryHelper.ValidPolygon.AsBinary())))
                 .When(importStatus)
                 .Then(_fixture.Create<BuildingId>(),
                     new BuildingWasMeasuredByGrb(_fixture.Create<BuildingId>(), GeometryHelper.CreateEwkbFrom(importStatus.BuildingGeometry)),
@@ -118,7 +119,8 @@ namespace BuildingRegistry.Tests.WhenImportingCrabBuildingGeometry
             Assert(new Scenario()
                 .Given(_fixture.Create<BuildingId>(),
                     _fixture.Create<BuildingWasRegistered>(),
-                    _fixture.Create<BuildingWasMeasuredByGrb>())
+                    _fixture.Create<BuildingWasMeasuredByGrb>()
+                        .WithGeometry(new WkbGeometry(GeometryHelper.ValidPolygon.AsBinary())))
                 .When(importStatus)
                 .Then(_fixture.Create<BuildingId>(),
                     new BuildingGeometryWasRemoved(_fixture.Create<BuildingId>()),
@@ -154,7 +156,8 @@ namespace BuildingRegistry.Tests.WhenImportingCrabBuildingGeometry
             Assert(new Scenario()
                 .Given(_fixture.Create<BuildingId>(),
                     _fixture.Create<BuildingWasRegistered>(),
-                    _fixture.Create<BuildingWasMeasuredByGrb>())
+                    _fixture.Create<BuildingWasMeasuredByGrb>()
+                        .WithGeometry(new WkbGeometry(GeometryHelper.ValidPolygon.AsBinary())))
                 .When(importStatus)
                 .Then(_fixture.Create<BuildingId>(),
                     new BuildingGeometryWasRemoved(_fixture.Create<BuildingId>()),
@@ -198,16 +201,19 @@ namespace BuildingRegistry.Tests.WhenImportingCrabBuildingGeometry
         public void WhenMeasuredWithGeometryMethodIsOutlinedAndNewerLifetime()
         {
             var importedStatus = _fixture.Create<ImportBuildingGeometryFromCrab>()
-                .WithGeometryMethod(CrabBuildingGeometryMethod.Survey);
+                .WithGeometryMethod(CrabBuildingGeometryMethod.Survey)
+                .WithGeometry(new WkbGeometry(GeometryHelper.ValidPolygon.AsBinary()));
 
             var importStatus = _fixture.Create<ImportBuildingGeometryFromCrab>()
                 .WithGeometryMethod(CrabBuildingGeometryMethod.Outlined)
+                .WithGeometry(new WkbGeometry(GeometryHelper.ValidPolygon.AsBinary()))
                 .WithLifetime(new CrabLifetime(importedStatus.Lifetime.BeginDateTime.Value.PlusDays(1), null));
 
             Assert(new Scenario()
                 .Given(_fixture.Create<BuildingId>(),
                     _fixture.Create<BuildingWasRegistered>(),
-                    _fixture.Create<BuildingWasMeasuredByGrb>(),
+                    _fixture.Create<BuildingWasMeasuredByGrb>()
+                        .WithGeometry(new WkbGeometry(GeometryHelper.ValidPolygon.AsBinary())),
                     importedStatus.ToLegacyEvent())
                 .When(importStatus)
                 .Then(_fixture.Create<BuildingId>(),
@@ -241,7 +247,8 @@ namespace BuildingRegistry.Tests.WhenImportingCrabBuildingGeometry
         [Fact]
         public void WhenMeasuredAndRemovedWithGeometryMethodIsOutlinedAndSameLifetime()
         {
-            var buildingWasMeasured = _fixture.Create<BuildingWasMeasuredByGrb>();
+            var buildingWasMeasured = _fixture.Create<BuildingWasMeasuredByGrb>()
+                .WithGeometry(new WkbGeometry(GeometryHelper.ValidPolygon.AsBinary()));
             var importedGeometry = _fixture.Create<ImportBuildingGeometryFromCrab>()
                 .WithGeometryMethod(CrabBuildingGeometryMethod.Survey)
                 .WithGeometry(new WkbGeometry(buildingWasMeasured.ExtendedWkb));

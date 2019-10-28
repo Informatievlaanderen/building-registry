@@ -31,7 +31,7 @@ namespace BuildingRegistry.ValueObjects
         private ExtendedWkbGeometry CleanUpGeometryCollection(ExtendedWkbGeometry geometry)
         {
             var buildingGeometry = _wkbReader.Read(geometry);
-            if (buildingGeometry is GeometryCollection gc)
+            if (buildingGeometry is GeometryCollection gc && buildingGeometry.OgcGeometryType != OgcGeometryType.MultiPolygon)
             {
                 var polygon = gc.Single(x => x is Polygon);
                 return new ExtendedWkbGeometry(polygon.AsBinary());

@@ -471,6 +471,10 @@ namespace BuildingRegistry.Building
                                         x.CrabSubaddressId == _buildingUnitCollection.GetNewReaddressedKeyByUnitKey(activeUnit.BuildingUnitKey).Subaddress)
                                     .ToList())
                                 .ToList();
+
+                        if (!filtered.Any()) // terreinobjectid: 9041275
+                            filtered = deduplicatedCollection.Where(x => x.CrabSubaddressId != null && x.CrabSubaddressId == activeUnit.BuildingUnitKey.Subaddress.Value)
+                                .ToList();
                     }
                     else
                         filtered = persistentLocalIdQuery

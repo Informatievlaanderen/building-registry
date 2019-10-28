@@ -131,20 +131,20 @@ namespace BuildingRegistry.Building
                 organisation));
         }
 
-        private void ImportHouseNumberBuffer(BuildingUnitKey buildingUnitKey, CrabHouseNumberId houseNumberId)
+        private void ImportHouseNumberBuffer(BuildingUnitKey buildingUnitKey, AddressId addressId)
         {
             var addedBuildingUnit = _buildingUnitCollection.GetActiveOrLastRetiredByKey(buildingUnitKey);
-            if (_legacyHouseNumberPositionEventsByHouseNumberId.ContainsKey(houseNumberId))
+            if (_legacyHouseNumberPositionEventsByHouseNumberId.ContainsKey(addressId))
             {
-                foreach (var addressHouseNumberPositionWasImportedFromCrab in _legacyHouseNumberPositionEventsByHouseNumberId[houseNumberId])
+                foreach (var addressHouseNumberPositionWasImportedFromCrab in _legacyHouseNumberPositionEventsByHouseNumberId[addressId])
                     addedBuildingUnit.Route(addressHouseNumberPositionWasImportedFromCrab);
 
                 addedBuildingUnit.ApplyPositionChange((AddressHouseNumberPositionWasImportedFromCrab)null, false);
             }
 
-            if (_legacyHouseNumberStatusEventsByHouseNumberId.ContainsKey(houseNumberId))
+            if (_legacyHouseNumberStatusEventsByHouseNumberId.ContainsKey(addressId))
             {
-                foreach (var addressHouseNumberStatusWasImportedFromCrab in _legacyHouseNumberStatusEventsByHouseNumberId[houseNumberId])
+                foreach (var addressHouseNumberStatusWasImportedFromCrab in _legacyHouseNumberStatusEventsByHouseNumberId[addressId])
                     addedBuildingUnit.Route(addressHouseNumberStatusWasImportedFromCrab);
 
                 addedBuildingUnit.ApplyStatusChange((AddressHouseNumberStatusWasImportedFromCrab)null);
@@ -315,20 +315,10 @@ namespace BuildingRegistry.Building
             var subaddressId = new CrabSubaddressId(buildingUnitKey.Subaddress.Value);
             var buildingUnit = _buildingUnitCollection.GetActiveOrLastRetiredByKey(buildingUnitKey);
             if (_legacySubaddressPositionEventsBySubadresId.ContainsKey(subaddressId))
-            {
-                foreach (var addressSubaddressPositionWasImportedFromCrab in _legacySubaddressPositionEventsBySubadresId[subaddressId])
-                    buildingUnit.Route(addressSubaddressPositionWasImportedFromCrab);
-
                 buildingUnit.ApplyPositionChange((AddressSubaddressPositionWasImportedFromCrab)null, false);
-            }
 
             if (_legacySubaddressStatusEventsBySubadresId.ContainsKey(subaddressId))
-            {
-                foreach (var addressSubadressStatusWasImportedFromCrab in _legacySubaddressStatusEventsBySubadresId[subaddressId])
-                    buildingUnit.Route(addressSubadressStatusWasImportedFromCrab);
-
                 buildingUnit.ApplyStatusChange((AddressSubaddressStatusWasImportedFromCrab)null);
-            }
         }
 
         public void ImportSubaddressStatusFromCrab(
@@ -559,7 +549,7 @@ namespace BuildingRegistry.Building
                 var buildingUnitId = _buildingUnitCollection.GetNextBuildingUnitIdFor(buildingUnitKey, fromAddressChange);
 
                 ApplyAddBuildingUnit(buildingUnitId, buildingUnitKey, addressId, new BuildingUnitVersion(timestamp));
-                ImportHouseNumberBuffer(buildingUnitKey, houseNumberId);
+                ImportHouseNumberBuffer(buildingUnitKey, AddressId.CreateFor(houseNumberId));
 
                 if (isRetired)
                     return;

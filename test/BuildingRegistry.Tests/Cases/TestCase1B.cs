@@ -559,6 +559,21 @@ namespace BuildingRegistry.Tests.Cases
             Assert(BasedOnT4AddSubaddressStatusToNewAddedUnit());
         }
 
+        public IEventCentricTestSpecificationBuilder BasedOnT4RetireSubaddressPosition()
+        {
+            var importSubaddressPositionFromCrab = _fixture.Create<ImportSubaddressPositionFromCrab>()
+                .WithSubaddressId(_.SubaddressNr16Bus2Id)
+                .WithTerrainObjectHouseNumberId(_.HuisNr16KoppelingId)
+                .WithLifetime(new CrabLifetime(LocalDateTime.FromDateTime(DateTime.Now), LocalDateTime.FromDateTime(DateTime.Now.AddDays(1))))
+                .WithPosition(_.Subaddr2Geometry);
+
+            return new AutoFixtureScenario(_fixture)
+                .Given(T4())
+                .When(importSubaddressPositionFromCrab)
+                .Then(_.Gebouw1Id,
+                    importSubaddressPositionFromCrab.ToLegacyEvent());
+        }
+
         public IEventCentricTestSpecificationBuilder BasedOnT4AddSubaddressPosition()
         {
             var importSubaddressPositionFromCrab = _fixture.Create<ImportSubaddressPositionFromCrab>()
@@ -569,7 +584,7 @@ namespace BuildingRegistry.Tests.Cases
                 .WithPositionOrigin(CrabAddressPositionOrigin.DerivedFromBuilding);
 
             return new AutoFixtureScenario(_fixture)
-                .Given(T4())
+                .Given(BasedOnT4RetireSubaddressPosition())
                 .When(importSubaddressPositionFromCrab)
                 .Then(_.Gebouw1Id,
                     importSubaddressPositionFromCrab.ToLegacyEvent());
