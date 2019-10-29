@@ -135,20 +135,10 @@ namespace BuildingRegistry.Building
         {
             var addedBuildingUnit = _buildingUnitCollection.GetActiveOrLastRetiredByKey(buildingUnitKey);
             if (_legacyHouseNumberPositionEventsByHouseNumberId.ContainsKey(addressId))
-            {
-                foreach (var addressHouseNumberPositionWasImportedFromCrab in _legacyHouseNumberPositionEventsByHouseNumberId[addressId])
-                    addedBuildingUnit.Route(addressHouseNumberPositionWasImportedFromCrab);
-
                 addedBuildingUnit.ApplyPositionChange((AddressHouseNumberPositionWasImportedFromCrab)null, false);
-            }
 
             if (_legacyHouseNumberStatusEventsByHouseNumberId.ContainsKey(addressId))
-            {
-                foreach (var addressHouseNumberStatusWasImportedFromCrab in _legacyHouseNumberStatusEventsByHouseNumberId[addressId])
-                    addedBuildingUnit.Route(addressHouseNumberStatusWasImportedFromCrab);
-
                 addedBuildingUnit.ApplyStatusChange((AddressHouseNumberStatusWasImportedFromCrab)null);
-            }
         }
 
         public void ImportHouseNumberStatusFromCrab(
