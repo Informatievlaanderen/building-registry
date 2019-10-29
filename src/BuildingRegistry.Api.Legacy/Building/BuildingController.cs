@@ -113,7 +113,7 @@ namespace BuildingRegistry.Api.Legacy.Building
                 GetBuildingPolygon(building.Geometry),
                 MapGeometryMethod(building.GeometryMethod.Value),
                 MapBuildingStatus(building.Status.Value),
-                buildingUnits.Select(x => new GebouwDetailGebouweenheid(x.ToString(), string.Format(responseOptions.Value.GebouweenheidDetailUrl, x))).ToList(),
+                buildingUnits.OrderBy(x => x.Value).Select(x => new GebouwDetailGebouweenheid(x.ToString(), string.Format(responseOptions.Value.GebouweenheidDetailUrl, x))).ToList(),
                 caPaKeys.Select(x => new GebouwDetailPerceel(x, string.Format(responseOptions.Value.PerceelUrl, x))).ToList());
 
             return Ok(response);
