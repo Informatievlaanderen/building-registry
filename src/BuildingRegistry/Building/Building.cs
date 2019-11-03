@@ -493,6 +493,9 @@ namespace BuildingRegistry.Building
                     }
                     else if (activeUnitPersistentLocalId == null)
                     {
+                        var crabSubaddressIds = deduplicatedCollection.Where(x => x != null).GroupBy(x => x.CrabSubaddressId);
+                        if (crabSubaddressIds.Any(y => y.Count() > 1))
+                            continue;
                         throw new InvalidOperationException("Cannot find persistent local id for active subaddress");
                     }
 

@@ -55,7 +55,7 @@ namespace BuildingRegistry.Building
 
                     predecessor.ApplyRetired(modification == CrabModification.Correction);
                 }
-                else if (lifetime.EndDateTime.HasValue && predecessor != null && predecessor.HasRetiredState && !_buildingUnitCollection.IsAddressLinkedToCommonBuildingUnit(addressId))
+                else if (lifetime.EndDateTime.HasValue && ((predecessor != null && predecessor.HasRetiredState) || IsHouseNumberReaddressedAt(buildingUnitKey, timestamp)) && !_buildingUnitCollection.IsAddressLinkedToCommonBuildingUnit(addressId))
                 {
                     doNothing = true;
                 }
