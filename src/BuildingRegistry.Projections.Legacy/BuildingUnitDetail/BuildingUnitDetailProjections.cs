@@ -59,7 +59,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetail
             {
                 var buildingUnits = (await context.BuildingUnitDetails.Where(unit => unit.BuildingId == message.Message.BuildingId).ToListAsync(ct))
                     .Union(context.BuildingUnitDetails.Local.Where(unit => unit.BuildingId == message.Message.BuildingId));
-                RetireUnitsByBuilding(buildingUnits, message.Message.BuildingUnitIdsToNotRealize, message.Message.BuildingUnitIdsToRetire, message.Message.Provenance.Timestamp);
+                RetireUnitsByBuilding(buildingUnits, message.Message.BuildingUnitIdsToNotRealize, message.Message.BuildingUnitIdsToRetire, message.Message.Provenance.Timestamp, context);
 
                 var building = await context.BuildingUnitBuildings.FindAsync(message.Message.BuildingId, cancellationToken: ct);
                 building.BuildingRetiredStatus = BuildingStatus.Retired;
@@ -69,7 +69,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetail
             {
                 var buildingUnits = (await context.BuildingUnitDetails.Where(unit => unit.BuildingId == message.Message.BuildingId).ToListAsync(ct))
                     .Union(context.BuildingUnitDetails.Local.Where(unit => unit.BuildingId == message.Message.BuildingId));
-                RetireUnitsByBuilding(buildingUnits, message.Message.BuildingUnitIdsToNotRealize, message.Message.BuildingUnitIdsToRetire, message.Message.Provenance.Timestamp);
+                RetireUnitsByBuilding(buildingUnits, message.Message.BuildingUnitIdsToNotRealize, message.Message.BuildingUnitIdsToRetire, message.Message.Provenance.Timestamp, context);
 
                 var building = await context.BuildingUnitBuildings.FindAsync(message.Message.BuildingId, cancellationToken: ct);
                 building.BuildingRetiredStatus = BuildingStatus.Retired;
@@ -79,7 +79,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetail
             {
                 var buildingUnits = (await context.BuildingUnitDetails.Where(unit => unit.BuildingId == message.Message.BuildingId).ToListAsync(ct))
                     .Union(context.BuildingUnitDetails.Local.Where(unit => unit.BuildingId == message.Message.BuildingId));
-                RetireUnitsByBuilding(buildingUnits, message.Message.BuildingUnitIdsToNotRealize, message.Message.BuildingUnitIdsToRetire, message.Message.Provenance.Timestamp);
+                RetireUnitsByBuilding(buildingUnits, message.Message.BuildingUnitIdsToNotRealize, message.Message.BuildingUnitIdsToRetire, message.Message.Provenance.Timestamp, context);
 
                 var building = await context.BuildingUnitBuildings.FindAsync(message.Message.BuildingId, cancellationToken: ct);
                 building.BuildingRetiredStatus = BuildingStatus.NotRealized;
@@ -89,7 +89,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetail
             {
                 var buildingUnits = (await context.BuildingUnitDetails.Where(unit => unit.BuildingId == message.Message.BuildingId).ToListAsync(ct))
                     .Union(context.BuildingUnitDetails.Local.Where(unit => unit.BuildingId == message.Message.BuildingId));
-                RetireUnitsByBuilding(buildingUnits, message.Message.BuildingUnitIdsToNotRealize, message.Message.BuildingUnitIdsToRetire, message.Message.Provenance.Timestamp);
+                RetireUnitsByBuilding(buildingUnits, message.Message.BuildingUnitIdsToNotRealize, message.Message.BuildingUnitIdsToRetire, message.Message.Provenance.Timestamp, context);
 
                 var building = await context.BuildingUnitBuildings.FindAsync(message.Message.BuildingId, cancellationToken: ct);
                 building.BuildingRetiredStatus = BuildingStatus.NotRealized;
@@ -425,14 +425,19 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetail
             IEnumerable<BuildingUnitDetailItem> buildingUnits,
             ICollection<Guid> buildingUnitIdsToNotRealize,
             ICollection<Guid> buildingUnitIdsToRetire,
-            Instant version)
+            Instant version,
+            LegacyContext context)
         {
             foreach (var buildingUnitDetailItem in buildingUnits)
             {
+                context.Entry(buildingUnitDetailItem).Collection(x => x.Addresses).Load();
+
                 if (buildingUnitIdsToNotRealize.Contains(buildingUnitDetailItem.BuildingUnitId))
                     buildingUnitDetailItem.Status = BuildingUnitStatus.NotRealized;
                 else if (buildingUnitIdsToRetire.Contains(buildingUnitDetailItem.BuildingUnitId))
                     buildingUnitDetailItem.Status = BuildingUnitStatus.Retired;
+
+                buildingUnitDetailItem.Addresses.Clear();
 
                 SetVersion(buildingUnitDetailItem, version);
             }
