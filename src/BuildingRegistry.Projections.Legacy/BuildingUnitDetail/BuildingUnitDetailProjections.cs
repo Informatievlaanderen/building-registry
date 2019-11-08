@@ -353,13 +353,6 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetail
                 SetVersion(buildingUnit, message.Message.Provenance.Timestamp);
             });
 
-            When<Envelope<BuildingUnitWasNotRealizedByBuilding>>(async (context, message, ct) =>
-            {
-                var buildingUnit = await context.BuildingUnitDetails.FindAsync(message.Message.BuildingUnitId, cancellationToken: ct);
-                buildingUnit.Status = BuildingUnitStatus.NotRealized;
-                SetVersion(buildingUnit, message.Message.Provenance.Timestamp);
-            });
-
             When<Envelope<BuildingUnitWasPlanned>>(async (context, message, ct) =>
             {
                 var buildingUnit = await context.BuildingUnitDetails.FindAsync(message.Message.BuildingUnitId, cancellationToken: ct);

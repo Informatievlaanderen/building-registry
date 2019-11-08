@@ -63,7 +63,7 @@ namespace BuildingRegistry.Tests.WhenImportingCrabHouseNumberStatus
         [Theory]
         [InlineData(CrabAddressStatus.Reserved)]
         [InlineData(CrabAddressStatus.Proposed)]
-        public void ByBuilding_ThenNothingHappens(CrabAddressStatus status)
+        public void ButRetiredByBuilding_ThenBecomesNotRealized(CrabAddressStatus status)
         {
             var importStatus = _fixture.Create<ImportHouseNumberStatusFromCrab>()
                 .WithStatus(status);
@@ -73,10 +73,10 @@ namespace BuildingRegistry.Tests.WhenImportingCrabHouseNumberStatus
             Assert(new Scenario()
                 .Given(buildingId,
                     _fixture.Create<BuildingWasRegistered>(),
-                    _fixture.Create<BuildingUnitWasAdded>(),
-                    _fixture.Create<BuildingUnitWasNotRealizedByBuilding>())
+                    _fixture.Create<BuildingUnitWasAddedToRetiredBuilding>())
                 .When(importStatus)
                 .Then(buildingId,
+                    new BuildingUnitWasNotRealized(buildingId, _fixture.Create<BuildingUnitId>()),
                     importStatus.ToLegacyEvent()));
         }
 
@@ -128,7 +128,7 @@ namespace BuildingRegistry.Tests.WhenImportingCrabHouseNumberStatus
         [InlineData(CrabAddressStatus.InUse)]
         [InlineData(CrabAddressStatus.OutOfUse)]
         [InlineData(CrabAddressStatus.Unofficial)]
-        public void ByBuilding_ThenBecomesRetired(CrabAddressStatus status)
+        public void ButRetiredByBuilding_ThenNothingHappens(CrabAddressStatus status)
         {
             var importStatus = _fixture.Create<ImportHouseNumberStatusFromCrab>()
                 .WithStatus(status);
@@ -138,11 +138,9 @@ namespace BuildingRegistry.Tests.WhenImportingCrabHouseNumberStatus
             Assert(new Scenario()
                 .Given(buildingId,
                     _fixture.Create<BuildingWasRegistered>(),
-                    _fixture.Create<BuildingUnitWasAdded>(),
-                    _fixture.Create<BuildingUnitWasNotRealizedByBuilding>())
+                    _fixture.Create<BuildingUnitWasAddedToRetiredBuilding>())
                 .When(importStatus)
                 .Then(buildingId,
-                    new BuildingUnitWasRetired(buildingId, _fixture.Create<BuildingUnitId>()),
                     importStatus.ToLegacyEvent()));
         }
     }

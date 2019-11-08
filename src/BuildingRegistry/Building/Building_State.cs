@@ -103,7 +103,6 @@ namespace BuildingRegistry.Building
             Register<BuildingUnitWasCorrectedToRetired>(When);
             Register<BuildingUnitWasNotRealized>(When);
             Register<BuildingUnitWasNotRealizedByParent>(When);
-            Register<BuildingUnitWasNotRealizedByBuilding>(When);
             Register<BuildingUnitWasCorrectedToNotRealized>(When);
             Register<BuildingUnitWasRealized>(When);
             Register<BuildingUnitWasCorrectedToRealized>(When);
@@ -212,11 +211,6 @@ namespace BuildingRegistry.Building
         }
 
         private void When(BuildingUnitWasNotRealizedByParent @event)
-        {
-            _buildingUnitCollection.GetById(new BuildingUnitId(@event.BuildingUnitId)).Route(@event);
-        }
-
-        private void When(BuildingUnitWasNotRealizedByBuilding @event)
         {
             _buildingUnitCollection.GetById(new BuildingUnitId(@event.BuildingUnitId)).Route(@event);
         }

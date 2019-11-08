@@ -68,8 +68,8 @@ namespace BuildingRegistry.Building
                     else
                         ApplyStatusChange(buildingStatus);
 
-                    if (!IsRetired && wasRetired)
-                        UnretireBuildingUnits(modification, timestamp);
+                    //if (!IsRetired && wasRetired) Actually impossible: if CRAB TerrainObject gets enddate so does the relation, so the relation will get reactivated too.
+                    //    UnretireBuildingUnits(modification, timestamp);
                 }
             }
 

@@ -697,7 +697,6 @@ namespace BuildingRegistry.Building
             if (IsRetired)
             {
                 ApplyChange(new BuildingUnitWasAddedToRetiredBuilding(_buildingId, buildingUnitId, buildingUnitKey, addressId, version, predecessor?.BuildingUnitId));
-                ApplyChange(new BuildingUnitWasNotRealizedByBuilding(_buildingId, buildingUnitId));
 
                 if (Geometry != null && (predecessor == null || predecessor.BuildingUnitPosition == null))
                     ApplyChange(new BuildingUnitPositionWasDerivedFromObject(_buildingId, buildingUnitId, Geometry.Center));

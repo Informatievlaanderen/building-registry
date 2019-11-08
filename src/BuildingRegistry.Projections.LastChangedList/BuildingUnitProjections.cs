@@ -74,9 +74,6 @@ namespace BuildingRegistry.Projections.LastChangedList
             When<Envelope<BuildingUnitWasNotRealized>>(async (context, message, ct) =>
                 await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingUnitId.ToString(), message.Position, context, ct));
 
-            When<Envelope<BuildingUnitWasNotRealizedByBuilding>>(async (context, message, ct) =>
-                await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingUnitId.ToString(), message.Position, context, ct));
-
             When<Envelope<BuildingUnitWasNotRealizedByParent>>(async (context, message, ct) =>
                 await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingUnitId.ToString(), message.Position, context, ct));
 

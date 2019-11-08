@@ -64,7 +64,6 @@ namespace BuildingRegistry.Tests.WhenImportingCrabTerrainObjectHouseNumber
                 .When(command)
                 .Then(buildingId,
                     new BuildingUnitWasAddedToRetiredBuilding(buildingId, _fixture.Create<BuildingUnitId>(), _fixture.Create<BuildingUnitKey>(), AddressId.CreateFor(command.HouseNumberId), new BuildingUnitVersion(command.Timestamp)),
-                    new BuildingUnitWasNotRealizedByBuilding(buildingId, _fixture.Create<BuildingUnitId>()),
                     new BuildingUnitPositionWasDerivedFromObject(buildingId, _fixture.Create<BuildingUnitId>(), GeometryHelper.CreateEwkbFrom(new WkbGeometry(center.AsBinary()))),
                     command.ToLegacyEvent()));
         }
