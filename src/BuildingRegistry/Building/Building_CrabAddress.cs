@@ -118,6 +118,21 @@ namespace BuildingRegistry.Building
 
                     addedBuildingUnit.ApplyStatusChange((AddressHouseNumberStatusWasImportedFromCrab)null);
                 }
+
+                if (_buildingUnitCollection.HasReaddressed(buildingUnitKey) && _buildingUnitCollection.HasActiveUnitByKey(buildingUnitKey))
+                {
+                    var children = _buildingUnitCollection.GetRetiredBuildingUnitsByKeyAndChildKeys(buildingUnitKey).Where(c => c.IsRetiredByParent && !c.IsRetiredBySelf);
+
+                    foreach (var child in children)
+                    {
+                        if(_buildingUnitCollection.HasActiveUnitByKey(child.BuildingUnitKey))
+                            continue;
+
+                        ApplyAddBuildingUnit(_buildingUnitCollection.GetNextBuildingUnitIdFor(child.BuildingUnitKey), child.BuildingUnitKey, child.PreviousAddressId, new BuildingUnitVersion(timestamp));
+                        ApplyCreateCommonBuildingUnitIfNeeded(terrainObjectId, new BuildingUnitVersion(timestamp));
+                        ApplyAddressMoveToCommonIfNeeded(buildingUnitKey, modification);
+                    }
+                }
             }
 
             ApplyChange(new TerrainObjectHouseNumberWasImportedFromCrab(
@@ -547,14 +562,14 @@ namespace BuildingRegistry.Building
                 ApplyCreateCommonBuildingUnitIfNeeded(terrainObjectId, new BuildingUnitVersion(timestamp));
                 ApplyAddressMoveToCommonIfNeeded(buildingUnitKey, modification);
 
-                var children = _buildingUnitCollection.GetRetiredBuildingUnitsByKeyAndChildKeys(buildingUnitKey).Where(c => c.IsRetiredByParent && !c.IsRetiredBySelf);
+                //var children = _buildingUnitCollection.GetRetiredBuildingUnitsByKeyAndChildKeys(buildingUnitKey).Where(c => c.IsRetiredByParent && !c.IsRetiredBySelf);
 
-                foreach (var child in children)
-                {
-                    ApplyAddBuildingUnit(_buildingUnitCollection.GetNextBuildingUnitIdFor(child.BuildingUnitKey), child.BuildingUnitKey, child.PreviousAddressId, new BuildingUnitVersion(timestamp));
-                    ApplyCreateCommonBuildingUnitIfNeeded(terrainObjectId, new BuildingUnitVersion(timestamp));
-                    ApplyAddressMoveToCommonIfNeeded(buildingUnitKey, modification);
-                }
+                //foreach (var child in children)
+                //{
+                //    ApplyAddBuildingUnit(_buildingUnitCollection.GetNextBuildingUnitIdFor(child.BuildingUnitKey), child.BuildingUnitKey, child.PreviousAddressId, new BuildingUnitVersion(timestamp));
+                //    ApplyCreateCommonBuildingUnitIfNeeded(terrainObjectId, new BuildingUnitVersion(timestamp));
+                //    ApplyAddressMoveToCommonIfNeeded(buildingUnitKey, modification);
+                //}
             }
         }
 
@@ -695,19 +710,22 @@ namespace BuildingRegistry.Building
             var predecessor = GetPredecessorFor(buildingUnitKey);
 
             if (IsRetired)
-            {
                 ApplyChange(new BuildingUnitWasAddedToRetiredBuilding(_buildingId, buildingUnitId, buildingUnitKey, addressId, version, predecessor?.BuildingUnitId));
-
-                if (Geometry != null && (predecessor == null || predecessor.BuildingUnitPosition == null))
-                    ApplyChange(new BuildingUnitPositionWasDerivedFromObject(_buildingId, buildingUnitId, Geometry.Center));
-            }
             else
-            {
                 ApplyChange(new BuildingUnitWasAdded(_buildingId, buildingUnitId, buildingUnitKey, addressId, version, predecessor?.BuildingUnitId));
 
-                if (Geometry != null && (predecessor == null || predecessor.BuildingUnitPosition == null))
-                    ApplyChange(new BuildingUnitPositionWasDerivedFromObject(_buildingId, buildingUnitId, Geometry.Center));
+            if (buildingUnitKey.Subaddress.HasValue)
+            {
+                ImportSubaddressBuffer(buildingUnitKey);
             }
+            else if (buildingUnitKey.HouseNumber.HasValue)
+            {
+                ImportHouseNumberBuffer(buildingUnitKey, addressId);
+            }
+
+            var unit = _buildingUnitCollection.GetActiveOrLastRetiredByKey(buildingUnitKey);
+            if (Geometry != null && unit.BuildingUnitPosition == null)
+                ApplyChange(new BuildingUnitPositionWasDerivedFromObject(_buildingId, buildingUnitId, Geometry.Center));
 
             if (_buildingUnitCollection.HasBeenReaddressed(buildingUnitKey))
             {

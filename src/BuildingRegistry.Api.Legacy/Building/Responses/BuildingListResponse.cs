@@ -37,7 +37,7 @@ namespace BuildingRegistry.Api.Legacy.Building.Responses
         /// De identificator van het gebouw.
         /// </summary>
         [DataMember(Name = "Identificator", Order = 1)]
-        public Identificator Identificator { get; set; }
+        public GebouwIdentificator Identificator { get; set; }
 
         /// <summary>
         /// De URL die naar de details van de meeste recente versie van een enkele gebouw leidt.
@@ -51,7 +51,7 @@ namespace BuildingRegistry.Api.Legacy.Building.Responses
             string detail,
             DateTimeOffset version)
         {
-            Identificator = new Identificator(naamruimte, id.ToString(), version);
+            Identificator = new GebouwIdentificator(naamruimte, id.ToString(), version);
             Detail = new Uri(string.Format(detail, id));
         }
     }

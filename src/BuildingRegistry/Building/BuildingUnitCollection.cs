@@ -9,7 +9,7 @@ namespace BuildingRegistry.Building
     {
         private readonly List<BuildingUnit> _allBuildingUnits = new List<BuildingUnit>();
         private readonly Dictionary<BuildingUnitKey, IList<BuildingUnit>> _allBuildingUnitsByKey = new Dictionary<BuildingUnitKey, IList<BuildingUnit>>();
-        private readonly Dictionary<BuildingUnitKey, BuildingUnitKey> _readdressedKeys = new Dictionary<BuildingUnitKey, BuildingUnitKey>();
+        private readonly Dictionary<BuildingUnitKey, BuildingUnitKey> _readdressedKeys = new Dictionary<BuildingUnitKey, BuildingUnitKey>(); //new, old
         private readonly Func<BuildingUnit, bool> _isRetiredPredicate = x => x.HasRetiredState && !x.IsRemoved;
         private readonly Func<BuildingUnit, bool> _isActivePredicate = x => !x.IsRemoved && !x.HasRetiredState;
 

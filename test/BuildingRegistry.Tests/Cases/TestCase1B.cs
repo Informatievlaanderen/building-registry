@@ -132,7 +132,6 @@ namespace BuildingRegistry.Tests.Cases
                 .When(importTerrainObjectHouseNumberFromCrab)
                 .Then(_.Gebouw1Id,
                     new BuildingUnitWasAdded(_.Gebouw1Id, _.GebouwEenheid1Id, _.GebouwEenheid1Key, _.Address16Id, new BuildingUnitVersion(importTerrainObjectHouseNumberFromCrab.Timestamp)),
-                    new BuildingUnitPositionWasDerivedFromObject(_.Gebouw1Id, _.GebouwEenheid1Id, GeometryHelper.CreateEwkbFrom(_.CenterBuilding)),
                     new BuildingUnitPositionWasAppointedByAdministrator(_.Gebouw1Id, _.GebouwEenheid1Id, GeometryHelper.CreateEwkbFrom(_.HouseNrGeometry)),
                     importTerrainObjectHouseNumberFromCrab.ToLegacyEvent());
         }

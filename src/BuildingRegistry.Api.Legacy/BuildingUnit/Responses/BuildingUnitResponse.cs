@@ -19,22 +19,22 @@ namespace BuildingRegistry.Api.Legacy.BuildingUnit.Responses
         /// De identificator van de gebouweenheid.
         /// </summary>
         [DataMember(Name = "Identificator", Order = 1)]
-        public Identificator Identificator { get; set; }
+        public GebouweenheidIdentificator Identificator { get; set; }
 
         /// <summary>
         /// The building unit geometry (a point with Lambert-72 coordinates)
         /// </summary>
         [DataMember(Name = "GeometriePunt", Order = 2)]
-        public Point Point { get; set; }
+        public Point Geometry { get; set; }
 
         /// <summary>
-        /// the method used to provide the position
+        /// De gebruikte methode om de positie te bepalen.
         /// </summary>
         [DataMember(Name = "PositieGeometrieMethode", Order = 3)]
         public PositieGeometrieMethode GeometryMethod { get; set; }
 
         /// <summary>
-        /// the current phase in the lifecycle of the building unit
+        /// De fase in het leven van een gebouweenheid.
         /// </summary>
         [DataMember(Name = "GebouweenheidStatus", Order = 4)]
         public GebouweenheidStatus Status { get; set; }
@@ -52,7 +52,7 @@ namespace BuildingRegistry.Api.Legacy.BuildingUnit.Responses
         public GebouweenheidDetailGebouw Building { get; set; }
 
         /// <summary>
-        /// a collection of addresses that are coupled to the building unit
+        /// De aan de gebouweenheid gelinkte adressen.
         /// </summary>
         [DataMember(Name = "Adressen", Order = 7)]
         public List<GebouweenheidDetailAdres> Addresses { get; set; }
@@ -64,15 +64,15 @@ namespace BuildingRegistry.Api.Legacy.BuildingUnit.Responses
             Point geometry,
             PositieGeometrieMethode geometryMethod,
             GebouweenheidStatus status,
-            GebouweenheidFunctie? functie,
+            GebouweenheidFunctie? function,
             GebouweenheidDetailGebouw building,
             List<GebouweenheidDetailAdres> addresses)
         {
-            Identificator = new Identificator(naamruimte, persistentLocalId.ToString(), version);
-            Point = geometry;
+            Identificator = new GebouweenheidIdentificator(naamruimte, persistentLocalId.ToString(), version);
+            Geometry = geometry;
             GeometryMethod = geometryMethod;
             Status = status;
-            Function = functie;
+            Function = function;
             Building = building;
             Addresses = addresses;
         }
@@ -95,7 +95,7 @@ namespace BuildingRegistry.Api.Legacy.BuildingUnit.Responses
                     JsonPoint = new GeoJSONPoint
                     {
                         Type = "point",
-                        Coordinates = new double[] { 140252.76, 198794.27 }
+                        Coordinates = new[] { 140252.76, 198794.27 }
                     },
                     XmlPoint = new GmlPoint
                     {

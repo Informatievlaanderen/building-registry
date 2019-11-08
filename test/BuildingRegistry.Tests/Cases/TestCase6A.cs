@@ -10,17 +10,16 @@ namespace BuildingRegistry.Tests.Cases
     using ValueObjects;
     using ValueObjects.Crab;
     using WhenImportingCrabBuildingGeometry;
-    using WhenImportingCrabHouseNumberPosition;
-    using WhenImportingCrabHouseNumberStatus;
+    using WhenImportingCrabBuildingStatus;
     using WhenImportingCrabSubaddress;
-    using WhenImportingCrabTerrainObject;
+    using WhenImportingCrabSubaddressPosition;
     using WhenImportingCrabTerrainObjectHouseNumber;
     using Xunit;
     using Xunit.Abstractions;
 
-    public class TestCase1AWithStatusAndPosition : AutofacBasedTest
+    public class TestCase6A : AutofacBasedTest
     {
-        public TestCase1AWithStatusAndPosition(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
+        public TestCase6A(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
         {
             Fixture = new Fixture()
                 .Customize(new InfrastructureCustomization())
@@ -29,12 +28,12 @@ namespace BuildingRegistry.Tests.Cases
                 .Customize(new WithFixedBuildingUnitIdFromHouseNumber(1, 16))
                 ;
 
-            _ = new TestCase1AData(Fixture);
+            _ = new TestCase6AData(Fixture);
         }
 
-        protected class TestCase1AData
+        protected class TestCase6AData
         {
-            public TestCase1AData(IFixture customizedFixture)
+            public TestCase6AData(IFixture customizedFixture)
             {
                 Gebouw1CrabTerrainObjectId = customizedFixture.Create<CrabTerrainObjectId>();
                 HuisNr16KoppelingId = customizedFixture.Create<CrabTerrainObjectHouseNumberId>();
@@ -87,51 +86,35 @@ namespace BuildingRegistry.Tests.Cases
         }
 
         protected readonly IFixture Fixture;
-        protected TestCase1AData _ { get; }
+        protected TestCase6AData _ { get; }
 
         public IEventCentricTestSpecificationBuilder T0()
         {
-            var importGeometry = Fixture.Create<ImportBuildingGeometryFromCrab>()
-                .WithTerrainObjectId(_.Gebouw1CrabTerrainObjectId)
-                .WithGeometryMethod(CrabBuildingGeometryMethod.Grb)
-                .WithGeometry(new WkbGeometry(GeometryHelper.ValidPolygon.AsBinary()));
+            var importTerrainObjectFromCrab = Fixture.Create<ImportBuildingStatusFromCrab>()
+                .WithStatus(CrabBuildingStatus.InUse);
 
             return new AutoFixtureScenario(Fixture)
                 .Given<BuildingWasRegistered>(_.Gebouw1Id)
-                .When(importGeometry)
+                .When(importTerrainObjectFromCrab)
                 .Then(_.Gebouw1Id,
-                    new BuildingWasMeasuredByGrb(_.Gebouw1Id, ExtendedWkbGeometry.CreateEWkb(GeometryHelper.ValidPolygon.AsBinary())),
-                    importGeometry.ToLegacyEvent());
-
+                    new BuildingWasRealized(_.Gebouw1Id),
+                    importTerrainObjectFromCrab.ToLegacyEvent());
         }
 
-        public IEventCentricTestSpecificationBuilder T1_PositionBeforeT1()
+        public IEventCentricTestSpecificationBuilder T0_1()
         {
-            var importHouseNumberPositionFromCrab = Fixture.Create<ImportHouseNumberPositionFromCrab>()
-                .WithTerrainObjectId(_.Gebouw1CrabTerrainObjectId)
-                .WithPositionOrigin(CrabAddressPositionOrigin.DerivedFromBuilding)
-                .WithTerrainObjectHouseNumber(_.HuisNr16KoppelingId)
-                .WithPosition(new WkbGeometry(GeometryHelper.ValidPointInPolygon.AsBinary()));
+            var importGeometry = Fixture.Create<ImportBuildingGeometryFromCrab>()
+                .WithGeometry(new WkbGeometry(GeometryHelper.ValidPolygon.AsBinary()))
+                .WithGeometryMethod(CrabBuildingGeometryMethod.Grb)
+                .WithTerrainObjectId(_.Gebouw1CrabTerrainObjectId);
 
             return new AutoFixtureScenario(Fixture)
                 .Given(T0())
-                .When(importHouseNumberPositionFromCrab)
+                .When(importGeometry)
                 .Then(_.Gebouw1Id,
-                    importHouseNumberPositionFromCrab.ToLegacyEvent());
-        }
-
-        public IEventCentricTestSpecificationBuilder T1_StatusBeforeT1()
-        {
-            var importHouseNumberStatusFromCrab = Fixture.Create<ImportHouseNumberStatusFromCrab>()
-                .WithTerrainObjectHouseNumberId(_.HuisNr16KoppelingId)
-                .WithStatus(CrabAddressStatus.InUse)
-                .WithHouseNumberId(_.HuisNr16Id); //koppel huisnr 16
-
-            return new AutoFixtureScenario(Fixture)
-                .Given(T1_PositionBeforeT1())
-                .When(importHouseNumberStatusFromCrab)
-                .Then(_.Gebouw1Id,
-                    importHouseNumberStatusFromCrab.ToLegacyEvent());
+                    new BuildingWasMeasuredByGrb(_.Gebouw1Id, ExtendedWkbGeometry.CreateEWkb(GeometryHelper.ValidPolygon.AsBinary())),
+                    new BuildingBecameComplete(_.Gebouw1Id),
+                    importGeometry.ToLegacyEvent());
         }
 
         public IEventCentricTestSpecificationBuilder T1()
@@ -141,14 +124,27 @@ namespace BuildingRegistry.Tests.Cases
                 .WithHouseNumberId(_.HuisNr16Id); //koppel huisnr 16
 
             return new AutoFixtureScenario(Fixture)
-                .Given(T1_StatusBeforeT1())
+                .Given(T0_1())
                 .When(importTerrainObjectHouseNumberFromCrab)
                 .Then(_.Gebouw1Id,
                     new BuildingUnitWasAdded(_.Gebouw1Id, _.GebouwEenheid1Id, _.GebouwEenheid1Key, _.Address16Id, new BuildingUnitVersion(importTerrainObjectHouseNumberFromCrab.Timestamp)),
-                    new BuildingUnitPositionWasDerivedFromObject(_.Gebouw1Id, _.GebouwEenheid1Id, ExtendedWkbGeometry.CreateEWkb(GeometryHelper.ValidPointInPolygon.AsBinary())),
-                    new BuildingUnitWasRealized(_.Gebouw1Id, _.GebouwEenheid1Id),
-                    new BuildingUnitBecameComplete(_.Gebouw1Id, _.GebouwEenheid1Id),
+                    new BuildingUnitPositionWasDerivedFromObject(_.Gebouw1Id, _.GebouwEenheid1Id, ExtendedWkbGeometry.CreateEWkb(GeometryHelper.ValidPolygon.Centroid.AsBinary())),
                     importTerrainObjectHouseNumberFromCrab.ToLegacyEvent());
+        }
+
+        public IEventCentricTestSpecificationBuilder T2_0()
+        {
+            var importSubaddressPositionFromCrab = Fixture.Create<ImportSubaddressPositionFromCrab>()
+                .WithSubaddressId(_.SubaddressNr16Bus1Id)
+                .WithPositionOrigin(CrabAddressPositionOrigin.ManualIndicationFromBuilding)
+                .WithTerrainObjectHouseNumberId(_.HuisNr16KoppelingId)
+                .WithPosition(new WkbGeometry(GeometryHelper.ValidPointInPolygon.AsBinary()));
+
+            return new AutoFixtureScenario(Fixture)
+                .Given(T1())
+                .When(importSubaddressPositionFromCrab)
+                .Then(_.Gebouw1Id,
+                    importSubaddressPositionFromCrab.ToLegacyEvent());
         }
 
         public IEventCentricTestSpecificationBuilder T2()
@@ -158,11 +154,11 @@ namespace BuildingRegistry.Tests.Cases
                 .WithTerrainObjectHouseNumberId(_.HuisNr16KoppelingId);
 
             return new AutoFixtureScenario(Fixture)
-                .Given(T1())
+                .Given(T2_0())
                 .When(importSubaddressFromCrab)
                 .Then(_.Gebouw1Id,
                     new BuildingUnitWasAdded(_.Gebouw1Id, _.GebouwEenheid2Id, _.GebouwEenheid2Key, _.Address16Bus1Id, new BuildingUnitVersion(importSubaddressFromCrab.Timestamp)),
-                    new BuildingUnitPositionWasDerivedFromObject(_.Gebouw1Id, _.GebouwEenheid2Id, ExtendedWkbGeometry.CreateEWkb(GeometryHelper.ValidPolygon.Centroid.AsBinary())),
+                    new BuildingUnitPositionWasAppointedByAdministrator(_.Gebouw1Id, _.GebouwEenheid2Id, ExtendedWkbGeometry.CreateEWkb(GeometryHelper.ValidPointInPolygon.AsBinary())),
                     new CommonBuildingUnitWasAdded(_.Gebouw1Id, _.GebouwEenheid3Id, _.GebouwEenheid3Key, new BuildingUnitVersion(importSubaddressFromCrab.Timestamp)),
                     new BuildingUnitWasRealized(_.Gebouw1Id, _.GebouwEenheid3Id),
                     new BuildingUnitPositionWasDerivedFromObject(_.Gebouw1Id, _.GebouwEenheid3Id, ExtendedWkbGeometry.CreateEWkb(GeometryHelper.ValidPolygon.Centroid.AsBinary())),
@@ -182,7 +178,7 @@ namespace BuildingRegistry.Tests.Cases
                 .Then(_.Gebouw1Id,
                     new BuildingUnitWasAdded(_.Gebouw1Id, _.GebouwEenheid4Id, _.GebouwEenheid4Key, _.Address16Bus2Id, new BuildingUnitVersion(importSubaddressFromCrab.Timestamp)),
                     new BuildingUnitPositionWasDerivedFromObject(_.Gebouw1Id, _.GebouwEenheid4Id, ExtendedWkbGeometry.CreateEWkb(GeometryHelper.ValidPolygon.Centroid.AsBinary())),
-                    new BuildingUnitWasRetired(_.Gebouw1Id, _.GebouwEenheid1Id),
+                    new BuildingUnitWasNotRealized(_.Gebouw1Id, _.GebouwEenheid1Id),
                     new BuildingUnitAddressWasDetached(_.Gebouw1Id, _.Address16Id, _.GebouwEenheid1Id),
                     new BuildingUnitAddressWasAttached(_.Gebouw1Id, _.Address16Id, _.GebouwEenheid3Id),
                     importSubaddressFromCrab.ToLegacyEvent());
@@ -190,74 +186,52 @@ namespace BuildingRegistry.Tests.Cases
 
         public IEventCentricTestSpecificationBuilder T4()
         {
-            var importSubaddressFromCrab = Fixture.Create<ImportSubaddressFromCrab>()
-                .WithSubaddressId(_.SubaddressNr16Bus2Id)
+            var importTerrainObjectHouseNumberFromCrab = Fixture.Create<ImportTerrainObjectHouseNumberFromCrab>()
                 .WithTerrainObjectHouseNumberId(_.HuisNr16KoppelingId)
-                .WithLifetime(new CrabLifetime(Fixture.Create<LocalDateTime>(), Fixture.Create<LocalDateTime>()));
+                .WithLifetime(new CrabLifetime(Fixture.Create<LocalDateTime>(), Fixture.Create<LocalDateTime>()))
+                .WithHouseNumberId(_.HuisNr16Id); //koppel huisnr 16
 
             return new AutoFixtureScenario(Fixture)
                 .Given(T3())
-                .When(importSubaddressFromCrab)
+                .When(importTerrainObjectHouseNumberFromCrab)
                 .Then(_.Gebouw1Id,
-                    new BuildingUnitWasNotRealized(_.Gebouw1Id, _.GebouwEenheid4Id),
+                    new BuildingUnitWasNotRealizedByParent(_.Gebouw1Id, _.GebouwEenheid2Id, _.GebouwEenheid1Id),
+                    new BuildingUnitAddressWasDetached(_.Gebouw1Id, _.Address16Bus1Id, _.GebouwEenheid2Id),
+                    new BuildingUnitWasNotRealizedByParent(_.Gebouw1Id, _.GebouwEenheid4Id, _.GebouwEenheid1Id),
                     new BuildingUnitAddressWasDetached(_.Gebouw1Id, _.Address16Bus2Id, _.GebouwEenheid4Id),
+                    new BuildingUnitWasRetired(_.Gebouw1Id, _.GebouwEenheid3Id),
                     new BuildingUnitAddressWasDetached(_.Gebouw1Id, _.Address16Id, _.GebouwEenheid3Id),
-                    new BuildingUnitWasReaddedByOtherUnitRemoval(_.Gebouw1Id, _.GebouwEenheid5Id, _.GebouwEenheid5Key, _.Address16Id, new BuildingUnitVersion(importSubaddressFromCrab.Timestamp), _.GebouwEenheid1Id),
-                    new BuildingUnitPositionWasDerivedFromObject(_.Gebouw1Id, _.GebouwEenheid5Id, ExtendedWkbGeometry.CreateEWkb(GeometryHelper.ValidPointInPolygon.AsBinary())),
-                    new BuildingUnitWasRealized(_.Gebouw1Id, _.GebouwEenheid5Id),
-                    new BuildingUnitBecameComplete(_.Gebouw1Id, _.GebouwEenheid5Id),
-                    importSubaddressFromCrab.ToLegacyEvent());
+                    new BuildingUnitBecameComplete(_.Gebouw1Id, _.GebouwEenheid1Id),
+                    importTerrainObjectHouseNumberFromCrab.ToLegacyEvent());
         }
 
         public IEventCentricTestSpecificationBuilder T5()
         {
-            var importSubaddressFromCrab = Fixture.Create<ImportSubaddressFromCrab>()
-                .WithSubaddressId(_.SubaddressNr16Bus1Id)
+            var importTerrainObjectHouseNumberFromCrab = Fixture.Create<ImportTerrainObjectHouseNumberFromCrab>()
                 .WithTerrainObjectHouseNumberId(_.HuisNr16KoppelingId)
-                .WithLifetime(new CrabLifetime(Fixture.Create<LocalDateTime>(), Fixture.Create<LocalDateTime>()));
+                .WithLifetime(new CrabLifetime(Fixture.Create<LocalDateTime>(), null))
+                .WithModification(CrabModification.Correction)
+                .WithHouseNumberId(_.HuisNr16Id); //koppel huisnr 16
 
             return new AutoFixtureScenario(Fixture)
                 .Given(T4())
-                .When(importSubaddressFromCrab)
-                .Then(_.Gebouw1Id,
-                    new BuildingUnitWasNotRealized(_.Gebouw1Id, _.GebouwEenheid2Id),
-                    new BuildingUnitAddressWasDetached(_.Gebouw1Id, _.Address16Bus1Id, _.GebouwEenheid2Id),
-                    new BuildingUnitWasRetired(_.Gebouw1Id, _.GebouwEenheid3Id),
-                    importSubaddressFromCrab.ToLegacyEvent());
-        }
-
-        public IEventCentricTestSpecificationBuilder T6()
-        {
-            var importTerrainObjectHouseNumberFromCrab = Fixture.Create<ImportTerrainObjectHouseNumberFromCrab>()
-                .WithHouseNumberId(_.HuisNr16Id)
-                .WithLifetime(new CrabLifetime(Fixture.Create<LocalDateTime>(), Fixture.Create<LocalDateTime>()));
-
-            return new AutoFixtureScenario(Fixture)
-                .Given(T5())
                 .When(importTerrainObjectHouseNumberFromCrab)
                 .Then(_.Gebouw1Id,
-                    new BuildingUnitWasRetired(_.Gebouw1Id, _.GebouwEenheid5Id),
-                    new BuildingUnitAddressWasDetached(_.Gebouw1Id, _.Address16Id, _.GebouwEenheid5Id),
+                    new BuildingUnitWasAdded(_.Gebouw1Id, _.GebouwEenheid1IdV2, _.GebouwEenheid1Key, _.Address16Id, new BuildingUnitVersion(importTerrainObjectHouseNumberFromCrab.Timestamp), _.GebouwEenheid1Id),
+                    new BuildingUnitPositionWasDerivedFromObject(_.Gebouw1Id, _.GebouwEenheid1IdV2, ExtendedWkbGeometry.CreateEWkb(GeometryHelper.ValidPolygon.Centroid.AsBinary())),
+                    new BuildingUnitWasAdded(_.Gebouw1Id, _.GebouwEenheid2IdV2, _.GebouwEenheid2Key, _.Address16Bus1Id, new BuildingUnitVersion(importTerrainObjectHouseNumberFromCrab.Timestamp), _.GebouwEenheid2Id),
+                    new BuildingUnitPositionWasAppointedByAdministrator(_.Gebouw1Id, _.GebouwEenheid2IdV2, ExtendedWkbGeometry.CreateEWkb(GeometryHelper.ValidPointInPolygon.AsBinary())),
+                    new CommonBuildingUnitWasAdded(_.Gebouw1Id, _.GebouwEenheid3IdV2, _.GebouwEenheid3Key, new BuildingUnitVersion(importTerrainObjectHouseNumberFromCrab.Timestamp)),
+                    new BuildingUnitWasRealized(_.Gebouw1Id, _.GebouwEenheid3IdV2),
+                    new BuildingUnitPositionWasDerivedFromObject(_.Gebouw1Id, _.GebouwEenheid3IdV2, ExtendedWkbGeometry.CreateEWkb(GeometryHelper.ValidPolygon.Centroid.AsBinary())),
+                    new BuildingUnitBecameComplete(_.Gebouw1Id, _.GebouwEenheid3IdV2),
+                    new BuildingUnitWasAdded(_.Gebouw1Id, _.GebouwEenheid4IdV2, _.GebouwEenheid4Key, _.Address16Bus2Id, new BuildingUnitVersion(importTerrainObjectHouseNumberFromCrab.Timestamp), _.GebouwEenheid4Id),
+                    new BuildingUnitPositionWasDerivedFromObject(_.Gebouw1Id, _.GebouwEenheid4IdV2, ExtendedWkbGeometry.CreateEWkb(GeometryHelper.ValidPolygon.Centroid.AsBinary())),
+                    new BuildingUnitWasNotRealized(_.Gebouw1Id, _.GebouwEenheid1IdV2),
+                    new BuildingUnitAddressWasDetached(_.Gebouw1Id, _.Address16Id, _.GebouwEenheid1IdV2),
+                    new BuildingUnitAddressWasAttached(_.Gebouw1Id, _.Address16Id, _.GebouwEenheid3IdV2),
+                    new BuildingUnitBecameComplete(_.Gebouw1Id, _.GebouwEenheid1IdV2),
                     importTerrainObjectHouseNumberFromCrab.ToLegacyEvent());
-        }
-
-        public IEventCentricTestSpecificationBuilder T7()
-        {
-            var importTerrainObjectFromCrab = Fixture.Create<ImportTerrainObjectFromCrab>()
-                .WithLifetime(new CrabLifetime(Fixture.Create<LocalDateTime>(), Fixture.Create<LocalDateTime>()));
-
-            return new AutoFixtureScenario(Fixture)
-                .Given(T6())
-                .When(importTerrainObjectFromCrab)
-                .Then(_.Gebouw1Id,
-                    new BuildingWasNotRealized(_.Gebouw1Id, new BuildingUnitId[0], new BuildingUnitId[0]),
-                    importTerrainObjectFromCrab.ToLegacyEvent());
-        }
-
-        [Fact]
-        public void TestT0()
-        {
-            Assert(T0());
         }
 
         [Fact]
@@ -289,18 +263,5 @@ namespace BuildingRegistry.Tests.Cases
         {
             Assert(T5());
         }
-
-        [Fact]
-        public void TestT6()
-        {
-            Assert(T6());
-        }
-
-        [Fact]
-        public void TestT7()
-        {
-            Assert(T7());
-        }
     }
 }
-
