@@ -1,3 +1,33 @@
+## [1.13.13](https://github.com/informatievlaanderen/building-registry/compare/v1.13.12...v1.13.13) (2019-10-25)
+
+
+### Bug Fixes
+
+* add setter for geometry to support docs ([bf27d64](https://github.com/informatievlaanderen/building-registry/commit/bf27d64))
+* update some docs ([ddf9e4f](https://github.com/informatievlaanderen/building-registry/commit/ddf9e4f))
+
+## [1.13.12](https://github.com/informatievlaanderen/building-registry/compare/v1.13.11...v1.13.12) (2019-10-25)
+
+
+### Bug Fixes
+
+* map point and function in response ([203c879](https://github.com/informatievlaanderen/building-registry/commit/203c879))
+
+## [1.13.11](https://github.com/informatievlaanderen/building-registry/compare/v1.13.10...v1.13.11) (2019-10-24)
+
+
+### Bug Fixes
+
+* use proper gebouweenheidId ([42713dd](https://github.com/informatievlaanderen/building-registry/commit/42713dd))
+
+## [1.13.10](https://github.com/informatievlaanderen/building-registry/compare/v1.13.9...v1.13.10) (2019-10-24)
+
+
+### Bug Fixes
+
+* push to correct repo ([8301bf1](https://github.com/informatievlaanderen/building-registry/commit/8301bf1))
+* upgrade grar common ([686b16b](https://github.com/informatievlaanderen/building-registry/commit/686b16b))
+
 ## [1.13.9](https://github.com/informatievlaanderen/building-registry/compare/v1.13.8...v1.13.9) (2019-10-10)
 
 

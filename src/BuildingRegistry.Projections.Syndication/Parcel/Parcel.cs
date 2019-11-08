@@ -20,7 +20,7 @@ namespace BuildingRegistry.Projections.Syndication.Parcel
         /// De identificator van het perceel.
         /// </summary>
         [DataMember(Name = "Identificator", Order = 2)]
-        public Identificator Identificator { get; set; }
+        public PerceelIdentificator Identificator { get; set; }
 
         /// <summary>
         /// De status van het perceel.
