@@ -6,6 +6,7 @@ namespace BuildingRegistry.Projections.Legacy
     using BuildingUnitDetail;
     using Infrastructure;
     using Microsoft.EntityFrameworkCore;
+    using PersistentLocalIdMigration;
 
     public class LegacyContext : RunnerDbContext<LegacyContext>
     {
@@ -16,6 +17,8 @@ namespace BuildingRegistry.Projections.Legacy
         public DbSet<BuildingUnitDetailItem> BuildingUnitDetails { get; set; }
         public DbSet<BuildingUnitBuildingItem> BuildingUnitBuildings { get; set; }
         public DbSet<BuildingUnitDetailAddressItem> BuildingUnitAddresses { get; set; }
+        public DbSet<RemovedPersistentLocalId> RemovedPersistentLocalIds { get; set; }
+        public DbSet<DuplicatedPersistentLocalId> DuplicatedPersistentLocalIds { get; set; }
 
         public LegacyContext() { }
 

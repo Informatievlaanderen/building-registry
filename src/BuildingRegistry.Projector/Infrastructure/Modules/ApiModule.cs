@@ -19,6 +19,7 @@ namespace BuildingRegistry.Projector.Infrastructure.Modules
     using BuildingRegistry.Projections.Legacy.BuildingDetail;
     using BuildingRegistry.Projections.Legacy.BuildingSyndication;
     using BuildingRegistry.Projections.Legacy.BuildingUnitDetail;
+    using BuildingRegistry.Projections.Legacy.PersistentLocalIdMigration;
     using BuildingRegistry.Projections.Wms;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
@@ -133,7 +134,9 @@ namespace BuildingRegistry.Projector.Infrastructure.Modules
 
                 .RegisterProjections<BuildingDetailProjections, LegacyContext>(() => new BuildingDetailProjections())
                 .RegisterProjections<BuildingSyndicationProjections, LegacyContext>(() => new BuildingSyndicationProjections())
-                .RegisterProjections<BuildingUnitDetailProjections, LegacyContext>(() => new BuildingUnitDetailProjections());
+                .RegisterProjections<BuildingUnitDetailProjections, LegacyContext>(() => new BuildingUnitDetailProjections())
+                .RegisterProjections<RemovedPersistentLocalIdProjections, LegacyContext>(() => new RemovedPersistentLocalIdProjections())
+                .RegisterProjections<DuplicatedPersistentLocalIdProjections, LegacyContext>(() => new DuplicatedPersistentLocalIdProjections());
         }
 
         private void RegisterWmsProjections(ContainerBuilder builder)
