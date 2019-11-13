@@ -7,6 +7,7 @@ namespace BuildingRegistry.Projections.Legacy
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.Runner.MigrationExtensions;
     using Infrastructure;
     using Microsoft.EntityFrameworkCore;
+    using Microsoft.EntityFrameworkCore.Diagnostics;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Logging;
@@ -53,7 +54,9 @@ namespace BuildingRegistry.Projections.Legacy
                         sqlServerOptions.EnableRetryOnFailure();
                         sqlServerOptions.MigrationsHistoryTable(MigrationTables.Extract, Schema.Extract);
                     })
-                    .UseExtendedSqlServerMigrations());
+                    .UseExtendedSqlServerMigrations()
+                    .ConfigureWarnings(x => x
+                        .Ignore(CoreEventId.IncludeIgnoredWarning)));
         }
 
         private static void RunInMemoryDb(
