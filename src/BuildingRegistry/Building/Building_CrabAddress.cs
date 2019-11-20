@@ -55,7 +55,7 @@ namespace BuildingRegistry.Building
 
                     predecessor.ApplyRetired(modification == CrabModification.Correction);
                 }
-                else if (lifetime.EndDateTime.HasValue && predecessor != null && predecessor.HasRetiredState && !_buildingUnitCollection.IsAddressLinkedToCommonBuildingUnit(addressId))
+                else if (lifetime.EndDateTime.HasValue && ((predecessor != null && predecessor.HasRetiredState) || IsHouseNumberReaddressedAt(buildingUnitKey, timestamp)) && !_buildingUnitCollection.IsAddressLinkedToCommonBuildingUnit(addressId))
                 {
                     doNothing = true;
                 }
@@ -95,6 +95,17 @@ namespace BuildingRegistry.Building
                             .OrderBy(x => x.Timestamp)
                             .Last();
 
+                        var addressIdForSubaddress = AddressId.CreateFor(new CrabSubaddressId(importedSubaddress.SubaddressId));
+                        var subaddressLaterImported = _legacySubaddressEventsByTerreinObjectHouseNumber.Values
+                            .SelectMany(x => x)
+                            .Any(x =>
+                                x.Timestamp > importedSubaddress.Timestamp &&
+                                x.SubaddressId == importedSubaddress.SubaddressId);
+
+                        var buildingUnitKeySubaddress = BuildingUnitKey.Create(terrainObjectId, terrainObjectHouseNumberId, new CrabSubaddressId(importedSubaddress.SubaddressId));
+                        if (subaddressLaterImported && _buildingUnitCollection.ActiveBuildingUnits.Any(x => x.AddressIds.Contains(addressIdForSubaddress)))
+                            continue;
+
                         ImportSubaddressFromCrab(
                             new CrabTerrainObjectId(importedSubaddress.TerrainObjectId),
                             new CrabTerrainObjectHouseNumberId(importedSubaddress.TerrainObjectHouseNumberId),
@@ -103,19 +114,24 @@ namespace BuildingRegistry.Building
                             new CrabLifetime(importedSubaddress.BeginDateTime, importedSubaddress.EndDateTime),
                             timestamp,
                             importedSubaddress.Modification);
-
-                        var subaddressLaterImported = _legacySubaddressEventsByTerreinObjectHouseNumber.Values
-                            .SelectMany(x => x)
-                            .Any(x =>
-                                x.Timestamp > importedSubaddress.Timestamp &&
-                                x.SubaddressId == importedSubaddress.SubaddressId);
-
-                        var buildingUnitKeySubaddress = BuildingUnitKey.Create(terrainObjectId, terrainObjectHouseNumberId, new CrabSubaddressId(importedSubaddress.SubaddressId));
-                        if (subaddressLaterImported)
-                            RemoveBuildingUnit(buildingUnitKeySubaddress, timestamp);
                     }
 
                     addedBuildingUnit.ApplyStatusChange((AddressHouseNumberStatusWasImportedFromCrab)null);
+                }
+
+                if (_buildingUnitCollection.HasReaddressed(buildingUnitKey) && _buildingUnitCollection.HasActiveUnitByKey(buildingUnitKey))
+                {
+                    var children = _buildingUnitCollection.GetRetiredBuildingUnitsByKeyAndChildKeys(buildingUnitKey).Where(c => c.IsRetiredByParent && !c.IsRetiredBySelf);
+
+                    foreach (var child in children)
+                    {
+                        if(_buildingUnitCollection.HasActiveUnitByKey(child.BuildingUnitKey))
+                            continue;
+
+                        ApplyAddBuildingUnit(_buildingUnitCollection.GetNextBuildingUnitIdFor(child.BuildingUnitKey), child.BuildingUnitKey, child.PreviousAddressId, new BuildingUnitVersion(timestamp));
+                        ApplyCreateCommonBuildingUnitIfNeeded(terrainObjectId, new BuildingUnitVersion(timestamp));
+                        ApplyAddressMoveToCommonIfNeeded(buildingUnitKey, modification);
+                    }
                 }
             }
 
@@ -130,24 +146,14 @@ namespace BuildingRegistry.Building
                 organisation));
         }
 
-        private void ImportHouseNumberBuffer(BuildingUnitKey buildingUnitKey, CrabHouseNumberId houseNumberId)
+        private void ImportHouseNumberBuffer(BuildingUnitKey buildingUnitKey, AddressId addressId)
         {
             var addedBuildingUnit = _buildingUnitCollection.GetActiveOrLastRetiredByKey(buildingUnitKey);
-            if (_legacyHouseNumberPositionEventsByHouseNumberId.ContainsKey(houseNumberId))
-            {
-                foreach (var addressHouseNumberPositionWasImportedFromCrab in _legacyHouseNumberPositionEventsByHouseNumberId[houseNumberId])
-                    addedBuildingUnit.Route(addressHouseNumberPositionWasImportedFromCrab);
-
+            if (_legacyHouseNumberPositionEventsByHouseNumberId.ContainsKey(addressId))
                 addedBuildingUnit.ApplyPositionChange((AddressHouseNumberPositionWasImportedFromCrab)null, false);
-            }
 
-            if (_legacyHouseNumberStatusEventsByHouseNumberId.ContainsKey(houseNumberId))
-            {
-                foreach (var addressHouseNumberStatusWasImportedFromCrab in _legacyHouseNumberStatusEventsByHouseNumberId[houseNumberId])
-                    addedBuildingUnit.Route(addressHouseNumberStatusWasImportedFromCrab);
-
+            if (_legacyHouseNumberStatusEventsByHouseNumberId.ContainsKey(addressId))
                 addedBuildingUnit.ApplyStatusChange((AddressHouseNumberStatusWasImportedFromCrab)null);
-            }
         }
 
         public void ImportHouseNumberStatusFromCrab(
@@ -314,20 +320,10 @@ namespace BuildingRegistry.Building
             var subaddressId = new CrabSubaddressId(buildingUnitKey.Subaddress.Value);
             var buildingUnit = _buildingUnitCollection.GetActiveOrLastRetiredByKey(buildingUnitKey);
             if (_legacySubaddressPositionEventsBySubadresId.ContainsKey(subaddressId))
-            {
-                foreach (var addressSubaddressPositionWasImportedFromCrab in _legacySubaddressPositionEventsBySubadresId[subaddressId])
-                    buildingUnit.Route(addressSubaddressPositionWasImportedFromCrab);
-
                 buildingUnit.ApplyPositionChange((AddressSubaddressPositionWasImportedFromCrab)null, false);
-            }
 
             if (_legacySubaddressStatusEventsBySubadresId.ContainsKey(subaddressId))
-            {
-                foreach (var addressSubadressStatusWasImportedFromCrab in _legacySubaddressStatusEventsBySubadresId[subaddressId])
-                    buildingUnit.Route(addressSubadressStatusWasImportedFromCrab);
-
                 buildingUnit.ApplyStatusChange((AddressSubaddressStatusWasImportedFromCrab)null);
-            }
         }
 
         public void ImportSubaddressStatusFromCrab(
@@ -522,8 +518,12 @@ namespace BuildingRegistry.Building
         {
             foreach (var activeBuildingUnit in _buildingUnitCollection.GetActiveBuildingUnitsByKeyAndChildKeys(buildingUnitKey).OrderByDescending(x => x.BuildingUnitKey.Subaddress.HasValue))
             {
+                var keyToMoveAddressFrom = activeBuildingUnit.BuildingUnitKey;
+                if (_buildingUnitCollection.HasBeenReaddressed(activeBuildingUnit.BuildingUnitKey))
+                    keyToMoveAddressFrom = _buildingUnitCollection.GetOldReaddressedKeyByUnitKey(activeBuildingUnit.BuildingUnitKey);
+
                 activeBuildingUnit.ApplyRemove();
-                ApplyAddressMoveFromCommonIfNeeded(activeBuildingUnit.BuildingUnitKey, new BuildingUnitVersion(timestamp), !buildingUnitKey.Subaddress.HasValue);
+                ApplyAddressMoveFromCommonIfNeeded(keyToMoveAddressFrom, new BuildingUnitVersion(timestamp), !buildingUnitKey.Subaddress.HasValue);
                 ApplyCommonBuildingUnitRemoveIfNeeded();
             }
 
@@ -554,7 +554,7 @@ namespace BuildingRegistry.Building
                 var buildingUnitId = _buildingUnitCollection.GetNextBuildingUnitIdFor(buildingUnitKey, fromAddressChange);
 
                 ApplyAddBuildingUnit(buildingUnitId, buildingUnitKey, addressId, new BuildingUnitVersion(timestamp));
-                ImportHouseNumberBuffer(buildingUnitKey, houseNumberId);
+                ImportHouseNumberBuffer(buildingUnitKey, AddressId.CreateFor(houseNumberId));
 
                 if (isRetired)
                     return;
@@ -562,14 +562,14 @@ namespace BuildingRegistry.Building
                 ApplyCreateCommonBuildingUnitIfNeeded(terrainObjectId, new BuildingUnitVersion(timestamp));
                 ApplyAddressMoveToCommonIfNeeded(buildingUnitKey, modification);
 
-                var children = _buildingUnitCollection.GetRetiredBuildingUnitsByKeyAndChildKeys(buildingUnitKey).Where(c => c.IsRetiredByParent && !c.IsRetiredBySelf);
+                //var children = _buildingUnitCollection.GetRetiredBuildingUnitsByKeyAndChildKeys(buildingUnitKey).Where(c => c.IsRetiredByParent && !c.IsRetiredBySelf);
 
-                foreach (var child in children)
-                {
-                    ApplyAddBuildingUnit(_buildingUnitCollection.GetNextBuildingUnitIdFor(child.BuildingUnitKey), child.BuildingUnitKey, child.PreviousAddressId, new BuildingUnitVersion(timestamp));
-                    ApplyCreateCommonBuildingUnitIfNeeded(terrainObjectId, new BuildingUnitVersion(timestamp));
-                    ApplyAddressMoveToCommonIfNeeded(buildingUnitKey, modification);
-                }
+                //foreach (var child in children)
+                //{
+                //    ApplyAddBuildingUnit(_buildingUnitCollection.GetNextBuildingUnitIdFor(child.BuildingUnitKey), child.BuildingUnitKey, child.PreviousAddressId, new BuildingUnitVersion(timestamp));
+                //    ApplyCreateCommonBuildingUnitIfNeeded(terrainObjectId, new BuildingUnitVersion(timestamp));
+                //    ApplyAddressMoveToCommonIfNeeded(buildingUnitKey, modification);
+                //}
             }
         }
 
@@ -585,8 +585,8 @@ namespace BuildingRegistry.Building
 
             if (unit != null && _buildingUnitCollection.HasReaddressed(buildingUnitKey))
             {
-                var readdressedToKey = _buildingUnitCollection.GetReaddressedKey(buildingUnitKey);
-                var readdressedEvent = _readdressedHouseNumbers[unit.BuildingUnitKey];
+                var readdressedToKey = _buildingUnitCollection.GetNewReaddressedKeyByUnitKey(buildingUnitKey);
+                var readdressedEvent = _readdressedHouseNumbers[readdressedToKey];
                 if (readdressedToKey?.HouseNumber != unit.BuildingUnitKey.HouseNumber || (readdressedToKey.HouseNumber == unit.BuildingUnitKey.HouseNumber && houseNumberId == readdressedEvent.NewHouseNumberId))
                     return;
             }
@@ -710,20 +710,22 @@ namespace BuildingRegistry.Building
             var predecessor = GetPredecessorFor(buildingUnitKey);
 
             if (IsRetired)
-            {
                 ApplyChange(new BuildingUnitWasAddedToRetiredBuilding(_buildingId, buildingUnitId, buildingUnitKey, addressId, version, predecessor?.BuildingUnitId));
-                ApplyChange(new BuildingUnitWasNotRealizedByBuilding(_buildingId, buildingUnitId));
-
-                if (Geometry != null && (predecessor == null || predecessor.BuildingUnitPosition == null))
-                    ApplyChange(new BuildingUnitPositionWasDerivedFromObject(_buildingId, buildingUnitId, Geometry.Center));
-            }
             else
-            {
                 ApplyChange(new BuildingUnitWasAdded(_buildingId, buildingUnitId, buildingUnitKey, addressId, version, predecessor?.BuildingUnitId));
 
-                if (Geometry != null && (predecessor == null || predecessor.BuildingUnitPosition == null))
-                    ApplyChange(new BuildingUnitPositionWasDerivedFromObject(_buildingId, buildingUnitId, Geometry.Center));
+            if (buildingUnitKey.Subaddress.HasValue)
+            {
+                ImportSubaddressBuffer(buildingUnitKey);
             }
+            else if (buildingUnitKey.HouseNumber.HasValue)
+            {
+                ImportHouseNumberBuffer(buildingUnitKey, addressId);
+            }
+
+            var unit = _buildingUnitCollection.GetActiveOrLastRetiredByKey(buildingUnitKey);
+            if (Geometry != null && unit.BuildingUnitPosition == null)
+                ApplyChange(new BuildingUnitPositionWasDerivedFromObject(_buildingId, buildingUnitId, Geometry.Center));
 
             if (_buildingUnitCollection.HasBeenReaddressed(buildingUnitKey))
             {

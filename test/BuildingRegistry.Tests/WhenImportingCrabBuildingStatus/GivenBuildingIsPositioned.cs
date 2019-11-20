@@ -33,7 +33,8 @@ namespace BuildingRegistry.Tests.WhenImportingCrabBuildingStatus
             Assert(new Scenario()
                 .Given(buildingId,
                     _fixture.Create<BuildingWasRegistered>(),
-                    _fixture.Create<BuildingWasMeasuredByGrb>())
+                    _fixture.Create<BuildingWasMeasuredByGrb>()
+                        .WithGeometry(new WkbGeometry(GeometryHelper.ValidPolygon.AsBinary())))
                 .When(importStatus)
                 .Then(buildingId,
                     new BuildingWasRealized(buildingId),

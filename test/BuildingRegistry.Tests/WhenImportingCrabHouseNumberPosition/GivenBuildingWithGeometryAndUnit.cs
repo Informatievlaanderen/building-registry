@@ -223,7 +223,8 @@ namespace BuildingRegistry.Tests.WhenImportingCrabHouseNumberPosition
         [Fact]
         public void WithValidGeometryWhenBuildingGeometryRemoved()
         {
-            var command = _fixture.Create<ImportHouseNumberPositionFromCrab>().WithPositionOrigin(CrabAddressPositionOrigin.DerivedFromBuilding);
+            var command = _fixture.Create<ImportHouseNumberPositionFromCrab>()
+                .WithPositionOrigin(CrabAddressPositionOrigin.DerivedFromBuilding);
 
             var buildingId = _fixture.Create<BuildingId>();
 
@@ -233,7 +234,8 @@ namespace BuildingRegistry.Tests.WhenImportingCrabHouseNumberPosition
                     _fixture.Create<BuildingUnitWasAdded>(),
                     _fixture.Create<AddressHouseNumberPositionWasImportedFromCrab>()
                         .WithPositionOrigin(CrabAddressPositionOrigin.ManualIndicationFromStand),
-                    _fixture.Create<BuildingWasMeasuredByGrb>(),
+                    _fixture.Create<BuildingWasMeasuredByGrb>()
+                        .WithGeometry(new WkbGeometry(GeometryHelper.ValidPolygon.AsBinary())),
                     _fixture.Create<BuildingUnitPositionWasAppointedByAdministrator>(),
                     _fixture.Create<BuildingGeometryWasRemoved>())
                 .When(command)

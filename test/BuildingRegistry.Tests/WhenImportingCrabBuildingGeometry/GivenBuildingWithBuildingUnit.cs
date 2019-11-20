@@ -158,7 +158,8 @@ namespace BuildingRegistry.Tests.WhenImportingCrabBuildingGeometry
                 .Given(buildingId,
                     _fixture.Create<BuildingWasRegistered>(),
                     _fixture.Create<BuildingUnitWasAdded>(),
-                    _fixture.Create<BuildingWasMeasuredByGrb>(),
+                    _fixture.Create<BuildingWasMeasuredByGrb>()
+                        .WithGeometry(new WkbGeometry(GeometryHelper.ValidPolygon.AsBinary())),
                     _fixture.Create<BuildingUnitPositionWasDerivedFromObject>(),
                     _fixture.Create<AddressHouseNumberPositionWasImportedFromCrab>(),
                     _fixture.Create<BuildingUnitBecameComplete>())

@@ -262,16 +262,6 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
                     }, ct);
             });
 
-            When<Envelope<BuildingUnitWasNotRealizedByBuilding>>(async (context, message, ct) =>
-            {
-                await context.FindAndUpdateBuildingUnitExtract(message.Message.BuildingUnitId,
-                    item =>
-                    {
-                        UpdateStatus(item, NotRealized);
-                        UpdateVersie(item, message.Message.Provenance.Timestamp);
-                    }, ct);
-            });
-
             When<Envelope<BuildingUnitWasNotRealizedByParent>>(async (context, message, ct) =>
             {
                 await context.FindAndUpdateBuildingUnitExtract(message.Message.BuildingUnitId,

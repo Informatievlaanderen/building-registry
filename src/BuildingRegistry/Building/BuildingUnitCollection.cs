@@ -9,7 +9,7 @@ namespace BuildingRegistry.Building
     {
         private readonly List<BuildingUnit> _allBuildingUnits = new List<BuildingUnit>();
         private readonly Dictionary<BuildingUnitKey, IList<BuildingUnit>> _allBuildingUnitsByKey = new Dictionary<BuildingUnitKey, IList<BuildingUnit>>();
-        private readonly Dictionary<BuildingUnitKey, BuildingUnitKey> _readdressedKeys = new Dictionary<BuildingUnitKey, BuildingUnitKey>();
+        private readonly Dictionary<BuildingUnitKey, BuildingUnitKey> _readdressedKeys = new Dictionary<BuildingUnitKey, BuildingUnitKey>(); //new, old
         private readonly Func<BuildingUnit, bool> _isRetiredPredicate = x => x.HasRetiredState && !x.IsRemoved;
         private readonly Func<BuildingUnit, bool> _isActivePredicate = x => !x.IsRemoved && !x.HasRetiredState;
 
@@ -20,8 +20,11 @@ namespace BuildingRegistry.Building
         public bool HasBeenReaddressed(BuildingUnitKey buildingUnitKey)
             => _readdressedKeys.ContainsValue(buildingUnitKey);
 
-        public BuildingUnitKey GetReaddressedKey(BuildingUnitKey buildingUnitKey)
+        public BuildingUnitKey GetNewReaddressedKeyByUnitKey(BuildingUnitKey buildingUnitKey)
             => _readdressedKeys[buildingUnitKey];
+
+        public BuildingUnitKey GetOldReaddressedKeyByUnitKey(BuildingUnitKey buildingUnitKey)
+            => _readdressedKeys.Single(x => x.Value == buildingUnitKey).Key;
 
         public bool HasReaddressed(BuildingUnitKey buildingUnitKey)
             => _readdressedKeys.ContainsKey(buildingUnitKey);
@@ -188,7 +191,11 @@ namespace BuildingRegistry.Building
 
             if (buildingUnitKey.HouseNumber.HasValue)
             {
-                if ((_allBuildingUnitsByKey.ContainsKey(buildingUnitKey) && _allBuildingUnitsByKey[buildingUnitKey].Any(x => x.IsRemoved) && !canBeDeleted))
+                if ((_allBuildingUnitsByKey.ContainsKey(buildingUnitKey)
+                     && _allBuildingUnitsByKey[buildingUnitKey].Any(x => x.IsRemoved)
+                     && !canBeDeleted
+                     && ActiveBuildingUnits.Where(x => x.BuildingUnitKey.HouseNumber.HasValue)
+                                            .All(x => x.BuildingUnitKey.ToHouseNumberKey() != buildingUnitKey.ToHouseNumberKey())))
                     throw new InvalidOperationException("Cannot get next building unit id for removed building unit");
 
                 var version = 1;

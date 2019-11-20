@@ -39,7 +39,6 @@ namespace BuildingRegistry.Tests.WhenImportingCrabTerrainObjectHouseNumber
                 .When(command)
                 .Then(buildingId,
                     new BuildingUnitWasAddedToRetiredBuilding(buildingId, _fixture.Create<BuildingUnitId>(), _fixture.Create<BuildingUnitKey>(), AddressId.CreateFor(command.HouseNumberId), new BuildingUnitVersion(command.Timestamp)),
-                    new BuildingUnitWasNotRealizedByBuilding(buildingId, _fixture.Create<BuildingUnitId>()),
                     command.ToLegacyEvent()));
         }
 
@@ -58,7 +57,6 @@ namespace BuildingRegistry.Tests.WhenImportingCrabTerrainObjectHouseNumber
                 .When(command)
                 .Then(buildingId,
                     new BuildingUnitWasAddedToRetiredBuilding(buildingId, _fixture.Create<BuildingUnitId>(), _fixture.Create<BuildingUnitKey>(), AddressId.CreateFor(command.HouseNumberId), new BuildingUnitVersion(command.Timestamp)),
-                    new BuildingUnitWasNotRealizedByBuilding(buildingId, _fixture.Create<BuildingUnitId>()),
                     command.ToLegacyEvent()));
         }
     }

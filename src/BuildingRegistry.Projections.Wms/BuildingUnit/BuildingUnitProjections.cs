@@ -223,16 +223,6 @@ namespace BuildingRegistry.Projections.Wms.BuildingUnit
                 }
             });
 
-            When<Envelope<BuildingUnitWasNotRealizedByBuilding>>(async (context, message, ct) =>
-            {
-                var buildingUnit = await context.BuildingUnits.FindAsync(message.Message.BuildingUnitId, cancellationToken: ct);
-                if (buildingUnit != null)
-                {
-                    buildingUnit.Status = BuildingUnitStatus.NotRealized;
-                    SetVersion(buildingUnit, message.Message.Provenance.Timestamp);
-                }
-            });
-
             When<Envelope<BuildingUnitWasCorrectedToPlanned>>(async (context, message, ct) =>
             {
                 var buildingUnit = await context.BuildingUnits.FindAsync(message.Message.BuildingUnitId, cancellationToken: ct);

@@ -129,7 +129,6 @@ namespace BuildingRegistry.Projections.LastChangedList
             When<Envelope<BuildingUnitWasCorrectedToRealized>>(async (context, message, ct) => DoNothing());
             When<Envelope<BuildingUnitWasCorrectedToRetired>>(async (context, message, ct) => DoNothing());
             When<Envelope<BuildingUnitWasNotRealized>>(async (context, message, ct) => DoNothing());
-            When<Envelope<BuildingUnitWasNotRealizedByBuilding>>(async (context, message, ct) => DoNothing());
             When<Envelope<BuildingUnitWasNotRealizedByParent>>(async (context, message, ct) => DoNothing());
             When<Envelope<BuildingUnitWasPlanned>>(async (context, message, ct) => DoNothing());
             When<Envelope<BuildingUnitWasReaddressed>>(async (context, message, ct) => DoNothing());

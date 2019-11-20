@@ -2,7 +2,9 @@ namespace BuildingRegistry.ValueObjects
 {
     using NetTopologySuite.IO;
     using System.Collections.Generic;
+    using System.Linq;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
+    using NetTopologySuite.Geometries;
     using Newtonsoft.Json;
 
     public class BuildingGeometry : ValueObject<BuildingGeometry>
@@ -16,7 +18,7 @@ namespace BuildingRegistry.ValueObjects
             [JsonProperty("geometry")] ExtendedWkbGeometry geometry,
             [JsonProperty("geometryMethod")] BuildingGeometryMethod geometryMethod)
         {
-            Geometry = geometry;
+            Geometry = CleanUpGeometryCollection(geometry);
             Method = geometryMethod;
         }
 
@@ -24,6 +26,18 @@ namespace BuildingRegistry.ValueObjects
         {
             var buildingUnitGeometry = _wkbReader.Read(geometry);
             return _wkbReader.Read(Geometry).Contains(buildingUnitGeometry);
+        }
+
+        private ExtendedWkbGeometry CleanUpGeometryCollection(ExtendedWkbGeometry geometry)
+        {
+            var buildingGeometry = _wkbReader.Read(geometry);
+            if (buildingGeometry is GeometryCollection gc && buildingGeometry.OgcGeometryType != OgcGeometryType.MultiPolygon)
+            {
+                var polygon = gc.Single(x => x is Polygon);
+                return new ExtendedWkbGeometry(polygon.AsBinary());
+            }
+
+            return geometry;
         }
 
         public ExtendedWkbGeometry Center =>

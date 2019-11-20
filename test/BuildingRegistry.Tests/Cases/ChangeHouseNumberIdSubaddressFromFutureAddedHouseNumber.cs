@@ -166,8 +166,6 @@ namespace BuildingRegistry.Tests.Cases
                 .When(importTerrainObjectHouseNumberFromCrab)
                 .Then(_.Gebouw1Id,
                     new BuildingUnitWasAdded(_.Gebouw1Id, _.GebouwEenheid1Id, _.GebouwEenheid1Key, _.Address16Id, new BuildingUnitVersion(importTerrainObjectHouseNumberFromCrab.Timestamp)),
-                    new BuildingUnitWasAdded(_.Gebouw1Id, _.GebouwEenheid5Id, _.GebouwEenheid5Key, _.Address18Bus1Id, new BuildingUnitVersion(importTerrainObjectHouseNumberFromCrab.Timestamp)),
-                    new BuildingUnitWasRemoved(_.Gebouw1Id, _.GebouwEenheid5Id),
                     importTerrainObjectHouseNumberFromCrab.ToLegacyEvent());
         }
 

@@ -1230,35 +1230,6 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
                     .AddAsync(newSyndicationItem, ct);
             });
 
-            When<Envelope<BuildingUnitWasNotRealizedByBuilding>>(async (context, message, ct) =>
-            {
-                var syndicationItem = await context.LatestPosition(message.Message.BuildingId, ct);
-
-                if (syndicationItem == null)
-                    throw DatabaseItemNotFound(message.Message.BuildingId);
-
-                if (syndicationItem.Position >= message.Position)
-                    return;
-
-                var newSyndicationItem = syndicationItem.CloneAndApplyEventInfo(
-                    message.Position,
-                    message.EventName,
-                    Instant.FromDateTimeUtc(message.CreatedUtc.ToUniversalTime()),
-                    x =>
-                    {
-                        var unit = x.BuildingUnits.Single(y => y.BuildingUnitId == message.Message.BuildingUnitId);
-                        unit.Status = BuildingUnitStatus.NotRealized;
-                        ApplyUnitVersion(unit, message.Message.Provenance.Timestamp);
-                    });
-
-                newSyndicationItem.EventDataAsXml = GetEventDataAsXmlString(message.Message);
-                ApplyProvenance(newSyndicationItem, message.Message.Provenance);
-
-                await context
-                    .BuildingSyndication
-                    .AddAsync(newSyndicationItem, ct);
-            });
-
             When<Envelope<BuildingUnitWasNotRealizedByParent>>(async (context, message, ct) =>
             {
                 var syndicationItem = await context.LatestPosition(message.Message.BuildingId, ct);

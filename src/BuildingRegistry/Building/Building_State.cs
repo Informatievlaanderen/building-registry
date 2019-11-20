@@ -38,10 +38,10 @@ namespace BuildingRegistry.Building
         private readonly Dictionary<CrabSubaddressId, List<AddressSubaddressPositionWasImportedFromCrab>> _legacySubaddressPositionEventsBySubadresId
             = new Dictionary<CrabSubaddressId, List<AddressSubaddressPositionWasImportedFromCrab>>();
 
-        private readonly Dictionary<CrabHouseNumberId, List<AddressHouseNumberStatusWasImportedFromCrab>> _legacyHouseNumberStatusEventsByHouseNumberId
-            = new Dictionary<CrabHouseNumberId, List<AddressHouseNumberStatusWasImportedFromCrab>>();
-        private readonly Dictionary<CrabHouseNumberId, List<AddressHouseNumberPositionWasImportedFromCrab>> _legacyHouseNumberPositionEventsByHouseNumberId
-            = new Dictionary<CrabHouseNumberId, List<AddressHouseNumberPositionWasImportedFromCrab>>();
+        private readonly Dictionary<AddressId, List<AddressHouseNumberStatusWasImportedFromCrab>> _legacyHouseNumberStatusEventsByHouseNumberId
+            = new Dictionary<AddressId, List<AddressHouseNumberStatusWasImportedFromCrab>>();
+        private readonly Dictionary<AddressId, List<AddressHouseNumberPositionWasImportedFromCrab>> _legacyHouseNumberPositionEventsByHouseNumberId
+            = new Dictionary<AddressId, List<AddressHouseNumberPositionWasImportedFromCrab>>();
 
         private readonly Dictionary<BuildingUnitKey, HouseNumberWasReaddressedFromCrab> _readdressedHouseNumbers = new Dictionary<BuildingUnitKey, HouseNumberWasReaddressedFromCrab>();
         private readonly Dictionary<BuildingUnitKey, SubaddressWasReaddressedFromCrab> _readdressedSubaddresses = new Dictionary<BuildingUnitKey, SubaddressWasReaddressedFromCrab>();
@@ -103,7 +103,6 @@ namespace BuildingRegistry.Building
             Register<BuildingUnitWasCorrectedToRetired>(When);
             Register<BuildingUnitWasNotRealized>(When);
             Register<BuildingUnitWasNotRealizedByParent>(When);
-            Register<BuildingUnitWasNotRealizedByBuilding>(When);
             Register<BuildingUnitWasCorrectedToNotRealized>(When);
             Register<BuildingUnitWasRealized>(When);
             Register<BuildingUnitWasCorrectedToRealized>(When);
@@ -216,11 +215,6 @@ namespace BuildingRegistry.Building
             _buildingUnitCollection.GetById(new BuildingUnitId(@event.BuildingUnitId)).Route(@event);
         }
 
-        private void When(BuildingUnitWasNotRealizedByBuilding @event)
-        {
-            _buildingUnitCollection.GetById(new BuildingUnitId(@event.BuildingUnitId)).Route(@event);
-        }
-
         #endregion BuildingUnit Status
 
         #region BuildingUnitPosition
@@ -274,6 +268,36 @@ namespace BuildingRegistry.Building
         {
             var buildingUnit = new BuildingUnit(ApplyChange, this);
             buildingUnit.Route(@event);
+
+            if (buildingUnit.BuildingUnitKey.Subaddress.HasValue)
+            {
+                var crabSubaddressId = new CrabSubaddressId(buildingUnit.BuildingUnitKey.Subaddress.Value);
+                if (_legacySubaddressPositionEventsBySubadresId.ContainsKey(crabSubaddressId))
+                {
+                    foreach (var subaddressPositionWasImportedFromCrab in _legacySubaddressPositionEventsBySubadresId[crabSubaddressId])
+                        buildingUnit.Route(subaddressPositionWasImportedFromCrab);
+                }
+
+                if (_legacySubaddressStatusEventsBySubadresId.ContainsKey(crabSubaddressId))
+                {
+                    foreach (var subaddressStatusWasImportedFromCrab in _legacySubaddressStatusEventsBySubadresId[crabSubaddressId])
+                        buildingUnit.Route(subaddressStatusWasImportedFromCrab);
+                }
+            }
+            else if(buildingUnit.BuildingUnitKey.HouseNumber.HasValue && buildingUnit.AddressIds.Any())
+            {
+                if (_legacyHouseNumberPositionEventsByHouseNumberId.ContainsKey(buildingUnit.AddressIds.First()))
+                {
+                    foreach (var houseNumberPositionWasImportedFromCrab in _legacyHouseNumberPositionEventsByHouseNumberId[buildingUnit.AddressIds.First()])
+                        buildingUnit.Route(houseNumberPositionWasImportedFromCrab);
+                }
+
+                if (_legacyHouseNumberStatusEventsByHouseNumberId.ContainsKey(buildingUnit.AddressIds.First()))
+                {
+                    foreach (var houseNumberStatusWasImportedFromCrab in _legacyHouseNumberStatusEventsByHouseNumberId[buildingUnit.AddressIds.First()])
+                        buildingUnit.Route(houseNumberStatusWasImportedFromCrab);
+                }
+            }
 
             _buildingUnitCollection.Add(buildingUnit);
         }
@@ -495,11 +519,11 @@ namespace BuildingRegistry.Building
 
             _buildingUnitCollection.GetActiveOrLastRetiredByKey(key)?.Route(@event);
 
-            var crabHouseNumberId = new CrabHouseNumberId(@event.HouseNumberId);
-            if (!_legacyHouseNumberStatusEventsByHouseNumberId.ContainsKey(crabHouseNumberId))
-                _legacyHouseNumberStatusEventsByHouseNumberId.Add(crabHouseNumberId, new List<AddressHouseNumberStatusWasImportedFromCrab>());
+            var addressId = AddressId.CreateFor(new CrabHouseNumberId(@event.HouseNumberId));
+            if (!_legacyHouseNumberStatusEventsByHouseNumberId.ContainsKey(addressId))
+                _legacyHouseNumberStatusEventsByHouseNumberId.Add(addressId, new List<AddressHouseNumberStatusWasImportedFromCrab>());
 
-            _legacyHouseNumberStatusEventsByHouseNumberId[crabHouseNumberId].Add(@event);
+            _legacyHouseNumberStatusEventsByHouseNumberId[addressId].Add(@event);
             WhenCrabEventApplied();
         }
 
@@ -513,11 +537,11 @@ namespace BuildingRegistry.Building
 
             _buildingUnitCollection.GetActiveOrLastRetiredByKey(key)?.Route(@event);
 
-            var crabHouseNumberId = new CrabHouseNumberId(@event.HouseNumberId);
-            if (!_legacyHouseNumberPositionEventsByHouseNumberId.ContainsKey(crabHouseNumberId))
-                _legacyHouseNumberPositionEventsByHouseNumberId.Add(crabHouseNumberId, new List<AddressHouseNumberPositionWasImportedFromCrab>());
+            var addressId = AddressId.CreateFor(new CrabHouseNumberId(@event.HouseNumberId));
+            if (!_legacyHouseNumberPositionEventsByHouseNumberId.ContainsKey(addressId))
+                _legacyHouseNumberPositionEventsByHouseNumberId.Add(addressId, new List<AddressHouseNumberPositionWasImportedFromCrab>());
 
-            _legacyHouseNumberPositionEventsByHouseNumberId[crabHouseNumberId].Add(@event);
+            _legacyHouseNumberPositionEventsByHouseNumberId[addressId].Add(@event);
             WhenCrabEventApplied();
         }
 

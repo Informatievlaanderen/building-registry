@@ -54,10 +54,10 @@ namespace BuildingRegistry.Building
         {
             _parent = parent;
 
-            //Register<BuildingWasRetired>(When);
-            //Register<BuildingWasNotRealized>(When);
-            //Register<BuildingWasCorrectedToRetired>(When);
-            //Register<BuildingWasCorrectedToNotRealized>(When);
+            Register<BuildingWasRetired>(When);
+            Register<BuildingWasNotRealized>(When);
+            Register<BuildingWasCorrectedToRetired>(When);
+            Register<BuildingWasCorrectedToNotRealized>(When);
             Register<BuildingUnitPersistentLocalIdWasAssigned>(When);
 
             Register<BuildingWasMeasuredByGrb>(When);
@@ -80,7 +80,6 @@ namespace BuildingRegistry.Building
             Register<BuildingUnitWasRetiredByParent>(When);
             Register<BuildingUnitWasNotRealized>(When);
             Register<BuildingUnitWasNotRealizedByParent>(When);
-            Register<BuildingUnitWasNotRealizedByBuilding>(When);
             Register<BuildingUnitWasRealized>(When);
             Register<BuildingUnitWasCorrectedToRealized>(When);
             Register<BuildingUnitWasCorrectedToPlanned>(When);
@@ -124,6 +123,34 @@ namespace BuildingRegistry.Building
         {
             PersistentLocalId = new PersistentLocalId(@event.PersistentLocalId);
         }
+
+        #region Building Retirement
+
+        private void When(BuildingWasRetired @event)
+        {
+            Status = BuildingUnitStatus.Retired;
+            IsRetiredByBuilding = true;
+        }
+
+        private void When(BuildingWasCorrectedToRetired @event)
+        {
+            Status = BuildingUnitStatus.Retired;
+            IsRetiredByBuilding = true;
+        }
+
+        private void When(BuildingWasNotRealized @event)
+        {
+            IsRetiredByBuilding = true;
+            Status = BuildingUnitStatus.NotRealized;
+        }
+
+        private void When(BuildingWasCorrectedToNotRealized @event)
+        {
+            IsRetiredByBuilding = true;
+            Status = BuildingUnitStatus.NotRealized;
+        }
+
+        #endregion
 
         #region Unit Position
         private void When(BuildingUnitPositionWasDerivedFromObject @event)
@@ -274,12 +301,6 @@ namespace BuildingRegistry.Building
             IsRetiredByParent = true;
             IsRetiredByBuilding = false;
         }
-
-        private void When(BuildingUnitWasNotRealizedByBuilding @event)
-        {
-            Status = BuildingUnitStatus.NotRealized;
-            IsRetiredByBuilding = true;
-        }
         #endregion Status
 
         private void When(BuildingUnitWasRemoved @event)
@@ -307,6 +328,8 @@ namespace BuildingRegistry.Building
             Function = BuildingUnitFunction.Unknown;
             PreviousAddressId = new AddressId(@event.AddressId);
             BuildingGeometry = _parent.Geometry;
+            Status = BuildingUnitStatus.Retired;
+            IsRetiredByBuilding = true;
 
             Version = @event.BuildingUnitVersion;
         }

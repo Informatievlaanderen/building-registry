@@ -68,8 +68,8 @@ namespace BuildingRegistry.Building
                     else
                         ApplyStatusChange(buildingStatus);
 
-                    if (!IsRetired && wasRetired)
-                        UnretireBuildingUnits(modification, timestamp);
+                    //if (!IsRetired && wasRetired) Actually impossible: if CRAB TerrainObject gets enddate so does the relation, so the relation will get reactivated too.
+                    //    UnretireBuildingUnits(modification, timestamp);
                 }
             }
 
@@ -446,28 +446,42 @@ namespace BuildingRegistry.Building
                                     x.CrabTerrainObjectHouseNumberId == activeUnit.BuildingUnitKey.HouseNumber.Value)
                         .ToList();
 
-                    if(!persistentLocalIdQuery.Any())
-                        continue; //shit really hit the fan... (terreinobjectid: 6683870 (see old prod))
-
                     if (_buildingUnitCollection.HasReaddressed(activeUnit.BuildingUnitKey.ToHouseNumberKey()))
                     {
                         persistentLocalIdQuery = persistentLocalIdQuery.Union(deduplicatedCollection.Where(
                             x => x.CrabTerrainObjectHouseNumberId != null &&
-                                 x.CrabTerrainObjectHouseNumberId == _buildingUnitCollection.GetReaddressedKey(activeUnit.BuildingUnitKey.ToHouseNumberKey()).HouseNumber))
+                                 x.CrabTerrainObjectHouseNumberId == _buildingUnitCollection.GetNewReaddressedKeyByUnitKey(activeUnit.BuildingUnitKey.ToHouseNumberKey()).HouseNumber))
                             .ToList();
                     }
 
+                    if (!persistentLocalIdQuery.Any())
+                        continue; //shit really hit the fan... (terreinobjectid: 6683870 (see old prod))
+
+                    var filtered = persistentLocalIdQuery;
                     if (activeUnit.BuildingUnitKey.Subaddress.HasValue)
-                        persistentLocalIdQuery = persistentLocalIdQuery.Where(x =>
-                            x.CrabSubaddressId != null &&
-                            x.CrabSubaddressId == activeUnit.BuildingUnitKey.Subaddress.Value)
+                    {
+                        filtered = persistentLocalIdQuery.Where(x =>
+                                x.CrabSubaddressId != null &&
+                                x.CrabSubaddressId == activeUnit.BuildingUnitKey.Subaddress.Value)
                             .ToList();
+
+                        if(_buildingUnitCollection.HasReaddressed(activeUnit.BuildingUnitKey))
+                            filtered = filtered.Union(persistentLocalIdQuery.Where(x =>
+                                        x.CrabSubaddressId != null &&
+                                        x.CrabSubaddressId == _buildingUnitCollection.GetNewReaddressedKeyByUnitKey(activeUnit.BuildingUnitKey).Subaddress)
+                                    .ToList())
+                                .ToList();
+
+                        if (!filtered.Any()) // terreinobjectid: 9041275
+                            filtered = deduplicatedCollection.Where(x => x.CrabSubaddressId != null && x.CrabSubaddressId == activeUnit.BuildingUnitKey.Subaddress.Value)
+                                .ToList();
+                    }
                     else
-                        persistentLocalIdQuery = persistentLocalIdQuery
+                        filtered = persistentLocalIdQuery
                             .Where(x => x.CrabSubaddressId == null)
                             .ToList();
 
-                    var activeUnitPersistentLocalId = persistentLocalIdQuery
+                    var activeUnitPersistentLocalId = filtered
                         .OrderByDescending(x => x.Index)
                         .FirstOrDefault();
 
@@ -479,6 +493,9 @@ namespace BuildingRegistry.Building
                     }
                     else if (activeUnitPersistentLocalId == null)
                     {
+                        var crabSubaddressIds = deduplicatedCollection.Where(x => x != null).GroupBy(x => x.CrabSubaddressId);
+                        if (crabSubaddressIds.Any(y => y.Count() > 1))
+                            continue;
                         throw new InvalidOperationException("Cannot find persistent local id for active subaddress");
                     }
 
