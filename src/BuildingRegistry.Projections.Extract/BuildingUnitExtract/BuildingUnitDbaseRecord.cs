@@ -8,7 +8,7 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
 
         public DbaseString id { get; }
         public DbaseInt32 gebouwehid { get; }
-        public DbaseDateTime versieid { get; }
+        public DbaseString versieid { get; }
         public DbaseString gebouwid { get; }
         public DbaseString functie { get; }
         public DbaseString status { get; }
@@ -18,7 +18,7 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
         {
             id = new DbaseString(Schema.id);
             gebouwehid = new DbaseInt32(Schema.gebouwehid);
-            versieid = new DbaseDateTime(Schema.versieid);
+            versieid = new DbaseString(Schema.versieid);
             gebouwid = new DbaseString(Schema.gebouwid);
             functie = new DbaseString(Schema.functie);
             status = new DbaseString(Schema.status);

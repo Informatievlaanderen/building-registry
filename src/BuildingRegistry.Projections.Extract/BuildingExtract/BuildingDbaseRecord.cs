@@ -8,7 +8,7 @@ namespace BuildingRegistry.Projections.Extract.BuildingExtract
 
         public DbaseString id { get; }
         public DbaseInt32 gebouwid { get; }
-        public DbaseDateTime versieid { get; }
+        public DbaseString versieid { get; }
         public DbaseString geommet { get; }
         public DbaseString status { get; }
 
@@ -16,7 +16,7 @@ namespace BuildingRegistry.Projections.Extract.BuildingExtract
         {
             id = new DbaseString(Schema.id);
             gebouwid = new DbaseInt32(Schema.gebouwid);
-            versieid = new DbaseDateTime(Schema.versieid);
+            versieid = new DbaseString(Schema.versieid);
             geommet = new DbaseString(Schema.geommet);
             status = new DbaseString(Schema.status);
 

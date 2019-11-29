@@ -9,6 +9,7 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
     using System;
     using System.Linq;
     using System.Text;
+    using Be.Vlaanderen.Basisregisters.GrAr.Extracts;
     using Be.Vlaanderen.Basisregisters.Shaperon;
     using Be.Vlaanderen.Basisregisters.Utilities.HexByteConvertor;
     using Building.Events.Crab;
@@ -57,7 +58,7 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
                         IsComplete = false,
                         DbaseRecord = new BuildingUnitDbaseRecord
                         {
-                            versieid = { Value = message.Message.Provenance.Timestamp.ToBelgianDateTimeOffset().DateTime },
+                            versieid = { Value = message.Message.Provenance.Timestamp.ToBelgianDateTimeOffset().FromDateTimeOffset() },
                             functie = { Value = Common }
                         }.ToBytes(_encoding)
                     }, ct);
@@ -74,7 +75,7 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
                         IsComplete = false,
                         DbaseRecord = new BuildingUnitDbaseRecord
                         {
-                            versieid = { Value = message.Message.Provenance.Timestamp.ToBelgianDateTimeOffset().DateTime },
+                            versieid = { Value = message.Message.Provenance.Timestamp.ToBelgianDateTimeOffset().FromDateTimeOffset() },
                             functie = { Value = Unknown }
                         }.ToBytes(_encoding)
                     }, ct);
@@ -91,7 +92,7 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
                         IsComplete = false,
                         DbaseRecord = new BuildingUnitDbaseRecord
                         {
-                            versieid = { Value = message.Message.Provenance.Timestamp.ToBelgianDateTimeOffset().DateTime },
+                            versieid = { Value = message.Message.Provenance.Timestamp.ToBelgianDateTimeOffset().FromDateTimeOffset() },
                             functie = { Value = Unknown }
                         }.ToBytes(_encoding)
                     }, ct);
@@ -108,7 +109,7 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
                         IsComplete = false,
                         DbaseRecord = new BuildingUnitDbaseRecord
                         {
-                            versieid = { Value = message.Message.Provenance.Timestamp.ToBelgianDateTimeOffset().DateTime },
+                            versieid = { Value = message.Message.Provenance.Timestamp.ToBelgianDateTimeOffset().FromDateTimeOffset() },
                             functie = { Value = Unknown }
                         }.ToBytes(_encoding)
                     }, ct);
@@ -379,7 +380,7 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
             });
 
         private void UpdateVersie(BuildingUnitExtractItem buildingUnit, Instant timestamp)
-            => UpdateRecord(buildingUnit, record => record.versieid.Value = timestamp.ToBelgianDateTimeOffset().DateTime);
+            => UpdateRecord(buildingUnit, record => record.versieid.SetValue(timestamp.ToBelgianDateTimeOffset()));
 
         private void UpdateRecord(BuildingUnitExtractItem buildingUnit, Action<BuildingUnitDbaseRecord> updateFunc)
         {
