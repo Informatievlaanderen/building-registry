@@ -8,9 +8,8 @@ namespace BuildingRegistry.Projections.Extract.BuildingExtract
     using NetTopologySuite.IO;
     using NodaTime;
     using System;
-    using System.Collections.Generic;
-    using System.Linq;
     using System.Text;
+    using Be.Vlaanderen.Basisregisters.GrAr.Extracts;
     using Be.Vlaanderen.Basisregisters.Shaperon;
     using Building.Events.Crab;
     using Microsoft.Extensions.Options;
@@ -45,7 +44,7 @@ namespace BuildingRegistry.Projections.Extract.BuildingExtract
                         IsComplete = false,
                         DbaseRecord = new BuildingDbaseRecord
                         {
-                            versieid = { Value = message.Message.Provenance.Timestamp.ToBelgianDateTimeOffset().DateTime }
+                            versieid = { Value = message.Message.Provenance.Timestamp.ToBelgianDateTimeOffset().FromDateTimeOffset() }
                         }.ToBytes(_encoding)
                     }, ct);
             });
@@ -347,7 +346,7 @@ namespace BuildingRegistry.Projections.Extract.BuildingExtract
             });
 
         private void UpdateVersie(BuildingExtractItem building, Instant timestamp)
-            => UpdateRecord(building, record => record.versieid.Value = timestamp.ToBelgianDateTimeOffset().DateTime);
+            => UpdateRecord(building, record => record.versieid.SetValue(timestamp.ToBelgianDateTimeOffset()));
 
         private void UpdateRecord(BuildingExtractItem building, Action<BuildingDbaseRecord> updateFunc)
         {

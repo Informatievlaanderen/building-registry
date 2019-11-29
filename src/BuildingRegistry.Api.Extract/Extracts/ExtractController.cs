@@ -19,8 +19,8 @@ namespace BuildingRegistry.Api.Extract.Extracts
     [ApiExplorerSettings(GroupName = "Extract")]
     public class ExtractController : ApiController
     {
-        public static readonly string BuildingZipName = "gebouwen";
-        public static readonly string BuildingUnitZipName = "gebouweenheden";
+        public static readonly string BuildingZipName = "Gebouw";
+        public static readonly string BuildingUnitZipName = "Gebouweenheid";
 
         /// <summary>
         /// Vraag een dump van het volledige register op.

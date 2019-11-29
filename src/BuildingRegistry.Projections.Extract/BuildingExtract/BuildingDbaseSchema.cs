@@ -14,7 +14,7 @@ namespace BuildingRegistry.Projections.Extract.BuildingExtract
         {
             DbaseField.CreateStringField(new DbaseFieldName(nameof(id)), new DbaseFieldLength(50)),
             DbaseField.CreateInt32Field(new DbaseFieldName(nameof(gebouwid)), new DbaseFieldLength(10)),
-            DbaseField.CreateDateTimeField(new DbaseFieldName(nameof(versieid))),
+            DbaseField.CreateStringField(new DbaseFieldName(nameof(versieid)), new DbaseFieldLength(25)),
             DbaseField.CreateStringField(new DbaseFieldName(nameof(geommet)), new DbaseFieldLength(20)),
             DbaseField.CreateStringField(new DbaseFieldName(nameof(status)), new DbaseFieldLength(20))
         };
