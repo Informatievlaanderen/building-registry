@@ -299,7 +299,7 @@ namespace BuildingRegistry.Api.Legacy.Building
                 context,
                 filtering.Filter?.ContainEvent ?? false,
                 filtering.Filter?.ContainObject ?? false)
-                .Fetch(filtering, sorting, pagination);
+                .Fetch(filtering, sorting, pagination, items => 0);
 
             Response.AddPagedQueryResultHeaders(pagedBuildings);
 
