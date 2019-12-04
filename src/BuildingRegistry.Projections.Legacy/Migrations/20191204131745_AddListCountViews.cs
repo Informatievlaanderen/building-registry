@@ -37,7 +37,6 @@ namespace BuildingRegistry.Projections.Legacy.Migrations
 
         private static void CreateBuildingUnitListCountView(MigrationBuilder migrationBuilder)
         {
-
             migrationBuilder.Sql($@"
             CREATE VIEW [{ViewSchema}].[{LegacyContext.BuildingUnitDetailListCountViewName}]
             WITH SCHEMABINDING
