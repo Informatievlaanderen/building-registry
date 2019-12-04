@@ -11,6 +11,8 @@ namespace BuildingRegistry.Projections.Legacy
     public class LegacyContext : RunnerDbContext<LegacyContext>
     {
         public override string ProjectionStateSchema => Schema.Legacy;
+        internal const string BuildingDetailListCountViewName = "vw_BuildingDetailListCountView";
+        internal const string BuildingUnitDetailListCountViewName = "vw_BuildingUnitDetailListCountView";
 
         public DbSet<BuildingDetailItem> BuildingDetails { get; set; }
         public DbSet<BuildingSyndicationItem> BuildingSyndication { get; set; }
@@ -20,10 +22,24 @@ namespace BuildingRegistry.Projections.Legacy
         public DbSet<RemovedPersistentLocalId> RemovedPersistentLocalIds { get; set; }
         public DbSet<DuplicatedPersistentLocalId> DuplicatedPersistentLocalIds { get; set; }
 
+        public DbQuery<BuildingDetailListCountView> BuildingDetailListCountView { get; set; }
+        public DbQuery<BuildingUnitDetailListCountView> BuildingUnitDetailListCountView { get; set; }
+
         public LegacyContext() { }
 
         // This needs to be DbContextOptions<T> for Autofac!
         public LegacyContext(DbContextOptions<LegacyContext> options)
             : base(options) { }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Query<BuildingDetailListCountView>()
+                .ToView(BuildingDetailListCountViewName, Schema.Legacy);
+
+            modelBuilder.Query<BuildingUnitDetailListCountView>()
+                .ToView(BuildingUnitDetailListCountViewName, Schema.Legacy);
+        }
     }
 }
