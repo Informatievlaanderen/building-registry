@@ -11,6 +11,11 @@ namespace BuildingRegistry.Projections.Legacy.PersistentLocalIdMigration
         {
             When<Envelope<BuildingUnitPersistentLocalIdWasDuplicated>>(async (context, message, ct) =>
             {
+                var id = await context.RemovedPersistentLocalIds.FindAsync(message.Message.DuplicatePersistentLocalId, cancellationToken: ct);
+
+                if (id != null)
+                    return;
+
                 await context
                     .DuplicatedPersistentLocalIds
                     .AddAsync(
