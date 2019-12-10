@@ -34,8 +34,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetail
             When<Envelope<BuildingWasRemoved>>(async (context, message, ct) =>
             {
                 // possible of ALOT of units, might exceed SQL server IN (...) limitation, thats why we first get id by BuildingId
-                var buildingUnits = (await context.BuildingUnitDetails.Where(unit => unit.BuildingId == message.Message.BuildingId).ToListAsync(ct))
-                    .Union(context.BuildingUnitDetails.Local.Where(unit => unit.BuildingId == message.Message.BuildingId));
+                var buildingUnits = await GetAllBuildingUnitsByBuildingId(context, message.Message.BuildingId, ct);
 
                 foreach (var buildingUnitDetailItem in buildingUnits)
                 {
@@ -57,8 +56,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetail
 
             When<Envelope<BuildingWasRetired>>(async (context, message, ct) =>
             {
-                var buildingUnits = (await context.BuildingUnitDetails.Where(unit => unit.BuildingId == message.Message.BuildingId).ToListAsync(ct))
-                    .Union(context.BuildingUnitDetails.Local.Where(unit => unit.BuildingId == message.Message.BuildingId));
+                var buildingUnits = await GetAllBuildingUnitsByBuildingId(context, message.Message.BuildingId, ct);
                 RetireUnitsByBuilding(buildingUnits, message.Message.BuildingUnitIdsToNotRealize, message.Message.BuildingUnitIdsToRetire, message.Message.Provenance.Timestamp, context);
 
                 var building = await context.BuildingUnitBuildings.FindAsync(message.Message.BuildingId, cancellationToken: ct);
@@ -67,8 +65,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetail
 
             When<Envelope<BuildingWasCorrectedToRetired>>(async (context, message, ct) =>
             {
-                var buildingUnits = (await context.BuildingUnitDetails.Where(unit => unit.BuildingId == message.Message.BuildingId).ToListAsync(ct))
-                    .Union(context.BuildingUnitDetails.Local.Where(unit => unit.BuildingId == message.Message.BuildingId));
+                var buildingUnits = await GetAllBuildingUnitsByBuildingId(context, message.Message.BuildingId, ct);
                 RetireUnitsByBuilding(buildingUnits, message.Message.BuildingUnitIdsToNotRealize, message.Message.BuildingUnitIdsToRetire, message.Message.Provenance.Timestamp, context);
 
                 var building = await context.BuildingUnitBuildings.FindAsync(message.Message.BuildingId, cancellationToken: ct);
@@ -77,8 +74,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetail
 
             When<Envelope<BuildingWasNotRealized>>(async (context, message, ct) =>
             {
-                var buildingUnits = (await context.BuildingUnitDetails.Where(unit => unit.BuildingId == message.Message.BuildingId).ToListAsync(ct))
-                    .Union(context.BuildingUnitDetails.Local.Where(unit => unit.BuildingId == message.Message.BuildingId));
+                var buildingUnits = await GetAllBuildingUnitsByBuildingId(context, message.Message.BuildingId, ct);
                 RetireUnitsByBuilding(buildingUnits, message.Message.BuildingUnitIdsToNotRealize, message.Message.BuildingUnitIdsToRetire, message.Message.Provenance.Timestamp, context);
 
                 var building = await context.BuildingUnitBuildings.FindAsync(message.Message.BuildingId, cancellationToken: ct);
@@ -87,8 +83,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetail
 
             When<Envelope<BuildingWasCorrectedToNotRealized>>(async (context, message, ct) =>
             {
-                var buildingUnits = (await context.BuildingUnitDetails.Where(unit => unit.BuildingId == message.Message.BuildingId).ToListAsync(ct))
-                    .Union(context.BuildingUnitDetails.Local.Where(unit => unit.BuildingId == message.Message.BuildingId));
+                var buildingUnits = await GetAllBuildingUnitsByBuildingId(context, message.Message.BuildingId, ct);
                 RetireUnitsByBuilding(buildingUnits, message.Message.BuildingUnitIdsToNotRealize, message.Message.BuildingUnitIdsToRetire, message.Message.Provenance.Timestamp, context);
 
                 var building = await context.BuildingUnitBuildings.FindAsync(message.Message.BuildingId, cancellationToken: ct);
@@ -97,8 +92,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetail
 
             When<Envelope<BuildingGeometryWasRemoved>>(async (context, message, ct) =>
             {
-                var buildingUnits = (await context.BuildingUnitDetails.Where(unit => unit.BuildingId == message.Message.BuildingId).ToListAsync(ct))
-                    .Union(context.BuildingUnitDetails.Local.Where(unit => unit.BuildingId == message.Message.BuildingId));
+                var buildingUnits = await GetAllBuildingUnitsByBuildingId(context, message.Message.BuildingId, ct);
                 foreach (var buildingUnit in buildingUnits)
                 {
                     buildingUnit.PositionMethod = null;
@@ -109,8 +103,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetail
 
             When<Envelope<BuildingBecameComplete>>(async (context, message, ct) =>
             {
-                var buildingUnits = (await context.BuildingUnitDetails.Where(unit => unit.BuildingId == message.Message.BuildingId).ToListAsync(ct))
-                    .Union(context.BuildingUnitDetails.Local.Where(unit => unit.BuildingId == message.Message.BuildingId));
+                var buildingUnits = await GetAllBuildingUnitsByBuildingId(context, message.Message.BuildingId, ct);
                 foreach (var buildingUnit in buildingUnits)
                 {
                     buildingUnit.IsBuildingComplete = true;
@@ -123,8 +116,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetail
 
             When<Envelope<BuildingBecameIncomplete>>(async (context, message, ct) =>
             {
-                var buildingUnits = (await context.BuildingUnitDetails.Where(unit => unit.BuildingId == message.Message.BuildingId).ToListAsync(ct))
-                    .Union(context.BuildingUnitDetails.Local.Where(unit => unit.BuildingId == message.Message.BuildingId));
+                var buildingUnits = await GetAllBuildingUnitsByBuildingId(context, message.Message.BuildingId, ct);
                 foreach (var buildingUnit in buildingUnits)
                 {
                     buildingUnit.IsBuildingComplete = false;
@@ -140,8 +132,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetail
                 var building = await context.BuildingUnitBuildings.FindAsync(message.Message.BuildingId, cancellationToken: ct);
                 building.BuildingPersistentLocalId = message.Message.PersistentLocalId;
 
-                var buildingUnits = (await context.BuildingUnitDetails.Where(unit => unit.BuildingId == message.Message.BuildingId).ToListAsync(ct))
-                    .Union(context.BuildingUnitDetails.Local.Where(unit => unit.BuildingId == message.Message.BuildingId));
+                var buildingUnits = await GetAllBuildingUnitsByBuildingId(context, message.Message.BuildingId, ct);
 
                 foreach (var buildingUnit in buildingUnits)
                     buildingUnit.BuildingPersistentLocalId = message.Message.PersistentLocalId;
@@ -407,6 +398,13 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetail
             When<Envelope<TerrainObjectHouseNumberWasImportedFromCrab>>(async (context, message, ct) => DoNothing());
             When<Envelope<TerrainObjectWasImportedFromCrab>>(async (context, message, ct) => DoNothing());
 
+        }
+
+        private static async Task<List<BuildingUnitDetailItem>> GetAllBuildingUnitsByBuildingId(LegacyContext context, Guid buildingId, CancellationToken ct)
+        {
+            return (await context.BuildingUnitDetails.Where(unit => unit.BuildingId == buildingId).ToListAsync(ct))
+                .Union(context.BuildingUnitDetails.Local.Where(unit => unit.BuildingId == buildingId))
+                .ToList();
         }
 
         private static void SetVersion(BuildingUnitDetailItem buildingUnit, Instant timestamp)
