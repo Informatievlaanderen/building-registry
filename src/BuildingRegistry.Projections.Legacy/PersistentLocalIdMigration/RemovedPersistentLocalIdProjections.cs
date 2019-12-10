@@ -11,6 +11,11 @@ namespace BuildingRegistry.Projections.Legacy.PersistentLocalIdMigration
         {
             When<Envelope<BuildingUnitPersistentLocalIdWasRemoved>>(async (context, message, ct) =>
             {
+                var id = await context.RemovedPersistentLocalIds.FindAsync(message.Message.PersistentLocalId, cancellationToken: ct);
+
+                if(id != null)
+                    return;
+
                 await context
                     .RemovedPersistentLocalIds
                     .AddAsync(
