@@ -17,6 +17,7 @@ namespace BuildingRegistry.Importer
         private static void Main(params string[] args)
         {
             var settings = new SettingsBasedConfig();
+            SqlServerTypes.Utilities.LoadNativeAssemblies(AppDomain.CurrentDomain.BaseDirectory);
 
             try
             {
