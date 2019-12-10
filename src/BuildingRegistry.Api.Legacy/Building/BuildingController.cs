@@ -35,6 +35,7 @@ namespace BuildingRegistry.Api.Legacy.Building
     using System.Xml;
     using Be.Vlaanderen.Basisregisters.Api.Search;
     using Infrastructure;
+    using Projections.Legacy.BuildingDetail;
     using ValueObjects;
     using ProblemDetails = Be.Vlaanderen.Basisregisters.BasicApiProblem.ProblemDetails;
 
@@ -138,13 +139,18 @@ namespace BuildingRegistry.Api.Legacy.Building
             [FromServices] IOptions<ResponseOptions> responseOptions,
             CancellationToken cancellationToken = default)
         {
+            var filtering = new FilteringHeader<BuildingFilter>(default);
             var sorting = Request.ExtractSortingRequest();
             var pagination = Request.ExtractPaginationRequest();
 
+            long Count(IQueryable<BuildingDetailItem> items) => context.BuildingDetailListCountView.Single().Count;
+
             var pagedBuildings = new BuildingListQuery(context)
-                .Fetch(new FilteringHeader<BuildingFilter>(new BuildingFilter()),
+                .Fetch(
+                    filtering,
                     sorting,
-                    pagination);
+                    pagination,
+                    filtering.ShouldFilter ? null : (Func<IQueryable<BuildingDetailItem>, long>) Count);
 
             Response.AddPagedQueryResultHeaders(pagedBuildings);
 
@@ -299,7 +305,7 @@ namespace BuildingRegistry.Api.Legacy.Building
                 context,
                 filtering.Filter?.ContainEvent ?? false,
                 filtering.Filter?.ContainObject ?? false)
-                .Fetch(filtering, sorting, pagination);
+                .Fetch(filtering, sorting, pagination, items => 0);
 
             Response.AddPagedQueryResultHeaders(pagedBuildings);
 

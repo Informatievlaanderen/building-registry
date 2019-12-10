@@ -9,7 +9,6 @@ namespace BuildingRegistry.Api.Legacy.BuildingUnit
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy.Gebouweenheid;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy.SpatialTools;
-    using Building;
     using Infrastructure.Options;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
@@ -27,6 +26,7 @@ namespace BuildingRegistry.Api.Legacy.BuildingUnit
     using System.Threading.Tasks;
     using Be.Vlaanderen.Basisregisters.Api.Search;
     using Infrastructure;
+    using Projections.Legacy.BuildingUnitDetail;
     using ValueObjects;
 
     [ApiVersion("1.0")]
@@ -60,11 +60,14 @@ namespace BuildingRegistry.Api.Legacy.BuildingUnit
             var sorting = Request.ExtractSortingRequest();
             var pagination = Request.ExtractPaginationRequest();
 
+            long Count(IQueryable<BuildingUnitDetailItem> items) => context.BuildingUnitDetailListCountView.Single().Count;
+
             var pagedBuildingUnits = new BuildingUnitListQuery(context, syndicationContext)
                 .Fetch(
                     filtering,
                     sorting,
-                    pagination);
+                    pagination,
+                    filtering.ShouldFilter ? null : (Func<IQueryable<BuildingUnitDetailItem>, long>)Count);
 
             Response.AddPagedQueryResultHeaders(pagedBuildingUnits);
 
