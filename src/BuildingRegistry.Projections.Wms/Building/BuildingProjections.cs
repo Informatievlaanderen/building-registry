@@ -285,10 +285,10 @@ namespace BuildingRegistry.Projections.Wms.Building
 
         private void SetGeometry(Building building, string extendedWkbGeometry, string method)
         {
-            var geometry = (Polygon)_wkbReader.Read(extendedWkbGeometry.ToByteArray());
+            var geometry = _wkbReader.Read(extendedWkbGeometry.ToByteArray()) as Polygon;
 
             building.GeometryMethod = method;
-            building.Geometry = geometry.AsBinary();
+            building.Geometry = geometry?.AsBinary();
         }
 
         private static void DoNothing() { }
