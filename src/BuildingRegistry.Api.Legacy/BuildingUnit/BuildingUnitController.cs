@@ -144,7 +144,7 @@ namespace BuildingRegistry.Api.Legacy.BuildingUnit
 
             var response = new BuildingUnitResponse(
                 buildingUnit.PersistentLocalId.Value,
-                responseOptions.Value.GebouwNaamruimte,
+                responseOptions.Value.GebouweenheidNaamruimte,
                 buildingUnit.Version.ToBelgianDateTimeOffset(),
                 GetBuildingUnitPoint(buildingUnit.Position),
                 MapBuildingUnitGeometryMethod(buildingUnit.PositionMethod.Value),
