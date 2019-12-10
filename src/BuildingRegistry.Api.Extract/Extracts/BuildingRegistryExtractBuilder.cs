@@ -16,7 +16,7 @@ namespace BuildingRegistry.Api.Extract.Extracts
             var extractItems = context
                 .BuildingExtract
                 .AsNoTracking()
-                .Where(m => m.IsComplete)
+                .Where(m => m.IsComplete && m.ShapeRecordContentLength > 0)
                 .OrderBy(m => m.PersistentLocalId);
 
             yield return ExtractBuilder.CreateDbfFile<BuildingExtractItem, BuildingDbaseRecord>(

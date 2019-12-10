@@ -319,17 +319,23 @@ namespace BuildingRegistry.Projections.Extract.BuildingExtract
 
         private static void UpdateGeometry(Polygon geometry, BuildingExtractItem item)
         {
-            var env = EnvelopePartialRecord.From(geometry.EnvelopeInternal);
+            if (geometry == null)
+                item.ShapeRecordContentLength = 0;
+            else
+            {
+                var env = EnvelopePartialRecord.From(geometry.EnvelopeInternal);
 
-            var polygon = Be.Vlaanderen.Basisregisters.Shaperon.Geometries.GeometryTranslator.FromGeometryPolygon(geometry);
-            var polygonShapeContent = new PolygonShapeContent(polygon);
-            item.ShapeRecordContent = polygonShapeContent.ToBytes();
-            item.ShapeRecordContentLength = polygonShapeContent.ContentLength.ToInt32();
+                var polygon =
+                    Be.Vlaanderen.Basisregisters.Shaperon.Geometries.GeometryTranslator.FromGeometryPolygon(geometry);
+                var polygonShapeContent = new PolygonShapeContent(polygon);
+                item.ShapeRecordContent = polygonShapeContent.ToBytes();
+                item.ShapeRecordContentLength = polygonShapeContent.ContentLength.ToInt32();
 
-            item.MinimumX = env.MinimumX;
-            item.MaximumX = env.MaximumX;
-            item.MinimumY = env.MinimumY;
-            item.MaximumY = env.MaximumY;
+                item.MinimumX = env.MinimumX;
+                item.MaximumX = env.MaximumX;
+                item.MinimumY = env.MinimumY;
+                item.MaximumY = env.MaximumY;
+            }
         }
 
         private void UpdateStatus(BuildingExtractItem building, string status)
