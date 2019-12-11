@@ -103,12 +103,13 @@ namespace BuildingRegistry.Projections.Wms.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.Sql($@"
-            DROP VIEW [{Schema.Wms}].[GebouweenheidView]
-            DROP VIEW [{Schema.Wms}].[GebouweenheidGehistoreerd]
+            DROP VIEW [{Schema.Wms}].[GebouweenheidGehistoreerd]    
             DROP VIEW [{Schema.Wms}].[GebouweenheidGepland]
             DROP VIEW [{Schema.Wms}].[GebouweenheidGerealiseerd]
             DROP VIEW [{Schema.Wms}].[GebouweenheidNietGerealiseerd]
-            ");
+            GO
+            DROP VIEW [{Schema.Wms}].[GebouweenheidView]
+            GO");
 
             migrationBuilder.Sql($@"
             DROP VIEW [{Schema.Wms}].[GebouwGepland]
@@ -116,6 +117,7 @@ namespace BuildingRegistry.Projections.Wms.Migrations
             DROP VIEW [{Schema.Wms}].[GebouwGerealiseerd]
             DROP VIEW [{Schema.Wms}].[GebouwNietGerealiseerd]
             DROP VIEW [{Schema.Wms}].[GebouwInAanbouw]
+            GO
             DROP VIEW [{Schema.Wms}].[GebouwView]
             GO");
         }
