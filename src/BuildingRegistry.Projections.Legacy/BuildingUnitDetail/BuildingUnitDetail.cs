@@ -97,6 +97,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetail
                 .IsRequired()
                 .HasForeignKey(x => x.BuildingUnitId);
 
+            b.HasIndex(p => p.BuildingId);
             b.HasIndex(p => p.PersistentLocalId).IsUnique();
             b.HasIndex(p => p.BuildingPersistentLocalId);
         }
