@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BuildingRegistry.Projections.Wms.Migrations
 {
     [DbContext(typeof(WmsContext))]
-    [Migration("20191211090055_ChangeVerionIdTypeInViews")]
-    partial class ChangeVerionIdTypeInViews
+    [Migration("20191213133643_AddWmsViews")]
+    partial class AddWmsViews
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
