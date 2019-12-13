@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace BuildingRegistry.Projections.Wms.Migrations
@@ -24,11 +24,10 @@ namespace BuildingRegistry.Projections.Wms.Migrations
                     Status = table.Column<string>(nullable: true),
                     Version = table.Column<DateTimeOffset>(nullable: false)
                 },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Buildings", x => x.BuildingId)
-                        .Annotation("SqlServer:Clustered", false);
-                });
+                constraints: table => table
+                    .PrimaryKey("PK_Buildings", x => x.BuildingId)
+                    .Annotation("SqlServer:Clustered", true)
+            );
 
             migrationBuilder.CreateTable(
                 name: "BuildingUnit_BuildingPersistentLocalIds",
@@ -38,11 +37,10 @@ namespace BuildingRegistry.Projections.Wms.Migrations
                     BuildingId = table.Column<Guid>(nullable: false),
                     BuildingPersistentLocalId = table.Column<string>(nullable: true)
                 },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_BuildingUnit_BuildingPersistentLocalIds", x => x.BuildingId)
-                        .Annotation("SqlServer:Clustered", false);
-                });
+                constraints: table => table
+                    .PrimaryKey("PK_BuildingUnit_BuildingPersistentLocalIds", x => x.BuildingId)
+                    .Annotation("SqlServer:Clustered", false)
+            );
 
             migrationBuilder.CreateTable(
                 name: "BuildingUnits",
@@ -62,11 +60,10 @@ namespace BuildingRegistry.Projections.Wms.Migrations
                     Status = table.Column<string>(nullable: true),
                     Version = table.Column<DateTimeOffset>(nullable: false)
                 },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_BuildingUnits", x => x.BuildingUnitId)
-                        .Annotation("SqlServer:Clustered", false);
-                });
+                constraints: table => table
+                    .PrimaryKey("PK_BuildingUnits", x => x.BuildingUnitId)
+                    .Annotation("SqlServer:Clustered", true)
+            );
 
             migrationBuilder.CreateTable(
                 name: "ProjectionStates",
@@ -78,11 +75,10 @@ namespace BuildingRegistry.Projections.Wms.Migrations
                     DesiredState = table.Column<string>(nullable: true),
                     DesiredStateChangedAt = table.Column<DateTimeOffset>(nullable: true)
                 },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ProjectionStates", x => x.Name)
-                        .Annotation("SqlServer:Clustered", true);
-                });
+                constraints: table => table
+                    .PrimaryKey("PK_ProjectionStates", x => x.Name)
+                    .Annotation("SqlServer:Clustered", true)
+            );
 
             migrationBuilder.CreateIndex(
                 name: "IX_BuildingUnit_BuildingPersistentLocalIds_BuildingPersistentLocalId",
