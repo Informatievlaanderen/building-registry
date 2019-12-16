@@ -91,7 +91,7 @@ namespace BuildingRegistry.Projections.Wms.Migrations
                 SELECT
                     [PersistentLocalId] AS [ObjectId],
                     [Id],
-                    CAST([Version] AS nvarchar) AS [VersieId],
+                    CAST([Version] AT TIME ZONE 'Central European Standard Time' AS nvarchar(max)) AS [VersieId],
                     [CalculatedGeometry] AS [Geometry],
                     [GeometryMethod] AS [GeometrieMethode],
                     [Status]
@@ -145,7 +145,7 @@ namespace BuildingRegistry.Projections.Wms.Migrations
                 SELECT
                     [Id],
                     [BuildingUnitPersistentLocalId] AS [ObjectId],
-                    CAST([Version] AS nvarchar) AS [VersieId],
+                    CAST([Version] AT TIME ZONE 'Central European Standard Time' AS nvarchar(max)) AS [VersieId],
                     [PositionMethod] AS [PositieGeometrieMethode],
                     [Status] AS [GebouweenheidStatus],
                     [Function] AS [Functie],
