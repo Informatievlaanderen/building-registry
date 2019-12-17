@@ -5,7 +5,7 @@ namespace BuildingRegistry.Projections.Wms.Migrations
     using System.Collections.Generic;
     using System.Linq;
 
-    public partial class AddWmsViews : Migration
+    public partial class AddViews : Migration
     {
         private readonly StatusViews _buildingViews = new StatusViews(
             "GebouwView",
@@ -72,7 +72,7 @@ namespace BuildingRegistry.Projections.Wms.Migrations
 	            GO");
 
             migrationBuilder.Sql(@"
-	            CREATE SPATIAL INDEX [SPATIAL_Gebouw_Geometrie] ON [wms].[buildings] ([CalculatedGeometry])                 
+	            CREATE SPATIAL INDEX [SPATIAL_Gebouw_Geometrie] ON [wms].[buildings] ([CalculatedGeometry])
 	            USING  GEOMETRY_GRID
 	            WITH (
 		            BOUNDING_BOX =(22279.17, 153050.23, 258873.3, 244022.31),
@@ -91,10 +91,11 @@ namespace BuildingRegistry.Projections.Wms.Migrations
                 SELECT
                     [PersistentLocalId] AS [ObjectId],
                     [Id],
-                    CAST([Version] AT TIME ZONE 'Central European Standard Time' AS nvarchar(max)) AS [VersieId],
+                    [VersionAsString] AS [VersieId],
                     [CalculatedGeometry] AS [Geometry],
                     [GeometryMethod] AS [GeometrieMethode],
-                    [Status]
+                    [Status],
+                    [Version] AS RawVersion
                 FROM [wms].[Buildings]
                 WHERE (IsComplete = 1)
                     AND ([CalculatedGeometry] IS NOT NULL)
@@ -145,12 +146,13 @@ namespace BuildingRegistry.Projections.Wms.Migrations
                 SELECT
                     [Id],
                     [BuildingUnitPersistentLocalId] AS [ObjectId],
-                    CAST([Version] AT TIME ZONE 'Central European Standard Time' AS nvarchar(max)) AS [VersieId],
+                    [VersionAsString] AS [VersieId],
                     [PositionMethod] AS [PositieGeometrieMethode],
                     [Status] AS [GebouweenheidStatus],
                     [Function] AS [Functie],
                     [BuildingPersistentLocalId] AS [GebouwObjectId],
-                    [CalculatedGeometry] AS [Geometry]
+                    [CalculatedGeometry] AS [Geometry],
+                    [Version] AS RawVersion
                 FROM [wms].[buildingUnits]
                 WHERE (IsComplete = 1) AND (IsBuildingComplete = 1)
                 GO");

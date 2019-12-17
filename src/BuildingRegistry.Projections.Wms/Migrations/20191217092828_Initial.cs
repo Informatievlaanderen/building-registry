@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace BuildingRegistry.Projections.Wms.Migrations
@@ -22,12 +22,14 @@ namespace BuildingRegistry.Projections.Wms.Migrations
                     GeometryMethod = table.Column<string>(type: "varchar(12)", maxLength: 12, nullable: true),
                     IsComplete = table.Column<bool>(nullable: false),
                     Status = table.Column<string>(nullable: true),
-                    Version = table.Column<DateTimeOffset>(nullable: false)
+                    Version = table.Column<DateTimeOffset>(nullable: false),
+                    VersionAsString = table.Column<string>(nullable: true)
                 },
-                constraints: table => table
-                    .PrimaryKey("PK_Buildings", x => x.BuildingId)
-                    .Annotation("SqlServer:Clustered", true)
-            );
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Buildings", x => x.BuildingId)
+                        .Annotation("SqlServer:Clustered", true);
+                });
 
             migrationBuilder.CreateTable(
                 name: "BuildingUnit_BuildingPersistentLocalIds",
@@ -37,10 +39,11 @@ namespace BuildingRegistry.Projections.Wms.Migrations
                     BuildingId = table.Column<Guid>(nullable: false),
                     BuildingPersistentLocalId = table.Column<string>(nullable: true)
                 },
-                constraints: table => table
-                    .PrimaryKey("PK_BuildingUnit_BuildingPersistentLocalIds", x => x.BuildingId)
-                    .Annotation("SqlServer:Clustered", false)
-            );
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_BuildingUnit_BuildingPersistentLocalIds", x => x.BuildingId)
+                        .Annotation("SqlServer:Clustered", false);
+                });
 
             migrationBuilder.CreateTable(
                 name: "BuildingUnits",
@@ -58,12 +61,14 @@ namespace BuildingRegistry.Projections.Wms.Migrations
                     IsComplete = table.Column<bool>(nullable: false),
                     IsBuildingComplete = table.Column<bool>(nullable: false),
                     Status = table.Column<string>(nullable: true),
-                    Version = table.Column<DateTimeOffset>(nullable: false)
+                    Version = table.Column<DateTimeOffset>(nullable: false),
+                    VersionAsString = table.Column<string>(nullable: true)
                 },
-                constraints: table => table
-                    .PrimaryKey("PK_BuildingUnits", x => x.BuildingUnitId)
-                    .Annotation("SqlServer:Clustered", true)
-            );
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_BuildingUnits", x => x.BuildingUnitId)
+                        .Annotation("SqlServer:Clustered", true);
+                });
 
             migrationBuilder.CreateTable(
                 name: "ProjectionStates",
@@ -75,16 +80,23 @@ namespace BuildingRegistry.Projections.Wms.Migrations
                     DesiredState = table.Column<string>(nullable: true),
                     DesiredStateChangedAt = table.Column<DateTimeOffset>(nullable: true)
                 },
-                constraints: table => table
-                    .PrimaryKey("PK_ProjectionStates", x => x.Name)
-                    .Annotation("SqlServer:Clustered", true)
-            );
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ProjectionStates", x => x.Name)
+                        .Annotation("SqlServer:Clustered", true);
+                });
 
             migrationBuilder.CreateIndex(
                 name: "IX_BuildingUnit_BuildingPersistentLocalIds_BuildingPersistentLocalId",
                 schema: "wms",
                 table: "BuildingUnit_BuildingPersistentLocalIds",
                 column: "BuildingPersistentLocalId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_BuildingUnits_BuildingId",
+                schema: "wms",
+                table: "BuildingUnits",
+                column: "BuildingId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)

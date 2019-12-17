@@ -5,6 +5,8 @@ namespace BuildingRegistry.Projections.Wms.Building
     using Microsoft.EntityFrameworkCore.Metadata.Builders;
     using NodaTime;
     using System;
+    using Be.Vlaanderen.Basisregisters.GrAr.Common;
+    using Be.Vlaanderen.Basisregisters.Utilities;
     using ValueObjects;
 
     public class Building
@@ -31,8 +33,14 @@ namespace BuildingRegistry.Projections.Wms.Building
         public Instant Version
         {
             get => Instant.FromDateTimeOffset(VersionTimestampAsDateTimeOffset);
-            set => VersionTimestampAsDateTimeOffset = value.ToDateTimeOffset();
+            set
+            {
+                VersionTimestampAsDateTimeOffset = value.ToDateTimeOffset();
+                VersionAsString = new Rfc3339SerializableDateTimeOffset(value.ToBelgianDateTimeOffset()).ToString();
+            }
         }
+
+        public string VersionAsString { get; protected set; }
     }
 
     public class BuildingConfiguration : IEntityTypeConfiguration<Building>
@@ -43,7 +51,7 @@ namespace BuildingRegistry.Projections.Wms.Building
         {
             b.ToTable(TableName, Schema.Wms)
                 .HasKey(p => p.BuildingId)
-                .ForSqlServerIsClustered(false);
+                .ForSqlServerIsClustered(true);
 
             b.Property(p => p.Id)
                 .HasColumnType("varchar(46)")
@@ -51,6 +59,7 @@ namespace BuildingRegistry.Projections.Wms.Building
 
             b.Property(Building.VersionTimestampBackingPropertyName)
                 .HasColumnName("Version");
+            b.Property(p => p.VersionAsString);
 
             b.Ignore(x => x.Version);
 
