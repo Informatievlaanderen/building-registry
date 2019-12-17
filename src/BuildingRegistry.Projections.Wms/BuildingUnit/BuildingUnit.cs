@@ -77,6 +77,8 @@ namespace BuildingRegistry.Projections.Wms.BuildingUnit
                 .HasColumnName("Status");
 
             b.Ignore(p => p.Status);
+
+            b.HasIndex(p => p.BuildingId);
         }
     }
 }
