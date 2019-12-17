@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BuildingRegistry.Projections.Wms.Migrations
 {
     [DbContext(typeof(WmsContext))]
-    [Migration("20191213133643_AddWmsViews")]
-    partial class AddWmsViews
+    [Migration("20191217092828_Initial")]
+    partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -60,11 +60,13 @@ namespace BuildingRegistry.Projections.Wms.Migrations
                     b.Property<string>("StatusAsText")
                         .HasColumnName("Status");
 
+                    b.Property<string>("VersionAsString");
+
                     b.Property<DateTimeOffset>("VersionTimestampAsDateTimeOffset")
                         .HasColumnName("Version");
 
                     b.HasKey("BuildingId")
-                        .HasAnnotation("SqlServer:Clustered", false);
+                        .HasAnnotation("SqlServer:Clustered", true);
 
                     b.ToTable("Buildings","wms");
                 });
@@ -101,11 +103,15 @@ namespace BuildingRegistry.Projections.Wms.Migrations
                     b.Property<string>("StatusAsText")
                         .HasColumnName("Status");
 
+                    b.Property<string>("VersionAsString");
+
                     b.Property<DateTimeOffset>("VersionTimestampAsDateTimeOffset")
                         .HasColumnName("Version");
 
                     b.HasKey("BuildingUnitId")
-                        .HasAnnotation("SqlServer:Clustered", false);
+                        .HasAnnotation("SqlServer:Clustered", true);
+
+                    b.HasIndex("BuildingId");
 
                     b.ToTable("BuildingUnits","wms");
                 });

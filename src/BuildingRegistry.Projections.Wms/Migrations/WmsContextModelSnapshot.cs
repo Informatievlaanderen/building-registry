@@ -58,11 +58,13 @@ namespace BuildingRegistry.Projections.Wms.Migrations
                     b.Property<string>("StatusAsText")
                         .HasColumnName("Status");
 
+                    b.Property<string>("VersionAsString");
+
                     b.Property<DateTimeOffset>("VersionTimestampAsDateTimeOffset")
                         .HasColumnName("Version");
 
                     b.HasKey("BuildingId")
-                        .HasAnnotation("SqlServer:Clustered", false);
+                        .HasAnnotation("SqlServer:Clustered", true);
 
                     b.ToTable("Buildings","wms");
                 });
@@ -99,11 +101,13 @@ namespace BuildingRegistry.Projections.Wms.Migrations
                     b.Property<string>("StatusAsText")
                         .HasColumnName("Status");
 
+                    b.Property<string>("VersionAsString");
+
                     b.Property<DateTimeOffset>("VersionTimestampAsDateTimeOffset")
                         .HasColumnName("Version");
 
                     b.HasKey("BuildingUnitId")
-                        .HasAnnotation("SqlServer:Clustered", false);
+                        .HasAnnotation("SqlServer:Clustered", true);
 
                     b.HasIndex("BuildingId");
 
