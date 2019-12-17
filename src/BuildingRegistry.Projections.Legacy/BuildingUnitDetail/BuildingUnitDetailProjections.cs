@@ -43,7 +43,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetail
                         buildingUnitDetailItem.IsRemoved = true;
                         var addressesToRemove = context.BuildingUnitAddresses.Local
                             .Where(x => x.BuildingUnitId == buildingUnitDetailItem.BuildingUnitId)
-                            .Union(context.BuildingUnitAddresses.Where(x => x.BuildingUnitId == buildingUnitDetailItem.BuildingUnitId));
+                            .Union(context.BuildingUnitAddresses.Where(x => x.BuildingUnitId == buildingUnitDetailItem.BuildingUnitId)).ToList();
                         context.BuildingUnitAddresses.RemoveRange(addressesToRemove);
 
                         SetVersion(buildingUnitDetailItem, message.Message.Provenance.Timestamp);
