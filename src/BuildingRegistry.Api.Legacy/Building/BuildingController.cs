@@ -180,7 +180,11 @@ namespace BuildingRegistry.Api.Legacy.Building
 
         internal static Polygon GetBuildingPolygon(byte[] polygon)
         {
-            var geometry = (NetTopologySuite.Geometries.Polygon)WKBReaderFactory.Create().Read(polygon);
+            var geometry = WKBReaderFactory.Create().Read(polygon) as NetTopologySuite.Geometries.Polygon;
+
+            if (geometry == null) //some buildings have multi polygons (imported) which are incorrect.
+                return null;
+
             return new Polygon
             {
                 XmlPolygon = MapGmlPolygon(geometry),
