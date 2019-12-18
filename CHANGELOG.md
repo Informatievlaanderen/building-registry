@@ -1,3 +1,10 @@
+## [1.14.14](https://github.com/informatievlaanderen/building-registry/compare/v1.14.13...v1.14.14) (2019-12-18)
+
+
+### Performance Improvements
+
+* increase timeout for wms projections ([a1f100d](https://github.com/informatievlaanderen/building-registry/commit/a1f100d))
+
 ## [1.14.13](https://github.com/informatievlaanderen/building-registry/compare/v1.14.12...v1.14.13) (2019-12-18)
 
 
