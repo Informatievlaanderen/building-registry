@@ -105,5 +105,19 @@ namespace BuildingRegistry.Tests.WhenImportingCrabBuildingGeometry
                 command.Modification,
                 command.Organisation);
         }
+
+        public static ImportBuildingGeometryFromCrab WithTimestamp(this ImportBuildingGeometryFromCrab command, CrabTimestamp timestamp)
+        {
+            return new ImportBuildingGeometryFromCrab(
+                command.BuildingGeometryId,
+                command.TerrainObjectId,
+                command.BuildingGeometry,
+                command.BuildingGeometryMethod,
+                command.Lifetime,
+                timestamp,
+                command.Operator,
+                command.Modification,
+                command.Organisation);
+        }
     }
 }
