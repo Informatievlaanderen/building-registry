@@ -17,6 +17,8 @@ namespace BuildingRegistry.Projections.Wms
         // This needs to be DbContextOptions<T> for Autofac!
         public WmsContext(DbContextOptions<WmsContext> options)
             : base(options)
-        { }
+        {
+            Database.SetCommandTimeout(5 * 60);
+        }
     }
 }
