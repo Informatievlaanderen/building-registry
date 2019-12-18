@@ -313,14 +313,14 @@ namespace BuildingRegistry.Building
 
             if (newGeometry != Geometry)
             {
-                if (Geometry != null && (legacyEvent.Modification == CrabModification.Delete || newGeometry == null))
+                if (Geometry != null && newGeometry == null)
                 {
                     ApplyChange(new BuildingGeometryWasRemoved(_buildingId));
                     foreach (var unit in _buildingUnitCollection.ActiveBuildingUnits)
                         unit.CheckCompleteness();
                 }
 
-                if (newGeometry != null && legacyEvent.Modification != CrabModification.Delete)
+                if (newGeometry != null)
                 {
                     if (legacyEvent.Modification == CrabModification.Correction)
                     {
