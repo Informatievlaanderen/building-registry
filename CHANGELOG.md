@@ -1,3 +1,15 @@
+# [2.0.0](https://github.com/informatievlaanderen/building-registry/compare/v1.14.14...v2.0.0) (2019-12-26)
+
+
+### Code Refactoring
+
+* upgrade to netcoreapp31 ([6886b06](https://github.com/informatievlaanderen/building-registry/commit/6886b06))
+
+
+### BREAKING CHANGES
+
+* Upgrade to .NET Core 3.1
+
 ## [1.14.14](https://github.com/informatievlaanderen/building-registry/compare/v1.14.13...v1.14.14) (2019-12-18)
 
 
