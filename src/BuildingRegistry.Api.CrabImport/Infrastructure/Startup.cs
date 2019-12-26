@@ -14,6 +14,7 @@ namespace BuildingRegistry.Api.CrabImport.Infrastructure
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Logging;
+    using Microsoft.Extensions.Hosting;
     using Modules;
     using SqlStreamStore;
     using Swashbuckle.AspNetCore.Swagger;
@@ -101,8 +102,8 @@ namespace BuildingRegistry.Api.CrabImport.Infrastructure
         public void Configure(
             IServiceProvider serviceProvider,
             IApplicationBuilder app,
-            IHostingEnvironment env,
-            IApplicationLifetime appLifetime,
+            IWebHostEnvironment env,
+            IHostApplicationLifetime appLifetime,
             ILoggerFactory loggerFactory,
             IApiVersionDescriptionProvider apiVersionProvider,
             MsSqlStreamStore streamStore,

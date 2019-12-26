@@ -6,23 +6,23 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
     {
         public static readonly BuildingUnitDbaseSchema Schema = new BuildingUnitDbaseSchema();
 
-        public DbaseString id { get; }
+        public DbaseCharacter id { get; }
         public DbaseInt32 gebouwehid { get; }
-        public DbaseString versieid { get; }
-        public DbaseString gebouwid { get; }
-        public DbaseString functie { get; }
-        public DbaseString status { get; }
-        public DbaseString posgeommet { get; }
+        public DbaseCharacter versieid { get; }
+        public DbaseCharacter gebouwid { get; }
+        public DbaseCharacter functie { get; }
+        public DbaseCharacter status { get; }
+        public DbaseCharacter posgeommet { get; }
 
         public BuildingUnitDbaseRecord()
         {
-            id = new DbaseString(Schema.id);
+            id = new DbaseCharacter(Schema.id);
             gebouwehid = new DbaseInt32(Schema.gebouwehid);
-            versieid = new DbaseString(Schema.versieid);
-            gebouwid = new DbaseString(Schema.gebouwid);
-            functie = new DbaseString(Schema.functie);
-            status = new DbaseString(Schema.status);
-            posgeommet = new DbaseString(Schema.posgeommet);
+            versieid = new DbaseCharacter(Schema.versieid);
+            gebouwid = new DbaseCharacter(Schema.gebouwid);
+            functie = new DbaseCharacter(Schema.functie);
+            status = new DbaseCharacter(Schema.status);
+            posgeommet = new DbaseCharacter(Schema.posgeommet);
 
             Values = new DbaseFieldValue[]
             {
