@@ -1,3 +1,10 @@
+# [2.1.0](https://github.com/informatievlaanderen/building-registry/compare/v2.0.0...v2.1.0) (2020-01-03)
+
+
+### Features
+
+* allow only one projector instance ([5cfe37e](https://github.com/informatievlaanderen/building-registry/commit/5cfe37e))
+
 # [2.0.0](https://github.com/informatievlaanderen/building-registry/compare/v1.14.14...v2.0.0) (2019-12-26)
 
 
