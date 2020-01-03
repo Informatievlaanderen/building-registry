@@ -1,3 +1,10 @@
+## [2.1.1](https://github.com/informatievlaanderen/building-registry/compare/v2.1.0...v2.1.1) (2020-01-03)
+
+
+### Bug Fixes
+
+* increase wms timeout ([0d7f985](https://github.com/informatievlaanderen/building-registry/commit/0d7f985))
+
 # [2.1.0](https://github.com/informatievlaanderen/building-registry/compare/v2.0.0...v2.1.0) (2020-01-03)
 
 
