@@ -213,9 +213,9 @@ namespace BuildingRegistry.Building
             switch (buildingGeometryMethod)
             {
                 case CrabBuildingGeometryMethod.Outlined:
+                case CrabBuildingGeometryMethod.Survey:
                     return BuildingGeometryMethod.Outlined;
 
-                case CrabBuildingGeometryMethod.Survey:
                 case CrabBuildingGeometryMethod.Grb:
                     return BuildingGeometryMethod.MeasuredByGrb;
             }
@@ -465,7 +465,7 @@ namespace BuildingRegistry.Building
                                 x.CrabSubaddressId == activeUnit.BuildingUnitKey.Subaddress.Value)
                             .ToList();
 
-                        if(_buildingUnitCollection.HasReaddressed(activeUnit.BuildingUnitKey))
+                        if (_buildingUnitCollection.HasReaddressed(activeUnit.BuildingUnitKey))
                             filtered = filtered.Union(persistentLocalIdQuery.Where(x =>
                                         x.CrabSubaddressId != null &&
                                         x.CrabSubaddressId == _buildingUnitCollection.GetNewReaddressedKeyByUnitKey(activeUnit.BuildingUnitKey).Subaddress)
