@@ -1,3 +1,11 @@
+## [2.1.2](https://github.com/informatievlaanderen/building-registry/compare/v2.1.1...v2.1.2) (2020-01-10)
+
+
+### Bug Fixes
+
+* map crab geometry method surveyed to outlined ([c4ecc25](https://github.com/informatievlaanderen/building-registry/commit/c4ecc25))
+* tests to accomodate geometry changes ([a20f402](https://github.com/informatievlaanderen/building-registry/commit/a20f402))
+
 ## [2.1.1](https://github.com/informatievlaanderen/building-registry/compare/v2.1.0...v2.1.1) (2020-01-03)
 
 
