@@ -53,7 +53,7 @@ namespace BuildingRegistry.Tests.WhenImportingCrabBuildingGeometry
                     _fixture.Create<BuildingWasRegistered>())
                 .When(importGeometry)
                 .Then(_fixture.Create<BuildingId>(),
-                    new BuildingMeasurementByGrbWasCorrected(_fixture.Create<BuildingId>(), GeometryHelper.CreateEwkbFrom(importGeometry.BuildingGeometry)),
+                    new BuildingOutlineWasCorrected(_fixture.Create<BuildingId>(), GeometryHelper.CreateEwkbFrom(importGeometry.BuildingGeometry)),
                     importGeometry.ToLegacyEvent()));
         }
 
