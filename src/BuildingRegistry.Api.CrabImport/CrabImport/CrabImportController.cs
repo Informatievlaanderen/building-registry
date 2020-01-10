@@ -12,7 +12,7 @@ namespace BuildingRegistry.Api.CrabImport.CrabImport
     using Requests;
     using Swashbuckle.AspNetCore.Filters;
     using System;
-    using System.Collections.Async;
+    using Dasync.Collections;
     using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Diagnostics;
@@ -101,7 +101,7 @@ namespace BuildingRegistry.Api.CrabImport.CrabImport
                 logger.LogDebug(CommandMessageTemplate, registerCrabImports.Length, elapsedCommandsMs);
             },
             cancellationToken: cancellationToken,
-            maxDegreeOfParalellism: 0);
+            maxDegreeOfParallelism: 0);
 
             var elapsedMs = GetElapsedMilliseconds(start, Stopwatch.GetTimestamp());
             logger.LogDebug(BatchMessageTemplate, registerCrabImportList.Count, registerCrabImportList.SelectMany(x => x).Count(), elapsedMs);

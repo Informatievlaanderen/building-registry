@@ -18,7 +18,7 @@ namespace BuildingRegistry.Projections.Wms
         public WmsContext(DbContextOptions<WmsContext> options)
             : base(options)
         {
-            Database.SetCommandTimeout(5 * 60);
+            Database.SetCommandTimeout(10 * 60);
         }
     }
 }

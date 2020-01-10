@@ -6,19 +6,19 @@ namespace BuildingRegistry.Projections.Extract.BuildingExtract
     {
         public static readonly BuildingDbaseSchema Schema = new BuildingDbaseSchema();
 
-        public DbaseString id { get; }
+        public DbaseCharacter id { get; }
         public DbaseInt32 gebouwid { get; }
-        public DbaseString versieid { get; }
-        public DbaseString geommet { get; }
-        public DbaseString status { get; }
+        public DbaseCharacter versieid { get; }
+        public DbaseCharacter geommet { get; }
+        public DbaseCharacter status { get; }
 
         public BuildingDbaseRecord()
         {
-            id = new DbaseString(Schema.id);
+            id = new DbaseCharacter(Schema.id);
             gebouwid = new DbaseInt32(Schema.gebouwid);
-            versieid = new DbaseString(Schema.versieid);
-            geommet = new DbaseString(Schema.geommet);
-            status = new DbaseString(Schema.status);
+            versieid = new DbaseCharacter(Schema.versieid);
+            geommet = new DbaseCharacter(Schema.geommet);
+            status = new DbaseCharacter(Schema.status);
 
             Values = new DbaseFieldValue[]
             {
