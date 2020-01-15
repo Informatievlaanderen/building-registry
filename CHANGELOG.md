@@ -1,3 +1,10 @@
+## [2.1.3](https://github.com/informatievlaanderen/building-registry/compare/v2.1.2...v2.1.3) (2020-01-15)
+
+
+### Bug Fixes
+
+* building unit addresses are now ordered ([3ec94fd](https://github.com/informatievlaanderen/building-registry/commit/3ec94fd))
+
 ## [2.1.2](https://github.com/informatievlaanderen/building-registry/compare/v2.1.1...v2.1.2) (2020-01-10)
 
 
