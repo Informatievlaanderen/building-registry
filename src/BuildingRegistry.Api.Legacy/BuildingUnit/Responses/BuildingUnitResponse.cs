@@ -8,6 +8,7 @@ namespace BuildingRegistry.Api.Legacy.BuildingUnit.Responses
     using Swashbuckle.AspNetCore.Filters;
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Runtime.Serialization;
     using Be.Vlaanderen.Basisregisters.BasicApiProblem;
     using Microsoft.Extensions.Options;
@@ -74,7 +75,7 @@ namespace BuildingRegistry.Api.Legacy.BuildingUnit.Responses
             Status = status;
             Function = function;
             Building = building;
-            Addresses = addresses;
+            Addresses = addresses.OrderBy(x => x.ObjectId).ToList();
         }
     }
 
