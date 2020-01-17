@@ -23,7 +23,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetail
         {
             b.ToTable(TableName, Schema.Legacy)
                 .HasKey(p => p.BuildingId)
-                .ForSqlServerIsClustered(false);
+                .IsClustered(false);
 
             b.Property(p => p.IsComplete);
             b.Property(p => p.IsRemoved);

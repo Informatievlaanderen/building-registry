@@ -9,7 +9,7 @@ namespace BuildingRegistry.Projections.Legacy.PersistentLocalIdMigration
     {
         public string PersistentLocalId { get; set; }
         public Guid BuildingId { get; set; }
-        public string Reason { get; set; }
+        public string? Reason { get; set; }
     }
 
     public class RemovedPersistentLocalIdConfiguration : IEntityTypeConfiguration<RemovedPersistentLocalId>
@@ -20,7 +20,7 @@ namespace BuildingRegistry.Projections.Legacy.PersistentLocalIdMigration
         {
             b.ToTable(TableName, Schema.Legacy)
                 .HasKey(p => p.PersistentLocalId)
-                .ForSqlServerIsClustered(false);
+                .IsClustered(false);
 
             b.Property(x => x.Reason);
             b.Property(x => x.BuildingId);

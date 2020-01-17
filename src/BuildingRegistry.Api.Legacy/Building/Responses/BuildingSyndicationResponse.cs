@@ -300,7 +300,7 @@ namespace BuildingRegistry.Api.Legacy.Building.Responses
         }
     }
 
-    public class BuildingSyndicationResponseExamples : IExamplesProvider
+    public class BuildingSyndicationResponseExamples : IExamplesProvider<object>
     {
         private SyndicationContent ContentExample
         {

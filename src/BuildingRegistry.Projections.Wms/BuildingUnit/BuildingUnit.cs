@@ -14,15 +14,15 @@ namespace BuildingRegistry.Projections.Wms.BuildingUnit
         public static string VersionTimestampBackingPropertyName = nameof(VersionTimestampAsDateTimeOffset);
 
         public Guid BuildingUnitId { get; set; }
-        public string Id { get; set; }
+        public string? Id { get; set; }
         public int? BuildingUnitPersistentLocalId { get; set; }
 
         public Guid BuildingId { get; set; }
         public int? BuildingPersistentLocalId { get; set; }
 
-        public byte[] Position { get; set; }
-        public string PositionMethod { get; set; }
-        public string Function { get; set; }
+        public byte[]? Position { get; set; }
+        public string? PositionMethod { get; set; }
+        public string? Function { get; set; }
         public bool IsComplete { get; set; }
         public bool IsBuildingComplete { get; set; }
 
@@ -32,7 +32,7 @@ namespace BuildingRegistry.Projections.Wms.BuildingUnit
             set => StatusAsText = value?.Status;
         }
 
-        public string StatusAsText { get; set; }
+        public string? StatusAsText { get; set; }
         private DateTimeOffset VersionTimestampAsDateTimeOffset { get; set; }
 
         public Instant Version
@@ -45,7 +45,7 @@ namespace BuildingRegistry.Projections.Wms.BuildingUnit
             }
         }
 
-        public string VersionAsString { get; protected set; }
+        public string? VersionAsString { get; protected set; }
     }
 
     public class BuildingUnitConfiguration : IEntityTypeConfiguration<BuildingUnit>
@@ -56,7 +56,7 @@ namespace BuildingRegistry.Projections.Wms.BuildingUnit
         {
             b.ToTable(TableName, Schema.Wms)
                 .HasKey(p => p.BuildingUnitId)
-                .ForSqlServerIsClustered(true);
+                .IsClustered(true);
 
             b.Property(p => p.Id)
                 .HasColumnType("varchar(53)")

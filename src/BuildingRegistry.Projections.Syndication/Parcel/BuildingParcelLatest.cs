@@ -9,7 +9,7 @@ namespace BuildingRegistry.Projections.Syndication.Parcel
     public class BuildingParcelLatestItem
     {
         public Guid ParcelId { get; set; }
-        public string CaPaKey { get; set; }
+        public string? CaPaKey { get; set; }
 
         public PerceelStatus? Status { get; set; }
         public DateTimeOffset? Version { get; set; }
@@ -27,7 +27,7 @@ namespace BuildingRegistry.Projections.Syndication.Parcel
         {
             b.ToTable(TableName, Schema.Syndication)
                 .HasKey(x => x.ParcelId)
-                .ForSqlServerIsClustered();
+                .IsClustered();
 
             b.Property(x => x.CaPaKey);
             b.Property(x => x.Status);

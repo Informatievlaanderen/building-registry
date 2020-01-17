@@ -55,13 +55,13 @@ namespace BuildingRegistry.Api.Legacy.BuildingUnit.Responses
         }
     }
 
-    public class BuildingUnitListResponseExamples : IExamplesProvider
+    public class BuildingUnitListResponseExamples : IExamplesProvider<BuildingUnitListResponse>
     {
         private readonly ResponseOptions _responseOptions;
 
         public BuildingUnitListResponseExamples(IOptions<ResponseOptions> responseOptionsProvider) => _responseOptions = responseOptionsProvider.Value;
 
-        public object GetExamples()
+        public BuildingUnitListResponse GetExamples()
             => new BuildingUnitListResponse
             {
                 Gebouweenheden = new List<GebouweenheidCollectieItem>

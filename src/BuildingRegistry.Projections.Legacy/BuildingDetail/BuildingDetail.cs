@@ -14,7 +14,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingDetail
         public Guid BuildingId { get; set; }
         public int? PersistentLocalId { get; set; }
         public BuildingGeometryMethod? GeometryMethod { get; set; }
-        public byte[] Geometry { get; set; }
+        public byte[]? Geometry { get; set; }
         public BuildingStatus? Status { get; set; }
         public bool IsComplete { get; set; }
         public bool IsRemoved { get; set; }
@@ -36,7 +36,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingDetail
         {
             b.ToTable(TableName, Schema.Legacy)
                 .HasKey(p => p.BuildingId)
-                .ForSqlServerIsClustered(false);
+                .IsClustered(false);
 
             b.Property(BuildingDetailItem.VersionTimestampBackingPropertyName)
                 .HasColumnName("Version");

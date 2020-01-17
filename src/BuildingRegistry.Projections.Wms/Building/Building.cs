@@ -15,10 +15,10 @@ namespace BuildingRegistry.Projections.Wms.Building
 
         public Guid BuildingId { get; set; }
         public int? PersistentLocalId { get; set; }
-        public string Id { get; set; }
+        public string? Id { get; set; }
 
-        public byte[] Geometry { get; set; }
-        public string GeometryMethod { get; set; }
+        public byte[]? Geometry { get; set; }
+        public string? GeometryMethod { get; set; }
         public bool IsComplete { get; set; }
 
         public BuildingStatus? Status
@@ -27,7 +27,7 @@ namespace BuildingRegistry.Projections.Wms.Building
             set => StatusAsText = value.HasValue ? value.ToString() : null;
         }
 
-        public string StatusAsText { get; set; }
+        public string? StatusAsText { get; set; }
         private DateTimeOffset VersionTimestampAsDateTimeOffset { get; set; }
 
         public Instant Version
@@ -40,7 +40,7 @@ namespace BuildingRegistry.Projections.Wms.Building
             }
         }
 
-        public string VersionAsString { get; protected set; }
+        public string? VersionAsString { get; protected set; }
     }
 
     public class BuildingConfiguration : IEntityTypeConfiguration<Building>
@@ -51,7 +51,7 @@ namespace BuildingRegistry.Projections.Wms.Building
         {
             b.ToTable(TableName, Schema.Wms)
                 .HasKey(p => p.BuildingId)
-                .ForSqlServerIsClustered(true);
+                .IsClustered(true);
 
             b.Property(p => p.Id)
                 .HasColumnType("varchar(46)")

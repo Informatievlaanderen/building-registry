@@ -34,7 +34,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
         {
             b.ToTable(TableName, Schema.Legacy)
                 .HasKey(p => new { p.Position, p.BuildingUnitId, p.AddressId })
-                .ForSqlServerIsClustered(false);
+                .IsClustered(false);
 
             b.Property(x => x.Count);
         }

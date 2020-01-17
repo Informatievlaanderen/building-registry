@@ -43,7 +43,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
         {
             b.ToTable(TableName, Schema.Legacy)
                 .HasKey(p => new { p.Position, p.BuildingUnitId, p.OldAddressId })
-                .ForSqlServerIsClustered(false);
+                .IsClustered(false);
 
             b.Property(x => x.NewAddressId);
             b.Property(x => x.ReaddressBeginDateAsDateTimeOffset).HasColumnName("ReaddressDate");

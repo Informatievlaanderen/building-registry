@@ -17,9 +17,9 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
 
         public Guid? BuildingId { get; set; }
         public int? PersistentLocalId { get; set; }
-        public string ChangeType { get; set; }
+        public string? ChangeType { get; set; }
 
-        public byte[] Geometry { get; set; }
+        public byte[]? Geometry { get; set; }
         public BuildingGeometryMethod? GeometryMethod { get; set; }
 
         public BuildingStatus? Status { get; set; }
@@ -43,10 +43,10 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
 
         public Application? Application { get; set; }
         public Modification? Modification { get; set; }
-        public string Operator { get; set; }
+        public string? Operator { get; set; }
         public Organisation? Organisation { get; set; }
-        public string Reason { get; set; }
-        public string EventDataAsXml { get; set; }
+        public string? Reason { get; set; }
+        public string? EventDataAsXml { get; set; }
 
         public virtual Collection<BuildingUnitSyndicationItem> BuildingUnits { get; set; }
 
@@ -96,7 +96,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
         {
             b.ToTable(TableName, Schema.Legacy)
                 .HasKey(x => x.Position)
-                .ForSqlServerIsClustered();
+                .IsClustered();
 
             b.Property(x => x.Position).ValueGeneratedNever();
             b.HasIndex(x => x.Position).IsColumnStore($"CI_{TableName}_Position");

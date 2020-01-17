@@ -56,13 +56,13 @@ namespace BuildingRegistry.Api.Legacy.Building.Responses
         }
     }
 
-    public class BuildingListResponseExamples : IExamplesProvider
+    public class BuildingListResponseExamples : IExamplesProvider<BuildingListResponse>
     {
         private readonly ResponseOptions _responseOptions;
 
         public BuildingListResponseExamples(IOptions<ResponseOptions> responseOptionsProvider) => _responseOptions = responseOptionsProvider.Value;
 
-        public object GetExamples()
+        public BuildingListResponse GetExamples()
             => new BuildingListResponse
             {
                 Gebouwen = new List<GebouwCollectieItem>
