@@ -1,3 +1,10 @@
+## [2.1.4](https://github.com/informatievlaanderen/building-registry/compare/v2.1.3...v2.1.4) (2020-01-17)
+
+
+### Bug Fixes
+
+* get api's working again ([4e4ea42](https://github.com/informatievlaanderen/building-registry/commit/4e4ea42))
+
 ## [2.1.3](https://github.com/informatievlaanderen/building-registry/compare/v2.1.2...v2.1.3) (2020-01-15)
 
 
