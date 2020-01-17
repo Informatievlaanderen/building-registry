@@ -8,7 +8,7 @@ namespace BuildingRegistry.Projections.Wms.BuildingUnit
     public class BuildingUnitBuildingPersistentLocalId
     {
         public Guid BuildingId { get; set; }
-        public string BuildingPersistentLocalId { get; set; }
+        public string? BuildingPersistentLocalId { get; set; }
     }
 
     public class BuildingUnitBuildingPersistentLocalIdConfiguration : IEntityTypeConfiguration<BuildingUnitBuildingPersistentLocalId>
@@ -19,7 +19,7 @@ namespace BuildingRegistry.Projections.Wms.BuildingUnit
         {
             b.ToTable(TableName, Schema.Wms)
                 .HasKey(p => p.BuildingId)
-                .ForSqlServerIsClustered(false);
+                .IsClustered(false);
 
             b.HasIndex(p => p.BuildingPersistentLocalId);
         }

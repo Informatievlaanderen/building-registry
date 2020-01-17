@@ -15,7 +15,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
         public long Position { get; set; }
         public Guid BuildingUnitId { get; set; }
         public int? PersistentLocalId { get; set; }
-        public byte[] PointPosition { get; set; }
+        public byte[]? PointPosition { get; set; }
         public bool IsComplete { get; set; }
 
         public BuildingUnitFunction? Function
@@ -24,21 +24,21 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
             set => FunctionAsString = value.HasValue ? value.Value.Function : string.Empty;
         }
 
-        public string FunctionAsString { get; set; }
+        public string? FunctionAsString { get; set; }
 
         public BuildingUnitPositionGeometryMethod? PositionMethod
         {
             get => string.IsNullOrEmpty(PositionMethodAsString) ? null : (BuildingUnitPositionGeometryMethod?)BuildingUnitPositionGeometryMethod.Parse(PositionMethodAsString);
             set => PositionMethodAsString = value?.GeometryMethod;
         }
-        public string PositionMethodAsString { get; set; }
+        public string? PositionMethodAsString { get; set; }
 
         public BuildingUnitStatus? Status
         {
             get => BuildingUnitStatus.Parse(StatusAsString);
             set => StatusAsString = value.HasValue ? value.Value.Status : string.Empty;
         }
-        public string StatusAsString { get; set; }
+        public string? StatusAsString { get; set; }
 
         public DateTimeOffset VersionTimestampAsDateTimeOffset { get; set; }
 
@@ -86,7 +86,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
         {
             b.ToTable(TableName, Schema.Legacy)
                 .HasKey(p => new { p.Position, p.BuildingUnitId })
-                .ForSqlServerIsClustered(false);
+                .IsClustered(false);
 
             b.Property(p => p.Position);
             b.Property(p => p.BuildingUnitId);

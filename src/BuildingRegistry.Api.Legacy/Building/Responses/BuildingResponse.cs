@@ -70,13 +70,13 @@ namespace BuildingRegistry.Api.Legacy.Building.Responses
         }
     }
 
-    public class BuildingResponseExamples : IExamplesProvider
+    public class BuildingResponseExamples : IExamplesProvider<BuildingResponse>
     {
         private readonly ResponseOptions _responseOptions;
 
         public BuildingResponseExamples(IOptions<ResponseOptions> responseOptionsProvider) => _responseOptions = responseOptionsProvider.Value;
 
-        public object GetExamples()
+        public BuildingResponse GetExamples()
             => new BuildingResponse(
                 6,
                 _responseOptions.GebouwNaamruimte,
@@ -113,9 +113,9 @@ namespace BuildingRegistry.Api.Legacy.Building.Responses
                 });
     }
 
-    public class BuildingNotFoundResponseExamples : IExamplesProvider
+    public class BuildingNotFoundResponseExamples : IExamplesProvider<ProblemDetails>
     {
-        public object GetExamples()
+        public ProblemDetails GetExamples()
             => new ProblemDetails
             {
                 HttpStatus = StatusCodes.Status404NotFound,
@@ -125,9 +125,9 @@ namespace BuildingRegistry.Api.Legacy.Building.Responses
             };
     }
 
-    public class BuildingGoneResponseExamples : IExamplesProvider
+    public class BuildingGoneResponseExamples : IExamplesProvider<ProblemDetails>
     {
-        public object GetExamples()
+        public ProblemDetails GetExamples()
             => new ProblemDetails
             {
                 HttpStatus = StatusCodes.Status410Gone,

@@ -16,9 +16,9 @@ namespace BuildingRegistry.Api.CrabImport.CrabImport.Requests
         public string CrabItem { get; set; }
     }
 
-    public class RegisterCrabImportRequestExample : IExamplesProvider
+    public class RegisterCrabImportRequestExample : IExamplesProvider<RegisterCrabImportRequest>
     {
-        public object GetExamples()
+        public RegisterCrabImportRequest GetExamples()
             => new RegisterCrabImportRequest
             {
                 Type = "BuildingRegistry.Municipality.Commands.ImportMunicipalityNameFromCrab",

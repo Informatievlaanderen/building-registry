@@ -79,13 +79,13 @@ namespace BuildingRegistry.Api.Legacy.BuildingUnit.Responses
         }
     }
 
-    public class BuildingUnitResponseExamples : IExamplesProvider
+    public class BuildingUnitResponseExamples : IExamplesProvider<BuildingUnitResponse>
     {
         private readonly ResponseOptions _responseOptions;
 
         public BuildingUnitResponseExamples(IOptions<ResponseOptions> responseOptionsProvider) => _responseOptions = responseOptionsProvider.Value;
 
-        public object GetExamples()
+        public BuildingUnitResponse GetExamples()
             => new BuildingUnitResponse
             (
                 6,
@@ -116,9 +116,9 @@ namespace BuildingRegistry.Api.Legacy.BuildingUnit.Responses
             );
     }
 
-    public class BuildingUnitNotFoundResponseExamples : IExamplesProvider
+    public class BuildingUnitNotFoundResponseExamples : IExamplesProvider<ProblemDetails>
     {
-        public object GetExamples()
+        public ProblemDetails GetExamples()
             => new ProblemDetails
             {
                 HttpStatus = StatusCodes.Status404NotFound,
@@ -128,9 +128,9 @@ namespace BuildingRegistry.Api.Legacy.BuildingUnit.Responses
             };
     }
 
-    public class BuildingUnitGoneResponseExamples : IExamplesProvider
+    public class BuildingUnitGoneResponseExamples : IExamplesProvider<ProblemDetails>
     {
-        public object GetExamples()
+        public ProblemDetails GetExamples()
             => new ProblemDetails
             {
                 HttpStatus = StatusCodes.Status410Gone,

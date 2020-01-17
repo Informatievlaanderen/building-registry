@@ -20,7 +20,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetail
         {
             b.ToTable(TableName, Schema.Legacy)
                 .HasKey(p => new { p.BuildingUnitId, p.AddressId })
-                .ForSqlServerIsClustered(false);
+                .IsClustered(false);
 
             b.Property(x => x.Count);
         }

@@ -18,11 +18,11 @@ namespace BuildingRegistry.Projector.Infrastructure
     using Microsoft.Extensions.Logging;
     using Microsoft.Extensions.Hosting;
     using Modules;
-    using Swashbuckle.AspNetCore.Swagger;
     using System;
     using System.Linq;
     using System.Reflection;
     using Be.Vlaanderen.Basisregisters.Projector;
+    using Microsoft.OpenApi.Models;
 
     /// <summary>Represents the startup process for the application.</summary>
     public class Startup
@@ -59,16 +59,16 @@ namespace BuildingRegistry.Projector.Infrastructure
                     },
                     Swagger =
                     {
-                        ApiInfo = (provider, description) => new Info
+                        ApiInfo = (provider, description) => new OpenApiInfo
                         {
                             Version = description.ApiVersion.ToString(),
                             Title = "Basisregisters Vlaanderen Building Registry API",
                             Description = GetApiLeadingText(description),
-                            Contact = new Contact
+                            Contact = new OpenApiContact
                             {
                                 Name = "Informatie Vlaanderen",
                                 Email = "informatie.vlaanderen@vlaanderen.be",
-                                Url = "https://legacy.basisregisters.vlaanderen"
+                                Url = new Uri("https://legacy.basisregisters.vlaanderen")
                             }
                         },
                         XmlCommentPaths = new[] {typeof(Startup).GetTypeInfo().Assembly.GetName().Name}

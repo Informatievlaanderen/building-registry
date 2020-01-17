@@ -20,7 +20,7 @@ namespace BuildingRegistry.Projections.Legacy.PersistentLocalIdMigration
         {
             b.ToTable(TableName, Schema.Legacy)
                 .HasKey(p => p.DuplicatePersistentLocalId)
-                .ForSqlServerIsClustered(false);
+                .IsClustered(false);
 
             b.Property(x => x.DuplicatePersistentLocalId).ValueGeneratedNever();
 
