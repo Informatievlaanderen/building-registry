@@ -1,3 +1,10 @@
+# [2.2.0](https://github.com/informatievlaanderen/building-registry/compare/v2.1.4...v2.2.0) (2020-01-23)
+
+
+### Features
+
+* use distributed lock for syndication ([379590d](https://github.com/informatievlaanderen/building-registry/commit/379590d))
+
 ## [2.1.4](https://github.com/informatievlaanderen/building-registry/compare/v2.1.3...v2.1.4) (2020-01-17)
 
 
