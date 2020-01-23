@@ -1,3 +1,10 @@
+# [2.3.0](https://github.com/informatievlaanderen/building-registry/compare/v2.2.0...v2.3.0) (2020-01-23)
+
+
+### Features
+
+* upgrade projectionhandling ([0878d49](https://github.com/informatievlaanderen/building-registry/commit/0878d49))
+
 # [2.2.0](https://github.com/informatievlaanderen/building-registry/compare/v2.1.4...v2.2.0) (2020-01-23)
 
 
