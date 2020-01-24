@@ -1,3 +1,10 @@
+## [2.3.2](https://github.com/informatievlaanderen/building-registry/compare/v2.3.1...v2.3.2) (2020-01-24)
+
+
+### Bug Fixes
+
+* add syndication to api references ([e8684c9](https://github.com/informatievlaanderen/building-registry/commit/e8684c9))
+
 ## [2.3.1](https://github.com/informatievlaanderen/building-registry/compare/v2.3.0...v2.3.1) (2020-01-23)
 
 
