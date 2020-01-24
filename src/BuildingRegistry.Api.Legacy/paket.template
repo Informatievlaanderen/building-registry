@@ -21,5 +21,8 @@ files
   BuildingRegistry.Projections.Legacy.dll => lib\netcoreapp3.1
   BuildingRegistry.Projections.Legacy.pdb => lib\netcoreapp3.1
 
+  BuildingRegistry.Projections.Syndication.dll => lib\netcoreapp3.1
+  BuildingRegistry.Projections.Syndication.pdb => lib\netcoreapp3.1
+  
   BuildingRegistry.dll => lib\netcoreapp3.1
   BuildingRegistry.pdb => lib\netcoreapp3.1
