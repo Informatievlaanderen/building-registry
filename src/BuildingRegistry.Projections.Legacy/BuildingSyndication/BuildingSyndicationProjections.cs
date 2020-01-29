@@ -11,6 +11,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
     using Be.Vlaanderen.Basisregisters.Utilities.HexByteConvertor;
     using ValueObjects;
     using Building.Events.Crab;
+    using System.Collections.Generic;
 
     public class BuildingSyndicationProjections : ConnectedProjection<LegacyContext>
     {
@@ -289,6 +290,8 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
 
                 ApplyProvenance(newSyndicationItem, message.Message.Provenance);
 
+                RetireUnitsByBuilding(newSyndicationItem.BuildingUnits, message.Message.BuildingUnitIdsToNotRealize, message.Message.BuildingUnitIdsToRetire, message.Message.Provenance.Timestamp, context);
+
                 await context
                     .BuildingSyndication
                     .AddAsync(newSyndicationItem, ct);
@@ -362,6 +365,8 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
                 newSyndicationItem.EventDataAsXml = GetEventDataAsXmlString(message.Message);
 
                 ApplyProvenance(newSyndicationItem, message.Message.Provenance);
+
+                RetireUnitsByBuilding(newSyndicationItem.BuildingUnits, message.Message.BuildingUnitIdsToNotRealize, message.Message.BuildingUnitIdsToRetire, message.Message.Provenance.Timestamp, context);
 
                 await context
                     .BuildingSyndication
@@ -441,6 +446,8 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
                 newSyndicationItem.EventDataAsXml = GetEventDataAsXmlString(message.Message);
 
                 ApplyProvenance(newSyndicationItem, message.Message.Provenance);
+
+                RetireUnitsByBuilding(newSyndicationItem.BuildingUnits, message.Message.BuildingUnitIdsToNotRealize, message.Message.BuildingUnitIdsToRetire, message.Message.Provenance.Timestamp, context);
 
                 await context
                     .BuildingSyndication
@@ -545,6 +552,8 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
                 newSyndicationItem.EventDataAsXml = GetEventDataAsXmlString(message.Message);
 
                 ApplyProvenance(newSyndicationItem, message.Message.Provenance);
+
+                RetireUnitsByBuilding(newSyndicationItem.BuildingUnits, message.Message.BuildingUnitIdsToNotRealize, message.Message.BuildingUnitIdsToRetire, message.Message.Provenance.Timestamp, context);
 
                 await context
                     .BuildingSyndication
@@ -1492,6 +1501,28 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
         private static void ApplyUnitVersion(BuildingUnitSyndicationItem item, Instant version)
         {
             item.Version = version;
+        }
+
+        private static void RetireUnitsByBuilding(
+            IEnumerable<BuildingUnitSyndicationItem> buildingUnits,
+            ICollection<Guid> buildingUnitIdsToNotRealize,
+            ICollection<Guid> buildingUnitIdsToRetire,
+            Instant version,
+            LegacyContext context)
+        {
+            foreach (var buildingUnitDetailItem in buildingUnits)
+            {
+                context.Entry(buildingUnitDetailItem).Collection(x => x.Addresses).Load();
+
+                if (buildingUnitIdsToNotRealize.Contains(buildingUnitDetailItem.BuildingUnitId))
+                    buildingUnitDetailItem.Status = BuildingUnitStatus.NotRealized;
+                else if (buildingUnitIdsToRetire.Contains(buildingUnitDetailItem.BuildingUnitId))
+                    buildingUnitDetailItem.Status = BuildingUnitStatus.Retired;
+
+                buildingUnitDetailItem.Addresses.Clear();
+
+                ApplyUnitVersion(buildingUnitDetailItem, version);
+            }
         }
 
         private static void DoNothing() { }

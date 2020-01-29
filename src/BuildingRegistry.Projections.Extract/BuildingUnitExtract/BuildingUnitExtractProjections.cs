@@ -7,6 +7,7 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
     using NetTopologySuite.IO;
     using NodaTime;
     using System;
+    using System.Collections.Generic;
     using System.Linq;
     using System.Text;
     using Be.Vlaanderen.Basisregisters.GrAr.Extracts;
@@ -37,15 +38,6 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
         {
             _extractConfig = extractConfig.Value;
             _encoding = encoding ?? throw new ArgumentNullException(nameof(encoding));
-
-            When<Envelope<BuildingPersistentLocalIdWasAssigned>>(async (context, message, ct) =>
-            {
-                var units = context.BuildingUnitExtract.Local.Where(x => x.BuildingId == message.Message.BuildingId)
-                    .Union(context.BuildingUnitExtract.Where(x => x.BuildingId == message.Message.BuildingId));
-
-                foreach (var unit in units)
-                    UpdateRecord(unit, item => { item.gebouwid.Value = message.Message.PersistentLocalId.ToString(); });
-            });
 
             When<Envelope<CommonBuildingUnitWasAdded>>(async (context, message, ct) =>
             {
@@ -313,33 +305,117 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
                     }, ct);
             });
 
-            When<Envelope<BuildingUnitAddressWasAttached>>(async (context, message, ct) => DoNothing());
-            When<Envelope<BuildingUnitAddressWasDetached>>(async (context, message, ct) => DoNothing());
+            When<Envelope<BuildingUnitAddressWasAttached>>(async (context, message, ct) =>
+            {
+                await context.FindAndUpdateBuildingUnitExtract(message.Message.To,
+                    item => UpdateVersie(item, message.Message.Provenance.Timestamp), ct);
+            });
+
+            When<Envelope<BuildingUnitAddressWasDetached>>(async (context, message, ct) =>
+            {
+                await context.FindAndUpdateBuildingUnitExtract(message.Message.From,
+                    item => UpdateVersie(item, message.Message.Provenance.Timestamp), ct);
+            });
+
             When<Envelope<BuildingUnitPersistentLocalIdWasDuplicated>>(async (context, message, ct) => DoNothing());
             When<Envelope<BuildingUnitPersistentLocalIdWasRemoved>>(async (context, message, ct) => DoNothing());
             When<Envelope<BuildingUnitWasReaddressed>>(async (context, message, ct) => DoNothing());
 
-            When<Envelope<BuildingBecameComplete>>(async (context, message, ct) => DoNothing());
-            When<Envelope<BuildingBecameIncomplete>>(async (context, message, ct) => DoNothing());
+            #region Building
+
+            When<Envelope<BuildingPersistentLocalIdWasAssigned>>(async (context, message, ct) =>
+            {
+                var units = GetBuildingUnitsByBuilding(context, message.Message.BuildingId);
+
+                foreach (var unit in units)
+                    UpdateRecord(unit, item => { item.gebouwid.Value = message.Message.PersistentLocalId.ToString(); });
+            });
+
+            When<Envelope<BuildingBecameComplete>>(async (context, message, ct) =>
+            {
+                var units = GetBuildingUnitsByBuilding(context, message.Message.BuildingId);
+                foreach (var buildingUnitExtractItem in units)
+                {
+                    UpdateRecord(buildingUnitExtractItem, b =>
+                    {
+                        buildingUnitExtractItem.IsBuildingComplete = true;
+                        UpdateVersie(buildingUnitExtractItem, message.Message.Provenance.Timestamp);
+                    });
+                }
+            });
+
+            When<Envelope<BuildingBecameIncomplete>>(async (context, message, ct) =>
+            {
+                var units = GetBuildingUnitsByBuilding(context, message.Message.BuildingId);
+                foreach (var buildingUnitExtractItem in units)
+                {
+                    UpdateRecord(buildingUnitExtractItem, b =>
+                    {
+                        buildingUnitExtractItem.IsBuildingComplete = true;
+                        UpdateVersie(buildingUnitExtractItem, message.Message.Provenance.Timestamp);
+                    });
+                }
+            });
+
+            When<Envelope<BuildingGeometryWasRemoved>>(async (context, message, ct) =>
+            {
+                var units = GetBuildingUnitsByBuilding(context, message.Message.BuildingId);
+                foreach (var buildingUnitExtractItem in units)
+                {
+                    UpdateRecord(buildingUnitExtractItem, b =>
+                    {
+                        UpdateGeometry(buildingUnitExtractItem, null);
+                        UpdateGeometryMethod(buildingUnitExtractItem, null);
+                        UpdateVersie(buildingUnitExtractItem, message.Message.Provenance.Timestamp);
+                    });
+                }
+            });
+
+            When<Envelope<BuildingWasCorrectedToNotRealized>>(async (context, message, ct) =>
+            {
+                var units = GetBuildingUnitsByBuilding(context, message.Message.BuildingId);
+                RetireUnitsByBuilding(units, message.Message.BuildingUnitIdsToNotRealize, message.Message.BuildingUnitIdsToRetire, message.Message.Provenance.Timestamp, context);
+            });
+
+            When<Envelope<BuildingWasCorrectedToRetired>>(async (context, message, ct) =>
+            {
+                var units = GetBuildingUnitsByBuilding(context, message.Message.BuildingId);
+                RetireUnitsByBuilding(units, message.Message.BuildingUnitIdsToNotRealize, message.Message.BuildingUnitIdsToRetire, message.Message.Provenance.Timestamp, context);
+            });
+
+            When<Envelope<BuildingWasNotRealized>>(async (context, message, ct) =>
+            {
+                var units = GetBuildingUnitsByBuilding(context, message.Message.BuildingId);
+                RetireUnitsByBuilding(units, message.Message.BuildingUnitIdsToNotRealize, message.Message.BuildingUnitIdsToRetire, message.Message.Provenance.Timestamp, context);
+            });
+
+            When<Envelope<BuildingWasRemoved>>(async (context, message, ct) =>
+            {
+                var units = GetBuildingUnitsByBuilding(context, message.Message.BuildingId);
+                foreach (var buildingUnitExtractItem in units)
+                    context.Remove(buildingUnitExtractItem);
+            });
+
+            When<Envelope<BuildingWasRetired>>(async (context, message, ct) =>
+            {
+                var units = GetBuildingUnitsByBuilding(context, message.Message.BuildingId);
+                RetireUnitsByBuilding(units, message.Message.BuildingUnitIdsToNotRealize, message.Message.BuildingUnitIdsToRetire, message.Message.Provenance.Timestamp, context);
+            });
+
             When<Envelope<BuildingBecameUnderConstruction>>(async (context, message, ct) => DoNothing());
-            When<Envelope<BuildingGeometryWasRemoved>>(async (context, message, ct) => DoNothing());
             When<Envelope<BuildingMeasurementByGrbWasCorrected>>(async (context, message, ct) => DoNothing());
             When<Envelope<BuildingOutlineWasCorrected>>(async (context, message, ct) => DoNothing());
             When<Envelope<BuildingStatusWasCorrectedToRemoved>>(async (context, message, ct) => DoNothing());
             When<Envelope<BuildingStatusWasRemoved>>(async (context, message, ct) => DoNothing());
-            When<Envelope<BuildingWasCorrectedToNotRealized>>(async (context, message, ct) => DoNothing());
             When<Envelope<BuildingWasCorrectedToPlanned>>(async (context, message, ct) => DoNothing());
             When<Envelope<BuildingWasCorrectedToRealized>>(async (context, message, ct) => DoNothing());
-            When<Envelope<BuildingWasCorrectedToRetired>>(async (context, message, ct) => DoNothing());
             When<Envelope<BuildingWasCorrectedToUnderConstruction>>(async (context, message, ct) => DoNothing());
             When<Envelope<BuildingWasMeasuredByGrb>>(async (context, message, ct) => DoNothing());
-            When<Envelope<BuildingWasNotRealized>>(async (context, message, ct) => DoNothing());
             When<Envelope<BuildingWasOutlined>>(async (context, message, ct) => DoNothing());
             When<Envelope<BuildingWasPlanned>>(async (context, message, ct) => DoNothing());
             When<Envelope<BuildingWasRealized>>(async (context, message, ct) => DoNothing());
             When<Envelope<BuildingWasRegistered>>(async (context, message, ct) => DoNothing());
-            When<Envelope<BuildingWasRemoved>>(async (context, message, ct) => DoNothing());
-            When<Envelope<BuildingWasRetired>>(async (context, message, ct) => DoNothing());
+            #endregion Building
 
             When<Envelope<AddressHouseNumberPositionWasImportedFromCrab>>(async (context, message, ct) => DoNothing());
             When<Envelope<AddressHouseNumberStatusWasImportedFromCrab>>(async (context, message, ct) => DoNothing());
@@ -355,15 +431,34 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
             When<Envelope<TerrainObjectWasImportedFromCrab>>(async (context, message, ct) => DoNothing());
         }
 
+        private static IEnumerable<BuildingUnitExtractItem> GetBuildingUnitsByBuilding(ExtractContext context, Guid buildingId)
+        {
+            var units = context.BuildingUnitExtract.Local.Where(x => x.BuildingId == buildingId)
+                .Union(context.BuildingUnitExtract.Where(x => x.BuildingId == buildingId).ToList());
+            return units;
+        }
+
         private static void UpdateGeometry(BuildingUnitExtractItem item, Geometry geometry)
         {
-            var pointShapeContent = new PointShapeContent(new Point(geometry.Coordinate.X, geometry.Coordinate.Y));
-            item.ShapeRecordContent = pointShapeContent.ToBytes();
-            item.ShapeRecordContentLength = pointShapeContent.ContentLength.ToInt32();
-            item.MinimumX = pointShapeContent.Shape.X;
-            item.MaximumX = pointShapeContent.Shape.X;
-            item.MinimumY = pointShapeContent.Shape.Y;
-            item.MaximumY = pointShapeContent.Shape.Y;
+            if (geometry == null)
+            {
+                item.ShapeRecordContentLength = 0;
+                item.ShapeRecordContent = null;
+                item.MinimumY = 0;
+                item.MinimumX = 0;
+                item.MaximumY = 0;
+                item.MaximumX = 0;
+            }
+            else
+            {
+                var pointShapeContent = new PointShapeContent(new Point(geometry.Coordinate.X, geometry.Coordinate.Y));
+                item.ShapeRecordContent = pointShapeContent.ToBytes();
+                item.ShapeRecordContentLength = pointShapeContent.ContentLength.ToInt32();
+                item.MinimumX = pointShapeContent.Shape.X;
+                item.MaximumX = pointShapeContent.Shape.X;
+                item.MinimumY = pointShapeContent.Shape.Y;
+                item.MaximumY = pointShapeContent.Shape.Y;
+            }
         }
 
         private void UpdateStatus(BuildingUnitExtractItem buildingUnit, string status)
@@ -390,6 +485,24 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
             updateFunc(record);
 
             buildingUnit.DbaseRecord = record.ToBytes(_encoding);
+        }
+
+        private void RetireUnitsByBuilding(
+            IEnumerable<BuildingUnitExtractItem> buildingUnits,
+            ICollection<Guid> buildingUnitIdsToNotRealize,
+            ICollection<Guid> buildingUnitIdsToRetire,
+            Instant version,
+            ExtractContext context)
+        {
+            foreach (var buildingUnitExtractItem in buildingUnits)
+            {
+                if (buildingUnitIdsToNotRealize.Contains(buildingUnitExtractItem.BuildingUnitId))
+                    UpdateStatus(buildingUnitExtractItem, NotRealized);
+                else if (buildingUnitIdsToRetire.Contains(buildingUnitExtractItem.BuildingUnitId))
+                    UpdateStatus(buildingUnitExtractItem, Retired);
+
+                UpdateVersie(buildingUnitExtractItem, version);
+            }
         }
 
         private static void DoNothing() { }

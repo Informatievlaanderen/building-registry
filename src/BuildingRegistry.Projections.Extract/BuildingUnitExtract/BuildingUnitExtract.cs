@@ -9,10 +9,11 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
     {
         public Guid BuildingUnitId { get; set; }
         public Guid? BuildingId { get; set; }
-        public int? PersistentLocalId  { get; set; }
+        public int? PersistentLocalId { get; set; }
         public bool IsComplete { get; set; }
+        public bool IsBuildingComplete { get; set; }
         public byte[] DbaseRecord { get; set; }
-        public byte[] ShapeRecordContent { get; set; }
+        public byte[]? ShapeRecordContent { get; set; }
         public int ShapeRecordContentLength { get; set; }
         public double MinimumX { get; set; }
         public double MaximumX { get; set; }
@@ -28,11 +29,12 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
         {
             builder.ToTable(TableName, Schema.Extract)
                 .HasKey(p => p.BuildingUnitId)
-                .ForSqlServerIsClustered(false);
+                .IsClustered(false);
 
             builder.Property(p => p.PersistentLocalId);
             builder.Property(p => p.BuildingId);
             builder.Property(p => p.IsComplete);
+            builder.Property(p => p.IsBuildingComplete);
             builder.Property(p => p.DbaseRecord);
             builder.Property(p => p.ShapeRecordContent);
             builder.Property(p => p.ShapeRecordContentLength);
@@ -41,7 +43,9 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
             builder.Property(p => p.MinimumY);
             builder.Property(p => p.MaximumY);
 
-            builder.HasIndex(p => p.BuildingId).ForSqlServerIsClustered();
+            builder.HasIndex(p => p.BuildingId).IsClustered();
+            builder.HasIndex(p => new { p.IsComplete, p.IsBuildingComplete });
+            builder.HasIndex(p => p.PersistentLocalId);
         }
     }
 }
