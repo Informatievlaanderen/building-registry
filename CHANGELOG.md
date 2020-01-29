@@ -1,3 +1,10 @@
+## [2.3.4](https://github.com/informatievlaanderen/building-registry/compare/v2.3.3...v2.3.4) (2020-01-29)
+
+
+### Bug Fixes
+
+* correct unit version and status from building events ([c7ef3b6](https://github.com/informatievlaanderen/building-registry/commit/c7ef3b6))
+
 ## [2.3.3](https://github.com/informatievlaanderen/building-registry/compare/v2.3.2...v2.3.3) (2020-01-29)
 
 
