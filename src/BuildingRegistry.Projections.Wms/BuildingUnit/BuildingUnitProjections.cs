@@ -339,8 +339,18 @@ namespace BuildingRegistry.Projections.Wms.BuildingUnit
 
             #endregion
 
-            When<Envelope<BuildingUnitAddressWasAttached>>(async (context, message, ct) => DoNothing());
-            When<Envelope<BuildingUnitAddressWasDetached>>(async (context, message, ct) => DoNothing());
+            When<Envelope<BuildingUnitAddressWasAttached>>(async (context, message, ct) =>
+            {
+                var buildingUnit = await context.BuildingUnits.FindAsync(message.Message.To, cancellationToken: ct);
+                SetVersion(buildingUnit, message.Message.Provenance.Timestamp);
+            });
+
+            When<Envelope<BuildingUnitAddressWasDetached>>(async (context, message, ct) =>
+            {
+                var buildingUnit = await context.BuildingUnits.FindAsync(message.Message.From, cancellationToken: ct);
+                SetVersion(buildingUnit, message.Message.Provenance.Timestamp);
+            });
+
             When<Envelope<BuildingUnitWasReaddressed>>(async (context, message, ct) => DoNothing());
             When<Envelope<BuildingUnitPersistentLocalIdWasRemoved>>(async (context, message, ct) => DoNothing());
             When<Envelope<BuildingUnitPersistentLocalIdWasDuplicated>>(async (context, message, ct) => DoNothing());
