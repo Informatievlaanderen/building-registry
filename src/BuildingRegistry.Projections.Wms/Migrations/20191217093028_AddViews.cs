@@ -68,7 +68,7 @@ namespace BuildingRegistry.Projections.Wms.Migrations
         {
             migrationBuilder.Sql(@"
 	            ALTER TABLE [wms].[buildings]
-		            ADD CalculatedGeometry AS (geometry::STGeomFromWKB([Geometry], 0)) PERSISTED
+		            ADD CalculatedGeometry AS (geometry::STGeomFromWKB([Geometry], 31370)) PERSISTED
 	            GO");
 
             migrationBuilder.Sql(@"
@@ -122,7 +122,7 @@ namespace BuildingRegistry.Projections.Wms.Migrations
         {
             migrationBuilder.Sql(@"
 	            ALTER TABLE [wms].[buildingUnits]
-		            ADD CalculatedGeometry AS (geometry::STGeomFromWKB([Position], 0)) PERSISTED
+		            ADD CalculatedGeometry AS (geometry::STGeomFromWKB([Position], 31370)) PERSISTED
 	            GO");
 
             migrationBuilder.Sql(@"
