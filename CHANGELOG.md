@@ -1,3 +1,10 @@
+## [2.3.5](https://github.com/informatievlaanderen/building-registry/compare/v2.3.4...v2.3.5) (2020-01-29)
+
+
+### Bug Fixes
+
+* update grar packages ([f22ec21](https://github.com/informatievlaanderen/building-registry/commit/f22ec21))
+
 ## [2.3.4](https://github.com/informatievlaanderen/building-registry/compare/v2.3.3...v2.3.4) (2020-01-29)
 
 
