@@ -1,3 +1,10 @@
+## [2.3.7](https://github.com/informatievlaanderen/building-registry/compare/v2.3.6...v2.3.7) (2020-01-30)
+
+
+### Bug Fixes
+
+* add migration for extract changes ([c620036](https://github.com/informatievlaanderen/building-registry/commit/c620036))
+
 ## [2.3.6](https://github.com/informatievlaanderen/building-registry/compare/v2.3.5...v2.3.6) (2020-01-30)
 
 
