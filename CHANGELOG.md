@@ -1,3 +1,10 @@
+## [2.3.6](https://github.com/informatievlaanderen/building-registry/compare/v2.3.5...v2.3.6) (2020-01-30)
+
+
+### Bug Fixes
+
+* xml (gml) coordinates are now rounded on 11 digits ([d9e5e5d](https://github.com/informatievlaanderen/building-registry/commit/d9e5e5d))
+
 ## [2.3.5](https://github.com/informatievlaanderen/building-registry/compare/v2.3.4...v2.3.5) (2020-01-29)
 
 
