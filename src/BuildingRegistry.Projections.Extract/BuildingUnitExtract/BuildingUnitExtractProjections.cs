@@ -16,6 +16,7 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
     using Building.Events.Crab;
     using Microsoft.Extensions.Options;
     using NetTopologySuite.Geometries;
+    using ValueObjects;
     using Point = Be.Vlaanderen.Basisregisters.Shaperon.Point;
 
     public class BuildingUnitExtractProjections : ConnectedProjection<ExtractContext>
@@ -41,6 +42,9 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
 
             When<Envelope<CommonBuildingUnitWasAdded>>(async (context, message, ct) =>
             {
+                var building =
+                    await context.BuildingUnitBuildings.FindAsync(message.Message.BuildingId, cancellationToken: ct);
+
                 await context
                     .BuildingUnitExtract
                     .AddAsync(new BuildingUnitExtractItem
@@ -48,16 +52,21 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
                         BuildingUnitId = message.Message.BuildingUnitId,
                         BuildingId = message.Message.BuildingId,
                         IsComplete = false,
+                        IsBuildingComplete = building.IsComplete ?? false,
                         DbaseRecord = new BuildingUnitDbaseRecord
                         {
                             versieid = { Value = message.Message.Provenance.Timestamp.ToBelgianDateTimeOffset().FromDateTimeOffset() },
-                            functie = { Value = Common }
+                            functie = { Value = Common },
+                            gebouwid = { Value = building.BuildingPersistentLocalId.HasValue ? building.BuildingPersistentLocalId.ToString() : null }
                         }.ToBytes(_encoding)
                     }, ct);
             });
 
             When<Envelope<BuildingUnitWasAdded>>(async (context, message, ct) =>
             {
+                var building =
+                    await context.BuildingUnitBuildings.FindAsync(message.Message.BuildingId, cancellationToken: ct);
+
                 await context
                     .BuildingUnitExtract
                     .AddAsync(new BuildingUnitExtractItem
@@ -65,16 +74,21 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
                         BuildingUnitId = message.Message.BuildingUnitId,
                         BuildingId = message.Message.BuildingId,
                         IsComplete = false,
+                        IsBuildingComplete = building.IsComplete ?? false,
                         DbaseRecord = new BuildingUnitDbaseRecord
                         {
                             versieid = { Value = message.Message.Provenance.Timestamp.ToBelgianDateTimeOffset().FromDateTimeOffset() },
-                            functie = { Value = Unknown }
+                            functie = { Value = Unknown },
+                            gebouwid = { Value = building.BuildingPersistentLocalId.HasValue ? building.BuildingPersistentLocalId.ToString() : null }
                         }.ToBytes(_encoding)
                     }, ct);
             });
 
             When<Envelope<BuildingUnitWasAddedToRetiredBuilding>>(async (context, message, ct) =>
             {
+                var building =
+                    await context.BuildingUnitBuildings.FindAsync(message.Message.BuildingId, cancellationToken: ct);
+
                 await context
                     .BuildingUnitExtract
                     .AddAsync(new BuildingUnitExtractItem
@@ -82,16 +96,22 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
                         BuildingUnitId = message.Message.BuildingUnitId,
                         BuildingId = message.Message.BuildingId,
                         IsComplete = false,
+                        IsBuildingComplete = building.IsComplete ?? false,
                         DbaseRecord = new BuildingUnitDbaseRecord
                         {
                             versieid = { Value = message.Message.Provenance.Timestamp.ToBelgianDateTimeOffset().FromDateTimeOffset() },
-                            functie = { Value = Unknown }
+                            functie = { Value = Unknown },
+                            gebouwid = { Value = building.BuildingPersistentLocalId.HasValue ? building.BuildingPersistentLocalId.ToString() : null },
+                            status = { Value = Retired }
                         }.ToBytes(_encoding)
                     }, ct);
             });
 
             When<Envelope<BuildingUnitWasReaddedByOtherUnitRemoval>>(async (context, message, ct) =>
             {
+                var building =
+                    await context.BuildingUnitBuildings.FindAsync(message.Message.BuildingId, cancellationToken: ct);
+
                 await context
                     .BuildingUnitExtract
                     .AddAsync(new BuildingUnitExtractItem
@@ -99,10 +119,12 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
                         BuildingUnitId = message.Message.BuildingUnitId,
                         BuildingId = message.Message.BuildingId,
                         IsComplete = false,
+                        IsBuildingComplete = building.IsComplete ?? false,
                         DbaseRecord = new BuildingUnitDbaseRecord
                         {
                             versieid = { Value = message.Message.Provenance.Timestamp.ToBelgianDateTimeOffset().FromDateTimeOffset() },
-                            functie = { Value = Unknown }
+                            functie = { Value = Unknown },
+                            gebouwid = { Value = building.BuildingPersistentLocalId.HasValue ? building.BuildingPersistentLocalId.ToString() : null }
                         }.ToBytes(_encoding)
                     }, ct);
             });
@@ -326,6 +348,9 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
             When<Envelope<BuildingPersistentLocalIdWasAssigned>>(async (context, message, ct) =>
             {
                 var units = GetBuildingUnitsByBuilding(context, message.Message.BuildingId);
+                var building = await context.BuildingUnitBuildings.FindAsync(message.Message.BuildingId, cancellationToken: ct);
+
+                building.BuildingPersistentLocalId = message.Message.PersistentLocalId;
 
                 foreach (var unit in units)
                     UpdateRecord(unit, item => { item.gebouwid.Value = message.Message.PersistentLocalId.ToString(); });
@@ -334,6 +359,10 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
             When<Envelope<BuildingBecameComplete>>(async (context, message, ct) =>
             {
                 var units = GetBuildingUnitsByBuilding(context, message.Message.BuildingId);
+                var building = await context.BuildingUnitBuildings.FindAsync(message.Message.BuildingId, cancellationToken: ct);
+
+                building.IsComplete = true;
+
                 foreach (var buildingUnitExtractItem in units)
                 {
                     UpdateRecord(buildingUnitExtractItem, b =>
@@ -347,6 +376,10 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
             When<Envelope<BuildingBecameIncomplete>>(async (context, message, ct) =>
             {
                 var units = GetBuildingUnitsByBuilding(context, message.Message.BuildingId);
+                var building = await context.BuildingUnitBuildings.FindAsync(message.Message.BuildingId, cancellationToken: ct);
+
+                building.IsComplete = false;
+
                 foreach (var buildingUnitExtractItem in units)
                 {
                     UpdateRecord(buildingUnitExtractItem, b =>
@@ -375,23 +408,36 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
             {
                 var units = GetBuildingUnitsByBuilding(context, message.Message.BuildingId);
                 RetireUnitsByBuilding(units, message.Message.BuildingUnitIdsToNotRealize, message.Message.BuildingUnitIdsToRetire, message.Message.Provenance.Timestamp, context);
+
+                var building = await context.BuildingUnitBuildings.FindAsync(message.Message.BuildingId, cancellationToken: ct);
+                building.BuildingRetiredStatus = BuildingStatus.NotRealized;
             });
 
             When<Envelope<BuildingWasCorrectedToRetired>>(async (context, message, ct) =>
             {
                 var units = GetBuildingUnitsByBuilding(context, message.Message.BuildingId);
                 RetireUnitsByBuilding(units, message.Message.BuildingUnitIdsToNotRealize, message.Message.BuildingUnitIdsToRetire, message.Message.Provenance.Timestamp, context);
+
+                var building = await context.BuildingUnitBuildings.FindAsync(message.Message.BuildingId, cancellationToken: ct);
+                building.BuildingRetiredStatus = BuildingStatus.Retired;
             });
 
             When<Envelope<BuildingWasNotRealized>>(async (context, message, ct) =>
             {
                 var units = GetBuildingUnitsByBuilding(context, message.Message.BuildingId);
                 RetireUnitsByBuilding(units, message.Message.BuildingUnitIdsToNotRealize, message.Message.BuildingUnitIdsToRetire, message.Message.Provenance.Timestamp, context);
+
+                var building = await context.BuildingUnitBuildings.FindAsync(message.Message.BuildingId, cancellationToken: ct);
+                building.BuildingRetiredStatus = BuildingStatus.NotRealized;
             });
 
             When<Envelope<BuildingWasRemoved>>(async (context, message, ct) =>
             {
                 var units = GetBuildingUnitsByBuilding(context, message.Message.BuildingId);
+                var building = await context.BuildingUnitBuildings.FindAsync(message.Message.BuildingId, cancellationToken: ct);
+
+                building.IsRemoved = true;
+
                 foreach (var buildingUnitExtractItem in units)
                     context.Remove(buildingUnitExtractItem);
             });
@@ -400,6 +446,9 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
             {
                 var units = GetBuildingUnitsByBuilding(context, message.Message.BuildingId);
                 RetireUnitsByBuilding(units, message.Message.BuildingUnitIdsToNotRealize, message.Message.BuildingUnitIdsToRetire, message.Message.Provenance.Timestamp, context);
+
+                var building = await context.BuildingUnitBuildings.FindAsync(message.Message.BuildingId, cancellationToken: ct);
+                building.BuildingRetiredStatus = BuildingStatus.Retired;
             });
 
             When<Envelope<BuildingBecameUnderConstruction>>(async (context, message, ct) => DoNothing());
@@ -414,7 +463,17 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
             When<Envelope<BuildingWasOutlined>>(async (context, message, ct) => DoNothing());
             When<Envelope<BuildingWasPlanned>>(async (context, message, ct) => DoNothing());
             When<Envelope<BuildingWasRealized>>(async (context, message, ct) => DoNothing());
-            When<Envelope<BuildingWasRegistered>>(async (context, message, ct) => DoNothing());
+            When<Envelope<BuildingWasRegistered>>(async (context, message, ct) =>
+            {
+                await context
+                    .BuildingUnitBuildings
+                    .AddAsync(
+                        new BuildingUnitBuildingItem
+                        {
+                            BuildingId = message.Message.BuildingId,
+                            IsRemoved = false
+                        }, ct);
+            });
             #endregion Building
 
             When<Envelope<AddressHouseNumberPositionWasImportedFromCrab>>(async (context, message, ct) => DoNothing());

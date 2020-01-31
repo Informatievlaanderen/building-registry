@@ -12,6 +12,7 @@ namespace BuildingRegistry.Projections.Extract
 
         public DbSet<BuildingExtractItem> BuildingExtract { get; set; }
         public DbSet<BuildingUnitExtractItem> BuildingUnitExtract { get; set; }
+        public DbSet<BuildingUnitBuildingItem> BuildingUnitBuildings { get; set; }
 
         // This needs to be here to please EF
         public ExtractContext() { }
