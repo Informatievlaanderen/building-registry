@@ -26,11 +26,10 @@ namespace BuildingRegistry.Projections.Wms.BuildingUnit
             #region Building
             When<Envelope<BuildingPersistentLocalIdWasAssigned>>(async (context, message, ct) =>
             {
-                await context.BuildingUnitBuildingPersistentLocalIds.AddAsync(new BuildingUnitBuildingPersistentLocalId
-                {
-                    BuildingId = message.Message.BuildingId,
-                    BuildingPersistentLocalId = message.Message.PersistentLocalId.ToString()
-                }, ct);
+                var building =
+                    await context.BuildingUnitBuildings.FindAsync(message.Message.BuildingId, cancellationToken: ct);
+
+                building.BuildingPersistentLocalId = message.Message.PersistentLocalId;
 
                 foreach (var unit in await context.BuildingUnits.GetByBuildingId(message.Message.BuildingId, ct))
                 {
@@ -47,6 +46,9 @@ namespace BuildingRegistry.Projections.Wms.BuildingUnit
                     if (message.Message.BuildingUnitIds.Contains(buildingUnitDetailItem.BuildingUnitId))
                         unitsToRemove.Add(buildingUnitDetailItem);
                 }
+
+                var building = await context.BuildingUnitBuildings.FindAsync(message.Message.BuildingId, cancellationToken: ct);
+                building.IsRemoved = true;
 
                 context.BuildingUnits.RemoveRange(unitsToRemove);
             });
@@ -70,6 +72,9 @@ namespace BuildingRegistry.Projections.Wms.BuildingUnit
                     unit.IsBuildingComplete = true;
                     SetVersion(unit, message.Message.Provenance.Timestamp);
                 }
+
+                var building = await context.BuildingUnitBuildings.FindAsync(message.Message.BuildingId, cancellationToken: ct);
+                building.IsComplete = true;
             });
 
             When<Envelope<BuildingBecameIncomplete>>(async (context, message, ct) =>
@@ -80,30 +85,45 @@ namespace BuildingRegistry.Projections.Wms.BuildingUnit
                     unit.IsBuildingComplete = false;
                     SetVersion(unit, message.Message.Provenance.Timestamp);
                 }
+
+                var building = await context.BuildingUnitBuildings.FindAsync(message.Message.BuildingId, cancellationToken: ct);
+                building.IsComplete = false;
             });
 
             When<Envelope<BuildingWasRetired>>(async (context, message, ct) =>
             {
                 var buildingUnits = await context.BuildingUnits.GetByBuildingId(message.Message.BuildingId, ct);
                 RetireUnitsByBuilding(buildingUnits, message.Message.BuildingUnitIdsToNotRealize, message.Message.BuildingUnitIdsToRetire, message.Message.Provenance.Timestamp);
+
+                var building = await context.BuildingUnitBuildings.FindAsync(message.Message.BuildingId, cancellationToken: ct);
+                building.BuildingRetiredStatus = BuildingStatus.Retired;
             });
 
             When<Envelope<BuildingWasCorrectedToRetired>>(async (context, message, ct) =>
             {
                 var buildingUnits = await context.BuildingUnits.GetByBuildingId(message.Message.BuildingId, ct);
                 RetireUnitsByBuilding(buildingUnits, message.Message.BuildingUnitIdsToNotRealize, message.Message.BuildingUnitIdsToRetire, message.Message.Provenance.Timestamp);
+
+                var building = await context.BuildingUnitBuildings.FindAsync(message.Message.BuildingId, cancellationToken: ct);
+                building.BuildingRetiredStatus = BuildingStatus.Retired;
             });
 
             When<Envelope<BuildingWasNotRealized>>(async (context, message, ct) =>
             {
                 var buildingUnits = await context.BuildingUnits.GetByBuildingId(message.Message.BuildingId, ct);
                 RetireUnitsByBuilding(buildingUnits, message.Message.BuildingUnitIdsToNotRealize, message.Message.BuildingUnitIdsToRetire, message.Message.Provenance.Timestamp);
+
+                var building = await context.BuildingUnitBuildings.FindAsync(message.Message.BuildingId, cancellationToken: ct);
+                building.BuildingRetiredStatus = BuildingStatus.NotRealized;
             });
 
             When<Envelope<BuildingWasCorrectedToNotRealized>>(async (context, message, ct) =>
             {
                 var buildingUnits = await context.BuildingUnits.GetByBuildingId(message.Message.BuildingId, ct);
                 RetireUnitsByBuilding(buildingUnits, message.Message.BuildingUnitIdsToNotRealize, message.Message.BuildingUnitIdsToRetire, message.Message.Provenance.Timestamp);
+
+                var building = await context.BuildingUnitBuildings.FindAsync(message.Message.BuildingId, cancellationToken: ct);
+                building.BuildingRetiredStatus = BuildingStatus.NotRealized;
             });
 
             When<Envelope<BuildingBecameUnderConstruction>>(async (context, message, ct) => DoNothing());
@@ -118,7 +138,16 @@ namespace BuildingRegistry.Projections.Wms.BuildingUnit
             When<Envelope<BuildingWasOutlined>>(async (context, message, ct) => DoNothing());
             When<Envelope<BuildingWasPlanned>>(async (context, message, ct) => DoNothing());
             When<Envelope<BuildingWasRealized>>(async (context, message, ct) => DoNothing());
-            When<Envelope<BuildingWasRegistered>>(async (context, message, ct) => DoNothing());
+            When<Envelope<BuildingWasRegistered>>(async (context, message, ct) =>
+            {
+                await context
+                    .BuildingUnitBuildings
+                    .AddAsync(new BuildingUnitBuildingItem
+                    {
+                        BuildingId = message.Message.BuildingId,
+                        IsRemoved =  false,
+                    }, ct);
+            });
             #endregion Building
 
             #region BuildingUnit
@@ -400,13 +429,14 @@ namespace BuildingRegistry.Projections.Wms.BuildingUnit
             Instant version,
             CancellationToken ct)
         {
-            var buildingPersistentLocalId = await context.BuildingUnitBuildingPersistentLocalIds.FindAsync(buildingId, cancellationToken: ct);
+            var building = await context.BuildingUnitBuildings.FindAsync(buildingId, cancellationToken: ct);
 
             await context.BuildingUnits.AddAsync(new BuildingUnit
             {
                 BuildingId = buildingId,
-                BuildingPersistentLocalId = buildingPersistentLocalId == null ? null : (int?)int.Parse(buildingPersistentLocalId.BuildingPersistentLocalId),
+                BuildingPersistentLocalId = building.BuildingPersistentLocalId,
                 BuildingUnitId = buildingUnitId,
+                IsBuildingComplete = building.IsComplete ?? false,
                 Version = version,
                 Function = MapFunction(function)
             }, ct);
