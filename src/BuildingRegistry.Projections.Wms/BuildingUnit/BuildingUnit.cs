@@ -88,6 +88,7 @@ namespace BuildingRegistry.Projections.Wms.BuildingUnit
             b.Ignore(p => p.Status);
 
             b.HasIndex(p => p.BuildingId);
+            b.HasIndex(p => p.StatusAsText);
         }
     }
 }
