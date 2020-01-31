@@ -74,6 +74,7 @@ namespace BuildingRegistry.Projections.Wms.Building
 
             b.Ignore(p => p.Status);
             b.HasIndex(p => p.StatusAsText);
+            b.HasIndex(p => p.IsComplete);
         }
     }
 }
