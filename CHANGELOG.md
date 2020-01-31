@@ -1,3 +1,10 @@
+## [2.3.9](https://github.com/informatievlaanderen/building-registry/compare/v2.3.8...v2.3.9) (2020-01-31)
+
+
+### Performance Improvements
+
+* add index on IsComplete filter for views WMS ([ef170a2](https://github.com/informatievlaanderen/building-registry/commit/ef170a2))
+
 ## [2.3.8](https://github.com/informatievlaanderen/building-registry/compare/v2.3.7...v2.3.8) (2020-01-31)
 
 
