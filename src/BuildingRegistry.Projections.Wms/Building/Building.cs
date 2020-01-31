@@ -73,6 +73,7 @@ namespace BuildingRegistry.Projections.Wms.Building
             b.Property(p => p.Geometry);
 
             b.Ignore(p => p.Status);
+            b.HasIndex(p => p.StatusAsText);
         }
     }
 }
