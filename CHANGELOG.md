@@ -1,3 +1,10 @@
+## [2.3.10](https://github.com/informatievlaanderen/building-registry/compare/v2.3.9...v2.3.10) (2020-01-31)
+
+
+### Bug Fixes
+
+* unit completeness based on building now stored seperatly ([2b73426](https://github.com/informatievlaanderen/building-registry/commit/2b73426))
+
 ## [2.3.9](https://github.com/informatievlaanderen/building-registry/compare/v2.3.8...v2.3.9) (2020-01-31)
 
 
