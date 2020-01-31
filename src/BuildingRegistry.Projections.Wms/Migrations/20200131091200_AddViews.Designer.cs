@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BuildingRegistry.Projections.Wms.Migrations
 {
     [DbContext(typeof(WmsContext))]
-    [Migration("20200131063710_AddStatusIndexes")]
-    partial class AddStatusIndexes
+    [Migration("20200131091200_AddViews")]
+    partial class AddViews
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {

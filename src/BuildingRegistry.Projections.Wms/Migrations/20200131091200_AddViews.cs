@@ -1,7 +1,6 @@
-using Microsoft.EntityFrameworkCore.Migrations;
-
 namespace BuildingRegistry.Projections.Wms.Migrations
 {
+    using Microsoft.EntityFrameworkCore.Migrations;
     using System.Collections.Generic;
     using System.Linq;
 

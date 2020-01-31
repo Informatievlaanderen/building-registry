@@ -87,6 +87,12 @@ namespace BuildingRegistry.Projections.Wms.Migrations
                 });
 
             migrationBuilder.CreateIndex(
+                name: "IX_Buildings_Status",
+                schema: "wms",
+                table: "Buildings",
+                column: "Status");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_BuildingUnit_BuildingPersistentLocalIds_BuildingPersistentLocalId",
                 schema: "wms",
                 table: "BuildingUnit_BuildingPersistentLocalIds",
@@ -97,6 +103,12 @@ namespace BuildingRegistry.Projections.Wms.Migrations
                 schema: "wms",
                 table: "BuildingUnits",
                 column: "BuildingId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_BuildingUnits_Status",
+                schema: "wms",
+                table: "BuildingUnits",
+                column: "Status");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
