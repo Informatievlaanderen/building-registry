@@ -1,3 +1,10 @@
+## [2.3.8](https://github.com/informatievlaanderen/building-registry/compare/v2.3.7...v2.3.8) (2020-01-31)
+
+
+### Performance Improvements
+
+* add indexes on wms on status to improve performance ([151db36](https://github.com/informatievlaanderen/building-registry/commit/151db36))
+
 ## [2.3.7](https://github.com/informatievlaanderen/building-registry/compare/v2.3.6...v2.3.7) (2020-01-30)
 
 
