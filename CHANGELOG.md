@@ -1,3 +1,10 @@
+# [2.4.0](https://github.com/informatievlaanderen/building-registry/compare/v2.3.10...v2.4.0) (2020-02-01)
+
+
+### Features
+
+* upgrade netcoreapp31 and dependencies ([adddb39](https://github.com/informatievlaanderen/building-registry/commit/adddb39))
+
 ## [2.3.10](https://github.com/informatievlaanderen/building-registry/compare/v2.3.9...v2.3.10) (2020-01-31)
 
 
