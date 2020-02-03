@@ -7,6 +7,7 @@ namespace BuildingRegistry.Api.Legacy.BuildingUnit.Responses
     using System.Collections.Generic;
     using System.Runtime.Serialization;
     using Microsoft.Extensions.Options;
+    using Newtonsoft.Json;
 
     [DataContract(Name = "GebouweenheidCollectie", Namespace = "")]
     public class BuildingUnitListResponse
@@ -15,18 +16,21 @@ namespace BuildingRegistry.Api.Legacy.BuildingUnit.Responses
         /// Collectie van gebouweenheden.
         /// </summary>
         [DataMember(Name = "Gebouweenheden")]
+        [JsonProperty(Required = Required.DisallowNull)]
         public List<GebouweenheidCollectieItem> Gebouweenheden { get; set; }
 
         /// <summary>
         /// Het totaal aantal gebouweneenheden die overeenkomen met de vraag.
         /// </summary>
         [DataMember(Name = "TotaalAantal", Order = 2)]
+        [JsonProperty(Required = Required.DisallowNull)]
         public long TotaalAantal { get; set; }
 
         /// <summary>
         /// De URL voor het ophalen van de volgende verzameling.
         /// </summary>
         [DataMember(Name = "Volgende", Order = 3, EmitDefaultValue = false)]
+        [JsonProperty(Required = Required.Default)]
         public Uri Volgende { get; set; }
     }
 
@@ -37,12 +41,14 @@ namespace BuildingRegistry.Api.Legacy.BuildingUnit.Responses
         /// De identificator van de gebouweenheid.
         /// </summary>
         [DataMember(Name = "Identificator", Order = 1)]
+        [JsonProperty(Required = Required.DisallowNull)]
         public GebouweenheidIdentificator Identificator { get; set; }
 
         /// <summary>
         /// De URL die naar de details van de meeste recente versie van een enkele gebouweenheid leidt.
         /// </summary>
         [DataMember(Name = "Detail", Order = 2)]
+        [JsonProperty(Required = Required.DisallowNull)]
         public Uri Detail { get; set; }
 
         public GebouweenheidCollectieItem(int id,

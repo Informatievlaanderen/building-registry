@@ -10,6 +10,7 @@ namespace BuildingRegistry.Api.Legacy.Building.Responses
     using Infrastructure.Options;
     using Microsoft.AspNetCore.Http;
     using Microsoft.Extensions.Options;
+    using Newtonsoft.Json;
     using Swashbuckle.AspNetCore.Filters;
 
     [DataContract(Name = "GebouwDetail", Namespace = "")]
@@ -19,36 +20,42 @@ namespace BuildingRegistry.Api.Legacy.Building.Responses
         /// De identificator van het gebouw.
         /// </summary>
         [DataMember(Name = "Identificator", Order = 1)]
+        [JsonProperty(Required = Required.DisallowNull)]
         public GebouwIdentificator Identificator { get; set; }
 
         /// <summary>
         /// the building geometry (a simple polygon with Lambert-72 coordinates)
         /// </summary>
         [DataMember(Name = "GeometriePolygoon", Order = 2)]
+        [JsonProperty(Required = Required.DisallowNull)]
         public Polygon Polygon { get; set; }
 
         /// <summary>
         /// De gebruikte methode om de positie te bepalen.
         /// </summary>
         [DataMember(Name = "GeometrieMethode", Order = 3)]
+        [JsonProperty(Required = Required.DisallowNull)]
         public GeometrieMethode GeometryMethod { get; set; }
 
         /// <summary>
         /// De fase in het leven van een gebouw.
         /// </summary>
         [DataMember(Name = "GebouwStatus", Order = 4)]
+        [JsonProperty(Required = Required.DisallowNull)]
         public GebouwStatus Status { get; set; }
 
         /// <summary>
         /// a collection of building units that reside within the building
         /// </summary>
         [DataMember(Name = "Gebouweenheden", Order = 5)]
+        [JsonProperty(Required = Required.DisallowNull)]
         public List<GebouwDetailGebouweenheid> BuildingUnits { get; set; }
 
         /// <summary>
         /// a collection of parcels that lie underneath the building
         /// </summary>
         [DataMember(Name = "Percelen", Order = 6)]
+        [JsonProperty(Required = Required.DisallowNull)]
         public List<GebouwDetailPerceel> Parcels { get; set; }
 
         public BuildingResponse(

@@ -12,6 +12,7 @@ namespace BuildingRegistry.Api.Legacy.BuildingUnit.Responses
     using System.Runtime.Serialization;
     using Be.Vlaanderen.Basisregisters.BasicApiProblem;
     using Microsoft.Extensions.Options;
+    using Newtonsoft.Json;
 
     [DataContract(Name = "GebouweenheidDetail", Namespace = "")]
     public class BuildingUnitResponse
@@ -20,42 +21,49 @@ namespace BuildingRegistry.Api.Legacy.BuildingUnit.Responses
         /// De identificator van de gebouweenheid.
         /// </summary>
         [DataMember(Name = "Identificator", Order = 1)]
+        [JsonProperty(Required = Required.DisallowNull)]
         public GebouweenheidIdentificator Identificator { get; set; }
 
         /// <summary>
         /// The building unit geometry (a point with Lambert-72 coordinates)
         /// </summary>
         [DataMember(Name = "GeometriePunt", Order = 2)]
+        [JsonProperty(Required = Required.DisallowNull)]
         public Point Geometry { get; set; }
 
         /// <summary>
         /// De gebruikte methode om de positie te bepalen.
         /// </summary>
         [DataMember(Name = "PositieGeometrieMethode", Order = 3)]
+        [JsonProperty(Required = Required.DisallowNull)]
         public PositieGeometrieMethode GeometryMethod { get; set; }
 
         /// <summary>
         /// De fase in het leven van een gebouweenheid.
         /// </summary>
         [DataMember(Name = "GebouweenheidStatus", Order = 4)]
+        [JsonProperty(Required = Required.DisallowNull)]
         public GebouweenheidStatus Status { get; set; }
 
         /// <summary>
         /// the function of the building unit in reality (as observed on site)
         /// </summary>
         [DataMember(Name = "Functie", Order = 5)]
+        [JsonProperty(Required = Required.DisallowNull)]
         public GebouweenheidFunctie? Function { get; set; }
 
         /// <summary>
         /// building wherein the building unit resides
         /// </summary>
         [DataMember(Name = "Gebouw", Order = 6)]
+        [JsonProperty(Required = Required.DisallowNull)]
         public GebouweenheidDetailGebouw Building { get; set; }
 
         /// <summary>
         /// De aan de gebouweenheid gelinkte adressen.
         /// </summary>
         [DataMember(Name = "Adressen", Order = 7)]
+        [JsonProperty(Required = Required.DisallowNull)]
         public List<GebouweenheidDetailAdres> Addresses { get; set; }
 
         public BuildingUnitResponse(
