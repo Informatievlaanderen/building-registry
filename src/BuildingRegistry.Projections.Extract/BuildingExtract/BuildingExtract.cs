@@ -11,7 +11,7 @@ namespace BuildingRegistry.Projections.Extract.BuildingExtract
         public int? PersistentLocalId  { get; set; }
         public bool IsComplete { get; set; }
         public byte[] DbaseRecord { get; set; }
-        public byte[] ShapeRecordContent { get; set; }
+        public byte[]? ShapeRecordContent { get; set; }
         public int ShapeRecordContentLength { get; set; }
         public double MinimumX { get; set; }
         public double MaximumX { get; set; }
