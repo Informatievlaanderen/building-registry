@@ -1512,8 +1512,6 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
         {
             foreach (var buildingUnitDetailItem in buildingUnits)
             {
-                context.Entry(buildingUnitDetailItem).Collection(x => x.Addresses).Load();
-
                 if (buildingUnitIdsToNotRealize.Contains(buildingUnitDetailItem.BuildingUnitId))
                     buildingUnitDetailItem.Status = BuildingUnitStatus.NotRealized;
                 else if (buildingUnitIdsToRetire.Contains(buildingUnitDetailItem.BuildingUnitId))
