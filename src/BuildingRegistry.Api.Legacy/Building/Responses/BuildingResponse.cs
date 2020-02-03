@@ -125,6 +125,7 @@ namespace BuildingRegistry.Api.Legacy.Building.Responses
         public ProblemDetails GetExamples()
             => new ProblemDetails
             {
+                ProblemTypeUri = "urn:be.vlaanderen.basisregisters.api:building:not-found",
                 HttpStatus = StatusCodes.Status404NotFound,
                 Title = ProblemDetails.DefaultTitle,
                 Detail = "Onbestaand gebouw.",
@@ -137,6 +138,7 @@ namespace BuildingRegistry.Api.Legacy.Building.Responses
         public ProblemDetails GetExamples()
             => new ProblemDetails
             {
+                ProblemTypeUri = "urn:be.vlaanderen.basisregisters.api:building:gone",
                 HttpStatus = StatusCodes.Status410Gone,
                 Title = ProblemDetails.DefaultTitle,
                 Detail = "Gebouw werd verwijderd.",
