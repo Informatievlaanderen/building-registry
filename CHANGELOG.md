@@ -1,3 +1,10 @@
+## [2.4.4](https://github.com/informatievlaanderen/building-registry/compare/v2.4.3...v2.4.4) (2020-02-04)
+
+
+### Bug Fixes
+
+* instanceuri for error example show correctly ([726aa3b](https://github.com/informatievlaanderen/building-registry/commit/726aa3b))
+
 ## [2.4.3](https://github.com/informatievlaanderen/building-registry/compare/v2.4.2...v2.4.3) (2020-02-03)
 
 
