@@ -10,6 +10,7 @@ namespace BuildingRegistry.Api.Legacy.BuildingUnit.Responses
     using System.Collections.Generic;
     using System.Linq;
     using System.Runtime.Serialization;
+    using Be.Vlaanderen.Basisregisters.Api.Exceptions;
     using Be.Vlaanderen.Basisregisters.BasicApiProblem;
     using Microsoft.Extensions.Options;
 
@@ -124,7 +125,7 @@ namespace BuildingRegistry.Api.Legacy.BuildingUnit.Responses
                 HttpStatus = StatusCodes.Status404NotFound,
                 Title = ProblemDetails.DefaultTitle,
                 Detail = "Onbestaande gebouweenheid.",
-                ProblemInstanceUri = ProblemDetails.GetProblemNumber()
+                ProblemInstanceUri = new DefaultHttpContext().GetProblemInstanceUri()
             };
     }
 
@@ -136,7 +137,7 @@ namespace BuildingRegistry.Api.Legacy.BuildingUnit.Responses
                 HttpStatus = StatusCodes.Status410Gone,
                 Title = ProblemDetails.DefaultTitle,
                 Detail = "Gebouweenheid werd verwijderd.",
-                ProblemInstanceUri = ProblemDetails.GetProblemNumber()
+                ProblemInstanceUri = new DefaultHttpContext().GetProblemInstanceUri()
             };
     }
 }
