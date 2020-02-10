@@ -27,8 +27,7 @@ namespace BuildingRegistry.Api.Legacy.Building.Responses
         /// <summary>
         /// the building geometry (a simple polygon with Lambert-72 coordinates)
         /// </summary>
-        [DataMember(Name = "GeometriePolygoon", Order = 2)]
-        [JsonProperty(Required = Required.DisallowNull)]
+        [DataMember(Name = "GeometriePolygoon", Order = 2, EmitDefaultValue = true)]
         public Polygon Polygon { get; set; }
 
         /// <summary>
