@@ -1,3 +1,10 @@
+## [2.4.5](https://github.com/informatievlaanderen/building-registry/compare/v2.4.4...v2.4.5) (2020-02-10)
+
+
+### Bug Fixes
+
+* json default values for nullable fields ([05bf81d](https://github.com/informatievlaanderen/building-registry/commit/05bf81d))
+
 ## [2.4.4](https://github.com/informatievlaanderen/building-registry/compare/v2.4.3...v2.4.4) (2020-02-04)
 
 
