@@ -193,6 +193,13 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetail
             When<Envelope<BuildingUnitWasAddedToRetiredBuilding>>(async (context, message, ct) =>
             {
                 await AddUnit(context, message.Message.BuildingId, message.Message.BuildingUnitId, message.Message.AddressId, message.Message.Provenance.Timestamp, false, ct);
+                var addedUnit = await context.BuildingUnitDetails.FindAsync(message.Message.BuildingUnitId, cancellationToken: ct);
+                var building = await context.BuildingUnitBuildings.FindAsync(message.Message.BuildingId, cancellationToken: ct);
+
+                if(building.BuildingRetiredStatus == BuildingStatus.NotRealized)
+                    addedUnit.Status = BuildingUnitStatus.NotRealized;
+                else
+                    addedUnit.Status = BuildingUnitStatus.Retired;
             });
 
             When<Envelope<BuildingUnitWasRemoved>>(async (context, message, ct) =>
