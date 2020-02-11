@@ -1,3 +1,10 @@
+## [2.4.6](https://github.com/informatievlaanderen/building-registry/compare/v2.4.5...v2.4.6) (2020-02-11)
+
+
+### Bug Fixes
+
+* set interior ring to null when no rings present ([c8e5381](https://github.com/informatievlaanderen/building-registry/commit/c8e5381))
+
 ## [2.4.5](https://github.com/informatievlaanderen/building-registry/compare/v2.4.4...v2.4.5) (2020-02-10)
 
 
