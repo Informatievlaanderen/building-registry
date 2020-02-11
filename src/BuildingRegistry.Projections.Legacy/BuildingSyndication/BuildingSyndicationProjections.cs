@@ -688,7 +688,8 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
                             Position = message.Position,
                             BuildingUnitId = message.Message.BuildingUnitId,
                             Function = BuildingUnitFunction.Unknown,
-                            Version = message.Message.Provenance.Timestamp
+                            Version = message.Message.Provenance.Timestamp,
+                            Status = syndicationItem.Status == BuildingStatus.NotRealized ? BuildingUnitStatus.NotRealized : BuildingUnitStatus.Retired
                         };
 
                         buildingUnitSyndicationItem.Addresses.Add(new BuildingUnitAddressSyndicationItem

@@ -89,6 +89,8 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
                 var building =
                     await context.BuildingUnitBuildings.FindAsync(message.Message.BuildingId, cancellationToken: ct);
 
+                var retired = building.BuildingRetiredStatus == BuildingStatus.NotRealized ? NotRealized : Retired;
+
                 await context
                     .BuildingUnitExtract
                     .AddAsync(new BuildingUnitExtractItem
@@ -102,7 +104,7 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
                             versieid = { Value = message.Message.Provenance.Timestamp.ToBelgianDateTimeOffset().FromDateTimeOffset() },
                             functie = { Value = Unknown },
                             gebouwid = { Value = building.BuildingPersistentLocalId.HasValue ? building.BuildingPersistentLocalId.ToString() : null },
-                            status = { Value = Retired }
+                            status = { Value = retired }
                         }.ToBytes(_encoding)
                     }, ct);
             });

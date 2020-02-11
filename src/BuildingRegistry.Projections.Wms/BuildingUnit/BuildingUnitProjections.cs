@@ -170,6 +170,13 @@ namespace BuildingRegistry.Projections.Wms.BuildingUnit
             When<Envelope<BuildingUnitWasAddedToRetiredBuilding>>(async (context, message, ct) =>
             {
                 await AddBuildingUnit(context, message.Message.BuildingId, message.Message.BuildingUnitId, BuildingUnitFunction.Unknown, message.Message.Provenance.Timestamp, ct);
+                var addedUnit = await context.BuildingUnits.FindAsync(message.Message.BuildingUnitId, cancellationToken: ct);
+                var building = await context.BuildingUnitBuildings.FindAsync(message.Message.BuildingId, cancellationToken: ct);
+
+                if (building.BuildingRetiredStatus == BuildingStatus.NotRealized)
+                    addedUnit.Status = BuildingUnitStatus.NotRealized;
+                else
+                    addedUnit.Status = BuildingUnitStatus.Retired;
             });
 
             When<Envelope<BuildingUnitWasReaddedByOtherUnitRemoval>>(async (context, message, ct) =>
