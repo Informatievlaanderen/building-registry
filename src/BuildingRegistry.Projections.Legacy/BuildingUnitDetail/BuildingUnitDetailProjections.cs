@@ -196,7 +196,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetail
                 var addedUnit = await context.BuildingUnitDetails.FindAsync(message.Message.BuildingUnitId, cancellationToken: ct);
                 var building = await context.BuildingUnitBuildings.FindAsync(message.Message.BuildingId, cancellationToken: ct);
 
-                if(building.BuildingRetiredStatus == BuildingStatus.NotRealized)
+                if (building.BuildingRetiredStatus == BuildingStatus.NotRealized)
                     addedUnit.Status = BuildingUnitStatus.NotRealized;
                 else
                     addedUnit.Status = BuildingUnitStatus.Retired;
