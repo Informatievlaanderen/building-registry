@@ -150,7 +150,7 @@ namespace BuildingRegistry.Api.Legacy.Building
                     filtering,
                     sorting,
                     pagination,
-                    filtering.ShouldFilter ? null : (Func<IQueryable<BuildingDetailItem>, long>) Count);
+                    filtering.ShouldFilter ? null : (Func<IQueryable<BuildingDetailItem>, long>)Count);
 
             Response.AddPagedQueryResultHeaders(pagedBuildings);
 
@@ -217,9 +217,11 @@ namespace BuildingRegistry.Api.Legacy.Building
         {
             var gmlPolygon = new GmlPolygon
             {
-                Interior = new List<RingProperty>(),
                 Exterior = GetGmlRing(polygon.ExteriorRing as NetTopologySuite.Geometries.LinearRing)
             };
+
+            if (polygon.NumInteriorRings > 0)
+                gmlPolygon.Interior = new List<RingProperty>();
 
             for (var i = 0; i < polygon.NumInteriorRings; i++)
                 gmlPolygon.Interior.Add(GetGmlRing(polygon.InteriorRings[i] as NetTopologySuite.Geometries.LinearRing));
@@ -342,7 +344,7 @@ namespace BuildingRegistry.Api.Legacy.Building
                     syndicationConfiguration.GetSection("Related").GetChildren().Select(c => c.Value).ToArray());
 
                 var nextUri = pagedBuildings.PaginationInfo.BuildNextUri(syndicationConfiguration["NextUri"]);
-                if(nextUri != null)
+                if (nextUri != null)
                     await writer.Write(new SyndicationLink(nextUri, "next"));
 
                 foreach (var building in pagedBuildings.Items)
