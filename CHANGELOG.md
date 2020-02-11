@@ -1,3 +1,10 @@
+## [2.4.7](https://github.com/informatievlaanderen/building-registry/compare/v2.4.6...v2.4.7) (2020-02-11)
+
+
+### Bug Fixes
+
+* correct status projections added buildingunit to retired building ([709a727](https://github.com/informatievlaanderen/building-registry/commit/709a727))
+
 ## [2.4.6](https://github.com/informatievlaanderen/building-registry/compare/v2.4.5...v2.4.6) (2020-02-11)
 
 
