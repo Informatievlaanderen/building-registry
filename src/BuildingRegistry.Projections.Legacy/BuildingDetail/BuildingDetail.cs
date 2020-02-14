@@ -51,6 +51,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingDetail
             b.Property(p => p.IsRemoved);
 
             b.HasIndex(p => p.PersistentLocalId).IsUnique();
+            b.HasIndex(p => new { p.IsComplete, p.IsRemoved, p.PersistentLocalId });
         }
     }
 }

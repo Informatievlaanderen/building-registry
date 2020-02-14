@@ -92,6 +92,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetail
             b.Property(p => p.IsComplete);
             b.Property(p => p.IsRemoved);
             b.Property(p => p.IsBuildingComplete);
+
             b.HasMany(x => x.Addresses)
                 .WithOne()
                 .IsRequired()
@@ -100,6 +101,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetail
             b.HasIndex(p => p.BuildingId);
             b.HasIndex(p => p.PersistentLocalId).IsUnique();
             b.HasIndex(p => p.BuildingPersistentLocalId);
+            b.HasIndex(p => new { p.IsComplete, p.IsRemoved, p.PersistentLocalId, p.IsBuildingComplete, p.BuildingPersistentLocalId });
         }
     }
 }
