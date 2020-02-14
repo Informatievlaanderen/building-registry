@@ -1,3 +1,10 @@
+## [2.4.8](https://github.com/informatievlaanderen/building-registry/compare/v2.4.7...v2.4.8) (2020-02-14)
+
+
+### Bug Fixes
+
+* add indexes on lists ([7d25d0e](https://github.com/informatievlaanderen/building-registry/commit/7d25d0e))
+
 ## [2.4.7](https://github.com/informatievlaanderen/building-registry/compare/v2.4.6...v2.4.7) (2020-02-11)
 
 
