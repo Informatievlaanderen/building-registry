@@ -1,3 +1,10 @@
+## [2.4.9](https://github.com/informatievlaanderen/building-registry/compare/v2.4.8...v2.4.9) (2020-02-17)
+
+
+### Bug Fixes
+
+* upgrade Grar common libs ([901e3c4](https://github.com/informatievlaanderen/building-registry/commit/901e3c4))
+
 ## [2.4.8](https://github.com/informatievlaanderen/building-registry/compare/v2.4.7...v2.4.8) (2020-02-14)
 
 
