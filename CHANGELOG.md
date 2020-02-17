@@ -1,3 +1,10 @@
+## [2.4.10](https://github.com/informatievlaanderen/building-registry/compare/v2.4.9...v2.4.10) (2020-02-17)
+
+
+### Bug Fixes
+
+* update packages to fix json order ([8a5c2c6](https://github.com/informatievlaanderen/building-registry/commit/8a5c2c6))
+
 ## [2.4.9](https://github.com/informatievlaanderen/building-registry/compare/v2.4.8...v2.4.9) (2020-02-17)
 
 
