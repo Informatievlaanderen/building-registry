@@ -233,7 +233,7 @@ namespace BuildingRegistry.Api.Legacy.Building
         {
             var posListBuilder = new StringBuilder();
             foreach (var coordinate in ring.Coordinates)
-                posListBuilder.Append($"{coordinate.X.ToGeometryCoordinateValueFormat()} {coordinate.Y.ToGeometryCoordinateValueFormat()} ");
+                posListBuilder.Append($"{coordinate.X.ToPolygonGeometryCoordinateValueFormat()} {coordinate.Y.ToPolygonGeometryCoordinateValueFormat()} ");
 
             //remove last space
             posListBuilder.Length--;
