@@ -386,7 +386,7 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
                 {
                     UpdateRecord(buildingUnitExtractItem, b =>
                     {
-                        buildingUnitExtractItem.IsBuildingComplete = true;
+                        buildingUnitExtractItem.IsBuildingComplete = false;
                         UpdateVersie(buildingUnitExtractItem, message.Message.Provenance.Timestamp);
                     });
                 }
