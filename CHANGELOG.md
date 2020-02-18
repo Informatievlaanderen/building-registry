@@ -1,3 +1,10 @@
+## [2.4.12](https://github.com/informatievlaanderen/building-registry/compare/v2.4.11...v2.4.12) (2020-02-18)
+
+
+### Bug Fixes
+
+* projections extract buildingunit when building incomplete ([3cfd92b](https://github.com/informatievlaanderen/building-registry/commit/3cfd92b))
+
 ## [2.4.11](https://github.com/informatievlaanderen/building-registry/compare/v2.4.10...v2.4.11) (2020-02-18)
 
 
