@@ -1,3 +1,10 @@
+## [2.4.11](https://github.com/informatievlaanderen/building-registry/compare/v2.4.10...v2.4.11) (2020-02-18)
+
+
+### Bug Fixes
+
+* check for not null buildingunits on extract ([271e0df](https://github.com/informatievlaanderen/building-registry/commit/271e0df))
+
 ## [2.4.10](https://github.com/informatievlaanderen/building-registry/compare/v2.4.9...v2.4.10) (2020-02-17)
 
 
