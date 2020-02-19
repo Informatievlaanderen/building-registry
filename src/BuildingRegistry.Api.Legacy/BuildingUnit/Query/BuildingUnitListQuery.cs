@@ -30,6 +30,7 @@ namespace BuildingRegistry.Api.Legacy.BuildingUnit.Query
             var buildingUnits = _context
                 .BuildingUnitDetails
                 .Where(x => x.IsComplete && !x.IsRemoved && x.IsBuildingComplete && x.PersistentLocalId.HasValue && x.BuildingPersistentLocalId.HasValue)
+                .OrderBy(x => x.PersistentLocalId)
                 .AsNoTracking();
 
             if (!string.IsNullOrEmpty(filtering.Filter?.AddressPersistentLocalId))

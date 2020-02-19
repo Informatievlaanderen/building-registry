@@ -27,7 +27,7 @@ namespace BuildingRegistry.Projections.Extract.BuildingExtract
         {
             builder.ToTable(TableName, Schema.Extract)
                 .HasKey(p => p.BuildingId)
-                .ForSqlServerIsClustered(false);
+                .IsClustered(false);
 
             builder.Property(p => p.PersistentLocalId);
             builder.Property(p => p.IsComplete);
@@ -39,7 +39,7 @@ namespace BuildingRegistry.Projections.Extract.BuildingExtract
             builder.Property(p => p.MinimumY);
             builder.Property(p => p.MaximumY);
 
-            builder.HasIndex(p => p.PersistentLocalId).ForSqlServerIsClustered();
+            builder.HasIndex(p => p.PersistentLocalId).IsClustered();
         }
     }
 }

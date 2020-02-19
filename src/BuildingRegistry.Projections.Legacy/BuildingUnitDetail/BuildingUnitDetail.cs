@@ -99,7 +99,10 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetail
                 .HasForeignKey(x => x.BuildingUnitId);
 
             b.HasIndex(p => p.BuildingId);
-            b.HasIndex(p => p.PersistentLocalId).IsUnique();
+            b.HasIndex(p => p.PersistentLocalId)
+                .IsUnique()
+                .IsClustered();
+
             b.HasIndex(p => p.BuildingPersistentLocalId);
             b.HasIndex(p => new { p.IsComplete, p.IsRemoved, p.PersistentLocalId, p.IsBuildingComplete, p.BuildingPersistentLocalId });
         }

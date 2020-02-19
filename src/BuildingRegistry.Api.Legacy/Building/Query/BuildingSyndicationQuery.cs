@@ -101,6 +101,7 @@ namespace BuildingRegistry.Api.Legacy.Building.Query
                 .BuildingSyndication
                 .Include(x => x.BuildingUnits).ThenInclude(x => x.Addresses)
                 .Include(x => x.BuildingUnits).ThenInclude(x => x.Readdresses)
+                .OrderBy(x => x.Position)
                 .AsNoTracking();
 
             if (!filtering.ShouldFilter || !filtering.Filter.Position.HasValue)

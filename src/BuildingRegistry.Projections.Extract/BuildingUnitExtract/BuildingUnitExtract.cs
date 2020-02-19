@@ -43,9 +43,9 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
             builder.Property(p => p.MinimumY);
             builder.Property(p => p.MaximumY);
 
-            builder.HasIndex(p => p.BuildingId).IsClustered();
+            builder.HasIndex(p => p.BuildingId);
             builder.HasIndex(p => new { p.IsComplete, p.IsBuildingComplete });
-            builder.HasIndex(p => p.PersistentLocalId);
+            builder.HasIndex(p => p.PersistentLocalId).IsClustered();
         }
     }
 }
