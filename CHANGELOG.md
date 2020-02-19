@@ -1,3 +1,10 @@
+## [2.4.13](https://github.com/informatievlaanderen/building-registry/compare/v2.4.12...v2.4.13) (2020-02-19)
+
+
+### Bug Fixes
+
+* order by is now in api's + added clustered indexes ([cdb7dd6](https://github.com/informatievlaanderen/building-registry/commit/cdb7dd6))
+
 ## [2.4.12](https://github.com/informatievlaanderen/building-registry/compare/v2.4.11...v2.4.12) (2020-02-18)
 
 
