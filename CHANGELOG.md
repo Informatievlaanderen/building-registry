@@ -1,3 +1,10 @@
+## [2.4.15](https://github.com/informatievlaanderen/building-registry/compare/v2.4.14...v2.4.15) (2020-02-20)
+
+
+### Bug Fixes
+
+* add index on synced address persistent id ([6c05490](https://github.com/informatievlaanderen/building-registry/commit/6c05490))
+
 ## [2.4.14](https://github.com/informatievlaanderen/building-registry/compare/v2.4.13...v2.4.14) (2020-02-20)
 
 
