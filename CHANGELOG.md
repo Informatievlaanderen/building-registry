@@ -1,3 +1,10 @@
+## [2.5.1](https://github.com/informatievlaanderen/building-registry/compare/v2.5.0...v2.5.1) (2020-02-20)
+
+
+### Bug Fixes
+
+* revert experiment ([113dc30](https://github.com/informatievlaanderen/building-registry/commit/113dc30))
+
 # [2.5.0](https://github.com/informatievlaanderen/building-registry/compare/v2.4.15...v2.5.0) (2020-02-20)
 
 
