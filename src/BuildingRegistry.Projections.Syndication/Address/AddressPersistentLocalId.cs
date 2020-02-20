@@ -33,6 +33,7 @@ namespace BuildingRegistry.Projections.Syndication.Address
             builder.Property(x => x.IsRemoved);
 
             builder.HasIndex(x => new { x.IsComplete, x.IsRemoved });
+            builder.HasIndex(x => x.PersistentLocalId);
         }
     }
 }
