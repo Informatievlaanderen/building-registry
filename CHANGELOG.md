@@ -1,3 +1,10 @@
+# [2.5.0](https://github.com/informatievlaanderen/building-registry/compare/v2.4.15...v2.5.0) (2020-02-20)
+
+
+### Features
+
+* set count -1 ([e2961c9](https://github.com/informatievlaanderen/building-registry/commit/e2961c9))
+
 ## [2.4.15](https://github.com/informatievlaanderen/building-registry/compare/v2.4.14...v2.4.15) (2020-02-20)
 
 
