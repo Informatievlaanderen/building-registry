@@ -1,3 +1,10 @@
+## [2.4.14](https://github.com/informatievlaanderen/building-registry/compare/v2.4.13...v2.4.14) (2020-02-20)
+
+
+### Bug Fixes
+
+* update grar common ([1ecec78](https://github.com/informatievlaanderen/building-registry/commit/1ecec78))
+
 ## [2.4.13](https://github.com/informatievlaanderen/building-registry/compare/v2.4.12...v2.4.13) (2020-02-19)
 
 
