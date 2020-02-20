@@ -67,8 +67,7 @@ namespace BuildingRegistry.Api.Legacy.BuildingUnit
                     filtering,
                     sorting,
                     pagination,
-                    items => -1);
-                    //filtering.ShouldFilter ? null : (Func<IQueryable<BuildingUnitDetailItem>, long>)Count);
+                    filtering.ShouldFilter ? null : (Func<IQueryable<BuildingUnitDetailItem>, long>)Count);
 
             Response.AddPagedQueryResultHeaders(pagedBuildingUnits);
 
