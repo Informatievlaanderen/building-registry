@@ -1,3 +1,10 @@
+## [2.5.2](https://github.com/informatievlaanderen/building-registry/compare/v2.5.1...v2.5.2) (2020-02-21)
+
+
+### Performance Improvements
+
+* add index on buildingunit address ([1a8a2ee](https://github.com/informatievlaanderen/building-registry/commit/1a8a2ee))
+
 ## [2.5.1](https://github.com/informatievlaanderen/building-registry/compare/v2.5.0...v2.5.1) (2020-02-20)
 
 
