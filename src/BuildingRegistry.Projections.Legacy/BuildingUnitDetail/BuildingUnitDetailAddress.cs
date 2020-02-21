@@ -23,6 +23,8 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetail
                 .IsClustered(false);
 
             b.Property(x => x.Count);
+
+            b.HasIndex(x => x.AddressId).IsClustered(false);
         }
     }
 }
