@@ -26,7 +26,6 @@ namespace BuildingRegistry.Api.Legacy.BuildingUnit
     using System.Threading.Tasks;
     using Be.Vlaanderen.Basisregisters.Api.Search;
     using Infrastructure;
-    using Projections.Legacy.BuildingUnitDetail;
     using ValueObjects;
 
     [ApiVersion("1.0")]
@@ -60,14 +59,8 @@ namespace BuildingRegistry.Api.Legacy.BuildingUnit
             var sorting = Request.ExtractSortingRequest();
             var pagination = Request.ExtractPaginationRequest();
 
-            long Count(IQueryable<BuildingUnitDetailItem> items) => context.BuildingUnitDetailListCountView.Single().Count;
-
             var pagedBuildingUnits = new BuildingUnitListQuery(context, syndicationContext)
-                .Fetch(
-                    filtering,
-                    sorting,
-                    pagination,
-                    filtering.ShouldFilter ? null : (Func<IQueryable<BuildingUnitDetailItem>, long>)Count);
+                .Fetch(filtering, sorting, pagination);
 
             Response.AddPagedQueryResultHeaders(pagedBuildingUnits);
 
@@ -88,7 +81,6 @@ namespace BuildingRegistry.Api.Legacy.BuildingUnit
                         responseOptions.Value.GebouweenheidDetailUrl,
                         x.Version.ToBelgianDateTimeOffset()))
                     .ToList(),
-                TotaalAantal = pagedBuildingUnits.PaginationInfo.TotalItems,
                 Volgende = pagedBuildingUnits.PaginationInfo.BuildNextUri(responseOptions.Value.GebouweenheidVolgendeUrl)
             };
 

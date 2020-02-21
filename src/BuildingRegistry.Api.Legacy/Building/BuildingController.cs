@@ -35,7 +35,6 @@ namespace BuildingRegistry.Api.Legacy.Building
     using System.Xml;
     using Be.Vlaanderen.Basisregisters.Api.Search;
     using Infrastructure;
-    using Projections.Legacy.BuildingDetail;
     using ValueObjects;
     using ProblemDetails = Be.Vlaanderen.Basisregisters.BasicApiProblem.ProblemDetails;
 
@@ -143,14 +142,8 @@ namespace BuildingRegistry.Api.Legacy.Building
             var sorting = Request.ExtractSortingRequest();
             var pagination = Request.ExtractPaginationRequest();
 
-            long Count(IQueryable<BuildingDetailItem> items) => context.BuildingDetailListCountView.Single().Count;
-
             var pagedBuildings = new BuildingListQuery(context)
-                .Fetch(
-                    filtering,
-                    sorting,
-                    pagination,
-                    filtering.ShouldFilter ? null : (Func<IQueryable<BuildingDetailItem>, long>)Count);
+                .Fetch(filtering, sorting, pagination);
 
             Response.AddPagedQueryResultHeaders(pagedBuildings);
 
@@ -171,7 +164,6 @@ namespace BuildingRegistry.Api.Legacy.Building
                         responseOptions.Value.GebouwDetailUrl,
                         x.Version.ToBelgianDateTimeOffset()))
                     .ToList(),
-                TotaalAantal = pagedBuildings.PaginationInfo.TotalItems,
                 Volgende = pagedBuildings.PaginationInfo.BuildNextUri(responseOptions.Value.GebouwVolgendeUrl)
             };
 
@@ -311,7 +303,7 @@ namespace BuildingRegistry.Api.Legacy.Building
                 context,
                 filtering.Filter?.ContainEvent ?? false,
                 filtering.Filter?.ContainObject ?? false)
-                .Fetch(filtering, sorting, pagination, items => 0);
+                .Fetch(filtering, sorting, pagination);
 
             Response.AddPagedQueryResultHeaders(pagedBuildings);
 

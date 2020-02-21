@@ -22,9 +22,9 @@ namespace BuildingRegistry.Api.Legacy.Building.Responses
         /// <summary>
         /// Het totaal aantal gebouwen die overeenkomen met de vraag.
         /// </summary>
-        [DataMember(Name = "TotaalAantal", Order = 2)]
-        [JsonProperty(Required = Required.DisallowNull)]
-        public long TotaalAantal { get; set; }
+        //[DataMember(Name = "TotaalAantal", Order = 2)]
+        //[JsonProperty(Required = Required.DisallowNull)]
+        //public long TotaalAantal { get; set; }
 
         /// <summary>
         /// De URL voor het ophalen van de volgende verzameling.
@@ -79,7 +79,6 @@ namespace BuildingRegistry.Api.Legacy.Building.Responses
                     new GebouwCollectieItem(9, _responseOptions.GebouwNaamruimte, _responseOptions.GebouwDetailUrl, DateTimeOffset.Now.AddHours(9)),
                     new GebouwCollectieItem(10, _responseOptions.GebouwNaamruimte, _responseOptions.GebouwDetailUrl, DateTimeOffset.Now.AddDays(2))
                 },
-                TotaalAantal = 1578,
                 Volgende = new Uri(string.Format(_responseOptions.GebouwVolgendeUrl, "5", "10"))
             };
     }
