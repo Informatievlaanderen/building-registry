@@ -1,3 +1,10 @@
+## [2.5.4](https://github.com/informatievlaanderen/building-registry/compare/v2.5.3...v2.5.4) (2020-02-21)
+
+
+### Performance Improvements
+
+* increase performance by removing count from lists ([bc5d938](https://github.com/informatievlaanderen/building-registry/commit/bc5d938))
+
 ## [2.5.3](https://github.com/informatievlaanderen/building-registry/compare/v2.5.2...v2.5.3) (2020-02-21)
 
 
