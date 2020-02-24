@@ -1,3 +1,10 @@
+## [2.5.5](https://github.com/informatievlaanderen/building-registry/compare/v2.5.4...v2.5.5) (2020-02-24)
+
+
+### Bug Fixes
+
+* update projection handling & sync migrator ([0360c85](https://github.com/informatievlaanderen/building-registry/commit/0360c85))
+
 ## [2.5.4](https://github.com/informatievlaanderen/building-registry/compare/v2.5.3...v2.5.4) (2020-02-21)
 
 
