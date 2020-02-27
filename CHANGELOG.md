@@ -1,3 +1,10 @@
+## [2.5.6](https://github.com/informatievlaanderen/building-registry/compare/v2.5.5...v2.5.6) (2020-02-27)
+
+
+### Bug Fixes
+
+* update json serialization dependencies ([c7deb1e](https://github.com/informatievlaanderen/building-registry/commit/c7deb1e))
+
 ## [2.5.5](https://github.com/informatievlaanderen/building-registry/compare/v2.5.4...v2.5.5) (2020-02-24)
 
 
