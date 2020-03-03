@@ -100,7 +100,6 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetail
 
             b.HasIndex(p => p.BuildingId);
             b.HasIndex(p => p.PersistentLocalId)
-                .IsUnique()
                 .IsClustered();
 
             b.HasIndex(p => p.BuildingPersistentLocalId);
