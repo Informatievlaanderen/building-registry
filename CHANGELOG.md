@@ -1,3 +1,12 @@
+## [2.5.7](https://github.com/informatievlaanderen/building-registry/compare/v2.5.6...v2.5.7) (2020-03-03)
+
+
+### Bug Fixes
+
+* bump netcore to 3.1.2 ([bb6e9c0](https://github.com/informatievlaanderen/building-registry/commit/bb6e9c0))
+* remove unique index from buildingunit ([b2fbd78](https://github.com/informatievlaanderen/building-registry/commit/b2fbd78))
+* update dockerid detection ([2094510](https://github.com/informatievlaanderen/building-registry/commit/2094510))
+
 ## [2.5.6](https://github.com/informatievlaanderen/building-registry/compare/v2.5.5...v2.5.6) (2020-02-27)
 
 
