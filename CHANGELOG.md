@@ -1,3 +1,10 @@
+## [2.5.8](https://github.com/informatievlaanderen/building-registry/compare/v2.5.7...v2.5.8) (2020-03-04)
+
+
+### Bug Fixes
+
+* bump netcore dockerfiles ([7ad59e4](https://github.com/informatievlaanderen/building-registry/commit/7ad59e4))
+
 ## [2.5.7](https://github.com/informatievlaanderen/building-registry/compare/v2.5.6...v2.5.7) (2020-03-03)
 
 
