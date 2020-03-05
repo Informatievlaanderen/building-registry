@@ -1,3 +1,10 @@
+## [2.5.10](https://github.com/informatievlaanderen/building-registry/compare/v2.5.9...v2.5.10) (2020-03-05)
+
+
+### Bug Fixes
+
+* correct provenance ([411157d](https://github.com/informatievlaanderen/building-registry/commit/411157d))
+
 ## [2.5.9](https://github.com/informatievlaanderen/building-registry/compare/v2.5.8...v2.5.9) (2020-03-05)
 
 
