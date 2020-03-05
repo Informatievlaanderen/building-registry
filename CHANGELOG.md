@@ -1,3 +1,10 @@
+## [2.5.9](https://github.com/informatievlaanderen/building-registry/compare/v2.5.8...v2.5.9) (2020-03-05)
+
+
+### Bug Fixes
+
+* update grar common to fix provenance ([8cbed0c](https://github.com/informatievlaanderen/building-registry/commit/8cbed0c))
+
 ## [2.5.8](https://github.com/informatievlaanderen/building-registry/compare/v2.5.7...v2.5.8) (2020-03-04)
 
 
