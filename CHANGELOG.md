@@ -1,3 +1,10 @@
+## [2.5.11](https://github.com/informatievlaanderen/building-registry/compare/v2.5.10...v2.5.11) (2020-03-05)
+
+
+### Bug Fixes
+
+* correct convert datetime to instant for sync projection ([45df361](https://github.com/informatievlaanderen/building-registry/commit/45df361))
+
 ## [2.5.10](https://github.com/informatievlaanderen/building-registry/compare/v2.5.9...v2.5.10) (2020-03-05)
 
 
