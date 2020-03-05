@@ -51,7 +51,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
             var newBuildingSyndicationItem = buildingSyndicationItem.CloneAndApplyEventInfo(
                 message.Position,
                 message.EventName,
-                message.Message is IHasProvenance x ? x.Provenance.Timestamp : Instant.MinValue,
+                message.Message is IHasProvenance x ? x.Provenance.Timestamp : Instant.FromDateTimeOffset(DateTimeOffset.MinValue),
                 dummyApplyEventInfoOn);
 
             if (message.Message is IHasProvenance provenanceMessage)
