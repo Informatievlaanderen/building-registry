@@ -76,6 +76,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
                    .FirstOrDefault()
                ?? await context
                    .BuildingSyndication
+                   .AsNoTracking()
                    .Where(x => x.BuildingId == buildingId)
                    .Include(x => x.BuildingUnits).ThenInclude(y => y.Addresses)
                    .Include(x => x.BuildingUnits).ThenInclude(y => y.Readdresses)
