@@ -1,3 +1,10 @@
+# [2.6.0](https://github.com/informatievlaanderen/building-registry/compare/v2.5.13...v2.6.0) (2020-03-10)
+
+
+### Features
+
+* add totaal aantal endpoints ([3a00be9](https://github.com/informatievlaanderen/building-registry/commit/3a00be9))
+
 ## [2.5.13](https://github.com/informatievlaanderen/building-registry/compare/v2.5.12...v2.5.13) (2020-03-10)
 
 
