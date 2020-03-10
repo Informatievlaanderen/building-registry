@@ -1,3 +1,10 @@
+## [2.5.12](https://github.com/informatievlaanderen/building-registry/compare/v2.5.11...v2.5.12) (2020-03-06)
+
+
+### Bug Fixes
+
+* correct building sync projection convert localdate to instant ([951d6f0](https://github.com/informatievlaanderen/building-registry/commit/951d6f0))
+
 ## [2.5.11](https://github.com/informatievlaanderen/building-registry/compare/v2.5.10...v2.5.11) (2020-03-05)
 
 
