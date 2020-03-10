@@ -1,3 +1,10 @@
+## [2.5.13](https://github.com/informatievlaanderen/building-registry/compare/v2.5.12...v2.5.13) (2020-03-10)
+
+
+### Performance Improvements
+
+* don't track ef entities in legacy syndication ([7a2fe1d](https://github.com/informatievlaanderen/building-registry/commit/7a2fe1d))
+
 ## [2.5.12](https://github.com/informatievlaanderen/building-registry/compare/v2.5.11...v2.5.12) (2020-03-06)
 
 
