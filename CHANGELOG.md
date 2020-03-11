@@ -1,3 +1,10 @@
+## [2.6.1](https://github.com/informatievlaanderen/building-registry/compare/v2.6.0...v2.6.1) (2020-03-11)
+
+
+### Bug Fixes
+
+* count building and units now counts correctly ([7a386bb](https://github.com/informatievlaanderen/building-registry/commit/7a386bb))
+
 # [2.6.0](https://github.com/informatievlaanderen/building-registry/compare/v2.5.13...v2.6.0) (2020-03-10)
 
 
