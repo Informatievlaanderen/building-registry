@@ -107,7 +107,7 @@ namespace BuildingRegistry.Api.Legacy.BuildingUnit
         {
             var filtering = Request.ExtractFilteringRequest<BuildingUnitFilter>();
             var sorting = Request.ExtractSortingRequest();
-            var pagination = Request.ExtractPaginationRequest();
+            var pagination = new NoPaginationRequest();
 
             return Ok(
                 new TotaalAantalResponse
