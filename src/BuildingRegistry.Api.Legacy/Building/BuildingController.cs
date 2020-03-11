@@ -189,7 +189,7 @@ namespace BuildingRegistry.Api.Legacy.Building
         {
             var filtering = Request.ExtractFilteringRequest<BuildingFilter>();
             var sorting = Request.ExtractSortingRequest();
-            var pagination = Request.ExtractPaginationRequest();
+            var pagination = new NoPaginationRequest();
 
             return Ok(
                 new TotaalAantalResponse
