@@ -367,11 +367,8 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
 
                 foreach (var buildingUnitExtractItem in units)
                 {
-                    UpdateRecord(buildingUnitExtractItem, b =>
-                    {
-                        buildingUnitExtractItem.IsBuildingComplete = true;
-                        UpdateVersie(buildingUnitExtractItem, message.Message.Provenance.Timestamp);
-                    });
+                    UpdateRecord(buildingUnitExtractItem, b => buildingUnitExtractItem.IsBuildingComplete = true);
+                    UpdateVersie(buildingUnitExtractItem, message.Message.Provenance.Timestamp);
                 }
             });
 
@@ -384,11 +381,8 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
 
                 foreach (var buildingUnitExtractItem in units)
                 {
-                    UpdateRecord(buildingUnitExtractItem, b =>
-                    {
-                        buildingUnitExtractItem.IsBuildingComplete = false;
-                        UpdateVersie(buildingUnitExtractItem, message.Message.Provenance.Timestamp);
-                    });
+                    UpdateRecord(buildingUnitExtractItem, b => buildingUnitExtractItem.IsBuildingComplete = false);
+                    UpdateVersie(buildingUnitExtractItem, message.Message.Provenance.Timestamp);
                 }
             });
 
@@ -397,12 +391,9 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
                 var units = GetBuildingUnitsByBuilding(context, message.Message.BuildingId);
                 foreach (var buildingUnitExtractItem in units)
                 {
-                    UpdateRecord(buildingUnitExtractItem, b =>
-                    {
-                        UpdateGeometry(buildingUnitExtractItem, null);
-                        UpdateGeometryMethod(buildingUnitExtractItem, null);
-                        UpdateVersie(buildingUnitExtractItem, message.Message.Provenance.Timestamp);
-                    });
+                    UpdateGeometry(buildingUnitExtractItem, null);
+                    UpdateGeometryMethod(buildingUnitExtractItem, null);
+                    UpdateVersie(buildingUnitExtractItem, message.Message.Provenance.Timestamp);
                 }
             });
 
