@@ -1,3 +1,10 @@
+## [2.6.2](https://github.com/informatievlaanderen/building-registry/compare/v2.6.1...v2.6.2) (2020-03-12)
+
+
+### Bug Fixes
+
+* extract building unit gets updated correctly for building events ([8be16f6](https://github.com/informatievlaanderen/building-registry/commit/8be16f6))
+
 ## [2.6.1](https://github.com/informatievlaanderen/building-registry/compare/v2.6.0...v2.6.1) (2020-03-11)
 
 
