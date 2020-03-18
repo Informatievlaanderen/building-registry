@@ -1,3 +1,10 @@
+# [2.7.0](https://github.com/informatievlaanderen/building-registry/compare/v2.6.2...v2.7.0) (2020-03-18)
+
+
+### Features
+
+* upgrade importer to netcore3 ([c911088](https://github.com/informatievlaanderen/building-registry/commit/c911088))
+
 ## [2.6.2](https://github.com/informatievlaanderen/building-registry/compare/v2.6.1...v2.6.2) (2020-03-12)
 
 
