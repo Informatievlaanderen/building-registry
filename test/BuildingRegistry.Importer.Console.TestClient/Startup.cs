@@ -1,25 +1,21 @@
-namespace BuildingRegistry.Api.CrabImport.Infrastructure
+namespace BuildingRegistry.Importer.Console.TestClient
 {
     using Autofac;
     using Autofac.Extensions.DependencyInjection;
     using Be.Vlaanderen.Basisregisters.Api;
-    using Be.Vlaanderen.Basisregisters.CommandHandling.Idempotency;
     using Be.Vlaanderen.Basisregisters.DataDog.Tracing.Autofac;
-    using Configuration;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.Mvc.ApiExplorer;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
+    using Microsoft.Extensions.Diagnostics.HealthChecks;
     using Microsoft.Extensions.Logging;
     using Microsoft.Extensions.Hosting;
     using Modules;
-    using SqlStreamStore;
     using System;
     using System.Linq;
     using System.Reflection;
-    using Be.Vlaanderen.Basisregisters.GrAr.Import.Processing.CrabImport;
-    using Microsoft.Extensions.Diagnostics.HealthChecks;
     using Microsoft.OpenApi.Models;
 
     /// <summary>Represents the startup process for the application.</summary>
@@ -60,7 +56,7 @@ namespace BuildingRegistry.Api.CrabImport.Infrastructure
                         ApiInfo = (provider, description) => new OpenApiInfo
                         {
                             Version = description.ApiVersion.ToString(),
-                            Title = "Basisregisters Vlaanderen BuildingRegistry Registry API",
+                            Title = "Basisregisters Vlaanderen Building Registry API",
                             Description = GetApiLeadingText(description),
                             Contact = new OpenApiContact
                             {
@@ -74,23 +70,12 @@ namespace BuildingRegistry.Api.CrabImport.Infrastructure
                     MiddlewareHooks =
                     {
                         FluentValidation = fv => fv.RegisterValidatorsFromAssemblyContaining<Startup>(),
-
-                        AfterHealthChecks = health =>
-                        {
-                            var connectionStrings = _configuration
-                                .GetSection("ConnectionStrings")
-                                .GetChildren();
-
-                            foreach (var connectionString in connectionStrings)
-                                health.AddSqlServer(
-                                    connectionString.Value,
-                                    name: $"sqlserver-{connectionString.Key.ToLowerInvariant()}",
-                                    tags: new[] {DatabaseTag, "sql", "sqlserver"});
-                        }
                     }
-                });
+                })
+                .Configure<ApplicationOptions>(_configuration.GetSection("ApplicationSettings"));
 
             var containerBuilder = new ContainerBuilder();
+            containerBuilder.RegisterModule(new LoggingModule(_configuration, services));
             containerBuilder.RegisterModule(new ApiModule(_configuration, services, _loggerFactory));
             _applicationContainer = containerBuilder.Build();
 
@@ -104,12 +89,11 @@ namespace BuildingRegistry.Api.CrabImport.Infrastructure
             IHostApplicationLifetime appLifetime,
             ILoggerFactory loggerFactory,
             IApiVersionDescriptionProvider apiVersionProvider,
-            MsSqlStreamStore streamStore,
             ApiDataDogToggle datadogToggle,
             ApiDebugDataDogToggle debugDataDogToggle,
             HealthCheckService healthCheckService)
         {
-            StartupHelpers.EnsureSqlStreamStoreSchema<Startup>(streamStore, loggerFactory);
+            StartupHelpers.CheckDatabases(healthCheckService, DatabaseTag).GetAwaiter().GetResult();
 
             app
                 .UseDataDog<Startup>(new DataDogOptions
@@ -129,7 +113,6 @@ namespace BuildingRegistry.Api.CrabImport.Infrastructure
                         ServiceName = _configuration["DataDog:ServiceName"],
                     }
                 })
-
                 .UseDefaultForApi(new StartupUseOptions
                 {
                     Common =
@@ -143,15 +126,16 @@ namespace BuildingRegistry.Api.CrabImport.Infrastructure
                     Api =
                     {
                         VersionProvider = apiVersionProvider,
-                        Info = groupName => $"Basisregisters Vlaanderen - Building Registry API {groupName}",
+                        Info = groupName =>
+                            $"Basisregisters.Vlaanderen - Building Information Registry API {groupName}",
                         CSharpClientOptions =
                         {
-                            ClassName = "BuildingRegistryCrabImport",
+                            ClassName = "BuildingRegistryProjector",
                             Namespace = "Be.Vlaanderen.Basisregisters"
                         },
                         TypeScriptClientOptions =
                         {
-                            ClassName = "BuildingRegistryCrabImport"
+                            ClassName = "BuildingRegistryProjector"
                         }
                     },
                     Server =
@@ -159,24 +143,10 @@ namespace BuildingRegistry.Api.CrabImport.Infrastructure
                         PoweredByName = "Vlaamse overheid - Basisregisters Vlaanderen",
                         ServerName = "agentschap Informatie Vlaanderen"
                     },
-                    MiddlewareHooks =
-                    {
-                        AfterMiddleware = x => x.UseMiddleware<AddNoCacheHeadersMiddleware>(),
-                    }
-                })
-
-                .UseIdempotencyDatabaseMigrations()
-                .UseCrabImportMigrations();
-
-            MigrationsHelper.Run(
-                _configuration.GetConnectionString("Sequences"),
-                serviceProvider.GetService<ILoggerFactory>());
-
-            StartupHelpers.CheckDatabases(healthCheckService, DatabaseTag).GetAwaiter().GetResult();
+                });
         }
 
         private static string GetApiLeadingText(ApiVersionDescription description)
-            => $"Momenteel leest u de documentatie voor versie {description.ApiVersion} van de Basisregisters Vlaanderen BuildingRegistry API{string.Format(description.IsDeprecated ? ", **deze API versie is niet meer ondersteund * *." : ".")}";
-
+            => $"Momenteel leest u de documentatie voor versie {description.ApiVersion} van de Basisregisters Vlaanderen Building Registry API{string.Format(description.IsDeprecated ? ", **deze API versie is niet meer ondersteund * *." : ".")}";
     }
 }
