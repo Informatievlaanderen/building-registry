@@ -1,3 +1,10 @@
+# [2.8.0](https://github.com/informatievlaanderen/building-registry/compare/v2.7.0...v2.8.0) (2020-03-20)
+
+
+### Features
+
+* send mail when importer crashes ([92f972e](https://github.com/informatievlaanderen/building-registry/commit/92f972e))
+
 # [2.7.0](https://github.com/informatievlaanderen/building-registry/compare/v2.6.2...v2.7.0) (2020-03-18)
 
 
