@@ -1,3 +1,11 @@
+## [2.8.1](https://github.com/informatievlaanderen/building-registry/compare/v2.8.0...v2.8.1) (2020-03-23)
+
+
+### Bug Fixes
+
+* correct versie id type change in syndication ([e2a7658](https://github.com/informatievlaanderen/building-registry/commit/e2a7658))
+* update grar common to fix versie id type ([fefd263](https://github.com/informatievlaanderen/building-registry/commit/fefd263))
+
 # [2.8.0](https://github.com/informatievlaanderen/building-registry/compare/v2.7.0...v2.8.0) (2020-03-20)
 
 
