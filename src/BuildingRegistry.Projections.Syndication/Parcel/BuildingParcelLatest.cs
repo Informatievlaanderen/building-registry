@@ -12,7 +12,7 @@ namespace BuildingRegistry.Projections.Syndication.Parcel
         public string? CaPaKey { get; set; }
 
         public PerceelStatus? Status { get; set; }
-        public DateTimeOffset? Version { get; set; }
+        public string? Version { get; set; }
         public long Position { get; set; }
 
         public bool IsComplete { get; set; }
