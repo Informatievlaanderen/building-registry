@@ -1,3 +1,10 @@
+# [2.9.0](https://github.com/informatievlaanderen/building-registry/compare/v2.8.1...v2.9.0) (2020-03-25)
+
+
+### Features
+
+* add status filter on lists ([d436b09](https://github.com/informatievlaanderen/building-registry/commit/d436b09))
+
 ## [2.8.1](https://github.com/informatievlaanderen/building-registry/compare/v2.8.0...v2.8.1) (2020-03-23)
 
 
