@@ -104,6 +104,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetail
 
             b.HasIndex(p => p.BuildingPersistentLocalId);
             b.HasIndex(p => new { p.IsComplete, p.IsRemoved, p.PersistentLocalId, p.IsBuildingComplete, p.BuildingPersistentLocalId });
+            b.HasIndex(p => p.StatusAsString);
         }
     }
 }
