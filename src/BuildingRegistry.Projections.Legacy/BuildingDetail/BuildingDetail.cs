@@ -55,6 +55,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingDetail
                 .IsClustered();
 
             b.HasIndex(p => new { p.IsComplete, p.IsRemoved, p.PersistentLocalId });
+            b.HasIndex(b => b.Status);
         }
     }
 }

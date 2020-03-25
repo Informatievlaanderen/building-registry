@@ -139,7 +139,7 @@ namespace BuildingRegistry.Api.Legacy.Building
             [FromServices] IOptions<ResponseOptions> responseOptions,
             CancellationToken cancellationToken = default)
         {
-            var filtering = new FilteringHeader<BuildingFilter>(default);
+            var filtering = Request.ExtractFilteringRequest<BuildingFilter>();
             var sorting = Request.ExtractSortingRequest();
             var pagination = Request.ExtractPaginationRequest();
 

@@ -29,6 +29,30 @@ namespace BuildingRegistry.Api.Legacy.Converters
                     throw new ArgumentOutOfRangeException(nameof(status), status, null);
             }
         }
+
+        public static BuildingStatus ConvertFromGebouwStatus(this GebouwStatus status)
+        {
+            switch (status)
+            {
+                case GebouwStatus.Gepland:
+                    return BuildingStatus.Planned;
+
+                case GebouwStatus.InAanbouw:
+                    return BuildingStatus.UnderConstruction;
+
+                case GebouwStatus.Gerealiseerd:
+                    return BuildingStatus.Realized;
+
+                case GebouwStatus.Gehistoreerd:
+                    return BuildingStatus.Retired;
+
+                case GebouwStatus.NietGerealiseerd:
+                    return BuildingStatus.NotRealized;
+
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(status), status, null);
+            }
+        }
     }
 
     public static class BuildingGeometryMethodExtensions

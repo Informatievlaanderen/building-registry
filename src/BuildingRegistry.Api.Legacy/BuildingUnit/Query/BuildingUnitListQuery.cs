@@ -1,5 +1,6 @@
 namespace BuildingRegistry.Api.Legacy.BuildingUnit.Query
 {
+    using System;
     using Be.Vlaanderen.Basisregisters.Api.Search;
     using Be.Vlaanderen.Basisregisters.Api.Search.Filtering;
     using Be.Vlaanderen.Basisregisters.Api.Search.Sorting;
@@ -9,6 +10,8 @@ namespace BuildingRegistry.Api.Legacy.BuildingUnit.Query
     using Projections.Syndication;
     using System.Collections.Generic;
     using System.Linq;
+    using Be.Vlaanderen.Basisregisters.GrAr.Legacy.Gebouweenheid;
+    using Converters;
 
     public class BuildingUnitListQuery : Query<BuildingUnitDetailItem, BuildingUnitFilter>
     {
@@ -33,6 +36,9 @@ namespace BuildingRegistry.Api.Legacy.BuildingUnit.Query
                 .OrderBy(x => x.PersistentLocalId)
                 .AsNoTracking();
 
+            if (!filtering.ShouldFilter)
+                return buildingUnits;
+
             if (!string.IsNullOrEmpty(filtering.Filter?.AddressPersistentLocalId))
             {
                 var addressPersistentLocalIds = _syndicationContext
@@ -44,6 +50,18 @@ namespace BuildingRegistry.Api.Legacy.BuildingUnit.Query
                 buildingUnits = _context
                     .BuildingUnitDetails
                     .Where(unit => unit.Addresses.Any(address => addressPersistentLocalIds.Contains(address.AddressId)));
+            }
+
+            if (!string.IsNullOrEmpty(filtering.Filter.Status))
+            {
+                if (Enum.TryParse(typeof(GebouweenheidStatus), filtering.Filter.Status, true, out var status))
+                {
+                    var buildingUnitStatus = ((GebouweenheidStatus)status).ConvertFromGebouweenheidStatus();
+                    buildingUnits = buildingUnits.Where(m => m.StatusAsString == buildingUnitStatus.Status);
+                }
+                else
+                    //have to filter on EF cannot return new List<>().AsQueryable() cause non-EF provider does not support .CountAsync()
+                    buildingUnits = buildingUnits.Where(m => m.StatusAsString == "-1");
             }
 
             return buildingUnits;
@@ -63,5 +81,6 @@ namespace BuildingRegistry.Api.Legacy.BuildingUnit.Query
     public class BuildingUnitFilter
     {
         public string AddressPersistentLocalId { get; set; }
+        public string Status { get; set; }
     }
 }

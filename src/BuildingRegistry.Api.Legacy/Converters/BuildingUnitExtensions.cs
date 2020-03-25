@@ -23,6 +23,23 @@ namespace BuildingRegistry.Api.Legacy.Converters
 
             throw new ArgumentOutOfRangeException(nameof(status), status, null);
         }
+
+        public static BuildingUnitStatus ConvertFromGebouweenheidStatus(this GebouweenheidStatus status)
+        {
+            if (status == GebouweenheidStatus.NietGerealiseerd)
+                return BuildingUnitStatus.NotRealized;
+
+            if (status == GebouweenheidStatus.Gepland)
+                return BuildingUnitStatus.Planned;
+
+            if (status == GebouweenheidStatus.Gerealiseerd)
+                return BuildingUnitStatus.Realized;
+
+            if (status == GebouweenheidStatus.Gehistoreerd)
+                return BuildingUnitStatus.Retired;
+
+            throw new ArgumentOutOfRangeException(nameof(status), status, null);
+        }
     }
 
     public static class BuildingUnitPositionGeometryMethodExtensions
