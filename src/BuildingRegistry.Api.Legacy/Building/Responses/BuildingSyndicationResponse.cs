@@ -39,8 +39,8 @@ namespace BuildingRegistry.Api.Legacy.Building.Responses
             {
                 Id = building.Position.ToString(CultureInfo.InvariantCulture),
                 Title = $"{building.ChangeType}-{building.Position}",
-                Published = building.RecordCreatedAt.ToDateTimeOffset(),
-                LastUpdated = building.LastChangedOn.ToDateTimeOffset(),
+                Published = building.RecordCreatedAt.ToBelgianDateTimeOffset(),
+                LastUpdated = building.LastChangedOn.ToBelgianDateTimeOffset(),
                 Description = BuildDescription(
                     building,
                     responseOptions.Value.GebouwNaamruimte,
