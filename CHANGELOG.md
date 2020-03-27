@@ -1,3 +1,10 @@
+## [2.9.1](https://github.com/informatievlaanderen/building-registry/compare/v2.9.0...v2.9.1) (2020-03-27)
+
+
+### Bug Fixes
+
+* set sync feed dates to belgian timezone ([454e12e](https://github.com/informatievlaanderen/building-registry/commit/454e12e))
+
 # [2.9.0](https://github.com/informatievlaanderen/building-registry/compare/v2.8.1...v2.9.0) (2020-03-25)
 
 
