@@ -1,3 +1,10 @@
+# [2.10.0](https://github.com/informatievlaanderen/building-registry/compare/v2.9.1...v2.10.0) (2020-04-03)
+
+
+### Features
+
+* upgrade projection handling to include errmessage lastchangedlist ([50ca3aa](https://github.com/informatievlaanderen/building-registry/commit/50ca3aa))
+
 ## [2.9.1](https://github.com/informatievlaanderen/building-registry/compare/v2.9.0...v2.9.1) (2020-03-27)
 
 
