@@ -1,3 +1,10 @@
+## [2.10.2](https://github.com/informatievlaanderen/building-registry/compare/v2.10.1...v2.10.2) (2020-04-06)
+
+
+### Bug Fixes
+
+* import new building via update with older linked data ([32ac1df](https://github.com/informatievlaanderen/building-registry/commit/32ac1df))
+
 ## [2.10.1](https://github.com/informatievlaanderen/building-registry/compare/v2.10.0...v2.10.1) (2020-04-06)
 
 
