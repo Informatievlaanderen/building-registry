@@ -23,7 +23,7 @@ namespace BuildingRegistry.Importer.Console
         private readonly Func<CRABEntities> _crabEntitiesFactory;
         private readonly bool _singleUpdate;
         private readonly Lazy<ILookup<int, AssignPersistentLocalIdForCrabTerrainObjectId>> _osloIdCommands;
-        private readonly List<int> _terrainObjectIdsWhichNeedNewPersistentId;
+        private readonly Lazy<List<int>> _terrainObjectIdsWhichNeedNewPersistentId;
 
         public CommandGenerator(string vbrConnectionString, Func<CRABEntities> crabEntitiesFactory, bool singleUpdate = false)
         {
@@ -31,7 +31,7 @@ namespace BuildingRegistry.Importer.Console
             _crabEntitiesFactory = crabEntitiesFactory;
             _singleUpdate = singleUpdate;
             _osloIdCommands = new Lazy<ILookup<int, AssignPersistentLocalIdForCrabTerrainObjectId>>(() => GetOsloCommandsToPost().ToLookup(x => (int)x.TerrainObjectId, x => x));
-            _terrainObjectIdsWhichNeedNewPersistentId = GetCorruptedTerrainObjectIdsWhichNeedNewPersistentLocalId();
+            _terrainObjectIdsWhichNeedNewPersistentId = new Lazy<List<int>>(() => GetCorruptedTerrainObjectIdsWhichNeedNewPersistentLocalId());
         }
 
         private List<int> GetCorruptedTerrainObjectIdsWhichNeedNewPersistentLocalId()
@@ -130,7 +130,7 @@ namespace BuildingRegistry.Importer.Console
         {
             var crabCommands = CreateCommandsInOrder(ImportMode.Init, key, from, until);
 
-            if (_terrainObjectIdsWhichNeedNewPersistentId.Contains(key))
+            if (_terrainObjectIdsWhichNeedNewPersistentId.Value.Contains(key))
                 crabCommands.Add(new RequestPersistentLocalIdsForCrabTerrainObjectId(new CrabTerrainObjectId(key)));
             else
                 crabCommands.Add(!_singleUpdate
