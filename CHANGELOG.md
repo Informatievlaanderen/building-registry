@@ -1,3 +1,10 @@
+## [2.10.1](https://github.com/informatievlaanderen/building-registry/compare/v2.10.0...v2.10.1) (2020-04-06)
+
+
+### Bug Fixes
+
+* change importer to lazy call so db is not called every update ([e29310b](https://github.com/informatievlaanderen/building-registry/commit/e29310b))
+
 # [2.10.0](https://github.com/informatievlaanderen/building-registry/compare/v2.9.1...v2.10.0) (2020-04-03)
 
 
