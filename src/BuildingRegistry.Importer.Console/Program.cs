@@ -9,7 +9,6 @@ namespace BuildingRegistry.Importer.Console
     using Serilog.Events;
     using System;
     using System.Diagnostics;
-    using System.Reflection;
 
     internal class Program
     {
@@ -73,7 +72,7 @@ namespace BuildingRegistry.Importer.Console
                     .UseHttpApiProxyConfig(settings)
                     .UseCommandProcessorConfig(settings)
                     .UseDefaultSerializerSettingsForCrabImports()
-                    .ConfigureImportFeedFromAssembly(Assembly.GetExecutingAssembly())
+                    .UseImportFeed(new ImportFeed { Name = settings.FeedName })
                     .Build();
 
                 WaitForStart(settings.WaitForUserInput);
