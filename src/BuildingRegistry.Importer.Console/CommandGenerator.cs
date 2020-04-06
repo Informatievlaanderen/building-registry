@@ -302,7 +302,7 @@ namespace BuildingRegistry.Importer.Console
 
             ImportTerrainObjectFromCrab initialTerrainObjectCommand = null;
             var commands = new List<dynamic>();
-            if (importMode == ImportMode.Init)
+            if (importTerrainObjectCommands.Any(x => x.Modification == CrabModification.Insert))
             {
                 initialTerrainObjectCommand = importTerrainObjectCommands
                     .OrderBy(x => (Instant)x.Timestamp)
@@ -316,7 +316,7 @@ namespace BuildingRegistry.Importer.Console
             commands.AddRange(readdressSubaddressCommands);
 
             foreach (var command in allCommands)
-                if (importMode == ImportMode.Update || !command.Item1.Equals(initialTerrainObjectCommand))
+                if (!command.Item1.Equals(initialTerrainObjectCommand))
                     commands.Add(command.Item1);
 
             return commands;
