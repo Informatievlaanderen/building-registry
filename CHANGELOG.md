@@ -1,3 +1,10 @@
+## [2.10.3](https://github.com/informatievlaanderen/building-registry/compare/v2.10.2...v2.10.3) (2020-04-10)
+
+
+### Bug Fixes
+
+* update packages for import batch timestamps ([026a6db](https://github.com/informatievlaanderen/building-registry/commit/026a6db))
+
 ## [2.10.2](https://github.com/informatievlaanderen/building-registry/compare/v2.10.1...v2.10.2) (2020-04-06)
 
 
