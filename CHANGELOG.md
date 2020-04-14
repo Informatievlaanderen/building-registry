@@ -1,3 +1,10 @@
+## [2.10.5](https://github.com/informatievlaanderen/building-registry/compare/v2.10.4...v2.10.5) (2020-04-14)
+
+
+### Bug Fixes
+
+* update packages ([89c3e85](https://github.com/informatievlaanderen/building-registry/commit/89c3e85))
+
 ## [2.10.4](https://github.com/informatievlaanderen/building-registry/compare/v2.10.3...v2.10.4) (2020-04-10)
 
 
