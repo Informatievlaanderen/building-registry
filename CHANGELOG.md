@@ -1,3 +1,10 @@
+## [2.10.7](https://github.com/informatievlaanderen/building-registry/compare/v2.10.6...v2.10.7) (2020-04-16)
+
+
+### Bug Fixes
+
+* building should not be cached ([1452b01](https://github.com/informatievlaanderen/building-registry/commit/1452b01))
+
 ## [2.10.6](https://github.com/informatievlaanderen/building-registry/compare/v2.10.5...v2.10.6) (2020-04-16)
 
 
