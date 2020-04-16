@@ -115,7 +115,7 @@ namespace BuildingRegistry.Projector.Infrastructure.Modules
                     _configuration,
                     _loggerFactory)
 
-                .RegisterProjections<BuildingProjections, LastChangedListContext>()
+                //.RegisterProjections<BuildingProjections, LastChangedListContext>()
                 .RegisterProjections<BuildingUnitProjections, LastChangedListContext>();
         }
 
