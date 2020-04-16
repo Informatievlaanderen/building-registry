@@ -1,3 +1,10 @@
+## [2.10.6](https://github.com/informatievlaanderen/building-registry/compare/v2.10.5...v2.10.6) (2020-04-16)
+
+
+### Bug Fixes
+
+* remove unique constraint from persistentlocalid GRAR-1189 ([adcdfc2](https://github.com/informatievlaanderen/building-registry/commit/adcdfc2))
+
 ## [2.10.5](https://github.com/informatievlaanderen/building-registry/compare/v2.10.4...v2.10.5) (2020-04-14)
 
 
