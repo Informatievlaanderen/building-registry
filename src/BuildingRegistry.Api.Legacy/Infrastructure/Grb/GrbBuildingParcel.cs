@@ -1,5 +1,6 @@
 namespace BuildingRegistry.Api.Legacy.Infrastructure.Grb
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
     using NetTopologySuite.Geometries;
@@ -12,33 +13,28 @@ namespace BuildingRegistry.Api.Legacy.Infrastructure.Grb
 
         public IEnumerable<string> GetUnderlyingParcels(byte[] buildingGeometry)
         {
-            var geometry = WKBReaderFactory.Create().Read(buildingGeometry);
+            var building = WKBReaderFactory.Create().Read(buildingGeometry);
 
-            var features = _wfsClient.GetFeaturesInBoundingBox(GrbFeatureType.Parcel, geometry.EnvelopeInternal);
-            var parcels = new Dictionary<string, Geometry>();
-            foreach (var feature in features)
+            var parcelFeatures = _wfsClient.GetFeaturesInBoundingBox(GrbFeatureType.Parcel, building.EnvelopeInternal);
+            var uniqueParcels = new Dictionary<string, Geometry>();
+            foreach (var (parcelGeometry, parcelProperties) in parcelFeatures)
             {
-                if (!parcels.ContainsKey(feature.Item2["CAPAKEY"]))
-                    parcels.Add(feature.Item2["CAPAKEY"], feature.Item1);
+                if (!uniqueParcels.ContainsKey(parcelProperties["CAPAKEY"]))
+                    uniqueParcels.Add(parcelProperties["CAPAKEY"], parcelGeometry);
             }
 
-            foreach (var perceel in parcels.ToList())
-            {
-                if (!geometry.Intersects(perceel.Value))
-                    parcels.Remove(perceel.Key);
-            }
+            var intersectingParcels = uniqueParcels
+                .Where(parcel => building.Intersects(parcel.Value))
+                .Select(parcel =>
+                    new {
+                        parcel.Key,
+                        Overlap = building.Intersection(parcel.Value).Area / building.Area
+                    })
+                .ToList();
 
-            var parcelCount = parcels.Count;
-
-            foreach (var parcelPair in parcels.ToList())
-            {
-                var sufficientOverlap = geometry.Intersection(parcelPair.Value).Area / geometry.Area >= 0.8 / parcelCount;
-
-                if (!sufficientOverlap)
-                    parcels.Remove(parcelPair.Key);
-            }
-
-            return parcels.Keys;
+            return intersectingParcels
+                .Where(parcel => parcel.Overlap >= 0.8 / intersectingParcels.Count)
+                .Select(parcelPair => parcelPair.Key);
         }
     }
 }
