@@ -28,13 +28,30 @@ namespace BuildingRegistry.Api.Legacy.Infrastructure.Grb
                 .Select(parcel =>
                     new {
                         parcel.Key,
-                        Overlap = building.Intersection(parcel.Value).Area / building.Area
+                        Overlap = CalculateOverlap(building, parcel.Value)
                     })
                 .ToList();
 
             return intersectingParcels
                 .Where(parcel => parcel.Overlap >= 0.8 / intersectingParcels.Count)
                 .Select(parcelPair => parcelPair.Key);
+        }
+
+        private static double CalculateOverlap(Geometry building, Geometry parcel)
+        {
+            try
+            {
+                return building.Intersection(parcel).Area / building.Area;
+            }
+            catch (TopologyException topologyException)
+            {
+                // Consider parcels that Intersect, but fail with "found non-noded intersection" on calculating, to have an overlap value of 0
+                if (topologyException.Message.Contains("found non-noded intersection", StringComparison.InvariantCultureIgnoreCase))
+                    return 0;
+
+                // any other TopologyException should be treated normally
+                throw;
+            }
         }
     }
 }
