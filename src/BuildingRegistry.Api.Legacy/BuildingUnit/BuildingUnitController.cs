@@ -161,7 +161,7 @@ namespace BuildingRegistry.Api.Legacy.BuildingUnit
             if (buildingUnit != null && buildingUnit.IsRemoved)
                 throw new ApiException("Gebouweenheid werd verwijderd.", StatusCodes.Status410Gone);
 
-            if (buildingUnit == null || !buildingUnit.IsComplete)
+            if (buildingUnit == null || !buildingUnit.IsComplete || !buildingUnit.IsBuildingComplete)
                 throw new ApiException("Onbestaande gebouweenheid.", StatusCodes.Status404NotFound);
 
             var addressIds = buildingUnit.Addresses.Select(x => x.AddressId).ToList();
