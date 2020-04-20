@@ -1,3 +1,10 @@
+## [2.10.8](https://github.com/informatievlaanderen/building-registry/compare/v2.10.7...v2.10.8) (2020-04-20)
+
+
+### Bug Fixes
+
+* exclude parcel when intersection calcularion fails GRAR-1189 ([3f296ce](https://github.com/informatievlaanderen/building-registry/commit/3f296ce))
+
 ## [2.10.7](https://github.com/informatievlaanderen/building-registry/compare/v2.10.6...v2.10.7) (2020-04-16)
 
 
