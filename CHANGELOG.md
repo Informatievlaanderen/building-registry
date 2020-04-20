@@ -1,3 +1,10 @@
+## [2.10.9](https://github.com/informatievlaanderen/building-registry/compare/v2.10.8...v2.10.9) (2020-04-20)
+
+
+### Bug Fixes
+
+* api buildingunit return 404 incomplete building ([a554213](https://github.com/informatievlaanderen/building-registry/commit/a554213))
+
 ## [2.10.8](https://github.com/informatievlaanderen/building-registry/compare/v2.10.7...v2.10.8) (2020-04-20)
 
 
