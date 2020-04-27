@@ -1,3 +1,11 @@
+## [2.10.10](https://github.com/informatievlaanderen/building-registry/compare/v2.10.9...v2.10.10) (2020-04-27)
+
+
+### Bug Fixes
+
+* add hacked sss 1.1.3 with 1h timeout ([64e42d3](https://github.com/informatievlaanderen/building-registry/commit/64e42d3))
+* use new sss for now ([16a7edd](https://github.com/informatievlaanderen/building-registry/commit/16a7edd))
+
 ## [2.10.9](https://github.com/informatievlaanderen/building-registry/compare/v2.10.8...v2.10.9) (2020-04-20)
 
 
