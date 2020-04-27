@@ -9,6 +9,7 @@ nuget Be.Vlaanderen.Basisregisters.Build.Pipeline 3.3.2 //"
 open Fake
 open Fake.Core
 open Fake.Core.TargetOperators
+open Fake.IO
 open Fake.IO.FileSystemOperators
 open ``Build-generic``
 
@@ -109,7 +110,15 @@ Target.create "PushContainer_ApiLegacy" (fun _ -> push "api-legacy")
 Target.create "Containerize_ApiExtract" (fun _ -> containerize "BuildingRegistry.Api.Extract" "api-extract")
 Target.create "PushContainer_ApiExtract" (fun _ -> push "api-extract")
 
-Target.create "Containerize_ApiCrabImport" (fun _ -> containerize "BuildingRegistry.Api.CrabImport" "api-crab-import")
+Target.create "Containerize_ApiCrabImport" (fun _ ->
+  let dist = (buildDir @@ "BuildingRegistry.Api.CrabImport" @@ "linux")
+  let source = "assets" @@ "sss"
+
+  Shell.copyFile dist (source @@ "SqlStreamStore.dll")
+  Shell.copyFile dist (source @@ "SqlStreamStore.MsSql.dll")
+
+  containerize "BuildingRegistry.Api.CrabImport" "api-crab-import")
+
 Target.create "PushContainer_ApiCrabImport" (fun _ -> push "api-crab-import")
 
 Target.create "Containerize_ProjectionsLegacy" (fun _ -> containerize "BuildingRegistry.Projections.Legacy" "projections-legacy")
