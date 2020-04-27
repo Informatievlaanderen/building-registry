@@ -1,0 +1,135 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>SqlStreamStore.MsSql</name>
+    </assembly>
+    <members>
+        <member name="T:SqlStreamStore.CheckSchemaResult">
+            <summary>
+                Represents the result of a schema check.
+            </summary>
+        </member>
+        <member name="P:SqlStreamStore.CheckSchemaResult.CurrentVersion">
+            <summary>
+                The version of the schema checked.
+            </summary>
+        </member>
+        <member name="P:SqlStreamStore.CheckSchemaResult.ExpectedVersion">
+            <summary>
+                The expected version for this version of MsSqlStreamStore to be compatible with.
+            </summary>
+        </member>
+        <member name="M:SqlStreamStore.CheckSchemaResult.#ctor(System.Int32,System.Int32)">
+            <summary>
+                Initializes a new instance of <see cref="T:SqlStreamStore.CheckSchemaResult"/>
+            </summary>
+            <param name="currentVersion">The current version of the schema.</param>
+            <param name="expectedVersion">The expected version of the schema.</param>
+        </member>
+        <member name="M:SqlStreamStore.CheckSchemaResult.IsMatch">
+            <summary>
+                Checks to see if the schema version matches.
+            </summary>
+            <returns>True if the version match, otherwise False.</returns>
+        </member>
+        <member name="T:SqlStreamStore.MsSqlStreamStore">
+            <summary>
+                Represents a Micrsoft SQL Server stream store implementation.
+            </summary>
+        </member>
+        <member name="M:SqlStreamStore.MsSqlStreamStore.#ctor(SqlStreamStore.MsSqlStreamStoreSettings)">
+            <summary>
+                Initializes a new instance of <see cref="T:SqlStreamStore.MsSqlStreamStore"/>
+            </summary>
+            <param name="settings">A settings class to configur this instance.</param>
+        </member>
+        <member name="M:SqlStreamStore.MsSqlStreamStore.CreateSchema(System.Threading.CancellationToken)">
+            <summary>
+                Creates a scheme to hold stream
+            </summary>
+            <param name="cancellationToken">The cancellation instruction.</param>
+            <returns>A <see cref="T:System.Threading.Tasks.Task"/> representing the asynchronous operation.</returns>
+        </member>
+        <member name="M:SqlStreamStore.MsSqlStreamStore.CheckSchema(System.Threading.CancellationToken)">
+             <summary>
+            
+             </summary>
+             <param name="cancellationToken"></param>
+             <returns>A <see cref="T:SqlStreamStore.CheckSchemaResult"/> representing the result of the operation.</returns>
+        </member>
+        <member name="M:SqlStreamStore.MsSqlStreamStore.DropAll(System.Threading.CancellationToken)">
+            <summary>
+                Drops all tables related to this store instance.
+            </summary>
+            <param name="cancellationToken">The cancellation instruction.</param>
+            <returns>A <see cref="T:System.Threading.Tasks.Task"/> representing the asynchronous operation.</returns>
+        </member>
+        <member name="M:SqlStreamStore.MsSqlStreamStore.GetStreamMessageCount(System.String,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="T:SqlStreamStore.MsSqlStreamStoreSettings">
+            <summary>
+                Represents setting to configure a <see cref="T:SqlStreamStore.MsSqlStreamStore"/>
+            </summary>
+        </member>
+        <member name="M:SqlStreamStore.MsSqlStreamStoreSettings.#ctor(System.String)">
+            <summary>
+                Initialized a new instance of <see cref="T:SqlStreamStore.MsSqlStreamStoreSettings"/>.
+            </summary>
+            <param name="connectionString"></param>
+        </member>
+        <member name="P:SqlStreamStore.MsSqlStreamStoreSettings.ConnectionString">
+            <summary>
+                Gets the connection string.
+            </summary>
+        </member>
+        <member name="P:SqlStreamStore.MsSqlStreamStoreSettings.CreateStreamStoreNotifier">
+            <summary>
+                Allows overriding of the stream store notifier. The default implementation
+                creates <see cref="T:SqlStreamStore.Subscriptions.PollingStreamStoreNotifier"/>
+            </summary>
+        </member>
+        <member name="P:SqlStreamStore.MsSqlStreamStoreSettings.Schema">
+            <summary>
+                MsSqlStream store supports stores in a single database through 
+                the useage of schema. This is useful if you want to contain
+                multiple bounded contexts in a single database. Alternative is
+                use a database per bounded context, which may be more appropriate
+                for larger stores.
+            </summary>
+        </member>
+        <member name="P:SqlStreamStore.MsSqlStreamStoreSettings.MetadataMaxAgeCacheExpire">
+            <summary>
+                To help with perf, the max age of messages in a stream
+                are cached. It is not expected that a streams max age
+                metadata to be changed frequently. Here we hold on to the
+                max age for the specified timespan. The default is 1 minute.
+            </summary>
+        </member>
+        <member name="P:SqlStreamStore.MsSqlStreamStoreSettings.MetadataMaxAgeCacheMaxSize">
+            <summary>
+                To help with perf, the max age of messages in a stream
+                are cached. It is not expected that a streams max age
+                metadata to be changed frequently. Here we define how many
+                items are cached. The default value is 10000.
+            </summary>
+        </member>
+        <member name="P:SqlStreamStore.MsSqlStreamStoreSettings.GetUtcNow">
+            <summary>
+                A delegate to return the current UTC now. Used in testing to
+                control timestamps and time related operations.
+            </summary>
+        </member>
+        <member name="P:SqlStreamStore.MsSqlStreamStoreSettings.LogName">
+            <summary>
+                The log name used for the any log messages.
+            </summary>
+        </member>
+        <member name="P:SqlStreamStore.MsSqlStreamStoreSettings.ConnectionFactory">
+            <summary>
+                Allows overriding the way a <see cref="T:System.Data.SqlClient.SqlConnection"/> is created given a connection string.
+                The default implementation simply passes the connection string into the <see cref="T:System.Data.SqlClient.SqlConnection"/> constructor.
+            </summary>
+        </member>
+    </members>
+</doc>
