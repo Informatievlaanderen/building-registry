@@ -1,3 +1,17 @@
+## [2.10.12](https://github.com/informatievlaanderen/building-registry/compare/v2.10.11...v2.10.12) (2020-04-29)
+
+
+### Bug Fixes
+
+* add logo and licence info to nuget ([7e52b93](https://github.com/informatievlaanderen/building-registry/commit/7e52b93))
+
+## [2.10.11](https://github.com/informatievlaanderen/building-registry/compare/v2.10.10...v2.10.11) (2020-04-28)
+
+
+### Bug Fixes
+
+* update grar dependencies GRAR-412 ([5f1450a](https://github.com/informatievlaanderen/building-registry/commit/5f1450a))
+
 ## [2.10.10](https://github.com/informatievlaanderen/building-registry/compare/v2.10.9...v2.10.10) (2020-04-27)
 
 
