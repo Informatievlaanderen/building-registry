@@ -1,3 +1,10 @@
+## [2.10.13](https://github.com/informatievlaanderen/building-registry/compare/v2.10.12...v2.10.13) (2020-04-30)
+
+
+### Bug Fixes
+
+* update packages and add filebasedproxy for debugging purposes ([#109](https://github.com/informatievlaanderen/building-registry/issues/109)) ([2e163d5](https://github.com/informatievlaanderen/building-registry/commit/2e163d5))
+
 ## [2.10.12](https://github.com/informatievlaanderen/building-registry/compare/v2.10.11...v2.10.12) (2020-04-29)
 
 
