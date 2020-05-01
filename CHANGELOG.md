@@ -1,3 +1,10 @@
+# [2.11.0](https://github.com/informatievlaanderen/building-registry/compare/v2.10.13...v2.11.0) (2020-05-01)
+
+
+### Features
+
+* add projection to map crab id to persistent local id ([2be9f9e](https://github.com/informatievlaanderen/building-registry/commit/2be9f9e))
+
 ## [2.10.13](https://github.com/informatievlaanderen/building-registry/compare/v2.10.12...v2.10.13) (2020-04-30)
 
 
