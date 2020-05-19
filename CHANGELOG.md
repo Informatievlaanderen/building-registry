@@ -1,3 +1,10 @@
+## [2.11.1](https://github.com/informatievlaanderen/building-registry/compare/v2.11.0...v2.11.1) (2020-05-19)
+
+
+### Bug Fixes
+
+* move to 3.1.4 and gh actions ([ae18959](https://github.com/informatievlaanderen/building-registry/commit/ae189593ccb146ace998932448b294ea0a9d73d9))
+
 # [2.11.0](https://github.com/informatievlaanderen/building-registry/compare/v2.10.13...v2.11.0) (2020-05-01)
 
 
