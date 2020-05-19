@@ -14,13 +14,13 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
 
         public BuildingUnitDbaseSchema() => Fields = new[]
         {
-            DbaseField.CreateStringField(new DbaseFieldName(nameof(id)), new DbaseFieldLength(55)),
-            DbaseField.CreateInt32Field(new DbaseFieldName(nameof(gebouwehid)), new DbaseFieldLength(10)),
-            DbaseField.CreateStringField(new DbaseFieldName(nameof(versieid)), new DbaseFieldLength(25)),
-            DbaseField.CreateStringField(new DbaseFieldName(nameof(gebouwid)), new DbaseFieldLength(10)),
-            DbaseField.CreateStringField(new DbaseFieldName(nameof(functie)), new DbaseFieldLength(30)),
-            DbaseField.CreateStringField(new DbaseFieldName(nameof(status)), new DbaseFieldLength(20)),
-            DbaseField.CreateStringField(new DbaseFieldName(nameof(posgeommet)), new DbaseFieldLength(30))
+            DbaseField.CreateCharacterField(new DbaseFieldName(nameof(id)), new DbaseFieldLength(55)),
+            DbaseField.CreateNumberField(new DbaseFieldName(nameof(gebouwehid)), new DbaseFieldLength(10), new DbaseDecimalCount(0)),
+            DbaseField.CreateCharacterField(new DbaseFieldName(nameof(versieid)), new DbaseFieldLength(25)),
+            DbaseField.CreateCharacterField(new DbaseFieldName(nameof(gebouwid)), new DbaseFieldLength(10)),
+            DbaseField.CreateCharacterField(new DbaseFieldName(nameof(functie)), new DbaseFieldLength(30)),
+            DbaseField.CreateCharacterField(new DbaseFieldName(nameof(status)), new DbaseFieldLength(20)),
+            DbaseField.CreateCharacterField(new DbaseFieldName(nameof(posgeommet)), new DbaseFieldLength(30))
         };
     }
 }

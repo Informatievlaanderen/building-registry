@@ -5,7 +5,7 @@ namespace BuildingRegistry.Api.CrabImport.Infrastructure
     using Microsoft.Extensions.Logging;
     using Polly;
     using System;
-    using System.Data.SqlClient;
+    using Microsoft.Data.SqlClient;
 
     public class MigrationsLogger { }
 

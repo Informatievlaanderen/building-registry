@@ -8,7 +8,6 @@
 
   <ItemGroup>
     <Content Include="appsettings.json" CopyToOutputDirectory="Always" />
-    <Content Include="SqlServerTypes\readme.htm" />
     <Content Include="SqlServerTypes\x64\msvcr120.dll" CopyToOutputDirectory="Always" />
     <Content Include="SqlServerTypes\x64\SqlServerSpatial130.dll" CopyToOutputDirectory="Always" />
     <Content Include="SqlServerTypes\x86\msvcr120.dll" CopyToOutputDirectory="Always" />
