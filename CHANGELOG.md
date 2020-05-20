@@ -1,3 +1,10 @@
+## [2.11.3](https://github.com/informatievlaanderen/building-registry/compare/v2.11.2...v2.11.3) (2020-05-20)
+
+
+### Bug Fixes
+
+* fall back on default sss ([3d4cc86](https://github.com/informatievlaanderen/building-registry/commit/3d4cc86c843b6452f1a0ab41583d15012f587108))
+
 ## [2.11.2](https://github.com/informatievlaanderen/building-registry/compare/v2.11.1...v2.11.2) (2020-05-20)
 
 
