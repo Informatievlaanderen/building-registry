@@ -74,8 +74,8 @@ Target.create "Containerize_ApiCrabImport" (fun _ ->
   let dist = (buildDir @@ "BuildingRegistry.Api.CrabImport" @@ "linux")
   let source = "assets" @@ "sss"
 
-  Shell.copyFile dist (source @@ "SqlStreamStore.dll")
-  Shell.copyFile dist (source @@ "SqlStreamStore.MsSql.dll")
+  //Shell.copyFile dist (source @@ "SqlStreamStore.dll")
+  //Shell.copyFile dist (source @@ "SqlStreamStore.MsSql.dll")
 
   containerize "BuildingRegistry.Api.CrabImport" "api-crab-import")
 
