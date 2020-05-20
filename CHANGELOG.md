@@ -1,3 +1,11 @@
+## [2.11.2](https://github.com/informatievlaanderen/building-registry/compare/v2.11.1...v2.11.2) (2020-05-20)
+
+
+### Bug Fixes
+
+* add build badge ([b88981f](https://github.com/informatievlaanderen/building-registry/commit/b88981fbdc9b78b3627f401f623b3eef96cbb609))
+* force build by updating readme ([77d724f](https://github.com/informatievlaanderen/building-registry/commit/77d724fe3f1a7e2360e6b56704c12bfb9548579c))
+
 ## [2.11.1](https://github.com/informatievlaanderen/building-registry/compare/v2.11.0...v2.11.1) (2020-05-19)
 
 
