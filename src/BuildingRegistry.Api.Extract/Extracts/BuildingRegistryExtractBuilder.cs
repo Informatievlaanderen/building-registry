@@ -20,7 +20,7 @@ namespace BuildingRegistry.Api.Extract.Extracts
                 .OrderBy(m => m.PersistentLocalId);
 
             yield return ExtractBuilder.CreateDbfFile<BuildingExtractItem, BuildingDbaseRecord>(
-                ExtractController.BuildingZipName,
+                ExtractFileNames.Building,
                 new BuildingDbaseSchema(),
                 extractItems,
                 extractItems.Count,
@@ -37,7 +37,7 @@ namespace BuildingRegistry.Api.Extract.Extracts
                 double.PositiveInfinity);
 
             yield return ExtractBuilder.CreateShapeFile<PolygonShapeContent>(
-                ExtractController.BuildingZipName,
+                ExtractFileNames.Building,
                 ShapeType.Polygon,
                 extractItems.Select(x => x.ShapeRecordContent),
                 ShapeContent.Read,
@@ -45,11 +45,15 @@ namespace BuildingRegistry.Api.Extract.Extracts
                 boundingBox);
 
             yield return ExtractBuilder.CreateShapeIndexFile(
-                ExtractController.BuildingZipName,
+                ExtractFileNames.Building,
                 ShapeType.Polygon,
                 extractItems.Select(x => x.ShapeRecordContentLength),
                 extractItems.Count,
                 boundingBox);
+
+            yield return ExtractBuilder.CreateProjectedCoordinateSystemFile(
+                ExtractFileNames.Building,
+                ProjectedCoordinateSystem.Belge_Lambert_1972);
         }
     }
 }

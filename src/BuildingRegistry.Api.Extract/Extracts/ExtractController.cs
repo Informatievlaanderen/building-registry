@@ -19,9 +19,6 @@ namespace BuildingRegistry.Api.Extract.Extracts
     [ApiExplorerSettings(GroupName = "Extract")]
     public class ExtractController : ApiController
     {
-        public static readonly string BuildingZipName = "Gebouw";
-        public static readonly string BuildingUnitZipName = "Gebouweenheid";
-
         /// <summary>
         /// Vraag een dump van het volledige register op.
         /// </summary>
@@ -37,7 +34,7 @@ namespace BuildingRegistry.Api.Extract.Extracts
         public IActionResult GetBuildings(
             [FromServices] ExtractContext context,
             CancellationToken cancellationToken = default) =>
-            new ExtractArchive($"{BuildingZipName}-{DateTime.Now:yyyy-MM-dd}")
+            new ExtractArchive(ExtractFileNames.GetBuildingZipName())
                 {
                     BuildingRegistryExtractBuilder.CreateBuildingFiles(context),
                     BuildingUnitRegistryExtractBuilder.CreateBuildingUnitFiles(context),
