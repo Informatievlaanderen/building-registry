@@ -1,3 +1,15 @@
+# [2.12.0](https://github.com/informatievlaanderen/building-registry/compare/v2.11.3...v2.12.0) (2020-05-22)
+
+
+### Bug Fixes
+
+* only run ci on master repo ([1a2ef5e](https://github.com/informatievlaanderen/building-registry/commit/1a2ef5e644474091690ebd3e17aa8c3b1132db4c))
+
+
+### Features
+
+* add prj file to extract GRAR-356 ([2966069](https://github.com/informatievlaanderen/building-registry/commit/296606957095e832f74011bf17f1366d3124e0ac))
+
 ## [2.11.3](https://github.com/informatievlaanderen/building-registry/compare/v2.11.2...v2.11.3) (2020-05-20)
 
 
