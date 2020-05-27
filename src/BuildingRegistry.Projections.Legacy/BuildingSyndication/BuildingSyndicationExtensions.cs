@@ -37,6 +37,8 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
             Action<BuildingSyndicationItem, BuildingSyndicationItem> applyEventInfoOn,
             CancellationToken ct)
         {
+            context.Database.SetCommandTimeout(300);
+
             var buildingSyndicationItem = await context.LatestPosition(buildingId, ct);
 
             if (buildingSyndicationItem == null)
