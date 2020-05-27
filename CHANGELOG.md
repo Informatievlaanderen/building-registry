@@ -1,3 +1,10 @@
+## [2.12.1](https://github.com/informatievlaanderen/building-registry/compare/v2.12.0...v2.12.1) (2020-05-27)
+
+
+### Bug Fixes
+
+* extend commandtimeout for sync projection ([e598d31](https://github.com/informatievlaanderen/building-registry/commit/e598d31e72c0f390e7ec7650d78248bc0e66abe8))
+
 # [2.12.0](https://github.com/informatievlaanderen/building-registry/compare/v2.11.3...v2.12.0) (2020-05-22)
 
 
