@@ -258,12 +258,45 @@ namespace BuildingRegistry.Importer.Console
 
             if (importMode == ImportMode.Update)
             {
-                var houseNumbersForUpdate = importTerrainObjectHouseNumberCommands
-                    .Where(x => x.Timestamp > from.ToCrabInstant() && x.Timestamp <= until.ToCrabInstant())
-                    .Select(x => x.HouseNumberId).ToList();
+                var importTerrainObjectHouseNumberFromCrabInRange = importTerrainObjectHouseNumberCommands
+                    .Where(x => x.Timestamp > @from.ToCrabInstant() && x.Timestamp <= until.ToCrabInstant())
+                    .ToList();
+
+                var houseNumbersForUpdate = importTerrainObjectHouseNumberFromCrabInRange.Select(x => x.HouseNumberId).ToList();
 
                 if (houseNumbersForUpdate.Any())
                 {
+                    var houseNumberIdFromImportsBeforeCurrentDateRange = importTerrainObjectHouseNumberCommands
+                        .Where(x => x.Timestamp <= from.ToCrabInstant())
+                        .Select(x => new { x.TerrainObjectHouseNumberId, x.HouseNumberId })
+                        .Distinct()
+                        .ToList();
+
+                    var newTerrainObjectHnrRelations = importTerrainObjectHouseNumberFromCrabInRange
+                        .Where(terrainObjectHouseNumberFromCrabInRange =>
+                            !houseNumberIdFromImportsBeforeCurrentDateRange
+                                .Any(relation =>
+                                    relation.TerrainObjectHouseNumberId == terrainObjectHouseNumberFromCrabInRange.TerrainObjectHouseNumberId &&
+                                    relation.HouseNumberId == terrainObjectHouseNumberFromCrabInRange.HouseNumberId));
+
+                    foreach (var terrainObjectHouseNumberFromCrab in newTerrainObjectHnrRelations)
+                    {
+                        var allNewSubaddressIds = importSubaddressCommands
+                            .Where(subaddressFromCrab => subaddressFromCrab.HouseNumberId == terrainObjectHouseNumberFromCrab.HouseNumberId)
+                            .Select(x => x.SubaddressId);
+
+                        foreach (var newSubaddressId in allNewSubaddressIds)
+                        {
+                            allCommands = allCommands.Concat(allTerrainObjectCommands
+                                    .Except(allCommands)
+                                    .Where(x => (
+                                        x.Item1 is ImportSubaddressFromCrab importSubaddressFromCrab &&
+                                        importSubaddressFromCrab.SubaddressId == newSubaddressId &&
+                                        importSubaddressFromCrab.TerrainObjectHouseNumberId == terrainObjectHouseNumberFromCrab.TerrainObjectHouseNumberId)))
+                                .ToList();
+                        }
+                    }
+
                     var houseNumbersBeforeUpdate = importTerrainObjectHouseNumberCommands
                         .Where(x => x.Timestamp <= from.ToCrabInstant())
                         .Select(x => x.HouseNumberId).ToList();
@@ -335,7 +368,7 @@ namespace BuildingRegistry.Importer.Console
 
             foreach (var importTerrainObjectHouseNumberFromCrab in orderedCommands)
             {
-                if(skipCommands.Contains(importTerrainObjectHouseNumberFromCrab))
+                if (skipCommands.Contains(importTerrainObjectHouseNumberFromCrab))
                     continue;
 
                 var crabTerrainObjectHouseNumberId = importTerrainObjectHouseNumberFromCrab.TerrainObjectHouseNumberId;
@@ -352,7 +385,7 @@ namespace BuildingRegistry.Importer.Console
                             x.TerrainObjectHouseNumberId == terrainObjectHouseNrId &&
                             (Instant)x.Timestamp > importTerrainObjectHouseNumberFromCrab.Timestamp);
 
-                        var newTimestamp = new CrabTimestamp(((Instant) importTerrainObjectHouseNumberFromCrab.Timestamp).Minus(Duration.FromSeconds(1)));
+                        var newTimestamp = new CrabTimestamp(((Instant)importTerrainObjectHouseNumberFromCrab.Timestamp).Minus(Duration.FromSeconds(1)));
 
                         activeHouseNumberByRelation.Remove(nextCommandForCurrentTerrainObjectHouseNumberFromCrab.TerrainObjectHouseNumberId);
 

@@ -554,7 +554,7 @@ namespace BuildingRegistry.Building
                 var buildingUnitId = _buildingUnitCollection.GetNextBuildingUnitIdFor(buildingUnitKey, fromAddressChange);
 
                 ApplyAddBuildingUnit(buildingUnitId, buildingUnitKey, addressId, new BuildingUnitVersion(timestamp));
-                ImportHouseNumberBuffer(buildingUnitKey, AddressId.CreateFor(houseNumberId));
+                ImportHouseNumberBuffer(buildingUnitKey, AddressId.CreateFor(houseNumberId)); //TODO: Possible duplicate events
 
                 if (isRetired)
                     return;
