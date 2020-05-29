@@ -1,3 +1,10 @@
+## [2.12.2](https://github.com/informatievlaanderen/building-registry/compare/v2.12.1...v2.12.2) (2020-05-29)
+
+
+### Bug Fixes
+
+* update dependencies GRAR-752 ([a293311](https://github.com/informatievlaanderen/building-registry/commit/a293311f9c49774481f151def1cdf13889dcbe2c))
+
 ## [2.12.1](https://github.com/informatievlaanderen/building-registry/compare/v2.12.0...v2.12.1) (2020-05-27)
 
 
