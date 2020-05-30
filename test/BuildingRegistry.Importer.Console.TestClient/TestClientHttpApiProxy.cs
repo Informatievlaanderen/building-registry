@@ -1,3 +1,6 @@
+using Be.Vlaanderen.Basisregisters.Crab;
+using NodaTime;
+
 namespace BuildingRegistry.Importer.Console.TestClient
 {
     using System;
@@ -35,19 +38,23 @@ namespace BuildingRegistry.Importer.Console.TestClient
             _httpApiProxy.ImportBatch(imports);
         }
 
-        public ICommandProcessorOptions<TKey> InitializeImport<TKey>(ImportOptions options,
-            ICommandProcessorBatchConfiguration<TKey> configuration)
+        public ICommandProcessorOptions<TKey> GetImportOptions<TKey>(ImportOptions options, ICommandProcessorBatchConfiguration<TKey> configuration)
         {
             if (options != null)
                 throw new ArgumentException($"{nameof(ImportOptions)} parameter is not supported for {nameof(TestClientHttpApiProxy)}, please pass null");
 
             return new CommandProcessorOptions<TKey>(
-                    _fromDateTime,
-                    DateTime.MaxValue,
-                    new List<int> {_key}.Cast<TKey>(),
-                    take: null,
-                    cleanStart: true,
-                    _importMode);
+                _fromDateTime.ToCrabInstant(),
+                Instant.FromDateTimeOffset(DateTimeOffset.MaxValue.AddDays(-2)),
+                new List<int> { _key }.Cast<TKey>(),
+                take: null,
+                cleanStart: true,
+                _importMode);
+        }
+
+        public void InitializeImport<TKey>(ICommandProcessorOptions<TKey> options)
+        {
+            //throw new NotImplementedException();
         }
 
         public void FinalizeImport<TKey>(ICommandProcessorOptions<TKey> options)
