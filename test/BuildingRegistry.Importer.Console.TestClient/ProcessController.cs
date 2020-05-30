@@ -27,9 +27,12 @@ namespace BuildingRegistry.Importer.Console.TestClient
             [FromServices] IConfiguration configuration,
             [FromQuery] string id,
             [FromQuery] string from,
-            [FromQuery] ImportMode mode = ImportMode.Init,
+            [FromQuery] ImportMode mode = ImportMode.Update,
             CancellationToken cancellationToken = default)
         {
+            if (mode == ImportMode.Init)
+                return BadRequest("");
+
             Func<CRABEntities> crabEntitiesFactory = () => new CRABEntities(configuration.GetConnectionString("CRABEntities"));
 
             var terrainObjectId = new CrabTerrainObjectId(Convert.ToInt32(id));
