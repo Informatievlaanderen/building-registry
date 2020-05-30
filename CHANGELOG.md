@@ -1,3 +1,11 @@
+## [2.12.3](https://github.com/informatievlaanderen/building-registry/compare/v2.12.2...v2.12.3) (2020-05-30)
+
+
+### Bug Fixes
+
+* test client can now compile ([be39f79](https://github.com/informatievlaanderen/building-registry/commit/be39f79cc7cfcab15e5083557e30b280965792b2))
+* when updating building relation with previously coupled units ([59182e5](https://github.com/informatievlaanderen/building-registry/commit/59182e5298c25eacb74edc04b42fb229207357f2))
+
 ## [2.12.2](https://github.com/informatievlaanderen/building-registry/compare/v2.12.1...v2.12.2) (2020-05-29)
 
 
