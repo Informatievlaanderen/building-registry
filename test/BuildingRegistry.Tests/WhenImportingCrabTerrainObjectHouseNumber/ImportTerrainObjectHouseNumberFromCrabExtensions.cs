@@ -60,6 +60,21 @@ namespace BuildingRegistry.Tests.WhenImportingCrabTerrainObjectHouseNumber
                 command.Organisation);
         }
 
+        public static ImportTerrainObjectHouseNumberFromCrab WithTerrainObjectId(
+            this ImportTerrainObjectHouseNumberFromCrab command,
+            CrabTerrainObjectId terrainObjectId)
+        {
+            return new ImportTerrainObjectHouseNumberFromCrab(
+                command.TerrainObjectHouseNumberId,
+                terrainObjectId,
+                command.HouseNumberId,
+                command.Lifetime,
+                command.Timestamp,
+                command.Operator,
+                command.Modification,
+                command.Organisation);
+        }
+
         public static ImportTerrainObjectHouseNumberFromCrab WithTerrainObjectHouseNumberId(
             this ImportTerrainObjectHouseNumberFromCrab command,
             CrabTerrainObjectHouseNumberId terrainObjectHouseNumberId)
