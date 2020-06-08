@@ -30,7 +30,7 @@ namespace BuildingRegistry.Importer
         {
             foreach (var import in imports)
             {
-                if(import.Commands.Length != 0)
+                if (import.Commands.Length != 0)
                     File.WriteAllText(
                         Path.Combine(ImportFolder, $"{import.Key:D9}.json"),
                         Serializer.Serialize(import.Commands));
