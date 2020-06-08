@@ -81,6 +81,7 @@ namespace BuildingRegistry.Console.SortToProcess
                 }
             }
 
+            //Don't forget to post an RequestPersistentId command!
         }
     }
 }
