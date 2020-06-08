@@ -1,3 +1,10 @@
+## [2.14.1](https://github.com/informatievlaanderen/building-registry/compare/v2.14.0...v2.14.1) (2020-06-08)
+
+
+### Bug Fixes
+
+* build msil version for public api ([24a8dbf](https://github.com/informatievlaanderen/building-registry/commit/24a8dbf1392b1ed6835300bf2de958f84efa0418))
+
 # [2.14.0](https://github.com/informatievlaanderen/building-registry/compare/v2.13.0...v2.14.0) (2020-06-08)
 
 
