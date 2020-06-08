@@ -97,7 +97,6 @@ namespace BuildingRegistry.Tests.Cases
                     importSubaddressFromCrab.ToLegacyEvent());
         }
 
-
         public IEventCentricTestSpecificationBuilder T3()
         {
             var importSubaddressFromCrab = Fixture.Create<ImportSubaddressFromCrab>()
