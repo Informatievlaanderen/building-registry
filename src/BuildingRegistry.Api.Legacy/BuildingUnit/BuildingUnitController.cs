@@ -69,6 +69,7 @@ namespace BuildingRegistry.Api.Legacy.BuildingUnit
                 {
                     a.PersistentLocalId,
                     a.Version,
+                    a.Status,
                 })
                 .ToListAsync(cancellationToken);
 
@@ -79,6 +80,7 @@ namespace BuildingRegistry.Api.Legacy.BuildingUnit
                         x.PersistentLocalId.Value,
                         responseOptions.Value.GebouweenheidNaamruimte,
                         responseOptions.Value.GebouweenheidDetailUrl,
+                        MapBuildingUnitStatus(x.Status.Value),
                         x.Version.ToBelgianDateTimeOffset()))
                     .ToList(),
                 Volgende = pagedBuildingUnits.PaginationInfo.BuildNextUri(responseOptions.Value.GebouweenheidVolgendeUrl)
