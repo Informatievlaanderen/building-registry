@@ -5,6 +5,7 @@ namespace BuildingRegistry.Api.Legacy.Building.Responses
     using System;
     using System.Collections.Generic;
     using System.Runtime.Serialization;
+    using Be.Vlaanderen.Basisregisters.GrAr.Legacy.Gebouw;
     using Infrastructure.Options;
     using Microsoft.Extensions.Options;
     using Newtonsoft.Json;
@@ -51,13 +52,22 @@ namespace BuildingRegistry.Api.Legacy.Building.Responses
         [JsonProperty(Required = Required.DisallowNull)]
         public Uri Detail { get; set; }
 
+        /// <summary>
+        /// De fase in het leven van een gebouw.
+        /// </summary>
+        [DataMember(Name = "GebouwStatus", Order = 3)]
+        [JsonProperty(Required = Required.DisallowNull)]
+        public GebouwStatus Status { get; set; }
+
         public GebouwCollectieItem(
             int id,
             string naamruimte,
             string detail,
+            GebouwStatus status,
             DateTimeOffset version)
         {
             Identificator = new GebouwIdentificator(naamruimte, id.ToString(), version);
+            Status = status;
             Detail = new Uri(string.Format(detail, id));
         }
     }
@@ -73,11 +83,11 @@ namespace BuildingRegistry.Api.Legacy.Building.Responses
             {
                 Gebouwen = new List<GebouwCollectieItem>
                 {
-                    new GebouwCollectieItem(6, _responseOptions.GebouwNaamruimte, _responseOptions.GebouwDetailUrl, DateTimeOffset.Now),
-                    new GebouwCollectieItem(7, _responseOptions.GebouwNaamruimte, _responseOptions.GebouwDetailUrl, DateTimeOffset.Now.AddHours(1)),
-                    new GebouwCollectieItem(8, _responseOptions.GebouwNaamruimte, _responseOptions.GebouwDetailUrl, DateTimeOffset.Now.AddDays(1)),
-                    new GebouwCollectieItem(9, _responseOptions.GebouwNaamruimte, _responseOptions.GebouwDetailUrl, DateTimeOffset.Now.AddHours(9)),
-                    new GebouwCollectieItem(10, _responseOptions.GebouwNaamruimte, _responseOptions.GebouwDetailUrl, DateTimeOffset.Now.AddDays(2))
+                    new GebouwCollectieItem(6, _responseOptions.GebouwNaamruimte, _responseOptions.GebouwDetailUrl, GebouwStatus.Gehistoreerd, DateTimeOffset.Now),
+                    new GebouwCollectieItem(7, _responseOptions.GebouwNaamruimte, _responseOptions.GebouwDetailUrl, GebouwStatus.Gepland, DateTimeOffset.Now.AddHours(1)),
+                    new GebouwCollectieItem(8, _responseOptions.GebouwNaamruimte, _responseOptions.GebouwDetailUrl, GebouwStatus.Gerealiseerd, DateTimeOffset.Now.AddDays(1)),
+                    new GebouwCollectieItem(9, _responseOptions.GebouwNaamruimte, _responseOptions.GebouwDetailUrl, GebouwStatus.InAanbouw, DateTimeOffset.Now.AddHours(9)),
+                    new GebouwCollectieItem(10, _responseOptions.GebouwNaamruimte, _responseOptions.GebouwDetailUrl, GebouwStatus.NietGerealiseerd, DateTimeOffset.Now.AddDays(2))
                 },
                 Volgende = new Uri(string.Format(_responseOptions.GebouwVolgendeUrl, "5", "10"))
             };
