@@ -152,7 +152,8 @@ namespace BuildingRegistry.Api.Legacy.Building
                 .Select(a => new
                 {
                     a.PersistentLocalId,
-                    a.Version
+                    a.Version,
+                    a.Status
                 })
                 .ToListAsync(cancellationToken);
 
@@ -163,6 +164,7 @@ namespace BuildingRegistry.Api.Legacy.Building
                         x.PersistentLocalId.Value,
                         responseOptions.Value.GebouwNaamruimte,
                         responseOptions.Value.GebouwDetailUrl,
+                        MapBuildingStatus(x.Status.Value),
                         x.Version.ToBelgianDateTimeOffset()))
                     .ToList(),
                 Volgende = pagedBuildings.PaginationInfo.BuildNextUri(responseOptions.Value.GebouwVolgendeUrl)
