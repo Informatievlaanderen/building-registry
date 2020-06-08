@@ -1,3 +1,10 @@
+# [2.14.0](https://github.com/informatievlaanderen/building-registry/compare/v2.13.0...v2.14.0) (2020-06-08)
+
+
+### Features
+
+* add status to api list buildings GRAR-33 ([a8ecf7c](https://github.com/informatievlaanderen/building-registry/commit/a8ecf7c6214298fd5cf8a3c12c4042d7b4ddf8a8))
+
 # [2.13.0](https://github.com/informatievlaanderen/building-registry/compare/v2.12.3...v2.13.0) (2020-06-08)
 
 
