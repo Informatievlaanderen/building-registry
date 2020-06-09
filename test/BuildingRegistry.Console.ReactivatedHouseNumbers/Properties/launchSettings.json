@@ -1,0 +1,7 @@
+{
+  "profiles": {
+    "BuildingRegistry.Importer.Console": {
+      "commandName": "Project"
+    }
+  }
+}
