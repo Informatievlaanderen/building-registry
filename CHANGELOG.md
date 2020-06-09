@@ -1,3 +1,10 @@
+## [2.14.2](https://github.com/informatievlaanderen/building-registry/compare/v2.14.1...v2.14.2) (2020-06-09)
+
+
+### Bug Fixes
+
+* reactivate housenumber didn't reactivate all subaddresses GRAR-1359 ([a951618](https://github.com/informatievlaanderen/building-registry/commit/a951618c8951e4f10269d9cf31634076e009d93f))
+
 ## [2.14.1](https://github.com/informatievlaanderen/building-registry/compare/v2.14.0...v2.14.1) (2020-06-08)
 
 
