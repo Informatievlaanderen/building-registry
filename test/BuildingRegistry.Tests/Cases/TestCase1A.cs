@@ -76,6 +76,7 @@ namespace BuildingRegistry.Tests.Cases
             public BuildingUnitId GebouwEenheid4IdV2 => BuildingUnitId.Create(GebouwEenheid4Key, 2);
             public BuildingUnitId GebouwEenheid5Id => BuildingUnitId.Create(GebouwEenheid5Key, 2);
             public BuildingUnitId GebouwEenheid6Id => BuildingUnitId.Create(GebouwEenheid6Key, 1);
+            public BuildingUnitId GebouwEenheid6IdV2 => BuildingUnitId.Create(GebouwEenheid6Key, 2);
             public AddressId Address16Id => AddressId.CreateFor(HuisNr16Id);
             public AddressId Address16Bus1Id => AddressId.CreateFor(SubaddressNr16Bus1Id);
             public AddressId Address16Bus2Id => AddressId.CreateFor(SubaddressNr16Bus2Id);

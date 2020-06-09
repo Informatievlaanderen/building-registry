@@ -428,5 +428,61 @@ namespace BuildingRegistry.Tests.Cases
         {
             Assert(BasedOnT3DoAddressIdHouseNumberChange());
         }
+
+        public IEventCentricTestSpecificationBuilder BasedOnT3And3SubaddressesRetireHouseNumberSpecification()
+        {
+            var importTerrainObjectHouseNumberFromCrab = Fixture.Create<ImportTerrainObjectHouseNumberFromCrab>()
+                .WithLifetime(new CrabLifetime(Fixture.Create<LocalDateTime>(), Fixture.Create<LocalDateTime>()))
+                .WithHouseNumberId(_.HuisNr16Id); //koppel huisnr 16
+
+            return new AutoFixtureScenario(Fixture)
+                .Given(ImportSubaddress3())
+                .When(importTerrainObjectHouseNumberFromCrab)
+                .Then(_.Gebouw1Id,
+                    new BuildingUnitWasNotRealizedByParent(_.Gebouw1Id, _.GebouwEenheid2Id, _.GebouwEenheid1Id),
+                    new BuildingUnitAddressWasDetached(_.Gebouw1Id, _.Address16Bus1Id, _.GebouwEenheid2Id),
+                    new BuildingUnitWasNotRealizedByParent(_.Gebouw1Id, _.GebouwEenheid4Id, _.GebouwEenheid1Id),
+                    new BuildingUnitAddressWasDetached(_.Gebouw1Id, _.Address16Bus2Id, _.GebouwEenheid4Id),
+                    new BuildingUnitWasNotRealizedByParent(_.Gebouw1Id, _.GebouwEenheid6Id, _.GebouwEenheid1Id),
+                    new BuildingUnitAddressWasDetached(_.Gebouw1Id, _.Address16Bus3Id, _.GebouwEenheid6Id),
+                    new BuildingUnitWasRetired(_.Gebouw1Id, _.GebouwEenheid3Id),
+                    new BuildingUnitAddressWasDetached(_.Gebouw1Id, _.Address16Id, _.GebouwEenheid3Id),
+                    importTerrainObjectHouseNumberFromCrab.ToLegacyEvent());
+        }
+
+        [Fact]
+        public void BasedOnT3And3SubaddressesRetireHouseNumber()
+        {
+            Assert(BasedOnT3And3SubaddressesRetireHouseNumberSpecification());
+        }
+
+        public IEventCentricTestSpecificationBuilder UnretireHouseNumberWith3SubaddressesSpecification()
+        {
+            var importTerrainObjectHouseNumberFromCrab = Fixture.Create<ImportTerrainObjectHouseNumberFromCrab>()
+                .WithLifetime(new CrabLifetime(Fixture.Create<LocalDateTime>(), null))
+                .WithModification(CrabModification.Correction)
+                .WithHouseNumberId(_.HuisNr16Id); //koppel huisnr 16
+
+            return new AutoFixtureScenario(Fixture)
+                .Given(BasedOnT3And3SubaddressesRetireHouseNumberSpecification())
+                .When(importTerrainObjectHouseNumberFromCrab)
+                .Then(_.Gebouw1Id,
+                    new BuildingUnitWasAdded(_.Gebouw1Id, _.GebouwEenheid1IdV2, _.GebouwEenheid1Key, _.Address16Id, new BuildingUnitVersion(importTerrainObjectHouseNumberFromCrab.Timestamp), _.GebouwEenheid1Id),
+                    new BuildingUnitWasAdded(_.Gebouw1Id, _.GebouwEenheid2IdV2, _.GebouwEenheid2Key, _.Address16Bus1Id, new BuildingUnitVersion(importTerrainObjectHouseNumberFromCrab.Timestamp), _.GebouwEenheid2Id),
+                    new CommonBuildingUnitWasAdded(_.Gebouw1Id, _.GebouwEenheid3IdV2, _.GebouwEenheid3Key, new BuildingUnitVersion(importTerrainObjectHouseNumberFromCrab.Timestamp)),
+                    new BuildingUnitWasRealized(_.Gebouw1Id, _.GebouwEenheid3IdV2),
+                    new BuildingUnitWasAdded(_.Gebouw1Id, _.GebouwEenheid4IdV2, _.GebouwEenheid4Key, _.Address16Bus2Id, new BuildingUnitVersion(importTerrainObjectHouseNumberFromCrab.Timestamp), _.GebouwEenheid4Id),
+                    new BuildingUnitWasNotRealized(_.Gebouw1Id, _.GebouwEenheid1IdV2),
+                    new BuildingUnitAddressWasDetached(_.Gebouw1Id, _.Address16Id, _.GebouwEenheid1IdV2),
+                    new BuildingUnitAddressWasAttached(_.Gebouw1Id, _.Address16Id, _.GebouwEenheid3IdV2),
+                    new BuildingUnitWasAdded(_.Gebouw1Id, _.GebouwEenheid6IdV2, _.GebouwEenheid6Key, _.Address16Bus3Id, new BuildingUnitVersion(importTerrainObjectHouseNumberFromCrab.Timestamp), _.GebouwEenheid6Id),
+                    importTerrainObjectHouseNumberFromCrab.ToLegacyEvent());
+        }
+
+        [Fact]
+        public void UnretireHouseNumberWith3Subaddresses()
+        {
+            Assert(UnretireHouseNumberWith3SubaddressesSpecification());
+        }
     }
 }
