@@ -293,8 +293,8 @@ namespace BuildingRegistry.Building
                 if (
                     (!lifetime.EndDateTime.HasValue &&
                      ((!_buildingUnitCollection.HasActiveUnitByKey(buildingUnitKey) && _buildingUnitCollection.HasActiveUnitByKey(houseNumberKey)) ||
-                      (!_buildingUnitCollection.HasActiveUnitByKey(houseNumberKey) && !_buildingUnitCollection.HasRetiredUnitByKey(buildingUnitKey))
-                    )
+                      (!_buildingUnitCollection.HasActiveUnitByKey(buildingUnitKey) && _buildingUnitCollection.IsAddressLinkedToCommonBuildingUnit(AddressId.CreateFor(houseNumberId))) ||
+                      (!_buildingUnitCollection.HasActiveUnitByKey(houseNumberKey) && !_buildingUnitCollection.HasRetiredUnitByKey(buildingUnitKey)))
                     || (lifetime.EndDateTime.HasValue && !_buildingUnitCollection.HasKey(buildingUnitKey))) //Even if retired, but never imported => import
                     && _activeHouseNumberIdsByTerreinObjectHouseNr.ContainsKey(terrainObjectHouseNumberId)) //but not if housenr isn't active
                 {
