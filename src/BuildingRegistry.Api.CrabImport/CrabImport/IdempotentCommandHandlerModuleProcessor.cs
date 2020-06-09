@@ -144,6 +144,12 @@ namespace BuildingRegistry.Api.CrabImport.CrabImport
                     message = commandReaddressSubaddress;
                     break;
 
+                case FixGrar1359 command:
+                    var commandFixGrar1359 = new CommandMessage<FixGrar1359>(command.CreateCommandId(), command, metadata);
+                    await _buildingCommandHandlerModule.FixGrar1359(commandFixGrar1359, cancellationToken);
+                    message = commandFixGrar1359;
+                    break;
+
                 default:
                     throw new NotImplementedException("Command to import is not recognized");
             }

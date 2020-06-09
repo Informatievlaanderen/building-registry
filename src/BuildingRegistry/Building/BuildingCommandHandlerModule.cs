@@ -89,6 +89,10 @@ namespace BuildingRegistry.Building
             For<RequestPersistentLocalIdsForCrabTerrainObjectId>()
                 .AddSqlStreamStore(getStreamStore, getUnitOfWork, eventMapping, eventSerializer)
                 .Handle(async (message, ct) => { await RequestPersistentLocalIdsForCrabTerrainObjectId(message, ct); });
+
+            For<FixGrar1359>()
+                .AddSqlStreamStore(getStreamStore, getUnitOfWork, eventMapping, eventSerializer)
+                .Handle(async (message, ct) => { await FixGrar1359(message, ct); });
         }
 
         public async Task ImportSubaddressPosition(CommandMessage<ImportSubaddressPositionFromCrab> message, CancellationToken ct)
@@ -327,6 +331,27 @@ namespace BuildingRegistry.Building
             var buildings = _getBuildings();
             var buildingId = message.Command.TerrainObjectId.CreateDeterministicId();
             var building = await buildings.GetAsync(buildingId.ToString(), ct);
+
+            building.AssignPersistentLocalIds(_persistentLocalIdGenerator);
+        }
+
+        public async Task FixGrar1359(CommandMessage<FixGrar1359> message, CancellationToken ct)
+        {
+            var buildings = _getBuildings();
+            var buildingId = message.Command.TerrainObjectId.CreateDeterministicId();
+            var building = await buildings.GetAsync(buildingId.ToString(), ct);
+
+            foreach (var importSubaddressFromCrab in message.Command.SubaddressCommandsFromCrab)
+            {
+                building.FixGrar1359(
+                    importSubaddressFromCrab.TerrainObjectId,
+                    importSubaddressFromCrab.TerrainObjectHouseNumberId,
+                    importSubaddressFromCrab.SubaddressId,
+                    importSubaddressFromCrab.HouseNumberId,
+                    importSubaddressFromCrab.Lifetime,
+                    importSubaddressFromCrab.Timestamp,
+                    importSubaddressFromCrab.Modification);
+            }
 
             building.AssignPersistentLocalIds(_persistentLocalIdGenerator);
         }
