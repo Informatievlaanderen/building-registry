@@ -208,6 +208,32 @@ namespace BuildingRegistry.Api.Legacy.Building
                 });
         }
 
+        /// <summary>
+        /// Vraag het totaal aantal actieve gebouwen op.
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="cancellationToken"></param>
+        /// <response code="200">Als de opvraging van het totaal aantal gelukt is.</response>
+        /// <response code="500">Als er een interne fout is opgetreden.</response>
+        [HttpGet("crabmapping")]
+        [ProducesResponseType(typeof(TotaalAantalResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
+        [SwaggerResponseExample(StatusCodes.Status200OK, typeof(TotalCountResponseExample), jsonConverter: typeof(StringEnumConverter))]
+        [SwaggerResponseExample(StatusCodes.Status500InternalServerError, typeof(InternalServerErrorResponseExamples), jsonConverter: typeof(StringEnumConverter))]
+        public async Task<IActionResult> CrabMapping(
+            [FromServices] LegacyContext context,
+            CancellationToken cancellationToken = default)
+        {
+            var filtering = Request.ExtractFilteringRequest<BuildingCrabMappingFilter>();
+            var sorting = Request.ExtractSortingRequest();
+            var pagination = new NoPaginationRequest();
+
+            if (!filtering.ShouldFilter)
+                return BadRequest("Filter is required");
+
+            var query = new BuildingCrabMappingQuery(context).Fetch(filtering, sorting, pagination);
+        }
+
         internal static Polygon GetBuildingPolygon(byte[] polygon)
         {
             var geometry = WKBReaderFactory.Create().Read(polygon) as NetTopologySuite.Geometries.Polygon;
