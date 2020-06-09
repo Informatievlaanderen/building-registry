@@ -30,6 +30,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingPersistentIdCrabIdMapping
             b.HasIndex(p => p.PersistentLocalId).IsClustered();
 
             b.HasIndex(b => b.CrabTerrainObjectId);
+            b.HasIndex(b => b.CrabIdentifierTerrainObject);
         }
     }
 }
