@@ -1,3 +1,10 @@
+## [2.14.3](https://github.com/informatievlaanderen/building-registry/compare/v2.14.2...v2.14.3) (2020-06-10)
+
+
+### Bug Fixes
+
+* update grar extract GRAR-1330 ([c8ab641](https://github.com/informatievlaanderen/building-registry/commit/c8ab64179bf1e6bf972aca13537b1118d757f52b))
+
 ## [2.14.2](https://github.com/informatievlaanderen/building-registry/compare/v2.14.1...v2.14.2) (2020-06-09)
 
 
