@@ -1,3 +1,10 @@
+## [2.14.4](https://github.com/informatievlaanderen/building-registry/compare/v2.14.3...v2.14.4) (2020-06-11)
+
+
+### Bug Fixes
+
+* force release ([0b80d01](https://github.com/informatievlaanderen/building-registry/commit/0b80d01d57df238766177d9fdbae66637f51e14a))
+
 ## [2.14.3](https://github.com/informatievlaanderen/building-registry/compare/v2.14.2...v2.14.3) (2020-06-10)
 
 
