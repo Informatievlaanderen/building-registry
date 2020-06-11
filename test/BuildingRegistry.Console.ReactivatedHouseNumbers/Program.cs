@@ -24,7 +24,7 @@ namespace BuildingRegistry.Console.ReactivatedHouseNumbers
     using ValueObjects.Crab;
 
     //Case 5f: when housenumber relation is retired then becomes active again (correction), buildings with more than 2 subaddresses don't have the right amount of units
-    class Program
+    public class Program
     {
         const string FilesToProcessPath = "FilesToProcess";
 
