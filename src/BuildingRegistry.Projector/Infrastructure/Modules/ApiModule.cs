@@ -8,6 +8,7 @@ namespace BuildingRegistry.Projector.Infrastructure.Modules
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.LastChangedList;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Autofac;
     using Be.Vlaanderen.Basisregisters.Projector;
+    using Be.Vlaanderen.Basisregisters.Projector.ConnectedProjections;
     using Be.Vlaanderen.Basisregisters.Projector.Modules;
     using Be.Vlaanderen.Basisregisters.Shaperon;
     using BuildingRegistry.Infrastructure;
@@ -22,6 +23,7 @@ namespace BuildingRegistry.Projector.Infrastructure.Modules
     using BuildingRegistry.Projections.Legacy.BuildingUnitDetail;
     using BuildingRegistry.Projections.Legacy.PersistentLocalIdMigration;
     using BuildingRegistry.Projections.Wms;
+    using Microsoft.Data.SqlClient;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Logging;
@@ -81,6 +83,7 @@ namespace BuildingRegistry.Projector.Infrastructure.Modules
                         _services,
                         _loggerFactory));
 
+            var extractRetryPolicy = RetryPolicy.NoRetries;
             builder
                 .RegisterProjectionMigrator<ExtractContextMigrationFactory>(
                     _configuration,
@@ -91,14 +94,16 @@ namespace BuildingRegistry.Projector.Infrastructure.Modules
                         new BuildingExtractProjections(
                             context.Resolve<IOptions<ExtractConfig>>(),
                             DbaseCodePage.Western_European_ANSI.ToEncoding(),
-                            WKBReaderFactory.Create()))
+                            WKBReaderFactory.Create()),
+                    extractRetryPolicy)
 
                 .RegisterProjections<BuildingUnitExtractProjections, ExtractContext>(
                     context =>
                         new BuildingUnitExtractProjections(
                             context.Resolve<IOptions<ExtractConfig>>(),
                             DbaseCodePage.Western_European_ANSI.ToEncoding(),
-                            WKBReaderFactory.Create()));
+                            WKBReaderFactory.Create()),
+                    extractRetryPolicy);
         }
 
         private void RegisterLastChangedProjections(ContainerBuilder builder)
@@ -111,13 +116,14 @@ namespace BuildingRegistry.Projector.Infrastructure.Modules
                         _services,
                         _loggerFactory));
 
+            var lastChangedListRetryPolicy = RetryPolicy.NoRetries;
             builder
                 .RegisterProjectionMigrator<BuildingRegistry.Projections.LastChangedList.LastChangedListContextMigrationFactory>(
                     _configuration,
                     _loggerFactory)
 
-                //.RegisterProjections<BuildingProjections, LastChangedListContext>()
-                .RegisterProjections<BuildingUnitProjections, LastChangedListContext>();
+                //.RegisterProjections<BuildingProjections, LastChangedListContext>(lastChangedListRetryPolicy)
+                .RegisterProjections<BuildingUnitProjections, LastChangedListContext>(lastChangedListRetryPolicy);
         }
 
         private void RegisterLegacyProjections(ContainerBuilder builder)
@@ -128,17 +134,31 @@ namespace BuildingRegistry.Projector.Infrastructure.Modules
                         _configuration,
                         _services,
                         _loggerFactory));
+
+            var legacyRetryPolicy = RetryPolicy.NoRetries;
             builder
                 .RegisterProjectionMigrator<LegacyContextMigrationFactory>(
                     _configuration,
                     _loggerFactory)
 
-                .RegisterProjections<BuildingDetailProjections, LegacyContext>(() => new BuildingDetailProjections())
-                .RegisterProjections<BuildingSyndicationProjections, LegacyContext>(() => new BuildingSyndicationProjections())
-                .RegisterProjections<BuildingUnitDetailProjections, LegacyContext>(() => new BuildingUnitDetailProjections())
-                .RegisterProjections<RemovedPersistentLocalIdProjections, LegacyContext>(() => new RemovedPersistentLocalIdProjections())
-                .RegisterProjections<DuplicatedPersistentLocalIdProjections, LegacyContext>(() => new DuplicatedPersistentLocalIdProjections())
-                .RegisterProjections<BuildingPersistenLocalIdCrabIdProjections, LegacyContext>(() => new BuildingPersistenLocalIdCrabIdProjections());
+                .RegisterProjections<BuildingDetailProjections, LegacyContext>(
+                    () => new BuildingDetailProjections(),
+                    legacyRetryPolicy)
+                .RegisterProjections<BuildingSyndicationProjections, LegacyContext>(
+                    () => new BuildingSyndicationProjections(),
+                    legacyRetryPolicy)
+                .RegisterProjections<BuildingUnitDetailProjections, LegacyContext>(
+                    () => new BuildingUnitDetailProjections(),
+                    legacyRetryPolicy)
+                .RegisterProjections<RemovedPersistentLocalIdProjections, LegacyContext>(
+                    () => new RemovedPersistentLocalIdProjections(),
+                    legacyRetryPolicy)
+                .RegisterProjections<DuplicatedPersistentLocalIdProjections, LegacyContext>(
+                    () => new DuplicatedPersistentLocalIdProjections(),
+                    legacyRetryPolicy)
+                .RegisterProjections<BuildingPersistenLocalIdCrabIdProjections, LegacyContext>(
+                    () => new BuildingPersistenLocalIdCrabIdProjections(),
+                    legacyRetryPolicy);
         }
 
         private void RegisterWmsProjections(ContainerBuilder builder)
@@ -149,16 +169,20 @@ namespace BuildingRegistry.Projector.Infrastructure.Modules
                         _configuration,
                         _services,
                         _loggerFactory));
+
+            var wmsRetryPolicy = RetryPolicy.ConfigureLinearBackoff<SqlException>(_configuration, "Wms");
             builder
                 .RegisterProjectionMigrator<WmsContextMigrationFactory>(
                     _configuration,
                     _loggerFactory)
 
                 .RegisterProjections<BuildingRegistry.Projections.Wms.Building.BuildingProjections, WmsContext>(() =>
-                    new BuildingRegistry.Projections.Wms.Building.BuildingProjections(WKBReaderFactory.Create()))
+                    new BuildingRegistry.Projections.Wms.Building.BuildingProjections(WKBReaderFactory.Create()),
+                    wmsRetryPolicy)
 
                 .RegisterProjections<BuildingRegistry.Projections.Wms.BuildingUnit.BuildingUnitProjections, WmsContext>(() =>
-                    new BuildingRegistry.Projections.Wms.BuildingUnit.BuildingUnitProjections(WKBReaderFactory.Create()));
+                    new BuildingRegistry.Projections.Wms.BuildingUnit.BuildingUnitProjections(WKBReaderFactory.Create()),
+                    wmsRetryPolicy);
         }
     }
 }
