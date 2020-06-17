@@ -1,3 +1,10 @@
+## [2.16.1](https://github.com/informatievlaanderen/building-registry/compare/v2.16.0...v2.16.1) (2020-06-17)
+
+
+### Bug Fixes
+
+* provenance for fix-1359 is now added ([6f77c13](https://github.com/informatievlaanderen/building-registry/commit/6f77c137dacc4386882eac6a3585d676a3e5e2ac))
+
 # [2.16.0](https://github.com/informatievlaanderen/building-registry/compare/v2.15.0...v2.16.0) (2020-06-17)
 
 
