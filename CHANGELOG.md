@@ -1,3 +1,10 @@
+# [2.16.0](https://github.com/informatievlaanderen/building-registry/compare/v2.15.0...v2.16.0) (2020-06-17)
+
+
+### Features
+
+* add building references endpoint ([4f8d152](https://github.com/informatievlaanderen/building-registry/commit/4f8d152deb5271f3379656cc4f56d242f076d124))
+
 # [2.15.0](https://github.com/informatievlaanderen/building-registry/compare/v2.14.5...v2.15.0) (2020-06-17)
 
 
