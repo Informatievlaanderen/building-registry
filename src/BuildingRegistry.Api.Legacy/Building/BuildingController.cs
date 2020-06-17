@@ -209,18 +209,21 @@ namespace BuildingRegistry.Api.Legacy.Building
         }
 
         /// <summary>
-        /// Vraag het totaal aantal actieve gebouwen op.
+        /// Vraag de koppeling tussen CRAB/GRB-gebouwen en GR-gebouwen
         /// </summary>
         /// <param name="context"></param>
         /// <param name="cancellationToken"></param>
-        /// <response code="200">Als de opvraging van het totaal aantal gelukt is.</response>
+        /// <response code="200">Als de opvraging van de CRAB/GRB-gebouwen gelukt is.</response>
+        /// <response code="400">Als er geen parameters zijn opgegeven.</response>
         /// <response code="500">Als er een interne fout is opgetreden.</response>
-        [HttpGet("crabmapping")]
-        [ProducesResponseType(typeof(TotaalAantalResponse), StatusCodes.Status200OK)]
+        [HttpGet("crabgebouwen")]
+        [ProducesResponseType(typeof(BuildingCrabMappingResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-        [SwaggerResponseExample(StatusCodes.Status200OK, typeof(TotalCountResponseExample), jsonConverter: typeof(StringEnumConverter))]
+        [SwaggerResponseExample(StatusCodes.Status200OK, typeof(BuildingCrabMappingResponseExamples), jsonConverter: typeof(StringEnumConverter))]
+        [SwaggerResponseExample(StatusCodes.Status400BadRequest, typeof(BadRequestResponseExamples), jsonConverter: typeof(StringEnumConverter))]
         [SwaggerResponseExample(StatusCodes.Status500InternalServerError, typeof(InternalServerErrorResponseExamples), jsonConverter: typeof(StringEnumConverter))]
-        public async Task<IActionResult> CrabMapping(
+        public async Task<IActionResult> CrabGebouwen(
             [FromServices] LegacyContext context,
             CancellationToken cancellationToken = default)
         {
@@ -228,10 +231,18 @@ namespace BuildingRegistry.Api.Legacy.Building
             var sorting = Request.ExtractSortingRequest();
             var pagination = new NoPaginationRequest();
 
-            if (!filtering.ShouldFilter)
+            if (filtering.Filter.TerrainObjectId == null && string.IsNullOrEmpty(filtering.Filter.IdentifierTerrainObject))
                 return BadRequest("Filter is required");
 
             var query = new BuildingCrabMappingQuery(context).Fetch(filtering, sorting, pagination);
+
+            return Ok(new BuildingCrabMappingResponse
+            {
+                CrabGebouwen = query
+                    .Items
+                    .Select(x => new BuildingCrabMappingItem(x.CrabTerrainObjectId.Value, x.CrabIdentifierTerrainObject, x.PersistentLocalId.Value))
+                    .ToList()
+            });
         }
 
         internal static Polygon GetBuildingPolygon(byte[] polygon)
