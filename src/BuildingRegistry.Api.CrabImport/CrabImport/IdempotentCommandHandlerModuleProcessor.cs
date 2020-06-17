@@ -22,6 +22,7 @@ namespace BuildingRegistry.Api.CrabImport.CrabImport
         private readonly ConcurrentUnitOfWork _concurrentUnitOfWork;
         private readonly BuildingCommandHandlerModule _buildingCommandHandlerModule;
         private readonly Func<IHasCrabProvenance, Building, Provenance> _provenanceFactory;
+        private readonly Func<FixGrar1359, Building, Provenance> _fixGrar1359ProvenanceFactory;
 
         public IdempotentCommandHandlerModuleProcessor(
             ILogger<IdempotentCommandHandlerModuleProcessor> logger,
@@ -36,6 +37,7 @@ namespace BuildingRegistry.Api.CrabImport.CrabImport
             _logger = logger;
             _concurrentUnitOfWork = concurrentUnitOfWork;
             _provenanceFactory = provenanceFactory.CreateFrom;
+            _fixGrar1359ProvenanceFactory = new FixGrar1359ProvenanceFactory().CreateFrom;
 
             _buildingCommandHandlerModule = new BuildingCommandHandlerModule(
                 container.Resolve<Func<IBuildings>>(),
@@ -147,6 +149,7 @@ namespace BuildingRegistry.Api.CrabImport.CrabImport
                 case FixGrar1359 command:
                     var commandFixGrar1359 = new CommandMessage<FixGrar1359>(command.CreateCommandId(), command, metadata);
                     await _buildingCommandHandlerModule.FixGrar1359(commandFixGrar1359, cancellationToken);
+                    AddProvenancePipe.AddProvenance(() => _concurrentUnitOfWork, commandFixGrar1359, _fixGrar1359ProvenanceFactory, currentPosition);
                     message = commandFixGrar1359;
                     break;
 
