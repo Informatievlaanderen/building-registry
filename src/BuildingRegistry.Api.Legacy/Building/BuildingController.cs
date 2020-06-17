@@ -121,6 +121,49 @@ namespace BuildingRegistry.Api.Legacy.Building
         }
 
         /// <summary>
+        /// Vraag de referenties van een gebouw op.
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="persistentLocalId"></param>
+        /// <param name="cancellationToken"></param>
+        /// <response code="200">De referenties van het gebouw.</response>
+        /// <response code="404">Als het gebouw niet gevonden kan worden.</response>
+        /// <response code="410">Als het gebouw verwijderd werd.</response>
+        /// <response code="500">Als er een interne fout is opgetreden.</response>
+        [HttpGet("{persistentLocalId}/referenties")]
+        [ProducesResponseType(typeof(BuildingReferencesResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status410Gone)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
+        [SwaggerResponseExample(StatusCodes.Status200OK, typeof(BuildingReferencesResponseExamples), jsonConverter: typeof(StringEnumConverter))]
+        [SwaggerResponseExample(StatusCodes.Status404NotFound, typeof(BuildingNotFoundResponseExamples), jsonConverter: typeof(StringEnumConverter))]
+        [SwaggerResponseExample(StatusCodes.Status410Gone, typeof(BuildingGoneResponseExamples), jsonConverter: typeof(StringEnumConverter))]
+        [SwaggerResponseExample(StatusCodes.Status500InternalServerError, typeof(InternalServerErrorResponseExamples), jsonConverter: typeof(StringEnumConverter))]
+        public async Task<IActionResult> GetReferences(
+            [FromServices] LegacyContext context,
+            [FromRoute] int persistentLocalId,
+            CancellationToken cancellationToken = default)
+        {
+            var building = await context
+                .BuildingDetails
+                .AsNoTracking()
+                .SingleOrDefaultAsync(item => item.PersistentLocalId == persistentLocalId, cancellationToken);
+
+            if (building != null && building.IsRemoved)
+                throw new ApiException("Gebouw werd verwijderd.", StatusCodes.Status410Gone);
+
+            if (building == null || !building.IsComplete)
+                throw new ApiException("Onbestaand gebouw.", StatusCodes.Status404NotFound);
+
+            var crabReferences = await context.BuildingPersistentIdCrabIdMappings.FindAsync(new object[] { building.BuildingId }, cancellationToken);
+
+            return Ok(new BuildingReferencesResponse(
+                new CrabReferences(
+                    crabReferences.CrabTerrainObjectId.Value,
+                    crabReferences.CrabIdentifierTerrainObject)));
+        }
+
+        /// <summary>
         /// Vraag een lijst met actieve gebouwn op.
         /// </summary>
         /// <param name="context"></param>
