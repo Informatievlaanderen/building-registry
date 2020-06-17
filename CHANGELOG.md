@@ -1,3 +1,10 @@
+## [2.14.5](https://github.com/informatievlaanderen/building-registry/compare/v2.14.4...v2.14.5) (2020-06-17)
+
+
+### Bug Fixes
+
+* add retry logic for WMS projections GRAR-1284 ([f519c05](https://github.com/informatievlaanderen/building-registry/commit/f519c0574de0da33191d7105c5c9bdddd624cd74))
+
 ## [2.14.4](https://github.com/informatievlaanderen/building-registry/compare/v2.14.3...v2.14.4) (2020-06-11)
 
 
