@@ -1,3 +1,11 @@
+# [2.15.0](https://github.com/informatievlaanderen/building-registry/compare/v2.14.5...v2.15.0) (2020-06-17)
+
+
+### Features
+
+* add crab mapping api endpoint ([c5d767b](https://github.com/informatievlaanderen/building-registry/commit/c5d767b03b0cb2096a6bd28bd0fa411fc7530f65))
+* add crabgebouwen endpoint to map crab/grb to grar GRAR-1369 ([706c465](https://github.com/informatievlaanderen/building-registry/commit/706c4658bb99786370e4c2e2b145c5e0ca0ccec6))
+
 ## [2.14.5](https://github.com/informatievlaanderen/building-registry/compare/v2.14.4...v2.14.5) (2020-06-17)
 
 
