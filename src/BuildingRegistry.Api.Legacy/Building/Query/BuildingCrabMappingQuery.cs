@@ -25,17 +25,15 @@ namespace BuildingRegistry.Api.Legacy.Building.Query
         {
             var buildings = _context
                 .BuildingPersistentIdCrabIdMappings
+                .Where(x => x.PersistentLocalId.HasValue && x.CrabTerrainObjectId.HasValue)
                 .OrderBy(x => x.PersistentLocalId)
                 .AsNoTracking();
 
-            if (filtering.Filter.PersistentLocalId.HasValue)
-                buildings = buildings.Where(x => x.PersistentLocalId == filtering.Filter.PersistentLocalId);
+            if (filtering.Filter.TerrainObjectId.HasValue)
+                buildings = buildings.Where(x => x.CrabTerrainObjectId == filtering.Filter.TerrainObjectId);
 
-            if (filtering.Filter.CrabTerrainObjectId.HasValue)
-                buildings = buildings.Where(x => x.CrabTerrainObjectId == filtering.Filter.CrabTerrainObjectId);
-
-            if (!string.IsNullOrEmpty(filtering.Filter.CrabIdentifierTerrainObject))
-                buildings = buildings.Where(x => x.CrabIdentifierTerrainObject == filtering.Filter.CrabIdentifierTerrainObject);
+            if (!string.IsNullOrEmpty(filtering.Filter.IdentifierTerrainObject))
+                buildings = buildings.Where(x => x.CrabIdentifierTerrainObject == filtering.Filter.IdentifierTerrainObject);
 
             return buildings;
         }
@@ -53,8 +51,7 @@ namespace BuildingRegistry.Api.Legacy.Building.Query
 
     public class BuildingCrabMappingFilter
     {
-        public int? PersistentLocalId { get; set; }
-        public int? CrabTerrainObjectId { get; set; }
-        public string? CrabIdentifierTerrainObject { get; set; }
+        public int? TerrainObjectId { get; set; }
+        public string? IdentifierTerrainObject { get; set; }
     }
 }
