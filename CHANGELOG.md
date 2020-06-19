@@ -1,3 +1,13 @@
+## [2.16.2](https://github.com/informatievlaanderen/building-registry/compare/v2.16.1...v2.16.2) (2020-06-19)
+
+
+### Bug Fixes
+
+* add identificator to references response ([c227584](https://github.com/informatievlaanderen/building-registry/commit/c227584e60f6a48f4bada076b7894008208455a2))
+* correct generating command id for grar-1359 ([dbfdadc](https://github.com/informatievlaanderen/building-registry/commit/dbfdadca0d12def3c0b7fae5f5f0bf69de370f89))
+* move to 3.1.5 ([e33362b](https://github.com/informatievlaanderen/building-registry/commit/e33362b9954480e748f3501bbee4c32b4c9b000e))
+* move to 3.1.5 ([1b37983](https://github.com/informatievlaanderen/building-registry/commit/1b3798336d2d7ce9ae238930cacb69bb8106cc43))
+
 ## [2.16.1](https://github.com/informatievlaanderen/building-registry/compare/v2.16.0...v2.16.1) (2020-06-17)
 
 
