@@ -142,6 +142,7 @@ namespace BuildingRegistry.Api.Legacy.Building
         public async Task<IActionResult> GetReferences(
             [FromServices] LegacyContext context,
             [FromRoute] int persistentLocalId,
+            [FromServices] IOptions<ResponseOptions> responseOptions,
             CancellationToken cancellationToken = default)
         {
             var building = await context
@@ -158,6 +159,9 @@ namespace BuildingRegistry.Api.Legacy.Building
             var crabReferences = await context.BuildingPersistentIdCrabIdMappings.FindAsync(new object[] { building.BuildingId }, cancellationToken);
 
             return Ok(new BuildingReferencesResponse(
+                building.PersistentLocalId.Value,
+                responseOptions.Value.GebouwNaamruimte,
+                building.Version.ToBelgianDateTimeOffset(),
                 new CrabReferences(
                     crabReferences.CrabTerrainObjectId.Value,
                     crabReferences.CrabIdentifierTerrainObject)));
