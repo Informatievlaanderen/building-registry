@@ -2,6 +2,7 @@ namespace BuildingRegistry.Building.Commands.Crab
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using Be.Vlaanderen.Basisregisters.Crab;
     using Be.Vlaanderen.Basisregisters.Generators.Guid;
     using Be.Vlaanderen.Basisregisters.Utilities;
@@ -28,7 +29,7 @@ namespace BuildingRegistry.Building.Commands.Crab
         private IEnumerable<object> IdentityFields()
         {
             yield return TerrainObjectId;
-            yield return SubaddressCommandsFromCrab;
+            yield return SubaddressCommandsFromCrab.Select(x => x.CreateCommandId());
         }
     }
 }
