@@ -122,6 +122,11 @@ namespace BuildingRegistry.Api.Legacy.Building.Responses
 
     public class BuildingNotFoundResponseExamples : IExamplesProvider<ProblemDetails>
     {
+        private readonly IHttpContextAccessor _httpContextAccessor;
+
+        public BuildingNotFoundResponseExamples(IHttpContextAccessor httpContextAccessor)
+            => _httpContextAccessor = httpContextAccessor;
+
         public ProblemDetails GetExamples()
             => new ProblemDetails
             {
@@ -129,12 +134,17 @@ namespace BuildingRegistry.Api.Legacy.Building.Responses
                 HttpStatus = StatusCodes.Status404NotFound,
                 Title = ProblemDetails.DefaultTitle,
                 Detail = "Onbestaand gebouw.",
-                ProblemInstanceUri = new DefaultHttpContext().GetProblemInstanceUri()
+                ProblemInstanceUri = _httpContextAccessor.HttpContext.GetProblemInstanceUri()
             };
     }
 
     public class BuildingGoneResponseExamples : IExamplesProvider<ProblemDetails>
     {
+        private readonly IHttpContextAccessor _httpContextAccessor;
+
+        public BuildingGoneResponseExamples(IHttpContextAccessor httpContextAccessor)
+            => _httpContextAccessor = httpContextAccessor;
+
         public ProblemDetails GetExamples()
             => new ProblemDetails
             {
@@ -142,7 +152,7 @@ namespace BuildingRegistry.Api.Legacy.Building.Responses
                 HttpStatus = StatusCodes.Status410Gone,
                 Title = ProblemDetails.DefaultTitle,
                 Detail = "Gebouw werd verwijderd.",
-                ProblemInstanceUri = new DefaultHttpContext().GetProblemInstanceUri()
+                ProblemInstanceUri = _httpContextAccessor.HttpContext.GetProblemInstanceUri()
             };
     }
 }
