@@ -1,3 +1,10 @@
+## [2.16.4](https://github.com/informatievlaanderen/building-registry/compare/v2.16.3...v2.16.4) (2020-06-22)
+
+
+### Bug Fixes
+
+* correct reactivated housenumbers and added processed archives ([879937c](https://github.com/informatievlaanderen/building-registry/commit/879937c351fbeba733aa88238c635ddb402c4150))
+
 ## [2.16.3](https://github.com/informatievlaanderen/building-registry/compare/v2.16.2...v2.16.3) (2020-06-22)
 
 
