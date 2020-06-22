@@ -149,8 +149,9 @@ namespace BuildingRegistry.Console.ReactivatedHouseNumbers
                 }
 
                 var crabTerrainObjectId = latestCommands.First().TerrainObjectId;
+                var crabTerrainObjectHouseNumberId = latestCommands.First().TerrainObjectHouseNumberId;
                 File.WriteAllText(
-                    Path.Combine(FilesToProcessPath, $"{crabTerrainObjectId:D9}.json"),
+                    Path.Combine(FilesToProcessPath, $"{crabTerrainObjectId:D9}-{crabTerrainObjectHouseNumberId}.json"),
                     JsonConvert.SerializeObject(
                         new RegisterCrabImportRequest
                         {
