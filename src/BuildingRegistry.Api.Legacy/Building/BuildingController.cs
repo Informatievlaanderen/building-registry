@@ -283,7 +283,7 @@ namespace BuildingRegistry.Api.Legacy.Building
             {
                 CrabGebouwen = query
                     .Items
-                    .Select(x => new BuildingCrabMappingItem(x.CrabTerrainObjectId.Value, x.CrabIdentifierTerrainObject, x.PersistentLocalId.Value))
+                    .Select(x => new BuildingCrabMappingItem(x.PersistentLocalId.Value, x.CrabTerrainObjectId.Value, x.CrabIdentifierTerrainObject))
                     .ToList()
             });
         }

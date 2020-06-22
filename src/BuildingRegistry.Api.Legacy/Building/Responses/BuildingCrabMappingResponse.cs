@@ -1,6 +1,7 @@
 namespace BuildingRegistry.Api.Legacy.Building.Responses
 {
     using System.Collections.Generic;
+    using System.Globalization;
     using System.Runtime.Serialization;
     using System.Xml.Serialization;
     using Newtonsoft.Json;
@@ -22,33 +23,49 @@ namespace BuildingRegistry.Api.Legacy.Building.Responses
     public class BuildingCrabMappingItem
     {
         /// <summary>
+        /// De identificator van het gebouw.
+        /// </summary>
+        [DataMember(Name = "Identificator", Order = 1)]
+        [JsonProperty(Required = Required.DisallowNull)]
+        public GebouwCrabIdentificator Identificator { get; set; }
+
+        /// <summary>
         /// De TerreinObjectId gekend in CRAB.
         /// </summary>
-        [DataMember(Name = "TerreinObjectId", Order = 1)]
+        [DataMember(Name = "TerreinObjectId", Order = 2)]
         [JsonProperty(Required = Required.DisallowNull)]
         public int TerrainObjectId { get; set; }
 
         /// <summary>
         /// De IdentificatorTerreinObject gekend in CRAB.
         /// </summary>
-        [DataMember(Name = "IdentificatorTerreinObject", Order = 2)]
+        [DataMember(Name = "IdentificatorTerreinObject", Order = 3)]
         public string IdentifierTerrainObject { get; set; }
 
-        /// <summary>
-        /// Het ObjectId van het gebouw in gebouwenregister.
-        /// </summary>
-        [DataMember(Name = "GebouwObjectId", Order = 3)]
-        [JsonProperty(Required = Required.DisallowNull)]
-        public int PersistentLocalId { get; set; }
-
         public BuildingCrabMappingItem(
+            int persistentLocalId,
             int terrainObjectId,
-            string identifierTerrainObject,
-            int persistentLocalId)
+            string identifierTerrainObject)
         {
+            Identificator = new GebouwCrabIdentificator(persistentLocalId.ToString(CultureInfo.InvariantCulture));
             TerrainObjectId = terrainObjectId;
             IdentifierTerrainObject = identifierTerrainObject;
-            PersistentLocalId = persistentLocalId;
+        }
+    }
+
+    [DataContract(Name = "Identificator", Namespace = "")]
+    public class GebouwCrabIdentificator
+    {
+        /// <summary>
+        /// De objectidentificator (enkel uniek binnen naamruimte).
+        /// </summary>
+        [DataMember(Name = "ObjectId", Order = 3)]
+        [JsonProperty(Required = Required.DisallowNull)]
+        public string ObjectId { get; set; }
+
+        public GebouwCrabIdentificator(string objectId)
+        {
+            ObjectId = objectId;
         }
     }
 
@@ -59,9 +76,9 @@ namespace BuildingRegistry.Api.Legacy.Building.Responses
             {
                 CrabGebouwen = new List<BuildingCrabMappingItem>
                 {
-                    new BuildingCrabMappingItem(6, "4897515", 15267),
-                    new BuildingCrabMappingItem(7, string.Empty, 987415),
-                    new BuildingCrabMappingItem(8, "7714587", 4845125),
+                    new BuildingCrabMappingItem(15267, 6, "4897515"),
+                    new BuildingCrabMappingItem(987415, 7, string.Empty),
+                    new BuildingCrabMappingItem(4845125, 8, "7714587"),
                 },
             };
     }
