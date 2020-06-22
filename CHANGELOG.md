@@ -1,3 +1,10 @@
+## [2.16.3](https://github.com/informatievlaanderen/building-registry/compare/v2.16.2...v2.16.3) (2020-06-22)
+
+
+### Bug Fixes
+
+* add identificator to crab endpoint response ([f9604bf](https://github.com/informatievlaanderen/building-registry/commit/f9604bff0b811a42ac181b4be291ab39ff2a4b4d))
+
 ## [2.16.2](https://github.com/informatievlaanderen/building-registry/compare/v2.16.1...v2.16.2) (2020-06-19)
 
 
