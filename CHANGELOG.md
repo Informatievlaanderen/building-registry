@@ -1,3 +1,10 @@
+## [2.16.7](https://github.com/informatievlaanderen/building-registry/compare/v2.16.6...v2.16.7) (2020-06-23)
+
+
+### Bug Fixes
+
+* correct response crabgebouwen GRAR-1381 ([d6fa913](https://github.com/informatievlaanderen/building-registry/commit/d6fa913983abe4e7d9fc208c66be550de0e71719))
+
 ## [2.16.6](https://github.com/informatievlaanderen/building-registry/compare/v2.16.5...v2.16.6) (2020-06-23)
 
 
