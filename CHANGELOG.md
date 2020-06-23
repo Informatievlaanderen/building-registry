@@ -1,3 +1,10 @@
+## [2.16.6](https://github.com/informatievlaanderen/building-registry/compare/v2.16.5...v2.16.6) (2020-06-23)
+
+
+### Bug Fixes
+
+* configure baseurls for all problemdetails GRAR-1357 ([c138fda](https://github.com/informatievlaanderen/building-registry/commit/c138fdaabc13c8235b806a55e5fccd1f591f349e))
+
 ## [2.16.5](https://github.com/informatievlaanderen/building-registry/compare/v2.16.4...v2.16.5) (2020-06-22)
 
 
