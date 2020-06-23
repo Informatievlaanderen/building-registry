@@ -23,33 +23,49 @@ namespace BuildingRegistry.Api.Legacy.Building.Responses
     public class BuildingCrabMappingItem
     {
         /// <summary>
-        /// De identificator van het gebouw.
-        /// </summary>
-        [DataMember(Name = "Identificator", Order = 1)]
-        [JsonProperty(Required = Required.DisallowNull)]
-        public GebouwCrabIdentificator Identificator { get; set; }
-
-        /// <summary>
         /// De TerreinObjectId gekend in CRAB.
         /// </summary>
-        [DataMember(Name = "TerreinObjectId", Order = 2)]
+        [DataMember(Name = "TerreinObjectId", Order = 1)]
         [JsonProperty(Required = Required.DisallowNull)]
         public int TerrainObjectId { get; set; }
 
         /// <summary>
         /// De IdentificatorTerreinObject gekend in CRAB.
         /// </summary>
-        [DataMember(Name = "IdentificatorTerreinObject", Order = 3)]
+        [DataMember(Name = "IdentificatorTerreinObject", Order = 2)]
         public string IdentifierTerrainObject { get; set; }
+
+        /// <summary>
+        /// Het gebouw in het gebouwenregister.
+        /// </summary>
+        [DataMember(Name = "Gebouw", Order = 3)]
+        [JsonProperty(Required = Required.DisallowNull)]
+        public CrabGrarGebouw Building { get; set; }
+
 
         public BuildingCrabMappingItem(
             int persistentLocalId,
             int terrainObjectId,
             string identifierTerrainObject)
         {
-            Identificator = new GebouwCrabIdentificator(persistentLocalId.ToString(CultureInfo.InvariantCulture));
+            Building = new CrabGrarGebouw(persistentLocalId);
             TerrainObjectId = terrainObjectId;
             IdentifierTerrainObject = identifierTerrainObject;
+        }
+    }
+
+    [DataContract(Name = "Gebouw", Namespace = "")]
+    public class CrabGrarGebouw
+    {
+        /// <summary>
+        /// De identificator van het gebouw.
+        /// </summary>
+        [DataMember(Name = "Identificator")]
+        public GebouwCrabIdentificator Identifier { get; set; }
+
+        public CrabGrarGebouw(int persistentLocalId)
+        {
+            Identifier = new GebouwCrabIdentificator(persistentLocalId.ToString(CultureInfo.InvariantCulture));
         }
     }
 
