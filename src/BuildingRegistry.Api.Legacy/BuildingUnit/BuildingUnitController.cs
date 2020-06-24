@@ -83,7 +83,9 @@ namespace BuildingRegistry.Api.Legacy.BuildingUnit
                         MapBuildingUnitStatus(x.Status.Value),
                         x.Version.ToBelgianDateTimeOffset()))
                     .ToList(),
-                Volgende = pagedBuildingUnits.PaginationInfo.BuildNextUri(responseOptions.Value.GebouweenheidVolgendeUrl)
+                Volgende = pagedBuildingUnits
+                    .PaginationInfo
+                    .BuildNextUri(responseOptions.Value.GebouweenheidVolgendeUrl)
             };
 
             return Ok(listResponse);
