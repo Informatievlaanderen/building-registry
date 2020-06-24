@@ -156,15 +156,17 @@ namespace BuildingRegistry.Api.Legacy.Building
             if (building == null || !building.IsComplete)
                 throw new ApiException("Onbestaand gebouw.", StatusCodes.Status404NotFound);
 
-            var crabReferences = await context.BuildingPersistentIdCrabIdMappings.FindAsync(new object[] { building.BuildingId }, cancellationToken);
+            var crabMappings = await context.BuildingPersistentIdCrabIdMappings.FindAsync(new object[] { building.BuildingId }, cancellationToken);
+            var crabReferences =
+                crabMappings.CrabTerrainObjectId.HasValue && !string.IsNullOrEmpty(crabMappings.CrabIdentifierTerrainObject)
+                ? new CrabReferences(crabMappings.CrabTerrainObjectId.Value, crabMappings.CrabIdentifierTerrainObject)
+                : null;
 
             return Ok(new BuildingReferencesResponse(
                 building.PersistentLocalId.Value,
                 responseOptions.Value.GebouwNaamruimte,
                 building.Version.ToBelgianDateTimeOffset(),
-                new CrabReferences(
-                    crabReferences.CrabTerrainObjectId.Value,
-                    crabReferences.CrabIdentifierTerrainObject)));
+                crabReferences));
         }
 
         /// <summary>

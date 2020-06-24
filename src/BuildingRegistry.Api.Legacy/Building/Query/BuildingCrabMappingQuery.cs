@@ -25,7 +25,7 @@ namespace BuildingRegistry.Api.Legacy.Building.Query
         {
             var buildings = _context
                 .BuildingPersistentIdCrabIdMappings
-                .Where(x => x.PersistentLocalId.HasValue && x.CrabTerrainObjectId.HasValue)
+                .Where(x => x.PersistentLocalId.HasValue && x.CrabTerrainObjectId.HasValue && x.CrabIdentifierTerrainObject != null)
                 .OrderBy(x => x.PersistentLocalId)
                 .AsNoTracking();
 
