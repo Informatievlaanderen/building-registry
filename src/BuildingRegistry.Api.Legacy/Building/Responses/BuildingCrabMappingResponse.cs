@@ -30,7 +30,7 @@ namespace BuildingRegistry.Api.Legacy.Building.Responses
         public int TerrainObjectId { get; set; }
 
         /// <summary>
-        /// De IdentificatorTerreinObject gekend in CRAB. <br/>
+        /// De CRAB IdentificatorTerreinObject.<br/>
         /// (= OIDN van de corresponderende GRB-gebouwgeometrie) <br/>
         /// (= enige identificator waarmee in Lara op gebouw kan gezocht worden)
         /// </summary>
