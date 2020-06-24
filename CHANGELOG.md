@@ -1,3 +1,10 @@
+## [2.16.9](https://github.com/informatievlaanderen/building-registry/compare/v2.16.8...v2.16.9) (2020-06-24)
+
+
+### Bug Fixes
+
+* force build ([cc7e1de](https://github.com/informatievlaanderen/building-registry/commit/cc7e1de2eaa3415376d7b66243d64227ae657c03))
+
 ## [2.16.8](https://github.com/informatievlaanderen/building-registry/compare/v2.16.7...v2.16.8) (2020-06-24)
 
 
