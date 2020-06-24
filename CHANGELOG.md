@@ -1,3 +1,10 @@
+## [2.16.8](https://github.com/informatievlaanderen/building-registry/compare/v2.16.7...v2.16.8) (2020-06-24)
+
+
+### Bug Fixes
+
+* add extra comments to docs + nullability for oidn GRAR-1383 ([daec2d5](https://github.com/informatievlaanderen/building-registry/commit/daec2d536ccfa4d59a2d5c9f3246e540947d6a2f))
+
 ## [2.16.7](https://github.com/informatievlaanderen/building-registry/compare/v2.16.6...v2.16.7) (2020-06-23)
 
 
