@@ -47,8 +47,11 @@ namespace BuildingRegistry.Api.Legacy.Building.Responses
 
         /// <summary>
         /// De CRAB IdentificatorTerreinObject.
+        /// (= OIDN van de corresponderende GRB-gebouwgeometrie)
+        /// (= enige identificator waarmee in Lara op gebouw kan gezocht worden)
         /// </summary>
         [DataMember(Name = "IdentificatorTerreinObject", Order = 2)]
+        [JsonProperty(Required = Required.DisallowNull)]
         public string IdentifierTerrainObject { get; set; }
 
         public CrabReferences(
