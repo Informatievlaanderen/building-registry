@@ -449,7 +449,13 @@ namespace BuildingRegistry.Structurizr
             foreach (var @event in events)
                 eventsView.Add(@event);
 
-            //eventsView.Relationships.RemoveWhere(x => x.Relationship.Tags.Contains(CustomTags.Event));
+            var eventRelationships = eventsView
+                .Relationships
+                .Where(x => x.Relationship.Tags.Contains(CustomTags.Event))
+                .ToArray();
+
+            foreach (var relationship in eventRelationships)
+                eventsView.Relationships.Remove(relationship);
 
             eventsView.PaperSize = PaperSize.A4_Landscape;
 
@@ -495,7 +501,13 @@ namespace BuildingRegistry.Structurizr
             foreach (var command in commands)
                 commandsView.Add(command);
 
-            //commandsView.Relationships.RemoveWhere(x => x.Relationship.Tags.Contains(CustomTags.Event));
+            var eventRelationships = commandsView
+                .Relationships
+                .Where(x => x.Relationship.Tags.Contains(CustomTags.Event))
+                .ToArray();
+
+            foreach (var relationship in eventRelationships)
+                commandsView.Relationships.Remove(relationship);
 
             commandsView.PaperSize = PaperSize.A4_Landscape;
 
