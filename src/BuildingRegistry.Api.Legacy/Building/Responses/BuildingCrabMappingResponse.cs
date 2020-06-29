@@ -11,7 +11,7 @@ namespace BuildingRegistry.Api.Legacy.Building.Responses
     public class BuildingCrabMappingResponse
     {
         /// <summary>
-        /// Collectie van Crab Gebouwen
+        /// Collectie van CRAB-gebouwen
         /// </summary>
         [DataMember(Name = "CrabGebouwen", Order = 1)]
         [XmlArrayItem(ElementName = "CrabGebouw")]
@@ -30,7 +30,7 @@ namespace BuildingRegistry.Api.Legacy.Building.Responses
         public int TerrainObjectId { get; set; }
 
         /// <summary>
-        /// De CRAB IdentificatorTerreinObject.<br/>
+        /// Het CRAB-IdentificatorTerreinObject.<br/>
         /// (= OIDN van de corresponderende GRB-gebouwgeometrie) <br/>
         /// (= enige identificator waarmee in Lara op gebouw kan gezocht worden)
         /// </summary>
