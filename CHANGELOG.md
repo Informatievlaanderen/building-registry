@@ -1,3 +1,10 @@
+## [2.16.10](https://github.com/informatievlaanderen/building-registry/compare/v2.16.9...v2.16.10) (2020-06-29)
+
+
+### Bug Fixes
+
+* add readdressing logic to fix housenr test + fixgrar1359 command id ([59c1bdc](https://github.com/informatievlaanderen/building-registry/commit/59c1bdcd9c46bf5e5b5d3a5786f3407f17c386ed))
+
 ## [2.16.9](https://github.com/informatievlaanderen/building-registry/compare/v2.16.8...v2.16.9) (2020-06-24)
 
 
