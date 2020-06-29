@@ -29,7 +29,7 @@ namespace BuildingRegistry.Building.Commands.Crab
         private IEnumerable<object> IdentityFields()
         {
             yield return TerrainObjectId;
-            yield return SubaddressCommandsFromCrab.Select(x => x.CreateCommandId());
+            yield return string.Join(",", SubaddressCommandsFromCrab.Select(x => x.CreateCommandId()));
         }
     }
 }

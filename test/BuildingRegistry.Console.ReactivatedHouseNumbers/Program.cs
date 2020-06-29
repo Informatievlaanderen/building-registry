@@ -58,20 +58,35 @@ namespace BuildingRegistry.Console.ReactivatedHouseNumbers
                     using (var sqlConnection = new SqlConnection(eventsConnectionString))
                     {
                         var importedTerrainObjectHouseNumbers = GetImportedTerrainObjectHouseNumbers(sqlConnection, streamId, eventsJsonSerializerSettings);
+                        var importedReaddressedHouseNumbers = GetReaddressedHouseNumbersByStream(sqlConnection, streamId, eventsJsonSerializerSettings);
 
                         var nonDeletedTerrainObjectHouseNumbersGroupedById = importedTerrainObjectHouseNumbers
                             .GroupBy(x => x.TerrainObjectHouseNumberId)
-                            .Where(x => x.All(y => y.Modification != CrabModification.Delete));
+                            .Where(x => x.All(y => y.Modification != CrabModification.Delete))
+                            .ToDictionary(x => x.Key, x => x.ToList());
 
                         foreach (var terrainObjectHouseNumberWasImportedFromCrab in nonDeletedTerrainObjectHouseNumbersGroupedById)
                         {
                             var hasEndDate = false;
                             var timestampSinceLastReactivation = Instant.MinValue;
-                            foreach (var terrainObjectHouseNumber in terrainObjectHouseNumberWasImportedFromCrab.OrderBy(x => x.Timestamp))
+                            foreach (var terrainObjectHouseNumber in terrainObjectHouseNumberWasImportedFromCrab.Value.OrderBy(x => x.Timestamp))
                             {
-                                if (hasEndDate && !terrainObjectHouseNumber.EndDateTime.HasValue) //was retired, now not anymore
+                                if ((hasEndDate && !terrainObjectHouseNumber.EndDateTime.HasValue) || HasReaddressedEnded(importedReaddressedHouseNumbers, terrainObjectHouseNumber, nonDeletedTerrainObjectHouseNumbersGroupedById)) //was retired, now not anymore
                                 {
-                                    var subaddresses = GetSubaddressesByStreamAndTerrainObjectHouseNumber(sqlConnection, streamId, terrainObjectHouseNumber, eventsJsonSerializerSettings);
+                                    var subaddresses = GetSubaddressesByStreamAndTerrainObjectHouseNumber(sqlConnection, streamId, terrainObjectHouseNumber.TerrainObjectHouseNumberId, eventsJsonSerializerSettings);
+                                    var readdressedSubaddresses = GetReaddressedSubaddressesByStream(sqlConnection, streamId, terrainObjectHouseNumber, eventsJsonSerializerSettings);
+
+                                    if (readdressedSubaddresses.Any())
+                                    {
+                                        //combine new subaddresses with old (fused)
+                                        subaddresses = subaddresses
+                                            .Union(GetSubaddressesByStreamAndTerrainObjectHouseNumber(
+                                                    sqlConnection,
+                                                    streamId,
+                                                    readdressedSubaddresses.First().OldTerrainObjectHouseNumberId,
+                                                    eventsJsonSerializerSettings))
+                                            .ToList();
+                                    }
 
                                     var deletedSubaddresses = subaddresses
                                         .Where(subaddress => subaddress.Modification == CrabModification.Delete)
@@ -79,16 +94,28 @@ namespace BuildingRegistry.Console.ReactivatedHouseNumbers
                                         .Distinct()
                                         .ToList();
 
+                                    var oldDeletedSubaddresses = new List<int>();
+                                    //if new one is deleted, then old one shouldn't be reactivated either
+                                    foreach (var deletedSubaddress in deletedSubaddresses)
+                                    {
+                                        var subaddressWasReaddressedFromCrab = readdressedSubaddresses.FirstOrDefault(x => x.NewSubaddressId == deletedSubaddress);
+                                        if (subaddressWasReaddressedFromCrab != null)
+                                            oldDeletedSubaddresses.Add(subaddressWasReaddressedFromCrab.OldSubaddressId);
+                                    }
+
+                                    deletedSubaddresses = deletedSubaddresses.Union(oldDeletedSubaddresses).ToList();
+
+                                    var sinceLastReactivation = timestampSinceLastReactivation;
                                     var nonDeletedSubaddresses = subaddresses
                                         .Where(subaddress =>
                                                     subaddress.Timestamp < terrainObjectHouseNumber.Timestamp &&
-                                                    subaddress.Timestamp > timestampSinceLastReactivation)
+                                                    subaddress.Timestamp > sinceLastReactivation)
                                         .Select(subaddress => subaddress.SubaddressId)
                                         .Distinct()
                                         .Except(deletedSubaddresses)
                                         .ToList();
 
-                                    CreateCommandsIfNecessary(nonDeletedSubaddresses, subaddresses, commandsJsonSerializerSettings);
+                                    CreateCommandsIfNecessary(nonDeletedSubaddresses, subaddresses, readdressedSubaddresses, subaddresses, commandsJsonSerializerSettings);
 
                                     hasEndDate = false;
                                     timestampSinceLastReactivation = terrainObjectHouseNumber.Timestamp;
@@ -107,6 +134,17 @@ namespace BuildingRegistry.Console.ReactivatedHouseNumbers
             } while (streamsIds.Any());
 
             ReadFilesAndSendCommands(commandsJsonSerializerSettings, appSettings);
+        }
+
+        private static bool HasReaddressedEnded(
+            List<HouseNumberWasReaddressedFromCrab> importedReaddressedHouseNumbers,
+            TerrainObjectHouseNumberWasImportedFromCrab terrainObjectHouseNumber,
+            Dictionary<int, List<TerrainObjectHouseNumberWasImportedFromCrab>> nonDeletedTerrainObjectHouseNumbersGroupedById)
+        {
+            var readdressedHouseNumber = importedReaddressedHouseNumbers.FirstOrDefault(x => x.NewTerrainObjectHouseNumberId == terrainObjectHouseNumber.TerrainObjectHouseNumberId);
+            return readdressedHouseNumber != null &&
+                                      nonDeletedTerrainObjectHouseNumbersGroupedById.ContainsKey(readdressedHouseNumber.OldTerrainObjectHouseNumberId) &&
+                                      nonDeletedTerrainObjectHouseNumbersGroupedById[readdressedHouseNumber.OldTerrainObjectHouseNumberId].Any(x => x.EndDateTime.HasValue);
         }
 
         private static void ReadFilesAndSendCommands(
@@ -132,6 +170,8 @@ namespace BuildingRegistry.Console.ReactivatedHouseNumbers
         private static void CreateCommandsIfNecessary(
             List<int> nonDeletedSubaddresses,
             List<AddressSubaddressWasImportedFromCrab> subaddresses,
+            List<SubaddressWasReaddressedFromCrab> readdressedSubaddresses,
+            List<AddressSubaddressWasImportedFromCrab> allSubaddresses,
             JsonSerializerSettings commandsJsonSerializerSettings)
         {
             if (nonDeletedSubaddresses.Count > 2)
@@ -145,13 +185,33 @@ namespace BuildingRegistry.Console.ReactivatedHouseNumbers
                             .OrderBy(x => x.Timestamp)
                             .Last();
 
-                    latestCommands.Add(CreateCommandFromImportedCommand(lastImportedCommand));
+                    var readdressedSubaddress = readdressedSubaddresses.FirstOrDefault(x => x.OldSubaddressId == nonDeletedSubaddressId);
+                    if (readdressedSubaddress != null)
+                    {
+                        lastImportedCommand = allSubaddresses
+                            .Where(x => x.SubaddressId == readdressedSubaddress.NewSubaddressId)
+                            .OrderBy(x => x.Timestamp)
+                            .Last();
+                    }
+
+                    if (latestCommands.All(x => x.SubaddressId != lastImportedCommand.SubaddressId))
+                        latestCommands.Add(CreateCommandFromImportedCommand(lastImportedCommand));
                 }
 
                 var crabTerrainObjectId = latestCommands.First().TerrainObjectId;
                 var crabTerrainObjectHouseNumberId = latestCommands.First().TerrainObjectHouseNumberId;
+
+                var path = Path.Combine(FilesToProcessPath, $"{crabTerrainObjectId:D9}-{crabTerrainObjectHouseNumberId}.json");
+                int fileNr = 2;
+
+                while (File.Exists(path))
+                {
+                    path = Path.Combine(FilesToProcessPath, $"{crabTerrainObjectId:D9}-{crabTerrainObjectHouseNumberId}-{fileNr}.json");
+                    fileNr++;
+                }
+
                 File.WriteAllText(
-                    Path.Combine(FilesToProcessPath, $"{crabTerrainObjectId:D9}-{crabTerrainObjectHouseNumberId}.json"),
+                    Path.Combine(path),
                     JsonConvert.SerializeObject(
                         new RegisterCrabImportRequest
                         {
@@ -217,13 +277,37 @@ namespace BuildingRegistry.Console.ReactivatedHouseNumbers
             }
         }
 
-        private static List<AddressSubaddressWasImportedFromCrab> GetSubaddressesByStreamAndTerrainObjectHouseNumber(SqlConnection sqlConnection, int streamId, TerrainObjectHouseNumberWasImportedFromCrab terrainObjectHouseNumber, JsonSerializerSettings eventsJsonSerializerSettings)
+        private static List<AddressSubaddressWasImportedFromCrab> GetSubaddressesByStreamAndTerrainObjectHouseNumber(SqlConnection sqlConnection, int streamId, int terrainObjectHouseNumberId, JsonSerializerSettings eventsJsonSerializerSettings)
         {
             return sqlConnection.Query<string>(
                     @"SELECT JsonData FROM [building-registry-events].BuildingRegistry.Messages
                                         WHERE StreamIdInternal = @streamId AND [type] = 'AddressSubaddressWasImportedFromCrab' AND JSON_VALUE(JsonData, '$.terrainObjectHouseNumberId') = @terrainObjectHouseNumberId
-                                        ORDER BY Position", new { streamId, terrainObjectHouseNumberId = terrainObjectHouseNumber.TerrainObjectHouseNumberId }, commandTimeout: 120)
+                                        ORDER BY Position", new { streamId, terrainObjectHouseNumberId = terrainObjectHouseNumberId }, commandTimeout: 120)
                 .Select(x => JsonConvert.DeserializeObject<AddressSubaddressWasImportedFromCrab>(x, eventsJsonSerializerSettings))
+                .ToList();
+        }
+
+        private static List<HouseNumberWasReaddressedFromCrab> GetReaddressedHouseNumbersByStream(SqlConnection sqlConnection, int streamId, JsonSerializerSettings eventsJsonSerializerSettings)
+        {
+            return sqlConnection.Query<string>(
+                    @"SELECT JsonData FROM [building-registry-events].BuildingRegistry.Messages
+                            WHERE StreamIdInternal = @streamId AND [type] = 'HouseNumberWasReaddressedFromCrab'
+                            ORDER BY Position", new { streamId }, commandTimeout: 120)
+                .Select(x => JsonConvert.DeserializeObject<HouseNumberWasReaddressedFromCrab>(x, eventsJsonSerializerSettings))
+                .ToList();
+        }
+
+        private static List<SubaddressWasReaddressedFromCrab> GetReaddressedSubaddressesByStream(
+            SqlConnection sqlConnection,
+            int streamId,
+            TerrainObjectHouseNumberWasImportedFromCrab terrainObjectHouseNumber,
+            JsonSerializerSettings eventsJsonSerializerSettings)
+        {
+            return sqlConnection.Query<string>(
+                    @"SELECT JsonData FROM [building-registry-events].BuildingRegistry.Messages
+                                        WHERE StreamIdInternal = @streamId AND [type] = 'SubaddressWasReaddressedFromCrab' AND JSON_VALUE(JsonData, '$.newTerrainObjectHouseNumberId') = @terrainObjectHouseNumberId
+                                        ORDER BY Position", new { streamId, terrainObjectHouseNumberId = terrainObjectHouseNumber.TerrainObjectHouseNumberId }, commandTimeout: 120)
+                .Select(x => JsonConvert.DeserializeObject<SubaddressWasReaddressedFromCrab>(x, eventsJsonSerializerSettings))
                 .ToList();
         }
 
