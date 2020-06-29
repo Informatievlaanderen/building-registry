@@ -1,3 +1,10 @@
+## [2.16.11](https://github.com/informatievlaanderen/building-registry/compare/v2.16.10...v2.16.11) (2020-06-29)
+
+
+### Bug Fixes
+
+* make CRAB naming consistent GRAR-1386 ([5f6165c](https://github.com/informatievlaanderen/building-registry/commit/5f6165cd8b96fd4cf496f8a39a0e38304cf15b1c))
+
 ## [2.16.10](https://github.com/informatievlaanderen/building-registry/compare/v2.16.9...v2.16.10) (2020-06-29)
 
 
