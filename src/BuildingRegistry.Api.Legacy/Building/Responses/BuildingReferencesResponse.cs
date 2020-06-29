@@ -39,14 +39,14 @@ namespace BuildingRegistry.Api.Legacy.Building.Responses
     public class CrabReferences
     {
         /// <summary>
-        /// Het CRAB TerreinObjectId.
+        /// De CRAB-TerreinObjectId.
         /// </summary>
         [DataMember(Name = "TerreinObjectId", Order = 1)]
         [JsonProperty(Required = Required.DisallowNull)]
         public int TerrainObjectId { get; set; }
 
         /// <summary>
-        /// De CRAB IdentificatorTerreinObject. <br/>
+        /// Het CRAB-IdentificatorTerreinObject. <br/>
         /// (= OIDN van de corresponderende GRB-gebouwgeometrie) <br/>
         /// (= enige identificator waarmee in Lara op gebouw kan gezocht worden)
         /// </summary>
