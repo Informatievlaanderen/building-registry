@@ -38,9 +38,6 @@ namespace BuildingRegistry.Api.Legacy.Building.Responses
         [JsonProperty(Required = Required.DisallowNull)]
         public string IdentifierTerrainObject { get; set; }
 
-        /// <summary>
-        /// Het gebouw in het gebouwenregister.
-        /// </summary>
         [DataMember(Name = "Gebouw", Order = 3)]
         [JsonProperty(Required = Required.DisallowNull)]
         public CrabGrarGebouw Building { get; set; }
@@ -57,12 +54,10 @@ namespace BuildingRegistry.Api.Legacy.Building.Responses
         }
     }
 
+    /// <summary>Het gebouw in het gebouwenregister.</summary>
     [DataContract(Name = "Gebouw", Namespace = "")]
     public class CrabGrarGebouw
     {
-        /// <summary>
-        /// De identificator van het gebouw.
-        /// </summary>
         [DataMember(Name = "Identificator")]
         public GebouwCrabIdentificator Identifier { get; set; }
 
@@ -72,6 +67,7 @@ namespace BuildingRegistry.Api.Legacy.Building.Responses
         }
     }
 
+    /// <summary>De identificator van het gebouw.</summary>
     [DataContract(Name = "Identificator", Namespace = "")]
     public class GebouwCrabIdentificator
     {
