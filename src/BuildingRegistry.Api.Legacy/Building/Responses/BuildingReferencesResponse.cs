@@ -11,16 +11,10 @@ namespace BuildingRegistry.Api.Legacy.Building.Responses
     [DataContract(Name = "GebouwReferenties", Namespace = "")]
     public class BuildingReferencesResponse
     {
-        /// <summary>
-        /// De identificator van het gebouw.
-        /// </summary>
         [DataMember(Name = "Identificator", Order = 1)]
         [JsonProperty(Required = Required.DisallowNull)]
         public GebouwIdentificator Identificator { get; set; }
 
-        /// <summary>
-        /// De referenties van CRAB.
-        /// </summary>
         [DataMember(Name = "Crab", Order = 2)]
         public CrabReferences Crab { get; set; }
 
@@ -35,6 +29,7 @@ namespace BuildingRegistry.Api.Legacy.Building.Responses
         }
     }
 
+    /// <summary> De referenties van CRAB.</summary>
     [DataContract(Name = "CrabReferenties", Namespace = "")]
     public class CrabReferences
     {
