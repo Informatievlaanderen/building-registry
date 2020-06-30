@@ -1,3 +1,11 @@
+## [2.16.12](https://github.com/informatievlaanderen/building-registry/compare/v2.16.11...v2.16.12) (2020-06-30)
+
+
+### Bug Fixes
+
+* correct response object descriptions GRAR-1386 ([aac8338](https://github.com/informatievlaanderen/building-registry/commit/aac8338d113b5c69905899f4664001b8355edb64))
+* correct response object descriptions GRAR-1387 ([6753850](https://github.com/informatievlaanderen/building-registry/commit/6753850b50ef4230cab6ea2c7c2b79b52898be38))
+
 ## [2.16.11](https://github.com/informatievlaanderen/building-registry/compare/v2.16.10...v2.16.11) (2020-06-29)
 
 
