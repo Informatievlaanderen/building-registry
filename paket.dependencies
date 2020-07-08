@@ -9,6 +9,7 @@ nuget AspNetCore.HealthChecks.SqlServer 3.1.1
 nuget Dapper 2.0.35
 nuget AsyncEnumerator 4.0.2
 
+nuget Microsoft.EntityFrameworkCore.SqlServer.NetTopologySuite 3.1.5
 nuget NetTopologySuite 2.0.0
 
 nuget Microsoft.EntityFrameworkCore.Design 3.1.5

@@ -26,9 +26,10 @@
 
   <ItemGroup>
     <ProjectReference Include="..\BuildingRegistry.Projections.Wms\BuildingRegistry.Projections.Wms.csproj" />
+    <ProjectReference Include="..\BuildingRegistry.Projections.Wfs\BuildingRegistry.Projections.Wfs.csproj" />
     <ProjectReference Include="..\BuildingRegistry.Projections.Extract\BuildingRegistry.Projections.Extract.csproj" />
     <ProjectReference Include="..\BuildingRegistry.Projections.Legacy\BuildingRegistry.Projections.Legacy.csproj" />
-	  <ProjectReference Include="..\BuildingRegistry.Projections.Syndication\BuildingRegistry.Projections.Syndication.csproj" />
+    <ProjectReference Include="..\BuildingRegistry.Projections.Syndication\BuildingRegistry.Projections.Syndication.csproj" />
   </ItemGroup>
 
   <Import Project="..\..\.paket\Paket.Restore.targets" />

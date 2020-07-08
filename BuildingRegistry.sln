@@ -58,6 +58,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BuildingRegistry.Console.So
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BuildingRegistry.Console.ReactivatedHouseNumbers", "test\BuildingRegistry.Console.ReactivatedHouseNumbers\BuildingRegistry.Console.ReactivatedHouseNumbers.csproj", "{3261BC73-1D48-4015-B151-0C49F481F297}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BuildingRegistry.Projections.Wfs", "src\BuildingRegistry.Projections.Wfs\BuildingRegistry.Projections.Wfs.csproj", "{4BF486E4-AB14-4009-8DD0-53A2C2D633EF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -124,6 +126,10 @@ Global
 		{3261BC73-1D48-4015-B151-0C49F481F297}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3261BC73-1D48-4015-B151-0C49F481F297}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3261BC73-1D48-4015-B151-0C49F481F297}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4BF486E4-AB14-4009-8DD0-53A2C2D633EF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4BF486E4-AB14-4009-8DD0-53A2C2D633EF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4BF486E4-AB14-4009-8DD0-53A2C2D633EF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4BF486E4-AB14-4009-8DD0-53A2C2D633EF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -144,6 +150,7 @@ Global
 		{CD463440-3836-4370-A7ED-D600FAB81B49} = {24B47154-C5F0-4356-B059-49A1E72C38A6}
 		{759EEAF5-7677-4D86-8216-639E03B97C35} = {1A034126-30E6-416B-BB2E-F5786E07B178}
 		{3261BC73-1D48-4015-B151-0C49F481F297} = {1A034126-30E6-416B-BB2E-F5786E07B178}
+		{4BF486E4-AB14-4009-8DD0-53A2C2D633EF} = {24B47154-C5F0-4356-B059-49A1E72C38A6}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {65FA30D5-DDFC-40EC-9BC9-3BF93D1B430F}

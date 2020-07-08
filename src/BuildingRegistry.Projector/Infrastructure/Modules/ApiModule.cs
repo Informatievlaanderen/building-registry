@@ -22,6 +22,7 @@ namespace BuildingRegistry.Projector.Infrastructure.Modules
     using BuildingRegistry.Projections.Legacy.BuildingSyndication;
     using BuildingRegistry.Projections.Legacy.BuildingUnitDetail;
     using BuildingRegistry.Projections.Legacy.PersistentLocalIdMigration;
+    using BuildingRegistry.Projections.Wfs;
     using BuildingRegistry.Projections.Wms;
     using Microsoft.Data.SqlClient;
     using Microsoft.Extensions.Configuration;
@@ -72,6 +73,7 @@ namespace BuildingRegistry.Projector.Infrastructure.Modules
             RegisterLastChangedProjections(builder);
             RegisterLegacyProjections(builder);
             RegisterWmsProjections(builder);
+            RegisterWfsProjections(builder);
         }
 
         private void RegisterExtractProjections(ContainerBuilder builder)
@@ -183,6 +185,29 @@ namespace BuildingRegistry.Projector.Infrastructure.Modules
                 .RegisterProjections<BuildingRegistry.Projections.Wms.BuildingUnit.BuildingUnitProjections, WmsContext>(() =>
                     new BuildingRegistry.Projections.Wms.BuildingUnit.BuildingUnitProjections(WKBReaderFactory.Create()),
                     wmsRetryPolicy);
+        }
+
+        private void RegisterWfsProjections(ContainerBuilder builder)
+        {
+            builder
+                .RegisterModule(
+                    new WfsModule(
+                        _configuration,
+                        _services,
+                        _loggerFactory));
+
+            var wfsRetryPolicy = RetryPolicy.ConfigureLinearBackoff<SqlException>(_configuration, "Wfs");
+            builder
+                .RegisterProjectionMigrator<WfsContextMigrationFactory>(
+                    _configuration,
+                    _loggerFactory)
+
+                .RegisterProjections<BuildingRegistry.Projections.Wfs.Building.BuildingProjections, WfsContext>(() =>
+                        new BuildingRegistry.Projections.Wfs.Building.BuildingProjections(WKBReaderFactory.Create()),
+                    wfsRetryPolicy)
+                .RegisterProjections<BuildingRegistry.Projections.Wfs.BuildingUnit.BuildingUnitProjections, WfsContext>(() =>
+                        new BuildingRegistry.Projections.Wfs.BuildingUnit.BuildingUnitProjections(WKBReaderFactory.Create()),
+                    wfsRetryPolicy);
         }
     }
 }

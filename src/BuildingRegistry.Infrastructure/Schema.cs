@@ -12,6 +12,7 @@ namespace BuildingRegistry.Infrastructure
         public const string CrabOdb = "odb";
         public const string CrabCdb = "cdb";
         public const string Wms = "wms";
+        public const string Wfs = "wfs";
 
         public const string Sequence = "BuildingRegistrySequence";
     }
@@ -20,6 +21,7 @@ namespace BuildingRegistry.Infrastructure
     {
         public const string Legacy = "__EFMigrationsHistoryLegacy";
         public const string Wms = "__EFMigrationsHistoryWmsBuilding";
+        public const string Wfs = "__EFMigrationsHistoryWfsBuilding";
         public const string Extract = "__EFMigrationsHistoryExtract";
         public const string Syndication = "__EFMigrationsHistorySyndication";
         public const string Sequence = "__EFMigrationsHistorySequence";
