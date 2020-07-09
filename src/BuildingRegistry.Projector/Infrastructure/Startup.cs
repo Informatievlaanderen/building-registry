@@ -22,6 +22,7 @@ namespace BuildingRegistry.Projector.Infrastructure
     using System.Linq;
     using System.Reflection;
     using Be.Vlaanderen.Basisregisters.Projector;
+    using BuildingRegistry.Projections.Wfs;
     using Microsoft.OpenApi.Models;
 
     /// <summary>Represents the startup process for the application.</summary>
@@ -112,6 +113,10 @@ namespace BuildingRegistry.Projector.Infrastructure
 
                             health.AddDbContextCheck<WmsContext>(
                                 $"dbcontext-{nameof(WmsContext).ToLowerInvariant()}",
+                                tags: new[] {DatabaseTag, "sql", "sqlserver"});
+
+                            health.AddDbContextCheck<WfsContext>(
+                                $"dbcontext-{nameof(WfsContext).ToLowerInvariant()}",
                                 tags: new[] {DatabaseTag, "sql", "sqlserver"});
                         }
                     }
