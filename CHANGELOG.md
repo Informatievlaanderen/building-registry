@@ -1,3 +1,10 @@
+# [2.17.0](https://github.com/informatievlaanderen/building-registry/compare/v2.16.12...v2.17.0) (2020-07-09)
+
+
+### Features
+
+* add WFS building/building unit GRAR-275 ([8482ddb](https://github.com/informatievlaanderen/building-registry/commit/8482ddb4849498a3aaca3f120b878aa418f12e12))
+
 ## [2.16.12](https://github.com/informatievlaanderen/building-registry/compare/v2.16.11...v2.16.12) (2020-06-30)
 
 
