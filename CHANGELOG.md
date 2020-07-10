@@ -1,3 +1,10 @@
+## [2.17.1](https://github.com/informatievlaanderen/building-registry/compare/v2.17.0...v2.17.1) (2020-07-10)
+
+
+### Bug Fixes
+
+* enums were not correctly serialized in syndication event GRAR-1490 ([ddf54e8](https://github.com/informatievlaanderen/building-registry/commit/ddf54e8ecb8eeb63ecd1780837bb163f2d9d14d7))
+
 # [2.17.0](https://github.com/informatievlaanderen/building-registry/compare/v2.16.12...v2.17.0) (2020-07-09)
 
 
