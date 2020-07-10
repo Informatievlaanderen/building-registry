@@ -19,7 +19,6 @@ namespace BuildingRegistry.Api.Legacy.Building.Responses
     using System.Collections.Generic;
     using System.Globalization;
     using System.Linq;
-    using System.Net.Mime;
     using System.Runtime.Serialization;
     using System.Threading.Tasks;
     using System.Xml;
@@ -54,22 +53,22 @@ namespace BuildingRegistry.Api.Legacy.Building.Responses
                         new Uri($"{responseOptions.Value.GebouwNaamruimte}/{building.PersistentLocalId}"),
                         AtomLinkTypes.Related));
 
-                item.AddLink(
-                    new SyndicationLink(
-                        new Uri(string.Format(responseOptions.Value.GebouwDetailUrl, building.PersistentLocalId)),
-                        AtomLinkTypes.Self));
+                //item.AddLink(
+                //    new SyndicationLink(
+                //        new Uri(string.Format(responseOptions.Value.GebouwDetailUrl, building.PersistentLocalId)),
+                //        AtomLinkTypes.Self));
 
-                item.AddLink(
-                    new SyndicationLink(
-                            new Uri(string.Format($"{responseOptions.Value.GebouwDetailUrl}.xml", building.PersistentLocalId)),
-                            AtomLinkTypes.Alternate)
-                    { MediaType = MediaTypeNames.Application.Xml });
+                //item.AddLink(
+                //    new SyndicationLink(
+                //            new Uri(string.Format($"{responseOptions.Value.GebouwDetailUrl}.xml", building.PersistentLocalId)),
+                //            AtomLinkTypes.Alternate)
+                //    { MediaType = MediaTypeNames.Application.Xml });
 
-                item.AddLink(
-                    new SyndicationLink(
-                            new Uri(string.Format($"{responseOptions.Value.GebouwDetailUrl}.json", building.PersistentLocalId)),
-                            AtomLinkTypes.Alternate)
-                    { MediaType = MediaTypeNames.Application.Json });
+                //item.AddLink(
+                //    new SyndicationLink(
+                //            new Uri(string.Format($"{responseOptions.Value.GebouwDetailUrl}.json", building.PersistentLocalId)),
+                //            AtomLinkTypes.Alternate)
+                //    { MediaType = MediaTypeNames.Application.Json });
             }
 
             item.AddCategory(
@@ -80,8 +79,8 @@ namespace BuildingRegistry.Api.Legacy.Building.Responses
 
             item.AddContributor(
                 new SyndicationPerson(
-                    "agentschap Informatie Vlaanderen",
-                    "informatie.vlaanderen@vlaanderen.be",
+                    building.Organisation?.ToName(),
+                    string.Empty,
                     AtomContributorTypes.Author));
 
             await writer.Write(new Microsoft.SyndicationFeed.SyndicationContent(formatter.CreateContent(item)));
@@ -363,34 +362,32 @@ namespace BuildingRegistry.Api.Legacy.Building.Responses
         public object GetExamples() =>
             $@"<?xml version=""1.0"" encoding=""utf-8""?>
 <feed xmlns=""http://www.w3.org/2005/Atom"">
-  <id>https://basisregisters.vlaanderen/syndication/feed/building.atom</id>
-  <title>Basisregisters Vlaanderen - Gebouwregister</title>
-  <subtitle>Basisregisters Vlaanderen stelt u in staat om alles te weten te komen rond: de Belgische gemeenten; de Belgische postcodes; de Vlaamse straatnamen; de Vlaamse adressen; de Vlaamse gebouwen en gebouweenheden; de Vlaamse percelen; de Vlaamse organisaties en organen; de Vlaamse dienstverlening.</subtitle>
-  <generator uri=""https://basisregisters.vlaanderen"" version=""2.0.0.0"">Basisregisters Vlaanderen</generator>
-  <rights>Copyright (c) 2017-2018, Informatie Vlaanderen</rights>
+  <id>https://api.basisregisters.vlaanderen.be/v1/feeds/gebouwen.atom</id>
+  <title>Basisregisters Vlaanderen - feed 'gebouwen'</title>
+  <subtitle>Deze Atom feed geeft leestoegang tot events op de resource 'gebouwen'.</subtitle>
+  <generator>Basisregisters Vlaanderen</generator>
+  <rights>Gratis hergebruik volgens https://overheid.vlaanderen.be/sites/default/files/documenten/ict-egov/licenties/hergebruik/modellicentie_gratis_hergebruik_v1_0.html</rights>
   <updated>2018-10-05T14:06:53Z</updated>
   <author>
     <name>agentschap Informatie Vlaanderen</name>
     <email>informatie.vlaanderen@vlaanderen.be</email>
   </author>
-  <link href=""https://basisregisters.vlaanderen/syndication/feed/building.atom"" rel=""self"" />
-  <link href=""https://legacy.staging-basisregisters.vlaanderen/"" rel=""related"" />
-  <link href=""https://legacy.staging-basisregisters.vlaanderen/v1/feeds/gebouwen.atom?offset=100&limit=100"" rel=""next""/>
+  <link href=""https://api.basisregisters.vlaanderen.be/v1/feeds/gebouwen"" rel=""self""/>
+  <link href=""https://api.basisregisters.vlaanderen.be/v1/feeds/gebouwen.atom"" rel=""alternate"" type=""application/atom+xml""/>
+  <link href=""https://api.basisregisters.vlaanderen.be/v1/feeds/gebouwen.xml"" rel=""alternate"" type=""application/xml""/>
+  <link href=""https://docs.basisregisters.vlaanderen.be/"" rel=""related""/>
+  <link href=""https://api.basisregisters.vlaanderen.be/v1/feeds/gebouwen?from=100&limit=100"" rel=""next""/>
   <entry>
     <id>4</id>
     <title>BuildingWasRegistered-4</title>
     <updated>2018-10-04T13:12:17Z</updated>
     <published>2018-10-04T13:12:17Z</published>
     <link href=""{_responseOptions.GebouwNaamruimte}/13023"" rel=""related"" />
-    <link href=""https://basisregisters.vlaanderen.be/api/v1/gebouwen/13023"" rel=""self"" />
-    <link href=""https://basisregisters.vlaanderen.be/api/v1/gebouwen/13023.xml"" rel=""alternate"" type=""application/xml"" />
-    <link href=""https://basisregisters.vlaanderen.be/api/v1/gebouwen/13023.json"" rel=""alternate"" type=""application/json"" />
     <author>
       <name>agentschap Informatie Vlaanderen</name>
-      <email>informatie.vlaanderen@vlaanderen.be</email>
     </author>
-    <category term=""https://data.vlaanderen.be/ns/gebouw"" />
-    <category term=""https://data.vlaanderen.be/ns/gebouweenheid"" />
+    <category term=""gebouwen"" />
+    <category term=""gebouweenheden"" />
     <content><![CDATA[{ContentExample.ToXml()}]]></content>
   </entry>
 </feed>";
