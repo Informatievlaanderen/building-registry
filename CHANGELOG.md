@@ -1,3 +1,10 @@
+## [2.17.2](https://github.com/informatievlaanderen/building-registry/compare/v2.17.1...v2.17.2) (2020-07-10)
+
+
+### Bug Fixes
+
+* correct author, links entry atom feed + example GRAR-1443 GRAR-1447 ([b37ebf2](https://github.com/informatievlaanderen/building-registry/commit/b37ebf2dcb39f2402280933a14ecb29a7b3f969e))
+
 ## [2.17.1](https://github.com/informatievlaanderen/building-registry/compare/v2.17.0...v2.17.1) (2020-07-10)
 
 
