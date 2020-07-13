@@ -1,3 +1,11 @@
+## [2.17.3](https://github.com/informatievlaanderen/building-registry/compare/v2.17.2...v2.17.3) (2020-07-13)
+
+
+### Bug Fixes
+
+* update dependencies ([bc4cdc7](https://github.com/informatievlaanderen/building-registry/commit/bc4cdc70c80bbe8a2dacbb803959c1d5467ad1a6))
+* use typed embed value GRAR-1465 ([4bedb3c](https://github.com/informatievlaanderen/building-registry/commit/4bedb3cd50086d3783781f94708d3d6cb468aa9b))
+
 ## [2.17.2](https://github.com/informatievlaanderen/building-registry/compare/v2.17.1...v2.17.2) (2020-07-10)
 
 
