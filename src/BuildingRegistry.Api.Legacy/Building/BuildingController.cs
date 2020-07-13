@@ -425,8 +425,7 @@ namespace BuildingRegistry.Api.Legacy.Building
 
             var pagedBuildings = new BuildingSyndicationQuery(
                 context,
-                filtering.Filter?.ContainEvent ?? false,
-                filtering.Filter?.ContainObject ?? false)
+                filtering.Filter?.Embed)
                 .Fetch(filtering, sorting, pagination);
 
             Response.AddPagedQueryResultHeaders(pagedBuildings);

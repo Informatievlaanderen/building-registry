@@ -18,11 +18,11 @@ namespace BuildingRegistry.Api.Legacy.Building.Query
         private readonly bool _embedEvent;
         private readonly bool _embedObject;
 
-        public BuildingSyndicationQuery(LegacyContext context, bool embedEvent, bool embedObject)
+        public BuildingSyndicationQuery(LegacyContext context, EmbedValue embed)
         {
             _context = context;
-            _embedEvent = embedEvent;
-            _embedObject = embedObject;
+            _embedEvent = embed?.Event ?? false;
+            _embedObject = embed?.Object ?? false;
         }
 
         protected override ISorting Sorting => new BuildingSyndicationSorting();
@@ -126,12 +126,6 @@ namespace BuildingRegistry.Api.Legacy.Building.Query
     public class BuildingSyndicationFilter
     {
         public long? Position { get; set; }
-        public string Embed { get; set; }
-
-        public bool ContainEvent =>
-            Embed.Contains("event", StringComparison.OrdinalIgnoreCase);
-
-        public bool ContainObject =>
-            Embed.Contains("object", StringComparison.OrdinalIgnoreCase);
+        public EmbedValue Embed { get; set; }
     }
 }
