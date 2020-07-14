@@ -221,7 +221,7 @@ namespace BuildingRegistry.Api.Legacy.Building.Responses
             IsComplete = isComplete;
             BuildingUnits = buildingUnits;
 
-            Provenance = new Provenance(organisation, new Reason(reason));
+            Provenance = new Provenance(version, organisation, new Reason(reason));
         }
     }
 
