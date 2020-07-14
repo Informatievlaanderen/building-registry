@@ -1,3 +1,10 @@
+# [2.18.0](https://github.com/informatievlaanderen/building-registry/compare/v2.17.3...v2.18.0) (2020-07-14)
+
+
+### Features
+
+* add timestamp to sync provenance GRAR-1451 ([90be3ec](https://github.com/informatievlaanderen/building-registry/commit/90be3ecff7804471120272b6c613e92aaac00149))
+
 ## [2.17.3](https://github.com/informatievlaanderen/building-registry/compare/v2.17.2...v2.17.3) (2020-07-13)
 
 
