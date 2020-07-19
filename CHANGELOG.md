@@ -1,3 +1,10 @@
+## [2.18.1](https://github.com/informatievlaanderen/building-registry/compare/v2.18.0...v2.18.1) (2020-07-19)
+
+
+### Bug Fixes
+
+* move to 3.1.6 ([c25f3b0](https://github.com/informatievlaanderen/building-registry/commit/c25f3b023fee0ac3fb83f498864aeba7cad94676))
+
 # [2.18.0](https://github.com/informatievlaanderen/building-registry/compare/v2.17.3...v2.18.0) (2020-07-14)
 
 
