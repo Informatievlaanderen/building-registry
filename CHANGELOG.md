@@ -1,3 +1,10 @@
+## [2.18.2](https://github.com/informatievlaanderen/building-registry/compare/v2.18.1...v2.18.2) (2020-09-02)
+
+
+### Bug Fixes
+
+* upgrade common to fix sync author ([acac5de](https://github.com/informatievlaanderen/building-registry/commit/acac5de4c1b00836d2a81ca62c9435eb3704828e))
+
 ## [2.18.1](https://github.com/informatievlaanderen/building-registry/compare/v2.18.0...v2.18.1) (2020-07-19)
 
 
