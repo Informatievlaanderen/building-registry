@@ -1,3 +1,10 @@
+## [2.18.3](https://github.com/informatievlaanderen/building-registry/compare/v2.18.2...v2.18.3) (2020-09-03)
+
+
+### Bug Fixes
+
+* sync null organisation defaults to Unknown ([9bc1714](https://github.com/informatievlaanderen/building-registry/commit/9bc1714c672026fbf7805702366ebf3cef7508e3))
+
 ## [2.18.2](https://github.com/informatievlaanderen/building-registry/compare/v2.18.1...v2.18.2) (2020-09-02)
 
 
