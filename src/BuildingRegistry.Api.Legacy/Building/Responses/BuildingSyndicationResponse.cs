@@ -79,7 +79,7 @@ namespace BuildingRegistry.Api.Legacy.Building.Responses
 
             item.AddContributor(
                 new SyndicationPerson(
-                    building.Organisation?.ToName(),
+                    building.Organisation == null ? Organisation.Unknown.ToName() : building.Organisation.Value.ToName(),
                     string.Empty,
                     AtomContributorTypes.Author));
 
