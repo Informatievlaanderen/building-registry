@@ -1,3 +1,10 @@
+## [2.18.4](https://github.com/informatievlaanderen/building-registry/compare/v2.18.3...v2.18.4) (2020-09-04)
+
+
+### Bug Fixes
+
+* buildingunit position event was not projected to sync GRAR-1543 ([397ab10](https://github.com/informatievlaanderen/building-registry/commit/397ab10b1587ca25c40353e2f7a5223fff6d8dd3))
+
 ## [2.18.3](https://github.com/informatievlaanderen/building-registry/compare/v2.18.2...v2.18.3) (2020-09-03)
 
 
