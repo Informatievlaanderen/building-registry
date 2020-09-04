@@ -563,6 +563,23 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
                     ct);
             });
 
+            When<Envelope<BuildingUnitPositionWasAppointedByAdministrator>>(async (context, message, ct) =>
+            {
+                await context.CreateNewBuildingSyndicationItem(
+                    message.Message.BuildingId,
+                    message,
+                    x =>
+                    {
+                        var unit = x.BuildingUnits.Single(y => y.BuildingUnitId == message.Message.BuildingUnitId);
+
+                        unit.PositionMethod = BuildingUnitPositionGeometryMethod.AppointedByAdministrator;
+                        unit.PointPosition = message.Message.Position.ToByteArray();
+
+                        ApplyUnitVersion(unit, message.Message.Provenance.Timestamp);
+                    },
+                    ct);
+            });
+
             When<Envelope<BuildingUnitStatusWasRemoved>>(async (context, message, ct) =>
             {
                 await context.CreateNewBuildingSyndicationItem(
