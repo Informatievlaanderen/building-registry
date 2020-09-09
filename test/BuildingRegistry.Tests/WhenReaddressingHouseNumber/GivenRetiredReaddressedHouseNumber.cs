@@ -161,7 +161,7 @@ namespace BuildingRegistry.Tests.WhenReaddressingHouseNumber
             Assert(AddReaddressedTerrainObjectHouseNumberWithNewHouseNumberId());
         }
 
-        [Fact]
+        [Fact] //TODO: *FLICKERING TEST* sometimes it crashes, check id's
         public void RetireNewHouseNumberTest()
         {
             Assert(RetireWithNewHouseNumberId());
