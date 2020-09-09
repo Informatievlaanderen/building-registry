@@ -13,6 +13,14 @@ namespace BuildingRegistry
                 .SingleInstance();
 
             containerBuilder
+                .RegisterType<FixGrar1359ProvenanceFactory>()
+                .SingleInstance();
+
+            containerBuilder
+                .RegisterType<PersistentLocalIdentifierProvenanceFactory>()
+                .SingleInstance();
+
+            containerBuilder
                 .RegisterType<BuildingCommandHandlerModule>()
                 .Named<CommandHandlerModule>(typeof(BuildingCommandHandlerModule).FullName)
                 .As<CommandHandlerModule>();

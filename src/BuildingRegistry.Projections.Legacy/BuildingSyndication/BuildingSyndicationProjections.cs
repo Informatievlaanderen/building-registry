@@ -95,11 +95,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
                 await context.CreateNewBuildingSyndicationItem(
                     message.Message.BuildingId,
                     message,
-                    x =>
-                    {
-                        x.LastChangedOn = message.Message.AssignmentDate;
-                        x.PersistentLocalId = message.Message.PersistentLocalId;
-                    },
+                    x => x.PersistentLocalId = message.Message.PersistentLocalId,
                     ct);
             });
 
@@ -502,8 +498,6 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
                     message,
                     x =>
                     {
-                        x.LastChangedOn = message.Message.AssignmentDate;
-
                         var unit = x.BuildingUnits.SingleOrDefault(y => y.BuildingUnitId == message.Message.BuildingUnitId);
 
                         if (unit != null)
@@ -782,7 +776,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
                 await context.CreateNewBuildingSyndicationItem(
                     message.Message.BuildingId,
                     message,
-                    x => x.LastChangedOn = message.Message.DuplicateAssignmentDate,
+                    x => { },
                     ct);
             });
 
@@ -791,7 +785,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
                 await context.CreateNewBuildingSyndicationItem(
                     message.Message.BuildingId,
                     message,
-                    x => x.LastChangedOn = message.Message.AssignmentDate,
+                    x => { },
                     ct);
             });
 

@@ -9,12 +9,13 @@ namespace BuildingRegistry.Building.Events
 
     [EventName("BuildingUnitPersistentLocalIdentifierWasRemoved")]
     [EventDescription("De persistente lokale id van de gebouweenheid werd verwijderd.")]
-    public class BuildingUnitPersistentLocalIdWasRemoved
+    public class BuildingUnitPersistentLocalIdWasRemoved : IHasProvenance, ISetProvenance
     {
         public Guid BuildingId { get; set; }
         public string PersistentLocalId { get; set; }
         public Instant AssignmentDate { get; set; }
         public string Reason { get; set; }
+        public ProvenanceData Provenance { get; set; }
 
         public BuildingUnitPersistentLocalIdWasRemoved(
             BuildingId buildingId,
@@ -33,11 +34,15 @@ namespace BuildingRegistry.Building.Events
             Guid buildingId,
             int persistentLocalId,
             Instant assignmentDate,
-            string reason)
+            string reason,
+            ProvenanceData provenance)
             : this(
                 new BuildingId(buildingId),
                 new PersistentLocalId(persistentLocalId),
                 new PersistentLocalIdAssignmentDate(assignmentDate),
-                new Reason(reason)) { }
+                new Reason(reason))
+            => ((ISetProvenance) this).SetProvenance(provenance.ToProvenance());
+
+        public void SetProvenance(Provenance provenance) => Provenance = new ProvenanceData(provenance);
     }
 }
