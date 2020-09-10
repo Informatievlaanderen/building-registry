@@ -1,3 +1,10 @@
+## [2.18.5](https://github.com/informatievlaanderen/building-registry/compare/v2.18.4...v2.18.5) (2020-09-10)
+
+
+### Bug Fixes
+
+* add provenance when assigning localpersistentids GRAR-1532 ([55e714f](https://github.com/informatievlaanderen/building-registry/commit/55e714f3e2666201ff782fd6b2b50bace21c8ab3))
+
 ## [2.18.4](https://github.com/informatievlaanderen/building-registry/compare/v2.18.3...v2.18.4) (2020-09-04)
 
 
