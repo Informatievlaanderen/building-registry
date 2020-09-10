@@ -423,6 +423,16 @@ namespace BuildingRegistry.Api.Legacy.Building
             var sorting = Request.ExtractSortingRequest();
             var pagination = Request.ExtractPaginationRequest();
 
+            var lastFeedUpdate = await context
+                .BuildingSyndication
+                .AsNoTracking()
+                .OrderByDescending(item => item.Position)
+                .Select(item => item.SyndicationItemCreatedAt)
+                .FirstOrDefaultAsync(cancellationToken);
+
+            if (lastFeedUpdate == default)
+                lastFeedUpdate = new DateTimeOffset(2020, 1, 1, 0, 0, 0, TimeSpan.Zero);
+
             var pagedBuildings = new BuildingSyndicationQuery(
                 context,
                 filtering.Filter?.Embed)
@@ -430,15 +440,17 @@ namespace BuildingRegistry.Api.Legacy.Building
 
             Response.AddPagedQueryResultHeaders(pagedBuildings);
 
+
             return new ContentResult
             {
-                Content = await BuildAtomFeed(pagedBuildings, responseOptions, configuration),
+                Content = await BuildAtomFeed(lastFeedUpdate, pagedBuildings, responseOptions, configuration),
                 ContentType = MediaTypeNames.Text.Xml,
                 StatusCode = StatusCodes.Status200OK
             };
         }
 
         private static async Task<string> BuildAtomFeed(
+            DateTimeOffset lastUpdate,
             PagedQueryable<BuildingSyndicationQueryResult> pagedBuildings,
             IOptions<ResponseOptions> responseOptions,
             IConfiguration configuration)
@@ -450,13 +462,9 @@ namespace BuildingRegistry.Api.Legacy.Building
                 var formatter = new AtomFormatter(null, xmlWriter.Settings) { UseCDATA = true };
                 var writer = new AtomFeedWriter(xmlWriter, null, formatter);
                 var syndicationConfiguration = configuration.GetSection("Syndication");
+                var atomConfiguration = AtomFeedConfigurationBuilder.CreateFrom(syndicationConfiguration, lastUpdate);
 
-                await writer.WriteDefaultMetadata(
-                    syndicationConfiguration["Id"],
-                    syndicationConfiguration["Title"],
-                    Assembly.GetEntryAssembly().GetName().Version.ToString(),
-                    new Uri(syndicationConfiguration["Self"]),
-                    syndicationConfiguration.GetSection("Related").GetChildren().Select(c => c.Value).ToArray());
+                await writer.WriteDefaultMetadata(atomConfiguration);
 
                 var nextUri = pagedBuildings.PaginationInfo.BuildNextUri(syndicationConfiguration["NextUri"]);
                 if (nextUri != null)
