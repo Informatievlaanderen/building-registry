@@ -1,3 +1,10 @@
+## [2.18.6](https://github.com/informatievlaanderen/building-registry/compare/v2.18.5...v2.18.6) (2020-09-10)
+
+
+### Bug Fixes
+
+* add sync with correct timestamp configuration GRAR-1483 ([efcf26f](https://github.com/informatievlaanderen/building-registry/commit/efcf26f8e58fe63e580143f4baa126a33e20d9cc))
+
 ## [2.18.5](https://github.com/informatievlaanderen/building-registry/compare/v2.18.4...v2.18.5) (2020-09-10)
 
 
