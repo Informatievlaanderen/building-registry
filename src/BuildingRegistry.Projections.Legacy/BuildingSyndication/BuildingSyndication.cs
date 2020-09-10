@@ -47,6 +47,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
         public Organisation? Organisation { get; set; }
         public string? Reason { get; set; }
         public string? EventDataAsXml { get; set; }
+        public DateTimeOffset SyndicationItemCreatedAt { get; set; }
 
         public virtual Collection<BuildingUnitSyndicationItem> BuildingUnits { get; set; }
 
@@ -61,6 +62,8 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
             Instant lastChangedOn,
             Action<BuildingSyndicationItem> editFunc)
         {
+            var buildingUnits = BuildingUnits.Select(x => x.CloneAndApplyEventInfo(position));
+
             var newItem = new BuildingSyndicationItem
             {
                 ChangeType = changeType,
@@ -79,7 +82,8 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
                 Operator = Operator,
                 Organisation = Organisation,
                 Reason = Reason,
-                BuildingUnits = new Collection<BuildingUnitSyndicationItem>(BuildingUnits.Select(x => x.CloneAndApplyEventInfo(position)).ToList())
+                BuildingUnits = new Collection<BuildingUnitSyndicationItem>(buildingUnits.ToList()),
+                SyndicationItemCreatedAt = DateTimeOffset.Now
             };
 
             editFunc(newItem);
@@ -120,6 +124,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
             b.Property(x => x.Organisation);
             b.Property(x => x.Reason);
             b.Property(x => x.EventDataAsXml);
+            b.Property(x => x.SyndicationItemCreatedAt).IsRequired();
 
             b.HasMany(x => x.BuildingUnits)
                 .WithOne()

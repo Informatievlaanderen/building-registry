@@ -27,6 +27,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
                     RecordCreatedAt = message.Message.Provenance.Timestamp,
                     LastChangedOn = message.Message.Provenance.Timestamp,
                     ChangeType = message.EventName,
+                    SyndicationItemCreatedAt = DateTimeOffset.Now
                 };
 
                 newBuildingSyndicationItem.ApplyProvenance(message.Message.Provenance);
