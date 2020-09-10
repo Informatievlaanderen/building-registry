@@ -440,7 +440,6 @@ namespace BuildingRegistry.Api.Legacy.Building
 
             Response.AddPagedQueryResultHeaders(pagedBuildings);
 
-
             return new ContentResult
             {
                 Content = await BuildAtomFeed(lastFeedUpdate, pagedBuildings, responseOptions, configuration),
