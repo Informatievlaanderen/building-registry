@@ -438,8 +438,6 @@ namespace BuildingRegistry.Api.Legacy.Building
                 filtering.Filter?.Embed)
                 .Fetch(filtering, sorting, pagination);
 
-            Response.AddPagedQueryResultHeaders(pagedBuildings);
-
             return new ContentResult
             {
                 Content = await BuildAtomFeed(lastFeedUpdate, pagedBuildings, responseOptions, configuration),
