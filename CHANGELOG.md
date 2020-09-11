@@ -1,3 +1,10 @@
+## [2.18.7](https://github.com/informatievlaanderen/building-registry/compare/v2.18.6...v2.18.7) (2020-09-11)
+
+
+### Bug Fixes
+
+* remove paging response header in sync ([e1715bc](https://github.com/informatievlaanderen/building-registry/commit/e1715bc566225bfee4e98f8ab34e296bf4e8f347))
+
 ## [2.18.6](https://github.com/informatievlaanderen/building-registry/compare/v2.18.5...v2.18.6) (2020-09-10)
 
 
