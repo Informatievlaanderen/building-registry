@@ -1,3 +1,10 @@
+## [2.18.8](https://github.com/informatievlaanderen/building-registry/compare/v2.18.7...v2.18.8) (2020-09-11)
+
+
+### Bug Fixes
+
+* remove Modification from xml GRAR-1529 ([f6a0702](https://github.com/informatievlaanderen/building-registry/commit/f6a07022f2bd8abaa65f3a80a13dc30c18a4f5b1))
+
 ## [2.18.7](https://github.com/informatievlaanderen/building-registry/compare/v2.18.6...v2.18.7) (2020-09-11)
 
 
