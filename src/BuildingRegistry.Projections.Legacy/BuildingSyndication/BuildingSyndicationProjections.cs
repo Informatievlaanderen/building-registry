@@ -755,8 +755,6 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
                     message,
                     x =>
                     {
-                        x.LastChangedOn = Instant.FromDateTimeUtc(message.Message.BeginDate.AtStartOfDayInZone(DateTimeZone.Utc).ToDateTimeUtc());
-
                         x.BuildingUnits
                             .Single(y => y.BuildingUnitId == message.Message.BuildingUnitId)
                             .Readdresses
