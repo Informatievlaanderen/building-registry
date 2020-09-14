@@ -1,3 +1,10 @@
+## [2.18.9](https://github.com/informatievlaanderen/building-registry/compare/v2.18.8...v2.18.9) (2020-09-14)
+
+
+### Bug Fixes
+
+* add provenance for readdressing commands GRAR-1548 ([c4967a5](https://github.com/informatievlaanderen/building-registry/commit/c4967a5a76508fe87c5f1b946975997fb23280db))
+
 ## [2.18.8](https://github.com/informatievlaanderen/building-registry/compare/v2.18.7...v2.18.8) (2020-09-11)
 
 
