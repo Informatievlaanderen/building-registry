@@ -6,12 +6,12 @@ namespace BuildingRegistry
     using Building.Commands.Crab;
     using NodaTime;
 
-    public class PersistentLocalIdentifierProvenanceFactory : IProvenanceFactory<Building.Building>
+    public class ReaddressingProvenanceFactory : IProvenanceFactory<Building.Building>
     {
         private static readonly List<Type> AllowedTypes = new List<Type>
         {
-            typeof(AssignPersistentLocalIdForCrabTerrainObjectId),
-            typeof(RequestPersistentLocalIdsForCrabTerrainObjectId),
+            typeof(ImportReaddressingHouseNumberFromCrab),
+            typeof(ImportReaddressingSubaddressFromCrab),
         };
 
         private static bool CanCreateFrom(Type? type) => type != null && AllowedTypes.Contains(type);
@@ -25,10 +25,10 @@ namespace BuildingRegistry
                 return new Provenance(
                     SystemClock.Instance.GetCurrentInstant(),
                     Application.BuildingRegistry,
-                    new Reason("Stabiele en unieke objectidentificatie"),
+                    new Reason("Gemeentelijke fusie"),
                     new Operator("BuildingRegistry"),
                     Modification.Update,
-                    Organisation.Aiv);
+                    Organisation.Municipality);
 
             throw new ApplicationException($"Cannot create provenance for {commandType?.Name}");
         }

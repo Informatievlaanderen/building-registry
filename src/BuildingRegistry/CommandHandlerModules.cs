@@ -21,6 +21,10 @@ namespace BuildingRegistry
                 .SingleInstance();
 
             containerBuilder
+                .RegisterType<ReaddressingProvenanceFactory>()
+                .SingleInstance();
+
+            containerBuilder
                 .RegisterType<BuildingCommandHandlerModule>()
                 .Named<CommandHandlerModule>(typeof(BuildingCommandHandlerModule).FullName)
                 .As<CommandHandlerModule>();
