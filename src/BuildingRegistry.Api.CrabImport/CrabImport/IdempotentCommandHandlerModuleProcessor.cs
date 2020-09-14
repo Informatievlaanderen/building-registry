@@ -24,6 +24,7 @@ namespace BuildingRegistry.Api.CrabImport.CrabImport
         private readonly Func<IHasCrabProvenance, Building, Provenance> _provenanceFactory;
         private readonly Func<FixGrar1359, Building, Provenance> _fixGrar1359ProvenanceFactory;
         private readonly Func<object, Building, Provenance> _persistentLocalIdProvenanceFactory;
+        private readonly Func<object, Building, Provenance> _readdressingProvenanceFactory;
 
         public IdempotentCommandHandlerModuleProcessor(
             ILogger<IdempotentCommandHandlerModuleProcessor> logger,
@@ -35,13 +36,15 @@ namespace BuildingRegistry.Api.CrabImport.CrabImport
             IPersistentLocalIdGenerator persistentLocalIdGenerator,
             BuildingProvenanceFactory provenanceFactory,
             FixGrar1359ProvenanceFactory fixGrar1359ProvenanceFactory,
-            PersistentLocalIdentifierProvenanceFactory persistentLocalIdentifierProvenanceFactory)
+            PersistentLocalIdentifierProvenanceFactory persistentLocalIdentifierProvenanceFactory,
+            ReaddressingProvenanceFactory readdressingProvenanceFactory)
         {
             _logger = logger;
             _concurrentUnitOfWork = concurrentUnitOfWork;
             _provenanceFactory = provenanceFactory.CreateFrom;
             _fixGrar1359ProvenanceFactory = fixGrar1359ProvenanceFactory.CreateFrom;
             _persistentLocalIdProvenanceFactory = persistentLocalIdentifierProvenanceFactory.CreateFrom;
+            _readdressingProvenanceFactory = readdressingProvenanceFactory.CreateFrom;
 
             _buildingCommandHandlerModule = new BuildingCommandHandlerModule(
                 container.Resolve<Func<IBuildings>>(),
@@ -52,7 +55,8 @@ namespace BuildingRegistry.Api.CrabImport.CrabImport
                 persistentLocalIdGenerator,
                 provenanceFactory,
                 fixGrar1359ProvenanceFactory,
-                persistentLocalIdentifierProvenanceFactory);
+                persistentLocalIdentifierProvenanceFactory,
+                readdressingProvenanceFactory);
         }
 
         public async Task<CommandMessage> Process(
@@ -145,12 +149,14 @@ namespace BuildingRegistry.Api.CrabImport.CrabImport
                 case ImportReaddressingHouseNumberFromCrab command:
                     var commandReaddressHouseNumber = new CommandMessage<ImportReaddressingHouseNumberFromCrab>(command.CreateCommandId(), command, metadata);
                     await _buildingCommandHandlerModule.ImportReaddressingHouseNumber(commandReaddressHouseNumber, cancellationToken);
+                    AddProvenancePipe.AddProvenance(() => _concurrentUnitOfWork, commandReaddressHouseNumber, _readdressingProvenanceFactory, currentPosition);
                     message = commandReaddressHouseNumber;
                     break;
 
                 case ImportReaddressingSubaddressFromCrab command:
                     var commandReaddressSubaddress = new CommandMessage<ImportReaddressingSubaddressFromCrab>(command.CreateCommandId(), command, metadata);
                     await _buildingCommandHandlerModule.ImportReaddressingSubaddress(commandReaddressSubaddress, cancellationToken);
+                    AddProvenancePipe.AddProvenance(() => _concurrentUnitOfWork, commandReaddressSubaddress, _readdressingProvenanceFactory, currentPosition);
                     message = commandReaddressSubaddress;
                     break;
 

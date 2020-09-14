@@ -26,7 +26,8 @@ namespace BuildingRegistry.Building
             IPersistentLocalIdGenerator persistentLocalIdGenerator,
             BuildingProvenanceFactory provenanceFactory,
             FixGrar1359ProvenanceFactory fixGrar1359ProvenanceFactory,
-            PersistentLocalIdentifierProvenanceFactory persistentLocalIdentifierProvenanceFactory)
+            PersistentLocalIdentifierProvenanceFactory persistentLocalIdentifierProvenanceFactory,
+            ReaddressingProvenanceFactory readdressingProvenanceFactory)
         {
             _getBuildings = getBuildings;
             _persistentLocalIdGenerator = persistentLocalIdGenerator;
@@ -83,10 +84,12 @@ namespace BuildingRegistry.Building
 
             For<ImportReaddressingHouseNumberFromCrab>()
                 .AddSqlStreamStore(getStreamStore, getUnitOfWork, eventMapping, eventSerializer)
+                .AddProvenance(getUnitOfWork, readdressingProvenanceFactory)
                 .Handle(async (message, ct) => { await ImportReaddressingHouseNumber(message, ct); });
 
             For<ImportReaddressingSubaddressFromCrab>()
                 .AddSqlStreamStore(getStreamStore, getUnitOfWork, eventMapping, eventSerializer)
+                .AddProvenance(getUnitOfWork, readdressingProvenanceFactory)
                 .Handle(async (message, ct) => { await ImportReaddressingSubaddress(message, ct); });
 
             For<RequestPersistentLocalIdsForCrabTerrainObjectId>()
