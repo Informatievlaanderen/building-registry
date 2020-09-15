@@ -1,3 +1,11 @@
+## [2.18.10](https://github.com/informatievlaanderen/building-registry/compare/v2.18.9...v2.18.10) (2020-09-15)
+
+
+### Bug Fixes
+
+* correct applying provenance on readdress event GRAR-1548 ([f2e9d15](https://github.com/informatievlaanderen/building-registry/commit/f2e9d1537556a611bccd0c44aa20670b64f120eb))
+* correct syndication projection handling readdressing provenance ([d297ddc](https://github.com/informatievlaanderen/building-registry/commit/d297ddcf355db62ef9f5380d64ad189ec7bc6d0c))
+
 ## [2.18.9](https://github.com/informatievlaanderen/building-registry/compare/v2.18.8...v2.18.9) (2020-09-14)
 
 
