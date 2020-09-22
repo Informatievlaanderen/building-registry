@@ -1,3 +1,16 @@
+# [2.19.0](https://github.com/informatievlaanderen/building-registry/compare/v2.18.10...v2.19.0) (2020-09-22)
+
+
+### Bug Fixes
+
+* add missing configuration items GRAR-1533 ([055209c](https://github.com/informatievlaanderen/building-registry/commit/055209c6a533ebc96ec34b1b3c1783b4efe5354b))
+* move to 3.1.8 ([18a5d36](https://github.com/informatievlaanderen/building-registry/commit/18a5d36e75603f3cdb4ad068f9a0a6961c8bdf65))
+
+
+### Features
+
+* add import status endpoint GRAR-1400 ([8c1b51d](https://github.com/informatievlaanderen/building-registry/commit/8c1b51dda1c6ebea6baa9f59e8c70243ace46c21))
+
 ## [2.18.10](https://github.com/informatievlaanderen/building-registry/compare/v2.18.9...v2.18.10) (2020-09-15)
 
 
