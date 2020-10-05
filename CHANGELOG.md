@@ -1,3 +1,10 @@
+## [2.19.1](https://github.com/informatievlaanderen/building-registry/compare/v2.19.0...v2.19.1) (2020-10-05)
+
+
+### Bug Fixes
+
+* run projection using the feedprojector GRAR-1562 ([7b7a9fa](https://github.com/informatievlaanderen/building-registry/commit/7b7a9fac228aff7c146cc5859b9ac852e771dc59))
+
 # [2.19.0](https://github.com/informatievlaanderen/building-registry/compare/v2.18.10...v2.19.0) (2020-09-22)
 
 
