@@ -96,6 +96,14 @@ namespace BuildingRegistry.Projections.Syndication
         }
 
         protected override void Load(ContainerBuilder builder)
-            => builder.RegisterType<RegistryAtomFeedReader>().As<IRegistryAtomFeedReader>();
+        {
+            builder
+                .RegisterType<RegistryAtomFeedReader>()
+                .As<IRegistryAtomFeedReader>();
+
+            builder
+                .RegisterType<FeedProjector<SyndicationContext>>()
+                .AsSelf();
+        }
     }
 }

@@ -63,10 +63,10 @@ namespace BuildingRegistry.Projections.Syndication
                             container.GetService<ILoggerFactory>(),
                             ct);
 
-                            await Task.WhenAll(StartRunners(configuration, container, ct));
-
-                            Log.Information("Running... Press CTRL + C to exit.");
-                            Closing.WaitOne();
+                            await container
+                                .GetService<FeedProjector<SyndicationContext>>()
+                                .Register(BuildProjectionRunners(configuration, container))
+                                .Start(ct);
                         }
                         catch(Exception e)
                         {
@@ -91,7 +91,7 @@ namespace BuildingRegistry.Projections.Syndication
             Closing.Close();
         }
 
-        private static IEnumerable<Task> StartRunners(IConfiguration configuration, IServiceProvider container, CancellationToken ct)
+        private static IEnumerable<IFeedProjectionRunner<SyndicationContext>> BuildProjectionRunners(IConfiguration configuration, IServiceProvider container)
         {
             var addressRunner = new FeedProjectionRunner<AddressEvent, SyndicationContent<Address.Address>, SyndicationContext>(
                 "address",
@@ -105,9 +105,7 @@ namespace BuildingRegistry.Projections.Syndication
                 container.GetService<IRegistryAtomFeedReader>(),
                 new AddressPersistentLocalIdProjection());
 
-            yield return addressRunner.CatchUpAsync(
-                  container.GetService<Func<Owned<SyndicationContext>>>(),
-                  ct);
+
 
             var parcelRunner = new FeedProjectionRunner<ParcelEvent, SyndicationContent<Parcel.Parcel>, SyndicationContext>(
                 "parcel",
@@ -121,9 +119,11 @@ namespace BuildingRegistry.Projections.Syndication
                 container.GetService<IRegistryAtomFeedReader>(),
                 new BuildingParcelLatestProjection());
 
-            yield return parcelRunner.CatchUpAsync(
-                container.GetService<Func<Owned<SyndicationContext>>>(),
-                ct);
+            return new IFeedProjectionRunner<SyndicationContext>[]
+            {
+                addressRunner,
+                parcelRunner
+            };
         }
 
         private static IServiceProvider ConfigureServices(IConfiguration configuration)
