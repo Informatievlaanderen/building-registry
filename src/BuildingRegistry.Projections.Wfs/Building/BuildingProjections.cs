@@ -8,6 +8,7 @@ namespace BuildingRegistry.Projections.Wfs.Building
     using BuildingRegistry.Building.Events.Crab;
     using Infrastructure;
     using NetTopologySuite.Geometries;
+    using NetTopologySuite.Geometries.Implementation;
     using NetTopologySuite.IO;
     using NodaTime;
 
@@ -211,6 +212,7 @@ namespace BuildingRegistry.Projections.Wfs.Building
         private void SetGeometry(Building building, string extendedWkbGeometry, string method)
         {
             var geometry = _wkbReader.Read(extendedWkbGeometry.ToByteArray()) as Polygon;
+            geometry = GeometryValidator.MakeValid(geometry) as Polygon;
 
             building.GeometryMethod = method;
             building.Geometry = geometry;

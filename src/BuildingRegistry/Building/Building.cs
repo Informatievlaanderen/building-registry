@@ -349,13 +349,7 @@ namespace BuildingRegistry.Building
                 return false;
 
             var geometry = WkbReader.Read(validGeometry);
-            var validOp =
-                new NetTopologySuite.Operation.Valid.IsValidOp(geometry)
-                {
-                    IsSelfTouchingRingFormingHoleValid = true
-                };
-
-            return validOp.IsValid;
+            return GeometryValidator.IsValid(geometry);
         }
 
         private void ApplyGeometryChange(BuildingGeometryMethod? newGeometryMethod, ExtendedWkbGeometry validGeometry)
