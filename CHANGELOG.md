@@ -1,3 +1,15 @@
+# [2.20.0](https://github.com/informatievlaanderen/building-registry/compare/v2.19.1...v2.20.0) (2020-10-07)
+
+
+### Bug Fixes
+
+* add geometry check selftouchingring to WFS and make valid GRAR-1577 ([b34506d](https://github.com/informatievlaanderen/building-registry/commit/b34506dfc60ba315d6962a90550d742e31a903b9))
+
+
+### Features
+
+* add GrbPolygon for projections ([84775f3](https://github.com/informatievlaanderen/building-registry/commit/84775f3fe5ecc84754913c12cd76de5e518aa127))
+
 ## [2.19.1](https://github.com/informatievlaanderen/building-registry/compare/v2.19.0...v2.19.1) (2020-10-05)
 
 
