@@ -1,3 +1,10 @@
+## [2.20.1](https://github.com/informatievlaanderen/building-registry/compare/v2.20.0...v2.20.1) (2020-10-13)
+
+
+### Bug Fixes
+
+* remove offset and add from to next uri GRAR-1422 ([a127395](https://github.com/informatievlaanderen/building-registry/commit/a127395477e8e4aaebe3e8eafb6ecf076178d75d))
+
 # [2.20.0](https://github.com/informatievlaanderen/building-registry/compare/v2.19.1...v2.20.0) (2020-10-07)
 
 
