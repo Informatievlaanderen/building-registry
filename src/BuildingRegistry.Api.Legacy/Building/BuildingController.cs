@@ -463,7 +463,13 @@ namespace BuildingRegistry.Api.Legacy.Building
 
                 await writer.WriteDefaultMetadata(atomConfiguration);
 
-                var nextUri = pagedBuildings.PaginationInfo.BuildNextUri(syndicationConfiguration["NextUri"]);
+                var buildings = pagedBuildings.Items.ToList();
+
+                var nextFrom = buildings.Any()
+                    ? buildings.Max(x => x.Position) + 1
+                    : (long?)null;
+
+                var nextUri = BuildNextSyncUri(pagedBuildings.PaginationInfo.Limit, nextFrom, syndicationConfiguration["NextUri"]);
                 if (nextUri != null)
                     await writer.Write(new SyndicationLink(nextUri, "next"));
 
@@ -479,6 +485,13 @@ namespace BuildingRegistry.Api.Legacy.Building
             }
 
             return sw.ToString();
+        }
+
+        private static Uri BuildNextSyncUri(int limit, long? from, string nextUrlBase)
+        {
+            return from.HasValue
+                ? new Uri(string.Format(nextUrlBase, from, limit))
+                : null;
         }
     }
 }
