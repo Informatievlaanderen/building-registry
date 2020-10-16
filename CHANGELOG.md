@@ -1,3 +1,10 @@
+# [2.21.0](https://github.com/informatievlaanderen/building-registry/compare/v2.20.1...v2.21.0) (2020-10-16)
+
+
+### Features
+
+* add cache status to projector api ([f366e57](https://github.com/informatievlaanderen/building-registry/commit/f366e57f11ad19d0943e79884227508c958cccc1))
+
 ## [2.20.1](https://github.com/informatievlaanderen/building-registry/compare/v2.20.0...v2.20.1) (2020-10-13)
 
 
