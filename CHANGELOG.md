@@ -1,3 +1,10 @@
+# [2.23.0](https://github.com/informatievlaanderen/building-registry/compare/v2.22.0...v2.23.0) (2020-10-27)
+
+
+### Features
+
+* add error message for syndication projections ([0a40aa6](https://github.com/informatievlaanderen/building-registry/commit/0a40aa679c06909577bb4f289585aacba15af720))
+
 # [2.22.0](https://github.com/informatievlaanderen/building-registry/compare/v2.21.0...v2.22.0) (2020-10-27)
 
 
