@@ -1,3 +1,10 @@
+# [2.22.0](https://github.com/informatievlaanderen/building-registry/compare/v2.21.0...v2.22.0) (2020-10-27)
+
+
+### Features
+
+* update projector with gap detection and extended status api ([b3a3e49](https://github.com/informatievlaanderen/building-registry/commit/b3a3e49dc5b96fff02211afc86f2c0505b725eac))
+
 # [2.21.0](https://github.com/informatievlaanderen/building-registry/compare/v2.20.1...v2.21.0) (2020-10-16)
 
 
