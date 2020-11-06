@@ -1,3 +1,14 @@
+## [2.23.1](https://github.com/informatievlaanderen/building-registry/compare/v2.23.0...v2.23.1) (2020-11-06)
+
+
+### Bug Fixes
+
+* logging ([3407eb6](https://github.com/informatievlaanderen/building-registry/commit/3407eb6b1d98de87002782664e707ddb8aeed2cf))
+* logging ([c3dca67](https://github.com/informatievlaanderen/building-registry/commit/c3dca67cafc5e97021ecb232402db0dde6c503e6))
+* logging ([a5a3983](https://github.com/informatievlaanderen/building-registry/commit/a5a398323e5339ec6dc5c2a720ef50073fe09d1b))
+* logging ([fa014ff](https://github.com/informatievlaanderen/building-registry/commit/fa014ffa7d7c3b6e29d8a5e8cc8549c4fd755904))
+* logging ([65fd450](https://github.com/informatievlaanderen/building-registry/commit/65fd450f6f7724a0c5e03a6a404e84bf2a75c9a6))
+
 # [2.23.0](https://github.com/informatievlaanderen/building-registry/compare/v2.22.0...v2.23.0) (2020-10-27)
 
 
