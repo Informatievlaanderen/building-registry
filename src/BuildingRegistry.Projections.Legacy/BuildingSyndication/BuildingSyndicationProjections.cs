@@ -31,7 +31,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
                 };
 
                 newBuildingSyndicationItem.ApplyProvenance(message.Message.Provenance);
-                newBuildingSyndicationItem.SetEventData(message.Message);
+                newBuildingSyndicationItem.SetEventData(message.Message, message.EventName);
 
                 await context
                     .BuildingSyndication
