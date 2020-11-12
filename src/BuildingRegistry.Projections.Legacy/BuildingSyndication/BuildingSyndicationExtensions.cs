@@ -59,7 +59,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
             if (message.Message is IHasProvenance provenanceMessage)
                 newBuildingSyndicationItem.ApplyProvenance(provenanceMessage.Provenance);
 
-            newBuildingSyndicationItem.SetEventData(message.Message);
+            newBuildingSyndicationItem.SetEventData(message.Message, message.EventName);
 
             await context
                 .BuildingSyndication
@@ -96,8 +96,8 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
             item.Reason = provenance.Reason;
         }
 
-        public static void SetEventData<T>(this BuildingSyndicationItem syndicationItem, T message)
-            => syndicationItem.EventDataAsXml = message.ToXml(message.GetType().Name).ToString(SaveOptions.DisableFormatting);
+        public static void SetEventData<T>(this BuildingSyndicationItem syndicationItem, T message, string eventName)
+            => syndicationItem.EventDataAsXml = message.ToXml(eventName).ToString(SaveOptions.DisableFormatting);
 
         private static ProjectionItemNotFoundException<BuildingSyndicationProjections> DatabaseItemNotFound(Guid addressId)
             => new ProjectionItemNotFoundException<BuildingSyndicationProjections>(addressId.ToString("D"));
