@@ -1,3 +1,10 @@
+## [2.23.2](https://github.com/informatievlaanderen/building-registry/compare/v2.23.1...v2.23.2) (2020-11-12)
+
+
+### Bug Fixes
+
+* use event name instead of type for sync xml serialization ([2192499](https://github.com/informatievlaanderen/building-registry/commit/2192499d2287203240069c25aecdc676e6614cb8))
+
 ## [2.23.1](https://github.com/informatievlaanderen/building-registry/compare/v2.23.0...v2.23.1) (2020-11-06)
 
 
