@@ -1,3 +1,12 @@
+## [2.23.3](https://github.com/informatievlaanderen/building-registry/compare/v2.23.2...v2.23.3) (2020-11-13)
+
+
+### Bug Fixes
+
+* display sync response example as correct xml GRAR-1599 ([ddce248](https://github.com/informatievlaanderen/building-registry/commit/ddce2488ddcbfeac87cd88e24528c448b4e42cc3))
+* upgrade basisregisters.api GRAR-1599 ([bd1c94b](https://github.com/informatievlaanderen/building-registry/commit/bd1c94b9c823ff7dee39bb48d496b56e9b8bb458))
+* use production url for sync examples ([104b72a](https://github.com/informatievlaanderen/building-registry/commit/104b72a90e065d11ccc115ae209c80e533719bc8))
+
 ## [2.23.2](https://github.com/informatievlaanderen/building-registry/compare/v2.23.1...v2.23.2) (2020-11-12)
 
 
