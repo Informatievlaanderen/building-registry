@@ -299,97 +299,66 @@ namespace BuildingRegistry.Api.Legacy.Building.Responses
         }
     }
 
-    public class BuildingSyndicationResponseExamples : IExamplesProvider<object>
+    public class BuildingSyndicationResponseExamples : IExamplesProvider<XmlElement>
     {
-        private SyndicationContent ContentExample
-        {
-            get
-            {
-                var buildingId = Guid.NewGuid();
-                var xmlString = $"<BuildingWasRegistered><BuildingId>{buildingId}</BuildingId><Provenance><Timestamp>2019-01-20T13:13:53Z</Timestamp><Modification>Update</Modification><Organisation>Aiv</Organisation><Plan>CentralManagementCrab</Plan></Provenance></BuildingWasRegistered>";
-                var doc = new XmlDocument();
-                doc.LoadXml(xmlString);
-                return new SyndicationContent
-                {
-                    Event = doc.DocumentElement,
-                    Object = new BuildingSyndicationContent(
-                        buildingId,
-                        _responseOptions.GebouwNaamruimte,
-                        13023,
-                        GebouwStatus.Gerealiseerd,
-                        GeometrieMethode.IngemetenGRB,
-                        new GmlPolygon
-                        {
-                            Exterior = new RingProperty
-                            {
-                                LinearRing = new LinearRing
-                                {
-                                    PosList =
-                                        "101673.0 193520.0 101673.0 193585.0 101732.0 193585.0 101673.0 193585.0 101673.0 193520.0"
-                                }
-                            }
-                        },
-                        DateTimeOffset.Now,
-                        true,
-                        Organisation.Agiv,
-                        Reason.CentralManagementCrab,
-                        new List<BuildingUnitSyndicationContent>
-                        {
-                            new BuildingUnitSyndicationContent(
-                                Guid.NewGuid(),
-                                _responseOptions.GebouweenheidNaamruimte,
-                                45871,
-                                GebouweenheidStatus.Gerealiseerd,
-                                PositieGeometrieMethode.AfgeleidVanObject,
-                                new GmlPoint
-                                {
-                                    Pos = "140252.76 198794.27"
-                                },
-                                GebouweenheidFunctie.NietGekend,
-                                new List<Guid> {Guid.NewGuid()},
-                                DateTimeOffset.Now,
-                                true)
-                        })
-                };
-            }
-        }
-
-        private readonly ResponseOptions _responseOptions;
-
-        public BuildingSyndicationResponseExamples(IOptions<ResponseOptions> responseOptionsProvider)
-            => _responseOptions = responseOptionsProvider.Value;
-
-        public object GetExamples() =>
-            $@"<?xml version=""1.0"" encoding=""utf-8""?>
+        private const string RawXml = @"<?xml version=""1.0"" encoding=""utf-8""?>
 <feed xmlns=""http://www.w3.org/2005/Atom"">
-  <id>https://api.basisregisters.vlaanderen.be/v1/feeds/gebouwen.atom</id>
-  <title>Basisregisters Vlaanderen - feed 'gebouwen'</title>
-  <subtitle>Deze Atom feed geeft leestoegang tot events op de resource 'gebouwen'.</subtitle>
-  <generator>Basisregisters Vlaanderen</generator>
-  <rights>Gratis hergebruik volgens https://overheid.vlaanderen.be/sites/default/files/documenten/ict-egov/licenties/hergebruik/modellicentie_gratis_hergebruik_v1_0.html</rights>
-  <updated>2018-10-05T14:06:53Z</updated>
-  <author>
-    <name>agentschap Informatie Vlaanderen</name>
-    <email>informatie.vlaanderen@vlaanderen.be</email>
-  </author>
-  <link href=""https://api.basisregisters.vlaanderen.be/v1/feeds/gebouwen"" rel=""self""/>
-  <link href=""https://api.basisregisters.vlaanderen.be/v1/feeds/gebouwen.atom"" rel=""alternate"" type=""application/atom+xml""/>
-  <link href=""https://api.basisregisters.vlaanderen.be/v1/feeds/gebouwen.xml"" rel=""alternate"" type=""application/xml""/>
-  <link href=""https://docs.basisregisters.vlaanderen.be/"" rel=""related""/>
-  <link href=""https://api.basisregisters.vlaanderen.be/v1/feeds/gebouwen?from=100&limit=100"" rel=""next""/>
-  <entry>
-    <id>4</id>
-    <title>BuildingWasRegistered-4</title>
-    <updated>2018-10-04T13:12:17Z</updated>
-    <published>2018-10-04T13:12:17Z</published>
-    <link href=""{_responseOptions.GebouwNaamruimte}/13023"" rel=""related"" />
+    <id>https://api.basisregisters.dev-vlaanderen.be/v1/feeds/gebouwen.atom</id>
+    <title>Basisregisters Vlaanderen - feed 'gebouwen' en 'gebouweenheden'</title>
+    <subtitle>Deze Atom feed geeft leestoegang tot events op de resources 'gebouwen' en 'gebouweenheden'.</subtitle>
+    <generator uri=""https://basisregisters.dev-vlaanderen.be"" version=""2.2.23.2"">Basisregisters Vlaanderen</generator>
+    <rights>Gratis hergebruik volgens https://overheid.vlaanderen.be/sites/default/files/documenten/ict-egov/licenties/hergebruik/modellicentie_gratis_hergebruik_v1_0.html</rights>
+    <updated>2020-09-18T06:25:34Z</updated>
     <author>
-      <name>agentschap Informatie Vlaanderen</name>
+        <name>agentschap Informatie Vlaanderen</name>
+        <email>informatie.vlaanderen@vlaanderen.be</email>
+    </author>
+    <link href=""https://api.basisregisters.dev-vlaanderen.be/v1/feeds/gebouwen"" rel=""self"" />
+    <link href=""https://api.basisregisters.dev-vlaanderen.be/v1/feeds/gebouwen.atom"" rel=""alternate"" type=""application/atom+xml"" />
+    <link href=""https://api.basisregisters.dev-vlaanderen.be/v1/feeds/gebouwen.xml"" rel=""alternate"" type=""application/xml"" />
+    <link href=""https://docs.basisregisters.dev-vlaanderen.be/"" rel=""related"" />
+    <link href=""https://api.basisregisters.dev-vlaanderen.be/v1/feeds/gebouwen?from=3&amp;limit=100&amp;embed=event,object"" rel=""next"" />
+    <entry>
+        <id>0</id>
+        <title>BuildingWasRegistered-0</title>
+        <updated>2011-05-18T19:59:07+02:00</updated>
+        <published>2011-05-18T19:59:07+02:00</published>
+        <author>
+            <name>Gemeente</name>
+        </author>
+        <category term=""gebouwen"" />
+        <category term=""gebouweenheden"" />
+        <content>
+            <![CDATA[<Content xmlns:i=""http://www.w3.org/2001/XMLSchema-instance""><Event><BuildingWasRegistered><BuildingId>b9a05759-f1aa-5d51-a47d-3adaf62a8b8c</BuildingId><Provenance><Timestamp>2011-05-18T17:59:07Z</Timestamp><Organisation>Municipality</Organisation><Reason>Centrale bijhouding CRAB</Reason></Provenance>
+    </BuildingWasRegistered>
+  </Event><Object><Id>b9a05759-f1aa-5d51-a47d-3adaf62a8b8c</Id><Identificator><Id>https://data.vlaanderen.be/id/gebouw/</Id><Naamruimte>https://data.vlaanderen.be/id/gebouw</Naamruimte><ObjectId /><VersieId>2011-05-18T19:59:07+02:00</VersieId></Identificator><GebouwStatus i:nil=""true"" /><GeometrieMethode i:nil=""true"" /><GeometriePolygoon i:nil=""true"" /><Gebouweenheden /><IsCompleet>false</IsCompleet><Creatie><Tijdstip>2011-05-18T19:59:07+02:00</Tijdstip><Organisatie>Gemeente</Organisatie><Reden>Centrale bijhouding CRAB</Reden></Creatie>
+  </Object></Content>]]>
+</content>
+</entry>
+<entry>
+    <id>2</id>
+    <title>BuildingWasRealized-2</title>
+    <updated>2011-05-19T10:51:09+02:00</updated>
+    <published>2011-05-18T19:59:07+02:00</published>
+    <author>
+        <name>Agentschap voor Geografische Informatie Vlaanderen</name>
     </author>
     <category term=""gebouwen"" />
     <category term=""gebouweenheden"" />
-    <content><![CDATA[{ContentExample.ToXml()}]]></content>
-  </entry>
+    <content>
+        <![CDATA[<Content xmlns:i=""http://www.w3.org/2001/XMLSchema-instance""><Event><BuildingWasRealized><BuildingId>b9a05759-f1aa-5d51-a47d-3adaf62a8b8c</BuildingId><Provenance><Timestamp>2011-05-19T08:51:09Z</Timestamp><Organisation>Agiv</Organisation><Reason>Centrale bijhouding CRAB</Reason></Provenance>
+    </BuildingWasRealized>
+  </Event><Object><Id>b9a05759-f1aa-5d51-a47d-3adaf62a8b8c</Id><Identificator><Id>https://data.vlaanderen.be/id/gebouw/</Id><Naamruimte>https://data.vlaanderen.be/id/gebouw</Naamruimte><ObjectId /><VersieId>2011-05-19T10:51:09+02:00</VersieId></Identificator><GebouwStatus>Gerealiseerd</GebouwStatus><GeometrieMethode i:nil=""true"" /><GeometriePolygoon i:nil=""true"" /><Gebouweenheden /><IsCompleet>false</IsCompleet><Creatie><Tijdstip>2011-05-19T10:51:09+02:00</Tijdstip><Organisatie>Agentschap voor Geografische Informatie Vlaanderen</Organisatie><Reden>Centrale bijhouding CRAB</Reden></Creatie>
+  </Object></Content>]]>
+</content>
+</entry>
 </feed>";
+
+        public XmlElement GetExamples()
+        {
+            var example = new XmlDocument();
+            example.LoadXml(RawXml);
+            return example.DocumentElement;
+        }
     }
 }
