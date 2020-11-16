@@ -1,3 +1,10 @@
+## [2.23.4](https://github.com/informatievlaanderen/building-registry/compare/v2.23.3...v2.23.4) (2020-11-16)
+
+
+### Bug Fixes
+
+* handle ParcelWasRecovered event in syndication ([63e07d0](https://github.com/informatievlaanderen/building-registry/commit/63e07d027cebd1fa5b303cf41fc9858639cb1d66))
+
 ## [2.23.3](https://github.com/informatievlaanderen/building-registry/compare/v2.23.2...v2.23.3) (2020-11-13)
 
 
