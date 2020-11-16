@@ -10,6 +10,7 @@ namespace BuildingRegistry.Projections.Syndication.Parcel
         {
             When(ParcelEvent.ParcelWasRegistered, AddSyndicationItemEntry);
             When(ParcelEvent.ParcelWasRemoved, RemoveSyndicationItemEntry);
+            When(ParcelEvent.ParcelWasRecovered, RemoveSyndicationItemEntry);
             When(ParcelEvent.ParcelWasRealized, AddSyndicationItemEntry);
             When(ParcelEvent.ParcelWasCorrectedToRealized, AddSyndicationItemEntry);
             When(ParcelEvent.ParcelWasRetired, AddSyndicationItemEntry);
@@ -48,6 +49,7 @@ namespace BuildingRegistry.Projections.Syndication.Parcel
                 latestItem.CaPaKey = entry.Content.Object.Identificator?.ObjectId;
                 latestItem.IsComplete = entry.Content.Object.IsComplete;
                 latestItem.Status = entry.Content.Object.Status;
+                latestItem.IsRemoved = false;
             }
         }
 
