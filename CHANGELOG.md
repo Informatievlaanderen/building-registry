@@ -1,3 +1,11 @@
+## [2.23.5](https://github.com/informatievlaanderen/building-registry/compare/v2.23.4...v2.23.5) (2020-11-19)
+
+
+### Bug Fixes
+
+* remove set-env usage in gh-actions ([22ebb66](https://github.com/informatievlaanderen/building-registry/commit/22ebb665e63f54318251b0e5354d501414836a75))
+* update references for event property descriptions ([83cabde](https://github.com/informatievlaanderen/building-registry/commit/83cabdec93f861d82f0b30da101b3d879aba111e))
+
 ## [2.23.4](https://github.com/informatievlaanderen/building-registry/compare/v2.23.3...v2.23.4) (2020-11-16)
 
 
