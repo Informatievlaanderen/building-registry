@@ -85,7 +85,6 @@ namespace BuildingRegistry.Projector.Infrastructure.Modules
                         _services,
                         _loggerFactory));
 
-            var extractRetryPolicy = RetryPolicy.NoRetries;
             builder
                 .RegisterProjectionMigrator<ExtractContextMigrationFactory>(
                     _configuration,
@@ -97,7 +96,7 @@ namespace BuildingRegistry.Projector.Infrastructure.Modules
                             context.Resolve<IOptions<ExtractConfig>>(),
                             DbaseCodePage.Western_European_ANSI.ToEncoding(),
                             WKBReaderFactory.Create()),
-                    extractRetryPolicy)
+                    ConnectedProjectionSettings.Default)
 
                 .RegisterProjections<BuildingUnitExtractProjections, ExtractContext>(
                     context =>
@@ -105,7 +104,7 @@ namespace BuildingRegistry.Projector.Infrastructure.Modules
                             context.Resolve<IOptions<ExtractConfig>>(),
                             DbaseCodePage.Western_European_ANSI.ToEncoding(),
                             WKBReaderFactory.Create()),
-                    extractRetryPolicy);
+                    ConnectedProjectionSettings.Default);
         }
 
         private void RegisterLastChangedProjections(ContainerBuilder builder)
@@ -118,14 +117,13 @@ namespace BuildingRegistry.Projector.Infrastructure.Modules
                         _services,
                         _loggerFactory));
 
-            var lastChangedListRetryPolicy = RetryPolicy.NoRetries;
             builder
                 .RegisterProjectionMigrator<BuildingRegistry.Projections.LastChangedList.LastChangedListContextMigrationFactory>(
                     _configuration,
                     _loggerFactory)
 
-                //.RegisterProjections<BuildingProjections, LastChangedListContext>(lastChangedListRetryPolicy)
-                .RegisterProjections<BuildingUnitProjections, LastChangedListContext>(lastChangedListRetryPolicy);
+                //.RegisterProjections<BuildingProjections, LastChangedListContext>(ConnectedProjectionSettings.Default)
+                .RegisterProjections<BuildingUnitProjections, LastChangedListContext>(ConnectedProjectionSettings.Default);
         }
 
         private void RegisterLegacyProjections(ContainerBuilder builder)
@@ -137,7 +135,6 @@ namespace BuildingRegistry.Projector.Infrastructure.Modules
                         _services,
                         _loggerFactory));
 
-            var legacyRetryPolicy = RetryPolicy.NoRetries;
             builder
                 .RegisterProjectionMigrator<LegacyContextMigrationFactory>(
                     _configuration,
@@ -145,22 +142,22 @@ namespace BuildingRegistry.Projector.Infrastructure.Modules
 
                 .RegisterProjections<BuildingDetailProjections, LegacyContext>(
                     () => new BuildingDetailProjections(),
-                    legacyRetryPolicy)
+                    ConnectedProjectionSettings.Default)
                 .RegisterProjections<BuildingSyndicationProjections, LegacyContext>(
                     () => new BuildingSyndicationProjections(),
-                    legacyRetryPolicy)
+                    ConnectedProjectionSettings.Default)
                 .RegisterProjections<BuildingUnitDetailProjections, LegacyContext>(
                     () => new BuildingUnitDetailProjections(),
-                    legacyRetryPolicy)
+                    ConnectedProjectionSettings.Default)
                 .RegisterProjections<RemovedPersistentLocalIdProjections, LegacyContext>(
                     () => new RemovedPersistentLocalIdProjections(),
-                    legacyRetryPolicy)
+                    ConnectedProjectionSettings.Default)
                 .RegisterProjections<DuplicatedPersistentLocalIdProjections, LegacyContext>(
                     () => new DuplicatedPersistentLocalIdProjections(),
-                    legacyRetryPolicy)
+                    ConnectedProjectionSettings.Default)
                 .RegisterProjections<BuildingPersistenLocalIdCrabIdProjections, LegacyContext>(
                     () => new BuildingPersistenLocalIdCrabIdProjections(),
-                    legacyRetryPolicy);
+                    ConnectedProjectionSettings.Default);
         }
 
         private void RegisterWmsProjections(ContainerBuilder builder)
@@ -172,7 +169,10 @@ namespace BuildingRegistry.Projector.Infrastructure.Modules
                         _services,
                         _loggerFactory));
 
-            var wmsRetryPolicy = RetryPolicy.ConfigureLinearBackoff<SqlException>(_configuration, "Wms");
+            var wmsProjectionSettings = ConnectedProjectionSettings
+                .Configure(settings =>
+                    settings.ConfigureLinearBackoff<SqlException>(_configuration, "Wms"));
+
             builder
                 .RegisterProjectionMigrator<WmsContextMigrationFactory>(
                     _configuration,
@@ -180,11 +180,11 @@ namespace BuildingRegistry.Projector.Infrastructure.Modules
 
                 .RegisterProjections<BuildingRegistry.Projections.Wms.Building.BuildingProjections, WmsContext>(() =>
                     new BuildingRegistry.Projections.Wms.Building.BuildingProjections(WKBReaderFactory.Create()),
-                    wmsRetryPolicy)
+                    wmsProjectionSettings)
 
                 .RegisterProjections<BuildingRegistry.Projections.Wms.BuildingUnit.BuildingUnitProjections, WmsContext>(() =>
                     new BuildingRegistry.Projections.Wms.BuildingUnit.BuildingUnitProjections(WKBReaderFactory.Create()),
-                    wmsRetryPolicy);
+                    wmsProjectionSettings);
         }
 
         private void RegisterWfsProjections(ContainerBuilder builder)
@@ -196,7 +196,10 @@ namespace BuildingRegistry.Projector.Infrastructure.Modules
                         _services,
                         _loggerFactory));
 
-            var wfsRetryPolicy = RetryPolicy.ConfigureLinearBackoff<SqlException>(_configuration, "Wfs");
+            var wfsProjectionSettings = ConnectedProjectionSettings
+                .Configure(settings =>
+                    settings.ConfigureLinearBackoff<SqlException>(_configuration, "Wfs"));
+
             builder
                 .RegisterProjectionMigrator<WfsContextMigrationFactory>(
                     _configuration,
@@ -204,10 +207,10 @@ namespace BuildingRegistry.Projector.Infrastructure.Modules
 
                 .RegisterProjections<BuildingRegistry.Projections.Wfs.Building.BuildingProjections, WfsContext>(() =>
                         new BuildingRegistry.Projections.Wfs.Building.BuildingProjections(WKBReaderFactory.Create()),
-                    wfsRetryPolicy)
+                    wfsProjectionSettings)
                 .RegisterProjections<BuildingRegistry.Projections.Wfs.BuildingUnit.BuildingUnitProjections, WfsContext>(() =>
                         new BuildingRegistry.Projections.Wfs.BuildingUnit.BuildingUnitProjections(WKBReaderFactory.Create()),
-                    wfsRetryPolicy);
+                    wfsProjectionSettings);
         }
     }
 }
