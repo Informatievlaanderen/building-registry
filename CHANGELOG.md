@@ -1,3 +1,10 @@
+## [2.23.6](https://github.com/informatievlaanderen/building-registry/compare/v2.23.5...v2.23.6) (2020-12-03)
+
+
+### Bug Fixes
+
+* remove iscomplete from parcel sync GRAR-1652 ([a659a30](https://github.com/informatievlaanderen/building-registry/commit/a659a30679892988c73e6c6b30a324fa4d2272d1))
+
 ## [2.23.5](https://github.com/informatievlaanderen/building-registry/compare/v2.23.4...v2.23.5) (2020-11-19)
 
 
