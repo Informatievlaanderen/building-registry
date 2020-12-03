@@ -34,7 +34,6 @@ namespace BuildingRegistry.Projections.Syndication.Parcel
                     Version = entry.Content.Object.Identificator?.Versie,
                     Position = long.Parse(entry.FeedEntry.Id),
                     CaPaKey = entry.Content.Object.Identificator?.ObjectId,
-                    IsComplete = entry.Content.Object.IsComplete,
                     Status = entry.Content.Object.Status,
                 };
 
@@ -47,7 +46,6 @@ namespace BuildingRegistry.Projections.Syndication.Parcel
                 latestItem.Version = entry.Content.Object.Identificator?.Versie;
                 latestItem.Position = long.Parse(entry.FeedEntry.Id);
                 latestItem.CaPaKey = entry.Content.Object.Identificator?.ObjectId;
-                latestItem.IsComplete = entry.Content.Object.IsComplete;
                 latestItem.Status = entry.Content.Object.Status;
                 latestItem.IsRemoved = false;
             }
@@ -62,7 +60,6 @@ namespace BuildingRegistry.Projections.Syndication.Parcel
             latestItem.Version = entry.Content.Object.Identificator?.Versie;
             latestItem.Position = long.Parse(entry.FeedEntry.Id);
             latestItem.CaPaKey = entry.Content.Object.Identificator?.ObjectId;
-            latestItem.IsComplete = entry.Content.Object.IsComplete;
             latestItem.Status = entry.Content.Object.Status;
             latestItem.IsRemoved = true;
         }

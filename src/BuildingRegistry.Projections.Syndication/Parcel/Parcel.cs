@@ -35,12 +35,6 @@ namespace BuildingRegistry.Projections.Syndication.Parcel
         public List<Guid> AddressIds { get; set; }
 
         /// <summary>
-        /// Duidt aan of het item compleet is.
-        /// </summary>
-        [DataMember(Name = "IsCompleet", Order = 5)]
-        public bool IsComplete { get; set; }
-
-        /// <summary>
         /// Creatie data ivm het item.
         /// </summary>
         [DataMember(Name = "Creatie", Order = 6)]
