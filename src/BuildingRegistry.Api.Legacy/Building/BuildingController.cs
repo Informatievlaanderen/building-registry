@@ -100,7 +100,6 @@ namespace BuildingRegistry.Api.Legacy.Building
             var caPaKeys = await syndicationContext
                 .BuildingParcelLatestItems
                 .Where(x => !x.IsRemoved &&
-                            x.IsComplete &&
                             parcels.Contains(x.CaPaKey))
                 .Select(x => x.CaPaKey)
                 .ToListAsync(cancellationToken);

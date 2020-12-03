@@ -15,7 +15,6 @@ namespace BuildingRegistry.Projections.Syndication.Parcel
         public string? Version { get; set; }
         public long Position { get; set; }
 
-        public bool IsComplete { get; set; }
         public bool IsRemoved { get; set; }
     }
 
@@ -35,7 +34,6 @@ namespace BuildingRegistry.Projections.Syndication.Parcel
             b.Property(x => x.Version);
             b.Property(x => x.Position);
 
-            b.Property(x => x.IsComplete);
             b.Property(x => x.IsRemoved);
 
             b.HasIndex(x => x.CaPaKey);
