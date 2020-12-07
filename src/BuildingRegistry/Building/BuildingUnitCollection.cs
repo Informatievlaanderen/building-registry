@@ -39,10 +39,14 @@ namespace BuildingRegistry.Building
 
         public IEnumerable<BuildingUnit> GetRetiredUnitsByKey(BuildingUnitKey buildingUnitKey)
         {
-            if (!_allBuildingUnitsByKey.ContainsKey(buildingUnitKey) && _readdressedKeys.ContainsKey(buildingUnitKey))
-                return GetRetiredUnitsByKey(_readdressedKeys[buildingUnitKey]);
+            var list = new List<BuildingUnit>();
+            if (_readdressedKeys.ContainsKey(buildingUnitKey))
+                list.AddRange(GetRetiredUnitsByKey(_readdressedKeys[buildingUnitKey]));
 
-            return _allBuildingUnitsByKey[buildingUnitKey].Where(_isRetiredPredicate);
+            if(_allBuildingUnitsByKey.ContainsKey(buildingUnitKey))
+                list.AddRange(_allBuildingUnitsByKey[buildingUnitKey].Where(_isRetiredPredicate));
+
+            return list;
         }
 
         public IEnumerable<BuildingUnit> GetLastRetiredUnitPerKey()
@@ -141,17 +145,17 @@ namespace BuildingRegistry.Building
 
         public BuildingUnit GetActiveOrLastRetiredByKey(BuildingUnitKey buildingUnitKey)
         {
-            if (!_allBuildingUnitsByKey.ContainsKey(buildingUnitKey) && _readdressedKeys.ContainsKey(buildingUnitKey))
-                return GetActiveOrLastRetiredByKey(_readdressedKeys[buildingUnitKey]);
-
-            if (ActiveCommonBuildingUnit?.BuildingUnitKey == buildingUnitKey)
-                return ActiveCommonBuildingUnit;
-
             if (HasActiveUnitByKey(buildingUnitKey))
                 return GetActiveUnitByKey(buildingUnitKey);
 
             if (HasRetiredUnitByKey(buildingUnitKey))
                 return GetRetiredUnitsByKey(buildingUnitKey).OrderBy(x => x.Version).Last();
+
+            if (!_allBuildingUnitsByKey.ContainsKey(buildingUnitKey) && _readdressedKeys.ContainsKey(buildingUnitKey))
+                return GetActiveOrLastRetiredByKey(_readdressedKeys[buildingUnitKey]);
+
+            if (ActiveCommonBuildingUnit?.BuildingUnitKey == buildingUnitKey)
+                return ActiveCommonBuildingUnit;
 
             return null;
         }

@@ -34,6 +34,7 @@ namespace BuildingRegistry.Tests.WhenReaddressingHouseNumber
 
         private BuildingUnitId GebouwEenheid1Id => BuildingUnitId.Create(GebouwEenheid1Key, 1);
         private BuildingUnitId GebouwEenheid2Id => BuildingUnitId.Create(GebouwEenheid2Key, 2);
+        private BuildingUnitId GebouwEenheid3Id => BuildingUnitId.Create(GebouwEenheid2Key, 3);
         private AddressId OldAddress16Id => AddressId.CreateFor(OldHuisNr16Id);
         private AddressId NewAddress16Id => AddressId.CreateFor(NewHuisNr16Id);
 
@@ -117,6 +118,7 @@ namespace BuildingRegistry.Tests.WhenReaddressingHouseNumber
         {
             var importTerrainObjectHouseNumberFromCrab = Fixture.Create<ImportTerrainObjectHouseNumberFromCrab>()
                 .WithTerrainObjectHouseNumberId(NewHuisNr16KoppelingId)
+                .WithTimestamp(new CrabTimestamp(Instant.FromDateTimeOffset(DateTimeOffset.Now.AddDays(1))))
                 .WithHouseNumberId(NewHuisNr16Id); //koppel huisnr 16
 
             return new AutoFixtureScenario(Fixture)
@@ -141,6 +143,39 @@ namespace BuildingRegistry.Tests.WhenReaddressingHouseNumber
                 .Then(Gebouw1Id,
                     new BuildingUnitWasPlanned(Gebouw1Id, GebouwEenheid2Id),
                     importStatus.ToLegacyEvent());
+        }
+
+        public IEventCentricTestSpecificationBuilder RetireWithNewHouseNumberAgain()
+        {
+            var importTerrainObjectHouseNumberFromCrab = Fixture.Create<ImportTerrainObjectHouseNumberFromCrab>()
+                .WithTerrainObjectHouseNumberId(NewHuisNr16KoppelingId)
+                .WithHouseNumberId(NewHuisNr16Id)
+                .WithLifetime(new CrabLifetime(Fixture.Create<LocalDateTime>(), Fixture.Create<LocalDateTime>()));
+
+            return new AutoFixtureScenario(Fixture)
+                .Given(SetStatusWithNewHouseNumberId())
+                .When(importTerrainObjectHouseNumberFromCrab)
+                .Then(Gebouw1Id,
+                    new BuildingUnitWasNotRealized(Gebouw1Id, GebouwEenheid2Id),
+                    new BuildingUnitAddressWasDetached(Gebouw1Id, NewAddress16Id, GebouwEenheid2Id),
+                    importTerrainObjectHouseNumberFromCrab.ToLegacyEvent());
+        }
+
+        public IEventCentricTestSpecificationBuilder UnretireWithNewHouseNumberAgain()
+        {
+            var importTerrainObjectHouseNumberFromCrab = Fixture.Create<ImportTerrainObjectHouseNumberFromCrab>()
+                .WithTerrainObjectHouseNumberId(NewHuisNr16KoppelingId)
+                .WithHouseNumberId(NewHuisNr16Id)
+                .WithTimestamp(new CrabTimestamp(Instant.FromDateTimeOffset(DateTimeOffset.Now.AddDays(2))))
+                .WithLifetime(new CrabLifetime(Fixture.Create<LocalDateTime>(), null));
+
+            return new AutoFixtureScenario(Fixture)
+                .Given(RetireWithNewHouseNumberAgain())
+                .When(importTerrainObjectHouseNumberFromCrab)
+                .Then(Gebouw1Id,
+                    new BuildingUnitWasAdded(Gebouw1Id, GebouwEenheid3Id, GebouwEenheid2Key, NewAddress16Id, new BuildingUnitVersion(importTerrainObjectHouseNumberFromCrab.Timestamp), GebouwEenheid2Id),
+                    new BuildingUnitWasPlanned(Gebouw1Id, GebouwEenheid3Id),
+                    importTerrainObjectHouseNumberFromCrab.ToLegacyEvent());
         }
 
         [Fact]
@@ -177,6 +212,18 @@ namespace BuildingRegistry.Tests.WhenReaddressingHouseNumber
         public void SetStatusForNewBuildingUnit()
         {
             Assert(SetStatusWithNewHouseNumberId());
+        }
+
+        [Fact]
+        public void RetireWithNewHouseNumberAgainTest()
+        {
+            Assert(RetireWithNewHouseNumberAgain());
+        }
+
+        [Fact]
+        public void UnretireWithNewHouseNumberAgainTest()
+        {
+            Assert(UnretireWithNewHouseNumberAgain());
         }
     }
 }
