@@ -1,3 +1,10 @@
+## [2.23.7](https://github.com/informatievlaanderen/building-registry/compare/v2.23.6...v2.23.7) (2020-12-08)
+
+
+### Bug Fixes
+
+* correct unretire multiple times by previously readdressed unit ([082dfec](https://github.com/informatievlaanderen/building-registry/commit/082dfec2acf8f4971b67ef544d5f49dfa15fa215))
+
 ## [2.23.6](https://github.com/informatievlaanderen/building-registry/compare/v2.23.5...v2.23.6) (2020-12-03)
 
 
