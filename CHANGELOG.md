@@ -1,3 +1,10 @@
+## [2.23.8](https://github.com/informatievlaanderen/building-registry/compare/v2.23.7...v2.23.8) (2020-12-09)
+
+
+### Bug Fixes
+
+* correct name of addresses in sync GRAR-1670 ([5672bf3](https://github.com/informatievlaanderen/building-registry/commit/5672bf34d6370a962fa48c9beefff19746725ac0))
+
 ## [2.23.7](https://github.com/informatievlaanderen/building-registry/compare/v2.23.6...v2.23.7) (2020-12-08)
 
 
