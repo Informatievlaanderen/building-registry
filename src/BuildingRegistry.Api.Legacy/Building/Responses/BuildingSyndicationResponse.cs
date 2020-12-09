@@ -267,7 +267,7 @@ namespace BuildingRegistry.Api.Legacy.Building.Responses
         /// <summary>
         /// De gebouweenheden van de gebouweenheid.
         /// </summary>
-        [DataMember(Name = "Addressen", Order = 7)]
+        [DataMember(Name = "Adressen", Order = 7)]
         public List<Guid> Addresses { get; set; }
 
         /// <summary>
