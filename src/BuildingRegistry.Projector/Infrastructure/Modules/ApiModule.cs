@@ -32,6 +32,8 @@ namespace BuildingRegistry.Projector.Infrastructure.Modules
 
     public class ApiModule : Module
     {
+        private const string CatchUpSizesConfigKey = "CatchUpSizes";
+
         private readonly IConfiguration _configuration;
         private readonly IServiceCollection _services;
         private readonly ILoggerFactory _loggerFactory;
@@ -135,6 +137,10 @@ namespace BuildingRegistry.Projector.Infrastructure.Modules
                         _services,
                         _loggerFactory));
 
+            var syndicationCatchUpSize = _configuration.GetSection(CatchUpSizesConfigKey).GetValue<int>("BuildingSyndication");
+            var syndicationProjectionSettings =
+                ConnectedProjectionSettings.Configure(settings => settings.ConfigureCatchUpPageSize(syndicationCatchUpSize));
+
             builder
                 .RegisterProjectionMigrator<LegacyContextMigrationFactory>(
                     _configuration,
@@ -145,7 +151,7 @@ namespace BuildingRegistry.Projector.Infrastructure.Modules
                     ConnectedProjectionSettings.Default)
                 .RegisterProjections<BuildingSyndicationProjections, LegacyContext>(
                     () => new BuildingSyndicationProjections(),
-                    ConnectedProjectionSettings.Default)
+                    syndicationProjectionSettings)
                 .RegisterProjections<BuildingUnitDetailProjections, LegacyContext>(
                     () => new BuildingUnitDetailProjections(),
                     ConnectedProjectionSettings.Default)
