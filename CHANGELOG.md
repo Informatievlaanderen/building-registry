@@ -1,3 +1,10 @@
+# [2.24.0](https://github.com/informatievlaanderen/building-registry/compare/v2.23.8...v2.24.0) (2020-12-11)
+
+
+### Features
+
+* add sync projection catchup size to config ([6fa400c](https://github.com/informatievlaanderen/building-registry/commit/6fa400c58fb225e4a900e9a085d090a16fb8da73))
+
 ## [2.23.8](https://github.com/informatievlaanderen/building-registry/compare/v2.23.7...v2.23.8) (2020-12-09)
 
 
