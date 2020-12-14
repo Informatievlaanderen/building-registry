@@ -1,3 +1,10 @@
+## [2.24.1](https://github.com/informatievlaanderen/building-registry/compare/v2.24.0...v2.24.1) (2020-12-14)
+
+
+### Bug Fixes
+
+* rename adressen to adressenids in sync ([031780c](https://github.com/informatievlaanderen/building-registry/commit/031780ce92af4f766def89130d153d9c88ac7813))
+
 # [2.24.0](https://github.com/informatievlaanderen/building-registry/compare/v2.23.8...v2.24.0) (2020-12-11)
 
 
