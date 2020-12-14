@@ -156,7 +156,7 @@ namespace BuildingRegistry.Api.Legacy.Building.Responses
         /// De technische id van het gebouw.
         /// </summary>
         [DataMember(Name = "Id", Order = 1)]
-        public Guid BuildingId { get; set; }
+        public Guid? BuildingId { get; set; }
 
         /// <summary>
         /// De identificator van het gebouw.
@@ -232,7 +232,7 @@ namespace BuildingRegistry.Api.Legacy.Building.Responses
         /// De technische id van de gebouweenheid.
         /// </summary>
         [DataMember(Name = "Id", Order = 1)]
-        public Guid BuildingUnitId { get; set; }
+        public Guid? BuildingUnitId { get; set; }
 
         /// <summary>
         /// De identificator van de gebouweenheid.
