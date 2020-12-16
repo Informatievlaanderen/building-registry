@@ -1,3 +1,10 @@
+## [2.24.3](https://github.com/informatievlaanderen/building-registry/compare/v2.24.2...v2.24.3) (2020-12-16)
+
+
+### Bug Fixes
+
+* correct nullable objectid in sync api GRAR-1710 ([1b46392](https://github.com/informatievlaanderen/building-registry/commit/1b46392bf64d13720e4bfb9f901fc691dffcb7be))
+
 ## [2.24.2](https://github.com/informatievlaanderen/building-registry/compare/v2.24.1...v2.24.2) (2020-12-14)
 
 
