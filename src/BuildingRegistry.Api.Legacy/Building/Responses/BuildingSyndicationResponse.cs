@@ -156,7 +156,7 @@ namespace BuildingRegistry.Api.Legacy.Building.Responses
         /// De technische id van het gebouw.
         /// </summary>
         [DataMember(Name = "Id", Order = 1)]
-        public Guid? BuildingId { get; set; }
+        public Guid BuildingId { get; set; }
 
         /// <summary>
         /// De identificator van het gebouw.
@@ -214,7 +214,7 @@ namespace BuildingRegistry.Api.Legacy.Building.Responses
             List<BuildingUnitSyndicationContent> buildingUnits)
         {
             BuildingId = buildingId;
-            Identificator = new GebouwIdentificator(naamruimte, persistentLocalId.HasValue ? persistentLocalId.ToString() : string.Empty, version);
+            Identificator = new GebouwIdentificator(naamruimte, persistentLocalId?.ToString(CultureInfo.InvariantCulture), version);
             Status = status;
             GeometryMethod = geometryMethod;
             Geometry = geometry == null ? null : new SyndicationPolygon { XmlPolygon = geometry };
@@ -232,7 +232,7 @@ namespace BuildingRegistry.Api.Legacy.Building.Responses
         /// De technische id van de gebouweenheid.
         /// </summary>
         [DataMember(Name = "Id", Order = 1)]
-        public Guid? BuildingUnitId { get; set; }
+        public Guid BuildingUnitId { get; set; }
 
         /// <summary>
         /// De identificator van de gebouweenheid.
@@ -289,7 +289,7 @@ namespace BuildingRegistry.Api.Legacy.Building.Responses
             bool isComplete)
         {
             BuildingUnitId = buildingUnitId;
-            Identificator = new GebouweenheidIdentificator(naamruimte, persistentLocalId.HasValue ? persistentLocalId.ToString() : string.Empty, version);
+            Identificator = new GebouweenheidIdentificator(naamruimte, persistentLocalId?.ToString(CultureInfo.InvariantCulture), version);
             Status = status;
             GeometryMethod = geometryMethod;
             Geometry = geometry == null ? null : new SyndicationPoint { XmlPoint = geometry };
