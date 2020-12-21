@@ -54,9 +54,9 @@ namespace BuildingRegistry.Projections.Legacy
                         sqlServerOptions.EnableRetryOnFailure();
                         sqlServerOptions.MigrationsHistoryTable(MigrationTables.Extract, Schema.Extract);
                     })
-                    .UseExtendedSqlServerMigrations()
-                    .ConfigureWarnings(x => x
-                        .Ignore(CoreEventId.IncludeIgnoredWarning)));
+                    .UseExtendedSqlServerMigrations());
+            //.ConfigureWarnings(x => x
+            //    .Ignore(CoreEventId.IncludeIgnoredWarning)));
         }
 
         private static void RunInMemoryDb(

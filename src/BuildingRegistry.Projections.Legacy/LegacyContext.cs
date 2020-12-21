@@ -23,8 +23,8 @@ namespace BuildingRegistry.Projections.Legacy
         public DbSet<RemovedPersistentLocalId> RemovedPersistentLocalIds { get; set; }
         public DbSet<DuplicatedPersistentLocalId> DuplicatedPersistentLocalIds { get; set; }
 
-        public DbQuery<BuildingDetailListCountView> BuildingDetailListCountView { get; set; }
-        public DbQuery<BuildingUnitDetailListCountView> BuildingUnitDetailListCountView { get; set; }
+        public DbSet<BuildingDetailListCountView> BuildingDetailListCountView { get; set; }
+        public DbSet<BuildingUnitDetailListCountView> BuildingUnitDetailListCountView { get; set; }
 
         public DbSet<BuildingPersistentLocalIdCrabIdMapping> BuildingPersistentIdCrabIdMappings { get; set; }
 
@@ -38,10 +38,12 @@ namespace BuildingRegistry.Projections.Legacy
         {
             base.OnModelCreating(modelBuilder);
 
-            modelBuilder.Query<BuildingDetailListCountView>()
+            modelBuilder.Entity<BuildingDetailListCountView>()
+                .HasNoKey()
                 .ToView(BuildingDetailListCountViewName, Schema.Legacy);
 
-            modelBuilder.Query<BuildingUnitDetailListCountView>()
+            modelBuilder.Entity<BuildingUnitDetailListCountView>()
+                .HasNoKey()
                 .ToView(BuildingUnitDetailListCountViewName, Schema.Legacy);
         }
     }
