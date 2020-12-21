@@ -15,10 +15,10 @@ licenseUrl https://opensource.org/licenses/EUPL-1.2
 description Building Registry.
 
 files
-  BuildingRegistry.Api.CrabImport.dll => lib\netcoreapp3.1
-  BuildingRegistry.Api.CrabImport.pdb => lib\netcoreapp3.1
-  BuildingRegistry.Api.CrabImport.xml => lib\netcoreapp3.1
+  BuildingRegistry.Api.CrabImport.dll => lib\net5.0
+  BuildingRegistry.Api.CrabImport.pdb => lib\net5.0
+  BuildingRegistry.Api.CrabImport.xml => lib\net5.0
   BuildingRegistry.Api.CrabImport.xml => content
 
-  BuildingRegistry.dll => lib\netcoreapp3.1
-  BuildingRegistry.pdb => lib\netcoreapp3.1
+  BuildingRegistry.dll => lib\net5.0
+  BuildingRegistry.pdb => lib\net5.0

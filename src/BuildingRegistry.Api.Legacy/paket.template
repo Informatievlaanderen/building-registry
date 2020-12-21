@@ -15,16 +15,16 @@ licenseUrl https://opensource.org/licenses/EUPL-1.2
 description Building Registry.
 
 files
-  BuildingRegistry.Api.Legacy.dll => lib\netcoreapp3.1
-  BuildingRegistry.Api.Legacy.pdb => lib\netcoreapp3.1
-  BuildingRegistry.Api.Legacy.xml => lib\netcoreapp3.1
+  BuildingRegistry.Api.Legacy.dll => lib\net5.0
+  BuildingRegistry.Api.Legacy.pdb => lib\net5.0
+  BuildingRegistry.Api.Legacy.xml => lib\net5.0
   BuildingRegistry.Api.Legacy.xml => content
 
-  BuildingRegistry.Projections.Legacy.dll => lib\netcoreapp3.1
-  BuildingRegistry.Projections.Legacy.pdb => lib\netcoreapp3.1
+  BuildingRegistry.Projections.Legacy.dll => lib\net5.0
+  BuildingRegistry.Projections.Legacy.pdb => lib\net5.0
 
-  BuildingRegistry.Projections.Syndication.dll => lib\netcoreapp3.1
-  BuildingRegistry.Projections.Syndication.pdb => lib\netcoreapp3.1
+  BuildingRegistry.Projections.Syndication.dll => lib\net5.0
+  BuildingRegistry.Projections.Syndication.pdb => lib\net5.0
   
-  BuildingRegistry.dll => lib\netcoreapp3.1
-  BuildingRegistry.pdb => lib\netcoreapp3.1
+  BuildingRegistry.dll => lib\net5.0
+  BuildingRegistry.pdb => lib\net5.0

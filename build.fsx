@@ -1,8 +1,8 @@
 #r "paket:
-version 5.247.3
+version 6.0.0-beta8-beta8
 framework: netstandard20
 source https://api.nuget.org/v3/index.json
-nuget Be.Vlaanderen.Basisregisters.Build.Pipeline 4.2.3 //"
+nuget Be.Vlaanderen.Basisregisters.Build.Pipeline 5.0.1 //"
 
 #load "packages/Be.Vlaanderen.Basisregisters.Build.Pipeline/Content/build-generic.fsx"
 
@@ -21,10 +21,11 @@ let dockerRepository = "building-registry"
 let assemblyVersionNumber = (sprintf "2.%s")
 let nugetVersionNumber = (sprintf "%s")
 
-let build = buildSolution assemblyVersionNumber
+let buildSource = build assemblyVersionNumber
+let buildTest = buildTest assemblyVersionNumber
 let setVersions = (setSolutionVersions assemblyVersionNumber product copyright company)
 let test = testSolution
-let publish = publish assemblyVersionNumber
+let publishSource = publish assemblyVersionNumber
 let pack = pack nugetVersionNumber
 let containerize = containerize dockerRepository
 let push = push dockerRepository
@@ -37,9 +38,22 @@ Target.create "Restore_Solution" (fun _ -> restore "BuildingRegistry")
 
 Target.create "Build_Solution" (fun _ ->
   setVersions "SolutionInfo.cs"
-  build "BuildingRegistry")
+  buildSource "BuildingRegistry.Projector"
+  buildSource "BuildingRegistry.Api.Legacy"
+  buildSource "BuildingRegistry.Api.Extract"
+  buildSource "BuildingRegistry.Api.CrabImport"
+  buildSource "BuildingRegistry.Projections.Legacy"
+  buildSource "BuildingRegistry.Projections.Extract"
+  buildSource "BuildingRegistry.Projections.LastChangedList"
+  buildSource "BuildingRegistry.Projections.Syndication"
+  buildTest "BuildingRegistry.Tests"
+)
 
-Target.create "Test_Solution" (fun _ -> test "BuildingRegistry")
+Target.create "Test_Solution" (fun _ ->
+    [
+        "test" @@ "BuildingRegistry.Tests"
+    ] |> List.iter testWithDotNet
+)
 
 Target.create "Publish_Solution" (fun _ ->
   [
@@ -51,7 +65,7 @@ Target.create "Publish_Solution" (fun _ ->
     "BuildingRegistry.Projections.Extract"
     "BuildingRegistry.Projections.LastChangedList"
     "BuildingRegistry.Projections.Syndication"
-  ] |> List.iter publish)
+  ] |> List.iter publishSource)
 
 Target.create "Pack_Solution" (fun _ ->
   [
