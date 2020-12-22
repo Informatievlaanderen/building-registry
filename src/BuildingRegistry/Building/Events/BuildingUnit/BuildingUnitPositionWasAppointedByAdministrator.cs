@@ -12,7 +12,7 @@ namespace BuildingRegistry.Building.Events
     {
         public Guid BuildingId { get; }
         public Guid BuildingUnitId { get; }
-        public string Position { get; }
+        public string ExtendedWkbGeometry { get; }
         public ProvenanceData Provenance { get; private set; }
 
         public BuildingUnitPositionWasAppointedByAdministrator(
@@ -22,20 +22,20 @@ namespace BuildingRegistry.Building.Events
         {
             BuildingId = buildingId;
             BuildingUnitId = buildingUnitId;
-            Position = position.ToString();
+            ExtendedWkbGeometry = position.ToString();
         }
 
         [JsonConstructor]
         private BuildingUnitPositionWasAppointedByAdministrator(
             Guid buildingId,
             Guid buildingUnitId,
-            string position,
+            string extendedWkbGeometry,
             ProvenanceData provenance)
             : this(
                 new BuildingId(buildingId),
                 new BuildingUnitId(buildingUnitId),
-                new ExtendedWkbGeometry(position)) => ((ISetProvenance)this).SetProvenance(provenance.ToProvenance());
-        
+                new ExtendedWkbGeometry(extendedWkbGeometry)) => ((ISetProvenance)this).SetProvenance(provenance.ToProvenance());
+
         void ISetProvenance.SetProvenance(Provenance provenance) => Provenance = new ProvenanceData(provenance);
     }
 }

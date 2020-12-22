@@ -11,7 +11,7 @@ namespace BuildingRegistry.Building.Events
     public class BuildingMeasurementByGrbWasCorrected : IHasProvenance, ISetProvenance
     {
         public Guid BuildingId { get; }
-        public string ExtendedWkb { get; }
+        public string ExtendedWkbGeometry { get; }
         public ProvenanceData Provenance { get; private set; }
 
         public BuildingMeasurementByGrbWasCorrected(
@@ -19,17 +19,17 @@ namespace BuildingRegistry.Building.Events
             ExtendedWkbGeometry geometry)
         {
             BuildingId = buildingId;
-            ExtendedWkb = geometry.ToString();
+            ExtendedWkbGeometry = geometry.ToString();
         }
 
         [JsonConstructor]
         private BuildingMeasurementByGrbWasCorrected(
             Guid buildingId,
-            string extendedWkb,
+            string extendedWkbGeometry,
             ProvenanceData provenance)
             : this(
                 new BuildingId(buildingId),
-                new ExtendedWkbGeometry(extendedWkb)) => ((ISetProvenance)this).SetProvenance(provenance.ToProvenance());
+                new ExtendedWkbGeometry(extendedWkbGeometry)) => ((ISetProvenance)this).SetProvenance(provenance.ToProvenance());
 
         void ISetProvenance.SetProvenance(Provenance provenance) => Provenance = new ProvenanceData(provenance);
     }

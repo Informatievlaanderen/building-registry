@@ -398,25 +398,25 @@ namespace BuildingRegistry.Building
 
         private void When(BuildingWasOutlined @event)
         {
-            Geometry = new BuildingGeometry(new ExtendedWkbGeometry(@event.ExtendedWkb), BuildingGeometryMethod.Outlined);
+            Geometry = new BuildingGeometry(new ExtendedWkbGeometry(@event.ExtendedWkbGeometry), BuildingGeometryMethod.Outlined);
             _buildingUnitCollection.RouteToNonDeleted(@event);
         }
 
         private void When(BuildingWasMeasuredByGrb @event)
         {
-            Geometry = new BuildingGeometry(new ExtendedWkbGeometry(@event.ExtendedWkb), BuildingGeometryMethod.MeasuredByGrb);
+            Geometry = new BuildingGeometry(new ExtendedWkbGeometry(@event.ExtendedWkbGeometry), BuildingGeometryMethod.MeasuredByGrb);
             _buildingUnitCollection.RouteToNonDeleted(@event);
         }
 
         private void When(BuildingMeasurementByGrbWasCorrected @event)
         {
-            Geometry = new BuildingGeometry(new ExtendedWkbGeometry(@event.ExtendedWkb), BuildingGeometryMethod.MeasuredByGrb);
+            Geometry = new BuildingGeometry(new ExtendedWkbGeometry(@event.ExtendedWkbGeometry), BuildingGeometryMethod.MeasuredByGrb);
             _buildingUnitCollection.RouteToNonDeleted(@event);
         }
 
         private void When(BuildingOutlineWasCorrected @event)
         {
-            Geometry = new BuildingGeometry(new ExtendedWkbGeometry(@event.ExtendedWkb), BuildingGeometryMethod.Outlined);
+            Geometry = new BuildingGeometry(new ExtendedWkbGeometry(@event.ExtendedWkbGeometry), BuildingGeometryMethod.Outlined);
             _buildingUnitCollection.RouteToNonDeleted(@event);
         }
 

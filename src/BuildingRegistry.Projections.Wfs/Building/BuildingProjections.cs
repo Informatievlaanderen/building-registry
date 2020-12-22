@@ -163,7 +163,7 @@ namespace BuildingRegistry.Projections.Wfs.Building
             {
                 var building = await context.Buildings.FindAsync(message.Message.BuildingId, cancellationToken: ct);
 
-                SetGeometry(building, message.Message.ExtendedWkb, MeasuredMethod);
+                SetGeometry(building, message.Message.ExtendedWkbGeometry, MeasuredMethod);
                 SetVersion(building, message.Message.Provenance.Timestamp);
             });
 
@@ -171,7 +171,7 @@ namespace BuildingRegistry.Projections.Wfs.Building
             {
                 var building = await context.Buildings.FindAsync(message.Message.BuildingId, cancellationToken: ct);
 
-                SetGeometry(building, message.Message.ExtendedWkb, MeasuredMethod);
+                SetGeometry(building, message.Message.ExtendedWkbGeometry, MeasuredMethod);
                 SetVersion(building, message.Message.Provenance.Timestamp);
             });
 
@@ -179,7 +179,7 @@ namespace BuildingRegistry.Projections.Wfs.Building
             {
                 var building = await context.Buildings.FindAsync(message.Message.BuildingId, cancellationToken: ct);
 
-                SetGeometry(building, message.Message.ExtendedWkb, OutlinedMethod);
+                SetGeometry(building, message.Message.ExtendedWkbGeometry, OutlinedMethod);
                 SetVersion(building, message.Message.Provenance.Timestamp);
             });
 
@@ -187,7 +187,7 @@ namespace BuildingRegistry.Projections.Wfs.Building
             {
                 var building = await context.Buildings.FindAsync(message.Message.BuildingId, cancellationToken: ct);
 
-                SetGeometry(building, message.Message.ExtendedWkb, OutlinedMethod);
+                SetGeometry(building, message.Message.ExtendedWkbGeometry, OutlinedMethod);
                 SetVersion(building, message.Message.Provenance.Timestamp);
             });
 

@@ -1,5 +1,6 @@
 namespace BuildingRegistry.Tests.WhenReaddressingHouseNumber
 {
+    using System.Linq;
     using Autofixture;
     using AutoFixture;
     using Be.Vlaanderen.Basisregisters.AggregateSource.Testing;
@@ -37,8 +38,9 @@ namespace BuildingRegistry.Tests.WhenReaddressingHouseNumber
                 SubaddressNr16Bus1Id = new CrabSubaddressId(161);
                 SubaddressNr16Bus2Id = new CrabSubaddressId(162);
 
-                NewHuisNr16Id = new CrabHouseNumberId(customizedFixture.Create<int>());
-                NewHuisNr16KoppelingId = new CrabTerrainObjectHouseNumberId(customizedFixture.Create<int>());
+                var intGenerator = customizedFixture.Create<Generator<int>>();
+                NewHuisNr16Id = new CrabHouseNumberId(intGenerator.First(x => x != HuisNr16Id));
+                NewHuisNr16KoppelingId = new CrabTerrainObjectHouseNumberId(intGenerator.First(x => x != HuisNr16KoppelingId));
 
                 ReaddressingBeginDate = new ReaddressingBeginDate(customizedFixture.Create<LocalDate>());
             }
