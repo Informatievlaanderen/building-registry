@@ -7,10 +7,13 @@ namespace BuildingRegistry.Building.Events
     using ValueObjects;
 
     [EventName("BuildingBecameComplete")]
-    [EventDescription("Gebouw werd volledig gemaakt")]
+    [EventDescription("Het gebouw voldoet aan het informatiemodel (wegens volledig).")]
     public class BuildingBecameComplete : IHasProvenance, ISetProvenance
     {
+        [EventPropertyDescription("Interne GUID van het gebouw.")]
         public Guid BuildingId { get; }
+        
+        [EventPropertyDescription("Metadata bij het event.")]
         public ProvenanceData Provenance { get; private set; }
 
         public BuildingBecameComplete(BuildingId buildingId)
