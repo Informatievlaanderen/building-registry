@@ -7,10 +7,13 @@ namespace BuildingRegistry.Building.Events
     using ValueObjects;
 
     [EventName("BuildingWasCorrectedToRealized")]
-    [EventDescription("Gebouw werd gerealiseerd via correctie.")]
+    [EventDescription("Het gebouw kreeg status 'gerealiseerd' (via correctie).")]
     public class BuildingWasCorrectedToRealized : IHasProvenance, ISetProvenance
     {
+        [EventPropertyDescription("Interne GUID van het gebouw.")]
         public Guid BuildingId { get; }
+        
+        [EventPropertyDescription("Metadata bij het event.")]
         public ProvenanceData Provenance { get; private set; }
 
         public BuildingWasCorrectedToRealized(BuildingId buildingId) => BuildingId = buildingId;
