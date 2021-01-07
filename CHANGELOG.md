@@ -1,3 +1,10 @@
+## [2.24.7](https://github.com/informatievlaanderen/building-registry/compare/v2.24.6...v2.24.7) (2021-01-07)
+
+
+### Bug Fixes
+
+* improve cache status page GRAR-1734 ([ae89aa9](https://github.com/informatievlaanderen/building-registry/commit/ae89aa9cab92b357b31b29e6d6c2e6762034e72b))
+
 ## [2.24.6](https://github.com/informatievlaanderen/building-registry/compare/v2.24.5...v2.24.6) (2021-01-07)
 
 
