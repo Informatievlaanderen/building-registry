@@ -7,7 +7,7 @@ namespace BuildingRegistry.Building.Events
     using ValueObjects;
 
     [EventName("BuildingWasCorrectedToUnderConstruction")]
-    [EventDescription("Gebouw werd in aanbouw via correctie")]
+    [EventDescription("Het gebouw kreeg status 'in aanbouw' (via correctie).")]
     public class BuildingWasCorrectedToUnderConstruction : IHasProvenance, ISetProvenance
     {
         public BuildingWasCorrectedToUnderConstruction(BuildingId buildingId) => BuildingId = buildingId;
@@ -18,7 +18,10 @@ namespace BuildingRegistry.Building.Events
             ProvenanceData provenance)
             : this(new BuildingId(buildingId)) => ((ISetProvenance)this).SetProvenance(provenance.ToProvenance());
 
+        [EventPropertyDescription("Interne GUID van het gebouw.")]
         public Guid BuildingId { get; }
+        
+        [EventPropertyDescription("Metadata bij het event.")]
         public ProvenanceData Provenance { get; private set; }
 
         void ISetProvenance.SetProvenance(Provenance provenance)
