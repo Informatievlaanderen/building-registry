@@ -7,10 +7,13 @@ namespace BuildingRegistry.Building.Events
     using ValueObjects;
 
     [EventName("BuildingBecameIncomplete")]
-    [EventDescription("Gebouw werd onvolledig gemaakt")]
+    [EventDescription("Het gebouw voldoet niet meer aan het informatiemodel (wegens niet volledig).")]
     public class BuildingBecameIncomplete : IHasProvenance, ISetProvenance
     {
+        [EventPropertyDescription("Interne GUID van het gebouw.")]
         public Guid BuildingId { get; }
+        
+        [EventPropertyDescription("Metadata bij het event.")]
         public ProvenanceData Provenance { get; private set; }
 
         public BuildingBecameIncomplete(BuildingId buildingId)
