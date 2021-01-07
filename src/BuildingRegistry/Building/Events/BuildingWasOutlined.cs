@@ -7,11 +7,16 @@ namespace BuildingRegistry.Building.Events
     using ValueObjects;
 
     [EventName("BuildingWasOutlined")]
-    [EventDescription("Gebouw werd ingeschetst")]
+    [EventDescription("Het gebouw werd ingeschetst.")]
     public class BuildingWasOutlined : IHasProvenance, ISetProvenance
     {
+        [EventPropertyDescription("Interne GUID van het gebouw.")]
         public Guid BuildingId { get; }
+        
+        [EventPropertyDescription("Extended WKB-voorstelling van de gebouwgeometrie.")]
         public string ExtendedWkb { get; }
+        
+        [EventPropertyDescription("Metadata bij het event.")]
         public ProvenanceData Provenance { get; private set; }
 
         public BuildingWasOutlined(
