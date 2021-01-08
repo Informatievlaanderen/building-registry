@@ -8,13 +8,22 @@ namespace BuildingRegistry.Building.Events
     using ValueObjects;
 
     [EventName("BuildingUnitPersistentLocalIdentifierWasAssigned")]
-    [EventDescription("De gebouweenheid kreeg een persistente lokale id toegekend.")]
+    [EventDescription("De gebouweenheid kreeg een persistente lokale identificator toegekend.")]
     public class BuildingUnitPersistentLocalIdWasAssigned : IHasProvenance, ISetProvenance
     {
+        [EventPropertyDescription("Interne GUID van het gebouw waartoe de gebouweenheid behoort.")]
         public Guid BuildingId { get; }
+        
+        [EventPropertyDescription("Interne GUID van de gebouweenheid.")]
         public Guid BuildingUnitId { get; }
+        
+        [EventPropertyDescription("Objectidentificator van de gebouweenheid.")]
         public int PersistentLocalId { get; }
+        
+        [EventPropertyDescription("Tijdstip waarop de objectidentificator van de gebouweenheid werd toegekend.")]
         public Instant AssignmentDate { get; }
+        
+        [EventPropertyDescription("Metadata bij het event.")]
         public ProvenanceData Provenance { get; private set; }
 
         public BuildingUnitPersistentLocalIdWasAssigned(
