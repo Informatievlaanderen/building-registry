@@ -9,13 +9,19 @@ namespace BuildingRegistry.Building.Events
     using ValueObjects;
 
     [EventName("BuildingUnitAddressWasDetached")]
-    [EventDescription("Een adres werd losgekoppeld van een gebouweenheid")]
+    [EventDescription("Er werd een adres losgekoppeld van de gebouweenheid.")]
     public class BuildingUnitAddressWasDetached : IHasProvenance, ISetProvenance
     {
+        [EventPropertyDescription("Interne GUID van het gebouw waartoe de gebouweenheid behoort.")]
         public Guid BuildingId { get; }
+        
+        [EventPropertyDescription("Interne GUID van het adres dat van de gebouweenheid werd losgekoppeld.")]
         public List<Guid> AddressIds { get; }
+        
+        [EventPropertyDescription("Interne GUID van de gebouweenheid waarvan het adres werd losgekoppeld.")]
         public Guid From { get; }
 
+        [EventPropertyDescription("Metadata bij het event.")]
         public ProvenanceData Provenance { get; private set; }
 
         public BuildingUnitAddressWasDetached(
