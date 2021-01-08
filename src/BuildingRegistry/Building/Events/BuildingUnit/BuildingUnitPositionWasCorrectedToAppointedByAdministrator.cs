@@ -7,12 +7,19 @@ namespace BuildingRegistry.Building.Events
     using ValueObjects;
 
     [EventName("BuildingUnitPositionWasCorrectedToAppointedByAdministrator")]
-    [EventDescription("Gebouweenheid positie werd aangeduid door beheerder.")]
+    [EventDescription("De gebouweenheidpositie werd manueel aangeduid door de beheerder (via correctie).")]
     public class BuildingUnitPositionWasCorrectedToAppointedByAdministrator : IHasProvenance, ISetProvenance
     {
+        [EventPropertyDescription("Interne GUID van het gebouw waartoe de gebouweenheid behoort.")]
         public Guid BuildingId { get; }
+        
+        [EventPropertyDescription("Interne GUID van de gebouweenheid.")]
         public Guid BuildingUnitId { get; }
+        
+        [EventPropertyDescription("Extended WKB-voorstelling van de gebouweenheidgeometrie.")]
         public string Position { get; }
+        
+        [EventPropertyDescription("Metadata bij het event.")]
         public ProvenanceData Provenance { get; private set; }
 
         public BuildingUnitPositionWasCorrectedToAppointedByAdministrator(
