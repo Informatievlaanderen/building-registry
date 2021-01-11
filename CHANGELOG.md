@@ -1,3 +1,11 @@
+## [2.24.8](https://github.com/informatievlaanderen/building-registry/compare/v2.24.7...v2.24.8) (2021-01-11)
+
+
+### Bug Fixes
+
+* bump version, force build ([4d80cb1](https://github.com/informatievlaanderen/building-registry/commit/4d80cb146480ffdfd0f9fc6ea39f01a10a528fe0))
+* ewkb property names to be consistent with address GRAR-1716 GRAR-1717 ([74d59c1](https://github.com/informatievlaanderen/building-registry/commit/74d59c1283714f2e21cb8f463b6af3df08cfb780))
+
 ## [2.24.7](https://github.com/informatievlaanderen/building-registry/compare/v2.24.6...v2.24.7) (2021-01-07)
 
 
