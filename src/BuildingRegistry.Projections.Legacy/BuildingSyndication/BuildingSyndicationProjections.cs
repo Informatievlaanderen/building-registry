@@ -86,7 +86,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
                     x =>
                     {
                         x.GeometryMethod = BuildingGeometryMethod.MeasuredByGrb;
-                        x.Geometry = message.Message.ExtendedWkb.ToByteArray();
+                        x.Geometry = message.Message.ExtendedWkbGeometry.ToByteArray();
                     },
                     ct);
             });
@@ -108,7 +108,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
                     x =>
                     {
                         x.GeometryMethod = BuildingGeometryMethod.Outlined;
-                        x.Geometry = message.Message.ExtendedWkb.ToByteArray();
+                        x.Geometry = message.Message.ExtendedWkbGeometry.ToByteArray();
                     },
                     ct);
             });
@@ -202,7 +202,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
                     x =>
                     {
                         x.GeometryMethod = BuildingGeometryMethod.MeasuredByGrb;
-                        x.Geometry = message.Message.ExtendedWkb.ToByteArray();
+                        x.Geometry = message.Message.ExtendedWkbGeometry.ToByteArray();
                     },
                     ct);
             });
@@ -233,7 +233,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
                     x =>
                     {
                         x.GeometryMethod = BuildingGeometryMethod.Outlined;
-                        x.Geometry = message.Message.ExtendedWkb.ToByteArray();
+                        x.Geometry = message.Message.ExtendedWkbGeometry.ToByteArray();
                     },
                     ct);
             });
@@ -517,7 +517,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
                         var unit = x.BuildingUnits.Single(y => y.BuildingUnitId == message.Message.BuildingUnitId);
 
                         unit.PositionMethod = BuildingUnitPositionGeometryMethod.AppointedByAdministrator;
-                        unit.PointPosition = message.Message.Position.ToByteArray();
+                        unit.PointPosition = message.Message.ExtendedWkbGeometry.ToByteArray();
 
                         ApplyUnitVersion(unit, message.Message.Provenance.Timestamp);
                     },
@@ -534,7 +534,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
                         var unit = x.BuildingUnits.Single(y => y.BuildingUnitId == message.Message.BuildingUnitId);
 
                         unit.PositionMethod = BuildingUnitPositionGeometryMethod.DerivedFromObject;
-                        unit.PointPosition = message.Message.Position.ToByteArray();
+                        unit.PointPosition = message.Message.ExtendedWkbGeometry.ToByteArray();
 
                         ApplyUnitVersion(unit, message.Message.Provenance.Timestamp);
                     },
@@ -551,7 +551,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
                         var unit = x.BuildingUnits.Single(y => y.BuildingUnitId == message.Message.BuildingUnitId);
 
                         unit.PositionMethod = BuildingUnitPositionGeometryMethod.DerivedFromObject;
-                        unit.PointPosition = message.Message.Position.ToByteArray();
+                        unit.PointPosition = message.Message.ExtendedWkbGeometry.ToByteArray();
 
                         ApplyUnitVersion(unit, message.Message.Provenance.Timestamp);
                     },
@@ -568,7 +568,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
                         var unit = x.BuildingUnits.Single(y => y.BuildingUnitId == message.Message.BuildingUnitId);
 
                         unit.PositionMethod = BuildingUnitPositionGeometryMethod.AppointedByAdministrator;
-                        unit.PointPosition = message.Message.Position.ToByteArray();
+                        unit.PointPosition = message.Message.ExtendedWkbGeometry.ToByteArray();
 
                         ApplyUnitVersion(unit, message.Message.Provenance.Timestamp);
                     },

@@ -112,7 +112,7 @@ namespace BuildingRegistry.Projections.Extract.BuildingExtract
                     item =>
                     {
                         UpdateGeometryMethod(item, MeasuredByGrb);
-                        var geometry = wkbReader.Read(message.Message.ExtendedWkb.ToByteArray()) as Polygon;
+                        var geometry = wkbReader.Read(message.Message.ExtendedWkbGeometry.ToByteArray()) as Polygon;
                         UpdateGeometry(geometry, item);
 
                         UpdateVersie(item, message.Message.Provenance.Timestamp);
@@ -125,7 +125,7 @@ namespace BuildingRegistry.Projections.Extract.BuildingExtract
                     item =>
                     {
                         UpdateGeometryMethod(item, Outlined);
-                        var geometry = wkbReader.Read(message.Message.ExtendedWkb.ToByteArray()) as Polygon;
+                        var geometry = wkbReader.Read(message.Message.ExtendedWkbGeometry.ToByteArray()) as Polygon;
                         UpdateGeometry(geometry, item);
 
                         UpdateVersie(item, message.Message.Provenance.Timestamp);
@@ -208,7 +208,7 @@ namespace BuildingRegistry.Projections.Extract.BuildingExtract
                     item =>
                     {
                         UpdateGeometryMethod(item, MeasuredByGrb);
-                        var geometry = wkbReader.Read(message.Message.ExtendedWkb.ToByteArray()) as Polygon;
+                        var geometry = wkbReader.Read(message.Message.ExtendedWkbGeometry.ToByteArray()) as Polygon;
                         UpdateGeometry(geometry, item);
 
                         UpdateVersie(item, message.Message.Provenance.Timestamp);
@@ -231,7 +231,7 @@ namespace BuildingRegistry.Projections.Extract.BuildingExtract
                     item =>
                     {
                         UpdateGeometryMethod(item, Outlined);
-                        var geometry = wkbReader.Read(message.Message.ExtendedWkb.ToByteArray()) as Polygon;
+                        var geometry = wkbReader.Read(message.Message.ExtendedWkbGeometry.ToByteArray()) as Polygon;
                         UpdateGeometry(geometry, item);
 
                         UpdateVersie(item, message.Message.Provenance.Timestamp);

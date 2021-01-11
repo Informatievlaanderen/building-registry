@@ -155,22 +155,22 @@ namespace BuildingRegistry.Building
         #region Unit Position
         private void When(BuildingUnitPositionWasDerivedFromObject @event)
         {
-            BuildingUnitPosition = new BuildingUnitPosition(new ExtendedWkbGeometry(@event.Position), BuildingUnitPositionGeometryMethod.DerivedFromObject);
+            BuildingUnitPosition = new BuildingUnitPosition(new ExtendedWkbGeometry(@event.ExtendedWkbGeometry), BuildingUnitPositionGeometryMethod.DerivedFromObject);
         }
 
         private void When(BuildingUnitPositionWasCorrectedToAppointedByAdministrator @event)
         {
-            BuildingUnitPosition = new BuildingUnitPosition(new ExtendedWkbGeometry(@event.Position), BuildingUnitPositionGeometryMethod.AppointedByAdministrator);
+            BuildingUnitPosition = new BuildingUnitPosition(new ExtendedWkbGeometry(@event.ExtendedWkbGeometry), BuildingUnitPositionGeometryMethod.AppointedByAdministrator);
         }
 
         private void When(BuildingUnitPositionWasAppointedByAdministrator @event)
         {
-            BuildingUnitPosition = new BuildingUnitPosition(new ExtendedWkbGeometry(@event.Position), BuildingUnitPositionGeometryMethod.AppointedByAdministrator);
+            BuildingUnitPosition = new BuildingUnitPosition(new ExtendedWkbGeometry(@event.ExtendedWkbGeometry), BuildingUnitPositionGeometryMethod.AppointedByAdministrator);
         }
 
         private void When(BuildingUnitPositionWasCorrectedToDerivedFromObject @event)
         {
-            BuildingUnitPosition = new BuildingUnitPosition(new ExtendedWkbGeometry(@event.Position), BuildingUnitPositionGeometryMethod.DerivedFromObject);
+            BuildingUnitPosition = new BuildingUnitPosition(new ExtendedWkbGeometry(@event.ExtendedWkbGeometry), BuildingUnitPositionGeometryMethod.DerivedFromObject);
         }
         #endregion
 
@@ -183,22 +183,22 @@ namespace BuildingRegistry.Building
 
         private void When(BuildingOutlineWasCorrected @event)
         {
-            BuildingGeometry = new BuildingGeometry(new ExtendedWkbGeometry(@event.ExtendedWkb), BuildingGeometryMethod.Outlined);
+            BuildingGeometry = new BuildingGeometry(new ExtendedWkbGeometry(@event.ExtendedWkbGeometry), BuildingGeometryMethod.Outlined);
         }
 
         private void When(BuildingMeasurementByGrbWasCorrected @event)
         {
-            BuildingGeometry = new BuildingGeometry(new ExtendedWkbGeometry(@event.ExtendedWkb), BuildingGeometryMethod.MeasuredByGrb);
+            BuildingGeometry = new BuildingGeometry(new ExtendedWkbGeometry(@event.ExtendedWkbGeometry), BuildingGeometryMethod.MeasuredByGrb);
         }
 
         private void When(BuildingWasOutlined @event)
         {
-            BuildingGeometry = new BuildingGeometry(new ExtendedWkbGeometry(@event.ExtendedWkb), BuildingGeometryMethod.Outlined);
+            BuildingGeometry = new BuildingGeometry(new ExtendedWkbGeometry(@event.ExtendedWkbGeometry), BuildingGeometryMethod.Outlined);
         }
 
         private void When(BuildingWasMeasuredByGrb @event)
         {
-            BuildingGeometry = new BuildingGeometry(new ExtendedWkbGeometry(@event.ExtendedWkb), BuildingGeometryMethod.MeasuredByGrb);
+            BuildingGeometry = new BuildingGeometry(new ExtendedWkbGeometry(@event.ExtendedWkbGeometry), BuildingGeometryMethod.MeasuredByGrb);
         }
         #endregion Building Geometry
 

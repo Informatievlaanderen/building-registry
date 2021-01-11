@@ -13,16 +13,16 @@ namespace BuildingRegistry.Building.Events
     {
         [EventPropertyDescription("Interne GUID van het gebouw waartoe de gebouweenheid behoort.")]
         public Guid BuildingId { get; }
-        
+
         [EventPropertyDescription("Interne GUID van de gebouweenheid.")]
         public Guid BuildingUnitId { get; }
-        
+
         [EventPropertyDescription("Objectidentificator van de gebouweenheid.")]
         public int PersistentLocalId { get; }
-        
+
         [EventPropertyDescription("Tijdstip waarop de objectidentificator van de gebouweenheid werd toegekend.")]
         public Instant AssignmentDate { get; }
-        
+
         [EventPropertyDescription("Metadata bij het event.")]
         public ProvenanceData Provenance { get; private set; }
 

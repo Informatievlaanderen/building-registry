@@ -14,10 +14,10 @@ namespace BuildingRegistry.Building.Events
     {
         [EventPropertyDescription("Interne GUID van het gebouw waartoe de gebouweenheid behoort.")]
         public Guid BuildingId { get; }
-        
+
         [EventPropertyDescription("Interne GUID van het adres dat van de gebouweenheid werd losgekoppeld.")]
         public List<Guid> AddressIds { get; }
-        
+
         [EventPropertyDescription("Interne GUID van de gebouweenheid waarvan het adres werd losgekoppeld.")]
         public Guid From { get; }
 

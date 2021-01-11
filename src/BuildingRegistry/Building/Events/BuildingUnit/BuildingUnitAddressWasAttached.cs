@@ -12,10 +12,10 @@ namespace BuildingRegistry.Building.Events
     {
         [EventPropertyDescription("Interne GUID van het gebouw waartoe de gebouweenheid behoort.")]
         public Guid BuildingId { get; }
-        
+
         [EventPropertyDescription("Interne GUID van het adres dat aan de gebouweenheid werd gekoppeld.")]
         public Guid AddressId { get; }
-        
+
         [EventPropertyDescription("Interne GUID van de gebouweenheid waaraan het adres werd gekoppeld.")]
         public Guid To { get; }
 

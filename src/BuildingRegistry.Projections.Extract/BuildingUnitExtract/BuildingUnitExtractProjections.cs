@@ -172,7 +172,7 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
                 await context.FindAndUpdateBuildingUnitExtract(message.Message.BuildingUnitId,
                     item =>
                     {
-                        var geometry = wkbReader.Read(message.Message.Position.ToByteArray());
+                        var geometry = wkbReader.Read(message.Message.ExtendedWkbGeometry.ToByteArray());
 
                         UpdateGeometry(item, geometry);
                         UpdateGeometryMethod(item, AppointedByAdministrator);
@@ -185,7 +185,7 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
                 await context.FindAndUpdateBuildingUnitExtract(message.Message.BuildingUnitId,
                     item =>
                     {
-                        var geometry = wkbReader.Read(message.Message.Position.ToByteArray());
+                        var geometry = wkbReader.Read(message.Message.ExtendedWkbGeometry.ToByteArray());
 
                         UpdateGeometry(item, geometry);
                         UpdateGeometryMethod(item, AppointedByAdministrator);
@@ -198,7 +198,7 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
                 await context.FindAndUpdateBuildingUnitExtract(message.Message.BuildingUnitId,
                     item =>
                     {
-                        var geometry = wkbReader.Read(message.Message.Position.ToByteArray());
+                        var geometry = wkbReader.Read(message.Message.ExtendedWkbGeometry.ToByteArray());
 
                         UpdateGeometry(item, geometry);
                         UpdateGeometryMethod(item, DerivedFromObject);
@@ -211,7 +211,7 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
                 await context.FindAndUpdateBuildingUnitExtract(message.Message.BuildingUnitId,
                     item =>
                     {
-                        var geometry = wkbReader.Read(message.Message.Position.ToByteArray());
+                        var geometry = wkbReader.Read(message.Message.ExtendedWkbGeometry.ToByteArray());
 
                         UpdateGeometry(item, geometry);
                         UpdateGeometryMethod(item, DerivedFromObject);

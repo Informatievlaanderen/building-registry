@@ -12,7 +12,7 @@ namespace BuildingRegistry.Building.Events
     {
         [EventPropertyDescription("Interne GUID van het gebouw.")]
         public Guid BuildingId { get; }
-        
+
         [EventPropertyDescription("Metadata bij het event.")]
         public ProvenanceData Provenance { get; private set; }
 

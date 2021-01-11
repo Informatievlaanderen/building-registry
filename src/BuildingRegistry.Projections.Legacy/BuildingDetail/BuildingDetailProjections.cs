@@ -145,28 +145,28 @@ namespace BuildingRegistry.Projections.Legacy.BuildingDetail
             When<Envelope<BuildingWasMeasuredByGrb>>(async (context, message, ct) =>
             {
                 var item = await context.BuildingDetails.FindAsync(message.Message.BuildingId, cancellationToken: ct);
-                SetGeometry(item, message.Message.ExtendedWkb, BuildingGeometryMethod.MeasuredByGrb);
+                SetGeometry(item, message.Message.ExtendedWkbGeometry, BuildingGeometryMethod.MeasuredByGrb);
                 SetVersion(item, message.Message.Provenance.Timestamp);
             });
 
             When<Envelope<BuildingWasOutlined>>(async (context, message, ct) =>
             {
                 var item = await context.BuildingDetails.FindAsync(message.Message.BuildingId, cancellationToken: ct);
-                SetGeometry(item, message.Message.ExtendedWkb, BuildingGeometryMethod.Outlined);
+                SetGeometry(item, message.Message.ExtendedWkbGeometry, BuildingGeometryMethod.Outlined);
                 SetVersion(item, message.Message.Provenance.Timestamp);
             });
 
             When<Envelope<BuildingMeasurementByGrbWasCorrected>>(async (context, message, ct) =>
             {
                 var item = await context.BuildingDetails.FindAsync(message.Message.BuildingId, cancellationToken: ct);
-                SetGeometry(item, message.Message.ExtendedWkb, BuildingGeometryMethod.MeasuredByGrb);
+                SetGeometry(item, message.Message.ExtendedWkbGeometry, BuildingGeometryMethod.MeasuredByGrb);
                 SetVersion(item, message.Message.Provenance.Timestamp);
             });
 
             When<Envelope<BuildingOutlineWasCorrected>>(async (context, message, ct) =>
             {
                 var item = await context.BuildingDetails.FindAsync(message.Message.BuildingId, cancellationToken: ct);
-                SetGeometry(item, message.Message.ExtendedWkb, BuildingGeometryMethod.Outlined);
+                SetGeometry(item, message.Message.ExtendedWkbGeometry, BuildingGeometryMethod.Outlined);
                 SetVersion(item, message.Message.Provenance.Timestamp);
             });
 

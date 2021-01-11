@@ -12,7 +12,7 @@ namespace BuildingRegistry.Building.Events
     {
         [EventPropertyDescription("Interne GUID van het gebouw waartoe de gebouweenheid behoort.")]
         public Guid BuildingId { get; }
-        
+
         [EventPropertyDescription("Interne GUID van de gebouweenheid.")]
         public Guid BuildingUnitId { get; }
 
