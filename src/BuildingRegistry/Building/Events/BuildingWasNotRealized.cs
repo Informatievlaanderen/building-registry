@@ -9,12 +9,19 @@ namespace BuildingRegistry.Building.Events
     using ValueObjects;
 
     [EventName("BuildingWasNotRealized")]
-    [EventDescription("Gebouw werd niet gerealiseerd")]
+    [EventDescription("Het gebouw kreeg status 'niet gerealiseerd'.")]
     public class BuildingWasNotRealized : IHasProvenance, ISetProvenance
     {
+        [EventPropertyDescription("Interne GUID van het gebouw.")]
         public Guid BuildingId { get; }
+
+        [EventPropertyDescription("Interne GUID van de gebouweenheden die status 'gehistoreerd' moeten krijgen.")]
         public List<Guid> BuildingUnitIdsToRetire { get; }
+
+        [EventPropertyDescription("Interne GUID van de gebouweenheden die status 'niet gerealiseerd' moeten krijgen.")]
         public List<Guid> BuildingUnitIdsToNotRealize { get; }
+
+        [EventPropertyDescription("Metadata bij het event.")]
         public ProvenanceData Provenance { get; private set; }
 
         public BuildingWasNotRealized(

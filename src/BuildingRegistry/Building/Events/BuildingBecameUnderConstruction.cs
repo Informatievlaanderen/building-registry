@@ -7,10 +7,13 @@ namespace BuildingRegistry.Building.Events
     using ValueObjects;
 
     [EventName("BuildingBecameUnderConstruction")]
-    [EventDescription("Gebouw werd in aanbouw")]
+    [EventDescription("Het gebouw kreeg status 'in aanbouw'.")]
     public class BuildingBecameUnderConstruction : IHasProvenance, ISetProvenance
     {
+        [EventPropertyDescription("Interne GUID van het gebouw.")]
         public Guid BuildingId { get; }
+
+        [EventPropertyDescription("Metadata bij het event.")]
         public ProvenanceData Provenance { get; private set; }
 
         public BuildingBecameUnderConstruction(BuildingId buildingId) => BuildingId = buildingId;

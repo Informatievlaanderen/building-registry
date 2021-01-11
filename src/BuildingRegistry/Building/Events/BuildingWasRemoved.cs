@@ -9,11 +9,16 @@ namespace BuildingRegistry.Building.Events
     using ValueObjects;
 
     [EventName("BuildingWasRemoved")]
-    [EventDescription("Gebouw werd verwijderd")]
+    [EventDescription("Het gebouw werd verwijderd.")]
     public class BuildingWasRemoved : IHasProvenance, ISetProvenance
     {
+        [EventPropertyDescription("Interne GUID van het gebouw.")]
         public Guid BuildingId { get; }
+
+        [EventPropertyDescription("Interne GUID van de gebouweenheden die verwijderd moeten worden.")]
         public List<Guid> BuildingUnitIds { get; }
+
+        [EventPropertyDescription("Metadata bij het event.")]
         public ProvenanceData Provenance { get; private set; }
 
         public BuildingWasRemoved(

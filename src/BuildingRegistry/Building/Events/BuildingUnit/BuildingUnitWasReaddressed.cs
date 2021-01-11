@@ -8,15 +8,25 @@ namespace BuildingRegistry.Building.Events
     using ValueObjects;
 
     [EventName("BuildingUnitWasReaddressed")]
-    [EventDescription("Gebouweenheid werd geheradresseerd")]
+    [EventDescription("De gebouweenheid werd geheradresseerd.")]
     public class BuildingUnitWasReaddressed : IHasProvenance, ISetProvenance
     {
+        [EventPropertyDescription("Interne GUID van het gebouw waartoe de gebouweenheid behoort.")]
         public Guid BuildingId { get; }
+
+        [EventPropertyDescription("Interne GUID van de gebouweenheid.")]
         public Guid BuildingUnitId { get; }
+
+        [EventPropertyDescription("Interne GUID van het adres dat vóór de heradressering aan de gebouweenheid gekoppeld was.")]
         public Guid OldAddressId { get; }
+
+        [EventPropertyDescription("Interne GUID van het adres dat na de heradressering aan de gebouweenheid gekoppeld is.")]
         public Guid NewAddressId { get; }
+
+        [EventPropertyDescription("Datum van de heradressering.")]
         public LocalDate BeginDate { get; }
 
+        [EventPropertyDescription("Metadata bij het event.")]
         public ProvenanceData Provenance { get; private set; }
 
         public BuildingUnitWasReaddressed(

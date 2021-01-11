@@ -1,3 +1,24 @@
+## [2.24.7](https://github.com/informatievlaanderen/building-registry/compare/v2.24.6...v2.24.7) (2021-01-07)
+
+
+### Bug Fixes
+
+* improve cache status page GRAR-1734 ([ae89aa9](https://github.com/informatievlaanderen/building-registry/commit/ae89aa9cab92b357b31b29e6d6c2e6762034e72b))
+
+## [2.24.6](https://github.com/informatievlaanderen/building-registry/compare/v2.24.5...v2.24.6) (2021-01-07)
+
+
+### Bug Fixes
+
+* update deps ([d858603](https://github.com/informatievlaanderen/building-registry/commit/d8586030c6cecc0fedf2790682147add6d8b1dab))
+
+## [2.24.5](https://github.com/informatievlaanderen/building-registry/compare/v2.24.4...v2.24.5) (2020-12-28)
+
+
+### Bug Fixes
+
+* update basisregisters api dependency ([62f67a5](https://github.com/informatievlaanderen/building-registry/commit/62f67a5dc524c2853cad654525842277af94f55d))
+
 ## [2.24.4](https://github.com/informatievlaanderen/building-registry/compare/v2.24.3...v2.24.4) (2020-12-21)
 
 

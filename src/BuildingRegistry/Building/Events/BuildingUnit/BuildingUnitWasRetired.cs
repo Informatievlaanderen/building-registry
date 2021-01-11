@@ -7,12 +7,16 @@ namespace BuildingRegistry.Building.Events
     using ValueObjects;
 
     [EventName("BuildingUnitWasRetired")]
-    [EventDescription("Gebouweenheid werd gehistoreerd.")]
+    [EventDescription("De gebouweenheid kreeg status 'gehistoreerd'.")]
     public class BuildingUnitWasRetired : IHasProvenance, ISetProvenance
     {
+        [EventPropertyDescription("Interne GUID van het gebouw waartoe de gebouweenheid behoort.")]
         public Guid BuildingId { get; }
+
+        [EventPropertyDescription("Interne GUID van de gebouweenheid.")]
         public Guid BuildingUnitId { get; }
 
+        [EventPropertyDescription("Metadata bij het event.")]
         public ProvenanceData Provenance { get; private set; }
 
         public BuildingUnitWasRetired(

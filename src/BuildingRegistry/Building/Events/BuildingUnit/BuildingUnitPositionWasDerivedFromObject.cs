@@ -7,12 +7,19 @@ namespace BuildingRegistry.Building.Events
     using ValueObjects;
 
     [EventName("BuildingUnitPositionWasDerivedFromObject")]
-    [EventDescription("Gebouweenheid positie werd afgeleid van object.")]
+    [EventDescription("De gebouweenheidpositie werd afgeleid van een ander object.")]
     public class BuildingUnitPositionWasDerivedFromObject : IHasProvenance, ISetProvenance
     {
+        [EventPropertyDescription("Interne GUID van het gebouw waartoe de gebouweenheid behoort.")]
         public Guid BuildingId { get; }
+
+        [EventPropertyDescription("Interne GUID van de gebouweenheid.")]
         public Guid BuildingUnitId { get; }
+
+        [EventPropertyDescription("Extended WKB-voorstelling van de gebouweenheidgeometrie.")]
         public string ExtendedWkbGeometry { get; }
+
+        [EventPropertyDescription("Metadata bij het event.")]
         public ProvenanceData Provenance { get; private set; }
 
         public BuildingUnitPositionWasDerivedFromObject(

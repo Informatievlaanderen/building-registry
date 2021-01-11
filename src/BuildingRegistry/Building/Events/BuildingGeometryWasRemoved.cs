@@ -7,10 +7,13 @@ namespace BuildingRegistry.Building.Events
     using ValueObjects;
 
     [EventName("BuildingGeometryWasRemoved")]
-    [EventDescription("Gebouw geometrie werd verwijderd")]
+    [EventDescription("De gebouwgeometrie werd verwijderd.")]
     public class BuildingGeometryWasRemoved : IHasProvenance, ISetProvenance
     {
+        [EventPropertyDescription("Interne GUID van het gebouw.")]
         public Guid BuildingId { get; }
+
+        [EventPropertyDescription("Metadata bij het event.")]
         public ProvenanceData Provenance { get; private set; }
 
         public BuildingGeometryWasRemoved(BuildingId buildingId) => BuildingId = buildingId;

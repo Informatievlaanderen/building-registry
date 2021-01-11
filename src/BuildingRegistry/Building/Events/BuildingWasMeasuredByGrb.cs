@@ -7,11 +7,16 @@ namespace BuildingRegistry.Building.Events
     using ValueObjects;
 
     [EventName("BuildingWasMeasuredByGrb")]
-    [EventDescription("Gebouw werd ingemeten door GRB")]
+    [EventDescription("Het gebouw werd ingemeten door GRB.")]
     public class BuildingWasMeasuredByGrb : IHasProvenance, ISetProvenance
     {
+        [EventPropertyDescription("Interne GUID van het gebouw.")]
         public Guid BuildingId { get; }
+
+        [EventPropertyDescription("Extended WKB-voorstelling van de gebouwgeometrie.")]
         public string ExtendedWkbGeometry { get; }
+
+        [EventPropertyDescription("Metadata bij het event.")]
         public ProvenanceData Provenance { get; private set; }
 
         public BuildingWasMeasuredByGrb(
