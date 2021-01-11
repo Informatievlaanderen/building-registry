@@ -7,7 +7,7 @@ namespace BuildingRegistry.Building.Events
     using ValueObjects;
 
     [EventName("BuildingUnitWasRetiredByParent")]
-    [EventDescription("De gebouweenheid kreeg status 'gehistoreerd' door een overkoepelende gebouweenheid (bvb. huisnummer > subadres).")]
+    [EventDescription("De gebouweenheid kreeg status 'gehistoreerd' door een overkoepelende gebouweenheid (bv. huisnummer > busnummer).")]
     public class BuildingUnitWasRetiredByParent : IHasProvenance, ISetProvenance
     {
         [EventPropertyDescription("Interne GUID van het gebouw waartoe de gebouweenheid behoort.")]
