@@ -10,18 +10,40 @@ namespace BuildingRegistry.Building.Events.Crab
     [EventDescription("Legacy event om tblHuisnummerStatus en tblHuisnummerStatus_hist te importeren.")]
     public class AddressHouseNumberStatusWasImportedFromCrab : ICrabEvent, IHasCrabAddressStatus, IHasCrabKey<int>
     {
+        [EventPropertyDescription("CRAB-identificator van het terreinobject.")]
         public int TerrainObjectId { get; }
+        
+        [EventPropertyDescription("CRAB-identificator van de terreinobject-huisnummerrelatie.")]
         public int TerrainObjectHouseNumberId { get; }
+        
+        [EventPropertyDescription("CRAB-identificator van de huisnummerstatus.")]
         public int HouseNumberStatusId { get; }
+        
+        [EventPropertyDescription("CRAB-identificator van het huisnummer.")]
         public int HouseNumberId { get; }
+        
+        [EventPropertyDescription("Datum waarop het object is ontstaan in werkelijkheid.")]
         public LocalDateTime? BeginDateTime { get; }
+        
+        [EventPropertyDescription("Datum waarop het object in werkelijkheid ophoudt te bestaan.")]
         public LocalDateTime? EndDateTime { get; }
+        
+        [EventPropertyDescription("Datum waarop het object in werkelijkheid ophoudt te bestaan.")]
         public Instant Timestamp { get; }
+        
+        [EventPropertyDescription("Operator door wie het object werd ingevoerd in de databank.")]
         public string Operator { get; }
+        
+        [EventPropertyDescription("Bewerking waarmee het object werd ingevoerd in de databank.")] 
         public CrabModification? Modification { get; }
+        
+        [EventPropertyDescription("Organisatie die het object heeft ingevoerd in de databank.")]
         public CrabOrganisation? Organisation { get; }
+        
+        [EventPropertyDescription("Huisnummerstatus.")]
         public CrabAddressStatus AddressStatus { get; }
 
+        [EventPropertyDescription("Unieke sleutel.")]
         public int Key => HouseNumberStatusId;
 
         public AddressHouseNumberStatusWasImportedFromCrab(
