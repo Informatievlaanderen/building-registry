@@ -8,20 +8,43 @@ namespace BuildingRegistry.Building.Events.Crab
     using ValueObjects.Crab;
 
     [EventName("AddressSubaddressWasImportedFromCrab")]
-    [EventDescription("Legacy event om tblSubadres en tblSubadres_hist te importeren.")]
+    [EventDescription("Legacy event om tblSubadres en tblSubadres_hist te importeren voor gemGebouwen.")]
     public class AddressSubaddressWasImportedFromCrab
     {
+        [EventPropertyDescription("CRAB-identificator van het terreinobject.")]
         public int TerrainObjectId { get; }
+        
+        [EventPropertyDescription("CRAB-identificator van de terreinobject-huisnummerrelatie.")]
         public int TerrainObjectHouseNumberId { get; }
+        
+        [EventPropertyDescription("CRAB-identificator van het subadres (bus- of appartementsnummer).")]
         public int SubaddressId { get; }
+        
+        [EventPropertyDescription("CRAB-identificator van het huisnummer.")]
         public int HouseNumberId { get; }
+        
+        [EventPropertyDescription("Aanduiding gebruikt voor het subadres.")]
         public string BoxNumber { get; }
+        
+        [EventPropertyDescription("Aard van het subadres.")]
         public string BoxNumberType { get; }
+        
+        [EventPropertyDescription("Datum waarop het object is ontstaan in werkelijkheid.")]
         public LocalDateTime? BeginDateTime { get; }
+        
+        [EventPropertyDescription("Datum waarop het object in werkelijkheid ophoudt te bestaan.")]
         public LocalDateTime? EndDateTime { get; }
+        
+        [EventPropertyDescription("Tijdstip waarop het object werd ingevoerd in de databank.")]
         public Instant Timestamp { get; }
+        
+        [EventPropertyDescription("Operator door wie het object werd ingevoerd in de databank.")]
         public string Operator { get; }
+        
+        [EventPropertyDescription("Bewerking waarmee het object werd ingevoerd in de databank.")] 
         public CrabModification? Modification { get; }
+        
+        [EventPropertyDescription("Organisatie die het object heeft ingevoerd in de databank.")]
         public CrabOrganisation? Organisation { get; }
 
         public AddressSubaddressWasImportedFromCrab(
