@@ -12,13 +12,13 @@ namespace BuildingRegistry.Building.Events
     {
         [EventPropertyDescription("Interne GUID van het gebouw waartoe de gebouweenheid behoort.")]
         public Guid BuildingId { get; }
-        
+
         [EventPropertyDescription("Interne GUID van de gebouweenheid.")]
         public Guid BuildingUnitId { get; }
-        
+
         [EventPropertyDescription("Extended WKB-voorstelling van de gebouweenheidgeometrie.")]
-        public string Position { get; }
-        
+        public string ExtendedWkbGeometry { get; }
+
         [EventPropertyDescription("Metadata bij het event.")]
         public ProvenanceData Provenance { get; private set; }
 
@@ -29,19 +29,19 @@ namespace BuildingRegistry.Building.Events
         {
             BuildingId = buildingId;
             BuildingUnitId = buildingUnitId;
-            Position = position.ToString();
+            ExtendedWkbGeometry = position.ToString();
         }
 
         [JsonConstructor]
         private BuildingUnitPositionWasCorrectedToDerivedFromObject(
             Guid buildingId,
             Guid buildingUnitId,
-            string position,
+            string extendedWkbGeometry,
             ProvenanceData provenance)
             : this(
                 new BuildingId(buildingId),
                 new BuildingUnitId(buildingUnitId),
-                new ExtendedWkbGeometry(position)) => ((ISetProvenance)this).SetProvenance(provenance.ToProvenance());
+                new ExtendedWkbGeometry(extendedWkbGeometry)) => ((ISetProvenance)this).SetProvenance(provenance.ToProvenance());
 
         void ISetProvenance.SetProvenance(Provenance provenance) => Provenance = new ProvenanceData(provenance);
     }

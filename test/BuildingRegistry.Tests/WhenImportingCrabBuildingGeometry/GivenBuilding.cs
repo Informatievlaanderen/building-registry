@@ -228,7 +228,7 @@ namespace BuildingRegistry.Tests.WhenImportingCrabBuildingGeometry
                 .WithGeometry(_fixture.Create<WkbGeometry>());
             var importedGeometry = _fixture.Create<ImportBuildingGeometryFromCrab>()
                 .WithGeometryMethod(CrabBuildingGeometryMethod.Survey)
-                .WithGeometry(new WkbGeometry(buildingWasMeasured.ExtendedWkb));
+                .WithGeometry(new WkbGeometry(buildingWasMeasured.ExtendedWkbGeometry));
 
             var importGeometry = _fixture.Create<ImportBuildingGeometryFromCrab>()
                 .WithGeometryMethod(CrabBuildingGeometryMethod.Outlined)
@@ -251,11 +251,11 @@ namespace BuildingRegistry.Tests.WhenImportingCrabBuildingGeometry
                 .WithGeometry(new WkbGeometry(GeometryHelper.ValidPolygon.AsBinary()));
             var importedGeometry = _fixture.Create<ImportBuildingGeometryFromCrab>()
                 .WithGeometryMethod(CrabBuildingGeometryMethod.Survey)
-                .WithGeometry(new WkbGeometry(buildingWasMeasured.ExtendedWkb));
+                .WithGeometry(new WkbGeometry(buildingWasMeasured.ExtendedWkbGeometry));
 
             var importedGeometryDelete = _fixture.Create<ImportBuildingGeometryFromCrab>()
                 .WithGeometryMethod(CrabBuildingGeometryMethod.Survey)
-                .WithGeometry(new WkbGeometry(buildingWasMeasured.ExtendedWkb))
+                .WithGeometry(new WkbGeometry(buildingWasMeasured.ExtendedWkbGeometry))
                 .WithCrabModification(CrabModification.Delete)
                 .WithLifetime(importedGeometry.Lifetime);
 
@@ -283,12 +283,12 @@ namespace BuildingRegistry.Tests.WhenImportingCrabBuildingGeometry
                 .WithGeometry(_fixture.Create<WkbGeometry>());
             var importedGeometry = _fixture.Create<ImportBuildingGeometryFromCrab>()
                 .WithGeometryMethod(CrabBuildingGeometryMethod.Survey)
-                .WithGeometry(new WkbGeometry(buildingWasMeasured.ExtendedWkb));
+                .WithGeometry(new WkbGeometry(buildingWasMeasured.ExtendedWkbGeometry));
 
             var importedGeometryDelete = _fixture.Create<ImportBuildingGeometryFromCrab>()
                 .WithBuildingGeometryId(importedGeometry.BuildingGeometryId)
                 .WithGeometryMethod(CrabBuildingGeometryMethod.Survey)
-                .WithGeometry(new WkbGeometry(buildingWasMeasured.ExtendedWkb))
+                .WithGeometry(new WkbGeometry(buildingWasMeasured.ExtendedWkbGeometry))
                 .WithCrabModification(CrabModification.Delete)
                 .WithLifetime(importedGeometry.Lifetime);
 
@@ -297,7 +297,7 @@ namespace BuildingRegistry.Tests.WhenImportingCrabBuildingGeometry
             var importGeometry = _fixture.Create<ImportBuildingGeometryFromCrab>()
                 .WithGeometryMethod(CrabBuildingGeometryMethod.Outlined)
                 .WithLifetime(importedGeometry.Lifetime)
-                .WithGeometry(new WkbGeometry(buildingWasOutlined.ExtendedWkb));
+                .WithGeometry(new WkbGeometry(buildingWasOutlined.ExtendedWkbGeometry));
 
             Assert(new Scenario()
                 .Given(_fixture.Create<BuildingId>(),

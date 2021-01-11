@@ -12,10 +12,10 @@ namespace BuildingRegistry.Building.Events
     {
         [EventPropertyDescription("Interne GUID van het gebouw.")]
         public Guid BuildingId { get; }
-        
+
         [EventPropertyDescription("Extended WKB-voorstelling van de gebouwgeometrie.")]
-        public string ExtendedWkb { get; }
-        
+        public string ExtendedWkbGeometry { get; }
+
         [EventPropertyDescription("Metadata bij het event.")]
         public ProvenanceData Provenance { get; private set; }
 
@@ -24,17 +24,17 @@ namespace BuildingRegistry.Building.Events
             ExtendedWkbGeometry geometry)
         {
             BuildingId = buildingId;
-            ExtendedWkb = geometry.ToString();
+            ExtendedWkbGeometry = geometry.ToString();
         }
 
         [JsonConstructor]
         private BuildingWasMeasuredByGrb(
             Guid buildingId,
-            string extendedWkb,
+            string extendedWkbGeometry,
             ProvenanceData provenance)
             : this(
                 new BuildingId(buildingId),
-                new ExtendedWkbGeometry(extendedWkb)) => ((ISetProvenance)this).SetProvenance(provenance.ToProvenance());
+                new ExtendedWkbGeometry(extendedWkbGeometry)) => ((ISetProvenance)this).SetProvenance(provenance.ToProvenance());
 
         void ISetProvenance.SetProvenance(Provenance provenance) => Provenance = new ProvenanceData(provenance);
     }

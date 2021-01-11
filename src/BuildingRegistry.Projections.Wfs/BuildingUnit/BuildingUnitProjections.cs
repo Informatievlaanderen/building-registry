@@ -334,7 +334,7 @@ namespace BuildingRegistry.Projections.Wfs.BuildingUnit
                 var buildingUnit = await context.BuildingUnits.FindAsync(message.Message.BuildingUnitId, cancellationToken: ct);
                 if (buildingUnit != null)
                 {
-                    SetPosition(buildingUnit, message.Message.Position, AppointedByAdministratorMethod);
+                    SetPosition(buildingUnit, message.Message.ExtendedWkbGeometry, AppointedByAdministratorMethod);
                     SetVersion(buildingUnit, message.Message.Provenance.Timestamp);
                 }
             });
@@ -344,7 +344,7 @@ namespace BuildingRegistry.Projections.Wfs.BuildingUnit
                 var buildingUnit = await context.BuildingUnits.FindAsync(message.Message.BuildingUnitId, cancellationToken: ct);
                 if (buildingUnit != null)
                 {
-                    SetPosition(buildingUnit, message.Message.Position, AppointedByAdministratorMethod);
+                    SetPosition(buildingUnit, message.Message.ExtendedWkbGeometry, AppointedByAdministratorMethod);
                     SetVersion(buildingUnit, message.Message.Provenance.Timestamp);
                 }
             });
@@ -354,7 +354,7 @@ namespace BuildingRegistry.Projections.Wfs.BuildingUnit
                 var buildingUnit = await context.BuildingUnits.FindAsync(message.Message.BuildingUnitId, cancellationToken: ct);
                 if (buildingUnit != null)
                 {
-                    SetPosition(buildingUnit, message.Message.Position, DerivedFromObjectMethod);
+                    SetPosition(buildingUnit, message.Message.ExtendedWkbGeometry, DerivedFromObjectMethod);
                     SetVersion(buildingUnit, message.Message.Provenance.Timestamp);
                 }
             });
@@ -364,7 +364,7 @@ namespace BuildingRegistry.Projections.Wfs.BuildingUnit
                 var buildingUnit = await context.BuildingUnits.FindAsync(message.Message.BuildingUnitId, cancellationToken: ct);
                 if (buildingUnit != null)
                 {
-                    SetPosition(buildingUnit, message.Message.Position, DerivedFromObjectMethod);
+                    SetPosition(buildingUnit, message.Message.ExtendedWkbGeometry, DerivedFromObjectMethod);
                     SetVersion(buildingUnit, message.Message.Provenance.Timestamp);
                 }
             });

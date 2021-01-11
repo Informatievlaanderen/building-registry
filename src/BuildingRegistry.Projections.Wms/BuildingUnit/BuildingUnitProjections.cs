@@ -338,7 +338,7 @@ namespace BuildingRegistry.Projections.Wms.BuildingUnit
                 var buildingUnit = await context.BuildingUnits.FindAsync(message.Message.BuildingUnitId, cancellationToken: ct);
                 if (buildingUnit != null)
                 {
-                    SetPosition(buildingUnit, message.Message.Position, "AangeduidDoorBeheerder");
+                    SetPosition(buildingUnit, message.Message.ExtendedWkbGeometry, "AangeduidDoorBeheerder");
                     SetVersion(buildingUnit, message.Message.Provenance.Timestamp);
                 }
             });
@@ -348,7 +348,7 @@ namespace BuildingRegistry.Projections.Wms.BuildingUnit
                 var buildingUnit = await context.BuildingUnits.FindAsync(message.Message.BuildingUnitId, cancellationToken: ct);
                 if (buildingUnit != null)
                 {
-                    SetPosition(buildingUnit, message.Message.Position, "AangeduidDoorBeheerder");
+                    SetPosition(buildingUnit, message.Message.ExtendedWkbGeometry, "AangeduidDoorBeheerder");
                     SetVersion(buildingUnit, message.Message.Provenance.Timestamp);
                 }
             });
@@ -358,7 +358,7 @@ namespace BuildingRegistry.Projections.Wms.BuildingUnit
                 var buildingUnit = await context.BuildingUnits.FindAsync(message.Message.BuildingUnitId, cancellationToken: ct);
                 if (buildingUnit != null)
                 {
-                    SetPosition(buildingUnit, message.Message.Position, "AfgeleidVanObject");
+                    SetPosition(buildingUnit, message.Message.ExtendedWkbGeometry, "AfgeleidVanObject");
                     SetVersion(buildingUnit, message.Message.Provenance.Timestamp);
                 }
             });
@@ -368,7 +368,7 @@ namespace BuildingRegistry.Projections.Wms.BuildingUnit
                 var buildingUnit = await context.BuildingUnits.FindAsync(message.Message.BuildingUnitId, cancellationToken: ct);
                 if (buildingUnit != null)
                 {
-                    SetPosition(buildingUnit, message.Message.Position, "AfgeleidVanObject");
+                    SetPosition(buildingUnit, message.Message.ExtendedWkbGeometry, "AfgeleidVanObject");
                     SetVersion(buildingUnit, message.Message.Provenance.Timestamp);
                 }
             });

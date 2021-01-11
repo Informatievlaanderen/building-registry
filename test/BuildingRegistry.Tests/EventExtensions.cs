@@ -112,7 +112,7 @@ namespace BuildingRegistry.Tests
 
         public static BuildingUnitPositionWasDerivedFromObject WithBuildingUnitId(this BuildingUnitPositionWasDerivedFromObject @event, BuildingUnitId buildingUnitId)
         {
-            var newEvent = new BuildingUnitPositionWasDerivedFromObject(new BuildingId(@event.BuildingId), buildingUnitId, new ExtendedWkbGeometry(@event.Position));
+            var newEvent = new BuildingUnitPositionWasDerivedFromObject(new BuildingId(@event.BuildingId), buildingUnitId, new ExtendedWkbGeometry(@event.ExtendedWkbGeometry));
             ((ISetProvenance)newEvent).SetProvenance(@event.Provenance.ToProvenance());
             return newEvent;
         }

@@ -187,7 +187,7 @@ namespace BuildingRegistry.Projections.Wms.Building
                 var building = await context.Buildings.FindAsync(message.Message.BuildingId, cancellationToken: ct);
                 if (building != null)
                 {
-                    SetGeometry(building, message.Message.ExtendedWkb, "IngemetenGRB");
+                    SetGeometry(building, message.Message.ExtendedWkbGeometry, "IngemetenGRB");
                     SetVersion(building, message.Message.Provenance.Timestamp);
                 }
             });
@@ -197,7 +197,7 @@ namespace BuildingRegistry.Projections.Wms.Building
                 var building = await context.Buildings.FindAsync(message.Message.BuildingId, cancellationToken: ct);
                 if (building != null)
                 {
-                    SetGeometry(building, message.Message.ExtendedWkb, "IngemetenGRB");
+                    SetGeometry(building, message.Message.ExtendedWkbGeometry, "IngemetenGRB");
                     SetVersion(building, message.Message.Provenance.Timestamp);
                 }
             });
@@ -207,7 +207,7 @@ namespace BuildingRegistry.Projections.Wms.Building
                 var building = await context.Buildings.FindAsync(message.Message.BuildingId, cancellationToken: ct);
                 if (building != null)
                 {
-                    SetGeometry(building, message.Message.ExtendedWkb, "Ingeschetst");
+                    SetGeometry(building, message.Message.ExtendedWkbGeometry, "Ingeschetst");
                     SetVersion(building, message.Message.Provenance.Timestamp);
                 }
             });
@@ -217,7 +217,7 @@ namespace BuildingRegistry.Projections.Wms.Building
                 var building = await context.Buildings.FindAsync(message.Message.BuildingId, cancellationToken: ct);
                 if (building != null)
                 {
-                    SetGeometry(building, message.Message.ExtendedWkb, "Ingeschetst");
+                    SetGeometry(building, message.Message.ExtendedWkbGeometry, "Ingeschetst");
                     SetVersion(building, message.Message.Provenance.Timestamp);
                 }
             });

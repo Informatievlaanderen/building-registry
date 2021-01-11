@@ -280,28 +280,28 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetail
             When<Envelope<BuildingUnitPositionWasAppointedByAdministrator>>(async (context, message, ct) =>
             {
                 var buildingUnit = await context.BuildingUnitDetails.FindAsync(message.Message.BuildingUnitId, cancellationToken: ct);
-                SetGeometry(buildingUnit, message.Message.Position, BuildingUnitPositionGeometryMethod.AppointedByAdministrator);
+                SetGeometry(buildingUnit, message.Message.ExtendedWkbGeometry, BuildingUnitPositionGeometryMethod.AppointedByAdministrator);
                 SetVersion(buildingUnit, message.Message.Provenance.Timestamp);
             });
 
             When<Envelope<BuildingUnitPositionWasCorrectedToAppointedByAdministrator>>(async (context, message, ct) =>
             {
                 var buildingUnit = await context.BuildingUnitDetails.FindAsync(message.Message.BuildingUnitId, cancellationToken: ct);
-                SetGeometry(buildingUnit, message.Message.Position, BuildingUnitPositionGeometryMethod.AppointedByAdministrator);
+                SetGeometry(buildingUnit, message.Message.ExtendedWkbGeometry, BuildingUnitPositionGeometryMethod.AppointedByAdministrator);
                 SetVersion(buildingUnit, message.Message.Provenance.Timestamp);
             });
 
             When<Envelope<BuildingUnitPositionWasCorrectedToDerivedFromObject>>(async (context, message, ct) =>
             {
                 var buildingUnit = await context.BuildingUnitDetails.FindAsync(message.Message.BuildingUnitId, cancellationToken: ct);
-                SetGeometry(buildingUnit, message.Message.Position, BuildingUnitPositionGeometryMethod.DerivedFromObject);
+                SetGeometry(buildingUnit, message.Message.ExtendedWkbGeometry, BuildingUnitPositionGeometryMethod.DerivedFromObject);
                 SetVersion(buildingUnit, message.Message.Provenance.Timestamp);
             });
 
             When<Envelope<BuildingUnitPositionWasDerivedFromObject>>(async (context, message, ct) =>
             {
                 var buildingUnit = await context.BuildingUnitDetails.FindAsync(message.Message.BuildingUnitId, cancellationToken: ct);
-                SetGeometry(buildingUnit, message.Message.Position, BuildingUnitPositionGeometryMethod.DerivedFromObject);
+                SetGeometry(buildingUnit, message.Message.ExtendedWkbGeometry, BuildingUnitPositionGeometryMethod.DerivedFromObject);
                 SetVersion(buildingUnit, message.Message.Provenance.Timestamp);
             });
 

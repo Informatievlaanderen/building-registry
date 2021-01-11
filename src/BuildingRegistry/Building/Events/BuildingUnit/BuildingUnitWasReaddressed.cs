@@ -13,16 +13,16 @@ namespace BuildingRegistry.Building.Events
     {
         [EventPropertyDescription("Interne GUID van het gebouw waartoe de gebouweenheid behoort.")]
         public Guid BuildingId { get; }
-        
+
         [EventPropertyDescription("Interne GUID van de gebouweenheid.")]
         public Guid BuildingUnitId { get; }
-        
+
         [EventPropertyDescription("Interne GUID van het adres dat vóór de heradressering aan de gebouweenheid gekoppeld was.")]
         public Guid OldAddressId { get; }
-        
+
         [EventPropertyDescription("Interne GUID van het adres dat na de heradressering aan de gebouweenheid gekoppeld is.")]
         public Guid NewAddressId { get; }
-        
+
         [EventPropertyDescription("Datum van de heradressering.")]
         public LocalDate BeginDate { get; }
 
