@@ -7,7 +7,7 @@ namespace BuildingRegistry.Building.Events
     using ValueObjects;
 
     [EventName("BuildingUnitWasNotRealizedByParent")]
-    [EventDescription("De gebouweenheid kreeg status 'niet gerealiseerd' door een overkoepelende gebouweenheid (bvb. huisnummer > subadres).")]
+    [EventDescription("De gebouweenheid kreeg status 'niet gerealiseerd' door een overkoepelende gebouweenheid (bv. huisnummer > busnummer).")]
     public class BuildingUnitWasNotRealizedByParent : IHasProvenance, ISetProvenance
     {
         [EventPropertyDescription("Interne GUID van het gebouw waartoe de gebouweenheid behoort.")]
