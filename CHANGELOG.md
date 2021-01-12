@@ -1,3 +1,10 @@
+# [2.25.0](https://github.com/informatievlaanderen/building-registry/compare/v2.24.8...v2.25.0) (2021-01-12)
+
+
+### Features
+
+* add syndication status to projector api GRAR-1567 ([6522f55](https://github.com/informatievlaanderen/building-registry/commit/6522f55408efb95b9c02caecf003532a1279e924))
+
 ## [2.24.8](https://github.com/informatievlaanderen/building-registry/compare/v2.24.7...v2.24.8) (2021-01-11)
 
 
