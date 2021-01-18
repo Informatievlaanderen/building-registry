@@ -1,3 +1,10 @@
+## [2.25.1](https://github.com/informatievlaanderen/building-registry/compare/v2.25.0...v2.25.1) (2021-01-18)
+
+
+### Bug Fixes
+
+* localdate serialization in sync eventxml GRAR-1754 ([38463d4](https://github.com/informatievlaanderen/building-registry/commit/38463d444397e9a7d246b6098cc8d8b8b23c6c9e))
+
 # [2.25.0](https://github.com/informatievlaanderen/building-registry/compare/v2.24.8...v2.25.0) (2021-01-12)
 
 
