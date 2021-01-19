@@ -26,24 +26,24 @@ namespace BuildingRegistry.Building.Events
 
         public BuildingWasCorrectedToRetired(
             BuildingId buildingId,
-            IEnumerable<BuildingUnitId> buildingUnitsToRetire,
-            IEnumerable<BuildingUnitId> buildingUnitsToNotRealize)
+            IEnumerable<BuildingUnitId> buildingUnitIdsToRetire,
+            IEnumerable<BuildingUnitId> buildingUnitIdsToNotRealize)
         {
             BuildingId = buildingId;
-            BuildingUnitIdsToRetire = buildingUnitsToRetire?.Select(x => (Guid) x).ToList() ?? new List<Guid>();
-            BuildingUnitIdsToNotRealize = buildingUnitsToNotRealize?.Select(x => (Guid) x).ToList() ?? new List<Guid>();
+            BuildingUnitIdsToRetire = buildingUnitIdsToRetire?.Select(x => (Guid) x).ToList() ?? new List<Guid>();
+            BuildingUnitIdsToNotRealize = buildingUnitIdsToNotRealize?.Select(x => (Guid) x).ToList() ?? new List<Guid>();
         }
 
         [JsonConstructor]
         private BuildingWasCorrectedToRetired(
             Guid buildingId,
-            IEnumerable<Guid> buildingUnitsToRetire,
-            IEnumerable<Guid> buildingUnitsToNotRealize,
+            IEnumerable<Guid> buildingUnitIdsToRetire,
+            IEnumerable<Guid> buildingUnitIdsToNotRealize,
             ProvenanceData provenance)
             : this(
                 new BuildingId(buildingId),
-                buildingUnitsToRetire?.Select(x => new BuildingUnitId(x)) ?? new List<BuildingUnitId>(),
-                buildingUnitsToNotRealize?.Select(x => new BuildingUnitId(x)) ?? new List<BuildingUnitId>()) => ((ISetProvenance)this).SetProvenance(provenance.ToProvenance());
+                buildingUnitIdsToRetire?.Select(x => new BuildingUnitId(x)) ?? new List<BuildingUnitId>(),
+                buildingUnitIdsToNotRealize?.Select(x => new BuildingUnitId(x)) ?? new List<BuildingUnitId>()) => ((ISetProvenance)this).SetProvenance(provenance.ToProvenance());
 
         void ISetProvenance.SetProvenance(Provenance provenance) => Provenance = new ProvenanceData(provenance);
     }
