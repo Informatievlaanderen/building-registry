@@ -1,3 +1,10 @@
+## [2.25.2](https://github.com/informatievlaanderen/building-registry/compare/v2.25.1...v2.25.2) (2021-01-19)
+
+
+### Bug Fixes
+
+* event deserialization some ctor parameters were incorrectly named GRAR-1759 ([10f8e80](https://github.com/informatievlaanderen/building-registry/commit/10f8e80ce1d91ec57958aa9aead2d55524f44cf1))
+
 ## [2.25.1](https://github.com/informatievlaanderen/building-registry/compare/v2.25.0...v2.25.1) (2021-01-18)
 
 
