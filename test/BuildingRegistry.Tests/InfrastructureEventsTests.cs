@@ -9,6 +9,7 @@ namespace Aiv.Vbr.Testing.Infrastructure.Events
     using System.Linq;
     using System.Reflection;
     using System.Runtime.CompilerServices;
+    using FluentAssertions.Equivalency;
     using Xunit;
 
     /// <summary>
@@ -102,6 +103,35 @@ namespace Aiv.Vbr.Testing.Infrastructure.Events
                     .SelectMany(s => s.GetCustomAttributes(typeof(JsonConstructorAttribute), true))
                     .Should()
                     .NotBeEmpty($"Forgot JsonConstructor on {type.FullName}");
+            }
+        }
+
+        [Fact]
+        public void HasNoPublicFields()
+        {
+            foreach (var type in _eventTypes)
+            {
+                type.GetFields(BindingFlags.Public | BindingFlags.Instance)
+                    .Should()
+                    .BeEmpty($"{type.FullName} has a public field");
+            }
+        }
+
+        [Fact]
+        public void HasJsonConstructorWithCorrectParameters()
+        {
+            foreach (var type in _eventTypes)
+            {
+                var propertyNamesCamelCased =
+                    type.GetProperties(BindingFlags.Public | BindingFlags.Instance)
+                        .Select(x => x.Name)
+                        .Select(x => x[0].ToString().ToLowerInvariant() + x.Substring(1))
+                        .ToList();
+
+                type.GetConstructors(BindingFlags.NonPublic | BindingFlags.Instance)
+                    .Where(s => s.GetCustomAttributes(typeof(JsonConstructorAttribute), true).Any())
+                    .SelectMany(x => x.GetParameters().Select(x => x.Name))
+                    .Should().BeEquivalentTo(propertyNamesCamelCased, $"JsonConstructor without correct parameters on {type.FullName}");
             }
         }
 

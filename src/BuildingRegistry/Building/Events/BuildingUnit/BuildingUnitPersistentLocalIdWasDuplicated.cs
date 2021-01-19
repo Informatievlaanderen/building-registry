@@ -49,14 +49,14 @@ namespace BuildingRegistry.Building.Events
             Guid buildingUnitId,
             int duplicatePersistentLocalId,
             int originalPersistentLocalId,
-            Instant assignmentDate,
+            Instant duplicateAssignmentDate,
             ProvenanceData provenance)
             : this(
                 new BuildingId(buildingId),
                 new BuildingUnitId(buildingUnitId),
                 new PersistentLocalId(duplicatePersistentLocalId),
                 new PersistentLocalId(originalPersistentLocalId),
-                new PersistentLocalIdAssignmentDate(assignmentDate))
+                new PersistentLocalIdAssignmentDate(duplicateAssignmentDate))
             => ((ISetProvenance)this).SetProvenance(provenance.ToProvenance());
 
         public void SetProvenance(Provenance provenance) => Provenance = new ProvenanceData(provenance);
