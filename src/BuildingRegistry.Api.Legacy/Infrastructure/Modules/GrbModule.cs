@@ -17,9 +17,11 @@ namespace BuildingRegistry.Api.Legacy.Infrastructure.Modules
             containerBuilder
                 .RegisterInstance(new GrbWfsConfiguration(_configuration["Grb:Wfs:Url"]))
                 .AsSelf();
+                
             containerBuilder
                 .RegisterType<GrbWfsClient>()
                 .AsImplementedInterfaces();
+                
             containerBuilder
                 .RegisterType<GrbBuildingParcel>()
                 .AsImplementedInterfaces();
