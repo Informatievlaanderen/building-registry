@@ -1,4 +1,4 @@
-namespace BuildingRegistry.Api.Legacy.Infrastructure.Grb
+namespace BuildingRegistry.Api.Legacy.Infrastructure.Grb.Wfs
 {
     using System;
     using System.Collections.Generic;
@@ -13,22 +13,28 @@ namespace BuildingRegistry.Api.Legacy.Infrastructure.Grb
     using NetTopologySuite.Geometries;
     using NetTopologySuite.IO.GML2;
 
-    public class GrbWfsClient : IGrbWfsClient
+    public interface IGrbWfsClient
     {
-        internal const string GmlNameSpace = "http://www.opengis.net/gml";
-        internal const string WfsNameSpace = "http://www.opengis.net/wfs";
-        internal const string GrbNameSpace = "informatievlaanderen.be/grb";
-        internal const string GrbWfs = "https://geoservices.informatievlaanderen.be/overdrachtdiensten/GRB/wfs"; // TODO place in config file
+        IEnumerable<Tuple<Geometry, IReadOnlyDictionary<string, string>>> GetFeaturesInBoundingBox(GrbFeatureType featureType, Envelope boundingBox);
+    }
 
+    internal class GrbWfsClient : IGrbWfsClient
+    {
+        private readonly string _wfsUrl;
         private readonly XmlNamespaceManager _namespaceManager;
         private readonly GMLReader _gmlReader;
 
-        public GrbWfsClient()
+        public GrbWfsClient(GrbWfsConfiguration configuration)
         {
+            if (configuration == null)
+                throw new ArgumentNullException(nameof(configuration));
+
+            _wfsUrl = configuration.Url;
+
             _namespaceManager = new XmlNamespaceManager(new NameTable());
-            _namespaceManager.AddNamespace("wfs", WfsNameSpace);
-            _namespaceManager.AddNamespace("gml", GmlNameSpace);
-            _namespaceManager.AddNamespace("grb", GrbNameSpace);
+            _namespaceManager.AddNamespace("wfs", GrbWfsNameSpaces.Wfs);
+            _namespaceManager.AddNamespace("gml", GrbWfsNameSpaces.Gml);
+            _namespaceManager.AddNamespace("grb", GrbWfsNameSpaces.Grb);
 
             _gmlReader = new GMLReader();
         }
@@ -46,23 +52,23 @@ namespace BuildingRegistry.Api.Legacy.Infrastructure.Grb
 
                 var wfsDoc = XDocument.Load(response);
                 if (wfsDoc.Root?.Name?.LocalName == null)
-                    throw new WfsException("Invalid response");
+                    throw new GrbWfsException("Invalid response");
 
                 if (wfsDoc.Root.Name.LocalName.Equals("ServiceExceptionReport", StringComparison.OrdinalIgnoreCase))
-                    throw new WfsException(wfsDoc.ToString());
+                    throw new GrbWfsException(wfsDoc.ToString());
 
                 return wfsDoc
                     .XPathSelectElements("/wfs:FeatureCollection/gml:featureMember", _namespaceManager)
                     .Select(element => MapFeature(featureName, element));
             }
             catch (Exception exception)
-                when (exception is WfsException)
+                when (exception is GrbWfsException)
             {
-                throw new WfsException(exception);
+                throw new GrbWfsException(exception);
             }
         }
 
-        private static WebRequest CreateWfsRequest(GrbFeatureName featureName, Envelope boundingBox)
+        private WebRequest CreateWfsRequest(GrbFeatureName featureName, Envelope boundingBox)
         {
             static string Format(double val) => val.ToString(CultureInfo.InvariantCulture.NumberFormat);
 
@@ -84,7 +90,7 @@ namespace BuildingRegistry.Api.Legacy.Infrastructure.Grb
                 Format(boundingBox.MaxX),
                 Format(boundingBox.MaxY));
 
-            var request = WebRequest.Create(GrbWfs); // TODO: put this in config?
+            var request = WebRequest.Create(_wfsUrl);
             request.Method = HttpMethod.Post.Method;
             ((HttpWebRequest)request).ContentType = "application/xml";
             using (var writer = new StreamWriter(request.GetRequestStream()))
@@ -95,17 +101,17 @@ namespace BuildingRegistry.Api.Legacy.Infrastructure.Grb
 
         private Tuple<Geometry, IReadOnlyDictionary<string, string>> MapFeature(GrbFeatureName name, XElement data)
         {
-            var featureElement = data.Element(XName.Get(name.ToString(), GrbNameSpace));
+            var featureElement = data.Element(XName.Get(name.ToString(), GrbWfsNameSpaces.Grb));
 
             var gml = featureElement
-                .Element(XName.Get("SHAPE", GrbNameSpace))
+                .Element(XName.Get("SHAPE", GrbWfsNameSpaces.Grb))
                 .Elements()
                 .First();
 
             if (gml.Name.LocalName == "MultiPolygon")
                 gml = gml
-                    .Element(XName.Get("polygonMember", GmlNameSpace))
-                    .Element(XName.Get("Polygon", GmlNameSpace));
+                    .Element(XName.Get("polygonMember", GrbWfsNameSpaces.Gml))
+                    .Element(XName.Get("Polygon", GrbWfsNameSpaces.Gml));
 
             gml
                 .DescendantsAndSelf()
@@ -119,7 +125,7 @@ namespace BuildingRegistry.Api.Legacy.Infrastructure.Grb
 
             var attributes = featureElement
                 .Elements()
-                .Where(el => el.Name.Namespace == GrbNameSpace && el.Name.LocalName != "SHAPE")
+                .Where(el => el.Name.Namespace == GrbWfsNameSpaces.Grb && el.Name.LocalName != "SHAPE")
                 .ToDictionary(el => el.Name.LocalName, el => el.Value) as IReadOnlyDictionary<string,string>;
 
             return Tuple.Create(geometry, attributes);
