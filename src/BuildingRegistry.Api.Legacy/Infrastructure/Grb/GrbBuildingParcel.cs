@@ -5,6 +5,7 @@ namespace BuildingRegistry.Api.Legacy.Infrastructure.Grb
     using System.Linq;
     using NetTopologySuite.Geometries;
     using Wfs;
+    
     public interface IGrbBuildingParcel
     {
         IEnumerable<string> GetUnderlyingParcels(byte[] buildingGeometry);
