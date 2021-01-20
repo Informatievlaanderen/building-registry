@@ -4,8 +4,13 @@ namespace BuildingRegistry.Api.Legacy.Infrastructure.Grb
     using System.Collections.Generic;
     using System.Linq;
     using NetTopologySuite.Geometries;
+    using Wfs;
+    public interface IGrbBuildingParcel
+    {
+        IEnumerable<string> GetUnderlyingParcels(byte[] buildingGeometry);
+    }
 
-    public class GrbBuildingParcel : IGrbBuildingParcel
+    internal class GrbBuildingParcel : IGrbBuildingParcel
     {
         private readonly IGrbWfsClient _wfsClient;
 

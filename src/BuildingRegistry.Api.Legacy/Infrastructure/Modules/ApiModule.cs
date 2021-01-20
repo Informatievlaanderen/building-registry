@@ -3,7 +3,6 @@ namespace BuildingRegistry.Api.Legacy.Infrastructure.Modules
     using Autofac;
     using Autofac.Extensions.DependencyInjection;
     using Be.Vlaanderen.Basisregisters.DataDog.Tracing.Autofac;
-    using Grb;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Logging;
@@ -31,10 +30,8 @@ namespace BuildingRegistry.Api.Legacy.Infrastructure.Modules
             containerBuilder
                 .RegisterModule(new DataDogModule(_configuration))
                 .RegisterModule(new LegacyModule(_configuration, _services, _loggerFactory))
-                .RegisterModule(new SyndicationModule(_configuration, _services, _loggerFactory));
-
-            containerBuilder.RegisterType<GrbWfsClient>().AsImplementedInterfaces();
-            containerBuilder.RegisterType<GrbBuildingParcel>().AsImplementedInterfaces();
+                .RegisterModule(new SyndicationModule(_configuration, _services, _loggerFactory))
+                .RegisterModule(new GrbModule(_configuration));
 
             containerBuilder.Populate(_services);
         }
