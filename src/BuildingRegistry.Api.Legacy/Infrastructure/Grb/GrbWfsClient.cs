@@ -36,19 +36,30 @@ namespace BuildingRegistry.Api.Legacy.Infrastructure.Grb
         public IEnumerable<Tuple<Geometry, IReadOnlyDictionary<string, string>>> GetFeaturesInBoundingBox(GrbFeatureType type, Envelope boundingBox)
         {
             var featureName = GrbFeatureName.For(type);
+            var wfsRequest = CreateWfsRequest(featureName, boundingBox);
 
-            var responseStream = CreateWfsRequest(featureName, boundingBox)
-                .GetResponse()
-                .GetResponseStream();
+            try
+            {
+                var response = wfsRequest
+                        .GetResponse()
+                        .GetResponseStream();
 
-            var wfsDoc = XDocument.Load(responseStream);
+                var wfsDoc = XDocument.Load(response);
+                if (wfsDoc.Root?.Name?.LocalName == null)
+                    throw new WfsException("Invalid response");
 
-            if (wfsDoc.Root.Name.LocalName.Equals("ServiceExceptionReport", StringComparison.OrdinalIgnoreCase))
-                throw new WfsException(wfsDoc.ToString());
+                if (wfsDoc.Root.Name.LocalName.Equals("ServiceExceptionReport", StringComparison.OrdinalIgnoreCase))
+                    throw new WfsException(wfsDoc.ToString());
 
-            return wfsDoc
-                .XPathSelectElements("/wfs:FeatureCollection/gml:featureMember", _namespaceManager)
-                .Select(element => MapFeature(featureName, element));
+                return wfsDoc
+                    .XPathSelectElements("/wfs:FeatureCollection/gml:featureMember", _namespaceManager)
+                    .Select(element => MapFeature(featureName, element));
+            }
+            catch (Exception exception)
+                when (exception is WfsException)
+            {
+                throw new WfsException(exception);
+            }
         }
 
         private static WebRequest CreateWfsRequest(GrbFeatureName featureName, Envelope boundingBox)
