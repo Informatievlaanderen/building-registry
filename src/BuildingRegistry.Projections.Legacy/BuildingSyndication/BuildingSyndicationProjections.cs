@@ -355,14 +355,6 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
                                 : BuildingUnitStatus.Retired
                         };
 
-                        buildingUnitSyndicationItem.Addresses.Add(new BuildingUnitAddressSyndicationItem
-                        {
-                            BuildingUnitId = message.Message.BuildingUnitId,
-                            Position = message.Position,
-                            AddressId = message.Message.AddressId,
-                            Count = 1
-                        });
-
                         newSyndicationItem.BuildingUnits.Add(buildingUnitSyndicationItem);
                     },
                     ct);
