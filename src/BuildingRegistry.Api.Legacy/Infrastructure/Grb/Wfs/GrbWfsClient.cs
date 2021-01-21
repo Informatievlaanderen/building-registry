@@ -62,7 +62,7 @@ namespace BuildingRegistry.Api.Legacy.Infrastructure.Grb.Wfs
                     .Select(element => MapFeature(featureName, element));
             }
             catch (Exception exception)
-                when (exception is GrbWfsException)
+                when (!(exception is GrbWfsException))
             {
                 throw new GrbWfsException(exception);
             }
