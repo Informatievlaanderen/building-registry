@@ -1,3 +1,13 @@
+## [2.25.4](https://github.com/informatievlaanderen/building-registry/compare/v2.25.3...v2.25.4) (2021-01-21)
+
+
+### Bug Fixes
+
+* add handler for GRB WFS exceptions GRAR-170 ([1f265d3](https://github.com/informatievlaanderen/building-registry/commit/1f265d361e78a334ac1389c85b013fe13336022f))
+* invert catch to all except GrbWfsExceptions GRAR-170 ([6b642a1](https://github.com/informatievlaanderen/building-registry/commit/6b642a19ce40e9a29db78ca03a56db54ba2e9279))
+* update error handling for wfs requests GRAR-170 ([ee3bc07](https://github.com/informatievlaanderen/building-registry/commit/ee3bc07384b4585c0b7f3b2ff719eaa95c2c0e94))
+* updated the GRB WFS exception message GRAR-170 ([288b875](https://github.com/informatievlaanderen/building-registry/commit/288b87588958ee570f8cd3c647a7fe1823766a39))
+
 ## [2.25.3](https://github.com/informatievlaanderen/building-registry/compare/v2.25.2...v2.25.3) (2021-01-21)
 
 
