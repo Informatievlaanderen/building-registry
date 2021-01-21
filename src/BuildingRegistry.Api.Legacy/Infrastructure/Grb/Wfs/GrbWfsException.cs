@@ -8,6 +8,6 @@ namespace BuildingRegistry.Api.Legacy.Infrastructure.Grb.Wfs
             : this(new Exception(message)) { }
 
         public GrbWfsException(Exception innerException)
-            : base("Failed to retrieve WFS data from GRB", innerException) { }
+            : base("Failed to retrieve data from GRB WFS-service", innerException) { }
     }
 }
