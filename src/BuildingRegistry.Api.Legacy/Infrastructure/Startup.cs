@@ -15,8 +15,11 @@ namespace BuildingRegistry.Api.Legacy.Infrastructure
     using Modules;
     using Options;
     using System;
+    using System.Collections.Generic;
     using System.Linq;
     using System.Reflection;
+    using Be.Vlaanderen.Basisregisters.Api.Exceptions;
+    using Grb.Wfs;
     using Microsoft.Extensions.Diagnostics.HealthChecks;
     using Microsoft.OpenApi.Models;
 
@@ -157,7 +160,8 @@ namespace BuildingRegistry.Api.Legacy.Infrastructure
                         TypeScriptClientOptions =
                         {
                             ClassName = "BuildingRegistry"
-                        }
+                        },
+                        CustomExceptionHandlers = new IExceptionHandler[] { new GrbWfsExceptionHandler() }
                     },
                     Server =
                     {

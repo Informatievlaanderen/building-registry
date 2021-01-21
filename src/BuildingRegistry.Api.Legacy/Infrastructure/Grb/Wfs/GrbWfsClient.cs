@@ -7,6 +7,7 @@ namespace BuildingRegistry.Api.Legacy.Infrastructure.Grb.Wfs
     using System.Linq;
     using System.Net;
     using System.Net.Http;
+    using System.Net.Mime;
     using System.Xml;
     using System.Xml.Linq;
     using System.Xml.XPath;
@@ -90,9 +91,9 @@ namespace BuildingRegistry.Api.Legacy.Infrastructure.Grb.Wfs
                 Format(boundingBox.MaxX),
                 Format(boundingBox.MaxY));
 
-            var request = WebRequest.Create(_wfsUrl);
+            var request = (HttpWebRequest)WebRequest.Create(_wfsUrl);
             request.Method = HttpMethod.Post.Method;
-            ((HttpWebRequest)request).ContentType = "application/xml";
+            request.ContentType = MediaTypeNames.Application.Xml;
             using (var writer = new StreamWriter(request.GetRequestStream()))
                 writer.Write(payload);
 
