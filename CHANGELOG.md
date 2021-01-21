@@ -1,3 +1,10 @@
+## [2.25.3](https://github.com/informatievlaanderen/building-registry/compare/v2.25.2...v2.25.3) (2021-01-21)
+
+
+### Bug Fixes
+
+* correct usage of address in BuildingUnitWasAddedToRetiredBuilding GRAR-1767 ([e956f04](https://github.com/informatievlaanderen/building-registry/commit/e956f0470e565a1ee72d899660276ed6e9e871ba))
+
 ## [2.25.2](https://github.com/informatievlaanderen/building-registry/compare/v2.25.1...v2.25.2) (2021-01-19)
 
 
