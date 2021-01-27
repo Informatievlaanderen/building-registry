@@ -1,3 +1,10 @@
+## [2.25.5](https://github.com/informatievlaanderen/building-registry/compare/v2.25.4...v2.25.5) (2021-01-27)
+
+
+### Bug Fixes
+
+* bump basisregisters.api version ([6c79b0b](https://github.com/informatievlaanderen/building-registry/commit/6c79b0b6210d12d9d4057e1c69fbaa2f09f33a2d))
+
 ## [2.25.4](https://github.com/informatievlaanderen/building-registry/compare/v2.25.3...v2.25.4) (2021-01-21)
 
 
