@@ -1,4 +1,4 @@
-namespace BuildingRegistry.Api.Legacy.Infrastructure.Options
+namespace BuildingRegistry.Api.Legacy.Infrastructure
 {
     using System;
     using System.Collections.Generic;
@@ -25,11 +25,7 @@ namespace BuildingRegistry.Api.Legacy.Infrastructure.Options
                 lastUpdated,
                 new SyndicationPerson(configuration["AuthorName"], configuration["AuthorEmail"], AtomContributorTypes.Author),
                 new SyndicationLink(new Uri(configuration["Self"]), AtomLinkTypes.Self),
-                new List<SyndicationLink>
-                {
-                    new SyndicationLink(new Uri(configuration["AlternateAtom"]), AtomLinkTypes.Alternate){ MediaType = "application/atom+xml"},
-                    new SyndicationLink(new Uri(configuration["AlternateXml"]), AtomLinkTypes.Alternate){ MediaType = MediaTypeNames.Application.Xml}
-                },
+                new List<SyndicationLink>(),
                 configuration
                     .GetSection("Related")
                     .GetChildren()
