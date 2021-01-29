@@ -1,3 +1,11 @@
+## [2.25.6](https://github.com/informatievlaanderen/building-registry/compare/v2.25.5...v2.25.6) (2021-01-29)
+
+
+### Bug Fixes
+
+* remove sync alternate links ([45068f5](https://github.com/informatievlaanderen/building-registry/commit/45068f56ae07ed234f8034a4d24cfac5296ac8b8))
+* update basisregisters api dependency GRAR-170 ([50d31c2](https://github.com/informatievlaanderen/building-registry/commit/50d31c27469f15275d328b79d4a87f9e0c7cf430))
+
 ## [2.25.5](https://github.com/informatievlaanderen/building-registry/compare/v2.25.4...v2.25.5) (2021-01-27)
 
 
