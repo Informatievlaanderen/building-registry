@@ -1,3 +1,10 @@
+# [2.26.0](https://github.com/informatievlaanderen/building-registry/compare/v2.25.6...v2.26.0) (2021-01-30)
+
+
+### Features
+
+* add sync tags to events ([8bc7177](https://github.com/informatievlaanderen/building-registry/commit/8bc71775e147651b343228ddde9f300ca956e0be))
+
 ## [2.25.6](https://github.com/informatievlaanderen/building-registry/compare/v2.25.5...v2.25.6) (2021-01-29)
 
 
