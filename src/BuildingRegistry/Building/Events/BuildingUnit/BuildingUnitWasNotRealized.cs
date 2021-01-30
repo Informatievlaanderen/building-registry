@@ -6,6 +6,7 @@ namespace BuildingRegistry.Building.Events
     using Newtonsoft.Json;
     using ValueObjects;
 
+    [EventTags(EventTag.For.Sync)]
     [EventName("BuildingUnitWasNotRealized")]
     [EventDescription("De gebouweenheid kreeg status 'niet gerealiseerd'.")]
     public class BuildingUnitWasNotRealized : IHasProvenance, ISetProvenance

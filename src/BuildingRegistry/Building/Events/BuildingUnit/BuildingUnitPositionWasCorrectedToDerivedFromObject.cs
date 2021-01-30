@@ -6,6 +6,7 @@ namespace BuildingRegistry.Building.Events
     using Newtonsoft.Json;
     using ValueObjects;
 
+    [EventTags(EventTag.For.Sync)]
     [EventName("BuildingUnitPositionWasCorrectedToDerivedFromObject")]
     [EventDescription("De gebouweenheidpositie werd afgeleid van een ander object (via correctie).")]
     public class BuildingUnitPositionWasCorrectedToDerivedFromObject : IHasProvenance, ISetProvenance

@@ -6,6 +6,7 @@ namespace BuildingRegistry.Building.Events
     using Newtonsoft.Json;
     using ValueObjects;
 
+    [EventTags(EventTag.For.Sync)]
     [EventName("BuildingUnitAddressWasAttached")]
     [EventDescription("Er werd een adres gekoppeld aan de gebouweenheid.")]
     public class BuildingUnitAddressWasAttached : IHasProvenance, ISetProvenance

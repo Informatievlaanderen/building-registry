@@ -6,6 +6,7 @@ namespace BuildingRegistry.Building.Events
     using Newtonsoft.Json;
     using ValueObjects;
 
+    [EventTags(EventTag.For.Sync)]
     [EventName("BuildingOutlineWasCorrected")]
     [EventDescription("Het gebouw werd ingeschetst (via correctie).")]
     public class BuildingOutlineWasCorrected : IHasProvenance, ISetProvenance

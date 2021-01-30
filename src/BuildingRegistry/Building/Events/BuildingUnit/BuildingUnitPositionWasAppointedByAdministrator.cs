@@ -6,6 +6,7 @@ namespace BuildingRegistry.Building.Events
     using Newtonsoft.Json;
     using ValueObjects;
 
+    [EventTags(EventTag.For.Sync)]
     [EventName("BuildingUnitPositionWasAppointedByAdministrator")]
     [EventDescription("De gebouweenheidpositie werd manueel aangeduid door de beheerder.")]
     public class BuildingUnitPositionWasAppointedByAdministrator : IHasProvenance, ISetProvenance

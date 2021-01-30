@@ -6,6 +6,7 @@ namespace BuildingRegistry.Building.Events
     using Newtonsoft.Json;
     using ValueObjects;
 
+    [EventTags(EventTag.For.Sync)]
     [EventName("BuildingStatusWasRemoved")]
     [EventDescription("De gebouwstatus werd verwijderd.")]
     public class BuildingStatusWasRemoved : IHasProvenance, ISetProvenance

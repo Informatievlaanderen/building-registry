@@ -6,6 +6,7 @@ namespace BuildingRegistry.Building.Events
     using Newtonsoft.Json;
     using ValueObjects;
 
+    [EventTags(EventTag.For.Sync)]
     [EventName("BuildingWasCorrectedToUnderConstruction")]
     [EventDescription("Het gebouw kreeg status 'in aanbouw' (via correctie).")]
     public class BuildingWasCorrectedToUnderConstruction : IHasProvenance, ISetProvenance

@@ -6,16 +6,17 @@ namespace BuildingRegistry.Building.Events
     using Newtonsoft.Json;
     using ValueObjects;
 
+    [EventTags(EventTag.For.Sync)]
     [EventName("BuildingUnitWasNotRealizedByParent")]
     [EventDescription("De gebouweenheid kreeg status 'niet gerealiseerd' door een overkoepelende gebouweenheid (bv. huisnummer > busnummer).")]
     public class BuildingUnitWasNotRealizedByParent : IHasProvenance, ISetProvenance
     {
         [EventPropertyDescription("Interne GUID van het gebouw waartoe de gebouweenheid behoort.")]
         public Guid BuildingId { get; }
-        
+
         [EventPropertyDescription("Interne GUID van de gebouweenheid.")]
         public Guid BuildingUnitId { get; }
-        
+
         [EventPropertyDescription("Interne GUID van de overkoepelende gebouweenheid.")]
         public Guid ParentBuildingUnitId { get; }
 

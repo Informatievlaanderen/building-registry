@@ -6,6 +6,7 @@ namespace BuildingRegistry.Building.Events
     using Newtonsoft.Json;
     using ValueObjects;
 
+    [EventTags(EventTag.For.Sync)]
     [EventName("BuildingBecameComplete")]
     [EventDescription("Het gebouw voldoet aan het informatiemodel (wegens volledig).")]
     public class BuildingBecameComplete : IHasProvenance, ISetProvenance

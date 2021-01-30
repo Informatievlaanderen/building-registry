@@ -7,6 +7,7 @@ namespace BuildingRegistry.Building.Events
     using NodaTime;
     using ValueObjects;
 
+    [EventTags(EventTag.For.Sync)]
     [EventName("BuildingUnitWasReaddressed")]
     [EventDescription("De gebouweenheid werd geheradresseerd.")]
     public class BuildingUnitWasReaddressed : IHasProvenance, ISetProvenance

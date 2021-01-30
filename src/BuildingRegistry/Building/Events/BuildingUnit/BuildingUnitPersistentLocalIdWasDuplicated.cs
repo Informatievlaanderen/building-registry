@@ -7,6 +7,7 @@ namespace BuildingRegistry.Building.Events
     using NodaTime;
     using ValueObjects;
 
+    [EventTags(EventTag.For.Sync)]
     [EventName("BuildingUnitPersistentLocalIdentifierWasDuplicated")]
     [EventDescription("Een gebouweenheid kreeg een tweede persistente lokale identificator toegekend door een bug.")]
     public class BuildingUnitPersistentLocalIdWasDuplicated : IHasProvenance, ISetProvenance
