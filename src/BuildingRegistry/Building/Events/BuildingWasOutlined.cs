@@ -6,6 +6,7 @@ namespace BuildingRegistry.Building.Events
     using Newtonsoft.Json;
     using ValueObjects;
 
+    [EventTags(EventTag.For.Sync)]
     [EventName("BuildingWasOutlined")]
     [EventDescription("Het gebouw werd ingeschetst.")]
     public class BuildingWasOutlined : IHasProvenance, ISetProvenance

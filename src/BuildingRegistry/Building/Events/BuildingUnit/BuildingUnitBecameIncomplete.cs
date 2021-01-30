@@ -6,6 +6,7 @@ namespace BuildingRegistry.Building.Events
     using Newtonsoft.Json;
     using ValueObjects;
 
+    [EventTags(EventTag.For.Sync)]
     [EventName("BuildingUnitBecameIncomplete")]
     [EventDescription("De gebouweenheid voldoet niet meer aan het informatiemodel (wegens niet volledig).")]
     public class BuildingUnitBecameIncomplete : IHasProvenance, ISetProvenance

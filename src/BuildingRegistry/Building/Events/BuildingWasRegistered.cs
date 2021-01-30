@@ -6,6 +6,7 @@ namespace BuildingRegistry.Building.Events
     using System;
     using ValueObjects;
 
+    [EventTags(EventTag.For.Sync)]
     [EventName("BuildingWasRegistered")]
     [EventDescription("Het gebouw werd aangemaakt in het register.")]
     public class BuildingWasRegistered : IHasProvenance, ISetProvenance

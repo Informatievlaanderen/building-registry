@@ -7,6 +7,7 @@ namespace BuildingRegistry.Building.Events
     using NodaTime;
     using ValueObjects;
 
+    [EventTags(EventTag.For.Sync)]
     [EventName("CommonBuildingUnitWasAdded")]
     [EventDescription("De gebouweenheid met functie 'gemeenschappelijk deel' werd toegevoegd.")]
     public class CommonBuildingUnitWasAdded : IHasProvenance, ISetProvenance

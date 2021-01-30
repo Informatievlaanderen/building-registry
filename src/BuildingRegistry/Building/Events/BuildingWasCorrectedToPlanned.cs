@@ -6,6 +6,7 @@ namespace BuildingRegistry.Building.Events
     using Newtonsoft.Json;
     using ValueObjects;
 
+    [EventTags(EventTag.For.Sync)]
     [EventName("BuildingWasCorrectedToPlanned")]
     [EventDescription("Het gebouw kreeg status 'gepland' (via correctie).")]
     public class BuildingWasCorrectedToPlanned : IHasProvenance, ISetProvenance

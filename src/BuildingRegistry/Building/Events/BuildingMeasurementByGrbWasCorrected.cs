@@ -6,6 +6,7 @@ namespace BuildingRegistry.Building.Events
     using Newtonsoft.Json;
     using ValueObjects;
 
+    [EventTags(EventTag.For.Sync)]
     [EventName("BuildingMeasurementByGrbWasCorrected")]
     [EventDescription("Het gebouw werd ingemeten door GRB (via correctie).")]
     public class BuildingMeasurementByGrbWasCorrected : IHasProvenance, ISetProvenance

@@ -7,6 +7,7 @@ namespace BuildingRegistry.Building.Events
     using NodaTime;
     using ValueObjects;
 
+    [EventTags(EventTag.For.Sync)]
     [EventName("BuildingUnitPersistentLocalIdentifierWasRemoved")]
     [EventDescription("De persistente lokale identificator van de gebouweenheid werd verwijderd.")]
     public class BuildingUnitPersistentLocalIdWasRemoved : IHasProvenance, ISetProvenance

@@ -6,6 +6,7 @@ namespace BuildingRegistry.Building.Events
     using Newtonsoft.Json;
     using ValueObjects;
 
+    [EventTags(EventTag.For.Sync)]
     [EventName("BuildingWasCorrectedToRealized")]
     [EventDescription("Het gebouw kreeg status 'gerealiseerd' (via correctie).")]
     public class BuildingWasCorrectedToRealized : IHasProvenance, ISetProvenance

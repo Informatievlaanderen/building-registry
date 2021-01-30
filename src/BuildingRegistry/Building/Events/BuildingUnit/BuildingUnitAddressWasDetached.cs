@@ -8,6 +8,7 @@ namespace BuildingRegistry.Building.Events
     using Newtonsoft.Json;
     using ValueObjects;
 
+    [EventTags(EventTag.For.Sync)]
     [EventName("BuildingUnitAddressWasDetached")]
     [EventDescription("Er werd een adres losgekoppeld van de gebouweenheid.")]
     public class BuildingUnitAddressWasDetached : IHasProvenance, ISetProvenance

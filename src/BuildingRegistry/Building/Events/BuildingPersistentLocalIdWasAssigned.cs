@@ -7,6 +7,7 @@ namespace BuildingRegistry.Building.Events
     using NodaTime;
     using ValueObjects;
 
+    [EventTags(EventTag.For.Sync)]
     [EventName("BuildingPersistentLocalIdentifierWasAssigned")]
     [EventDescription("Het gebouw kreeg een persistente lokale identificator toegekend.")]
     public class BuildingPersistentLocalIdWasAssigned : IHasProvenance, ISetProvenance

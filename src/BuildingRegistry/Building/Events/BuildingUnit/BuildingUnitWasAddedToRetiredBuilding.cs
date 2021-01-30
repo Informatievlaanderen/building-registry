@@ -7,6 +7,7 @@ namespace BuildingRegistry.Building.Events
     using NodaTime;
     using ValueObjects;
 
+    [EventTags(EventTag.For.Sync)]
     [EventName("BuildingUnitWasAddedToRetiredBuilding")]
     [EventDescription("De gebouweenheid werd toegevoegd aan een gehistoreerd gebouw.")]
     public class BuildingUnitWasAddedToRetiredBuilding : IHasProvenance, ISetProvenance
