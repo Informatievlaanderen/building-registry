@@ -1,3 +1,10 @@
+## [2.26.1](https://github.com/informatievlaanderen/building-registry/compare/v2.26.0...v2.26.1) (2021-02-02)
+
+
+### Bug Fixes
+
+* move to 5.0.2 ([c6bf43c](https://github.com/informatievlaanderen/building-registry/commit/c6bf43c7615c0fb97e2bf52d27f932fbed61bdfc))
+
 # [2.26.0](https://github.com/informatievlaanderen/building-registry/compare/v2.25.6...v2.26.0) (2021-01-30)
 
 
