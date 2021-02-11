@@ -1,3 +1,10 @@
+## [2.26.2](https://github.com/informatievlaanderen/building-registry/compare/v2.26.1...v2.26.2) (2021-02-11)
+
+
+### Bug Fixes
+
+* update api with use of problemdetailshelper GRAR-1814 ([56a05ae](https://github.com/informatievlaanderen/building-registry/commit/56a05ae6c7e6eb3d319e4d7502cbe4048eef20f6))
+
 ## [2.26.1](https://github.com/informatievlaanderen/building-registry/compare/v2.26.0...v2.26.1) (2021-02-02)
 
 
