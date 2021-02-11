@@ -2,6 +2,7 @@ namespace BuildingRegistry.Api.Legacy.Infrastructure.Modules
 {
     using Autofac;
     using Autofac.Extensions.DependencyInjection;
+    using Be.Vlaanderen.Basisregisters.Api.Exceptions;
     using Be.Vlaanderen.Basisregisters.DataDog.Tracing.Autofac;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
@@ -32,6 +33,10 @@ namespace BuildingRegistry.Api.Legacy.Infrastructure.Modules
                 .RegisterModule(new LegacyModule(_configuration, _services, _loggerFactory))
                 .RegisterModule(new SyndicationModule(_configuration, _services, _loggerFactory))
                 .RegisterModule(new GrbModule(_configuration));
+
+            containerBuilder
+                .RegisterType<ProblemDetailsHelper>()
+                .AsSelf();
 
             containerBuilder.Populate(_services);
         }

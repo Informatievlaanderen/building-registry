@@ -123,9 +123,15 @@ namespace BuildingRegistry.Api.Legacy.Building.Responses
     public class BuildingNotFoundResponseExamples : IExamplesProvider<ProblemDetails>
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly ProblemDetailsHelper _problemDetailsHelper;
 
-        public BuildingNotFoundResponseExamples(IHttpContextAccessor httpContextAccessor)
-            => _httpContextAccessor = httpContextAccessor;
+        public BuildingNotFoundResponseExamples(
+            IHttpContextAccessor httpContextAccessor,
+            ProblemDetailsHelper problemDetailsHelper)
+        {
+            _httpContextAccessor = httpContextAccessor;
+            _problemDetailsHelper = problemDetailsHelper;
+        }
 
         public ProblemDetails GetExamples()
             => new ProblemDetails
@@ -134,16 +140,22 @@ namespace BuildingRegistry.Api.Legacy.Building.Responses
                 HttpStatus = StatusCodes.Status404NotFound,
                 Title = ProblemDetails.DefaultTitle,
                 Detail = "Onbestaand gebouw.",
-                ProblemInstanceUri = _httpContextAccessor.HttpContext.GetProblemInstanceUri()
+                ProblemInstanceUri = _problemDetailsHelper.GetInstanceUri(_httpContextAccessor.HttpContext)
             };
     }
 
     public class BuildingGoneResponseExamples : IExamplesProvider<ProblemDetails>
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly ProblemDetailsHelper _problemDetailsHelper;
 
-        public BuildingGoneResponseExamples(IHttpContextAccessor httpContextAccessor)
-            => _httpContextAccessor = httpContextAccessor;
+        public BuildingGoneResponseExamples(
+            IHttpContextAccessor httpContextAccessor,
+            ProblemDetailsHelper problemDetailsHelper)
+        {
+            _httpContextAccessor = httpContextAccessor;
+            _problemDetailsHelper = problemDetailsHelper;
+        }
 
         public ProblemDetails GetExamples()
             => new ProblemDetails
@@ -152,7 +164,7 @@ namespace BuildingRegistry.Api.Legacy.Building.Responses
                 HttpStatus = StatusCodes.Status410Gone,
                 Title = ProblemDetails.DefaultTitle,
                 Detail = "Gebouw werd verwijderd.",
-                ProblemInstanceUri = _httpContextAccessor.HttpContext.GetProblemInstanceUri()
+                ProblemInstanceUri = _problemDetailsHelper.GetInstanceUri(_httpContextAccessor.HttpContext)
             };
     }
 }
