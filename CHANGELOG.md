@@ -1,3 +1,10 @@
+## [2.26.3](https://github.com/informatievlaanderen/building-registry/compare/v2.26.2...v2.26.3) (2021-02-15)
+
+
+### Bug Fixes
+
+* register problem details helper for projector GRAR-1814 ([f7467f5](https://github.com/informatievlaanderen/building-registry/commit/f7467f556a2a15016b614d5b0745921f7eecbb5d))
+
 ## [2.26.2](https://github.com/informatievlaanderen/building-registry/compare/v2.26.1...v2.26.2) (2021-02-11)
 
 
