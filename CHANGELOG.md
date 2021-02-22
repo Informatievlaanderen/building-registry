@@ -1,3 +1,10 @@
+## [2.26.5](https://github.com/informatievlaanderen/building-registry/compare/v2.26.4...v2.26.5) (2021-02-22)
+
+
+### Bug Fixes
+
+* add query splitting behavior for sync query ([4572825](https://github.com/informatievlaanderen/building-registry/commit/4572825df9983c75437a76be495fc39149cffbe6))
+
 ## [2.26.4](https://github.com/informatievlaanderen/building-registry/compare/v2.26.3...v2.26.4) (2021-02-22)
 
 
