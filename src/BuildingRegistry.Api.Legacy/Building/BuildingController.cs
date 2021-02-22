@@ -478,7 +478,7 @@ namespace BuildingRegistry.Api.Legacy.Building
                         syndicationConfiguration["Category2"],
                         building);
 
-                xmlWriter.Flush();
+                await xmlWriter.FlushAsync();
             }
 
             return sw.ToString();
