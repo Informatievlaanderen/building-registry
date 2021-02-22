@@ -102,6 +102,7 @@ namespace BuildingRegistry.Api.Legacy.Building.Query
 
             buildings = buildings
                 .OrderBy(x => x.Position)
+                .AsSplitQuery()
                 .AsNoTracking();
 
             if (!filtering.ShouldFilter || !filtering.Filter.Position.HasValue)
