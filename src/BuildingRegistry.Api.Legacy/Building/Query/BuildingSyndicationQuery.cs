@@ -3,7 +3,6 @@ namespace BuildingRegistry.Api.Legacy.Building.Query
     using Be.Vlaanderen.Basisregisters.Api.Search;
     using Be.Vlaanderen.Basisregisters.Api.Search.Filtering;
     using Be.Vlaanderen.Basisregisters.Api.Search.Sorting;
-    using Be.Vlaanderen.Basisregisters.Utilities.HexByteConvertor;
     using Microsoft.EntityFrameworkCore;
     using Projections.Legacy;
     using Projections.Legacy.BuildingSyndication;
@@ -94,10 +93,14 @@ namespace BuildingRegistry.Api.Legacy.Building.Query
 
         protected override IQueryable<BuildingSyndicationItem> Filter(FilteringHeader<BuildingSyndicationFilter> filtering)
         {
-            var buildings = _context
-                .BuildingSyndication
-                .Include(x => x.BuildingUnits).ThenInclude(x => x.Addresses)
-                .Include(x => x.BuildingUnits).ThenInclude(x => x.Readdresses)
+            var buildings = _context.BuildingSyndication.AsQueryable();
+
+            if (_embedObject)
+                buildings = buildings
+                    .Include(x => x.BuildingUnits).ThenInclude(x => x.Addresses)
+                    .Include(x => x.BuildingUnits).ThenInclude(x => x.Readdresses);
+
+            buildings = buildings
                 .OrderBy(x => x.Position)
                 .AsNoTracking();
 
