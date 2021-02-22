@@ -189,6 +189,7 @@ namespace BuildingRegistry.Api.Legacy.Building.Query
                 .Select(address => relevantReaddresses.Any(x => x.OldAddressId == address.AddressId)
                     ? relevantReaddresses.First(x => x.OldAddressId == address.AddressId).NewAddressId
                     : address.AddressId.Value)
+                .Distinct()
                 .ToList();
         }
     }
