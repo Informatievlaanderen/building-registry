@@ -59,9 +59,6 @@ namespace BuildingRegistry.Api.Legacy.Building.Query
 
         private static BuildingSyndicationQueryResult BuildingSyndicationQueryResult(BuildingSyndicationItem x, bool withXml)
         {
-            var addresses = x.BuildingUnits.SelectMany(a => a.Addresses).ToList();
-            var readdresses = x.BuildingUnits.SelectMany(r => r.Readdresses).ToList();
-
             if (withXml)
                 return new BuildingSyndicationQueryResult(
                     x.BuildingId.Value,
