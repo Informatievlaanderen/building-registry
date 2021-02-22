@@ -1,3 +1,15 @@
+## [2.26.4](https://github.com/informatievlaanderen/building-registry/compare/v2.26.3...v2.26.4) (2021-02-22)
+
+
+### Bug Fixes
+
+* correct possible duplicate addressid's in sync buildingunit ([69a417d](https://github.com/informatievlaanderen/building-registry/commit/69a417d1cad3789d87a5e814082c5b9738114f8c))
+
+
+### Performance Improvements
+
+* sync only include when object is requested ([d9d0629](https://github.com/informatievlaanderen/building-registry/commit/d9d0629c848521b06fb4ad78fd50222658b20b30))
+
 ## [2.26.3](https://github.com/informatievlaanderen/building-registry/compare/v2.26.2...v2.26.3) (2021-02-15)
 
 
