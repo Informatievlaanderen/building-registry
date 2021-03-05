@@ -1,5 +1,6 @@
 namespace BuildingRegistry.Api.Extract.Extracts
 {
+    using System.Data;
     using Be.Vlaanderen.Basisregisters.Api;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
     using Microsoft.AspNetCore.Http;
@@ -8,7 +9,9 @@ namespace BuildingRegistry.Api.Extract.Extracts
     using Responses;
     using Swashbuckle.AspNetCore.Filters;
     using System.Threading;
+    using System.Threading.Tasks;
     using Be.Vlaanderen.Basisregisters.Api.Extract;
+    using Microsoft.EntityFrameworkCore;
     using ProblemDetails = Be.Vlaanderen.Basisregisters.BasicApiProblem.ProblemDetails;
 
     [ApiVersion("1.0")]
@@ -29,14 +32,19 @@ namespace BuildingRegistry.Api.Extract.Extracts
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
         [SwaggerResponseExample(StatusCodes.Status200OK, typeof(BuildingRegistryResponseExample))]
         [SwaggerResponseExample(StatusCodes.Status500InternalServerError, typeof(InternalServerErrorResponseExamples))]
-        public IActionResult GetBuildings(
+        public async Task<IActionResult> GetBuildings(
             [FromServices] ExtractContext context,
-            CancellationToken cancellationToken = default) =>
-            new ExtractArchive(ExtractFileNames.GetBuildingZipName())
-                {
-                    BuildingRegistryExtractBuilder.CreateBuildingFiles(context),
-                    BuildingUnitRegistryExtractBuilder.CreateBuildingUnitFiles(context),
-                }
-                .CreateFileCallbackResult(cancellationToken);
+            CancellationToken cancellationToken = default)
+        {
+            using (await context.Database.BeginTransactionAsync(IsolationLevel.Snapshot, cancellationToken))
+            {
+                return new ExtractArchive(ExtractFileNames.GetBuildingZipName())
+                    {
+                        BuildingRegistryExtractBuilder.CreateBuildingFiles(context),
+                        BuildingUnitRegistryExtractBuilder.CreateBuildingUnitFiles(context),
+                    }
+                    .CreateFileCallbackResult(cancellationToken);
+            }
+        }
     }
 }
