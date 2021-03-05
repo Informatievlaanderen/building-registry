@@ -1,3 +1,10 @@
+# [2.27.0](https://github.com/informatievlaanderen/building-registry/compare/v2.26.5...v2.27.0) (2021-03-05)
+
+
+### Features
+
+* add transaction isolation snapshot to extract GRAR-1796 ([ff99f88](https://github.com/informatievlaanderen/building-registry/commit/ff99f886ce3c840ce28e5cada1d10d0dc5a65c8a))
+
 ## [2.26.5](https://github.com/informatievlaanderen/building-registry/compare/v2.26.4...v2.26.5) (2021-02-22)
 
 
