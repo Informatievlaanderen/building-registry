@@ -1,3 +1,10 @@
+## [2.27.1](https://github.com/informatievlaanderen/building-registry/compare/v2.27.0...v2.27.1) (2021-03-06)
+
+
+### Bug Fixes
+
+* disable retry strategy in extract ([53a3f89](https://github.com/informatievlaanderen/building-registry/commit/53a3f89e208f5e08ba75f418b9fa2cfc040de7d6))
+
 # [2.27.0](https://github.com/informatievlaanderen/building-registry/compare/v2.26.5...v2.27.0) (2021-03-05)
 
 
