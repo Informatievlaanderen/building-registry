@@ -1,3 +1,10 @@
+## [2.27.2](https://github.com/informatievlaanderen/building-registry/compare/v2.27.1...v2.27.2) (2021-03-08)
+
+
+### Bug Fixes
+
+* disabled removed/duplictated persistentId projections GRAR-1876 ([d4dcc57](https://github.com/informatievlaanderen/building-registry/commit/d4dcc57a48624d3fafb3b49353f877194a3ca532))
+
 ## [2.27.1](https://github.com/informatievlaanderen/building-registry/compare/v2.27.0...v2.27.1) (2021-03-06)
 
 
