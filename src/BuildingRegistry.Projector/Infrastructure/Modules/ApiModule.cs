@@ -160,12 +160,6 @@ namespace BuildingRegistry.Projector.Infrastructure.Modules
                 .RegisterProjections<BuildingUnitDetailProjections, LegacyContext>(
                     () => new BuildingUnitDetailProjections(),
                     ConnectedProjectionSettings.Default)
-                .RegisterProjections<RemovedPersistentLocalIdProjections, LegacyContext>(
-                    () => new RemovedPersistentLocalIdProjections(),
-                    ConnectedProjectionSettings.Default)
-                .RegisterProjections<DuplicatedPersistentLocalIdProjections, LegacyContext>(
-                    () => new DuplicatedPersistentLocalIdProjections(),
-                    ConnectedProjectionSettings.Default)
                 .RegisterProjections<BuildingPersistenLocalIdCrabIdProjections, LegacyContext>(
                     () => new BuildingPersistenLocalIdCrabIdProjections(),
                     ConnectedProjectionSettings.Default);
