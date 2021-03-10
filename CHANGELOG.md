@@ -1,3 +1,10 @@
+## [2.27.3](https://github.com/informatievlaanderen/building-registry/compare/v2.27.2...v2.27.3) (2021-03-10)
+
+
+### Bug Fixes
+
+* use isolation extract archive for extracts ([fc6836f](https://github.com/informatievlaanderen/building-registry/commit/fc6836f82f9e9c90fc5bb10152ed9869da4b905c))
+
 ## [2.27.2](https://github.com/informatievlaanderen/building-registry/compare/v2.27.1...v2.27.2) (2021-03-08)
 
 
