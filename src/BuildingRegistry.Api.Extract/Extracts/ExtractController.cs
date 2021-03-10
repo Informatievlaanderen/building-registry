@@ -1,6 +1,5 @@
 namespace BuildingRegistry.Api.Extract.Extracts
 {
-    using System.Data;
     using Be.Vlaanderen.Basisregisters.Api;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
     using Microsoft.AspNetCore.Http;
@@ -11,7 +10,6 @@ namespace BuildingRegistry.Api.Extract.Extracts
     using System.Threading;
     using System.Threading.Tasks;
     using Be.Vlaanderen.Basisregisters.Api.Extract;
-    using Microsoft.EntityFrameworkCore;
     using ProblemDetails = Be.Vlaanderen.Basisregisters.BasicApiProblem.ProblemDetails;
 
     [ApiVersion("1.0")]
@@ -36,15 +34,12 @@ namespace BuildingRegistry.Api.Extract.Extracts
             [FromServices] ExtractContext context,
             CancellationToken cancellationToken = default)
         {
-            using (await context.Database.BeginTransactionAsync(IsolationLevel.Snapshot, cancellationToken))
-            {
-                return new ExtractArchive(ExtractFileNames.GetBuildingZipName())
-                    {
-                        BuildingRegistryExtractBuilder.CreateBuildingFiles(context),
-                        BuildingUnitRegistryExtractBuilder.CreateBuildingUnitFiles(context),
-                    }
-                    .CreateFileCallbackResult(cancellationToken);
-            }
+            return new IsolationExtractArchive(ExtractFileNames.GetBuildingZipName(), context)
+                {
+                    BuildingRegistryExtractBuilder.CreateBuildingFiles(context),
+                    BuildingUnitRegistryExtractBuilder.CreateBuildingUnitFiles(context),
+                }
+               .CreateFileCallbackResult(cancellationToken);
         }
     }
 }
