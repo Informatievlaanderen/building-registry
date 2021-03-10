@@ -14,6 +14,8 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetail
     using Building.Events.Crab;
     using ValueObjects;
 
+    [ConnectedProjectionName(" Legacy - BuildingUnitDetail")]
+    [ConnectedProjectionDescription("Gebouweenheid detail data.")]
     public class BuildingUnitDetailProjections : ConnectedProjection<LegacyContext>
     {
         public BuildingUnitDetailProjections()

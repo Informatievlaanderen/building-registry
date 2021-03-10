@@ -15,6 +15,8 @@ namespace BuildingRegistry.Projections.Wms.BuildingUnit
     using NetTopologySuite.Geometries;
     using ValueObjects;
 
+    [ConnectedProjectionName("Wms - BuildingUnit")]
+    [ConnectedProjectionDescription("Gebouweenheid data voor WMS")]
     public class BuildingUnitProjections : ConnectedProjection<WmsContext>
     {
         private readonly WKBReader _wkbReader;

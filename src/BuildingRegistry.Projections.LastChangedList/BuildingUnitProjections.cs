@@ -1,10 +1,13 @@
 namespace BuildingRegistry.Projections.LastChangedList
 {
+    using Be.Vlaanderen.Basisregisters.ProjectionHandling.Connector;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.LastChangedList;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore;
     using Building.Events;
     using Building.Events.Crab;
 
+    [ConnectedProjectionName("LastChangedList")]
+    [ConnectedProjectionDescription("Markeert de gebouw en gebouweenheden waarvan de cached data moet geupdate worden.")]
     public class BuildingUnitProjections : LastChangedListConnectedProjection
     {
         protected override string CacheKeyFormat => "legacy/buildingunit:{{0}}.{1}";
