@@ -1,3 +1,15 @@
+# [2.28.0](https://github.com/informatievlaanderen/building-registry/compare/v2.27.3...v2.28.0) (2021-03-11)
+
+
+### Bug Fixes
+
+* update projector dependency GRAR-1876 ([385af8a](https://github.com/informatievlaanderen/building-registry/commit/385af8ac3a3b6e4269d631e185abb49ff5773c1a))
+
+
+### Features
+
+* add projection attributes GRAR-1876 ([19df3e2](https://github.com/informatievlaanderen/building-registry/commit/19df3e298f70e78d46d5c0575059ea7149dbf3d9))
+
 ## [2.27.3](https://github.com/informatievlaanderen/building-registry/compare/v2.27.2...v2.27.3) (2021-03-10)
 
 
