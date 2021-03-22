@@ -1,3 +1,10 @@
+## [2.28.1](https://github.com/informatievlaanderen/building-registry/compare/v2.28.0...v2.28.1) (2021-03-22)
+
+
+### Bug Fixes
+
+* remove ridingwolf, collaboration ended ([895fade](https://github.com/informatievlaanderen/building-registry/commit/895fade3b1f9c32d0be7814ae6e3fbe313f30287))
+
 # [2.28.0](https://github.com/informatievlaanderen/building-registry/compare/v2.27.3...v2.28.0) (2021-03-11)
 
 
