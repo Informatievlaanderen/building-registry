@@ -8,8 +8,8 @@ namespace BuildingRegistry.Projections.Legacy.BuildingPersistentIdCrabIdMapping
     using Building.Events.Crab;
     using ValueObjects;
 
-    [ConnectedProjectionName("Legacy - BuildingPersistentLocalIdCrabId")]
-    [ConnectedProjectionDescription("Linking the CRAB-id to the GRAR-id")]
+    [ConnectedProjectionName("API endpoint CRAB-gebouwen")]
+    [ConnectedProjectionDescription("Projectie die de data voor de link tussen CRAB en gebouwen- en adressenregister voorziet.")]
     public class BuildingPersistenLocalIdCrabIdProjections : ConnectedProjection<LegacyContext>
     {
         public BuildingPersistenLocalIdCrabIdProjections()
