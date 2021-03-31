@@ -8,8 +8,8 @@ namespace BuildingRegistry.Projections.Legacy.BuildingDetail
     using NodaTime;
     using ValueObjects;
 
-    [ConnectedProjectionName("API endpoint detail gebouwen")]
-    [ConnectedProjectionDescription("Projectie die de gebouwen data voor het gebouwen detail voorziet.")]
+    [ConnectedProjectionName("API endpoint detail/lijst gebouwen")]
+    [ConnectedProjectionDescription("Projectie die de gebouwen data voor het gebouwen detail & lijst voorziet.")]
     public class BuildingDetailProjections : ConnectedProjection<LegacyContext>
     {
         public BuildingDetailProjections()
