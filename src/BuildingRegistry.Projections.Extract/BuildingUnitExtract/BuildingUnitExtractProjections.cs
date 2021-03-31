@@ -19,8 +19,8 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
     using ValueObjects;
     using Point = Be.Vlaanderen.Basisregisters.Shaperon.Point;
 
-    [ConnectedProjectionName("Extract - BuildingUnitExtract")]
-    [ConnectedProjectionDescription("Gebouweenheid data voor testbestand.")]
+    [ConnectedProjectionName("Extract gebouweenheden")]
+    [ConnectedProjectionDescription("Projectie die de gebouweenheden data voor het gebouweenheden extract voorziet.")]
     public class BuildingUnitExtractProjections : ConnectedProjection<ExtractContext>
     {
         private const string NotRealized = "NietGerealiseerd";
