@@ -11,7 +11,7 @@ namespace BuildingRegistry.Projections.Wfs.Building
     using NodaTime;
 
     [ConnectedProjectionName("WFS gebouwen")]
-    [ConnectedProjectionDescription("Projectie die de gebouwen data voor de WFS gebouwenregister voorziet.")]
+    [ConnectedProjectionDescription("Projectie die de gebouwen data voor het WFS gebouwenregister voorziet.")]
     public class BuildingProjections : ConnectedProjection<WfsContext>
     {
         private static readonly string RealizedStatus = GebouwStatus.Gerealiseerd.ToString();
