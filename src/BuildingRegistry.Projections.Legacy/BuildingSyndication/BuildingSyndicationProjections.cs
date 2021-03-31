@@ -12,8 +12,8 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
     using System.Collections.Generic;
     using System.Threading.Tasks;
 
-    [ConnectedProjectionName("Legacy - BuildingSyndication")]
-    [ConnectedProjectionDescription("Gebouw en gebouweenheid data voor de feed.")]
+    [ConnectedProjectionName("Feed endpoint gebouwen")]
+    [ConnectedProjectionDescription("Projectie die de gebouwen- en gebouweenheden data voor de gebouwen feed voorziet.")]
     public class BuildingSyndicationProjections : ConnectedProjection<LegacyContext>
     {
         public BuildingSyndicationProjections()
