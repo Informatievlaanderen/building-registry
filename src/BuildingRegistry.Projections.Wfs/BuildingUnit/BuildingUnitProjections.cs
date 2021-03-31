@@ -16,8 +16,8 @@ namespace BuildingRegistry.Projections.Wfs.BuildingUnit
     using NetTopologySuite.Geometries;
     using ValueObjects;
 
-    [ConnectedProjectionName("Wfs - BuildingUnit")]
-    [ConnectedProjectionDescription("Gebouweenheid data voor WFS")]
+    [ConnectedProjectionName("WFS gebouweenheden")]
+    [ConnectedProjectionDescription("Projectie die de gebouweenheden data voor het WFS gebouwenregister voorziet.")]
     public class BuildingUnitProjections : ConnectedProjection<WfsContext>
     {
         private readonly WKBReader _wkbReader;
