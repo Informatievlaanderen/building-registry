@@ -1,3 +1,10 @@
+## [2.28.2](https://github.com/informatievlaanderen/building-registry/compare/v2.28.1...v2.28.2) (2021-03-31)
+
+
+### Bug Fixes
+
+* change buildingcrabidprojections 'ConnectedProjectionName' and 'ConnectedProjectionDescription' ([93686b0](https://github.com/informatievlaanderen/building-registry/commit/93686b070f4903e5609299817c63756973ebfb5b))
+
 ## [2.28.1](https://github.com/informatievlaanderen/building-registry/compare/v2.28.0...v2.28.1) (2021-03-22)
 
 
