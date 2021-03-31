@@ -11,8 +11,8 @@ namespace BuildingRegistry.Projections.Wms.Building
     using NodaTime;
     using ValueObjects;
 
-    [ConnectedProjectionName("Wms - Building")]
-    [ConnectedProjectionDescription("Gebouw data voor WMS")]
+    [ConnectedProjectionName("WMS gebouwen")]
+    [ConnectedProjectionDescription("Projectie die de gebouwen data voor het WMS gebouwregister voorziet.")]
     public class BuildingProjections : ConnectedProjection<WmsContext>
     {
         private readonly WKBReader _wkbReader;
