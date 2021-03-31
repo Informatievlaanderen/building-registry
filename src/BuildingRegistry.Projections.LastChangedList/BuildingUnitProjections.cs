@@ -6,8 +6,8 @@ namespace BuildingRegistry.Projections.LastChangedList
     using Building.Events;
     using Building.Events.Crab;
 
-    [ConnectedProjectionName("LastChangedList")]
-    [ConnectedProjectionDescription("Markeert de gebouw en gebouweenheden waarvan de cached data moet geupdate worden.")]
+    [ConnectedProjectionName("Cache markering gebouwen en gebouweenheden")]
+    [ConnectedProjectionDescription("Projectie die markeert voor hoeveel gebouwen en gebouweenheden de gecachte data nog geüpdated moeten worden.")]
     public class BuildingUnitProjections : LastChangedListConnectedProjection
     {
         protected override string CacheKeyFormat => "legacy/buildingunit:{{0}}.{1}";
