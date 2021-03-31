@@ -15,8 +15,8 @@ namespace BuildingRegistry.Projections.Extract.BuildingExtract
     using Microsoft.Extensions.Options;
     using Polygon = NetTopologySuite.Geometries.Polygon;
 
-    [ConnectedProjectionName("Extract - BuildingExtract")]
-    [ConnectedProjectionDescription("Gebouw data voor testbestand.")]
+    [ConnectedProjectionName("Extract gebouwen")]
+    [ConnectedProjectionDescription("Projectie die de gebouwen data voor het gebouwen extract voorziet.")]
     public class BuildingExtractProjections : ConnectedProjection<ExtractContext>
     {
         private const string NotRealized = "NietGerealiseerd";
