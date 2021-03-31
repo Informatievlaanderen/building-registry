@@ -10,8 +10,8 @@ namespace BuildingRegistry.Projections.Wfs.Building
     using NetTopologySuite.IO;
     using NodaTime;
 
-    [ConnectedProjectionName("Wfs - Building")]
-    [ConnectedProjectionDescription("Gebouweenheid data voor WFS")]
+    [ConnectedProjectionName("WFS gebouwen")]
+    [ConnectedProjectionDescription("Projectie die de gebouwen data voor het WFS gebouwenregister voorziet.")]
     public class BuildingProjections : ConnectedProjection<WfsContext>
     {
         private static readonly string RealizedStatus = GebouwStatus.Gerealiseerd.ToString();
