@@ -1,3 +1,11 @@
+## [2.28.3](https://github.com/informatievlaanderen/building-registry/compare/v2.28.2...v2.28.3) (2021-04-01)
+
+
+### Bug Fixes
+
+* bump projection-handling & projector ([c47aeb7](https://github.com/informatievlaanderen/building-registry/commit/c47aeb7efa30f4836d783464ae6cfb715f82f609))
+* update docs projections ([a5e7045](https://github.com/informatievlaanderen/building-registry/commit/a5e70458d1431854d6d4bb3711f14382d94f8853))
+
 ## [2.28.2](https://github.com/informatievlaanderen/building-registry/compare/v2.28.1...v2.28.2) (2021-03-31)
 
 
