@@ -1,3 +1,10 @@
+## [2.28.4](https://github.com/informatievlaanderen/building-registry/compare/v2.28.3...v2.28.4) (2021-04-26)
+
+
+### Bug Fixes
+
+* rename cache status endpoint in projector ([432f7fe](https://github.com/informatievlaanderen/building-registry/commit/432f7fe1128f454a33815bc140e43290853dce31))
+
 ## [2.28.3](https://github.com/informatievlaanderen/building-registry/compare/v2.28.2...v2.28.3) (2021-04-01)
 
 
