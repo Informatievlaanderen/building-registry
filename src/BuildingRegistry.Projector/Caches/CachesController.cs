@@ -32,7 +32,7 @@ namespace BuildingRegistry.Projector.Caches
             return Ok(new[]
             {
                 new {
-                    name = "LastChangedList",
+                    name = "Cache detail gebouwen & gebouweenheden  ",
                     numberOfRecordsToProcess = numberOfRecords
                 }
             });
