@@ -1,3 +1,10 @@
+# [2.29.0](https://github.com/informatievlaanderen/building-registry/compare/v2.28.4...v2.29.0) (2021-05-04)
+
+
+### Features
+
+* bump packages ([856d054](https://github.com/informatievlaanderen/building-registry/commit/856d054197b85af89b07a6d1abbe7faa7db11194))
+
 ## [2.28.4](https://github.com/informatievlaanderen/building-registry/compare/v2.28.3...v2.28.4) (2021-04-26)
 
 
