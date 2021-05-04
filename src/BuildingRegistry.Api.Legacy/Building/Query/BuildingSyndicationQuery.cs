@@ -17,7 +17,7 @@ namespace BuildingRegistry.Api.Legacy.Building.Query
         private readonly bool _embedEvent;
         private readonly bool _embedObject;
 
-        public BuildingSyndicationQuery(LegacyContext context, EmbedValue embed)
+        public BuildingSyndicationQuery(LegacyContext context, SyncEmbedValue embed)
         {
             _context = context;
             _embedEvent = embed?.Event ?? false;
@@ -127,6 +127,6 @@ namespace BuildingRegistry.Api.Legacy.Building.Query
     public class BuildingSyndicationFilter
     {
         public long? Position { get; set; }
-        public EmbedValue Embed { get; set; }
+        public SyncEmbedValue Embed { get; set; }
     }
 }
