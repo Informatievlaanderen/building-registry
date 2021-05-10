@@ -1,3 +1,10 @@
+## [2.29.1](https://github.com/informatievlaanderen/building-registry/compare/v2.29.0...v2.29.1) (2021-05-10)
+
+
+### Bug Fixes
+
+* correct provenance for persistentlocalid ([7608947](https://github.com/informatievlaanderen/building-registry/commit/7608947ce5f0802ac81f540655310fc9faf09368))
+
 # [2.29.0](https://github.com/informatievlaanderen/building-registry/compare/v2.28.4...v2.29.0) (2021-05-04)
 
 
