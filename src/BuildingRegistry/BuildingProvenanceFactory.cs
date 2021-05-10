@@ -34,7 +34,7 @@ namespace BuildingRegistry
             if (!(provenanceHolder is FixGrar1359 crabProvenance))
                 throw new ApplicationException($"Cannot create provenance from {provenanceHolder.GetType().Name}");
 
-            return new Provenance(Instant.FromDateTimeUtc(DateTime.UtcNow), Application.Unknown, new Reason("Rechtzetting gebouweenheden"), new Operator("crabadmin"), Modification.Update, Organisation.Aiv);
+            return new Provenance(Instant.FromDateTimeUtc(DateTime.UtcNow), Application.Unknown, new Reason("Rechtzetting gebouweenheden"), new Operator("crabadmin"), Modification.Update, Organisation.DigitaalVlaanderen);
         }
     }
 }
