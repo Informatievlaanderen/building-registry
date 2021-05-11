@@ -35,7 +35,10 @@ namespace BuildingRegistry.Api.Legacy.Building.Query
             int? persistentLocalId,
             string changeType,
             Instant recordCreateAt,
-            Instant lastChangedOn)
+            Instant lastChangedOn,
+            bool isComplete,
+            Organisation? organisation,
+            string reason)
         {
             ContainsEvent = false;
             ContainsObject = false;
@@ -46,6 +49,9 @@ namespace BuildingRegistry.Api.Legacy.Building.Query
             ChangeType = changeType;
             RecordCreatedAt = recordCreateAt;
             LastChangedOn = lastChangedOn;
+            IsComplete = isComplete;
+            Organisation = organisation;
+            Reason = reason;
         }
 
         public BuildingSyndicationQueryResult(
@@ -55,6 +61,9 @@ namespace BuildingRegistry.Api.Legacy.Building.Query
             string changeType,
             Instant recordCreateAt,
             Instant lastChangedOn,
+            bool isComplete,
+            Organisation? organisation,
+            string reason,
             string eventDataAsXml)
 
             : this(buildingId,
@@ -62,7 +71,10 @@ namespace BuildingRegistry.Api.Legacy.Building.Query
                 persistentLocalId,
                 changeType,
                 recordCreateAt,
-                lastChangedOn)
+                lastChangedOn,
+                isComplete,
+                organisation,
+                reason)
         {
             ContainsEvent = true;
             EventDataAsXml = eventDataAsXml;
@@ -87,7 +99,10 @@ namespace BuildingRegistry.Api.Legacy.Building.Query
                 persistentLocalId,
                 changeType,
                 recordCreateAt,
-                lastChangedOn)
+                lastChangedOn,
+                isComplete,
+                organisation,
+                reason)
         {
             ContainsObject = true;
 
