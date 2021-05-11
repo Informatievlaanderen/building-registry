@@ -1,3 +1,10 @@
+## [2.29.2](https://github.com/informatievlaanderen/building-registry/compare/v2.29.1...v2.29.2) (2021-05-11)
+
+
+### Bug Fixes
+
+* correct the author of the syndication feed ([277da69](https://github.com/informatievlaanderen/building-registry/commit/277da69d5e352af50b8cd62fe245bf1f38a1154c))
+
 ## [2.29.1](https://github.com/informatievlaanderen/building-registry/compare/v2.29.0...v2.29.1) (2021-05-10)
 
 
