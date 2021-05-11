@@ -41,6 +41,9 @@ namespace BuildingRegistry.Api.Legacy.Building.Query
                         x.ChangeType,
                         x.RecordCreatedAt,
                         x.LastChangedOn,
+                        x.IsComplete,
+                        x.Organisation,
+                        x.Reason,
                         x.EventDataAsXml);
 
                 if (_embedObject)
@@ -52,7 +55,10 @@ namespace BuildingRegistry.Api.Legacy.Building.Query
                     x.PersistentLocalId,
                     x.ChangeType,
                     x.RecordCreatedAt,
-                    x.LastChangedOn);
+                    x.LastChangedOn,
+                    x.IsComplete,
+                    x.Organisation,
+                    x.Reason);
             }
         }
 
