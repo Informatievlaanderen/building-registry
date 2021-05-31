@@ -1,3 +1,10 @@
+## [2.29.4](https://github.com/informatievlaanderen/building-registry/compare/v2.29.3...v2.29.4) (2021-05-31)
+
+
+### Bug Fixes
+
+* update api ([7ab5bc6](https://github.com/informatievlaanderen/building-registry/commit/7ab5bc6767201457f951b835b634b3cb921e954f))
+
 ## [2.29.3](https://github.com/informatievlaanderen/building-registry/compare/v2.29.2...v2.29.3) (2021-05-31)
 
 
