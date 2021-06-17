@@ -1,3 +1,10 @@
+## [2.29.6](https://github.com/informatievlaanderen/building-registry/compare/v2.29.5...v2.29.6) (2021-06-17)
+
+
+### Bug Fixes
+
+*  update nuget package ([e3e7d65](https://github.com/informatievlaanderen/building-registry/commit/e3e7d652cf9f7553940071518531ec9f2c790dad))
+
 ## [2.29.5](https://github.com/informatievlaanderen/building-registry/compare/v2.29.4...v2.29.5) (2021-05-31)
 
 
