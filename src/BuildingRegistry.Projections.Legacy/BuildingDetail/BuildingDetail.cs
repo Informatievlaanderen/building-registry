@@ -53,6 +53,11 @@ namespace BuildingRegistry.Projections.Legacy.BuildingDetail
             b.HasIndex(p => p.PersistentLocalId)
                 .IsClustered();
 
+            b.HasIndex(p => p.PersistentLocalId)
+                .IsUnique()
+                .HasFilter($"([{nameof(BuildingDetailItem.PersistentLocalId)}] IS NOT NULL)")
+                .HasDatabaseName($"IX_BuildingDetails_PersistentLocalId_1");
+
             b.HasIndex(p => new { p.IsComplete, p.IsRemoved, p.PersistentLocalId });
             b.HasIndex(b => b.Status);
         }
