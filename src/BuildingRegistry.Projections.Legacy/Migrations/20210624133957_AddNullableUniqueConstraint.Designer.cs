@@ -4,14 +4,16 @@ using BuildingRegistry.Projections.Legacy;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace BuildingRegistry.Projections.Legacy.Migrations
 {
     [DbContext(typeof(LegacyContext))]
-    partial class LegacyContextModelSnapshot : ModelSnapshot
+    [Migration("20210624133957_AddNullableUniqueConstraint")]
+    partial class AddNullableUniqueConstraint
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -74,7 +76,7 @@ namespace BuildingRegistry.Projections.Legacy.Migrations
                         .IsClustered(false);
 
                     b.HasIndex("PersistentLocalId")
-                        .IsClustered(true);
+                        .IsClustered();
 
                     b.HasIndex("PersistentLocalId")
                         .IsUnique()
@@ -380,12 +382,6 @@ namespace BuildingRegistry.Projections.Legacy.Migrations
 
                     b.HasIndex("PersistentLocalId")
                         .IsClustered();
-
-                    b.HasIndex("PersistentLocalId")
-                        .IsUnique()
-                        .HasDatabaseName("IX_BuildingUnitDetails_PersistentLocalId_1")
-                        .HasFilter("([PersistentLocalId] IS NOT NULL)")
-                        .IsClustered(false);
 
                     b.HasIndex("StatusAsString");
 
