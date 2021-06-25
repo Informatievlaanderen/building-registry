@@ -1,3 +1,10 @@
+## [2.29.8](https://github.com/informatievlaanderen/building-registry/compare/v2.29.7...v2.29.8) (2021-06-25)
+
+
+### Bug Fixes
+
+* added unique constraint to the persistentlocalid ([77eee7d](https://github.com/informatievlaanderen/building-registry/commit/77eee7d33abe983a174202708e9e0ed095e3f958))
+
 ## [2.29.7](https://github.com/informatievlaanderen/building-registry/compare/v2.29.6...v2.29.7) (2021-06-25)
 
 
