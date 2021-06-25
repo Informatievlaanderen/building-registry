@@ -1,3 +1,10 @@
+## [2.29.7](https://github.com/informatievlaanderen/building-registry/compare/v2.29.6...v2.29.7) (2021-06-25)
+
+
+### Bug Fixes
+
+* update aws DistributedMutex package ([df8acbc](https://github.com/informatievlaanderen/building-registry/commit/df8acbc7491e45d295e84839dac47a9fa8ec89a3))
+
 ## [2.29.6](https://github.com/informatievlaanderen/building-registry/compare/v2.29.5...v2.29.6) (2021-06-17)
 
 
