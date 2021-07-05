@@ -9,13 +9,24 @@ namespace BuildingRegistry.Building
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using Be.Vlaanderen.Basisregisters.AggregateSource;
+    using Be.Vlaanderen.Basisregisters.AggregateSource.Snapshotting;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using ValueObjects;
     using ValueObjects.Crab;
 
-    public partial class Building
+    public partial class Building : ISnapshotable
     {
         private static readonly WKBReader WkbReader = WKBReaderFactory.Create();
+
+        public static readonly Func<Building> Factory = () => new Building();
+
+        public static Building Register(BuildingId id)
+        {
+            var building = Factory();
+            building.ApplyChange(new BuildingWasRegistered(id));
+            return building;
+        }
 
         public void ImportTerrainObjectFromCrab(
            CrabTerrainObjectId terrainObjectId,

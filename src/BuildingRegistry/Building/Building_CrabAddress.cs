@@ -12,15 +12,6 @@ namespace BuildingRegistry.Building
 
     public partial class Building : AggregateRootEntity
     {
-        public static readonly Func<Building> Factory = () => new Building();
-
-        public static Building Register(BuildingId id)
-        {
-            var building = Factory();
-            building.ApplyChange(new BuildingWasRegistered(id));
-            return building;
-        }
-
         public void ImportTerrainObjectHouseNumberFromCrab(
              CrabTerrainObjectHouseNumberId terrainObjectHouseNumberId,
              CrabTerrainObjectId terrainObjectId,

@@ -7,6 +7,7 @@ namespace BuildingRegistry.Building
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using Be.Vlaanderen.Basisregisters.AggregateSource.Snapshotting;
     using ValueObjects;
 
     public partial class Building
@@ -46,6 +47,11 @@ namespace BuildingRegistry.Building
         private readonly Dictionary<BuildingUnitKey, HouseNumberWasReaddressedFromCrab> _readdressedHouseNumbers = new Dictionary<BuildingUnitKey, HouseNumberWasReaddressedFromCrab>();
         private readonly Dictionary<BuildingUnitKey, SubaddressWasReaddressedFromCrab> _readdressedSubaddresses = new Dictionary<BuildingUnitKey, SubaddressWasReaddressedFromCrab>();
         private readonly List<CrabTerrainObjectHouseNumberId> _importedTerrainObjectHouseNumberIds = new List<CrabTerrainObjectHouseNumberId>();
+
+        internal Building(ISnapshotStrategy snapshotStrategy)
+        {
+            Strategy = snapshotStrategy;
+        }
 
         private Building()
         {
@@ -608,5 +614,30 @@ namespace BuildingRegistry.Building
         {
             return _buildingUnitCollection.GetById(buildingUnitId);
         }
+
+        public object TakeSnapshot()
+        {
+            return new BuildingSnapshot(
+                _buildingId,
+                _persistentLocalId,
+                Geometry,
+                _status,
+                _isComplete,
+                IsRemoved,
+                _geometryChronicle.ToList(),
+                _statusChronicle.ToList(),
+                _activeHouseNumberIdsByTerreinObjectHouseNr,
+                _legacySubaddressEventsByTerreinObjectHouseNumber,
+                _legacySubaddressStatusEventsBySubadresId,
+                _legacySubaddressPositionEventsBySubadresId,
+                _legacyHouseNumberStatusEventsByHouseNumberId,
+                _legacyHouseNumberPositionEventsByHouseNumberId,
+                _readdressedHouseNumbers,
+                _readdressedSubaddresses,
+                _importedTerrainObjectHouseNumberIds,
+                LastModificationBasedOnCrab);
+        }
+
+        public ISnapshotStrategy Strategy { get; }
     }
 }
