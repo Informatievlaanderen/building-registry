@@ -219,15 +219,15 @@ namespace BuildingRegistry.Building
 
         private void ApplyPositionChange(bool isCorrection, IHasCrabPosition crabPositionEvent)
         {
-            if (BuildingGeometry == null)
+            if (_parent.Geometry == null)
                 return;
 
             var position = crabPositionEvent == null ? null : ExtendedWkbGeometry.CreateEWkb(crabPositionEvent.AddressPosition.ToByteArray());
             var method = Map(crabPositionEvent?.AddressPositionOrigin);
 
-            if (position == null || !BuildingGeometry.Contains(position))
+            if (position == null || !_parent.Geometry.Contains(position))
             {
-                position = BuildingGeometry.Center;
+                position = _parent.Geometry.Center;
                 method = BuildingUnitPositionGeometryMethod.DerivedFromObject;
             }
 

@@ -7,6 +7,7 @@ namespace BuildingRegistry.Building.Events
     using Be.Vlaanderen.Basisregisters.EventHandling;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Crab;
+    using DataStructures;
     using Newtonsoft.Json;
     using ValueObjects;
 
@@ -23,6 +24,7 @@ namespace BuildingRegistry.Building.Events
         public bool IsRemoved { get; }
         public IEnumerable<BuildingGeometryWasImportedFromCrab> GeometryChronicle { get; }
         public IEnumerable<BuildingStatusWasImportedFromCrab> StatusChronicle { get; }
+        public BuildingUnitCollectionSnapshot BuildingUnitCollection { get; }
 
         public Dictionary<int, int> ActiveHouseNumberIdsByTerrainObjectHouseNr { get; }
 
@@ -57,6 +59,7 @@ namespace BuildingRegistry.Building.Events
             Dictionary<BuildingUnitKey, HouseNumberWasReaddressedFromCrab> houseNumberReaddressedEventsByBuildingUnit,
             Dictionary<BuildingUnitKey, SubaddressWasReaddressedFromCrab> subaddressReaddressedEventsByBuildingUnit,
             IEnumerable<CrabTerrainObjectHouseNumberId> importedTerrainObjectHouseNumberIds,
+            BuildingUnitCollectionSnapshot buildingUnitCollection,
             Modification lastModificationBasedOnCrab)
         {
             BuildingId = buildingId;
@@ -94,12 +97,14 @@ namespace BuildingRegistry.Building.Events
                 y => y.Value.AsEnumerable());
 
             HouseNumberReaddressedEventsByBuildingUnit = houseNumberReaddressedEventsByBuildingUnit.ToDictionary(
-                x => (BuildingUnitKeyType) x.Key,
+                x => (BuildingUnitKeyType)x.Key,
                 y => y.Value);
             SubaddressReaddressedEventsByBuildingUnit = subaddressReaddressedEventsByBuildingUnit.ToDictionary(
                 x => (BuildingUnitKeyType)x.Key,
                 y => y.Value);
-            ImportedTerrainObjectHouseNumberIds = importedTerrainObjectHouseNumberIds.Select(x => (int) x);
+            ImportedTerrainObjectHouseNumberIds = importedTerrainObjectHouseNumberIds.Select(x => (int)x);
+
+            BuildingUnitCollection = buildingUnitCollection;
 
             LastModificationBasedOnCrab = lastModificationBasedOnCrab;
         }
@@ -125,6 +130,7 @@ namespace BuildingRegistry.Building.Events
             Dictionary<BuildingUnitKeyType, HouseNumberWasReaddressedFromCrab> houseNumberReaddressedEventsByBuildingUnit,
             Dictionary<BuildingUnitKeyType, SubaddressWasReaddressedFromCrab> subaddressReaddressedEventsByBuildingUnit,
             IEnumerable<int> importedTerrainObjectHouseNumberIds,
+            BuildingUnitCollectionSnapshot buildingUnitCollection,
             Modification lastModificationBasedOnCrab)
             : this(
                 new BuildingId(buildingId),
@@ -166,6 +172,7 @@ namespace BuildingRegistry.Building.Events
                     x => new BuildingUnitKey(x.Key),
                     y => y.Value),
                 importedTerrainObjectHouseNumberIds.Select(x => new CrabTerrainObjectHouseNumberId(x)),
+                buildingUnitCollection,
                 lastModificationBasedOnCrab)
         { }
     }

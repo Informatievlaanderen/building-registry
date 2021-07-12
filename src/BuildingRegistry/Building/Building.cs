@@ -15,7 +15,7 @@ namespace BuildingRegistry.Building
     using ValueObjects;
     using ValueObjects.Crab;
 
-    public partial class Building : ISnapshotable
+    public partial class Building //: ISnapshotable
     {
         private static readonly WKBReader WkbReader = WKBReaderFactory.Create();
 

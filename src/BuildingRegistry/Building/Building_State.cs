@@ -48,10 +48,10 @@ namespace BuildingRegistry.Building
         private readonly Dictionary<BuildingUnitKey, SubaddressWasReaddressedFromCrab> _readdressedSubaddresses = new Dictionary<BuildingUnitKey, SubaddressWasReaddressedFromCrab>();
         private readonly List<CrabTerrainObjectHouseNumberId> _importedTerrainObjectHouseNumberIds = new List<CrabTerrainObjectHouseNumberId>();
 
-        internal Building(ISnapshotStrategy snapshotStrategy)
-        {
-            Strategy = snapshotStrategy;
-        }
+        //internal Building(ISnapshotStrategy snapshotStrategy)
+        //{
+        //    Strategy = snapshotStrategy;
+        //}
 
         private Building()
         {
@@ -405,25 +405,25 @@ namespace BuildingRegistry.Building
         private void When(BuildingWasOutlined @event)
         {
             Geometry = new BuildingGeometry(new ExtendedWkbGeometry(@event.ExtendedWkbGeometry), BuildingGeometryMethod.Outlined);
-            _buildingUnitCollection.RouteToNonDeleted(@event);
+            //_buildingUnitCollection.RouteToNonDeleted(@event);
         }
 
         private void When(BuildingWasMeasuredByGrb @event)
         {
             Geometry = new BuildingGeometry(new ExtendedWkbGeometry(@event.ExtendedWkbGeometry), BuildingGeometryMethod.MeasuredByGrb);
-            _buildingUnitCollection.RouteToNonDeleted(@event);
+            //_buildingUnitCollection.RouteToNonDeleted(@event);
         }
 
         private void When(BuildingMeasurementByGrbWasCorrected @event)
         {
             Geometry = new BuildingGeometry(new ExtendedWkbGeometry(@event.ExtendedWkbGeometry), BuildingGeometryMethod.MeasuredByGrb);
-            _buildingUnitCollection.RouteToNonDeleted(@event);
+            //_buildingUnitCollection.RouteToNonDeleted(@event);
         }
 
         private void When(BuildingOutlineWasCorrected @event)
         {
             Geometry = new BuildingGeometry(new ExtendedWkbGeometry(@event.ExtendedWkbGeometry), BuildingGeometryMethod.Outlined);
-            _buildingUnitCollection.RouteToNonDeleted(@event);
+            //_buildingUnitCollection.RouteToNonDeleted(@event);
         }
 
         private void When(BuildingGeometryWasRemoved @event)
@@ -635,6 +635,7 @@ namespace BuildingRegistry.Building
                 _readdressedHouseNumbers,
                 _readdressedSubaddresses,
                 _importedTerrainObjectHouseNumberIds,
+                _buildingUnitCollection.TakeSnapshot(),
                 LastModificationBasedOnCrab);
         }
 

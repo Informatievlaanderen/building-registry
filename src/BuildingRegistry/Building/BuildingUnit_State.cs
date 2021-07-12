@@ -7,6 +7,7 @@ namespace BuildingRegistry.Building
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using DataStructures;
     using ValueObjects;
 
     public partial class BuildingUnit
@@ -34,7 +35,7 @@ namespace BuildingRegistry.Building
         public BuildingUnitStatus? Status { get; private set; }
         public List<AddressId> AddressIds { get; private set; }
         public AddressId PreviousAddressId { get; private set; }
-        public BuildingGeometry BuildingGeometry { get; internal set; }
+        //public BuildingGeometry BuildingGeometry { get; internal set; }
         public BuildingUnitPosition BuildingUnitPosition { get; private set; }
         public PersistentLocalId PersistentLocalId { get; private set; }
 
@@ -60,10 +61,10 @@ namespace BuildingRegistry.Building
             Register<BuildingWasCorrectedToNotRealized>(When);
             Register<BuildingUnitPersistentLocalIdWasAssigned>(When);
 
-            Register<BuildingWasMeasuredByGrb>(When);
-            Register<BuildingWasOutlined>(When);
-            Register<BuildingMeasurementByGrbWasCorrected>(When);
-            Register<BuildingOutlineWasCorrected>(When);
+            //Register<BuildingWasMeasuredByGrb>(When);
+            //Register<BuildingWasOutlined>(When);
+            //Register<BuildingMeasurementByGrbWasCorrected>(When);
+            //Register<BuildingOutlineWasCorrected>(When);
             Register<BuildingGeometryWasRemoved>(When);
             Register<BuildingWasRemoved>(When);
 
@@ -177,29 +178,29 @@ namespace BuildingRegistry.Building
         #region Building Geometry
         private void When(BuildingGeometryWasRemoved @event)
         {
-            BuildingGeometry = null;
+            //BuildingGeometry = null;
             BuildingUnitPosition = null;
         }
 
-        private void When(BuildingOutlineWasCorrected @event)
-        {
-            BuildingGeometry = new BuildingGeometry(new ExtendedWkbGeometry(@event.ExtendedWkbGeometry), BuildingGeometryMethod.Outlined);
-        }
+        //private void When(BuildingOutlineWasCorrected @event)
+        //{
+        //    BuildingGeometry = new BuildingGeometry(new ExtendedWkbGeometry(@event.ExtendedWkbGeometry), BuildingGeometryMethod.Outlined);
+        //}
 
-        private void When(BuildingMeasurementByGrbWasCorrected @event)
-        {
-            BuildingGeometry = new BuildingGeometry(new ExtendedWkbGeometry(@event.ExtendedWkbGeometry), BuildingGeometryMethod.MeasuredByGrb);
-        }
+        //private void When(BuildingMeasurementByGrbWasCorrected @event)
+        //{
+        //    BuildingGeometry = new BuildingGeometry(new ExtendedWkbGeometry(@event.ExtendedWkbGeometry), BuildingGeometryMethod.MeasuredByGrb);
+        //}
 
-        private void When(BuildingWasOutlined @event)
-        {
-            BuildingGeometry = new BuildingGeometry(new ExtendedWkbGeometry(@event.ExtendedWkbGeometry), BuildingGeometryMethod.Outlined);
-        }
+        //private void When(BuildingWasOutlined @event)
+        //{
+        //    BuildingGeometry = new BuildingGeometry(new ExtendedWkbGeometry(@event.ExtendedWkbGeometry), BuildingGeometryMethod.Outlined);
+        //}
 
-        private void When(BuildingWasMeasuredByGrb @event)
-        {
-            BuildingGeometry = new BuildingGeometry(new ExtendedWkbGeometry(@event.ExtendedWkbGeometry), BuildingGeometryMethod.MeasuredByGrb);
-        }
+        //private void When(BuildingWasMeasuredByGrb @event)
+        //{
+        //    BuildingGeometry = new BuildingGeometry(new ExtendedWkbGeometry(@event.ExtendedWkbGeometry), BuildingGeometryMethod.MeasuredByGrb);
+        //}
         #endregion Building Geometry
 
         private void When(BuildingUnitAddressWasDetached @event)
@@ -315,7 +316,7 @@ namespace BuildingRegistry.Building
             BuildingUnitKey = new BuildingUnitKey(@event.BuildingUnitKey);
             Function = BuildingUnitFunction.Unknown;
             AddressIds = new List<AddressId> { new AddressId(@event.AddressId) };
-            BuildingGeometry = _parent.Geometry;
+            //BuildingGeometry = _parent.Geometry;
 
             Version = @event.BuildingUnitVersion;
         }
@@ -327,7 +328,7 @@ namespace BuildingRegistry.Building
             BuildingUnitKey = new BuildingUnitKey(@event.BuildingUnitKey);
             Function = BuildingUnitFunction.Unknown;
             PreviousAddressId = new AddressId(@event.AddressId);
-            BuildingGeometry = _parent.Geometry;
+            //BuildingGeometry = _parent.Geometry;
             Status = BuildingUnitStatus.Retired;
             IsRetiredByBuilding = true;
 
@@ -340,7 +341,7 @@ namespace BuildingRegistry.Building
             BuildingUnitId = new BuildingUnitId(@event.BuildingUnitId);
             BuildingUnitKey = new BuildingUnitKey(@event.BuildingUnitKey);
             Function = BuildingUnitFunction.Common;
-            BuildingGeometry = _parent.Geometry;
+            //BuildingGeometry = _parent.Geometry;
 
             Version = @event.BuildingUnitVersion;
         }
@@ -352,7 +353,7 @@ namespace BuildingRegistry.Building
             BuildingUnitKey = new BuildingUnitKey(@event.BuildingUnitKey);
             Function = BuildingUnitFunction.Unknown;
             AddressIds = new List<AddressId> { new AddressId(@event.AddressId) };
-            BuildingGeometry = _parent.Geometry;
+            //BuildingGeometry = _parent.Geometry;
 
             Version = @event.BuildingUnitVersion;
         }
@@ -414,5 +415,35 @@ namespace BuildingRegistry.Building
                 IsRetiredBySelf = false;
         }
         #endregion
+
+        public BuildingUnitSnapshot TakeSnapshot()
+        {
+            return new BuildingUnitSnapshot(
+                _buildingId,
+                BuildingUnitId,
+                BuildingUnitKey,
+                Function,
+                Status,
+                AddressIds,
+                PreviousAddressId,
+                BuildingUnitPosition,
+                PersistentLocalId,
+                IsComplete,
+                IsRemoved,
+                IsRetiredByBuilding,
+                IsRetiredByParent,
+                IsRetiredBySelf,
+                Version,
+                _houseNumberStatusChronicle.ToList(),
+                _subaddressStatusChronicle.ToList(),
+                _houseNumberPositionsFromCrab,
+                _subaddressPositionsFromCrab,
+                _readdressedEvents);
+        }
+
+        public void RestoreSnapshot(BuildingUnitSnapshot snapshot)
+        {
+
+        }
     }
 }
