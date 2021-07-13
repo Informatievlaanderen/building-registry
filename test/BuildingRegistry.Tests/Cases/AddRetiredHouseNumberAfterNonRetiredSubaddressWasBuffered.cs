@@ -5,6 +5,7 @@ namespace BuildingRegistry.Tests.Cases
     using Be.Vlaanderen.Basisregisters.Crab;
     using Autofixture;
     using AutoFixture;
+    using Be.Vlaanderen.Basisregisters.AggregateSource.Snapshotting;
     using Building;
     using Building.Commands.Crab;
     using Building.Events;
@@ -93,7 +94,7 @@ namespace BuildingRegistry.Tests.Cases
                 .Customize(new WithFixedBuildingUnitIdFromHouseNumber());
 
             _ = new TestCaseData(Fixture);
-            _building = Building.Register(_.Gebouw1Id);
+            _building = Building.Register(_.Gebouw1Id, new BuildingFactory(IntervalStrategy.Default));
         }
 
         private Building _building;

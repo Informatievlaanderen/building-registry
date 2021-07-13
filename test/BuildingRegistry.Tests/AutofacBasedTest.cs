@@ -13,6 +13,11 @@ namespace BuildingRegistry.Tests
     using Microsoft.Extensions.Logging;
     using Microsoft.Extensions.Primitives;
     using System.Collections.Generic;
+    using AutoFixture;
+    using Be.Vlaanderen.Basisregisters.AggregateSource.Snapshotting;
+    using Building;
+    using Building.Events;
+    using Newtonsoft.Json;
     using Xunit.Abstractions;
 
     public class TestConfig : IConfiguration
@@ -43,6 +48,8 @@ namespace BuildingRegistry.Tests
     {
         private readonly IContainer _container;
 
+        private readonly JsonSerializerSettings _eventSerializerSettings = EventsJsonSerializerSettingsProvider.CreateSerializerSettings();
+
         protected IExceptionCentricTestSpecificationRunner ExceptionCentricTestSpecificationRunner => _container.Resolve<IExceptionCentricTestSpecificationRunner>();
 
         protected IEventCentricTestSpecificationRunner EventCentricTestSpecificationRunner => _container.Resolve<IEventCentricTestSpecificationRunner>();
@@ -59,14 +66,25 @@ namespace BuildingRegistry.Tests
                 .AddInMemoryCollection(new Dictionary<string, string> { { "ConnectionStrings:Events", "x" } })
                 .Build();
 
-            var eventSerializerSettings = EventsJsonSerializerSettingsProvider.CreateSerializerSettings();
-
             var containerBuilder = new ContainerBuilder();
 
             containerBuilder
-                .RegisterModule(new EventHandlingModule(typeof(DomainAssemblyMarker).Assembly, eventSerializerSettings))
+                .RegisterModule(new EventHandlingModule(typeof(DomainAssemblyMarker).Assembly, _eventSerializerSettings))
                 .RegisterModule(new CommandHandlingModule(configuration))
                 .RegisterModule(new SqlStreamStoreModule());
+
+            var eventMappingDictionary =
+                new Dictionary<string, System.Type>(
+                    EventMapping.DiscoverEventNamesInAssembly(typeof(DomainAssemblyMarker).Assembly))
+                {
+                    {$"{nameof(SnapshotContainer)}<{nameof(BuildingSnapshot)}>", typeof(SnapshotContainer)}
+                };
+
+            containerBuilder.RegisterInstance(new EventMapping(eventMappingDictionary)).As<EventMapping>();
+
+            containerBuilder
+                .Register(c => new BuildingFactory(IntervalStrategy.SnapshotEvery(1000)))
+                .As<IBuildingFactory>();
 
             containerBuilder.UseAggregateSourceTesting(CreateFactComparer(), CreateExceptionComparer());
 
@@ -99,5 +117,7 @@ namespace BuildingRegistry.Tests
 
         protected void Assert(IEventCentricTestSpecificationBuilder builder)
             => builder.Assert(EventCentricTestSpecificationRunner, FactComparer, Logger);
+
+        public string GetSnapshotIdentifier(string identifier) => $"{identifier}-snapshots";
     }
 }

@@ -48,10 +48,10 @@ namespace BuildingRegistry.Building
         private readonly Dictionary<BuildingUnitKey, SubaddressWasReaddressedFromCrab> _readdressedSubaddresses = new Dictionary<BuildingUnitKey, SubaddressWasReaddressedFromCrab>();
         private readonly List<CrabTerrainObjectHouseNumberId> _importedTerrainObjectHouseNumberIds = new List<CrabTerrainObjectHouseNumberId>();
 
-        //internal Building(ISnapshotStrategy snapshotStrategy)
-        //{
-        //    Strategy = snapshotStrategy;
-        //}
+        internal Building(ISnapshotStrategy snapshotStrategy) : this()
+        {
+            Strategy = snapshotStrategy;
+        }
 
         private Building()
         {
@@ -123,6 +123,8 @@ namespace BuildingRegistry.Building
             Register<BuildingUnitAddressWasAttached>(When);
             Register<BuildingUnitWasReaddressed>(When);
             Register<BuildingUnitPersistentLocalIdWasAssigned>(When);
+
+            Register<BuildingSnapshot>(When);
         }
 
         private void When(BuildingUnitWasReaddressed @event)
@@ -610,11 +612,6 @@ namespace BuildingRegistry.Building
                 .Last();
         }
 
-        public BuildingUnit GetBuildingUnitById(BuildingUnitId buildingUnitId)
-        {
-            return _buildingUnitCollection.GetById(buildingUnitId);
-        }
-
         public object TakeSnapshot()
         {
             return new BuildingSnapshot(
@@ -637,6 +634,11 @@ namespace BuildingRegistry.Building
                 _importedTerrainObjectHouseNumberIds,
                 _buildingUnitCollection.TakeSnapshot(),
                 LastModificationBasedOnCrab);
+        }
+
+        private void When(BuildingSnapshot snapshot)
+        {
+            _buildingUnitCollection.RestoreSnapshot(snapshot.BuildingUnitCollection);
         }
 
         public ISnapshotStrategy Strategy { get; }

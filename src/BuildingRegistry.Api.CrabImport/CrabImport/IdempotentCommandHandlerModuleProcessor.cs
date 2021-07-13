@@ -48,6 +48,7 @@ namespace BuildingRegistry.Api.CrabImport.CrabImport
 
             _buildingCommandHandlerModule = new BuildingCommandHandlerModule(
                 container.Resolve<Func<IBuildings>>(),
+                container.Resolve<IBuildingFactory>(),
                 () => concurrentUnitOfWork,
                 getStreamStore,
                 eventMapping,

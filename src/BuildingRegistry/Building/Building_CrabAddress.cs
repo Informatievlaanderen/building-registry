@@ -10,7 +10,7 @@ namespace BuildingRegistry.Building
     using ValueObjects;
     using ValueObjects.Crab;
 
-    public partial class Building : AggregateRootEntity
+    public partial class Building
     {
         public void ImportTerrainObjectHouseNumberFromCrab(
              CrabTerrainObjectHouseNumberId terrainObjectHouseNumberId,

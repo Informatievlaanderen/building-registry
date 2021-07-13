@@ -10,20 +10,17 @@ namespace BuildingRegistry.Building
     using System.Collections.Generic;
     using System.Linq;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
-    using Be.Vlaanderen.Basisregisters.AggregateSource.Snapshotting;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using ValueObjects;
     using ValueObjects.Crab;
 
-    public partial class Building //: ISnapshotable
+    public partial class Building : AggregateRootEntity, ISnapshotable
     {
         private static readonly WKBReader WkbReader = WKBReaderFactory.Create();
 
-        public static readonly Func<Building> Factory = () => new Building();
-
-        public static Building Register(BuildingId id)
+        public static Building Register(BuildingId id, IBuildingFactory buildingFactory)
         {
-            var building = Factory();
+            var building = buildingFactory.Create();
             building.ApplyChange(new BuildingWasRegistered(id));
             return building;
         }

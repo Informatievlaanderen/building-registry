@@ -8,9 +8,18 @@ namespace BuildingRegistry.Infrastructure.Repositories
 
     public class Buildings : Repository<Building>, IBuildings
     {
-        public Buildings(ConcurrentUnitOfWork unitOfWork, IStreamStore eventStore, EventMapping eventMapping, EventDeserializer eventDeserializer)
-            : base(Building.Factory, unitOfWork, eventStore, eventMapping, eventDeserializer)
-        {
-        }
+        public Buildings(
+            IBuildingFactory buildingFactory,
+            ConcurrentUnitOfWork unitOfWork,
+            IStreamStore eventStore,
+            EventMapping eventMapping,
+            EventDeserializer eventDeserializer)
+            : base(
+                buildingFactory.Create,
+                unitOfWork,
+                eventStore,
+                eventMapping,
+                eventDeserializer)
+        { }
     }
 }
