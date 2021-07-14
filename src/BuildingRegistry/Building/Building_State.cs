@@ -624,16 +624,13 @@ namespace BuildingRegistry.Building
                 _geometryChronicle.ToList(),
                 _statusChronicle.ToList(),
                 _activeHouseNumberIdsByTerreinObjectHouseNr,
-                _legacySubaddressEventsByTerreinObjectHouseNumber,
-                _legacySubaddressStatusEventsBySubadresId,
-                _legacySubaddressPositionEventsBySubadresId,
                 _legacyHouseNumberStatusEventsByHouseNumberId,
                 _legacyHouseNumberPositionEventsByHouseNumberId,
                 _readdressedHouseNumbers,
-                _readdressedSubaddresses,
-                _importedTerrainObjectHouseNumberIds,
-                _buildingUnitCollection.TakeSnapshot(),
-                LastModificationBasedOnCrab);
+                _legacySubaddressEventsByTerreinObjectHouseNumber,
+                _legacySubaddressStatusEventsBySubadresId,
+                _legacySubaddressPositionEventsBySubadresId,
+                _readdressedSubaddresses, _importedTerrainObjectHouseNumberIds, _buildingUnitCollection.TakeSnapshot(), LastModificationBasedOnCrab);
         }
 
         private void When(BuildingSnapshot snapshot)

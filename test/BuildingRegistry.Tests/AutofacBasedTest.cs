@@ -13,7 +13,6 @@ namespace BuildingRegistry.Tests
     using Microsoft.Extensions.Logging;
     using Microsoft.Extensions.Primitives;
     using System.Collections.Generic;
-    using AutoFixture;
     using Be.Vlaanderen.Basisregisters.AggregateSource.Snapshotting;
     using Building;
     using Building.Events;
@@ -46,19 +45,19 @@ namespace BuildingRegistry.Tests
 
     public class AutofacBasedTest
     {
-        private readonly IContainer _container;
+        protected IContainer Container { get; set; }
 
-        private readonly JsonSerializerSettings _eventSerializerSettings = EventsJsonSerializerSettingsProvider.CreateSerializerSettings();
+        protected readonly JsonSerializerSettings EventSerializerSettings = EventsJsonSerializerSettingsProvider.CreateSerializerSettings();
 
-        protected IExceptionCentricTestSpecificationRunner ExceptionCentricTestSpecificationRunner => _container.Resolve<IExceptionCentricTestSpecificationRunner>();
+        protected IExceptionCentricTestSpecificationRunner ExceptionCentricTestSpecificationRunner => Container.Resolve<IExceptionCentricTestSpecificationRunner>();
 
-        protected IEventCentricTestSpecificationRunner EventCentricTestSpecificationRunner => _container.Resolve<IEventCentricTestSpecificationRunner>();
+        protected IEventCentricTestSpecificationRunner EventCentricTestSpecificationRunner => Container.Resolve<IEventCentricTestSpecificationRunner>();
 
-        protected IFactComparer FactComparer => _container.Resolve<IFactComparer>();
+        protected IFactComparer FactComparer => Container.Resolve<IFactComparer>();
 
-        protected IExceptionComparer ExceptionComparer => _container.Resolve<IExceptionComparer>();
+        protected IExceptionComparer ExceptionComparer => Container.Resolve<IExceptionComparer>();
 
-        protected ILogger Logger => _container.Resolve<ILogger>();
+        protected ILogger Logger => Container.Resolve<ILogger>();
 
         public AutofacBasedTest(ITestOutputHelper testOutputHelper)
         {
@@ -69,7 +68,7 @@ namespace BuildingRegistry.Tests
             var containerBuilder = new ContainerBuilder();
 
             containerBuilder
-                .RegisterModule(new EventHandlingModule(typeof(DomainAssemblyMarker).Assembly, _eventSerializerSettings))
+                .RegisterModule(new EventHandlingModule(typeof(DomainAssemblyMarker).Assembly, EventSerializerSettings))
                 .RegisterModule(new CommandHandlingModule(configuration))
                 .RegisterModule(new SqlStreamStoreModule());
 
@@ -92,7 +91,7 @@ namespace BuildingRegistry.Tests
             containerBuilder.RegisterType<XUnitLogger>().AsImplementedInterfaces();
             containerBuilder.RegisterType<FakePersistentLocalIdGenerator>().As<IPersistentLocalIdGenerator>();
 
-            _container = containerBuilder.Build();
+            Container = containerBuilder.Build();
         }
 
         protected virtual IFactComparer CreateFactComparer()

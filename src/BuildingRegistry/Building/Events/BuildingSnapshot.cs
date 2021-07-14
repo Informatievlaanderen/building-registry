@@ -41,8 +41,7 @@ namespace BuildingRegistry.Building.Events
 
         public Modification LastModificationBasedOnCrab { get; }
 
-        public BuildingSnapshot(
-            BuildingId buildingId,
+        public BuildingSnapshot(BuildingId buildingId,
             PersistentLocalId? persistentLocalId,
             BuildingGeometry? buildingGeometry,
             BuildingStatus? buildingStatus,
@@ -51,12 +50,12 @@ namespace BuildingRegistry.Building.Events
             IEnumerable<BuildingGeometryWasImportedFromCrab> geometryChronicle,
             IEnumerable<BuildingStatusWasImportedFromCrab> statusChronicle,
             Dictionary<CrabTerrainObjectHouseNumberId, CrabHouseNumberId> activeHouseNumberIdsByTerrainObjectHouseNr,
-            Dictionary<Tuple<CrabTerrainObjectHouseNumberId, CrabHouseNumberId>, List<AddressSubaddressWasImportedFromCrab>> subaddressEventsByTerrainObjectHouseNumberAndHouseNumber,
-            Dictionary<CrabSubaddressId, List<AddressSubaddressStatusWasImportedFromCrab>> subaddressStatusEventsBySubaddressId,
-            Dictionary<CrabSubaddressId, List<AddressSubaddressPositionWasImportedFromCrab>> subaddressPositionEventsBySubaddressId,
             Dictionary<AddressId, List<AddressHouseNumberStatusWasImportedFromCrab>> houseNumberStatusEventsByHouseNumberId,
             Dictionary<AddressId, List<AddressHouseNumberPositionWasImportedFromCrab>> houseNumberPositionEventsByHouseNumberId,
             Dictionary<BuildingUnitKey, HouseNumberWasReaddressedFromCrab> houseNumberReaddressedEventsByBuildingUnit,
+            Dictionary<Tuple<CrabTerrainObjectHouseNumberId, CrabHouseNumberId>, List<AddressSubaddressWasImportedFromCrab>> subaddressEventsByTerrainObjectHouseNumberAndHouseNumber,
+            Dictionary<CrabSubaddressId, List<AddressSubaddressStatusWasImportedFromCrab>> subaddressStatusEventsBySubaddressId,
+            Dictionary<CrabSubaddressId, List<AddressSubaddressPositionWasImportedFromCrab>> subaddressPositionEventsBySubaddressId,
             Dictionary<BuildingUnitKey, SubaddressWasReaddressedFromCrab> subaddressReaddressedEventsByBuildingUnit,
             IEnumerable<CrabTerrainObjectHouseNumberId> importedTerrainObjectHouseNumberIds,
             BuildingUnitCollectionSnapshot buildingUnitCollection,
@@ -121,13 +120,12 @@ namespace BuildingRegistry.Building.Events
             IEnumerable<BuildingGeometryWasImportedFromCrab> geometryChronicle,
             IEnumerable<BuildingStatusWasImportedFromCrab> statusChronicle,
             Dictionary<int, int> activeHouseNumberIdsByTerrainObjectHouseNr,
-            Dictionary<Tuple<int, int>, IEnumerable<AddressSubaddressWasImportedFromCrab>>
-                subaddressEventsByTerrainObjectHouseNumberAndHouseNumber,
-            Dictionary<int, IEnumerable<AddressSubaddressStatusWasImportedFromCrab>> subaddressStatusEventsBySubaddressId,
-            Dictionary<int, IEnumerable<AddressSubaddressPositionWasImportedFromCrab>> subaddressPositionEventsBySubaddressId,
             Dictionary<Guid, IEnumerable<AddressHouseNumberStatusWasImportedFromCrab>> houseNumberStatusEventsByHouseNumberId,
             Dictionary<Guid, IEnumerable<AddressHouseNumberPositionWasImportedFromCrab>> houseNumberPositionEventsByHouseNumberId,
             Dictionary<BuildingUnitKeyType, HouseNumberWasReaddressedFromCrab> houseNumberReaddressedEventsByBuildingUnit,
+            Dictionary<Tuple<int, int>, IEnumerable<AddressSubaddressWasImportedFromCrab>> subaddressEventsByTerrainObjectHouseNumberAndHouseNumber,
+            Dictionary<int, IEnumerable<AddressSubaddressStatusWasImportedFromCrab>> subaddressStatusEventsBySubaddressId,
+            Dictionary<int, IEnumerable<AddressSubaddressPositionWasImportedFromCrab>> subaddressPositionEventsBySubaddressId,
             Dictionary<BuildingUnitKeyType, SubaddressWasReaddressedFromCrab> subaddressReaddressedEventsByBuildingUnit,
             IEnumerable<int> importedTerrainObjectHouseNumberIds,
             BuildingUnitCollectionSnapshot buildingUnitCollection,
@@ -147,17 +145,6 @@ namespace BuildingRegistry.Building.Events
                     x => new CrabTerrainObjectHouseNumberId(x.Key),
                     y => new CrabHouseNumberId(y.Value)),
 
-                subaddressEventsByTerrainObjectHouseNumberAndHouseNumber.ToDictionary(
-                    x => new Tuple<CrabTerrainObjectHouseNumberId, CrabHouseNumberId>(
-                        new CrabTerrainObjectHouseNumberId(x.Key.Item1), new CrabHouseNumberId(x.Key.Item2)),
-                    y => y.Value.ToList()),
-                subaddressStatusEventsBySubaddressId.ToDictionary(
-                    x => new CrabSubaddressId(x.Key),
-                    y => y.Value.ToList()),
-                subaddressPositionEventsBySubaddressId.ToDictionary(
-                    x => new CrabSubaddressId(x.Key),
-                    y => y.Value.ToList()),
-
                 houseNumberStatusEventsByHouseNumberId.ToDictionary(
                     x => new AddressId(x.Key),
                     y => y.Value.ToList()),
@@ -168,12 +155,19 @@ namespace BuildingRegistry.Building.Events
                 houseNumberReaddressedEventsByBuildingUnit.ToDictionary(
                     x => new BuildingUnitKey(x.Key),
                     y => y.Value),
+                subaddressEventsByTerrainObjectHouseNumberAndHouseNumber.ToDictionary(
+                    x => new Tuple<CrabTerrainObjectHouseNumberId, CrabHouseNumberId>(
+                        new CrabTerrainObjectHouseNumberId(x.Key.Item1), new CrabHouseNumberId(x.Key.Item2)),
+                    y => y.Value.ToList()),
+                subaddressStatusEventsBySubaddressId.ToDictionary(
+                    x => new CrabSubaddressId(x.Key),
+                    y => y.Value.ToList()),
+                subaddressPositionEventsBySubaddressId.ToDictionary(
+                    x => new CrabSubaddressId(x.Key),
+                    y => y.Value.ToList()),
                 subaddressReaddressedEventsByBuildingUnit.ToDictionary(
                     x => new BuildingUnitKey(x.Key),
-                    y => y.Value),
-                importedTerrainObjectHouseNumberIds.Select(x => new CrabTerrainObjectHouseNumberId(x)),
-                buildingUnitCollection,
-                lastModificationBasedOnCrab)
+                    y => y.Value), importedTerrainObjectHouseNumberIds.Select(x => new CrabTerrainObjectHouseNumberId(x)), buildingUnitCollection, lastModificationBasedOnCrab)
         { }
     }
 }
