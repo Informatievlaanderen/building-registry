@@ -39,7 +39,7 @@ namespace BuildingRegistry.Tests.WhenImportingCrabTerrainObject
                        new Fact(buildingId, new BuildingWasRemoved(buildingId, new List<BuildingUnitId>())),
                        new Fact(buildingId, command.ToLegacyEvent()),
                        new Fact(GetSnapshotIdentifier(buildingId),
-                           SnapshotBuilder
+                           BuildingSnapshotBuilder
                                .CreateDefaultSnapshot(buildingId)
                                .WithIsRemoved(true)
                                .WithLastModificationFromCrab(Modification.Delete)
@@ -50,6 +50,8 @@ namespace BuildingRegistry.Tests.WhenImportingCrabTerrainObject
         [Fact]
         public void WithFiniteLifetime()
         {
+            Fixture.Customize(new WithSnapshotInterval(1));
+
             var command = Fixture.Create<ImportTerrainObjectFromCrab>();
 
             var buildingId = Fixture.Create<BuildingId>();
@@ -58,14 +60,22 @@ namespace BuildingRegistry.Tests.WhenImportingCrabTerrainObject
                 .Given(buildingId,
                     Fixture.Create<BuildingWasRegistered>())
                 .When(command)
-                .Then(buildingId,
-                    new BuildingWasNotRealized(buildingId, new List<BuildingUnitId>(), new List<BuildingUnitId>()),
-                    command.ToLegacyEvent()));
+                .Then(new[]
+                {
+                    new Fact(buildingId, new BuildingWasNotRealized(buildingId, new List<BuildingUnitId>(), new List<BuildingUnitId>())),
+                    new Fact(buildingId, command.ToLegacyEvent()),
+                    new Fact(GetSnapshotIdentifier(buildingId),
+                        BuildingSnapshotBuilder
+                            .CreateDefaultSnapshot(buildingId)
+                            .WithStatus(BuildingStatus.NotRealized)
+                            .Build(2, EventSerializerSettings))
+                }));
         }
 
         [Fact]
         public void WhenRealizedWithFiniteLifetime()
         {
+            Fixture.Customize(new WithSnapshotInterval(1));
             var command = Fixture.Create<ImportTerrainObjectFromCrab>();
 
             var buildingId = Fixture.Create<BuildingId>();
@@ -75,14 +85,22 @@ namespace BuildingRegistry.Tests.WhenImportingCrabTerrainObject
                     Fixture.Create<BuildingWasRegistered>(),
                     Fixture.Create<BuildingWasRealized>())
                 .When(command)
-                .Then(buildingId,
-                    new BuildingWasRetired(buildingId, new List<BuildingUnitId>(), new List<BuildingUnitId>()),
-                    command.ToLegacyEvent()));
+                .Then(new[]
+                {
+                    new Fact(buildingId, new BuildingWasRetired(buildingId, new List<BuildingUnitId>(), new List<BuildingUnitId>())),
+                    new Fact(buildingId, command.ToLegacyEvent()),
+                    new Fact(GetSnapshotIdentifier(buildingId),
+                        BuildingSnapshotBuilder
+                            .CreateDefaultSnapshot(buildingId)
+                            .WithStatus(BuildingStatus.Retired)
+                            .Build(3, EventSerializerSettings))
+                }));
         }
 
         [Fact]
         public void WithFiniteLifetimeAndCorrection()
         {
+            Fixture.Customize(new WithSnapshotInterval(1));
             var command = Fixture.Create<ImportTerrainObjectFromCrab>()
                 .WithModification(CrabModification.Correction);
 
@@ -92,14 +110,22 @@ namespace BuildingRegistry.Tests.WhenImportingCrabTerrainObject
                 .Given(buildingId,
                     Fixture.Create<BuildingWasRegistered>())
                 .When(command)
-                .Then(buildingId,
-                    new BuildingWasCorrectedToNotRealized(buildingId, new List<BuildingUnitId>(), new List<BuildingUnitId>()),
-                    command.ToLegacyEvent()));
+                .Then(new[]
+                {
+                    new Fact(buildingId, new BuildingWasCorrectedToNotRealized(buildingId, new List<BuildingUnitId>(), new List<BuildingUnitId>())),
+                    new Fact(buildingId, command.ToLegacyEvent()),
+                    new Fact(GetSnapshotIdentifier(buildingId),
+                        BuildingSnapshotBuilder
+                            .CreateDefaultSnapshot(buildingId)
+                            .WithStatus(BuildingStatus.NotRealized)
+                            .Build(2, EventSerializerSettings))
+                }));
         }
 
         [Fact]
         public void WhenRealizedWithFiniteLifetimeAndCorrection()
         {
+            Fixture.Customize(new WithSnapshotInterval(1));
             var command = Fixture.Create<ImportTerrainObjectFromCrab>()
                 .WithModification(CrabModification.Correction);
 
@@ -110,9 +136,16 @@ namespace BuildingRegistry.Tests.WhenImportingCrabTerrainObject
                     Fixture.Create<BuildingWasRegistered>(),
                     Fixture.Create<BuildingWasRealized>())
                 .When(command)
-                .Then(buildingId,
-                    new BuildingWasCorrectedToRetired(buildingId, new List<BuildingUnitId>(), new List<BuildingUnitId>()),
-                    command.ToLegacyEvent()));
+                .Then(new[]
+                {
+                    new Fact(buildingId, new BuildingWasCorrectedToRetired(buildingId, new List<BuildingUnitId>(), new List<BuildingUnitId>())),
+                    new Fact(buildingId, command.ToLegacyEvent()),
+                    new Fact(GetSnapshotIdentifier(buildingId),
+                        BuildingSnapshotBuilder
+                            .CreateDefaultSnapshot(buildingId)
+                            .WithStatus(BuildingStatus.Retired)
+                            .Build(3, EventSerializerSettings))
+                }));
         }
     }
 }

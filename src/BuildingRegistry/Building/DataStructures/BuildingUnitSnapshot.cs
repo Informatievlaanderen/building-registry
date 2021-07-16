@@ -16,7 +16,7 @@ namespace BuildingRegistry.Building.DataStructures
         public string Function { get; }
         public string? Status { get; }
         public IEnumerable<Guid> AddressIds { get; }
-        public Guid PreviousAddressId { get; }
+        public Guid? PreviousAddressId { get; }
         public string? BuildingUnitPositionGeometryMethod { get; }
         public string? BuildingUnitPositionAsHex { get; }
         public int? PersistentLocalId { get; }
@@ -39,9 +39,9 @@ namespace BuildingRegistry.Building.DataStructures
             BuildingUnitFunction function,
             BuildingUnitStatus? status,
             IEnumerable<AddressId> addressIds,
-            AddressId previousAddressId,
-            BuildingUnitPosition buildingUnitPosition,
-            PersistentLocalId persistentLocalId,
+            AddressId? previousAddressId,
+            BuildingUnitPosition? buildingUnitPosition,
+            PersistentLocalId? persistentLocalId,
             bool isComplete,
             bool isRemoved,
             bool isRetiredByBuilding,
@@ -60,10 +60,10 @@ namespace BuildingRegistry.Building.DataStructures
             Function = function;
             Status = status;
             AddressIds = addressIds.Select(x => (Guid)x);
-            PreviousAddressId = previousAddressId;
+            if (previousAddressId is not null) PreviousAddressId = previousAddressId;
             BuildingUnitPositionGeometryMethod = buildingUnitPosition?.GeometryMethod;
             BuildingUnitPositionAsHex = buildingUnitPosition?.Geometry.ToString();
-            PersistentLocalId = persistentLocalId;
+            if (persistentLocalId is not null) PersistentLocalId = persistentLocalId;
             IsComplete = isComplete;
             IsRemoved = isRemoved;
             IsRetiredByBuilding = isRetiredByBuilding;

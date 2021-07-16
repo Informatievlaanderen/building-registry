@@ -4,6 +4,8 @@ namespace BuildingRegistry.Tests.WhenImportingCrabTerrainObject
     using Be.Vlaanderen.Basisregisters.Crab;
     using Autofixture;
     using AutoFixture;
+    using Be.Vlaanderen.Basisregisters.AggregateSource;
+    using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Building.Commands.Crab;
     using Building.Events;
     using NodaTime;
@@ -13,165 +15,227 @@ namespace BuildingRegistry.Tests.WhenImportingCrabTerrainObject
     using Xunit;
     using Xunit.Abstractions;
 
-    public class GivenBuildingIsRetired : AutofacBasedTest
+    public class GivenBuildingIsRetired : SnapshotBasedTest
     {
-        private readonly Fixture _fixture;
-
         public GivenBuildingIsRetired(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
         {
-            _fixture = new Fixture();
-            _fixture.Customize(new NodaTimeCustomization());
-            _fixture.Customize(new SetProvenanceImplementationsCallSetProvenance());
-            _fixture.Customize(new WithFixedBuildingId());
-            _fixture.Customize(new WithInfiniteLifetime());
-            _fixture.Customize(new WithNoDeleteModification());
+            Fixture.Customize(new WithFixedBuildingId());
+            Fixture.Customize(new WithInfiniteLifetime());
+            Fixture.Customize(new WithNoDeleteModification());
         }
 
         [Fact]
         public void WhenStatusWasUnderConstructionWithInfiniteLifetime()
         {
-            var statusCommand = _fixture.Create<ImportBuildingStatusFromCrab>()
+            Fixture.Customize(new WithSnapshotInterval(1));
+
+            var statusCommand = Fixture.Create<ImportBuildingStatusFromCrab>()
                 .WithStatus(CrabBuildingStatus.UnderConstruction);
 
-            var command = _fixture.Create<ImportTerrainObjectFromCrab>();
+            var command = Fixture.Create<ImportTerrainObjectFromCrab>();
 
-            var buildingId = _fixture.Create<BuildingId>();
+            var buildingId = Fixture.Create<BuildingId>();
 
             Assert(new Scenario()
                 .Given(buildingId,
-                    _fixture.Create<BuildingWasRegistered>(),
-                    _fixture.Create<BuildingBecameUnderConstruction>(),
+                    Fixture.Create<BuildingWasRegistered>(),
+                    Fixture.Create<BuildingBecameUnderConstruction>(),
                     statusCommand.ToLegacyEvent(),
-                    _fixture.Create<BuildingWasNotRealized>()
+                    Fixture.Create<BuildingWasNotRealized>()
                         .WithNoRetiredUnits())
                 .When(command)
-                .Then(buildingId,
-                    new BuildingBecameUnderConstruction(buildingId),
-                    command.ToLegacyEvent()));
+                .Then(new[]
+                {
+                    new Fact(buildingId, new BuildingBecameUnderConstruction(buildingId)),
+                    new Fact(buildingId, command.ToLegacyEvent()),
+                    new Fact(GetSnapshotIdentifier(buildingId), BuildingSnapshotBuilder
+                        .CreateDefaultSnapshot(buildingId)
+                        .WithStatusChronicle(statusCommand)
+                        .WithStatus(BuildingStatus.UnderConstruction)
+                        .WithLastModificationFromCrab(Modification.Update)
+                        .Build(5, EventSerializerSettings))
+                }));
         }
 
         [Fact]
         public void WhenNoStatusWithInfiniteLifetime()
         {
-            var command = _fixture.Create<ImportTerrainObjectFromCrab>();
+            Fixture.Customize(new WithSnapshotInterval(1));
 
-            var buildingId = _fixture.Create<BuildingId>();
+            var command = Fixture.Create<ImportTerrainObjectFromCrab>();
+
+            var buildingId = Fixture.Create<BuildingId>();
 
             Assert(new Scenario()
                 .Given(buildingId,
-                    _fixture.Create<BuildingWasRegistered>(),
-                    _fixture.Create<BuildingWasRetired>()
+                    Fixture.Create<BuildingWasRegistered>(),
+                    Fixture.Create<BuildingWasRetired>()
                         .WithNoRetiredUnits())
                 .When(command)
-                .Then(buildingId,
-                    new BuildingStatusWasRemoved(buildingId),
-                    command.ToLegacyEvent()));
+                .Then(new[]
+                {
+                    new Fact(buildingId, new BuildingStatusWasRemoved(buildingId)),
+                    new Fact(buildingId, command.ToLegacyEvent()),
+                    new Fact(GetSnapshotIdentifier(buildingId), BuildingSnapshotBuilder
+                        .CreateDefaultSnapshot(buildingId)
+                        .WithStatus(null)
+                        .WithLastModificationFromCrab(Modification.Insert)
+                        .Build(3, EventSerializerSettings))
+                }));
         }
 
         [Fact]
         public void WhenStatusWasPlannedWithInfiniteLifetime()
         {
-            var command = _fixture.Create<ImportTerrainObjectFromCrab>();
-            var statusCommand = _fixture.Create<ImportBuildingStatusFromCrab>()
+            Fixture.Customize(new WithSnapshotInterval(1));
+
+            var command = Fixture.Create<ImportTerrainObjectFromCrab>();
+            var statusCommand = Fixture.Create<ImportBuildingStatusFromCrab>()
                 .WithStatus(CrabBuildingStatus.PermitRequested);
 
-            var buildingId = _fixture.Create<BuildingId>();
+            var buildingId = Fixture.Create<BuildingId>();
 
             Assert(new Scenario()
                 .Given(buildingId,
-                    _fixture.Create<BuildingWasRegistered>(),
-                    _fixture.Create<BuildingWasPlanned>(),
+                    Fixture.Create<BuildingWasRegistered>(),
+                    Fixture.Create<BuildingWasPlanned>(),
                     statusCommand.ToLegacyEvent(),
-                    _fixture.Create<BuildingWasNotRealized>()
+                    Fixture.Create<BuildingWasNotRealized>()
                         .WithNoRetiredUnits())
                 .When(command)
-                .Then(buildingId,
-                    new BuildingWasPlanned(buildingId),
-                    command.ToLegacyEvent()));
+                .Then(new[]
+                {
+                    new Fact(buildingId, new BuildingWasPlanned(buildingId)),
+                    new Fact(buildingId, command.ToLegacyEvent()),
+                    new Fact(GetSnapshotIdentifier(buildingId), BuildingSnapshotBuilder
+                        .CreateDefaultSnapshot(buildingId)
+                        .WithStatus(BuildingStatus.Planned)
+                        .WithStatusChronicle(statusCommand)
+                        .WithLastModificationFromCrab(Modification.Update)
+                        .Build(5, EventSerializerSettings))
+                }));
         }
 
         [Fact]
         public void WhenStatusWasRealizedWithInfiniteLifetime()
         {
-            var statusCommand = _fixture.Create<ImportBuildingStatusFromCrab>()
-                .WithStatus(CrabBuildingStatus.InUse);
-            var command = _fixture.Create<ImportTerrainObjectFromCrab>();
+            Fixture.Customize(new WithSnapshotInterval(1));
 
-            var buildingId = _fixture.Create<BuildingId>();
+            var statusCommand = Fixture.Create<ImportBuildingStatusFromCrab>()
+                .WithStatus(CrabBuildingStatus.InUse);
+            var command = Fixture.Create<ImportTerrainObjectFromCrab>();
+
+            var buildingId = Fixture.Create<BuildingId>();
 
             Assert(new Scenario()
                 .Given(buildingId,
-                    _fixture.Create<BuildingWasRegistered>(),
-                    _fixture.Create<BuildingWasRealized>(),
+                    Fixture.Create<BuildingWasRegistered>(),
+                    Fixture.Create<BuildingWasRealized>(),
                     statusCommand.ToLegacyEvent(),
-                    _fixture.Create<BuildingWasRetired>()
+                    Fixture.Create<BuildingWasRetired>()
                         .WithNoRetiredUnits())
                 .When(command)
-                .Then(buildingId,
-                    new BuildingWasRealized(buildingId),
-                    command.ToLegacyEvent()));
+                .Then(new[]
+                {
+                    new Fact(buildingId, new BuildingWasRealized(buildingId)),
+                    new Fact(buildingId, command.ToLegacyEvent()),
+                    new Fact(GetSnapshotIdentifier(buildingId), BuildingSnapshotBuilder
+                        .CreateDefaultSnapshot(buildingId)
+                        .WithStatus(BuildingStatus.Realized)
+                        .WithStatusChronicle(statusCommand)
+                        .WithLastModificationFromCrab(Modification.Update)
+                        .Build(5, EventSerializerSettings))
+                }));
         }
 
         [Fact]
         public void WhenStatusWasRealizedWithInfiniteLifetimeAndCorrection()
         {
-            var statusCommand = _fixture.Create<ImportBuildingStatusFromCrab>()
+            Fixture.Customize(new WithSnapshotInterval(1));
+
+            var statusCommand = Fixture.Create<ImportBuildingStatusFromCrab>()
                 .WithStatus(CrabBuildingStatus.OutOfUse);
 
-            var command = _fixture.Create<ImportTerrainObjectFromCrab>()
+            var command = Fixture.Create<ImportTerrainObjectFromCrab>()
                 .WithModification(CrabModification.Correction);
 
-            var buildingId = _fixture.Create<BuildingId>();
+            var buildingId = Fixture.Create<BuildingId>();
 
             Assert(new Scenario()
                 .Given(buildingId,
-                    _fixture.Create<BuildingWasRegistered>(),
-                    _fixture.Create<BuildingWasRealized>(),
+                    Fixture.Create<BuildingWasRegistered>(),
+                    Fixture.Create<BuildingWasRealized>(),
                     statusCommand.ToLegacyEvent(),
-                    _fixture.Create<BuildingWasRetired>()
+                    Fixture.Create<BuildingWasRetired>()
                         .WithNoRetiredUnits())
                 .When(command)
-                .Then(buildingId,
-                    new BuildingWasCorrectedToRealized(buildingId),
-                    command.ToLegacyEvent()));
+                .Then(new[]
+                {
+                    new Fact(buildingId, new BuildingWasCorrectedToRealized(buildingId)),
+                    new Fact(buildingId, command.ToLegacyEvent()),
+                    new Fact(GetSnapshotIdentifier(buildingId), BuildingSnapshotBuilder
+                        .CreateDefaultSnapshot(buildingId)
+                        .WithStatus(BuildingStatus.Realized)
+                        .WithStatusChronicle(statusCommand)
+                        .WithLastModificationFromCrab(Modification.Update)
+                        .Build(5, EventSerializerSettings))
+                }));
         }
 
         [Fact]
         public void WithFiniteLifetime()
         {
-            var command = _fixture.Create<ImportTerrainObjectFromCrab>()
-                .WithLifetime(new CrabLifetime(_fixture.Create<LocalDateTime>(), _fixture.Create<LocalDateTime>()));
+            Fixture.Customize(new WithSnapshotInterval(1));
 
-            var buildingId = _fixture.Create<BuildingId>();
+            var command = Fixture.Create<ImportTerrainObjectFromCrab>()
+                .WithLifetime(new CrabLifetime(Fixture.Create<LocalDateTime>(), Fixture.Create<LocalDateTime>()));
+
+            var buildingId = Fixture.Create<BuildingId>();
 
             Assert(new Scenario()
                 .Given(buildingId,
-                    _fixture.Create<BuildingWasRegistered>(),
-                    _fixture.Create<BuildingWasRealized>(),
-                    _fixture.Create<BuildingWasRetired>()
+                    Fixture.Create<BuildingWasRegistered>(),
+                    Fixture.Create<BuildingWasRealized>(),
+                    Fixture.Create<BuildingWasRetired>()
                         .WithNoRetiredUnits())
                 .When(command)
-                .Then(buildingId,
-                    command.ToLegacyEvent()));
+                .Then(new[]
+                {
+                    new Fact(buildingId, command.ToLegacyEvent()),
+                    new Fact(GetSnapshotIdentifier(buildingId), BuildingSnapshotBuilder
+                        .CreateDefaultSnapshot(buildingId)
+                        .WithStatus(BuildingStatus.Retired)
+                        .WithLastModificationFromCrab(Modification.Insert)
+                        .Build(3, EventSerializerSettings))
+                }));
         }
 
         [Fact]
         public void WhenNoStatusWithInfiniteLifetimeAndCorrection()
         {
-            var command = _fixture.Create<ImportTerrainObjectFromCrab>()
+            Fixture.Customize(new WithSnapshotInterval(1));
+
+            var command = Fixture.Create<ImportTerrainObjectFromCrab>()
                 .WithModification(CrabModification.Correction);
 
-            var buildingId = _fixture.Create<BuildingId>();
+            var buildingId = Fixture.Create<BuildingId>();
 
             Assert(new Scenario()
                 .Given(buildingId,
-                    _fixture.Create<BuildingWasRegistered>(),
-                    _fixture.Create<BuildingWasRetired>()
+                    Fixture.Create<BuildingWasRegistered>(),
+                    Fixture.Create<BuildingWasRetired>()
                         .WithNoRetiredUnits())
                 .When(command)
-                .Then(buildingId,
-                    new BuildingStatusWasCorrectedToRemoved(buildingId),
-                    command.ToLegacyEvent()));
+                .Then(new[]
+                {
+                    new Fact(buildingId, new BuildingStatusWasCorrectedToRemoved(buildingId)),
+                    new Fact(buildingId, command.ToLegacyEvent()),
+                    new Fact(GetSnapshotIdentifier(buildingId), BuildingSnapshotBuilder
+                        .CreateDefaultSnapshot(buildingId)
+                        .WithStatus(null)
+                        .WithLastModificationFromCrab(Modification.Insert)
+                        .Build(3, EventSerializerSettings))
+                }));
         }
     }
 }
