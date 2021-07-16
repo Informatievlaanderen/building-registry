@@ -15,10 +15,12 @@ namespace BuildingRegistry.Building
     public sealed class BuildingCommandHandlerModule : CommandHandlerModule
     {
         private readonly Func<IBuildings> _getBuildings;
+        private readonly IBuildingFactory _buildingFactory;
         private readonly IPersistentLocalIdGenerator _persistentLocalIdGenerator;
 
         public BuildingCommandHandlerModule(
             Func<IBuildings> getBuildings,
+            IBuildingFactory buildingFactory,
             Func<ConcurrentUnitOfWork> getUnitOfWork,
             Func<IStreamStore> getStreamStore,
             EventMapping eventMapping,
@@ -30,6 +32,7 @@ namespace BuildingRegistry.Building
             ReaddressingProvenanceFactory readdressingProvenanceFactory)
         {
             _getBuildings = getBuildings;
+            _buildingFactory = buildingFactory;
             _persistentLocalIdGenerator = persistentLocalIdGenerator;
 
             For<ImportTerrainObjectFromCrab>()
@@ -264,7 +267,7 @@ namespace BuildingRegistry.Building
             if (!building.HasValue)
             {
                 building = new Optional<Building>(
-                    Building.Register(new BuildingId(buildingId)));
+                    Building.Register(new BuildingId(buildingId), _buildingFactory));
 
                 buildings.Add(buildingId.ToString(), building.Value);
             }

@@ -3,6 +3,8 @@ namespace BuildingRegistry.Building
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using DataStructures;
+    using Events;
     using ValueObjects;
 
     public class BuildingUnitCollection
@@ -292,6 +294,16 @@ namespace BuildingRegistry.Building
         public IEnumerable<BuildingUnit> GetAllBuildingUnitsWithoutPersistentLocalId()
         {
             return _allBuildingUnits.Where(x => x.PersistentLocalId == null);
+        }
+
+        public BuildingUnitCollectionSnapshot TakeSnapshot()
+        {
+            return new BuildingUnitCollectionSnapshot(_allBuildingUnits.Select(x => x.TakeSnapshot()), _readdressedKeys);
+        }
+
+        public void RestoreSnapshot(BuildingUnitCollectionSnapshot buildingUnitCollection)
+        {
+            throw new NotImplementedException();
         }
     }
 }

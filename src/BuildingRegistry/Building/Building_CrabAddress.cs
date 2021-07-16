@@ -10,17 +10,8 @@ namespace BuildingRegistry.Building
     using ValueObjects;
     using ValueObjects.Crab;
 
-    public partial class Building : AggregateRootEntity
+    public partial class Building
     {
-        public static readonly Func<Building> Factory = () => new Building();
-
-        public static Building Register(BuildingId id)
-        {
-            var building = Factory();
-            building.ApplyChange(new BuildingWasRegistered(id));
-            return building;
-        }
-
         public void ImportTerrainObjectHouseNumberFromCrab(
              CrabTerrainObjectHouseNumberId terrainObjectHouseNumberId,
              CrabTerrainObjectId terrainObjectId,

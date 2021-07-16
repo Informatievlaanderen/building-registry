@@ -2,7 +2,9 @@ namespace BuildingRegistry.Infrastructure.Modules
 {
     using Autofac;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
+    using Be.Vlaanderen.Basisregisters.AggregateSource.Snapshotting;
     using Be.Vlaanderen.Basisregisters.CommandHandling;
+    using Building;
     using Microsoft.Extensions.Configuration;
 
     public class CommandHandlingModule : Module
@@ -14,6 +16,10 @@ namespace BuildingRegistry.Infrastructure.Modules
 
         protected override void Load(ContainerBuilder containerBuilder)
         {
+            containerBuilder
+                .Register(c => new BuildingFactory(IntervalStrategy.Default))
+                .As<IBuildingFactory>();
+
             containerBuilder
                 .RegisterModule<RepositoriesModule>();
 

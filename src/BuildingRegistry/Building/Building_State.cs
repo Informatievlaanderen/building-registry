@@ -7,6 +7,7 @@ namespace BuildingRegistry.Building
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using Be.Vlaanderen.Basisregisters.AggregateSource.Snapshotting;
     using ValueObjects;
 
     public partial class Building
@@ -46,6 +47,11 @@ namespace BuildingRegistry.Building
         private readonly Dictionary<BuildingUnitKey, HouseNumberWasReaddressedFromCrab> _readdressedHouseNumbers = new Dictionary<BuildingUnitKey, HouseNumberWasReaddressedFromCrab>();
         private readonly Dictionary<BuildingUnitKey, SubaddressWasReaddressedFromCrab> _readdressedSubaddresses = new Dictionary<BuildingUnitKey, SubaddressWasReaddressedFromCrab>();
         private readonly List<CrabTerrainObjectHouseNumberId> _importedTerrainObjectHouseNumberIds = new List<CrabTerrainObjectHouseNumberId>();
+
+        internal Building(ISnapshotStrategy snapshotStrategy) : this()
+        {
+            Strategy = snapshotStrategy;
+        }
 
         private Building()
         {
@@ -117,6 +123,8 @@ namespace BuildingRegistry.Building
             Register<BuildingUnitAddressWasAttached>(When);
             Register<BuildingUnitWasReaddressed>(When);
             Register<BuildingUnitPersistentLocalIdWasAssigned>(When);
+
+            Register<BuildingSnapshot>(When);
         }
 
         private void When(BuildingUnitWasReaddressed @event)
@@ -399,25 +407,25 @@ namespace BuildingRegistry.Building
         private void When(BuildingWasOutlined @event)
         {
             Geometry = new BuildingGeometry(new ExtendedWkbGeometry(@event.ExtendedWkbGeometry), BuildingGeometryMethod.Outlined);
-            _buildingUnitCollection.RouteToNonDeleted(@event);
+            //_buildingUnitCollection.RouteToNonDeleted(@event);
         }
 
         private void When(BuildingWasMeasuredByGrb @event)
         {
             Geometry = new BuildingGeometry(new ExtendedWkbGeometry(@event.ExtendedWkbGeometry), BuildingGeometryMethod.MeasuredByGrb);
-            _buildingUnitCollection.RouteToNonDeleted(@event);
+            //_buildingUnitCollection.RouteToNonDeleted(@event);
         }
 
         private void When(BuildingMeasurementByGrbWasCorrected @event)
         {
             Geometry = new BuildingGeometry(new ExtendedWkbGeometry(@event.ExtendedWkbGeometry), BuildingGeometryMethod.MeasuredByGrb);
-            _buildingUnitCollection.RouteToNonDeleted(@event);
+            //_buildingUnitCollection.RouteToNonDeleted(@event);
         }
 
         private void When(BuildingOutlineWasCorrected @event)
         {
             Geometry = new BuildingGeometry(new ExtendedWkbGeometry(@event.ExtendedWkbGeometry), BuildingGeometryMethod.Outlined);
-            _buildingUnitCollection.RouteToNonDeleted(@event);
+            //_buildingUnitCollection.RouteToNonDeleted(@event);
         }
 
         private void When(BuildingGeometryWasRemoved @event)
@@ -604,9 +612,32 @@ namespace BuildingRegistry.Building
                 .Last();
         }
 
-        public BuildingUnit GetBuildingUnitById(BuildingUnitId buildingUnitId)
+        public object TakeSnapshot()
         {
-            return _buildingUnitCollection.GetById(buildingUnitId);
+            return new BuildingSnapshot(
+                _buildingId,
+                _persistentLocalId,
+                Geometry,
+                _status,
+                _isComplete,
+                IsRemoved,
+                _geometryChronicle.ToList(),
+                _statusChronicle.ToList(),
+                _activeHouseNumberIdsByTerreinObjectHouseNr,
+                _legacyHouseNumberStatusEventsByHouseNumberId,
+                _legacyHouseNumberPositionEventsByHouseNumberId,
+                _readdressedHouseNumbers,
+                _legacySubaddressEventsByTerreinObjectHouseNumber,
+                _legacySubaddressStatusEventsBySubadresId,
+                _legacySubaddressPositionEventsBySubadresId,
+                _readdressedSubaddresses, _importedTerrainObjectHouseNumberIds, _buildingUnitCollection.TakeSnapshot(), LastModificationBasedOnCrab);
         }
+
+        private void When(BuildingSnapshot snapshot)
+        {
+            _buildingUnitCollection.RestoreSnapshot(snapshot.BuildingUnitCollection);
+        }
+
+        public ISnapshotStrategy Strategy { get; }
     }
 }

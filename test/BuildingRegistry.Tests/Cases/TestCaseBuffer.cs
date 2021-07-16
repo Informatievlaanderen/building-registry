@@ -10,6 +10,7 @@ namespace BuildingRegistry.Tests.Cases
     using NetTopologySuite.IO;
     using System.Collections.Generic;
     using System.Linq;
+    using Be.Vlaanderen.Basisregisters.AggregateSource.Snapshotting;
     using ValueObjects;
     using ValueObjects.Crab;
     using WhenImportingCrabHouseNumberPosition;
@@ -38,7 +39,7 @@ namespace BuildingRegistry.Tests.Cases
 
             _ = new TestCaseData(Fixture);
 
-            _building = Building.Register(_.Gebouw1Id);
+            _building = Building.Register(_.Gebouw1Id, new BuildingFactory(IntervalStrategy.Default));
         }
 
         protected class TestCaseData
