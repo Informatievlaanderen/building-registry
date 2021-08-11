@@ -13,6 +13,7 @@ namespace BuildingRegistry.Tests
     using Building.Events.Crab;
     using Newtonsoft.Json;
     using ValueObjects;
+    using WhenImportingCrabBuildingGeometry;
     using WhenImportingCrabBuildingStatus;
 
     public static class BuildingSnapshotBuilder
@@ -52,6 +53,38 @@ namespace BuildingRegistry.Tests
                 snapshot.IsRemoved,
                 snapshot.GeometryChronicle.ToList(),
                 new List<BuildingStatusWasImportedFromCrab> { buildingStatusFromCrab.ToLegacyEvent() },
+                GetActiveHouseNumberIdsByTerrainObjectHouseNr(snapshot),
+                GetHouseNumberStatusEventsByHouseNumberId(snapshot),
+                GetHouseNumberPositionEventsByHouseNumberId(snapshot),
+                GetHouseNumberReaddressedEventsByBuildingUnit(snapshot),
+                GetSubaddressEventsByTerrainObjectHouseNumberAndHouseNumber(snapshot),
+                GetSubaddressStatusEventsBySubaddressId(snapshot),
+                GetSubaddressPositionEventsBySubaddressId(snapshot),
+                GetSubaddressReaddressedEventsByBuildingUnit(snapshot),
+                GetImportedTerrainObjectHouseNumberIds(snapshot),
+                snapshot.BuildingUnitCollection,
+                snapshot.LastModificationBasedOnCrab);
+        }
+
+        public static BuildingSnapshot WithGeometryChronicle(this BuildingSnapshot snapshot,
+            ImportBuildingGeometryFromCrab buildingGeometriesFromCrab)
+        {
+            return snapshot.WithGeometryChronicle(
+                new List<ImportBuildingGeometryFromCrab>(new List<ImportBuildingGeometryFromCrab>()
+                    {buildingGeometriesFromCrab}));
+        }
+
+        public static BuildingSnapshot WithGeometryChronicle(this BuildingSnapshot snapshot, IList<ImportBuildingGeometryFromCrab> buildingGeometriesFromCrab)
+        {
+            return new BuildingSnapshot(
+                new BuildingId(snapshot.BuildingId),
+                snapshot.PersistentLocalId.HasValue ? new PersistentLocalId(snapshot.PersistentLocalId.Value) : null,
+                GetGeometry(snapshot),
+                snapshot.Status,
+                snapshot.IsComplete,
+                snapshot.IsRemoved,
+                buildingGeometriesFromCrab.Select(x => x.ToLegacyEvent()).ToList(),
+                snapshot.StatusChronicle,
                 GetActiveHouseNumberIdsByTerrainObjectHouseNr(snapshot),
                 GetHouseNumberStatusEventsByHouseNumberId(snapshot),
                 GetHouseNumberPositionEventsByHouseNumberId(snapshot),
@@ -136,6 +169,31 @@ namespace BuildingRegistry.Tests
                 snapshot.BuildingUnitCollection,
                 modification);
         }
+
+        public static BuildingSnapshot WithGeometry(this BuildingSnapshot snapshot, BuildingGeometry buildingGeometry)
+        {
+            return new BuildingSnapshot(
+                new BuildingId(snapshot.BuildingId),
+                snapshot.PersistentLocalId.HasValue ? new PersistentLocalId(snapshot.PersistentLocalId.Value) : null,
+                buildingGeometry,
+                snapshot.Status,
+                snapshot.IsComplete,
+                snapshot.IsRemoved,
+                snapshot.GeometryChronicle.ToList(),
+                snapshot.StatusChronicle.ToList(),
+                GetActiveHouseNumberIdsByTerrainObjectHouseNr(snapshot),
+                GetHouseNumberStatusEventsByHouseNumberId(snapshot),
+                GetHouseNumberPositionEventsByHouseNumberId(snapshot),
+                GetHouseNumberReaddressedEventsByBuildingUnit(snapshot),
+                GetSubaddressEventsByTerrainObjectHouseNumberAndHouseNumber(snapshot),
+                GetSubaddressStatusEventsBySubaddressId(snapshot),
+                GetSubaddressPositionEventsBySubaddressId(snapshot),
+                GetSubaddressReaddressedEventsByBuildingUnit(snapshot),
+                GetImportedTerrainObjectHouseNumberIds(snapshot),
+                snapshot.BuildingUnitCollection,
+                snapshot.LastModificationBasedOnCrab);
+        }
+
 
         public static BuildingSnapshot CreateDefaultSnapshot(BuildingId buildingId)
         {
