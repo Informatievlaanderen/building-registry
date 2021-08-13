@@ -264,6 +264,33 @@ namespace BuildingRegistry.Tests
                 snapshot.ReaddressedEvents);
         }
 
+        public static BuildingUnitSnapshot WithPosition(
+            this BuildingUnitSnapshot snapshot,
+            BuildingUnitPosition unitPosition)
+        {
+            return new BuildingUnitSnapshot(
+                new BuildingId(snapshot.BuildingId),
+                new BuildingUnitId(snapshot.BuildingUnitId),
+                new BuildingUnitKey(snapshot.BuildingUnitKey),
+                BuildingUnitFunction.Parse(snapshot.Function).Value,
+                string.IsNullOrEmpty(snapshot.Status) ? null : BuildingUnitStatus.Parse(snapshot.Status),
+                snapshot.AddressIds.Select(x => new AddressId(x)),
+                snapshot.PreviousAddressId.HasValue ? new AddressId(snapshot.PreviousAddressId.Value) : null,
+                unitPosition,
+                snapshot.PersistentLocalId.HasValue ? new PersistentLocalId(snapshot.PersistentLocalId.Value) : null,
+                snapshot.IsComplete,
+                snapshot.IsRemoved,
+                snapshot.IsRetiredByBuilding,
+                snapshot.IsRetiredByParent,
+                snapshot.IsRetiredBySelf,
+                snapshot.Version,
+                snapshot.HouseNumberStatusChronicle,
+                snapshot.SubaddressStatusChronicle,
+                snapshot.HouseNumberPositions,
+                snapshot.SubaddressPositions,
+                snapshot.ReaddressedEvents);
+        }
+
         public static BuildingUnitSnapshot CreateDefaultSnapshotFor(BuildingUnitWasAddedToRetiredBuilding buildingUnitWasAdded, BuildingUnitStatus status)
         {
             return CreateDefaultSnapshot(

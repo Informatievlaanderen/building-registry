@@ -49,6 +49,7 @@ namespace BuildingRegistry.Tests.WhenImportingCrabTerrainObjectHouseNumber
                     new Fact(GetSnapshotIdentifier(buildingId),
                         BuildingSnapshotBuilder.CreateDefaultSnapshot(buildingId)
                             .WithImportedTerrainObjectHouseNrIds(new List<CrabTerrainObjectHouseNumberId>{command.TerrainObjectHouseNumberId})
+                            .WithGeometry(new BuildingGeometry(GeometryHelper.CreateEwkbFrom(Fixture.Create<WkbGeometry>()), BuildingGeometryMethod.MeasuredByGrb))
                             .WithActiveHouseNumberIdsByTerrainObjectHouseNr(new Dictionary<CrabTerrainObjectHouseNumberId, CrabHouseNumberId>
                             {
                                 { command.TerrainObjectHouseNumberId, command.HouseNumberId }
@@ -57,7 +58,7 @@ namespace BuildingRegistry.Tests.WhenImportingCrabTerrainObjectHouseNumber
                                 .WithBuildingUnits(new List<BuildingUnitSnapshot>
                                 {
                                     BuildingUnitSnapshotBuilder.CreateDefaultSnapshotFor(buildingUnitWasAdded)
-
+                                        .WithPosition(new BuildingUnitPosition(GeometryHelper.CreateEwkbFrom(new WkbGeometry(center.AsBinary())), BuildingUnitPositionGeometryMethod.DerivedFromObject))
                                 }))
                             .Build(4, EventSerializerSettings))
                 }));
