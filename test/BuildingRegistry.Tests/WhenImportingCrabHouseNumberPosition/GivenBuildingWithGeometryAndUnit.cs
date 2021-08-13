@@ -1,29 +1,30 @@
 namespace BuildingRegistry.Tests.WhenImportingCrabHouseNumberPosition
 {
+    using System.Collections.Generic;
     using Be.Vlaanderen.Basisregisters.AggregateSource.Testing;
     using Be.Vlaanderen.Basisregisters.Crab;
     using Autofixture;
     using AutoFixture;
+    using Be.Vlaanderen.Basisregisters.AggregateSource;
+    using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Building.Commands.Crab;
+    using Building.DataStructures;
     using Building.Events;
     using Building.Events.Crab;
     using NetTopologySuite.IO;
     using ValueObjects;
-    using ValueObjects.Crab;
     using Xunit;
     using Xunit.Abstractions;
 
-    public class GivenBuildingWithGeometryAndUnit : AutofacBasedTest
+    public class GivenBuildingWithGeometryAndUnit : SnapshotBasedTest
     {
-        private readonly Fixture _fixture = new Fixture();
-
         public GivenBuildingWithGeometryAndUnit(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
         {
-            _fixture.Customize(new InfrastructureCustomization());
-            _fixture.Customize(new WithInfiniteLifetime());
-            _fixture.Customize(new WithNoDeleteModification());
-            _fixture.Customize(new WithFixedBuildingUnitIdFromHouseNumber());
-            _fixture.Customize(new WithValidPoint());
+            Fixture.Customize(new InfrastructureCustomization());
+            Fixture.Customize(new WithInfiniteLifetime());
+            Fixture.Customize(new WithNoDeleteModification());
+            Fixture.Customize(new WithFixedBuildingUnitIdFromHouseNumber());
+            Fixture.Customize(new WithValidPoint());
         }
 
         [Theory]
@@ -37,19 +38,19 @@ namespace BuildingRegistry.Tests.WhenImportingCrabHouseNumberPosition
         {
             var polygonFixture = new Fixture().Customize(new WithValidPolygon());
 
-            var command = _fixture.Create<ImportHouseNumberPositionFromCrab>()
+            var command = Fixture.Create<ImportHouseNumberPositionFromCrab>()
                 .WithPositionOrigin(crabAddressPosition);
-            var buildingId = _fixture.Create<BuildingId>();
+            var buildingId = Fixture.Create<BuildingId>();
 
             Assert(new Scenario()
                 .Given(buildingId,
-                    _fixture.Create<BuildingWasRegistered>(),
-                    _fixture.Create<BuildingWasMeasuredByGrb>()
+                    Fixture.Create<BuildingWasRegistered>(),
+                    Fixture.Create<BuildingWasMeasuredByGrb>()
                         .WithGeometry(polygonFixture.Create<WkbGeometry>()),
-                    _fixture.Create<BuildingUnitWasAdded>())
+                    Fixture.Create<BuildingUnitWasAdded>())
                 .When(command)
                 .Then(buildingId,
-                    new BuildingUnitPositionWasAppointedByAdministrator(buildingId, _fixture.Create<BuildingUnitId>(), GeometryHelper.CreateEwkbFrom(_fixture.Create<WkbGeometry>())),
+                    new BuildingUnitPositionWasAppointedByAdministrator(buildingId, Fixture.Create<BuildingUnitId>(), GeometryHelper.CreateEwkbFrom(Fixture.Create<WkbGeometry>())),
                     command.ToLegacyEvent()));
         }
 
@@ -63,19 +64,19 @@ namespace BuildingRegistry.Tests.WhenImportingCrabHouseNumberPosition
 
             var derived = new WKBReader().Read(polygonFixture.Create<WkbGeometry>()).Centroid;
 
-            var command = _fixture.Create<ImportHouseNumberPositionFromCrab>()
+            var command = Fixture.Create<ImportHouseNumberPositionFromCrab>()
                 .WithPositionOrigin(crabAddressPosition);
-            var buildingId = _fixture.Create<BuildingId>();
+            var buildingId = Fixture.Create<BuildingId>();
 
             Assert(new Scenario()
                 .Given(buildingId,
-                    _fixture.Create<BuildingWasRegistered>(),
-                    _fixture.Create<BuildingWasMeasuredByGrb>()
+                    Fixture.Create<BuildingWasRegistered>(),
+                    Fixture.Create<BuildingWasMeasuredByGrb>()
                         .WithGeometry(polygonFixture.Create<WkbGeometry>()),
-                    _fixture.Create<BuildingUnitWasAdded>())
+                    Fixture.Create<BuildingUnitWasAdded>())
                 .When(command)
                 .Then(buildingId,
-                    new BuildingUnitPositionWasDerivedFromObject(buildingId, _fixture.Create<BuildingUnitId>(), GeometryHelper.CreateEwkbFrom(new WkbGeometry(derived.AsBinary()))),
+                    new BuildingUnitPositionWasDerivedFromObject(buildingId, Fixture.Create<BuildingUnitId>(), GeometryHelper.CreateEwkbFrom(new WkbGeometry(derived.AsBinary()))),
                     command.ToLegacyEvent()));
 
         }
@@ -94,19 +95,19 @@ namespace BuildingRegistry.Tests.WhenImportingCrabHouseNumberPosition
         {
             var polygonFixture = new Fixture().Customize(new WithValidPolygon());
 
-            var command = _fixture.Create<ImportHouseNumberPositionFromCrab>()
+            var command = Fixture.Create<ImportHouseNumberPositionFromCrab>()
                 .WithPositionOrigin(crabAddressPosition);
-            var buildingId = _fixture.Create<BuildingId>();
+            var buildingId = Fixture.Create<BuildingId>();
 
             Assert(new Scenario()
                 .Given(buildingId,
-                    _fixture.Create<BuildingWasRegistered>(),
-                    _fixture.Create<BuildingWasMeasuredByGrb>()
+                    Fixture.Create<BuildingWasRegistered>(),
+                    Fixture.Create<BuildingWasMeasuredByGrb>()
                         .WithGeometry(polygonFixture.Create<WkbGeometry>()),
-                    _fixture.Create<BuildingUnitWasAdded>())
+                    Fixture.Create<BuildingUnitWasAdded>())
                 .When(command)
                 .Then(buildingId,
-                    new BuildingUnitPositionWasDerivedFromObject(buildingId, _fixture.Create<BuildingUnitId>(), GeometryHelper.CreateEwkbFrom(_fixture.Create<WkbGeometry>())),
+                    new BuildingUnitPositionWasDerivedFromObject(buildingId, Fixture.Create<BuildingUnitId>(), GeometryHelper.CreateEwkbFrom(Fixture.Create<WkbGeometry>())),
                     command.ToLegacyEvent()));
         }
 
@@ -115,18 +116,18 @@ namespace BuildingRegistry.Tests.WhenImportingCrabHouseNumberPosition
         {
             var polygonFixture = new Fixture().Customize(new WithValidPolygon());
 
-            var command = _fixture.Create<ImportHouseNumberPositionFromCrab>();
-            var buildingId = _fixture.Create<BuildingId>();
+            var command = Fixture.Create<ImportHouseNumberPositionFromCrab>();
+            var buildingId = Fixture.Create<BuildingId>();
 
             Assert(new Scenario()
                 .Given(buildingId,
-                    _fixture.Create<BuildingWasRegistered>(),
-                    _fixture.Create<BuildingUnitWasAdded>(),
-                    _fixture.Create<BuildingWasMeasuredByGrb>()
+                    Fixture.Create<BuildingWasRegistered>(),
+                    Fixture.Create<BuildingUnitWasAdded>(),
+                    Fixture.Create<BuildingWasMeasuredByGrb>()
                         .WithGeometry(polygonFixture.Create<WkbGeometry>()))
                 .When(command)
                 .Then(buildingId,
-                    new BuildingUnitPositionWasAppointedByAdministrator(buildingId, _fixture.Create<BuildingUnitId>(), GeometryHelper.CreateEwkbFrom(_fixture.Create<WkbGeometry>())),
+                    new BuildingUnitPositionWasAppointedByAdministrator(buildingId, Fixture.Create<BuildingUnitId>(), GeometryHelper.CreateEwkbFrom(Fixture.Create<WkbGeometry>())),
                     command.ToLegacyEvent()));
         }
 
@@ -134,22 +135,22 @@ namespace BuildingRegistry.Tests.WhenImportingCrabHouseNumberPosition
         public void WithGeometryOutsideBuilding()
         {
             var polygonFixture = new Fixture().Customize(new WithValidPolygon());
-            _fixture.Customize(new WithInvalidPoint());
+            Fixture.Customize(new WithInvalidPoint());
 
             var derived = new WKBReader().Read(polygonFixture.Create<WkbGeometry>()).Centroid;
 
-            var command = _fixture.Create<ImportHouseNumberPositionFromCrab>();
-            var buildingId = _fixture.Create<BuildingId>();
+            var command = Fixture.Create<ImportHouseNumberPositionFromCrab>();
+            var buildingId = Fixture.Create<BuildingId>();
 
             Assert(new Scenario()
                 .Given(buildingId,
-                    _fixture.Create<BuildingWasRegistered>(),
-                    _fixture.Create<BuildingUnitWasAdded>(),
-                    _fixture.Create<BuildingWasMeasuredByGrb>()
+                    Fixture.Create<BuildingWasRegistered>(),
+                    Fixture.Create<BuildingUnitWasAdded>(),
+                    Fixture.Create<BuildingWasMeasuredByGrb>()
                         .WithGeometry(polygonFixture.Create<WkbGeometry>()))
                 .When(command)
                 .Then(buildingId,
-                    new BuildingUnitPositionWasDerivedFromObject(buildingId, _fixture.Create<BuildingUnitId>(), GeometryHelper.CreateEwkbFrom(new WkbGeometry(derived.AsBinary()))),
+                    new BuildingUnitPositionWasDerivedFromObject(buildingId, Fixture.Create<BuildingUnitId>(), GeometryHelper.CreateEwkbFrom(new WkbGeometry(derived.AsBinary()))),
                     command.ToLegacyEvent()));
         }
 
@@ -157,19 +158,19 @@ namespace BuildingRegistry.Tests.WhenImportingCrabHouseNumberPosition
         public void WhenModificationIsDelete()
         {
             var polygonFixture = new Fixture().Customize(new WithValidPolygon());
-            var command = _fixture.Create<ImportHouseNumberPositionFromCrab>()
+            var command = Fixture.Create<ImportHouseNumberPositionFromCrab>()
                 .WithModification(CrabModification.Delete);
-            var buildingId = _fixture.Create<BuildingId>();
+            var buildingId = Fixture.Create<BuildingId>();
 
             var center = new WKBReader().Read(polygonFixture.Create<WkbGeometry>()).Centroid;
 
             Assert(new Scenario()
                 .Given(buildingId,
-                    _fixture.Create<BuildingWasRegistered>(),
-                    _fixture.Create<BuildingUnitWasAdded>(),
-                    _fixture.Create<BuildingWasMeasuredByGrb>()
+                    Fixture.Create<BuildingWasRegistered>(),
+                    Fixture.Create<BuildingUnitWasAdded>(),
+                    Fixture.Create<BuildingWasMeasuredByGrb>()
                         .WithGeometry(polygonFixture.Create<WkbGeometry>()),
-                    _fixture.Create<BuildingUnitPositionWasDerivedFromObject>()
+                    Fixture.Create<BuildingUnitPositionWasDerivedFromObject>()
                         .WithGeometry(new WkbGeometry(center.AsBinary())))
                 .When(command)
                 .Then(buildingId,
@@ -180,22 +181,22 @@ namespace BuildingRegistry.Tests.WhenImportingCrabHouseNumberPosition
         public void WithUnitGeometryWhenModificationIsDelete()
         {
             var polygonFixture = new Fixture().Customize(new WithValidPolygon());
-            var command = _fixture.Create<ImportHouseNumberPositionFromCrab>()
+            var command = Fixture.Create<ImportHouseNumberPositionFromCrab>()
                 .WithModification(CrabModification.Delete);
-            var buildingId = _fixture.Create<BuildingId>();
+            var buildingId = Fixture.Create<BuildingId>();
 
             var center = new WKBReader().Read(polygonFixture.Create<WkbGeometry>()).Centroid;
 
             Assert(new Scenario()
                 .Given(buildingId,
-                    _fixture.Create<BuildingWasRegistered>(),
-                    _fixture.Create<BuildingUnitWasAdded>(),
-                    _fixture.Create<BuildingWasMeasuredByGrb>()
+                    Fixture.Create<BuildingWasRegistered>(),
+                    Fixture.Create<BuildingUnitWasAdded>(),
+                    Fixture.Create<BuildingWasMeasuredByGrb>()
                         .WithGeometry(polygonFixture.Create<WkbGeometry>()),
-                    _fixture.Create<BuildingUnitPositionWasDerivedFromObject>())
+                    Fixture.Create<BuildingUnitPositionWasDerivedFromObject>())
                 .When(command)
                 .Then(buildingId,
-                    new BuildingUnitPositionWasDerivedFromObject(buildingId, _fixture.Create<BuildingUnitId>(), GeometryHelper.CreateEwkbFrom(new WkbGeometry(center.AsBinary()))),
+                    new BuildingUnitPositionWasDerivedFromObject(buildingId, Fixture.Create<BuildingUnitId>(), GeometryHelper.CreateEwkbFrom(new WkbGeometry(center.AsBinary()))),
                     command.ToLegacyEvent()));
         }
 
@@ -203,16 +204,16 @@ namespace BuildingRegistry.Tests.WhenImportingCrabHouseNumberPosition
         public void ThenNoPositionChangeWhenPositionIsTheSame()
         {
             var polygonFixture = new Fixture().Customize(new WithValidPolygon());
-            var command = _fixture.Create<ImportHouseNumberPositionFromCrab>().WithPositionOrigin(CrabAddressPositionOrigin.ManualIndicationFromBuilding);
-            var buildingId = _fixture.Create<BuildingId>();
+            var command = Fixture.Create<ImportHouseNumberPositionFromCrab>().WithPositionOrigin(CrabAddressPositionOrigin.ManualIndicationFromBuilding);
+            var buildingId = Fixture.Create<BuildingId>();
 
             Assert(new Scenario()
                 .Given(buildingId,
-                    _fixture.Create<BuildingWasRegistered>(),
-                    _fixture.Create<BuildingUnitWasAdded>(),
-                    _fixture.Create<BuildingWasMeasuredByGrb>()
+                    Fixture.Create<BuildingWasRegistered>(),
+                    Fixture.Create<BuildingUnitWasAdded>(),
+                    Fixture.Create<BuildingWasMeasuredByGrb>()
                         .WithGeometry(polygonFixture.Create<WkbGeometry>()),
-                    _fixture.Create<BuildingUnitPositionWasAppointedByAdministrator>()
+                    Fixture.Create<BuildingUnitPositionWasAppointedByAdministrator>()
                         .WithGeometry(command.AddressPosition),
                     command.ToLegacyEvent())
                 .When(command)
@@ -223,21 +224,21 @@ namespace BuildingRegistry.Tests.WhenImportingCrabHouseNumberPosition
         [Fact]
         public void WithValidGeometryWhenBuildingGeometryRemoved()
         {
-            var command = _fixture.Create<ImportHouseNumberPositionFromCrab>()
+            var command = Fixture.Create<ImportHouseNumberPositionFromCrab>()
                 .WithPositionOrigin(CrabAddressPositionOrigin.DerivedFromBuilding);
 
-            var buildingId = _fixture.Create<BuildingId>();
+            var buildingId = Fixture.Create<BuildingId>();
 
             Assert(new Scenario()
                 .Given(buildingId,
-                    _fixture.Create<BuildingWasRegistered>(),
-                    _fixture.Create<BuildingUnitWasAdded>(),
-                    _fixture.Create<AddressHouseNumberPositionWasImportedFromCrab>()
+                    Fixture.Create<BuildingWasRegistered>(),
+                    Fixture.Create<BuildingUnitWasAdded>(),
+                    Fixture.Create<AddressHouseNumberPositionWasImportedFromCrab>()
                         .WithPositionOrigin(CrabAddressPositionOrigin.ManualIndicationFromStand),
-                    _fixture.Create<BuildingWasMeasuredByGrb>()
+                    Fixture.Create<BuildingWasMeasuredByGrb>()
                         .WithGeometry(new WkbGeometry(GeometryHelper.ValidPolygon.AsBinary())),
-                    _fixture.Create<BuildingUnitPositionWasAppointedByAdministrator>(),
-                    _fixture.Create<BuildingGeometryWasRemoved>())
+                    Fixture.Create<BuildingUnitPositionWasAppointedByAdministrator>(),
+                    Fixture.Create<BuildingGeometryWasRemoved>())
                 .When(command)
                 .Then(buildingId,
                     command.ToLegacyEvent()));
@@ -246,54 +247,54 @@ namespace BuildingRegistry.Tests.WhenImportingCrabHouseNumberPosition
         [Fact]
         public void ThenAddressWasPositionedWhenNewerLifetimeAndHigherQuality()
         {
-            var addressHouseNumberPositionWasImportedFromCrab = _fixture.Create<AddressHouseNumberPositionWasImportedFromCrab>()
+            var addressHouseNumberPositionWasImportedFromCrab = Fixture.Create<AddressHouseNumberPositionWasImportedFromCrab>()
                 .WithPositionOrigin(CrabAddressPositionOrigin.ManualIndicationFromLot);
 
             var polygonFixture = new Fixture().Customize(new WithValidPolygon());
             var newPosition = new WkbGeometry(GeometryHelper.OtherValidPointInPolygon.AsBinary());
-            var command = _fixture.Create<ImportHouseNumberPositionFromCrab>()
+            var command = Fixture.Create<ImportHouseNumberPositionFromCrab>()
                 .WithPosition(newPosition)
                 .WithPositionOrigin(CrabAddressPositionOrigin.ManualIndicationFromStand)
                 .WithLifetime(new CrabLifetime(addressHouseNumberPositionWasImportedFromCrab.BeginDateTime.Value.PlusDays(1), addressHouseNumberPositionWasImportedFromCrab.EndDateTime));
 
-            var buildingId = _fixture.Create<BuildingId>();
+            var buildingId = Fixture.Create<BuildingId>();
 
             Assert(new Scenario()
                 .Given(buildingId,
-                    _fixture.Create<BuildingWasRegistered>(),
-                    _fixture.Create<BuildingUnitWasAdded>(),
-                    _fixture.Create<BuildingWasMeasuredByGrb>()
+                    Fixture.Create<BuildingWasRegistered>(),
+                    Fixture.Create<BuildingUnitWasAdded>(),
+                    Fixture.Create<BuildingWasMeasuredByGrb>()
                         .WithGeometry(polygonFixture.Create<WkbGeometry>()),
-                    _fixture.Create<BuildingUnitPositionWasAppointedByAdministrator>(),
+                    Fixture.Create<BuildingUnitPositionWasAppointedByAdministrator>(),
                     addressHouseNumberPositionWasImportedFromCrab)
                 .When(command)
                 .Then(buildingId,
-                    new BuildingUnitPositionWasAppointedByAdministrator(buildingId, _fixture.Create<BuildingUnitId>(), GeometryHelper.CreateEwkbFrom(newPosition)),
+                    new BuildingUnitPositionWasAppointedByAdministrator(buildingId, Fixture.Create<BuildingUnitId>(), GeometryHelper.CreateEwkbFrom(newPosition)),
                     command.ToLegacyEvent()));
         }
 
         [Fact]
         public void NoPositionedWhenNewerLifetimeAndLowerQuality()
         {
-            var addressHouseNumberPositionWasImportedFromCrab = _fixture.Create<AddressHouseNumberPositionWasImportedFromCrab>()
+            var addressHouseNumberPositionWasImportedFromCrab = Fixture.Create<AddressHouseNumberPositionWasImportedFromCrab>()
                 .WithPositionOrigin(CrabAddressPositionOrigin.ManualIndicationFromStand);
 
             var polygonFixture = new Fixture().Customize(new WithValidPolygon());
             var newPosition = new WkbGeometry(GeometryHelper.OtherValidPointInPolygon.AsBinary());
-            var command = _fixture.Create<ImportHouseNumberPositionFromCrab>()
+            var command = Fixture.Create<ImportHouseNumberPositionFromCrab>()
                 .WithPosition(newPosition)
                 .WithPositionOrigin(CrabAddressPositionOrigin.ManualIndicationFromLot)
                 .WithLifetime(new CrabLifetime(addressHouseNumberPositionWasImportedFromCrab.BeginDateTime.Value.PlusDays(1), addressHouseNumberPositionWasImportedFromCrab.EndDateTime));
 
-            var buildingId = _fixture.Create<BuildingId>();
+            var buildingId = Fixture.Create<BuildingId>();
 
             Assert(new Scenario()
                 .Given(buildingId,
-                    _fixture.Create<BuildingWasRegistered>(),
-                    _fixture.Create<BuildingUnitWasAdded>(),
-                    _fixture.Create<BuildingWasMeasuredByGrb>()
+                    Fixture.Create<BuildingWasRegistered>(),
+                    Fixture.Create<BuildingUnitWasAdded>(),
+                    Fixture.Create<BuildingWasMeasuredByGrb>()
                         .WithGeometry(polygonFixture.Create<WkbGeometry>()),
-                    _fixture.Create<BuildingUnitPositionWasAppointedByAdministrator>()
+                    Fixture.Create<BuildingUnitPositionWasAppointedByAdministrator>()
                         .WithGeometry(new WkbGeometry(addressHouseNumberPositionWasImportedFromCrab.AddressPosition)),
                     addressHouseNumberPositionWasImportedFromCrab)
                 .When(command)
@@ -304,25 +305,25 @@ namespace BuildingRegistry.Tests.WhenImportingCrabHouseNumberPosition
         [Fact]
         public void ThenNoPositionChangeWhenOlderLifetimeAndLessQuality()
         {
-            var addressHouseNumberPositionWasImportedFromCrab = _fixture.Create<AddressHouseNumberPositionWasImportedFromCrab>()
+            var addressHouseNumberPositionWasImportedFromCrab = Fixture.Create<AddressHouseNumberPositionWasImportedFromCrab>()
                 .WithPositionOrigin(CrabAddressPositionOrigin.ManualIndicationFromStand);
 
             var polygonFixture = new Fixture().Customize(new WithValidPolygon());
             var newPosition = new WkbGeometry(GeometryHelper.OtherValidPointInPolygon.AsBinary());
-            var command = _fixture.Create<ImportHouseNumberPositionFromCrab>()
+            var command = Fixture.Create<ImportHouseNumberPositionFromCrab>()
                 .WithPosition(newPosition)
                 .WithPositionOrigin(CrabAddressPositionOrigin.ManualIndicationFromLot)
                 .WithLifetime(new CrabLifetime(addressHouseNumberPositionWasImportedFromCrab.BeginDateTime.Value.PlusDays(-1), addressHouseNumberPositionWasImportedFromCrab.EndDateTime));
 
-            var buildingId = _fixture.Create<BuildingId>();
+            var buildingId = Fixture.Create<BuildingId>();
 
             Assert(new Scenario()
                 .Given(buildingId,
-                    _fixture.Create<BuildingWasRegistered>(),
-                    _fixture.Create<BuildingUnitWasAdded>(),
-                    _fixture.Create<BuildingWasMeasuredByGrb>()
+                    Fixture.Create<BuildingWasRegistered>(),
+                    Fixture.Create<BuildingUnitWasAdded>(),
+                    Fixture.Create<BuildingWasMeasuredByGrb>()
                         .WithGeometry(polygonFixture.Create<WkbGeometry>()),
-                    _fixture.Create<BuildingUnitPositionWasAppointedByAdministrator>()
+                    Fixture.Create<BuildingUnitPositionWasAppointedByAdministrator>()
                         .WithGeometry(new WkbGeometry(addressHouseNumberPositionWasImportedFromCrab.AddressPosition)),
                     addressHouseNumberPositionWasImportedFromCrab)
                 .When(command)
@@ -333,30 +334,58 @@ namespace BuildingRegistry.Tests.WhenImportingCrabHouseNumberPosition
         [Fact]
         public void ThenPositionChangeWhenOlderLifetimeAndHigherQuality()
         {
-            var addressHouseNumberPositionWasImportedFromCrab = _fixture.Create<AddressHouseNumberPositionWasImportedFromCrab>()
+            Fixture.Customize(new WithSnapshotInterval(1));
+            var addressHouseNumberPositionWasImportedFromCrab = Fixture.Create<AddressHouseNumberPositionWasImportedFromCrab>()
                 .WithPositionOrigin(CrabAddressPositionOrigin.ManualIndicationFromLot);
 
             var polygonFixture = new Fixture().Customize(new WithValidPolygon());
             var newPosition = new WkbGeometry(GeometryHelper.OtherValidPointInPolygon.AsBinary());
-            var command = _fixture.Create<ImportHouseNumberPositionFromCrab>()
+            var command = Fixture.Create<ImportHouseNumberPositionFromCrab>()
                 .WithPosition(newPosition)
                 .WithPositionOrigin(CrabAddressPositionOrigin.ManualIndicationFromStand)
                 .WithLifetime(new CrabLifetime(addressHouseNumberPositionWasImportedFromCrab.BeginDateTime.Value.PlusDays(-1), addressHouseNumberPositionWasImportedFromCrab.EndDateTime));
 
-            var buildingId = _fixture.Create<BuildingId>();
+            var buildingId = Fixture.Create<BuildingId>();
+            var buildingUnitWasAdded = Fixture.Create<BuildingUnitWasAdded>();
 
             Assert(new Scenario()
                 .Given(buildingId,
-                    _fixture.Create<BuildingWasRegistered>(),
-                    _fixture.Create<BuildingUnitWasAdded>(),
-                    _fixture.Create<BuildingWasMeasuredByGrb>()
+                    Fixture.Create<BuildingWasRegistered>(),
+                    buildingUnitWasAdded,
+                    Fixture.Create<BuildingWasMeasuredByGrb>()
                         .WithGeometry(polygonFixture.Create<WkbGeometry>()),
-                    _fixture.Create<BuildingUnitPositionWasAppointedByAdministrator>(),
+                    Fixture.Create<BuildingUnitPositionWasAppointedByAdministrator>(),
                     addressHouseNumberPositionWasImportedFromCrab)
                 .When(command)
-                .Then(buildingId,
-                    new BuildingUnitPositionWasAppointedByAdministrator(buildingId, _fixture.Create<BuildingUnitId>(), GeometryHelper.CreateEwkbFrom(newPosition)),
-                    command.ToLegacyEvent()));
+                .Then(new Fact[]
+                {
+                    new Fact(buildingId, new BuildingUnitPositionWasAppointedByAdministrator(buildingId, Fixture.Create<BuildingUnitId>(), GeometryHelper.CreateEwkbFrom(newPosition))),
+                    new Fact(buildingId, command.ToLegacyEvent()),
+                    new Fact(GetSnapshotIdentifier(buildingId), BuildingSnapshotBuilder.CreateDefaultSnapshot(buildingId)
+                        .WithGeometry(new BuildingGeometry(GeometryHelper.CreateEwkbFrom(polygonFixture.Create<WkbGeometry>()), BuildingGeometryMethod.MeasuredByGrb))
+                        .WithLastModificationFromCrab(Modification.Update)
+                        .WithHouseNumberPositionEventsByHouseNumberId(new Dictionary<AddressId, List<AddressHouseNumberPositionWasImportedFromCrab>>
+                        {
+                            { AddressId.CreateFor(command.HouseNumberId), new List<AddressHouseNumberPositionWasImportedFromCrab>
+                                {
+                                    addressHouseNumberPositionWasImportedFromCrab,
+                                    command.ToLegacyEvent()
+                                }
+                            }
+                        })
+                        .WithBuildingUnitCollection(BuildingUnitCollectionSnapshotBuilder.CreateDefaultSnapshot()
+                            .WithBuildingUnits(new List<BuildingUnitSnapshot>
+                            {
+                                BuildingUnitSnapshotBuilder.CreateDefaultSnapshotFor(buildingUnitWasAdded)
+                                    .WithPosition(new BuildingUnitPosition(GeometryHelper.CreateEwkbFrom(newPosition), BuildingUnitPositionGeometryMethod.AppointedByAdministrator))
+                                    .WithHouseNumberPositions(new List<AddressHouseNumberPositionWasImportedFromCrab>
+                                    {
+                                        addressHouseNumberPositionWasImportedFromCrab,
+                                        command.ToLegacyEvent()
+                                    })
+                            }))
+                        .Build(6, EventSerializerSettings))
+                }));
         }
 
         // see AddressRegistry for AddressComparerQuality tests
