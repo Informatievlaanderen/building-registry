@@ -1,70 +1,88 @@
 namespace BuildingRegistry.Tests.WhenImportingCrabTerrainObjectHouseNumber
 {
+    using System.Collections.Generic;
     using Be.Vlaanderen.Basisregisters.AggregateSource.Testing;
     using Autofixture;
     using AutoFixture;
+    using Be.Vlaanderen.Basisregisters.AggregateSource;
+    using Be.Vlaanderen.Basisregisters.Crab;
     using Building.Commands.Crab;
+    using Building.DataStructures;
     using Building.Events;
     using NetTopologySuite.IO;
     using ValueObjects;
     using Xunit;
     using Xunit.Abstractions;
 
-    public class GivenBuildingWithGeometry : AutofacBasedTest
+    public class GivenBuildingWithGeometry : SnapshotBasedTest
     {
-        private readonly Fixture _fixture = new Fixture();
-
         public GivenBuildingWithGeometry(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
         {
-            _fixture.Customize(new InfrastructureCustomization());
-            _fixture.Customize(new WithFixedBuildingId());
-            _fixture.Customize(new WithInfiniteLifetime());
-            _fixture.Customize(new WithNoDeleteModification());
-            _fixture.Customize(new WithValidPolygon());
-            _fixture.Customize(new WithFixedBuildingUnitIdFromHouseNumber());
+            Fixture.Customize(new WithFixedBuildingId());
+            Fixture.Customize(new WithInfiniteLifetime());
+            Fixture.Customize(new WithNoDeleteModification());
+            Fixture.Customize(new WithValidPolygon());
+            Fixture.Customize(new WithFixedBuildingUnitIdFromHouseNumber());
         }
 
         [Fact]
         public void ThenBuildingUnitIsAddedWithDerivedGeometry()
         {
-            var command = _fixture.Create<ImportTerrainObjectHouseNumberFromCrab>();
+            Fixture.Customize(new WithSnapshotInterval(1));
+            var command = Fixture.Create<ImportTerrainObjectHouseNumberFromCrab>();
 
-            var center = new WKBReader().Read(_fixture.Create<WkbGeometry>()).Centroid;
+            var center = new WKBReader().Read(Fixture.Create<WkbGeometry>()).Centroid;
 
-            var buildingId = _fixture.Create<BuildingId>();
+            var buildingId = Fixture.Create<BuildingId>();
+            var buildingUnitWasAdded = new BuildingUnitWasAdded(buildingId, Fixture.Create<BuildingUnitId>(), Fixture.Create<BuildingUnitKey>(), AddressId.CreateFor(command.HouseNumberId), new BuildingUnitVersion(command.Timestamp));
 
             Assert(new Scenario()
                 .Given(buildingId,
-                    _fixture.Create<BuildingWasRegistered>(),
-                    _fixture.Create<BuildingWasMeasuredByGrb>()
-                        .WithGeometry(_fixture.Create<WkbGeometry>()))
+                    Fixture.Create<BuildingWasRegistered>(),
+                    Fixture.Create<BuildingWasMeasuredByGrb>()
+                        .WithGeometry(Fixture.Create<WkbGeometry>()))
                 .When(command)
-                .Then(buildingId,
-                    new BuildingUnitWasAdded(buildingId, _fixture.Create<BuildingUnitId>(), _fixture.Create<BuildingUnitKey>(), AddressId.CreateFor(command.HouseNumberId), new BuildingUnitVersion(command.Timestamp)),
-                    new BuildingUnitPositionWasDerivedFromObject(buildingId, _fixture.Create<BuildingUnitId>(), GeometryHelper.CreateEwkbFrom(new WkbGeometry(center.AsBinary()))),
-                    command.ToLegacyEvent()));
+                .Then(new Fact[] {
+                    new Fact(buildingId, buildingUnitWasAdded),
+                    new Fact(buildingId, new BuildingUnitPositionWasDerivedFromObject(buildingId, Fixture.Create<BuildingUnitId>(), GeometryHelper.CreateEwkbFrom(new WkbGeometry(center.AsBinary())))),
+                    new Fact(buildingId, command.ToLegacyEvent()),
+                    new Fact(GetSnapshotIdentifier(buildingId),
+                        BuildingSnapshotBuilder.CreateDefaultSnapshot(buildingId)
+                            .WithImportedTerrainObjectHouseNrIds(new List<CrabTerrainObjectHouseNumberId>{command.TerrainObjectHouseNumberId})
+                            .WithActiveHouseNumberIdsByTerrainObjectHouseNr(new Dictionary<CrabTerrainObjectHouseNumberId, CrabHouseNumberId>
+                            {
+                                { command.TerrainObjectHouseNumberId, command.HouseNumberId }
+                            })
+                            .WithBuildingUnitCollection(BuildingUnitCollectionSnapshotBuilder.CreateDefaultSnapshot()
+                                .WithBuildingUnits(new List<BuildingUnitSnapshot>
+                                {
+                                    BuildingUnitSnapshotBuilder.CreateDefaultSnapshotFor(buildingUnitWasAdded)
+
+                                }))
+                            .Build(4, EventSerializerSettings))
+                }));
         }
 
         [Fact]
         public void WithFiniteLifetimeThenRetireNewlyAddedBuildingUnitAndDerivePosition()
         {
-            var command = _fixture.Create<ImportTerrainObjectHouseNumberFromCrab>();
+            var command = Fixture.Create<ImportTerrainObjectHouseNumberFromCrab>();
 
-            var center = new WKBReader().Read(_fixture.Create<WkbGeometry>()).Centroid;
+            var center = new WKBReader().Read(Fixture.Create<WkbGeometry>()).Centroid;
 
-            var buildingId = _fixture.Create<BuildingId>();
+            var buildingId = Fixture.Create<BuildingId>();
 
             Assert(new Scenario()
                 .Given(buildingId,
-                    _fixture.Create<BuildingWasRegistered>(),
-                    _fixture.Create<BuildingWasMeasuredByGrb>()
-                                .WithGeometry(_fixture.Create<WkbGeometry>()),
-                    _fixture.Create<BuildingWasNotRealized>()
+                    Fixture.Create<BuildingWasRegistered>(),
+                    Fixture.Create<BuildingWasMeasuredByGrb>()
+                                .WithGeometry(Fixture.Create<WkbGeometry>()),
+                    Fixture.Create<BuildingWasNotRealized>()
                         .WithNoRetiredUnits())
                 .When(command)
                 .Then(buildingId,
-                    new BuildingUnitWasAddedToRetiredBuilding(buildingId, _fixture.Create<BuildingUnitId>(), _fixture.Create<BuildingUnitKey>(), AddressId.CreateFor(command.HouseNumberId), new BuildingUnitVersion(command.Timestamp)),
-                    new BuildingUnitPositionWasDerivedFromObject(buildingId, _fixture.Create<BuildingUnitId>(), GeometryHelper.CreateEwkbFrom(new WkbGeometry(center.AsBinary()))),
+                    new BuildingUnitWasAddedToRetiredBuilding(buildingId, Fixture.Create<BuildingUnitId>(), Fixture.Create<BuildingUnitKey>(), AddressId.CreateFor(command.HouseNumberId), new BuildingUnitVersion(command.Timestamp)),
+                    new BuildingUnitPositionWasDerivedFromObject(buildingId, Fixture.Create<BuildingUnitId>(), GeometryHelper.CreateEwkbFrom(new WkbGeometry(center.AsBinary()))),
                     command.ToLegacyEvent()));
         }
     }

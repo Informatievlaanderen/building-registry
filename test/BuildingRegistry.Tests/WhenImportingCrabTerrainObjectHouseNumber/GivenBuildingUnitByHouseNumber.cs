@@ -9,119 +9,167 @@ namespace BuildingRegistry.Tests.WhenImportingCrabTerrainObjectHouseNumber
     using Building.Events;
     using NodaTime;
     using System;
+    using System.Collections.Generic;
+    using Be.Vlaanderen.Basisregisters.AggregateSource;
+    using Building.DataStructures;
+    using Building.Events.Crab;
     using ValueObjects;
     using WhenImportingCrabHouseNumberStatus;
     using Xunit;
     using Xunit.Abstractions;
 
-    public class GivenBuildingUnitByHouseNumber : AutofacBasedTest
+    public class GivenBuildingUnitByHouseNumber : SnapshotBasedTest
     {
-        private readonly Fixture _fixture = new Fixture();
-
         public GivenBuildingUnitByHouseNumber(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
         {
-            _fixture.Customize(new InfrastructureCustomization());
-            _fixture.Customize(new WithNoDeleteModification());
-            _fixture.Customize(new WithInfiniteLifetime());
-            _fixture.Customize(new WithFixedBuildingUnitIdFromHouseNumber());
+            Fixture.Customize(new WithNoDeleteModification());
+            Fixture.Customize(new WithInfiniteLifetime());
+            Fixture.Customize(new WithFixedBuildingUnitIdFromHouseNumber());
         }
 
         [Fact]
         public void WithStatusIsRealizedWhenLifetimeIsFinite()
         {
-            var importStatus = _fixture.Create<ImportHouseNumberStatusFromCrab>()
+            Fixture.Customize(new WithSnapshotInterval(1));
+
+            var importStatus = Fixture.Create<ImportHouseNumberStatusFromCrab>()
                 .WithStatus(CrabAddressStatus.InUse);
 
-            var importTerrainObjectHouseNumber = _fixture.Create<ImportTerrainObjectHouseNumberFromCrab>()
-                .WithLifetime(new CrabLifetime(_fixture.Create<LocalDateTime>(), _fixture.Create<LocalDateTime>()));
+            var importTerrainObjectHouseNumber = Fixture.Create<ImportTerrainObjectHouseNumberFromCrab>()
+                .WithLifetime(new CrabLifetime(Fixture.Create<LocalDateTime>(), Fixture.Create<LocalDateTime>()));
 
-            var buildingId = _fixture.Create<BuildingId>();
-            var buildingUnitWasAdded = _fixture.Create<BuildingUnitWasAdded>()
-                .WithAddressId(AddressId.CreateFor(_fixture.Create<CrabHouseNumberId>()));
+            var buildingId = Fixture.Create<BuildingId>();
+            var buildingUnitWasAdded = Fixture.Create<BuildingUnitWasAdded>()
+                .WithAddressId(AddressId.CreateFor(Fixture.Create<CrabHouseNumberId>()));
 
             Assert(new Scenario()
                 .Given(buildingId,
-                    _fixture.Create<BuildingWasRegistered>(),
+                    Fixture.Create<BuildingWasRegistered>(),
                     buildingUnitWasAdded,
-                    _fixture.Create<BuildingUnitWasRealized>(),
+                    Fixture.Create<BuildingUnitWasRealized>(),
                     importStatus.ToLegacyEvent())
                 .When(importTerrainObjectHouseNumber)
-                .Then(buildingId,
-                    new BuildingUnitWasRetired(buildingId, _fixture.Create<BuildingUnitId>()),
-                    new BuildingUnitAddressWasDetached(buildingId, new AddressId(buildingUnitWasAdded.AddressId), _fixture.Create<BuildingUnitId>()),
-                    importTerrainObjectHouseNumber.ToLegacyEvent()));
+                .Then(new Fact[] {
+                    new Fact(buildingId, new BuildingUnitWasRetired(buildingId, Fixture.Create<BuildingUnitId>())),
+                    new Fact(buildingId, new BuildingUnitAddressWasDetached(buildingId, new AddressId(buildingUnitWasAdded.AddressId), Fixture.Create<BuildingUnitId>())),
+                    new Fact(buildingId, importTerrainObjectHouseNumber.ToLegacyEvent()),
+                    new Fact(GetSnapshotIdentifier(buildingId), BuildingSnapshotBuilder
+                        .CreateDefaultSnapshot(buildingId)
+                        .WithLastModificationFromCrab(Modification.Update)
+                        .WithImportedTerrainObjectHouseNrIds(new List<CrabTerrainObjectHouseNumberId>{ importTerrainObjectHouseNumber.TerrainObjectHouseNumberId })
+                        .WithActiveHouseNumberIdsByTerrainObjectHouseNr(new Dictionary<CrabTerrainObjectHouseNumberId, CrabHouseNumberId>
+                        {
+                            { importTerrainObjectHouseNumber.TerrainObjectHouseNumberId, importTerrainObjectHouseNumber.HouseNumberId }
+                        })
+                        .WithHouseNumberStatusEventsByHouseNumberId(new Dictionary<AddressId, List<AddressHouseNumberStatusWasImportedFromCrab>>
+                        {
+                            { new AddressId(buildingUnitWasAdded.AddressId), new List<AddressHouseNumberStatusWasImportedFromCrab>{importStatus.ToLegacyEvent()} }
+                        })
+                        .WithBuildingUnitCollection(BuildingUnitCollectionSnapshotBuilder.CreateDefaultSnapshot()
+                            .WithBuildingUnits(new List<BuildingUnitSnapshot>
+                            {
+                                BuildingUnitSnapshotBuilder
+                                    .CreateDefaultSnapshot(buildingId, new BuildingUnitId(buildingUnitWasAdded.BuildingUnitId), new BuildingUnitKey(buildingUnitWasAdded.BuildingUnitKey), buildingUnitWasAdded.BuildingUnitVersion)
+                                    .WithStatus(BuildingUnitStatus.Retired)
+                                    .WithPreviousAddressId(new AddressId(buildingUnitWasAdded.AddressId))
+                                    .WithHouseNumberStatusChronicle(new List<AddressHouseNumberStatusWasImportedFromCrab>{ importStatus.ToLegacyEvent() })
+                            })).Build(6, EventSerializerSettings)
+                    )
+                }));
         }
 
         [Fact]
         public void WithStatusIsRealizedWhenLifetimeIsFiniteAndCorrection()
         {
-            var importStatus = _fixture.Create<ImportHouseNumberStatusFromCrab>()
+            var importStatus = Fixture.Create<ImportHouseNumberStatusFromCrab>()
                 .WithStatus(CrabAddressStatus.InUse);
 
-            var importTerrainObjectHouseNumber = _fixture.Create<ImportTerrainObjectHouseNumberFromCrab>()
-                .WithLifetime(new CrabLifetime(_fixture.Create<LocalDateTime>(), _fixture.Create<LocalDateTime>()))
+            var importTerrainObjectHouseNumber = Fixture.Create<ImportTerrainObjectHouseNumberFromCrab>()
+                .WithLifetime(new CrabLifetime(Fixture.Create<LocalDateTime>(), Fixture.Create<LocalDateTime>()))
                 .WithModification(CrabModification.Correction);
 
-            var buildingId = _fixture.Create<BuildingId>();
-            var buildingUnitWasAdded = _fixture.Create<BuildingUnitWasAdded>()
-                .WithAddressId(AddressId.CreateFor(_fixture.Create<CrabHouseNumberId>()));
+            var buildingId = Fixture.Create<BuildingId>();
+            var buildingUnitWasAdded = Fixture.Create<BuildingUnitWasAdded>()
+                .WithAddressId(AddressId.CreateFor(Fixture.Create<CrabHouseNumberId>()));
 
             Assert(new Scenario()
                 .Given(buildingId,
-                    _fixture.Create<BuildingWasRegistered>(),
+                    Fixture.Create<BuildingWasRegistered>(),
                     buildingUnitWasAdded,
-                    _fixture.Create<BuildingUnitWasRealized>(),
+                    Fixture.Create<BuildingUnitWasRealized>(),
                     importStatus.ToLegacyEvent())
                 .When(importTerrainObjectHouseNumber)
                 .Then(buildingId,
-                    new BuildingUnitWasCorrectedToRetired(buildingId, _fixture.Create<BuildingUnitId>()),
-                    new BuildingUnitAddressWasDetached(buildingId, new AddressId(buildingUnitWasAdded.AddressId), _fixture.Create<BuildingUnitId>()),
+                    new BuildingUnitWasCorrectedToRetired(buildingId, Fixture.Create<BuildingUnitId>()),
+                    new BuildingUnitAddressWasDetached(buildingId, new AddressId(buildingUnitWasAdded.AddressId), Fixture.Create<BuildingUnitId>()),
                     importTerrainObjectHouseNumber.ToLegacyEvent()));
         }
 
         [Fact]
         public void WithStatusIsRetiredWhenLifetimeIsFinite()
         {
-            var importTerrainObjectHouseNumber = _fixture.Create<ImportTerrainObjectHouseNumberFromCrab>()
-                .WithLifetime(new CrabLifetime(_fixture.Create<LocalDateTime>(), _fixture.Create<LocalDateTime>()));
+            Fixture.Customize(new WithSnapshotInterval(1));
 
-            var buildingId = _fixture.Create<BuildingId>();
+            var importTerrainObjectHouseNumber = Fixture.Create<ImportTerrainObjectHouseNumberFromCrab>()
+                .WithLifetime(new CrabLifetime(Fixture.Create<LocalDateTime>(), Fixture.Create<LocalDateTime>()));
+
+            var buildingId = Fixture.Create<BuildingId>();
             var buildingUnitKey = BuildingUnitKey.Create(importTerrainObjectHouseNumber.TerrainObjectId, importTerrainObjectHouseNumber.TerrainObjectHouseNumberId);
             var expectedUnitId = BuildingUnitId.Create(buildingUnitKey, 2);
+            var buildingUnitWasAdded = Fixture.Create<BuildingUnitWasAdded>().WithAddressId(AddressId.CreateFor(Fixture.Create<CrabHouseNumberId>()));
 
             Assert(new Scenario()
                 .Given(buildingId,
-                    _fixture.Create<BuildingWasRegistered>(),
-                    _fixture.Create<BuildingUnitWasAdded>()
-                        .WithAddressId(AddressId.CreateFor(_fixture.Create<CrabHouseNumberId>())),
-                    _fixture.Create<BuildingUnitWasRetired>())
+                    Fixture.Create<BuildingWasRegistered>(),
+                    buildingUnitWasAdded,
+                    Fixture.Create<BuildingUnitWasRetired>())
                 .When(importTerrainObjectHouseNumber)
-                .Then(buildingId,
-                    //new BuildingVersionWasIncreased(buildingId, new Version(1)),
-                    //new BuildingUnitWasAdded(buildingId, expectedUnitId, buildingUnitKey, AddressId.CreateFor(importTerrainObjectHouseNumber.HouseNumberId), BuildingUnitId.Create(buildingUnitKey, 1)),
-                    //new BuildingUnitVersionWasIncreased(buildingId, expectedUnitId, new Version(1)),
-                    //new BuildingUnitVersionWasIncreased(buildingId, expectedUnitId, new Version(2)),
-                    //new BuildingUnitWasNotRealized(buildingId, expectedUnitId),
-                    //new AddressWasDetached(buildingId, AddressId.CreateFor(importTerrainObjectHouseNumber.HouseNumberId), expectedUnitId),
-                    importTerrainObjectHouseNumber.ToLegacyEvent()));
+                //.Then(buildingId,
+                //    //new BuildingVersionWasIncreased(buildingId, new Version(1)),
+                //    //new BuildingUnitWasAdded(buildingId, expectedUnitId, buildingUnitKey, AddressId.CreateFor(importTerrainObjectHouseNumber.HouseNumberId), BuildingUnitId.Create(buildingUnitKey, 1)),
+                //    //new BuildingUnitVersionWasIncreased(buildingId, expectedUnitId, new Version(1)),
+                //    //new BuildingUnitVersionWasIncreased(buildingId, expectedUnitId, new Version(2)),
+                //    //new BuildingUnitWasNotRealized(buildingId, expectedUnitId),
+                //    //new AddressWasDetached(buildingId, AddressId.CreateFor(importTerrainObjectHouseNumber.HouseNumberId), expectedUnitId),
+                //    importTerrainObjectHouseNumber.ToLegacyEvent()));
+                .Then(new Fact[]
+                {
+                    new Fact(buildingId, importTerrainObjectHouseNumber.ToLegacyEvent()),
+                    new Fact(GetSnapshotIdentifier(buildingId), BuildingSnapshotBuilder
+                        .CreateDefaultSnapshot(buildingId)
+                        .WithLastModificationFromCrab(Modification.Insert)
+                        .WithImportedTerrainObjectHouseNrIds(new List<CrabTerrainObjectHouseNumberId>{ importTerrainObjectHouseNumber.TerrainObjectHouseNumberId })
+                        .WithActiveHouseNumberIdsByTerrainObjectHouseNr(new Dictionary<CrabTerrainObjectHouseNumberId, CrabHouseNumberId>
+                        {
+                            { importTerrainObjectHouseNumber.TerrainObjectHouseNumberId, importTerrainObjectHouseNumber.HouseNumberId }
+                        })
+                        .WithBuildingUnitCollection(BuildingUnitCollectionSnapshotBuilder.CreateDefaultSnapshot()
+                            .WithBuildingUnits(new List<BuildingUnitSnapshot>
+                            {
+                                BuildingUnitSnapshotBuilder
+                                    .CreateDefaultSnapshot(buildingId, new BuildingUnitId(buildingUnitWasAdded.BuildingUnitId), new BuildingUnitKey(buildingUnitWasAdded.BuildingUnitKey), buildingUnitWasAdded.BuildingUnitVersion)
+                                    .WithStatus(BuildingUnitStatus.Retired)
+                                    .WithAddressIds(new List<AddressId>{new AddressId(buildingUnitWasAdded.AddressId)})
+                            })).Build(3, EventSerializerSettings))
+                }));
         }
 
         [Fact]
         public void WithStatusIsCorrectedToRetiredWhenLifetimeIsFinite()
         {
-            var importTerrainObjectHouseNumber = _fixture.Create<ImportTerrainObjectHouseNumberFromCrab>()
-                .WithLifetime(new CrabLifetime(_fixture.Create<LocalDateTime>(), _fixture.Create<LocalDateTime>()));
+            var importTerrainObjectHouseNumber = Fixture.Create<ImportTerrainObjectHouseNumberFromCrab>()
+                .WithLifetime(new CrabLifetime(Fixture.Create<LocalDateTime>(), Fixture.Create<LocalDateTime>()));
 
-            var buildingId = _fixture.Create<BuildingId>();
+            var buildingId = Fixture.Create<BuildingId>();
             var buildingUnitKey = BuildingUnitKey.Create(importTerrainObjectHouseNumber.TerrainObjectId, importTerrainObjectHouseNumber.TerrainObjectHouseNumberId);
             var expectedUnitId = BuildingUnitId.Create(buildingUnitKey, 2);
 
             Assert(new Scenario()
                 .Given(buildingId,
-                    _fixture.Create<BuildingWasRegistered>(),
-                    _fixture.Create<BuildingUnitWasAdded>()
-                        .WithAddressId(AddressId.CreateFor(_fixture.Create<CrabHouseNumberId>())),
-                    _fixture.Create<BuildingUnitWasCorrectedToRetired>())
+                    Fixture.Create<BuildingWasRegistered>(),
+                    Fixture.Create<BuildingUnitWasAdded>()
+                        .WithAddressId(AddressId.CreateFor(Fixture.Create<CrabHouseNumberId>())),
+                    Fixture.Create<BuildingUnitWasCorrectedToRetired>())
                 .When(importTerrainObjectHouseNumber)
                 .Then(buildingId,
                     //new BuildingVersionWasIncreased(buildingId, new Version(1)),
@@ -136,19 +184,19 @@ namespace BuildingRegistry.Tests.WhenImportingCrabTerrainObjectHouseNumber
         [Fact]
         public void WithStatusIsNotRealizedWhenLifetimeIsFinite()
         {
-            var importTerrainObjectHouseNumber = _fixture.Create<ImportTerrainObjectHouseNumberFromCrab>()
-                .WithLifetime(new CrabLifetime(_fixture.Create<LocalDateTime>(), _fixture.Create<LocalDateTime>()));
+            var importTerrainObjectHouseNumber = Fixture.Create<ImportTerrainObjectHouseNumberFromCrab>()
+                .WithLifetime(new CrabLifetime(Fixture.Create<LocalDateTime>(), Fixture.Create<LocalDateTime>()));
 
-            var buildingId = _fixture.Create<BuildingId>();
+            var buildingId = Fixture.Create<BuildingId>();
             var buildingUnitKey = BuildingUnitKey.Create(importTerrainObjectHouseNumber.TerrainObjectId, importTerrainObjectHouseNumber.TerrainObjectHouseNumberId);
             var expectedUnitId = BuildingUnitId.Create(buildingUnitKey, 2);
 
             Assert(new Scenario()
                 .Given(buildingId,
-                    _fixture.Create<BuildingWasRegistered>(),
-                    _fixture.Create<BuildingUnitWasAdded>()
-                        .WithAddressId(AddressId.CreateFor(_fixture.Create<CrabHouseNumberId>())),
-                    _fixture.Create<BuildingUnitWasNotRealized>())
+                    Fixture.Create<BuildingWasRegistered>(),
+                    Fixture.Create<BuildingUnitWasAdded>()
+                        .WithAddressId(AddressId.CreateFor(Fixture.Create<CrabHouseNumberId>())),
+                    Fixture.Create<BuildingUnitWasNotRealized>())
                 .When(importTerrainObjectHouseNumber)
                 .Then(buildingId,
                     //new BuildingVersionWasIncreased(buildingId, new Version(1)),
@@ -163,19 +211,19 @@ namespace BuildingRegistry.Tests.WhenImportingCrabTerrainObjectHouseNumber
         [Fact]
         public void WithStatusIsCorrectedNotRealizedWhenLifetimeIsFinite()
         {
-            var importTerrainObjectHouseNumber = _fixture.Create<ImportTerrainObjectHouseNumberFromCrab>()
-                .WithLifetime(new CrabLifetime(_fixture.Create<LocalDateTime>(), _fixture.Create<LocalDateTime>()));
+            var importTerrainObjectHouseNumber = Fixture.Create<ImportTerrainObjectHouseNumberFromCrab>()
+                .WithLifetime(new CrabLifetime(Fixture.Create<LocalDateTime>(), Fixture.Create<LocalDateTime>()));
 
-            var buildingId = _fixture.Create<BuildingId>();
+            var buildingId = Fixture.Create<BuildingId>();
             var buildingUnitKey = BuildingUnitKey.Create(importTerrainObjectHouseNumber.TerrainObjectId, importTerrainObjectHouseNumber.TerrainObjectHouseNumberId);
             var expectedUnitId = BuildingUnitId.Create(buildingUnitKey, 2);
 
             Assert(new Scenario()
                 .Given(buildingId,
-                    _fixture.Create<BuildingWasRegistered>(),
-                    _fixture.Create<BuildingUnitWasAdded>()
-                        .WithAddressId(AddressId.CreateFor(_fixture.Create<CrabHouseNumberId>())),
-            _fixture.Create<BuildingUnitWasCorrectedToNotRealized>())
+                    Fixture.Create<BuildingWasRegistered>(),
+                    Fixture.Create<BuildingUnitWasAdded>()
+                        .WithAddressId(AddressId.CreateFor(Fixture.Create<CrabHouseNumberId>())),
+            Fixture.Create<BuildingUnitWasCorrectedToNotRealized>())
                 .When(importTerrainObjectHouseNumber)
                 .Then(buildingId,
                     //new BuildingVersionWasIncreased(buildingId, new Version(1)),
@@ -190,96 +238,134 @@ namespace BuildingRegistry.Tests.WhenImportingCrabTerrainObjectHouseNumber
         [Fact]
         public void WithStatusPlannedWhenLifetimeIsFinite()
         {
-            var importStatus = _fixture.Create<ImportHouseNumberStatusFromCrab>()
+            Fixture.Customize(new WithSnapshotInterval(1));
+            var importStatus = Fixture.Create<ImportHouseNumberStatusFromCrab>()
                 .WithStatus(CrabAddressStatus.InUse);
 
-            var importTerrainObjectHouseNumber = _fixture.Create<ImportTerrainObjectHouseNumberFromCrab>()
-                .WithLifetime(new CrabLifetime(_fixture.Create<LocalDateTime>(), _fixture.Create<LocalDateTime>()));
+            var importTerrainObjectHouseNumber = Fixture.Create<ImportTerrainObjectHouseNumberFromCrab>()
+                .WithLifetime(new CrabLifetime(Fixture.Create<LocalDateTime>(), Fixture.Create<LocalDateTime>()));
 
-            var buildingId = _fixture.Create<BuildingId>();
-            var buildingUnitWasAdded = _fixture.Create<BuildingUnitWasAdded>()
-                .WithAddressId(AddressId.CreateFor(_fixture.Create<CrabHouseNumberId>()));
+            var buildingId = Fixture.Create<BuildingId>();
+            var buildingUnitWasAdded = Fixture.Create<BuildingUnitWasAdded>()
+                .WithAddressId(AddressId.CreateFor(Fixture.Create<CrabHouseNumberId>()));
 
             Assert(new Scenario()
                 .Given(buildingId,
-                    _fixture.Create<BuildingWasRegistered>(),
+                    Fixture.Create<BuildingWasRegistered>(),
                     buildingUnitWasAdded,
-                    _fixture.Create<BuildingUnitWasPlanned>(),
+                    Fixture.Create<BuildingUnitWasPlanned>(),
                     importStatus.ToLegacyEvent())
                 .When(importTerrainObjectHouseNumber)
-                .Then(buildingId,
-                    new BuildingUnitWasNotRealized(buildingId, _fixture.Create<BuildingUnitId>()),
-                    new BuildingUnitAddressWasDetached(buildingId, new AddressId(buildingUnitWasAdded.AddressId), _fixture.Create<BuildingUnitId>()),
-                    importTerrainObjectHouseNumber.ToLegacyEvent()));
+                .Then(new Fact[] {
+                    new Fact(buildingId, new BuildingUnitWasNotRealized(buildingId, Fixture.Create<BuildingUnitId>())),
+                    new Fact(buildingId, new BuildingUnitAddressWasDetached(buildingId, new AddressId(buildingUnitWasAdded.AddressId), Fixture.Create<BuildingUnitId>())),
+                    new Fact(buildingId, importTerrainObjectHouseNumber.ToLegacyEvent()),
+                    new Fact(GetSnapshotIdentifier(buildingId), BuildingSnapshotBuilder
+                        .CreateDefaultSnapshot(buildingId)
+                        .WithLastModificationFromCrab(Modification.Update)
+                        .WithImportedTerrainObjectHouseNrIds(new List<CrabTerrainObjectHouseNumberId>{ importTerrainObjectHouseNumber.TerrainObjectHouseNumberId })
+                        .WithActiveHouseNumberIdsByTerrainObjectHouseNr(new Dictionary<CrabTerrainObjectHouseNumberId, CrabHouseNumberId>
+                        {
+                            { importTerrainObjectHouseNumber.TerrainObjectHouseNumberId, importTerrainObjectHouseNumber.HouseNumberId }
+                        })
+                        .WithHouseNumberStatusEventsByHouseNumberId(new Dictionary<AddressId, List<AddressHouseNumberStatusWasImportedFromCrab>>
+                        {
+                            { new AddressId(buildingUnitWasAdded.AddressId), new List<AddressHouseNumberStatusWasImportedFromCrab>{importStatus.ToLegacyEvent()} }
+                        })
+                        .WithBuildingUnitCollection(BuildingUnitCollectionSnapshotBuilder.CreateDefaultSnapshot()
+                            .WithBuildingUnits(new List<BuildingUnitSnapshot>
+                            {
+                                BuildingUnitSnapshotBuilder
+                                    .CreateDefaultSnapshot(buildingId, new BuildingUnitId(buildingUnitWasAdded.BuildingUnitId), new BuildingUnitKey(buildingUnitWasAdded.BuildingUnitKey), buildingUnitWasAdded.BuildingUnitVersion)
+                                    .WithStatus(BuildingUnitStatus.NotRealized)
+                                    .WithPreviousAddressId(new AddressId(buildingUnitWasAdded.AddressId))
+                                    .WithHouseNumberStatusChronicle(new List<AddressHouseNumberStatusWasImportedFromCrab>{ importStatus.ToLegacyEvent() })
+                            })).Build(6, EventSerializerSettings))
+                }));
         }
 
         [Fact]
         public void WithStatusPlannedWhenLifetimeIsFiniteAndCorrection()
         {
-            var importStatus = _fixture.Create<ImportHouseNumberStatusFromCrab>()
+            var importStatus = Fixture.Create<ImportHouseNumberStatusFromCrab>()
                 .WithStatus(CrabAddressStatus.InUse);
 
-            var importTerrainObjectHouseNumber = _fixture.Create<ImportTerrainObjectHouseNumberFromCrab>()
-                .WithLifetime(new CrabLifetime(_fixture.Create<LocalDateTime>(), _fixture.Create<LocalDateTime>()))
+            var importTerrainObjectHouseNumber = Fixture.Create<ImportTerrainObjectHouseNumberFromCrab>()
+                .WithLifetime(new CrabLifetime(Fixture.Create<LocalDateTime>(), Fixture.Create<LocalDateTime>()))
                 .WithModification(CrabModification.Correction);
 
-            var buildingId = _fixture.Create<BuildingId>();
-            var buildingUnitWasAdded = _fixture.Create<BuildingUnitWasAdded>()
-                .WithAddressId(AddressId.CreateFor(_fixture.Create<CrabHouseNumberId>()));
+            var buildingId = Fixture.Create<BuildingId>();
+            var buildingUnitWasAdded = Fixture.Create<BuildingUnitWasAdded>()
+                .WithAddressId(AddressId.CreateFor(Fixture.Create<CrabHouseNumberId>()));
 
             Assert(new Scenario()
                 .Given(buildingId,
-                    _fixture.Create<BuildingWasRegistered>(),
+                    Fixture.Create<BuildingWasRegistered>(),
                     buildingUnitWasAdded,
-                    _fixture.Create<BuildingUnitWasPlanned>(),
+                    Fixture.Create<BuildingUnitWasPlanned>(),
                     importStatus.ToLegacyEvent())
                 .When(importTerrainObjectHouseNumber)
                 .Then(buildingId,
-                    new BuildingUnitWasCorrectedToNotRealized(buildingId, _fixture.Create<BuildingUnitId>()),
-                    new BuildingUnitAddressWasDetached(buildingId, new AddressId(buildingUnitWasAdded.AddressId), _fixture.Create<BuildingUnitId>()),
+                    new BuildingUnitWasCorrectedToNotRealized(buildingId, Fixture.Create<BuildingUnitId>()),
+                    new BuildingUnitAddressWasDetached(buildingId, new AddressId(buildingUnitWasAdded.AddressId), Fixture.Create<BuildingUnitId>()),
                     importTerrainObjectHouseNumber.ToLegacyEvent()));
         }
 
         [Fact]
         public void WithDelete()
         {
-            _fixture.Customize(new WithNoDeleteModification());
+            Fixture.Customize(new WithNoDeleteModification());
+            Fixture.Customize(new WithSnapshotInterval(1));
 
-            var command = _fixture.Create<ImportTerrainObjectHouseNumberFromCrab>()
+            var command = Fixture.Create<ImportTerrainObjectHouseNumberFromCrab>()
                 .WithModification(CrabModification.Delete);
-            var buildingId = _fixture.Create<BuildingId>();
+            var buildingId = Fixture.Create<BuildingId>();
 
             var buildingUnitId = new BuildingUnitId(Guid.NewGuid());
             var buildingUnitWasAdded = new BuildingUnitWasAdded(buildingId, buildingUnitId, BuildingUnitKey.Create(command.TerrainObjectId, command.TerrainObjectHouseNumberId), AddressId.CreateFor(command.HouseNumberId), new BuildingUnitVersion(command.Timestamp));
-            ((ISetProvenance)buildingUnitWasAdded).SetProvenance(_fixture.Create<Provenance>());
+            ((ISetProvenance)buildingUnitWasAdded).SetProvenance(Fixture.Create<Provenance>());
 
             Assert(new Scenario()
                 .Given(buildingId,
-                    _fixture.Create<BuildingWasRegistered>(),
+                    Fixture.Create<BuildingWasRegistered>(),
                     buildingUnitWasAdded
-                        .WithAddressId(AddressId.CreateFor(_fixture.Create<CrabHouseNumberId>())))
+                        .WithAddressId(AddressId.CreateFor(Fixture.Create<CrabHouseNumberId>())))
                 .When(command)
-                .Then(buildingId,
-                    new BuildingUnitWasRemoved(buildingId, buildingUnitId),
-                    command.ToLegacyEvent()));
+                .Then(new Fact[]
+                    {
+                        new Fact(buildingId, new BuildingUnitWasRemoved(buildingId, buildingUnitId)),
+                        new Fact(buildingId, command.ToLegacyEvent()),
+                        new Fact(GetSnapshotIdentifier(buildingId), BuildingSnapshotBuilder
+                            .CreateDefaultSnapshot(buildingId)
+                            .WithLastModificationFromCrab(Modification.Insert)
+                            .WithImportedTerrainObjectHouseNrIds(new List<CrabTerrainObjectHouseNumberId>{ command.TerrainObjectHouseNumberId })
+                            .WithBuildingUnitCollection(BuildingUnitCollectionSnapshotBuilder.CreateDefaultSnapshot()
+                                .WithBuildingUnits(new List<BuildingUnitSnapshot>
+                                {
+                                    BuildingUnitSnapshotBuilder
+                                        .CreateDefaultSnapshot(buildingId, new BuildingUnitId(buildingUnitWasAdded.BuildingUnitId), new BuildingUnitKey(buildingUnitWasAdded.BuildingUnitKey), buildingUnitWasAdded.BuildingUnitVersion)
+                                        .WithAddressIds(new List<AddressId>{AddressId.CreateFor(Fixture.Create<CrabHouseNumberId>())})
+                                        .WithRemoved()
+                                })).Build(3, EventSerializerSettings))
+                    }));
         }
 
         [Fact]
         public void WhenNewBuildingUnit()
         {
-            var terrainObjectHouseNumberId = _fixture.Create<int>();
-            var importTerrainObjectHouseNumber = _fixture.Create<ImportTerrainObjectHouseNumberFromCrab>()
+            var terrainObjectHouseNumberId = Fixture.Create<int>();
+            var importTerrainObjectHouseNumber = Fixture.Create<ImportTerrainObjectHouseNumberFromCrab>()
                 .WithTerrainObjectHouseNumberId(new CrabTerrainObjectHouseNumberId(terrainObjectHouseNumberId));
 
-            var buildingId = _fixture.Create<BuildingId>();
+            var buildingId = Fixture.Create<BuildingId>();
 
             var buildingUnitKey = BuildingUnitKey.Create(importTerrainObjectHouseNumber.TerrainObjectId, importTerrainObjectHouseNumber.TerrainObjectHouseNumberId);
             var commonBuildingUnitKey = BuildingUnitKey.Create(importTerrainObjectHouseNumber.TerrainObjectId);
             Assert(new Scenario()
                 .Given(buildingId,
-                    _fixture.Create<BuildingWasRegistered>(),
-                    _fixture.Create<BuildingUnitWasAdded>()
-                            .WithAddressId(AddressId.CreateFor(_fixture.Create<CrabHouseNumberId>())))
+                    Fixture.Create<BuildingWasRegistered>(),
+                    Fixture.Create<BuildingUnitWasAdded>()
+                            .WithAddressId(AddressId.CreateFor(Fixture.Create<CrabHouseNumberId>())))
                 .When(importTerrainObjectHouseNumber)
                 .Then(buildingId,
                     new BuildingUnitWasAdded(buildingId, BuildingUnitId.Create(buildingUnitKey, 1), buildingUnitKey, AddressId.CreateFor(importTerrainObjectHouseNumber.HouseNumberId), new BuildingUnitVersion(importTerrainObjectHouseNumber.Timestamp)),
@@ -291,21 +377,21 @@ namespace BuildingRegistry.Tests.WhenImportingCrabTerrainObjectHouseNumber
         [Fact]
         public void WithFiniteLifetimeWhenNewBuildingUnit()
         {
-            var terrainObjectHouseNumberId = _fixture.Create<int>();
-            var importTerrainObjectHouseNumber = _fixture.Create<ImportTerrainObjectHouseNumberFromCrab>()
+            var terrainObjectHouseNumberId = Fixture.Create<int>();
+            var importTerrainObjectHouseNumber = Fixture.Create<ImportTerrainObjectHouseNumberFromCrab>()
                 .WithTerrainObjectHouseNumberId(new CrabTerrainObjectHouseNumberId(terrainObjectHouseNumberId))
-                .WithLifetime(new CrabLifetime(_fixture.Create<LocalDateTime>(), _fixture.Create<LocalDateTime>()));
+                .WithLifetime(new CrabLifetime(Fixture.Create<LocalDateTime>(), Fixture.Create<LocalDateTime>()));
 
-            var buildingId = _fixture.Create<BuildingId>();
+            var buildingId = Fixture.Create<BuildingId>();
 
             var buildingUnitKey = BuildingUnitKey.Create(importTerrainObjectHouseNumber.TerrainObjectId, importTerrainObjectHouseNumber.TerrainObjectHouseNumberId);
             var buildingUnitId = BuildingUnitId.Create(buildingUnitKey, 1);
 
             Assert(new Scenario()
                 .Given(buildingId,
-                    _fixture.Create<BuildingWasRegistered>(),
-                    _fixture.Create<BuildingUnitWasAdded>()
-                            .WithAddressId(AddressId.CreateFor(_fixture.Create<CrabHouseNumberId>())))
+                    Fixture.Create<BuildingWasRegistered>(),
+                    Fixture.Create<BuildingUnitWasAdded>()
+                            .WithAddressId(AddressId.CreateFor(Fixture.Create<CrabHouseNumberId>())))
                 .When(importTerrainObjectHouseNumber)
                 .Then(buildingId,
                     new BuildingUnitWasAdded(buildingId, buildingUnitId, buildingUnitKey, AddressId.CreateFor(importTerrainObjectHouseNumber.HouseNumberId), new BuildingUnitVersion(importTerrainObjectHouseNumber.Timestamp)),
@@ -317,11 +403,11 @@ namespace BuildingRegistry.Tests.WhenImportingCrabTerrainObjectHouseNumber
         [Fact]
         public void WithNewHouseNumber()
         {
-            var newHouseNumberId = new CrabHouseNumberId(_fixture.Create<int>());
-            var importTerrainObjectHouseNumber = _fixture.Create<ImportTerrainObjectHouseNumberFromCrab>()
+            var newHouseNumberId = new CrabHouseNumberId(Fixture.Create<int>());
+            var importTerrainObjectHouseNumber = Fixture.Create<ImportTerrainObjectHouseNumberFromCrab>()
                 .WithHouseNumberId(newHouseNumberId);
 
-            var buildingId = _fixture.Create<BuildingId>();
+            var buildingId = Fixture.Create<BuildingId>();
 
             var buildingUnitKey = BuildingUnitKey.Create(importTerrainObjectHouseNumber.TerrainObjectId, importTerrainObjectHouseNumber.TerrainObjectHouseNumberId);
             var buildingUnitId = BuildingUnitId.Create(buildingUnitKey, 1);
@@ -329,9 +415,9 @@ namespace BuildingRegistry.Tests.WhenImportingCrabTerrainObjectHouseNumber
 
             Assert(new Scenario()
                 .Given(buildingId,
-                    _fixture.Create<BuildingWasRegistered>(),
-                    _fixture.Create<BuildingUnitWasAdded>()
-                            .WithAddressId(AddressId.CreateFor(_fixture.Create<CrabHouseNumberId>())))
+                    Fixture.Create<BuildingWasRegistered>(),
+                    Fixture.Create<BuildingUnitWasAdded>()
+                            .WithAddressId(AddressId.CreateFor(Fixture.Create<CrabHouseNumberId>())))
                 .When(importTerrainObjectHouseNumber)
                 .Then(buildingId,
                     new BuildingUnitWasRemoved(buildingId, buildingUnitId),
