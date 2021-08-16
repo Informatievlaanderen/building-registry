@@ -105,42 +105,65 @@ namespace BuildingRegistry.Tests.WhenImportingCrabBuildingGeometry
         [Fact]
         public void WhenBuildingWasMeasuredWithOtherGeometryWithGeometryMethodIsSurveyed()
         {
+            Fixture.Customize(new WithSnapshotInterval(1));
+            var buildingId = Fixture.Create<BuildingId>();
             var validPolygon =
                 "POLYGON ((141298.83027724177 185196.03552261365, 141294.79827723652 185190.20384261012, 141296.80672523379 185188.7793306075, 141295.2384692356 185186.52896260843, 141296.27578123659 185185.72653060779, 141294.88224523515 185183.81600260362, 141296.85165324062 185182.33645060286, 141298.27155724168 185184.30649860576, 141298.47520523518 185184.18451460451, 141304.05254924297 185192.11923461035, 141298.83027724177 185196.03552261365))";
 
-            var importStatus = Fixture.Create<ImportBuildingGeometryFromCrab>()
+            var importBuilding = Fixture.Create<ImportBuildingGeometryFromCrab>()
                 .WithGeometryMethod(CrabBuildingGeometryMethod.Survey)
                 .WithGeometry(new WkbGeometry(new WKTReader {DefaultSRID = WkbGeometry.SridLambert72}.Read(validPolygon)
                     .AsBinary()));
 
             Assert(new Scenario()
-                .Given(Fixture.Create<BuildingId>(),
+                .Given(buildingId,
                     Fixture.Create<BuildingWasRegistered>(),
                     Fixture.Create<BuildingWasMeasuredByGrb>()
                         .WithGeometry(new WkbGeometry(GeometryHelper.ValidPolygon.AsBinary())))
-                .When(importStatus)
-                .Then(Fixture.Create<BuildingId>(),
-                    new BuildingWasOutlined(Fixture.Create<BuildingId>(),
-                        GeometryHelper.CreateEwkbFrom(importStatus.BuildingGeometry)),
-                    importStatus.ToLegacyEvent()));
+                .When(importBuilding)
+                .Then(new[]
+                {
+                    new Fact(buildingId, new BuildingWasOutlined(buildingId, GeometryHelper.CreateEwkbFrom(importBuilding.BuildingGeometry))),
+                    new Fact(buildingId, importBuilding.ToLegacyEvent()),
+                    new Fact(GetSnapshotIdentifier(buildingId),
+                        BuildingSnapshotBuilder
+                            .CreateDefaultSnapshot(buildingId)
+                            .WithGeometry(new BuildingGeometry(GeometryHelper.CreateEwkbFrom(importBuilding.BuildingGeometry), BuildingGeometryMethod.Outlined))
+                            .WithGeometryChronicle(importBuilding)
+                            .WithLastModificationFromCrab(Modification.Insert)
+                            .Build(3, EventSerializerSettings))
+                }));
         }
 
         [Fact]
         public void WhenBuildingWasMeasuredWithInvalidGeometry()
         {
-            var importStatus = Fixture.Create<ImportBuildingGeometryFromCrab>()
+            Fixture.Customize(new WithSnapshotInterval(1));
+            var buildingId = Fixture.Create<BuildingId>();
+
+            var importBuilding = Fixture.Create<ImportBuildingGeometryFromCrab>()
                 .WithGeometryMethod(CrabBuildingGeometryMethod.Survey)
                 .WithGeometry(null);
 
+            var buildingGeometryWasRemoved = Fixture.Create<BuildingGeometryWasRemoved>();
+
             Assert(new Scenario()
-                .Given(Fixture.Create<BuildingId>(),
+                .Given(buildingId,
                     Fixture.Create<BuildingWasRegistered>(),
-                    Fixture.Create<BuildingWasMeasuredByGrb>()
-                        .WithGeometry(new WkbGeometry(GeometryHelper.ValidPolygon.AsBinary())))
-                .When(importStatus)
-                .Then(Fixture.Create<BuildingId>(),
-                    new BuildingGeometryWasRemoved(Fixture.Create<BuildingId>()),
-                    importStatus.ToLegacyEvent()));
+                    Fixture.Create<BuildingWasMeasuredByGrb>().WithGeometry(new WkbGeometry(GeometryHelper.ValidPolygon.AsBinary())),
+                    buildingGeometryWasRemoved
+                    )
+                .When(importBuilding)
+                .Then(new[]
+                {
+                    new Fact(buildingId, importBuilding.ToLegacyEvent()),
+                    new Fact(GetSnapshotIdentifier(buildingId),
+                        BuildingSnapshotBuilder
+                            .CreateDefaultSnapshot(buildingId)
+                            .WithGeometryChronicle(importBuilding)
+                            .WithLastModificationFromCrab(Modification.Insert)
+                            .Build(3, EventSerializerSettings))
+                }));
         }
 
         [Fact]
@@ -222,7 +245,7 @@ namespace BuildingRegistry.Tests.WhenImportingCrabBuildingGeometry
                 .WithGeometryMethod(CrabBuildingGeometryMethod.Survey)
                 .WithGeometry(new WkbGeometry(GeometryHelper.ValidPolygon.AsBinary()));
 
-            var importStatus = Fixture.Create<ImportBuildingGeometryFromCrab>()
+            var importGeometry = Fixture.Create<ImportBuildingGeometryFromCrab>()
                 .WithGeometryMethod(CrabBuildingGeometryMethod.Outlined)
                 .WithGeometry(new WkbGeometry(GeometryHelper.ValidPolygon.AsBinary()))
                 .WithLifetime(new CrabLifetime(importedStatus.Lifetime.BeginDateTime.Value.PlusDays(1), null));
@@ -233,16 +256,19 @@ namespace BuildingRegistry.Tests.WhenImportingCrabBuildingGeometry
                     Fixture.Create<BuildingWasMeasuredByGrb>()
                         .WithGeometry(new WkbGeometry(GeometryHelper.ValidPolygon.AsBinary())),
                     importedStatus.ToLegacyEvent())
-                .When(importStatus)
+                .When(importGeometry)
                 .Then(Fixture.Create<BuildingId>(),
                     new BuildingWasOutlined(Fixture.Create<BuildingId>(),
-                        GeometryHelper.CreateEwkbFrom(importStatus.BuildingGeometry)),
-                    importStatus.ToLegacyEvent()));
+                        GeometryHelper.CreateEwkbFrom(importGeometry.BuildingGeometry)),
+                    importGeometry.ToLegacyEvent()));
         }
 
         [Fact]
         public void WhenMeasuredWithGeometryMethodIsOutlinedAndOlderLifetime()
         {
+            Fixture.Customize(new WithSnapshotInterval(1));
+            var buildingId = Fixture.Create<BuildingId>();
+
             var buildingWasMeasured = Fixture.Create<BuildingWasOutlined>()
                 .WithGeometry(Fixture.Create<WkbGeometry>());
             var importedGeometry = Fixture.Create<ImportBuildingGeometryFromCrab>()
@@ -254,13 +280,26 @@ namespace BuildingRegistry.Tests.WhenImportingCrabBuildingGeometry
                 .WithLifetime(new CrabLifetime(importedGeometry.Lifetime.BeginDateTime.Value.PlusDays(-1), null));
 
             Assert(new Scenario()
-                .Given(Fixture.Create<BuildingId>(),
+                .Given(buildingId,
                     Fixture.Create<BuildingWasRegistered>(),
                     buildingWasMeasured,
                     importedGeometry.ToLegacyEvent())
                 .When(importGeometry)
-                .Then(Fixture.Create<BuildingId>(),
-                    importGeometry.ToLegacyEvent()));
+                .Then(new[]
+                {
+                    new Fact(buildingId, importGeometry.ToLegacyEvent()),
+                    new Fact(GetSnapshotIdentifier(buildingId),
+                        BuildingSnapshotBuilder
+                            .CreateDefaultSnapshot(buildingId)
+                            .WithGeometry(new BuildingGeometry(GeometryHelper.CreateEwkbFrom(importGeometry.BuildingGeometry), BuildingGeometryMethod.Outlined))
+                            .WithGeometryChronicle(new List<ImportBuildingGeometryFromCrab>
+                            {
+                                importedGeometry,
+                                importGeometry
+                            })
+                            .WithLastModificationFromCrab(Modification.Update)
+                            .Build(3, EventSerializerSettings))
+                }));
         }
 
         [Fact]
@@ -295,10 +334,6 @@ namespace BuildingRegistry.Tests.WhenImportingCrabBuildingGeometry
                     buildingGeometryWasRemoved,
                     importedGeometryDelete.ToLegacyEvent())
                 .When(importGeometry)
-                // .Then(Fixture.Create<BuildingId>(),
-                //     new BuildingWasOutlined(Fixture.Create<BuildingId>(),
-                //         GeometryHelper.CreateEwkbFrom(importGeometry.BuildingGeometry)),
-                //     importGeometry.ToLegacyEvent()))
                 .Then(new[]
                 {
                     new Fact(buildingId, new BuildingWasOutlined(buildingId, GeometryHelper.CreateEwkbFrom(importGeometry.BuildingGeometry))),
@@ -315,7 +350,7 @@ namespace BuildingRegistry.Tests.WhenImportingCrabBuildingGeometry
                             })
                             .WithLastModificationFromCrab(Modification.Update)
                             .Build(6, EventSerializerSettings))
-                }));;
+                }));
         }
 
         [Fact]

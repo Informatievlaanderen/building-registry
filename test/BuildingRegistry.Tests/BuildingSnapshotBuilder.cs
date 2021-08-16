@@ -290,6 +290,30 @@ namespace BuildingRegistry.Tests
                 snapshot.LastModificationBasedOnCrab);
         }
 
+        public static BuildingSnapshot BecameComplete(this BuildingSnapshot snapshot, bool isComplete)
+        {
+            return new BuildingSnapshot(
+                new BuildingId(snapshot.BuildingId),
+                snapshot.PersistentLocalId.HasValue ? new PersistentLocalId(snapshot.PersistentLocalId.Value) : null,
+                GetGeometry(snapshot),
+                snapshot.Status,
+                isComplete,
+                snapshot.IsRemoved,
+                snapshot.GeometryChronicle.ToList(),
+                snapshot.StatusChronicle.ToList(),
+                GetActiveHouseNumberIdsByTerrainObjectHouseNr(snapshot),
+                GetHouseNumberStatusEventsByHouseNumberId(snapshot),
+                GetHouseNumberPositionEventsByHouseNumberId(snapshot),
+                GetHouseNumberReaddressedEventsByBuildingUnit(snapshot),
+                GetSubaddressEventsByTerrainObjectHouseNumberAndHouseNumber(snapshot),
+                GetSubaddressStatusEventsBySubaddressId(snapshot),
+                GetSubaddressPositionEventsBySubaddressId(snapshot),
+                GetSubaddressReaddressedEventsByBuildingUnit(snapshot),
+                GetImportedTerrainObjectHouseNumberIds(snapshot),
+                snapshot.BuildingUnitCollection,
+                snapshot.LastModificationBasedOnCrab);
+        }
+
 
         public static BuildingSnapshot CreateDefaultSnapshot(BuildingId buildingId)
         {
@@ -361,5 +385,6 @@ namespace BuildingRegistry.Tests
         private static Dictionary<CrabTerrainObjectHouseNumberId, CrabHouseNumberId> GetActiveHouseNumberIdsByTerrainObjectHouseNr(BuildingSnapshot snapshot)
             => snapshot.ActiveHouseNumberIdsByTerrainObjectHouseNr
                 .ToDictionary(x => new CrabTerrainObjectHouseNumberId(x.Key), y => new CrabHouseNumberId(y.Value));
+
     }
 }
