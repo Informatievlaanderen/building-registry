@@ -1,42 +1,60 @@
 namespace BuildingRegistry.Tests.WhenImportingCrabHouseNumberStatus
 {
-    using System;
+    using System.Collections.Generic;
     using Be.Vlaanderen.Basisregisters.AggregateSource.Testing;
     using Autofixture;
     using AutoFixture;
-    using Building;
+    using Be.Vlaanderen.Basisregisters.AggregateSource;
     using Building.Commands.Crab;
+    using Building.DataStructures;
     using Building.Events;
+    using Building.Events.Crab;
     using ValueObjects;
     using Xunit;
     using Xunit.Abstractions;
 
-    public class GivenBuildingUnitIsRemoved : AutofacBasedTest
+    public class GivenBuildingUnitIsRemoved : SnapshotBasedTest
     {
-        private readonly Fixture _fixture = new Fixture();
-
         public GivenBuildingUnitIsRemoved(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
         {
-            _fixture.Customize(new InfrastructureCustomization());
-            _fixture.Customize(new WithNoDeleteModification());
-            _fixture.Customize(new WithFixedBuildingUnitIdFromHouseNumber());
+            Fixture.Customize(new InfrastructureCustomization());
+            Fixture.Customize(new WithNoDeleteModification());
+            Fixture.Customize(new WithFixedBuildingUnitIdFromHouseNumber());
         }
 
         [Fact]
         public void ThenOnlyLegacyEventIsApplied()
         {
-            _fixture.Customize(new WithNoDeleteModification());
+            Fixture.Customize(new WithSnapshotInterval(1));
+            Fixture.Customize(new WithNoDeleteModification());
 
-            var command = _fixture.Create<ImportHouseNumberStatusFromCrab>();
-            var buildingId = _fixture.Create<BuildingId>();
+            var command = Fixture.Create<ImportHouseNumberStatusFromCrab>();
+            var buildingId = Fixture.Create<BuildingId>();
+            var buildingUnitWasAdded = Fixture.Create<BuildingUnitWasAdded>();
 
             Assert(new Scenario()
                 .Given(buildingId,
-                    _fixture.Create<BuildingWasRegistered>(),
-                    _fixture.Create<BuildingUnitWasAdded>(),
-                    _fixture.Create<BuildingUnitWasRemoved>())
+                    Fixture.Create<BuildingWasRegistered>(),
+                    buildingUnitWasAdded,
+                    Fixture.Create<BuildingUnitWasRemoved>())
                 .When(command)
-                .Then(buildingId, command.ToLegacyEvent()));
+                .Then(new Fact[]
+                {
+                    new Fact(buildingId, command.ToLegacyEvent()),
+                    new Fact(GetSnapshotIdentifier(buildingId),
+                        BuildingSnapshotBuilder.CreateDefaultSnapshot(buildingId)
+                            .WithHouseNumberStatusEventsByHouseNumberId(new Dictionary<AddressId, List<AddressHouseNumberStatusWasImportedFromCrab>>
+                            {
+                                { AddressId.CreateFor(command.HouseNumberId), new List<AddressHouseNumberStatusWasImportedFromCrab>{ command.ToLegacyEvent() } }
+                            })
+                            .WithBuildingUnitCollection(BuildingUnitCollectionSnapshotBuilder.CreateDefaultSnapshot()
+                                .WithBuildingUnits(new List<BuildingUnitSnapshot>
+                                {
+                                    BuildingUnitSnapshotBuilder.CreateDefaultSnapshotFor(buildingUnitWasAdded)
+                                        .WithRemoved()
+                                }))
+                            .Build(3, EventSerializerSettings))
+                }));
         }
     }
 }

@@ -1,25 +1,26 @@
 namespace BuildingRegistry.Tests.WhenImportingCrabHouseNumberStatus
 {
+    using System.Collections.Generic;
     using Be.Vlaanderen.Basisregisters.AggregateSource.Testing;
     using Be.Vlaanderen.Basisregisters.Crab;
     using Autofixture;
     using AutoFixture;
+    using Be.Vlaanderen.Basisregisters.AggregateSource;
     using Building.Commands.Crab;
+    using Building.DataStructures;
     using Building.Events;
+    using Building.Events.Crab;
     using ValueObjects;
-    using ValueObjects.Crab;
     using Xunit;
     using Xunit.Abstractions;
 
-    public class GivenBuildingUnit : AutofacBasedTest
+    public class GivenBuildingUnit : SnapshotBasedTest
     {
-        private readonly Fixture _fixture = new Fixture();
-
         public GivenBuildingUnit(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
         {
-            _fixture.Customize(new InfrastructureCustomization());
-            _fixture.Customize(new WithFixedBuildingUnitIdFromHouseNumber());
-            _fixture.Customize(new WithNoDeleteModification());
+            Fixture.Customize(new InfrastructureCustomization());
+            Fixture.Customize(new WithFixedBuildingUnitIdFromHouseNumber());
+            Fixture.Customize(new WithNoDeleteModification());
         }
 
         [Theory]
@@ -28,18 +29,18 @@ namespace BuildingRegistry.Tests.WhenImportingCrabHouseNumberStatus
         [InlineData(CrabAddressStatus.Unofficial)]
         public void WhenStatusMapsToRealized(CrabAddressStatus status)
         {
-            var importStatus = _fixture.Create<ImportHouseNumberStatusFromCrab>()
+            var importStatus = Fixture.Create<ImportHouseNumberStatusFromCrab>()
                 .WithStatus(status);
 
-            var buildingId = _fixture.Create<BuildingId>();
+            var buildingId = Fixture.Create<BuildingId>();
 
             Assert(new Scenario()
                 .Given(buildingId,
-                    _fixture.Create<BuildingWasRegistered>(),
-                    _fixture.Create<BuildingUnitWasAdded>())
+                    Fixture.Create<BuildingWasRegistered>(),
+                    Fixture.Create<BuildingUnitWasAdded>())
                 .When(importStatus)
                 .Then(buildingId,
-                    new BuildingUnitWasRealized(buildingId, _fixture.Create<BuildingUnitId>()),
+                    new BuildingUnitWasRealized(buildingId, Fixture.Create<BuildingUnitId>()),
                     importStatus.ToLegacyEvent()));
         }
 
@@ -48,33 +49,55 @@ namespace BuildingRegistry.Tests.WhenImportingCrabHouseNumberStatus
         [InlineData(CrabAddressStatus.Reserved)]
         public void WhenStatusMapsToPlanned(CrabAddressStatus status)
         {
-            var importStatus = _fixture.Create<ImportHouseNumberStatusFromCrab>()
+            Fixture.Customize(new WithSnapshotInterval(1));
+
+            var importStatus = Fixture.Create<ImportHouseNumberStatusFromCrab>()
                 .WithStatus(status);
 
-            var buildingId = _fixture.Create<BuildingId>();
+            var buildingId = Fixture.Create<BuildingId>();
+            var buildingUnitWasAdded = Fixture.Create<BuildingUnitWasAdded>();
 
             Assert(new Scenario()
                 .Given(buildingId,
-                    _fixture.Create<BuildingWasRegistered>(),
-                    _fixture.Create<BuildingUnitWasAdded>())
+                    Fixture.Create<BuildingWasRegistered>(),
+                    buildingUnitWasAdded)
                 .When(importStatus)
-                .Then(buildingId,
-                    new BuildingUnitWasPlanned(buildingId, _fixture.Create<BuildingUnitId>()),
-                    importStatus.ToLegacyEvent()));
+                .Then(new Fact[]
+                {
+                    new Fact(buildingId, new BuildingUnitWasPlanned(buildingId, Fixture.Create<BuildingUnitId>())),
+                    new Fact(buildingId, importStatus.ToLegacyEvent()),
+                    new Fact(GetSnapshotIdentifier(buildingId),
+                        BuildingSnapshotBuilder.CreateDefaultSnapshot(buildingId)
+                            .WithHouseNumberStatusEventsByHouseNumberId(new Dictionary<AddressId, List<AddressHouseNumberStatusWasImportedFromCrab>>
+                            {
+                                { AddressId.CreateFor(importStatus.HouseNumberId), new List<AddressHouseNumberStatusWasImportedFromCrab>{ importStatus.ToLegacyEvent() } }
+                            })
+                            .WithBuildingUnitCollection(BuildingUnitCollectionSnapshotBuilder.CreateDefaultSnapshot()
+                                .WithBuildingUnits(
+                                    new List<BuildingUnitSnapshot>{
+                                        BuildingUnitSnapshotBuilder.CreateDefaultSnapshotFor(buildingUnitWasAdded)
+                                        .WithStatus(BuildingUnitStatus.Planned)
+                                        .WithHouseNumberStatusChronicle(new List<AddressHouseNumberStatusWasImportedFromCrab>
+                                        {
+                                            importStatus.ToLegacyEvent()
+                                        })
+                                    }))
+                            .Build(3, EventSerializerSettings))
+                }));
         }
 
         [Fact]
         public void WithEmptyStatusWhenModificationRemoved()
         {
-            var importStatus = _fixture.Create<ImportHouseNumberStatusFromCrab>()
+            var importStatus = Fixture.Create<ImportHouseNumberStatusFromCrab>()
                 .WithModification(CrabModification.Delete);
 
-            var buildingId = _fixture.Create<BuildingId>();
+            var buildingId = Fixture.Create<BuildingId>();
 
             Assert(new Scenario()
                 .Given(buildingId,
-                    _fixture.Create<BuildingWasRegistered>(),
-                    _fixture.Create<BuildingUnitWasAdded>())
+                    Fixture.Create<BuildingWasRegistered>(),
+                    Fixture.Create<BuildingUnitWasAdded>())
                 .When(importStatus)
                 .Then(buildingId,
                     importStatus.ToLegacyEvent()));
@@ -83,44 +106,44 @@ namespace BuildingRegistry.Tests.WhenImportingCrabHouseNumberStatus
         [Fact]
         public void WithStatusProposedWhenStatusIsRealizedAndNewerLifetime()
         {
-            var importedStatus = _fixture.Create<ImportHouseNumberStatusFromCrab>()
+            var importedStatus = Fixture.Create<ImportHouseNumberStatusFromCrab>()
                 .WithStatus(CrabAddressStatus.InUse);
 
-            var importStatus = _fixture.Create<ImportHouseNumberStatusFromCrab>()
+            var importStatus = Fixture.Create<ImportHouseNumberStatusFromCrab>()
                 .WithStatus(CrabAddressStatus.Proposed)
                 .WithLifetime(new CrabLifetime(importedStatus.Lifetime.BeginDateTime.Value.PlusDays(1), importedStatus.Lifetime.EndDateTime));
 
-            var buildingId = _fixture.Create<BuildingId>();
+            var buildingId = Fixture.Create<BuildingId>();
 
             Assert(new Scenario()
                 .Given(buildingId,
-                    _fixture.Create<BuildingWasRegistered>(),
-                    _fixture.Create<BuildingUnitWasAdded>(),
-                    _fixture.Create<BuildingUnitWasRealized>(),
+                    Fixture.Create<BuildingWasRegistered>(),
+                    Fixture.Create<BuildingUnitWasAdded>(),
+                    Fixture.Create<BuildingUnitWasRealized>(),
                     importedStatus.ToLegacyEvent())
                 .When(importStatus)
                 .Then(buildingId,
-                    new BuildingUnitWasPlanned(buildingId, _fixture.Create<BuildingUnitId>()),
+                    new BuildingUnitWasPlanned(buildingId, Fixture.Create<BuildingUnitId>()),
                     importStatus.ToLegacyEvent()));
         }
 
         [Fact]
         public void WithStatusProposedWhenStatusIsRealizedAndOlderLifetime()
         {
-            var importedStatus = _fixture.Create<ImportHouseNumberStatusFromCrab>()
+            var importedStatus = Fixture.Create<ImportHouseNumberStatusFromCrab>()
                 .WithStatus(CrabAddressStatus.InUse);
 
-            var importStatus = _fixture.Create<ImportHouseNumberStatusFromCrab>()
+            var importStatus = Fixture.Create<ImportHouseNumberStatusFromCrab>()
                 .WithStatus(CrabAddressStatus.Proposed)
                 .WithLifetime(new CrabLifetime(importedStatus.Lifetime.BeginDateTime.Value.PlusDays(-1), importedStatus.Lifetime.EndDateTime));
 
-            var buildingId = _fixture.Create<BuildingId>();
+            var buildingId = Fixture.Create<BuildingId>();
 
             Assert(new Scenario()
                 .Given(buildingId,
-                    _fixture.Create<BuildingWasRegistered>(),
-                    _fixture.Create<BuildingUnitWasAdded>(),
-                    _fixture.Create<BuildingUnitWasRealized>(),
+                    Fixture.Create<BuildingWasRegistered>(),
+                    Fixture.Create<BuildingUnitWasAdded>(),
+                    Fixture.Create<BuildingUnitWasRealized>(),
                     importedStatus.ToLegacyEvent())
                 .When(importStatus)
                 .Then(buildingId,
