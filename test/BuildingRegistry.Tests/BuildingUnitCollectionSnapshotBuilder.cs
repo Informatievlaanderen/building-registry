@@ -293,6 +293,35 @@ namespace BuildingRegistry.Tests
                 snapshot.ReaddressedEvents);
         }
 
+        public static BuildingUnitSnapshot WithSubaddressPositions(
+            this BuildingUnitSnapshot snapshot,
+            IEnumerable<AddressSubaddressPositionWasImportedFromCrab> subaddressPositions)
+        {
+            return new BuildingUnitSnapshot(
+                new BuildingId(snapshot.BuildingId),
+                new BuildingUnitId(snapshot.BuildingUnitId),
+                new BuildingUnitKey(snapshot.BuildingUnitKey),
+                BuildingUnitFunction.Parse(snapshot.Function).Value,
+                string.IsNullOrEmpty(snapshot.Status) ? null : BuildingUnitStatus.Parse(snapshot.Status),
+                snapshot.AddressIds.Select(x => new AddressId(x)),
+                snapshot.PreviousAddressId.HasValue ? new AddressId(snapshot.PreviousAddressId.Value) : null,
+                string.IsNullOrEmpty(snapshot.BuildingUnitPositionGeometryMethod)
+                    ? null
+                    : new BuildingUnitPosition(new ExtendedWkbGeometry(snapshot.BuildingUnitPositionAsHex), BuildingUnitPositionGeometryMethod.Parse(snapshot.BuildingUnitPositionGeometryMethod)),
+                snapshot.PersistentLocalId.HasValue ? new PersistentLocalId(snapshot.PersistentLocalId.Value) : null,
+                snapshot.IsComplete,
+                snapshot.IsRemoved,
+                snapshot.IsRetiredByBuilding,
+                snapshot.IsRetiredByParent,
+                snapshot.IsRetiredBySelf,
+                snapshot.Version,
+                snapshot.HouseNumberStatusChronicle,
+                snapshot.SubaddressStatusChronicle,
+                snapshot.HouseNumberPositions,
+                subaddressPositions,
+                snapshot.ReaddressedEvents);
+        }
+
         public static BuildingUnitSnapshot WithFunction(
             this BuildingUnitSnapshot snapshot,
             BuildingUnitFunction function)

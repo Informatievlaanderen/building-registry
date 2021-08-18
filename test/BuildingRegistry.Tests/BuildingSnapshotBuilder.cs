@@ -137,6 +137,7 @@ namespace BuildingRegistry.Tests
                 snapshot.BuildingUnitCollection,
                 snapshot.LastModificationBasedOnCrab);
         }
+
         public static BuildingSnapshot WithSubaddressEventsByTerrainObjectHouseNumberAndHouseNumber(
             this BuildingSnapshot snapshot,
             Dictionary<Tuple<CrabTerrainObjectHouseNumberId, CrabHouseNumberId>, List<AddressSubaddressWasImportedFromCrab>> subaddressEventsByTerrainObjectHouseNr)
@@ -157,6 +158,32 @@ namespace BuildingRegistry.Tests
                 subaddressEventsByTerrainObjectHouseNr,
                 GetSubaddressStatusEventsBySubaddressId(snapshot),
                 GetSubaddressPositionEventsBySubaddressId(snapshot),
+                GetSubaddressReaddressedEventsByBuildingUnit(snapshot),
+                GetImportedTerrainObjectHouseNumberIds(snapshot),
+                snapshot.BuildingUnitCollection,
+                snapshot.LastModificationBasedOnCrab);
+        }
+
+        public static BuildingSnapshot WithSubaddressPositionEventsByHouseNumberId(
+            this BuildingSnapshot snapshot,
+            Dictionary<CrabSubaddressId, List<AddressSubaddressPositionWasImportedFromCrab>> subaddressPositionEvents)
+        {
+            return new BuildingSnapshot(
+                new BuildingId(snapshot.BuildingId),
+                snapshot.PersistentLocalId.HasValue ? new PersistentLocalId(snapshot.PersistentLocalId.Value) : null,
+                GetGeometry(snapshot),
+                snapshot.Status,
+                snapshot.IsComplete,
+                snapshot.IsRemoved,
+                snapshot.GeometryChronicle.ToList(),
+                snapshot.StatusChronicle.ToList(),
+                GetActiveHouseNumberIdsByTerrainObjectHouseNr(snapshot),
+                GetHouseNumberStatusEventsByHouseNumberId(snapshot),
+                GetHouseNumberPositionEventsByHouseNumberId(snapshot),
+                GetHouseNumberReaddressedEventsByBuildingUnit(snapshot),
+                GetSubaddressEventsByTerrainObjectHouseNumberAndHouseNumber(snapshot),
+                GetSubaddressStatusEventsBySubaddressId(snapshot),
+                subaddressPositionEvents,
                 GetSubaddressReaddressedEventsByBuildingUnit(snapshot),
                 GetImportedTerrainObjectHouseNumberIds(snapshot),
                 snapshot.BuildingUnitCollection,
