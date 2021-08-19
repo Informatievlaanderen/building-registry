@@ -391,6 +391,57 @@ namespace BuildingRegistry.Tests
                 snapshot.LastModificationBasedOnCrab);
         }
 
+        public static BuildingSnapshot WithHouseNumberReaddressedEventsByBuildingUnit(
+            this BuildingSnapshot snapshot,
+            Dictionary<BuildingUnitKey, HouseNumberWasReaddressedFromCrab> houseNumberReaddressedEvents)
+        {
+            return new BuildingSnapshot(
+                new BuildingId(snapshot.BuildingId),
+                snapshot.PersistentLocalId.HasValue ? new PersistentLocalId(snapshot.PersistentLocalId.Value) : null,
+                GetGeometry(snapshot),
+                snapshot.Status,
+                snapshot.IsComplete,
+                snapshot.IsRemoved,
+                snapshot.GeometryChronicle.ToList(),
+                snapshot.StatusChronicle.ToList(),
+                GetActiveHouseNumberIdsByTerrainObjectHouseNr(snapshot),
+                GetHouseNumberStatusEventsByHouseNumberId(snapshot),
+                GetHouseNumberPositionEventsByHouseNumberId(snapshot),
+                houseNumberReaddressedEvents,
+                GetSubaddressEventsByTerrainObjectHouseNumberAndHouseNumber(snapshot),
+                GetSubaddressStatusEventsBySubaddressId(snapshot),
+                GetSubaddressPositionEventsBySubaddressId(snapshot),
+                GetSubaddressReaddressedEventsByBuildingUnit(snapshot),
+                GetImportedTerrainObjectHouseNumberIds(snapshot),
+                snapshot.BuildingUnitCollection,
+                snapshot.LastModificationBasedOnCrab);
+        }
+
+        public static BuildingSnapshot WithSubaddressReaddressedEventsByBuildingUnit(
+            this BuildingSnapshot snapshot,
+            Dictionary<BuildingUnitKey, SubaddressWasReaddressedFromCrab> subaddressReaddressedEvents)
+        {
+            return new BuildingSnapshot(
+                new BuildingId(snapshot.BuildingId),
+                snapshot.PersistentLocalId.HasValue ? new PersistentLocalId(snapshot.PersistentLocalId.Value) : null,
+                GetGeometry(snapshot),
+                snapshot.Status,
+                snapshot.IsComplete,
+                snapshot.IsRemoved,
+                snapshot.GeometryChronicle.ToList(),
+                snapshot.StatusChronicle.ToList(),
+                GetActiveHouseNumberIdsByTerrainObjectHouseNr(snapshot),
+                GetHouseNumberStatusEventsByHouseNumberId(snapshot),
+                GetHouseNumberPositionEventsByHouseNumberId(snapshot),
+                GetHouseNumberReaddressedEventsByBuildingUnit(snapshot),
+                GetSubaddressEventsByTerrainObjectHouseNumberAndHouseNumber(snapshot),
+                GetSubaddressStatusEventsBySubaddressId(snapshot),
+                GetSubaddressPositionEventsBySubaddressId(snapshot),
+                subaddressReaddressedEvents,
+                GetImportedTerrainObjectHouseNumberIds(snapshot),
+                snapshot.BuildingUnitCollection,
+                snapshot.LastModificationBasedOnCrab);
+        }
 
         public static BuildingSnapshot CreateDefaultSnapshot(BuildingId buildingId)
         {
