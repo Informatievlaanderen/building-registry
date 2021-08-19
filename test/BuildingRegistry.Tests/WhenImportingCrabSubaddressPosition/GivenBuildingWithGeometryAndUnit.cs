@@ -340,7 +340,7 @@ namespace BuildingRegistry.Tests.WhenImportingCrabSubaddressPosition
                     new Fact(buildingId, command.ToLegacyEvent()),
                     new Fact(GetSnapshotIdentifier(buildingId), BuildingSnapshotBuilder.CreateDefaultSnapshot(buildingId)
                         .WithGeometry(new BuildingGeometry(GeometryHelper.CreateEwkbFrom(polygonFixture.Create<WkbGeometry>()), BuildingGeometryMethod.MeasuredByGrb))
-                        .WithSubaddressPositionEventsByHouseNumberId(new Dictionary<CrabSubaddressId, List<AddressSubaddressPositionWasImportedFromCrab>>
+                        .WithSubaddressPositionEventsBySubaddressId(new Dictionary<CrabSubaddressId, List<AddressSubaddressPositionWasImportedFromCrab>>
                         {
                             { new CrabSubaddressId(addressSubaddressPositionWasImportedFromCrab.SubaddressId), new List<AddressSubaddressPositionWasImportedFromCrab>{ addressSubaddressPositionWasImportedFromCrab, command.ToLegacyEvent() } },
                         })
