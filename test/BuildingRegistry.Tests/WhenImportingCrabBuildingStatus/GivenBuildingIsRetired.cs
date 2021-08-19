@@ -5,6 +5,8 @@ namespace BuildingRegistry.Tests.WhenImportingCrabBuildingStatus
     using Be.Vlaanderen.Basisregisters.Crab;
     using Autofixture;
     using AutoFixture;
+    using Be.Vlaanderen.Basisregisters.AggregateSource;
+    using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Building.Commands.Crab;
     using Building.Events;
     using ValueObjects;
@@ -12,16 +14,12 @@ namespace BuildingRegistry.Tests.WhenImportingCrabBuildingStatus
     using Xunit;
     using Xunit.Abstractions;
 
-    public class GivenBuildingIsRetired : AutofacBasedTest
+    public class GivenBuildingIsRetired : SnapshotBasedTest
     {
-        private readonly Fixture _fixture;
-
         public GivenBuildingIsRetired(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
         {
-            _fixture = new Fixture();
-            _fixture.Customize(new InfrastructureCustomization());
-            _fixture.Customize(new WithFixedBuildingId());
-            _fixture.Customize(new WithNoDeleteModification());
+            Fixture.Customize(new WithFixedBuildingId());
+            Fixture.Customize(new WithNoDeleteModification());
         }
 
         [Theory]
@@ -29,17 +27,29 @@ namespace BuildingRegistry.Tests.WhenImportingCrabBuildingStatus
         [InlineData(CrabBuildingStatus.OutOfUse)]
         public void WithMappedToRealizedThenNoStatusChangeIsApplied(CrabBuildingStatus status)
         {
-            var importStatus = _fixture.Create<ImportBuildingStatusFromCrab>()
-                .WithStatus(status);
+            Fixture.Customize(new WithSnapshotInterval(1));
+            var buildingId = Fixture.Create<BuildingId>();
 
+            var importStatus = Fixture.Create<ImportBuildingStatusFromCrab>()
+                .WithStatus(status);
+            var buildingWasRetired = Fixture.Create<BuildingWasRetired>()
+                .WithNoRetiredUnits();
             Assert(new Scenario()
-                .Given(_fixture.Create<BuildingId>(),
-                    _fixture.Create<BuildingWasRegistered>(),
-                    _fixture.Create<BuildingWasRetired>()
-                        .WithNoRetiredUnits())
+                .Given(buildingId,
+                    Fixture.Create<BuildingWasRegistered>(),
+                    buildingWasRetired)
                 .When(importStatus)
-                .Then(_fixture.Create<BuildingId>(),
-                    importStatus.ToLegacyEvent()));
+                .Then(new[]
+                {
+                    new Fact(buildingId, importStatus.ToLegacyEvent()),
+                    new Fact(GetSnapshotIdentifier(buildingId),
+                        BuildingSnapshotBuilder
+                            .CreateDefaultSnapshot(buildingId)
+                            .WithStatusChronicle(importStatus)
+                            .WithStatus(BuildingStatus.Retired)
+                            .WithLastModificationFromCrab(Modification.Insert)
+                            .Build(2, EventSerializerSettings))
+                }));
         }
 
         [Theory]
@@ -48,16 +58,16 @@ namespace BuildingRegistry.Tests.WhenImportingCrabBuildingStatus
         [InlineData(CrabBuildingStatus.BuildingPermitGranted)]
         public void WithMappedToNotRealizedThenNoStatusChangeIsApplied(CrabBuildingStatus status)
         {
-            var importStatus = _fixture.Create<ImportBuildingStatusFromCrab>()
+            var importStatus = Fixture.Create<ImportBuildingStatusFromCrab>()
                 .WithStatus(status);
 
             Assert(new Scenario()
-                .Given(_fixture.Create<BuildingId>(),
-                    _fixture.Create<BuildingWasRegistered>(),
-                    _fixture.Create<BuildingWasNotRealized>()
+                .Given(Fixture.Create<BuildingId>(),
+                    Fixture.Create<BuildingWasRegistered>(),
+                    Fixture.Create<BuildingWasNotRealized>()
                         .WithNoRetiredUnits())
                 .When(importStatus)
-                .Then(_fixture.Create<BuildingId>(),
+                .Then(Fixture.Create<BuildingId>(),
                     importStatus.ToLegacyEvent()));
         }
 
@@ -66,18 +76,33 @@ namespace BuildingRegistry.Tests.WhenImportingCrabBuildingStatus
         [InlineData(CrabBuildingStatus.OutOfUse)]
         public void WithMappedToRealizedWhenNotRealized(CrabBuildingStatus status)
         {
-            var importStatus = _fixture.Create<ImportBuildingStatusFromCrab>()
+            Fixture.Customize(new WithSnapshotInterval(1));
+            var buildingId = Fixture.Create<BuildingId>();
+
+            var importStatus = Fixture.Create<ImportBuildingStatusFromCrab>()
                 .WithStatus(status);
 
+            var buildingWasRetired = Fixture.Create<BuildingWasRetired>()
+                .WithNoRetiredUnits();
+
             Assert(new Scenario()
-                .Given(_fixture.Create<BuildingId>(),
-                    _fixture.Create<BuildingWasRegistered>(),
-                    _fixture.Create<BuildingWasNotRealized>()
+                .Given(Fixture.Create<BuildingId>(),
+                    Fixture.Create<BuildingWasRegistered>(),
+                    Fixture.Create<BuildingWasNotRealized>()
                         .WithNoRetiredUnits())
                 .When(importStatus)
-                .Then(_fixture.Create<BuildingId>(),
-                    new BuildingWasRetired(_fixture.Create<BuildingId>(), new List<BuildingUnitId>(), new List<BuildingUnitId>()),
-                    importStatus.ToLegacyEvent()));
+                .Then(new[]
+                {
+                    new Fact(buildingId, buildingWasRetired),
+                    new Fact(buildingId, importStatus.ToLegacyEvent()),
+                    new Fact(GetSnapshotIdentifier(buildingId),
+                        BuildingSnapshotBuilder
+                            .CreateDefaultSnapshot(buildingId)
+                            .WithStatusChronicle(importStatus)
+                            .WithStatus(BuildingStatus.Retired)
+                            .WithLastModificationFromCrab(Modification.Insert)
+                            .Build(3, EventSerializerSettings))
+                }));
         }
 
 
@@ -87,34 +112,49 @@ namespace BuildingRegistry.Tests.WhenImportingCrabBuildingStatus
         [InlineData(CrabBuildingStatus.BuildingPermitGranted)]
         public void WithMappedToNotRealizedWhenRetired(CrabBuildingStatus status)
         {
-            var importStatus = _fixture.Create<ImportBuildingStatusFromCrab>()
+            Fixture.Customize(new WithSnapshotInterval(1));
+            var buildingId = Fixture.Create<BuildingId>();
+
+            var importStatus = Fixture.Create<ImportBuildingStatusFromCrab>()
                 .WithStatus(status);
 
+            var buildingWasNotRealized = Fixture.Create<BuildingWasNotRealized>()
+                .WithNoRetiredUnits();
+
             Assert(new Scenario()
-                .Given(_fixture.Create<BuildingId>(),
-                    _fixture.Create<BuildingWasRegistered>(),
-                    _fixture.Create<BuildingWasRetired>()
+                .Given(Fixture.Create<BuildingId>(),
+                    Fixture.Create<BuildingWasRegistered>(),
+                    Fixture.Create<BuildingWasRetired>()
                         .WithNoRetiredUnits())
                 .When(importStatus)
-                .Then(_fixture.Create<BuildingId>(),
-                    new BuildingWasNotRealized(_fixture.Create<BuildingId>(), new List<BuildingUnitId>(), new List<BuildingUnitId>()),
-                    importStatus.ToLegacyEvent()));
+                .Then(new[]
+                {
+                    new Fact(buildingId, buildingWasNotRealized),
+                    new Fact(buildingId, importStatus.ToLegacyEvent()),
+                    new Fact(GetSnapshotIdentifier(buildingId),
+                        BuildingSnapshotBuilder
+                            .CreateDefaultSnapshot(buildingId)
+                            .WithStatusChronicle(importStatus)
+                            .WithStatus(BuildingStatus.NotRealized)
+                            .WithLastModificationFromCrab(Modification.Insert)
+                            .Build(3, EventSerializerSettings))
+                }));
         }
 
         ////TBD: Ruben question
         //[Fact]
         //public void WithDeletedWhenNotRealized()
         //{
-        //    var importStatus = _fixture.Create<ImportBuildingStatusFromCrab>()
+        //    var importStatus = Fixture.Create<ImportBuildingStatusFromCrab>()
         //        .WithCrabModification(CrabModification.Delete);
 
         //    Assert(new Scenario()
-        //        .Given(_fixture.Create<BuildingId>(),
-        //            _fixture.Create<BuildingWasRegistered>(),
-        //            _fixture.Create<BuildingWasNotRealized>()
+        //        .Given(Fixture.Create<BuildingId>(),
+        //            Fixture.Create<BuildingWasRegistered>(),
+        //            Fixture.Create<BuildingWasNotRealized>()
         //                .WithNoRetiredUnits())
         //        .When(importStatus)
-        //        .Then(_fixture.Create<BuildingId>(),
+        //        .Then(Fixture.Create<BuildingId>(),
         //            importStatus.ToLegacyEvent()));
         //}
 
@@ -122,18 +162,18 @@ namespace BuildingRegistry.Tests.WhenImportingCrabBuildingStatus
         //[Fact]
         //public void WithDeletedWhenRetired()
         //{
-        //    var importStatus = _fixture.Create<ImportBuildingStatusFromCrab>()
+        //    var importStatus = Fixture.Create<ImportBuildingStatusFromCrab>()
         //        .WithCrabModification(CrabModification.Delete);
 
         //    Assert(new Scenario()
-        //        .Given(_fixture.Create<BuildingId>(),
-        //            _fixture.Create<BuildingWasRegistered>(),
-        //            _fixture.Create<BuildingWasRetired>()
+        //        .Given(Fixture.Create<BuildingId>(),
+        //            Fixture.Create<BuildingWasRegistered>(),
+        //            Fixture.Create<BuildingWasRetired>()
         //                .WithNoRetiredUnits())
         //        .When(importStatus)
-        //        .Then(_fixture.Create<BuildingId>(),
-        //            new BuildingVersionWasIncreased(_fixture.Create<BuildingId>(), new Version(1)),
-        //            new BuildingWasNotRealized(_fixture.Create<BuildingId>(), new List<BuildingUnitId>(), new List<BuildingUnitId>()),
+        //        .Then(Fixture.Create<BuildingId>(),
+        //            new BuildingVersionWasIncreased(Fixture.Create<BuildingId>(), new Version(1)),
+        //            new BuildingWasNotRealized(Fixture.Create<BuildingId>(), new List<BuildingUnitId>(), new List<BuildingUnitId>()),
         //            importStatus.ToLegacyEvent()));
         //}
     }
