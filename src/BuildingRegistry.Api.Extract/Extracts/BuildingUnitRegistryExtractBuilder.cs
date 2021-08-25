@@ -19,12 +19,25 @@ namespace BuildingRegistry.Api.Extract.Extracts
                 .Where(m => m.IsComplete && m.IsBuildingComplete && m.ShapeRecordContentLength > 0)
                 .OrderBy(m => m.PersistentLocalId);
 
+            var buildingUnitProjectionState = context
+                .ProjectionStates
+                .AsNoTracking()
+                .Single(m => m.Name == typeof(BuildingUnitExtractProjections).FullName);
+            var extractMetadata = new Dictionary<string,string>
+            {
+                { ExtractMetadataKeys.LatestEventId, buildingUnitProjectionState.Position.ToString()}
+            };
+
             yield return ExtractBuilder.CreateDbfFile<BuildingUnitExtractItem, BuildingUnitDbaseRecord>(
                 ExtractFileNames.BuildingUnit,
                 new BuildingUnitDbaseSchema(),
                 extractItems,
                 extractItems.Count,
                 x => x.DbaseRecord);
+
+            yield return ExtractBuilder.CreateMetadataDbfFile(
+                ExtractFileNames.BuildingUnit,
+                extractMetadata);
 
             var boundingBox = new BoundingBox3D(
                 extractItems.Where(x => x.MinimumX > 0).Min(record => record.MinimumX),

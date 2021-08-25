@@ -19,6 +19,15 @@ namespace BuildingRegistry.Api.Extract.Extracts
                 .Where(m => m.IsComplete && m.ShapeRecordContentLength > 0)
                 .OrderBy(m => m.PersistentLocalId);
 
+            var buildingProjectionState = context
+                .ProjectionStates
+                .AsNoTracking()
+                .Single(m => m.Name == typeof(BuildingExtractProjections).FullName);
+            var extractMetadata = new Dictionary<string,string>
+            {
+                { ExtractMetadataKeys.LatestEventId, buildingProjectionState.Position.ToString()}
+            };
+
             yield return ExtractBuilder.CreateDbfFile<BuildingExtractItem, BuildingDbaseRecord>(
                 ExtractFileNames.Building,
                 new BuildingDbaseSchema(),
@@ -26,7 +35,11 @@ namespace BuildingRegistry.Api.Extract.Extracts
                 extractItems.Count,
                 x => x.DbaseRecord);
 
-            var boundingBox = new BoundingBox3D(
+            yield return ExtractBuilder.CreateMetadataDbfFile(
+                ExtractFileNames.Building,
+                extractMetadata);
+
+        var boundingBox = new BoundingBox3D(
                 extractItems.Where(x => x.MinimumX > 0).Min(record => record.MinimumX),
                 extractItems.Where(x => x.MinimumY > 0).Min(record => record.MinimumY),
                 extractItems.Where(x => x.MaximumX > 0).Max(record => record.MaximumX),
