@@ -1,3 +1,10 @@
+# [2.30.0](https://github.com/informatievlaanderen/building-registry/compare/v2.29.8...v2.30.0) (2021-08-25)
+
+
+### Features
+
+* add metadata file with latest event id to building and buildingunit extract GRAR-2060 ([5e2d8b2](https://github.com/informatievlaanderen/building-registry/commit/5e2d8b27bf4e4bff2f5edf43164cfc5921c98c73))
+
 ## [2.29.8](https://github.com/informatievlaanderen/building-registry/compare/v2.29.7...v2.29.8) (2021-06-25)
 
 
