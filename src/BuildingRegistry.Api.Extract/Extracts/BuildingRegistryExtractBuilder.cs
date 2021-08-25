@@ -9,7 +9,6 @@ namespace BuildingRegistry.Api.Extract.Extracts
     using System.Collections.Generic;
     using System.Linq;
 
-
     public class BuildingRegistryExtractBuilder
     {
         public static IEnumerable<ExtractFile> CreateBuildingFiles(ExtractContext context)
