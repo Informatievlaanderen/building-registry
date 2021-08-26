@@ -1,3 +1,10 @@
+## [2.30.1](https://github.com/informatievlaanderen/building-registry/compare/v2.30.0...v2.30.1) (2021-08-26)
+
+
+### Bug Fixes
+
+* update grar-common dependencies GRAR-2060 ([3ab923a](https://github.com/informatievlaanderen/building-registry/commit/3ab923a51d91423a5897d35bc29288a3bcf021a5))
+
 # [2.30.0](https://github.com/informatievlaanderen/building-registry/compare/v2.29.8...v2.30.0) (2021-08-25)
 
 
