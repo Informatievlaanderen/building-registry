@@ -18,6 +18,12 @@ namespace BuildingRegistry.Tests
                 buildingUnitCollectionSnapshot.ReaddressedKeys
                     .ToDictionary(x => new BuildingUnitKey(x.Key), y => new BuildingUnitKey(y.Value)));
         }
+        public static BuildingUnitCollectionSnapshot WithReaddressedKeys(
+            this BuildingUnitCollectionSnapshot buildingUnitCollectionSnapshot,
+            Dictionary<BuildingUnitKey, BuildingUnitKey> readdressedKeys)
+        {
+            return new BuildingUnitCollectionSnapshot(buildingUnitCollectionSnapshot.BuildingUnits, readdressedKeys);
+        }
 
         public static BuildingUnitCollectionSnapshot CreateDefaultSnapshot()
         {
