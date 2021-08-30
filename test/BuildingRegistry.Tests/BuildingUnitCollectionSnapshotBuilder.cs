@@ -490,6 +490,16 @@ namespace BuildingRegistry.Tests
                 .WithAddressIds(new List<AddressId> { new AddressId(buildingUnitWasAdded.AddressId) });
         }
 
+        public static BuildingUnitSnapshot CreateDefaultSnapshotFor(BuildingUnitWasReaddedByOtherUnitRemoval buildingUnitWasAdded)
+        {
+            return CreateDefaultSnapshot(
+                    new BuildingId(buildingUnitWasAdded.BuildingId),
+                    new BuildingUnitId(buildingUnitWasAdded.BuildingUnitId),
+                    new BuildingUnitKey(buildingUnitWasAdded.BuildingUnitKey),
+                    buildingUnitWasAdded.BuildingUnitVersion)
+                .WithAddressIds(new List<AddressId> { new AddressId(buildingUnitWasAdded.AddressId) });
+        }
+
         public static BuildingUnitSnapshot CreateDefaultSnapshotFor(CommonBuildingUnitWasAdded buildingUnitWasAdded)
         {
             return CreateDefaultSnapshot(

@@ -354,7 +354,7 @@ namespace BuildingRegistry.Building
             Function = BuildingUnitFunction.Unknown;
             AddressIds = new List<AddressId> { new AddressId(@event.AddressId) };
             //BuildingGeometry = _parent.Geometry;
-
+            
             Version = @event.BuildingUnitVersion;
         }
 
