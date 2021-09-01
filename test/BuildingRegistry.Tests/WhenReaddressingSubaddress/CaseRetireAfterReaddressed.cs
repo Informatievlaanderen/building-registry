@@ -22,6 +22,7 @@ namespace BuildingRegistry.Tests.WhenReaddressingSubaddress
 
     public class CaseRetireAfterReaddressed : SnapshotBasedTest
     {
+        #region Snapshot variables
         private LocalDate _readdressingBeginDate;
         private ImportReaddressingHouseNumberFromCrab? _importReaddressingHouseNumberFromCrab;
         private ImportReaddressingSubaddressFromCrab? _importReaddressingSubaddress;
@@ -35,6 +36,7 @@ namespace BuildingRegistry.Tests.WhenReaddressingSubaddress
         private BuildingUnitWasReaddressed? _buildingUnitSubaddressWasReaddressed;
         private CommonBuildingUnitWasAdded? _commonBuildingUnitWasAdded;
         private BuildingUnitWasAdded? _buildingUnitNewSubaddressWasAdded;
+        #endregion
 
         private CrabTerrainObjectId Gebouw1CrabTerrainObjectId { get; }
         private CrabTerrainObjectHouseNumberId HuisNr16KoppelingId { get; }
