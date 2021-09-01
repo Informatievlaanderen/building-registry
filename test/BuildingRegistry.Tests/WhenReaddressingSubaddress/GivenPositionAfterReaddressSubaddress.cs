@@ -9,6 +9,11 @@ namespace BuildingRegistry.Tests.WhenReaddressingSubaddress
     using NetTopologySuite.IO;
     using NodaTime;
     using System;
+    using System.Collections.Generic;
+    using Be.Vlaanderen.Basisregisters.AggregateSource;
+    using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
+    using Building.DataStructures;
+    using Building.Events.Crab;
     using NetTopologySuite.Geometries;
     using ValueObjects;
     using ValueObjects.Crab;
@@ -19,11 +24,25 @@ namespace BuildingRegistry.Tests.WhenReaddressingSubaddress
     using Xunit;
     using Xunit.Abstractions;
 
-    public class GivenPositionAfterReaddressSubaddress : AutofacBasedTest
+    public class GivenPositionAfterReaddressSubaddress : SnapshotBasedTest
     {
-        protected readonly IFixture Fixture;
         private readonly Point _position;
         private readonly Geometry _geometry;
+        private WkbGeometry _wkbGeometry;
+
+        #region Snapshot variables
+
+        private BuildingUnitWasAdded? _buildingUnitWasAdded;
+        private ImportBuildingGeometryFromCrab? _importBuildingGeometryFromCrab;
+        private ImportSubaddressFromCrab? _importSubaddress;
+        private ImportSubaddressPositionFromCrab? _importSubaddressPosition;
+        private ImportReaddressingSubaddressFromCrab? _importReaddressingSubaddress;
+        private ImportSubaddressPositionFromCrab? _importNewSubaddressPosition;
+        private BuildingUnitWasAdded? _buildingUnit2WasAdded;
+        private CommonBuildingUnitWasAdded? _commonBuildingUnitWasAdded;
+        private BuildingUnitWasReaddressed? _buildingUnitWasReaddressed;
+
+        #endregion
 
         private CrabTerrainObjectId Gebouw1CrabTerrainObjectId { get; }
         private CrabTerrainObjectHouseNumberId HuisNr16KoppelingId { get; }
@@ -54,7 +73,7 @@ namespace BuildingRegistry.Tests.WhenReaddressingSubaddress
 
         public GivenPositionAfterReaddressSubaddress(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
         {
-            Fixture = new Fixture()
+            Fixture
                     .Customize(new InfrastructureCustomization())
                     .Customize(new WithNoDeleteModification())
                     .Customize(new WithInfiniteLifetime())
@@ -68,7 +87,8 @@ namespace BuildingRegistry.Tests.WhenReaddressingSubaddress
             NewSubaddressNr16Bus1Id = new CrabSubaddressId(163);
             ReaddressingBeginDate = new ReaddressingBeginDate(Fixture.Create<LocalDate>());
 
-            _geometry = new WKBReader().Read(Fixture.Create<WkbGeometry>());
+            _wkbGeometry = Fixture.Create<WkbGeometry>();
+            _geometry = new WKBReader().Read(_wkbGeometry);
             _position = _geometry.Centroid;
         }
 
@@ -78,53 +98,56 @@ namespace BuildingRegistry.Tests.WhenReaddressingSubaddress
                 .WithTerrainObjectHouseNumberId(HuisNr16KoppelingId)
                 .WithHouseNumberId(HuisNr16Id);
 
+            _buildingUnitWasAdded = new BuildingUnitWasAdded(Gebouw1Id, GebouwEenheid1Id, GebouwEenheid1Key, Address16Id, new BuildingUnitVersion(importTerrainObjectHouseNumberFromCrab.Timestamp));
             return new AutoFixtureScenario(Fixture)
                 .Given<BuildingWasRegistered>(Gebouw1Id)
                 .When(importTerrainObjectHouseNumberFromCrab)
                 .Then(Gebouw1Id,
-                    new BuildingUnitWasAdded(Gebouw1Id, GebouwEenheid1Id, GebouwEenheid1Key, Address16Id, new BuildingUnitVersion(importTerrainObjectHouseNumberFromCrab.Timestamp)),
+                    _buildingUnitWasAdded,
                     importTerrainObjectHouseNumberFromCrab.ToLegacyEvent());
         }
 
         public IEventCentricTestSpecificationBuilder AddBuildingPosition()
         {
-            var importBuildingGeometryFromCrab = Fixture.Create<ImportBuildingGeometryFromCrab>()
+            _importBuildingGeometryFromCrab = Fixture.Create<ImportBuildingGeometryFromCrab>()
                 .WithTerrainObjectId(Gebouw1CrabTerrainObjectId)
                 .WithGeometry(new WkbGeometry(_geometry.AsBinary()))
                 .WithGeometryMethod(CrabBuildingGeometryMethod.Grb);
 
             return new AutoFixtureScenario(Fixture)
                 .Given(AddHouseNumberUnit())
-                .When(importBuildingGeometryFromCrab)
+                .When(_importBuildingGeometryFromCrab)
                 .Then(Gebouw1Id,
-                    new BuildingWasMeasuredByGrb(Gebouw1Id, GeometryHelper.CreateEwkbFrom(Fixture.Create<WkbGeometry>())),
+                    new BuildingWasMeasuredByGrb(Gebouw1Id, GeometryHelper.CreateEwkbFrom(_wkbGeometry)),
                     new BuildingUnitPositionWasDerivedFromObject(Gebouw1Id, GebouwEenheid1Id, ExtendedWkbGeometry.CreateEWkb(_position.AsBinary())),
-                    importBuildingGeometryFromCrab.ToLegacyEvent());
+                    _importBuildingGeometryFromCrab.ToLegacyEvent());
         }
 
         public IEventCentricTestSpecificationBuilder AddSubaddress()
         {
-            var importSubaddress = Fixture.Create<ImportSubaddressFromCrab>()
+            _importSubaddress = Fixture.Create<ImportSubaddressFromCrab>()
                 .WithSubaddressId(OldSubaddressNr16Bus1Id)
                 .WithTerrainObjectHouseNumberId(HuisNr16KoppelingId);
 
+            _buildingUnit2WasAdded = new BuildingUnitWasAdded(Gebouw1Id, GebouwEenheid2Id, OldGebouwEenheid2Key, OldAddress16Bus1Id, new BuildingUnitVersion(_importSubaddress.Timestamp));
+            _commonBuildingUnitWasAdded = new CommonBuildingUnitWasAdded(Gebouw1Id, GebouwEenheid3Id, GebouwEenheid3Key, new BuildingUnitVersion(_importSubaddress.Timestamp));
             return new AutoFixtureScenario(Fixture)
                 .Given(AddBuildingPosition())
-                .When(importSubaddress)
+                .When(_importSubaddress)
                 .Then(Gebouw1Id,
-                    new BuildingUnitWasAdded(Gebouw1Id, GebouwEenheid2Id, OldGebouwEenheid2Key, OldAddress16Bus1Id, new BuildingUnitVersion(importSubaddress.Timestamp)),
+                    _buildingUnit2WasAdded,
                     new BuildingUnitPositionWasDerivedFromObject(Gebouw1Id, GebouwEenheid2Id, ExtendedWkbGeometry.CreateEWkb(_position.AsBinary())),
-                    new CommonBuildingUnitWasAdded(Gebouw1Id, GebouwEenheid3Id, GebouwEenheid3Key, new BuildingUnitVersion(importSubaddress.Timestamp)),
+                    _commonBuildingUnitWasAdded,
                     new BuildingUnitWasRealized(Gebouw1Id, GebouwEenheid3Id),
                     new BuildingUnitPositionWasDerivedFromObject(Gebouw1Id, GebouwEenheid3Id, ExtendedWkbGeometry.CreateEWkb(_position.AsBinary())),
                     new BuildingUnitBecameComplete(Gebouw1Id, GebouwEenheid3Id),
-                    importSubaddress.ToLegacyEvent());
+                    _importSubaddress.ToLegacyEvent());
         }
 
         public IEventCentricTestSpecificationBuilder SetSubaddressPosition()
         {
             var wkbGeometry = new WkbGeometry(GeometryHelper.OtherValidPointInPolygon.AsBinary());
-            var importSubaddressPosition = Fixture.Create<ImportSubaddressPositionFromCrab>()
+            _importSubaddressPosition = Fixture.Create<ImportSubaddressPositionFromCrab>()
                 .WithPositionOrigin(CrabAddressPositionOrigin.ManualIndicationFromLot)
                 .WithPosition(wkbGeometry)
                 .WithSubaddressId(OldSubaddressNr16Bus1Id)
@@ -133,33 +156,34 @@ namespace BuildingRegistry.Tests.WhenReaddressingSubaddress
 
             return new AutoFixtureScenario(Fixture)
                 .Given(AddSubaddress())
-                .When(importSubaddressPosition)
+                .When(_importSubaddressPosition)
                 .Then(Gebouw1Id,
                     new BuildingUnitPositionWasAppointedByAdministrator(Gebouw1Id, GebouwEenheid2Id, GeometryHelper.CreateEwkbFrom(wkbGeometry)),
-                    importSubaddressPosition.ToLegacyEvent());
+                    _importSubaddressPosition.ToLegacyEvent());
         }
 
         public IEventCentricTestSpecificationBuilder AddReaddressingOfSubaddress()
         {
-            var importReaddressingSubaddress = Fixture.Create<ImportReaddressingSubaddressFromCrab>()
+            _importReaddressingSubaddress = Fixture.Create<ImportReaddressingSubaddressFromCrab>()
                 .WithOldTerrainObjectHouseNumberId(HuisNr16KoppelingId)
                 .WithOldSubaddressId(OldSubaddressNr16Bus1Id)
                 .WithNewTerrainObjectHouseNumberId(HuisNr16KoppelingId)
                 .WithNewSubaddressId(NewSubaddressNr16Bus1Id)
                 .WithBeginDate(ReaddressingBeginDate);
 
+            _buildingUnitWasReaddressed = new BuildingUnitWasReaddressed(Gebouw1Id, GebouwEenheid2Id, OldAddress16Bus1Id, NewAddress16Bus1Id, ReaddressingBeginDate);
             return new AutoFixtureScenario(Fixture)
                 .Given(SetSubaddressPosition())
-                .When(importReaddressingSubaddress)
+                .When(_importReaddressingSubaddress)
                 .Then(Gebouw1Id,
-                    new BuildingUnitWasReaddressed(Gebouw1Id, GebouwEenheid2Id, OldAddress16Bus1Id, NewAddress16Bus1Id, ReaddressingBeginDate),
-                    importReaddressingSubaddress.ToLegacyEvent());
+                    _buildingUnitWasReaddressed,
+                    _importReaddressingSubaddress.ToLegacyEvent());
         }
 
         public IEventCentricTestSpecificationBuilder SetSubaddressPositionWithNewSubaddressId()
         {
             var wkbGeometry = new WkbGeometry(GeometryHelper.ValidPointInPolygon.AsBinary());
-            var importSubaddressPosition = Fixture.Create<ImportSubaddressPositionFromCrab>()
+            _importNewSubaddressPosition = Fixture.Create<ImportSubaddressPositionFromCrab>()
                 .WithPositionOrigin(CrabAddressPositionOrigin.ManualIndicationFromBuilding)
                 .WithPosition(wkbGeometry)
                 .WithSubaddressId(NewSubaddressNr16Bus1Id)
@@ -168,17 +192,17 @@ namespace BuildingRegistry.Tests.WhenReaddressingSubaddress
 
             return new AutoFixtureScenario(Fixture)
                 .Given(AddReaddressingOfSubaddress())
-                .When(importSubaddressPosition)
+                .When(_importNewSubaddressPosition)
                 .Then(Gebouw1Id,
                     new BuildingUnitPositionWasAppointedByAdministrator(Gebouw1Id, GebouwEenheid2Id, GeometryHelper.CreateEwkbFrom(wkbGeometry)),
-                    importSubaddressPosition.ToLegacyEvent());
+                    _importNewSubaddressPosition.ToLegacyEvent());
         }
 
         public IEventCentricTestSpecificationBuilder SetReaddressedSubaddressPositionWithOldSubaddressId()
         {
             var otherPoint = GeometryHelper.OtherValidPointInPolygon;
 
-            var importPosition = Fixture.Create<ImportSubaddressPositionFromCrab>()
+            var importPositionOldSubaddress = Fixture.Create<ImportSubaddressPositionFromCrab>()
                 .WithTerrainObjectHouseNumberId(HuisNr16KoppelingId)
                 .WithLifetime(new CrabLifetime(LocalDateTime.FromDateTime(DateTime.Now.AddDays(1)), null))
                 .WithPositionOrigin(CrabAddressPositionOrigin.ManualIndicationFromEntryOfBuilding)
@@ -187,13 +211,15 @@ namespace BuildingRegistry.Tests.WhenReaddressingSubaddress
 
             return new AutoFixtureScenario(Fixture)
                 .Given(SetSubaddressPositionWithNewSubaddressId())
-                .When(importPosition)
+                .When(importPositionOldSubaddress)
                 .Then(Gebouw1Id,
-                    importPosition.ToLegacyEvent());
+                    importPositionOldSubaddress.ToLegacyEvent());
         }
 
         public IEventCentricTestSpecificationBuilder SetSamePositionWithNewSubaddressIdButBeforePositionOldSubaddress()
         {
+            Fixture.Customize(new WithSnapshotInterval(1));
+
             var wkbGeometry = new WkbGeometry(GeometryHelper.ValidPointInPolygon.AsBinary());
             var importSubaddressPosition = Fixture.Create<ImportSubaddressPositionFromCrab>()
                 .WithPositionOrigin(CrabAddressPositionOrigin.ManualIndicationFromBuilding)
@@ -205,8 +231,51 @@ namespace BuildingRegistry.Tests.WhenReaddressingSubaddress
             return new AutoFixtureScenario(Fixture)
                 .Given(SetReaddressedSubaddressPositionWithOldSubaddressId())
                 .When(importSubaddressPosition)
-                .Then(Gebouw1Id,
-                    importSubaddressPosition.ToLegacyEvent());
+                .Then(new Fact[]
+                    {
+                        new Fact(Gebouw1Id, importSubaddressPosition.ToLegacyEvent()),
+                        new Fact(GetSnapshotIdentifier(Gebouw1Id), BuildingSnapshotBuilder.CreateDefaultSnapshot(Gebouw1Id)
+                            .WithGeometry(new BuildingGeometry(ExtendedWkbGeometry.CreateEWkb(_wkbGeometry), BuildingGeometryMethod.MeasuredByGrb))
+                            .WithGeometryChronicle(_importBuildingGeometryFromCrab)
+                            .WithLastModificationFromCrab(Modification.Update)
+                            .WithActiveHouseNumberIdsByTerrainObjectHouseNr(new Dictionary<CrabTerrainObjectHouseNumberId, CrabHouseNumberId>{{HuisNr16KoppelingId, HuisNr16Id}})
+                            .WithImportedTerrainObjectHouseNrIds(new List<CrabTerrainObjectHouseNumberId>{HuisNr16KoppelingId})
+                            .WithSubaddressEventsByTerrainObjectHouseNumberAndHouseNumber(new Dictionary<Tuple<CrabTerrainObjectHouseNumberId, CrabHouseNumberId>, List<AddressSubaddressWasImportedFromCrab>>
+                            {
+                                { new Tuple<CrabTerrainObjectHouseNumberId, CrabHouseNumberId>(HuisNr16KoppelingId, HuisNr16Id), new List<AddressSubaddressWasImportedFromCrab>{ _importSubaddress.ToLegacyEvent() } }
+                            })
+                            .WithSubaddressPositionEventsBySubaddressId(new Dictionary<CrabSubaddressId, List<AddressSubaddressPositionWasImportedFromCrab>>
+                            {
+                                { OldSubaddressNr16Bus1Id, new List<AddressSubaddressPositionWasImportedFromCrab> { _importSubaddressPosition.ToLegacyEvent() } },
+                                { NewSubaddressNr16Bus1Id, new List<AddressSubaddressPositionWasImportedFromCrab> { _importNewSubaddressPosition.ToLegacyEvent(), importSubaddressPosition.ToLegacyEvent() } }
+                            })
+                            .WithSubaddressReaddressedEventsByBuildingUnit(new Dictionary<BuildingUnitKey, SubaddressWasReaddressedFromCrab>
+                            {
+                                { OldGebouwEenheid2Key, _importReaddressingSubaddress.ToLegacyEvent()  }
+                            })
+                            .WithBuildingUnitCollection(BuildingUnitCollectionSnapshotBuilder.CreateDefaultSnapshot()
+                                .WithBuildingUnits(new List<BuildingUnitSnapshot>
+                                {
+                                    BuildingUnitSnapshotBuilder.CreateDefaultSnapshotFor(_buildingUnitWasAdded)
+                                        .WithPosition(new BuildingUnitPosition(ExtendedWkbGeometry.CreateEWkb(_position.AsBinary()), BuildingUnitPositionGeometryMethod.DerivedFromObject)),
+
+                                    BuildingUnitSnapshotBuilder.CreateDefaultSnapshotFor(_buildingUnit2WasAdded)
+                                        .WithAddressIds(new List<AddressId>{NewAddress16Bus1Id})
+                                        .WithPosition(new BuildingUnitPosition(ExtendedWkbGeometry.CreateEWkb(GeometryHelper.ValidPointInPolygon.AsBinary()), BuildingUnitPositionGeometryMethod.AppointedByAdministrator))
+                                        .WithReaddressedEvents(_buildingUnitWasReaddressed)
+                                        .WithSubaddressPositions(new List<AddressSubaddressPositionWasImportedFromCrab>{ _importSubaddressPosition.ToLegacyEvent(), _importNewSubaddressPosition.ToLegacyEvent(), importSubaddressPosition.ToLegacyEvent()}),
+
+                                    BuildingUnitSnapshotBuilder.CreateDefaultSnapshotFor(_commonBuildingUnitWasAdded)
+                                        .BecameComplete(true)
+                                        .WithStatus(BuildingUnitStatus.Realized)
+                                        .WithPosition(new BuildingUnitPosition(ExtendedWkbGeometry.CreateEWkb(_position.AsBinary()), BuildingUnitPositionGeometryMethod.DerivedFromObject))
+                                })
+                                .WithReaddressedKeys(new Dictionary<BuildingUnitKey, BuildingUnitKey>
+                                {
+                                    { NewGebouwEenheid2Key, OldGebouwEenheid2Key }
+                                }))
+                            .Build(20, EventSerializerSettings))
+                    });
         }
 
         [Fact]
