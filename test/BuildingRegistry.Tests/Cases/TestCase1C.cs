@@ -169,6 +169,8 @@ namespace BuildingRegistry.Tests.Cases
 
         public IEventCentricTestSpecificationBuilder T7()
         {
+            //TODO: add snapshotting
+
             var importTerrainObjectFromCrab = Fixture.Create<ImportTerrainObjectFromCrab>()
                 .WithModification(CrabModification.Delete);
 

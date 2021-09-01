@@ -99,6 +99,8 @@ namespace BuildingRegistry.Tests.Cases
 
         public IEventCentricTestSpecificationBuilder DeleteNewGeometry()
         {
+            //TODO: add snapshotting
+
             var buildingGeometryFromCrab = Fixture.Create<ImportBuildingGeometryFromCrab>()
                 .WithBuildingGeometryId(new CrabBuildingGeometryId(2))
                 .WithGeometry(new WkbGeometry(GeometryHelper.ValidPolygonWithNoValidPoints.AsBinary()))

@@ -249,6 +249,8 @@ namespace BuildingRegistry.Tests.Cases
 
         public IEventCentricTestSpecificationBuilder DeleteRelationWithHouseNr17()
         {
+            //TODO: add snapshotting
+
             var importTerrainObjectHouseNumberFromCrab = Fixture.Create<ImportTerrainObjectHouseNumberFromCrab>()
                 .WithTerrainObjectHouseNumberId(_.HuisNrKoppeling1Id)
                 .WithTimestamp(new CrabTimestamp(Instant.FromDateTimeOffset(DateTimeOffset.Now.AddDays(4))))

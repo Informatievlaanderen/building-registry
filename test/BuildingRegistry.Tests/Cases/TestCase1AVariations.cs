@@ -251,6 +251,8 @@ namespace BuildingRegistry.Tests.Cases
 
         public IEventCentricTestSpecificationBuilder UnretireHouseNumberBasedOnUnretireRetiredSubaddressT4BasedOnT3Historized()
         {
+            //TODO: Add snapshotting
+
             var importTerrainObjectHouseNumberFromCrab = Fixture.Create<ImportTerrainObjectHouseNumberFromCrab>()
                 .WithLifetime(new CrabLifetime(Fixture.Create<LocalDateTime>(), null))
                 .WithHouseNumberId(_.HuisNr16Id); //koppel huisnr 16
@@ -431,6 +433,8 @@ namespace BuildingRegistry.Tests.Cases
 
         public IEventCentricTestSpecificationBuilder BasedOnT3And3SubaddressesRetireHouseNumberSpecification()
         {
+            //TODO: add snapshotting
+
             var importTerrainObjectHouseNumberFromCrab = Fixture.Create<ImportTerrainObjectHouseNumberFromCrab>()
                 .WithLifetime(new CrabLifetime(Fixture.Create<LocalDateTime>(), Fixture.Create<LocalDateTime>()))
                 .WithHouseNumberId(_.HuisNr16Id); //koppel huisnr 16

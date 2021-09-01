@@ -207,6 +207,8 @@ namespace BuildingRegistry.Tests.Cases
 
         public IEventCentricTestSpecificationBuilder BasedOnT6RetireHouseNumberWithSubaddresses()
         {
+            //TODO: add snapshotting
+
             var importTerrainObjectHouseNumberFromCrab = Fixture.Create<ImportTerrainObjectHouseNumberFromCrab>()
                 .WithLifetime(new CrabLifetime(Fixture.Create<LocalDateTime>(), Fixture.Create<LocalDateTime>()))
                 .WithTerrainObjectHouseNumberId(_.HuisNr18KoppelingId)

@@ -430,6 +430,8 @@ namespace BuildingRegistry.Tests.Cases
 
         public void T8()
         {
+            //TODO: add snapshotting
+
             var skip = T7();
 
             var importHouseNumberPositionFromCrab = Fixture.Create<ImportTerrainObjectHouseNumberFromCrab>()

@@ -231,6 +231,8 @@ namespace BuildingRegistry.Tests.Cases
         [Fact]
         public int AddHouseNumber()
         {
+            //TODO: add snapshotting
+
             var skip = AddRetiredSubaddress();
 
             var importTerrainObjectHouseNumberFromCrab = Fixture.Create<ImportTerrainObjectHouseNumberFromCrab>()
