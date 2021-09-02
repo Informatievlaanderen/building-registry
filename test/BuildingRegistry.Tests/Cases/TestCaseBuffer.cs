@@ -1,5 +1,6 @@
 namespace BuildingRegistry.Tests.Cases
 {
+    using System;
     using Be.Vlaanderen.Basisregisters.Crab;
     using Autofixture;
     using AutoFixture;
@@ -11,8 +12,11 @@ namespace BuildingRegistry.Tests.Cases
     using System.Collections.Generic;
     using System.Linq;
     using Be.Vlaanderen.Basisregisters.AggregateSource.Snapshotting;
+    using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
+    using Building.DataStructures;
+    using Building.Events.Crab;
+    using Namotion.Reflection;
     using ValueObjects;
-    using ValueObjects.Crab;
     using WhenImportingCrabHouseNumberPosition;
     using WhenImportingCrabHouseNumberStatus;
     using WhenImportingCrabSubaddress;
@@ -21,17 +25,22 @@ namespace BuildingRegistry.Tests.Cases
     using Xunit;
     using Xunit.Abstractions;
 
-    public class TestCaseBuffer : AutofacBasedTest
+    public class TestCaseBuffer : SnapshotBasedTest
     {
         private TestCaseData _;
         private Building _building;
         private ImportSubaddressFromCrab _importSubaddressFromCrab;
         private ImportSubaddressFromCrab _importSubaddressFromCrab2;
-        protected IFixture Fixture { get; }
+        private ImportSubaddressStatusFromCrab? _importSubaddressStatusFromCrab;
+        private ImportSubaddressPositionFromCrab? _importSubaddressPositionFromCrab;
+        private ImportSubaddressStatusFromCrab? _importSubaddress2StatusFromCrab;
+        private ImportSubaddressPositionFromCrab? _importSubaddress2PositionFromCrab;
+        private ImportHouseNumberStatusFromCrab? _houseNumberStatusFromCrab;
+        private ImportHouseNumberPositionFromCrab? _importHouseNumberPositionFromCrab;
 
         public TestCaseBuffer(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
         {
-            Fixture = new Fixture()
+            Fixture
                 .Customize(new InfrastructureCustomization())
                 .Customize(new WithNoDeleteModification())
                 .Customize(new WithInfiniteLifetime())
@@ -109,29 +118,29 @@ namespace BuildingRegistry.Tests.Cases
 
         public int T0()
         {
-            var importSubaddressStatusFromCrab = Fixture.Create<ImportSubaddressStatusFromCrab>()
+            _importSubaddressStatusFromCrab = Fixture.Create<ImportSubaddressStatusFromCrab>()
                 .WithSubaddressId(_.SubaddressNr16Bus1Id)
                 .WithTerrainObjectHouseNumberId(_.HuisNr16KoppelingId)
                 .WithStatus(CrabAddressStatus.Proposed);
 
-            _building.ImportSubaddressStatusFromCrab(importSubaddressStatusFromCrab.TerrainObjectId,
+            _building.ImportSubaddressStatusFromCrab(_importSubaddressStatusFromCrab.TerrainObjectId,
 
-            importSubaddressStatusFromCrab.TerrainObjectHouseNumberId,
-                importSubaddressStatusFromCrab.SubaddressStatusId,
-                importSubaddressStatusFromCrab.SubaddressId,
-                importSubaddressStatusFromCrab.SubaddressStatus,
-                importSubaddressStatusFromCrab.Lifetime,
-                importSubaddressStatusFromCrab.Timestamp,
-                importSubaddressStatusFromCrab.Operator,
-                importSubaddressStatusFromCrab.Modification,
-                importSubaddressStatusFromCrab.Organisation);
+            _importSubaddressStatusFromCrab.TerrainObjectHouseNumberId,
+                _importSubaddressStatusFromCrab.SubaddressStatusId,
+                _importSubaddressStatusFromCrab.SubaddressId,
+                _importSubaddressStatusFromCrab.SubaddressStatus,
+                _importSubaddressStatusFromCrab.Lifetime,
+                _importSubaddressStatusFromCrab.Timestamp,
+                _importSubaddressStatusFromCrab.Operator,
+                _importSubaddressStatusFromCrab.Modification,
+                _importSubaddressStatusFromCrab.Organisation);
 
             _building.GetChanges()
                 .Skip(1)
                 .Should()
                 .BeEquivalentTo(new List<object>
                 {
-                    importSubaddressStatusFromCrab.ToLegacyEvent()
+                    _importSubaddressStatusFromCrab.ToLegacyEvent()
                 });
 
             return _building.GetChanges().Count();
@@ -141,30 +150,30 @@ namespace BuildingRegistry.Tests.Cases
         {
             var skip = T0();
 
-            var importSubaddressPositionFromCrab = Fixture.Create<ImportSubaddressPositionFromCrab>()
+            _importSubaddressPositionFromCrab = Fixture.Create<ImportSubaddressPositionFromCrab>()
                 .WithSubaddressId(_.SubaddressNr16Bus1Id)
                 .WithTerrainObjectHouseNumberId(_.HuisNr16KoppelingId)
                 .WithPosition(_.Subaddr1Geometry);
 
-            _building.ImportSubaddressPositionFromCrab(importSubaddressPositionFromCrab.TerrainObjectId,
-                importSubaddressPositionFromCrab.TerrainObjectHouseNumberId,
-                importSubaddressPositionFromCrab.AddressPositionId,
-                importSubaddressPositionFromCrab.SubaddressId,
-                importSubaddressPositionFromCrab.AddressPosition,
-                importSubaddressPositionFromCrab.AddressPositionOrigin,
-                importSubaddressPositionFromCrab.AddressNature,
-                importSubaddressPositionFromCrab.Lifetime,
-                importSubaddressPositionFromCrab.Timestamp,
-                importSubaddressPositionFromCrab.Operator,
-                importSubaddressPositionFromCrab.Modification,
-                importSubaddressPositionFromCrab.Organisation);
+            _building.ImportSubaddressPositionFromCrab(_importSubaddressPositionFromCrab.TerrainObjectId,
+                _importSubaddressPositionFromCrab.TerrainObjectHouseNumberId,
+                _importSubaddressPositionFromCrab.AddressPositionId,
+                _importSubaddressPositionFromCrab.SubaddressId,
+                _importSubaddressPositionFromCrab.AddressPosition,
+                _importSubaddressPositionFromCrab.AddressPositionOrigin,
+                _importSubaddressPositionFromCrab.AddressNature,
+                _importSubaddressPositionFromCrab.Lifetime,
+                _importSubaddressPositionFromCrab.Timestamp,
+                _importSubaddressPositionFromCrab.Operator,
+                _importSubaddressPositionFromCrab.Modification,
+                _importSubaddressPositionFromCrab.Organisation);
 
             _building.GetChanges()
                 .Skip(skip)
                 .Should()
                 .BeEquivalentTo(new List<object>
                 {
-                    importSubaddressPositionFromCrab.ToLegacyEvent()
+                    _importSubaddressPositionFromCrab.ToLegacyEvent()
                 });
 
             return _building.GetChanges().Count();
@@ -202,29 +211,29 @@ namespace BuildingRegistry.Tests.Cases
         {
             var skip = T2();
 
-            var importSubaddressStatusFromCrab = Fixture.Create<ImportSubaddressStatusFromCrab>()
+            _importSubaddress2StatusFromCrab = Fixture.Create<ImportSubaddressStatusFromCrab>()
                 .WithSubaddressId(_.SubaddressNr16Bus2Id)
                 .WithTerrainObjectHouseNumberId(_.HuisNr16KoppelingId)
                 .WithStatus(CrabAddressStatus.Proposed);
 
-            _building.ImportSubaddressStatusFromCrab(importSubaddressStatusFromCrab.TerrainObjectId,
+            _building.ImportSubaddressStatusFromCrab(_importSubaddress2StatusFromCrab.TerrainObjectId,
 
-            importSubaddressStatusFromCrab.TerrainObjectHouseNumberId,
-                importSubaddressStatusFromCrab.SubaddressStatusId,
-                importSubaddressStatusFromCrab.SubaddressId,
-                importSubaddressStatusFromCrab.SubaddressStatus,
-                importSubaddressStatusFromCrab.Lifetime,
-                importSubaddressStatusFromCrab.Timestamp,
-                importSubaddressStatusFromCrab.Operator,
-                importSubaddressStatusFromCrab.Modification,
-                importSubaddressStatusFromCrab.Organisation);
+            _importSubaddress2StatusFromCrab.TerrainObjectHouseNumberId,
+                _importSubaddress2StatusFromCrab.SubaddressStatusId,
+                _importSubaddress2StatusFromCrab.SubaddressId,
+                _importSubaddress2StatusFromCrab.SubaddressStatus,
+                _importSubaddress2StatusFromCrab.Lifetime,
+                _importSubaddress2StatusFromCrab.Timestamp,
+                _importSubaddress2StatusFromCrab.Operator,
+                _importSubaddress2StatusFromCrab.Modification,
+                _importSubaddress2StatusFromCrab.Organisation);
 
             _building.GetChanges()
                 .Skip(skip)
                 .Should()
                 .BeEquivalentTo(new List<object>
                 {
-                    importSubaddressStatusFromCrab.ToLegacyEvent()
+                    _importSubaddress2StatusFromCrab.ToLegacyEvent()
                 });
 
             return _building.GetChanges().Count();
@@ -234,30 +243,30 @@ namespace BuildingRegistry.Tests.Cases
         {
             var skip = T3();
 
-            var importSubaddressPositionFromCrab = Fixture.Create<ImportSubaddressPositionFromCrab>()
+            _importSubaddress2PositionFromCrab = Fixture.Create<ImportSubaddressPositionFromCrab>()
                 .WithSubaddressId(_.SubaddressNr16Bus2Id)
                 .WithTerrainObjectHouseNumberId(_.HuisNr16KoppelingId)
                 .WithPosition(_.Subaddr2Geometry);
 
-            _building.ImportSubaddressPositionFromCrab(importSubaddressPositionFromCrab.TerrainObjectId,
-                importSubaddressPositionFromCrab.TerrainObjectHouseNumberId,
-                importSubaddressPositionFromCrab.AddressPositionId,
-                importSubaddressPositionFromCrab.SubaddressId,
-                importSubaddressPositionFromCrab.AddressPosition,
-                importSubaddressPositionFromCrab.AddressPositionOrigin,
-                importSubaddressPositionFromCrab.AddressNature,
-                importSubaddressPositionFromCrab.Lifetime,
-                importSubaddressPositionFromCrab.Timestamp,
-                importSubaddressPositionFromCrab.Operator,
-                importSubaddressPositionFromCrab.Modification,
-                importSubaddressPositionFromCrab.Organisation);
+            _building.ImportSubaddressPositionFromCrab(_importSubaddress2PositionFromCrab.TerrainObjectId,
+                _importSubaddress2PositionFromCrab.TerrainObjectHouseNumberId,
+                _importSubaddress2PositionFromCrab.AddressPositionId,
+                _importSubaddress2PositionFromCrab.SubaddressId,
+                _importSubaddress2PositionFromCrab.AddressPosition,
+                _importSubaddress2PositionFromCrab.AddressPositionOrigin,
+                _importSubaddress2PositionFromCrab.AddressNature,
+                _importSubaddress2PositionFromCrab.Lifetime,
+                _importSubaddress2PositionFromCrab.Timestamp,
+                _importSubaddress2PositionFromCrab.Operator,
+                _importSubaddress2PositionFromCrab.Modification,
+                _importSubaddress2PositionFromCrab.Organisation);
 
             _building.GetChanges()
                 .Skip(skip)
                 .Should()
                 .BeEquivalentTo(new List<object>
                 {
-                    importSubaddressPositionFromCrab.ToLegacyEvent()
+                    _importSubaddress2PositionFromCrab.ToLegacyEvent()
                 });
 
             return _building.GetChanges().Count();
@@ -295,27 +304,27 @@ namespace BuildingRegistry.Tests.Cases
         {
             var skip = T5();
 
-            var houseNumberStatusFromCrab = Fixture.Create<ImportHouseNumberStatusFromCrab>()
+            _houseNumberStatusFromCrab = Fixture.Create<ImportHouseNumberStatusFromCrab>()
                 .WithTerrainObjectHouseNumberId(_.HuisNr16KoppelingId)
                 .WithStatus(CrabAddressStatus.Proposed);
 
-            _building.ImportHouseNumberStatusFromCrab(houseNumberStatusFromCrab.TerrainObjectId,
-                houseNumberStatusFromCrab.TerrainObjectHouseNumberId,
-                houseNumberStatusFromCrab.HouseNumberStatusId,
-                houseNumberStatusFromCrab.HouseNumberId,
-                houseNumberStatusFromCrab.AddressStatus,
-                houseNumberStatusFromCrab.Lifetime,
-                houseNumberStatusFromCrab.Timestamp,
-                houseNumberStatusFromCrab.Operator,
-                houseNumberStatusFromCrab.Modification,
-                houseNumberStatusFromCrab.Organisation);
+            _building.ImportHouseNumberStatusFromCrab(_houseNumberStatusFromCrab.TerrainObjectId,
+                _houseNumberStatusFromCrab.TerrainObjectHouseNumberId,
+                _houseNumberStatusFromCrab.HouseNumberStatusId,
+                _houseNumberStatusFromCrab.HouseNumberId,
+                _houseNumberStatusFromCrab.AddressStatus,
+                _houseNumberStatusFromCrab.Lifetime,
+                _houseNumberStatusFromCrab.Timestamp,
+                _houseNumberStatusFromCrab.Operator,
+                _houseNumberStatusFromCrab.Modification,
+                _houseNumberStatusFromCrab.Organisation);
 
             _building.GetChanges()
                 .Skip(skip)
                 .Should()
                 .BeEquivalentTo(new List<object>
                 {
-                    houseNumberStatusFromCrab.ToLegacyEvent()
+                    _houseNumberStatusFromCrab.ToLegacyEvent()
                 });
 
             return _building.GetChanges().Count();
@@ -357,29 +366,29 @@ namespace BuildingRegistry.Tests.Cases
         {
             var skip = T6();
 
-            var importHouseNumberPositionFromCrab = Fixture.Create<ImportHouseNumberPositionFromCrab>()
+            _importHouseNumberPositionFromCrab = Fixture.Create<ImportHouseNumberPositionFromCrab>()
                 .WithTerrainObjectHouseNumber(_.HuisNr16KoppelingId)
                 .WithPosition(_.HouseNrGeometry);
 
-            _building.ImportHouseNumberPositionFromCrab(importHouseNumberPositionFromCrab.TerrainObjectId,
-                importHouseNumberPositionFromCrab.TerrainObjectHouseNumberId,
-                importHouseNumberPositionFromCrab.AddressPositionId,
-                importHouseNumberPositionFromCrab.HouseNumberId,
-                importHouseNumberPositionFromCrab.AddressPosition,
-                importHouseNumberPositionFromCrab.AddressPositionOrigin,
-                importHouseNumberPositionFromCrab.AddressNature,
-                importHouseNumberPositionFromCrab.Lifetime,
-                importHouseNumberPositionFromCrab.Timestamp,
-                importHouseNumberPositionFromCrab.Operator,
-                importHouseNumberPositionFromCrab.Modification,
-                importHouseNumberPositionFromCrab.Organisation);
+            _building.ImportHouseNumberPositionFromCrab(_importHouseNumberPositionFromCrab.TerrainObjectId,
+                _importHouseNumberPositionFromCrab.TerrainObjectHouseNumberId,
+                _importHouseNumberPositionFromCrab.AddressPositionId,
+                _importHouseNumberPositionFromCrab.HouseNumberId,
+                _importHouseNumberPositionFromCrab.AddressPosition,
+                _importHouseNumberPositionFromCrab.AddressPositionOrigin,
+                _importHouseNumberPositionFromCrab.AddressNature,
+                _importHouseNumberPositionFromCrab.Lifetime,
+                _importHouseNumberPositionFromCrab.Timestamp,
+                _importHouseNumberPositionFromCrab.Operator,
+                _importHouseNumberPositionFromCrab.Modification,
+                _importHouseNumberPositionFromCrab.Organisation);
 
             _building.GetChanges()
                 .Skip(skip)
                 .Should()
                 .BeEquivalentTo(new List<object>
                 {
-                    importHouseNumberPositionFromCrab.ToLegacyEvent()
+                    _importHouseNumberPositionFromCrab.ToLegacyEvent()
                 });
 
             return _building.GetChanges().Count();
@@ -430,39 +439,42 @@ namespace BuildingRegistry.Tests.Cases
 
         public void T8()
         {
-            //TODO: add snapshotting
-
             var skip = T7();
 
-            var importHouseNumberPositionFromCrab = Fixture.Create<ImportTerrainObjectHouseNumberFromCrab>()
+            var importHouseNumberFromCrab = Fixture.Create<ImportTerrainObjectHouseNumberFromCrab>()
                 .WithHouseNumberId(_.HuisNr16Id)
                 .WithTerrainObjectHouseNumberId(_.HuisNr16KoppelingId);
 
             _building.ImportTerrainObjectHouseNumberFromCrab(
-                importHouseNumberPositionFromCrab.TerrainObjectHouseNumberId,
-                importHouseNumberPositionFromCrab.TerrainObjectId,
-                importHouseNumberPositionFromCrab.HouseNumberId,
-                importHouseNumberPositionFromCrab.Lifetime,
-                importHouseNumberPositionFromCrab.Timestamp,
-                importHouseNumberPositionFromCrab.Operator,
-                importHouseNumberPositionFromCrab.Modification,
-                importHouseNumberPositionFromCrab.Organisation);
+                importHouseNumberFromCrab.TerrainObjectHouseNumberId,
+                importHouseNumberFromCrab.TerrainObjectId,
+                importHouseNumberFromCrab.HouseNumberId,
+                importHouseNumberFromCrab.Lifetime,
+                importHouseNumberFromCrab.Timestamp,
+                importHouseNumberFromCrab.Operator,
+                importHouseNumberFromCrab.Modification,
+                importHouseNumberFromCrab.Organisation);
+
+            var buildingUnitWasAdded = new BuildingUnitWasAdded(_.Gebouw1Id, _.GebouwEenheid1Id, _.GebouwEenheid1Key, _.Address16Id, new BuildingUnitVersion(importHouseNumberFromCrab.Timestamp));
+            var buildingUnit2WasAdded = new BuildingUnitWasAdded(_.Gebouw1Id, _.GebouwEenheid2Id, _.GebouwEenheid2Key, _.Address16Bus1Id, new BuildingUnitVersion(importHouseNumberFromCrab.Timestamp));
+            var commonBuildingUnitWasAdded = new CommonBuildingUnitWasAdded(_.Gebouw1Id, _.GebouwEenheid3Id, _.GebouwEenheid3Key, new BuildingUnitVersion(importHouseNumberFromCrab.Timestamp));
+            var buildingUnit3WasAdded = new BuildingUnitWasAdded(_.Gebouw1Id, _.GebouwEenheid4Id, _.GebouwEenheid4Key, _.Address16Bus2Id, new BuildingUnitVersion(importHouseNumberFromCrab.Timestamp));
 
             _building.GetChanges()
                 .Skip(skip)
                 .Should()
                 .BeEquivalentTo(new List<object>
                 {
-                    new BuildingUnitWasAdded(_.Gebouw1Id, _.GebouwEenheid1Id, _.GebouwEenheid1Key, _.Address16Id, new BuildingUnitVersion(importHouseNumberPositionFromCrab.Timestamp)),
+                    buildingUnitWasAdded,
                     new BuildingUnitWasPlanned(_.Gebouw1Id, _.GebouwEenheid1Id),
 
-                    new BuildingUnitWasAdded(_.Gebouw1Id, _.GebouwEenheid2Id, _.GebouwEenheid2Key, _.Address16Bus1Id, new BuildingUnitVersion(importHouseNumberPositionFromCrab.Timestamp)),
+                    buildingUnit2WasAdded,
                     new BuildingUnitWasPlanned(_.Gebouw1Id, _.GebouwEenheid2Id),
 
-                    new CommonBuildingUnitWasAdded(_.Gebouw1Id, _.GebouwEenheid3Id, _.GebouwEenheid3Key, new BuildingUnitVersion(importHouseNumberPositionFromCrab.Timestamp)),
+                    commonBuildingUnitWasAdded,
                     new BuildingUnitWasRealized(_.Gebouw1Id, _.GebouwEenheid3Id),
 
-                    new BuildingUnitWasAdded(_.Gebouw1Id, _.GebouwEenheid4Id, _.GebouwEenheid4Key, _.Address16Bus2Id, new BuildingUnitVersion(importHouseNumberPositionFromCrab.Timestamp)),
+                    buildingUnit3WasAdded,
                     new BuildingUnitWasPlanned(_.Gebouw1Id, _.GebouwEenheid4Id),
 
                     new BuildingUnitWasRetired(_.Gebouw1Id, _.GebouwEenheid1Id),
@@ -470,8 +482,65 @@ namespace BuildingRegistry.Tests.Cases
 
                     new BuildingUnitAddressWasAttached(_.Gebouw1Id, _.Address16Id, _.GebouwEenheid3Id),
 
-                    importHouseNumberPositionFromCrab.ToLegacyEvent()
+                    importHouseNumberFromCrab.ToLegacyEvent()
                 }, config => config.WithStrictOrdering());
+
+            _building.TakeSnapshot()
+                .Should()
+                .BeOfType<BuildingSnapshot>()
+                .And
+                .Should()
+                .BeEquivalentTo(
+                    BuildingSnapshotBuilder.CreateDefaultSnapshot(_.Gebouw1Id)
+                        .WithActiveHouseNumberIdsByTerrainObjectHouseNr(new Dictionary<CrabTerrainObjectHouseNumberId, CrabHouseNumberId>
+                        {
+                            { _.HuisNr16KoppelingId, _.HuisNr16Id  }
+                        })
+                        .WithImportedTerrainObjectHouseNrIds(new List<CrabTerrainObjectHouseNumberId>{_.HuisNr16KoppelingId})
+                        .WithHouseNumberPositionEventsByHouseNumberId(new Dictionary<AddressId, List<AddressHouseNumberPositionWasImportedFromCrab>>
+                        {
+                            { _.Address16Id, new List<AddressHouseNumberPositionWasImportedFromCrab>{_importHouseNumberPositionFromCrab.ToLegacyEvent()}}
+                        })
+                        .WithHouseNumberStatusEventsByHouseNumberId(new Dictionary<AddressId, List<AddressHouseNumberStatusWasImportedFromCrab>>
+                        {
+                            { _.Address16Id, new List<AddressHouseNumberStatusWasImportedFromCrab>{_houseNumberStatusFromCrab.ToLegacyEvent()} }
+                        })
+                        .WithSubaddressEventsByTerrainObjectHouseNumberAndHouseNumber(new Dictionary<Tuple<CrabTerrainObjectHouseNumberId, CrabHouseNumberId>, List<AddressSubaddressWasImportedFromCrab>>
+                            {
+                                { new Tuple<CrabTerrainObjectHouseNumberId, CrabHouseNumberId>(_.HuisNr16KoppelingId, _.HuisNr16Id), new List<AddressSubaddressWasImportedFromCrab>
+                                    { _importSubaddressFromCrab.ToLegacyEvent(), _importSubaddressFromCrab2.ToLegacyEvent()}
+                                }
+                            })
+                        .WithSubaddressStatusEventsBySubaddressId(new Dictionary<CrabSubaddressId, List<AddressSubaddressStatusWasImportedFromCrab>>
+                        {
+                            { _.SubaddressNr16Bus1Id, new List<AddressSubaddressStatusWasImportedFromCrab>{_importSubaddressStatusFromCrab.ToLegacyEvent()} },
+                            { _.SubaddressNr16Bus2Id, new List<AddressSubaddressStatusWasImportedFromCrab>{_importSubaddress2StatusFromCrab.ToLegacyEvent()} }
+                        })
+                        .WithSubaddressPositionEventsBySubaddressId(new Dictionary<CrabSubaddressId, List<AddressSubaddressPositionWasImportedFromCrab>>
+                        {
+                            { _.SubaddressNr16Bus1Id, new List<AddressSubaddressPositionWasImportedFromCrab>{_importSubaddressPositionFromCrab.ToLegacyEvent()} },
+                            { _.SubaddressNr16Bus2Id, new List<AddressSubaddressPositionWasImportedFromCrab>{ _importSubaddress2PositionFromCrab.ToLegacyEvent()} }
+                        })
+                        .WithLastModificationFromCrab(Modification.Update)
+                        .WithBuildingUnitCollection(BuildingUnitCollectionSnapshotBuilder.CreateDefaultSnapshot()
+                            .WithBuildingUnits(new List<BuildingUnitSnapshot>
+                            {
+                                BuildingUnitSnapshotBuilder.CreateDefaultSnapshotFor(buildingUnitWasAdded)
+                                    .WithStatus(BuildingUnitStatus.NotRealized)
+                                    .WithPreviousAddressId(_.Address16Id)
+                                    .WithAddressIds(new List<AddressId>()),
+
+                                BuildingUnitSnapshotBuilder.CreateDefaultSnapshotFor(buildingUnit2WasAdded)
+                                    .WithStatus(BuildingUnitStatus.Planned),
+
+                                BuildingUnitSnapshotBuilder.CreateDefaultSnapshotFor(commonBuildingUnitWasAdded)
+                                    .WithStatus(BuildingUnitStatus.Realized)
+                                    .WithAddressIds(new List<AddressId>{_.Address16Id}),
+
+                                BuildingUnitSnapshotBuilder.CreateDefaultSnapshotFor(buildingUnit3WasAdded)
+                                    .WithStatus(BuildingUnitStatus.Planned)
+                            }))
+                    , config => config.AllowingInfiniteRecursion().ExcludingMissingMembers());
         }
 
         [Fact]
