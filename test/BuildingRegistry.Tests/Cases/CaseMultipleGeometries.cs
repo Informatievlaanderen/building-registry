@@ -1,10 +1,13 @@
 namespace BuildingRegistry.Tests.Cases
 {
     using System;
+    using System.Collections.Generic;
     using Autofixture;
     using AutoFixture;
+    using Be.Vlaanderen.Basisregisters.AggregateSource;
     using Be.Vlaanderen.Basisregisters.AggregateSource.Testing;
     using Be.Vlaanderen.Basisregisters.Crab;
+    using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Building.Commands.Crab;
     using Building.Events;
     using NodaTime;
@@ -15,16 +18,19 @@ namespace BuildingRegistry.Tests.Cases
     using Xunit;
     using Xunit.Abstractions;
 
-    public class CaseMultipleGeometries : AutofacBasedTest
+    public class CaseMultipleGeometries : SnapshotBasedTest
     {
+        private ImportBuildingGeometryFromCrab? _buildingGeometryFromCrab;
+        private ImportBuildingGeometryFromCrab? _retireBuildingGeometryFromCrab;
+        private ImportBuildingGeometryFromCrab? _newBuildingGeometryFromCrab;
+
         public CaseMultipleGeometries(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
         {
-            Fixture = new Fixture()
+            Fixture
                 .Customize(new InfrastructureCustomization())
                 .Customize(new WithNoDeleteModification())
                 .Customize(new WithInfiniteLifetime())
-                .Customize(new WithFixedBuildingUnitIdFromHouseNumber(1, 16))
-                ;
+                .Customize(new WithFixedBuildingUnitIdFromHouseNumber(1, 16));
 
             _ = new TestCase1AData(Fixture);
         }
@@ -44,12 +50,11 @@ namespace BuildingRegistry.Tests.Cases
             public LocalDateTime FromDateGeometry2 => LocalDateTime.FromDateTime(DateTime.Now.AddDays(2));
         }
 
-        protected readonly IFixture Fixture;
         protected TestCase1AData _ { get; }
 
         public IEventCentricTestSpecificationBuilder AddGeometry()
         {
-            var buildingGeometryFromCrab = Fixture.Create<ImportBuildingGeometryFromCrab>()
+            _buildingGeometryFromCrab = Fixture.Create<ImportBuildingGeometryFromCrab>()
                 .WithBuildingGeometryId(new CrabBuildingGeometryId(1))
                 .WithGeometry(new WkbGeometry(GeometryHelper.ValidPolygon.AsBinary()))
                 .WithGeometryMethod(CrabBuildingGeometryMethod.Grb)
@@ -58,31 +63,31 @@ namespace BuildingRegistry.Tests.Cases
 
             return new AutoFixtureScenario(Fixture)
                 .Given<BuildingWasRegistered>(_.Gebouw1Id)
-                .When(buildingGeometryFromCrab)
+                .When(_buildingGeometryFromCrab)
                 .Then(_.Gebouw1Id,
                     new BuildingWasMeasuredByGrb(_.Gebouw1Id, ExtendedWkbGeometry.CreateEWkb(GeometryHelper.ValidPolygon.AsBinary())),
-                    buildingGeometryFromCrab.ToLegacyEvent());
+                    _buildingGeometryFromCrab.ToLegacyEvent());
         }
 
         public IEventCentricTestSpecificationBuilder RetireGeometry()
         {
-            var buildingGeometryFromCrab = Fixture.Create<ImportBuildingGeometryFromCrab>()
-                    .WithBuildingGeometryId(new CrabBuildingGeometryId(1))
-                    .WithGeometry(new WkbGeometry(GeometryHelper.ValidPolygon.AsBinary()))
-                    .WithGeometryMethod(CrabBuildingGeometryMethod.Grb)
-                    .WithLifetime(new CrabLifetime(_.FromDateGeometry1, _.ToDateGeometry1))
-                    .WithTimestamp(new CrabTimestamp(Instant.FromDateTimeOffset(DateTimeOffset.Now.AddDays(1)))); ;
+            _retireBuildingGeometryFromCrab = Fixture.Create<ImportBuildingGeometryFromCrab>()
+                .WithBuildingGeometryId(new CrabBuildingGeometryId(1))
+                .WithGeometry(new WkbGeometry(GeometryHelper.ValidPolygon.AsBinary()))
+                .WithGeometryMethod(CrabBuildingGeometryMethod.Grb)
+                .WithLifetime(new CrabLifetime(_.FromDateGeometry1, _.ToDateGeometry1))
+                .WithTimestamp(new CrabTimestamp(Instant.FromDateTimeOffset(DateTimeOffset.Now.AddDays(1)))); ;
 
             return new AutoFixtureScenario(Fixture)
                 .Given(AddGeometry())
-                .When(buildingGeometryFromCrab)
+                .When(_retireBuildingGeometryFromCrab)
                 .Then(_.Gebouw1Id,
-                    buildingGeometryFromCrab.ToLegacyEvent());
+                    _retireBuildingGeometryFromCrab.ToLegacyEvent());
         }
 
         public IEventCentricTestSpecificationBuilder AddNewGeometry()
         {
-            var buildingGeometryFromCrab = Fixture.Create<ImportBuildingGeometryFromCrab>()
+            _newBuildingGeometryFromCrab = Fixture.Create<ImportBuildingGeometryFromCrab>()
                 .WithBuildingGeometryId(new CrabBuildingGeometryId(2))
                 .WithGeometry(new WkbGeometry(GeometryHelper.ValidPolygonWithNoValidPoints.AsBinary()))
                 .WithGeometryMethod(CrabBuildingGeometryMethod.Grb)
@@ -91,15 +96,15 @@ namespace BuildingRegistry.Tests.Cases
 
             return new AutoFixtureScenario(Fixture)
                 .Given(RetireGeometry())
-                .When(buildingGeometryFromCrab)
+                .When(_newBuildingGeometryFromCrab)
                 .Then(_.Gebouw1Id,
                     new BuildingWasMeasuredByGrb(_.Gebouw1Id, ExtendedWkbGeometry.CreateEWkb(GeometryHelper.ValidPolygonWithNoValidPoints.AsBinary())),
-                    buildingGeometryFromCrab.ToLegacyEvent());
+                    _newBuildingGeometryFromCrab.ToLegacyEvent());
         }
 
         public IEventCentricTestSpecificationBuilder DeleteNewGeometry()
         {
-            //TODO: add snapshotting
+            Fixture.Customize(new WithSnapshotInterval(1));
 
             var buildingGeometryFromCrab = Fixture.Create<ImportBuildingGeometryFromCrab>()
                 .WithBuildingGeometryId(new CrabBuildingGeometryId(2))
@@ -112,9 +117,21 @@ namespace BuildingRegistry.Tests.Cases
             return new AutoFixtureScenario(Fixture)
                 .Given(AddNewGeometry())
                 .When(buildingGeometryFromCrab)
-                .Then(_.Gebouw1Id,
-                    new BuildingWasMeasuredByGrb(_.Gebouw1Id, ExtendedWkbGeometry.CreateEWkb(GeometryHelper.ValidPolygon.AsBinary())),
-                    buildingGeometryFromCrab.ToLegacyEvent());
+                .Then(
+                    new Fact(_.Gebouw1Id, new BuildingWasMeasuredByGrb(_.Gebouw1Id, ExtendedWkbGeometry.CreateEWkb(GeometryHelper.ValidPolygon.AsBinary()))),
+                    new Fact(_.Gebouw1Id, buildingGeometryFromCrab.ToLegacyEvent()),
+                    new Fact(GetSnapshotIdentifier(_.Gebouw1Id), BuildingSnapshotBuilder.CreateDefaultSnapshot(_.Gebouw1Id)
+                        .WithLastModificationFromCrab(Modification.Update)
+                        .WithGeometry(new BuildingGeometry(ExtendedWkbGeometry.CreateEWkb(GeometryHelper.ValidPolygon.AsBinary()), BuildingGeometryMethod.MeasuredByGrb))
+                        .WithGeometryChronicle(new List<ImportBuildingGeometryFromCrab>
+                        {
+                            _buildingGeometryFromCrab,
+                            _retireBuildingGeometryFromCrab,
+                            _newBuildingGeometryFromCrab,
+                            buildingGeometryFromCrab
+                        })
+                        .Build(7, EventSerializerSettings))
+                );
         }
 
         [Fact]
