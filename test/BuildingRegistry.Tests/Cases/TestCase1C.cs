@@ -1,11 +1,17 @@
 namespace BuildingRegistry.Tests.Cases
 {
+    using System;
+    using System.Collections.Generic;
     using Be.Vlaanderen.Basisregisters.AggregateSource.Testing;
     using Be.Vlaanderen.Basisregisters.Crab;
     using Autofixture;
     using AutoFixture;
+    using Be.Vlaanderen.Basisregisters.AggregateSource;
+    using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Building.Commands.Crab;
+    using Building.DataStructures;
     using Building.Events;
+    using Building.Events.Crab;
     using ValueObjects;
     using WhenImportingCrabSubaddress;
     using WhenImportingCrabTerrainObject;
@@ -13,16 +19,31 @@ namespace BuildingRegistry.Tests.Cases
     using Xunit;
     using Xunit.Abstractions;
 
-    public class TestCase1C : AutofacBasedTest
+    public class TestCase1C : SnapshotBasedTest
     {
+        #region Snapshot variables
+
+        private ImportTerrainObjectHouseNumberFromCrab? _importTerrainObjectHouseNumberFromCrab;
+        private ImportSubaddressFromCrab? _importSubaddressFromCrab;
+        private ImportSubaddressFromCrab? _importSubaddress2FromCrab;
+        private ImportSubaddressFromCrab? _importSubaddress2RemoveFromCrab;
+        private ImportSubaddressFromCrab? _importSubaddressRemoveFromCrab;
+        private ImportTerrainObjectHouseNumberFromCrab? _importTerrainObjectHouseNumberRemoveFromCrab;
+        private BuildingUnitWasAdded? _buildingUnitWasAdded;
+        private BuildingUnitWasAdded? _buildingUnit2WasAdded;
+        private CommonBuildingUnitWasAdded? _commonBuildingUnitWasAdded;
+        private BuildingUnitWasAdded? _buildingUnit3WasAdded;
+        private BuildingUnitWasReaddedByOtherUnitRemoval? _buildingUnitWasReaddedByOtherUnitRemoval;
+
+        #endregion
+
         public TestCase1C(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
         {
-            Fixture = new Fixture()
+            Fixture
                     .Customize(new InfrastructureCustomization())
                     .Customize(new WithNoDeleteModification())
                     .Customize(new WithInfiniteLifetime())
-                    .Customize(new WithFixedBuildingUnitIdFromHouseNumber(1, 16))
-                ;
+                    .Customize(new WithFixedBuildingUnitIdFromHouseNumber(1, 16));
 
             _ = new TestCase1CData(Fixture);
         }
@@ -70,106 +91,113 @@ namespace BuildingRegistry.Tests.Cases
             public AddressId Address16Bus2Id => AddressId.CreateFor(SubaddressNr16Bus2Id);
         }
 
-        protected IFixture Fixture { get; }
         protected TestCase1CData _ { get; }
 
         public IEventCentricTestSpecificationBuilder T1()
         {
-            var importTerrainObjectHouseNumberFromCrab = Fixture.Create<ImportTerrainObjectHouseNumberFromCrab>()
-                .WithHouseNumberId(_.HuisNr16Id); //koppel huisnr 16
+            _importTerrainObjectHouseNumberFromCrab = Fixture.Create<ImportTerrainObjectHouseNumberFromCrab>()
+                .WithHouseNumberId(_.HuisNr16Id);
 
+            _buildingUnitWasAdded = new BuildingUnitWasAdded(_.Gebouw1Id, _.GebouwEenheid1Id, _.GebouwEenheid1Key, _.Address16Id, new BuildingUnitVersion(_importTerrainObjectHouseNumberFromCrab.Timestamp));
             return new AutoFixtureScenario(Fixture)
                 .Given<BuildingWasRegistered>(_.Gebouw1Id)
-                .When(importTerrainObjectHouseNumberFromCrab)
+                .When(_importTerrainObjectHouseNumberFromCrab)
                 .Then(_.Gebouw1Id,
-                    new BuildingUnitWasAdded(_.Gebouw1Id, _.GebouwEenheid1Id, _.GebouwEenheid1Key, _.Address16Id, new BuildingUnitVersion(importTerrainObjectHouseNumberFromCrab.Timestamp)),
-                    importTerrainObjectHouseNumberFromCrab.ToLegacyEvent());
+                    _buildingUnitWasAdded,
+                    _importTerrainObjectHouseNumberFromCrab.ToLegacyEvent());
         }
 
         public IEventCentricTestSpecificationBuilder T2()
         {
-            var importSubaddressFromCrab = Fixture.Create<ImportSubaddressFromCrab>()
+            _importSubaddressFromCrab = Fixture.Create<ImportSubaddressFromCrab>()
                 .WithSubaddressId(_.SubaddressNr16Bus1Id)
                 .WithTerrainObjectHouseNumberId(_.HuisNr16KoppelingId);
 
+            _buildingUnit2WasAdded = new BuildingUnitWasAdded(_.Gebouw1Id, _.GebouwEenheid2Id, _.GebouwEenheid2Key, _.Address16Bus1Id, new BuildingUnitVersion(_importSubaddressFromCrab.Timestamp));
+            _commonBuildingUnitWasAdded = new CommonBuildingUnitWasAdded(_.Gebouw1Id, _.GebouwEenheid3Id, _.GebouwEenheid3Key, new BuildingUnitVersion(_importSubaddressFromCrab.Timestamp));
+
             return new AutoFixtureScenario(Fixture)
                 .Given(T1())
-                .When(importSubaddressFromCrab)
+                .When(_importSubaddressFromCrab)
                 .Then(_.Gebouw1Id,
-                    new BuildingUnitWasAdded(_.Gebouw1Id, _.GebouwEenheid2Id, _.GebouwEenheid2Key, _.Address16Bus1Id, new BuildingUnitVersion(importSubaddressFromCrab.Timestamp)),
-                    new CommonBuildingUnitWasAdded(_.Gebouw1Id, _.GebouwEenheid3Id, _.GebouwEenheid3Key, new BuildingUnitVersion(importSubaddressFromCrab.Timestamp)),
+                    _buildingUnit2WasAdded,
+                    _commonBuildingUnitWasAdded,
                     new BuildingUnitWasRealized(_.Gebouw1Id, _.GebouwEenheid3Id),
-                    importSubaddressFromCrab.ToLegacyEvent());
+                    _importSubaddressFromCrab.ToLegacyEvent());
         }
 
         public IEventCentricTestSpecificationBuilder T3()
         {
-            var importSubaddressFromCrab = Fixture.Create<ImportSubaddressFromCrab>()
+            _importSubaddress2FromCrab = Fixture.Create<ImportSubaddressFromCrab>()
                 .WithSubaddressId(_.SubaddressNr16Bus2Id)
                 .WithTerrainObjectHouseNumberId(_.HuisNr16KoppelingId);
 
+            _buildingUnit3WasAdded = new BuildingUnitWasAdded(_.Gebouw1Id, _.GebouwEenheid4Id, _.GebouwEenheid4Key, _.Address16Bus2Id, new BuildingUnitVersion(_importSubaddress2FromCrab.Timestamp));
+
             return new AutoFixtureScenario(Fixture)
                 .Given(T2())
-                .When(importSubaddressFromCrab)
+                .When(_importSubaddress2FromCrab)
                 .Then(_.Gebouw1Id,
-                    new BuildingUnitWasAdded(_.Gebouw1Id, _.GebouwEenheid4Id, _.GebouwEenheid4Key, _.Address16Bus2Id, new BuildingUnitVersion(importSubaddressFromCrab.Timestamp)),
+                    _buildingUnit3WasAdded,
                     new BuildingUnitWasNotRealized(_.Gebouw1Id, _.GebouwEenheid1Id),
                     new BuildingUnitAddressWasDetached(_.Gebouw1Id, _.Address16Id, _.GebouwEenheid1Id),
                     new BuildingUnitAddressWasAttached(_.Gebouw1Id, _.Address16Id, _.GebouwEenheid3Id),
-                    importSubaddressFromCrab.ToLegacyEvent());
+                    _importSubaddress2FromCrab.ToLegacyEvent());
         }
 
         public IEventCentricTestSpecificationBuilder T4()
         {
-            var importSubaddressFromCrab = Fixture.Create<ImportSubaddressFromCrab>()
+            _importSubaddress2RemoveFromCrab = Fixture.Create<ImportSubaddressFromCrab>()
                 .WithSubaddressId(_.SubaddressNr16Bus2Id)
                 .WithTerrainObjectHouseNumberId(_.HuisNr16KoppelingId)
                 .WithModification(CrabModification.Delete);
 
+            _buildingUnitWasReaddedByOtherUnitRemoval = new BuildingUnitWasReaddedByOtherUnitRemoval(_.Gebouw1Id, _.GebouwEenheid5Id, _.GebouwEenheid5Key, _.Address16Id, new BuildingUnitVersion(_importSubaddress2RemoveFromCrab.Timestamp), _.GebouwEenheid1Id);
+
             return new AutoFixtureScenario(Fixture)
                 .Given(T3())
-                .When(importSubaddressFromCrab)
+                .When(_importSubaddress2RemoveFromCrab)
                 .Then(_.Gebouw1Id,
                     new BuildingUnitWasRemoved(_.Gebouw1Id, _.GebouwEenheid4Id),
                     new BuildingUnitAddressWasDetached(_.Gebouw1Id, _.Address16Id, _.GebouwEenheid3Id),
-                    new BuildingUnitWasReaddedByOtherUnitRemoval(_.Gebouw1Id, _.GebouwEenheid5Id, _.GebouwEenheid5Key, _.Address16Id, new BuildingUnitVersion(importSubaddressFromCrab.Timestamp), _.GebouwEenheid1Id),
-                    importSubaddressFromCrab.ToLegacyEvent());
+                    _buildingUnitWasReaddedByOtherUnitRemoval,
+                    _importSubaddress2RemoveFromCrab.ToLegacyEvent());
         }
 
         public IEventCentricTestSpecificationBuilder T5()
         {
-            var importSubaddressFromCrab = Fixture.Create<ImportSubaddressFromCrab>()
+            _importSubaddressRemoveFromCrab = Fixture.Create<ImportSubaddressFromCrab>()
                 .WithSubaddressId(_.SubaddressNr16Bus1Id)
                 .WithTerrainObjectHouseNumberId(_.HuisNr16KoppelingId)
                 .WithModification(CrabModification.Delete);
 
             return new AutoFixtureScenario(Fixture)
                 .Given(T4())
-                .When(importSubaddressFromCrab)
+                .When(_importSubaddressRemoveFromCrab)
                 .Then(_.Gebouw1Id,
                     new BuildingUnitWasRemoved(_.Gebouw1Id, _.GebouwEenheid2Id),
                     new BuildingUnitWasRemoved(_.Gebouw1Id, _.GebouwEenheid3Id),
-                    importSubaddressFromCrab.ToLegacyEvent());
+                    _importSubaddressRemoveFromCrab.ToLegacyEvent());
         }
 
         public IEventCentricTestSpecificationBuilder T6()
         {
-            var importTerrainObjectHouseNumberFromCrab = Fixture.Create<ImportTerrainObjectHouseNumberFromCrab>()
+            _importTerrainObjectHouseNumberRemoveFromCrab = Fixture.Create<ImportTerrainObjectHouseNumberFromCrab>()
                 .WithHouseNumberId(_.HuisNr16Id)
                 .WithModification(CrabModification.Delete);
 
             return new AutoFixtureScenario(Fixture)
                 .Given(T5())
-                .When(importTerrainObjectHouseNumberFromCrab)
+                .When(_importTerrainObjectHouseNumberRemoveFromCrab)
                 .Then(_.Gebouw1Id,
                     new BuildingUnitWasRemoved(_.Gebouw1Id, _.GebouwEenheid5Id),
                     new BuildingUnitWasRemoved(_.Gebouw1Id, _.GebouwEenheid1Id),
-                    importTerrainObjectHouseNumberFromCrab.ToLegacyEvent());
+                    _importTerrainObjectHouseNumberRemoveFromCrab.ToLegacyEvent());
         }
 
         public IEventCentricTestSpecificationBuilder T7()
         {
-            //TODO: add snapshotting
+            Fixture.Customize(new WithSnapshotInterval(1));
 
             var importTerrainObjectFromCrab = Fixture.Create<ImportTerrainObjectFromCrab>()
                 .WithModification(CrabModification.Delete);
@@ -177,9 +205,44 @@ namespace BuildingRegistry.Tests.Cases
             return new AutoFixtureScenario(Fixture)
                 .Given(T6())
                 .When(importTerrainObjectFromCrab)
-                .Then(_.Gebouw1Id,
-                    new BuildingWasRemoved(_.Gebouw1Id, new BuildingUnitId[0]),
-                    importTerrainObjectFromCrab.ToLegacyEvent());
+                .Then(
+                    new Fact(_.Gebouw1Id, new BuildingWasRemoved(_.Gebouw1Id, new BuildingUnitId[0])),
+                    new Fact(_.Gebouw1Id, importTerrainObjectFromCrab.ToLegacyEvent()),
+                    new Fact(GetSnapshotIdentifier(_.Gebouw1Id),
+                        BuildingSnapshotBuilder.CreateDefaultSnapshot(_.Gebouw1Id)
+                            .WithLastModificationFromCrab(Modification.Delete)
+                            .WithIsRemoved(true)
+                            .WithSubaddressEventsByTerrainObjectHouseNumberAndHouseNumber(new Dictionary<Tuple<CrabTerrainObjectHouseNumberId, CrabHouseNumberId>, List<AddressSubaddressWasImportedFromCrab>>
+                            {
+                                { new Tuple<CrabTerrainObjectHouseNumberId, CrabHouseNumberId>(_.HuisNr16KoppelingId, _.HuisNr16Id), new List<AddressSubaddressWasImportedFromCrab>
+                                    { _importSubaddressFromCrab.ToLegacyEvent(), _importSubaddress2FromCrab.ToLegacyEvent(), _importSubaddress2RemoveFromCrab.ToLegacyEvent(), _importSubaddressRemoveFromCrab.ToLegacyEvent() }
+                                }
+                            })
+                            .WithImportedTerrainObjectHouseNrIds(new List<CrabTerrainObjectHouseNumberId>{_.HuisNr16KoppelingId})
+                            .WithBuildingUnitCollection(BuildingUnitCollectionSnapshotBuilder.CreateDefaultSnapshot()
+                                .WithBuildingUnits(new List<BuildingUnitSnapshot>
+                                {
+                                    BuildingUnitSnapshotBuilder.CreateDefaultSnapshotFor(_buildingUnitWasAdded)
+                                        .WithRemoved()
+                                        .WithStatus(BuildingUnitStatus.NotRealized)
+                                        .WithAddressIds(new List<AddressId>())
+                                        .WithPreviousAddressId(_.Address16Id),
+
+                                    BuildingUnitSnapshotBuilder.CreateDefaultSnapshotFor(_buildingUnit2WasAdded)
+                                        .WithRemoved(),
+
+                                    BuildingUnitSnapshotBuilder.CreateDefaultSnapshotFor(_commonBuildingUnitWasAdded)
+                                        .WithStatus(BuildingUnitStatus.Realized)
+                                        .WithRemoved()
+                                        .WithPreviousAddressId(_.Address16Id),
+
+                                    BuildingUnitSnapshotBuilder.CreateDefaultSnapshotFor(_buildingUnit3WasAdded)
+                                        .WithRemoved(),
+
+                                    BuildingUnitSnapshotBuilder.CreateDefaultSnapshotFor(_buildingUnitWasReaddedByOtherUnitRemoval)
+                                        .WithRemoved()
+                                }))
+                            .Build(23, EventSerializerSettings)));
         }
 
         [Fact]
