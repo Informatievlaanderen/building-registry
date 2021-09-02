@@ -14,16 +14,27 @@ namespace BuildingRegistry.Tests.Cases
     using Xunit;
     using Xunit.Abstractions;
 
-    public class TestCase1A: AutofacBasedTest
+    public class TestCase1A: SnapshotBasedTest
     {
+        #region Snapshot variables
+
+        private protected BuildingUnitWasAdded? _buildingUnitWasAdded;
+        private protected ImportTerrainObjectHouseNumberFromCrab? _importTerrainObjectHouseNumberFromCrab;
+        private protected ImportSubaddressFromCrab? _importSubaddressFromCrab;
+        private protected CommonBuildingUnitWasAdded? _commonBuildingUnitWasAdded;
+        private protected BuildingUnitWasAdded? _buildingUnit2WasAdded;
+        private protected ImportSubaddressFromCrab? _importSubaddress2FromCrab;
+        private protected BuildingUnitWasAdded? _buildingUnit3WasAdded;
+
+        #endregion
+
         public TestCase1A(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
         {
-            Fixture = new Fixture()
+            Fixture
                 .Customize(new InfrastructureCustomization())
                 .Customize(new WithNoDeleteModification())
                 .Customize(new WithInfiniteLifetime())
-                .Customize(new WithFixedBuildingUnitIdFromHouseNumber(1, 16))
-                ;
+                .Customize(new WithFixedBuildingUnitIdFromHouseNumber(1, 16));
 
             _ = new TestCase1AData(Fixture);
         }
@@ -83,54 +94,57 @@ namespace BuildingRegistry.Tests.Cases
             public AddressId Address16Bus3Id => AddressId.CreateFor(SubaddressNr16Bus3Id);
         }
 
-        protected readonly IFixture Fixture;
         protected TestCase1AData _ { get; }
 
         public IEventCentricTestSpecificationBuilder T1()
         {
-            var importTerrainObjectHouseNumberFromCrab = Fixture.Create<ImportTerrainObjectHouseNumberFromCrab>()
+            _importTerrainObjectHouseNumberFromCrab = Fixture.Create<ImportTerrainObjectHouseNumberFromCrab>()
                 .WithTerrainObjectHouseNumberId(_.HuisNr16KoppelingId)
-                .WithHouseNumberId(_.HuisNr16Id); //koppel huisnr 16
+                .WithHouseNumberId(_.HuisNr16Id);
 
+            _buildingUnitWasAdded = new BuildingUnitWasAdded(_.Gebouw1Id, _.GebouwEenheid1Id, _.GebouwEenheid1Key, _.Address16Id, new BuildingUnitVersion(_importTerrainObjectHouseNumberFromCrab.Timestamp));
             return new AutoFixtureScenario(Fixture)
                 .Given<BuildingWasRegistered>(_.Gebouw1Id)
-                .When(importTerrainObjectHouseNumberFromCrab)
+                .When(_importTerrainObjectHouseNumberFromCrab)
                 .Then(_.Gebouw1Id,
-                    new BuildingUnitWasAdded(_.Gebouw1Id, _.GebouwEenheid1Id, _.GebouwEenheid1Key, _.Address16Id, new BuildingUnitVersion(importTerrainObjectHouseNumberFromCrab.Timestamp)),
-                    importTerrainObjectHouseNumberFromCrab.ToLegacyEvent());
+                    _buildingUnitWasAdded,
+                    _importTerrainObjectHouseNumberFromCrab.ToLegacyEvent());
         }
 
         public IEventCentricTestSpecificationBuilder T2()
         {
-            var importSubaddressFromCrab = Fixture.Create<ImportSubaddressFromCrab>()
+            _importSubaddressFromCrab = Fixture.Create<ImportSubaddressFromCrab>()
                 .WithSubaddressId(_.SubaddressNr16Bus1Id)
                 .WithTerrainObjectHouseNumberId(_.HuisNr16KoppelingId);
 
+            _buildingUnit2WasAdded = new BuildingUnitWasAdded(_.Gebouw1Id, _.GebouwEenheid2Id, _.GebouwEenheid2Key, _.Address16Bus1Id, new BuildingUnitVersion(_importSubaddressFromCrab.Timestamp));
+            _commonBuildingUnitWasAdded = new CommonBuildingUnitWasAdded(_.Gebouw1Id, _.GebouwEenheid3Id, _.GebouwEenheid3Key, new BuildingUnitVersion(_importSubaddressFromCrab.Timestamp));
             return new AutoFixtureScenario(Fixture)
                 .Given(T1())
-                .When(importSubaddressFromCrab)
+                .When(_importSubaddressFromCrab)
                 .Then(_.Gebouw1Id,
-                    new BuildingUnitWasAdded(_.Gebouw1Id, _.GebouwEenheid2Id, _.GebouwEenheid2Key, _.Address16Bus1Id, new BuildingUnitVersion(importSubaddressFromCrab.Timestamp)),
-                    new CommonBuildingUnitWasAdded(_.Gebouw1Id, _.GebouwEenheid3Id, _.GebouwEenheid3Key, new BuildingUnitVersion(importSubaddressFromCrab.Timestamp)),
+                    _buildingUnit2WasAdded,
+                    _commonBuildingUnitWasAdded,
                     new BuildingUnitWasRealized(_.Gebouw1Id, _.GebouwEenheid3Id),
-                    importSubaddressFromCrab.ToLegacyEvent());
+                    _importSubaddressFromCrab.ToLegacyEvent());
         }
 
         public IEventCentricTestSpecificationBuilder T3()
         {
-            var importSubaddressFromCrab = Fixture.Create<ImportSubaddressFromCrab>()
+            _importSubaddress2FromCrab = Fixture.Create<ImportSubaddressFromCrab>()
                 .WithSubaddressId(_.SubaddressNr16Bus2Id)
                 .WithTerrainObjectHouseNumberId(_.HuisNr16KoppelingId);
 
+            _buildingUnit3WasAdded = new BuildingUnitWasAdded(_.Gebouw1Id, _.GebouwEenheid4Id, _.GebouwEenheid4Key, _.Address16Bus2Id, new BuildingUnitVersion(_importSubaddress2FromCrab.Timestamp));
             return new AutoFixtureScenario(Fixture)
                 .Given(T2())
-                .When(importSubaddressFromCrab)
+                .When(_importSubaddress2FromCrab)
                 .Then(_.Gebouw1Id,
-                    new BuildingUnitWasAdded(_.Gebouw1Id, _.GebouwEenheid4Id, _.GebouwEenheid4Key, _.Address16Bus2Id, new BuildingUnitVersion(importSubaddressFromCrab.Timestamp)),
+                    _buildingUnit3WasAdded,
                     new BuildingUnitWasNotRealized(_.Gebouw1Id, _.GebouwEenheid1Id),
                     new BuildingUnitAddressWasDetached(_.Gebouw1Id, _.Address16Id, _.GebouwEenheid1Id),
                     new BuildingUnitAddressWasAttached(_.Gebouw1Id, _.Address16Id, _.GebouwEenheid3Id),
-                    importSubaddressFromCrab.ToLegacyEvent());
+                    _importSubaddress2FromCrab.ToLegacyEvent());
         }
 
         public IEventCentricTestSpecificationBuilder T4()
