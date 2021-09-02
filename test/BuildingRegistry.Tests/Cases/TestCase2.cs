@@ -224,6 +224,66 @@ namespace BuildingRegistry.Tests.Cases
                     _importSubaddress16_2FromCrab.ToLegacyEvent());
         }
 
+        public IEventCentricTestSpecificationBuilder T6_WithSnapshot()
+        {
+            Fixture.Customize(new WithSnapshotInterval(1));
+
+            _importSubaddress16_2FromCrab = Fixture.Create<ImportSubaddressFromCrab>()
+                .WithSubaddressId(_.SubaddressNr16Bus2Id)
+                .WithTerrainObjectHouseNumberId(_.HuisNr16KoppelingId);
+
+            _buildingUnit16_2WasAdded = new BuildingUnitWasAdded(_.Gebouw1Id, _.GebouwEenheid7Id, _.GebouwEenheid7Key, AddressId.CreateFor(_.SubaddressNr16Bus2Id), new BuildingUnitVersion(_importSubaddress16_2FromCrab.Timestamp));
+
+            return new AutoFixtureScenario(Fixture)
+                .Given(T5())
+                .When(_importSubaddress16_2FromCrab)
+                .Then(
+                    new Fact(_.Gebouw1Id, _buildingUnit16_2WasAdded),
+                    new Fact(_.Gebouw1Id, new BuildingUnitWasNotRealized(_.Gebouw1Id, _.GebouwEenheid1Id)),
+                    new Fact(_.Gebouw1Id, new BuildingUnitAddressWasDetached(_.Gebouw1Id, _.Address16Id, _.GebouwEenheid1Id)),
+                    new Fact(_.Gebouw1Id, new BuildingUnitAddressWasAttached(_.Gebouw1Id, _.Address16Id, _.GebouwEenheid3Id)),
+                    new Fact(_.Gebouw1Id, _importSubaddress16_2FromCrab.ToLegacyEvent()),
+                    new Fact(GetSnapshotIdentifier(_.Gebouw1Id), BuildingSnapshotBuilder
+                        .CreateDefaultSnapshot(_.Gebouw1Id)
+                        .WithActiveHouseNumberIdsByTerrainObjectHouseNr(new Dictionary<CrabTerrainObjectHouseNumberId, CrabHouseNumberId>
+                        {
+                            { _.HuisNr16KoppelingId, _.HuisNr16Id },
+                            { _.HuisNr18KoppelingId, _.HuisNr18Id }
+                        })
+                        .WithImportedTerrainObjectHouseNrIds(new List<CrabTerrainObjectHouseNumberId> { _.HuisNr16KoppelingId, _.HuisNr18KoppelingId })
+                        .WithSubaddressEventsByTerrainObjectHouseNumberAndHouseNumber(new Dictionary<Tuple<CrabTerrainObjectHouseNumberId, CrabHouseNumberId>, List<AddressSubaddressWasImportedFromCrab>>
+                        {
+                            { new Tuple<CrabTerrainObjectHouseNumberId, CrabHouseNumberId>(_.HuisNr18KoppelingId, _.HuisNr18Id), new List<AddressSubaddressWasImportedFromCrab>{ _importSubaddress18_1FromCrab.ToLegacyEvent(), _importSubaddress18_2FromCrab.ToLegacyEvent()} },
+                            { new Tuple<CrabTerrainObjectHouseNumberId, CrabHouseNumberId>(_.HuisNr16KoppelingId, _.HuisNr16Id), new List<AddressSubaddressWasImportedFromCrab>{ _importSubaddress16_1FromCrab.ToLegacyEvent(), _importSubaddress16_2FromCrab.ToLegacyEvent()} },
+                        })
+                        .WithLastModificationFromCrab(Modification.Update)
+                        .WithBuildingUnitCollection(BuildingUnitCollectionSnapshotBuilder.CreateDefaultSnapshot()
+                            .WithBuildingUnits(new List<BuildingUnitSnapshot>
+                            {
+                                BuildingUnitSnapshotBuilder.CreateDefaultSnapshotFor(_buildingUnit16WasAdded)
+                                    .WithStatus(BuildingUnitStatus.NotRealized)
+                                    .WithAddressIds(new List<AddressId>())
+                                    .WithPreviousAddressId(_.Address16Id),
+
+                                BuildingUnitSnapshotBuilder.CreateDefaultSnapshotFor(_buildingUnit18WasAdded)
+                                    .WithStatus(BuildingUnitStatus.NotRealized)
+                                    .WithPreviousAddressId(_.Address18Id)
+                                    .WithAddressIds(new List<AddressId>()),
+
+                                BuildingUnitSnapshotBuilder.CreateDefaultSnapshotFor(_commonBuildingUnitWasAdded)
+                                    .WithStatus(BuildingUnitStatus.Realized)
+                                    .WithAddressIds(new List<AddressId>{_.Address18Id, _.Address16Id}),
+
+                                BuildingUnitSnapshotBuilder.CreateDefaultSnapshotFor(_buildingUnit18_1WasAdded),
+                                BuildingUnitSnapshotBuilder.CreateDefaultSnapshotFor(_buildingUnit18_2WasAdded),
+
+                                BuildingUnitSnapshotBuilder.CreateDefaultSnapshotFor(_buildingUnit16_1WasAdded),
+                                BuildingUnitSnapshotBuilder.CreateDefaultSnapshotFor(_buildingUnit16_2WasAdded),
+                            }))
+                        .Build(20, EventSerializerSettings))
+                );
+        }
+
         public IEventCentricTestSpecificationBuilder BasedOnT4RetireHouseNumberWithSubaddresses()
         {
             var importRetireTerrainObjectHouseNumber18FromCrab = Fixture.Create<ImportTerrainObjectHouseNumberFromCrab>()
@@ -346,6 +406,12 @@ namespace BuildingRegistry.Tests.Cases
         public void TestT6()
         {
             Assert(T6());
+        }
+
+        [Fact]
+        public void TestT6_WithSnapshot()
+        {
+            Assert(T6_WithSnapshot());
         }
 
         [Fact]
