@@ -487,10 +487,10 @@ namespace BuildingRegistry.Tests.Cases
 
             _building.TakeSnapshot()
                 .Should()
-                .BeOfType<BuildingSnapshot>()
-                .And
-                .Should()
-                .BeEquivalentTo(
+                .BeOfType<BuildingSnapshot>();
+
+            var snapshot = _building.TakeSnapshot() as BuildingSnapshot;
+            var expected = 
                     BuildingSnapshotBuilder.CreateDefaultSnapshot(_.Gebouw1Id)
                         .WithActiveHouseNumberIdsByTerrainObjectHouseNr(new Dictionary<CrabTerrainObjectHouseNumberId, CrabHouseNumberId>
                         {
@@ -527,10 +527,14 @@ namespace BuildingRegistry.Tests.Cases
                             {
                                 BuildingUnitSnapshotBuilder.CreateDefaultSnapshotFor(buildingUnitWasAdded)
                                     .WithStatus(BuildingUnitStatus.NotRealized)
+                                    .WithHouseNumberStatusChronicle(new List<AddressHouseNumberStatusWasImportedFromCrab>{_houseNumberStatusFromCrab.ToLegacyEvent()})
+                                    .WithHouseNumberPositions(new List<AddressHouseNumberPositionWasImportedFromCrab>{_importHouseNumberPositionFromCrab.ToLegacyEvent()})
                                     .WithPreviousAddressId(_.Address16Id)
                                     .WithAddressIds(new List<AddressId>()),
 
                                 BuildingUnitSnapshotBuilder.CreateDefaultSnapshotFor(buildingUnit2WasAdded)
+                                    .WithSubaddressStatusChronicle(new List<AddressSubaddressStatusWasImportedFromCrab>{_importSubaddressStatusFromCrab.ToLegacyEvent()})
+                                    .WithSubaddressPositions(new List<AddressSubaddressPositionWasImportedFromCrab>{_importSubaddressPositionFromCrab.ToLegacyEvent()})
                                     .WithStatus(BuildingUnitStatus.Planned),
 
                                 BuildingUnitSnapshotBuilder.CreateDefaultSnapshotFor(commonBuildingUnitWasAdded)
@@ -538,9 +542,12 @@ namespace BuildingRegistry.Tests.Cases
                                     .WithAddressIds(new List<AddressId>{_.Address16Id}),
 
                                 BuildingUnitSnapshotBuilder.CreateDefaultSnapshotFor(buildingUnit3WasAdded)
+                                    .WithSubaddressStatusChronicle(new List<AddressSubaddressStatusWasImportedFromCrab>{_importSubaddress2StatusFromCrab.ToLegacyEvent()})
+                                    .WithSubaddressPositions(new List<AddressSubaddressPositionWasImportedFromCrab>{_importSubaddress2PositionFromCrab.ToLegacyEvent()})
                                     .WithStatus(BuildingUnitStatus.Planned)
-                            }))
-                    , config => config.AllowingInfiniteRecursion().ExcludingMissingMembers());
+                            }));
+
+            snapshot.Should().BeEquivalentTo(expected, config => config.AllowingInfiniteRecursion().IgnoringCyclicReferences());
         }
 
         [Fact]
