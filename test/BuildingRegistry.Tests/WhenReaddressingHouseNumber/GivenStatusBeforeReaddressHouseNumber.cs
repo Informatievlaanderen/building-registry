@@ -1,11 +1,16 @@
 namespace BuildingRegistry.Tests.WhenReaddressingHouseNumber
 {
+    using System.Collections.Generic;
     using Autofixture;
     using AutoFixture;
+    using Be.Vlaanderen.Basisregisters.AggregateSource;
     using Be.Vlaanderen.Basisregisters.AggregateSource.Testing;
     using Be.Vlaanderen.Basisregisters.Crab;
+    using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Building.Commands.Crab;
+    using Building.DataStructures;
     using Building.Events;
+    using Building.Events.Crab;
     using NodaTime;
     using ValueObjects;
     using WhenImportingCrabHouseNumberStatus;
@@ -13,9 +18,8 @@ namespace BuildingRegistry.Tests.WhenReaddressingHouseNumber
     using Xunit;
     using Xunit.Abstractions;
 
-    public class GivenStatusBeforeReaddressHouseNumber : AutofacBasedTest
+    public class GivenStatusBeforeReaddressHouseNumber : SnapshotBasedTest
     {
-        protected readonly IFixture Fixture;
 
         private CrabTerrainObjectId Gebouw1CrabTerrainObjectId { get; }
         private CrabTerrainObjectHouseNumberId OldHuisNr16KoppelingId { get; }
@@ -32,9 +36,14 @@ namespace BuildingRegistry.Tests.WhenReaddressingHouseNumber
         private AddressId OldAddress16Id => AddressId.CreateFor(OldHuisNr16Id);
         private AddressId NewAddress16Id => AddressId.CreateFor(NewHuisNr16Id);
 
+        private ImportReaddressingHouseNumberFromCrab importReaddressingHouseNumberFromCrab;
+        private ImportHouseNumberStatusFromCrab importHouseNumberStatusFromCrab;
+        private BuildingUnitWasReaddressed buildingUnitWasReaddressed;
+        private BuildingUnitWasAdded buildingUnitWasAdded;
+
         public GivenStatusBeforeReaddressHouseNumber(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
         {
-            Fixture = new Fixture()
+            Fixture
                     .Customize(new InfrastructureCustomization())
                     .Customize(new WithNoDeleteModification())
                     .Customize(new WithInfiniteLifetime())
@@ -57,6 +66,8 @@ namespace BuildingRegistry.Tests.WhenReaddressingHouseNumber
                 .WithNewHouseNumberId(NewHuisNr16Id)
                 .WithBeginDate(ReaddressingBeginDate);
 
+            importReaddressingHouseNumberFromCrab = importReaddressingHouseNumber;
+
             return new AutoFixtureScenario(Fixture)
                 .Given<BuildingWasRegistered>(Gebouw1Id)
                 .When(importReaddressingHouseNumber)
@@ -70,12 +81,16 @@ namespace BuildingRegistry.Tests.WhenReaddressingHouseNumber
                 .WithTerrainObjectHouseNumberId(OldHuisNr16KoppelingId)
                 .WithHouseNumberId(OldHuisNr16Id);
 
+            buildingUnitWasAdded = new BuildingUnitWasAdded(Gebouw1Id, GebouwEenheid1Id, GebouwEenheid1Key,
+                OldAddress16Id, new BuildingUnitVersion(importTerrainObjectHouseNumberFromCrab.Timestamp));
+            buildingUnitWasReaddressed = new BuildingUnitWasReaddressed(Gebouw1Id, GebouwEenheid1Id, OldAddress16Id, NewAddress16Id, ReaddressingBeginDate);
+
             return new AutoFixtureScenario(Fixture)
                 .Given(AddReaddressingOfHouseNumber())
                 .When(importTerrainObjectHouseNumberFromCrab)
                 .Then(Gebouw1Id,
-                    new BuildingUnitWasAdded(Gebouw1Id, GebouwEenheid1Id, GebouwEenheid1Key, OldAddress16Id, new BuildingUnitVersion(importTerrainObjectHouseNumberFromCrab.Timestamp)),
-                    new BuildingUnitWasReaddressed(Gebouw1Id, GebouwEenheid1Id, OldAddress16Id, NewAddress16Id, ReaddressingBeginDate),
+                    buildingUnitWasAdded,
+                    buildingUnitWasReaddressed,
                     importTerrainObjectHouseNumberFromCrab.ToLegacyEvent());
         }
 
@@ -85,6 +100,8 @@ namespace BuildingRegistry.Tests.WhenReaddressingHouseNumber
                 .WithTerrainObjectHouseNumberId(OldHuisNr16KoppelingId)
                 .WithStatus(CrabAddressStatus.InUse)
                 .WithTimestamp(new CrabTimestamp(Instant.FromDateTimeOffset(((LocalDate) ReaddressingBeginDate).ToDateTimeUnspecified().AddDays(-2))));
+
+            importHouseNumberStatusFromCrab = importStatus;
 
             return new AutoFixtureScenario(Fixture)
                 .Given(AddHouseNumberUnit())
@@ -96,6 +113,8 @@ namespace BuildingRegistry.Tests.WhenReaddressingHouseNumber
 
         public IEventCentricTestSpecificationBuilder AddReaddressedTerrainObjectHouseNumberWithNewHouseNumberId()
         {
+            Fixture.Customize(new WithSnapshotInterval(1));
+
             var importTerrainObjectHouseNumberFromCrab = Fixture.Create<ImportTerrainObjectHouseNumberFromCrab>()
                 .WithTerrainObjectHouseNumberId(NewHuisNr16KoppelingId)
                 .WithHouseNumberId(NewHuisNr16Id);
@@ -103,8 +122,80 @@ namespace BuildingRegistry.Tests.WhenReaddressingHouseNumber
             return new AutoFixtureScenario(Fixture)
                 .Given(SetStatusForOldHouseNr())
                 .When(importTerrainObjectHouseNumberFromCrab)
-                .Then(Gebouw1Id,
-                    importTerrainObjectHouseNumberFromCrab.ToLegacyEvent());
+                // .Then(Gebouw1Id,
+                //     importTerrainObjectHouseNumberFromCrab.ToLegacyEvent());
+                .Then(new[]
+                {
+                    new Fact(Gebouw1Id, importTerrainObjectHouseNumberFromCrab.ToLegacyEvent()),
+                    new Fact(GetSnapshotIdentifier(Gebouw1Id),
+                        BuildingSnapshotBuilder
+                            .CreateDefaultSnapshot(Gebouw1Id)
+                            .WithLastModificationFromCrab(Modification.Update)
+                            .WithActiveHouseNumberIdsByTerrainObjectHouseNr(
+                                new Dictionary<CrabTerrainObjectHouseNumberId, CrabHouseNumberId>
+                                {
+                                    {
+                                        importTerrainObjectHouseNumberFromCrab.TerrainObjectHouseNumberId,
+                                        importTerrainObjectHouseNumberFromCrab.HouseNumberId
+                                    },
+                                    {
+                                        importReaddressingHouseNumberFromCrab.OldTerrainObjectHouseNumberId,
+                                        importReaddressingHouseNumberFromCrab.OldHouseNumberId
+                                    }
+                                })
+                            .WithHouseNumberReaddressedEventsByBuildingUnit(new Dictionary<BuildingUnitKey, HouseNumberWasReaddressedFromCrab>()
+                            {
+                                {BuildingUnitKey.Create(importReaddressingHouseNumberFromCrab.TerrainObjectId,
+                                    importReaddressingHouseNumberFromCrab.OldTerrainObjectHouseNumberId), importReaddressingHouseNumberFromCrab.ToLegacyEvent()}
+                            })
+                            .WithHouseNumberStatusEventsByHouseNumberId(new Dictionary<AddressId, List<AddressHouseNumberStatusWasImportedFromCrab>>()
+                            {
+                                {
+                                    new AddressId(buildingUnitWasReaddressed.OldAddressId),
+                                    new List<AddressHouseNumberStatusWasImportedFromCrab>()
+                                    {
+                                        importHouseNumberStatusFromCrab.ToLegacyEvent()
+                                    }
+                                }
+                            })
+                            .WithImportedTerrainObjectHouseNrIds(new List<CrabTerrainObjectHouseNumberId>
+                                {
+                                    importReaddressingHouseNumberFromCrab.OldTerrainObjectHouseNumberId,
+                                    importReaddressingHouseNumberFromCrab.NewTerrainObjectHouseNumberId
+                                }
+                            )
+                            .WithBuildingUnitCollection(
+                                BuildingUnitCollectionSnapshotBuilder.CreateDefaultSnapshot()
+                                    .WithBuildingUnits(new List<BuildingUnitSnapshot>
+                                    {
+                                        BuildingUnitSnapshotBuilder.CreateDefaultSnapshotFor(buildingUnitWasAdded)
+                                            .WithAddressIds(new List<AddressId>()
+                                            {
+                                                new AddressId(buildingUnitWasReaddressed.NewAddressId)
+                                            })
+                                            .WithReaddressedEvents(new List<BuildingUnitWasReaddressed>()
+                                            {
+                                                buildingUnitWasReaddressed,
+                                            })
+                                            .WithHouseNumberStatusChronicle(new List<AddressHouseNumberStatusWasImportedFromCrab>()
+                                            {
+                                                importHouseNumberStatusFromCrab.ToLegacyEvent()
+                                            })
+                                            .WithStatus(BuildingUnitStatus.Realized),
+
+                                    })
+                                    .WithReaddressedKeys(new Dictionary<BuildingUnitKey, BuildingUnitKey>()
+                                    {
+                                        {
+                                            BuildingUnitKey.Create(importReaddressingHouseNumberFromCrab.TerrainObjectId,
+                                                importReaddressingHouseNumberFromCrab.NewTerrainObjectHouseNumberId),
+                                            BuildingUnitKey.Create(importReaddressingHouseNumberFromCrab.TerrainObjectId,
+                                                importReaddressingHouseNumberFromCrab.OldTerrainObjectHouseNumberId)
+                                        }
+                                    })
+                            )
+                            .Build(7, EventSerializerSettings))
+                });
         }
 
         [Fact]

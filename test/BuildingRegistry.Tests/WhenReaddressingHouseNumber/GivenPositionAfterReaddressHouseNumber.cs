@@ -8,6 +8,11 @@ namespace BuildingRegistry.Tests.WhenReaddressingHouseNumber
     using Building.Events;
     using NodaTime;
     using System;
+    using System.Collections.Generic;
+    using Be.Vlaanderen.Basisregisters.AggregateSource;
+    using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
+    using Building.DataStructures;
+    using Building.Events.Crab;
     using NetTopologySuite.Geometries;
     using NetTopologySuite.IO;
     using ValueObjects;
@@ -18,9 +23,8 @@ namespace BuildingRegistry.Tests.WhenReaddressingHouseNumber
     using Xunit;
     using Xunit.Abstractions;
 
-    public class GivenPositionAfterReaddressHouseNumber : AutofacBasedTest
+    public class GivenPositionAfterReaddressHouseNumber : SnapshotBasedTest
     {
-        protected readonly IFixture Fixture;
         private readonly Point _position;
         private readonly Geometry _geometry;
 
@@ -39,9 +43,16 @@ namespace BuildingRegistry.Tests.WhenReaddressingHouseNumber
         private AddressId NewAddress16Id => AddressId.CreateFor(NewHuisNr16Id);
         private ReaddressingBeginDate ReaddressingBeginDate { get; }
 
+        private BuildingUnitWasAdded buildingUnitWasAdded;
+        private BuildingUnitWasReaddressed buildingUnitWasReaddressed;
+        private ImportReaddressingHouseNumberFromCrab importReaddressingHouseNumberFromCrab;
+        private ImportBuildingGeometryFromCrab importBuildingGeometryFromCrab;
+        private ImportHouseNumberPositionFromCrab importHouseNumberPositionFromCrab1;
+        private ImportHouseNumberPositionFromCrab importHouseNumberPositionFromCrab2;
+
         public GivenPositionAfterReaddressHouseNumber(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
         {
-            Fixture = new Fixture()
+            Fixture
                     .Customize(new InfrastructureCustomization())
                     .Customize(new WithNoDeleteModification())
                     .Customize(new WithInfiniteLifetime())
@@ -66,26 +77,31 @@ namespace BuildingRegistry.Tests.WhenReaddressingHouseNumber
                 .WithTerrainObjectHouseNumberId(OldHuisNr16KoppelingId)
                 .WithHouseNumberId(OldHuisNr16Id);
 
+            buildingUnitWasAdded = new BuildingUnitWasAdded(Gebouw1Id, GebouwEenheid1Id, GebouwEenheid1Key,
+                OldAddress16Id, new BuildingUnitVersion(importTerrainObjectHouseNumberFromCrab.Timestamp));
+
             return new AutoFixtureScenario(Fixture)
                 .Given<BuildingWasRegistered>(Gebouw1Id)
                 .When(importTerrainObjectHouseNumberFromCrab)
                 .Then(Gebouw1Id,
-                    new BuildingUnitWasAdded(Gebouw1Id, GebouwEenheid1Id, GebouwEenheid1Key, OldAddress16Id, new BuildingUnitVersion(importTerrainObjectHouseNumberFromCrab.Timestamp)),
+                    buildingUnitWasAdded,
                     importTerrainObjectHouseNumberFromCrab.ToLegacyEvent());
         }
 
         public IEventCentricTestSpecificationBuilder AddBuildingPosition()
         {
-            var importBuildingGeometryFromCrab = Fixture.Create<ImportBuildingGeometryFromCrab>()
+            importBuildingGeometryFromCrab = Fixture.Create<ImportBuildingGeometryFromCrab>()
                 .WithTerrainObjectId(Gebouw1CrabTerrainObjectId)
                 .WithGeometry(new WkbGeometry(_geometry.AsBinary()))
                 .WithGeometryMethod(CrabBuildingGeometryMethod.Grb);
 
+            var buildingWasMeasuredByGrb =
+                new BuildingWasMeasuredByGrb(Gebouw1Id, new ExtendedWkbGeometry(_geometry.AsBinary()));
             return new AutoFixtureScenario(Fixture)
                 .Given(AddHouseNumberUnit())
                 .When(importBuildingGeometryFromCrab)
                 .Then(Gebouw1Id,
-                    new BuildingWasMeasuredByGrb(Gebouw1Id, new ExtendedWkbGeometry(_geometry.AsBinary())),
+                    buildingWasMeasuredByGrb,
                     importBuildingGeometryFromCrab.ToLegacyEvent());
         }
 
@@ -97,6 +113,8 @@ namespace BuildingRegistry.Tests.WhenReaddressingHouseNumber
                 .WithLifetime(new CrabLifetime(LocalDateTime.FromDateTime(DateTime.Now), null))
                 .WithPositionOrigin(CrabAddressPositionOrigin.DerivedFromBuilding)
                 .WithPosition(new WkbGeometry(_position.AsBinary()));
+
+            importHouseNumberPositionFromCrab1 = importPosition;
 
             return new AutoFixtureScenario(Fixture)
                 .Given(AddBuildingPosition())
@@ -115,11 +133,15 @@ namespace BuildingRegistry.Tests.WhenReaddressingHouseNumber
                 .WithNewHouseNumberId(NewHuisNr16Id)
                 .WithBeginDate(ReaddressingBeginDate);
 
+            buildingUnitWasReaddressed = new BuildingUnitWasReaddressed(Gebouw1Id, GebouwEenheid1Id, OldAddress16Id,
+                NewAddress16Id, ReaddressingBeginDate);
+            importReaddressingHouseNumberFromCrab = importReaddressingHouseNumber;
+
             return new AutoFixtureScenario(Fixture)
                 .Given(SetHouseNumberPosition())
                 .When(importReaddressingHouseNumber)
                 .Then(Gebouw1Id,
-                    new BuildingUnitWasReaddressed(Gebouw1Id, GebouwEenheid1Id, OldAddress16Id, NewAddress16Id, ReaddressingBeginDate),
+                    buildingUnitWasReaddressed,
                     importReaddressingHouseNumber.ToLegacyEvent());
         }
 
@@ -131,6 +153,8 @@ namespace BuildingRegistry.Tests.WhenReaddressingHouseNumber
                 .WithLifetime(new CrabLifetime(LocalDateTime.FromDateTime(DateTime.Now.AddDays(1)), null))
                 .WithPositionOrigin(CrabAddressPositionOrigin.ManualIndicationFromStand)
                 .WithPosition(new WkbGeometry(_position.AsBinary()));
+
+            importHouseNumberPositionFromCrab2 = importPosition;
 
             return new AutoFixtureScenario(Fixture)
                 .Given(AddReaddressingOfHouseNumber())
@@ -160,6 +184,8 @@ namespace BuildingRegistry.Tests.WhenReaddressingHouseNumber
 
         public IEventCentricTestSpecificationBuilder SetSamePositionWithNewHouseNumberIdButBeforePositionOldHouseNr()
         {
+            Fixture.Customize(new WithSnapshotInterval(1));
+
             var importPosition = Fixture.Create<ImportHouseNumberPositionFromCrab>()
                 .WithTerrainObjectHouseNumber(NewHuisNr16KoppelingId)
                 .WithTerrainObjectId(Gebouw1CrabTerrainObjectId)
@@ -170,8 +196,80 @@ namespace BuildingRegistry.Tests.WhenReaddressingHouseNumber
             return new AutoFixtureScenario(Fixture)
                 .Given(SetReaddressedHouseNrPositionWithOldHouseNumberId())
                 .When(importPosition)
-                .Then(Gebouw1Id,
-                    importPosition.ToLegacyEvent());
+                .Then(new[]
+                {
+                    new Fact(Gebouw1Id, importPosition.ToLegacyEvent()),
+                    new Fact(GetSnapshotIdentifier(Gebouw1Id),
+                        BuildingSnapshotBuilder
+                            .CreateDefaultSnapshot(Gebouw1Id)
+                            .WithGeometry(new BuildingGeometry(new ExtendedWkbGeometry(_geometry.AsBinary()), BuildingGeometryMethod.MeasuredByGrb))
+                            .WithGeometryChronicle(new List<ImportBuildingGeometryFromCrab>()
+                            {
+                                importBuildingGeometryFromCrab
+                            })
+                            .WithLastModificationFromCrab(Modification.Update)
+                            .WithActiveHouseNumberIdsByTerrainObjectHouseNr(
+                                new Dictionary<CrabTerrainObjectHouseNumberId, CrabHouseNumberId>
+                                {
+                                    {
+                                        importReaddressingHouseNumberFromCrab.NewTerrainObjectHouseNumberId,
+                                        importReaddressingHouseNumberFromCrab.NewHouseNumberId
+                                    },
+                                })
+                            .WithImportedTerrainObjectHouseNrIds(new List<CrabTerrainObjectHouseNumberId>
+                                {
+                                    importReaddressingHouseNumberFromCrab.OldTerrainObjectHouseNumberId
+                                }
+                            )
+                            .WithHouseNumberReaddressedEventsByBuildingUnit(new Dictionary<BuildingUnitKey, HouseNumberWasReaddressedFromCrab>()
+                            {
+                                {BuildingUnitKey.Create(importReaddressingHouseNumberFromCrab.TerrainObjectId,
+                                    importReaddressingHouseNumberFromCrab.OldTerrainObjectHouseNumberId), importReaddressingHouseNumberFromCrab.ToLegacyEvent()}
+                            })
+                            .WithBuildingUnitCollection(
+                                BuildingUnitCollectionSnapshotBuilder.CreateDefaultSnapshot()
+                                    .WithBuildingUnits(new List<BuildingUnitSnapshot>
+                                    {
+                                        BuildingUnitSnapshotBuilder.CreateDefaultSnapshotFor(buildingUnitWasAdded)
+
+                                            .WithAddressIds(new []
+                                            {
+                                                new AddressId(buildingUnitWasReaddressed.NewAddressId)
+                                            })
+                                            .WithReaddressedEvents(new List<BuildingUnitWasReaddressed>()
+                                            {
+                                                buildingUnitWasReaddressed,
+                                            })
+                                            .WithPosition(new BuildingUnitPosition(ExtendedWkbGeometry.CreateEWkb(_position.AsBinary()), BuildingUnitPositionGeometryMethod.AppointedByAdministrator))
+                                            .WithHouseNumberPositions(new List<AddressHouseNumberPositionWasImportedFromCrab>
+                                            {
+                                                importHouseNumberPositionFromCrab1.ToLegacyEvent(),
+                                                importHouseNumberPositionFromCrab2.ToLegacyEvent(),
+                                                importPosition.ToLegacyEvent()
+                                            })
+                                    })
+                                    .WithReaddressedKeys(new Dictionary<BuildingUnitKey, BuildingUnitKey>()
+                                    {
+                                        {
+                                            BuildingUnitKey.Create(importReaddressingHouseNumberFromCrab.TerrainObjectId,
+                                                importReaddressingHouseNumberFromCrab.NewTerrainObjectHouseNumberId),
+                                            BuildingUnitKey.Create(importReaddressingHouseNumberFromCrab.TerrainObjectId,
+                                                importReaddressingHouseNumberFromCrab.OldTerrainObjectHouseNumberId)
+                                        }
+                                    })
+                            )
+                            .WithHouseNumberPositionEventsByHouseNumberId(new Dictionary<AddressId, List<AddressHouseNumberPositionWasImportedFromCrab>>
+                            {
+                                { AddressId.CreateFor(importPosition.HouseNumberId), new List<AddressHouseNumberPositionWasImportedFromCrab>
+                                    {
+                                        importHouseNumberPositionFromCrab1.ToLegacyEvent(),
+                                        importHouseNumberPositionFromCrab2.ToLegacyEvent(),
+                                        importPosition.ToLegacyEvent()
+                                    }
+                                }
+                            })
+                            .Build(12, EventSerializerSettings))
+                });
         }
 
         [Fact]
