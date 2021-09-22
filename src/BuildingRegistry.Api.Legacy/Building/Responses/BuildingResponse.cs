@@ -163,7 +163,7 @@ namespace BuildingRegistry.Api.Legacy.Building.Responses
                 ProblemTypeUri = "urn:be.vlaanderen.basisregisters.api:building:gone",
                 HttpStatus = StatusCodes.Status410Gone,
                 Title = ProblemDetails.DefaultTitle,
-                Detail = "Gebouw werd verwijderd.",
+                Detail = "Verwijderd gebouw.",
                 ProblemInstanceUri = _problemDetailsHelper.GetInstanceUri(_httpContextAccessor.HttpContext)
             };
     }
