@@ -1,3 +1,10 @@
+## [2.30.3](https://github.com/informatievlaanderen/building-registry/compare/v2.30.2...v2.30.3) (2021-09-22)
+
+
+### Bug Fixes
+
+* gawr-611 fix exception detail ([a52a763](https://github.com/informatievlaanderen/building-registry/commit/a52a763f1335a515accefc75e9f65435e7462f24))
+
 ## [2.30.2](https://github.com/informatievlaanderen/building-registry/compare/v2.30.1...v2.30.2) (2021-09-20)
 
 
