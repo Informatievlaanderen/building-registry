@@ -1,3 +1,10 @@
+## [2.30.4](https://github.com/informatievlaanderen/building-registry/compare/v2.30.3...v2.30.4) (2021-09-24)
+
+
+### Bug Fixes
+
+* gawr-730 api documentation ([7a4a1df](https://github.com/informatievlaanderen/building-registry/commit/7a4a1df2408899357b70ad8b2898957141aae49a))
+
 ## [2.30.3](https://github.com/informatievlaanderen/building-registry/compare/v2.30.2...v2.30.3) (2021-09-22)
 
 
