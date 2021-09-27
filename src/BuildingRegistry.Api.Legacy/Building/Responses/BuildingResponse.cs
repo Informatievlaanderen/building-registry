@@ -110,13 +110,13 @@ namespace BuildingRegistry.Api.Legacy.Building.Responses
                 GebouwStatus.Gerealiseerd,
                 new List<GebouwDetailGebouweenheid>
                 {
-                    new GebouwDetailGebouweenheid("1", "http://baseuri/api/gebouweenheid/1"),
-                    new GebouwDetailGebouweenheid("2", "http://baseuri/api/gebouweenheid/2")
+                    new GebouwDetailGebouweenheid("1", _responseOptions.GebouweenheidDetailUrl),
+                    new GebouwDetailGebouweenheid("2", _responseOptions.GebouweenheidDetailUrl)
                 },
                 new List<GebouwDetailPerceel>
                 {
-                    new GebouwDetailPerceel("11001B0008-00G002", "http://baseuri/api/perceel/1/11001B0008-00G002"),
-                    new GebouwDetailPerceel("11001B0008-00G003", "http://baseuri/api/perceel/1/11001B0008-00G003")
+                    new GebouwDetailPerceel("11001B0008-00G002", _responseOptions.PerceelUrl),
+                    new GebouwDetailPerceel("11001B0008-00G003", _responseOptions.PerceelUrl)
                 });
     }
 
