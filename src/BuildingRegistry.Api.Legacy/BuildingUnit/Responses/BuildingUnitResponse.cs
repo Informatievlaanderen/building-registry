@@ -115,12 +115,12 @@ namespace BuildingRegistry.Api.Legacy.BuildingUnit.Responses
                 PositieGeometrieMethode.AangeduidDoorBeheerder,
                 GebouweenheidStatus.Gerealiseerd,
                 GebouweenheidFunctie.GemeenschappelijkDeel,
-                new GebouweenheidDetailGebouw("1", "http://baseuri/api/gebouw/1"),
+                new GebouweenheidDetailGebouw("1", _responseOptions.GebouwDetailUrl),
                 new List<GebouweenheidDetailAdres>
                 {
-                    new GebouweenheidDetailAdres("1", "http://baseuri/api/adres/1"),
-                    new GebouweenheidDetailAdres("7", "http://baseuri/api/adres/7"),
-                    new GebouweenheidDetailAdres("10", "http://baseuri/api/adres/10")
+                    new GebouweenheidDetailAdres("1", _responseOptions.AdresUrl),
+                    new GebouweenheidDetailAdres("7", _responseOptions.AdresUrl),
+                    new GebouweenheidDetailAdres("10", _responseOptions.AdresUrl)
                 }
             );
     }
