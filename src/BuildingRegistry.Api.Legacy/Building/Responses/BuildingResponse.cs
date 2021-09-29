@@ -45,14 +45,14 @@ namespace BuildingRegistry.Api.Legacy.Building.Responses
         public GebouwStatus Status { get; set; }
 
         /// <summary>
-        /// a collection of building units that reside within the building
+        /// De aan het gebouw gelinkte gebouweenheden.
         /// </summary>
         [DataMember(Name = "Gebouweenheden", Order = 5)]
         [JsonProperty(Required = Required.DisallowNull)]
         public List<GebouwDetailGebouweenheid> BuildingUnits { get; set; }
 
         /// <summary>
-        /// a collection of parcels that lie underneath the building
+        /// De aan het gebouw gelinkte percelen.
         /// </summary>
         [DataMember(Name = "Percelen", Order = 6)]
         [JsonProperty(Required = Required.DisallowNull)]
