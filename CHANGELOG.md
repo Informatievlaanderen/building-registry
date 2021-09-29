@@ -1,3 +1,11 @@
+## [2.30.5](https://github.com/informatievlaanderen/building-registry/compare/v2.30.4...v2.30.5) (2021-09-29)
+
+
+### Bug Fixes
+
+* gawr-627 api documentation ([af5f71e](https://github.com/informatievlaanderen/building-registry/commit/af5f71ec9768abeeb8eb69f7353969b5ba242796))
+* gawr-652 docfix real building uri ([2e55cc0](https://github.com/informatievlaanderen/building-registry/commit/2e55cc08ae6a471f439a4f274ac53b39db0ffa24))
+
 ## [2.30.4](https://github.com/informatievlaanderen/building-registry/compare/v2.30.3...v2.30.4) (2021-09-24)
 
 
