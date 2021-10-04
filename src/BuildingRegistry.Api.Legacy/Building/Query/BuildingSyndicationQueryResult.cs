@@ -197,7 +197,7 @@ namespace BuildingRegistry.Api.Legacy.Building.Query
             Version = version;
 
             var datetimeLastChangedOn = lastChangedOn.ToBelgianDateTimeOffset();
-            var relevantReaddresses = readdresses.Where(x => x.ReaddressBeginDate >= LocalDate.FromDateTime(datetimeLastChangedOn.DateTime)).ToList();
+            var relevantReaddresses = readdresses.Where(x => x.ReaddressBeginDate <= LocalDate.FromDateTime(datetimeLastChangedOn.DateTime)).ToList();
 
             AddressIds = addresses
                 .Where(x => x.AddressId.HasValue)
