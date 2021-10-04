@@ -1,3 +1,10 @@
+## [2.30.7](https://github.com/informatievlaanderen/building-registry/compare/v2.30.6...v2.30.7) (2021-10-04)
+
+
+### Bug Fixes
+
+* correct addressid for linked readdresses in syndication GAWR-2128 ([854da6a](https://github.com/informatievlaanderen/building-registry/commit/854da6ac5dc891a0796ddd4e03675ec6f0cc90b0))
+
 ## [2.30.6](https://github.com/informatievlaanderen/building-registry/compare/v2.30.5...v2.30.6) (2021-10-01)
 
 
