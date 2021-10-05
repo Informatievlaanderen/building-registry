@@ -2,6 +2,7 @@ namespace BuildingRegistry.Api.Legacy.Building.Responses
 {
     using System;
     using System.Runtime.Serialization;
+    using Be.Vlaanderen.Basisregisters.GrAr.Common;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy;
     using Infrastructure.Options;
     using Microsoft.Extensions.Options;
@@ -68,7 +69,7 @@ namespace BuildingRegistry.Api.Legacy.Building.Responses
             => new BuildingReferencesResponse(
                 45127,
                 _responseOptions.GebouwNaamruimte,
-                DateTimeOffset.Now,
+                DateTimeOffset.Now.ToExampleOffset(),
                 new CrabReferences(
                     15784,
                     "787748"));

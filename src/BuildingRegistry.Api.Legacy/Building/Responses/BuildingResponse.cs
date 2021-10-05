@@ -5,6 +5,7 @@ namespace BuildingRegistry.Api.Legacy.Building.Responses
     using System.Runtime.Serialization;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
     using Be.Vlaanderen.Basisregisters.BasicApiProblem;
+    using Be.Vlaanderen.Basisregisters.GrAr.Common;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy.Gebouw;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy.SpatialTools;
@@ -87,7 +88,7 @@ namespace BuildingRegistry.Api.Legacy.Building.Responses
             => new BuildingResponse(
                 6,
                 _responseOptions.GebouwNaamruimte,
-                DateTimeOffset.Now,
+                DateTimeOffset.Now.ToExampleOffset(),
                 new Polygon
                 {
                     JsonPolygon = new GeoJSONPolygon

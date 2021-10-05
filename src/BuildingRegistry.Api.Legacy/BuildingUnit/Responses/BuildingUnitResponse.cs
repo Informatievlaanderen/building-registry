@@ -12,6 +12,7 @@ namespace BuildingRegistry.Api.Legacy.BuildingUnit.Responses
     using System.Runtime.Serialization;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
     using Be.Vlaanderen.Basisregisters.BasicApiProblem;
+    using Be.Vlaanderen.Basisregisters.GrAr.Common;
     using Microsoft.Extensions.Options;
     using Newtonsoft.Json;
 
@@ -99,7 +100,7 @@ namespace BuildingRegistry.Api.Legacy.BuildingUnit.Responses
             (
                 6,
                 _responseOptions.GebouweenheidNaamruimte,
-                DateTimeOffset.Now,
+                DateTimeOffset.Now.ToExampleOffset(),
                 new Point
                 {
                     JsonPoint = new GeoJSONPoint
