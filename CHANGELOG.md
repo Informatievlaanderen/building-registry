@@ -1,3 +1,15 @@
+## [2.30.8](https://github.com/informatievlaanderen/building-registry/compare/v2.30.7...v2.30.8) (2021-10-06)
+
+
+### Bug Fixes
+
+* add Test to ECR ([c4110ad](https://github.com/informatievlaanderen/building-registry/commit/c4110adeb467702145ea96eb9a80d9ab8eac9b43))
+* added paket files ([58a4a95](https://github.com/informatievlaanderen/building-registry/commit/58a4a952b94bac19a3a7942d34db6074812e3216))
+* gawr-612 add id with stringformat to url ([ce4ae8e](https://github.com/informatievlaanderen/building-registry/commit/ce4ae8ec5a4337f679a8c6553030a4273416053d))
+* gawr-615 versionid datetimeoffset +2 ([fd004f4](https://github.com/informatievlaanderen/building-registry/commit/fd004f4304770404df0d2c951c4cbc20ea0797b6))
+* GAWR-615 versionid localtime in docs ([a0cc294](https://github.com/informatievlaanderen/building-registry/commit/a0cc294438dec25778a0cd968f905a6da954628e))
+* gawr-652 docfix real building uri ([495e48f](https://github.com/informatievlaanderen/building-registry/commit/495e48fa6b7bfee582653640859c8faaa24e02f6))
+
 ## [2.30.7](https://github.com/informatievlaanderen/building-registry/compare/v2.30.6...v2.30.7) (2021-10-04)
 
 
