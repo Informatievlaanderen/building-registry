@@ -1,3 +1,10 @@
+## [2.30.9](https://github.com/informatievlaanderen/building-registry/compare/v2.30.8...v2.30.9) (2021-10-08)
+
+
+### Bug Fixes
+
+* docs CRAB remove `-` GAWR-632 ([0283b32](https://github.com/informatievlaanderen/building-registry/commit/0283b32950e73614b537491742b74a1dacc7eb2b))
+
 ## [2.30.8](https://github.com/informatievlaanderen/building-registry/compare/v2.30.7...v2.30.8) (2021-10-06)
 
 
