@@ -11,7 +11,7 @@ namespace BuildingRegistry.Api.Legacy.Building.Responses
     public class BuildingCrabMappingResponse
     {
         /// <summary>
-        /// Collectie van CRAB-gebouwen
+        /// Collectie van CRAB gebouwen
         /// </summary>
         [DataMember(Name = "CrabGebouwen", Order = 1)]
         [XmlArrayItem(ElementName = "CrabGebouw")]
