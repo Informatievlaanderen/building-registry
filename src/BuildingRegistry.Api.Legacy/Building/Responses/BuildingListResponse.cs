@@ -47,7 +47,7 @@ namespace BuildingRegistry.Api.Legacy.Building.Responses
         public GebouwIdentificator Identificator { get; set; }
 
         /// <summary>
-        /// De URL die naar de details van de meeste recente versie van een enkele gebouw leidt.
+        /// De URL die de details van de meest recente versie van het gebouw weergeeft.
         /// </summary>
         [DataMember(Name = "Detail", Order = 2)]
         [JsonProperty(Required = Required.DisallowNull)]
