@@ -27,21 +27,21 @@ namespace BuildingRegistry.Api.Legacy.BuildingUnit.Responses
         public GebouweenheidIdentificator Identificator { get; set; }
 
         /// <summary>
-        /// The building unit geometry (a point with Lambert-72 coordinates)
+        /// De puntgeometrie van de gebouweenheid in gml- of geoJSON-formaat, afhankelijk van het content-type.
         /// </summary>
         [DataMember(Name = "GeometriePunt", Order = 2)]
         [JsonProperty(Required = Required.DisallowNull)]
         public Point Geometry { get; set; }
 
         /// <summary>
-        /// De gebruikte methode om de positie te bepalen.
+        /// De geometriemethode van de gebouweenheidpositie. 
         /// </summary>
         [DataMember(Name = "PositieGeometrieMethode", Order = 3)]
         [JsonProperty(Required = Required.DisallowNull)]
         public PositieGeometrieMethode GeometryMethod { get; set; }
 
         /// <summary>
-        /// De fase in het leven van een gebouweenheid.
+        /// De status van de gebouweenheid. 
         /// </summary>
         [DataMember(Name = "GebouweenheidStatus", Order = 4)]
         [JsonProperty(Required = Required.DisallowNull)]
@@ -62,7 +62,7 @@ namespace BuildingRegistry.Api.Legacy.BuildingUnit.Responses
         public GebouweenheidDetailGebouw Building { get; set; }
 
         /// <summary>
-        /// De aan de gebouweenheid gelinkte adressen.
+        /// De aan de gebouweenheid gekoppelde adressen.
         /// </summary>
         [DataMember(Name = "Adressen", Order = 7)]
         [JsonProperty(Required = Required.DisallowNull)]

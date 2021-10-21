@@ -46,14 +46,14 @@ namespace BuildingRegistry.Api.Legacy.Building.Responses
         public GebouwStatus Status { get; set; }
 
         /// <summary>
-        /// De aan het gebouw gelinkte gebouweenheden.
+        /// De aan het gebouw gekoppelde gebouweenheden.
         /// </summary>
         [DataMember(Name = "Gebouweenheden", Order = 5)]
         [JsonProperty(Required = Required.DisallowNull)]
         public List<GebouwDetailGebouweenheid> BuildingUnits { get; set; }
 
         /// <summary>
-        /// De aan het gebouw gelinkte percelen.
+        /// De aan het gebouw gekoppelde percelen.
         /// </summary>
         [DataMember(Name = "Percelen", Order = 6)]
         [JsonProperty(Required = Required.DisallowNull)]
