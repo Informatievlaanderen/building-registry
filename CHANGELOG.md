@@ -1,3 +1,10 @@
+## [2.30.12](https://github.com/informatievlaanderen/building-registry/compare/v2.30.11...v2.30.12) (2021-10-25)
+
+
+### Bug Fixes
+
+* paket bump ([53bda81](https://github.com/informatievlaanderen/building-registry/commit/53bda8190ea6e48501c77f57fddaf09c5b26622a))
+
 ## [2.30.11](https://github.com/informatievlaanderen/building-registry/compare/v2.30.10...v2.30.11) (2021-10-21)
 
 
