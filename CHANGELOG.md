@@ -1,3 +1,10 @@
+## [2.30.13](https://github.com/informatievlaanderen/building-registry/compare/v2.30.12...v2.30.13) (2021-10-27)
+
+
+### Bug Fixes
+
+* remove default accesskey/secret ([bda4833](https://github.com/informatievlaanderen/building-registry/commit/bda483305e323f69c58a32347a8239ae9e8fbe28))
+
 ## [2.30.12](https://github.com/informatievlaanderen/building-registry/compare/v2.30.11...v2.30.12) (2021-10-25)
 
 
