@@ -1,3 +1,10 @@
+## [2.30.14](https://github.com/informatievlaanderen/building-registry/compare/v2.30.13...v2.30.14) (2021-11-02)
+
+
+### Bug Fixes
+
+* gawr-2202 IdentificatorTerreinObject docu changed ([4445582](https://github.com/informatievlaanderen/building-registry/commit/444558291ced76e72153110bd0fadbbfe4b72862))
+
 ## [2.30.13](https://github.com/informatievlaanderen/building-registry/compare/v2.30.12...v2.30.13) (2021-10-27)
 
 
