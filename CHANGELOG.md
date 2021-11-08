@@ -1,3 +1,10 @@
+## [2.30.16](https://github.com/informatievlaanderen/building-registry/compare/v2.30.15...v2.30.16) (2021-11-08)
+
+
+### Bug Fixes
+
+* gawr-2202   another docu fix ([4158d37](https://github.com/informatievlaanderen/building-registry/commit/4158d3793c16ddb854481d23f80e5d3f2982a7f4))
+
 ## [2.30.15](https://github.com/informatievlaanderen/building-registry/compare/v2.30.14...v2.30.15) (2021-11-05)
 
 
