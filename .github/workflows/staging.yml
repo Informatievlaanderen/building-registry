@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix: 
-        services: ['building-registry-api', 'building-registry-import-api', 'building-registry-projections']
+        services: ['building-registry-api', 'building-registry-projections']
     steps:
     - name: CD
       env:
