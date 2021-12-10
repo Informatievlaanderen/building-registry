@@ -118,7 +118,7 @@ namespace BuildingRegistry.Projector.Infrastructure.Modules
         {
             builder
                 .RegisterModule(
-                    new LastChangedListModule(
+                    new BuildingUnitLastChangedListModule(
                         _configuration.GetConnectionString("LastChangedList"),
                         _configuration["DataDog:ServiceName"],
                         _services,
@@ -128,7 +128,9 @@ namespace BuildingRegistry.Projector.Infrastructure.Modules
                 .RegisterProjectionMigrator<BuildingRegistry.Projections.LastChangedList.LastChangedListContextMigrationFactory>(
                     _configuration,
                     _loggerFactory)
-
+                .RegisterProjectionMigrator<DataMigrationContextMigrationFactory>(
+                    _configuration,
+                    _loggerFactory)
                 //.RegisterProjections<BuildingProjections, LastChangedListContext>(ConnectedProjectionSettings.Default)
                 .RegisterProjections<BuildingUnitProjections, LastChangedListContext>(ConnectedProjectionSettings.Default);
         }

@@ -1,6 +1,6 @@
 namespace BuildingRegistry.Infrastructure
 {
-    public class Schema
+    public static class Schema
     {
         public const string Default = "BuildingRegistry";
 
@@ -17,13 +17,14 @@ namespace BuildingRegistry.Infrastructure
         public const string Sequence = "BuildingRegistrySequence";
     }
 
-    public class MigrationTables
+    public static class MigrationTables
     {
         public const string Legacy = "__EFMigrationsHistoryLegacy";
         public const string Wms = "__EFMigrationsHistoryWmsBuilding";
         public const string Wfs = "__EFMigrationsHistoryWfsBuilding";
         public const string Extract = "__EFMigrationsHistoryExtract";
         public const string Syndication = "__EFMigrationsHistorySyndication";
+        public const string RedisDataMigration = "__EFMigrationsHistoryDataMigration";
         public const string Sequence = "__EFMigrationsHistorySequence";
     }
 }

@@ -1,5 +1,6 @@
 namespace BuildingRegistry.Projections.LastChangedList
 {
+    using System;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.Connector;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.LastChangedList;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore;
@@ -10,10 +11,7 @@ namespace BuildingRegistry.Projections.LastChangedList
     [ConnectedProjectionDescription("Projectie die markeert voor hoeveel gebouwen en gebouweenheden de gecachte data nog geüpdated moeten worden.")]
     public class BuildingUnitProjections : LastChangedListConnectedProjection
     {
-        protected override string CacheKeyFormat => "legacy/buildingunit:{{0}}.{1}";
-        protected override string UriFormat => "/v1/gebouweenheden/{{0}}";
-
-        private static readonly AcceptType[] SupportedAcceptTypes = { AcceptType.Json, AcceptType.Xml };
+        private static readonly AcceptType[] SupportedAcceptTypes = { AcceptType.Json, AcceptType.Xml, AcceptType.JsonLd };
 
         public BuildingUnitProjections()
             : base(SupportedAcceptTypes)
@@ -145,6 +143,29 @@ namespace BuildingRegistry.Projections.LastChangedList
             When<Envelope<SubaddressWasReaddressedFromCrab>>(async (context, message, ct) => DoNothing());
             When<Envelope<TerrainObjectHouseNumberWasImportedFromCrab>>(async (context, message, ct) => DoNothing());
             When<Envelope<TerrainObjectWasImportedFromCrab>>(async (context, message, ct) => DoNothing());
+        }
+
+        protected override string BuildCacheKey(AcceptType acceptType, string identifier)
+        {
+            var shortenedAcceptType = acceptType.ToString().ToLowerInvariant();
+            return acceptType switch
+            {
+                AcceptType.Json => string.Format("legacy/buildingunit:{{0}}.{1}", identifier, shortenedAcceptType),
+                AcceptType.Xml => string.Format("legacy/buildingunit:{{0}}.{1}", identifier, shortenedAcceptType),
+                AcceptType.JsonLd => string.Format("oslo/buildingunit:{{0}}.{1}", identifier, shortenedAcceptType),
+                _ => throw new NotImplementedException($"Cannot build CacheKey for type {typeof(AcceptType)}")
+            };
+        }
+
+        protected override string BuildUri(AcceptType acceptType, string identifier)
+        {
+            return acceptType switch
+            {
+                AcceptType.Json => string.Format("/v1/gebouweenheden/{{0}}", identifier),
+                AcceptType.Xml => string.Format("/v1/gebouweenheden/{{0}}", identifier),
+                AcceptType.JsonLd => string.Format("/v2/gebouweenheden/{{0}}", identifier),
+                _ => throw new NotImplementedException($"Cannot build Uri for type {typeof(AcceptType)}")
+            };
         }
 
         private static void DoNothing() { }
