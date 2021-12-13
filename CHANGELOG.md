@@ -1,3 +1,10 @@
+# [2.31.0](https://github.com/informatievlaanderen/building-registry/compare/v2.30.17...v2.31.0) (2021-12-13)
+
+
+### Features
+
+* buildingunit add projection handler ([ec2cd70](https://github.com/informatievlaanderen/building-registry/commit/ec2cd703058a75985f1554eded1a3b26f37246ca))
+
 ## [2.30.17](https://github.com/informatievlaanderen/building-registry/compare/v2.30.16...v2.30.17) (2021-11-18)
 
 
