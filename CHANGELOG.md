@@ -1,3 +1,10 @@
+## [2.32.1](https://github.com/informatievlaanderen/building-registry/compare/v2.32.0...v2.32.1) (2021-12-13)
+
+
+### Bug Fixes
+
+* add gml property to BuildingUnitOsloResponse ([0b49a62](https://github.com/informatievlaanderen/building-registry/commit/0b49a62e686113db2c6198a57c87b801c666af3b))
+
 # [2.32.0](https://github.com/informatievlaanderen/building-registry/compare/v2.31.0...v2.32.0) (2021-12-13)
 
 
