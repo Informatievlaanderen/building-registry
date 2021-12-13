@@ -2,8 +2,10 @@ namespace BuildingRegistry.Api.Oslo.BuildingUnit
 {
     using System;
     using System.Linq;
+    using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
+    using System.Xml;
     using Be.Vlaanderen.Basisregisters.Api;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
     using Be.Vlaanderen.Basisregisters.Api.Search;
@@ -20,6 +22,7 @@ namespace BuildingRegistry.Api.Oslo.BuildingUnit
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Options;
+    using NetTopologySuite.Geometries;
     using Projections.Legacy;
     using Projections.Syndication;
     using Query;
@@ -182,8 +185,7 @@ namespace BuildingRegistry.Api.Oslo.BuildingUnit
                 buildingUnit.PersistentLocalId.Value,
                 responseOptions.Value.GebouweenheidNaamruimte,
                 buildingUnit.Version.ToBelgianDateTimeOffset(),
-                GetBuildingUnitPoint(buildingUnit.Position),
-                MapBuildingUnitGeometryMethod(buildingUnit.PositionMethod.Value),
+                GetBuildingUnitPoint(buildingUnit.Position, buildingUnit.PositionMethod.Value),
                 MapBuildingUnitStatus(buildingUnit.Status.Value),
                 MapBuildingUnitFunction(buildingUnit.Function),
                 new GebouweenheidDetailGebouw(buildingUnit.BuildingPersistentLocalId.Value.ToString(), string.Format(responseOptions.Value.GebouwDetailUrl, buildingUnit.BuildingPersistentLocalId.Value)),
@@ -237,14 +239,33 @@ namespace BuildingRegistry.Api.Oslo.BuildingUnit
             throw new ArgumentOutOfRangeException(nameof(function), function, null);
         }
 
-        public static Point GetBuildingUnitPoint(byte[] point)
+        public static Responses.BuildingUnitPosition GetBuildingUnitPoint(byte[] point, BuildingUnitPositionGeometryMethod geometryMethod)
         {
             var geometry = WKBReaderFactory.Create().Read(point);
-            return new Point
+            var gml = GetGml(geometry);
+            return new Responses.BuildingUnitPosition(new GmlJsonPoint(gml), MapBuildingUnitGeometryMethod(geometryMethod));
+        }
+
+        private static string GetGml(Geometry geometry)
+        {
+            StringBuilder builder = new();
+            XmlWriterSettings settings = new() { Indent = false, OmitXmlDeclaration = true };
+            using (XmlWriter xmlwriter = XmlWriter.Create(builder, settings))
             {
-                XmlPoint = new GmlPoint { Pos = $"{geometry.Coordinate.X.ToPointGeometryCoordinateValueFormat()} {geometry.Coordinate.Y.ToPointGeometryCoordinateValueFormat()}" },
-                JsonPoint = new GeoJSONPoint { Coordinates = new[] { geometry.Coordinate.X, geometry.Coordinate.Y } }
-            };
+                xmlwriter.WriteStartElement("gml", "Point", "http://www.opengis.net/gml/3.2");
+                xmlwriter.WriteAttributeString("srsName", "https://www.opengis.net/def/crs/EPSG/0/31370");
+                Write(geometry.Coordinate, xmlwriter);
+                xmlwriter.WriteEndElement();
+            }
+            return builder.ToString();
+        }
+
+        private static void Write(Coordinate coordinate, XmlWriter writer)
+        {
+            writer.WriteStartElement("gml", "pos", "http://www.opengis.net/gml/3.2");
+            writer.WriteValue(string.Format(NetTopologySuite.Utilities.Global.GetNfi(), "{0} {1}", coordinate.X,
+                coordinate.Y));
+            writer.WriteEndElement();
         }
     }
 }
