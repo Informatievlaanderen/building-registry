@@ -1,3 +1,10 @@
+# [2.32.0](https://github.com/informatievlaanderen/building-registry/compare/v2.31.0...v2.32.0) (2021-12-13)
+
+
+### Features
+
+* add oslo api  ([a4e04d6](https://github.com/informatievlaanderen/building-registry/commit/a4e04d6c8c4bb7df00ae12a48b358e12e05148d9))
+
 # [2.31.0](https://github.com/informatievlaanderen/building-registry/compare/v2.30.17...v2.31.0) (2021-12-13)
 
 
