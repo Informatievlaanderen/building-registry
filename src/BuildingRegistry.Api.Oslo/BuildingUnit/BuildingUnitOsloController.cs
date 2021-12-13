@@ -28,8 +28,8 @@ namespace BuildingRegistry.Api.Oslo.BuildingUnit
     using ValueObjects;
     using ProblemDetails = Be.Vlaanderen.Basisregisters.BasicApiProblem.ProblemDetails;
 
-    [ApiVersion("1.0")]
-    [AdvertiseApiVersions("1.0")]
+    [ApiVersion("2.0")]
+    [AdvertiseApiVersions("2.0")]
     [ApiRoute("gebouweenheden")]
     [ApiExplorerSettings(GroupName = "Gebouweenheden")]
     public class BuildingUnitOsloController : ApiController
@@ -77,7 +77,7 @@ namespace BuildingRegistry.Api.Oslo.BuildingUnit
             var listResponse = new BuildingUnitListOsloResponse
             {
                 Gebouweenheden = units
-                    .Select(x => new GebouweenheidCollectieItem(
+                    .Select(x => new GebouweenheidCollectieItemOslo(
                         x.PersistentLocalId.Value,
                         responseOptions.Value.GebouweenheidNaamruimte,
                         responseOptions.Value.GebouweenheidDetailUrl,

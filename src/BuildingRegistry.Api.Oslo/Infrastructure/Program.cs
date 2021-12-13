@@ -14,7 +14,7 @@ namespace BuildingRegistry.Api.Oslo.Infrastructure
                     {
                         Hosting =
                         {
-                            HttpPort = 6002
+                            HttpPort = 6012
                         },
                         Logging =
                         {

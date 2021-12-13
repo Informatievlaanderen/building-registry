@@ -3,6 +3,7 @@ namespace BuildingRegistry.Api.Oslo.Building.Responses
     using System;
     using System.Collections.Generic;
     using System.Runtime.Serialization;
+    using Be.Vlaanderen.Basisregisters.Api.JsonConverters;
     using Be.Vlaanderen.Basisregisters.GrAr.Common;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy.Gebouw;
@@ -14,12 +15,27 @@ namespace BuildingRegistry.Api.Oslo.Building.Responses
     [DataContract(Name = "GebouwCollectie", Namespace = "")]
     public class BuildingListOsloResponse
     {
+        [DataMember(Name = "@context", Order = 0)]
+        [JsonProperty(Required = Required.DisallowNull)]
+        [JsonConverter(typeof(PlainStringJsonConverter))]
+        public object Context => @"{
+	""gebouwStatus"": {
+		""@id"": ""https://data.vlaanderen.be/ns/gebouw#Gebouweenheid.status"",
+		""@type"": ""@id""},
+	""detail"": ""http://www.iana.org/assignments/relation/self"",
+	""gebouwen"": ""@graph"",
+	""identificator"": ""@nest"",
+	""id"": ""@id"",
+	""versieId"":{
+		""@id"": ""https://data.vlaanderen.be/ns/generiek#versieIdentificator"",        
+		""@type"": ""http://www.w3.org/2001/XMLSchema#string""}
+}";
         /// <summary>
         /// Collectie van gebouwen
         /// </summary>
         [DataMember(Name = "Gebouwen", Order = 1)]
         [JsonProperty(Required = Required.DisallowNull)]
-        public List<GebouwCollectieItem> Gebouwen { get; set; }
+        public List<GebouwCollectieItemOslo> Gebouwen { get; set; }
 
         /// <summary>
         /// Het totaal aantal gebouwen die overeenkomen met de vraag.
@@ -37,8 +53,15 @@ namespace BuildingRegistry.Api.Oslo.Building.Responses
     }
 
     [DataContract(Name = "Gebouw", Namespace = "")]
-    public class GebouwCollectieItem
+    public class GebouwCollectieItemOslo
     {
+        /// <summary>
+        /// Het linked-data type van de gebouw.
+        /// </summary>
+        [DataMember(Name = "@type", Order = 0)]
+        [JsonProperty(Required = Required.DisallowNull)]
+        public string Type => "https://data.vlaanderen.be/ns/gebouw";
+
         /// <summary>
         /// De identificator van het gebouw.
         /// </summary>
@@ -60,7 +83,7 @@ namespace BuildingRegistry.Api.Oslo.Building.Responses
         [JsonProperty(Required = Required.DisallowNull)]
         public GebouwStatus Status { get; set; }
 
-        public GebouwCollectieItem(
+        public GebouwCollectieItemOslo(
             int id,
             string naamruimte,
             string detail,
@@ -82,13 +105,13 @@ namespace BuildingRegistry.Api.Oslo.Building.Responses
         public BuildingListOsloResponse GetExamples()
             => new BuildingListOsloResponse
             {
-                Gebouwen = new List<GebouwCollectieItem>
+                Gebouwen = new List<GebouwCollectieItemOslo>
                 {
-                    new GebouwCollectieItem(6, _responseOptions.GebouwNaamruimte, _responseOptions.GebouwDetailUrl, GebouwStatus.Gehistoreerd, DateTimeOffset.Now.ToExampleOffset()),
-                    new GebouwCollectieItem(7, _responseOptions.GebouwNaamruimte, _responseOptions.GebouwDetailUrl, GebouwStatus.Gepland, DateTimeOffset.Now.AddHours(1).ToExampleOffset()),
-                    new GebouwCollectieItem(8, _responseOptions.GebouwNaamruimte, _responseOptions.GebouwDetailUrl, GebouwStatus.Gerealiseerd, DateTimeOffset.Now.AddDays(1).ToExampleOffset()),
-                    new GebouwCollectieItem(9, _responseOptions.GebouwNaamruimte, _responseOptions.GebouwDetailUrl, GebouwStatus.InAanbouw, DateTimeOffset.Now.AddHours(9).ToExampleOffset()),
-                    new GebouwCollectieItem(10, _responseOptions.GebouwNaamruimte, _responseOptions.GebouwDetailUrl, GebouwStatus.NietGerealiseerd, DateTimeOffset.Now.AddDays(2).ToExampleOffset())
+                    new GebouwCollectieItemOslo(6, _responseOptions.GebouwNaamruimte, _responseOptions.GebouwDetailUrl, GebouwStatus.Gehistoreerd, DateTimeOffset.Now.ToExampleOffset()),
+                    new GebouwCollectieItemOslo(7, _responseOptions.GebouwNaamruimte, _responseOptions.GebouwDetailUrl, GebouwStatus.Gepland, DateTimeOffset.Now.AddHours(1).ToExampleOffset()),
+                    new GebouwCollectieItemOslo(8, _responseOptions.GebouwNaamruimte, _responseOptions.GebouwDetailUrl, GebouwStatus.Gerealiseerd, DateTimeOffset.Now.AddDays(1).ToExampleOffset()),
+                    new GebouwCollectieItemOslo(9, _responseOptions.GebouwNaamruimte, _responseOptions.GebouwDetailUrl, GebouwStatus.InAanbouw, DateTimeOffset.Now.AddHours(9).ToExampleOffset()),
+                    new GebouwCollectieItemOslo(10, _responseOptions.GebouwNaamruimte, _responseOptions.GebouwDetailUrl, GebouwStatus.NietGerealiseerd, DateTimeOffset.Now.AddDays(2).ToExampleOffset())
                 },
                 Volgende = new Uri(string.Format(_responseOptions.GebouwVolgendeUrl, "5", "10"))
             };

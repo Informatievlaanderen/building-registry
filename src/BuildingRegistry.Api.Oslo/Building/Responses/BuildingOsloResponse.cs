@@ -4,6 +4,7 @@ namespace BuildingRegistry.Api.Oslo.Building.Responses
     using System.Collections.Generic;
     using System.Runtime.Serialization;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
+    using Be.Vlaanderen.Basisregisters.Api.JsonConverters;
     using Be.Vlaanderen.Basisregisters.BasicApiProblem;
     using Be.Vlaanderen.Basisregisters.GrAr.Common;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy;
@@ -18,44 +19,87 @@ namespace BuildingRegistry.Api.Oslo.Building.Responses
     [DataContract(Name = "GebouwDetail", Namespace = "")]
     public class BuildingOsloResponse
     {
+        [DataMember(Name = "@context", Order = 0)]
+        [JsonProperty(Required = Required.DisallowNull)]
+        [JsonConverter(typeof(PlainStringJsonConverter))]
+        public object Context => @"{
+	""identificator"": ""@nest"",
+    ""id"": ""@id"",
+    ""versieId"": {
+        ""@id"": ""https://data.vlaanderen.be/ns/generiek#versieIdentificator"",
+        ""@type"": ""http://www.w3.org/2001/XMLSchema#string""
+    },
+    ""positieGeometrieMethode"":""https://data.vlaanderen.be/id/conceptscheme/geometriemethode"",
+    ""gebouwStatus"":{
+		""@id"": ""https://data.vlaanderen.be/ns/gebouw#Gebouw.status"",
+		""@type"": ""@id"",
+        ""@context"": {
+          ""@base"": ""https://data.vlaanderen.be/id/concept/gebouwstatus/"" 
+        }
+    },
+	""percelen"": {
+		""@id"":""https://data.vlaanderen.be/ns/gebouw#ligtOp"",
+		""@type"":""@id"",
+		""@context"": {
+			""@objectId"": ""@id"",
+			""detail"": ""http://www.iana.org/assignments/relation/self""
+		}
+	},
+	""gebouweenheden"": {
+		""@id"":""https://data.vlaanderen.be/ns/gebouw#bestaatUit"",
+		""@type"":""@id"",
+		""@context"":{
+          ""objectid"":""@id"",
+          ""detail"":""http://www.iana.org/assignments/relation/self""
+      }
+	}	
+}";
+
+        /// <summary>
+        /// Het linked-data type van de gebouw.
+        /// </summary>
+        [DataMember(Name = "@type", Order = 1)]
+        [JsonProperty(Required = Required.DisallowNull)]
+        public string Type => "https://data.vlaanderen.be/ns/gebouw";
+
         /// <summary>
         /// De identificator van het gebouw.
         /// </summary>
-        [DataMember(Name = "Identificator", Order = 1)]
+        [DataMember(Name = "Identificator", Order = 2)]
         [JsonProperty(Required = Required.DisallowNull)]
         public GebouwIdentificator Identificator { get; set; }
 
         /// <summary>
         /// the building geometry (a simple polygon with Lambert-72 coordinates)
         /// </summary>
-        [DataMember(Name = "GeometriePolygoon", Order = 2, EmitDefaultValue = true)]
+        [DataMember(Name = "GeometriePolygoon", Order = 3, EmitDefaultValue = true)]
         public Polygon Polygon { get; set; }
 
         /// <summary>
         /// De gebruikte methode om de positie te bepalen.
         /// </summary>
-        [DataMember(Name = "GeometrieMethode", Order = 3)]
+        [DataMember(Name = "GeometrieMethode", Order = 4)]
         [JsonProperty(Required = Required.DisallowNull)]
         public GeometrieMethode GeometryMethod { get; set; }
 
         /// <summary>
         /// De fase in het leven van een gebouw.
         /// </summary>
-        [DataMember(Name = "GebouwStatus", Order = 4)]
+        [DataMember(Name = "GebouwStatus", Order = 5)]
         [JsonProperty(Required = Required.DisallowNull)]
         public GebouwStatus Status { get; set; }
 
         /// <summary>
         /// De aan het gebouw gekoppelde gebouweenheden.
         /// </summary>
-        [DataMember(Name = "Gebouweenheden", Order = 5)]
+        [DataMember(Name = "Gebouweenheden", Order = 6)]
         [JsonProperty(Required = Required.DisallowNull)]
         public List<GebouwDetailGebouweenheid> BuildingUnits { get; set; }
 
         /// <summary>
         /// De aan het gebouw gekoppelde percelen.
         /// </summary>
-        [DataMember(Name = "Percelen", Order = 6)]
+        [DataMember(Name = "Percelen", Order = 7)]
         [JsonProperty(Required = Required.DisallowNull)]
         public List<GebouwDetailPerceel> Parcels { get; set; }
 

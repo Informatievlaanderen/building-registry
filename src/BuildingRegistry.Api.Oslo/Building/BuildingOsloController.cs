@@ -31,8 +31,8 @@ namespace BuildingRegistry.Api.Oslo.Building
     using ValueObjects;
     using ProblemDetails = Be.Vlaanderen.Basisregisters.BasicApiProblem.ProblemDetails;
 
-    [ApiVersion("1.0")]
-    [AdvertiseApiVersions("1.0")]
+    [ApiVersion("2.0")]
+    [AdvertiseApiVersions("2.0")]
     [ApiRoute("gebouwen")]
     [ApiExplorerSettings(GroupName = "Gebouwen")]
     public class BuildingOsloController : ApiController
@@ -113,56 +113,6 @@ namespace BuildingRegistry.Api.Oslo.Building
         }
 
         /// <summary>
-        /// Vraag de referenties van een gebouw op.
-        /// </summary>
-        /// <param name="context"></param>
-        /// <param name="persistentLocalId"></param>
-        /// <param name="cancellationToken"></param>
-        /// <response code="200">De referenties van het gebouw.</response>
-        /// <response code="404">Als het gebouw niet gevonden kan worden.</response>
-        /// <response code="410">Als het gebouw verwijderd werd.</response>
-        /// <response code="500">Als er een interne fout is opgetreden.</response>
-        [HttpGet("{persistentLocalId}/referenties")]
-        [Produces(AcceptTypes.JsonLd)]
-        [ProducesResponseType(typeof(BuildingReferencesOsloResponse), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status410Gone)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-        [SwaggerResponseExample(StatusCodes.Status200OK, typeof(BuildingReferencesOsloResponseExamples))]
-        [SwaggerResponseExample(StatusCodes.Status404NotFound, typeof(BuildingNotFoundResponseExamples))]
-        [SwaggerResponseExample(StatusCodes.Status410Gone, typeof(BuildingGoneResponseExamples))]
-        [SwaggerResponseExample(StatusCodes.Status500InternalServerError, typeof(InternalServerErrorResponseExamples))]
-        public async Task<IActionResult> GetReferences(
-            [FromServices] LegacyContext context,
-            [FromRoute] int persistentLocalId,
-            [FromServices] IOptions<ResponseOptions> responseOptions,
-            CancellationToken cancellationToken = default)
-        {
-            var building = await context
-                .BuildingDetails
-                .AsNoTracking()
-                .SingleOrDefaultAsync(item => item.PersistentLocalId == persistentLocalId, cancellationToken);
-
-            if (building != null && building.IsRemoved)
-                throw new ApiException("Gebouw werd verwijderd.", StatusCodes.Status410Gone);
-
-            if (building == null || !building.IsComplete)
-                throw new ApiException("Onbestaand gebouw.", StatusCodes.Status404NotFound);
-
-            var crabMappings = await context.BuildingPersistentIdCrabIdMappings.FindAsync(new object[] { building.BuildingId }, cancellationToken);
-            var crabReferences =
-                crabMappings.CrabTerrainObjectId.HasValue && !string.IsNullOrEmpty(crabMappings.CrabIdentifierTerrainObject)
-                ? new CrabReferences(crabMappings.CrabTerrainObjectId.Value, crabMappings.CrabIdentifierTerrainObject)
-                : null;
-
-            return Ok(new BuildingReferencesOsloResponse(
-                building.PersistentLocalId.Value,
-                responseOptions.Value.GebouwNaamruimte,
-                building.Version.ToBelgianDateTimeOffset(),
-                crabReferences));
-        }
-
-        /// <summary>
         /// Vraag een lijst met actieve gebouwn op.
         /// </summary>
         /// <param name="context"></param>
@@ -203,7 +153,7 @@ namespace BuildingRegistry.Api.Oslo.Building
             var listResponse = new BuildingListOsloResponse
             {
                 Gebouwen = buildings
-                    .Select(x => new GebouwCollectieItem(
+                    .Select(x => new GebouwCollectieItemOslo(
                         x.PersistentLocalId.Value,
                         responseOptions.Value.GebouwNaamruimte,
                         responseOptions.Value.GebouwDetailUrl,
@@ -250,44 +200,6 @@ namespace BuildingRegistry.Api.Oslo.Building
                             .First()
                             .Count)
                 });
-        }
-
-        /// <summary>
-        /// Vraag de koppeling tussen CRAB/GRB-gebouwen en GR-gebouwen
-        /// </summary>
-        /// <param name="context"></param>
-        /// <param name="cancellationToken"></param>
-        /// <response code="200">Als de opvraging van de CRAB/GRB-gebouwen gelukt is.</response>
-        /// <response code="400">Als er geen parameters zijn opgegeven.</response>
-        /// <response code="500">Als er een interne fout is opgetreden.</response>
-        [HttpGet("crabgebouwen")]
-        [Produces(AcceptTypes.JsonLd)]
-        [ProducesResponseType(typeof(BuildingCrabMappingOsloResponse), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-        [SwaggerResponseExample(StatusCodes.Status200OK, typeof(BuildingCrabMappingOsloResponseExamples))]
-        [SwaggerResponseExample(StatusCodes.Status400BadRequest, typeof(BadRequestResponseExamples))]
-        [SwaggerResponseExample(StatusCodes.Status500InternalServerError, typeof(InternalServerErrorResponseExamples))]
-        public async Task<IActionResult> CrabGebouwen(
-            [FromServices] LegacyContext context,
-            CancellationToken cancellationToken = default)
-        {
-            var filtering = Request.ExtractFilteringRequest<BuildingCrabMappingFilter>();
-            var sorting = Request.ExtractSortingRequest();
-            var pagination = new NoPaginationRequest();
-
-            if (filtering.Filter.TerrainObjectId == null && string.IsNullOrEmpty(filtering.Filter.IdentifierTerrainObject))
-                return BadRequest("Filter is required");
-
-            var query = new BuildingCrabMappingOsloQuery(context).Fetch(filtering, sorting, pagination);
-
-            return Ok(new BuildingCrabMappingOsloResponse
-            {
-                CrabGebouwen = query
-                    .Items
-                    .Select(x => new BuildingCrabMappingItem(x.PersistentLocalId.Value, x.CrabTerrainObjectId.Value, x.CrabIdentifierTerrainObject))
-                    .ToList()
-            });
         }
 
         internal static Polygon GetBuildingPolygon(byte[] polygon)

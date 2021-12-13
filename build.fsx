@@ -40,6 +40,7 @@ Target.create "Build_Solution" (fun _ ->
   setVersions "SolutionInfo.cs"
   buildSource "BuildingRegistry.Projector"
   buildSource "BuildingRegistry.Api.Legacy"
+  buildSource "BuildingRegistry.Api.Oslo"
   buildSource "BuildingRegistry.Api.Extract"
   buildSource "BuildingRegistry.Api.CrabImport"
   buildSource "BuildingRegistry.Projections.Legacy"
@@ -59,6 +60,7 @@ Target.create "Publish_Solution" (fun _ ->
   [
     "BuildingRegistry.Projector"
     "BuildingRegistry.Api.Legacy"
+    "BuildingRegistry.Api.Oslo"
     "BuildingRegistry.Api.Extract"
     "BuildingRegistry.Api.CrabImport"
     "BuildingRegistry.Projections.Legacy"
@@ -71,6 +73,7 @@ Target.create "Pack_Solution" (fun _ ->
   [
     "BuildingRegistry.Projector"
     "BuildingRegistry.Api.Legacy"
+    "BuildingRegistry.Api.Oslo"
     "BuildingRegistry.Api.Extract"
     "BuildingRegistry.Api.CrabImport"
   ] |> List.iter pack)
@@ -80,6 +83,9 @@ Target.create "PushContainer_Projector" (fun _ -> push "projector")
 
 Target.create "Containerize_ApiLegacy" (fun _ -> containerize "BuildingRegistry.Api.Legacy" "api-legacy")
 Target.create "PushContainer_ApiLegacy" (fun _ -> push "api-legacy")
+
+Target.create "Containerize_ApiOslo" (fun _ -> containerize "BuildingRegistry.Api.Oslo" "api-oslo")
+Target.create "PushContainer_ApiOslo" (fun _ -> push "api-oslo")
 
 Target.create "Containerize_ApiExtract" (fun _ -> containerize "BuildingRegistry.Api.Extract" "api-extract")
 Target.create "PushContainer_ApiExtract" (fun _ -> push "api-extract")
@@ -135,6 +141,7 @@ Target.create "Push" ignore
 "Pack"
   ==> "Containerize_Projector"
   ==> "Containerize_ApiLegacy"
+  ==> "Containerize_ApiOslo"
   ==> "Containerize_ApiExtract"
   ==> "Containerize_ApiCrabImport"
   ==> "Containerize_ProjectionsSyndication"
@@ -145,6 +152,7 @@ Target.create "Push" ignore
   ==> "DockerLogin"
   ==> "PushContainer_Projector"
   ==> "PushContainer_ApiLegacy"
+  ==> "PushContainer_ApiOslo"
   ==> "PushContainer_ApiExtract"
   ==> "PushContainer_ApiCrabImport"
   ==> "PushContainer_ProjectionsSyndication"

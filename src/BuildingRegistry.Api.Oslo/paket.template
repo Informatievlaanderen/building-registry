@@ -20,8 +20,8 @@ files
   BuildingRegistry.Api.Oslo.xml => lib\net5.0
   BuildingRegistry.Api.Oslo.xml => content
 
-  BuildingRegistry.Projections.Oslo.dll => lib\net5.0
-  BuildingRegistry.Projections.Oslo.pdb => lib\net5.0
+  BuildingRegistry.Projections.Legacy.dll => lib\net5.0
+  BuildingRegistry.Projections.Legacy.pdb => lib\net5.0
 
   BuildingRegistry.Projections.Syndication.dll => lib\net5.0
   BuildingRegistry.Projections.Syndication.pdb => lib\net5.0

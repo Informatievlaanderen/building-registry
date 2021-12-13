@@ -9,7 +9,7 @@ RUN apt-get update && \
     apt-get install curl jq -y && \
     chmod +x ./init.sh
 
-EXPOSE 6002/tcp
-ENV ASPNETCORE_URLS http://*:6002
+EXPOSE 6012/tcp
+ENV ASPNETCORE_URLS http://*:6012
 
 ENTRYPOINT ["./init.sh"]
