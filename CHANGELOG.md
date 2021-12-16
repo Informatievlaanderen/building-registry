@@ -1,3 +1,10 @@
+## [2.32.2](https://github.com/informatievlaanderen/building-registry/compare/v2.32.1...v2.32.2) (2021-12-16)
+
+
+### Bug Fixes
+
+* use async startup of projections to fix hanging migrations ([7c8db16](https://github.com/informatievlaanderen/building-registry/commit/7c8db16aefc64b1a4d5148f2044c43bd3859f99a))
+
 ## [2.32.1](https://github.com/informatievlaanderen/building-registry/compare/v2.32.0...v2.32.1) (2021-12-13)
 
 
