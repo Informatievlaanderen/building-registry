@@ -197,7 +197,7 @@ namespace BuildingRegistry.Projector.Infrastructure
                     }
                 })
 
-                .UseProjectionsManager(new ProjectionsManagerOptions
+                .UseProjectionsManagerAsync(new ProjectionsManagerOptions
                 {
                     Common =
                     {
