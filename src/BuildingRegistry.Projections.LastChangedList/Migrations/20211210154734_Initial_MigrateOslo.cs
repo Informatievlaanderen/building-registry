@@ -25,7 +25,7 @@ SELECT
   null,
   null
 FROM [{LastChangedListContext.Schema}].[{LastChangedListContext.TableName}]
-WHERE Id like '%.json'");
+WHERE Id like '%.json' AND CacheKey like 'legacy/buildingunit:%'");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
