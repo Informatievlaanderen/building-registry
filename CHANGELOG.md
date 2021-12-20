@@ -1,3 +1,10 @@
+## [2.32.3](https://github.com/informatievlaanderen/building-registry/compare/v2.32.2...v2.32.3) (2021-12-20)
+
+
+### Bug Fixes
+
+* add filter to datamigration ([a9c8b95](https://github.com/informatievlaanderen/building-registry/commit/a9c8b957f72a5a07dafd3b1a7219438bc709bb1f))
+
 ## [2.32.2](https://github.com/informatievlaanderen/building-registry/compare/v2.32.1...v2.32.2) (2021-12-16)
 
 
