@@ -1,3 +1,10 @@
+## [2.32.4](https://github.com/informatievlaanderen/building-registry/compare/v2.32.3...v2.32.4) (2021-12-21)
+
+
+### Bug Fixes
+
+* gawr-2506 till gawr-2509 api docs oslo endpoints ([540a4c0](https://github.com/informatievlaanderen/building-registry/commit/540a4c0918a6bfab964c16d88f7cfdc9e8529257))
+
 ## [2.32.3](https://github.com/informatievlaanderen/building-registry/compare/v2.32.2...v2.32.3) (2021-12-20)
 
 
