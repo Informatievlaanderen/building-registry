@@ -15,6 +15,9 @@ namespace BuildingRegistry.Api.Oslo.Building.Responses
     [DataContract(Name = "GebouwCollectie", Namespace = "")]
     public class BuildingListOsloResponse
     {
+        /// <summary>
+        /// De linked-data context van het gebouw.
+        /// </summary>
         [DataMember(Name = "@context", Order = 0)]
         [JsonProperty(Required = Required.DisallowNull)]
         [JsonConverter(typeof(PlainStringJsonConverter))]
@@ -56,11 +59,11 @@ namespace BuildingRegistry.Api.Oslo.Building.Responses
     public class GebouwCollectieItemOslo
     {
         /// <summary>
-        /// Het linked-data type van de gebouw.
+        /// Het linked-data type van het gebouw.
         /// </summary>
         [DataMember(Name = "@type", Order = 0)]
         [JsonProperty(Required = Required.DisallowNull)]
-        public string Type => "https://data.vlaanderen.be/ns/gebouw";
+        public string Type => "Gebouw";
 
         /// <summary>
         /// De identificator van het gebouw.

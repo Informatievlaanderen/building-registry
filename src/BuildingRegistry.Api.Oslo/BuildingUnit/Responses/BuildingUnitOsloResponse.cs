@@ -20,6 +20,9 @@ namespace BuildingRegistry.Api.Oslo.BuildingUnit.Responses
     [DataContract(Name = "GebouweenheidDetail", Namespace = "")]
     public class BuildingUnitOsloResponse
     {
+        /// <summary>
+        /// De linked-data context van de gebouweenheid.
+        /// </summary>
         [DataMember(Name = "@context", Order = 0)]
         [JsonProperty(Required = Required.DisallowNull)]
         [JsonConverter(typeof(PlainStringJsonConverter))]
@@ -58,7 +61,7 @@ namespace BuildingRegistry.Api.Oslo.BuildingUnit.Responses
 }";
 
         /// <summary>
-        /// Het linked-data type van de gebouweenheid
+        /// Het linked-data type van de gebouweenheid.
         /// </summary>
         [DataMember(Name = "@type", Order = 1)]
         [JsonProperty(Required = Required.DisallowNull)]
