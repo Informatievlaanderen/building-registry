@@ -75,7 +75,7 @@ namespace BuildingRegistry.Api.Oslo.BuildingUnit.Responses
         public GebouweenheidIdentificator Identificator { get; set; }
 
         /// <summary>
-        /// De puntgeometrie van de gebouweenheid in gml3.
+        /// De geometrie van het object in gml-formaat.
         /// </summary>
         [DataMember(Name = "GebouweenheidPositie", Order = 3)]
         [JsonProperty(Required = Required.DisallowNull)]
