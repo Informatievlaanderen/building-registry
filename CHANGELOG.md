@@ -1,3 +1,10 @@
+# [2.33.0](https://github.com/informatievlaanderen/building-registry/compare/v2.32.5...v2.33.0) (2022-01-04)
+
+
+### Features
+
+* GAWR-2519 add buildingPolygoon property with gml 3.2 xml string ([1617297](https://github.com/informatievlaanderen/building-registry/commit/1617297ee6a26c4d5824a423a6757c8a49ca6e9f))
+
 ## [2.32.5](https://github.com/informatievlaanderen/building-registry/compare/v2.32.4...v2.32.5) (2021-12-21)
 
 
