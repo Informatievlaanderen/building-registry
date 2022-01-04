@@ -239,7 +239,7 @@ namespace BuildingRegistry.Api.Oslo.BuildingUnit
             throw new ArgumentOutOfRangeException(nameof(function), function, null);
         }
 
-        public static Responses.BuildingUnitPosition GetBuildingUnitPoint(byte[] point, BuildingUnitPositionGeometryMethod geometryMethod)
+        private static Responses.BuildingUnitPosition GetBuildingUnitPoint(byte[] point, BuildingUnitPositionGeometryMethod geometryMethod)
         {
             var geometry = WKBReaderFactory.Create().Read(point);
             var gml = GetGml(geometry);

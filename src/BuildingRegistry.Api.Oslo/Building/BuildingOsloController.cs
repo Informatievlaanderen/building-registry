@@ -1,11 +1,11 @@
 namespace BuildingRegistry.Api.Oslo.Building
 {
     using System;
-    using System.Collections.Generic;
     using System.Linq;
     using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
+    using System.Xml;
     using Be.Vlaanderen.Basisregisters.Api;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
     using Be.Vlaanderen.Basisregisters.Api.Search;
@@ -23,6 +23,7 @@ namespace BuildingRegistry.Api.Oslo.Building
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Options;
+    using NetTopologySuite.Geometries;
     using Projections.Legacy;
     using Projections.Syndication;
     using Query;
@@ -103,8 +104,7 @@ namespace BuildingRegistry.Api.Oslo.Building
                 building.PersistentLocalId.Value,
                 responseOptions.Value.GebouwNaamruimte,
                 building.Version.ToBelgianDateTimeOffset(),
-                GetBuildingPolygon(building.Geometry),
-                MapGeometryMethod(building.GeometryMethod.Value),
+                GetBuildingPolygon(building.Geometry, building.GeometryMethod.Value),
                 MapBuildingStatus(building.Status.Value),
                 buildingUnits.OrderBy(x => x.Value).Select(x => new GebouwDetailGebouweenheid(x.ToString(), string.Format(responseOptions.Value.GebouweenheidDetailUrl, x))).ToList(),
                 caPaKeys.Select(x => new GebouwDetailPerceel(x, string.Format(responseOptions.Value.PerceelUrl, x))).ToList());
@@ -202,70 +202,6 @@ namespace BuildingRegistry.Api.Oslo.Building
                 });
         }
 
-        internal static Polygon GetBuildingPolygon(byte[] polygon)
-        {
-            var geometry = WKBReaderFactory.Create().Read(polygon) as NetTopologySuite.Geometries.Polygon;
-
-            if (geometry == null) //some buildings have multi polygons (imported) which are incorrect.
-                return null;
-
-            return new Polygon
-            {
-                XmlPolygon = MapGmlPolygon(geometry),
-                JsonPolygon = MapToGeoJsonPolygon(geometry)
-            };
-        }
-
-        private static GeoJSONPolygon MapToGeoJsonPolygon(NetTopologySuite.Geometries.Polygon polygon)
-        {
-            var rings = polygon.InteriorRings.ToList();
-            rings.Insert(0, polygon.ExteriorRing); //insert exterior ring as first item
-
-            var output = new double[rings.Count][][];
-            for (var i = 0; i < rings.Count; i++)
-            {
-                output[i] = new double[rings[i].Coordinates.Length][];
-
-                for (int j = 0; j < rings[i].Coordinates.Length; j++)
-                {
-                    output[i][j] = new double[2];
-                    output[i][j][0] = rings[i].Coordinates[j].X;
-                    output[i][j][1] = rings[i].Coordinates[j].Y;
-                }
-            }
-
-            return new GeoJSONPolygon { Coordinates = output };
-        }
-
-        private static GmlPolygon MapGmlPolygon(NetTopologySuite.Geometries.Polygon polygon)
-        {
-            var gmlPolygon = new GmlPolygon
-            {
-                Exterior = GetGmlRing(polygon.ExteriorRing as NetTopologySuite.Geometries.LinearRing)
-            };
-
-            if (polygon.NumInteriorRings > 0)
-                gmlPolygon.Interior = new List<RingProperty>();
-
-            for (var i = 0; i < polygon.NumInteriorRings; i++)
-                gmlPolygon.Interior.Add(GetGmlRing(polygon.InteriorRings[i] as NetTopologySuite.Geometries.LinearRing));
-
-            return gmlPolygon;
-        }
-
-        private static RingProperty GetGmlRing(NetTopologySuite.Geometries.LinearRing ring)
-        {
-            var posListBuilder = new StringBuilder();
-            foreach (var coordinate in ring.Coordinates)
-                posListBuilder.Append($"{coordinate.X.ToPolygonGeometryCoordinateValueFormat()} {coordinate.Y.ToPolygonGeometryCoordinateValueFormat()} ");
-
-            //remove last space
-            posListBuilder.Length--;
-
-            var gmlRing = new RingProperty { LinearRing = new LinearRing { PosList = posListBuilder.ToString() } };
-            return gmlRing;
-        }
-
         private static GeometrieMethode MapGeometryMethod(BuildingGeometryMethod geometryMethod)
         {
             switch (geometryMethod)
@@ -303,6 +239,64 @@ namespace BuildingRegistry.Api.Oslo.Building
                 default:
                     throw new ArgumentOutOfRangeException(nameof(status), status, null);
             }
+        }
+
+        private static BuildingPolygon GetBuildingPolygon(byte[] polygon, BuildingGeometryMethod geometryMethod)
+        {
+            var geometry = WKBReaderFactory.Create().Read(polygon) as NetTopologySuite.Geometries.Polygon;
+
+            if (geometry == null) //some buildings have multi polygons (imported) which are incorrect.
+                return null;
+
+            var gml = GetGml(geometry);
+
+            return new BuildingPolygon(new GmlJsonPolygon(gml), MapGeometryMethod(geometryMethod));
+        }
+
+        internal static string GetGml(Geometry geometry)
+        {
+            StringBuilder builder = new();
+            XmlWriterSettings settings = new() { Indent = false, OmitXmlDeclaration = true };
+
+            var polygon = geometry as NetTopologySuite.Geometries.Polygon;
+
+            using (XmlWriter xmlwriter = XmlWriter.Create(builder, settings))
+            {
+                xmlwriter.WriteStartElement("gml", "Polygon", "http://www.opengis.net/gml/3.2");
+                xmlwriter.WriteAttributeString("srsName", "https://www.opengis.net/def/crs/EPSG/0/31370");
+                WriteRing(polygon.ExteriorRing as NetTopologySuite.Geometries.LinearRing, xmlwriter);
+                WriteInteriorRings(polygon.InteriorRings, polygon.NumInteriorRings, xmlwriter);
+                xmlwriter.WriteEndElement();
+            }
+            return builder.ToString();
+        }
+
+        private static void WriteRing(NetTopologySuite.Geometries.LinearRing ring, XmlWriter writer, bool isInterior = false)
+        {
+            writer.WriteStartElement("gml", isInterior ? "interior" : "exterior", "http://www.opengis.net/gml/3.2");
+            writer.WriteStartElement("gml", "LinearRing", "http://www.opengis.net/gml/3.2");
+            writer.WriteStartElement("gml", "posList", "http://www.opengis.net/gml/3.2");
+            foreach (var coordinate in ring.Coordinates)
+            {
+                writer.WriteValue(
+                    string.Format(
+                        NetTopologySuite.Utilities.Global.GetNfi(),
+                        "{0} {1}",
+                        coordinate.X,
+                        coordinate.Y));
+            }
+            writer.WriteEndElement();
+            writer.WriteEndElement();
+            writer.WriteEndElement();
+        }
+
+        private static void WriteInteriorRings(LineString[] rings, int numInteriorRings, XmlWriter writer)
+        {
+            if (numInteriorRings < 1)
+                return;
+
+            foreach (var ring in rings)
+                WriteRing(ring as NetTopologySuite.Geometries.LinearRing, writer, true);
         }
     }
 }
