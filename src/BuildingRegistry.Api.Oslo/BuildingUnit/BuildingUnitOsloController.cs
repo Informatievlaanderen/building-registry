@@ -263,8 +263,8 @@ namespace BuildingRegistry.Api.Oslo.BuildingUnit
         private static void Write(Coordinate coordinate, XmlWriter writer)
         {
             writer.WriteStartElement("gml", "pos", "http://www.opengis.net/gml/3.2");
-            writer.WriteValue(string.Format(NetTopologySuite.Utilities.Global.GetNfi(), "{0} {1}", coordinate.X,
-                coordinate.Y));
+            writer.WriteValue(string.Format(NetTopologySuite.Utilities.Global.GetNfi(), "{0} {1}", coordinate.X.ToPointGeometryCoordinateValueFormat(),
+                coordinate.Y.ToPointGeometryCoordinateValueFormat()));
             writer.WriteEndElement();
         }
     }
