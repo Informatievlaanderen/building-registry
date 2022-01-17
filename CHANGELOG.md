@@ -1,3 +1,10 @@
+## [2.33.1](https://github.com/informatievlaanderen/building-registry/compare/v2.33.0...v2.33.1) (2022-01-17)
+
+
+### Bug Fixes
+
+* gML afronden 2 cijfers na komma ([69e10d8](https://github.com/informatievlaanderen/building-registry/commit/69e10d8f286e041bc4861b9facba33779c8fb575))
+
 # [2.33.0](https://github.com/informatievlaanderen/building-registry/compare/v2.32.5...v2.33.0) (2022-01-04)
 
 
