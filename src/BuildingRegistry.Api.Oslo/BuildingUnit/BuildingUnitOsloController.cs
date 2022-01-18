@@ -89,7 +89,8 @@ namespace BuildingRegistry.Api.Oslo.BuildingUnit
                     .ToList(),
                 Volgende = pagedBuildingUnits
                     .PaginationInfo
-                    .BuildNextUri(responseOptions.Value.GebouweenheidVolgendeUrl)
+                    .BuildNextUri(responseOptions.Value.GebouweenheidVolgendeUrl),
+                Context = responseOptions.Value.ContextUrlUnitList
             };
 
             return Ok(listResponse);
@@ -184,6 +185,7 @@ namespace BuildingRegistry.Api.Oslo.BuildingUnit
             var response = new BuildingUnitOsloResponse(
                 buildingUnit.PersistentLocalId.Value,
                 responseOptions.Value.GebouweenheidNaamruimte,
+                responseOptions.Value.ContextUrlUnitDetail,
                 buildingUnit.Version.ToBelgianDateTimeOffset(),
                 GetBuildingUnitPoint(buildingUnit.Position, buildingUnit.PositionMethod.Value),
                 MapBuildingUnitStatus(buildingUnit.Status.Value),

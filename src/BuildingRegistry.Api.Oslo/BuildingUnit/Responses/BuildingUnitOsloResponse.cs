@@ -26,39 +26,7 @@ namespace BuildingRegistry.Api.Oslo.BuildingUnit.Responses
         [DataMember(Name = "@context", Order = 0)]
         [JsonProperty(Required = Required.DisallowNull)]
         [JsonConverter(typeof(PlainStringJsonConverter))]
-        public object Context => @"{
-	""identificator"": ""@nest"",
-	""id"": ""@id"",
-	""objectId"":""http://www.w3.org/2001/XMLSchema#string"",
- 	""detail"": ""http://www.iana.org/assignments/relation/self"",
-	""versieId"": {
-		""@id"": ""https://data.vlaanderen.be/ns/generiek#versieIdentificator"",
-		""@type"": ""http://www.w3.org/2001/XMLSchema#string""},
-	""geometriePunt"": {
-		""@id"" : ""https://data.vlaanderen.be/ns/gebouw#Gebouweenheid.geometrie"",
-		""@type"": ""@id"",
-		""@context"":{
-			""point"": ""http://www.opengis.net/ont/sf#Point"",
-			""type"": ""@type""
-
-		}
-	},
-	""positieGeometrieMethode"":""https://data.vlaanderen.be/id/conceptscheme/geometriemethode"",
-	""gebouweenheidStatus"":{
-		""@id"":""https://data.vlaanderen.be/ns/gebouw#Gebouweenheid.status"",
-		""@type"":""@id"",
-		""@context"":{
-			""@base"":""https://data.vlaanderen.be/doc/concept/gebouweenheidsstatus/""
-		}
-	},
-	""functie"": {
-		""@id"":""https://data.vlaanderen.be/ns/gebouw#Gebouweenheid.functie"",
-		""@type"":""@id"",
-		""@context"":{
-			""@base"":""https://data.vlaanderen.be/doc/concept/gebouweenheidsfunction/""
-		}
-	}
-}";
+        public object Context { get; }
 
         /// <summary>
         /// Het linked-data type van de gebouweenheid.
@@ -112,6 +80,7 @@ namespace BuildingRegistry.Api.Oslo.BuildingUnit.Responses
         public BuildingUnitOsloResponse(
             int persistentLocalId,
             string naamruimte,
+            string contextUrlUnitDetail,
             DateTimeOffset version,
             BuildingUnitPosition buildingUnitPosition,
             GebouweenheidStatus status,
@@ -119,6 +88,7 @@ namespace BuildingRegistry.Api.Oslo.BuildingUnit.Responses
             GebouweenheidDetailGebouw building,
             List<GebouweenheidDetailAdres> addresses)
         {
+            Context = contextUrlUnitDetail;
             Identificator = new GebouweenheidIdentificator(naamruimte, persistentLocalId.ToString(), version);
             BuildingUnitPosition = buildingUnitPosition;
             Status = status;
@@ -139,6 +109,7 @@ namespace BuildingRegistry.Api.Oslo.BuildingUnit.Responses
             (
                 6,
                 _responseOptions.GebouweenheidNaamruimte,
+                _responseOptions.ContextUrlUnitDetail,
                 DateTimeOffset.Now.ToExampleOffset(),
                 new BuildingUnitPosition(
                     new GmlJsonPoint("<gml:Point srsName=\"https://www.opengis.net/def/crs/EPSG/0/31370\" xmlns:gml=\"http://www.opengis.net/gml/3.2\"><gml:pos>140252.76 198794.27</gml:pos></gml:Point>"),

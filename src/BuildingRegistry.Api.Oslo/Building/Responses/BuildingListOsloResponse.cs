@@ -21,18 +21,8 @@ namespace BuildingRegistry.Api.Oslo.Building.Responses
         [DataMember(Name = "@context", Order = 0)]
         [JsonProperty(Required = Required.DisallowNull)]
         [JsonConverter(typeof(PlainStringJsonConverter))]
-        public object Context => @"{
-	""gebouwStatus"": {
-		""@id"": ""https://data.vlaanderen.be/ns/gebouw#Gebouweenheid.status"",
-		""@type"": ""@id""},
-	""detail"": ""http://www.iana.org/assignments/relation/self"",
-	""gebouwen"": ""@graph"",
-	""identificator"": ""@nest"",
-	""id"": ""@id"",
-	""versieId"":{
-		""@id"": ""https://data.vlaanderen.be/ns/generiek#versieIdentificator"",        
-		""@type"": ""http://www.w3.org/2001/XMLSchema#string""}
-}";
+        public object Context { get; set; }
+
         /// <summary>
         /// Collectie van gebouwen
         /// </summary>
@@ -116,7 +106,8 @@ namespace BuildingRegistry.Api.Oslo.Building.Responses
                     new GebouwCollectieItemOslo(9, _responseOptions.GebouwNaamruimte, _responseOptions.GebouwDetailUrl, GebouwStatus.InAanbouw, DateTimeOffset.Now.AddHours(9).ToExampleOffset()),
                     new GebouwCollectieItemOslo(10, _responseOptions.GebouwNaamruimte, _responseOptions.GebouwDetailUrl, GebouwStatus.NietGerealiseerd, DateTimeOffset.Now.AddDays(2).ToExampleOffset())
                 },
-                Volgende = new Uri(string.Format(_responseOptions.GebouwVolgendeUrl, "5", "10"))
+                Volgende = new Uri(string.Format(_responseOptions.GebouwVolgendeUrl, "5", "10")),
+                Context = _responseOptions.ContextUrlList
             };
     }
 }

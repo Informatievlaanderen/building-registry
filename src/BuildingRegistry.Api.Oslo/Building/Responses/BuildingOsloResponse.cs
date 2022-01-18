@@ -25,38 +25,7 @@ namespace BuildingRegistry.Api.Oslo.Building.Responses
         [DataMember(Name = "@context", Order = 0)]
         [JsonProperty(Required = Required.DisallowNull)]
         [JsonConverter(typeof(PlainStringJsonConverter))]
-        public object Context => @"{
-	""identificator"": ""@nest"",
-    ""id"": ""@id"",
-    ""versieId"": {
-        ""@id"": ""https://data.vlaanderen.be/ns/generiek#versieIdentificator"",
-        ""@type"": ""http://www.w3.org/2001/XMLSchema#string""
-    },
-    ""positieGeometrieMethode"":""https://data.vlaanderen.be/id/conceptscheme/geometriemethode"",
-    ""gebouwStatus"":{
-		""@id"": ""https://data.vlaanderen.be/ns/gebouw#Gebouw.status"",
-		""@type"": ""@id"",
-        ""@context"": {
-          ""@base"": ""https://data.vlaanderen.be/id/concept/gebouwstatus/""
-        }
-    },
-	""percelen"": {
-		""@id"":""https://data.vlaanderen.be/ns/gebouw#ligtOp"",
-		""@type"":""@id"",
-		""@context"": {
-			""@objectId"": ""@id"",
-			""detail"": ""http://www.iana.org/assignments/relation/self""
-		}
-	},
-	""gebouweenheden"": {
-		""@id"":""https://data.vlaanderen.be/ns/gebouw#bestaatUit"",
-		""@type"":""@id"",
-		""@context"":{
-          ""objectid"":""@id"",
-          ""detail"":""http://www.iana.org/assignments/relation/self""
-      }
-	}
-}";
+        public object Context { get; }
 
         /// <summary>
         /// Het linked-data type van het gebouw.
@@ -102,12 +71,14 @@ namespace BuildingRegistry.Api.Oslo.Building.Responses
         public BuildingOsloResponse(
             int persistentLocalId,
             string naamruimte,
+            string contextUrlDetail,
             DateTimeOffset version,
             BuildingPolygon buildingPolygon,
             GebouwStatus status,
             List<GebouwDetailGebouweenheid> buildingUnits,
             List<GebouwDetailPerceel> parcels)
         {
+            Context = contextUrlDetail;
             Identificator = new GebouwIdentificator(naamruimte, persistentLocalId.ToString(), version);
             BuildingPolygon = buildingPolygon;
             Status = status;
@@ -131,6 +102,7 @@ namespace BuildingRegistry.Api.Oslo.Building.Responses
             return new BuildingOsloResponse(
                 6,
                 _responseOptions.GebouwNaamruimte,
+                _responseOptions.ContextUrlDetail,
                 DateTimeOffset.Now.ToExampleOffset(),
                 buildingPolygon,
                 GebouwStatus.Gerealiseerd,
