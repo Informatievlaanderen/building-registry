@@ -278,15 +278,22 @@ namespace BuildingRegistry.Api.Oslo.Building
             writer.WriteStartElement("gml", isInterior ? "interior" : "exterior", "http://www.opengis.net/gml/3.2");
             writer.WriteStartElement("gml", "LinearRing", "http://www.opengis.net/gml/3.2");
             writer.WriteStartElement("gml", "posList", "http://www.opengis.net/gml/3.2");
+
+            var posListBuilder = new StringBuilder();
             foreach (var coordinate in ring.Coordinates)
             {
-                writer.WriteValue(
-                    string.Format(
-                        NetTopologySuite.Utilities.Global.GetNfi(),
-                        "{0} {1}",
-                        coordinate.X,
-                        coordinate.Y));
+                posListBuilder.Append(string.Format(
+                    NetTopologySuite.Utilities.Global.GetNfi(),
+                    "{0} {1} ",
+                    coordinate.X.ToPolygonGeometryCoordinateValueFormat(),
+                    coordinate.Y.ToPolygonGeometryCoordinateValueFormat()));
             }
+
+            //remove last space
+            posListBuilder.Length--;
+
+            writer.WriteValue(posListBuilder.ToString());
+
             writer.WriteEndElement();
             writer.WriteEndElement();
             writer.WriteEndElement();
