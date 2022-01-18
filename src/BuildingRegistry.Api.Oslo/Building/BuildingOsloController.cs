@@ -103,6 +103,7 @@ namespace BuildingRegistry.Api.Oslo.Building
             var response = new BuildingOsloResponse(
                 building.PersistentLocalId.Value,
                 responseOptions.Value.GebouwNaamruimte,
+                responseOptions.Value.ContextUrlDetail,
                 building.Version.ToBelgianDateTimeOffset(),
                 GetBuildingPolygon(building.Geometry, building.GeometryMethod.Value),
                 MapBuildingStatus(building.Status.Value),
@@ -160,7 +161,8 @@ namespace BuildingRegistry.Api.Oslo.Building
                         MapBuildingStatus(x.Status.Value),
                         x.Version.ToBelgianDateTimeOffset()))
                     .ToList(),
-                Volgende = pagedBuildings.PaginationInfo.BuildNextUri(responseOptions.Value.GebouwVolgendeUrl)
+                Volgende = pagedBuildings.PaginationInfo.BuildNextUri(responseOptions.Value.GebouwVolgendeUrl),
+                Context = responseOptions.Value.ContextUrlList
             };
 
             return Ok(listResponse);

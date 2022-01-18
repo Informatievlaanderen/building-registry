@@ -10,5 +10,9 @@ namespace BuildingRegistry.Api.Oslo.Infrastructure.Options
         public string GebouweenheidDetailUrl { get; set; }
         public string AdresUrl { get; set; }
         public string PerceelUrl { get; set; }
+        public string ContextUrlList { get; set; }
+        public string ContextUrlDetail { get; set; }
+        public string ContextUrlUnitList { get; set; }
+        public string ContextUrlUnitDetail { get; set; }
     }
 }

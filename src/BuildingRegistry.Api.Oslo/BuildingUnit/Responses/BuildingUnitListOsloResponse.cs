@@ -21,22 +21,7 @@ namespace BuildingRegistry.Api.Oslo.BuildingUnit.Responses
         [DataMember(Name = "@context", Order = 0)]
         [JsonProperty(Required = Required.DisallowNull)]
         [JsonConverter(typeof(PlainStringJsonConverter))]
-        public object Context => @"{
-	""identificator"": ""@nest"",
-	""id"": ""@id"",
-	""versieId"":{
-		""@id"": ""https://data.vlaanderen.be/ns/generiek#versieIdentificator"",        
-		""@type"": ""http://www.w3.org/2001/XMLSchema#string""},
-	""detail"": ""http://www.iana.org/assignments/relation/self"",	
-	""gebouweenheidStatus"":{
-		""@id"":""https://data.vlaanderen.be/ns/gebouw#Gebouweenheid.status"",
-		""@type"":""@id"",
-		""@context"":{
-			""@base"":""https://data.vlaanderen.be/doc/concept/gebouweenheidsstatus/""
-	  },
-	  ""gebouweenheden"": ""@graph""
-	}
-}";
+        public object Context { get; set; }
 
         /// <summary>
         /// Collectie van gebouweenheden.
@@ -120,7 +105,8 @@ namespace BuildingRegistry.Api.Oslo.BuildingUnit.Responses
                     new GebouweenheidCollectieItemOslo(9, _responseOptions.GebouweenheidNaamruimte, _responseOptions.GebouweenheidDetailUrl, GebouweenheidStatus.Gehistoreerd, DateTimeOffset.Now.AddHours(9).ToExampleOffset()),
                     new GebouweenheidCollectieItemOslo(10, _responseOptions.GebouweenheidNaamruimte, _responseOptions.GebouweenheidDetailUrl, GebouweenheidStatus.Gerealiseerd, DateTimeOffset.Now.AddDays(2).ToExampleOffset())
                 },
-                Volgende = new Uri(string.Format(_responseOptions.GebouweenheidVolgendeUrl, "5", "10"))
+                Volgende = new Uri(string.Format(_responseOptions.GebouweenheidVolgendeUrl, "5", "10")),
+                Context = _responseOptions.ContextUrlUnitList
             };
     }
 }
