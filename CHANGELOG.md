@@ -1,3 +1,10 @@
+## [2.33.3](https://github.com/informatievlaanderen/building-registry/compare/v2.33.2...v2.33.3) (2022-01-18)
+
+
+### Bug Fixes
+
+* GML polygon values GAWR-2614 + docs GAWR-2616 ([672d843](https://github.com/informatievlaanderen/building-registry/commit/672d843b2f1252aa0653eba0ea5e75519c284573))
+
 ## [2.33.2](https://github.com/informatievlaanderen/building-registry/compare/v2.33.1...v2.33.2) (2022-01-18)
 
 ## [2.33.1](https://github.com/informatievlaanderen/building-registry/compare/v2.33.0...v2.33.1) (2022-01-17)
