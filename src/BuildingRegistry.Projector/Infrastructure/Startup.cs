@@ -5,6 +5,7 @@ namespace BuildingRegistry.Projector.Infrastructure
     using Be.Vlaanderen.Basisregisters.Api;
     using Be.Vlaanderen.Basisregisters.DataDog.Tracing.Autofac;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.LastChangedList;
+    using Be.Vlaanderen.Basisregisters.Projector.ConnectedProjections;
     using BuildingRegistry.Projections.Extract;
     using BuildingRegistry.Projections.Legacy;
     using BuildingRegistry.Projections.Wms;
@@ -24,6 +25,7 @@ namespace BuildingRegistry.Projector.Infrastructure
     using Be.Vlaanderen.Basisregisters.Projector;
     using BuildingRegistry.Projections.Wfs;
     using Microsoft.OpenApi.Models;
+    using System.Threading;    
 
     /// <summary>Represents the startup process for the application.</summary>
     public class Startup
@@ -34,6 +36,7 @@ namespace BuildingRegistry.Projector.Infrastructure
 
         private readonly IConfiguration _configuration;
         private readonly ILoggerFactory _loggerFactory;
+        private readonly CancellationTokenSource _projectionsCancellationTokenSource = new CancellationTokenSource();
 
         public Startup(
             IConfiguration configuration,
@@ -195,16 +198,14 @@ namespace BuildingRegistry.Projector.Infrastructure
                     {
                         AfterMiddleware = x => x.UseMiddleware<AddNoCacheHeadersMiddleware>()
                     }
-                })
-
-                .UseProjectionsManagerAsync(new ProjectionsManagerOptions
-                {
-                    Common =
-                    {
-                        ServiceProvider = serviceProvider,
-                        ApplicationLifetime = appLifetime
-                    }
                 });
+
+            appLifetime.ApplicationStopping.Register(() => _projectionsCancellationTokenSource.Cancel());
+            appLifetime.ApplicationStarted.Register(() =>
+            {
+                var projectionsManager = _applicationContainer.Resolve<IConnectedProjectionsManager>();
+                projectionsManager.Resume(_projectionsCancellationTokenSource.Token);
+            });
         }
 
         private static string GetApiLeadingText(ApiVersionDescription description)
