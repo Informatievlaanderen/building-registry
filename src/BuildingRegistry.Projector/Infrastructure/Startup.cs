@@ -5,6 +5,7 @@ namespace BuildingRegistry.Projector.Infrastructure
     using Be.Vlaanderen.Basisregisters.Api;
     using Be.Vlaanderen.Basisregisters.DataDog.Tracing.Autofac;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.LastChangedList;
+    using Be.Vlaanderen.Basisregisters.Projector.ConnectedProjections;
     using BuildingRegistry.Projections.Extract;
     using BuildingRegistry.Projections.Legacy;
     using BuildingRegistry.Projections.Wms;
@@ -24,10 +25,9 @@ namespace BuildingRegistry.Projector.Infrastructure
     using Be.Vlaanderen.Basisregisters.Projector;
     using BuildingRegistry.Projections.Wfs;
     using Microsoft.OpenApi.Models;
-using System.Threading;
-    using Be.Vlaanderen.Basisregisters.Projector.ConnectedProjections;
+    using System.Threading;    
 
-/// <summary>Represents the startup process for the application.</summary>
+    /// <summary>Represents the startup process for the application.</summary>
     public class Startup
     {
         private const string DatabaseTag = "db";
