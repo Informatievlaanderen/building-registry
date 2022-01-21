@@ -1,3 +1,10 @@
+## [2.33.4](https://github.com/informatievlaanderen/building-registry/compare/v2.33.3...v2.33.4) (2022-01-21)
+
+
+### Bug Fixes
+
+* correctly resume projections async ([3032352](https://github.com/informatievlaanderen/building-registry/commit/30323523df1f9bca45b4c8bfdd0ba92f872f3ecf))
+
 ## [2.33.3](https://github.com/informatievlaanderen/building-registry/compare/v2.33.2...v2.33.3) (2022-01-18)
 
 
