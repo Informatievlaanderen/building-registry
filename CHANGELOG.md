@@ -1,3 +1,10 @@
+## [2.33.5](https://github.com/informatievlaanderen/building-registry/compare/v2.33.4...v2.33.5) (2022-02-10)
+
+
+### Bug Fixes
+
+* update Api dependency to fix exception handler ([0193669](https://github.com/informatievlaanderen/building-registry/commit/01936698cc6401d00f7a8d2099e57185a68d6fee))
+
 ## [2.33.4](https://github.com/informatievlaanderen/building-registry/compare/v2.33.3...v2.33.4) (2022-01-21)
 
 
