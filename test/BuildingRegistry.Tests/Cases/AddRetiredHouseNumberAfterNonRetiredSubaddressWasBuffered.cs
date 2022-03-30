@@ -8,6 +8,7 @@ namespace BuildingRegistry.Tests.Cases
     using Building;
     using Building.Commands.Crab;
     using Building.Events;
+    using Building.Events.Crab;
     using FluentAssertions;
     using NetTopologySuite.IO;
     using NodaTime;
@@ -222,10 +223,12 @@ namespace BuildingRegistry.Tests.Cases
                 _importSubaddressFromCrab.Modification,
                 _importSubaddressFromCrab.Organisation);
 
+            var expected = _importSubaddressFromCrab.ToLegacyEvent();
+
             _building.GetChanges()
                 .Skip(skip)
                 .Should()
-                .BeEquivalentTo(_importSubaddressFromCrab.ToLegacyEvent());
+                .BeEquivalentTo(new List<object> { expected });
 
             return _building.GetChanges().Count();
         }
@@ -250,21 +253,25 @@ namespace BuildingRegistry.Tests.Cases
                 importTerrainObjectHouseNumberFromCrab.Modification,
                 importTerrainObjectHouseNumberFromCrab.Organisation);
 
+            var expected = new List<object>
+            {
+                new BuildingUnitWasAdded(_.Gebouw1Id, _.GebouwEenheid1Id, _.GebouwEenheid1Key, _.Address16Id,
+                    new BuildingUnitVersion(importTerrainObjectHouseNumberFromCrab.Timestamp)),
+                new BuildingUnitWasRealized(_.Gebouw1Id, _.GebouwEenheid1Id),
+                new BuildingUnitWasRetired(_.Gebouw1Id, _.GebouwEenheid1Id),
+                new BuildingUnitAddressWasDetached(_.Gebouw1Id, _.Address16Id, _.GebouwEenheid1Id),
+                new BuildingUnitWasAdded(_.Gebouw1Id, _.GebouwEenheid2Id, _.GebouwEenheid2Key, _.Address16Bus1Id,
+                    new BuildingUnitVersion(importTerrainObjectHouseNumberFromCrab.Timestamp)),
+                new BuildingUnitWasRealized(_.Gebouw1Id, _.GebouwEenheid2Id),
+                new BuildingUnitWasRetired(_.Gebouw1Id, _.GebouwEenheid2Id),
+                new BuildingUnitAddressWasDetached(_.Gebouw1Id, _.Address16Bus1Id, _.GebouwEenheid2Id),
+                importTerrainObjectHouseNumberFromCrab.ToLegacyEvent()
+            };
+
             _building.GetChanges()
                 .Skip(skip)
                 .Should()
-                .BeEquivalentTo(new List<object>
-                {
-                    new BuildingUnitWasAdded(_.Gebouw1Id, _.GebouwEenheid1Id, _.GebouwEenheid1Key, _.Address16Id, new BuildingUnitVersion(importTerrainObjectHouseNumberFromCrab.Timestamp)),
-                    new BuildingUnitWasRealized(_.Gebouw1Id, _.GebouwEenheid1Id),
-                    new BuildingUnitWasRetired(_.Gebouw1Id, _.GebouwEenheid1Id),
-                    new BuildingUnitAddressWasDetached(_.Gebouw1Id, _.Address16Id, _.GebouwEenheid1Id),
-                    new BuildingUnitWasAdded(_.Gebouw1Id, _.GebouwEenheid2Id, _.GebouwEenheid2Key, _.Address16Bus1Id, new BuildingUnitVersion(importTerrainObjectHouseNumberFromCrab.Timestamp)),
-                    new BuildingUnitWasRealized(_.Gebouw1Id, _.GebouwEenheid2Id),
-                    new BuildingUnitWasRetired(_.Gebouw1Id, _.GebouwEenheid2Id),
-                    new BuildingUnitAddressWasDetached(_.Gebouw1Id, _.Address16Bus1Id, _.GebouwEenheid2Id),
-                    importTerrainObjectHouseNumberFromCrab.ToLegacyEvent()
-                });
+                .BeEquivalentTo(expected);
 
             return _building.GetChanges().Count();
         }
