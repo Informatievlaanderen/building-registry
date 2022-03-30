@@ -1,3 +1,16 @@
+# [3.0.0](https://github.com/informatievlaanderen/building-registry/compare/v2.33.5...v3.0.0) (2022-03-30)
+
+
+### Features
+
+* move to dotnet 6.0.3 ([#525](https://github.com/informatievlaanderen/building-registry/issues/525)) ([849550f](https://github.com/informatievlaanderen/building-registry/commit/849550f40497f4369ee1628d30e1c0c27c58b553))
+* update api to 17.0.0 ([#517](https://github.com/informatievlaanderen/building-registry/issues/517)) ([6e6596c](https://github.com/informatievlaanderen/building-registry/commit/6e6596cb9048ae91125b5d340e3499fec29ccad5))
+
+
+### BREAKING CHANGES
+
+* move to dotnet 6.0.3
+
 ## [2.33.5](https://github.com/informatievlaanderen/building-registry/compare/v2.33.4...v2.33.5) (2022-02-10)
 
 
