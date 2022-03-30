@@ -2,9 +2,9 @@ namespace BuildingRegistry.Tests.Cases
 {
     using System.Collections.Generic;
     using System.Linq;
-    using Be.Vlaanderen.Basisregisters.Crab;
     using Autofixture;
     using AutoFixture;
+    using Be.Vlaanderen.Basisregisters.Crab;
     using Building;
     using Building.Commands.Crab;
     using Building.Events;
@@ -12,7 +12,6 @@ namespace BuildingRegistry.Tests.Cases
     using NetTopologySuite.IO;
     using NodaTime;
     using ValueObjects;
-    using ValueObjects.Crab;
     using WhenImportingCrabSubaddress;
     using WhenImportingCrabTerrainObjectHouseNumber;
     using Xunit;
@@ -188,10 +187,12 @@ namespace BuildingRegistry.Tests.Cases
                 _importSubaddressFromCrab.Modification,
                 _importSubaddressFromCrab.Organisation);
 
+            var expected = _importSubaddressFromCrab.ToLegacyEvent();
+
             _building.GetChanges()
                 .Skip(skip)
                 .Should()
-                .BeEquivalentTo(_importSubaddressFromCrab.ToLegacyEvent());
+                .BeEquivalentTo(new List<object> { expected });
 
             return _building.GetChanges().Count();
         }
@@ -219,10 +220,12 @@ namespace BuildingRegistry.Tests.Cases
                 _importSubaddress2FromCrab.Modification,
                 _importSubaddress2FromCrab.Organisation);
 
+            var expected = _importSubaddress2FromCrab.ToLegacyEvent();
+
             _building.GetChanges()
                 .Skip(skip)
                 .Should()
-                .BeEquivalentTo(_importSubaddress2FromCrab.ToLegacyEvent());
+                .BeEquivalentTo(new List<object>{expected});
 
             return _building.GetChanges().Count();
         }

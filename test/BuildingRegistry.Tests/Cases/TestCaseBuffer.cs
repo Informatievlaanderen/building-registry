@@ -10,6 +10,7 @@ namespace BuildingRegistry.Tests.Cases
     using NetTopologySuite.IO;
     using System.Collections.Generic;
     using System.Linq;
+    using Building.Events.Crab;
     using ValueObjects;
     using ValueObjects.Crab;
     using WhenImportingCrabHouseNumberPosition;
@@ -192,7 +193,7 @@ namespace BuildingRegistry.Tests.Cases
             _building.GetChanges()
                 .Skip(skip)
                 .Should()
-                .BeEquivalentTo(_importSubaddressFromCrab.ToLegacyEvent());
+                .BeEquivalentTo(new List<object> { _importSubaddressFromCrab.ToLegacyEvent() });
 
             return _building.GetChanges().Count();
         }
@@ -285,7 +286,7 @@ namespace BuildingRegistry.Tests.Cases
             _building.GetChanges()
                 .Skip(skip)
                 .Should()
-                .BeEquivalentTo(_importSubaddressFromCrab2.ToLegacyEvent());
+                .BeEquivalentTo(new List<object> { _importSubaddressFromCrab2.ToLegacyEvent() });
 
             return _building.GetChanges().Count();
         }
