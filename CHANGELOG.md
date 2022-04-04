@@ -1,3 +1,10 @@
+## [3.0.1](https://github.com/informatievlaanderen/building-registry/compare/v3.0.0...v3.0.1) (2022-04-04)
+
+
+### Bug Fixes
+
+* set oslo context type to string GAWR-2931 ([dcbc732](https://github.com/informatievlaanderen/building-registry/commit/dcbc732bddb4401049193232645a7a218e2df340))
+
 # [3.0.0](https://github.com/informatievlaanderen/building-registry/compare/v2.33.5...v3.0.0) (2022-03-30)
 
 
