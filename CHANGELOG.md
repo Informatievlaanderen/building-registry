@@ -1,3 +1,10 @@
+## [3.0.2](https://github.com/informatievlaanderen/building-registry/compare/v3.0.1...v3.0.2) (2022-04-27)
+
+
+### Bug Fixes
+
+* redirect sonar to /dev/null ([52e8550](https://github.com/informatievlaanderen/building-registry/commit/52e8550b2ce7adf3d0fe4d18bcea046f5b8b2a28))
+
 ## [3.0.1](https://github.com/informatievlaanderen/building-registry/compare/v3.0.0...v3.0.1) (2022-04-04)
 
 
