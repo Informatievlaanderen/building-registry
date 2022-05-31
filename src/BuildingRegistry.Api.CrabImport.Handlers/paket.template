@@ -1,0 +1,21 @@
+type file
+version 1.0.0
+
+id Be.Vlaanderen.Basisregisters.BuildingRegistry.Api.CrabImport
+title Be.Vlaanderen.Basisregisters.BuildingRegistry.Api.CrabImport
+
+authors Basisregisters.Vlaanderen
+owners Vlaamse overheid
+copyright Copyright (c) Vlaamse overheid
+requireLicenseAcceptance false
+projectUrl https://vlaanderen.be/digitaal-vlaanderen
+iconUrl https://raw.githubusercontent.com/Informatievlaanderen/build-pipeline/master/logo.png
+licenseUrl https://opensource.org/licenses/EUPL-1.2
+
+description Building Registry.
+
+files
+  BuildingRegistry.Api.CrabImport.Handlers.dll => lib\net6.0
+  BuildingRegistry.Api.CrabImport.Handlers.pdb => lib\net6.0
+  BuildingRegistry.Api.CrabImport.Handlers.xml => lib\net6.0
+  BuildingRegistry.Api.CrabImport.Handlers.xml => content

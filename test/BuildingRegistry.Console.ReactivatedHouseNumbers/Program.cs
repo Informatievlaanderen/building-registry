@@ -9,7 +9,7 @@ namespace BuildingRegistry.Console.ReactivatedHouseNumbers
     using System.Net.Mime;
     using System.Text;
     using System.Threading.Tasks;
-    using Api.CrabImport.CrabImport.Requests;
+    using Api.CrabImport.Abstractions.Post;
     using Be.Vlaanderen.Basisregisters.Crab;
     using Be.Vlaanderen.Basisregisters.EventHandling;
     using Be.Vlaanderen.Basisregisters.GrAr.Import.Processing.Json;

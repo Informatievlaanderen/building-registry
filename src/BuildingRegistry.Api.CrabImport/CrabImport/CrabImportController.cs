@@ -7,18 +7,15 @@ namespace BuildingRegistry.Api.CrabImport.CrabImport
     using Be.Vlaanderen.Basisregisters.GrAr.Import.Processing.CrabImport;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
-    using Microsoft.Extensions.Logging;
-    using Requests;
     using Swashbuckle.AspNetCore.Filters;
-    using System;
-    using Dasync.Collections;
-    using System.Collections.Concurrent;
     using System.Collections.Generic;
-    using System.Diagnostics;
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
+    using Abstractions.Post;
     using Be.Vlaanderen.Basisregisters.GrAr.Import.Processing.Api.Messages;
+    using Handlers.Post;
+    using MediatR;
     using ApiController = Infrastructure.ApiController;
     using ProblemDetails = Be.Vlaanderen.Basisregisters.BasicApiProblem.ProblemDetails;
 
@@ -28,9 +25,12 @@ namespace BuildingRegistry.Api.CrabImport.CrabImport
     [ApiExplorerSettings(GroupName = "CRAB Import")]
     public class CrabImportController : ApiController
     {
-        private const string CommandMessageTemplate = "Handled {CommandCount} commands in {Elapsed:0.0000} ms";
-        private const string BatchMessageTemplate = "Handled {AggregateCount} aggregates ({CommandCount} commands) in {Elapsed:0.0000} ms";
-        private static double GetElapsedMilliseconds(long start, long stop) => (stop - start) * 1000 / (double)Stopwatch.Frequency;
+        private readonly IMediator _mediator;
+
+        public CrabImportController(IMediator mediator)
+        {
+            _mediator = mediator;
+        }
 
         /// <summary>
         /// Import een CRAB item.
@@ -38,7 +38,6 @@ namespace BuildingRegistry.Api.CrabImport.CrabImport
         /// <param name="bus"></param>
         /// <param name="registerCrabImportList"></param>
         /// <param name="cancellationToken"></param>
-        /// <param name="logger"></param>
         /// <response code="202">Als het verzoek aanvaard is.</response>
         /// <response code="400">Als het verzoek ongeldige data bevat.</response>
         /// <response code="500">Als er een interne fout is opgetreden.</response>
@@ -54,57 +53,16 @@ namespace BuildingRegistry.Api.CrabImport.CrabImport
         [RequestSizeLimit(104_857_600)]
         public async Task<IActionResult> Post(
             [FromServices] IdempotentCommandHandlerModule bus,
-            [FromServices] ILogger<CrabImportController> logger,
             [FromBody] List<RegisterCrabImportRequest[]> registerCrabImportList,
             CancellationToken cancellationToken)
         {
             if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            var tags = new ConcurrentBag<long?>();
-
-            var start = Stopwatch.GetTimestamp();
-            logger.LogDebug("Preparing to process commands for {AggregateCount} aggregates.", registerCrabImportList.Count);
-
-            await registerCrabImportList.ParallelForEachAsync(async registerCrabImports =>
             {
-                var startCommands = Stopwatch.GetTimestamp();
+                return BadRequest(ModelState);
+            }
 
-                try
-                {
-                    var commandsPerCommandId = registerCrabImports
-                        .Select(RegisterCrabImportRequestMapping.Map)
-                        .Distinct(new LambdaEqualityComparer<dynamic>(x => (string)x.CreateCommandId().ToString()))
-                        .ToDictionary(x => (Guid?)x.CreateCommandId(), x => x);
-
-                    var tag = await bus.IdempotentCommandHandlerDispatchBatch(
-                        commandsPerCommandId,
-                        GetMetadata(),
-                        cancellationToken);
-
-                    tags.Add(tag);
-                }
-                catch (IdempotentCommandHandlerModule.InvalidCommandException)
-                {
-                    throw new ApiException("Ongeldig verzoek id", StatusCodes.Status400BadRequest);
-                }
-                catch (Exception ex)
-                {
-                    var x = registerCrabImports.Select(RegisterCrabImportRequestMapping.Map).ToList();
-                    Console.WriteLine($"Boom, {x.First()}");
-                    logger.LogError(ex, "Import error for id {TerrainObjectId}", new List<dynamic> { x.First().TerrainObjectId });
-                    throw;
-                }
-
-                var elapsedCommandsMs = GetElapsedMilliseconds(startCommands, Stopwatch.GetTimestamp());
-                logger.LogDebug(CommandMessageTemplate, registerCrabImports.Length, elapsedCommandsMs);
-            },
-            cancellationToken: cancellationToken,
-            maxDegreeOfParallelism: 0);
-
-            var elapsedMs = GetElapsedMilliseconds(start, Stopwatch.GetTimestamp());
-            logger.LogDebug(BatchMessageTemplate, registerCrabImportList.Count, registerCrabImportList.SelectMany(x => x).Count(), elapsedMs);
-            return Accepted(tags.Any() ? tags.Max() : null);
+            var response = await _mediator.Send(new PostRequest(registerCrabImportList, GetMetadata(), bus), cancellationToken);
+            return Accepted(response.Tags.Any() ? response.Tags.Max() : null);
         }
 
         [HttpGet("batch/{feed}")]

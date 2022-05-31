@@ -3,7 +3,7 @@ namespace BuildingRegistry.Console.SortToProcess
     using System;
     using System.IO;
     using System.Linq;
-    using Api.CrabImport.CrabImport.Requests;
+    using Api.CrabImport.Abstractions.Post;
     using Be.Vlaanderen.Basisregisters.GrAr.Import.Processing.Json;
     using Building.Commands.Crab;
     using Dapper;
