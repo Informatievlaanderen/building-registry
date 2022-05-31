@@ -1,10 +1,10 @@
 namespace BuildingRegistry
 {
+    using Legacy;
     using NetTopologySuite;
     using NetTopologySuite.Geometries;
     using NetTopologySuite.Geometries.Implementation;
     using NetTopologySuite.IO;
-    using ValueObjects;
 
     public static class WKBReaderFactory
     {

@@ -13,15 +13,15 @@ namespace BuildingRegistry.Console.ReactivatedHouseNumbers
     using Be.Vlaanderen.Basisregisters.Crab;
     using Be.Vlaanderen.Basisregisters.EventHandling;
     using Be.Vlaanderen.Basisregisters.GrAr.Import.Processing.Json;
-    using Building.Commands.Crab;
-    using Building.Events.Crab;
     using Dapper;
+    using Legacy;
+    using Legacy.Commands.Crab;
+    using Legacy.Crab;
+    using Legacy.Events.Crab;
     using Microsoft.Data.SqlClient;
     using Microsoft.Extensions.Configuration;
     using Newtonsoft.Json;
     using NodaTime;
-    using ValueObjects;
-    using ValueObjects.Crab;
 
     //Case 5f: when housenumber relation is retired then becomes active again (correction), buildings with more than 2 subaddresses don't have the right amount of units
     public class Program

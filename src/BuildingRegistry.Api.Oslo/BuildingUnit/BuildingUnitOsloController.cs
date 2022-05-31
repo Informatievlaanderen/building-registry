@@ -17,6 +17,7 @@ namespace BuildingRegistry.Api.Oslo.BuildingUnit
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy.Gebouweenheid;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy.SpatialTools;
+    using BuildingRegistry.Legacy;
     using Infrastructure;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
@@ -28,7 +29,6 @@ namespace BuildingRegistry.Api.Oslo.BuildingUnit
     using Query;
     using Responses;
     using Swashbuckle.AspNetCore.Filters;
-    using ValueObjects;
     using ProblemDetails = Be.Vlaanderen.Basisregisters.BasicApiProblem.ProblemDetails;
 
     [ApiVersion("2.0")]

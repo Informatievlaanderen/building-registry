@@ -5,11 +5,11 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
     using System.Linq;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.Runner.MigrationExtensions;
+    using BuildingRegistry.Legacy;
     using Infrastructure;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.EntityFrameworkCore.Metadata.Builders;
     using NodaTime;
-    using ValueObjects;
 
     public class BuildingSyndicationItem
     {

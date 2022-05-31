@@ -2,7 +2,7 @@ namespace BuildingRegistry.Api.Legacy.Converters
 {
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy.Gebouw;
     using System;
-    using ValueObjects;
+    using BuildingRegistry.Legacy;
 
     public static class BuildingStatusExtensions
     {

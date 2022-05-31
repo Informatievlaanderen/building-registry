@@ -1,7 +1,7 @@
 namespace BuildingRegistry.Api.CrabImport.Abstractions.Post
 {
     using System.ComponentModel.DataAnnotations;
-    using Building;
+    using Legacy;
     using Newtonsoft.Json;
     using Swashbuckle.AspNetCore.Filters;
 

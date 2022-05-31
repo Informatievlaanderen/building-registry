@@ -4,14 +4,14 @@ namespace BuildingRegistry.Projections.Extract.BuildingExtract
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.Connector;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore;
     using Be.Vlaanderen.Basisregisters.Utilities.HexByteConvertor;
-    using Building.Events;
     using NetTopologySuite.IO;
     using NodaTime;
     using System;
     using System.Text;
     using Be.Vlaanderen.Basisregisters.GrAr.Extracts;
     using Be.Vlaanderen.Basisregisters.Shaperon;
-    using Building.Events.Crab;
+    using Legacy.Events;
+    using Legacy.Events.Crab;
     using Microsoft.Extensions.Options;
     using Polygon = NetTopologySuite.Geometries.Polygon;
 

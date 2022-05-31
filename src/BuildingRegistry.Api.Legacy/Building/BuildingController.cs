@@ -33,8 +33,8 @@ namespace BuildingRegistry.Api.Legacy.Building
     using System.Xml;
     using Be.Vlaanderen.Basisregisters.Api.Search;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy;
+    using BuildingRegistry.Legacy;
     using Infrastructure;
-    using ValueObjects;
     using ProblemDetails = Be.Vlaanderen.Basisregisters.BasicApiProblem.ProblemDetails;
 
     [ApiVersion("1.0")]

@@ -2,7 +2,7 @@ namespace BuildingRegistry.Projections.Legacy.PersistentLocalIdMigration
 {
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.Connector;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore;
-    using Building.Events;
+    using BuildingRegistry.Legacy.Events;
 
     // Artifact from INIT, can be removed once the EDIT-api is active
     public class RemovedPersistentLocalIdProjections : ConnectedProjection<LegacyContext>

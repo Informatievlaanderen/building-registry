@@ -4,8 +4,8 @@ namespace BuildingRegistry.Projections.Wfs.Building
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.Connector;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore;
     using Be.Vlaanderen.Basisregisters.Utilities.HexByteConvertor;
-    using BuildingRegistry.Building.Events;
     using Infrastructure;
+    using Legacy.Events;
     using NetTopologySuite.Geometries;
     using NetTopologySuite.IO;
     using NodaTime;

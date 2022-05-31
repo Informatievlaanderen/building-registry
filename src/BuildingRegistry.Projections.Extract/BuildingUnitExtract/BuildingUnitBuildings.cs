@@ -2,9 +2,9 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
 {
     using System;
     using Infrastructure;
+    using Legacy;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.EntityFrameworkCore.Metadata.Builders;
-    using ValueObjects;
 
     public class BuildingUnitBuildingItem
     {

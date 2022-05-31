@@ -1,6 +1,6 @@
 namespace BuildingRegistry
 {
-    using ValueObjects;
+    using Legacy;
 
     public interface IPersistentLocalIdGenerator
     {

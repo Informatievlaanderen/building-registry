@@ -6,7 +6,7 @@ namespace BuildingRegistry.Infrastructure.Repositories
     using Building;
     using SqlStreamStore;
 
-    public class Buildings : Repository<Building>, IBuildings
+    public class Buildings : Repository<Building, BuildingStreamId>, IBuildings
     {
         public Buildings(ConcurrentUnitOfWork unitOfWork, IStreamStore eventStore, EventMapping eventMapping, EventDeserializer eventDeserializer)
             : base(Building.Factory, unitOfWork, eventStore, eventMapping, eventDeserializer)

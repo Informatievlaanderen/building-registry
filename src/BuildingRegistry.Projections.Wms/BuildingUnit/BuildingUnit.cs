@@ -4,10 +4,10 @@ namespace BuildingRegistry.Projections.Wms.BuildingUnit
     using Be.Vlaanderen.Basisregisters.GrAr.Common;
     using Be.Vlaanderen.Basisregisters.Utilities;
     using Infrastructure;
+    using Legacy;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.EntityFrameworkCore.Metadata.Builders;
     using NodaTime;
-    using ValueObjects;
 
     public class BuildingUnit
     {

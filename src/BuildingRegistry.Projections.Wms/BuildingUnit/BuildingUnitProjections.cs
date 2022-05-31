@@ -3,7 +3,6 @@ namespace BuildingRegistry.Projections.Wms.BuildingUnit
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.Connector;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore;
     using Be.Vlaanderen.Basisregisters.Utilities.HexByteConvertor;
-    using BuildingRegistry.Building.Events;
     using Infrastructure;
     using NetTopologySuite.IO;
     using NodaTime;
@@ -11,9 +10,10 @@ namespace BuildingRegistry.Projections.Wms.BuildingUnit
     using System.Collections.Generic;
     using System.Threading;
     using System.Threading.Tasks;
-    using BuildingRegistry.Building.Events.Crab;
+    using Legacy;
+    using Legacy.Events;
+    using Legacy.Events.Crab;
     using NetTopologySuite.Geometries;
-    using ValueObjects;
 
     [ConnectedProjectionName("WMS gebouweenheden")]
     [ConnectedProjectionDescription("Projectie die de gebouweenheden data voor het WMS gebouwregister voorziet.")]

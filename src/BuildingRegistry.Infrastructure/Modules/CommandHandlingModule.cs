@@ -24,7 +24,8 @@ namespace BuildingRegistry.Infrastructure.Modules
             containerBuilder
                 .RegisterEventstreamModule(_configuration);
 
-            CommandHandlerModules.Register(containerBuilder);
+            Legacy.CommandHandlerModules.Register(containerBuilder);
+            Building.CommandHandlerModules.Register(containerBuilder);
 
             containerBuilder
                 .RegisterType<CommandHandlerResolver>()

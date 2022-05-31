@@ -5,7 +5,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingDetail
     using Microsoft.EntityFrameworkCore.Metadata.Builders;
     using NodaTime;
     using System;
-    using ValueObjects;
+    using BuildingRegistry.Legacy;
 
     public class BuildingDetailItem
     {

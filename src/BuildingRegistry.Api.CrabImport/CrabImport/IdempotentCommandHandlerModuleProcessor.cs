@@ -5,8 +5,6 @@ namespace BuildingRegistry.Api.CrabImport.CrabImport
     using Be.Vlaanderen.Basisregisters.CommandHandling;
     using Be.Vlaanderen.Basisregisters.GrAr.Import.Api;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
-    using Building;
-    using Building.Commands.Crab;
     using Microsoft.Extensions.Logging;
     using System;
     using System.Collections.Generic;
@@ -14,6 +12,8 @@ namespace BuildingRegistry.Api.CrabImport.CrabImport
     using System.Threading;
     using System.Threading.Tasks;
     using Be.Vlaanderen.Basisregisters.EventHandling;
+    using Legacy;
+    using Legacy.Commands.Crab;
     using SqlStreamStore;
 
     public class IdempotentCommandHandlerModuleProcessor : IIdempotentCommandHandlerModuleProcessor

@@ -3,7 +3,7 @@ namespace BuildingRegistry.Api.Legacy.Converters
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy.Gebouweenheid;
     using System;
-    using ValueObjects;
+    using BuildingRegistry.Legacy;
 
     public static class BuildingUnitStatusExtensions
     {

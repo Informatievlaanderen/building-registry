@@ -7,7 +7,7 @@ namespace BuildingRegistry.Api.Legacy.Building.Query
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using ValueObjects;
+    using BuildingRegistry.Legacy;
 
     public class BuildingSyndicationQueryResult
     {
