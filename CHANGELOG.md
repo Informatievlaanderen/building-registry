@@ -1,3 +1,15 @@
+# [3.1.0](https://github.com/informatievlaanderen/building-registry/compare/v3.0.2...v3.1.0) (2022-05-31)
+
+
+### Bug Fixes
+
+* change csproj to reflect .net6 ([292b248](https://github.com/informatievlaanderen/building-registry/commit/292b248e2c3b63376b32565279cf19e65829e630))
+
+
+### Features
+
+* add consumer address ([d739b4c](https://github.com/informatievlaanderen/building-registry/commit/d739b4c84e9a3db3703eb1a8062fdd2b600a9858))
+
 ## [3.0.2](https://github.com/informatievlaanderen/building-registry/compare/v3.0.1...v3.0.2) (2022-04-29)
 
 
