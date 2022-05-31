@@ -11,6 +11,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
     using Building.Events.Crab;
     using System.Collections.Generic;
     using System.Threading.Tasks;
+    using Be.Vlaanderen.Basisregisters.EventHandling;
 
     [ConnectedProjectionName("Feed endpoint gebouwen")]
     [ConnectedProjectionDescription("Projectie die de gebouwen- en gebouweenheden data voor de gebouwen feed voorziet.")]
@@ -823,6 +824,6 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
             }
         }
 
-        private static Task DoNothing<T>(LegacyContext _, Envelope<T> __) => Task.CompletedTask;
+        private static Task DoNothing<T>(LegacyContext _, Envelope<T> __) where T : IMessage => Task.CompletedTask;
     }
 }

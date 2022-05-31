@@ -9,7 +9,7 @@ namespace BuildingRegistry.Building.Events
     [EventTags(EventTag.For.Sync)]
     [EventName("BuildingBecameUnderConstruction")]
     [EventDescription("Het gebouw kreeg status 'in aanbouw'.")]
-    public class BuildingBecameUnderConstruction : IHasProvenance, ISetProvenance
+    public class BuildingBecameUnderConstruction : IHasProvenance, ISetProvenance, IMessage
     {
         [EventPropertyDescription("Interne GUID van het gebouw.")]
         public Guid BuildingId { get; }

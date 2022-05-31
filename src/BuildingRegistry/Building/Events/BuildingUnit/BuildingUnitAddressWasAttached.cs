@@ -9,7 +9,7 @@ namespace BuildingRegistry.Building.Events
     [EventTags(EventTag.For.Sync)]
     [EventName("BuildingUnitAddressWasAttached")]
     [EventDescription("Er werd een adres gekoppeld aan de gebouweenheid.")]
-    public class BuildingUnitAddressWasAttached : IHasProvenance, ISetProvenance
+    public class BuildingUnitAddressWasAttached : IHasProvenance, ISetProvenance, IMessage
     {
         [EventPropertyDescription("Interne GUID van het gebouw waartoe de gebouweenheid behoort.")]
         public Guid BuildingId { get; }

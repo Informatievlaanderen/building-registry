@@ -31,6 +31,7 @@
     <ProjectReference Include="..\BuildingRegistry.Projections.Legacy\BuildingRegistry.Projections.Legacy.csproj" />
     <ProjectReference Include="..\BuildingRegistry.Projections.LastChangedList\BuildingRegistry.Projections.LastChangedList.csproj" />
     <ProjectReference Include="..\BuildingRegistry.Projections.Syndication\BuildingRegistry.Projections.Syndication.csproj" />
+    <ProjectReference Include="..\BuildingRegistry.Consumer.Address\BuildingRegistry.Consumer.Address.csproj" />
   </ItemGroup>
 
   <Import Project="..\..\.paket\Paket.Restore.targets" />

@@ -9,7 +9,7 @@ namespace BuildingRegistry.Building.Events
     [EventTags(EventTag.For.Sync)]
     [EventName("BuildingUnitBecameComplete")]
     [EventDescription("De gebouweenheid voldoet aan het informatiemodel (wegens volledig).")]
-    public class BuildingUnitBecameComplete : IHasProvenance, ISetProvenance
+    public class BuildingUnitBecameComplete : IHasProvenance, ISetProvenance, IMessage
     {
         [EventPropertyDescription("Interne GUID van het gebouw waartoe de gebouweenheid behoort.")]
         public Guid BuildingId { get; }

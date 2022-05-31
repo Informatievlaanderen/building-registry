@@ -10,7 +10,7 @@ namespace BuildingRegistry.Building.Events
     [EventTags(EventTag.For.Sync)]
     [EventName("BuildingUnitWasReaddressed")]
     [EventDescription("De gebouweenheid werd geheradresseerd.")]
-    public class BuildingUnitWasReaddressed : IHasProvenance, ISetProvenance
+    public class BuildingUnitWasReaddressed : IHasProvenance, ISetProvenance, IMessage
     {
         [EventPropertyDescription("Interne GUID van het gebouw waartoe de gebouweenheid behoort.")]
         public Guid BuildingId { get; }

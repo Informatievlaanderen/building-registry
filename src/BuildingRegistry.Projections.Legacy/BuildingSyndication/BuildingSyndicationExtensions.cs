@@ -6,6 +6,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
     using System.Threading;
     using System.Threading.Tasks;
     using System.Xml.Linq;
+    using Be.Vlaanderen.Basisregisters.EventHandling;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.Connector;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore;
@@ -19,6 +20,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
             Envelope<T> message,
             Action<BuildingSyndicationItem> applyEventInfoOn,
             CancellationToken ct)
+            where T : IMessage
         {
             var dummyApplyEventInfoOn = new Action<BuildingSyndicationItem, BuildingSyndicationItem>(
                 (oldSyndicationItem, newSyndicationItem) => applyEventInfoOn(newSyndicationItem));
@@ -36,6 +38,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
             Envelope<T> message,
             Action<BuildingSyndicationItem, BuildingSyndicationItem> applyEventInfoOn,
             CancellationToken ct)
+            where T : IMessage
         {
             context.Database.SetCommandTimeout(300);
 

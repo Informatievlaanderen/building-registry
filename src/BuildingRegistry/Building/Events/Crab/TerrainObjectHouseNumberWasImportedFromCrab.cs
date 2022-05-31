@@ -7,7 +7,7 @@ namespace BuildingRegistry.Building.Events.Crab
 
     [EventName("TerrainObjectHouseNumberWasImportedFromCrab")]
     [EventDescription("Legacy event om tblterreinobject_huisnummer en tblterreinobject_huisnummer_hist te importeren voor gemGebouwen.")]
-    public class TerrainObjectHouseNumberWasImportedFromCrab : ICrabEvent, IHasCrabKey<int>
+    public class TerrainObjectHouseNumberWasImportedFromCrab : ICrabEvent, IHasCrabKey<int>, IMessage
     {
         [EventPropertyDescription("CRAB-identificator van de terreinobject-huisnummerrelatie.")]
         public int TerrainObjectHouseNumberId { get; }

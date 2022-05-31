@@ -10,7 +10,7 @@ namespace BuildingRegistry.Building.Events
     [EventTags(EventTag.For.Sync)]
     [EventName("BuildingUnitWasAdded")]
     [EventDescription("De gebouweenheid werd toegevoegd.")]
-    public class BuildingUnitWasAdded : IHasProvenance, ISetProvenance
+    public class BuildingUnitWasAdded : IHasProvenance, ISetProvenance, IMessage
     {
         [EventPropertyDescription("Interne GUID van het gebouw waartoe de gebouweenheid behoort.")]
         public Guid BuildingId { get; }

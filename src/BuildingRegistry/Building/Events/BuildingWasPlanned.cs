@@ -9,7 +9,7 @@ namespace BuildingRegistry.Building.Events
     [EventTags(EventTag.For.Sync)]
     [EventName("BuildingWasPlanned")]
     [EventDescription("Het gebouw kreeg status 'gepland'.")]
-    public class BuildingWasPlanned : IHasProvenance, ISetProvenance
+    public class BuildingWasPlanned : IHasProvenance, ISetProvenance, IMessage
     {
         [EventPropertyDescription("Interne GUID van het gebouw.")]
         public Guid BuildingId { get; }

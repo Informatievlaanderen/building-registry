@@ -9,7 +9,7 @@ namespace BuildingRegistry.Building.Events
     [EventTags(EventTag.For.Sync)]
     [EventName("BuildingMeasurementByGrbWasCorrected")]
     [EventDescription("Het gebouw werd ingemeten door GRB (via correctie).")]
-    public class BuildingMeasurementByGrbWasCorrected : IHasProvenance, ISetProvenance
+    public class BuildingMeasurementByGrbWasCorrected : IHasProvenance, ISetProvenance, IMessage
     {
         [EventPropertyDescription("Interne GUID van het gebouw.")]
         public Guid BuildingId { get; }

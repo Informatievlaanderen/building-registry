@@ -8,7 +8,7 @@ namespace BuildingRegistry.Building.Events.Crab
 
     [EventName("TerrainObjectWasImportedFromCrab")]
     [EventDescription("Legacy event om tblterreinobject en tblterreinobject_hist te importeren voor gemGebouwen.")]
-    public class TerrainObjectWasImportedFromCrab
+    public class TerrainObjectWasImportedFromCrab : IMessage
     {
         [EventPropertyDescription("CRAB-identificator van het terreinobject.")]
         public int TerrainObjectId { get; }

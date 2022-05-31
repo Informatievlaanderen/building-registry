@@ -9,7 +9,7 @@ namespace BuildingRegistry.Building.Events
     [EventTags(EventTag.For.Sync)]
     [EventName("BuildingUnitWasRemoved")]
     [EventDescription("De gebouweenheid werd verwijderd.")]
-    public class BuildingUnitWasRemoved : IHasProvenance, ISetProvenance
+    public class BuildingUnitWasRemoved : IHasProvenance, ISetProvenance, IMessage
     {
         [EventPropertyDescription("Interne GUID van het gebouw waartoe de gebouweenheid behoort.")]
         public Guid BuildingId { get; }

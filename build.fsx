@@ -2,7 +2,7 @@
 version 7.0.2
 framework: net6.0
 source https://api.nuget.org/v3/index.json
-nuget Be.Vlaanderen.Basisregisters.Build.Pipeline 6.0.3 //"
+nuget Be.Vlaanderen.Basisregisters.Build.Pipeline 6.0.5 //"
 
 #load "packages/Be.Vlaanderen.Basisregisters.Build.Pipeline/Content/build-generic.fsx"
 
@@ -21,6 +21,7 @@ let dockerRepository = "building-registry"
 let assemblyVersionNumber = (sprintf "2.%s")
 let nugetVersionNumber = (sprintf "%s")
 
+let buildSolution = buildSolution assemblyVersionNumber
 let buildSource = build assemblyVersionNumber
 let buildTest = buildTest assemblyVersionNumber
 let setVersions = (setSolutionVersions assemblyVersionNumber product copyright company)
@@ -38,23 +39,9 @@ Target.create "Restore_Solution" (fun _ -> restore "BuildingRegistry")
 
 Target.create "Build_Solution" (fun _ ->
   setVersions "SolutionInfo.cs"
-  buildSource "BuildingRegistry.Projector"
-  buildSource "BuildingRegistry.Api.Legacy"
-  buildSource "BuildingRegistry.Api.Oslo"
-  buildSource "BuildingRegistry.Api.Extract"
-  buildSource "BuildingRegistry.Api.CrabImport"
-  buildSource "BuildingRegistry.Projections.Legacy"
-  buildSource "BuildingRegistry.Projections.Extract"
-  buildSource "BuildingRegistry.Projections.LastChangedList"
-  buildSource "BuildingRegistry.Projections.Syndication"
-  buildTest "BuildingRegistry.Tests"
-)
+  buildSolution "BuildingRegistry")
 
-Target.create "Test_Solution" (fun _ ->
-    [
-        "test" @@ "BuildingRegistry.Tests"
-    ] |> List.iter testWithDotNet
-)
+Target.create "Test_Solution" (fun _ -> test "BuildingRegistry")
 
 Target.create "Publish_Solution" (fun _ ->
   [
@@ -63,6 +50,7 @@ Target.create "Publish_Solution" (fun _ ->
     "BuildingRegistry.Api.Oslo"
     "BuildingRegistry.Api.Extract"
     "BuildingRegistry.Api.CrabImport"
+    "BuildingRegistry.Consumer.Address"
     "BuildingRegistry.Projections.Legacy"
     "BuildingRegistry.Projections.Extract"
     "BuildingRegistry.Projections.LastChangedList"
@@ -110,6 +98,9 @@ Target.create "PushContainer_ProjectionsExtract" (fun _ -> push "projections-ext
 Target.create "Containerize_ProjectionsSyndication" (fun _ -> containerize "BuildingRegistry.Projections.Syndication" "projections-syndication")
 Target.create "PushContainer_ProjectionsSyndication" (fun _ -> push "projections-syndication")
 
+Target.create "Containerize_ConsumerAddress" (fun _ -> containerize "BuildingRegistry.Consumer.Address" "consumer-address")
+Target.create "PushContainer_ConsumerAddress" (fun _ -> push "consumer-address")
+
 // --------------------------------------------------------------------------------
 
 Target.create "Build" ignore
@@ -145,6 +136,7 @@ Target.create "Push" ignore
   ==> "Containerize_ApiExtract"
   ==> "Containerize_ApiCrabImport"
   ==> "Containerize_ProjectionsSyndication"
+  ==> "Containerize_ConsumerAddress"
   ==> "Containerize"
 // Possibly add more projects to containerize here
 
@@ -156,6 +148,7 @@ Target.create "Push" ignore
   ==> "PushContainer_ApiExtract"
   ==> "PushContainer_ApiCrabImport"
   ==> "PushContainer_ProjectionsSyndication"
+  ==> "PushContainer_ConsumerAddress"
   ==> "Push"
 // Possibly add more projects to push here
 

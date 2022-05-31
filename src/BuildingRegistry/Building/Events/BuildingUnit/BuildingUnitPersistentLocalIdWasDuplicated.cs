@@ -10,7 +10,7 @@ namespace BuildingRegistry.Building.Events
     [EventTags(EventTag.For.Sync)]
     [EventName("BuildingUnitPersistentLocalIdentifierWasDuplicated")]
     [EventDescription("Een gebouweenheid kreeg een tweede persistente lokale identificator toegekend door een bug.")]
-    public class BuildingUnitPersistentLocalIdWasDuplicated : IHasProvenance, ISetProvenance
+    public class BuildingUnitPersistentLocalIdWasDuplicated : IHasProvenance, ISetProvenance, IMessage
     {
         [EventPropertyDescription("Interne GUID van het gebouw waartoe de gebouweenheid behoort.")]
         public Guid BuildingId { get; }

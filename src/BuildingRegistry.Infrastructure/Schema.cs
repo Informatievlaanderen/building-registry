@@ -8,11 +8,11 @@ namespace BuildingRegistry.Infrastructure
         public const string Legacy = "BuildingRegistryLegacy";
         public const string Extract = "BuildingRegistryExtract";
         public const string Syndication = "BuildingRegistrySyndication";
-
-        public const string CrabOdb = "odb";
-        public const string CrabCdb = "cdb";
+        
         public const string Wms = "wms";
         public const string Wfs = "wfs";
+        
+        public const string ConsumerAddress = "ConsumerAddress";
 
         public const string Sequence = "BuildingRegistrySequence";
     }
@@ -26,5 +26,6 @@ namespace BuildingRegistry.Infrastructure
         public const string Syndication = "__EFMigrationsHistorySyndication";
         public const string RedisDataMigration = "__EFMigrationsHistoryDataMigration";
         public const string Sequence = "__EFMigrationsHistorySequence";
+        public const string ConsumerAddress = "__EFMigrationsHistoryConsumerAddress";
     }
 }

@@ -8,7 +8,7 @@ namespace BuildingRegistry.Building.Events.Crab
 
     [EventName("AddressSubaddressStatusWasImportedFromCrab")]
     [EventDescription("Legacy event om tblSubadresStatus en tblSubadresStatus_hist te importeren.")]
-    public class AddressSubaddressStatusWasImportedFromCrab : ICrabEvent, IHasCrabAddressStatus, IHasCrabKey<int>
+    public class AddressSubaddressStatusWasImportedFromCrab : ICrabEvent, IHasCrabAddressStatus, IHasCrabKey<int>, IMessage
     {
         [EventPropertyDescription("CRAB-identificator van het terreinobject.")]
         public int TerrainObjectId { get; }

@@ -10,7 +10,7 @@ namespace BuildingRegistry.Building.Events
     [EventTags(EventTag.For.Sync)]
     [EventName("BuildingPersistentLocalIdentifierWasAssigned")]
     [EventDescription("Het gebouw kreeg een persistente lokale identificator toegekend.")]
-    public class BuildingPersistentLocalIdWasAssigned : IHasProvenance, ISetProvenance
+    public class BuildingPersistentLocalIdWasAssigned : IHasProvenance, ISetProvenance, IMessage
     {
         [EventPropertyDescription("Interne GUID van het gebouw.")]
         public Guid BuildingId { get; }

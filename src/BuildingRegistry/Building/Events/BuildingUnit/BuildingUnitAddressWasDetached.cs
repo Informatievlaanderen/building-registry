@@ -11,7 +11,7 @@ namespace BuildingRegistry.Building.Events
     [EventTags(EventTag.For.Sync)]
     [EventName("BuildingUnitAddressWasDetached")]
     [EventDescription("Er werd een adres losgekoppeld van de gebouweenheid.")]
-    public class BuildingUnitAddressWasDetached : IHasProvenance, ISetProvenance
+    public class BuildingUnitAddressWasDetached : IHasProvenance, ISetProvenance, IMessage
     {
         [EventPropertyDescription("Interne GUID van het gebouw waartoe de gebouweenheid behoort.")]
         public Guid BuildingId { get; }

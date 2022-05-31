@@ -9,7 +9,7 @@ namespace BuildingRegistry.Building.Events
     [EventTags(EventTag.For.Sync)]
     [EventName("BuildingUnitBecameIncomplete")]
     [EventDescription("De gebouweenheid voldoet niet meer aan het informatiemodel (wegens niet volledig).")]
-    public class BuildingUnitBecameIncomplete : IHasProvenance, ISetProvenance
+    public class BuildingUnitBecameIncomplete : IHasProvenance, ISetProvenance, IMessage
     {
         [EventPropertyDescription("Interne GUID van het gebouw waartoe de gebouweenheid behoort.")]
         public Guid BuildingId { get; }

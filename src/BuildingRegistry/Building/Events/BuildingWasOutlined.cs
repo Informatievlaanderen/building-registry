@@ -9,7 +9,7 @@ namespace BuildingRegistry.Building.Events
     [EventTags(EventTag.For.Sync)]
     [EventName("BuildingWasOutlined")]
     [EventDescription("Het gebouw werd ingeschetst.")]
-    public class BuildingWasOutlined : IHasProvenance, ISetProvenance
+    public class BuildingWasOutlined : IHasProvenance, ISetProvenance, IMessage
     {
         [EventPropertyDescription("Interne GUID van het gebouw.")]
         public Guid BuildingId { get; }
