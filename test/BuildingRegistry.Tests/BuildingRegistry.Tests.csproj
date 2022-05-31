@@ -3,6 +3,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\BuildingRegistry.Api.Legacy\BuildingRegistry.Api.Legacy.csproj" />
+    <ProjectReference Include="..\..\src\BuildingRegistry.Consumer.Address\BuildingRegistry.Consumer.Address.csproj" />
     <ProjectReference Include="..\..\src\BuildingRegistry\BuildingRegistry.csproj" />
   </ItemGroup>
 

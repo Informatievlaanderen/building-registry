@@ -9,7 +9,7 @@ namespace BuildingRegistry.Building.Events
     [EventTags(EventTag.For.Sync)]
     [EventName("BuildingUnitPositionWasCorrectedToAppointedByAdministrator")]
     [EventDescription("De gebouweenheidpositie werd manueel aangeduid door de beheerder (via correctie).")]
-    public class BuildingUnitPositionWasCorrectedToAppointedByAdministrator : IHasProvenance, ISetProvenance
+    public class BuildingUnitPositionWasCorrectedToAppointedByAdministrator : IHasProvenance, ISetProvenance, IMessage
     {
         [EventPropertyDescription("Interne GUID van het gebouw waartoe de gebouweenheid behoort.")]
         public Guid BuildingId { get; }

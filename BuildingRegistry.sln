@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.28917.181
+# Visual Studio Version 17
+VisualStudioVersion = 17.1.32319.34
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{24B47154-C5F0-4356-B059-49A1E72C38A6}"
 EndProject
@@ -61,6 +61,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BuildingRegistry.Projections.Wfs", "src\BuildingRegistry.Projections.Wfs\BuildingRegistry.Projections.Wfs.csproj", "{4BF486E4-AB14-4009-8DD0-53A2C2D633EF}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BuildingRegistry.Api.Oslo", "src\BuildingRegistry.Api.Oslo\BuildingRegistry.Api.Oslo.csproj", "{A3952D0F-646C-4FC7-91F7-EED768CFE0DD}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BuildingRegistry.Consumer.Address", "src\BuildingRegistry.Consumer.Address\BuildingRegistry.Consumer.Address.csproj", "{2BA61B97-B06E-4970-931B-2CDF2F5D3F37}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -136,6 +138,10 @@ Global
 		{A3952D0F-646C-4FC7-91F7-EED768CFE0DD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A3952D0F-646C-4FC7-91F7-EED768CFE0DD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A3952D0F-646C-4FC7-91F7-EED768CFE0DD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2BA61B97-B06E-4970-931B-2CDF2F5D3F37}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2BA61B97-B06E-4970-931B-2CDF2F5D3F37}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2BA61B97-B06E-4970-931B-2CDF2F5D3F37}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2BA61B97-B06E-4970-931B-2CDF2F5D3F37}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -158,6 +164,7 @@ Global
 		{3261BC73-1D48-4015-B151-0C49F481F297} = {1A034126-30E6-416B-BB2E-F5786E07B178}
 		{4BF486E4-AB14-4009-8DD0-53A2C2D633EF} = {24B47154-C5F0-4356-B059-49A1E72C38A6}
 		{A3952D0F-646C-4FC7-91F7-EED768CFE0DD} = {24B47154-C5F0-4356-B059-49A1E72C38A6}
+		{2BA61B97-B06E-4970-931B-2CDF2F5D3F37} = {24B47154-C5F0-4356-B059-49A1E72C38A6}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {65FA30D5-DDFC-40EC-9BC9-3BF93D1B430F}

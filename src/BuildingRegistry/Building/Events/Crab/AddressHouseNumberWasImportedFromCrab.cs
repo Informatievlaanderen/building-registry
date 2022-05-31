@@ -9,7 +9,7 @@ namespace BuildingRegistry.Building.Events.Crab
 
     [EventName("AddressHouseNumberWasImportedFromCrab")]
     [EventDescription("Legacy event om tblHuisnummer en tblHuisnummer_hist te importeren.")]
-    public class AddressHouseNumberWasImportedFromCrab
+    public class AddressHouseNumberWasImportedFromCrab : IMessage
     {
         [EventPropertyDescription("CRAB-identificator van het huisnummer.")]
         public int HouseNumberId { get; }

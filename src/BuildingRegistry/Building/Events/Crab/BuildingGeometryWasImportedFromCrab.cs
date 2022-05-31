@@ -9,7 +9,7 @@ namespace BuildingRegistry.Building.Events.Crab
 
     [EventName("BuildingGeometryWasImportedFromCrab")]
     [EventDescription("Legacy event om tblgebouwgeometrie en tblgebouwgeometrie_hist te importeren.")]
-    public class BuildingGeometryWasImportedFromCrab : ICrabEvent, IHasCrabKey<int>
+    public class BuildingGeometryWasImportedFromCrab : ICrabEvent, IHasCrabKey<int>, IMessage
     {
         [EventPropertyDescription("CRAB-identificator van de gebouwgeometrie.")]
         public int BuildingGeometryId { get; }

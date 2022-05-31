@@ -11,7 +11,7 @@ namespace BuildingRegistry.Building.Events
     [EventTags(EventTag.For.Sync)]
     [EventName("BuildingWasNotRealized")]
     [EventDescription("Het gebouw kreeg status 'niet gerealiseerd'.")]
-    public class BuildingWasNotRealized : IHasProvenance, ISetProvenance
+    public class BuildingWasNotRealized : IHasProvenance, ISetProvenance, IMessage
     {
         [EventPropertyDescription("Interne GUID van het gebouw.")]
         public Guid BuildingId { get; }

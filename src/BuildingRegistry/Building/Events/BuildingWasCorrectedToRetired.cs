@@ -11,7 +11,7 @@ namespace BuildingRegistry.Building.Events
     [EventTags(EventTag.For.Sync)]
     [EventName("BuildingWasCorrectedToRetired")]
     [EventDescription("Het gebouw kreeg status 'gehistoreerd' (via correctie).")]
-    public class BuildingWasCorrectedToRetired : IHasProvenance, ISetProvenance
+    public class BuildingWasCorrectedToRetired : IHasProvenance, ISetProvenance, IMessage
     {
         [EventPropertyDescription("Interne GUID van het gebouw.")]
         public Guid BuildingId { get; }

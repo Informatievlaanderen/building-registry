@@ -9,7 +9,7 @@ namespace BuildingRegistry.Building.Events.Crab
 
     [EventName("AddressSubaddressWasImportedFromCrab")]
     [EventDescription("Legacy event om tblSubadres en tblSubadres_hist te importeren voor gemGebouwen.")]
-    public class AddressSubaddressWasImportedFromCrab
+    public class AddressSubaddressWasImportedFromCrab : IMessage
     {
         [EventPropertyDescription("CRAB-identificator van het terreinobject.")]
         public int TerrainObjectId { get; }

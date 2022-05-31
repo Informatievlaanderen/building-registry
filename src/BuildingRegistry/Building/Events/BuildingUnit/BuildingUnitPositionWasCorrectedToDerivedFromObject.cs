@@ -9,7 +9,7 @@ namespace BuildingRegistry.Building.Events
     [EventTags(EventTag.For.Sync)]
     [EventName("BuildingUnitPositionWasCorrectedToDerivedFromObject")]
     [EventDescription("De gebouweenheidpositie werd afgeleid van een ander object (via correctie).")]
-    public class BuildingUnitPositionWasCorrectedToDerivedFromObject : IHasProvenance, ISetProvenance
+    public class BuildingUnitPositionWasCorrectedToDerivedFromObject : IHasProvenance, ISetProvenance, IMessage
     {
         [EventPropertyDescription("Interne GUID van het gebouw waartoe de gebouweenheid behoort.")]
         public Guid BuildingId { get; }

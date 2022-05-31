@@ -11,7 +11,7 @@ namespace BuildingRegistry.Building.Events
     [EventTags(EventTag.For.Sync)]
     [EventName("BuildingWasRemoved")]
     [EventDescription("Het gebouw werd verwijderd.")]
-    public class BuildingWasRemoved : IHasProvenance, ISetProvenance
+    public class BuildingWasRemoved : IHasProvenance, ISetProvenance, IMessage
     {
         [EventPropertyDescription("Interne GUID van het gebouw.")]
         public Guid BuildingId { get; }

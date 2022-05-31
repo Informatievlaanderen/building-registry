@@ -10,7 +10,7 @@ namespace BuildingRegistry.Building.Events
     [EventTags(EventTag.For.Sync)]
     [EventName("BuildingUnitWasReaddedByOtherUnitRemoval")]
     [EventDescription("De gebouweenheid werd opnieuw toegevoegd door het verwijderen/historeren van een andere gebouweenheid.")]
-    public class BuildingUnitWasReaddedByOtherUnitRemoval : IHasProvenance, ISetProvenance
+    public class BuildingUnitWasReaddedByOtherUnitRemoval : IHasProvenance, ISetProvenance, IMessage
     {
         [EventPropertyDescription("Interne GUID van het gebouw waartoe de gebouweenheid behoort.")]
         public Guid BuildingId { get; }

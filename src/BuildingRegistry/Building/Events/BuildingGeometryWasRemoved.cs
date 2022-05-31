@@ -9,7 +9,7 @@ namespace BuildingRegistry.Building.Events
     [EventTags(EventTag.For.Sync)]
     [EventName("BuildingGeometryWasRemoved")]
     [EventDescription("De gebouwgeometrie werd verwijderd.")]
-    public class BuildingGeometryWasRemoved : IHasProvenance, ISetProvenance
+    public class BuildingGeometryWasRemoved : IHasProvenance, ISetProvenance, IMessage
     {
         [EventPropertyDescription("Interne GUID van het gebouw.")]
         public Guid BuildingId { get; }

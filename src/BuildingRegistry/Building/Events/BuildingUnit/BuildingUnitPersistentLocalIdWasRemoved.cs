@@ -10,7 +10,7 @@ namespace BuildingRegistry.Building.Events
     [EventTags(EventTag.For.Sync)]
     [EventName("BuildingUnitPersistentLocalIdentifierWasRemoved")]
     [EventDescription("De persistente lokale identificator van de gebouweenheid werd verwijderd.")]
-    public class BuildingUnitPersistentLocalIdWasRemoved : IHasProvenance, ISetProvenance
+    public class BuildingUnitPersistentLocalIdWasRemoved : IHasProvenance, ISetProvenance, IMessage
     {
         [EventPropertyDescription("Interne GUID van het gebouw waartoe de gebouweenheid behoort.")]
         public Guid BuildingId { get; set; }
