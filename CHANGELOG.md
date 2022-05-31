@@ -1,3 +1,10 @@
+## [3.1.1](https://github.com/informatievlaanderen/building-registry/compare/v3.1.0...v3.1.1) (2022-05-31)
+
+
+### Bug Fixes
+
+* add MediatR handlers for BuildingRegistry.Api.CrabImport ([5a9bfa5](https://github.com/informatievlaanderen/building-registry/commit/5a9bfa54e5ac17f4033064874f04b6c4b31637a8))
+
 # [3.1.0](https://github.com/informatievlaanderen/building-registry/compare/v3.0.2...v3.1.0) (2022-05-31)
 
 
