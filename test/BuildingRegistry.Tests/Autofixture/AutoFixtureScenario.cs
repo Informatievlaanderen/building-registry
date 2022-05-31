@@ -1,11 +1,11 @@
 namespace BuildingRegistry.Tests.Autofixture
 {
+    using System;
     using AutoFixture;
     using AutoFixture.Dsl;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
     using Be.Vlaanderen.Basisregisters.AggregateSource.Testing;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
-    using System;
 
     public class AutoFixtureScenario : Scenario, IEventGeneratingScenarioInitialStateBuilder
     {

@@ -3,13 +3,13 @@ namespace BuildingRegistry.Tests.ProjectionTests.Consumer.Address
     using System;
     using System.Collections.Generic;
     using System.Threading.Tasks;
-    using Autofixture;
     using AutoFixture;
     using Be.Vlaanderen.Basisregisters.GrAr.Contracts.AddressRegistry;
     using Be.Vlaanderen.Basisregisters.GrAr.Contracts.Common;
     using BuildingRegistry.Consumer.Address;
     using BuildingRegistry.Consumer.Address.Projections;
     using FluentAssertions;
+    using Legacy.Autofixture;
     using Microsoft.EntityFrameworkCore;
     using Xunit;
     using Xunit.Abstractions;

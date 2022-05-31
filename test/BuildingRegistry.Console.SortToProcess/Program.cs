@@ -5,8 +5,8 @@ namespace BuildingRegistry.Console.SortToProcess
     using System.Linq;
     using Api.CrabImport.Abstractions.Post;
     using Be.Vlaanderen.Basisregisters.GrAr.Import.Processing.Json;
-    using Building.Commands.Crab;
     using Dapper;
+    using Legacy.Commands.Crab;
     using Microsoft.Data.SqlClient;
     using Microsoft.Extensions.Configuration;
     using Newtonsoft.Json;

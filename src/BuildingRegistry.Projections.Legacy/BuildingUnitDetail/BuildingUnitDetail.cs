@@ -6,7 +6,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetail
     using NodaTime;
     using System;
     using System.Collections.ObjectModel;
-    using ValueObjects;
+    using BuildingRegistry.Legacy;
 
     public class BuildingUnitDetailItem
     {

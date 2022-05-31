@@ -3,7 +3,6 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
     using Be.Vlaanderen.Basisregisters.GrAr.Common;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.Connector;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore;
-    using Building.Events;
     using NetTopologySuite.IO;
     using NodaTime;
     using System;
@@ -13,10 +12,11 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
     using Be.Vlaanderen.Basisregisters.GrAr.Extracts;
     using Be.Vlaanderen.Basisregisters.Shaperon;
     using Be.Vlaanderen.Basisregisters.Utilities.HexByteConvertor;
-    using Building.Events.Crab;
+    using Legacy;
+    using Legacy.Events;
+    using Legacy.Events.Crab;
     using Microsoft.Extensions.Options;
     using NetTopologySuite.Geometries;
-    using ValueObjects;
     using Point = Be.Vlaanderen.Basisregisters.Shaperon.Point;
 
     [ConnectedProjectionName("Extract gebouweenheden")]

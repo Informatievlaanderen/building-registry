@@ -19,6 +19,7 @@ namespace BuildingRegistry.Api.Oslo.Building
     using Projections.Legacy;
     using Projections.Syndication;
     using Swashbuckle.AspNetCore.Filters;
+    using ProblemDetails = Be.Vlaanderen.Basisregisters.BasicApiProblem.ProblemDetails;
 
     [ApiVersion("2.0")]
     [AdvertiseApiVersions("2.0")]

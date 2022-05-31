@@ -2,7 +2,6 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetail
 {
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.Connector;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore;
-    using Building.Events;
     using Microsoft.EntityFrameworkCore;
     using NodaTime;
     using System;
@@ -11,8 +10,9 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetail
     using System.Threading;
     using System.Threading.Tasks;
     using Be.Vlaanderen.Basisregisters.Utilities.HexByteConvertor;
-    using Building.Events.Crab;
-    using ValueObjects;
+    using BuildingRegistry.Legacy;
+    using BuildingRegistry.Legacy.Events;
+    using BuildingRegistry.Legacy.Events.Crab;
 
     [ConnectedProjectionName("API endpoint detail/lijst gebouweenheden")]
     [ConnectedProjectionDescription("Projectie die de gebouweenheden data voor het gebouweenheden detail & lijst voorziet.")]

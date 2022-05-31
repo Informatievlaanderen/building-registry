@@ -1,7 +1,6 @@
 namespace BuildingRegistry.Infrastructure.Modules
 {
     using Autofac;
-    using Building;
     using Repositories;
 
     public class RepositoriesModule : Module
@@ -10,8 +9,12 @@ namespace BuildingRegistry.Infrastructure.Modules
         {
             // We could just scan the assembly for classes using Repository<> and registering them against the only interface they implement
             containerBuilder
+                .RegisterType<LegacyBuildings>()
+                .As<Legacy.IBuildings>();
+
+            containerBuilder
                 .RegisterType<Buildings>()
-                .As<IBuildings>();
+                .As<Building.IBuildings>();
         }
     }
 }

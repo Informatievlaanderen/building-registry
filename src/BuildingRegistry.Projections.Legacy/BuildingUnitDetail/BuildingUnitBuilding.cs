@@ -1,10 +1,10 @@
 namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetail
 {
     using System;
+    using BuildingRegistry.Legacy;
     using Infrastructure;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.EntityFrameworkCore.Metadata.Builders;
-    using ValueObjects;
 
     public class BuildingUnitBuildingItem
     {

@@ -7,7 +7,7 @@ namespace BuildingRegistry.Projections.Wms.Building
     using System;
     using Be.Vlaanderen.Basisregisters.GrAr.Common;
     using Be.Vlaanderen.Basisregisters.Utilities;
-    using ValueObjects;
+    using Legacy;
 
     public class Building
     {

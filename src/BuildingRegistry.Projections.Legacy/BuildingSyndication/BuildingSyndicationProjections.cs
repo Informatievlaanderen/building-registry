@@ -2,15 +2,15 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
 {
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.Connector;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore;
-    using Building.Events;
     using NodaTime;
     using System;
     using System.Linq;
     using Be.Vlaanderen.Basisregisters.Utilities.HexByteConvertor;
-    using ValueObjects;
-    using Building.Events.Crab;
     using System.Collections.Generic;
     using System.Threading.Tasks;
+    using BuildingRegistry.Legacy;
+    using BuildingRegistry.Legacy.Events;
+    using BuildingRegistry.Legacy.Events.Crab;
     using Be.Vlaanderen.Basisregisters.EventHandling;
 
     [ConnectedProjectionName("Feed endpoint gebouwen")]

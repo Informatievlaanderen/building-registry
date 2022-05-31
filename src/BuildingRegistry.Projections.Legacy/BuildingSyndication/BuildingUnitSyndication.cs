@@ -7,8 +7,8 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
     using System.Collections.ObjectModel;
     using System.Linq;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.Runner.MigrationExtensions;
+    using BuildingRegistry.Legacy;
     using NodaTime;
-    using ValueObjects;
 
     public class BuildingUnitSyndicationItem
     {

@@ -1,12 +1,12 @@
 namespace BuildingRegistry.Tests.Autofixture
 {
+    using System;
+    using System.Linq;
+    using System.Reflection;
     using AutoFixture;
     using AutoFixture.Dsl;
     using AutoFixture.Kernel;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
-    using System;
-    using System.Linq;
-    using System.Reflection;
 
     public class SetProvenanceImplementationsCallSetProvenance : ICustomization
     {

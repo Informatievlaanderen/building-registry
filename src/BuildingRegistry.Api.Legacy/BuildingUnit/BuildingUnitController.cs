@@ -24,8 +24,8 @@ namespace BuildingRegistry.Api.Legacy.BuildingUnit
     using System.Threading;
     using System.Threading.Tasks;
     using Be.Vlaanderen.Basisregisters.Api.Search;
+    using BuildingRegistry.Legacy;
     using Infrastructure;
-    using ValueObjects;
     using ProblemDetails = Be.Vlaanderen.Basisregisters.BasicApiProblem.ProblemDetails;
 
     [ApiVersion("1.0")]

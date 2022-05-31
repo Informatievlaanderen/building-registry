@@ -4,9 +4,9 @@ namespace BuildingRegistry.Projections.Legacy.BuildingPersistentIdCrabIdMapping
     using Be.Vlaanderen.Basisregisters.Crab;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.Connector;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore;
-    using Building.Events;
-    using Building.Events.Crab;
-    using ValueObjects;
+    using BuildingRegistry.Legacy;
+    using BuildingRegistry.Legacy.Events;
+    using BuildingRegistry.Legacy.Events.Crab;
 
     [ConnectedProjectionName("API endpoint CRAB-gebouwen")]
     [ConnectedProjectionDescription("Projectie die de data voor de link tussen CRAB en gebouwen- en adressenregister voorziet.")]

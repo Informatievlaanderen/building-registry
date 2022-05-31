@@ -2,8 +2,8 @@ namespace BuildingRegistry.Api.CrabImport.Infrastructure
 {
     using System.Data;
     using BuildingRegistry.Infrastructure;
+    using Legacy;
     using Microsoft.EntityFrameworkCore;
-    using ValueObjects;
 
     public class SqlPersistentLocalIdGenerator : IPersistentLocalIdGenerator
     {
