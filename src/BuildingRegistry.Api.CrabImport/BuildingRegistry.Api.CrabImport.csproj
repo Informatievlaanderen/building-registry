@@ -26,6 +26,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\BuildingRegistry.Api.CrabImport.Abstractions\BuildingRegistry.Api.CrabImport.Abstractions.csproj" />
+    <ProjectReference Include="..\BuildingRegistry.Api.CrabImport.Handlers\BuildingRegistry.Api.CrabImport.Handlers.csproj" />
     <ProjectReference Include="..\BuildingRegistry.Infrastructure\BuildingRegistry.Infrastructure.csproj" />
     <ProjectReference Include="..\BuildingRegistry\BuildingRegistry.csproj" />
   </ItemGroup>

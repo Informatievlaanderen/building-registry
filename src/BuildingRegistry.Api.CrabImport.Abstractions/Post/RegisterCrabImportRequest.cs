@@ -1,4 +1,4 @@
-namespace BuildingRegistry.Api.CrabImport.CrabImport.Requests
+namespace BuildingRegistry.Api.CrabImport.Abstractions.Post
 {
     using System.ComponentModel.DataAnnotations;
     using Building;
@@ -28,7 +28,7 @@ namespace BuildingRegistry.Api.CrabImport.CrabImport.Requests
 
     public static class RegisterCrabImportRequestMapping
     {
-        public static dynamic Map(RegisterCrabImportRequest message)
+        public static dynamic? Map(RegisterCrabImportRequest message)
         {
             var assembly = typeof(Building).Assembly;
             var type = assembly.GetType(message.Type);

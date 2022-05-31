@@ -39,6 +39,8 @@ namespace BuildingRegistry.Api.CrabImport.Infrastructure.Modules
             var eventSerializerSettings = EventsJsonSerializerSettingsProvider.CreateSerializerSettings();
 
             containerBuilder
+                .RegisterModule(new MediatRModule())
+
                 .RegisterModule(new DataDogModule(_configuration))
 
                 .RegisterModule(new IdempotencyModule(
