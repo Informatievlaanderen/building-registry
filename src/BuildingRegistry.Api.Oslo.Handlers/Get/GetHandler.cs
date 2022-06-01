@@ -11,12 +11,12 @@ namespace BuildingRegistry.Api.Oslo.Handlers.Get
     using Be.Vlaanderen.Basisregisters.GrAr.Common;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy.Gebouw;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy.SpatialTools;
+    using BuildingRegistry.Legacy;
     using Handlers;
     using MediatR;
     using Microsoft.AspNetCore.Http;
     using Microsoft.EntityFrameworkCore;
     using NetTopologySuite.Geometries;
-    using ValueObjects;
 
     public class GetHandler : BaseHandler, IRequestHandler<GetRequest, BuildingOsloResponse>
     {
