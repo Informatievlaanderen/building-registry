@@ -4,5 +4,7 @@ Be.Vlaanderen.Basisregisters.Api
 Be.Vlaanderen.Basisregisters.DataDog.Tracing.Autofac
 Be.Vlaanderen.Basisregisters.Shaperon
 
+MediatR
+
 SourceLink.Embed.AllSourceFiles
 SourceLink.Copy.PdbFiles

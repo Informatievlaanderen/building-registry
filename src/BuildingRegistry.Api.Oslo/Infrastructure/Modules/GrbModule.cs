@@ -1,8 +1,8 @@
 namespace BuildingRegistry.Api.Oslo.Infrastructure.Modules
 {
+    using Abstractions.Infrastructure.Grb;
+    using Abstractions.Infrastructure.Grb.Wfs;
     using Autofac;
-    using Grb;
-    using Grb.Wfs;
     using Microsoft.Extensions.Configuration;
 
     public class GrbModule : Module

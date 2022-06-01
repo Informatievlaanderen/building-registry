@@ -17,7 +17,6 @@ namespace BuildingRegistry.Api.CrabImport.CrabImport
     using Handlers.Post;
     using MediatR;
     using ApiController = Infrastructure.ApiController;
-    using ProblemDetails = Be.Vlaanderen.Basisregisters.BasicApiProblem.ProblemDetails;
 
     [ApiVersion("1.0")]
     [AdvertiseApiVersions("1.0")]

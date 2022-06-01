@@ -32,6 +32,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\BuildingRegistry.Api.Oslo.Abstractions\BuildingRegistry.Api.Oslo.Abstractions.csproj" />
+    <ProjectReference Include="..\BuildingRegistry.Api.Oslo.Handlers\BuildingRegistry.Api.Oslo.Handlers.csproj" />
     <ProjectReference Include="..\BuildingRegistry.Infrastructure\BuildingRegistry.Infrastructure.csproj" />
     <ProjectReference Include="..\BuildingRegistry.Projections.Legacy\BuildingRegistry.Projections.Legacy.csproj" />
     <ProjectReference Include="..\BuildingRegistry.Projections.Syndication\BuildingRegistry.Projections.Syndication.csproj" />

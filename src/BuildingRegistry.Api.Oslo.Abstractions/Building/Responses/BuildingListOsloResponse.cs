@@ -1,4 +1,4 @@
-namespace BuildingRegistry.Api.Oslo.Building.Responses
+namespace BuildingRegistry.Api.Oslo.Abstractions.Building.Responses
 {
     using System;
     using System.Collections.Generic;

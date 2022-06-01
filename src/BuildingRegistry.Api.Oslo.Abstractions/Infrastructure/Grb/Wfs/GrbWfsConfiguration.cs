@@ -1,8 +1,8 @@
-namespace BuildingRegistry.Api.Oslo.Infrastructure.Grb.Wfs
+namespace BuildingRegistry.Api.Oslo.Abstractions.Infrastructure.Grb.Wfs
 {
     using System;
 
-    internal class GrbWfsConfiguration
+    public class GrbWfsConfiguration
     {
         public string Url { get; }
         

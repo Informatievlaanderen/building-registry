@@ -6,6 +6,7 @@ namespace BuildingRegistry.Api.Oslo.BuildingUnit
     using System.Threading;
     using System.Threading.Tasks;
     using System.Xml;
+    using Abstractions.Infrastructure.Options;
     using Be.Vlaanderen.Basisregisters.Api;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
     using Be.Vlaanderen.Basisregisters.Api.Search;
@@ -17,7 +18,6 @@ namespace BuildingRegistry.Api.Oslo.BuildingUnit
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy.Gebouweenheid;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy.SpatialTools;
     using Infrastructure;
-    using Infrastructure.Options;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.EntityFrameworkCore;
