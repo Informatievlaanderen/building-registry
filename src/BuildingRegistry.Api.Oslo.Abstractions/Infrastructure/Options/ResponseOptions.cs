@@ -1,4 +1,4 @@
-namespace BuildingRegistry.Api.Oslo.Infrastructure.Options
+namespace BuildingRegistry.Api.Oslo.Abstractions.Infrastructure.Options
 {
     public class ResponseOptions
     {

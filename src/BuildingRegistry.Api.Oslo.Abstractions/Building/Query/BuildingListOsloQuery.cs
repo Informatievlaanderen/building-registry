@@ -1,4 +1,4 @@
-namespace BuildingRegistry.Api.Oslo.Building.Query
+namespace BuildingRegistry.Api.Oslo.Abstractions.Building.Query
 {
     using System;
     using System.Collections.Generic;
@@ -7,7 +7,7 @@ namespace BuildingRegistry.Api.Oslo.Building.Query
     using Be.Vlaanderen.Basisregisters.Api.Search.Filtering;
     using Be.Vlaanderen.Basisregisters.Api.Search.Sorting;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy.Gebouw;
-    using Converters;
+    using Legacy.Converters;
     using Microsoft.EntityFrameworkCore;
     using Projections.Legacy;
     using Projections.Legacy.BuildingDetail;

@@ -1,4 +1,4 @@
-namespace BuildingRegistry.Api.Oslo.Infrastructure.Grb.Wfs
+namespace BuildingRegistry.Api.Oslo.Abstractions.Infrastructure.Grb.Wfs
 {
     using System;
     using System.Collections.Generic;
@@ -19,7 +19,7 @@ namespace BuildingRegistry.Api.Oslo.Infrastructure.Grb.Wfs
         IEnumerable<Tuple<Geometry, IReadOnlyDictionary<string, string>>> GetFeaturesInBoundingBox(GrbFeatureType featureType, Envelope boundingBox);
     }
 
-    internal class GrbWfsClient : IGrbWfsClient
+    public class GrbWfsClient : IGrbWfsClient
     {
         private readonly string _wfsUrl;
         private readonly XmlNamespaceManager _namespaceManager;
@@ -28,7 +28,9 @@ namespace BuildingRegistry.Api.Oslo.Infrastructure.Grb.Wfs
         public GrbWfsClient(GrbWfsConfiguration configuration)
         {
             if (configuration == null)
+            {
                 throw new ArgumentNullException(nameof(configuration));
+            }
 
             _wfsUrl = configuration.Url;
 
@@ -53,10 +55,14 @@ namespace BuildingRegistry.Api.Oslo.Infrastructure.Grb.Wfs
 
                 var wfsDoc = XDocument.Load(response);
                 if (wfsDoc.Root?.Name?.LocalName == null)
+                {
                     throw new GrbWfsException("Invalid response");
+                }
 
                 if (wfsDoc.Root.Name.LocalName.Equals("ServiceExceptionReport", StringComparison.OrdinalIgnoreCase))
+                {
                     throw new GrbWfsException(wfsDoc.ToString());
+                }
 
                 return wfsDoc
                     .XPathSelectElements("/wfs:FeatureCollection/gml:featureMember", _namespaceManager)
@@ -94,8 +100,8 @@ namespace BuildingRegistry.Api.Oslo.Infrastructure.Grb.Wfs
             var request = (HttpWebRequest)WebRequest.Create(_wfsUrl);
             request.Method = HttpMethod.Post.Method;
             request.ContentType = MediaTypeNames.Application.Xml;
-            using (var writer = new StreamWriter(request.GetRequestStream()))
-                writer.Write(payload);
+            using var writer = new StreamWriter(request.GetRequestStream());
+            writer.Write(payload);
 
             return request;
         }
@@ -110,9 +116,11 @@ namespace BuildingRegistry.Api.Oslo.Infrastructure.Grb.Wfs
                 .First();
 
             if (gml.Name.LocalName == "MultiPolygon")
+            {
                 gml = gml
                     .Element(XName.Get("polygonMember", GrbWfsNameSpaces.Gml))
                     .Element(XName.Get("Polygon", GrbWfsNameSpaces.Gml));
+            }
 
             gml
                 .DescendantsAndSelf()

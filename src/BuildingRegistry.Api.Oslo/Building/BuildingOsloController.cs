@@ -1,36 +1,24 @@
 namespace BuildingRegistry.Api.Oslo.Building
 {
-    using System;
-    using System.Linq;
-    using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
-    using System.Xml;
+    using Abstractions.Building.Responses;
+    using Abstractions.Infrastructure.Grb;
+    using Abstractions.Infrastructure.Options;
     using Be.Vlaanderen.Basisregisters.Api;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
-    using Be.Vlaanderen.Basisregisters.Api.Search;
-    using Be.Vlaanderen.Basisregisters.Api.Search.Filtering;
-    using Be.Vlaanderen.Basisregisters.Api.Search.Pagination;
-    using Be.Vlaanderen.Basisregisters.Api.Search.Sorting;
-    using Be.Vlaanderen.Basisregisters.GrAr.Common;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy;
-    using Be.Vlaanderen.Basisregisters.GrAr.Legacy.Gebouw;
-    using Be.Vlaanderen.Basisregisters.GrAr.Legacy.SpatialTools;
+    using Handlers.Count;
+    using Handlers.Get;
+    using Handlers.GetList;
     using Infrastructure;
-    using Infrastructure.Grb;
-    using Infrastructure.Options;
+    using MediatR;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
-    using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Options;
-    using NetTopologySuite.Geometries;
     using Projections.Legacy;
     using Projections.Syndication;
-    using Query;
-    using Responses;
     using Swashbuckle.AspNetCore.Filters;
-    using ValueObjects;
-    using ProblemDetails = Be.Vlaanderen.Basisregisters.BasicApiProblem.ProblemDetails;
 
     [ApiVersion("2.0")]
     [AdvertiseApiVersions("2.0")]
@@ -38,6 +26,13 @@ namespace BuildingRegistry.Api.Oslo.Building
     [ApiExplorerSettings(GroupName = "Gebouwen")]
     public class BuildingOsloController : ApiController
     {
+        private readonly IMediator _mediator;
+
+        public BuildingOsloController(IMediator mediator)
+        {
+            _mediator = mediator;
+        }
+
         /// <summary>
         /// Vraag een gebouw op.
         /// </summary>
@@ -69,47 +64,7 @@ namespace BuildingRegistry.Api.Oslo.Building
             [FromRoute] int persistentLocalId,
             CancellationToken cancellationToken = default)
         {
-            var building = await context
-                .BuildingDetails
-                .AsNoTracking()
-                .SingleOrDefaultAsync(item => item.PersistentLocalId == persistentLocalId, cancellationToken);
-
-            if (building != null && building.IsRemoved)
-                throw new ApiException("Gebouw werd verwijderd.", StatusCodes.Status410Gone);
-
-            if (building == null || !building.IsComplete)
-                throw new ApiException("Onbestaand gebouw.", StatusCodes.Status404NotFound);
-
-            //TODO: improvement getting buildingunits and parcels in parallel.
-            var buildingUnits = await context
-                .BuildingUnitDetails
-                .Where(x => x.BuildingId == building.BuildingId)
-                .Where(x => x.IsComplete && !x.IsRemoved)
-                .Select(x => x.PersistentLocalId)
-                .ToListAsync(cancellationToken);
-
-            var parcels = grbBuildingParcel
-                .GetUnderlyingParcels(building.Geometry)
-                .Select(s => CaPaKey.CreateFrom(s).VbrCaPaKey)
-                .Distinct();
-
-            var caPaKeys = await syndicationContext
-                .BuildingParcelLatestItems
-                .Where(x => !x.IsRemoved &&
-                            parcels.Contains(x.CaPaKey))
-                .Select(x => x.CaPaKey)
-                .ToListAsync(cancellationToken);
-
-            var response = new BuildingOsloResponse(
-                building.PersistentLocalId.Value,
-                responseOptions.Value.GebouwNaamruimte,
-                responseOptions.Value.ContextUrlDetail,
-                building.Version.ToBelgianDateTimeOffset(),
-                GetBuildingPolygon(building.Geometry, building.GeometryMethod.Value),
-                MapBuildingStatus(building.Status.Value),
-                buildingUnits.OrderBy(x => x.Value).Select(x => new GebouwDetailGebouweenheid(x.ToString(), string.Format(responseOptions.Value.GebouweenheidDetailUrl, x))).ToList(),
-                caPaKeys.Select(x => new GebouwDetailPerceel(x, string.Format(responseOptions.Value.PerceelUrl, x))).ToList());
-
+            var response = await _mediator.Send(new GetRequest(context, syndicationContext, responseOptions, grbBuildingParcel, persistentLocalId), cancellationToken);
             return Ok(response);
         }
 
@@ -133,38 +88,7 @@ namespace BuildingRegistry.Api.Oslo.Building
             [FromServices] IOptions<ResponseOptions> responseOptions,
             CancellationToken cancellationToken = default)
         {
-            var filtering = Request.ExtractFilteringRequest<BuildingFilter>();
-            var sorting = Request.ExtractSortingRequest();
-            var pagination = Request.ExtractPaginationRequest();
-
-            var pagedBuildings = new BuildingListOsloQuery(context)
-                .Fetch(filtering, sorting, pagination);
-
-            Response.AddPagedQueryResultHeaders(pagedBuildings);
-
-            var buildings = await pagedBuildings.Items
-                .Select(a => new
-                {
-                    a.PersistentLocalId,
-                    a.Version,
-                    a.Status
-                })
-                .ToListAsync(cancellationToken);
-
-            var listResponse = new BuildingListOsloResponse
-            {
-                Gebouwen = buildings
-                    .Select(x => new GebouwCollectieItemOslo(
-                        x.PersistentLocalId.Value,
-                        responseOptions.Value.GebouwNaamruimte,
-                        responseOptions.Value.GebouwDetailUrl,
-                        MapBuildingStatus(x.Status.Value),
-                        x.Version.ToBelgianDateTimeOffset()))
-                    .ToList(),
-                Volgende = pagedBuildings.PaginationInfo.BuildNextUri(responseOptions.Value.GebouwVolgendeUrl),
-                Context = responseOptions.Value.ContextUrlList
-            };
-
+            var listResponse = await _mediator.Send(new GetListRequest(Request, Response, context, responseOptions), cancellationToken);
             return Ok(listResponse);
         }
 
@@ -185,127 +109,8 @@ namespace BuildingRegistry.Api.Oslo.Building
             [FromServices] LegacyContext context,
             CancellationToken cancellationToken = default)
         {
-            var filtering = Request.ExtractFilteringRequest<BuildingFilter>();
-            var sorting = Request.ExtractSortingRequest();
-            var pagination = new NoPaginationRequest();
-
-            return Ok(
-                new TotaalAantalResponse
-                {
-                    Aantal = filtering.ShouldFilter
-                        ? await new BuildingListOsloQuery(context)
-                            .Fetch(filtering, sorting, pagination)
-                            .Items
-                            .CountAsync(cancellationToken)
-                        : Convert.ToInt32(context
-                            .BuildingDetailListCountView
-                            .First()
-                            .Count)
-                });
-        }
-
-        private static GeometrieMethode MapGeometryMethod(BuildingGeometryMethod geometryMethod)
-        {
-            switch (geometryMethod)
-            {
-                case BuildingGeometryMethod.Outlined:
-                    return GeometrieMethode.Ingeschetst;
-
-                case BuildingGeometryMethod.MeasuredByGrb:
-                    return GeometrieMethode.IngemetenGRB;
-
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(geometryMethod), geometryMethod, null);
-            }
-        }
-
-        private static GebouwStatus MapBuildingStatus(BuildingStatus status)
-        {
-            switch (status)
-            {
-                case BuildingStatus.Planned:
-                    return GebouwStatus.Gepland;
-
-                case BuildingStatus.UnderConstruction:
-                    return GebouwStatus.InAanbouw;
-
-                case BuildingStatus.Realized:
-                    return GebouwStatus.Gerealiseerd;
-
-                case BuildingStatus.Retired:
-                    return GebouwStatus.Gehistoreerd;
-
-                case BuildingStatus.NotRealized:
-                    return GebouwStatus.NietGerealiseerd;
-
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(status), status, null);
-            }
-        }
-
-        private static BuildingPolygon GetBuildingPolygon(byte[] polygon, BuildingGeometryMethod geometryMethod)
-        {
-            var geometry = WKBReaderFactory.Create().Read(polygon) as NetTopologySuite.Geometries.Polygon;
-
-            if (geometry == null) //some buildings have multi polygons (imported) which are incorrect.
-                return null;
-
-            var gml = GetGml(geometry);
-
-            return new BuildingPolygon(new GmlJsonPolygon(gml), MapGeometryMethod(geometryMethod));
-        }
-
-        internal static string GetGml(Geometry geometry)
-        {
-            StringBuilder builder = new();
-            XmlWriterSettings settings = new() { Indent = false, OmitXmlDeclaration = true };
-
-            var polygon = geometry as NetTopologySuite.Geometries.Polygon;
-
-            using (XmlWriter xmlwriter = XmlWriter.Create(builder, settings))
-            {
-                xmlwriter.WriteStartElement("gml", "Polygon", "http://www.opengis.net/gml/3.2");
-                xmlwriter.WriteAttributeString("srsName", "https://www.opengis.net/def/crs/EPSG/0/31370");
-                WriteRing(polygon.ExteriorRing as NetTopologySuite.Geometries.LinearRing, xmlwriter);
-                WriteInteriorRings(polygon.InteriorRings, polygon.NumInteriorRings, xmlwriter);
-                xmlwriter.WriteEndElement();
-            }
-            return builder.ToString();
-        }
-
-        private static void WriteRing(NetTopologySuite.Geometries.LinearRing ring, XmlWriter writer, bool isInterior = false)
-        {
-            writer.WriteStartElement("gml", isInterior ? "interior" : "exterior", "http://www.opengis.net/gml/3.2");
-            writer.WriteStartElement("gml", "LinearRing", "http://www.opengis.net/gml/3.2");
-            writer.WriteStartElement("gml", "posList", "http://www.opengis.net/gml/3.2");
-
-            var posListBuilder = new StringBuilder();
-            foreach (var coordinate in ring.Coordinates)
-            {
-                posListBuilder.Append(string.Format(
-                    NetTopologySuite.Utilities.Global.GetNfi(),
-                    "{0} {1} ",
-                    coordinate.X.ToPolygonGeometryCoordinateValueFormat(),
-                    coordinate.Y.ToPolygonGeometryCoordinateValueFormat()));
-            }
-
-            //remove last space
-            posListBuilder.Length--;
-
-            writer.WriteValue(posListBuilder.ToString());
-
-            writer.WriteEndElement();
-            writer.WriteEndElement();
-            writer.WriteEndElement();
-        }
-
-        private static void WriteInteriorRings(LineString[] rings, int numInteriorRings, XmlWriter writer)
-        {
-            if (numInteriorRings < 1)
-                return;
-
-            foreach (var ring in rings)
-                WriteRing(ring as NetTopologySuite.Geometries.LinearRing, writer, true);
+            var response = await _mediator.Send(new CountRequest(context, Request), cancellationToken);
+            return Ok(response);
         }
     }
 }

@@ -3,13 +3,14 @@ namespace BuildingRegistry.Api.Oslo.Infrastructure
     using System;
     using System.Linq;
     using System.Reflection;
+    using Abstractions.Infrastructure.Grb.Wfs;
+    using Abstractions.Infrastructure.Options;
     using Autofac;
     using Autofac.Extensions.DependencyInjection;
     using Be.Vlaanderen.Basisregisters.Api;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
     using Be.Vlaanderen.Basisregisters.DataDog.Tracing.Autofac;
     using Configuration;
-    using Grb.Wfs;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.Mvc.ApiExplorer;
@@ -20,7 +21,6 @@ namespace BuildingRegistry.Api.Oslo.Infrastructure
     using Microsoft.Extensions.Logging;
     using Microsoft.OpenApi.Models;
     using Modules;
-    using Options;
 
     /// <summary>Represents the startup process for the application.</summary>
     public class Startup
@@ -91,10 +91,12 @@ namespace BuildingRegistry.Api.Oslo.Infrastructure
                                 .GetChildren();
 
                             foreach (var connectionString in connectionStrings)
+                            {
                                 health.AddSqlServer(
                                     connectionString.Value,
                                     name: $"sqlserver-{connectionString.Key.ToLowerInvariant()}",
                                     tags: new[] { DatabaseTag, "sql", "sqlserver" });
+                            }
                         }
                     }
                 })
@@ -133,7 +135,7 @@ namespace BuildingRegistry.Api.Oslo.Infrastructure
                     },
                     Tracing =
                     {
-                        ServiceName = _configuration["DataDog:ServiceName"],
+                        ServiceName = _configuration["DataDog:ServiceName"]
                     }
                 })
 
@@ -145,7 +147,7 @@ namespace BuildingRegistry.Api.Oslo.Infrastructure
                         ServiceProvider = serviceProvider,
                         HostingEnvironment = env,
                         ApplicationLifetime = appLifetime,
-                        LoggerFactory = loggerFactory,
+                        LoggerFactory = loggerFactory
                     },
                     Api =
                     {
@@ -169,7 +171,7 @@ namespace BuildingRegistry.Api.Oslo.Infrastructure
                     },
                     MiddlewareHooks =
                     {
-                        AfterMiddleware = x => x.UseMiddleware<AddNoCacheHeadersMiddleware>(),
+                        AfterMiddleware = x => x.UseMiddleware<AddNoCacheHeadersMiddleware>()
                     }
                 });
         }

@@ -1,4 +1,4 @@
-namespace BuildingRegistry.Api.Oslo.Infrastructure.Grb
+namespace BuildingRegistry.Api.Oslo.Abstractions.Infrastructure.Grb
 {
     using System;
     using System.Collections.Generic;
@@ -11,7 +11,7 @@ namespace BuildingRegistry.Api.Oslo.Infrastructure.Grb
         IEnumerable<string> GetUnderlyingParcels(byte[] buildingGeometry);
     }
 
-    internal class GrbBuildingParcel : IGrbBuildingParcel
+    public class GrbBuildingParcel : IGrbBuildingParcel
     {
         private readonly IGrbWfsClient _wfsClient;
 

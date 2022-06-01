@@ -3,10 +3,10 @@ namespace BuildingRegistry.Api.Oslo.BuildingUnit.Responses
     using System;
     using System.Collections.Generic;
     using System.Runtime.Serialization;
+    using Abstractions.Infrastructure.Options;
     using Be.Vlaanderen.Basisregisters.GrAr.Common;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy.Gebouweenheid;
-    using Infrastructure.Options;
     using Microsoft.Extensions.Options;
     using Newtonsoft.Json;
     using Swashbuckle.AspNetCore.Filters;
