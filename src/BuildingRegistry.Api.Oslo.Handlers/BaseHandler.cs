@@ -1,9 +1,9 @@
-using Be.Vlaanderen.Basisregisters.GrAr.Legacy.Gebouw;
-using BuildingRegistry.ValueObjects;
-using System;
-
 namespace BuildingRegistry.Api.Oslo.Handlers
 {
+    using System;
+    using Be.Vlaanderen.Basisregisters.GrAr.Legacy.Gebouw;
+    using BuildingRegistry.Legacy;
+
     public abstract class BaseHandler
     {
         public static GebouwStatus MapBuildingStatus(BuildingStatus status)
