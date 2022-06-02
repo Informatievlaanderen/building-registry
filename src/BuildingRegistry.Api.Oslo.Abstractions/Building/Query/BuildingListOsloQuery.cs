@@ -7,7 +7,7 @@ namespace BuildingRegistry.Api.Oslo.Abstractions.Building.Query
     using Be.Vlaanderen.Basisregisters.Api.Search.Filtering;
     using Be.Vlaanderen.Basisregisters.Api.Search.Sorting;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy.Gebouw;
-    using Legacy.Converters;
+    using Legacy.Abstractions.Converters;
     using Microsoft.EntityFrameworkCore;
     using Projections.Legacy;
     using Projections.Legacy.BuildingDetail;
@@ -54,7 +54,7 @@ namespace BuildingRegistry.Api.Oslo.Abstractions.Building.Query
     {
         public IEnumerable<string> SortableFields { get; } = new[]
         {
-            nameof(BuildingDetailItem.PersistentLocalId),
+            nameof(BuildingDetailItem.PersistentLocalId)
         };
 
         public SortingHeader DefaultSortingHeader { get; } = new SortingHeader(nameof(BuildingDetailItem.PersistentLocalId), SortOrder.Ascending);

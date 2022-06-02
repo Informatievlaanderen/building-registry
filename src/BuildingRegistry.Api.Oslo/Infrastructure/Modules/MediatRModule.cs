@@ -2,7 +2,7 @@ namespace BuildingRegistry.Api.Oslo.Infrastructure.Modules
 {
     using System.Reflection;
     using Autofac;
-    using Handlers.Get;
+    using Handlers;
     using MediatR;
     using Module = Autofac.Module;
 

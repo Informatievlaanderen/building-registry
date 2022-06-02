@@ -13,13 +13,12 @@ namespace BuildingRegistry.Api.Legacy.Infrastructure
     using Microsoft.Extensions.Logging;
     using Microsoft.Extensions.Hosting;
     using Modules;
-    using Options;
     using System;
-    using System.Collections.Generic;
     using System.Linq;
     using System.Reflection;
+    using Abstractions.Infrastructure.Grb.Wfs;
+    using Abstractions.Infrastructure.Options;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
-    using Grb.Wfs;
     using Microsoft.Extensions.Diagnostics.HealthChecks;
     using Microsoft.OpenApi.Models;
 
