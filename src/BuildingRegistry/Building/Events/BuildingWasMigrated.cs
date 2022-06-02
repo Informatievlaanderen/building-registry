@@ -8,16 +8,11 @@ namespace BuildingRegistry.Building.Events
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Newtonsoft.Json;
     using NodaTime;
-    using BuildingGeometry = BuildingRegistry.Building.BuildingGeometry;
-    using BuildingGeometryMethod = BuildingRegistry.Building.BuildingGeometryMethod;
-    using BuildingId = BuildingRegistry.Building.BuildingId;
-    using BuildingStatus = BuildingRegistry.Building.BuildingStatus;
-    using ExtendedWkbGeometry = BuildingRegistry.Building.ExtendedWkbGeometry;
 
     [EventTags(EventTag.For.Sync, Tag.Migration)]
     [EventName(EventName)]
     [EventDescription("Het gebouw werd gemigreerd.")]
-    public class BuildingWasMigrated : IBuildingEvent, IHasProvenance, ISetProvenance, IHaveHash
+    public class BuildingWasMigrated : IBuildingEvent
     {
         public const string EventName = "BuildingWasMigrated"; // BE CAREFUL CHANGING THIS!!
 

@@ -13,7 +13,7 @@ namespace BuildingRegistry.Building
         private static readonly WKBReader WkbReader = WKBReaderFactory.Create();
 
         [JsonConstructor]
-        public ExtendedWkbGeometry([JsonProperty("value")] byte[] ewkbBytes) : base(ewkbBytes) { }
+        public ExtendedWkbGeometry(byte[] ewkbBytes) : base(ewkbBytes) { }
 
         public ExtendedWkbGeometry(string ewkbBytesHex) : base(ewkbBytesHex.ToByteArray()) { }
 

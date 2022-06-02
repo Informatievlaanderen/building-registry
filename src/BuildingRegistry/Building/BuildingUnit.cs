@@ -9,7 +9,6 @@ namespace BuildingRegistry.Building
     {
         private IHaveHash _lastEvent;
 
-        public BuildingUnitId BuildingUnitId { get; private set; }
         public BuildingUnitPersistentLocalId BuildingUnitPersistentLocalId { get; private set; }
         public BuildingUnitFunction Function { get; private set; }
         public BuildingUnitStatus Status { get; private set; }
@@ -24,7 +23,6 @@ namespace BuildingRegistry.Building
 
         public static BuildingUnit Migrate(
             Action<object> applier,
-            BuildingUnitId buildingUnitId,
             BuildingUnitPersistentLocalId buildingUnitPersistentLocalId,
             BuildingUnitFunction function,
             BuildingUnitStatus status,
@@ -33,7 +31,6 @@ namespace BuildingRegistry.Building
         {
             var unit = new BuildingUnit(applier);
 
-            unit.BuildingUnitId = buildingUnitId;
             unit.BuildingUnitPersistentLocalId = buildingUnitPersistentLocalId;
             unit.Function = function;
             unit.Status = status;
