@@ -43,7 +43,7 @@ namespace BuildingRegistry.Consumer.Address.Migrations
 
                     SqlServerKeyBuilderExtensions.IsClustered(b.HasKey("Name"));
 
-                    b.ToTable("ProjectionStates", "ConsumerAddress");
+                    b.ToTable("ProjectionStates", "BuildingRegistryConsumerAddress");
                 });
 
             modelBuilder.Entity("BuildingRegistry.Consumer.Address.AddressConsumerItem", b =>
@@ -69,7 +69,7 @@ namespace BuildingRegistry.Consumer.Address.Migrations
 
                     b.HasIndex("IsRemoved");
 
-                    b.ToTable("Addresses", "ConsumerAddress");
+                    b.ToTable("Addresses", "BuildingRegistryConsumerAddress");
                 });
 #pragma warning restore 612, 618
         }

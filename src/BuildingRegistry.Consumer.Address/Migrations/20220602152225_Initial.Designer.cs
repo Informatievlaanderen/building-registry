@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BuildingRegistry.Consumer.Address.Migrations
 {
     [DbContext(typeof(ConsumerAddressContext))]
-    [Migration("20220531111544_Initial")]
+    [Migration("20220602152225_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -45,7 +45,7 @@ namespace BuildingRegistry.Consumer.Address.Migrations
 
                     SqlServerKeyBuilderExtensions.IsClustered(b.HasKey("Name"));
 
-                    b.ToTable("ProjectionStates", "ConsumerAddress");
+                    b.ToTable("ProjectionStates", "BuildingRegistryConsumerAddress");
                 });
 
             modelBuilder.Entity("BuildingRegistry.Consumer.Address.AddressConsumerItem", b =>
@@ -71,7 +71,7 @@ namespace BuildingRegistry.Consumer.Address.Migrations
 
                     b.HasIndex("IsRemoved");
 
-                    b.ToTable("Addresses", "ConsumerAddress");
+                    b.ToTable("Addresses", "BuildingRegistryConsumerAddress");
                 });
 #pragma warning restore 612, 618
         }

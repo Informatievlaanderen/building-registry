@@ -10,11 +10,11 @@ namespace BuildingRegistry.Consumer.Address.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.EnsureSchema(
-                name: "ConsumerAddress");
+                name: "BuildingRegistryConsumerAddress");
 
             migrationBuilder.CreateTable(
                 name: "Addresses",
-                schema: "ConsumerAddress",
+                schema: "BuildingRegistryConsumerAddress",
                 columns: table => new
                 {
                     AddressPersistentLocalId = table.Column<int>(type: "int", nullable: false),
@@ -30,7 +30,7 @@ namespace BuildingRegistry.Consumer.Address.Migrations
 
             migrationBuilder.CreateTable(
                 name: "ProjectionStates",
-                schema: "ConsumerAddress",
+                schema: "BuildingRegistryConsumerAddress",
                 columns: table => new
                 {
                     Name = table.Column<string>(type: "nvarchar(450)", nullable: false),
@@ -47,13 +47,13 @@ namespace BuildingRegistry.Consumer.Address.Migrations
 
             migrationBuilder.CreateIndex(
                 name: "IX_Addresses_AddressId",
-                schema: "ConsumerAddress",
+                schema: "BuildingRegistryConsumerAddress",
                 table: "Addresses",
                 column: "AddressId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Addresses_IsRemoved",
-                schema: "ConsumerAddress",
+                schema: "BuildingRegistryConsumerAddress",
                 table: "Addresses",
                 column: "IsRemoved");
         }
@@ -62,11 +62,11 @@ namespace BuildingRegistry.Consumer.Address.Migrations
         {
             migrationBuilder.DropTable(
                 name: "Addresses",
-                schema: "ConsumerAddress");
+                schema: "BuildingRegistryConsumerAddress");
 
             migrationBuilder.DropTable(
                 name: "ProjectionStates",
-                schema: "ConsumerAddress");
+                schema: "BuildingRegistryConsumerAddress");
         }
     }
 }
