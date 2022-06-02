@@ -12,7 +12,7 @@ namespace BuildingRegistry.Infrastructure
         public const string Wms = "wms";
         public const string Wfs = "wfs";
         
-        public const string ConsumerAddress = "ConsumerAddress";
+        public const string ConsumerAddress = "BuildingRegistryConsumerAddress";
 
         public const string Sequence = "BuildingRegistrySequence";
     }
