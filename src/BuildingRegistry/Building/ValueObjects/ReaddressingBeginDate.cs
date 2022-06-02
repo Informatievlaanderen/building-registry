@@ -3,12 +3,11 @@ namespace BuildingRegistry.Building
     using System;
     using System.Globalization;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
-    using Newtonsoft.Json;
     using NodaTime;
 
     public class ReaddressingBeginDate : StructDataTypeValueObject<ReaddressingBeginDate, LocalDate>, IComparable
     {
-        public ReaddressingBeginDate([JsonProperty("value")] LocalDate readdressingBeginDate) : base(readdressingBeginDate)  { }
+        public ReaddressingBeginDate(LocalDate readdressingBeginDate) : base(readdressingBeginDate)  { }
 
         public override string ToString() => Value.ToString("dd/MM/yyyy", CultureInfo.InvariantCulture);
 

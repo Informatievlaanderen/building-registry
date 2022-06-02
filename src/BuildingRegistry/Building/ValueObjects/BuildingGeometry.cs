@@ -40,7 +40,7 @@ namespace BuildingRegistry.Building
         }
 
         public ExtendedWkbGeometry Center =>
-            ExtendedWkbGeometry.CreateEWkb(_wkbReader.Read(Geometry).Centroid.AsBinary());
+            ExtendedWkbGeometry.CreateEWkb(_wkbReader.Read(Geometry).Centroid.AsBinary())!;
 
         protected override IEnumerable<object> Reflect()
         {

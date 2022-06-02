@@ -5,17 +5,6 @@ namespace BuildingRegistry.Building.Commands
     using Be.Vlaanderen.Basisregisters.Generators.Guid;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Be.Vlaanderen.Basisregisters.Utilities;
-    using Legacy;
-    using BuildingGeometry = BuildingRegistry.Building.BuildingGeometry;
-    using BuildingGeometryMethod = BuildingRegistry.Building.BuildingGeometryMethod;
-    using BuildingId = BuildingRegistry.Building.BuildingId;
-    using BuildingStatus = BuildingRegistry.Building.BuildingStatus;
-    using BuildingUnitFunction = BuildingRegistry.Building.BuildingUnitFunction;
-    using BuildingUnitId = BuildingRegistry.Building.BuildingUnitId;
-    using BuildingUnitPosition = BuildingRegistry.Building.BuildingUnitPosition;
-    using BuildingUnitPositionGeometryMethod = BuildingRegistry.Building.BuildingUnitPositionGeometryMethod;
-    using BuildingUnitStatus = BuildingRegistry.Building.BuildingUnitStatus;
-    using ExtendedWkbGeometry = BuildingRegistry.Building.ExtendedWkbGeometry;
 
     public class MigrateBuilding : IHasCommandProvenance
     {
@@ -44,7 +33,7 @@ namespace BuildingRegistry.Building.Commands
             BuildingId = new BuildingId(buildingId);
             BuildingPersistentLocalId = new BuildingPersistentLocalId(persistentLocalId);
             BuildingPersistentLocalIdAssignmentDate = new BuildingPersistentLocalIdAssignmentDate(assignmentDate);
-            BuildingStatus = BuildingStatusHelpers.Map(buildingStatus);
+            BuildingStatus = Legacy.BuildingStatusHelpers.Map(buildingStatus);
             BuildingGeometry = new BuildingGeometry(
                 new ExtendedWkbGeometry(buildingGeometry.Geometry.ToString()),
                 BuildingGeometryMethod.Parse(buildingGeometry.Method.ToString()));

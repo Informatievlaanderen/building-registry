@@ -1,9 +1,7 @@
 namespace BuildingRegistry.Building
 {
-    using System;
-
-    public interface IHasBuildingId
+    public interface IHasBuildingPersistentLocalId
     {
-        public Guid BuildingId { get; }
+        public int BuildingPersistentLocalId { get; }
     }
 }

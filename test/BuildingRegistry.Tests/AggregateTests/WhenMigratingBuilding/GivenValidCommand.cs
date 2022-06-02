@@ -53,7 +53,6 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenMigratingBuilding
 
             // Assert
             result.Should().NotBeNull();
-            result.BuildingId.Should().Be(command.BuildingId);
             result.BuildingPersistentLocalId.Should().Be(command.BuildingPersistentLocalId);
             result.BuildingPersistentLocalIdAssignmentDate.Should().Be(command.BuildingPersistentLocalIdAssignmentDate);
             result.BuildingStatus.Should().Be(command.BuildingStatus);
@@ -62,9 +61,8 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenMigratingBuilding
 
             foreach (var expectedBuildingUnit in command.BuildingUnits)
             {
-                var actualBuildingUnit = result.BuildingUnits.FirstOrDefault(x => x.BuildingUnitId == expectedBuildingUnit.BuildingUnitId);
+                var actualBuildingUnit = result.BuildingUnits.FirstOrDefault(x => x.BuildingUnitPersistentLocalId == expectedBuildingUnit.BuildingUnitPersistentLocalId);
                 actualBuildingUnit.Should().NotBeNull();
-                actualBuildingUnit.BuildingUnitId.Should().Be(expectedBuildingUnit.BuildingUnitId);
                 actualBuildingUnit.BuildingUnitPersistentLocalId.Should().Be(expectedBuildingUnit.BuildingUnitPersistentLocalId);
                 actualBuildingUnit.Function.Should().Be(expectedBuildingUnit.Function);
                 actualBuildingUnit.Status.Should().Be(expectedBuildingUnit.Status);

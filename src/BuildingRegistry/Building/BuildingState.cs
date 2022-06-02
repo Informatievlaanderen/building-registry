@@ -5,7 +5,6 @@ namespace BuildingRegistry.Building
 
     public partial class Building
     {
-        public BuildingId BuildingId { get; private set; }
         public BuildingPersistentLocalId BuildingPersistentLocalId { get; private set; }
         public BuildingPersistentLocalIdAssignmentDate BuildingPersistentLocalIdAssignmentDate { get; private set; }
         public BuildingStatus BuildingStatus { get; private set; }
@@ -20,7 +19,6 @@ namespace BuildingRegistry.Building
 
         private void When(BuildingWasMigrated @event)
         {
-            BuildingId = new BuildingId(@event.BuildingId);
             BuildingPersistentLocalId = new BuildingPersistentLocalId(@event.BuildingPersistentLocalId);
             BuildingPersistentLocalIdAssignmentDate = new BuildingPersistentLocalIdAssignmentDate(@event.BuildingPersistentLocalIdAssignmentDate);
             BuildingStatus = BuildingStatus.Parse(@event.BuildingStatus);
@@ -33,7 +31,6 @@ namespace BuildingRegistry.Building
             {
                 var newBuildingUnit = BuildingUnit.Migrate(
                     ApplyChange,
-                    new BuildingUnitId(buildingUnit.BuildingUnitId),
                     new BuildingUnitPersistentLocalId(buildingUnit.BuildingUnitPersistentLocalId),
                     BuildingUnitFunction.Parse(buildingUnit.Function),
                     BuildingUnitStatus.Parse(buildingUnit.Status),

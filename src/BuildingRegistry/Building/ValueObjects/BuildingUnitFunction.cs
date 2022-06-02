@@ -2,7 +2,6 @@ namespace BuildingRegistry.Building
 {
     using System;
 
-    // TODO: convert to enum?
     public struct BuildingUnitFunction
     {
         public static readonly BuildingUnitFunction Common = new BuildingUnitFunction("Common");

@@ -2,7 +2,6 @@ namespace BuildingRegistry.Building
 {
     using System;
 
-    // TODO: convert to enum?
     public struct BuildingUnitPositionGeometryMethod
     {
         public static readonly BuildingUnitPositionGeometryMethod AppointedByAdministrator = new BuildingUnitPositionGeometryMethod("AppointedByAdministrator");
