@@ -1,3 +1,15 @@
+# [3.2.0](https://github.com/informatievlaanderen/building-registry/compare/v3.1.2...v3.2.0) (2022-06-02)
+
+
+### Bug Fixes
+
+* correct usings ([625d30d](https://github.com/informatievlaanderen/building-registry/commit/625d30dc2e97eae276129eb6986ad1b160d9b5c4))
+
+
+### Features
+
+* new aggregate + migration command & event ([63c05e3](https://github.com/informatievlaanderen/building-registry/commit/63c05e32bbf05198105c040bb057475f85ada809))
+
 ## [3.1.2](https://github.com/informatievlaanderen/building-registry/compare/v3.1.1...v3.1.2) (2022-06-01)
 
 
