@@ -19,3 +19,6 @@ files
   BuildingRegistry.Api.Legacy.Abstractions.pdb => lib\net6.0
   BuildingRegistry.Api.Legacy.Abstractions.xml => lib\net6.0
   BuildingRegistry.Api.Legacy.Abstractions.xml => content
+
+  BuildingRegistry.dll => lib\net6.0
+  BuildingRegistry.pdb => lib\net6.0
