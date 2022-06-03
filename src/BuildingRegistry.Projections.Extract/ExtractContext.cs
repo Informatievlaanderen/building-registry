@@ -11,8 +11,11 @@ namespace BuildingRegistry.Projections.Extract
         public override string ProjectionStateSchema => Schema.Extract;
 
         public DbSet<BuildingExtractItem> BuildingExtract { get; set; }
+        public DbSet<BuildingExtractItemV2> BuildingExtractV2 { get; set; }
         public DbSet<BuildingUnitExtractItem> BuildingUnitExtract { get; set; }
+        public DbSet<BuildingUnitExtractItemV2> BuildingUnitExtractV2 { get; set; }
         public DbSet<BuildingUnitBuildingItem> BuildingUnitBuildings { get; set; }
+        public DbSet<BuildingUnitBuildingItemV2> BuildingUnitBuildingsV2 { get; set; }
 
         // This needs to be here to please EF
         public ExtractContext() { }
