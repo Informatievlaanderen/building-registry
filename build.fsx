@@ -47,9 +47,17 @@ Target.create "Publish_Solution" (fun _ ->
   [
     "BuildingRegistry.Projector"
     "BuildingRegistry.Api.Legacy"
+    "BuildingRegistry.Api.Legacy.Abstractions"
+    "BuildingRegistry.Api.Legacy.Handlers"
     "BuildingRegistry.Api.Oslo"
+    "BuildingRegistry.Api.Oslo.Abstractions"
+    "BuildingRegistry.Api.Oslo.Handlers"
     "BuildingRegistry.Api.Extract"
+    "BuildingRegistry.Api.Extract.Abstractions"
+    "BuildingRegistry.Api.Extract.Handlers"
     "BuildingRegistry.Api.CrabImport"
+    "BuildingRegistry.Api.CrabImport.Abstractions"
+    "BuildingRegistry.Api.CrabImport.Handlers"
     "BuildingRegistry.Consumer.Address"
     "BuildingRegistry.Projections.Legacy"
     "BuildingRegistry.Projections.Extract"
@@ -61,9 +69,13 @@ Target.create "Pack_Solution" (fun _ ->
   [
     "BuildingRegistry.Projector"
     "BuildingRegistry.Api.Legacy"
+    "BuildingRegistry.Api.Legacy.Abstractions"
     "BuildingRegistry.Api.Oslo"
+    "BuildingRegistry.Api.Oslo.Abstractions"
     "BuildingRegistry.Api.Extract"
+    "BuildingRegistry.Api.Extract.Abstractions"
     "BuildingRegistry.Api.CrabImport"
+    "BuildingRegistry.Api.CrabImport.Abstractions"
   ] |> List.iter pack)
 
 Target.create "Containerize_Projector" (fun _ -> containerize "BuildingRegistry.Projector" "projector")

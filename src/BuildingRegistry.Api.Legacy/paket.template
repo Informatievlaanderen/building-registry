@@ -20,6 +20,9 @@ files
   BuildingRegistry.Api.Legacy.xml => lib\net6.0
   BuildingRegistry.Api.Legacy.xml => content
 
+  BuildingRegistry.Api.Legacy.Abstractions.dll => lib\net6.0
+  BuildingRegistry.Api.Legacy.Abstractions.pdb => lib\net6.0
+
   BuildingRegistry.Projections.Legacy.dll => lib\net6.0
   BuildingRegistry.Projections.Legacy.pdb => lib\net6.0
 
