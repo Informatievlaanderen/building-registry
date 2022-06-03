@@ -75,7 +75,6 @@ Target.create "Pack_Solution" (fun _ ->
     "BuildingRegistry.Api.Extract"
     "BuildingRegistry.Api.Extract.Abstractions"
     "BuildingRegistry.Api.CrabImport"
-    "BuildingRegistry.Api.CrabImport.Abstractions"
   ] |> List.iter pack)
 
 Target.create "Containerize_Projector" (fun _ -> containerize "BuildingRegistry.Projector" "projector")

@@ -5,6 +5,7 @@ namespace BuildingRegistry.Api.Oslo.Handlers
     using System.Threading.Tasks;
     using Abstractions.Building.Query;
     using Abstractions.Building.Responses;
+    using Abstractions.Infrastructure;
     using Abstractions.Infrastructure.Options;
     using Be.Vlaanderen.Basisregisters.Api.Search;
     using Be.Vlaanderen.Basisregisters.Api.Search.Filtering;
@@ -12,7 +13,6 @@ namespace BuildingRegistry.Api.Oslo.Handlers
     using Be.Vlaanderen.Basisregisters.Api.Search.Sorting;
     using Be.Vlaanderen.Basisregisters.GrAr.Common;
     using BuildingRegistry.Projections.Legacy;
-    using Legacy.Abstractions.Infrastructure;
     using MediatR;
     using Microsoft.AspNetCore.Http;
     using Microsoft.EntityFrameworkCore;
