@@ -1,4 +1,4 @@
-namespace BuildingRegistry.Api.Oslo.Handlers
+namespace BuildingRegistry.Api.Oslo.Handlers.Building
 {
     using System;
     using System.Linq;
@@ -6,22 +6,22 @@ namespace BuildingRegistry.Api.Oslo.Handlers
     using System.Threading;
     using System.Threading.Tasks;
     using System.Xml;
-    using Abstractions.Building.Responses;
-    using Abstractions.Infrastructure.Grb;
-    using Abstractions.Infrastructure.Options;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
     using Be.Vlaanderen.Basisregisters.GrAr.Common;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy.Gebouw;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy.SpatialTools;
     using BuildingRegistry;
+    using BuildingRegistry.Api.Oslo.Abstractions.Building.Responses;
+    using BuildingRegistry.Api.Oslo.Abstractions.Infrastructure.Grb;
+    using BuildingRegistry.Api.Oslo.Abstractions.Infrastructure.Options;
     using BuildingRegistry.Legacy;
+    using BuildingRegistry.Projections.Legacy;
+    using BuildingRegistry.Projections.Syndication;
     using MediatR;
     using Microsoft.AspNetCore.Http;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Options;
     using NetTopologySuite.Geometries;
-    using Projections.Legacy;
-    using Projections.Syndication;
 
     public record GetRequest(LegacyContext Context, SyndicationContext SyndicationContext, IOptions<ResponseOptions> ResponseOptions, IGrbBuildingParcel GrbBuildingParcel, int PersistentLocalId) : IRequest<BuildingOsloResponse>;
 
