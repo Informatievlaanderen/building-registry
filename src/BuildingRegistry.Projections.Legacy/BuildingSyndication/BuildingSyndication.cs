@@ -15,6 +15,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
     {
         public long Position { get; set; }
 
+        [Obsolete("Guid identifiers are no longer used.")]
         public Guid? BuildingId { get; set; }
         public int? PersistentLocalId { get; set; }
         public string? ChangeType { get; set; }
@@ -50,10 +51,12 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
         public DateTimeOffset SyndicationItemCreatedAt { get; set; }
 
         public virtual Collection<BuildingUnitSyndicationItem> BuildingUnits { get; set; }
+        public virtual Collection<BuildingUnitSyndicationItemV2> BuildingUnitsV2 { get; set; }
 
         public BuildingSyndicationItem()
         {
             BuildingUnits = new Collection<BuildingUnitSyndicationItem>();
+            BuildingUnitsV2 = new Collection<BuildingUnitSyndicationItemV2>();
         }
 
         public BuildingSyndicationItem CloneAndApplyEventInfo(
@@ -63,6 +66,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
             Action<BuildingSyndicationItem> editFunc)
         {
             var buildingUnits = BuildingUnits.Select(x => x.CloneAndApplyEventInfo(position));
+            var buildingUnitsV2 = BuildingUnitsV2.Select(x => x.CloneAndApplyEventInfo(position));
 
             var newItem = new BuildingSyndicationItem
             {
@@ -83,6 +87,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
                 Organisation = Organisation,
                 Reason = Reason,
                 BuildingUnits = new Collection<BuildingUnitSyndicationItem>(buildingUnits.ToList()),
+                BuildingUnitsV2 = new Collection<BuildingUnitSyndicationItemV2>(buildingUnitsV2.ToList()),
                 SyndicationItemCreatedAt = DateTimeOffset.Now
             };
 
@@ -105,7 +110,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
             b.Property(x => x.Position).ValueGeneratedNever();
             b.HasIndex(x => x.Position).IsColumnStore($"CI_{TableName}_Position");
 
-            b.Property(x => x.BuildingId).IsRequired();
+            b.Property(x => x.BuildingId);
             b.Property(x => x.ChangeType);
 
             b.Property(x => x.Geometry);
@@ -127,6 +132,11 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
             b.Property(x => x.SyndicationItemCreatedAt).IsRequired();
 
             b.HasMany(x => x.BuildingUnits)
+                .WithOne()
+                .HasForeignKey(x => x.Position)
+                .IsRequired();
+
+            b.HasMany(x => x.BuildingUnitsV2)
                 .WithOne()
                 .HasForeignKey(x => x.Position)
                 .IsRequired();

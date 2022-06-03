@@ -35,7 +35,7 @@ namespace BuildingRegistry.Api.Legacy.Abstractions.Building.Query
 
                 if (_embedEvent)
                     return x => new BuildingSyndicationQueryResult(
-                        x.BuildingId.Value,
+                        x.BuildingId.HasValue ? x.BuildingId.Value.ToString("D") : x.PersistentLocalId.ToString()!,
                         x.Position,
                         x.PersistentLocalId,
                         x.ChangeType,
@@ -50,7 +50,7 @@ namespace BuildingRegistry.Api.Legacy.Abstractions.Building.Query
                     return x => BuildingSyndicationQueryResult(x, false);
 
                 return x => new BuildingSyndicationQueryResult(
-                    x.BuildingId.Value,
+                    x.BuildingId.HasValue ? x.BuildingId.Value.ToString("D") : x.PersistentLocalId.ToString()!,
                     x.Position,
                     x.PersistentLocalId,
                     x.ChangeType,
@@ -65,8 +65,27 @@ namespace BuildingRegistry.Api.Legacy.Abstractions.Building.Query
         private static BuildingSyndicationQueryResult BuildingSyndicationQueryResult(BuildingSyndicationItem x, bool withXml)
         {
             if (withXml)
+            {
+                if (x.BuildingId.HasValue)
+                {
+                    return new BuildingSyndicationQueryResult(
+                        x.BuildingId.Value.ToString("D"),
+                        x.Position,
+                        x.PersistentLocalId,
+                        x.Status,
+                        x.GeometryMethod,
+                        x.Geometry,
+                        x.ChangeType,
+                        x.RecordCreatedAt,
+                        x.LastChangedOn,
+                        x.IsComplete,
+                        x.Organisation,
+                        x.Reason,
+                        x.BuildingUnits,
+                        x.EventDataAsXml);
+                }
                 return new BuildingSyndicationQueryResult(
-                    x.BuildingId.Value,
+                    x.PersistentLocalId.ToString()!,
                     x.Position,
                     x.PersistentLocalId,
                     x.Status,
@@ -78,11 +97,30 @@ namespace BuildingRegistry.Api.Legacy.Abstractions.Building.Query
                     x.IsComplete,
                     x.Organisation,
                     x.Reason,
-                    x.BuildingUnits,
+                    x.BuildingUnitsV2,
                     x.EventDataAsXml);
+            }
+
+            if (x.BuildingId.HasValue)
+            {
+                return new BuildingSyndicationQueryResult(
+                    x.BuildingId.Value.ToString("D"),
+                    x.Position,
+                    x.PersistentLocalId,
+                    x.Status,
+                    x.GeometryMethod,
+                    x.Geometry,
+                    x.ChangeType,
+                    x.RecordCreatedAt,
+                    x.LastChangedOn,
+                    x.IsComplete,
+                    x.Organisation,
+                    x.Reason,
+                    x.BuildingUnits);
+            }
 
             return new BuildingSyndicationQueryResult(
-                x.BuildingId.Value,
+                x.PersistentLocalId.ToString()!,
                 x.Position,
                 x.PersistentLocalId,
                 x.Status,
@@ -94,7 +132,7 @@ namespace BuildingRegistry.Api.Legacy.Abstractions.Building.Query
                 x.IsComplete,
                 x.Organisation,
                 x.Reason,
-                x.BuildingUnits);
+                x.BuildingUnitsV2);
         }
 
         protected override IQueryable<BuildingSyndicationItem> Filter(FilteringHeader<BuildingSyndicationFilter> filtering)
@@ -104,7 +142,8 @@ namespace BuildingRegistry.Api.Legacy.Abstractions.Building.Query
             if (_embedObject)
                 buildings = buildings
                     .Include(x => x.BuildingUnits).ThenInclude(x => x.Addresses)
-                    .Include(x => x.BuildingUnits).ThenInclude(x => x.Readdresses);
+                    .Include(x => x.BuildingUnits).ThenInclude(x => x.Readdresses)
+                    .Include(x => x.BuildingUnitsV2).ThenInclude(x => x.Addresses);
 
             buildings = buildings
                 .OrderBy(x => x.Position)

@@ -69,7 +69,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
                 .AddAsync(newBuildingSyndicationItem, ct);
         }
 
-        public static async Task<BuildingSyndicationItem> LatestPosition(
+        public static async Task<BuildingSyndicationItem?> LatestPosition(
             this LegacyContext context,
             Guid buildingId,
             CancellationToken ct)
@@ -83,6 +83,80 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
                    .BuildingSyndication
                    .AsNoTracking()
                    .Where(x => x.BuildingId == buildingId)
+                   .Include(x => x.BuildingUnits).ThenInclude(y => y.Addresses)
+                   .Include(x => x.BuildingUnits).ThenInclude(y => y.Readdresses)
+                   .OrderByDescending(x => x.Position)
+                   .FirstOrDefaultAsync(ct);
+
+        public static async Task CreateNewBuildingSyndicationItem<T>(
+            this LegacyContext context,
+            int buildingPersistentLocalId,
+            Envelope<T> message,
+            Action<BuildingSyndicationItem> applyEventInfoOn,
+            CancellationToken ct)
+            where T : IMessage
+        {
+            var dummyApplyEventInfoOn = new Action<BuildingSyndicationItem, BuildingSyndicationItem>(
+                (oldSyndicationItem, newSyndicationItem) => applyEventInfoOn(newSyndicationItem));
+
+            await context.CreateNewBuildingSyndicationItem(
+                buildingPersistentLocalId,
+                message,
+                dummyApplyEventInfoOn,
+                ct);
+        }
+
+        public static async Task CreateNewBuildingSyndicationItem<T>(
+            this LegacyContext context,
+            int buildingPersistentLocalId,
+            Envelope<T> message,
+            Action<BuildingSyndicationItem, BuildingSyndicationItem> applyEventInfoOn,
+            CancellationToken ct)
+            where T : IMessage
+        {
+            context.Database.SetCommandTimeout(300);
+
+            var buildingSyndicationItem = await context.LatestPosition(buildingPersistentLocalId, ct);
+
+            if (buildingSyndicationItem == null)
+                throw DatabaseItemNotFound(buildingPersistentLocalId);
+
+            if (buildingSyndicationItem.Position >= message.Position)
+                return;
+
+            var dummyApplyEventInfoOn = new Action<BuildingSyndicationItem>(
+                newSyndicationItem => applyEventInfoOn(buildingSyndicationItem, newSyndicationItem));
+
+            var newBuildingSyndicationItem = buildingSyndicationItem.CloneAndApplyEventInfo(
+                message.Position,
+                message.EventName,
+                message.Message is IHasProvenance x ? x.Provenance.Timestamp : Instant.FromDateTimeOffset(DateTimeOffset.MinValue),
+                dummyApplyEventInfoOn);
+
+            if (message.Message is IHasProvenance provenanceMessage)
+                newBuildingSyndicationItem.ApplyProvenance(provenanceMessage.Provenance);
+
+            newBuildingSyndicationItem.SetEventData(message.Message, message.EventName);
+
+            await context
+                .BuildingSyndication
+                .AddAsync(newBuildingSyndicationItem, ct);
+        }
+
+        public static async Task<BuildingSyndicationItem?> LatestPosition(
+            this LegacyContext context,
+            int buildingPersistentLocalId,
+            CancellationToken ct)
+            => context
+                   .BuildingSyndication
+                   .Local
+                   .Where(x => x.PersistentLocalId == buildingPersistentLocalId)
+                   .OrderByDescending(x => x.Position)
+                   .FirstOrDefault()
+               ?? await context
+                   .BuildingSyndication
+                   .AsNoTracking()
+                   .Where(x => x.PersistentLocalId == buildingPersistentLocalId)
                    .Include(x => x.BuildingUnits).ThenInclude(y => y.Addresses)
                    .Include(x => x.BuildingUnits).ThenInclude(y => y.Readdresses)
                    .OrderByDescending(x => x.Position)
@@ -102,7 +176,10 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
         public static void SetEventData<T>(this BuildingSyndicationItem syndicationItem, T message, string eventName)
             => syndicationItem.EventDataAsXml = message.ToXml(eventName).ToString(SaveOptions.DisableFormatting);
 
-        private static ProjectionItemNotFoundException<BuildingSyndicationProjections> DatabaseItemNotFound(Guid addressId)
-            => new ProjectionItemNotFoundException<BuildingSyndicationProjections>(addressId.ToString("D"));
+        private static ProjectionItemNotFoundException<BuildingSyndicationProjections> DatabaseItemNotFound(Guid buildingId)
+            => new ProjectionItemNotFoundException<BuildingSyndicationProjections>(buildingId.ToString("D"));
+
+        private static ProjectionItemNotFoundException<BuildingSyndicationProjections> DatabaseItemNotFound(int buildingPersistentLocalId)
+            => new ProjectionItemNotFoundException<BuildingSyndicationProjections>(buildingPersistentLocalId.ToString());
     }
 }

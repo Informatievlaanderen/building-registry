@@ -1,6 +1,5 @@
 namespace BuildingRegistry.Api.Legacy.Abstractions.Building.Query
 {
-    using System;
     using System.Collections.Generic;
     using System.Linq;
     using Be.Vlaanderen.Basisregisters.GrAr.Common;
@@ -14,7 +13,7 @@ namespace BuildingRegistry.Api.Legacy.Abstractions.Building.Query
         public bool ContainsEvent { get; }
         public bool ContainsObject { get; }
 
-        public Guid BuildingId { get; }
+        public string BuildingId { get; }
         public long Position { get; }
         public int? PersistentLocalId { get; }
         public string ChangeType { get; }
@@ -30,7 +29,7 @@ namespace BuildingRegistry.Api.Legacy.Abstractions.Building.Query
         public string EventDataAsXml { get; }
 
         public BuildingSyndicationQueryResult(
-            Guid buildingId,
+            string buildingId,
             long position,
             int? persistentLocalId,
             string changeType,
@@ -55,7 +54,7 @@ namespace BuildingRegistry.Api.Legacy.Abstractions.Building.Query
         }
 
         public BuildingSyndicationQueryResult(
-            Guid buildingId,
+            string buildingId,
             long position,
             int? persistentLocalId,
             string changeType,
@@ -81,7 +80,7 @@ namespace BuildingRegistry.Api.Legacy.Abstractions.Building.Query
         }
 
         public BuildingSyndicationQueryResult(
-            Guid buildingId,
+            string buildingId,
             long position,
             int? persistentLocalId,
             BuildingStatus? status,
@@ -113,7 +112,7 @@ namespace BuildingRegistry.Api.Legacy.Abstractions.Building.Query
             Organisation = organisation;
             Reason = reason;
             BuildingUnits = buildingUnits.Select(x => new BuildingUnitSyndicationQueryResult(
-                x.BuildingUnitId,
+                x.BuildingUnitId.ToString("D"),
                 x.PersistentLocalId,
                 x.Function,
                 x.Status,
@@ -125,9 +124,51 @@ namespace BuildingRegistry.Api.Legacy.Abstractions.Building.Query
                 lastChangedOn,
                 x.Version));
         }
+        public BuildingSyndicationQueryResult(
+            string buildingId,
+            long position,
+            int? persistentLocalId,
+            BuildingStatus? status,
+            BuildingGeometryMethod? geometryMethod,
+            byte[] geometry,
+            string changeType,
+            Instant recordCreateAt,
+            Instant lastChangedOn,
+            bool isComplete,
+            Organisation? organisation,
+            string reason,
+            IEnumerable<BuildingUnitSyndicationItemV2> buildingUnits)
+            : this(buildingId,
+                position,
+                persistentLocalId,
+                changeType,
+                recordCreateAt,
+                lastChangedOn,
+                isComplete,
+                organisation,
+                reason)
+        {
+            ContainsObject = true;
+
+            Status = status;
+            GeometryMethod = geometryMethod;
+            Geometry = geometry;
+            IsComplete = isComplete;
+            Organisation = organisation;
+            Reason = reason;
+            BuildingUnits = buildingUnits.Select(x => new BuildingUnitSyndicationQueryResult(
+                x.PersistentLocalId,
+                x.Function,
+                x.Status,
+                x.PositionMethod,
+                x.PointPosition,
+                x.Addresses,
+                lastChangedOn,
+                x.Version));
+        }
 
         public BuildingSyndicationQueryResult(
-            Guid buildingId,
+            string buildingId,
             long position,
             int? persistentLocalId,
             BuildingStatus? status,
@@ -160,11 +201,46 @@ namespace BuildingRegistry.Api.Legacy.Abstractions.Building.Query
 
             EventDataAsXml = eventDataAsXml;
         }
+
+        public BuildingSyndicationQueryResult(
+            string buildingId,
+            long position,
+            int? persistentLocalId,
+            BuildingStatus? status,
+            BuildingGeometryMethod? geometryMethod,
+            byte[] geometry,
+            string changeType,
+            Instant recordCreateAt,
+            Instant lastChangedOn,
+            bool isComplete,
+            Organisation? organisation,
+            string reason,
+            IEnumerable<BuildingUnitSyndicationItemV2> buildingUnits,
+            string eventDataAsXml)
+            : this(buildingId,
+                position,
+                persistentLocalId,
+                status,
+                geometryMethod,
+                geometry,
+                changeType,
+                recordCreateAt,
+                lastChangedOn,
+                isComplete,
+                organisation,
+                reason,
+                buildingUnits)
+        {
+            ContainsEvent = true;
+            ContainsObject = true;
+
+            EventDataAsXml = eventDataAsXml;
+        }
     }
 
     public class BuildingUnitSyndicationQueryResult
     {
-        public Guid BuildingUnitId { get; }
+        public string BuildingUnitId { get; }
         public int? PersistentLocalId { get; }
         public BuildingUnitFunction? Function { get; }
         public BuildingUnitStatus? Status { get; }
@@ -172,10 +248,10 @@ namespace BuildingRegistry.Api.Legacy.Abstractions.Building.Query
         public byte[] Geometry { get; }
         public bool IsComplete { get; }
         public Instant Version { get; }
-        public IEnumerable<Guid> AddressIds { get; }
+        public IEnumerable<string> AddressIds { get; }
 
         public BuildingUnitSyndicationQueryResult(
-            Guid buildingUnitId,
+            string buildingUnitId,
             int? persistentLocalId,
             BuildingUnitFunction? function,
             BuildingUnitStatus? status,
@@ -197,7 +273,8 @@ namespace BuildingRegistry.Api.Legacy.Abstractions.Building.Query
             Version = version;
 
             var datetimeLastChangedOn = lastChangedOn.ToBelgianDateTimeOffset();
-            var relevantReaddresses = readdresses.Where(x => x.ReaddressBeginDate <= LocalDate.FromDateTime(datetimeLastChangedOn.DateTime)).ToList();
+            var relevantReaddresses = readdresses.Where(x =>
+                x.ReaddressBeginDate <= LocalDate.FromDateTime(datetimeLastChangedOn.DateTime)).ToList();
 
             AddressIds = addresses
                 .Where(x => x.AddressId.HasValue)
@@ -205,7 +282,30 @@ namespace BuildingRegistry.Api.Legacy.Abstractions.Building.Query
                     ? relevantReaddresses.First(x => x.OldAddressId == address.AddressId).NewAddressId
                     : address.AddressId.Value)
                 .Distinct()
+                .Select(x => x.ToString("D"))
                 .ToList();
+        }
+
+        public BuildingUnitSyndicationQueryResult(
+            int persistentLocalId,
+            BuildingRegistry.Building.BuildingUnitFunction function,
+            BuildingRegistry.Building.BuildingUnitStatus status,
+            BuildingRegistry.Building.BuildingUnitPositionGeometryMethod geometryMethod,
+            byte[] geometry,
+            IEnumerable<BuildingUnitAddressSyndicationItemV2> addresses,
+            Instant lastChangedOn,
+            Instant version)
+        {
+            BuildingUnitId = persistentLocalId.ToString();
+            PersistentLocalId = persistentLocalId;
+            Function = BuildingUnitFunction.Parse(function.Function);
+            Status = BuildingUnitStatus.Parse(status.Status);
+            GeometryMethod = BuildingUnitPositionGeometryMethod.Parse(geometryMethod.GeometryMethod);
+            Geometry = geometry;
+            IsComplete = true;
+            Version = version;
+
+            AddressIds = addresses.Select(address => address.AddressPersistentLocalId.ToString());
         }
     }
 }

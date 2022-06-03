@@ -156,7 +156,7 @@ namespace BuildingRegistry.Api.Legacy.Abstractions.Building.Responses
         /// De technische id van het gebouw.
         /// </summary>
         [DataMember(Name = "Id", Order = 1)]
-        public Guid BuildingId { get; set; }
+        public string BuildingId { get; set; }
 
         /// <summary>
         /// De identificator van het gebouw.
@@ -201,7 +201,7 @@ namespace BuildingRegistry.Api.Legacy.Abstractions.Building.Responses
         public Provenance Provenance { get; set; }
 
         public BuildingSyndicationContent(
-            Guid buildingId,
+            string buildingId,
             string naamruimte,
             int? persistentLocalId,
             GebouwStatus? status,
@@ -232,7 +232,7 @@ namespace BuildingRegistry.Api.Legacy.Abstractions.Building.Responses
         /// De technische id van de gebouweenheid.
         /// </summary>
         [DataMember(Name = "Id", Order = 1)]
-        public Guid BuildingUnitId { get; set; }
+        public string BuildingUnitId { get; set; }
 
         /// <summary>
         /// De identificator van de gebouweenheid.
@@ -268,7 +268,7 @@ namespace BuildingRegistry.Api.Legacy.Abstractions.Building.Responses
         /// De gebouweenheden van de gebouweenheid.
         /// </summary>
         [DataMember(Name = "AdressenIds", Order = 7)]
-        public List<Guid> Addresses { get; set; }
+        public List<string> Addresses { get; set; }
 
         /// <summary>
         /// Duidt aan of het item compleet is.
@@ -277,14 +277,14 @@ namespace BuildingRegistry.Api.Legacy.Abstractions.Building.Responses
         public bool IsComplete { get; set; }
 
         public BuildingUnitSyndicationContent(
-            Guid buildingUnitId,
+            string buildingUnitId,
             string naamruimte,
             int? persistentLocalId,
             GebouweenheidStatus? status,
             PositieGeometrieMethode? geometryMethod,
             GmlPoint geometry,
             GebouweenheidFunctie? function,
-            List<Guid> addresses,
+            List<string> addresses,
             DateTimeOffset version,
             bool isComplete)
         {
