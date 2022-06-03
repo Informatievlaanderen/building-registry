@@ -1,17 +1,19 @@
 namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Collections.ObjectModel;
+    using System.Linq;
+    using System.Threading.Tasks;
+    using Be.Vlaanderen.Basisregisters.EventHandling;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.Connector;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore;
-    using NodaTime;
-    using System;
-    using System.Linq;
     using Be.Vlaanderen.Basisregisters.Utilities.HexByteConvertor;
-    using System.Collections.Generic;
-    using System.Threading.Tasks;
+    using Building.Events;
     using BuildingRegistry.Legacy;
     using BuildingRegistry.Legacy.Events;
     using BuildingRegistry.Legacy.Events.Crab;
-    using Be.Vlaanderen.Basisregisters.EventHandling;
+    using NodaTime;
 
     [ConnectedProjectionName("Feed endpoint gebouwen")]
     [ConnectedProjectionDescription("Projectie die de gebouwen- en gebouweenheden data voor de gebouwen feed voorziet.")]
@@ -19,6 +21,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
     {
         public BuildingSyndicationProjections()
         {
+            #region Legacy
             #region Building Events
 
             When<Envelope<BuildingWasRegistered>>(async (context, message, ct) =>
@@ -798,6 +801,86 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
             When<Envelope<SubaddressWasReaddressedFromCrab>>(DoNothing);
             When<Envelope<TerrainObjectHouseNumberWasImportedFromCrab>>(DoNothing);
             When<Envelope<TerrainObjectWasImportedFromCrab>>(DoNothing);
+
+            #endregion Legacy
+
+            When<Envelope<BuildingWasMigrated>>(async (context, message, ct) =>
+            {
+                var buildingUnitSyndicationItems = new Collection<BuildingUnitSyndicationItemV2>();
+                foreach (var buildingUnit in message.Message.BuildingUnits)
+                {
+                    var addressesIdsGrouped = buildingUnit.AddressPersistentLocalIds.GroupBy(x => x);
+                    var addresses = addressesIdsGrouped
+                        .Select(groupedAddressId => new BuildingUnitAddressSyndicationItemV2
+                        {
+                            Position = message.Position,
+                            BuildingUnitPersistentLocalId = buildingUnit.BuildingUnitPersistentLocalId,
+                            AddressPersistentLocalId = groupedAddressId.Key,
+                            Count = groupedAddressId.Count()
+                        })
+                        .ToList();
+
+                    buildingUnitSyndicationItems.Add(new BuildingUnitSyndicationItemV2
+                    {
+                        Position = message.Position,
+                        PersistentLocalId = buildingUnit.BuildingUnitPersistentLocalId,
+                        Status = BuildingRegistry.Building.BuildingUnitStatus.Parse(buildingUnit.Status),
+                        Function = BuildingRegistry.Building.BuildingUnitFunction.Parse(buildingUnit.Function),
+                        PositionMethod = BuildingRegistry.Building.BuildingUnitPositionGeometryMethod.Parse(buildingUnit.GeometryMethod),
+                        PointPosition = buildingUnit.ExtendedWkbGeometry.ToByteArray(),
+                        Version = message.Message.Provenance.Timestamp,
+                        Addresses = new Collection<BuildingUnitAddressSyndicationItemV2>(addresses)
+                    });
+                }
+
+                var newBuildingSyndicationItem = new BuildingSyndicationItem
+                {
+                    Position = message.Position,
+                    BuildingId = null, //while we have the information, we shouldn't identify this resource with its old guid id
+                    PersistentLocalId = message.Message.BuildingPersistentLocalId,
+                    Status = MapBuildingStatus(BuildingRegistry.Building.BuildingStatus.Parse(message.Message.BuildingStatus)),
+                    GeometryMethod = MapBuildingGeometryMethod(BuildingRegistry.Building.BuildingGeometryMethod.Parse(message.Message.GeometryMethod)),
+                    Geometry = message.Message.ExtendedWkbGeometry.ToByteArray(),
+                    IsComplete = true,
+                    RecordCreatedAt = message.Message.Provenance.Timestamp,
+                    LastChangedOn = message.Message.Provenance.Timestamp,
+                    ChangeType = message.EventName,
+                    SyndicationItemCreatedAt = DateTimeOffset.Now,
+                    BuildingUnitsV2 = buildingUnitSyndicationItems
+                };
+
+                newBuildingSyndicationItem.ApplyProvenance(message.Message.Provenance);
+                newBuildingSyndicationItem.SetEventData(message.Message, message.EventName);
+
+                await context
+                    .BuildingSyndication
+                    .AddAsync(newBuildingSyndicationItem, ct); ;
+            });
+        }
+
+        private static BuildingGeometryMethod MapBuildingGeometryMethod(BuildingRegistry.Building.BuildingGeometryMethod buildingGeometryMethod)
+        {
+            var dictionary = new Dictionary<BuildingRegistry.Building.BuildingGeometryMethod, BuildingGeometryMethod>
+            {
+                { BuildingRegistry.Building.BuildingGeometryMethod.MeasuredByGrb, BuildingGeometryMethod.MeasuredByGrb },
+                { BuildingRegistry.Building.BuildingGeometryMethod.Outlined, BuildingGeometryMethod.Outlined },
+            };
+
+            return dictionary[buildingGeometryMethod];
+        }
+
+        private static BuildingStatus MapBuildingStatus(BuildingRegistry.Building.BuildingStatus buildingStatus)
+        {
+            var dictionary = new Dictionary<BuildingRegistry.Building.BuildingStatus, BuildingStatus>
+            {
+                { BuildingRegistry.Building.BuildingStatus.Planned, BuildingStatus.Planned },
+                { BuildingRegistry.Building.BuildingStatus.UnderConstruction, BuildingStatus.UnderConstruction },
+                { BuildingRegistry.Building.BuildingStatus.NotRealized, BuildingStatus.NotRealized },
+                { BuildingRegistry.Building.BuildingStatus.Realized, BuildingStatus.Realized },
+                { BuildingRegistry.Building.BuildingStatus.Retired, BuildingStatus.Retired },
+            };
+
+            return dictionary[buildingStatus];
         }
 
         private static void ApplyUnitVersion(BuildingUnitSyndicationItem item, Instant version)
