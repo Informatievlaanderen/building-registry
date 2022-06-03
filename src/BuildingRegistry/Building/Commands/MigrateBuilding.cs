@@ -16,7 +16,7 @@ namespace BuildingRegistry.Building.Commands
         public BuildingStatus BuildingStatus { get; }
         public BuildingGeometry BuildingGeometry { get; }
         public bool IsRemoved { get; }
-        public List<BuildingUnit> BuildingUnits { get; }
+        public List<BuildingUnit> BuildingUnits { get; private set; }
 
         public Provenance Provenance { get; }
 
@@ -68,6 +68,19 @@ namespace BuildingRegistry.Building.Commands
         public List<AddressPersistentLocalId> AddressPersistentLocalIds { get; }
         public BuildingUnitPosition BuildingUnitPosition { get; }
         public bool IsRemoved { get; }
+
+        //public BuildingUnit(Legacy.BuildingUnit buildingUnit)
+        //{
+        //    BuildingUnitId = new BuildingUnitId(buildingUnit.BuildingUnitId);
+        //    BuildingUnitPersistentLocalId = new BuildingUnitPersistentLocalId(buildingUnit.PersistentLocalId);
+        //    Function = BuildingUnitFunction.Parse(buildingUnit.Function);
+        //    Status = BuildingUnitStatus.Parse(buildingUnit.Status);
+        //    AddressPersistentLocalIds = buildingUnit.AddressPersistentLocalIds;
+        //    BuildingUnitPosition = new BuildingUnitPosition(
+        //        new ExtendedWkbGeometry(buildingUnitPosition.Geometry.ToString()),
+        //        BuildingUnitPositionGeometryMethod.Parse(buildingUnitPosition.GeometryMethod));
+        //    IsRemoved = isRemoved;
+        //}
 
         public BuildingUnit(
             Legacy.BuildingUnitId buildingUnitId,

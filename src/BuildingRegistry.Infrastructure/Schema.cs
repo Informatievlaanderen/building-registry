@@ -3,17 +3,14 @@ namespace BuildingRegistry.Infrastructure
     public static class Schema
     {
         public const string Default = "BuildingRegistry";
-
         public const string Import = "BuildingRegistryImport";
         public const string Legacy = "BuildingRegistryLegacy";
         public const string Extract = "BuildingRegistryExtract";
         public const string Syndication = "BuildingRegistrySyndication";
-        
         public const string Wms = "wms";
         public const string Wfs = "wfs";
-        
         public const string ConsumerAddress = "BuildingRegistryConsumerAddress";
-
+        public const string MigrateBuilding = "BuildingRegistryMigration";
         public const string Sequence = "BuildingRegistrySequence";
     }
 

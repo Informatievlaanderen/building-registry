@@ -35,6 +35,7 @@ namespace BuildingRegistry.Api.CrabImport.CrabImport
             EventSerializer eventSerializer,
             IPersistentLocalIdGenerator persistentLocalIdGenerator,
             BuildingProvenanceFactory provenanceFactory,
+            BuildingLegacyProvenanceFactory legacyProvenanceFactory,
             FixGrar1359ProvenanceFactory fixGrar1359ProvenanceFactory,
             PersistentLocalIdentifierProvenanceFactory persistentLocalIdentifierProvenanceFactory,
             ReaddressingProvenanceFactory readdressingProvenanceFactory)
@@ -54,6 +55,7 @@ namespace BuildingRegistry.Api.CrabImport.CrabImport
                 eventSerializer,
                 persistentLocalIdGenerator,
                 provenanceFactory,
+                legacyProvenanceFactory,
                 fixGrar1359ProvenanceFactory,
                 persistentLocalIdentifierProvenanceFactory,
                 readdressingProvenanceFactory);

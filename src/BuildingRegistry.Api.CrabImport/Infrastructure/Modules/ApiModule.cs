@@ -62,13 +62,13 @@ namespace BuildingRegistry.Api.CrabImport.Infrastructure.Modules
                     Schema.Import,
                     _loggerFactory));
 
-            containerBuilder
-                .RegisterType<IdempotentCommandHandlerModule>()
-                .AsSelf();
+            //containerBuilder
+            //    .RegisterType<IdempotentCommandHandlerModule>()
+            //    .AsSelf();
 
-            containerBuilder
-                .RegisterType<IdempotentCommandHandlerModuleProcessor>()
-                .As<IIdempotentCommandHandlerModuleProcessor>();
+            //containerBuilder
+            //    .RegisterType<IdempotentCommandHandlerModuleProcessor>()
+            //    .As<IIdempotentCommandHandlerModuleProcessor>();
 
             containerBuilder
                 .RegisterType<IdempotentCommandHandlerModule>()
