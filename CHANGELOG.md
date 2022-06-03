@@ -1,3 +1,10 @@
+## [3.3.2](https://github.com/informatievlaanderen/building-registry/compare/v3.3.1...v3.3.2) (2022-06-03)
+
+
+### Bug Fixes
+
+* add MediatR handlers for Api.Oslo BuildingUnitController ([0c39d42](https://github.com/informatievlaanderen/building-registry/commit/0c39d4217ecb0c896ca970c29e6220cf66dfdf24))
+
 ## [3.3.1](https://github.com/informatievlaanderen/building-registry/compare/v3.3.0...v3.3.1) (2022-06-03)
 
 
