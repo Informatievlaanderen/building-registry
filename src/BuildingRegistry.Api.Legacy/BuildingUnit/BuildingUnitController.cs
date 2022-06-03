@@ -2,31 +2,20 @@ namespace BuildingRegistry.Api.Legacy.BuildingUnit
 {
     using Be.Vlaanderen.Basisregisters.Api;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
-    using Be.Vlaanderen.Basisregisters.Api.Search.Filtering;
-    using Be.Vlaanderen.Basisregisters.Api.Search.Pagination;
-    using Be.Vlaanderen.Basisregisters.Api.Search.Sorting;
-    using Be.Vlaanderen.Basisregisters.GrAr.Common;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy;
-    using Be.Vlaanderen.Basisregisters.GrAr.Legacy.Gebouweenheid;
-    using Be.Vlaanderen.Basisregisters.GrAr.Legacy.SpatialTools;
-    using Infrastructure.Options;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
-    using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Options;
     using Projections.Legacy;
     using Projections.Syndication;
-    using Query;
-    using Responses;
     using Swashbuckle.AspNetCore.Filters;
-    using System;
-    using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
-    using Be.Vlaanderen.Basisregisters.Api.Search;
-    using BuildingRegistry.Legacy;
+    using Abstractions.BuildingUnit.Responses;
+    using Abstractions.Infrastructure.Options;
+    using Handlers.BuildingUnit;
     using Infrastructure;
-    using ProblemDetails = Be.Vlaanderen.Basisregisters.BasicApiProblem.ProblemDetails;
+    using MediatR;
 
     [ApiVersion("1.0")]
     [AdvertiseApiVersions("1.0")]
@@ -34,6 +23,13 @@ namespace BuildingRegistry.Api.Legacy.BuildingUnit
     [ApiExplorerSettings(GroupName = "Gebouweenheden")]
     public class BuildingUnitController : ApiController
     {
+        private readonly IMediator _mediator;
+
+        public BuildingUnitController(IMediator mediator)
+        {
+            _mediator = mediator;
+        }
+
         /// <summary>
         /// Vraag een lijst met actieve gebouweenheden op.
         /// </summary>
@@ -55,39 +51,7 @@ namespace BuildingRegistry.Api.Legacy.BuildingUnit
             [FromServices] IOptions<ResponseOptions> responseOptions,
             CancellationToken cancellationToken = default)
         {
-            var filtering = Request.ExtractFilteringRequest<BuildingUnitFilter>();
-            var sorting = Request.ExtractSortingRequest();
-            var pagination = Request.ExtractPaginationRequest();
-
-            var pagedBuildingUnits = new BuildingUnitListQuery(context, syndicationContext)
-                .Fetch(filtering, sorting, pagination);
-
-            Response.AddPagedQueryResultHeaders(pagedBuildingUnits);
-
-            var units = await pagedBuildingUnits.Items
-                .Select(a => new
-                {
-                    a.PersistentLocalId,
-                    a.Version,
-                    a.Status,
-                })
-                .ToListAsync(cancellationToken);
-
-            var listResponse = new BuildingUnitListResponse
-            {
-                Gebouweenheden = units
-                    .Select(x => new GebouweenheidCollectieItem(
-                        x.PersistentLocalId.Value,
-                        responseOptions.Value.GebouweenheidNaamruimte,
-                        responseOptions.Value.GebouweenheidDetailUrl,
-                        MapBuildingUnitStatus(x.Status.Value),
-                        x.Version.ToBelgianDateTimeOffset()))
-                    .ToList(),
-                Volgende = pagedBuildingUnits
-                    .PaginationInfo
-                    .BuildNextUri(responseOptions.Value.GebouweenheidVolgendeUrl)
-            };
-
+            var listResponse = await _mediator.Send(new ListRequest(context, syndicationContext, responseOptions, Request, Response), cancellationToken);
             return Ok(listResponse);
         }
 
@@ -109,23 +73,8 @@ namespace BuildingRegistry.Api.Legacy.BuildingUnit
             [FromServices] SyndicationContext syndicationContext,
             CancellationToken cancellationToken = default)
         {
-            var filtering = Request.ExtractFilteringRequest<BuildingUnitFilter>();
-            var sorting = Request.ExtractSortingRequest();
-            var pagination = new NoPaginationRequest();
-
-            return Ok(
-                new TotaalAantalResponse
-                {
-                    Aantal = filtering.ShouldFilter
-                        ? await new BuildingUnitListQuery(context, syndicationContext)
-                            .Fetch(filtering, sorting, pagination)
-                            .Items
-                            .CountAsync(cancellationToken)
-                        : Convert.ToInt32(context
-                            .BuildingUnitDetailListCountView
-                            .First()
-                            .Count)
-                });
+            var response = await _mediator.Send(new CountRequest(context, syndicationContext, Request), cancellationToken);
+            return Ok(response);
         }
 
         /// <summary>
@@ -156,92 +105,8 @@ namespace BuildingRegistry.Api.Legacy.BuildingUnit
             [FromRoute] int persistentLocalId,
             CancellationToken cancellationToken = default)
         {
-            var buildingUnit = await context
-                .BuildingUnitDetails
-                .Include(x => x.Addresses)
-                .AsNoTracking()
-                .SingleOrDefaultAsync(item => item.PersistentLocalId == persistentLocalId, cancellationToken);
-
-            if (buildingUnit != null && buildingUnit.IsRemoved)
-                throw new ApiException("Gebouweenheid werd verwijderd.", StatusCodes.Status410Gone);
-
-            if (buildingUnit == null || !buildingUnit.IsComplete || !buildingUnit.IsBuildingComplete)
-                throw new ApiException("Onbestaande gebouweenheid.", StatusCodes.Status404NotFound);
-
-            var addressIds = buildingUnit.Addresses.Select(x => x.AddressId).ToList();
-            var addressPersistentLocalIds = await syndicationContext
-                .AddressPersistentLocalIds
-                .Where(x => addressIds.Contains(x.AddressId))
-                .Select(x => x.PersistentLocalId)
-                .ToListAsync(cancellationToken);
-
-            var response = new BuildingUnitResponse(
-                buildingUnit.PersistentLocalId.Value,
-                responseOptions.Value.GebouweenheidNaamruimte,
-                buildingUnit.Version.ToBelgianDateTimeOffset(),
-                GetBuildingUnitPoint(buildingUnit.Position),
-                MapBuildingUnitGeometryMethod(buildingUnit.PositionMethod.Value),
-                MapBuildingUnitStatus(buildingUnit.Status.Value),
-                MapBuildingUnitFunction(buildingUnit.Function),
-                new GebouweenheidDetailGebouw(buildingUnit.BuildingPersistentLocalId.Value.ToString(), string.Format(responseOptions.Value.GebouwDetailUrl, buildingUnit.BuildingPersistentLocalId.Value)),
-                addressPersistentLocalIds.Select(id => new GebouweenheidDetailAdres(id, string.Format(responseOptions.Value.AdresUrl, id))).ToList());
-
+            var response = await _mediator.Send(new GetRequest(context, syndicationContext, responseOptions, persistentLocalId), cancellationToken);
             return Ok(response);
-        }
-
-        private static PositieGeometrieMethode MapBuildingUnitGeometryMethod(
-            BuildingUnitPositionGeometryMethod geometryMethod)
-        {
-            if (BuildingUnitPositionGeometryMethod.AppointedByAdministrator == geometryMethod)
-                return PositieGeometrieMethode.AangeduidDoorBeheerder;
-
-            if (BuildingUnitPositionGeometryMethod.DerivedFromObject == geometryMethod)
-                return PositieGeometrieMethode.AfgeleidVanObject;
-
-            throw new ArgumentOutOfRangeException(nameof(geometryMethod), geometryMethod, null);
-        }
-
-        private static GebouweenheidStatus MapBuildingUnitStatus(
-            BuildingUnitStatus status)
-        {
-            if (BuildingUnitStatus.Planned == status)
-                return GebouweenheidStatus.Gepland;
-
-            if (BuildingUnitStatus.NotRealized == status)
-                return GebouweenheidStatus.NietGerealiseerd;
-
-            if (BuildingUnitStatus.Realized == status)
-                return GebouweenheidStatus.Gerealiseerd;
-
-            if (BuildingUnitStatus.Retired == status)
-                return GebouweenheidStatus.Gehistoreerd;
-
-            throw new ArgumentOutOfRangeException(nameof(status), status, null);
-        }
-
-        private static GebouweenheidFunctie? MapBuildingUnitFunction(
-            BuildingUnitFunction? function)
-        {
-            if (function == null)
-                return null;
-
-            if (BuildingUnitFunction.Common == function)
-                return GebouweenheidFunctie.GemeenschappelijkDeel;
-
-            if (BuildingUnitFunction.Unknown == function)
-                return GebouweenheidFunctie.NietGekend;
-
-            throw new ArgumentOutOfRangeException(nameof(function), function, null);
-        }
-
-        public static Point GetBuildingUnitPoint(byte[] point)
-        {
-            var geometry = WKBReaderFactory.Create().Read(point);
-            return new Point
-            {
-                XmlPoint = new GmlPoint { Pos = $"{geometry.Coordinate.X.ToPointGeometryCoordinateValueFormat()} {geometry.Coordinate.Y.ToPointGeometryCoordinateValueFormat()}" },
-                JsonPoint = new GeoJSONPoint { Coordinates = new[] { geometry.Coordinate.X, geometry.Coordinate.Y } }
-            };
         }
     }
 }

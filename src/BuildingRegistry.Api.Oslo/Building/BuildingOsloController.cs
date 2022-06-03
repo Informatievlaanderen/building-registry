@@ -8,9 +8,7 @@ namespace BuildingRegistry.Api.Oslo.Building
     using Be.Vlaanderen.Basisregisters.Api;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy;
-    using Handlers.Count;
-    using Handlers.Get;
-    using Handlers.GetList;
+    using Handlers;
     using Infrastructure;
     using MediatR;
     using Microsoft.AspNetCore.Http;

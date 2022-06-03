@@ -29,6 +29,7 @@ namespace BuildingRegistry.Api.Legacy.Infrastructure.Modules
         protected override void Load(ContainerBuilder containerBuilder)
         {
             containerBuilder
+                .RegisterModule(new MediatRModule())
                 .RegisterModule(new DataDogModule(_configuration))
                 .RegisterModule(new LegacyModule(_configuration, _services, _loggerFactory))
                 .RegisterModule(new SyndicationModule(_configuration, _services, _loggerFactory))

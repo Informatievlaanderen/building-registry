@@ -5,12 +5,12 @@ namespace BuildingRegistry.Api.Extract.Extracts
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
     using Projections.Extract;
-    using Responses;
     using Swashbuckle.AspNetCore.Filters;
     using System.Threading;
     using System.Threading.Tasks;
-    using Be.Vlaanderen.Basisregisters.Api.Extract;
-    using ProblemDetails = Be.Vlaanderen.Basisregisters.BasicApiProblem.ProblemDetails;
+    using Abstractions.Extracts.Responses;
+    using Handlers.GetBuildings;
+    using MediatR;
 
     [ApiVersion("1.0")]
     [AdvertiseApiVersions("1.0")]
@@ -18,6 +18,13 @@ namespace BuildingRegistry.Api.Extract.Extracts
     [ApiExplorerSettings(GroupName = "Extract")]
     public class ExtractController : ApiController
     {
+        private readonly IMediator _mediator;
+
+        public ExtractController(IMediator mediator)
+        {
+            _mediator = mediator;
+        }
+
         /// <summary>
         /// Vraag een dump van het volledige register op.
         /// </summary>
@@ -32,14 +39,6 @@ namespace BuildingRegistry.Api.Extract.Extracts
         [SwaggerResponseExample(StatusCodes.Status500InternalServerError, typeof(InternalServerErrorResponseExamples))]
         public async Task<IActionResult> GetBuildings(
             [FromServices] ExtractContext context,
-            CancellationToken cancellationToken = default)
-        {
-            return new IsolationExtractArchive(ExtractFileNames.GetBuildingZipName(), context)
-                {
-                    BuildingRegistryExtractBuilder.CreateBuildingFiles(context),
-                    BuildingUnitRegistryExtractBuilder.CreateBuildingUnitFiles(context),
-                }
-               .CreateFileCallbackResult(cancellationToken);
-        }
+            CancellationToken cancellationToken = default) => await _mediator.Send(new GetBuildingsRequest(context), cancellationToken);
     }
 }

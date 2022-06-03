@@ -20,5 +20,8 @@ files
   BuildingRegistry.Api.CrabImport.xml => lib\net6.0
   BuildingRegistry.Api.CrabImport.xml => content
 
+  BuildingRegistry.Api.CrabImport.Abstractions.dll => lib\net6.0
+  BuildingRegistry.Api.CrabImport.Abstractions.pdb => lib\net6.0
+
   BuildingRegistry.dll => lib\net6.0
   BuildingRegistry.pdb => lib\net6.0

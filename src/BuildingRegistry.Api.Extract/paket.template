@@ -24,5 +24,8 @@ files
   BuildingRegistry.Api.Extract.xml => lib\net6.0
   BuildingRegistry.Api.Extract.xml => content
 
+  BuildingRegistry.Api.Extract.Abstractions.dll => lib\net6.0
+  BuildingRegistry.Api.Extract.Abstractions.pdb => lib\net6.0
+
   BuildingRegistry.Projections.Extract.dll => lib\net6.0
   BuildingRegistry.Projections.Extract.pdb => lib\net6.0
