@@ -2,7 +2,7 @@ namespace BuildingRegistry.Api.Oslo.Handlers
 {
     using System;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy.Gebouw;
-    using BuildingRegistry.Legacy;
+    using Legacy;
 
     public static class BuildingStatusExtensions
     {

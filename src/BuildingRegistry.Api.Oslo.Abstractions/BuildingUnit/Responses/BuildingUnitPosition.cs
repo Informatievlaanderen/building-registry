@@ -1,4 +1,4 @@
-namespace BuildingRegistry.Api.Oslo.BuildingUnit.Responses
+namespace BuildingRegistry.Api.Oslo.Abstractions.BuildingUnit.Responses
 {
     using System.Runtime.Serialization;
     using System.Xml.Serialization;

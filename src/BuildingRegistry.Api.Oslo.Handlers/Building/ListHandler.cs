@@ -1,28 +1,28 @@
-namespace BuildingRegistry.Api.Oslo.Handlers
+namespace BuildingRegistry.Api.Oslo.Handlers.Building
 {
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
-    using Abstractions.Building.Query;
-    using Abstractions.Building.Responses;
-    using Abstractions.Infrastructure;
-    using Abstractions.Infrastructure.Options;
     using Be.Vlaanderen.Basisregisters.Api.Search;
     using Be.Vlaanderen.Basisregisters.Api.Search.Filtering;
     using Be.Vlaanderen.Basisregisters.Api.Search.Pagination;
     using Be.Vlaanderen.Basisregisters.Api.Search.Sorting;
     using Be.Vlaanderen.Basisregisters.GrAr.Common;
+    using BuildingRegistry.Api.Oslo.Abstractions.Building.Query;
+    using BuildingRegistry.Api.Oslo.Abstractions.Building.Responses;
+    using BuildingRegistry.Api.Oslo.Abstractions.Infrastructure;
+    using BuildingRegistry.Api.Oslo.Abstractions.Infrastructure.Options;
     using BuildingRegistry.Projections.Legacy;
     using MediatR;
     using Microsoft.AspNetCore.Http;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Options;
 
-    public record GetListRequest(HttpRequest HttpRequest, HttpResponse HttpResponse, LegacyContext Context, IOptions<ResponseOptions> ResponseOptions) : IRequest<BuildingListOsloResponse>;
+    public record ListRequest(HttpRequest HttpRequest, HttpResponse HttpResponse, LegacyContext Context, IOptions<ResponseOptions> ResponseOptions) : IRequest<BuildingListOsloResponse>;
 
-    public class GetListHandler : IRequestHandler<GetListRequest, BuildingListOsloResponse>
+    public class ListHandler : IRequestHandler<ListRequest, BuildingListOsloResponse>
     {
-        public async Task<BuildingListOsloResponse> Handle(GetListRequest request, CancellationToken cancellationToken)
+        public async Task<BuildingListOsloResponse> Handle(ListRequest request, CancellationToken cancellationToken)
         {
             var filtering = request.HttpRequest.ExtractFilteringRequest<BuildingFilter>();
             var sorting = request.HttpRequest.ExtractSortingRequest();

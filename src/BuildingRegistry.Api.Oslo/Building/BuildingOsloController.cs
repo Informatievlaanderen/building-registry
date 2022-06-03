@@ -9,6 +9,7 @@ namespace BuildingRegistry.Api.Oslo.Building
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy;
     using Handlers;
+    using Handlers.Building;
     using Infrastructure;
     using MediatR;
     using Microsoft.AspNetCore.Http;
@@ -87,7 +88,7 @@ namespace BuildingRegistry.Api.Oslo.Building
             [FromServices] IOptions<ResponseOptions> responseOptions,
             CancellationToken cancellationToken = default)
         {
-            var listResponse = await _mediator.Send(new GetListRequest(Request, Response, context, responseOptions), cancellationToken);
+            var listResponse = await _mediator.Send(new ListRequest(Request, Response, context, responseOptions), cancellationToken);
             return Ok(listResponse);
         }
 

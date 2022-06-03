@@ -1,35 +1,21 @@
 namespace BuildingRegistry.Api.Oslo.BuildingUnit
 {
-    using System;
-    using System.Linq;
-    using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
-    using System.Xml;
+    using Abstractions.BuildingUnit.Responses;
     using Abstractions.Infrastructure.Options;
     using Be.Vlaanderen.Basisregisters.Api;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
-    using Be.Vlaanderen.Basisregisters.Api.Search;
-    using Be.Vlaanderen.Basisregisters.Api.Search.Filtering;
-    using Be.Vlaanderen.Basisregisters.Api.Search.Pagination;
-    using Be.Vlaanderen.Basisregisters.Api.Search.Sorting;
-    using Be.Vlaanderen.Basisregisters.GrAr.Common;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy;
-    using Be.Vlaanderen.Basisregisters.GrAr.Legacy.Gebouweenheid;
-    using Be.Vlaanderen.Basisregisters.GrAr.Legacy.SpatialTools;
-    using BuildingRegistry.Legacy;
+    using Handlers.BuildingUnit;
     using Infrastructure;
+    using MediatR;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
-    using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Options;
-    using NetTopologySuite.Geometries;
     using Projections.Legacy;
     using Projections.Syndication;
-    using Query;
-    using Responses;
     using Swashbuckle.AspNetCore.Filters;
-    using ProblemDetails = Be.Vlaanderen.Basisregisters.BasicApiProblem.ProblemDetails;
 
     [ApiVersion("2.0")]
     [AdvertiseApiVersions("2.0")]
@@ -37,6 +23,13 @@ namespace BuildingRegistry.Api.Oslo.BuildingUnit
     [ApiExplorerSettings(GroupName = "Gebouweenheden")]
     public class BuildingUnitOsloController : ApiController
     {
+        private readonly IMediator _mediator;
+
+        public BuildingUnitOsloController(IMediator mediator)
+        {
+            _mediator = mediator;
+        }
+
         /// <summary>
         /// Vraag een lijst met actieve gebouweenheden op.
         /// </summary>
@@ -59,40 +52,7 @@ namespace BuildingRegistry.Api.Oslo.BuildingUnit
             [FromServices] IOptions<ResponseOptions> responseOptions,
             CancellationToken cancellationToken = default)
         {
-            var filtering = Request.ExtractFilteringRequest<BuildingUnitFilter>();
-            var sorting = Request.ExtractSortingRequest();
-            var pagination = Request.ExtractPaginationRequest();
-
-            var pagedBuildingUnits = new BuildingUnitListOsloQuery(context, syndicationContext)
-                .Fetch(filtering, sorting, pagination);
-
-            Response.AddPagedQueryResultHeaders(pagedBuildingUnits);
-
-            var units = await pagedBuildingUnits.Items
-                .Select(a => new
-                {
-                    a.PersistentLocalId,
-                    a.Version,
-                    a.Status,
-                })
-                .ToListAsync(cancellationToken);
-
-            var listResponse = new BuildingUnitListOsloResponse
-            {
-                Gebouweenheden = units
-                    .Select(x => new GebouweenheidCollectieItemOslo(
-                        x.PersistentLocalId.Value,
-                        responseOptions.Value.GebouweenheidNaamruimte,
-                        responseOptions.Value.GebouweenheidDetailUrl,
-                        MapBuildingUnitStatus(x.Status.Value),
-                        x.Version.ToBelgianDateTimeOffset()))
-                    .ToList(),
-                Volgende = pagedBuildingUnits
-                    .PaginationInfo
-                    .BuildNextUri(responseOptions.Value.GebouweenheidVolgendeUrl),
-                Context = responseOptions.Value.ContextUrlUnitList
-            };
-
+            var listResponse = await _mediator.Send(new ListRequest(context, syndicationContext, responseOptions, Request, Response), cancellationToken);
             return Ok(listResponse);
         }
 
@@ -115,23 +75,8 @@ namespace BuildingRegistry.Api.Oslo.BuildingUnit
             [FromServices] SyndicationContext syndicationContext,
             CancellationToken cancellationToken = default)
         {
-            var filtering = Request.ExtractFilteringRequest<BuildingUnitFilter>();
-            var sorting = Request.ExtractSortingRequest();
-            var pagination = new NoPaginationRequest();
-
-            return Ok(
-                new TotaalAantalResponse
-                {
-                    Aantal = filtering.ShouldFilter
-                        ? await new BuildingUnitListOsloQuery(context, syndicationContext)
-                            .Fetch(filtering, sorting, pagination)
-                            .Items
-                            .CountAsync(cancellationToken)
-                        : Convert.ToInt32(context
-                            .BuildingUnitDetailListCountView
-                            .First()
-                            .Count)
-                });
+            var response = await _mediator.Send(new CountRequest(context, syndicationContext, Request), cancellationToken);
+            return Ok(response);
         }
 
         /// <summary>
@@ -163,111 +108,8 @@ namespace BuildingRegistry.Api.Oslo.BuildingUnit
             [FromRoute] int persistentLocalId,
             CancellationToken cancellationToken = default)
         {
-            var buildingUnit = await context
-                .BuildingUnitDetails
-                .Include(x => x.Addresses)
-                .AsNoTracking()
-                .SingleOrDefaultAsync(item => item.PersistentLocalId == persistentLocalId, cancellationToken);
-
-            if (buildingUnit != null && buildingUnit.IsRemoved)
-                throw new ApiException("Gebouweenheid werd verwijderd.", StatusCodes.Status410Gone);
-
-            if (buildingUnit == null || !buildingUnit.IsComplete || !buildingUnit.IsBuildingComplete)
-                throw new ApiException("Onbestaande gebouweenheid.", StatusCodes.Status404NotFound);
-
-            var addressIds = buildingUnit.Addresses.Select(x => x.AddressId).ToList();
-            var addressPersistentLocalIds = await syndicationContext
-                .AddressPersistentLocalIds
-                .Where(x => addressIds.Contains(x.AddressId))
-                .Select(x => x.PersistentLocalId)
-                .ToListAsync(cancellationToken);
-
-            var response = new BuildingUnitOsloResponse(
-                buildingUnit.PersistentLocalId.Value,
-                responseOptions.Value.GebouweenheidNaamruimte,
-                responseOptions.Value.ContextUrlUnitDetail,
-                buildingUnit.Version.ToBelgianDateTimeOffset(),
-                GetBuildingUnitPoint(buildingUnit.Position, buildingUnit.PositionMethod.Value),
-                MapBuildingUnitStatus(buildingUnit.Status.Value),
-                MapBuildingUnitFunction(buildingUnit.Function),
-                new GebouweenheidDetailGebouw(buildingUnit.BuildingPersistentLocalId.Value.ToString(), string.Format(responseOptions.Value.GebouwDetailUrl, buildingUnit.BuildingPersistentLocalId.Value)),
-                addressPersistentLocalIds.Select(id => new GebouweenheidDetailAdres(id, string.Format(responseOptions.Value.AdresUrl, id))).ToList());
-
+            var response = await _mediator.Send(new GetRequest(context, syndicationContext, responseOptions, persistentLocalId), cancellationToken);
             return Ok(response);
-        }
-
-        private static PositieGeometrieMethode MapBuildingUnitGeometryMethod(
-            BuildingUnitPositionGeometryMethod geometryMethod)
-        {
-            if (BuildingUnitPositionGeometryMethod.AppointedByAdministrator == geometryMethod)
-                return PositieGeometrieMethode.AangeduidDoorBeheerder;
-
-            if (BuildingUnitPositionGeometryMethod.DerivedFromObject == geometryMethod)
-                return PositieGeometrieMethode.AfgeleidVanObject;
-
-            throw new ArgumentOutOfRangeException(nameof(geometryMethod), geometryMethod, null);
-        }
-
-        private static GebouweenheidStatus MapBuildingUnitStatus(
-            BuildingUnitStatus status)
-        {
-            if (BuildingUnitStatus.Planned == status)
-                return GebouweenheidStatus.Gepland;
-
-            if (BuildingUnitStatus.NotRealized == status)
-                return GebouweenheidStatus.NietGerealiseerd;
-
-            if (BuildingUnitStatus.Realized == status)
-                return GebouweenheidStatus.Gerealiseerd;
-
-            if (BuildingUnitStatus.Retired == status)
-                return GebouweenheidStatus.Gehistoreerd;
-
-            throw new ArgumentOutOfRangeException(nameof(status), status, null);
-        }
-
-        private static GebouweenheidFunctie? MapBuildingUnitFunction(
-            BuildingUnitFunction? function)
-        {
-            if (function == null)
-                return null;
-
-            if (BuildingUnitFunction.Common == function)
-                return GebouweenheidFunctie.GemeenschappelijkDeel;
-
-            if (BuildingUnitFunction.Unknown == function)
-                return GebouweenheidFunctie.NietGekend;
-
-            throw new ArgumentOutOfRangeException(nameof(function), function, null);
-        }
-
-        private static Responses.BuildingUnitPosition GetBuildingUnitPoint(byte[] point, BuildingUnitPositionGeometryMethod geometryMethod)
-        {
-            var geometry = WKBReaderFactory.Create().Read(point);
-            var gml = GetGml(geometry);
-            return new Responses.BuildingUnitPosition(new GmlJsonPoint(gml), MapBuildingUnitGeometryMethod(geometryMethod));
-        }
-
-        private static string GetGml(Geometry geometry)
-        {
-            StringBuilder builder = new();
-            XmlWriterSettings settings = new() { Indent = false, OmitXmlDeclaration = true };
-            using (XmlWriter xmlwriter = XmlWriter.Create(builder, settings))
-            {
-                xmlwriter.WriteStartElement("gml", "Point", "http://www.opengis.net/gml/3.2");
-                xmlwriter.WriteAttributeString("srsName", "https://www.opengis.net/def/crs/EPSG/0/31370");
-                Write(geometry.Coordinate, xmlwriter);
-                xmlwriter.WriteEndElement();
-            }
-            return builder.ToString();
-        }
-
-        private static void Write(Coordinate coordinate, XmlWriter writer)
-        {
-            writer.WriteStartElement("gml", "pos", "http://www.opengis.net/gml/3.2");
-            writer.WriteValue(string.Format(NetTopologySuite.Utilities.Global.GetNfi(), "{0} {1}", coordinate.X.ToPointGeometryCoordinateValueFormat(),
-                coordinate.Y.ToPointGeometryCoordinateValueFormat()));
-            writer.WriteEndElement();
         }
     }
 }

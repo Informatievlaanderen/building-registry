@@ -1,18 +1,18 @@
-namespace BuildingRegistry.Api.Oslo.Handlers
+namespace BuildingRegistry.Api.Oslo.Handlers.Building
 {
     using System;
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
-    using Api.Oslo.Abstractions.Building.Query;
     using Be.Vlaanderen.Basisregisters.Api.Search.Filtering;
     using Be.Vlaanderen.Basisregisters.Api.Search.Pagination;
     using Be.Vlaanderen.Basisregisters.Api.Search.Sorting;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy;
+    using BuildingRegistry.Api.Oslo.Abstractions.Building.Query;
+    using BuildingRegistry.Projections.Legacy;
     using MediatR;
     using Microsoft.AspNetCore.Http;
     using Microsoft.EntityFrameworkCore;
-    using Projections.Legacy;
 
     public record CountRequest(LegacyContext Context, HttpRequest HttpRequest) : IRequest<TotaalAantalResponse>;
 
