@@ -1,3 +1,10 @@
+## [3.3.1](https://github.com/informatievlaanderen/building-registry/compare/v3.3.0...v3.3.1) (2022-06-03)
+
+
+### Bug Fixes
+
+* correct paket template for abstractions ([a58a581](https://github.com/informatievlaanderen/building-registry/commit/a58a581ef78eaaea976fb4f683651a92b49e8889))
+
 # [3.3.0](https://github.com/informatievlaanderen/building-registry/compare/v3.2.0...v3.3.0) (2022-06-03)
 
 
