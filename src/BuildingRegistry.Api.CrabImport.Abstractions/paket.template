@@ -1,8 +1,8 @@
 type file
 version 1.0.0
 
-id Be.Vlaanderen.Basisregisters.BuildingRegistry.Api.CrabImport
-title Be.Vlaanderen.Basisregisters.BuildingRegistry.Api.CrabImport
+id Be.Vlaanderen.Basisregisters.BuildingRegistry.Api.CrabImport.Abstractions
+title Be.Vlaanderen.Basisregisters.BuildingRegistry.Api.CrabImport.Abstractions
 
 authors Basisregisters.Vlaanderen
 owners Vlaamse overheid
@@ -12,7 +12,7 @@ projectUrl https://vlaanderen.be/digitaal-vlaanderen
 iconUrl https://raw.githubusercontent.com/Informatievlaanderen/build-pipeline/master/logo.png
 licenseUrl https://opensource.org/licenses/EUPL-1.2
 
-description Building Registry.
+description Building Registry Api CrabImport Abstractions.
 
 files
   BuildingRegistry.Api.CrabImport.Abstractions.dll => lib\net6.0
