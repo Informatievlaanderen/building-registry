@@ -1,3 +1,15 @@
+# [3.3.0](https://github.com/informatievlaanderen/building-registry/compare/v3.2.0...v3.3.0) (2022-06-03)
+
+
+### Bug Fixes
+
+* build handlers ([3c4fab1](https://github.com/informatievlaanderen/building-registry/commit/3c4fab1adf4e56e771a329e606f232adfc5823e9))
+
+
+### Features
+
+* add MediatR handlers for all API projects ([b64da5c](https://github.com/informatievlaanderen/building-registry/commit/b64da5c271d1aaaa145b7aed9fa9cba046026252))
+
 # [3.2.0](https://github.com/informatievlaanderen/building-registry/compare/v3.1.2...v3.2.0) (2022-06-02)
 
 
