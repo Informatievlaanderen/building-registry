@@ -29,7 +29,7 @@ namespace BuildingRegistry.Building.Events
         public string BuildingStatus { get; }
 
         [EventPropertyDescription("Geometriemethode van de gebouwpositie. Mogelijkheden: Outlined of MeasuredByGrb.")]
-        public string Method { get; }
+        public string GeometryMethod { get; }
 
         [EventPropertyDescription("Extended WKB-voorstelling van de gebouwpositie.")]
         public string ExtendedWkbGeometry { get; }
@@ -56,7 +56,7 @@ namespace BuildingRegistry.Building.Events
             BuildingPersistentLocalId = buildingPersistentLocalId;
             BuildingPersistentLocalIdAssignmentDate = buildingPersistentLocalIdAssignmentDate;
             BuildingStatus = buildingStatus.Value;
-            Method = buildingGeometry.Method;
+            GeometryMethod = buildingGeometry.Method;
             ExtendedWkbGeometry = buildingGeometry.Geometry;
             IsRemoved = isRemoved;
             BuildingUnits = buildingUnits.ConvertAll(x => new BuildingUnit(x));
@@ -68,7 +68,7 @@ namespace BuildingRegistry.Building.Events
             int buildingPersistentLocalId,
             Instant buildingPersistentLocalIdAssignmentDate,
             string buildingStatus,
-            string method,
+            string geometryMethod,
             string extendedWkbGeometry,
             bool isRemoved,
             List<BuildingUnit> buildingUnits,
@@ -80,7 +80,7 @@ namespace BuildingRegistry.Building.Events
                 BuildingRegistry.Building.BuildingStatus.Parse(buildingStatus),
                 new BuildingGeometry(
                     new ExtendedWkbGeometry(extendedWkbGeometry),
-                    BuildingGeometryMethod.Parse(method)),
+                    BuildingGeometryMethod.Parse(geometryMethod)),
                 isRemoved,
                 new List<Commands.BuildingUnit>())
         {
@@ -97,7 +97,7 @@ namespace BuildingRegistry.Building.Events
             fields.Add(BuildingPersistentLocalId.ToString());
             fields.Add(BuildingPersistentLocalIdAssignmentDate.ToString());
             fields.Add(BuildingStatus);
-            fields.Add(Method);
+            fields.Add(GeometryMethod);
             fields.Add(ExtendedWkbGeometry);
             fields.Add(IsRemoved.ToString());
             return fields;

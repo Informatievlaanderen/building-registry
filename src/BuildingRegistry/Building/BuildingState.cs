@@ -24,7 +24,7 @@ namespace BuildingRegistry.Building
             BuildingStatus = BuildingStatus.Parse(@event.BuildingStatus);
             BuildingGeometry = new BuildingGeometry(
                 new ExtendedWkbGeometry(@event.ExtendedWkbGeometry),
-                BuildingGeometryMethod.Parse(@event.Method));
+                BuildingGeometryMethod.Parse(@event.GeometryMethod));
             IsRemoved = @event.IsRemoved;
 
             foreach (var buildingUnit in @event.BuildingUnits)
