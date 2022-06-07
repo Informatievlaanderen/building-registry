@@ -1,3 +1,16 @@
+# [3.4.0](https://github.com/informatievlaanderen/building-registry/compare/v3.3.2...v3.4.0) (2022-06-07)
+
+
+### Bug Fixes
+
+* correct consumer schema ([3c704ab](https://github.com/informatievlaanderen/building-registry/commit/3c704ab30967a753499850a5fb89c69f59dd8aa8))
+
+
+### Features
+
+* add extract projections v2 ([d246cd3](https://github.com/informatievlaanderen/building-registry/commit/d246cd37da9d14963a65b5ec6781b119f3a9ea83))
+* add legacy v2 projections ([7d87407](https://github.com/informatievlaanderen/building-registry/commit/7d87407ba5231a570cf4feed41e9d1f1ff04353e))
+
 ## [3.3.2](https://github.com/informatievlaanderen/building-registry/compare/v3.3.1...v3.3.2) (2022-06-03)
 
 
