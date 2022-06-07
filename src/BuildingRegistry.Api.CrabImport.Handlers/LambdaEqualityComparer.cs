@@ -1,4 +1,4 @@
-namespace BuildingRegistry.Api.CrabImport.Handlers.Post
+namespace BuildingRegistry.Api.CrabImport.Handlers
 {
     using System;
     using System.Collections.Generic;

@@ -2,7 +2,7 @@ namespace BuildingRegistry.Api.Extract.Infrastructure.Modules
 {
     using System.Reflection;
     using Autofac;
-    using Handlers.GetBuildings;
+    using Handlers;
     using MediatR;
     using Module = Autofac.Module;
 

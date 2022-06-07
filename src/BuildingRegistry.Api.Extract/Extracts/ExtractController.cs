@@ -9,7 +9,7 @@ namespace BuildingRegistry.Api.Extract.Extracts
     using System.Threading;
     using System.Threading.Tasks;
     using Abstractions.Extracts.Responses;
-    using Handlers.GetBuildings;
+    using Handlers;
     using MediatR;
 
     [ApiVersion("1.0")]

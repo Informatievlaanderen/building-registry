@@ -2,7 +2,7 @@ namespace BuildingRegistry.Api.CrabImport.Infrastructure.Modules
 {
     using System.Reflection;
     using Autofac;
-    using Handlers.Post;
+    using Handlers;
     using MediatR;
     using Module = Autofac.Module;
 
