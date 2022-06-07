@@ -1,5 +1,9 @@
 namespace BuildingRegistry.Projector.Infrastructure
 {
+    using System;
+    using System.Linq;
+    using System.Reflection;
+    using System.Threading;
     using Autofac;
     using Autofac.Extensions.DependencyInjection;
     using Be.Vlaanderen.Basisregisters.Api;
@@ -8,6 +12,7 @@ namespace BuildingRegistry.Projector.Infrastructure
     using Be.Vlaanderen.Basisregisters.Projector.ConnectedProjections;
     using BuildingRegistry.Projections.Extract;
     using BuildingRegistry.Projections.Legacy;
+    using BuildingRegistry.Projections.Wfs;
     using BuildingRegistry.Projections.Wms;
     using Configuration;
     using Microsoft.AspNetCore.Builder;
@@ -16,16 +21,11 @@ namespace BuildingRegistry.Projector.Infrastructure
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Diagnostics.HealthChecks;
-    using Microsoft.Extensions.Logging;
     using Microsoft.Extensions.Hosting;
-    using Modules;
-    using System;
-    using System.Linq;
-    using System.Reflection;
-    using Be.Vlaanderen.Basisregisters.Projector;
-    using BuildingRegistry.Projections.Wfs;
+    using Microsoft.Extensions.Logging;
+    using Microsoft.Extensions.Options;
     using Microsoft.OpenApi.Models;
-    using System.Threading;    
+    using Modules;
 
     /// <summary>Represents the startup process for the application.</summary>
     public class Startup
@@ -124,7 +124,9 @@ namespace BuildingRegistry.Projector.Infrastructure
                         }
                     }
                 })
-                .Configure<ExtractConfig>(_configuration.GetSection("Extract"));
+                .Configure<ExtractConfig>(_configuration.GetSection("Extract"))
+                .Configure<FeatureToggleOptions>(_configuration.GetSection(FeatureToggleOptions.ConfigurationKey))
+                .AddSingleton(c => new UseProjectionsV2Toggle(c.GetRequiredService<IOptions<FeatureToggleOptions>>().Value.UseProjectionsV2));
 
             var containerBuilder = new ContainerBuilder();
             containerBuilder.RegisterModule(new LoggingModule(_configuration, services));

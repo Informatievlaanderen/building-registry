@@ -12,11 +12,11 @@ namespace BuildingRegistry.Projections.Wms.BuildingV2
 
     [ConnectedProjectionName("WMS gebouwen")]
     [ConnectedProjectionDescription("Projectie die de gebouwen data voor het WMS gebouwregister voorziet.")]
-    public class BuildingProjections : ConnectedProjection<WmsContext>
+    public class BuildingV2Projections : ConnectedProjection<WmsContext>
     {
         private readonly WKBReader _wkbReader;
 
-        public BuildingProjections(WKBReader wkbReader)
+        public BuildingV2Projections(WKBReader wkbReader)
         {
             _wkbReader = wkbReader;
 

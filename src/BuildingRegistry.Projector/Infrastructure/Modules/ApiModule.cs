@@ -1,5 +1,6 @@
 namespace BuildingRegistry.Projector.Infrastructure.Modules
 {
+    using System;
     using Autofac;
     using Autofac.Extensions.DependencyInjection;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
@@ -19,10 +20,11 @@ namespace BuildingRegistry.Projector.Infrastructure.Modules
     using BuildingRegistry.Projections.LastChangedList;
     using BuildingRegistry.Projections.Legacy;
     using BuildingRegistry.Projections.Legacy.BuildingDetail;
+    using BuildingRegistry.Projections.Legacy.BuildingDetailV2;
     using BuildingRegistry.Projections.Legacy.BuildingPersistentIdCrabIdMapping;
     using BuildingRegistry.Projections.Legacy.BuildingSyndication;
     using BuildingRegistry.Projections.Legacy.BuildingUnitDetail;
-    using BuildingRegistry.Projections.Legacy.PersistentLocalIdMigration;
+    using BuildingRegistry.Projections.Legacy.BuildingUnitDetailV2;
     using BuildingRegistry.Projections.Wfs;
     using BuildingRegistry.Projections.Wms;
     using Microsoft.Data.SqlClient;
@@ -38,6 +40,7 @@ namespace BuildingRegistry.Projector.Infrastructure.Modules
         private readonly IConfiguration _configuration;
         private readonly IServiceCollection _services;
         private readonly ILoggerFactory _loggerFactory;
+        private readonly bool _useProjectionsV2;
 
         public ApiModule(
             IConfiguration configuration,
@@ -47,6 +50,7 @@ namespace BuildingRegistry.Projector.Infrastructure.Modules
             _configuration = configuration;
             _services = services;
             _loggerFactory = loggerFactory;
+            _useProjectionsV2 = Convert.ToBoolean(_configuration.GetSection(FeatureToggleOptions.ConfigurationKey)[nameof(FeatureToggleOptions.UseProjectionsV2)]);
         }
 
         protected override void Load(ContainerBuilder builder)
@@ -69,18 +73,29 @@ namespace BuildingRegistry.Projector.Infrastructure.Modules
                     new EventHandlingModule(
                         typeof(DomainAssemblyMarker).Assembly,
                         EventsJsonSerializerSettingsProvider.CreateSerializerSettings()))
-
                 .RegisterModule<EnvelopeModule>()
-
                 .RegisterEventstreamModule(_configuration)
-
                 .RegisterModule(new ProjectorModule(_configuration));
 
-            RegisterExtractProjections(builder);
             RegisterLastChangedProjections(builder);
-            RegisterLegacyProjections(builder);
-            RegisterWmsProjections(builder);
-            RegisterWfsProjections(builder);
+
+            if (_useProjectionsV2)
+            {
+                RegisterExtractProjectionsV2(builder);
+                RegisterLegacyProjectionsV2(builder);
+                RegisterWmsProjectionsV2(builder);
+                RegisterWfsProjectionsV2(builder);
+
+                RegisterWmsProjections(builder); //TODO: Remove when Wms has been filled in staging
+                RegisterWfsProjections(builder); //TODO: Remove when Wfs has been filled in staging
+            }
+            else
+            {
+                RegisterExtractProjections(builder);
+                RegisterLegacyProjections(builder);
+                RegisterWmsProjections(builder);
+                RegisterWfsProjections(builder);
+            }
         }
 
         private void RegisterExtractProjections(ContainerBuilder builder)
@@ -108,6 +123,37 @@ namespace BuildingRegistry.Projector.Infrastructure.Modules
                 .RegisterProjections<BuildingUnitExtractProjections, ExtractContext>(
                     context =>
                         new BuildingUnitExtractProjections(
+                            context.Resolve<IOptions<ExtractConfig>>(),
+                            DbaseCodePage.Western_European_ANSI.ToEncoding(),
+                            WKBReaderFactory.Create()),
+                    ConnectedProjectionSettings.Default);
+        }
+
+        private void RegisterExtractProjectionsV2(ContainerBuilder builder)
+        {
+            builder
+                .RegisterModule(
+                    new ExtractModule(
+                        _configuration,
+                        _services,
+                        _loggerFactory));
+
+            builder
+                .RegisterProjectionMigrator<ExtractContextMigrationFactory>(
+                    _configuration,
+                    _loggerFactory)
+
+                .RegisterProjections<BuildingExtractV2Projections, ExtractContext>(
+                    context =>
+                        new BuildingExtractV2Projections(
+                            context.Resolve<IOptions<ExtractConfig>>(),
+                            DbaseCodePage.Western_European_ANSI.ToEncoding(),
+                            WKBReaderFactory.Create()),
+                    ConnectedProjectionSettings.Default)
+
+                .RegisterProjections<BuildingUnitExtractV2Projections, ExtractContext>(
+                    context =>
+                        new BuildingUnitExtractV2Projections(
                             context.Resolve<IOptions<ExtractConfig>>(),
                             DbaseCodePage.Western_European_ANSI.ToEncoding(),
                             WKBReaderFactory.Create()),
@@ -167,6 +213,35 @@ namespace BuildingRegistry.Projector.Infrastructure.Modules
                     ConnectedProjectionSettings.Default);
         }
 
+        private void RegisterLegacyProjectionsV2(ContainerBuilder builder)
+        {
+            builder
+                .RegisterModule(
+                    new LegacyModule(
+                        _configuration,
+                        _services,
+                        _loggerFactory));
+
+            var syndicationCatchUpSize = _configuration.GetSection(CatchUpSizesConfigKey).GetValue<int>("BuildingSyndication");
+            var syndicationProjectionSettings =
+                ConnectedProjectionSettings.Configure(settings => settings.ConfigureCatchUpPageSize(syndicationCatchUpSize));
+
+            builder
+                .RegisterProjectionMigrator<LegacyContextMigrationFactory>(
+                    _configuration,
+                    _loggerFactory)
+
+                .RegisterProjections<BuildingDetailV2Projections, LegacyContext>(
+                    () => new BuildingDetailV2Projections(),
+                    ConnectedProjectionSettings.Default)
+                .RegisterProjections<BuildingSyndicationProjections, LegacyContext>(
+                    () => new BuildingSyndicationProjections(),
+                    syndicationProjectionSettings)
+                .RegisterProjections<BuildingUnitDetailV2Projections, LegacyContext>(
+                    () => new BuildingUnitDetailV2Projections(),
+                    ConnectedProjectionSettings.Default);
+        }
+
         private void RegisterWmsProjections(ContainerBuilder builder)
         {
             builder
@@ -194,6 +269,33 @@ namespace BuildingRegistry.Projector.Infrastructure.Modules
                     wmsProjectionSettings);
         }
 
+        private void RegisterWmsProjectionsV2(ContainerBuilder builder)
+        {
+            builder
+                .RegisterModule(
+                    new WmsModule(
+                        _configuration,
+                        _services,
+                        _loggerFactory));
+
+            var wmsProjectionSettings = ConnectedProjectionSettings
+                .Configure(settings =>
+                    settings.ConfigureLinearBackoff<SqlException>(_configuration, "Wms"));
+
+            builder
+                .RegisterProjectionMigrator<WmsContextMigrationFactory>(
+                    _configuration,
+                    _loggerFactory)
+
+                .RegisterProjections<BuildingRegistry.Projections.Wms.BuildingV2.BuildingV2Projections, WmsContext>(() =>
+                        new BuildingRegistry.Projections.Wms.BuildingV2.BuildingV2Projections(WKBReaderFactory.Create()),
+                    wmsProjectionSettings)
+
+                .RegisterProjections<BuildingRegistry.Projections.Wms.BuildingUnitV2.BuildingUnitV2Projections, WmsContext>(() =>
+                        new BuildingRegistry.Projections.Wms.BuildingUnitV2.BuildingUnitV2Projections(WKBReaderFactory.Create()),
+                    wmsProjectionSettings);
+        }
+
         private void RegisterWfsProjections(ContainerBuilder builder)
         {
             builder
@@ -217,6 +319,32 @@ namespace BuildingRegistry.Projector.Infrastructure.Modules
                     wfsProjectionSettings)
                 .RegisterProjections<BuildingRegistry.Projections.Wfs.BuildingUnit.BuildingUnitProjections, WfsContext>(() =>
                         new BuildingRegistry.Projections.Wfs.BuildingUnit.BuildingUnitProjections(WKBReaderFactory.Create()),
+                    wfsProjectionSettings);
+        }
+
+        private void RegisterWfsProjectionsV2(ContainerBuilder builder)
+        {
+            builder
+                .RegisterModule(
+                    new WfsModule(
+                        _configuration,
+                        _services,
+                        _loggerFactory));
+
+            var wfsProjectionSettings = ConnectedProjectionSettings
+                .Configure(settings =>
+                    settings.ConfigureLinearBackoff<SqlException>(_configuration, "Wfs"));
+
+            builder
+                .RegisterProjectionMigrator<WfsContextMigrationFactory>(
+                    _configuration,
+                    _loggerFactory)
+
+                .RegisterProjections<BuildingRegistry.Projections.Wfs.BuildingV2.BuildingV2Projections, WfsContext>(() =>
+                        new BuildingRegistry.Projections.Wfs.BuildingV2.BuildingV2Projections(WKBReaderFactory.Create()),
+                    wfsProjectionSettings)
+                .RegisterProjections<BuildingRegistry.Projections.Wfs.BuildingUnitV2.BuildingUnitV2Projections, WfsContext>(() =>
+                        new BuildingRegistry.Projections.Wfs.BuildingUnitV2.BuildingUnitV2Projections(WKBReaderFactory.Create()),
                     wfsProjectionSettings);
         }
     }
