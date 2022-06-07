@@ -2,6 +2,10 @@ namespace BuildingRegistry
 {
     using NetTopologySuite.Geometries;
 
+    /// <summary>
+    /// Some GRB polygons are Invalid according to NTS Spec (and the world). But GRB decided it is valid.
+    /// In order not to invalidate and correct (change) the polygon from the source we use this class.
+    /// </summary>
     public class GrbPolygon : Polygon
     {
         public override bool IsValid => GeometryValidator.IsValid(this);
