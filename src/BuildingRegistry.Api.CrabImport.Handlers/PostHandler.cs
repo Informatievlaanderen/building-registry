@@ -1,4 +1,4 @@
-namespace BuildingRegistry.Api.CrabImport.Handlers.Post
+namespace BuildingRegistry.Api.CrabImport.Handlers
 {
     using System;
     using System.Collections.Concurrent;
@@ -13,6 +13,13 @@ namespace BuildingRegistry.Api.CrabImport.Handlers.Post
     using MediatR;
     using Microsoft.AspNetCore.Http;
     using Microsoft.Extensions.Logging;
+
+    public record PostRequest(List<RegisterCrabImportRequest[]> RegisterCrabImportList, IDictionary<string, object> Metadata, IdempotentCommandHandlerModule Bus) : IRequest<PostResponse>;
+
+    public record PostResponse(ConcurrentBag<long?> Tags)
+    {
+        public ConcurrentBag<long?> Tags { get; set; } = Tags;
+    }
 
     public class PostHandler : IRequestHandler<PostRequest, PostResponse>
     {

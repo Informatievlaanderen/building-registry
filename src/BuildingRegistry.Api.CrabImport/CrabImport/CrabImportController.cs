@@ -14,7 +14,7 @@ namespace BuildingRegistry.Api.CrabImport.CrabImport
     using System.Threading.Tasks;
     using Abstractions.Post;
     using Be.Vlaanderen.Basisregisters.GrAr.Import.Processing.Api.Messages;
-    using Handlers.Post;
+    using Handlers;
     using MediatR;
     using ApiController = Infrastructure.ApiController;
 

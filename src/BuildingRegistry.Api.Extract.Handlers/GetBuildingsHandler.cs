@@ -1,4 +1,4 @@
-namespace BuildingRegistry.Api.Extract.Handlers.GetBuildings
+namespace BuildingRegistry.Api.Extract.Handlers
 {
     using System.Threading;
     using System.Threading.Tasks;
@@ -7,7 +7,7 @@ namespace BuildingRegistry.Api.Extract.Handlers.GetBuildings
     using MediatR;
     using Microsoft.AspNetCore.Mvc;
     using Projections.Extract;
-    
+
     public record GetBuildingsRequest(ExtractContext Context) : IRequest<FileResult>;
 
     public class GetBuildingsHandler : IRequestHandler<GetBuildingsRequest, FileResult>
