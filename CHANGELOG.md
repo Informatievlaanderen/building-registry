@@ -1,3 +1,10 @@
+# [3.5.0](https://github.com/informatievlaanderen/building-registry/compare/v3.4.1...v3.5.0) (2022-06-07)
+
+
+### Features
+
+* add WMS and WFS v2 projections ([70eda33](https://github.com/informatievlaanderen/building-registry/commit/70eda3350f7a26828949545340bc7d9826fbeec4))
+
 ## [3.4.1](https://github.com/informatievlaanderen/building-registry/compare/v3.4.0...v3.4.1) (2022-06-07)
 
 
