@@ -60,7 +60,7 @@ namespace BuildingRegistry.Projections.Wfs.BuildingUnitV2
 
         private static void SetVersion(BuildingUnitV2 unit, Instant timestamp) => unit.Version = timestamp;
 
-        private static string MapFunction(BuildingUnitFunction function)
+        public static string MapFunction(BuildingUnitFunction function)
             => function == BuildingUnitFunction.Common ? GebouweenheidFunctie.GemeenschappelijkDeel.ToString() : GebouweenheidFunctie.NietGekend.ToString();
 
         private void SetPosition(BuildingUnitV2 buildingUnit, string extendedWkbPosition, string method)
@@ -71,7 +71,7 @@ namespace BuildingRegistry.Projections.Wfs.BuildingUnitV2
             buildingUnit.Position = geometry;
         }
 
-        private static string MapGeometryMethod(BuildingUnitPositionGeometryMethod geometryMethod)
+        public static string MapGeometryMethod(BuildingUnitPositionGeometryMethod geometryMethod)
         {
             var dictionary = new Dictionary<BuildingUnitPositionGeometryMethod, string>
             {
@@ -82,7 +82,7 @@ namespace BuildingRegistry.Projections.Wfs.BuildingUnitV2
             return dictionary[geometryMethod];
         }
 
-        private static string MapStatus(BuildingUnitStatus buildingUnitStatus)
+        public static string MapStatus(BuildingUnitStatus buildingUnitStatus)
         {
             var dictionary = new Dictionary<BuildingUnitStatus, string>
             {

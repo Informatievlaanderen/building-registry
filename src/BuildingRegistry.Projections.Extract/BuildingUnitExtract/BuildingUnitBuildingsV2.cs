@@ -28,7 +28,7 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
 
             b.Property(p => p.BuildingRetiredStatus)
                 .HasConversion(
-                    x => x == null ? (string?)null : x.Value,
+                    x => x == null ? null : x.Value.Value,
                     y => string.IsNullOrEmpty(y) ? null : BuildingStatus.Parse(y));
         }
     }

@@ -14,7 +14,6 @@ namespace BuildingRegistry.Projections.Legacy.BuildingDetailV2
 
         public int PersistentLocalId { get; set; }
         public BuildingGeometryMethod GeometryMethod { get; set; }
-        public BuildingGeometryMethod BuildingGeometryMethod { get; }
         public byte[] Geometry { get; set; }
         public BuildingStatus Status { get; set; }
         public bool IsRemoved { get; set; }
@@ -41,7 +40,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingDetailV2
             Instant version)
         {
             PersistentLocalId = persistentLocalId;
-            BuildingGeometryMethod = buildingGeometryMethod;
+            GeometryMethod = buildingGeometryMethod;
             Geometry = geometry;
             Status = status;
             IsRemoved = isRemoved;

@@ -63,7 +63,7 @@ namespace BuildingRegistry.Projections.Wfs.BuildingV2
             building.Geometry = geometry;
         }
 
-        private static string MapGeometryMethod(BuildingGeometryMethod buildingGeometryMethod)
+        public static string MapGeometryMethod(BuildingGeometryMethod buildingGeometryMethod)
         {
             var dictionary = new Dictionary<BuildingGeometryMethod, string>
             {
@@ -74,7 +74,7 @@ namespace BuildingRegistry.Projections.Wfs.BuildingV2
             return dictionary[buildingGeometryMethod];
         }
 
-        private static string MapStatus(BuildingStatus buildingStatus)
+        public static string MapStatus(BuildingStatus buildingStatus)
         {
             var dictionary = new Dictionary<BuildingStatus, string>
             {

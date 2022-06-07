@@ -9,8 +9,8 @@ namespace BuildingRegistry.Tests.ProjectionTests.Consumer.Address
     using BuildingRegistry.Consumer.Address;
     using BuildingRegistry.Consumer.Address.Projections;
     using FluentAssertions;
-    using Legacy.Autofixture;
     using Microsoft.EntityFrameworkCore;
+    using Tests.Legacy.Autofixture;
     using Xunit;
     using Xunit.Abstractions;
 
