@@ -23,7 +23,10 @@ namespace BuildingRegistry.Projections.Wms
         public WmsContext(DbContextOptions<WmsContext> options)
             : base(options)
         {
-            Database.SetCommandTimeout(10 * 60);
+            if (!Database.IsInMemory())
+            {
+                Database.SetCommandTimeout(10 * 60);
+            }
         }
     }
 }

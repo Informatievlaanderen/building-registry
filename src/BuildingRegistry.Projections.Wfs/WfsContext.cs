@@ -21,7 +21,10 @@ namespace BuildingRegistry.Projections.Wfs
         public WfsContext(DbContextOptions<WfsContext> options)
             : base(options)
         {
-            Database.SetCommandTimeout(10 * 60);
+            if(!Database.IsInMemory())
+            {
+                Database.SetCommandTimeout(10 * 60);
+            }
         }
     }
 }

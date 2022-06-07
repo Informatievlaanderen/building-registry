@@ -6,10 +6,8 @@ namespace BuildingRegistry.Tests.ProjectionTests
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.Connector;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.Connector.Testing;
     using FluentAssertions.Execution;
-    using Legacy;
     using Tests;
     using Xunit.Abstractions;
-    using AutofacBasedTest = Tests.AutofacBasedTest;
 
     public abstract class KafkaProjectionTest<TContext, TProjection> : BuildingRegistryTest
         where TProjection : ConnectedProjection<TContext>

@@ -27,11 +27,6 @@ namespace BuildingRegistry.Projections.Wms.BuildingUnitV2
 
             When<Envelope<BuildingWasMigrated>>(async (context, message, ct) =>
             {
-                if (message.Message.IsRemoved)
-                {
-                    return;
-                }
-
                 await context.BuildingUnitBuildingsV2.AddAsync(new BuildingUnitBuildingItemV2
                 {
                     BuildingPersistentLocalId = message.Message.BuildingPersistentLocalId,
@@ -67,7 +62,7 @@ namespace BuildingRegistry.Projections.Wms.BuildingUnitV2
         {
             unit.Version = timestamp;
         }
-        private static string MapGeometryMethod(BuildingUnitPositionGeometryMethod geometryMethod)
+        public static string MapGeometryMethod(BuildingUnitPositionGeometryMethod geometryMethod)
         {
             var dictionary = new Dictionary<BuildingUnitPositionGeometryMethod, string>
             {
@@ -78,7 +73,7 @@ namespace BuildingRegistry.Projections.Wms.BuildingUnitV2
             return dictionary[geometryMethod];
         }
 
-        private static string MapFunction(BuildingUnitFunction function)
+        public static string MapFunction(BuildingUnitFunction function)
             => function == BuildingUnitFunction.Common ? "GemeenschappelijkDeel" : "NietGekend";
 
         private void SetPosition(BuildingUnitV2 buildingUnit, string extendedWkbPosition, string method)
