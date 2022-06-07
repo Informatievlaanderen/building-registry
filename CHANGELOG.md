@@ -1,3 +1,10 @@
+## [3.4.1](https://github.com/informatievlaanderen/building-registry/compare/v3.4.0...v3.4.1) (2022-06-07)
+
+
+### Bug Fixes
+
+* cleanup handlers ([10fc026](https://github.com/informatievlaanderen/building-registry/commit/10fc026d12ed7e882229b626c75f12002b8dbec7))
+
 # [3.4.0](https://github.com/informatievlaanderen/building-registry/compare/v3.3.2...v3.4.0) (2022-06-07)
 
 
