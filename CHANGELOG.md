@@ -1,3 +1,10 @@
+# [3.6.0](https://github.com/informatievlaanderen/building-registry/compare/v3.5.0...v3.6.0) (2022-06-08)
+
+
+### Features
+
+* add projector toggle V2 ([5a247b6](https://github.com/informatievlaanderen/building-registry/commit/5a247b638848e9ffa58578788ad4ebf35416118f))
+
 # [3.5.0](https://github.com/informatievlaanderen/building-registry/compare/v3.4.1...v3.5.0) (2022-06-07)
 
 
