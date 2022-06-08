@@ -213,13 +213,10 @@ namespace BuildingRegistry.Console.ReactivatedHouseNumbers
                 File.WriteAllText(
                     Path.Combine(path),
                     JsonConvert.SerializeObject(
-                        new RegisterCrabImportRequest
-                        {
-                            CrabItem = JsonConvert.SerializeObject(
-                                new FixGrar1359(latestCommands, new CrabTerrainObjectId(crabTerrainObjectId)),
-                                commandsJsonSerializerSettings),
-                            Type = typeof(FixGrar1359).FullName
-                        }, commandsJsonSerializerSettings));
+                        new RegisterCrabImportRequest(JsonConvert.SerializeObject(
+                            new FixGrar1359(latestCommands, new CrabTerrainObjectId(crabTerrainObjectId)),
+                            commandsJsonSerializerSettings), typeof(FixGrar1359).FullName),
+                        commandsJsonSerializerSettings));
             }
         }
 
