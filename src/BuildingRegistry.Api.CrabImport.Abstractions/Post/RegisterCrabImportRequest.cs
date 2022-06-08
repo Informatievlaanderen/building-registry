@@ -9,21 +9,22 @@ namespace BuildingRegistry.Api.CrabImport.Abstractions.Post
     {
         /// <summary>Type van het CRAB item.</summary>
         [Required]
-        public string Type { get; set; }
+        public string Type { get; }
 
         /// <summary>Het CRAB item.</summary>
         [Required]
-        public string CrabItem { get; set; }
+        public string CrabItem { get; }
+
+        public RegisterCrabImportRequest(string type, string crabItem)
+        {
+            Type = type;
+            CrabItem = crabItem;
+        }
     }
 
     public class RegisterCrabImportRequestExample : IExamplesProvider<RegisterCrabImportRequest>
     {
-        public RegisterCrabImportRequest GetExamples()
-            => new RegisterCrabImportRequest
-            {
-                Type = "BuildingRegistry.Municipality.Commands.ImportMunicipalityNameFromCrab",
-                CrabItem = "{}"
-            };
+        public RegisterCrabImportRequest GetExamples() => new RegisterCrabImportRequest("BuildingRegistry.Municipality.Commands.ImportMunicipalityNameFromCrab", "{}");
     }
 
     public static class RegisterCrabImportRequestMapping
@@ -31,7 +32,7 @@ namespace BuildingRegistry.Api.CrabImport.Abstractions.Post
         public static dynamic? Map(RegisterCrabImportRequest message)
         {
             var assembly = typeof(Building).Assembly;
-            var type = assembly.GetType(message.Type);
+            var type = assembly.GetType(message.Type)!;
 
             return JsonConvert.DeserializeObject(message.CrabItem, type);
         }
