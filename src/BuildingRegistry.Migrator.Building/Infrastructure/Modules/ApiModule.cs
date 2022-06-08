@@ -1,5 +1,6 @@
 namespace BuildingRegistry.Migrator.Building.Infrastructure.Modules
 {
+    using Api.BackOffice;
     using Autofac;
     using Autofac.Extensions.DependencyInjection;
     using Be.Vlaanderen.Basisregisters.DataDog.Tracing.Autofac;
@@ -9,6 +10,7 @@ namespace BuildingRegistry.Migrator.Building.Infrastructure.Modules
     using BuildingRegistry.Infrastructure;
     using BuildingRegistry.Infrastructure.Modules;
     using Consumer.Address;
+    using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Logging;
@@ -31,15 +33,14 @@ namespace BuildingRegistry.Migrator.Building.Infrastructure.Modules
 
         protected override void Load(ContainerBuilder builder)
         {
-            // TODO: backoffice
-            //var projectionsConnectionString = _configuration.GetConnectionString("BackOffice");
-            //_services
-            //    .AddDbContext<BackOfficeContext>(options => options
-            //            .UseLoggerFactory(_loggerFactory)
-            //            .UseSqlServer(projectionsConnectionString, sqlServerOptions => sqlServerOptions
-            //                .EnableRetryOnFailure()
-            //                .MigrationsHistoryTable(MigrationTables.BackOffice, Schema.BackOffice))
-            //        , ServiceLifetime.Transient);
+            var backOfficeConnectionString = _configuration.GetConnectionString("BackOffice");
+            _services
+                .AddDbContext<BackOfficeContext>(options => options
+                        .UseLoggerFactory(_loggerFactory)
+                        .UseSqlServer(backOfficeConnectionString, sqlServerOptions => sqlServerOptions
+                            .EnableRetryOnFailure()
+                            .MigrationsHistoryTable(MigrationTables.BackOffice, Schema.BackOffice))
+                    , ServiceLifetime.Transient);
 
             builder
                 .RegisterModule(new DataDogModule(_configuration))

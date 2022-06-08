@@ -12,6 +12,7 @@ namespace BuildingRegistry.Infrastructure
         public const string ConsumerAddress = "BuildingRegistryConsumerAddress";
         public const string MigrateBuilding = "BuildingRegistryMigration";
         public const string Sequence = "BuildingRegistrySequence";
+        public const string BackOffice = "AddressRegistryBackOffice";
     }
 
     public static class MigrationTables
@@ -24,5 +25,6 @@ namespace BuildingRegistry.Infrastructure
         public const string RedisDataMigration = "__EFMigrationsHistoryDataMigration";
         public const string Sequence = "__EFMigrationsHistorySequence";
         public const string ConsumerAddress = "__EFMigrationsHistoryConsumerAddress";
+        public const string BackOffice = "__EFMigrationsHistoryBackOffice";
     }
 }

@@ -6,6 +6,7 @@ namespace BuildingRegistry.Migrator.Building.Infrastructure
     using System.Threading;
     using System.Threading.Tasks;
     using Amazon.DynamoDBv2.Model;
+    using Api.BackOffice;
     using Autofac;
     using Be.Vlaanderen.Basisregisters.CommandHandling;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
@@ -208,14 +209,16 @@ namespace BuildingRegistry.Migrator.Building.Infrastructure
             await _processedIdsTable.Add(internalId);
             processedItems.Add(internalId);
 
-            // TODO: iterate buildingUnits and add ( BuildingUnitPersistentLocalId, BuildingPersistentLocalId )
-            //await using var backOfficeContext = streamLifetimeScope.Resolve<BackOfficeContext>();
-            //await backOfficeContext
-            //    .AddressPersistentIdStreetNamePersistentIds
-            //    .AddAsync(
-            //        new AddressPersistentIdStreetNamePersistentId(addressAggregate.PersistentLocalId,
-            //            streetName.PersistentLocalId), token);
-            //await backOfficeContext.SaveChangesAsync(token);
+            await using var backOfficeContext = streamLifetimeScope.Resolve<BackOfficeContext>();
+            foreach (var buildingUnit in migrateBuilding.BuildingUnits)
+            {
+                await backOfficeContext
+                    .BuildingUnitBuildingRelationship.AddAsync(
+                        new BuildingUnitBuildingRelationship(
+                            buildingUnit.BuildingUnitPersistentLocalId,
+                            migrateBuilding.BuildingPersistentLocalId));
+            }
+            await backOfficeContext.SaveChangesAsync(ct);
         }
 
         private async Task DispatchCommand<TCommand>(
