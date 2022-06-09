@@ -1,8 +1,7 @@
-namespace BuildingRegistry.Api.CrabImport.Infrastructure
+namespace BuildingRegistry.Infrastructure
 {
     using System;
     using System.IO;
-    using BuildingRegistry.Infrastructure;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.EntityFrameworkCore.Design;
     using Microsoft.Extensions.Configuration;

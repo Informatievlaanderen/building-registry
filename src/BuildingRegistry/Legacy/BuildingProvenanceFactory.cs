@@ -24,6 +24,24 @@ namespace BuildingRegistry.Legacy
         }
     }
 
+    public class BuildingLegacyProvenanceFactory : IProvenanceFactory<Building>
+    {
+        public bool CanCreateFrom<TCommand>() => typeof(IHasCommandProvenance).IsAssignableFrom(typeof(TCommand));
+
+        public Provenance CreateFrom(
+            object provenanceHolder,
+            Building aggregate)
+        {
+            if (provenanceHolder is not IHasCommandProvenance provenance)
+            {
+                throw new ApplicationException($"Cannot create provenance from {provenanceHolder.GetType().Name}");
+            }
+
+            return provenance.Provenance;
+        }
+    }
+
+
     public class FixGrar1359ProvenanceFactory : CrabProvenanceFactory, IProvenanceFactory<Building>
     {
         public bool CanCreateFrom<TCommand>() => typeof(FixGrar1359).IsAssignableFrom(typeof(TCommand));

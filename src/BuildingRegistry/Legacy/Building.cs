@@ -6,6 +6,8 @@ namespace BuildingRegistry.Legacy
     using Be.Vlaanderen.Basisregisters.Crab;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Be.Vlaanderen.Basisregisters.Utilities.HexByteConvertor;
+    using BuildingRegistry.Building.Commands;
+    using Commands;
     using Crab;
     using Events;
     using Events.Crab;
@@ -15,6 +17,35 @@ namespace BuildingRegistry.Legacy
     public partial class Building
     {
         private static readonly WKBReader WkbReader = WKBReaderFactory.Create();
+
+        public MigrateBuilding CreateMigrateCommand(Func<List<Legacy.BuildingUnit>, List<BuildingRegistry.Building.Commands.BuildingUnit>> buildingUnitMapper)
+        {
+            var status = _status ?? throw new InvalidOperationException($"No status found for Building '{_persistentLocalId}'");
+
+            return new MigrateBuilding(
+                _buildingId,
+                _persistentLocalId,
+                _persistentLocalIdAssignmentDate,
+                status,
+                Geometry,
+                IsRemoved,
+                buildingUnitMapper(_buildingUnitCollection.AllBuildingUnits.ToList()),
+                new Provenance(
+                    SystemClock.Instance.GetCurrentInstant(),
+                    Application.BuildingRegistry,
+                    new Reason("Migrate Building aggregate."),
+                    new Operator("Building Registry"),
+                    Modification.Insert,
+                    Organisation.DigitaalVlaanderen));
+        }
+
+        public void MarkBuildingAsMigrated(MarkBuildingAsMigrated command)
+        {
+            if (!IsMigrated)
+            {
+                ApplyChange(new BuildingWasMarkedAsMigrated(command.BuildingId, command.PersistentLocalId));
+            }
+        }
 
         public void ImportTerrainObjectFromCrab(
            CrabTerrainObjectId terrainObjectId,
@@ -381,9 +412,9 @@ namespace BuildingRegistry.Legacy
 
         private void ApplyCompletionIfNecessary()
         {
-            if ((_status == null || Geometry == null) && _isComplete)
+            if ((_status == null || Geometry == null) && IsComplete)
                 ApplyChange(new BuildingBecameIncomplete(_buildingId));
-            else if (_status != null && Geometry != null && !_isComplete)
+            else if (_status != null && Geometry != null && !IsComplete)
                 ApplyChange(new BuildingBecameComplete(_buildingId));
         }
 

@@ -13,6 +13,8 @@ namespace BuildingRegistry.Legacy
         private readonly Func<BuildingUnit, bool> _isActivePredicate = x => !x.IsRemoved && !x.HasRetiredState;
 
         public IEnumerable<BuildingUnit> ActiveBuildingUnits => _allBuildingUnits.Where(_isActivePredicate);
+
+        public IEnumerable<BuildingUnit> AllBuildingUnits => _allBuildingUnits;
         public BuildingUnit ActiveCommonBuildingUnit =>
             ActiveBuildingUnits.SingleOrDefault(x => x.Function == BuildingUnitFunction.Common);
 

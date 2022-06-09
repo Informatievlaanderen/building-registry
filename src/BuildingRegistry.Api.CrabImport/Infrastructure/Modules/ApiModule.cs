@@ -70,14 +70,6 @@ namespace BuildingRegistry.Api.CrabImport.Infrastructure.Modules
                 .RegisterType<IdempotentCommandHandlerModuleProcessor>()
                 .As<IIdempotentCommandHandlerModuleProcessor>();
 
-            containerBuilder
-                .RegisterType<IdempotentCommandHandlerModule>()
-                .AsSelf();
-
-            containerBuilder
-                .RegisterType<IdempotentCommandHandlerModuleProcessor>()
-                .As<IIdempotentCommandHandlerModuleProcessor>();
-
             var projectionsConnectionString = _configuration.GetConnectionString("Sequences");
 
             _services

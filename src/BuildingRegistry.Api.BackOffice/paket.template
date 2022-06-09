@@ -1,0 +1,28 @@
+type file
+version 1.0.0
+
+id Be.Vlaanderen.Basisregisters.BuildingRegistry.Api.BackOffice
+title Be.Vlaanderen.Basisregisters.BuildingRegistry.Api.BackOffice
+
+authors Basisregisters Vlaanderen
+owners Digitaal Vlaanderen <https://vlaanderen.be/digitaal-vlaanderen>
+copyright Copyright (c) Digitaal Vlaanderen
+requireLicenseAcceptance false
+projectUrl https://github.com/Informatievlaanderen/building-registry
+iconUrl https://raw.githubusercontent.com/Informatievlaanderen/build-pipeline/master/logo.png
+licenseUrl https://opensource.org/licenses/EUPL-1.2
+
+description Building Registry.
+
+dependencies
+  framework: net6.0
+    Be.Vlaanderen.Basisregisters.GrAr.Legacy >= LOCKEDVERSION
+
+files
+  BuildingRegistry.Api.BackOffice.dll => lib\net6.0
+  BuildingRegistry.Api.BackOffice.pdb => lib\net6.0
+  BuildingRegistry.Api.BackOffice.xml => lib\net6.0
+  BuildingRegistry.Api.BackOffice.xml => content
+
+  BuildingRegistry.dll => lib\net6.0
+  BuildingRegistry.pdb => lib\net6.0

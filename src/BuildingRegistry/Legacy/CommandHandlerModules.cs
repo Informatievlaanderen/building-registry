@@ -12,6 +12,10 @@ namespace BuildingRegistry.Legacy
                 .SingleInstance();
 
             containerBuilder
+                .RegisterType<BuildingLegacyProvenanceFactory>()
+                .SingleInstance();
+
+            containerBuilder
                 .RegisterType<FixGrar1359ProvenanceFactory>()
                 .SingleInstance();
 

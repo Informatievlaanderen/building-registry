@@ -3,7 +3,6 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace BuildingRegistry.Api.CrabImport.Migrations
 {
     using BuildingRegistry.Infrastructure;
-    using Infrastructure;
 
     public partial class Initial : Migration
     {

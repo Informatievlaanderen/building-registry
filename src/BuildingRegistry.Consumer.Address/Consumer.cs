@@ -2,7 +2,6 @@ namespace BuildingRegistry.Consumer.Address
 {
     using System.Threading;
     using System.Threading.Tasks;
-    using Autofac;
     using Be.Vlaanderen.Basisregisters.MessageHandling.Kafka.Simple;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.Connector;
     using Confluent.Kafka;
@@ -11,7 +10,7 @@ namespace BuildingRegistry.Consumer.Address
 
     public class Consumer
     {
-        private readonly ILifetimeScope _container;
+        private readonly ConsumerAddressContext _consumerContext;
         private readonly KafkaOptions _options;
         private readonly string _topic;
         private readonly string _consumerGroupSuffix;
@@ -19,14 +18,14 @@ namespace BuildingRegistry.Consumer.Address
         private readonly ILogger<Consumer> _logger;
 
         public Consumer(
-            ILifetimeScope container,
+            ConsumerAddressContext consumerContext,
             ILoggerFactory loggerFactory,
             KafkaOptions options,
             string topic,
             string consumerGroupSuffix,
             Offset? offset)
         {
-            _container = container;
+            _consumerContext = consumerContext;
             _options = options;
             _topic = topic;
             _consumerGroupSuffix = consumerGroupSuffix;
@@ -50,7 +49,8 @@ namespace BuildingRegistry.Consumer.Address
                     async message =>
                     {
                         _logger.LogInformation("Handling next message");
-                        await projector.ProjectAsync(_container.Resolve<ConsumerAddressContext>(), message, cancellationToken);
+                        await projector.ProjectAsync(_consumerContext, message, cancellationToken);
+                        await _consumerContext.SaveChangesAsync(cancellationToken);
                     },
                     noMessageFoundDelay: 300,
                     _offset,
