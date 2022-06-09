@@ -1,7 +1,6 @@
-namespace BuildingRegistry.Api.CrabImport.Infrastructure
+namespace BuildingRegistry.Infrastructure
 {
     using System.Data;
-    using BuildingRegistry.Infrastructure;
     using Legacy;
     using Microsoft.EntityFrameworkCore;
 

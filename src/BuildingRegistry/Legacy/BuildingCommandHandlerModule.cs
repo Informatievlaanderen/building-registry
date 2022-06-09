@@ -8,7 +8,9 @@ namespace BuildingRegistry.Legacy
     using Be.Vlaanderen.Basisregisters.CommandHandling.SqlStreamStore;
     using Be.Vlaanderen.Basisregisters.EventHandling;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
+    using Commands;
     using Commands.Crab;
+    using Events;
     using SqlStreamStore;
 
     public sealed class BuildingCommandHandlerModule : CommandHandlerModule
@@ -24,6 +26,7 @@ namespace BuildingRegistry.Legacy
             EventSerializer eventSerializer,
             IPersistentLocalIdGenerator persistentLocalIdGenerator,
             BuildingProvenanceFactory provenanceFactory,
+            BuildingLegacyProvenanceFactory legacyProvenanceFactory,
             FixGrar1359ProvenanceFactory fixGrar1359ProvenanceFactory,
             PersistentLocalIdentifierProvenanceFactory persistentLocalIdentifierProvenanceFactory,
             ReaddressingProvenanceFactory readdressingProvenanceFactory)
@@ -100,6 +103,15 @@ namespace BuildingRegistry.Legacy
                 .AddSqlStreamStore(getStreamStore, getUnitOfWork, eventMapping, eventSerializer)
                 .AddProvenance(getUnitOfWork, fixGrar1359ProvenanceFactory)
                 .Handle(async (message, ct) => { await FixGrar1359(message, ct); });
+
+            For<MarkBuildingAsMigrated>()
+                .AddSqlStreamStore(getStreamStore, getUnitOfWork, eventMapping, eventSerializer)
+                .AddProvenance(getUnitOfWork, legacyProvenanceFactory)
+                .Handle(async (message, ct) =>
+                {
+                    var building = await _getBuildings().GetAsync(message.Command.BuildingId.ToString(), ct);
+                    building.MarkBuildingAsMigrated(message.Command);
+                });
         }
 
         public async Task ImportSubaddressPosition(CommandMessage<ImportSubaddressPositionFromCrab> message, CancellationToken ct)

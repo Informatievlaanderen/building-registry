@@ -17,8 +17,9 @@ namespace BuildingRegistry.Legacy
         private PersistentLocalIdAssignmentDate _persistentLocalIdAssignmentDate;
         private BuildingStatus? _status;
 
+        public bool IsMigrated { get; private set; }
         public bool IsRemoved { get; private set; }
-        private bool _isComplete;
+        public bool IsComplete { get; private set; }
         private bool IsRetired => _status == BuildingStatus.Retired || _status == BuildingStatus.NotRealized;
         public Modification LastModificationBasedOnCrab { get; private set; }
 
@@ -117,6 +118,11 @@ namespace BuildingRegistry.Legacy
             Register<BuildingUnitAddressWasAttached>(When);
             Register<BuildingUnitWasReaddressed>(When);
             Register<BuildingUnitPersistentLocalIdWasAssigned>(When);
+
+            Register<BuildingWasMarkedAsMigrated>( _ =>
+            {
+                IsMigrated = true;
+            });
         }
 
         private void When(BuildingUnitWasReaddressed @event)
@@ -389,12 +395,12 @@ namespace BuildingRegistry.Legacy
 
         private void When(BuildingBecameComplete @event)
         {
-            _isComplete = true;
+            IsComplete = true;
         }
 
         private void When(BuildingBecameIncomplete @event)
         {
-            _isComplete = false;
+            IsComplete = false;
         }
 
         private void When(BuildingWasOutlined @event)
