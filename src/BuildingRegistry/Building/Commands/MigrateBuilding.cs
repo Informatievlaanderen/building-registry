@@ -69,19 +69,6 @@ namespace BuildingRegistry.Building.Commands
         public BuildingUnitPosition BuildingUnitPosition { get; }
         public bool IsRemoved { get; }
 
-        //public BuildingUnit(Legacy.BuildingUnit buildingUnit)
-        //{
-        //    BuildingUnitId = new BuildingUnitId(buildingUnit.BuildingUnitId);
-        //    BuildingUnitPersistentLocalId = new BuildingUnitPersistentLocalId(buildingUnit.PersistentLocalId);
-        //    Function = BuildingUnitFunction.Parse(buildingUnit.Function);
-        //    Status = BuildingUnitStatus.Parse(buildingUnit.Status);
-        //    AddressPersistentLocalIds = buildingUnit.AddressPersistentLocalIds;
-        //    BuildingUnitPosition = new BuildingUnitPosition(
-        //        new ExtendedWkbGeometry(buildingUnitPosition.Geometry.ToString()),
-        //        BuildingUnitPositionGeometryMethod.Parse(buildingUnitPosition.GeometryMethod));
-        //    IsRemoved = isRemoved;
-        //}
-
         public BuildingUnit(
             Legacy.BuildingUnitId buildingUnitId,
             Legacy.PersistentLocalId buildingUnitPersistentLocalId,

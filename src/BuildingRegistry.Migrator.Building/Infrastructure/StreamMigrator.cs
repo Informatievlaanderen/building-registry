@@ -214,7 +214,7 @@ namespace BuildingRegistry.Migrator.Building.Infrastructure
             {
                 await backOfficeContext
                     .BuildingUnitBuildingRelationship.AddAsync(
-                        new BuildingUnitBuildingRelationship(
+                        new BuildingUnitBuilding(
                             buildingUnit.BuildingUnitPersistentLocalId,
                             migrateBuilding.BuildingPersistentLocalId));
             }

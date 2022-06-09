@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -9,11 +9,11 @@ namespace BuildingRegistry.Api.BackOffice.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.EnsureSchema(
-                name: "AddressRegistryBackOffice");
+                name: "BuildingRegistryBackOffice");
 
             migrationBuilder.CreateTable(
-                name: "BuildingUnitBuildingRelationship",
-                schema: "AddressRegistryBackOffice",
+                name: "BuildingUnitBuilding",
+                schema: "BuildingRegistryBackOffice",
                 columns: table => new
                 {
                     BuildingUnitPersistentLocalId = table.Column<int>(type: "int", nullable: false),
@@ -21,7 +21,7 @@ namespace BuildingRegistry.Api.BackOffice.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_BuildingUnitBuildingRelationship", x => x.BuildingUnitPersistentLocalId)
+                    table.PrimaryKey("PK_BuildingUnitBuilding", x => x.BuildingUnitPersistentLocalId)
                         .Annotation("SqlServer:Clustered", true);
                 });
         }
@@ -29,8 +29,8 @@ namespace BuildingRegistry.Api.BackOffice.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "BuildingUnitBuildingRelationship",
-                schema: "AddressRegistryBackOffice");
+                name: "BuildingUnitBuilding",
+                schema: "BuildingRegistryBackOffice");
         }
     }
 }

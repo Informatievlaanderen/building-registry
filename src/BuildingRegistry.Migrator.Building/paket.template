@@ -1,8 +1,8 @@
 type file
 version 1.0.0
 
-id Be.Vlaanderen.Basisregisters.BuildingRegistry.Migrator.Address
-title Be.Vlaanderen.Basisregisters.BuildingRegistry.Migrator.Address
+id Be.Vlaanderen.Basisregisters.BuildingRegistry.Migrator.Building
+title Be.Vlaanderen.Basisregisters.BuildingRegistry.Migrator.Building
 
 authors Basisregisters Vlaanderen
 owners Digitaal Vlaanderen <https://vlaanderen.be/digitaal-vlaanderen>
@@ -12,7 +12,7 @@ projectUrl https://github.com/Informatievlaanderen/building-registry
 iconUrl https://raw.githubusercontent.com/Informatievlaanderen/build-pipeline/master/logo.png
 licenseUrl https://opensource.org/licenses/EUPL-1.2
 
-description Address Registry Migrator Address.
+description Building Registry Migrator Building.
 
 dependencies
   framework: net6.0

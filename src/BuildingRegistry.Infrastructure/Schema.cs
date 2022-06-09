@@ -12,7 +12,7 @@ namespace BuildingRegistry.Infrastructure
         public const string ConsumerAddress = "BuildingRegistryConsumerAddress";
         public const string MigrateBuilding = "BuildingRegistryMigration";
         public const string Sequence = "BuildingRegistrySequence";
-        public const string BackOffice = "AddressRegistryBackOffice";
+        public const string BackOffice = "BuildingRegistryBackOffice";
     }
 
     public static class MigrationTables

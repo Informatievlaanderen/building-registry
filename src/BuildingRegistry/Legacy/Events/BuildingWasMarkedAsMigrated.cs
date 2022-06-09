@@ -4,7 +4,6 @@ namespace BuildingRegistry.Legacy.Events
     using Be.Vlaanderen.Basisregisters.EventHandling;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Newtonsoft.Json;
-    using BuildingId = Legacy.BuildingId;
 
     [EventTags(EventTag.For.Sync)]
     [EventName("BuildingWasMarkedAsMigrated")]
@@ -29,7 +28,7 @@ namespace BuildingRegistry.Legacy.Events
         }
 
         [JsonConstructor]
-        public BuildingWasMarkedAsMigrated(
+        private BuildingWasMarkedAsMigrated(
             Guid buildingId,
             int persistentLocalId,
             ProvenanceData provenance)

@@ -14,35 +14,37 @@ namespace BuildingRegistry.Api.BackOffice
         public BackOfficeContext(DbContextOptions<BackOfficeContext> options)
             : base(options) { }
 
-        public DbSet<BuildingUnitBuildingRelationship> BuildingUnitBuildingRelationship { get; set; }
+        public DbSet<BuildingUnitBuilding> BuildingUnitBuildings { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
-            modelBuilder.Entity<BuildingUnitBuildingRelationship>()
-                .ToTable("BuildingUnitBuildingRelationship", Schema.BackOffice)
+            modelBuilder.Entity<BuildingUnitBuilding>()
+                .ToTable("BuildingUnitBuilding", Schema.BackOffice)
                 .HasKey(x => x.BuildingUnitPersistentLocalId)
                 .IsClustered();
 
-            modelBuilder.Entity<BuildingUnitBuildingRelationship>()
+            modelBuilder.Entity<BuildingUnitBuilding>()
                 .Property(x => x.BuildingUnitPersistentLocalId)
                 .ValueGeneratedNever();
 
-            modelBuilder.Entity<BuildingUnitBuildingRelationship>()
+            modelBuilder.Entity<BuildingUnitBuilding>()
                 .Property(x => x.BuildingPersistentLocalId);
         }
     }
 
-    public class BuildingUnitBuildingRelationship
+    public class BuildingUnitBuilding
     {
         public int BuildingUnitPersistentLocalId { get; set; }
         public int BuildingPersistentLocalId { get; set; }
 
-        private BuildingUnitBuildingRelationship()
+        private BuildingUnitBuilding()
         { }
 
-        public BuildingUnitBuildingRelationship(int buildingUnitPersistentLocalId, int buildingPersistentLocalId)
+        public BuildingUnitBuilding(
+            int buildingUnitPersistentLocalId,
+            int buildingPersistentLocalId)
         {
             BuildingUnitPersistentLocalId = buildingUnitPersistentLocalId;
             BuildingPersistentLocalId = buildingPersistentLocalId;

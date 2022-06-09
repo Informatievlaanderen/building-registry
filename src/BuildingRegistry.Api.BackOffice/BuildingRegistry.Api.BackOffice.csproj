@@ -36,11 +36,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Building\Requests\" />
-    <Folder Include="Migrations\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\BuildingRegistry.Infrastructure\BuildingRegistry.Infrastructure.csproj" />
   </ItemGroup>
 

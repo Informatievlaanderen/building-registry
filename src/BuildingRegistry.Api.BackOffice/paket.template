@@ -8,11 +8,11 @@ authors Basisregisters Vlaanderen
 owners Digitaal Vlaanderen <https://vlaanderen.be/digitaal-vlaanderen>
 copyright Copyright (c) Digitaal Vlaanderen
 requireLicenseAcceptance false
-projectUrl https://github.com/Informatievlaanderen/address-registry
+projectUrl https://github.com/Informatievlaanderen/building-registry
 iconUrl https://raw.githubusercontent.com/Informatievlaanderen/build-pipeline/master/logo.png
 licenseUrl https://opensource.org/licenses/EUPL-1.2
 
-description Address Registry.
+description Building Registry.
 
 dependencies
   framework: net6.0

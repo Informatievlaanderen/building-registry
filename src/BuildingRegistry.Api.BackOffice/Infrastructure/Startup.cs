@@ -69,7 +69,7 @@ namespace BuildingRegistry.Api.BackOffice.Infrastructure
                         ApiInfo = (provider, description) => new OpenApiInfo
                         {
                             Version = description.ApiVersion.ToString(),
-                            Title = "Basisregisters Vlaanderen Address Registry API",
+                            Title = "Basisregisters Vlaanderen Building Registry API",
                             Description = GetApiLeadingText(description),
                             Contact = new OpenApiContact
                             {
@@ -154,7 +154,7 @@ namespace BuildingRegistry.Api.BackOffice.Infrastructure
                     Api =
                     {
                         VersionProvider = apiVersionProvider,
-                        Info = groupName => $"Basisregisters Vlaanderen - Address Registry API {groupName}",
+                        Info = groupName => $"Basisregisters Vlaanderen - Building Registry API {groupName}",
                         CSharpClientOptions =
                         {
                             ClassName = "BuildingRegistry",
