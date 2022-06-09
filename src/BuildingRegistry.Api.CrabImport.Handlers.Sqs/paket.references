@@ -1,0 +1,10 @@
+Be.Vlaanderen.Basisregisters.CommandHandling.Idempotency
+Be.Vlaanderen.Basisregisters.MessageHandling.AwsSqs.Simple
+Be.Vlaanderen.Basisregisters.GrAr.Import
+
+AsyncEnumerator
+
+MediatR
+
+SourceLink.Embed.AllSourceFiles
+SourceLink.Copy.PdbFiles
