@@ -1,10 +1,13 @@
 namespace BuildingRegistry.Building
 {
     using System.Collections.Generic;
+    using Be.Vlaanderen.Basisregisters.GrAr.Common;
     using Events;
 
     public partial class Building
     {
+        private IHaveHash _lastEvent;
+
         public BuildingPersistentLocalId BuildingPersistentLocalId { get; private set; }
         public BuildingPersistentLocalIdAssignmentDate BuildingPersistentLocalIdAssignmentDate { get; private set; }
         public BuildingStatus BuildingStatus { get; private set; }
@@ -12,9 +15,12 @@ namespace BuildingRegistry.Building
         public bool IsRemoved { get; private set; }
         public List<BuildingUnit> BuildingUnits { get; private set; } = new List<BuildingUnit>();
 
+        public string LastEventHash => _lastEvent.GetHash();
+
         private Building()
         {
             Register<BuildingWasMigrated>(When);
+            Register<BuildingWasPlannedV2>(When);
         }
 
         private void When(BuildingWasMigrated @event)
@@ -42,6 +48,17 @@ namespace BuildingRegistry.Building
 
                 BuildingUnits.Add(newBuildingUnit);
             }
+
+            _lastEvent = @event;
+        }
+
+        private void When(BuildingWasPlannedV2 @event)
+        {
+            BuildingPersistentLocalId = new BuildingPersistentLocalId(@event.BuildingPersistentLocalId);
+            BuildingGeometry = new BuildingGeometry(new ExtendedWkbGeometry(@event.ExtendedWkbGeometry),
+                BuildingGeometryMethod.Outlined);
+
+            _lastEvent = @event;
         }
     }
 }

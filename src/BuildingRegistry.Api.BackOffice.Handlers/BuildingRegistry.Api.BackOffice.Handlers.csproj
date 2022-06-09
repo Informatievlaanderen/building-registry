@@ -6,7 +6,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Building\Exceptions\" />
+    <ProjectReference Include="..\BuildingRegistry.Api.BackOffice.Abstractions\BuildingRegistry.Api.BackOffice.Abstractions.csproj" />
   </ItemGroup>
 
   <Import Project="..\..\.paket\Paket.Restore.targets" />

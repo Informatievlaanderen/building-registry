@@ -69,8 +69,6 @@ nuget Be.Vlaanderen.Basisregisters.GrAr.Extracts 17.3.1
 nuget Be.Vlaanderen.Basisregisters.Shaperon 9.0.1
 nuget Be.Vlaanderen.Basisregisters.Shaperon.Geometries 9.0.1
 
-nuget Swashbuckle.AspNetCore.Filters 6.0.1
-
 // .NET CLASSIC STUFF
 nuget EntityFramework 6.4.4
 nuget Microsoft.SqlServer.Types 13.0.4001 // Don't update: requires version 13.0.4001 for legacy reasons

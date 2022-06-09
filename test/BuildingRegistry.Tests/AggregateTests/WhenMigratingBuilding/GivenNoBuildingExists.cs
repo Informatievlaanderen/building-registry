@@ -11,9 +11,9 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenMigratingBuilding
     using Xunit;
     using Xunit.Abstractions;
 
-    public class GivenValidCommand : BuildingRegistryTest
+    public class GivenNoBuildingExists : BuildingRegistryTest
     {
-        public GivenValidCommand(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
+        public GivenNoBuildingExists(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
         { }
 
         [Fact]

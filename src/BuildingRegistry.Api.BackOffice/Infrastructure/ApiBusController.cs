@@ -1,4 +1,4 @@
-namespace BuildingRegistry.Api.BackOffice.Building
+namespace BuildingRegistry.Api.BackOffice.Infrastructure
 {
     using System;
     using System.Collections.Generic;

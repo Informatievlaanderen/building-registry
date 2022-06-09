@@ -713,7 +713,7 @@ namespace BuildingRegistry.Legacy
                 ApplyChange(
                     new BuildingPersistentLocalIdWasAssigned(
                         _buildingId,
-                        persistentLocalIdGenerator.GenerateNextPersistentLocalId(),
+                        new PersistentLocalId(persistentLocalIdGenerator.GenerateNextPersistentLocalId()),
                         new PersistentLocalIdAssignmentDate(Instant.FromDateTimeOffset(DateTimeOffset.Now))));
 
             foreach (var buildingUnit in _buildingUnitCollection.GetAllBuildingUnitsWithoutPersistentLocalId())

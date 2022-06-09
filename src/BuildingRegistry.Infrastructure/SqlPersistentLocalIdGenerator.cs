@@ -1,7 +1,6 @@
 namespace BuildingRegistry.Infrastructure
 {
     using System.Data;
-    using Legacy;
     using Microsoft.EntityFrameworkCore;
 
     public class SqlPersistentLocalIdGenerator : IPersistentLocalIdGenerator
@@ -10,7 +9,7 @@ namespace BuildingRegistry.Infrastructure
 
         public SqlPersistentLocalIdGenerator(SequenceContext context) => _context = context;
 
-        public PersistentLocalId GenerateNextPersistentLocalId()
+        public int GenerateNextPersistentLocalId()
         {
             var sqlStatement = $"SELECT NEXT VALUE FOR {Schema.Sequence}.{SequenceContext.BuildingPersistentLocalIdSequenceName}";
 
@@ -25,7 +24,7 @@ namespace BuildingRegistry.Infrastructure
                 command.Connection.Close();
             }
 
-            return new PersistentLocalId(nextNumber);
+            return nextNumber;
         }
     }
 }

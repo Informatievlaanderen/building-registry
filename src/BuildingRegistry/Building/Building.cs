@@ -4,6 +4,8 @@ namespace BuildingRegistry.Building
     using System.Collections.Generic;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
     using Events;
+    using Exceptions;
+    using NetTopologySuite.Geometries;
 
     public partial class Building : AggregateRootEntity
     {
@@ -29,6 +31,34 @@ namespace BuildingRegistry.Building
                 buildingUnits));
 
             return newBuilding;
+        }
+
+        public static Building Plan(
+            BuildingPersistentLocalId buildingPersistentLocalId,
+            ExtendedWkbGeometry extendedWkbGeometry)
+        {
+            var geometry = WKBReaderFactory.Create().Read(extendedWkbGeometry);
+
+            GuardPolygon(geometry);
+
+            var newBuilding = Factory();
+            newBuilding.ApplyChange(new BuildingWasPlannedV2(
+                buildingPersistentLocalId,
+                extendedWkbGeometry));
+
+            return newBuilding;
+        }
+
+        private static void GuardPolygon(Geometry? geometry)
+        {
+            if (
+                geometry == null
+                || geometry is not Polygon
+                || geometry.SRID != ExtendedWkbGeometry.SridLambert72
+                || !GeometryValidator.IsValid(geometry))
+            {
+                throw new InvalidPolygonException();
+            }
         }
 
         #region Metadata

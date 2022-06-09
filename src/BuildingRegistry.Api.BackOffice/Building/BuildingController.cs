@@ -3,9 +3,10 @@ namespace BuildingRegistry.Api.BackOffice.Building
     using System.Collections.Generic;
     using Be.Vlaanderen.Basisregisters.Api;
     using Be.Vlaanderen.Basisregisters.CommandHandling;
-    using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using FluentValidation;
     using FluentValidation.Results;
+    using Infrastructure;
+    using MediatR;
     using Microsoft.AspNetCore.Mvc;
 
     [ApiVersion("2.0")]
@@ -14,7 +15,12 @@ namespace BuildingRegistry.Api.BackOffice.Building
     [ApiExplorerSettings(GroupName = "gebouwen")]
     public partial class BuildingController : ApiBusController
     {
-        public BuildingController(ICommandHandlerResolver bus) : base(bus) { }
+        private readonly IMediator _mediator;
+
+        public BuildingController(IMediator mediator, ICommandHandlerResolver bus) : base(bus)
+        {
+            _mediator = mediator;
+        }
 
         private ValidationException CreateValidationException(string errorCode, string propertyName, string message)
         {
@@ -27,18 +33,6 @@ namespace BuildingRegistry.Api.BackOffice.Building
             {
                 failure
             });
-        }
-
-        private Provenance CreateFakeProvenance()
-        {
-            return new Provenance(
-                NodaTime.SystemClock.Instance.GetCurrentInstant(),
-                Application.StreetNameRegistry,
-                new Reason(""), // TODO: TBD
-                new Operator(""), // TODO: from claims
-                Modification.Insert,
-                Organisation.DigitaalVlaanderen // TODO: from claims
-            );
         }
     }
 }
