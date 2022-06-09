@@ -99,16 +99,20 @@ namespace BuildingRegistry.Consumer.Address.Infrastructure
 
                             var kafkaOffset = await GetOffset(container, loggerFactory.CreateLogger<Program>(), topic);
 
-                            var consumer = new Consumer(actualContainer, loggerFactory, kafkaOptions, topic, consumerGroupSuffix, kafkaOffset);
-                            var consumerTask = consumer.Start(cancellationToken);
+                            await using (var consumerContext = actualContainer.Resolve<ConsumerAddressContext>())
+                            {
+                                var consumer = new Consumer(consumerContext, loggerFactory, kafkaOptions, topic,
+                                    consumerGroupSuffix, kafkaOffset);
+                                var consumerTask = consumer.Start(cancellationToken);
 
-                            Log.Information("The kafka consumer was started");
+                                Log.Information("The kafka consumer was started");
 
-                            await Task.WhenAny(consumerTask);
+                                await Task.WhenAny(consumerTask);
 
-                            cancellationTokenSource.Cancel();
+                                cancellationTokenSource.Cancel();
 
-                            Log.Error($"Consumer task stopped with status: {consumerTask.Status}");
+                                Log.Error($"Consumer task stopped with status: {consumerTask.Status}");
+                            }
 
                             Log.Error("The consumer was terminated");
                         }

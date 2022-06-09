@@ -37,11 +37,11 @@ namespace BuildingRegistry.Consumer.Address
             IServiceCollection services,
             ServiceLifetime serviceLifetime,
             ILoggerFactory loggerFactory,
-            string backofficeProjectionsConnectionString)
+            string consumerProjectionsConnectionString)
         {
             services
                 .AddScoped(s => new TraceDbConnection<ConsumerAddressContext>(
-                    new SqlConnection(backofficeProjectionsConnectionString),
+                    new SqlConnection(consumerProjectionsConnectionString),
                     configuration["DataDog:ServiceName"]))
                 .AddDbContext<ConsumerAddressContext>((provider, options) => options
                     .UseLoggerFactory(loggerFactory)
