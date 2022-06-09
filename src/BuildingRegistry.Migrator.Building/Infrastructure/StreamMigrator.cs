@@ -213,10 +213,10 @@ namespace BuildingRegistry.Migrator.Building.Infrastructure
             foreach (var buildingUnit in migrateBuilding.BuildingUnits)
             {
                 await backOfficeContext
-                    .BuildingUnitBuildingRelationship.AddAsync(
+                    .BuildingUnitBuildings.AddAsync(
                         new BuildingUnitBuilding(
                             buildingUnit.BuildingUnitPersistentLocalId,
-                            migrateBuilding.BuildingPersistentLocalId));
+                            migrateBuilding.BuildingPersistentLocalId), ct);
             }
             await backOfficeContext.SaveChangesAsync(ct);
         }
