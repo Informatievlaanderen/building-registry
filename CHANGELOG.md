@@ -1,3 +1,10 @@
+## [3.8.1](https://github.com/informatievlaanderen/building-registry/compare/v3.8.0...v3.8.1) (2022-06-10)
+
+
+### Bug Fixes
+
+* correct push to test docker images ([02f48aa](https://github.com/informatievlaanderen/building-registry/commit/02f48aaac475489afc3cb16bb50ed073e5c7bca8))
+
 # [3.8.0](https://github.com/informatievlaanderen/building-registry/compare/v3.7.1...v3.8.0) (2022-06-10)
 
 
