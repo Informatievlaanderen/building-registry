@@ -1,3 +1,19 @@
+# [3.7.0](https://github.com/informatievlaanderen/building-registry/compare/v3.6.0...v3.7.0) (2022-06-10)
+
+
+### Bug Fixes
+
+* add experimental SQS handler for CrabImport (not used) ([#560](https://github.com/informatievlaanderen/building-registry/issues/560)) ([3751ac5](https://github.com/informatievlaanderen/building-registry/commit/3751ac5befea8621ab00166612c27bd68f84a99a))
+* consumer ([197e19c](https://github.com/informatievlaanderen/building-registry/commit/197e19c8fdd7a82f93d3c7a945d9d85c19ecd216))
+* consumer address resolve context ([7528b8d](https://github.com/informatievlaanderen/building-registry/commit/7528b8d36849d308d5b4d43af510bc2115fa9051))
+* correct build ([6b05a02](https://github.com/informatievlaanderen/building-registry/commit/6b05a02b5cf463a9ea13d4e92bfe0a6b521c9195))
+* migrator build ([4624c07](https://github.com/informatievlaanderen/building-registry/commit/4624c078f20c6eb493a3c07a333f4dab6b1d220e))
+
+
+### Features
+
+* add migrator ([6b276b7](https://github.com/informatievlaanderen/building-registry/commit/6b276b79ef54f6e3129a29aec212b9e88c1a96b3))
+
 # [3.6.0](https://github.com/informatievlaanderen/building-registry/compare/v3.5.0...v3.6.0) (2022-06-08)
 
 
