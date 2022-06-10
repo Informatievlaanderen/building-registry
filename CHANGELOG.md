@@ -1,3 +1,10 @@
+# [3.8.0](https://github.com/informatievlaanderen/building-registry/compare/v3.7.1...v3.8.0) (2022-06-10)
+
+
+### Features
+
+* add migrator backoffice to pipeline ([2095061](https://github.com/informatievlaanderen/building-registry/commit/2095061da0811cf3e000f983e086c339aa4f0cbe))
+
 ## [3.7.1](https://github.com/informatievlaanderen/building-registry/compare/v3.7.0...v3.7.1) (2022-06-10)
 
 
