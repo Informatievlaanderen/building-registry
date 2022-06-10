@@ -63,6 +63,28 @@ namespace BuildingRegistry.Projections.Extract.BuildingExtract
                     .AddAsync(buildingExtractItemV2, ct);
             });
 
+            When<Envelope<BuildingWasPlannedV2>>(async (context, message, ct) =>
+            {
+                var buildingExtractItemV2 = new BuildingExtractItemV2
+                {
+                    PersistentLocalId = message.Message.BuildingPersistentLocalId,
+                    DbaseRecord = new BuildingDbaseRecord
+                    {
+                        id = { Value = $"{_extractConfig.DataVlaanderenNamespaceBuilding}/{message.Message.BuildingPersistentLocalId}" },
+                        gebouwid = { Value = message.Message.BuildingPersistentLocalId },
+                        geommet = { Value = MapGeometryMethod(BuildingGeometryMethod.Outlined) },
+                        status = { Value = MapStatus(BuildingStatus.Planned) },
+                        versieid = { Value = message.Message.Provenance.Timestamp.ToBelgianDateTimeOffset().FromDateTimeOffset() }
+                    }.ToBytes(_encoding)
+                };
+
+                var geometry = wkbReader.Read(message.Message.ExtendedWkbGeometry.ToByteArray()) as Polygon;
+                UpdateGeometry(geometry, buildingExtractItemV2);
+
+                await context
+                    .BuildingExtractV2
+                    .AddAsync(buildingExtractItemV2, ct);
+            });
         }
 
         private static string MapGeometryMethod(BuildingGeometryMethod buildingGeometryMethod)

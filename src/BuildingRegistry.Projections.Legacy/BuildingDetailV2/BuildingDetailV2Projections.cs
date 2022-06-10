@@ -1,5 +1,9 @@
 namespace BuildingRegistry.Projections.Legacy.BuildingDetailV2
 {
+    using System;
+    using Be.Vlaanderen.Basisregisters.EventHandling;
+    using Be.Vlaanderen.Basisregisters.GrAr.Common;
+    using Be.Vlaanderen.Basisregisters.GrAr.Common.Pipes;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.Connector;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore;
     using Be.Vlaanderen.Basisregisters.Utilities.HexByteConvertor;
@@ -22,10 +26,39 @@ namespace BuildingRegistry.Projections.Legacy.BuildingDetailV2
                     message.Message.IsRemoved,
                     message.Message.Provenance.Timestamp);
 
+                UpdateHash(building, message);
+
                 await context
                     .BuildingDetailsV2
                     .AddAsync(building, ct);
             });
+
+            When<Envelope<BuildingWasPlannedV2>>(async (context, message, ct) =>
+            {
+                var building = new BuildingDetailItemV2(
+                    message.Message.BuildingPersistentLocalId,
+                    BuildingGeometryMethod.Outlined,
+                    message.Message.ExtendedWkbGeometry.ToByteArray(),
+                    BuildingStatus.Planned,
+                    false,
+                    message.Message.Provenance.Timestamp);
+
+                UpdateHash(building, message);
+
+                await context
+                    .BuildingDetailsV2
+                    .AddAsync(building, ct);
+            });
+        }
+
+        private static void UpdateHash<T>(BuildingDetailItemV2 entity, Envelope<T> wrappedEvent) where T : IHaveHash, IMessage
+        {
+            if (!wrappedEvent.Metadata.ContainsKey(AddEventHashPipe.HashMetadataKey))
+            {
+                throw new InvalidOperationException($"Cannot find hash in metadata for event at position {wrappedEvent.Position}");
+            }
+
+            entity.LastEventHash = wrappedEvent.Metadata[AddEventHashPipe.HashMetadataKey].ToString()!;
         }
     }
 }

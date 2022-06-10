@@ -856,6 +856,32 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
                     .BuildingSyndication
                     .AddAsync(newBuildingSyndicationItem, ct); ;
             });
+
+            When<Envelope<BuildingWasPlannedV2>>(async (context, message, ct) =>
+            {
+                var buildingUnitSyndicationItems = new Collection<BuildingUnitSyndicationItemV2>();
+                var newBuildingSyndicationItem = new BuildingSyndicationItem
+                {
+                    Position = message.Position,
+                    PersistentLocalId = message.Message.BuildingPersistentLocalId,
+                    Status = MapBuildingStatus(BuildingRegistry.Building.BuildingStatus.Planned),
+                    GeometryMethod = MapBuildingGeometryMethod(BuildingRegistry.Building.BuildingGeometryMethod.Outlined),
+                    Geometry = message.Message.ExtendedWkbGeometry.ToByteArray(),
+                    IsComplete = true,
+                    RecordCreatedAt = message.Message.Provenance.Timestamp,
+                    LastChangedOn = message.Message.Provenance.Timestamp,
+                    ChangeType = message.EventName,
+                    SyndicationItemCreatedAt = DateTimeOffset.Now,
+                    BuildingUnitsV2 = buildingUnitSyndicationItems
+                };
+
+                newBuildingSyndicationItem.ApplyProvenance(message.Message.Provenance);
+                newBuildingSyndicationItem.SetEventData(message.Message, message.EventName);
+
+                await context
+                    .BuildingSyndication
+                    .AddAsync(newBuildingSyndicationItem, ct); ;
+            });
         }
 
         private static BuildingGeometryMethod MapBuildingGeometryMethod(BuildingRegistry.Building.BuildingGeometryMethod buildingGeometryMethod)

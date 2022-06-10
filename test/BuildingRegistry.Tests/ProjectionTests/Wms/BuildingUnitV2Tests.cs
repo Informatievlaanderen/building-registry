@@ -161,6 +161,26 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wms
                 });
         }
 
+        [Fact]
+        public async Task WhenBuildingWasPlannedV2()
+        {
+            var buildingWasPlannedV2 = _fixture.Create<BuildingWasPlannedV2>();
+            var metadata = new Dictionary<string, object>
+            {
+                { AddEventHashPipe.HashMetadataKey, buildingWasPlannedV2.GetHash() }
+            };
+
+            await Sut
+                .Given(new Envelope<BuildingWasPlannedV2>(new Envelope(buildingWasPlannedV2, metadata)))
+                .Then(async ct =>
+                {
+                    var buildingDetailItemV2 = (await ct.BuildingUnitBuildingsV2.FindAsync(buildingWasPlannedV2.BuildingPersistentLocalId));
+                    buildingDetailItemV2.Should().NotBeNull();
+                    buildingDetailItemV2.BuildingRetiredStatus.Should().BeNull();
+                    buildingDetailItemV2.IsRemoved.Should().BeFalse();
+                });
+        }
+
         protected override BuildingUnitV2Projections CreateProjection() => new BuildingUnitV2Projections(WKBReaderFactory.Create());
     }
 }

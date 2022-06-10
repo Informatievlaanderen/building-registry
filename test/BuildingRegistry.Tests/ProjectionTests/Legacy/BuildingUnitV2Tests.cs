@@ -18,7 +18,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Legacy
     public class BuildingUnitV2Tests : BuildingLegacyProjectionTest<BuildingUnitDetailV2Projections>
     {
         private readonly Fixture? _fixture = new Fixture();
-        
+
         public BuildingUnitV2Tests()
         {
             _fixture.Customize(new InfrastructureCustomization());
@@ -86,7 +86,30 @@ namespace BuildingRegistry.Tests.ProjectionTests.Legacy
                             AddressPersistentLocalId = x,
                             Count = 1
                         }));
+
+                        expectedUnit.LastEventHash.Should().Be(buildingWasMigrated.GetHash());
                     }
+                });
+        }
+
+        [Fact]
+        public async Task WhenBuildingWasPlanned()
+        {
+            var buildingWasPlannedV2 = _fixture.Create<BuildingWasPlannedV2>();
+            var metadata = new Dictionary<string, object>
+            {
+                { AddEventHashPipe.HashMetadataKey, buildingWasPlannedV2.GetHash() }
+            };
+
+            await Sut
+                .Given(new Envelope<BuildingWasPlannedV2>(new Envelope(buildingWasPlannedV2, metadata)))
+                .Then(async ct =>
+                {
+                    var buildingDetailItemV2 = (await ct.BuildingUnitBuildingsV2.FindAsync(buildingWasPlannedV2.BuildingPersistentLocalId));
+                    buildingDetailItemV2.Should().NotBeNull();
+
+                    buildingDetailItemV2.IsRemoved.Should().BeFalse();
+                    buildingDetailItemV2.BuildingRetiredStatus.Should().BeNull();
                 });
         }
 
