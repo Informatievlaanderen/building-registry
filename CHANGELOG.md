@@ -1,3 +1,10 @@
+## [3.8.2](https://github.com/informatievlaanderen/building-registry/compare/v3.8.1...v3.8.2) (2022-06-10)
+
+
+### Bug Fixes
+
+* correct containerize migrator ([069d98a](https://github.com/informatievlaanderen/building-registry/commit/069d98ad537d2b72089c5e849d4abd6683f972e3))
+
 ## [3.8.1](https://github.com/informatievlaanderen/building-registry/compare/v3.8.0...v3.8.1) (2022-06-10)
 
 
