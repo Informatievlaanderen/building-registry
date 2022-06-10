@@ -2,10 +2,9 @@ namespace BuildingRegistry.Api.BackOffice.Building
 {
     using System.Collections.Generic;
     using Be.Vlaanderen.Basisregisters.Api;
-    using Be.Vlaanderen.Basisregisters.CommandHandling;
+    using Be.Vlaanderen.Basisregisters.AspNetCore.Mvc.Middleware;
     using FluentValidation;
     using FluentValidation.Results;
-    using Infrastructure;
     using MediatR;
     using Microsoft.AspNetCore.Mvc;
 
@@ -13,13 +12,25 @@ namespace BuildingRegistry.Api.BackOffice.Building
     [AdvertiseApiVersions("2.0")]
     [ApiRoute("gebouwen")]
     [ApiExplorerSettings(GroupName = "gebouwen")]
-    public partial class BuildingController : ApiBusController
+    public partial class BuildingController : ApiController
     {
         private readonly IMediator _mediator;
 
-        public BuildingController(IMediator mediator, ICommandHandlerResolver bus) : base(bus)
+        public BuildingController(IMediator mediator)
         {
             _mediator = mediator;
+        }
+
+        protected IDictionary<string, object> GetMetadata()
+        {
+            var userId = User.FindFirst("urn:be:vlaanderen:buildingregistry:acmid")?.Value;
+            var correlationId = User.FindFirst(AddCorrelationIdMiddleware.UrnBasisregistersVlaanderenCorrelationId)?.Value;
+
+            return new Dictionary<string, object>
+            {
+                { "UserId", userId },
+                { "CorrelationId", correlationId }
+            };
         }
 
         private ValidationException CreateValidationException(string errorCode, string propertyName, string message)

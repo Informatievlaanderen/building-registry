@@ -8,7 +8,7 @@ namespace BuildingRegistry.Api.BackOffice.Building
     using Be.Vlaanderen.Basisregisters.Api.ETag;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
     using FluentValidation;
-    using Infrastructure;
+    using Handlers.Building;
     using Infrastructure.Options;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;

@@ -8,7 +8,6 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenPlanningBuilding
     using BuildingRegistry.Api.BackOffice.Abstractions.Building.Validators;
     using BuildingRegistry.Api.BackOffice.Building;
     using FluentAssertions;
-    using Microsoft.AspNetCore.Mvc;
     using Moq;
     using Xunit;
     using Xunit.Abstractions;

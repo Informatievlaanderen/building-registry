@@ -5,9 +5,9 @@ namespace BuildingRegistry.Tests.BackOffice
     using System.Security.Claims;
     using Autofac;
     using AutoFixture;
+    using Be.Vlaanderen.Basisregisters.Api;
     using Be.Vlaanderen.Basisregisters.CommandHandling;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
-    using BuildingRegistry.Api.BackOffice.Infrastructure;
     using BuildingRegistry.Api.BackOffice.Infrastructure.Options;
     using MediatR;
     using Microsoft.AspNetCore.Http;
@@ -35,12 +35,11 @@ namespace BuildingRegistry.Tests.BackOffice
             bus.Dispatch(command.CreateCommandId(), command);
         }
 
-        public T CreateApiBusControllerWithUser<T>(string username) where T : ApiBusController
+        public T CreateApiBusControllerWithUser<T>(string username) where T : ApiController
         {
-            var bus = Container.Resolve<ICommandHandlerResolver>();
-            var controller = Activator.CreateInstance(typeof(T), MockMediator.Object, bus) as T;
+            var controller = Activator.CreateInstance(typeof(T), MockMediator.Object) as T;
 
-            var claims = new List<Claim>()
+            var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.Name, "username"),
                 new Claim(ClaimTypes.NameIdentifier, "userId"),

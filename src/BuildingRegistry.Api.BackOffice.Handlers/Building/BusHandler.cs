@@ -37,7 +37,6 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Building
                 .Where(x => x.CommandId == commandId)
                 .ToDictionaryAsync(x => x.CommandContentHash, x => x, cancellationToken);
 
-
             var contentHash = SHA512
                 .Create()
                 .ComputeHash(Encoding.UTF8.GetBytes((string)command.ToString()))
@@ -49,7 +48,6 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Building
                 throw new IdempotencyException("Already processed");
 
             var processedCommand = new ProcessedCommand(commandId.Value, contentHash);
-
             try
             {
                 // Store commandId in Command Store if it does not exist
@@ -77,7 +75,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Building
         {
             return new Provenance(
                 NodaTime.SystemClock.Instance.GetCurrentInstant(),
-                Application.StreetNameRegistry,
+                Application.BuildingRegistry,
                 new Reason(""), // TODO: TBD
                 new Operator(""), // TODO: from claims
                 Modification.Insert,
