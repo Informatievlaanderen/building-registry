@@ -44,7 +44,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenPlanningBuilding
             };
 
             //Act
-            var result = (AcceptedResult)await _controller.Plan(
+            var result = (AcceptedWithETagResult)await _controller.Plan(
                 ResponseOptions,
                 new PlanBuildingRequestValidator(),
                 body);
@@ -52,8 +52,9 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenPlanningBuilding
             //Assert
             MockMediator.Verify(x => x.Send(It.IsAny<PlanBuildingRequest>(), CancellationToken.None), Times.Once);
 
+            result.StatusCode.Should().Be(202);
             result.Location.Should().Be(string.Format(DetailUrl, expectedLocation));
-            //TODO: check hash
+            result.ETag.Should().Be(expectedHash);
         }
     }
 }

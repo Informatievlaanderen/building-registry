@@ -48,6 +48,7 @@ namespace BuildingRegistry.Api.BackOffice.Infrastructure.Modules
             containerBuilder.RegisterModule(new EnvelopeModule());
             containerBuilder.RegisterModule(new BackOfficeModule(_configuration, _services, _loggerFactory));
             containerBuilder.RegisterModule(new EditModule(_configuration, _services, _loggerFactory));
+            containerBuilder.RegisterModule(new MediatRModule());
 
             containerBuilder.Populate(_services);
         }
