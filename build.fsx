@@ -58,11 +58,13 @@ Target.create "Publish_Solution" (fun _ ->
     "BuildingRegistry.Api.CrabImport"
     "BuildingRegistry.Api.CrabImport.Abstractions"
     "BuildingRegistry.Api.CrabImport.Handlers"
+    "BuildingRegistry.Api.BackOffice"
     "BuildingRegistry.Consumer.Address"
     "BuildingRegistry.Projections.Legacy"
     "BuildingRegistry.Projections.Extract"
     "BuildingRegistry.Projections.LastChangedList"
     "BuildingRegistry.Projections.Syndication"
+    "BuildingRegistry.Migrator.Building"
   ] |> List.iter publishSource)
 
 Target.create "Pack_Solution" (fun _ ->
@@ -75,6 +77,8 @@ Target.create "Pack_Solution" (fun _ ->
     "BuildingRegistry.Api.Extract"
     "BuildingRegistry.Api.Extract.Abstractions"
     "BuildingRegistry.Api.CrabImport"
+    "BuildingRegistry.Api.BackOffice"
+    "BuildingRegistry.Migrator.Building"
   ] |> List.iter pack)
 
 Target.create "Containerize_Projector" (fun _ -> containerize "BuildingRegistry.Projector" "projector")
@@ -88,6 +92,9 @@ Target.create "PushContainer_ApiOslo" (fun _ -> push "api-oslo")
 
 Target.create "Containerize_ApiExtract" (fun _ -> containerize "BuildingRegistry.Api.Extract" "api-extract")
 Target.create "PushContainer_ApiExtract" (fun _ -> push "api-extract")
+
+Target.create "Containerize_ApiBackOffice" (fun _ -> containerize "BuildingRegistry.Api.BackOffice" "api-backoffice")
+Target.create "PushContainer_ApiBackOffice" (fun _ -> push "api-backoffice")
 
 Target.create "Containerize_ApiCrabImport" (fun _ ->
   let dist = (buildDir @@ "BuildingRegistry.Api.CrabImport" @@ "linux")
@@ -111,6 +118,9 @@ Target.create "PushContainer_ProjectionsSyndication" (fun _ -> push "projections
 
 Target.create "Containerize_ConsumerAddress" (fun _ -> containerize "BuildingRegistry.Consumer.Address" "consumer-address")
 Target.create "PushContainer_ConsumerAddress" (fun _ -> push "consumer-address")
+
+Target.create "Containerize_Migrator_Building" (fun _ -> containerize "BuildingRegistry.Migrator.Building" "migrator-building")
+Target.create "PushContainer_Migrator_Building" (fun _ -> push "migrator-building")
 
 // --------------------------------------------------------------------------------
 
@@ -146,9 +156,11 @@ Target.create "Push" ignore
   ==> "Containerize_ApiOslo"
   ==> "Containerize_ApiExtract"
   ==> "Containerize_ApiCrabImport"
+  ==> "Containerize_ApiBackOffice"
   ==> "Containerize_ProjectionsSyndication"
   ==> "Containerize_ConsumerAddress"
   ==> "Containerize"
+  ==> "Containerize_Migrator_Building"
 // Possibly add more projects to containerize here
 
 "Containerize"
@@ -158,8 +170,10 @@ Target.create "Push" ignore
   ==> "PushContainer_ApiOslo"
   ==> "PushContainer_ApiExtract"
   ==> "PushContainer_ApiCrabImport"
+  ==> "PushContainer_ApiBackOffice"
   ==> "PushContainer_ProjectionsSyndication"
   ==> "PushContainer_ConsumerAddress"
+  ==> "PushContainer_Migrator_Building"
   ==> "Push"
 // Possibly add more projects to push here
 
