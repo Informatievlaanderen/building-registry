@@ -1,3 +1,10 @@
+## [3.7.1](https://github.com/informatievlaanderen/building-registry/compare/v3.7.0...v3.7.1) (2022-06-10)
+
+
+### Bug Fixes
+
+* remove ParallelForEachAsync ([91b6aa4](https://github.com/informatievlaanderen/building-registry/commit/91b6aa40a733fcacc723960953bf118b11fe8b30))
+
 # [3.7.0](https://github.com/informatievlaanderen/building-registry/compare/v3.6.0...v3.7.0) (2022-06-10)
 
 
