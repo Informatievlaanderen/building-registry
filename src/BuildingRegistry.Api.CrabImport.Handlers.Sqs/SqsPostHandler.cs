@@ -32,29 +32,29 @@ namespace BuildingRegistry.Api.CrabImport.Handlers.Sqs
 
         public async Task<Unit> Handle(SqsPostRequest request, CancellationToken cancellationToken)
         {
-            await request.RegisterCrabImportList.ParallelForEachAsync(async registerCrabImports =>
+            const string accessKey = "";
+            const string secretKey = "";
+            const string sessionToken = "";
+            var regionEndpoint = RegionEndpoint.EUWest1;
+
+            var commandsPerCommandId = request.RegisterCrabImportList//.ToList()
+                .SelectMany(x => x)
+                .Select(RegisterCrabImportRequestMapping.Map)
+                .Distinct(new LambdaEqualityComparer<dynamic?>(x => x.CreateCommandId().ToString()))
+                .ToDictionary(x => (Guid?)x!.CreateCommandId(), x => x);
+
+            var sqsOptions = new SqsOptions(accessKey, secretKey, sessionToken, regionEndpoint);
+            var queueUrl = await SqsQueue.CreateQueue(sqsOptions, nameof(SqsPostHandler), true, cancellationToken);
+
+            foreach (var command in commandsPerCommandId)
             {
-                const string accessKey = "";
-                const string secretKey = "";
-                const string sessionToken = "";
+                _logger.LogDebug($"Copying command {command.Key} to queue");
 
-                var commandsPerCommandId = registerCrabImports
-                    .Select(RegisterCrabImportRequestMapping.Map)
-                    .Distinct(new LambdaEqualityComparer<dynamic?>(x => x.CreateCommandId().ToString()))
-                    .ToDictionary(x => (Guid?)x!.CreateCommandId(), x => x);
-
-                var queueUrl = await SqsQueue.CreateQueue(new SqsOptions(accessKey, secretKey, sessionToken, RegionEndpoint.EUWest1), nameof(SqsPostHandler), true, cancellationToken);
-
-                foreach (var command in commandsPerCommandId)
-                {
-                    _logger.LogDebug($"Copying command {command.Key} to queue");
-
-                    var groupId = command.Key.HasValue
-                        ? command.Key.Value.ToString("D")
-                        : "";
-                    await SqsProducer.Produce(new SqsOptions(accessKey, secretKey, sessionToken, RegionEndpoint.EUWest1), queueUrl, command.Value, groupId, cancellationToken);
-                }
-            }, cancellationToken: cancellationToken, maxDegreeOfParallelism: 0);
+                var groupId = command.Key.HasValue
+                    ? command.Key.Value.ToString("D")
+                    : "";
+                await SqsProducer.Produce(sqsOptions, queueUrl, command.Value, groupId, cancellationToken);
+            }
 
             return Unit.Value;
         }
