@@ -19,6 +19,7 @@ namespace BuildingRegistry.Consumer.Address.Projections
                             AddressStatus.Parse(message.Status),
                             message.IsRemoved)
                         , ct);
+                await context.SaveChangesAsync(ct);
             });
 
             When<AddressWasProposedV2>(async (context, message, ct) =>
@@ -29,12 +30,14 @@ namespace BuildingRegistry.Consumer.Address.Projections
                             message.AddressPersistentLocalId,
                             AddressStatus.Proposed)
                         , ct);
+                await context.SaveChangesAsync(ct);
             });
 
             When<AddressWasApproved>(async (context, message, ct) =>
             {
                 var address = await context.AddressConsumerItems.FindAsync(message.AddressPersistentLocalId, cancellationToken: ct);
                 address.Status = AddressStatus.Current;
+                await context.SaveChangesAsync(ct);
             });
         }
     }
