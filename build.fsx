@@ -119,8 +119,8 @@ Target.create "PushContainer_ProjectionsSyndication" (fun _ -> push "projections
 Target.create "Containerize_ConsumerAddress" (fun _ -> containerize "BuildingRegistry.Consumer.Address" "consumer-address")
 Target.create "PushContainer_ConsumerAddress" (fun _ -> push "consumer-address")
 
-Target.create "Containerize_Migrator_Building" (fun _ -> containerize "BuildingRegistry.Migrator.Building" "migrator-building")
-Target.create "PushContainer_Migrator_Building" (fun _ -> push "migrator-building")
+Target.create "Containerize_MigratorBuilding" (fun _ -> containerize "BuildingRegistry.Migrator.Building" "migrator-building")
+Target.create "PushContainer_MigratorBuilding" (fun _ -> push "migrator-building")
 
 // --------------------------------------------------------------------------------
 
@@ -159,8 +159,8 @@ Target.create "Push" ignore
   ==> "Containerize_ApiBackOffice"
   ==> "Containerize_ProjectionsSyndication"
   ==> "Containerize_ConsumerAddress"
-  ==> "Containerize"
-  ==> "Containerize_Migrator_Building"
+  ==> "Containerize_MigratorBuilding"
+  ==> "Containerize"  
 // Possibly add more projects to containerize here
 
 "Containerize"
@@ -173,7 +173,7 @@ Target.create "Push" ignore
   ==> "PushContainer_ApiBackOffice"
   ==> "PushContainer_ProjectionsSyndication"
   ==> "PushContainer_ConsumerAddress"
-  ==> "PushContainer_Migrator_Building"
+  ==> "PushContainer_MigratorBuilding"
   ==> "Push"
 // Possibly add more projects to push here
 
