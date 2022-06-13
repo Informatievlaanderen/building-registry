@@ -184,12 +184,12 @@ namespace BuildingRegistry.Migrator.Building.Infrastructure
                     {
                         var addressItem = _consumedAddressItems.FirstOrDefault(x => x.AddressId == addressId);
 
-                        //if (addressItem is null)
-                        //{
-                        //    throw new InvalidOperationException($"AddressConsumerItem for addressId '{addressId}' was not found in the ConsumerAddressContext.");
-                        //}
+                        if (addressItem is null)
+                        {
+                            throw new InvalidOperationException($"AddressConsumerItem for addressId '{addressId}' was not found in the ConsumerAddressContext.");
+                        }
 
-                        addressPersistentLocalIds.Add(new AddressPersistentLocalId(1 /* TODO: addressItem.AddressPersistentLocalId */ ));
+                        addressPersistentLocalIds.Add(new AddressPersistentLocalId(addressItem.AddressPersistentLocalId));
                     }
 
                     commandBuildingUnits.Add(new BuildingUnit(legacyBuildingUnit.BuildingUnitId, legacyBuildingUnit.PersistentLocalId, legacyBuildingUnit.Function, status, addressPersistentLocalIds, legacyBuildingUnit.BuildingUnitPosition, legacyBuildingUnit.IsRemoved));
