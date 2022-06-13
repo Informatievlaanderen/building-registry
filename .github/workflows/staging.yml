@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix: 
-        services: ['building-registry-api', 'building-registry-projections', 'building-registry-consumer-address', 'building-registry-backoffice-api', 'building-registry-migrator-building']
+        services: ['building-registry-api', 'building-registry-projections', 'building-registry-consumer-address']
     steps:
     - name: CD
       env:
