@@ -33,6 +33,8 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetailV2
             set => VersionTimestampAsDateTimeOffset = value.ToDateTimeOffset();
         }
 
+        public string? LastEventHash { get; set; }
+
         private BuildingUnitDetailItemV2()
         {
             Addresses = new Collection<BuildingUnitDetailAddressItemV2>();

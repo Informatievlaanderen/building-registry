@@ -82,7 +82,9 @@ namespace BuildingRegistry.Api.BackOffice.Infrastructure
                     },
                     MiddlewareHooks =
                     {
-                        FluentValidation = fv => fv.RegisterValidatorsFromAssemblyContaining<Startup>(),
+                        FluentValidation = fv => fv
+                            .RegisterValidatorsFromAssemblyContaining<Startup>()
+                            .RegisterValidatorsFromAssemblyContaining<Abstractions.Building.Validators.PlanBuildingRequestValidator>(),
 
                         AfterHealthChecks = health =>
                         {

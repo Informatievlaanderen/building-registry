@@ -2,19 +2,36 @@ namespace BuildingRegistry.Api.BackOffice.Building
 {
     using System.Collections.Generic;
     using Be.Vlaanderen.Basisregisters.Api;
-    using Be.Vlaanderen.Basisregisters.CommandHandling;
-    using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
+    using Be.Vlaanderen.Basisregisters.AspNetCore.Mvc.Middleware;
     using FluentValidation;
     using FluentValidation.Results;
+    using MediatR;
     using Microsoft.AspNetCore.Mvc;
 
     [ApiVersion("2.0")]
     [AdvertiseApiVersions("2.0")]
     [ApiRoute("gebouwen")]
     [ApiExplorerSettings(GroupName = "gebouwen")]
-    public partial class BuildingController : ApiBusController
+    public partial class BuildingController : ApiController
     {
-        public BuildingController(ICommandHandlerResolver bus) : base(bus) { }
+        private readonly IMediator _mediator;
+
+        public BuildingController(IMediator mediator)
+        {
+            _mediator = mediator;
+        }
+
+        protected IDictionary<string, object> GetMetadata()
+        {
+            var userId = User.FindFirst("urn:be:vlaanderen:buildingregistry:acmid")?.Value;
+            var correlationId = User.FindFirst(AddCorrelationIdMiddleware.UrnBasisregistersVlaanderenCorrelationId)?.Value;
+
+            return new Dictionary<string, object>
+            {
+                { "UserId", userId },
+                { "CorrelationId", correlationId }
+            };
+        }
 
         private ValidationException CreateValidationException(string errorCode, string propertyName, string message)
         {
@@ -27,18 +44,6 @@ namespace BuildingRegistry.Api.BackOffice.Building
             {
                 failure
             });
-        }
-
-        private Provenance CreateFakeProvenance()
-        {
-            return new Provenance(
-                NodaTime.SystemClock.Instance.GetCurrentInstant(),
-                Application.StreetNameRegistry,
-                new Reason(""), // TODO: TBD
-                new Operator(""), // TODO: from claims
-                Modification.Insert,
-                Organisation.DigitaalVlaanderen // TODO: from claims
-            );
         }
     }
 }

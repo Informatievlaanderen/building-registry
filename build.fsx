@@ -59,6 +59,8 @@ Target.create "Publish_Solution" (fun _ ->
     "BuildingRegistry.Api.CrabImport.Abstractions"
     "BuildingRegistry.Api.CrabImport.Handlers"
     "BuildingRegistry.Api.BackOffice"
+    "BuildingRegistry.Api.BackOffice.Abstractions"
+    "BuildingRegistry.Api.BackOffice.Handlers"
     "BuildingRegistry.Consumer.Address"
     "BuildingRegistry.Projections.Legacy"
     "BuildingRegistry.Projections.Extract"
@@ -78,6 +80,7 @@ Target.create "Pack_Solution" (fun _ ->
     "BuildingRegistry.Api.Extract.Abstractions"
     "BuildingRegistry.Api.CrabImport"
     "BuildingRegistry.Api.BackOffice"
+    "BuildingRegistry.Api.BackOffice.Abstractions"
     "BuildingRegistry.Migrator.Building"
   ] |> List.iter pack)
 
@@ -160,7 +163,7 @@ Target.create "Push" ignore
   ==> "Containerize_ProjectionsSyndication"
   ==> "Containerize_ConsumerAddress"
   ==> "Containerize_MigratorBuilding"
-  ==> "Containerize"  
+  ==> "Containerize"
 // Possibly add more projects to containerize here
 
 "Containerize"

@@ -7,6 +7,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Legacy
     using Be.Vlaanderen.Basisregisters.GrAr.Common.Pipes;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore;
     using Be.Vlaanderen.Basisregisters.Utilities.HexByteConvertor;
+    using Building;
     using Building.Events;
     using FluentAssertions;
     using Projections.Legacy.BuildingDetailV2;
@@ -50,6 +51,32 @@ namespace BuildingRegistry.Tests.ProjectionTests.Legacy
                     buildingDetailItemV2.Version.Should().Be(buildingWasMigrated.Provenance.Timestamp);
                     buildingDetailItemV2.Geometry.Should().BeEquivalentTo(buildingWasMigrated.ExtendedWkbGeometry.ToByteArray());
                     buildingDetailItemV2.GeometryMethod.Value.Should().Be(buildingWasMigrated.GeometryMethod);
+                    buildingDetailItemV2.LastEventHash.Should().Be(buildingWasMigrated.GetHash());
+                });
+        }
+
+        [Fact]
+        public async Task WhenBuildingWasPlanned()
+        {
+            var buildingWasPlannedV2 = _fixture.Create<BuildingWasPlannedV2>();
+            var metadata = new Dictionary<string, object>
+            {
+                { AddEventHashPipe.HashMetadataKey, buildingWasPlannedV2.GetHash() }
+            };
+
+            await Sut
+                .Given(new Envelope<BuildingWasPlannedV2>(new Envelope(buildingWasPlannedV2, metadata)))
+                .Then(async ct =>
+                {
+                    var buildingDetailItemV2 = (await ct.BuildingDetailsV2.FindAsync(buildingWasPlannedV2.BuildingPersistentLocalId));
+                    buildingDetailItemV2.Should().NotBeNull();
+
+                    buildingDetailItemV2.IsRemoved.Should().BeFalse();
+                    buildingDetailItemV2.Status.Should().Be(BuildingStatus.Planned);
+                    buildingDetailItemV2.Version.Should().Be(buildingWasPlannedV2.Provenance.Timestamp);
+                    buildingDetailItemV2.Geometry.Should().BeEquivalentTo(buildingWasPlannedV2.ExtendedWkbGeometry.ToByteArray());
+                    buildingDetailItemV2.GeometryMethod.Should().Be(BuildingGeometryMethod.Outlined);
+                    buildingDetailItemV2.LastEventHash.Should().Be(buildingWasPlannedV2.GetHash());
                 });
         }
 

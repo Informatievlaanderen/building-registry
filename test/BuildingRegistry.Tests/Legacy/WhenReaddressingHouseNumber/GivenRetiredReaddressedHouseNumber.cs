@@ -49,9 +49,29 @@ namespace BuildingRegistry.Tests.Legacy.WhenReaddressingHouseNumber
 
             Gebouw1CrabTerrainObjectId = Fixture.Create<CrabTerrainObjectId>();
             OldHuisNr16KoppelingId = Fixture.Create<CrabTerrainObjectHouseNumberId>();
-            NewHuisNr16KoppelingId = new CrabTerrainObjectHouseNumberId(Fixture.Create<int>());
+            NewHuisNr16KoppelingId = new CrabTerrainObjectHouseNumberId(Fixture.Build<int>().FromFactory(() =>
+            {
+                var newInt = Fixture.Create<int>();
+                while (newInt == OldHuisNr16KoppelingId)
+                {
+                    newInt = Fixture.Create<int>();
+                }
+
+                return newInt;
+            }).Create());
+
             OldHuisNr16Id = Fixture.Create<CrabHouseNumberId>();
-            NewHuisNr16Id = new CrabHouseNumberId(Fixture.Create<int>());
+            NewHuisNr16Id = new CrabHouseNumberId(Fixture.Build<int>().FromFactory(() =>
+            {
+                var newInt = Fixture.Create<int>();
+                while (newInt == OldHuisNr16KoppelingId)
+                {
+                    newInt = Fixture.Create<int>();
+                }
+
+                return newInt;
+            }).Create());
+
             ReaddressingBeginDate = new ReaddressingBeginDate(Fixture.Create<LocalDate>());
         }
 
@@ -197,7 +217,7 @@ namespace BuildingRegistry.Tests.Legacy.WhenReaddressingHouseNumber
             Assert(AddReaddressedTerrainObjectHouseNumberWithNewHouseNumberId());
         }
 
-        [Fact] //TODO: *FLICKERING TEST* sometimes it crashes, check id's
+        [Fact]
         public void RetireNewHouseNumberTest()
         {
             Assert(RetireWithNewHouseNumberId());

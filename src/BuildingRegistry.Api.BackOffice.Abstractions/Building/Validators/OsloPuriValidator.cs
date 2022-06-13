@@ -1,4 +1,4 @@
-namespace BuildingRegistry.Api.BackOffice.Validators
+namespace BuildingRegistry.Api.BackOffice.Abstractions.Building.Validators
 {
     using System;
     using Be.Vlaanderen.Basisregisters.GrAr.Common.Oslo.Extensions;

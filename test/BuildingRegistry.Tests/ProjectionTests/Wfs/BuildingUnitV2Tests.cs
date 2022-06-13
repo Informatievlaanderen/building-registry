@@ -20,7 +20,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wfs
     public class BuildingUnitV2Tests : BuildingWfsProjectionTest<BuildingUnitV2Projections>
     {
         private readonly Fixture? _fixture = new Fixture();
-        
+
         public BuildingUnitV2Tests()
         {
             _fixture.Customize(new InfrastructureCustomization());
@@ -84,6 +84,26 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wfs
                         var point = WKBReaderFactory.Create().Read(unit.ExtendedWkbGeometry.ToByteArray()) as Point;
                         expectedUnit.Position.Should().Be(point);
                     }
+                });
+        }
+
+        [Fact]
+        public async Task WhenBuildingWasPlannedV2()
+        {
+            var buildingWasPlannedV2 = _fixture.Create<BuildingWasPlannedV2>();
+            var metadata = new Dictionary<string, object>
+            {
+                { AddEventHashPipe.HashMetadataKey, buildingWasPlannedV2.GetHash() }
+            };
+
+            await Sut
+                .Given(new Envelope<BuildingWasPlannedV2>(new Envelope(buildingWasPlannedV2, metadata)))
+                .Then(async ct =>
+                {
+                    var buildingDetailItemV2 = (await ct.BuildingUnitsBuildingsV2.FindAsync(buildingWasPlannedV2.BuildingPersistentLocalId));
+                    buildingDetailItemV2.Should().NotBeNull();
+                    buildingDetailItemV2.BuildingRetiredStatus.Should().BeNull();
+                    buildingDetailItemV2.IsRemoved.Should().BeFalse();
                 });
         }
 

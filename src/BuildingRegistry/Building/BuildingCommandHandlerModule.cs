@@ -45,6 +45,27 @@ namespace BuildingRegistry.Building
 
                     buildingRepository().Add(streamId, newBuilding);
                 });
+
+            For<PlanBuilding>()
+                .AddSqlStreamStore(getStreamStore, getUnitOfWork, eventMapping, eventSerializer)
+                .AddEventHash<PlanBuilding, Building>(getUnitOfWork)
+                .AddProvenance(getUnitOfWork, provenanceFactory)
+                .Handle(async (message, ct) =>
+                {
+                    var streamId = new BuildingStreamId(message.Command.BuildingPersistentLocalId);
+                    var building = await buildingRepository().GetOptionalAsync(streamId, ct);
+
+                    if (building.HasValue)
+                    {
+                        throw new AggregateSourceException($"Building with id {message.Command.BuildingPersistentLocalId} already exists");
+                    }
+
+                    var newBuilding = Building.Plan(
+                        message.Command.BuildingPersistentLocalId,
+                        message.Command.Geometry);
+
+                    buildingRepository().Add(streamId, newBuilding);
+                });
         }
     }
 }

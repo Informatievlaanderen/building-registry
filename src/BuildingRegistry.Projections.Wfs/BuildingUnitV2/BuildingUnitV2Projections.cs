@@ -56,6 +56,16 @@ namespace BuildingRegistry.Projections.Wfs.BuildingUnitV2
                     await context.BuildingUnitsV2.AddAsync(buildingUnitV2, ct);
                 }
             });
+
+            When<Envelope<BuildingWasPlannedV2>>(async (context, message, ct) =>
+            {
+                await context.BuildingUnitsBuildingsV2.AddAsync(new BuildingUnitBuildingItemV2
+                {
+                    BuildingPersistentLocalId = message.Message.BuildingPersistentLocalId,
+                    IsRemoved = false,
+                    BuildingRetiredStatus = null
+                }, ct);
+            });
         }
 
         private static void SetVersion(BuildingUnitV2 unit, Instant timestamp) => unit.Version = timestamp;

@@ -26,6 +26,8 @@ namespace BuildingRegistry.Projections.Legacy.BuildingDetailV2
             set => VersionTimestampAsDateTimeOffset = value.ToDateTimeOffset();
         }
 
+        public string? LastEventHash { get; set; }
+
         private BuildingDetailItemV2()
         {
             Geometry = Array.Empty<byte>();

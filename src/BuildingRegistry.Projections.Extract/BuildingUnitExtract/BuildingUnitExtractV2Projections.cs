@@ -89,6 +89,18 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
                     await context.BuildingUnitExtractV2.AddAsync(buildingUnitItemV2, ct);
                 }
             });
+
+            When<Envelope<BuildingWasPlannedV2>>(async (context, message, ct) =>
+            {
+                var buildingUnitBuildingItemV2 = new BuildingUnitBuildingItemV2
+                {
+                    BuildingPersistentLocalId = message.Message.BuildingPersistentLocalId,
+                    IsRemoved = false,
+                    BuildingRetiredStatus = null,
+                };
+
+                await context.BuildingUnitBuildingsV2.AddAsync(buildingUnitBuildingItemV2, ct);
+            });
         }
 
         private static string MapFunction(BuildingUnitFunction function)

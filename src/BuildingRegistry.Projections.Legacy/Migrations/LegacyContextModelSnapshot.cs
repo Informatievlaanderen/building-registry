@@ -116,6 +116,9 @@ namespace BuildingRegistry.Projections.Legacy.Migrations
                     b.Property<bool>("IsRemoved")
                         .HasColumnType("bit");
 
+                    b.Property<string>("LastEventHash")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
@@ -580,6 +583,9 @@ namespace BuildingRegistry.Projections.Legacy.Migrations
 
                     b.Property<bool>("IsRemoved")
                         .HasColumnType("bit");
+
+                    b.Property<string>("LastEventHash")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<byte[]>("Position")
                         .IsRequired()

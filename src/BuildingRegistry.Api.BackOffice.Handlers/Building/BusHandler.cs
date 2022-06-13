@@ -1,4 +1,4 @@
-namespace BuildingRegistry.Api.BackOffice.Building
+namespace BuildingRegistry.Api.BackOffice.Handlers.Building
 {
     using System;
     using System.Collections.Generic;
@@ -7,36 +7,25 @@ namespace BuildingRegistry.Api.BackOffice.Building
     using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
-    using Be.Vlaanderen.Basisregisters.Api;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
-    using Be.Vlaanderen.Basisregisters.AspNetCore.Mvc.Middleware;
     using Be.Vlaanderen.Basisregisters.CommandHandling;
     using Be.Vlaanderen.Basisregisters.CommandHandling.Idempotency;
+    using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Be.Vlaanderen.Basisregisters.Utilities.HexByteConvertor;
+    using BuildingRegistry.Building;
     using Microsoft.AspNetCore.Http;
     using Microsoft.EntityFrameworkCore;
 
-    public abstract class ApiBusController : ApiController
+    public abstract class BusHandler
     {
         protected ICommandHandlerResolver Bus { get; }
-        protected ApiBusController(ICommandHandlerResolver bus) => Bus = bus;
-
-        protected IDictionary<string, object> GetMetadata()
-        {
-            var userId = User.FindFirst("urn:be:vlaanderen:buildingregistry:acmid")?.Value;
-            var correlationId = User.FindFirst(AddCorrelationIdMiddleware.UrnBasisregistersVlaanderenCorrelationId)?.Value;
-
-            return new Dictionary<string, object>
-            {
-                { "UserId", userId },
-                { "CorrelationId", correlationId }
-            };
-        }
+        protected BusHandler(ICommandHandlerResolver bus) => Bus = bus;
 
         protected async Task<long> IdempotentCommandHandlerDispatch(
             IdempotencyContext context,
             Guid? commandId,
             object command,
+            IDictionary<string, object> metadata,
             CancellationToken cancellationToken)
         {
             if (!commandId.HasValue || command == null)
@@ -48,10 +37,9 @@ namespace BuildingRegistry.Api.BackOffice.Building
                 .Where(x => x.CommandId == commandId)
                 .ToDictionaryAsync(x => x.CommandContentHash, x => x, cancellationToken);
 
-
             var contentHash = SHA512
                 .Create()
-                .ComputeHash(Encoding.UTF8.GetBytes((string) command.ToString()))
+                .ComputeHash(Encoding.UTF8.GetBytes((string)command.ToString()))
                 .ToHexString();
 
             // It is possible we have a GUID collision, check the SHA-512 hash as well to see if it is really the same one.
@@ -60,7 +48,6 @@ namespace BuildingRegistry.Api.BackOffice.Building
                 throw new IdempotencyException("Already processed");
 
             var processedCommand = new ProcessedCommand(commandId.Value, contentHash);
-
             try
             {
                 // Store commandId in Command Store if it does not exist
@@ -72,9 +59,8 @@ namespace BuildingRegistry.Api.BackOffice.Building
                     Bus,
                     commandId.Value,
                     command,
-                    GetMetadata(),
+                    metadata,
                     cancellationToken);
-
             }
             catch
             {
@@ -83,6 +69,28 @@ namespace BuildingRegistry.Api.BackOffice.Building
                 context.SaveChanges();
                 throw;
             }
+        }
+
+        protected Provenance CreateFakeProvenance()
+        {
+            return new Provenance(
+                NodaTime.SystemClock.Instance.GetCurrentInstant(),
+                Application.BuildingRegistry,
+                new Reason(""), // TODO: TBD
+                new Operator(""), // TODO: from claims
+                Modification.Insert,
+                Organisation.DigitaalVlaanderen // TODO: from claims
+            );
+        }
+
+        protected async Task<string> GetBuildingHash(
+            IBuildings buildings,
+            BuildingPersistentLocalId buildingPersistentLocalId,
+            CancellationToken cancellationToken)
+        {
+            var aggregate =
+                await buildings.GetAsync(new BuildingStreamId(buildingPersistentLocalId), cancellationToken);
+            return aggregate.LastEventHash;
         }
     }
 

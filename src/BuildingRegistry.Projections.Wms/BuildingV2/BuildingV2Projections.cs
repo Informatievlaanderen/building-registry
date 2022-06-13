@@ -39,6 +39,21 @@ namespace BuildingRegistry.Projections.Wms.BuildingV2
 
                 await context.BuildingsV2.AddAsync(buildingV2, ct);
             });
+
+            When<Envelope<BuildingWasPlannedV2>>(async (context, message, ct) =>
+            {
+                var buildingV2 = new BuildingV2
+                {
+                    PersistentLocalId = message.Message.BuildingPersistentLocalId,
+                    Id = PersistentLocalIdHelper.CreateBuildingId(message.Message.BuildingPersistentLocalId),
+                    Status = BuildingStatus.Planned,
+                    Version = message.Message.Provenance.Timestamp
+                };
+
+                SetGeometry(buildingV2, message.Message.ExtendedWkbGeometry, BuildingGeometryMethod.Outlined);
+
+                await context.BuildingsV2.AddAsync(buildingV2, ct);
+            });
         }
 
         private static void SetVersion(BuildingV2 building, Instant provenanceTimestamp)

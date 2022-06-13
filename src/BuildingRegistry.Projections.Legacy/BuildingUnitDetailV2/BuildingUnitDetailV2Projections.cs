@@ -1,10 +1,14 @@
 namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetailV2
 {
+    using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
+    using Be.Vlaanderen.Basisregisters.EventHandling;
+    using Be.Vlaanderen.Basisregisters.GrAr.Common;
+    using Be.Vlaanderen.Basisregisters.GrAr.Common.Pipes;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.Connector;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore;
     using Be.Vlaanderen.Basisregisters.Utilities.HexByteConvertor;
@@ -46,20 +50,44 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetailV2
                         })
                         .ToList();
 
+                    var buildingUnitDetailItemV2 = new BuildingUnitDetailItemV2(
+                        buildingUnit.BuildingUnitPersistentLocalId,
+                        message.Message.BuildingPersistentLocalId,
+                        buildingUnit.ExtendedWkbGeometry.ToByteArray(),
+                        BuildingUnitPositionGeometryMethod.Parse(buildingUnit.GeometryMethod),
+                        BuildingUnitFunction.Parse(buildingUnit.Function),
+                        BuildingUnitStatus.Parse(buildingUnit.Status),
+                        new Collection<BuildingUnitDetailAddressItemV2>(addresses),
+                        buildingUnit.IsRemoved,
+                        message.Message.Provenance.Timestamp);
+
+                    UpdateHash(buildingUnitDetailItemV2, message);
+
                     await context.BuildingUnitDetailsV2.AddAsync(
-                        new BuildingUnitDetailItemV2(
-                            buildingUnit.BuildingUnitPersistentLocalId,
-                            message.Message.BuildingPersistentLocalId,
-                            buildingUnit.ExtendedWkbGeometry.ToByteArray(),
-                            BuildingUnitPositionGeometryMethod.Parse(buildingUnit.GeometryMethod),
-                            BuildingUnitFunction.Parse(buildingUnit.Function),
-                            BuildingUnitStatus.Parse(buildingUnit.Status),
-                            new Collection<BuildingUnitDetailAddressItemV2>(addresses),
-                            buildingUnit.IsRemoved,
-                            message.Message.Provenance.Timestamp)
+                        buildingUnitDetailItemV2
                         , ct);
                 }
             });
+
+            When<Envelope<BuildingWasPlannedV2>>(async (context, message, ct) =>
+            {
+                var building = new BuildingUnitBuildingItemV2(
+                    message.Message.BuildingPersistentLocalId,
+                    false,
+                    null);
+
+                await context.BuildingUnitBuildingsV2.AddAsync(building, ct);
+            });
+        }
+
+        private static void UpdateHash<T>(BuildingUnitDetailItemV2 entity, Envelope<T> wrappedEvent) where T : IHaveHash, IMessage
+        {
+            if (!wrappedEvent.Metadata.ContainsKey(AddEventHashPipe.HashMetadataKey))
+            {
+                throw new InvalidOperationException($"Cannot find hash in metadata for event at position {wrappedEvent.Position}");
+            }
+
+            entity.LastEventHash = wrappedEvent.Metadata[AddEventHashPipe.HashMetadataKey].ToString()!;
         }
 
         private static async Task<List<BuildingUnitDetailItemV2>> GetAllBuildingUnitsByBuildingPersistentLocalId(LegacyContext context, int buildingPersistentLocalId, CancellationToken ct)
