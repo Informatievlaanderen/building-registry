@@ -1,6 +1,5 @@
 namespace BuildingRegistry.Projections.Syndication.Address
 {
-    using System;
     using System.Runtime.Serialization;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy.Adres;
@@ -12,7 +11,7 @@ namespace BuildingRegistry.Projections.Syndication.Address
         /// De technische id van het adres.
         /// </summary>
         [DataMember(Name = "Id", Order = 1)]
-        public Guid AddressId { get; set; }
+        public string AddressId { get; set; }
 
         /// <summary>
         /// De identificator van het adres.
@@ -24,7 +23,7 @@ namespace BuildingRegistry.Projections.Syndication.Address
         /// De id van de straatnaam.
         /// </summary>
         [DataMember(Name = "StraatnaamId", Order = 3)]
-        public Guid? SteetnameId { get; set; }
+        public string? SteetnameId { get; set; }
 
         /// <summary>
         /// De id van de postinfo.

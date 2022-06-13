@@ -1,5 +1,6 @@
 namespace BuildingRegistry.Projections.Syndication.Address
 {
+    using System;
     using System.Threading;
     using System.Threading.Tasks;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.Syndication;
@@ -57,7 +58,7 @@ namespace BuildingRegistry.Projections.Syndication.Address
             {
                 latestItem = new AddressPersistentLocalIdItem
                 {
-                    AddressId = entry.Content.Object.AddressId,
+                    AddressId = Guid.Parse(entry.Content.Object.AddressId),
                     Version = entry.Content.Object.Identificator?.Versie,
                     Position = long.Parse(entry.FeedEntry.Id),
                     PersistentLocalId = entry.Content.Object.Identificator?.ObjectId,
