@@ -3,6 +3,7 @@ namespace BuildingRegistry.Api.Oslo.Handlers.Building
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
+    using Abstractions.Building;
     using Be.Vlaanderen.Basisregisters.Api.Search;
     using Be.Vlaanderen.Basisregisters.Api.Search.Filtering;
     using Be.Vlaanderen.Basisregisters.Api.Search.Pagination;
@@ -11,14 +12,8 @@ namespace BuildingRegistry.Api.Oslo.Handlers.Building
     using BuildingRegistry.Api.Oslo.Abstractions.Building.Query;
     using BuildingRegistry.Api.Oslo.Abstractions.Building.Responses;
     using BuildingRegistry.Api.Oslo.Abstractions.Infrastructure;
-    using BuildingRegistry.Api.Oslo.Abstractions.Infrastructure.Options;
-    using BuildingRegistry.Projections.Legacy;
     using MediatR;
-    using Microsoft.AspNetCore.Http;
     using Microsoft.EntityFrameworkCore;
-    using Microsoft.Extensions.Options;
-
-    public record ListRequest(HttpRequest HttpRequest, HttpResponse HttpResponse, LegacyContext Context, IOptions<ResponseOptions> ResponseOptions) : IRequest<BuildingListOsloResponse>;
 
     public class ListHandler : IRequestHandler<ListRequest, BuildingListOsloResponse>
     {

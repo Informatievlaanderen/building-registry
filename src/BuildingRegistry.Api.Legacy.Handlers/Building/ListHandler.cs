@@ -7,19 +7,13 @@ namespace BuildingRegistry.Api.Legacy.Handlers.Building
     using Abstractions.Infrastructure;
     using Api.Legacy.Abstractions.Building.Query;
     using Api.Legacy.Abstractions.Building.Responses;
-    using Api.Legacy.Abstractions.Infrastructure.Options;
     using Be.Vlaanderen.Basisregisters.Api.Search;
     using Be.Vlaanderen.Basisregisters.Api.Search.Filtering;
     using Be.Vlaanderen.Basisregisters.Api.Search.Pagination;
     using Be.Vlaanderen.Basisregisters.Api.Search.Sorting;
     using Be.Vlaanderen.Basisregisters.GrAr.Common;
     using MediatR;
-    using Microsoft.AspNetCore.Http;
     using Microsoft.EntityFrameworkCore;
-    using Microsoft.Extensions.Options;
-    using Projections.Legacy;
-
-    public record ListRequest(LegacyContext Context, IOptions<ResponseOptions> ResponseOptions, HttpRequest HttpRequest, HttpResponse HttpResponse) : IRequest<BuildingListResponse>;
 
     public class ListHandler : IRequestHandler<ListRequest, BuildingListResponse>
     {

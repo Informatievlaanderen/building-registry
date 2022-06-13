@@ -5,18 +5,12 @@ namespace BuildingRegistry.Api.Legacy.Handlers.BuildingUnit
     using System.Threading.Tasks;
     using Abstractions.BuildingUnit.Responses;
     using Api.Legacy.Abstractions.BuildingUnit;
-    using Api.Legacy.Abstractions.Infrastructure.Options;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
     using Be.Vlaanderen.Basisregisters.GrAr.Common;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy.Gebouweenheid;
-    using Projections.Legacy;
-    using Projections.Syndication;
     using MediatR;
     using Microsoft.AspNetCore.Http;
     using Microsoft.EntityFrameworkCore;
-    using Microsoft.Extensions.Options;
-
-    public record GetRequest(LegacyContext Context, SyndicationContext SyndicationContext, IOptions<ResponseOptions> ResponseOptions, int PersistentLocalId) : IRequest<BuildingUnitResponse>;
 
     public class GetHandler : IRequestHandler<GetRequest, BuildingUnitResponse>
     {

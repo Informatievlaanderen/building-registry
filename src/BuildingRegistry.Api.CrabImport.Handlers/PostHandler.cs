@@ -14,14 +14,7 @@ namespace BuildingRegistry.Api.CrabImport.Handlers
     using Microsoft.AspNetCore.Http;
     using Microsoft.Extensions.Logging;
 
-    public record PostRequest(List<RegisterCrabImportRequest[]> RegisterCrabImportList, IDictionary<string, object> Metadata, IdempotentCommandHandlerModule Bus) : IRequest<PostResponse>;
-
-    public record PostResponse(ConcurrentBag<long?> Tags)
-    {
-        public ConcurrentBag<long?> Tags { get; set; } = Tags;
-    }
-
-    public class PostHandler : IRequestHandler<PostRequest, PostResponse>
+    public class PostHandler : IRequestHandler<PostRequest, ConcurrentBag<long?>>
     {
         private readonly ILogger<PostHandler> _logger;
 
@@ -30,7 +23,7 @@ namespace BuildingRegistry.Api.CrabImport.Handlers
             _logger = logger;
         }
 
-        public async Task<PostResponse> Handle(PostRequest request, CancellationToken cancellationToken)
+        public async Task<ConcurrentBag<long?>> Handle(PostRequest request, CancellationToken cancellationToken)
         {
             var tags = new ConcurrentBag<long?>();
 
@@ -62,7 +55,7 @@ namespace BuildingRegistry.Api.CrabImport.Handlers
                 }
             }, cancellationToken: cancellationToken, maxDegreeOfParallelism: 0);
 
-            return new PostResponse(tags);
+            return tags;
         }
     }
 }

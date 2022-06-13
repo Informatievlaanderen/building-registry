@@ -2,17 +2,13 @@ namespace BuildingRegistry.Api.Legacy.Handlers.Building
 {
     using System.Threading;
     using System.Threading.Tasks;
+    using Abstractions.Building;
     using Api.Legacy.Abstractions.Building.Responses;
-    using Api.Legacy.Abstractions.Infrastructure.Options;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
     using Be.Vlaanderen.Basisregisters.GrAr.Common;
     using MediatR;
     using Microsoft.AspNetCore.Http;
     using Microsoft.EntityFrameworkCore;
-    using Microsoft.Extensions.Options;
-    using Projections.Legacy;
-
-    public record GetReferencesRequest(LegacyContext Context, int PersistentLocalId, IOptions<ResponseOptions> ResponseOptions) : IRequest<BuildingReferencesResponse>;
 
     public class GetReferencesHandler : IRequestHandler<GetReferencesRequest, BuildingReferencesResponse>
     {

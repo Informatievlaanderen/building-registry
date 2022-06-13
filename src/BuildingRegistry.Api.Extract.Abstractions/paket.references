@@ -1,5 +1,7 @@
 Be.Vlaanderen.Basisregisters.Api
 
+MediatR.Contracts
+
 SourceLink.Embed.AllSourceFiles
 SourceLink.Copy.PdbFiles
 

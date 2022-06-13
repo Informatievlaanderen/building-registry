@@ -3,23 +3,17 @@ namespace BuildingRegistry.Api.Oslo.Handlers.BuildingUnit
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
+    using Abstractions.BuildingUnit;
     using Abstractions.BuildingUnit.Query;
     using Abstractions.BuildingUnit.Responses;
     using Abstractions.Infrastructure;
-    using Abstractions.Infrastructure.Options;
     using Be.Vlaanderen.Basisregisters.Api.Search;
     using Be.Vlaanderen.Basisregisters.Api.Search.Filtering;
     using Be.Vlaanderen.Basisregisters.Api.Search.Pagination;
     using Be.Vlaanderen.Basisregisters.Api.Search.Sorting;
     using Be.Vlaanderen.Basisregisters.GrAr.Common;
     using MediatR;
-    using Microsoft.AspNetCore.Http;
     using Microsoft.EntityFrameworkCore;
-    using Microsoft.Extensions.Options;
-    using Projections.Legacy;
-    using Projections.Syndication;
-
-    public record ListRequest(LegacyContext Context, SyndicationContext SyndicationContext, IOptions<ResponseOptions> ResponseOptions, HttpRequest HttpRequest, HttpResponse HttpResponse) : IRequest<BuildingUnitListOsloResponse>;
 
     public class ListHandler : IRequestHandler<ListRequest, BuildingUnitListOsloResponse>
     {

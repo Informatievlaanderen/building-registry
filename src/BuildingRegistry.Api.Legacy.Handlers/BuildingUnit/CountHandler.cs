@@ -4,18 +4,14 @@ namespace BuildingRegistry.Api.Legacy.Handlers.BuildingUnit
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
+    using Abstractions.BuildingUnit;
     using Be.Vlaanderen.Basisregisters.Api.Search.Filtering;
     using Be.Vlaanderen.Basisregisters.Api.Search.Pagination;
     using Be.Vlaanderen.Basisregisters.Api.Search.Sorting;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy;
     using BuildingRegistry.Api.Legacy.Abstractions.BuildingUnit.Query;
-    using Projections.Legacy;
-    using Projections.Syndication;
     using MediatR;
-    using Microsoft.AspNetCore.Http;
     using Microsoft.EntityFrameworkCore;
-
-    public record CountRequest(LegacyContext Context, SyndicationContext SyndicationContext, HttpRequest HttpRequest) : IRequest<TotaalAantalResponse>;
 
     public class CountHandler : IRequestHandler<CountRequest, TotaalAantalResponse>
     {

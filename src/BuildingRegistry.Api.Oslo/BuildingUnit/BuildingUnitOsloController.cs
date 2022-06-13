@@ -2,12 +2,12 @@ namespace BuildingRegistry.Api.Oslo.BuildingUnit
 {
     using System.Threading;
     using System.Threading.Tasks;
+    using Abstractions.BuildingUnit;
     using Abstractions.BuildingUnit.Responses;
     using Abstractions.Infrastructure.Options;
     using Be.Vlaanderen.Basisregisters.Api;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy;
-    using Handlers.BuildingUnit;
     using Infrastructure;
     using MediatR;
     using Microsoft.AspNetCore.Http;
