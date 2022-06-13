@@ -37,7 +37,9 @@ namespace BuildingRegistry.Projections.Legacy
         public DbSet<DuplicatedPersistentLocalId> DuplicatedPersistentLocalIds { get; set; }
 
         public DbSet<BuildingDetailListCountView> BuildingDetailListCountView { get; set; }
+        public DbSet<BuildingDetailV2ListCountView> BuildingDetailListCountViewV2 { get; set; }
         public DbSet<BuildingUnitDetailListCountView> BuildingUnitDetailListCountView { get; set; }
+        public DbSet<BuildingUnitDetailV2ListCountView> BuildingUnitDetailListCountViewV2 { get; set; }
 
         public DbSet<BuildingPersistentLocalIdCrabIdMapping> BuildingPersistentIdCrabIdMappings { get; set; }
 

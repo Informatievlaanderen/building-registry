@@ -11,23 +11,24 @@ namespace BuildingRegistry.Api.Oslo.Abstractions.Building.Query
     using Microsoft.EntityFrameworkCore;
     using Projections.Legacy;
     using Projections.Legacy.BuildingDetail;
+    using Projections.Legacy.BuildingDetailV2;
 
-    public class BuildingListOsloQuery : Query<BuildingDetailItem, BuildingFilter>
+    public class BuildingListOsloQueryV2 : Query<BuildingDetailItemV2, BuildingFilterV2>
     {
         private readonly LegacyContext _context;
 
         protected override ISorting Sorting => new BuildingSorting();
 
-        public BuildingListOsloQuery(LegacyContext context)
+        public BuildingListOsloQueryV2(LegacyContext context)
         {
             _context = context;
         }
 
-        protected override IQueryable<BuildingDetailItem> Filter(FilteringHeader<BuildingFilter> filtering)
+        protected override IQueryable<BuildingDetailItemV2> Filter(FilteringHeader<BuildingFilterV2> filtering)
         {
             var buildings = _context
-                .BuildingDetails
-                .Where(x => x.IsComplete && !x.IsRemoved && x.PersistentLocalId.HasValue)
+                .BuildingDetailsV2
+                .Where(x => !x.IsRemoved)
                 .OrderBy(x => x.PersistentLocalId)
                 .AsNoTracking();
 
@@ -38,30 +39,30 @@ namespace BuildingRegistry.Api.Oslo.Abstractions.Building.Query
             {
                 if (Enum.TryParse(typeof(GebouwStatus), filtering.Filter.Status, true, out var status))
                 {
-                    var buildingStatus = ((GebouwStatus)status).Map();
-                    buildings = buildings.Where(m => m.Status.HasValue && m.Status.Value == buildingStatus);
+                    var buildingStatus = ((GebouwStatus)status).MapToV2();
+                    buildings = buildings.Where(m => m.Status == buildingStatus);
                 }
                 else
                     //have to filter on EF cannot return new List<>().AsQueryable() cause non-EF provider does not support .CountAsync()
-                    buildings = buildings.Where(m => m.Status.HasValue && (int)m.Status.Value == -1);
-                //return new List<BuildingDetailItemV2>().AsQueryable();
+                    buildings = new List<BuildingDetailItemV2>().AsQueryable();
+                //buildings = buildings.Where(m => m.Status.HasValue && (int)m.Status.Value == -1);
             }
 
             return buildings;
         }
     }
 
-    public class BuildingSorting : ISorting
+    public class BuildingSortingV2 : ISorting
     {
         public IEnumerable<string> SortableFields { get; } = new[]
         {
-            nameof(BuildingDetailItem.PersistentLocalId)
+            nameof(BuildingDetailItemV2.PersistentLocalId)
         };
 
-        public SortingHeader DefaultSortingHeader { get; } = new SortingHeader(nameof(BuildingDetailItem.PersistentLocalId), SortOrder.Ascending);
+        public SortingHeader DefaultSortingHeader { get; } = new SortingHeader(nameof(BuildingDetailItemV2.PersistentLocalId), SortOrder.Ascending);
     }
 
-    public class BuildingFilter
+    public class BuildingFilterV2
     {
         public string Status { get; set; }
     }

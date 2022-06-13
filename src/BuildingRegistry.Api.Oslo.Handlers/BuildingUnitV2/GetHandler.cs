@@ -1,4 +1,4 @@
-namespace BuildingRegistry.Api.Oslo.Handlers.BuildingUnit
+namespace BuildingRegistry.Api.Oslo.Handlers.BuildingUnitV2
 {
     using System;
     using System.Linq;
@@ -7,58 +7,53 @@ namespace BuildingRegistry.Api.Oslo.Handlers.BuildingUnit
     using System.Threading.Tasks;
     using System.Xml;
     using Abstractions.BuildingUnit;
+    using Abstractions.BuildingUnit.Responses;
     using Abstractions.Converters;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
     using Be.Vlaanderen.Basisregisters.GrAr.Common;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy.Gebouweenheid;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy.SpatialTools;
-    using BuildingRegistry.Api.Oslo.Abstractions.BuildingUnit.Responses;
+    using BuildingRegistry.Building;
     using MediatR;
     using Microsoft.AspNetCore.Http;
     using Microsoft.EntityFrameworkCore;
     using NetTopologySuite.Geometries;
-    using BuildingUnitFunction = Legacy.BuildingUnitFunction;
     using BuildingUnitPosition = Abstractions.BuildingUnit.Responses.BuildingUnitPosition;
-    using BuildingUnitPositionGeometryMethod = Legacy.BuildingUnitPositionGeometryMethod;
 
     public class GetHandler : IRequestHandler<GetRequest, BuildingUnitOsloResponse>
     {
         public async Task<BuildingUnitOsloResponse> Handle(GetRequest request, CancellationToken cancellationToken)
         {
             var buildingUnit = await request.Context
-                .BuildingUnitDetails
+                .BuildingUnitDetailsV2
                 .Include(x => x.Addresses)
                 .AsNoTracking()
-                .SingleOrDefaultAsync(item => item.PersistentLocalId == request.PersistentLocalId, cancellationToken);
+                .SingleOrDefaultAsync(item => item.BuildingUnitPersistentLocalId == request.PersistentLocalId, cancellationToken);
 
             if (buildingUnit is { IsRemoved: true })
             {
                 throw new ApiException("Gebouweenheid werd verwijderd.", StatusCodes.Status410Gone);
             }
 
-            if (buildingUnit is not { IsComplete: true, IsBuildingComplete: true })
+            if (buildingUnit is null)
             {
                 throw new ApiException("Onbestaande gebouweenheid.", StatusCodes.Status404NotFound);
             }
 
-            var addressIds = buildingUnit.Addresses.Select(x => x.AddressId).ToList();
-            var addressPersistentLocalIds = await request.SyndicationContext
-                .AddressPersistentLocalIds
-                .Where(x => addressIds.Contains(x.AddressId))
-                .Select(x => x.PersistentLocalId)
-                .ToListAsync(cancellationToken);
+            var addressPersistentLocalIds = buildingUnit.Addresses
+                .Select(x => x.AddressPersistentLocalId).ToList();
 
             return new BuildingUnitOsloResponse(
-                buildingUnit.PersistentLocalId.Value,
+                buildingUnit.BuildingPersistentLocalId,
                 request.ResponseOptions.Value.GebouweenheidNaamruimte,
                 request.ResponseOptions.Value.ContextUrlUnitDetail,
                 buildingUnit.Version.ToBelgianDateTimeOffset(),
-                GetBuildingUnitPoint(buildingUnit.Position, buildingUnit.PositionMethod.Value),
-                buildingUnit.Status.Value.Map(),
+                GetBuildingUnitPoint(buildingUnit.Position, buildingUnit.PositionMethod),
+                buildingUnit.Status.Map(),
                 MapBuildingUnitFunction(buildingUnit.Function),
-                new GebouweenheidDetailGebouw(buildingUnit.BuildingPersistentLocalId.Value.ToString(), string.Format(request.ResponseOptions.Value.GebouwDetailUrl, buildingUnit.BuildingPersistentLocalId.Value)),
-                addressPersistentLocalIds.Select(id => new GebouweenheidDetailAdres(id, string.Format(request.ResponseOptions.Value.AdresUrl, id))).ToList());
+                new GebouweenheidDetailGebouw(buildingUnit.BuildingPersistentLocalId.ToString(), string.Format(request.ResponseOptions.Value.GebouwDetailUrl, buildingUnit.BuildingPersistentLocalId)),
+                addressPersistentLocalIds.Select(id => new GebouweenheidDetailAdres(id.ToString(), string.Format(request.ResponseOptions.Value.AdresUrl, id))).ToList());
         }
 
         private static PositieGeometrieMethode MapBuildingUnitGeometryMethod(BuildingUnitPositionGeometryMethod geometryMethod)

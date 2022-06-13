@@ -8,5 +8,11 @@ namespace BuildingRegistry.Api.Legacy.Abstractions.BuildingUnit
     using Projections.Syndication;
     using Responses;
 
-    public record ListRequest(LegacyContext Context, SyndicationContext SyndicationContext, IOptions<ResponseOptions> ResponseOptions, HttpRequest HttpRequest, HttpResponse HttpResponse) : IRequest<BuildingUnitListResponse>;
+    public record ListRequest(
+        LegacyContext Context,
+        SyndicationContext SyndicationContext,
+        IOptions<ResponseOptions> ResponseOptions,
+        HttpRequest HttpRequest,
+        HttpResponse HttpResponse)
+            : IRequest<BuildingUnitListResponse>;
 }

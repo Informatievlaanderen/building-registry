@@ -1,4 +1,4 @@
-namespace BuildingRegistry.Api.Oslo.Handlers.Building
+namespace BuildingRegistry.Api.Oslo.Handlers.BuildingV2
 {
     using System;
     using System.Linq;
@@ -7,14 +7,14 @@ namespace BuildingRegistry.Api.Oslo.Handlers.Building
     using System.Threading.Tasks;
     using System.Xml;
     using Abstractions.Building;
+    using Abstractions.Building.Responses;
     using Abstractions.Converters;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
     using Be.Vlaanderen.Basisregisters.GrAr.Common;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy.Gebouw;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy.SpatialTools;
     using BuildingRegistry;
-    using BuildingRegistry.Api.Oslo.Abstractions.Building.Responses;
-    using Legacy;
+    using BuildingRegistry.Building;
     using MediatR;
     using Microsoft.AspNetCore.Http;
     using Microsoft.EntityFrameworkCore;
@@ -25,7 +25,7 @@ namespace BuildingRegistry.Api.Oslo.Handlers.Building
         public async Task<BuildingOsloResponse> Handle(GetRequest request, CancellationToken cancellationToken)
         {
             var building = await request.Context
-                .BuildingDetails
+                .BuildingDetailsV2
                 .AsNoTracking()
                 .SingleOrDefaultAsync(item => item.PersistentLocalId == request.PersistentLocalId, cancellationToken);
 
@@ -34,17 +34,16 @@ namespace BuildingRegistry.Api.Oslo.Handlers.Building
                 throw new ApiException("Gebouw werd verwijderd.", StatusCodes.Status410Gone);
             }
 
-            if (building is not { IsComplete: true })
+            if (building is null)
             {
                 throw new ApiException("Onbestaand gebouw.", StatusCodes.Status404NotFound);
             }
 
-            //TODO: improvement getting buildingunits and parcels in parallel.
             var buildingUnits = await request.Context
-                .BuildingUnitDetails
-                .Where(x => x.BuildingId == building.BuildingId)
-                .Where(x => x.IsComplete && !x.IsRemoved)
-                .Select(x => x.PersistentLocalId)
+                .BuildingUnitDetailsV2
+                .Where(x => x.BuildingPersistentLocalId == building.PersistentLocalId)
+                .Where(x => !x.IsRemoved)
+                .Select(x => x.BuildingUnitPersistentLocalId)
                 .ToListAsync(cancellationToken);
 
             var parcels = request.GrbBuildingParcel
@@ -60,31 +59,16 @@ namespace BuildingRegistry.Api.Oslo.Handlers.Building
                 .ToListAsync(cancellationToken);
 
             return new BuildingOsloResponse(
-                building.PersistentLocalId.Value,
+                building.PersistentLocalId,
                 request.ResponseOptions.Value.GebouwNaamruimte,
                 request.ResponseOptions.Value.ContextUrlDetail,
                 building.Version.ToBelgianDateTimeOffset(),
-                GetBuildingPolygon(building.Geometry, building.GeometryMethod.Value),
-                building.Status.Value.MapToGebouwStatus(),
-                buildingUnits.OrderBy(x => x.Value).Select(x => new GebouwDetailGebouweenheid(x.ToString(), string.Format(request.ResponseOptions.Value.GebouweenheidDetailUrl, x))).ToList(),
+                GetBuildingPolygon(building.Geometry, building.GeometryMethod),
+                building.Status.Map(),
+                buildingUnits.OrderBy(x => x).Select(x => new GebouwDetailGebouweenheid(x.ToString(), string.Format(request.ResponseOptions.Value.GebouweenheidDetailUrl, x))).ToList(),
                 caPaKeys.Select(x => new GebouwDetailPerceel(x, string.Format(request.ResponseOptions.Value.PerceelUrl, x))).ToList());
         }
-
-        private static GeometrieMethode MapGeometryMethod(BuildingGeometryMethod geometryMethod)
-        {
-            switch (geometryMethod)
-            {
-                case BuildingGeometryMethod.Outlined:
-                    return GeometrieMethode.Ingeschetst;
-
-                case BuildingGeometryMethod.MeasuredByGrb:
-                    return GeometrieMethode.IngemetenGRB;
-
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(geometryMethod), geometryMethod, null);
-            }
-        }
-
+        
         private static BuildingPolygon GetBuildingPolygon(byte[] polygon, BuildingGeometryMethod geometryMethod)
         {
             var geometry = WKBReaderFactory.Create().Read(polygon) as NetTopologySuite.Geometries.Polygon;
@@ -96,7 +80,7 @@ namespace BuildingRegistry.Api.Oslo.Handlers.Building
 
             var gml = GetGml(geometry);
 
-            return new BuildingPolygon(new GmlJsonPolygon(gml), MapGeometryMethod(geometryMethod));
+            return new BuildingPolygon(new GmlJsonPolygon(gml), geometryMethod.Map());
         }
 
         internal static string GetGml(Geometry geometry)
@@ -155,6 +139,5 @@ namespace BuildingRegistry.Api.Oslo.Handlers.Building
                 WriteRing(ring as NetTopologySuite.Geometries.LinearRing, writer, true);
             }
         }
-
     }
 }

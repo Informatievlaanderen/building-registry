@@ -1,4 +1,4 @@
-namespace BuildingRegistry.Api.Oslo.Handlers.BuildingUnit
+namespace BuildingRegistry.Api.Oslo.Handlers.BuildingUnitV2
 {
     using System.Linq;
     using System.Threading;
@@ -20,11 +20,11 @@ namespace BuildingRegistry.Api.Oslo.Handlers.BuildingUnit
     {
         public async Task<BuildingUnitListOsloResponse> Handle(ListRequest request, CancellationToken cancellationToken)
         {
-            var filtering = request.HttpRequest.ExtractFilteringRequest<BuildingUnitFilter>();
+            var filtering = request.HttpRequest.ExtractFilteringRequest<BuildingUnitFilterV2>();
             var sorting = request.HttpRequest.ExtractSortingRequest();
             var pagination = request.HttpRequest.ExtractPaginationRequest();
 
-            var pagedBuildingUnits = new BuildingUnitListOsloQuery(request.Context, request.SyndicationContext)
+            var pagedBuildingUnits = new BuildingUnitListOsloQueryV2(request.Context, request.SyndicationContext)
                 .Fetch(filtering, sorting, pagination);
 
             request.HttpResponse.AddPagedQueryResultHeaders(pagedBuildingUnits);
@@ -32,7 +32,7 @@ namespace BuildingRegistry.Api.Oslo.Handlers.BuildingUnit
             var units = await pagedBuildingUnits.Items
                 .Select(a => new
                 {
-                    a.PersistentLocalId,
+                    a.BuildingUnitPersistentLocalId,
                     a.Version,
                     a.Status
                 })
@@ -42,10 +42,10 @@ namespace BuildingRegistry.Api.Oslo.Handlers.BuildingUnit
             {
                 Gebouweenheden = units
                     .Select(x => new GebouweenheidCollectieItemOslo(
-                        x.PersistentLocalId.Value,
+                        x.BuildingUnitPersistentLocalId,
                         request.ResponseOptions.Value.GebouweenheidNaamruimte,
                         request.ResponseOptions.Value.GebouweenheidDetailUrl,
-                        x.Status.Value.Map(),
+                        x.Status.Map(),
                         x.Version.ToBelgianDateTimeOffset()))
                     .ToList(),
                 Volgende = pagedBuildingUnits
