@@ -10,6 +10,7 @@ namespace BuildingRegistry.Api.Legacy.Building
     using Abstractions.Building;
     using Abstractions.Building.Query;
     using Abstractions.Building.Responses;
+    using Abstractions.Infrastructure;
     using Abstractions.Infrastructure.Grb;
     using Abstractions.Infrastructure.Options;
     using Be.Vlaanderen.Basisregisters.Api;

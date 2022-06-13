@@ -1,9 +1,9 @@
-namespace BuildingRegistry.Api.Legacy.Infrastructure
+namespace BuildingRegistry.Api.Oslo.Abstractions.Infrastructure
 {
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy;
     using Swashbuckle.AspNetCore.Filters;
 
-    public class TotalCountResponseExample : IExamplesProvider<TotaalAantalResponse>
+    public class TotalCountOsloResponseExample : IExamplesProvider<TotaalAantalResponse>
     {
         public TotaalAantalResponse GetExamples()
         {
