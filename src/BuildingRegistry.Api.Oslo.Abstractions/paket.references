@@ -1,5 +1,7 @@
 Be.Vlaanderen.Basisregisters.Api
 
+MediatR.Contracts
+
 Newtonsoft.Json
 
 SourceLink.Embed.AllSourceFiles

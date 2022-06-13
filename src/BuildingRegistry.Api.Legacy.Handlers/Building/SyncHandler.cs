@@ -4,18 +4,13 @@ namespace BuildingRegistry.Api.Legacy.Handlers.Building
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
+    using Abstractions.Building;
     using Api.Legacy.Abstractions.Building.Query;
     using Be.Vlaanderen.Basisregisters.Api.Search.Filtering;
     using Be.Vlaanderen.Basisregisters.Api.Search.Pagination;
     using Be.Vlaanderen.Basisregisters.Api.Search.Sorting;
     using MediatR;
-    using Microsoft.AspNetCore.Http;
     using Microsoft.EntityFrameworkCore;
-    using Projections.Legacy;
-
-    public record SyncRequest(LegacyContext Context, HttpRequest HttpRequest) : IRequest<SyncResponse>;
-
-    public record SyncResponse(DateTimeOffset LastFeedUpdate, PagedQueryable<BuildingSyndicationQueryResult> PagedBuildings);
 
     public class SyncHandler : IRequestHandler<SyncRequest, SyncResponse>
     {

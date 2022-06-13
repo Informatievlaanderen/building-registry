@@ -14,6 +14,10 @@ licenseUrl https://opensource.org/licenses/EUPL-1.2
 
 description Building Registry Api CrabImport Abstractions.
 
+dependencies
+  framework: net6.0
+    Be.Vlaanderen.Basisregisters.GrAr.Import >= LOCKEDVERSION
+
 files
   BuildingRegistry.Api.CrabImport.Abstractions.dll => lib\net6.0
   BuildingRegistry.Api.CrabImport.Abstractions.pdb => lib\net6.0

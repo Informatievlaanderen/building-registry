@@ -60,8 +60,8 @@ namespace BuildingRegistry.Api.CrabImport.CrabImport
                 return BadRequest(ModelState);
             }
 
-            var response = await _mediator.Send(new PostRequest(registerCrabImportList, GetMetadata(), bus), cancellationToken);
-            return Accepted(response.Tags.Any() ? response.Tags.Max() : null);
+            var tags = await _mediator.Send(new PostRequest(registerCrabImportList, GetMetadata(), bus), cancellationToken);
+            return Accepted(tags.Any() ? tags.Max() : null);
         }
 
         [HttpGet("batch/{feed}")]

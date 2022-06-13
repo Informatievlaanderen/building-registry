@@ -8,8 +8,8 @@ namespace BuildingRegistry.Api.Extract.Extracts
     using Swashbuckle.AspNetCore.Filters;
     using System.Threading;
     using System.Threading.Tasks;
+    using Abstractions;
     using Abstractions.Extracts.Responses;
-    using Handlers;
     using MediatR;
 
     [ApiVersion("1.0")]

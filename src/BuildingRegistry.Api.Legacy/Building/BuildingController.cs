@@ -7,6 +7,7 @@ namespace BuildingRegistry.Api.Legacy.Building
     using System.Threading;
     using System.Threading.Tasks;
     using System.Xml;
+    using Abstractions.Building;
     using Abstractions.Building.Query;
     using Abstractions.Building.Responses;
     using Abstractions.Infrastructure.Grb;
@@ -26,7 +27,6 @@ namespace BuildingRegistry.Api.Legacy.Building
     using Projections.Legacy;
     using Projections.Syndication;
     using Swashbuckle.AspNetCore.Filters;
-    using Handlers.Building;
     using Infrastructure;
     using MediatR;
     

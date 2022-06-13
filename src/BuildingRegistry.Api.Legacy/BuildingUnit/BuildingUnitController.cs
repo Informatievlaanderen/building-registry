@@ -11,9 +11,9 @@ namespace BuildingRegistry.Api.Legacy.BuildingUnit
     using Swashbuckle.AspNetCore.Filters;
     using System.Threading;
     using System.Threading.Tasks;
+    using Abstractions.BuildingUnit;
     using Abstractions.BuildingUnit.Responses;
     using Abstractions.Infrastructure.Options;
-    using Handlers.BuildingUnit;
     using Infrastructure;
     using MediatR;
 

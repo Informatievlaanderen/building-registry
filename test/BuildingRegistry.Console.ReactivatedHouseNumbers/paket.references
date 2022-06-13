@@ -1,3 +1,5 @@
+AWSSDK.Core
+
 Newtonsoft.Json
 NodaTime.Serialization.JsonNet
 

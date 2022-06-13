@@ -6,7 +6,7 @@ namespace BuildingRegistry.Api.Oslo.Handlers.BuildingUnit
     using System.Threading;
     using System.Threading.Tasks;
     using System.Xml;
-    using Abstractions.Infrastructure.Options;
+    using Abstractions.BuildingUnit;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
     using Be.Vlaanderen.Basisregisters.GrAr.Common;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy;
@@ -16,15 +16,10 @@ namespace BuildingRegistry.Api.Oslo.Handlers.BuildingUnit
     using MediatR;
     using Microsoft.AspNetCore.Http;
     using Microsoft.EntityFrameworkCore;
-    using Microsoft.Extensions.Options;
     using NetTopologySuite.Geometries;
-    using Projections.Legacy;
-    using Projections.Syndication;
     using BuildingUnitFunction = Legacy.BuildingUnitFunction;
     using BuildingUnitPosition = Abstractions.BuildingUnit.Responses.BuildingUnitPosition;
     using BuildingUnitPositionGeometryMethod = Legacy.BuildingUnitPositionGeometryMethod;
-
-    public record GetRequest(LegacyContext Context, SyndicationContext SyndicationContext, IOptions<ResponseOptions> ResponseOptions, int PersistentLocalId) : IRequest<BuildingUnitOsloResponse>;
 
     public class GetHandler : IRequestHandler<GetRequest, BuildingUnitOsloResponse>
     {
