@@ -1,3 +1,17 @@
+# [3.9.0](https://github.com/informatievlaanderen/building-registry/compare/v3.8.2...v3.9.0) (2022-06-13)
+
+
+### Bug Fixes
+
+* activate address consumer in migrator ([5437bed](https://github.com/informatievlaanderen/building-registry/commit/5437bed9eb04489f8d9b32ac445dd2680747ba98))
+* move MediatR contracts to Abstractions ([5647d32](https://github.com/informatievlaanderen/building-registry/commit/5647d323fa087dd7415e129ea34b81728e7388f4))
+* remove aws sdk dep + move backoffice context ([d917d2f](https://github.com/informatievlaanderen/building-registry/commit/d917d2f4092c7eb69698869597f77230964185de))
+
+
+### Features
+
+* add plan building ([bfab949](https://github.com/informatievlaanderen/building-registry/commit/bfab9499ac19b1c499cd9cf9d68ca482518cdd9d))
+
 ## [3.8.2](https://github.com/informatievlaanderen/building-registry/compare/v3.8.1...v3.8.2) (2022-06-10)
 
 
