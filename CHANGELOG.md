@@ -1,3 +1,10 @@
+## [3.9.1](https://github.com/informatievlaanderen/building-registry/compare/v3.9.0...v3.9.1) (2022-06-13)
+
+
+### Bug Fixes
+
+* move examples to abstractions ([9f7c432](https://github.com/informatievlaanderen/building-registry/commit/9f7c43244c4c39a3d687a32cc08343aa3efd8d11))
+
 # [3.9.0](https://github.com/informatievlaanderen/building-registry/compare/v3.8.2...v3.9.0) (2022-06-13)
 
 
