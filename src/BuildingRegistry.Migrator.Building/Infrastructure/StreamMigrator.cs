@@ -7,6 +7,7 @@ namespace BuildingRegistry.Migrator.Building.Infrastructure
     using System.Threading.Tasks;
     using Amazon.DynamoDBv2.Model;
     using Api.BackOffice;
+    using Api.BackOffice.Abstractions;
     using Autofac;
     using Be.Vlaanderen.Basisregisters.CommandHandling;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;

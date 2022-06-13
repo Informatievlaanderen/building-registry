@@ -3,16 +3,20 @@ using BuildingRegistry.Api.BackOffice;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace BuildingRegistry.Api.BackOffice.Migrations
+namespace BuildingRegistry.Api.BackOffice.Abstractions.Migrations
 {
+    using Abstractions;
+
     [DbContext(typeof(BackOfficeContext))]
-    partial class BackOfficeContextModelSnapshot : ModelSnapshot
+    [Migration("20220608125205_Initial")]
+    partial class Initial
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
