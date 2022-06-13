@@ -1,3 +1,10 @@
+## [3.9.4](https://github.com/informatievlaanderen/building-registry/compare/v3.9.3...v3.9.4) (2022-06-13)
+
+
+### Bug Fixes
+
+* correct nupkg dependency abstractions ([b7a8c98](https://github.com/informatievlaanderen/building-registry/commit/b7a8c982077843b381ce4de1667f84ec660ac281))
+
 ## [3.9.3](https://github.com/informatievlaanderen/building-registry/compare/v3.9.2...v3.9.3) (2022-06-13)
 
 
