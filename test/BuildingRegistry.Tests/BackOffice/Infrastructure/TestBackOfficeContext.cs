@@ -2,6 +2,7 @@ namespace BuildingRegistry.Tests.BackOffice.Infrastructure
 {
     using System;
     using BuildingRegistry.Api.BackOffice;
+    using BuildingRegistry.Api.BackOffice.Abstractions;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.EntityFrameworkCore.Design;
 

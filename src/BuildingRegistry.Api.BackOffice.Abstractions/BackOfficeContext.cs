@@ -1,11 +1,11 @@
-namespace BuildingRegistry.Api.BackOffice
+namespace BuildingRegistry.Api.BackOffice.Abstractions
 {
     using System;
     using System.IO;
+    using Infrastructure;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.EntityFrameworkCore.Design;
     using Microsoft.Extensions.Configuration;
-    using BuildingRegistry.Infrastructure;
 
     public class BackOfficeContext : DbContext
     {

@@ -1,5 +1,6 @@
 namespace BuildingRegistry.Api.BackOffice.Infrastructure.Modules
 {
+    using Abstractions;
     using Autofac;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Configuration;
