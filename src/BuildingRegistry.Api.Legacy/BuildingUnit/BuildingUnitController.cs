@@ -1,21 +1,21 @@
 namespace BuildingRegistry.Api.Legacy.BuildingUnit
 {
+    using System.Threading;
+    using System.Threading.Tasks;
+    using Abstractions.BuildingUnit;
+    using Abstractions.BuildingUnit.Responses;
+    using Abstractions.Infrastructure;
+    using Abstractions.Infrastructure.Options;
     using Be.Vlaanderen.Basisregisters.Api;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy;
+    using MediatR;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.Extensions.Options;
     using Projections.Legacy;
     using Projections.Syndication;
     using Swashbuckle.AspNetCore.Filters;
-    using System.Threading;
-    using System.Threading.Tasks;
-    using Abstractions.BuildingUnit;
-    using Abstractions.BuildingUnit.Responses;
-    using Abstractions.Infrastructure.Options;
-    using Infrastructure;
-    using MediatR;
 
     [ApiVersion("1.0")]
     [AdvertiseApiVersions("1.0")]

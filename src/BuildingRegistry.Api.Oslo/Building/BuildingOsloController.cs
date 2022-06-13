@@ -4,12 +4,12 @@ namespace BuildingRegistry.Api.Oslo.Building
     using System.Threading.Tasks;
     using Abstractions.Building;
     using Abstractions.Building.Responses;
+    using Abstractions.Infrastructure;
     using Abstractions.Infrastructure.Grb;
     using Abstractions.Infrastructure.Options;
     using Be.Vlaanderen.Basisregisters.Api;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy;
-    using Infrastructure;
     using MediatR;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;

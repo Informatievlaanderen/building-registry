@@ -33,7 +33,6 @@ namespace BuildingRegistry.Api.Oslo.Handlers.Building
                         .First()
                         .Count)
             };
-
         }
     }
 }
