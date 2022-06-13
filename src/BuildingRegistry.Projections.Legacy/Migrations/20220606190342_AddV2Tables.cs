@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
@@ -147,13 +147,6 @@ namespace BuildingRegistry.Projections.Legacy.Migrations
                 schema: "BuildingRegistryLegacy",
                 table: "BuildingDetailsV2",
                 columns: new[] { "IsRemoved", "PersistentLocalId" });
-
-            migrationBuilder.CreateIndex(
-                name: "IX_BuildingDetailsV2_PersistentLocalId",
-                schema: "BuildingRegistryLegacy",
-                table: "BuildingDetailsV2",
-                column: "PersistentLocalId")
-                .Annotation("SqlServer:Clustered", true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_BuildingDetailsV2_Status",

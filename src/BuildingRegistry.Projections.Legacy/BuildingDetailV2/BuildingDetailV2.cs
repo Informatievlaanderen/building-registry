@@ -80,9 +80,6 @@ namespace BuildingRegistry.Projections.Legacy.BuildingDetailV2
                 .HasConversion(x => x.Value, y => BuildingStatus.Parse(y));
             b.Property(p => p.IsRemoved);
 
-            b.HasIndex(p => p.PersistentLocalId)
-                .IsClustered();
-
             b.HasIndex(p => new { p.IsRemoved, p.PersistentLocalId });
             b.HasIndex(p => p.Status);
         }
