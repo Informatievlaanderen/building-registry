@@ -1,3 +1,10 @@
+## [3.9.3](https://github.com/informatievlaanderen/building-registry/compare/v3.9.2...v3.9.3) (2022-06-13)
+
+
+### Bug Fixes
+
+* remove double clustered index ([0d9a6c4](https://github.com/informatievlaanderen/building-registry/commit/0d9a6c4b74362b7e4cef5808a7e1343f2021207b))
+
 ## [3.9.2](https://github.com/informatievlaanderen/building-registry/compare/v3.9.1...v3.9.2) (2022-06-13)
 
 
