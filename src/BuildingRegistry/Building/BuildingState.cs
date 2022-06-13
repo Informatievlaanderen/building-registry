@@ -58,6 +58,8 @@ namespace BuildingRegistry.Building
             BuildingGeometry = new BuildingGeometry(new ExtendedWkbGeometry(@event.ExtendedWkbGeometry),
                 BuildingGeometryMethod.Outlined);
 
+            BuildingStatus = BuildingStatus.Planned;
+
             _lastEvent = @event;
         }
     }

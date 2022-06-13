@@ -60,6 +60,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuilding
             // Assert
             result.Should().NotBeNull();
             result.BuildingPersistentLocalId.Should().Be(command.BuildingPersistentLocalId);
+            result.BuildingStatus.Should().Be(BuildingStatus.Planned);
             result.BuildingGeometry.Geometry.Should().Be(command.Geometry);
             result.BuildingGeometry.Method.Should().Be(BuildingGeometryMethod.Outlined);
         }
