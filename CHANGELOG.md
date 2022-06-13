@@ -1,3 +1,10 @@
+## [3.9.2](https://github.com/informatievlaanderen/building-registry/compare/v3.9.1...v3.9.2) (2022-06-13)
+
+
+### Bug Fixes
+
+* correct syndication event dto ([1081cdd](https://github.com/informatievlaanderen/building-registry/commit/1081cddad0ca435ce7c04be5f4caa323ff4e1687))
+
 ## [3.9.1](https://github.com/informatievlaanderen/building-registry/compare/v3.9.0...v3.9.1) (2022-06-13)
 
 
