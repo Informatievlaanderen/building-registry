@@ -17,6 +17,7 @@ description Building Registry Api CrabImport Abstractions.
 dependencies
   framework: net6.0
     Be.Vlaanderen.Basisregisters.GrAr.Import >= LOCKEDVERSION
+    MediatR.Contracts >= LOCKEDVERSION
 
 files
   BuildingRegistry.Api.CrabImport.Abstractions.dll => lib\net6.0

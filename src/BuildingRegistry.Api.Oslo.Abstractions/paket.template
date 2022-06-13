@@ -14,6 +14,11 @@ licenseUrl https://opensource.org/licenses/EUPL-1.2
 
 description Building Registry Api Oslo Abstractions.
 
+dependencies
+  framework: net6.0
+    Be.Vlaanderen.Basisregisters.Api >= LOCKEDVERSION
+    MediatR.Contracts >= LOCKEDVERSION
+
 files
   BuildingRegistry.Api.Oslo.Abstractions.dll => lib\net6.0
   BuildingRegistry.Api.Oslo.Abstractions.pdb => lib\net6.0

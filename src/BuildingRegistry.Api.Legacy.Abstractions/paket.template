@@ -14,6 +14,11 @@ licenseUrl https://opensource.org/licenses/EUPL-1.2
 
 description Building Registry Api Legacy Abstractions.
 
+dependencies
+  framework: net6.0
+    Be.Vlaanderen.Basisregisters.Api >= LOCKEDVERSION
+    MediatR.Contracts >= LOCKEDVERSION
+
 files
   BuildingRegistry.Api.Legacy.Abstractions.dll => lib\net6.0
   BuildingRegistry.Api.Legacy.Abstractions.pdb => lib\net6.0
