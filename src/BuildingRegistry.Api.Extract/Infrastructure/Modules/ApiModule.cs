@@ -28,7 +28,7 @@ namespace BuildingRegistry.Api.Extract.Infrastructure.Modules
         protected override void Load(ContainerBuilder containerBuilder)
         {
             containerBuilder
-                .RegisterModule(new MediatRModule())
+                .RegisterModule(new MediatRModule(_configuration))
 
                 .RegisterModule(new DataDogModule(_configuration))
                 .RegisterModule(new ExtractModule(_configuration, _services, _loggerFactory, false));
