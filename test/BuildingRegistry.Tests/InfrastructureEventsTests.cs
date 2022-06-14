@@ -9,7 +9,6 @@ namespace Aiv.Vbr.Testing.Infrastructure.Events
     using System.Linq;
     using System.Reflection;
     using System.Runtime.CompilerServices;
-    using FluentAssertions.Equivalency;
     using Xunit;
 
     /// <summary>

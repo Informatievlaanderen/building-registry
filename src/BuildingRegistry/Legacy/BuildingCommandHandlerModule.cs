@@ -10,7 +10,6 @@ namespace BuildingRegistry.Legacy
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Commands;
     using Commands.Crab;
-    using Events;
     using SqlStreamStore;
 
     public sealed class BuildingCommandHandlerModule : CommandHandlerModule

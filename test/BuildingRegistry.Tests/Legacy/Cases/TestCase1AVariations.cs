@@ -1,7 +1,6 @@
 namespace BuildingRegistry.Tests.Legacy.Cases
 {
     using System;
-    using Autofixture;
     using AutoFixture;
     using Be.Vlaanderen.Basisregisters.AggregateSource.Testing;
     using Be.Vlaanderen.Basisregisters.Crab;

@@ -6,6 +6,7 @@ namespace BuildingRegistry.Api.Oslo.Handlers.BuildingUnit
     using Abstractions.BuildingUnit;
     using Abstractions.BuildingUnit.Query;
     using Abstractions.BuildingUnit.Responses;
+    using Abstractions.Converters;
     using Abstractions.Infrastructure;
     using Be.Vlaanderen.Basisregisters.Api.Search;
     using Be.Vlaanderen.Basisregisters.Api.Search.Filtering;
@@ -44,7 +45,7 @@ namespace BuildingRegistry.Api.Oslo.Handlers.BuildingUnit
                         x.PersistentLocalId.Value,
                         request.ResponseOptions.Value.GebouweenheidNaamruimte,
                         request.ResponseOptions.Value.GebouweenheidDetailUrl,
-                        x.Status.Value.MapBuildingUnitStatus(),
+                        x.Status.Value.Map(),
                         x.Version.ToBelgianDateTimeOffset()))
                     .ToList(),
                 Volgende = pagedBuildingUnits

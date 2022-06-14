@@ -7,6 +7,7 @@ namespace BuildingRegistry.Api.Oslo.Handlers.Building
     using System.Threading.Tasks;
     using System.Xml;
     using Abstractions.Building;
+    using Abstractions.Converters;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
     using Be.Vlaanderen.Basisregisters.GrAr.Common;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy.Gebouw;
@@ -64,7 +65,7 @@ namespace BuildingRegistry.Api.Oslo.Handlers.Building
                 request.ResponseOptions.Value.ContextUrlDetail,
                 building.Version.ToBelgianDateTimeOffset(),
                 GetBuildingPolygon(building.Geometry, building.GeometryMethod.Value),
-                building.Status.Value.MapBuildingStatus(),
+                building.Status.Value.MapToGebouwStatus(),
                 buildingUnits.OrderBy(x => x.Value).Select(x => new GebouwDetailGebouweenheid(x.ToString(), string.Format(request.ResponseOptions.Value.GebouweenheidDetailUrl, x))).ToList(),
                 caPaKeys.Select(x => new GebouwDetailPerceel(x, string.Format(request.ResponseOptions.Value.PerceelUrl, x))).ToList());
         }

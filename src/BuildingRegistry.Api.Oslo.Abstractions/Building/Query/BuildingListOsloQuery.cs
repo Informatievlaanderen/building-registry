@@ -38,12 +38,13 @@ namespace BuildingRegistry.Api.Oslo.Abstractions.Building.Query
             {
                 if (Enum.TryParse(typeof(GebouwStatus), filtering.Filter.Status, true, out var status))
                 {
-                    var buildingStatus = ((GebouwStatus)status).ConvertFromGebouwStatus();
+                    var buildingStatus = ((GebouwStatus)status).Map();
                     buildings = buildings.Where(m => m.Status.HasValue && m.Status.Value == buildingStatus);
                 }
                 else
                     //have to filter on EF cannot return new List<>().AsQueryable() cause non-EF provider does not support .CountAsync()
                     buildings = buildings.Where(m => m.Status.HasValue && (int)m.Status.Value == -1);
+                //return new List<BuildingDetailItemV2>().AsQueryable();
             }
 
             return buildings;

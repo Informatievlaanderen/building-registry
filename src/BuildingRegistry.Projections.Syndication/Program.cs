@@ -3,7 +3,6 @@ namespace BuildingRegistry.Projections.Syndication
     using Address;
     using Autofac;
     using Autofac.Extensions.DependencyInjection;
-    using Autofac.Features.OwnedInstances;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.Syndication;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;

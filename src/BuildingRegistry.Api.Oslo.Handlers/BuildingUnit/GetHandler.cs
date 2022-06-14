@@ -7,6 +7,7 @@ namespace BuildingRegistry.Api.Oslo.Handlers.BuildingUnit
     using System.Threading.Tasks;
     using System.Xml;
     using Abstractions.BuildingUnit;
+    using Abstractions.Converters;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
     using Be.Vlaanderen.Basisregisters.GrAr.Common;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy;
@@ -54,7 +55,7 @@ namespace BuildingRegistry.Api.Oslo.Handlers.BuildingUnit
                 request.ResponseOptions.Value.ContextUrlUnitDetail,
                 buildingUnit.Version.ToBelgianDateTimeOffset(),
                 GetBuildingUnitPoint(buildingUnit.Position, buildingUnit.PositionMethod.Value),
-                buildingUnit.Status.Value.MapBuildingUnitStatus(),
+                buildingUnit.Status.Value.Map(),
                 MapBuildingUnitFunction(buildingUnit.Function),
                 new GebouweenheidDetailGebouw(buildingUnit.BuildingPersistentLocalId.Value.ToString(), string.Format(request.ResponseOptions.Value.GebouwDetailUrl, buildingUnit.BuildingPersistentLocalId.Value)),
                 addressPersistentLocalIds.Select(id => new GebouweenheidDetailAdres(id, string.Format(request.ResponseOptions.Value.AdresUrl, id))).ToList());

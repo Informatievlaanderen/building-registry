@@ -4,6 +4,7 @@ namespace BuildingRegistry.Api.Oslo.Handlers.Building
     using System.Threading;
     using System.Threading.Tasks;
     using Abstractions.Building;
+    using Abstractions.Converters;
     using Be.Vlaanderen.Basisregisters.Api.Search;
     using Be.Vlaanderen.Basisregisters.Api.Search.Filtering;
     using Be.Vlaanderen.Basisregisters.Api.Search.Pagination;
@@ -44,7 +45,7 @@ namespace BuildingRegistry.Api.Oslo.Handlers.Building
                         x.PersistentLocalId.Value,
                         request.ResponseOptions.Value.GebouwNaamruimte,
                         request.ResponseOptions.Value.GebouwDetailUrl,
-                        x.Status.Value.MapBuildingStatus(),
+                        x.Status.Value.MapToGebouwStatus(),
                         x.Version.ToBelgianDateTimeOffset()))
                     .ToList(),
                 Volgende = pagedBuildings.PaginationInfo.BuildNextUri(request.ResponseOptions.Value.GebouwVolgendeUrl),

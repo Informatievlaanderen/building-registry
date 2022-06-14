@@ -1,14 +1,12 @@
 namespace BuildingRegistry.Api.CrabImport.Handlers.Sqs
 {
     using System;
-    using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
     using Abstractions.Post;
     using Amazon;
-    using Be.Vlaanderen.Basisregisters.GrAr.Import.Api;
     using Be.Vlaanderen.Basisregisters.MessageHandling.AwsSqs.Simple;
     using MediatR;
     using Microsoft.Extensions.Logging;

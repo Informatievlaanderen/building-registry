@@ -1,6 +1,5 @@
 namespace BuildingRegistry.Projector.Infrastructure
 {
-    using System;
     using Be.Vlaanderen.Basisregisters.Api;
     using Be.Vlaanderen.Basisregisters.Aws.DistributedMutex;
     using Microsoft.AspNetCore.Hosting;

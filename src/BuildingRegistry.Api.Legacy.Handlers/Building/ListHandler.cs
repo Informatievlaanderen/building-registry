@@ -4,6 +4,7 @@ namespace BuildingRegistry.Api.Legacy.Handlers.Building
     using System.Threading;
     using System.Threading.Tasks;
     using Abstractions.Building;
+    using Abstractions.Converters;
     using Abstractions.Infrastructure;
     using Api.Legacy.Abstractions.Building.Query;
     using Api.Legacy.Abstractions.Building.Responses;
@@ -12,6 +13,7 @@ namespace BuildingRegistry.Api.Legacy.Handlers.Building
     using Be.Vlaanderen.Basisregisters.Api.Search.Pagination;
     using Be.Vlaanderen.Basisregisters.Api.Search.Sorting;
     using Be.Vlaanderen.Basisregisters.GrAr.Common;
+    using BuildingRegistry.Legacy;
     using MediatR;
     using Microsoft.EntityFrameworkCore;
 
@@ -44,7 +46,7 @@ namespace BuildingRegistry.Api.Legacy.Handlers.Building
                         x.PersistentLocalId.Value,
                         request.ResponseOptions.Value.GebouwNaamruimte,
                         request.ResponseOptions.Value.GebouwDetailUrl,
-                        BuildingHelpers.MapBuildingStatus(x.Status.Value),
+                        x.Status.Value.ConvertFromBuildingStatus(),
                         x.Version.ToBelgianDateTimeOffset()))
                     .ToList(),
                 Volgende = pagedBuildings.PaginationInfo.BuildNextUri(request.ResponseOptions.Value.GebouwVolgendeUrl)
