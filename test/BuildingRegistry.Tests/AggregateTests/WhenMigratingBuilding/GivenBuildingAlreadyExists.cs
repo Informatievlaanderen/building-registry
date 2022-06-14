@@ -1,6 +1,5 @@
 namespace BuildingRegistry.Tests.AggregateTests.WhenMigratingBuilding
 {
-    using System;
     using Autofixture;
     using AutoFixture;
     using Be.Vlaanderen.Basisregisters.AggregateSource;

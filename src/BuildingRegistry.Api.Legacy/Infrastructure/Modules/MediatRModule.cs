@@ -1,7 +1,5 @@
 namespace BuildingRegistry.Api.Legacy.Infrastructure.Modules
 {
-    using System;
-    using System.Configuration;
     using Autofac;
     using MediatR;
     using Microsoft.Extensions.Configuration;

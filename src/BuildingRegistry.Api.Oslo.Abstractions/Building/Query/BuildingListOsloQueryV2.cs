@@ -10,7 +10,6 @@ namespace BuildingRegistry.Api.Oslo.Abstractions.Building.Query
     using Converters;
     using Microsoft.EntityFrameworkCore;
     using Projections.Legacy;
-    using Projections.Legacy.BuildingDetail;
     using Projections.Legacy.BuildingDetailV2;
 
     public class BuildingListOsloQueryV2 : Query<BuildingDetailItemV2, BuildingFilterV2>

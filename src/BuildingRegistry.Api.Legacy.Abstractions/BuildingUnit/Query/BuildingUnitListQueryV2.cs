@@ -8,7 +8,6 @@ namespace BuildingRegistry.Api.Legacy.Abstractions.BuildingUnit.Query
     using Be.Vlaanderen.Basisregisters.Api.Search.Sorting;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy.Gebouweenheid;
     using BuildingRegistry.Projections.Legacy;
-    using BuildingRegistry.Projections.Legacy.BuildingUnitDetail;
     using Converters;
     using Microsoft.EntityFrameworkCore;
     using Projections.Legacy.BuildingUnitDetailV2;

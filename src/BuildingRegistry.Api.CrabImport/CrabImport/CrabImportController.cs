@@ -9,12 +9,10 @@ namespace BuildingRegistry.Api.CrabImport.CrabImport
     using Microsoft.AspNetCore.Mvc;
     using Swashbuckle.AspNetCore.Filters;
     using System.Collections.Generic;
-    using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
     using Abstractions.Post;
     using Be.Vlaanderen.Basisregisters.GrAr.Import.Processing.Api.Messages;
-    using Handlers;
     using MediatR;
     using ApiController = Infrastructure.ApiController;
 

@@ -3,7 +3,6 @@ namespace BuildingRegistry.Api.Legacy.Infrastructure
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Net.Mime;
     using System.Reflection;
     using Be.Vlaanderen.Basisregisters.Api.Syndication;
     using Microsoft.Extensions.Configuration;

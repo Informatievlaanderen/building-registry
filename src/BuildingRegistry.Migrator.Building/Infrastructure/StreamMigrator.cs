@@ -5,8 +5,6 @@ namespace BuildingRegistry.Migrator.Building.Infrastructure
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
-    using Amazon.DynamoDBv2.Model;
-    using Api.BackOffice;
     using Api.BackOffice.Abstractions;
     using Autofac;
     using Be.Vlaanderen.Basisregisters.CommandHandling;

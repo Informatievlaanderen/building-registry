@@ -1,12 +1,9 @@
 namespace BuildingRegistry.Migrator.Building.Infrastructure.Modules
 {
-    using Api.BackOffice;
     using Api.BackOffice.Abstractions;
     using Autofac;
     using Autofac.Extensions.DependencyInjection;
     using Be.Vlaanderen.Basisregisters.DataDog.Tracing.Autofac;
-    using Be.Vlaanderen.Basisregisters.EventHandling;
-    using Be.Vlaanderen.Basisregisters.EventHandling.Autofac;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Autofac;
     using BuildingRegistry.Infrastructure;
     using BuildingRegistry.Infrastructure.Modules;

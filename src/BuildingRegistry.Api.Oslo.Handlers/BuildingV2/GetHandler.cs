@@ -1,6 +1,5 @@
 namespace BuildingRegistry.Api.Oslo.Handlers.BuildingV2
 {
-    using System;
     using System.Linq;
     using System.Text;
     using System.Threading;
