@@ -3,16 +3,15 @@ namespace BuildingRegistry.Api.Extract.Infrastructure.Modules
     using Autofac;
     using Handlers;
     using MediatR;
-    using Microsoft.Extensions.Configuration;
     using Module = Autofac.Module;
 
     public class MediatRModule : Module
     {
-        private readonly IConfiguration _configuration;
+        private readonly bool _useProjectionsV2;
 
-        public MediatRModule(IConfiguration configuration)
+        public MediatRModule(bool useProjectionsV2)
         {
-            _configuration = configuration;
+            _useProjectionsV2 = useProjectionsV2;
         }
 
         protected override void Load(ContainerBuilder builder)
@@ -29,15 +28,7 @@ namespace BuildingRegistry.Api.Extract.Infrastructure.Modules
                 return type => ctx.Resolve(type);
             });
 
-            var useProjectionsV2ConfigValue = _configuration.GetSection("FeatureToggles")["UseProjectionsV2"];
-            var useProjectionsV2 = false;
-
-            if (!string.IsNullOrEmpty(useProjectionsV2ConfigValue))
-            {
-                useProjectionsV2 = bool.Parse(useProjectionsV2ConfigValue);
-            }
-
-            if (useProjectionsV2)
+            if (_useProjectionsV2)
             {
                 builder.RegisterType<GetBuildingsHandlerV2>().AsImplementedInterfaces();
             }
