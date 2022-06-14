@@ -1,3 +1,10 @@
+# [3.10.0](https://github.com/informatievlaanderen/building-registry/compare/v3.9.4...v3.10.0) (2022-06-14)
+
+
+### Features
+
+* toggle projections ([267fe84](https://github.com/informatievlaanderen/building-registry/commit/267fe84843dfc9029c1ba3ffb5207341e5fccf94))
+
 ## [3.9.4](https://github.com/informatievlaanderen/building-registry/compare/v3.9.3...v3.9.4) (2022-06-13)
 
 
