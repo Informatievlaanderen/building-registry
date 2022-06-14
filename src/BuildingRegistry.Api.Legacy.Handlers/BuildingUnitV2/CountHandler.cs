@@ -17,13 +17,13 @@ namespace BuildingRegistry.Api.Legacy.Handlers.BuildingUnitV2
     {
         public async Task<TotaalAantalResponse> Handle(CountRequest request, CancellationToken cancellationToken)
         {
-            var filtering = request.HttpRequest.ExtractFilteringRequest<BuildingUnitFilter>();
+            var filtering = request.HttpRequest.ExtractFilteringRequest<BuildingUnitFilterV2>();
             var sorting = request.HttpRequest.ExtractSortingRequest();
             var pagination = new NoPaginationRequest();
             return new TotaalAantalResponse
             {
                 Aantal = filtering.ShouldFilter
-                    ? await new BuildingUnitListQuery(request.Context, request.SyndicationContext)
+                    ? await new BuildingUnitListQueryV2(request.Context)
                         .Fetch(filtering, sorting, pagination)
                         .Items
                         .CountAsync(cancellationToken)

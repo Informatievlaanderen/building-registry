@@ -24,7 +24,7 @@ namespace BuildingRegistry.Api.Oslo.Handlers.BuildingUnitV2
             return new TotaalAantalResponse
             {
                 Aantal = filtering.ShouldFilter
-                    ? await new BuildingUnitListOsloQueryV2(request.Context, request.SyndicationContext)
+                    ? await new BuildingUnitListOsloQueryV2(request.Context)
                         .Fetch(filtering, sorting, pagination)
                         .Items
                         .CountAsync(cancellationToken)

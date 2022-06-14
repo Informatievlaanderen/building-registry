@@ -38,7 +38,7 @@ namespace BuildingRegistry.Api.Oslo.Handlers.BuildingV2
                 throw new ApiException("Onbestaand gebouw.", StatusCodes.Status404NotFound);
             }
 
-            var buildingUnits = await request.Context
+            var buildingUnitsTask = request.Context
                 .BuildingUnitDetailsV2
                 .Where(x => x.BuildingPersistentLocalId == building.PersistentLocalId)
                 .Where(x => !x.IsRemoved)
@@ -50,12 +50,16 @@ namespace BuildingRegistry.Api.Oslo.Handlers.BuildingV2
                 .Select(s => CaPaKey.CreateFrom(s).VbrCaPaKey)
                 .Distinct();
 
-            var caPaKeys = await request.SyndicationContext
+            var caPaKeysTask = request.SyndicationContext
                 .BuildingParcelLatestItems
-                .Where(x => !x.IsRemoved &&
-                            parcels.Contains(x.CaPaKey))
+                .Where(x => !x.IsRemoved && parcels.Contains(x.CaPaKey))
                 .Select(x => x.CaPaKey)
                 .ToListAsync(cancellationToken);
+
+            await Task.WhenAll(buildingUnitsTask, caPaKeysTask);
+
+            var buildingUnits = buildingUnitsTask.Result;
+            var caPaKeys = caPaKeysTask.Result;
 
             return new BuildingOsloResponse(
                 building.PersistentLocalId,

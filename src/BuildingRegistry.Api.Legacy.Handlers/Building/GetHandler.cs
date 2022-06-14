@@ -3,6 +3,7 @@ namespace BuildingRegistry.Api.Legacy.Handlers.Building
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
+    using Abstractions.Converters;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
     using Be.Vlaanderen.Basisregisters.GrAr.Common;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy.Gebouw;
@@ -56,8 +57,8 @@ namespace BuildingRegistry.Api.Legacy.Handlers.Building
                 request.ResponseOptions.Value.GebouwNaamruimte,
                 building.Version.ToBelgianDateTimeOffset(),
                 BuildingHelpers.GetBuildingPolygon(building.Geometry),
-                BuildingHelpers.MapGeometryMethod(building.GeometryMethod.Value),
-                BuildingHelpers.MapBuildingStatus(building.Status.Value),
+                building.GeometryMethod.Value.ConvertFromBuildingGeometryMethod(),
+                building.Status.Value.ConvertFromBuildingStatus(),
                 buildingUnits.OrderBy(x => x.Value).Select(x => new GebouwDetailGebouweenheid(x.ToString(), string.Format(request.ResponseOptions.Value.GebouweenheidDetailUrl, x))).ToList(),
                 caPaKeys.Select(x => new GebouwDetailPerceel(x, string.Format(request.ResponseOptions.Value.PerceelUrl, x))).ToList());
         }

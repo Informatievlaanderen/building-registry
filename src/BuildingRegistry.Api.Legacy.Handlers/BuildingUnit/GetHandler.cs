@@ -4,6 +4,7 @@ namespace BuildingRegistry.Api.Legacy.Handlers.BuildingUnit
     using System.Threading;
     using System.Threading.Tasks;
     using Abstractions.BuildingUnit.Responses;
+    using Abstractions.Converters;
     using Api.Legacy.Abstractions.BuildingUnit;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
     using Be.Vlaanderen.Basisregisters.GrAr.Common;
@@ -44,9 +45,9 @@ namespace BuildingRegistry.Api.Legacy.Handlers.BuildingUnit
                 request.ResponseOptions.Value.GebouweenheidNaamruimte,
                 buildingUnit.Version.ToBelgianDateTimeOffset(),
                 BuildingUnitHelpers.GetBuildingUnitPoint(buildingUnit.Position),
-                BuildingUnitHelpers.MapBuildingUnitGeometryMethod(buildingUnit.PositionMethod.Value),
-                BuildingUnitHelpers.MapBuildingUnitStatus(buildingUnit.Status.Value),
-                BuildingUnitHelpers.MapBuildingUnitFunction(buildingUnit.Function),
+                buildingUnit.PositionMethod.Value.ConvertFromBuildingUnitGeometryMethod(),
+                buildingUnit.Status.Value.ConvertFromBuildingUnitStatus(),
+                buildingUnit.Function.ConvertFromBuildingUnitFunction(),
                 new GebouweenheidDetailGebouw(buildingUnit.BuildingPersistentLocalId.Value.ToString(), string.Format(request.ResponseOptions.Value.GebouwDetailUrl, buildingUnit.BuildingPersistentLocalId.Value)),
                 addressPersistentLocalIds.Select(id => new GebouweenheidDetailAdres(id, string.Format(request.ResponseOptions.Value.AdresUrl, id))).ToList());
         }

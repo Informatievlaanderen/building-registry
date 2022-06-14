@@ -4,6 +4,7 @@ namespace BuildingRegistry.Api.Legacy.Handlers.BuildingUnit
     using System.Threading;
     using System.Threading.Tasks;
     using Abstractions.BuildingUnit;
+    using Abstractions.Converters;
     using Abstractions.Infrastructure;
     using Api.Legacy.Abstractions.BuildingUnit.Query;
     using Api.Legacy.Abstractions.BuildingUnit.Responses;
@@ -44,7 +45,7 @@ namespace BuildingRegistry.Api.Legacy.Handlers.BuildingUnit
                         x.PersistentLocalId.Value,
                         request.ResponseOptions.Value.GebouweenheidNaamruimte,
                         request.ResponseOptions.Value.GebouweenheidDetailUrl,
-                        BuildingUnitHelpers.MapBuildingUnitStatus(x.Status.Value),
+                        x.Status.Value.ConvertFromBuildingUnitStatus(),
                         x.Version.ToBelgianDateTimeOffset()))
                     .ToList(),
                 Volgende = pagedBuildingUnits

@@ -32,8 +32,7 @@ namespace BuildingRegistry.Api.Legacy.Handlers.BuildingV2
                 throw new ApiException("Onbestaand gebouw.", StatusCodes.Status404NotFound);
             }
 
-            //TODO: improvement getting buildingunits and parcels in parallel.
-            var buildingUnitPersistentLocalIds = await request.Context
+            var buildingUnitPersistentLocalIdsTask = request.Context
                 .BuildingUnitDetailsV2
                 .Where(x => x.BuildingPersistentLocalId == building.PersistentLocalId)
                 .Where(x => !x.IsRemoved)
@@ -45,12 +44,16 @@ namespace BuildingRegistry.Api.Legacy.Handlers.BuildingV2
                 .Select(s => CaPaKey.CreateFrom(s).VbrCaPaKey)
                 .Distinct();
 
-            var caPaKeys = await request.SyndicationContext
+            var caPaKeysTask = request.SyndicationContext
                 .BuildingParcelLatestItems
-                .Where(x => !x.IsRemoved &&
-                            parcels.Contains(x.CaPaKey))
+                .Where(x => !x.IsRemoved && parcels.Contains(x.CaPaKey))
                 .Select(x => x.CaPaKey)
                 .ToListAsync(cancellationToken);
+
+            await Task.WhenAll(buildingUnitPersistentLocalIdsTask, caPaKeysTask);
+
+            var buildingUnitPersistentLocalIds = buildingUnitPersistentLocalIdsTask.Result;
+            var caPaKeys = caPaKeysTask.Result;
 
             return new BuildingResponse(
                 building.PersistentLocalId,

@@ -24,7 +24,7 @@ namespace BuildingRegistry.Api.Legacy.Handlers.BuildingUnitV2
             var sorting = request.HttpRequest.ExtractSortingRequest();
             var pagination = request.HttpRequest.ExtractPaginationRequest();
 
-            var pagedBuildingUnits = new BuildingUnitListQueryV2(request.Context, request.SyndicationContext)
+            var pagedBuildingUnits = new BuildingUnitListQueryV2(request.Context)
                 .Fetch(filtering, sorting, pagination);
 
             request.HttpResponse.AddPagedQueryResultHeaders(pagedBuildingUnits);

@@ -119,8 +119,13 @@ namespace BuildingRegistry.Api.Legacy.Abstractions.Converters
 
     public static class BuildingUnitFunctionExtensions
     {
-        public static GebouweenheidFunctie ConvertFromBuildingUnitFunction(this Legacy.BuildingUnitFunction function)
+        public static GebouweenheidFunctie? ConvertFromBuildingUnitFunction(this Legacy.BuildingUnitFunction? function)
         {
+            if (function == null)
+            {
+                return null;
+            }
+
             if (function == Legacy.BuildingUnitFunction.Unknown)
             {
                 return GebouweenheidFunctie.NietGekend;

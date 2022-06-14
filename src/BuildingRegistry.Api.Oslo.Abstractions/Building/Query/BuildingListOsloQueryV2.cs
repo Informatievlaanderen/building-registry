@@ -42,9 +42,9 @@ namespace BuildingRegistry.Api.Oslo.Abstractions.Building.Query
                     buildings = buildings.Where(m => m.Status == buildingStatus);
                 }
                 else
-                    //have to filter on EF cannot return new List<>().AsQueryable() cause non-EF provider does not support .CountAsync()
-                    buildings = new List<BuildingDetailItemV2>().AsQueryable();
-                //buildings = buildings.Where(m => m.Status.HasValue && (int)m.Status.Value == -1);
+                {
+                    return new List<BuildingDetailItemV2>().AsQueryable();
+                }
             }
 
             return buildings;

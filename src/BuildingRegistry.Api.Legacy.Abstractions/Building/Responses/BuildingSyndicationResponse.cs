@@ -121,7 +121,7 @@ namespace BuildingRegistry.Api.Legacy.Abstractions.Building.Responses
                             unit.Geometry == null
                                 ? null
                                 : BuildingUnitHelpers.GetBuildingUnitPoint(unit.Geometry)?.XmlPoint,
-                            unit.Function?.ConvertFromBuildingUnitFunction(),
+                            unit.Function.ConvertFromBuildingUnitFunction(),
                             unit.AddressIds.ToList(),
                             unit.Version.ToBelgianDateTimeOffset(),
                             unit.IsComplete))

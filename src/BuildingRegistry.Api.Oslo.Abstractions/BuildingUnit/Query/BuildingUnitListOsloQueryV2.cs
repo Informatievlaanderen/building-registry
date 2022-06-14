@@ -11,21 +11,16 @@ namespace BuildingRegistry.Api.Oslo.Abstractions.BuildingUnit.Query
     using Converters;
     using Microsoft.EntityFrameworkCore;
     using Projections.Legacy.BuildingUnitDetailV2;
-    using Projections.Syndication;
 
     public class BuildingUnitListOsloQueryV2 : Query<BuildingUnitDetailItemV2, BuildingUnitFilterV2>
     {
         private readonly LegacyContext _context;
-        private readonly SyndicationContext _syndicationContext;
 
         protected override ISorting Sorting => new BuildingUnitSortingV2();
 
-        public BuildingUnitListOsloQueryV2(
-            LegacyContext context,
-            SyndicationContext syndicationContext)
+        public BuildingUnitListOsloQueryV2(LegacyContext context)
         {
             _context = context;
-            _syndicationContext = syndicationContext;
         }
 
         protected override IQueryable<BuildingUnitDetailItemV2> Filter(FilteringHeader<BuildingUnitFilterV2> filtering)
@@ -37,19 +32,22 @@ namespace BuildingRegistry.Api.Oslo.Abstractions.BuildingUnit.Query
                 .AsNoTracking();
 
             if (!filtering.ShouldFilter)
+            {
                 return buildingUnits;
+            }
 
             if (!string.IsNullOrEmpty(filtering.Filter?.AddressPersistentLocalId))
             {
-                var addressPersistentLocalIds = _syndicationContext
-                    .AddressPersistentLocalIds
-                    .Where(x => x.PersistentLocalId == filtering.Filter.AddressPersistentLocalId)
-                    .Select(x => x.PersistentLocalId)
-                    .ToList();
-
-                buildingUnits = _context
-                    .BuildingUnitDetailsV2
-                    .Where(unit => unit.Addresses.Any(address => addressPersistentLocalIds.Contains(address.AddressPersistentLocalId.ToString())));
+                if (int.TryParse(filtering.Filter.AddressPersistentLocalId, out var addressPersistentLocalId))
+                {
+                    buildingUnits = _context
+                            .BuildingUnitDetailsV2
+                            .Where(unit => unit.Addresses.Any(address => address.AddressPersistentLocalId == addressPersistentLocalId));
+                }
+                else
+                {
+                    return new List<BuildingUnitDetailItemV2>().AsQueryable();
+                }
             }
 
             if (!string.IsNullOrEmpty(filtering.Filter.Status))
@@ -60,9 +58,9 @@ namespace BuildingRegistry.Api.Oslo.Abstractions.BuildingUnit.Query
                     buildingUnits = buildingUnits.Where(m => m.Status == buildingUnitStatus.Status);
                 }
                 else
-                    //have to filter on EF cannot return new List<>().AsQueryable() cause non-EF provider does not support .CountAsync()
-                    buildingUnits = new List<BuildingUnitDetailItemV2>().AsQueryable();
-                //buildingUnits = buildingUnits.Where(m => m.Status == "-1");
+                {
+                    return new List<BuildingUnitDetailItemV2>().AsQueryable();
+                }
             }
 
             return buildingUnits;

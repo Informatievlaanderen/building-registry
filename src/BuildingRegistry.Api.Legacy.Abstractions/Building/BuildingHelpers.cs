@@ -81,44 +81,5 @@ namespace BuildingRegistry.Api.Legacy.Abstractions.Building
             var gmlRing = new RingProperty { LinearRing = new LinearRing { PosList = posListBuilder.ToString() } };
             return gmlRing;
         }
-
-        public static GeometrieMethode MapGeometryMethod(BuildingGeometryMethod geometryMethod)
-        {
-            switch (geometryMethod)
-            {
-                case BuildingGeometryMethod.Outlined:
-                    return GeometrieMethode.Ingeschetst;
-
-                case BuildingGeometryMethod.MeasuredByGrb:
-                    return GeometrieMethode.IngemetenGRB;
-
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(geometryMethod), geometryMethod, null);
-            }
-        }
-
-        public static GebouwStatus MapBuildingStatus(BuildingStatus status)
-        {
-            switch (status)
-            {
-                case BuildingStatus.Planned:
-                    return GebouwStatus.Gepland;
-
-                case BuildingStatus.UnderConstruction:
-                    return GebouwStatus.InAanbouw;
-
-                case BuildingStatus.Realized:
-                    return GebouwStatus.Gerealiseerd;
-
-                case BuildingStatus.Retired:
-                    return GebouwStatus.Gehistoreerd;
-
-                case BuildingStatus.NotRealized:
-                    return GebouwStatus.NietGerealiseerd;
-
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(status), status, null);
-            }
-        }
     }
 }
