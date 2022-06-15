@@ -1,3 +1,10 @@
+## [3.10.2](https://github.com/informatievlaanderen/building-registry/compare/v3.10.1...v3.10.2) (2022-06-15)
+
+
+### Bug Fixes
+
+* consumer connectionString in migrator ([7f40b04](https://github.com/informatievlaanderen/building-registry/commit/7f40b04e90ad54ccca5e622157a01298b3e2fe3f))
+
 ## [3.10.1](https://github.com/informatievlaanderen/building-registry/compare/v3.10.0...v3.10.1) (2022-06-15)
 
 
