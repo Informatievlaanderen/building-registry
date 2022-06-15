@@ -1,3 +1,10 @@
+## [3.10.1](https://github.com/informatievlaanderen/building-registry/compare/v3.10.0...v3.10.1) (2022-06-15)
+
+
+### Bug Fixes
+
+* backoffice consumer connectionstring ([759b73c](https://github.com/informatievlaanderen/building-registry/commit/759b73cd232336ad90570bcc191092fea4271360))
+
 # [3.10.0](https://github.com/informatievlaanderen/building-registry/compare/v3.9.4...v3.10.0) (2022-06-14)
 
 
