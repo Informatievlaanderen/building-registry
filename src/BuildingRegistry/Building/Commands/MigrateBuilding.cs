@@ -6,7 +6,7 @@ namespace BuildingRegistry.Building.Commands
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Be.Vlaanderen.Basisregisters.Utilities;
 
-    public class  MigrateBuilding : IHasCommandProvenance
+    public class MigrateBuilding : IHasCommandProvenance
     {
         private static readonly Guid Namespace = new Guid("6e10f865-b2d9-48e5-a7e5-1cdb9bc817eb");
 
