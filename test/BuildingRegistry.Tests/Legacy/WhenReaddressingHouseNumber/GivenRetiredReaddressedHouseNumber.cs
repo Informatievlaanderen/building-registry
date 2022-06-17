@@ -8,8 +8,8 @@ namespace BuildingRegistry.Tests.Legacy.WhenReaddressingHouseNumber
     using BuildingRegistry.Legacy;
     using BuildingRegistry.Legacy.Commands.Crab;
     using BuildingRegistry.Legacy.Events;
+    using Fixtures;
     using NodaTime;
-    using Tests.Autofixture;
     using WhenImportingCrabHouseNumberStatus;
     using WhenImportingCrabTerrainObjectHouseNumber;
     using Xunit;

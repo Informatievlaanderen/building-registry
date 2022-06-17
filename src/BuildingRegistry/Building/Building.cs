@@ -49,6 +49,50 @@ namespace BuildingRegistry.Building
             return newBuilding;
         }
 
+        public void PlaceUnderConstruction()
+        {
+            if (BuildingStatus == BuildingStatus.UnderConstruction)
+            {
+                return;
+            }
+
+            var invalidStates = new List<BuildingStatus>
+            {
+                BuildingStatus.Retired,
+                BuildingStatus.Realized,
+                BuildingStatus.NotRealized,
+            };
+
+            if (invalidStates.Contains(BuildingStatus))
+            {
+                throw new BuildingCannotBePlacedUnderConstructionException(BuildingPersistentLocalId);
+            }
+
+            ApplyChange(new BuildingBecameUnderConstructionV2(BuildingPersistentLocalId));
+        }
+
+        public void RealizeConstruction()
+        {
+            if (BuildingStatus == BuildingStatus.Realized)
+            {
+                return;
+            }
+
+            var invalidStates = new List<BuildingStatus>
+            {
+                BuildingStatus.Planned,
+                BuildingStatus.Retired,
+                BuildingStatus.NotRealized
+            };
+
+            if (invalidStates.Contains(BuildingStatus))
+            {
+                throw new BuildingCannotBeRealizedException(BuildingPersistentLocalId);
+            }
+
+            ApplyChange(new BuildingWasRealizedV2(BuildingPersistentLocalId));
+        }
+
         private static void GuardPolygon(Geometry? geometry)
         {
             if (
@@ -60,7 +104,7 @@ namespace BuildingRegistry.Building
                 throw new InvalidPolygonException();
             }
         }
-
+        
         #region Metadata
         protected override void BeforeApplyChange(object @event)
         {

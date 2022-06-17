@@ -7,8 +7,8 @@ namespace BuildingRegistry.Tests.Legacy.Cases
     using BuildingRegistry.Legacy;
     using BuildingRegistry.Legacy.Commands.Crab;
     using BuildingRegistry.Legacy.Events;
+    using Fixtures;
     using NetTopologySuite.IO;
-    using Tests.Autofixture;
     using WhenImportingCrabSubaddress;
     using WhenImportingCrabTerrainObjectHouseNumber;
     using Xunit;

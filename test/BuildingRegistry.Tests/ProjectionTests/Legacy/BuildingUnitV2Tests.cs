@@ -3,13 +3,13 @@ namespace BuildingRegistry.Tests.ProjectionTests.Legacy
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
-    using Autofixture;
     using AutoFixture;
     using Be.Vlaanderen.Basisregisters.GrAr.Common.Pipes;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore;
     using Be.Vlaanderen.Basisregisters.Utilities.HexByteConvertor;
     using Building;
     using Building.Events;
+    using Fixtures;
     using FluentAssertions;
     using Projections.Legacy.BuildingUnitDetailV2;
     using Tests.Legacy.Autofixture;

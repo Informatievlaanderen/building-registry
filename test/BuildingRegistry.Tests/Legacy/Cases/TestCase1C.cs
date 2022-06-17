@@ -7,7 +7,7 @@ namespace BuildingRegistry.Tests.Legacy.Cases
     using BuildingRegistry.Legacy;
     using BuildingRegistry.Legacy.Commands.Crab;
     using BuildingRegistry.Legacy.Events;
-    using Tests.Autofixture;
+    using Fixtures;
     using WhenImportingCrabSubaddress;
     using WhenImportingCrabTerrainObject;
     using WhenImportingCrabTerrainObjectHouseNumber;

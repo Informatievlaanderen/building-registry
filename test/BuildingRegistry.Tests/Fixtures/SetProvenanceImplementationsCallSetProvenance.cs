@@ -1,4 +1,4 @@
-namespace BuildingRegistry.Tests.Autofixture
+namespace BuildingRegistry.Tests.Fixtures
 {
     using System;
     using System.Linq;

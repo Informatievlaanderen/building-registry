@@ -1,6 +1,5 @@
 namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuilding
 {
-    using Autofixture;
     using AutoFixture;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
     using Be.Vlaanderen.Basisregisters.AggregateSource.Testing;
@@ -8,6 +7,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuilding
     using Building.Commands;
     using Building.Events;
     using Building.Exceptions;
+    using Fixtures;
     using FluentAssertions;
     using Xunit;
     using Xunit.Abstractions;
@@ -23,8 +23,6 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuilding
         public void ThenBuildingWasPlanned()
         {
             var command = Fixture.Create<PlanBuilding>();
-
-            var geo = WKBReaderFactory.Create().Read(command.Geometry);
 
             Assert(new Scenario()
                 .GivenNone()

@@ -8,8 +8,8 @@ namespace BuildingRegistry.Tests.Legacy.Cases
     using BuildingRegistry.Legacy.Commands.Crab;
     using BuildingRegistry.Legacy.Crab;
     using BuildingRegistry.Legacy.Events;
+    using Fixtures;
     using NodaTime;
-    using Tests.Autofixture;
     using WhenImportingCrabBuildingStatus;
     using WhenImportingCrabSubaddress;
     using WhenImportingCrabTerrainObject;

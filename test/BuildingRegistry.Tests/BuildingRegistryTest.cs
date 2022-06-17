@@ -3,8 +3,8 @@ namespace BuildingRegistry.Tests
     using System;
     using System.Collections.Generic;
     using Autofac;
-    using Autofixture;
     using AutoFixture;
+    using Fixtures;
     using Microsoft.Extensions.Configuration;
 
     public class BuildingRegistryTest : AutofacBasedTest

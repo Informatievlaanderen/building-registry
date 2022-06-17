@@ -21,6 +21,8 @@ namespace BuildingRegistry.Building
         {
             Register<BuildingWasMigrated>(When);
             Register<BuildingWasPlannedV2>(When);
+            Register<BuildingBecameUnderConstructionV2>(When);
+            Register<BuildingWasRealizedV2>(When);
         }
 
         private void When(BuildingWasMigrated @event)
@@ -59,6 +61,19 @@ namespace BuildingRegistry.Building
                 BuildingGeometryMethod.Outlined);
 
             BuildingStatus = BuildingStatus.Planned;
+
+            _lastEvent = @event;
+        }
+
+        private void When(BuildingBecameUnderConstructionV2 @event)
+        {
+            BuildingStatus = BuildingStatus.UnderConstruction;
+
+            _lastEvent = @event;
+        }
+        private void When(BuildingWasRealizedV2 @event)
+        {
+            BuildingStatus = BuildingStatus.Realized;
 
             _lastEvent = @event;
         }
