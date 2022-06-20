@@ -32,7 +32,8 @@ namespace BuildingRegistry.Projections.Extract.BuildingExtract
         private readonly ExtractConfig _extractConfig;
         private readonly Encoding _encoding;
 
-        public BuildingExtractV2Projections(IOptions<ExtractConfig> extractConfig, Encoding encoding, WKBReader wkbReader)
+        public BuildingExtractV2Projections(IOptions<ExtractConfig> extractConfig, Encoding encoding,
+            WKBReader wkbReader)
         {
             _extractConfig = extractConfig.Value;
             _encoding = encoding ?? throw new ArgumentNullException(nameof(encoding));
@@ -47,11 +48,21 @@ namespace BuildingRegistry.Projections.Extract.BuildingExtract
                     PersistentLocalId = message.Message.BuildingPersistentLocalId,
                     DbaseRecord = new BuildingDbaseRecord
                     {
-                        id = { Value = $"{_extractConfig.DataVlaanderenNamespaceBuilding}/{message.Message.BuildingPersistentLocalId}" },
-                        gebouwid = { Value = message.Message.BuildingPersistentLocalId },
-                        geommet = { Value = MapGeometryMethod(BuildingGeometryMethod.Parse(message.Message.GeometryMethod)) },
-                        status = { Value = MapStatus(BuildingStatus.Parse(message.Message.BuildingStatus)) },
-                        versieid = { Value = message.Message.Provenance.Timestamp.ToBelgianDateTimeOffset().FromDateTimeOffset() }
+                        id =
+                        {
+                            Value =
+                                $"{_extractConfig.DataVlaanderenNamespaceBuilding}/{message.Message.BuildingPersistentLocalId}"
+                        },
+                        gebouwid = {Value = message.Message.BuildingPersistentLocalId},
+                        geommet =
+                        {
+                            Value = MapGeometryMethod(BuildingGeometryMethod.Parse(message.Message.GeometryMethod))
+                        },
+                        status = {Value = MapStatus(BuildingStatus.Parse(message.Message.BuildingStatus))},
+                        versieid =
+                        {
+                            Value = message.Message.Provenance.Timestamp.ToBelgianDateTimeOffset().FromDateTimeOffset()
+                        }
                     }.ToBytes(_encoding)
                 };
 
@@ -70,11 +81,18 @@ namespace BuildingRegistry.Projections.Extract.BuildingExtract
                     PersistentLocalId = message.Message.BuildingPersistentLocalId,
                     DbaseRecord = new BuildingDbaseRecord
                     {
-                        id = { Value = $"{_extractConfig.DataVlaanderenNamespaceBuilding}/{message.Message.BuildingPersistentLocalId}" },
-                        gebouwid = { Value = message.Message.BuildingPersistentLocalId },
-                        geommet = { Value = MapGeometryMethod(BuildingGeometryMethod.Outlined) },
-                        status = { Value = MapStatus(BuildingStatus.Planned) },
-                        versieid = { Value = message.Message.Provenance.Timestamp.ToBelgianDateTimeOffset().FromDateTimeOffset() }
+                        id =
+                        {
+                            Value =
+                                $"{_extractConfig.DataVlaanderenNamespaceBuilding}/{message.Message.BuildingPersistentLocalId}"
+                        },
+                        gebouwid = {Value = message.Message.BuildingPersistentLocalId},
+                        geommet = {Value = MapGeometryMethod(BuildingGeometryMethod.Outlined)},
+                        status = {Value = MapStatus(BuildingStatus.Planned)},
+                        versieid =
+                        {
+                            Value = message.Message.Provenance.Timestamp.ToBelgianDateTimeOffset().FromDateTimeOffset()
+                        }
                     }.ToBytes(_encoding)
                 };
 
@@ -84,6 +102,22 @@ namespace BuildingRegistry.Projections.Extract.BuildingExtract
                 await context
                     .BuildingExtractV2
                     .AddAsync(buildingExtractItemV2, ct);
+            });
+
+            When<Envelope<BuildingBecameUnderConstructionV2>>(async (context, message, ct) =>
+            {
+                var item = await context.BuildingExtractV2.FindAsync(message.Message.BuildingPersistentLocalId,
+                    cancellationToken: ct);
+                UpdateStatus(item, MapStatus(BuildingStatus.UnderConstruction));
+                UpdateVersie(item, message.Message.Provenance.Timestamp);
+            });
+
+            When<Envelope<BuildingWasRealizedV2>>(async (context, message, ct) =>
+            {
+                var item = await context.BuildingExtractV2.FindAsync(message.Message.BuildingPersistentLocalId,
+                    cancellationToken: ct);
+                UpdateStatus(item, MapStatus(BuildingStatus.Realized));
+                UpdateVersie(item, message.Message.Provenance.Timestamp);
             });
         }
 

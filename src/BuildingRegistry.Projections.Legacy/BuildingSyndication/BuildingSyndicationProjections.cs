@@ -882,6 +882,22 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
                     .BuildingSyndication
                     .AddAsync(newBuildingSyndicationItem, ct); ;
             });
+
+            When<Envelope<BuildingBecameUnderConstructionV2>>(async (context, message, ct) =>
+            {
+                await context.CreateNewBuildingSyndicationItem(message.Message.BuildingPersistentLocalId, message, item =>
+                {
+                    item.Status = MapBuildingStatus(BuildingRegistry.Building.BuildingStatus.UnderConstruction);
+                }, ct);
+            });
+
+            When<Envelope<BuildingWasRealizedV2>>(async (context, message, ct) =>
+            {
+                await context.CreateNewBuildingSyndicationItem(message.Message.BuildingPersistentLocalId, message, item =>
+                {
+                    item.Status = MapBuildingStatus(BuildingRegistry.Building.BuildingStatus.Realized);
+                }, ct);
+            });
         }
 
         private static BuildingGeometryMethod MapBuildingGeometryMethod(BuildingRegistry.Building.BuildingGeometryMethod buildingGeometryMethod)

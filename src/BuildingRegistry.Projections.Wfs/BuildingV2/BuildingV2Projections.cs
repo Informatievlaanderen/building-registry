@@ -54,7 +54,7 @@ namespace BuildingRegistry.Projections.Wfs.BuildingV2
                 {
                     PersistentLocalId = message.Message.BuildingPersistentLocalId,
                     Id = PersistentLocalIdHelper.CreateBuildingId(message.Message.BuildingPersistentLocalId),
-                    Status = MapStatus(BuildingStatus.Planned),
+                    Status = PlannedStatus,
                     IsRemoved = false,
                     Version = message.Message.Provenance.Timestamp
                 };
@@ -69,14 +69,14 @@ namespace BuildingRegistry.Projections.Wfs.BuildingV2
             When<Envelope<BuildingBecameUnderConstructionV2>>(async (context, message, ct) =>
             {
                 var item = await context.BuildingsV2.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);
-                item.Status = BuildingStatus.UnderConstruction;
+                item.Status = UnderConstructionStatus;
                 item.Version = message.Message.Provenance.Timestamp;
             });
 
             When<Envelope<BuildingWasRealizedV2>>(async (context, message, ct) =>
             {
                 var item = await context.BuildingsV2.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);
-                item.Status = BuildingStatus.Realized;
+                item.Status = RealizedStatus;
                 item.Version = message.Message.Provenance.Timestamp;
             });
         }
