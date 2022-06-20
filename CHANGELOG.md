@@ -1,3 +1,10 @@
+# [3.11.0](https://github.com/informatievlaanderen/building-registry/compare/v3.10.2...v3.11.0) (2022-06-20)
+
+
+### Features
+
+* add underConstruction & realize ([76cda71](https://github.com/informatievlaanderen/building-registry/commit/76cda71a156d6f117bff2634093a7cd9c3a6efba))
+
 ## [3.10.2](https://github.com/informatievlaanderen/building-registry/compare/v3.10.1...v3.10.2) (2022-06-15)
 
 
