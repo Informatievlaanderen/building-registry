@@ -1,6 +1,7 @@
 namespace BuildingRegistry.Api.CrabImport.Abstractions.Post
 {
     using System.ComponentModel.DataAnnotations;
+    using System.Dynamic;
     using Legacy;
     using Newtonsoft.Json;
     using Swashbuckle.AspNetCore.Filters;
@@ -29,12 +30,13 @@ namespace BuildingRegistry.Api.CrabImport.Abstractions.Post
 
     public static class RegisterCrabImportRequestMapping
     {
-        public static dynamic? Map(RegisterCrabImportRequest message)
+        public static dynamic Map(RegisterCrabImportRequest message)
         {
             var assembly = typeof(Building).Assembly;
             var type = assembly.GetType(message.Type)!;
 
-            return JsonConvert.DeserializeObject(message.CrabItem, type);
+            var result = JsonConvert.DeserializeObject(message.CrabItem, type);
+            return result ?? new ExpandoObject();
         }
     }
 }

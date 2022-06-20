@@ -33,6 +33,7 @@ nuget Be.Vlaanderen.Basisregisters.AggregateSource.Testing.Xunit 6.1.0
 nuget Be.Vlaanderen.Basisregisters.Api 18.0.0
 
 nuget Be.Vlaanderen.Basisregisters.Aws.DistributedMutex 3.0.0
+nuget Be.Vlaanderen.Basisregisters.Aws.Lambda 1.0.0
 
 nuget Be.Vlaanderen.Basisregisters.CommandHandling 6.1.0
 nuget Be.Vlaanderen.Basisregisters.CommandHandling.Idempotency 6.1.0
@@ -70,6 +71,17 @@ nuget Be.Vlaanderen.Basisregisters.GrAr.Extracts 17.3.1
 nuget Be.Vlaanderen.Basisregisters.Shaperon 9.0.1
 nuget Be.Vlaanderen.Basisregisters.Shaperon.Geometries 9.0.1
 
+// LAMBDA STUFF
+nuget Amazon.Lambda.Core 2.1.0
+nuget Amazon.Lambda.Serialization.Json 2.0.0
+nuget Amazon.Lambda.SQSEvents 2.1.0
+nuget Microsoft.Extensions.Configuration.Binder 6.0.0
+nuget Microsoft.Extensions.Configuration.EnvironmentVariables 6.0.1
+nuget Microsoft.Extensions.Configuration.FileExtensions 6.0.0
+nuget Microsoft.Extensions.Configuration.Json 6.0.0
+nuget Microsoft.Extensions.DependencyInjection 6.0.0
+nuget MediatR.Extensions.Microsoft.DependencyInjection 10.0.1
+
 // .NET CLASSIC STUFF
 nuget EntityFramework 6.4.4
 nuget Microsoft.SqlServer.Types 13.0.4001 // Don't update: requires version 13.0.4001 for legacy reasons
@@ -88,6 +100,7 @@ nuget xunit.categories 2.0.6
 nuget FluentAssertions 6.5.1
 nuget Moq 4.17.2
 nuget AutoFixture.Xunit2 4.17.0
+nuget Amazon.Lambda.TestUtilities 2.0.0
 
 // BUILD STUFF
 nuget SourceLink.Embed.AllSourceFiles 2.8.3 copy_local: true
