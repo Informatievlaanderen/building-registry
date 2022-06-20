@@ -1,3 +1,16 @@
+# [3.12.0](https://github.com/informatievlaanderen/building-registry/compare/v3.11.1...v3.12.0) (2022-06-20)
+
+
+### Bug Fixes
+
+* after testing ([1a99a98](https://github.com/informatievlaanderen/building-registry/commit/1a99a98e8647f4213bf24d9019feda7d946afece))
+* typo `realiseren` ([c8c07da](https://github.com/informatievlaanderen/building-registry/commit/c8c07dad70cabe294d78cc2b1df8163332129165))
+
+
+### Features
+
+* add underConstruction & realize projections ([30635b5](https://github.com/informatievlaanderen/building-registry/commit/30635b5c7b3dba8aca9e035959d1814e3f2856d0))
+
 ## [3.11.1](https://github.com/informatievlaanderen/building-registry/compare/v3.11.0...v3.11.1) (2022-06-20)
 
 
