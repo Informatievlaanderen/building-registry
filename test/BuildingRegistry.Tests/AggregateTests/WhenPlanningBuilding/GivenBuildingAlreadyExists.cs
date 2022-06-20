@@ -1,12 +1,12 @@
 namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuilding
 {
-    using Autofixture;
     using AutoFixture;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
     using Be.Vlaanderen.Basisregisters.AggregateSource.Testing;
     using Building;
     using Building.Commands;
     using Building.Events;
+    using Fixtures;
     using Xunit;
     using Xunit.Abstractions;
 

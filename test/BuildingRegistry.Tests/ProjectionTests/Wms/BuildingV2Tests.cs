@@ -2,13 +2,13 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wms
 {
     using System.Collections.Generic;
     using System.Threading.Tasks;
-    using Autofixture;
     using AutoFixture;
     using Be.Vlaanderen.Basisregisters.GrAr.Common.Pipes;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore;
     using Be.Vlaanderen.Basisregisters.Utilities.HexByteConvertor;
     using Building;
     using Building.Events;
+    using Fixtures;
     using FluentAssertions;
     using Infrastructure;
     using Projections.Wms.BuildingV2;

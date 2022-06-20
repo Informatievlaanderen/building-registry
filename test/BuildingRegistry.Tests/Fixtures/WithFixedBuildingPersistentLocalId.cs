@@ -1,4 +1,4 @@
-namespace BuildingRegistry.Tests.Autofixture
+namespace BuildingRegistry.Tests.Fixtures
 {
     using AutoFixture;
     using Building;
@@ -10,6 +10,7 @@ namespace BuildingRegistry.Tests.Autofixture
             var persistentLocalIdInt = fixture.Create<int>();
 
             fixture.Register(() => new BuildingPersistentLocalId(persistentLocalIdInt));
+            fixture.Register(() => new BuildingRegistry.Legacy.PersistentLocalId(persistentLocalIdInt));
 
             fixture.Customizations.Add(
                 new AutoFixture.Kernel.FilteringSpecimenBuilder(

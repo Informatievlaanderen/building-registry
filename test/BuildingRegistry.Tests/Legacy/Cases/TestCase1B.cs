@@ -9,9 +9,9 @@ namespace BuildingRegistry.Tests.Legacy.Cases
     using BuildingRegistry.Legacy.Commands.Crab;
     using BuildingRegistry.Legacy.Crab;
     using BuildingRegistry.Legacy.Events;
+    using Fixtures;
     using NetTopologySuite.IO;
     using NodaTime;
-    using Tests.Autofixture;
     using WhenImportingCrabBuildingGeometry;
     using WhenImportingCrabHouseNumberPosition;
     using WhenImportingCrabHouseNumberStatus;
