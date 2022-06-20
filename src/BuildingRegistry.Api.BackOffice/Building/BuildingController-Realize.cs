@@ -16,7 +16,7 @@ namespace BuildingRegistry.Api.BackOffice.Building
     public partial class BuildingController
     {
         /// <summary>
-        /// Gebouw realizeren.
+        /// Gebouw realiseren.
         /// </summary>
         /// <param name="options"></param>
         /// <param name="request"></param>
@@ -24,7 +24,7 @@ namespace BuildingRegistry.Api.BackOffice.Building
         /// <param name="cancellationToken"></param>
         /// <response code="202">todo</response>
         /// <returns></returns>
-        [HttpPost("{persistentLocalId}/acties/realizeren")]
+        [HttpPost("{persistentLocalId}/acties/realiseren")]
         [ProducesResponseType(StatusCodes.Status202Accepted)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
