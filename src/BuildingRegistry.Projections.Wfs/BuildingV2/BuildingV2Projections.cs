@@ -54,7 +54,7 @@ namespace BuildingRegistry.Projections.Wfs.BuildingV2
                 {
                     PersistentLocalId = message.Message.BuildingPersistentLocalId,
                     Id = PersistentLocalIdHelper.CreateBuildingId(message.Message.BuildingPersistentLocalId),
-                    Status = MapStatus(BuildingStatus.Planned),
+                    Status = PlannedStatus,
                     IsRemoved = false,
                     Version = message.Message.Provenance.Timestamp
                 };
@@ -65,11 +65,20 @@ namespace BuildingRegistry.Projections.Wfs.BuildingV2
 
                 await context.BuildingsV2.AddAsync(buildingV2, ct);
             });
-        }
 
-        private static void SetVersion(BuildingV2 building, Instant provenanceTimestamp)
-        {
-            building.Version = provenanceTimestamp;
+            When<Envelope<BuildingBecameUnderConstructionV2>>(async (context, message, ct) =>
+            {
+                var item = await context.BuildingsV2.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);
+                item.Status = UnderConstructionStatus;
+                item.Version = message.Message.Provenance.Timestamp;
+            });
+
+            When<Envelope<BuildingWasRealizedV2>>(async (context, message, ct) =>
+            {
+                var item = await context.BuildingsV2.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);
+                item.Status = RealizedStatus;
+                item.Version = message.Message.Provenance.Timestamp;
+            });
         }
 
         private void SetGeometry(BuildingV2 building, string extendedWkbGeometry, string method)

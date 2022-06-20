@@ -49,6 +49,22 @@ namespace BuildingRegistry.Projections.Legacy.BuildingDetailV2
                     .BuildingDetailsV2
                     .AddAsync(building, ct);
             });
+
+            When<Envelope<BuildingBecameUnderConstructionV2>>(async (context, message, ct) =>
+            {
+                var item = await context.BuildingDetailsV2.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);
+                item.Status = BuildingStatus.UnderConstruction;
+                item.Version = message.Message.Provenance.Timestamp;
+                UpdateHash(item, message);
+            });
+
+            When<Envelope<BuildingWasRealizedV2>>(async (context, message, ct) =>
+            {
+                var item = await context.BuildingDetailsV2.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);
+                item.Status = BuildingStatus.Realized;
+                item.Version = message.Message.Provenance.Timestamp;
+                UpdateHash(item, message);
+            });
         }
 
         private static void UpdateHash<T>(BuildingDetailItemV2 entity, Envelope<T> wrappedEvent) where T : IHaveHash, IMessage
