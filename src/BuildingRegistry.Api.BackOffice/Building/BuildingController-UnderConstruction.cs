@@ -24,14 +24,14 @@ namespace BuildingRegistry.Api.BackOffice.Building
         /// <param name="cancellationToken"></param>
         /// <response code="202">todo</response>
         /// <returns></returns>
-        [HttpPost("{persistentLocalId}/acties/inaanbouw")]
+        [HttpPost("{persistentLocalId}/acties/inaanbouwplaatsen")]
         [ProducesResponseType(StatusCodes.Status202Accepted)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
         [SwaggerResponseHeader(StatusCodes.Status202Accepted, "location", "string", "De url van het gebouw.")]
         [SwaggerResponseExample(StatusCodes.Status400BadRequest, typeof(BadRequestResponseExamples))]
         [SwaggerResponseExample(StatusCodes.Status500InternalServerError, typeof(InternalServerErrorResponseExamples))]
-        public async Task<IActionResult> Plan(
+        public async Task<IActionResult> UnderConstruction(
             [FromServices] IOptions<ResponseOptions> options,
             [FromServices] IValidator<PlaceBuildingUnderConstructionRequest> validator,
             [FromRoute] PlaceBuildingUnderConstructionRequest request,
@@ -45,7 +45,7 @@ namespace BuildingRegistry.Api.BackOffice.Building
                 var response = await _mediator.Send(request, cancellationToken);
 
                 return new AcceptedWithETagResult(
-                    new Uri(string.Format(options.Value.BuildingDetailUrl)),
+                    new Uri(string.Format(options.Value.BuildingDetailUrl, request.PersistentLocalId)),
                     response.LastEventHash);
             }
             catch (IdempotencyException)

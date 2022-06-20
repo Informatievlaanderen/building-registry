@@ -45,7 +45,7 @@ namespace BuildingRegistry.Api.BackOffice.Building
                 var response = await _mediator.Send(request, cancellationToken);
 
                 return new AcceptedWithETagResult(
-                    new Uri(string.Format(options.Value.BuildingDetailUrl)),
+                    new Uri(string.Format(options.Value.BuildingDetailUrl, request.PersistentLocalId)),
                     response.LastEventHash);
             }
             catch (IdempotencyException)
