@@ -1,3 +1,10 @@
+## [3.11.1](https://github.com/informatievlaanderen/building-registry/compare/v3.11.0...v3.11.1) (2022-06-20)
+
+
+### Bug Fixes
+
+* add projection toggle in settings ([04ee9b1](https://github.com/informatievlaanderen/building-registry/commit/04ee9b130c92e86516331e22c1f77237db5ff4fe))
+
 # [3.11.0](https://github.com/informatievlaanderen/building-registry/compare/v3.10.2...v3.11.0) (2022-06-20)
 
 
