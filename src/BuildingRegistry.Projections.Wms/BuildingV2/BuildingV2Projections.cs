@@ -54,11 +54,20 @@ namespace BuildingRegistry.Projections.Wms.BuildingV2
 
                 await context.BuildingsV2.AddAsync(buildingV2, ct);
             });
-        }
 
-        private static void SetVersion(BuildingV2 building, Instant provenanceTimestamp)
-        {
-            building.Version = provenanceTimestamp;
+            When<Envelope<BuildingBecameUnderConstructionV2>>(async (context, message, ct) =>
+            {
+                var item = await context.BuildingsV2.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);
+                item.Status = BuildingStatus.UnderConstruction;
+                item.Version = message.Message.Provenance.Timestamp;
+            });
+
+            When<Envelope<BuildingWasRealizedV2>>(async (context, message, ct) =>
+            {
+                var item = await context.BuildingsV2.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);
+                item.Status = BuildingStatus.Realized;
+                item.Version = message.Message.Provenance.Timestamp;
+            });
         }
 
         private void SetGeometry(BuildingV2 building, string extendedWkbGeometry, BuildingGeometryMethod method)
