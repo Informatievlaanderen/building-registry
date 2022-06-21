@@ -5,29 +5,28 @@ namespace BuildingRegistry.Api.CrabImport.Handlers.Sqs
     using System.Threading;
     using System.Threading.Tasks;
     using Abstractions.Post;
-    using Amazon;
     using Be.Vlaanderen.Basisregisters.MessageHandling.AwsSqs.Simple;
     using MediatR;
+    using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.Logging;
 
     public class SqsPostHandler : IRequestHandler<SqsPostRequest, Unit>
     {
+        private readonly IConfiguration _configuration;
         private readonly ILogger<SqsPostHandler> _logger;
 
-        public SqsPostHandler(ILogger<SqsPostHandler> logger)
+        public SqsPostHandler(IConfiguration configuration, ILogger<SqsPostHandler> logger)
         {
+            _configuration = configuration;
             _logger = logger;
         }
 
         public async Task<Unit> Handle(SqsPostRequest request, CancellationToken cancellationToken)
         {
-            // TODO: get from environemtn vars
-            const string accessKey = "";
-            const string secretKey = "";
-            const string sessionToken = "";
-            var regionEndpoint = RegionEndpoint.EUWest1;
+            var accessKey = _configuration.GetValue<string>("AWS_ACCESS_KEY_ID") ?? throw new InvalidOperationException("The AWS_ACCESS_KEY_ID configuration variable was not set.");
+            var secretKey = _configuration.GetValue<string>("AWS_SECRET_ACCESS_KEY") ?? throw new InvalidOperationException("The AWS_SECRET_ACCESS_KEY configuration variable was not set.");
 
-            var sqsOptions = new SqsOptions(accessKey, secretKey, sessionToken, regionEndpoint);
+            var sqsOptions = new SqsOptions(accessKey, secretKey);
             string queueName = $"{nameof(BuildingRegistry)}.{nameof(Api)}.{nameof(CrabImport)}";
             var queueUrl = await SqsQueue.CreateQueue(sqsOptions, queueName, true, cancellationToken);
 
