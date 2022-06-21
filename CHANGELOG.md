@@ -1,3 +1,10 @@
+## [3.12.1](https://github.com/informatievlaanderen/building-registry/compare/v3.12.0...v3.12.1) (2022-06-20)
+
+
+### Bug Fixes
+
+* etag for construct & realize ([1a5e44b](https://github.com/informatievlaanderen/building-registry/commit/1a5e44b253754d51ecdd47468d92a407bab0ddd3))
+
 # [3.12.0](https://github.com/informatievlaanderen/building-registry/compare/v3.11.1...v3.12.0) (2022-06-20)
 
 

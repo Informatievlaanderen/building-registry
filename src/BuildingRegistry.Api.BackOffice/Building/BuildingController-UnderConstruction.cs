@@ -5,6 +5,8 @@ namespace BuildingRegistry.Api.BackOffice.Building
     using System.Threading.Tasks;
     using Abstractions.Building.Requests;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
+    using Be.Vlaanderen.Basisregisters.Api.ETag;
+    using BuildingRegistry.Building;
     using FluentValidation;
     using Handlers.Building;
     using Infrastructure.Options;
@@ -21,8 +23,10 @@ namespace BuildingRegistry.Api.BackOffice.Building
         /// <param name="options"></param>
         /// <param name="request"></param>
         /// <param name="validator"></param>
+        /// <param name="ifMatchHeaderValue"></param>
         /// <param name="cancellationToken"></param>
-        /// <response code="202">todo</response>
+        /// <response code="202">Aanvraag tot goedkeuring wordt reeds verwerkt.</response>
+        /// <response code="412">Als de If-Match header niet overeenkomt met de laatste ETag.</response>
         /// <returns></returns>
         [HttpPost("{persistentLocalId}/acties/inaanbouwplaatsen")]
         [ProducesResponseType(StatusCodes.Status202Accepted)]
@@ -32,9 +36,11 @@ namespace BuildingRegistry.Api.BackOffice.Building
         [SwaggerResponseExample(StatusCodes.Status400BadRequest, typeof(BadRequestResponseExamples))]
         [SwaggerResponseExample(StatusCodes.Status500InternalServerError, typeof(InternalServerErrorResponseExamples))]
         public async Task<IActionResult> UnderConstruction(
+            [FromServices] IBuildings buildingsRepository,
             [FromServices] IOptions<ResponseOptions> options,
             [FromServices] IValidator<PlaceBuildingUnderConstructionRequest> validator,
             [FromRoute] PlaceBuildingUnderConstructionRequest request,
+            [FromHeader(Name = "If-Match")] string? ifMatchHeaderValue,
             CancellationToken cancellationToken = default)
         {
             await validator.ValidateAndThrowAsync(request, cancellationToken);
@@ -42,6 +48,18 @@ namespace BuildingRegistry.Api.BackOffice.Building
             try
             {
                 request.Metadata = GetMetadata();
+
+                // Check if user provided ETag is equal to the current Entity Tag
+                if (ifMatchHeaderValue is not null)
+                {
+                    var ifMatchTag = ifMatchHeaderValue.Trim();
+                    var currentETag = await GetEtag(buildingsRepository, request.PersistentLocalId, cancellationToken);
+                    if (ifMatchTag != currentETag.ToString())
+                    {
+                        return new PreconditionFailedResult();
+                    }
+                }
+
                 var response = await _mediator.Send(request, cancellationToken);
 
                 return new AcceptedWithETagResult(
