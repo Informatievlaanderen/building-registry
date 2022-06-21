@@ -10,7 +10,7 @@ namespace BuildingRegistry.Building.Events
 
     [EventTags(EventTag.For.Sync, EventTag.For.Edit)]
     [EventName(EventName)]
-    [EventDescription("Het gebouw werd in status 'gerealiseerd' gezet.")] // todo: review text
+    [EventDescription("Het gebouw werd gerealiseerd.")] // todo: review text
     public class BuildingWasRealizedV2 : IBuildingEvent
     {
         public const string EventName = "BuildingWasRealizedV2"; // BE CAREFUL CHANGING THIS!!

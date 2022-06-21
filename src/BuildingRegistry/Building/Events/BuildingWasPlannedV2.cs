@@ -11,7 +11,7 @@ namespace BuildingRegistry.Building.Events
 
     [EventTags(EventTag.For.Sync, EventTag.For.Edit)]
     [EventName(EventName)]
-    [EventDescription("Het gebouw werd ingeschetst met status 'gepland'.")]
+    [EventDescription("Het gebouw werd gepland.")]
     public class BuildingWasPlannedV2 : IBuildingEvent
     {
         public const string EventName = "BuildingWasPlannedV2"; // BE CAREFUL CHANGING THIS!!
