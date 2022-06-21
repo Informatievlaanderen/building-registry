@@ -1,3 +1,18 @@
+# [3.13.0](https://github.com/informatievlaanderen/building-registry/compare/v3.12.1...v3.13.0) (2022-06-21)
+
+
+### Bug Fixes
+
+* register MessageHandler ([5dff391](https://github.com/informatievlaanderen/building-registry/commit/5dff391414859956308ffd7de153ac2b2e8fbc41))
+* remove CrabImport.json ([f4b632b](https://github.com/informatievlaanderen/building-registry/commit/f4b632b76e28f7e0ce5d194bcda8c5a797181a0f))
+
+
+### Features
+
+* add CrabImport lambda ([0a56522](https://github.com/informatievlaanderen/building-registry/commit/0a565220c255b47f9634bc74d22e3b4bafc764c7))
+* add CrabImport lambda ([a56b332](https://github.com/informatievlaanderen/building-registry/commit/a56b332121a0982068a7aaa2d9747a815aab7099))
+* add lambda ([#582](https://github.com/informatievlaanderen/building-registry/issues/582)) ([b03ba84](https://github.com/informatievlaanderen/building-registry/commit/b03ba84db9fd4086618c370c1a73ef26b2ebc43c))
+
 ## [3.12.1](https://github.com/informatievlaanderen/building-registry/compare/v3.12.0...v3.12.1) (2022-06-20)
 
 
