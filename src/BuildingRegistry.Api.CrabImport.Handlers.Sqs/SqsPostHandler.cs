@@ -2,7 +2,6 @@ namespace BuildingRegistry.Api.CrabImport.Handlers.Sqs
 {
     using System;
     using System.Diagnostics.CodeAnalysis;
-    using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
     using Abstractions.Post;
@@ -22,30 +21,19 @@ namespace BuildingRegistry.Api.CrabImport.Handlers.Sqs
 
         public async Task<Unit> Handle(SqsPostRequest request, CancellationToken cancellationToken)
         {
+            // TODO: get from environemtn vars
             const string accessKey = "";
             const string secretKey = "";
             const string sessionToken = "";
             var regionEndpoint = RegionEndpoint.EUWest1;
 
-            var commandsPerCommandId = request.RegisterCrabImportList
-                .SelectMany(x => x)
-                .Select(RegisterCrabImportRequestMapping.Map)
-                .Where(x => IsValidGuid(x))
-                .Distinct(new LambdaEqualityComparer<dynamic?>(x => CreateSafeCommandId(x).ToString()))
-                .ToDictionary(x => CreateSafeCommandId(x), x => x);
-
             var sqsOptions = new SqsOptions(accessKey, secretKey, sessionToken, regionEndpoint);
-            var queueUrl = await SqsQueue.CreateQueue(sqsOptions, nameof(SqsPostHandler), true, cancellationToken);
+            string queueName = $"{nameof(BuildingRegistry)}.{nameof(Api)}.{nameof(CrabImport)}";
+            var queueUrl = await SqsQueue.CreateQueue(sqsOptions, queueName, true, cancellationToken);
 
-            foreach (var command in commandsPerCommandId)
-            {
-                _logger.LogDebug($"Copying command {command.Key} to queue");
+            await SqsProducer.Produce(sqsOptions, queueUrl, request, string.Empty, cancellationToken);
 
-                var groupId = command.Key.HasValue
-                    ? command.Key.Value.ToString("D")
-                    : Guid.Empty.ToString("D");
-                await SqsProducer.Produce(sqsOptions, queueUrl, command.Value, groupId, cancellationToken);
-            }
+            _logger.LogDebug($"Request sent to queue {queueName}");
 
             return Unit.Value;
         }
