@@ -1,3 +1,11 @@
+## [3.13.1](https://github.com/informatievlaanderen/building-registry/compare/v3.13.0...v3.13.1) (2022-06-21)
+
+
+### Bug Fixes
+
+* correct v2 event descriptions ([ace2f31](https://github.com/informatievlaanderen/building-registry/commit/ace2f31fdaa5990558813d9c352cc49a1d7f9406))
+* simplify SqsOptions creation ([76c81a3](https://github.com/informatievlaanderen/building-registry/commit/76c81a3db1d1782d31a69d20e35fcf1937fdb997))
+
 # [3.13.0](https://github.com/informatievlaanderen/building-registry/compare/v3.12.1...v3.13.0) (2022-06-21)
 
 
