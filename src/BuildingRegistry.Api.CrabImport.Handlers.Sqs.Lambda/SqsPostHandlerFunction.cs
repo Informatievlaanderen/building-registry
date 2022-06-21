@@ -13,6 +13,7 @@ namespace BuildingRegistry.Api.CrabImport.Handlers.Sqs.Lambda
         public override void ConfigureServices(ServiceCollection services)
         {
             base.ConfigureServices(services);
+            services.AddTransient<IMessageHandler, MessageHandler>();
             services.AddMediatR(typeof(SqsPostHandler).Assembly);
         }
     }
