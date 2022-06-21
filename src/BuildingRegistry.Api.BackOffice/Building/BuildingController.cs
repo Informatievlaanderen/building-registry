@@ -1,8 +1,12 @@
 namespace BuildingRegistry.Api.BackOffice.Building
 {
     using System.Collections.Generic;
+    using System.Threading;
+    using System.Threading.Tasks;
     using Be.Vlaanderen.Basisregisters.Api;
+    using Be.Vlaanderen.Basisregisters.Api.ETag;
     using Be.Vlaanderen.Basisregisters.AspNetCore.Mvc.Middleware;
+    using BuildingRegistry.Building;
     using FluentValidation;
     using FluentValidation.Results;
     using MediatR;
@@ -44,6 +48,16 @@ namespace BuildingRegistry.Api.BackOffice.Building
             {
                 failure
             });
+        }
+
+        private async Task<ETag> GetEtag(
+            IBuildings buildingRepository,
+            int buildingPersistentLocalId,
+            CancellationToken cancellationToken)
+        {
+            var aggregate =
+                await buildingRepository.GetAsync(new BuildingStreamId(new BuildingPersistentLocalId(buildingPersistentLocalId)), cancellationToken);
+            return new ETag(ETagType.Strong, aggregate.LastEventHash);
         }
     }
 }
