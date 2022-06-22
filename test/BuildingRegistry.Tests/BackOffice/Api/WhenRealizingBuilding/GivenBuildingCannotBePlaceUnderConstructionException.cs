@@ -56,7 +56,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenRealizingBuilding
                 .Where(x =>
                     x.Errors.Any(
                         failure => failure.ErrorCode == "GebouwStatusInAanbouw"
-                                    && failure.ErrorMessage == "Deze actie is enkel toegestaan op gebouwen met status 'inaanbouw'."));
+                                    && failure.ErrorMessage == "Deze actie is enkel toegestaan op gebouwen met status 'inAanbouw'."));
         }
     }
 }
