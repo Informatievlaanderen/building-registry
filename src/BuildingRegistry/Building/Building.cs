@@ -51,6 +51,11 @@ namespace BuildingRegistry.Building
 
         public void PlaceUnderConstruction()
         {
+            if (IsRemoved)
+            {
+                throw new BuildingIsRemovedException(BuildingPersistentLocalId);
+            }
+
             if (BuildingStatus == BuildingStatus.UnderConstruction)
             {
                 return;
@@ -65,7 +70,7 @@ namespace BuildingRegistry.Building
 
             if (invalidStates.Contains(BuildingStatus))
             {
-                throw new BuildingCannotBePlacedUnderConstructionException(BuildingPersistentLocalId);
+                throw new BuildingCannotBePlacedUnderConstructionException(BuildingStatus);
             }
 
             ApplyChange(new BuildingBecameUnderConstructionV2(BuildingPersistentLocalId));
@@ -73,6 +78,11 @@ namespace BuildingRegistry.Building
 
         public void RealizeConstruction()
         {
+            if (IsRemoved)
+            {
+                throw new BuildingIsRemovedException(BuildingPersistentLocalId);
+            }
+
             if (BuildingStatus == BuildingStatus.Realized)
             {
                 return;
@@ -87,7 +97,7 @@ namespace BuildingRegistry.Building
 
             if (invalidStates.Contains(BuildingStatus))
             {
-                throw new BuildingCannotBeRealizedException(BuildingPersistentLocalId);
+                throw new BuildingCannotBeRealizedException(BuildingStatus);
             }
 
             ApplyChange(new BuildingWasRealizedV2(BuildingPersistentLocalId));

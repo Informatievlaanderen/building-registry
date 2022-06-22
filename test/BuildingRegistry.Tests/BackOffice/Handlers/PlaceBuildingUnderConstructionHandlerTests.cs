@@ -1,11 +1,13 @@
 namespace BuildingRegistry.Tests.BackOffice.Handlers
 {
+    using System.Collections.Generic;
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
     using Autofac;
     using AutoFixture;
     using Be.Vlaanderen.Basisregisters.CommandHandling;
+    using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Building;
     using Building.Commands;
     using BuildingRegistry.Api.BackOffice.Abstractions.Building.Requests;
@@ -17,6 +19,7 @@ namespace BuildingRegistry.Tests.BackOffice.Handlers
     using SqlStreamStore.Streams;
     using Xunit;
     using Xunit.Abstractions;
+    using BuildingUnit = Building.Commands.BuildingUnit;
 
     public class PlaceBuildingUnderConstructionHandlerTests : BuildingRegistryHandlerTest
     {
@@ -45,9 +48,16 @@ namespace BuildingRegistry.Tests.BackOffice.Handlers
         [Fact]
         public async Task WhenBuildingPlanned_ThenBuildingUnderConstruction()
         {
-            Fixture.Register(() => BuildingRegistry.Legacy.BuildingStatus.Planned);
-
-            var migrateBuilding = Fixture.Create<MigrateBuilding>();
+            var migrateBuilding = new MigrateBuilding(
+                Fixture.Create<BuildingRegistry.Legacy.BuildingId>(),
+                Fixture.Create<BuildingRegistry.Legacy.PersistentLocalId>(),
+                Fixture.Create<BuildingRegistry.Legacy.PersistentLocalIdAssignmentDate>(),
+                BuildingRegistry.Legacy.BuildingStatus.Planned,
+                Fixture.Create<BuildingRegistry.Legacy.BuildingGeometry>(),
+                isRemoved: false,
+                new List<BuildingUnit>(),
+                Fixture.Create<Provenance>()
+            );
             DispatchArrangeCommand(migrateBuilding);
 
             var request = new PlaceBuildingUnderConstructionRequest
@@ -70,15 +80,22 @@ namespace BuildingRegistry.Tests.BackOffice.Handlers
         [Fact]
         public async Task WhenBuildingUnderConstruction_ThenBuildingUnderConstruction()
         {
-            Fixture.Register(() => BuildingRegistry.Legacy.BuildingStatus.UnderConstruction);
-
-            var migrateBuilding = Fixture.Create<MigrateBuilding>();
-            DispatchArrangeCommand(migrateBuilding);
-
             var request = new PlaceBuildingUnderConstructionRequest
             {
                 PersistentLocalId = _buildingPersistentLocalId
             };
+
+            var migrateBuilding = new MigrateBuilding(
+                Fixture.Create<BuildingRegistry.Legacy.BuildingId>(),
+                Fixture.Create<BuildingRegistry.Legacy.PersistentLocalId>(),
+                Fixture.Create<BuildingRegistry.Legacy.PersistentLocalIdAssignmentDate>(),
+                BuildingRegistry.Legacy.BuildingStatus.UnderConstruction,
+                Fixture.Create<BuildingRegistry.Legacy.BuildingGeometry>(),
+                isRemoved: false,
+                new List<BuildingUnit>(),
+                Fixture.Create<Provenance>()
+            );
+            DispatchArrangeCommand(migrateBuilding);
 
             // Act
             var result = await _sut.Handle(request, CancellationToken.None);
