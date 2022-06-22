@@ -1,3 +1,10 @@
+## [3.13.2](https://github.com/informatievlaanderen/building-registry/compare/v3.13.1...v3.13.2) (2022-06-22)
+
+
+### Bug Fixes
+
+* extract with no building units won't crash ([8f92fe3](https://github.com/informatievlaanderen/building-registry/commit/8f92fe3298922635cfc14b915799dd232dba7051))
+
 ## [3.13.1](https://github.com/informatievlaanderen/building-registry/compare/v3.13.0...v3.13.1) (2022-06-21)
 
 
