@@ -4,6 +4,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlacingBuildingUnderConstruc
     using AutoFixture;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
     using Be.Vlaanderen.Basisregisters.AggregateSource.Testing;
+    using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Building;
     using Building.Commands;
     using Building.Events;
@@ -12,6 +13,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlacingBuildingUnderConstruc
     using FluentAssertions;
     using Xunit;
     using Xunit.Abstractions;
+    using BuildingUnit = Building.Commands.BuildingUnit;
 
     public class GivenBuildingExists : BuildingRegistryTest
     {
@@ -54,17 +56,52 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlacingBuildingUnderConstruc
         [InlineData("NotRealized")]
         public void WithInvalidStatus_ThrowsBuildingCannotBePlacedUnderConstructionException(string status)
         {
-            Fixture.Register(() => BuildingStatus.Parse(status));
-
             var command = Fixture.Create<PlaceBuildingUnderConstruction>();
+
+            var buildingWasMigrated = new BuildingWasMigrated(
+                Fixture.Create<BuildingId>(),
+                command.BuildingPersistentLocalId,
+                Fixture.Create<BuildingPersistentLocalIdAssignmentDate>(),
+                BuildingStatus.Parse(status),
+                Fixture.Create<BuildingGeometry>(),
+                isRemoved: false,
+                new List<BuildingUnit>()
+            );
+            ((ISetProvenance)buildingWasMigrated).SetProvenance(Fixture.Create<Provenance>());
 
             Assert(new Scenario()
                 .Given(
                     new BuildingStreamId(Fixture.Create<BuildingPersistentLocalId>()),
-                    Fixture.Create<BuildingWasMigrated>())
+                    buildingWasMigrated)
                 .When(command)
-                .Throws(new BuildingCannotBePlacedUnderConstructionException(command.BuildingPersistentLocalId)));
+                .Throws(new BuildingCannotBePlacedUnderConstructionException(BuildingStatus.Parse(status))));
         }
+
+
+        [Fact]
+        public void BuildingIsRemoved_ThrowsBuildingIsRemovedException()
+        {
+            var command = Fixture.Create<PlaceBuildingUnderConstruction>();
+
+            var buildingWasMigrated = new BuildingWasMigrated(
+                Fixture.Create<BuildingId>(),
+                command.BuildingPersistentLocalId,
+                Fixture.Create<BuildingPersistentLocalIdAssignmentDate>(),
+                BuildingStatus.Planned,
+                Fixture.Create<BuildingGeometry>(),
+                isRemoved: true,
+                new List<BuildingUnit>()
+            );
+            ((ISetProvenance)buildingWasMigrated).SetProvenance(Fixture.Create<Provenance>());
+
+            Assert(new Scenario()
+                .Given(
+                    new BuildingStreamId(Fixture.Create<BuildingPersistentLocalId>()),
+                    buildingWasMigrated)
+                .When(command)
+                .Throws(new BuildingIsRemovedException(command.BuildingPersistentLocalId)));
+        }
+
 
         [Fact]
         public void StateCheck()

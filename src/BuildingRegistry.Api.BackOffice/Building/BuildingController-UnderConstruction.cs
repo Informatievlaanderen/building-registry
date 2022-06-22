@@ -1,13 +1,18 @@
 namespace BuildingRegistry.Api.BackOffice.Building
 {
     using System;
+    using System.Collections.Generic;
     using System.Threading;
     using System.Threading.Tasks;
     using Abstractions.Building.Requests;
+    using Abstractions.Building.Validators;
+    using Be.Vlaanderen.Basisregisters.AggregateSource;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
     using Be.Vlaanderen.Basisregisters.Api.ETag;
     using BuildingRegistry.Building;
+    using BuildingRegistry.Building.Exceptions;
     using FluentValidation;
+    using FluentValidation.Results;
     using Handlers.Building;
     using Infrastructure.Options;
     using Microsoft.AspNetCore.Http;
@@ -20,6 +25,7 @@ namespace BuildingRegistry.Api.BackOffice.Building
         /// <summary>
         /// Gebouw in aanbouw zetten.
         /// </summary>
+        /// <param name="buildingsRepository"></param>
         /// <param name="options"></param>
         /// <param name="request"></param>
         /// <param name="validator"></param>
@@ -69,6 +75,24 @@ namespace BuildingRegistry.Api.BackOffice.Building
             catch (IdempotencyException)
             {
                 return Accepted();
+            }
+            catch (AggregateNotFoundException)
+            {
+                throw new ApiException(ValidationErrorMessages.BuildingNotFound, StatusCodes.Status404NotFound);
+            }
+            catch (DomainException exception)
+            {
+                throw exception switch
+                {
+                    BuildingIsRemovedException => new ApiException(ValidationErrorMessages.BuildingRemoved, StatusCodes.Status410Gone),
+                    BuildingCannotBePlacedUnderConstructionException => CreateValidationException(
+                        ValidationErrorCodes.BuildingCannotBePlacedUnderConstruction,
+                        string.Empty,
+                        ValidationErrorMessages.BuildingCannotBePlacedUnderConstruction),
+
+                    _ => new ValidationException(new List<ValidationFailure>
+                        { new ValidationFailure(string.Empty, exception.Message) })
+                };
             }
         }
     }
