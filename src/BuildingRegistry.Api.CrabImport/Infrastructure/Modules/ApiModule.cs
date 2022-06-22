@@ -9,6 +9,7 @@ namespace BuildingRegistry.Api.CrabImport.Infrastructure.Modules
     using Be.Vlaanderen.Basisregisters.EventHandling.Autofac;
     using Be.Vlaanderen.Basisregisters.GrAr.Import.Api;
     using Be.Vlaanderen.Basisregisters.GrAr.Import.Processing.CrabImport;
+    using Be.Vlaanderen.Basisregisters.MessageHandling.AwsSqs.Simple;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Autofac;
     using BuildingRegistry.Infrastructure;
     using BuildingRegistry.Infrastructure.Modules;
@@ -17,6 +18,7 @@ namespace BuildingRegistry.Api.CrabImport.Infrastructure.Modules
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Logging;
+using System;
 
     public class ApiModule : Module
     {
@@ -88,6 +90,13 @@ namespace BuildingRegistry.Api.CrabImport.Infrastructure.Modules
             containerBuilder
                 .RegisterType<ProblemDetailsHelper>()
                 .AsSelf();
+
+            // register SqsOptions instance
+            var accessKey = _configuration.GetValue<string>("AWS_ACCESS_KEY_ID");// ?? throw new InvalidOperationException("The AWS_ACCESS_KEY_ID configuration variable was not set.");
+            var secretKey = _configuration.GetValue<string>("AWS_SECRET_ACCESS_KEY");// ?? throw new InvalidOperationException("The AWS_SECRET_ACCESS_KEY configuration variable was not set.");
+            var sqsOptions = new SqsOptions(accessKey, secretKey);
+            containerBuilder
+                .RegisterInstance(sqsOptions);
 
             containerBuilder.Populate(_services);
         }
