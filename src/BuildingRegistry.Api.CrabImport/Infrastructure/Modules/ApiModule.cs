@@ -92,9 +92,7 @@ using System;
                 .AsSelf();
 
             // register SqsOptions instance
-            var accessKey = _configuration.GetValue<string>("AWS_ACCESS_KEY_ID");// ?? throw new InvalidOperationException("The AWS_ACCESS_KEY_ID configuration variable was not set.");
-            var secretKey = _configuration.GetValue<string>("AWS_SECRET_ACCESS_KEY");// ?? throw new InvalidOperationException("The AWS_SECRET_ACCESS_KEY configuration variable was not set.");
-            var sqsOptions = new SqsOptions(accessKey, secretKey);
+            var sqsOptions = new SqsOptions();
             containerBuilder
                 .RegisterInstance(sqsOptions);
 
