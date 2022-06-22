@@ -94,6 +94,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BuildingRegistry.Api.CrabIm
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BuildingRegistry.Api.CrabImport.Handlers.Sqs.Lambda.Tests", "test\BuildingRegistry.Api.CrabImport.Handlers.Sqs.Lambda.Tests\BuildingRegistry.Api.CrabImport.Handlers.Sqs.Lambda.Tests.csproj", "{8C1B6ADC-7444-4C83-A827-C5F90F8944E0}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BuildingRegistry.Api.BackOffice.Handlers.Sqs", "src\BuildingRegistry.Api.BackOffice.Handlers.Sqs\BuildingRegistry.Api.BackOffice.Handlers.Sqs.csproj", "{98B2265D-1750-490E-A6BB-6718721F3E69}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -232,6 +234,10 @@ Global
 		{8C1B6ADC-7444-4C83-A827-C5F90F8944E0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8C1B6ADC-7444-4C83-A827-C5F90F8944E0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8C1B6ADC-7444-4C83-A827-C5F90F8944E0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{98B2265D-1750-490E-A6BB-6718721F3E69}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{98B2265D-1750-490E-A6BB-6718721F3E69}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{98B2265D-1750-490E-A6BB-6718721F3E69}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{98B2265D-1750-490E-A6BB-6718721F3E69}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -270,6 +276,7 @@ Global
 		{36EDFD27-971F-4C2D-8AC4-5FF0F07F8804} = {24B47154-C5F0-4356-B059-49A1E72C38A6}
 		{965C3A6C-A3D9-4FEE-B39E-88BB1244257E} = {24B47154-C5F0-4356-B059-49A1E72C38A6}
 		{8C1B6ADC-7444-4C83-A827-C5F90F8944E0} = {1A034126-30E6-416B-BB2E-F5786E07B178}
+		{98B2265D-1750-490E-A6BB-6718721F3E69} = {24B47154-C5F0-4356-B059-49A1E72C38A6}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {65FA30D5-DDFC-40EC-9BC9-3BF93D1B430F}

@@ -10,20 +10,21 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Sqs.Building
 
     public class SqsRealizeBuildingHandler : IRequestHandler<SqsRealizeBuildingRequest, Unit>
     {
+        private readonly SqsOptions _sqsOptions;
         private readonly ILogger<SqsRealizeBuildingHandler> _logger;
 
-        public SqsRealizeBuildingHandler(ILogger<SqsRealizeBuildingHandler> logger)
+        public SqsRealizeBuildingHandler(SqsOptions sqsOptions, ILogger<SqsRealizeBuildingHandler> logger)
         {
+            _sqsOptions = sqsOptions;
             _logger = logger;
         }
 
         public async Task<Unit> Handle(SqsRealizeBuildingRequest request, CancellationToken cancellationToken)
         {
-            var sqsOptions = new SqsOptions();
             var queueName = $"{nameof(BuildingRegistry)}.{nameof(Api)}.{nameof(BackOffice)}.{nameof(Building)}.{nameof(SqsRealizeBuildingHandler)}";
-            var queueUrl = await SqsQueue.CreateQueue(sqsOptions, queueName, true, cancellationToken);
+            var queueUrl = await SqsQueue.CreateQueue(_sqsOptions, queueName, true, cancellationToken);
 
-            await SqsProducer.Produce(sqsOptions, queueUrl, request, string.Empty, cancellationToken);
+            await SqsProducer.Produce(_sqsOptions, queueUrl, request, string.Empty, cancellationToken);
 
             _logger.LogDebug($"Request sent to queue {queueName}");
 
