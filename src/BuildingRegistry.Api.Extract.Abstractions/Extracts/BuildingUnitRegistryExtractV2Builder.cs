@@ -39,11 +39,12 @@ namespace BuildingRegistry.Api.Extract.Abstractions.Extracts
                 ExtractFileNames.BuildingUnit,
                 extractMetadata);
 
+            var anyItems = extractItems.Any();
             var boundingBox = new BoundingBox3D(
-                extractItems.Where(x => x.MinimumX > 0).Min(record => record.MinimumX),
-                extractItems.Where(x => x.MinimumY > 0).Min(record => record.MinimumY),
-                extractItems.Where(x => x.MaximumX > 0).Max(record => record.MaximumX),
-                extractItems.Where(x => x.MaximumY > 0).Max(record => record.MaximumY),
+                anyItems ? extractItems.Where(x => x.MinimumX > 0).Min(record => record.MinimumX) : 0,
+                anyItems ? extractItems.Where(x => x.MinimumY > 0).Min(record => record.MinimumY) : 0,
+                anyItems ? extractItems.Where(x => x.MaximumX > 0).Max(record => record.MaximumX) : 0,
+                anyItems ? extractItems.Where(x => x.MaximumY > 0).Max(record => record.MaximumY) : 0,
                 0,
                 0,
                 double.NegativeInfinity,
