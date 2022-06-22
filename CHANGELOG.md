@@ -1,3 +1,16 @@
+# [3.14.0](https://github.com/informatievlaanderen/building-registry/compare/v3.13.3...v3.14.0) (2022-06-22)
+
+
+### Bug Fixes
+
+* correct sync feed handler ([a67ed0e](https://github.com/informatievlaanderen/building-registry/commit/a67ed0ed6179afd5a7477736048668b7391caa70))
+
+
+### Features
+
+* add backoffice handlers sqs project (to be implemented) ([e6da22a](https://github.com/informatievlaanderen/building-registry/commit/e6da22a4251fa9059def9ff2d9dfa0d153f1aaf6))
+* realize & construct validations ([26b1045](https://github.com/informatievlaanderen/building-registry/commit/26b10457de74d8a7590af652f1a5830bb96bd286))
+
 ## [3.13.3](https://github.com/informatievlaanderen/building-registry/compare/v3.13.2...v3.13.3) (2022-06-22)
 
 
