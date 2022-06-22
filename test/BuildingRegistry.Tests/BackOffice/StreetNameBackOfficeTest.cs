@@ -8,6 +8,8 @@ namespace BuildingRegistry.Tests.BackOffice
     using Be.Vlaanderen.Basisregisters.Api;
     using Be.Vlaanderen.Basisregisters.CommandHandling;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
+    using Building;
+    using Building.Commands;
     using BuildingRegistry.Api.BackOffice.Infrastructure.Options;
     using MediatR;
     using Microsoft.AspNetCore.Http;
@@ -33,6 +35,11 @@ namespace BuildingRegistry.Tests.BackOffice
             using var scope = Container.BeginLifetimeScope();
             var bus = scope.Resolve<ICommandHandlerResolver>();
             bus.Dispatch(command.CreateCommandId(), command);
+        }
+
+        public void PlanBuilding(BuildingPersistentLocalId buildingPersistentLocalId, ExtendedWkbGeometry wkbGeometry)
+        {
+            DispatchArrangeCommand(new PlanBuilding(buildingPersistentLocalId, wkbGeometry, Fixture.Create<Provenance>()));
         }
 
         public T CreateApiBusControllerWithUser<T>(string username) where T : ApiController

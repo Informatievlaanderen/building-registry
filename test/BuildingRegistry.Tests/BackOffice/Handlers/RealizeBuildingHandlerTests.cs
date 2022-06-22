@@ -1,11 +1,13 @@
 namespace BuildingRegistry.Tests.BackOffice.Handlers
 {
+    using System.Collections.Generic;
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
     using Autofac;
     using AutoFixture;
     using Be.Vlaanderen.Basisregisters.CommandHandling;
+    using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Building;
     using Building.Commands;
     using BuildingRegistry.Api.BackOffice.Abstractions.Building.Requests;
@@ -47,7 +49,16 @@ namespace BuildingRegistry.Tests.BackOffice.Handlers
         {
             Fixture.Register(() => BuildingRegistry.Legacy.BuildingStatus.UnderConstruction);
 
-            var migrateBuilding = Fixture.Create<MigrateBuilding>();
+            var migrateBuilding = new MigrateBuilding(
+                Fixture.Create<BuildingRegistry.Legacy.BuildingId>(),
+                Fixture.Create<BuildingRegistry.Legacy.PersistentLocalId>(),
+                Fixture.Create<BuildingRegistry.Legacy.PersistentLocalIdAssignmentDate>(),
+                BuildingRegistry.Legacy.BuildingStatus.UnderConstruction,
+                Fixture.Create<BuildingRegistry.Legacy.BuildingGeometry>(),
+                isRemoved: false,
+                new List<BuildingRegistry.Building.Commands.BuildingUnit>(),
+                Fixture.Create<Provenance>()
+            );
             DispatchArrangeCommand(migrateBuilding);
 
             var request = new RealizeBuildingRequest()
@@ -72,7 +83,16 @@ namespace BuildingRegistry.Tests.BackOffice.Handlers
         {
             Fixture.Register(() => BuildingRegistry.Legacy.BuildingStatus.Realized);
 
-            var migrateBuilding = Fixture.Create<MigrateBuilding>();
+            var migrateBuilding = new MigrateBuilding(
+                Fixture.Create<BuildingRegistry.Legacy.BuildingId>(),
+                Fixture.Create<BuildingRegistry.Legacy.PersistentLocalId>(),
+                Fixture.Create<BuildingRegistry.Legacy.PersistentLocalIdAssignmentDate>(),
+                BuildingRegistry.Legacy.BuildingStatus.Realized,
+                Fixture.Create<BuildingRegistry.Legacy.BuildingGeometry>(),
+                isRemoved: false,
+                new List<BuildingRegistry.Building.Commands.BuildingUnit>(),
+                Fixture.Create<Provenance>()
+            );
             DispatchArrangeCommand(migrateBuilding);
 
             var request = new RealizeBuildingRequest()
