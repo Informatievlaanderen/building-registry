@@ -34,7 +34,7 @@ namespace BuildingRegistry.Api.Legacy.Handlers.Building
 
             var pagedBuildings = new BuildingSyndicationQuery(
                     request.Context,
-                    filtering.Filter.Embed)
+                    filtering.Filter?.Embed)
                 .Fetch(filtering, sorting, pagination);
 
             return new SyncResponse(lastFeedUpdate, pagedBuildings);

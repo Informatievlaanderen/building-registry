@@ -1,3 +1,10 @@
+## [3.13.3](https://github.com/informatievlaanderen/building-registry/compare/v3.13.2...v3.13.3) (2022-06-22)
+
+
+### Bug Fixes
+
+* inject SqsOptions ([c184ee9](https://github.com/informatievlaanderen/building-registry/commit/c184ee9ace492ae3401541b9e9e7c41cdf1763a6))
+
 ## [3.13.2](https://github.com/informatievlaanderen/building-registry/compare/v3.13.1...v3.13.2) (2022-06-22)
 
 
