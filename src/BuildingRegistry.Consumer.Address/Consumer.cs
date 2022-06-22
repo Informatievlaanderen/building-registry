@@ -36,6 +36,7 @@ namespace BuildingRegistry.Consumer.Address
 
         public Task<Result<KafkaJsonMessage>> Start(CancellationToken cancellationToken = default)
         {
+            var messageCounter = 0;
             var projector = new ConnectedProjector<ConsumerAddressContext>(Resolve.WhenEqualToHandlerMessageType(new AddressKafkaProjection().Handlers));
 
             var consumerGroupId = $"{nameof(BuildingRegistry)}.{nameof(Consumer)}.{_topic}{_consumerGroupSuffix}";
@@ -51,6 +52,9 @@ namespace BuildingRegistry.Consumer.Address
                         _logger.LogInformation("Handling next message");
                         await projector.ProjectAsync(_consumerContext, message, cancellationToken);
                         await _consumerContext.SaveChangesAsync(cancellationToken);
+                        messageCounter++;
+                        if(messageCounter % 1000 == 0)
+                            _consumerContext.ChangeTracker.Clear();
                     },
                     noMessageFoundDelay: 300,
                     _offset,
