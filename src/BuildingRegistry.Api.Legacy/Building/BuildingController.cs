@@ -215,37 +215,40 @@ namespace BuildingRegistry.Api.Legacy.Building
         {
             var sw = new StringWriterWithEncoding(Encoding.UTF8);
 
-            await using var xmlWriter = XmlWriter.Create(sw, new XmlWriterSettings { Async = true, Indent = true, Encoding = sw.Encoding });
-            var formatter = new AtomFormatter(null, xmlWriter.Settings) { UseCDATA = true };
-            var writer = new AtomFeedWriter(xmlWriter, null, formatter);
-            var syndicationConfiguration = configuration.GetSection("Syndication");
-            var atomConfiguration = AtomFeedConfigurationBuilder.CreateFrom(syndicationConfiguration, lastUpdate);
-
-            await writer.WriteDefaultMetadata(atomConfiguration);
-
-            var buildings = pagedBuildings.Items.ToList();
-
-            var nextFrom = buildings.Any()
-                ? buildings.Max(x => x.Position) + 1
-                : (long?)null;
-
-            var nextUri = BuildNextSyncUri(pagedBuildings.PaginationInfo.Limit, nextFrom, syndicationConfiguration["NextUri"]);
-            if (nextUri is not null)
+            using (var xmlWriter = XmlWriter.Create(sw, new XmlWriterSettings { Async = true, Indent = true, Encoding = sw.Encoding }))
             {
-                await writer.Write(new SyndicationLink(nextUri, "next"));
-            }
+                var formatter = new AtomFormatter(null, xmlWriter.Settings) { UseCDATA = true };
+                var writer = new AtomFeedWriter(xmlWriter, null, formatter);
+                var syndicationConfiguration = configuration.GetSection("Syndication");
+                var atomConfiguration = AtomFeedConfigurationBuilder.CreateFrom(syndicationConfiguration, lastUpdate);
 
-            foreach (var building in pagedBuildings.Items)
-            {
-                await writer.WriteBuilding(
-                    responseOptions,
-                    formatter,
-                    syndicationConfiguration["Category1"],
-                    syndicationConfiguration["Category2"],
-                    building);
-            }
+                await writer.WriteDefaultMetadata(atomConfiguration);
 
-            await xmlWriter.FlushAsync();
+                var buildings = pagedBuildings.Items.ToList();
+
+                var nextFrom = buildings.Any()
+                    ? buildings.Max(x => x.Position) + 1
+                    : (long?)null;
+
+                var nextUri = BuildNextSyncUri(pagedBuildings.PaginationInfo.Limit, nextFrom,
+                    syndicationConfiguration["NextUri"]);
+                if (nextUri is not null)
+                {
+                    await writer.Write(new SyndicationLink(nextUri, "next"));
+                }
+
+                foreach (var building in pagedBuildings.Items)
+                {
+                    await writer.WriteBuilding(
+                        responseOptions,
+                        formatter,
+                        syndicationConfiguration["Category1"],
+                        syndicationConfiguration["Category2"],
+                        building);
+                }
+
+                await xmlWriter.FlushAsync();
+            }
 
             return sw.ToString();
         }
