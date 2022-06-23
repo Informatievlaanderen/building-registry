@@ -16,7 +16,7 @@ namespace BuildingRegistry.Legacy.Events
         [EventPropertyDescription("Interne GUID van de gebouweenheid.")]
         public Guid BuildingUnitId { get; }
 
-        [EventPropertyDescription("Extended WKB-voorstelling van de gebouweenheidgeometrie.")]
+        [EventPropertyDescription("Extended WKB-voorstelling van de gebouweenheidpositie (Hexadecimale notatie).")]
         public string ExtendedWkbGeometry { get; }
 
         [EventPropertyDescription("Metadata bij het event.")]

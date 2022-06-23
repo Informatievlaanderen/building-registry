@@ -19,7 +19,7 @@ namespace BuildingRegistry.Building.Events
         [EventPropertyDescription("Objectidentificator van het gebouw.")]
         public int BuildingPersistentLocalId { get; }
 
-        [EventPropertyDescription("Extended WKB-voorstelling van de gebouwgeometrie.")]
+        [EventPropertyDescription("Extended WKB-voorstelling van de gebouwgeometrie (Hexadecimale notatie).")]
         public string ExtendedWkbGeometry { get; }
 
         [EventPropertyDescription("Metadata bij het event.")]
