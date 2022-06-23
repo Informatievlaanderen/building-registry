@@ -31,7 +31,7 @@ namespace BuildingRegistry.Building.Events
         [EventPropertyDescription("Geometriemethode van de gebouwpositie. Mogelijkheden: Outlined of MeasuredByGrb.")]
         public string GeometryMethod { get; }
 
-        [EventPropertyDescription("Extended WKB-voorstelling van de gebouwpositie.")]
+        [EventPropertyDescription("Extended WKB-voorstelling van de gebouwgeometrie (Hexadecimale notatie).")]
         public string ExtendedWkbGeometry { get; }
 
         [EventPropertyDescription("False wanneer het gebouw niet werd verwijderd. True wanneer het gebouw werd verwijderd.")]
@@ -125,7 +125,7 @@ namespace BuildingRegistry.Building.Events
             [EventPropertyDescription("Geometriemethode van de gebouweenheid. Mogelijkheden: AppointedByAdministrator of DerivedFromObject.")]
             public string GeometryMethod { get; }
 
-            [EventPropertyDescription("Extended WKB-voorstelling van de gebouweenheidpositie.")]
+            [EventPropertyDescription("Extended WKB-voorstelling van de gebouweenheidpositie (Hexadecimale notatie).")]
             public string ExtendedWkbGeometry { get; }
 
             [EventPropertyDescription("False wanneer de gebouweenheid niet werd verwijderd. True wanneer de gebouweenheid werd verwijderd.")]
