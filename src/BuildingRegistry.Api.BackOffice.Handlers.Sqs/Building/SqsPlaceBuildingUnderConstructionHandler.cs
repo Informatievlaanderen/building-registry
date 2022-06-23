@@ -2,48 +2,35 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Sqs.Building
 {
     using System.Threading;
     using System.Threading.Tasks;
-    using Be.Vlaanderen.Basisregisters.CommandHandling;
-    using Be.Vlaanderen.Basisregisters.CommandHandling.Idempotency;
+    using Be.Vlaanderen.Basisregisters.MessageHandling.AwsSqs.Simple;
     using BuildingRegistry.Api.BackOffice.Abstractions.Building.Requests;
     using BuildingRegistry.Building;
     using MediatR;
+    using Microsoft.Extensions.Logging;
 
-    public class SqsPlaceBuildingUnderConstructionHandler : SqsBusHandler, IRequestHandler<SqsPlaceBuildingUnderConstructionRequest, Unit>
+    public class SqsPlaceBuildingUnderConstructionHandler : IRequestHandler<SqsPlaceBuildingUnderConstructionRequest, Unit>
     {
-        private readonly IdempotencyContext _idempotencyContext;
-        private readonly IBuildings _buildings;
+        private readonly SqsOptions _sqsOptions;
+        private readonly ILogger<SqsPlaceBuildingUnderConstructionHandler> _logger;
 
         public SqsPlaceBuildingUnderConstructionHandler(
-            ICommandHandlerResolver bus,
-            IdempotencyContext idempotencyContext,
-            IBuildings buildings) : base(bus)
+            SqsOptions sqsOptions,
+            ILogger<SqsPlaceBuildingUnderConstructionHandler> logger)
         {
-            _idempotencyContext = idempotencyContext;
-            _buildings = buildings;
+            _sqsOptions = sqsOptions;
+            _logger = logger;
         }
 
         public async Task<Unit> Handle(SqsPlaceBuildingUnderConstructionRequest request, CancellationToken cancellationToken)
         {
-            var buildingPersistentLocalId = new BuildingPersistentLocalId(request.PersistentLocalId);
+            var queueName = $"{nameof(BuildingRegistry)}.{nameof(Api)}.{nameof(BackOffice)}.{nameof(Building)}.{nameof(SqsPlaceBuildingUnderConstructionHandler)}";
+            var queueUrl = await SqsQueue.CreateQueue(_sqsOptions, queueName, true, cancellationToken);
 
-            var planBuilding = request.ToCommand(
-                buildingPersistentLocalId,
-                CreateFakeProvenance());
+            await SqsProducer.Produce(_sqsOptions, queueUrl, request, string.Empty, cancellationToken);
 
-            await IdempotentCommandHandlerDispatch(
-                _idempotencyContext,
-                planBuilding.CreateCommandId(),
-                planBuilding,
-                request.Metadata,
-                cancellationToken);
-
-            var buildingHash = await GetBuildingHash(
-                _buildings,
-                buildingPersistentLocalId,
-                cancellationToken);
+            _logger.LogDebug($"Request sent to queue {queueName}");
 
             return Unit.Value;
-            //return new ETagResponse(buildingHash);
         }
     }
 }

@@ -20,7 +20,7 @@ namespace BuildingRegistry.Api.CrabImport.Handlers.Sqs
 
         public async Task<Unit> Handle(SqsPostRequest request, CancellationToken cancellationToken)
         {
-            string queueName = $"{nameof(BuildingRegistry)}.{nameof(Api)}.{nameof(CrabImport)}";
+            string queueName = $"{nameof(BuildingRegistry)}.{nameof(Api)}.{nameof(CrabImport)}.{nameof(SqsPostHandler)}";
             var queueUrl = await SqsQueue.CreateQueue(_sqsOptions, queueName, true, cancellationToken);
 
             await SqsProducer.Produce(_sqsOptions, queueUrl, request, string.Empty, cancellationToken);
