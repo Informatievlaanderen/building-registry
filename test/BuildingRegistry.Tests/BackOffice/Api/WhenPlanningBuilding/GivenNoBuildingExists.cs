@@ -1,13 +1,21 @@
 namespace BuildingRegistry.Tests.BackOffice.Api.WhenPlanningBuilding
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
+    using Autofac;
     using BackOffice;
+    using Building;
+    using Building.Exceptions;
     using BuildingRegistry.Api.BackOffice.Abstractions.Building.Requests;
     using BuildingRegistry.Api.BackOffice.Abstractions.Building.Responses;
     using BuildingRegistry.Api.BackOffice.Abstractions.Building.Validators;
     using BuildingRegistry.Api.BackOffice.Building;
     using FluentAssertions;
+    using FluentValidation;
+    using FluentValidation.Results;
     using Moq;
     using Xunit;
     using Xunit.Abstractions;
@@ -54,6 +62,46 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenPlanningBuilding
             result.StatusCode.Should().Be(202);
             result.Location.Should().Be(string.Format(DetailUrl, expectedLocation));
             result.ETag.Should().Be(expectedHash);
+        }
+
+        [Fact]
+        public async Task WithInvalidGeometry_ThrowsValidationException()
+        {
+            const int expectedLocation = 5;
+
+            //Arrange
+            var mockPersistentLocalIdGenerator = new Mock<IPersistentLocalIdGenerator>();
+            mockPersistentLocalIdGenerator
+                .Setup(x => x.GenerateNextPersistentLocalId())
+                .Returns(expectedLocation);
+
+            MockMediator
+                .Setup(x => x.Send(It.IsAny<PlanBuildingRequest>(), CancellationToken.None).Result)
+                .Throws(new InvalidPolygonException());
+
+            var body = new PlanBuildingRequest
+            {
+                GeometriePolygoon = ""
+            };
+
+            //Act
+            Func<Task> act = async () => await _controller.Plan(
+                ResponseOptions,
+                new PlanBuildingRequestValidator(),
+                body,
+                CancellationToken.None);
+
+            // Assert
+            act
+                .Should()
+                .ThrowAsync<ValidationException>()
+                .Result
+                .Where(x =>
+                    x.Errors.Any(
+                        failure => failure.ErrorCode == "GebouwPolygoonValidatie"
+                                   && failure.ErrorMessage == "Ongeldig formaat geometriePolygoon."));
+
+            MockMediator.Verify(x => x.Send(It.IsAny<PlanBuildingRequest>(), CancellationToken.None), Times.Never);
         }
     }
 }

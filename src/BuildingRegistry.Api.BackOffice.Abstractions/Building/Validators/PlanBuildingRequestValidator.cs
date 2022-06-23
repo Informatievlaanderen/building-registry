@@ -9,8 +9,8 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.Building.Validators
         {
             RuleFor(x => x.GeometriePolygoon)
                 .Must(GmlPolygonValidator.IsValid)
-                .WithErrorCode(ValidationErrorCodes.InvalidGeometry)
-                .WithMessage(ValidationErrorMessages.InvalidGeometry);
+                .WithErrorCode(ValidationErrorCodes.InvalidPolygonGeometry)
+                .WithMessage(ValidationErrorMessages.InvalidPolygonGeometry);
         }
     }
 }
