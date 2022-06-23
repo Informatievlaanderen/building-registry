@@ -1,3 +1,15 @@
+# [3.15.0](https://github.com/informatievlaanderen/building-registry/compare/v3.14.0...v3.15.0) (2022-06-23)
+
+
+### Bug Fixes
+
+* use documentation for invalid polygon validation ([42ea36c](https://github.com/informatievlaanderen/building-registry/commit/42ea36c3e44749904a78217247b012727d556633))
+
+
+### Features
+
+* implement backoffice sqs handlers ([ecfa267](https://github.com/informatievlaanderen/building-registry/commit/ecfa2679ac86962053601859e9774c463a0e7337))
+
 # [3.14.0](https://github.com/informatievlaanderen/building-registry/compare/v3.13.3...v3.14.0) (2022-06-22)
 
 
