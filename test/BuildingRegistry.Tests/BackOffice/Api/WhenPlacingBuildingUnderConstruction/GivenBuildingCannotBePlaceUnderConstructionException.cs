@@ -59,7 +59,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenPlacingBuildingUnderConstruc
                 .Result
                 .Where(x =>
                     x.Errors.Any(
-                        failure => failure.ErrorCode == "GebouwStatusNietGepland"
+                        failure => failure.ErrorCode == "GebouwGehistoreerdGerealiseerdOfNietGerealiseerd"
                                     && failure.ErrorMessage == "Deze actie is enkel toegestaan op gebouwen met status 'gepland'."));
         }
     }
