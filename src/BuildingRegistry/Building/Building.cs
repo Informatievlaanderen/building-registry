@@ -2,7 +2,9 @@ namespace BuildingRegistry.Building
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
+    using Commands;
     using Events;
     using Exceptions;
     using NetTopologySuite.Geometries;
@@ -101,6 +103,67 @@ namespace BuildingRegistry.Building
             }
 
             ApplyChange(new BuildingWasRealizedV2(BuildingPersistentLocalId));
+        }
+
+        public void PlanBuildingUnit(PlanBuildingUnit command)
+        {
+            // validate command
+            var position = command.Position ?? BuildingGeometry.Center;
+
+            if (command.HasDeviation)
+            {
+                ApplyChange(new DeviatedBuildingUnitWasPlanned(
+                    command.BuildingPersistentLocalId,
+                    command.BuildingUnitPersistentLocalId,
+                    command.PositionGeometryMethod,
+                    position,
+                    command.Function));
+            }
+            else
+            {
+                ApplyChange(new BuildingUnitWasPlannedV2(
+                    command.BuildingPersistentLocalId,
+                    command.BuildingUnitPersistentLocalId,
+                    command.PositionGeometryMethod,
+                    position,
+                    command.Function));
+            }
+        }
+
+        public void RealizeBuildingUnit(RealizeBuildingUnit command)
+        {
+            // validate command
+            var buildingUnit = BuildingUnits.FirstOrDefault(x => x.BuildingUnitPersistentLocalId == command.BuildingUnitPersistentLocalId);
+
+            if (buildingUnit is null)
+            {
+                throw new BuildingUnitNotFoundException(
+                    command.BuildingPersistentLocalId,
+                    command.BuildingUnitPersistentLocalId);
+            }
+
+            if (buildingUnit.IsRemoved)
+            {
+                throw new BuildingUnitIsRemovedException(command.BuildingUnitPersistentLocalId);
+            }
+
+            if (buildingUnit.Status == BuildingUnitStatus.Realized)
+            {
+                return;
+            }
+
+            var invalidStatusses = new List<BuildingUnitStatus>
+            {
+                BuildingUnitStatus.Retired,
+                BuildingUnitStatus.NotRealized
+            };
+
+            if (invalidStatusses.Contains(buildingUnit.Status))
+            {
+                throw new BuildingUnitCannotBeRealizedException(buildingUnit.Status);
+            }
+
+            ApplyChange(new BuildingUnitWasRealizedV2(command.BuildingPersistentLocalId, command.BuildingUnitPersistentLocalId));
         }
 
         private static void GuardPolygon(Geometry? geometry)

@@ -4,6 +4,9 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Requests
     using System.Runtime.Serialization;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy.Gebouweenheid;
+    using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
+    using BuildingRegistry.Building;
+    using BuildingRegistry.Building.Commands;
     using MediatR;
     using Newtonsoft.Json;
     using Responses;
@@ -48,6 +51,24 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Requests
 
         [JsonIgnore]
         public IDictionary<string, object> Metadata { get; set; }
+
+        public PlanBuildingUnit ToCommand(
+            BuildingPersistentLocalId buildingPersistentLocalId,
+            BuildingUnitPersistentLocalId buildingUnitPersistentLocalId,
+            BuildingUnitPositionGeometryMethod geometryMethod,
+            ExtendedWkbGeometry? position,
+            BuildingUnitFunction function,
+            bool hasDeviation,
+            Provenance provenance
+            )
+            => new PlanBuildingUnit(
+                buildingPersistentLocalId,
+                buildingUnitPersistentLocalId,
+                geometryMethod,
+                position,
+                function,
+                hasDeviation,
+                provenance);
     }
 
     public class PlanBuildingUnitRequestExamples : IExamplesProvider<PlanBuildingUnitRequest>

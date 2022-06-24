@@ -1,8 +1,10 @@
 namespace BuildingRegistry.Building
 {
     using System.Collections.Generic;
+    using System.Linq;
     using Be.Vlaanderen.Basisregisters.GrAr.Common;
     using Events;
+    using Exceptions;
 
     public partial class Building
     {
@@ -23,6 +25,10 @@ namespace BuildingRegistry.Building
             Register<BuildingWasPlannedV2>(When);
             Register<BuildingBecameUnderConstructionV2>(When);
             Register<BuildingWasRealizedV2>(When);
+
+            Register<BuildingUnitWasPlannedV2>(When);
+            Register<DeviatedBuildingUnitWasPlanned>(When);
+            Register<BuildingUnitWasRealizedV2>(When);
         }
 
         private void When(BuildingWasMigrated @event)
@@ -74,6 +80,40 @@ namespace BuildingRegistry.Building
         private void When(BuildingWasRealizedV2 @event)
         {
             BuildingStatus = BuildingStatus.Realized;
+
+            _lastEvent = @event;
+        }
+
+        private void When(BuildingUnitWasPlannedV2 @event)
+        {
+            var newBuildingUnit = new BuildingUnit(ApplyChange);
+            newBuildingUnit.Route(@event);
+            BuildingUnits.Add(newBuildingUnit);
+
+            _lastEvent = @event;
+        }
+
+        private void When(DeviatedBuildingUnitWasPlanned @event)
+        {
+            var newBuildingUnit = new BuildingUnit(ApplyChange);
+            newBuildingUnit.Route(@event);
+            BuildingUnits.Add(newBuildingUnit);
+
+            _lastEvent = @event;
+        }
+
+        private void When(BuildingUnitWasRealizedV2 @event)
+        {
+            var buildingUnit = BuildingUnits.FirstOrDefault(x => x.BuildingUnitPersistentLocalId == @event.BuildingUnitPersistentLocalId);
+
+            if (buildingUnit is null)
+            {
+                throw new BuildingUnitNotFoundException(
+                    BuildingPersistentLocalId,
+                    @event.BuildingUnitPersistentLocalId);
+            }
+
+            buildingUnit.Route(@event);
 
             _lastEvent = @event;
         }
