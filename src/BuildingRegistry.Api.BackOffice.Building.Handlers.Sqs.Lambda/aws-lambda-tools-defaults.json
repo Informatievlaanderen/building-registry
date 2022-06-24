@@ -11,5 +11,5 @@
   "function-runtime": "dotnet6",
   "function-memory-size": 256,
   "function-timeout": 30,
-  "function-handler": "BuildingRegistry.Api.BackOffice.Handlers.Sqs.Lambda::BuildingRegistry.Api.BackOffice.Handlers.Sqs.Lambda.SqsBackOfficeHandlerFunction::FunctionHandler"
+  "function-handler": "BuildingRegistry.Api.BackOffice.Building.Handlers.Sqs.Lambda::BuildingRegistry.Api.BackOffice.Building.Handlers.Sqs.Lambda.SqsBackOfficeHandlerFunction::FunctionHandler"
 }

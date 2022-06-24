@@ -1,4 +1,4 @@
-namespace BuildingRegistry.Api.BackOffice.Handlers.Sqs.Lambda.Building
+namespace BuildingRegistry.Api.BackOffice.Building.Handlers.Sqs.Lambda.Building
 {
     using System.Threading;
     using System.Threading.Tasks;
@@ -8,12 +8,12 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Sqs.Lambda.Building
     using BuildingRegistry.Building;
     using MediatR;
 
-    public class SqsRealizeBuildingHandler : SqsBusHandler, IRequestHandler<SqsRealizeBuildingRequest, Unit>
+    public class SqsPlaceBuildingUnderConstructionHandler : SqsBusHandler, IRequestHandler<SqsPlaceBuildingUnderConstructionRequest, Unit>
     {
         private readonly IdempotencyContext _idempotencyContext;
         private readonly IBuildings _buildings;
 
-        public SqsRealizeBuildingHandler(
+        public SqsPlaceBuildingUnderConstructionHandler(
             ICommandHandlerResolver bus,
             IdempotencyContext idempotencyContext,
             IBuildings buildings) : base(bus)
@@ -22,7 +22,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Sqs.Lambda.Building
             _buildings = buildings;
         }
 
-        public async Task<Unit> Handle(SqsRealizeBuildingRequest request, CancellationToken cancellationToken)
+        public async Task<Unit> Handle(SqsPlaceBuildingUnderConstructionRequest request, CancellationToken cancellationToken)
         {
             var buildingPersistentLocalId = new BuildingPersistentLocalId(request.PersistentLocalId);
 

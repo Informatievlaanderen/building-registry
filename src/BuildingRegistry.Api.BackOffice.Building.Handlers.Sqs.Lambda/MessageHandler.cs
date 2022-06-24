@@ -1,4 +1,4 @@
-namespace BuildingRegistry.Api.BackOffice.Handlers.Sqs.Lambda
+namespace BuildingRegistry.Api.BackOffice.Building.Handlers.Sqs.Lambda
 {
     using System.Threading;
     using System.Threading.Tasks;
