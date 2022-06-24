@@ -1,11 +1,9 @@
 namespace BuildingRegistry.Api.BackOffice.Building
 {
     using System;
-    using System.Collections.Generic;
     using System.Threading;
     using System.Threading.Tasks;
     using Abstractions.Building.Requests;
-    using Be.Vlaanderen.Basisregisters.Api.ETag;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
     using FluentValidation;
     using Handlers.Building;
@@ -13,7 +11,6 @@ namespace BuildingRegistry.Api.BackOffice.Building
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.Extensions.Options;
-    using Microsoft.Net.Http.Headers;
     using Swashbuckle.AspNetCore.Filters;
 
     public partial class BuildingController
