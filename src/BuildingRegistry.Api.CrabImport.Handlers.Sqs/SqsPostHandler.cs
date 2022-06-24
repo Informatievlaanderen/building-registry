@@ -6,6 +6,7 @@ namespace BuildingRegistry.Api.CrabImport.Handlers.Sqs
     using Be.Vlaanderen.Basisregisters.MessageHandling.AwsSqs.Simple;
     using MediatR;
     using Microsoft.Extensions.Logging;
+    using static Be.Vlaanderen.Basisregisters.MessageHandling.AwsSqs.Simple.Sqs;
 
     public class SqsPostHandler : IRequestHandler<SqsPostRequest, Unit>
     {
@@ -19,13 +20,10 @@ namespace BuildingRegistry.Api.CrabImport.Handlers.Sqs
         }
 
         public async Task<Unit> Handle(SqsPostRequest request, CancellationToken cancellationToken)
-        {
-            string queueName = $"{nameof(BuildingRegistry)}.{nameof(Api)}.{nameof(CrabImport)}.{nameof(SqsPostHandler)}";
-            var queueUrl = await SqsQueue.CreateQueue(_sqsOptions, queueName, true, cancellationToken);
+{
+            _ = await CopyToQueue(_sqsOptions, SqsQueueName.Value, request, cancellationToken);
 
-            await SqsProducer.Produce(_sqsOptions, queueUrl, request, string.Empty, cancellationToken);
-
-            _logger.LogDebug($"Request sent to queue {queueName}");
+            _logger.LogDebug($"Request sent to queue {SqsQueueName.Value}");
 
             return Unit.Value;
         }
