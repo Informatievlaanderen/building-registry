@@ -1,3 +1,15 @@
+# [3.17.0](https://github.com/informatievlaanderen/building-registry/compare/v3.16.1...v3.17.0) (2022-06-24)
+
+
+### Bug Fixes
+
+* finish migrator ([9cf46b3](https://github.com/informatievlaanderen/building-registry/commit/9cf46b3a3c3f711cbc5365795a460bbe954bf08c))
+
+
+### Features
+
+* add planbuildingunit contract ([b9503d9](https://github.com/informatievlaanderen/building-registry/commit/b9503d9e59545335e722a6011fb8965773d2f39b))
+
 ## [3.16.1](https://github.com/informatievlaanderen/building-registry/compare/v3.16.0...v3.16.1) (2022-06-24)
 
 
