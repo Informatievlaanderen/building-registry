@@ -8,7 +8,7 @@ namespace BuildingRegistry.Building.Events
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Newtonsoft.Json;
 
-    [EventTags(EventTag.For.Sync, EventTag.For.Edit)]
+    [EventTags(EventTag.For.Sync, EventTag.For.Edit, Tag.Building)]
     [EventName(EventName)]
     [EventDescription("Het gebouw werd inAanbouw geplaatst.")] // todo: review text
     public class BuildingBecameUnderConstructionV2 : IBuildingEvent

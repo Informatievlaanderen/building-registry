@@ -15,6 +15,11 @@ namespace BuildingRegistry.Building
                 .RegisterType<BuildingCommandHandlerModule>()
                 .Named<CommandHandlerModule>(typeof(BuildingCommandHandlerModule).FullName)
                 .As<CommandHandlerModule>();
+
+            containerBuilder
+                .RegisterType<BuildingUnitCommandHandlerModule>()
+                .Named<CommandHandlerModule>(typeof(BuildingUnitCommandHandlerModule).FullName)
+                .As<CommandHandlerModule>();
         }
     }
 }

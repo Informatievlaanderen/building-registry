@@ -19,6 +19,8 @@ namespace BuildingRegistry.Tests
 
             Fixture.Customize(new WithValidExtendedWkbPolygon());
             Fixture.Customize(new WithBuildingStatus());
+            Fixture.Customize(new WithBuildingUnitPositionGeometryMethod());
+            Fixture.Customize(new WithBuildingUnitFunction());
             Fixture.Customize(new WithBuildingGeometryMethod());
             Fixture.Customize(new WithBuildingUnitStatus());
             Fixture.Customize(new SetProvenanceImplementationsCallSetProvenance());
