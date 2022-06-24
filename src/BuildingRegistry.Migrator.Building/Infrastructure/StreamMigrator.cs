@@ -159,7 +159,7 @@ namespace BuildingRegistry.Migrator.Building.Infrastructure
 
                 foreach (var legacyBuildingUnit in legacyBuildingUnits)
                 {
-                    if (!legacyBuildingUnit.IsComplete)
+                    if (!legacyBuildingUnit.IsComplete || legacyBuildingUnit.IsRemoved)
                     {
                         if (legacyBuildingUnit.IsRemoved)
                         {
@@ -184,6 +184,11 @@ namespace BuildingRegistry.Migrator.Building.Infrastructure
 
                         if (addressItem is null)
                         {
+                            if (_skipIncomplete)
+                            {
+                                continue;
+                            }
+
                             throw new InvalidOperationException($"AddressConsumerItem for addressId '{addressId}' was not found in the ConsumerAddressContext.");
                         }
 
