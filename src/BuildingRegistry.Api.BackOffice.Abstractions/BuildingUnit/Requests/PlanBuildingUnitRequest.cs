@@ -42,7 +42,7 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Requests
         /// <summary>
         /// Wanneer de definitie van een gebouweenheid niet werd gevolgd en dus ‘afwijkend’ is.
         /// </summary>
-        [DataMember(Name = "AfwijkingVastgesteld")]
+        [DataMember(Name = "AfwijkingVastgesteld", Order = 4)]
         [JsonProperty(Required = Required.Always)]
         public bool AfwijkingVastgesteld { get; set; }
 
