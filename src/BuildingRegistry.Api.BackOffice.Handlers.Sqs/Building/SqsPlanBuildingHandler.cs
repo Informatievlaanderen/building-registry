@@ -4,9 +4,9 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Sqs.Building
     using System.Threading.Tasks;
     using Be.Vlaanderen.Basisregisters.MessageHandling.AwsSqs.Simple;
     using BuildingRegistry.Api.BackOffice.Abstractions.Building.Requests;
-    using BuildingRegistry.Building;
     using MediatR;
     using Microsoft.Extensions.Logging;
+    using static Be.Vlaanderen.Basisregisters.MessageHandling.AwsSqs.Simple.Sqs;
 
     public class SqsPlanBuildingHandler : IRequestHandler<SqsPlanBuildingRequest, Unit>
     {
@@ -23,12 +23,9 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Sqs.Building
 
         public async Task<Unit> Handle(SqsPlanBuildingRequest request, CancellationToken cancellationToken)
         {
-            var queueName = $"{nameof(BuildingRegistry)}.{nameof(Api)}.{nameof(BackOffice)}.{nameof(Building)}.{nameof(SqsPlanBuildingHandler)}";
-            var queueUrl = await SqsQueue.CreateQueue(_sqsOptions, queueName, true, cancellationToken);
+            _ = await CopyToQueue(_sqsOptions, SqsQueueName.Value, request, cancellationToken);
 
-            await SqsProducer.Produce(_sqsOptions, queueUrl, request, string.Empty, cancellationToken);
-
-            _logger.LogDebug($"Request sent to queue {queueName}");
+            _logger.LogDebug($"Request sent to queue {SqsQueueName.Value}");
 
             return Unit.Value;
         }
