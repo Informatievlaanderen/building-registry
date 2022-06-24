@@ -1,3 +1,11 @@
+## [3.16.1](https://github.com/informatievlaanderen/building-registry/compare/v3.16.0...v3.16.1) (2022-06-24)
+
+
+### Bug Fixes
+
+* add hexa notation docs extended wkb event info ([9fd531b](https://github.com/informatievlaanderen/building-registry/commit/9fd531b69c5ebd0605c83f2198eb4468dff97e01))
+* correct errorcodes realize/underconstruction ([74c8fde](https://github.com/informatievlaanderen/building-registry/commit/74c8fde68abf08bba7c67e1a41d270c6184a20cf))
+
 # [3.16.0](https://github.com/informatievlaanderen/building-registry/compare/v3.15.0...v3.16.0) (2022-06-23)
 
 
