@@ -1,3 +1,10 @@
+## [3.17.1](https://github.com/informatievlaanderen/building-registry/compare/v3.17.0...v3.17.1) (2022-06-24)
+
+
+### Bug Fixes
+
+* add order to planbuildingunit request ([977a12a](https://github.com/informatievlaanderen/building-registry/commit/977a12a5df05e11ef5e967edec7652f476efa5c3))
+
 # [3.17.0](https://github.com/informatievlaanderen/building-registry/compare/v3.16.1...v3.17.0) (2022-06-24)
 
 
