@@ -1,4 +1,4 @@
-namespace BuildingRegistry.Api.BackOffice.Handlers.Sqs.Lambda.Building
+namespace BuildingRegistry.Api.BackOffice.Building.Handlers.Sqs.Lambda.Building
 {
     using System;
     using System.Collections.Generic;
