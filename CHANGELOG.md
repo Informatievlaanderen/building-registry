@@ -1,3 +1,10 @@
+## [3.17.2](https://github.com/informatievlaanderen/building-registry/compare/v3.17.1...v3.17.2) (2022-06-24)
+
+
+### Bug Fixes
+
+* one queue per api ([5f241a8](https://github.com/informatievlaanderen/building-registry/commit/5f241a8e2a3d56250b0564de3fb139594fbc89aa))
+
 ## [3.17.1](https://github.com/informatievlaanderen/building-registry/compare/v3.17.0...v3.17.1) (2022-06-24)
 
 
