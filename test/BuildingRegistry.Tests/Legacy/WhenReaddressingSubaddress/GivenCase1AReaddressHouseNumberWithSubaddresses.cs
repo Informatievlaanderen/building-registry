@@ -16,6 +16,7 @@ namespace BuildingRegistry.Tests.Legacy.WhenReaddressingSubaddress
     using Xunit;
     using Xunit.Abstractions;
 
+    //TODO: fix test collision id's
     public class GivenCase1AReaddressHouseNumberWithSubaddresses : AutofacBasedTest
     {
         public GivenCase1AReaddressHouseNumberWithSubaddresses(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
@@ -24,8 +25,7 @@ namespace BuildingRegistry.Tests.Legacy.WhenReaddressingSubaddress
                 .Customize(new InfrastructureCustomization())
                 .Customize(new WithNoDeleteModification())
                 .Customize(new WithInfiniteLifetime())
-                .Customize(new WithFixedBuildingUnitIdFromHouseNumber(1, 16))
-                ;
+                .Customize(new WithFixedBuildingUnitIdFromHouseNumber(1, 16));
 
             _ = new TestCase1AData(Fixture);
         }
@@ -41,7 +41,16 @@ namespace BuildingRegistry.Tests.Legacy.WhenReaddressingSubaddress
                 SubaddressNr16Bus2Id = new CrabSubaddressId(162);
 
                 NewHuisNr16Id = new CrabHouseNumberId(customizedFixture.Create<int>());
-                NewHuisNr16KoppelingId = new CrabTerrainObjectHouseNumberId(customizedFixture.Create<int>());
+                NewHuisNr16KoppelingId = new CrabTerrainObjectHouseNumberId(customizedFixture.Build<int>().FromFactory(() =>
+                {
+                    var newInt = customizedFixture.Create<int>();
+                    while (newInt == HuisNr16KoppelingId)
+                    {
+                        newInt = customizedFixture.Create<int>();
+                    }
+
+                    return newInt;
+                }).Create());
                 NewSubaddressNr16Bus1Id = new CrabSubaddressId(261);
                 NewSubaddressNr16Bus2Id = new CrabSubaddressId(262);
                 ReaddressingBeginLocalDate = customizedFixture.Create<LocalDate>();
