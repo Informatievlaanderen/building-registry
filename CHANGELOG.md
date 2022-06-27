@@ -1,3 +1,15 @@
+# [3.18.0](https://github.com/informatievlaanderen/building-registry/compare/v3.17.2...v3.18.0) (2022-06-27)
+
+
+### Bug Fixes
+
+* add BuildingUnit Sqs components ([61d15ea](https://github.com/informatievlaanderen/building-registry/commit/61d15eaafaa1c215d561d3049fafbccc18e5a919))
+
+
+### Features
+
+* plan & realize building unit aggregate + tests ([0ff678d](https://github.com/informatievlaanderen/building-registry/commit/0ff678dd87d999ad95dc93652cc4b65404c88fb4))
+
 ## [3.17.2](https://github.com/informatievlaanderen/building-registry/compare/v3.17.1...v3.17.2) (2022-06-24)
 
 
