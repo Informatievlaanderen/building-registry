@@ -1,3 +1,10 @@
+## [3.18.2](https://github.com/informatievlaanderen/building-registry/compare/v3.18.1...v3.18.2) (2022-06-28)
+
+
+### Bug Fixes
+
+* correct method of WMS ([ac47cc6](https://github.com/informatievlaanderen/building-registry/commit/ac47cc6e9a4618cd9afc71866000109f882b2478))
+
 ## [3.18.1](https://github.com/informatievlaanderen/building-registry/compare/v3.18.0...v3.18.1) (2022-06-28)
 
 
