@@ -1,6 +1,6 @@
-namespace BuildingRegistry.Api.BackOffice.BuildingUnit.Handlers.Sqs.Lambda.BuildingUnit
+namespace BuildingRegistry.Api.BackOffice.Handlers.Sqs.Lambda.BuildingUnit
 {
-    using Abstractions.BuildingUnit.Requests;
+    using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Requests;
     using MediatR;
 
     public class SqsPlanBuildingUnitHandler : IRequestHandler<SqsPlanBuildingUnitRequest, Unit>

@@ -11,8 +11,8 @@
     <!-- Generate ready to run images during publishing to improve cold start time. -->
     <PublishReadyToRun>true</PublishReadyToRun>
   </PropertyGroup>
+  <Import Project="..\..\.paket\Paket.Restore.targets" />
   <ItemGroup>
     <ProjectReference Include="..\BuildingRegistry.Api.BackOffice.Abstractions\BuildingRegistry.Api.BackOffice.Abstractions.csproj" />
   </ItemGroup>
-  <Import Project="..\..\.paket\Paket.Restore.targets" />
 </Project>

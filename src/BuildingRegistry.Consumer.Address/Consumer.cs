@@ -53,8 +53,10 @@ namespace BuildingRegistry.Consumer.Address
                         await projector.ProjectAsync(_consumerContext, message, cancellationToken);
                         await _consumerContext.SaveChangesAsync(cancellationToken);
                         messageCounter++;
-                        if(messageCounter % 1000 == 0)
+                        if (messageCounter % 1000 == 0)
+                        {
                             _consumerContext.ChangeTracker.Clear();
+                        }
                     },
                     noMessageFoundDelay: 300,
                     _offset,
