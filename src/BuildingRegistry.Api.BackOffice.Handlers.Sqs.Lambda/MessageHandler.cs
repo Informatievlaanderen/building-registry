@@ -1,8 +1,9 @@
-namespace BuildingRegistry.Api.BackOffice.BuildingUnit.Handlers.Sqs.Lambda
+namespace BuildingRegistry.Api.BackOffice.Handlers.Sqs.Lambda
 {
     using System.Threading;
     using System.Threading.Tasks;
     using Be.Vlaanderen.Basisregisters.Aws.Lambda;
+    using BuildingRegistry.Api.BackOffice.Abstractions.Building.Requests;
     using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Requests;
     using MediatR;
 
@@ -19,6 +20,17 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit.Handlers.Sqs.Lambda
         {
             switch (messageData)
             {
+                case SqsPlanBuildingRequest sqsPlanBuildingRequest:
+                    await _mediator.Send(sqsPlanBuildingRequest, cancellationToken);
+                    break;
+
+                case SqsPlaceBuildingUnderConstructionRequest sqsPlaceBuildingUnderConstructionRequest:
+                    await _mediator.Send(sqsPlaceBuildingUnderConstructionRequest, cancellationToken);
+                    break;
+
+                case SqsRealizeBuildingRequest sqsRealizeBuildingRequest:
+                    await _mediator.Send(sqsRealizeBuildingRequest, cancellationToken);
+                    break;
                 case SqsPlanBuildingUnitRequest sqsPlanBuildingUnitRequest:
                     await _mediator.Send(sqsPlanBuildingUnitRequest, cancellationToken);
                     break;

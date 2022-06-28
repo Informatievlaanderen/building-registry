@@ -2,7 +2,7 @@ using Amazon.Lambda.Core;
 
 [assembly: LambdaSerializer(typeof(Amazon.Lambda.Serialization.Json.JsonSerializer))]
 
-namespace BuildingRegistry.Api.BackOffice.Building.Handlers.Sqs.Lambda
+namespace BuildingRegistry.Api.BackOffice.Handlers.Sqs.Lambda
 {
     using Be.Vlaanderen.Basisregisters.Aws.Lambda;
     using Building;

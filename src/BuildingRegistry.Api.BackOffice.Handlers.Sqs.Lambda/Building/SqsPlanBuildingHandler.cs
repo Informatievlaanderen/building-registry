@@ -1,4 +1,4 @@
-namespace BuildingRegistry.Api.BackOffice.Building.Handlers.Sqs.Lambda.Building
+namespace BuildingRegistry.Api.BackOffice.Handlers.Sqs.Lambda.Building
 {
     using System.Threading;
     using System.Threading.Tasks;
@@ -8,26 +8,29 @@ namespace BuildingRegistry.Api.BackOffice.Building.Handlers.Sqs.Lambda.Building
     using BuildingRegistry.Building;
     using MediatR;
 
-    public class SqsPlaceBuildingUnderConstructionHandler : SqsBusHandler, IRequestHandler<SqsPlaceBuildingUnderConstructionRequest, Unit>
+    public class SqsPlanBuildingHandler : SqsBusHandler, IRequestHandler<SqsPlanBuildingRequest, Unit>
     {
         private readonly IdempotencyContext _idempotencyContext;
         private readonly IBuildings _buildings;
+        private readonly IPersistentLocalIdGenerator _persistentLocalIdGenerator;
 
-        public SqsPlaceBuildingUnderConstructionHandler(
+        public SqsPlanBuildingHandler(
             ICommandHandlerResolver bus,
             IdempotencyContext idempotencyContext,
-            IBuildings buildings) : base(bus)
+            IBuildings buildings,
+            IPersistentLocalIdGenerator persistentLocalIdGenerator) : base(bus)
         {
             _idempotencyContext = idempotencyContext;
             _buildings = buildings;
+            _persistentLocalIdGenerator = persistentLocalIdGenerator;
         }
 
-        public async Task<Unit> Handle(SqsPlaceBuildingUnderConstructionRequest request, CancellationToken cancellationToken)
+        public async Task<Unit> Handle(SqsPlanBuildingRequest request, CancellationToken cancellationToken)
         {
-            var buildingPersistentLocalId = new BuildingPersistentLocalId(request.PersistentLocalId);
+            var nextBuildingPersistentLocalId = new BuildingPersistentLocalId(_persistentLocalIdGenerator.GenerateNextPersistentLocalId());
 
             var planBuilding = request.ToCommand(
-                buildingPersistentLocalId,
+                nextBuildingPersistentLocalId,
                 CreateFakeProvenance());
 
             await IdempotentCommandHandlerDispatch(
@@ -39,11 +42,11 @@ namespace BuildingRegistry.Api.BackOffice.Building.Handlers.Sqs.Lambda.Building
 
             var buildingHash = await GetBuildingHash(
                 _buildings,
-                buildingPersistentLocalId,
+                nextBuildingPersistentLocalId,
                 cancellationToken);
 
             // TODO: return value
-            //return new ETagResponse(buildingHash);
+            //return new PlanBuildingResponse(nextBuildingPersistentLocalId, buildingHash);
             return Unit.Value;
         }
     }
