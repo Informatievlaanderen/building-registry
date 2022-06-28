@@ -166,6 +166,18 @@ namespace BuildingRegistry.Building
             ApplyChange(new BuildingUnitWasRealizedV2(command.BuildingPersistentLocalId, command.BuildingUnitPersistentLocalId));
         }
 
+        public string GetBuildingUnitHash(BuildingUnitPersistentLocalId buildingUnitPersistentLocalId)
+        {
+            var buildingUnit = BuildingUnits.FirstOrDefault(
+                x => x.BuildingUnitPersistentLocalId == buildingUnitPersistentLocalId);
+
+            if (buildingUnit is null)
+            {
+                throw new BuildingUnitNotFoundException();
+            }
+
+            return buildingUnit.LastEventHash;
+        }
         private static void GuardPolygon(Geometry? geometry)
         {
             if (

@@ -1,14 +1,17 @@
-namespace BuildingRegistry.Api.BackOffice.Building
+namespace BuildingRegistry.Api.BackOffice.BuildingUnit
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
-    using Abstractions.Building.Requests;
+    using Abstractions;
     using Abstractions.Building.Validators;
+    using Abstractions.BuildingUnit.Requests;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
     using Be.Vlaanderen.Basisregisters.Api.ETag;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
+    using Building;
     using BuildingRegistry.Building;
     using BuildingRegistry.Building.Exceptions;
     using FluentValidation;
@@ -21,75 +24,67 @@ namespace BuildingRegistry.Api.BackOffice.Building
     using Microsoft.Extensions.Options;
     using Swashbuckle.AspNetCore.Filters;
 
-    public partial class BuildingController
+    public partial class BuildingUnitController
     {
         /// <summary>
-        /// Gebouw realiseren.
+        /// Realiseer een gebouweenheid..
         /// </summary>
-        /// <param name="buildingsRepository"></param>
         /// <param name="options"></param>
         /// <param name="request"></param>
-        /// <param name="validator"></param>
         /// <param name="ifMatchHeaderValue"></param>
         /// <param name="cancellationToken"></param>
-        /// <response code="202">Aanvraag tot goedkeuring wordt reeds verwerkt.</response>
-        /// <response code="412">Als de If-Match header niet overeenkomt met de laatste ETag.</response>
         /// <returns></returns>
         [HttpPost("{persistentLocalId}/acties/realiseren")]
         [ProducesResponseType(StatusCodes.Status202Accepted)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-        [SwaggerResponseHeader(StatusCodes.Status202Accepted, "location", "string", "De url van het gebouw.")]
+        [SwaggerResponseHeader(StatusCodes.Status202Accepted, "location", "string", "De url van de gerealiseerde gebouweenheid.")]
         [SwaggerResponseExample(StatusCodes.Status400BadRequest, typeof(BadRequestResponseExamples))]
         [SwaggerResponseExample(StatusCodes.Status500InternalServerError, typeof(InternalServerErrorResponseExamples))]
         public async Task<IActionResult> Realize(
-            [FromServices] IBuildings buildingsRepository,
             [FromServices] IOptions<ResponseOptions> options,
-            [FromServices] IValidator<RealizeBuildingRequest> validator,
-            [FromRoute] RealizeBuildingRequest request,
+            [FromRoute] RealizeBuildingUnitRequest request,
             [FromHeader(Name = "If-Match")] string? ifMatchHeaderValue,
             CancellationToken cancellationToken = default)
         {
-            await validator.ValidateAndThrowAsync(request, cancellationToken);
-
             try
             {
-                request.Metadata = GetMetadata();
-
-                // Check if user provided ETag is equal to the current Entity Tag
-                if (ifMatchHeaderValue is not null)
+                if (!string.IsNullOrWhiteSpace(ifMatchHeaderValue))
                 {
-                    var ifMatchTag = ifMatchHeaderValue.Trim();
-                    var currentETag = await GetEtag(buildingsRepository, request.PersistentLocalId, cancellationToken);
-                    if (ifMatchTag != currentETag.ToString())
+                    if (!TryGetBuildingIdForBuildingUnit(request.PersistentLocalId, out var buildingPersistentLocalId))
+                    {
+                        return NotFound();
+                    }
+
+                    var etag = await GetBuildingUnitEtag(buildingPersistentLocalId, request.PersistentLocalId, cancellationToken);
+
+                    if (!IfMatchHeaderMatchesEtag(ifMatchHeaderValue, etag))
                     {
                         return new PreconditionFailedResult();
                     }
                 }
 
+                request.Metadata = GetMetadata();
                 var response = await _mediator.Send(request, cancellationToken);
 
                 return new AcceptedWithETagResult(
-                    new Uri(string.Format(options.Value.BuildingDetailUrl, request.PersistentLocalId)),
+                    new Uri(string.Format(options.Value.BuildingUnitDetailUrl, request.PersistentLocalId)),
                     response.LastEventHash);
             }
             catch (IdempotencyException)
             {
                 return Accepted();
             }
-            catch (AggregateNotFoundException)
-            {
-                throw new ApiException(ValidationErrorMessages.BuildingNotFound, StatusCodes.Status404NotFound);
-            }
             catch (DomainException exception)
             {
                 throw exception switch
                 {
-                    BuildingIsRemovedException => new ApiException(ValidationErrorMessages.BuildingRemoved, StatusCodes.Status410Gone),
-                    BuildingCannotBeRealizedException => CreateValidationException(
-                        ValidationErrorCodes.BuildingCannotBeRealizedException,
-                        string.Empty,
-                        ValidationErrorMessages.BuildingCannotBeRealizedException),
+                    BuildingUnitNotFoundException => new ApiException(ValidationErrorMessages.BuildingNotFound, StatusCodes.Status404NotFound),
+
+                    //BuildingCannotBeRealizedException => CreateValidationException(
+                    //    ValidationErrorCodes.BuildingCannotBeRealizedException,
+                    //    string.Empty,
+                    //    ValidationErrorMessages.BuildingCannotBeRealizedException),
 
                     _ => new ValidationException(new List<ValidationFailure>
                         { new ValidationFailure(string.Empty, exception.Message) })

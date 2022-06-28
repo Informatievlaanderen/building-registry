@@ -2,8 +2,11 @@ namespace BuildingRegistry.Tests
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics.Metrics;
     using Autofac;
     using AutoFixture;
+    using Be.Vlaanderen.Basisregisters.CommandHandling;
+    using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Fixtures;
     using Microsoft.Extensions.Configuration;
 
@@ -11,6 +14,13 @@ namespace BuildingRegistry.Tests
     {
         protected Fixture Fixture { get; }
         protected Newtonsoft.Json.JsonSerializerSettings EventSerializerSettings { get; } = Be.Vlaanderen.Basisregisters.EventHandling.EventsJsonSerializerSettingsProvider.CreateSerializerSettings();
+
+        public void DispatchArrangeCommand<T>(T command) where T : IHasCommandProvenance
+        {
+            using var scope = Container.BeginLifetimeScope();
+            var bus = scope.Resolve<ICommandHandlerResolver>();
+            bus.Dispatch(command.CreateCommandId(), command);
+        }
 
         public BuildingRegistryTest(Xunit.Abstractions.ITestOutputHelper testOutputHelper) : base(testOutputHelper)
         {

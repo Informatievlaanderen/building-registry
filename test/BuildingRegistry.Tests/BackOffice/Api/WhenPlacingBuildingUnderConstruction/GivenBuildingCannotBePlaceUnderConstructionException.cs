@@ -26,7 +26,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenPlacingBuildingUnderConstruc
 
         public GivenBuildingCannotBePlaceUnderConstructionException(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
         {
-            _controller = CreateApiBusControllerWithUser<BuildingController>("John Doe");
+            _controller = CreateBuildingControllerWithUser<BuildingController>();
         }
 
         [Fact]

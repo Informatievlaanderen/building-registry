@@ -4,6 +4,9 @@ namespace BuildingRegistry.Building.Exceptions
 
     public class BuildingUnitNotFoundException : DomainException
     {
+        public BuildingUnitNotFoundException()
+        { }
+
         public BuildingUnitNotFoundException(
             int buildingPersistentLocalId,
             int buildingUnitPersistentLocalId

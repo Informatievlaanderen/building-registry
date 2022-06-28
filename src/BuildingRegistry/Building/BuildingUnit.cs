@@ -20,6 +20,8 @@ namespace BuildingRegistry.Building
 
         public bool HasDeviation { get; private set; }
 
+        public string LastEventHash => _lastEvent.GetHash();
+
         public BuildingUnit(Action<object> applier) : base(applier)
         {
             Register<BuildingUnitWasPlannedV2>(When);

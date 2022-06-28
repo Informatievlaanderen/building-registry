@@ -6,6 +6,7 @@ namespace BuildingRegistry.Api.BackOffice.Building
     using Abstractions.Building.Requests;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
     using FluentValidation;
+    using Handlers;
     using Handlers.Building;
     using Infrastructure.Options;
     using Microsoft.AspNetCore.Http;
@@ -32,7 +33,6 @@ namespace BuildingRegistry.Api.BackOffice.Building
         [SwaggerRequestExample(typeof(PlanBuildingRequest), typeof(PlanBuildingRequestExamples))]
         [SwaggerResponseExample(StatusCodes.Status400BadRequest, typeof(BadRequestResponseExamples))]
         [SwaggerResponseExample(StatusCodes.Status500InternalServerError, typeof(InternalServerErrorResponseExamples))]
-
         public async Task<IActionResult> Plan(
             [FromServices] IOptions<ResponseOptions> options,
             [FromServices] IValidator<PlanBuildingRequest> validator,
@@ -53,10 +53,6 @@ namespace BuildingRegistry.Api.BackOffice.Building
             catch (IdempotencyException)
             {
                 return Accepted();
-            }
-            catch (Exception e)
-            {
-                throw;
             }
         }
     }

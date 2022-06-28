@@ -10,6 +10,7 @@ namespace BuildingRegistry.Tests.BackOffice
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Building;
     using Building.Commands;
+    using BuildingRegistry.Api.BackOffice.Abstractions;
     using BuildingRegistry.Api.BackOffice.Infrastructure.Options;
     using MediatR;
     using Microsoft.AspNetCore.Http;
@@ -19,14 +20,17 @@ namespace BuildingRegistry.Tests.BackOffice
 
     public class BuildingRegistryBackOfficeTest : BuildingRegistryTest
     {
-        internal const string DetailUrl = "https://www.registry.com/buliding/gepland/{0}";
+        internal const string BuildingDetailUrl = "https://www.registry.com/building/gepland/{0}";
+        internal const string BuildingUnitDetailUrl = "https://www.registry.com/building/gepland/{0}";
         protected IOptions<ResponseOptions> ResponseOptions { get; }
         protected Mock<IMediator> MockMediator { get; }
+        public const string Username = "John Doe";
 
         public BuildingRegistryBackOfficeTest(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
         {
-            ResponseOptions = Options.Create<ResponseOptions>(Fixture.Create<ResponseOptions>());
-            ResponseOptions.Value.BuildingDetailUrl = DetailUrl;
+            ResponseOptions = Options.Create(Fixture.Create<ResponseOptions>());
+            ResponseOptions.Value.BuildingDetailUrl = BuildingDetailUrl;
+            ResponseOptions.Value.BuildingUnitDetailUrl = BuildingUnitDetailUrl;
             MockMediator = new Mock<IMediator>();
         }
 
@@ -42,7 +46,7 @@ namespace BuildingRegistry.Tests.BackOffice
             DispatchArrangeCommand(new PlanBuilding(buildingPersistentLocalId, wkbGeometry, Fixture.Create<Provenance>()));
         }
 
-        public T CreateApiBusControllerWithUser<T>(string username) where T : ApiController
+        public T CreateBuildingControllerWithUser<T>() where T : ApiController
         {
             var controller = Activator.CreateInstance(typeof(T), MockMediator.Object) as T;
 
@@ -50,7 +54,34 @@ namespace BuildingRegistry.Tests.BackOffice
             {
                 new Claim(ClaimTypes.Name, "username"),
                 new Claim(ClaimTypes.NameIdentifier, "userId"),
-                new Claim("name", username),
+                new Claim("name", Username),
+            };
+            var identity = new ClaimsIdentity(claims, "TestAuthType");
+            var claimsPrincipal = new ClaimsPrincipal(identity);
+            if (controller != null)
+            {
+                controller.ControllerContext.HttpContext = new DefaultHttpContext { User = claimsPrincipal };
+
+                return controller;
+            }
+            else
+            {
+                throw new Exception("Could not find controller type");
+            }
+        }
+
+        public T CreateBuildingUnitControllerWithUser<T>(
+            IBuildings buildingsRepository,
+            BackOfficeContext backOfficeContext)
+            where T : ApiController
+        {
+            var controller = Activator.CreateInstance(typeof(T), MockMediator.Object, buildingsRepository, backOfficeContext) as T;
+
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.Name, "username"),
+                new Claim(ClaimTypes.NameIdentifier, "userId"),
+                new Claim("name", Username),
             };
             var identity = new ClaimsIdentity(claims, "TestAuthType");
             var claimsPrincipal = new ClaimsPrincipal(identity);

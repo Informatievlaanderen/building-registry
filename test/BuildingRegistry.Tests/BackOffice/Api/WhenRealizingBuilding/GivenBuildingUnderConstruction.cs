@@ -20,7 +20,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenRealizingBuilding
 
         public GivenBuildingUnderConstruction(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
         {
-            _controller = CreateApiBusControllerWithUser<BuildingController>("John Doe");
+            _controller = CreateBuildingControllerWithUser<BuildingController>();
         }
 
         [Fact]
@@ -53,7 +53,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenRealizingBuilding
             MockMediator.Verify(x => x.Send(It.IsAny<RealizeBuildingRequest>(), CancellationToken.None), Times.Once);
 
             result.StatusCode.Should().Be(202);
-            result.Location.Should().Be(string.Format(DetailUrl, expectedLocation));
+            result.Location.Should().Be(string.Format(BuildingDetailUrl, expectedLocation));
             result.ETag.Should().Be(expectedHash);
         }
     }
