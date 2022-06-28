@@ -1,3 +1,10 @@
+## [3.18.1](https://github.com/informatievlaanderen/building-registry/compare/v3.18.0...v3.18.1) (2022-06-28)
+
+
+### Bug Fixes
+
+* combine lambda projects ([8838e17](https://github.com/informatievlaanderen/building-registry/commit/8838e17662971962d7e335d4e0a33c901604b296))
+
 # [3.18.0](https://github.com/informatievlaanderen/building-registry/compare/v3.17.2...v3.18.0) (2022-06-27)
 
 
