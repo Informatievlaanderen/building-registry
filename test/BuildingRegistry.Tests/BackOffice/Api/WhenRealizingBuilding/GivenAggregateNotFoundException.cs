@@ -22,7 +22,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenRealizingBuilding
 
         public GivenAggregateNotFoundException(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
         {
-            _controller = CreateApiBusControllerWithUser<BuildingController>("John Doe");
+            _controller = CreateBuildingControllerWithUser<BuildingController>();
         }
 
         [Fact]

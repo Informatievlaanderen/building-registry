@@ -1,4 +1,4 @@
-namespace BuildingRegistry.Tests.BackOffice.Handlers.PlanBuildingHandlerTests
+namespace BuildingRegistry.Tests.BackOffice.Handlers.Building
 {
     using System.Collections.Generic;
     using System.Linq;
@@ -6,9 +6,9 @@ namespace BuildingRegistry.Tests.BackOffice.Handlers.PlanBuildingHandlerTests
     using System.Threading.Tasks;
     using Autofac;
     using Be.Vlaanderen.Basisregisters.CommandHandling;
-    using Building;
     using BuildingRegistry.Api.BackOffice.Abstractions.Building.Requests;
     using BuildingRegistry.Api.BackOffice.Handlers.Building;
+    using BuildingRegistry.Building;
     using FluentAssertions;
     using Infrastructure;
     using Legacy;

@@ -22,7 +22,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenRealizingBuilding
 
         public GivenBuildingIsRemovedException(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
         {
-            _controller = CreateApiBusControllerWithUser<BuildingController>("John Doe");
+            _controller = CreateBuildingControllerWithUser<BuildingController>();
         }
 
         [Fact]

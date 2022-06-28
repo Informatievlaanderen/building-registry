@@ -9,20 +9,18 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Building
     using BuildingRegistry.Building;
     using MediatR;
 
-    public class PlanBuildingHandler : BusHandler, IRequestHandler<PlanBuildingRequest, PlanBuildingResponse>
+    public class PlanBuildingHandler : BuildingBusHandler, IRequestHandler<PlanBuildingRequest, PlanBuildingResponse>
     {
         private readonly IdempotencyContext _idempotencyContext;
-        private readonly IBuildings _buildings;
         private readonly IPersistentLocalIdGenerator _persistentLocalIdGenerator;
 
         public PlanBuildingHandler(
             ICommandHandlerResolver bus,
             IdempotencyContext idempotencyContext,
             IBuildings buildings,
-            IPersistentLocalIdGenerator persistentLocalIdGenerator) : base(bus)
+            IPersistentLocalIdGenerator persistentLocalIdGenerator) : base(bus, buildings)
         {
             _idempotencyContext = idempotencyContext;
-            _buildings = buildings;
             _persistentLocalIdGenerator = persistentLocalIdGenerator;
         }
 
@@ -42,7 +40,6 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Building
                 cancellationToken);
 
             var buildingHash = await GetBuildingHash(
-                _buildings,
                 nextBuildingPersistentLocalId,
                 cancellationToken);
 

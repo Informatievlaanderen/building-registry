@@ -13,6 +13,7 @@ namespace BuildingRegistry.Api.BackOffice.Building
     using BuildingRegistry.Building.Exceptions;
     using FluentValidation;
     using FluentValidation.Results;
+    using Handlers;
     using Handlers.Building;
     using Infrastructure.Options;
     using Microsoft.AspNetCore.Http;

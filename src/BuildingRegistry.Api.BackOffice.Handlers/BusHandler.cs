@@ -1,4 +1,4 @@
-namespace BuildingRegistry.Api.BackOffice.Handlers.Building
+namespace BuildingRegistry.Api.BackOffice.Handlers
 {
     using System;
     using System.Collections.Generic;
@@ -81,16 +81,6 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Building
                 Modification.Insert,
                 Organisation.DigitaalVlaanderen // TODO: from claims
             );
-        }
-
-        protected async Task<string> GetBuildingHash(
-            IBuildings buildings,
-            BuildingPersistentLocalId buildingPersistentLocalId,
-            CancellationToken cancellationToken)
-        {
-            var aggregate =
-                await buildings.GetAsync(new BuildingStreamId(buildingPersistentLocalId), cancellationToken);
-            return aggregate.LastEventHash;
         }
     }
 

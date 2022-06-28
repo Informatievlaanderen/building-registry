@@ -9,18 +9,16 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Building
     using BuildingRegistry.Building;
     using MediatR;
 
-    public class PlaceBuildingUnderConstructionHandler : BusHandler, IRequestHandler<PlaceBuildingUnderConstructionRequest, ETagResponse>
+    public class PlaceBuildingUnderConstructionHandler : BuildingBusHandler, IRequestHandler<PlaceBuildingUnderConstructionRequest, ETagResponse>
     {
         private readonly IdempotencyContext _idempotencyContext;
-        private readonly IBuildings _buildings;
 
         public PlaceBuildingUnderConstructionHandler(
             ICommandHandlerResolver bus,
             IdempotencyContext idempotencyContext,
-            IBuildings buildings) : base(bus)
+            IBuildings buildings) : base(bus, buildings)
         {
             _idempotencyContext = idempotencyContext;
-            _buildings = buildings;
         }
 
         public async Task<ETagResponse> Handle(PlaceBuildingUnderConstructionRequest request, CancellationToken cancellationToken)
@@ -39,7 +37,6 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Building
                 cancellationToken);
 
             var buildingHash = await GetBuildingHash(
-                _buildings,
                 buildingPersistentLocalId,
                 cancellationToken);
 

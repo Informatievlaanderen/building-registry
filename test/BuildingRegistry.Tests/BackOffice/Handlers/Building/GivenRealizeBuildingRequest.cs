@@ -1,4 +1,4 @@
-namespace BuildingRegistry.Tests.BackOffice.Handlers
+namespace BuildingRegistry.Tests.BackOffice.Handlers.Building
 {
     using System.Collections.Generic;
     using System.Linq;
@@ -8,10 +8,10 @@ namespace BuildingRegistry.Tests.BackOffice.Handlers
     using AutoFixture;
     using Be.Vlaanderen.Basisregisters.CommandHandling;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
-    using Building;
-    using Building.Commands;
     using BuildingRegistry.Api.BackOffice.Abstractions.Building.Requests;
     using BuildingRegistry.Api.BackOffice.Handlers.Building;
+    using BuildingRegistry.Building;
+    using BuildingRegistry.Building.Commands;
     using Fixtures;
     using FluentAssertions;
     using Infrastructure;
@@ -20,7 +20,7 @@ namespace BuildingRegistry.Tests.BackOffice.Handlers
     using Xunit;
     using Xunit.Abstractions;
 
-    public class RealizeBuildingHandlerTests : BuildingRegistryHandlerTest
+    public class GivenRealizeBuildingRequest : BuildingRegistryHandlerTest
     {
         private readonly RealizeBuildingHandler _sut;
 
@@ -30,7 +30,7 @@ namespace BuildingRegistry.Tests.BackOffice.Handlers
 
         private BuildingStreamId BuildingStreamId => new BuildingStreamId(_buildingPersistentLocalId);
 
-        public RealizeBuildingHandlerTests(ITestOutputHelper testOutputHelper)
+        public GivenRealizeBuildingRequest(ITestOutputHelper testOutputHelper)
             : base(testOutputHelper)
         {
             Fixture.Customize(new WithFixedBuildingPersistentLocalId());

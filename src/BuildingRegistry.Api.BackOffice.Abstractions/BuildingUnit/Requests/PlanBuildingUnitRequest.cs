@@ -5,8 +5,10 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Requests
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy.Gebouweenheid;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
+    using Building;
     using BuildingRegistry.Building;
     using BuildingRegistry.Building.Commands;
+    using Converters;
     using MediatR;
     using Newtonsoft.Json;
     using Responses;
@@ -15,7 +17,7 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Requests
     public class PlanBuildingUnitRequest : IRequest<PlanBuildingUnitResponse>
     {
         /// <summary>
-        /// Identificator van het gebouw
+        /// Identificator van het gebouw.
         /// </summary>
         [DataMember(Name="GebouwId", Order = 0)]
         [JsonProperty(Required = Required.Always)]
@@ -29,7 +31,7 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Requests
         public PositieGeometrieMethode PositieGeometrieMethode { get; set; }
 
         /// <summary>
-        /// Puntgeometrie van de gebouweenheid binnen het gebouw.
+        /// Puntgeometrie van de gebouweenheid binnen het gebouw in GML-3 formaat met Lambert 72 referentie systeem.
         /// </summary>
         [DataMember(Name = "Positie", Order = 2)]
         [JsonProperty(Required = Required.Default)]
@@ -55,19 +57,14 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Requests
         public PlanBuildingUnit ToCommand(
             BuildingPersistentLocalId buildingPersistentLocalId,
             BuildingUnitPersistentLocalId buildingUnitPersistentLocalId,
-            BuildingUnitPositionGeometryMethod geometryMethod,
-            ExtendedWkbGeometry? position,
-            BuildingUnitFunction function,
-            bool hasDeviation,
-            Provenance provenance
-            )
+            Provenance provenance)
             => new PlanBuildingUnit(
                 buildingPersistentLocalId,
                 buildingUnitPersistentLocalId,
-                geometryMethod,
-                position,
-                function,
-                hasDeviation,
+                PositieGeometrieMethode.Map(),
+                Positie == null ? null : Positie.ToExtendedWkbGeometry(),
+                Functie.Map(),
+                AfwijkingVastgesteld,
                 provenance);
     }
 
