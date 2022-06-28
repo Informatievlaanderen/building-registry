@@ -18,7 +18,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wms
     public class BuildingV2Tests : BuildingWmsProjectionTest<BuildingV2Projections>
     {
         private readonly Fixture? _fixture;
-        
+
         public BuildingV2Tests()
         {
             _fixture = new Fixture();
@@ -54,7 +54,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wms
                     buildingDetailItemV2.Version.Should().Be(buildingWasMigrated.Provenance.Timestamp);
 
                     buildingDetailItemV2.Geometry.Should().BeEquivalentTo(buildingWasMigrated.ExtendedWkbGeometry.ToByteArray());
-                    buildingDetailItemV2.GeometryMethod.Should().Be(BuildingGeometryMethod.Parse(buildingWasMigrated.GeometryMethod));
+                    buildingDetailItemV2.GeometryMethod.Should().Be(BuildingV2Projections.MapMethod(BuildingGeometryMethod.Parse(buildingWasMigrated.GeometryMethod)));
                 });
         }
 
@@ -101,7 +101,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wms
                     var wkbReader = WKBReaderFactory.Create();
                     var polygon = wkbReader.Read(buildingWasPlannedV2.ExtendedWkbGeometry.ToByteArray());
                     buildingDetailItemV2.Geometry.Should().BeEquivalentTo(polygon.AsBinary());
-                    buildingDetailItemV2.GeometryMethod.Should().Be(BuildingGeometryMethod.Outlined.Value);
+                    buildingDetailItemV2.GeometryMethod.Should().Be("Ingeschetst");
                 });
         }
 

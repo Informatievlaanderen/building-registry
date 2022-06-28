@@ -1,5 +1,6 @@
 namespace BuildingRegistry.Projections.Wms.BuildingV2
 {
+    using System.Collections.Generic;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.Connector;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore;
     using Be.Vlaanderen.Basisregisters.Utilities.HexByteConvertor;
@@ -8,13 +9,15 @@ namespace BuildingRegistry.Projections.Wms.BuildingV2
     using Infrastructure;
     using NetTopologySuite.Geometries;
     using NetTopologySuite.IO;
-    using NodaTime;
 
     [ConnectedProjectionName("WMS gebouwen")]
     [ConnectedProjectionDescription("Projectie die de gebouwen data voor het WMS gebouwregister voorziet.")]
     public class BuildingV2Projections : ConnectedProjection<WmsContext>
     {
         private readonly WKBReader _wkbReader;
+
+        public const string MeasuredByGrbMethod = "IngemetenGRB";
+        public const string OutlinedMethod = "Ingeschetst";
 
         public BuildingV2Projections(WKBReader wkbReader)
         {
@@ -35,7 +38,7 @@ namespace BuildingRegistry.Projections.Wms.BuildingV2
                     Status = BuildingStatus.Parse(message.Message.BuildingStatus),
                 };
 
-                SetGeometry(buildingV2, message.Message.ExtendedWkbGeometry, BuildingGeometryMethod.Parse(message.Message.GeometryMethod));
+                SetGeometry(buildingV2, message.Message.ExtendedWkbGeometry, MapMethod(BuildingGeometryMethod.Parse(message.Message.GeometryMethod)));
 
                 await context.BuildingsV2.AddAsync(buildingV2, ct);
             });
@@ -50,7 +53,7 @@ namespace BuildingRegistry.Projections.Wms.BuildingV2
                     Version = message.Message.Provenance.Timestamp
                 };
 
-                SetGeometry(buildingV2, message.Message.ExtendedWkbGeometry, BuildingGeometryMethod.Outlined);
+                SetGeometry(buildingV2, message.Message.ExtendedWkbGeometry, OutlinedMethod);
 
                 await context.BuildingsV2.AddAsync(buildingV2, ct);
             });
@@ -70,11 +73,22 @@ namespace BuildingRegistry.Projections.Wms.BuildingV2
             });
         }
 
-        private void SetGeometry(BuildingV2 building, string extendedWkbGeometry, BuildingGeometryMethod method)
+        public static string MapMethod(BuildingGeometryMethod method)
+        {
+            var dictionary = new Dictionary<BuildingGeometryMethod, string>
+            {
+                { BuildingGeometryMethod.Outlined, OutlinedMethod },
+                { BuildingGeometryMethod.MeasuredByGrb, MeasuredByGrbMethod }
+            };
+
+            return dictionary[method];
+        }
+
+        private void SetGeometry(BuildingV2 building, string extendedWkbGeometry, string method)
         {
             var geometry = _wkbReader.Read(extendedWkbGeometry.ToByteArray()) as Polygon;
 
-            building.GeometryMethod = method.Value;
+            building.GeometryMethod = method;
             building.Geometry = geometry?.AsBinary();
         }
     }
