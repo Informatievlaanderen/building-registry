@@ -1,3 +1,10 @@
+## [3.18.3](https://github.com/informatievlaanderen/building-registry/compare/v3.18.2...v3.18.3) (2022-06-29)
+
+
+### Bug Fixes
+
+* add message group id through persistentLocalId ([83c4cfb](https://github.com/informatievlaanderen/building-registry/commit/83c4cfbea369b61db68322beb1088100a811939f))
+
 ## [3.18.2](https://github.com/informatievlaanderen/building-registry/compare/v3.18.1...v3.18.2) (2022-06-28)
 
 
