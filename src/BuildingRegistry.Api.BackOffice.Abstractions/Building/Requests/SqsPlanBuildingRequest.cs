@@ -22,6 +22,9 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.Building.Requests
         [JsonIgnore]
         public IDictionary<string, object> Metadata { get; set; }
 
+        [JsonIgnore]
+        public string? MessageGroupId { get; set; }
+
         public PlanBuilding ToCommand(
             BuildingPersistentLocalId buildingPersistentLocalId,
             Provenance provenance)

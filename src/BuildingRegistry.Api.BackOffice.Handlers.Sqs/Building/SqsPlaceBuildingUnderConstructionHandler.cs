@@ -6,6 +6,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Sqs.Building
     using BuildingRegistry.Api.BackOffice.Abstractions.Building.Requests;
     using MediatR;
     using Microsoft.Extensions.Logging;
+    using Sqs;
     using static Be.Vlaanderen.Basisregisters.MessageHandling.AwsSqs.Simple.Sqs;
 
     public class SqsPlaceBuildingUnderConstructionHandler : IRequestHandler<SqsPlaceBuildingUnderConstructionRequest, Unit>
@@ -23,7 +24,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Sqs.Building
 
         public async Task<Unit> Handle(SqsPlaceBuildingUnderConstructionRequest request, CancellationToken cancellationToken)
         {
-            _ = await CopyToQueue(_sqsOptions, SqsQueueName.Value, request, cancellationToken);
+            _ = await CopyToQueue(_sqsOptions, SqsQueueName.Value, request, request.PersistentLocalId.ToString(), cancellationToken);
 
             _logger.LogDebug($"Request sent to queue {SqsQueueName.Value}");
 
