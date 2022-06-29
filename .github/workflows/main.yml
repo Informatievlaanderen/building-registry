@@ -171,6 +171,15 @@ jobs:
         BUILD_DOCKER_REGISTRY_TST: ${{ secrets.VBR_BUILD_DOCKER_REGISTRY_TST }}
         SEMVER: ${{ env.RELEASE_VERSION }}
         WORKSPACE: ${{ github.workspace }}
+        
+    # Deployment of Lambda functions must be done from the Test environment
+    - name: Deploy Lambda functions
+      if: env.RELEASE_VERSION != 'none'
+      shell: bash
+      run: |
+        echo Deploying Lambda functions to Test
+        echo Deploying Lambda functions to Staging
+        echo Deploying Lambda functions to Production
 
     - name: Configure AWS credentials (Staging)
       if: env.RELEASE_VERSION != 'none'
