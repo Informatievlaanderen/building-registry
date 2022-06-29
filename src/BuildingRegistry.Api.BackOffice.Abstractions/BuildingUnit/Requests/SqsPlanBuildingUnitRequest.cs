@@ -47,6 +47,9 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Requests
 
         [JsonIgnore]
         public IDictionary<string, object> Metadata { get; set; }
+
+        [JsonIgnore]
+        public string? MessageGroupId { get; set; }
     }
 
     public class SqsPlanBuildingUnitRequestExamples : IExamplesProvider<SqsPlanBuildingUnitRequest>

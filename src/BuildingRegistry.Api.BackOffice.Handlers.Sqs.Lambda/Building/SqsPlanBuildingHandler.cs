@@ -12,22 +12,25 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Sqs.Lambda.Building
     {
         private readonly IdempotencyContext _idempotencyContext;
         private readonly IBuildings _buildings;
-        private readonly IPersistentLocalIdGenerator _persistentLocalIdGenerator;
 
         public SqsPlanBuildingHandler(
             ICommandHandlerResolver bus,
             IdempotencyContext idempotencyContext,
-            IBuildings buildings,
-            IPersistentLocalIdGenerator persistentLocalIdGenerator) : base(bus)
+            IBuildings buildings)
+            : base(bus)
         {
             _idempotencyContext = idempotencyContext;
             _buildings = buildings;
-            _persistentLocalIdGenerator = persistentLocalIdGenerator;
         }
 
         public async Task<Unit> Handle(SqsPlanBuildingRequest request, CancellationToken cancellationToken)
         {
-            var nextBuildingPersistentLocalId = new BuildingPersistentLocalId(_persistentLocalIdGenerator.GenerateNextPersistentLocalId());
+            if (!int.TryParse(request.MessageGroupId, out int buildingPersistentLocalId))
+            {
+                return Unit.Value;
+            }
+            
+            var nextBuildingPersistentLocalId = new BuildingPersistentLocalId(buildingPersistentLocalId);
 
             var planBuilding = request.ToCommand(
                 nextBuildingPersistentLocalId,

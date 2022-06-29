@@ -16,7 +16,8 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Sqs.Lambda.Building
         public SqsRealizeBuildingHandler(
             ICommandHandlerResolver bus,
             IdempotencyContext idempotencyContext,
-            IBuildings buildings) : base(bus)
+            IBuildings buildings)
+            : base(bus)
         {
             _idempotencyContext = idempotencyContext;
             _buildings = buildings;

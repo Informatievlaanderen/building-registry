@@ -15,7 +15,7 @@ namespace BuildingRegistry.Api.CrabImport.Handlers.Sqs.Lambda
             _mediator = mediator;
         }
 
-        public async Task HandleMessage(object? messageData, CancellationToken cancellationToken)
+        public async Task HandleMessage(object? messageData, MessageMetadata messageMetadata, CancellationToken cancellationToken)
         {
             if (messageData is not SqsPostRequest sqsPostRequest)
             {

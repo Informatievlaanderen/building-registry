@@ -11,17 +11,25 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Sqs.BuildingUnit
     public class SqsPlanBuildingUnitHandler : IRequestHandler<SqsPlanBuildingUnitRequest, Unit>
     {
         private readonly SqsOptions _sqsOptions;
+        private readonly IPersistentLocalIdGenerator _persistentLocalIdGenerator;
         private readonly ILogger<SqsPlanBuildingUnitHandler> _logger;
 
-        public SqsPlanBuildingUnitHandler(SqsOptions sqsOptions, ILogger<SqsPlanBuildingUnitHandler> logger)
+        public SqsPlanBuildingUnitHandler(
+            SqsOptions sqsOptions,
+            IPersistentLocalIdGenerator persistentLocalIdGenerator,
+            ILogger<SqsPlanBuildingUnitHandler> logger)
         {
             _sqsOptions = sqsOptions;
+            _persistentLocalIdGenerator = persistentLocalIdGenerator;
             _logger = logger;
         }
         
         public async Task<Unit> Handle(SqsPlanBuildingUnitRequest request, CancellationToken cancellationToken)
         {
-            _ = await CopyToQueue(_sqsOptions, SqsQueueName.Value, request, cancellationToken);
+            var persistentLocalId = _persistentLocalIdGenerator.GenerateNextPersistentLocalId();
+            request.MessageGroupId = persistentLocalId.ToString();
+
+            _ = await CopyToQueue(_sqsOptions, SqsQueueName.Value, request, request.MessageGroupId, cancellationToken);
 
             _logger.LogDebug($"Request sent to queue {SqsQueueName.Value}");
 

@@ -16,10 +16,12 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Sqs.Lambda
             _mediator = mediator;
         }
 
-        public async Task HandleMessage(object? messageData, CancellationToken cancellationToken)
+        public async Task HandleMessage(object? messageData, MessageMetadata messageMetadata, CancellationToken cancellationToken)
         {
             switch (messageData)
             {
+                // Building
+                
                 case SqsPlanBuildingRequest sqsPlanBuildingRequest:
                     await _mediator.Send(sqsPlanBuildingRequest, cancellationToken);
                     break;
@@ -31,6 +33,9 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Sqs.Lambda
                 case SqsRealizeBuildingRequest sqsRealizeBuildingRequest:
                     await _mediator.Send(sqsRealizeBuildingRequest, cancellationToken);
                     break;
+
+                // BuildingUnit
+                
                 case SqsPlanBuildingUnitRequest sqsPlanBuildingUnitRequest:
                     await _mediator.Send(sqsPlanBuildingUnitRequest, cancellationToken);
                     break;
