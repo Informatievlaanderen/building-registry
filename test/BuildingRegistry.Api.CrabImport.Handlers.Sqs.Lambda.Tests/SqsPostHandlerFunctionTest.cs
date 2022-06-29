@@ -15,7 +15,7 @@ namespace BuildingRegistry.Api.CrabImport.Handlers.Sqs.Lambda.Tests
 
     public class SqsPostHandlerFunctionTest
     {
-        [Fact]
+        [Fact(Skip = "No need to test CrabImport lambda function")]
         public async Task TestCrabImportLambdaFunction()
         {
             var sqsPostRequest = new SqsPostRequest(new List<RegisterCrabImportRequest[]> { new []

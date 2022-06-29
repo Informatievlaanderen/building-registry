@@ -27,8 +27,8 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Sqs.Building
 
         public async Task<Unit> Handle(SqsPlanBuildingRequest request, CancellationToken cancellationToken)
         {
-            var persistentLocalId = _persistentLocalIdGenerator.GenerateNextPersistentLocalId();
-            request.MessageGroupId = persistentLocalId.ToString();
+            var buildingPersistentLocalId = _persistentLocalIdGenerator.GenerateNextPersistentLocalId();
+            request.MessageGroupId = buildingPersistentLocalId.ToString();
             
             _ = await CopyToQueue(_sqsOptions, SqsQueueName.Value, request, request.MessageGroupId, cancellationToken);
 
