@@ -1,3 +1,10 @@
+## [3.19.1](https://github.com/informatievlaanderen/building-registry/compare/v3.19.0...v3.19.1) (2022-06-30)
+
+
+### Bug Fixes
+
+* pr review ([183b537](https://github.com/informatievlaanderen/building-registry/commit/183b537953eea21f71c5f43e5aea65b9d22249ce))
+
 # [3.19.0](https://github.com/informatievlaanderen/building-registry/compare/v3.18.5...v3.19.0) (2022-06-30)
 
 
