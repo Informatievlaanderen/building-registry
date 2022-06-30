@@ -30,7 +30,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.BuildingUnit
         {
             var buildingUnitPersistentLocalId = new BuildingUnitPersistentLocalId(request.BuildingUnitPersistentLocalId);
 
-            if (!request.PersistentLocalId.TryGetBuildingIdForBuildingUnit(BackOfficeContext, out var buildingPersistentLocalId))
+            if (!request.BuildingUnitPersistentLocalId.TryGetBuildingIdForBuildingUnit(BackOfficeContext, out var buildingPersistentLocalId))
             {
                 throw new InvalidOperationException();
             }
