@@ -4,6 +4,8 @@ namespace BuildingRegistry.Api.BackOffice.Building
     using System.Threading;
     using System.Threading.Tasks;
     using Abstractions.Building.Requests;
+    using Abstractions.Building.Validators;
+    using Be.Vlaanderen.Basisregisters.AggregateSource;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
     using FluentValidation;
     using Handlers;

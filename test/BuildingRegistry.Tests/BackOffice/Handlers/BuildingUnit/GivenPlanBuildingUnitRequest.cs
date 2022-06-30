@@ -38,7 +38,7 @@ namespace BuildingRegistry.Tests.BackOffice.Handlers.Building
         }
 
         [Fact]
-        public async Task WhenCorrectRequestIsSent_ThenResponseIsExpected()
+        public async Task WhenExistingBuilding_ThenBuildingUnitIsPlanned()
         {
             var buildingPersistentLocalId = new BuildingPersistentLocalId(123);
 

@@ -27,9 +27,9 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.BuildingUnit
 
         public async Task<ETagResponse> Handle(RealizeBuildingUnitRequest request, CancellationToken cancellationToken)
         {
-            var buildingUnitPersistentLocalId = new BuildingUnitPersistentLocalId(request.PersistentLocalId);
+            var buildingUnitPersistentLocalId = new BuildingUnitPersistentLocalId(request.BuildingUnitPersistentLocalId);
 
-            if (!TryGetBuildingIdForBuildingUnit(request.PersistentLocalId, out var buildingPersistentLocalId))
+            if (!TryGetBuildingIdForBuildingUnit(request.BuildingUnitPersistentLocalId, out var buildingPersistentLocalId))
             {
                 throw new InvalidOperationException();
             }

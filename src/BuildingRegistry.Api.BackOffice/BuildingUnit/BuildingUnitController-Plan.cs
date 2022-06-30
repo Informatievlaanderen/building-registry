@@ -10,7 +10,6 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
     using Be.Vlaanderen.Basisregisters.AggregateSource;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
     using Building;
-    using BuildingRegistry.Building.Exceptions;
     using FluentValidation;
     using FluentValidation.Results;
     using Handlers;
@@ -38,7 +37,6 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
         [SwaggerRequestExample(typeof(PlanBuildingRequest), typeof(PlanBuildingRequestExamples))]
         [SwaggerResponseExample(StatusCodes.Status400BadRequest, typeof(BadRequestResponseExamples))]
         [SwaggerResponseExample(StatusCodes.Status500InternalServerError, typeof(InternalServerErrorResponseExamples))]
-
         public async Task<IActionResult> Plan(
             [FromServices] IOptions<ResponseOptions> options,
             [FromServices] IValidator<PlanBuildingUnitRequest> validator,
@@ -60,17 +58,17 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
             {
                 return Accepted();
             }
+            catch (AggregateNotFoundException)
+            {
+                throw CreateValidationException(
+                    ValidationErrorCodes.Building.BuildingNotFound,
+                    string.Empty,
+                    ValidationErrorMessages.Building.BuildingNotFound);
+            }
             catch (DomainException exception)
             {
                 throw exception switch
                 {
-                    BuildingUnitNotFoundException => new ApiException(ValidationErrorMessages.BuildingNotFound, StatusCodes.Status404NotFound),
-
-                    //BuildingCannotBeRealizedException => CreateValidationException(
-                    //    ValidationErrorCodes.BuildingCannotBeRealizedException,
-                    //    string.Empty,
-                    //    ValidationErrorMessages.BuildingCannotBeRealizedException),
-
                     _ => new ValidationException(new List<ValidationFailure>
                         { new ValidationFailure(string.Empty, exception.Message) })
                 };

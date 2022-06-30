@@ -12,7 +12,7 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Requests
     [DataContract(Name = "RealiseerGebouweenheid", Namespace = "")]
     public class RealizeBuildingUnitRequest : IRequest<ETagResponse>
     {
-        public int PersistentLocalId { get; set; }
+        public int BuildingUnitPersistentLocalId { get; set; }
 
         [JsonIgnore]
         public IDictionary<string, object> Metadata { get; set; }
