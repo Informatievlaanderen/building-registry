@@ -1,22 +1,21 @@
-namespace BuildingRegistry.Api.BackOffice.Handlers.BuildingUnit
+namespace BuildingRegistry.Api.BackOffice.Handlers.Sqs.Lambda.BuildingUnit
 {
     using System;
     using System.Threading;
     using System.Threading.Tasks;
     using Abstractions;
-    using Abstractions.Building.Responses;
-    using Abstractions.BuildingUnit.Extensions;
-    using Abstractions.BuildingUnit.Requests;
     using Be.Vlaanderen.Basisregisters.CommandHandling;
     using Be.Vlaanderen.Basisregisters.CommandHandling.Idempotency;
+    using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Extensions;
+    using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Requests;
     using BuildingRegistry.Building;
     using MediatR;
 
-    public class RealizeBuildingUnitHandler : BuildingUnitBusHandler, IRequestHandler<RealizeBuildingUnitRequest, ETagResponse>
+    public class SqsRealizeBuildingUnitHandler : SqsBuildingUnitBusHandler, IRequestHandler<SqsRealizeBuildingUnitRequest, Unit>
     {
         private readonly IdempotencyContext _idempotencyContext;
 
-        public RealizeBuildingUnitHandler(
+        public SqsRealizeBuildingUnitHandler(
             ICommandHandlerResolver bus,
             IBuildings buildings,
             BackOfficeContext backOfficeContext,
@@ -26,7 +25,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.BuildingUnit
             _idempotencyContext = idempotencyContext;
         }
 
-        public async Task<ETagResponse> Handle(RealizeBuildingUnitRequest request, CancellationToken cancellationToken)
+        public async Task<Unit> Handle(SqsRealizeBuildingUnitRequest request, CancellationToken cancellationToken)
         {
             var buildingUnitPersistentLocalId = new BuildingUnitPersistentLocalId(request.PersistentLocalId);
 
@@ -49,7 +48,9 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.BuildingUnit
 
             var buildingUnitLastEventHash = await GetBuildingUnitHash(buildingPersistentLocalId, buildingUnitPersistentLocalId, cancellationToken);
 
-            return new ETagResponse(buildingUnitLastEventHash);
+            // TODO: return value
+            //return new ETagResponse(buildingUnitLastEventHash);
+            return Unit.Value;
         }
     }
 }

@@ -4,6 +4,11 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Requests
     using System.Runtime.Serialization;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy.Gebouweenheid;
+    using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
+    using Building;
+    using BuildingRegistry.Building;
+    using BuildingRegistry.Building.Commands;
+    using Converters;
     using MediatR;
     using Newtonsoft.Json;
     using Swashbuckle.AspNetCore.Filters;
@@ -11,21 +16,21 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Requests
     public class SqsPlanBuildingUnitRequest : IRequest<Unit>
     {
         /// <summary>
-        /// Identificator van het gebouw
+        /// Identificator van het gebouw.
         /// </summary>
-        [DataMember(Name = "GebouwId", Order = 0)]
+        [DataMember(Name="GebouwId", Order = 0)]
         [JsonProperty(Required = Required.Always)]
         public string GebouwId { get; set; }
 
         /// <summary>
         /// De geometriemethode van de gebouweenheidpositie. 
         /// </summary>
-        [DataMember(Name = "PositieGeometriemethode", Order = 1)]
+        [DataMember(Name= "PositieGeometriemethode", Order = 1)]
         [JsonProperty(Required = Required.Always)]
         public PositieGeometrieMethode PositieGeometrieMethode { get; set; }
 
         /// <summary>
-        /// Puntgeometrie van de gebouweenheid binnen het gebouw.
+        /// Puntgeometrie van de gebouweenheid binnen het gebouw in GML-3 formaat met Lambert 72 referentie systeem.
         /// </summary>
         [DataMember(Name = "Positie", Order = 2)]
         [JsonProperty(Required = Required.Default)]
@@ -50,6 +55,19 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Requests
 
         [JsonIgnore]
         public string? MessageGroupId { get; set; }
+
+        public PlanBuildingUnit ToCommand(
+            BuildingPersistentLocalId buildingPersistentLocalId,
+            BuildingUnitPersistentLocalId buildingUnitPersistentLocalId,
+            Provenance provenance)
+            => new PlanBuildingUnit(
+                buildingPersistentLocalId,
+                buildingUnitPersistentLocalId,
+                PositieGeometrieMethode.Map(),
+                Positie?.ToExtendedWkbGeometry(),
+                Functie.Map(),
+                AfwijkingVastgesteld,
+                provenance);
     }
 
     public class SqsPlanBuildingUnitRequestExamples : IExamplesProvider<SqsPlanBuildingUnitRequest>
@@ -66,5 +84,4 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Requests
             };
         }
     }
-
 }
