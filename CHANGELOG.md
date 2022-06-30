@@ -1,3 +1,10 @@
+# [3.19.0](https://github.com/informatievlaanderen/building-registry/compare/v3.18.5...v3.19.0) (2022-06-30)
+
+
+### Features
+
+* buildingunit plan & realize controllers ([c131dad](https://github.com/informatievlaanderen/building-registry/commit/c131dad9dc7f0eac525134f39996ce8a6ef0768d))
+
 ## [3.18.5](https://github.com/informatievlaanderen/building-registry/compare/v3.18.4...v3.18.5) (2022-06-30)
 
 
