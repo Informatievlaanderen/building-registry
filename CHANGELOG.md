@@ -1,3 +1,10 @@
+## [3.18.5](https://github.com/informatievlaanderen/building-registry/compare/v3.18.4...v3.18.5) (2022-06-30)
+
+
+### Bug Fixes
+
+* add LABEL to Dockerfile (for easier DataDog filtering) ([3e2d239](https://github.com/informatievlaanderen/building-registry/commit/3e2d23989a107467a367c5cc97651a2d2ba7bee3))
+
 ## [3.18.4](https://github.com/informatievlaanderen/building-registry/compare/v3.18.3...v3.18.4) (2022-06-29)
 
 ## [3.18.3](https://github.com/informatievlaanderen/building-registry/compare/v3.18.2...v3.18.3) (2022-06-29)
