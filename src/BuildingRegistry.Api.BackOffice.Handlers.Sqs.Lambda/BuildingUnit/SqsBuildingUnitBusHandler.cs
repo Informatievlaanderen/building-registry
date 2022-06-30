@@ -1,19 +1,20 @@
-namespace BuildingRegistry.Api.BackOffice.Handlers.BuildingUnit
+namespace BuildingRegistry.Api.BackOffice.Handlers.Sqs.Lambda.BuildingUnit
 {
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
     using Abstractions;
     using Be.Vlaanderen.Basisregisters.CommandHandling;
+    using Building;
     using BuildingRegistry.Building;
     using BuildingRegistry.Building.Exceptions;
 
-    public abstract class BuildingUnitBusHandler : BusHandler
+    public abstract class SqsBuildingUnitBusHandler : SqsBusHandler
     {
         protected IBuildings Buildings { get; }
         protected BackOfficeContext BackOfficeContext { get; }
 
-        protected BuildingUnitBusHandler(
+        protected SqsBuildingUnitBusHandler(
             ICommandHandlerResolver bus,
             BackOfficeContext backOfficeContext,
             IBuildings buildings) : base(bus)

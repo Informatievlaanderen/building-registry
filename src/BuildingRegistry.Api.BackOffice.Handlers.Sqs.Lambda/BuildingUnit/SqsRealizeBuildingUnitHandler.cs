@@ -1,36 +1,38 @@
 namespace BuildingRegistry.Api.BackOffice.Handlers.Sqs.Lambda.BuildingUnit
 {
+    using System;
     using System.Threading;
     using System.Threading.Tasks;
     using Abstractions;
     using Be.Vlaanderen.Basisregisters.CommandHandling;
     using Be.Vlaanderen.Basisregisters.CommandHandling.Idempotency;
-    using BuildingRegistry.Api.BackOffice.Abstractions.Building.Validators;
+    using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Extensions;
     using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Requests;
     using BuildingRegistry.Building;
     using MediatR;
 
-    public class SqsPlanBuildingUnitHandler : SqsBuildingUnitBusHandler, IRequestHandler<SqsPlanBuildingUnitRequest, Unit>
+    public class SqsRealizeBuildingUnitHandler : SqsBuildingUnitBusHandler, IRequestHandler<SqsRealizeBuildingUnitRequest, Unit>
     {
-        private readonly IPersistentLocalIdGenerator _persistentLocalIdGenerator;
         private readonly IdempotencyContext _idempotencyContext;
 
-        public SqsPlanBuildingUnitHandler(
+        public SqsRealizeBuildingUnitHandler(
             ICommandHandlerResolver bus,
             IBuildings buildings,
             BackOfficeContext backOfficeContext,
-            IPersistentLocalIdGenerator persistentLocalIdGenerator,
             IdempotencyContext idempotencyContext)
             : base(bus, backOfficeContext, buildings)
         {
-            _persistentLocalIdGenerator = persistentLocalIdGenerator;
             _idempotencyContext = idempotencyContext;
         }
 
-        public async Task<Unit> Handle(SqsPlanBuildingUnitRequest request, CancellationToken cancellationToken)
+        public async Task<Unit> Handle(SqsRealizeBuildingUnitRequest request, CancellationToken cancellationToken)
         {
-            var buildingPersistentLocalId = new BuildingPersistentLocalId(OsloPuriValidator.ParsePersistentLocalId(request.GebouwId));
-            var buildingUnitPersistentLocalId = new BuildingUnitPersistentLocalId(_persistentLocalIdGenerator.GenerateNextPersistentLocalId());
+            var buildingUnitPersistentLocalId = new BuildingUnitPersistentLocalId(request.PersistentLocalId);
+
+            if (!request.PersistentLocalId.TryGetBuildingIdForBuildingUnit(BackOfficeContext, out var buildingPersistentLocalId))
+            {
+                throw new InvalidOperationException();
+            }
 
             var command = request.ToCommand(
                 buildingPersistentLocalId,
@@ -44,16 +46,10 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Sqs.Lambda.BuildingUnit
                 request.Metadata,
                 cancellationToken);
 
-            BackOfficeContext.BuildingUnitBuildings.Add(
-                new BuildingUnitBuilding(
-                    buildingUnitPersistentLocalId,
-                    buildingPersistentLocalId));
-            await BackOfficeContext.SaveChangesAsync(cancellationToken);
-
             var buildingUnitLastEventHash = await GetBuildingUnitHash(buildingPersistentLocalId, buildingUnitPersistentLocalId, cancellationToken);
 
             // TODO: return value
-            //return new PlanBuildingUnitResponse(buildingPersistentLocalId, buildingUnitPersistentLocalId, buildingUnitLastEventHash);
+            //return new ETagResponse(buildingUnitLastEventHash);
             return Unit.Value;
         }
     }
