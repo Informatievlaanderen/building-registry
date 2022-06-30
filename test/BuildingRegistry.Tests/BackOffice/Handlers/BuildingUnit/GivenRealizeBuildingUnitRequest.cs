@@ -35,7 +35,7 @@ namespace BuildingRegistry.Tests.BackOffice.Handlers.BuildingUnit
         }
 
         [Fact]
-        public async Task WhenCorrectRequestIsSent_ThenResponseIsExpected()
+        public async Task GivenBuildingUnitPlanned_ThenBuildingUnitRealized()
         {
             var buildingPersistentLocalId = new BuildingPersistentLocalId(123);
             var buildingUnitPersistentLocalId = new BuildingUnitPersistentLocalId(456);
@@ -60,7 +60,7 @@ namespace BuildingRegistry.Tests.BackOffice.Handlers.BuildingUnit
 
             var request = new RealizeBuildingUnitRequest()
             {
-                PersistentLocalId = buildingUnitPersistentLocalId
+                BuildingUnitPersistentLocalId = buildingUnitPersistentLocalId
             };
 
             var response = await _sut.Handle(request, CancellationToken.None);

@@ -2,22 +2,18 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
-    using Abstractions;
     using Abstractions.Building.Validators;
     using Abstractions.BuildingUnit.Requests;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
     using Be.Vlaanderen.Basisregisters.Api.ETag;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
     using Building;
-    using BuildingRegistry.Building;
     using BuildingRegistry.Building.Exceptions;
     using FluentValidation;
     using FluentValidation.Results;
     using Handlers;
-    using Handlers.Building;
     using Infrastructure.Options;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
@@ -34,7 +30,7 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
         /// <param name="ifMatchHeaderValue"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        [HttpPost("{persistentLocalId}/acties/realiseren")]
+        [HttpPost("{buildingUnitPersistentLocalId}/acties/realiseren")]
         [ProducesResponseType(StatusCodes.Status202Accepted)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
@@ -51,12 +47,12 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
             {
                 if (!string.IsNullOrWhiteSpace(ifMatchHeaderValue))
                 {
-                    if (!TryGetBuildingIdForBuildingUnit(request.PersistentLocalId, out var buildingPersistentLocalId))
+                    if (!TryGetBuildingIdForBuildingUnit(request.BuildingUnitPersistentLocalId, out var buildingPersistentLocalId))
                     {
                         return NotFound();
                     }
 
-                    var etag = await GetBuildingUnitEtag(buildingPersistentLocalId, request.PersistentLocalId, cancellationToken);
+                    var etag = await GetBuildingUnitEtag(buildingPersistentLocalId, request.BuildingUnitPersistentLocalId, cancellationToken);
 
                     if (!IfMatchHeaderMatchesEtag(ifMatchHeaderValue, etag))
                     {
@@ -68,23 +64,28 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
                 var response = await _mediator.Send(request, cancellationToken);
 
                 return new AcceptedWithETagResult(
-                    new Uri(string.Format(options.Value.BuildingUnitDetailUrl, request.PersistentLocalId)),
+                    new Uri(string.Format(options.Value.BuildingUnitDetailUrl, request.BuildingUnitPersistentLocalId)),
                     response.LastEventHash);
             }
             catch (IdempotencyException)
             {
                 return Accepted();
             }
+            catch (AggregateNotFoundException)
+            {
+
+                throw CreateValidationException(
+                    ValidationErrorCodes.Building.BuildingNotFound,
+                    string.Empty,
+                    ValidationErrorMessages.Building.BuildingNotFound);
+            }
             catch (DomainException exception)
             {
                 throw exception switch
                 {
-                    BuildingUnitNotFoundException => new ApiException(ValidationErrorMessages.BuildingNotFound, StatusCodes.Status404NotFound),
-
-                    //BuildingCannotBeRealizedException => CreateValidationException(
-                    //    ValidationErrorCodes.BuildingCannotBeRealizedException,
-                    //    string.Empty,
-                    //    ValidationErrorMessages.BuildingCannotBeRealizedException),
+                    BuildingUnitNotFoundException => new ApiException(ValidationErrorMessages.BuildingUnit.BuildingUnitNotFound, StatusCodes.Status404NotFound),
+                    
+                    BuildingUnitIsRemovedException => new ApiException(ValidationErrorMessages.BuildingUnit.BuildingUnitIsRemoved, StatusCodes.Status410Gone),
 
                     _ => new ValidationException(new List<ValidationFailure>
                         { new ValidationFailure(string.Empty, exception.Message) })

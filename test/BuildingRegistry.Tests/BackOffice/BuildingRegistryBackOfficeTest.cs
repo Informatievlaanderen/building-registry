@@ -21,7 +21,7 @@ namespace BuildingRegistry.Tests.BackOffice
     public class BuildingRegistryBackOfficeTest : BuildingRegistryTest
     {
         internal const string BuildingDetailUrl = "https://www.registry.com/building/gepland/{0}";
-        internal const string BuildingUnitDetailUrl = "https://www.registry.com/building/gepland/{0}";
+        internal const string BuildingUnitDetailUrl = "https://www.registry.com/buildingunit/gepland/{0}";
         protected IOptions<ResponseOptions> ResponseOptions { get; }
         protected Mock<IMediator> MockMediator { get; }
         public const string Username = "John Doe";

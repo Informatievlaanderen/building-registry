@@ -1,36 +1,35 @@
 namespace BuildingRegistry.Tests.BackOffice.Api.WhenRealizingBuildingUnit
 {
     using System;
-    using System.Collections.Generic;
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
     using AutoFixture;
     using Be.Vlaanderen.Basisregisters.Api.ETag;
+    using Be.Vlaanderen.Basisregisters.Api.Exceptions;
     using Building;
     using Building.Events;
+    using Building.Exceptions;
     using BuildingRegistry.Api.BackOffice.Abstractions;
     using BuildingRegistry.Api.BackOffice.Abstractions.Building.Responses;
     using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Requests;
     using BuildingRegistry.Api.BackOffice.Building;
     using BuildingRegistry.Api.BackOffice.BuildingUnit;
-    using BuildingRegistry.Legacy.Events;
-    using FeatureToggle;
     using FluentAssertions;
-    using Microsoft.EntityFrameworkCore;
-    using Microsoft.EntityFrameworkCore.Internal;
+    using FluentValidation;
+    using Microsoft.AspNetCore.Http;
     using Moq;
     using Xunit;
     using Xunit.Abstractions;
 
-    public class GivenBuildingUnitRealized : BuildingRegistryBackOfficeTest
+    public class GivenBuildingUnitPlanned : BuildingRegistryBackOfficeTest
     {
         private readonly BuildingUnitController _controller;
 
         private readonly Mock<IBuildings> _mockBuildingsRepository;
         private readonly BackOfficeContext _backOfficeContext;
 
-        public GivenBuildingUnitRealized(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
+        public GivenBuildingUnitPlanned(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
         {
             _mockBuildingsRepository = new Mock<IBuildings>();
             _backOfficeContext = new FakeBackOfficeContextFactory().CreateDbContext();
@@ -38,7 +37,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenRealizingBuildingUnit
         }
 
         [Fact]
-        public async Task WithoutIfMatchHeader_ThenShouldSucceed()
+        public async Task WithoutIfMatchHeader_ThenAcceptedResponseIsExpected()
         {
             var buildingUnitPersistentLocalId = new BuildingUnitPersistentLocalId(456);
 
@@ -48,7 +47,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenRealizingBuildingUnit
 
             var request = new RealizeBuildingUnitRequest()
             {
-                PersistentLocalId = buildingUnitPersistentLocalId
+                BuildingUnitPersistentLocalId = buildingUnitPersistentLocalId
             };
 
             //Act
@@ -66,7 +65,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenRealizingBuildingUnit
         }
 
         [Fact]
-        public async Task WithCorrectIfMatchHeader_ThenShouldSucceed()
+        public async Task WithCorrectIfMatchHeader_ThenAcceptedResponseIsExpected()
         {
             var buildingPersistentLocalId = new BuildingPersistentLocalId(123);
             var buildingStreamId = new BuildingStreamId(new BuildingPersistentLocalId(buildingPersistentLocalId));
@@ -97,7 +96,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenRealizingBuildingUnit
 
             var request = new RealizeBuildingUnitRequest()
             {
-                PersistentLocalId = buildingUnitPersistentLocalId
+                BuildingUnitPersistentLocalId = buildingUnitPersistentLocalId
             };
 
             //Act
@@ -115,10 +114,9 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenRealizingBuildingUnit
         }
 
         [Fact]
-        public async Task WithInvalidIfMatchHeader_ThenShouldSucceed()
+        public async Task WithInvalidIfMatchHeader_ThenPreconditionFailedResponse()
         {
             var buildingPersistentLocalId = new BuildingPersistentLocalId(123);
-            var buildingStreamId = new BuildingStreamId(new BuildingPersistentLocalId(buildingPersistentLocalId));
             var buildingUnitPersistentLocalId = new BuildingUnitPersistentLocalId(456);
 
             Fixture.Register(() => buildingUnitPersistentLocalId);
@@ -146,7 +144,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenRealizingBuildingUnit
 
             var request = new RealizeBuildingUnitRequest()
             {
-                PersistentLocalId = buildingUnitPersistentLocalId
+                BuildingUnitPersistentLocalId = buildingUnitPersistentLocalId
             };
 
             //Act
@@ -161,6 +159,68 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenRealizingBuildingUnit
             MockMediator.Verify(x => x.Send(It.IsAny<RealizeBuildingUnitRequest>(), CancellationToken.None), Times.Never);
 
             result.Should().NotBeNull();
+        }
+
+        [Fact]
+        public void WhenBuildingUnitNotFound_ThenValidationException()
+        {
+            var buildingUnitPersistentLocalId = new BuildingUnitPersistentLocalId(456);
+
+            MockMediator
+                .Setup(x => x.Send(It.IsAny<RealizeBuildingUnitRequest>(), CancellationToken.None).Result)
+                .Throws(new BuildingUnitNotFoundException());
+
+            var request = new RealizeBuildingUnitRequest()
+            {
+                BuildingUnitPersistentLocalId = buildingUnitPersistentLocalId
+            };
+
+            //Act
+            Func<Task> act = async () => await _controller.Realize(
+                ResponseOptions,
+                request,
+                string.Empty,
+                CancellationToken.None);
+
+            // Assert
+            act
+                .Should()
+                .ThrowAsync<ApiException>()
+                .Result
+                .Where(x =>
+                    x.Message == "Onbestaande gebouweenheid."
+                    && x.StatusCode == StatusCodes.Status404NotFound);
+        }
+
+        [Fact]
+        public void WhenBuildingUnitIsRemoved_ThenValidationException()
+        {
+            var buildingUnitPersistentLocalId = new BuildingUnitPersistentLocalId(456);
+
+            MockMediator
+                .Setup(x => x.Send(It.IsAny<RealizeBuildingUnitRequest>(), CancellationToken.None).Result)
+                .Throws(new BuildingUnitIsRemovedException(buildingUnitPersistentLocalId));
+
+            var request = new RealizeBuildingUnitRequest()
+            {
+                BuildingUnitPersistentLocalId = buildingUnitPersistentLocalId
+            };
+
+            //Act
+            Func<Task> act = async () => await _controller.Realize(
+                ResponseOptions,
+                request,
+                string.Empty,
+                CancellationToken.None);
+
+            // Assert
+            act
+                .Should()
+                .ThrowAsync<ApiException>()
+                .Result
+                .Where(x =>
+                    x.Message == "Verwijderde gebouweenheid."
+                                   && x.StatusCode == StatusCodes.Status410Gone);
         }
     }
 }

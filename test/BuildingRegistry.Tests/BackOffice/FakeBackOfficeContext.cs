@@ -5,22 +5,22 @@ namespace BuildingRegistry.Tests.BackOffice
     using Microsoft.EntityFrameworkCore;
     using Microsoft.EntityFrameworkCore.Design;
 
-    public class TestBackOfficeContext : BackOfficeContext
+    public class FakeBackOfficeContext : BackOfficeContext
     {
         // This needs to be here to please EF
-        public TestBackOfficeContext() { }
+        public FakeBackOfficeContext() { }
 
         // This needs to be DbContextOptions<T> for Autofac!
-        public TestBackOfficeContext(DbContextOptions<BackOfficeContext> options)
+        public FakeBackOfficeContext(DbContextOptions<BackOfficeContext> options)
             : base(options) { }
     }
 
-    public class FakeBackOfficeContextFactory : IDesignTimeDbContextFactory<TestBackOfficeContext>
+    public class FakeBackOfficeContextFactory : IDesignTimeDbContextFactory<FakeBackOfficeContext>
     {
-        public TestBackOfficeContext CreateDbContext(params string[] args)
+        public FakeBackOfficeContext CreateDbContext(params string[] args)
         {
             var builder = new DbContextOptionsBuilder<BackOfficeContext>().UseInMemoryDatabase(Guid.NewGuid().ToString());
-            return new TestBackOfficeContext(builder.Options);
+            return new FakeBackOfficeContext(builder.Options);
         }
     }
 }

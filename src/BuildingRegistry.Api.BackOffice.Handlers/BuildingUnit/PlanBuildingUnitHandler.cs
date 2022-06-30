@@ -52,7 +52,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.BuildingUnit
             await BackOfficeContext.SaveChangesAsync(cancellationToken);
 
             var buildingUnitLastEventHash = await GetBuildingUnitHash(buildingPersistentLocalId, buildingUnitPersistentLocalId, cancellationToken);
-            return new PlanBuildingUnitResponse(buildingPersistentLocalId, buildingUnitPersistentLocalId, buildingUnitLastEventHash);
+            return new PlanBuildingUnitResponse(buildingUnitPersistentLocalId, buildingUnitLastEventHash);
         }
     }
 }

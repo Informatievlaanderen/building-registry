@@ -16,11 +16,11 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenPlanningBuildingUnit
     using Xunit;
     using Xunit.Abstractions;
 
-    public class GivenBuildingUnitPlanned : BuildingRegistryBackOfficeTest
+    public class GivenBuilding : BuildingRegistryBackOfficeTest
     {
         private readonly BuildingUnitController _controller;
 
-        public GivenBuildingUnitPlanned(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
+        public GivenBuilding(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
         {
             var buildings = new Mock<IBuildings>();
             var backOfficeContext = new Mock<BackOfficeContext>();
@@ -28,14 +28,14 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenPlanningBuildingUnit
         }
 
         [Fact]
-        public async Task ThenShouldSucceed()
+        public async Task ThenAcceptedResponseIsExpected()
         {
             var buildingPersistentLocalId = new BuildingPersistentLocalId(123);
             var buildingUnitPersistentLocalId = new BuildingUnitPersistentLocalId(456);
 
             MockMediator
                 .Setup(x => x.Send(It.IsAny<PlanBuildingUnitRequest>(), CancellationToken.None).Result)
-                .Returns(new PlanBuildingUnitResponse(buildingPersistentLocalId, buildingUnitPersistentLocalId, string.Empty));
+                .Returns(new PlanBuildingUnitResponse(buildingUnitPersistentLocalId, string.Empty));
 
             var request = new PlanBuildingUnitRequest()
             {
