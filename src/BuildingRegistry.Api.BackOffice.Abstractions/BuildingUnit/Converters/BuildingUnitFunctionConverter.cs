@@ -1,7 +1,7 @@
 namespace BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Converters
 {
     using System;
-    using Be.Vlaanderen.Basisregisters.GrAr.Legacy.Gebouweenheid;
+    using Be.Vlaanderen.Basisregisters.GrAr.Edit.Contracts;
     using BuildingRegistry.Building;
 
     public static class BuildingUnitFunctionConverter
@@ -10,7 +10,6 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Converters
         {
             return f switch
             {
-                GebouweenheidFunctie.GemeenschappelijkDeel => BuildingUnitFunction.Common,
                 GebouweenheidFunctie.NietGekend => BuildingUnitFunction.Unknown,
                 _ => throw new ArgumentException(nameof(f), f.ToString(), null)
             };

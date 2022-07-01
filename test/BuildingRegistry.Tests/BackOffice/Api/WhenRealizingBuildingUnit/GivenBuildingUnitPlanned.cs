@@ -1,7 +1,6 @@
 namespace BuildingRegistry.Tests.BackOffice.Api.WhenRealizingBuildingUnit
 {
     using System;
-    using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
     using AutoFixture;
@@ -16,7 +15,6 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenRealizingBuildingUnit
     using BuildingRegistry.Api.BackOffice.Building;
     using BuildingRegistry.Api.BackOffice.BuildingUnit;
     using FluentAssertions;
-    using FluentValidation;
     using Microsoft.AspNetCore.Http;
     using Moq;
     using Xunit;

@@ -1,5 +1,6 @@
 namespace BuildingRegistry.Api.BackOffice.Abstractions.Building.Validators
 {
+    using Be.Vlaanderen.Basisregisters.GrAr.Edit.Validators;
     using FluentValidation;
     using Requests;
 
@@ -8,7 +9,7 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.Building.Validators
         public PlanBuildingRequestValidator()
         {
             RuleFor(x => x.GeometriePolygoon)
-                .Must(GmlPolygonValidator.IsValid)
+                .Must(gml => GmlPolygonValidator.IsValid(gml, GmlHelpers.CreateGmlReader()))
                 .WithErrorCode(ValidationErrorCodes.Building.InvalidPolygonGeometry)
                 .WithMessage(ValidationErrorMessages.Building.InvalidPolygonGeometry);
         }
