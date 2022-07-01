@@ -5,6 +5,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.BuildingUnit
     using System.Threading.Tasks;
     using Abstractions;
     using Abstractions.Building.Responses;
+    using Abstractions.BuildingUnit.Extensions;
     using Abstractions.BuildingUnit.Requests;
     using Be.Vlaanderen.Basisregisters.CommandHandling;
     using Be.Vlaanderen.Basisregisters.CommandHandling.Idempotency;
@@ -29,7 +30,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.BuildingUnit
         {
             var buildingUnitPersistentLocalId = new BuildingUnitPersistentLocalId(request.BuildingUnitPersistentLocalId);
 
-            if (!TryGetBuildingIdForBuildingUnit(request.BuildingUnitPersistentLocalId, out var buildingPersistentLocalId))
+            if (!request.BuildingUnitPersistentLocalId.TryGetBuildingIdForBuildingUnit(BackOfficeContext, out var buildingPersistentLocalId))
             {
                 throw new InvalidOperationException();
             }
