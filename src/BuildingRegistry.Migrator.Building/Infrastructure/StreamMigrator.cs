@@ -2,6 +2,8 @@ namespace BuildingRegistry.Migrator.Building.Infrastructure
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
+    using System.Globalization;
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
@@ -24,10 +26,11 @@ namespace BuildingRegistry.Migrator.Building.Infrastructure
         private readonly ILogger _logger;
         private readonly ProcessedIdsTable _processedIdsTable;
         private readonly SqlStreamsTable _sqlStreamTable;
-        private List<AddressConsumerItem> _consumedAddressItems;
+        private Dictionary<Guid, int> _consumedAddressItems;
         private readonly bool _skipIncomplete;
 
         private List<(int processedId, bool isPageCompleted)> _processedIds;
+        private readonly Stopwatch _stopwatch = new Stopwatch();
 
         public StreamMigrator(ILoggerFactory loggerFactory, IConfiguration configuration, ILifetimeScope lifetimeScope)
         {
@@ -38,7 +41,7 @@ namespace BuildingRegistry.Migrator.Building.Infrastructure
             _processedIdsTable = new ProcessedIdsTable(connectionString, loggerFactory);
             _sqlStreamTable = new SqlStreamsTable(connectionString);
 
-            _skipIncomplete = Boolean.Parse(configuration["SkipIncomplete"]);
+            _skipIncomplete = bool.Parse(configuration["SkipIncomplete"]);
         }
 
         public async Task ProcessAsync(CancellationToken ct)
@@ -46,7 +49,11 @@ namespace BuildingRegistry.Migrator.Building.Infrastructure
             await _processedIdsTable.CreateTableIfNotExists();
 
             var consumerContext = _lifetimeScope.Resolve<ConsumerAddressContext>();
-            _consumedAddressItems = await consumerContext.AddressConsumerItems.ToListAsync(ct); // TODO: monitor memory usage
+            _consumedAddressItems = await consumerContext
+                .AddressConsumerItems
+                .Where(x => x.AddressId != null)
+                .Select(x => new { AddressId = x.AddressId.Value, x.AddressPersistentLocalId })
+                .ToDictionaryAsync(x => x.AddressId, y => y.AddressPersistentLocalId, ct);
 
             var processedIdsList = await _processedIdsTable.GetProcessedIds();
             _processedIds = new List<(int, bool)>(processedIdsList);
@@ -71,7 +78,7 @@ namespace BuildingRegistry.Migrator.Building.Infrastructure
                 try
                 {
                     var processedPageItems = await ProcessStreams(pageOfStreams, ct);
-                    
+
                     if (!processedPageItems.Any())
                     {
                         lastCursorPosition = pageOfStreams.Max(x => x.internalId);
@@ -109,7 +116,7 @@ namespace BuildingRegistry.Migrator.Building.Infrastructure
                     throw;
                 }
             }
-            
+
             return processedItems;
         }
 
@@ -135,7 +142,12 @@ namespace BuildingRegistry.Migrator.Building.Infrastructure
 
             var legacyBuildingsRepo = streamLifetimeScope.Resolve<Legacy.IBuildings>();
             var buildingId = new Legacy.BuildingId(Guid.Parse(aggregateId));
+
+            _stopwatch.Start();
             var legacyBuildingAggregate = await legacyBuildingsRepo.GetAsync(buildingId, ct);
+            _stopwatch.Stop();
+            _logger.LogInformation("Resolved aggregate in {timing}", _stopwatch.Elapsed.ToString("g", CultureInfo.InvariantCulture));
+            _stopwatch.Reset();
 
             if (!legacyBuildingAggregate.IsComplete)
             {
@@ -180,9 +192,7 @@ namespace BuildingRegistry.Migrator.Building.Infrastructure
                     var addressPersistentLocalIds = new List<AddressPersistentLocalId>();
                     foreach (var addressId in legacyBuildingUnit.AddressIds)
                     {
-                        var addressItem = _consumedAddressItems.FirstOrDefault(x => x.AddressId == addressId);
-
-                        if (addressItem is null)
+                        if (!_consumedAddressItems.TryGetValue(addressId, out var addressPersistentLocalId))
                         {
                             if (_skipIncomplete)
                             {
@@ -192,7 +202,7 @@ namespace BuildingRegistry.Migrator.Building.Infrastructure
                             throw new InvalidOperationException($"AddressConsumerItem for addressId '{addressId}' was not found in the ConsumerAddressContext.");
                         }
 
-                        addressPersistentLocalIds.Add(new AddressPersistentLocalId(addressItem.AddressPersistentLocalId));
+                        addressPersistentLocalIds.Add(new AddressPersistentLocalId(addressPersistentLocalId));
                     }
 
                     commandBuildingUnits.Add(new BuildingUnit(legacyBuildingUnit.BuildingUnitId, legacyBuildingUnit.PersistentLocalId, legacyBuildingUnit.Function, status, addressPersistentLocalIds, legacyBuildingUnit.BuildingUnitPosition, legacyBuildingUnit.IsRemoved));
