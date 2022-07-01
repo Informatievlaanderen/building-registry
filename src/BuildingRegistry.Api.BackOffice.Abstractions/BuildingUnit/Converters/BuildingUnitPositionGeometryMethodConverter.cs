@@ -1,7 +1,7 @@
 namespace BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Converters
 {
     using System;
-    using Be.Vlaanderen.Basisregisters.GrAr.Legacy;
+    using Be.Vlaanderen.Basisregisters.GrAr.Edit.Contracts;
     using BuildingRegistry.Building;
 
     public static class BuildingUnitPositionGeometryMethodConverter
@@ -14,7 +14,6 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Converters
                     return BuildingUnitPositionGeometryMethod.AppointedByAdministrator;;
                 case PositieGeometrieMethode.AfgeleidVanObject:
                     return BuildingUnitPositionGeometryMethod.DerivedFromObject;
-                case PositieGeometrieMethode.Geinterpoleerd:
                 default:
                     throw new ArgumentOutOfRangeException(nameof(methode), methode, null);
             }

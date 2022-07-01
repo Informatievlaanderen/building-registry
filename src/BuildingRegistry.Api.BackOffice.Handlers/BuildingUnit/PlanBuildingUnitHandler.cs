@@ -30,7 +30,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.BuildingUnit
 
         public async Task<PlanBuildingUnitResponse> Handle(PlanBuildingUnitRequest request, CancellationToken cancellationToken)
         {
-            var buildingPersistentLocalId = new BuildingPersistentLocalId(OsloPuriValidator.ParsePersistentLocalId(request.GebouwId));
+            var buildingPersistentLocalId = new BuildingPersistentLocalId(OsloPuriValidatorExtensions.ParsePersistentLocalId(request.GebouwId));
             var buildingUnitPersistentLocalId = new BuildingUnitPersistentLocalId(_persistentLocalIdGenerator.GenerateNextPersistentLocalId());
 
             var command = request.ToCommand(

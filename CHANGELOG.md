@@ -1,3 +1,10 @@
+# [3.20.0](https://github.com/informatievlaanderen/building-registry/compare/v3.19.1...v3.20.0) (2022-07-01)
+
+
+### Features
+
+* implement sqs + lambda for buildingunit plan & realize ([84c79f2](https://github.com/informatievlaanderen/building-registry/commit/84c79f2bfc27a42718592e2e007cc0d45d4fc4c5))
+
 ## [3.19.1](https://github.com/informatievlaanderen/building-registry/compare/v3.19.0...v3.19.1) (2022-06-30)
 
 
