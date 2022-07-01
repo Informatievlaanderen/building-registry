@@ -1,3 +1,15 @@
+# [3.21.0](https://github.com/informatievlaanderen/building-registry/compare/v3.20.1...v3.21.0) (2022-07-01)
+
+
+### Bug Fixes
+
+* build ([7a6557a](https://github.com/informatievlaanderen/building-registry/commit/7a6557a8103cbdc7874707a45c128007535dbef1))
+
+
+### Features
+
+* add ticketing system ([969f592](https://github.com/informatievlaanderen/building-registry/commit/969f592ac812beaae1f5118aa4fda052c375a0ac))
+
 ## [3.20.1](https://github.com/informatievlaanderen/building-registry/compare/v3.20.0...v3.20.1) (2022-07-01)
 
 # [3.20.0](https://github.com/informatievlaanderen/building-registry/compare/v3.19.1...v3.20.0) (2022-07-01)
