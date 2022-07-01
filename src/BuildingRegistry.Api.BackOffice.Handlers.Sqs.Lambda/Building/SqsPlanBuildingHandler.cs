@@ -2,9 +2,11 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Sqs.Lambda.Building
 {
     using System.Threading;
     using System.Threading.Tasks;
+    using Abstractions;
     using Be.Vlaanderen.Basisregisters.CommandHandling;
     using Be.Vlaanderen.Basisregisters.CommandHandling.Idempotency;
     using BuildingRegistry.Api.BackOffice.Abstractions.Building.Requests;
+    using BuildingRegistry.Api.BackOffice.Abstractions.Building.Responses;
     using BuildingRegistry.Building;
     using MediatR;
 
@@ -14,10 +16,11 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Sqs.Lambda.Building
         private readonly IBuildings _buildings;
 
         public SqsPlanBuildingHandler(
+            ITicketing ticketing,
             ICommandHandlerResolver bus,
             IdempotencyContext idempotencyContext,
             IBuildings buildings)
-            : base(bus)
+            : base(ticketing, bus)
         {
             _idempotencyContext = idempotencyContext;
             _buildings = buildings;
@@ -25,6 +28,11 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Sqs.Lambda.Building
 
         public async Task<Unit> Handle(SqsPlanBuildingRequest request, CancellationToken cancellationToken)
         {
+            var ticketId = request.TicketId;
+
+            // update ticket to pending
+            await Ticketing.Pending(ticketId);
+
             if (!int.TryParse(request.MessageGroupId, out int buildingPersistentLocalId))
             {
                 return Unit.Value;
@@ -48,8 +56,9 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Sqs.Lambda.Building
                 nextBuildingPersistentLocalId,
                 cancellationToken);
 
-            // TODO: return value
-            //return new PlanBuildingResponse(nextBuildingPersistentLocalId, buildingHash);
+            // update ticket to complete
+            await Ticketing.Complete(ticketId, new PlanBuildingResponse(nextBuildingPersistentLocalId, buildingHash));
+            
             return Unit.Value;
         }
     }

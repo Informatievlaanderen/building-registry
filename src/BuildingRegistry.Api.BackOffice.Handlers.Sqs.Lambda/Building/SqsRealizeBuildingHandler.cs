@@ -2,6 +2,8 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Sqs.Lambda.Building
 {
     using System.Threading;
     using System.Threading.Tasks;
+    using Abstractions;
+    using Abstractions.Building.Responses;
     using Be.Vlaanderen.Basisregisters.CommandHandling;
     using Be.Vlaanderen.Basisregisters.CommandHandling.Idempotency;
     using BuildingRegistry.Api.BackOffice.Abstractions.Building.Requests;
@@ -14,10 +16,11 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Sqs.Lambda.Building
         private readonly IBuildings _buildings;
 
         public SqsRealizeBuildingHandler(
+            ITicketing ticketing,
             ICommandHandlerResolver bus,
             IdempotencyContext idempotencyContext,
             IBuildings buildings)
-            : base(bus)
+            : base(ticketing, bus)
         {
             _idempotencyContext = idempotencyContext;
             _buildings = buildings;
@@ -25,6 +28,11 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Sqs.Lambda.Building
 
         public async Task<Unit> Handle(SqsRealizeBuildingRequest request, CancellationToken cancellationToken)
         {
+            var ticketId = request.TicketId;
+
+            // update ticket to pending
+            await Ticketing.Pending(ticketId);
+            
             var buildingPersistentLocalId = new BuildingPersistentLocalId(request.PersistentLocalId);
 
             var planBuilding = request.ToCommand(
@@ -43,8 +51,9 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Sqs.Lambda.Building
                 buildingPersistentLocalId,
                 cancellationToken);
 
-            // TODO: return value
-            //return new ETagResponse(buildingHash);
+            // update ticket to complete
+            await Ticketing.Complete(ticketId, new ETagResponse(buildingHash));
+            
             return Unit.Value;
         }
     }

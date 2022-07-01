@@ -1,5 +1,6 @@
 namespace BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Requests
 {
+    using System;
     using System.Collections.Generic;
     using System.Runtime.Serialization;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
@@ -18,6 +19,9 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Requests
 
         [JsonIgnore]
         public string? MessageGroupId { get; set; }
+
+        [JsonIgnore]
+        public Guid TicketId { get; set; }
 
         public RealizeBuildingUnit ToCommand(
             BuildingPersistentLocalId buildingPersistentLocalId,

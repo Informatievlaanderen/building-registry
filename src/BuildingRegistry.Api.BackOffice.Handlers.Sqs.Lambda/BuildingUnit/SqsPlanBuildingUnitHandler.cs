@@ -7,6 +7,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Sqs.Lambda.BuildingUnit
     using Be.Vlaanderen.Basisregisters.CommandHandling.Idempotency;
     using BuildingRegistry.Api.BackOffice.Abstractions.Building.Validators;
     using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Requests;
+    using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Responses;
     using BuildingRegistry.Building;
     using MediatR;
 
@@ -16,12 +17,13 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Sqs.Lambda.BuildingUnit
         private readonly IdempotencyContext _idempotencyContext;
 
         public SqsPlanBuildingUnitHandler(
+            ITicketing ticketing,
             ICommandHandlerResolver bus,
             IBuildings buildings,
             BackOfficeContext backOfficeContext,
             IPersistentLocalIdGenerator persistentLocalIdGenerator,
             IdempotencyContext idempotencyContext)
-            : base(bus, backOfficeContext, buildings)
+            : base(ticketing, bus, backOfficeContext, buildings)
         {
             _persistentLocalIdGenerator = persistentLocalIdGenerator;
             _idempotencyContext = idempotencyContext;
@@ -29,7 +31,12 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Sqs.Lambda.BuildingUnit
 
         public async Task<Unit> Handle(SqsPlanBuildingUnitRequest request, CancellationToken cancellationToken)
         {
-            var buildingPersistentLocalId = new BuildingPersistentLocalId(OsloPuriValidatorExtensions.ParsePersistentLocalId(request.GebouwId));
+            var ticketId = request.TicketId;
+
+            // update ticket to pending
+            await Ticketing.Pending(ticketId);
+
+            var buildingPersistentLocalId = new BuildingPersistentLocalId(OsloPuriValidator.ParsePersistentLocalId(request.GebouwId));
             var buildingUnitPersistentLocalId = new BuildingUnitPersistentLocalId(_persistentLocalIdGenerator.GenerateNextPersistentLocalId());
 
             var command = request.ToCommand(
@@ -52,8 +59,9 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Sqs.Lambda.BuildingUnit
 
             var buildingUnitLastEventHash = await GetBuildingUnitHash(buildingPersistentLocalId, buildingUnitPersistentLocalId, cancellationToken);
 
-            // TODO: return value
-            //return new PlanBuildingUnitResponse(buildingPersistentLocalId, buildingUnitPersistentLocalId, buildingUnitLastEventHash);
+            // update ticket to complete
+            await Ticketing.Complete(ticketId, new PlanBuildingUnitResponse(buildingUnitPersistentLocalId, buildingUnitLastEventHash));
+
             return Unit.Value;
         }
     }

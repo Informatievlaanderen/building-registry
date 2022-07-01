@@ -6,6 +6,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Sqs.Lambda.BuildingUnit
     using Abstractions;
     using Be.Vlaanderen.Basisregisters.CommandHandling;
     using Be.Vlaanderen.Basisregisters.CommandHandling.Idempotency;
+    using BuildingRegistry.Api.BackOffice.Abstractions.Building.Responses;
     using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Extensions;
     using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Requests;
     using BuildingRegistry.Building;
@@ -16,17 +17,23 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Sqs.Lambda.BuildingUnit
         private readonly IdempotencyContext _idempotencyContext;
 
         public SqsRealizeBuildingUnitHandler(
+            ITicketing ticketing,
             ICommandHandlerResolver bus,
             IBuildings buildings,
             BackOfficeContext backOfficeContext,
             IdempotencyContext idempotencyContext)
-            : base(bus, backOfficeContext, buildings)
+            : base(ticketing, bus, backOfficeContext, buildings)
         {
             _idempotencyContext = idempotencyContext;
         }
 
         public async Task<Unit> Handle(SqsRealizeBuildingUnitRequest request, CancellationToken cancellationToken)
         {
+            var ticketId = request.TicketId;
+
+            // update ticket to pending
+            await Ticketing.Pending(ticketId);
+
             var buildingUnitPersistentLocalId = new BuildingUnitPersistentLocalId(request.PersistentLocalId);
 
             if (!request.PersistentLocalId.TryGetBuildingIdForBuildingUnit(BackOfficeContext, out var buildingPersistentLocalId))
@@ -48,8 +55,9 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Sqs.Lambda.BuildingUnit
 
             var buildingUnitLastEventHash = await GetBuildingUnitHash(buildingPersistentLocalId, buildingUnitPersistentLocalId, cancellationToken);
 
-            // TODO: return value
-            //return new ETagResponse(buildingUnitLastEventHash);
+            // update ticket to complete
+            await Ticketing.Complete(ticketId, new ETagResponse(buildingUnitLastEventHash));
+
             return Unit.Value;
         }
     }
