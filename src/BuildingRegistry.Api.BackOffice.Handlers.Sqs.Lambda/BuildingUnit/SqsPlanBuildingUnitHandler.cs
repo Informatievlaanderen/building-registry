@@ -36,7 +36,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Sqs.Lambda.BuildingUnit
             // update ticket to pending
             await Ticketing.Pending(ticketId);
 
-            var buildingPersistentLocalId = new BuildingPersistentLocalId(OsloPuriValidator.ParsePersistentLocalId(request.GebouwId));
+            var buildingPersistentLocalId = new BuildingPersistentLocalId(OsloPuriValidatorExtensions.ParsePersistentLocalId(request.GebouwId));
             var buildingUnitPersistentLocalId = new BuildingUnitPersistentLocalId(_persistentLocalIdGenerator.GenerateNextPersistentLocalId());
 
             var command = request.ToCommand(
