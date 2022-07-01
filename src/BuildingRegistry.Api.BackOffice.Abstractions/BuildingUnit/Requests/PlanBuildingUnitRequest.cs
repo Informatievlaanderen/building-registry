@@ -2,8 +2,7 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Requests
 {
     using System.Collections.Generic;
     using System.Runtime.Serialization;
-    using Be.Vlaanderen.Basisregisters.GrAr.Legacy;
-    using Be.Vlaanderen.Basisregisters.GrAr.Legacy.Gebouweenheid;
+    using Be.Vlaanderen.Basisregisters.GrAr.Edit.Contracts;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Building;
     using BuildingRegistry.Building;
@@ -62,7 +61,7 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Requests
                 buildingPersistentLocalId,
                 buildingUnitPersistentLocalId,
                 PositieGeometrieMethode.Map(),
-                Positie == null ? null : Positie.ToExtendedWkbGeometry(),
+                Positie?.ToExtendedWkbGeometry(),
                 Functie.Map(),
                 AfwijkingVastgesteld,
                 provenance);

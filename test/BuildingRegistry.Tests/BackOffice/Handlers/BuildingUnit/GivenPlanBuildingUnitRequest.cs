@@ -1,14 +1,12 @@
-namespace BuildingRegistry.Tests.BackOffice.Handlers.Building
+namespace BuildingRegistry.Tests.BackOffice.Handlers.BuildingUnit
 {
-    using System.Collections.Generic;
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
     using Autofac;
     using AutoFixture;
     using Be.Vlaanderen.Basisregisters.CommandHandling;
-    using Be.Vlaanderen.Basisregisters.GrAr.Legacy;
-    using Be.Vlaanderen.Basisregisters.GrAr.Legacy.Gebouweenheid;
+    using Be.Vlaanderen.Basisregisters.GrAr.Edit.Contracts;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Requests;
     using BuildingRegistry.Api.BackOffice.Handlers.BuildingUnit;
@@ -25,7 +23,7 @@ namespace BuildingRegistry.Tests.BackOffice.Handlers.Building
     public class GivenPlanBuildingUnitRequest : BuildingRegistryTest
     {
         private readonly FakePersistentLocalIdGenerator _fakePersistentLocalIdGenerator = new FakePersistentLocalIdGenerator();
-        private PlanBuildingUnitHandler _sut;
+        private readonly PlanBuildingUnitHandler _sut;
 
         public GivenPlanBuildingUnitRequest(ITestOutputHelper outputHelper) : base(outputHelper)
         {
