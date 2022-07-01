@@ -15,9 +15,11 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Sqs.Lambda.BuildingUnit
         protected BackOfficeContext BackOfficeContext { get; }
 
         protected SqsBuildingUnitBusHandler(
+            ITicketing ticketing,
             ICommandHandlerResolver bus,
             BackOfficeContext backOfficeContext,
-            IBuildings buildings) : base(bus)
+            IBuildings buildings)
+            : base(ticketing, bus)
         {
             Buildings = buildings;
             BackOfficeContext = backOfficeContext;

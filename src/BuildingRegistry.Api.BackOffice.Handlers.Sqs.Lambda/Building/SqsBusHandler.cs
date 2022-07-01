@@ -7,6 +7,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Sqs.Lambda.Building
     using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
+    using Abstractions;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
     using Be.Vlaanderen.Basisregisters.CommandHandling;
     using Be.Vlaanderen.Basisregisters.CommandHandling.Idempotency;
@@ -18,8 +19,14 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Sqs.Lambda.Building
 
     public abstract class SqsBusHandler
     {
+        protected ITicketing Ticketing { get; }
         protected ICommandHandlerResolver Bus { get; }
-        protected SqsBusHandler(ICommandHandlerResolver bus) => Bus = bus;
+
+        protected SqsBusHandler(ITicketing ticketing, ICommandHandlerResolver bus)
+        {
+            Ticketing = ticketing;
+            Bus = bus;
+        }
 
         protected async Task<long> IdempotentCommandHandlerDispatch(
             IdempotencyContext context,
