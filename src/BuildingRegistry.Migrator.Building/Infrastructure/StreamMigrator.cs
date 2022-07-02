@@ -15,10 +15,14 @@ namespace BuildingRegistry.Migrator.Building.Infrastructure
     using Consumer.Address;
     using Legacy;
     using Legacy.Commands;
+    using Microsoft.Data.SqlClient;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.Logging;
+    using Polly;
+    using Serilog;
     using BuildingUnit = BuildingRegistry.Building.Commands.BuildingUnit;
+    using ILogger = Microsoft.Extensions.Logging.ILogger;
 
     internal class StreamMigrator
     {
@@ -107,7 +111,16 @@ namespace BuildingRegistry.Migrator.Building.Infrastructure
             {
                 try
                 {
-                    await ProcessStream(stream, processedItems, ct);
+                    await Policy
+                        .Handle<SqlException>()
+                        .WaitAndRetryAsync(10,
+                            currentRetry => Math.Pow(currentRetry, 2) * TimeSpan.FromSeconds(30),
+                            (_, timespan) =>
+                                Log.Information($"SqlException occurred retrying after {timespan.Seconds} seconds."))
+                        .ExecuteAsync(async () =>
+                        {
+                            await ProcessStream(stream, processedItems, ct);
+                        });
                 }
                 catch (Exception ex)
                 {
