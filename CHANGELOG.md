@@ -1,3 +1,10 @@
+## [3.21.1](https://github.com/informatievlaanderen/building-registry/compare/v3.21.0...v3.21.1) (2022-07-03)
+
+
+### Bug Fixes
+
+* add retry per stream with backoff ([01b6130](https://github.com/informatievlaanderen/building-registry/commit/01b61301af50a1f54b9fcfc45aa8955d6019f021))
+
 # [3.21.0](https://github.com/informatievlaanderen/building-registry/compare/v3.20.1...v3.21.0) (2022-07-01)
 
 
