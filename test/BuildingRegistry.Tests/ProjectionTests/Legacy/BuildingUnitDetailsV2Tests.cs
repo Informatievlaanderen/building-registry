@@ -15,11 +15,11 @@ namespace BuildingRegistry.Tests.ProjectionTests.Legacy
     using Tests.Legacy.Autofixture;
     using Xunit;
 
-    public class BuildingUnitV2Tests : BuildingLegacyProjectionTest<BuildingUnitDetailV2Projections>
+    public class BuildingUnitDetailsV2Tests : BuildingLegacyProjectionTest<BuildingUnitDetailV2Projections>
     {
         private readonly Fixture? _fixture = new Fixture();
 
-        public BuildingUnitV2Tests()
+        public BuildingUnitDetailsV2Tests()
         {
             _fixture.Customize(new InfrastructureCustomization());
             _fixture.Customize(new WithBuildingStatus());
@@ -95,6 +95,9 @@ namespace BuildingRegistry.Tests.ProjectionTests.Legacy
         [Fact]
         public async Task WhenBuildingWasPlanned()
         {
+            _fixture.Customize(new WithFixedBuildingPersistentLocalId());
+            _fixture.Customize(new WithFixedBuildingUnitPersistentLocalId());
+
             var buildingWasPlannedV2 = _fixture.Create<BuildingWasPlannedV2>();
             var metadata = new Dictionary<string, object>
             {
@@ -110,6 +113,64 @@ namespace BuildingRegistry.Tests.ProjectionTests.Legacy
 
                     buildingDetailItemV2.IsRemoved.Should().BeFalse();
                     buildingDetailItemV2.BuildingRetiredStatus.Should().BeNull();
+                });
+        }
+
+        [Fact]
+        public async Task WhenBuildingUnitWasPlannedV2()
+        {
+            _fixture.Customize(new WithFixedBuildingPersistentLocalId());
+            _fixture.Customize(new WithFixedBuildingUnitPersistentLocalId());
+
+            var buildingUnitWasPlannedV2 = _fixture.Create<BuildingUnitWasPlannedV2>();
+            var metadata = new Dictionary<string, object>
+            {
+                { AddEventHashPipe.HashMetadataKey, buildingUnitWasPlannedV2.GetHash() }
+            };
+
+            await Sut
+                .Given(new Envelope<BuildingUnitWasPlannedV2>(new Envelope(buildingUnitWasPlannedV2, metadata)))
+                .Then(async ct =>
+                {
+                    var item = (await ct.BuildingUnitDetailsV2.FindAsync(buildingUnitWasPlannedV2.BuildingUnitPersistentLocalId));
+                    item.Should().NotBeNull();
+                    item.BuildingPersistentLocalId.Should().Be(buildingUnitWasPlannedV2.BuildingPersistentLocalId);
+                    item.Position.Should().BeEquivalentTo(buildingUnitWasPlannedV2.ExtendedWkbGeometry.ToByteArray());
+                    item.PositionMethod.Should().Be(BuildingUnitPositionGeometryMethod.Parse(buildingUnitWasPlannedV2.GeometryMethod));
+                    item.Function.Should()
+                        .Be(BuildingUnitFunction.Parse(buildingUnitWasPlannedV2.Function));
+                    item.Version.Should().Be(buildingUnitWasPlannedV2.Provenance.Timestamp);
+                    item.IsRemoved.Should().BeFalse();
+                    item.Status.Should().Be(BuildingUnitStatus.Planned);
+                });
+        }
+
+        [Fact]
+        public async Task WhenBuildingUnitWasRealizedV2()
+        {
+            _fixture.Customize(new WithFixedBuildingPersistentLocalId());
+            _fixture.Customize(new WithFixedBuildingUnitPersistentLocalId());
+
+            var buildingUnitWasPlannedV2 = _fixture.Create<BuildingUnitWasPlannedV2>();
+
+            var @event = _fixture.Create<BuildingUnitWasRealizedV2>();
+
+            await Sut
+                .Given(new Envelope<BuildingUnitWasPlannedV2>(new Envelope(buildingUnitWasPlannedV2, new Dictionary<string, object>
+                {
+                    { AddEventHashPipe.HashMetadataKey, buildingUnitWasPlannedV2.GetHash() }
+                })),
+                    new Envelope<BuildingUnitWasRealizedV2>(new Envelope(@event, new Dictionary<string, object>
+                {
+                    { AddEventHashPipe.HashMetadataKey, @event.GetHash() }
+                })))
+                .Then(async ct =>
+                {
+                    var item = await ct.BuildingUnitDetailsV2.FindAsync(@event.BuildingUnitPersistentLocalId);
+                    item.Should().NotBeNull();
+
+                    item.IsRemoved.Should().BeFalse();
+                    item.Status.Should().Be(BuildingUnitStatus.Realized);
                 });
         }
 

@@ -2,7 +2,6 @@ namespace BuildingRegistry.Building.Commands
 {
     using System;
     using System.Collections.Generic;
-    using System.ComponentModel.DataAnnotations;
     using Be.Vlaanderen.Basisregisters.Generators.Guid;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Be.Vlaanderen.Basisregisters.Utilities;

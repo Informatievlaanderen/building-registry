@@ -898,6 +898,40 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
                     item.Status = MapBuildingStatus(BuildingRegistry.Building.BuildingStatus.Realized);
                 }, ct);
             });
+
+            When<Envelope<BuildingUnitWasPlannedV2>>(async (context, message, ct) =>
+            {
+                await context.CreateNewBuildingSyndicationItem(
+                    message.Message.BuildingPersistentLocalId,
+                    message,
+                    x =>
+                    {
+                        var buildingUnitSyndicationItem = new BuildingUnitSyndicationItemV2
+                        {
+                            Position = message.Position,
+                            PersistentLocalId = message.Message.BuildingUnitPersistentLocalId,
+                            Status = BuildingRegistry.Building.BuildingUnitStatus.Planned,
+                            Function = BuildingRegistry.Building.BuildingUnitFunction.Parse(message.Message.Function),
+                            PointPosition = message.Message.ExtendedWkbGeometry.ToByteArray(),
+                            PositionMethod = BuildingRegistry.Building.BuildingUnitPositionGeometryMethod.Parse(message.Message.GeometryMethod),
+                            Version = message.Message.Provenance.Timestamp,
+                            Addresses = new Collection<BuildingUnitAddressSyndicationItemV2>()
+                        };
+
+                        x.BuildingUnitsV2.Add(buildingUnitSyndicationItem);
+                    },
+                    ct);
+            });
+
+            When<Envelope<BuildingUnitWasRealizedV2>>(async (context, message, ct) =>
+            {
+                await context.CreateNewBuildingSyndicationItem(message.Message.BuildingPersistentLocalId, message, item =>
+                {
+                    var unit = item.BuildingUnitsV2.Single(y => y.PersistentLocalId == message.Message.BuildingUnitPersistentLocalId);
+                    unit.Status = BuildingRegistry.Building.BuildingUnitStatus.Realized;
+                    unit.Version = message.Message.Provenance.Timestamp;
+                }, ct);
+            });
         }
 
         private static BuildingGeometryMethod MapBuildingGeometryMethod(BuildingRegistry.Building.BuildingGeometryMethod buildingGeometryMethod)

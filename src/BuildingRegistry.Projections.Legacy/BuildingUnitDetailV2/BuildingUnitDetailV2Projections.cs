@@ -78,6 +78,44 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetailV2
 
                 await context.BuildingUnitBuildingsV2.AddAsync(building, ct);
             });
+
+            When<Envelope<BuildingUnitWasPlannedV2>>(async (context, message, ct) =>
+            {
+                var buildingUnitDetailItemV2 = new BuildingUnitDetailItemV2(
+                    message.Message.BuildingUnitPersistentLocalId,
+                    message.Message.BuildingPersistentLocalId,
+                    message.Message.ExtendedWkbGeometry.ToByteArray(),
+                    BuildingUnitPositionGeometryMethod.Parse(message.Message.GeometryMethod),
+                    BuildingUnitFunction.Parse(message.Message.Function),
+                    BuildingUnitStatus.Planned,
+                    new Collection<BuildingUnitDetailAddressItemV2>(),
+                    isRemoved: false,
+                    message.Message.Provenance.Timestamp);
+
+                UpdateHash(buildingUnitDetailItemV2, message);
+
+                await context.BuildingUnitDetailsV2.AddAsync(
+                    buildingUnitDetailItemV2
+                    , ct);
+            });
+
+            When<Envelope<BuildingUnitWasRealizedV2>>(async (context, message, ct) =>
+            {
+                await Update(context, message.Message.BuildingUnitPersistentLocalId, item =>
+                {
+                    item.Status = BuildingUnitStatus.Realized;
+                    item.Version = message.Message.Provenance.Timestamp;
+                    UpdateHash(item, message);
+                }, ct);
+            });
+        }
+
+        private async Task Update(LegacyContext context, int buildingUnitPersistentLocalId, Action<BuildingUnitDetailItemV2> updateAction, CancellationToken ct)
+        {
+            var item = await context
+                .BuildingUnitDetailsV2
+                .FindAsync(buildingUnitPersistentLocalId);
+            updateAction(item);
         }
 
         private static void UpdateHash<T>(BuildingUnitDetailItemV2 entity, Envelope<T> wrappedEvent) where T : IHaveHash, IMessage
