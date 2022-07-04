@@ -66,6 +66,34 @@ namespace BuildingRegistry.Projections.Wms.BuildingUnitV2
                     BuildingRetiredStatus = null
                 }, ct);
             });
+
+            When<Envelope<BuildingUnitWasPlannedV2>>(async (context, message, ct) =>
+            {
+                var buildingUnitV2 = new BuildingUnitV2
+                {
+                    Id = PersistentLocalIdHelper.CreateBuildingUnitId(message.Message.BuildingUnitPersistentLocalId),
+                    BuildingPersistentLocalId = message.Message.BuildingPersistentLocalId,
+                    BuildingUnitPersistentLocalId = message.Message.BuildingUnitPersistentLocalId,
+                    Function = MapFunction(BuildingUnitFunction.Parse(message.Message.Function)),
+                    Version = message.Message.Provenance.Timestamp,
+                    Status = BuildingUnitStatus.Planned
+                };
+
+                SetPosition(
+                    buildingUnitV2,
+                    message.Message.ExtendedWkbGeometry,
+                    MapGeometryMethod(BuildingUnitPositionGeometryMethod.Parse(message.Message.GeometryMethod)));
+
+                await context.BuildingUnitsV2.AddAsync(buildingUnitV2, ct);
+            });
+
+            When<Envelope<BuildingUnitWasRealizedV2>>(async (context, message, ct) =>
+            {
+                var unit = await context.BuildingUnitsV2.FindAsync(message.Message.BuildingUnitPersistentLocalId);
+                unit.Status = BuildingUnitStatus.Realized;
+
+                SetVersion(unit, message.Message.Provenance.Timestamp);
+            });
         }
 
         private static void SetVersion(BuildingUnitV2 unit, Instant timestamp)

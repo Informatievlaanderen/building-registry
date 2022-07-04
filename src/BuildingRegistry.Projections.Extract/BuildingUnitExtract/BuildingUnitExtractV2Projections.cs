@@ -90,6 +90,7 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
                 }
             });
 
+            // TODO: Still required with V2 business rules?
             When<Envelope<BuildingWasPlannedV2>>(async (context, message, ct) =>
             {
                 var buildingUnitBuildingItemV2 = new BuildingUnitBuildingItemV2
@@ -100,6 +101,40 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
                 };
 
                 await context.BuildingUnitBuildingsV2.AddAsync(buildingUnitBuildingItemV2, ct);
+            });
+
+            When<Envelope<BuildingUnitWasPlannedV2>>(async (context, message, ct) =>
+            {
+                var buildingUnitItemV2 = new BuildingUnitExtractItemV2
+                {
+                    BuildingPersistentLocalId = message.Message.BuildingPersistentLocalId,
+                    BuildingUnitPersistentLocalId = message.Message.BuildingUnitPersistentLocalId,
+                    DbaseRecord = new BuildingUnitDbaseRecord
+                    {
+                        id = { Value = $"{extractConfig.Value.DataVlaanderenNamespaceBuildingUnit}/{message.Message.BuildingUnitPersistentLocalId}" },
+                        gebouwehid = { Value = message.Message.BuildingUnitPersistentLocalId },
+                        gebouwid = { Value = message.Message.BuildingPersistentLocalId.ToString() },
+                        functie = { Value = MapFunction(BuildingUnitFunction.Parse(message.Message.Function)) },
+                        status = { Value = Planned },
+                        posgeommet = { Value = MapGeometryMethod(BuildingUnitPositionGeometryMethod.Parse(message.Message.GeometryMethod)) },
+                        versieid = { Value = message.Message.Provenance.Timestamp.ToBelgianDateTimeOffset().FromDateTimeOffset() }
+                    }.ToBytes(_encoding)
+                };
+
+                var geometry = wkbReader.Read(message.Message.ExtendedWkbGeometry.ToByteArray());
+                UpdateGeometry(buildingUnitItemV2, geometry);
+
+                await context.BuildingUnitExtractV2.AddAsync(buildingUnitItemV2, ct);
+            });
+
+            When<Envelope<BuildingUnitWasRealizedV2>>(async (context, message, ct) =>
+            {
+                await context.FindAndUpdateBuildingUnitExtract(message.Message.BuildingUnitPersistentLocalId,
+                    itemV2 =>
+                    {
+                        UpdateStatus(itemV2, Realized);
+                        UpdateVersie(itemV2, message.Message.Provenance.Timestamp);
+                    }, ct);
             });
         }
 
