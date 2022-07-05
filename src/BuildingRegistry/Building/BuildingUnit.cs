@@ -2,13 +2,16 @@ namespace BuildingRegistry.Building
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Events;
 
     public class BuildingUnit : Entity
     {
-        private IBuildingEvent _lastEvent;
+        private IBuildingEvent? _lastEvent;
+        private string _lastSnapshotEventHash = string.Empty;
+        private ProvenanceData _lastSnapshotProvenance;
         private List<AddressPersistentLocalId> _addressPersistentLocalIds = new List<AddressPersistentLocalId>();
 
         public BuildingUnitPersistentLocalId BuildingUnitPersistentLocalId { get; private set; }
@@ -22,8 +25,9 @@ namespace BuildingRegistry.Building
 
         public bool HasDeviation { get; private set; }
 
-        public string LastEventHash => _lastEvent.GetHash();
-        public ProvenanceData LastProvenanceData => _lastEvent.Provenance;
+        public string LastEventHash => _lastEvent is null ? _lastSnapshotEventHash : _lastEvent.GetHash();
+        public ProvenanceData LastProvenanceData =>
+            _lastEvent is null ? _lastSnapshotProvenance : _lastEvent.Provenance;
 
         public BuildingUnit(Action<object> applier) : base(applier)
         {
@@ -95,6 +99,26 @@ namespace BuildingRegistry.Building
             };
 
             return unit;
+        }
+
+        public void RestoreSnapshot(
+            BuildingSnapshot.BuildingUnitData buildingUnitData)
+        {
+            BuildingUnitPersistentLocalId = new BuildingUnitPersistentLocalId(buildingUnitData.BuildingUnitPersistentLocalId);
+            Status = BuildingUnitStatus.Parse(buildingUnitData.Status);
+            Function = BuildingUnitFunction.Parse(buildingUnitData.Function);
+            BuildingUnitPosition = new BuildingUnitPosition(
+                new ExtendedWkbGeometry(buildingUnitData.ExtendedWkbGeometry),
+                BuildingUnitPositionGeometryMethod.Parse(buildingUnitData.GeometryMethod));
+
+            _addressPersistentLocalIds =
+                buildingUnitData.AddressPersistentLocalIds.Select(x => new AddressPersistentLocalId(x)).ToList();
+
+            IsRemoved = buildingUnitData.IsRemoved;
+            HasDeviation = buildingUnitData.HasDeviation;
+
+            _lastSnapshotEventHash = buildingUnitData.LastEventHash;
+            _lastSnapshotProvenance = buildingUnitData.LastProvenanceData;
         }
     }
 }

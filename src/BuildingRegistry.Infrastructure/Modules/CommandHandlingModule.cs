@@ -8,6 +8,7 @@ namespace BuildingRegistry.Infrastructure.Modules
     using Building;
     using Microsoft.Extensions.Configuration;
 
+    //TODO: split for backoffice & migrator VS crabimport
     public class CommandHandlingModule : Module
     {
         public const string SnapshotIntervalKey = "SnapshotInterval";
@@ -22,8 +23,14 @@ namespace BuildingRegistry.Infrastructure.Modules
             var value = _configuration[SnapshotIntervalKey] ?? "50";
             var snapshotInterval = Convert.ToInt32(value);
 
+            ISnapshotStrategy snapshotStrategy = NoSnapshotStrategy.Instance;
+            if (snapshotInterval > 0)
+            {
+                snapshotStrategy = IntervalStrategy.SnapshotEvery(snapshotInterval);
+            }
+            
             containerBuilder
-                .Register(c => new BuildingFactory(NoSnapshotStrategy.Instance))
+                .Register(c => new BuildingFactory(snapshotStrategy))
                 .As<IBuildingFactory>();
 
             containerBuilder

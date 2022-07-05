@@ -2,6 +2,7 @@ namespace BuildingRegistry.Building
 {
     using System;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
+    using Be.Vlaanderen.Basisregisters.AggregateSource.Snapshotting;
     using Be.Vlaanderen.Basisregisters.CommandHandling;
     using Be.Vlaanderen.Basisregisters.CommandHandling.SqlStreamStore;
     using Be.Vlaanderen.Basisregisters.EventHandling;
@@ -17,12 +18,13 @@ namespace BuildingRegistry.Building
             Func<IBuildings> buildingRepository,
             Func<ConcurrentUnitOfWork> getUnitOfWork,
             Func<IStreamStore> getStreamStore,
+            Func<ISnapshotStore> getSnapshotStore,
             EventMapping eventMapping,
             EventSerializer eventSerializer,
             ProvenanceFactory<Building> provenanceFactory)
         {
             For<MigrateBuilding>()
-                .AddSqlStreamStore(getStreamStore, getUnitOfWork, eventMapping, eventSerializer)
+                .AddSqlStreamStore(getStreamStore, getUnitOfWork, eventMapping, eventSerializer, getSnapshotStore)
                 .AddEventHash<MigrateBuilding, Building>(getUnitOfWork)
                 .AddProvenance(getUnitOfWork, provenanceFactory)
                 .Handle(async (message, ct) =>
@@ -49,7 +51,7 @@ namespace BuildingRegistry.Building
                 });
 
             For<PlanBuilding>()
-                .AddSqlStreamStore(getStreamStore, getUnitOfWork, eventMapping, eventSerializer)
+                .AddSqlStreamStore(getStreamStore, getUnitOfWork, eventMapping, eventSerializer, getSnapshotStore)
                 .AddEventHash<PlanBuilding, Building>(getUnitOfWork)
                 .AddProvenance(getUnitOfWork, provenanceFactory)
                 .Handle(async (message, ct) =>
@@ -71,7 +73,7 @@ namespace BuildingRegistry.Building
                 });
 
             For<PlaceBuildingUnderConstruction>()
-                .AddSqlStreamStore(getStreamStore, getUnitOfWork, eventMapping, eventSerializer)
+                .AddSqlStreamStore(getStreamStore, getUnitOfWork, eventMapping, eventSerializer, getSnapshotStore)
                 .AddEventHash<PlaceBuildingUnderConstruction, Building>(getUnitOfWork)
                 .AddProvenance(getUnitOfWork, provenanceFactory)
                 .Handle(async (message, ct) =>
@@ -83,7 +85,7 @@ namespace BuildingRegistry.Building
                 });
 
             For<RealizeBuilding>()
-                .AddSqlStreamStore(getStreamStore, getUnitOfWork, eventMapping, eventSerializer)
+                .AddSqlStreamStore(getStreamStore, getUnitOfWork, eventMapping, eventSerializer, getSnapshotStore)
                 .AddEventHash<RealizeBuilding, Building>(getUnitOfWork)
                 .AddProvenance(getUnitOfWork, provenanceFactory)
                 .Handle(async (message, ct) =>

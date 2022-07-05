@@ -205,8 +205,8 @@ namespace BuildingRegistry.Building
                 BuildingStatus,
                 BuildingGeometry,
                 IsRemoved,
-                _lastEvent.GetHash(),
-                _lastEvent.Provenance,
+                LastEventHash,
+                LastProvenanceData,
                 BuildingUnits);
         }
 

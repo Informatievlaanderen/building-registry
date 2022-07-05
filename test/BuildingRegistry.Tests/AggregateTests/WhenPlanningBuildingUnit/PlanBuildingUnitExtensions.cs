@@ -1,5 +1,6 @@
 namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuildingUnit
 {
+    using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Building.Commands;
 
     public static class PlanBuildingUnitExtensions
@@ -14,6 +15,12 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuildingUnit
         {
             return new PlanBuildingUnit(cmd.BuildingPersistentLocalId, cmd.BuildingUnitPersistentLocalId,
                 cmd.PositionGeometryMethod, null, cmd.Function, true, cmd.Provenance);
+        }
+
+        public static PlanBuildingUnit WithProvenance(this PlanBuildingUnit cmd, Provenance provenance)
+        {
+            return new PlanBuildingUnit(cmd.BuildingPersistentLocalId, cmd.BuildingUnitPersistentLocalId,
+                cmd.PositionGeometryMethod, cmd.Position, cmd.Function, cmd.HasDeviation, provenance);
         }
     }
 }

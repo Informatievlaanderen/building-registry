@@ -2,12 +2,15 @@ namespace BuildingRegistry.Tests.Legacy
 {
     using System.Collections.Generic;
     using Autofac;
+    using AutoFixture;
+    using Be.Vlaanderen.Basisregisters.AggregateSource.Snapshotting;
     using Be.Vlaanderen.Basisregisters.AggregateSource.SqlStreamStore.Autofac;
     using Be.Vlaanderen.Basisregisters.AggregateSource.Testing;
     using Be.Vlaanderen.Basisregisters.AggregateSource.Testing.Comparers;
     using Be.Vlaanderen.Basisregisters.AggregateSource.Testing.SqlStreamStore.Autofac;
     using Be.Vlaanderen.Basisregisters.EventHandling;
     using Be.Vlaanderen.Basisregisters.EventHandling.Autofac;
+    using Building;
     using Infrastructure.Modules;
     using KellermanSoftware.CompareNetObjects;
     using Microsoft.Extensions.Configuration;
@@ -57,6 +60,7 @@ namespace BuildingRegistry.Tests.Legacy
         {
             var configuration = new ConfigurationBuilder()
                 .AddInMemoryCollection(new Dictionary<string, string> { { "ConnectionStrings:Events", "x" } })
+                .AddInMemoryCollection(new Dictionary<string, string> { { "ConnectionStrings:Snapshots", "x" } })
                 .Build();
 
             var eventSerializerSettings = EventsJsonSerializerSettingsProvider.CreateSerializerSettings();
@@ -68,11 +72,17 @@ namespace BuildingRegistry.Tests.Legacy
                 .RegisterModule(new CommandHandlingModule(configuration))
                 .RegisterModule(new SqlStreamStoreModule());
 
+            containerBuilder.RegisterModule(new SqlSnapshotStoreModule());
+
             containerBuilder.UseAggregateSourceTesting(CreateFactComparer(), CreateExceptionComparer());
 
             containerBuilder.RegisterInstance(testOutputHelper);
             containerBuilder.RegisterType<XUnitLogger>().AsImplementedInterfaces();
             containerBuilder.RegisterType<FakePersistentLocalIdGenerator>().As<IPersistentLocalIdGenerator>();
+
+            containerBuilder
+                .Register(c => new BuildingFactory(NoSnapshotStrategy.Instance))
+                .As<IBuildingFactory>();
 
             _container = containerBuilder.Build();
         }

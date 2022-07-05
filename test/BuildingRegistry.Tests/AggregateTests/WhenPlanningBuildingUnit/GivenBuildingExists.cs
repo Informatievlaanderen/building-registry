@@ -27,7 +27,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuildingUnit
 
             var @buildingWasPlanned = Fixture.Create<BuildingWasPlannedV2>();
             var buildingGeometry = new BuildingGeometry(new ExtendedWkbGeometry(@buildingWasPlanned.ExtendedWkbGeometry),
-                BuildingGeometryMethod.MeasuredByGrb);
+                BuildingGeometryMethod.Outlined);
 
             Assert(new Scenario()
                 .Given(new BuildingStreamId(Fixture.Create<BuildingPersistentLocalId>()),
