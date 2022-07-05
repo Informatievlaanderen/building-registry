@@ -3,20 +3,20 @@ namespace BuildingRegistry.Building
     using System.Collections.Generic;
     using System.Linq;
     using Be.Vlaanderen.Basisregisters.AggregateSource.Snapshotting;
-    using Be.Vlaanderen.Basisregisters.GrAr.Common;
     using Events;
     using Exceptions;
 
     public partial class Building
     {
-        private IHaveHash _lastEvent;
+        private IBuildingEvent _lastEvent;
+        private readonly List<BuildingUnit> _buildingUnits = new List<BuildingUnit>();
 
         public BuildingPersistentLocalId BuildingPersistentLocalId { get; private set; }
-        public BuildingPersistentLocalIdAssignmentDate BuildingPersistentLocalIdAssignmentDate { get; private set; }
         public BuildingStatus BuildingStatus { get; private set; }
         public BuildingGeometry BuildingGeometry { get; private set; }
         public bool IsRemoved { get; private set; }
-        public List<BuildingUnit> BuildingUnits { get; private set; } = new List<BuildingUnit>();
+
+        public IReadOnlyList<BuildingUnit> BuildingUnits => _buildingUnits;
 
         public string LastEventHash => _lastEvent.GetHash();
 
@@ -41,7 +41,6 @@ namespace BuildingRegistry.Building
         private void When(BuildingWasMigrated @event)
         {
             BuildingPersistentLocalId = new BuildingPersistentLocalId(@event.BuildingPersistentLocalId);
-            BuildingPersistentLocalIdAssignmentDate = new BuildingPersistentLocalIdAssignmentDate(@event.BuildingPersistentLocalIdAssignmentDate);
             BuildingStatus = BuildingStatus.Parse(@event.BuildingStatus);
             BuildingGeometry = new BuildingGeometry(
                 new ExtendedWkbGeometry(@event.ExtendedWkbGeometry),
@@ -61,7 +60,8 @@ namespace BuildingRegistry.Building
                         BuildingUnitPositionGeometryMethod.Parse(buildingUnit.GeometryMethod)),
                     buildingUnit.IsRemoved);
 
-                BuildingUnits.Add(newBuildingUnit);
+                newBuildingUnit.Route(@event);
+                _buildingUnits.Add(newBuildingUnit);
             }
 
             _lastEvent = @event;
@@ -95,7 +95,7 @@ namespace BuildingRegistry.Building
         {
             var newBuildingUnit = new BuildingUnit(ApplyChange);
             newBuildingUnit.Route(@event);
-            BuildingUnits.Add(newBuildingUnit);
+            _buildingUnits.Add(newBuildingUnit);
 
             _lastEvent = @event;
         }
@@ -104,7 +104,7 @@ namespace BuildingRegistry.Building
         {
             var newBuildingUnit = new BuildingUnit(ApplyChange);
             newBuildingUnit.Route(@event);
-            BuildingUnits.Add(newBuildingUnit);
+            _buildingUnits.Add(newBuildingUnit);
 
             _lastEvent = @event;
         }

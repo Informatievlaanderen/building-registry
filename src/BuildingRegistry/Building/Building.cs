@@ -1,6 +1,5 @@
 namespace BuildingRegistry.Building
 {
-    using System;
     using System.Collections.Generic;
     using System.Linq;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
@@ -201,7 +200,14 @@ namespace BuildingRegistry.Building
 
         public object TakeSnapshot()
         {
-            throw new NotImplementedException();
+            return new BuildingSnapshot(
+                BuildingPersistentLocalId,
+                BuildingStatus,
+                BuildingGeometry,
+                IsRemoved,
+                _lastEvent.GetHash(),
+                _lastEvent.Provenance,
+                BuildingUnits);
         }
 
         public ISnapshotStrategy Strategy { get; }

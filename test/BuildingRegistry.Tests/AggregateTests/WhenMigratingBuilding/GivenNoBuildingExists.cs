@@ -56,7 +56,6 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenMigratingBuilding
             // Assert
             result.Should().NotBeNull();
             result.BuildingPersistentLocalId.Should().Be(command.BuildingPersistentLocalId);
-            result.BuildingPersistentLocalIdAssignmentDate.Should().Be(command.BuildingPersistentLocalIdAssignmentDate);
             result.BuildingStatus.Should().Be(command.BuildingStatus);
             result.BuildingGeometry.Should().Be(command.BuildingGeometry);
             result.IsRemoved.Should().Be(command.IsRemoved);

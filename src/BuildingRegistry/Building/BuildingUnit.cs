@@ -3,30 +3,40 @@ namespace BuildingRegistry.Building
     using System;
     using System.Collections.Generic;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
-    using Be.Vlaanderen.Basisregisters.GrAr.Common;
+    using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Events;
 
     public class BuildingUnit : Entity
     {
-        private IHaveHash _lastEvent;
+        private IBuildingEvent _lastEvent;
+        private List<AddressPersistentLocalId> _addressPersistentLocalIds = new List<AddressPersistentLocalId>();
 
         public BuildingUnitPersistentLocalId BuildingUnitPersistentLocalId { get; private set; }
         public BuildingUnitFunction Function { get; private set; }
         public BuildingUnitStatus Status { get; private set; }
 
-        public List<AddressPersistentLocalId> AddressPersistentLocalIds { get; private set; } = new List<AddressPersistentLocalId>();
+        public IReadOnlyList<AddressPersistentLocalId> AddressPersistentLocalIds => _addressPersistentLocalIds;
+
         public BuildingUnitPosition BuildingUnitPosition { get; private set; }
         public bool IsRemoved { get; private set; }
 
         public bool HasDeviation { get; private set; }
 
         public string LastEventHash => _lastEvent.GetHash();
+        public ProvenanceData LastProvenanceData => _lastEvent.Provenance;
 
         public BuildingUnit(Action<object> applier) : base(applier)
         {
+            Register<BuildingWasMigrated>(When);
+
             Register<BuildingUnitWasPlannedV2>(When);
             Register<DeviatedBuildingUnitWasPlanned>(When);
             Register<BuildingUnitWasRealizedV2>(When);
+        }
+
+        private void When(BuildingWasMigrated @event)
+        {
+            _lastEvent = @event;
         }
 
         private void When(BuildingUnitWasPlannedV2 @event)
@@ -71,15 +81,18 @@ namespace BuildingRegistry.Building
             BuildingUnitFunction function,
             BuildingUnitStatus status,
             List<AddressPersistentLocalId> addressPersistentLocalIds,
-            BuildingUnitPosition buildingUnitPosition, bool isRemoved)
+            BuildingUnitPosition buildingUnitPosition,
+            bool isRemoved)
         {
-            var unit = new BuildingUnit(applier);
-            unit.BuildingUnitPersistentLocalId = buildingUnitPersistentLocalId;
-            unit.Function = function;
-            unit.Status = status;
-            unit.AddressPersistentLocalIds = addressPersistentLocalIds;
-            unit.BuildingUnitPosition = buildingUnitPosition;
-            unit.IsRemoved = isRemoved;
+            var unit = new BuildingUnit(applier)
+            {
+                BuildingUnitPersistentLocalId = buildingUnitPersistentLocalId,
+                Function = function,
+                Status = status,
+                _addressPersistentLocalIds = addressPersistentLocalIds,
+                BuildingUnitPosition = buildingUnitPosition,
+                IsRemoved = isRemoved,
+            };
 
             return unit;
         }
