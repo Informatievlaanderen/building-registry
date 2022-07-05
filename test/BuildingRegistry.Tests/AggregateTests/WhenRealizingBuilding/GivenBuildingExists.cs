@@ -3,6 +3,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRealizingBuilding
     using System.Collections.Generic;
     using AutoFixture;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
+    using Be.Vlaanderen.Basisregisters.AggregateSource.Snapshotting;
     using Be.Vlaanderen.Basisregisters.AggregateSource.Testing;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Building;
@@ -130,7 +131,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRealizingBuilding
             );
             ((ISetProvenance)buildingWasMigrated).SetProvenance(Fixture.Create<Provenance>());
 
-            var sut = Building.Factory();
+            var sut = new BuildingFactory(NoSnapshotStrategy.Instance).Create();
             sut.Initialize(new List<object> { buildingWasMigrated });
             sut.RealizeConstruction();
             sut.BuildingStatus.Should().Be(BuildingStatus.Realized);

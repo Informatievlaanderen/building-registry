@@ -5,8 +5,11 @@ namespace BuildingRegistry.Tests
     using System.Diagnostics.Metrics;
     using Autofac;
     using AutoFixture;
+    using Be.Vlaanderen.Basisregisters.AggregateSource.Snapshotting;
+    using Be.Vlaanderen.Basisregisters.AggregateSource.SqlStreamStore.Autofac;
     using Be.Vlaanderen.Basisregisters.CommandHandling;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
+    using Building;
     using Fixtures;
     using Microsoft.Extensions.Configuration;
 
@@ -25,7 +28,6 @@ namespace BuildingRegistry.Tests
         public BuildingRegistryTest(Xunit.Abstractions.ITestOutputHelper testOutputHelper) : base(testOutputHelper)
         {
             Fixture = new Fixture();
-            Fixture.Register(() => (Be.Vlaanderen.Basisregisters.AggregateSource.Snapshotting.ISnapshotStrategy)Be.Vlaanderen.Basisregisters.AggregateSource.Snapshotting.IntervalStrategy.Default);
 
             Fixture.Customize(new WithValidExtendedWkbPolygon());
             Fixture.Customize(new WithBuildingStatus());
@@ -34,6 +36,7 @@ namespace BuildingRegistry.Tests
             Fixture.Customize(new WithBuildingGeometryMethod());
             Fixture.Customize(new WithBuildingUnitStatus());
             Fixture.Customize(new SetProvenanceImplementationsCallSetProvenance());
+            Fixture.Register(() => (ISnapshotStrategy)NoSnapshotStrategy.Instance);
 
             Fixture.Register(() =>
             {
@@ -71,15 +74,22 @@ namespace BuildingRegistry.Tests
             });
         }
 
-        protected override void ConfigureCommandHandling(Autofac.ContainerBuilder builder)
+        protected override void ConfigureCommandHandling(ContainerBuilder builder)
         {
             var configuration = new ConfigurationBuilder()
                 .AddInMemoryCollection(new Dictionary<string, string> { { "ConnectionStrings:Events", "x" } })
+                .AddInMemoryCollection(new Dictionary<string, string> { { "ConnectionStrings:Snapshots", "x" } })
                 .Build();
 
             builder
                 .RegisterModule(new Infrastructure.Modules.CommandHandlingModule(configuration))
-                .RegisterModule(new Be.Vlaanderen.Basisregisters.AggregateSource.SqlStreamStore.Autofac.SqlStreamStoreModule());
+                .RegisterModule(new SqlStreamStoreModule());
+
+            builder.RegisterModule(new SqlSnapshotStoreModule());
+
+            builder
+                .Register(c => new BuildingFactory(Fixture.Create<ISnapshotStrategy>()))
+                .As<IBuildingFactory>();
         }
 
         protected override void ConfigureEventHandling(ContainerBuilder builder)

@@ -4,16 +4,16 @@ namespace BuildingRegistry.Building
     using System.Collections.Generic;
     using System.Linq;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
+    using Be.Vlaanderen.Basisregisters.AggregateSource.Snapshotting;
     using Commands;
     using Events;
     using Exceptions;
     using NetTopologySuite.Geometries;
 
-    public partial class Building : AggregateRootEntity
+    public partial class Building : AggregateRootEntity, ISnapshotable
     {
-        public static readonly Func<Building> Factory = () => new Building();
-
         public static Building MigrateBuilding(
+            IBuildingFactory buildingFactory,
             BuildingId buildingId,
             BuildingPersistentLocalId buildingPersistentLocalId,
             BuildingPersistentLocalIdAssignmentDate assignmentDate,
@@ -22,7 +22,7 @@ namespace BuildingRegistry.Building
             bool isRemoved,
             List<Commands.BuildingUnit> buildingUnits)
         {
-            var newBuilding = Factory();
+            var newBuilding = buildingFactory.Create();
             newBuilding.ApplyChange(new BuildingWasMigrated(
                 buildingId,
                 buildingPersistentLocalId,
@@ -36,6 +36,7 @@ namespace BuildingRegistry.Building
         }
 
         public static Building Plan(
+            IBuildingFactory buildingFactory,
             BuildingPersistentLocalId buildingPersistentLocalId,
             ExtendedWkbGeometry extendedWkbGeometry)
         {
@@ -43,7 +44,7 @@ namespace BuildingRegistry.Building
 
             GuardPolygon(geometry);
 
-            var newBuilding = Factory();
+            var newBuilding = buildingFactory.Create();
             newBuilding.ApplyChange(new BuildingWasPlannedV2(
                 buildingPersistentLocalId,
                 extendedWkbGeometry));
@@ -197,5 +198,12 @@ namespace BuildingRegistry.Building
             base.BeforeApplyChange(@event);
         }
         #endregion
+
+        public object TakeSnapshot()
+        {
+            throw new NotImplementedException();
+        }
+
+        public ISnapshotStrategy Strategy { get; }
     }
 }

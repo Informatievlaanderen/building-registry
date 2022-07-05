@@ -4,6 +4,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenRealizingBuildingUnit
     using System.Threading;
     using System.Threading.Tasks;
     using AutoFixture;
+    using Be.Vlaanderen.Basisregisters.AggregateSource.Snapshotting;
     using Be.Vlaanderen.Basisregisters.Api.ETag;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
     using Building;
@@ -75,7 +76,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenRealizingBuildingUnit
                 buildingPersistentLocalId));
             _backOfficeContext.SaveChanges();
 
-            var building = Building.Factory();
+            var building = new BuildingFactory(NoSnapshotStrategy.Instance).Create();
             var buildingUnitPlanned = Fixture.Create<BuildingUnitWasPlannedV2>();
             var ifMatchHeader = buildingUnitPlanned.GetHash();
 
@@ -123,7 +124,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenRealizingBuildingUnit
                 buildingPersistentLocalId));
             _backOfficeContext.SaveChanges();
 
-            var building = Building.Factory();
+            var building = new BuildingFactory(NoSnapshotStrategy.Instance).Create();
             var buildingUnitPlanned = Fixture.Create<BuildingUnitWasPlannedV2>();
             var ifMatchHeader = "IncorrectIfMatchHeader";
 

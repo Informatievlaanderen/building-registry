@@ -2,6 +2,7 @@ namespace BuildingRegistry.Building
 {
     using System.Collections.Generic;
     using System.Linq;
+    using Be.Vlaanderen.Basisregisters.AggregateSource.Snapshotting;
     using Be.Vlaanderen.Basisregisters.GrAr.Common;
     using Events;
     using Exceptions;
@@ -18,6 +19,12 @@ namespace BuildingRegistry.Building
         public List<BuildingUnit> BuildingUnits { get; private set; } = new List<BuildingUnit>();
 
         public string LastEventHash => _lastEvent.GetHash();
+
+        internal Building(ISnapshotStrategy snapshotStrategy)
+            : this()
+        {
+            Strategy = snapshotStrategy;
+        }
 
         private Building()
         {

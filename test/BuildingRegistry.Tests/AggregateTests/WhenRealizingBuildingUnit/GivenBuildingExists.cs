@@ -5,6 +5,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRealizingBuildingUnit
     using System.Linq;
     using AutoFixture;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
+    using Be.Vlaanderen.Basisregisters.AggregateSource.Snapshotting;
     using Be.Vlaanderen.Basisregisters.AggregateSource.Testing;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Building;
@@ -157,7 +158,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRealizingBuildingUnit
         {
             var command = Fixture.Create<PlanBuildingUnit>().WithDeviation(false);
 
-            var building = Building.Factory();
+            var building = new BuildingFactory(NoSnapshotStrategy.Instance).Create();
             building.PlanBuildingUnit(command);
 
             // Act
@@ -175,7 +176,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRealizingBuildingUnit
         {
             var command = Fixture.Create<PlanBuildingUnit>().WithDeviation(true);
 
-            var building = Building.Factory();
+            var building = new BuildingFactory(NoSnapshotStrategy.Instance).Create();
             building.PlanBuildingUnit(command);
 
             // Act

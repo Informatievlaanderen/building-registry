@@ -3,6 +3,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenMigratingBuilding
     using System.Linq;
     using AutoFixture;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
+    using Be.Vlaanderen.Basisregisters.AggregateSource.Snapshotting;
     using Be.Vlaanderen.Basisregisters.AggregateSource.Testing;
     using Building;
     using Building.Commands;
@@ -43,6 +44,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenMigratingBuilding
 
             // Act
             var result = Building.MigrateBuilding(
+                new BuildingFactory(NoSnapshotStrategy.Instance),
                 command.BuildingId,
                 command.BuildingPersistentLocalId,
                 command.BuildingPersistentLocalIdAssignmentDate,

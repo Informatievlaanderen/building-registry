@@ -13,6 +13,7 @@ namespace BuildingRegistry.Building
     public sealed class BuildingCommandHandlerModule : CommandHandlerModule
     {
         public BuildingCommandHandlerModule(
+            IBuildingFactory buildingFactory,
             Func<IBuildings> buildingRepository,
             Func<ConcurrentUnitOfWork> getUnitOfWork,
             Func<IStreamStore> getStreamStore,
@@ -35,6 +36,7 @@ namespace BuildingRegistry.Building
                     }
 
                     var newBuilding = Building.MigrateBuilding(
+                        buildingFactory,
                         message.Command.BuildingId,
                         message.Command.BuildingPersistentLocalId,
                         message.Command.BuildingPersistentLocalIdAssignmentDate,
@@ -61,6 +63,7 @@ namespace BuildingRegistry.Building
                     }
 
                     var newBuilding = Building.Plan(
+                        buildingFactory,
                         message.Command.BuildingPersistentLocalId,
                         message.Command.Geometry);
 
