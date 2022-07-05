@@ -11,6 +11,8 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Sqs.Lambda.BuildingUnit
     using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Requests;
     using BuildingRegistry.Building;
     using MediatR;
+    using Newtonsoft.Json;
+    using TicketingService.Abstractions;
 
     public class SqsRealizeBuildingUnitHandler : SqsBuildingUnitBusHandler, IRequestHandler<SqsRealizeBuildingUnitRequest, Unit>
     {
@@ -56,7 +58,8 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Sqs.Lambda.BuildingUnit
             var buildingUnitLastEventHash = await GetBuildingUnitHash(buildingPersistentLocalId, buildingUnitPersistentLocalId, cancellationToken);
 
             // update ticket to complete
-            await Ticketing.Complete(ticketId, new ETagResponse(buildingUnitLastEventHash));
+            await Ticketing.Complete(ticketId, new Ticket(ticketId, nameof(BuildingRegistry), TicketStatus.Complete,
+                JsonConvert.SerializeObject(new ETagResponse(buildingUnitLastEventHash))));
 
             return Unit.Value;
         }

@@ -2,13 +2,14 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Sqs.Lambda.Building
 {
     using System.Threading;
     using System.Threading.Tasks;
-    using Abstractions;
     using Abstractions.Building.Responses;
     using Be.Vlaanderen.Basisregisters.CommandHandling;
     using Be.Vlaanderen.Basisregisters.CommandHandling.Idempotency;
     using BuildingRegistry.Api.BackOffice.Abstractions.Building.Requests;
     using BuildingRegistry.Building;
     using MediatR;
+    using Newtonsoft.Json;
+    using TicketingService.Abstractions;
 
     public class SqsRealizeBuildingHandler : SqsBusHandler, IRequestHandler<SqsRealizeBuildingRequest, Unit>
     {
@@ -52,7 +53,8 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Sqs.Lambda.Building
                 cancellationToken);
 
             // update ticket to complete
-            await Ticketing.Complete(ticketId, new ETagResponse(buildingHash));
+            await Ticketing.Complete(ticketId, new Ticket(ticketId, nameof(BuildingRegistry), TicketStatus.Complete,
+                JsonConvert.SerializeObject(new ETagResponse(buildingHash))));
             
             return Unit.Value;
         }
