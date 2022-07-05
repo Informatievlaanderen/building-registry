@@ -1,3 +1,10 @@
+## [3.22.1](https://github.com/informatievlaanderen/building-registry/compare/v3.22.0...v3.22.1) (2022-07-05)
+
+
+### Bug Fixes
+
+* use ticketing abstractions ([99adea6](https://github.com/informatievlaanderen/building-registry/commit/99adea6f8d9fe4dbff275a604f2c0bdc3f888687))
+
 # [3.22.0](https://github.com/informatievlaanderen/building-registry/compare/v3.21.1...v3.22.0) (2022-07-05)
 
 
