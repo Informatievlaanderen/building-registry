@@ -8,6 +8,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Sqs.Lambda.BuildingUnit
     using Building;
     using BuildingRegistry.Building;
     using BuildingRegistry.Building.Exceptions;
+    using TicketingService.Abstractions;
 
     public abstract class SqsBuildingUnitBusHandler : SqsBusHandler
     {

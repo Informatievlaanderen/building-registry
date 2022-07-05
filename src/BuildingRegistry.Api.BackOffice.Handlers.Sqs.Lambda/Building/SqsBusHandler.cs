@@ -7,7 +7,6 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Sqs.Lambda.Building
     using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
-    using Abstractions;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
     using Be.Vlaanderen.Basisregisters.CommandHandling;
     using Be.Vlaanderen.Basisregisters.CommandHandling.Idempotency;
@@ -16,6 +15,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Sqs.Lambda.Building
     using BuildingRegistry.Building;
     using Microsoft.AspNetCore.Http;
     using Microsoft.EntityFrameworkCore;
+    using TicketingService.Abstractions;
 
     public abstract class SqsBusHandler
     {

@@ -73,6 +73,8 @@ nuget Be.Vlaanderen.Basisregisters.GrAr.Extracts 17.4.1
 nuget Be.Vlaanderen.Basisregisters.Shaperon 9.0.1
 nuget Be.Vlaanderen.Basisregisters.Shaperon.Geometries 9.0.1
 
+nuget Be.Vlaanderen.Basisregisters.TicketingService.Abstractions 1.0.4
+
 // LAMBDA STUFF
 nuget Amazon.Lambda.Core 2.1.0
 nuget Amazon.Lambda.Serialization.Json 2.0.0
