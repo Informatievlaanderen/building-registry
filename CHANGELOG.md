@@ -1,3 +1,10 @@
+# [3.22.0](https://github.com/informatievlaanderen/building-registry/compare/v3.21.1...v3.22.0) (2022-07-05)
+
+
+### Features
+
+* update buildingunit projections ([f70f625](https://github.com/informatievlaanderen/building-registry/commit/f70f6250b940a43210b2ccece155cc5cb2a0403a))
+
 ## [3.21.1](https://github.com/informatievlaanderen/building-registry/compare/v3.21.0...v3.21.1) (2022-07-03)
 
 
