@@ -73,7 +73,6 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
             }
             catch (AggregateNotFoundException)
             {
-
                 throw CreateValidationException(
                     ValidationErrorCodes.Building.BuildingNotFound,
                     string.Empty,
@@ -86,6 +85,11 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
                     BuildingUnitNotFoundException => new ApiException(ValidationErrorMessages.BuildingUnit.BuildingUnitNotFound, StatusCodes.Status404NotFound),
                     
                     BuildingUnitIsRemovedException => new ApiException(ValidationErrorMessages.BuildingUnit.BuildingUnitIsRemoved, StatusCodes.Status410Gone),
+
+                    BuildingUnitCannotBeRealizedException => CreateValidationException(
+                        ValidationErrorCodes.BuildingUnit.BuildingUnitCannotBeRealized,
+                        string.Empty,
+                        ValidationErrorMessages.BuildingUnit.BuildingUnitCannotBeRealized),
 
                     _ => new ValidationException(new List<ValidationFailure>
                         { new ValidationFailure(string.Empty, exception.Message) })

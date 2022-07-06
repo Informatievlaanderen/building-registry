@@ -14,6 +14,7 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.Building.Validators
         {
             public const string BuildingUnitNotFound = "GebouweenheidNietGevonden";
             public const string BuildingUnitIsRemoved = "GebouweenheidVerwijderd";
+            public const string BuildingUnitCannotBeRealized = "GebouweenheidGehistoreerdOfNietGerealiseerd";
         }
     }
 
@@ -32,6 +33,7 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.Building.Validators
         {
             public const string BuildingUnitNotFound = "Onbestaande gebouweenheid.";
             public const string BuildingUnitIsRemoved = "Verwijderde gebouweenheid.";
+            public const string BuildingUnitCannotBeRealized = "Deze actie is enkel toegestaan op gebouweenheden met status 'gepland'.";
         }
     }
 }
