@@ -1,3 +1,11 @@
+# [3.23.0](https://github.com/informatievlaanderen/building-registry/compare/v3.22.1...v3.23.0) (2022-07-06)
+
+
+### Features
+
+* realize buildingunit val3 ([fc3be8d](https://github.com/informatievlaanderen/building-registry/commit/fc3be8d63058a8e5ea88e4f8d86ca2e3b4a5b39d))
+* take snapshot ([af99745](https://github.com/informatievlaanderen/building-registry/commit/af99745484779f12c438c0b261dd9f7c413791bf))
+
 ## [3.22.1](https://github.com/informatievlaanderen/building-registry/compare/v3.22.0...v3.22.1) (2022-07-05)
 
 
