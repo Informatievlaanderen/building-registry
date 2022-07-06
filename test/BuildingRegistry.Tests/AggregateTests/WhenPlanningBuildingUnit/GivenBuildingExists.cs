@@ -5,6 +5,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuildingUnit
     using Be.Vlaanderen.Basisregisters.AggregateSource;
     using Be.Vlaanderen.Basisregisters.AggregateSource.Snapshotting;
     using Be.Vlaanderen.Basisregisters.AggregateSource.Testing;
+    using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Building;
     using Building.Commands;
     using Building.Events;
@@ -84,7 +85,18 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuildingUnit
             var command = Fixture.Create<PlanBuildingUnit>().WithDeviation(false);
 
             var building = new BuildingFactory(NoSnapshotStrategy.Instance).Create();
-            building.PlanBuildingUnit(command);
+
+            var buildingWasPlannedV2 = Fixture.Create<BuildingWasPlannedV2>();
+            ((ISetProvenance)buildingWasPlannedV2).SetProvenance(Fixture.Create<Provenance>());
+
+            var buildingUnitWasPlannedV2 = Fixture.Create<BuildingUnitWasPlannedV2>();
+            ((ISetProvenance)buildingUnitWasPlannedV2).SetProvenance(Fixture.Create<Provenance>());
+
+            building.Initialize(new object[]
+            {
+                buildingWasPlannedV2,
+                buildingUnitWasPlannedV2
+            });
 
             building.BuildingUnits.Should().NotBeEmpty();
             building.BuildingUnits.Count.Should().Be(1);
@@ -95,6 +107,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuildingUnit
             buildingUnit.Function.Should().Be(command.Function);
             buildingUnit.HasDeviation.Should().BeFalse();
             buildingUnit.IsRemoved.Should().BeFalse();
+            buildingUnit.LastEventHash.Should().Be(building.LastEventHash);
         }
 
         [Fact]
@@ -103,7 +116,18 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuildingUnit
             var command = Fixture.Create<PlanBuildingUnit>().WithDeviation(true);
 
             var building = new BuildingFactory(NoSnapshotStrategy.Instance).Create();
-            building.PlanBuildingUnit(command);
+
+            var buildingWasPlannedV2 = Fixture.Create<BuildingWasPlannedV2>();
+            ((ISetProvenance)buildingWasPlannedV2).SetProvenance(Fixture.Create<Provenance>());
+
+            var deviatedBuildingUnitWasPlanned = Fixture.Create<DeviatedBuildingUnitWasPlanned>();
+            ((ISetProvenance)deviatedBuildingUnitWasPlanned).SetProvenance(Fixture.Create<Provenance>());
+
+            building.Initialize(new object[]
+            {
+                buildingWasPlannedV2,
+                deviatedBuildingUnitWasPlanned
+            });
 
             building.BuildingUnits.Should().NotBeEmpty();
             building.BuildingUnits.Count.Should().Be(1);
@@ -114,6 +138,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuildingUnit
             buildingUnit.Function.Should().Be(command.Function);
             buildingUnit.HasDeviation.Should().BeTrue();
             buildingUnit.IsRemoved.Should().BeFalse();
+            buildingUnit.LastEventHash.Should().Be(building.LastEventHash);
         }
     }
 }

@@ -63,7 +63,6 @@ namespace BuildingRegistry.Building.Events
             BuildingUnitFunction.Parse(function))
         => ((ISetProvenance)this).SetProvenance(provenance.ToProvenance());
 
-
         void ISetProvenance.SetProvenance(Provenance provenance) => Provenance = new ProvenanceData(provenance);
 
         public IEnumerable<string> GetHashFields()

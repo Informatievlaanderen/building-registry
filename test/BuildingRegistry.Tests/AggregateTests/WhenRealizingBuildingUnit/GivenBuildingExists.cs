@@ -156,37 +156,61 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRealizingBuildingUnit
         [Fact]
         public void StateCheck_WithoutDeviation()
         {
-            var command = Fixture.Create<PlanBuildingUnit>().WithDeviation(false);
-
             var building = new BuildingFactory(NoSnapshotStrategy.Instance).Create();
-            building.PlanBuildingUnit(command);
+
+            var buildingWasPlanned = Fixture.Create<BuildingWasPlannedV2>();
+            ((ISetProvenance)buildingWasPlanned).SetProvenance(Fixture.Create<Provenance>());
+
+            var buildingUnitWasPlanned = Fixture.Create<BuildingUnitWasPlannedV2>();
+            ((ISetProvenance)buildingUnitWasPlanned).SetProvenance(Fixture.Create<Provenance>());
+
+            var buildingUnitWasRealized = Fixture.Create<BuildingUnitWasRealizedV2>();
+            ((ISetProvenance)buildingUnitWasRealized).SetProvenance(Fixture.Create<Provenance>());
 
             // Act
-            building.RealizeBuildingUnit(Fixture.Create<RealizeBuildingUnit>());
+            building.Initialize(new object[]
+            {
+                buildingWasPlanned,
+                buildingUnitWasPlanned,
+                buildingUnitWasRealized
+            });
 
             // Assert
             building.BuildingUnits.Should().NotBeEmpty();
             building.BuildingUnits.Count.Should().Be(1);
             var buildingUnit = building.BuildingUnits.First();
             buildingUnit.Status.Should().Be(BuildingUnitStatus.Realized);
+            buildingUnit.LastEventHash.Should().NotBe(building.LastEventHash);
         }
 
         [Fact]
         public void StateCheck_WithDeviation()
         {
-            var command = Fixture.Create<PlanBuildingUnit>().WithDeviation(true);
-
             var building = new BuildingFactory(NoSnapshotStrategy.Instance).Create();
-            building.PlanBuildingUnit(command);
+
+            var buildingWasPlanned = Fixture.Create<BuildingWasPlannedV2>();
+            ((ISetProvenance)buildingWasPlanned).SetProvenance(Fixture.Create<Provenance>());
+
+            var deviatedBuildingUnitWasPlanned = Fixture.Create<DeviatedBuildingUnitWasPlanned>();
+            ((ISetProvenance)deviatedBuildingUnitWasPlanned).SetProvenance(Fixture.Create<Provenance>());
+
+            var buildingUnitWasRealized = Fixture.Create<BuildingUnitWasRealizedV2>();
+            ((ISetProvenance)buildingUnitWasRealized).SetProvenance(Fixture.Create<Provenance>());
 
             // Act
-            building.RealizeBuildingUnit(Fixture.Create<RealizeBuildingUnit>());
+            building.Initialize(new object[]
+            {
+                buildingWasPlanned,
+                deviatedBuildingUnitWasPlanned,
+                buildingUnitWasRealized
+            });
 
             // Assert
             building.BuildingUnits.Should().NotBeEmpty();
             building.BuildingUnits.Count.Should().Be(1);
             var buildingUnit = building.BuildingUnits.First();
             buildingUnit.Status.Should().Be(BuildingUnitStatus.Realized);
+            buildingUnit.LastEventHash.Should().NotBe(building.LastEventHash);
         }
     }
 }
