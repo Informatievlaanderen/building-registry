@@ -1,3 +1,10 @@
+## [3.23.1](https://github.com/informatievlaanderen/building-registry/compare/v3.23.0...v3.23.1) (2022-07-06)
+
+
+### Bug Fixes
+
+* building aggregate root set hash on building unit command ([d325ca8](https://github.com/informatievlaanderen/building-registry/commit/d325ca8ebe3d79b2a8b5e8b1eabfb9b813215f51))
+
 # [3.23.0](https://github.com/informatievlaanderen/building-registry/compare/v3.22.1...v3.23.0) (2022-07-06)
 
 
