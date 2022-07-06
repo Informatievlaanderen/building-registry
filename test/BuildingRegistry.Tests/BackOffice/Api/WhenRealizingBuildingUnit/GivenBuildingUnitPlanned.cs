@@ -1,6 +1,7 @@
 namespace BuildingRegistry.Tests.BackOffice.Api.WhenRealizingBuildingUnit
 {
     using System;
+    using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
     using AutoFixture;
@@ -16,6 +17,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenRealizingBuildingUnit
     using BuildingRegistry.Api.BackOffice.Building;
     using BuildingRegistry.Api.BackOffice.BuildingUnit;
     using FluentAssertions;
+    using FluentValidation;
     using Microsoft.AspNetCore.Http;
     using Moq;
     using Xunit;
@@ -220,6 +222,38 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenRealizingBuildingUnit
                 .Where(x =>
                     x.Message == "Verwijderde gebouweenheid."
                                    && x.StatusCode == StatusCodes.Status410Gone);
+        }
+
+        [Fact]
+        public void WhenBuildingUnitStatusInvalid_ThenValidationException()
+        {
+            var buildingUnitPersistentLocalId = new BuildingUnitPersistentLocalId(456);
+
+            MockMediator
+                .Setup(x => x.Send(It.IsAny<RealizeBuildingUnitRequest>(), CancellationToken.None).Result)
+                .Throws(new BuildingUnitCannotBeRealizedException(BuildingUnitStatus.NotRealized));
+
+            var request = new RealizeBuildingUnitRequest()
+            {
+                BuildingUnitPersistentLocalId = buildingUnitPersistentLocalId
+            };
+
+            //Act
+            Func<Task> act = async () => await _controller.Realize(
+                ResponseOptions,
+                request,
+                string.Empty,
+                CancellationToken.None);
+
+            // Assert
+            act
+                .Should()
+                .ThrowAsync<ValidationException>()
+                .Result
+                .Where(x =>
+                    x.Errors.Any(error
+                        => error.ErrorCode == "GebouweenheidGehistoreerdOfNietGerealiseerd"
+                                          && error.ErrorMessage == "Deze actie is enkel toegestaan op gebouweenheden met status 'gepland'."));
         }
     }
 }
