@@ -43,6 +43,8 @@ namespace BuildingRegistry.Infrastructure.Modules
                 .RegisterModule(new EventHandlingModule(typeof(DomainAssemblyMarker).Assembly, eventSerializerSettings))
                 .RegisterModule(new CommandHandlingModule(_configuration));
 
+            containerBuilder.RegisterSnapshotModule(_configuration);
+
             containerBuilder
                 .RegisterType<SqlPersistentLocalIdGenerator>()
                 .As<IPersistentLocalIdGenerator>();

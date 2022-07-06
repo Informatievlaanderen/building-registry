@@ -2,6 +2,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuilding
 {
     using AutoFixture;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
+    using Be.Vlaanderen.Basisregisters.AggregateSource.Snapshotting;
     using Be.Vlaanderen.Basisregisters.AggregateSource.Testing;
     using Building;
     using Building.Commands;
@@ -52,6 +53,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuilding
 
             // Act
             var result = Building.Plan(
+                new BuildingFactory(NoSnapshotStrategy.Instance),
                 command.BuildingPersistentLocalId,
                 command.Geometry);
 

@@ -2,22 +2,36 @@ namespace BuildingRegistry.Building
 {
     using System.Collections.Generic;
     using System.Linq;
-    using Be.Vlaanderen.Basisregisters.GrAr.Common;
+    using Be.Vlaanderen.Basisregisters.AggregateSource.Snapshotting;
+    using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Events;
     using Exceptions;
 
     public partial class Building
     {
-        private IHaveHash _lastEvent;
+        private IBuildingEvent? _lastEvent;
+
+        private string _lastSnapshotEventHash = string.Empty;
+        private ProvenanceData _lastSnapshotProvenance;
+
+        private readonly List<BuildingUnit> _buildingUnits = new List<BuildingUnit>();
 
         public BuildingPersistentLocalId BuildingPersistentLocalId { get; private set; }
-        public BuildingPersistentLocalIdAssignmentDate BuildingPersistentLocalIdAssignmentDate { get; private set; }
         public BuildingStatus BuildingStatus { get; private set; }
         public BuildingGeometry BuildingGeometry { get; private set; }
         public bool IsRemoved { get; private set; }
-        public List<BuildingUnit> BuildingUnits { get; private set; } = new List<BuildingUnit>();
 
-        public string LastEventHash => _lastEvent.GetHash();
+        public IReadOnlyList<BuildingUnit> BuildingUnits => _buildingUnits;
+
+        public string LastEventHash => _lastEvent is null ? _lastSnapshotEventHash : _lastEvent.GetHash();
+        public ProvenanceData LastProvenanceData =>
+            _lastEvent is null ? _lastSnapshotProvenance : _lastEvent.Provenance;
+
+        internal Building(ISnapshotStrategy snapshotStrategy)
+            : this()
+        {
+            Strategy = snapshotStrategy;
+        }
 
         private Building()
         {
@@ -29,12 +43,13 @@ namespace BuildingRegistry.Building
             Register<BuildingUnitWasPlannedV2>(When);
             Register<DeviatedBuildingUnitWasPlanned>(When);
             Register<BuildingUnitWasRealizedV2>(When);
+
+            Register<BuildingSnapshot>(When);
         }
 
         private void When(BuildingWasMigrated @event)
         {
             BuildingPersistentLocalId = new BuildingPersistentLocalId(@event.BuildingPersistentLocalId);
-            BuildingPersistentLocalIdAssignmentDate = new BuildingPersistentLocalIdAssignmentDate(@event.BuildingPersistentLocalIdAssignmentDate);
             BuildingStatus = BuildingStatus.Parse(@event.BuildingStatus);
             BuildingGeometry = new BuildingGeometry(
                 new ExtendedWkbGeometry(@event.ExtendedWkbGeometry),
@@ -54,7 +69,8 @@ namespace BuildingRegistry.Building
                         BuildingUnitPositionGeometryMethod.Parse(buildingUnit.GeometryMethod)),
                     buildingUnit.IsRemoved);
 
-                BuildingUnits.Add(newBuildingUnit);
+                newBuildingUnit.Route(@event);
+                _buildingUnits.Add(newBuildingUnit);
             }
 
             _lastEvent = @event;
@@ -88,7 +104,7 @@ namespace BuildingRegistry.Building
         {
             var newBuildingUnit = new BuildingUnit(ApplyChange);
             newBuildingUnit.Route(@event);
-            BuildingUnits.Add(newBuildingUnit);
+            _buildingUnits.Add(newBuildingUnit);
 
             _lastEvent = @event;
         }
@@ -97,7 +113,7 @@ namespace BuildingRegistry.Building
         {
             var newBuildingUnit = new BuildingUnit(ApplyChange);
             newBuildingUnit.Route(@event);
-            BuildingUnits.Add(newBuildingUnit);
+            _buildingUnits.Add(newBuildingUnit);
 
             _lastEvent = @event;
         }
@@ -116,6 +132,27 @@ namespace BuildingRegistry.Building
             buildingUnit.Route(@event);
 
             _lastEvent = @event;
+        }
+
+        private void When(BuildingSnapshot @event)
+        {
+            BuildingPersistentLocalId = new BuildingPersistentLocalId(@event.BuildingPersistentLocalId);
+            BuildingStatus = BuildingStatus.Parse(@event.BuildingStatus);
+            BuildingGeometry = new BuildingGeometry(
+                new ExtendedWkbGeometry(@event.ExtendedWkbGeometry),
+                BuildingGeometryMethod.Parse(@event.GeometryMethod));
+            IsRemoved = @event.IsRemoved;
+
+            foreach (var buildingUnitData in @event.BuildingUnits)
+            {
+                var buildingUnit = new BuildingUnit(ApplyChange);
+                buildingUnit.RestoreSnapshot(buildingUnitData);
+
+                _buildingUnits.Add(buildingUnit);
+            }
+
+            _lastSnapshotEventHash = @event.LastEventHash;
+            _lastSnapshotProvenance = @event.LastProvenanceData;
         }
     }
 }

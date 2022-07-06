@@ -3,6 +3,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuildingUnit
     using System.Linq;
     using AutoFixture;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
+    using Be.Vlaanderen.Basisregisters.AggregateSource.Snapshotting;
     using Be.Vlaanderen.Basisregisters.AggregateSource.Testing;
     using Building;
     using Building.Commands;
@@ -26,7 +27,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuildingUnit
 
             var @buildingWasPlanned = Fixture.Create<BuildingWasPlannedV2>();
             var buildingGeometry = new BuildingGeometry(new ExtendedWkbGeometry(@buildingWasPlanned.ExtendedWkbGeometry),
-                BuildingGeometryMethod.MeasuredByGrb);
+                BuildingGeometryMethod.Outlined);
 
             Assert(new Scenario()
                 .Given(new BuildingStreamId(Fixture.Create<BuildingPersistentLocalId>()),
@@ -82,7 +83,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuildingUnit
         {
             var command = Fixture.Create<PlanBuildingUnit>().WithDeviation(false);
 
-            var building = Building.Factory();
+            var building = new BuildingFactory(NoSnapshotStrategy.Instance).Create();
             building.PlanBuildingUnit(command);
 
             building.BuildingUnits.Should().NotBeEmpty();
@@ -101,7 +102,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuildingUnit
         {
             var command = Fixture.Create<PlanBuildingUnit>().WithDeviation(true);
 
-            var building = Building.Factory();
+            var building = new BuildingFactory(NoSnapshotStrategy.Instance).Create();
             building.PlanBuildingUnit(command);
 
             building.BuildingUnits.Should().NotBeEmpty();
