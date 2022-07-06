@@ -130,8 +130,6 @@ namespace BuildingRegistry.Building
             }
 
             buildingUnit.Route(@event);
-
-            _lastEvent = @event;
         }
 
         private void When(BuildingSnapshot @event)
