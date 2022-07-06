@@ -1,3 +1,10 @@
+## [3.23.2](https://github.com/informatievlaanderen/building-registry/compare/v3.23.1...v3.23.2) (2022-07-06)
+
+
+### Bug Fixes
+
+* fix projections hash & version according to buildingunit events ([a3d2f47](https://github.com/informatievlaanderen/building-registry/commit/a3d2f479c65778f72b3fbe7616ecc16a1ffd3754))
+
 ## [3.23.1](https://github.com/informatievlaanderen/building-registry/compare/v3.23.0...v3.23.1) (2022-07-06)
 
 
