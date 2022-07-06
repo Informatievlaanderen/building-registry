@@ -29,6 +29,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wms
             _fixture.Customize(new WithBuildingUnitStatus());
             _fixture.Customize(new WithBuildingUnitFunction());
             _fixture.Customize(new WithBuildingUnitPositionGeometryMethod());
+            _fixture.Customize(new WithFixedBuildingPersistentLocalId());
         }
 
         [Fact]
@@ -102,6 +103,29 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wms
                     var polygon = wkbReader.Read(buildingWasPlannedV2.ExtendedWkbGeometry.ToByteArray());
                     buildingDetailItemV2.Geometry.Should().BeEquivalentTo(polygon.AsBinary());
                     buildingDetailItemV2.GeometryMethod.Should().Be("Ingeschetst");
+                });
+        }
+
+        [Fact]
+        public async Task WhenBuildingUnitWasPlannedV2()
+        {
+            var buildingWasPlannedV2 = _fixture.Create<BuildingWasPlannedV2>();
+            var buildingUnitWasPlannedV2 = _fixture.Create<BuildingUnitWasPlannedV2>();
+
+            await Sut
+                .Given(new Envelope<BuildingWasPlannedV2>(new Envelope(buildingWasPlannedV2, new Dictionary<string, object>
+                    {
+                        { AddEventHashPipe.HashMetadataKey, buildingWasPlannedV2.GetHash() }
+                    })),
+                    new Envelope<BuildingUnitWasPlannedV2>(new Envelope(buildingUnitWasPlannedV2, new Dictionary<string, object>
+                    {
+                        { AddEventHashPipe.HashMetadataKey, buildingUnitWasPlannedV2.GetHash() }
+                    })))
+                .Then(async ct =>
+                {
+                    var buildingDetailItemV2 = await ct.BuildingsV2.FindAsync(buildingUnitWasPlannedV2.BuildingPersistentLocalId);
+                    buildingDetailItemV2.Should().NotBeNull();
+                    buildingDetailItemV2.Version.Should().Be(buildingUnitWasPlannedV2.Provenance.Timestamp);
                 });
         }
 

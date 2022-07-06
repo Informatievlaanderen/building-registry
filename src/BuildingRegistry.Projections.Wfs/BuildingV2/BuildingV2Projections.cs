@@ -79,6 +79,12 @@ namespace BuildingRegistry.Projections.Wfs.BuildingV2
                 item.Status = RealizedStatus;
                 item.Version = message.Message.Provenance.Timestamp;
             });
+
+            When<Envelope<BuildingUnitWasPlannedV2>>(async (context, message, ct) =>
+            {
+                var item = await context.BuildingsV2.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);
+                item.Version = message.Message.Provenance.Timestamp;
+            });
         }
 
         private void SetGeometry(BuildingV2 building, string extendedWkbGeometry, string method)

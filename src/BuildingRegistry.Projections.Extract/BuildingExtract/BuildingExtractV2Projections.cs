@@ -119,6 +119,13 @@ namespace BuildingRegistry.Projections.Extract.BuildingExtract
                 UpdateStatus(item, MapStatus(BuildingStatus.Realized));
                 UpdateVersie(item, message.Message.Provenance.Timestamp);
             });
+
+            When<Envelope<BuildingUnitWasPlannedV2>>(async (context, message, ct) =>
+            {
+                var item = await context.BuildingExtractV2.FindAsync(message.Message.BuildingPersistentLocalId,
+                    cancellationToken: ct);
+                UpdateVersie(item, message.Message.Provenance.Timestamp);
+            });
         }
 
         private static string MapGeometryMethod(BuildingGeometryMethod buildingGeometryMethod)
