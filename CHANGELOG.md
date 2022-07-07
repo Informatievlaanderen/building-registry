@@ -1,3 +1,10 @@
+# [3.24.0](https://github.com/informatievlaanderen/building-registry/compare/v3.23.2...v3.24.0) (2022-07-07)
+
+
+### Features
+
+* remove deviatedBuildingUnitWasPlanned ([5dc0043](https://github.com/informatievlaanderen/building-registry/commit/5dc004386503588c8a24aced2ed48762a5942975))
+
 ## [3.23.2](https://github.com/informatievlaanderen/building-registry/compare/v3.23.1...v3.23.2) (2022-07-06)
 
 
