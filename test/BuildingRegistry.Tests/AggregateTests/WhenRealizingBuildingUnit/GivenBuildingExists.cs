@@ -191,8 +191,8 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRealizingBuildingUnit
             var buildingWasPlanned = Fixture.Create<BuildingWasPlannedV2>();
             ((ISetProvenance)buildingWasPlanned).SetProvenance(Fixture.Create<Provenance>());
 
-            var deviatedBuildingUnitWasPlanned = Fixture.Create<DeviatedBuildingUnitWasPlanned>();
-            ((ISetProvenance)deviatedBuildingUnitWasPlanned).SetProvenance(Fixture.Create<Provenance>());
+            var buildingUnitWasPlanned = Fixture.Create<BuildingUnitWasPlannedV2>();
+            ((ISetProvenance)buildingUnitWasPlanned).SetProvenance(Fixture.Create<Provenance>());
 
             var buildingUnitWasRealized = Fixture.Create<BuildingUnitWasRealizedV2>();
             ((ISetProvenance)buildingUnitWasRealized).SetProvenance(Fixture.Create<Provenance>());
@@ -201,7 +201,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRealizingBuildingUnit
             building.Initialize(new object[]
             {
                 buildingWasPlanned,
-                deviatedBuildingUnitWasPlanned,
+                buildingUnitWasPlanned,
                 buildingUnitWasRealized
             });
 

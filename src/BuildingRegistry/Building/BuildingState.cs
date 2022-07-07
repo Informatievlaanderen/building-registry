@@ -41,7 +41,6 @@ namespace BuildingRegistry.Building
             Register<BuildingWasRealizedV2>(When);
 
             Register<BuildingUnitWasPlannedV2>(When);
-            Register<DeviatedBuildingUnitWasPlanned>(When);
             Register<BuildingUnitWasRealizedV2>(When);
 
             Register<BuildingSnapshot>(When);
@@ -101,15 +100,6 @@ namespace BuildingRegistry.Building
         }
 
         private void When(BuildingUnitWasPlannedV2 @event)
-        {
-            var newBuildingUnit = new BuildingUnit(ApplyChange);
-            newBuildingUnit.Route(@event);
-            _buildingUnits.Add(newBuildingUnit);
-
-            _lastEvent = @event;
-        }
-
-        private void When(DeviatedBuildingUnitWasPlanned @event)
         {
             var newBuildingUnit = new BuildingUnit(ApplyChange);
             newBuildingUnit.Route(@event);
