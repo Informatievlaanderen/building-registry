@@ -40,11 +40,12 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuildingUnit
                         command.BuildingUnitPersistentLocalId,
                         command.PositionGeometryMethod,
                         buildingGeometry.Center,
-                        command.Function))));
+                        command.Function,
+                        false))));
         }
 
         [Fact]
-        public void WithNoDeviation_ThenBuildingUnitWasPlanned()
+        public void ThenBuildingUnitWasPlanned()
         {
             var command = Fixture.Create<PlanBuildingUnit>().WithDeviation(false);
 
@@ -58,29 +59,12 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuildingUnit
                         command.BuildingUnitPersistentLocalId,
                         command.PositionGeometryMethod,
                         command.Position,
-                        command.Function))));
+                        command.Function,
+                        hasDeviation: false))));
         }
 
         [Fact]
-        public void WithDeviation_ThenDeviatedBuildingUnitWasPlanned()
-        {
-            var command = Fixture.Create<PlanBuildingUnit>().WithDeviation(true);
-
-            Assert(new Scenario()
-                .Given(new BuildingStreamId(Fixture.Create<BuildingPersistentLocalId>()),
-                    Fixture.Create<BuildingWasPlannedV2>())
-                .When(command)
-                .Then(new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
-                    new DeviatedBuildingUnitWasPlanned(
-                        command.BuildingPersistentLocalId,
-                        command.BuildingUnitPersistentLocalId,
-                        command.PositionGeometryMethod,
-                        command.Position,
-                        command.Function))));
-        }
-
-        [Fact]
-        public void WithNoDeviation_ThenStateWasCorrectlySet()
+        public void ThenStateWasCorrectlySet()
         {
             var command = Fixture.Create<PlanBuildingUnit>().WithDeviation(false);
 
@@ -106,37 +90,6 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuildingUnit
             buildingUnit.BuildingUnitPosition.GeometryMethod.ToString().Should().Be(command.PositionGeometryMethod.ToString());
             buildingUnit.Function.Should().Be(command.Function);
             buildingUnit.HasDeviation.Should().BeFalse();
-            buildingUnit.IsRemoved.Should().BeFalse();
-            buildingUnit.LastEventHash.Should().Be(building.LastEventHash);
-        }
-
-        [Fact]
-        public void WithDeviation_ThenStateWasCorrectlySet()
-        {
-            var command = Fixture.Create<PlanBuildingUnit>().WithDeviation(true);
-
-            var building = new BuildingFactory(NoSnapshotStrategy.Instance).Create();
-
-            var buildingWasPlannedV2 = Fixture.Create<BuildingWasPlannedV2>();
-            ((ISetProvenance)buildingWasPlannedV2).SetProvenance(Fixture.Create<Provenance>());
-
-            var deviatedBuildingUnitWasPlanned = Fixture.Create<DeviatedBuildingUnitWasPlanned>();
-            ((ISetProvenance)deviatedBuildingUnitWasPlanned).SetProvenance(Fixture.Create<Provenance>());
-
-            building.Initialize(new object[]
-            {
-                buildingWasPlannedV2,
-                deviatedBuildingUnitWasPlanned
-            });
-
-            building.BuildingUnits.Should().NotBeEmpty();
-            building.BuildingUnits.Count.Should().Be(1);
-            var buildingUnit = building.BuildingUnits.First();
-            buildingUnit.Status.Should().Be(BuildingUnitStatus.Planned);
-            buildingUnit.BuildingUnitPosition.Geometry.ToString().Should().Be(command.Position.ToString());
-            buildingUnit.BuildingUnitPosition.GeometryMethod.ToString().Should().Be(command.PositionGeometryMethod.ToString());
-            buildingUnit.Function.Should().Be(command.Function);
-            buildingUnit.HasDeviation.Should().BeTrue();
             buildingUnit.IsRemoved.Should().BeFalse();
             buildingUnit.LastEventHash.Should().Be(building.LastEventHash);
         }

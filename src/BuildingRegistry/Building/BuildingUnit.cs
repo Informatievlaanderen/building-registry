@@ -34,7 +34,6 @@ namespace BuildingRegistry.Building
             Register<BuildingWasMigrated>(When);
 
             Register<BuildingUnitWasPlannedV2>(When);
-            Register<DeviatedBuildingUnitWasPlanned>(When);
             Register<BuildingUnitWasRealizedV2>(When);
         }
 
@@ -52,21 +51,7 @@ namespace BuildingRegistry.Building
                 new ExtendedWkbGeometry(@event.ExtendedWkbGeometry),
                 BuildingUnitPositionGeometryMethod.Parse(@event.GeometryMethod));
 
-            HasDeviation = false;
-
-            _lastEvent = @event;
-        }
-
-        private void When(DeviatedBuildingUnitWasPlanned @event)
-        {
-            BuildingUnitPersistentLocalId = new BuildingUnitPersistentLocalId(@event.BuildingUnitPersistentLocalId);
-            Function = BuildingUnitFunction.Parse(@event.Function);
-            Status = BuildingUnitStatus.Planned;
-            BuildingUnitPosition = new BuildingUnitPosition(
-                new ExtendedWkbGeometry(@event.ExtendedWkbGeometry),
-                BuildingUnitPositionGeometryMethod.Parse(@event.GeometryMethod));
-
-            HasDeviation = true;
+            HasDeviation = @event.HasDeviation;
 
             _lastEvent = @event;
         }
@@ -77,7 +62,6 @@ namespace BuildingRegistry.Building
 
             _lastEvent = @event;
         }
-
 
         public static BuildingUnit Migrate(
             Action<object> applier,

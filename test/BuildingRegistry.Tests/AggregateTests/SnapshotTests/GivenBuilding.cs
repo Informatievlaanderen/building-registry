@@ -45,43 +45,44 @@ namespace BuildingRegistry.Tests.AggregateTests.SnapshotTests
             var buildingGeometry = new BuildingGeometry(new ExtendedWkbGeometry(buildingWasPlanned.ExtendedWkbGeometry),
                 BuildingGeometryMethod.Outlined);
 
-            var planDeviatedBuildingUnit = Fixture.Create<PlanBuildingUnit>()
+            var planBuildingUnit = Fixture.Create<PlanBuildingUnit>()
                 .WithoutPosition()
                 .WithProvenance(provenance);
 
-            var deviatedBuildingUnitWasPlanned = new DeviatedBuildingUnitWasPlanned(
-                planDeviatedBuildingUnit.BuildingPersistentLocalId,
-                planDeviatedBuildingUnit.BuildingUnitPersistentLocalId,
-                planDeviatedBuildingUnit.PositionGeometryMethod,
+            var expectedEvent = new BuildingUnitWasPlannedV2(
+                planBuildingUnit.BuildingPersistentLocalId,
+                planBuildingUnit.BuildingUnitPersistentLocalId,
+                planBuildingUnit.PositionGeometryMethod,
                 buildingGeometry.Center,
-                BuildingUnitFunction.Unknown);
-            ((ISetProvenance)deviatedBuildingUnitWasPlanned).SetProvenance(provenance);
+                BuildingUnitFunction.Unknown,
+                planBuildingUnit.HasDeviation);
+            ((ISetProvenance)expectedEvent).SetProvenance(provenance);
 
             var plannedBuildingUnit = new BuildingUnit(o => { });
             plannedBuildingUnit.Route(buildingUnitWasPlanned);
-            var deviatedBuildingUnit = new BuildingUnit(o => { });
-            deviatedBuildingUnit.Route(deviatedBuildingUnitWasPlanned);
+            var buildingUnit = new BuildingUnit(o => { });
+            buildingUnit.Route(expectedEvent);
 
             var expectedSnapshot = new BuildingSnapshot(
                 Fixture.Create<BuildingPersistentLocalId>(),
                 BuildingStatus.Planned,
                 buildingGeometry,
                 false,
-                deviatedBuildingUnitWasPlanned.GetHash(),
-                deviatedBuildingUnitWasPlanned.Provenance,
+                expectedEvent.GetHash(),
+                expectedEvent.Provenance,
                 new List<BuildingUnit>
                 {
                     plannedBuildingUnit,
-                    deviatedBuildingUnit
+                    buildingUnit
                 });
 
             Assert(new Scenario()
                 .Given(_streamId,
                     buildingWasPlanned,
                     buildingUnitWasPlanned)
-                .When(planDeviatedBuildingUnit)
+                .When(planBuildingUnit)
                 .Then(new Fact(_streamId,
-                    deviatedBuildingUnitWasPlanned)));
+                    expectedEvent)));
 
             var snapshotStore = (ISnapshotStore)Container.Resolve(typeof(ISnapshotStore));
             var latestSnapshot = await snapshotStore.FindLatestSnapshotAsync(_streamId, CancellationToken.None);

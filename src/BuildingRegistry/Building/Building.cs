@@ -110,24 +110,13 @@ namespace BuildingRegistry.Building
             // validate command
             var position = command.Position ?? BuildingGeometry.Center;
 
-            if (command.HasDeviation)
-            {
-                ApplyChange(new DeviatedBuildingUnitWasPlanned(
-                    command.BuildingPersistentLocalId,
-                    command.BuildingUnitPersistentLocalId,
-                    command.PositionGeometryMethod,
-                    position,
-                    command.Function));
-            }
-            else
-            {
-                ApplyChange(new BuildingUnitWasPlannedV2(
-                    command.BuildingPersistentLocalId,
-                    command.BuildingUnitPersistentLocalId,
-                    command.PositionGeometryMethod,
-                    position,
-                    command.Function));
-            }
+            ApplyChange(new BuildingUnitWasPlannedV2(
+                command.BuildingPersistentLocalId,
+                command.BuildingUnitPersistentLocalId,
+                command.PositionGeometryMethod,
+                position,
+                command.Function,
+                command.HasDeviation));
         }
 
         public void RealizeBuildingUnit(RealizeBuildingUnit command)

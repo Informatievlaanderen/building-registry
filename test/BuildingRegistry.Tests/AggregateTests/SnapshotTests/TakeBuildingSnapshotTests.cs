@@ -85,7 +85,7 @@ namespace BuildingRegistry.Tests.AggregateTests.SnapshotTests
             var aggregate = new BuildingFactory(IntervalStrategy.Default).Create();
 
             var buildingWasPlanned = Fixture.Create<BuildingWasPlannedV2>();
-            var buildingUnitWasPlanned = Fixture.Create<DeviatedBuildingUnitWasPlanned>();
+            var buildingUnitWasPlanned = Fixture.Create<BuildingUnitWasPlannedV2>();
 
             aggregate.Initialize(new List<object>
             {
@@ -107,7 +107,7 @@ namespace BuildingRegistry.Tests.AggregateTests.SnapshotTests
             buildingUnitData.GeometryMethod.Should().Be(buildingUnitWasPlanned.GeometryMethod);
 
             buildingUnitData.IsRemoved.Should().BeFalse();
-            buildingUnitData.HasDeviation.Should().BeTrue();
+            buildingUnitData.HasDeviation.Should().Be(buildingUnitWasPlanned.HasDeviation);
 
             buildingUnitData.LastEventHash.Should().Be(buildingUnitWasPlanned.GetHash());
             buildingUnitData.LastProvenanceData.Should().Be(buildingUnitWasPlanned.Provenance);

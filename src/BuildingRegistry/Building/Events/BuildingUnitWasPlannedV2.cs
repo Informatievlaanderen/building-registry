@@ -30,6 +30,9 @@ namespace BuildingRegistry.Building.Events
         [EventPropertyDescription("Functie van de gebouweenheid.")] // todo: correct description?
         public string Function { get; }
 
+        [EventPropertyDescription("Gebouweenheid afwijking.")]
+        public bool HasDeviation { get; }
+
         [EventPropertyDescription("Metadata bij het event.")]
         public ProvenanceData Provenance { get; private set; }
 
@@ -38,13 +41,15 @@ namespace BuildingRegistry.Building.Events
             BuildingUnitPersistentLocalId buildingUnitPersistentLocalId,
             BuildingUnitPositionGeometryMethod geometryMethod,
             ExtendedWkbGeometry extendedWkbGeometry,
-            BuildingUnitFunction function)
+            BuildingUnitFunction function,
+            bool hasDeviation)
         {
             BuildingPersistentLocalId = buildingPersistentLocalId;
             BuildingUnitPersistentLocalId = buildingUnitPersistentLocalId;
             GeometryMethod = geometryMethod;
             ExtendedWkbGeometry = extendedWkbGeometry;
             Function = function;
+            HasDeviation = hasDeviation;
         }
 
         [JsonConstructor]
@@ -54,13 +59,15 @@ namespace BuildingRegistry.Building.Events
             string geometryMethod,
             string extendedWkbGeometry,
             string function,
+            bool hasDeviation,
             ProvenanceData provenance)
         : this(
             new BuildingPersistentLocalId(buildingPersistentLocalId),
             new BuildingUnitPersistentLocalId(buildingUnitPersistentLocalId),
             BuildingUnitPositionGeometryMethod.Parse(geometryMethod),
             new ExtendedWkbGeometry(extendedWkbGeometry),
-            BuildingUnitFunction.Parse(function))
+            BuildingUnitFunction.Parse(function),
+            hasDeviation)
         => ((ISetProvenance)this).SetProvenance(provenance.ToProvenance());
 
         void ISetProvenance.SetProvenance(Provenance provenance) => Provenance = new ProvenanceData(provenance);
