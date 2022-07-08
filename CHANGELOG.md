@@ -1,3 +1,10 @@
+## [3.24.2](https://github.com/informatievlaanderen/building-registry/compare/v3.24.1...v3.24.2) (2022-07-08)
+
+
+### Bug Fixes
+
+* use SqsQueueOptions ([f868500](https://github.com/informatievlaanderen/building-registry/commit/f86850001f41c546f299672a8a938b4d403d86a1))
+
 ## [3.24.1](https://github.com/informatievlaanderen/building-registry/compare/v3.24.0...v3.24.1) (2022-07-08)
 
 
