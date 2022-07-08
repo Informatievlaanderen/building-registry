@@ -58,8 +58,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Sqs.Lambda.BuildingUnit
             var buildingUnitLastEventHash = await GetBuildingUnitHash(buildingPersistentLocalId, buildingUnitPersistentLocalId, cancellationToken);
 
             // update ticket to complete
-            await Ticketing.Complete(ticketId, new Ticket(ticketId, nameof(BuildingRegistry), TicketStatus.Complete,
-                JsonConvert.SerializeObject(new ETagResponse(buildingUnitLastEventHash))));
+            await Ticketing.Complete(ticketId, new ETagResponse(buildingUnitLastEventHash));
 
             return Unit.Value;
         }

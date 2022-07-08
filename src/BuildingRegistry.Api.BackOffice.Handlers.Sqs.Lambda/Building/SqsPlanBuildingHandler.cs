@@ -8,7 +8,6 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Sqs.Lambda.Building
     using BuildingRegistry.Api.BackOffice.Abstractions.Building.Responses;
     using BuildingRegistry.Building;
     using MediatR;
-    using Newtonsoft.Json;
     using TicketingService.Abstractions;
 
     public class SqsPlanBuildingHandler : SqsBusHandler, IRequestHandler<SqsPlanBuildingRequest, Unit>
@@ -58,8 +57,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Sqs.Lambda.Building
                 cancellationToken);
 
             // update ticket to complete
-            await Ticketing.Complete(ticketId, new Ticket(ticketId, nameof(BuildingRegistry), TicketStatus.Complete,
-                JsonConvert.SerializeObject(new PlanBuildingResponse(nextBuildingPersistentLocalId, buildingHash))));
+            await Ticketing.Complete(ticketId, new PlanBuildingResponse(nextBuildingPersistentLocalId, buildingHash));
             
             return Unit.Value;
         }
