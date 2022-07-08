@@ -1,3 +1,10 @@
+## [3.24.1](https://github.com/informatievlaanderen/building-registry/compare/v3.24.0...v3.24.1) (2022-07-08)
+
+
+### Bug Fixes
+
+* lanbda sends result to ticket ([a5b4025](https://github.com/informatievlaanderen/building-registry/commit/a5b4025ea5401e1da992921441e1d2a5b728d229))
+
 # [3.24.0](https://github.com/informatievlaanderen/building-registry/compare/v3.23.2...v3.24.0) (2022-07-07)
 
 
