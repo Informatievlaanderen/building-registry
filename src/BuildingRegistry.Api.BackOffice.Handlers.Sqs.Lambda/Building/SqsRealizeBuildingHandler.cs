@@ -53,8 +53,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Sqs.Lambda.Building
                 cancellationToken);
 
             // update ticket to complete
-            await Ticketing.Complete(ticketId, new Ticket(ticketId, nameof(BuildingRegistry), TicketStatus.Complete,
-                JsonConvert.SerializeObject(new ETagResponse(buildingHash))));
+            await Ticketing.Complete(ticketId, new ETagResponse(buildingHash));
             
             return Unit.Value;
         }
