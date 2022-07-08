@@ -37,7 +37,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Sqs.Building
             var buildingPersistentLocalId = _persistentLocalIdGenerator.GenerateNextPersistentLocalId();
             request.MessageGroupId = buildingPersistentLocalId.ToString();
             
-            _ = await CopyToQueue(_sqsOptions, SqsQueueName.Value, request, request.MessageGroupId, cancellationToken);
+            _ = await CopyToQueue(_sqsOptions, SqsQueueName.Value, request, new SqsQueueOptions { MessageGroupId = request.MessageGroupId }, cancellationToken);
 
             _logger.LogDebug($"Request sent to queue {SqsQueueName.Value}");
 
