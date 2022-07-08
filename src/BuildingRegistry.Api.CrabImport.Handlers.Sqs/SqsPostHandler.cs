@@ -21,7 +21,7 @@ namespace BuildingRegistry.Api.CrabImport.Handlers.Sqs
 
         public async Task<Unit> Handle(SqsPostRequest request, CancellationToken cancellationToken)
 {
-            _ = await CopyToQueue(_sqsOptions, SqsQueueName.Value, request, cancellationToken);
+            _ = await CopyToQueue(_sqsOptions, SqsQueueName.Value, request, new SqsQueueOptions(), cancellationToken);
 
             _logger.LogDebug($"Request sent to queue {SqsQueueName.Value}");
 

@@ -31,7 +31,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Sqs.Building
             var ticketId = await _ticketing.CreateTicket(nameof(BuildingRegistry));
             request.TicketId = ticketId;
 
-            _ = await CopyToQueue(_sqsOptions, SqsQueueName.Value, request, request.PersistentLocalId.ToString(), cancellationToken);
+            _ = await CopyToQueue(_sqsOptions, SqsQueueName.Value, request, new SqsQueueOptions(request.PersistentLocalId.ToString()), cancellationToken);
 
             _logger.LogDebug($"Request sent to queue {SqsQueueName.Value}");
 
