@@ -1,3 +1,10 @@
+## [3.24.3](https://github.com/informatievlaanderen/building-registry/compare/v3.24.2...v3.24.3) (2022-07-11)
+
+
+### Bug Fixes
+
+* add assemblyinfo files ([eb619b3](https://github.com/informatievlaanderen/building-registry/commit/eb619b3e1689c9f0eeda57f0d7ca5936bb9eea1d))
+
 ## [3.24.2](https://github.com/informatievlaanderen/building-registry/compare/v3.24.1...v3.24.2) (2022-07-08)
 
 
