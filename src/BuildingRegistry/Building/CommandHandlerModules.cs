@@ -9,6 +9,8 @@ namespace BuildingRegistry.Building
         {
             containerBuilder
                 .RegisterType<ProvenanceFactory<Building>>()
+                .AsSelf()
+                .AsImplementedInterfaces()
                 .SingleInstance();
 
             containerBuilder

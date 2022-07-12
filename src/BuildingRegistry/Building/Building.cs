@@ -4,7 +4,6 @@ namespace BuildingRegistry.Building
     using System.Linq;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
     using Be.Vlaanderen.Basisregisters.AggregateSource.Snapshotting;
-    using Commands;
     using Events;
     using Exceptions;
     using NetTopologySuite.Geometries;
@@ -53,24 +52,21 @@ namespace BuildingRegistry.Building
 
         public void PlaceUnderConstruction()
         {
-            if (IsRemoved)
-            {
-                throw new BuildingIsRemovedException(BuildingPersistentLocalId);
-            }
+            GuardRemovedBuilding();
 
             if (BuildingStatus == BuildingStatus.UnderConstruction)
             {
                 return;
             }
 
-            var invalidStates = new List<BuildingStatus>
+            var invalidStatuses = new List<BuildingStatus>
             {
                 BuildingStatus.Retired,
                 BuildingStatus.Realized,
                 BuildingStatus.NotRealized,
             };
 
-            if (invalidStates.Contains(BuildingStatus))
+            if (invalidStatuses.Contains(BuildingStatus))
             {
                 throw new BuildingCannotBePlacedUnderConstructionException(BuildingStatus);
             }
@@ -80,24 +76,21 @@ namespace BuildingRegistry.Building
 
         public void RealizeConstruction()
         {
-            if (IsRemoved)
-            {
-                throw new BuildingIsRemovedException(BuildingPersistentLocalId);
-            }
+            GuardRemovedBuilding();
 
             if (BuildingStatus == BuildingStatus.Realized)
             {
                 return;
             }
 
-            var invalidStates = new List<BuildingStatus>
+            var invalidStatuses = new List<BuildingStatus>
             {
                 BuildingStatus.Planned,
                 BuildingStatus.Retired,
                 BuildingStatus.NotRealized
             };
 
-            if (invalidStates.Contains(BuildingStatus))
+            if (invalidStatuses.Contains(BuildingStatus))
             {
                 throw new BuildingCannotBeRealizedException(BuildingStatus);
             }
@@ -105,54 +98,45 @@ namespace BuildingRegistry.Building
             ApplyChange(new BuildingWasRealizedV2(BuildingPersistentLocalId));
         }
 
-        public void PlanBuildingUnit(PlanBuildingUnit command)
+        public void PlanBuildingUnit(
+            BuildingUnitPersistentLocalId buildingUnitPersistentLocalId,
+            BuildingUnitPositionGeometryMethod positionGeometryMethod,
+            ExtendedWkbGeometry? position,
+            BuildingUnitFunction function,
+            bool hasDeviation)
         {
             // validate command
-            var position = command.Position ?? BuildingGeometry.Center;
+            var finalPosition = position ?? BuildingGeometry.Center;
 
             ApplyChange(new BuildingUnitWasPlannedV2(
-                command.BuildingPersistentLocalId,
-                command.BuildingUnitPersistentLocalId,
-                command.PositionGeometryMethod,
-                position,
-                command.Function,
-                command.HasDeviation));
+                BuildingPersistentLocalId,
+                buildingUnitPersistentLocalId,
+                positionGeometryMethod,
+                finalPosition,
+                function,
+                hasDeviation));
         }
 
-        public void RealizeBuildingUnit(RealizeBuildingUnit command)
+        public void RealizeBuildingUnit(BuildingUnitPersistentLocalId buildingUnitPersistentLocalId)
         {
-            // validate command
-            var buildingUnit = BuildingUnits.FirstOrDefault(x => x.BuildingUnitPersistentLocalId == command.BuildingUnitPersistentLocalId);
+            var buildingUnit = BuildingUnits.FirstOrDefault(x => x.BuildingUnitPersistentLocalId == buildingUnitPersistentLocalId);
 
             if (buildingUnit is null)
             {
                 throw new BuildingUnitNotFoundException(
-                    command.BuildingPersistentLocalId,
-                    command.BuildingUnitPersistentLocalId);
+                    BuildingPersistentLocalId,
+                    buildingUnitPersistentLocalId);
             }
 
-            if (buildingUnit.IsRemoved)
+            buildingUnit.Realize();
+        }
+
+        private void GuardRemovedBuilding()
+        {
+            if (IsRemoved)
             {
-                throw new BuildingUnitIsRemovedException(command.BuildingUnitPersistentLocalId);
+                throw new BuildingIsRemovedException(BuildingPersistentLocalId);
             }
-
-            if (buildingUnit.Status == BuildingUnitStatus.Realized)
-            {
-                return;
-            }
-
-            var invalidStatusses = new List<BuildingUnitStatus>
-            {
-                BuildingUnitStatus.Retired,
-                BuildingUnitStatus.NotRealized
-            };
-
-            if (invalidStatusses.Contains(buildingUnit.Status))
-            {
-                throw new BuildingUnitCannotBeRealizedException(buildingUnit.Status);
-            }
-
-            ApplyChange(new BuildingUnitWasRealizedV2(command.BuildingPersistentLocalId, command.BuildingUnitPersistentLocalId));
         }
 
         private static void GuardPolygon(Geometry? geometry)
@@ -166,7 +150,7 @@ namespace BuildingRegistry.Building
                 throw new InvalidPolygonException();
             }
         }
-        
+
         #region Metadata
         protected override void BeforeApplyChange(object @event)
         {
@@ -174,6 +158,8 @@ namespace BuildingRegistry.Building
             base.BeforeApplyChange(@event);
         }
         #endregion
+
+        #region Snapshot
 
         public object TakeSnapshot()
         {
@@ -188,5 +174,7 @@ namespace BuildingRegistry.Building
         }
 
         public ISnapshotStrategy Strategy { get; }
+
+        #endregion
     }
 }

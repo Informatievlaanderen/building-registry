@@ -56,7 +56,7 @@ namespace BuildingRegistry.Tests.AggregateTests.SnapshotTests
                     foreach (var data in buildingUnitData)
                     {
                         var buildingUnit = new BuildingUnit(o => { });
-                        buildingUnit.RestoreSnapshot(data);
+                        buildingUnit.RestoreSnapshot(fixture.Create<BuildingPersistentLocalId>(), data);
 
                         units.Add(buildingUnit);
                     }

@@ -59,6 +59,7 @@ namespace BuildingRegistry.Building
             {
                 var newBuildingUnit = BuildingUnit.Migrate(
                     ApplyChange,
+                    BuildingPersistentLocalId,
                     new BuildingUnitPersistentLocalId(buildingUnit.BuildingUnitPersistentLocalId),
                     BuildingUnitFunction.Parse(buildingUnit.Function),
                     BuildingUnitStatus.Parse(buildingUnit.Status),
@@ -78,7 +79,8 @@ namespace BuildingRegistry.Building
         private void When(BuildingWasPlannedV2 @event)
         {
             BuildingPersistentLocalId = new BuildingPersistentLocalId(@event.BuildingPersistentLocalId);
-            BuildingGeometry = new BuildingGeometry(new ExtendedWkbGeometry(@event.ExtendedWkbGeometry),
+            BuildingGeometry = new BuildingGeometry(
+                new ExtendedWkbGeometry(@event.ExtendedWkbGeometry),
                 BuildingGeometryMethod.Outlined);
 
             BuildingStatus = BuildingStatus.Planned;
@@ -134,7 +136,7 @@ namespace BuildingRegistry.Building
             foreach (var buildingUnitData in @event.BuildingUnits)
             {
                 var buildingUnit = new BuildingUnit(ApplyChange);
-                buildingUnit.RestoreSnapshot(buildingUnitData);
+                buildingUnit.RestoreSnapshot(BuildingPersistentLocalId, buildingUnitData);
 
                 _buildingUnits.Add(buildingUnit);
             }

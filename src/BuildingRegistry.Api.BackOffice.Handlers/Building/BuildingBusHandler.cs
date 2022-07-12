@@ -9,7 +9,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Building
     {
         protected IBuildings Buildings { get; }
 
-        public BuildingBusHandler(ICommandHandlerResolver bus, IBuildings buildings) : base(bus)
+        protected BuildingBusHandler(ICommandHandlerResolver bus, IBuildings buildings) : base(bus)
         {
             Buildings = buildings;
         }

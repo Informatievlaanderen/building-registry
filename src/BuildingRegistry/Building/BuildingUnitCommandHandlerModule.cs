@@ -20,7 +20,7 @@ namespace BuildingRegistry.Building
             Func<ISnapshotStore> getSnapshotStore,
             EventMapping eventMapping,
             EventSerializer eventSerializer,
-            ProvenanceFactory<Building> provenanceFactory)
+            IProvenanceFactory<Building> provenanceFactory)
         {
             For<PlanBuildingUnit>()
                 .AddSqlStreamStore(getStreamStore, getUnitOfWork, eventMapping, eventSerializer, getSnapshotStore)
@@ -31,7 +31,12 @@ namespace BuildingRegistry.Building
                     var streamId = new BuildingStreamId(message.Command.BuildingPersistentLocalId);
                     var building = await buildingRepository().GetAsync(streamId, ct);
 
-                    building.PlanBuildingUnit(message.Command);
+                    building.PlanBuildingUnit(
+                        message.Command.BuildingUnitPersistentLocalId,
+                        message.Command.PositionGeometryMethod,
+                        message.Command.Position,
+                        message.Command.Function,
+                        message.Command.HasDeviation);
                 });
 
             For<RealizeBuildingUnit>()
@@ -43,7 +48,7 @@ namespace BuildingRegistry.Building
                     var streamId = new BuildingStreamId(message.Command.BuildingPersistentLocalId);
                     var building = await buildingRepository().GetAsync(streamId, ct);
 
-                    building.RealizeBuildingUnit(message.Command);
+                    building.RealizeBuildingUnit(message.Command.BuildingUnitPersistentLocalId);
                 });
         }
     }
