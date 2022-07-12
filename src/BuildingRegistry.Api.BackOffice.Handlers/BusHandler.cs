@@ -12,7 +12,6 @@ namespace BuildingRegistry.Api.BackOffice.Handlers
     using Be.Vlaanderen.Basisregisters.CommandHandling.Idempotency;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Be.Vlaanderen.Basisregisters.Utilities.HexByteConvertor;
-    using BuildingRegistry.Building;
     using Microsoft.AspNetCore.Http;
     using Microsoft.EntityFrameworkCore;
 

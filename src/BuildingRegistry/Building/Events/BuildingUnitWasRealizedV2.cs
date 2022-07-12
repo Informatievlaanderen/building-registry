@@ -36,12 +36,10 @@ namespace BuildingRegistry.Building.Events
             int buildingPersistentLocalId,
             int buildingUnitPersistentLocalId,
             ProvenanceData provenance)
-        : this(
-            new BuildingPersistentLocalId(buildingPersistentLocalId),
-            new BuildingUnitPersistentLocalId(buildingUnitPersistentLocalId)
-            )
+            : this(
+                new BuildingPersistentLocalId(buildingPersistentLocalId),
+                new BuildingUnitPersistentLocalId(buildingUnitPersistentLocalId))
             => ((ISetProvenance)this).SetProvenance(provenance.ToProvenance());
-
 
         void ISetProvenance.SetProvenance(Provenance provenance) => Provenance = new ProvenanceData(provenance);
 

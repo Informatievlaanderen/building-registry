@@ -61,14 +61,14 @@ namespace BuildingRegistry.Building.Events
             string function,
             bool hasDeviation,
             ProvenanceData provenance)
-        : this(
-            new BuildingPersistentLocalId(buildingPersistentLocalId),
-            new BuildingUnitPersistentLocalId(buildingUnitPersistentLocalId),
-            BuildingUnitPositionGeometryMethod.Parse(geometryMethod),
-            new ExtendedWkbGeometry(extendedWkbGeometry),
-            BuildingUnitFunction.Parse(function),
-            hasDeviation)
-        => ((ISetProvenance)this).SetProvenance(provenance.ToProvenance());
+            : this(
+                new BuildingPersistentLocalId(buildingPersistentLocalId),
+                new BuildingUnitPersistentLocalId(buildingUnitPersistentLocalId),
+                BuildingUnitPositionGeometryMethod.Parse(geometryMethod),
+                new ExtendedWkbGeometry(extendedWkbGeometry),
+                BuildingUnitFunction.Parse(function),
+                hasDeviation)
+            => ((ISetProvenance)this).SetProvenance(provenance.ToProvenance());
 
         void ISetProvenance.SetProvenance(Provenance provenance) => Provenance = new ProvenanceData(provenance);
 

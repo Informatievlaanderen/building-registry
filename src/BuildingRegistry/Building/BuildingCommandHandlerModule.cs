@@ -21,7 +21,7 @@ namespace BuildingRegistry.Building
             Func<ISnapshotStore> getSnapshotStore,
             EventMapping eventMapping,
             EventSerializer eventSerializer,
-            ProvenanceFactory<Building> provenanceFactory)
+            IProvenanceFactory<Building> provenanceFactory)
         {
             For<MigrateBuilding>()
                 .AddSqlStreamStore(getStreamStore, getUnitOfWork, eventMapping, eventSerializer, getSnapshotStore)

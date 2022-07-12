@@ -16,7 +16,7 @@ namespace BuildingRegistry.Building.Commands
         public BuildingStatus BuildingStatus { get; }
         public BuildingGeometry BuildingGeometry { get; }
         public bool IsRemoved { get; }
-        public List<BuildingUnit> BuildingUnits { get; private set; }
+        public List<BuildingUnit> BuildingUnits { get; }
 
         public Provenance Provenance { get; }
 

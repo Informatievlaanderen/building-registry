@@ -1,8 +1,6 @@
 namespace BuildingRegistry.Building.Exceptions
 {
-    using Be.Vlaanderen.Basisregisters.AggregateSource;
-
-    public class BuildingUnitNotFoundException : DomainException
+    public class BuildingUnitNotFoundException : BuildingRegistryException
     {
         public BuildingUnitNotFoundException()
         { }
