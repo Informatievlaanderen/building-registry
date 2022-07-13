@@ -1,5 +1,6 @@
 Be.Vlaanderen.Basisregisters.MessageHandling.AwsSqs.Simple
 Be.Vlaanderen.Basisregisters.TicketingService.Abstractions
+Be.Vlaanderen.Basisregisters.TicketingService.Proxy.HttpProxy
 
 MediatR
 
