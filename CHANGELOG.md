@@ -1,3 +1,10 @@
+## [3.24.5](https://github.com/informatievlaanderen/building-registry/compare/v3.24.4...v3.24.5) (2022-07-13)
+
+
+### Bug Fixes
+
+* use ticketing system abstractions ([d2fb0ac](https://github.com/informatievlaanderen/building-registry/commit/d2fb0ac946e89740c356c0ba0460101e9e1818f2))
+
 ## [3.24.4](https://github.com/informatievlaanderen/building-registry/compare/v3.24.3...v3.24.4) (2022-07-12)
 
 ## [3.24.3](https://github.com/informatievlaanderen/building-registry/compare/v3.24.2...v3.24.3) (2022-07-11)
