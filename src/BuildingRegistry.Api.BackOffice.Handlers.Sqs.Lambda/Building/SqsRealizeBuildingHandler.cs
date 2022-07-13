@@ -32,7 +32,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Sqs.Lambda.Building
             var ticketId = request.TicketId;
 
             // update ticket to pending
-            await Ticketing.Pending(ticketId);
+            await Ticketing.Pending(ticketId, cancellationToken);
             
             var buildingPersistentLocalId = new BuildingPersistentLocalId(request.PersistentLocalId);
 
@@ -53,7 +53,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Sqs.Lambda.Building
                 cancellationToken);
 
             // update ticket to complete
-            await Ticketing.Complete(ticketId, new ETagResponse(buildingHash));
+            await Ticketing.Complete(ticketId, new TicketResult(new ETagResponse(buildingHash)), cancellationToken);
             
             return Unit.Value;
         }

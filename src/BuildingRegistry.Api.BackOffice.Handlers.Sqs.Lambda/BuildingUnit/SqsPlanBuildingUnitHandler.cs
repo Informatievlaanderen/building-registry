@@ -36,7 +36,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Sqs.Lambda.BuildingUnit
             var ticketId = request.TicketId;
 
             // update ticket to pending
-            await Ticketing.Pending(ticketId);
+            await Ticketing.Pending(ticketId, cancellationToken);
 
             var buildingPersistentLocalId = new BuildingPersistentLocalId(OsloPuriValidatorExtensions.ParsePersistentLocalId(request.GebouwId));
             var buildingUnitPersistentLocalId = new BuildingUnitPersistentLocalId(_persistentLocalIdGenerator.GenerateNextPersistentLocalId());
@@ -62,7 +62,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Sqs.Lambda.BuildingUnit
             var buildingUnitLastEventHash = await GetBuildingUnitHash(buildingPersistentLocalId, buildingUnitPersistentLocalId, cancellationToken);
 
             // update ticket to complete
-            await Ticketing.Complete(ticketId, new PlanBuildingUnitResponse(buildingUnitPersistentLocalId, buildingUnitLastEventHash));
+            await Ticketing.Complete(ticketId, new TicketResult(new PlanBuildingUnitResponse(buildingUnitPersistentLocalId, buildingUnitLastEventHash)), cancellationToken);
 
             return Unit.Value;
         }
