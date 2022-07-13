@@ -28,7 +28,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Sqs.Building
 
         public async Task<Unit> Handle(SqsPlaceBuildingUnderConstructionRequest request, CancellationToken cancellationToken)
         {
-            var ticketId = await _ticketing.CreateTicket(nameof(BuildingRegistry));
+            var ticketId = await _ticketing.CreateTicket(nameof(BuildingRegistry), cancellationToken);
             request.TicketId = ticketId;
 
             _ = await CopyToQueue(_sqsOptions, SqsQueueName.Value, request, new SqsQueueOptions(request.PersistentLocalId.ToString()), cancellationToken);

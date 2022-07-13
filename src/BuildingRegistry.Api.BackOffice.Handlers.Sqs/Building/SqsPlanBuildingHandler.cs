@@ -31,7 +31,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Sqs.Building
 
         public async Task<Unit> Handle(SqsPlanBuildingRequest request, CancellationToken cancellationToken)
         {
-            var ticketId = await _ticketing.CreateTicket(nameof(BuildingRegistry));
+            var ticketId = await _ticketing.CreateTicket(nameof(BuildingRegistry), cancellationToken);
             request.TicketId = ticketId;
                 
             var buildingPersistentLocalId = _persistentLocalIdGenerator.GenerateNextPersistentLocalId();
