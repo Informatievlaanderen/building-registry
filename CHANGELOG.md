@@ -1,3 +1,10 @@
+## [3.24.6](https://github.com/informatievlaanderen/building-registry/compare/v3.24.5...v3.24.6) (2022-07-14)
+
+
+### Bug Fixes
+
+* use ticketing http proxy ([e361ef3](https://github.com/informatievlaanderen/building-registry/commit/e361ef3b7d4232720ef1123ba87758ac5a3a3992))
+
 ## [3.24.5](https://github.com/informatievlaanderen/building-registry/compare/v3.24.4...v3.24.5) (2022-07-13)
 
 
