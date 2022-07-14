@@ -10,28 +10,30 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Sqs.Lambda.BuildingUnit
     using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Responses;
     using BuildingRegistry.Building;
     using MediatR;
-    using Newtonsoft.Json;
+    using Microsoft.AspNetCore.Http;
     using TicketingService.Abstractions;
+    using static Microsoft.AspNetCore.Http.Results;
 
-    public class SqsPlanBuildingUnitHandler : SqsBuildingUnitBusHandler, IRequestHandler<SqsPlanBuildingUnitRequest, Unit>
+    public class SqsPlanBuildingUnitHandler : SqsBuildingUnitBusHandler, IRequestHandler<SqsPlanBuildingUnitRequest, IResult>
     {
         private readonly IPersistentLocalIdGenerator _persistentLocalIdGenerator;
         private readonly IdempotencyContext _idempotencyContext;
 
         public SqsPlanBuildingUnitHandler(
             ITicketing ticketing,
+            ITicketingUrl ticketingUrl,
             ICommandHandlerResolver bus,
             IBuildings buildings,
             BackOfficeContext backOfficeContext,
             IPersistentLocalIdGenerator persistentLocalIdGenerator,
             IdempotencyContext idempotencyContext)
-            : base(ticketing, bus, backOfficeContext, buildings)
+            : base(ticketing, ticketingUrl, bus, backOfficeContext, buildings)
         {
             _persistentLocalIdGenerator = persistentLocalIdGenerator;
             _idempotencyContext = idempotencyContext;
         }
 
-        public async Task<Unit> Handle(SqsPlanBuildingUnitRequest request, CancellationToken cancellationToken)
+        public async Task<IResult> Handle(SqsPlanBuildingUnitRequest request, CancellationToken cancellationToken)
         {
             var ticketId = request.TicketId;
 
@@ -64,7 +66,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Sqs.Lambda.BuildingUnit
             // update ticket to complete
             await Ticketing.Complete(ticketId, new TicketResult(new PlanBuildingUnitResponse(buildingUnitPersistentLocalId, buildingUnitLastEventHash)), cancellationToken);
 
-            return Unit.Value;
+            return Ok();
         }
     }
 }

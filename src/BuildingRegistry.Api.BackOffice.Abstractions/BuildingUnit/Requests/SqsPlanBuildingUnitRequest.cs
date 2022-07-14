@@ -10,10 +10,11 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Requests
     using BuildingRegistry.Building.Commands;
     using Converters;
     using MediatR;
+    using Microsoft.AspNetCore.Http;
     using Newtonsoft.Json;
     using Swashbuckle.AspNetCore.Filters;
 
-    public class SqsPlanBuildingUnitRequest : IRequest<Unit>
+    public class SqsPlanBuildingUnitRequest : IRequest<IResult>
     {
         /// <summary>
         /// Identificator van het gebouw.

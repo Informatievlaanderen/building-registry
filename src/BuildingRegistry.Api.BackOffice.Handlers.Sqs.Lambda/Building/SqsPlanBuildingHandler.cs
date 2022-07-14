@@ -8,25 +8,28 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Sqs.Lambda.Building
     using BuildingRegistry.Api.BackOffice.Abstractions.Building.Responses;
     using BuildingRegistry.Building;
     using MediatR;
+    using Microsoft.AspNetCore.Http;
     using TicketingService.Abstractions;
+    using static Microsoft.AspNetCore.Http.Results;
 
-    public class SqsPlanBuildingHandler : SqsBusHandler, IRequestHandler<SqsPlanBuildingRequest, Unit>
+    public class SqsPlanBuildingHandler : SqsBusHandler, IRequestHandler<SqsPlanBuildingRequest, IResult>
     {
         private readonly IdempotencyContext _idempotencyContext;
         private readonly IBuildings _buildings;
 
         public SqsPlanBuildingHandler(
             ITicketing ticketing,
+            ITicketingUrl ticketingUrl,
             ICommandHandlerResolver bus,
             IdempotencyContext idempotencyContext,
             IBuildings buildings)
-            : base(ticketing, bus)
+            : base(ticketing, ticketingUrl, bus)
         {
             _idempotencyContext = idempotencyContext;
             _buildings = buildings;
         }
 
-        public async Task<Unit> Handle(SqsPlanBuildingRequest request, CancellationToken cancellationToken)
+        public async Task<IResult> Handle(SqsPlanBuildingRequest request, CancellationToken cancellationToken)
         {
             var ticketId = request.TicketId;
 
@@ -35,7 +38,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Sqs.Lambda.Building
 
             if (!int.TryParse(request.MessageGroupId, out int buildingPersistentLocalId))
             {
-                return Unit.Value;
+                return BadRequest();
             }
             
             var nextBuildingPersistentLocalId = new BuildingPersistentLocalId(buildingPersistentLocalId);
@@ -59,7 +62,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Sqs.Lambda.Building
             // update ticket to complete
             await Ticketing.Complete(ticketId, new TicketResult(new PlanBuildingResponse(nextBuildingPersistentLocalId, buildingHash)), cancellationToken);
             
-            return Unit.Value;
+            return Ok();
         }
     }
 }
