@@ -5,26 +5,32 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Sqs.BuildingUnit
     using Abstractions.BuildingUnit.Requests;
     using Be.Vlaanderen.Basisregisters.MessageHandling.AwsSqs.Simple;
     using MediatR;
+    using Microsoft.AspNetCore.Http;
     using Microsoft.Extensions.Logging;
+    using TicketingService.Abstractions;
     using static Be.Vlaanderen.Basisregisters.MessageHandling.AwsSqs.Simple.Sqs;
+    using static Microsoft.AspNetCore.Http.Results;
 
-    public class SqsPlanBuildingUnitHandler : IRequestHandler<SqsPlanBuildingUnitRequest, Unit>
+    public class SqsPlanBuildingUnitHandler : IRequestHandler<SqsPlanBuildingUnitRequest, IResult>
     {
         private readonly SqsOptions _sqsOptions;
+        private readonly ITicketingUrl _ticketingUrl;
         private readonly IPersistentLocalIdGenerator _persistentLocalIdGenerator;
         private readonly ILogger<SqsPlanBuildingUnitHandler> _logger;
 
         public SqsPlanBuildingUnitHandler(
             SqsOptions sqsOptions,
+            ITicketingUrl ticketingUrl,
             IPersistentLocalIdGenerator persistentLocalIdGenerator,
             ILogger<SqsPlanBuildingUnitHandler> logger)
         {
             _sqsOptions = sqsOptions;
+            _ticketingUrl = ticketingUrl;
             _persistentLocalIdGenerator = persistentLocalIdGenerator;
             _logger = logger;
         }
         
-        public async Task<Unit> Handle(SqsPlanBuildingUnitRequest request, CancellationToken cancellationToken)
+        public async Task<IResult> Handle(SqsPlanBuildingUnitRequest request, CancellationToken cancellationToken)
         {
             var buildingPersistentLocalId = _persistentLocalIdGenerator.GenerateNextPersistentLocalId();
             request.MessageGroupId = buildingPersistentLocalId.ToString();
@@ -33,7 +39,8 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Sqs.BuildingUnit
 
             _logger.LogDebug($"Request sent to queue {SqsQueueName.Value}");
 
-            return Unit.Value;
+            var location = _ticketingUrl.For(request.TicketId);
+            return Accepted(location);
         }
     }
 }

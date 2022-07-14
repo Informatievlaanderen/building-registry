@@ -8,26 +8,28 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Sqs.Lambda.Building
     using BuildingRegistry.Api.BackOffice.Abstractions.Building.Requests;
     using BuildingRegistry.Building;
     using MediatR;
-    using Newtonsoft.Json;
+    using Microsoft.AspNetCore.Http;
     using TicketingService.Abstractions;
+    using static Microsoft.AspNetCore.Http.Results;
 
-    public class SqsRealizeBuildingHandler : SqsBusHandler, IRequestHandler<SqsRealizeBuildingRequest, Unit>
+    public class SqsRealizeBuildingHandler : SqsBusHandler, IRequestHandler<SqsRealizeBuildingRequest, IResult>
     {
         private readonly IdempotencyContext _idempotencyContext;
         private readonly IBuildings _buildings;
 
         public SqsRealizeBuildingHandler(
             ITicketing ticketing,
+            ITicketingUrl ticketingUrl,
             ICommandHandlerResolver bus,
             IdempotencyContext idempotencyContext,
             IBuildings buildings)
-            : base(ticketing, bus)
+            : base(ticketing, ticketingUrl, bus)
         {
             _idempotencyContext = idempotencyContext;
             _buildings = buildings;
         }
 
-        public async Task<Unit> Handle(SqsRealizeBuildingRequest request, CancellationToken cancellationToken)
+        public async Task<IResult> Handle(SqsRealizeBuildingRequest request, CancellationToken cancellationToken)
         {
             var ticketId = request.TicketId;
 
@@ -55,7 +57,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Sqs.Lambda.Building
             // update ticket to complete
             await Ticketing.Complete(ticketId, new TicketResult(new ETagResponse(buildingHash)), cancellationToken);
             
-            return Unit.Value;
+            return Ok();
         }
     }
 }

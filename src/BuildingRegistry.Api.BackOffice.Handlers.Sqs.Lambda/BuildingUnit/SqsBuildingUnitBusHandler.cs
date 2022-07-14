@@ -17,10 +17,11 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Sqs.Lambda.BuildingUnit
 
         protected SqsBuildingUnitBusHandler(
             ITicketing ticketing,
+            ITicketingUrl ticketingUrl,
             ICommandHandlerResolver bus,
             BackOfficeContext backOfficeContext,
             IBuildings buildings)
-            : base(ticketing, bus)
+            : base(ticketing, ticketingUrl, bus)
         {
             Buildings = buildings;
             BackOfficeContext = backOfficeContext;

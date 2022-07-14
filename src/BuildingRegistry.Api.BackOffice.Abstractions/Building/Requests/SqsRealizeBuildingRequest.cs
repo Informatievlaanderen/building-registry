@@ -7,10 +7,11 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.Building.Requests
     using BuildingRegistry.Building;
     using BuildingRegistry.Building.Commands;
     using MediatR;
+    using Microsoft.AspNetCore.Http;
     using Newtonsoft.Json;
 
     [DataContract(Name = "RealiseerGebouw", Namespace = "")]
-    public class SqsRealizeBuildingRequest : IRequest<Unit>
+    public class SqsRealizeBuildingRequest : IRequest<IResult>
     {
         public int PersistentLocalId { get; set; }
 

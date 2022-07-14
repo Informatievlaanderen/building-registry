@@ -7,11 +7,12 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.Building.Requests
     using BuildingRegistry.Building;
     using BuildingRegistry.Building.Commands;
     using MediatR;
+    using Microsoft.AspNetCore.Http;
     using Newtonsoft.Json;
     using Swashbuckle.AspNetCore.Filters;
 
     [DataContract(Name = "PlanGebouw", Namespace = "")]
-    public class SqsPlanBuildingRequest : IRequest<Unit>
+    public class SqsPlanBuildingRequest : IRequest<IResult>
     {
         /// <summary>
         /// De schets van het gebouw in GML-3 formaat met Lambert 72 referentie systeem.

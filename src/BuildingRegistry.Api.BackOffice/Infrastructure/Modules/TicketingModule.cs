@@ -1,5 +1,7 @@
 namespace BuildingRegistry.Api.BackOffice.Infrastructure.Modules
 {
+    using System;
+    using Abstractions;
     using Autofac;
     using Microsoft.Extensions.Configuration;
     using TicketingService.Abstractions;
@@ -20,6 +22,15 @@ namespace BuildingRegistry.Api.BackOffice.Infrastructure.Modules
             builder
                 .RegisterInstance(new HttpProxyTicketing(baseUrl))
                 .As<ITicketing>()
+                .SingleInstance();
+
+            var baseUri = new Uri(baseUrl);
+            var scheme = baseUri.Scheme;
+            var host = $"{baseUri.Host}:{baseUri.Port}";
+            var pathBase = baseUri.AbsolutePath;
+            builder
+                .RegisterInstance(new TicketingUrl(scheme, host, pathBase))
+                .As<ITicketingUrl>()
                 .SingleInstance();
         }
     }

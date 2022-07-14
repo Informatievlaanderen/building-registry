@@ -20,11 +20,13 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Sqs.Lambda.Building
     public abstract class SqsBusHandler
     {
         protected ITicketing Ticketing { get; }
+        protected ITicketingUrl TicketingUrl { get; }
         protected ICommandHandlerResolver Bus { get; }
 
-        protected SqsBusHandler(ITicketing ticketing, ICommandHandlerResolver bus)
+        protected SqsBusHandler(ITicketing ticketing, ITicketingUrl ticketingUrl, ICommandHandlerResolver bus)
         {
             Ticketing = ticketing;
+            TicketingUrl = ticketingUrl;
             Bus = bus;
         }
 
