@@ -1,3 +1,12 @@
+## [3.24.7](https://github.com/informatievlaanderen/building-registry/compare/v3.24.6...v3.24.7) (2022-07-15)
+
+
+### Bug Fixes
+
+* add ticketing url ([0d01fc7](https://github.com/informatievlaanderen/building-registry/commit/0d01fc704bcfe02ff15d4f122e47ccbb634ad739))
+* bump TicketingService.Abstractions dependency ([9ab31e1](https://github.com/informatievlaanderen/building-registry/commit/9ab31e1729d5d35bcd3324b7fb42ec8bc8d2d6fa))
+* remove reference from csproj file ([8a3444d](https://github.com/informatievlaanderen/building-registry/commit/8a3444d0f931b85df7bdc20f1c0413f9b7a7e600))
+
 ## [3.24.6](https://github.com/informatievlaanderen/building-registry/compare/v3.24.5...v3.24.6) (2022-07-14)
 
 
