@@ -1,3 +1,10 @@
+# [3.25.0](https://github.com/informatievlaanderen/building-registry/compare/v3.24.7...v3.25.0) (2022-07-15)
+
+
+### Features
+
+* add RealizeBecauseBuildingWasRealized on buildingunit ([ba3e9d4](https://github.com/informatievlaanderen/building-registry/commit/ba3e9d48227d4c8235be9c2a73f0182ac0c3d116))
+
 ## [3.24.7](https://github.com/informatievlaanderen/building-registry/compare/v3.24.6...v3.24.7) (2022-07-15)
 
 
