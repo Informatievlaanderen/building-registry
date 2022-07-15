@@ -2,6 +2,7 @@ namespace BuildingRegistry.Building
 {
     using System;
     using System.Collections.Generic;
+    using System.Collections.ObjectModel;
     using System.Linq;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
     using Events;
@@ -33,6 +34,12 @@ namespace BuildingRegistry.Building
             return unit;
         }
 
+        private List<BuildingUnitStatus> StatusesWhichCannotBeRealized => new List<BuildingUnitStatus>
+            {
+                BuildingUnitStatus.Retired,
+                BuildingUnitStatus.NotRealized
+            };
+
         public void Realize()
         {
             if (IsRemoved)
@@ -45,15 +52,30 @@ namespace BuildingRegistry.Building
                 return;
             }
 
-            var invalidStatuses = new List<BuildingUnitStatus>
-            {
-                BuildingUnitStatus.Retired,
-                BuildingUnitStatus.NotRealized
-            };
-
-            if (invalidStatuses.Contains(Status))
+            if (StatusesWhichCannotBeRealized.Contains(Status))
             {
                 throw new BuildingUnitCannotBeRealizedException(Status);
+            }
+
+            Apply(new BuildingUnitWasRealizedV2(_buildingPersistentLocalId, BuildingUnitPersistentLocalId));
+        }
+
+        // todo: review Arne
+        public void RealizeBecauseBuildingWasRealized()
+        {
+            if (IsRemoved)
+            {
+                return;
+            }
+
+            if (Status == BuildingUnitStatus.Realized)
+            {
+                return;
+            }
+
+            if (StatusesWhichCannotBeRealized.Contains(Status))
+            {
+                return;
             }
 
             Apply(new BuildingUnitWasRealizedV2(_buildingPersistentLocalId, BuildingUnitPersistentLocalId));
