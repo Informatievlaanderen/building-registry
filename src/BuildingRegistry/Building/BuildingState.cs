@@ -98,6 +98,11 @@ namespace BuildingRegistry.Building
         {
             BuildingStatus = BuildingStatus.Realized;
 
+            foreach (var unit in _buildingUnits)
+            {
+                unit.RealizeBecauseBuildingWasRealized();
+            }
+
             _lastEvent = @event;
         }
 

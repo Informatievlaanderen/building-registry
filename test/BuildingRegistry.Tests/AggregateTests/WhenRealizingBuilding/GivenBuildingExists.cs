@@ -1,6 +1,8 @@
 namespace BuildingRegistry.Tests.AggregateTests.WhenRealizingBuilding
 {
+    using System;
     using System.Collections.Generic;
+    using System.Linq;
     using AutoFixture;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
     using Be.Vlaanderen.Basisregisters.AggregateSource.Snapshotting;
@@ -14,6 +16,9 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRealizingBuilding
     using FluentAssertions;
     using Xunit;
     using Xunit.Abstractions;
+    using BuildingGeometry = Building.BuildingGeometry;
+    using BuildingId = Building.BuildingId;
+    using BuildingStatus = Building.BuildingStatus;
     using BuildingUnit = Building.Commands.BuildingUnit;
 
     public class GivenBuildingExists : BuildingRegistryTest
@@ -119,6 +124,11 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRealizingBuilding
         [Fact]
         public void StateCheck()
         {
+            var plannedBuildingUnitPersistentLocalId = new BuildingRegistry.Legacy.PersistentLocalId(123);
+            var retiredBuildingUnitPersistentLocalId = new BuildingRegistry.Legacy.PersistentLocalId(456);
+            var notRealizedBuildingUnitPersistentLocalId = new BuildingRegistry.Legacy.PersistentLocalId(789);
+            var removedBuildingUnitPersistentLocalId = new BuildingRegistry.Legacy.PersistentLocalId(101);
+
             var buildingPersistentLocalId = Fixture.Create<BuildingPersistentLocalId>();
             var buildingWasMigrated = new BuildingWasMigrated(
                 Fixture.Create<BuildingId>(),
@@ -128,13 +138,67 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRealizingBuilding
                 Fixture.Create<BuildingGeometry>(),
                 isRemoved: false,
                 new List<BuildingUnit>()
+                {
+                    new BuildingUnit(
+                        new BuildingRegistry.Legacy.BuildingUnitId(Guid.NewGuid()),
+                        plannedBuildingUnitPersistentLocalId,
+                        BuildingRegistry.Legacy.BuildingUnitFunction.Unknown,
+                        BuildingRegistry.Legacy.BuildingUnitStatus.Planned,
+                        new List<AddressPersistentLocalId>(),
+                        Fixture.Create<BuildingRegistry.Legacy.BuildingUnitPosition>(),
+                        false),
+                    new BuildingUnit(
+                        new BuildingRegistry.Legacy.BuildingUnitId(Guid.NewGuid()),
+                        retiredBuildingUnitPersistentLocalId,
+                        BuildingRegistry.Legacy.BuildingUnitFunction.Unknown,
+                        BuildingRegistry.Legacy.BuildingUnitStatus.Retired,
+                        new List<AddressPersistentLocalId>(),
+                        Fixture.Create<BuildingRegistry.Legacy.BuildingUnitPosition>(),
+                        false),
+                    new BuildingUnit(
+                        new BuildingRegistry.Legacy.BuildingUnitId(Guid.NewGuid()),
+                        notRealizedBuildingUnitPersistentLocalId,
+                        BuildingRegistry.Legacy.BuildingUnitFunction.Unknown,
+                        BuildingRegistry.Legacy.BuildingUnitStatus.NotRealized,
+                        new List<AddressPersistentLocalId>(),
+                        Fixture.Create<BuildingRegistry.Legacy.BuildingUnitPosition>(),
+                        false),
+                    new BuildingUnit(
+                        new BuildingRegistry.Legacy.BuildingUnitId(Guid.NewGuid()),
+                        removedBuildingUnitPersistentLocalId,
+                        BuildingRegistry.Legacy.BuildingUnitFunction.Unknown,
+                        BuildingRegistry.Legacy.BuildingUnitStatus.Planned,
+                        new List<AddressPersistentLocalId>(),
+                        Fixture.Create<BuildingRegistry.Legacy.BuildingUnitPosition>(),
+                        true)
+                }
             );
             ((ISetProvenance)buildingWasMigrated).SetProvenance(Fixture.Create<Provenance>());
 
             var sut = new BuildingFactory(NoSnapshotStrategy.Instance).Create();
             sut.Initialize(new List<object> { buildingWasMigrated });
+
+            // Act
             sut.RealizeConstruction();
+
+            // Assert
             sut.BuildingStatus.Should().Be(BuildingStatus.Realized);
+
+            var plannedUnit = sut.BuildingUnits
+                .First(x => x.BuildingUnitPersistentLocalId == new BuildingUnitPersistentLocalId(plannedBuildingUnitPersistentLocalId));
+            plannedUnit.Status.Should().Be(BuildingUnitStatus.Realized);
+
+            var retiredUnit = sut.BuildingUnits
+                .First(x => x.BuildingUnitPersistentLocalId == new BuildingUnitPersistentLocalId(retiredBuildingUnitPersistentLocalId));
+            retiredUnit.Status.Should().Be(BuildingUnitStatus.Retired);
+
+            var notRealizedUnit = sut.BuildingUnits
+                .First(x => x.BuildingUnitPersistentLocalId == new BuildingUnitPersistentLocalId(notRealizedBuildingUnitPersistentLocalId));
+            notRealizedUnit.Status.Should().Be(BuildingUnitStatus.NotRealized);
+
+            var removedUnit = sut.BuildingUnits
+                .First(x => x.BuildingUnitPersistentLocalId == new BuildingUnitPersistentLocalId(removedBuildingUnitPersistentLocalId));
+            removedUnit.Status.Should().Be(BuildingUnitStatus.Planned);
         }
     }
 }
