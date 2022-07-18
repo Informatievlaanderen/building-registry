@@ -10,6 +10,7 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
     using Be.Vlaanderen.Basisregisters.AggregateSource;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
     using Building;
+    using BuildingRegistry.Building.Exceptions;
     using FluentValidation;
     using FluentValidation.Results;
     using Handlers;
@@ -69,6 +70,12 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
             {
                 throw exception switch
                 {
+                    BuildingUnitCannotBePlannedException =>
+                        throw CreateValidationException(
+                            ValidationErrorCodes.BuildingUnit.BuildingUnitCannotBePlanned,
+                            string.Empty,
+                            ValidationErrorMessages.BuildingUnit.BuildingUnitCannotBePlanned),
+
                     _ => new ValidationException(new List<ValidationFailure>
                         { new ValidationFailure(string.Empty, exception.Message) })
                 };
