@@ -1,3 +1,10 @@
+# [3.26.0](https://github.com/informatievlaanderen/building-registry/compare/v3.25.0...v3.26.0) (2022-07-18)
+
+
+### Features
+
+* plan building unit validition building istatus ([732bc1d](https://github.com/informatievlaanderen/building-registry/commit/732bc1d8de6baad90b05f80f3bdf62cc0e32dc08))
+
 # [3.25.0](https://github.com/informatievlaanderen/building-registry/compare/v3.24.7...v3.25.0) (2022-07-15)
 
 
