@@ -97,12 +97,37 @@ namespace BuildingRegistry.Projections.Wfs.BuildingUnitV2
 
                 SetVersion(unit, message.Message.Provenance.Timestamp);
             });
+
+            When<Envelope<CommonBuildingUnitWasAddedV2>>(async (context, message, ct) =>
+            {
+                var commonBuildingUnitV2 = new BuildingUnitV2
+                {
+                    Id = PersistentLocalIdHelper.CreateBuildingUnitId(message.Message.BuildingUnitPersistentLocalId),
+                    BuildingPersistentLocalId = message.Message.BuildingPersistentLocalId,
+                    BuildingUnitPersistentLocalId = message.Message.BuildingUnitPersistentLocalId,
+                    Position = (Point)_wkbReader.Read(message.Message.ExtendedWkbGeometry.ToByteArray()),
+                    PositionMethod = message.Message.GeometryMethod,
+                    Function = MapFunction(BuildingUnitFunction.Common),
+                    Version = message.Message.Provenance.Timestamp,
+                    IsRemoved = false,
+                    Status = BuildingUnitStatus.Parse(message.Message.BuildingUnitStatus)
+                };
+
+                SetPosition(
+                    commonBuildingUnitV2,
+                    message.Message.ExtendedWkbGeometry,
+                    MapGeometryMethod(BuildingUnitPositionGeometryMethod.Parse(message.Message.GeometryMethod)));
+
+                await context.BuildingUnitsV2.AddAsync(commonBuildingUnitV2, ct);
+            });
         }
 
         private static void SetVersion(BuildingUnitV2 unit, Instant timestamp) => unit.Version = timestamp;
 
         public static string MapFunction(BuildingUnitFunction function)
-            => function == BuildingUnitFunction.Common ? GebouweenheidFunctie.GemeenschappelijkDeel.ToString() : GebouweenheidFunctie.NietGekend.ToString();
+            => function == BuildingUnitFunction.Common
+                ? GebouweenheidFunctie.GemeenschappelijkDeel.ToString()
+                : GebouweenheidFunctie.NietGekend.ToString();
 
         private void SetPosition(BuildingUnitV2 buildingUnit, string extendedWkbPosition, string method)
         {

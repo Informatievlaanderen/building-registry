@@ -47,7 +47,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wms
                 .Given(new Envelope<BuildingWasMigrated>(new Envelope(buildingWasMigrated, metadata)))
                 .Then(async ct =>
                 {
-                    var buildingDetailItemV2 = (await ct.BuildingsV2.FindAsync(buildingWasMigrated.BuildingPersistentLocalId));
+                    var buildingDetailItemV2 = await ct.BuildingsV2.FindAsync(buildingWasMigrated.BuildingPersistentLocalId);
                     buildingDetailItemV2.Should().NotBeNull();
 
                     buildingDetailItemV2.Id.Should().Be(PersistentLocalIdHelper.CreateBuildingId(buildingWasMigrated.BuildingPersistentLocalId));
@@ -74,7 +74,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wms
                 .Given(new Envelope<BuildingWasMigrated>(new Envelope(buildingWasMigrated, metadata)))
                 .Then(async ct =>
                 {
-                    var buildingDetailItemV2 = (await ct.BuildingsV2.FindAsync(buildingWasMigrated.BuildingPersistentLocalId));
+                    var buildingDetailItemV2 = await ct.BuildingsV2.FindAsync(buildingWasMigrated.BuildingPersistentLocalId);
                     buildingDetailItemV2.Should().BeNull();
                 });
         }
@@ -92,7 +92,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wms
                 .Given(new Envelope<BuildingWasPlannedV2>(new Envelope(buildingWasPlannedV2, metadata)))
                 .Then(async ct =>
                 {
-                    var buildingDetailItemV2 = (await ct.BuildingsV2.FindAsync(buildingWasPlannedV2.BuildingPersistentLocalId));
+                    var buildingDetailItemV2 = await ct.BuildingsV2.FindAsync(buildingWasPlannedV2.BuildingPersistentLocalId);
                     buildingDetailItemV2.Should().NotBeNull();
 
                     buildingDetailItemV2.Id.Should().Be(PersistentLocalIdHelper.CreateBuildingId(buildingWasPlannedV2.BuildingPersistentLocalId));
@@ -126,6 +126,29 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wms
                     var buildingDetailItemV2 = await ct.BuildingsV2.FindAsync(buildingUnitWasPlannedV2.BuildingPersistentLocalId);
                     buildingDetailItemV2.Should().NotBeNull();
                     buildingDetailItemV2.Version.Should().Be(buildingUnitWasPlannedV2.Provenance.Timestamp);
+                });
+        }
+
+        [Fact]
+        public async Task WhenCommonBuildingUnitWasAddedV2()
+        {
+            var buildingWasPlannedV2 = _fixture.Create<BuildingWasPlannedV2>();
+            var commonBuildingUnitWasAddedV2 = _fixture.Create<CommonBuildingUnitWasAddedV2>();
+
+            await Sut
+                .Given(new Envelope<BuildingWasPlannedV2>(new Envelope(buildingWasPlannedV2, new Dictionary<string, object>
+                    {
+                        { AddEventHashPipe.HashMetadataKey, buildingWasPlannedV2.GetHash() }
+                    })),
+                    new Envelope<CommonBuildingUnitWasAddedV2>(new Envelope(commonBuildingUnitWasAddedV2, new Dictionary<string, object>
+                    {
+                        { AddEventHashPipe.HashMetadataKey, commonBuildingUnitWasAddedV2.GetHash() }
+                    })))
+                .Then(async ct =>
+                {
+                    var buildingDetailItemV2 = await ct.BuildingsV2.FindAsync(commonBuildingUnitWasAddedV2.BuildingPersistentLocalId);
+                    buildingDetailItemV2.Should().NotBeNull();
+                    buildingDetailItemV2.Version.Should().Be(commonBuildingUnitWasAddedV2.Provenance.Timestamp);
                 });
         }
 

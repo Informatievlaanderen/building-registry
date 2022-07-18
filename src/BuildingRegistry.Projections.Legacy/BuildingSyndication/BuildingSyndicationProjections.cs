@@ -932,6 +932,30 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
                     unit.Version = message.Message.Provenance.Timestamp;
                 }, ct);
             });
+
+            When<Envelope<CommonBuildingUnitWasAddedV2>>(async (context, message, ct) =>
+            {
+                await context.CreateNewBuildingSyndicationItem(
+                    message.Message.BuildingPersistentLocalId,
+                    message,
+                    x =>
+                    {
+                        var commonBuildingUnitSyndicationItem = new BuildingUnitSyndicationItemV2
+                        {
+                            Position = message.Position,
+                            PersistentLocalId = message.Message.BuildingUnitPersistentLocalId,
+                            Status = BuildingRegistry.Building.BuildingUnitStatus.Parse(message.Message.BuildingUnitStatus),
+                            Function = BuildingRegistry.Building.BuildingUnitFunction.Common,
+                            PointPosition = message.Message.ExtendedWkbGeometry.ToByteArray(),
+                            PositionMethod = BuildingRegistry.Building.BuildingUnitPositionGeometryMethod.Parse(message.Message.GeometryMethod),
+                            Version = message.Message.Provenance.Timestamp,
+                            Addresses = new Collection<BuildingUnitAddressSyndicationItemV2>()
+                        };
+
+                        x.BuildingUnitsV2.Add(commonBuildingUnitSyndicationItem);
+                    },
+                    ct);
+            });
         }
 
         private static BuildingGeometryMethod MapBuildingGeometryMethod(BuildingRegistry.Building.BuildingGeometryMethod buildingGeometryMethod)

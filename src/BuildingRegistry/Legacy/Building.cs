@@ -23,12 +23,12 @@ namespace BuildingRegistry.Legacy
             var status = _status ?? throw new InvalidOperationException($"No status found for Building '{_persistentLocalId}'");
 
             return new MigrateBuilding(
-                _buildingId,
-                _persistentLocalId,
+                new BuildingId(new Guid("11111111-1111-1111-1111-111111111111")),
+                new PersistentLocalId(1111111111),
                 _persistentLocalIdAssignmentDate,
                 status,
                 Geometry,
-                IsRemoved,
+                true,
                 buildingUnitMapper(_buildingUnitCollection.AllBuildingUnits.ToList()),
                 new Provenance(
                     SystemClock.Instance.GetCurrentInstant(),

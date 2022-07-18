@@ -99,6 +99,7 @@ namespace BuildingRegistry.Building
         }
 
         public void PlanBuildingUnit(
+            IPersistentLocalIdGenerator persistentLocalIdGenerator,
             BuildingUnitPersistentLocalId buildingUnitPersistentLocalId,
             BuildingUnitPositionGeometryMethod positionGeometryMethod,
             ExtendedWkbGeometry? position,
@@ -106,7 +107,7 @@ namespace BuildingRegistry.Building
             bool hasDeviation)
         {
             var validStatuses = new[]
-                { BuildingStatus.Planned, BuildingStatus.UnderConstruction, BuildingStatus.Realized };
+                {BuildingStatus.Planned, BuildingStatus.UnderConstruction, BuildingStatus.Realized};
 
             if (!validStatuses.Contains(BuildingStatus))
             {
@@ -123,6 +124,35 @@ namespace BuildingRegistry.Building
                 finalPosition,
                 function,
                 hasDeviation));
+
+            AddCommonBuildingUnit(persistentLocalIdGenerator);
+        }
+
+        private void AddCommonBuildingUnit(IPersistentLocalIdGenerator persistentLocalIdGenerator)
+        {
+            if (BuildingStatus != BuildingStatus.Planned
+                && BuildingStatus != BuildingStatus.UnderConstruction
+                && BuildingStatus != BuildingStatus.Realized)
+            {
+                return;
+            }
+
+            if (_buildingUnits.RequiresCommonBuildingUnit)
+            {
+                var commonBuildingUnitPersistentLocalId = new BuildingUnitPersistentLocalId(persistentLocalIdGenerator.GenerateNextPersistentLocalId());
+
+                var commonBuildingUnitStatus = BuildingStatus == BuildingStatus.Realized
+                    ? BuildingUnitStatus.Realized
+                    : BuildingUnitStatus.Planned;
+
+                ApplyChange(new CommonBuildingUnitWasAddedV2(
+                    BuildingPersistentLocalId,
+                    commonBuildingUnitPersistentLocalId,
+                    commonBuildingUnitStatus,
+                    BuildingUnitPositionGeometryMethod.DerivedFromObject,
+                    BuildingGeometry.Center,
+                    hasDeviation: false));
+            }
         }
 
         public void RealizeBuildingUnit(BuildingUnitPersistentLocalId buildingUnitPersistentLocalId)

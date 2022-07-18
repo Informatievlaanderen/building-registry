@@ -14,7 +14,7 @@ namespace BuildingRegistry.Building
         private string _lastSnapshotEventHash = string.Empty;
         private ProvenanceData _lastSnapshotProvenance;
 
-        private readonly List<BuildingUnit> _buildingUnits = new List<BuildingUnit>();
+        private readonly BuildingUnits _buildingUnits = new BuildingUnits();
 
         public BuildingPersistentLocalId BuildingPersistentLocalId { get; private set; }
         public BuildingStatus BuildingStatus { get; private set; }
@@ -42,6 +42,7 @@ namespace BuildingRegistry.Building
 
             Register<BuildingUnitWasPlannedV2>(When);
             Register<BuildingUnitWasRealizedV2>(When);
+            Register<CommonBuildingUnitWasAddedV2>(When);
 
             Register<BuildingSnapshot>(When);
         }
@@ -148,6 +149,15 @@ namespace BuildingRegistry.Building
 
             _lastSnapshotEventHash = @event.LastEventHash;
             _lastSnapshotProvenance = @event.LastProvenanceData;
+        }
+
+        private void When(CommonBuildingUnitWasAddedV2 @event)
+        {
+            var commonBuildingUnit = new BuildingUnit(ApplyChange);
+            commonBuildingUnit.Route(@event);
+            _buildingUnits.Add(commonBuildingUnit);
+
+            _lastEvent = @event;
         }
     }
 }

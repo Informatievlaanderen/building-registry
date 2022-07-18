@@ -20,7 +20,8 @@ namespace BuildingRegistry.Building
             Func<ISnapshotStore> getSnapshotStore,
             EventMapping eventMapping,
             EventSerializer eventSerializer,
-            IProvenanceFactory<Building> provenanceFactory)
+            IProvenanceFactory<Building> provenanceFactory,
+            IPersistentLocalIdGenerator persistentLocalIdGenerator)
         {
             For<PlanBuildingUnit>()
                 .AddSqlStreamStore(getStreamStore, getUnitOfWork, eventMapping, eventSerializer, getSnapshotStore)
@@ -32,6 +33,7 @@ namespace BuildingRegistry.Building
                     var building = await buildingRepository().GetAsync(streamId, ct);
 
                     building.PlanBuildingUnit(
+                        persistentLocalIdGenerator,
                         message.Command.BuildingUnitPersistentLocalId,
                         message.Command.PositionGeometryMethod,
                         message.Command.Position,

@@ -77,6 +77,12 @@ namespace BuildingRegistry.Projections.Wms.BuildingV2
                 var item = await context.BuildingsV2.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);
                 item.Version = message.Message.Provenance.Timestamp;
             });
+
+            When<Envelope<CommonBuildingUnitWasAddedV2>>(async (context, message, ct) =>
+            {
+                var item = await context.BuildingsV2.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);
+                item.Version = message.Message.Provenance.Timestamp;
+            });
         }
 
         public static string MapMethod(BuildingGeometryMethod method)

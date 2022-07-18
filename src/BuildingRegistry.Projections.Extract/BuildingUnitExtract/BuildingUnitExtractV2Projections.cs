@@ -136,6 +136,30 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
                         UpdateVersie(itemV2, message.Message.Provenance.Timestamp);
                     }, ct);
             });
+
+            When<Envelope<CommonBuildingUnitWasAddedV2>>(async (context, message, ct) =>
+            {
+                var commonBuildingUnitItemV2 = new BuildingUnitExtractItemV2
+                {
+                    BuildingPersistentLocalId = message.Message.BuildingPersistentLocalId,
+                    BuildingUnitPersistentLocalId = message.Message.BuildingUnitPersistentLocalId,
+                    DbaseRecord = new BuildingUnitDbaseRecord
+                    {
+                        id = { Value = $"{extractConfig.Value.DataVlaanderenNamespaceBuildingUnit}/{message.Message.BuildingUnitPersistentLocalId}" },
+                        gebouwehid = { Value = message.Message.BuildingUnitPersistentLocalId },
+                        gebouwid = { Value = message.Message.BuildingPersistentLocalId.ToString() },
+                        functie = { Value = BuildingUnitFunction.Common },
+                        status = { Value = MapStatus(BuildingUnitStatus.Parse(message.Message.BuildingUnitStatus)) },
+                        posgeommet = { Value = MapGeometryMethod(BuildingUnitPositionGeometryMethod.Parse(message.Message.GeometryMethod)) },
+                        versieid = { Value = message.Message.Provenance.Timestamp.ToBelgianDateTimeOffset().FromDateTimeOffset() }
+                    }.ToBytes(_encoding)
+                };
+
+                var geometry = wkbReader.Read(message.Message.ExtendedWkbGeometry.ToByteArray());
+                UpdateGeometry(commonBuildingUnitItemV2, geometry);
+
+                await context.BuildingUnitExtractV2.AddAsync(commonBuildingUnitItemV2, ct);
+            });
         }
 
         private static string MapFunction(BuildingUnitFunction function)

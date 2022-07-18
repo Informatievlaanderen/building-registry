@@ -94,6 +94,26 @@ namespace BuildingRegistry.Projections.Wms.BuildingUnitV2
 
                 SetVersion(unit, message.Message.Provenance.Timestamp);
             });
+
+            When<Envelope<CommonBuildingUnitWasAddedV2>>(async (context, message, ct) =>
+            {
+                var buildingUnitV2 = new BuildingUnitV2
+                {
+                    Id = PersistentLocalIdHelper.CreateBuildingUnitId(message.Message.BuildingUnitPersistentLocalId),
+                    BuildingPersistentLocalId = message.Message.BuildingPersistentLocalId,
+                    BuildingUnitPersistentLocalId = message.Message.BuildingUnitPersistentLocalId,
+                    Function = MapFunction(BuildingUnitFunction.Common),
+                    Version = message.Message.Provenance.Timestamp,
+                    Status = BuildingUnitStatus.Parse(message.Message.BuildingUnitStatus)
+                };
+
+                SetPosition(
+                    buildingUnitV2,
+                    message.Message.ExtendedWkbGeometry,
+                    MapGeometryMethod(BuildingUnitPositionGeometryMethod.Parse(message.Message.GeometryMethod)));
+
+                await context.BuildingUnitsV2.AddAsync(buildingUnitV2, ct);
+            });
         }
 
         private static void SetVersion(BuildingUnitV2 unit, Instant timestamp)
