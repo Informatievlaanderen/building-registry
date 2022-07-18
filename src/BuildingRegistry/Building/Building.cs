@@ -105,6 +105,14 @@ namespace BuildingRegistry.Building
             BuildingUnitFunction function,
             bool hasDeviation)
         {
+            var validStatuses = new[]
+                { BuildingStatus.Planned, BuildingStatus.UnderConstruction, BuildingStatus.Realized };
+
+            if (!validStatuses.Contains(BuildingStatus))
+            {
+                throw new BuildingUnitCannotBePlannedException();
+            }
+
             // validate command
             var finalPosition = position ?? BuildingGeometry.Center;
 
