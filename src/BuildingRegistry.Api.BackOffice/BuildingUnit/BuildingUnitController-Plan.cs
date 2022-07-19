@@ -76,6 +76,12 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
                             string.Empty,
                             ValidationErrorMessages.BuildingUnit.BuildingUnitCannotBePlanned),
 
+                    BuildingUnitOutsideGeometryBuildingException =>
+                        throw CreateValidationException(
+                            ValidationErrorCodes.BuildingUnit.BuildingUnitOutsideGeometryBuilding,
+                            string.Empty,
+                            ValidationErrorMessages.BuildingUnit.BuildingUnitOutsideGeometryBuilding),
+
                     _ => new ValidationException(new List<ValidationFailure>
                         { new ValidationFailure(string.Empty, exception.Message) })
                 };

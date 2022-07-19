@@ -1,5 +1,7 @@
 namespace BuildingRegistry.Tests.BackOffice.Api.WhenPlanningBuildingUnit
 {
+    using System;
+    using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
     using Be.Vlaanderen.Basisregisters.GrAr.Edit.Contracts;
@@ -11,6 +13,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenPlanningBuildingUnit
     using BuildingRegistry.Api.BackOffice.Building;
     using BuildingRegistry.Api.BackOffice.BuildingUnit;
     using FluentAssertions;
+    using FluentValidation;
     using Moq;
     using Xunit;
     using Xunit.Abstractions;
@@ -40,7 +43,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenPlanningBuildingUnit
             {
                 GebouwId = $"/{buildingPersistentLocalId}",
                 PositieGeometrieMethode = PositieGeometrieMethode.AangeduidDoorBeheerder,
-                Positie = "<gml:Point srsName=\"https://www.opengis.net/def/crs/EPSG/0/3137\" xmlns:gml=\"http://www.opengis.net/gml/3.2\"><gml:pos>103671.37 192046.71</gml:pos></gml:Point>",
+                Positie = "<gml:Point srsName=\"https://www.opengis.net/def/crs/EPSG/0/31370\" xmlns:gml=\"http://www.opengis.net/gml/3.2\"><gml:pos>103671.37 192046.71</gml:pos></gml:Point>",
                 Functie = GebouweenheidFunctie.NietGekend,
                 AfwijkingVastgesteld = false
             };
@@ -57,6 +60,71 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenPlanningBuildingUnit
 
             result.StatusCode.Should().Be(202);
             result.Location.Should().Be(string.Format(BuildingUnitDetailUrl, buildingUnitPersistentLocalId));
+        }
+
+        [Theory]
+        [InlineData("")]
+        [InlineData(null)]
+        public void
+            WithPositionGeometryMethodAppointedByAdministratorAndMissingPosition_ThenValidationExceptionIsThrown(string? position)
+        {
+            var buildingPersistentLocalId = new BuildingPersistentLocalId(123);
+
+            var request = new PlanBuildingUnitRequest
+            {
+                GebouwId = $"/{buildingPersistentLocalId}",
+                PositieGeometrieMethode = PositieGeometrieMethode.AangeduidDoorBeheerder,
+                Positie = position,
+                Functie = GebouweenheidFunctie.NietGekend,
+                AfwijkingVastgesteld = false
+            };
+
+            //Act
+            Func<Task> act = async () => await _controller.Plan(
+                ResponseOptions,
+                new PlanBuildingUnitRequestValidator(),
+                request,
+                CancellationToken.None);
+
+            //Assert
+            act
+                .Should()
+                .ThrowAsync<ValidationException>()
+                .Result
+                .Where(x => x.Errors.Any(e =>
+                    e.ErrorCode == "GebouweendheidPositieValidatie"
+                    && e.ErrorMessage == "De verplichte parameter 'Geometriepunt' ontbreekt."));
+        }
+
+        [Fact]
+        public void WithPositionHavingInvalidFormat_ThenValidationExceptionIsThrown()
+        {
+            var buildingPersistentLocalId = new BuildingPersistentLocalId(123);
+
+            var request = new PlanBuildingUnitRequest()
+            {
+                GebouwId = $"/{buildingPersistentLocalId}",
+                PositieGeometrieMethode = PositieGeometrieMethode.AangeduidDoorBeheerder,
+                Positie = "<gml:Point srsName=\"https://www.opengis.net/def/crs/EPSG/0/31370\"><gml:pos>103671.37 192046.71</gml:pos></gml:Point>",
+                Functie = GebouweenheidFunctie.NietGekend,
+                AfwijkingVastgesteld = false
+            };
+
+            //Act
+            Func<Task> act = async () => await _controller.Plan(
+                ResponseOptions,
+                new PlanBuildingUnitRequestValidator(),
+                request,
+                CancellationToken.None);
+
+            //Assert
+            act
+                .Should()
+                .ThrowAsync<ValidationException>()
+                .Result
+                .Where(x => x.Errors.Any(e =>
+                    e.ErrorCode == "GebouweenheidPositieformaatValidatie"
+                    && e.ErrorMessage == "De positie is geen geldige gml-puntgeometrie."));
         }
     }
 }
