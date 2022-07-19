@@ -115,7 +115,14 @@ namespace BuildingRegistry.Building
             }
 
             // validate command
-            var finalPosition = position ?? BuildingGeometry.Center;
+            var finalPosition = positionGeometryMethod != BuildingUnitPositionGeometryMethod.AppointedByAdministrator
+                ? BuildingGeometry.Center
+                : position;
+
+            if (!IsBuildingUnitPositionValidForBuildingGeometry(positionGeometryMethod, finalPosition))
+            {
+                throw new BuildingUnitOutsideGeometryBuildingException();
+            }
 
             ApplyChange(new BuildingUnitWasPlannedV2(
                 BuildingPersistentLocalId,
@@ -153,6 +160,19 @@ namespace BuildingRegistry.Building
                     BuildingGeometry.Center,
                     hasDeviation: false));
             }
+        }
+
+        private bool IsBuildingUnitPositionValidForBuildingGeometry(
+            BuildingUnitPositionGeometryMethod positionGeometryMethod,
+            ExtendedWkbGeometry? position)
+        {
+            if (positionGeometryMethod != BuildingUnitPositionGeometryMethod.AppointedByAdministrator)
+            {
+                return true;
+            }
+
+            return position is not null
+                   && BuildingGeometry.Contains(position);
         }
 
         public void RealizeBuildingUnit(BuildingUnitPersistentLocalId buildingUnitPersistentLocalId)
