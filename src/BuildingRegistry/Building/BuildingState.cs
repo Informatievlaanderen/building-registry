@@ -117,14 +117,7 @@ namespace BuildingRegistry.Building
 
         private void When(BuildingUnitWasRealizedV2 @event)
         {
-            var buildingUnit = BuildingUnits.FirstOrDefault(x => x.BuildingUnitPersistentLocalId == @event.BuildingUnitPersistentLocalId);
-
-            if (buildingUnit is null)
-            {
-                throw new BuildingUnitNotFoundException(
-                    BuildingPersistentLocalId,
-                    @event.BuildingUnitPersistentLocalId);
-            }
+            var buildingUnit = BuildingUnits.First(x => x.BuildingUnitPersistentLocalId == @event.BuildingUnitPersistentLocalId);
 
             buildingUnit.Route(@event);
         }
