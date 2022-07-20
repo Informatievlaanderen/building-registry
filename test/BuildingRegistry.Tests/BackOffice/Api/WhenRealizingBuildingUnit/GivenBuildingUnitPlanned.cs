@@ -19,6 +19,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenRealizingBuildingUnit
     using FluentAssertions;
     using FluentValidation;
     using Microsoft.AspNetCore.Http;
+    using Microsoft.AspNetCore.Mvc;
     using Moq;
     using Xunit;
     using Xunit.Abstractions;
@@ -40,7 +41,12 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenRealizingBuildingUnit
         [Fact]
         public async Task WithoutIfMatchHeader_ThenAcceptedResponseIsExpected()
         {
+            var buildingPersistentLocalId = new BuildingPersistentLocalId(123);
             var buildingUnitPersistentLocalId = new BuildingUnitPersistentLocalId(456);
+
+            _backOfficeContext.BuildingUnitBuildings.Add(new BuildingUnitBuilding(buildingUnitPersistentLocalId,
+                buildingPersistentLocalId));
+            _backOfficeContext.SaveChanges();
 
             MockMediator
                 .Setup(x => x.Send(It.IsAny<RealizeBuildingUnitRequest>(), CancellationToken.None).Result)
@@ -165,7 +171,12 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenRealizingBuildingUnit
         [Fact]
         public void WhenBuildingUnitNotFound_ThenValidationException()
         {
+            var buildingPersistentLocalId = new BuildingPersistentLocalId(123);
             var buildingUnitPersistentLocalId = new BuildingUnitPersistentLocalId(456);
+
+            _backOfficeContext.BuildingUnitBuildings.Add(new BuildingUnitBuilding(buildingUnitPersistentLocalId,
+                buildingPersistentLocalId));
+            _backOfficeContext.SaveChanges();
 
             MockMediator
                 .Setup(x => x.Send(It.IsAny<RealizeBuildingUnitRequest>(), CancellationToken.None).Result)
@@ -194,9 +205,41 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenRealizingBuildingUnit
         }
 
         [Fact]
-        public void WhenBuildingUnitIsRemoved_ThenValidationException()
+        public void WhenBuildingUnitNotFound_ThenReturnNotFound()
         {
             var buildingUnitPersistentLocalId = new BuildingUnitPersistentLocalId(456);
+
+            var request = new RealizeBuildingUnitRequest()
+            {
+                BuildingUnitPersistentLocalId = buildingUnitPersistentLocalId
+            };
+
+            //Act
+            Func<Task> act = async () => await _controller.Realize(
+                ResponseOptions,
+                request,
+                string.Empty,
+                CancellationToken.None);
+
+            // Assert
+            act
+                .Should()
+                .ThrowAsync<ApiException>()
+                .Result
+                .Where(x =>
+                    x.Message == "Onbestaande gebouweenheid."
+                    && x.StatusCode == StatusCodes.Status404NotFound);
+        }
+
+        [Fact]
+        public void WhenBuildingUnitIsRemoved_ThenValidationException()
+        {
+            var buildingPersistentLocalId = new BuildingPersistentLocalId(123);
+            var buildingUnitPersistentLocalId = new BuildingUnitPersistentLocalId(456);
+
+            _backOfficeContext.BuildingUnitBuildings.Add(new BuildingUnitBuilding(buildingUnitPersistentLocalId,
+                buildingPersistentLocalId));
+            _backOfficeContext.SaveChanges();
 
             MockMediator
                 .Setup(x => x.Send(It.IsAny<RealizeBuildingUnitRequest>(), CancellationToken.None).Result)
@@ -227,7 +270,12 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenRealizingBuildingUnit
         [Fact]
         public void WhenBuildingUnitStatusInvalid_ThenValidationException()
         {
+            var buildingPersistentLocalId = new BuildingPersistentLocalId(123);
             var buildingUnitPersistentLocalId = new BuildingUnitPersistentLocalId(456);
+
+            _backOfficeContext.BuildingUnitBuildings.Add(new BuildingUnitBuilding(buildingUnitPersistentLocalId,
+                buildingPersistentLocalId));
+            _backOfficeContext.SaveChanges();
 
             MockMediator
                 .Setup(x => x.Send(It.IsAny<RealizeBuildingUnitRequest>(), CancellationToken.None).Result)

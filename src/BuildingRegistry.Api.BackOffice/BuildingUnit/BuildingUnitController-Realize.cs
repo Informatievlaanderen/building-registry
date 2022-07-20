@@ -45,13 +45,13 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
         {
             try
             {
+                if (!TryGetBuildingIdForBuildingUnit(request.BuildingUnitPersistentLocalId, out var buildingPersistentLocalId))
+                {
+                    throw new BuildingUnitNotFoundException();
+                }
+
                 if (!string.IsNullOrWhiteSpace(ifMatchHeaderValue))
                 {
-                    if (!TryGetBuildingIdForBuildingUnit(request.BuildingUnitPersistentLocalId, out var buildingPersistentLocalId))
-                    {
-                        return NotFound();
-                    }
-
                     var etag = await GetBuildingUnitEtag(buildingPersistentLocalId, request.BuildingUnitPersistentLocalId, cancellationToken);
 
                     if (!IfMatchHeaderMatchesEtag(ifMatchHeaderValue, etag))
@@ -69,7 +69,7 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
             }
             catch (IdempotencyException)
             {
-                return Accepted();
+                return Accepted();         
             }
             catch (AggregateNotFoundException)
             {
