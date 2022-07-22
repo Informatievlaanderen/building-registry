@@ -6,6 +6,7 @@ namespace BuildingRegistry.Legacy
     using Be.Vlaanderen.Basisregisters.Crab;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Be.Vlaanderen.Basisregisters.Utilities.HexByteConvertor;
+    using BuildingRegistry.Building;
     using BuildingRegistry.Building.Commands;
     using Commands;
     using Crab;
@@ -23,12 +24,12 @@ namespace BuildingRegistry.Legacy
             var status = _status ?? throw new InvalidOperationException($"No status found for Building '{_persistentLocalId}'");
 
             return new MigrateBuilding(
-                new BuildingId(new Guid("11111111-1111-1111-1111-111111111111")),
-                new PersistentLocalId(1111111111),
+               _buildingId,
+               _persistentLocalId,
                 _persistentLocalIdAssignmentDate,
                 status,
                 Geometry,
-                true,
+                IsRemoved,
                 buildingUnitMapper(_buildingUnitCollection.AllBuildingUnits.ToList()),
                 new Provenance(
                     SystemClock.Instance.GetCurrentInstant(),

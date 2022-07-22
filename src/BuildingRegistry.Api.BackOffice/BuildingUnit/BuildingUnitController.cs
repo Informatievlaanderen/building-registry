@@ -57,6 +57,7 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
             return new ETag(ETagType.Strong, buildingUnit.LastEventHash);
         }
 
+        // todo: move to handler
         protected bool TryGetBuildingIdForBuildingUnit(int buildingUnitPersistentLocalId, out int buildingPersistentLocalId)
         {
             buildingPersistentLocalId = 0;
