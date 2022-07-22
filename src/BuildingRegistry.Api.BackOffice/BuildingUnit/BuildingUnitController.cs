@@ -19,7 +19,7 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
     {
         private readonly IMediator _mediator;
         private readonly IBuildings _buildingRepository;
-        private readonly BackOfficeContext _backOfficeContext;
+        protected readonly BackOfficeContext BackOfficeContext;
 
         public BuildingUnitController(
             IMediator mediator,
@@ -29,7 +29,7 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
         {
             _mediator = mediator;
             _buildingRepository = buildingsRepository;
-            _backOfficeContext = backOfficeContext;
+            BackOfficeContext = backOfficeContext;
         }
 
         protected bool IfMatchHeaderMatchesEtag(string ifMatchHeaderValue, ETag etag)
@@ -55,23 +55,6 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
             }
 
             return new ETag(ETagType.Strong, buildingUnit.LastEventHash);
-        }
-
-        // todo: move to handler
-        protected bool TryGetBuildingIdForBuildingUnit(int buildingUnitPersistentLocalId, out int buildingPersistentLocalId)
-        {
-            buildingPersistentLocalId = 0;
-
-            var buildingUnitBuilding = _backOfficeContext.BuildingUnitBuildings
-                .FirstOrDefault(x => x.BuildingUnitPersistentLocalId == buildingUnitPersistentLocalId);
-
-            if (buildingUnitBuilding is null)
-            {
-                return false;
-            }
-
-            buildingPersistentLocalId = buildingUnitBuilding.BuildingPersistentLocalId;
-            return true;
         }
     }
 }

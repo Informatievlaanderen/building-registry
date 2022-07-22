@@ -29,11 +29,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.BuildingUnit
         public async Task<ETagResponse> Handle(RealizeBuildingUnitRequest request, CancellationToken cancellationToken)
         {
             var buildingUnitPersistentLocalId = new BuildingUnitPersistentLocalId(request.BuildingUnitPersistentLocalId);
-
-            if (!request.BuildingUnitPersistentLocalId.TryGetBuildingIdForBuildingUnit(BackOfficeContext, out var buildingPersistentLocalId))
-            {
-                throw new InvalidOperationException();
-            }
+            var buildingPersistentLocalId = BackOfficeContext.GetBuildingIdForBuildingUnit(request.BuildingUnitPersistentLocalId);
 
             var command = request.ToCommand(
                 buildingPersistentLocalId,
