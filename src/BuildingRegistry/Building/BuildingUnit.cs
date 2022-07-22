@@ -54,7 +54,7 @@ namespace BuildingRegistry.Building
 
             if (StatusesWhichCannotBeRealized.Contains(Status))
             {
-                throw new BuildingUnitCannotBeRealizedException(Status);
+                throw new BuildingUnitStatusPreventsBuildingUnitRealizationException();
             }
 
             Apply(new BuildingUnitWasRealizedV2(_buildingPersistentLocalId, BuildingUnitPersistentLocalId));

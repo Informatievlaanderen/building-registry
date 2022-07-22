@@ -86,10 +86,15 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
                     
                     BuildingUnitIsRemovedException => new ApiException(ValidationErrorMessages.BuildingUnit.BuildingUnitIsRemoved, StatusCodes.Status410Gone),
 
-                    BuildingUnitCannotBeRealizedException => CreateValidationException(
+                    BuildingUnitStatusPreventsBuildingUnitRealizationException => CreateValidationException(
                         ValidationErrorCodes.BuildingUnit.BuildingUnitCannotBeRealized,
                         string.Empty,
                         ValidationErrorMessages.BuildingUnit.BuildingUnitCannotBeRealized),
+
+                    BuildingStatusPreventsBuildingUnitRealizationException => CreateValidationException(
+                        ValidationErrorCodes.BuildingUnit.BuildingStatusNotInRealized,
+                        string.Empty,
+                        ValidationErrorMessages.BuildingUnit.BuildingStatusNotInRealized),
 
                     _ => new ValidationException(new List<ValidationFailure>
                         { new ValidationFailure(string.Empty, exception.Message) })

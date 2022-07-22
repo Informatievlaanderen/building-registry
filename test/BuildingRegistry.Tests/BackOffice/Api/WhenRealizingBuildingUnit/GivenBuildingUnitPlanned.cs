@@ -231,7 +231,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenRealizingBuildingUnit
 
             MockMediator
                 .Setup(x => x.Send(It.IsAny<RealizeBuildingUnitRequest>(), CancellationToken.None).Result)
-                .Throws(new BuildingUnitCannotBeRealizedException(BuildingUnitStatus.NotRealized));
+                .Throws(new BuildingUnitStatusPreventsBuildingUnitRealizationException());
 
             var request = new RealizeBuildingUnitRequest()
             {
@@ -254,6 +254,38 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenRealizingBuildingUnit
                     x.Errors.Any(error
                         => error.ErrorCode == "GebouweenheidGehistoreerdOfNietGerealiseerd"
                                           && error.ErrorMessage == "Deze actie is enkel toegestaan op gebouweenheden met status 'gepland'."));
+        }
+
+        [Fact]
+        public void WhenBuildingStatusInvalid_ThenValidationException()
+        {
+            var buildingUnitPersistentLocalId = new BuildingUnitPersistentLocalId(456);
+
+            MockMediator
+                .Setup(x => x.Send(It.IsAny<RealizeBuildingUnitRequest>(), CancellationToken.None).Result)
+                .Throws(new BuildingStatusPreventsBuildingUnitRealizationException());
+
+            var request = new RealizeBuildingUnitRequest()
+            {
+                BuildingUnitPersistentLocalId = buildingUnitPersistentLocalId
+            };
+
+            //Act
+            Func<Task> act = async () => await _controller.Realize(
+                ResponseOptions,
+                request,
+                string.Empty,
+                CancellationToken.None);
+
+            // Assert
+            act
+                .Should()
+                .ThrowAsync<ValidationException>()
+                .Result
+                .Where(x =>
+                    x.Errors.Any(error
+                        => error.ErrorCode == "GebouwStatusNietInGerealiseerd"
+                                          && error.ErrorMessage == "Deze actie is enkel toegestaan binnen een gerealiseerd gebouw."));
         }
     }
 }
