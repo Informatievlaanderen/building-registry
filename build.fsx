@@ -61,6 +61,8 @@ Target.create "Publish_Solution" (fun _ ->
     "BuildingRegistry.Api.BackOffice"
     "BuildingRegistry.Api.BackOffice.Abstractions"
     "BuildingRegistry.Api.BackOffice.Handlers"
+    "BuildingRegistry.Api.BackOffice.Handlers.Sqs"
+    "BuildingRegistry.Api.BackOffice.Handlers.Sqs.Lambda"
     "BuildingRegistry.Consumer.Address"
     "BuildingRegistry.Projections.Legacy"
     "BuildingRegistry.Projections.Extract"
