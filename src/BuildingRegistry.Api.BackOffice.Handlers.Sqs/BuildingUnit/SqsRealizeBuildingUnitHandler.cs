@@ -36,10 +36,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Sqs.BuildingUnit
 
         public async Task<IResult> Handle(SqsRealizeBuildingUnitRequest request, CancellationToken cancellationToken)
         {
-            if (!request.PersistentLocalId.TryGetBuildingIdForBuildingUnit(_backOfficeContext, out var buildingPersistentLocalId))
-            {
-                throw new InvalidOperationException();
-            }
+            var buildingPersistentLocalId = _backOfficeContext.GetBuildingIdForBuildingUnit(request.PersistentLocalId);
 
             request.MessageGroupId = buildingPersistentLocalId.ToString();
 

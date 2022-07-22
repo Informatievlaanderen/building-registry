@@ -205,33 +205,6 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenRealizingBuildingUnit
         }
 
         [Fact]
-        public void WhenBuildingUnitNotFound_ThenReturnNotFound()
-        {
-            var buildingUnitPersistentLocalId = new BuildingUnitPersistentLocalId(456);
-
-            var request = new RealizeBuildingUnitRequest()
-            {
-                BuildingUnitPersistentLocalId = buildingUnitPersistentLocalId
-            };
-
-            //Act
-            Func<Task> act = async () => await _controller.Realize(
-                ResponseOptions,
-                request,
-                string.Empty,
-                CancellationToken.None);
-
-            // Assert
-            act
-                .Should()
-                .ThrowAsync<ApiException>()
-                .Result
-                .Where(x =>
-                    x.Message == "Onbestaande gebouweenheid."
-                    && x.StatusCode == StatusCodes.Status404NotFound);
-        }
-
-        [Fact]
         public void WhenBuildingUnitIsRemoved_ThenValidationException()
         {
             var buildingPersistentLocalId = new BuildingPersistentLocalId(123);

@@ -39,11 +39,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Sqs.Lambda.BuildingUnit
             await Ticketing.Pending(ticketId, cancellationToken);
 
             var buildingUnitPersistentLocalId = new BuildingUnitPersistentLocalId(request.PersistentLocalId);
-
-            if (!request.PersistentLocalId.TryGetBuildingIdForBuildingUnit(BackOfficeContext, out var buildingPersistentLocalId))
-            {
-                throw new InvalidOperationException();
-            }
+            var buildingPersistentLocalId = BackOfficeContext.GetBuildingIdForBuildingUnit(buildingUnitPersistentLocalId);
 
             var command = request.ToCommand(
                 buildingPersistentLocalId,
