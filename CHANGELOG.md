@@ -1,3 +1,10 @@
+## [3.26.1](https://github.com/informatievlaanderen/building-registry/compare/v3.26.0...v3.26.1) (2022-07-22)
+
+
+### Bug Fixes
+
+* turn off lambda processing ([598dbdc](https://github.com/informatievlaanderen/building-registry/commit/598dbdc7e0e9159dcd179f7914049f8c867ef560))
+
 # [3.26.0](https://github.com/informatievlaanderen/building-registry/compare/v3.25.0...v3.26.0) (2022-07-18)
 
 
