@@ -37,6 +37,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRealizingBuildingUnit
                 .Given(
                     new BuildingStreamId(Fixture.Create<BuildingPersistentLocalId>()),
                     Fixture.Create<BuildingWasPlannedV2>(),
+                    Fixture.Create<BuildingWasRealizedV2>(),
                     Fixture.Create<BuildingUnitWasPlannedV2>())
                 .When(command)
                 .Then(new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
@@ -52,6 +53,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRealizingBuildingUnit
                 .Given(
                     new BuildingStreamId(Fixture.Create<BuildingPersistentLocalId>()),
                     Fixture.Create<BuildingWasPlannedV2>(),
+                    Fixture.Create<BuildingWasRealizedV2>(),
                     Fixture.Create<BuildingUnitWasPlannedV2>(),
                     Fixture.Create<BuildingUnitWasRealizedV2>())
                 .When(command)
@@ -69,7 +71,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRealizingBuildingUnit
                 Fixture.Create<BuildingId>(),
                 command.BuildingPersistentLocalId,
                 Fixture.Create<BuildingPersistentLocalIdAssignmentDate>(),
-                BuildingStatus.Planned,
+                BuildingStatus.Realized,
                 Fixture.Create<BuildingGeometry>(),
                 isRemoved: false,
                 new List<BuildingUnit>
@@ -91,7 +93,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRealizingBuildingUnit
                     new BuildingStreamId(Fixture.Create<BuildingPersistentLocalId>()),
                     buildingWasMigrated)
                 .When(command)
-                .Throws(new BuildingUnitCannotBeRealizedException(BuildingUnitStatus.Parse(status))));
+                .Throws(new BuildingUnitStatusPreventsBuildingUnitRealizationException()));
         }
 
 
@@ -104,7 +106,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRealizingBuildingUnit
                 Fixture.Create<BuildingId>(),
                 command.BuildingPersistentLocalId,
                 Fixture.Create<BuildingPersistentLocalIdAssignmentDate>(),
-                BuildingStatus.Planned,
+                BuildingStatus.Realized,
                 Fixture.Create<BuildingGeometry>(),
                 isRemoved: false,
                 new List<BuildingUnit>()
@@ -128,7 +130,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRealizingBuildingUnit
                 Fixture.Create<BuildingId>(),
                 command.BuildingPersistentLocalId,
                 Fixture.Create<BuildingPersistentLocalIdAssignmentDate>(),
-                BuildingStatus.Planned,
+                BuildingStatus.Realized,
                 Fixture.Create<BuildingGeometry>(),
                 isRemoved: false,
                 new List<BuildingUnit>
@@ -151,6 +153,40 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRealizingBuildingUnit
                     buildingWasMigrated)
                 .When(command)
                 .Throws(new BuildingUnitIsRemovedException(command.BuildingUnitPersistentLocalId)));
+        }
+
+        [Fact]
+        public void BuildingStatusNotValid_ThrowsBuildingStatusPreventsBuildingUnitRealizationException()
+        {
+            var command = Fixture.Create<RealizeBuildingUnit>();
+
+            var buildingWasMigrated = new BuildingWasMigrated(
+                Fixture.Create<BuildingId>(),
+                command.BuildingPersistentLocalId,
+                Fixture.Create<BuildingPersistentLocalIdAssignmentDate>(),
+                BuildingStatus.Planned,
+                Fixture.Create<BuildingGeometry>(),
+                isRemoved: false,
+                new List<BuildingUnit>
+                {
+                        new BuildingUnit(
+                            Fixture.Create<BuildingRegistry.Legacy.BuildingUnitId>(),
+                            Fixture.Create<BuildingRegistry.Legacy.PersistentLocalId>(),
+                            Fixture.Create<BuildingRegistry.Legacy.BuildingUnitFunction>(),
+                            BuildingRegistry.Legacy.BuildingUnitStatus.Planned,
+                            new List<AddressPersistentLocalId>(),
+                            Fixture.Create<BuildingRegistry.Legacy.BuildingUnitPosition>(),
+                            isRemoved: false)
+                }
+            );
+            ((ISetProvenance)buildingWasMigrated).SetProvenance(Fixture.Create<Provenance>());
+
+            Assert(new Scenario()
+                .Given(
+                    new BuildingStreamId(Fixture.Create<BuildingPersistentLocalId>()),
+                    buildingWasMigrated)
+                .When(command)
+                .Throws(new BuildingStatusPreventsBuildingUnitRealizationException()));
         }
 
         [Fact]

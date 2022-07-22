@@ -127,7 +127,10 @@ namespace BuildingRegistry.Building
 
         public void RealizeBuildingUnit(BuildingUnitPersistentLocalId buildingUnitPersistentLocalId)
         {
-            // todo: check if building is realized before accepting unit realization
+            if(BuildingStatus != BuildingStatus.Realized)
+            {
+                throw new BuildingStatusPreventsBuildingUnitRealizationException();
+            }
 
             var buildingUnit = BuildingUnits.FirstOrDefault(x => x.BuildingUnitPersistentLocalId == buildingUnitPersistentLocalId);
 

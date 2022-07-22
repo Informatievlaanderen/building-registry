@@ -19,7 +19,7 @@ namespace BuildingRegistry.Tests.BackOffice.Handlers.BuildingUnit
     using Xunit;
     using Xunit.Abstractions;
 
-    public class GivenRealizeBuildingUnitRequest : BuildingRegistryTest
+    public class GivenRealizeBuildingUnitRequest : BuildingRegistryBackOfficeTest
     {
         private readonly RealizeBuildingUnitHandler _sut;
         private readonly BackOfficeContext _backOfficeContext;
@@ -48,6 +48,14 @@ namespace BuildingRegistry.Tests.BackOffice.Handlers.BuildingUnit
                 buildingPersistentLocalId,
                 Fixture.Create<ExtendedWkbGeometry>(),
                 Fixture.Create<Provenance>()));
+
+            DispatchArrangeCommand(new PlaceBuildingUnderConstruction(
+                buildingPersistentLocalId,
+                Fixture.Create<Provenance>()));
+
+            DispatchArrangeCommand(new RealizeBuilding(
+                buildingPersistentLocalId,
+                Fixture.Create<Provenance>()));
             
             DispatchArrangeCommand(new PlanBuildingUnit(
                 buildingPersistentLocalId,
@@ -66,7 +74,7 @@ namespace BuildingRegistry.Tests.BackOffice.Handlers.BuildingUnit
             var response = await _sut.Handle(request, CancellationToken.None);
 
             response.Should().NotBeNull();
-            var stream = await Container.Resolve<IStreamStore>().ReadStreamBackwards(new StreamId(new BuildingStreamId(buildingPersistentLocalId)), 2, 1);
+            var stream = await Container.Resolve<IStreamStore>().ReadStreamBackwards(new StreamId(new BuildingStreamId(buildingPersistentLocalId)), 4, 1);
             stream.Messages.First().JsonMetadata.Should().Contain(response.LastEventHash);
         }
     }
