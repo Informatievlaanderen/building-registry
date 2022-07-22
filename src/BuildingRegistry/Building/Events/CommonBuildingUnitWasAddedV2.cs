@@ -10,10 +10,10 @@ namespace BuildingRegistry.Building.Events
 
     [EventTags(EventTag.For.Sync, EventTag.For.Edit, Tag.Building)]
     [EventName(EventName)]
-    [EventDescription("De gebouweenheid werd gepland.")]
-    public class BuildingUnitWasPlannedV2 : IBuildingEvent
+    [EventDescription("Een gebouweenheid gemeenschappelijk deel werd aangemaakt.")]
+    public class CommonBuildingUnitWasAddedV2 : IBuildingEvent
     {
-        public const string EventName = "BuildingUnitWasPlannedV2"; // BE CAREFUL CHANGING THIS!!
+        public const string EventName = "CommonBuildingUnitWasAddedV2"; // BE CAREFUL CHANGING THIS!!
 
         [EventPropertyDescription("Objectidentificator van het gebouw.")]
         public int BuildingPersistentLocalId { get; }
@@ -21,14 +21,14 @@ namespace BuildingRegistry.Building.Events
         [EventPropertyDescription("Objectidentificator van de gebouweenheid.")]
         public int BuildingUnitPersistentLocalId { get; }
 
+        [EventPropertyDescription("De status van de gebouweenheid. Mogelijkheden: Planned of Realized.")]
+        public string BuildingUnitStatus { get; set; }
+
         [EventPropertyDescription("Geometriemethode van de gebouwpositie. Mogelijkheden: Outlined of MeasuredByGrb.")]
         public string GeometryMethod { get; }
 
         [EventPropertyDescription("Extended WKB-voorstelling van de gebouweenheidpositie (Hexadecimale notatie).")]
         public string ExtendedWkbGeometry { get; }
-
-        [EventPropertyDescription("Functie van de gebouweenheid.")] // todo: correct description?
-        public string Function { get; }
 
         [EventPropertyDescription("Gebouweenheid afwijking.")]
         public bool HasDeviation { get; }
@@ -36,37 +36,37 @@ namespace BuildingRegistry.Building.Events
         [EventPropertyDescription("Metadata bij het event.")]
         public ProvenanceData Provenance { get; private set; }
 
-        public BuildingUnitWasPlannedV2(
+        public CommonBuildingUnitWasAddedV2(
             BuildingPersistentLocalId buildingPersistentLocalId,
             BuildingUnitPersistentLocalId buildingUnitPersistentLocalId,
+            BuildingUnitStatus buildingUnitStatus,
             BuildingUnitPositionGeometryMethod geometryMethod,
             ExtendedWkbGeometry extendedWkbGeometry,
-            BuildingUnitFunction function,
             bool hasDeviation)
         {
             BuildingPersistentLocalId = buildingPersistentLocalId;
             BuildingUnitPersistentLocalId = buildingUnitPersistentLocalId;
+            BuildingUnitStatus = buildingUnitStatus;
             GeometryMethod = geometryMethod;
             ExtendedWkbGeometry = extendedWkbGeometry;
-            Function = function;
             HasDeviation = hasDeviation;
         }
 
         [JsonConstructor]
-        private BuildingUnitWasPlannedV2(
+        private CommonBuildingUnitWasAddedV2(
             int buildingPersistentLocalId,
             int buildingUnitPersistentLocalId,
+            string buildingUnitStatus,
             string geometryMethod,
             string extendedWkbGeometry,
-            string function,
             bool hasDeviation,
             ProvenanceData provenance)
             : this(
                 new BuildingPersistentLocalId(buildingPersistentLocalId),
                 new BuildingUnitPersistentLocalId(buildingUnitPersistentLocalId),
+                BuildingRegistry.Building.BuildingUnitStatus.Parse(buildingUnitStatus),
                 BuildingUnitPositionGeometryMethod.Parse(geometryMethod),
                 new ExtendedWkbGeometry(extendedWkbGeometry),
-                BuildingUnitFunction.Parse(function),
                 hasDeviation)
             => ((ISetProvenance)this).SetProvenance(provenance.ToProvenance());
 
@@ -77,9 +77,9 @@ namespace BuildingRegistry.Building.Events
             var fields = Provenance.GetHashFields().ToList();
             fields.Add(BuildingPersistentLocalId.ToString(CultureInfo.InvariantCulture));
             fields.Add(BuildingUnitPersistentLocalId.ToString(CultureInfo.InvariantCulture));
+            fields.Add(BuildingUnitStatus);
             fields.Add(GeometryMethod);
             fields.Add(ExtendedWkbGeometry);
-            fields.Add(Function);
             fields.Add(HasDeviation.ToString());
             return fields;
         }

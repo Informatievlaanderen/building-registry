@@ -108,6 +108,26 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetailV2
                     UpdateHash(item, message);
                 }, ct);
             });
+
+            When<Envelope<CommonBuildingUnitWasAddedV2>>(async (context, message, ct) =>
+            {
+                var commonBuildingUnitDetailItemV2 = new BuildingUnitDetailItemV2(
+                    message.Message.BuildingUnitPersistentLocalId,
+                    message.Message.BuildingPersistentLocalId,
+                    message.Message.ExtendedWkbGeometry.ToByteArray(),
+                    BuildingUnitPositionGeometryMethod.Parse(message.Message.GeometryMethod),
+                    BuildingUnitFunction.Common,
+                    BuildingUnitStatus.Parse(message.Message.BuildingUnitStatus),
+                    new Collection<BuildingUnitDetailAddressItemV2>(),
+                    isRemoved: false,
+                    message.Message.Provenance.Timestamp);
+
+                UpdateHash(commonBuildingUnitDetailItemV2, message);
+
+                await context.BuildingUnitDetailsV2.AddAsync(
+                    commonBuildingUnitDetailItemV2
+                    , ct);
+            });
         }
 
         private async Task Update(LegacyContext context, int buildingUnitPersistentLocalId, Action<BuildingUnitDetailItemV2> updateAction, CancellationToken ct)

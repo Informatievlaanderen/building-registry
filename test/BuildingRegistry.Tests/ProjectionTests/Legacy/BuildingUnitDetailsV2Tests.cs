@@ -5,6 +5,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Legacy
     using System.Threading.Tasks;
     using AutoFixture;
     using Be.Vlaanderen.Basisregisters.GrAr.Common.Pipes;
+    using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore;
     using Be.Vlaanderen.Basisregisters.Utilities.HexByteConvertor;
     using Building;
@@ -50,7 +51,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Legacy
                 .Given(new Envelope<BuildingWasMigrated>(new Envelope(buildingWasMigrated, metadata)))
                 .Then(async ct =>
                 {
-                    var buildingUnitBuildingItem = (await ct.BuildingUnitBuildingsV2.FindAsync(buildingWasMigrated.BuildingPersistentLocalId));
+                    var buildingUnitBuildingItem = await ct.BuildingUnitBuildingsV2.FindAsync(buildingWasMigrated.BuildingPersistentLocalId);
                     buildingUnitBuildingItem.Should().NotBeNull();
 
                     buildingUnitBuildingItem.IsRemoved.Should().Be(buildingWasMigrated.IsRemoved);
@@ -108,7 +109,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Legacy
                 .Given(new Envelope<BuildingWasPlannedV2>(new Envelope(buildingWasPlannedV2, metadata)))
                 .Then(async ct =>
                 {
-                    var buildingDetailItemV2 = (await ct.BuildingUnitBuildingsV2.FindAsync(buildingWasPlannedV2.BuildingPersistentLocalId));
+                    var buildingDetailItemV2 = await ct.BuildingUnitBuildingsV2.FindAsync(buildingWasPlannedV2.BuildingPersistentLocalId);
                     buildingDetailItemV2.Should().NotBeNull();
 
                     buildingDetailItemV2.IsRemoved.Should().BeFalse();
@@ -132,7 +133,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Legacy
                 .Given(new Envelope<BuildingUnitWasPlannedV2>(new Envelope(buildingUnitWasPlannedV2, metadata)))
                 .Then(async ct =>
                 {
-                    var item = (await ct.BuildingUnitDetailsV2.FindAsync(buildingUnitWasPlannedV2.BuildingUnitPersistentLocalId));
+                    var item = await ct.BuildingUnitDetailsV2.FindAsync(buildingUnitWasPlannedV2.BuildingUnitPersistentLocalId);
                     item.Should().NotBeNull();
                     item.BuildingPersistentLocalId.Should().Be(buildingUnitWasPlannedV2.BuildingPersistentLocalId);
                     item.Position.Should().BeEquivalentTo(buildingUnitWasPlannedV2.ExtendedWkbGeometry.ToByteArray());
@@ -171,6 +172,43 @@ namespace BuildingRegistry.Tests.ProjectionTests.Legacy
 
                     item.IsRemoved.Should().BeFalse();
                     item.Status.Should().Be(BuildingUnitStatus.Realized);
+                });
+        }
+
+        [Fact]
+        public async Task WhenCommonBuildingUnitWasAddedV2()
+        {
+            _fixture.Customize(new WithFixedBuildingPersistentLocalId());
+            _fixture.Customize(new WithFixedBuildingUnitPersistentLocalId());
+
+            var commonBuildingUnitWasAddedV2 = new CommonBuildingUnitWasAddedV2(
+                _fixture.Create<BuildingPersistentLocalId>(),
+                _fixture.Create<BuildingUnitPersistentLocalId>(),
+                BuildingUnitStatus.Planned,
+                BuildingUnitPositionGeometryMethod.DerivedFromObject,
+                _fixture.Create<ExtendedWkbGeometry>(),
+                false);
+            ((ISetProvenance)commonBuildingUnitWasAddedV2).SetProvenance(_fixture.Create<Provenance>());
+
+            var metadata = new Dictionary<string, object>
+            {
+                { AddEventHashPipe.HashMetadataKey, commonBuildingUnitWasAddedV2.GetHash() }
+            };
+
+            await Sut
+                .Given(new Envelope<CommonBuildingUnitWasAddedV2>(new Envelope(commonBuildingUnitWasAddedV2, metadata)))
+                .Then(async ct =>
+                {
+                    var item = await ct.BuildingUnitDetailsV2.FindAsync(commonBuildingUnitWasAddedV2.BuildingUnitPersistentLocalId);
+                    item.Should().NotBeNull();
+                    item.BuildingPersistentLocalId.Should().Be(commonBuildingUnitWasAddedV2.BuildingPersistentLocalId);
+                    item.Position.Should().BeEquivalentTo(commonBuildingUnitWasAddedV2.ExtendedWkbGeometry.ToByteArray());
+                    item.PositionMethod.Should().Be(BuildingUnitPositionGeometryMethod.Parse(commonBuildingUnitWasAddedV2.GeometryMethod));
+                    item.Function.Should()
+                        .Be(BuildingUnitFunction.Common);
+                    item.Version.Should().Be(commonBuildingUnitWasAddedV2.Provenance.Timestamp);
+                    item.IsRemoved.Should().BeFalse();
+                    item.Status.Should().Be(BuildingUnitStatus.Parse(commonBuildingUnitWasAddedV2.BuildingUnitStatus));
                 });
         }
 

@@ -34,6 +34,7 @@ namespace BuildingRegistry.Building
 
             Register<BuildingUnitWasPlannedV2>(When);
             Register<BuildingUnitWasRealizedV2>(When);
+            Register<CommonBuildingUnitWasAddedV2>(When);
         }
 
         private void When(BuildingWasMigrated @event)
@@ -59,6 +60,21 @@ namespace BuildingRegistry.Building
         private void When(BuildingUnitWasRealizedV2 @event)
         {
             Status = BuildingUnitStatus.Realized;
+
+            _lastEvent = @event;
+        }
+
+        private void When(CommonBuildingUnitWasAddedV2 @event)
+        {
+            _buildingPersistentLocalId = new BuildingPersistentLocalId(@event.BuildingPersistentLocalId);
+            BuildingUnitPersistentLocalId = new BuildingUnitPersistentLocalId(@event.BuildingUnitPersistentLocalId);
+            Function = BuildingUnitFunction.Common;
+            Status = BuildingUnitStatus.Planned;
+            BuildingUnitPosition = new BuildingUnitPosition(
+                new ExtendedWkbGeometry(@event.ExtendedWkbGeometry),
+                BuildingUnitPositionGeometryMethod.Parse(@event.GeometryMethod));
+
+            HasDeviation = @event.HasDeviation;
 
             _lastEvent = @event;
         }

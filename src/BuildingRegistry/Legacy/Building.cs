@@ -6,6 +6,7 @@ namespace BuildingRegistry.Legacy
     using Be.Vlaanderen.Basisregisters.Crab;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Be.Vlaanderen.Basisregisters.Utilities.HexByteConvertor;
+    using BuildingRegistry.Building;
     using BuildingRegistry.Building.Commands;
     using Commands;
     using Crab;
@@ -23,8 +24,8 @@ namespace BuildingRegistry.Legacy
             var status = _status ?? throw new InvalidOperationException($"No status found for Building '{_persistentLocalId}'");
 
             return new MigrateBuilding(
-                _buildingId,
-                _persistentLocalId,
+               _buildingId,
+               _persistentLocalId,
                 _persistentLocalIdAssignmentDate,
                 status,
                 Geometry,
