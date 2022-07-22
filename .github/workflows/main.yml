@@ -172,7 +172,7 @@ jobs:
         SEMVER: ${{ env.RELEASE_VERSION }}
         WORKSPACE: ${{ github.workspace }}
         
-    -name: Package Lambda functions        
+    - name: Package Lambda functions        
       if: env.RELEASE_VERSION != 'none'
       shell: bash
       run: |
