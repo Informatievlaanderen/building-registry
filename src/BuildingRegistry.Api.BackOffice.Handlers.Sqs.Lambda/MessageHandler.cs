@@ -18,28 +18,30 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Sqs.Lambda
 
         public async Task HandleMessage(object? messageData, MessageMetadata messageMetadata, CancellationToken cancellationToken)
         {
-            switch (messageData)
-            {
-                // Building
-                
-                case SqsPlanBuildingRequest sqsPlanBuildingRequest:
-                    await _mediator.Send(sqsPlanBuildingRequest, cancellationToken);
-                    break;
+            messageMetadata.Logger?.LogInformation($"Handling message {messageData?.GetType().Name}");
+            // TODO: uncomment after initial lambda testing
+            //switch (messageData)
+            //{
+            //    // Building
 
-                case SqsPlaceBuildingUnderConstructionRequest sqsPlaceBuildingUnderConstructionRequest:
-                    await _mediator.Send(sqsPlaceBuildingUnderConstructionRequest, cancellationToken);
-                    break;
+            //    case SqsPlanBuildingRequest sqsPlanBuildingRequest:
+            //        await _mediator.Send(sqsPlanBuildingRequest, cancellationToken);
+            //        break;
 
-                case SqsRealizeBuildingRequest sqsRealizeBuildingRequest:
-                    await _mediator.Send(sqsRealizeBuildingRequest, cancellationToken);
-                    break;
+            //    case SqsPlaceBuildingUnderConstructionRequest sqsPlaceBuildingUnderConstructionRequest:
+            //        await _mediator.Send(sqsPlaceBuildingUnderConstructionRequest, cancellationToken);
+            //        break;
 
-                // BuildingUnit
-                
-                case SqsPlanBuildingUnitRequest sqsPlanBuildingUnitRequest:
-                    await _mediator.Send(sqsPlanBuildingUnitRequest, cancellationToken);
-                    break;
-            }
+            //    case SqsRealizeBuildingRequest sqsRealizeBuildingRequest:
+            //        await _mediator.Send(sqsRealizeBuildingRequest, cancellationToken);
+            //        break;
+
+            //    // BuildingUnit
+
+            //    case SqsPlanBuildingUnitRequest sqsPlanBuildingUnitRequest:
+            //        await _mediator.Send(sqsPlanBuildingUnitRequest, cancellationToken);
+            //        break;
+            //}
         }
     }
 }
