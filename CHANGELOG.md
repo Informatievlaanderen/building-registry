@@ -1,3 +1,19 @@
+# [3.27.0](https://github.com/informatievlaanderen/building-registry/compare/v3.26.1...v3.27.0) (2022-07-22)
+
+
+### Bug Fixes
+
+* add linux rid to lambda project ([ba5f2a6](https://github.com/informatievlaanderen/building-registry/commit/ba5f2a6c53dc9e4ea2ec911c4086865f10010978))
+* add sqs & lambda to build ([3aa7f2c](https://github.com/informatievlaanderen/building-registry/commit/3aa7f2c366ec64f7e9511bffd4fb862d01515330))
+* realize non existing building unit should return 404 ([a51ce03](https://github.com/informatievlaanderen/building-registry/commit/a51ce0327fdab0bd035e2d95eda1b184bf9fb9f5))
+
+
+### Features
+
+* automatic common building unit ([#637](https://github.com/informatievlaanderen/building-registry/issues/637)) ([c103ab1](https://github.com/informatievlaanderen/building-registry/commit/c103ab1bf978f4ab911ae8e2ecacadfac67f8116))
+* realize building unit val4 ([bbc5bdb](https://github.com/informatievlaanderen/building-registry/commit/bbc5bdb412bfe1896a82a8770bc4bae4b69a6853))
+* refactoring tryGetBuildingIdForBuildingUnit ([ab313df](https://github.com/informatievlaanderen/building-registry/commit/ab313dfa8f72c9336e07b64a7de35635911f9d7e))
+
 ## [3.26.1](https://github.com/informatievlaanderen/building-registry/compare/v3.26.0...v3.26.1) (2022-07-22)
 
 
