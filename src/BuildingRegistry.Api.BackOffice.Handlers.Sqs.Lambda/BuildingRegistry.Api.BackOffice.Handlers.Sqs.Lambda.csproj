@@ -10,6 +10,7 @@
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <!-- Generate ready to run images during publishing to improve cold start time. -->
     <PublishReadyToRun>true</PublishReadyToRun>
+    <RuntimeIdentifier>linux-x64</RuntimeIdentifier>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\BuildingRegistry.Api.BackOffice.Abstractions\BuildingRegistry.Api.BackOffice.Abstractions.csproj" />
