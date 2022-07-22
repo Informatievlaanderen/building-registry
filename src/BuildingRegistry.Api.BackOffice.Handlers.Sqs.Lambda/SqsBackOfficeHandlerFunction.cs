@@ -14,8 +14,9 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Sqs.Lambda
         public override void ConfigureServices(ServiceCollection services)
         {
             base.ConfigureServices(services);
-            services.AddTransient<IMessageHandler, MessageHandler>();
-            services.AddMediatR(typeof(SqsPlanBuildingHandler).Assembly);
+            // TODO: uncomment after initial lambda testing
+            //services.AddTransient<IMessageHandler, MessageHandler>();
+            //services.AddMediatR(typeof(SqsPlanBuildingHandler).Assembly);
         }
     }
 }
