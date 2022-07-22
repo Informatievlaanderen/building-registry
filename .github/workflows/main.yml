@@ -178,6 +178,7 @@ jobs:
       shell: bash
       run: |
         echo Deploying Lambda functions to Test
+        ls -l /home/runner/work/building-registry/building-registry/dist
         ls -l /home/runner/work/building-registry/building-registry/dist/BuildingRegistry.Api.BackOffice.Handlers.Sqs.Lambda/linux
         #zip -r lambda.zip /home/runner/work/building-registry/building-registry/dist/BuildingRegistry.Api.BackOffice.Handlers.Sqs.Lambda/linux
         #aws s3 sync ./lambda.zip s3://s3-vbr-test-basisregisters-lam-sqsbackofficehandlerfunction
