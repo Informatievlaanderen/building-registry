@@ -172,23 +172,23 @@ jobs:
         SEMVER: ${{ env.RELEASE_VERSION }}
         WORKSPACE: ${{ github.workspace }}
         
-    # Deployment of Lambda functions must be done from the Test environment
-    - name: Deploy Lambda functions
+    -name: Package Lambda functions        
       if: env.RELEASE_VERSION != 'none'
       shell: bash
       run: |
-        echo Deploying Lambda functions to Test
-        ls -l /home/runner/work/building-registry/building-registry/dist
-        ls -l /home/runner/work/building-registry/building-registry/dist/BuildingRegistry.Api.BackOffice.Handlers.Sqs.Lambda/linux
-        #zip -r lambda.zip /home/runner/work/building-registry/building-registry/dist/BuildingRegistry.Api.BackOffice.Handlers.Sqs.Lambda/linux
-        #aws s3 sync ./lambda.zip s3://s3-vbr-test-basisregisters-lam-sqsbackofficehandlerfunction
+        echo Zip lambda functions
+        echo zip -r lambda.zip /home/runner/work/building-registry/building-registry/dist/BuildingRegistry.Api.BackOffice.Handlers.Sqs.Lambda/linux
+        zip -r lambda.zip /home/runner/work/building-registry/building-registry/dist/BuildingRegistry.Api.BackOffice.Handlers.Sqs.Lambda/linux
         
-        #echo Deploying Lambda functions to Staging
-        #aws s3 sync ./lambda.zip s3://s3-vbr-staging-basisregisters-lam-sqsbackofficehandlerfunction
-
-        #echo Deploying Lambda functions to Production
-        #aws s3 sync ./lambda.zip s3://s3-vbr-production-basisregisters-lam-sqsbackofficehandlerfunction
-
+    # Deployment of Lambda functions must be done from the Test environment
+    - name: Deploy Lambda functions to Test
+      if: env.RELEASE_VERSION != 'none'
+      shell: bash
+      run: |
+        echo Deploy Lambda functions to Test
+        echo aws s3 cp lambda.zip s3://s3-vbr-test-basisregisters-lam-sqsbackofficehandlerfunction
+        aws s3 cp lambda.zip s3://s3-vbr-test-basisregisters-lam-sqsbackofficehandlerfunction
+        
     - name: Configure AWS credentials (Staging)
       if: env.RELEASE_VERSION != 'none'
       uses: aws-actions/configure-aws-credentials@v1
@@ -236,6 +236,14 @@ jobs:
         BUILD_DOCKER_REGISTRY: ${{ secrets.VBR_BUILD_DOCKER_REGISTRY }}
         SEMVER: ${{ env.RELEASE_VERSION }}
         WORKSPACE: ${{ github.workspace }}
+
+    - name: Deploy Lambda functions to Staging
+      if: env.RELEASE_VERSION != 'none'
+      shell: bash
+      run: |
+        #echo Deploy Lambda functions to Staging
+        #echo aws s3 cp lambda.zip s3://s3-vbr-staging-basisregisters-lam-sqsbackofficehandlerfunction
+        #aws s3 cp lambda.zip s3://s3-vbr-staging-basisregisters-lam-sqsbackofficehandlerfunction
 
     - name: Configure AWS credentials (Production)
       if: env.RELEASE_VERSION != 'none'
@@ -285,6 +293,14 @@ jobs:
         SEMVER: ${{ env.RELEASE_VERSION }}
         WORKSPACE: ${{ github.workspace }}
 
+    - name: Deploy Lambda functions to Production
+      if: env.RELEASE_VERSION != 'none'
+      shell: bash
+      run: |
+        #echo Deploy Lambda functions to Production
+        #echo aws s3 cp lambda.zip s3://s3-vbr-production-basisregisters-lam-sqsbackofficehandlerfunction
+        #aws s3 cp lambda.zip s3://s3-vbr-production-basisregisters-lam-sqsbackofficehandlerfunction
+        
     - name: Publish to NuGet
       if: env.RELEASE_VERSION != 'none'
       shell: bash
