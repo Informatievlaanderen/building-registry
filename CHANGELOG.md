@@ -1,3 +1,12 @@
+## [3.27.2](https://github.com/informatievlaanderen/building-registry/compare/v3.27.1...v3.27.2) (2022-07-23)
+
+
+### Bug Fixes
+
+* fix build (S3 access) ([1020c50](https://github.com/informatievlaanderen/building-registry/commit/1020c50ea1e56d793ee08659dff34e0036409332))
+* rename ci to tests3 ([b85a1e7](https://github.com/informatievlaanderen/building-registry/commit/b85a1e7f0814ee0b5d2806ef9dbc44e3c2297a46))
+* run tests3 manually ([18a199e](https://github.com/informatievlaanderen/building-registry/commit/18a199ef0c2e6fae318bad8a903f9c953d7226cf))
+
 ## [3.27.1](https://github.com/informatievlaanderen/building-registry/compare/v3.27.0...v3.27.1) (2022-07-22)
 
 
