@@ -116,7 +116,7 @@ namespace BuildingRegistry.Api.Legacy.Abstractions.BuildingUnit.Responses
                 PositieGeometrieMethode.AangeduidDoorBeheerder,
                 GebouweenheidStatus.Gerealiseerd,
                 GebouweenheidFunctie.GemeenschappelijkDeel,
-                new GebouweenheidDetailGebouw("1", string.Format(_responseOptions.GebouwDetailUrl,"1")),
+                new GebouweenheidDetailGebouw("1", string.Format(_responseOptions.GebouweenheidDetailUrl,"1")),
                 new List<GebouweenheidDetailAdres>
                 {
                     new GebouweenheidDetailAdres("1", string.Format(_responseOptions.AdresUrl,"1")),

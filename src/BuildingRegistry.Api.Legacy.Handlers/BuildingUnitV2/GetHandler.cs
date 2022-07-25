@@ -42,9 +42,9 @@ namespace BuildingRegistry.Api.Legacy.Handlers.BuildingUnitV2
                 buildingUnit.Status.Map(),
                 buildingUnit.Function.Map(),
                 new GebouweenheidDetailGebouw(
-                    buildingUnit.BuildingPersistentLocalId.ToString(),
-                    string.Format(request.ResponseOptions.Value.GebouwDetailUrl,
-                        buildingUnit.BuildingPersistentLocalId)),
+                    buildingUnit.BuildingUnitPersistentLocalId.ToString(),
+                    string.Format(request.ResponseOptions.Value.GebouweenheidDetailUrl,
+                        buildingUnit.BuildingUnitPersistentLocalId)),
                 buildingUnit.Addresses.Select(x =>
                     new GebouweenheidDetailAdres(
                         x.BuildingUnitPersistentLocalId.ToString(),

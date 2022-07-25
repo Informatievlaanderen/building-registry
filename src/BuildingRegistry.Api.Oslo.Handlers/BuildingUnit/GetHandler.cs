@@ -57,7 +57,9 @@ namespace BuildingRegistry.Api.Oslo.Handlers.BuildingUnit
                 GetBuildingUnitPoint(buildingUnit.Position, buildingUnit.PositionMethod.Value),
                 buildingUnit.Status.Value.Map(),
                 MapBuildingUnitFunction(buildingUnit.Function),
-                new GebouweenheidDetailGebouw(buildingUnit.BuildingPersistentLocalId.Value.ToString(), string.Format(request.ResponseOptions.Value.GebouwDetailUrl, buildingUnit.BuildingPersistentLocalId.Value)),
+                new GebouweenheidDetailGebouw(
+                    buildingUnit.PersistentLocalId.Value.ToString(),
+                    string.Format(request.ResponseOptions.Value.GebouweenheidDetailUrl, buildingUnit.PersistentLocalId.Value)),
                 addressPersistentLocalIds.Select(id => new GebouweenheidDetailAdres(id, string.Format(request.ResponseOptions.Value.AdresUrl, id))).ToList());
         }
 

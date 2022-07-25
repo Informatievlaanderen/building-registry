@@ -45,14 +45,16 @@ namespace BuildingRegistry.Api.Oslo.Handlers.BuildingUnitV2
                 .Select(x => x.AddressPersistentLocalId).ToList();
 
             return new BuildingUnitOsloResponse(
-                buildingUnit.BuildingPersistentLocalId,
+                buildingUnit.BuildingUnitPersistentLocalId,
                 request.ResponseOptions.Value.GebouweenheidNaamruimte,
                 request.ResponseOptions.Value.ContextUrlUnitDetail,
                 buildingUnit.Version.ToBelgianDateTimeOffset(),
                 GetBuildingUnitPoint(buildingUnit.Position, buildingUnit.PositionMethod),
                 buildingUnit.Status.Map(),
                 MapBuildingUnitFunction(buildingUnit.Function),
-                new GebouweenheidDetailGebouw(buildingUnit.BuildingPersistentLocalId.ToString(), string.Format(request.ResponseOptions.Value.GebouwDetailUrl, buildingUnit.BuildingPersistentLocalId)),
+                new GebouweenheidDetailGebouw(
+                    buildingUnit.BuildingUnitPersistentLocalId.ToString(),
+                    string.Format(request.ResponseOptions.Value.GebouweenheidDetailUrl, buildingUnit.BuildingUnitPersistentLocalId)),
                 addressPersistentLocalIds.Select(id => new GebouweenheidDetailAdres(id.ToString(), string.Format(request.ResponseOptions.Value.AdresUrl, id))).ToList());
         }
 

@@ -48,7 +48,10 @@ namespace BuildingRegistry.Api.Legacy.Handlers.BuildingUnit
                 buildingUnit.PositionMethod.Value.ConvertFromBuildingUnitGeometryMethod(),
                 buildingUnit.Status.Value.ConvertFromBuildingUnitStatus(),
                 buildingUnit.Function.ConvertFromBuildingUnitFunction(),
-                new GebouweenheidDetailGebouw(buildingUnit.BuildingPersistentLocalId.Value.ToString(), string.Format(request.ResponseOptions.Value.GebouwDetailUrl, buildingUnit.BuildingPersistentLocalId.Value)),
+                new GebouweenheidDetailGebouw(
+                    buildingUnit.PersistentLocalId.Value.ToString(),
+                    string.Format(request.ResponseOptions.Value.GebouweenheidDetailUrl,
+                        buildingUnit.PersistentLocalId.Value)),
                 addressPersistentLocalIds.Select(id => new GebouweenheidDetailAdres(id, string.Format(request.ResponseOptions.Value.AdresUrl, id))).ToList());
         }
     }
