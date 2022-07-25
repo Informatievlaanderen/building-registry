@@ -1,0 +1,151 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      # TODO: inputs: RELEASE_VERSION
+      version:
+        description: 'Version'     
+        required: true
+  # TODO: start when build.yml is successful
+
+jobs:
+  deployment:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix: 
+        services: ['building-registry-api', 'building-registry-import-api', 'building-registry-projections']
+    steps:
+    - name: Determine AWS credentials from env
+      if: env.RELEASE_VERSION != 'none'
+      shell: bash
+      run: |
+        if (env == 'stg')
+        {
+        }
+        elif (end == 'prd')
+        {
+        }
+        else #tst
+        {
+            env.AWS_ACCES_KEY_ID = ${{ secrets.VBR_AWS_ACCESS_KEY_ID_TST }}
+            env.AWS_SECRET_ACCESS_KEY = ${{ secrets.VBR_AWS_SECRET_ACCESS_KEY_TST }}
+        }
+        $BUILD_DOCKER_REGISTRY_TST = blabla + env
+
+    - name: Configure AWS credentials
+      if: env.RELEASE_VERSION != 'none'
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ secrets.VBR_AWS_REGION_PRD }}
+
+    - name: Login to Amazon ECR
+      if: env.RELEASE_VERSION != 'none'
+      uses: aws-actions/amazon-ecr-login@v1.5.0
+
+    - name: Determine Docker registry from env
+      if: env.RELEASE_VERSION != 'none'
+      shell: bash
+      run: |
+        $BUILD_DOCKER_REGISTRY = blabla + env
+    
+    - name: Push to Test
+      if: env.RELEASE_VERSION != 'none'
+      shell: bash
+      run: |
+        docker push $BUILD_DOCKER_REGISTRY/building-registry/api-legacy:$SEMVER
+        docker push $BUILD_DOCKER_REGISTRY/building-registry/api-oslo:$SEMVER
+        docker push $BUILD_DOCKER_REGISTRY/building-registry/api-crab-import:$SEMVER
+        docker push $BUILD_DOCKER_REGISTRY/building-registry/api-extract:$SEMVER
+        docker push $BUILD_DOCKER_REGISTRY/building-registry/api-backoffice:$SEMVER
+        docker push $BUILD_DOCKER_REGISTRY/building-registry/projector:$SEMVER
+        docker push $BUILD_DOCKER_REGISTRY/building-registry/projections-syndication:$SEMVER
+        docker push $BUILD_DOCKER_REGISTRY/building-registry/consumer-address:$SEMVER
+        docker push $BUILD_DOCKER_REGISTRY/building-registry/migrator-building:$SEMVER
+      env:
+        BUILD_DOCKER_REGISTRY_TST: ${{ secrets.VBR_BUILD_DOCKER_REGISTRY }} # TODO: why this env var?
+        SEMVER: ${{ env.RELEASE_VERSION }}
+        WORKSPACE: ${{ github.workspace }}
+        
+    - name: Package Lambda functions        
+      if: env.RELEASE_VERSION != 'none'
+      shell: bash
+      run: |
+        echo Zip lambda functions
+        echo zip -r lambda.zip /home/runner/work/building-registry/building-registry/dist/BuildingRegistry.Api.BackOffice.Handlers.Sqs.Lambda/linux
+        zip -r lambda.zip /home/runner/work/building-registry/building-registry/dist/BuildingRegistry.Api.BackOffice.Handlers.Sqs.Lambda/linux
+        
+    # Deployment of Lambda functions must be done from the Test environment
+    - name: Deploy Lambda functions
+      if: env.RELEASE_VERSION != 'none'
+      shell: bash
+      run: |
+        echo Deploy Lambda functions to Test
+        echo aws s3 cp lambda.zip s3://s3-vbr-test-basisregisters-lam-sqsbackofficehandlerfunction # TODO: determine S3 bucket from env
+        #aws s3 cp lambda.zip s3://s3-vbr-test-basisregisters-lam-sqsbackofficehandlerfunction
+
+    # TODO: decide when nuget packages get published
+    - name: Publish to NuGet
+      if: env.RELEASE_VERSION != 'none' && env == 'tst'
+      shell: bash
+      run: |
+        node packages/Be.Vlaanderen.Basisregisters.Build.Pipeline/Content/ci-nuget.js dist/nuget/Be.Vlaanderen.Basisregisters.BuildingRegistry.Api.Legacy.$SEMVER.nupkg
+        node packages/Be.Vlaanderen.Basisregisters.Build.Pipeline/Content/ci-nuget.js dist/nuget/Be.Vlaanderen.Basisregisters.BuildingRegistry.Api.Oslo.$SEMVER.nupkg
+        node packages/Be.Vlaanderen.Basisregisters.Build.Pipeline/Content/ci-nuget.js dist/nuget/Be.Vlaanderen.Basisregisters.BuildingRegistry.Api.Extract.$SEMVER.nupkg
+        node packages/Be.Vlaanderen.Basisregisters.Build.Pipeline/Content/ci-nuget.js dist/nuget/Be.Vlaanderen.Basisregisters.BuildingRegistry.Api.BackOffice.$SEMVER.nupkg
+        node packages/Be.Vlaanderen.Basisregisters.Build.Pipeline/Content/ci-nuget.js dist/nuget/Be.Vlaanderen.Basisregisters.BuildingRegistry.Api.CrabImport.$SEMVER.nupkg
+        node packages/Be.Vlaanderen.Basisregisters.Build.Pipeline/Content/ci-nuget.js dist/nuget/Be.Vlaanderen.Basisregisters.BuildingRegistry.Projector.$SEMVER.nupkg
+        node packages/Be.Vlaanderen.Basisregisters.Build.Pipeline/Content/ci-nuget.js dist/nuget/Be.Vlaanderen.Basisregisters.BuildingRegistry.Api.Legacy.Abstractions.$SEMVER.nupkg
+        node packages/Be.Vlaanderen.Basisregisters.Build.Pipeline/Content/ci-nuget.js dist/nuget/Be.Vlaanderen.Basisregisters.BuildingRegistry.Api.Extract.Abstractions.$SEMVER.nupkg
+        node packages/Be.Vlaanderen.Basisregisters.Build.Pipeline/Content/ci-nuget.js dist/nuget/Be.Vlaanderen.Basisregisters.BuildingRegistry.Api.Oslo.Abstractions.$SEMVER.nupkg
+        node packages/Be.Vlaanderen.Basisregisters.Build.Pipeline/Content/ci-nuget.js dist/nuget/Be.Vlaanderen.Basisregisters.BuildingRegistry.Api.BackOffice.Abstractions.$SEMVER.nupkg
+      env:
+        SEMVER: ${{ env.RELEASE_VERSION }}
+        NUGET_HOST: ${{ secrets.NUGET_HOST }}
+        NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+
+    # TODO: decide when to publish to Confluence
+    - name: Publish to Confluence
+      if: env.RELEASE_VERSION != 'none'
+      shell: bash
+      run: ./packages/Be.Vlaanderen.Basisregisters.Build.Pipeline/Content/ci-confluence.sh
+      env:
+        CONFLUENCE_TITLE: ${{ env.REPOSITORY_NAME }}
+        CONFLUENCE_USERNAME: ${{ secrets.VBR_CONFLUENCE_USER }}
+        CONFLUENCE_PASSWORD: ${{ secrets.VBR_CONFLUENCE_PASSWORD }}
+
+    # TODO: decide when to publish to JIRA
+    - name: Create Jira Release
+      if: env.RELEASE_VERSION != 'none'
+      shell: bash
+      run: ./packages/Be.Vlaanderen.Basisregisters.Build.Pipeline/Content/ci-jira.sh
+      env:
+        CONFLUENCE_TITLE: ${{ env.REPOSITORY_NAME }}
+        CONFLUENCE_USERNAME: ${{ secrets.VBR_CONFLUENCE_USER }}
+        CONFLUENCE_PASSWORD: ${{ secrets.VBR_CONFLUENCE_PASSWORD }}
+        JIRA_PREFIX: Building
+        JIRA_PROJECT: GAWR
+        JIRA_VERSION: ${{ env.RELEASE_VERSION }}
+
+    - name: CD
+      env:
+        BUILD_URL: ${{ secrets.VBR_AWS_BUILD_API }}/${{matrix.services}}
+        STATUS_URL: ${{ secrets.VBR_AWS_BUILD_STATUS_API }}/${{matrix.services}}
+      uses: informatievlaanderen/awscurl-polling-action@main
+      with:
+          environment: test
+          version: ${{ github.event.inputs.version }}
+          status-url: $STATUS_URL
+          deploy-url: $BUILD_URL
+          access-key: ${{ secrets.VBR_AWS_BUILD_USER_ACCESS_KEY_ID }}
+          secret-key: ${{ secrets.VBR_AWS_BUILD_USER_SECRET_ACCESS_KEY }}
+          region: eu-west-1
+          interval: 2
+    - name: output
+      shell: bash
+      run: |
+        echo build-uuid: ${{ steps.awscurl-polling-action.outputs.build-uuid }}
+        echo Status: ${{ steps.awscurl-polling-action.outputs.status }}
+        echo ${{ steps.awscurl-polling-action.outputs.final-message }}
