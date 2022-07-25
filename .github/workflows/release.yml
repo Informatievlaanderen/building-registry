@@ -34,18 +34,6 @@ jobs:
             echo "BUILD_DOCKER_REGISTRY_ENV=$BUILD_DOCKER_REGISTRY_TST" >> $GITHUB_ENV
         fi
 
-    - name: Configure AWS credentials
-      if: env.RELEASE_VERSION != 'none'
-      uses: aws-actions/configure-aws-credentials@v1
-      with:
-        aws-access-key-id: ${{ AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ AWS_SECRET_ACCESS_KEY }}
-        aws-region: ${{ secrets.VBR_AWS_REGION_PRD }}
-
-    - name: Login to Amazon ECR
-      if: env.RELEASE_VERSION != 'none'
-      uses: aws-actions/amazon-ecr-login@v1.5.0
-
     - name: Determine Docker registry from env
       if: env.RELEASE_VERSION != 'none'
       shell: bash
@@ -55,7 +43,29 @@ jobs:
         echo BUILD_DOCKER_REGISTRY_ENV: $BUILD_DOCKER_REGISTRY_ENV
         echo "BUILD_DOCKER_REGISTRY=$BUILD_DOCKER_REGISTRY_TST" + _${{ secrets.ENVIRONMENT_NAME_SHORT }}
         #echo "BUILD_DOCKER_REGISTRY=$BUILD_DOCKER_REGISTRY_TST" + _${{ secrets.ENVIRONMENT_NAME_SHORT }} >> $GITHUB_ENV
-    
+        
+    - name: Configure AWS credentials
+      if: env.RELEASE_VERSION != 'none'
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: $AWS_ACCESS_KEY_ID
+        aws-secret-access-key: $AWS_SECRET_ACCESS_KEY
+        aws-region: ${{ secrets.VBR_AWS_REGION_PRD }}
+
+#    - name: Login to Amazon ECR
+#      if: env.RELEASE_VERSION != 'none'
+#      uses: aws-actions/amazon-ecr-login@v1.5.0
+#
+#    - name: Determine Docker registry from env
+#      if: env.RELEASE_VERSION != 'none'
+#      shell: bash
+#      run: |
+#        echo AWS_ACCES_KEY_ID: $AWS_ACCES_KEY_ID
+#        echo AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
+#        echo BUILD_DOCKER_REGISTRY_ENV: $BUILD_DOCKER_REGISTRY_ENV
+#        echo "BUILD_DOCKER_REGISTRY=$BUILD_DOCKER_REGISTRY_TST" + _${{ secrets.ENVIRONMENT_NAME_SHORT }}
+#        #echo "BUILD_DOCKER_REGISTRY=$BUILD_DOCKER_REGISTRY_TST" + _${{ secrets.ENVIRONMENT_NAME_SHORT }} >> $GITHUB_ENV
+#    
 #    - name: Push to Test
 #      if: env.RELEASE_VERSION != 'none'
 #      shell: bash
