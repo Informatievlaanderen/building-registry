@@ -44,14 +44,14 @@ jobs:
         echo "BUILD_DOCKER_REGISTRY=$BUILD_DOCKER_REGISTRY_TST" + _${{ secrets.ENVIRONMENT_NAME_SHORT }}
         #echo "BUILD_DOCKER_REGISTRY=$BUILD_DOCKER_REGISTRY_TST" + _${{ secrets.ENVIRONMENT_NAME_SHORT }} >> $GITHUB_ENV
         
-    - name: Configure AWS credentials
-      if: env.RELEASE_VERSION != 'none'
-      uses: aws-actions/configure-aws-credentials@v1
-      with:
-        aws-access-key-id: $AWS_ACCESS_KEY_ID
-        aws-secret-access-key: $AWS_SECRET_ACCESS_KEY
-        aws-region: ${{ secrets.VBR_AWS_REGION_PRD }}
-
+#    - name: Configure AWS credentials
+#      if: env.RELEASE_VERSION != 'none'
+#      uses: aws-actions/configure-aws-credentials@v1
+#      with:
+#        aws-access-key-id: $AWS_ACCESS_KEY_ID
+#        aws-secret-access-key: $AWS_SECRET_ACCESS_KEY
+#        aws-region: ${{ secrets.VBR_AWS_REGION_PRD }}
+#
 #    - name: Login to Amazon ECR
 #      if: env.RELEASE_VERSION != 'none'
 #      uses: aws-actions/amazon-ecr-login@v1.5.0
