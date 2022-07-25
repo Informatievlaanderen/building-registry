@@ -26,7 +26,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenPlanningBuildingUnit
         {
             var buildings = new Mock<IBuildings>();
             var backOfficeContext = new Mock<BackOfficeContext>();
-            _controller = CreateBuildingUnitControllerWithUser<BuildingUnitController>(buildings.Object, backOfficeContext.Object);
+            _controller = CreateBuildingUnitControllerWithUser<BuildingUnitController>();
         }
 
         [Fact]

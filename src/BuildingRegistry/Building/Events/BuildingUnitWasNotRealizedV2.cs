@@ -10,28 +10,35 @@ namespace BuildingRegistry.Building.Events
 
     [EventTags(EventTag.For.Sync, EventTag.For.Edit, Tag.Building)]
     [EventName(EventName)]
-    [EventDescription("Het gebouw werd gerealiseerd.")]
-    public class BuildingWasRealizedV2 : IBuildingEvent
+    [EventDescription("De gebouweenheid werd niet gerealiseerd.")]
+    public class BuildingUnitWasNotRealizedV2 : IBuildingEvent
     {
-        public const string EventName = "BuildingWasRealizedV2"; // BE CAREFUL CHANGING THIS!!
+        public const string EventName = "BuildingUnitWasNotRealizedV2"; // BE CAREFUL CHANGING THIS!!
 
         [EventPropertyDescription("Objectidentificator van het gebouw.")]
         public int BuildingPersistentLocalId { get; }
+        [EventPropertyDescription("Objectidentificator van de gebouweenheid.")]
+        public int BuildingUnitPersistentLocalId { get; }
 
         [EventPropertyDescription("Metadata bij het event.")]
         public ProvenanceData Provenance { get; private set; }
 
-        public BuildingWasRealizedV2(BuildingPersistentLocalId buildingPersistentLocalId)
+        public BuildingUnitWasNotRealizedV2(
+            BuildingPersistentLocalId buildingPersistentLocalId,
+            BuildingUnitPersistentLocalId buildingUnitPersistentLocalId)
         {
             BuildingPersistentLocalId = buildingPersistentLocalId;
+            BuildingUnitPersistentLocalId = buildingUnitPersistentLocalId;
         }
 
         [JsonConstructor]
-        private BuildingWasRealizedV2(
+        private BuildingUnitWasNotRealizedV2(
             int buildingPersistentLocalId,
+            int buildingUnitPersistentLocalId,
             ProvenanceData provenance)
             : this(
-                new BuildingPersistentLocalId(buildingPersistentLocalId))
+                new BuildingPersistentLocalId(buildingPersistentLocalId),
+                new BuildingUnitPersistentLocalId(buildingUnitPersistentLocalId))
             => ((ISetProvenance)this).SetProvenance(provenance.ToProvenance());
 
         void ISetProvenance.SetProvenance(Provenance provenance) => Provenance = new ProvenanceData(provenance);
@@ -40,6 +47,7 @@ namespace BuildingRegistry.Building.Events
         {
             var fields = Provenance.GetHashFields().ToList();
             fields.Add(BuildingPersistentLocalId.ToString(CultureInfo.InvariantCulture));
+            fields.Add(BuildingUnitPersistentLocalId.ToString(CultureInfo.InvariantCulture));
             return fields;
         }
 

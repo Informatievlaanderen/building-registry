@@ -86,7 +86,7 @@ namespace BuildingRegistry.Projections.Wfs.BuildingUnitV2
                     buildingUnitV2,
                     message.Message.ExtendedWkbGeometry,
                     MapGeometryMethod(BuildingUnitPositionGeometryMethod.Parse(message.Message.GeometryMethod)));
-                
+
                 await context.BuildingUnitsV2.AddAsync(buildingUnitV2, ct);
             });
 
@@ -94,6 +94,14 @@ namespace BuildingRegistry.Projections.Wfs.BuildingUnitV2
             {
                 var unit = await context.BuildingUnitsV2.FindAsync(message.Message.BuildingUnitPersistentLocalId);
                 unit.Status = RealizedStatus;
+
+                SetVersion(unit, message.Message.Provenance.Timestamp);
+            });
+
+            When<Envelope<BuildingUnitWasNotRealizedV2>>(async (context, message, _) =>
+            {
+                var unit = await context.BuildingUnitsV2.FindAsync(message.Message.BuildingUnitPersistentLocalId);
+                unit.Status = NotRealizedStatus;
 
                 SetVersion(unit, message.Message.Provenance.Timestamp);
             });

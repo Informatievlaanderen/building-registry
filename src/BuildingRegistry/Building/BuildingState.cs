@@ -42,6 +42,7 @@ namespace BuildingRegistry.Building
 
             Register<BuildingUnitWasPlannedV2>(When);
             Register<BuildingUnitWasRealizedV2>(When);
+            Register<BuildingUnitWasNotRealizedV2>(When);
             Register<CommonBuildingUnitWasAddedV2>(When);
 
             Register<BuildingSnapshot>(When);
@@ -117,6 +118,13 @@ namespace BuildingRegistry.Building
         }
 
         private void When(BuildingUnitWasRealizedV2 @event)
+        {
+            var buildingUnit = BuildingUnits.First(x => x.BuildingUnitPersistentLocalId == @event.BuildingUnitPersistentLocalId);
+
+            buildingUnit.Route(@event);
+        }
+
+        private void When(BuildingUnitWasNotRealizedV2 @event)
         {
             var buildingUnit = BuildingUnits.First(x => x.BuildingUnitPersistentLocalId == @event.BuildingUnitPersistentLocalId);
 

@@ -1,4 +1,4 @@
-namespace BuildingRegistry.Tests.BackOffice.Infrastructure
+namespace BuildingRegistry.Tests.BackOffice
 {
     using System;
     using Be.Vlaanderen.Basisregisters.CommandHandling.Idempotency;

@@ -194,6 +194,20 @@ namespace BuildingRegistry.Building
             buildingUnit.Realize();
         }
 
+        public void NotRealizeBuildingUnit(BuildingUnitPersistentLocalId buildingUnitPersistentLocalId)
+        {
+            var buildingUnit = BuildingUnits.FirstOrDefault(x => x.BuildingUnitPersistentLocalId == buildingUnitPersistentLocalId);
+
+            if (buildingUnit is null)
+            {
+                throw new BuildingUnitNotFoundException(
+                    BuildingPersistentLocalId,
+                    buildingUnitPersistentLocalId);
+            }
+
+            buildingUnit.NotRealize();
+        }
+
         private void GuardRemovedBuilding()
         {
             if (IsRemoved)

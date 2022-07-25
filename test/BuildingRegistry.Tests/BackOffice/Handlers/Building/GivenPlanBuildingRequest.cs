@@ -10,7 +10,6 @@ namespace BuildingRegistry.Tests.BackOffice.Handlers.Building
     using BuildingRegistry.Api.BackOffice.Handlers.Building;
     using BuildingRegistry.Building;
     using FluentAssertions;
-    using Infrastructure;
     using Legacy;
     using SqlStreamStore;
     using SqlStreamStore.Streams;
