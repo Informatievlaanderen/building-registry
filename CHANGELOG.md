@@ -1,3 +1,16 @@
+# [3.28.0](https://github.com/informatievlaanderen/building-registry/compare/v3.27.3...v3.28.0) (2022-07-25)
+
+
+### Bug Fixes
+
+* build tests ([8d709c2](https://github.com/informatievlaanderen/building-registry/commit/8d709c21c1672fc0e562275b44ff1b9538ff3251))
+* buildingUnitRealizedV2 event docs ([49a2e20](https://github.com/informatievlaanderen/building-registry/commit/49a2e205b59288bf7111c117048d10cfadef4036))
+
+
+### Features
+
+* plan building unit validation position ([5522fdd](https://github.com/informatievlaanderen/building-registry/commit/5522fddc05c048f5eb7b3284ad8a8cba4b01286e))
+
 ## [3.27.3](https://github.com/informatievlaanderen/building-registry/compare/v3.27.2...v3.27.3) (2022-07-25)
 
 
