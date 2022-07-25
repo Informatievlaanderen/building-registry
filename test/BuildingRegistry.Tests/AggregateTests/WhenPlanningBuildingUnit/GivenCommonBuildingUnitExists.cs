@@ -44,7 +44,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuildingUnit
                 buildingGeometry.Center,
                 false);
             ((ISetProvenance)commonBuildingUnitWasAdded).SetProvenance(Fixture.Create<Provenance>());
-
+            
             Assert(new Scenario()
                 .Given(new BuildingStreamId(Fixture.Create<BuildingPersistentLocalId>()),
                     buildingWasPlanned,
@@ -57,7 +57,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuildingUnit
                             command.BuildingPersistentLocalId,
                             command.BuildingUnitPersistentLocalId,
                             command.PositionGeometryMethod,
-                            command.Position,
+                            buildingGeometry.Center,
                             command.Function,
                             command.HasDeviation))));
         }
