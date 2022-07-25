@@ -1,4 +1,4 @@
-namespace BuildingRegistry.Tests.BackOffice.Api.WhenRealizingBuildingUnit
+namespace BuildingRegistry.Tests.BackOffice.Api.WhenNotRealizingBuildingUnit
 {
     using System;
     using System.Linq;
@@ -39,16 +39,16 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenRealizingBuildingUnit
             var buildingUnitPersistentLocalId = new BuildingUnitPersistentLocalId(456);
 
             MockMediator
-                .Setup(x => x.Send(It.IsAny<RealizeBuildingUnitRequest>(), CancellationToken.None).Result)
+                .Setup(x => x.Send(It.IsAny<NotRealizeBuildingUnitRequest>(), CancellationToken.None).Result)
                 .Returns(new ETagResponse(string.Empty));
 
-            var request = new RealizeBuildingUnitRequest()
+            var request = new NotRealizeBuildingUnitRequest()
             {
                 BuildingUnitPersistentLocalId = buildingUnitPersistentLocalId
             };
 
             //Act
-            var result = (AcceptedWithETagResult)await _controller.Realize(
+            var result = (AcceptedWithETagResult)await _controller.NotRealize(
                 ResponseOptions,
                 MockIfMatchValidator(true),
                 request,
@@ -56,7 +56,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenRealizingBuildingUnit
                 CancellationToken.None);
 
             //Assert
-            MockMediator.Verify(x => x.Send(It.IsAny<RealizeBuildingUnitRequest>(), CancellationToken.None), Times.Once);
+            MockMediator.Verify(x => x.Send(It.IsAny<NotRealizeBuildingUnitRequest>(), CancellationToken.None), Times.Once);
 
             result.StatusCode.Should().Be(202);
             result.Location.Should().Be(string.Format(BuildingUnitDetailUrl, buildingUnitPersistentLocalId));
@@ -79,17 +79,17 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenRealizingBuildingUnit
             });
 
             MockMediator
-                .Setup(x => x.Send(It.IsAny<RealizeBuildingUnitRequest>(), CancellationToken.None).Result)
+                .Setup(x => x.Send(It.IsAny<NotRealizeBuildingUnitRequest>(), CancellationToken.None).Result)
                 .Returns(new ETagResponse(string.Empty));
 
-            var request = new RealizeBuildingUnitRequest()
+            var request = new NotRealizeBuildingUnitRequest()
             {
                 BuildingUnitPersistentLocalId = buildingUnitPersistentLocalId
             };
 
             //Act
 
-            var result = (PreconditionFailedResult)await _controller.Realize(
+            var result = (PreconditionFailedResult)await _controller.NotRealize(
                 ResponseOptions,
                 MockIfMatchValidator(false),
                 request,
@@ -97,7 +97,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenRealizingBuildingUnit
                 CancellationToken.None);
 
             //Assert
-            MockMediator.Verify(x => x.Send(It.IsAny<RealizeBuildingUnitRequest>(), CancellationToken.None), Times.Never);
+            MockMediator.Verify(x => x.Send(It.IsAny<NotRealizeBuildingUnitRequest>(), CancellationToken.None), Times.Never);
 
             result.Should().NotBeNull();
         }
@@ -108,16 +108,16 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenRealizingBuildingUnit
             var buildingUnitPersistentLocalId = new BuildingUnitPersistentLocalId(456);
 
             MockMediator
-                .Setup(x => x.Send(It.IsAny<RealizeBuildingUnitRequest>(), CancellationToken.None).Result)
+                .Setup(x => x.Send(It.IsAny<NotRealizeBuildingUnitRequest>(), CancellationToken.None).Result)
                 .Throws(new BuildingUnitNotFoundException());
 
-            var request = new RealizeBuildingUnitRequest()
+            var request = new NotRealizeBuildingUnitRequest()
             {
                 BuildingUnitPersistentLocalId = buildingUnitPersistentLocalId
             };
 
             //Act
-            Func<Task> act = async () => await _controller.Realize(
+            Func<Task> act = async () => await _controller.NotRealize(
                 ResponseOptions,
                 MockIfMatchValidator(true),
                 request,
@@ -140,16 +140,16 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenRealizingBuildingUnit
             var buildingUnitPersistentLocalId = new BuildingUnitPersistentLocalId(456);
 
             MockMediator
-                .Setup(x => x.Send(It.IsAny<RealizeBuildingUnitRequest>(), CancellationToken.None).Result)
+                .Setup(x => x.Send(It.IsAny<NotRealizeBuildingUnitRequest>(), CancellationToken.None).Result)
                 .Throws(new BuildingUnitIsRemovedException(buildingUnitPersistentLocalId));
 
-            var request = new RealizeBuildingUnitRequest()
+            var request = new NotRealizeBuildingUnitRequest()
             {
                 BuildingUnitPersistentLocalId = buildingUnitPersistentLocalId
             };
 
             //Act
-            Func<Task> act = async () => await _controller.Realize(
+            Func<Task> act = async () => await _controller.NotRealize(
                 ResponseOptions,
                 MockIfMatchValidator(true),
                 request,
@@ -172,16 +172,16 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenRealizingBuildingUnit
             var buildingUnitPersistentLocalId = new BuildingUnitPersistentLocalId(456);
 
             MockMediator
-                .Setup(x => x.Send(It.IsAny<RealizeBuildingUnitRequest>(), CancellationToken.None).Result)
-                .Throws(new BuildingUnitStatusPreventsBuildingUnitRealizationException());
+                .Setup(x => x.Send(It.IsAny<NotRealizeBuildingUnitRequest>(), CancellationToken.None).Result)
+                .Throws(new BuildingUnitStatusPreventsBuildingUnitNotRealizationException());
 
-            var request = new RealizeBuildingUnitRequest()
+            var request = new NotRealizeBuildingUnitRequest()
             {
                 BuildingUnitPersistentLocalId = buildingUnitPersistentLocalId
             };
 
             //Act
-            Func<Task> act = async () => await _controller.Realize(
+            Func<Task> act = async () => await _controller.NotRealize(
                 ResponseOptions,
                 MockIfMatchValidator(true),
                 request,
@@ -195,41 +195,8 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenRealizingBuildingUnit
                 .Result
                 .Where(x =>
                     x.Errors.Any(error
-                        => error.ErrorCode == "GebouweenheidGehistoreerdOfNietGerealiseerd"
+                        => error.ErrorCode == "GebouweenheidStatusNietGepland"
                                           && error.ErrorMessage == "Deze actie is enkel toegestaan op gebouweenheden met status 'gepland'."));
-        }
-
-        [Fact]
-        public void WhenBuildingStatusInvalid_ThenValidationException()
-        {
-            var buildingUnitPersistentLocalId = new BuildingUnitPersistentLocalId(456);
-
-            MockMediator
-                .Setup(x => x.Send(It.IsAny<RealizeBuildingUnitRequest>(), CancellationToken.None).Result)
-                .Throws(new BuildingStatusPreventsBuildingUnitRealizationException());
-
-            var request = new RealizeBuildingUnitRequest()
-            {
-                BuildingUnitPersistentLocalId = buildingUnitPersistentLocalId
-            };
-
-            //Act
-            Func<Task> act = async () => await _controller.Realize(
-                ResponseOptions,
-                MockIfMatchValidator(true),
-                request,
-                string.Empty,
-                CancellationToken.None);
-
-            // Assert
-            act
-                .Should()
-                .ThrowAsync<ValidationException>()
-                .Result
-                .Where(x =>
-                    x.Errors.Any(error
-                        => error.ErrorCode == "GebouwStatusNietInGerealiseerd"
-                                          && error.ErrorMessage == "Deze actie is enkel toegestaan binnen een gerealiseerd gebouw."));
         }
     }
 }

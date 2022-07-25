@@ -14,7 +14,6 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRealizingBuildingUnit
     using Building.Exceptions;
     using Fixtures;
     using FluentAssertions;
-    using WhenPlanningBuildingUnit;
     using Xunit;
     using Xunit.Abstractions;
     using BuildingUnit = Building.Commands.BuildingUnit;

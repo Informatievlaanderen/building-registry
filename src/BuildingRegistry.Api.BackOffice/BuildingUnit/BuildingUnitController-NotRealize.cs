@@ -10,7 +10,6 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
     using Be.Vlaanderen.Basisregisters.Api.ETag;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
     using Building;
-    using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Extensions;
     using BuildingRegistry.Building;
     using BuildingRegistry.Building.Exceptions;
     using FluentValidation;
@@ -26,7 +25,7 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
     public partial class BuildingUnitController
     {
         /// <summary>
-        /// Realiseer een gebouweenheid..
+        /// Gebouweenheid niet realiseren.
         /// </summary>
         /// <param name="options"></param>
         /// <param name="ifMatchHeaderValidator"></param>
@@ -34,17 +33,17 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
         /// <param name="ifMatchHeaderValue"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        [HttpPost("{buildingUnitPersistentLocalId}/acties/realiseren")]
+        [HttpPost("{buildingUnitPersistentLocalId}/acties/nietrealiseren")]
         [ProducesResponseType(StatusCodes.Status202Accepted)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-        [SwaggerResponseHeader(StatusCodes.Status202Accepted, "location", "string", "De url van de gerealiseerde gebouweenheid.")]
+        [SwaggerResponseHeader(StatusCodes.Status202Accepted, "location", "string", "De url van de niet gerealiseerde gebouweenheid.")]
         [SwaggerResponseExample(StatusCodes.Status400BadRequest, typeof(BadRequestResponseExamples))]
         [SwaggerResponseExample(StatusCodes.Status500InternalServerError, typeof(InternalServerErrorResponseExamples))]
-        public async Task<IActionResult> Realize(
+        public async Task<IActionResult> NotRealize(
             [FromServices] IOptions<ResponseOptions> options,
             [FromServices] IIfMatchHeaderValidator ifMatchHeaderValidator,
-            [FromRoute] RealizeBuildingUnitRequest request,
+            [FromRoute] NotRealizeBuildingUnitRequest request,
             [FromHeader(Name = "If-Match")] string? ifMatchHeaderValue,
             CancellationToken ct = default)
         {
@@ -81,15 +80,11 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
 
                     BuildingUnitIsRemovedException => new ApiException(ValidationErrorMessages.BuildingUnit.BuildingUnitIsRemoved, StatusCodes.Status410Gone),
 
-                    BuildingUnitStatusPreventsBuildingUnitRealizationException => CreateValidationException(
-                        ValidationErrorCodes.BuildingUnit.BuildingUnitCannotBeRealized,
-                        string.Empty,
-                        ValidationErrorMessages.BuildingUnit.BuildingUnitCannotBeRealized),
-
-                    BuildingStatusPreventsBuildingUnitRealizationException => CreateValidationException(
-                        ValidationErrorCodes.BuildingUnit.BuildingStatusNotInRealized,
-                        string.Empty,
-                        ValidationErrorMessages.BuildingUnit.BuildingStatusNotInRealized),
+                    BuildingUnitStatusPreventsBuildingUnitNotRealizationException =>
+                        CreateValidationException(
+                            ValidationErrorCodes.BuildingUnit.BuildingUnitCannotBeNotRealized,
+                            string.Empty,
+                            ValidationErrorMessages.BuildingUnit.BuildingUnitCannotBeNotRealized),
 
                     _ => new ValidationException(new List<ValidationFailure>
                         { new ValidationFailure(string.Empty, exception.Message) })

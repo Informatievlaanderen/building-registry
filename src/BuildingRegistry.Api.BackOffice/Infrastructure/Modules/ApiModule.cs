@@ -37,6 +37,11 @@ namespace BuildingRegistry.Api.BackOffice.Infrastructure.Modules
                 .RegisterType<ProblemDetailsHelper>()
                 .AsSelf();
 
+            containerBuilder
+                .RegisterType<IfMatchHeaderValidator>()
+                .As<IIfMatchHeaderValidator>()
+                .AsSelf();
+
             containerBuilder.RegisterModule(new IdempotencyModule(
                 _services,
                 _configuration.GetSection(IdempotencyConfiguration.Section).Get<IdempotencyConfiguration>()

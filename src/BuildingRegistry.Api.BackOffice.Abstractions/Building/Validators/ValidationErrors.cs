@@ -16,6 +16,7 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.Building.Validators
             public const string BuildingUnitIsRemoved = "GebouweenheidVerwijderd";
             public const string BuildingStatusNotInRealized = "GebouwStatusNietInGerealiseerd";
             public const string BuildingUnitCannotBeRealized = "GebouweenheidGehistoreerdOfNietGerealiseerd";
+            public const string BuildingUnitCannotBeNotRealized = "GebouweenheidStatusNietGepland";
             public const string BuildingUnitCannotBePlanned = "GebouwStatusOngeldig";
             public const string BuildingUnitOutsideGeometryBuilding = "GebouweenheidOngeldigePositie";
             public const string MissingRequiredPosition = "GebouweendheidPositieValidatie";
@@ -40,6 +41,7 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.Building.Validators
             public const string BuildingUnitIsRemoved = "Verwijderde gebouweenheid.";
             public const string BuildingStatusNotInRealized = "Deze actie is enkel toegestaan binnen een gerealiseerd gebouw.";
             public const string BuildingUnitCannotBeRealized = "Deze actie is enkel toegestaan op gebouweenheden met status 'gepland'.";
+            public const string BuildingUnitCannotBeNotRealized = "Deze actie is enkel toegestaan op gebouweenheden met status 'gepland'.";
             public const string BuildingUnitCannotBePlanned = "Een gebouweenheid kan enkel toegevoegd worden aan een gebouw in status: gepland, in aanbouw of gerealiseerd.";
             public const string BuildingUnitOutsideGeometryBuilding = "Het geometriepunt dient binnen de geometrie van het gebouw te liggen.";
             public const string MissingRequiredPosition = "De verplichte parameter 'Geometriepunt' ontbreekt.";

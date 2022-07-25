@@ -3,6 +3,8 @@ namespace BuildingRegistry.Tests.BackOffice
     using System;
     using System.Collections.Generic;
     using System.Security.Claims;
+    using System.Threading;
+    using System.Threading.Tasks;
     using Autofac;
     using AutoFixture;
     using Be.Vlaanderen.Basisregisters.Api;
@@ -11,12 +13,16 @@ namespace BuildingRegistry.Tests.BackOffice
     using Building;
     using Building.Commands;
     using BuildingRegistry.Api.BackOffice.Abstractions;
+    using BuildingRegistry.Api.BackOffice.Infrastructure;
     using BuildingRegistry.Api.BackOffice.Infrastructure.Options;
+    using BuildingRegistry.Legacy;
     using MediatR;
     using Microsoft.AspNetCore.Http;
     using Microsoft.Extensions.Options;
     using Moq;
     using Xunit.Abstractions;
+    using ExtendedWkbGeometry = Building.ExtendedWkbGeometry;
+    using IBuildings = Building.IBuildings;
 
     public class BuildingRegistryBackOfficeTest : BuildingRegistryTest
     {
@@ -39,6 +45,15 @@ namespace BuildingRegistry.Tests.BackOffice
             using var scope = Container.BeginLifetimeScope();
             var bus = scope.Resolve<ICommandHandlerResolver>();
             bus.Dispatch(command.CreateCommandId(), command);
+        }
+
+        protected IIfMatchHeaderValidator MockIfMatchValidator(bool expectedResult)
+        {
+            var mockIfMatchHeaderValidator = new Mock<IIfMatchHeaderValidator>();
+            mockIfMatchHeaderValidator.Setup(x =>
+                    x.IsValidForBuildingUnit(It.IsAny<string>(), It.IsAny<BuildingUnitPersistentLocalId>(), CancellationToken.None))
+                .Returns(Task.FromResult(expectedResult));
+            return mockIfMatchHeaderValidator.Object;
         }
 
         public void PlanBuilding(BuildingPersistentLocalId buildingPersistentLocalId, ExtendedWkbGeometry wkbGeometry)
@@ -70,12 +85,10 @@ namespace BuildingRegistry.Tests.BackOffice
             }
         }
 
-        public T CreateBuildingUnitControllerWithUser<T>(
-            IBuildings buildingsRepository,
-            BackOfficeContext backOfficeContext)
+        public T CreateBuildingUnitControllerWithUser<T>()
             where T : ApiController
         {
-            var controller = Activator.CreateInstance(typeof(T), MockMediator.Object, buildingsRepository, backOfficeContext) as T;
+            var controller = Activator.CreateInstance(typeof(T), MockMediator.Object) as T;
 
             var claims = new List<Claim>
             {

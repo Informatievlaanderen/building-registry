@@ -14,7 +14,6 @@ namespace BuildingRegistry.Tests.BackOffice.Handlers.Building
     using BuildingRegistry.Building.Commands;
     using Fixtures;
     using FluentAssertions;
-    using Infrastructure;
     using SqlStreamStore;
     using SqlStreamStore.Streams;
     using Xunit;
