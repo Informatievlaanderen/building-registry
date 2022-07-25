@@ -34,7 +34,7 @@ namespace BuildingRegistry.Api.Legacy.Handlers.BuildingUnitV2
             }
 
             return new BuildingUnitResponse(
-                buildingUnit.BuildingPersistentLocalId,
+                buildingUnit.BuildingUnitPersistentLocalId,
                 request.ResponseOptions.Value.GebouweenheidNaamruimte,
                 buildingUnit.Version.ToBelgianDateTimeOffset(),
                 BuildingUnitHelpers.GetBuildingUnitPoint(buildingUnit.Position),
