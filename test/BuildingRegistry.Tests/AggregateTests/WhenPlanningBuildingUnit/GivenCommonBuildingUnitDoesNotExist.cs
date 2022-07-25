@@ -172,7 +172,9 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuildingUnit
         [Fact]
         public void WithInvalidBuildingUnits_AndValidBuildingStatus_ThenNoCommonBuildingUnitWasAdded()
         {
-            var command = Fixture.Create<PlanBuildingUnit>();
+            var command = Fixture.Create<PlanBuildingUnit>()
+                .WithoutPosition()
+                .WithPositionGeometryMethod(BuildingUnitPositionGeometryMethod.DerivedFromObject);
 
             var removedBuildingUnit = new BuildingRegistry.Building.Commands.BuildingUnit(
                 Fixture.Create<BuildingUnitId>(),
@@ -201,12 +203,14 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuildingUnit
                 Fixture.Create<BuildingRegistry.Legacy.BuildingUnitPosition>(),
                 isRemoved: false);
 
+            var buildingGeometry = Fixture.Create<BuildingGeometry>();
+
             var buildingWasMigrated = new BuildingWasMigrated(
                 Fixture.Create<BuildingId>(),
                 command.BuildingPersistentLocalId,
                 Fixture.Create<BuildingPersistentLocalIdAssignmentDate>(),
                 BuildingStatus.Planned,
-                Fixture.Create<BuildingGeometry>(),
+                buildingGeometry,
                 isRemoved: false,
                 new List<BuildingRegistry.Building.Commands.BuildingUnit>
                 {
@@ -216,7 +220,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuildingUnit
                 }
             );
             ((ISetProvenance)buildingWasMigrated).SetProvenance(Fixture.Create<Provenance>());
-            
+
             Assert(new Scenario()
                 .Given(new BuildingStreamId(Fixture.Create<BuildingPersistentLocalId>()),
                     buildingWasMigrated)
@@ -226,7 +230,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuildingUnit
                         command.BuildingPersistentLocalId,
                         command.BuildingUnitPersistentLocalId,
                         command.PositionGeometryMethod,
-                        command.Position,
+                        buildingGeometry.Center,
                         command.Function,
                         command.HasDeviation))));
         }
