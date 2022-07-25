@@ -8,9 +8,9 @@ namespace BuildingRegistry.Building.Events
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Newtonsoft.Json;
 
-    [EventTags(EventTag.For.Edit, EventTag.For.Edit, Tag.Building)]
+    [EventTags(EventTag.For.Sync, EventTag.For.Edit, Tag.Building)]
     [EventName(EventName)]
-    [EventDescription("Het gebouw werd gerealiseerd.")]
+    [EventDescription("De gebouweenheid werd gerealiseerd.")]
     public class BuildingUnitWasRealizedV2 : IBuildingEvent
     {
         public const string EventName = "BuildingUnitWasRealizedV2"; // BE CAREFUL CHANGING THIS!!
