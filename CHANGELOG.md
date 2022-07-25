@@ -1,3 +1,10 @@
+## [3.28.1](https://github.com/informatievlaanderen/building-registry/compare/v3.28.0...v3.28.1) (2022-07-25)
+
+
+### Bug Fixes
+
+* objectId for BuildingUnitResponse in Legacy GetHandler ([a9995a7](https://github.com/informatievlaanderen/building-registry/commit/a9995a7cfa248eb2a73ef99897b190164782a587))
+
 # [3.28.0](https://github.com/informatievlaanderen/building-registry/compare/v3.27.3...v3.28.0) (2022-07-25)
 
 
