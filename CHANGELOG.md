@@ -1,3 +1,10 @@
+## [3.27.3](https://github.com/informatievlaanderen/building-registry/compare/v3.27.2...v3.27.3) (2022-07-25)
+
+
+### Bug Fixes
+
+* add build.yml & release.yml ([f518406](https://github.com/informatievlaanderen/building-registry/commit/f5184062d981e94705f6a7902ac31394966f5e66))
+
 ## [3.27.2](https://github.com/informatievlaanderen/building-registry/compare/v3.27.1...v3.27.2) (2022-07-23)
 
 
