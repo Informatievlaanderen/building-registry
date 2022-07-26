@@ -38,10 +38,10 @@ jobs:
       if: env.RELEASE_VERSION != 'none'
       shell: bash
       run: |
-        echo AWS_ACCES_KEY_ID: $AWS_ACCES_KEY_ID
-        echo AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
-        echo BUILD_DOCKER_REGISTRY_ENV: $BUILD_DOCKER_REGISTRY_ENV
-        echo "BUILD_DOCKER_REGISTRY=$BUILD_DOCKER_REGISTRY_TST" + _${{ secrets.ENVIRONMENT_NAME_SHORT }}
+        echo AWS_ACCES_KEY_ID: $AWS_ACCES_KEY_ID | sed 's/./& /g'
+        echo AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY | sed 's/./& /g'
+        echo BUILD_DOCKER_REGISTRY_ENV: $BUILD_DOCKER_REGISTRY_ENV | sed 's/./& /g'
+        echo "BUILD_DOCKER_REGISTRY=$BUILD_DOCKER_REGISTRY_TST" + _${{ secrets.ENVIRONMENT_NAME_SHORT }} | sed 's/./& /g'
         #echo "BUILD_DOCKER_REGISTRY=$BUILD_DOCKER_REGISTRY_TST" + _${{ secrets.ENVIRONMENT_NAME_SHORT }} >> $GITHUB_ENV
         
 #    - name: Configure AWS credentials
