@@ -219,7 +219,7 @@ namespace BuildingRegistry.Building
         private static void GuardPolygon(Geometry? geometry)
         {
             if (
-                geometry == null
+            geometry == null
                 || geometry is not Polygon
                 || geometry.SRID != ExtendedWkbGeometry.SridLambert72
                 || !GeometryValidator.IsValid(geometry))
@@ -231,7 +231,7 @@ namespace BuildingRegistry.Building
         #region Metadata
         protected override void BeforeApplyChange(object @event)
         {
-            new EventMetadataContext(new Dictionary<string, object>());
+            _ = new EventMetadataContext(new Dictionary<string, object>());
             base.BeforeApplyChange(@event);
         }
         #endregion
