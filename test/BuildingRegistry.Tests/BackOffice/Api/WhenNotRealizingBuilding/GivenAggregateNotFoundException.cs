@@ -1,26 +1,26 @@
-namespace BuildingRegistry.Tests.BackOffice.Api.WhenRealizingBuilding
+namespace BuildingRegistry.Tests.BackOffice.Api.WhenNotRealizingBuilding
 {
     using System;
     using System.Threading;
     using System.Threading.Tasks;
     using Autofac;
+    using Be.Vlaanderen.Basisregisters.AggregateSource;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
-    using Building;
-    using Building.Exceptions;
     using BuildingRegistry.Api.BackOffice.Abstractions.Building.Requests;
     using BuildingRegistry.Api.BackOffice.Abstractions.Building.Validators;
     using BuildingRegistry.Api.BackOffice.Building;
+    using BuildingRegistry.Building;
     using FluentAssertions;
     using Microsoft.AspNetCore.Http;
     using Moq;
     using Xunit;
     using Xunit.Abstractions;
 
-    public class GivenBuildingIsRemovedException : BuildingRegistryBackOfficeTest
+    public class GivenAggregateNotFoundException : BuildingRegistryBackOfficeTest
     {
         private readonly BuildingController _controller;
 
-        public GivenBuildingIsRemovedException(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
+        public GivenAggregateNotFoundException(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
         {
             _controller = CreateBuildingControllerWithUser<BuildingController>();
         }
@@ -30,20 +30,20 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenRealizingBuilding
         {
             var buildingPersistentLocalId = new BuildingPersistentLocalId(123);
 
-            var request = new RealizeBuildingRequest()
+            var request = new NotRealizeBuildingRequest
             {
                 PersistentLocalId = buildingPersistentLocalId
             };
 
             MockMediator
-                .Setup(x => x.Send(It.IsAny<RealizeBuildingRequest>(), CancellationToken.None).Result)
-                .Throws(new BuildingIsRemovedException(buildingPersistentLocalId));
+                .Setup(x => x.Send(It.IsAny<NotRealizeBuildingRequest>(), CancellationToken.None).Result)
+                .Throws(new AggregateNotFoundException(buildingPersistentLocalId, typeof(Building)));
 
             //Act
-            Func<Task> act = async () => await _controller.Realize(
+            Func<Task> act = async () => await _controller.NotRealize(
                 Container.Resolve<IBuildings>(),
                 ResponseOptions,
-                new RealizeBuildingRequestValidator(),
+                new NotRealizeBuildingRequestValidator(),
                 MockIfMatchValidator(true),
                 request,
                 null,
@@ -55,8 +55,8 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenRealizingBuilding
                 .ThrowAsync<ApiException>()
                 .Result
                 .Where(x =>
-                    x.StatusCode == StatusCodes.Status410Gone
-                    && x.Message == "Verwijderd gebouw.");
+                    x.StatusCode == StatusCodes.Status404NotFound
+                    && x.Message == "Onbestaand gebouw.");
         }
     }
 }

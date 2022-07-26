@@ -44,6 +44,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenRealizingBuilding
                 Container.Resolve<IBuildings>(),
                 ResponseOptions,
                 new RealizeBuildingRequestValidator(),
+                MockIfMatchValidator(true),
                 request,
                 null,
                 CancellationToken.None);

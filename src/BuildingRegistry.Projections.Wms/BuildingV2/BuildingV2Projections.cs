@@ -72,6 +72,13 @@ namespace BuildingRegistry.Projections.Wms.BuildingV2
                 item.Version = message.Message.Provenance.Timestamp;
             });
 
+            When<Envelope<BuildingWasNotRealizedV2>>(async (context, message, ct) =>
+            {
+                var item = await context.BuildingsV2.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);
+                item.Status = BuildingStatus.NotRealized;
+                item.Version = message.Message.Provenance.Timestamp;
+            });
+
             When<Envelope<BuildingUnitWasPlannedV2>>(async (context, message, ct) =>
             {
                 var item = await context.BuildingsV2.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);

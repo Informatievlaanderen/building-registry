@@ -98,6 +98,29 @@ namespace BuildingRegistry.Building
             ApplyChange(new BuildingWasRealizedV2(BuildingPersistentLocalId));
         }
 
+        public void NotRealizeConstruction()
+        {
+            GuardRemovedBuilding();
+
+            if (BuildingStatus == BuildingStatus.NotRealized)
+            {
+                return;
+            }
+
+            var invalidStatuses = new List<BuildingStatus>
+            {
+                BuildingStatus.Realized,
+                BuildingStatus.Retired,
+            };
+
+            if (invalidStatuses.Contains(BuildingStatus))
+            {
+                throw new BuildingStatusPreventsNotRealizeBuildingException();
+            }
+
+            ApplyChange(new BuildingWasNotRealizedV2(BuildingPersistentLocalId));
+        }
+
         public void PlanBuildingUnit(
             IPersistentLocalIdGenerator persistentLocalIdGenerator,
             BuildingUnitPersistentLocalId buildingUnitPersistentLocalId,

@@ -1,4 +1,4 @@
-﻿namespace BuildingRegistry.Api.BackOffice.Infrastructure
+namespace BuildingRegistry.Api.BackOffice.Infrastructure
 {
     using System.Linq;
     using System.Threading;
@@ -11,13 +11,14 @@
 
     public interface IIfMatchHeaderValidator
     {
+        public Task<bool> IsValidForBuilding(string? ifMatchHeaderValue, BuildingPersistentLocalId buildingPersistentLocalId, CancellationToken ct);
         public Task<bool> IsValidForBuildingUnit(string? ifMatchHeaderValue, BuildingUnitPersistentLocalId buildingUnitPersistentLocalId, CancellationToken ct);
     }
 
     public class IfMatchHeaderValidator : IIfMatchHeaderValidator
     {
         private readonly IBuildings _buildings;
-        private BackOfficeContext _backOfficeContext;
+        private readonly BackOfficeContext _backOfficeContext;
 
         public IfMatchHeaderValidator(
             IBuildings buildings,
@@ -25,6 +26,21 @@
         {
             _buildings = buildings;
             _backOfficeContext = backOfficeContext;
+        }
+
+        public async Task<bool> IsValidForBuilding(
+            string? ifMatchHeaderValue,
+            BuildingPersistentLocalId buildingPersistentLocalId,
+            CancellationToken ct)
+        {
+            if (string.IsNullOrWhiteSpace(ifMatchHeaderValue))
+            {
+                return true;
+            }
+
+            var etag = await GetBuildingEtag(buildingPersistentLocalId, ct);
+
+            return IfMatchHeaderMatchesEtag(ifMatchHeaderValue, etag);
         }
 
         public async Task<bool> IsValidForBuildingUnit(
@@ -62,6 +78,16 @@
             }
 
             return new ETag(ETagType.Strong, buildingUnit.LastEventHash);
+        }
+
+
+        private async Task<ETag> GetBuildingEtag(
+            int buildingPersistentLocalId,
+            CancellationToken cancellationToken)
+        {
+            var aggregate =
+                await _buildings.GetAsync(new BuildingStreamId(new BuildingPersistentLocalId(buildingPersistentLocalId)), cancellationToken);
+            return new ETag(ETagType.Strong, aggregate.LastEventHash);
         }
 
         private bool IfMatchHeaderMatchesEtag(string ifMatchHeaderValue, ETag etag)

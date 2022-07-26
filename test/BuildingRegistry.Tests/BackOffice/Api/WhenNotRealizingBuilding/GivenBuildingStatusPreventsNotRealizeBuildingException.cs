@@ -1,49 +1,49 @@
-namespace BuildingRegistry.Tests.BackOffice.Api.WhenRealizingBuilding
+namespace BuildingRegistry.Tests.BackOffice.Api.WhenNotRealizingBuilding
 {
     using System;
+    using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
     using Autofac;
-    using Be.Vlaanderen.Basisregisters.Api.Exceptions;
-    using Building;
-    using Building.Exceptions;
     using BuildingRegistry.Api.BackOffice.Abstractions.Building.Requests;
     using BuildingRegistry.Api.BackOffice.Abstractions.Building.Validators;
     using BuildingRegistry.Api.BackOffice.Building;
+    using Building;
+    using Building.Exceptions;
     using FluentAssertions;
-    using Microsoft.AspNetCore.Http;
+    using FluentValidation;
     using Moq;
     using Xunit;
     using Xunit.Abstractions;
 
-    public class GivenBuildingIsRemovedException : BuildingRegistryBackOfficeTest
+    public class GivenBuildingStatusPreventsNotRealizeBuildingException : BuildingRegistryBackOfficeTest
     {
         private readonly BuildingController _controller;
 
-        public GivenBuildingIsRemovedException(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
+        public GivenBuildingStatusPreventsNotRealizeBuildingException(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
         {
             _controller = CreateBuildingControllerWithUser<BuildingController>();
         }
 
         [Fact]
-        public void ThenThrowApiException()
+        public void ThenValidationException()
         {
             var buildingPersistentLocalId = new BuildingPersistentLocalId(123);
 
-            var request = new RealizeBuildingRequest()
+            var request = new NotRealizeBuildingRequest()
             {
                 PersistentLocalId = buildingPersistentLocalId
             };
 
             MockMediator
-                .Setup(x => x.Send(It.IsAny<RealizeBuildingRequest>(), CancellationToken.None).Result)
-                .Throws(new BuildingIsRemovedException(buildingPersistentLocalId));
+                .Setup(x => x.Send(It.IsAny<NotRealizeBuildingRequest>(), CancellationToken.None).Result)
+                .Throws(new BuildingStatusPreventsNotRealizeBuildingException());
 
             //Act
-            Func<Task> act = async () => await _controller.Realize(
+            Func<Task> act = async () => await _controller.NotRealize(
                 Container.Resolve<IBuildings>(),
                 ResponseOptions,
-                new RealizeBuildingRequestValidator(),
+                new NotRealizeBuildingRequestValidator(),
                 MockIfMatchValidator(true),
                 request,
                 null,
@@ -52,11 +52,12 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenRealizingBuilding
             // Assert
             act
                 .Should()
-                .ThrowAsync<ApiException>()
+                .ThrowAsync<ValidationException>()
                 .Result
                 .Where(x =>
-                    x.StatusCode == StatusCodes.Status410Gone
-                    && x.Message == "Verwijderd gebouw.");
+                    x.Errors.Any(
+                        failure => failure.ErrorCode == "GebouwGehistoreerdOfGerealiseerd"
+                                    && failure.ErrorMessage == "Deze actie is enkel toegestaan op gebouw met status 'inAanbouw', 'gepland'."));
         }
     }
 }

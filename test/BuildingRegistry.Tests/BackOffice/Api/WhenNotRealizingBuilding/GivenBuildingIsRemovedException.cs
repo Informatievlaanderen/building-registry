@@ -1,18 +1,18 @@
-namespace BuildingRegistry.Tests.BackOffice.Api.WhenRealizingBuilding
+namespace BuildingRegistry.Tests.BackOffice.Api.WhenNotRealizingBuilding
 {
-    using System;
-    using System.Threading;
-    using System.Threading.Tasks;
     using Autofac;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
-    using Building;
-    using Building.Exceptions;
     using BuildingRegistry.Api.BackOffice.Abstractions.Building.Requests;
     using BuildingRegistry.Api.BackOffice.Abstractions.Building.Validators;
     using BuildingRegistry.Api.BackOffice.Building;
+    using Building;
+    using Building.Exceptions;
     using FluentAssertions;
     using Microsoft.AspNetCore.Http;
     using Moq;
+    using System;
+    using System.Threading;
+    using System.Threading.Tasks;
     using Xunit;
     using Xunit.Abstractions;
 
@@ -30,20 +30,20 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenRealizingBuilding
         {
             var buildingPersistentLocalId = new BuildingPersistentLocalId(123);
 
-            var request = new RealizeBuildingRequest()
+            var request = new NotRealizeBuildingRequest()
             {
                 PersistentLocalId = buildingPersistentLocalId
             };
 
             MockMediator
-                .Setup(x => x.Send(It.IsAny<RealizeBuildingRequest>(), CancellationToken.None).Result)
+                .Setup(x => x.Send(It.IsAny<NotRealizeBuildingRequest>(), CancellationToken.None).Result)
                 .Throws(new BuildingIsRemovedException(buildingPersistentLocalId));
 
             //Act
-            Func<Task> act = async () => await _controller.Realize(
+            Func<Task> act = async () => await _controller.NotRealize(
                 Container.Resolve<IBuildings>(),
                 ResponseOptions,
-                new RealizeBuildingRequestValidator(),
+                new NotRealizeBuildingRequestValidator(),
                 MockIfMatchValidator(true),
                 request,
                 null,

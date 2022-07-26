@@ -39,6 +39,7 @@ namespace BuildingRegistry.Building
             Register<BuildingWasPlannedV2>(When);
             Register<BuildingBecameUnderConstructionV2>(When);
             Register<BuildingWasRealizedV2>(When);
+            Register<BuildingWasNotRealizedV2>(When);
 
             Register<BuildingUnitWasPlannedV2>(When);
             Register<BuildingUnitWasRealizedV2>(When);
@@ -104,6 +105,13 @@ namespace BuildingRegistry.Building
             {
                 unit.RealizeBecauseBuildingWasRealized();
             }
+
+            _lastEvent = @event;
+        }
+
+        private void When(BuildingWasNotRealizedV2 @event)
+        {
+            BuildingStatus = BuildingStatus.NotRealized;
 
             _lastEvent = @event;
         }
