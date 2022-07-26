@@ -28,9 +28,6 @@ namespace BuildingRegistry.Console.ReactivatedHouseNumbers
     {
         const string FilesToProcessPath = "FilesToProcess";
 
-        protected Program()
-        { }
-        
         static void Main(string[] args)
         {
             var configuration = new ConfigurationBuilder()

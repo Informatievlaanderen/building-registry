@@ -9,7 +9,7 @@ namespace BuildingRegistry.Api.Legacy.Infrastructure
     using Microsoft.SyndicationFeed;
     using Microsoft.SyndicationFeed.Atom;
 
-    public static class AtomFeedConfigurationBuilder
+    public class AtomFeedConfigurationBuilder
     {
         public static AtomFeedConfiguration CreateFrom(IConfigurationSection configuration, DateTimeOffset lastUpdated)
         {
