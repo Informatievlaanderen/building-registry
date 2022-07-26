@@ -1,3 +1,15 @@
+# [3.29.0](https://github.com/informatievlaanderen/building-registry/compare/v3.28.2...v3.29.0) (2022-07-26)
+
+
+### Features
+
+* building unit not realize ([95dcebb](https://github.com/informatievlaanderen/building-registry/commit/95dcebb5774465b158974cd86bd1f93fa7d60536))
+
+
+### Reverts
+
+* Revert "fix: resolve sonar bugs" ([485995a](https://github.com/informatievlaanderen/building-registry/commit/485995a89c5b40d11dda8c7cfe76413a834c26c6))
+
 ## [3.28.2](https://github.com/informatievlaanderen/building-registry/compare/v3.28.1...v3.28.2) (2022-07-25)
 
 
