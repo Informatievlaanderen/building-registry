@@ -63,7 +63,7 @@ namespace BuildingRegistry.Building
             {
                 BuildingStatus.Retired,
                 BuildingStatus.Realized,
-                BuildingStatus.NotRealized
+                BuildingStatus.NotRealized,
             };
 
             if (invalidStatuses.Contains(BuildingStatus))
@@ -217,7 +217,7 @@ namespace BuildingRegistry.Building
         #region Metadata
         protected override void BeforeApplyChange(object @event)
         {
-            //new EventMetadataContext(new Dictionary<string, object>());
+            new EventMetadataContext(new Dictionary<string, object>());
             base.BeforeApplyChange(@event);
         }
         #endregion
