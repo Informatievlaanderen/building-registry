@@ -11,7 +11,7 @@ namespace BuildingRegistry.Console.SortToProcess
     using Microsoft.Extensions.Configuration;
     using Newtonsoft.Json;
 
-    public static class Program
+    class Program
     {
         static void Main(string[] args)
         {
