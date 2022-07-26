@@ -53,6 +53,9 @@ namespace BuildingRegistry.Tests.BackOffice
             mockIfMatchHeaderValidator.Setup(x =>
                     x.IsValidForBuildingUnit(It.IsAny<string>(), It.IsAny<BuildingUnitPersistentLocalId>(), CancellationToken.None))
                 .Returns(Task.FromResult(expectedResult));
+            mockIfMatchHeaderValidator.Setup(x =>
+                    x.IsValidForBuilding(It.IsAny<string>(), It.IsAny<BuildingPersistentLocalId>(), CancellationToken.None))
+                .Returns(Task.FromResult(expectedResult));
             return mockIfMatchHeaderValidator.Object;
         }
 

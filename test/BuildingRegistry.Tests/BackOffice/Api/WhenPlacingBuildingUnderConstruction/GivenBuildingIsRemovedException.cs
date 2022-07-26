@@ -45,6 +45,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenPlacingBuildingUnderConstruc
                 Container.Resolve<IBuildings>(),
                 ResponseOptions,
                 new PlaceBuildingUnderConstructionRequestValidator(),
+                MockIfMatchValidator(true),
                 request,
                 null,
                 CancellationToken.None);

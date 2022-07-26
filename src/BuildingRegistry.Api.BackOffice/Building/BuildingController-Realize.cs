@@ -14,6 +14,7 @@ namespace BuildingRegistry.Api.BackOffice.Building
     using FluentValidation;
     using FluentValidation.Results;
     using Handlers;
+    using Infrastructure;
     using Infrastructure.Options;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
@@ -27,6 +28,7 @@ namespace BuildingRegistry.Api.BackOffice.Building
         /// </summary>
         /// <param name="buildingsRepository"></param>
         /// <param name="options"></param>
+        /// <param name="ifMatchHeaderValidator"></param>
         /// <param name="request"></param>
         /// <param name="validator"></param>
         /// <param name="ifMatchHeaderValue"></param>
@@ -45,6 +47,7 @@ namespace BuildingRegistry.Api.BackOffice.Building
             [FromServices] IBuildings buildingsRepository,
             [FromServices] IOptions<ResponseOptions> options,
             [FromServices] IValidator<RealizeBuildingRequest> validator,
+            [FromServices] IIfMatchHeaderValidator ifMatchHeaderValidator,
             [FromRoute] RealizeBuildingRequest request,
             [FromHeader(Name = "If-Match")] string? ifMatchHeaderValue,
             CancellationToken cancellationToken = default)
@@ -55,15 +58,11 @@ namespace BuildingRegistry.Api.BackOffice.Building
             {
                 request.Metadata = GetMetadata();
 
-                // Check if user provided ETag is equal to the current Entity Tag
-                if (ifMatchHeaderValue is not null)
+
+                if (!await ifMatchHeaderValidator.IsValidForBuilding(ifMatchHeaderValue,
+                        new BuildingPersistentLocalId(request.PersistentLocalId), cancellationToken))
                 {
-                    var ifMatchTag = ifMatchHeaderValue.Trim();
-                    var currentETag = await GetEtag(buildingsRepository, request.PersistentLocalId, cancellationToken);
-                    if (ifMatchTag != currentETag.ToString())
-                    {
-                        return new PreconditionFailedResult();
-                    }
+                    return new PreconditionFailedResult();
                 }
 
                 var response = await _mediator.Send(request, cancellationToken);

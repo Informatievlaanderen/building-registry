@@ -20,15 +20,5 @@ namespace BuildingRegistry.Api.BackOffice.Building
         {
             _mediator = mediator;
         }
-
-        protected async Task<ETag> GetEtag(
-            IBuildings buildingRepository,
-            int buildingPersistentLocalId,
-            CancellationToken cancellationToken)
-        {
-            var aggregate =
-                await buildingRepository.GetAsync(new BuildingStreamId(new BuildingPersistentLocalId(buildingPersistentLocalId)), cancellationToken);
-            return new ETag(ETagType.Strong, aggregate.LastEventHash);
-        }
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace BuildingRegistry.Tests.BackOffice.Infrastructure
+namespace BuildingRegistry.Tests.BackOffice.Infrastructure
 {
     using System;
     using System.Threading;
@@ -18,11 +18,11 @@
     using Xunit;
     using Xunit.Abstractions;
 
-    public class IfMatchHeaderValidatorTests : BuildingRegistryBackOfficeTest
+    public class IfBuildingUnitMatchHeaderValidatorTests : BuildingRegistryBackOfficeTest
     {
         private readonly FakeBackOfficeContext _backOfficeContext;
 
-        public IfMatchHeaderValidatorTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
+        public IfBuildingUnitMatchHeaderValidatorTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
         {
             Fixture.Customize(new WithFixedBuildingPersistentLocalId());
             Fixture.Customize(new WithFixedBuildingUnitPersistentLocalId());

@@ -24,7 +24,7 @@ namespace BuildingRegistry.Api.BackOffice.Building
     public partial class BuildingController
     {
         /// <summary>
-        /// Gebouw in aanbouw zetten.
+        /// Gebouw niet realiseren.
         /// </summary>
         /// <param name="buildingsRepository"></param>
         /// <param name="options"></param>
@@ -33,22 +33,22 @@ namespace BuildingRegistry.Api.BackOffice.Building
         /// <param name="validator"></param>
         /// <param name="ifMatchHeaderValue"></param>
         /// <param name="cancellationToken"></param>
-        /// <response code="202">Aanvraag tot goedkeuring wordt reeds verwerkt.</response>
+        /// <response code="202">Als het gebouw (reeds) niet gerealiseerd is.</response>
         /// <response code="412">Als de If-Match header niet overeenkomt met de laatste ETag.</response>
         /// <returns></returns>
-        [HttpPost("{persistentLocalId}/acties/inaanbouwplaatsen")]
+        [HttpPost("{persistentLocalId}/acties/nietrealiseren")]
         [ProducesResponseType(StatusCodes.Status202Accepted)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
         [SwaggerResponseHeader(StatusCodes.Status202Accepted, "location", "string", "De url van het gebouw.")]
         [SwaggerResponseExample(StatusCodes.Status400BadRequest, typeof(BadRequestResponseExamples))]
         [SwaggerResponseExample(StatusCodes.Status500InternalServerError, typeof(InternalServerErrorResponseExamples))]
-        public async Task<IActionResult> UnderConstruction(
+        public async Task<IActionResult> NotRealize(
             [FromServices] IBuildings buildingsRepository,
             [FromServices] IOptions<ResponseOptions> options,
-            [FromServices] IValidator<PlaceBuildingUnderConstructionRequest> validator,
+            [FromServices] IValidator<NotRealizeBuildingRequest> validator,
             [FromServices] IIfMatchHeaderValidator ifMatchHeaderValidator,
-            [FromRoute] PlaceBuildingUnderConstructionRequest request,
+            [FromRoute] NotRealizeBuildingRequest request,
             [FromHeader(Name = "If-Match")] string? ifMatchHeaderValue,
             CancellationToken cancellationToken = default)
         {
@@ -83,10 +83,10 @@ namespace BuildingRegistry.Api.BackOffice.Building
                 throw exception switch
                 {
                     BuildingIsRemovedException => new ApiException(ValidationErrorMessages.Building.BuildingRemoved, StatusCodes.Status410Gone),
-                    BuildingCannotBePlacedUnderConstructionException => CreateValidationException(
-                        ValidationErrorCodes.Building.BuildingCannotBePlacedUnderConstruction,
+                    BuildingStatusPreventsNotRealizeBuildingException => CreateValidationException(
+                        ValidationErrorCodes.Building.BuildingCannotBeNotRealizedException,
                         string.Empty,
-                        ValidationErrorMessages.Building.BuildingCannotBePlacedUnderConstruction),
+                        ValidationErrorMessages.Building.BuildingCannotBeNotRealizedException),
 
                     _ => new ValidationException(new List<ValidationFailure>
                         { new ValidationFailure(string.Empty, exception.Message) })
