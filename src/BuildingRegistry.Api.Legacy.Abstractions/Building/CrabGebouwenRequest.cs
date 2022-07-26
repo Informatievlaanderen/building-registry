@@ -5,5 +5,5 @@ namespace BuildingRegistry.Api.Legacy.Abstractions.Building
     using Projections.Legacy;
     using Responses;
 
-    public record CrabGebouwenRequest(LegacyContext Context, HttpRequest HttpRequest) : IRequest<BuildingCrabMappingResponse>;
+    public record CrabGebouwenRequest(LegacyContext Context, HttpRequest HttpRequest) : IRequest<BuildingCrabMappingResponse?>;
 }
