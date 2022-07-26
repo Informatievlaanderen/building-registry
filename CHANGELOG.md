@@ -1,3 +1,10 @@
+## [3.29.1](https://github.com/informatievlaanderen/building-registry/compare/v3.29.0...v3.29.1) (2022-07-26)
+
+
+### Bug Fixes
+
+* copy lambda.zip to S3 bucket ([4add199](https://github.com/informatievlaanderen/building-registry/commit/4add199ed8f7f09362b0fbfd30b983450547fc1b))
+
 # [3.29.0](https://github.com/informatievlaanderen/building-registry/compare/v3.28.2...v3.29.0) (2022-07-26)
 
 
