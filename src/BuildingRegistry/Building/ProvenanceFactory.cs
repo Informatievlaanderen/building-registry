@@ -1,7 +1,6 @@
 namespace BuildingRegistry.Building
 {
     using System;
-
     using Be.Vlaanderen.Basisregisters.AggregateSource;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
 
@@ -12,7 +11,9 @@ namespace BuildingRegistry.Building
         public Provenance CreateFrom(object provenanceHolder, TAggregateRoot aggregate)
         {
             if (provenanceHolder is not IHasCommandProvenance provenance)
-                throw new ApplicationException($"Cannot create provenance from {provenanceHolder.GetType().Name}");
+            {
+                throw new InvalidOperationException($"Cannot create provenance from {provenanceHolder.GetType().Name}");
+            }
 
             return provenance.Provenance;
         }

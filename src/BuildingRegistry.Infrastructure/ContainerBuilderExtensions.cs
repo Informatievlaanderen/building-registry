@@ -16,7 +16,9 @@ namespace BuildingRegistry.Infrastructure
             var connectionString = configuration.GetConnectionString("Events");
 
             if (string.IsNullOrWhiteSpace(connectionString))
-                throw new ApplicationException("Missing 'Events' connectionstring.");
+            {
+                throw new InvalidOperationException("Missing 'Events' connectionstring.");
+            }
 
             builder
                 .RegisterModule(new SqlStreamStoreModule(connectionString, Schema.Default))
@@ -32,7 +34,9 @@ namespace BuildingRegistry.Infrastructure
             var connectionString = configuration.GetConnectionString("Events");
 
             if (string.IsNullOrWhiteSpace(connectionString))
-                throw new ApplicationException("Missing 'Events' connectionstring.");
+            {
+                throw new InvalidOperationException("Missing 'Events' connectionstring.");
+            }
 
             return builder
                 .RegisterModule(new SqlStreamStoreModule(connectionString, Schema.Default))
@@ -44,7 +48,9 @@ namespace BuildingRegistry.Infrastructure
             var connectionString = configuration.GetConnectionString("Snapshots");
 
             if (string.IsNullOrWhiteSpace(connectionString))
-                throw new ApplicationException("Missing 'Snapshots' connectionstring.");
+            {
+                throw new InvalidOperationException("Missing 'Snapshots' connectionstring.");
+            }
 
             builder
                 .RegisterModule(new SqlSnapshotStoreModule(connectionString, Schema.Default));

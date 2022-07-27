@@ -9,11 +9,12 @@ namespace BuildingRegistry.Legacy
     {
         public bool CanCreateFrom<TCommand>() => typeof(IHasCrabProvenance).IsAssignableFrom(typeof(TCommand));
 
-        public Provenance CreateFrom(object provenanceHolder,
-            Building aggregate)
+        public Provenance CreateFrom(object provenanceHolder, Building aggregate)
         {
-            if (!(provenanceHolder is IHasCrabProvenance crabProvenance))
-                throw new ApplicationException($"Cannot create provenance from {provenanceHolder.GetType().Name}");
+            if (provenanceHolder is not IHasCrabProvenance crabProvenance)
+            {
+                throw new InvalidOperationException($"Cannot create provenance from {provenanceHolder.GetType().Name}");
+            }
 
             return CreateFrom(
                 aggregate.LastModificationBasedOnCrab,
@@ -28,13 +29,11 @@ namespace BuildingRegistry.Legacy
     {
         public bool CanCreateFrom<TCommand>() => typeof(IHasCommandProvenance).IsAssignableFrom(typeof(TCommand));
 
-        public Provenance CreateFrom(
-            object provenanceHolder,
-            Building aggregate)
+        public Provenance CreateFrom(object provenanceHolder, Building aggregate)
         {
             if (provenanceHolder is not IHasCommandProvenance provenance)
             {
-                throw new ApplicationException($"Cannot create provenance from {provenanceHolder.GetType().Name}");
+                throw new InvalidOperationException($"Cannot create provenance from {provenanceHolder.GetType().Name}");
             }
 
             return provenance.Provenance;
@@ -46,11 +45,12 @@ namespace BuildingRegistry.Legacy
     {
         public bool CanCreateFrom<TCommand>() => typeof(FixGrar1359).IsAssignableFrom(typeof(TCommand));
 
-        public Provenance CreateFrom(object provenanceHolder,
-            Building aggregate)
+        public Provenance CreateFrom(object provenanceHolder, Building aggregate)
         {
-            if (!(provenanceHolder is FixGrar1359 crabProvenance))
-                throw new ApplicationException($"Cannot create provenance from {provenanceHolder.GetType().Name}");
+            if (provenanceHolder is not FixGrar1359)
+            {
+                throw new InvalidOperationException($"Cannot create provenance from {provenanceHolder.GetType().Name}");
+            }
 
             return new Provenance(Instant.FromDateTimeUtc(DateTime.UtcNow), Application.Unknown, new Reason("Rechtzetting gebouweenheden"), new Operator("crabadmin"), Modification.Update, Organisation.DigitaalVlaanderen);
         }
