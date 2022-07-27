@@ -1,3 +1,10 @@
+## [3.29.3](https://github.com/informatievlaanderen/building-registry/compare/v3.29.2...v3.29.3) (2022-07-27)
+
+
+### Bug Fixes
+
+* fix lambda.zip location ([d221f65](https://github.com/informatievlaanderen/building-registry/commit/d221f65ef932c6a911584c4f06b2706b0e3eb46d))
+
 ## [3.29.2](https://github.com/informatievlaanderen/building-registry/compare/v3.29.1...v3.29.2) (2022-07-27)
 
 
