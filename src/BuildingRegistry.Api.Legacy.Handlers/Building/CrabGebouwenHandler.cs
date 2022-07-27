@@ -11,9 +11,9 @@ namespace BuildingRegistry.Api.Legacy.Handlers.Building
     using Be.Vlaanderen.Basisregisters.Api.Search.Sorting;
     using MediatR;
 
-    public class CrabGebouwenHandler : IRequestHandler<CrabGebouwenRequest, BuildingCrabMappingResponse>
+    public class CrabGebouwenHandler : IRequestHandler<CrabGebouwenRequest, BuildingCrabMappingResponse?>
     {
-        public Task<BuildingCrabMappingResponse> Handle(CrabGebouwenRequest request, CancellationToken cancellationToken)
+        public Task<BuildingCrabMappingResponse?> Handle(CrabGebouwenRequest request, CancellationToken cancellationToken)
         {
             var filtering = request.HttpRequest.ExtractFilteringRequest<BuildingCrabMappingFilter>();
             var sorting = request.HttpRequest.ExtractSortingRequest();
@@ -21,11 +21,11 @@ namespace BuildingRegistry.Api.Legacy.Handlers.Building
 
             if (filtering.Filter.TerrainObjectId == null && string.IsNullOrEmpty(filtering.Filter.IdentifierTerrainObject))
             {
-                return null;
+                return Task.FromResult((BuildingCrabMappingResponse?)null);
             }
 
             var query = new BuildingCrabMappingQuery(request.Context).Fetch(filtering, sorting, pagination);
-            return Task.FromResult(new BuildingCrabMappingResponse
+            return Task.FromResult<BuildingCrabMappingResponse?>(new BuildingCrabMappingResponse
             {
                 CrabGebouwen = query
                     .Items

@@ -426,7 +426,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
                                 AddressId = message.Message.AddressId,
                                 BuildingUnitId = unit.BuildingUnitId,
                                 Count = 1,
-                                Position = message.Position,
+                                Position = message.Position
                             });
                         }
 
@@ -447,10 +447,14 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
                         foreach (var addressId in message.Message.AddressIds)
                         {
                             var addressSyndicationItem = unit.Addresses.SingleOrDefault(u => u.AddressId == addressId);
-                            if (addressSyndicationItem != null && addressSyndicationItem.Count > 1)
+                            if (addressSyndicationItem is { Count: > 1 })
+                            {
                                 addressSyndicationItem.Count -= 1;
-                            else
+                            }
+                            else if (addressSyndicationItem is not null)
+                            {
                                 unit.Addresses.Remove(addressSyndicationItem);
+                            }
                         }
 
                         ApplyUnitVersion(unit, message.Message.Provenance.Timestamp);
@@ -500,7 +504,9 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
                         var unit = x.BuildingUnits.SingleOrDefault(y => y.BuildingUnitId == message.Message.BuildingUnitId);
 
                         if (unit != null)
+                        {
                             unit.PersistentLocalId = message.Message.PersistentLocalId;
+                        }
                     },
                     ct);
             });
@@ -854,7 +860,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
 
                 await context
                     .BuildingSyndication
-                    .AddAsync(newBuildingSyndicationItem, ct); ;
+                    .AddAsync(newBuildingSyndicationItem, ct);
             });
 
             When<Envelope<BuildingWasPlannedV2>>(async (context, message, ct) =>
@@ -880,7 +886,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
 
                 await context
                     .BuildingSyndication
-                    .AddAsync(newBuildingSyndicationItem, ct); ;
+                    .AddAsync(newBuildingSyndicationItem, ct);
             });
 
             When<Envelope<BuildingBecameUnderConstructionV2>>(async (context, message, ct) =>
@@ -973,7 +979,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
             var dictionary = new Dictionary<BuildingRegistry.Building.BuildingGeometryMethod, BuildingGeometryMethod>
             {
                 { BuildingRegistry.Building.BuildingGeometryMethod.MeasuredByGrb, BuildingGeometryMethod.MeasuredByGrb },
-                { BuildingRegistry.Building.BuildingGeometryMethod.Outlined, BuildingGeometryMethod.Outlined },
+                { BuildingRegistry.Building.BuildingGeometryMethod.Outlined, BuildingGeometryMethod.Outlined }
             };
 
             return dictionary[buildingGeometryMethod];
@@ -987,7 +993,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
                 { BuildingRegistry.Building.BuildingStatus.UnderConstruction, BuildingStatus.UnderConstruction },
                 { BuildingRegistry.Building.BuildingStatus.NotRealized, BuildingStatus.NotRealized },
                 { BuildingRegistry.Building.BuildingStatus.Realized, BuildingStatus.Realized },
-                { BuildingRegistry.Building.BuildingStatus.Retired, BuildingStatus.Retired },
+                { BuildingRegistry.Building.BuildingStatus.Retired, BuildingStatus.Retired }
             };
 
             return dictionary[buildingStatus];
@@ -1007,9 +1013,13 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
             foreach (var buildingUnitDetailItem in buildingUnits)
             {
                 if (buildingUnitIdsToNotRealize.Contains(buildingUnitDetailItem.BuildingUnitId))
+                {
                     buildingUnitDetailItem.Status = BuildingUnitStatus.NotRealized;
+                }
                 else if (buildingUnitIdsToRetire.Contains(buildingUnitDetailItem.BuildingUnitId))
+                {
                     buildingUnitDetailItem.Status = BuildingUnitStatus.Retired;
+                }
 
                 buildingUnitDetailItem.Addresses.Clear();
 
