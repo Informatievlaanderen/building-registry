@@ -11,7 +11,7 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Converters
             switch (methode)
             {
                 case PositieGeometrieMethode.AangeduidDoorBeheerder:
-                    return BuildingUnitPositionGeometryMethod.AppointedByAdministrator;;
+                    return BuildingUnitPositionGeometryMethod.AppointedByAdministrator;
                 case PositieGeometrieMethode.AfgeleidVanObject:
                     return BuildingUnitPositionGeometryMethod.DerivedFromObject;
                 default:

@@ -11,7 +11,7 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.Building.Validators
             if (OsloPuriValidator.TryParseIdentifier(url, out var stringId) && int.TryParse(stringId, out int persistentLocalId))
             {
                 return persistentLocalId;
-            };
+            }
 
             throw new InvalidOperationException();
         }

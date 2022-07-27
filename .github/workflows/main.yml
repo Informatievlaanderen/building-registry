@@ -188,8 +188,8 @@ jobs:
       shell: bash
       run: |
         echo Deploy Lambda functions to Test
-        echo aws s3 cp lambda.zip s3://s3-vbr-test-basisregisters-lam-sqsbackofficehandlerfunction
-        aws s3 cp lambda.zip s3://s3-vbr-test-basisregisters-lam-sqsbackofficehandlerfunction
+        echo aws s3 cp /home/runner/work/building-registry/building-registry/dist/BuildingRegistry.Api.BackOffice.Handlers.Sqs.Lambda/linux/lambda.zip s3://s3-vbr-test-basisregisters-lam-sqsbackofficehandlerfunction
+        aws s3 cp /home/runner/work/building-registry/building-registry/dist/BuildingRegistry.Api.BackOffice.Handlers.Sqs.Lambda/linux/lambda.zip s3://s3-vbr-test-basisregisters-lam-sqsbackofficehandlerfunction
         
     - name: Configure AWS credentials (Staging)
       if: env.RELEASE_VERSION != 'none'
@@ -239,13 +239,13 @@ jobs:
         SEMVER: ${{ env.RELEASE_VERSION }}
         WORKSPACE: ${{ github.workspace }}
 
-    - name: Deploy Lambda functions to Staging
-      if: env.RELEASE_VERSION != 'none'
-      shell: bash
-      run: |
-        #echo Deploy Lambda functions to Staging
-        #echo aws s3 cp lambda.zip s3://s3-vbr-staging-basisregisters-lam-sqsbackofficehandlerfunction
-        #aws s3 cp lambda.zip s3://s3-vbr-staging-basisregisters-lam-sqsbackofficehandlerfunction
+#    - name: Deploy Lambda functions to Staging
+#      if: env.RELEASE_VERSION != 'none'
+#      shell: bash
+#      run: |
+#        #echo Deploy Lambda functions to Staging
+#        #echo aws s3 cp lambda.zip s3://s3-vbr-staging-basisregisters-lam-sqsbackofficehandlerfunction
+#        #aws s3 cp lambda.zip s3://s3-vbr-staging-basisregisters-lam-sqsbackofficehandlerfunction
 
     - name: Configure AWS credentials (Production)
       if: env.RELEASE_VERSION != 'none'
@@ -295,13 +295,13 @@ jobs:
         SEMVER: ${{ env.RELEASE_VERSION }}
         WORKSPACE: ${{ github.workspace }}
 
-    - name: Deploy Lambda functions to Production
-      if: env.RELEASE_VERSION != 'none'
-      shell: bash
-      run: |
-        #echo Deploy Lambda functions to Production
-        #echo aws s3 cp lambda.zip s3://s3-vbr-production-basisregisters-lam-sqsbackofficehandlerfunction
-        #aws s3 cp lambda.zip s3://s3-vbr-production-basisregisters-lam-sqsbackofficehandlerfunction
+ #   - name: Deploy Lambda functions to Production
+ #     if: env.RELEASE_VERSION != 'none'
+ #     shell: bash
+ #     run: |
+ #       #echo Deploy Lambda functions to Production
+ #       #echo aws s3 cp lambda.zip s3://s3-vbr-production-basisregisters-lam-sqsbackofficehandlerfunction
+ #       #aws s3 cp lambda.zip s3://s3-vbr-production-basisregisters-lam-sqsbackofficehandlerfunction
         
     - name: Publish to NuGet
       if: env.RELEASE_VERSION != 'none'
