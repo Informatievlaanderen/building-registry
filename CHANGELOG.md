@@ -1,3 +1,10 @@
+## [3.29.2](https://github.com/informatievlaanderen/building-registry/compare/v3.29.1...v3.29.2) (2022-07-27)
+
+
+### Bug Fixes
+
+* finalize lambda deployment ([9aec4a5](https://github.com/informatievlaanderen/building-registry/commit/9aec4a5d308735b5e074de50908fa6439389a510))
+
 ## [3.29.1](https://github.com/informatievlaanderen/building-registry/compare/v3.29.0...v3.29.1) (2022-07-26)
 
 
