@@ -6,6 +6,9 @@ namespace BuildingRegistry.Projector.Infrastructure
 
     public class Program
     {
+        protected Program()
+        { }
+        
         public static void Main(string[] args)
             => Run(new ProgramOptions
                 {
@@ -24,8 +27,7 @@ namespace BuildingRegistry.Projector.Infrastructure
                     },
                     MiddlewareHooks =
                     {
-                        ConfigureDistributedLock =
-                            configuration => DistributedLockOptions.LoadFromConfiguration(configuration)
+                        ConfigureDistributedLock = DistributedLockOptions.LoadFromConfiguration
                     }
                 });
 

@@ -9,17 +9,18 @@ namespace BuildingRegistry.Api.Legacy.Infrastructure
     using Microsoft.SyndicationFeed;
     using Microsoft.SyndicationFeed.Atom;
 
-    public class AtomFeedConfigurationBuilder
+    public static class AtomFeedConfigurationBuilder
     {
         public static AtomFeedConfiguration CreateFrom(IConfigurationSection configuration, DateTimeOffset lastUpdated)
         {
+            var version = Assembly.GetEntryAssembly()?.GetName().Version?.ToString();
             return new AtomFeedConfiguration(
                 configuration["Id"],
                 configuration["Title"],
                 configuration["Subtitle"],
                 configuration["GeneratorTitle"],
                 configuration["GeneratorUri"],
-                Assembly.GetEntryAssembly().GetName().Version.ToString(),
+                version!,
                 configuration["Rights"],
                 lastUpdated,
                 new SyndicationPerson(configuration["AuthorName"], configuration["AuthorEmail"], AtomContributorTypes.Author),

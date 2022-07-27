@@ -19,6 +19,9 @@ namespace BuildingRegistry.Migrator.Building.Infrastructure
 
     public class Program
     {
+        protected Program()
+        { }
+        
         public static async Task Main(string[] args)
         {
             var cancellationTokenSource = new CancellationTokenSource();
@@ -51,7 +54,7 @@ namespace BuildingRegistry.Migrator.Building.Infrastructure
 
             try
             {
-                Stopwatch watch = Stopwatch.StartNew();
+                var watch = Stopwatch.StartNew();
 
                 var migrator = new StreamMigrator(
                     container.GetRequiredService<ILoggerFactory>(),

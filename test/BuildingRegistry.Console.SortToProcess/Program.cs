@@ -11,16 +11,16 @@ namespace BuildingRegistry.Console.SortToProcess
     using Microsoft.Extensions.Configuration;
     using Newtonsoft.Json;
 
-    class Program
+    public static class Program
     {
-        static void Main(string[] args)
+        public static void Main(string[] args)
         {
             var configuration = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: false)
                 .AddJsonFile($"appsettings.{Environment.MachineName.ToLowerInvariant()}.json", optional: true, reloadOnChange: false)
                 .AddEnvironmentVariables()
-                .AddCommandLine(args ?? new string[0])
+                .AddCommandLine(args)
                 .Build();
 
             var eventsConnectionString = configuration.GetConnectionString("Events");
@@ -48,14 +48,13 @@ namespace BuildingRegistry.Console.SortToProcess
                 int terrainObjectId = subaddressCommands.First().TerrainObjectId;
 
                 var subaddressByTerrainObjectHouseNumbers = subaddressCommands.GroupBy(x => (int)x.TerrainObjectHouseNumberId, x => (int)x.SubaddressId);
-                using (var sqlConnection = new SqlConnection(eventsConnectionString))
-                {
-                    var hasTbd = false;
-                    var hasToProcess = false;
+                using var sqlConnection = new SqlConnection(eventsConnectionString);
+                var hasTbd = false;
+                var hasToProcess = false;
 
-                    foreach (var subaddressByTerrainObjectHouseNumber in subaddressByTerrainObjectHouseNumbers)
-                    {
-                        var subaddressIds = sqlConnection.Query<int>(@"
+                foreach (var subaddressByTerrainObjectHouseNumber in subaddressByTerrainObjectHouseNumbers)
+                {
+                    var subaddressIds = sqlConnection.Query<int>(@"
                             select JSON_VALUE(jsondata, '$.subaddressId') from [building-registry-events].[BuildingRegistry].[Messages]
                             where StreamIdInternal in (
                                 select IdInternal
@@ -64,20 +63,32 @@ namespace BuildingRegistry.Console.SortToProcess
                                     SELECT buildingId FROM[building-registry].[BuildingRegistryLegacy].[BuildingPersistentIdCrabIdMappings] where crabterrainobjectid = @terrainobjectid))
                             and[type] = 'AddressSubaddressWasImportedFromCrab' and JSON_VALUE(jsondata, '$.terrainObjectHouseNumberId') = @terrainobjecthousenumberid", new { terrainobjectid = terrainObjectId, terrainobjecthousenumberid = subaddressByTerrainObjectHouseNumber.Key });
 
-                        if (subaddressByTerrainObjectHouseNumber.All(x => subaddressIds.Contains(x)))
-                            continue;
-                        else if (subaddressByTerrainObjectHouseNumber.Any(x => subaddressIds.Contains(x)))
-                            hasTbd = true;
-                        else
-                            hasToProcess = true;
+                    if (subaddressByTerrainObjectHouseNumber.All(x => subaddressIds.Contains(x)))
+                    {
+                        continue;
                     }
 
-                    if (!hasToProcess && !hasTbd)
-                        File.Copy(file, Path.Combine(rejectsPath, Path.GetFileName(file)));
-                    else if (hasTbd)
-                        File.Copy(file, Path.Combine(tbdPath, Path.GetFileName(file)));
+                    if (subaddressByTerrainObjectHouseNumber.Any(x => subaddressIds.Contains(x)))
+                    {
+                        hasTbd = true;
+                    }
                     else
-                        File.Copy(file, Path.Combine(toProcessPath, Path.GetFileName(file)));
+                    {
+                        hasToProcess = true;
+                    }
+                }
+
+                if (!hasToProcess && !hasTbd)
+                {
+                    File.Copy(file, Path.Combine(rejectsPath, Path.GetFileName(file)));
+                }
+                else if (hasTbd)
+                {
+                    File.Copy(file, Path.Combine(tbdPath, Path.GetFileName(file)));
+                }
+                else
+                {
+                    File.Copy(file, Path.Combine(toProcessPath, Path.GetFileName(file)));
                 }
             }
 

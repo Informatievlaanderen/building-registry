@@ -12,33 +12,32 @@ namespace BuildingRegistry.Structurizr
 
     public static class Ids
     {
-        public static int PersonUser = 10000;
-        public static int SoftwareSystemRegistry = 10001;
-        public static int ContainerApi = 10002;
-        public static int ContainerApiRunner = 10003;
-        public static int ContainerApiStore = 10004;
-        public static int ContainerEventStore = 10005;
-        public static int ContainerAggregateRoot = 10006;
-
-        public static int SoftwareSystemProjectionProducer = 10007;
-        public static int SoftwareSystemApi = 10008;
+        public static int PersonUser => 10000;
+        public static int SoftwareSystemRegistry => 10001;
+        public static int ContainerApi => 10002;
+        public static int ContainerApiRunner => 10003;
+        public static int ContainerApiStore => 10004;
+        public static int ContainerEventStore => 10005;
+        public static int ContainerAggregateRoot => 10006;
+        public static int SoftwareSystemProjectionProducer => 10007;
+        public static int SoftwareSystemApi => 10008;
     }
 
     public static class CustomTags
     {
-        public static string Store = "Store";
-        public static string Event = "Event";
-        public static string Command = "Command";
-        public static string Https = "HTTPS";
-        public static string EntityFramework = "Entity Framework";
-        public static string SqlStreamStore = "SqlStreamStore";
-        public static string Direct = "Direct";
+        public static string Store => "Store";
+        public static string Event => "Event";
+        public static string Command => "Command";
+        public static string Https => "HTTPS";
+        public static string EntityFramework => "Entity Framework";
+        public static string SqlStreamStore => "SqlStreamStore";
+        public static string Direct => "Direct";
     }
 
     /// <summary>
     /// This is a simple example of how to get started with Structurizr for .NET.
     /// </summary>
-    class Program
+    public static class Program
     {
         private const string WorkspaceUrlFormat = "https://structurizr.com/workspace/{0}";
         private const string PersonUserName = "Gebruiker";
@@ -75,7 +74,7 @@ namespace BuildingRegistry.Structurizr
 
             var workspace = new Workspace("BuildingRegistry", "Gebouwen register.")
             {
-                Version = DateTime.Today.ToString("yyyy-MM-dd"),
+                Version = DateTime.Today.ToString("yyyy-MM-dd")
             };
 
             var model = workspace.Model;
@@ -447,7 +446,9 @@ namespace BuildingRegistry.Structurizr
             eventsView.Add(eventStore);
 
             foreach (var @event in events)
+            {
                 eventsView.Add(@event);
+            }
 
             var eventRelationships = eventsView
                 .Relationships
@@ -455,7 +456,9 @@ namespace BuildingRegistry.Structurizr
                 .ToArray();
 
             foreach (var relationship in eventRelationships)
+            {
                 eventsView.Relationships.Remove(relationship);
+            }
 
             eventsView.PaperSize = PaperSize.A4_Landscape;
 
@@ -474,7 +477,9 @@ namespace BuildingRegistry.Structurizr
                 left += blockWidth + yPortion;
 
                 if ((eventNumber + 1) % eventsPerRow != 0)
+                {
                     continue;
+                }
 
                 left = startLeft;
                 top += blockHeight + 100;
@@ -499,7 +504,9 @@ namespace BuildingRegistry.Structurizr
             commandsView.Add(aggregateRoot);
 
             foreach (var command in commands)
+            {
                 commandsView.Add(command);
+            }
 
             var eventRelationships = commandsView
                 .Relationships
@@ -507,7 +514,9 @@ namespace BuildingRegistry.Structurizr
                 .ToArray();
 
             foreach (var relationship in eventRelationships)
+            {
                 commandsView.Relationships.Remove(relationship);
+            }
 
             commandsView.PaperSize = PaperSize.A4_Landscape;
 
@@ -526,7 +535,9 @@ namespace BuildingRegistry.Structurizr
                 left += blockWidth + yPortion;
 
                 if ((commandNumber + 1) % commandsPerRow != 0)
+                {
                     continue;
+                }
 
                 left = startLeft;
                 top += blockHeight + 100;
