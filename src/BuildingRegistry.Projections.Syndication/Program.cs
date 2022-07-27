@@ -22,6 +22,9 @@ namespace BuildingRegistry.Projections.Syndication
         private static readonly AutoResetEvent Closing = new AutoResetEvent(false);
         private static readonly CancellationTokenSource CancellationTokenSource = new CancellationTokenSource();
 
+        protected Program()
+        { }
+        
         public static async Task Main(string[] args)
         {
             var ct = CancellationTokenSource.Token;
@@ -43,7 +46,7 @@ namespace BuildingRegistry.Projections.Syndication
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: false)
                 .AddJsonFile($"appsettings.{Environment.MachineName.ToLowerInvariant()}.json", optional: true, reloadOnChange: false)
                 .AddEnvironmentVariables()
-                .AddCommandLine(args ?? new string[0])
+                .AddCommandLine(args)
                 .Build();
 
             var container = ConfigureServices(configuration);
@@ -59,11 +62,11 @@ namespace BuildingRegistry.Projections.Syndication
                         {
                             await MigrationsHelper.RunAsync(
                             configuration.GetConnectionString("SyndicationProjectionsAdmin"),
-                            container.GetService<ILoggerFactory>(),
+                            container.GetRequiredService<ILoggerFactory>(),
                             ct);
 
                             await container
-                                .GetService<FeedProjector<SyndicationContext>>()
+                                .GetRequiredService<FeedProjector<SyndicationContext>>()
                                 .Register(BuildProjectionRunners(configuration, container))
                                 .Start(ct);
                         }
@@ -73,8 +76,8 @@ namespace BuildingRegistry.Projections.Syndication
                             throw;
                         }
                     },
-                    DistributedLockOptions.LoadFromConfiguration(configuration) ?? DistributedLockOptions.Defaults,
-                    container.GetService<ILogger<Program>>());
+                    DistributedLockOptions.LoadFromConfiguration(configuration),
+                    container.GetRequiredService<ILogger<Program>>());
             }
             catch (Exception e)
             {
@@ -100,8 +103,8 @@ namespace BuildingRegistry.Projections.Syndication
                 configuration.GetValue<int>("SyndicationFeeds:AddressPollingInMilliseconds"),
                 false,
                 true,
-                container.GetService<ILogger<Program>>(),
-                container.GetService<IRegistryAtomFeedReader>(),
+                container.GetRequiredService<ILogger<Program>>(),
+                container.GetRequiredService<IRegistryAtomFeedReader>(),
                 new AddressPersistentLocalIdProjection());
 
 
@@ -114,8 +117,8 @@ namespace BuildingRegistry.Projections.Syndication
                 configuration.GetValue<int>("SyndicationFeeds:ParcelPollingInMilliseconds"),
                 false,
                 true,
-                container.GetService<ILogger<Program>>(),
-                container.GetService<IRegistryAtomFeedReader>(),
+                container.GetRequiredService<ILogger<Program>>(),
+                container.GetRequiredService<IRegistryAtomFeedReader>(),
                 new BuildingParcelLatestProjection());
 
             return new IFeedProjectionRunner<SyndicationContext>[]
@@ -133,7 +136,7 @@ namespace BuildingRegistry.Projections.Syndication
             builder.RegisterModule(new LoggingModule(configuration, services));
 
             var tempProvider = services.BuildServiceProvider();
-            builder.RegisterModule(new SyndicationModule(configuration, services, tempProvider.GetService<ILoggerFactory>()));
+            builder.RegisterModule(new SyndicationModule(configuration, services, tempProvider.GetRequiredService<ILoggerFactory>()));
 
             builder.Populate(services);
 

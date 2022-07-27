@@ -21,18 +21,18 @@ namespace BuildingRegistry.Consumer.Address.Infrastructure
 
     public class Program
     {
-        private static readonly AutoResetEvent closing = new AutoResetEvent(false);
-        private static readonly CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
+        private static readonly AutoResetEvent Closing = new AutoResetEvent(false);
+        private static readonly CancellationTokenSource CancellationTokenSource = new CancellationTokenSource();
 
         protected Program()
         { }
 
         public static async Task Main(string[] args)
         {
-            var cancellationToken = cancellationTokenSource.Token;
+            var cancellationToken = CancellationTokenSource.Token;
 
-            cancellationToken.Register(() => closing.Set());
-            Console.CancelKeyPress += (sender, eventArgs) => cancellationTokenSource.Cancel();
+            cancellationToken.Register(() => Closing.Set());
+            Console.CancelKeyPress += (sender, eventArgs) => CancellationTokenSource.Cancel();
 
             AppDomain.CurrentDomain.FirstChanceException += (sender, eventArgs) =>
                 Log.Debug(
@@ -109,7 +109,7 @@ namespace BuildingRegistry.Consumer.Address.Infrastructure
 
                                 await Task.WhenAny(consumerTask);
 
-                                cancellationTokenSource.Cancel();
+                                CancellationTokenSource.Cancel();
 
                                 Log.Error($"Consumer task stopped with status: {consumerTask.Status}");
                             }
@@ -136,7 +136,7 @@ namespace BuildingRegistry.Consumer.Address.Infrastructure
             }
 
             Log.Information("Stopping...");
-            closing.Close();
+            Closing.Close();
         }
 
         private static IServiceProvider ConfigureServices(IConfiguration configuration)
