@@ -1,7 +1,6 @@
 namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetailV2
 {
     using System;
-    using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Linq;
     using System.Threading;
@@ -14,7 +13,6 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetailV2
     using Be.Vlaanderen.Basisregisters.Utilities.HexByteConvertor;
     using Building;
     using Building.Events;
-    using Microsoft.EntityFrameworkCore;
 
     [ConnectedProjectionName("API endpoint detail/lijst gebouweenheden")]
     [ConnectedProjectionDescription("Projectie die de gebouweenheden data voor het gebouweenheden detail & lijst voorziet.")]
@@ -144,7 +142,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetailV2
         {
             var item = await context
                 .BuildingUnitDetailsV2
-                .FindAsync(buildingUnitPersistentLocalId);
+                .FindAsync(buildingUnitPersistentLocalId, ct);
             updateAction(item);
         }
 
@@ -156,13 +154,6 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetailV2
             }
 
             entity.LastEventHash = wrappedEvent.Metadata[AddEventHashPipe.HashMetadataKey].ToString()!;
-        }
-
-        private static async Task<List<BuildingUnitDetailItemV2>> GetAllBuildingUnitsByBuildingPersistentLocalId(LegacyContext context, int buildingPersistentLocalId, CancellationToken ct)
-        {
-            return (await context.BuildingUnitDetailsV2.Where(unit => unit.BuildingPersistentLocalId == buildingPersistentLocalId).ToListAsync(ct))
-                .Union(context.BuildingUnitDetailsV2.Local.Where(unit => unit.BuildingPersistentLocalId == buildingPersistentLocalId))
-                .ToList();
         }
     }
 }

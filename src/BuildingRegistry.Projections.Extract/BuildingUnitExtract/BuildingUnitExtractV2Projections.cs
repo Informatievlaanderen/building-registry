@@ -2,7 +2,6 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
     using System.Text;
     using Be.Vlaanderen.Basisregisters.GrAr.Common;
     using Be.Vlaanderen.Basisregisters.GrAr.Extracts;
@@ -44,7 +43,7 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
                 var buildingUnitBuildingItemV2 = new BuildingUnitBuildingItemV2
                 {
                     BuildingPersistentLocalId = message.Message.BuildingPersistentLocalId,
-                    IsRemoved = message.Message.IsRemoved,
+                    IsRemoved = message.Message.IsRemoved
                 };
 
                 var buildingStatus = BuildingStatus.Parse(message.Message.BuildingStatus);
@@ -97,7 +96,7 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
                 {
                     BuildingPersistentLocalId = message.Message.BuildingPersistentLocalId,
                     IsRemoved = false,
-                    BuildingRetiredStatus = null,
+                    BuildingRetiredStatus = null
                 };
 
                 await context.BuildingUnitBuildingsV2.AddAsync(buildingUnitBuildingItemV2, ct);
@@ -207,13 +206,6 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
             return dictionary[geometryMethod];
         }
 
-        private static IEnumerable<BuildingUnitExtractItemV2> GetBuildingUnitsByBuilding(ExtractContext context, int buildingPersistentLocalId)
-        {
-            var units = context.BuildingUnitExtractV2.Local.Where(x => x.BuildingPersistentLocalId == buildingPersistentLocalId)
-                .Union(context.BuildingUnitExtractV2.Where(x => x.BuildingPersistentLocalId == buildingPersistentLocalId).ToList());
-            return units;
-        }
-
         private static void UpdateGeometry(BuildingUnitExtractItemV2 item, Geometry? geometry)
         {
             if (geometry == null)
@@ -239,9 +231,6 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
 
         private void UpdateStatus(BuildingUnitExtractItemV2 buildingUnit, string status)
             => UpdateRecord(buildingUnit, record => record.status.Value = status);
-
-        private void UpdateGeometryMethod(BuildingUnitExtractItemV2 buildingUnit, string method)
-            => UpdateRecord(buildingUnit, record => record.posgeommet.Value = method);
 
         private void UpdateVersie(BuildingUnitExtractItemV2 buildingUnit, Instant timestamp)
             => UpdateRecord(buildingUnit, record => record.versieid.SetValue(timestamp.ToBelgianDateTimeOffset()));
