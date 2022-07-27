@@ -1,6 +1,8 @@
 AsyncEnumerator
 
+Be.Vlaanderen.Basisregisters.AggregateSource
 Be.Vlaanderen.Basisregisters.Api
+Be.Vlaanderen.Basisregisters.CommandHandling
 Be.Vlaanderen.Basisregisters.GrAr.Import
 
 MediatR.Contracts
