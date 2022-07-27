@@ -812,7 +812,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
 
             When<Envelope<BuildingWasMigrated>>(async (context, message, ct) =>
             {
-                var buildingUnitSyndicationItems = new Collection<BuildingUnitSyndicationItemV2>();
+                var buildingUnitSyndicationItemsV2 = new Collection<BuildingUnitSyndicationItemV2>();
                 foreach (var buildingUnit in message.Message.BuildingUnits)
                 {
                     var addressesIdsGrouped = buildingUnit.AddressPersistentLocalIds.GroupBy(x => x);
@@ -826,7 +826,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
                         })
                         .ToList();
 
-                    buildingUnitSyndicationItems.Add(new BuildingUnitSyndicationItemV2
+                    buildingUnitSyndicationItemsV2.Add(new BuildingUnitSyndicationItemV2
                     {
                         Position = message.Position,
                         PersistentLocalId = buildingUnit.BuildingUnitPersistentLocalId,
@@ -852,7 +852,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
                     LastChangedOn = message.Message.Provenance.Timestamp,
                     ChangeType = message.EventName,
                     SyndicationItemCreatedAt = DateTimeOffset.Now,
-                    BuildingUnitsV2 = buildingUnitSyndicationItems
+                    BuildingUnitsV2 = buildingUnitSyndicationItemsV2
                 };
 
                 newBuildingSyndicationItem.ApplyProvenance(message.Message.Provenance);
