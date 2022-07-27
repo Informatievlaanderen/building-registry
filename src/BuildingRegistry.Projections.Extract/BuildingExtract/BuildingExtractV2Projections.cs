@@ -29,19 +29,20 @@ namespace BuildingRegistry.Projections.Extract.BuildingExtract
         private const string MeasuredByGrb = "IngemetenGRB";
         private const string Outlined = "Ingeschetst";
 
-        private readonly ExtractConfig _extractConfig;
         private readonly Encoding _encoding;
 
         public BuildingExtractV2Projections(IOptions<ExtractConfig> extractConfig, Encoding encoding,
             WKBReader wkbReader)
         {
-            _extractConfig = extractConfig.Value;
+            var extractConfigValue = extractConfig.Value;
             _encoding = encoding ?? throw new ArgumentNullException(nameof(encoding));
 
             When<Envelope<BuildingWasMigrated>>(async (context, message, ct) =>
             {
                 if (message.Message.IsRemoved)
+                {
                     return;
+                }
 
                 var buildingExtractItemV2 = new BuildingExtractItemV2
                 {
@@ -51,7 +52,7 @@ namespace BuildingRegistry.Projections.Extract.BuildingExtract
                         id =
                         {
                             Value =
-                                $"{_extractConfig.DataVlaanderenNamespaceBuilding}/{message.Message.BuildingPersistentLocalId}"
+                                $"{extractConfigValue.DataVlaanderenNamespaceBuilding}/{message.Message.BuildingPersistentLocalId}"
                         },
                         gebouwid = {Value = message.Message.BuildingPersistentLocalId},
                         geommet =
@@ -84,7 +85,7 @@ namespace BuildingRegistry.Projections.Extract.BuildingExtract
                         id =
                         {
                             Value =
-                                $"{_extractConfig.DataVlaanderenNamespaceBuilding}/{message.Message.BuildingPersistentLocalId}"
+                                $"{extractConfigValue.DataVlaanderenNamespaceBuilding}/{message.Message.BuildingPersistentLocalId}"
                         },
                         gebouwid = {Value = message.Message.BuildingPersistentLocalId},
                         geommet = {Value = MapGeometryMethod(BuildingGeometryMethod.Outlined)},
@@ -162,7 +163,7 @@ namespace BuildingRegistry.Projections.Extract.BuildingExtract
                 { BuildingStatus.UnderConstruction, UnderConstruction },
                 { BuildingStatus.Realized, Realized },
                 { BuildingStatus.NotRealized, NotRealized },
-                { BuildingStatus.Retired, Retired },
+                { BuildingStatus.Retired, Retired }
             };
 
             return dictionary[buildingStatus];
@@ -193,16 +194,6 @@ namespace BuildingRegistry.Projections.Extract.BuildingExtract
 
         private void UpdateStatus(BuildingExtractItemV2 building, string status)
             => UpdateRecord(building, record => record.status.Value = status);
-
-        private void UpdateGeometryMethod(BuildingExtractItemV2 building, string method)
-            => UpdateRecord(building, record => record.geommet.Value = method);
-
-        private void UpdateId(BuildingExtractItemV2 building, int id)
-            => UpdateRecord(building, record =>
-            {
-                record.id.Value = $"{_extractConfig.DataVlaanderenNamespaceBuilding}/{id}";
-                record.gebouwid.Value = id;
-            });
 
         private void UpdateVersie(BuildingExtractItemV2 building, Instant timestamp)
             => UpdateRecord(building, record => record.versieid.SetValue(timestamp.ToBelgianDateTimeOffset()));

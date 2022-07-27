@@ -18,12 +18,11 @@ namespace BuildingRegistry.Projections.Extract.BuildingExtract
                 .FindAsync(buildingId, cancellationToken: ct);
 
             if (building == null) //building can be removed and events keep pouring in (building unit clean up events, persistent local id, etc)
+            {
                 return;
+            }
 
             updateFunc(building);
         }
-
-        private static ProjectionItemNotFoundException<BuildingExtractProjections> DatabaseItemNotFound(Guid buildingId)
-            => new ProjectionItemNotFoundException<BuildingExtractProjections>(buildingId.ToString("D"));
     }
 }
