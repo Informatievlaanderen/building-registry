@@ -142,7 +142,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetailV2
         {
             var item = await context
                 .BuildingUnitDetailsV2
-                .FindAsync(buildingUnitPersistentLocalId, ct);
+                .FindAsync(buildingUnitPersistentLocalId, cancellationToken: ct);
             updateAction(item);
         }
 
