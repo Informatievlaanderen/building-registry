@@ -1,5 +1,16 @@
 namespace BuildingRegistry.Building.Exceptions
 {
-    public class BuildingUnitStatusPreventsBuildingUnitRealizationException : BuildingRegistryException
-    {}
+    using System;
+    using System.Runtime.Serialization;
+
+    [Serializable]
+    public sealed class BuildingUnitStatusPreventsBuildingUnitRealizationException : BuildingRegistryException
+    {
+        public BuildingUnitStatusPreventsBuildingUnitRealizationException()
+        { }
+
+        private BuildingUnitStatusPreventsBuildingUnitRealizationException(SerializationInfo info, StreamingContext context)
+            : base(info, context)
+        { }
+    }
 }
