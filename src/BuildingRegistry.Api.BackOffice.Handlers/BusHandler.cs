@@ -3,6 +3,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Runtime.Serialization;
     using System.Security.Cryptography;
     using System.Text;
     using System.Threading;
@@ -83,10 +84,15 @@ namespace BuildingRegistry.Api.BackOffice.Handlers
         }
     }
 
-    public class IdempotencyException : Exception
+    [Serializable]
+    public sealed class IdempotencyException : Exception
     {
-        public IdempotencyException(string? message) : base(message)
-        {
-        }
+        public IdempotencyException(string? message)
+            : base(message)
+        { }
+
+        private IdempotencyException(SerializationInfo info, StreamingContext context)
+            : base(info, context)
+        { }
     }
 }

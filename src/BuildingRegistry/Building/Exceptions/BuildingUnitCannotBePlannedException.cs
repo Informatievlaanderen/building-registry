@@ -1,5 +1,16 @@
-﻿namespace BuildingRegistry.Building.Exceptions
+namespace BuildingRegistry.Building.Exceptions
 {
-    public class BuildingUnitCannotBePlannedException : BuildingRegistryException
-    { }
+    using System;
+    using System.Runtime.Serialization;
+
+    [Serializable]
+    public sealed class BuildingUnitCannotBePlannedException : BuildingRegistryException
+    {
+        public BuildingUnitCannotBePlannedException()
+        { }
+
+        private BuildingUnitCannotBePlannedException(SerializationInfo info, StreamingContext context)
+            : base(info, context)
+        { }
+    }
 }
