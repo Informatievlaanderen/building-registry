@@ -1,3 +1,11 @@
+## [3.30.1](https://github.com/informatievlaanderen/building-registry/compare/v3.30.0...v3.30.1) (2022-07-27)
+
+
+### Bug Fixes
+
+* conform exceptions to serializable spec ([1d82017](https://github.com/informatievlaanderen/building-registry/commit/1d820173054eeea011dd9144696bd963a0796bae))
+* fix sonar bugs ([a333fb4](https://github.com/informatievlaanderen/building-registry/commit/a333fb4563d852eb56939b28cf564c0b2dd0e2ee))
+
 # [3.30.0](https://github.com/informatievlaanderen/building-registry/compare/v3.29.3...v3.30.0) (2022-07-27)
 
 
