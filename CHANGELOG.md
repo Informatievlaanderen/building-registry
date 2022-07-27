@@ -1,3 +1,18 @@
+## [3.30.2](https://github.com/informatievlaanderen/building-registry/compare/v3.30.1...v3.30.2) (2022-07-27)
+
+
+### Bug Fixes
+
+* buildingSyndication include BuildingUnitV2 table ([eaefb09](https://github.com/informatievlaanderen/building-registry/commit/eaefb099ee676f3f9f145381420035a0a400e80d))
+* bump dependencies ([fa6525c](https://github.com/informatievlaanderen/building-registry/commit/fa6525c1d6c30f21017c98a731d6d9a1f0cd868c))
+* fix empty methods ([bafd57d](https://github.com/informatievlaanderen/building-registry/commit/bafd57d80204797b042791ae7e9ca93b58c7f2e2))
+* fix sonar fields visibility ([6e89072](https://github.com/informatievlaanderen/building-registry/commit/6e89072f2eb235013dfc442a5805562726cb6231))
+* fix sonar general exceptions ([ad9ec82](https://github.com/informatievlaanderen/building-registry/commit/ad9ec82d749f21f193e8838893bc3b12316a0072))
+* fix sonar parameter names ([bb5b5cd](https://github.com/informatievlaanderen/building-registry/commit/bb5b5cdf77537f1159c3a9c5acdbdbe55499597f))
+* fix sonar protected ctor or static ([66fab11](https://github.com/informatievlaanderen/building-registry/commit/66fab1110384319f6e4a16e548c6b5a82e430c92))
+* remove unused private members ([3655682](https://github.com/informatievlaanderen/building-registry/commit/3655682606e4b6599470b3a3ffa6ce4e2d94f1a1))
+* Serializable exceptions ([6ff2893](https://github.com/informatievlaanderen/building-registry/commit/6ff28936608265c554c5afae4bd320b77deb45fd))
+
 ## [3.30.1](https://github.com/informatievlaanderen/building-registry/compare/v3.30.0...v3.30.1) (2022-07-27)
 
 
