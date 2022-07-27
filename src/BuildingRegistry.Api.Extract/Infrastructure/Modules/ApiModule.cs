@@ -25,7 +25,7 @@ namespace BuildingRegistry.Api.Extract.Infrastructure.Modules
             _loggerFactory = loggerFactory;
         }
 
-        protected override void Load(ContainerBuilder containerBuilder)
+        protected override void Load(ContainerBuilder builder)
         {
             var useProjectionsV2ConfigValue = _configuration.GetSection("FeatureToggles")["UseProjectionsV2"];
             var useProjectionsV2 = false;
@@ -35,16 +35,16 @@ namespace BuildingRegistry.Api.Extract.Infrastructure.Modules
                 useProjectionsV2 = bool.Parse(useProjectionsV2ConfigValue);
             }
 
-            containerBuilder
+            builder
                 .RegisterModule(new MediatRModule(useProjectionsV2))
                 .RegisterModule(new DataDogModule(_configuration))
                 .RegisterModule(new ExtractModule(_configuration, _services, _loggerFactory, false));
 
-            containerBuilder
+            builder
                 .RegisterType<ProblemDetailsHelper>()
                 .AsSelf();
 
-            containerBuilder.Populate(_services);
+            builder.Populate(_services);
         }
     }
 }

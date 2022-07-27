@@ -12,17 +12,17 @@ namespace BuildingRegistry.Api.Legacy.Infrastructure.Modules
         public GrbModule(IConfiguration configuration)
             => _configuration = configuration;
 
-        protected override void Load(ContainerBuilder containerBuilder)
+        protected override void Load(ContainerBuilder builder)
         {
-            containerBuilder
+            builder
                 .RegisterInstance(new GrbWfsConfiguration(_configuration["Grb:Wfs:Url"]))
                 .AsSelf();
                 
-            containerBuilder
+            builder
                 .RegisterType<GrbWfsClient>()
                 .AsImplementedInterfaces();
                 
-            containerBuilder
+            builder
                 .RegisterType<GrbBuildingParcel>()
                 .AsImplementedInterfaces();
         }

@@ -36,11 +36,11 @@ using System;
             _loggerFactory = loggerFactory;
         }
 
-        protected override void Load(ContainerBuilder containerBuilder)
+        protected override void Load(ContainerBuilder builder)
         {
             var eventSerializerSettings = EventsJsonSerializerSettingsProvider.CreateSerializerSettings();
 
-            containerBuilder
+            builder
                 .RegisterModule(new MediatRModule())
 
                 .RegisterModule(new DataDogModule(_configuration))
@@ -64,11 +64,11 @@ using System;
                     Schema.Import,
                     _loggerFactory));
 
-            containerBuilder
+            builder
                 .RegisterType<IdempotentCommandHandlerModule>()
                 .AsSelf();
 
-            containerBuilder
+            builder
                 .RegisterType<IdempotentCommandHandlerModuleProcessor>()
                 .As<IIdempotentCommandHandlerModuleProcessor>();
 
@@ -83,20 +83,20 @@ using System;
                         sqlServerOptions.MigrationsHistoryTable(MigrationTables.Sequence, Schema.Sequence);
                     }));
 
-            containerBuilder
+            builder
                 .RegisterType<SqlPersistentLocalIdGenerator>()
                 .As<IPersistentLocalIdGenerator>();
 
-            containerBuilder
+            builder
                 .RegisterType<ProblemDetailsHelper>()
                 .AsSelf();
 
             // register SqsOptions instance
             var sqsOptions = new SqsOptions();
-            containerBuilder
+            builder
                 .RegisterInstance(sqsOptions);
 
-            containerBuilder.Populate(_services);
+            builder.Populate(_services);
         }
     }
 }

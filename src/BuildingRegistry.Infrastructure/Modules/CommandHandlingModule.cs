@@ -18,7 +18,7 @@ namespace BuildingRegistry.Infrastructure.Modules
         public CommandHandlingModule(IConfiguration configuration)
             => _configuration = configuration;
 
-        protected override void Load(ContainerBuilder containerBuilder)
+        protected override void Load(ContainerBuilder builder)
         {
             var value = _configuration[SnapshotIntervalKey] ?? "50";
             var snapshotInterval = Convert.ToInt32(value);
@@ -29,24 +29,24 @@ namespace BuildingRegistry.Infrastructure.Modules
                 snapshotStrategy = IntervalStrategy.SnapshotEvery(snapshotInterval);
             }
             
-            containerBuilder
+            builder
                 .Register(c => new BuildingFactory(snapshotStrategy))
                 .As<IBuildingFactory>();
 
-            containerBuilder
+            builder
                 .RegisterModule<RepositoriesModule>();
 
-            containerBuilder
+            builder
                 .RegisterType<ConcurrentUnitOfWork>()
                 .InstancePerLifetimeScope();
 
-            containerBuilder
+            builder
                 .RegisterEventstreamModule(_configuration);
 
-            Legacy.CommandHandlerModules.Register(containerBuilder);
-            CommandHandlerModules.Register(containerBuilder);
+            Legacy.CommandHandlerModules.Register(builder);
+            CommandHandlerModules.Register(builder);
 
-            containerBuilder
+            builder
                 .RegisterType<CommandHandlerResolver>()
                 .As<ICommandHandlerResolver>();
         }
