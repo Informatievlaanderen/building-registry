@@ -5,7 +5,6 @@ namespace BuildingRegistry.Building
     using Be.Vlaanderen.Basisregisters.AggregateSource.Snapshotting;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Events;
-    using Exceptions;
 
     public partial class Building
     {
@@ -97,6 +96,7 @@ namespace BuildingRegistry.Building
 
             _lastEvent = @event;
         }
+
         private void When(BuildingWasRealizedV2 @event)
         {
             BuildingStatus = BuildingStatus.Realized;
@@ -112,6 +112,11 @@ namespace BuildingRegistry.Building
         private void When(BuildingWasNotRealizedV2 @event)
         {
             BuildingStatus = BuildingStatus.NotRealized;
+
+            foreach (var unit in _buildingUnits.PlannedBuildingUnits)
+            {
+                unit.NotRealizeBecauseBuildingWasNotRealized();
+            }
 
             _lastEvent = @event;
         }
