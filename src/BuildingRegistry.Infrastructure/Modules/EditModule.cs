@@ -35,17 +35,17 @@ namespace BuildingRegistry.Infrastructure.Modules
                     ));
         }
 
-        protected override void Load(ContainerBuilder containerBuilder)
+        protected override void Load(ContainerBuilder builder)
         {
             var eventSerializerSettings = EventsJsonSerializerSettingsProvider.CreateSerializerSettings();
 
-            containerBuilder
+            builder
                 .RegisterModule(new EventHandlingModule(typeof(DomainAssemblyMarker).Assembly, eventSerializerSettings))
                 .RegisterModule(new CommandHandlingModule(_configuration));
 
-            containerBuilder.RegisterSnapshotModule(_configuration);
+            builder.RegisterSnapshotModule(_configuration);
 
-            containerBuilder
+            builder
                 .RegisterType<SqlPersistentLocalIdGenerator>()
                 .As<IPersistentLocalIdGenerator>();
         }

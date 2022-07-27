@@ -42,19 +42,19 @@ namespace BuildingRegistry.Api.Oslo.Abstractions.Infrastructure.Grb.Wfs
             _gmlReader = new GMLReader();
         }
 
-        public IEnumerable<Tuple<Geometry, IReadOnlyDictionary<string, string>>> GetFeaturesInBoundingBox(GrbFeatureType type, Envelope boundingBox)
+        public IEnumerable<Tuple<Geometry, IReadOnlyDictionary<string, string>>> GetFeaturesInBoundingBox(GrbFeatureType featureType, Envelope boundingBox)
         {
-            var featureName = GrbFeatureName.For(type);
+            var featureName = GrbFeatureName.For(featureType);
             var wfsRequest = CreateWfsRequest(featureName, boundingBox);
 
             try
             {
                 var response = wfsRequest
-                        .GetResponse()
-                        .GetResponseStream();
+                    .GetResponse()
+                    .GetResponseStream();
 
                 var wfsDoc = XDocument.Load(response);
-                if (wfsDoc.Root?.Name?.LocalName == null)
+                if (wfsDoc.Root?.Name.LocalName == null)
                 {
                     throw new GrbWfsException("Invalid response");
                 }
@@ -106,34 +106,34 @@ namespace BuildingRegistry.Api.Oslo.Abstractions.Infrastructure.Grb.Wfs
             return request;
         }
 
-        private Tuple<Geometry, IReadOnlyDictionary<string, string>> MapFeature(GrbFeatureName name, XElement data)
+        private Tuple<Geometry, IReadOnlyDictionary<string, string>?> MapFeature(GrbFeatureName name, XElement data)
         {
             var featureElement = data.Element(XName.Get(name.ToString(), GrbWfsNameSpaces.Grb));
 
             var gml = featureElement
-                .Element(XName.Get("SHAPE", GrbWfsNameSpaces.Grb))
-                .Elements()
+                ?.Element(XName.Get("SHAPE", GrbWfsNameSpaces.Grb))
+                ?.Elements()
                 .First();
 
-            if (gml.Name.LocalName == "MultiPolygon")
+            if (gml?.Name.LocalName == "MultiPolygon")
             {
                 gml = gml
                     .Element(XName.Get("polygonMember", GrbWfsNameSpaces.Gml))
-                    .Element(XName.Get("Polygon", GrbWfsNameSpaces.Gml));
+                    ?.Element(XName.Get("Polygon", GrbWfsNameSpaces.Gml));
             }
 
             gml
-                .DescendantsAndSelf()
+                ?.DescendantsAndSelf()
                 .ToList()
                 .ForEach(d => d.RemoveAttributes());
 
             // convert GML2 to GML3
             //var gmlString = gml.ToString().Replace("outerBoundaryIs", "exterior").Replace("innerBoundaryIs", "interior").Replace("coordinates", "posList").Replace(",", " ");
 
-            var geometry = _gmlReader.Read(gml.ToString());
+            var geometry = _gmlReader.Read(gml?.ToString());
 
             var attributes = featureElement
-                .Elements()
+                ?.Elements()
                 .Where(el => el.Name.Namespace == GrbWfsNameSpaces.Grb && el.Name.LocalName != "SHAPE")
                 .ToDictionary(el => el.Name.LocalName, el => el.Value) as IReadOnlyDictionary<string,string>;
 

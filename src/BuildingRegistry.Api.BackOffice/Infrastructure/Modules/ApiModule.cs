@@ -28,21 +28,21 @@ namespace BuildingRegistry.Api.BackOffice.Infrastructure.Modules
             _loggerFactory = loggerFactory;
         }
 
-        protected override void Load(ContainerBuilder containerBuilder)
+        protected override void Load(ContainerBuilder builder)
         {
-            containerBuilder
+            builder
                 .RegisterModule(new DataDogModule(_configuration));
 
-            containerBuilder
+            builder
                 .RegisterType<ProblemDetailsHelper>()
                 .AsSelf();
 
-            containerBuilder
+            builder
                 .RegisterType<IfMatchHeaderValidator>()
                 .As<IIfMatchHeaderValidator>()
                 .AsSelf();
 
-            containerBuilder.RegisterModule(new IdempotencyModule(
+            builder.RegisterModule(new IdempotencyModule(
                 _services,
                 _configuration.GetSection(IdempotencyConfiguration.Section).Get<IdempotencyConfiguration>()
                     .ConnectionString,
@@ -50,13 +50,13 @@ namespace BuildingRegistry.Api.BackOffice.Infrastructure.Modules
                 new IdempotencyTableInfo(Schema.Import),
                 _loggerFactory));
 
-            containerBuilder.RegisterModule(new EnvelopeModule());
-            containerBuilder.RegisterModule(new BackOfficeModule(_configuration, _services, _loggerFactory));
-            containerBuilder.RegisterModule(new EditModule(_configuration, _services, _loggerFactory));
-            containerBuilder.RegisterModule(new MediatRModule());
-            containerBuilder.RegisterModule(new TicketingModule(_configuration));
+            builder.RegisterModule(new EnvelopeModule());
+            builder.RegisterModule(new BackOfficeModule(_configuration, _services, _loggerFactory));
+            builder.RegisterModule(new EditModule(_configuration, _services, _loggerFactory));
+            builder.RegisterModule(new MediatRModule());
+            builder.RegisterModule(new TicketingModule(_configuration));
 
-            containerBuilder.Populate(_services);
+            builder.Populate(_services);
         }
     }
 }

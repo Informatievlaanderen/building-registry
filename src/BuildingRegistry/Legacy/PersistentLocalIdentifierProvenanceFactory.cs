@@ -11,17 +11,18 @@ namespace BuildingRegistry.Legacy
         private static readonly List<Type> AllowedTypes = new List<Type>
         {
             typeof(AssignPersistentLocalIdForCrabTerrainObjectId),
-            typeof(RequestPersistentLocalIdsForCrabTerrainObjectId),
+            typeof(RequestPersistentLocalIdsForCrabTerrainObjectId)
         };
 
         private static bool CanCreateFrom(Type? type) => type != null && AllowedTypes.Contains(type);
 
         public bool CanCreateFrom<TCommand>() => CanCreateFrom(typeof(TCommand));
 
-        public Provenance CreateFrom(object command, Building aggregate)
+        public Provenance CreateFrom(object provenanceHolder, Building aggregate)
         {
-            var commandType = command?.GetType();
+            var commandType = provenanceHolder.GetType();
             if (CanCreateFrom(commandType))
+            {
                 return new Provenance(
                     SystemClock.Instance.GetCurrentInstant(),
                     Application.BuildingRegistry,
@@ -29,8 +30,9 @@ namespace BuildingRegistry.Legacy
                     new Operator("BuildingRegistry"),
                     Modification.Update,
                     Organisation.DigitaalVlaanderen);
+            }
 
-            throw new ApplicationException($"Cannot create provenance for {commandType?.Name}");
+            throw new InvalidOperationException($"Cannot create provenance for {commandType.Name}");
         }
     }
 }
