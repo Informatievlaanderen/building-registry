@@ -31,14 +31,14 @@ namespace BuildingRegistry.Api.Oslo.Handlers.BuildingUnitV2
                 .AsNoTracking()
                 .SingleOrDefaultAsync(item => item.BuildingUnitPersistentLocalId == request.PersistentLocalId, cancellationToken);
 
-            if (buildingUnit is { IsRemoved: true })
-            {
-                throw new ApiException("Gebouweenheid werd verwijderd.", StatusCodes.Status410Gone);
-            }
-
             if (buildingUnit is null)
             {
                 throw new ApiException("Onbestaande gebouweenheid.", StatusCodes.Status404NotFound);
+            }
+
+            if (buildingUnit is { IsRemoved: true })
+            {
+                throw new ApiException("Gebouweenheid werd verwijderd.", StatusCodes.Status410Gone);
             }
 
             var addressPersistentLocalIds = buildingUnit.Addresses
