@@ -9,7 +9,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingDetail
 
     public class BuildingDetailItem
     {
-        public static string VersionTimestampBackingPropertyName = nameof(VersionTimestampAsDateTimeOffset);
+        public const string VersionTimestampBackingPropertyName = nameof(VersionTimestampAsDateTimeOffset);
 
         public Guid BuildingId { get; set; }
         public int? PersistentLocalId { get; set; }
@@ -56,11 +56,11 @@ namespace BuildingRegistry.Projections.Legacy.BuildingDetail
             b.HasIndex(p => p.PersistentLocalId)
                 .IsUnique()
                 .HasFilter($"([{nameof(BuildingDetailItem.PersistentLocalId)}] IS NOT NULL)")
-                .HasDatabaseName($"IX_BuildingDetails_PersistentLocalId_1")
+                .HasDatabaseName("IX_BuildingDetails_PersistentLocalId_1")
                 .IsClustered(false);
 
             b.HasIndex(p => new { p.IsComplete, p.IsRemoved, p.PersistentLocalId });
-            b.HasIndex(b => b.Status);
+            b.HasIndex(p => p.Status);
         }
     }
 }

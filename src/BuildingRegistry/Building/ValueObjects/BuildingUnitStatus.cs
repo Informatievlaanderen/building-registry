@@ -4,10 +4,10 @@ namespace BuildingRegistry.Building
 
     public struct BuildingUnitStatus
     {
-        public static BuildingUnitStatus Planned = new BuildingUnitStatus("Planned");
-        public static BuildingUnitStatus Realized = new BuildingUnitStatus("Realized");
-        public static BuildingUnitStatus Retired = new BuildingUnitStatus("Retired");
-        public static BuildingUnitStatus NotRealized = new BuildingUnitStatus("NotRealized");
+        public static readonly BuildingUnitStatus Planned = new BuildingUnitStatus("Planned");
+        public static readonly BuildingUnitStatus Realized = new BuildingUnitStatus("Realized");
+        public static readonly BuildingUnitStatus Retired = new BuildingUnitStatus("Retired");
+        public static readonly BuildingUnitStatus NotRealized = new BuildingUnitStatus("NotRealized");
 
         public string Status { get; }
 
@@ -15,11 +15,13 @@ namespace BuildingRegistry.Building
 
         public static BuildingUnitStatus Parse(string status)
         {
-            if(status != Planned.Status &&
+            if (status != Planned.Status &&
                status != Realized.Status &&
                status != Retired.Status &&
                status != NotRealized.Status)
+            {
                 throw new NotImplementedException($"Cannot parse {status} to BuildingUnitStatus");
+            }
 
             return new BuildingUnitStatus(status);
         }

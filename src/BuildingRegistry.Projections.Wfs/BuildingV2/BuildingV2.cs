@@ -11,7 +11,7 @@ namespace BuildingRegistry.Projections.Wfs.BuildingV2
 
     public class BuildingV2
     {
-        public static string VersionTimestampBackingPropertyName = nameof(VersionTimestampAsDateTimeOffset);
+        public const string VersionTimestampBackingPropertyName = nameof(VersionTimestampAsDateTimeOffset);
 
         public int PersistentLocalId { get; set; }
         public string Id { get; set; }

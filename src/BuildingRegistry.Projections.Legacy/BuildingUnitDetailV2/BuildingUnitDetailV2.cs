@@ -11,7 +11,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetailV2
 
     public class BuildingUnitDetailItemV2
     {
-        public static string VersionTimestampBackingPropertyName = nameof(VersionTimestampAsDateTimeOffset);
+        public const string VersionTimestampBackingPropertyName = nameof(VersionTimestampAsDateTimeOffset);
 
         public int BuildingUnitPersistentLocalId { get; set; }
         public int BuildingPersistentLocalId { get; set; }
@@ -78,7 +78,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetailV2
         {
            b.ToTable(TableName, Schema.Legacy)
                 .HasKey(p => p.BuildingUnitPersistentLocalId)
-                .IsClustered(true);
+                .IsClustered();
 
            b.Property(p => p.BuildingUnitPersistentLocalId)
                .ValueGeneratedNever();

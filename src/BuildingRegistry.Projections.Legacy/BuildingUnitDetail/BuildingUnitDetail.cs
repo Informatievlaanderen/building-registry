@@ -10,7 +10,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetail
 
     public class BuildingUnitDetailItem
     {
-        public static string VersionTimestampBackingPropertyName = nameof(VersionTimestampAsDateTimeOffset);
+        public const string VersionTimestampBackingPropertyName = nameof(VersionTimestampAsDateTimeOffset);
 
         public Guid BuildingUnitId { get; set; }
         public Guid BuildingId { get; set; }
@@ -31,7 +31,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetail
 
         public BuildingUnitPositionGeometryMethod? PositionMethod
         {
-            get => string.IsNullOrEmpty(PositionMethodAsString) ? null : (BuildingUnitPositionGeometryMethod?)BuildingUnitPositionGeometryMethod.Parse(PositionMethodAsString);
+            get => string.IsNullOrEmpty(PositionMethodAsString) ? null : BuildingUnitPositionGeometryMethod.Parse(PositionMethodAsString);
             set => PositionMethodAsString = value?.GeometryMethod;
         }
         public string? PositionMethodAsString { get; set; }
@@ -105,7 +105,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetail
             b.HasIndex(p => p.PersistentLocalId)
                 .IsUnique()
                 .HasFilter($"([{nameof(BuildingUnitDetailItem.PersistentLocalId)}] IS NOT NULL)")
-                .HasDatabaseName($"IX_BuildingUnitDetails_PersistentLocalId_1")
+                .HasDatabaseName("IX_BuildingUnitDetails_PersistentLocalId_1")
                 .IsClustered(false);
 
             b.HasIndex(p => p.BuildingPersistentLocalId);

@@ -7,7 +7,7 @@ namespace BuildingRegistry.Legacy
         UnderConstruction = 1,
         Realized = 2,
         Retired = 3,
-        NotRealized = 4,
+        NotRealized = 4
     }
 
     public static class BuildingStatusHelpers
