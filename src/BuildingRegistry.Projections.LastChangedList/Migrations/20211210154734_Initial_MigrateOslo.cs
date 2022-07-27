@@ -1,6 +1,5 @@
-﻿namespace BuildingRegistry.Projections.LastChangedList.Migrations
+namespace BuildingRegistry.Projections.LastChangedList.Migrations
 {
-    using System;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.LastChangedList;
     using Microsoft.EntityFrameworkCore.Migrations;
 
@@ -30,7 +29,7 @@ WHERE Id like '%.json' AND CacheKey like 'legacy/buildingunit:%'");
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-
+            // do nothing
         }
     }
 }

@@ -8,6 +8,7 @@ namespace BuildingRegistry.Projections.Wms.BuildingUnit
     using NodaTime;
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
     using Legacy;
@@ -42,12 +43,9 @@ namespace BuildingRegistry.Projections.Wms.BuildingUnit
             When<Envelope<BuildingWasRemoved>>(async (context, message, ct) =>
             {
                 var buildingUnits = await context.BuildingUnits.GetByBuildingId(message.Message.BuildingId, ct);
-                var unitsToRemove = new List<BuildingUnit>();
-                foreach (var buildingUnitDetailItem in buildingUnits)
-                {
-                    if (message.Message.BuildingUnitIds.Contains(buildingUnitDetailItem.BuildingUnitId))
-                        unitsToRemove.Add(buildingUnitDetailItem);
-                }
+                var unitsToRemove = buildingUnits
+                    .Where(buildingUnitDetailItem => message.Message.BuildingUnitIds.Contains(buildingUnitDetailItem.BuildingUnitId))
+                    .ToList();
 
                 var building = await context.BuildingUnitBuildings.FindAsync(message.Message.BuildingId, cancellationToken: ct);
                 building.IsRemoved = true;
@@ -128,18 +126,18 @@ namespace BuildingRegistry.Projections.Wms.BuildingUnit
                 building.BuildingRetiredStatus = BuildingStatus.NotRealized;
             });
 
-            When<Envelope<BuildingBecameUnderConstruction>>(async (context, message, ct) => DoNothing());
-            When<Envelope<BuildingMeasurementByGrbWasCorrected>>(async (context, message, ct) => DoNothing());
-            When<Envelope<BuildingOutlineWasCorrected>>(async (context, message, ct) => DoNothing());
-            When<Envelope<BuildingStatusWasCorrectedToRemoved>>(async (context, message, ct) => DoNothing());
-            When<Envelope<BuildingStatusWasRemoved>>(async (context, message, ct) => DoNothing());
-            When<Envelope<BuildingWasCorrectedToPlanned>>(async (context, message, ct) => DoNothing());
-            When<Envelope<BuildingWasCorrectedToRealized>>(async (context, message, ct) => DoNothing());
-            When<Envelope<BuildingWasCorrectedToUnderConstruction>>(async (context, message, ct) => DoNothing());
-            When<Envelope<BuildingWasMeasuredByGrb>>(async (context, message, ct) => DoNothing());
-            When<Envelope<BuildingWasOutlined>>(async (context, message, ct) => DoNothing());
-            When<Envelope<BuildingWasPlanned>>(async (context, message, ct) => DoNothing());
-            When<Envelope<BuildingWasRealized>>(async (context, message, ct) => DoNothing());
+            When<Envelope<BuildingBecameUnderConstruction>>(async (context, message, ct) => await DoNothing());
+            When<Envelope<BuildingMeasurementByGrbWasCorrected>>(async (context, message, ct) => await DoNothing());
+            When<Envelope<BuildingOutlineWasCorrected>>(async (context, message, ct) => await DoNothing());
+            When<Envelope<BuildingStatusWasCorrectedToRemoved>>(async (context, message, ct) => await DoNothing());
+            When<Envelope<BuildingStatusWasRemoved>>(async (context, message, ct) => await DoNothing());
+            When<Envelope<BuildingWasCorrectedToPlanned>>(async (context, message, ct) => await DoNothing());
+            When<Envelope<BuildingWasCorrectedToRealized>>(async (context, message, ct) => await DoNothing());
+            When<Envelope<BuildingWasCorrectedToUnderConstruction>>(async (context, message, ct) => await DoNothing());
+            When<Envelope<BuildingWasMeasuredByGrb>>(async (context, message, ct) => await DoNothing());
+            When<Envelope<BuildingWasOutlined>>(async (context, message, ct) => await DoNothing());
+            When<Envelope<BuildingWasPlanned>>(async (context, message, ct) => await DoNothing());
+            When<Envelope<BuildingWasRealized>>(async (context, message, ct) => await DoNothing());
             When<Envelope<BuildingWasRegistered>>(async (context, message, ct) =>
             {
                 await context
@@ -147,7 +145,7 @@ namespace BuildingRegistry.Projections.Wms.BuildingUnit
                     .AddAsync(new BuildingUnitBuildingItem
                     {
                         BuildingId = message.Message.BuildingId,
-                        IsRemoved =  false,
+                        IsRemoved = false
                     }, ct);
             });
             #endregion Building
@@ -157,11 +155,8 @@ namespace BuildingRegistry.Projections.Wms.BuildingUnit
             When<Envelope<BuildingUnitPersistentLocalIdWasAssigned>>(async (context, message, ct) =>
             {
                 var buildingUnit = await context.BuildingUnits.FindAsync(message.Message.BuildingUnitId, cancellationToken: ct);
-                if (buildingUnit != null)
-                {
-                    buildingUnit.Id = PersistentLocalIdHelper.CreateBuildingUnitId(message.Message.PersistentLocalId);
-                    buildingUnit.BuildingUnitPersistentLocalId = int.Parse(message.Message.PersistentLocalId.ToString());
-                }
+                buildingUnit.Id = PersistentLocalIdHelper.CreateBuildingUnitId(message.Message.PersistentLocalId);
+                buildingUnit.BuildingUnitPersistentLocalId = int.Parse(message.Message.PersistentLocalId.ToString());
             });
 
             When<Envelope<BuildingUnitWasAdded>>(async (context, message, ct) =>
@@ -175,10 +170,9 @@ namespace BuildingRegistry.Projections.Wms.BuildingUnit
                 var addedUnit = await context.BuildingUnits.FindAsync(message.Message.BuildingUnitId, cancellationToken: ct);
                 var building = await context.BuildingUnitBuildings.FindAsync(message.Message.BuildingId, cancellationToken: ct);
 
-                if (building.BuildingRetiredStatus == BuildingStatus.NotRealized)
-                    addedUnit.Status = BuildingUnitStatus.NotRealized;
-                else
-                    addedUnit.Status = BuildingUnitStatus.Retired;
+                addedUnit.Status = building.BuildingRetiredStatus == BuildingStatus.NotRealized
+                    ? BuildingUnitStatus.NotRealized
+                    : BuildingUnitStatus.Retired;
             });
 
             When<Envelope<BuildingUnitWasReaddedByOtherUnitRemoval>>(async (context, message, ct) =>
@@ -200,21 +194,15 @@ namespace BuildingRegistry.Projections.Wms.BuildingUnit
             When<Envelope<BuildingUnitBecameComplete>>(async (context, message, ct) =>
             {
                 var buildingUnit = await context.BuildingUnits.FindAsync(message.Message.BuildingUnitId, cancellationToken: ct);
-                if (buildingUnit != null)
-                {
-                    buildingUnit.IsComplete = true;
-                    SetVersion(buildingUnit, message.Message.Provenance.Timestamp);
-                }
+                buildingUnit.IsComplete = true;
+                SetVersion(buildingUnit, message.Message.Provenance.Timestamp);
             });
 
             When<Envelope<BuildingUnitBecameIncomplete>>(async (context, message, ct) =>
             {
                 var buildingUnit = await context.BuildingUnits.FindAsync(message.Message.BuildingUnitId, cancellationToken: ct);
-                if (buildingUnit != null)
-                {
-                    buildingUnit.IsComplete = false;
-                    SetVersion(buildingUnit, message.Message.Provenance.Timestamp);
-                }
+                buildingUnit.IsComplete = false;
+                SetVersion(buildingUnit, message.Message.Provenance.Timestamp);
             });
 
             #endregion
@@ -224,111 +212,78 @@ namespace BuildingRegistry.Projections.Wms.BuildingUnit
             When<Envelope<BuildingUnitStatusWasRemoved>>(async (context, message, ct) =>
             {
                 var buildingUnit = await context.BuildingUnits.FindAsync(message.Message.BuildingUnitId, cancellationToken: ct);
-                if (buildingUnit != null)
-                {
-                    buildingUnit.Status = null;
-                    SetVersion(buildingUnit, message.Message.Provenance.Timestamp);
-                }
+                buildingUnit.Status = null;
+                SetVersion(buildingUnit, message.Message.Provenance.Timestamp);
             });
 
             When<Envelope<BuildingUnitWasCorrectedToNotRealized>>(async (context, message, ct) =>
             {
                 var buildingUnit = await context.BuildingUnits.FindAsync(message.Message.BuildingUnitId, cancellationToken: ct);
-                if (buildingUnit != null)
-                {
-                    buildingUnit.Status = BuildingUnitStatus.NotRealized;
-                    SetVersion(buildingUnit, message.Message.Provenance.Timestamp);
-                }
+                buildingUnit.Status = BuildingUnitStatus.NotRealized;
+                SetVersion(buildingUnit, message.Message.Provenance.Timestamp);
             });
 
             When<Envelope<BuildingUnitWasNotRealized>>(async (context, message, ct) =>
             {
                 var buildingUnit = await context.BuildingUnits.FindAsync(message.Message.BuildingUnitId, cancellationToken: ct);
-                if (buildingUnit != null)
-                {
-                    buildingUnit.Status = BuildingUnitStatus.NotRealized;
-                    SetVersion(buildingUnit, message.Message.Provenance.Timestamp);
-                }
+                buildingUnit.Status = BuildingUnitStatus.NotRealized;
+                SetVersion(buildingUnit, message.Message.Provenance.Timestamp);
             });
 
             When<Envelope<BuildingUnitWasNotRealizedByParent>>(async (context, message, ct) =>
             {
                 var buildingUnit = await context.BuildingUnits.FindAsync(message.Message.BuildingUnitId, cancellationToken: ct);
-                if (buildingUnit != null)
-                {
-                    buildingUnit.Status = BuildingUnitStatus.NotRealized;
-                    SetVersion(buildingUnit, message.Message.Provenance.Timestamp);
-                }
+                buildingUnit.Status = BuildingUnitStatus.NotRealized;
+                SetVersion(buildingUnit, message.Message.Provenance.Timestamp);
             });
 
             When<Envelope<BuildingUnitWasCorrectedToPlanned>>(async (context, message, ct) =>
             {
                 var buildingUnit = await context.BuildingUnits.FindAsync(message.Message.BuildingUnitId, cancellationToken: ct);
-                if (buildingUnit != null)
-                {
-                    buildingUnit.Status = BuildingUnitStatus.Planned;
-                    SetVersion(buildingUnit, message.Message.Provenance.Timestamp);
-                }
+                buildingUnit.Status = BuildingUnitStatus.Planned;
+                SetVersion(buildingUnit, message.Message.Provenance.Timestamp);
             });
 
             When<Envelope<BuildingUnitWasPlanned>>(async (context, message, ct) =>
             {
                 var buildingUnit = await context.BuildingUnits.FindAsync(message.Message.BuildingUnitId, cancellationToken: ct);
-                if (buildingUnit != null)
-                {
-                    buildingUnit.Status = BuildingUnitStatus.Planned;
-                    SetVersion(buildingUnit, message.Message.Provenance.Timestamp);
-                }
+                buildingUnit.Status = BuildingUnitStatus.Planned;
+                SetVersion(buildingUnit, message.Message.Provenance.Timestamp);
             });
 
             When<Envelope<BuildingUnitWasCorrectedToRealized>>(async (context, message, ct) =>
             {
                 var buildingUnit = await context.BuildingUnits.FindAsync(message.Message.BuildingUnitId, cancellationToken: ct);
-                if (buildingUnit != null)
-                {
-                    buildingUnit.Status = BuildingUnitStatus.Realized;
-                    SetVersion(buildingUnit, message.Message.Provenance.Timestamp);
-                }
+                buildingUnit.Status = BuildingUnitStatus.Realized;
+                SetVersion(buildingUnit, message.Message.Provenance.Timestamp);
             });
 
             When<Envelope<BuildingUnitWasRealized>>(async (context, message, ct) =>
             {
                 var buildingUnit = await context.BuildingUnits.FindAsync(message.Message.BuildingUnitId, cancellationToken: ct);
-                if (buildingUnit != null)
-                {
-                    buildingUnit.Status = BuildingUnitStatus.Realized;
-                    SetVersion(buildingUnit, message.Message.Provenance.Timestamp);
-                }
+                buildingUnit.Status = BuildingUnitStatus.Realized;
+                SetVersion(buildingUnit, message.Message.Provenance.Timestamp);
             });
 
             When<Envelope<BuildingUnitWasCorrectedToRetired>>(async (context, message, ct) =>
             {
                 var buildingUnit = await context.BuildingUnits.FindAsync(message.Message.BuildingUnitId, cancellationToken: ct);
-                if (buildingUnit != null)
-                {
-                    buildingUnit.Status = BuildingUnitStatus.Retired;
-                    SetVersion(buildingUnit, message.Message.Provenance.Timestamp);
-                }
+                buildingUnit.Status = BuildingUnitStatus.Retired;
+                SetVersion(buildingUnit, message.Message.Provenance.Timestamp);
             });
 
             When<Envelope<BuildingUnitWasRetired>>(async (context, message, ct) =>
             {
                 var buildingUnit = await context.BuildingUnits.FindAsync(message.Message.BuildingUnitId, cancellationToken: ct);
-                if (buildingUnit != null)
-                {
-                    buildingUnit.Status = BuildingUnitStatus.Retired;
-                    SetVersion(buildingUnit, message.Message.Provenance.Timestamp);
-                }
+                buildingUnit.Status = BuildingUnitStatus.Retired;
+                SetVersion(buildingUnit, message.Message.Provenance.Timestamp);
             });
 
             When<Envelope<BuildingUnitWasRetiredByParent>>(async (context, message, ct) =>
             {
                 var buildingUnit = await context.BuildingUnits.FindAsync(message.Message.BuildingUnitId, cancellationToken: ct);
-                if (buildingUnit != null)
-                {
-                    buildingUnit.Status = BuildingUnitStatus.Retired;
-                    SetVersion(buildingUnit, message.Message.Provenance.Timestamp);
-                }
+                buildingUnit.Status = BuildingUnitStatus.Retired;
+                SetVersion(buildingUnit, message.Message.Provenance.Timestamp);
             });
 
             #endregion BuildingUnitStatus
@@ -338,41 +293,29 @@ namespace BuildingRegistry.Projections.Wms.BuildingUnit
             When<Envelope<BuildingUnitPositionWasAppointedByAdministrator>>(async (context, message, ct) =>
             {
                 var buildingUnit = await context.BuildingUnits.FindAsync(message.Message.BuildingUnitId, cancellationToken: ct);
-                if (buildingUnit != null)
-                {
-                    SetPosition(buildingUnit, message.Message.ExtendedWkbGeometry, "AangeduidDoorBeheerder");
-                    SetVersion(buildingUnit, message.Message.Provenance.Timestamp);
-                }
+                SetPosition(buildingUnit, message.Message.ExtendedWkbGeometry, "AangeduidDoorBeheerder");
+                SetVersion(buildingUnit, message.Message.Provenance.Timestamp);
             });
 
             When<Envelope<BuildingUnitPositionWasCorrectedToAppointedByAdministrator>>(async (context, message, ct) =>
             {
                 var buildingUnit = await context.BuildingUnits.FindAsync(message.Message.BuildingUnitId, cancellationToken: ct);
-                if (buildingUnit != null)
-                {
-                    SetPosition(buildingUnit, message.Message.ExtendedWkbGeometry, "AangeduidDoorBeheerder");
-                    SetVersion(buildingUnit, message.Message.Provenance.Timestamp);
-                }
+                SetPosition(buildingUnit, message.Message.ExtendedWkbGeometry, "AangeduidDoorBeheerder");
+                SetVersion(buildingUnit, message.Message.Provenance.Timestamp);
             });
 
             When<Envelope<BuildingUnitPositionWasDerivedFromObject>>(async (context, message, ct) =>
             {
                 var buildingUnit = await context.BuildingUnits.FindAsync(message.Message.BuildingUnitId, cancellationToken: ct);
-                if (buildingUnit != null)
-                {
-                    SetPosition(buildingUnit, message.Message.ExtendedWkbGeometry, "AfgeleidVanObject");
-                    SetVersion(buildingUnit, message.Message.Provenance.Timestamp);
-                }
+                SetPosition(buildingUnit, message.Message.ExtendedWkbGeometry, "AfgeleidVanObject");
+                SetVersion(buildingUnit, message.Message.Provenance.Timestamp);
             });
 
             When<Envelope<BuildingUnitPositionWasCorrectedToDerivedFromObject>>(async (context, message, ct) =>
             {
                 var buildingUnit = await context.BuildingUnits.FindAsync(message.Message.BuildingUnitId, cancellationToken: ct);
-                if (buildingUnit != null)
-                {
-                    SetPosition(buildingUnit, message.Message.ExtendedWkbGeometry, "AfgeleidVanObject");
-                    SetVersion(buildingUnit, message.Message.Provenance.Timestamp);
-                }
+                SetPosition(buildingUnit, message.Message.ExtendedWkbGeometry, "AfgeleidVanObject");
+                SetVersion(buildingUnit, message.Message.Provenance.Timestamp);
             });
 
             #endregion
@@ -389,23 +332,23 @@ namespace BuildingRegistry.Projections.Wms.BuildingUnit
                 SetVersion(buildingUnit, message.Message.Provenance.Timestamp);
             });
 
-            When<Envelope<BuildingUnitWasReaddressed>>(async (context, message, ct) => DoNothing());
-            When<Envelope<BuildingUnitPersistentLocalIdWasRemoved>>(async (context, message, ct) => DoNothing());
-            When<Envelope<BuildingUnitPersistentLocalIdWasDuplicated>>(async (context, message, ct) => DoNothing());
+            When<Envelope<BuildingUnitWasReaddressed>>(async (context, message, ct) => await DoNothing());
+            When<Envelope<BuildingUnitPersistentLocalIdWasRemoved>>(async (context, message, ct) => await DoNothing());
+            When<Envelope<BuildingUnitPersistentLocalIdWasDuplicated>>(async (context, message, ct) => await DoNothing());
 
             //CRAB
-            When<Envelope<AddressHouseNumberPositionWasImportedFromCrab>>(async (context, message, ct) => DoNothing());
-            When<Envelope<AddressHouseNumberStatusWasImportedFromCrab>>(async (context, message, ct) => DoNothing());
-            When<Envelope<AddressHouseNumberWasImportedFromCrab>>(async (context, message, ct) => DoNothing());
-            When<Envelope<AddressSubaddressPositionWasImportedFromCrab>>(async (context, message, ct) => DoNothing());
-            When<Envelope<AddressSubaddressStatusWasImportedFromCrab>>(async (context, message, ct) => DoNothing());
-            When<Envelope<AddressSubaddressWasImportedFromCrab>>(async (context, message, ct) => DoNothing());
-            When<Envelope<BuildingGeometryWasImportedFromCrab>>(async (context, message, ct) => DoNothing());
-            When<Envelope<BuildingStatusWasImportedFromCrab>>(async (context, message, ct) => DoNothing());
-            When<Envelope<HouseNumberWasReaddressedFromCrab>>(async (context, message, ct) => DoNothing());
-            When<Envelope<SubaddressWasReaddressedFromCrab>>(async (context, message, ct) => DoNothing());
-            When<Envelope<TerrainObjectHouseNumberWasImportedFromCrab>>(async (context, message, ct) => DoNothing());
-            When<Envelope<TerrainObjectWasImportedFromCrab>>(async (context, message, ct) => DoNothing());
+            When<Envelope<AddressHouseNumberPositionWasImportedFromCrab>>(async (context, message, ct) => await DoNothing());
+            When<Envelope<AddressHouseNumberStatusWasImportedFromCrab>>(async (context, message, ct) => await DoNothing());
+            When<Envelope<AddressHouseNumberWasImportedFromCrab>>(async (context, message, ct) => await DoNothing());
+            When<Envelope<AddressSubaddressPositionWasImportedFromCrab>>(async (context, message, ct) => await DoNothing());
+            When<Envelope<AddressSubaddressStatusWasImportedFromCrab>>(async (context, message, ct) => await DoNothing());
+            When<Envelope<AddressSubaddressWasImportedFromCrab>>(async (context, message, ct) => await DoNothing());
+            When<Envelope<BuildingGeometryWasImportedFromCrab>>(async (context, message, ct) => await DoNothing());
+            When<Envelope<BuildingStatusWasImportedFromCrab>>(async (context, message, ct) => await DoNothing());
+            When<Envelope<HouseNumberWasReaddressedFromCrab>>(async (context, message, ct) => await DoNothing());
+            When<Envelope<SubaddressWasReaddressedFromCrab>>(async (context, message, ct) => await DoNothing());
+            When<Envelope<TerrainObjectHouseNumberWasImportedFromCrab>>(async (context, message, ct) => await DoNothing());
+            When<Envelope<TerrainObjectWasImportedFromCrab>>(async (context, message, ct) => await DoNothing());
         }
 
         private static void SetVersion(BuildingUnit unit, Instant timestamp)
@@ -422,9 +365,13 @@ namespace BuildingRegistry.Projections.Wms.BuildingUnit
             foreach (var buildingUnitDetailItem in buildingUnits)
             {
                 if (buildingUnitIdsToNotRealize.Contains(buildingUnitDetailItem.BuildingUnitId))
+                {
                     buildingUnitDetailItem.Status = BuildingUnitStatus.NotRealized;
+                }
                 else if (buildingUnitIdsToRetire.Contains(buildingUnitDetailItem.BuildingUnitId))
+                {
                     buildingUnitDetailItem.Status = BuildingUnitStatus.Retired;
+                }
 
                 SetVersion(buildingUnitDetailItem, version);
             }
@@ -462,6 +409,9 @@ namespace BuildingRegistry.Projections.Wms.BuildingUnit
             buildingUnit.Position = geometry.AsBinary();
         }
 
-        private static void DoNothing() { }
+        private static async Task DoNothing()
+        {
+            await Task.Yield();
+        }
     }
 }
