@@ -1,5 +1,6 @@
 namespace BuildingRegistry.Projections.Wms.Building
 {
+    using System.Threading.Tasks;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.Connector;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore;
     using Be.Vlaanderen.Basisregisters.Utilities.HexByteConvertor;
@@ -236,48 +237,48 @@ namespace BuildingRegistry.Projections.Wms.Building
             });
 
             //BuildingUnit
-            When<Envelope<BuildingUnitAddressWasAttached>>(async (context, message, ct) => DoNothing());
-            When<Envelope<BuildingUnitAddressWasDetached>>(async (context, message, ct) => DoNothing());
-            When<Envelope<BuildingUnitBecameComplete>>(async (context, message, ct) => DoNothing());
-            When<Envelope<BuildingUnitBecameIncomplete>>(async (context, message, ct) => DoNothing());
-            When<Envelope<BuildingUnitPersistentLocalIdWasAssigned>>(async (context, message, ct) => DoNothing());
-            When<Envelope<BuildingUnitPersistentLocalIdWasDuplicated>>(async (context, message, ct) => DoNothing());
-            When<Envelope<BuildingUnitPersistentLocalIdWasRemoved>>(async (context, message, ct) => DoNothing());
-            When<Envelope<BuildingUnitPositionWasAppointedByAdministrator>>(async (context, message, ct) => DoNothing());
-            When<Envelope<BuildingUnitPositionWasCorrectedToAppointedByAdministrator>>(async (context, message, ct) => DoNothing());
-            When<Envelope<BuildingUnitPositionWasCorrectedToDerivedFromObject>>(async (context, message, ct) => DoNothing());
-            When<Envelope<BuildingUnitPositionWasDerivedFromObject>>(async (context, message, ct) => DoNothing());
-            When<Envelope<BuildingUnitStatusWasRemoved>>(async (context, message, ct) => DoNothing());
-            When<Envelope<BuildingUnitWasAdded>>(async (context, message, ct) => DoNothing());
-            When<Envelope<BuildingUnitWasAddedToRetiredBuilding>>(async (context, message, ct) => DoNothing());
-            When<Envelope<BuildingUnitWasCorrectedToNotRealized>>(async (context, message, ct) => DoNothing());
-            When<Envelope<BuildingUnitWasCorrectedToPlanned>>(async (context, message, ct) => DoNothing());
-            When<Envelope<BuildingUnitWasCorrectedToRealized>>(async (context, message, ct) => DoNothing());
-            When<Envelope<BuildingUnitWasCorrectedToRetired>>(async (context, message, ct) => DoNothing());
-            When<Envelope<BuildingUnitWasNotRealized>>(async (context, message, ct) => DoNothing());
-            When<Envelope<BuildingUnitWasNotRealizedByParent>>(async (context, message, ct) => DoNothing());
-            When<Envelope<BuildingUnitWasPlanned>>(async (context, message, ct) => DoNothing());
-            When<Envelope<BuildingUnitWasReaddedByOtherUnitRemoval>>(async (context, message, ct) => DoNothing());
-            When<Envelope<BuildingUnitWasReaddressed>>(async (context, message, ct) => DoNothing());
-            When<Envelope<BuildingUnitWasRealized>>(async (context, message, ct) => DoNothing());
-            When<Envelope<BuildingUnitWasRemoved>>(async (context, message, ct) => DoNothing());
-            When<Envelope<BuildingUnitWasRetired>>(async (context, message, ct) => DoNothing());
-            When<Envelope<BuildingUnitWasRetiredByParent>>(async (context, message, ct) => DoNothing());
-            When<Envelope<CommonBuildingUnitWasAdded>>(async (context, message, ct) => DoNothing());
+            When<Envelope<BuildingUnitAddressWasAttached>>(async (context, message, ct) => await DoNothing());
+            When<Envelope<BuildingUnitAddressWasDetached>>(async (context, message, ct) => await DoNothing());
+            When<Envelope<BuildingUnitBecameComplete>>(async (context, message, ct) => await DoNothing());
+            When<Envelope<BuildingUnitBecameIncomplete>>(async (context, message, ct) => await DoNothing());
+            When<Envelope<BuildingUnitPersistentLocalIdWasAssigned>>(async (context, message, ct) => await DoNothing());
+            When<Envelope<BuildingUnitPersistentLocalIdWasDuplicated>>(async (context, message, ct) => await DoNothing());
+            When<Envelope<BuildingUnitPersistentLocalIdWasRemoved>>(async (context, message, ct) => await DoNothing());
+            When<Envelope<BuildingUnitPositionWasAppointedByAdministrator>>(async (context, message, ct) => await DoNothing());
+            When<Envelope<BuildingUnitPositionWasCorrectedToAppointedByAdministrator>>(async (context, message, ct) => await DoNothing());
+            When<Envelope<BuildingUnitPositionWasCorrectedToDerivedFromObject>>(async (context, message, ct) => await DoNothing());
+            When<Envelope<BuildingUnitPositionWasDerivedFromObject>>(async (context, message, ct) => await DoNothing());
+            When<Envelope<BuildingUnitStatusWasRemoved>>(async (context, message, ct) => await DoNothing());
+            When<Envelope<BuildingUnitWasAdded>>(async (context, message, ct) => await DoNothing());
+            When<Envelope<BuildingUnitWasAddedToRetiredBuilding>>(async (context, message, ct) => await DoNothing());
+            When<Envelope<BuildingUnitWasCorrectedToNotRealized>>(async (context, message, ct) => await DoNothing());
+            When<Envelope<BuildingUnitWasCorrectedToPlanned>>(async (context, message, ct) => await DoNothing());
+            When<Envelope<BuildingUnitWasCorrectedToRealized>>(async (context, message, ct) => await DoNothing());
+            When<Envelope<BuildingUnitWasCorrectedToRetired>>(async (context, message, ct) => await DoNothing());
+            When<Envelope<BuildingUnitWasNotRealized>>(async (context, message, ct) => await DoNothing());
+            When<Envelope<BuildingUnitWasNotRealizedByParent>>(async (context, message, ct) => await DoNothing());
+            When<Envelope<BuildingUnitWasPlanned>>(async (context, message, ct) => await DoNothing());
+            When<Envelope<BuildingUnitWasReaddedByOtherUnitRemoval>>(async (context, message, ct) => await DoNothing());
+            When<Envelope<BuildingUnitWasReaddressed>>(async (context, message, ct) => await DoNothing());
+            When<Envelope<BuildingUnitWasRealized>>(async (context, message, ct) => await DoNothing());
+            When<Envelope<BuildingUnitWasRemoved>>(async (context, message, ct) => await DoNothing());
+            When<Envelope<BuildingUnitWasRetired>>(async (context, message, ct) => await DoNothing());
+            When<Envelope<BuildingUnitWasRetiredByParent>>(async (context, message, ct) => await DoNothing());
+            When<Envelope<CommonBuildingUnitWasAdded>>(async (context, message, ct) => await DoNothing());
 
             //CRAB
-            When<Envelope<AddressHouseNumberPositionWasImportedFromCrab>>(async (context, message, ct) => DoNothing());
-            When<Envelope<AddressHouseNumberStatusWasImportedFromCrab>>(async (context, message, ct) => DoNothing());
-            When<Envelope<AddressHouseNumberWasImportedFromCrab>>(async (context, message, ct) => DoNothing());
-            When<Envelope<AddressSubaddressPositionWasImportedFromCrab>>(async (context, message, ct) => DoNothing());
-            When<Envelope<AddressSubaddressStatusWasImportedFromCrab>>(async (context, message, ct) => DoNothing());
-            When<Envelope<AddressSubaddressWasImportedFromCrab>>(async (context, message, ct) => DoNothing());
-            When<Envelope<BuildingGeometryWasImportedFromCrab>>(async (context, message, ct) => DoNothing());
-            When<Envelope<BuildingStatusWasImportedFromCrab>>(async (context, message, ct) => DoNothing());
-            When<Envelope<HouseNumberWasReaddressedFromCrab>>(async (context, message, ct) => DoNothing());
-            When<Envelope<SubaddressWasReaddressedFromCrab>>(async (context, message, ct) => DoNothing());
-            When<Envelope<TerrainObjectHouseNumberWasImportedFromCrab>>(async (context, message, ct) => DoNothing());
-            When<Envelope<TerrainObjectWasImportedFromCrab>>(async (context, message, ct) => DoNothing());
+            When<Envelope<AddressHouseNumberPositionWasImportedFromCrab>>(async (context, message, ct) => await DoNothing());
+            When<Envelope<AddressHouseNumberStatusWasImportedFromCrab>>(async (context, message, ct) => await DoNothing());
+            When<Envelope<AddressHouseNumberWasImportedFromCrab>>(async (context, message, ct) => await DoNothing());
+            When<Envelope<AddressSubaddressPositionWasImportedFromCrab>>(async (context, message, ct) => await DoNothing());
+            When<Envelope<AddressSubaddressStatusWasImportedFromCrab>>(async (context, message, ct) => await DoNothing());
+            When<Envelope<AddressSubaddressWasImportedFromCrab>>(async (context, message, ct) => await DoNothing());
+            When<Envelope<BuildingGeometryWasImportedFromCrab>>(async (context, message, ct) => await DoNothing());
+            When<Envelope<BuildingStatusWasImportedFromCrab>>(async (context, message, ct) => await DoNothing());
+            When<Envelope<HouseNumberWasReaddressedFromCrab>>(async (context, message, ct) => await DoNothing());
+            When<Envelope<SubaddressWasReaddressedFromCrab>>(async (context, message, ct) => await DoNothing());
+            When<Envelope<TerrainObjectHouseNumberWasImportedFromCrab>>(async (context, message, ct) => await DoNothing());
+            When<Envelope<TerrainObjectWasImportedFromCrab>>(async (context, message, ct) => await DoNothing());
         }
 
         private static void SetVersion(Building building, Instant provenanceTimestamp)
@@ -293,6 +294,9 @@ namespace BuildingRegistry.Projections.Wms.Building
             building.Geometry = geometry?.AsBinary();
         }
 
-        private static void DoNothing() { }
+        private static async Task DoNothing()
+        {
+            await Task.Yield();
+        }
     }
 }

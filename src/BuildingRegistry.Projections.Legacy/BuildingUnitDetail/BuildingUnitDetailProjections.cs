@@ -1,18 +1,18 @@
 namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetail
 {
-    using Be.Vlaanderen.Basisregisters.ProjectionHandling.Connector;
-    using Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore;
-    using Microsoft.EntityFrameworkCore;
-    using NodaTime;
     using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
+    using Be.Vlaanderen.Basisregisters.ProjectionHandling.Connector;
+    using Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore;
     using Be.Vlaanderen.Basisregisters.Utilities.HexByteConvertor;
     using BuildingRegistry.Legacy;
     using BuildingRegistry.Legacy.Events;
     using BuildingRegistry.Legacy.Events.Crab;
+    using Microsoft.EntityFrameworkCore;
+    using NodaTime;
 
     [ConnectedProjectionName("API endpoint detail/lijst gebouweenheden")]
     [ConnectedProjectionDescription("Projectie die de gebouweenheden data voor het gebouweenheden detail & lijst voorziet.")]
@@ -38,18 +38,15 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetail
                 // possible of ALOT of units, might exceed SQL server IN (...) limitation, thats why we first get id by BuildingId
                 var buildingUnits = await GetAllBuildingUnitsByBuildingId(context, message.Message.BuildingId, ct);
 
-                foreach (var buildingUnitDetailItem in buildingUnits)
+                foreach (var buildingUnitDetailItem in buildingUnits.Where(buildingUnitDetailItem => message.Message.BuildingUnitIds.Contains(buildingUnitDetailItem.BuildingUnitId)))
                 {
-                    if (message.Message.BuildingUnitIds.Contains(buildingUnitDetailItem.BuildingUnitId))
-                    {
-                        buildingUnitDetailItem.IsRemoved = true;
-                        var addressesToRemove = context.BuildingUnitAddresses.Local
-                            .Where(x => x.BuildingUnitId == buildingUnitDetailItem.BuildingUnitId)
-                            .Union(context.BuildingUnitAddresses.Where(x => x.BuildingUnitId == buildingUnitDetailItem.BuildingUnitId)).ToList();
-                        context.BuildingUnitAddresses.RemoveRange(addressesToRemove);
+                    buildingUnitDetailItem.IsRemoved = true;
+                    var addressesToRemove = context.BuildingUnitAddresses.Local
+                        .Where(x => x.BuildingUnitId == buildingUnitDetailItem.BuildingUnitId)
+                        .Union(context.BuildingUnitAddresses.Where(x => x.BuildingUnitId == buildingUnitDetailItem.BuildingUnitId)).ToList();
+                    context.BuildingUnitAddresses.RemoveRange(addressesToRemove);
 
-                        SetVersion(buildingUnitDetailItem, message.Message.Provenance.Timestamp);
-                    }
+                    SetVersion(buildingUnitDetailItem, message.Message.Provenance.Timestamp);
                 }
 
                 var building = await context.BuildingUnitBuildings.FindAsync(message.Message.BuildingId, cancellationToken: ct);
@@ -137,21 +134,23 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetail
                 var buildingUnits = await GetAllBuildingUnitsByBuildingId(context, message.Message.BuildingId, ct);
 
                 foreach (var buildingUnit in buildingUnits)
+                {
                     buildingUnit.BuildingPersistentLocalId = message.Message.PersistentLocalId;
+                }
             });
 
-            When<Envelope<BuildingBecameUnderConstruction>>(async (context, message, ct) => DoNothing());
-            When<Envelope<BuildingMeasurementByGrbWasCorrected>>(async (context, message, ct) => DoNothing());
-            When<Envelope<BuildingOutlineWasCorrected>>(async (context, message, ct) => DoNothing());
-            When<Envelope<BuildingStatusWasCorrectedToRemoved>>(async (context, message, ct) => DoNothing());
-            When<Envelope<BuildingStatusWasRemoved>>(async (context, message, ct) => DoNothing());
-            When<Envelope<BuildingWasCorrectedToPlanned>>(async (context, message, ct) => DoNothing());
-            When<Envelope<BuildingWasCorrectedToRealized>>(async (context, message, ct) => DoNothing());
-            When<Envelope<BuildingWasCorrectedToUnderConstruction>>(async (context, message, ct) => DoNothing());
-            When<Envelope<BuildingWasMeasuredByGrb>>(async (context, message, ct) => DoNothing());
-            When<Envelope<BuildingWasOutlined>>(async (context, message, ct) => DoNothing());
-            When<Envelope<BuildingWasPlanned>>(async (context, message, ct) => DoNothing());
-            When<Envelope<BuildingWasRealized>>(async (context, message, ct) => DoNothing());
+            When<Envelope<BuildingBecameUnderConstruction>>(async (context, message, ct) => await DoNothing());
+            When<Envelope<BuildingMeasurementByGrbWasCorrected>>(async (context, message, ct) => await DoNothing());
+            When<Envelope<BuildingOutlineWasCorrected>>(async (context, message, ct) => await DoNothing());
+            When<Envelope<BuildingStatusWasCorrectedToRemoved>>(async (context, message, ct) => await DoNothing());
+            When<Envelope<BuildingStatusWasRemoved>>(async (context, message, ct) => await DoNothing());
+            When<Envelope<BuildingWasCorrectedToPlanned>>(async (context, message, ct) => await DoNothing());
+            When<Envelope<BuildingWasCorrectedToRealized>>(async (context, message, ct) => await DoNothing());
+            When<Envelope<BuildingWasCorrectedToUnderConstruction>>(async (context, message, ct) => await DoNothing());
+            When<Envelope<BuildingWasMeasuredByGrb>>(async (context, message, ct) => await DoNothing());
+            When<Envelope<BuildingWasOutlined>>(async (context, message, ct) => await DoNothing());
+            When<Envelope<BuildingWasPlanned>>(async (context, message, ct) => await DoNothing());
+            When<Envelope<BuildingWasRealized>>(async (context, message, ct) => await DoNothing());
             #endregion
 
             //BuildingUnit
@@ -159,8 +158,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetail
             When<Envelope<BuildingUnitPersistentLocalIdWasAssigned>>(async (context, message, ct) =>
             {
                 var buildingUnit = await context.BuildingUnitDetails.FindAsync(message.Message.BuildingUnitId, cancellationToken: ct);
-                if (buildingUnit != null)
-                    buildingUnit.PersistentLocalId = message.Message.PersistentLocalId;
+                buildingUnit.PersistentLocalId = message.Message.PersistentLocalId;
             });
 
             When<Envelope<BuildingUnitBecameComplete>>(async (context, message, ct) =>
@@ -198,10 +196,9 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetail
                 var addedUnit = await context.BuildingUnitDetails.FindAsync(message.Message.BuildingUnitId, cancellationToken: ct);
                 var building = await context.BuildingUnitBuildings.FindAsync(message.Message.BuildingId, cancellationToken: ct);
 
-                if (building.BuildingRetiredStatus == BuildingStatus.NotRealized)
-                    addedUnit.Status = BuildingUnitStatus.NotRealized;
-                else
-                    addedUnit.Status = BuildingUnitStatus.Retired;
+                addedUnit.Status = building.BuildingRetiredStatus == BuildingStatus.NotRealized
+                    ? BuildingUnitStatus.NotRealized
+                    : BuildingUnitStatus.Retired;
             });
 
             When<Envelope<BuildingUnitWasRemoved>>(async (context, message, ct) =>
@@ -248,13 +245,16 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetail
 
                 SetVersion(buildingUnit, message.Message.Provenance.Timestamp);
 
-                foreach (var addressId in message.Message.AddressIds)
+                foreach (var address in message.Message.AddressIds.Select(addressId => buildingUnit.Addresses.FirstOrDefault(x => x.AddressId == addressId)))
                 {
-                    var address = buildingUnit.Addresses.FirstOrDefault(x => x.AddressId == addressId);
-                    if (address == null || address.Count <= 1)
-                        buildingUnit.Addresses.Remove(address);
+                    if (address is not { Count: > 1 })
+                    {
+                        buildingUnit.Addresses.Remove(address!);
+                    }
                     else
+                    {
                         address.Count--;
+                    }
                 }
             });
 
@@ -269,9 +269,13 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetail
                 if (address != null)
                 {
                     if (address.Count <= 1)
+                    {
                         buildingUnit.Addresses.Remove(address);
+                    }
                     else
+                    {
                         address.Count = address.Count - 1;
+                    }
 
                     buildingUnit.Addresses.Add(new BuildingUnitDetailAddressItem { AddressId = message.Message.NewAddressId, BuildingUnitId = buildingUnit.BuildingUnitId, Count = 1 });
                 }
@@ -390,22 +394,22 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetail
 
             #endregion
 
-            When<Envelope<BuildingUnitPersistentLocalIdWasDuplicated>>(async (context, message, ct) => DoNothing());
-            When<Envelope<BuildingUnitPersistentLocalIdWasRemoved>>(async (context, message, ct) => DoNothing());
+            When<Envelope<BuildingUnitPersistentLocalIdWasDuplicated>>(async (context, message, ct) => await DoNothing());
+            When<Envelope<BuildingUnitPersistentLocalIdWasRemoved>>(async (context, message, ct) => await DoNothing());
 
             //CRAB
-            When<Envelope<AddressHouseNumberPositionWasImportedFromCrab>>(async (context, message, ct) => DoNothing());
-            When<Envelope<AddressHouseNumberStatusWasImportedFromCrab>>(async (context, message, ct) => DoNothing());
-            When<Envelope<AddressHouseNumberWasImportedFromCrab>>(async (context, message, ct) => DoNothing());
-            When<Envelope<AddressSubaddressPositionWasImportedFromCrab>>(async (context, message, ct) => DoNothing());
-            When<Envelope<AddressSubaddressStatusWasImportedFromCrab>>(async (context, message, ct) => DoNothing());
-            When<Envelope<AddressSubaddressWasImportedFromCrab>>(async (context, message, ct) => DoNothing());
-            When<Envelope<BuildingGeometryWasImportedFromCrab>>(async (context, message, ct) => DoNothing());
-            When<Envelope<BuildingStatusWasImportedFromCrab>>(async (context, message, ct) => DoNothing());
-            When<Envelope<HouseNumberWasReaddressedFromCrab>>(async (context, message, ct) => DoNothing());
-            When<Envelope<SubaddressWasReaddressedFromCrab>>(async (context, message, ct) => DoNothing());
-            When<Envelope<TerrainObjectHouseNumberWasImportedFromCrab>>(async (context, message, ct) => DoNothing());
-            When<Envelope<TerrainObjectWasImportedFromCrab>>(async (context, message, ct) => DoNothing());
+            When<Envelope<AddressHouseNumberPositionWasImportedFromCrab>>(async (context, message, ct) => await DoNothing());
+            When<Envelope<AddressHouseNumberStatusWasImportedFromCrab>>(async (context, message, ct) => await DoNothing());
+            When<Envelope<AddressHouseNumberWasImportedFromCrab>>(async (context, message, ct) => await DoNothing());
+            When<Envelope<AddressSubaddressPositionWasImportedFromCrab>>(async (context, message, ct) => await DoNothing());
+            When<Envelope<AddressSubaddressStatusWasImportedFromCrab>>(async (context, message, ct) => await DoNothing());
+            When<Envelope<AddressSubaddressWasImportedFromCrab>>(async (context, message, ct) => await DoNothing());
+            When<Envelope<BuildingGeometryWasImportedFromCrab>>(async (context, message, ct) => await DoNothing());
+            When<Envelope<BuildingStatusWasImportedFromCrab>>(async (context, message, ct) => await DoNothing());
+            When<Envelope<HouseNumberWasReaddressedFromCrab>>(async (context, message, ct) => await DoNothing());
+            When<Envelope<SubaddressWasReaddressedFromCrab>>(async (context, message, ct) => await DoNothing());
+            When<Envelope<TerrainObjectHouseNumberWasImportedFromCrab>>(async (context, message, ct) => await DoNothing());
+            When<Envelope<TerrainObjectWasImportedFromCrab>>(async (context, message, ct) => await DoNothing());
 
         }
 
@@ -433,9 +437,13 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetail
                 context.Entry(buildingUnitDetailItem).Collection(x => x.Addresses).Load();
 
                 if (buildingUnitIdsToNotRealize.Contains(buildingUnitDetailItem.BuildingUnitId))
+                {
                     buildingUnitDetailItem.Status = BuildingUnitStatus.NotRealized;
+                }
                 else if (buildingUnitIdsToRetire.Contains(buildingUnitDetailItem.BuildingUnitId))
+                {
                     buildingUnitDetailItem.Status = BuildingUnitStatus.Retired;
+                }
 
                 buildingUnitDetailItem.Addresses.Clear();
 
@@ -459,19 +467,21 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetail
             {
                 BuildingUnitId = buildingUnitId,
                 BuildingId = buildingId,
-                BuildingPersistentLocalId = building?.BuildingPersistentLocalId,
-                IsBuildingComplete = building?.IsComplete ?? false,
+                BuildingPersistentLocalId = building.BuildingPersistentLocalId,
+                IsBuildingComplete = building.IsComplete ?? false,
                 Version = version,
-                Function = isCommon ? BuildingUnitFunction.Common : BuildingUnitFunction.Unknown,
+                Function = isCommon ? BuildingUnitFunction.Common : BuildingUnitFunction.Unknown
             };
 
             if (addressId.HasValue)
+            {
                 buildingUnitDetailItem.Addresses.Add(new BuildingUnitDetailAddressItem
                 {
                     AddressId = addressId.Value,
                     BuildingUnitId = buildingUnitId,
                     Count = 1
                 });
+            }
 
             await context
                 .BuildingUnitDetails
@@ -487,6 +497,9 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetail
             buildingUnit.Position = extendedWkb.ToByteArray();
         }
 
-        private static void DoNothing() { }
+        private static async Task DoNothing()
+        {
+            await Task.Yield();
+        }
     }
 }
