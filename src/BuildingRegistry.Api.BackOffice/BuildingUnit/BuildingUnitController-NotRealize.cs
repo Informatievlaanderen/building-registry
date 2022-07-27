@@ -25,7 +25,7 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
     public partial class BuildingUnitController
     {
         /// <summary>
-        /// Gebouweenheid niet realiseren.
+        /// Realiseer een gebouweenheid niet.
         /// </summary>
         /// <param name="options"></param>
         /// <param name="ifMatchHeaderValidator"></param>

@@ -2,7 +2,6 @@ namespace BuildingRegistry.Building
 {
     using System;
     using System.Collections.Generic;
-    using System.Collections.ObjectModel;
     using System.Linq;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
     using Events;
@@ -34,11 +33,17 @@ namespace BuildingRegistry.Building
             return unit;
         }
 
-        private List<BuildingUnitStatus> StatusesWhichCannotBeRealized => new List<BuildingUnitStatus>
-            {
-                BuildingUnitStatus.Retired,
-                BuildingUnitStatus.NotRealized
-            };
+        private List<BuildingUnitStatus> StatusesWhichCannotBeRealized => new()
+        {
+            BuildingUnitStatus.Retired,
+            BuildingUnitStatus.NotRealized
+        };
+
+        private List<BuildingUnitStatus> StatusesWhichCannotBeNotRealized => new()
+        {
+            BuildingUnitStatus.Realized,
+            BuildingUnitStatus.Retired
+        };
 
         public void Realize()
         {
@@ -93,9 +98,29 @@ namespace BuildingRegistry.Building
                 return;
             }
 
-            if (Status == BuildingUnitStatus.Realized || Status == BuildingUnitStatus.Retired)
+            if (StatusesWhichCannotBeNotRealized.Contains(Status))
             {
                 throw new BuildingUnitStatusPreventsBuildingUnitNotRealizationException();
+            }
+
+            Apply(new BuildingUnitWasNotRealizedV2(_buildingPersistentLocalId, BuildingUnitPersistentLocalId));
+        }
+
+        public void NotRealizeBecauseBuildingWasNotRealized()
+        {
+            if (IsRemoved)
+            {
+                return;
+            }
+
+            if (Status == BuildingUnitStatus.NotRealized)
+            {
+                return;
+            }
+
+            if (StatusesWhichCannotBeNotRealized.Contains(Status))
+            {
+                return;
             }
 
             Apply(new BuildingUnitWasNotRealizedV2(_buildingPersistentLocalId, BuildingUnitPersistentLocalId));

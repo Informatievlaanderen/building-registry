@@ -1,5 +1,6 @@
 namespace BuildingRegistry.Tests.AggregateTests.WhenNotRealizingBuilding
 {
+    using System;
     using AutoFixture;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
     using Be.Vlaanderen.Basisregisters.AggregateSource.Snapshotting;
@@ -12,6 +13,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenNotRealizingBuilding
     using Fixtures;
     using FluentAssertions;
     using System.Collections.Generic;
+    using System.Linq;
     using Xunit;
     using Xunit.Abstractions;
     using BuildingGeometry = Building.BuildingGeometry;
@@ -107,6 +109,11 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenNotRealizingBuilding
         [Fact]
         public void StateCheck()
         {
+            var plannedBuildingUnitPersistentLocalId = new BuildingRegistry.Legacy.PersistentLocalId(123);
+            var retiredBuildingUnitPersistentLocalId = new BuildingRegistry.Legacy.PersistentLocalId(456);
+            var realizedBuildingUnitPersistentLocalId = new BuildingRegistry.Legacy.PersistentLocalId(789);
+            var removedBuildingUnitPersistentLocalId = new BuildingRegistry.Legacy.PersistentLocalId(101);
+
             var buildingPersistentLocalId = Fixture.Create<BuildingPersistentLocalId>();
             var buildingWasMigrated = new BuildingWasMigrated(
                 Fixture.Create<BuildingId>(),
@@ -116,6 +123,40 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenNotRealizingBuilding
                 Fixture.Create<BuildingGeometry>(),
                 isRemoved: false,
                 new List<BuildingUnit>()
+                {
+                    new BuildingUnit(
+                        new BuildingRegistry.Legacy.BuildingUnitId(Guid.NewGuid()),
+                        plannedBuildingUnitPersistentLocalId,
+                        BuildingRegistry.Legacy.BuildingUnitFunction.Unknown,
+                        BuildingRegistry.Legacy.BuildingUnitStatus.Planned,
+                        new List<AddressPersistentLocalId>(),
+                        Fixture.Create<BuildingRegistry.Legacy.BuildingUnitPosition>(),
+                        false),
+                    new BuildingUnit(
+                        new BuildingRegistry.Legacy.BuildingUnitId(Guid.NewGuid()),
+                        retiredBuildingUnitPersistentLocalId,
+                        BuildingRegistry.Legacy.BuildingUnitFunction.Unknown,
+                        BuildingRegistry.Legacy.BuildingUnitStatus.Retired,
+                        new List<AddressPersistentLocalId>(),
+                        Fixture.Create<BuildingRegistry.Legacy.BuildingUnitPosition>(),
+                        false),
+                    new BuildingUnit(
+                        new BuildingRegistry.Legacy.BuildingUnitId(Guid.NewGuid()),
+                        realizedBuildingUnitPersistentLocalId,
+                        BuildingRegistry.Legacy.BuildingUnitFunction.Unknown,
+                        BuildingRegistry.Legacy.BuildingUnitStatus.Realized,
+                        new List<AddressPersistentLocalId>(),
+                        Fixture.Create<BuildingRegistry.Legacy.BuildingUnitPosition>(),
+                        false),
+                    new BuildingUnit(
+                        new BuildingRegistry.Legacy.BuildingUnitId(Guid.NewGuid()),
+                        removedBuildingUnitPersistentLocalId,
+                        BuildingRegistry.Legacy.BuildingUnitFunction.Unknown,
+                        BuildingRegistry.Legacy.BuildingUnitStatus.Planned,
+                        new List<AddressPersistentLocalId>(),
+                        Fixture.Create<BuildingRegistry.Legacy.BuildingUnitPosition>(),
+                        true)
+                }
             );
             ((ISetProvenance)buildingWasMigrated).SetProvenance(Fixture.Create<Provenance>());
 
@@ -127,6 +168,22 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenNotRealizingBuilding
 
             // Assert
             sut.BuildingStatus.Should().Be(BuildingStatus.NotRealized);
+
+            var plannedUnit = sut.BuildingUnits
+                .First(x => x.BuildingUnitPersistentLocalId == new BuildingUnitPersistentLocalId(plannedBuildingUnitPersistentLocalId));
+            plannedUnit.Status.Should().Be(BuildingUnitStatus.NotRealized);
+
+            var retiredUnit = sut.BuildingUnits
+                .First(x => x.BuildingUnitPersistentLocalId == new BuildingUnitPersistentLocalId(retiredBuildingUnitPersistentLocalId));
+            retiredUnit.Status.Should().Be(BuildingUnitStatus.Retired);
+
+            var realizedUnit = sut.BuildingUnits
+                .First(x => x.BuildingUnitPersistentLocalId == new BuildingUnitPersistentLocalId(realizedBuildingUnitPersistentLocalId));
+            realizedUnit.Status.Should().Be(BuildingUnitStatus.Realized);
+
+            var removedUnit = sut.BuildingUnits
+                .First(x => x.BuildingUnitPersistentLocalId == new BuildingUnitPersistentLocalId(removedBuildingUnitPersistentLocalId));
+            removedUnit.Status.Should().Be(BuildingUnitStatus.Planned);
         }
     }
 }
