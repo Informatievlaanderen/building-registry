@@ -12,26 +12,26 @@ namespace BuildingRegistry.Structurizr
 
     public static class Ids
     {
-        public static int PersonUser => 10000;
-        public static int SoftwareSystemRegistry => 10001;
-        public static int ContainerApi => 10002;
-        public static int ContainerApiRunner => 10003;
-        public static int ContainerApiStore => 10004;
-        public static int ContainerEventStore => 10005;
-        public static int ContainerAggregateRoot => 10006;
-        public static int SoftwareSystemProjectionProducer => 10007;
-        public static int SoftwareSystemApi => 10008;
+        public const int PersonUser = 10000;
+        public const int SoftwareSystemRegistry = 10001;
+        public const int ContainerApi = 10002;
+        public const int ContainerApiRunner = 10003;
+        public const int ContainerApiStore = 10004;
+        public const int ContainerEventStore = 10005;
+        public const int ContainerAggregateRoot = 10006;
+        public const int SoftwareSystemProjectionProducer = 10007;
+        public const int SoftwareSystemApi = 10008;
     }
 
     public static class CustomTags
     {
-        public static string Store => "Store";
-        public static string Event => "Event";
-        public static string Command => "Command";
-        public static string Https => "HTTPS";
-        public static string EntityFramework => "Entity Framework";
-        public static string SqlStreamStore => "SqlStreamStore";
-        public static string Direct => "Direct";
+        public const string Store = "Store";
+        public const string Event = "Event";
+        public const string Command = "Command";
+        public const string Https = "HTTPS";
+        public const string EntityFramework = "Entity Framework";
+        public const string SqlStreamStore = "SqlStreamStore";
+        public const string Direct = "Direct";
     }
 
     /// <summary>

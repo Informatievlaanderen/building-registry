@@ -5,7 +5,7 @@ namespace BuildingRegistry.Legacy
     public enum BuildingGeometryMethod
     {
         Outlined,
-        MeasuredByGrb,
+        MeasuredByGrb
     }
 
     public static class BuildingGeometryMethodHelpers

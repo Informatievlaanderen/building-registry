@@ -4,8 +4,8 @@ namespace BuildingRegistry.Building
 
     public struct BuildingGeometryMethod
     {
-        public static BuildingGeometryMethod Outlined = new BuildingGeometryMethod("Outlined");
-        public static BuildingGeometryMethod MeasuredByGrb = new BuildingGeometryMethod("MeasuredByGrb");
+        public static readonly BuildingGeometryMethod Outlined = new BuildingGeometryMethod("Outlined");
+        public static readonly BuildingGeometryMethod MeasuredByGrb = new BuildingGeometryMethod("MeasuredByGrb");
 
         public string Value { get; }
 

@@ -11,7 +11,7 @@ namespace BuildingRegistry.Projections.Wfs.BuildingUnit
 
     public class BuildingUnit
     {
-        public static string VersionTimestampBackingPropertyName = nameof(VersionTimestampAsDateTimeOffset);
+        public const string VersionTimestampBackingPropertyName = nameof(VersionTimestampAsDateTimeOffset);
 
         public Guid BuildingUnitId { get; set; }
         public string? Id { get; set; }
@@ -51,7 +51,7 @@ namespace BuildingRegistry.Projections.Wfs.BuildingUnit
         {
             b.ToTable(TableName, Schema.Wfs)
                 .HasKey(p => p.BuildingUnitId)
-                .IsClustered(true);
+                .IsClustered();
 
             b.Property(p => p.Id);
 

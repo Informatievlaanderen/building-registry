@@ -10,7 +10,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingDetailV2
 
     public class BuildingDetailItemV2
     {
-        public static string VersionTimestampBackingPropertyName = nameof(VersionTimestampAsDateTimeOffset);
+        public const string VersionTimestampBackingPropertyName = nameof(VersionTimestampAsDateTimeOffset);
 
         public int PersistentLocalId { get; set; }
         public BuildingGeometryMethod GeometryMethod { get; set; }

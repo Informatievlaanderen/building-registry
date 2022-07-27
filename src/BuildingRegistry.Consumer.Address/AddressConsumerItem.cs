@@ -39,10 +39,10 @@ namespace BuildingRegistry.Consumer.Address
 
     public struct AddressStatus
     {
-        public static AddressStatus Proposed = new AddressStatus("Proposed");
-        public static AddressStatus Current = new AddressStatus("Current");
-        public static AddressStatus Retired = new AddressStatus("Retired");
-        public static AddressStatus Rejected = new AddressStatus("Rejected");
+        public static readonly AddressStatus Proposed = new AddressStatus("Proposed");
+        public static readonly AddressStatus Current = new AddressStatus("Current");
+        public static readonly AddressStatus Retired = new AddressStatus("Retired");
+        public static readonly AddressStatus Rejected = new AddressStatus("Rejected");
 
         public string Status { get; }
 
@@ -54,7 +54,9 @@ namespace BuildingRegistry.Consumer.Address
                 status != Current.Status &&
                 status != Retired.Status &&
                 status != Rejected.Status)
+            {
                 throw new NotImplementedException($"Cannot parse {status} to AddressStatus");
+            }
 
             return new AddressStatus(status);
         }

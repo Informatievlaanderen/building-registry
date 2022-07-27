@@ -11,7 +11,7 @@ namespace BuildingRegistry.Projections.Wms.Building
 
     public class Building
     {
-        public static string VersionTimestampBackingPropertyName = nameof(VersionTimestampAsDateTimeOffset);
+        public const string VersionTimestampBackingPropertyName = nameof(VersionTimestampAsDateTimeOffset);
 
         public Guid BuildingId { get; set; }
         public int? PersistentLocalId { get; set; }
@@ -51,7 +51,7 @@ namespace BuildingRegistry.Projections.Wms.Building
         {
             b.ToTable(TableName, Schema.Wms)
                 .HasKey(p => p.BuildingId)
-                .IsClustered(true);
+                .IsClustered();
 
             b.Property(p => p.Id)
                 .HasColumnType("varchar(46)")
