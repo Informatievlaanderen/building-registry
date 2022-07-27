@@ -1,3 +1,10 @@
+# [3.30.0](https://github.com/informatievlaanderen/building-registry/compare/v3.29.3...v3.30.0) (2022-07-27)
+
+
+### Features
+
+* not realize building ([9e5d411](https://github.com/informatievlaanderen/building-registry/commit/9e5d4113bf7f5b8cb1542ecafa7d2fb5b8044ec5))
+
 ## [3.29.3](https://github.com/informatievlaanderen/building-registry/compare/v3.29.2...v3.29.3) (2022-07-27)
 
 
