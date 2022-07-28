@@ -63,7 +63,7 @@ namespace BuildingRegistry.Building
             {
                 BuildingStatus.Retired,
                 BuildingStatus.Realized,
-                BuildingStatus.NotRealized,
+                BuildingStatus.NotRealized
             };
 
             if (invalidStatuses.Contains(BuildingStatus))
@@ -110,7 +110,7 @@ namespace BuildingRegistry.Building
             var invalidStatuses = new List<BuildingStatus>
             {
                 BuildingStatus.Realized,
-                BuildingStatus.Retired,
+                BuildingStatus.Retired
             };
 
             if (invalidStatuses.Contains(BuildingStatus))
@@ -242,9 +242,8 @@ namespace BuildingRegistry.Building
         private static void GuardPolygon(Geometry? geometry)
         {
             if (
-            geometry == null
-                || geometry is not Polygon
-                || geometry.SRID != ExtendedWkbGeometry.SridLambert72
+                geometry is not Polygon 
+                || geometry.SRID != ExtendedWkbGeometry.SridLambert72 
                 || !GeometryValidator.IsValid(geometry))
             {
                 throw new InvalidPolygonException();
