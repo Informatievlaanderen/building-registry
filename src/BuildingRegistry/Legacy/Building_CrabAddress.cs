@@ -56,7 +56,7 @@ namespace BuildingRegistry.Legacy
 
                     predecessor.ApplyRetired(modification == CrabModification.Correction);
                 }
-                else if (lifetime.EndDateTime.HasValue && ((predecessor != null && predecessor.HasRetiredState) || IsHouseNumberReaddressedAt(buildingUnitKey, timestamp)) && !_buildingUnitCollection.IsAddressLinkedToCommonBuildingUnit(addressId))
+                else if (lifetime.EndDateTime.HasValue && (predecessor is { HasRetiredState: true } || IsHouseNumberReaddressedAt(buildingUnitKey, timestamp)) && !_buildingUnitCollection.IsAddressLinkedToCommonBuildingUnit(addressId))
                 {
                     doNothing = true;
                 }
@@ -105,7 +105,7 @@ namespace BuildingRegistry.Legacy
                                 x.Timestamp > importedSubaddress.Timestamp &&
                                 x.SubaddressId == importedSubaddress.SubaddressId);
 
-                        var buildingUnitKeySubaddress = BuildingUnitKey.Create(terrainObjectId, terrainObjectHouseNumberId, new CrabSubaddressId(importedSubaddress.SubaddressId));
+                        _ = BuildingUnitKey.Create(terrainObjectId, terrainObjectHouseNumberId, new CrabSubaddressId(importedSubaddress.SubaddressId));
                         if (subaddressLaterImported && _buildingUnitCollection.ActiveBuildingUnits.Any(x => x.AddressIds.Contains(addressIdForSubaddress)))
                         {
                             continue;
