@@ -1,3 +1,5 @@
+using System.Linq;
+
 namespace BuildingRegistry.Projections.Wfs.BuildingUnit
 {
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.Connector;
@@ -49,13 +51,10 @@ namespace BuildingRegistry.Projections.Wfs.BuildingUnit
             When<Envelope<BuildingWasRemoved>>(async (context, message, ct) =>
             {
                 var buildingUnits = await context.BuildingUnits.GetByBuildingId(message.Message.BuildingId, ct);
-                foreach (var buildingUnitDetailItem in buildingUnits)
+                foreach (var buildingUnitDetailItem in buildingUnits.Where(buildingUnitDetailItem => message.Message.BuildingUnitIds.Contains(buildingUnitDetailItem.BuildingUnitId)))
                 {
-                    if (message.Message.BuildingUnitIds.Contains(buildingUnitDetailItem.BuildingUnitId))
-                    {
-                        buildingUnitDetailItem.IsRemoved = true;
-                        SetVersion(buildingUnitDetailItem, message.Message.Provenance.Timestamp);
-                    }
+                    buildingUnitDetailItem.IsRemoved = true;
+                    SetVersion(buildingUnitDetailItem, message.Message.Provenance.Timestamp);
                 }
 
                 var building = await context.BuildingUnitsBuildings.FindAsync(message.Message.BuildingId, cancellationToken: ct);
@@ -142,7 +141,7 @@ namespace BuildingRegistry.Projections.Wfs.BuildingUnit
                     .AddAsync(new BuildingUnitBuildingItem
                     {
                         BuildingId = message.Message.BuildingId,
-                        IsRemoved = false,
+                        IsRemoved = false
                     }, ct);
             });
             #endregion Building
