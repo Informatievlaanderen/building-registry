@@ -193,13 +193,11 @@ namespace BuildingRegistry.Legacy
                 modification,
                 organisation);
 
-            if (!IsHouseNumberReaddressedAt(buildingUnitKey, timestamp))
+            if (!IsHouseNumberReaddressedAt(buildingUnitKey, timestamp)
+                && !_buildingUnitCollection.IsDeleted(buildingUnitKey) && _buildingUnitCollection.HasKey(buildingUnitKey))
             {
-                if (!_buildingUnitCollection.IsDeleted(buildingUnitKey) && _buildingUnitCollection.HasKey(buildingUnitKey))
-                {
-                    var buildingUnit = _buildingUnitCollection.GetActiveOrLastRetiredByKey(buildingUnitKey);
-                    buildingUnit.ApplyStatusChange(legacyEvent);
-                }
+                var buildingUnit = _buildingUnitCollection.GetActiveOrLastRetiredByKey(buildingUnitKey);
+                buildingUnit.ApplyStatusChange(legacyEvent);
             }
 
             ApplyChange(legacyEvent);
