@@ -175,7 +175,7 @@ namespace BuildingRegistry.Projections.Wms.Migrations
                     GO");
         }
 
-        private class StatusViews
+        private sealed class StatusViews
         {
             public StatusViews(string sourceViewName, params StatusView[] views)
             {
@@ -187,7 +187,7 @@ namespace BuildingRegistry.Projections.Wms.Migrations
             public IEnumerable<StatusView> Views { get; }
         }
 
-        private class StatusView
+        private sealed class StatusView
         {
             public string Name { get; set; }
             public string DisplayedStatus { get; set; }
