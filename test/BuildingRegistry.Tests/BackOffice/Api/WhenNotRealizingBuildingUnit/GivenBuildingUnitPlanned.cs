@@ -195,7 +195,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenNotRealizingBuildingUnit
                 .Result
                 .Where(x =>
                     x.Errors.Any(error
-                        => error.ErrorCode == "GebouweenheidStatusNietGepland"
+                        => error.ErrorCode == "GebouweenheidGehistoreerdOfGerealiseerd"
                                           && error.ErrorMessage == "Deze actie is enkel toegestaan op gebouweenheden met status 'gepland'."));
         }
     }

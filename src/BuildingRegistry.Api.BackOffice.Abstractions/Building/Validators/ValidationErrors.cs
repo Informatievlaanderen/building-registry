@@ -17,7 +17,7 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.Building.Validators
             public const string BuildingUnitIsRemoved = "GebouweenheidVerwijderd";
             public const string BuildingStatusNotInRealized = "GebouwStatusNietInGerealiseerd";
             public const string BuildingUnitCannotBeRealized = "GebouweenheidGehistoreerdOfNietGerealiseerd";
-            public const string BuildingUnitCannotBeNotRealized = "GebouweenheidStatusNietGepland";
+            public const string BuildingUnitCannotBeNotRealized = "GebouweenheidGehistoreerdOfGerealiseerd";
             public const string BuildingUnitCannotBePlanned = "GebouwStatusOngeldig";
             public const string BuildingUnitOutsideGeometryBuilding = "GebouweenheidOngeldigePositie";
             public const string MissingRequiredPosition = "GebouweendheidPositieValidatie";
@@ -34,7 +34,7 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.Building.Validators
             public const string InvalidPolygonGeometry = "Ongeldig formaat geometriePolygoon.";
             public const string BuildingCannotBePlacedUnderConstruction = "Deze actie is enkel toegestaan op gebouwen met status 'gepland'.";
             public const string BuildingCannotBeRealizedException = "Deze actie is enkel toegestaan op gebouwen met status 'inAanbouw'.";
-            public const string BuildingCannotBeNotRealizedException = "Deze actie is enkel toegestaan op gebouw met status 'inAanbouw', 'gepland'.";
+            public const string BuildingCannotBeNotRealizedException = "Deze actie is enkel toegestaan op gebouwen met status 'gepland' of 'inAanbouw'.";
         }
 
         public static class BuildingUnit
