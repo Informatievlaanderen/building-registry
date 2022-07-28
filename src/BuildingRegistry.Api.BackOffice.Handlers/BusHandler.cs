@@ -29,7 +29,9 @@ namespace BuildingRegistry.Api.BackOffice.Handlers
             CancellationToken cancellationToken)
         {
             if (!commandId.HasValue || command == null)
+            {
                 throw new ApiException("Ongeldig verzoek id.", StatusCodes.Status400BadRequest);
+            }
 
             // First check if the command id already has been processed
             var possibleProcessedCommand = await context
@@ -39,13 +41,15 @@ namespace BuildingRegistry.Api.BackOffice.Handlers
 
             var contentHash = SHA512
                 .Create()
-                .ComputeHash(Encoding.UTF8.GetBytes((string)command.ToString()))
+                .ComputeHash(Encoding.UTF8.GetBytes(command.ToString()))
                 .ToHexString();
 
             // It is possible we have a GUID collision, check the SHA-512 hash as well to see if it is really the same one.
             // Do nothing if commandId with contenthash exists
             if (possibleProcessedCommand.Any() && possibleProcessedCommand.ContainsKey(contentHash))
+            {
                 throw new IdempotencyException("Already processed");
+            }
 
             var processedCommand = new ProcessedCommand(commandId.Value, contentHash);
             try
@@ -55,9 +59,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers
                 await context.SaveChangesAsync(cancellationToken);
 
                 // Do work
-                return await CommandHandlerResolverExtensions.Dispatch(
-                    Bus,
-                    commandId.Value,
+                return await Bus.Dispatch(commandId.Value,
                     command,
                     metadata,
                     cancellationToken);
@@ -66,7 +68,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers
             {
                 // On exception, remove commandId from Command Store
                 context.ProcessedCommands.Remove(processedCommand);
-                context.SaveChanges();
+                await context.SaveChangesAsync(cancellationToken);
                 throw;
             }
         }
