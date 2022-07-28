@@ -11,8 +11,6 @@ namespace BuildingRegistry.Infrastructure.Modules
     public class EditModule : Module
     {
         private readonly IConfiguration _configuration;
-        private readonly IServiceCollection _services;
-        private readonly ILoggerFactory _loggerFactory;
 
         public EditModule(
             IConfiguration configuration,
@@ -20,14 +18,12 @@ namespace BuildingRegistry.Infrastructure.Modules
             ILoggerFactory loggerFactory)
         {
             _configuration = configuration;
-            _services = services;
-            _loggerFactory = loggerFactory;
 
             var projectionsConnectionString = _configuration.GetConnectionString("Sequences");
 
-            _services
+            services
                 .AddDbContext<SequenceContext>(options => options
-                    .UseLoggerFactory(_loggerFactory)
+                    .UseLoggerFactory(loggerFactory)
                     .UseSqlServer(projectionsConnectionString, sqlServerOptions => sqlServerOptions
                             .EnableRetryOnFailure()
                             .MigrationsHistoryTable(MigrationTables.Sequence, Schema.Sequence)
