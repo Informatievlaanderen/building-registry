@@ -11,7 +11,7 @@ namespace BuildingRegistry.Projections.Wms.BuildingUnit
 
     public class BuildingUnit
     {
-        public static string VersionTimestampBackingPropertyName = nameof(VersionTimestampAsDateTimeOffset);
+        public const string VersionTimestampBackingPropertyName = nameof(VersionTimestampAsDateTimeOffset);
 
         public Guid BuildingUnitId { get; set; }
         public string? Id { get; set; }
