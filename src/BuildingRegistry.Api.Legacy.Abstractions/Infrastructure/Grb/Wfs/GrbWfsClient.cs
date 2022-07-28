@@ -42,9 +42,9 @@ namespace BuildingRegistry.Api.Legacy.Abstractions.Infrastructure.Grb.Wfs
             _gmlReader = new GMLReader();
         }
 
-        public IEnumerable<Tuple<Geometry, IReadOnlyDictionary<string, string>>> GetFeaturesInBoundingBox(GrbFeatureType type, Envelope boundingBox)
+        public IEnumerable<Tuple<Geometry, IReadOnlyDictionary<string, string>>> GetFeaturesInBoundingBox(GrbFeatureType featureType, Envelope boundingBox)
         {
-            var featureName = GrbFeatureName.For(type);
+            var featureName = GrbFeatureName.For(featureType);
             var wfsRequest = CreateWfsRequest(featureName, boundingBox);
 
             try
