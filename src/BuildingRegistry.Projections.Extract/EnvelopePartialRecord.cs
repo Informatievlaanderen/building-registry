@@ -1,8 +1,9 @@
 namespace BuildingRegistry.Projections.Extract
 {
+    using System;
     using NetTopologySuite.Geometries;
 
-    public class EnvelopePartialRecord
+    public sealed class EnvelopePartialRecord : IEquatable<EnvelopePartialRecord>
     {
         public double MinimumX { get; set; }
         public double MaximumX { get; set; }
@@ -17,17 +18,17 @@ namespace BuildingRegistry.Projections.Extract
             MaximumY = envelope.MaxY
         };
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             return obj is EnvelopePartialRecord envelope && Equals(envelope);
         }
 
-        protected bool Equals(EnvelopePartialRecord other)
+        public bool Equals(EnvelopePartialRecord? other)
         {
-            return MinimumX.Equals(other.MinimumX)
-                   && MinimumY.Equals(other.MinimumY)
-                   && MaximumX.Equals(other.MaximumX)
-                   && MaximumY.Equals(other.MaximumY);
+            return MinimumX.Equals(other?.MinimumX)
+                && MinimumY.Equals(other?.MinimumY)
+                && MaximumX.Equals(other?.MaximumX)
+                && MaximumY.Equals(other?.MaximumY);
         }
 
         public override int GetHashCode()
