@@ -727,10 +727,9 @@ namespace BuildingRegistry.Legacy
                 }
             }
 
-            foreach (var buildingUnit in _buildingUnitCollection.GetAllBuildingUnitsWithoutPersistentLocalId())
+            foreach (var buildingUnitId in _buildingUnitCollection.GetAllBuildingUnitsWithoutPersistentLocalId().Select(x => x.BuildingUnitId))
             {
-                var id = buildingUnit.BuildingUnitId;
-                ApplyChange(new BuildingUnitPersistentLocalIdWasAssigned(_buildingId, id, new PersistentLocalId(persistentLocalIdGenerator.GenerateNextPersistentLocalId()), new PersistentLocalIdAssignmentDate(Instant.FromDateTimeOffset(DateTimeOffset.Now))));
+                ApplyChange(new BuildingUnitPersistentLocalIdWasAssigned(_buildingId, buildingUnitId, new PersistentLocalId(persistentLocalIdGenerator.GenerateNextPersistentLocalId()), new PersistentLocalIdAssignmentDate(Instant.FromDateTimeOffset(DateTimeOffset.Now))));
             }
         }
 
