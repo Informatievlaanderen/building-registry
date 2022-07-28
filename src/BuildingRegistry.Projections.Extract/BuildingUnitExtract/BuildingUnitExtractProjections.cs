@@ -407,7 +407,7 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
             When<Envelope<BuildingWasCorrectedToNotRealized>>(async (context, message, ct) =>
             {
                 var units = GetBuildingUnitsByBuilding(context, message.Message.BuildingId);
-                RetireUnitsByBuilding(units, message.Message.BuildingUnitIdsToNotRealize, message.Message.BuildingUnitIdsToRetire, message.Message.Provenance.Timestamp, context);
+                RetireUnitsByBuilding(units, message.Message.BuildingUnitIdsToNotRealize, message.Message.BuildingUnitIdsToRetire, message.Message.Provenance.Timestamp);
 
                 var building = await context.BuildingUnitBuildings.FindAsync(message.Message.BuildingId, cancellationToken: ct);
                 building.BuildingRetiredStatus = BuildingStatus.NotRealized;
@@ -416,7 +416,7 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
             When<Envelope<BuildingWasCorrectedToRetired>>(async (context, message, ct) =>
             {
                 var units = GetBuildingUnitsByBuilding(context, message.Message.BuildingId);
-                RetireUnitsByBuilding(units, message.Message.BuildingUnitIdsToNotRealize, message.Message.BuildingUnitIdsToRetire, message.Message.Provenance.Timestamp, context);
+                RetireUnitsByBuilding(units, message.Message.BuildingUnitIdsToNotRealize, message.Message.BuildingUnitIdsToRetire, message.Message.Provenance.Timestamp);
 
                 var building = await context.BuildingUnitBuildings.FindAsync(message.Message.BuildingId, cancellationToken: ct);
                 building.BuildingRetiredStatus = BuildingStatus.Retired;
@@ -425,7 +425,7 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
             When<Envelope<BuildingWasNotRealized>>(async (context, message, ct) =>
             {
                 var units = GetBuildingUnitsByBuilding(context, message.Message.BuildingId);
-                RetireUnitsByBuilding(units, message.Message.BuildingUnitIdsToNotRealize, message.Message.BuildingUnitIdsToRetire, message.Message.Provenance.Timestamp, context);
+                RetireUnitsByBuilding(units, message.Message.BuildingUnitIdsToNotRealize, message.Message.BuildingUnitIdsToRetire, message.Message.Provenance.Timestamp);
 
                 var building = await context.BuildingUnitBuildings.FindAsync(message.Message.BuildingId, cancellationToken: ct);
                 building.BuildingRetiredStatus = BuildingStatus.NotRealized;
@@ -447,7 +447,7 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
             When<Envelope<BuildingWasRetired>>(async (context, message, ct) =>
             {
                 var units = GetBuildingUnitsByBuilding(context, message.Message.BuildingId);
-                RetireUnitsByBuilding(units, message.Message.BuildingUnitIdsToNotRealize, message.Message.BuildingUnitIdsToRetire, message.Message.Provenance.Timestamp, context);
+                RetireUnitsByBuilding(units, message.Message.BuildingUnitIdsToNotRealize, message.Message.BuildingUnitIdsToRetire, message.Message.Provenance.Timestamp);
 
                 var building = await context.BuildingUnitBuildings.FindAsync(message.Message.BuildingId, cancellationToken: ct);
                 building.BuildingRetiredStatus = BuildingStatus.Retired;
@@ -548,12 +548,10 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
             buildingUnit.DbaseRecord = record.ToBytes(_encoding);
         }
 
-        private void RetireUnitsByBuilding(
-            IEnumerable<BuildingUnitExtractItem> buildingUnits,
+        private void RetireUnitsByBuilding(IEnumerable<BuildingUnitExtractItem> buildingUnits,
             ICollection<Guid> buildingUnitIdsToNotRealize,
             ICollection<Guid> buildingUnitIdsToRetire,
-            Instant version,
-            ExtractContext context)
+            Instant version)
         {
             foreach (var buildingUnitExtractItem in buildingUnits)
             {
