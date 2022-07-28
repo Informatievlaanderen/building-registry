@@ -12,7 +12,8 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
 
     public static class XmlTools
     {
-        private static readonly Type[] WriteTypes = {
+        private static readonly Type[] WriteTypes =
+        {
             typeof(string),
             typeof(DateTime),
             typeof(Enum),
@@ -28,7 +29,8 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
         /// <summary>
         /// Preferred way to exclude properties
         /// </summary>
-        private static readonly Type[] ExcludeTypes = {
+        private static readonly Type[] ExcludeTypes =
+        {
             typeof(Application),
             typeof(Modification)
         };
@@ -36,7 +38,8 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
         /// <summary>
         /// Alternative way if property is a primitive type or included in WriteTypes.
         /// </summary>
-        private static readonly string[] ExcludePropertyNames = {
+        private static readonly string[] ExcludePropertyNames =
+        {
             "Operator"
         };
 
@@ -48,19 +51,24 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
 
         public static XElement ToXml(this object input) => input.ToXml(null);
 
-        public static XElement ToXml(this object input, string element, int? arrayIndex = null, string arrayName = null)
+        public static XElement ToXml(this object input, string? element, int? arrayIndex = null, string? arrayName = null)
         {
             if (input == null)
+            {
                 return null;
+            }
 
             if (string.IsNullOrEmpty(element))
             {
                 var name = input.GetType().Name;
+
+                var elementValue = arrayIndex != null
+                    ? arrayName + "_" + arrayIndex
+                    : name;
+
                 element = name.Contains("AnonymousType")
                     ? "Object"
-                    : arrayIndex != null
-                        ? arrayName + "_" + arrayIndex
-                        : name;
+                    : elementValue;
             }
 
             element = XmlConvert.EncodeName(element);
@@ -70,14 +78,19 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
             var props = type.GetProperties();
 
             var elements = from prop in props
-                let pType = Nullable.GetUnderlyingType(prop.PropertyType) ?? prop.PropertyType
-                let name = XmlConvert.EncodeName(prop.Name)
-                let val = pType.IsArray ? "array" : prop.GetValue(input, null)
-                let value = pType.IsEnumerable()
-                    ? GetEnumerableElements(prop, (IEnumerable)prop.GetValue(input, null))
-                    : pType.IsSimpleType() ? new XElement(name, GetValue(val)) : val.ToXml(name)
-                where value != null && !pType.IsExcludedType() && !name.IsExcludedPropertyName()
-                select value;
+                           let pType = Nullable.GetUnderlyingType(prop.PropertyType) ?? prop.PropertyType
+                           let name = XmlConvert.EncodeName(prop.Name)
+                           let val = pType.IsArray
+                               ? "array"
+                               : prop.GetValue(input, null)
+                           let elementValue = pType.IsSimpleType()
+                               ? new XElement(name, GetValue(val))
+                               : val.ToXml(name)
+                           let value = pType.IsEnumerable()
+                               ? GetEnumerableElements(prop, (IEnumerable)prop.GetValue(input, null))
+                               : elementValue
+                           where value != null && !pType.IsExcludedType() && !name.IsExcludedPropertyName()
+                           select value;
 
             ret.Add(elements);
 
@@ -86,22 +99,18 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
 
         private static object? GetValue(object? val)
         {
-            switch (val)
+            return val switch
             {
-                case LocalDate localDate:
-                    return localDate.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
-                case LocalDateTime localDateTime:
-                    return localDateTime.ToString("o", CultureInfo.InvariantCulture);
-                case DateTime dateTime:
-                    return dateTime.ToString("o", CultureInfo.InvariantCulture);
-                case DateTimeOffset dateTimeOffset:
-                    return dateTimeOffset.ToString("o", CultureInfo.InvariantCulture);
-                default:
-                    return val;
-            }
+                LocalDate localDate => localDate.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture),
+                LocalDateTime localDateTime => localDateTime.ToString("o", CultureInfo.InvariantCulture),
+                DateTime dateTime => dateTime.ToString("o", CultureInfo.InvariantCulture),
+                DateTimeOffset dateTimeOffset => dateTimeOffset.ToString("o", CultureInfo.InvariantCulture),
+                _ => val
+            };
         }
 
-        private static readonly Type[] FlatternTypes = {
+        private static readonly Type[] FlatternTypes =
+        {
             typeof(string)
         };
 
