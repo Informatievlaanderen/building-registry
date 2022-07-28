@@ -1,3 +1,11 @@
+## [3.30.4](https://github.com/informatievlaanderen/building-registry/compare/v3.30.3...v3.30.4) (2022-07-28)
+
+
+### Bug Fixes
+
+* override Equals & comparison operators ([551fbaf](https://github.com/informatievlaanderen/building-registry/commit/551fbaf5dd5a68bb37094b441b27352288932cff))
+* remove unused private fields ([91e9be2](https://github.com/informatievlaanderen/building-registry/commit/91e9be203bcf646a747c0b283190fe92809db704))
+
 ## [3.30.3](https://github.com/informatievlaanderen/building-registry/compare/v3.30.2...v3.30.3) (2022-07-28)
 
 
