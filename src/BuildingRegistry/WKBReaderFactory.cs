@@ -6,6 +6,7 @@ namespace BuildingRegistry
     using NetTopologySuite.Geometries.Implementation;
     using NetTopologySuite.IO;
 
+    // ReSharper disable once InconsistentNaming
     public static class WKBReaderFactory
     {
         public static WKBReader Create() =>
