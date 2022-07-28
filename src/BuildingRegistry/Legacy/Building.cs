@@ -6,7 +6,6 @@ namespace BuildingRegistry.Legacy
     using Be.Vlaanderen.Basisregisters.Crab;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Be.Vlaanderen.Basisregisters.Utilities.HexByteConvertor;
-    using BuildingRegistry.Building;
     using BuildingRegistry.Building.Commands;
     using Commands;
     using Crab;
@@ -19,7 +18,7 @@ namespace BuildingRegistry.Legacy
     {
         private static readonly WKBReader WkbReader = WKBReaderFactory.Create();
 
-        public MigrateBuilding CreateMigrateCommand(Func<List<Legacy.BuildingUnit>, List<BuildingRegistry.Building.Commands.BuildingUnit>> buildingUnitMapper)
+        public MigrateBuilding CreateMigrateCommand(Func<List<BuildingUnit>, List<BuildingRegistry.Building.Commands.BuildingUnit>> buildingUnitMapper)
         {
             var status = _status ?? throw new InvalidOperationException($"No status found for Building '{_persistentLocalId}'");
 
@@ -61,11 +60,13 @@ namespace BuildingRegistry.Legacy
            CrabModification? modification,
            CrabOrganisation? organisation)
         {
-            var wasRetired = IsRetired;
+            _ = IsRetired;
             if (IsRemoved)
+            {
                 throw new BuildingRemovedException($"Cannot change removed building for building id {_buildingId}");
+            }
 
-            if (!IsRemoved && modification.HasValue && modification.Value == CrabModification.Delete)
+            if (!IsRemoved && modification is CrabModification.Delete)
             {
                 ApplyChange(new BuildingWasRemoved(_buildingId, _buildingUnitCollection.GetAllBuildingUnitIdsToRemove()));
             }
@@ -97,7 +98,9 @@ namespace BuildingRegistry.Legacy
                         ApplyStatusCorrectionChange(buildingStatus);
                     }
                     else
+                    {
                         ApplyStatusChange(buildingStatus);
+                    }
 
                     //if (!IsRetired && wasRetired) Actually impossible: if CRAB-TerrainObject gets enddate so does the relation, so the relation will get reactivated too.
                     //    UnretireBuildingUnits(modification, timestamp);
@@ -160,7 +163,7 @@ namespace BuildingRegistry.Legacy
             if (_status != newStatus)
             {
                 var previousStatus = _status;
-                if (crabStatusEvent != null && crabStatusEvent.Modification == CrabModification.Correction)
+                if (crabStatusEvent is { Modification: CrabModification.Correction })
                 {
                     ApplyStatusCorrectionChange(newStatus);
                 }
@@ -170,7 +173,9 @@ namespace BuildingRegistry.Legacy
                 }
 
                 if (previousStatus == null && !IsRetired)
+                {
                     UnretireBuildingUnits(modification, timestamp);
+                }
             }
 
             ApplyCompletionIfNecessary();
@@ -211,29 +216,38 @@ namespace BuildingRegistry.Legacy
         private static BuildingStatus? MapStatus(CrabBuildingStatus buildingStatus, CrabModification? modification, bool isRetired)
         {
             if (modification == CrabModification.Delete)
+            {
                 return null;
+            }
 
             if (isRetired)
             {
-                if (buildingStatus == CrabBuildingStatus.BuildingPermitGranted ||
-                    buildingStatus == CrabBuildingStatus.PermitRequested ||
-                    buildingStatus == CrabBuildingStatus.UnderConstruction)
+                if (buildingStatus is CrabBuildingStatus.BuildingPermitGranted or CrabBuildingStatus.PermitRequested or CrabBuildingStatus.UnderConstruction)
+                {
                     return BuildingStatus.NotRealized;
+                }
 
-                if (buildingStatus == CrabBuildingStatus.InUse || buildingStatus == CrabBuildingStatus.OutOfUse)
+                if (buildingStatus is CrabBuildingStatus.InUse or CrabBuildingStatus.OutOfUse)
+                {
                     return BuildingStatus.Retired;
+                }
             }
             else
             {
-                if (buildingStatus == CrabBuildingStatus.BuildingPermitGranted ||
-                    buildingStatus == CrabBuildingStatus.PermitRequested)
+                if (buildingStatus is CrabBuildingStatus.BuildingPermitGranted or CrabBuildingStatus.PermitRequested)
+                {
                     return BuildingStatus.Planned;
+                }
 
                 if (buildingStatus == CrabBuildingStatus.UnderConstruction)
+                {
                     return BuildingStatus.UnderConstruction;
+                }
 
-                if (buildingStatus == CrabBuildingStatus.InUse || buildingStatus == CrabBuildingStatus.OutOfUse)
+                if (buildingStatus is CrabBuildingStatus.InUse or CrabBuildingStatus.OutOfUse)
+                {
                     return BuildingStatus.Realized;
+                }
             }
 
             throw new NotImplementedException();
@@ -348,7 +362,9 @@ namespace BuildingRegistry.Legacy
                 {
                     ApplyChange(new BuildingGeometryWasRemoved(_buildingId));
                     foreach (var unit in _buildingUnitCollection.ActiveBuildingUnits)
+                    {
                         unit.CheckCompleteness();
+                    }
                 }
 
                 if (newGeometry != null)
@@ -364,12 +380,16 @@ namespace BuildingRegistry.Legacy
                 }
 
                 foreach (var activeBuildingUnit in _buildingUnitCollection.ActiveBuildingUnits)
+                {
                     activeBuildingUnit.CheckAndCorrectPositionIfNeeded(legacyEvent.Modification == CrabModification.Correction);
+                }
 
                 foreach (var retiredBuildingUnit in _buildingUnitCollection.GetLastRetiredUnitPerKey())
                 {
                     if (!_buildingUnitCollection.HasActiveUnitByKey(retiredBuildingUnit.BuildingUnitKey))
+                    {
                         retiredBuildingUnit.CheckAndCorrectPositionIfNeeded(legacyEvent.Modification == CrabModification.Correction);
+                    }
                 }
             }
         }
@@ -377,7 +397,9 @@ namespace BuildingRegistry.Legacy
         private static bool IsGeometryValid(ExtendedWkbGeometry validGeometry)
         {
             if (validGeometry == null)
+            {
                 return false;
+            }
 
             var geometry = WkbReader.Read(validGeometry);
             return GeometryValidator.IsValid(geometry);
@@ -414,15 +436,21 @@ namespace BuildingRegistry.Legacy
         private void ApplyCompletionIfNecessary()
         {
             if ((_status == null || Geometry == null) && IsComplete)
+            {
                 ApplyChange(new BuildingBecameIncomplete(_buildingId));
+            }
             else if (_status != null && Geometry != null && !IsComplete)
+            {
                 ApplyChange(new BuildingBecameComplete(_buildingId));
+            }
         }
 
         private void GuardDeletedBuildingForCrab(CrabModification? modification)
         {
             if (IsRemoved && modification != CrabModification.Delete)
+            {
                 throw new BuildingRemovedException($"Cannot change removed building for building id {_buildingId}");
+            }
         }
 
         public void AssignPersistentLocalIdForCrabTerrainObjectId(
@@ -433,7 +461,9 @@ namespace BuildingRegistry.Legacy
             IPersistentLocalIdGenerator persistentLocalIdGenerator)
         {
             if (_persistentLocalId != null)
+            {
                 return;
+            }
 
             if (persistentLocalId == null)
             {
@@ -480,7 +510,9 @@ namespace BuildingRegistry.Legacy
                     }
 
                     if (!persistentLocalIdQuery.Any())
+                    {
                         continue; //shit really hit the fan... (terreinobjectid: 6683870 (see old prod))
+                    }
 
                     var filtered = persistentLocalIdQuery;
                     if (activeUnit.BuildingUnitKey.Subaddress.HasValue)
@@ -491,20 +523,26 @@ namespace BuildingRegistry.Legacy
                             .ToList();
 
                         if (_buildingUnitCollection.HasReaddressed(activeUnit.BuildingUnitKey))
+                        {
                             filtered = filtered.Union(persistentLocalIdQuery.Where(x =>
                                         x.CrabSubaddressId != null &&
                                         x.CrabSubaddressId == _buildingUnitCollection.GetNewReaddressedKeyByUnitKey(activeUnit.BuildingUnitKey).Subaddress)
                                     .ToList())
                                 .ToList();
+                        }
 
                         if (!filtered.Any()) // terreinobjectid: 9041275
+                        {
                             filtered = deduplicatedCollection.Where(x => x.CrabSubaddressId != null && x.CrabSubaddressId == activeUnit.BuildingUnitKey.Subaddress.Value)
                                 .ToList();
+                        }
                     }
                     else
+                    {
                         filtered = persistentLocalIdQuery
                             .Where(x => x.CrabSubaddressId == null)
                             .ToList();
+                    }
 
                     var activeUnitPersistentLocalId = filtered
                         .OrderByDescending(x => x.Index)
@@ -520,7 +558,10 @@ namespace BuildingRegistry.Legacy
                     {
                         var crabSubaddressIds = deduplicatedCollection.Where(x => x != null).GroupBy(x => x.CrabSubaddressId);
                         if (crabSubaddressIds.Any(y => y.Count() > 1))
+                        {
                             continue;
+                        }
+
                         throw new InvalidOperationException("Cannot find persistent local id for active subaddress");
                     }
 
@@ -550,11 +591,13 @@ namespace BuildingRegistry.Legacy
                         !nonActiveUnitsWithoutPersistentLocalIdByKey.ContainsKey(buildingUnitKey))
                     {
                         foreach (var assignBuildingUnitPersistentLocalId in assignBuildingUnitPersistentLocalIdByUnit)
+                        {
                             ApplyChange(new BuildingUnitPersistentLocalIdWasRemoved(
                                 _buildingId,
                                 assignBuildingUnitPersistentLocalId.PersistentLocalId,
                                 assignBuildingUnitPersistentLocalId.PersistentLocalIdAssignmentDate,
                                 new Reason("Due to duplication the common building unit with this PersistentLocalId should never have existed.")));
+                        }
                     }
 
                     foreach (var assignBuildingUnitPersistentLocalId in assignBuildingUnitPersistentLocalIdByUnit.OrderByDescending(x => x.Index))
@@ -665,16 +708,20 @@ namespace BuildingRegistry.Legacy
 
                             // less can occurr
                             if (buildingUnit == null)
+                            {
                                 ApplyChange(new BuildingUnitPersistentLocalIdWasRemoved(
                                     _buildingId,
                                     assignBuildingUnitPersistentLocalId.PersistentLocalId,
                                     assignBuildingUnitPersistentLocalId.PersistentLocalIdAssignmentDate,
                                     new Reason("Due to duplication, the building unit with this PersistentLocalId should never have existed. Could not mark as duplicate as no candidate was found.")));
+                            }
                             else
+                            {
                                 ApplyBuildingUnitPersistentLocalIdWithDuplicateCheck(
                                     buildingUnit,
                                     assignBuildingUnitPersistentLocalId,
                                     deduplicatedCollection);
+                            }
                         }
                     }
                 }
@@ -711,19 +758,23 @@ namespace BuildingRegistry.Legacy
         public void AssignPersistentLocalIds(IPersistentLocalIdGenerator persistentLocalIdGenerator)
         {
             if (_persistentLocalId == null)
+            {
                 ApplyChange(
                     new BuildingPersistentLocalIdWasAssigned(
                         _buildingId,
                         new PersistentLocalId(persistentLocalIdGenerator.GenerateNextPersistentLocalId()),
                         new PersistentLocalIdAssignmentDate(Instant.FromDateTimeOffset(DateTimeOffset.Now))));
+            }
 
             foreach (var buildingUnit in _buildingUnitCollection.GetAllBuildingUnitsWithoutPersistentLocalId())
+            {
                 ApplyChange(
                     new BuildingUnitPersistentLocalIdWasAssigned(
                         _buildingId,
                         buildingUnit.BuildingUnitId,
                         new PersistentLocalId(persistentLocalIdGenerator.GenerateNextPersistentLocalId()),
                         new PersistentLocalIdAssignmentDate(Instant.FromDateTimeOffset(DateTimeOffset.Now))));
+            }
         }
     }
 }
