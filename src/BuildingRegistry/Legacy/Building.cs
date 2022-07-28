@@ -514,7 +514,7 @@ namespace BuildingRegistry.Legacy
                         continue; //shit really hit the fan... (terreinobjectid: 6683870 (see old prod))
                     }
 
-                    var filtered = persistentLocalIdQuery;
+                    List<AssignBuildingUnitPersistentLocalIdForCrabTerrainObjectId> filtered;
                     if (activeUnit.BuildingUnitKey.Subaddress.HasValue)
                     {
                         filtered = persistentLocalIdQuery.Where(x =>
