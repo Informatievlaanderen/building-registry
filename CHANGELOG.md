@@ -1,3 +1,22 @@
+## [3.30.3](https://github.com/informatievlaanderen/building-registry/compare/v3.30.2...v3.30.3) (2022-07-28)
+
+
+### Bug Fixes
+
+* collapse if stmts ([c1e552d](https://github.com/informatievlaanderen/building-registry/commit/c1e552d504b766eacfe29488ca7c29f83913c253))
+* correct param name ([a7544db](https://github.com/informatievlaanderen/building-registry/commit/a7544db68399cad3fbda49157fa81617724adb5f))
+* don't nest ternary clauses ([59123c5](https://github.com/informatievlaanderen/building-registry/commit/59123c5996cd8fb671230216cb73c33d08c5e19c))
+* fix field access ([a1ebf71](https://github.com/informatievlaanderen/building-registry/commit/a1ebf719100d2369ce2c2eec5ca126780f636503))
+* remove new Guid() ([7482ff6](https://github.com/informatievlaanderen/building-registry/commit/7482ff6ba40e235f86e1ee8abeb87062e473e00e))
+* remove null check ([4e7a106](https://github.com/informatievlaanderen/building-registry/commit/4e7a1060f31c83214d1261dff190327dcf368e8c))
+* remove unnecessary casts ([50eaa64](https://github.com/informatievlaanderen/building-registry/commit/50eaa645cd22330630c71eabf5848eb21861519c))
+* remove unused params ([3b23117](https://github.com/informatievlaanderen/building-registry/commit/3b23117f01305c138d56f0730cecbb0211c75f34))
+* remove unused variables ([6cc7912](https://github.com/informatievlaanderen/building-registry/commit/6cc7912cb496652a7176c084742b1e985f7d6bf1))
+* remove useless assignment ([cb6d64e](https://github.com/informatievlaanderen/building-registry/commit/cb6d64ece2b2d493d9a0f2d8cc031c2d58c0f193))
+* seal EnvelopePartialRecord ([83054f8](https://github.com/informatievlaanderen/building-registry/commit/83054f8985e1b4f4e6e3a534a59d2487a3fadc5e))
+* seal private non-derived types ([f733b4f](https://github.com/informatievlaanderen/building-registry/commit/f733b4f82a3be77c753d7ee73834fb52ad7bab62))
+* simplify loops with linq ([1becf07](https://github.com/informatievlaanderen/building-registry/commit/1becf07be1e09679019db100efac44ca90c9c7a6))
+
 ## [3.30.2](https://github.com/informatievlaanderen/building-registry/compare/v3.30.1...v3.30.2) (2022-07-27)
 
 
