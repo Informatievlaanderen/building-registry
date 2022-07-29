@@ -173,7 +173,7 @@ namespace BuildingRegistry.Api.Legacy.Building
             var response = await _mediator.Send(new CrabGebouwenRequest(context, Request), cancellationToken);
             return response is null
                 ? BadRequest("Filter is required")
-                : Ok(Response);
+                : Ok(response);
         }
 
         /// <summary>
