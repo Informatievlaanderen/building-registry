@@ -1,3 +1,10 @@
+## [3.30.5](https://github.com/informatievlaanderen/building-registry/compare/v3.30.4...v3.30.5) (2022-07-29)
+
+
+### Bug Fixes
+
+* error code and message ([c484a9d](https://github.com/informatievlaanderen/building-registry/commit/c484a9d401014d609e65dd43285d228bd24a3653))
+
 ## [3.30.4](https://github.com/informatievlaanderen/building-registry/compare/v3.30.3...v3.30.4) (2022-07-28)
 
 
