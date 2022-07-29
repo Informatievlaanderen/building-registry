@@ -11,6 +11,11 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Validators
     {
         public PlanBuildingUnitRequestValidator()
         {
+            RuleFor(x => x.GebouwId)
+                .Must((_, gebouwId) => OsloPuriValidator.TryParseIdentifier(gebouwId, out var _))
+                .WithMessage((_, straatNaamId) => ValidationErrorMessages.BuildingUnit.BuildingInvalid(straatNaamId))
+                .WithErrorCode(ValidationErrorCodes.BuildingUnit.BuildingNotFound);
+
             RuleFor(x => x.Positie)
                 .NotEmpty()
                 .When(x => x.PositieGeometrieMethode == PositieGeometrieMethode.AangeduidDoorBeheerder)

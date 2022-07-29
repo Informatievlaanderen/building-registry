@@ -11,7 +11,6 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenNotRealizingBuildingUnit
     using Building;
     using Building.Events;
     using Building.Exceptions;
-    using BuildingRegistry.Api.BackOffice.Abstractions;
     using BuildingRegistry.Api.BackOffice.Abstractions.Building.Responses;
     using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Requests;
     using BuildingRegistry.Api.BackOffice.Building;
@@ -19,7 +18,6 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenNotRealizingBuildingUnit
     using FluentAssertions;
     using FluentValidation;
     using Microsoft.AspNetCore.Http;
-    using Microsoft.AspNetCore.Mvc;
     using Moq;
     using Xunit;
     using Xunit.Abstractions;

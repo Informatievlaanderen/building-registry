@@ -68,10 +68,7 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
             }
             catch (AggregateNotFoundException)
             {
-                throw CreateValidationException(
-                    ValidationErrorCodes.Building.BuildingNotFound,
-                    string.Empty,
-                    ValidationErrorMessages.Building.BuildingNotFound);
+                throw new ApiException(ValidationErrorMessages.BuildingUnit.BuildingNotFound, StatusCodes.Status404NotFound);
             }
             catch (DomainException exception)
             {

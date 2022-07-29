@@ -41,7 +41,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenPlanningBuildingUnit
 
             var request = new PlanBuildingUnitRequest()
             {
-                GebouwId = $"/{buildingPersistentLocalId}",
+                GebouwId = $"https://data.vlaanderen.be/id/gebouw/{buildingPersistentLocalId}",
                 PositieGeometrieMethode = PositieGeometrieMethode.AangeduidDoorBeheerder,
                 Positie = "<gml:Point srsName=\"https://www.opengis.net/def/crs/EPSG/0/31370\" xmlns:gml=\"http://www.opengis.net/gml/3.2\"><gml:pos>103671.37 192046.71</gml:pos></gml:Point>",
                 Functie = GebouweenheidFunctie.NietGekend,
@@ -93,7 +93,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenPlanningBuildingUnit
                 .Result
                 .Where(x => x.Errors.Any(e =>
                     e.ErrorCode == "GebouweendheidPositieValidatie"
-                    && e.ErrorMessage == "De verplichte parameter 'Geometriepunt' ontbreekt."));
+                    && e.ErrorMessage == "De verplichte parameter 'positie' ontbreekt."));
         }
 
         [Fact]
