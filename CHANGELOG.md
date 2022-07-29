@@ -1,3 +1,11 @@
+## [3.30.6](https://github.com/informatievlaanderen/building-registry/compare/v3.30.5...v3.30.6) (2022-07-29)
+
+
+### Bug Fixes
+
+* building id not found on plan building unit ([c025aa7](https://github.com/informatievlaanderen/building-registry/commit/c025aa71a7c6118b8064573fc526a2ebaf54d16d))
+* buildingcontroller CrabGebouwen endpoint ([c4ff072](https://github.com/informatievlaanderen/building-registry/commit/c4ff0723d286e23839bff449d119eb84927f2bbc))
+
 ## [3.30.5](https://github.com/informatievlaanderen/building-registry/compare/v3.30.4...v3.30.5) (2022-07-29)
 
 
