@@ -16,11 +16,11 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenPlanningBuildingUnit
     using Xunit;
     using Xunit.Abstractions;
 
-    public class GivenBuildingUnitCannotBePlannedException : BuildingRegistryBackOfficeTest
+    public class GivenBuildingUnitOutsideGeometryBuildingException : BuildingRegistryBackOfficeTest
     {
         private readonly BuildingUnitController _controller;
 
-        public GivenBuildingUnitCannotBePlannedException(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
+        public GivenBuildingUnitOutsideGeometryBuildingException(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
         {
             _controller = CreateBuildingUnitControllerWithUser<BuildingUnitController>();
         }
@@ -29,7 +29,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenPlanningBuildingUnit
         public void ThenThrowValidationException()
         {
             MockMediator.Setup<object?>(x => x.Send(It.IsAny<PlanBuildingUnitRequest>(), CancellationToken.None).Result)
-                .Throws(new BuildingUnitCannotBePlannedException());
+                .Throws(new BuildingUnitOutsideGeometryBuildingException());
 
             var request = new PlanBuildingUnitRequest()
             {
@@ -52,8 +52,8 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenPlanningBuildingUnit
                 .ThrowAsync<ValidationException>()
                 .Result
                 .Where(x => x.Errors.Any(e =>
-                    e.ErrorCode == "GebouweenheidGebouwIdNietGerealiseerdofGehistoreerd"
-                    && e.ErrorMessage == "De gebouwId is niet gerealiseerd of gehistoreerd."));
+                    e.ErrorCode == "GebouweenheidOngeldigePositieValidatie"
+                    && e.ErrorMessage == "De positie dient binnen de geometrie van het gebouw te liggen."));
         }
     }
 }

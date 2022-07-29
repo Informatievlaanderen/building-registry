@@ -4,6 +4,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenPlanningBuildingUnit
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
+    using Be.Vlaanderen.Basisregisters.AggregateSource;
     using Be.Vlaanderen.Basisregisters.GrAr.Edit.Contracts;
     using Building;
     using Building.Exceptions;
@@ -16,11 +17,11 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenPlanningBuildingUnit
     using Xunit;
     using Xunit.Abstractions;
 
-    public class GivenBuildingUnitCannotBePlannedException : BuildingRegistryBackOfficeTest
+    public class GivenAggregateNotFoundException : BuildingRegistryBackOfficeTest
     {
         private readonly BuildingUnitController _controller;
 
-        public GivenBuildingUnitCannotBePlannedException(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
+        public GivenAggregateNotFoundException(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
         {
             _controller = CreateBuildingUnitControllerWithUser<BuildingUnitController>();
         }
@@ -29,7 +30,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenPlanningBuildingUnit
         public void ThenThrowValidationException()
         {
             MockMediator.Setup<object?>(x => x.Send(It.IsAny<PlanBuildingUnitRequest>(), CancellationToken.None).Result)
-                .Throws(new BuildingUnitCannotBePlannedException());
+                .Throws(new AggregateNotFoundException("", typeof(Building)));
 
             var request = new PlanBuildingUnitRequest()
             {
@@ -52,8 +53,8 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenPlanningBuildingUnit
                 .ThrowAsync<ValidationException>()
                 .Result
                 .Where(x => x.Errors.Any(e =>
-                    e.ErrorCode == "GebouweenheidGebouwIdNietGerealiseerdofGehistoreerd"
-                    && e.ErrorMessage == "De gebouwId is niet gerealiseerd of gehistoreerd."));
+                    e.ErrorCode == "GebouweenheidGebouwIdNietGekendValidatie"
+                    && e.ErrorMessage == $"De gebouwId '{request.GebouwId}' is niet gekend in het gebouwenregister."));
         }
     }
 }

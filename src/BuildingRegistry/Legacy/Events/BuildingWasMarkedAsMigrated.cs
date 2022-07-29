@@ -7,10 +7,10 @@ namespace BuildingRegistry.Legacy.Events
 
     [EventTags(EventTag.For.Sync)]
     [EventName("BuildingWasMarkedAsMigrated")]
-    [EventDescription("Het gebouw werd germarkeerd als gemigreerd.")]
+    [EventDescription("Het gebouw werd gemarkeerd als gemigreerd.")]
     public class BuildingWasMarkedAsMigrated : IHasProvenance, ISetProvenance, IMessage
     {
-        [EventPropertyDescription("Interne GUID van het building.")]
+        [EventPropertyDescription("Interne GUID van het gebouw.")]
         public Guid BuildingId { get; }
 
         [EventPropertyDescription("Objectidentificator van het gebouw.")]

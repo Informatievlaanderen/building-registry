@@ -61,7 +61,7 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Requests
                 buildingPersistentLocalId,
                 buildingUnitPersistentLocalId,
                 PositieGeometrieMethode.Map(),
-                Positie?.ToExtendedWkbGeometry(),
+                string.IsNullOrWhiteSpace(Positie) ? null : Positie.ToExtendedWkbGeometry(),
                 Functie.Map(),
                 AfwijkingVastgesteld,
                 provenance);
@@ -75,7 +75,7 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Requests
             {
                 GebouwId = "https://data.vlaanderen.be/id/gebouw/6447380",
                 PositieGeometrieMethode = PositieGeometrieMethode.AangeduidDoorBeheerder,
-                Positie = "<gml:Point srsName=\"https://www.opengis.net/def/crs/EPSG/0/3137\" xmlns:gml=\"http://www.opengis.net/gml/3.2\"><gml:pos>103671.37 192046.71</gml:pos></gml:Point>",
+                Positie = "<gml:Point srsName=\"https://www.opengis.net/def/crs/EPSG/0/31370\" xmlns:gml=\"http://www.opengis.net/gml/3.2\"><gml:pos>103671.37 192046.71</gml:pos></gml:Point>",
                 Functie = GebouweenheidFunctie.NietGekend,
                 AfwijkingVastgesteld = false
             };
