@@ -1,3 +1,10 @@
+## [3.30.7](https://github.com/informatievlaanderen/building-registry/compare/v3.30.6...v3.30.7) (2022-08-01)
+
+
+### Bug Fixes
+
+* add gebouwId to validation error ([20f9220](https://github.com/informatievlaanderen/building-registry/commit/20f92200cd139df975d734add21a8b98ff69f97c))
+
 ## [3.30.6](https://github.com/informatievlaanderen/building-registry/compare/v3.30.5...v3.30.6) (2022-07-29)
 
 
