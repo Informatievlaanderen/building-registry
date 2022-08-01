@@ -45,7 +45,7 @@ namespace BuildingRegistry.Api.Oslo.Handlers.BuildingUnitV2
                 .Select(x => x.AddressPersistentLocalId).ToList();
 
             return new BuildingUnitOsloResponse(
-                buildingUnit.BuildingPersistentLocalId,
+                buildingUnit.BuildingUnitPersistentLocalId,
                 request.ResponseOptions.Value.GebouweenheidNaamruimte,
                 request.ResponseOptions.Value.ContextUrlUnitDetail,
                 buildingUnit.Version.ToBelgianDateTimeOffset(),
