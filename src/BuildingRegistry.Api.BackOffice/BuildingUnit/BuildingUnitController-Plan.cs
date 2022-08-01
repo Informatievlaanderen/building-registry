@@ -73,7 +73,7 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
                     BuildingUnitCannotBePlannedException =>
                         throw CreateValidationException(
                             ValidationErrorCodes.BuildingUnit.BuildingUnitCannotBePlanned,
-                            string.Empty,
+                            nameof(request.GebouwId),
                             ValidationErrorMessages.BuildingUnit.BuildingUnitCannotBePlanned),
 
                     BuildingUnitOutsideGeometryBuildingException =>
