@@ -1,3 +1,10 @@
+## [3.30.8](https://github.com/informatievlaanderen/building-registry/compare/v3.30.7...v3.30.8) (2022-08-01)
+
+
+### Bug Fixes
+
+* get buildingunit oslo handler ([0a8aa01](https://github.com/informatievlaanderen/building-registry/commit/0a8aa01d36a816e1004d079868d26a2421f40c4c))
+
 ## [3.30.7](https://github.com/informatievlaanderen/building-registry/compare/v3.30.6...v3.30.7) (2022-08-01)
 
 
