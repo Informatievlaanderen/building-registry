@@ -47,8 +47,8 @@ namespace BuildingRegistry.Api.Legacy.Handlers.BuildingUnitV2
                         buildingUnit.BuildingPersistentLocalId)),
                 buildingUnit.Addresses.Select(x =>
                     new GebouweenheidDetailAdres(
-                        x.BuildingUnitPersistentLocalId.ToString(),
-                        string.Format(request.ResponseOptions.Value.AdresUrl, x.BuildingUnitPersistentLocalId.ToString())))
+                        x.AddressPersistentLocalId.ToString(),
+                        string.Format(request.ResponseOptions.Value.AdresUrl, x.AddressPersistentLocalId.ToString())))
                     .ToList());
         }
     }
