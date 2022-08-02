@@ -5,6 +5,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenPlanningBuildingUnit
     using System.Threading;
     using System.Threading.Tasks;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
+    using Be.Vlaanderen.Basisregisters.Api.Exceptions;
     using Be.Vlaanderen.Basisregisters.GrAr.Edit.Contracts;
     using Building;
     using Building.Exceptions;
@@ -13,6 +14,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenPlanningBuildingUnit
     using BuildingRegistry.Api.BackOffice.BuildingUnit;
     using FluentAssertions;
     using FluentValidation;
+    using Microsoft.AspNetCore.Http;
     using Moq;
     using Xunit;
     using Xunit.Abstractions;
@@ -48,13 +50,14 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenPlanningBuildingUnit
                 request,
                 CancellationToken.None);
 
+            // Assert
             act
                 .Should()
-                .ThrowAsync<ValidationException>()
+                .ThrowAsync<ApiException>()
                 .Result
-                .Where(x => x.Errors.Any(e =>
-                    e.ErrorCode == "GebouweenheidGebouwIdNietGekendValidatie"
-                    && e.ErrorMessage == $"De gebouwId '{request.GebouwId}' is niet gekend in het gebouwenregister."));
+                .Where(x =>
+                    x.StatusCode == StatusCodes.Status404NotFound
+                    && x.Message == "Onbestaand gebouw.");
         }
     }
 }
