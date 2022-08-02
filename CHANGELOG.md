@@ -1,3 +1,10 @@
+## [3.30.9](https://github.com/informatievlaanderen/building-registry/compare/v3.30.8...v3.30.9) (2022-08-02)
+
+
+### Bug Fixes
+
+* legacy buildingunitV2 get handler to return addressId's ([c247e4a](https://github.com/informatievlaanderen/building-registry/commit/c247e4a20650cd0efd5ac93ab0238adb575cb969))
+
 ## [3.30.8](https://github.com/informatievlaanderen/building-registry/compare/v3.30.7...v3.30.8) (2022-08-01)
 
 
