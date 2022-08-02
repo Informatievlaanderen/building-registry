@@ -1,3 +1,10 @@
+## [3.30.10](https://github.com/informatievlaanderen/building-registry/compare/v3.30.9...v3.30.10) (2022-08-02)
+
+
+### Bug Fixes
+
+* aggregateNotFound Exception produces apiException ([87b301d](https://github.com/informatievlaanderen/building-registry/commit/87b301d69ff61e0d57cd610615333a78bf0ab232))
+
 ## [3.30.9](https://github.com/informatievlaanderen/building-registry/compare/v3.30.8...v3.30.9) (2022-08-02)
 
 
