@@ -63,7 +63,7 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
             {
                 throw CreateValidationException(
                     ValidationErrorCodes.BuildingUnit.BuildingNotFound,
-                    string.Empty,
+                    nameof(request.GebouwId),
                     ValidationErrorMessages.BuildingUnit.BuildingInvalid(request.GebouwId));
             }
             catch (DomainException exception)
