@@ -1,3 +1,12 @@
+## [3.30.11](https://github.com/informatievlaanderen/building-registry/compare/v3.30.10...v3.30.11) (2022-08-03)
+
+
+### Bug Fixes
+
+* add migration script for v2 listcount views ([d43b0ca](https://github.com/informatievlaanderen/building-registry/commit/d43b0ca66d021b68e89b654ff45c20bb955cf662))
+* test ([2a8dff4](https://github.com/informatievlaanderen/building-registry/commit/2a8dff43136126581b5f2e095c315f24a6454520))
+* validation error when aggregatenotfound on plan buildingunit ([4193d8f](https://github.com/informatievlaanderen/building-registry/commit/4193d8fd40d53374ec12426352545186887151ce))
+
 ## [3.30.10](https://github.com/informatievlaanderen/building-registry/compare/v3.30.9...v3.30.10) (2022-08-02)
 
 
