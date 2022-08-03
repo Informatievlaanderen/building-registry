@@ -25,7 +25,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetailV2
         }
     }
 
-    public class BuildingUnitBuildingPersistentLocalIdItemConfiguration : IEntityTypeConfiguration<BuildingUnitBuildingItemV2>
+    public class BuildingUnitBuildingV2PersistentLocalIdItemConfiguration : IEntityTypeConfiguration<BuildingUnitBuildingItemV2>
     {
         private const string TableName = "BuildingUnit_BuildingsV2";
 
