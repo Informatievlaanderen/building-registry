@@ -53,11 +53,11 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenPlanningBuildingUnit
             // Assert
             act
                 .Should()
-                .ThrowAsync<ApiException>()
+                .ThrowAsync<ValidationException>()
                 .Result
-                .Where(x =>
-                    x.StatusCode == StatusCodes.Status404NotFound
-                    && x.Message == "Onbestaand gebouw.");
+                .Where(x => x.Errors.Any(e =>
+                    e.ErrorCode == "GebouweenheidGebouwIdNietGekendValidatie"
+                    && e.ErrorMessage == $"De gebouwId '{request.GebouwId}' is niet gekend in het gebouwenregister."));
         }
     }
 }
