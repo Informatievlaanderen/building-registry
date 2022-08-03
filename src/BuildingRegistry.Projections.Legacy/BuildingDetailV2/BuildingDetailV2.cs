@@ -56,7 +56,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingDetailV2
         }
     }
 
-    public class BuildingDetailItemV2Configuration : IEntityTypeConfiguration<BuildingDetailItemV2>
+    public class BuildingDetailItemConfiguration : IEntityTypeConfiguration<BuildingDetailItemV2>
     {
         internal const string TableName = "BuildingDetailsV2";
 
