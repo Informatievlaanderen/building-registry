@@ -18,7 +18,7 @@ jobs:
         aws-region: ${{ secrets.VBR_AWS_REGION_PRD }}
 
     - name: Login to Amazon ECR (Test)
-      uses: aws-actions/amazon-ecr-login@v1.5.0
+      uses: aws-actions/amazon-ecr-login@v1.5.1
 
     - name: Prepare file to deploy
       shell: bash
