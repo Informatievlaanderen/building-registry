@@ -5,7 +5,6 @@ namespace BuildingRegistry.Legacy.Events
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Newtonsoft.Json;
 
-    [EventTags(EventTag.For.Sync)]
     [EventName("BuildingWasMarkedAsMigrated")]
     [EventDescription("Het gebouw werd gemarkeerd als gemigreerd.")]
     public class BuildingWasMarkedAsMigrated : IHasProvenance, ISetProvenance, IMessage
