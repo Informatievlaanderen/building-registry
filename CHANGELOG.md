@@ -1,3 +1,10 @@
+## [3.30.12](https://github.com/informatievlaanderen/building-registry/compare/v3.30.11...v3.30.12) (2022-08-10)
+
+
+### Bug Fixes
+
+* remove sync tag from BuildingWasMarkedAsMigrated ([c030471](https://github.com/informatievlaanderen/building-registry/commit/c0304719c4db406adf2d25e428538877ed64eb9d))
+
 ## [3.30.11](https://github.com/informatievlaanderen/building-registry/compare/v3.30.10...v3.30.11) (2022-08-03)
 
 
