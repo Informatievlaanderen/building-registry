@@ -1,3 +1,10 @@
+## [3.30.13](https://github.com/informatievlaanderen/building-registry/compare/v3.30.12...v3.30.13) (2022-08-11)
+
+
+### Bug Fixes
+
+* remove wrongly added file Q ([6cf7f3e](https://github.com/informatievlaanderen/building-registry/commit/6cf7f3e1e3369a8c2e6e9a158db78cadd2ece333))
+
 ## [3.30.12](https://github.com/informatievlaanderen/building-registry/compare/v3.30.11...v3.30.12) (2022-08-10)
 
 
