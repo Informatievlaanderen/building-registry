@@ -1,0 +1,60 @@
+namespace BuildingRegistry.Tests.BackOffice.Api.WhenNotRealizingBuildingUnit
+{
+    using System;
+    using System.Linq;
+    using System.Threading;
+    using System.Threading.Tasks;
+    using BackOffice;
+    using Be.Vlaanderen.Basisregisters.AggregateSource;
+    using Building;
+    using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Requests;
+    using BuildingRegistry.Api.BackOffice.BuildingUnit;
+    using FluentAssertions;
+    using FluentValidation;
+    using Moq;
+    using Xunit;
+    using Xunit.Abstractions;
+
+    public class GivenAggregateNotFoundException : BuildingRegistryBackOfficeTest
+    {
+        private readonly BuildingUnitController _controller;
+
+        public GivenAggregateNotFoundException(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
+        {
+            _controller = CreateBuildingControllerWithUser<BuildingUnitController>();
+        }
+
+        [Fact]
+        public void ThenThrowApiException()
+        {
+            var buildingPersistentLocalId = new BuildingUnitPersistentLocalId(456);
+
+            var request = new NotRealizeBuildingUnitRequest
+            {
+                BuildingUnitPersistentLocalId = buildingPersistentLocalId
+            };
+
+            MockMediator
+                .Setup(x => x.Send(It.IsAny<NotRealizeBuildingUnitRequest>(), CancellationToken.None).Result)
+                .Throws(new AggregateNotFoundException(buildingPersistentLocalId, typeof(Building)));
+
+            //Act
+            Func<Task> act = async () => await _controller.NotRealize(
+                ResponseOptions,
+                MockIfMatchValidator(true),
+                request,
+                string.Empty,
+                CancellationToken.None);
+
+            // Assert
+            act
+                .Should()
+                .ThrowAsync<ValidationException>()
+                .Result
+                .Where(x =>
+                    x.Errors.Any(e =>
+                        e.ErrorCode == "GebouweenheidGebouwIdNietGekendValidatie"
+                        && e.ErrorMessage == "Onbestaand gebouw."));
+        }
+    }
+}

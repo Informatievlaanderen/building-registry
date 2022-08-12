@@ -29,7 +29,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenPlanningBuildingUnit
         public void ThenThrowValidationException()
         {
             MockMediator.Setup<object?>(x => x.Send(It.IsAny<PlanBuildingUnitRequest>(), CancellationToken.None).Result)
-                .Throws(new BuildingUnitCannotBePlannedException());
+                .Throws(new BuildingHasInvalidStatusException());
 
             var request = new PlanBuildingUnitRequest()
             {

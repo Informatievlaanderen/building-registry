@@ -129,13 +129,8 @@ namespace BuildingRegistry.Building
             BuildingUnitFunction function,
             bool hasDeviation)
         {
-            var validStatuses = new[]
-                {BuildingStatus.Planned, BuildingStatus.UnderConstruction, BuildingStatus.Realized};
-
-            if (!validStatuses.Contains(BuildingStatus))
-            {
-                throw new BuildingUnitCannotBePlannedException();
-            }
+            GuardRemovedBuilding();
+            GuardActiveBuilding();
 
             // validate command
             var finalPosition = positionGeometryMethod != BuildingUnitPositionGeometryMethod.AppointedByAdministrator
@@ -155,17 +150,24 @@ namespace BuildingRegistry.Building
                 function,
                 hasDeviation));
 
-            AddCommonBuildingUnit(persistentLocalIdGenerator);
+            AddCommonBuildingUnitIfNeeded(persistentLocalIdGenerator);
         }
 
-        private void AddCommonBuildingUnit(IPersistentLocalIdGenerator persistentLocalIdGenerator)
+        private void GuardActiveBuilding()
         {
-            if (BuildingStatus != BuildingStatus.Planned
-                && BuildingStatus != BuildingStatus.UnderConstruction
-                && BuildingStatus != BuildingStatus.Realized)
+            var validStatuses = new[]
+                {BuildingStatus.Planned, BuildingStatus.UnderConstruction, BuildingStatus.Realized};
+
+            if (!validStatuses.Contains(BuildingStatus))
             {
-                return;
+                throw new BuildingHasInvalidStatusException();
             }
+        }
+
+        private void AddCommonBuildingUnitIfNeeded(IPersistentLocalIdGenerator persistentLocalIdGenerator)
+        {
+            GuardRemovedBuilding();
+            GuardActiveBuilding();
 
             if (_buildingUnits.RequiresCommonBuildingUnit)
             {
@@ -187,7 +189,9 @@ namespace BuildingRegistry.Building
 
         public void RealizeBuildingUnit(BuildingUnitPersistentLocalId buildingUnitPersistentLocalId)
         {
-            if(BuildingStatus != BuildingStatus.Realized)
+            GuardRemovedBuilding();
+
+            if (BuildingStatus != BuildingStatus.Realized)
             {
                 throw new BuildingStatusPreventsBuildingUnitRealizationException();
             }
@@ -206,6 +210,8 @@ namespace BuildingRegistry.Building
 
         public void NotRealizeBuildingUnit(BuildingUnitPersistentLocalId buildingUnitPersistentLocalId)
         {
+            GuardRemovedBuilding();
+
             var buildingUnit = BuildingUnits.FirstOrDefault(x => x.BuildingUnitPersistentLocalId == buildingUnitPersistentLocalId);
 
             if (buildingUnit is null)

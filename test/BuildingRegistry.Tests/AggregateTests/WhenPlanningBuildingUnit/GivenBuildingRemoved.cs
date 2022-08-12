@@ -14,36 +14,35 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuildingUnit
     using Xunit.Abstractions;
     using BuildingUnit = Building.Commands.BuildingUnit;
 
-    public class GivenBuildingStatusIsNotValid : BuildingRegistryTest
+    public class GivenBuildingRemoved : BuildingRegistryTest
     {
-        public GivenBuildingStatusIsNotValid(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
+        public GivenBuildingRemoved(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
         {
             Fixture.Customize(new WithFixedBuildingPersistentLocalId());
         }
 
-        [Theory]
-        [InlineData("Retired")]
-        [InlineData("NotRealized")]
-        public void ThenThrowBuildingUnitCannotBePlannedException(string buildingStatus)
+        [Fact]
+        public void BuildingIsRemoved_ThrowsBuildingIsRemovedException()
         {
-            var command = Fixture.Create<PlanBuildingUnit>().WithoutPosition();
+            var command = Fixture.Create<PlanBuildingUnit>();
 
             var buildingWasMigrated = new BuildingWasMigrated(
                 Fixture.Create<BuildingId>(),
-                Fixture.Create<BuildingPersistentLocalId>(),
+                command.BuildingPersistentLocalId,
                 Fixture.Create<BuildingPersistentLocalIdAssignmentDate>(),
-                BuildingStatus.Parse(buildingStatus),
+                BuildingStatus.Planned,
                 Fixture.Create<BuildingGeometry>(),
-                false,
+                isRemoved: true,
                 new List<BuildingUnit>()
             );
             ((ISetProvenance)buildingWasMigrated).SetProvenance(Fixture.Create<Provenance>());
 
             Assert(new Scenario()
-                .Given(new BuildingStreamId(Fixture.Create<BuildingPersistentLocalId>()),
+                .Given(
+                    new BuildingStreamId(Fixture.Create<BuildingPersistentLocalId>()),
                     buildingWasMigrated)
                 .When(command)
-                .Throws(new BuildingHasInvalidStatusException()));
+                .Throws(new BuildingIsRemovedException(command.BuildingPersistentLocalId)));
         }
     }
 }
