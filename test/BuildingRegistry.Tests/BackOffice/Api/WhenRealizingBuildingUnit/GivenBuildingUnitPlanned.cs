@@ -11,7 +11,6 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenRealizingBuildingUnit
     using Building;
     using Building.Events;
     using Building.Exceptions;
-    using BuildingRegistry.Api.BackOffice.Abstractions;
     using BuildingRegistry.Api.BackOffice.Abstractions.Building.Responses;
     using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Requests;
     using BuildingRegistry.Api.BackOffice.Building;
@@ -19,7 +18,6 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenRealizingBuildingUnit
     using FluentAssertions;
     using FluentValidation;
     using Microsoft.AspNetCore.Http;
-    using Microsoft.AspNetCore.Mvc;
     using Moq;
     using Xunit;
     using Xunit.Abstractions;
@@ -63,7 +61,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenRealizingBuildingUnit
         }
 
         [Fact]
-        public async Task WithInvalidIfMatchHeader_ThenPreconditionFailedResponse()
+        public async Task WithInvalidIfMatchHeader_ThenReturnsPreconditionFailedResponse()
         {
             var buildingUnitPersistentLocalId = new BuildingUnitPersistentLocalId(456);
 
@@ -103,7 +101,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenRealizingBuildingUnit
         }
 
         [Fact]
-        public void WhenBuildingUnitNotFound_ThenValidationException()
+        public void WhenBuildingUnitNotFound_ThenThrowsValidationException()
         {
             var buildingUnitPersistentLocalId = new BuildingUnitPersistentLocalId(456);
 
@@ -135,7 +133,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenRealizingBuildingUnit
         }
 
         [Fact]
-        public void WhenBuildingUnitIsRemoved_ThenValidationException()
+        public void WhenBuildingUnitIsRemoved_ThenThrowsValidationException()
         {
             var buildingUnitPersistentLocalId = new BuildingUnitPersistentLocalId(456);
 
@@ -167,7 +165,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenRealizingBuildingUnit
         }
 
         [Fact]
-        public void WhenBuildingUnitStatusInvalid_ThenValidationException()
+        public void WhenBuildingUnitStatusInvalid_ThenThrowsValidationException()
         {
             var buildingUnitPersistentLocalId = new BuildingUnitPersistentLocalId(456);
 
@@ -200,7 +198,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenRealizingBuildingUnit
         }
 
         [Fact]
-        public void WhenBuildingStatusInvalid_ThenValidationException()
+        public void WhenBuildingStatusInvalid_ThenThrowsValidationException()
         {
             var buildingUnitPersistentLocalId = new BuildingUnitPersistentLocalId(456);
 
