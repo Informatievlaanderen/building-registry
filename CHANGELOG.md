@@ -1,3 +1,10 @@
+# [3.31.0](https://github.com/informatievlaanderen/building-registry/compare/v3.30.13...v3.31.0) (2022-08-12)
+
+
+### Features
+
+* remove redundant check on PositionGeometryMethod ([061d4cd](https://github.com/informatievlaanderen/building-registry/commit/061d4cd4d089c286d6ceea3a72d1c54450f7c07d))
+
 ## [3.30.13](https://github.com/informatievlaanderen/building-registry/compare/v3.30.12...v3.30.13) (2022-08-11)
 
 
