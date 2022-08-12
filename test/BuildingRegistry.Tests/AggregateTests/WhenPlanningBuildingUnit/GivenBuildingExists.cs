@@ -83,25 +83,6 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuildingUnit
                         hasDeviation: false))));
         }
 
-        [Theory]
-        [InlineData(null)]
-        [InlineData("")]
-        public void WithAppointedByAdministratorAndNoPosition_ThrowBuildingUnitOutsideGeometryBuildingException(string position)
-        {
-            var command = Fixture.Create<PlanBuildingUnit>()
-                .WithDeviation(false)
-                .WithPositionGeometryMethod(BuildingUnitPositionGeometryMethod.AppointedByAdministrator)
-                .WithPointPosition(position);
-
-            var buildingWasPlanned = Fixture.Create<BuildingWasPlannedV2>();
-
-            Assert(new Scenario()
-                .Given(new BuildingStreamId(Fixture.Create<BuildingPersistentLocalId>()),
-                    buildingWasPlanned)
-                .When(command)
-                .Throws(new BuildingUnitOutsideGeometryBuildingException()));
-        }
-
         [Fact]
         public void WithBuildingUnitPositionInsideOfBuildingGeometry_ThenBuildingUnitWasPlanned()
         {

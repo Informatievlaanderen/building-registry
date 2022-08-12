@@ -140,9 +140,9 @@ namespace BuildingRegistry.Building
             // validate command
             var finalPosition = positionGeometryMethod != BuildingUnitPositionGeometryMethod.AppointedByAdministrator
                 ? BuildingGeometry.Center
-                : position;
+                : position!;
 
-            if (!IsBuildingUnitPositionValidForBuildingGeometry(positionGeometryMethod, finalPosition))
+            if (!BuildingGeometry.Contains(finalPosition))
             {
                 throw new BuildingUnitOutsideGeometryBuildingException();
             }
@@ -183,19 +183,6 @@ namespace BuildingRegistry.Building
                     BuildingGeometry.Center,
                     hasDeviation: false));
             }
-        }
-
-        private bool IsBuildingUnitPositionValidForBuildingGeometry(
-            BuildingUnitPositionGeometryMethod positionGeometryMethod,
-            ExtendedWkbGeometry? position)
-        {
-            if (positionGeometryMethod != BuildingUnitPositionGeometryMethod.AppointedByAdministrator)
-            {
-                return true;
-            }
-
-            return position is not null
-                   && BuildingGeometry.Contains(position);
         }
 
         public void RealizeBuildingUnit(BuildingUnitPersistentLocalId buildingUnitPersistentLocalId)
@@ -242,8 +229,8 @@ namespace BuildingRegistry.Building
         private static void GuardPolygon(Geometry? geometry)
         {
             if (
-                geometry is not Polygon 
-                || geometry.SRID != ExtendedWkbGeometry.SridLambert72 
+                geometry is not Polygon
+                || geometry.SRID != ExtendedWkbGeometry.SridLambert72
                 || !GeometryValidator.IsValid(geometry))
             {
                 throw new InvalidPolygonException();
