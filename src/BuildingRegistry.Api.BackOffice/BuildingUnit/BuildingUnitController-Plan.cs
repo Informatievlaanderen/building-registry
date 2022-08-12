@@ -70,7 +70,7 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
             {
                 throw exception switch
                 {
-                    BuildingUnitCannotBePlannedException =>
+                    BuildingHasInvalidStatusException =>
                         throw CreateValidationException(
                             ValidationErrorCodes.BuildingUnit.BuildingUnitCannotBePlanned,
                             nameof(request.GebouwId),
