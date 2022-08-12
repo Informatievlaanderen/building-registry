@@ -10,7 +10,6 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
     using Be.Vlaanderen.Basisregisters.Api.ETag;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
     using Building;
-    using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Extensions;
     using BuildingRegistry.Building;
     using BuildingRegistry.Building.Exceptions;
     using FluentValidation;
