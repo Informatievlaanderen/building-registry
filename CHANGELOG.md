@@ -1,3 +1,11 @@
+## [3.31.1](https://github.com/informatievlaanderen/building-registry/compare/v3.31.0...v3.31.1) (2022-08-16)
+
+
+### Bug Fixes
+
+* automatic common building unit (review) ([e9865b7](https://github.com/informatievlaanderen/building-registry/commit/e9865b7ba73da0bc5288064724689239092a3e94))
+* Make namespace import commands backwards compatible ([a96d3c7](https://github.com/informatievlaanderen/building-registry/commit/a96d3c756dbbf4b7c7d8190ce1d974718edba980))
+
 # [3.31.0](https://github.com/informatievlaanderen/building-registry/compare/v3.30.13...v3.31.0) (2022-08-12)
 
 
