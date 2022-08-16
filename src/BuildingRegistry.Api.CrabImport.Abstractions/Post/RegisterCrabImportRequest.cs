@@ -33,10 +33,13 @@ namespace BuildingRegistry.Api.CrabImport.Abstractions.Post
         public static dynamic Map(RegisterCrabImportRequest message)
         {
             var assembly = typeof(Building).Assembly;
-            var type = assembly.GetType(message.Type)!;
+            var type = assembly.GetType(MakeNamespaceBackwardsCompatible(message))!;
 
             var result = JsonConvert.DeserializeObject(message.CrabItem, type);
             return result ?? new ExpandoObject();
         }
+
+        private static string MakeNamespaceBackwardsCompatible(RegisterCrabImportRequest message)
+            => message.Type.Replace("BuildingRegistry.Building.Commands.Crab", "BuildingRegistry.Legacy.Commands.Crab");
     }
 }
