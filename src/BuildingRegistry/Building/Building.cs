@@ -68,7 +68,7 @@ namespace BuildingRegistry.Building
 
             if (invalidStatuses.Contains(BuildingStatus))
             {
-                throw new BuildingCannotBePlacedUnderConstructionException(BuildingStatus);
+                throw new BuildingHasInvalidStatusException();
             }
 
             ApplyChange(new BuildingBecameUnderConstructionV2(BuildingPersistentLocalId));
@@ -92,7 +92,7 @@ namespace BuildingRegistry.Building
 
             if (invalidStatuses.Contains(BuildingStatus))
             {
-                throw new BuildingCannotBeRealizedException(BuildingStatus);
+                throw new BuildingHasInvalidStatusException();
             }
 
             ApplyChange(new BuildingWasRealizedV2(BuildingPersistentLocalId));
@@ -115,7 +115,7 @@ namespace BuildingRegistry.Building
 
             if (invalidStatuses.Contains(BuildingStatus))
             {
-                throw new BuildingStatusPreventsNotRealizeBuildingException();
+                throw new BuildingHasInvalidStatusException();
             }
 
             ApplyChange(new BuildingWasNotRealizedV2(BuildingPersistentLocalId));
@@ -139,7 +139,7 @@ namespace BuildingRegistry.Building
 
             if (!BuildingGeometry.Contains(finalPosition))
             {
-                throw new BuildingUnitOutsideGeometryBuildingException();
+                throw new BuildingUnitPositionIsOutsideBuildingGeometryException();
             }
 
             ApplyChange(new BuildingUnitWasPlannedV2(
@@ -193,14 +193,14 @@ namespace BuildingRegistry.Building
 
             if (BuildingStatus != BuildingStatus.Realized)
             {
-                throw new BuildingStatusPreventsBuildingUnitRealizationException();
+                throw new BuildingHasInvalidStatusException();
             }
 
             var buildingUnit = BuildingUnits.FirstOrDefault(x => x.BuildingUnitPersistentLocalId == buildingUnitPersistentLocalId);
 
             if (buildingUnit is null)
             {
-                throw new BuildingUnitNotFoundException(
+                throw new BuildingUnitIsNotFoundException(
                     BuildingPersistentLocalId,
                     buildingUnitPersistentLocalId);
             }
@@ -216,7 +216,7 @@ namespace BuildingRegistry.Building
 
             if (buildingUnit is null)
             {
-                throw new BuildingUnitNotFoundException(
+                throw new BuildingUnitIsNotFoundException(
                     BuildingPersistentLocalId,
                     buildingUnitPersistentLocalId);
             }
@@ -239,7 +239,7 @@ namespace BuildingRegistry.Building
                 || geometry.SRID != ExtendedWkbGeometry.SridLambert72
                 || !GeometryValidator.IsValid(geometry))
             {
-                throw new InvalidPolygonException();
+                throw new PolygonIsInvalidException();
             }
         }
 

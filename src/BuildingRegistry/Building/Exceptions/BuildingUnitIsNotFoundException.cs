@@ -4,16 +4,16 @@ namespace BuildingRegistry.Building.Exceptions
     using System.Runtime.Serialization;
 
     [Serializable]
-    public sealed class BuildingUnitNotFoundException : BuildingRegistryException
+    public sealed class BuildingUnitIsNotFoundException : BuildingRegistryException
     {
-        public BuildingUnitNotFoundException()
+        public BuildingUnitIsNotFoundException()
         { }
 
-        private BuildingUnitNotFoundException(SerializationInfo info, StreamingContext context)
+        private BuildingUnitIsNotFoundException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         { }
 
-        public BuildingUnitNotFoundException(
+        public BuildingUnitIsNotFoundException(
             int buildingPersistentLocalId,
             int buildingUnitPersistentLocalId
             ) : base($"BuildingUnit with id '{buildingUnitPersistentLocalId}' was not found in Building '{buildingPersistentLocalId}'.")

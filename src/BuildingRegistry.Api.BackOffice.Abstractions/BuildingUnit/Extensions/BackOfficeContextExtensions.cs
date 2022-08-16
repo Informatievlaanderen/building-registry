@@ -12,7 +12,7 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Extensions
 
             if (buildingUnitBuilding is null)
             {
-                throw new BuildingUnitNotFoundException();
+                throw new BuildingUnitIsNotFoundException();
             }
 
             return new BuildingPersistentLocalId(buildingUnitBuilding.BuildingPersistentLocalId);

@@ -59,7 +59,7 @@ namespace BuildingRegistry.Building
 
             if (StatusesWhichCannotBeRealized.Contains(Status))
             {
-                throw new BuildingUnitStatusPreventsBuildingUnitRealizationException();
+                throw new BuildingUnitHasInvalidStatusException();
             }
 
             Apply(new BuildingUnitWasRealizedV2(_buildingPersistentLocalId, BuildingUnitPersistentLocalId));
@@ -100,7 +100,7 @@ namespace BuildingRegistry.Building
 
             if (StatusesWhichCannotBeNotRealized.Contains(Status))
             {
-                throw new BuildingUnitStatusPreventsBuildingUnitNotRealizationException();
+                throw new BuildingUnitHasInvalidStatusException();
             }
 
             Apply(new BuildingUnitWasNotRealizedV2(_buildingPersistentLocalId, BuildingUnitPersistentLocalId));

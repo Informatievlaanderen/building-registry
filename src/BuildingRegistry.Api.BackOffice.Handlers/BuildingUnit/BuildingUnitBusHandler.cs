@@ -34,7 +34,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.BuildingUnit
 
             if (buildingUnit is null)
             {
-                throw new BuildingUnitNotFoundException();
+                throw new BuildingUnitIsNotFoundException();
             }
 
             return buildingUnit.LastEventHash;

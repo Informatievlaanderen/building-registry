@@ -150,7 +150,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuildingUnit
                 .Given(new BuildingStreamId(Fixture.Create<BuildingPersistentLocalId>()),
                     @buildingWasPlanned)
                 .When(command)
-                .Throws(new BuildingUnitOutsideGeometryBuildingException()));
+                .Throws(new BuildingUnitPositionIsOutsideBuildingGeometryException()));
         }
     }
 }

@@ -109,7 +109,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenRealizingBuildingUnit
 
             MockMediator
                 .Setup(x => x.Send(It.IsAny<RealizeBuildingUnitRequest>(), CancellationToken.None).Result)
-                .Throws(new BuildingUnitNotFoundException());
+                .Throws(new BuildingUnitIsNotFoundException());
 
             var request = new RealizeBuildingUnitRequest()
             {
@@ -173,7 +173,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenRealizingBuildingUnit
 
             MockMediator
                 .Setup(x => x.Send(It.IsAny<RealizeBuildingUnitRequest>(), CancellationToken.None).Result)
-                .Throws(new BuildingUnitStatusPreventsBuildingUnitRealizationException());
+                .Throws(new BuildingUnitHasInvalidStatusException());
 
             var request = new RealizeBuildingUnitRequest()
             {
@@ -206,7 +206,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenRealizingBuildingUnit
 
             MockMediator
                 .Setup(x => x.Send(It.IsAny<RealizeBuildingUnitRequest>(), CancellationToken.None).Result)
-                .Throws(new BuildingStatusPreventsBuildingUnitRealizationException());
+                .Throws(new BuildingHasInvalidStatusException());
 
             var request = new RealizeBuildingUnitRequest()
             {

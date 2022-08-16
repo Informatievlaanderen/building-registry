@@ -41,7 +41,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenPlacingBuildingUnderConstruc
 
             MockMediator
                 .Setup(x => x.Send(It.IsAny<PlaceBuildingUnderConstructionRequest>(), CancellationToken.None).Result)
-                .Throws(new BuildingCannotBePlacedUnderConstructionException(BuildingStatus.Retired));
+                .Throws(new BuildingHasInvalidStatusException());
 
             //Act
             Func<Task> act = async () => await _controller.UnderConstruction(

@@ -1,4 +1,4 @@
-﻿namespace BuildingRegistry.Tests.AggregateTests.WhenNotRealizingBuildingUnit
+namespace BuildingRegistry.Tests.AggregateTests.WhenNotRealizingBuildingUnit
 {
     using System;
     using System.Collections.Generic;
@@ -95,7 +95,7 @@
         [Theory]
         [InlineData("Retired")]
         [InlineData("Realized")]
-        public void WithInvalidBuildingUnitStatus_ThrowsBuildingUnitStatusPreventsBuildingUnitNotRealizationException(string status)
+        public void WithInvalidBuildingUnitStatus_ThrowsBuildingUnitHasInvalidStatusException(string status)
         {
             var command = Fixture.Create<NotRealizeBuildingUnit>();
 
@@ -125,7 +125,7 @@
                     new BuildingStreamId(Fixture.Create<BuildingPersistentLocalId>()),
                     buildingWasMigrated)
                 .When(command)
-                .Throws(new BuildingUnitStatusPreventsBuildingUnitNotRealizationException()));
+                .Throws(new BuildingUnitHasInvalidStatusException()));
         }
 
         [Fact]

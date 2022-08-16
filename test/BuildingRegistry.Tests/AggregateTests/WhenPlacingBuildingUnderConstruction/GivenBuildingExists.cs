@@ -55,7 +55,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlacingBuildingUnderConstruc
         [InlineData("Realized")]
         [InlineData("Retired")]
         [InlineData("NotRealized")]
-        public void WithInvalidStatus_ThrowsBuildingCannotBePlacedUnderConstructionException(string status)
+        public void WithInvalidStatus_ThrowsBuildingHasInvalidStatusException(string status)
         {
             var command = Fixture.Create<PlaceBuildingUnderConstruction>();
 
@@ -75,7 +75,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlacingBuildingUnderConstruc
                     new BuildingStreamId(Fixture.Create<BuildingPersistentLocalId>()),
                     buildingWasMigrated)
                 .When(command)
-                .Throws(new BuildingCannotBePlacedUnderConstructionException(BuildingStatus.Parse(status))));
+                .Throws(new BuildingHasInvalidStatusException()));
         }
 
 

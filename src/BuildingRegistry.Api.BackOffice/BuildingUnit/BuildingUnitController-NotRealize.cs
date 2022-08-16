@@ -76,11 +76,11 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
             {
                 throw exception switch
                 {
-                    BuildingUnitNotFoundException => new ApiException(ValidationErrorMessages.BuildingUnit.BuildingUnitNotFound, StatusCodes.Status404NotFound),
+                    BuildingUnitIsNotFoundException => new ApiException(ValidationErrorMessages.BuildingUnit.BuildingUnitNotFound, StatusCodes.Status404NotFound),
 
                     BuildingUnitIsRemovedException => new ApiException(ValidationErrorMessages.BuildingUnit.BuildingUnitIsRemoved, StatusCodes.Status410Gone),
 
-                    BuildingUnitStatusPreventsBuildingUnitNotRealizationException =>
+                    BuildingUnitHasInvalidStatusException =>
                         CreateValidationException(
                             ValidationErrorCodes.BuildingUnit.BuildingUnitCannotBeNotRealized,
                             string.Empty,

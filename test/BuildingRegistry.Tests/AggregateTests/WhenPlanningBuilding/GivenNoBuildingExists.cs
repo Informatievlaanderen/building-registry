@@ -43,7 +43,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuilding
             Assert(new Scenario()
                 .GivenNone()
                 .When(command)
-                .Throws(new InvalidPolygonException()));
+                .Throws(new PolygonIsInvalidException()));
         }
 
         [Fact]

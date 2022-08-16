@@ -29,7 +29,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenPlanningBuildingUnit
         public void ThenThrowValidationException()
         {
             MockMediator.Setup<object?>(x => x.Send(It.IsAny<PlanBuildingUnitRequest>(), CancellationToken.None).Result)
-                .Throws(new BuildingUnitOutsideGeometryBuildingException());
+                .Throws(new BuildingUnitPositionIsOutsideBuildingGeometryException());
 
             var request = new PlanBuildingUnitRequest()
             {

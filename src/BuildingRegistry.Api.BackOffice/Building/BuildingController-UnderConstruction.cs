@@ -83,7 +83,7 @@ namespace BuildingRegistry.Api.BackOffice.Building
                 throw exception switch
                 {
                     BuildingIsRemovedException => new ApiException(ValidationErrorMessages.Building.BuildingRemoved, StatusCodes.Status410Gone),
-                    BuildingCannotBePlacedUnderConstructionException => CreateValidationException(
+                    BuildingHasInvalidStatusException => CreateValidationException(
                         ValidationErrorCodes.Building.BuildingCannotBePlacedUnderConstruction,
                         string.Empty,
                         ValidationErrorMessages.Building.BuildingCannotBePlacedUnderConstruction),
