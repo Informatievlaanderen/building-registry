@@ -74,7 +74,7 @@ namespace BuildingRegistry.Api.BackOffice.Infrastructure
 
             if (buildingUnit is null)
             {
-                throw new BuildingUnitNotFoundException();
+                throw new BuildingUnitIsNotFoundException();
             }
 
             return new ETag(ETagType.Strong, buildingUnit.LastEventHash);

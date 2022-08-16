@@ -62,7 +62,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRealizingBuildingUnit
         [Theory]
         [InlineData("Retired")]
         [InlineData("NotRealized")]
-        public void WithInvalidBuildingUnitStatus_ThrowsBuildingUnitCannotBeRealizedException(string status)
+        public void WithInvalidBuildingUnitStatus_ThrowsBuildingUnitHasInvalidStatusException(string status)
         {
             var command = Fixture.Create<RealizeBuildingUnit>();
 
@@ -92,7 +92,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRealizingBuildingUnit
                     new BuildingStreamId(Fixture.Create<BuildingPersistentLocalId>()),
                     buildingWasMigrated)
                 .When(command)
-                .Throws(new BuildingUnitStatusPreventsBuildingUnitRealizationException()));
+                .Throws(new BuildingUnitHasInvalidStatusException()));
         }
 
 
@@ -117,7 +117,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRealizingBuildingUnit
                     new BuildingStreamId(Fixture.Create<BuildingPersistentLocalId>()),
                     buildingWasMigrated)
                 .When(command)
-                .Throws(new BuildingUnitNotFoundException(command.BuildingPersistentLocalId, command.BuildingUnitPersistentLocalId)));
+                .Throws(new BuildingUnitIsNotFoundException(command.BuildingPersistentLocalId, command.BuildingUnitPersistentLocalId)));
         }
 
         [Fact]
@@ -185,7 +185,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRealizingBuildingUnit
                     new BuildingStreamId(Fixture.Create<BuildingPersistentLocalId>()),
                     buildingWasMigrated)
                 .When(command)
-                .Throws(new BuildingStatusPreventsBuildingUnitRealizationException()));
+                .Throws(new BuildingHasInvalidStatusException()));
         }
 
         [Fact]

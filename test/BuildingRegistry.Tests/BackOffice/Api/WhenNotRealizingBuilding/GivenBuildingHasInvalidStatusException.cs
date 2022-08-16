@@ -16,11 +16,11 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenNotRealizingBuilding
     using Xunit;
     using Xunit.Abstractions;
 
-    public class GivenBuildingStatusPreventsNotRealizeBuildingException : BuildingRegistryBackOfficeTest
+    public class GivenBuildingHasInvalidStatusException : BuildingRegistryBackOfficeTest
     {
         private readonly BuildingController _controller;
 
-        public GivenBuildingStatusPreventsNotRealizeBuildingException(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
+        public GivenBuildingHasInvalidStatusException(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
         {
             _controller = CreateBuildingControllerWithUser<BuildingController>();
         }
@@ -37,7 +37,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenNotRealizingBuilding
 
             MockMediator
                 .Setup(x => x.Send(It.IsAny<NotRealizeBuildingRequest>(), CancellationToken.None).Result)
-                .Throws(new BuildingStatusPreventsNotRealizeBuildingException());
+                .Throws(new BuildingHasInvalidStatusException());
 
             //Act
             Func<Task> act = async () => await _controller.NotRealize(

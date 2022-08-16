@@ -84,7 +84,7 @@ namespace BuildingRegistry.Api.BackOffice.Building
                 throw exception switch
                 {
                     BuildingIsRemovedException => new ApiException(ValidationErrorMessages.Building.BuildingRemoved, StatusCodes.Status410Gone),
-                    BuildingCannotBeRealizedException => CreateValidationException(
+                    BuildingHasInvalidStatusException => CreateValidationException(
                         ValidationErrorCodes.Building.BuildingCannotBeRealizedException,
                         string.Empty,
                         ValidationErrorMessages.Building.BuildingCannotBeRealizedException),

@@ -59,7 +59,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRealizingBuilding
         }
 
         [Fact]
-        public void WithStatusPlanned_ThrowsBuildingCannotBeRealizedException()
+        public void WithStatusPlanned_ThrowsBuildingHasInvalidStatusException()
         {
             var command = Fixture.Create<RealizeBuilding>();
 
@@ -68,7 +68,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRealizingBuilding
                     new BuildingStreamId(Fixture.Create<BuildingPersistentLocalId>()),
                     Fixture.Create<BuildingWasPlannedV2>())
                 .When(command)
-                .Throws(new BuildingCannotBeRealizedException(BuildingStatus.Planned)));
+                .Throws(new BuildingHasInvalidStatusException()));
         }
 
         [Theory]
@@ -94,7 +94,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRealizingBuilding
                     new BuildingStreamId(Fixture.Create<BuildingPersistentLocalId>()),
                     buildingWasMigrated)
                 .When(command)
-                .Throws(new BuildingCannotBeRealizedException(BuildingStatus.Parse(status))));
+                .Throws(new BuildingHasInvalidStatusException()));
         }
 
         [Fact]

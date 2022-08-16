@@ -39,7 +39,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Sqs.Lambda.BuildingUnit
 
             if (buildingUnit is null)
             {
-                throw new BuildingUnitNotFoundException();
+                throw new BuildingUnitIsNotFoundException();
             }
 
             return buildingUnit.LastEventHash;
