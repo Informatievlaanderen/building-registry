@@ -26,7 +26,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenNotRealizingBuilding
         }
 
         [Fact]
-        public void ThenThrowApiException()
+        public void ThenThrowsApiException()
         {
             var buildingPersistentLocalId = new BuildingPersistentLocalId(123);
 

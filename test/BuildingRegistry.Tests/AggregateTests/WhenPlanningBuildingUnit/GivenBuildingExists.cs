@@ -123,7 +123,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuildingUnit
         }
 
         [Fact]
-        public void WithBuildingUnitPositionOutsideOfBuildingGeometry_ThrowBuildingUnitOutsideGeometryBuildingException()
+        public void WithBuildingUnitPositionOutsideOfBuildingGeometry_ThrowsBuildingUnitOutsideGeometryBuildingException()
         {
             var wrongPointCoordinateX = "666666.77777777777";
             var wrongPointCoordinateY = "777777.66666666666";

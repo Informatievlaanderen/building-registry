@@ -27,7 +27,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenPlacingBuildingUnderConstruc
         }
 
         [Fact]
-        public void ThenThrowApiException()
+        public void ThenThrowsApiException()
         {
             var buildingPersistentLocalId = new BuildingPersistentLocalId(123);
 
