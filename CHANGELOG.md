@@ -1,3 +1,10 @@
+## [3.31.3](https://github.com/informatievlaanderen/building-registry/compare/v3.31.2...v3.31.3) (2022-08-17)
+
+
+### Bug Fixes
+
+* review prs ([378bf99](https://github.com/informatievlaanderen/building-registry/commit/378bf992ca5432e77a511eb5b9cbbfdf34eb830e)), closes [#640](https://github.com/informatievlaanderen/building-registry/issues/640) [#682](https://github.com/informatievlaanderen/building-registry/issues/682)
+
 ## [3.31.2](https://github.com/informatievlaanderen/building-registry/compare/v3.31.1...v3.31.2) (2022-08-16)
 
 ## [3.31.1](https://github.com/informatievlaanderen/building-registry/compare/v3.31.0...v3.31.1) (2022-08-16)
