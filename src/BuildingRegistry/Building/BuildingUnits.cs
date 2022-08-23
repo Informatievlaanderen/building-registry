@@ -15,5 +15,8 @@ namespace BuildingRegistry.Building
                 x.Status == BuildingUnitStatus.Planned
                 || x.Status == BuildingUnitStatus.Realized)
             > 1;
+
+        public bool HasPersistentLocalId(BuildingUnitPersistentLocalId persistentLocalId)
+            => this.Any(x => x.BuildingUnitPersistentLocalId == persistentLocalId);
     }
 }

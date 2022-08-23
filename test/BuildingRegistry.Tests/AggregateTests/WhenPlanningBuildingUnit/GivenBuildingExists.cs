@@ -152,5 +152,53 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuildingUnit
                 .When(command)
                 .Throws(new BuildingUnitPositionIsOutsideBuildingGeometryException()));
         }
+
+        [Fact]
+        public void WithDuplicateBuildingUnitPersistentLocalId_ThrowsBuildingUnitPersistentIdAlreadyExistsException()
+        {
+            var buildingGeometry = "" +
+                                   "<gml:Polygon srsName=\"https://www.opengis.net/def/crs/EPSG/0/31370\" xmlns:gml=\"http://www.opengis.net/gml/3.2\">" +
+                                   "<gml:exterior>" +
+                                   "<gml:LinearRing>" +
+                                   "<gml:posList>140284.15277253836 186724.74131567031 140291.06016454101 186726.38355567306 140288.22675654292 186738.25798767805 140281.19098053873 186736.57913967967 140284.15277253836 186724.74131567031</gml:posList>" +
+                                   "</gml:LinearRing>" +
+                                   "</gml:exterior>" +
+                                   "</gml:Polygon>";
+
+            var correctPointCoordinateX = "140285.15277253836";
+            var correctPointCoordinateY = "186725.74131567031";
+
+            var pointCoordinateInsideBuildingGeometry =
+                "<gml:Point srsName=\"https://www.opengis.net/def/crs/EPSG/0/3137\" xmlns:gml=\"http://www.opengis.net/gml/3.2\">" +
+                $"<gml:pos>{correctPointCoordinateX} {correctPointCoordinateY}</gml:pos></gml:Point>";
+
+            var buildingUnitPersistentLocalId = new BuildingUnitPersistentLocalId(456);
+
+            var buildingWasPlanned = new BuildingWasPlannedV2(
+                Fixture.Create<BuildingPersistentLocalId>(),
+                buildingGeometry.ToExtendedWkbGeometry());
+            ((ISetProvenance)buildingWasPlanned).SetProvenance(Fixture.Create<Provenance>());
+
+            var buildingUnitWasPlanned = new BuildingUnitWasPlannedV2(
+                Fixture.Create<BuildingPersistentLocalId>(),
+                buildingUnitPersistentLocalId,
+                BuildingUnitPositionGeometryMethod.AppointedByAdministrator,
+                pointCoordinateInsideBuildingGeometry.ToExtendedWkbGeometry(),
+                Fixture.Create<BuildingUnitFunction>(),
+                hasDeviation: false);
+            ((ISetProvenance)buildingUnitWasPlanned).SetProvenance(Fixture.Create<Provenance>());
+
+            var command = Fixture.Create<PlanBuildingUnit>()
+                .WithPersistentLocalId(buildingUnitPersistentLocalId)
+                .WithPositionGeometryMethod(BuildingUnitPositionGeometryMethod.AppointedByAdministrator)
+                .WithPointPosition(pointCoordinateInsideBuildingGeometry);
+
+            Assert(new Scenario()
+                .Given(new BuildingStreamId(Fixture.Create<BuildingPersistentLocalId>()),
+                    @buildingWasPlanned,
+                    buildingUnitWasPlanned)
+                .When(command)
+                .Throws(new BuildingUnitPersistentLocalIdAlreadyExistsException()));
+        }
     }
 }

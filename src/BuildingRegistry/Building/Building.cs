@@ -132,6 +132,11 @@ namespace BuildingRegistry.Building
             GuardRemovedBuilding();
             GuardActiveBuilding();
 
+            if (_buildingUnits.HasPersistentLocalId(new BuildingUnitPersistentLocalId(buildingUnitPersistentLocalId)))
+            {
+                throw new BuildingUnitPersistentLocalIdAlreadyExistsException();
+            }
+
             // validate command
             var finalPosition = positionGeometryMethod != BuildingUnitPositionGeometryMethod.AppointedByAdministrator
                 ? BuildingGeometry.Center
