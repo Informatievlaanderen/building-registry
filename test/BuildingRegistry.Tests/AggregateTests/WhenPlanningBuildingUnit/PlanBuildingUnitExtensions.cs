@@ -40,5 +40,12 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuildingUnit
             return new PlanBuildingUnit(cmd.BuildingPersistentLocalId, cmd.BuildingUnitPersistentLocalId,
                 cmd.PositionGeometryMethod, positionExtendedWkbGeometry, cmd.Function, cmd.HasDeviation, cmd.Provenance);
         }
+
+        public static PlanBuildingUnit WithPersistentLocalId(this PlanBuildingUnit cmd,
+            BuildingUnitPersistentLocalId persistentLocalId)
+        {
+            return new PlanBuildingUnit(cmd.BuildingPersistentLocalId, persistentLocalId,
+                cmd.PositionGeometryMethod, cmd.Position, cmd.Function, cmd.HasDeviation, cmd.Provenance);
+        }
     }
 }
