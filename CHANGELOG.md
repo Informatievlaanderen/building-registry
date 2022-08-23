@@ -1,3 +1,10 @@
+# [3.32.0](https://github.com/informatievlaanderen/building-registry/compare/v3.31.3...v3.32.0) (2022-08-23)
+
+
+### Features
+
+* check for duplicate persistentLocalId when adding buildingUnit ([f7ddb6b](https://github.com/informatievlaanderen/building-registry/commit/f7ddb6b3bea67602e46a0b644a347dd87142484a))
+
 ## [3.31.3](https://github.com/informatievlaanderen/building-registry/compare/v3.31.2...v3.31.3) (2022-08-17)
 
 
