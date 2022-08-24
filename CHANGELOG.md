@@ -1,3 +1,10 @@
+## [3.32.1](https://github.com/informatievlaanderen/building-registry/compare/v3.32.0...v3.32.1) (2022-08-24)
+
+
+### Bug Fixes
+
+* bump snapshotting ([24eeb83](https://github.com/informatievlaanderen/building-registry/commit/24eeb830254cff821e90f25ac6483f8abf589e27))
+
 # [3.32.0](https://github.com/informatievlaanderen/building-registry/compare/v3.31.3...v3.32.0) (2022-08-23)
 
 
