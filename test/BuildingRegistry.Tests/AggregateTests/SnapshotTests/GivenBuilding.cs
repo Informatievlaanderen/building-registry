@@ -113,12 +113,12 @@ namespace BuildingRegistry.Tests.AggregateTests.SnapshotTests
 
         private static SnapshotContainer Build(
             BuildingSnapshot snapshot,
-            long position,
+            long streamVersion,
             JsonSerializerSettings serializerSettings)
         {
             return new SnapshotContainer
             {
-                Info = new SnapshotInfo { Position = position, Type = nameof(BuildingSnapshot) },
+                Info = new SnapshotInfo { StreamVersion = streamVersion, Type = nameof(BuildingSnapshot) },
                 Data = JsonConvert.SerializeObject(snapshot, serializerSettings)
             };
         }
