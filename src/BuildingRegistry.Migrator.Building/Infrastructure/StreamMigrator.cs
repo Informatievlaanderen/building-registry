@@ -21,6 +21,7 @@ namespace BuildingRegistry.Migrator.Building.Infrastructure
     using Microsoft.Extensions.Logging;
     using Polly;
     using Serilog;
+    using BuildingGeometry = Legacy.BuildingGeometry;
     using BuildingUnit = BuildingRegistry.Building.Commands.BuildingUnit;
     using ILogger = Microsoft.Extensions.Logging.ILogger;
 
@@ -178,7 +179,7 @@ namespace BuildingRegistry.Migrator.Building.Infrastructure
                 throw new InvalidOperationException($"Incomplete but not removed Building '{aggregateId}'.");
             }
 
-            List<BuildingUnit> BuildingUnitMapper(List<Legacy.BuildingUnit> legacyBuildingUnits)
+            List<BuildingUnit> BuildingUnitMapper(List<Legacy.BuildingUnit> legacyBuildingUnits, BuildingGeometry legacyBuildingGeometry)
             {
                 var commandBuildingUnits = new List<BuildingUnit>();
 
@@ -218,7 +219,7 @@ namespace BuildingRegistry.Migrator.Building.Infrastructure
                         addressPersistentLocalIds.Add(new AddressPersistentLocalId(addressPersistentLocalId));
                     }
 
-                    commandBuildingUnits.Add(new BuildingUnit(legacyBuildingUnit.BuildingUnitId, legacyBuildingUnit.PersistentLocalId, legacyBuildingUnit.Function, status, addressPersistentLocalIds, legacyBuildingUnit.BuildingUnitPosition, legacyBuildingUnit.IsRemoved));
+                    commandBuildingUnits.Add(new BuildingUnit(legacyBuildingUnit.BuildingUnitId, legacyBuildingUnit.PersistentLocalId, legacyBuildingUnit.Function, status, addressPersistentLocalIds, legacyBuildingUnit.BuildingUnitPosition, legacyBuildingGeometry, legacyBuildingUnit.IsRemoved));
                 }
 
                 return commandBuildingUnits;

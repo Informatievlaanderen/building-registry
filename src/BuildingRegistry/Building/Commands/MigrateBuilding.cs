@@ -3,6 +3,7 @@ namespace BuildingRegistry.Building.Commands
     using System;
     using System.Collections.Generic;
     using Be.Vlaanderen.Basisregisters.Generators.Guid;
+    using Be.Vlaanderen.Basisregisters.GrAr.Common.NetTopology;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Be.Vlaanderen.Basisregisters.Utilities;
 
@@ -44,7 +45,7 @@ namespace BuildingRegistry.Building.Commands
 
         public Guid CreateCommandId()
             => Deterministic.Create(Namespace, $"MigrateLegacyBuilding-{ToString()}");
-        
+
         public override string? ToString()
             => ToStringBuilder.ToString(IdentityFields());
 
@@ -76,6 +77,7 @@ namespace BuildingRegistry.Building.Commands
             Legacy.BuildingUnitStatus status,
             List<AddressPersistentLocalId> addressPersistentLocalIds,
             Legacy.BuildingUnitPosition buildingUnitPosition,
+            Legacy.BuildingGeometry buildingGeometry,
             bool isRemoved)
         {
             BuildingUnitId = new BuildingUnitId(buildingUnitId);
@@ -83,9 +85,21 @@ namespace BuildingRegistry.Building.Commands
             Function = BuildingUnitFunction.Parse(function);
             Status = BuildingUnitStatus.Parse(status);
             AddressPersistentLocalIds = addressPersistentLocalIds;
-            BuildingUnitPosition = new BuildingUnitPosition(
-                new ExtendedWkbGeometry(buildingUnitPosition.Geometry.ToString()),
-                BuildingUnitPositionGeometryMethod.Parse(buildingUnitPosition.GeometryMethod));
+
+            if (buildingUnitPosition.GeometryMethod == BuildingUnitPositionGeometryMethod.DerivedFromObject
+                && !buildingGeometry.Contains(buildingUnitPosition.Geometry))
+            {
+                BuildingUnitPosition = new BuildingUnitPosition(
+                    ExtendedWkbGeometry.CreateEWkb(buildingGeometry.Geometry.ToGeometry().CentroidWithinArea().AsBinary())!,
+                    BuildingUnitPositionGeometryMethod.Parse(buildingUnitPosition.GeometryMethod));
+            }
+            else
+            {
+                BuildingUnitPosition = new BuildingUnitPosition(
+                    new ExtendedWkbGeometry(buildingUnitPosition.Geometry.ToString()),
+                    BuildingUnitPositionGeometryMethod.Parse(buildingUnitPosition.GeometryMethod));
+            }
+
             IsRemoved = isRemoved;
         }
     }
