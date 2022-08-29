@@ -1,3 +1,10 @@
+## [3.32.2](https://github.com/informatievlaanderen/building-registry/compare/v3.32.1...v3.32.2) (2022-08-29)
+
+
+### Bug Fixes
+
+* migrate building units using centroidwithinarea ([22c7804](https://github.com/informatievlaanderen/building-registry/commit/22c780486423ab1352d0c61614e9429b13aab742))
+
 ## [3.32.1](https://github.com/informatievlaanderen/building-registry/compare/v3.32.0...v3.32.1) (2022-08-24)
 
 
