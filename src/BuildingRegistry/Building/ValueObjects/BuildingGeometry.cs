@@ -3,6 +3,7 @@ namespace BuildingRegistry.Building
     using System.Collections.Generic;
     using System.Linq;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
+    using Be.Vlaanderen.Basisregisters.GrAr.Common.NetTopology;
     using NetTopologySuite.Geometries;
     using NetTopologySuite.IO;
 
@@ -40,7 +41,7 @@ namespace BuildingRegistry.Building
         }
 
         public ExtendedWkbGeometry Center =>
-            ExtendedWkbGeometry.CreateEWkb(_wkbReader.Read(Geometry).Centroid.AsBinary())!;
+            ExtendedWkbGeometry.CreateEWkb(_wkbReader.Read(Geometry).CentroidWithinArea().AsBinary())!;
 
         protected override IEnumerable<object> Reflect()
         {
