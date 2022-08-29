@@ -131,6 +131,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenNotRealizingBuilding
                         BuildingRegistry.Legacy.BuildingUnitStatus.Planned,
                         new List<AddressPersistentLocalId>(),
                         Fixture.Create<BuildingRegistry.Legacy.BuildingUnitPosition>(),
+                        Fixture.Create<BuildingRegistry.Legacy.BuildingGeometry>(),
                         false),
                     new BuildingUnit(
                         new BuildingRegistry.Legacy.BuildingUnitId(Guid.NewGuid()),
@@ -139,6 +140,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenNotRealizingBuilding
                         BuildingRegistry.Legacy.BuildingUnitStatus.Retired,
                         new List<AddressPersistentLocalId>(),
                         Fixture.Create<BuildingRegistry.Legacy.BuildingUnitPosition>(),
+                        Fixture.Create<BuildingRegistry.Legacy.BuildingGeometry>(),
                         false),
                     new BuildingUnit(
                         new BuildingRegistry.Legacy.BuildingUnitId(Guid.NewGuid()),
@@ -147,6 +149,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenNotRealizingBuilding
                         BuildingRegistry.Legacy.BuildingUnitStatus.Realized,
                         new List<AddressPersistentLocalId>(),
                         Fixture.Create<BuildingRegistry.Legacy.BuildingUnitPosition>(),
+                        Fixture.Create<BuildingRegistry.Legacy.BuildingGeometry>(),
                         false),
                     new BuildingUnit(
                         new BuildingRegistry.Legacy.BuildingUnitId(Guid.NewGuid()),
@@ -155,6 +158,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenNotRealizingBuilding
                         BuildingRegistry.Legacy.BuildingUnitStatus.Planned,
                         new List<AddressPersistentLocalId>(),
                         Fixture.Create<BuildingRegistry.Legacy.BuildingUnitPosition>(),
+                        Fixture.Create<BuildingRegistry.Legacy.BuildingGeometry>(),
                         true)
                 }
             );

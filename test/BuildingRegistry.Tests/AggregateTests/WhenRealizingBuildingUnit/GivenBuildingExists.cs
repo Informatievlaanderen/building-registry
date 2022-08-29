@@ -82,6 +82,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRealizingBuildingUnit
                         BuildingRegistry.Legacy.BuildingUnitStatus.Parse(status) ?? throw new ArgumentException(),
                         new List<AddressPersistentLocalId>(),
                         Fixture.Create<BuildingRegistry.Legacy.BuildingUnitPosition>(),
+                        Fixture.Create<BuildingRegistry.Legacy.BuildingGeometry>(),
                         isRemoved: false)
                 }
             );
@@ -141,6 +142,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRealizingBuildingUnit
                             BuildingRegistry.Legacy.BuildingUnitStatus.Planned,
                             new List<AddressPersistentLocalId>(),
                             Fixture.Create<BuildingRegistry.Legacy.BuildingUnitPosition>(),
+                            Fixture.Create<BuildingRegistry.Legacy.BuildingGeometry>(),
                             isRemoved: true)
                 }
             );
@@ -175,6 +177,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRealizingBuildingUnit
                             BuildingRegistry.Legacy.BuildingUnitStatus.Planned,
                             new List<AddressPersistentLocalId>(),
                             Fixture.Create<BuildingRegistry.Legacy.BuildingUnitPosition>(),
+                            Fixture.Create<BuildingRegistry.Legacy.BuildingGeometry>(),
                             isRemoved: false)
                 }
             );

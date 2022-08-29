@@ -1,6 +1,5 @@
 namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuildingUnit
 {
-    using System;
     using System.Collections.Generic;
     using AutoFixture;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
@@ -11,14 +10,12 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuildingUnit
     using Building.Events;
     using BuildingRegistry.Legacy;
     using Fixtures;
-    using Microsoft.EntityFrameworkCore;
     using Xunit;
     using Xunit.Abstractions;
     using BuildingGeometry = Building.BuildingGeometry;
     using BuildingGeometryMethod = Building.BuildingGeometryMethod;
     using BuildingId = Building.BuildingId;
     using BuildingStatus = Building.BuildingStatus;
-    using BuildingUnitFunction = Building.BuildingUnitFunction;
     using BuildingUnitId = BuildingRegistry.Legacy.BuildingUnitId;
     using BuildingUnitPositionGeometryMethod = Building.BuildingUnitPositionGeometryMethod;
     using BuildingUnitStatus = Building.BuildingUnitStatus;
@@ -62,7 +59,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuildingUnit
                             command.BuildingPersistentLocalId,
                             new BuildingUnitPersistentLocalId(1),
                             BuildingUnitStatus.Planned,
-                            BuildingUnitPositionGeometryMethod.DerivedFromObject, 
+                            BuildingUnitPositionGeometryMethod.DerivedFromObject,
                             buildingGeometry.Center,
                             false))));
         }
@@ -183,6 +180,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuildingUnit
                 BuildingRegistry.Legacy.BuildingUnitStatus.Planned,
                 new List<AddressPersistentLocalId>(),
                 Fixture.Create<BuildingRegistry.Legacy.BuildingUnitPosition>(),
+                Fixture.Create<BuildingRegistry.Legacy.BuildingGeometry>(),
                 isRemoved: true);
 
             var retiredBuildingUnit = new BuildingRegistry.Building.Commands.BuildingUnit(
@@ -192,6 +190,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuildingUnit
                 BuildingRegistry.Legacy.BuildingUnitStatus.Retired,
                 new List<AddressPersistentLocalId>(),
                 Fixture.Create<BuildingRegistry.Legacy.BuildingUnitPosition>(),
+                Fixture.Create<BuildingRegistry.Legacy.BuildingGeometry>(),
                 isRemoved: false);
 
             var notRealizedBuildingUnit = new BuildingRegistry.Building.Commands.BuildingUnit(
@@ -201,6 +200,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuildingUnit
                 BuildingRegistry.Legacy.BuildingUnitStatus.NotRealized,
                 new List<AddressPersistentLocalId>(),
                 Fixture.Create<BuildingRegistry.Legacy.BuildingUnitPosition>(),
+                Fixture.Create<BuildingRegistry.Legacy.BuildingGeometry>(),
                 isRemoved: false);
 
             var buildingGeometry = Fixture.Create<BuildingGeometry>();

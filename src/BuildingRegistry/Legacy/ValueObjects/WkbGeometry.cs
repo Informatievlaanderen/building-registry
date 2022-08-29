@@ -3,6 +3,7 @@ namespace BuildingRegistry.Legacy
     using System;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
     using Be.Vlaanderen.Basisregisters.Utilities.HexByteConvertor;
+    using NetTopologySuite.Geometries;
     using NetTopologySuite.IO;
     using Newtonsoft.Json;
 
@@ -26,6 +27,8 @@ namespace BuildingRegistry.Legacy
         public ExtendedWkbGeometry([JsonProperty("value")] byte[] ewkbBytes) : base(ewkbBytes) { }
 
         public ExtendedWkbGeometry(string ewkbBytesHex) : base(ewkbBytesHex.ToByteArray()) { }
+
+        public Geometry ToGeometry() => WkbReader.Read(Value);
 
         public override string ToString() => Value.ToHexString();
 

@@ -18,7 +18,8 @@ namespace BuildingRegistry.Legacy
     {
         private static readonly WKBReader WkbReader = WKBReaderFactory.Create();
 
-        public MigrateBuilding CreateMigrateCommand(Func<List<BuildingUnit>, List<BuildingRegistry.Building.Commands.BuildingUnit>> buildingUnitMapper)
+        public MigrateBuilding CreateMigrateCommand(
+            Func<List<BuildingUnit>, BuildingGeometry, List<BuildingRegistry.Building.Commands.BuildingUnit>> buildingUnitMapper)
         {
             var status = _status ?? throw new InvalidOperationException($"No status found for Building '{_persistentLocalId}'");
 
@@ -29,7 +30,7 @@ namespace BuildingRegistry.Legacy
                 status,
                 Geometry,
                 IsRemoved,
-                buildingUnitMapper(_buildingUnitCollection.AllBuildingUnits.ToList()),
+                buildingUnitMapper(_buildingUnitCollection.AllBuildingUnits.ToList(), Geometry),
                 new Provenance(
                     SystemClock.Instance.GetCurrentInstant(),
                     Application.BuildingRegistry,
