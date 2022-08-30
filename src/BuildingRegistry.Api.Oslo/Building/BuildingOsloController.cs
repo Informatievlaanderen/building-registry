@@ -8,6 +8,7 @@ namespace BuildingRegistry.Api.Oslo.Building
     using Abstractions.Infrastructure.Grb;
     using Abstractions.Infrastructure.Options;
     using Be.Vlaanderen.Basisregisters.Api;
+    using Be.Vlaanderen.Basisregisters.Api.ETag;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy;
     using MediatR;
@@ -64,7 +65,10 @@ namespace BuildingRegistry.Api.Oslo.Building
             CancellationToken cancellationToken = default)
         {
             var response = await _mediator.Send(new GetRequest(context, syndicationContext, responseOptions, grbBuildingParcel, persistentLocalId), cancellationToken);
-            return Ok(response);
+
+            return string.IsNullOrWhiteSpace(response.LastEventHash)
+                ? Ok(response.BuildingResponse)
+                : new OkWithLastObservedPositionAsETagResult(response.BuildingResponse, response.LastEventHash);
         }
 
         /// <summary>

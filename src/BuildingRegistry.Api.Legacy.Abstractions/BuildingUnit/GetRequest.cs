@@ -7,5 +7,9 @@ namespace BuildingRegistry.Api.Legacy.Abstractions.BuildingUnit
     using Projections.Syndication;
     using Responses;
 
-    public record GetRequest(LegacyContext Context, SyndicationContext SyndicationContext, IOptions<ResponseOptions> ResponseOptions, int PersistentLocalId) : IRequest<BuildingUnitResponse>;
+    public record GetRequest(
+        LegacyContext Context,
+        SyndicationContext SyndicationContext,
+        IOptions<ResponseOptions> ResponseOptions,
+        int PersistentLocalId) : IRequest<BuildingUnitResponseWithEtag>;
 }

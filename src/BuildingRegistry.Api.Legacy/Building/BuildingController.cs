@@ -14,6 +14,7 @@ namespace BuildingRegistry.Api.Legacy.Building
     using Abstractions.Infrastructure.Grb;
     using Abstractions.Infrastructure.Options;
     using Be.Vlaanderen.Basisregisters.Api;
+    using Be.Vlaanderen.Basisregisters.Api.ETag;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
     using Be.Vlaanderen.Basisregisters.Api.Search.Pagination;
     using Be.Vlaanderen.Basisregisters.Api.Syndication;
@@ -30,7 +31,7 @@ namespace BuildingRegistry.Api.Legacy.Building
     using Swashbuckle.AspNetCore.Filters;
     using Infrastructure;
     using MediatR;
-    
+
     [ApiVersion("1.0")]
     [AdvertiseApiVersions("1.0")]
     [ApiRoute("gebouwen")]
@@ -75,7 +76,10 @@ namespace BuildingRegistry.Api.Legacy.Building
             CancellationToken cancellationToken = default)
         {
             var response = await _mediator.Send(new GetRequest(context, syndicationContext, responseOptions, grbBuildingParcel, persistentLocalId), cancellationToken);
-            return Ok(response);
+
+            return string.IsNullOrWhiteSpace(response.LastEventHash)
+                ? Ok(response.BuildingResponse)
+                : new OkWithLastObservedPositionAsETagResult(response.BuildingResponse, response.LastEventHash);
         }
 
         /// <summary>

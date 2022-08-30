@@ -34,14 +34,14 @@ namespace BuildingRegistry.Api.Legacy.Abstractions.BuildingUnit.Responses
         public Point Geometry { get; set; }
 
         /// <summary>
-        /// De geometriemethode van de gebouweenheidpositie. 
+        /// De geometriemethode van de gebouweenheidpositie.
         /// </summary>
         [DataMember(Name = "PositieGeometrieMethode", Order = 3)]
         [JsonProperty(Required = Required.DisallowNull)]
         public PositieGeometrieMethode GeometryMethod { get; set; }
 
         /// <summary>
-        /// De status van de gebouweenheid. 
+        /// De status van de gebouweenheid.
         /// </summary>
         [DataMember(Name = "GebouweenheidStatus", Order = 4)]
         [JsonProperty(Required = Required.DisallowNull)]

@@ -21,9 +21,9 @@ namespace BuildingRegistry.Api.Oslo.Handlers.BuildingUnitV2
     using NetTopologySuite.Geometries;
     using BuildingUnitPosition = Abstractions.BuildingUnit.Responses.BuildingUnitPosition;
 
-    public class GetHandler : IRequestHandler<GetRequest, BuildingUnitOsloResponse>
+    public class GetHandler : IRequestHandler<GetRequest, BuildingUnitOsloResponseWithEtag>
     {
-        public async Task<BuildingUnitOsloResponse> Handle(GetRequest request, CancellationToken cancellationToken)
+        public async Task<BuildingUnitOsloResponseWithEtag> Handle(GetRequest request, CancellationToken cancellationToken)
         {
             var buildingUnit = await request.Context
                 .BuildingUnitDetailsV2
@@ -44,16 +44,18 @@ namespace BuildingRegistry.Api.Oslo.Handlers.BuildingUnitV2
             var addressPersistentLocalIds = buildingUnit.Addresses
                 .Select(x => x.AddressPersistentLocalId).ToList();
 
-            return new BuildingUnitOsloResponse(
-                buildingUnit.BuildingUnitPersistentLocalId,
-                request.ResponseOptions.Value.GebouweenheidNaamruimte,
-                request.ResponseOptions.Value.ContextUrlUnitDetail,
-                buildingUnit.Version.ToBelgianDateTimeOffset(),
-                GetBuildingUnitPoint(buildingUnit.Position, buildingUnit.PositionMethod),
-                buildingUnit.Status.Map(),
-                MapBuildingUnitFunction(buildingUnit.Function),
-                new GebouweenheidDetailGebouw(buildingUnit.BuildingPersistentLocalId.ToString(), string.Format(request.ResponseOptions.Value.GebouwDetailUrl, buildingUnit.BuildingPersistentLocalId)),
-                addressPersistentLocalIds.Select(id => new GebouweenheidDetailAdres(id.ToString(), string.Format(request.ResponseOptions.Value.AdresUrl, id))).ToList());
+            return new BuildingUnitOsloResponseWithEtag(
+                new BuildingUnitOsloResponse(
+                    buildingUnit.BuildingUnitPersistentLocalId,
+                    request.ResponseOptions.Value.GebouweenheidNaamruimte,
+                    request.ResponseOptions.Value.ContextUrlUnitDetail,
+                    buildingUnit.Version.ToBelgianDateTimeOffset(),
+                    GetBuildingUnitPoint(buildingUnit.Position, buildingUnit.PositionMethod),
+                    buildingUnit.Status.Map(),
+                    MapBuildingUnitFunction(buildingUnit.Function),
+                    new GebouweenheidDetailGebouw(buildingUnit.BuildingPersistentLocalId.ToString(), string.Format(request.ResponseOptions.Value.GebouwDetailUrl, buildingUnit.BuildingPersistentLocalId)),
+                    addressPersistentLocalIds.Select(id => new GebouweenheidDetailAdres(id.ToString(), string.Format(request.ResponseOptions.Value.AdresUrl, id))).ToList()),
+                buildingUnit.LastEventHash);
         }
 
         private static PositieGeometrieMethode MapBuildingUnitGeometryMethod(BuildingUnitPositionGeometryMethod geometryMethod)

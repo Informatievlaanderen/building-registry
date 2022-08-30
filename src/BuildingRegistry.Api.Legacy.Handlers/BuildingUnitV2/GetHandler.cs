@@ -13,9 +13,9 @@ namespace BuildingRegistry.Api.Legacy.Handlers.BuildingUnitV2
     using Microsoft.AspNetCore.Http;
     using Microsoft.EntityFrameworkCore;
 
-    public class GetHandler : IRequestHandler<GetRequest, BuildingUnitResponse>
+    public class GetHandler : IRequestHandler<GetRequest, BuildingUnitResponseWithEtag>
     {
-        public async Task<BuildingUnitResponse> Handle(GetRequest request, CancellationToken cancellationToken)
+        public async Task<BuildingUnitResponseWithEtag> Handle(GetRequest request, CancellationToken cancellationToken)
         {
             var buildingUnit = await request.Context
                 .BuildingUnitDetailsV2
@@ -33,23 +33,25 @@ namespace BuildingRegistry.Api.Legacy.Handlers.BuildingUnitV2
                 throw new ApiException("Gebouweenheid werd verwijderd.", StatusCodes.Status410Gone);
             }
 
-            return new BuildingUnitResponse(
-                buildingUnit.BuildingUnitPersistentLocalId,
-                request.ResponseOptions.Value.GebouweenheidNaamruimte,
-                buildingUnit.Version.ToBelgianDateTimeOffset(),
-                BuildingUnitHelpers.GetBuildingUnitPoint(buildingUnit.Position),
-                buildingUnit.PositionMethod.Map(),
-                buildingUnit.Status.Map(),
-                buildingUnit.Function.Map(),
-                new GebouweenheidDetailGebouw(
-                    buildingUnit.BuildingPersistentLocalId.ToString(),
-                    string.Format(request.ResponseOptions.Value.GebouwDetailUrl,
-                        buildingUnit.BuildingPersistentLocalId)),
-                buildingUnit.Addresses.Select(x =>
-                    new GebouweenheidDetailAdres(
-                        x.AddressPersistentLocalId.ToString(),
-                        string.Format(request.ResponseOptions.Value.AdresUrl, x.AddressPersistentLocalId.ToString())))
-                    .ToList());
+            return new BuildingUnitResponseWithEtag(
+                new BuildingUnitResponse(
+                    buildingUnit.BuildingUnitPersistentLocalId,
+                    request.ResponseOptions.Value.GebouweenheidNaamruimte,
+                    buildingUnit.Version.ToBelgianDateTimeOffset(),
+                    BuildingUnitHelpers.GetBuildingUnitPoint(buildingUnit.Position),
+                    buildingUnit.PositionMethod.Map(),
+                    buildingUnit.Status.Map(),
+                    buildingUnit.Function.Map(),
+                    new GebouweenheidDetailGebouw(
+                        buildingUnit.BuildingPersistentLocalId.ToString(),
+                        string.Format(request.ResponseOptions.Value.GebouwDetailUrl,
+                            buildingUnit.BuildingPersistentLocalId)),
+                    buildingUnit.Addresses.Select(x =>
+                        new GebouweenheidDetailAdres(
+                            x.AddressPersistentLocalId.ToString(),
+                            string.Format(request.ResponseOptions.Value.AdresUrl, x.AddressPersistentLocalId.ToString())))
+                        .ToList()),
+                buildingUnit.LastEventHash);
         }
     }
 }
