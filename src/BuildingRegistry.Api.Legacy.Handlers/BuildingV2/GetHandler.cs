@@ -13,9 +13,9 @@ namespace BuildingRegistry.Api.Legacy.Handlers.BuildingV2
     using Microsoft.AspNetCore.Http;
     using Microsoft.EntityFrameworkCore;
 
-    public class GetHandler : IRequestHandler<GetRequest, BuildingResponse>
+    public class GetHandler : IRequestHandler<GetRequest, BuildingResponseWithEtag>
     {
-        public async Task<BuildingResponse> Handle(GetRequest request, CancellationToken cancellationToken)
+        public async Task<BuildingResponseWithEtag> Handle(GetRequest request, CancellationToken cancellationToken)
         {
             var building = await request.Context
                 .BuildingDetailsV2
@@ -55,21 +55,25 @@ namespace BuildingRegistry.Api.Legacy.Handlers.BuildingV2
             var buildingUnitPersistentLocalIds = buildingUnitPersistentLocalIdsTask.Result;
             var caPaKeys = caPaKeysTask.Result;
 
-            return new BuildingResponse(
-                building.PersistentLocalId,
-                request.ResponseOptions.Value.GebouwNaamruimte,
-                building.Version.ToBelgianDateTimeOffset(),
-                BuildingHelpers.GetBuildingPolygon(building.Geometry),
-                building.GeometryMethod.Map(),
-                building.Status.Map(),
-                buildingUnitPersistentLocalIds
-                    .OrderBy(x => x)
-                    .Select(x =>
-                        new GebouwDetailGebouweenheid(
-                            x.ToString(),
-                            string.Format(request.ResponseOptions.Value.GebouweenheidDetailUrl, x)))
-                    .ToList(),
-                caPaKeys.Select(x => new GebouwDetailPerceel(x, string.Format(request.ResponseOptions.Value.PerceelUrl, x))).ToList());
+            return new BuildingResponseWithEtag(
+                new BuildingResponse(
+                    building.PersistentLocalId,
+                    request.ResponseOptions.Value.GebouwNaamruimte,
+                    building.Version.ToBelgianDateTimeOffset(),
+                    BuildingHelpers.GetBuildingPolygon(building.Geometry),
+                    building.GeometryMethod.Map(),
+                    building.Status.Map(),
+                    buildingUnitPersistentLocalIds
+                        .OrderBy(x => x)
+                        .Select(x =>
+                            new GebouwDetailGebouweenheid(
+                                x.ToString(),
+                                string.Format(request.ResponseOptions.Value.GebouweenheidDetailUrl, x)))
+                        .ToList(),
+                    caPaKeys.Select(x =>
+                            new GebouwDetailPerceel(x, string.Format(request.ResponseOptions.Value.PerceelUrl, x)))
+                        .ToList()),
+                building.LastEventHash);
         }
     }
 }

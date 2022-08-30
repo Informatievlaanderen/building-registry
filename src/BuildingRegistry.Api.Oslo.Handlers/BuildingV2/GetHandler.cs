@@ -19,9 +19,9 @@ namespace BuildingRegistry.Api.Oslo.Handlers.BuildingV2
     using Microsoft.EntityFrameworkCore;
     using NetTopologySuite.Geometries;
 
-    public class GetHandler : IRequestHandler<GetRequest, BuildingOsloResponse>
+    public class GetHandler : IRequestHandler<GetRequest, BuildingOsloResponseWithEtag>
     {
-        public async Task<BuildingOsloResponse> Handle(GetRequest request, CancellationToken cancellationToken)
+        public async Task<BuildingOsloResponseWithEtag> Handle(GetRequest request, CancellationToken cancellationToken)
         {
             var building = await request.Context
                 .BuildingDetailsV2
@@ -61,17 +61,19 @@ namespace BuildingRegistry.Api.Oslo.Handlers.BuildingV2
             var buildingUnits = buildingUnitsTask.Result;
             var caPaKeys = caPaKeysTask.Result;
 
-            return new BuildingOsloResponse(
-                building.PersistentLocalId,
-                request.ResponseOptions.Value.GebouwNaamruimte,
-                request.ResponseOptions.Value.ContextUrlDetail,
-                building.Version.ToBelgianDateTimeOffset(),
-                GetBuildingPolygon(building.Geometry, building.GeometryMethod),
-                building.Status.Map(),
-                buildingUnits.OrderBy(x => x).Select(x => new GebouwDetailGebouweenheid(x.ToString(), string.Format(request.ResponseOptions.Value.GebouweenheidDetailUrl, x))).ToList(),
-                caPaKeys.Select(x => new GebouwDetailPerceel(x, string.Format(request.ResponseOptions.Value.PerceelUrl, x))).ToList());
+            return new BuildingOsloResponseWithEtag(
+                new BuildingOsloResponse(
+                    building.PersistentLocalId,
+                    request.ResponseOptions.Value.GebouwNaamruimte,
+                    request.ResponseOptions.Value.ContextUrlDetail,
+                    building.Version.ToBelgianDateTimeOffset(),
+                    GetBuildingPolygon(building.Geometry, building.GeometryMethod),
+                    building.Status.Map(),
+                    buildingUnits.OrderBy(x => x).Select(x => new GebouwDetailGebouweenheid(x.ToString(), string.Format(request.ResponseOptions.Value.GebouweenheidDetailUrl, x))).ToList(),
+                    caPaKeys.Select(x => new GebouwDetailPerceel(x, string.Format(request.ResponseOptions.Value.PerceelUrl, x))).ToList()),
+                building.LastEventHash);
         }
-        
+
         private static BuildingPolygon GetBuildingPolygon(byte[] polygon, BuildingGeometryMethod geometryMethod)
         {
             var geometry = WKBReaderFactory.Create().Read(polygon) as NetTopologySuite.Geometries.Polygon;

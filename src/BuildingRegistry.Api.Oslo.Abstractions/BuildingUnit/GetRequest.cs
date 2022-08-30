@@ -7,5 +7,9 @@ namespace BuildingRegistry.Api.Oslo.Abstractions.BuildingUnit
     using Projections.Syndication;
     using Responses;
 
-    public record GetRequest(LegacyContext Context, SyndicationContext SyndicationContext, IOptions<ResponseOptions> ResponseOptions, int PersistentLocalId) : IRequest<BuildingUnitOsloResponse>;
+    public record GetRequest(
+        LegacyContext Context,
+        SyndicationContext SyndicationContext,
+        IOptions<ResponseOptions> ResponseOptions,
+        int PersistentLocalId) : IRequest<BuildingUnitOsloResponseWithEtag>;
 }
