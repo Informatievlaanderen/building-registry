@@ -1,3 +1,10 @@
+## [3.32.3](https://github.com/informatievlaanderen/building-registry/compare/v3.32.2...v3.32.3) (2022-08-30)
+
+
+### Bug Fixes
+
+* include etag in legacy and oslo detail responses ([9a55148](https://github.com/informatievlaanderen/building-registry/commit/9a55148d2cd283b0421d85a7f7154c6e3ecc3252))
+
 ## [3.32.2](https://github.com/informatievlaanderen/building-registry/compare/v3.32.1...v3.32.2) (2022-08-29)
 
 
