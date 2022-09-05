@@ -169,9 +169,9 @@ namespace BuildingRegistry.Projections.LastChangedList
         {
             return acceptType switch
             {
-                AcceptType.Json => $"/v1/gebouweenheden/{{{0}}}",
-                AcceptType.Xml => $"/v1/gebouweenheden/{{{0}}}",
-                AcceptType.JsonLd => $"/v2/gebouweenheden/{{{0}}}",
+                AcceptType.Json => "/v1/gebouweenheden/{0}",
+                AcceptType.Xml => "/v1/gebouweenheden/{0}",
+                AcceptType.JsonLd => "/v2/gebouweenheden/{0}",
                 _ => throw new NotImplementedException($"Cannot build Uri for type {typeof(AcceptType)}")
             };
         }
