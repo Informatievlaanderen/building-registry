@@ -1,3 +1,10 @@
+## [3.32.5](https://github.com/informatievlaanderen/building-registry/compare/v3.32.4...v3.32.5) (2022-09-09)
+
+
+### Bug Fixes
+
+* fix s3 lambda destination ([8ffadc5](https://github.com/informatievlaanderen/building-registry/commit/8ffadc5e78a2a5f99e43281e0b69514f720b75c5))
+
 ## [3.32.4](https://github.com/informatievlaanderen/building-registry/compare/v3.32.3...v3.32.4) (2022-09-09)
 
 
