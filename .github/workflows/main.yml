@@ -188,8 +188,8 @@ jobs:
       shell: bash
       run: |
         echo Deploy Lambda functions to Test
-        echo aws s3 cp /home/runner/work/building-registry/building-registry/dist/BuildingRegistry.Api.BackOffice.Handlers.Sqs.Lambda/linux/lambda.zip s3://s3-vbr-test-basisregisters-lam-sqsbackofficehandlerfunction
-        aws s3 cp /home/runner/work/building-registry/building-registry/dist/BuildingRegistry.Api.BackOffice.Handlers.Sqs.Lambda/linux/lambda.zip s3://s3-vbr-test-basisregisters-lam-sqsbackofficehandlerfunction
+        echo aws s3 cp /home/runner/work/building-registry/building-registry/dist/BuildingRegistry.Api.BackOffice.Handlers.Sqs.Lambda/linux/lambda.zip s3://s3-vbr-test-basisregisters-lam-br-sqsbackofficehandlerfunction
+        aws s3 cp /home/runner/work/building-registry/building-registry/dist/BuildingRegistry.Api.BackOffice.Handlers.Sqs.Lambda/linux/lambda.zip s3://s3-vbr-test-basisregisters-lam-br-sqsbackofficehandlerfunction
         
     - name: Configure AWS credentials (Staging)
       if: env.RELEASE_VERSION != 'none'
@@ -244,8 +244,8 @@ jobs:
 #      shell: bash
 #      run: |
 #        #echo Deploy Lambda functions to Staging
-#        #echo aws s3 cp lambda.zip s3://s3-vbr-staging-basisregisters-lam-sqsbackofficehandlerfunction
-#        #aws s3 cp lambda.zip s3://s3-vbr-staging-basisregisters-lam-sqsbackofficehandlerfunction
+#        #echo aws s3 cp lambda.zip s3://s3-vbr-staging-basisregisters-lam-br-sqsbackofficehandlerfunction
+#        #aws s3 cp lambda.zip s3://s3-vbr-staging-basisregisters-lam-br-sqsbackofficehandlerfunction
 
     - name: Configure AWS credentials (Production)
       if: env.RELEASE_VERSION != 'none'
@@ -300,8 +300,8 @@ jobs:
  #     shell: bash
  #     run: |
  #       #echo Deploy Lambda functions to Production
- #       #echo aws s3 cp lambda.zip s3://s3-vbr-production-basisregisters-lam-sqsbackofficehandlerfunction
- #       #aws s3 cp lambda.zip s3://s3-vbr-production-basisregisters-lam-sqsbackofficehandlerfunction
+ #       #echo aws s3 cp lambda.zip s3://s3-vbr-production-basisregisters-lam-br-sqsbackofficehandlerfunction
+ #       #aws s3 cp lambda.zip s3://s3-vbr-production-basisregisters-lam-br-sqsbackofficehandlerfunction
         
     - name: Publish to NuGet
       if: env.RELEASE_VERSION != 'none'
