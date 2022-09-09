@@ -10,7 +10,7 @@ namespace BuildingRegistry.Building.Events
 
     [EventTags(EventTag.For.Sync, EventTag.For.Edit, Tag.Building)]
     [EventName(EventName)]
-    [EventDescription("Een gebouweenheid gemeenschappelijk deel werd aangemaakt.")]
+    [EventDescription("De gebouweenheid gemeenschappelijkDeel werd automatisch aangemaakt.")]
     public class CommonBuildingUnitWasAddedV2 : IBuildingEvent
     {
         public const string EventName = "CommonBuildingUnitWasAddedV2"; // BE CAREFUL CHANGING THIS!!
@@ -24,7 +24,7 @@ namespace BuildingRegistry.Building.Events
         [EventPropertyDescription("De status van de gebouweenheid. Mogelijkheden: Planned of Realized.")]
         public string BuildingUnitStatus { get; set; }
 
-        [EventPropertyDescription("Geometriemethode van de gebouwpositie. Mogelijkheden: Outlined of MeasuredByGrb.")]
+        [EventPropertyDescription("Geometriemethode van de gebouweenheidpositie. Mogelijkheden: Outlined.")]
         public string GeometryMethod { get; }
 
         [EventPropertyDescription("Extended WKB-voorstelling van de gebouweenheidpositie (Hexadecimale notatie).")]
