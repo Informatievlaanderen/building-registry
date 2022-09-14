@@ -1,3 +1,10 @@
+## [3.32.6](https://github.com/informatievlaanderen/building-registry/compare/v3.32.5...v3.32.6) (2022-09-14)
+
+
+### Bug Fixes
+
+* translate common building unit in extract ([7a6a291](https://github.com/informatievlaanderen/building-registry/commit/7a6a29143ceeb89eb50c850451750ec12d0664a8))
+
 ## [3.32.5](https://github.com/informatievlaanderen/building-registry/compare/v3.32.4...v3.32.5) (2022-09-09)
 
 
