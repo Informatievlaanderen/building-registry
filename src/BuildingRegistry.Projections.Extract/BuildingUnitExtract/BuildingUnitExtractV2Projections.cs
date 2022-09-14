@@ -157,7 +157,7 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
                         id = { Value = $"{extractConfig.Value.DataVlaanderenNamespaceBuildingUnit}/{message.Message.BuildingUnitPersistentLocalId}" },
                         gebouwehid = { Value = message.Message.BuildingUnitPersistentLocalId },
                         gebouwid = { Value = message.Message.BuildingPersistentLocalId.ToString() },
-                        functie = { Value = BuildingUnitFunction.Common },
+                        functie = { Value = MapFunction(BuildingUnitFunction.Common) },
                         status = { Value = MapStatus(BuildingUnitStatus.Parse(message.Message.BuildingUnitStatus)) },
                         posgeommet = { Value = MapGeometryMethod(BuildingUnitPositionGeometryMethod.Parse(message.Message.GeometryMethod)) },
                         versieid = { Value = message.Message.Provenance.Timestamp.ToBelgianDateTimeOffset().FromDateTimeOffset() }
