@@ -43,6 +43,26 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenNotRealizingBuilding
         }
 
         [Fact]
+        public void WithPlannedBuildingUnits_ThenBuildingUnitsWereNotRealized()
+        {
+            var command = Fixture.Create<NotRealizeBuilding>();
+
+            var buildingUnitWasPlannedV2 = Fixture.Create<BuildingUnitWasPlannedV2>();  
+            Assert(new Scenario()
+                .Given(
+                    new BuildingStreamId(Fixture.Create<BuildingPersistentLocalId>()),
+                    Fixture.Create<BuildingWasPlannedV2>(),
+                    buildingUnitWasPlannedV2)
+                .When(command)
+                .Then(new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
+                    new BuildingUnitWasNotRealizedV2(
+                        command.BuildingPersistentLocalId,
+                        new BuildingUnitPersistentLocalId(buildingUnitWasPlannedV2.BuildingUnitPersistentLocalId))),
+                    new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
+                        new BuildingWasNotRealizedV2(command.BuildingPersistentLocalId))));
+        }
+
+        [Fact]
         public void WithStatusNotRealized_ThenDoNothing()
         {
             var command = Fixture.Create<NotRealizeBuilding>();

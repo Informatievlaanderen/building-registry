@@ -101,23 +101,13 @@ namespace BuildingRegistry.Building
         {
             BuildingStatus = BuildingStatus.Realized;
 
-            foreach (var unit in _buildingUnits)
-            {
-                unit.RealizeBecauseBuildingWasRealized();
-            }
-
             _lastEvent = @event;
         }
 
         private void When(BuildingWasNotRealizedV2 @event)
         {
             BuildingStatus = BuildingStatus.NotRealized;
-
-            foreach (var unit in _buildingUnits.PlannedBuildingUnits)
-            {
-                unit.NotRealizeBecauseBuildingWasNotRealized();
-            }
-
+            
             _lastEvent = @event;
         }
 
