@@ -96,6 +96,11 @@ namespace BuildingRegistry.Building
             }
 
             ApplyChange(new BuildingWasRealizedV2(BuildingPersistentLocalId));
+
+            foreach (var unit in _buildingUnits)
+            {
+                unit.RealizeBecauseBuildingWasRealized();
+            }
         }
 
         public void NotRealizeConstruction()
@@ -116,6 +121,11 @@ namespace BuildingRegistry.Building
             if (invalidStatuses.Contains(BuildingStatus))
             {
                 throw new BuildingHasInvalidStatusException();
+            }
+
+            foreach (var unit in _buildingUnits.PlannedBuildingUnits)
+            {
+                unit.NotRealizeBecauseBuildingWasNotRealized();
             }
 
             ApplyChange(new BuildingWasNotRealizedV2(BuildingPersistentLocalId));
