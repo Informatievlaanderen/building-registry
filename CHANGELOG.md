@@ -1,3 +1,10 @@
+## [3.32.7](https://github.com/informatievlaanderen/building-registry/compare/v3.32.6...v3.32.7) (2022-09-19)
+
+
+### Bug Fixes
+
+* change order between building and building unit events ([3046769](https://github.com/informatievlaanderen/building-registry/commit/304676908875cc4108ca3ab52b4ac051ea756cb6))
+
 ## [3.32.6](https://github.com/informatievlaanderen/building-registry/compare/v3.32.5...v3.32.6) (2022-09-14)
 
 
