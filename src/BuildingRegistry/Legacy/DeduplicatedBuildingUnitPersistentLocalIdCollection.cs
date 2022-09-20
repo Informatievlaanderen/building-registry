@@ -3,8 +3,10 @@ namespace BuildingRegistry.Legacy
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Runtime.Serialization;
 
-    public class DeduplicatedBuildingUnitPersistentLocalIdCollection : HashSet<AssignBuildingUnitPersistentLocalIdForCrabTerrainObjectId>
+    [Serializable]
+    public sealed class DeduplicatedBuildingUnitPersistentLocalIdCollection : HashSet<AssignBuildingUnitPersistentLocalIdForCrabTerrainObjectId>
     {
         /*
          GE + Index = unique id
@@ -32,7 +34,9 @@ namespace BuildingRegistry.Legacy
                 if (buildingUnitPersistentLocalIdsByIndex.Count() == 1)
                 {
                     if (!_duplicatesByOriginal.Values.Contains(buildingUnitPersistentLocalIdsByIndex.First()))
+                    {
                         Add(buildingUnitPersistentLocalIdsByIndex.First());
+                    }
                 }
                 else if (buildingUnitPersistentLocalIdsByIndex.Count() == 2)
                 {
@@ -54,12 +58,16 @@ namespace BuildingRegistry.Legacy
                             var original = allByKey.First();
                             var duplicate = allByKey.Skip(1).First();
                             if (_duplicatesByOriginal.ContainsKey(original)) //OF value is duplicate ?
+                            {
                                 continue;
+                            }
 
                             Add(original);
                             _duplicatesByOriginal.Add(original, duplicate);
                             foreach (var assignBuildingUnitPersistentLocalIdForCrabTerrainObjectId in allByKey.Skip(2))
+                            {
                                 Add(assignBuildingUnitPersistentLocalIdForCrabTerrainObjectId);
+                            }
                         }
                     }
                 }
@@ -87,16 +95,21 @@ namespace BuildingRegistry.Legacy
             //    }
             //}
         }
+        
+        private DeduplicatedBuildingUnitPersistentLocalIdCollection(SerializationInfo info, StreamingContext context)
+            : base(info, context)
+        { }
 
-        public bool HasDuplicate(AssignBuildingUnitPersistentLocalIdForCrabTerrainObjectId assignBuildingUnitPersistentLocalId)
+        public override void GetObjectData(SerializationInfo info, StreamingContext context)
         {
-            return _duplicatesByOriginal.ContainsKey(assignBuildingUnitPersistentLocalId);
+            info.AddValue("m_child", _duplicatesByOriginal, typeof(Dictionary<AssignBuildingUnitPersistentLocalIdForCrabTerrainObjectId, AssignBuildingUnitPersistentLocalIdForCrabTerrainObjectId>));
+            base.GetObjectData(info, context);
         }
 
-        public AssignBuildingUnitPersistentLocalIdForCrabTerrainObjectId GetDuplicate(
-            AssignBuildingUnitPersistentLocalIdForCrabTerrainObjectId originalBuildingUnitPersistentLocalId)
-        {
-            return _duplicatesByOriginal[originalBuildingUnitPersistentLocalId];
-        }
+        public bool HasDuplicate(AssignBuildingUnitPersistentLocalIdForCrabTerrainObjectId assignBuildingUnitPersistentLocalId) =>
+            _duplicatesByOriginal.ContainsKey(assignBuildingUnitPersistentLocalId);
+
+        public AssignBuildingUnitPersistentLocalIdForCrabTerrainObjectId GetDuplicate(AssignBuildingUnitPersistentLocalIdForCrabTerrainObjectId originalBuildingUnitPersistentLocalId) =>
+            _duplicatesByOriginal[originalBuildingUnitPersistentLocalId];
     }
 }
