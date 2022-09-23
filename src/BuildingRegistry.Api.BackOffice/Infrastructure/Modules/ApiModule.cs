@@ -54,7 +54,7 @@ namespace BuildingRegistry.Api.BackOffice.Infrastructure.Modules
             builder.RegisterModule(new BackOfficeModule(_configuration, _services, _loggerFactory));
             builder.RegisterModule(new EditModule(_configuration, _services, _loggerFactory));
             builder.RegisterModule(new MediatRModule());
-            builder.RegisterModule(new TicketingModule(_configuration));
+            builder.RegisterModule(new TicketingModule(_configuration, _services));
 
             builder.Populate(_services);
         }
