@@ -3,8 +3,6 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Sqs.Lambda
     using System.Threading;
     using System.Threading.Tasks;
     using Be.Vlaanderen.Basisregisters.Aws.Lambda;
-    using BuildingRegistry.Api.BackOffice.Abstractions.Building.Requests;
-    using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Requests;
     using MediatR;
 
     public class MessageHandler : IMessageHandler

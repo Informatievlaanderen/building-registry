@@ -5,6 +5,7 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.Building.Validators
         public static class Building
         {
             public const string BuildingNotFound = "GebouwNietGevonden";
+            public const string BuildingRemoved = "GebouwIsVerwijderd";
             public const string InvalidPolygonGeometry = "GebouwPolygoonValidatie";
             public const string BuildingCannotBePlacedUnderConstruction = "GebouwGehistoreerdGerealiseerdOfNietGerealiseerd";
             public const string BuildingCannotBeRealizedException = "GebouwGehistoreerdGeplandOfNietGerealiseerd";
