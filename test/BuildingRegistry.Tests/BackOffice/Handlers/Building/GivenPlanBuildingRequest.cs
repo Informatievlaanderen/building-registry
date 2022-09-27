@@ -44,9 +44,9 @@ namespace BuildingRegistry.Tests.BackOffice.Handlers.Building
             var response = await _sut.Handle(planBuildingRequest, CancellationToken.None);
 
             response.Should().NotBeNull();
-            
+
             response.BuildingPersistentLocalId.Should().Be(generateNextPersistentLocalId);
-            
+
             var stream = await Container.Resolve<IStreamStore>().ReadStreamBackwards(new StreamId(new BuildingStreamId(new BuildingPersistentLocalId(generateNextPersistentLocalId))), 0, 1); //1 = version of stream (zero based)
             stream.Messages.First().JsonMetadata.Should().Contain(response.LastEventHash);
         }

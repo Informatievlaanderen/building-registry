@@ -3,7 +3,6 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenNotRealizingBuilding
     using System;
     using System.Threading;
     using System.Threading.Tasks;
-    using Autofac;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
     using BuildingRegistry.Api.BackOffice.Abstractions.Building.Requests;
@@ -16,7 +15,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenNotRealizingBuilding
     using Xunit;
     using Xunit.Abstractions;
 
-    public class GivenAggregateNotFoundException : BuildingRegistryBackOfficeTest
+    public class GivenAggregateNotFoundException : BackOfficeApiTest
     {
         private readonly BuildingController _controller;
 
@@ -40,9 +39,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenNotRealizingBuilding
                 .Throws(new AggregateNotFoundException(buildingPersistentLocalId, typeof(Building)));
 
             //Act
-            Func<Task> act = async () => await _controller.NotRealize(
-                Container.Resolve<IBuildings>(),
-                ResponseOptions,
+            Func<Task> act = async () => await _controller.NotRealize(ResponseOptions,
                 new NotRealizeBuildingRequestValidator(),
                 MockIfMatchValidator(true),
                 request,

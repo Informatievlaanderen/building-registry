@@ -4,7 +4,6 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenNotRealizingBuilding
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
-    using Autofac;
     using BuildingRegistry.Api.BackOffice.Abstractions.Building.Requests;
     using BuildingRegistry.Api.BackOffice.Abstractions.Building.Validators;
     using BuildingRegistry.Api.BackOffice.Building;
@@ -16,7 +15,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenNotRealizingBuilding
     using Xunit;
     using Xunit.Abstractions;
 
-    public class GivenBuildingHasInvalidStatusException : BuildingRegistryBackOfficeTest
+    public class GivenBuildingHasInvalidStatusException : BackOfficeApiTest
     {
         private readonly BuildingController _controller;
 
@@ -40,9 +39,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenNotRealizingBuilding
                 .Throws(new BuildingHasInvalidStatusException());
 
             //Act
-            Func<Task> act = async () => await _controller.NotRealize(
-                Container.Resolve<IBuildings>(),
-                ResponseOptions,
+            Func<Task> act = async () => await _controller.NotRealize(ResponseOptions,
                 new NotRealizeBuildingRequestValidator(),
                 MockIfMatchValidator(true),
                 request,
@@ -57,7 +54,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenNotRealizingBuilding
                 .Where(x =>
                     x.Errors.Any(
                         failure => failure.ErrorCode == "GebouwGehistoreerdOfGerealiseerd"
-                                    && failure.ErrorMessage == "Deze actie is enkel toegestaan op gebouwen met status 'gepland' of 'inAanbouw'."));
+                                    && failure.ErrorMessage == "Deze actie is enkel toegestaan op gebouwen met status 'gepland' of 'inAanbouw'."));
         }
     }
 }

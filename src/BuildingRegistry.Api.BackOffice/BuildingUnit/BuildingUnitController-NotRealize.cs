@@ -6,21 +6,24 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
     using System.Threading.Tasks;
     using Abstractions.Building.Validators;
     using Abstractions.BuildingUnit.Requests;
+    using Abstractions.Exceptions;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
     using Be.Vlaanderen.Basisregisters.Api.ETag;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
+    using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Building;
     using BuildingRegistry.Building;
     using BuildingRegistry.Building.Exceptions;
     using FluentValidation;
     using FluentValidation.Results;
-    using Handlers;
+    using Handlers.Sqs.Requests.BuildingUnit;
     using Infrastructure;
     using Infrastructure.Options;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.Extensions.Options;
     using Swashbuckle.AspNetCore.Filters;
+    using IdempotencyException = Handlers.IdempotencyException;
 
     public partial class BuildingUnitController
     {
@@ -49,17 +52,39 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
         {
             try
             {
-                if (!await ifMatchHeaderValidator.IsValidForBuildingUnit(ifMatchHeaderValue, new BuildingUnitPersistentLocalId(request.BuildingUnitPersistentLocalId), ct))
+                if (!await ifMatchHeaderValidator
+                        .IsValidForBuildingUnit(ifMatchHeaderValue, new BuildingUnitPersistentLocalId(request.BuildingUnitPersistentLocalId), ct))
                 {
                     return new PreconditionFailedResult();
                 }
 
+                if (UseSqsToggle.FeatureEnabled)
+                {
+                    var result = await Mediator.Send(
+                        new NotRealizeBuildingUnitSqsRequest
+                        {
+                            Request = request,
+                            Metadata = GetMetadata(),
+                            ProvenanceData = new ProvenanceData(CreateFakeProvenance()),
+                            IfMatchHeaderValue = ifMatchHeaderValue
+                        }, ct);
+
+                    return Accepted(result);
+                }
+
                 request.Metadata = GetMetadata();
-                var response = await _mediator.Send(request, ct);
+                var response = await Mediator.Send(request, ct);
 
                 return new AcceptedWithETagResult(
                     new Uri(string.Format(options.Value.BuildingUnitDetailUrl, request.BuildingUnitPersistentLocalId)),
-                    response.LastEventHash);
+                    response.ETag);
+            }
+            catch (AggregateIdIsNotFoundException)
+            {
+                throw CreateValidationException(
+                    string.Empty, // TODO: see GAWR-2883
+                    string.Empty,
+                    ValidationErrorMessages.BuildingUnit.BuildingUnitIdInvalid(request.BuildingUnitPersistentLocalId));
             }
             catch (IdempotencyException)
             {

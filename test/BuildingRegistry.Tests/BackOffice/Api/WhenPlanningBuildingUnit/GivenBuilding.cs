@@ -18,7 +18,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenPlanningBuildingUnit
     using Xunit;
     using Xunit.Abstractions;
 
-    public class GivenBuilding : BuildingRegistryBackOfficeTest
+    public class GivenBuilding : BackOfficeApiTest
     {
         private readonly BuildingUnitController _controller;
 

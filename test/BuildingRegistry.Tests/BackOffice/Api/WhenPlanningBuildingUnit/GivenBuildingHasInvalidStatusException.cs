@@ -16,7 +16,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenPlanningBuildingUnit
     using Xunit;
     using Xunit.Abstractions;
 
-    public class GivenBuildingUnitCannotBePlannedException : BuildingRegistryBackOfficeTest
+    public class GivenBuildingUnitCannotBePlannedException : BackOfficeApiTest
     {
         private readonly BuildingUnitController _controller;
 
@@ -53,7 +53,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenPlanningBuildingUnit
                 .Result
                 .Where(x => x.Errors.Any(e =>
                     e.ErrorCode == "GebouweenheidGebouwIdNietGerealiseerdofGehistoreerd"
-                    && e.ErrorMessage == "De gebouwId is niet gerealiseerd of gehistoreerd."));
+                    && e.ErrorMessage == "De gebouwId is niet gerealiseerd of gehistoreerd."));
         }
     }
 }

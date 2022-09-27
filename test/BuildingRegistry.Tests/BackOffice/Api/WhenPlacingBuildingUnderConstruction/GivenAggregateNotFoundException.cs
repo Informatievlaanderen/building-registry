@@ -3,8 +3,6 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenPlacingBuildingUnderConstruc
     using System;
     using System.Threading;
     using System.Threading.Tasks;
-    using Autofac;
-    using AutoFixture;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
     using Building;
@@ -17,7 +15,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenPlacingBuildingUnderConstruc
     using Xunit;
     using Xunit.Abstractions;
 
-    public class GivenAggregateNotFoundException : BuildingRegistryBackOfficeTest
+    public class GivenAggregateNotFoundException : BackOfficeApiTest
     {
         private readonly BuildingController _controller;
 
@@ -41,9 +39,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenPlacingBuildingUnderConstruc
                 .Throws(new AggregateNotFoundException(buildingPersistentLocalId, typeof(Building)));
 
             //Act
-            Func<Task> act = async () => await _controller.UnderConstruction(
-                Container.Resolve<IBuildings>(),
-                ResponseOptions,
+            Func<Task> act = async () => await _controller.UnderConstruction(ResponseOptions,
                 new PlaceBuildingUnderConstructionRequestValidator(),
                 MockIfMatchValidator(true),
                 request,

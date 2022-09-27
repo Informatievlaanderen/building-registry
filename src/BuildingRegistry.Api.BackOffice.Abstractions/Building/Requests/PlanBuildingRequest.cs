@@ -9,17 +9,9 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.Building.Requests
     using Newtonsoft.Json;
     using Responses;
     using Swashbuckle.AspNetCore.Filters;
-
-    [DataContract(Name = "PlanGebouw", Namespace = "")]
-    public class PlanBuildingRequest : IRequest<PlanBuildingResponse>
+    
+    public class PlanBuildingRequest : BackOfficePlanBuildingRequest, IRequest<PlanBuildingResponse>
     {
-        /// <summary>
-        /// De schets van het gebouw in GML-3 formaat met Lambert 72 referentie systeem.
-        /// </summary>
-        [DataMember(Name = "GeometriePolygoon", Order = 0)]
-        [JsonProperty(Required = Required.Always)]
-        public string GeometriePolygoon { get; set; }
-
         [JsonIgnore]
         public IDictionary<string, object> Metadata { get; set; }
 

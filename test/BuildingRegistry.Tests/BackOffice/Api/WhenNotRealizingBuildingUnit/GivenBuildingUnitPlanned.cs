@@ -22,7 +22,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenNotRealizingBuildingUnit
     using Xunit;
     using Xunit.Abstractions;
 
-    public class GivenBuildingUnitPlanned : BuildingRegistryBackOfficeTest
+    public class GivenBuildingUnitPlanned : BackOfficeApiTest
     {
         private readonly BuildingUnitController _controller;
 
@@ -38,7 +38,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenNotRealizingBuildingUnit
 
             MockMediator
                 .Setup(x => x.Send(It.IsAny<NotRealizeBuildingUnitRequest>(), CancellationToken.None).Result)
-                .Returns(new ETagResponse(string.Empty));
+                .Returns(new ETagResponse(string.Empty, string.Empty));
 
             var request = new NotRealizeBuildingUnitRequest()
             {
@@ -78,7 +78,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenNotRealizingBuildingUnit
 
             MockMediator
                 .Setup(x => x.Send(It.IsAny<NotRealizeBuildingUnitRequest>(), CancellationToken.None).Result)
-                .Returns(new ETagResponse(string.Empty));
+                .Returns(new ETagResponse(string.Empty, string.Empty));
 
             var request = new NotRealizeBuildingUnitRequest()
             {

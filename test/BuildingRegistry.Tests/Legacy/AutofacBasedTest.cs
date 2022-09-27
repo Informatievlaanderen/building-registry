@@ -2,7 +2,6 @@ namespace BuildingRegistry.Tests.Legacy
 {
     using System.Collections.Generic;
     using Autofac;
-    using AutoFixture;
     using Be.Vlaanderen.Basisregisters.AggregateSource.Snapshotting;
     using Be.Vlaanderen.Basisregisters.AggregateSource.SqlStreamStore.Autofac;
     using Be.Vlaanderen.Basisregisters.AggregateSource.Testing;

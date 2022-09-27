@@ -12,7 +12,6 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wms
     using Building.Events;
     using Fixtures;
     using FluentAssertions;
-    using NetTopologySuite.Index.HPRtree;
     using Projections.Wms.BuildingUnitV2;
     using Tests.Legacy.Autofixture;
     using Xunit;

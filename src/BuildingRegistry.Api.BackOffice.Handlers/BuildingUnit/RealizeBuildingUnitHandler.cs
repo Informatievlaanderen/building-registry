@@ -45,7 +45,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.BuildingUnit
 
             var buildingUnitLastEventHash = await GetBuildingUnitHash(buildingPersistentLocalId, buildingUnitPersistentLocalId, cancellationToken);
 
-            return new ETagResponse(buildingUnitLastEventHash);
+            return new ETagResponse(string.Empty, buildingUnitLastEventHash);
         }
     }
 }

@@ -4,7 +4,6 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenRealizingBuilding
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
-    using Autofac;
     using Building;
     using Building.Exceptions;
     using BuildingRegistry.Api.BackOffice.Abstractions.Building.Requests;
@@ -16,7 +15,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenRealizingBuilding
     using Xunit;
     using Xunit.Abstractions;
 
-    public class GivenBuildingHasInvalidStatusException : BuildingRegistryBackOfficeTest
+    public class GivenBuildingHasInvalidStatusException : BackOfficeApiTest
     {
         private readonly BuildingController _controller;
 
@@ -40,9 +39,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenRealizingBuilding
                 .Throws(new BuildingHasInvalidStatusException());
 
             //Act
-            Func<Task> act = async () => await _controller.Realize(
-                Container.Resolve<IBuildings>(),
-                ResponseOptions,
+            Func<Task> act = async () => await _controller.Realize(ResponseOptions,
                 new RealizeBuildingRequestValidator(),
                 MockIfMatchValidator(true),
                 request,

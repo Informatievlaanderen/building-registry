@@ -2,8 +2,6 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenPlacingBuildingUnderConstruc
 {
     using System.Threading;
     using System.Threading.Tasks;
-    using Autofac;
-    using AutoFixture;
     using Building;
     using BuildingRegistry.Api.BackOffice.Abstractions.Building.Requests;
     using BuildingRegistry.Api.BackOffice.Abstractions.Building.Responses;
@@ -14,7 +12,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenPlacingBuildingUnderConstruc
     using Xunit;
     using Xunit.Abstractions;
 
-    public class GivenBuildingPlanned : BuildingRegistryBackOfficeTest
+    public class GivenBuildingPlanned : BackOfficeApiTest
     {
         private readonly BuildingController _controller;
 
@@ -33,7 +31,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenPlacingBuildingUnderConstruc
 
             MockMediator
                 .Setup(x => x.Send(It.IsAny<PlaceBuildingUnderConstructionRequest>(), CancellationToken.None).Result)
-                .Returns(new ETagResponse(expectedHash));
+                .Returns(new ETagResponse(string.Empty, expectedHash));
 
             var request = new PlaceBuildingUnderConstructionRequest
             {
@@ -41,9 +39,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenPlacingBuildingUnderConstruc
             };
 
             //Act
-            var result = (AcceptedWithETagResult)await _controller.UnderConstruction(
-                Container.Resolve<IBuildings>(),
-                ResponseOptions,
+            var result = (AcceptedWithETagResult)await _controller.UnderConstruction(ResponseOptions,
                 new PlaceBuildingUnderConstructionRequestValidator(),
                 MockIfMatchValidator(true),
                 request,

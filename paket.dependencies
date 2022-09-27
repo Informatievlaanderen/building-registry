@@ -33,8 +33,8 @@ nuget Be.Vlaanderen.Basisregisters.AggregateSource.Testing.Xunit 7.0.0
 
 nuget Be.Vlaanderen.Basisregisters.Api 18.1.1
 
-nuget Be.Vlaanderen.Basisregisters.Aws.DistributedMutex 3.0.0
-nuget Be.Vlaanderen.Basisregisters.Aws.Lambda 1.2.1
+nuget Be.Vlaanderen.Basisregisters.Aws.DistributedMutex 3.0.1
+nuget Be.Vlaanderen.Basisregisters.Aws.Lambda 1.2.4
 
 nuget Be.Vlaanderen.Basisregisters.CommandHandling 7.0.0
 nuget Be.Vlaanderen.Basisregisters.CommandHandling.Idempotency 7.0.0
@@ -62,19 +62,19 @@ nuget Be.Vlaanderen.Basisregisters.DataDog.Tracing.SqlStreamStore 5.0.0
 
 nuget Be.Vlaanderen.Basisregisters.Crab 3.0.0
 
-nuget Be.Vlaanderen.Basisregisters.GrAr.Common 17.20.0
-nuget Be.Vlaanderen.Basisregisters.GrAr.Contracts 17.20.0
-nuget Be.Vlaanderen.Basisregisters.GrAr.Edit 17.20.0
-nuget Be.Vlaanderen.Basisregisters.GrAr.Import 17.20.0
-nuget Be.Vlaanderen.Basisregisters.GrAr.Legacy 17.20.0
-nuget Be.Vlaanderen.Basisregisters.GrAr.Provenance 17.20.0
-nuget Be.Vlaanderen.Basisregisters.GrAr.Extracts 17.20.0
+nuget Be.Vlaanderen.Basisregisters.GrAr.Common 17.24.1
+nuget Be.Vlaanderen.Basisregisters.GrAr.Contracts 17.24.1
+nuget Be.Vlaanderen.Basisregisters.GrAr.Edit 17.24.1
+nuget Be.Vlaanderen.Basisregisters.GrAr.Import 17.24.1
+nuget Be.Vlaanderen.Basisregisters.GrAr.Legacy 17.24.1
+nuget Be.Vlaanderen.Basisregisters.GrAr.Provenance 17.24.1
+nuget Be.Vlaanderen.Basisregisters.GrAr.Extracts 17.24.1
 
 nuget Be.Vlaanderen.Basisregisters.Shaperon 9.0.1
 nuget Be.Vlaanderen.Basisregisters.Shaperon.Geometries 9.0.1
 
-nuget Be.Vlaanderen.Basisregisters.TicketingService.Abstractions 1.7.1
-nuget Be.Vlaanderen.Basisregisters.TicketingService.Proxy.HttpProxy 1.7.1
+nuget Be.Vlaanderen.Basisregisters.TicketingService.Abstractions 1.7.6
+nuget Be.Vlaanderen.Basisregisters.TicketingService.Proxy.HttpProxy 1.7.6
 
 // LAMBDA STUFF
 nuget Amazon.Lambda.Core 2.1.0

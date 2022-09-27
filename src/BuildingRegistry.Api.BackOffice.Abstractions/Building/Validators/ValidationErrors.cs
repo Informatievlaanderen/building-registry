@@ -36,13 +36,14 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.Building.Validators
             public const string InvalidPolygonGeometry = "Ongeldig formaat geometriePolygoon.";
             public const string BuildingCannotBePlacedUnderConstruction = "Deze actie is enkel toegestaan op gebouwen met status 'gepland'.";
             public const string BuildingCannotBeRealizedException = "Deze actie is enkel toegestaan op gebouwen met status 'inAanbouw'.";
-            public const string BuildingCannotBeNotRealizedException = "Deze actie is enkel toegestaan op gebouwen met status 'gepland' of 'inAanbouw'.";
+            public const string BuildingCannotBeNotRealizedException = "Deze actie is enkel toegestaan op gebouwen met status 'gepland' of 'inAanbouw'.";
         }
 
         public static class BuildingUnit
         {
             public static string BuildingInvalid(string buildingPuri)
-                => $"De gebouwId '{buildingPuri}' is niet gekend in het gebouwenregister.";
+                => $"De gebouwId '{buildingPuri}' is niet gekend in het gebouwenregister.";
+            public static string BuildingUnitIdInvalid(int persistentLocalId) => $"De waarde '{persistentLocalId}' is ongeldig.";
 
             public const string BuildingNotFound = "Onbestaand gebouw.";
             public const string BuildingUnitNotFound = "Onbestaande gebouweenheid.";
@@ -50,8 +51,8 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.Building.Validators
             public const string BuildingStatusNotInRealized = "Deze actie is enkel toegestaan binnen een gerealiseerd gebouw.";
             public const string BuildingUnitCannotBeRealized = "Deze actie is enkel toegestaan op gebouweenheden met status 'gepland'.";
             public const string BuildingUnitCannotBeNotRealized = "Deze actie is enkel toegestaan op gebouweenheden met status 'gepland'.";
-            public const string BuildingUnitCannotBePlanned = "De gebouwId is niet gerealiseerd of gehistoreerd.";
-            public const string BuildingUnitOutsideGeometryBuilding = "De positie dient binnen de geometrie van het gebouw te liggen.";
+            public const string BuildingUnitCannotBePlanned = "De gebouwId is niet gerealiseerd of gehistoreerd.";
+            public const string BuildingUnitOutsideGeometryBuilding = "De positie dient binnen de geometrie van het gebouw te liggen.";
             public const string MissingRequiredPosition = "De verplichte parameter 'positie' ontbreekt.";
             public const string InvalidPositionFormat = "De positie is geen geldige gml-puntgeometrie.";
         }

@@ -15,7 +15,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenNotRealizingBuildingUnit
     using Xunit;
     using Xunit.Abstractions;
 
-    public class GivenAggregateNotFoundException : BuildingRegistryBackOfficeTest
+    public class GivenAggregateNotFoundException : BackOfficeApiTest
     {
         private readonly BuildingUnitController _controller;
 
