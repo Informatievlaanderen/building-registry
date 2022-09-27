@@ -9,11 +9,8 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.Building.Requests
     using Newtonsoft.Json;
     using Responses;
 
-    [DataContract(Name = "GebouwInAanbouw", Namespace = "")]
-    public class PlaceBuildingUnderConstructionRequest : IRequest<ETagResponse>
+    public class PlaceBuildingUnderConstructionRequest : BackOfficePlaceBuildingUnderConstructionRequest, IRequest<ETagResponse>
     {
-        public int PersistentLocalId { get; set; }
-
         [JsonIgnore]
         public IDictionary<string, object> Metadata { get; set; }
 

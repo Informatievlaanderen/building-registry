@@ -40,7 +40,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Building
                 buildingPersistentLocalId,
                 cancellationToken);
 
-            return new ETagResponse(buildingHash);
+            return new ETagResponse(string.Empty, buildingHash);
         }
     }
 }

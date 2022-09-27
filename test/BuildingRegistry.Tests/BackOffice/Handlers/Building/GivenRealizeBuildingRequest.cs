@@ -19,7 +19,7 @@ namespace BuildingRegistry.Tests.BackOffice.Handlers.Building
     using Xunit;
     using Xunit.Abstractions;
 
-    public class GivenRealizeBuildingRequest : BuildingRegistryHandlerTest
+    public class GivenRealizeBuildingRequest : BuildingRegistryTest
     {
         private readonly RealizeBuildingHandler _sut;
 
@@ -74,7 +74,7 @@ namespace BuildingRegistry.Tests.BackOffice.Handlers.Building
             actual.BuildingStatus.Should().Be(BuildingStatus.Realized);
 
             var stream = await Container.Resolve<IStreamStore>().ReadStreamBackwards(new StreamId(BuildingStreamId), fromVersionInclusive: 1, maxCount: 1); // 1 = fromVersionInclusive of stream (zero based)
-            stream.Messages.First().JsonMetadata.Should().Contain(result.LastEventHash);
+            stream.Messages.First().JsonMetadata.Should().Contain(result.ETag);
         }
 
         [Fact]
@@ -108,7 +108,7 @@ namespace BuildingRegistry.Tests.BackOffice.Handlers.Building
             actual.BuildingStatus.Should().Be(BuildingStatus.Realized);
 
             var stream = await Container.Resolve<IStreamStore>().ReadStreamBackwards(new StreamId(BuildingStreamId), fromVersionInclusive: 0, maxCount: 1); // 1 = fromVersionInclusive of stream (zero based)
-            stream.Messages.First().JsonMetadata.Should().Contain(result.LastEventHash);
+            stream.Messages.First().JsonMetadata.Should().Contain(result.ETag);
         }
     }
 }

@@ -1,6 +1,5 @@
 namespace BuildingRegistry.Tests.BackOffice.Api.WhenNotRealizingBuilding
 {
-    using Autofac;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
     using BuildingRegistry.Api.BackOffice.Abstractions.Building.Requests;
     using BuildingRegistry.Api.BackOffice.Abstractions.Building.Validators;
@@ -16,7 +15,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenNotRealizingBuilding
     using Xunit;
     using Xunit.Abstractions;
 
-    public class GivenBuildingIsRemovedException : BuildingRegistryBackOfficeTest
+    public class GivenBuildingIsRemovedException : BackOfficeApiTest
     {
         private readonly BuildingController _controller;
 
@@ -40,9 +39,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenNotRealizingBuilding
                 .Throws(new BuildingIsRemovedException(buildingPersistentLocalId));
 
             //Act
-            Func<Task> act = async () => await _controller.NotRealize(
-                Container.Resolve<IBuildings>(),
-                ResponseOptions,
+            Func<Task> act = async () => await _controller.NotRealize(ResponseOptions,
                 new NotRealizeBuildingRequestValidator(),
                 MockIfMatchValidator(true),
                 request,

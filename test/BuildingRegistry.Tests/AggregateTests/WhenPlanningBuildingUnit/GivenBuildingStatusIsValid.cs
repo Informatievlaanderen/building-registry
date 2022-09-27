@@ -1,4 +1,4 @@
-﻿namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuildingUnit
+namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuildingUnit
 {
     using System.Collections.Generic;
     using AutoFixture;
@@ -8,7 +8,6 @@
     using Building;
     using Building.Commands;
     using Building.Events;
-    using Building.Exceptions;
     using Fixtures;
     using Xunit;
     using Xunit.Abstractions;

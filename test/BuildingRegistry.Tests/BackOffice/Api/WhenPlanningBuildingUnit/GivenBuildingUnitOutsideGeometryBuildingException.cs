@@ -16,7 +16,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenPlanningBuildingUnit
     using Xunit;
     using Xunit.Abstractions;
 
-    public class GivenBuildingUnitOutsideGeometryBuildingException : BuildingRegistryBackOfficeTest
+    public class GivenBuildingUnitOutsideGeometryBuildingException : BackOfficeApiTest
     {
         private readonly BuildingUnitController _controller;
 
@@ -53,7 +53,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenPlanningBuildingUnit
                 .Result
                 .Where(x => x.Errors.Any(e =>
                     e.ErrorCode == "GebouweenheidOngeldigePositieValidatie"
-                    && e.ErrorMessage == "De positie dient binnen de geometrie van het gebouw te liggen."));
+                    && e.ErrorMessage == "De positie dient binnen de geometrie van het gebouw te liggen."));
         }
     }
 }

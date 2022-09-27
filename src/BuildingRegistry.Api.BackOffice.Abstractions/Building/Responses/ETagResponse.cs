@@ -1,4 +1,4 @@
 namespace BuildingRegistry.Api.BackOffice.Abstractions.Building.Responses
 {
-    public record ETagResponse(string LastEventHash);
+    public record ETagResponse(string Location, string ETag);
 }

@@ -16,7 +16,7 @@ namespace BuildingRegistry.Tests.BackOffice.Infrastructure
     using Xunit;
     using Xunit.Abstractions;
 
-    public class IfBuildingMatchHeaderValidatorTests : BuildingRegistryBackOfficeTest
+    public class IfBuildingMatchHeaderValidatorTests : BuildingRegistryTest
     {
         private readonly FakeBackOfficeContext _backOfficeContext;
 
@@ -57,9 +57,9 @@ namespace BuildingRegistry.Tests.BackOffice.Infrastructure
         {
             // Arrange
             var buildingPersistentLocalId = Fixture.Create<BuildingPersistentLocalId>();
-            
+
             DispatchArrangeCommand(Fixture.Create<PlanBuilding>());
-           
+
             var invalidEtag = new ETag(ETagType.Strong, "NotValidHash");
             var sut = new IfMatchHeaderValidator(Container.Resolve<IBuildings>(), _backOfficeContext);
 

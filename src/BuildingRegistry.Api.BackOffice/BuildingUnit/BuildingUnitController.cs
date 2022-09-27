@@ -1,8 +1,11 @@
 namespace BuildingRegistry.Api.BackOffice.BuildingUnit
 {
     using Be.Vlaanderen.Basisregisters.Api;
+    using Infrastructure.FeatureToggles;
+    using Infrastructure.Options;
     using MediatR;
     using Microsoft.AspNetCore.Mvc;
+    using Microsoft.Extensions.Options;
 
     [ApiVersion("2.0")]
     [AdvertiseApiVersions("2.0")]
@@ -10,12 +13,10 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
     [ApiExplorerSettings(GroupName = "gebouweenheden")]
     public partial class BuildingUnitController : BuildingRegistryController
     {
-        private readonly IMediator _mediator;
-
-        public BuildingUnitController(IMediator mediator)
-            : base(mediator)
-        {
-            _mediator = mediator;
-        }
+        public BuildingUnitController(
+            IMediator mediator,
+            UseSqsToggle useSqsToggle,
+            IOptions<TicketingOptions> ticketingOptions) : base(mediator, useSqsToggle, ticketingOptions)
+        { }
     }
 }

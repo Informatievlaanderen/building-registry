@@ -2,7 +2,6 @@ namespace BuildingRegistry.Tests
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics.Metrics;
     using Autofac;
     using AutoFixture;
     using Be.Vlaanderen.Basisregisters.AggregateSource.Snapshotting;
@@ -16,6 +15,7 @@ namespace BuildingRegistry.Tests
     public class BuildingRegistryTest : AutofacBasedTest
     {
         protected Fixture Fixture { get; }
+        protected string ConfigDetailUrl => "http://base/{0}";
         protected Newtonsoft.Json.JsonSerializerSettings EventSerializerSettings { get; } = Be.Vlaanderen.Basisregisters.EventHandling.EventsJsonSerializerSettingsProvider.CreateSerializerSettings();
 
         public void DispatchArrangeCommand<T>(T command) where T : IHasCommandProvenance
@@ -61,7 +61,7 @@ namespace BuildingRegistry.Tests
 
                 return statusses[new Random(Fixture.Create<int>()).Next(0, statusses.Count - 1)];
             });
-            
+
             Fixture.Register(() =>
             {
                 var method = new List<BuildingRegistry.Legacy.BuildingUnitPositionGeometryMethod>
@@ -79,7 +79,11 @@ namespace BuildingRegistry.Tests
             var configuration = new ConfigurationBuilder()
                 .AddInMemoryCollection(new Dictionary<string, string> { { "ConnectionStrings:Events", "x" } })
                 .AddInMemoryCollection(new Dictionary<string, string> { { "ConnectionStrings:Snapshots", "x" } })
+                .AddInMemoryCollection(new Dictionary<string, string> { { "BuildingDetailUrl", ConfigDetailUrl } })
+                .AddInMemoryCollection(new Dictionary<string, string> { { "BuildingUnitDetailUrl", ConfigDetailUrl } })
                 .Build();
+
+            builder.Register((a) => (IConfiguration)configuration);
 
             builder
                 .RegisterModule(new Infrastructure.Modules.CommandHandlingModule(configuration))

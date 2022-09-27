@@ -4,7 +4,6 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenNotRealizingBuildingUnit
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
-    using BackOffice;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
     using Building;
     using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Requests;
@@ -15,7 +14,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenNotRealizingBuildingUnit
     using Xunit;
     using Xunit.Abstractions;
 
-    public class GivenAggregateNotFoundException : BuildingRegistryBackOfficeTest
+    public class GivenAggregateNotFoundException : BackOfficeApiTest
     {
         private readonly BuildingUnitController _controller;
 
