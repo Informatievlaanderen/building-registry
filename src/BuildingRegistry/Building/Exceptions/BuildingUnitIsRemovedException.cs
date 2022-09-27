@@ -6,6 +6,9 @@ namespace BuildingRegistry.Building.Exceptions
     [Serializable]
     public sealed class BuildingUnitIsRemovedException : BuildingRegistryException
     {
+        public BuildingUnitIsRemovedException()
+        { }
+        
         public BuildingUnitIsRemovedException(int persistentLocalId)
             : base($"BuildingUnit with Id '{persistentLocalId}' is removed.")
         { }

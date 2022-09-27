@@ -4,10 +4,6 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenPlacingBuildingUnderConstruc
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
-    using Autofac;
-    using AutoFixture;
-    using Be.Vlaanderen.Basisregisters.AggregateSource;
-    using Be.Vlaanderen.Basisregisters.Api.Exceptions;
     using Building;
     using Building.Exceptions;
     using BuildingRegistry.Api.BackOffice.Abstractions.Building.Requests;
@@ -15,12 +11,11 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenPlacingBuildingUnderConstruc
     using BuildingRegistry.Api.BackOffice.Building;
     using FluentAssertions;
     using FluentValidation;
-    using Microsoft.AspNetCore.Http;
     using Moq;
     using Xunit;
     using Xunit.Abstractions;
 
-    public class GivenBuildingCannotBePlaceUnderConstructionException : BuildingRegistryBackOfficeTest
+    public class GivenBuildingCannotBePlaceUnderConstructionException : BackOfficeApiTest
     {
         private readonly BuildingController _controller;
 
@@ -44,9 +39,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenPlacingBuildingUnderConstruc
                 .Throws(new BuildingHasInvalidStatusException());
 
             //Act
-            Func<Task> act = async () => await _controller.UnderConstruction(
-                Container.Resolve<IBuildings>(),
-                ResponseOptions,
+            Func<Task> act = async () => await _controller.UnderConstruction(ResponseOptions,
                 new PlaceBuildingUnderConstructionRequestValidator(),
                 MockIfMatchValidator(true),
                 request,

@@ -2,7 +2,6 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Extensions
 {
     using BuildingRegistry.Building;
     using BuildingRegistry.Building.Exceptions;
-    using BuildingUnitIsNotFoundException = Exceptions.BuildingUnitIsNotFoundException;
 
     public static class BackOfficeContextExtensions
     {

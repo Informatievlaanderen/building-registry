@@ -16,7 +16,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenPlanningBuildingUnit
     using Xunit;
     using Xunit.Abstractions;
 
-    public class GivenAggregateNotFoundException : BuildingRegistryBackOfficeTest
+    public class GivenAggregateNotFoundException : BackOfficeApiTest
     {
         private readonly BuildingUnitController _controller;
 
@@ -54,7 +54,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenPlanningBuildingUnit
                 .Result
                 .Where(x => x.Errors.Any(e =>
                     e.ErrorCode == "GebouweenheidGebouwIdNietGekendValidatie"
-                    && e.ErrorMessage == $"De gebouwId '{request.GebouwId}' is niet gekend in het gebouwenregister."));
+                    && e.ErrorMessage == $"De gebouwId '{request.GebouwId}' is niet gekend in het gebouwenregister."));
         }
     }
 }

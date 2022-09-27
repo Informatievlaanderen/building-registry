@@ -9,11 +9,13 @@ namespace BuildingRegistry.Api.BackOffice.Building
     using Be.Vlaanderen.Basisregisters.AggregateSource;
     using Be.Vlaanderen.Basisregisters.Api.ETag;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
+    using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using BuildingRegistry.Building;
     using BuildingRegistry.Building.Exceptions;
     using FluentValidation;
     using FluentValidation.Results;
     using Handlers;
+    using Handlers.Sqs.Requests.Building;
     using Infrastructure;
     using Infrastructure.Options;
     using Microsoft.AspNetCore.Http;
@@ -26,7 +28,6 @@ namespace BuildingRegistry.Api.BackOffice.Building
         /// <summary>
         /// Gebouw in aanbouw zetten.
         /// </summary>
-        /// <param name="buildingsRepository"></param>
         /// <param name="options"></param>
         /// <param name="ifMatchHeaderValidator"></param>
         /// <param name="request"></param>
@@ -44,7 +45,6 @@ namespace BuildingRegistry.Api.BackOffice.Building
         [SwaggerResponseExample(StatusCodes.Status400BadRequest, typeof(BadRequestResponseExamples))]
         [SwaggerResponseExample(StatusCodes.Status500InternalServerError, typeof(InternalServerErrorResponseExamples))]
         public async Task<IActionResult> UnderConstruction(
-            [FromServices] IBuildings buildingsRepository,
             [FromServices] IOptions<ResponseOptions> options,
             [FromServices] IValidator<PlaceBuildingUnderConstructionRequest> validator,
             [FromServices] IIfMatchHeaderValidator ifMatchHeaderValidator,
@@ -64,11 +64,25 @@ namespace BuildingRegistry.Api.BackOffice.Building
                     return new PreconditionFailedResult();
                 }
 
-                var response = await _mediator.Send(request, cancellationToken);
+                if (UseSqsToggle.FeatureEnabled)
+                {
+                    var result = await Mediator.Send(
+                        new PlaceBuildingUnderConstructionSqsRequest
+                        {
+                            Request = request,
+                            Metadata = GetMetadata(),
+                            ProvenanceData = new ProvenanceData(CreateFakeProvenance()),
+                            IfMatchHeaderValue = ifMatchHeaderValue
+                        }, cancellationToken);
+
+                    return Accepted(result);
+                }
+
+                var response = await Mediator.Send(request, cancellationToken);
 
                 return new AcceptedWithETagResult(
                     new Uri(string.Format(options.Value.BuildingDetailUrl, request.PersistentLocalId)),
-                    response.LastEventHash);
+                    response.ETag);
             }
             catch (IdempotencyException)
             {

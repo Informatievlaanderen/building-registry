@@ -2,7 +2,6 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuildingUnit
 {
     using System.Collections.Generic;
     using AutoFixture;
-    using Be.Vlaanderen.Basisregisters.AggregateSource;
     using Be.Vlaanderen.Basisregisters.AggregateSource.Testing;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Building;

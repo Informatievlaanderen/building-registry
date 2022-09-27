@@ -18,7 +18,7 @@ namespace BuildingRegistry.Tests.BackOffice.Infrastructure
     using Xunit;
     using Xunit.Abstractions;
 
-    public class IfBuildingUnitMatchHeaderValidatorTests : BuildingRegistryBackOfficeTest
+    public class IfBuildingUnitMatchHeaderValidatorTests : BuildingRegistryTest
     {
         private readonly FakeBackOfficeContext _backOfficeContext;
 

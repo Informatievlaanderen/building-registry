@@ -2,7 +2,6 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenPlanningBuilding
 {
     using System.Threading;
     using System.Threading.Tasks;
-    using BackOffice;
     using BuildingRegistry.Api.BackOffice.Abstractions.Building.Requests;
     using BuildingRegistry.Api.BackOffice.Abstractions.Building.Responses;
     using BuildingRegistry.Api.BackOffice.Building;
@@ -13,7 +12,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenPlanningBuilding
     using Xunit;
     using Xunit.Abstractions;
 
-    public class GivenNoBuildingExists : BuildingRegistryBackOfficeTest
+    public class GivenNoBuildingExists : BackOfficeApiTest
     {
         private readonly BuildingController _controller;
 

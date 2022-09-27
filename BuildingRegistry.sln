@@ -90,7 +90,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BuildingRegistry.Api.BackOf
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BuildingRegistry.Api.BackOffice.Handlers.Sqs", "src\BuildingRegistry.Api.BackOffice.Handlers.Sqs\BuildingRegistry.Api.BackOffice.Handlers.Sqs.csproj", "{5CDC43F9-263A-4416-B998-F4DD297A5011}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BuildingRegistry.Api.BackOffice.Handlers.Sqs.Lambda", "src\BuildingRegistry.Api.BackOffice.Handlers.Sqs.Lambda\BuildingRegistry.Api.BackOffice.Handlers.Sqs.Lambda.csproj", "{984EB1FD-D6EC-4023-8FDF-3BA2B74157BF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BuildingRegistry.Api.BackOffice.Handlers.Lambda", "src\BuildingRegistry.Api.BackOffice.Handlers.Lambda\BuildingRegistry.Api.BackOffice.Handlers.Lambda.csproj", "{984EB1FD-D6EC-4023-8FDF-3BA2B74157BF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

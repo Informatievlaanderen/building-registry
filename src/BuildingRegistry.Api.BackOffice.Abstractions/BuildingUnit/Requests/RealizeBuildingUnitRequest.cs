@@ -8,12 +8,9 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Requests
     using BuildingRegistry.Building.Commands;
     using MediatR;
     using Newtonsoft.Json;
-
-    [DataContract(Name = "RealiseerGebouweenheid", Namespace = "")]
-    public class RealizeBuildingUnitRequest : IRequest<ETagResponse>
+    
+    public class RealizeBuildingUnitRequest : BackOfficeRealizeBuildingUnitRequest, IRequest<ETagResponse>
     {
-        public int BuildingUnitPersistentLocalId { get; set; }
-
         [JsonIgnore]
         public IDictionary<string, object> Metadata { get; set; }
 

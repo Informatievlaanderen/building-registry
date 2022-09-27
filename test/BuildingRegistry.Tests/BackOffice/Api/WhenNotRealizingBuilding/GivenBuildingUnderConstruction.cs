@@ -1,6 +1,5 @@
 namespace BuildingRegistry.Tests.BackOffice.Api.WhenNotRealizingBuilding
 {
-    using Autofac;
     using BuildingRegistry.Api.BackOffice.Abstractions.Building.Requests;
     using BuildingRegistry.Api.BackOffice.Abstractions.Building.Responses;
     using BuildingRegistry.Api.BackOffice.Abstractions.Building.Validators;
@@ -13,7 +12,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenNotRealizingBuilding
     using Xunit;
     using Xunit.Abstractions;
 
-    public class GivenBuildingUnderConstruction : BuildingRegistryBackOfficeTest
+    public class GivenBuildingUnderConstruction : BackOfficeApiTest
     {
         private readonly BuildingController _controller;
 
@@ -32,7 +31,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenNotRealizingBuilding
 
             MockMediator
                 .Setup(x => x.Send(It.IsAny<NotRealizeBuildingRequest>(), CancellationToken.None).Result)
-                .Returns(new ETagResponse(expectedHash));
+                .Returns(new ETagResponse(string.Empty, expectedHash));
 
             var request = new NotRealizeBuildingRequest()
             {
@@ -40,9 +39,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenNotRealizingBuilding
             };
 
             //Act
-            var result = (AcceptedWithETagResult)await _controller.NotRealize(
-                Container.Resolve<IBuildings>(),
-                ResponseOptions,
+            var result = (AcceptedWithETagResult)await _controller.NotRealize(ResponseOptions,
                 new NotRealizeBuildingRequestValidator(),
                 MockIfMatchValidator(true),
                 request,

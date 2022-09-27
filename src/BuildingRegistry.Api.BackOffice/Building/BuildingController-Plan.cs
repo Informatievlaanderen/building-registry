@@ -4,12 +4,11 @@ namespace BuildingRegistry.Api.BackOffice.Building
     using System.Threading;
     using System.Threading.Tasks;
     using Abstractions.Building.Requests;
-    using Abstractions.Building.Validators;
-    using Be.Vlaanderen.Basisregisters.AggregateSource;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
+    using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using FluentValidation;
     using Handlers;
-    using Handlers.Building;
+    using Handlers.Sqs.Requests.Building;
     using Infrastructure.Options;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
@@ -45,8 +44,21 @@ namespace BuildingRegistry.Api.BackOffice.Building
 
             try
             {
+                if (UseSqsToggle.FeatureEnabled)
+                {
+                    var result = await Mediator.Send(
+                        new PlanBuildingSqsRequest
+                        {
+                            Request = planBuildingRequest,
+                            Metadata = GetMetadata(),
+                            ProvenanceData = new ProvenanceData(CreateFakeProvenance()),
+                        }, cancellationToken);
+
+                    return Accepted(result);
+                }
+
                 planBuildingRequest.Metadata = GetMetadata();
-                var response = await _mediator.Send(planBuildingRequest, cancellationToken);
+                var response = await Mediator.Send(planBuildingRequest, cancellationToken);
 
                 return new AcceptedWithETagResult(
                     new Uri(string.Format(options.Value.BuildingDetailUrl, response.BuildingPersistentLocalId)),
