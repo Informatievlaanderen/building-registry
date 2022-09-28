@@ -1,3 +1,18 @@
+# [3.33.0](https://github.com/informatievlaanderen/building-registry/compare/v3.32.7...v3.33.0) (2022-09-28)
+
+
+### Bug Fixes
+
+* fix format strings ([aa167f2](https://github.com/informatievlaanderen/building-registry/commit/aa167f2a3f5027e06ecc548495911d56e0dba3ba))
+* implement serializable correctly ([6e34a88](https://github.com/informatievlaanderen/building-registry/commit/6e34a88513400bea4e7730862410ca8bc8710155))
+* remove extra braces ([07db5cd](https://github.com/informatievlaanderen/building-registry/commit/07db5cdb03d9dbdf909240773526028fe1fde964))
+
+
+### Features
+
+* refactor to async ([3699178](https://github.com/informatievlaanderen/building-registry/commit/36991788fc8d657bb2029b137b2f1d257d1b037b))
+* refactor to async ([4f5c617](https://github.com/informatievlaanderen/building-registry/commit/4f5c617e147ac78658f4ddf14fc3a161cee2e934))
+
 ## [3.32.7](https://github.com/informatievlaanderen/building-registry/compare/v3.32.6...v3.32.7) (2022-09-19)
 
 
