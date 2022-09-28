@@ -89,8 +89,8 @@ jobs:
 #      shell: bash
 #      run: |
 #        echo Zip lambda functions
-#        echo zip -r lambda.zip /home/runner/work/building-registry/building-registry/dist/BuildingRegistry.Api.BackOffice.Handlers.Sqs.Lambda/linux
-#        zip -r lambda.zip /home/runner/work/building-registry/building-registry/dist/BuildingRegistry.Api.BackOffice.Handlers.Sqs.Lambda/linux
+#        echo zip -r lambda.zip /home/runner/work/building-registry/building-registry/dist/BuildingRegistry.Api.BackOffice.Handlers.Lambda/linux
+#        zip -r lambda.zip /home/runner/work/building-registry/building-registry/dist/BuildingRegistry.Api.BackOffice.Handlers.Lambda/linux
 #
 #    # Deployment of Lambda functions must be done from the Test environment
 #    - name: Deploy Lambda functions
