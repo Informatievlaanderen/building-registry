@@ -39,8 +39,7 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions
         public int BuildingUnitPersistentLocalId { get; set; }
         public int BuildingPersistentLocalId { get; set; }
 
-        private BuildingUnitBuilding()
-        { }
+        private BuildingUnitBuilding() { }
 
         public BuildingUnitBuilding(
             int buildingUnitPersistentLocalId,
