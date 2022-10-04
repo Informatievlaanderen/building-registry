@@ -22,7 +22,9 @@ namespace BuildingRegistry.Building
         public static ExtendedWkbGeometry? CreateEWkb(byte[]? wkb)
         {
             if (wkb == null)
+            {
                 return null;
+            }
             try
             {
                 var geometry = WkbReader.Read(wkb);
