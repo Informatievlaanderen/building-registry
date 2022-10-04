@@ -1,3 +1,10 @@
+## [3.33.4](https://github.com/informatievlaanderen/building-registry/compare/v3.33.3...v3.33.4) (2022-10-04)
+
+
+### Bug Fixes
+
+* lambda container ticketing registration ([d07c1d5](https://github.com/informatievlaanderen/building-registry/commit/d07c1d5e5edd31477437c7d45200744b36981e16))
+
 ## [3.33.3](https://github.com/informatievlaanderen/building-registry/compare/v3.33.2...v3.33.3) (2022-10-04)
 
 
