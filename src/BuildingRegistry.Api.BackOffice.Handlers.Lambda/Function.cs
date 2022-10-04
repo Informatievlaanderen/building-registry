@@ -63,7 +63,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda
                 .As<IConfiguration>()
                 .SingleInstance();
 
-            services.AddHttpProxyTicketing(configuration.GetSection("TicketingService")["BaseUrl"]);
+            services.AddHttpProxyTicketing(configuration.GetSection("TicketingService")["InternalBaseUrl"]);
 
             // RETRY POLICY
             var maxRetryCount = int.Parse(configuration.GetSection("RetryPolicy")["MaxRetryCount"]);
