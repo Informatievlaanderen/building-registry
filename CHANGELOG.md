@@ -1,3 +1,10 @@
+## [3.33.3](https://github.com/informatievlaanderen/building-registry/compare/v3.33.2...v3.33.3) (2022-10-04)
+
+
+### Bug Fixes
+
+* style to trigger build ([32edc7b](https://github.com/informatievlaanderen/building-registry/commit/32edc7bb3384737ee8845b3c67992f90bcf9ae55))
+
 ## [3.33.2](https://github.com/informatievlaanderen/building-registry/compare/v3.33.1...v3.33.2) (2022-10-04)
 
 
