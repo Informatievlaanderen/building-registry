@@ -172,24 +172,26 @@ jobs:
         SEMVER: ${{ env.RELEASE_VERSION }}
         WORKSPACE: ${{ github.workspace }}
         
-    - name: Package Lambda functions        
+    - name: Package Lambda functions
       if: env.RELEASE_VERSION != 'none'
       shell: bash
       run: |
         echo Zip lambda functions
-        pushd /home/runner/work/building-registry/building-registry/dist/BuildingRegistry.Api.BackOffice.Handlers.Lambda/linux
+        pwd
         echo zip -r lambda.zip /home/runner/work/building-registry/building-registry/dist/BuildingRegistry.Api.BackOffice.Handlers.Lambda/linux
+        cd /home/runner/work/building-registry/building-registry/dist/BuildingRegistry.Api.BackOffice.Handlers.Lambda/linux
         zip -r lambda.zip .
-        popd
-        
+
     # Deployment of Lambda functions must be done from the Test environment
-    - name: Deploy Lambda functions to Test
+    - name: Push Lambda functions to Test
       if: env.RELEASE_VERSION != 'none'
       shell: bash
       run: |
-        echo Deploy Lambda functions to Test
-        echo aws s3 cp /home/runner/work/building-registry/building-registry/dist/BuildingRegistry.Api.BackOffice.Handlers.Lambda/linux/lambda.zip s3://s3-vbr-test-basisregisters-lam-br-sqsbackofficehandlerfunction
-        aws s3 cp /home/runner/work/building-registry/building-registry/dist/BuildingRegistry.Api.BackOffice.Handlers.Lambda/linux/lambda.zip s3://s3-vbr-test-basisregisters-lam-br-sqsbackofficehandlerfunction
+        echo Push Lambda functions to Test
+        pushd /home/runner/work/building-registry/building-registry/dist/BuildingRegistry.Api.BackOffice.Handlers.Lambda/linux
+        echo aws s3 cp lambda.zip s3://s3-vbr-test-basisregisters-lam-br-sqsbackofficehandlerfunction/$SEMVER/lambda.zip
+        aws s3 cp lambda.zip s3://s3-vbr-test-basisregisters-lam-br-sqsbackofficehandlerfunction/$SEMVER/lambda.zip
+        popd
         
     - name: Configure AWS credentials (Staging)
       if: env.RELEASE_VERSION != 'none'
@@ -239,13 +241,17 @@ jobs:
         SEMVER: ${{ env.RELEASE_VERSION }}
         WORKSPACE: ${{ github.workspace }}
 
-#    - name: Deploy Lambda functions to Staging
-#      if: env.RELEASE_VERSION != 'none'
-#      shell: bash
-#      run: |
-#        #echo Deploy Lambda functions to Staging
-#        #echo aws s3 cp lambda.zip s3://s3-vbr-staging-basisregisters-lam-br-sqsbackofficehandlerfunction
-#        #aws s3 cp lambda.zip s3://s3-vbr-staging-basisregisters-lam-br-sqsbackofficehandlerfunction
+    - name: Push Lambda functions to Staging
+      if: env.RELEASE_VERSION != 'none'
+      shell: bash
+      run: |
+        echo Push Lambda functions to Staging
+        pushd /home/runner/work/building-registry/building-registry/dist/BuildingRegistry.Api.BackOffice.Handlers.Lambda/linux
+        echo aws s3 cp lambda.zip s3://s3-vbr-stg-basisregisters-lam-br-sqsbackofficehandlerfunction/$SEMVER/lambda.zip
+        aws s3 cp lambda.zip s3://s3-vbr-stg-basisregisters-lam-br-sqsbackofficehandlerfunction/$SEMVER/lambda.zip
+        popd
+      env:
+        SEMVER: ${{ env.RELEASE_VERSION }}
 
     - name: Configure AWS credentials (Production)
       if: env.RELEASE_VERSION != 'none'
