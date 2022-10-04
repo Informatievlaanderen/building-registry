@@ -1,3 +1,10 @@
+## [3.33.2](https://github.com/informatievlaanderen/building-registry/compare/v3.33.1...v3.33.2) (2022-10-04)
+
+
+### Bug Fixes
+
+* remove unused reference ([d28f33a](https://github.com/informatievlaanderen/building-registry/commit/d28f33a952c179892ed67ced4313fa2f67bd346e))
+
 ## [3.33.1](https://github.com/informatievlaanderen/building-registry/compare/v3.33.0...v3.33.1) (2022-09-28)
 
 
