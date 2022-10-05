@@ -1,3 +1,10 @@
+## [3.33.5](https://github.com/informatievlaanderen/building-registry/compare/v3.33.4...v3.33.5) (2022-10-05)
+
+
+### Bug Fixes
+
+* xml serialization syndication ([f37df73](https://github.com/informatievlaanderen/building-registry/commit/f37df73c845474a7220d7c522d3676b9b2c59b89))
+
 ## [3.33.4](https://github.com/informatievlaanderen/building-registry/compare/v3.33.3...v3.33.4) (2022-10-04)
 
 
