@@ -40,7 +40,8 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenRealizingBuilding
 
             //Act
             var result = (AcceptedWithETagResult)await _controller.Realize(ResponseOptions,
-                new RealizeBuildingRequestValidator(),
+                MockValidRequestValidator<RealizeBuildingRequest>(),
+                null,
                 MockIfMatchValidator(true),
                 request,
                 null,

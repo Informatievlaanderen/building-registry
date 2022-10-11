@@ -40,7 +40,8 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenPlacingBuildingUnderConstruc
 
             //Act
             var result = (AcceptedWithETagResult)await _controller.UnderConstruction(ResponseOptions,
-                new PlaceBuildingUnderConstructionRequestValidator(),
+                MockValidRequestValidator<PlaceBuildingUnderConstructionRequest>(),
+                null,
                 MockIfMatchValidator(true),
                 request,
                 null,

@@ -1,10 +1,11 @@
-﻿namespace BuildingRegistry.Tests.BackOffice.Api.WhenPlacingBuildingUnderConstruction
+namespace BuildingRegistry.Tests.BackOffice.Api.WhenPlacingBuildingUnderConstruction
 {
     using System;
     using System.Threading;
     using System.Threading.Tasks;
     using AutoFixture;
     using Be.Vlaanderen.Basisregisters.Api.ETag;
+    using Be.Vlaanderen.Basisregisters.Api.Exceptions;
     using BuildingRegistry.Api.BackOffice.Abstractions.Building.Requests;
     using BuildingRegistry.Api.BackOffice.Abstractions.Building.Validators;
     using BuildingRegistry.Api.BackOffice.Building;
@@ -12,19 +13,24 @@
     using BuildingRegistry.Api.BackOffice.Handlers.Sqs.Requests.Building;
     using Fixtures;
     using FluentAssertions;
+    using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
     using Moq;
+    using SqlStreamStore;
+    using SqlStreamStore.Streams;
     using Xunit;
     using Xunit.Abstractions;
 
     public class GivenSqsToggleEnabled : BackOfficeApiTest
     {
         private readonly BuildingController _controller;
+        private readonly Mock<IStreamStore> _streamStore;
 
         public GivenSqsToggleEnabled(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
         {
             Fixture.Customize(new WithFixedBuildingPersistentLocalId());
 
+            _streamStore = new Mock<IStreamStore>();
             _controller = CreateBuildingControllerWithUser<BuildingController>(useSqs: true);
         }
 
@@ -38,9 +44,13 @@
                 .Setup(x => x.Send(It.IsAny<PlaceBuildingUnderConstructionSqsRequest>(), CancellationToken.None))
                 .Returns(Task.FromResult(expectedLocationResult));
 
+            _streamStore.Setup(x => x.ListStreams(It.IsAny<Pattern>(), It.IsAny<int>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(() => new ListStreamsPage("1", new[] { "1" }, (_, _) => null));
+
             var result = (AcceptedResult)await _controller.UnderConstruction(
                 ResponseOptions,
-                new PlaceBuildingUnderConstructionRequestValidator(),
+                MockValidRequestValidator<PlaceBuildingUnderConstructionRequest>(),
+                new BuildingExistsValidator(_streamStore.Object),
                 MockIfMatchValidator(true),
                 Fixture.Create<PlaceBuildingUnderConstructionRequest>(),
                 ifMatchHeaderValue: null);
@@ -55,13 +65,37 @@
             //Act
             var result = await _controller.UnderConstruction(
                 ResponseOptions,
-                new PlaceBuildingUnderConstructionRequestValidator(),
+                MockValidRequestValidator<PlaceBuildingUnderConstructionRequest>(),
+                new BuildingExistsValidator(_streamStore.Object),
                 MockIfMatchValidator(false),
                 Fixture.Create<PlaceBuildingUnderConstructionRequest>(),
                 "IncorrectIfMatchHeader");
 
             //Assert
             result.Should().BeOfType<PreconditionFailedResult>();
+        }
+
+        [Fact]
+        public async Task WithNonExistingBuildingPersistentLocalId_ThenValidationErrorIsThrown()
+        {
+            //Act
+            var act = async () => await _controller.UnderConstruction(
+                ResponseOptions,
+                new PlaceBuildingUnderConstructionRequestValidator(),
+                new BuildingExistsValidator(_streamStore.Object),
+                MockIfMatchValidator(true),
+                Fixture.Create<PlaceBuildingUnderConstructionRequest>(),
+                null,
+                CancellationToken.None);
+
+            //Assert
+            act
+                .Should()
+                .ThrowAsync<ApiException>()
+                .Result
+                .Where(x =>
+                    x.StatusCode == StatusCodes.Status404NotFound
+                    && x.Message == "Onbestaand gebouw.");
         }
     }
 }

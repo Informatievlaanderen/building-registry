@@ -4,11 +4,10 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenNotRealizingBuilding
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
-    using BuildingRegistry.Api.BackOffice.Abstractions.Building.Requests;
-    using BuildingRegistry.Api.BackOffice.Abstractions.Building.Validators;
-    using BuildingRegistry.Api.BackOffice.Building;
     using Building;
     using Building.Exceptions;
+    using BuildingRegistry.Api.BackOffice.Abstractions.Building.Requests;
+    using BuildingRegistry.Api.BackOffice.Building;
     using FluentAssertions;
     using FluentValidation;
     using Moq;
@@ -40,7 +39,8 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenNotRealizingBuilding
 
             //Act
             Func<Task> act = async () => await _controller.NotRealize(ResponseOptions,
-                new NotRealizeBuildingRequestValidator(),
+                MockValidRequestValidator<NotRealizeBuildingRequest>(),
+                null,
                 MockIfMatchValidator(true),
                 request,
                 null,

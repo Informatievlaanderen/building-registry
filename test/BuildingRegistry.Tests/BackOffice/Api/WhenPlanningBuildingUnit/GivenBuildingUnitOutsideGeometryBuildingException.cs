@@ -44,6 +44,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenPlanningBuildingUnit
             Func<Task> act = async () => await _controller.Plan(
                 ResponseOptions,
                 new PlanBuildingUnitRequestValidator(),
+                null,
                 request,
                 CancellationToken.None);
 
