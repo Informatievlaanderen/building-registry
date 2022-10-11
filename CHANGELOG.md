@@ -1,3 +1,14 @@
+## [3.33.6](https://github.com/informatievlaanderen/building-registry/compare/v3.33.5...v3.33.6) (2022-10-11)
+
+
+### Bug Fixes
+
+* confirm to serializable pattern ([95ee4e7](https://github.com/informatievlaanderen/building-registry/commit/95ee4e77253aac59a9b441ad257992546ddc5002))
+* don't throw general exceptions ([54a8135](https://github.com/informatievlaanderen/building-registry/commit/54a8135a919f256a7d14b18576c08115ffafb238))
+* public field to property ([51186a6](https://github.com/informatievlaanderen/building-registry/commit/51186a6732dac0558fbd6966697cf0b100978fcd))
+* remove unused variable ([5913c4f](https://github.com/informatievlaanderen/building-registry/commit/5913c4ffbe11d4bd1932ec912703b4f80d9ab152))
+* rename parameter ([0c5953b](https://github.com/informatievlaanderen/building-registry/commit/0c5953b429027699d890d7ae391737c06af17731))
+
 ## [3.33.5](https://github.com/informatievlaanderen/building-registry/compare/v3.33.4...v3.33.5) (2022-10-05)
 
 
