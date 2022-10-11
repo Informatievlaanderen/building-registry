@@ -1,5 +1,6 @@
 namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.BuildingUnit
 {
+    using System.Configuration;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
     using Be.Vlaanderen.Basisregisters.Api.ETag;
     using BuildingRegistry.Api.BackOffice.Abstractions.Building.Responses;
@@ -38,7 +39,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.BuildingUnit
             DetailUrlFormat = configuration["BuildingUnitDetailUrl"];
             if (string.IsNullOrEmpty(DetailUrlFormat))
             {
-                throw new NullReferenceException("'BuildingUnitDetailUrl' cannot be found in the configuration");
+                throw new ConfigurationErrorsException("'BuildingUnitDetailUrl' cannot be found in the configuration");
             }
         }
 
@@ -97,7 +98,9 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.BuildingUnit
         private async Task ValidateIfMatchHeaderValue(TSqsLambdaRequest request, CancellationToken cancellationToken)
         {
             if (string.IsNullOrWhiteSpace(request.IfMatchHeaderValue) || request is not Abstractions.IHasBuildingUnitPersistentLocalId id)
+            {
                 return;
+            }
 
             var lastHash = await GetHash(
                 request.BuildingPersistentLocalId,

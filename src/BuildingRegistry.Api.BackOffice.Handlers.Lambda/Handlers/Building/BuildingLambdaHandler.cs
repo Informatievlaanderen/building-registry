@@ -1,5 +1,6 @@
 namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.Building
 {
+    using System.Configuration;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
     using Be.Vlaanderen.Basisregisters.Api.ETag;
     using BuildingRegistry.Api.BackOffice.Abstractions.Building.Responses;
@@ -38,7 +39,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.Building
             DetailUrlFormat = configuration["BuildingDetailUrl"];
             if (string.IsNullOrEmpty(DetailUrlFormat))
             {
-                throw new NullReferenceException("'BuildingDetailUrl' cannot be found in the configuration");
+                throw new ConfigurationErrorsException("'BuildingDetailUrl' cannot be found in the configuration");
             }
         }
 
