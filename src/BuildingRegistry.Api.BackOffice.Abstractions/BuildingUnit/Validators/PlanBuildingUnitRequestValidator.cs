@@ -13,7 +13,7 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Validators
         {
             RuleFor(x => x.GebouwId)
                 .Must((_, gebouwId) => OsloPuriValidator.TryParseIdentifier(gebouwId, out var _))
-                .WithMessage((_, straatNaamId) => ValidationErrorMessages.BuildingUnit.BuildingInvalid(straatNaamId))
+                .WithMessage((_, gebouwId) => ValidationErrorMessages.BuildingUnit.BuildingInvalid(gebouwId))
                 .WithErrorCode(ValidationErrorCodes.BuildingUnit.BuildingNotFound);
 
             RuleFor(x => x.Positie)

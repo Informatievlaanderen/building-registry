@@ -1,14 +1,13 @@
 namespace BuildingRegistry.Tests.BackOffice.Api.WhenNotRealizingBuilding
 {
-    using BuildingRegistry.Api.BackOffice.Abstractions.Building.Requests;
-    using BuildingRegistry.Api.BackOffice.Abstractions.Building.Responses;
-    using BuildingRegistry.Api.BackOffice.Abstractions.Building.Validators;
-    using BuildingRegistry.Api.BackOffice.Building;
-    using Building;
-    using FluentAssertions;
-    using Moq;
     using System.Threading;
     using System.Threading.Tasks;
+    using Building;
+    using BuildingRegistry.Api.BackOffice.Abstractions.Building.Requests;
+    using BuildingRegistry.Api.BackOffice.Abstractions.Building.Responses;
+    using BuildingRegistry.Api.BackOffice.Building;
+    using FluentAssertions;
+    using Moq;
     using Xunit;
     using Xunit.Abstractions;
 
@@ -40,7 +39,8 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenNotRealizingBuilding
 
             //Act
             var result = (AcceptedWithETagResult)await _controller.NotRealize(ResponseOptions,
-                new NotRealizeBuildingRequestValidator(),
+                MockValidRequestValidator<NotRealizeBuildingRequest>(),
+                null,
                 MockIfMatchValidator(true),
                 request,
                 null,

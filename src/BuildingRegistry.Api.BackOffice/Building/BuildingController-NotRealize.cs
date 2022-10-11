@@ -29,6 +29,7 @@ namespace BuildingRegistry.Api.BackOffice.Building
         /// Gebouw niet realiseren.
         /// </summary>
         /// <param name="options"></param>
+        /// <param name="buildingExistsValidator"></param>
         /// <param name="ifMatchHeaderValidator"></param>
         /// <param name="request"></param>
         /// <param name="validator"></param>
@@ -47,6 +48,7 @@ namespace BuildingRegistry.Api.BackOffice.Building
         public async Task<IActionResult> NotRealize(
             [FromServices] IOptions<ResponseOptions> options,
             [FromServices] IValidator<NotRealizeBuildingRequest> validator,
+            [FromServices] BuildingExistsValidator buildingExistsValidator,
             [FromServices] IIfMatchHeaderValidator ifMatchHeaderValidator,
             [FromRoute] NotRealizeBuildingRequest request,
             [FromHeader(Name = "If-Match")] string? ifMatchHeaderValue,
@@ -68,6 +70,11 @@ namespace BuildingRegistry.Api.BackOffice.Building
 
                 if (UseSqsToggle.FeatureEnabled)
                 {
+                    if (!await buildingExistsValidator.Exists(new BuildingPersistentLocalId(request.PersistentLocalId), cancellationToken))
+                    {
+                        throw new ApiException(ValidationErrorMessages.Building.BuildingNotFound, StatusCodes.Status404NotFound);
+                    }
+
                     var result = await Mediator.Send(
                         new NotRealizeBuildingSqsRequest
                         {

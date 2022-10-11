@@ -3,6 +3,7 @@ namespace BuildingRegistry.Legacy
     using System.Collections.Generic;
     using System.Linq;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
+    using NetTopologySuite.Algorithm;
     using NetTopologySuite.Geometries;
     using NetTopologySuite.IO;
     using Newtonsoft.Json;

@@ -9,8 +9,10 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
     using Abstractions.BuildingUnit.Requests;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
+    using Be.Vlaanderen.Basisregisters.GrAr.Edit.Validators;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Building;
+    using BuildingRegistry.Building;
     using BuildingRegistry.Building.Exceptions;
     using FluentValidation;
     using FluentValidation.Results;
@@ -28,6 +30,7 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
         /// Plan een gebouweenheid in.
         /// </summary>
         /// <param name="options"></param>
+        /// <param name="buildingExistsValidator"></param>
         /// <param name="request"></param>
         /// <param name="validator"></param>
         /// <param name="cancellationToken"></param>
@@ -43,6 +46,7 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
         public async Task<IActionResult> Plan(
             [FromServices] IOptions<ResponseOptions> options,
             [FromServices] IValidator<PlanBuildingUnitRequest> validator,
+            [FromServices] BuildingExistsValidator buildingExistsValidator,
             [FromBody] PlanBuildingUnitRequest request,
             CancellationToken cancellationToken = default)
         {
@@ -52,6 +56,13 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
             {
                 if (UseSqsToggle.FeatureEnabled)
                 {
+                    OsloPuriValidator.TryParseIdentifier(request.GebouwId, out var buildingIdentifier);
+
+                    if (!await buildingExistsValidator.Exists(new BuildingPersistentLocalId(Convert.ToInt32(buildingIdentifier)), cancellationToken))
+                    {
+                        throw new ApiException(ValidationErrorMessages.Building.BuildingNotFound, StatusCodes.Status404NotFound);
+                    }
+
                     var result = await Mediator.Send(
                         new PlanBuildingUnitSqsRequest
                         {

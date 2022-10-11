@@ -1,6 +1,7 @@
 namespace BuildingRegistry.Api.BackOffice.Infrastructure.Modules
 {
     using Abstractions;
+    using Abstractions.Building.Validators;
     using Autofac;
     using Autofac.Extensions.DependencyInjection;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
@@ -46,6 +47,11 @@ namespace BuildingRegistry.Api.BackOffice.Infrastructure.Modules
                 .RegisterType<IfMatchHeaderValidator>()
                 .As<IIfMatchHeaderValidator>()
                 .AsSelf();
+
+            builder
+                .RegisterType<BuildingExistsValidator>()
+                .AsSelf()
+                .InstancePerLifetimeScope();
 
             builder.RegisterModule(new IdempotencyModule(
                 _services,

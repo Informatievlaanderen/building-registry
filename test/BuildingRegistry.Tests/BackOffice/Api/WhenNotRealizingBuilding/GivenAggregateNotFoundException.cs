@@ -6,7 +6,6 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenNotRealizingBuilding
     using Be.Vlaanderen.Basisregisters.AggregateSource;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
     using BuildingRegistry.Api.BackOffice.Abstractions.Building.Requests;
-    using BuildingRegistry.Api.BackOffice.Abstractions.Building.Validators;
     using BuildingRegistry.Api.BackOffice.Building;
     using BuildingRegistry.Building;
     using FluentAssertions;
@@ -40,7 +39,8 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenNotRealizingBuilding
 
             //Act
             Func<Task> act = async () => await _controller.NotRealize(ResponseOptions,
-                new NotRealizeBuildingRequestValidator(),
+                MockValidRequestValidator<NotRealizeBuildingRequest>(),
+                null,
                 MockIfMatchValidator(true),
                 request,
                 null,

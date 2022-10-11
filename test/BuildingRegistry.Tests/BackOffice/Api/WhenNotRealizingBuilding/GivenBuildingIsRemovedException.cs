@@ -1,17 +1,16 @@
 namespace BuildingRegistry.Tests.BackOffice.Api.WhenNotRealizingBuilding
 {
-    using Be.Vlaanderen.Basisregisters.Api.Exceptions;
-    using BuildingRegistry.Api.BackOffice.Abstractions.Building.Requests;
-    using BuildingRegistry.Api.BackOffice.Abstractions.Building.Validators;
-    using BuildingRegistry.Api.BackOffice.Building;
-    using Building;
-    using Building.Exceptions;
-    using FluentAssertions;
-    using Microsoft.AspNetCore.Http;
-    using Moq;
     using System;
     using System.Threading;
     using System.Threading.Tasks;
+    using Be.Vlaanderen.Basisregisters.Api.Exceptions;
+    using Building;
+    using Building.Exceptions;
+    using BuildingRegistry.Api.BackOffice.Abstractions.Building.Requests;
+    using BuildingRegistry.Api.BackOffice.Building;
+    using FluentAssertions;
+    using Microsoft.AspNetCore.Http;
+    using Moq;
     using Xunit;
     using Xunit.Abstractions;
 
@@ -29,7 +28,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenNotRealizingBuilding
         {
             var buildingPersistentLocalId = new BuildingPersistentLocalId(123);
 
-            var request = new NotRealizeBuildingRequest()
+            var request = new NotRealizeBuildingRequest
             {
                 PersistentLocalId = buildingPersistentLocalId
             };
@@ -40,7 +39,8 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenNotRealizingBuilding
 
             //Act
             Func<Task> act = async () => await _controller.NotRealize(ResponseOptions,
-                new NotRealizeBuildingRequestValidator(),
+                MockValidRequestValidator<NotRealizeBuildingRequest>(),
+                null,
                 MockIfMatchValidator(true),
                 request,
                 null,
