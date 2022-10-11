@@ -35,8 +35,6 @@ namespace BuildingRegistry.Api.BackOffice.Infrastructure.Modules
 
         protected override void Load(ContainerBuilder builder)
         {
-            var eventSerializerSettings = EventsJsonSerializerSettingsProvider.CreateSerializerSettings();
-
             builder
                 .RegisterModule(new DataDogModule(_configuration));
 
