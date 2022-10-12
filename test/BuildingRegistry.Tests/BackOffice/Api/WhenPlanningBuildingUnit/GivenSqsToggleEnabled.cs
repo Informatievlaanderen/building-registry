@@ -43,8 +43,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenPlanningBuildingUnit
                 .Setup(x => x.Send(It.IsAny<PlanBuildingUnitSqsRequest>(), CancellationToken.None))
                 .Returns(Task.FromResult(expectedLocationResult));
 
-            _streamStore.Setup(x => x.ListStreams(It.IsAny<Pattern>(), It.IsAny<int>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(() => new ListStreamsPage("1", new[] { "1" }, (_, _) => null));
+            _streamStore.SetStreamFound();
 
             var planBuildingUnitRequest = Fixture.Create<PlanBuildingUnitRequest>();
             planBuildingUnitRequest.GebouwId = "https://bla/1";
@@ -64,6 +63,9 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenPlanningBuildingUnit
         {
             var planBuildingUnitRequest = Fixture.Create<PlanBuildingUnitRequest>();
             planBuildingUnitRequest.GebouwId = "https://bla/1";
+
+            //Arrange
+            _streamStore.SetStreamNotFound();
 
             //Act
             var act = async () => await _controller.Plan(

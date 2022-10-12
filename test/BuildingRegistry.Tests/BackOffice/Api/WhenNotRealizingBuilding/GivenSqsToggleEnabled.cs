@@ -44,8 +44,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenNotRealizingBuilding
                 .Setup(x => x.Send(It.IsAny<NotRealizeBuildingSqsRequest>(), CancellationToken.None))
                 .Returns(Task.FromResult(expectedLocationResult));
 
-            _streamStore.Setup(x => x.ListStreams(It.IsAny<Pattern>(), It.IsAny<int>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(() => new ListStreamsPage("1", new[] { "1" }, (_, _) => null));
+            _streamStore.SetStreamFound();
 
             var result = (AcceptedResult)await _controller.NotRealize(
                 ResponseOptions,
@@ -78,6 +77,9 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenNotRealizingBuilding
         [Fact]
         public void WithNonExistingBuildingPersistentLocalId_ThenValidationErrorIsThrown()
         {
+            //Arrange
+            _streamStore.SetStreamNotFound();
+
             //Act
             var act = async () => await _controller.NotRealize(
                 ResponseOptions,

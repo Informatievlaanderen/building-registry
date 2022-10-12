@@ -13,6 +13,7 @@
 
   <ItemGroup>
     <Folder Include="AggregateTests\SnapshotTests\" />
+    <Folder Include="TestResults\" />
   </ItemGroup>
 
   <Import Project="..\..\.paket\Paket.Restore.targets" />

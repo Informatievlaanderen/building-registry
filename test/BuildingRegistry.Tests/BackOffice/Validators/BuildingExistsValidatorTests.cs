@@ -20,13 +20,11 @@ namespace BuildingRegistry.Tests.BackOffice.Validators
             var streamStoreMock = new Mock<IStreamStore>();
 
             var buildingPersistentLocalId = new BuildingPersistentLocalId(buildingId);
-            if (expectedResult)
-            {
-                var expectedPattern = Pattern.EndsWith(new BuildingStreamId(buildingPersistentLocalId).ToString());
-                streamStoreMock
-                    .Setup(store => store.ListStreams(It.Is<Pattern>(x => x.Value == expectedPattern.Value), 1, It.IsAny<string>(), It.IsAny<CancellationToken>()))
-                    .ReturnsAsync(() => new ListStreamsPage("1", new[] { buildingPersistentLocalId.ToString() }, (_, _) => null));
-            }
+            var streamId = new BuildingStreamId(buildingPersistentLocalId).ToString();
+
+            streamStoreMock
+                .Setup(store => store.GetStreamMetadata(streamId, CancellationToken.None))
+                .ReturnsAsync(() => expectedResult ? new StreamMetadataResult(streamId, 1) : new StreamMetadataResult(streamId, -1));
 
             var sut = new BuildingExistsValidator(streamStoreMock.Object);
 

@@ -1,11 +1,9 @@
 namespace BuildingRegistry.Api.BackOffice.Abstractions.Building.Validators
 {
-    using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
     using BuildingRegistry.Building;
     using SqlStreamStore;
-    using SqlStreamStore.Streams;
 
     public sealed class BuildingExistsValidator
     {
@@ -18,9 +16,8 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.Building.Validators
 
         public async Task<bool> Exists(BuildingPersistentLocalId buildingPersistentLocalId, CancellationToken cancellationToken)
         {
-            var endsWith = Pattern.EndsWith(new BuildingStreamId(buildingPersistentLocalId).ToString());
-            var page = await _streamStore.ListStreams(endsWith, 1, cancellationToken: cancellationToken);
-            return page?.StreamIds.Any() ?? false;
+            var streamMetadata = await _streamStore.GetStreamMetadata(new BuildingStreamId(buildingPersistentLocalId), cancellationToken);
+            return streamMetadata.MetadataStreamVersion != -1;
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace BuildingRegistry.Tests.BackOffice.Validators
+namespace BuildingRegistry.Tests.BackOffice.Validators
 {
     using BuildingRegistry.Api.BackOffice.Abstractions.Building.Requests;
     using BuildingRegistry.Api.BackOffice.Abstractions.Building.Validators;

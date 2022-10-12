@@ -44,8 +44,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenPlacingBuildingUnderConstruc
                 .Setup(x => x.Send(It.IsAny<PlaceBuildingUnderConstructionSqsRequest>(), CancellationToken.None))
                 .Returns(Task.FromResult(expectedLocationResult));
 
-            _streamStore.Setup(x => x.ListStreams(It.IsAny<Pattern>(), It.IsAny<int>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(() => new ListStreamsPage("1", new[] { "1" }, (_, _) => null));
+            _streamStore.SetStreamFound();
 
             var result = (AcceptedResult)await _controller.UnderConstruction(
                 ResponseOptions,
@@ -76,8 +75,11 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenPlacingBuildingUnderConstruc
         }
 
         [Fact]
-        public async Task WithNonExistingBuildingPersistentLocalId_ThenValidationErrorIsThrown()
+        public void WithNonExistingBuildingPersistentLocalId_ThenValidationErrorIsThrown()
         {
+            //Arrange
+            _streamStore.SetStreamNotFound();
+
             //Act
             var act = async () => await _controller.UnderConstruction(
                 ResponseOptions,
