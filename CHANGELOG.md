@@ -1,3 +1,10 @@
+## [3.34.1](https://github.com/informatievlaanderen/building-registry/compare/v3.34.0...v3.34.1) (2022-10-12)
+
+
+### Bug Fixes
+
+* use getstream metadata to check stream exists ([2ca75d9](https://github.com/informatievlaanderen/building-registry/commit/2ca75d92b7dd257cbfa2adb4beba20e540e46eed))
+
 # [3.34.0](https://github.com/informatievlaanderen/building-registry/compare/v3.33.6...v3.34.0) (2022-10-12)
 
 
