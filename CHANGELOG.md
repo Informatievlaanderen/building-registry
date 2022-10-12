@@ -1,3 +1,15 @@
+# [3.34.0](https://github.com/informatievlaanderen/building-registry/compare/v3.33.6...v3.34.0) (2022-10-12)
+
+
+### Bug Fixes
+
+* change workflow ([f197cdb](https://github.com/informatievlaanderen/building-registry/commit/f197cdb2795d6b0a621b4dae987baf25da6f7636))
+
+
+### Features
+
+* add existing building check in api before sending to handler ([fc916e9](https://github.com/informatievlaanderen/building-registry/commit/fc916e93e4eddc61b87c4a5b9913fa59ad0627a2))
+
 ## [3.33.6](https://github.com/informatievlaanderen/building-registry/compare/v3.33.5...v3.33.6) (2022-10-11)
 
 
