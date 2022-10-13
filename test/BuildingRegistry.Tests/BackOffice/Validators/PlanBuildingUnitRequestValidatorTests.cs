@@ -4,6 +4,8 @@ namespace BuildingRegistry.Tests.BackOffice.Validators
     using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Requests;
     using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Validators;
     using FluentValidation.TestHelper;
+    using Moq;
+    using SqlStreamStore;
     using Xunit;
 
     public class PlanBuildingUnitRequestValidatorTests
@@ -12,14 +14,18 @@ namespace BuildingRegistry.Tests.BackOffice.Validators
 
         public PlanBuildingUnitRequestValidatorTests()
         {
-            _validator = new PlanBuildingUnitRequestValidator();
+            var streamStoreMock = new Mock<IStreamStore>();
+            streamStoreMock.SetStreamNotFound();
+            _validator = new PlanBuildingUnitRequestValidator(new BuildingExistsValidator(streamStoreMock.Object));
         }
 
         [Theory]
         [InlineData("")]
         [InlineData(" ")]
         [InlineData(null)]
-        public void GivenInvalidGeometry_ThenReturnsExpectedFailure(string buildingId)
+        [InlineData("http://bla/a")]
+        [InlineData("http://bla/1")]
+        public void GivenInvalidBuildingId_ThenReturnsExpectedFailure(string buildingId)
         {
             var result = _validator.TestValidate(new PlanBuildingUnitRequest
             {

@@ -46,7 +46,6 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
         public async Task<IActionResult> Plan(
             [FromServices] IOptions<ResponseOptions> options,
             [FromServices] IValidator<PlanBuildingUnitRequest> validator,
-            [FromServices] BuildingExistsValidator buildingExistsValidator,
             [FromBody] PlanBuildingUnitRequest request,
             CancellationToken cancellationToken = default)
         {
@@ -57,11 +56,6 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
                 if (UseSqsToggle.FeatureEnabled)
                 {
                     OsloPuriValidator.TryParseIdentifier(request.GebouwId, out var buildingIdentifier);
-
-                    if (!await buildingExistsValidator.Exists(new BuildingPersistentLocalId(Convert.ToInt32(buildingIdentifier)), cancellationToken))
-                    {
-                        throw new ApiException(ValidationErrorMessages.Building.BuildingNotFound, StatusCodes.Status404NotFound);
-                    }
 
                     var result = await Mediator.Send(
                         new PlanBuildingUnitSqsRequest
