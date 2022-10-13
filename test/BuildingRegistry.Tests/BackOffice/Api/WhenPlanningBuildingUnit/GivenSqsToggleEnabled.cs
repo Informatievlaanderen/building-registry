@@ -1,22 +1,24 @@
 namespace BuildingRegistry.Tests.BackOffice.Api.WhenPlanningBuildingUnit
 {
     using System;
+    using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
     using AutoFixture;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
     using BuildingRegistry.Api.BackOffice.Abstractions.Building.Validators;
     using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Requests;
+    using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Validators;
     using BuildingRegistry.Api.BackOffice.BuildingUnit;
     using BuildingRegistry.Api.BackOffice.Handlers.Sqs.Requests;
     using BuildingRegistry.Api.BackOffice.Handlers.Sqs.Requests.BuildingUnit;
     using Fixtures;
     using FluentAssertions;
+    using FluentValidation;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
     using Moq;
     using SqlStreamStore;
-    using SqlStreamStore.Streams;
     using Xunit;
     using Xunit.Abstractions;
 
@@ -51,7 +53,6 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenPlanningBuildingUnit
             var result = (AcceptedResult)await _controller.Plan(
                 ResponseOptions,
                 MockValidRequestValidator<PlanBuildingUnitRequest>(),
-                new BuildingExistsValidator(_streamStore.Object),
                 planBuildingUnitRequest);
 
             result.Should().NotBeNull();
@@ -70,19 +71,18 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenPlanningBuildingUnit
             //Act
             var act = async () => await _controller.Plan(
                 ResponseOptions,
-                MockValidRequestValidator<PlanBuildingUnitRequest>(),
-                new BuildingExistsValidator(_streamStore.Object),
+                new PlanBuildingUnitRequestValidator(new BuildingExistsValidator(_streamStore.Object)),
                 planBuildingUnitRequest,
                 CancellationToken.None);
 
             //Assert
             act
                 .Should()
-                .ThrowAsync<ApiException>()
+                .ThrowAsync<ValidationException>()
                 .Result
-                .Where(x =>
-                    x.StatusCode == StatusCodes.Status404NotFound
-                    && x.Message == "Onbestaand gebouw.");
+                .Where(x => x.Errors.Any(e =>
+                    e.ErrorCode == "GebouweenheidGebouwIdNietGekendValidatie"
+                    && e.ErrorMessage == $"De gebouwId '{planBuildingUnitRequest.GebouwId}' is niet gekend in het gebouwenregister."));
         }
     }
 }

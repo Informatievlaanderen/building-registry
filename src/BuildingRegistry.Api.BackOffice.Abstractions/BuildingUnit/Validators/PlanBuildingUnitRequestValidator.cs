@@ -4,15 +4,19 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Validators
     using Be.Vlaanderen.Basisregisters.GrAr.Edit.Validators;
     using Building;
     using Building.Validators;
+    using BuildingRegistry.Building;
     using FluentValidation;
     using Requests;
 
     public class PlanBuildingUnitRequestValidator : AbstractValidator<PlanBuildingUnitRequest>
     {
-        public PlanBuildingUnitRequestValidator()
+        public PlanBuildingUnitRequestValidator(BuildingExistsValidator buildingExistsValidator)
         {
             RuleFor(x => x.GebouwId)
-                .Must((_, gebouwId) => OsloPuriValidator.TryParseIdentifier(gebouwId, out var _))
+                .MustAsync(async (gebouwId, ct) => 
+                    OsloPuriValidator.TryParseIdentifier(gebouwId, out var id)
+                    && int.TryParse(id, out var buildingId)
+                    && await buildingExistsValidator.Exists(new BuildingPersistentLocalId(buildingId), ct))
                 .WithMessage((_, gebouwId) => ValidationErrorMessages.BuildingUnit.BuildingInvalid(gebouwId))
                 .WithErrorCode(ValidationErrorCodes.BuildingUnit.BuildingNotFound);
 

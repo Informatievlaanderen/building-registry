@@ -7,6 +7,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenPlanningBuildingUnit
     using Be.Vlaanderen.Basisregisters.GrAr.Edit.Contracts;
     using Building;
     using BuildingRegistry.Api.BackOffice.Abstractions;
+    using BuildingRegistry.Api.BackOffice.Abstractions.Building.Validators;
     using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Requests;
     using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Responses;
     using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Validators;
@@ -15,18 +16,21 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenPlanningBuildingUnit
     using FluentAssertions;
     using FluentValidation;
     using Moq;
+    using SqlStreamStore;
     using Xunit;
     using Xunit.Abstractions;
 
     public class GivenBuilding : BackOfficeApiTest
     {
         private readonly BuildingUnitController _controller;
+        private readonly Mock<IStreamStore> _streamStoreMock;
 
         public GivenBuilding(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
         {
             var buildings = new Mock<IBuildings>();
             var backOfficeContext = new Mock<BackOfficeContext>();
             _controller = CreateBuildingUnitControllerWithUser<BuildingUnitController>();
+            _streamStoreMock = new Mock<IStreamStore>();
         }
 
         [Fact]
@@ -38,6 +42,8 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenPlanningBuildingUnit
             MockMediator
                 .Setup(x => x.Send(It.IsAny<PlanBuildingUnitRequest>(), CancellationToken.None).Result)
                 .Returns(new PlanBuildingUnitResponse(buildingUnitPersistentLocalId, string.Empty));
+
+            _streamStoreMock.SetStreamFound();
 
             var request = new PlanBuildingUnitRequest()
             {
@@ -51,8 +57,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenPlanningBuildingUnit
             //Act
             var result = (AcceptedWithETagResult)await _controller.Plan(
                 ResponseOptions,
-                new PlanBuildingUnitRequestValidator(),
-                null,
+                new PlanBuildingUnitRequestValidator(new BuildingExistsValidator(_streamStoreMock.Object)),
                 request,
                 CancellationToken.None);
 
@@ -80,11 +85,12 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenPlanningBuildingUnit
                 AfwijkingVastgesteld = false
             };
 
+            _streamStoreMock.SetStreamFound();
+
             //Act
             Func<Task> act = async () => await _controller.Plan(
                 ResponseOptions,
-                new PlanBuildingUnitRequestValidator(),
-                null,
+                new PlanBuildingUnitRequestValidator(new BuildingExistsValidator(_streamStoreMock.Object)),
                 request,
                 CancellationToken.None);
 
@@ -112,11 +118,12 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenPlanningBuildingUnit
                 AfwijkingVastgesteld = false
             };
 
+            _streamStoreMock.SetStreamFound();
+
             //Act
             Func<Task> act = async () => await _controller.Plan(
                 ResponseOptions,
-                new PlanBuildingUnitRequestValidator(),
-                null,
+                new PlanBuildingUnitRequestValidator(new BuildingExistsValidator(_streamStoreMock.Object)),
                 request,
                 CancellationToken.None);
 
