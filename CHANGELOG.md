@@ -1,3 +1,10 @@
+## [3.34.2](https://github.com/informatievlaanderen/building-registry/compare/v3.34.1...v3.34.2) (2022-10-13)
+
+
+### Bug Fixes
+
+* verify if building exists by trying to read single message from stream ([15a7608](https://github.com/informatievlaanderen/building-registry/commit/15a7608670aa37df85aa20c1d3a7ba065cbc27e7))
+
 ## [3.34.1](https://github.com/informatievlaanderen/building-registry/compare/v3.34.0...v3.34.1) (2022-10-12)
 
 
