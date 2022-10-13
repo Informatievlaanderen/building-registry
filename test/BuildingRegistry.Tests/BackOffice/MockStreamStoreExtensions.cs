@@ -1,5 +1,6 @@
 namespace BuildingRegistry.Tests.BackOffice
 {
+    using System;
     using System.Threading;
     using AutoFixture;
     using Moq;
@@ -11,15 +12,17 @@ namespace BuildingRegistry.Tests.BackOffice
         public static void SetStreamFound(this Mock<IStreamStore> streamStoreMock)
         {
             streamStoreMock
-                .Setup(store => store.GetStreamMetadata(It.IsAny<string>(), CancellationToken.None))
-                .ReturnsAsync(() => new StreamMetadataResult(new Fixture().Create<string>(), 1));
+                .Setup(store => store.ReadStreamBackwards(It.IsAny<StreamId>(), StreamVersion.End, 1, false, CancellationToken.None))
+                .ReturnsAsync(() =>
+                    new ReadStreamPage(new Fixture().Create<string>(), PageReadStatus.Success, 1, 2, 2, 2, ReadDirection.Backward, false, messages: new []{ new StreamMessage() }));
         }
 
         public static void SetStreamNotFound(this Mock<IStreamStore> streamStoreMock)
         {
             streamStoreMock
-                .Setup(store => store.GetStreamMetadata(It.IsAny<string>(), CancellationToken.None))
-                .ReturnsAsync(() => new StreamMetadataResult(new Fixture().Create<string>(), -1));
+                .Setup(store => store.ReadStreamBackwards(It.IsAny<StreamId>(), StreamVersion.End, 1, false, CancellationToken.None))
+                .ReturnsAsync(() =>
+                    new ReadStreamPage(new Fixture().Create<string>(), PageReadStatus.StreamNotFound, -1, -1, -1, -1, ReadDirection.Backward, false, messages: Array.Empty<StreamMessage>()));
         }
     }
 }
