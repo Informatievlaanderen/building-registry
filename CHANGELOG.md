@@ -1,3 +1,10 @@
+## [3.34.3](https://github.com/informatievlaanderen/building-registry/compare/v3.34.2...v3.34.3) (2022-10-13)
+
+
+### Bug Fixes
+
+* plan buildingunit in no existing building gives 400 ([e14d98b](https://github.com/informatievlaanderen/building-registry/commit/e14d98b33b75d3f6aa00bf06d85dee84b76b0104))
+
 ## [3.34.2](https://github.com/informatievlaanderen/building-registry/compare/v3.34.1...v3.34.2) (2022-10-13)
 
 
