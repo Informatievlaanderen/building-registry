@@ -8,6 +8,7 @@ namespace BuildingRegistry.Building
         private IEnumerable<BuildingUnit> NotRemovedUnits => this.Where(x => !x.IsRemoved);
         public bool DoesNotHaveCommonBuildingUnit => NotRemovedUnits.All(x => x.Function != BuildingUnitFunction.Common);
         public IEnumerable<BuildingUnit> PlannedBuildingUnits => NotRemovedUnits.Where(x => x.Status == BuildingUnitStatus.Planned);
+        public IEnumerable<BuildingUnit> RetiredBuildingUnits => NotRemovedUnits.Where(x => x.Status == BuildingUnitStatus.Retired);
 
         public bool RequiresCommonBuildingUnit =>
             DoesNotHaveCommonBuildingUnit

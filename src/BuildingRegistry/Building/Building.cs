@@ -103,6 +103,38 @@ namespace BuildingRegistry.Building
             }
         }
 
+        public void CorrectRealizeConstruction()
+        {
+            GuardRemovedBuilding();
+
+            if (BuildingStatus == BuildingStatus.UnderConstruction)
+            {
+                return;
+            }
+
+            if (BuildingStatus != BuildingStatus.Realized)
+            {
+                throw new BuildingHasInvalidStatusException();
+            }
+
+            if (BuildingGeometry.Method != BuildingGeometryMethod.Outlined)
+            {
+                throw new BuildingHasInvalidBuildingGeometryMethodException();
+            }
+
+            if (_buildingUnits.RetiredBuildingUnits.Any())
+            {
+                throw new BuildingHasRetiredBuildingUnitsException();
+            }
+
+            foreach (var unit in _buildingUnits)
+            {
+                unit.CorrectRealizeBecauseBuildingWasCorrected();
+            }
+
+            ApplyChange(new BuildingWasCorrectedFromRealizedToUnderConstruction(BuildingPersistentLocalId));
+        }
+
         public void NotRealizeConstruction()
         {
             GuardRemovedBuilding();
