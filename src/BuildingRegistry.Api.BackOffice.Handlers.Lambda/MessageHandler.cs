@@ -59,6 +59,18 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda
                     }, cancellationToken);
                     break;
 
+                case CorrectPlaceBuildingUnderConstructionSqsRequest request:
+                    await mediator.Send(new CorrectPlaceBuildingUnderConstructionLambdaRequest
+                    {
+                        Request = request.Request,
+                        TicketId = request.TicketId,
+                        MessageGroupId = messageMetadata.MessageGroupId!,
+                        IfMatchHeaderValue = request.IfMatchHeaderValue,
+                        Metadata = request.Metadata,
+                        Provenance = request.ProvenanceData.ToProvenance()
+                    }, cancellationToken);
+                    break;
+
                 case PlanBuildingSqsRequest request:
                     await mediator.Send(new PlanBuildingLambdaRequest
                     {

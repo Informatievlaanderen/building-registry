@@ -37,6 +37,7 @@ namespace BuildingRegistry.Building
             Register<BuildingWasMigrated>(When);
             Register<BuildingWasPlannedV2>(When);
             Register<BuildingBecameUnderConstructionV2>(When);
+            Register<BuildingWasCorrectedFromUnderConstructionToPlanned>(When);
             Register<BuildingWasRealizedV2>(When);
             Register<BuildingWasCorrectedFromRealizedToUnderConstruction>(When);
             Register<BuildingWasNotRealizedV2>(When);
@@ -95,6 +96,13 @@ namespace BuildingRegistry.Building
         private void When(BuildingBecameUnderConstructionV2 @event)
         {
             BuildingStatus = BuildingStatus.UnderConstruction;
+
+            _lastEvent = @event;
+        }
+
+        private void When(BuildingWasCorrectedFromUnderConstructionToPlanned @event)
+        {
+            BuildingStatus = BuildingStatus.Planned;
 
             _lastEvent = @event;
         }

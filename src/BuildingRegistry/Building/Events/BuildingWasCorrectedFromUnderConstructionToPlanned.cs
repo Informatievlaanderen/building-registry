@@ -10,10 +10,10 @@ namespace BuildingRegistry.Building.Events
 
     [EventTags(EventTag.For.Sync, EventTag.For.Edit, Tag.Building)]
     [EventName(EventName)]
-    [EventDescription("Het gebouw werd inAanbouw geplaatst.")]
-    public class BuildingBecameUnderConstructionV2 : IBuildingEvent
+    [EventDescription("Het gebouw met status inAanbouw werd gecorrigeerd naar status gepland.")]
+    public class BuildingWasCorrectedFromUnderConstructionToPlanned : IBuildingEvent
     {
-        public const string EventName = "BuildingBecameUnderConstructionV2"; // BE CAREFUL CHANGING THIS!!
+        public const string EventName = "BuildingWasCorrectedFromUnderConstructionToPlanned"; // BE CAREFUL CHANGING THIS!!
 
         [EventPropertyDescription("Objectidentificator van het gebouw.")]
         public int BuildingPersistentLocalId { get; }
@@ -21,13 +21,13 @@ namespace BuildingRegistry.Building.Events
         [EventPropertyDescription("Metadata bij het event.")]
         public ProvenanceData Provenance { get; private set; }
 
-        public BuildingBecameUnderConstructionV2(BuildingPersistentLocalId buildingPersistentLocalId)
+        public BuildingWasCorrectedFromUnderConstructionToPlanned(BuildingPersistentLocalId buildingPersistentLocalId)
         {
             BuildingPersistentLocalId = buildingPersistentLocalId;
         }
 
         [JsonConstructor]
-        private BuildingBecameUnderConstructionV2(
+        private BuildingWasCorrectedFromUnderConstructionToPlanned(
             int buildingPersistentLocalId,
             ProvenanceData provenance)
             : this(
