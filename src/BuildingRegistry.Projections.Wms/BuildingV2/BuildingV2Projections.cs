@@ -65,6 +65,13 @@ namespace BuildingRegistry.Projections.Wms.BuildingV2
                 item.Version = message.Message.Provenance.Timestamp;
             });
 
+            When<Envelope<BuildingWasCorrectedFromUnderConstructionToPlanned>>(async (context, message, ct) =>
+            {
+                var item = await context.BuildingsV2.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);
+                item.Status = BuildingStatus.Planned;
+                item.Version = message.Message.Provenance.Timestamp;
+            });
+
             When<Envelope<BuildingWasRealizedV2>>(async (context, message, ct) =>
             {
                 var item = await context.BuildingsV2.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);

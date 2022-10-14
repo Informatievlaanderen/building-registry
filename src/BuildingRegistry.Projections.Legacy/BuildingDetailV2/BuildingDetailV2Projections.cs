@@ -58,6 +58,14 @@ namespace BuildingRegistry.Projections.Legacy.BuildingDetailV2
                 UpdateHash(item, message);
             });
 
+            When<Envelope<BuildingWasCorrectedFromUnderConstructionToPlanned>>(async (context, message, ct) =>
+            {
+                var item = await context.BuildingDetailsV2.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);
+                item.Status = BuildingStatus.Planned;
+                item.Version = message.Message.Provenance.Timestamp;
+                UpdateHash(item, message);
+            });
+
             When<Envelope<BuildingWasRealizedV2>>(async (context, message, ct) =>
             {
                 var item = await context.BuildingDetailsV2.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);

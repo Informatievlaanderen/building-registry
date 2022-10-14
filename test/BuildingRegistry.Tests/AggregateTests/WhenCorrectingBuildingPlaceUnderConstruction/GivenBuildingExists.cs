@@ -1,4 +1,4 @@
-namespace BuildingRegistry.Tests.AggregateTests.WhenPlacingBuildingUnderConstruction
+namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingPlaceUnderConstruction
 {
     using System.Collections.Generic;
     using AutoFixture;
@@ -24,29 +24,29 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlacingBuildingUnderConstruc
         }
 
         [Fact]
-        public void WithStatusPlanned_ThenBuildingBecameUnderConstruction()
+        public void WithStatusUnderConstruction_ThenBuildingBecamePlanned()
         {
-            var command = Fixture.Create<PlaceBuildingUnderConstruction>();
-
-            Assert(new Scenario()
-                .Given(
-                    new BuildingStreamId(Fixture.Create<BuildingPersistentLocalId>()),
-                    Fixture.Create<BuildingWasPlannedV2>())
-                .When(command)
-                .Then(new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
-                    new BuildingBecameUnderConstructionV2(command.BuildingPersistentLocalId))));
-        }
-
-        [Fact]
-        public void WithStatusUnderConstruction_ThenNone()
-        {
-            var command = Fixture.Create<PlaceBuildingUnderConstruction>();
+            var command = Fixture.Create<CorrectBuildingPlaceUnderConstruction>();
 
             Assert(new Scenario()
                 .Given(
                     new BuildingStreamId(Fixture.Create<BuildingPersistentLocalId>()),
                     Fixture.Create<BuildingWasPlannedV2>(),
                     Fixture.Create<BuildingBecameUnderConstructionV2>())
+                .When(command)
+                .Then(new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
+                    new BuildingWasCorrectedFromUnderConstructionToPlanned(command.BuildingPersistentLocalId))));
+        }
+
+        [Fact]
+        public void WithStatusPlanned_ThenNone()
+        {
+            var command = Fixture.Create<CorrectBuildingPlaceUnderConstruction>();
+
+            Assert(new Scenario()
+                .Given(
+                    new BuildingStreamId(Fixture.Create<BuildingPersistentLocalId>()),
+                    Fixture.Create<BuildingWasPlannedV2>())
                 .When(command)
                 .ThenNone());
         }
@@ -57,7 +57,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlacingBuildingUnderConstruc
         [InlineData("NotRealized")]
         public void WithInvalidStatus_ThrowsBuildingHasInvalidStatusException(string status)
         {
-            var command = Fixture.Create<PlaceBuildingUnderConstruction>();
+            var command = Fixture.Create<CorrectBuildingPlaceUnderConstruction>();
 
             var buildingWasMigrated = new BuildingWasMigrated(
                 Fixture.Create<BuildingId>(),
@@ -82,7 +82,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlacingBuildingUnderConstruc
         [Fact]
         public void BuildingIsRemoved_ThrowsBuildingIsRemovedException()
         {
-            var command = Fixture.Create<PlaceBuildingUnderConstruction>();
+            var command = Fixture.Create<CorrectBuildingPlaceUnderConstruction>();
 
             var buildingWasMigrated = new BuildingWasMigrated(
                 Fixture.Create<BuildingId>(),
@@ -108,9 +108,9 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlacingBuildingUnderConstruc
         public void StateCheck()
         {
             var sut = new BuildingFactory(NoSnapshotStrategy.Instance).Create();
-            sut.Initialize(new List<object>{ Fixture.Create<BuildingWasPlannedV2>() });
-            sut.PlaceUnderConstruction();
-            sut.BuildingStatus.Should().Be(BuildingStatus.UnderConstruction);
+            sut.Initialize(new List<object>{ Fixture.Create<BuildingWasPlannedV2>(), Fixture.Create<PlaceBuildingUnderConstruction>()});
+            sut.CorrectBuildingPlaceUnderConstruction();
+            sut.BuildingStatus.Should().Be(BuildingStatus.Planned);
         }
     }
 }

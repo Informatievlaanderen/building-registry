@@ -74,6 +74,30 @@ namespace BuildingRegistry.Building
             ApplyChange(new BuildingBecameUnderConstructionV2(BuildingPersistentLocalId));
         }
 
+        public void CorrectBuildingPlaceUnderConstruction()
+        {
+            GuardRemovedBuilding();
+
+            if (BuildingStatus == BuildingStatus.Planned)
+            {
+                return;
+            }
+
+            var invalidStatuses = new List<BuildingStatus>
+            {
+                BuildingStatus.Retired,
+                BuildingStatus.Realized,
+                BuildingStatus.NotRealized
+            };
+
+            if (invalidStatuses.Contains(BuildingStatus))
+            {
+                throw new BuildingHasInvalidStatusException();
+            }
+
+            ApplyChange(new BuildingWasCorrectedFromUnderConstructionToPlanned(BuildingPersistentLocalId));
+        }
+
         public void RealizeConstruction()
         {
             GuardRemovedBuilding();
