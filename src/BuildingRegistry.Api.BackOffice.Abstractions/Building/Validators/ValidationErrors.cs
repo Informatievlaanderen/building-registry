@@ -9,7 +9,11 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.Building.Validators
             public const string InvalidPolygonGeometry = "GebouwPolygoonValidatie";
             public const string BuildingCannotBePlacedUnderConstruction = "GebouwGehistoreerdGerealiseerdOfNietGerealiseerd";
             public const string BuildingCannotBeRealizedException = "GebouwGehistoreerdGeplandOfNietGerealiseerd";
+            public const string BuildingCannotBeCorrectedFromRealizedToUnderConstruction = "GebouwGeplandOfGehistoreerdOfNietgerealiseerd";
             public const string BuildingCannotBeNotRealizedException = "GebouwGehistoreerdOfGerealiseerd";
+
+            public const string BuildingIsMeasuredByGrb = "GebouwGeometrieIngemeten";
+            public const string BuildingHasRetiredBuildingUnits = "GebouwBevatGehistoreerdeGebouweenheden";
         }
 
         public static class BuildingUnit
@@ -36,7 +40,11 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.Building.Validators
             public const string InvalidPolygonGeometry = "Ongeldig formaat geometriePolygoon.";
             public const string BuildingCannotBePlacedUnderConstruction = "Deze actie is enkel toegestaan op gebouwen met status 'gepland'.";
             public const string BuildingCannotBeRealizedException = "Deze actie is enkel toegestaan op gebouwen met status 'inAanbouw'.";
+            public const string BuildingCannotBeCorrectedFromRealizedToUnderConstruction = "Deze actie is enkel toegestaan op gebouwen met status 'gerealiseerd'.";
             public const string BuildingCannotBeNotRealizedException = "Deze actie is enkel toegestaan op gebouwen met status 'gepland' of 'inAanbouw'.";
+
+            public const string BuildingIsMeasuredByGrb = "Deze actie is enkel toegestaan op gebouwen met geometriemethode 'ingeschetst'.";
+            public const string BuildingHasRetiredBuildingUnits = "Deze actie is niet toegestaan wanneer er gehistoreerde gebouweenheden aanwezig zijn.";
         }
 
         public static class BuildingUnit

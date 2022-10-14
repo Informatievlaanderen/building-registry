@@ -153,6 +153,61 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wms
         }
 
         [Fact]
+        public async Task WhenBuildingWasRealizedV2()
+        {
+            var buildingWasPlannedV2 = _fixture.Create<BuildingWasPlannedV2>();
+            var buildingWasRealizedV2 = _fixture.Create<BuildingWasRealizedV2>();
+
+            await Sut
+                .Given(
+                    new Envelope<BuildingWasPlannedV2>(
+                        new Envelope(
+                            buildingWasPlannedV2,
+                            new Dictionary<string, object> { { AddEventHashPipe.HashMetadataKey, buildingWasPlannedV2.GetHash() } })),
+                    new Envelope<BuildingWasRealizedV2>(
+                        new Envelope(
+                            buildingWasRealizedV2,
+                            new Dictionary<string, object> { { AddEventHashPipe.HashMetadataKey, buildingWasRealizedV2.GetHash() } })))
+                .Then(async ct =>
+                {
+                    var buildingDetailItemV2 = await ct.BuildingsV2.FindAsync(buildingWasRealizedV2.BuildingPersistentLocalId);
+                    buildingDetailItemV2.Should().NotBeNull();
+                    buildingDetailItemV2!.Status.Should().Be(BuildingStatus.Realized);
+                    buildingDetailItemV2.Version.Should().Be(buildingWasRealizedV2.Provenance.Timestamp);
+                });
+        }
+
+        [Fact]
+        public async Task WhenBuildingWasCorrectedFromRealizedToUnderConstruction()
+        {
+            var buildingWasPlannedV2 = _fixture.Create<BuildingWasPlannedV2>();
+            var buildingWasRealizedV2 = _fixture.Create<BuildingWasRealizedV2>();
+            var buildingWasCorrectedFromRealizedToUnderConstruction = _fixture.Create<BuildingWasCorrectedFromRealizedToUnderConstruction>();
+
+            await Sut
+                .Given(
+                    new Envelope<BuildingWasPlannedV2>(
+                        new Envelope(
+                            buildingWasPlannedV2,
+                            new Dictionary<string, object> { { AddEventHashPipe.HashMetadataKey, buildingWasPlannedV2.GetHash() } })),
+                    new Envelope<BuildingWasRealizedV2>(
+                        new Envelope(
+                            buildingWasRealizedV2,
+                            new Dictionary<string, object> { { AddEventHashPipe.HashMetadataKey, buildingWasRealizedV2.GetHash() } })),
+                    new Envelope<BuildingWasCorrectedFromRealizedToUnderConstruction>(
+                        new Envelope(
+                            buildingWasCorrectedFromRealizedToUnderConstruction,
+                            new Dictionary<string, object> { { AddEventHashPipe.HashMetadataKey, buildingWasCorrectedFromRealizedToUnderConstruction.GetHash() } })))
+                .Then(async ct =>
+                {
+                    var buildingDetailItemV2 = await ct.BuildingsV2.FindAsync(buildingWasRealizedV2.BuildingPersistentLocalId);
+                    buildingDetailItemV2.Should().NotBeNull();
+                    buildingDetailItemV2!.Status.Should().Be(BuildingStatus.UnderConstruction);
+                    buildingDetailItemV2.Version.Should().Be(buildingWasCorrectedFromRealizedToUnderConstruction.Provenance.Timestamp);
+                });
+        }
+
+        [Fact]
         public async Task WhenBuildingWasNotRealizedV2()
         {
             var buildingWasPlannedV2 = _fixture.Create<BuildingWasPlannedV2>();

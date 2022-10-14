@@ -121,6 +121,15 @@ namespace BuildingRegistry.Projections.Extract.BuildingExtract
                 UpdateVersie(item, message.Message.Provenance.Timestamp);
             });
 
+            When<Envelope<BuildingWasCorrectedFromRealizedToUnderConstruction>>(async (context, message, ct) =>
+            {
+                var item = await context.BuildingExtractV2.FindAsync(
+                    message.Message.BuildingPersistentLocalId,
+                    cancellationToken: ct);
+                UpdateStatus(item, MapStatus(BuildingStatus.UnderConstruction));
+                UpdateVersie(item, message.Message.Provenance.Timestamp);
+            });
+
             When<Envelope<BuildingWasNotRealizedV2>>(async (context, message, ct) =>
             {
                 var item = await context.BuildingExtractV2.FindAsync(message.Message.BuildingPersistentLocalId,

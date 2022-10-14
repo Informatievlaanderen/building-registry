@@ -905,6 +905,14 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
                 }, ct);
             });
 
+            When<Envelope<BuildingWasCorrectedFromRealizedToUnderConstruction>>(async (context, message, ct) =>
+            {
+                await context.CreateNewBuildingSyndicationItem(message.Message.BuildingPersistentLocalId, message, item =>
+                {
+                    item.Status = MapBuildingStatus(BuildingRegistry.Building.BuildingStatus.UnderConstruction);
+                }, ct);
+            });
+
             When<Envelope<BuildingWasNotRealizedV2>>(async (context, message, ct) =>
             {
                 await context.CreateNewBuildingSyndicationItem(message.Message.BuildingPersistentLocalId, message, item =>
@@ -943,6 +951,16 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
                 {
                     var unit = item.BuildingUnitsV2.Single(y => y.PersistentLocalId == message.Message.BuildingUnitPersistentLocalId);
                     unit.Status = BuildingRegistry.Building.BuildingUnitStatus.Realized;
+                    unit.Version = message.Message.Provenance.Timestamp;
+                }, ct);
+            });
+
+            When<Envelope<BuildingUnitWasCorrectedFromRealizedToPlannedBecauseBuildingWasCorrected>>(async (context, message, ct) =>
+            {
+                await context.CreateNewBuildingSyndicationItem(message.Message.BuildingPersistentLocalId, message, item =>
+                {
+                    var unit = item.BuildingUnitsV2.Single(y => y.PersistentLocalId == message.Message.BuildingUnitPersistentLocalId);
+                    unit.Status = BuildingRegistry.Building.BuildingUnitStatus.Planned;
                     unit.Version = message.Message.Provenance.Timestamp;
                 }, ct);
             });
