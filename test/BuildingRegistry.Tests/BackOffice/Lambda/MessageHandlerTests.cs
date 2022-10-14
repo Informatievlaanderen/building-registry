@@ -1,5 +1,6 @@
 namespace BuildingRegistry.Tests.BackOffice.Lambda
 {
+    using System;
     using System.Threading;
     using System.Threading.Tasks;
     using Autofac;
@@ -8,8 +9,10 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda
     using BuildingRegistry.Api.BackOffice.Handlers.Lambda;
     using BuildingRegistry.Api.BackOffice.Handlers.Lambda.Requests.Building;
     using BuildingRegistry.Api.BackOffice.Handlers.Lambda.Requests.BuildingUnit;
+    using BuildingRegistry.Api.BackOffice.Handlers.Sqs.Requests;
     using BuildingRegistry.Api.BackOffice.Handlers.Sqs.Requests.Building;
     using BuildingRegistry.Api.BackOffice.Handlers.Sqs.Requests.BuildingUnit;
+    using FluentAssertions;
     using MediatR;
     using Moq;
     using Xunit;
@@ -23,7 +26,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda
         [Fact]
         public async Task WhenProcessingUnknownMessage_ThenNothingIsSent()
         {
-            // Arrang
+            // Arrange
             var mediator = new Mock<IMediator>();
             var containerBuilder = new ContainerBuilder();
             containerBuilder.Register(_ => mediator.Object);
@@ -42,6 +45,30 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda
 
             // Assert
             mediator.VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        public async Task WhenProcessingSqsRequestWithoutCorrespondingSqsLambdaRequest_ThenThrowsNotImplementedException()
+        {
+            // Arrange
+            var mediator = new Mock<IMediator>();
+            var containerBuilder = new ContainerBuilder();
+            containerBuilder.Register(_ => mediator.Object);
+            var container = containerBuilder.Build();
+
+            var messageData = Fixture.Create<TestSqsRequest>();
+            var messageMetadata = new MessageMetadata { MessageGroupId = Fixture.Create<string>() };
+
+            var sut = new MessageHandler(container);
+
+            // Act
+            var act = async () => await sut.HandleMessage(
+                messageData,
+                messageMetadata,
+                CancellationToken.None);
+
+            // Assert
+            await act.Should().ThrowAsync<NotImplementedException>();
         }
 
         [Fact]
@@ -268,4 +295,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda
                 ), CancellationToken.None), Times.Once);
         }
     }
+
+    public class TestSqsRequest : SqsRequest
+    { }
 }

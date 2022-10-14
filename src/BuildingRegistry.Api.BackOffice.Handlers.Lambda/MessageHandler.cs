@@ -116,6 +116,10 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda
                         Provenance = request.ProvenanceData.ToProvenance()
                     }, cancellationToken);
                     break;
+
+                default:
+                    throw new NotImplementedException(
+                        $"{sqsRequest.GetType().Name} has no corresponding SqsLambdaRequest defined.");
             }
         }
     }
