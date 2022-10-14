@@ -65,7 +65,6 @@ namespace BuildingRegistry.Building
             Apply(new BuildingUnitWasRealizedV2(_buildingPersistentLocalId, BuildingUnitPersistentLocalId));
         }
 
-        // todo: review Arne
         public void RealizeBecauseBuildingWasRealized()
         {
             if (IsRemoved)
@@ -84,6 +83,19 @@ namespace BuildingRegistry.Building
             }
 
             Apply(new BuildingUnitWasRealizedV2(_buildingPersistentLocalId, BuildingUnitPersistentLocalId));
+        }
+
+        public void CorrectRealizeBecauseBuildingWasCorrected()
+        {
+            if (IsRemoved)
+            {
+                return;
+            }
+
+            if (Status == BuildingUnitStatus.Realized)
+            {
+                Apply(new BuildingUnitWasCorrectedFromRealizedToPlannedBecauseBuildingWasCorrected(_buildingPersistentLocalId, BuildingUnitPersistentLocalId));
+            }
         }
 
         public void NotRealize()
