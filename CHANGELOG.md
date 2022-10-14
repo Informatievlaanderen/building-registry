@@ -1,3 +1,12 @@
+# [3.35.0](https://github.com/informatievlaanderen/building-registry/compare/v3.34.3...v3.35.0) (2022-10-14)
+
+
+### Features
+
+* correct building realization backoffice + projections ([01c491a](https://github.com/informatievlaanderen/building-registry/commit/01c491ac26f911918ce554451c261d65325a2e9b))
+* correct realize of building in domain ([d9a9c6a](https://github.com/informatievlaanderen/building-registry/commit/d9a9c6aeaf7cccc7a53688abbb13832ccad31f63))
+* throw when sqs request is not mapped to lambda request ([172e133](https://github.com/informatievlaanderen/building-registry/commit/172e1337c83dae4b61c36d38ffc3efa8c727ae48))
+
 ## [3.34.3](https://github.com/informatievlaanderen/building-registry/compare/v3.34.2...v3.34.3) (2022-10-13)
 
 
