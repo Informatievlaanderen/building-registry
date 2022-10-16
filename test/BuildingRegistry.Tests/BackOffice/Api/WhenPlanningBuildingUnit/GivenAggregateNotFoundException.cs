@@ -8,7 +8,6 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenPlanningBuildingUnit
     using Be.Vlaanderen.Basisregisters.GrAr.Edit.Contracts;
     using Building;
     using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Requests;
-    using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Validators;
     using BuildingRegistry.Api.BackOffice.BuildingUnit;
     using FluentAssertions;
     using FluentValidation;
@@ -31,7 +30,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenPlanningBuildingUnit
             MockMediator.Setup<object?>(x => x.Send(It.IsAny<PlanBuildingUnitRequest>(), CancellationToken.None).Result)
                 .Throws(new AggregateNotFoundException("", typeof(Building)));
 
-            var request = new PlanBuildingUnitRequest()
+            var request = new PlanBuildingUnitRequest
             {
                 GebouwId = $"https://data.vlaanderen.be/id/gebouw/{new BuildingPersistentLocalId(123)}",
                 PositieGeometrieMethode = PositieGeometrieMethode.AangeduidDoorBeheerder,

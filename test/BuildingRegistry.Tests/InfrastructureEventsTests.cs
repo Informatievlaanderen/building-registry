@@ -1,14 +1,14 @@
 namespace Aiv.Vbr.Testing.Infrastructure.Events
 {
-    using Be.Vlaanderen.Basisregisters.AggregateSource;
-    using Be.Vlaanderen.Basisregisters.EventHandling;
-    using FluentAssertions;
-    using Newtonsoft.Json;
     using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Reflection;
     using System.Runtime.CompilerServices;
+    using Be.Vlaanderen.Basisregisters.AggregateSource;
+    using Be.Vlaanderen.Basisregisters.EventHandling;
+    using FluentAssertions;
+    using Newtonsoft.Json;
     using Xunit;
 
     /// <summary>

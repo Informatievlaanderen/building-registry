@@ -1,10 +1,12 @@
-﻿namespace BuildingRegistry.Api.BackOffice.Handlers.Sqs
+namespace BuildingRegistry.Api.BackOffice.Handlers.Sqs
 {
     using System;
     using Amazon;
     using Autofac;
     using Be.Vlaanderen.Basisregisters.EventHandling;
     using Be.Vlaanderen.Basisregisters.MessageHandling.AwsSqs.Simple;
+    using Be.Vlaanderen.Basisregisters.Sqs;
+    using SqsQueue = Be.Vlaanderen.Basisregisters.Sqs.SqsQueue;
 
     public sealed class SqsHandlersModule : Module
     {

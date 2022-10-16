@@ -5,24 +5,37 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Requests.BuildingUnit
     using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Requests;
     using BuildingRegistry.Building;
     using BuildingRegistry.Building.Commands;
+    using Sqs.Requests.BuildingUnit;
 
-    public sealed class CorrectBuildingUnitNotRealizationLambdaRequest :
+    public sealed record CorrectBuildingUnitNotRealizationLambdaRequest :
         BuildingUnitLambdaRequest,
         IHasBackOfficeRequest<CorrectBuildingUnitNotRealizationBackOfficeRequest>,
         IHasBuildingUnitPersistentLocalId
     {
-        public CorrectBuildingUnitNotRealizationBackOfficeRequest Request { get; set; }
+        public CorrectBuildingUnitNotRealizationBackOfficeRequest Request { get; }
 
         public int BuildingUnitPersistentLocalId => Request.BuildingUnitPersistentLocalId;
 
         public CorrectBuildingUnitNotRealizationLambdaRequest(
-            Guid ticketId,
             string messageGroupId,
+            CorrectBuildingUnitNotRealizationSqsRequest sqsRequest)
+            : this(
+                messageGroupId,
+                sqsRequest.TicketId,
+                sqsRequest.IfMatchHeaderValue,
+                sqsRequest.ProvenanceData.ToProvenance(),
+                sqsRequest.Metadata,
+                sqsRequest.Request)
+        { }
+
+        public CorrectBuildingUnitNotRealizationLambdaRequest(
+            string messageGroupId,
+            Guid ticketId,
             string? ifMatchHeaderValue,
             Provenance provenance,
-            IDictionary<string, object> metadata,
+            IDictionary<string, object?> metadata,
             CorrectBuildingUnitNotRealizationBackOfficeRequest request)
-            : base(ticketId, messageGroupId, ifMatchHeaderValue, provenance, metadata)
+            : base(messageGroupId, ticketId, ifMatchHeaderValue, provenance, metadata)
         {
             Request = request;
         }

@@ -10,11 +10,11 @@ namespace BuildingRegistry.Api.BackOffice.Building
     using Be.Vlaanderen.Basisregisters.Api.ETag;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
+    using Be.Vlaanderen.Basisregisters.Sqs.Exceptions;
     using BuildingRegistry.Building;
     using BuildingRegistry.Building.Exceptions;
     using FluentValidation;
     using FluentValidation.Results;
-    using Handlers;
     using Handlers.Sqs.Requests.Building;
     using Infrastructure;
     using Infrastructure.Options;

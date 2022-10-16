@@ -8,9 +8,9 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
     using AutoFixture;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
-    using BuildingRegistry.Api.BackOffice.Abstractions.Building.Responses;
+    using Be.Vlaanderen.Basisregisters.Sqs.Lambda.Handlers;
+    using Be.Vlaanderen.Basisregisters.Sqs.Responses;
     using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Requests;
-    using BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers;
     using BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.BuildingUnit;
     using BuildingRegistry.Api.BackOffice.Handlers.Lambda.Requests.BuildingUnit;
     using BuildingRegistry.Building;
@@ -33,13 +33,12 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
             var ticketing = new Mock<ITicketing>();
             var idempotentCommandHandler = new Mock<IIdempotentCommandHandler>();
 
-            var lambdaRequest = new RealizeBuildingUnitLambdaRequest
-            (
-                Guid.NewGuid(),
+            var lambdaRequest = new RealizeBuildingUnitLambdaRequest(
                 Guid.NewGuid().ToString(),
+                Guid.NewGuid(),
                 string.Empty,
                 Fixture.Create<Provenance>(),
-                new Dictionary<string, object>(),
+                new Dictionary<string, object?>(),
                 new RealizeBuildingUnitBackOfficeRequest { BuildingUnitPersistentLocalId = 1 }
             );
 
@@ -64,11 +63,11 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
             var ticketing = new Mock<ITicketing>();
 
             var lambdaRequest = new RealizeBuildingUnitLambdaRequest(
-                Guid.NewGuid(),
                 Guid.NewGuid().ToString(),
+                Guid.NewGuid(),
                 string.Empty,
                 Fixture.Create<Provenance>(),
-                new Dictionary<string, object>(),
+                new Dictionary<string, object?>(),
                 new RealizeBuildingUnitBackOfficeRequest { BuildingUnitPersistentLocalId = 1 }
             );
 
@@ -97,11 +96,11 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
             var ticketing = new Mock<ITicketing>();
 
             var lambdaRequest = new RealizeBuildingUnitLambdaRequest(
-                Guid.NewGuid(),
                 Guid.NewGuid().ToString(),
+                Guid.NewGuid(),
                 string.Empty,
                 Fixture.Create<Provenance>(),
-                new Dictionary<string, object>(),
+                new Dictionary<string, object?>(),
                 new RealizeBuildingUnitBackOfficeRequest { BuildingUnitPersistentLocalId = 1 }
             );
 
@@ -130,11 +129,11 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
             var ticketing = new Mock<ITicketing>();
 
             var lambdaRequest = new RealizeBuildingUnitLambdaRequest(
-                Guid.NewGuid(),
                 Guid.NewGuid().ToString(),
+                Guid.NewGuid(),
                 string.Empty,
                 Fixture.Create<Provenance>(),
-                new Dictionary<string, object>(),
+                new Dictionary<string, object?>(),
                 new RealizeBuildingUnitBackOfficeRequest { BuildingUnitPersistentLocalId = 1 }
             );
 
@@ -177,11 +176,11 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
 
             // Act
             await sut.Handle(new RealizeBuildingUnitLambdaRequest(
-                Guid.NewGuid(),
                 buildingPersistentLocalId.ToString(),
+                Guid.NewGuid(),
                 "Outdated",
                 Fixture.Create<Provenance>(),
-                new Dictionary<string, object>(),
+                new Dictionary<string, object?>(),
                 new RealizeBuildingUnitBackOfficeRequest
                 {
                     BuildingUnitPersistentLocalId = buildingUnitPersistentLocalId
@@ -210,11 +209,11 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
 
             await sut.Handle(
                 new RealizeBuildingUnitLambdaRequest(
-                    Guid.NewGuid(),
                     Guid.NewGuid().ToString(),
+                    Guid.NewGuid(),
                     string.Empty,
                     Fixture.Create<Provenance>(),
-                    new Dictionary<string, object>(),
+                    new Dictionary<string, object?>(),
                     new RealizeBuildingUnitBackOfficeRequest { BuildingUnitPersistentLocalId = 1 }
                     ), CancellationToken.None);
 

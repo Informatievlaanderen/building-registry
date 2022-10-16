@@ -1,8 +1,9 @@
 namespace BuildingRegistry.Api.BackOffice.Handlers.Sqs.Handlers.Building
 {
     using BuildingRegistry.Api.BackOffice.Handlers.Sqs.Requests.Building;
-    using Sqs;
     using System.Collections.Generic;
+    using Be.Vlaanderen.Basisregisters.Sqs;
+    using Be.Vlaanderen.Basisregisters.Sqs.Handlers;
     using TicketingService.Abstractions;
 
     public sealed class PlanBuildingSqsHandler : SqsHandler<PlanBuildingSqsRequest>

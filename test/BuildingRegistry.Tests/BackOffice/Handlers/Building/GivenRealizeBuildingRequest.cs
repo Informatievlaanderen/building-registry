@@ -12,12 +12,18 @@ namespace BuildingRegistry.Tests.BackOffice.Handlers.Building
     using BuildingRegistry.Api.BackOffice.Handlers.Building;
     using BuildingRegistry.Building;
     using BuildingRegistry.Building.Commands;
+    using BuildingRegistry.Legacy;
     using Fixtures;
     using FluentAssertions;
     using SqlStreamStore;
     using SqlStreamStore.Streams;
     using Xunit;
     using Xunit.Abstractions;
+    using BuildingGeometry = BuildingRegistry.Legacy.BuildingGeometry;
+    using BuildingId = BuildingRegistry.Legacy.BuildingId;
+    using BuildingStatus = BuildingRegistry.Legacy.BuildingStatus;
+    using BuildingUnit = BuildingRegistry.Building.Commands.BuildingUnit;
+    using IBuildings = BuildingRegistry.Building.IBuildings;
 
     public class GivenRealizeBuildingRequest : BuildingRegistryTest
     {
@@ -46,21 +52,21 @@ namespace BuildingRegistry.Tests.BackOffice.Handlers.Building
         [Fact]
         public async Task WhenBuildingUnderConstruction_ThenBuildingWasRealized()
         {
-            Fixture.Register(() => BuildingRegistry.Legacy.BuildingStatus.UnderConstruction);
+            Fixture.Register(() => BuildingStatus.UnderConstruction);
 
             var migrateBuilding = new MigrateBuilding(
-                Fixture.Create<BuildingRegistry.Legacy.BuildingId>(),
-                Fixture.Create<BuildingRegistry.Legacy.PersistentLocalId>(),
-                Fixture.Create<BuildingRegistry.Legacy.PersistentLocalIdAssignmentDate>(),
-                BuildingRegistry.Legacy.BuildingStatus.UnderConstruction,
-                Fixture.Create<BuildingRegistry.Legacy.BuildingGeometry>(),
+                Fixture.Create<BuildingId>(),
+                Fixture.Create<PersistentLocalId>(),
+                Fixture.Create<PersistentLocalIdAssignmentDate>(),
+                BuildingStatus.UnderConstruction,
+                Fixture.Create<BuildingGeometry>(),
                 isRemoved: false,
-                new List<BuildingRegistry.Building.Commands.BuildingUnit>(),
+                new List<BuildingUnit>(),
                 Fixture.Create<Provenance>()
             );
             DispatchArrangeCommand(migrateBuilding);
 
-            var request = new RealizeBuildingRequest()
+            var request = new RealizeBuildingRequest
             {
                 PersistentLocalId = _buildingPersistentLocalId
             };
@@ -71,7 +77,7 @@ namespace BuildingRegistry.Tests.BackOffice.Handlers.Building
             // Assert
             var actual = await _repo.GetAsync(BuildingStreamId);
             actual.Should().NotBeNull();
-            actual.BuildingStatus.Should().Be(BuildingStatus.Realized);
+            actual.BuildingStatus.Should().Be(BuildingRegistry.Building.BuildingStatus.Realized);
 
             var stream = await Container.Resolve<IStreamStore>().ReadStreamBackwards(new StreamId(BuildingStreamId), fromVersionInclusive: 1, maxCount: 1); // 1 = fromVersionInclusive of stream (zero based)
             stream.Messages.First().JsonMetadata.Should().Contain(result.ETag);
@@ -80,21 +86,21 @@ namespace BuildingRegistry.Tests.BackOffice.Handlers.Building
         [Fact]
         public async Task WhenBuildingRealized_ThenBuildingWasRealized()
         {
-            Fixture.Register(() => BuildingRegistry.Legacy.BuildingStatus.Realized);
+            Fixture.Register(() => BuildingStatus.Realized);
 
             var migrateBuilding = new MigrateBuilding(
-                Fixture.Create<BuildingRegistry.Legacy.BuildingId>(),
-                Fixture.Create<BuildingRegistry.Legacy.PersistentLocalId>(),
-                Fixture.Create<BuildingRegistry.Legacy.PersistentLocalIdAssignmentDate>(),
-                BuildingRegistry.Legacy.BuildingStatus.Realized,
-                Fixture.Create<BuildingRegistry.Legacy.BuildingGeometry>(),
+                Fixture.Create<BuildingId>(),
+                Fixture.Create<PersistentLocalId>(),
+                Fixture.Create<PersistentLocalIdAssignmentDate>(),
+                BuildingStatus.Realized,
+                Fixture.Create<BuildingGeometry>(),
                 isRemoved: false,
-                new List<BuildingRegistry.Building.Commands.BuildingUnit>(),
+                new List<BuildingUnit>(),
                 Fixture.Create<Provenance>()
             );
             DispatchArrangeCommand(migrateBuilding);
 
-            var request = new RealizeBuildingRequest()
+            var request = new RealizeBuildingRequest
             {
                 PersistentLocalId = _buildingPersistentLocalId
             };
@@ -105,7 +111,7 @@ namespace BuildingRegistry.Tests.BackOffice.Handlers.Building
             // Assert
             var actual = await _repo.GetAsync(BuildingStreamId);
             actual.Should().NotBeNull();
-            actual.BuildingStatus.Should().Be(BuildingStatus.Realized);
+            actual.BuildingStatus.Should().Be(BuildingRegistry.Building.BuildingStatus.Realized);
 
             var stream = await Container.Resolve<IStreamStore>().ReadStreamBackwards(new StreamId(BuildingStreamId), fromVersionInclusive: 0, maxCount: 1); // 1 = fromVersionInclusive of stream (zero based)
             stream.Messages.First().JsonMetadata.Should().Contain(result.ETag);

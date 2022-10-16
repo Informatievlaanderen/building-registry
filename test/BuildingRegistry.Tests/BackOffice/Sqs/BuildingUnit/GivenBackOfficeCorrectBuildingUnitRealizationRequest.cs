@@ -8,9 +8,9 @@ namespace BuildingRegistry.Tests.BackOffice.Sqs.BuildingUnit
     using System.Collections.Generic;
     using System.Threading;
     using System.Threading.Tasks;
+    using Be.Vlaanderen.Basisregisters.Sqs;
+    using Be.Vlaanderen.Basisregisters.Sqs.Exceptions;
     using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Requests;
-    using BuildingRegistry.Api.BackOffice.Abstractions.Exceptions;
-    using BuildingRegistry.Api.BackOffice.Handlers.Sqs;
     using BuildingRegistry.Api.BackOffice.Handlers.Sqs.Handlers.BuildingUnit;
     using BuildingRegistry.Api.BackOffice.Handlers.Sqs.Requests.BuildingUnit;
     using BuildingRegistry.Building;

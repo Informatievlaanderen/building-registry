@@ -5,16 +5,14 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenCorrectingBuildingUnitNotRea
     using System.Threading;
     using System.Threading.Tasks;
     using AutoFixture;
-    using Be.Vlaanderen.Basisregisters.AggregateSource.Snapshotting;
     using Be.Vlaanderen.Basisregisters.Api.ETag;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
-    using BuildingRegistry.Api.BackOffice.Abstractions.Building.Responses;
+    using Be.Vlaanderen.Basisregisters.Sqs.Responses;
     using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Requests;
     using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Validators;
     using BuildingRegistry.Api.BackOffice.Building;
     using BuildingRegistry.Api.BackOffice.BuildingUnit;
     using Building;
-    using Building.Events;
     using Building.Exceptions;
     using FluentAssertions;
     using FluentValidation;

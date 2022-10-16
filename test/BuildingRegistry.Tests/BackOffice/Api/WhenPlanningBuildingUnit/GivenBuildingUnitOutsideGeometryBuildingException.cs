@@ -36,7 +36,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenPlanningBuildingUnit
             var streamStoreMock = new Mock<IStreamStore>();
             streamStoreMock.SetStreamFound();
 
-            var request = new PlanBuildingUnitRequest()
+            var request = new PlanBuildingUnitRequest
             {
                 GebouwId = $"https://data.vlaanderen.be/id/gebouw/{new BuildingPersistentLocalId(123)}",
                 PositieGeometrieMethode = PositieGeometrieMethode.AangeduidDoorBeheerder,

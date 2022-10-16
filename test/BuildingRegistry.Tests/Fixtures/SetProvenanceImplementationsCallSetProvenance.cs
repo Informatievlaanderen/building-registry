@@ -26,7 +26,7 @@ namespace BuildingRegistry.Tests.Fixtures
 
                 var customizeMethod = typeof(Fixture).GetMethods().Single(m => m.Name == "Customize" && m.IsGenericMethod);
                 var genericCustomizeMethod = customizeMethod.MakeGenericMethod(allEventType);
-                genericCustomizeMethod.Invoke(fixture, new object[] { setProvenanceDelegate });
+                genericCustomizeMethod.Invoke(fixture, new[] { setProvenanceDelegate });
             }
         }
 
@@ -34,7 +34,7 @@ namespace BuildingRegistry.Tests.Fixtures
             where T : ISetProvenance
         {
             return c => c.Do(@event =>
-                (@event as ISetProvenance).SetProvenance(provenance));
+                @event.SetProvenance(provenance));
         }
     }
 }

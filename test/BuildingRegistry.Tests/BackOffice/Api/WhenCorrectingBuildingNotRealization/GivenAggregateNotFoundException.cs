@@ -8,7 +8,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenCorrectingBuildingNotRealiza
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
     using BuildingRegistry.Api.BackOffice.Abstractions.Building.Requests;
     using BuildingRegistry.Api.BackOffice.Building;
-    using BuildingRegistry.Building;
+    using Building;
     using FluentAssertions;
     using Microsoft.AspNetCore.Http;
     using Moq;

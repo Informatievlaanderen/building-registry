@@ -1,6 +1,5 @@
 namespace BuildingRegistry.Api.BackOffice.Abstractions.Building.Validators
 {
-    using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
     using BuildingRegistry.Building;

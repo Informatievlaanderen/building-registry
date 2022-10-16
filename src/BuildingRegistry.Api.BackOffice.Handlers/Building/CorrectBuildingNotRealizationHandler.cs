@@ -3,9 +3,9 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Building
     using System.Threading;
     using System.Threading.Tasks;
     using Abstractions.Building.Requests;
-    using Abstractions.Building.Responses;
     using Be.Vlaanderen.Basisregisters.CommandHandling;
     using Be.Vlaanderen.Basisregisters.CommandHandling.Idempotency;
+    using Be.Vlaanderen.Basisregisters.Sqs.Responses;
     using BuildingRegistry.Building;
     using MediatR;
 

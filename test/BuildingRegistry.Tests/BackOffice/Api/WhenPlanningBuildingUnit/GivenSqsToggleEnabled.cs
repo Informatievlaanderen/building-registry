@@ -5,17 +5,15 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenPlanningBuildingUnit
     using System.Threading;
     using System.Threading.Tasks;
     using AutoFixture;
-    using Be.Vlaanderen.Basisregisters.Api.Exceptions;
+    using Be.Vlaanderen.Basisregisters.Sqs.Requests;
     using BuildingRegistry.Api.BackOffice.Abstractions.Building.Validators;
     using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Requests;
     using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Validators;
     using BuildingRegistry.Api.BackOffice.BuildingUnit;
-    using BuildingRegistry.Api.BackOffice.Handlers.Sqs.Requests;
     using BuildingRegistry.Api.BackOffice.Handlers.Sqs.Requests.BuildingUnit;
     using Fixtures;
     using FluentAssertions;
     using FluentValidation;
-    using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
     using Moq;
     using SqlStreamStore;

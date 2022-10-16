@@ -1,5 +1,6 @@
 namespace BuildingRegistry.Tests
 {
+    using BuildingRegistry.Legacy;
     using NetTopologySuite.Geometries;
     using NetTopologySuite.IO;
 
@@ -24,18 +25,18 @@ namespace BuildingRegistry.Tests
 
         private static readonly WKBWriter WkbWriter = new WKBWriter { Strict = false, HandleSRID = true };
 
-        public static BuildingRegistry.Legacy.ExtendedWkbGeometry CreateEwkbFrom(BuildingRegistry.Legacy.WkbGeometry wkbGeometry)
+        public static ExtendedWkbGeometry CreateEwkbFrom(WkbGeometry wkbGeometry)
         {
             var reader = new WKBReader();
             var geometry = reader.Read(wkbGeometry);
-            geometry.SRID = BuildingRegistry.Legacy.WkbGeometry.SridLambert72;
-            return new BuildingRegistry.Legacy.ExtendedWkbGeometry(WkbWriter.Write(geometry));
+            geometry.SRID = WkbGeometry.SridLambert72;
+            return new ExtendedWkbGeometry(WkbWriter.Write(geometry));
         }
 
-        public static BuildingRegistry.Legacy.WkbGeometry CreateFromWkt(string wkt)
+        public static WkbGeometry CreateFromWkt(string wkt)
         {
-            var geometry = new WKTReader { DefaultSRID = BuildingRegistry.Legacy.WkbGeometry.SridLambert72 }.Read(wkt);
-            return new BuildingRegistry.Legacy.WkbGeometry(WkbWriter.Write(geometry));
+            var geometry = new WKTReader { DefaultSRID = WkbGeometry.SridLambert72 }.Read(wkt);
+            return new WkbGeometry(WkbWriter.Write(geometry));
         }
     }
 }

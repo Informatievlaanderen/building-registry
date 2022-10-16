@@ -89,7 +89,7 @@ namespace BuildingRegistry.Tests.Legacy.Cases
                 .Customize(new WithInfiniteLifetime())
                 .Customize(new WithFixedBuildingUnitIdFromHouseNumber());
 
-            _ = new ChangeHouseNumberIdThenAddSubaddressToOldHouseNumber.TestCaseData(Fixture);
+            _ = new TestCaseData(Fixture);
         }
 
         protected readonly IFixture Fixture;

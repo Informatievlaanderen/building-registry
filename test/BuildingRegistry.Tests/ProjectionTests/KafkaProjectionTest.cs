@@ -6,7 +6,6 @@ namespace BuildingRegistry.Tests.ProjectionTests
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.Connector;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.Connector.Testing;
     using FluentAssertions.Execution;
-    using Tests;
     using Xunit.Abstractions;
 
     public abstract class KafkaProjectionTest<TContext, TProjection> : BuildingRegistryTest

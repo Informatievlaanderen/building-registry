@@ -1,19 +1,19 @@
 namespace BuildingRegistry.Tests.BackOffice.Sqs.BuildingUnit
 {
-    using AutoFixture;
-    using Be.Vlaanderen.Basisregisters.MessageHandling.AwsSqs.Simple;
-    using FluentAssertions;
-    using Moq;
     using System;
     using System.Collections.Generic;
     using System.Threading;
     using System.Threading.Tasks;
+    using AutoFixture;
+    using Be.Vlaanderen.Basisregisters.MessageHandling.AwsSqs.Simple;
+    using Be.Vlaanderen.Basisregisters.Sqs;
     using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Requests;
-    using BuildingRegistry.Api.BackOffice.Handlers.Sqs;
     using BuildingRegistry.Api.BackOffice.Handlers.Sqs.Handlers.BuildingUnit;
     using BuildingRegistry.Api.BackOffice.Handlers.Sqs.Requests.BuildingUnit;
     using BuildingRegistry.Building;
     using Fixtures;
+    using FluentAssertions;
+    using Moq;
     using TicketingService.Abstractions;
     using Xunit;
     using Xunit.Abstractions;
@@ -45,7 +45,7 @@ namespace BuildingRegistry.Tests.BackOffice.Sqs.BuildingUnit
                 ticketingMock.Object,
                 ticketingUrl);
 
-            var sqsRequest = new PlanBuildingUnitSqsRequest()
+            var sqsRequest = new PlanBuildingUnitSqsRequest
             {
                 Request = new PlanBuildingUnitBackOfficeRequest
                 {

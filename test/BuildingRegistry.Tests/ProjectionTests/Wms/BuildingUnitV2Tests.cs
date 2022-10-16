@@ -15,7 +15,6 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wms
     using Projections.Wms.BuildingUnitV2;
     using Tests.Legacy.Autofixture;
     using Xunit;
-    using Envelope = Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope;
 
     public class BuildingUnitV2Tests : BuildingWmsProjectionTest<BuildingUnitV2Projections>
     {

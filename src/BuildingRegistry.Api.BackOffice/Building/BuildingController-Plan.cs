@@ -6,8 +6,8 @@ namespace BuildingRegistry.Api.BackOffice.Building
     using Abstractions.Building.Requests;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
+    using Be.Vlaanderen.Basisregisters.Sqs.Exceptions;
     using FluentValidation;
-    using Handlers;
     using Handlers.Sqs.Requests.Building;
     using Infrastructure.Options;
     using Microsoft.AspNetCore.Http;

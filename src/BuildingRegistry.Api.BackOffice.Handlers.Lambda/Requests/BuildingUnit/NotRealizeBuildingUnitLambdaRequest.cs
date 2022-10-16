@@ -5,27 +5,40 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Requests.BuildingUnit
     using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Requests;
     using BuildingRegistry.Building;
     using BuildingRegistry.Building.Commands;
+    using Sqs.Requests.BuildingUnit;
 
-    public sealed class NotRealizeBuildingUnitLambdaRequest :
+    public sealed record NotRealizeBuildingUnitLambdaRequest :
         BuildingUnitLambdaRequest,
         IHasBackOfficeRequest<NotRealizeBuildingUnitBackOfficeRequest>,
         IHasBuildingUnitPersistentLocalId
     {
+        public NotRealizeBuildingUnitBackOfficeRequest Request { get; }
+
+        public int BuildingUnitPersistentLocalId => Request.BuildingUnitPersistentLocalId;
+
         public NotRealizeBuildingUnitLambdaRequest(
-            Guid ticketId,
             string messageGroupId,
+            NotRealizeBuildingUnitSqsRequest sqsRequest)
+            : this(
+                messageGroupId,
+                sqsRequest.TicketId,
+                sqsRequest.IfMatchHeaderValue,
+                sqsRequest.ProvenanceData.ToProvenance(),
+                sqsRequest.Metadata,
+                sqsRequest.Request)
+        { }
+
+        public NotRealizeBuildingUnitLambdaRequest(
+            string messageGroupId,
+            Guid ticketId,
             string? ifMatchHeaderValue,
             Provenance provenance,
-            IDictionary<string, object> metadata,
+            IDictionary<string, object?> metadata,
             NotRealizeBuildingUnitBackOfficeRequest request)
-            : base(ticketId, messageGroupId, ifMatchHeaderValue, provenance, metadata)
+            : base(messageGroupId, ticketId, ifMatchHeaderValue, provenance, metadata)
         {
             Request = request;
         }
-
-        public NotRealizeBuildingUnitBackOfficeRequest Request { get; set; }
-
-        public int BuildingUnitPersistentLocalId => Request.BuildingUnitPersistentLocalId;
 
         /// <summary>
         /// Map to NotRealizeBuildingUnit command
