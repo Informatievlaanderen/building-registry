@@ -12,15 +12,22 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingRealizatio
     using Building.Commands;
     using Building.Events;
     using Building.Exceptions;
+    using BuildingRegistry.Legacy;
     using Extensions;
     using Fixtures;
     using FluentAssertions;
     using Xunit;
     using Xunit.Abstractions;
     using BuildingGeometry = Building.BuildingGeometry;
+    using BuildingGeometryMethod = Building.BuildingGeometryMethod;
     using BuildingId = Building.BuildingId;
     using BuildingStatus = Building.BuildingStatus;
     using BuildingUnit = Building.Commands.BuildingUnit;
+    using BuildingUnitFunction = BuildingRegistry.Legacy.BuildingUnitFunction;
+    using BuildingUnitId = BuildingRegistry.Legacy.BuildingUnitId;
+    using BuildingUnitPosition = BuildingRegistry.Legacy.BuildingUnitPosition;
+    using BuildingUnitStatus = Building.BuildingUnitStatus;
+    using ExtendedWkbGeometry = Building.ExtendedWkbGeometry;
 
     public class GivenBuildingExists : BuildingRegistryTest
     {
@@ -196,12 +203,12 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingRealizatio
                 new List<BuildingUnit>
                 {
                     new BuildingUnit(
-                        Fixture.Create<BuildingRegistry.Legacy.BuildingUnitId>(),
-                        Fixture.Create<BuildingRegistry.Legacy.PersistentLocalId>(),
-                        Fixture.Create<BuildingRegistry.Legacy.BuildingUnitFunction>(),
+                        Fixture.Create<BuildingUnitId>(),
+                        Fixture.Create<PersistentLocalId>(),
+                        Fixture.Create<BuildingUnitFunction>(),
                         BuildingRegistry.Legacy.BuildingUnitStatus.Retired,
                         new List<AddressPersistentLocalId>(),
-                        Fixture.Create<BuildingRegistry.Legacy.BuildingUnitPosition>(),
+                        Fixture.Create<BuildingUnitPosition>(),
                         new BuildingRegistry.Legacy.BuildingGeometry(
                             Fixture.Create<BuildingRegistry.Legacy.ExtendedWkbGeometry>(),
                             BuildingRegistry.Legacy.BuildingGeometryMethod.Outlined),
@@ -221,10 +228,10 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingRealizatio
         [Fact]
         public void StateCheck()
         {
-            var plannedBuildingUnitPersistentLocalId = new BuildingRegistry.Legacy.PersistentLocalId(1);
-            var realizedBuildingUnitPersistentLocalId = new BuildingRegistry.Legacy.PersistentLocalId(2);
-            var notRealizedBuildingUnitPersistentLocalId = new BuildingRegistry.Legacy.PersistentLocalId(3);
-            var removedBuildingUnitPersistentLocalId = new BuildingRegistry.Legacy.PersistentLocalId(4);
+            var plannedBuildingUnitPersistentLocalId = new PersistentLocalId(1);
+            var realizedBuildingUnitPersistentLocalId = new PersistentLocalId(2);
+            var notRealizedBuildingUnitPersistentLocalId = new PersistentLocalId(3);
+            var removedBuildingUnitPersistentLocalId = new PersistentLocalId(4);
 
             var buildingWasMigrated = new BuildingWasMigrated(
                 Fixture.Create<BuildingId>(),
@@ -238,39 +245,39 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingRealizatio
                 new List<BuildingUnit>
                 {
                     new BuildingUnit(
-                        new BuildingRegistry.Legacy.BuildingUnitId(Guid.NewGuid()),
+                        new BuildingUnitId(Guid.NewGuid()),
                         plannedBuildingUnitPersistentLocalId,
-                        BuildingRegistry.Legacy.BuildingUnitFunction.Unknown,
+                        BuildingUnitFunction.Unknown,
                         BuildingRegistry.Legacy.BuildingUnitStatus.Planned,
                         new List<AddressPersistentLocalId>(),
-                        Fixture.Create<BuildingRegistry.Legacy.BuildingUnitPosition>(),
+                        Fixture.Create<BuildingUnitPosition>(),
                         Fixture.Create<BuildingRegistry.Legacy.BuildingGeometry>(),
                         false),
                     new BuildingUnit(
-                        new BuildingRegistry.Legacy.BuildingUnitId(Guid.NewGuid()),
+                        new BuildingUnitId(Guid.NewGuid()),
                         realizedBuildingUnitPersistentLocalId,
-                        BuildingRegistry.Legacy.BuildingUnitFunction.Unknown,
+                        BuildingUnitFunction.Unknown,
                         BuildingRegistry.Legacy.BuildingUnitStatus.Realized,
                         new List<AddressPersistentLocalId>(),
-                        Fixture.Create<BuildingRegistry.Legacy.BuildingUnitPosition>(),
+                        Fixture.Create<BuildingUnitPosition>(),
                         Fixture.Create<BuildingRegistry.Legacy.BuildingGeometry>(),
                         false),
                     new BuildingUnit(
-                        new BuildingRegistry.Legacy.BuildingUnitId(Guid.NewGuid()),
+                        new BuildingUnitId(Guid.NewGuid()),
                         notRealizedBuildingUnitPersistentLocalId,
-                        BuildingRegistry.Legacy.BuildingUnitFunction.Unknown,
+                        BuildingUnitFunction.Unknown,
                         BuildingRegistry.Legacy.BuildingUnitStatus.NotRealized,
                         new List<AddressPersistentLocalId>(),
-                        Fixture.Create<BuildingRegistry.Legacy.BuildingUnitPosition>(),
+                        Fixture.Create<BuildingUnitPosition>(),
                         Fixture.Create<BuildingRegistry.Legacy.BuildingGeometry>(),
                         false),
                     new BuildingUnit(
-                        new BuildingRegistry.Legacy.BuildingUnitId(Guid.NewGuid()),
+                        new BuildingUnitId(Guid.NewGuid()),
                         removedBuildingUnitPersistentLocalId,
-                        BuildingRegistry.Legacy.BuildingUnitFunction.Unknown,
+                        BuildingUnitFunction.Unknown,
                         BuildingRegistry.Legacy.BuildingUnitStatus.Realized,
                         new List<AddressPersistentLocalId>(),
-                        Fixture.Create<BuildingRegistry.Legacy.BuildingUnitPosition>(),
+                        Fixture.Create<BuildingUnitPosition>(),
                         Fixture.Create<BuildingRegistry.Legacy.BuildingGeometry>(),
                         true)
                 }

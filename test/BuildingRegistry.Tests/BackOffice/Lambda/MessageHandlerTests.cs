@@ -6,10 +6,10 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda
     using Autofac;
     using AutoFixture;
     using Be.Vlaanderen.Basisregisters.Aws.Lambda;
+    using Be.Vlaanderen.Basisregisters.Sqs.Requests;
     using BuildingRegistry.Api.BackOffice.Handlers.Lambda;
     using BuildingRegistry.Api.BackOffice.Handlers.Lambda.Requests.Building;
     using BuildingRegistry.Api.BackOffice.Handlers.Lambda.Requests.BuildingUnit;
-    using BuildingRegistry.Api.BackOffice.Handlers.Sqs.Requests;
     using BuildingRegistry.Api.BackOffice.Handlers.Sqs.Requests.Building;
     using BuildingRegistry.Api.BackOffice.Handlers.Sqs.Requests.BuildingUnit;
     using FluentAssertions;
@@ -328,6 +328,6 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda
         }
     }
 
-    public class TestSqsRequest : SqsRequest
+    internal class TestSqsRequest : SqsRequest
     { }
 }

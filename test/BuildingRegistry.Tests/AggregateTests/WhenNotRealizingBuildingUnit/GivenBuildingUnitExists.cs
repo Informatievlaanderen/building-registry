@@ -12,11 +12,19 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenNotRealizingBuildingUnit
     using Building.Commands;
     using Building.Events;
     using Building.Exceptions;
+    using BuildingRegistry.Legacy;
     using Fixtures;
     using FluentAssertions;
     using Xunit;
     using Xunit.Abstractions;
+    using BuildingGeometry = Building.BuildingGeometry;
+    using BuildingId = Building.BuildingId;
+    using BuildingStatus = Building.BuildingStatus;
     using BuildingUnit = Building.Commands.BuildingUnit;
+    using BuildingUnitFunction = BuildingRegistry.Legacy.BuildingUnitFunction;
+    using BuildingUnitId = BuildingRegistry.Legacy.BuildingUnitId;
+    using BuildingUnitPosition = BuildingRegistry.Legacy.BuildingUnitPosition;
+    using BuildingUnitStatus = BuildingRegistry.Legacy.BuildingUnitStatus;
 
     public class GivenBuildingUnitExists: BuildingRegistryTest
     {
@@ -73,12 +81,12 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenNotRealizingBuildingUnit
                 new List<BuildingUnit>
                 {
                     new BuildingUnit(
-                        Fixture.Create<BuildingRegistry.Legacy.BuildingUnitId>(),
-                        Fixture.Create<BuildingRegistry.Legacy.PersistentLocalId>(),
-                        Fixture.Create<BuildingRegistry.Legacy.BuildingUnitFunction>(),
-                        BuildingRegistry.Legacy.BuildingUnitStatus.Planned,
+                        Fixture.Create<BuildingUnitId>(),
+                        Fixture.Create<PersistentLocalId>(),
+                        Fixture.Create<BuildingUnitFunction>(),
+                        BuildingUnitStatus.Planned,
                         new List<AddressPersistentLocalId>(),
-                        Fixture.Create<BuildingRegistry.Legacy.BuildingUnitPosition>(),
+                        Fixture.Create<BuildingUnitPosition>(),
                         Fixture.Create<BuildingRegistry.Legacy.BuildingGeometry>(),
                         isRemoved: true)
                 }
@@ -110,12 +118,12 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenNotRealizingBuildingUnit
                 new List<BuildingUnit>
                 {
                     new BuildingUnit(
-                        Fixture.Create<BuildingRegistry.Legacy.BuildingUnitId>(),
-                        Fixture.Create<BuildingRegistry.Legacy.PersistentLocalId>(),
-                        Fixture.Create<BuildingRegistry.Legacy.BuildingUnitFunction>(),
-                        BuildingRegistry.Legacy.BuildingUnitStatus.Parse(status) ?? throw new ArgumentException(),
+                        Fixture.Create<BuildingUnitId>(),
+                        Fixture.Create<PersistentLocalId>(),
+                        Fixture.Create<BuildingUnitFunction>(),
+                        BuildingUnitStatus.Parse(status) ?? throw new ArgumentException(),
                         new List<AddressPersistentLocalId>(),
-                        Fixture.Create<BuildingRegistry.Legacy.BuildingUnitPosition>(),
+                        Fixture.Create<BuildingUnitPosition>(),
                         Fixture.Create<BuildingRegistry.Legacy.BuildingGeometry>(),
                         isRemoved: false)
                 }
@@ -156,7 +164,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenNotRealizingBuildingUnit
             building.BuildingUnits.Should().NotBeEmpty();
             building.BuildingUnits.Count.Should().Be(1);
             var buildingUnit = building.BuildingUnits.First();
-            buildingUnit.Status.Should().Be(BuildingUnitStatus.NotRealized);
+            buildingUnit.Status.Should().Be(BuildingRegistry.Building.BuildingUnitStatus.NotRealized);
             buildingUnit.LastEventHash.Should().NotBe(building.LastEventHash);
         }
     }

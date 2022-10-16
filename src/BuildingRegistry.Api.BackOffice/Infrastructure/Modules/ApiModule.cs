@@ -7,7 +7,6 @@ namespace BuildingRegistry.Api.BackOffice.Infrastructure.Modules
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
     using Be.Vlaanderen.Basisregisters.CommandHandling.Idempotency;
     using Be.Vlaanderen.Basisregisters.DataDog.Tracing.Autofac;
-    using Be.Vlaanderen.Basisregisters.EventHandling;
     using BuildingRegistry.Infrastructure;
     using BuildingRegistry.Infrastructure.Modules;
     using Microsoft.Extensions.Configuration;

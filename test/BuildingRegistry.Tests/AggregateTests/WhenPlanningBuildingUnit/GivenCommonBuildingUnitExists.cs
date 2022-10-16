@@ -10,11 +10,6 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuildingUnit
     using Fixtures;
     using Xunit;
     using Xunit.Abstractions;
-    using BuildingGeometry = Building.BuildingGeometry;
-    using BuildingGeometryMethod = Building.BuildingGeometryMethod;
-    using BuildingUnitPositionGeometryMethod = Building.BuildingUnitPositionGeometryMethod;
-    using BuildingUnitStatus = Building.BuildingUnitStatus;
-    using ExtendedWkbGeometry = Building.ExtendedWkbGeometry;
 
     public class GivenCommonBuildingUnitExists : BuildingRegistryTest
     {

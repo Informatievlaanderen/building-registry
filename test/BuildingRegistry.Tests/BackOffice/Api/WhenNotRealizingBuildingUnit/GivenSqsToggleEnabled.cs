@@ -1,20 +1,18 @@
 namespace BuildingRegistry.Tests.BackOffice.Api.WhenNotRealizingBuildingUnit
 {
     using System;
-    using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
     using AutoFixture;
     using Be.Vlaanderen.Basisregisters.Api.ETag;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
+    using Be.Vlaanderen.Basisregisters.Sqs.Exceptions;
+    using Be.Vlaanderen.Basisregisters.Sqs.Requests;
     using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Requests;
-    using BuildingRegistry.Api.BackOffice.Abstractions.Exceptions;
     using BuildingRegistry.Api.BackOffice.BuildingUnit;
-    using BuildingRegistry.Api.BackOffice.Handlers.Sqs.Requests;
     using BuildingRegistry.Api.BackOffice.Handlers.Sqs.Requests.BuildingUnit;
     using Fixtures;
     using FluentAssertions;
-    using FluentValidation;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
     using Moq;

@@ -1,18 +1,18 @@
 namespace BuildingRegistry.Tests.BackOffice.Sqs.Building
 {
-    using AutoFixture;
-    using Be.Vlaanderen.Basisregisters.MessageHandling.AwsSqs.Simple;
-    using FluentAssertions;
-    using Moq;
     using System;
     using System.Collections.Generic;
     using System.Threading;
     using System.Threading.Tasks;
+    using AutoFixture;
+    using Be.Vlaanderen.Basisregisters.MessageHandling.AwsSqs.Simple;
+    using Be.Vlaanderen.Basisregisters.Sqs;
     using BuildingRegistry.Api.BackOffice.Abstractions.Building.Requests;
-    using BuildingRegistry.Api.BackOffice.Handlers.Sqs;
     using BuildingRegistry.Api.BackOffice.Handlers.Sqs.Handlers.Building;
     using BuildingRegistry.Api.BackOffice.Handlers.Sqs.Requests.Building;
     using Fixtures;
+    using FluentAssertions;
+    using Moq;
     using TicketingService.Abstractions;
     using Xunit;
     using Xunit.Abstractions;

@@ -148,7 +148,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuildingUnit
 
             Assert(new Scenario()
                 .Given(new BuildingStreamId(Fixture.Create<BuildingPersistentLocalId>()),
-                    @buildingWasPlanned)
+                    buildingWasPlanned)
                 .When(command)
                 .Throws(new BuildingUnitPositionIsOutsideBuildingGeometryException()));
         }
@@ -195,7 +195,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuildingUnit
 
             Assert(new Scenario()
                 .Given(new BuildingStreamId(Fixture.Create<BuildingPersistentLocalId>()),
-                    @buildingWasPlanned,
+                    buildingWasPlanned,
                     buildingUnitWasPlanned)
                 .When(command)
                 .Throws(new BuildingUnitPersistentLocalIdAlreadyExistsException()));

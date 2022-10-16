@@ -5,9 +5,9 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenNotRealizingBuilding
     using System.Threading.Tasks;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
+    using Building;
     using BuildingRegistry.Api.BackOffice.Abstractions.Building.Requests;
     using BuildingRegistry.Api.BackOffice.Building;
-    using BuildingRegistry.Building;
     using FluentAssertions;
     using Microsoft.AspNetCore.Http;
     using Moq;

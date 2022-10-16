@@ -28,7 +28,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenNotRealizingBuilding
         {
             var buildingPersistentLocalId = new BuildingPersistentLocalId(123);
 
-            var request = new NotRealizeBuildingRequest()
+            var request = new NotRealizeBuildingRequest
             {
                 PersistentLocalId = buildingPersistentLocalId
             };

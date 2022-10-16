@@ -10,7 +10,7 @@ namespace BuildingRegistry.Api.Oslo.Abstractions.BuildingUnit.Responses
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy.Gebouweenheid;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy.SpatialTools;
-    using BuildingRegistry.Api.Oslo.Abstractions.Infrastructure.Options;
+    using Infrastructure.Options;
     using Microsoft.AspNetCore.Http;
     using Microsoft.Extensions.Options;
     using Newtonsoft.Json;

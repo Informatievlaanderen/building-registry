@@ -8,10 +8,10 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenRealizingBuildingUnit
     using Be.Vlaanderen.Basisregisters.AggregateSource.Snapshotting;
     using Be.Vlaanderen.Basisregisters.Api.ETag;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
+    using Be.Vlaanderen.Basisregisters.Sqs.Responses;
     using Building;
     using Building.Events;
     using Building.Exceptions;
-    using BuildingRegistry.Api.BackOffice.Abstractions.Building.Responses;
     using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Requests;
     using BuildingRegistry.Api.BackOffice.Building;
     using BuildingRegistry.Api.BackOffice.BuildingUnit;
@@ -40,7 +40,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenRealizingBuildingUnit
                 .Setup(x => x.Send(It.IsAny<RealizeBuildingUnitRequest>(), CancellationToken.None).Result)
                 .Returns(new ETagResponse(string.Empty, string.Empty));
 
-            var request = new RealizeBuildingUnitRequest()
+            var request = new RealizeBuildingUnitRequest
             {
                 BuildingUnitPersistentLocalId = buildingUnitPersistentLocalId
             };
@@ -80,7 +80,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenRealizingBuildingUnit
                 .Setup(x => x.Send(It.IsAny<RealizeBuildingUnitRequest>(), CancellationToken.None).Result)
                 .Returns(new ETagResponse(string.Empty, string.Empty));
 
-            var request = new RealizeBuildingUnitRequest()
+            var request = new RealizeBuildingUnitRequest
             {
                 BuildingUnitPersistentLocalId = buildingUnitPersistentLocalId
             };
@@ -109,7 +109,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenRealizingBuildingUnit
                 .Setup(x => x.Send(It.IsAny<RealizeBuildingUnitRequest>(), CancellationToken.None).Result)
                 .Throws(new BuildingUnitIsNotFoundException());
 
-            var request = new RealizeBuildingUnitRequest()
+            var request = new RealizeBuildingUnitRequest
             {
                 BuildingUnitPersistentLocalId = buildingUnitPersistentLocalId
             };
@@ -141,7 +141,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenRealizingBuildingUnit
                 .Setup(x => x.Send(It.IsAny<RealizeBuildingUnitRequest>(), CancellationToken.None).Result)
                 .Throws(new BuildingUnitIsRemovedException(buildingUnitPersistentLocalId));
 
-            var request = new RealizeBuildingUnitRequest()
+            var request = new RealizeBuildingUnitRequest
             {
                 BuildingUnitPersistentLocalId = buildingUnitPersistentLocalId
             };
@@ -173,7 +173,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenRealizingBuildingUnit
                 .Setup(x => x.Send(It.IsAny<RealizeBuildingUnitRequest>(), CancellationToken.None).Result)
                 .Throws(new BuildingUnitHasInvalidStatusException());
 
-            var request = new RealizeBuildingUnitRequest()
+            var request = new RealizeBuildingUnitRequest
             {
                 BuildingUnitPersistentLocalId = buildingUnitPersistentLocalId
             };
@@ -206,7 +206,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenRealizingBuildingUnit
                 .Setup(x => x.Send(It.IsAny<RealizeBuildingUnitRequest>(), CancellationToken.None).Result)
                 .Throws(new BuildingHasInvalidStatusException());
 
-            var request = new RealizeBuildingUnitRequest()
+            var request = new RealizeBuildingUnitRequest
             {
                 BuildingUnitPersistentLocalId = buildingUnitPersistentLocalId
             };

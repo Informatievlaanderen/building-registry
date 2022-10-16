@@ -11,12 +11,11 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
     using Be.Vlaanderen.Basisregisters.GrAr.Edit.Validators;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
+    using Be.Vlaanderen.Basisregisters.Sqs.Exceptions;
     using Building;
-    using BuildingRegistry.Building;
     using BuildingRegistry.Building.Exceptions;
     using FluentValidation;
     using FluentValidation.Results;
-    using Handlers;
     using Handlers.Sqs.Requests.BuildingUnit;
     using Infrastructure.Options;
     using Microsoft.AspNetCore.Http;

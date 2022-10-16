@@ -3,12 +3,13 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.BuildingUnit
     using System.Configuration;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
     using Be.Vlaanderen.Basisregisters.Api.ETag;
-    using BuildingRegistry.Api.BackOffice.Abstractions.Building.Responses;
     using BuildingRegistry.Api.BackOffice.Abstractions.Building.Validators;
-    using Abstractions.Exceptions;
+    using Be.Vlaanderen.Basisregisters.Sqs.Exceptions;
+    using Be.Vlaanderen.Basisregisters.Sqs.Lambda.Handlers;
+    using Be.Vlaanderen.Basisregisters.Sqs.Responses;
     using BuildingRegistry.Building;
     using BuildingRegistry.Building.Exceptions;
-    using BuildingRegistry.Infrastructure;
+    using Infrastructure;
     using MediatR;
     using Microsoft.Extensions.Configuration;
     using Requests.BuildingUnit;

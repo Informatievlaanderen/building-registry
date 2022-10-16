@@ -5,8 +5,8 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda
     using System.Reflection;
     using System.Threading.Tasks;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
-    using BuildingRegistry.Api.BackOffice.Abstractions.Exceptions;
-    using BuildingRegistry.Api.BackOffice.Handlers.Lambda.Infrastructure;
+    using Be.Vlaanderen.Basisregisters.Sqs.Exceptions;
+    using Be.Vlaanderen.Basisregisters.Sqs.Lambda.Infrastructure;
     using BuildingRegistry.Building.Exceptions;
     using FluentAssertions;
     using Microsoft.Data.SqlClient;

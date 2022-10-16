@@ -11,10 +11,11 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wfs
     using Fixtures;
     using FluentAssertions;
     using Infrastructure;
+    using NetTopologySuite.Geometries;
     using Projections.Wfs.BuildingV2;
     using Tests.Legacy.Autofixture;
     using Xunit;
-    using Polygon = NetTopologySuite.Geometries.Polygon;
+    using Envelope = Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope;
 
     public class BuildingV2Tests : BuildingWfsProjectionTest<BuildingV2Projections>
     {

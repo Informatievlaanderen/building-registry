@@ -3,6 +3,8 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Sqs.Handlers.BuildingUnit
     using Be.Vlaanderen.Basisregisters.GrAr.Common.Oslo.Extensions;
     using Requests.BuildingUnit;
     using System.Collections.Generic;
+    using Be.Vlaanderen.Basisregisters.Sqs;
+    using Be.Vlaanderen.Basisregisters.Sqs.Handlers;
     using TicketingService.Abstractions;
 
     public sealed class PlanBuildingUnitSqsHandler : SqsHandler<PlanBuildingUnitSqsRequest>

@@ -4,10 +4,10 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda
     using System.Threading.Tasks;
     using Autofac;
     using Be.Vlaanderen.Basisregisters.Aws.Lambda;
+    using Be.Vlaanderen.Basisregisters.Sqs.Requests;
     using MediatR;
     using Requests.Building;
     using Requests.BuildingUnit;
-    using Sqs.Requests;
     using Sqs.Requests.Building;
     using Sqs.Requests.BuildingUnit;
 

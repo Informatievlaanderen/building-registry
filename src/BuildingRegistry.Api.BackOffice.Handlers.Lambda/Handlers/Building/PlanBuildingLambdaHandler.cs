@@ -3,9 +3,10 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.Building
     using System.Threading;
     using System.Threading.Tasks;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
-    using BuildingRegistry.Api.BackOffice.Abstractions.Building.Responses;
+    using Be.Vlaanderen.Basisregisters.Sqs.Lambda.Handlers;
+    using Be.Vlaanderen.Basisregisters.Sqs.Responses;
     using BuildingRegistry.Building;
-    using BuildingRegistry.Infrastructure;
+    using Infrastructure;
     using Microsoft.Extensions.Configuration;
     using Requests.Building;
     using TicketingService.Abstractions;

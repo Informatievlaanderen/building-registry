@@ -1,7 +1,7 @@
 namespace BuildingRegistry.Api.BackOffice.Abstractions
 {
     using Autofac;
-    using BuildingRegistry.Infrastructure;
+    using Infrastructure;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;

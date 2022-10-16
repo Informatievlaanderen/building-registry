@@ -7,7 +7,7 @@ namespace BuildingRegistry.Building.Events
     using Be.Vlaanderen.Basisregisters.GrAr.Common;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Newtonsoft.Json;
-    using ExtendedWkbGeometry = BuildingRegistry.Building.ExtendedWkbGeometry;
+    using ExtendedWkbGeometry = ExtendedWkbGeometry;
 
     [EventTags(EventTag.For.Sync, EventTag.For.Edit, Tag.Building)]
     [EventName(EventName)]

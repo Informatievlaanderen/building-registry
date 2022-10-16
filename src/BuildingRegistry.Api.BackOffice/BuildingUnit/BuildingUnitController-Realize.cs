@@ -6,11 +6,11 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
     using System.Threading.Tasks;
     using Abstractions.Building.Validators;
     using Abstractions.BuildingUnit.Requests;
-    using Abstractions.Exceptions;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
     using Be.Vlaanderen.Basisregisters.Api.ETag;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
+    using Be.Vlaanderen.Basisregisters.Sqs.Exceptions;
     using Building;
     using BuildingRegistry.Building;
     using BuildingRegistry.Building.Exceptions;
@@ -23,7 +23,6 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.Extensions.Options;
     using Swashbuckle.AspNetCore.Filters;
-    using IdempotencyException = Handlers.IdempotencyException;
 
     public partial class BuildingUnitController
     {

@@ -6,6 +6,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenMigratingBuilding
     using Building;
     using Building.Commands;
     using Building.Events;
+    using BuildingRegistry.Legacy;
     using Fixtures;
     using Xunit;
     using Xunit.Abstractions;
@@ -23,7 +24,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenMigratingBuilding
         {
             var buildingWasMigrated = Fixture.Create<BuildingWasMigrated>();
             
-            Fixture.Register(() => new BuildingRegistry.Legacy.PersistentLocalId(buildingWasMigrated.BuildingPersistentLocalId));
+            Fixture.Register(() => new PersistentLocalId(buildingWasMigrated.BuildingPersistentLocalId));
             var command = Fixture.Create<MigrateBuilding>();
 
             Assert(new Scenario()

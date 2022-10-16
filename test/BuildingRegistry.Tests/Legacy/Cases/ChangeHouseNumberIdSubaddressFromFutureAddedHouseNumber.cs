@@ -83,11 +83,11 @@ namespace BuildingRegistry.Tests.Legacy.Cases
                 .Customize(new WithInfiniteLifetime())
                 .Customize(new WithFixedBuildingUnitIdFromHouseNumber());
 
-            _ = new ChangeHouseNumberIdSubaddressFromFutureAddedHouseNumber.TestCaseData(Fixture);
+            _ = new TestCaseData(Fixture);
         }
 
         protected readonly IFixture Fixture;
-        protected ChangeHouseNumberIdSubaddressFromFutureAddedHouseNumber.TestCaseData _ { get; }
+        protected TestCaseData _ { get; }
 
 
         public IEventCentricTestSpecificationBuilder ImportSubaddressWithOldHouseNumber()

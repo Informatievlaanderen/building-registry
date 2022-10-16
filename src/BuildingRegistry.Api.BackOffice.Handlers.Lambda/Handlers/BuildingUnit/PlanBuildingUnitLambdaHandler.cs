@@ -4,12 +4,12 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.BuildingUnit
     using System.Threading.Tasks;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
     using Abstractions;
-    using BuildingRegistry.Api.BackOffice.Abstractions.Building.Responses;
+    using Be.Vlaanderen.Basisregisters.Sqs.Lambda.Handlers;
+    using Be.Vlaanderen.Basisregisters.Sqs.Responses;
     using BuildingRegistry.Api.BackOffice.Abstractions.Building.Validators;
-    using Abstractions.Exceptions;
     using BuildingRegistry.Building;
     using BuildingRegistry.Building.Exceptions;
-    using BuildingRegistry.Infrastructure;
+    using Infrastructure;
     using Microsoft.Extensions.Configuration;
     using Requests.BuildingUnit;
     using TicketingService.Abstractions;

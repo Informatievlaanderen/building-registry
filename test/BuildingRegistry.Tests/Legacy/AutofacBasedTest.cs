@@ -1,5 +1,6 @@
 namespace BuildingRegistry.Tests.Legacy
 {
+    using System;
     using System.Collections.Generic;
     using Autofac;
     using Be.Vlaanderen.Basisregisters.AggregateSource.Snapshotting;
@@ -31,13 +32,13 @@ namespace BuildingRegistry.Tests.Legacy
 
         public IChangeToken GetReloadToken()
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
         public string this[string key]
         {
             get => null;
-            set => throw new System.NotImplementedException();
+            set => throw new NotImplementedException();
         }
     }
 

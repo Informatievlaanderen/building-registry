@@ -6,10 +6,10 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenRealizingBuilding
     using AutoFixture;
     using Be.Vlaanderen.Basisregisters.Api.ETag;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
+    using Be.Vlaanderen.Basisregisters.Sqs.Requests;
     using BuildingRegistry.Api.BackOffice.Abstractions.Building.Requests;
     using BuildingRegistry.Api.BackOffice.Abstractions.Building.Validators;
     using BuildingRegistry.Api.BackOffice.Building;
-    using BuildingRegistry.Api.BackOffice.Handlers.Sqs.Requests;
     using BuildingRegistry.Api.BackOffice.Handlers.Sqs.Requests.Building;
     using Fixtures;
     using FluentAssertions;
@@ -17,7 +17,6 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenRealizingBuilding
     using Microsoft.AspNetCore.Mvc;
     using Moq;
     using SqlStreamStore;
-    using SqlStreamStore.Streams;
     using Xunit;
     using Xunit.Abstractions;
 

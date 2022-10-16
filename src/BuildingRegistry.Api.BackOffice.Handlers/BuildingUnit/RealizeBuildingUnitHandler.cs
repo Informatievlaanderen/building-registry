@@ -9,6 +9,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.BuildingUnit
     using Abstractions.BuildingUnit.Requests;
     using Be.Vlaanderen.Basisregisters.CommandHandling;
     using Be.Vlaanderen.Basisregisters.CommandHandling.Idempotency;
+    using Be.Vlaanderen.Basisregisters.Sqs.Responses;
     using BuildingRegistry.Building;
     using MediatR;
 
