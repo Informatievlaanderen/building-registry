@@ -1,12 +1,12 @@
-﻿namespace BuildingRegistry.Tests.BackOffice.Api.WhenPlanningBuilding
+namespace BuildingRegistry.Tests.BackOffice.Api.WhenPlanningBuilding
 {
     using System;
     using System.Threading;
     using System.Threading.Tasks;
     using AutoFixture;
+    using Be.Vlaanderen.Basisregisters.Sqs.Requests;
     using BuildingRegistry.Api.BackOffice.Abstractions.Building.Requests;
     using BuildingRegistry.Api.BackOffice.Building;
-    using BuildingRegistry.Api.BackOffice.Handlers.Sqs.Requests;
     using BuildingRegistry.Api.BackOffice.Handlers.Sqs.Requests.Building;
     using Fixtures;
     using FluentAssertions;

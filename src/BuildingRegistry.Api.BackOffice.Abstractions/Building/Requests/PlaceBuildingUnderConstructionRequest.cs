@@ -2,11 +2,11 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.Building.Requests
 {
     using System.Collections.Generic;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
+    using Be.Vlaanderen.Basisregisters.Sqs.Responses;
     using BuildingRegistry.Building;
     using BuildingRegistry.Building.Commands;
     using MediatR;
     using Newtonsoft.Json;
-    using Responses;
 
     public class PlaceBuildingUnderConstructionRequest : PlaceBuildingUnderConstructionBackOfficeRequest, IRequest<ETagResponse>
     {

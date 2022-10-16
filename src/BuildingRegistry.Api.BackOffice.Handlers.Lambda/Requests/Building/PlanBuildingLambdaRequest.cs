@@ -6,20 +6,30 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Requests.Building
     using BuildingRegistry.Api.BackOffice.Abstractions.Building.Requests;
     using BuildingRegistry.Building;
     using BuildingRegistry.Building.Commands;
+    using Sqs.Requests.Building;
 
-    public sealed class PlanBuildingLambdaRequest :
+    public sealed record PlanBuildingLambdaRequest :
         BuildingLambdaRequest,
         IHasBackOfficeRequest<PlanBuildingBackOfficeRequest>
     {
-        public PlanBuildingBackOfficeRequest Request { get; set; }
+        public PlanBuildingBackOfficeRequest Request { get; }
+
+        public PlanBuildingLambdaRequest(string messageGroupId, PlanBuildingSqsRequest sqsRequest)
+            : this(
+                messageGroupId,
+                sqsRequest.TicketId,
+                sqsRequest.ProvenanceData.ToProvenance(),
+                sqsRequest.Metadata,
+                sqsRequest.Request)
+        { }
 
         public PlanBuildingLambdaRequest(
+            string messageGroupId,
             Guid ticketId,
-            string messageGroupId, 
             Provenance provenance,
-            IDictionary<string, object> metadata,
+            IDictionary<string, object?> metadata,
             PlanBuildingBackOfficeRequest request)
-            : base(ticketId, messageGroupId, null, provenance, metadata)
+            : base(messageGroupId, ticketId, null, provenance, metadata)
         {
             Request = request;
         }

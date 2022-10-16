@@ -12,6 +12,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers
     using Be.Vlaanderen.Basisregisters.CommandHandling;
     using Be.Vlaanderen.Basisregisters.CommandHandling.Idempotency;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
+    using Be.Vlaanderen.Basisregisters.Sqs.Exceptions;
     using Be.Vlaanderen.Basisregisters.Utilities.HexByteConvertor;
     using Microsoft.AspNetCore.Http;
     using Microsoft.EntityFrameworkCore;
@@ -84,17 +85,5 @@ namespace BuildingRegistry.Api.BackOffice.Handlers
                 Organisation.DigitaalVlaanderen // TODO: from claims
             );
         }
-    }
-
-    [Serializable]
-    public sealed class IdempotencyException : Exception
-    {
-        public IdempotencyException(string? message)
-            : base(message)
-        { }
-
-        private IdempotencyException(SerializationInfo info, StreamingContext context)
-            : base(info, context)
-        { }
     }
 }

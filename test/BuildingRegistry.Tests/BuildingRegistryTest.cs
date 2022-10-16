@@ -7,16 +7,24 @@ namespace BuildingRegistry.Tests
     using Be.Vlaanderen.Basisregisters.AggregateSource.Snapshotting;
     using Be.Vlaanderen.Basisregisters.AggregateSource.SqlStreamStore.Autofac;
     using Be.Vlaanderen.Basisregisters.CommandHandling;
+    using Be.Vlaanderen.Basisregisters.EventHandling;
+    using Be.Vlaanderen.Basisregisters.EventHandling.Autofac;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Building;
     using Fixtures;
+    using Infrastructure.Modules;
     using Microsoft.Extensions.Configuration;
+    using Newtonsoft.Json;
+    using Xunit.Abstractions;
+    using BuildingUnitFunction = BuildingRegistry.Legacy.BuildingUnitFunction;
+    using BuildingUnitPositionGeometryMethod = BuildingRegistry.Legacy.BuildingUnitPositionGeometryMethod;
+    using BuildingUnitStatus = BuildingRegistry.Legacy.BuildingUnitStatus;
 
     public class BuildingRegistryTest : AutofacBasedTest
     {
         protected Fixture Fixture { get; }
         protected string ConfigDetailUrl => "http://base/{0}";
-        protected Newtonsoft.Json.JsonSerializerSettings EventSerializerSettings { get; } = Be.Vlaanderen.Basisregisters.EventHandling.EventsJsonSerializerSettingsProvider.CreateSerializerSettings();
+        protected JsonSerializerSettings EventSerializerSettings { get; } = EventsJsonSerializerSettingsProvider.CreateSerializerSettings();
 
         public void DispatchArrangeCommand<T>(T command) where T : IHasCommandProvenance
         {
@@ -25,7 +33,7 @@ namespace BuildingRegistry.Tests
             bus.Dispatch(command.CreateCommandId(), command);
         }
 
-        public BuildingRegistryTest(Xunit.Abstractions.ITestOutputHelper testOutputHelper) : base(testOutputHelper)
+        public BuildingRegistryTest(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
         {
             Fixture = new Fixture();
 
@@ -40,10 +48,10 @@ namespace BuildingRegistry.Tests
 
             Fixture.Register(() =>
             {
-                var functions = new List<BuildingRegistry.Legacy.BuildingUnitFunction>
+                var functions = new List<BuildingUnitFunction>
                 {
-                    BuildingRegistry.Legacy.BuildingUnitFunction.Common,
-                    BuildingRegistry.Legacy.BuildingUnitFunction.Unknown,
+                    BuildingUnitFunction.Common,
+                    BuildingUnitFunction.Unknown,
                 };
 
                 return functions[new Random(Fixture.Create<int>()).Next(0, functions.Count - 1)];
@@ -51,12 +59,12 @@ namespace BuildingRegistry.Tests
 
             Fixture.Register(() =>
             {
-                var statusses = new List<BuildingRegistry.Legacy.BuildingUnitStatus>
+                var statusses = new List<BuildingUnitStatus>
                 {
-                    BuildingRegistry.Legacy.BuildingUnitStatus.NotRealized,
-                    BuildingRegistry.Legacy.BuildingUnitStatus.Retired,
-                    BuildingRegistry.Legacy.BuildingUnitStatus.Realized,
-                    BuildingRegistry.Legacy.BuildingUnitStatus.Planned,
+                    BuildingUnitStatus.NotRealized,
+                    BuildingUnitStatus.Retired,
+                    BuildingUnitStatus.Realized,
+                    BuildingUnitStatus.Planned,
                 };
 
                 return statusses[new Random(Fixture.Create<int>()).Next(0, statusses.Count - 1)];
@@ -64,10 +72,10 @@ namespace BuildingRegistry.Tests
 
             Fixture.Register(() =>
             {
-                var method = new List<BuildingRegistry.Legacy.BuildingUnitPositionGeometryMethod>
+                var method = new List<BuildingUnitPositionGeometryMethod>
                 {
-                    BuildingRegistry.Legacy.BuildingUnitPositionGeometryMethod.AppointedByAdministrator,
-                    BuildingRegistry.Legacy.BuildingUnitPositionGeometryMethod.DerivedFromObject,
+                    BuildingUnitPositionGeometryMethod.AppointedByAdministrator,
+                    BuildingUnitPositionGeometryMethod.DerivedFromObject,
                 };
 
                 return method[new Random(Fixture.Create<int>()).Next(0, method.Count - 1)];
@@ -83,10 +91,10 @@ namespace BuildingRegistry.Tests
                 .AddInMemoryCollection(new Dictionary<string, string> { { "BuildingUnitDetailUrl", ConfigDetailUrl } })
                 .Build();
 
-            builder.Register((a) => (IConfiguration)configuration);
+            builder.Register(a => (IConfiguration)configuration);
 
             builder
-                .RegisterModule(new Infrastructure.Modules.CommandHandlingModule(configuration))
+                .RegisterModule(new CommandHandlingModule(configuration))
                 .RegisterModule(new SqlStreamStoreModule());
 
             builder.RegisterModule(new SqlSnapshotStoreModule());
@@ -98,8 +106,8 @@ namespace BuildingRegistry.Tests
 
         protected override void ConfigureEventHandling(ContainerBuilder builder)
         {
-            var eventSerializerSettings = Be.Vlaanderen.Basisregisters.EventHandling.EventsJsonSerializerSettingsProvider.CreateSerializerSettings();
-            builder.RegisterModule(new Be.Vlaanderen.Basisregisters.EventHandling.Autofac.EventHandlingModule(typeof(DomainAssemblyMarker).Assembly, eventSerializerSettings));
+            var eventSerializerSettings = EventsJsonSerializerSettingsProvider.CreateSerializerSettings();
+            builder.RegisterModule(new EventHandlingModule(typeof(DomainAssemblyMarker).Assembly, eventSerializerSettings));
         }
         public string GetSnapshotIdentifier(string identifier) => $"{identifier}-snapshots";
     }

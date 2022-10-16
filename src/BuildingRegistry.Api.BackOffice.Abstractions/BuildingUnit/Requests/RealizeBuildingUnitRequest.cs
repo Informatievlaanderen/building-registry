@@ -2,7 +2,7 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Requests
 {
     using System.Collections.Generic;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
-    using Building.Responses;
+    using Be.Vlaanderen.Basisregisters.Sqs.Responses;
     using BuildingRegistry.Building;
     using BuildingRegistry.Building.Commands;
     using MediatR;

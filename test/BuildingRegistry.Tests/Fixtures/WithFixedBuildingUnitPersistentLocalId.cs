@@ -1,21 +1,23 @@
 namespace BuildingRegistry.Tests.Fixtures
 {
     using AutoFixture;
+    using AutoFixture.Kernel;
     using Building;
+    using BuildingRegistry.Legacy;
 
     public class WithFixedBuildingUnitPersistentLocalId : ICustomization
     {
-        public void Customize(AutoFixture.IFixture fixture)
+        public void Customize(IFixture fixture)
         {
             var persistentLocalIdInt = fixture.Create<int>();
 
             fixture.Register(() => new BuildingUnitPersistentLocalId(persistentLocalIdInt));
-            fixture.Register(() => new BuildingRegistry.Legacy.PersistentLocalId(persistentLocalIdInt));
+            fixture.Register(() => new PersistentLocalId(persistentLocalIdInt));
 
             fixture.Customizations.Add(
-                new AutoFixture.Kernel.FilteringSpecimenBuilder(
-                    new AutoFixture.Kernel.FixedBuilder(persistentLocalIdInt),
-                    new AutoFixture.Kernel.ParameterSpecification(
+                new FilteringSpecimenBuilder(
+                    new FixedBuilder(persistentLocalIdInt),
+                    new ParameterSpecification(
                         typeof(int),
                         "buildingUnitPersistentLocalId")));
         }

@@ -17,17 +17,18 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda
     using System.Reflection;
     using Abstractions;
     using Be.Vlaanderen.Basisregisters.CommandHandling.Idempotency;
+    using Be.Vlaanderen.Basisregisters.Sqs.Lambda.Infrastructure;
     using Infrastructure;
-    using BuildingRegistry.Infrastructure;
-    using BuildingRegistry.Infrastructure.Modules;
+    using Infrastructure.Modules;
     using Newtonsoft.Json;
-    using Sqs.Requests;
+    using Sqs.Requests.Building;
     using TicketingService.Proxy.HttpProxy;
+    using ICustomRetryPolicy = Infrastructure.ICustomRetryPolicy;
 
     public class Function : FunctionBase
     {
         public Function()
-            : base(new List<Assembly>{ typeof(SqsRequest).Assembly })
+            : base(new List<Assembly>{ typeof(PlanBuildingSqsRequest).Assembly })
         { }
 
         protected override IServiceProvider ConfigureServices(IServiceCollection services)

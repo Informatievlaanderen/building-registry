@@ -5,10 +5,10 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenCorrectingBuildingRealizatio
     using System.Threading.Tasks;
     using AutoFixture;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
-    using BuildingRegistry.Api.BackOffice.Abstractions.Building.Requests;
-    using BuildingRegistry.Api.BackOffice.Building;
     using Building;
     using Building.Exceptions;
+    using BuildingRegistry.Api.BackOffice.Abstractions.Building.Requests;
+    using BuildingRegistry.Api.BackOffice.Building;
     using FluentAssertions;
     using Microsoft.AspNetCore.Http;
     using Moq;

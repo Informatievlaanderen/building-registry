@@ -3,8 +3,8 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenCorrectingBuildingNotRealiza
     using System.Threading;
     using System.Threading.Tasks;
     using AutoFixture;
+    using Be.Vlaanderen.Basisregisters.Sqs.Responses;
     using BuildingRegistry.Api.BackOffice.Abstractions.Building.Requests;
-    using BuildingRegistry.Api.BackOffice.Abstractions.Building.Responses;
     using BuildingRegistry.Api.BackOffice.Building;
     using Building;
     using FluentAssertions;

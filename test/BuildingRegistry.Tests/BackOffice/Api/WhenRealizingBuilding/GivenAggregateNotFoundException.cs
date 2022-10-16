@@ -7,7 +7,6 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenRealizingBuilding
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
     using Building;
     using BuildingRegistry.Api.BackOffice.Abstractions.Building.Requests;
-    using BuildingRegistry.Api.BackOffice.Abstractions.Building.Validators;
     using BuildingRegistry.Api.BackOffice.Building;
     using FluentAssertions;
     using Microsoft.AspNetCore.Http;

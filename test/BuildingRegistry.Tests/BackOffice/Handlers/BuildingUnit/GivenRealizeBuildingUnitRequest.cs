@@ -65,7 +65,7 @@ namespace BuildingRegistry.Tests.BackOffice.Handlers.BuildingUnit
                 hasDeviation: false,
                 Fixture.Create<Provenance>()));
 
-            var request = new RealizeBuildingUnitRequest()
+            var request = new RealizeBuildingUnitRequest
             {
                 BuildingUnitPersistentLocalId = buildingUnitPersistentLocalId
             };

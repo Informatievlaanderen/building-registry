@@ -13,6 +13,7 @@ namespace BuildingRegistry.Tests
     using Microsoft.Extensions.Logging;
     using Newtonsoft.Json;
     using Xunit.Abstractions;
+    using LogExtensions = Be.Vlaanderen.Basisregisters.ProjectionHandling.Connector.Testing.LogExtensions;
 
     public abstract class AutofacBasedTest
     {
@@ -57,7 +58,7 @@ namespace BuildingRegistry.Tests
                 return containerBuilder.Build();
             });
 
-            Be.Vlaanderen.Basisregisters.ProjectionHandling.Connector.Testing.LogExtensions.LogSerializerSettings = new JsonSerializerSettings
+            LogExtensions.LogSerializerSettings = new JsonSerializerSettings
             {
                 ReferenceLoopHandling = ReferenceLoopHandling.Ignore
             };

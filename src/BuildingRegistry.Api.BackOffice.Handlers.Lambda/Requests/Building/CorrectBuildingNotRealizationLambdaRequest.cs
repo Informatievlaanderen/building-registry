@@ -5,24 +5,37 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Requests.Building
     using BuildingRegistry.Api.BackOffice.Abstractions.Building.Requests;
     using BuildingRegistry.Building;
     using BuildingRegistry.Building.Commands;
+    using Sqs.Requests.Building;
 
-    public sealed class CorrectBuildingNotRealizationLambdaRequest :
+    public sealed record CorrectBuildingNotRealizationLambdaRequest :
         BuildingLambdaRequest,
         IHasBackOfficeRequest<CorrectBuildingNotRealizationBackOfficeRequest>,
         Abstractions.IHasBuildingPersistentLocalId
     {
-        public CorrectBuildingNotRealizationBackOfficeRequest Request { get; set; }
+        public CorrectBuildingNotRealizationBackOfficeRequest Request { get; }
 
         public int BuildingPersistentLocalId => Request.PersistentLocalId;
 
         public CorrectBuildingNotRealizationLambdaRequest(
-            Guid ticketId,
             string messageGroupId,
+            CorrectBuildingNotRealizationSqsRequest sqsRequest)
+            : this(
+                messageGroupId,
+                sqsRequest.TicketId,
+                sqsRequest.IfMatchHeaderValue,
+                sqsRequest.ProvenanceData.ToProvenance(),
+                sqsRequest.Metadata,
+                sqsRequest.Request)
+        { }
+
+        public CorrectBuildingNotRealizationLambdaRequest(
+            string messageGroupId,
+            Guid ticketId,
             string? ifMatchHeaderValue,
             Provenance provenance,
-            IDictionary<string, object> metadata,
+            IDictionary<string, object?> metadata,
             CorrectBuildingNotRealizationBackOfficeRequest request)
-            : base(ticketId, messageGroupId, ifMatchHeaderValue, provenance, metadata)
+            : base(messageGroupId, ticketId, ifMatchHeaderValue, provenance, metadata)
         {
             Request = request;
         }

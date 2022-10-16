@@ -34,13 +34,13 @@ namespace BuildingRegistry.Tests.Legacy
 
         public IChangeToken GetReloadToken()
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
         public string this[string key]
         {
             get => null;
-            set => throw new System.NotImplementedException();
+            set => throw new NotImplementedException();
         }
     }
 

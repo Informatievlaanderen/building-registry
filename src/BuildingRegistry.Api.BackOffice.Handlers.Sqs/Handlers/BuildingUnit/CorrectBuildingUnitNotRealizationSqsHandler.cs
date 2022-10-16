@@ -3,6 +3,8 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Sqs.Handlers.BuildingUnit
     using Abstractions;
     using Requests.BuildingUnit;
     using System.Collections.Generic;
+    using Be.Vlaanderen.Basisregisters.Sqs;
+    using Be.Vlaanderen.Basisregisters.Sqs.Handlers;
     using TicketingService.Abstractions;
 
     public sealed class CorrectBuildingUnitNotRealizationSqsHandler : SqsHandler<CorrectBuildingUnitNotRealizationSqsRequest>

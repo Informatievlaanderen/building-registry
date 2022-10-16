@@ -8,8 +8,8 @@ namespace BuildingRegistry.Tests.BackOffice.Sqs.Building
     using System.Collections.Generic;
     using System.Threading;
     using System.Threading.Tasks;
+    using Be.Vlaanderen.Basisregisters.Sqs;
     using BuildingRegistry.Api.BackOffice.Abstractions.Building.Requests;
-    using BuildingRegistry.Api.BackOffice.Handlers.Sqs;
     using BuildingRegistry.Api.BackOffice.Handlers.Sqs.Handlers.Building;
     using BuildingRegistry.Api.BackOffice.Handlers.Sqs.Requests.Building;
     using BuildingRegistry.Building;

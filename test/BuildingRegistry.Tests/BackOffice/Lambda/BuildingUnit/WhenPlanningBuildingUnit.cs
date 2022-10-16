@@ -11,10 +11,10 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
     using Be.Vlaanderen.Basisregisters.CommandHandling.Idempotency;
     using Be.Vlaanderen.Basisregisters.GrAr.Edit.Contracts;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
+    using Be.Vlaanderen.Basisregisters.Sqs.Lambda.Handlers;
+    using Be.Vlaanderen.Basisregisters.Sqs.Responses;
     using BuildingRegistry.Api.BackOffice.Abstractions;
-    using BuildingRegistry.Api.BackOffice.Abstractions.Building.Responses;
     using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Requests;
-    using BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers;
     using BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.BuildingUnit;
     using BuildingRegistry.Api.BackOffice.Handlers.Lambda.Requests.BuildingUnit;
     using BuildingRegistry.Building;
@@ -69,10 +69,10 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
 
             //Act
             await handler.Handle(new PlanBuildingUnitLambdaRequest(
-                Guid.NewGuid(),
                 buildingPersistentLocalId,
+                Guid.NewGuid(),
                 Fixture.Create<Provenance>(),
-                new Dictionary<string, object>(),
+                new Dictionary<string, object?>(),
                 new PlanBuildingUnitBackOfficeRequest
                 {
                     GebouwId = $"https://data.vlaanderen.be/id/gebouw/{buildingPersistentLocalId}",
@@ -139,10 +139,10 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
 
             //Act
             await handler.Handle(new PlanBuildingUnitLambdaRequest(
-                Guid.NewGuid(),
                 buildingPersistentLocalId,
+                Guid.NewGuid(),
                 Fixture.Create<Provenance>(),
-                new Dictionary<string, object>(),
+                new Dictionary<string, object?>(),
                 new PlanBuildingUnitBackOfficeRequest
                 {
                     GebouwId = $"https://data.vlaanderen.be/id/gebouw/{buildingPersistentLocalId}",
@@ -196,10 +196,10 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
 
             // Act
             await handler.Handle(new PlanBuildingUnitLambdaRequest(
-                Guid.NewGuid(),
                 buildingPersistentLocalId,
+                Guid.NewGuid(),
                 Fixture.Create<Provenance>(),
-                new Dictionary<string, object>(),
+                new Dictionary<string, object?>(),
                 new PlanBuildingUnitBackOfficeRequest
                 {
                     GebouwId = $"https://data.vlaanderen.be/id/gebouw/{buildingPersistentLocalId}",
@@ -243,10 +243,10 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
 
             // Act
             await handler.Handle(new PlanBuildingUnitLambdaRequest(
-                Guid.NewGuid(),
                 buildingPersistentLocalId,
+                Guid.NewGuid(),
                 Fixture.Create<Provenance>(),
-                new Dictionary<string, object>(),
+                new Dictionary<string, object?>(),
                 new PlanBuildingUnitBackOfficeRequest
                 {
                     GebouwId = $"https://data.vlaanderen.be/id/gebouw/{buildingPersistentLocalId}",

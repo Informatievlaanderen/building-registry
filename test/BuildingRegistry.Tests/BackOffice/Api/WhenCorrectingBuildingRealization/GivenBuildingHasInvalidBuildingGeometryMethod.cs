@@ -5,10 +5,10 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenCorrectingBuildingRealizatio
     using System.Threading;
     using System.Threading.Tasks;
     using AutoFixture;
-    using BuildingRegistry.Api.BackOffice.Abstractions.Building.Requests;
-    using BuildingRegistry.Api.BackOffice.Building;
     using Building;
     using Building.Exceptions;
+    using BuildingRegistry.Api.BackOffice.Abstractions.Building.Requests;
+    using BuildingRegistry.Api.BackOffice.Building;
     using FluentAssertions;
     using FluentValidation;
     using Moq;

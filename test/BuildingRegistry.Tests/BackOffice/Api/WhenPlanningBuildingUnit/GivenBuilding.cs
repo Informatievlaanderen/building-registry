@@ -45,7 +45,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenPlanningBuildingUnit
 
             _streamStoreMock.SetStreamFound();
 
-            var request = new PlanBuildingUnitRequest()
+            var request = new PlanBuildingUnitRequest
             {
                 GebouwId = $"https://data.vlaanderen.be/id/gebouw/{buildingPersistentLocalId}",
                 PositieGeometrieMethode = PositieGeometrieMethode.AangeduidDoorBeheerder,
@@ -109,7 +109,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenPlanningBuildingUnit
         {
             var buildingPersistentLocalId = new BuildingPersistentLocalId(123);
 
-            var request = new PlanBuildingUnitRequest()
+            var request = new PlanBuildingUnitRequest
             {
                 GebouwId = $"/{buildingPersistentLocalId}",
                 PositieGeometrieMethode = PositieGeometrieMethode.AangeduidDoorBeheerder,
