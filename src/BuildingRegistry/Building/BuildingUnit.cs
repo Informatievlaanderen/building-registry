@@ -98,6 +98,31 @@ namespace BuildingRegistry.Building
             }
         }
 
+        public void CorrectRealizeBuildingUnit()
+        {
+            if (IsRemoved)
+            {
+                throw new BuildingUnitIsRemovedException(BuildingUnitPersistentLocalId);
+            }
+
+            if (Function == BuildingUnitFunction.Common)
+            {
+                throw new BuildingUnitHasInvalidFunctionException();
+            }
+
+            if (Status == BuildingUnitStatus.Planned)
+            {
+                return;
+            }
+
+            if (Status != BuildingUnitStatus.Realized)
+            {
+                throw new BuildingUnitHasInvalidStatusException();
+            }
+
+            Apply(new BuildingUnitWasCorrectedFromRealizedToPlanned(_buildingPersistentLocalId, BuildingUnitPersistentLocalId));
+        }
+
         public void NotRealize()
         {
             if (IsRemoved)
