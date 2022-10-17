@@ -1,3 +1,12 @@
+# [3.36.0](https://github.com/informatievlaanderen/building-registry/compare/v3.35.0...v3.36.0) (2022-10-17)
+
+
+### Features
+
+* consume address status changes ([3ef7a6d](https://github.com/informatievlaanderen/building-registry/commit/3ef7a6d47d1f23d726352b9ca73f50c44bee8b8f))
+* correct building place under construction ([13a3958](https://github.com/informatievlaanderen/building-registry/commit/13a39584d4c55783fe87cc4ccb91a24d8a6bdf52))
+* correct not-realization building ([970595a](https://github.com/informatievlaanderen/building-registry/commit/970595ad93e2e9c9879623baecc1d7b4691bbe06))
+
 # [3.35.0](https://github.com/informatievlaanderen/building-registry/compare/v3.34.3...v3.35.0) (2022-10-14)
 
 
