@@ -36,121 +36,132 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda
             switch (sqsRequest)
             {
                 case NotRealizeBuildingSqsRequest request:
-                    await mediator.Send(new NotRealizeBuildingLambdaRequest
-                    {
-                        Request = request.Request,
-                        TicketId = request.TicketId,
-                        MessageGroupId = messageMetadata.MessageGroupId!,
-                        IfMatchHeaderValue = request.IfMatchHeaderValue,
-                        Metadata = request.Metadata,
-                        Provenance = request.ProvenanceData.ToProvenance()
-                    }, cancellationToken);
+                    await mediator.Send(
+                        new NotRealizeBuildingLambdaRequest(
+                            request.TicketId,
+                            messageMetadata.MessageGroupId!,
+                            request.IfMatchHeaderValue,
+                            request.ProvenanceData.ToProvenance(),
+                            request.Metadata,
+                            request.Request),
+                        cancellationToken);
                     break;
 
                 case CorrectBuildingNotRealizationSqsRequest request:
-                    await mediator.Send(new CorrectBuildingNotRealizationLambdaRequest
-                    {
-                        Request = request.Request,
-                        TicketId = request.TicketId,
-                        MessageGroupId = messageMetadata.MessageGroupId!,
-                        IfMatchHeaderValue = request.IfMatchHeaderValue,
-                        Metadata = request.Metadata,
-                        Provenance = request.ProvenanceData.ToProvenance()
-                    }, cancellationToken);
+                    await mediator.Send(
+                        new CorrectBuildingNotRealizationLambdaRequest(
+                            request.TicketId,
+                            messageMetadata.MessageGroupId!,
+                            request.IfMatchHeaderValue,
+                            request.ProvenanceData.ToProvenance(),
+                            request.Metadata,
+                            request.Request),
+                        cancellationToken);
                     break;
 
                 case PlaceBuildingUnderConstructionSqsRequest request:
-                    await mediator.Send(new PlaceBuildingUnderConstructionLambdaRequest
-                    {
-                        Request = request.Request,
-                        TicketId = request.TicketId,
-                        MessageGroupId = messageMetadata.MessageGroupId!,
-                        IfMatchHeaderValue = request.IfMatchHeaderValue,
-                        Metadata = request.Metadata,
-                        Provenance = request.ProvenanceData.ToProvenance()
-                    }, cancellationToken);
+                    await mediator.Send(
+                        new PlaceBuildingUnderConstructionLambdaRequest(
+                            request.TicketId,
+                            messageMetadata.MessageGroupId!,
+                            request.IfMatchHeaderValue,
+                            request.ProvenanceData.ToProvenance(),
+                            request.Metadata,
+                            request.Request),
+                        cancellationToken);
                     break;
 
                 case CorrectPlaceBuildingUnderConstructionSqsRequest request:
-                    await mediator.Send(new CorrectPlaceBuildingUnderConstructionLambdaRequest
-                    {
-                        Request = request.Request,
-                        TicketId = request.TicketId,
-                        MessageGroupId = messageMetadata.MessageGroupId!,
-                        IfMatchHeaderValue = request.IfMatchHeaderValue,
-                        Metadata = request.Metadata,
-                        Provenance = request.ProvenanceData.ToProvenance()
-                    }, cancellationToken);
+                    await mediator.Send(
+                        new CorrectPlaceBuildingUnderConstructionLambdaRequest(
+                            request.TicketId,
+                            messageMetadata.MessageGroupId!,
+                            request.IfMatchHeaderValue,
+                            request.ProvenanceData.ToProvenance(),
+                            request.Metadata,
+                            request.Request),
+                        cancellationToken);
                     break;
 
                 case PlanBuildingSqsRequest request:
-                    await mediator.Send(new PlanBuildingLambdaRequest
-                    {
-                        Request = request.Request,
-                        TicketId = request.TicketId,
-                        MessageGroupId = messageMetadata.MessageGroupId!,
-                        Metadata = request.Metadata,
-                        Provenance = request.ProvenanceData.ToProvenance()
-                    }, cancellationToken);
+                    await mediator.Send(
+                        new PlanBuildingLambdaRequest(
+                            request.TicketId,
+                            messageMetadata.MessageGroupId!,
+                            request.ProvenanceData.ToProvenance(),
+                            request.Metadata,
+                            request.Request),
+                        cancellationToken);
                     break;
 
                 case RealizeBuildingSqsRequest request:
-                    await mediator.Send(new RealizeBuildingLambdaRequest
-                    {
-                        Request = request.Request,
-                        TicketId = request.TicketId,
-                        MessageGroupId = messageMetadata.MessageGroupId!,
-                        IfMatchHeaderValue = request.IfMatchHeaderValue,
-                        Metadata = request.Metadata,
-                        Provenance = request.ProvenanceData.ToProvenance()
-                    }, cancellationToken);
+                    await mediator.Send(
+                        new RealizeBuildingLambdaRequest(
+                            request.TicketId,
+                            messageMetadata.MessageGroupId!,
+                            request.IfMatchHeaderValue,
+                            request.ProvenanceData.ToProvenance(),
+                            request.Metadata,
+                            request.Request
+                            ),
+                        cancellationToken);
+                    break;
+
+                case CorrectBuildingUnitRealizationSqsRequest request:
+                    await mediator.Send(new CorrectBuildingUnitRealizationLambdaRequest
+                    (
+                        request.TicketId,
+                        messageMetadata.MessageGroupId!,
+                        request.IfMatchHeaderValue,
+                        request.ProvenanceData.ToProvenance(),
+                        request.Metadata,
+                        request.Request),
+                        cancellationToken);
                     break;
 
                 case CorrectBuildingRealizationSqsRequest request:
-                    await mediator.Send(new CorrectBuildingRealizationLambdaRequest
-                    {
-                        Request = request.Request,
-                        TicketId = request.TicketId,
-                        MessageGroupId = messageMetadata.MessageGroupId!,
-                        IfMatchHeaderValue = request.IfMatchHeaderValue,
-                        Metadata = request.Metadata,
-                        Provenance = request.ProvenanceData.ToProvenance()
-                    }, cancellationToken);
+                    await mediator.Send(
+                        new CorrectBuildingRealizationLambdaRequest(
+                            request.TicketId,
+                            messageMetadata.MessageGroupId!,
+                            request.IfMatchHeaderValue,
+                            request.ProvenanceData.ToProvenance(),
+                            request.Metadata,
+                            request.Request),
+                        cancellationToken);
                     break;
 
                 case NotRealizeBuildingUnitSqsRequest request:
-                    await mediator.Send(new NotRealizeBuildingUnitLambdaRequest
-                    {
-                        Request = request.Request,
-                        TicketId = request.TicketId,
-                        MessageGroupId = messageMetadata.MessageGroupId!,
-                        IfMatchHeaderValue = request.IfMatchHeaderValue,
-                        Metadata = request.Metadata,
-                        Provenance = request.ProvenanceData.ToProvenance()
-                    }, cancellationToken);
+                    await mediator.Send(new NotRealizeBuildingUnitLambdaRequest(
+                        request.TicketId,
+                        messageMetadata.MessageGroupId!,
+                        request.IfMatchHeaderValue,
+                        request.ProvenanceData.ToProvenance(),
+                        request.Metadata,
+                        request.Request
+                    ), cancellationToken);
                     break;
 
                 case PlanBuildingUnitSqsRequest request:
-                    await mediator.Send(new PlanBuildingUnitLambdaRequest
-                    {
-                        Request = request.Request,
-                        TicketId = request.TicketId,
-                        MessageGroupId = messageMetadata.MessageGroupId!,
-                        Metadata = request.Metadata,
-                        Provenance = request.ProvenanceData.ToProvenance()
-                    }, cancellationToken);
+                    await mediator.Send(new PlanBuildingUnitLambdaRequest(
+                        request.TicketId,
+                        messageMetadata.MessageGroupId!,
+                        request.ProvenanceData.ToProvenance(),
+                        request.Metadata,
+                        request.Request
+                    ), cancellationToken);
                     break;
 
                 case RealizeBuildingUnitSqsRequest request:
                     await mediator.Send(new RealizeBuildingUnitLambdaRequest
-                    {
-                        Request = request.Request,
-                        TicketId = request.TicketId,
-                        MessageGroupId = messageMetadata.MessageGroupId!,
-                        IfMatchHeaderValue = request.IfMatchHeaderValue,
-                        Metadata = request.Metadata,
-                        Provenance = request.ProvenanceData.ToProvenance()
-                    }, cancellationToken);
+                    (
+                        request.TicketId,
+                        messageMetadata.MessageGroupId!,
+                        request.IfMatchHeaderValue,
+                        request.ProvenanceData.ToProvenance(),
+                        request.Metadata,
+                        request.Request
+                    ), cancellationToken);
                     break;
 
                 default:

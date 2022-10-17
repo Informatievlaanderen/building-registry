@@ -13,6 +13,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenNotRealizingBuildingUnit
     using Building.Exceptions;
     using BuildingRegistry.Api.BackOffice.Abstractions.Building.Responses;
     using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Requests;
+    using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Validators;
     using BuildingRegistry.Api.BackOffice.Building;
     using BuildingRegistry.Api.BackOffice.BuildingUnit;
     using FluentAssertions;
@@ -49,6 +50,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenNotRealizingBuildingUnit
             var result = (AcceptedWithETagResult)await _controller.NotRealize(
                 ResponseOptions,
                 MockIfMatchValidator(true),
+                new NotRealizeBuildingUnitRequestValidator(),
                 request,
                 string.Empty,
                 CancellationToken.None);
@@ -90,6 +92,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenNotRealizingBuildingUnit
             var result = (PreconditionFailedResult)await _controller.NotRealize(
                 ResponseOptions,
                 MockIfMatchValidator(false),
+                new NotRealizeBuildingUnitRequestValidator(),
                 request,
                 new ETag(ETagType.Strong, ifMatchHeader).ToString(),
                 CancellationToken.None);
@@ -118,6 +121,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenNotRealizingBuildingUnit
             Func<Task> act = async () => await _controller.NotRealize(
                 ResponseOptions,
                 MockIfMatchValidator(true),
+                new NotRealizeBuildingUnitRequestValidator(),
                 request,
                 string.Empty,
                 CancellationToken.None);
@@ -150,6 +154,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenNotRealizingBuildingUnit
             Func<Task> act = async () => await _controller.NotRealize(
                 ResponseOptions,
                 MockIfMatchValidator(true),
+                new NotRealizeBuildingUnitRequestValidator(),
                 request,
                 string.Empty,
                 CancellationToken.None);
@@ -182,6 +187,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenNotRealizingBuildingUnit
             Func<Task> act = async () => await _controller.NotRealize(
                 ResponseOptions,
                 MockIfMatchValidator(true),
+                new NotRealizeBuildingUnitRequestValidator(),
                 request,
                 string.Empty,
                 CancellationToken.None);

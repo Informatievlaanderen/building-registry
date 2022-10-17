@@ -98,6 +98,14 @@ namespace BuildingRegistry.Projections.Wfs.BuildingUnitV2
                 SetVersion(unit, message.Message.Provenance.Timestamp);
             });
 
+             When<Envelope<BuildingUnitWasCorrectedFromRealizedToPlanned>>(async (context, message, _) =>
+            {
+                var unit = await context.BuildingUnitsV2.FindAsync(message.Message.BuildingUnitPersistentLocalId);
+                unit.Status = PlannedStatus;
+
+                SetVersion(unit, message.Message.Provenance.Timestamp);
+            });
+
             When<Envelope<BuildingUnitWasCorrectedFromRealizedToPlannedBecauseBuildingWasCorrected>>(async (context, message, _) =>
             {
                 var unit = await context.BuildingUnitsV2.FindAsync(message.Message.BuildingUnitPersistentLocalId);

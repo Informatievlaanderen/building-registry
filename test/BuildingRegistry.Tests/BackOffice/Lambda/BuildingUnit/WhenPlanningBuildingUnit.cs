@@ -67,20 +67,18 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
                 persistentLocalIdGenerator.Object);
 
             //Act
-            await handler.Handle(new PlanBuildingUnitLambdaRequest
-            {
-                Request = new BackOfficePlanBuildingUnitRequest
+            await handler.Handle(new PlanBuildingUnitLambdaRequest(
+                Guid.NewGuid(),
+                buildingPersistentLocalId,
+                Fixture.Create<Provenance>(),
+                new Dictionary<string, object>(),
+                new BackOfficePlanBuildingUnitRequest
                 {
                     GebouwId = $"https://data.vlaanderen.be/id/gebouw/{buildingPersistentLocalId}",
                     PositieGeometrieMethode = PositieGeometrieMethode.AfgeleidVanObject,
                     Functie = GebouweenheidFunctie.NietGekend,
                     AfwijkingVastgesteld = false
-                },
-                MessageGroupId = buildingPersistentLocalId,
-                TicketId = Guid.NewGuid(),
-                Metadata = new Dictionary<string, object>(),
-                Provenance = Fixture.Create<Provenance>()
-            }, CancellationToken.None);
+                }), CancellationToken.None);
 
             //Assert
             var stream = await Container.Resolve<IStreamStore>()
@@ -120,20 +118,18 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
                 persistentLocalIdGenerator.Object);
 
             // Act
-            await handler.Handle(new PlanBuildingUnitLambdaRequest
-            {
-                Request = new BackOfficePlanBuildingUnitRequest
+            await handler.Handle(new PlanBuildingUnitLambdaRequest(
+                Guid.NewGuid(),
+                buildingPersistentLocalId,
+                Fixture.Create<Provenance>(),
+                new Dictionary<string, object>(),
+                new BackOfficePlanBuildingUnitRequest
                 {
                     GebouwId = $"https://data.vlaanderen.be/id/gebouw/{buildingPersistentLocalId}",
                     PositieGeometrieMethode = PositieGeometrieMethode.AfgeleidVanObject,
                     Functie = GebouweenheidFunctie.NietGekend,
                     AfwijkingVastgesteld = false
-                },
-                MessageGroupId = buildingPersistentLocalId,
-                TicketId = Guid.NewGuid(),
-                Metadata = new Dictionary<string, object>(),
-                Provenance = Fixture.Create<Provenance>()
-            }, CancellationToken.None);
+                }), CancellationToken.None);
 
             //Assert
             ticketing.Verify(x =>
@@ -169,20 +165,18 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
                 persistentLocalIdGenerator.Object);
 
             // Act
-            await handler.Handle(new PlanBuildingUnitLambdaRequest
-            {
-                Request = new BackOfficePlanBuildingUnitRequest
+            await handler.Handle(new PlanBuildingUnitLambdaRequest(
+                Guid.NewGuid(),
+                buildingPersistentLocalId,
+                Fixture.Create<Provenance>(),
+                new Dictionary<string, object>(),
+                new BackOfficePlanBuildingUnitRequest
                 {
                     GebouwId = $"https://data.vlaanderen.be/id/gebouw/{buildingPersistentLocalId}",
                     PositieGeometrieMethode = PositieGeometrieMethode.AfgeleidVanObject,
                     Functie = GebouweenheidFunctie.NietGekend,
                     AfwijkingVastgesteld = false
-                },
-                MessageGroupId = buildingPersistentLocalId,
-                TicketId = Guid.NewGuid(),
-                Metadata = new Dictionary<string, object>(),
-                Provenance = Fixture.Create<Provenance>()
-            }, CancellationToken.None);
+                }), CancellationToken.None);
 
             //Assert
             ticketing.Verify(x =>

@@ -32,6 +32,7 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
         /// </summary>
         /// <param name="options"></param>
         /// <param name="ifMatchHeaderValidator"></param>
+        /// <param name="validator"></param>
         /// <param name="request"></param>
         /// <param name="ifMatchHeaderValue"></param>
         /// <param name="ct"></param>
@@ -46,6 +47,7 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
         public async Task<IActionResult> NotRealize(
             [FromServices] IOptions<ResponseOptions> options,
             [FromServices] IIfMatchHeaderValidator ifMatchHeaderValidator,
+            [FromServices] IValidator<NotRealizeBuildingUnitRequest> validator,
             [FromRoute] NotRealizeBuildingUnitRequest request,
             [FromHeader(Name = "If-Match")] string? ifMatchHeaderValue,
             CancellationToken ct = default)

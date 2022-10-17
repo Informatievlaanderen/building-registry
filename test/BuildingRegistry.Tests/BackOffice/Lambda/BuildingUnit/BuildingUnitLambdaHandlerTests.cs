@@ -34,13 +34,14 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
             var idempotentCommandHandler = new Mock<IIdempotentCommandHandler>();
 
             var lambdaRequest = new RealizeBuildingUnitLambdaRequest
-            {
-                Request = new BackOfficeRealizeBuildingUnitRequest { BuildingUnitPersistentLocalId = 1 },
-                MessageGroupId = Guid.NewGuid().ToString(),
-                TicketId = Guid.NewGuid(),
-                Metadata = new Dictionary<string, object>(),
-                Provenance = Fixture.Create<Provenance>()
-            };
+            (
+                Guid.NewGuid(),
+                Guid.NewGuid().ToString(),
+                string.Empty,
+                Fixture.Create<Provenance>(),
+                new Dictionary<string, object>(),
+                new BackOfficeRealizeBuildingUnitRequest { BuildingUnitPersistentLocalId = 1 }
+            );
 
             var sut = new FakeBuildingUnitLambdaHandler(
                 Container.Resolve<IConfiguration>(),
@@ -62,14 +63,14 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
         {
             var ticketing = new Mock<ITicketing>();
 
-            var lambdaRequest = new RealizeBuildingUnitLambdaRequest
-            {
-                Request = new BackOfficeRealizeBuildingUnitRequest { BuildingUnitPersistentLocalId = 1 },
-                MessageGroupId = Guid.NewGuid().ToString(),
-                TicketId = Guid.NewGuid(),
-                Metadata = new Dictionary<string, object>(),
-                Provenance = Fixture.Create<Provenance>()
-            };
+            var lambdaRequest = new RealizeBuildingUnitLambdaRequest(
+                Guid.NewGuid(),
+                Guid.NewGuid().ToString(),
+                string.Empty,
+                Fixture.Create<Provenance>(),
+                new Dictionary<string, object>(),
+                new BackOfficeRealizeBuildingUnitRequest { BuildingUnitPersistentLocalId = 1 }
+            );
 
             var sut = new FakeBuildingUnitLambdaHandler(
                 Container.Resolve<IConfiguration>(),
@@ -109,18 +110,17 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
                 Mock.Of<IIdempotentCommandHandler>());
 
             // Act
-            await sut.Handle(new RealizeBuildingUnitLambdaRequest
-            {
-                IfMatchHeaderValue = "Outdated",
-                Request = new BackOfficeRealizeBuildingUnitRequest
+            await sut.Handle(new RealizeBuildingUnitLambdaRequest(
+                Guid.NewGuid(),
+                buildingPersistentLocalId.ToString(),
+                "Outdated",
+                Fixture.Create<Provenance>(),
+                new Dictionary<string, object>(),
+                new BackOfficeRealizeBuildingUnitRequest
                 {
                     BuildingUnitPersistentLocalId = buildingUnitPersistentLocalId
-                },
-                MessageGroupId = buildingPersistentLocalId.ToString(),
-                TicketId = Guid.NewGuid(),
-                Metadata = new Dictionary<string, object>(),
-                Provenance = Fixture.Create<Provenance>()
-            }, CancellationToken.None);
+                })
+            , CancellationToken.None);
 
             //Assert
             ticketing.Verify(x =>
@@ -143,15 +143,14 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
                 idempotentCommandHandler.Object);
 
             await sut.Handle(
-                new RealizeBuildingUnitLambdaRequest
-                {
-                    IfMatchHeaderValue = string.Empty,
-                    Request = new BackOfficeRealizeBuildingUnitRequest { BuildingUnitPersistentLocalId = 1 },
-                    MessageGroupId = Guid.NewGuid().ToString(),
-                    TicketId = Guid.NewGuid(),
-                    Metadata = new Dictionary<string, object>(),
-                    Provenance = Fixture.Create<Provenance>()
-                }, CancellationToken.None);
+                new RealizeBuildingUnitLambdaRequest(
+                    Guid.NewGuid(),
+                    Guid.NewGuid().ToString(),
+                    string.Empty,
+                    Fixture.Create<Provenance>(),
+                    new Dictionary<string, object>(),
+                    new BackOfficeRealizeBuildingUnitRequest { BuildingUnitPersistentLocalId = 1 }
+                    ), CancellationToken.None);
 
             //Assert
             idempotentCommandHandler

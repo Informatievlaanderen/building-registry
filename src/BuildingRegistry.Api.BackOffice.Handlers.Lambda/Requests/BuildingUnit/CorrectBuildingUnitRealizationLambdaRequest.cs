@@ -6,34 +6,34 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Requests.BuildingUnit
     using BuildingRegistry.Building;
     using BuildingRegistry.Building.Commands;
 
-    public sealed class RealizeBuildingUnitLambdaRequest :
+    public sealed class CorrectBuildingUnitRealizationLambdaRequest :
         BuildingUnitLambdaRequest,
-        IHasBackOfficeRequest<BackOfficeRealizeBuildingUnitRequest>,
+        IHasBackOfficeRequest<BackOfficeCorrectBuildingUnitRealizationRequest>,
         IHasBuildingUnitPersistentLocalId
     {
-        public RealizeBuildingUnitLambdaRequest(
+        public CorrectBuildingUnitRealizationLambdaRequest(
             Guid ticketId,
             string messageGroupId,
             string? ifMatchHeaderValue,
             Provenance provenance,
             IDictionary<string, object> metadata,
-            BackOfficeRealizeBuildingUnitRequest request)
+            BackOfficeCorrectBuildingUnitRealizationRequest request)
             : base(ticketId, messageGroupId, ifMatchHeaderValue, provenance, metadata)
         {
             Request = request;
         }
 
-        public BackOfficeRealizeBuildingUnitRequest Request { get; set; }
+        public BackOfficeCorrectBuildingUnitRealizationRequest Request { get; set; }
 
         public int BuildingUnitPersistentLocalId => Request.BuildingUnitPersistentLocalId;
 
         /// <summary>
-        /// Map to RealizeBuildingUnit command
+        /// Map to CorrectBuildingUnitRealization command
         /// </summary>
-        /// <returns>RealizeBuildingUnit.</returns>
-        public RealizeBuildingUnit ToCommand()
+        /// <returns>CorrectBuildingUnitRealization.</returns>
+        public CorrectBuildingUnitRealization ToCommand()
         {
-            return new RealizeBuildingUnit(BuildingPersistentLocalId, new BuildingUnitPersistentLocalId(BuildingUnitPersistentLocalId), Provenance);
+            return new CorrectBuildingUnitRealization(BuildingPersistentLocalId, new BuildingUnitPersistentLocalId(BuildingUnitPersistentLocalId), Provenance);
         }
     }
 }

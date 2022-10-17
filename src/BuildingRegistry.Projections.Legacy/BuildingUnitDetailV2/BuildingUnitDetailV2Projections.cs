@@ -107,6 +107,16 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetailV2
                 }, ct);
             });
 
+            When<Envelope<BuildingUnitWasCorrectedFromRealizedToPlanned>>(async (context, message, ct) =>
+            {
+                await Update(context, message.Message.BuildingUnitPersistentLocalId, item =>
+                {
+                    item.Status = BuildingUnitStatus.Planned;
+                    item.Version = message.Message.Provenance.Timestamp;
+                    UpdateHash(item, message);
+                }, ct);
+            });
+
             When<Envelope<BuildingUnitWasCorrectedFromRealizedToPlannedBecauseBuildingWasCorrected>>(async (context, message, ct) =>
             {
                 await Update(context, message.Message.BuildingUnitPersistentLocalId, item =>
