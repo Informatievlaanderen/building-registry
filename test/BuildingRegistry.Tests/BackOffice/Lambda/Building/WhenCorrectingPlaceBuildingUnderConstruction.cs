@@ -57,14 +57,15 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
                 Container.Resolve<IBuildings>());
 
             //Act
-            await handler.Handle(new CorrectPlaceBuildingUnderConstructionLambdaRequest
-            {
-                Request = new BackOfficeCorrectPlaceBuildingUnderConstructionRequest { PersistentLocalId = buildingPersistentLocalId },
-                MessageGroupId = buildingPersistentLocalId,
-                TicketId = Guid.NewGuid(),
-                Metadata = new Dictionary<string, object>(),
-                Provenance = Fixture.Create<Provenance>()
-            }, CancellationToken.None);
+            await handler.Handle(
+                new CorrectPlaceBuildingUnderConstructionLambdaRequest(
+                    Guid.NewGuid(),
+                    buildingPersistentLocalId,
+                    null,
+                    Fixture.Create<Provenance>(),
+                    new Dictionary<string, object>(),
+                    new BackOfficeCorrectPlaceBuildingUnderConstructionRequest { PersistentLocalId = buildingPersistentLocalId }),
+                CancellationToken.None);
 
             //Assert
             var stream = await Container.Resolve<IStreamStore>()
@@ -94,14 +95,15 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
                 await buildings.GetAsync(new BuildingStreamId(buildingPersistentLocalId), CancellationToken.None);
 
             // Act
-            await handler.Handle(new CorrectPlaceBuildingUnderConstructionLambdaRequest
-            {
-                Request = new BackOfficeCorrectPlaceBuildingUnderConstructionRequest { PersistentLocalId = buildingPersistentLocalId },
-                MessageGroupId = buildingPersistentLocalId,
-                TicketId = Guid.NewGuid(),
-                Metadata = new Dictionary<string, object>(),
-                Provenance = Fixture.Create<Provenance>()
-            }, CancellationToken.None);
+            await handler.Handle(
+                new CorrectPlaceBuildingUnderConstructionLambdaRequest(
+                    Guid.NewGuid(),
+                    buildingPersistentLocalId,
+                    null,
+                    Fixture.Create<Provenance>(),
+                    new Dictionary<string, object>(),
+                    new BackOfficeCorrectPlaceBuildingUnderConstructionRequest { PersistentLocalId = buildingPersistentLocalId }),
+                CancellationToken.None);
 
             //Assert
             ticketing.Verify(x =>
@@ -129,14 +131,15 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
                 Container.Resolve<IBuildings>());
 
             // Act
-            await handler.Handle(new CorrectPlaceBuildingUnderConstructionLambdaRequest
-            {
-                Request = new BackOfficeCorrectPlaceBuildingUnderConstructionRequest { PersistentLocalId = buildingPersistentLocalId },
-                MessageGroupId = buildingPersistentLocalId,
-                TicketId = Guid.NewGuid(),
-                Metadata = new Dictionary<string, object>(),
-                Provenance = Fixture.Create<Provenance>()
-            }, CancellationToken.None);
+            await handler.Handle(
+                new CorrectPlaceBuildingUnderConstructionLambdaRequest(
+                    Guid.NewGuid(),
+                    buildingPersistentLocalId,
+                    null,
+                    Fixture.Create<Provenance>(),
+                    new Dictionary<string, object>(),
+                    new BackOfficeCorrectPlaceBuildingUnderConstructionRequest { PersistentLocalId = buildingPersistentLocalId }),
+                CancellationToken.None);
 
             //Assert
             ticketing.Verify(x =>

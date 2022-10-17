@@ -8,6 +8,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenRealizingBuildingUnit
     using Be.Vlaanderen.Basisregisters.Api.ETag;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
     using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Requests;
+    using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Validators;
     using BuildingRegistry.Api.BackOffice.Abstractions.Exceptions;
     using BuildingRegistry.Api.BackOffice.BuildingUnit;
     using BuildingRegistry.Api.BackOffice.Handlers.Sqs.Requests;
@@ -45,6 +46,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenRealizingBuildingUnit
             var result = (AcceptedResult)await _controller.Realize(
                 ResponseOptions,
                 MockIfMatchValidator(true),
+                new RealizeBuildingUnitRequestValidator(),
                 Fixture.Create<RealizeBuildingUnitRequest>(),
                 ifMatchHeaderValue: null);
 
@@ -59,6 +61,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenRealizingBuildingUnit
             var result = await _controller.Realize(
                 ResponseOptions,
                 MockIfMatchValidator(false),
+                new RealizeBuildingUnitRequestValidator(),
                 Fixture.Create<RealizeBuildingUnitRequest>(),
                 "IncorrectIfMatchHeader");
 
@@ -79,6 +82,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenRealizingBuildingUnit
                 await _controller.Realize(
                     ResponseOptions,
                     MockIfMatchValidator(true),
+                    new RealizeBuildingUnitRequestValidator(),
                     request,
                     string.Empty);
             };

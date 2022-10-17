@@ -12,5 +12,19 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Requests.Building
         public string? IfMatchHeaderValue { get; set; }
         public Provenance Provenance { get; set; }
         public IDictionary<string, object> Metadata { get; set; }
+
+        protected BuildingLambdaRequest(
+            Guid ticketId,
+            string messageGroupId,
+            string? ifMatchHeaderValue,
+            Provenance provenance,
+            IDictionary<string, object> metadata)
+        {
+            TicketId = ticketId;
+            MessageGroupId = messageGroupId;
+            IfMatchHeaderValue = ifMatchHeaderValue;
+            Provenance = provenance;
+            Metadata = metadata;
+        }
     }
 }

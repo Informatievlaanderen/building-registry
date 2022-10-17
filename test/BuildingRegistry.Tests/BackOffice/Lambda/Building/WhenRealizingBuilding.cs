@@ -1,4 +1,4 @@
-﻿namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
+namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
 {
     using System;
     using System.Collections.Generic;
@@ -57,14 +57,15 @@
                 Container.Resolve<IBuildings>());
 
             //Act
-            await handler.Handle(new RealizeBuildingLambdaRequest
-            {
-                Request = new BackOfficeRealizeBuildingRequest { PersistentLocalId = buildingPersistentLocalId },
-                MessageGroupId = buildingPersistentLocalId,
-                TicketId = Guid.NewGuid(),
-                Metadata = new Dictionary<string, object>(),
-                Provenance = Fixture.Create<Provenance>()
-            }, CancellationToken.None);
+            await handler.Handle(
+                new RealizeBuildingLambdaRequest(
+                    Guid.NewGuid(),
+                    buildingPersistentLocalId,
+                    null,
+                    Fixture.Create<Provenance>(),
+                    new Dictionary<string, object>(),
+                    new BackOfficeRealizeBuildingRequest { PersistentLocalId = buildingPersistentLocalId }),
+                CancellationToken.None);
 
             //Assert
             var stream = await Container.Resolve<IStreamStore>()
@@ -94,14 +95,15 @@
                 await buildings.GetAsync(new BuildingStreamId(buildingPersistentLocalId), CancellationToken.None);
 
             // Act
-            await handler.Handle(new RealizeBuildingLambdaRequest
-            {
-                Request = new BackOfficeRealizeBuildingRequest { PersistentLocalId = buildingPersistentLocalId },
-                MessageGroupId = buildingPersistentLocalId,
-                TicketId = Guid.NewGuid(),
-                Metadata = new Dictionary<string, object>(),
-                Provenance = Fixture.Create<Provenance>()
-            }, CancellationToken.None);
+            await handler.Handle(
+                new RealizeBuildingLambdaRequest(
+                    Guid.NewGuid(),
+                    buildingPersistentLocalId,
+                    null,
+                    Fixture.Create<Provenance>(),
+                    new Dictionary<string, object>(),
+                    new BackOfficeRealizeBuildingRequest { PersistentLocalId = buildingPersistentLocalId }),
+                CancellationToken.None);
 
             //Assert
             ticketing.Verify(x =>
@@ -129,14 +131,15 @@
                 Container.Resolve<IBuildings>());
 
             // Act
-            await handler.Handle(new RealizeBuildingLambdaRequest
-            {
-                Request = new BackOfficeRealizeBuildingRequest { PersistentLocalId = buildingPersistentLocalId },
-                MessageGroupId = buildingPersistentLocalId,
-                TicketId = Guid.NewGuid(),
-                Metadata = new Dictionary<string, object>(),
-                Provenance = Fixture.Create<Provenance>()
-            }, CancellationToken.None);
+            await handler.Handle(
+                new RealizeBuildingLambdaRequest(
+                    Guid.NewGuid(),
+                    buildingPersistentLocalId,
+                    null,
+                    Fixture.Create<Provenance>(),
+                    new Dictionary<string, object>(),
+                    new BackOfficeRealizeBuildingRequest { PersistentLocalId = buildingPersistentLocalId }),
+                CancellationToken.None);
 
             //Assert
             ticketing.Verify(x =>

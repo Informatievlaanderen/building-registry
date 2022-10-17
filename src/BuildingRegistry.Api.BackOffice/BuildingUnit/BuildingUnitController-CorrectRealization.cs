@@ -28,7 +28,7 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
     public partial class BuildingUnitController
     {
         /// <summary>
-        /// Realiseer een gebouweenheid..
+        /// Corrigeer de statuswijzing van een ‘gerealiseerd’ gebouweenheid naar ‘gepland’
         /// </summary>
         /// <param name="options"></param>
         /// <param name="ifMatchHeaderValidator"></param>
@@ -37,18 +37,18 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
         /// <param name="ifMatchHeaderValue"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        [HttpPost("{buildingUnitPersistentLocalId}/acties/realiseren")]
+        [HttpPost("{buildingUnitPersistentLocalId}/acties/corrigeren/realisering")]
         [ProducesResponseType(StatusCodes.Status202Accepted)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-        [SwaggerResponseHeader(StatusCodes.Status202Accepted, "location", "string", "De url van de gerealiseerde gebouweenheid.")]
+        [SwaggerResponseHeader(StatusCodes.Status202Accepted, "location", "string", "De url van de gebouweenheid.")]
         [SwaggerResponseExample(StatusCodes.Status400BadRequest, typeof(BadRequestResponseExamples))]
         [SwaggerResponseExample(StatusCodes.Status500InternalServerError, typeof(InternalServerErrorResponseExamples))]
-        public async Task<IActionResult> Realize(
+        public async Task<IActionResult> CorrectRealization(
             [FromServices] IOptions<ResponseOptions> options,
             [FromServices] IIfMatchHeaderValidator ifMatchHeaderValidator,
-            [FromServices] IValidator<RealizeBuildingUnitRequest> validator,
-            [FromRoute] RealizeBuildingUnitRequest request,
+            [FromServices] IValidator<CorrectBuildingUnitRealizationRequest> validator,
+            [FromRoute] CorrectBuildingUnitRealizationRequest request,
             [FromHeader(Name = "If-Match")] string? ifMatchHeaderValue,
             CancellationToken ct = default)
         {
@@ -63,7 +63,7 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
                 if (UseSqsToggle.FeatureEnabled)
                 {
                     var result = await Mediator.Send(
-                        new RealizeBuildingUnitSqsRequest
+                        new CorrectBuildingUnitRealizationSqsRequest()
                         {
                             Request = request,
                             Metadata = GetMetadata(),
@@ -104,15 +104,15 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
 
                     BuildingUnitIsRemovedException => new ApiException(ValidationErrorMessages.BuildingUnit.BuildingUnitIsRemoved, StatusCodes.Status410Gone),
 
-                    BuildingUnitHasInvalidStatusException => CreateValidationException(
-                        ValidationErrorCodes.BuildingUnit.BuildingUnitCannotBeRealized,
+                    BuildingUnitHasInvalidFunctionException => CreateValidationException(
+                        ValidationErrorCodes.BuildingUnit.BuildingUnitHasInvalidFunction,
                         string.Empty,
-                        ValidationErrorMessages.BuildingUnit.BuildingUnitCannotBeRealized),
+                        ValidationErrorMessages.BuildingUnit.BuildingUnitHasInvalidFunction),
 
-                    BuildingHasInvalidStatusException => CreateValidationException(
-                        ValidationErrorCodes.BuildingUnit.BuildingStatusNotInRealized,
+                    BuildingUnitHasInvalidStatusException => CreateValidationException(
+                        ValidationErrorCodes.BuildingUnit.BuildingUnitCannotBeCorrectedFromRealized,
                         string.Empty,
-                        ValidationErrorMessages.BuildingUnit.BuildingStatusNotInRealized),
+                        ValidationErrorMessages.BuildingUnit.BuildingUnitCannotBeCorrectedFromRealized),
 
                     _ => new ValidationException(new List<ValidationFailure>
                         { new ValidationFailure(string.Empty, exception.Message) })

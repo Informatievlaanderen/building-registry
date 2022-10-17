@@ -1,14 +1,14 @@
-namespace BuildingRegistry.Tests.BackOffice.Api.WhenRealizingBuildingUnit
+namespace BuildingRegistry.Tests.BackOffice.Api.WhenCorrectingBuildingUnitRealization
 {
     using System;
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
-    using Building;
     using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Requests;
-    using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Validators;
     using BuildingRegistry.Api.BackOffice.BuildingUnit;
+    using Building;
+    using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Validators;
     using FluentAssertions;
     using FluentValidation;
     using Moq;
@@ -29,20 +29,20 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenRealizingBuildingUnit
         {
             var buildingPersistentLocalId = new BuildingUnitPersistentLocalId(456);
 
-            var request = new RealizeBuildingUnitRequest
+            var request = new CorrectBuildingUnitRealizationRequest()
             {
                 BuildingUnitPersistentLocalId = buildingPersistentLocalId
             };
 
             MockMediator
-                .Setup(x => x.Send(It.IsAny<RealizeBuildingUnitRequest>(), CancellationToken.None).Result)
+                .Setup(x => x.Send(It.IsAny<CorrectBuildingUnitRealizationRequest>(), CancellationToken.None).Result)
                 .Throws(new AggregateNotFoundException(buildingPersistentLocalId, typeof(Building)));
 
             //Act
-            Func<Task> act = async () => await _controller.Realize(
+            Func<Task> act = async () => await _controller.CorrectRealization(
                 ResponseOptions,
                 MockIfMatchValidator(true),
-                new RealizeBuildingUnitRequestValidator(),
+                new CorrectBuildingUnitRealizationRequestValidator(),
                 request,
                 string.Empty,
                 CancellationToken.None);

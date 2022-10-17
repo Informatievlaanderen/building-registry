@@ -1,7 +1,6 @@
-namespace BuildingRegistry.Tests.BackOffice.Api.WhenNotRealizingBuildingUnit
+namespace BuildingRegistry.Tests.BackOffice.Api.WhenCorrectingBuildingUnitRealization
 {
     using System;
-    using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
     using AutoFixture;
@@ -15,7 +14,6 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenNotRealizingBuildingUnit
     using BuildingRegistry.Api.BackOffice.Handlers.Sqs.Requests.BuildingUnit;
     using Fixtures;
     using FluentAssertions;
-    using FluentValidation;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
     using Moq;
@@ -40,14 +38,14 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenNotRealizingBuildingUnit
             var expectedLocationResult = new LocationResult(CreateTicketUri(ticketId));
 
             MockMediator
-                .Setup(x => x.Send(It.IsAny<NotRealizeBuildingUnitSqsRequest>(), CancellationToken.None))
+                .Setup(x => x.Send(It.IsAny<CorrectBuildingUnitRealizationSqsRequest>(), CancellationToken.None))
                 .Returns(Task.FromResult(expectedLocationResult));
 
-            var result = (AcceptedResult)await _controller.NotRealize(
+            var result = (AcceptedResult)await _controller.CorrectRealization(
                 ResponseOptions,
                 MockIfMatchValidator(true),
-                new NotRealizeBuildingUnitRequestValidator(),
-                Fixture.Create<NotRealizeBuildingUnitRequest>(),
+                new CorrectBuildingUnitRealizationRequestValidator(),
+                Fixture.Create<CorrectBuildingUnitRealizationRequest>(),
                 ifMatchHeaderValue: null);
 
             result.Should().NotBeNull();
@@ -58,11 +56,11 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenNotRealizingBuildingUnit
         public async Task WithInvalidIfMatchHeader_ThenPreconditionFailedResponse()
         {
             //Act
-            var result = await _controller.NotRealize(
+            var result = await _controller.CorrectRealization(
                 ResponseOptions,
                 MockIfMatchValidator(false),
-                new NotRealizeBuildingUnitRequestValidator(),
-                Fixture.Create<NotRealizeBuildingUnitRequest>(),
+                new CorrectBuildingUnitRealizationRequestValidator(),
+                Fixture.Create<CorrectBuildingUnitRealizationRequest>(),
                 "IncorrectIfMatchHeader");
 
             //Assert
@@ -73,16 +71,16 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenNotRealizingBuildingUnit
         public void WithAggregateIdIsNotFound_ThenThrowsApiException()
         {
             MockMediator
-                .Setup(x => x.Send(It.IsAny<NotRealizeBuildingUnitSqsRequest>(), CancellationToken.None))
+                .Setup(x => x.Send(It.IsAny<CorrectBuildingUnitRealizationSqsRequest>(), CancellationToken.None))
                 .Throws(new AggregateIdIsNotFoundException());
 
-            var request = Fixture.Create<NotRealizeBuildingUnitRequest>();
+            var request = Fixture.Create<CorrectBuildingUnitRealizationRequest>();
             Func<Task> act = async () =>
             {
-                await _controller.NotRealize(
+                await _controller.CorrectRealization(
                     ResponseOptions,
                     MockIfMatchValidator(true),
-                    new NotRealizeBuildingUnitRequestValidator(),
+                    new CorrectBuildingUnitRealizationRequestValidator(),
                     request,
                     string.Empty);
             };
