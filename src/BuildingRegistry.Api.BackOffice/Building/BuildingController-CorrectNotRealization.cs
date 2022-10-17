@@ -26,7 +26,7 @@ namespace BuildingRegistry.Api.BackOffice.Building
     public partial class BuildingController
     {
         /// <summary>
-        /// Corrigeer realisatie gebouw.
+        /// Corrigeer niet realisatie gebouw.
         /// </summary>
         /// <param name="options"></param>
         /// <param name="buildingExistsValidator"></param>
@@ -38,19 +38,19 @@ namespace BuildingRegistry.Api.BackOffice.Building
         /// <response code="202">Aanvraag tot correctie realisatie wordt reeds verwerkt.</response>
         /// <response code="412">Als de If-Match header niet overeenkomt met de laatste ETag.</response>
         /// <returns></returns>
-        [HttpPost("{persistentLocalId}/acties/corrigeren/realisering")]
+        [HttpPost("{persistentLocalId}/acties/corrigeren/nietrealisering")]
         [ProducesResponseType(StatusCodes.Status202Accepted)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status412PreconditionFailed)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
         [SwaggerResponseExample(StatusCodes.Status400BadRequest, typeof(BadRequestResponseExamples))]
         [SwaggerResponseExample(StatusCodes.Status500InternalServerError, typeof(InternalServerErrorResponseExamples))]
-        public async Task<IActionResult> CorrectRealization(
+        public async Task<IActionResult> CorrectNotRealization(
             [FromServices] IOptions<ResponseOptions> options,
-            [FromServices] IValidator<CorrectBuildingRealizationRequest> validator,
+            [FromServices] IValidator<CorrectBuildingNotRealizationRequest> validator,
             [FromServices] BuildingExistsValidator buildingExistsValidator,
             [FromServices] IIfMatchHeaderValidator ifMatchHeaderValidator,
-            [FromRoute] CorrectBuildingRealizationRequest request,
+            [FromRoute] CorrectBuildingNotRealizationRequest request,
             [FromHeader(Name = "If-Match")] string? ifMatchHeaderValue,
             CancellationToken cancellationToken = default)
         {
@@ -76,7 +76,7 @@ namespace BuildingRegistry.Api.BackOffice.Building
                     }
 
                     var result = await Mediator.Send(
-                        new CorrectBuildingRealizationSqsRequest
+                        new CorrectBuildingNotRealizationSqsRequest
                         {
                             Request = request,
                             Metadata = GetMetadata(),
@@ -107,17 +107,13 @@ namespace BuildingRegistry.Api.BackOffice.Building
                 {
                     BuildingIsRemovedException => new ApiException(ValidationErrorMessages.Building.BuildingRemoved, StatusCodes.Status410Gone),
                     BuildingHasInvalidStatusException => CreateValidationException(
-                        ValidationErrorCodes.Building.BuildingCannotBeCorrectedFromRealizedToUnderConstruction,
+                        ValidationErrorCodes.Building.BuildingCannotBeCorrectedFromNotRealizedToPlanned,
                         string.Empty,
-                        ValidationErrorMessages.Building.BuildingCannotBeCorrectedFromRealizedToUnderConstruction),
+                        ValidationErrorMessages.Building.BuildingCannotBeCorrectedFromNotRealizedToPlanned),
                     BuildingHasInvalidBuildingGeometryMethodException =>CreateValidationException(
                         ValidationErrorCodes.Building.BuildingIsMeasuredByGrb,
                         string.Empty,
                         ValidationErrorMessages.Building.BuildingIsMeasuredByGrb),
-                    BuildingHasRetiredBuildingUnitsException => CreateValidationException(
-                        ValidationErrorCodes.Building.BuildingHasRetiredBuildingUnits,
-                        string.Empty,
-                        ValidationErrorMessages.Building.BuildingHasRetiredBuildingUnits),
 
                     _ => new ValidationException(new List<ValidationFailure>
                         { new ValidationFailure(string.Empty, exception.Message) })

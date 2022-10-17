@@ -8,10 +8,11 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.Building.Validators
             public const string BuildingRemoved = "GebouwIsVerwijderd";
             public const string InvalidPolygonGeometry = "GebouwPolygoonValidatie";
             public const string BuildingCannotBePlacedUnderConstruction = "GebouwGehistoreerdGerealiseerdOfNietGerealiseerd";
-            public const string BuildingCannotCorrectPlacedUnderConstruction = "GebouwGeplandOfGerealiseerdOfGehistoreerdOfNietgerealiseerd";
+            public const string BuildingCannotCorrectPlacedUnderConstruction = "GebouwGeplandOfGerealiseerdOfGehistoreerdOfNietGerealiseerd";
             public const string BuildingCannotBeRealizedException = "GebouwGehistoreerdGeplandOfNietGerealiseerd";
-            public const string BuildingCannotBeCorrectedFromRealizedToUnderConstruction = "GebouwGeplandOfGehistoreerdOfNietgerealiseerd";
+            public const string BuildingCannotBeCorrectedFromRealizedToUnderConstruction = "GebouwGeplandGehistoreerdOfNietGerealiseerd";
             public const string BuildingCannotBeNotRealizedException = "GebouwGehistoreerdOfGerealiseerd";
+            public const string BuildingCannotBeCorrectedFromNotRealizedToPlanned = "GebouwInaanbouwGerealiseerdOfGehistoreerd";
 
             public const string BuildingIsMeasuredByGrb = "GebouwGeometrieIngemeten";
             public const string BuildingHasRetiredBuildingUnits = "GebouwBevatGehistoreerdeGebouweenheden";
@@ -44,8 +45,9 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.Building.Validators
             public const string BuildingCannotBeRealizedException = "Deze actie is enkel toegestaan op gebouwen met status 'inAanbouw'.";
             public const string BuildingCannotBeCorrectedFromRealizedToUnderConstruction = "Deze actie is enkel toegestaan op gebouwen met status 'gerealiseerd'.";
             public const string BuildingCannotBeNotRealizedException = "Deze actie is enkel toegestaan op gebouwen met status 'gepland' of 'inAanbouw'.";
+            public const string BuildingCannotBeCorrectedFromNotRealizedToPlanned = "Deze actie is enkel toegestaan op geschetste gebouwen met status 'nietGerealiseerd'.";
 
-            public const string BuildingIsMeasuredByGrb = "Deze actie is enkel toegestaan op gebouwen met geometriemethode 'ingeschetst'.";
+            public const string BuildingIsMeasuredByGrb = "Deze actie is enkel toegestaan op gebouwen met geometrieMethode 'ingeschetst'.";
             public const string BuildingHasRetiredBuildingUnits = "Deze actie is niet toegestaan wanneer er gehistoreerde gebouweenheden aanwezig zijn.";
         }
 

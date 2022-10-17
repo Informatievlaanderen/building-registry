@@ -187,6 +187,28 @@ namespace BuildingRegistry.Building
             ApplyChange(new BuildingWasNotRealizedV2(BuildingPersistentLocalId));
         }
 
+        public void CorrectNotRealizeConstruction()
+        {
+            GuardRemovedBuilding();
+
+            if (BuildingStatus == BuildingStatus.Planned)
+            {
+                return;
+            }
+
+            if (BuildingStatus != BuildingStatus.NotRealized)
+            {
+                throw new BuildingHasInvalidStatusException();
+            }
+
+            if (BuildingGeometry.Method != BuildingGeometryMethod.Outlined)
+            {
+                throw new BuildingHasInvalidBuildingGeometryMethodException();
+            }
+
+            ApplyChange(new BuildingWasCorrectedFromNotRealizedToPlanned(BuildingPersistentLocalId));
+        }
+
         public void PlanBuildingUnit(
             IPersistentLocalIdGenerator persistentLocalIdGenerator,
             BuildingUnitPersistentLocalId buildingUnitPersistentLocalId,
