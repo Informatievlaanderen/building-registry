@@ -38,7 +38,7 @@ namespace BuildingRegistry.Api.BackOffice.Building
         /// <response code="202">Als het gebouw succesvol naar gepland geplaatst is.</response>
         /// <response code="412">Als de If-Match header niet overeenkomt met de laatste ETag.</response>
         /// <returns></returns>
-        [HttpPost("{persistentLocalId}/acties/corrigeren/inaanbouw")]
+        [HttpPost("{persistentLocalId}/acties/corrigeren/inaanbouwplaatsing")]
         [ProducesResponseType(StatusCodes.Status202Accepted)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
