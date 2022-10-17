@@ -28,11 +28,11 @@
     using Xunit;
     using Xunit.Abstractions;
 
-    public class WhenCorrectingBuildingRealization : BackOfficeLambdaTest
+    public class WhenCorrectingBuildingNotRealization : BackOfficeLambdaTest
     {
         private readonly IdempotencyContext _idempotencyContext;
 
-        public WhenCorrectingBuildingRealization(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
+        public WhenCorrectingBuildingNotRealization(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
         {
             Fixture.Customize(new WithFixedBuildingPersistentLocalId());
 
@@ -46,11 +46,10 @@
             var buildingPersistentLocalId = Fixture.Create<BuildingPersistentLocalId>();
 
             PlanBuilding(buildingPersistentLocalId);
-            PlaceBuildingUnderConstruction(buildingPersistentLocalId);
-            RealizeBuilding(buildingPersistentLocalId);
+            NotRealizeBuilding(buildingPersistentLocalId);
 
             var eTagResponse = new ETagResponse(string.Empty, Fixture.Create<string>());
-            var handler = new CorrectBuildingRealizationLambdaHandler(
+            var handler = new CorrectBuildingNotRealizationLambdaHandler(
                 Container.Resolve<IConfiguration>(),
                 new FakeRetryPolicy(),
                 MockTicketing(response => { eTagResponse = response; }).Object,
@@ -58,9 +57,9 @@
                 Container.Resolve<IBuildings>());
 
             //Act
-            await handler.Handle(new CorrectBuildingRealizationLambdaRequest
+            await handler.Handle(new CorrectBuildingNotRealizationLambdaRequest
             {
-                Request = new BackOfficeCorrectBuildingRealizationRequest { PersistentLocalId = buildingPersistentLocalId },
+                Request = new BackOfficeCorrectBuildingNotRealizationRequest { PersistentLocalId = buildingPersistentLocalId },
                 MessageGroupId = buildingPersistentLocalId,
                 TicketId = Guid.NewGuid(),
                 Metadata = new Dictionary<string, object>(),
@@ -69,7 +68,7 @@
 
             //Assert
             var stream = await Container.Resolve<IStreamStore>()
-                .ReadStreamBackwards(new StreamId(new BuildingStreamId(buildingPersistentLocalId)), 3, 1);
+                .ReadStreamBackwards(new StreamId(new BuildingStreamId(buildingPersistentLocalId)), 2, 1);
             stream.Messages.First().JsonMetadata.Should().Contain(eTagResponse.ETag);
         }
 
@@ -81,10 +80,9 @@
             var buildingPersistentLocalId = Fixture.Create<BuildingPersistentLocalId>();
 
             PlanBuilding(buildingPersistentLocalId);
-            PlaceBuildingUnderConstruction(buildingPersistentLocalId);
 
             var buildings = Container.Resolve<IBuildings>();
-            var handler = new CorrectBuildingRealizationLambdaHandler(
+            var handler = new CorrectBuildingNotRealizationLambdaHandler(
                 Container.Resolve<IConfiguration>(),
                 new FakeRetryPolicy(),
                 ticketing.Object,
@@ -95,9 +93,9 @@
                 await buildings.GetAsync(new BuildingStreamId(buildingPersistentLocalId), CancellationToken.None);
 
             // Act
-            await handler.Handle(new CorrectBuildingRealizationLambdaRequest
+            await handler.Handle(new CorrectBuildingNotRealizationLambdaRequest
             {
-                Request = new BackOfficeCorrectBuildingRealizationRequest { PersistentLocalId = buildingPersistentLocalId },
+                Request = new BackOfficeCorrectBuildingNotRealizationRequest { PersistentLocalId = buildingPersistentLocalId },
                 MessageGroupId = buildingPersistentLocalId,
                 TicketId = Guid.NewGuid(),
                 Metadata = new Dictionary<string, object>(),
@@ -122,7 +120,7 @@
             var ticketing = new Mock<ITicketing>();
             var buildingPersistentLocalId = Fixture.Create<BuildingPersistentLocalId>();
 
-            var handler = new CorrectBuildingRealizationLambdaHandler(
+            var handler = new CorrectBuildingNotRealizationLambdaHandler(
                 Container.Resolve<IConfiguration>(),
                 new FakeRetryPolicy(),
                 ticketing.Object,
@@ -130,9 +128,9 @@
                 Container.Resolve<IBuildings>());
 
             // Act
-            await handler.Handle(new CorrectBuildingRealizationLambdaRequest
+            await handler.Handle(new CorrectBuildingNotRealizationLambdaRequest
             {
-                Request = new BackOfficeCorrectBuildingRealizationRequest { PersistentLocalId = buildingPersistentLocalId },
+                Request = new BackOfficeCorrectBuildingNotRealizationRequest { PersistentLocalId = buildingPersistentLocalId },
                 MessageGroupId = buildingPersistentLocalId,
                 TicketId = Guid.NewGuid(),
                 Metadata = new Dictionary<string, object>(),
@@ -144,8 +142,8 @@
                 x.Error(
                     It.IsAny<Guid>(),
                     new TicketError(
-                        "Deze actie is enkel toegestaan op gebouwen met status 'gerealiseerd'.",
-                        "GebouwGeplandGehistoreerdOfNietGerealiseerd"),
+                        "Deze actie is enkel toegestaan op geschetste gebouwen met status 'nietGerealiseerd'.",
+                        "GebouwInaanbouwGerealiseerdOfGehistoreerd"),
                     CancellationToken.None));
         }
 
@@ -156,7 +154,7 @@
             var ticketing = new Mock<ITicketing>();
             var buildingPersistentLocalId = Fixture.Create<BuildingPersistentLocalId>();
 
-            var handler = new CorrectBuildingRealizationLambdaHandler(
+            var handler = new CorrectBuildingNotRealizationLambdaHandler(
                 Container.Resolve<IConfiguration>(),
                 new FakeRetryPolicy(),
                 ticketing.Object,
@@ -164,9 +162,9 @@
                 Container.Resolve<IBuildings>());
 
             // Act
-            await handler.Handle(new CorrectBuildingRealizationLambdaRequest
+            await handler.Handle(new CorrectBuildingNotRealizationLambdaRequest
             {
-                Request = new BackOfficeCorrectBuildingRealizationRequest { PersistentLocalId = buildingPersistentLocalId },
+                Request = new BackOfficeCorrectBuildingNotRealizationRequest { PersistentLocalId = buildingPersistentLocalId },
                 MessageGroupId = buildingPersistentLocalId,
                 TicketId = Guid.NewGuid(),
                 Metadata = new Dictionary<string, object>(),
@@ -180,40 +178,6 @@
                     new TicketError(
                         "Deze actie is enkel toegestaan op gebouwen met geometrieMethode 'ingeschetst'.",
                         "GebouwGeometrieIngemeten"),
-                    CancellationToken.None));
-        }
-
-        [Fact]
-        public async Task WhenBuildingHasRetiredBuildingUnits_ThenTicketingErrorIsExpected()
-        {
-            // Arrange
-            var ticketing = new Mock<ITicketing>();
-            var buildingPersistentLocalId = Fixture.Create<BuildingPersistentLocalId>();
-
-            var handler = new CorrectBuildingRealizationLambdaHandler(
-                Container.Resolve<IConfiguration>(),
-                new FakeRetryPolicy(),
-                ticketing.Object,
-                MockExceptionIdempotentCommandHandler<BuildingHasRetiredBuildingUnitsException>().Object,
-                Container.Resolve<IBuildings>());
-
-            // Act
-            await handler.Handle(new CorrectBuildingRealizationLambdaRequest
-            {
-                Request = new BackOfficeCorrectBuildingRealizationRequest { PersistentLocalId = buildingPersistentLocalId },
-                MessageGroupId = buildingPersistentLocalId,
-                TicketId = Guid.NewGuid(),
-                Metadata = new Dictionary<string, object>(),
-                Provenance = Fixture.Create<Provenance>()
-            }, CancellationToken.None);
-
-            //Assert
-            ticketing.Verify(x =>
-                x.Error(
-                    It.IsAny<Guid>(),
-                    new TicketError(
-                        "Deze actie is niet toegestaan wanneer er gehistoreerde gebouweenheden aanwezig zijn.",
-                        "GebouwBevatGehistoreerdeGebouweenheden"),
                     CancellationToken.None));
         }
     }

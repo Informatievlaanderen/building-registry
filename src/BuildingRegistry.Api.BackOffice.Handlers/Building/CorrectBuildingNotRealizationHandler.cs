@@ -9,11 +9,11 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Building
     using BuildingRegistry.Building;
     using MediatR;
 
-    public class CorrectBuildingRealizationHandler : BuildingBusHandler, IRequestHandler<CorrectBuildingRealizationRequest, ETagResponse>
+    public class CorrectBuildingNotRealizationHandler : BuildingBusHandler, IRequestHandler<CorrectBuildingNotRealizationRequest, ETagResponse>
     {
         private readonly IdempotencyContext _idempotencyContext;
 
-        public CorrectBuildingRealizationHandler(
+        public CorrectBuildingNotRealizationHandler(
             ICommandHandlerResolver bus,
             IdempotencyContext idempotencyContext,
             IBuildings buildings) : base(bus, buildings)
@@ -21,7 +21,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Building
             _idempotencyContext = idempotencyContext;
         }
 
-        public async Task<ETagResponse> Handle(CorrectBuildingRealizationRequest request, CancellationToken cancellationToken)
+        public async Task<ETagResponse> Handle(CorrectBuildingNotRealizationRequest request, CancellationToken cancellationToken)
         {
             var buildingPersistentLocalId = new BuildingPersistentLocalId(request.PersistentLocalId);
 

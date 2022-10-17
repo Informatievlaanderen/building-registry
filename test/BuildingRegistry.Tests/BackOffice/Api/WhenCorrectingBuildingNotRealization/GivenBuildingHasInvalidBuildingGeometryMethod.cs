@@ -1,9 +1,10 @@
-namespace BuildingRegistry.Tests.BackOffice.Api.WhenCorrectingPlaceBuildingUnderConstruction
+namespace BuildingRegistry.Tests.BackOffice.Api.WhenCorrectingBuildingNotRealization
 {
     using System;
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
+    using AutoFixture;
     using BuildingRegistry.Api.BackOffice.Abstractions.Building.Requests;
     using BuildingRegistry.Api.BackOffice.Building;
     using Building;
@@ -14,11 +15,11 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenCorrectingPlaceBuildingUnder
     using Xunit;
     using Xunit.Abstractions;
 
-    public class GivenBuildingCannotCorrectPlaceUnderConstructionException : BackOfficeApiTest
+    public class GivenBuildingHasInvalidBuildingGeometryMethod : BackOfficeApiTest
     {
         private readonly BuildingController _controller;
 
-        public GivenBuildingCannotCorrectPlaceUnderConstructionException(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
+        public GivenBuildingHasInvalidBuildingGeometryMethod(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
         {
             _controller = CreateBuildingControllerWithUser<BuildingController>();
         }
@@ -26,20 +27,21 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenCorrectingPlaceBuildingUnder
         [Fact]
         public void ThenValidationException()
         {
-            var buildingPersistentLocalId = new BuildingPersistentLocalId(123);
+            var buildingPersistentLocalId = Fixture.Create<BuildingPersistentLocalId>();
 
-            var request = new CorrectPlaceBuildingUnderConstructionRequest
+            var request = new CorrectBuildingNotRealizationRequest
             {
                 PersistentLocalId = buildingPersistentLocalId
             };
 
             MockMediator
-                .Setup(x => x.Send(It.IsAny<CorrectPlaceBuildingUnderConstructionRequest>(), CancellationToken.None).Result)
-                .Throws(new BuildingHasInvalidStatusException());
+                .Setup(x => x.Send(It.IsAny<CorrectBuildingNotRealizationRequest>(), CancellationToken.None).Result)
+                .Throws(new BuildingHasInvalidBuildingGeometryMethodException());
 
             //Act
-            Func<Task> act = async () => await _controller.CorrectPlaceUnderConstruction(ResponseOptions,
-                MockValidRequestValidator<CorrectPlaceBuildingUnderConstructionRequest>(),
+            Func<Task> act = async () => await _controller.CorrectNotRealization(
+                ResponseOptions,
+                MockValidRequestValidator<CorrectBuildingNotRealizationRequest>(),
                 null,
                 MockIfMatchValidator(true),
                 request,
@@ -53,8 +55,8 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenCorrectingPlaceBuildingUnder
                 .Result
                 .Where(x =>
                     x.Errors.Any(
-                        failure => failure.ErrorCode == "GebouwGeplandOfGerealiseerdOfGehistoreerdOfNietGerealiseerd"
-                                    && failure.ErrorMessage == "Deze actie is enkel toegestaan op gebouwen met status 'inAanbouw'."));
+                        failure => failure.ErrorCode == "GebouwGeometrieIngemeten"
+                                    && failure.ErrorMessage == "Deze actie is enkel toegestaan op gebouwen met geometrieMethode 'ingeschetst'."));
         }
     }
 }

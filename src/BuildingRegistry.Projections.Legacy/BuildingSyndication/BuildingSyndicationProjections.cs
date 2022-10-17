@@ -929,6 +929,14 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
                 }, ct);
             });
 
+            When<Envelope<BuildingWasCorrectedFromNotRealizedToPlanned>>(async (context, message, ct) =>
+            {
+                await context.CreateNewBuildingSyndicationItem(message.Message.BuildingPersistentLocalId, message, item =>
+                {
+                    item.Status = MapBuildingStatus(BuildingRegistry.Building.BuildingStatus.Planned);
+                }, ct);
+            });
+
             When<Envelope<BuildingUnitWasPlannedV2>>(async (context, message, ct) =>
             {
                 await context.CreateNewBuildingSyndicationItem(

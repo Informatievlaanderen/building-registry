@@ -41,6 +41,13 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda
                 Fixture.Create<Provenance>()));
         }
 
+        protected void NotRealizeBuilding(BuildingPersistentLocalId buildingPersistentLocalId)
+        {
+            DispatchArrangeCommand(new NotRealizeBuilding(
+                buildingPersistentLocalId,
+                Fixture.Create<Provenance>()));
+        }
+
         protected void PlanBuildingUnit(
             BuildingPersistentLocalId buildingPersistentLocalId,
             BuildingUnitPersistentLocalId buildingUnitPersistentLocalId,
