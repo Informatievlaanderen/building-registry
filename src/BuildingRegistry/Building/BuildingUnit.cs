@@ -105,11 +105,6 @@ namespace BuildingRegistry.Building
                 throw new BuildingUnitIsRemovedException(BuildingUnitPersistentLocalId);
             }
 
-            if (Function == BuildingUnitFunction.Common)
-            {
-                throw new BuildingUnitHasInvalidFunctionException();
-            }
-
             if (Status == BuildingUnitStatus.Planned)
             {
                 return;
@@ -118,6 +113,11 @@ namespace BuildingRegistry.Building
             if (Status != BuildingUnitStatus.Realized)
             {
                 throw new BuildingUnitHasInvalidStatusException();
+            }
+
+            if (Function == BuildingUnitFunction.Common)
+            {
+                throw new BuildingUnitHasInvalidFunctionException();
             }
 
             Apply(new BuildingUnitWasCorrectedFromRealizedToPlanned(_buildingPersistentLocalId, BuildingUnitPersistentLocalId));
@@ -141,6 +141,31 @@ namespace BuildingRegistry.Building
             }
 
             Apply(new BuildingUnitWasNotRealizedV2(_buildingPersistentLocalId, BuildingUnitPersistentLocalId));
+        }
+
+        public void CorrectNotRealize()
+        {
+            if (IsRemoved)
+            {
+                throw new BuildingUnitIsRemovedException(BuildingUnitPersistentLocalId);
+            }
+
+            if (Status == BuildingUnitStatus.Planned)
+            {
+                return;
+            }
+
+            if (Status != BuildingUnitStatus.NotRealized)
+            {
+                throw new BuildingUnitHasInvalidStatusException();
+            }
+
+            if (Function == BuildingUnitFunction.Common)
+            {
+                throw new BuildingUnitHasInvalidFunctionException();
+            }
+
+            Apply(new BuildingUnitWasCorrectedFromNotRealizedToPlanned(_buildingPersistentLocalId, BuildingUnitPersistentLocalId));
         }
 
         public void NotRealizeBecauseBuildingWasNotRealized()

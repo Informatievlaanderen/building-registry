@@ -333,6 +333,22 @@ namespace BuildingRegistry.Building
             buildingUnit.NotRealize();
         }
 
+        public void CorrectNotRealizeBuildingUnit(BuildingUnitPersistentLocalId buildingUnitPersistentLocalId)
+        {
+            GuardRemovedBuilding();
+
+            var buildingUnit = BuildingUnits.FirstOrDefault(x => x.BuildingUnitPersistentLocalId == buildingUnitPersistentLocalId);
+
+            if (buildingUnit is null)
+            {
+                throw new BuildingUnitIsNotFoundException(
+                    BuildingPersistentLocalId,
+                    buildingUnitPersistentLocalId);
+            }
+
+            buildingUnit.CorrectNotRealize();
+        }
+
         private void GuardRemovedBuilding()
         {
             if (IsRemoved)
