@@ -5,11 +5,11 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.Building
     using Be.Vlaanderen.Basisregisters.AggregateSource;
     using Be.Vlaanderen.Basisregisters.Sqs.Exceptions;
     using Be.Vlaanderen.Basisregisters.Sqs.Lambda.Handlers;
+    using Be.Vlaanderen.Basisregisters.Sqs.Lambda.Infrastructure;
     using Be.Vlaanderen.Basisregisters.Sqs.Responses;
     using BuildingRegistry.Api.BackOffice.Abstractions.Building.Validators;
     using BuildingRegistry.Building;
     using BuildingRegistry.Building.Exceptions;
-    using Infrastructure;
     using Microsoft.Extensions.Configuration;
     using Requests.Building;
     using TicketingService.Abstractions;
@@ -51,7 +51,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.Building
             return new ETagResponse(string.Format(DetailUrlFormat, request.BuildingPersistentLocalId), lastHash);
         }
 
-        protected override TicketError? MapDomainException(DomainException exception, CorrectPlaceBuildingUnderConstructionLambdaRequest request)
+        protected override TicketError? InnerMapDomainException(DomainException exception, CorrectPlaceBuildingUnderConstructionLambdaRequest request)
         {
             return exception switch
             {

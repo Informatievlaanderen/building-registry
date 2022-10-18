@@ -2,7 +2,7 @@
 {
     using System;
     using System.Threading.Tasks;
-    using BuildingRegistry.Infrastructure;
+    using Be.Vlaanderen.Basisregisters.Sqs.Lambda.Infrastructure;
 
     internal class FakeRetryPolicy : ICustomRetryPolicy
     {
