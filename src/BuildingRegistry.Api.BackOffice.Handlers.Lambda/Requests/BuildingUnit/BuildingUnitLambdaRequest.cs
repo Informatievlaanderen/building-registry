@@ -16,7 +16,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Requests.BuildingUnit
 
         public BuildingPersistentLocalId BuildingPersistentLocalId => new(Convert.ToInt32(MessageGroupId));
 
-        public BuildingUnitLambdaRequest(
+        protected BuildingUnitLambdaRequest(
             Guid ticketId,
             string messageGroupId,
             string? ifMatchHeaderValue,

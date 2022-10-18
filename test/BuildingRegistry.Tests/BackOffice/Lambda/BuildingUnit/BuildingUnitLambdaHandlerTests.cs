@@ -59,7 +59,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
         }
 
         [Fact]
-        public async Task WhenBuildingUnitIsRemovedException_ThenTicketingErrorIsExpected()
+        public async Task WhenBuildingIsRemovedException_ThenTicketingErrorIsExpected()
         {
             var ticketing = new Mock<ITicketing>();
 
@@ -85,6 +85,72 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
             ticketing
                 .Verify(x =>
                     x.Error(lambdaRequest.TicketId, new TicketError("Verwijderd gebouw.", "GebouwIsVerwijderd"),
+                        CancellationToken.None));
+            ticketing
+                .Verify(x =>
+                    x.Complete(It.IsAny<Guid>(), It.IsAny<TicketResult>(), CancellationToken.None), Times.Never);
+        }
+
+        [Fact]
+        public async Task WhenBuildingUnitIsRemovedException_ThenTicketingErrorIsExpected()
+        {
+            var ticketing = new Mock<ITicketing>();
+
+            var lambdaRequest = new RealizeBuildingUnitLambdaRequest(
+                Guid.NewGuid(),
+                Guid.NewGuid().ToString(),
+                string.Empty,
+                Fixture.Create<Provenance>(),
+                new Dictionary<string, object>(),
+                new BackOfficeRealizeBuildingUnitRequest { BuildingUnitPersistentLocalId = 1 }
+            );
+
+            var sut = new FakeBuildingUnitLambdaHandler(
+                Container.Resolve<IConfiguration>(),
+                new FakeRetryPolicy(),
+                Mock.Of<IBuildings>(),
+                ticketing.Object,
+                MockExceptionIdempotentCommandHandler<BuildingUnitIsRemovedException>().Object);
+
+            await sut.Handle(lambdaRequest, CancellationToken.None);
+
+            //Assert
+            ticketing
+                .Verify(x =>
+                    x.Error(lambdaRequest.TicketId, new TicketError("Verwijderde gebouweenheid.", "GebouweenheidVerwijderd"),
+                        CancellationToken.None));
+            ticketing
+                .Verify(x =>
+                    x.Complete(It.IsAny<Guid>(), It.IsAny<TicketResult>(), CancellationToken.None), Times.Never);
+        }
+
+        [Fact]
+        public async Task WhenBuildingUnitIsNotFoundException_ThenTicketingErrorIsExpected()
+        {
+            var ticketing = new Mock<ITicketing>();
+
+            var lambdaRequest = new RealizeBuildingUnitLambdaRequest(
+                Guid.NewGuid(),
+                Guid.NewGuid().ToString(),
+                string.Empty,
+                Fixture.Create<Provenance>(),
+                new Dictionary<string, object>(),
+                new BackOfficeRealizeBuildingUnitRequest { BuildingUnitPersistentLocalId = 1 }
+            );
+
+            var sut = new FakeBuildingUnitLambdaHandler(
+                Container.Resolve<IConfiguration>(),
+                new FakeRetryPolicy(),
+                Mock.Of<IBuildings>(),
+                ticketing.Object,
+                MockExceptionIdempotentCommandHandler<BuildingUnitIsNotFoundException>().Object);
+
+            await sut.Handle(lambdaRequest, CancellationToken.None);
+
+            //Assert
+            ticketing
+                .Verify(x =>
+                    x.Error(lambdaRequest.TicketId, new TicketError("Onbestaande gebouweenheid.", "GebouweenheidNietGevonden"),
                         CancellationToken.None));
             ticketing
                 .Verify(x =>

@@ -75,12 +75,15 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.BuildingUnit
             {
                 var ticketError = exception switch
                 {
-                    BuildingUnitIsNotFoundException => new TicketError(
-                        ValidationErrorMessages.Building.BuildingNotFound,
-                        ValidationErrorCodes.Building.BuildingNotFound),
                     BuildingIsRemovedException => new TicketError(
                         ValidationErrorMessages.Building.BuildingRemoved,
                         ValidationErrorCodes.Building.BuildingRemoved),
+                    BuildingUnitIsRemovedException => new TicketError(
+                        ValidationErrorMessages.BuildingUnit.BuildingUnitIsRemoved,
+                        ValidationErrorCodes.BuildingUnit.BuildingUnitIsRemoved),
+                    BuildingUnitIsNotFoundException => new TicketError(
+                        ValidationErrorMessages.BuildingUnit.BuildingUnitNotFound,
+                        ValidationErrorCodes.BuildingUnit.BuildingUnitNotFound),
                     _ => MapDomainException(exception, request)
                 };
 
