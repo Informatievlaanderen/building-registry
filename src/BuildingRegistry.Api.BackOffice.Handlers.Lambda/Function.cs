@@ -24,6 +24,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda
     using Sqs.Requests.Building;
     using TicketingService.Proxy.HttpProxy;
     using ICustomRetryPolicy = Infrastructure.ICustomRetryPolicy;
+    using Be.Vlaanderen.Basisregisters.Sqs.Lambda.Handlers;
 
     public class Function : FunctionBase
     {
@@ -85,6 +86,10 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda
                 .RegisterModule(new EditModule(configuration, services, loggerFactory))
                 .RegisterModule(new BackOfficeModule(configuration, services, loggerFactory));
 
+            builder.RegisterType<IdempotentCommandHandler>()
+                .As<IIdempotentCommandHandler>()
+                .AsSelf()
+                .InstancePerLifetimeScope();
             builder.RegisterModule(new IdempotencyModule(
                 services,
                 configuration.GetSection(IdempotencyConfiguration.Section).Get<IdempotencyConfiguration>()

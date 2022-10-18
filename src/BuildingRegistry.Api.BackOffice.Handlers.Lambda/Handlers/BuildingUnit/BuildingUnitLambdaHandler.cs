@@ -46,7 +46,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.BuildingUnit
 
         protected abstract Task<ETagResponse> InnerHandle(TSqsLambdaRequest request, CancellationToken cancellationToken);
 
-        protected abstract TicketError? MapDomainException(DomainException exception, TSqsLambdaRequest request);
+        protected abstract TicketError? InnerMapDomainException(DomainException exception);
 
         public async Task<Unit> Handle(TSqsLambdaRequest request, CancellationToken cancellationToken)
         {
@@ -82,7 +82,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.BuildingUnit
                     BuildingIsRemovedException => new TicketError(
                         ValidationErrorMessages.Building.BuildingRemoved,
                         ValidationErrorCodes.Building.BuildingRemoved),
-                    _ => MapDomainException(exception, request)
+                    _ => InnerMapDomainException(exception)
                 };
 
                 ticketError ??= new TicketError(exception.Message, "");

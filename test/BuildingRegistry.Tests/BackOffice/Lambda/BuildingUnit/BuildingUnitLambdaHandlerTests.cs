@@ -191,8 +191,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
             return Task.FromResult(new ETagResponse("location", "etag"));
         }
 
-        protected override TicketError MapDomainException(DomainException exception,
-            RealizeBuildingUnitLambdaRequest request)
+        protected override TicketError InnerMapDomainException(DomainException exception)
         {
             throw new NotImplementedException();
         }

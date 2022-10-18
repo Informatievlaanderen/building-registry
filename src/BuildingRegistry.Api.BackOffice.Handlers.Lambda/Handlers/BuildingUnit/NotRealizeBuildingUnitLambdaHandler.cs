@@ -54,7 +54,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.BuildingUnit
             return new ETagResponse(string.Format(DetailUrlFormat, request.BuildingUnitPersistentLocalId), lastHash);
         }
 
-        protected override TicketError? MapDomainException(DomainException exception, NotRealizeBuildingUnitLambdaRequest request)
+        protected override TicketError? InnerMapDomainException(DomainException exception)
         {
             return exception switch
             {

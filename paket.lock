@@ -368,9 +368,11 @@ NUGET
       System.Threading.Tasks.Dataflow (>= 6.0) - restriction: || (&& (== net472) (>= net6.0)) (== net6.0)
     Be.Vlaanderen.Basisregisters.Shaperon (9.0.1)
     Be.Vlaanderen.Basisregisters.Shaperon.Geometries (9.0.1)
-    Be.Vlaanderen.Basisregisters.Sqs (1.1.5)
+    Be.Vlaanderen.Basisregisters.Sqs (1.1.7)
       MediatR (>= 10.0.1) - restriction: || (&& (== net472) (>= net6.0)) (== net6.0)
-    Be.Vlaanderen.Basisregisters.Sqs.Lambda (1.1.5)
+    Be.Vlaanderen.Basisregisters.Sqs.Lambda (1.1.7)
+      Be.Vlaanderen.Basisregisters.Api (>= 18.1) - restriction: || (&& (== net472) (>= net6.0)) (== net6.0)
+      Be.Vlaanderen.Basisregisters.CommandHandling.Idempotency (>= 7.0) - restriction: || (&& (== net472) (>= net6.0)) (== net6.0)
       MediatR (>= 10.0.1) - restriction: || (&& (== net472) (>= net6.0)) (== net6.0)
     Be.Vlaanderen.Basisregisters.Testing.Infrastructure.Events (3.0) - copy_local: true, copy_content_to_output_dir: always, content: true
       Be.Vlaanderen.Basisregisters.AggregateSource (>= 6.0) - restriction: || (&& (== net472) (>= net6.0)) (== net6.0)
