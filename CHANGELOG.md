@@ -1,3 +1,10 @@
+## [3.37.1](https://github.com/informatievlaanderen/building-registry/compare/v3.37.0...v3.37.1) (2022-10-18)
+
+
+### Bug Fixes
+
+* event description ([e3b5bd2](https://github.com/informatievlaanderen/building-registry/commit/e3b5bd21a85b727ba7d8daa72e8ed66765c23468))
+
 # [3.37.0](https://github.com/informatievlaanderen/building-registry/compare/v3.36.0...v3.37.0) (2022-10-18)
 
 
