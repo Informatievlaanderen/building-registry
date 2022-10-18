@@ -1,3 +1,13 @@
+# [3.37.0](https://github.com/informatievlaanderen/building-registry/compare/v3.36.0...v3.37.0) (2022-10-18)
+
+
+### Features
+
+* correct notrealize building unit ([7917b42](https://github.com/informatievlaanderen/building-registry/commit/7917b426fd14e17a09612b107ebc09e6df10d772))
+* correct notrealize buildingunit backoffice + projections ([a96ce94](https://github.com/informatievlaanderen/building-registry/commit/a96ce94f2a0d50f9fec67735eef40511587f22d2))
+* correct realize building unit ([db17531](https://github.com/informatievlaanderen/building-registry/commit/db175312ac2c80a8534a4835e52dc7525a3bd833))
+* correct realize building unit backoffice ([d80ad91](https://github.com/informatievlaanderen/building-registry/commit/d80ad9126270267e8e52ab89306e86424826a89a))
+
 # [3.36.0](https://github.com/informatievlaanderen/building-registry/compare/v3.35.0...v3.36.0) (2022-10-17)
 
 
