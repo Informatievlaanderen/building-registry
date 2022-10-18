@@ -142,6 +142,18 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda
                     ), cancellationToken);
                     break;
 
+                case CorrectBuildingUnitNotRealizationSqsRequest request:
+                    await mediator.Send(
+                        new CorrectBuildingUnitNotRealizationLambdaRequest(
+                            request.TicketId,
+                            messageMetadata.MessageGroupId!,
+                            request.IfMatchHeaderValue,
+                            request.ProvenanceData.ToProvenance(),
+                            request.Metadata,
+                            request.Request),
+                        cancellationToken);
+                    break;
+
                 case PlanBuildingUnitSqsRequest request:
                     await mediator.Send(new PlanBuildingUnitLambdaRequest(
                         request.TicketId,

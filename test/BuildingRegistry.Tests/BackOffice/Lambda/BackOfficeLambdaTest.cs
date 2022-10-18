@@ -76,6 +76,16 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda
                 Fixture.Create<Provenance>()));
         }
 
+        protected void NotRealizeBuildingUnit(
+            BuildingPersistentLocalId buildingPersistentLocalId,
+            BuildingUnitPersistentLocalId buildingUnitPersistentLocalId)
+        {
+            DispatchArrangeCommand(new NotRealizeBuildingUnit(
+                buildingPersistentLocalId,
+                buildingUnitPersistentLocalId,
+                Fixture.Create<Provenance>()));
+        }
+
         protected Mock<ITicketing> MockTicketing(Action<ETagResponse> ticketingCompleteCallback)
         {
             var ticketing = new Mock<ITicketing>();

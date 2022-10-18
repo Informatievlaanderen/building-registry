@@ -28,11 +28,11 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
     using Xunit;
     using Xunit.Abstractions;
 
-    public class WhenCorrectingBuildingUnitRealization : BackOfficeLambdaTest
+    public class WhenCorrectingBuildingUnitNotRealization : BackOfficeLambdaTest
     {
         private readonly IdempotencyContext _idempotencyContext;
 
-        public WhenCorrectingBuildingUnitRealization(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
+        public WhenCorrectingBuildingUnitNotRealization(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
         {
             Fixture.Customize(new WithFixedBuildingPersistentLocalId());
             Fixture.Customize(new WithFixedBuildingUnitPersistentLocalId());
@@ -41,7 +41,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
         }
 
         [Fact]
-        public async Task ThenBuildingUnitIsCorrectedFromRealizedToPlanned()
+        public async Task ThenBuildingUnitIsCorrectedFromNotRealizedToPlanned()
         {
             // Arrange
             var buildingPersistentLocalId = Fixture.Create<BuildingPersistentLocalId>();
@@ -52,10 +52,10 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
             RealizeBuilding(buildingPersistentLocalId);
 
             PlanBuildingUnit(buildingPersistentLocalId, buildingUnitPersistentLocalId);
-            RealizeBuildingUnit(buildingPersistentLocalId, buildingUnitPersistentLocalId);
+            NotRealizeBuildingUnit(buildingPersistentLocalId, buildingUnitPersistentLocalId);
 
             var eTagResponse = new ETagResponse(string.Empty, Fixture.Create<string>());
-            var handler = new CorrectBuildingUnitRealizationLambdaHandler(
+            var handler = new CorrectBuildingUnitNotRealizationLambdaHandler(
                 Container.Resolve<IConfiguration>(),
                 new FakeRetryPolicy(),
                 MockTicketing(response => { eTagResponse = response; }).Object,
@@ -63,14 +63,15 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
                 Container.Resolve<IBuildings>());
 
             //Act
-            await handler.Handle(new CorrectBuildingUnitRealizationLambdaRequest(
-                Guid.NewGuid(),
-                buildingPersistentLocalId,
-                null,
-                Fixture.Create<Provenance>(),
-                new Dictionary<string, object>(),
-                new BackOfficeCorrectBuildingUnitRealizationRequest() { BuildingUnitPersistentLocalId = buildingUnitPersistentLocalId }
-                ), CancellationToken.None);
+            await handler.Handle(
+                new CorrectBuildingUnitNotRealizationLambdaRequest(
+                    Fixture.Create<Guid>(),
+                    buildingPersistentLocalId,
+                    null,
+                    Fixture.Create<Provenance>(),
+                    new Dictionary<string, object>(),
+                    new BackOfficeCorrectBuildingUnitNotRealizationRequest { BuildingUnitPersistentLocalId = buildingUnitPersistentLocalId }),
+                CancellationToken.None);
 
             //Assert
             var stream = await Container.Resolve<IStreamStore>()
@@ -90,7 +91,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
             PlanBuildingUnit(buildingPersistentLocalId, buildingUnitPersistentLocalId);
 
             var buildings = Container.Resolve<IBuildings>();
-            var handler = new CorrectBuildingUnitRealizationLambdaHandler(
+            var handler = new CorrectBuildingUnitNotRealizationLambdaHandler(
                 Container.Resolve<IConfiguration>(),
                 new FakeRetryPolicy(),
                 ticketing.Object,
@@ -101,14 +102,15 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
                 await buildings.GetAsync(new BuildingStreamId(buildingPersistentLocalId), CancellationToken.None);
 
             // Act
-            await handler.Handle(new CorrectBuildingUnitRealizationLambdaRequest(
-                Guid.NewGuid(),
-                buildingPersistentLocalId,
-                null,
-                Fixture.Create<Provenance>(),
-                new Dictionary<string, object>(),
-                new BackOfficeCorrectBuildingUnitRealizationRequest() { BuildingUnitPersistentLocalId = buildingUnitPersistentLocalId }
-                ), CancellationToken.None);
+            await handler.Handle(
+                new CorrectBuildingUnitNotRealizationLambdaRequest(
+                    Fixture.Create<Guid>(),
+                    buildingPersistentLocalId,
+                    null,
+                    Fixture.Create<Provenance>(),
+                    new Dictionary<string, object>(),
+                    new BackOfficeCorrectBuildingUnitNotRealizationRequest { BuildingUnitPersistentLocalId = buildingUnitPersistentLocalId }),
+                CancellationToken.None);
 
             //Assert
             ticketing.Verify(x =>
@@ -132,7 +134,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
             PlanBuilding(buildingPersistentLocalId);
             PlanBuildingUnit(buildingPersistentLocalId, buildingUnitPersistentLocalId);
 
-            var handler = new CorrectBuildingUnitRealizationLambdaHandler(
+            var handler = new CorrectBuildingUnitNotRealizationLambdaHandler(
                 Container.Resolve<IConfiguration>(),
                 new FakeRetryPolicy(),
                 ticketing.Object,
@@ -140,22 +142,23 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
                 Container.Resolve<IBuildings>());
 
             // Act
-            await handler.Handle(new CorrectBuildingUnitRealizationLambdaRequest(
-                Guid.NewGuid(),
-                buildingPersistentLocalId,
-                null,
-                Fixture.Create<Provenance>(),
-                new Dictionary<string, object>(),
-                new BackOfficeCorrectBuildingUnitRealizationRequest() { BuildingUnitPersistentLocalId = buildingUnitPersistentLocalId }
-                ), CancellationToken.None);
+            await handler.Handle(
+                new CorrectBuildingUnitNotRealizationLambdaRequest(
+                    Fixture.Create<Guid>(),
+                    buildingPersistentLocalId,
+                    null,
+                    Fixture.Create<Provenance>(),
+                    new Dictionary<string, object>(),
+                    new BackOfficeCorrectBuildingUnitNotRealizationRequest { BuildingUnitPersistentLocalId = buildingUnitPersistentLocalId }),
+                CancellationToken.None);
 
             //Assert
             ticketing.Verify(x =>
                 x.Error(
                     It.IsAny<Guid>(),
                     new TicketError(
-                        "Deze actie is enkel toegestaan op gebouweenheden met status 'gerealiseerd'.",
-                        "GebouweenheidNietGerealiseerdOfGehistoreerd"),
+                        "Deze actie is enkel toegestaan op gebouweenheden met status 'nietGerealiseerd'.",
+                        "GebouweenheidGerealiseerdOfGehistoreerd"),
                     CancellationToken.None));
         }
 
@@ -170,7 +173,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
             PlanBuilding(buildingPersistentLocalId);
             PlanBuildingUnit(buildingPersistentLocalId, buildingUnitPersistentLocalId);
 
-            var handler = new CorrectBuildingUnitRealizationLambdaHandler(
+            var handler = new CorrectBuildingUnitNotRealizationLambdaHandler(
                 Container.Resolve<IConfiguration>(),
                 new FakeRetryPolicy(),
                 ticketing.Object,
@@ -178,14 +181,15 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
                 Container.Resolve<IBuildings>());
 
             // Act
-            await handler.Handle(new CorrectBuildingUnitRealizationLambdaRequest(
-                Guid.NewGuid(),
-                buildingPersistentLocalId,
-                string.Empty,
-                Fixture.Create<Provenance>(),
-                new Dictionary<string, object>(),
-                new BackOfficeCorrectBuildingUnitRealizationRequest() { BuildingUnitPersistentLocalId = buildingUnitPersistentLocalId }
-                ), CancellationToken.None);
+            await handler.Handle(
+                new CorrectBuildingUnitNotRealizationLambdaRequest(
+                    Fixture.Create<Guid>(),
+                    buildingPersistentLocalId,
+                    string.Empty,
+                    Fixture.Create<Provenance>(),
+                    new Dictionary<string, object>(),
+                    new BackOfficeCorrectBuildingUnitNotRealizationRequest() { BuildingUnitPersistentLocalId = buildingUnitPersistentLocalId }),
+                CancellationToken.None);
 
             //Assert
             ticketing.Verify(x =>

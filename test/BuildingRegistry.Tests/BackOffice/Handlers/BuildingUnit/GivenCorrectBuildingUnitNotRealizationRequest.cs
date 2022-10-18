@@ -18,15 +18,15 @@ namespace BuildingRegistry.Tests.BackOffice.Handlers.BuildingUnit
     using Xunit;
     using Xunit.Abstractions;
 
-    public class GivenCorrectBuildingUnitRealizationRequest : BuildingRegistryTest
+    public class GivenCorrectBuildingUnitNotRealizationRequest : BuildingRegistryTest
     {
-        private readonly CorrectBuildingUnitRealizationHandler _sut;
+        private readonly CorrectBuildingUnitNotRealizationHandler _sut;
         private readonly BackOfficeContext _backOfficeContext;
 
-        public GivenCorrectBuildingUnitRealizationRequest(ITestOutputHelper outputHelper) : base(outputHelper)
+        public GivenCorrectBuildingUnitNotRealizationRequest(ITestOutputHelper outputHelper) : base(outputHelper)
         {
             _backOfficeContext = new FakeBackOfficeContextFactory().CreateDbContext();
-            _sut = new CorrectBuildingUnitRealizationHandler(
+            _sut = new CorrectBuildingUnitNotRealizationHandler(
                 Container.Resolve<ICommandHandlerResolver>(),
                 Container.Resolve<IBuildings>(),
                 _backOfficeContext,
@@ -34,10 +34,10 @@ namespace BuildingRegistry.Tests.BackOffice.Handlers.BuildingUnit
         }
 
         [Fact]
-        public async Task GivenBuildingUnitRealized_ThenBuildingUnitIsCorrectedToPlanned()
+        public async Task GivenBuildingUnitNotRealized_ThenBuildingUnitIsCorrectedToPlanned()
         {
-            var buildingPersistentLocalId = new BuildingPersistentLocalId(123);
-            var buildingUnitPersistentLocalId = new BuildingUnitPersistentLocalId(456);
+            var buildingPersistentLocalId = Fixture.Create<BuildingPersistentLocalId>();
+            var buildingUnitPersistentLocalId = Fixture.Create<BuildingUnitPersistentLocalId>();
 
             _backOfficeContext.BuildingUnitBuildings.Add(new BuildingUnitBuilding(
                 buildingUnitPersistentLocalId,
@@ -61,16 +61,16 @@ namespace BuildingRegistry.Tests.BackOffice.Handlers.BuildingUnit
                 buildingUnitPersistentLocalId,
                 Fixture.Create<BuildingUnitPositionGeometryMethod>(),
                 Fixture.Create<ExtendedWkbGeometry>(),
-                Fixture.Create<BuildingUnitFunction>(),
+                BuildingUnitFunction.Unknown,
                 hasDeviation: false,
                 Fixture.Create<Provenance>()));
 
-            DispatchArrangeCommand(new RealizeBuildingUnit(
+            DispatchArrangeCommand(new NotRealizeBuildingUnit(
                 buildingPersistentLocalId,
                 buildingUnitPersistentLocalId,
                 Fixture.Create<Provenance>()));
 
-            var request = new CorrectBuildingUnitRealizationRequest()
+            var request = new CorrectBuildingUnitNotRealizationRequest
             {
                 BuildingUnitPersistentLocalId = buildingUnitPersistentLocalId
             };

@@ -93,7 +93,7 @@ namespace BuildingRegistry.Projections.Wfs.BuildingUnitV2
             When<Envelope<BuildingUnitWasRealizedV2>>(async (context, message, _) =>
             {
                 var unit = await context.BuildingUnitsV2.FindAsync(message.Message.BuildingUnitPersistentLocalId);
-                unit.Status = RealizedStatus;
+                unit!.Status = RealizedStatus;
 
                 SetVersion(unit, message.Message.Provenance.Timestamp);
             });
@@ -101,7 +101,7 @@ namespace BuildingRegistry.Projections.Wfs.BuildingUnitV2
              When<Envelope<BuildingUnitWasCorrectedFromRealizedToPlanned>>(async (context, message, _) =>
             {
                 var unit = await context.BuildingUnitsV2.FindAsync(message.Message.BuildingUnitPersistentLocalId);
-                unit.Status = PlannedStatus;
+                unit!.Status = PlannedStatus;
 
                 SetVersion(unit, message.Message.Provenance.Timestamp);
             });
@@ -109,7 +109,7 @@ namespace BuildingRegistry.Projections.Wfs.BuildingUnitV2
             When<Envelope<BuildingUnitWasCorrectedFromRealizedToPlannedBecauseBuildingWasCorrected>>(async (context, message, _) =>
             {
                 var unit = await context.BuildingUnitsV2.FindAsync(message.Message.BuildingUnitPersistentLocalId);
-                unit.Status = PlannedStatus;
+                unit!.Status = PlannedStatus;
 
                 SetVersion(unit, message.Message.Provenance.Timestamp);
             });
@@ -117,7 +117,15 @@ namespace BuildingRegistry.Projections.Wfs.BuildingUnitV2
             When<Envelope<BuildingUnitWasNotRealizedV2>>(async (context, message, _) =>
             {
                 var unit = await context.BuildingUnitsV2.FindAsync(message.Message.BuildingUnitPersistentLocalId);
-                unit.Status = NotRealizedStatus;
+                unit!.Status = NotRealizedStatus;
+
+                SetVersion(unit, message.Message.Provenance.Timestamp);
+            });
+
+            When<Envelope<BuildingUnitWasCorrectedFromNotRealizedToPlanned>>(async (context, message, _) =>
+            {
+                var unit = await context.BuildingUnitsV2.FindAsync(message.Message.BuildingUnitPersistentLocalId);
+                unit!.Status = PlannedStatus;
 
                 SetVersion(unit, message.Message.Provenance.Timestamp);
             });

@@ -199,8 +199,8 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenCorrectingBuildingUnitRealiz
                 .Result
                 .Where(x =>
                     x.Errors.Any(error
-                        => error.ErrorCode == "GebouweenheidNietgerealiseerdOfGehistoreerd"
-                                          && error.ErrorMessage == "Deze actie is enkel toegestaan op gebouweenheden met status 'gerealiseerd'"));
+                        => error.ErrorCode == "GebouweenheidNietGerealiseerdOfGehistoreerd"
+                           && error.ErrorMessage == "Deze actie is enkel toegestaan op gebouweenheden met status 'gerealiseerd'."));
         }
 
         [Fact]
@@ -212,7 +212,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenCorrectingBuildingUnitRealiz
                 .Setup(x => x.Send(It.IsAny<CorrectBuildingUnitRealizationRequest>(), CancellationToken.None).Result)
                 .Throws(new BuildingUnitHasInvalidFunctionException());
 
-            var request = new CorrectBuildingUnitRealizationRequest()
+            var request = new CorrectBuildingUnitRealizationRequest
             {
                 BuildingUnitPersistentLocalId = buildingUnitPersistentLocalId
             };
@@ -234,7 +234,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenCorrectingBuildingUnitRealiz
                 .Where(x =>
                     x.Errors.Any(error
                         => error.ErrorCode == "GebouweenheidGemeenschappelijkdeel"
-                                          && error.ErrorMessage == "Deze actie is niet toegestaan voor een gemeenschappelijk deel."));
+                           && error.ErrorMessage == "Deze actie is niet toegestaan op gebouweenheden met functie gemeenschappelijkDeel."));
         }
     }
 }
