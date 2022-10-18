@@ -5,11 +5,11 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Requests.BuildingUnit
     using Be.Vlaanderen.Basisregisters.Sqs.Lambda.Requests;
     using BuildingRegistry.Building;
 
-    public record BuildingUnitLambdaRequest : SqsLambdaRequest
+    public abstract record BuildingUnitLambdaRequest : SqsLambdaRequest
     {
         public BuildingPersistentLocalId BuildingPersistentLocalId => new BuildingPersistentLocalId(Convert.ToInt32(MessageGroupId));
 
-        public BuildingUnitLambdaRequest(
+        protected BuildingUnitLambdaRequest(
             string messageGroupId,
             Guid ticketId,
             string? ifMatchHeaderValue,

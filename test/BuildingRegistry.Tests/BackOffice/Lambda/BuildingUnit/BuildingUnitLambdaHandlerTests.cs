@@ -9,13 +9,13 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
     using Be.Vlaanderen.Basisregisters.AggregateSource;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Be.Vlaanderen.Basisregisters.Sqs.Lambda.Handlers;
+    using Be.Vlaanderen.Basisregisters.Sqs.Lambda.Infrastructure;
     using Be.Vlaanderen.Basisregisters.Sqs.Responses;
     using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Requests;
     using BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.BuildingUnit;
     using BuildingRegistry.Api.BackOffice.Handlers.Lambda.Requests.BuildingUnit;
     using BuildingRegistry.Building;
     using BuildingRegistry.Building.Exceptions;
-    using BuildingRegistry.Infrastructure;
     using Microsoft.Extensions.Configuration;
     using Moq;
     using TicketingService.Abstractions;
@@ -255,10 +255,9 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
             return Task.FromResult(new ETagResponse("location", "etag"));
         }
 
-        protected override TicketError MapDomainException(DomainException exception,
-            RealizeBuildingUnitLambdaRequest request)
+        protected override TicketError? InnerMapDomainException(DomainException exception, RealizeBuildingUnitLambdaRequest request)
         {
-            throw new NotImplementedException();
+            return null;
         }
     }
 }

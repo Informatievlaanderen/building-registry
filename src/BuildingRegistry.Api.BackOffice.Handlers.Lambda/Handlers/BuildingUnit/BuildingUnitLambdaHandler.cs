@@ -1,28 +1,23 @@
 namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.BuildingUnit
 {
     using System.Configuration;
+    using Abstractions.Building.Validators;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
     using Be.Vlaanderen.Basisregisters.Api.ETag;
-    using BuildingRegistry.Api.BackOffice.Abstractions.Building.Validators;
     using Be.Vlaanderen.Basisregisters.Sqs.Exceptions;
     using Be.Vlaanderen.Basisregisters.Sqs.Lambda.Handlers;
-    using Be.Vlaanderen.Basisregisters.Sqs.Responses;
+    using Be.Vlaanderen.Basisregisters.Sqs.Lambda.Infrastructure;
     using BuildingRegistry.Building;
     using BuildingRegistry.Building.Exceptions;
-    using Infrastructure;
-    using MediatR;
     using Microsoft.Extensions.Configuration;
     using Requests.BuildingUnit;
     using TicketingService.Abstractions;
 
-    public abstract class BuildingUnitLambdaHandler<TSqsLambdaRequest> : IRequestHandler<TSqsLambdaRequest>
+    public abstract class BuildingUnitLambdaHandler<TSqsLambdaRequest> : SqsLambdaHandlerBase<TSqsLambdaRequest>
         where TSqsLambdaRequest : BuildingUnitLambdaRequest
     {
-        private readonly ITicketing _ticketing;
-        private readonly ICustomRetryPolicy _retryPolicy;
         private readonly IBuildings _buildings;
 
-        protected IIdempotentCommandHandler IdempotentCommandHandler { get; }
         protected string DetailUrlFormat { get; }
 
         protected BuildingUnitLambdaHandler(
@@ -31,10 +26,8 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.BuildingUnit
             ITicketing ticketing,
             IIdempotentCommandHandler idempotentCommandHandler,
             IBuildings buildings)
+            : base(retryPolicy, ticketing, idempotentCommandHandler)
         {
-            _retryPolicy = retryPolicy;
-            _ticketing = ticketing;
-            IdempotentCommandHandler = idempotentCommandHandler;
             _buildings = buildings;
 
             DetailUrlFormat = configuration["BuildingUnitDetailUrl"];
@@ -44,62 +37,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.BuildingUnit
             }
         }
 
-        protected abstract Task<ETagResponse> InnerHandle(TSqsLambdaRequest request, CancellationToken cancellationToken);
-
-        protected abstract TicketError? MapDomainException(DomainException exception, TSqsLambdaRequest request);
-
-        public async Task<Unit> Handle(TSqsLambdaRequest request, CancellationToken cancellationToken)
-        {
-            try
-            {
-                await ValidateIfMatchHeaderValue(request, cancellationToken);
-
-                await _ticketing.Pending(request.TicketId, cancellationToken);
-
-                ETagResponse? etag = null;
-
-                await _retryPolicy.Retry(async () => etag = await InnerHandle(request, cancellationToken));
-
-                await _ticketing.Complete(
-                    request.TicketId,
-                    new TicketResult(etag),
-                    cancellationToken);
-            }
-            catch (IfMatchHeaderValueMismatchException)
-            {
-                await _ticketing.Error(
-                    request.TicketId,
-                    new TicketError("Als de If-Match header niet overeenkomt met de laatste ETag.", "PreconditionFailed"),
-                    cancellationToken);
-            }
-            catch (DomainException exception)
-            {
-                var ticketError = exception switch
-                {
-                    BuildingIsRemovedException => new TicketError(
-                        ValidationErrorMessages.Building.BuildingRemoved,
-                        ValidationErrorCodes.Building.BuildingRemoved),
-                    BuildingUnitIsRemovedException => new TicketError(
-                        ValidationErrorMessages.BuildingUnit.BuildingUnitIsRemoved,
-                        ValidationErrorCodes.BuildingUnit.BuildingUnitIsRemoved),
-                    BuildingUnitIsNotFoundException => new TicketError(
-                        ValidationErrorMessages.BuildingUnit.BuildingUnitNotFound,
-                        ValidationErrorCodes.BuildingUnit.BuildingUnitNotFound),
-                    _ => MapDomainException(exception, request)
-                };
-
-                ticketError ??= new TicketError(exception.Message, "");
-
-                await _ticketing.Error(
-                    request.TicketId,
-                    ticketError,
-                    cancellationToken);
-            }
-
-            return Unit.Value;
-        }
-
-        private async Task ValidateIfMatchHeaderValue(TSqsLambdaRequest request, CancellationToken cancellationToken)
+        protected override async Task ValidateIfMatchHeaderValue(TSqsLambdaRequest request, CancellationToken cancellationToken)
         {
             if (string.IsNullOrWhiteSpace(request.IfMatchHeaderValue) || request is not Abstractions.IHasBuildingUnitPersistentLocalId id)
             {
@@ -131,6 +69,38 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.BuildingUnit
                 x => x.BuildingUnitPersistentLocalId == buildingUnitPersistentLocalId);
 
             return buildingUnit.LastEventHash;
+        }
+
+        protected override Task HandleAggregateIdIsNotFoundException(
+            TSqsLambdaRequest request,
+            CancellationToken cancellationToken)
+        {
+            return Task.CompletedTask;
+        }
+
+        protected abstract TicketError? InnerMapDomainException(DomainException exception, TSqsLambdaRequest request);
+
+        protected override TicketError? MapDomainException(DomainException exception, TSqsLambdaRequest request)
+        {
+            var error = InnerMapDomainException(exception, request);
+            if (error is not null)
+            {
+                return error;
+            }
+
+            return exception switch
+            {
+                BuildingIsRemovedException => new TicketError(
+                    ValidationErrorMessages.Building.BuildingRemoved,
+                    ValidationErrorCodes.Building.BuildingRemoved),
+                BuildingUnitIsRemovedException => new TicketError(
+                    ValidationErrorMessages.BuildingUnit.BuildingUnitIsRemoved,
+                    ValidationErrorCodes.BuildingUnit.BuildingUnitIsRemoved),
+                BuildingUnitIsNotFoundException => new TicketError(
+                    ValidationErrorMessages.BuildingUnit.BuildingUnitNotFound,
+                    ValidationErrorCodes.BuildingUnit.BuildingUnitNotFound),
+                _ => null
+            };
         }
     }
 }
