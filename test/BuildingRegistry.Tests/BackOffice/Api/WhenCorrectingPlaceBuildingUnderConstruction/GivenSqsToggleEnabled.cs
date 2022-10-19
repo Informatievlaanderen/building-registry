@@ -40,7 +40,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenCorrectingPlaceBuildingUnder
             var expectedLocationResult = new LocationResult(CreateTicketUri(ticketId));
 
             MockMediator
-                .Setup(x => x.Send(It.IsAny<PlaceBuildingUnderConstructionSqsRequest>(), CancellationToken.None))
+                .Setup(x => x.Send(It.IsAny<CorrectPlaceBuildingUnderConstructionSqsRequest>(), CancellationToken.None))
                 .Returns(Task.FromResult(expectedLocationResult));
 
             _streamStore.SetStreamFound();
@@ -61,12 +61,12 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenCorrectingPlaceBuildingUnder
         public async Task WithInvalidIfMatchHeader_ThenPreconditionFailedResponse()
         {
             //Act
-            var result = await _controller.UnderConstruction(
+            var result = await _controller.CorrectPlaceUnderConstruction(
                 ResponseOptions,
-                MockValidRequestValidator<PlaceBuildingUnderConstructionRequest>(),
+                MockValidRequestValidator<CorrectPlaceBuildingUnderConstructionRequest>(),
                 new BuildingExistsValidator(_streamStore.Object),
                 MockIfMatchValidator(false),
-                Fixture.Create<PlaceBuildingUnderConstructionRequest>(),
+                Fixture.Create<CorrectPlaceBuildingUnderConstructionRequest>(),
                 "IncorrectIfMatchHeader");
 
             //Assert
