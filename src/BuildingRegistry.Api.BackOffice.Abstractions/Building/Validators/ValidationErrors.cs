@@ -14,7 +14,7 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.Building.Validators
             public const string BuildingCannotBeNotRealizedException = "GebouwGehistoreerdOfGerealiseerd";
             public const string BuildingCannotBeCorrectedFromNotRealizedToPlanned = "GebouwInaanbouwGerealiseerdOfGehistoreerd";
 
-            public const string BuildingIsMeasuredByGrb = "GebouwGeometrieIngemeten";
+            public const string BuildingIsMeasuredByGrb = "GebouwGeometrieMethodeIngemetenGRB";
             public const string BuildingHasRetiredBuildingUnits = "GebouwBevatGehistoreerdeGebouweenheden";
         }
 

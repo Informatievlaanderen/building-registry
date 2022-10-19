@@ -55,8 +55,8 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenCorrectingBuildingRealizatio
                 .Result
                 .Where(x =>
                     x.Errors.Any(
-                        failure => failure.ErrorCode == "GebouwGeometrieIngemeten"
-                                    && failure.ErrorMessage == "Deze actie is enkel toegestaan op gebouwen met geometrieMethode 'ingeschetst'."));
+                        failure => failure.ErrorCode == "GebouwGeometrieMethodeIngemetenGRB"
+                                   && failure.ErrorMessage == "Deze actie is enkel toegestaan op gebouwen met geometrieMethode 'ingeschetst'."));
         }
     }
 }
