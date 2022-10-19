@@ -8,11 +8,11 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.Building.Validators
             public const string BuildingRemoved = "GebouwIsVerwijderd";
             public const string InvalidPolygonGeometry = "GebouwPolygoonValidatie";
             public const string BuildingCannotBePlacedUnderConstruction = "GebouwGehistoreerdGerealiseerdOfNietGerealiseerd";
-            public const string BuildingCannotCorrectPlacedUnderConstruction = "GebouwGeplandOfGerealiseerdOfGehistoreerdOfNietGerealiseerd";
+            public const string BuildingCannotCorrectPlacedUnderConstruction = "GebouwGerealiseerdGehistoreerdOfNietGerealiseerd";
             public const string BuildingCannotBeRealizedException = "GebouwGehistoreerdGeplandOfNietGerealiseerd";
             public const string BuildingCannotBeCorrectedFromRealizedToUnderConstruction = "GebouwGeplandGehistoreerdOfNietGerealiseerd";
             public const string BuildingCannotBeNotRealizedException = "GebouwGehistoreerdOfGerealiseerd";
-            public const string BuildingCannotBeCorrectedFromNotRealizedToPlanned = "GebouwInaanbouwGerealiseerdOfGehistoreerd";
+            public const string BuildingCannotBeCorrectedFromNotRealizedToPlanned = "GebouwInAanbouwGerealiseerdOfGehistoreerd";
 
             public const string BuildingIsMeasuredByGrb = "GebouwGeometrieMethodeIngemetenGRB";
             public const string BuildingHasRetiredBuildingUnits = "GebouwBevatGehistoreerdeGebouweenheden";
