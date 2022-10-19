@@ -6,7 +6,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Requests.BuildingUnit
     using BuildingRegistry.Building;
     using MediatR;
 
-    public class BuildingUnitLambdaRequest : IRequest
+    public abstract class BuildingUnitLambdaRequest : IRequest
     {
         public Guid TicketId { get; set; }
         public string MessageGroupId { get; set; }

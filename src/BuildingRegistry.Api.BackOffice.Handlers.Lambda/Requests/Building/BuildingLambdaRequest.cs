@@ -5,7 +5,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Requests.Building
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using MediatR;
 
-    public class BuildingLambdaRequest : IRequest
+    public abstract class BuildingLambdaRequest : IRequest
     {
         public Guid TicketId { get; set; }
         public string MessageGroupId { get; set; }
