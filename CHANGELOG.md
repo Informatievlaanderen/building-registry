@@ -1,3 +1,12 @@
+## [3.37.2](https://github.com/informatievlaanderen/building-registry/compare/v3.37.1...v3.37.2) (2022-10-19)
+
+
+### Bug Fixes
+
+* error code for invalid BuildingGeometryMethod ([af00816](https://github.com/informatievlaanderen/building-registry/commit/af0081667b31f7e148e5d62a1e56c2783889435d))
+* make lambda request base classes abstract ([3d0086e](https://github.com/informatievlaanderen/building-registry/commit/3d0086e68b398c8e17d80ad3ee32a71f356a271f))
+* map to correct sqs request in api ([efd18fc](https://github.com/informatievlaanderen/building-registry/commit/efd18fc04255d0992e9eb99970b85e2c1918d6b8))
+
 ## [3.37.1](https://github.com/informatievlaanderen/building-registry/compare/v3.37.0...v3.37.1) (2022-10-18)
 
 
