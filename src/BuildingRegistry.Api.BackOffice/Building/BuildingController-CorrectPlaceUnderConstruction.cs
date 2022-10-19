@@ -74,7 +74,7 @@ namespace BuildingRegistry.Api.BackOffice.Building
                     }
 
                     var result = await Mediator.Send(
-                        new PlaceBuildingUnderConstructionSqsRequest
+                        new CorrectPlaceBuildingUnderConstructionSqsRequest
                         {
                             Request = request,
                             Metadata = GetMetadata(),
