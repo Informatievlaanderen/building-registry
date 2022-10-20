@@ -114,6 +114,11 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
                         string.Empty,
                         ValidationErrorMessages.BuildingUnit.BuildingUnitHasInvalidFunction),
 
+                    BuildingHasInvalidStatusException => CreateValidationException(
+                        ValidationErrorCodes.BuildingUnit.BuildingUnitCannotBeCorrectedFromNotRealizedToPlannedBecauseOfInvalidBuildingStatus,
+                        string.Empty,
+                        ValidationErrorMessages.BuildingUnit.BuildingUnitCannotBeCorrectedFromNotRealizedToPlannedBecauseOfInvalidBuildingStatus),
+
                     _ => new ValidationException(new List<ValidationFailure>
                         { new ValidationFailure(string.Empty, exception.Message) })
                 };

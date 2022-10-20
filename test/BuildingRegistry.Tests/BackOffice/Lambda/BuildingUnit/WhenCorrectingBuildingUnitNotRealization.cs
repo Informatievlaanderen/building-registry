@@ -163,6 +163,45 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
         }
 
         [Fact]
+        public async Task WhenBuildingHasInvalidStatus_ThenTicketingErrorIsExpected()
+        {
+            // Arrange
+            var ticketing = new Mock<ITicketing>();
+            var buildingPersistentLocalId = Fixture.Create<BuildingPersistentLocalId>();
+            var buildingUnitPersistentLocalId = Fixture.Create<BuildingUnitPersistentLocalId>();
+
+            PlanBuilding(buildingPersistentLocalId);
+            PlanBuildingUnit(buildingPersistentLocalId, buildingUnitPersistentLocalId);
+
+            var handler = new CorrectBuildingUnitNotRealizationLambdaHandler(
+                Container.Resolve<IConfiguration>(),
+                new FakeRetryPolicy(),
+                ticketing.Object,
+                MockExceptionIdempotentCommandHandler<BuildingHasInvalidStatusException>().Object,
+                Container.Resolve<IBuildings>());
+
+            // Act
+            await handler.Handle(
+                new CorrectBuildingUnitNotRealizationLambdaRequest(
+                    Fixture.Create<Guid>(),
+                    buildingPersistentLocalId,
+                    null,
+                    Fixture.Create<Provenance>(),
+                    new Dictionary<string, object>(),
+                    new BackOfficeCorrectBuildingUnitNotRealizationRequest { BuildingUnitPersistentLocalId = buildingUnitPersistentLocalId }),
+                CancellationToken.None);
+
+            //Assert
+            ticketing.Verify(x =>
+                x.Error(
+                    It.IsAny<Guid>(),
+                    new TicketError(
+                        "Deze actie is enkel toegestaan voor een 'gepland' of 'gerealiseerd' gebouw.",
+                        "GebouwNietgerealiseerdOfGehistoreerd"),
+                    CancellationToken.None));
+        }
+
+        [Fact]
         public async Task WhenBuildingUnitHasInvalidFunction_ThenTicketingErrorIsExpected()
         {
             // Arrange

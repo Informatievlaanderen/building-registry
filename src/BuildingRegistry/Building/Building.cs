@@ -339,6 +339,14 @@ namespace BuildingRegistry.Building
 
             var buildingUnit = BuildingUnits.FirstOrDefault(x => x.BuildingUnitPersistentLocalId == buildingUnitPersistentLocalId);
 
+            var invalidStatuses = new[]
+                {BuildingStatus.NotRealized, BuildingStatus.Retired};
+
+            if (invalidStatuses.Contains(BuildingStatus))
+            {
+                throw new BuildingHasInvalidStatusException();
+            }
+
             if (buildingUnit is null)
             {
                 throw new BuildingUnitIsNotFoundException(
