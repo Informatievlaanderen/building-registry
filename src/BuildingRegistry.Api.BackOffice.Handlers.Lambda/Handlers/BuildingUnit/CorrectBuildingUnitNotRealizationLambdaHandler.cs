@@ -64,6 +64,9 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.BuildingUnit
                 BuildingUnitHasInvalidStatusException => new TicketError(
                     ValidationErrorMessages.BuildingUnit.BuildingUnitCannotBeCorrectedFromNotRealizedToPlanned,
                     ValidationErrorCodes.BuildingUnit.BuildingUnitCannotBeCorrectedFromNotRealizedToPlanned),
+                BuildingHasInvalidStatusException => new TicketError(
+                    ValidationErrorMessages.BuildingUnit.BuildingUnitCannotBeCorrectedFromNotRealizedToPlannedBecauseOfInvalidBuildingStatus,
+                    ValidationErrorCodes.BuildingUnit.BuildingUnitCannotBeCorrectedFromNotRealizedToPlannedBecauseOfInvalidBuildingStatus),
                 _ => null
             };
         }

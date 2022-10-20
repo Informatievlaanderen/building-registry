@@ -101,6 +101,42 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitNotRea
                 .Throws(new BuildingUnitHasInvalidStatusException()));
         }
 
+        [Theory]
+        [InlineData("NotRealized")]
+        [InlineData("Retired")]
+        public void WithInvalidBuildingStatus_ThrowsBuildingHasInvalidStatusException(string status)
+        {
+            var command = Fixture.Create<CorrectBuildingUnitNotRealization>();
+
+            var buildingWasMigrated = new BuildingWasMigrated(
+                Fixture.Create<BuildingId>(),
+                command.BuildingPersistentLocalId,
+                Fixture.Create<BuildingPersistentLocalIdAssignmentDate>(),
+                BuildingStatus.Parse(status),
+                Fixture.Create<BuildingGeometry>(),
+                isRemoved: false, new List<BuildingUnit>
+                {
+                    new BuildingUnit(
+                        Fixture.Create<BuildingRegistry.Legacy.BuildingUnitId>(),
+                        Fixture.Create<BuildingRegistry.Legacy.PersistentLocalId>(),
+                        BuildingRegistry.Legacy.BuildingUnitFunction.Unknown,
+                        BuildingRegistry.Legacy.BuildingUnitStatus.NotRealized,
+                        new List<AddressPersistentLocalId>(),
+                        Fixture.Create<BuildingRegistry.Legacy.BuildingUnitPosition>(),
+                        Fixture.Create<BuildingRegistry.Legacy.BuildingGeometry>(),
+                        isRemoved: false)
+                }
+            );
+            ((ISetProvenance)buildingWasMigrated).SetProvenance(Fixture.Create<Provenance>());
+
+            Assert(new Scenario()
+                .Given(
+                    new BuildingStreamId(Fixture.Create<BuildingPersistentLocalId>()),
+                    buildingWasMigrated)
+                .When(command)
+                .Throws(new BuildingHasInvalidStatusException()));
+        }
+
         [Fact]
         public void WithCommonBuilding_ThrowsBuildingUnitHasInvalidFunctionException()
         {
@@ -169,7 +205,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitNotRea
                 Fixture.Create<BuildingId>(),
                 command.BuildingPersistentLocalId,
                 Fixture.Create<BuildingPersistentLocalIdAssignmentDate>(),
-                BuildingStatus.NotRealized,
+                BuildingStatus.Realized,
                 Fixture.Create<BuildingGeometry>(),
                 isRemoved: false,
                 new List<BuildingUnit>
