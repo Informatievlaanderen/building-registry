@@ -1,3 +1,10 @@
+## [3.37.3](https://github.com/informatievlaanderen/building-registry/compare/v3.37.2...v3.37.3) (2022-10-20)
+
+
+### Bug Fixes
+
+* error code CorrectUnderConstruction GAWR-3856 ([9c33b45](https://github.com/informatievlaanderen/building-registry/commit/9c33b457652afb7111dfb6d20bc7e5bc9d7b4086))
+
 ## [3.37.2](https://github.com/informatievlaanderen/building-registry/compare/v3.37.1...v3.37.2) (2022-10-19)
 
 
