@@ -50,8 +50,9 @@ namespace BuildingRegistry.Consumer.Address
                     async message =>
                     {
                         _logger.LogInformation("Handling next message");
-                        await projector.ProjectAsync(_consumerContext, message, cancellationToken);
-                        await _consumerContext.SaveChangesAsync(cancellationToken);
+                        //CancellationToken.None to prevent halfway consumption
+                        await projector.ProjectAsync(_consumerContext, message, CancellationToken.None);
+                        await _consumerContext.SaveChangesAsync(CancellationToken.None);
                         messageCounter++;
                         if (messageCounter % 1000 == 0)
                         {
