@@ -38,6 +38,7 @@ namespace BuildingRegistry.Building
             Register<BuildingUnitWasCorrectedFromRealizedToPlannedBecauseBuildingWasCorrected>(When);
             Register<BuildingUnitWasNotRealizedV2>(When);
             Register<BuildingUnitWasCorrectedFromNotRealizedToPlanned>(When);
+            Register<BuildingUnitWasRetiredV2>(When);
             Register<CommonBuildingUnitWasAddedV2>(When);
         }
 
@@ -96,12 +97,19 @@ namespace BuildingRegistry.Building
             _lastEvent = @event;
         }
 
+        private void When(BuildingUnitWasRetiredV2 @event)
+        {
+            Status = BuildingUnitStatus.Retired;
+
+            _lastEvent = @event;
+        }
+
         private void When(CommonBuildingUnitWasAddedV2 @event)
         {
             _buildingPersistentLocalId = new BuildingPersistentLocalId(@event.BuildingPersistentLocalId);
             BuildingUnitPersistentLocalId = new BuildingUnitPersistentLocalId(@event.BuildingUnitPersistentLocalId);
             Function = BuildingUnitFunction.Common;
-            Status = BuildingUnitStatus.Planned;
+            Status = BuildingUnitStatus.Parse(@event.BuildingUnitStatus);
             BuildingUnitPosition = new BuildingUnitPosition(
                 new ExtendedWkbGeometry(@event.ExtendedWkbGeometry),
                 BuildingUnitPositionGeometryMethod.Parse(@event.GeometryMethod));

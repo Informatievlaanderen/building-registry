@@ -12,6 +12,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenNotRealizingBuildingUnit
     using Building.Commands;
     using Building.Events;
     using Building.Exceptions;
+    using Extensions;
     using Fixtures;
     using FluentAssertions;
     using Xunit;
@@ -56,6 +57,105 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenNotRealizingBuildingUnit
                     Fixture.Create<BuildingUnitWasNotRealizedV2>())
                 .When(command)
                 .ThenNone());
+        }
+
+        [Fact]
+        public void WithPlannedCommonBuildingUnitAndTwoOtherBuildingUnits_ThenCommonBuildingUnitWasNotRealized()
+        {
+            var command = Fixture.Create<NotRealizeBuildingUnit>();
+
+            var commonBuildingUnitWasAddedV2 = Fixture.Create<CommonBuildingUnitWasAddedV2>()
+                .WithBuildingUnitStatus(BuildingUnitStatus.Planned);
+
+            Assert(new Scenario()
+                .Given(
+                    new BuildingStreamId(Fixture.Create<BuildingPersistentLocalId>()),
+                    Fixture.Create<BuildingWasPlannedV2>(),
+                    Fixture.Create<BuildingWasRealizedV2>(),
+                    Fixture.Create<BuildingUnitWasPlannedV2>()
+                        .WithFunction(BuildingUnitFunction.Unknown),
+                    Fixture.Create<BuildingUnitWasPlannedV2>()
+                        .WithBuildingUnitPersistentLocalId(new BuildingUnitPersistentLocalId(1))
+                        .WithFunction(BuildingUnitFunction.Unknown),
+                    commonBuildingUnitWasAddedV2)
+                .When(command)
+                .Then(
+                    new Fact(
+                        new BuildingStreamId(command.BuildingPersistentLocalId),
+                        new BuildingUnitWasNotRealizedV2(
+                            command.BuildingPersistentLocalId,
+                            command.BuildingUnitPersistentLocalId)),
+                    new Fact(
+                        new BuildingStreamId(command.BuildingPersistentLocalId),
+                        new BuildingUnitWasNotRealizedV2(
+                            command.BuildingPersistentLocalId,
+                            new BuildingUnitPersistentLocalId(commonBuildingUnitWasAddedV2.BuildingUnitPersistentLocalId)))));
+        }
+
+        [Fact]
+        public void WithRealizedCommonBuildingUnitAndTwoOtherBuildingUnits_ThenCommonBuildingUnitWasRetired()
+        {
+            var command = Fixture.Create<NotRealizeBuildingUnit>();
+
+            var commonBuildingUnitWasAddedV2 = Fixture.Create<CommonBuildingUnitWasAddedV2>()
+                .WithBuildingUnitStatus(BuildingUnitStatus.Realized);
+
+            Assert(new Scenario()
+                .Given(
+                    new BuildingStreamId(Fixture.Create<BuildingPersistentLocalId>()),
+                    Fixture.Create<BuildingWasPlannedV2>(),
+                    Fixture.Create<BuildingWasRealizedV2>(),
+                    Fixture.Create<BuildingUnitWasPlannedV2>()
+                        .WithFunction(BuildingUnitFunction.Unknown),
+                    Fixture.Create<BuildingUnitWasPlannedV2>()
+                        .WithBuildingUnitPersistentLocalId(new BuildingUnitPersistentLocalId(1))
+                        .WithFunction(BuildingUnitFunction.Unknown),
+                    commonBuildingUnitWasAddedV2)
+                .When(command)
+                .Then(
+                    new Fact(
+                        new BuildingStreamId(command.BuildingPersistentLocalId),
+                        new BuildingUnitWasNotRealizedV2(
+                            command.BuildingPersistentLocalId,
+                            command.BuildingUnitPersistentLocalId)),
+                    new Fact(
+                        new BuildingStreamId(command.BuildingPersistentLocalId),
+                        new BuildingUnitWasRetiredV2(
+                            command.BuildingPersistentLocalId,
+                            new BuildingUnitPersistentLocalId(commonBuildingUnitWasAddedV2.BuildingUnitPersistentLocalId)))));
+        }
+
+        [Theory]
+        [InlineData("Planned")]
+        [InlineData("Realized")]
+        public void WithActiveCommonBuildingUnitAndThreeOtherBuildingUnits_ThenNothingForCommonBuildingUnit(string buildingUnitStatus)
+        {
+            var command = Fixture.Create<NotRealizeBuildingUnit>();
+
+            var commonBuildingUnitWasAddedV2 = Fixture.Create<CommonBuildingUnitWasAddedV2>()
+                .WithBuildingUnitStatus(BuildingUnitStatus.Parse(buildingUnitStatus));
+
+            Assert(new Scenario()
+                .Given(
+                    new BuildingStreamId(Fixture.Create<BuildingPersistentLocalId>()),
+                    Fixture.Create<BuildingWasPlannedV2>(),
+                    Fixture.Create<BuildingWasRealizedV2>(),
+                    Fixture.Create<BuildingUnitWasPlannedV2>()
+                        .WithFunction(BuildingUnitFunction.Unknown),
+                    Fixture.Create<BuildingUnitWasPlannedV2>()
+                        .WithBuildingUnitPersistentLocalId(new BuildingUnitPersistentLocalId(1))
+                        .WithFunction(BuildingUnitFunction.Unknown),
+                    Fixture.Create<BuildingUnitWasPlannedV2>()
+                        .WithBuildingUnitPersistentLocalId(new BuildingUnitPersistentLocalId(1))
+                        .WithFunction(BuildingUnitFunction.Unknown),
+                    commonBuildingUnitWasAddedV2)
+                .When(command)
+                .Then(
+                    new Fact(
+                        new BuildingStreamId(command.BuildingPersistentLocalId),
+                        new BuildingUnitWasNotRealizedV2(
+                            command.BuildingPersistentLocalId,
+                            command.BuildingUnitPersistentLocalId))));
         }
 
         [Fact]
@@ -137,27 +237,39 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenNotRealizingBuildingUnit
 
             var buildingWasPlanned = Fixture.Create<BuildingWasPlannedV2>();
             ((ISetProvenance)buildingWasPlanned).SetProvenance(Fixture.Create<Provenance>());
-
             var buildingUnitWasPlanned = Fixture.Create<BuildingUnitWasPlannedV2>();
             ((ISetProvenance)buildingUnitWasPlanned).SetProvenance(Fixture.Create<Provenance>());
-
-            var buildingUnitWasNotRealized = Fixture.Create<BuildingUnitWasNotRealizedV2>();
-            ((ISetProvenance)buildingUnitWasNotRealized).SetProvenance(Fixture.Create<Provenance>());
+            var secondBuildingUnitWasPlanned = Fixture.Create<BuildingUnitWasPlannedV2>()
+                .WithBuildingUnitPersistentLocalId(new BuildingUnitPersistentLocalId(1));
+            ((ISetProvenance)secondBuildingUnitWasPlanned).SetProvenance(Fixture.Create<Provenance>());
+            var commonBuildingUnitWasAdded = Fixture.Create<CommonBuildingUnitWasAddedV2>()
+                .WithBuildingUnitStatus(BuildingUnitStatus.Realized)
+                .WithBuildingUnitPersistentLocalId(new BuildingUnitPersistentLocalId(2));
+            ((ISetProvenance)commonBuildingUnitWasAdded).SetProvenance(Fixture.Create<Provenance>());
 
             // Act
             building.Initialize(new object[]
             {
                 buildingWasPlanned,
                 buildingUnitWasPlanned,
-                buildingUnitWasNotRealized
+                secondBuildingUnitWasPlanned,
+                commonBuildingUnitWasAdded
             });
+
+            building.NotRealizeBuildingUnit(
+                new BuildingUnitPersistentLocalId(buildingUnitWasPlanned.BuildingUnitPersistentLocalId));
 
             // Assert
             building.BuildingUnits.Should().NotBeEmpty();
-            building.BuildingUnits.Count.Should().Be(1);
-            var buildingUnit = building.BuildingUnits.First();
+            building.BuildingUnits.Count.Should().Be(3);
+
+            var buildingUnit = building.BuildingUnits
+                .Single(x => x.BuildingUnitPersistentLocalId == buildingUnitWasPlanned.BuildingUnitPersistentLocalId);
             buildingUnit.Status.Should().Be(BuildingUnitStatus.NotRealized);
-            buildingUnit.LastEventHash.Should().NotBe(building.LastEventHash);
+
+            var commonBuildingUnit = building.BuildingUnits
+                .Single(x => x.BuildingUnitPersistentLocalId == commonBuildingUnitWasAdded.BuildingUnitPersistentLocalId);
+            commonBuildingUnit.Status.Should().Be(BuildingUnitStatus.Retired);
         }
     }
 }

@@ -130,6 +130,14 @@ namespace BuildingRegistry.Projections.Wfs.BuildingUnitV2
                 SetVersion(unit, message.Message.Provenance.Timestamp);
             });
 
+            When<Envelope<BuildingUnitWasRetiredV2>>(async (context, message, _) =>
+            {
+                var unit = await context.BuildingUnitsV2.FindAsync(message.Message.BuildingUnitPersistentLocalId);
+                unit!.Status = RetiredStatus;
+
+                SetVersion(unit, message.Message.Provenance.Timestamp);
+            });
+
             When<Envelope<CommonBuildingUnitWasAddedV2>>(async (context, message, ct) =>
             {
                 var commonBuildingUnitV2 = new BuildingUnitV2
@@ -142,7 +150,7 @@ namespace BuildingRegistry.Projections.Wfs.BuildingUnitV2
                     Function = MapFunction(BuildingUnitFunction.Common),
                     Version = message.Message.Provenance.Timestamp,
                     IsRemoved = false,
-                    Status = BuildingUnitStatus.Parse(message.Message.BuildingUnitStatus)
+                    Status = MapStatus(BuildingUnitStatus.Parse(message.Message.BuildingUnitStatus))
                 };
 
                 SetPosition(

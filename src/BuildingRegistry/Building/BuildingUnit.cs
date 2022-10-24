@@ -188,6 +188,23 @@ namespace BuildingRegistry.Building
             Apply(new BuildingUnitWasNotRealizedV2(_buildingPersistentLocalId, BuildingUnitPersistentLocalId));
         }
 
+        public void Retire()
+        {
+            if (IsRemoved)
+            {
+                return;
+            }
+
+            if (Status == BuildingUnitStatus.Retired)
+            {
+                return;
+            }
+
+            // TODO: validations on status. Method was added because of GAWR-3734
+
+            Apply(new BuildingUnitWasRetiredV2(_buildingPersistentLocalId, BuildingUnitPersistentLocalId));
+        }
+
         public void RestoreSnapshot(
             BuildingPersistentLocalId buildingPersistentLocalId,
             BuildingSnapshot.BuildingUnitData buildingUnitData)
