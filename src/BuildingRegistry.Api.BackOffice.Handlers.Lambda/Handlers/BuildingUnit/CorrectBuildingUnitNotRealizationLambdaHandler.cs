@@ -2,6 +2,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.BuildingUnit
 {
     using System.Threading;
     using System.Threading.Tasks;
+    using Abstractions;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
     using BuildingRegistry.Api.BackOffice.Abstractions.Building.Responses;
     using BuildingRegistry.Api.BackOffice.Abstractions.Building.Validators;
@@ -15,19 +16,24 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.BuildingUnit
 
     public sealed class CorrectBuildingUnitNotRealizationLambdaHandler : BuildingUnitLambdaHandler<CorrectBuildingUnitNotRealizationLambdaRequest>
     {
+        private readonly BackOfficeContext _backOfficeContext;
+
         public CorrectBuildingUnitNotRealizationLambdaHandler(
             IConfiguration configuration,
             ICustomRetryPolicy retryPolicy,
             ITicketing ticketing,
             IIdempotentCommandHandler idempotentCommandHandler,
-            IBuildings buildings)
+            IBuildings buildings,
+            BackOfficeContext backOfficeContext)
             : base(
                 configuration,
                 retryPolicy,
                 ticketing,
                 idempotentCommandHandler,
                 buildings)
-        { }
+        {
+            _backOfficeContext = backOfficeContext;
+        }
 
         protected override async Task<ETagResponse> InnerHandle(CorrectBuildingUnitNotRealizationLambdaRequest request, CancellationToken cancellationToken)
         {
@@ -35,11 +41,15 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.BuildingUnit
 
             try
             {
+                await using var transaction = await _backOfficeContext.Database.BeginTransactionAsync(cancellationToken);
+
                 await IdempotentCommandHandler.Dispatch(
                     cmd.CreateCommandId(),
                     cmd,
                     request.Metadata,
                     cancellationToken);
+                
+                await transaction.CommitAsync(cancellationToken);
             }
             catch (IdempotencyException)
             {

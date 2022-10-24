@@ -38,6 +38,8 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.BuildingUnit
                 buildingUnitPersistentLocalId,
                 CreateFakeProvenance());
 
+            await using var transaction = await BackOfficeContext.Database.BeginTransactionAsync(cancellationToken);
+
             await IdempotentCommandHandlerDispatch(
                 _idempotencyContext,
                 command.CreateCommandId(),
@@ -49,7 +51,9 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.BuildingUnit
                 new BuildingUnitBuilding(
                     buildingUnitPersistentLocalId,
                     buildingPersistentLocalId));
+
             await BackOfficeContext.SaveChangesAsync(cancellationToken);
+            await transaction.CommitAsync(cancellationToken);
 
             var buildingUnitLastEventHash = await GetBuildingUnitHash(buildingPersistentLocalId, buildingUnitPersistentLocalId, cancellationToken);
             return new PlanBuildingUnitResponse(buildingUnitPersistentLocalId, buildingUnitLastEventHash);

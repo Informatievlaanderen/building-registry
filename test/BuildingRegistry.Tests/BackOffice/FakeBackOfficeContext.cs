@@ -6,6 +6,7 @@ namespace BuildingRegistry.Tests.BackOffice
     using BuildingRegistry.Api.BackOffice.Abstractions;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.EntityFrameworkCore.Design;
+    using Microsoft.EntityFrameworkCore.Diagnostics;
 
     public class FakeBackOfficeContext : BackOfficeContext
     {
@@ -23,6 +24,13 @@ namespace BuildingRegistry.Tests.BackOffice
                 buildingUnitPersistentLocalId, buildingPersistentLocalId));
             await SaveChangesAsync();
         }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            optionsBuilder.ConfigureWarnings(x => x.Ignore(InMemoryEventId.TransactionIgnoredWarning));
+
+            base.OnConfiguring(optionsBuilder);
+        }
     }
 
     public class FakeBackOfficeContextFactory : IDesignTimeDbContextFactory<FakeBackOfficeContext>
@@ -30,6 +38,7 @@ namespace BuildingRegistry.Tests.BackOffice
         public FakeBackOfficeContext CreateDbContext(params string[] args)
         {
             var builder = new DbContextOptionsBuilder<BackOfficeContext>().UseInMemoryDatabase(Guid.NewGuid().ToString());
+
             return new FakeBackOfficeContext(builder.Options);
         }
     }

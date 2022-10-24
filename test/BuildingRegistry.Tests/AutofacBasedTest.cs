@@ -1,7 +1,9 @@
 namespace BuildingRegistry.Tests
 {
     using System;
+    using Api.BackOffice.Abstractions;
     using Autofac;
+    using BackOffice;
     using Be.Vlaanderen.Basisregisters.AggregateSource.SqlStreamStore.Autofac;
     using Be.Vlaanderen.Basisregisters.AggregateSource.Testing;
     using Be.Vlaanderen.Basisregisters.AggregateSource.Testing.Comparers;
@@ -44,6 +46,13 @@ namespace BuildingRegistry.Tests
                 containerBuilder.RegisterInstance(testOutputHelper);
                 containerBuilder.RegisterType<XUnitLogger>().AsImplementedInterfaces();
                 containerBuilder.RegisterType<FakePersistentLocalIdGenerator>().As<IPersistentLocalIdGenerator>();
+
+                containerBuilder.Register(c => new FakeBackOfficeContextFactory().CreateDbContext(Array.Empty<string>()))
+                    .As<BackOfficeContext>()
+                    .InstancePerLifetimeScope();
+
+                containerBuilder.RegisterType<AddCommonBuildingUnit>()
+                    .As<IAddCommonBuildingUnit>();
 
                 return containerBuilder.Build();
             });
