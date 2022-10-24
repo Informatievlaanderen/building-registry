@@ -262,21 +262,43 @@ namespace BuildingRegistry.Building
             GuardRemovedBuilding();
             GuardActiveBuilding();
 
-            if (_buildingUnits.RequiresCommonBuildingUnit)
+            if (_buildingUnits.HasCommonBuildingUnit() || !_buildingUnits.RequiresCommonBuildingUnit())
             {
-                var commonBuildingUnitPersistentLocalId = new BuildingUnitPersistentLocalId(persistentLocalIdGenerator.GenerateNextPersistentLocalId());
+                return;
+            }
 
-                var commonBuildingUnitStatus = BuildingStatus == BuildingStatus.Realized
-                    ? BuildingUnitStatus.Realized
-                    : BuildingUnitStatus.Planned;
+            var commonBuildingUnitPersistentLocalId = new BuildingUnitPersistentLocalId(persistentLocalIdGenerator.GenerateNextPersistentLocalId());
 
-                ApplyChange(new CommonBuildingUnitWasAddedV2(
-                    BuildingPersistentLocalId,
-                    commonBuildingUnitPersistentLocalId,
-                    commonBuildingUnitStatus,
-                    BuildingUnitPositionGeometryMethod.DerivedFromObject,
-                    BuildingGeometry.Center,
-                    hasDeviation: false));
+            var commonBuildingUnitStatus = BuildingStatus == BuildingStatus.Realized
+                ? BuildingUnitStatus.Realized
+                : BuildingUnitStatus.Planned;
+
+            ApplyChange(new CommonBuildingUnitWasAddedV2(
+                BuildingPersistentLocalId,
+                commonBuildingUnitPersistentLocalId,
+                commonBuildingUnitStatus,
+                BuildingUnitPositionGeometryMethod.DerivedFromObject,
+                BuildingGeometry.Center,
+                hasDeviation: false));
+        }
+
+        private void NotRealizeOrRetireCommonBuildingUnitIfRedundant()
+        {
+            if (!_buildingUnits.HasCommonBuildingUnit() || _buildingUnits.RequiresCommonBuildingUnit())
+            {
+                return;
+            }
+
+            var commonBuildingUnit = _buildingUnits.CommonBuildingUnit;
+
+            if (commonBuildingUnit.Status == BuildingUnitStatus.Planned)
+            {
+                commonBuildingUnit.NotRealize();
+            }
+
+            if (commonBuildingUnit.Status == BuildingUnitStatus.Realized)
+            {
+                commonBuildingUnit.Retire();
             }
         }
 
@@ -331,6 +353,8 @@ namespace BuildingRegistry.Building
             }
 
             buildingUnit.NotRealize();
+
+            NotRealizeOrRetireCommonBuildingUnitIfRedundant();
         }
 
         public void CorrectNotRealizeBuildingUnit(BuildingUnitPersistentLocalId buildingUnitPersistentLocalId)
