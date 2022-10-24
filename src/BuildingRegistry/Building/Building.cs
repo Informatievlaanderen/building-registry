@@ -210,7 +210,7 @@ namespace BuildingRegistry.Building
         }
 
         public void PlanBuildingUnit(
-            IPersistentLocalIdGenerator persistentLocalIdGenerator,
+            IAddCommonBuildingUnit addCommonBuildingUnit,
             BuildingUnitPersistentLocalId buildingUnitPersistentLocalId,
             BuildingUnitPositionGeometryMethod positionGeometryMethod,
             ExtendedWkbGeometry? position,
@@ -243,7 +243,7 @@ namespace BuildingRegistry.Building
                 function,
                 hasDeviation));
 
-            AddCommonBuildingUnitIfNeeded(persistentLocalIdGenerator);
+            AddCommonBuildingUnitIfNeeded(addCommonBuildingUnit);
         }
 
         private void GuardActiveBuilding()
@@ -257,7 +257,8 @@ namespace BuildingRegistry.Building
             }
         }
 
-        private void AddCommonBuildingUnitIfNeeded(IPersistentLocalIdGenerator persistentLocalIdGenerator)
+        private void AddCommonBuildingUnitIfNeeded(
+            IAddCommonBuildingUnit addCommonBuildingUnit)
         {
             GuardRemovedBuilding();
             GuardActiveBuilding();
@@ -267,7 +268,7 @@ namespace BuildingRegistry.Building
                 return;
             }
 
-            var commonBuildingUnitPersistentLocalId = new BuildingUnitPersistentLocalId(persistentLocalIdGenerator.GenerateNextPersistentLocalId());
+            var commonBuildingUnitPersistentLocalId = new BuildingUnitPersistentLocalId(addCommonBuildingUnit.GenerateNextPersistentLocalId());
 
             var commonBuildingUnitStatus = BuildingStatus == BuildingStatus.Realized
                 ? BuildingUnitStatus.Realized
@@ -280,6 +281,8 @@ namespace BuildingRegistry.Building
                 BuildingUnitPositionGeometryMethod.DerivedFromObject,
                 BuildingGeometry.Center,
                 hasDeviation: false));
+
+            addCommonBuildingUnit.AddForBuilding(BuildingPersistentLocalId, commonBuildingUnitPersistentLocalId);
         }
 
         private void NotRealizeOrRetireCommonBuildingUnitIfRedundant()

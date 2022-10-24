@@ -6,7 +6,6 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.BuildingUnit
     using Abstractions;
     using BuildingRegistry.Api.BackOffice.Abstractions.Building.Responses;
     using BuildingRegistry.Api.BackOffice.Abstractions.Building.Validators;
-    using Abstractions.Exceptions;
     using BuildingRegistry.Building;
     using BuildingRegistry.Building.Exceptions;
     using BuildingRegistry.Infrastructure;
@@ -44,6 +43,8 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.BuildingUnit
 
             var cmd = request.ToCommand(buildingUnitPersistentLocalId);
 
+            await using var transaction = await _backOfficeContext.Database.BeginTransactionAsync(cancellationToken);
+
             await IdempotentCommandHandler.Dispatch(
                                cmd.CreateCommandId(),
                                cmd,
@@ -54,7 +55,9 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.BuildingUnit
                            new BuildingUnitBuilding(
                                buildingUnitPersistentLocalId,
                                request.BuildingPersistentLocalId));
+
             await _backOfficeContext.SaveChangesAsync(cancellationToken);
+            await transaction.CommitAsync(cancellationToken);
 
             var lastHash = await GetHash(
                 request.BuildingPersistentLocalId,

@@ -18,6 +18,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
     using BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.BuildingUnit;
     using BuildingRegistry.Api.BackOffice.Handlers.Lambda.Requests.BuildingUnit;
     using BuildingRegistry.Building;
+    using BuildingRegistry.Building.Commands;
     using BuildingRegistry.Building.Exceptions;
     using Fixtures;
     using FluentAssertions;
@@ -40,7 +41,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
             Fixture.Customize(new WithFixedBuildingUnitPersistentLocalId());
 
             _idempotencyContext = new FakeIdempotencyContextFactory().CreateDbContext(Array.Empty<string>());
-            _backOfficeContext = new FakeBackOfficeContextFactory().CreateDbContext(Array.Empty<string>());
+            _backOfficeContext = Container.Resolve<BackOfficeContext>();
         }
 
         [Fact]
@@ -92,6 +93,82 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
                          && x.BuildingUnitPersistentLocalId == expectedBuildingUnitPersistentLocalId);
 
             buildingUnitBuilding.Should().NotBeNull();
+        }
+
+        [Fact]
+        public async Task WithTwoPlannedBuildingUnits_ThenCommonBuildingUnitIsAdded()
+        {
+            // Arrange
+            var buildingPersistentLocalId = Fixture.Create<BuildingPersistentLocalId>();
+            var expectedBuildingUnitPersistentLocalId = Fixture.Create<BuildingUnitPersistentLocalId>();
+            var persistentLocalIdGenerator = new Mock<IPersistentLocalIdGenerator>();
+            persistentLocalIdGenerator
+                .Setup(x => x.GenerateNextPersistentLocalId())
+                .Returns(expectedBuildingUnitPersistentLocalId);
+
+            DispatchArrangeCommand(new MigrateBuilding(
+                Fixture.Create<BuildingRegistry.Legacy.BuildingId>(),
+                new BuildingRegistry.Legacy.PersistentLocalId(buildingPersistentLocalId),
+                Fixture.Create<BuildingRegistry.Legacy.PersistentLocalIdAssignmentDate>(),
+                BuildingRegistry.Legacy.BuildingStatus.Planned,
+                Fixture.Create<BuildingRegistry.Legacy.BuildingGeometry>(),
+                false,
+                new List<BuildingRegistry.Building.Commands.BuildingUnit>
+                {
+                    new BuildingRegistry.Building.Commands.BuildingUnit(
+                        Fixture.Create<BuildingRegistry.Legacy.BuildingUnitId>(),
+                        new BuildingRegistry.Legacy.PersistentLocalId(1),
+                        BuildingRegistry.Legacy.BuildingUnitFunction.Unknown,
+                        BuildingRegistry.Legacy.BuildingUnitStatus.Planned,
+                        new List<AddressPersistentLocalId>(),
+                        Fixture.Create<BuildingRegistry.Legacy.BuildingUnitPosition>(),
+                        Fixture.Create<BuildingRegistry.Legacy.BuildingGeometry>(),
+                        false)
+                },
+                Fixture.Create<Provenance>()));
+
+            var eTagResponse = new ETagResponse(string.Empty, Fixture.Create<string>());
+            var handler = new PlanBuildingUnitLambdaHandler(
+                Container.Resolve<IConfiguration>(),
+                new FakeRetryPolicy(),
+                MockTicketing(response => { eTagResponse = response; }).Object,
+                new IdempotentCommandHandler(Container.Resolve<ICommandHandlerResolver>(), _idempotencyContext),
+                Container.Resolve<IBuildings>(),
+                _backOfficeContext,
+                persistentLocalIdGenerator.Object);
+
+            //Act
+            await handler.Handle(new PlanBuildingUnitLambdaRequest(
+                Guid.NewGuid(),
+                buildingPersistentLocalId,
+                Fixture.Create<Provenance>(),
+                new Dictionary<string, object>(),
+                new BackOfficePlanBuildingUnitRequest
+                {
+                    GebouwId = $"https://data.vlaanderen.be/id/gebouw/{buildingPersistentLocalId}",
+                    PositieGeometrieMethode = PositieGeometrieMethode.AfgeleidVanObject,
+                    Functie = GebouweenheidFunctie.NietGekend,
+                    AfwijkingVastgesteld = false
+                }), CancellationToken.None);
+
+            //Assert
+            var stream = await Container.Resolve<IStreamStore>()
+                .ReadStreamBackwards(new StreamId(new BuildingStreamId(buildingPersistentLocalId)), 1, 1);
+            stream.Messages.First().JsonMetadata.Should().Contain(eTagResponse.ETag);
+
+            var buildingUnitBuilding = _backOfficeContext
+                .BuildingUnitBuildings
+                .SingleOrDefault(
+                    x => x.BuildingPersistentLocalId == buildingPersistentLocalId
+                         && x.BuildingUnitPersistentLocalId == expectedBuildingUnitPersistentLocalId);
+            var commonBuildingUnitBuilding = _backOfficeContext
+                .BuildingUnitBuildings
+                .SingleOrDefault(
+                    x => x.BuildingPersistentLocalId == buildingPersistentLocalId
+                         && x.BuildingUnitPersistentLocalId != expectedBuildingUnitPersistentLocalId);
+
+            buildingUnitBuilding.Should().NotBeNull();
+            commonBuildingUnitBuilding.Should().NotBeNull();
         }
 
         [Fact]

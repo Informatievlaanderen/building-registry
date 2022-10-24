@@ -10,6 +10,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
     using Be.Vlaanderen.Basisregisters.CommandHandling;
     using Be.Vlaanderen.Basisregisters.CommandHandling.Idempotency;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
+    using BuildingRegistry.Api.BackOffice.Abstractions;
     using BuildingRegistry.Api.BackOffice.Abstractions.Building.Responses;
     using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Requests;
     using BuildingRegistry.Api.BackOffice.Abstractions.Exceptions;
@@ -31,6 +32,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
     public class WhenCorrectingBuildingUnitNotRealization : BackOfficeLambdaTest
     {
         private readonly IdempotencyContext _idempotencyContext;
+        private readonly BackOfficeContext _backOfficeContext;
 
         public WhenCorrectingBuildingUnitNotRealization(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
         {
@@ -38,6 +40,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
             Fixture.Customize(new WithFixedBuildingUnitPersistentLocalId());
 
             _idempotencyContext = new FakeIdempotencyContextFactory().CreateDbContext(Array.Empty<string>());
+            _backOfficeContext = Container.Resolve<BackOfficeContext>();
         }
 
         [Fact]
@@ -60,7 +63,8 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
                 new FakeRetryPolicy(),
                 MockTicketing(response => { eTagResponse = response; }).Object,
                 new IdempotentCommandHandler(Container.Resolve<ICommandHandlerResolver>(), _idempotencyContext),
-                Container.Resolve<IBuildings>());
+                Container.Resolve<IBuildings>(),
+                _backOfficeContext);
 
             //Act
             await handler.Handle(
@@ -96,7 +100,8 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
                 new FakeRetryPolicy(),
                 ticketing.Object,
                 MockExceptionIdempotentCommandHandler(() => new IdempotencyException(string.Empty)).Object,
-                Container.Resolve<IBuildings>());
+                Container.Resolve<IBuildings>(),
+                _backOfficeContext);
 
             var building =
                 await buildings.GetAsync(new BuildingStreamId(buildingPersistentLocalId), CancellationToken.None);
@@ -139,7 +144,8 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
                 new FakeRetryPolicy(),
                 ticketing.Object,
                 MockExceptionIdempotentCommandHandler<BuildingUnitHasInvalidStatusException>().Object,
-                Container.Resolve<IBuildings>());
+                Container.Resolve<IBuildings>(),
+                _backOfficeContext);
 
             // Act
             await handler.Handle(
@@ -178,7 +184,8 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
                 new FakeRetryPolicy(),
                 ticketing.Object,
                 MockExceptionIdempotentCommandHandler<BuildingHasInvalidStatusException>().Object,
-                Container.Resolve<IBuildings>());
+                Container.Resolve<IBuildings>(),
+                _backOfficeContext);
 
             // Act
             await handler.Handle(
@@ -217,7 +224,8 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
                 new FakeRetryPolicy(),
                 ticketing.Object,
                 MockExceptionIdempotentCommandHandler<BuildingUnitHasInvalidFunctionException>().Object,
-                Container.Resolve<IBuildings>());
+                Container.Resolve<IBuildings>(),
+                _backOfficeContext);
 
             // Act
             await handler.Handle(

@@ -1,7 +1,10 @@
 namespace BuildingRegistry.Tests.Legacy
 {
+    using System;
     using System.Collections.Generic;
+    using Api.BackOffice.Abstractions;
     using Autofac;
+    using BackOffice;
     using Be.Vlaanderen.Basisregisters.AggregateSource.Snapshotting;
     using Be.Vlaanderen.Basisregisters.AggregateSource.SqlStreamStore.Autofac;
     using Be.Vlaanderen.Basisregisters.AggregateSource.Testing;
@@ -78,6 +81,12 @@ namespace BuildingRegistry.Tests.Legacy
             containerBuilder.RegisterInstance(testOutputHelper);
             containerBuilder.RegisterType<XUnitLogger>().AsImplementedInterfaces();
             containerBuilder.RegisterType<FakePersistentLocalIdGenerator>().As<IPersistentLocalIdGenerator>();
+
+            containerBuilder.Register(c => new FakeBackOfficeContextFactory().CreateDbContext(Array.Empty<string>()))
+                .As<BackOfficeContext>();
+
+            containerBuilder.RegisterType<AddCommonBuildingUnit>()
+                .As<IAddCommonBuildingUnit>();
 
             containerBuilder
                 .Register(c => new BuildingFactory(NoSnapshotStrategy.Instance))

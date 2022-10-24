@@ -1,7 +1,7 @@
 namespace BuildingRegistry.Api.BackOffice.Abstractions
 {
     using Autofac;
-    using BuildingRegistry.Infrastructure;
+    using Infrastructure;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
@@ -20,9 +20,18 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions
                 .AddDbContext<BackOfficeContext>(options => options
                     .UseLoggerFactory(loggerFactory)
                     .UseSqlServer(projectionsConnectionString, sqlServerOptions => sqlServerOptions
-                            .EnableRetryOnFailure()
+                            // .EnableRetryOnFailure() Commented to enable transactions
                             .MigrationsHistoryTable(MigrationTables.BackOffice, Schema.BackOffice)
                     ));
+        }
+
+        protected override void Load(ContainerBuilder builder)
+        {
+            builder
+                .RegisterType<AddCommonBuildingUnit>()
+                .As<IAddCommonBuildingUnit>();
+
+            base.Load(builder);
         }
     }
 }

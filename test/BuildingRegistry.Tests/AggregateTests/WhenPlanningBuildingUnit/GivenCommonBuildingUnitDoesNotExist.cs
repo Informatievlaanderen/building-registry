@@ -1,21 +1,26 @@
 namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuildingUnit
 {
     using System.Collections.Generic;
+    using System.Linq;
     using AutoFixture;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
+    using Be.Vlaanderen.Basisregisters.AggregateSource.Snapshotting;
     using Be.Vlaanderen.Basisregisters.AggregateSource.Testing;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Building;
     using Building.Commands;
     using Building.Events;
     using BuildingRegistry.Legacy;
+    using Extensions;
     using Fixtures;
+    using Moq;
     using Xunit;
     using Xunit.Abstractions;
     using BuildingGeometry = Building.BuildingGeometry;
     using BuildingGeometryMethod = Building.BuildingGeometryMethod;
     using BuildingId = Building.BuildingId;
     using BuildingStatus = Building.BuildingStatus;
+    using BuildingUnitFunction = Building.BuildingUnitFunction;
     using BuildingUnitId = BuildingRegistry.Legacy.BuildingUnitId;
     using BuildingUnitPositionGeometryMethod = Building.BuildingUnitPositionGeometryMethod;
     using BuildingUnitStatus = Building.BuildingUnitStatus;
@@ -29,13 +34,48 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuildingUnit
         }
 
         [Fact]
+        public void VerifyAddCommonBuildingUnitIsCalled()
+        {
+            var command = Fixture.Create<PlanBuildingUnit>().WithDeviation(false);
+
+            var building = new BuildingFactory(NoSnapshotStrategy.Instance).Create();
+
+            var buildingWasPlannedV2 = Fixture.Create<BuildingWasPlannedV2>();
+            var buildingUnitWasPlannedV2 = Fixture.Create<BuildingUnitWasPlannedV2>().WithFunction(BuildingUnitFunction.Unknown);
+
+            building.Initialize(new object[]
+            {
+                buildingWasPlannedV2,
+                buildingUnitWasPlannedV2
+            });
+
+            var expectedCommonBuildingUnitPersistentLocalId = Fixture.Create<BuildingUnitPersistentLocalId>();
+            var addCommonBuilding = new Mock<IAddCommonBuildingUnit>();
+            addCommonBuilding
+                .Setup(x => x.GenerateNextPersistentLocalId())
+                .Returns(expectedCommonBuildingUnitPersistentLocalId);
+
+            building.PlanBuildingUnit(
+                addCommonBuilding.Object,
+                Fixture.Create<BuildingUnitPersistentLocalId>(),
+                BuildingUnitPositionGeometryMethod.DerivedFromObject,
+                null,
+                BuildingUnitFunction.Unknown,
+                false);
+
+            addCommonBuilding.Verify(x => x.AddForBuilding(
+                new BuildingPersistentLocalId(buildingWasPlannedV2.BuildingPersistentLocalId),
+                expectedCommonBuildingUnitPersistentLocalId), Times.Once);
+        }
+
+        [Fact]
         public void WithSingleBuildingUnit_AndBuildingStatusPlanned_ThenCommonBuildingUnitWasAdded()
         {
             var command = Fixture.Create<PlanBuildingUnit>()
                 .WithoutPosition()
                 .WithDeviation(false);
 
-            var @buildingWasPlanned = Fixture.Create<BuildingWasPlannedV2>();
+            var buildingWasPlanned = Fixture.Create<BuildingWasPlannedV2>();
             var buildingUnitWasPlanned = Fixture.Create<BuildingUnitWasPlannedV2>();
 
             var buildingGeometry = new BuildingGeometry(new ExtendedWkbGeometry(@buildingWasPlanned.ExtendedWkbGeometry),
@@ -43,7 +83,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuildingUnit
 
             Assert(new Scenario()
                 .Given(new BuildingStreamId(Fixture.Create<BuildingPersistentLocalId>()),
-                    @buildingWasPlanned,
+                    buildingWasPlanned,
                     buildingUnitWasPlanned)
                 .When(command)
                 .Then(new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
