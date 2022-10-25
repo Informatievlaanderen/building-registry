@@ -1,3 +1,18 @@
+# [3.38.0](https://github.com/informatievlaanderen/building-registry/compare/v3.37.3...v3.38.0) (2022-10-25)
+
+
+### Bug Fixes
+
+* add common building unit to backoffice context ([437c100](https://github.com/informatievlaanderen/building-registry/commit/437c100dce72cb1236f96d2c082c21646378c9ac))
+* prevent half consumption of kafka GAWR-3879 ([70b475b](https://github.com/informatievlaanderen/building-registry/commit/70b475b4c10ea765aaec1ae5deb058792dc57e30))
+
+
+### Features
+
+* add building validation for correcting not realize building unit ([52a90c8](https://github.com/informatievlaanderen/building-registry/commit/52a90c869cfcf8b5aecfd9814fe08efb7f6e27a4))
+* common building unit add or status changes ([691e9c4](https://github.com/informatievlaanderen/building-registry/commit/691e9c4d459c497a019dff393424f3bfee234c67))
+* notrealize or retire common building unit ([f16e90c](https://github.com/informatievlaanderen/building-registry/commit/f16e90cd49f03239b0c1b7a48c92ec0afb1dcf73))
+
 ## [3.37.3](https://github.com/informatievlaanderen/building-registry/compare/v3.37.2...v3.37.3) (2022-10-20)
 
 
