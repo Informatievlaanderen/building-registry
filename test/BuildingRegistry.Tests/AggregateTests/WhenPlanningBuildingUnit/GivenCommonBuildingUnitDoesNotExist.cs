@@ -1,7 +1,6 @@
 namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuildingUnit
 {
     using System.Collections.Generic;
-    using System.Linq;
     using AutoFixture;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
     using Be.Vlaanderen.Basisregisters.AggregateSource.Snapshotting;
@@ -36,8 +35,6 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuildingUnit
         [Fact]
         public void VerifyAddCommonBuildingUnitIsCalled()
         {
-            var command = Fixture.Create<PlanBuildingUnit>().WithDeviation(false);
-
             var building = new BuildingFactory(NoSnapshotStrategy.Instance).Create();
 
             var buildingWasPlannedV2 = Fixture.Create<BuildingWasPlannedV2>();
@@ -197,13 +194,13 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuildingUnit
                     buildingWasPlanned)
                 .When(command)
                 .Then(new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
-                        new BuildingUnitWasPlannedV2(
-                            command.BuildingPersistentLocalId,
-                            command.BuildingUnitPersistentLocalId,
-                            command.PositionGeometryMethod,
-                            buildingGeometry.Center,
-                            command.Function,
-                            false))));
+                    new BuildingUnitWasPlannedV2(
+                        command.BuildingPersistentLocalId,
+                        command.BuildingUnitPersistentLocalId,
+                        command.PositionGeometryMethod,
+                        buildingGeometry.Center,
+                        command.Function,
+                        false))));
         }
 
         [Fact]

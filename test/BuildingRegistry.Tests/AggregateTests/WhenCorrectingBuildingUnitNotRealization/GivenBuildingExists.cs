@@ -22,7 +22,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitNotRea
     using BuildingUnit = Building.Commands.BuildingUnit;
     using BuildingUnitStatus = Building.BuildingUnitStatus;
 
-    public class GivenBuildingExists : BuildingRegistryTest
+    public partial class GivenBuildingExists : BuildingRegistryTest
     {
         public GivenBuildingExists(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
         {

@@ -11,6 +11,9 @@ namespace BuildingRegistry.Building
         public BuildingUnit CommonBuildingUnit => NotRemovedUnits.Single(x => x.Function == BuildingUnitFunction.Common);
 
         public bool HasCommonBuildingUnit() => NotRemovedUnits.Any(x => x.Function == BuildingUnitFunction.Common);
+        public bool HasPlannedOrRealizedCommonBuildingUnit() => NotRemovedUnits.Any(x =>
+            x.Function == BuildingUnitFunction.Common
+            && (x.Status == BuildingUnitStatus.Planned || x.Status == BuildingUnitStatus.Realized));
 
         public bool RequiresCommonBuildingUnit() =>
             NotRemovedUnits.Count(x =>
