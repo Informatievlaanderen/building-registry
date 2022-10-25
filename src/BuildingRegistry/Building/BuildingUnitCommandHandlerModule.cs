@@ -86,7 +86,7 @@ namespace BuildingRegistry.Building
                     var streamId = new BuildingStreamId(message.Command.BuildingPersistentLocalId);
                     var building = await buildingRepository().GetAsync(streamId, ct);
 
-                    building.CorrectNotRealizeBuildingUnit(message.Command.BuildingUnitPersistentLocalId);
+                    building.CorrectNotRealizeBuildingUnit(addCommonBuildingUnit, message.Command.BuildingUnitPersistentLocalId);
                 });
         }
     }

@@ -243,7 +243,7 @@ namespace BuildingRegistry.Building
                 function,
                 hasDeviation));
 
-            AddCommonBuildingUnitIfNeeded(addCommonBuildingUnit);
+            AddOrUpdateStatusCommonBuildingUnit(addCommonBuildingUnit);
         }
 
         private void GuardActiveBuilding()
@@ -257,37 +257,69 @@ namespace BuildingRegistry.Building
             }
         }
 
-        private void AddCommonBuildingUnitIfNeeded(
+        private void AddOrUpdateStatusCommonBuildingUnit(
             IAddCommonBuildingUnit addCommonBuildingUnit)
         {
             GuardRemovedBuilding();
             GuardActiveBuilding();
 
-            if (_buildingUnits.HasCommonBuildingUnit() || !_buildingUnits.RequiresCommonBuildingUnit())
+            if (_buildingUnits.HasPlannedOrRealizedCommonBuildingUnit() || !_buildingUnits.RequiresCommonBuildingUnit())
             {
                 return;
             }
 
-            var commonBuildingUnitPersistentLocalId = new BuildingUnitPersistentLocalId(addCommonBuildingUnit.GenerateNextPersistentLocalId());
+            if (!_buildingUnits.HasCommonBuildingUnit())
+            {
+                var commonBuildingUnitPersistentLocalId = new BuildingUnitPersistentLocalId(addCommonBuildingUnit.GenerateNextPersistentLocalId());
 
-            var commonBuildingUnitStatus = BuildingStatus == BuildingStatus.Realized
-                ? BuildingUnitStatus.Realized
-                : BuildingUnitStatus.Planned;
+                var commonBuildingUnitStatus = BuildingStatus == BuildingStatus.Realized
+                    ? BuildingUnitStatus.Realized
+                    : BuildingUnitStatus.Planned;
 
-            ApplyChange(new CommonBuildingUnitWasAddedV2(
-                BuildingPersistentLocalId,
-                commonBuildingUnitPersistentLocalId,
-                commonBuildingUnitStatus,
-                BuildingUnitPositionGeometryMethod.DerivedFromObject,
-                BuildingGeometry.Center,
-                hasDeviation: false));
+                ApplyChange(new CommonBuildingUnitWasAddedV2(
+                    BuildingPersistentLocalId,
+                    commonBuildingUnitPersistentLocalId,
+                    commonBuildingUnitStatus,
+                    BuildingUnitPositionGeometryMethod.DerivedFromObject,
+                    BuildingGeometry.Center,
+                    hasDeviation: false));
 
-            addCommonBuildingUnit.AddForBuilding(BuildingPersistentLocalId, commonBuildingUnitPersistentLocalId);
+                addCommonBuildingUnit.AddForBuilding(BuildingPersistentLocalId, commonBuildingUnitPersistentLocalId);
+
+                return;
+            }
+
+            var commonBuildingUnit = _buildingUnits.CommonBuildingUnit;
+
+            if ((BuildingStatus == BuildingStatus.Planned || BuildingStatus == BuildingStatus.UnderConstruction)
+                && commonBuildingUnit.Status == BuildingUnitStatus.NotRealized)
+            {
+                ApplyChange(new BuildingUnitWasCorrectedFromNotRealizedToPlanned(
+                    BuildingPersistentLocalId,
+                    commonBuildingUnit.BuildingUnitPersistentLocalId));
+            }
+
+            if (BuildingStatus == BuildingStatus.Realized && commonBuildingUnit.Status == BuildingUnitStatus.NotRealized)
+            {
+                ApplyChange(new BuildingUnitWasCorrectedFromNotRealizedToPlanned(
+                    BuildingPersistentLocalId,
+                    commonBuildingUnit.BuildingUnitPersistentLocalId));
+                ApplyChange(new BuildingUnitWasRealizedV2(
+                    BuildingPersistentLocalId,
+                    commonBuildingUnit.BuildingUnitPersistentLocalId));
+            }
+
+            if (BuildingStatus == BuildingStatus.Realized && commonBuildingUnit.Status == BuildingUnitStatus.Retired)
+            {
+                ApplyChange(new BuildingUnitWasCorrectedFromRetiredToRealized(
+                    BuildingPersistentLocalId,
+                    commonBuildingUnit.BuildingUnitPersistentLocalId));
+            }
         }
 
-        private void NotRealizeOrRetireCommonBuildingUnitIfRedundant()
+        private void NotRealizeOrRetireCommonBuildingUnit()
         {
-            if (!_buildingUnits.HasCommonBuildingUnit() || _buildingUnits.RequiresCommonBuildingUnit())
+            if (!_buildingUnits.HasPlannedOrRealizedCommonBuildingUnit() || _buildingUnits.RequiresCommonBuildingUnit())
             {
                 return;
             }
@@ -357,10 +389,12 @@ namespace BuildingRegistry.Building
 
             buildingUnit.NotRealize();
 
-            NotRealizeOrRetireCommonBuildingUnitIfRedundant();
+            NotRealizeOrRetireCommonBuildingUnit();
         }
 
-        public void CorrectNotRealizeBuildingUnit(BuildingUnitPersistentLocalId buildingUnitPersistentLocalId)
+        public void CorrectNotRealizeBuildingUnit(
+            IAddCommonBuildingUnit addCommonBuildingUnit,
+            BuildingUnitPersistentLocalId buildingUnitPersistentLocalId)
         {
             GuardRemovedBuilding();
 
@@ -382,6 +416,8 @@ namespace BuildingRegistry.Building
             }
 
             buildingUnit.CorrectNotRealize();
+
+            AddOrUpdateStatusCommonBuildingUnit(addCommonBuildingUnit);
         }
 
         private void GuardRemovedBuilding()
