@@ -339,12 +339,16 @@ namespace BuildingRegistry.Building
 
             if (commonBuildingUnit.Status == BuildingUnitStatus.Planned)
             {
-                commonBuildingUnit.NotRealize();
+                ApplyChange(new BuildingUnitWasNotRealizedV2(
+                    BuildingPersistentLocalId,
+                    commonBuildingUnit.BuildingUnitPersistentLocalId));
             }
 
             if (commonBuildingUnit.Status == BuildingUnitStatus.Realized)
             {
-                commonBuildingUnit.Retire();
+                ApplyChange(new BuildingUnitWasRetiredV2(
+                    BuildingPersistentLocalId,
+                    commonBuildingUnit.BuildingUnitPersistentLocalId));
             }
         }
 

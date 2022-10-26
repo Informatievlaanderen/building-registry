@@ -236,5 +236,39 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenRealizingBuildingUnit
                         => error.ErrorCode == "GebouwStatusNietInGerealiseerd"
                                           && error.ErrorMessage == "Deze actie is enkel toegestaan binnen een gerealiseerd gebouw."));
         }
+
+        [Fact]
+        public void WhenBuildingUnitHasInvalidFunction_ThenThrowsBuildingUnitHasInvalidFunctionException()
+        {
+            var buildingUnitPersistentLocalId = new BuildingUnitPersistentLocalId(456);
+
+            MockMediator
+                .Setup(x => x.Send(It.IsAny<RealizeBuildingUnitRequest>(), CancellationToken.None).Result)
+                .Throws(new BuildingUnitHasInvalidFunctionException());
+
+            var request = new RealizeBuildingUnitRequest()
+            {
+                BuildingUnitPersistentLocalId = buildingUnitPersistentLocalId
+            };
+
+            //Act
+            Func<Task> act = async () => await _controller.Realize(
+                ResponseOptions,
+                MockIfMatchValidator(true),
+                new RealizeBuildingUnitRequestValidator(),
+                request,
+                string.Empty,
+                CancellationToken.None);
+
+            // Assert
+            act
+                .Should()
+                .ThrowAsync<ValidationException>()
+                .Result
+                .Where(x =>
+                    x.Errors.Any(error
+                        => error.ErrorCode == "GebouweenheidGemeenschappelijkdeel"
+                           && error.ErrorMessage == "Deze actie is niet toegestaan op gebouweenheden met functie gemeenschappelijkDeel."));
+        }
     }
 }

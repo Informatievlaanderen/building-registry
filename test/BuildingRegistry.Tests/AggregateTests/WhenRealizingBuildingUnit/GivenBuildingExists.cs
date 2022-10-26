@@ -59,6 +59,41 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRealizingBuildingUnit
                 .ThenNone());
         }
 
+        [Fact]
+        public void WithCommonBuilding_ThrowsBuildingUnitHasInvalidFunctionException()
+        {
+            var command = Fixture.Create<RealizeBuildingUnit>();
+
+            var buildingWasMigrated = new BuildingWasMigrated(
+                Fixture.Create<BuildingId>(),
+                command.BuildingPersistentLocalId,
+                Fixture.Create<BuildingPersistentLocalIdAssignmentDate>(),
+                BuildingStatus.Realized,
+                Fixture.Create<BuildingGeometry>(),
+                isRemoved: false,
+                new List<BuildingUnit>
+                {
+                    new BuildingUnit(
+                        Fixture.Create<BuildingRegistry.Legacy.BuildingUnitId>(),
+                        Fixture.Create<BuildingRegistry.Legacy.PersistentLocalId>(),
+                        BuildingRegistry.Legacy.BuildingUnitFunction.Common,
+                        BuildingRegistry.Legacy.BuildingUnitStatus.Planned,
+                        new List<AddressPersistentLocalId>(),
+                        Fixture.Create<BuildingRegistry.Legacy.BuildingUnitPosition>(),
+                        Fixture.Create<BuildingRegistry.Legacy.BuildingGeometry>(),
+                        isRemoved: false)
+                }
+            );
+            ((ISetProvenance)buildingWasMigrated).SetProvenance(Fixture.Create<Provenance>());
+
+            Assert(new Scenario()
+                .Given(
+                    new BuildingStreamId(Fixture.Create<BuildingPersistentLocalId>()),
+                    buildingWasMigrated)
+                .When(command)
+                .Throws(new BuildingUnitHasInvalidFunctionException()));
+        }
+
         [Theory]
         [InlineData("Retired")]
         [InlineData("NotRealized")]
@@ -78,7 +113,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRealizingBuildingUnit
                     new BuildingUnit(
                         Fixture.Create<BuildingRegistry.Legacy.BuildingUnitId>(),
                         Fixture.Create<BuildingRegistry.Legacy.PersistentLocalId>(),
-                        Fixture.Create<BuildingRegistry.Legacy.BuildingUnitFunction>(),
+                        BuildingRegistry.Legacy.BuildingUnitFunction.Unknown,
                         BuildingRegistry.Legacy.BuildingUnitStatus.Parse(status) ?? throw new ArgumentException(),
                         new List<AddressPersistentLocalId>(),
                         Fixture.Create<BuildingRegistry.Legacy.BuildingUnitPosition>(),

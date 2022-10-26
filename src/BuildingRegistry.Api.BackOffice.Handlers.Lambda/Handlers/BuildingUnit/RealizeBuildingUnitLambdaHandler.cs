@@ -58,6 +58,9 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.BuildingUnit
         {
             return exception switch
             {
+                BuildingUnitHasInvalidFunctionException => new TicketError(
+                    ValidationErrorMessages.BuildingUnit.BuildingUnitHasInvalidFunction,
+                    ValidationErrorCodes.BuildingUnit.BuildingUnitHasInvalidFunction),
                 BuildingHasInvalidStatusException => new TicketError(
                     ValidationErrorMessages.BuildingUnit.BuildingStatusNotInRealized,
                     ValidationErrorCodes.BuildingUnit.BuildingStatusNotInRealized),

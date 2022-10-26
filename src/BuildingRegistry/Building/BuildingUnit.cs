@@ -52,6 +52,11 @@ namespace BuildingRegistry.Building
                 throw new BuildingUnitIsRemovedException(BuildingUnitPersistentLocalId);
             }
 
+            if (Function == BuildingUnitFunction.Common)
+            {
+                throw new BuildingUnitHasInvalidFunctionException();
+            }
+
             if (Status == BuildingUnitStatus.Realized)
             {
                 return;
@@ -105,6 +110,11 @@ namespace BuildingRegistry.Building
                 throw new BuildingUnitIsRemovedException(BuildingUnitPersistentLocalId);
             }
 
+            if (Function == BuildingUnitFunction.Common)
+            {
+                throw new BuildingUnitHasInvalidFunctionException();
+            }
+
             if (Status == BuildingUnitStatus.Planned)
             {
                 return;
@@ -115,11 +125,6 @@ namespace BuildingRegistry.Building
                 throw new BuildingUnitHasInvalidStatusException();
             }
 
-            if (Function == BuildingUnitFunction.Common)
-            {
-                throw new BuildingUnitHasInvalidFunctionException();
-            }
-
             Apply(new BuildingUnitWasCorrectedFromRealizedToPlanned(_buildingPersistentLocalId, BuildingUnitPersistentLocalId));
         }
 
@@ -128,6 +133,11 @@ namespace BuildingRegistry.Building
             if (IsRemoved)
             {
                 throw new BuildingUnitIsRemovedException(BuildingUnitPersistentLocalId);
+            }
+
+            if (Function == BuildingUnitFunction.Common)
+            {
+                throw new BuildingUnitHasInvalidFunctionException();
             }
 
             if (Status == BuildingUnitStatus.NotRealized)
@@ -150,6 +160,11 @@ namespace BuildingRegistry.Building
                 throw new BuildingUnitIsRemovedException(BuildingUnitPersistentLocalId);
             }
 
+            if (Function == BuildingUnitFunction.Common)
+            {
+                throw new BuildingUnitHasInvalidFunctionException();
+            }
+
             if (Status == BuildingUnitStatus.Planned)
             {
                 return;
@@ -158,11 +173,6 @@ namespace BuildingRegistry.Building
             if (Status != BuildingUnitStatus.NotRealized)
             {
                 throw new BuildingUnitHasInvalidStatusException();
-            }
-
-            if (Function == BuildingUnitFunction.Common)
-            {
-                throw new BuildingUnitHasInvalidFunctionException();
             }
 
             Apply(new BuildingUnitWasCorrectedFromNotRealizedToPlanned(_buildingPersistentLocalId, BuildingUnitPersistentLocalId));
@@ -186,23 +196,6 @@ namespace BuildingRegistry.Building
             }
 
             Apply(new BuildingUnitWasNotRealizedBecauseBuildingWasNotRealized(_buildingPersistentLocalId, BuildingUnitPersistentLocalId));
-        }
-
-        public void Retire()
-        {
-            if (IsRemoved)
-            {
-                return;
-            }
-
-            if (Status == BuildingUnitStatus.Retired)
-            {
-                return;
-            }
-
-            // TODO: validations on status. Method was added because of GAWR-3734
-
-            Apply(new BuildingUnitWasRetiredV2(_buildingPersistentLocalId, BuildingUnitPersistentLocalId));
         }
 
         public void RestoreSnapshot(

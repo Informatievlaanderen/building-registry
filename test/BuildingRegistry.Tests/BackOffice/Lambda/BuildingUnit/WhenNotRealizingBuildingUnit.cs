@@ -157,5 +157,43 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
                         "GebouweenheidGehistoreerdOfGerealiseerd"),
                     CancellationToken.None));
         }
+
+        [Fact]
+        public async Task WhenBuildingUnitHasInvalidFunction_ThenTicketingErrorIsExpected()
+        {
+            // Arrange
+            var ticketing = new Mock<ITicketing>();
+            var buildingPersistentLocalId = Fixture.Create<BuildingPersistentLocalId>();
+            var buildingUnitPersistentLocalId = Fixture.Create<BuildingUnitPersistentLocalId>();
+
+            PlanBuilding(buildingPersistentLocalId);
+            PlanBuildingUnit(buildingPersistentLocalId, buildingUnitPersistentLocalId);
+
+            var handler = new NotRealizeBuildingUnitLambdaHandler(
+                Container.Resolve<IConfiguration>(),
+                new FakeRetryPolicy(),
+                ticketing.Object,
+                MockExceptionIdempotentCommandHandler<BuildingUnitHasInvalidFunctionException>().Object,
+                Container.Resolve<IBuildings>());
+
+            // Act
+            await handler.Handle(new NotRealizeBuildingUnitLambdaRequest(
+                Guid.NewGuid(),
+                buildingPersistentLocalId,
+                string.Empty,
+                Fixture.Create<Provenance>(),
+                new Dictionary<string, object>(),
+                new NotRealizeBuildingUnitBackOfficeRequest { BuildingUnitPersistentLocalId = buildingUnitPersistentLocalId }
+            ), CancellationToken.None);
+
+            //Assert
+            ticketing.Verify(x =>
+                x.Error(
+                    It.IsAny<Guid>(),
+                    new TicketError(
+                        "Deze actie is niet toegestaan op gebouweenheden met functie gemeenschappelijkDeel.",
+                        "GebouweenheidGemeenschappelijkdeel"),
+                    CancellationToken.None));
+        }
     }
 }
