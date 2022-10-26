@@ -46,7 +46,7 @@ namespace BuildingRegistry.Tests.BackOffice.Sqs.Building
 
             var sqsRequest = new RealizeBuildingSqsRequest
             {
-                Request = new BackOfficeRealizeBuildingRequest
+                Request = new RealizeBuildingBackOfficeRequest
                 {
                     PersistentLocalId = Fixture.Create<BuildingPersistentLocalId>()
                 }

@@ -73,7 +73,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
                 buildingPersistentLocalId,
                 Fixture.Create<Provenance>(),
                 new Dictionary<string, object>(),
-                new BackOfficePlanBuildingUnitRequest
+                new PlanBuildingUnitBackOfficeRequest
                 {
                     GebouwId = $"https://data.vlaanderen.be/id/gebouw/{buildingPersistentLocalId}",
                     PositieGeometrieMethode = PositieGeometrieMethode.AfgeleidVanObject,
@@ -143,7 +143,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
                 buildingPersistentLocalId,
                 Fixture.Create<Provenance>(),
                 new Dictionary<string, object>(),
-                new BackOfficePlanBuildingUnitRequest
+                new PlanBuildingUnitBackOfficeRequest
                 {
                     GebouwId = $"https://data.vlaanderen.be/id/gebouw/{buildingPersistentLocalId}",
                     PositieGeometrieMethode = PositieGeometrieMethode.AfgeleidVanObject,
@@ -200,7 +200,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
                 buildingPersistentLocalId,
                 Fixture.Create<Provenance>(),
                 new Dictionary<string, object>(),
-                new BackOfficePlanBuildingUnitRequest
+                new PlanBuildingUnitBackOfficeRequest
                 {
                     GebouwId = $"https://data.vlaanderen.be/id/gebouw/{buildingPersistentLocalId}",
                     PositieGeometrieMethode = PositieGeometrieMethode.AfgeleidVanObject,
@@ -247,7 +247,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
                 buildingPersistentLocalId,
                 Fixture.Create<Provenance>(),
                 new Dictionary<string, object>(),
-                new BackOfficePlanBuildingUnitRequest
+                new PlanBuildingUnitBackOfficeRequest
                 {
                     GebouwId = $"https://data.vlaanderen.be/id/gebouw/{buildingPersistentLocalId}",
                     PositieGeometrieMethode = PositieGeometrieMethode.AfgeleidVanObject,

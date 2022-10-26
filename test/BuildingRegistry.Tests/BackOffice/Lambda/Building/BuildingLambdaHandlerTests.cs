@@ -39,7 +39,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
                 null,
                 Fixture.Create<Provenance>(),
                 new Dictionary<string, object>(),
-                new BackOfficeRealizeBuildingRequest { PersistentLocalId = 1 }
+                new RealizeBuildingBackOfficeRequest { PersistentLocalId = 1 }
             );
 
             var sut = new FakeBuildingLambdaHandler(
@@ -68,7 +68,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
                 null,
                 Fixture.Create<Provenance>(),
                 new Dictionary<string, object>(),
-                new BackOfficeRealizeBuildingRequest { PersistentLocalId = 1 }
+                new RealizeBuildingBackOfficeRequest { PersistentLocalId = 1 }
             );
 
             var sut = new FakeBuildingLambdaHandler(
@@ -114,7 +114,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
                     "Outdated",
                     Fixture.Create<Provenance>(),
                     new Dictionary<string, object>(),
-                    new BackOfficeRealizeBuildingRequest
+                    new RealizeBuildingBackOfficeRequest
                     {
                         PersistentLocalId = buildingPersistentLocalId
                     }),
@@ -148,7 +148,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
                     string.Empty,
                     Fixture.Create<Provenance>(),
                     new Dictionary<string, object>(),
-                    new BackOfficeRealizeBuildingRequest { PersistentLocalId = 1 }),
+                    new RealizeBuildingBackOfficeRequest { PersistentLocalId = 1 }),
                 CancellationToken.None);
 
             //Assert

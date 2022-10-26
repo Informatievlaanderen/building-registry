@@ -10,20 +10,20 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Requests.BuildingUnit
 
     public sealed class PlanBuildingUnitLambdaRequest :
         BuildingUnitLambdaRequest,
-        IHasBackOfficeRequest<BackOfficePlanBuildingUnitRequest>
+        IHasBackOfficeRequest<PlanBuildingUnitBackOfficeRequest>
     {
         public PlanBuildingUnitLambdaRequest(
             Guid ticketId,
             string messageGroupId,
             Provenance provenance,
             IDictionary<string, object> metadata,
-            BackOfficePlanBuildingUnitRequest request)
+            PlanBuildingUnitBackOfficeRequest request)
             : base(ticketId, messageGroupId, null, provenance, metadata)
         {
             Request = request;
         }
 
-        public BackOfficePlanBuildingUnitRequest Request { get; set; }
+        public PlanBuildingUnitBackOfficeRequest Request { get; set; }
 
         /// <summary>
         /// Map to PlanBuildingUnit command

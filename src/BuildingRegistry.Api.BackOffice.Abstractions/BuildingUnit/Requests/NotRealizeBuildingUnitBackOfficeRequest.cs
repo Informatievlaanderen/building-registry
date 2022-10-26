@@ -1,8 +1,6 @@
 namespace BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Requests
 {
-    using System.Runtime.Serialization;
-
-    public class BackOfficeRealizeBuildingUnitRequest
+    public class NotRealizeBuildingUnitBackOfficeRequest
     {
         public int BuildingUnitPersistentLocalId { get; set; }
     }

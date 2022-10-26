@@ -12,7 +12,7 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Requests
     using Responses;
     using Swashbuckle.AspNetCore.Filters;
 
-    public class PlanBuildingUnitRequest : BackOfficePlanBuildingUnitRequest, IRequest<PlanBuildingUnitResponse>
+    public class PlanBuildingUnitRequest : PlanBuildingUnitBackOfficeRequest, IRequest<PlanBuildingUnitResponse>
     {
         [JsonIgnore]
         public IDictionary<string, object> Metadata { get; set; }

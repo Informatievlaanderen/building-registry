@@ -45,7 +45,7 @@ namespace BuildingRegistry.Tests.BackOffice.Sqs.Building
 
             var sqsRequest = new PlanBuildingSqsRequest
             {
-                Request = new BackOfficePlanBuildingRequest()
+                Request = new PlanBuildingBackOfficeRequest()
             };
 
             // Act
