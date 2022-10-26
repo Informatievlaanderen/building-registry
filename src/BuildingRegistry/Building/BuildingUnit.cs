@@ -82,7 +82,7 @@ namespace BuildingRegistry.Building
                 return;
             }
 
-            Apply(new BuildingUnitWasRealizedV2(_buildingPersistentLocalId, BuildingUnitPersistentLocalId));
+            Apply(new BuildingUnitWasRealizedBecauseBuildingWasRealized(_buildingPersistentLocalId, BuildingUnitPersistentLocalId));
         }
 
         public void CorrectRealizeBecauseBuildingWasCorrected()

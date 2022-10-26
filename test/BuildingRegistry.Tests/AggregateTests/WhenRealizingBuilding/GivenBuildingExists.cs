@@ -60,7 +60,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRealizingBuilding
                     new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
                         new BuildingWasRealizedV2(command.BuildingPersistentLocalId)),
                     new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
-                        new BuildingUnitWasRealizedV2(
+                        new BuildingUnitWasRealizedBecauseBuildingWasRealized(
                             command.BuildingPersistentLocalId,
                             new BuildingUnitPersistentLocalId(buildingUnitWasPlannedV2.BuildingUnitPersistentLocalId)))));
         }
