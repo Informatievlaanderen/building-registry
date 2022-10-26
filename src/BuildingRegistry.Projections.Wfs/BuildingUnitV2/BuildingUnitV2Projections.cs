@@ -130,6 +130,15 @@ namespace BuildingRegistry.Projections.Wfs.BuildingUnitV2
                 SetVersion(unit, message.Message.Provenance.Timestamp);
             });
 
+
+            When<Envelope<BuildingUnitWasNotRealizedBecauseBuildingWasNotRealized>>(async (context, message, _) =>
+            {
+                var unit = await context.BuildingUnitsV2.FindAsync(message.Message.BuildingUnitPersistentLocalId);
+                unit!.Status = NotRealizedStatus;
+
+                SetVersion(unit, message.Message.Provenance.Timestamp);
+            });
+
             When<Envelope<BuildingUnitWasCorrectedFromNotRealizedToPlanned>>(async (context, message, _) =>
             {
                 var unit = await context.BuildingUnitsV2.FindAsync(message.Message.BuildingUnitPersistentLocalId);
