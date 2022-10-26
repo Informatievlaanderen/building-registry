@@ -1,3 +1,5 @@
+## [3.38.1](https://github.com/informatievlaanderen/building-registry/compare/v3.38.0...v3.38.1) (2022-10-26)
+
 # [3.38.0](https://github.com/informatievlaanderen/building-registry/compare/v3.37.3...v3.38.0) (2022-10-25)
 
 
