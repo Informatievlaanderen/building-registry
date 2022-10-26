@@ -244,7 +244,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
                     It.IsAny<Guid>(),
                     new TicketError(
                         "Deze actie is niet toegestaan op gebouweenheden met functie gemeenschappelijkDeel.",
-                        "GebouweenheidGemeenschappelijkdeel"),
+                        "GebouweenheidGemeenschappelijkDeel"),
                     CancellationToken.None));
         }
     }

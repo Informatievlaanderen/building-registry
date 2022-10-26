@@ -267,7 +267,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenRealizingBuildingUnit
                 .Result
                 .Where(x =>
                     x.Errors.Any(error
-                        => error.ErrorCode == "GebouweenheidGemeenschappelijkdeel"
+                        => error.ErrorCode == "GebouweenheidGemeenschappelijkDeel"
                            && error.ErrorMessage == "Deze actie is niet toegestaan op gebouweenheden met functie gemeenschappelijkDeel."));
         }
     }

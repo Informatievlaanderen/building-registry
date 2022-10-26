@@ -31,7 +31,7 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.Building.Validators
             public const string BuildingUnitCannotBeNotRealized = "GebouweenheidGehistoreerdOfGerealiseerd";
             public const string BuildingUnitCannotBePlanned = "GebouweenheidGebouwIdNietGerealiseerdofGehistoreerd";
             public const string BuildingUnitOutsideGeometryBuilding = "GebouweenheidOngeldigePositieValidatie";
-            public const string BuildingUnitHasInvalidFunction = "GebouweenheidGemeenschappelijkdeel";
+            public const string BuildingUnitHasInvalidFunction = "GebouweenheidGemeenschappelijkDeel";
             public const string MissingRequiredPosition = "GebouweendheidPositieValidatie";
             public const string InvalidPositionFormat = "GebouweenheidPositieformaatValidatie";
         }
