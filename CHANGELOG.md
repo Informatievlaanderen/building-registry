@@ -1,3 +1,11 @@
+## [3.39.1](https://github.com/informatievlaanderen/building-registry/compare/v3.39.0...v3.39.1) (2022-10-26)
+
+
+### Bug Fixes
+
+* common building unit validations ([5cf254d](https://github.com/informatievlaanderen/building-registry/commit/5cf254d46049bf9af8818426666bacc177e97d3e))
+* error code common building unit ([d6e2843](https://github.com/informatievlaanderen/building-registry/commit/d6e284397cc988e41220425f239b4c268ca7a83f))
+
 # [3.39.0](https://github.com/informatievlaanderen/building-registry/compare/v3.38.1...v3.39.0) (2022-10-26)
 
 
