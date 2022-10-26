@@ -47,7 +47,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenNotRealizingBuilding
         {
             var command = Fixture.Create<NotRealizeBuilding>();
 
-            var buildingUnitWasPlannedV2 = Fixture.Create<BuildingUnitWasPlannedV2>();  
+            var buildingUnitWasPlannedV2 = Fixture.Create<BuildingUnitWasPlannedV2>();
             Assert(new Scenario()
                 .Given(
                     new BuildingStreamId(Fixture.Create<BuildingPersistentLocalId>()),
@@ -55,7 +55,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenNotRealizingBuilding
                     buildingUnitWasPlannedV2)
                 .When(command)
                 .Then(new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
-                    new BuildingUnitWasNotRealizedV2(
+                    new BuildingUnitWasNotRealizedBecauseBuildingWasNotRealized(
                         command.BuildingPersistentLocalId,
                         new BuildingUnitPersistentLocalId(buildingUnitWasPlannedV2.BuildingUnitPersistentLocalId))),
                     new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),

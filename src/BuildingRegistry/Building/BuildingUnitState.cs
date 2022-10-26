@@ -38,6 +38,7 @@ namespace BuildingRegistry.Building
             Register<BuildingUnitWasCorrectedFromRealizedToPlanned>(When);
             Register<BuildingUnitWasCorrectedFromRealizedToPlannedBecauseBuildingWasCorrected>(When);
             Register<BuildingUnitWasNotRealizedV2>(When);
+            Register<BuildingUnitWasNotRealizedBecauseBuildingWasNotRealized>(When);
             Register<BuildingUnitWasCorrectedFromNotRealizedToPlanned>(When);
             Register<BuildingUnitWasRetiredV2>(When);
             Register<CommonBuildingUnitWasAddedV2>(When);
@@ -92,6 +93,13 @@ namespace BuildingRegistry.Building
         }
 
         private void When(BuildingUnitWasNotRealizedV2 @event)
+        {
+            Status = BuildingUnitStatus.NotRealized;
+
+            _lastEvent = @event;
+        }
+
+        private void When(BuildingUnitWasNotRealizedBecauseBuildingWasNotRealized @event)
         {
             Status = BuildingUnitStatus.NotRealized;
 

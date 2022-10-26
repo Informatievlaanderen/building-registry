@@ -185,7 +185,7 @@ namespace BuildingRegistry.Building
                 return;
             }
 
-            Apply(new BuildingUnitWasNotRealizedV2(_buildingPersistentLocalId, BuildingUnitPersistentLocalId));
+            Apply(new BuildingUnitWasNotRealizedBecauseBuildingWasNotRealized(_buildingPersistentLocalId, BuildingUnitPersistentLocalId));
         }
 
         public void Retire()
