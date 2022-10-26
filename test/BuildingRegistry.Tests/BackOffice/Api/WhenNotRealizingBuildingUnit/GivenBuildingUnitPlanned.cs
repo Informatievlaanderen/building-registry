@@ -202,5 +202,39 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenNotRealizingBuildingUnit
                         => error.ErrorCode == "GebouweenheidGehistoreerdOfGerealiseerd"
                                           && error.ErrorMessage == "Deze actie is enkel toegestaan op gebouweenheden met status 'gepland'."));
         }
+
+        [Fact]
+        public void WhenBuildingUnitHasInvalidFunction_ThenThrowsBuildingUnitHasInvalidFunctionException()
+        {
+            var buildingUnitPersistentLocalId = new BuildingUnitPersistentLocalId(456);
+
+            MockMediator
+                .Setup(x => x.Send(It.IsAny<NotRealizeBuildingUnitRequest>(), CancellationToken.None).Result)
+                .Throws(new BuildingUnitHasInvalidFunctionException());
+
+            var request = new NotRealizeBuildingUnitRequest()
+            {
+                BuildingUnitPersistentLocalId = buildingUnitPersistentLocalId
+            };
+
+            //Act
+            Func<Task> act = async () => await _controller.NotRealize(
+                ResponseOptions,
+                MockIfMatchValidator(true),
+                new NotRealizeBuildingUnitRequestValidator(),
+                request,
+                string.Empty,
+                CancellationToken.None);
+
+            // Assert
+            act
+                .Should()
+                .ThrowAsync<ValidationException>()
+                .Result
+                .Where(x =>
+                    x.Errors.Any(error
+                        => error.ErrorCode == "GebouweenheidGemeenschappelijkdeel"
+                           && error.ErrorMessage == "Deze actie is niet toegestaan op gebouweenheden met functie gemeenschappelijkDeel."));
+        }
     }
 }
