@@ -3,8 +3,8 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Sqs.Requests.Building
     using Abstractions;
     using Abstractions.Building.Requests;
 
-    public sealed class RealizeBuildingSqsRequest : SqsRequest, IHasBackOfficeRequest<BackOfficeRealizeBuildingRequest>
+    public sealed class RealizeBuildingSqsRequest : SqsRequest, IHasBackOfficeRequest<RealizeBuildingBackOfficeRequest>
     {
-        public BackOfficeRealizeBuildingRequest Request { get; set; }
+        public RealizeBuildingBackOfficeRequest Request { get; set; }
     }
 }

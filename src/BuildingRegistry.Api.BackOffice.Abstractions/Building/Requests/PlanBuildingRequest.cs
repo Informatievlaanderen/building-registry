@@ -1,7 +1,6 @@
 namespace BuildingRegistry.Api.BackOffice.Abstractions.Building.Requests
 {
     using System.Collections.Generic;
-    using System.Runtime.Serialization;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using BuildingRegistry.Building;
     using BuildingRegistry.Building.Commands;
@@ -9,8 +8,8 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.Building.Requests
     using Newtonsoft.Json;
     using Responses;
     using Swashbuckle.AspNetCore.Filters;
-    
-    public class PlanBuildingRequest : BackOfficePlanBuildingRequest, IRequest<PlanBuildingResponse>
+
+    public class PlanBuildingRequest : PlanBuildingBackOfficeRequest, IRequest<PlanBuildingResponse>
     {
         [JsonIgnore]
         public IDictionary<string, object> Metadata { get; set; }

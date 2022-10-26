@@ -8,7 +8,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Requests.BuildingUnit
 
     public sealed class NotRealizeBuildingUnitLambdaRequest :
         BuildingUnitLambdaRequest,
-        IHasBackOfficeRequest<BackOfficeNotRealizeBuildingUnitRequest>,
+        IHasBackOfficeRequest<NotRealizeBuildingUnitBackOfficeRequest>,
         IHasBuildingUnitPersistentLocalId
     {
         public NotRealizeBuildingUnitLambdaRequest(
@@ -17,13 +17,13 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Requests.BuildingUnit
             string? ifMatchHeaderValue,
             Provenance provenance,
             IDictionary<string, object> metadata,
-            BackOfficeNotRealizeBuildingUnitRequest request)
+            NotRealizeBuildingUnitBackOfficeRequest request)
             : base(ticketId, messageGroupId, ifMatchHeaderValue, provenance, metadata)
         {
             Request = request;
         }
 
-        public BackOfficeNotRealizeBuildingUnitRequest Request { get; set; }
+        public NotRealizeBuildingUnitBackOfficeRequest Request { get; set; }
 
         public int BuildingUnitPersistentLocalId => Request.BuildingUnitPersistentLocalId;
 

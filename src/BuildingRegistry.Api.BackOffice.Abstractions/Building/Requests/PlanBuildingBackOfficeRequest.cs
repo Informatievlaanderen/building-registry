@@ -4,7 +4,7 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.Building.Requests
     using System.Runtime.Serialization;
 
     [DataContract(Name = "PlanGebouw", Namespace = "")]
-    public class BackOfficePlanBuildingRequest
+    public class PlanBuildingBackOfficeRequest
     {
         /// <summary>
         /// De schets van het gebouw in GML-3 formaat met Lambert 72 referentie systeem.

@@ -9,16 +9,16 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Requests.Building
 
     public sealed class PlanBuildingLambdaRequest :
         BuildingLambdaRequest,
-        IHasBackOfficeRequest<BackOfficePlanBuildingRequest>
+        IHasBackOfficeRequest<PlanBuildingBackOfficeRequest>
     {
-        public BackOfficePlanBuildingRequest Request { get; set; }
+        public PlanBuildingBackOfficeRequest Request { get; set; }
 
         public PlanBuildingLambdaRequest(
             Guid ticketId,
             string messageGroupId, 
             Provenance provenance,
             IDictionary<string, object> metadata,
-            BackOfficePlanBuildingRequest request)
+            PlanBuildingBackOfficeRequest request)
             : base(ticketId, messageGroupId, null, provenance, metadata)
         {
             Request = request;

@@ -8,10 +8,10 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Requests.Building
 
     public sealed class RealizeBuildingLambdaRequest :
         BuildingLambdaRequest,
-        IHasBackOfficeRequest<BackOfficeRealizeBuildingRequest>,
+        IHasBackOfficeRequest<RealizeBuildingBackOfficeRequest>,
         Abstractions.IHasBuildingPersistentLocalId
     {
-        public BackOfficeRealizeBuildingRequest Request { get; set; }
+        public RealizeBuildingBackOfficeRequest Request { get; set; }
 
         public int BuildingPersistentLocalId => Request.PersistentLocalId;
 
@@ -21,7 +21,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Requests.Building
             string? ifMatchHeaderValue,
             Provenance provenance,
             IDictionary<string, object> metadata,
-            BackOfficeRealizeBuildingRequest request)
+            RealizeBuildingBackOfficeRequest request)
             : base(ticketId, messageGroupId, ifMatchHeaderValue, provenance, metadata)
         {
             Request = request;

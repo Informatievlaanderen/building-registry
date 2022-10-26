@@ -63,7 +63,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
                     null,
                     Fixture.Create<Provenance>(),
                     new Dictionary<string, object>(),
-                    new BackOfficePlaceBuildingUnderConstructionRequest { PersistentLocalId = buildingPersistentLocalId }),
+                    new PlaceBuildingUnderConstructionBackOfficeRequest { PersistentLocalId = buildingPersistentLocalId }),
                 CancellationToken.None);
 
             //Assert
@@ -100,7 +100,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
                     null,
                     Fixture.Create<Provenance>(),
                     new Dictionary<string, object>(),
-                    new BackOfficePlaceBuildingUnderConstructionRequest { PersistentLocalId = buildingPersistentLocalId }
+                    new PlaceBuildingUnderConstructionBackOfficeRequest { PersistentLocalId = buildingPersistentLocalId }
                 ),
                 CancellationToken.None);
 
@@ -137,7 +137,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
                     null,
                     Fixture.Create<Provenance>(),
                     new Dictionary<string, object>(),
-                    new BackOfficePlaceBuildingUnderConstructionRequest { PersistentLocalId = buildingPersistentLocalId }
+                    new PlaceBuildingUnderConstructionBackOfficeRequest { PersistentLocalId = buildingPersistentLocalId }
                     ),
                 CancellationToken.None);
 

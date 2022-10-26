@@ -5,7 +5,7 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Requests
     using System.Runtime.Serialization;
 
     [DataContract(Name = "PlanGebouweenheid", Namespace = "")]
-    public class BackOfficePlanBuildingUnitRequest
+    public class PlanBuildingUnitBackOfficeRequest
     {
         /// <summary>
         /// Identificator van het gebouw.

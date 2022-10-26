@@ -8,7 +8,7 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.Building.Requests
     using Newtonsoft.Json;
     using Responses;
 
-    public class CorrectBuildingRealizationRequest : BackOfficeCorrectBuildingRealizationRequest, IRequest<ETagResponse>
+    public class CorrectBuildingRealizationRequest : CorrectBuildingRealizationBackOfficeRequest, IRequest<ETagResponse>
     {
         [JsonIgnore]
         public IDictionary<string, object> Metadata { get; set; }

@@ -54,7 +54,7 @@ namespace BuildingRegistry.Tests.BackOffice.Sqs.BuildingUnit
 
             var sqsRequest = new NotRealizeBuildingUnitSqsRequest
             {
-                Request = new BackOfficeNotRealizeBuildingUnitRequest
+                Request = new NotRealizeBuildingUnitBackOfficeRequest
                 {
                     BuildingUnitPersistentLocalId = Fixture.Create<BuildingUnitPersistentLocalId>()
                 }
@@ -86,7 +86,7 @@ namespace BuildingRegistry.Tests.BackOffice.Sqs.BuildingUnit
             var act = async () => await sut.Handle(
                 new NotRealizeBuildingUnitSqsRequest
                 {
-                    Request = new BackOfficeNotRealizeBuildingUnitRequest
+                    Request = new NotRealizeBuildingUnitBackOfficeRequest
                     {
                         BuildingUnitPersistentLocalId = Fixture.Create<BuildingUnitPersistentLocalId>()
                     }
