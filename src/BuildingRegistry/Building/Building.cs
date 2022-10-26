@@ -270,25 +270,36 @@ namespace BuildingRegistry.Building
 
             if (!_buildingUnits.HasCommonBuildingUnit())
             {
-                var commonBuildingUnitPersistentLocalId = new BuildingUnitPersistentLocalId(addCommonBuildingUnit.GenerateNextPersistentLocalId());
-
-                var commonBuildingUnitStatus = BuildingStatus == BuildingStatus.Realized
-                    ? BuildingUnitStatus.Realized
-                    : BuildingUnitStatus.Planned;
-
-                ApplyChange(new CommonBuildingUnitWasAddedV2(
-                    BuildingPersistentLocalId,
-                    commonBuildingUnitPersistentLocalId,
-                    commonBuildingUnitStatus,
-                    BuildingUnitPositionGeometryMethod.DerivedFromObject,
-                    BuildingGeometry.Center,
-                    hasDeviation: false));
-
-                addCommonBuildingUnit.AddForBuilding(BuildingPersistentLocalId, commonBuildingUnitPersistentLocalId);
-
-                return;
+                AddCommonBuildingUnit(addCommonBuildingUnit);
             }
+            else
+            {
+                UpdateStatusCommonBuildingUnit();
+            }
+        }
 
+        private void AddCommonBuildingUnit(IAddCommonBuildingUnit addCommonBuildingUnit)
+        {
+            var commonBuildingUnitPersistentLocalId =
+                new BuildingUnitPersistentLocalId(addCommonBuildingUnit.GenerateNextPersistentLocalId());
+
+            var commonBuildingUnitStatus = BuildingStatus == BuildingStatus.Realized
+                ? BuildingUnitStatus.Realized
+                : BuildingUnitStatus.Planned;
+
+            ApplyChange(new CommonBuildingUnitWasAddedV2(
+                BuildingPersistentLocalId,
+                commonBuildingUnitPersistentLocalId,
+                commonBuildingUnitStatus,
+                BuildingUnitPositionGeometryMethod.DerivedFromObject,
+                BuildingGeometry.Center,
+                hasDeviation: false));
+
+            addCommonBuildingUnit.AddForBuilding(BuildingPersistentLocalId, commonBuildingUnitPersistentLocalId);
+        }
+
+        private void UpdateStatusCommonBuildingUnit()
+        {
             var commonBuildingUnit = _buildingUnits.CommonBuildingUnit;
 
             if ((BuildingStatus == BuildingStatus.Planned || BuildingStatus == BuildingStatus.UnderConstruction)
