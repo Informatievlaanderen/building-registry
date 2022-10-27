@@ -1,3 +1,12 @@
+## [3.39.2](https://github.com/informatievlaanderen/building-registry/compare/v3.39.1...v3.39.2) (2022-10-27)
+
+
+### Bug Fixes
+
+* correct building unit correct realization error message ([dfc43f9](https://github.com/informatievlaanderen/building-registry/commit/dfc43f9ab77017d1cf73451b72f32c3e40d5ef7e))
+* override InnerMapDomainException ([cce031c](https://github.com/informatievlaanderen/building-registry/commit/cce031ccb547dc900de328456a6f0d3a89fc84bd))
+* use BasisRegisters.Sqs package ([2dcb7ef](https://github.com/informatievlaanderen/building-registry/commit/2dcb7efb5d7396a827e005feb82cec07faeb7342))
+
 ## [3.39.1](https://github.com/informatievlaanderen/building-registry/compare/v3.39.0...v3.39.1) (2022-10-26)
 
 
