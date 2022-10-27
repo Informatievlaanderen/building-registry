@@ -55,8 +55,8 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenCorrectingBuildingUnitRealiz
                 .Result
                 .Where(x =>
                     x.Errors.Any(
-                        failure => failure.ErrorCode == "GebouwNietgerealiseerdOfGehistoreerd"
-                                    && failure.ErrorMessage == "Deze actie is enkel toegestaan voor een 'gepland' of 'gerealiseerd' gebouw."));
+                        failure => failure.ErrorCode == "GebouwStatusNietInGeplandOfGerealiseerd"
+                                   && failure.ErrorMessage == "Deze actie is enkel toegestaan binnen een gepland of gerealiseerd gebouw."));
         }
     }
 }
