@@ -71,11 +71,15 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.BuildingUnit
             return buildingUnit.LastEventHash;
         }
 
-        protected override Task HandleAggregateIdIsNotFoundException(
+        protected override async Task HandleAggregateIdIsNotFoundException(
             TSqsLambdaRequest request,
             CancellationToken cancellationToken)
         {
-            return Task.CompletedTask;
+            await Ticketing.Error(request.TicketId,
+                new TicketError(
+                    ValidationErrorMessages.BuildingUnit.BuildingNotFound,
+                    ValidationErrorCodes.BuildingUnit.BuildingNotFound),
+                cancellationToken);
         }
 
         protected abstract TicketError? InnerMapDomainException(DomainException exception, TSqsLambdaRequest request);
