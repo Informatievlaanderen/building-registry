@@ -435,6 +435,22 @@ namespace BuildingRegistry.Building
             AddOrUpdateStatusCommonBuildingUnit(addCommonBuildingUnit);
         }
 
+        public void RetireBuildingUnit(BuildingUnitPersistentLocalId buildingUnitPersistentLocalId)
+        {
+            GuardRemovedBuilding();
+
+            var buildingUnit = BuildingUnits.FirstOrDefault(x => x.BuildingUnitPersistentLocalId == buildingUnitPersistentLocalId);
+
+            if (buildingUnit is null)
+            {
+                throw new BuildingUnitIsNotFoundException(
+                    BuildingPersistentLocalId,
+                    buildingUnitPersistentLocalId);
+            }
+
+            buildingUnit.Retire();
+        }
+
         private void GuardRemovedBuilding()
         {
             if (IsRemoved)

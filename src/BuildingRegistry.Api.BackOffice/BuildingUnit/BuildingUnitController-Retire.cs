@@ -27,27 +27,24 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
     public partial class BuildingUnitController
     {
         /// <summary>
-        /// Realiseer een gebouweenheid.
+        /// Hef een gebouweenheid op.
         /// </summary>
         /// <param name="options"></param>
         /// <param name="ifMatchHeaderValidator"></param>
-        /// <param name="validator"></param>
         /// <param name="request"></param>
         /// <param name="ifMatchHeaderValue"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        [HttpPost("{buildingUnitPersistentLocalId}/acties/realiseren")]
+        [HttpPost("{buildingUnitPersistentLocalId}/acties/opheffing")]
         [ProducesResponseType(StatusCodes.Status202Accepted)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-        [SwaggerResponseHeader(StatusCodes.Status202Accepted, "location", "string", "De url van de gerealiseerde gebouweenheid.")]
         [SwaggerResponseExample(StatusCodes.Status400BadRequest, typeof(BadRequestResponseExamples))]
         [SwaggerResponseExample(StatusCodes.Status500InternalServerError, typeof(InternalServerErrorResponseExamples))]
-        public async Task<IActionResult> Realize(
+        public async Task<IActionResult> Retire(
             [FromServices] IOptions<ResponseOptions> options,
             [FromServices] IIfMatchHeaderValidator ifMatchHeaderValidator,
-            [FromServices] IValidator<RealizeBuildingUnitRequest> validator,
-            [FromRoute] RealizeBuildingUnitRequest request,
+            [FromRoute] RetireBuildingUnitRequest request,
             [FromHeader(Name = "If-Match")] string? ifMatchHeaderValue,
             CancellationToken ct = default)
         {
@@ -62,7 +59,7 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
                 if (UseSqsToggle.FeatureEnabled)
                 {
                     var result = await Mediator.Send(
-                        new RealizeBuildingUnitSqsRequest
+                        new RetireBuildingUnitSqsRequest
                         {
                             Request = request,
                             Metadata = GetMetadata(),
@@ -109,14 +106,9 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
                         ValidationErrorMessages.BuildingUnit.BuildingUnitHasInvalidFunction),
 
                     BuildingUnitHasInvalidStatusException => CreateValidationException(
-                        ValidationErrorCodes.BuildingUnit.BuildingUnitCannotBeRealized,
+                        ValidationErrorCodes.BuildingUnit.BuildingUnitCannotBeRetired,
                         string.Empty,
-                        ValidationErrorMessages.BuildingUnit.BuildingUnitCannotBeRealized),
-
-                    BuildingHasInvalidStatusException => CreateValidationException(
-                        ValidationErrorCodes.BuildingUnit.BuildingStatusNotInRealized,
-                        string.Empty,
-                        ValidationErrorMessages.BuildingUnit.BuildingStatusNotInRealized),
+                        ValidationErrorMessages.BuildingUnit.BuildingUnitCannotBeRetired),
 
                     _ => new ValidationException(new List<ValidationFailure>
                         { new ValidationFailure(string.Empty, exception.Message) })
