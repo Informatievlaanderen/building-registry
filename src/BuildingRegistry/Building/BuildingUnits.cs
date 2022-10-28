@@ -7,6 +7,7 @@ namespace BuildingRegistry.Building
     {
         private IEnumerable<BuildingUnit> NotRemovedUnits => this.Where(x => !x.IsRemoved);
         public IEnumerable<BuildingUnit> PlannedBuildingUnits => NotRemovedUnits.Where(x => x.Status == BuildingUnitStatus.Planned);
+        public IEnumerable<BuildingUnit> RealizedBuildingUnits => NotRemovedUnits.Where(x => x.Status == BuildingUnitStatus.Realized);
         public IEnumerable<BuildingUnit> RetiredBuildingUnits => NotRemovedUnits.Where(x => x.Status == BuildingUnitStatus.Retired);
         public BuildingUnit CommonBuildingUnit => NotRemovedUnits.Single(x => x.Function == BuildingUnitFunction.Common);
 
