@@ -106,6 +106,11 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda
                         new RealizeBuildingUnitLambdaRequest(messageMetadata.MessageGroupId!, request),
                         cancellationToken);
                     break;
+                case RetireBuildingUnitSqsRequest request:
+                    await mediator.Send(
+                        new RetireBuildingUnitLambdaRequest(messageMetadata.MessageGroupId!, request),
+                        cancellationToken);
+                    break;
 
                 default:
                     throw new NotImplementedException(

@@ -25,6 +25,7 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.Building.Validators
             public const string BuildingNotFound = "GebouweenheidGebouwIdNietGekendValidatie";
             public const string BuildingStatusNotInRealized = "GebouwStatusNietInGerealiseerd";
             public const string BuildingUnitCannotBeRealized = "GebouweenheidGehistoreerdOfNietGerealiseerd";
+            public const string BuildingUnitCannotBeRetired = "GebouweenheidGeplandOfNietgerealiseerd";
             public const string BuildingUnitCannotBeCorrectedFromRealized = "GebouweenheidNietGerealiseerdOfGehistoreerd";
             public const string BuildingUnitCannotBeCorrectedFromNotRealizedToPlanned = "GebouweenheidGerealiseerdOfGehistoreerd";
             public const string BuildingUnitCannotBeCorrectedFromNotRealizedToPlannedBecauseOfInvalidBuildingStatus = "GebouwStatusNietInGeplandOfGerealiseerd";
@@ -67,6 +68,7 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.Building.Validators
             public const string BuildingStatusNotInRealized = "Deze actie is enkel toegestaan binnen een gerealiseerd gebouw.";
             public const string BuildingUnitCannotBeCorrectedFromRealized = "Deze actie is enkel toegestaan op gebouweenheden met status 'gerealiseerd'.";
             public const string BuildingUnitCannotBeRealized = "Deze actie is enkel toegestaan op gebouweenheden met status 'gepland'.";
+            public const string BuildingUnitCannotBeRetired = "Deze actie is enkel toegestaan op gebouweenheden met status 'gerealiseerd'.";
             public const string BuildingUnitCannotBeNotRealized = "Deze actie is enkel toegestaan op gebouweenheden met status 'gepland'.";
             public const string BuildingUnitCannotBeCorrectedFromNotRealizedToPlanned = "Deze actie is enkel toegestaan op gebouweenheden met status 'nietGerealiseerd'.";
             public const string BuildingUnitCannotBeCorrectedFromNotRealizedToPlannedBecauseOfInvalidBuildingStatus = "Deze actie is enkel toegestaan binnen een gepland of gerealiseerd gebouw.";

@@ -88,6 +88,18 @@ namespace BuildingRegistry.Building
 
                     building.CorrectNotRealizeBuildingUnit(addCommonBuildingUnit, message.Command.BuildingUnitPersistentLocalId);
                 });
+
+            For<RetireBuildingUnit>()
+                .AddSqlStreamStore(getStreamStore, getUnitOfWork, eventMapping, eventSerializer, getSnapshotStore)
+                .AddEventHash<RetireBuildingUnit, Building>(getUnitOfWork)
+                .AddProvenance(getUnitOfWork, provenanceFactory)
+                .Handle(async (message, ct) =>
+                {
+                    var streamId = new BuildingStreamId(message.Command.BuildingPersistentLocalId);
+                    var building = await buildingRepository().GetAsync(streamId, ct);
+
+                    building.RetireBuildingUnit(message.Command.BuildingUnitPersistentLocalId);
+                });
         }
     }
 }
