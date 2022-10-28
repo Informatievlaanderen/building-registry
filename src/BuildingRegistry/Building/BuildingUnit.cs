@@ -153,7 +153,7 @@ namespace BuildingRegistry.Building
             Apply(new BuildingUnitWasNotRealizedV2(_buildingPersistentLocalId, BuildingUnitPersistentLocalId));
         }
 
-        public void CorrectNotRealize()
+        public void CorrectNotRealize(BuildingGeometry buildingGeometry)
         {
             if (IsRemoved)
             {
@@ -175,7 +175,17 @@ namespace BuildingRegistry.Building
                 throw new BuildingUnitHasInvalidStatusException();
             }
 
-            Apply(new BuildingUnitWasCorrectedFromNotRealizedToPlanned(_buildingPersistentLocalId, BuildingUnitPersistentLocalId));
+            var correctedBuildingUnitPosition =
+                !buildingGeometry.Contains(BuildingUnitPosition.Geometry)
+                || (BuildingUnitPosition.GeometryMethod == BuildingUnitPositionGeometryMethod.DerivedFromObject
+                    && BuildingUnitPosition.Geometry != buildingGeometry.Center)
+                    ? buildingGeometry.Center
+                    : null;
+
+            Apply(new BuildingUnitWasCorrectedFromNotRealizedToPlanned(
+                _buildingPersistentLocalId,
+                BuildingUnitPersistentLocalId,
+                correctedBuildingUnitPosition));
         }
 
         public void NotRealizeBecauseBuildingWasNotRealized()

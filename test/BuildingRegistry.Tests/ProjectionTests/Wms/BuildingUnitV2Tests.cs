@@ -420,6 +420,11 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wms
                     item.Should().NotBeNull();
 
                     item!.Status.Should().Be(BuildingUnitStatus.Planned);
+                    if (!string.IsNullOrWhiteSpace(@event.DerivedExtendedWkbGeometry))
+                    {
+                        item.PositionMethod.Should().Be(BuildingUnitV2Projections.MapGeometryMethod(BuildingUnitPositionGeometryMethod.DerivedFromObject));
+                        item.Position.Should().BeEquivalentTo(@event.DerivedExtendedWkbGeometry.ToByteArray());
+                    }
                 });
         }
 
@@ -486,6 +491,11 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wms
                     item.Should().NotBeNull();
 
                     item!.Status.Should().Be(BuildingUnitStatus.Realized);
+                    if (!string.IsNullOrWhiteSpace(@event.DerivedExtendedWkbGeometry))
+                    {
+                        item.PositionMethod.Should().Be(BuildingUnitV2Projections.MapGeometryMethod(BuildingUnitPositionGeometryMethod.DerivedFromObject));
+                        item.Position.Should().BeEquivalentTo(@event.DerivedExtendedWkbGeometry.ToByteArray());
+                    }
                 });
         }
 

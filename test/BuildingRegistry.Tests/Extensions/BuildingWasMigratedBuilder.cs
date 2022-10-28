@@ -17,13 +17,14 @@ namespace BuildingRegistry.Tests.Extensions
     using BuildingUnitId = BuildingRegistry.Legacy.BuildingUnitId;
     using BuildingUnitPosition = BuildingRegistry.Legacy.BuildingUnitPosition;
     using BuildingUnitFunction = BuildingRegistry.Legacy.BuildingUnitFunction;
+    using BuildingUnitPositionGeometryMethod = BuildingRegistry.Legacy.BuildingUnitPositionGeometryMethod;
 
     public class BuildingWasMigratedBuilder
     {
         private readonly Fixture _fixture;
         private BuildingPersistentLocalId? _buildingPersistentLocalId;
         private BuildingStatus? _buildingStatus;
-        private bool _isBuildingRemoved = false;
+        private bool _isBuildingRemoved;
         private readonly List<BuildingUnit> _buildingUnits = new();
         private BuildingRegistry.Building.BuildingGeometry? _buildingGeometry;
 
@@ -71,8 +72,25 @@ namespace BuildingRegistry.Tests.Extensions
             BuildingRegistry.Legacy.BuildingUnitStatus status,
             BuildingUnitPersistentLocalId? buildingUnitPersistentLocalId = null,
             BuildingUnitFunction? function = null,
-            BuildingUnitPosition? position = null)
+            BuildingUnitPositionGeometryMethod? positionGeometryMethod = null,
+            ExtendedWkbGeometry? extendedWkbGeometry = null)
         {
+            var buildingGeometry = _buildingGeometry is not null
+                ? new BuildingGeometry(
+                    new ExtendedWkbGeometry(_buildingGeometry.Geometry.ToString()),
+                    _buildingGeometry.Method == BuildingRegistry.Building.BuildingGeometryMethod.Outlined
+                        ? BuildingGeometryMethod.Outlined
+                        : BuildingGeometryMethod.MeasuredByGrb)
+                : _fixture.Create<BuildingGeometry>();
+
+            var buildingUnitPosition =
+                function == BuildingUnitFunction.Common
+                || positionGeometryMethod is null || positionGeometryMethod == BuildingUnitPositionGeometryMethod.DerivedFromObject
+                    ? new BuildingUnitPosition(buildingGeometry.Center, BuildingUnitPositionGeometryMethod.DerivedFromObject)
+                    : extendedWkbGeometry is not null
+                        ? new BuildingUnitPosition(extendedWkbGeometry, BuildingUnitPositionGeometryMethod.AppointedByAdministrator)
+                        : _fixture.Create<BuildingUnitPosition>();
+
             _buildingUnits.Add(
                     new BuildingUnit(
                         _fixture.Create<BuildingUnitId>(),
@@ -80,17 +98,11 @@ namespace BuildingRegistry.Tests.Extensions
                             ? new PersistentLocalId(buildingUnitPersistentLocalId)
                             : _fixture.Create<PersistentLocalId>(),
                         function ?? BuildingUnitFunction.Unknown,
-                    status,
-                    new List<AddressPersistentLocalId>(),
-                    position ?? _fixture.Create<BuildingUnitPosition>(),
-                    _buildingGeometry is not null
-                        ? new BuildingGeometry(
-                            new ExtendedWkbGeometry(_buildingGeometry.Geometry.ToString()),
-                            _buildingGeometry.Method == BuildingRegistry.Building.BuildingGeometryMethod.Outlined
-                                ? BuildingGeometryMethod.Outlined
-                                : BuildingGeometryMethod.MeasuredByGrb)
-                        : _fixture.Create<BuildingGeometry>(),
-                    isRemoved: false));
+                        status,
+                        new List<AddressPersistentLocalId>(),
+                            buildingUnitPosition,
+                        buildingGeometry,
+                        isRemoved: false));
 
             return this;
         }

@@ -192,6 +192,12 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
                     itemV2 =>
                     {
                         UpdateStatus(itemV2, Planned);
+                        if (!string.IsNullOrWhiteSpace(message.Message.DerivedExtendedWkbGeometry))
+                        {
+                            var geometry = wkbReader.Read(message.Message.DerivedExtendedWkbGeometry.ToByteArray());
+                            UpdateGeometry(itemV2, geometry);
+                            MapGeometryMethod(BuildingUnitPositionGeometryMethod.DerivedFromObject);
+                        }
                         UpdateVersie(itemV2, message.Message.Provenance.Timestamp);
                     }, ct);
             });
@@ -212,6 +218,12 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
                     itemV2 =>
                     {
                         UpdateStatus(itemV2, Realized);
+                        if (!string.IsNullOrWhiteSpace(message.Message.DerivedExtendedWkbGeometry))
+                        {
+                            var geometry = wkbReader.Read(message.Message.DerivedExtendedWkbGeometry.ToByteArray());
+                            UpdateGeometry(itemV2, geometry);
+                            MapGeometryMethod(BuildingUnitPositionGeometryMethod.DerivedFromObject);
+                        }
                         UpdateVersie(itemV2, message.Message.Provenance.Timestamp);
                     }, ct);
             });

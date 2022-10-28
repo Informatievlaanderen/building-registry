@@ -7,7 +7,6 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenChangingBuildingOutline
     using Be.Vlaanderen.Basisregisters.AggregateSource;
     using Be.Vlaanderen.Basisregisters.AggregateSource.Snapshotting;
     using Be.Vlaanderen.Basisregisters.AggregateSource.Testing;
-    using Be.Vlaanderen.Basisregisters.GrAr.Common.NetTopology;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Building;
     using Building.Commands;
@@ -19,7 +18,6 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenChangingBuildingOutline
     using Xunit;
     using Xunit.Abstractions;
     using BuildingUnitFunction = BuildingRegistry.Legacy.BuildingUnitFunction;
-    using BuildingUnitPosition = BuildingRegistry.Legacy.BuildingUnitPosition;
     using BuildingUnitPositionGeometryMethod = BuildingRegistry.Legacy.BuildingUnitPositionGeometryMethod;
     using BuildingUnitStatus = BuildingRegistry.Legacy.BuildingUnitStatus;
     using ExtendedWkbGeometry = BuildingRegistry.Legacy.ExtendedWkbGeometry;
@@ -74,41 +72,26 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenChangingBuildingOutline
             var initialBuildingGeometry = new BuildingGeometry(
                 new BuildingRegistry.Building.ExtendedWkbGeometry(GeometryHelper.ValidPolygon.AsBinary()),
                 BuildingGeometryMethod.Outlined);
-            var initialBuildingUnitGeometry =
-                ExtendedWkbGeometry.CreateEWkb(new ExtendedWkbGeometry(GeometryHelper.ValidPolygon.AsBinary())
-                    .ToGeometry().CentroidWithinArea().AsBinary());
 
             var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
                 .WithBuildingGeometry(initialBuildingGeometry)
                 .WithBuildingUnit(
                     BuildingUnitStatus.Planned,
                     new BuildingUnitPersistentLocalId(1),
-                    BuildingUnitFunction.Unknown,
-                    new BuildingUnitPosition(
-                        initialBuildingUnitGeometry,
-                        BuildingUnitPositionGeometryMethod.DerivedFromObject))
+                    positionGeometryMethod: BuildingUnitPositionGeometryMethod.DerivedFromObject)
                 .WithBuildingUnit(
                     BuildingUnitStatus.Planned,
                     new BuildingUnitPersistentLocalId(2),
-                    BuildingUnitFunction.Unknown,
-                    new BuildingUnitPosition(
-                        // Because this building unit's position will not change, it should (already) be inside the new building geometry.
-                        new ExtendedWkbGeometry(changedBuildingUnitGeometry.ToString()),
-                        BuildingUnitPositionGeometryMethod.AppointedByAdministrator))
+                    positionGeometryMethod: BuildingUnitPositionGeometryMethod.AppointedByAdministrator,
+                    extendedWkbGeometry: new ExtendedWkbGeometry(changedBuildingUnitGeometry.ToString()))
                 .WithBuildingUnit(
                     BuildingUnitStatus.Realized,
                     new BuildingUnitPersistentLocalId(3),
-                    BuildingUnitFunction.Unknown,
-                    new BuildingUnitPosition(
-                        initialBuildingUnitGeometry,
-                        BuildingUnitPositionGeometryMethod.DerivedFromObject))
+                    positionGeometryMethod: BuildingUnitPositionGeometryMethod.DerivedFromObject)
                 .WithBuildingUnit(
                     BuildingUnitStatus.NotRealized,
                     new BuildingUnitPersistentLocalId(4),
-                    BuildingUnitFunction.Unknown,
-                    new BuildingUnitPosition(
-                        initialBuildingUnitGeometry,
-                        BuildingUnitPositionGeometryMethod.DerivedFromObject))
+                    positionGeometryMethod: BuildingUnitPositionGeometryMethod.DerivedFromObject)
                 .Build();
 
             Assert(new Scenario()
@@ -216,10 +199,8 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenChangingBuildingOutline
                 .WithBuildingUnit(
                     BuildingUnitStatus.Parse(buildingUnitStatus)!.Value,
                     new BuildingUnitPersistentLocalId(1),
-                    BuildingUnitFunction.Unknown,
-                    new BuildingUnitPosition(
-                        new ExtendedWkbGeometry(GeometryHelper.PointNotInPolygon.AsBinary()),
-                        BuildingUnitPositionGeometryMethod.AppointedByAdministrator))
+                    positionGeometryMethod: BuildingUnitPositionGeometryMethod.AppointedByAdministrator,
+                    extendedWkbGeometry: new ExtendedWkbGeometry(GeometryHelper.PointNotInPolygon.AsBinary()))
                 .Build();
 
             Assert(new Scenario()
@@ -239,41 +220,27 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenChangingBuildingOutline
             var initialBuildingGeometry = new BuildingGeometry(
                 new BuildingRegistry.Building.ExtendedWkbGeometry(GeometryHelper.ValidPolygon.AsBinary()),
                 BuildingGeometryMethod.Outlined);
-            var initialBuildingUnitGeometry =
-                ExtendedWkbGeometry.CreateEWkb(new ExtendedWkbGeometry(GeometryHelper.ValidPolygon.AsBinary())
-                    .ToGeometry().CentroidWithinArea().AsBinary());
 
             var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
                 .WithBuildingGeometry(initialBuildingGeometry)
                 .WithBuildingUnit(
                     BuildingUnitStatus.Planned,
                     new BuildingUnitPersistentLocalId(1),
-                    BuildingUnitFunction.Unknown,
-                    new BuildingUnitPosition(
-                        initialBuildingUnitGeometry,
-                        BuildingUnitPositionGeometryMethod.DerivedFromObject))
+                    positionGeometryMethod: BuildingUnitPositionGeometryMethod.DerivedFromObject)
                 .WithBuildingUnit(
                     BuildingUnitStatus.Planned,
                     new BuildingUnitPersistentLocalId(2),
-                    BuildingUnitFunction.Unknown,
-                    new BuildingUnitPosition(
-                        // Because this building unit's position will not change, it should (already) be inside the new building geometry.
-                        new ExtendedWkbGeometry(changedBuildingUnitGeometry.ToString()),
-                        BuildingUnitPositionGeometryMethod.AppointedByAdministrator))
+                    positionGeometryMethod: BuildingUnitPositionGeometryMethod.AppointedByAdministrator,
+                    extendedWkbGeometry: new ExtendedWkbGeometry(changedBuildingUnitGeometry.ToString()))
                 .WithBuildingUnit(
                     BuildingUnitStatus.Realized,
                     new BuildingUnitPersistentLocalId(3),
-                    BuildingUnitFunction.Unknown,
-                    new BuildingUnitPosition(
-                        initialBuildingUnitGeometry,
-                        BuildingUnitPositionGeometryMethod.DerivedFromObject))
+                    positionGeometryMethod: BuildingUnitPositionGeometryMethod.DerivedFromObject)
                 .WithBuildingUnit(
                     BuildingUnitStatus.NotRealized,
                     new BuildingUnitPersistentLocalId(4),
                     BuildingUnitFunction.Unknown,
-                    new BuildingUnitPosition(
-                        initialBuildingUnitGeometry,
-                        BuildingUnitPositionGeometryMethod.DerivedFromObject))
+                    positionGeometryMethod: BuildingUnitPositionGeometryMethod.DerivedFromObject)
                 .Build();
 
             var sut = new BuildingFactory(NoSnapshotStrategy.Instance).Create();
@@ -292,11 +259,11 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenChangingBuildingOutline
                 x.BuildingUnitPersistentLocalId == new BuildingUnitPersistentLocalId(3));
 
             plannedBuildingUnit.BuildingUnitPosition.Should().Be(
-                new BuildingRegistry.Building.BuildingUnitPosition(
+                new BuildingUnitPosition(
                     changedBuildingUnitGeometry,
                     BuildingRegistry.Building.BuildingUnitPositionGeometryMethod.DerivedFromObject));
             realizedBuildingUnit.BuildingUnitPosition.Should().Be(
-                new BuildingRegistry.Building.BuildingUnitPosition(
+                new BuildingUnitPosition(
                     changedBuildingUnitGeometry,
                     BuildingRegistry.Building.BuildingUnitPositionGeometryMethod.DerivedFromObject));
         }
