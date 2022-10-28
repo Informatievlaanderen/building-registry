@@ -36,6 +36,21 @@ namespace BuildingRegistry.Tests.Extensions
             return updatedEvent;
         }
 
+        public static BuildingUnitWasPlannedV2 WithPosition(this BuildingUnitWasPlannedV2 @event,
+            BuildingUnitPosition position)
+        {
+            var updatedEvent = new BuildingUnitWasPlannedV2(
+                new BuildingPersistentLocalId(@event.BuildingPersistentLocalId),
+                new BuildingUnitPersistentLocalId(@event.BuildingUnitPersistentLocalId),
+                position.GeometryMethod,
+                position.Geometry,
+                BuildingUnitFunction.Parse(@event.Function),
+                @event.HasDeviation);
+            ((ISetProvenance)updatedEvent).SetProvenance(@event.Provenance.ToProvenance());
+
+            return updatedEvent;
+        }
+
         public static BuildingUnitWasPlannedV2 WithGeometryMethod(this BuildingUnitWasPlannedV2 @event,
             BuildingUnitPositionGeometryMethod buildingUnitPositionGeometryMethod)
         {

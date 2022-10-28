@@ -12,6 +12,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitNotRea
     using Building.Commands;
     using Building.Events;
     using Building.Exceptions;
+    using Extensions;
     using Fixtures;
     using FluentAssertions;
     using Xunit;
@@ -32,21 +33,94 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitNotRea
         }
 
         [Fact]
-        public void WhenNotRealizedBuildingUnit_ThenBuildingUnitWasPlanned()
+        public void WhenNotRealizedBuildingUnit_ThenBuildingUnitWasCorrectedToPlanned()
+        {
+            var command = Fixture.Create<CorrectBuildingUnitNotRealization>();
+
+            var buildingExtendedWkbGeometry = new ExtendedWkbGeometry(GeometryHelper.ValidPolygon.AsBinary());
+            var buildingGeometry = new BuildingGeometry(
+                buildingExtendedWkbGeometry,
+                BuildingGeometryMethod.Outlined);
+
+            Assert(new Scenario()
+                .Given(
+                    new BuildingStreamId(Fixture.Create<BuildingPersistentLocalId>()),
+                    Fixture.Create<BuildingWasPlannedV2>()
+                        .WithGeometry(buildingExtendedWkbGeometry),
+                    Fixture.Create<BuildingWasRealizedV2>(),
+                    Fixture.Create<BuildingUnitWasPlannedV2>()
+                        .WithFunction(BuildingUnitFunction.Unknown)
+                        .WithPosition(
+                            new BuildingUnitPosition(buildingGeometry.Center,
+                                BuildingUnitPositionGeometryMethod.AppointedByAdministrator)),
+                    Fixture.Create<BuildingUnitWasNotRealizedV2>())
+                .When(command)
+                .Then(
+                    new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
+                    new BuildingUnitWasCorrectedFromNotRealizedToPlanned(
+                        command.BuildingPersistentLocalId,
+                        command.BuildingUnitPersistentLocalId,
+                        null))));
+        }
+
+        [Fact]
+        public void WithPositionDerivedFromObject_ThenBuildingUnitWasCorrectedToPlannedAndPositionCorrected()
+        {
+            var command = Fixture.Create<CorrectBuildingUnitNotRealization>();
+
+            var buildingGeometry = new ExtendedWkbGeometry(GeometryHelper.SecondValidPolygon.AsBinary());
+            var expectedPosition = new BuildingGeometry(buildingGeometry, BuildingGeometryMethod.Outlined).Center;
+
+            Assert(new Scenario()
+                .Given(
+                    new BuildingStreamId(Fixture.Create<BuildingPersistentLocalId>()),
+                    Fixture.Create<BuildingWasPlannedV2>()
+                        .WithGeometry(buildingGeometry),
+                    Fixture.Create<BuildingWasRealizedV2>(),
+                    Fixture.Create<BuildingUnitWasPlannedV2>()
+                        .WithFunction(BuildingUnitFunction.Unknown)
+                        .WithPosition(
+                            new BuildingUnitPosition(
+                                new ExtendedWkbGeometry(GeometryHelper.PointNotInPolygon.AsBinary()),
+                                BuildingUnitPositionGeometryMethod.DerivedFromObject)),
+                    Fixture.Create<BuildingUnitWasNotRealizedV2>())
+                .When(command)
+                .Then(
+                    new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
+                    new BuildingUnitWasCorrectedFromNotRealizedToPlanned(
+                        command.BuildingPersistentLocalId,
+                        command.BuildingUnitPersistentLocalId,
+                        expectedPosition))));
+        }
+
+        [Fact]
+        public void WithPositionAppointedByAdminAndOutsideOfBuildingGeometry_ThenBuildingUnitWasCorrectedToPlannedAndPositionCorrected()
         {
             var command = Fixture.Create<CorrectBuildingUnitNotRealization>();
 
             Assert(new Scenario()
                 .Given(
                     new BuildingStreamId(Fixture.Create<BuildingPersistentLocalId>()),
-                    Fixture.Create<BuildingWasPlannedV2>(),
+                    Fixture.Create<BuildingWasPlannedV2>()
+                        .WithGeometry(new ExtendedWkbGeometry(GeometryHelper.SecondValidPolygon.AsBinary())),
                     Fixture.Create<BuildingWasRealizedV2>(),
-                    Fixture.Create<BuildingUnitWasPlannedV2>(),
+                    Fixture.Create<BuildingUnitWasPlannedV2>()
+                        .WithFunction(BuildingUnitFunction.Unknown)
+                        .WithPosition(
+                            new BuildingUnitPosition(
+                                new ExtendedWkbGeometry(GeometryHelper.PointNotInPolygon.AsBinary()),
+                                BuildingUnitPositionGeometryMethod.AppointedByAdministrator)),
                     Fixture.Create<BuildingUnitWasNotRealizedV2>())
                 .When(command)
                 .Then(
                     new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
-                    new BuildingUnitWasCorrectedFromNotRealizedToPlanned(command.BuildingPersistentLocalId, command.BuildingUnitPersistentLocalId))));
+                    new BuildingUnitWasCorrectedFromNotRealizedToPlanned(
+                        command.BuildingPersistentLocalId,
+                        command.BuildingUnitPersistentLocalId,
+                        new BuildingGeometry(
+                                new ExtendedWkbGeometry(GeometryHelper.SecondValidPolygon.AsBinary()),
+                                BuildingGeometryMethod.Outlined)
+                            .Center))));
         }
 
         [Fact]

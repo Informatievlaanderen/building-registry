@@ -42,6 +42,7 @@ namespace BuildingRegistry.Building
             Register<BuildingUnitWasNotRealizedBecauseBuildingWasNotRealized>(When);
             Register<BuildingUnitWasCorrectedFromNotRealizedToPlanned>(When);
             Register<BuildingUnitWasRetiredV2>(When);
+            Register<BuildingUnitWasCorrectedFromRetiredToRealized>(When);
             Register<CommonBuildingUnitWasAddedV2>(When);
             Register<BuildingUnitPositionWasCorrected>(When);
         }
@@ -121,12 +122,33 @@ namespace BuildingRegistry.Building
         {
             Status = BuildingUnitStatus.Planned;
 
+            if (!string.IsNullOrWhiteSpace(@event.DerivedExtendedWkbGeometry))
+            {
+                BuildingUnitPosition = new BuildingUnitPosition(
+                    new ExtendedWkbGeometry(@event.DerivedExtendedWkbGeometry),
+                    BuildingUnitPositionGeometryMethod.DerivedFromObject);
+            }
+
             _lastEvent = @event;
         }
 
         private void When(BuildingUnitWasRetiredV2 @event)
         {
             Status = BuildingUnitStatus.Retired;
+
+            _lastEvent = @event;
+        }
+
+        private void When(BuildingUnitWasCorrectedFromRetiredToRealized @event)
+        {
+            Status = BuildingUnitStatus.Realized;
+
+            if (!string.IsNullOrWhiteSpace(@event.DerivedExtendedWkbGeometry))
+            {
+                BuildingUnitPosition = new BuildingUnitPosition(
+                    new ExtendedWkbGeometry(@event.DerivedExtendedWkbGeometry),
+                    BuildingUnitPositionGeometryMethod.DerivedFromObject);
+            }
 
             _lastEvent = @event;
         }

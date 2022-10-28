@@ -346,20 +346,25 @@ namespace BuildingRegistry.Building
         private void UpdateStatusCommonBuildingUnit()
         {
             var commonBuildingUnit = _buildingUnits.CommonBuildingUnit;
+            var commonBuildingUnitPosition = commonBuildingUnit.BuildingUnitPosition.Geometry != BuildingGeometry.Center
+                ? BuildingGeometry.Center
+                : null;
 
             if ((BuildingStatus == BuildingStatus.Planned || BuildingStatus == BuildingStatus.UnderConstruction)
                 && commonBuildingUnit.Status == BuildingUnitStatus.NotRealized)
             {
                 ApplyChange(new BuildingUnitWasCorrectedFromNotRealizedToPlanned(
                     BuildingPersistentLocalId,
-                    commonBuildingUnit.BuildingUnitPersistentLocalId));
+                    commonBuildingUnit.BuildingUnitPersistentLocalId,
+                    commonBuildingUnitPosition));
             }
 
             if (BuildingStatus == BuildingStatus.Realized && commonBuildingUnit.Status == BuildingUnitStatus.NotRealized)
             {
                 ApplyChange(new BuildingUnitWasCorrectedFromNotRealizedToPlanned(
                     BuildingPersistentLocalId,
-                    commonBuildingUnit.BuildingUnitPersistentLocalId));
+                    commonBuildingUnit.BuildingUnitPersistentLocalId,
+                    commonBuildingUnitPosition));
                 ApplyChange(new BuildingUnitWasRealizedV2(
                     BuildingPersistentLocalId,
                     commonBuildingUnit.BuildingUnitPersistentLocalId));
@@ -369,7 +374,8 @@ namespace BuildingRegistry.Building
             {
                 ApplyChange(new BuildingUnitWasCorrectedFromRetiredToRealized(
                     BuildingPersistentLocalId,
-                    commonBuildingUnit.BuildingUnitPersistentLocalId));
+                    commonBuildingUnit.BuildingUnitPersistentLocalId,
+                    commonBuildingUnitPosition));
             }
         }
 
@@ -475,7 +481,7 @@ namespace BuildingRegistry.Building
                     buildingUnitPersistentLocalId);
             }
 
-            buildingUnit.CorrectNotRealize();
+            buildingUnit.CorrectNotRealize(BuildingGeometry);
 
             AddOrUpdateStatusCommonBuildingUnit(addCommonBuildingUnit);
         }

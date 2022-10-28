@@ -139,6 +139,13 @@ namespace BuildingRegistry.Projections.Wms.BuildingUnitV2
             {
                 var unit = await context.BuildingUnitsV2.FindAsync(message.Message.BuildingUnitPersistentLocalId);
                 unit!.Status = BuildingUnitStatus.Planned;
+                if (!string.IsNullOrWhiteSpace(message.Message.DerivedExtendedWkbGeometry))
+                {
+                    SetPosition(
+                        unit,
+                        message.Message.DerivedExtendedWkbGeometry,
+                        MapGeometryMethod(BuildingUnitPositionGeometryMethod.DerivedFromObject));
+                }
 
                 SetVersion(unit, message.Message.Provenance.Timestamp);
             });
@@ -155,6 +162,13 @@ namespace BuildingRegistry.Projections.Wms.BuildingUnitV2
             {
                 var unit = await context.BuildingUnitsV2.FindAsync(message.Message.BuildingUnitPersistentLocalId);
                 unit!.Status = BuildingUnitStatus.Realized;
+                if (!string.IsNullOrWhiteSpace(message.Message.DerivedExtendedWkbGeometry))
+                {
+                    SetPosition(
+                        unit,
+                        message.Message.DerivedExtendedWkbGeometry,
+                        MapGeometryMethod(BuildingUnitPositionGeometryMethod.DerivedFromObject));
+                }
 
                 SetVersion(unit, message.Message.Provenance.Timestamp);
             });
