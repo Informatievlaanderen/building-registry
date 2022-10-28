@@ -66,6 +66,15 @@ namespace BuildingRegistry.Projections.Wfs.BuildingV2
                 await context.BuildingsV2.AddAsync(buildingV2, ct);
             });
 
+            When<Envelope<BuildingOutlineWasChanged>>(async (context, message, ct) =>
+            {
+                var item = await context.BuildingsV2.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);
+                SetGeometry(
+                    item, message.Message.ExtendedWkbGeometryBuilding,
+                    MapGeometryMethod(BuildingGeometryMethod.Outlined));
+                item.Version = message.Message.Provenance.Timestamp;
+            });
+
             When<Envelope<BuildingBecameUnderConstructionV2>>(async (context, message, ct) =>
             {
                 var item = await context.BuildingsV2.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);

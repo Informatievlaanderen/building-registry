@@ -16,6 +16,7 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.Building.Validators
 
             public const string BuildingIsMeasuredByGrb = "GebouwGeometrieMethodeIngemetenGRB";
             public const string BuildingHasRetiredBuildingUnits = "GebouwBevatGehistoreerdeGebouweenheden";
+            public const string BuildingHasBuildingUnitsOutsideChangedGeometry = "GebouweenheidGeomtrieBuitenGebouwGeometrie";
         }
 
         public static class BuildingUnit
@@ -54,6 +55,7 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.Building.Validators
 
             public const string BuildingIsMeasuredByGrb = "Deze actie is enkel toegestaan op gebouwen met geometrieMethode 'ingeschetst'.";
             public const string BuildingHasRetiredBuildingUnits = "Deze actie is niet toegestaan wanneer er gehistoreerde gebouweenheden aanwezig zijn.";
+            public const string BuildingHasBuildingUnitsOutsideChangedGeometry = "Het gebouw heeft onderliggende gebouweenheden buiten de nieuw geschetste gebouwgeometrie.";
         }
 
         public static class BuildingUnit
