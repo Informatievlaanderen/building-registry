@@ -100,7 +100,8 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenNotRealizingBuildingUnit
             var command = Fixture.Create<NotRealizeBuildingUnit>();
 
             var commonBuildingUnitWasAddedV2 = Fixture.Create<CommonBuildingUnitWasAddedV2>()
-                .WithBuildingUnitStatus(BuildingUnitStatus.Planned);
+                .WithBuildingUnitStatus(BuildingUnitStatus.Planned)
+                .WithBuildingUnitPersistentLocalId(new BuildingUnitPersistentLocalId(1));
 
             Assert(new Scenario()
                 .Given(
@@ -110,7 +111,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenNotRealizingBuildingUnit
                     Fixture.Create<BuildingUnitWasPlannedV2>()
                         .WithFunction(BuildingUnitFunction.Unknown),
                     Fixture.Create<BuildingUnitWasPlannedV2>()
-                        .WithBuildingUnitPersistentLocalId(new BuildingUnitPersistentLocalId(1))
+                        .WithBuildingUnitPersistentLocalId(new BuildingUnitPersistentLocalId(2))
                         .WithFunction(BuildingUnitFunction.Unknown),
                     commonBuildingUnitWasAddedV2)
                 .When(command)
@@ -133,7 +134,8 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenNotRealizingBuildingUnit
             var command = Fixture.Create<NotRealizeBuildingUnit>();
 
             var commonBuildingUnitWasAddedV2 = Fixture.Create<CommonBuildingUnitWasAddedV2>()
-                .WithBuildingUnitStatus(BuildingUnitStatus.Realized);
+                .WithBuildingUnitStatus(BuildingUnitStatus.Realized)
+                .WithBuildingUnitPersistentLocalId(new BuildingUnitPersistentLocalId(1));
 
             Assert(new Scenario()
                 .Given(
@@ -143,7 +145,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenNotRealizingBuildingUnit
                     Fixture.Create<BuildingUnitWasPlannedV2>()
                         .WithFunction(BuildingUnitFunction.Unknown),
                     Fixture.Create<BuildingUnitWasPlannedV2>()
-                        .WithBuildingUnitPersistentLocalId(new BuildingUnitPersistentLocalId(1))
+                        .WithBuildingUnitPersistentLocalId(new BuildingUnitPersistentLocalId(2))
                         .WithFunction(BuildingUnitFunction.Unknown),
                     commonBuildingUnitWasAddedV2)
                 .When(command)
@@ -168,7 +170,8 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenNotRealizingBuildingUnit
             var command = Fixture.Create<NotRealizeBuildingUnit>();
 
             var commonBuildingUnitWasAddedV2 = Fixture.Create<CommonBuildingUnitWasAddedV2>()
-                .WithBuildingUnitStatus(BuildingUnitStatus.Parse(buildingUnitStatus));
+                .WithBuildingUnitStatus(BuildingUnitStatus.Parse(buildingUnitStatus))
+                .WithBuildingUnitPersistentLocalId(new BuildingUnitPersistentLocalId(1));
 
             Assert(new Scenario()
                 .Given(
@@ -178,10 +181,10 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenNotRealizingBuildingUnit
                     Fixture.Create<BuildingUnitWasPlannedV2>()
                         .WithFunction(BuildingUnitFunction.Unknown),
                     Fixture.Create<BuildingUnitWasPlannedV2>()
-                        .WithBuildingUnitPersistentLocalId(new BuildingUnitPersistentLocalId(1))
+                        .WithBuildingUnitPersistentLocalId(new BuildingUnitPersistentLocalId(3))
                         .WithFunction(BuildingUnitFunction.Unknown),
                     Fixture.Create<BuildingUnitWasPlannedV2>()
-                        .WithBuildingUnitPersistentLocalId(new BuildingUnitPersistentLocalId(1))
+                        .WithBuildingUnitPersistentLocalId(new BuildingUnitPersistentLocalId(4))
                         .WithFunction(BuildingUnitFunction.Unknown),
                     commonBuildingUnitWasAddedV2)
                 .When(command)
@@ -247,7 +250,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenNotRealizingBuildingUnit
                     new BuildingUnit(
                         Fixture.Create<BuildingRegistry.Legacy.BuildingUnitId>(),
                         Fixture.Create<BuildingRegistry.Legacy.PersistentLocalId>(),
-                        BuildingRegistry.Legacy.BuildingUnitFunction.Unknown, 
+                        BuildingRegistry.Legacy.BuildingUnitFunction.Unknown,
                         BuildingRegistry.Legacy.BuildingUnitStatus.Parse(status) ?? throw new ArgumentException(),
                         new List<AddressPersistentLocalId>(),
                         Fixture.Create<BuildingRegistry.Legacy.BuildingUnitPosition>(),
@@ -272,14 +275,15 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenNotRealizingBuildingUnit
 
             var buildingWasPlanned = Fixture.Create<BuildingWasPlannedV2>();
             ((ISetProvenance)buildingWasPlanned).SetProvenance(Fixture.Create<Provenance>());
-            var buildingUnitWasPlanned = Fixture.Create<BuildingUnitWasPlannedV2>();
+            var buildingUnitWasPlanned = Fixture.Create<BuildingUnitWasPlannedV2>()
+                .WithBuildingUnitPersistentLocalId(new BuildingUnitPersistentLocalId(1));
             ((ISetProvenance)buildingUnitWasPlanned).SetProvenance(Fixture.Create<Provenance>());
             var secondBuildingUnitWasPlanned = Fixture.Create<BuildingUnitWasPlannedV2>()
-                .WithBuildingUnitPersistentLocalId(new BuildingUnitPersistentLocalId(1));
+                .WithBuildingUnitPersistentLocalId(new BuildingUnitPersistentLocalId(2));
             ((ISetProvenance)secondBuildingUnitWasPlanned).SetProvenance(Fixture.Create<Provenance>());
             var commonBuildingUnitWasAdded = Fixture.Create<CommonBuildingUnitWasAddedV2>()
                 .WithBuildingUnitStatus(BuildingUnitStatus.Realized)
-                .WithBuildingUnitPersistentLocalId(new BuildingUnitPersistentLocalId(2));
+                .WithBuildingUnitPersistentLocalId(new BuildingUnitPersistentLocalId(3));
             ((ISetProvenance)commonBuildingUnitWasAdded).SetProvenance(Fixture.Create<Provenance>());
 
             // Act

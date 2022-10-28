@@ -33,6 +33,7 @@ namespace BuildingRegistry.Building
             Register<BuildingWasMigrated>(When);
 
             Register<BuildingUnitWasPlannedV2>(When);
+            Register<BuildingOutlineWasChanged>(When);
             Register<BuildingUnitWasRealizedV2>(When);
             Register<BuildingUnitWasRealizedBecauseBuildingWasRealized>(When);
             Register<BuildingUnitWasCorrectedFromRealizedToPlanned>(When);
@@ -60,6 +61,15 @@ namespace BuildingRegistry.Building
                 BuildingUnitPositionGeometryMethod.Parse(@event.GeometryMethod));
 
             HasDeviation = @event.HasDeviation;
+
+            _lastEvent = @event;
+        }
+
+        private void When(BuildingOutlineWasChanged @event)
+        {
+            BuildingUnitPosition = new BuildingUnitPosition(
+                new ExtendedWkbGeometry(@event.ExtendedWkbGeometryBuildingUnits!),
+                BuildingUnitPositionGeometryMethod.DerivedFromObject);
 
             _lastEvent = @event;
         }

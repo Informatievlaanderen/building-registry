@@ -50,6 +50,51 @@ namespace BuildingRegistry.Building
             return newBuilding;
         }
 
+        public void ChangeOutlining(ExtendedWkbGeometry extendedWkbGeometry)
+        {
+            GuardRemovedBuilding();
+
+            if (BuildingGeometry.Method != BuildingGeometryMethod.Outlined)
+            {
+                throw new BuildingHasInvalidBuildingGeometryMethodException();
+            }
+
+            if (BuildingGeometry.Geometry == extendedWkbGeometry)
+            {
+                return;
+            }
+
+            var newBuildingGeometry = new BuildingGeometry(extendedWkbGeometry, BuildingGeometryMethod.Outlined);
+            var plannedOrRealizedBuildingUnits = _buildingUnits.PlannedBuildingUnits
+                .Concat(_buildingUnits.RealizedBuildingUnits)
+                .ToList();
+
+            var buildingUnitsOutsideOfBuildingOutlining = plannedOrRealizedBuildingUnits
+                .Where(x =>
+                    x.BuildingUnitPosition.GeometryMethod == BuildingUnitPositionGeometryMethod.AppointedByAdministrator
+                    && !newBuildingGeometry.Contains(x.BuildingUnitPosition.Geometry));
+
+            if (buildingUnitsOutsideOfBuildingOutlining.Any())
+            {
+                throw new BuildingUnitPositionIsOutsideBuildingGeometryException();
+            }
+
+            var buildingUnitsWithPositionDerivedFromBuilding = plannedOrRealizedBuildingUnits
+                .Where(x => x.BuildingUnitPosition.GeometryMethod == BuildingUnitPositionGeometryMethod.DerivedFromObject)
+                .Select(x => x.BuildingUnitPersistentLocalId)
+                .ToList();
+
+            var buildingUnitsPosition = plannedOrRealizedBuildingUnits.Any()
+                ? newBuildingGeometry.Center
+                : null;
+
+            ApplyChange(new BuildingOutlineWasChanged(
+                BuildingPersistentLocalId,
+                buildingUnitsWithPositionDerivedFromBuilding,
+                extendedWkbGeometry,
+                buildingUnitsPosition));
+        }
+
         public void PlaceUnderConstruction()
         {
             GuardRemovedBuilding();
