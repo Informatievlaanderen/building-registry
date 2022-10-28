@@ -72,6 +72,18 @@ namespace BuildingRegistry.Building
                     buildingRepository().Add(streamId, newBuilding);
                 });
 
+            For<ChangeBuildingOutline>()
+                .AddSqlStreamStore(getStreamStore, getUnitOfWork, eventMapping, eventSerializer, getSnapshotStore)
+                .AddEventHash<ChangeBuildingOutline, Building>(getUnitOfWork)
+                .AddProvenance(getUnitOfWork, provenanceFactory)
+                .Handle(async (message, ct) =>
+                {
+                    var streamId = new BuildingStreamId(message.Command.BuildingPersistentLocalId);
+                    var building = await buildingRepository().GetAsync(streamId, ct);
+
+                    building.ChangeOutlining(message.Command.Geometry);
+                });
+
             For<PlaceBuildingUnderConstruction>()
                 .AddSqlStreamStore(getStreamStore, getUnitOfWork, eventMapping, eventSerializer, getSnapshotStore)
                 .AddEventHash<PlaceBuildingUnderConstruction, Building>(getUnitOfWork)
