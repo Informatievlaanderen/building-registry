@@ -1,4 +1,4 @@
-﻿namespace BuildingRegistry.Tests.Extensions
+namespace BuildingRegistry.Tests.Extensions
 {
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Building;
@@ -30,6 +30,21 @@
                 BuildingUnitPositionGeometryMethod.Parse(@event.GeometryMethod),
                 new ExtendedWkbGeometry(@event.ExtendedWkbGeometry),
                 function,
+                @event.HasDeviation);
+            ((ISetProvenance)updatedEvent).SetProvenance(@event.Provenance.ToProvenance());
+
+            return updatedEvent;
+        }
+
+        public static BuildingUnitWasPlannedV2 WithGeometryMethod(this BuildingUnitWasPlannedV2 @event,
+            BuildingUnitPositionGeometryMethod buildingUnitPositionGeometryMethod)
+        {
+            var updatedEvent = new BuildingUnitWasPlannedV2(
+                new BuildingPersistentLocalId(@event.BuildingPersistentLocalId),
+                new BuildingUnitPersistentLocalId(@event.BuildingUnitPersistentLocalId),
+                buildingUnitPositionGeometryMethod,
+                new ExtendedWkbGeometry(@event.ExtendedWkbGeometry),
+                BuildingUnitFunction.Parse(@event.Function),
                 @event.HasDeviation);
             ((ISetProvenance)updatedEvent).SetProvenance(@event.Provenance.ToProvenance());
 

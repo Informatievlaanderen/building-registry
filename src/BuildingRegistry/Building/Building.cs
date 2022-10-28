@@ -435,6 +435,43 @@ namespace BuildingRegistry.Building
             AddOrUpdateStatusCommonBuildingUnit(addCommonBuildingUnit);
         }
 
+        public void CorrectPositionBuildingUnit(
+            BuildingUnitPersistentLocalId buildingUnitPersistentLocalId,
+            BuildingUnitPositionGeometryMethod positionGeometryMethod,
+            ExtendedWkbGeometry? position)
+        {
+            GuardRemovedBuilding();
+
+            var buildingUnit = BuildingUnits.FirstOrDefault(x => x.BuildingUnitPersistentLocalId == buildingUnitPersistentLocalId);
+
+            var invalidStatuses = new[]
+                {BuildingStatus.NotRealized, BuildingStatus.Retired};
+
+            if (invalidStatuses.Contains(BuildingStatus))
+            {
+                throw new BuildingHasInvalidStatusException();
+            }
+
+            if (buildingUnit is null)
+            {
+                throw new BuildingUnitIsNotFoundException(
+                    BuildingPersistentLocalId,
+                    buildingUnitPersistentLocalId);
+            }
+
+            // validate command
+            var finalPosition = positionGeometryMethod != BuildingUnitPositionGeometryMethod.AppointedByAdministrator
+                ? BuildingGeometry.Center
+                : position!;
+
+            if (!BuildingGeometry.Contains(finalPosition))
+            {
+                throw new BuildingUnitPositionIsOutsideBuildingGeometryException();
+            }
+
+            buildingUnit.CorrectPosition(positionGeometryMethod, finalPosition);
+        }
+
         public void RetireBuildingUnit(BuildingUnitPersistentLocalId buildingUnitPersistentLocalId)
         {
             GuardRemovedBuilding();

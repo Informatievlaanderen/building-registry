@@ -198,6 +198,33 @@ namespace BuildingRegistry.Building
             Apply(new BuildingUnitWasNotRealizedBecauseBuildingWasNotRealized(_buildingPersistentLocalId, BuildingUnitPersistentLocalId));
         }
 
+        public void CorrectPosition(BuildingUnitPositionGeometryMethod positionGeometryMethod, ExtendedWkbGeometry finalPosition)
+        {
+            if (IsRemoved)
+            {
+                throw new BuildingUnitIsRemovedException(BuildingUnitPersistentLocalId);
+            }
+
+            if (Function == BuildingUnitFunction.Common)
+            {
+                throw new BuildingUnitHasInvalidFunctionException();
+            }
+
+            var validStatuses = new[]
+                {BuildingUnitStatus.Planned, BuildingUnitStatus.Realized};
+
+            if (!validStatuses.Contains(Status))
+            {
+                throw new BuildingUnitHasInvalidStatusException();
+            }
+
+            Apply(new BuildingUnitPositionWasCorrected(
+                _buildingPersistentLocalId,
+                BuildingUnitPersistentLocalId,
+                positionGeometryMethod,
+                finalPosition));
+        }
+
         public void Retire()
         {
             if (IsRemoved)

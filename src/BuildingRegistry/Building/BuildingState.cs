@@ -52,6 +52,7 @@ namespace BuildingRegistry.Building
             Register<BuildingUnitWasNotRealizedBecauseBuildingWasNotRealized>(When);
             Register<BuildingUnitWasCorrectedFromNotRealizedToPlanned>(When);
             Register<BuildingUnitWasRetiredV2>(When);
+            Register<BuildingUnitPositionWasCorrected>(When);
             Register<CommonBuildingUnitWasAddedV2>(When);
 
             Register<BuildingSnapshot>(When);
@@ -202,6 +203,13 @@ namespace BuildingRegistry.Building
         private void When(BuildingUnitWasRetiredV2 @event)
         {
             var buildingUnit = BuildingUnits.First(x => x.BuildingUnitPersistentLocalId == @event.BuildingUnitPersistentLocalId);
+
+            buildingUnit.Route(@event);
+        }
+
+        private void When(BuildingUnitPositionWasCorrected @event)
+        {
+            var buildingUnit = BuildingUnits.Single(x => x.BuildingUnitPersistentLocalId == @event.BuildingUnitPersistentLocalId);
 
             buildingUnit.Route(@event);
         }
