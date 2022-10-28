@@ -134,6 +134,31 @@ namespace BuildingRegistry.Tests.ProjectionTests.Legacy
         }
 
         [Fact]
+        public async Task WhenBuildingOutlineWasChanged()
+        {
+            var buildingWasPlannedV2 = _fixture.Create<BuildingWasPlannedV2>();
+            var buildingOutlineWasChanged = _fixture.Create<BuildingOutlineWasChanged>();
+
+            await Sut
+                .Given(new Envelope<BuildingWasPlannedV2>(
+                        new Envelope(
+                            buildingWasPlannedV2,
+                            new Dictionary<string, object> { { AddEventHashPipe.HashMetadataKey, buildingWasPlannedV2.GetHash() } })),
+                    new Envelope<BuildingOutlineWasChanged>(
+                        new Envelope(
+                            buildingOutlineWasChanged,
+                            new Dictionary<string, object> { { AddEventHashPipe.HashMetadataKey, buildingOutlineWasChanged.GetHash() } })))
+                .Then(async ct =>
+                {
+                    var buildingDetailItemV2 = await ct.BuildingDetailsV2.FindAsync(buildingOutlineWasChanged.BuildingPersistentLocalId);
+                    buildingDetailItemV2.Should().NotBeNull();
+                    buildingDetailItemV2!.Version.Should().Be(buildingOutlineWasChanged.Provenance.Timestamp);
+
+                    buildingDetailItemV2.Geometry.Should().BeEquivalentTo(buildingOutlineWasChanged.ExtendedWkbGeometryBuilding.ToByteArray());
+                });
+        }
+
+        [Fact]
         public async Task WhenBuildingBecameUnderConstructionV2()
         {
             var buildingWasPlannedV2 = _fixture.Create<BuildingWasPlannedV2>();

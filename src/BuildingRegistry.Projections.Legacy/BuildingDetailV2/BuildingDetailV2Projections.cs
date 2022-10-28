@@ -50,6 +50,14 @@ namespace BuildingRegistry.Projections.Legacy.BuildingDetailV2
                     .AddAsync(building, ct);
             });
 
+            When<Envelope<BuildingOutlineWasChanged>>(async (context, message, ct) =>
+            {
+                var item = await context.BuildingDetailsV2.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);
+                item.Geometry = message.Message.ExtendedWkbGeometryBuilding.ToByteArray();
+                item.Version = message.Message.Provenance.Timestamp;
+                UpdateHash(item, message);
+            });
+
             When<Envelope<BuildingBecameUnderConstructionV2>>(async (context, message, ct) =>
             {
                 var item = await context.BuildingDetailsV2.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);

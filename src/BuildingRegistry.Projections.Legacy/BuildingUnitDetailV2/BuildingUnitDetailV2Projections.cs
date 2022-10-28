@@ -97,6 +97,18 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetailV2
                     , ct);
             });
 
+            When<Envelope<BuildingOutlineWasChanged>>(async (context, message, ct) =>
+            {
+                foreach (var buildingUnitPersistentLocalId in message.Message.BuildingUnitPersistentLocalIds)
+                {
+                    await Update(context, buildingUnitPersistentLocalId, item =>
+                    {
+                        item.Position = message.Message.ExtendedWkbGeometryBuildingUnits!.ToByteArray();
+                        item.PositionMethod = BuildingUnitPositionGeometryMethod.DerivedFromObject;
+                    }, ct);
+                }
+            });
+
             When<Envelope<BuildingUnitWasRealizedV2>>(async (context, message, ct) =>
             {
                 await Update(context, message.Message.BuildingUnitPersistentLocalId, item =>

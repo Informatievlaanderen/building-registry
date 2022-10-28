@@ -65,6 +65,12 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda
                         cancellationToken);
                     break;
 
+                case ChangeBuildingOutlineSqsRequest request:
+                    await mediator.Send(
+                        new ChangeBuildingOutlineLambdaRequest(messageMetadata.MessageGroupId!, request),
+                        cancellationToken);
+                    break;
+
                 case RealizeBuildingSqsRequest request:
                     await mediator.Send(
                         new RealizeBuildingLambdaRequest(messageMetadata.MessageGroupId!, request),

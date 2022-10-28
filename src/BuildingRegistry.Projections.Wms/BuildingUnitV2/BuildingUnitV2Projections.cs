@@ -87,6 +87,20 @@ namespace BuildingRegistry.Projections.Wms.BuildingUnitV2
                 await context.BuildingUnitsV2.AddAsync(buildingUnitV2, ct);
             });
 
+            When<Envelope<BuildingOutlineWasChanged>>(async (context, message, ct) =>
+            {
+                foreach (var buildingUnitPersistentLocalId in message.Message.BuildingUnitPersistentLocalIds)
+                {
+                    var unit = await context.BuildingUnitsV2.FindAsync(buildingUnitPersistentLocalId);
+                    SetPosition(
+                        unit!,
+                        message.Message.ExtendedWkbGeometryBuildingUnits!,
+                        MapGeometryMethod(BuildingUnitPositionGeometryMethod.DerivedFromObject));
+
+                    SetVersion(unit!, message.Message.Provenance.Timestamp);
+                }
+            });
+
             When<Envelope<BuildingUnitWasRealizedV2>>(async (context, message, ct) =>
             {
                 var unit = await context.BuildingUnitsV2.FindAsync(message.Message.BuildingUnitPersistentLocalId);

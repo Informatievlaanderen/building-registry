@@ -889,6 +889,14 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
                     .AddAsync(newBuildingSyndicationItem, ct);
             });
 
+            When<Envelope<BuildingOutlineWasChanged>>(async (context, message, ct) =>
+            {
+                await context.CreateNewBuildingSyndicationItem(message.Message.BuildingPersistentLocalId, message, item =>
+                {
+                    item.Geometry = message.Message.ExtendedWkbGeometryBuilding.ToByteArray();
+                }, ct);
+            });
+
             When<Envelope<BuildingBecameUnderConstructionV2>>(async (context, message, ct) =>
             {
                 await context.CreateNewBuildingSyndicationItem(message.Message.BuildingPersistentLocalId, message, item =>

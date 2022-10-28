@@ -90,6 +90,18 @@ namespace BuildingRegistry.Projections.Wfs.BuildingUnitV2
                 await context.BuildingUnitsV2.AddAsync(buildingUnitV2, ct);
             });
 
+            When<Envelope<BuildingOutlineWasChanged>>(async (context, message, _) =>
+            {
+                foreach (var buildingUnitPersistentLocalId in message.Message.BuildingUnitPersistentLocalIds)
+                {
+                    var unit = await context.BuildingUnitsV2.FindAsync(buildingUnitPersistentLocalId);
+                    unit!.Position = (Point)_wkbReader.Read(message.Message.ExtendedWkbGeometryBuildingUnits!.ToByteArray());
+                    unit.PositionMethod = MapGeometryMethod(BuildingUnitPositionGeometryMethod.DerivedFromObject);
+
+                    SetVersion(unit, message.Message.Provenance.Timestamp);
+                }
+            });
+
             When<Envelope<BuildingUnitWasRealizedV2>>(async (context, message, _) =>
             {
                 var unit = await context.BuildingUnitsV2.FindAsync(message.Message.BuildingUnitPersistentLocalId);
