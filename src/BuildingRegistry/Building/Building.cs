@@ -486,6 +486,8 @@ namespace BuildingRegistry.Building
             }
 
             buildingUnit.Retire();
+
+            NotRealizeOrRetireCommonBuildingUnit();
         }
 
         private void GuardRemovedBuilding()
