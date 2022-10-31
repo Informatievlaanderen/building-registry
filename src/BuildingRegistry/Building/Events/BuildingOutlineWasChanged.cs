@@ -1,5 +1,6 @@
 namespace BuildingRegistry.Building.Events
 {
+    using System;
     using System.Collections.Generic;
     using System.Globalization;
     using System.Linq;
@@ -39,6 +40,12 @@ namespace BuildingRegistry.Building.Events
             BuildingPersistentLocalId = buildingPersistentLocalId;
             BuildingUnitPersistentLocalIds = buildingUnitPersistentLocalIds.Select(x => (int)x).ToList();
             ExtendedWkbGeometryBuilding = extendedWkbGeometryBuilding;
+
+            if (BuildingUnitPersistentLocalIds.Any() && extendedWkbGeometryBuilding is null)
+            {
+                throw new ArgumentNullException(nameof(extendedWkbGeometryBuildingUnits));
+            }
+
             ExtendedWkbGeometryBuildingUnits = extendedWkbGeometryBuildingUnits ?? (string?)null;
         }
 

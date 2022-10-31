@@ -84,7 +84,7 @@ namespace BuildingRegistry.Building
                 .Select(x => x.BuildingUnitPersistentLocalId)
                 .ToList();
 
-            var buildingUnitsPosition = plannedOrRealizedBuildingUnits.Any()
+            var buildingUnitsPosition = buildingUnitsWithPositionDerivedFromBuilding.Any()
                 ? newBuildingGeometry.Center
                 : null;
 
