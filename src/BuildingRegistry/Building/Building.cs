@@ -440,6 +440,32 @@ namespace BuildingRegistry.Building
             buildingUnit.CorrectRealizeBuildingUnit();
         }
 
+        public void CorrectRetiredBuildingUnit(BuildingUnitPersistentLocalId buildingUnitPersistentLocalId)
+        {
+            GuardRemovedBuilding();
+
+            if (BuildingStatus != BuildingStatus.Realized)
+            {
+                throw new BuildingHasInvalidStatusException();
+            }
+
+            var buildingUnit = BuildingUnits.FirstOrDefault(x => x.BuildingUnitPersistentLocalId == buildingUnitPersistentLocalId);
+
+            if (buildingUnit is null)
+            {
+                throw new BuildingUnitIsNotFoundException(
+                    BuildingPersistentLocalId,
+                    buildingUnitPersistentLocalId);
+            }
+
+            buildingUnit.CorrectRetiredBuildingUnit();
+
+            if (_buildingUnits.HasCommonBuildingUnit())
+            {
+                UpdateStatusCommonBuildingUnit();
+            }
+        }
+
         public void NotRealizeBuildingUnit(BuildingUnitPersistentLocalId buildingUnitPersistentLocalId)
         {
             GuardRemovedBuilding();

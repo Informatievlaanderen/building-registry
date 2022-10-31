@@ -122,6 +122,11 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda
                         new CorrectBuildingUnitPositionLambdaRequest(messageMetadata.MessageGroupId!, request),
                         cancellationToken);
                     break;
+                case CorrectBuildingUnitRetirementSqsRequest request:
+                    await mediator.Send(
+                        new CorrectBuildingUnitRetirementLambdaRequest(messageMetadata.MessageGroupId!, request),
+                        cancellationToken);
+                    break;
 
                 default:
                     throw new NotImplementedException(

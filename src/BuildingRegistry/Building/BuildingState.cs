@@ -5,6 +5,7 @@ namespace BuildingRegistry.Building
     using Be.Vlaanderen.Basisregisters.AggregateSource.Snapshotting;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Events;
+    using Microsoft.Extensions.Logging;
 
     public partial class Building
     {
@@ -238,7 +239,7 @@ namespace BuildingRegistry.Building
 
             buildingUnit.Route(@event);
         }
-
+        
         private void When(BuildingSnapshot @event)
         {
             BuildingPersistentLocalId = new BuildingPersistentLocalId(@event.BuildingPersistentLocalId);

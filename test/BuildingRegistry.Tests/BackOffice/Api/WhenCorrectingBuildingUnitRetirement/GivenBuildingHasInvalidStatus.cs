@@ -1,5 +1,9 @@
-namespace BuildingRegistry.Tests.BackOffice.Api.WhenCorrectingBuildingUnitRealization
+namespace BuildingRegistry.Tests.BackOffice.Api.WhenCorrectingBuildingUnitRetirement
 {
+    using System;
+    using System.Linq;
+    using System.Threading;
+    using System.Threading.Tasks;
     using AutoFixture;
     using Building;
     using Building.Exceptions;
@@ -9,10 +13,6 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenCorrectingBuildingUnitRealiz
     using FluentAssertions;
     using FluentValidation;
     using Moq;
-    using System;
-    using System.Linq;
-    using System.Threading;
-    using System.Threading.Tasks;
     using Xunit;
     using Xunit.Abstractions;
 
@@ -30,20 +30,19 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenCorrectingBuildingUnitRealiz
         {
             var buildingUnitPersistentLocalId = Fixture.Create<BuildingUnitPersistentLocalId>();
 
-            var request = new CorrectBuildingUnitNotRealizationRequest
+            var request = new CorrectBuildingUnitRetirementRequest
             {
                 BuildingUnitPersistentLocalId = buildingUnitPersistentLocalId
             };
 
             MockMediator
-                .Setup(x => x.Send(It.IsAny<CorrectBuildingUnitNotRealizationRequest>(), CancellationToken.None).Result)
+                .Setup(x => x.Send(It.IsAny<CorrectBuildingUnitRetirementRequest>(), CancellationToken.None).Result)
                 .Throws(new BuildingHasInvalidStatusException());
 
             //Act
-            Func<Task> act = async () => await _controller.CorrectNotRealization(
+            Func<Task> act = async () => await _controller.CorrectRetirement(
                 ResponseOptions,
                 MockIfMatchValidator(true),
-                new CorrectBuildingUnitNotRealizationRequestValidator(),
                 request,
                 string.Empty,
                 CancellationToken.None);
@@ -55,8 +54,8 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenCorrectingBuildingUnitRealiz
                 .Result
                 .Where(x =>
                     x.Errors.Any(
-                        failure => failure.ErrorCode == "GebouwStatusNietInGeplandOfGerealiseerd"
-                                   && failure.ErrorMessage == "Deze actie is enkel toegestaan binnen een gepland of gerealiseerd gebouw."));
+                        failure => failure.ErrorCode == "GebouwStatusNietInGerealiseerd"
+                                   && failure.ErrorMessage == "Deze actie is enkel toegestaan binnen een gerealiseerd gebouw."));
         }
     }
 }

@@ -1,4 +1,4 @@
-namespace Aiv.Vbr.Testing.Infrastructure.Events
+namespace BuildingRegistry.Tests
 {
     using System;
     using System.Collections.Generic;
