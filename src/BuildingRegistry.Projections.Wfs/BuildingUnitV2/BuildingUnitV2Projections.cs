@@ -106,13 +106,13 @@ namespace BuildingRegistry.Projections.Wfs.BuildingUnitV2
                 SetVersion(unit, message.Message.Provenance.Timestamp);
             });
 
-             When<Envelope<BuildingUnitWasCorrectedFromRealizedToPlanned>>(async (context, message, _) =>
-            {
-                var unit = await context.BuildingUnitsV2.FindAsync(message.Message.BuildingUnitPersistentLocalId);
-                unit!.Status = PlannedStatus;
+            When<Envelope<BuildingUnitWasCorrectedFromRealizedToPlanned>>(async (context, message, _) =>
+           {
+               var unit = await context.BuildingUnitsV2.FindAsync(message.Message.BuildingUnitPersistentLocalId);
+               unit!.Status = PlannedStatus;
 
-                SetVersion(unit, message.Message.Provenance.Timestamp);
-            });
+               SetVersion(unit, message.Message.Provenance.Timestamp);
+           });
 
             When<Envelope<BuildingUnitWasCorrectedFromRealizedToPlannedBecauseBuildingWasCorrected>>(async (context, message, _) =>
             {
@@ -184,6 +184,18 @@ namespace BuildingRegistry.Projections.Wfs.BuildingUnitV2
                     MapGeometryMethod(BuildingUnitPositionGeometryMethod.Parse(message.Message.GeometryMethod)));
 
                 await context.BuildingUnitsV2.AddAsync(commonBuildingUnitV2, ct);
+            });
+
+            When<Envelope<BuildingUnitPositionWasCorrected>>(async (context, message, ct) =>
+            {
+                var unit = await context.BuildingUnitsV2.FindAsync(message.Message.BuildingUnitPersistentLocalId);
+                
+                SetPosition(
+                    unit,
+                    message.Message.ExtendedWkbGeometry,
+                    MapGeometryMethod(BuildingUnitPositionGeometryMethod.Parse(message.Message.GeometryMethod)));
+
+                SetVersion(unit, message.Message.Provenance.Timestamp);
             });
         }
 

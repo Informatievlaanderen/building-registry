@@ -178,6 +178,18 @@ namespace BuildingRegistry.Projections.Wms.BuildingUnitV2
 
                 await context.BuildingUnitsV2.AddAsync(buildingUnitV2, ct);
             });
+
+            When<Envelope<BuildingUnitPositionWasCorrected>>(async (context, message, ct) =>
+            {
+                var unit = await context.BuildingUnitsV2.FindAsync(message.Message.BuildingUnitPersistentLocalId);
+
+                SetPosition(
+                    unit!,
+                    message.Message.ExtendedWkbGeometry,
+                    MapGeometryMethod(BuildingUnitPositionGeometryMethod.Parse(message.Message.GeometryMethod)));
+
+                SetVersion(unit, message.Message.Provenance.Timestamp);
+            });
         }
 
         private static void SetVersion(BuildingUnitV2 unit, Instant timestamp)

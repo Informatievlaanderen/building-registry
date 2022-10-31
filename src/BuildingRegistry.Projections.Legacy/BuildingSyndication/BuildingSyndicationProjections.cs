@@ -1,10 +1,5 @@
 namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Collections.ObjectModel;
-    using System.Linq;
-    using System.Threading.Tasks;
     using Be.Vlaanderen.Basisregisters.EventHandling;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.Connector;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore;
@@ -14,6 +9,11 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
     using BuildingRegistry.Legacy.Events;
     using BuildingRegistry.Legacy.Events.Crab;
     using NodaTime;
+    using System;
+    using System.Collections.Generic;
+    using System.Collections.ObjectModel;
+    using System.Linq;
+    using System.Threading.Tasks;
 
     [ConnectedProjectionName("Feed endpoint gebouwen")]
     [ConnectedProjectionDescription("Projectie die de gebouwen- en gebouweenheden data voor de gebouwen feed voorziet.")]
@@ -1073,6 +1073,18 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
                         x.BuildingUnitsV2.Add(commonBuildingUnitSyndicationItem);
                     },
                     ct);
+            });
+
+            When<Envelope<BuildingUnitPositionWasCorrected>>(async (context, message, ct) =>
+            {
+                await context.CreateNewBuildingSyndicationItem(message.Message.BuildingPersistentLocalId, message, item =>
+                {
+                    var unit = item.BuildingUnitsV2.Single(y => y.PersistentLocalId == message.Message.BuildingUnitPersistentLocalId);
+                    unit.Position = message.Position;
+                    unit.PointPosition = message.Message.ExtendedWkbGeometry.ToByteArray();
+                    unit.PositionMethod = BuildingRegistry.Building.BuildingUnitPositionGeometryMethod.Parse(message.Message.GeometryMethod);
+                    unit.Version = message.Message.Provenance.Timestamp;
+                }, ct);
             });
         }
 
