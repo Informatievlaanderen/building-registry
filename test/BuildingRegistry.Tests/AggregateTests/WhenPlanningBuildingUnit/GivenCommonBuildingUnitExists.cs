@@ -81,10 +81,10 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuildingUnit
                 .WithBuildingPersistentLocalId(command.BuildingPersistentLocalId)
                 .WithBuildingStatus(buildingStatus)
                 .WithBuildingGeometry(buildingGeometry)
-                .WithBuildingUnit(BuildingRegistry.Legacy.BuildingUnitStatus.Planned)
+                .WithBuildingUnit(BuildingRegistry.Legacy.BuildingUnitStatus.Planned, new BuildingUnitPersistentLocalId(1))
                 .WithBuildingUnit(
                     BuildingRegistry.Legacy.BuildingUnitStatus.NotRealized,
-                    new BuildingUnitPersistentLocalId(1),
+                    new BuildingUnitPersistentLocalId(2),
                     BuildingRegistry.Legacy.BuildingUnitFunction.Common)
                 .Build();
 
@@ -105,7 +105,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuildingUnit
                     new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
                     new BuildingUnitWasCorrectedFromNotRealizedToPlanned(
                         command.BuildingPersistentLocalId,
-                        new BuildingUnitPersistentLocalId(1),
+                        new BuildingUnitPersistentLocalId(2),
                         null))));
         }
 
