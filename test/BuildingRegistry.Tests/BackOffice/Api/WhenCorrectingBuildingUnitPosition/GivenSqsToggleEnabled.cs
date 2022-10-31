@@ -1,10 +1,9 @@
-namespace BuildingRegistry.Tests.BackOffice.Api.WhenRetiringBuildingUnit
+namespace BuildingRegistry.Tests.BackOffice.Api.WhenCorrectingBuildingUnitPosition
 {
     using System;
     using System.Threading;
     using System.Threading.Tasks;
     using AutoFixture;
-    using Be.Vlaanderen.Basisregisters.Api.ETag;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
     using Be.Vlaanderen.Basisregisters.Sqs.Exceptions;
     using Be.Vlaanderen.Basisregisters.Sqs.Requests;
@@ -16,17 +15,20 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenRetiringBuildingUnit
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
     using Moq;
+    using SqlStreamStore;
     using Xunit;
     using Xunit.Abstractions;
 
     public class GivenSqsToggleEnabled : BackOfficeApiTest
     {
         private readonly BuildingUnitController _controller;
+        private readonly Mock<IStreamStore> _streamStore;
 
         public GivenSqsToggleEnabled(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
         {
             Fixture.Customize(new WithFixedBuildingPersistentLocalId());
 
+            _streamStore = new Mock<IStreamStore>();
             _controller = CreateBuildingUnitControllerWithUser<BuildingUnitController>(useSqs: true);
         }
 
@@ -37,46 +39,43 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenRetiringBuildingUnit
             var expectedLocationResult = new LocationResult(CreateTicketUri(ticketId));
 
             MockMediator
-                .Setup(x => x.Send(It.IsAny<RetireBuildingUnitSqsRequest>(), CancellationToken.None))
+                .Setup(x => x.Send(It.IsAny<CorrectBuildingUnitPositionSqsRequest>(), CancellationToken.None))
                 .Returns(Task.FromResult(expectedLocationResult));
 
-            var result = (AcceptedResult)await _controller.Retire(
+            _streamStore.SetStreamFound();
+
+            var correctBuildingUnitPositionRequest = Fixture.Create<CorrectBuildingUnitPositionRequest>();
+
+            var result = (AcceptedResult)await _controller.CorrectPosition(
                 ResponseOptions,
                 MockIfMatchValidator(true),
-                Fixture.Create<RetireBuildingUnitRequest>(),
-                ifMatchHeaderValue: null);
+                MockValidRequestValidator<CorrectBuildingUnitPositionRequest>(),
+                correctBuildingUnitPositionRequest,
+                null,
+                CancellationToken.None);
 
             result.Should().NotBeNull();
             AssertLocation(result.Location, ticketId);
         }
 
         [Fact]
-        public async Task WithInvalidIfMatchHeader_ThenPreconditionFailedResponse()
+        public void WithNonExistingBuildingPersistentLocalId_ThenValidationErrorIsThrown()
         {
-            //Act
-            var result = await _controller.Retire(
-                ResponseOptions,
-                MockIfMatchValidator(false),
-                Fixture.Create<RetireBuildingUnitRequest>(),
-                "IncorrectIfMatchHeader");
+            var correctBuildingUnitPositionRequest = Fixture.Create<CorrectBuildingUnitPositionRequest>();
 
-            //Assert
-            result.Should().BeOfType<PreconditionFailedResult>();
-        }
-
-        [Fact]
-        public void WithAggregateIdIsNotFound_ThenThrowsApiException()
-        {
             MockMediator
-                .Setup(x => x.Send(It.IsAny<RetireBuildingUnitSqsRequest>(), CancellationToken.None))
+                .Setup(x => x.Send(It.IsAny<CorrectBuildingUnitPositionSqsRequest>(), CancellationToken.None))
                 .Throws(new AggregateIdIsNotFoundException());
 
-            var request = Fixture.Create<RetireBuildingUnitRequest>();
+            _streamStore.SetStreamNotFound();
+
+            var request = Fixture.Create<CorrectBuildingUnitPositionRequest>();
             Func<Task> act = async () =>
             {
-                await _controller.Retire(
+                await _controller.CorrectPosition(
                     ResponseOptions,
                     MockIfMatchValidator(true),
+                    MockValidRequestValidator<CorrectBuildingUnitPositionRequest>(),
                     request,
                     string.Empty);
             };
