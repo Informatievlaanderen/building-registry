@@ -32,40 +32,6 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenCorrectingBuildingUnitPositi
             _streamStoreMock = new Mock<IStreamStore>();
         }
 
-        [Fact]
-        public async Task ThenAcceptedResponseIsExpected()
-        {
-            var buildingUnitPersistentLocalId = new BuildingUnitPersistentLocalId(456);
-
-            MockMediator
-                .Setup(x => x.Send(It.IsAny<CorrectBuildingUnitPositionRequest>(), CancellationToken.None).Result)
-                .Returns(new ETagResponse(string.Empty, string.Empty));
-
-            _streamStoreMock.SetStreamFound();
-
-            var request = new CorrectBuildingUnitPositionRequest
-            {
-                BuildingUnitPersistentLocalId = buildingUnitPersistentLocalId,
-                PositieGeometrieMethode = PositieGeometrieMethode.AangeduidDoorBeheerder,
-                Positie = "<gml:Point srsName=\"https://www.opengis.net/def/crs/EPSG/0/31370\" xmlns:gml=\"http://www.opengis.net/gml/3.2\"><gml:pos>103671.37 192046.71</gml:pos></gml:Point>"
-            };
-
-            //Act
-            var result = (AcceptedWithETagResult)await _controller.CorrectPosition(
-                ResponseOptions,
-                MockIfMatchValidator(true),
-                new CorrectBuildingUnitPositionRequestValidator(),
-                request,
-                null,
-                CancellationToken.None);
-           
-            //Assert
-            MockMediator.Verify(x => x.Send(It.IsAny<CorrectBuildingUnitPositionRequest>(), CancellationToken.None), Times.Once);
-
-            result.StatusCode.Should().Be(202);
-            result.Location.Should().Be(string.Format(BuildingUnitDetailUrl, buildingUnitPersistentLocalId));
-        }
-
         [Theory]
         [InlineData("")]
         [InlineData(null)]
@@ -87,6 +53,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenCorrectingBuildingUnitPositi
                 ResponseOptions,
                 MockIfMatchValidator(true),
                 new CorrectBuildingUnitPositionRequestValidator(),
+                0,
                 request,
                 null,
                 CancellationToken.None);
@@ -119,6 +86,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenCorrectingBuildingUnitPositi
                 ResponseOptions,
                 MockIfMatchValidator(true),
                 new CorrectBuildingUnitPositionRequestValidator(),
+                0,
                 request,
                 null,
                 CancellationToken.None);

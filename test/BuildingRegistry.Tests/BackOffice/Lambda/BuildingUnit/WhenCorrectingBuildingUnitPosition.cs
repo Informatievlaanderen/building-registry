@@ -64,13 +64,13 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
             //Act
             await handler.Handle(new CorrectBuildingUnitPositionLambdaRequest(
                     buildingPersistentLocalId,
+                    buildingUnitPersistentLocalId,
                     Guid.NewGuid(),
                     null,
                     Fixture.Create<Provenance>(),
                     new Dictionary<string, object?>(),
                     new CorrectBuildingUnitPositionBackOfficeRequest
                     {
-                        BuildingUnitPersistentLocalId = buildingUnitPersistentLocalId,
                         PositieGeometrieMethode = PositieGeometrieMethode.AfgeleidVanObject
                     }),
                 CancellationToken.None);
@@ -106,13 +106,13 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
             // Act
             await handler.Handle(new CorrectBuildingUnitPositionLambdaRequest(
                     buildingPersistentLocalId,
+                    buildingUnitPersistentLocalId,
                     Guid.NewGuid(),
                     null,
                     Fixture.Create<Provenance>(),
                     new Dictionary<string, object?>(),
                     new CorrectBuildingUnitPositionBackOfficeRequest
                     {
-                        BuildingUnitPersistentLocalId = buildingUnitPersistentLocalId,
                         PositieGeometrieMethode = PositieGeometrieMethode.AfgeleidVanObject
                     }),
                 CancellationToken.None);
@@ -149,13 +149,13 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
             // Act
             await handler.Handle(new CorrectBuildingUnitPositionLambdaRequest(
                     buildingPersistentLocalId,
+                    buildingUnitPersistentLocalId,
                     Guid.NewGuid(),
                     null,
                     Fixture.Create<Provenance>(),
                     new Dictionary<string, object?>(),
                     new CorrectBuildingUnitPositionBackOfficeRequest
                     {
-                        BuildingUnitPersistentLocalId = buildingUnitPersistentLocalId,
                         PositieGeometrieMethode = PositieGeometrieMethode.AfgeleidVanObject
                     }),
                 CancellationToken.None);
@@ -191,13 +191,13 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
             // Act
             await handler.Handle(new CorrectBuildingUnitPositionLambdaRequest(
                     buildingPersistentLocalId,
+                    buildingUnitPersistentLocalId,
                     Guid.NewGuid(),
                     null,
                     Fixture.Create<Provenance>(),
                     new Dictionary<string, object?>(),
                     new CorrectBuildingUnitPositionBackOfficeRequest
                     {
-                        BuildingUnitPersistentLocalId = buildingUnitPersistentLocalId,
                         PositieGeometrieMethode = PositieGeometrieMethode.AfgeleidVanObject
                     }),
                 CancellationToken.None);
@@ -237,13 +237,13 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
             // Act
             await handler.Handle(new CorrectBuildingUnitPositionLambdaRequest(
                     buildingPersistentLocalId,
+                    buildingUnitPersistentLocalId,
                     Guid.NewGuid(),
                     null,
                     Fixture.Create<Provenance>(),
                     new Dictionary<string, object?>(),
                     new CorrectBuildingUnitPositionBackOfficeRequest
                     {
-                        BuildingUnitPersistentLocalId = buildingUnitPersistentLocalId,
                         PositieGeometrieMethode = PositieGeometrieMethode.AfgeleidVanObject
                     }),
                 CancellationToken.None);

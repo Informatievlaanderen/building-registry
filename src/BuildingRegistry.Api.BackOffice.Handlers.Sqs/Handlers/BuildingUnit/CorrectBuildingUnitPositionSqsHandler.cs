@@ -26,7 +26,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Sqs.Handlers.BuildingUnit
         {
             var relation = _backOfficeContext
                 .BuildingUnitBuildings
-                .Find(request.Request.BuildingUnitPersistentLocalId);
+                .Find(request.BuildingUnitPersistentLocalId);
 
             return relation?.BuildingPersistentLocalId.ToString();
         }
@@ -38,7 +38,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Sqs.Handlers.BuildingUnit
                 { RegistryKey, nameof(BuildingRegistry) },
                 { ActionKey, Action },
                 { AggregateIdKey, aggregateId },
-                { ObjectIdKey, sqsRequest.Request.BuildingUnitPersistentLocalId.ToString() }
+                { ObjectIdKey, sqsRequest.BuildingUnitPersistentLocalId.ToString() }
             };
         }
     }

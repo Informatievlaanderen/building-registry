@@ -54,10 +54,8 @@ namespace BuildingRegistry.Tests.BackOffice.Sqs.BuildingUnit
 
             var sqsRequest = new CorrectBuildingUnitPositionSqsRequest()
             {
+                BuildingUnitPersistentLocalId = Fixture.Create<BuildingUnitPersistentLocalId>(),
                 Request = new CorrectBuildingUnitPositionBackOfficeRequest()
-                {
-                    BuildingUnitPersistentLocalId = Fixture.Create<BuildingUnitPersistentLocalId>()
-                }
             };
 
             // Act
@@ -87,9 +85,9 @@ namespace BuildingRegistry.Tests.BackOffice.Sqs.BuildingUnit
             var act = async () => await sut.Handle(
                 new CorrectBuildingUnitPositionSqsRequest()
                 {
+                    BuildingUnitPersistentLocalId = Fixture.Create<BuildingUnitPersistentLocalId>(),
                     Request = new CorrectBuildingUnitPositionBackOfficeRequest()
                     {
-                        BuildingUnitPersistentLocalId = Fixture.Create<BuildingUnitPersistentLocalId>()
                     }
                 }, CancellationToken.None);
 

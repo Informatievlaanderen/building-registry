@@ -11,18 +11,18 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Requests.BuildingUnit
 
     public sealed record CorrectBuildingUnitPositionLambdaRequest :
         BuildingUnitLambdaRequest,
-        IHasBackOfficeRequest<CorrectBuildingUnitPositionBackOfficeRequest>,
-        IHasBuildingUnitPersistentLocalId
+        IHasBackOfficeRequest<CorrectBuildingUnitPositionBackOfficeRequest>
     {
         public CorrectBuildingUnitPositionBackOfficeRequest Request { get; }
 
-        public int BuildingUnitPersistentLocalId => Request.BuildingUnitPersistentLocalId;
+        public int BuildingUnitPersistentLocalId { get; }
 
         public CorrectBuildingUnitPositionLambdaRequest(
             string messageGroupId,
             CorrectBuildingUnitPositionSqsRequest sqsRequest)
             : this(
                 messageGroupId,
+                sqsRequest.BuildingUnitPersistentLocalId,
                 sqsRequest.TicketId,
                 sqsRequest.IfMatchHeaderValue,
                 sqsRequest.ProvenanceData.ToProvenance(),
@@ -32,6 +32,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Requests.BuildingUnit
 
         public CorrectBuildingUnitPositionLambdaRequest(
             string messageGroupId,
+            int buildingUnitPersistentLocalId,
             Guid ticketId,
             string? ifMatchHeaderValue,
             Provenance provenance,
@@ -39,6 +40,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Requests.BuildingUnit
             CorrectBuildingUnitPositionBackOfficeRequest request)
             : base(messageGroupId, ticketId, ifMatchHeaderValue, provenance, metadata)
         {
+            BuildingUnitPersistentLocalId = buildingUnitPersistentLocalId;
             Request = request;
         }
 

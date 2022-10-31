@@ -32,6 +32,7 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
         /// <param name="options"></param>
         /// <param name="ifMatchHeaderValidator"></param>
         /// <param name="validator"></param>
+        /// <param name="buildingUnitPersistentLocalId"></param>
         /// <param name="request"></param>
         /// <param name="ifMatchHeaderValue"></param>
         /// <param name="ct"></param>
@@ -47,10 +48,13 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
             [FromServices] IOptions<ResponseOptions> options,
             [FromServices] IIfMatchHeaderValidator ifMatchHeaderValidator,
             [FromServices] IValidator<CorrectBuildingUnitPositionRequest> validator,
-            [FromRoute] CorrectBuildingUnitPositionRequest request,
+            [FromRoute] int buildingUnitPersistentLocalId,
+            [FromBody] CorrectBuildingUnitPositionRequest request,
             [FromHeader(Name = "If-Match")] string? ifMatchHeaderValue,
             CancellationToken ct = default)
         {
+            request.BuildingUnitPersistentLocalId = buildingUnitPersistentLocalId;
+
             await validator.ValidateAndThrowAsync(request, ct);
 
             try
@@ -66,6 +70,7 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
                     var result = await Mediator.Send(
                         new CorrectBuildingUnitPositionSqsRequest()
                         {
+                            BuildingUnitPersistentLocalId = request.BuildingUnitPersistentLocalId,
                             Request = request,
                             Metadata = GetMetadata(),
                             ProvenanceData = new ProvenanceData(CreateFakeProvenance()),

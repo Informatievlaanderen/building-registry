@@ -1,5 +1,8 @@
 namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Text;
     using Be.Vlaanderen.Basisregisters.GrAr.Common;
     using Be.Vlaanderen.Basisregisters.GrAr.Extracts;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.Connector;
@@ -12,9 +15,6 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
     using NetTopologySuite.Geometries;
     using NetTopologySuite.IO;
     using NodaTime;
-    using System;
-    using System.Collections.Generic;
-    using System.Text;
     using Point = Be.Vlaanderen.Basisregisters.Shaperon.Point;
 
     [ConnectedProjectionName("Extract gebouweenheden")]

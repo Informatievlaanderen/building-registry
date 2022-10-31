@@ -13,6 +13,9 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Requests
     public class CorrectBuildingUnitPositionRequest : CorrectBuildingUnitPositionBackOfficeRequest, IRequest<ETagResponse>
     {
         [JsonIgnore]
+        public int BuildingUnitPersistentLocalId { get; set; }
+
+        [JsonIgnore]
         public IDictionary<string, object> Metadata { get; set; }
 
         public CorrectBuildingUnitPosition ToCommand(

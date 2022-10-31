@@ -8,6 +8,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenCorrectingBuildingUnitPositi
     using Be.Vlaanderen.Basisregisters.AggregateSource.Snapshotting;
     using Be.Vlaanderen.Basisregisters.Api.ETag;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
+    using Be.Vlaanderen.Basisregisters.GrAr.Edit.Contracts;
     using Be.Vlaanderen.Basisregisters.Sqs.Responses;
     using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Requests;
     using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Validators;
@@ -20,16 +21,19 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenCorrectingBuildingUnitPositi
     using FluentValidation;
     using Microsoft.AspNetCore.Http;
     using Moq;
+    using SqlStreamStore;
     using Xunit;
     using Xunit.Abstractions;
 
     public class GivenBuildingUnitPlanned : BackOfficeApiTest
     {
         private readonly BuildingUnitController _controller;
+        private readonly Mock<IStreamStore> _streamStoreMock;
 
         public GivenBuildingUnitPlanned(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
         {
             _controller = CreateBuildingUnitControllerWithUser<BuildingUnitController>();
+            _streamStoreMock = new Mock<IStreamStore>();
         }
 
         [Fact]
@@ -51,6 +55,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenCorrectingBuildingUnitPositi
                 ResponseOptions,
                 MockIfMatchValidator(true),
                 new CorrectBuildingUnitPositionRequestValidator(),
+                buildingUnitPersistentLocalId,
                 request,
                 string.Empty,
                 CancellationToken.None);
@@ -93,6 +98,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenCorrectingBuildingUnitPositi
                 ResponseOptions,
                 MockIfMatchValidator(false),
                 new CorrectBuildingUnitPositionRequestValidator(),
+                0,
                 request,
                 new ETag(ETagType.Strong, ifMatchHeader).ToString(),
                 CancellationToken.None);
@@ -122,6 +128,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenCorrectingBuildingUnitPositi
                 ResponseOptions,
                 MockIfMatchValidator(true),
                 new CorrectBuildingUnitPositionRequestValidator(),
+                0,
                 request,
                 string.Empty,
                 CancellationToken.None);
@@ -155,6 +162,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenCorrectingBuildingUnitPositi
                 ResponseOptions,
                 MockIfMatchValidator(true),
                 new CorrectBuildingUnitPositionRequestValidator(),
+                0,
                 request,
                 string.Empty,
                 CancellationToken.None);
@@ -188,6 +196,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenCorrectingBuildingUnitPositi
                 ResponseOptions,
                 MockIfMatchValidator(true),
                 new CorrectBuildingUnitPositionRequestValidator(),
+                0,
                 request,
                 string.Empty,
                 CancellationToken.None);
@@ -222,6 +231,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenCorrectingBuildingUnitPositi
                 ResponseOptions,
                 MockIfMatchValidator(true),
                 new CorrectBuildingUnitPositionRequestValidator(),
+                0,
                 request,
                 string.Empty,
                 CancellationToken.None);
@@ -235,6 +245,75 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenCorrectingBuildingUnitPositi
                     x.Errors.Any(error
                         => error.ErrorCode == "GebouweenheidGemeenschappelijkDeel"
                            && error.ErrorMessage == "Deze actie is niet toegestaan op gebouweenheden met functie gemeenschappelijkDeel."));
+        }
+
+        [Theory]
+        [InlineData("")]
+        [InlineData(null)]
+        public void WithPositionGeometryMethodAppointedByAdministratorAndMissingPosition_ThenValidationExceptionIsThrown(string? position)
+        {
+            var buildingUnitPersistentLocalId = new BuildingUnitPersistentLocalId(456);
+
+            var request = new CorrectBuildingUnitPositionRequest
+            {
+                BuildingUnitPersistentLocalId = buildingUnitPersistentLocalId,
+                PositieGeometrieMethode = PositieGeometrieMethode.AangeduidDoorBeheerder,
+                Positie = position
+            };
+
+            _streamStoreMock.SetStreamFound();
+
+            //Act
+            Func<Task> act = async () => await _controller.CorrectPosition(
+                ResponseOptions,
+                MockIfMatchValidator(true),
+                new CorrectBuildingUnitPositionRequestValidator(),
+                0,
+                request,
+                null,
+                CancellationToken.None);
+
+            //Assert
+            act
+                .Should()
+                .ThrowAsync<ValidationException>()
+                .Result
+                .Where(x => x.Errors.Any(e =>
+                    e.ErrorCode == "GebouweendheidPositieValidatie"
+                    && e.ErrorMessage == "De verplichte parameter 'positie' ontbreekt."));
+        }
+
+        [Fact]
+        public void WithPositionHavingInvalidFormat_ThenValidationExceptionIsThrown()
+        {
+            var buildingPersistentLocalId = new BuildingPersistentLocalId(123);
+
+            var request = new CorrectBuildingUnitPositionRequest
+            {
+                PositieGeometrieMethode = PositieGeometrieMethode.AangeduidDoorBeheerder,
+                Positie = "<gml:Point srsName=\"https://www.opengis.net/def/crs/EPSG/0/31370\"><gml:pos>103671.37 192046.71</gml:pos></gml:Point>"
+            };
+
+            _streamStoreMock.SetStreamFound();
+
+            //Act
+            Func<Task> act = async () => await _controller.CorrectPosition(
+                ResponseOptions,
+                MockIfMatchValidator(true),
+                new CorrectBuildingUnitPositionRequestValidator(),
+                0,
+                request,
+                null,
+                CancellationToken.None);
+
+            //Assert
+            act
+                .Should()
+                .ThrowAsync<ValidationException>()
+                .Result
+                .Where(x => x.Errors.Any(e =>
+                    e.ErrorCode == "GebouweenheidPositieformaatValidatie"
+                    && e.ErrorMessage == "De positie is geen geldige gml-puntgeometrie."));
         }
     }
 }

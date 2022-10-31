@@ -6,6 +6,8 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Sqs.Requests.BuildingUnit
 
     public sealed class CorrectBuildingUnitPositionSqsRequest : SqsRequest, IHasBackOfficeRequest<CorrectBuildingUnitPositionBackOfficeRequest>
     {
+        public int BuildingUnitPersistentLocalId { get; set; }
+
         public CorrectBuildingUnitPositionBackOfficeRequest Request { get; set; }
     }
 }

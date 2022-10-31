@@ -50,6 +50,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenCorrectingBuildingUnitPositi
                 ResponseOptions,
                 MockIfMatchValidator(true),
                 MockValidRequestValidator<CorrectBuildingUnitPositionRequest>(),
+                0,
                 correctBuildingUnitPositionRequest,
                 null,
                 CancellationToken.None);
@@ -76,6 +77,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenCorrectingBuildingUnitPositi
                     ResponseOptions,
                     MockIfMatchValidator(true),
                     MockValidRequestValidator<CorrectBuildingUnitPositionRequest>(),
+                    0,
                     request,
                     string.Empty);
             };

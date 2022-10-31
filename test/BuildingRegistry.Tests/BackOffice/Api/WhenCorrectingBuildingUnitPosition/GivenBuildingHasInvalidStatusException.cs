@@ -40,6 +40,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenCorrectingBuildingUnitPositi
                 ResponseOptions,
                 MockIfMatchValidator(true),
                 MockValidRequestValidator<CorrectBuildingUnitPositionRequest>(),
+                0,
                 request,
                 null,
                 CancellationToken.None);
