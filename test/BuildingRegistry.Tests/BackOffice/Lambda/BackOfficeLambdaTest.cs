@@ -76,6 +76,16 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda
                 Fixture.Create<Provenance>()));
         }
 
+        protected void RetireBuildingUnit(
+            BuildingPersistentLocalId buildingPersistentLocalId,
+            BuildingUnitPersistentLocalId buildingUnitPersistentLocalId)
+        {
+            DispatchArrangeCommand(new RetireBuildingUnit(
+                buildingPersistentLocalId,
+                buildingUnitPersistentLocalId,
+                Fixture.Create<Provenance>()));
+        }
+
         protected void NotRealizeBuildingUnit(
             BuildingPersistentLocalId buildingPersistentLocalId,
             BuildingUnitPersistentLocalId buildingUnitPersistentLocalId)

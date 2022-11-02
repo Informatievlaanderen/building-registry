@@ -260,6 +260,31 @@ namespace BuildingRegistry.Building
             Apply(new BuildingUnitWasRetiredV2(_buildingPersistentLocalId, BuildingUnitPersistentLocalId));
         }
 
+        public void CorrectRetiredBuildingUnit()
+        {
+            if (IsRemoved)
+            {
+                throw new BuildingUnitIsRemovedException(BuildingUnitPersistentLocalId);
+            }
+
+            if (Function == BuildingUnitFunction.Common)
+            {
+                throw new BuildingUnitHasInvalidFunctionException();
+            }
+
+            if (Status == BuildingUnitStatus.Realized)
+            {
+                return;
+            }
+
+            if (Status != BuildingUnitStatus.Retired)
+            {
+                throw new BuildingUnitHasInvalidStatusException();
+            }
+
+            Apply(new BuildingUnitWasCorrectedFromRetiredToRealized(_buildingPersistentLocalId, BuildingUnitPersistentLocalId, BuildingUnitPosition.Geometry));
+        }
+
         public void RestoreSnapshot(
             BuildingPersistentLocalId buildingPersistentLocalId,
             BuildingSnapshot.BuildingUnitData buildingUnitData)

@@ -101,6 +101,18 @@ namespace BuildingRegistry.Building
                     building.RetireBuildingUnit(message.Command.BuildingUnitPersistentLocalId);
                 });
 
+            For<CorrectBuildingUnitRetirement>()
+                .AddSqlStreamStore(getStreamStore, getUnitOfWork, eventMapping, eventSerializer, getSnapshotStore)
+                .AddEventHash<CorrectBuildingUnitRetirement, Building>(getUnitOfWork)
+                .AddProvenance(getUnitOfWork, provenanceFactory)
+                .Handle(async (message, ct) =>
+                {
+                    var streamId = new BuildingStreamId(message.Command.BuildingPersistentLocalId);
+                    var building = await buildingRepository().GetAsync(streamId, ct);
+
+                    building.CorrectRetiredBuildingUnit(message.Command.BuildingUnitPersistentLocalId);
+                });
+
             For<CorrectBuildingUnitPosition>()
                 .AddSqlStreamStore(getStreamStore, getUnitOfWork, eventMapping, eventSerializer, getSnapshotStore)
                 .AddEventHash<CorrectBuildingUnitPosition, Building>(getUnitOfWork)

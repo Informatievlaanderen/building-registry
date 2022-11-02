@@ -238,7 +238,7 @@ namespace BuildingRegistry.Building
 
             buildingUnit.Route(@event);
         }
-
+        
         private void When(BuildingSnapshot @event)
         {
             BuildingPersistentLocalId = new BuildingPersistentLocalId(@event.BuildingPersistentLocalId);
