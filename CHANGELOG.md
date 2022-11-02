@@ -1,3 +1,29 @@
+# [3.40.0](https://github.com/informatievlaanderen/building-registry/compare/v3.39.2...v3.40.0) (2022-11-02)
+
+
+### Bug Fixes
+
+* add nuget to dependabot ([4109f3f](https://github.com/informatievlaanderen/building-registry/commit/4109f3fbe597a1241a883336d88c4fe6d526d5dc))
+* enable pr's & coverage ([3919b7d](https://github.com/informatievlaanderen/building-registry/commit/3919b7dafa5b3686a5af8f5d67bc469ca470561c))
+* make IHasBackOfficeRequest covariant ([194da89](https://github.com/informatievlaanderen/building-registry/commit/194da89d4967894efc62adf11c4775e6fbd19872))
+* unit test common buildingunit ([b7d999d](https://github.com/informatievlaanderen/building-registry/commit/b7d999df6820b5c1e9c0ef75c3b6dd01c8e5ce89))
+* use VBR_SONAR_TOKEN ([2bb162d](https://github.com/informatievlaanderen/building-registry/commit/2bb162d8e01b2328dcb1c9ae39dbc905fa800cc7))
+* use VBR_SONAR_TOKEN ([f7d8078](https://github.com/informatievlaanderen/building-registry/commit/f7d8078141d249d58007a72446e58240dee308cd))
+
+
+### Features
+
+* add correct position building unit domain ([af83878](https://github.com/informatievlaanderen/building-registry/commit/af838788def28ec713188c9f808e3f0b2494938f))
+* change geometry outlined building - backoffice ([cda5f72](https://github.com/informatievlaanderen/building-registry/commit/cda5f7228db14fcfdaa44f0821dde845b046fa49))
+* change geomettry outlined building domain ([321d51a](https://github.com/informatievlaanderen/building-registry/commit/321d51ac680b4d6d1d1f65bac805611446665e7c))
+* common buildingunit logic when retiring a buildingunit ([e6ca54b](https://github.com/informatievlaanderen/building-registry/commit/e6ca54bf9242c88ea3e5514ab86997b213d54b21))
+* correct building unit position on BuildingUnitWasCorrectedFromNotRealizedToPlanned and BuildingUnitWasCorrectedFromRetiredToRealized ([4af463a](https://github.com/informatievlaanderen/building-registry/commit/4af463af776f4e60fc70b7acdaa07535db420b1e))
+* correct buildingunit retirement ([9850056](https://github.com/informatievlaanderen/building-registry/commit/98500561c91d50f0f1b60e67b7a7686e94803a23))
+* correct position buildingunit backofffice ([76cfae7](https://github.com/informatievlaanderen/building-registry/commit/76cfae7eb732cc081ddfdd470feab904eb027af9))
+* correct position buildingunit backofffice ([845c23a](https://github.com/informatievlaanderen/building-registry/commit/845c23abb1810ce151a84806be36895c009c6dbe))
+* properly implement HandleAggregateIdIsNotFoundException ([e178a60](https://github.com/informatievlaanderen/building-registry/commit/e178a607ff2e9ff9fe0025db15f25ef72e7dcc62))
+* retire buildingunit ([5bb6b8e](https://github.com/informatievlaanderen/building-registry/commit/5bb6b8eb1323973463536eec9b29a8893dda707f))
+
 ## [3.39.2](https://github.com/informatievlaanderen/building-registry/compare/v3.39.1...v3.39.2) (2022-10-27)
 
 
