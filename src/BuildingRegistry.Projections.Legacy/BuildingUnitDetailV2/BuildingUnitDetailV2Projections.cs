@@ -1,10 +1,5 @@
 namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetailV2
 {
-    using System;
-    using System.Collections.ObjectModel;
-    using System.Linq;
-    using System.Threading;
-    using System.Threading.Tasks;
     using Be.Vlaanderen.Basisregisters.EventHandling;
     using Be.Vlaanderen.Basisregisters.GrAr.Common;
     using Be.Vlaanderen.Basisregisters.GrAr.Common.Pipes;
@@ -13,6 +8,11 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetailV2
     using Be.Vlaanderen.Basisregisters.Utilities.HexByteConvertor;
     using Building;
     using Building.Events;
+    using System;
+    using System.Collections.ObjectModel;
+    using System.Linq;
+    using System.Threading;
+    using System.Threading.Tasks;
 
     [ConnectedProjectionName("API endpoint detail/lijst gebouweenheden")]
     [ConnectedProjectionDescription("Projectie die de gebouweenheden data voor het gebouweenheden detail & lijst voorziet.")]
@@ -227,6 +227,16 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetailV2
                 await context.BuildingUnitDetailsV2.AddAsync(
                     commonBuildingUnitDetailItemV2
                     , ct);
+            });
+
+            When<Envelope<BuildingUnitPositionWasCorrected>>(async (context, message, ct) =>
+            {
+                await Update(context, message.Message.BuildingUnitPersistentLocalId, item =>
+                {
+                    item.Position = message.Message.ExtendedWkbGeometry.ToByteArray();
+                    item.PositionMethod = BuildingRegistry.Building.BuildingUnitPositionGeometryMethod.Parse(message.Message.GeometryMethod);
+                    item.Version = message.Message.Provenance.Timestamp;
+                }, ct);
             });
         }
 

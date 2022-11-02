@@ -266,6 +266,22 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
 
                 await context.BuildingUnitExtractV2.AddAsync(commonBuildingUnitItemV2, ct);
             });
+
+            When<Envelope<BuildingUnitPositionWasCorrected>>(async (context, message, ct) =>
+            {
+                var posgeommet =
+                    MapGeometryMethod(BuildingUnitPositionGeometryMethod.Parse(message.Message.GeometryMethod));
+
+                var geometry = wkbReader.Read(message.Message.ExtendedWkbGeometry.ToByteArray());
+
+                await context.FindAndUpdateBuildingUnitExtract(message.Message.BuildingUnitPersistentLocalId,
+                    itemV2 =>
+                    {
+                        UpdatePosition(itemV2, posgeommet);
+                        UpdateGeometry(itemV2, geometry);
+                        UpdateVersie(itemV2, message.Message.Provenance.Timestamp);
+                    }, ct);
+            });
         }
 
         private static string MapFunction(BuildingUnitFunction function)
@@ -341,5 +357,8 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
 
             buildingUnit.DbaseRecord = record.ToBytes(_encoding);
         }
+
+        private void UpdatePosition(BuildingUnitExtractItemV2 buildingUnit, string? posgeommet)
+            => UpdateRecord(buildingUnit, record => record.posgeommet.Value = posgeommet);
     }
 }
