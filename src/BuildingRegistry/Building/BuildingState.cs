@@ -5,7 +5,7 @@ namespace BuildingRegistry.Building
     using Be.Vlaanderen.Basisregisters.AggregateSource.Snapshotting;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Events;
-    
+
     public partial class Building
     {
         private IBuildingEvent? _lastEvent;
