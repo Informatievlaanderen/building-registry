@@ -1,3 +1,13 @@
+## [3.40.1](https://github.com/informatievlaanderen/building-registry/compare/v3.40.0...v3.40.1) (2022-11-03)
+
+
+### Bug Fixes
+
+* correct workflow ([1dc73d6](https://github.com/informatievlaanderen/building-registry/commit/1dc73d6b3c5143d54c5bb4bfc079b7b6edf89403))
+* flaky tests ([6823f3b](https://github.com/informatievlaanderen/building-registry/commit/6823f3b084874e75a57d7e80df48994a449743c2))
+* retire bu route ([30510be](https://github.com/informatievlaanderen/building-registry/commit/30510beaeeb733d29f75e2fcde1d5d7597f70854))
+* title event BuildingOutlineWasChanged ([b761732](https://github.com/informatievlaanderen/building-registry/commit/b761732c41815e46e7b82ddd37a520e8f7549b8a))
+
 # [3.40.0](https://github.com/informatievlaanderen/building-registry/compare/v3.39.2...v3.40.0) (2022-11-02)
 
 
