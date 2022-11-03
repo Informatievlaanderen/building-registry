@@ -33,13 +33,13 @@ namespace BuildingRegistry.Building
             return unit;
         }
 
-        private List<BuildingUnitStatus> StatusesWhichCannotBeRealized => new()
+        private static List<BuildingUnitStatus> StatusesWhichCannotBeRealized => new()
         {
             BuildingUnitStatus.Retired,
             BuildingUnitStatus.NotRealized
         };
 
-        private List<BuildingUnitStatus> StatusesWhichCannotBeNotRealized => new()
+        private static List<BuildingUnitStatus> StatusesWhichCannotBeNotRealized => new()
         {
             BuildingUnitStatus.Realized,
             BuildingUnitStatus.Retired
@@ -47,15 +47,8 @@ namespace BuildingRegistry.Building
 
         public void Realize()
         {
-            if (IsRemoved)
-            {
-                throw new BuildingUnitIsRemovedException(BuildingUnitPersistentLocalId);
-            }
-
-            if (Function == BuildingUnitFunction.Common)
-            {
-                throw new BuildingUnitHasInvalidFunctionException();
-            }
+            GuardRemoved();
+            GuardCommonUnit();
 
             if (Status == BuildingUnitStatus.Realized)
             {
@@ -105,15 +98,8 @@ namespace BuildingRegistry.Building
 
         public void CorrectRealizeBuildingUnit()
         {
-            if (IsRemoved)
-            {
-                throw new BuildingUnitIsRemovedException(BuildingUnitPersistentLocalId);
-            }
-
-            if (Function == BuildingUnitFunction.Common)
-            {
-                throw new BuildingUnitHasInvalidFunctionException();
-            }
+            GuardRemoved();
+            GuardCommonUnit();
 
             if (Status == BuildingUnitStatus.Planned)
             {
@@ -130,15 +116,8 @@ namespace BuildingRegistry.Building
 
         public void NotRealize()
         {
-            if (IsRemoved)
-            {
-                throw new BuildingUnitIsRemovedException(BuildingUnitPersistentLocalId);
-            }
-
-            if (Function == BuildingUnitFunction.Common)
-            {
-                throw new BuildingUnitHasInvalidFunctionException();
-            }
+            GuardRemoved();
+            GuardCommonUnit();
 
             if (Status == BuildingUnitStatus.NotRealized)
             {
@@ -155,15 +134,8 @@ namespace BuildingRegistry.Building
 
         public void CorrectNotRealize(BuildingGeometry buildingGeometry)
         {
-            if (IsRemoved)
-            {
-                throw new BuildingUnitIsRemovedException(BuildingUnitPersistentLocalId);
-            }
-
-            if (Function == BuildingUnitFunction.Common)
-            {
-                throw new BuildingUnitHasInvalidFunctionException();
-            }
+            GuardRemoved();
+            GuardCommonUnit();
 
             if (Status == BuildingUnitStatus.Planned)
             {
@@ -210,15 +182,8 @@ namespace BuildingRegistry.Building
 
         public void CorrectPosition(BuildingUnitPositionGeometryMethod positionGeometryMethod, ExtendedWkbGeometry finalPosition)
         {
-            if (IsRemoved)
-            {
-                throw new BuildingUnitIsRemovedException(BuildingUnitPersistentLocalId);
-            }
-
-            if (Function == BuildingUnitFunction.Common)
-            {
-                throw new BuildingUnitHasInvalidFunctionException();
-            }
+            GuardRemoved();
+            GuardCommonUnit();
 
             var validStatuses = new[]
                 {BuildingUnitStatus.Planned, BuildingUnitStatus.Realized};
@@ -237,15 +202,8 @@ namespace BuildingRegistry.Building
 
         public void Retire()
         {
-            if (IsRemoved)
-            {
-                throw new BuildingUnitIsRemovedException(BuildingUnitPersistentLocalId);
-            }
-
-            if (Function == BuildingUnitFunction.Common)
-            {
-                throw new BuildingUnitHasInvalidFunctionException();
-            }
+            GuardRemoved();
+            GuardCommonUnit();
 
             if (Status == BuildingUnitStatus.Retired)
             {
@@ -262,15 +220,8 @@ namespace BuildingRegistry.Building
 
         public void CorrectRetiredBuildingUnit()
         {
-            if (IsRemoved)
-            {
-                throw new BuildingUnitIsRemovedException(BuildingUnitPersistentLocalId);
-            }
-
-            if (Function == BuildingUnitFunction.Common)
-            {
-                throw new BuildingUnitHasInvalidFunctionException();
-            }
+            GuardRemoved();
+            GuardCommonUnit();
 
             if (Status == BuildingUnitStatus.Realized)
             {
@@ -305,6 +256,22 @@ namespace BuildingRegistry.Building
 
             _lastSnapshotEventHash = buildingUnitData.LastEventHash;
             _lastSnapshotProvenance = buildingUnitData.LastProvenanceData;
+        }
+
+        private void GuardRemoved()
+        {
+            if (IsRemoved)
+            {
+                throw new BuildingUnitIsRemovedException(BuildingUnitPersistentLocalId);
+            }
+        }
+
+        private void GuardCommonUnit()
+        {
+            if (Function == BuildingUnitFunction.Common)
+            {
+                throw new BuildingUnitHasInvalidFunctionException();
+            }
         }
     }
 }
