@@ -3,7 +3,7 @@ namespace BuildingRegistry.Building
     using System.Collections.Generic;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
 
-    public class BuildingUnitPosition : ValueObject<BuildingUnitPosition>
+    public sealed class BuildingUnitPosition : ValueObject<BuildingUnitPosition>
     {
         public ExtendedWkbGeometry Geometry { get; }
         public BuildingUnitPositionGeometryMethod GeometryMethod { get; }

@@ -7,7 +7,7 @@ namespace BuildingRegistry.Building
     using NetTopologySuite.Geometries;
     using NetTopologySuite.IO;
 
-    public class BuildingGeometry : ValueObject<BuildingGeometry>
+    public sealed class BuildingGeometry : ValueObject<BuildingGeometry>
     {
         private readonly WKBReader _wkbReader = new WKBReader { HandleSRID = true };
 

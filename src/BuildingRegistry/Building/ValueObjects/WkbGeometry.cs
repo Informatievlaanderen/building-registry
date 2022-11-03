@@ -6,7 +6,7 @@ namespace BuildingRegistry.Building
     using NetTopologySuite.IO;
     using Newtonsoft.Json;
 
-    public class ExtendedWkbGeometry : ByteArrayValueObject<ExtendedWkbGeometry>
+    public sealed class ExtendedWkbGeometry : ByteArrayValueObject<ExtendedWkbGeometry>
     {
         public const int SridLambert72 = 31370;
 
