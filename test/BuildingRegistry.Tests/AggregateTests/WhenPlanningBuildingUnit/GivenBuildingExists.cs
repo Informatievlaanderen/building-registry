@@ -13,6 +13,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuildingUnit
     using Building.Exceptions;
     using Fixtures;
     using FluentAssertions;
+    using Moq;
     using Xunit;
     using Xunit.Abstractions;
 
@@ -28,7 +29,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuildingUnit
         {
             var command = Fixture.Create<PlanBuildingUnit>().WithDeviation(false);
 
-            var building = new BuildingFactory(NoSnapshotStrategy.Instance).Create();
+            var building = new BuildingFactory(NoSnapshotStrategy.Instance, Mock.Of<IAddCommonBuildingUnit>()).Create();
 
             var buildingWasPlannedV2 = Fixture.Create<BuildingWasPlannedV2>();
             ((ISetProvenance)buildingWasPlannedV2).SetProvenance(Fixture.Create<Provenance>());

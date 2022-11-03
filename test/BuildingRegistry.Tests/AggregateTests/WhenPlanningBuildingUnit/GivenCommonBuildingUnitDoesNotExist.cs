@@ -35,7 +35,13 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuildingUnit
         [Fact]
         public void VerifyAddCommonBuildingUnitIsCalled()
         {
-            var building = new BuildingFactory(NoSnapshotStrategy.Instance).Create();
+            var expectedCommonBuildingUnitPersistentLocalId = Fixture.Create<BuildingUnitPersistentLocalId>();
+            var addCommonBuilding = new Mock<IAddCommonBuildingUnit>();
+            addCommonBuilding
+                .Setup(x => x.GenerateNextPersistentLocalId())
+                .Returns(expectedCommonBuildingUnitPersistentLocalId);
+
+            var building = new BuildingFactory(NoSnapshotStrategy.Instance, addCommonBuilding.Object).Create();
 
             var buildingWasPlannedV2 = Fixture.Create<BuildingWasPlannedV2>();
             var buildingUnitWasPlannedV2 = Fixture.Create<BuildingUnitWasPlannedV2>().WithFunction(BuildingUnitFunction.Unknown);
@@ -46,14 +52,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuildingUnit
                 buildingUnitWasPlannedV2
             });
 
-            var expectedCommonBuildingUnitPersistentLocalId = Fixture.Create<BuildingUnitPersistentLocalId>();
-            var addCommonBuilding = new Mock<IAddCommonBuildingUnit>();
-            addCommonBuilding
-                .Setup(x => x.GenerateNextPersistentLocalId())
-                .Returns(expectedCommonBuildingUnitPersistentLocalId);
-
             building.PlanBuildingUnit(
-                addCommonBuilding.Object,
                 Fixture.Create<BuildingUnitPersistentLocalId>(),
                 BuildingUnitPositionGeometryMethod.DerivedFromObject,
                 null,

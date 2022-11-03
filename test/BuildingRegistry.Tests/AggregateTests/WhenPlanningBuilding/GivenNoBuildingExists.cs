@@ -10,6 +10,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuilding
     using Building.Exceptions;
     using Fixtures;
     using FluentAssertions;
+    using Moq;
     using Xunit;
     using Xunit.Abstractions;
 
@@ -53,7 +54,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuilding
 
             // Act
             var result = Building.Plan(
-                new BuildingFactory(NoSnapshotStrategy.Instance),
+                new BuildingFactory(NoSnapshotStrategy.Instance, Mock.Of<IAddCommonBuildingUnit>()),
                 command.BuildingPersistentLocalId,
                 command.Geometry);
 

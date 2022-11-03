@@ -13,7 +13,6 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenCorrectingBuildingUnitRetire
     using Building.Events;
     using Building.Exceptions;
     using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Requests;
-    using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Validators;
     using BuildingRegistry.Api.BackOffice.Building;
     using BuildingRegistry.Api.BackOffice.BuildingUnit;
     using FluentAssertions;
@@ -68,7 +67,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenCorrectingBuildingUnitRetire
 
             Fixture.Register(() => buildingUnitPersistentLocalId);
 
-            var building = new BuildingFactory(NoSnapshotStrategy.Instance).Create();
+            var building = new BuildingFactory(NoSnapshotStrategy.Instance, Mock.Of<IAddCommonBuildingUnit>()).Create();
             var buildingUnitPlanned = Fixture.Create<BuildingUnitWasPlannedV2>();
             var ifMatchHeader = "IncorrectIfMatchHeader";
 

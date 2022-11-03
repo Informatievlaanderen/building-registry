@@ -15,6 +15,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitNotRea
     using Extensions;
     using Fixtures;
     using FluentAssertions;
+    using Moq;
     using Xunit;
     using Xunit.Abstractions;
     using BuildingGeometry = Building.BuildingGeometry;
@@ -309,7 +310,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitNotRea
         public void StateCheck()
         {
             // Arrange
-            var building = new BuildingFactory(NoSnapshotStrategy.Instance).Create();
+            var building = new BuildingFactory(NoSnapshotStrategy.Instance, Mock.Of<IAddCommonBuildingUnit>()).Create();
 
             // Act
             building.Initialize(new object[]

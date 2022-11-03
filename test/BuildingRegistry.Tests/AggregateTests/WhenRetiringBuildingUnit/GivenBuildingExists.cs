@@ -15,6 +15,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRetiringBuildingUnit
     using BuildingRegistry.Tests.Extensions;
     using Fixtures;
     using FluentAssertions;
+    using Moq;
     using Xunit;
     using Xunit.Abstractions;
     using BuildingUnit = Building.Commands.BuildingUnit;
@@ -172,7 +173,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRetiringBuildingUnit
         [Fact]
         public void StateCheck()
         {
-            var building = new BuildingFactory(NoSnapshotStrategy.Instance).Create();
+            var building = new BuildingFactory(NoSnapshotStrategy.Instance, Mock.Of<IAddCommonBuildingUnit>()).Create();
 
             var buildingWasPlanned = Fixture.Create<BuildingWasPlannedV2>();
             ((ISetProvenance)buildingWasPlanned).SetProvenance(Fixture.Create<Provenance>());

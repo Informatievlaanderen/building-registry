@@ -4,6 +4,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenRealizingBuildingUnit
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
+    using Autofac;
     using AutoFixture;
     using Be.Vlaanderen.Basisregisters.AggregateSource.Snapshotting;
     using Be.Vlaanderen.Basisregisters.Api.ETag;
@@ -69,7 +70,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenRealizingBuildingUnit
 
             Fixture.Register(() => buildingUnitPersistentLocalId);
 
-            var building = new BuildingFactory(NoSnapshotStrategy.Instance).Create();
+            var building = new BuildingFactory(NoSnapshotStrategy.Instance, Mock.Of<IAddCommonBuildingUnit>()).Create();
             var buildingUnitPlanned = Fixture.Create<BuildingUnitWasPlannedV2>();
             var ifMatchHeader = "IncorrectIfMatchHeader";
 

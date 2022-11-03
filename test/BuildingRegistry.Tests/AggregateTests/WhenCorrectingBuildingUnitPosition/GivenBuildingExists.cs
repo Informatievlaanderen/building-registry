@@ -1,7 +1,7 @@
 namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitPosition
 {
-    using System.Collections.Generic;
     using System;
+    using System.Collections.Generic;
     using System.Linq;
     using Api.BackOffice.Abstractions.Building;
     using AutoFixture;
@@ -17,6 +17,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitPositi
     using Extensions;
     using Fixtures;
     using FluentAssertions;
+    using Moq;
     using Xunit;
     using Xunit.Abstractions;
     using BuildingGeometry = Building.BuildingGeometry;
@@ -272,7 +273,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitPositi
                                    "</gml:exterior>" +
                                    "</gml:Polygon>";
 
-            var building = new BuildingFactory(NoSnapshotStrategy.Instance).Create();
+            var building = new BuildingFactory(NoSnapshotStrategy.Instance, Mock.Of<IAddCommonBuildingUnit>()).Create();
 
             var buildingWasPlannedV2 = new BuildingWasPlannedV2(
                 Fixture.Create<BuildingPersistentLocalId>(),

@@ -14,6 +14,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRealizingBuildingUnit
     using Building.Exceptions;
     using Fixtures;
     using FluentAssertions;
+    using Moq;
     using Xunit;
     using Xunit.Abstractions;
     using BuildingUnit = Building.Commands.BuildingUnit;
@@ -229,7 +230,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRealizingBuildingUnit
         [Fact]
         public void StateCheck_WithoutDeviation()
         {
-            var building = new BuildingFactory(NoSnapshotStrategy.Instance).Create();
+            var building = new BuildingFactory(NoSnapshotStrategy.Instance, Mock.Of<IAddCommonBuildingUnit>()).Create();
 
             var buildingWasPlanned = Fixture.Create<BuildingWasPlannedV2>();
             ((ISetProvenance)buildingWasPlanned).SetProvenance(Fixture.Create<Provenance>());
@@ -259,7 +260,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRealizingBuildingUnit
         [Fact]
         public void StateCheck_WithDeviation()
         {
-            var building = new BuildingFactory(NoSnapshotStrategy.Instance).Create();
+            var building = new BuildingFactory(NoSnapshotStrategy.Instance, Mock.Of<IAddCommonBuildingUnit>()).Create();
 
             var buildingWasPlanned = Fixture.Create<BuildingWasPlannedV2>();
             ((ISetProvenance)buildingWasPlanned).SetProvenance(Fixture.Create<Provenance>());

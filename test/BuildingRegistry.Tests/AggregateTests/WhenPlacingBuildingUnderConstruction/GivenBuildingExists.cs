@@ -12,6 +12,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlacingBuildingUnderConstruc
     using Building.Exceptions;
     using Fixtures;
     using FluentAssertions;
+    using Moq;
     using Xunit;
     using Xunit.Abstractions;
     using BuildingUnit = Building.Commands.BuildingUnit;
@@ -107,7 +108,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlacingBuildingUnderConstruc
         [Fact]
         public void StateCheck()
         {
-            var sut = new BuildingFactory(NoSnapshotStrategy.Instance).Create();
+            var sut = new BuildingFactory(NoSnapshotStrategy.Instance, Mock.Of<IAddCommonBuildingUnit>()).Create();
             sut.Initialize(new List<object>{ Fixture.Create<BuildingWasPlannedV2>() });
             sut.PlaceUnderConstruction();
             sut.BuildingStatus.Should().Be(BuildingStatus.UnderConstruction);

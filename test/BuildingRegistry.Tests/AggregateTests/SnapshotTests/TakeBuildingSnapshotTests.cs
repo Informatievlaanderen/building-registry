@@ -7,6 +7,7 @@ namespace BuildingRegistry.Tests.AggregateTests.SnapshotTests
     using Building;
     using Building.Events;
     using FluentAssertions;
+    using Moq;
     using Xunit;
     using Xunit.Abstractions;
 
@@ -20,7 +21,7 @@ namespace BuildingRegistry.Tests.AggregateTests.SnapshotTests
         [Fact]
         public void BuildingWasPlannedIsSavedInSnapshot()
         {
-            var aggregate = new BuildingFactory(IntervalStrategy.Default).Create();
+            var aggregate = new BuildingFactory(IntervalStrategy.Default, Mock.Of<IAddCommonBuildingUnit>()).Create();
 
             var buildingWasPlanned = Fixture.Create<BuildingWasPlannedV2>();
 
@@ -42,7 +43,7 @@ namespace BuildingRegistry.Tests.AggregateTests.SnapshotTests
         [Fact]
         public void BuildingWasMigratedIsSavedInSnapshot()
         {
-            var aggregate = new BuildingFactory(IntervalStrategy.Default).Create();
+            var aggregate = new BuildingFactory(IntervalStrategy.Default, Mock.Of<IAddCommonBuildingUnit>()).Create();
 
             var buildingWasMigrated = Fixture.Create<BuildingWasMigrated>();
 
@@ -82,7 +83,7 @@ namespace BuildingRegistry.Tests.AggregateTests.SnapshotTests
         [Fact]
         public void BuildingUnitWasPlannedIsSavedInSnapshot()
         {
-            var aggregate = new BuildingFactory(IntervalStrategy.Default).Create();
+            var aggregate = new BuildingFactory(IntervalStrategy.Default, Mock.Of<IAddCommonBuildingUnit>()).Create();
 
             var buildingWasPlanned = Fixture.Create<BuildingWasPlannedV2>();
             var buildingUnitWasPlanned = Fixture.Create<BuildingUnitWasPlannedV2>();
