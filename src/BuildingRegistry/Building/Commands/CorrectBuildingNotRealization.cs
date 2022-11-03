@@ -6,7 +6,7 @@ namespace BuildingRegistry.Building.Commands
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Be.Vlaanderen.Basisregisters.Utilities;
 
-    public class CorrectBuildingNotRealization : IHasCommandProvenance
+    public sealed class CorrectBuildingNotRealization : IHasCommandProvenance
     {
         private static readonly Guid Namespace = new Guid("7f52a1ad-2f76-419e-b2af-c84a41b9c447");
 
