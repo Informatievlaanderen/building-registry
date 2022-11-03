@@ -11,7 +11,7 @@ namespace BuildingRegistry.Building.Events
     [EventTags(EventTag.For.Sync, EventTag.For.Edit, Tag.Building)]
     [EventName(EventName)]
     [EventDescription("De gebouweenheid werd niet gerealiseerd.")]
-    public class BuildingUnitWasNotRealizedV2 : IBuildingEvent
+    public sealed class BuildingUnitWasNotRealizedV2 : IBuildingEvent
     {
         public const string EventName = "BuildingUnitWasNotRealizedV2"; // BE CAREFUL CHANGING THIS!!
 

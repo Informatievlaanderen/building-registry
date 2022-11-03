@@ -11,7 +11,7 @@ namespace BuildingRegistry.Building.Events
     [EventTags(EventTag.For.Sync, EventTag.For.Edit, Tag.Building)]
     [EventName(EventName)]
     [EventDescription("Het gebouw met status gerealiseerd werd gecorrigeerd naar status inAanbouw.")]
-    public class BuildingWasCorrectedFromRealizedToUnderConstruction : IBuildingEvent
+    public sealed class BuildingWasCorrectedFromRealizedToUnderConstruction : IBuildingEvent
     {
         public const string EventName = "BuildingWasCorrectedFromRealizedToUnderConstruction"; // BE CAREFUL CHANGING THIS!!
 

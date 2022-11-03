@@ -11,7 +11,7 @@ namespace BuildingRegistry.Building.Events
     [EventTags(EventTag.For.Sync, EventTag.For.Edit, Tag.Building)]
     [EventName(EventName)]
     [EventDescription("De gebouweenheid met status nietGerealiseerd werd gecorrigeerd naar status gepland.")]
-    public class BuildingUnitWasCorrectedFromNotRealizedToPlanned : IBuildingEvent
+    public sealed class BuildingUnitWasCorrectedFromNotRealizedToPlanned : IBuildingEvent
     {
         public const string EventName = "BuildingUnitWasCorrectedFromNotRealizedToPlanned"; // BE CAREFUL CHANGING THIS!!
 
