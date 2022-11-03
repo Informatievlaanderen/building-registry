@@ -35,7 +35,7 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
         /// <param name="ifMatchHeaderValue"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        [HttpPost("{buildingUnitPersistentLocalId}/acties/opheffing")]
+        [HttpPost("{buildingUnitPersistentLocalId}/acties/opheffen")]
         [ProducesResponseType(StatusCodes.Status202Accepted)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
