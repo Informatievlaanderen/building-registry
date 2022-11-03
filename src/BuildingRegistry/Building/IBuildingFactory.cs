@@ -10,15 +10,17 @@ namespace BuildingRegistry.Building
     public class BuildingFactory : IBuildingFactory
     {
         private readonly ISnapshotStrategy _snapshotStrategy;
+        private readonly IAddCommonBuildingUnit _addCommonBuildingUnit;
 
-        public BuildingFactory(ISnapshotStrategy snapshotStrategy)
+        public BuildingFactory(ISnapshotStrategy snapshotStrategy, IAddCommonBuildingUnit addCommonBuildingUnit)
         {
             _snapshotStrategy = snapshotStrategy;
+            _addCommonBuildingUnit = addCommonBuildingUnit;
         }
 
         public Building Create()
         {
-            return new Building(_snapshotStrategy);
+            return new Building(_snapshotStrategy, _addCommonBuildingUnit);
         }
     }
 }

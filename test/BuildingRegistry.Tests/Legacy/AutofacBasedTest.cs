@@ -18,6 +18,7 @@ namespace BuildingRegistry.Tests.Legacy
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.Logging;
     using Microsoft.Extensions.Primitives;
+    using Moq;
     using Xunit.Abstractions;
 
     public class TestConfig : IConfiguration
@@ -89,7 +90,7 @@ namespace BuildingRegistry.Tests.Legacy
                 .As<IAddCommonBuildingUnit>();
 
             containerBuilder
-                .Register(c => new BuildingFactory(NoSnapshotStrategy.Instance))
+                .Register(c => new BuildingFactory(NoSnapshotStrategy.Instance, c.Resolve<IAddCommonBuildingUnit>()))
                 .As<IBuildingFactory>();
 
             _container = containerBuilder.Build();

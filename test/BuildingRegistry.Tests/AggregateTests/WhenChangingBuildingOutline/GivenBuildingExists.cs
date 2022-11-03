@@ -15,6 +15,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenChangingBuildingOutline
     using Extensions;
     using Fixtures;
     using FluentAssertions;
+    using Moq;
     using Xunit;
     using Xunit.Abstractions;
     using BuildingUnitFunction = BuildingRegistry.Legacy.BuildingUnitFunction;
@@ -285,7 +286,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenChangingBuildingOutline
                     positionGeometryMethod: BuildingUnitPositionGeometryMethod.DerivedFromObject)
                 .Build();
 
-            var sut = new BuildingFactory(NoSnapshotStrategy.Instance).Create();
+            var sut = new BuildingFactory(NoSnapshotStrategy.Instance, Mock.Of<IAddCommonBuildingUnit>()).Create();
             sut.Initialize(new List<object> { buildingWasMigrated });
 
             // Act

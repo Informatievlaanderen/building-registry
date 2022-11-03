@@ -8,6 +8,7 @@ namespace BuildingRegistry.Building
 
     public partial class Building
     {
+        private readonly IAddCommonBuildingUnit _addCommonBuildingUnit;
         private IBuildingEvent? _lastEvent;
 
         private string _lastSnapshotEventHash = string.Empty;
@@ -26,10 +27,13 @@ namespace BuildingRegistry.Building
         public ProvenanceData LastProvenanceData =>
             _lastEvent is null ? _lastSnapshotProvenance : _lastEvent.Provenance;
 
-        internal Building(ISnapshotStrategy snapshotStrategy)
+        internal Building(
+            ISnapshotStrategy snapshotStrategy,
+            IAddCommonBuildingUnit addCommonBuildingUnit)
             : this()
         {
             Strategy = snapshotStrategy;
+            _addCommonBuildingUnit = addCommonBuildingUnit;
         }
 
         private Building()
@@ -169,6 +173,15 @@ namespace BuildingRegistry.Building
             _lastEvent = @event;
         }
 
+        private void When(CommonBuildingUnitWasAddedV2 @event)
+        {
+            var commonBuildingUnit = new BuildingUnit(ApplyChange);
+            commonBuildingUnit.Route(@event);
+            _buildingUnits.Add(commonBuildingUnit);
+
+            _lastEvent = @event;
+        }
+
         private void When(BuildingUnitWasRealizedV2 @event)
         {
             var buildingUnit = BuildingUnits.Single(x => x.BuildingUnitPersistentLocalId == @event.BuildingUnitPersistentLocalId);
@@ -258,15 +271,6 @@ namespace BuildingRegistry.Building
 
             _lastSnapshotEventHash = @event.LastEventHash;
             _lastSnapshotProvenance = @event.LastProvenanceData;
-        }
-
-        private void When(CommonBuildingUnitWasAddedV2 @event)
-        {
-            var commonBuildingUnit = new BuildingUnit(ApplyChange);
-            commonBuildingUnit.Route(@event);
-            _buildingUnits.Add(commonBuildingUnit);
-
-            _lastEvent = @event;
         }
     }
 }

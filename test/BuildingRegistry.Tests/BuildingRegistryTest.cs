@@ -14,6 +14,7 @@ namespace BuildingRegistry.Tests
     using Fixtures;
     using Infrastructure.Modules;
     using Microsoft.Extensions.Configuration;
+    using Moq;
     using Newtonsoft.Json;
     using Xunit.Abstractions;
     using BuildingUnitFunction = BuildingRegistry.Legacy.BuildingUnitFunction;
@@ -100,7 +101,7 @@ namespace BuildingRegistry.Tests
             builder.RegisterModule(new SqlSnapshotStoreModule());
 
             builder
-                .Register(c => new BuildingFactory(Fixture.Create<ISnapshotStrategy>()))
+                .Register(c => new BuildingFactory(Fixture.Create<ISnapshotStrategy>(), c.Resolve<IAddCommonBuildingUnit>()))
                 .As<IBuildingFactory>();
         }
 

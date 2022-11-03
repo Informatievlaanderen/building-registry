@@ -15,6 +15,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenNotRealizingBuilding
     using BuildingRegistry.Legacy;
     using Fixtures;
     using FluentAssertions;
+    using Moq;
     using Xunit;
     using Xunit.Abstractions;
     using BuildingGeometry = Building.BuildingGeometry;
@@ -189,7 +190,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenNotRealizingBuilding
             );
             ((ISetProvenance)buildingWasMigrated).SetProvenance(Fixture.Create<Provenance>());
 
-            var sut = new BuildingFactory(NoSnapshotStrategy.Instance).Create();
+            var sut = new BuildingFactory(NoSnapshotStrategy.Instance, Mock.Of<IAddCommonBuildingUnit>()).Create();
             sut.Initialize(new List<object> { buildingWasMigrated });
 
             // Act

@@ -9,6 +9,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenMigratingBuilding
     using Building.Commands;
     using Building.Events;
     using FluentAssertions;
+    using Moq;
     using Xunit;
     using Xunit.Abstractions;
 
@@ -44,7 +45,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenMigratingBuilding
 
             // Act
             var result = Building.MigrateBuilding(
-                new BuildingFactory(NoSnapshotStrategy.Instance),
+                new BuildingFactory(NoSnapshotStrategy.Instance, Mock.Of<IAddCommonBuildingUnit>()),
                 command.BuildingId,
                 command.BuildingPersistentLocalId,
                 command.BuildingPersistentLocalIdAssignmentDate,

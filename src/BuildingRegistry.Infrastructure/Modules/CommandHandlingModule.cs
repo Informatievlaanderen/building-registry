@@ -30,7 +30,7 @@ namespace BuildingRegistry.Infrastructure.Modules
             }
             
             builder
-                .Register(c => new BuildingFactory(snapshotStrategy))
+                .Register(c => new BuildingFactory(snapshotStrategy, c.Resolve<IAddCommonBuildingUnit>()))
                 .As<IBuildingFactory>();
 
             builder

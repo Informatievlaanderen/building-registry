@@ -11,6 +11,7 @@ namespace BuildingRegistry.Tests.AggregateTests.SnapshotTests
     using Fixtures;
     using FluentAssertions;
     using Legacy.Autofixture;
+    using Moq;
     using Xunit;
     using Xunit.Abstractions;
 
@@ -71,7 +72,7 @@ namespace BuildingRegistry.Tests.AggregateTests.SnapshotTests
 
             Fixture.Customize(new WithValidExtendedWkbPolygon());
 
-            _sut = new BuildingFactory(IntervalStrategy.Default).Create();
+            _sut = new BuildingFactory(IntervalStrategy.Default, Mock.Of<IAddCommonBuildingUnit>()).Create();
             _buildingSnapshot = Fixture.Create<BuildingSnapshot>();
             _sut.Initialize(new List<object> { _buildingSnapshot });
         }
