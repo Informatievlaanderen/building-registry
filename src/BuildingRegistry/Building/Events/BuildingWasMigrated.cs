@@ -12,7 +12,7 @@ namespace BuildingRegistry.Building.Events
     [EventTags(EventTag.For.Sync, Tag.Migration)]
     [EventName(EventName)]
     [EventDescription("Het gebouw werd gemigreerd.")]
-    public class BuildingWasMigrated : IBuildingEvent
+    public sealed class BuildingWasMigrated : IBuildingEvent
     {
         public const string EventName = "BuildingWasMigrated"; // BE CAREFUL CHANGING THIS!!
 
@@ -105,7 +105,7 @@ namespace BuildingRegistry.Building.Events
 
         public string GetHash() => this.ToEventHash(EventName);
 
-        public class BuildingUnit
+        public sealed class BuildingUnit
         {
             [EventPropertyDescription("Interne GUID van de gebouweenheid.")]
             public Guid BuildingUnitId { get; }

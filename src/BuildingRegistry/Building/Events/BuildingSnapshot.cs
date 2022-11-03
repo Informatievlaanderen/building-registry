@@ -10,7 +10,7 @@ namespace BuildingRegistry.Building.Events
     [EventName("BuildingSnapshot")]
     [EventSnapshot(nameof(SnapshotContainer) + "<BuildingSnapshot>", typeof(SnapshotContainer))]
     [EventDescription("Snapshot of Building with BuildingUnits")]
-    public class BuildingSnapshot
+    public sealed class BuildingSnapshot
     {
         public int BuildingPersistentLocalId { get; }
         public string BuildingStatus { get; }
@@ -65,7 +65,7 @@ namespace BuildingRegistry.Building.Events
             BuildingUnits = buildingUnits;
         }
 
-        public class BuildingUnitData
+        public sealed class BuildingUnitData
         {
             public int BuildingUnitPersistentLocalId { get; }
 

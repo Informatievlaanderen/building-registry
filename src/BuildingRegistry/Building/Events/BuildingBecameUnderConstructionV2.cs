@@ -11,7 +11,7 @@ namespace BuildingRegistry.Building.Events
     [EventTags(EventTag.For.Sync, EventTag.For.Edit, Tag.Building)]
     [EventName(EventName)]
     [EventDescription("Het gebouw werd inAanbouw geplaatst.")]
-    public class BuildingBecameUnderConstructionV2 : IBuildingEvent
+    public sealed class BuildingBecameUnderConstructionV2 : IBuildingEvent
     {
         public const string EventName = "BuildingBecameUnderConstructionV2"; // BE CAREFUL CHANGING THIS!!
 

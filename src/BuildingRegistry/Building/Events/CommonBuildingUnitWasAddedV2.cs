@@ -11,7 +11,7 @@ namespace BuildingRegistry.Building.Events
     [EventTags(EventTag.For.Sync, EventTag.For.Edit, Tag.Building)]
     [EventName(EventName)]
     [EventDescription("De gebouweenheid gemeenschappelijkDeel werd automatisch aangemaakt.")]
-    public class CommonBuildingUnitWasAddedV2 : IBuildingEvent
+    public sealed class CommonBuildingUnitWasAddedV2 : IBuildingEvent
     {
         public const string EventName = "CommonBuildingUnitWasAddedV2"; // BE CAREFUL CHANGING THIS!!
 

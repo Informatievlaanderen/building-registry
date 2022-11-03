@@ -11,7 +11,7 @@ namespace BuildingRegistry.Building.Events
     [EventTags(EventTag.For.Sync, EventTag.For.Edit, Tag.Building)]
     [EventName(EventName)]
     [EventDescription("De positie van de gebouweenheid werd gecorrigeerd.")]
-    public class BuildingUnitPositionWasCorrected : IBuildingEvent
+    public sealed class BuildingUnitPositionWasCorrected : IBuildingEvent
     {
         public const string EventName = "BuildingUnitPositionWasCorrected"; // BE CAREFUL CHANGING THIS!!
 

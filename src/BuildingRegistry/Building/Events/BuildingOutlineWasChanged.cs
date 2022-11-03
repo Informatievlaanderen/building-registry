@@ -12,7 +12,7 @@ namespace BuildingRegistry.Building.Events
     [EventTags(EventTag.For.Sync, EventTag.For.Edit, Tag.Building)]
     [EventName(EventName)]
     [EventDescription("De geometrie van het geschetst gebouw werd gewijzigd.")]
-    public class BuildingOutlineWasChanged : IBuildingEvent
+    public sealed class BuildingOutlineWasChanged : IBuildingEvent
     {
         public const string EventName = "BuildingOutlineWasChanged"; // BE CAREFUL CHANGING THIS!!
 
