@@ -5,7 +5,7 @@ namespace BuildingRegistry.Building
     using Be.Vlaanderen.Basisregisters.AggregateSource;
     using NodaTime;
 
-    public class ReaddressingBeginDate : StructDataTypeValueObject<ReaddressingBeginDate, LocalDate>, IComparable
+    public sealed class ReaddressingBeginDate : StructDataTypeValueObject<ReaddressingBeginDate, LocalDate>, IComparable
     {
         public ReaddressingBeginDate(LocalDate readdressingBeginDate) : base(readdressingBeginDate)  { }
 
