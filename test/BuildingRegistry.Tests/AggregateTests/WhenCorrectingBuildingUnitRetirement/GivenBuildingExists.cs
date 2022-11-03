@@ -12,6 +12,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitRetire
     using Building.Commands;
     using Building.Events;
     using Building.Exceptions;
+    using Extensions;
     using Fixtures;
     using FluentAssertions;
     using Xunit;
@@ -39,19 +40,34 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitRetire
             var buildingUnitWasPlanned = Fixture.Create<BuildingUnitWasPlannedV2>();
             ((ISetProvenance)buildingUnitWasPlanned).SetProvenance(Fixture.Create<Provenance>());
 
+            var buildingGeometry = new BuildingGeometry(
+                new ExtendedWkbGeometry(GeometryHelper.ValidPolygon.AsBinary()),
+                BuildingGeometryMethod.Outlined);
+
+            var validPointInPolygon = new BuildingRegistry.Legacy.ExtendedWkbGeometry(GeometryHelper.ValidPointInPolygon.AsBinary());
+
+            var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
+                .WithBuildingPersistentLocalId(command.BuildingPersistentLocalId)
+                .WithBuildingStatus(BuildingStatus.Realized)
+                .WithBuildingGeometry(buildingGeometry)
+                .WithBuildingUnit(
+                    BuildingRegistry.Legacy.BuildingUnitStatus.Retired,
+                    command.BuildingUnitPersistentLocalId,
+                    positionGeometryMethod: BuildingRegistry.Legacy.BuildingUnitPositionGeometryMethod.AppointedByAdministrator,
+                    extendedWkbGeometry: validPointInPolygon)
+                .Build();
+
             Assert(new Scenario()
                 .Given(
                     new BuildingStreamId(Fixture.Create<BuildingPersistentLocalId>()),
-                    Fixture.Create<BuildingWasPlannedV2>(),
-                    Fixture.Create<BuildingWasRealizedV2>(),
-                    buildingUnitWasPlanned,
-                    Fixture.Create<BuildingUnitWasRetiredV2>())
+                    buildingWasMigrated)
                 .When(command)
                 .Then(new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
                     new BuildingUnitWasCorrectedFromRetiredToRealized(
                         command.BuildingPersistentLocalId,
                         command.BuildingUnitPersistentLocalId,
-                        new ExtendedWkbGeometry(buildingUnitWasPlanned.ExtendedWkbGeometry)))));
+                        new ExtendedWkbGeometry(GeometryHelper.ValidPointInPolygon.AsBinary()),
+                        BuildingUnitPositionGeometryMethod.AppointedByAdministrator))));
         }
 
         [Fact]
@@ -204,34 +220,47 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitRetire
         [Fact]
         public void StateCheck()
         {
-            var building = new BuildingFactory(NoSnapshotStrategy.Instance).Create();
+            var command = Fixture.Create<CorrectBuildingUnitRetirement>();
 
-            var buildingWasPlanned = Fixture.Create<BuildingWasPlannedV2>();
-            ((ISetProvenance)buildingWasPlanned).SetProvenance(Fixture.Create<Provenance>());
+            var buildingGeometry = new BuildingGeometry(
+                new ExtendedWkbGeometry(GeometryHelper.ValidPolygon.AsBinary()),
+                BuildingGeometryMethod.Outlined);
 
-            var buildingUnitWasPlanned = Fixture.Create<BuildingUnitWasPlannedV2>();
-            ((ISetProvenance)buildingUnitWasPlanned).SetProvenance(Fixture.Create<Provenance>());
+            var validPointInBuildingGeometry =
+                new BuildingRegistry.Legacy.ExtendedWkbGeometry(GeometryHelper.ValidPointInPolygon.AsBinary());
 
-            var buildingUnitWasRetired = Fixture.Create<BuildingUnitWasRetiredV2>();
-            ((ISetProvenance)buildingUnitWasRetired).SetProvenance(Fixture.Create<Provenance>());
+            var migrateScenario = new BuildingWasMigratedBuilder(Fixture)
+                .WithBuildingPersistentLocalId(command.BuildingPersistentLocalId)
+                .WithBuildingStatus(BuildingStatus.Realized)
+                .WithBuildingGeometry(buildingGeometry)
+                .WithBuildingUnit(
+                    BuildingRegistry.Legacy.BuildingUnitStatus.Retired,
+                    command.BuildingUnitPersistentLocalId,
+                    positionGeometryMethod: BuildingRegistry.Legacy.BuildingUnitPositionGeometryMethod.AppointedByAdministrator,
+                    extendedWkbGeometry: validPointInBuildingGeometry)
+                .Build();
 
-            var eventToTest = Fixture.Create<BuildingUnitWasCorrectedFromRetiredToRealized>();
+            var eventToTest = new BuildingUnitWasCorrectedFromRetiredToRealized(
+                command.BuildingPersistentLocalId,
+                command.BuildingUnitPersistentLocalId,
+                new ExtendedWkbGeometry(GeometryHelper.ValidPolygon.AsBinary()),
+                BuildingUnitPositionGeometryMethod.AppointedByAdministrator);
             ((ISetProvenance)eventToTest).SetProvenance(Fixture.Create<Provenance>());
 
             // Act
+            var building = new BuildingFactory(NoSnapshotStrategy.Instance).Create();
             building.Initialize(new object[]
             {
-                buildingWasPlanned,
-                buildingUnitWasPlanned,
-                buildingUnitWasRetired,
-                eventToTest
+                migrateScenario, eventToTest
             });
 
             // Assert
-            building.BuildingUnits.Should().NotBeEmpty();
-            building.BuildingUnits.Count.Should().Be(1);
             var buildingUnit = building.BuildingUnits.First();
+
             buildingUnit.Status.Should().Be(BuildingUnitStatus.Realized);
+            buildingUnit.BuildingUnitPosition.Geometry.Should().Be(new ExtendedWkbGeometry(GeometryHelper.ValidPolygon.AsBinary()));
+            buildingUnit.BuildingUnitPosition.GeometryMethod.Should().Be(BuildingUnitPositionGeometryMethod.AppointedByAdministrator);
+
             buildingUnit.LastEventHash.Should().NotBe(building.LastEventHash);
         }
     }

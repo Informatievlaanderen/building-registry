@@ -323,7 +323,8 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitNotRea
                         new BuildingUnitWasCorrectedFromRetiredToRealized(
                             command.BuildingPersistentLocalId,
                             new BuildingUnitPersistentLocalId(1),
-                            null))));
+                            buildingGeometry.Center,
+                            BuildingUnitPositionGeometryMethod.DerivedFromObject))));
         }
 
         [Fact]
@@ -376,7 +377,8 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitNotRea
                         new BuildingUnitWasCorrectedFromRetiredToRealized(
                             command.BuildingPersistentLocalId,
                             new BuildingUnitPersistentLocalId(1),
-                            initialBuildingGeometry.Center))));
+                            initialBuildingGeometry.Center,
+                            BuildingUnitPositionGeometryMethod.DerivedFromObject))));
         }
     }
 }

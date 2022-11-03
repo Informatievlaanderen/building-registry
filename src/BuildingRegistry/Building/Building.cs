@@ -375,7 +375,8 @@ namespace BuildingRegistry.Building
                 ApplyChange(new BuildingUnitWasCorrectedFromRetiredToRealized(
                     BuildingPersistentLocalId,
                     commonBuildingUnit.BuildingUnitPersistentLocalId,
-                    commonBuildingUnitPosition));
+                    BuildingGeometry.Center,
+                    BuildingUnitPositionGeometryMethod.DerivedFromObject));
             }
         }
 
@@ -458,7 +459,8 @@ namespace BuildingRegistry.Building
                     buildingUnitPersistentLocalId);
             }
 
-            buildingUnit.CorrectRetiredBuildingUnit();
+            buildingUnit.CorrectRetiredBuildingUnit(()
+                => (!BuildingGeometry.Contains(buildingUnit.BuildingUnitPosition.Geometry), BuildingGeometry.Center));
 
             if (_buildingUnits.HasCommonBuildingUnit())
             {

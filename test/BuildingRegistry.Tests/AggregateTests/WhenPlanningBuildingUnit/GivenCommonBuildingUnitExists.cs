@@ -199,7 +199,8 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuildingUnit
                     new BuildingUnitWasCorrectedFromRetiredToRealized(
                         command.BuildingPersistentLocalId,
                         new BuildingUnitPersistentLocalId(1),
-                        null))));
+                        buildingGeometry.Center,
+                        BuildingUnitPositionGeometryMethod.DerivedFromObject))));
         }
     }
 }

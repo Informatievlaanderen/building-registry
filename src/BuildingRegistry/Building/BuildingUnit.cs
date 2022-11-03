@@ -3,6 +3,7 @@ namespace BuildingRegistry.Building
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using Autofac.Diagnostics;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
     using Events;
     using Exceptions;
@@ -260,7 +261,7 @@ namespace BuildingRegistry.Building
             Apply(new BuildingUnitWasRetiredV2(_buildingPersistentLocalId, BuildingUnitPersistentLocalId));
         }
 
-        public void CorrectRetiredBuildingUnit()
+        public void CorrectRetiredBuildingUnit(Func<(bool isOutsideBuildingGeometry,  ExtendedWkbGeometry buildingCenteroid)> isBuildingUnitOutsideBuildingGeometry)
         {
             if (IsRemoved)
             {
@@ -282,7 +283,23 @@ namespace BuildingRegistry.Building
                 throw new BuildingUnitHasInvalidStatusException();
             }
 
-            Apply(new BuildingUnitWasCorrectedFromRetiredToRealized(_buildingPersistentLocalId, BuildingUnitPersistentLocalId, BuildingUnitPosition.Geometry));
+            var (isOutsideBuildingGeometry, buildingCenteroid)  = isBuildingUnitOutsideBuildingGeometry();
+            if (isOutsideBuildingGeometry)
+            {
+                Apply(new BuildingUnitWasCorrectedFromRetiredToRealized(
+                    _buildingPersistentLocalId,
+                    BuildingUnitPersistentLocalId,
+                    buildingCenteroid,
+                    BuildingUnitPositionGeometryMethod.DerivedFromObject));
+            }
+            else
+            {
+                Apply(new BuildingUnitWasCorrectedFromRetiredToRealized(
+                    _buildingPersistentLocalId,
+                    BuildingUnitPersistentLocalId,
+                    BuildingUnitPosition.Geometry,
+                    BuildingUnitPosition.GeometryMethod));
+            }
         }
 
         public void RestoreSnapshot(

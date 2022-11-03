@@ -143,12 +143,9 @@ namespace BuildingRegistry.Building
         {
             Status = BuildingUnitStatus.Realized;
 
-            if (!string.IsNullOrWhiteSpace(@event.DerivedExtendedWkbGeometry))
-            {
-                BuildingUnitPosition = new BuildingUnitPosition(
-                    new ExtendedWkbGeometry(@event.DerivedExtendedWkbGeometry),
-                    BuildingUnitPositionGeometryMethod.DerivedFromObject);
-            }
+            BuildingUnitPosition = new BuildingUnitPosition(
+                new ExtendedWkbGeometry(@event.DerivedExtendedWkbGeometry),
+                BuildingUnitPositionGeometryMethod.Parse(@event.GeometryMethod));
 
             _lastEvent = @event;
         }

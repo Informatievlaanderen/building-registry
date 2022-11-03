@@ -21,7 +21,10 @@ namespace BuildingRegistry.Building.Events
         public int BuildingUnitPersistentLocalId { get; }
 
         [EventPropertyDescription("Extended WKB-voorstelling van de gebouweenheidpositie (Hexadecimale notatie).")]
-        public string? DerivedExtendedWkbGeometry { get; }
+        public string DerivedExtendedWkbGeometry { get; }
+
+        [EventPropertyDescription("Geometriemethode van de gebouweenheidpositie. Mogelijkheden: Outlined of MeasuredByGrb.")]
+        public string GeometryMethod { get; }
 
         [EventPropertyDescription("Metadata bij het event.")]
         public ProvenanceData Provenance { get; private set; }
@@ -29,25 +32,27 @@ namespace BuildingRegistry.Building.Events
         public BuildingUnitWasCorrectedFromRetiredToRealized(
             BuildingPersistentLocalId buildingPersistentLocalId,
             BuildingUnitPersistentLocalId buildingUnitPersistentLocalId,
-            ExtendedWkbGeometry? derivedExtendedWkbGeometry)
+            ExtendedWkbGeometry derivedExtendedWkbGeometry,
+            BuildingUnitPositionGeometryMethod geometryMethod)
         {
             BuildingPersistentLocalId = buildingPersistentLocalId;
             BuildingUnitPersistentLocalId = buildingUnitPersistentLocalId;
-            DerivedExtendedWkbGeometry = derivedExtendedWkbGeometry ?? (string?)null;
+            DerivedExtendedWkbGeometry = derivedExtendedWkbGeometry;
+            GeometryMethod = geometryMethod;
         }
 
         [JsonConstructor]
         private BuildingUnitWasCorrectedFromRetiredToRealized(
             int buildingPersistentLocalId,
             int buildingUnitPersistentLocalId,
-            string? derivedExtendedWkbGeometry,
+            string derivedExtendedWkbGeometry,
+            string geometryMethod,
             ProvenanceData provenance)
             : this(
                 new BuildingPersistentLocalId(buildingPersistentLocalId),
                 new BuildingUnitPersistentLocalId(buildingUnitPersistentLocalId),
-                !string.IsNullOrWhiteSpace(derivedExtendedWkbGeometry)
-                    ? new ExtendedWkbGeometry(derivedExtendedWkbGeometry)
-                    : null)
+                new ExtendedWkbGeometry(derivedExtendedWkbGeometry),
+                BuildingUnitPositionGeometryMethod.Parse(geometryMethod))
             => ((ISetProvenance)this).SetProvenance(provenance.ToProvenance());
 
         void ISetProvenance.SetProvenance(Provenance provenance) => Provenance = new ProvenanceData(provenance);
@@ -57,10 +62,9 @@ namespace BuildingRegistry.Building.Events
             var fields = Provenance.GetHashFields().ToList();
             fields.Add(BuildingPersistentLocalId.ToString(CultureInfo.InvariantCulture));
             fields.Add(BuildingUnitPersistentLocalId.ToString(CultureInfo.InvariantCulture));
-            if (!string.IsNullOrWhiteSpace(DerivedExtendedWkbGeometry))
-            {
-                fields.Add(DerivedExtendedWkbGeometry);
-            }
+            fields.Add(GeometryMethod);
+            fields.Add(DerivedExtendedWkbGeometry);
+
             return fields;
         }
 
