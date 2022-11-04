@@ -32,7 +32,7 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.Building.Validators
             public const string BuildingUnitCannotBeCorrectedFromNotRealizedToPlannedBecauseOfInvalidBuildingStatus = "GebouwStatusNietInGeplandOfGerealiseerd";
             public const string BuildingUnitCannotBeNotRealized = "GebouweenheidGehistoreerdOfGerealiseerd";
             public const string BuildingUnitCannotBePlanned = "GebouweenheidGebouwIdNietGerealiseerdofGehistoreerd";
-            public const string BuildingStatusIsNotRealizedOrRetired = "GebouweenheidGebouwNietGerealiseerdofGehistoreerd";
+            public const string BuildingStatusIsNotRealizedOrRetired = "GebouwStatusNietInGeplandOfGerealiseerd";
             public const string BuildingUnitPositionCannotBeCorrected = "GebouweenheidNietGerealiseerdOfGehistoreerd";
             public const string BuildingUnitOutsideGeometryBuilding = "GebouweenheidOngeldigePositieValidatie";
             public const string BuildingUnitHasInvalidFunction = "GebouweenheidGemeenschappelijkDeel";
@@ -77,7 +77,7 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.Building.Validators
             public const string BuildingUnitCannotBeCorrectedFromNotRealizedToPlanned = "Deze actie is enkel toegestaan op gebouweenheden met status 'nietGerealiseerd'.";
             public const string BuildingUnitCannotBeCorrectedFromNotRealizedToPlannedBecauseOfInvalidBuildingStatus = "Deze actie is enkel toegestaan binnen een gepland of gerealiseerd gebouw.";
             public const string BuildingUnitCannotBePlanned = "De gebouwId is niet gerealiseerd of gehistoreerd.";
-            public const string BuildingStatusIsNotRealizedOrRetired = "Het gebouw is niet gerealiseerd of gehistoreerd.";
+            public const string BuildingStatusIsNotRealizedOrRetired = "Deze actie is enkel toegestaan binnen een gepland of gerealiseerd gebouw.";
             public const string BuildingUnitPositionCannotBeCorrected = "Deze actie is enkel toegestaan op gebouweenheden met status 'gepland' of 'gerealiseerd'.";
             public const string BuildingUnitOutsideGeometryBuilding = "De positie dient binnen de geometrie van het gebouw te liggen.";
             public const string BuildingUnitHasInvalidFunction = "Deze actie is niet toegestaan op gebouweenheden met functie gemeenschappelijkDeel.";
