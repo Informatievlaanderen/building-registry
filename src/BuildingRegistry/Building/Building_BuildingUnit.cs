@@ -203,17 +203,7 @@ namespace BuildingRegistry.Building
 
         public void RemoveBuildingUnit(BuildingUnitPersistentLocalId buildingUnitPersistentLocalId)
         {
-            GuardRemovedBuilding();
-
             var buildingUnit = BuildingUnits.FirstOrDefault(x => x.BuildingUnitPersistentLocalId == buildingUnitPersistentLocalId);
-
-            var invalidStatuses = new[]
-                {BuildingStatus.NotRealized, BuildingStatus.Retired};
-
-            if (invalidStatuses.Contains(BuildingStatus))
-            {
-                throw new BuildingHasInvalidStatusException();
-            }
 
             if (buildingUnit is null)
             {
