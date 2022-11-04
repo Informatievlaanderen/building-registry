@@ -248,6 +248,18 @@ namespace BuildingRegistry.Building
             return correctedBuildingUnitPosition;
         }
 
+        public void Remove()
+        {
+            GuardCommonUnit();
+
+            if (IsRemoved)
+            {
+                return;
+            }
+
+            Apply(new BuildingUnitWasRemovedV2(_buildingPersistentLocalId, BuildingUnitPersistentLocalId));
+        }
+
         public void RestoreSnapshot(
             BuildingPersistentLocalId buildingPersistentLocalId,
             BuildingSnapshot.BuildingUnitData buildingUnitData)

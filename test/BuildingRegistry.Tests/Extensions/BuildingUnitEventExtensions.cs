@@ -113,4 +113,18 @@ namespace BuildingRegistry.Tests.Extensions
             return updatedEvent;
         }
     }
+
+    public static class BuildingUnitWasRemovedV2Extensions
+    {
+        public static BuildingUnitWasRemovedV2 WithBuildingUnitPersistentLocalId(this BuildingUnitWasRemovedV2 @event,
+            BuildingUnitPersistentLocalId buildingUnitPersistentLocalId)
+        {
+            var updatedEvent = new BuildingUnitWasRemovedV2(
+                new BuildingPersistentLocalId(@event.BuildingPersistentLocalId),
+                buildingUnitPersistentLocalId);
+            ((ISetProvenance)updatedEvent).SetProvenance(@event.Provenance.ToProvenance());
+
+            return updatedEvent;
+        }
+    }
 }
