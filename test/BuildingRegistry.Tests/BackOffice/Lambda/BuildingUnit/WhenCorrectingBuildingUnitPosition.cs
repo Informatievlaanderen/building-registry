@@ -171,6 +171,48 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
         }
 
         [Fact]
+        public async Task WhenBuildingHasInvalidStatus_ThenTicketingErrorIsExpected()
+        {
+            // Arrange
+            var ticketing = new Mock<ITicketing>();
+            var buildingPersistentLocalId = Fixture.Create<BuildingPersistentLocalId>();
+            var buildingUnitPersistentLocalId = Fixture.Create<BuildingUnitPersistentLocalId>();
+
+            PlanBuilding(buildingPersistentLocalId);
+            PlanBuildingUnit(buildingPersistentLocalId, buildingUnitPersistentLocalId);
+
+            var handler = new CorrectBuildingUnitPositionLambdaHandler(
+                Container.Resolve<IConfiguration>(),
+                new FakeRetryPolicy(),
+                ticketing.Object,
+                MockExceptionIdempotentCommandHandler<BuildingHasInvalidStatusException>().Object,
+                Container.Resolve<IBuildings>());
+
+            // Act
+            await handler.Handle(new CorrectBuildingUnitPositionLambdaRequest(
+                    buildingPersistentLocalId,
+                    buildingUnitPersistentLocalId,
+                    Guid.NewGuid(),
+                    null,
+                    Fixture.Create<Provenance>(),
+                    new Dictionary<string, object?>(),
+                    new CorrectBuildingUnitPositionBackOfficeRequest
+                    {
+                        PositieGeometrieMethode = PositieGeometrieMethode.AfgeleidVanObject
+                    }),
+                CancellationToken.None);
+
+            //Assert
+            ticketing.Verify(x =>
+                x.Error(
+                    It.IsAny<Guid>(),
+                    new TicketError(
+                        "Deze actie is enkel toegestaan binnen een gepland of gerealiseerd gebouw.",
+                        "GebouwStatusNietInGeplandOfGerealiseerd"),
+                    CancellationToken.None));
+        }
+
+        [Fact]
         public async Task WhenBuildingUnitHasInvalidFunction_ThenTicketingErrorIsExpected()
         {
             // Arrange

@@ -50,8 +50,8 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenCorrectingBuildingUnitPositi
                 .ThrowAsync<ValidationException>()
                 .Result
                 .Where(x => x.Errors.Any(e =>
-                    e.ErrorCode == "GebouweenheidGebouwNietGerealiseerdofGehistoreerd"
-                    && e.ErrorMessage == "Het gebouw is niet gerealiseerd of gehistoreerd."));
+                    e.ErrorCode == "GebouwStatusNietInGeplandOfGerealiseerd"
+                    && e.ErrorMessage == "Deze actie is enkel toegestaan binnen een gepland of gerealiseerd gebouw."));
         }
     }
 }
