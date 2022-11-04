@@ -1,3 +1,11 @@
+## [3.40.2](https://github.com/informatievlaanderen/building-registry/compare/v3.40.1...v3.40.2) (2022-11-04)
+
+
+### Bug Fixes
+
+* add example request correct position bu ([4d9e221](https://github.com/informatievlaanderen/building-registry/commit/4d9e2216a335fe79e6f07fbe673a87dcd0f6347c))
+* change error messages building invalid status on correct bu position ([8f1ca81](https://github.com/informatievlaanderen/building-registry/commit/8f1ca811b54b1c6ec253659fd78a692f4321f33e))
+
 ## [3.40.1](https://github.com/informatievlaanderen/building-registry/compare/v3.40.0...v3.40.1) (2022-11-03)
 
 
