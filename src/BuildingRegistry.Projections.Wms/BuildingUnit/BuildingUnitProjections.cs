@@ -155,8 +155,11 @@ namespace BuildingRegistry.Projections.Wms.BuildingUnit
             When<Envelope<BuildingUnitPersistentLocalIdWasAssigned>>(async (context, message, ct) =>
             {
                 var buildingUnit = await context.BuildingUnits.FindAsync(message.Message.BuildingUnitId, cancellationToken: ct);
-                buildingUnit.Id = PersistentLocalIdHelper.CreateBuildingUnitId(message.Message.PersistentLocalId);
-                buildingUnit.BuildingUnitPersistentLocalId = int.Parse(message.Message.PersistentLocalId.ToString());
+                if (buildingUnit is not null)
+                {
+                    buildingUnit.Id = PersistentLocalIdHelper.CreateBuildingUnitId(message.Message.PersistentLocalId);
+                    buildingUnit.BuildingUnitPersistentLocalId = int.Parse(message.Message.PersistentLocalId.ToString());
+                }
             });
 
             When<Envelope<BuildingUnitWasAdded>>(async (context, message, ct) =>
