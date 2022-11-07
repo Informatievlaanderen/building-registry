@@ -100,7 +100,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
         {
             // Arrange
             var buildingPersistentLocalId = Fixture.Create<BuildingPersistentLocalId>();
-            var expectedBuildingUnitPersistentLocalId = Fixture.Create<BuildingUnitPersistentLocalId>();
+            var expectedBuildingUnitPersistentLocalId = new BuildingUnitPersistentLocalId(3);
             var persistentLocalIdGenerator = new Mock<IPersistentLocalIdGenerator>();
             persistentLocalIdGenerator
                 .Setup(x => x.GenerateNextPersistentLocalId())
@@ -117,7 +117,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
                 {
                     new BuildingRegistry.Building.Commands.BuildingUnit(
                         Fixture.Create<BuildingRegistry.Legacy.BuildingUnitId>(),
-                        new BuildingRegistry.Legacy.PersistentLocalId(1),
+                        new BuildingRegistry.Legacy.PersistentLocalId(2),
                         BuildingRegistry.Legacy.BuildingUnitFunction.Unknown,
                         BuildingRegistry.Legacy.BuildingUnitStatus.Planned,
                         new List<AddressPersistentLocalId>(),

@@ -12,8 +12,10 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitRetire
     using Xunit;
     using Xunit.Abstractions;
     using BuildingGeometry = Building.BuildingGeometry;
+    using BuildingGeometryMethod = Building.BuildingGeometryMethod;
     using BuildingStatus = Building.BuildingStatus;
-    using BuildingUnitFunction = BuildingRegistry.Legacy.BuildingUnitFunction;
+    using BuildingUnitPositionGeometryMethod = Building.BuildingUnitPositionGeometryMethod;
+    using ExtendedWkbGeometry = Building.ExtendedWkbGeometry;
 
     public class GivenCommonBuildingUnit : BuildingRegistryTest
     {
@@ -24,15 +26,18 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitRetire
         }
 
         [Fact]
-        public void WithRetiredCommonBuilding_ThenCommonBuildingBecomesRealized()
+        public void WithRetiredCommonBuildingUnit_ThenCommonBuildingBecomesRealized()
         {
-            var command = Fixture.Create<CorrectBuildingUnitRetirement>();
-
-            var commonBuildingUnitPersistentLocalId = Fixture.Create<BuildingUnitPersistentLocalId>();
+            var command = new CorrectBuildingUnitRetirement(
+                Fixture.Create<BuildingPersistentLocalId>(),
+                new BuildingUnitPersistentLocalId(1),
+                Fixture.Create<Provenance>());
 
             var buildingGeometry = new BuildingGeometry(
                 new ExtendedWkbGeometry(GeometryHelper.ValidPolygon.AsBinary()),
                 BuildingGeometryMethod.Outlined);
+
+            var commonBuildingUnitPersistentLocalId = new BuildingUnitPersistentLocalId(2);
 
             var migrateScenario = new BuildingWasMigratedBuilder(Fixture)
                 .WithBuildingPersistentLocalId(command.BuildingPersistentLocalId)
@@ -46,11 +51,12 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitRetire
                 .WithBuildingUnit(
                     BuildingRegistry.Legacy.BuildingUnitStatus.Retired,
                     commonBuildingUnitPersistentLocalId,
-                    BuildingUnitFunction.Common,
+                    BuildingRegistry.Legacy.BuildingUnitFunction.Common,
                     positionGeometryMethod: BuildingRegistry.Legacy.BuildingUnitPositionGeometryMethod.AppointedByAdministrator,
                     extendedWkbGeometry: new BuildingRegistry.Legacy.ExtendedWkbGeometry(buildingGeometry.Center.ToString()))
                 .WithBuildingUnit(
                     BuildingRegistry.Legacy.BuildingUnitStatus.Realized,
+                    new BuildingUnitPersistentLocalId(3),
                     positionGeometryMethod: BuildingRegistry.Legacy.BuildingUnitPositionGeometryMethod.AppointedByAdministrator,
                     extendedWkbGeometry: new BuildingRegistry.Legacy.ExtendedWkbGeometry(buildingGeometry.Center.ToString()))
                 .Build();
@@ -96,7 +102,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitRetire
                 .WithBuildingUnit(
                     BuildingRegistry.Legacy.BuildingUnitStatus.Retired,
                     commonBuildingUnitPersistentLocalId,
-                    BuildingUnitFunction.Common)
+                    BuildingRegistry.Legacy.BuildingUnitFunction.Common)
                 .WithBuildingUnit(
                     BuildingRegistry.Legacy.BuildingUnitStatus.Realized,
                     positionGeometryMethod: BuildingRegistry.Legacy.BuildingUnitPositionGeometryMethod.AppointedByAdministrator,
@@ -169,7 +175,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitRetire
                         new CommonBuildingUnitWasAddedV2(
                             command.BuildingPersistentLocalId,
                             new BuildingUnitPersistentLocalId(1),
-                            BuildingRegistry.Building.BuildingUnitStatus.Realized,
+                            BuildingUnitStatus.Realized,
                             BuildingUnitPositionGeometryMethod.DerivedFromObject,
                             buildingGeometry.Center,
                             false))));

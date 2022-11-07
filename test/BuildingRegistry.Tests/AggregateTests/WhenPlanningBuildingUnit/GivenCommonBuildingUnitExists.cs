@@ -70,6 +70,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuildingUnit
         public void WithNotRealizedCommonBuildingUnit_ThenCommonBuildingUnitIsPlanned(string buildingStatus)
         {
             var command = Fixture.Create<PlanBuildingUnit>()
+                .WithPersistentLocalId(new BuildingUnitPersistentLocalId(3))
                 .WithoutPosition()
                 .WithDeviation(false);
 
@@ -81,7 +82,9 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuildingUnit
                 .WithBuildingPersistentLocalId(command.BuildingPersistentLocalId)
                 .WithBuildingStatus(buildingStatus)
                 .WithBuildingGeometry(buildingGeometry)
-                .WithBuildingUnit(BuildingRegistry.Legacy.BuildingUnitStatus.Planned, new BuildingUnitPersistentLocalId(1))
+                .WithBuildingUnit(
+                    BuildingRegistry.Legacy.BuildingUnitStatus.Planned,
+                    new BuildingUnitPersistentLocalId(1))
                 .WithBuildingUnit(
                     BuildingRegistry.Legacy.BuildingUnitStatus.NotRealized,
                     new BuildingUnitPersistentLocalId(2),
@@ -160,6 +163,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuildingUnit
         public void WithRetiredCommonBuildingUnitAndRealizedBuilding_ThenCommonBuildingUnitIsRealized()
         {
             var command = Fixture.Create<PlanBuildingUnit>()
+                .WithPersistentLocalId(new BuildingUnitPersistentLocalId(3))
                 .WithoutPosition()
                 .WithDeviation(false);
 
@@ -167,17 +171,19 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuildingUnit
                 new ExtendedWkbGeometry(GeometryHelper.ValidPolygon.AsBinary()),
                 BuildingGeometryMethod.Outlined);
 
+            var retiredBuildingUnitPersistentLocalId = new BuildingUnitPersistentLocalId(2);
             var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
                 .WithBuildingPersistentLocalId(command.BuildingPersistentLocalId)
                 .WithBuildingStatus(BuildingStatus.Realized)
                 .WithBuildingGeometry(buildingGeometry)
                 .WithBuildingUnit(
                     BuildingRegistry.Legacy.BuildingUnitStatus.Planned,
+                    new BuildingUnitPersistentLocalId(1),
                     positionGeometryMethod: BuildingRegistry.Legacy.BuildingUnitPositionGeometryMethod.AppointedByAdministrator,
                     extendedWkbGeometry: new BuildingRegistry.Legacy.ExtendedWkbGeometry(buildingGeometry.Center.ToString()))
                 .WithBuildingUnit(
                     BuildingRegistry.Legacy.BuildingUnitStatus.Retired,
-                    new BuildingUnitPersistentLocalId(1),
+                    retiredBuildingUnitPersistentLocalId,
                     BuildingRegistry.Legacy.BuildingUnitFunction.Common)
                 .Build();
 
@@ -198,7 +204,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuildingUnit
                     new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
                     new BuildingUnitWasCorrectedFromRetiredToRealized(
                         command.BuildingPersistentLocalId,
-                        new BuildingUnitPersistentLocalId(1),
+                        retiredBuildingUnitPersistentLocalId,
                         null))));
         }
     }
