@@ -8,7 +8,7 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Requests
     using MediatR;
     using Newtonsoft.Json;
 
-    public class RemoveBuildingUnitRequest : RealizeBuildingUnitBackOfficeRequest, IRequest<ETagResponse>
+    public class RemoveBuildingUnitRequest : RemoveBuildingUnitBackOfficeRequest, IRequest<ETagResponse>
     {
         [JsonIgnore]
         public IDictionary<string, object> Metadata { get; set; }
