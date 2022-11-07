@@ -3,7 +3,6 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.BuildingUnit
     using System.Threading;
     using System.Threading.Tasks;
     using Abstractions;
-    using Abstractions.Building.Responses;
     using Abstractions.BuildingUnit.Extensions;
     using Abstractions.BuildingUnit.Requests;
     using Be.Vlaanderen.Basisregisters.CommandHandling;
