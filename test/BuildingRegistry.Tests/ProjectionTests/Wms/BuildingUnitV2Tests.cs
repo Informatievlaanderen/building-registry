@@ -573,6 +573,39 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wms
         }
 
         [Fact]
+        public async Task WhenBuildingUnitWasRemovedV2()
+        {
+            _fixture.Customize(new WithFixedBuildingPersistentLocalId());
+            _fixture.Customize(new WithFixedBuildingUnitPersistentLocalId());
+
+            var buildingUnitWasPlannedV2 = _fixture.Create<BuildingUnitWasPlannedV2>();
+
+            ((ISetProvenance)buildingUnitWasPlannedV2).SetProvenance(_fixture.Create<Provenance>());
+
+
+            var @event = new BuildingUnitWasRemovedV2(
+                new BuildingPersistentLocalId(buildingUnitWasPlannedV2.BuildingPersistentLocalId),
+                new BuildingUnitPersistentLocalId(buildingUnitWasPlannedV2.BuildingUnitPersistentLocalId));
+            ((ISetProvenance)@event).SetProvenance(_fixture.Create<Provenance>());
+
+            await Sut
+                .Given(
+                    new Envelope<BuildingUnitWasPlannedV2>(
+                        new Envelope(
+                            buildingUnitWasPlannedV2,
+                            new Dictionary<string, object> { { AddEventHashPipe.HashMetadataKey, buildingUnitWasPlannedV2.GetHash() } })),
+                    new Envelope<BuildingUnitWasRemovedV2>(
+                        new Envelope(
+                            @event,
+                            new Dictionary<string, object> { { AddEventHashPipe.HashMetadataKey, @event.GetHash() } })))
+                .Then(async ct =>
+                {
+                    var item = await ct.BuildingUnitsV2.FindAsync(@event.BuildingUnitPersistentLocalId);
+                    item.Should().BeNull();
+                });
+        }
+
+        [Fact]
         public async Task WhenCommonBuildingUnitWasAddedV2()
         {
             _fixture.Customize(new WithFixedBuildingPersistentLocalId());
