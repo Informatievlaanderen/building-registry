@@ -1,3 +1,10 @@
+## [3.40.3](https://github.com/informatievlaanderen/building-registry/compare/v3.40.2...v3.40.3) (2022-11-07)
+
+
+### Bug Fixes
+
+* wms buildingunit assign id when already removed GAWR-3945 ([01f4f0e](https://github.com/informatievlaanderen/building-registry/commit/01f4f0ebaeef7512a166f2bbe5ba3c7632a36860))
+
 ## [3.40.2](https://github.com/informatievlaanderen/building-registry/compare/v3.40.1...v3.40.2) (2022-11-04)
 
 
