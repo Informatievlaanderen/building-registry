@@ -52,9 +52,20 @@ namespace BuildingRegistry.Building
             return newBuilding;
         }
 
+        private static readonly List<BuildingStatus> ChangeBuildingOutlineInvalidStatuses = new()
+        {
+            BuildingStatus.NotRealized,
+            BuildingStatus.Retired
+        };
+
         public void ChangeOutlining(ExtendedWkbGeometry extendedWkbGeometry)
         {
             GuardRemovedBuilding();
+
+            if (ChangeBuildingOutlineInvalidStatuses.Contains(BuildingStatus))
+            {
+                throw new BuildingHasInvalidStatusException();
+            }
 
             if (BuildingGeometry.Method != BuildingGeometryMethod.Outlined)
             {

@@ -114,6 +114,11 @@ namespace BuildingRegistry.Api.BackOffice.Building
                 {
                     BuildingIsRemovedException => new ApiException(ValidationErrorMessages.Building.BuildingRemoved, StatusCodes.Status410Gone),
 
+                    BuildingHasInvalidStatusException => CreateValidationException(
+                        ValidationErrorCodes.Building.BuildingOutlineCannotBeChanged,
+                        string.Empty,
+                        ValidationErrorMessages.Building.BuildingOutlineCannotBeChanged),
+
                     BuildingHasInvalidBuildingGeometryMethodException => CreateValidationException(
                         ValidationErrorCodes.Building.BuildingIsMeasuredByGrb,
                         string.Empty,

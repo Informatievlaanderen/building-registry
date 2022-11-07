@@ -55,6 +55,9 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.Building
         {
             return exception switch
             {
+                BuildingHasInvalidStatusException => new TicketError(
+                    ValidationErrorMessages.Building.BuildingOutlineCannotBeChanged,
+                    ValidationErrorCodes.Building.BuildingOutlineCannotBeChanged),
                 BuildingHasInvalidBuildingGeometryMethodException => new TicketError(
                     ValidationErrorMessages.Building.BuildingIsMeasuredByGrb,
                     ValidationErrorCodes.Building.BuildingIsMeasuredByGrb),
