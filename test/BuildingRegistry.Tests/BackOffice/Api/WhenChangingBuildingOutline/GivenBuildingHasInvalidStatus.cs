@@ -15,11 +15,11 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenChangingBuildingOutline
     using Xunit;
     using Xunit.Abstractions;
 
-    public class GivenBuildingHasBuildingUnitsOutsideBuildingGeometry : BackOfficeApiTest
+    public class GivenBuildingHasInvalidStatus : BackOfficeApiTest
     {
         private readonly BuildingController _controller;
 
-        public GivenBuildingHasBuildingUnitsOutsideBuildingGeometry(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
+        public GivenBuildingHasInvalidStatus(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
         {
             _controller = CreateBuildingControllerWithUser<BuildingController>();
         }
@@ -31,7 +31,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenChangingBuildingOutline
 
             MockMediator
                 .Setup(x => x.Send(It.IsAny<ChangeBuildingOutlineRequest>(), CancellationToken.None).Result)
-                .Throws(new BuildingHasBuildingUnitsOutsideBuildingGeometryException());
+                .Throws(new BuildingHasInvalidStatusException ());
 
             //Act
             Func<Task> act = async () => await _controller.ChangeOutline(
@@ -51,8 +51,8 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenChangingBuildingOutline
                 .Result
                 .Where(x =>
                     x.Errors.Any(
-                        failure => failure.ErrorCode == "GebouweenheidGeomtrieBuitenGebouwGeometrie"
-                                   && failure.ErrorMessage == "Het gebouw heeft onderliggende gebouweenheden met status 'gepland' of 'gerealiseerd' buiten de nieuw geschetste gebouwgeometrie."));
+                        failure => failure.ErrorCode == "GebouwGehistoreerdOfNietGerealiseerd"
+                                   && failure.ErrorMessage == "Deze actie is enkel toegestaan op gebouwen met status 'gepland', 'inAanbouw' of 'gerealiseerd'"));
         }
     }
 }

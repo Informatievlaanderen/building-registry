@@ -7,6 +7,7 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.Building.Validators
             public const string BuildingNotFound = "GebouwNietGevonden";
             public const string BuildingRemoved = "GebouwIsVerwijderd";
             public const string InvalidPolygonGeometry = "GebouwPolygoonValidatie";
+            public const string BuildingOutlineCannotBeChanged = "GebouwGehistoreerdOfNietGerealiseerd";
             public const string BuildingCannotBePlacedUnderConstruction = "GebouwGehistoreerdGerealiseerdOfNietGerealiseerd";
             public const string BuildingCannotCorrectPlacedUnderConstruction = "GebouwGerealiseerdGehistoreerdOfNietGerealiseerd";
             public const string BuildingCannotBeRealizedException = "GebouwGehistoreerdGeplandOfNietGerealiseerd";
@@ -48,6 +49,7 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.Building.Validators
             public const string BuildingNotFound = "Onbestaand gebouw.";
             public const string BuildingRemoved = "Verwijderd gebouw.";
             public const string InvalidPolygonGeometry = "Ongeldig formaat geometriePolygoon.";
+            public const string BuildingOutlineCannotBeChanged = "Deze actie is enkel toegestaan op gebouwen met status 'gepland', 'inAanbouw' of 'gerealiseerd'";
             public const string BuildingCannotBePlacedUnderConstruction = "Deze actie is enkel toegestaan op gebouwen met status 'gepland'.";
             public const string BuildingCannotCorrectPlacedUnderConstruction = "Deze actie is enkel toegestaan op gebouwen met status 'inAanbouw'.";
             public const string BuildingCannotBeRealizedException = "Deze actie is enkel toegestaan op gebouwen met status 'inAanbouw'.";
@@ -57,7 +59,7 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.Building.Validators
 
             public const string BuildingIsMeasuredByGrb = "Deze actie is enkel toegestaan op gebouwen met geometrieMethode 'ingeschetst'.";
             public const string BuildingHasRetiredBuildingUnits = "Deze actie is niet toegestaan wanneer er gehistoreerde gebouweenheden aanwezig zijn.";
-            public const string BuildingHasBuildingUnitsOutsideChangedGeometry = "Het gebouw heeft onderliggende gebouweenheden buiten de nieuw geschetste gebouwgeometrie.";
+            public const string BuildingHasBuildingUnitsOutsideChangedGeometry = "Het gebouw heeft onderliggende gebouweenheden met status 'gepland' of 'gerealiseerd' buiten de nieuw geschetste gebouwgeometrie.";
         }
 
         public static class BuildingUnit
@@ -77,7 +79,7 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.Building.Validators
             public const string BuildingUnitCannotBeCorrectedFromNotRealizedToPlanned = "Deze actie is enkel toegestaan op gebouweenheden met status 'nietGerealiseerd'.";
             public const string BuildingUnitCannotBeCorrectedFromNotRealizedToPlannedBecauseOfInvalidBuildingStatus = "Deze actie is enkel toegestaan binnen een gepland of gerealiseerd gebouw.";
             public const string BuildingUnitCannotBePlanned = "De gebouwId is niet gerealiseerd of gehistoreerd.";
-            public const string BuildingStatusIsNotRealizedOrRetired = "Deze actie is enkel toegestaan binnen een gepland of gerealiseerd gebouw.";
+            public const string BuildingStatusIsNotRealizedOrRetired = "Deze actie is enkel toegestaan binnen een gepland of gerealiseerd gebouw.";
             public const string BuildingUnitPositionCannotBeCorrected = "Deze actie is enkel toegestaan op gebouweenheden met status 'gepland' of 'gerealiseerd'.";
             public const string BuildingUnitOutsideGeometryBuilding = "De positie dient binnen de geometrie van het gebouw te liggen.";
             public const string BuildingUnitHasInvalidFunction = "Deze actie is niet toegestaan op gebouweenheden met functie gemeenschappelijkDeel.";

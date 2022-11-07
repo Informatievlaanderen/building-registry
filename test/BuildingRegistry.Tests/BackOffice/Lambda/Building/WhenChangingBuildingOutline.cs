@@ -125,6 +125,46 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
         }
 
         [Fact]
+        public async Task WhenBuildingHasInvalidStatus_ThenTicketingErrorIsExpected()
+        {
+            // Arrange
+            var ticketing = new Mock<ITicketing>();
+            var buildingPersistentLocalId = Fixture.Create<BuildingPersistentLocalId>();
+
+            var handler = new ChangeBuildingOutlineLambdaHandler(
+                Container.Resolve<IConfiguration>(),
+                new FakeRetryPolicy(),
+                ticketing.Object,
+                MockExceptionIdempotentCommandHandler<BuildingHasInvalidStatusException>().Object,
+                Container.Resolve<IBuildings>());
+
+            // Act
+            await handler.Handle(
+                new ChangeBuildingOutlineLambdaRequest(
+                    buildingPersistentLocalId,
+                    buildingPersistentLocalId,
+                    Guid.NewGuid(),
+                    null,
+                    Fixture.Create<Provenance>(),
+                    new Dictionary<string, object?>(),
+                    new ChangeBuildingOutlineBackOfficeRequest
+                    {
+                        GeometriePolygoon =
+                            "<gml:Polygon srsName=\"https://www.opengis.net/def/crs/EPSG/0/31370\" xmlns:gml=\"http://www.opengis.net/gml/3.2\"><gml:exterior><gml:LinearRing><gml:posList>140284.15277253836 186724.74131567031 140291.06016454101 186726.38355567306 140288.22675654292 186738.25798767805 140281.19098053873 186736.57913967967 140284.15277253836 186724.74131567031</gml:posList></gml:LinearRing></gml:exterior></gml:Polygon>"
+                    }),
+                CancellationToken.None);
+
+            //Assert
+            ticketing.Verify(x =>
+                x.Error(
+                    It.IsAny<Guid>(),
+                    new TicketError(
+                        "Deze actie is enkel toegestaan op gebouwen met status 'gepland', 'inAanbouw' of 'gerealiseerd'",
+                        "GebouwGehistoreerdOfNietGerealiseerd"),
+                    CancellationToken.None));
+        }
+
+        [Fact]
         public async Task WhenBuildingHasInvalidBuildingGeometryMethod_ThenTicketingErrorIsExpected()
         {
             // Arrange
@@ -199,7 +239,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
                 x.Error(
                     It.IsAny<Guid>(),
                     new TicketError(
-                        "Het gebouw heeft onderliggende gebouweenheden buiten de nieuw geschetste gebouwgeometrie.",
+                        "Het gebouw heeft onderliggende gebouweenheden met status 'gepland' of 'gerealiseerd' buiten de nieuw geschetste gebouwgeometrie.",
                         "GebouweenheidGeomtrieBuitenGebouwGeometrie"),
                     CancellationToken.None));
         }

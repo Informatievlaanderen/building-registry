@@ -198,6 +198,33 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenChangingBuildingOutline
                 .Throws(new BuildingIsRemovedException(command.BuildingPersistentLocalId)));
         }
 
+        [Theory]
+        [InlineData("NotRealized")]
+        [InlineData("Retired")]
+        public void WhenBuildingHasInvalidStatus_ThenThrowsBuildingHasInvalidStatusException(string invalidBuildingStatus)
+        {
+            var command = new ChangeBuildingOutline(
+                Fixture.Create<BuildingPersistentLocalId>(),
+                new BuildingRegistry.Building.ExtendedWkbGeometry(GeometryHelper.SecondValidPolygon.AsBinary()),
+                Fixture.Create<Provenance>());
+
+            var initialBuildingGeometry = new BuildingGeometry(
+                new BuildingRegistry.Building.ExtendedWkbGeometry(GeometryHelper.ValidPolygon.AsBinary()),
+                BuildingGeometryMethod.MeasuredByGrb);
+
+            var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
+                .WithBuildingStatus(invalidBuildingStatus)
+                .WithBuildingGeometry(initialBuildingGeometry)
+                .Build();
+
+            Assert(new Scenario()
+                .Given(
+                    new BuildingStreamId(Fixture.Create<BuildingPersistentLocalId>()),
+                    buildingWasMigrated)
+                .When(command)
+                .Throws(new BuildingHasInvalidStatusException ()));
+        }
+
         [Fact]
         public void WhenBuildingGeometryMethodIsMeasuredByGrb_ThenThrowsBuildingHasInvalidBuildingGeometryMethodException()
         {
@@ -221,7 +248,6 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenChangingBuildingOutline
                 .When(command)
                 .Throws(new BuildingHasInvalidBuildingGeometryMethodException()));
         }
-
 
         [Theory]
         [InlineData("Planned")]
