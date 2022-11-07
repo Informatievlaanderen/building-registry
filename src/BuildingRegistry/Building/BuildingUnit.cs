@@ -4,6 +4,7 @@ namespace BuildingRegistry.Building
     using System.Collections.Generic;
     using System.Linq;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
+    using BuildingRegistry.Legacy;
     using Events;
     using Exceptions;
 
@@ -147,12 +148,7 @@ namespace BuildingRegistry.Building
                 throw new BuildingUnitHasInvalidStatusException();
             }
 
-            var correctedBuildingUnitPosition =
-                !buildingGeometry.Contains(BuildingUnitPosition.Geometry)
-                || (BuildingUnitPosition.GeometryMethod == BuildingUnitPositionGeometryMethod.DerivedFromObject
-                    && BuildingUnitPosition.Geometry != buildingGeometry.Center)
-                    ? buildingGeometry.Center
-                    : null;
+            var correctedBuildingUnitPosition = CorrectedBuildingUnitPosition(buildingGeometry);
 
             Apply(new BuildingUnitWasCorrectedFromNotRealizedToPlanned(
                 _buildingPersistentLocalId,
@@ -218,7 +214,7 @@ namespace BuildingRegistry.Building
             Apply(new BuildingUnitWasRetiredV2(_buildingPersistentLocalId, BuildingUnitPersistentLocalId));
         }
 
-        public void CorrectRetiredBuildingUnit()
+        public void CorrectRetiredBuildingUnit(BuildingGeometry buildingGeometry)
         {
             GuardRemoved();
             GuardCommonUnit();
@@ -233,7 +229,23 @@ namespace BuildingRegistry.Building
                 throw new BuildingUnitHasInvalidStatusException();
             }
 
-            Apply(new BuildingUnitWasCorrectedFromRetiredToRealized(_buildingPersistentLocalId, BuildingUnitPersistentLocalId, BuildingUnitPosition.Geometry));
+            var correctedBuildingUnitPosition = CorrectedBuildingUnitPosition(buildingGeometry);
+
+            Apply(new BuildingUnitWasCorrectedFromRetiredToRealized(
+                _buildingPersistentLocalId,
+                BuildingUnitPersistentLocalId,
+                correctedBuildingUnitPosition));
+        }
+
+        private ExtendedWkbGeometry? CorrectedBuildingUnitPosition(BuildingGeometry buildingGeometry)
+        {
+            var correctedBuildingUnitPosition =
+                !buildingGeometry.Contains(BuildingUnitPosition.Geometry)
+                || BuildingUnitPosition.GeometryMethod == BuildingUnitPositionGeometryMethod.DerivedFromObject
+                && BuildingUnitPosition.Geometry != buildingGeometry.Center
+                    ? buildingGeometry.Center
+                    : null;
+            return correctedBuildingUnitPosition;
         }
 
         public void RestoreSnapshot(

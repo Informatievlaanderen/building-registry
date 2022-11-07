@@ -97,12 +97,9 @@ namespace BuildingRegistry.Building
                     buildingUnitPersistentLocalId);
             }
 
-            buildingUnit.CorrectRetiredBuildingUnit();
+            buildingUnit.CorrectRetiredBuildingUnit(BuildingGeometry);
 
-            if (_buildingUnits.HasCommonBuildingUnit())
-            {
-                UpdateStatusCommonBuildingUnit();
-            }
+            AddOrUpdateStatusCommonBuildingUnit();
         }
 
         public void NotRealizeBuildingUnit(BuildingUnitPersistentLocalId buildingUnitPersistentLocalId)

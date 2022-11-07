@@ -116,6 +116,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitNotRea
                         new BuildingUnitPersistentLocalId(1),
                         null))));
         }
+
         [Theory]
         [InlineData("Planned")]
         [InlineData("UnderConstruction")]
@@ -171,6 +172,54 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitNotRea
                         buildingGeometry.Center))));
         }
 
+        [Theory]
+        [InlineData("Planned")]
+        [InlineData("UnderConstruction")]
+        public void WithoutCommonBuildingUnitWithBuildingStatus_ThenCommonBuildingUnitIsAdded(string buildingStatus)
+        {
+            var command = new CorrectBuildingUnitNotRealization(
+                Fixture.Create<BuildingPersistentLocalId>(),
+                new BuildingUnitPersistentLocalId(2),
+                Fixture.Create<Provenance>()
+            );
+
+            var buildingGeometry = new BuildingGeometry(
+                new ExtendedWkbGeometry(GeometryHelper.ValidPolygon.AsBinary()),
+                BuildingGeometryMethod.Outlined);
+
+            var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
+                .WithBuildingPersistentLocalId(command.BuildingPersistentLocalId)
+                .WithBuildingStatus(buildingStatus)
+                .WithBuildingGeometry(buildingGeometry)
+                .WithBuildingUnit(BuildingUnitStatus.Planned, new BuildingUnitPersistentLocalId(3))
+                .WithBuildingUnit(
+                    BuildingUnitStatus.NotRealized,
+                    command.BuildingUnitPersistentLocalId,
+                    positionGeometryMethod: BuildingRegistry.Legacy.BuildingUnitPositionGeometryMethod.AppointedByAdministrator,
+                    extendedWkbGeometry: new BuildingRegistry.Legacy.ExtendedWkbGeometry(buildingGeometry.Center.ToString()))
+                .Build();
+
+            Assert(new Scenario()
+                .Given(
+                    new BuildingStreamId(Fixture.Create<BuildingPersistentLocalId>()),
+                    buildingWasMigrated)
+                .When(command)
+                .Then(
+                    new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
+                        new BuildingUnitWasCorrectedFromNotRealizedToPlanned(
+                            command.BuildingPersistentLocalId,
+                            command.BuildingUnitPersistentLocalId,
+                            null)),
+                    new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
+                        new CommonBuildingUnitWasAddedV2(
+                            command.BuildingPersistentLocalId,
+                            new BuildingUnitPersistentLocalId(1),
+                            BuildingRegistry.Building.BuildingUnitStatus.Planned,
+                            BuildingUnitPositionGeometryMethod.DerivedFromObject,
+                            buildingGeometry.Center,
+                            false))));
+        }
+
         [Fact]
         public void WithNotRealizedCommonBuildingUnitAndRealizedBuilding_ThenCommonBuildingUnitIsRealized()
         {
@@ -207,19 +256,19 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitNotRea
                 .When(command)
                 .Then(
                     new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
-                    new BuildingUnitWasCorrectedFromNotRealizedToPlanned(
-                        command.BuildingPersistentLocalId,
-                        command.BuildingUnitPersistentLocalId,
-                        null)),
+                        new BuildingUnitWasCorrectedFromNotRealizedToPlanned(
+                            command.BuildingPersistentLocalId,
+                            command.BuildingUnitPersistentLocalId,
+                            null)),
                     new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
-                    new BuildingUnitWasCorrectedFromNotRealizedToPlanned(
-                        command.BuildingPersistentLocalId,
-                        new BuildingUnitPersistentLocalId(1),
-                        null)),
+                        new BuildingUnitWasCorrectedFromNotRealizedToPlanned(
+                            command.BuildingPersistentLocalId,
+                            new BuildingUnitPersistentLocalId(1),
+                            null)),
                     new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
-                    new BuildingUnitWasRealizedV2(
-                        command.BuildingPersistentLocalId,
-                        new BuildingUnitPersistentLocalId(1)))));
+                        new BuildingUnitWasRealizedV2(
+                            command.BuildingPersistentLocalId,
+                            new BuildingUnitPersistentLocalId(1)))));
         }
 
         [Fact]
@@ -264,19 +313,65 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitNotRea
                 .When(command)
                 .Then(
                     new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
-                    new BuildingUnitWasCorrectedFromNotRealizedToPlanned(
-                        command.BuildingPersistentLocalId,
-                        command.BuildingUnitPersistentLocalId,
-                        null)),
+                        new BuildingUnitWasCorrectedFromNotRealizedToPlanned(
+                            command.BuildingPersistentLocalId,
+                            command.BuildingUnitPersistentLocalId,
+                            null)),
                     new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
-                    new BuildingUnitWasCorrectedFromNotRealizedToPlanned(
-                        command.BuildingPersistentLocalId,
-                        new BuildingUnitPersistentLocalId(1),
-                        buildingGeometry.Center)),
+                        new BuildingUnitWasCorrectedFromNotRealizedToPlanned(
+                            command.BuildingPersistentLocalId,
+                            new BuildingUnitPersistentLocalId(1),
+                            buildingGeometry.Center)),
                     new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
-                    new BuildingUnitWasRealizedV2(
-                        command.BuildingPersistentLocalId,
-                        new BuildingUnitPersistentLocalId(1)))));
+                        new BuildingUnitWasRealizedV2(
+                            command.BuildingPersistentLocalId,
+                            new BuildingUnitPersistentLocalId(1)))));
+        }
+
+        [Fact]
+        public void WithoutCommonBuildingUnitWithRealizedBuilding_ThenCommonBuildingUnitWasAdded()
+        {
+            var command = new CorrectBuildingUnitNotRealization(
+                Fixture.Create<BuildingPersistentLocalId>(),
+                new BuildingUnitPersistentLocalId(2),
+                Fixture.Create<Provenance>()
+            );
+
+            var buildingGeometry = new BuildingGeometry(
+                new ExtendedWkbGeometry(GeometryHelper.ValidPolygon.AsBinary()),
+                BuildingGeometryMethod.Outlined);
+
+            var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
+                .WithBuildingPersistentLocalId(command.BuildingPersistentLocalId)
+                .WithBuildingGeometry(buildingGeometry)
+                .WithBuildingStatus(BuildingStatus.Realized)
+                .WithBuildingUnit(BuildingUnitStatus.Planned, new BuildingUnitPersistentLocalId(3))
+                .WithBuildingUnit(
+                    BuildingUnitStatus.NotRealized,
+                    command.BuildingUnitPersistentLocalId,
+                    positionGeometryMethod: BuildingRegistry.Legacy.BuildingUnitPositionGeometryMethod.AppointedByAdministrator,
+                    extendedWkbGeometry: new BuildingRegistry.Legacy.ExtendedWkbGeometry(buildingGeometry.Center.ToString()))
+                .Build();
+
+            Assert(new Scenario()
+                .Given(
+                    new BuildingStreamId(Fixture.Create<BuildingPersistentLocalId>()),
+                    buildingWasMigrated)
+                .When(command)
+                .Then(
+                    new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
+                        new BuildingUnitWasCorrectedFromNotRealizedToPlanned(
+                            command.BuildingPersistentLocalId,
+                            command.BuildingUnitPersistentLocalId,
+                            null)),
+                    new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
+                        new CommonBuildingUnitWasAddedV2(
+                            command.BuildingPersistentLocalId,
+                            new BuildingUnitPersistentLocalId(1),
+                            BuildingRegistry.Building.BuildingUnitStatus.Realized,
+                            BuildingUnitPositionGeometryMethod.DerivedFromObject,
+                            buildingGeometry.Center,
+                            false))));
         }
 
         [Fact]
@@ -343,7 +438,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitNotRea
                 .WithBuildingPersistentLocalId(command.BuildingPersistentLocalId)
                 .WithBuildingStatus(BuildingStatus.Realized)
                 .WithBuildingGeometry(initialBuildingGeometry)
-                .WithBuildingUnit(BuildingUnitStatus.Planned)
+                .WithBuildingUnit(BuildingUnitStatus.Planned, new BuildingUnitPersistentLocalId(3))
                 .WithBuildingUnit(
                     BuildingUnitStatus.NotRealized,
                     command.BuildingUnitPersistentLocalId,
