@@ -109,6 +109,14 @@ namespace BuildingRegistry.Tests.Extensions
 
         public BuildingWasMigrated Build()
         {
+            if (_buildingUnits
+                .GroupBy(x => x.BuildingUnitPersistentLocalId)
+                .Any(x => x.Count() > 1))
+            {
+                throw new Exception(
+                    "Test setup contains multiple building units with the same BuildingUnitPersistentLocalId.");
+            }
+
             var buildingWasMigrated = new BuildingWasMigrated(
                 _fixture.Create<BuildingId>(),
                 _buildingPersistentLocalId ?? _fixture.Create<BuildingPersistentLocalId>(),
