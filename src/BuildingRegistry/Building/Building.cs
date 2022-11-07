@@ -459,8 +459,7 @@ namespace BuildingRegistry.Building
                     buildingUnitPersistentLocalId);
             }
 
-            buildingUnit.CorrectRetiredBuildingUnit(()
-                => (!BuildingGeometry.Contains(buildingUnit.BuildingUnitPosition.Geometry), BuildingGeometry.Center));
+            buildingUnit.CorrectRetiredBuildingUnit(BuildingGeometry);
 
             if (_buildingUnits.HasCommonBuildingUnit())
             {
