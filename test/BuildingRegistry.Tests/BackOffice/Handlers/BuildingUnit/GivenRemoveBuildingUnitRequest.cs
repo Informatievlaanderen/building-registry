@@ -12,6 +12,7 @@ namespace BuildingRegistry.Tests.BackOffice.Handlers.BuildingUnit
     using BuildingRegistry.Api.BackOffice.Handlers.BuildingUnit;
     using BuildingRegistry.Building;
     using BuildingRegistry.Building.Commands;
+    using BuildingRegistry.Building.Events;
     using FluentAssertions;
     using SqlStreamStore;
     using SqlStreamStore.Streams;
@@ -70,7 +71,7 @@ namespace BuildingRegistry.Tests.BackOffice.Handlers.BuildingUnit
 
             response.Should().NotBeNull();
             var stream = await Container.Resolve<IStreamStore>().ReadStreamBackwards(new StreamId(new BuildingStreamId(buildingPersistentLocalId)), 3, 1);
-            stream.Messages.First().JsonMetadata.Should().Contain(response.ETag);
+            stream.Messages.First().Type.Should().Be(BuildingUnitWasRemovedV2.EventName);
         }
     }
 }

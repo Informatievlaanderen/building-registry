@@ -8,16 +8,15 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenRemovingBuildingUnit
     using Be.Vlaanderen.Basisregisters.AggregateSource.Snapshotting;
     using Be.Vlaanderen.Basisregisters.Api.ETag;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
-    using Be.Vlaanderen.Basisregisters.Sqs.Responses;
     using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Requests;
     using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Validators;
-    using BuildingRegistry.Api.BackOffice.Building;
     using BuildingRegistry.Api.BackOffice.BuildingUnit;
     using Building;
     using Building.Events;
     using Building.Exceptions;
     using FluentAssertions;
     using FluentValidation;
+    using MediatR;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
     using Moq;
@@ -40,7 +39,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenRemovingBuildingUnit
 
             MockMediator
                 .Setup(x => x.Send(It.IsAny<RemoveBuildingUnitRequest>(), CancellationToken.None).Result)
-                .Returns(new ETagResponse(string.Empty, string.Empty));
+                .Returns(Unit.Value);
 
             var request = new RemoveBuildingUnitRequest
             {
@@ -81,7 +80,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenRemovingBuildingUnit
 
             MockMediator
                 .Setup(x => x.Send(It.IsAny<RemoveBuildingUnitRequest>(), CancellationToken.None).Result)
-                .Returns(new ETagResponse(string.Empty, string.Empty));
+                .Returns(Unit.Value);
 
             var request = new RemoveBuildingUnitRequest
             {

@@ -73,7 +73,8 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
                 }
 
                 request.Metadata = GetMetadata();
-                var response = await Mediator.Send(request, ct);
+
+                await Mediator.Send(request, ct);
 
                 return Accepted(new Uri(string.Format(options.Value.BuildingUnitDetailUrl, request.BuildingUnitPersistentLocalId)));
             }
