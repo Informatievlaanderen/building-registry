@@ -1,3 +1,15 @@
+# [3.41.0](https://github.com/informatievlaanderen/building-registry/compare/v3.40.3...v3.41.0) (2022-11-07)
+
+
+### Bug Fixes
+
+* syndication of address id type GAWR-3952 ([33cd6e1](https://github.com/informatievlaanderen/building-registry/commit/33cd6e1888e148447ab81e2c2fdd7db93e9501b4))
+
+
+### Features
+
+* validate building status when changing building outline ([865b11e](https://github.com/informatievlaanderen/building-registry/commit/865b11ed625d4d8f6ac09cd6cffced548b224ded))
+
 ## [3.40.3](https://github.com/informatievlaanderen/building-registry/compare/v3.40.2...v3.40.3) (2022-11-07)
 
 
