@@ -6,6 +6,7 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
     using System.Threading.Tasks;
     using Abstractions.Building.Validators;
     using Abstractions.BuildingUnit.Requests;
+    using Abstractions.Validation;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
     using Be.Vlaanderen.Basisregisters.Api.ETag;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
@@ -96,6 +97,11 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
             {
                 throw exception switch
                 {
+                    BuildingHasInvalidStatusException => CreateValidationException(
+                        ValidationErrors.RetireBuildingUnit.BuildingInvalidStatus.Code,
+                        string.Empty,
+                        ValidationErrors.RetireBuildingUnit.BuildingInvalidStatus.Message),
+
                     BuildingUnitIsNotFoundException => new ApiException(ValidationErrorMessages.BuildingUnit.BuildingUnitNotFound, StatusCodes.Status404NotFound),
 
                     BuildingUnitIsRemovedException => new ApiException(ValidationErrorMessages.BuildingUnit.BuildingUnitIsRemoved, StatusCodes.Status410Gone),

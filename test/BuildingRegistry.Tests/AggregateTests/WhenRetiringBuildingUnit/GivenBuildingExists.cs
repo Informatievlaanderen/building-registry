@@ -170,6 +170,30 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRetiringBuildingUnit
                 .Throws(new BuildingUnitIsRemovedException(command.BuildingUnitPersistentLocalId)));
         }
 
+        [Theory]
+        [InlineData("Retired")]
+        [InlineData("NotRealized")]
+        public void WithInvalidBuildingStatus_ThrowsBuildingHasInvalidStatusException(string status)
+        {
+            var command = Fixture.Create<RetireBuildingUnit>();
+
+            var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
+                .WithBuildingPersistentLocalId(command.BuildingPersistentLocalId)
+                .WithBuildingStatus(BuildingStatus.Parse(status))
+                .WithBuildingUnit(
+                    BuildingRegistry.Legacy.BuildingUnitStatus.Realized,
+                    Fixture.Create<BuildingUnitPersistentLocalId>(),
+                    BuildingUnitFunction.Unknown)
+                .Build();
+
+            Assert(new Scenario()
+                .Given(
+                    new BuildingStreamId(Fixture.Create<BuildingPersistentLocalId>()),
+                    buildingWasMigrated)
+                .When(command)
+                .Throws(new BuildingHasInvalidStatusException()));
+        }
+
         [Fact]
         public void StateCheck()
         {
