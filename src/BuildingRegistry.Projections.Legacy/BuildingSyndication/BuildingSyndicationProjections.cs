@@ -1074,7 +1074,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
                 await context.CreateNewBuildingSyndicationItem(message.Message.BuildingPersistentLocalId, message, item =>
                 {
                     var unit = item.BuildingUnitsV2.Single(y => y.PersistentLocalId == message.Message.BuildingUnitPersistentLocalId);
-                    unit.Version = message.Message.Provenance.Timestamp;
+                    item.BuildingUnitsV2.Remove(unit);
                 }, ct);
             });
 
