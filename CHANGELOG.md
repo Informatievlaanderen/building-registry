@@ -1,3 +1,15 @@
+# [3.42.0](https://github.com/informatievlaanderen/building-registry/compare/v3.41.0...v3.42.0) (2022-11-08)
+
+
+### Bug Fixes
+
+* correct buildingunit retirement common unit logic ([ccd0e76](https://github.com/informatievlaanderen/building-registry/commit/ccd0e7624e5742eaeb23d6a34030c31ecdda3014))
+
+
+### Features
+
+* add remove building unit domain ([ec45ee4](https://github.com/informatievlaanderen/building-registry/commit/ec45ee4ecbb363ab394e572db5046d2a5bd1e480))
+
 # [3.41.0](https://github.com/informatievlaanderen/building-registry/compare/v3.40.3...v3.41.0) (2022-11-07)
 
 
