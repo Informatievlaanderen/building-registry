@@ -52,10 +52,14 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitRetire
                 .When(command)
                 .Then(
                     new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
+                        new BuildingUnitPositionWasCorrected(command.BuildingPersistentLocalId,
+                            command.BuildingUnitPersistentLocalId,
+                            BuildingUnitPositionGeometryMethod.DerivedFromObject,
+                            buildingGeometry.Center)),
+                    new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
                         new BuildingUnitWasCorrectedFromRetiredToRealized(
                             command.BuildingPersistentLocalId,
-                            command.BuildingUnitPersistentLocalId,
-                            buildingGeometry.Center))));
+                            command.BuildingUnitPersistentLocalId))));
         }
     }
 }

@@ -108,8 +108,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuildingUnit
                     new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
                     new BuildingUnitWasCorrectedFromNotRealizedToPlanned(
                         command.BuildingPersistentLocalId,
-                        new BuildingUnitPersistentLocalId(2),
-                        null))));
+                        new BuildingUnitPersistentLocalId(2)))));
         }
 
         [Fact]
@@ -151,8 +150,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuildingUnit
                     new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
                     new BuildingUnitWasCorrectedFromNotRealizedToPlanned(
                         command.BuildingPersistentLocalId,
-                        new BuildingUnitPersistentLocalId(1),
-                        null)),
+                        new BuildingUnitPersistentLocalId(1))),
                     new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
                     new BuildingUnitWasRealizedV2(
                         command.BuildingPersistentLocalId,
@@ -204,8 +202,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuildingUnit
                     new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
                     new BuildingUnitWasCorrectedFromRetiredToRealized(
                         command.BuildingPersistentLocalId,
-                        retiredBuildingUnitPersistentLocalId,
-                        null))));
+                        retiredBuildingUnitPersistentLocalId))));
         }
     }
 }

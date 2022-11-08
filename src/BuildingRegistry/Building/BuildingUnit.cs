@@ -4,6 +4,7 @@ namespace BuildingRegistry.Building
     using System.Collections.Generic;
     using System.Linq;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
+    using Commands;
     using Events;
     using Exceptions;
 
@@ -145,10 +146,18 @@ namespace BuildingRegistry.Building
 
             var correctedBuildingUnitPosition = CorrectedBuildingUnitPosition(buildingGeometry);
 
+            if (correctedBuildingUnitPosition is not null)
+            {
+                Apply(new BuildingUnitPositionWasCorrected(
+                    _buildingPersistentLocalId,
+                    BuildingUnitPersistentLocalId,
+                    BuildingUnitPositionGeometryMethod.DerivedFromObject,
+                    correctedBuildingUnitPosition));
+            }
+
             Apply(new BuildingUnitWasCorrectedFromNotRealizedToPlanned(
                 _buildingPersistentLocalId,
-                BuildingUnitPersistentLocalId,
-                correctedBuildingUnitPosition));
+                BuildingUnitPersistentLocalId));
         }
 
         public void NotRealizeBecauseBuildingWasNotRealized()
@@ -225,10 +234,18 @@ namespace BuildingRegistry.Building
 
             var correctedBuildingUnitPosition = CorrectedBuildingUnitPosition(buildingGeometry);
 
+            if (correctedBuildingUnitPosition is not null)
+            {
+                Apply(new BuildingUnitPositionWasCorrected(
+                    _buildingPersistentLocalId,
+                    BuildingUnitPersistentLocalId,
+                    BuildingUnitPositionGeometryMethod.DerivedFromObject,
+                    correctedBuildingUnitPosition));
+            }
+
             Apply(new BuildingUnitWasCorrectedFromRetiredToRealized(
                 _buildingPersistentLocalId,
-                BuildingUnitPersistentLocalId,
-                correctedBuildingUnitPosition));
+                BuildingUnitPersistentLocalId));
         }
 
         private void GuardBuildingUnitInvalidStatuses(BuildingUnitStatus[] invalidStatuses)

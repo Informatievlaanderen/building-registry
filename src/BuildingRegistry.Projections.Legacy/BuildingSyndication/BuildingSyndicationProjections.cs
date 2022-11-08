@@ -1035,11 +1035,6 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
                 {
                     var unit = item.BuildingUnitsV2.Single(y => y.PersistentLocalId == message.Message.BuildingUnitPersistentLocalId);
                     unit.Status = BuildingRegistry.Building.BuildingUnitStatus.Planned;
-                    if (!string.IsNullOrWhiteSpace(message.Message.DerivedExtendedWkbGeometry))
-                    {
-                        unit.PointPosition = message.Message.DerivedExtendedWkbGeometry.ToByteArray();
-                        unit.PositionMethod = BuildingRegistry.Building.BuildingUnitPositionGeometryMethod.DerivedFromObject;
-                    }
                     unit.Version = message.Message.Provenance.Timestamp;
                 }, ct);
             });
@@ -1060,11 +1055,6 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
                 {
                     var unit = item.BuildingUnitsV2.Single(y => y.PersistentLocalId == message.Message.BuildingUnitPersistentLocalId);
                     unit.Status = BuildingRegistry.Building.BuildingUnitStatus.Realized;
-                    if (!string.IsNullOrWhiteSpace(message.Message.DerivedExtendedWkbGeometry))
-                    {
-                        unit.PointPosition = message.Message.DerivedExtendedWkbGeometry.ToByteArray();
-                        unit.PositionMethod = BuildingRegistry.Building.BuildingUnitPositionGeometryMethod.DerivedFromObject;
-                    }
                     unit.Version = message.Message.Provenance.Timestamp;
                 }, ct);
             });

@@ -60,8 +60,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitNotRea
                     new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
                     new BuildingUnitWasCorrectedFromNotRealizedToPlanned(
                         command.BuildingPersistentLocalId,
-                        command.BuildingUnitPersistentLocalId,
-                        null))));
+                        command.BuildingUnitPersistentLocalId))));
         }
 
         [Fact]
@@ -88,16 +87,25 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitNotRea
                 .When(command)
                 .Then(
                     new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
+                        new BuildingUnitPositionWasCorrected(
+                            command.BuildingPersistentLocalId,
+                            command.BuildingUnitPersistentLocalId,
+                            BuildingUnitPositionGeometryMethod.DerivedFromObject,
+                            expectedPosition)),
+                    new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
                     new BuildingUnitWasCorrectedFromNotRealizedToPlanned(
                         command.BuildingPersistentLocalId,
-                        command.BuildingUnitPersistentLocalId,
-                        expectedPosition))));
+                        command.BuildingUnitPersistentLocalId))));
         }
 
         [Fact]
         public void WithPositionAppointedByAdminAndOutsideOfBuildingGeometry_ThenBuildingUnitWasCorrectedToPlannedAndPositionCorrected()
         {
             var command = Fixture.Create<CorrectBuildingUnitNotRealization>();
+
+            var buildingGeometry = new BuildingGeometry(
+                new ExtendedWkbGeometry(GeometryHelper.SecondValidPolygon.AsBinary()),
+                BuildingGeometryMethod.Outlined);
 
             Assert(new Scenario()
                 .Given(
@@ -115,13 +123,15 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitNotRea
                 .When(command)
                 .Then(
                     new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
-                    new BuildingUnitWasCorrectedFromNotRealizedToPlanned(
-                        command.BuildingPersistentLocalId,
-                        command.BuildingUnitPersistentLocalId,
-                        new BuildingGeometry(
-                                new ExtendedWkbGeometry(GeometryHelper.SecondValidPolygon.AsBinary()),
-                                BuildingGeometryMethod.Outlined)
-                            .Center))));
+                        new BuildingUnitPositionWasCorrected(
+                            command.BuildingPersistentLocalId,
+                            command.BuildingUnitPersistentLocalId,
+                            BuildingUnitPositionGeometryMethod.DerivedFromObject,
+                            buildingGeometry.Center)),
+                    new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
+                        new BuildingUnitWasCorrectedFromNotRealizedToPlanned(
+                            command.BuildingPersistentLocalId,
+                            command.BuildingUnitPersistentLocalId))));
         }
 
         [Fact]

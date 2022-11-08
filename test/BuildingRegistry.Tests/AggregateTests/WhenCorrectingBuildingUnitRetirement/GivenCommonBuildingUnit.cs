@@ -70,13 +70,11 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitRetire
                     new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
                         new BuildingUnitWasCorrectedFromRetiredToRealized(
                             command.BuildingPersistentLocalId,
-                            command.BuildingUnitPersistentLocalId,
-                            null)),
+                            command.BuildingUnitPersistentLocalId)),
                     new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
                         new BuildingUnitWasCorrectedFromRetiredToRealized(
                             command.BuildingPersistentLocalId,
-                            commonBuildingUnitPersistentLocalId,
-                            null))));
+                            commonBuildingUnitPersistentLocalId))));
         }
 
         [Fact]
@@ -124,15 +122,25 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitRetire
                 .When(command)
                 .Then(
                     new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
-                        new BuildingUnitWasCorrectedFromRetiredToRealized(
+                        new BuildingUnitPositionWasCorrected(
                             command.BuildingPersistentLocalId,
                             command.BuildingUnitPersistentLocalId,
+                            BuildingUnitPositionGeometryMethod.DerivedFromObject,
                             buildingGeometry.Center)),
                     new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
                         new BuildingUnitWasCorrectedFromRetiredToRealized(
                             command.BuildingPersistentLocalId,
+                            command.BuildingUnitPersistentLocalId)),
+                    new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
+                        new BuildingUnitPositionWasCorrected(
+                            command.BuildingPersistentLocalId,
                             commonBuildingUnitPersistentLocalId,
-                            buildingGeometry.Center))));
+                            BuildingUnitPositionGeometryMethod.DerivedFromObject,
+                            buildingGeometry.Center)),
+                    new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
+                        new BuildingUnitWasCorrectedFromRetiredToRealized(
+                            command.BuildingPersistentLocalId,
+                            commonBuildingUnitPersistentLocalId))));
         }
 
         [Fact]
@@ -169,8 +177,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitRetire
                     new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
                         new BuildingUnitWasCorrectedFromRetiredToRealized(
                             command.BuildingPersistentLocalId,
-                            command.BuildingUnitPersistentLocalId,
-                            null)),
+                            command.BuildingUnitPersistentLocalId)),
                     new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
                         new CommonBuildingUnitWasAddedV2(
                             command.BuildingPersistentLocalId,

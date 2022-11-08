@@ -174,11 +174,6 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetailV2
                 await Update(context, message.Message.BuildingUnitPersistentLocalId, item =>
                 {
                     item.Status = BuildingUnitStatus.Planned;
-                    if (!string.IsNullOrWhiteSpace(message.Message.DerivedExtendedWkbGeometry))
-                    {
-                        item.Position = message.Message.DerivedExtendedWkbGeometry.ToByteArray();
-                        item.PositionMethod = BuildingUnitPositionGeometryMethod.DerivedFromObject;
-                    }
                     item.Version = message.Message.Provenance.Timestamp;
                     UpdateHash(item, message);
                 }, ct);
@@ -199,11 +194,6 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetailV2
                 await Update(context, message.Message.BuildingUnitPersistentLocalId, item =>
                 {
                     item.Status = BuildingUnitStatus.Realized;
-                    if (!string.IsNullOrWhiteSpace(message.Message.DerivedExtendedWkbGeometry))
-                    {
-                        item.Position = message.Message.DerivedExtendedWkbGeometry.ToByteArray();
-                        item.PositionMethod = BuildingUnitPositionGeometryMethod.DerivedFromObject;
-                    }
                     item.Version = message.Message.Provenance.Timestamp;
                     UpdateHash(item, message);
                 }, ct);

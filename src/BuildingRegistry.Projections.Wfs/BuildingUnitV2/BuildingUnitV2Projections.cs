@@ -155,11 +155,6 @@ namespace BuildingRegistry.Projections.Wfs.BuildingUnitV2
             {
                 var unit = await context.BuildingUnitsV2.FindAsync(message.Message.BuildingUnitPersistentLocalId);
                 unit!.Status = PlannedStatus;
-                if (!string.IsNullOrWhiteSpace(message.Message.DerivedExtendedWkbGeometry))
-                {
-                    unit.Position = (Point)_wkbReader.Read(message.Message.DerivedExtendedWkbGeometry.ToByteArray());
-                    unit.PositionMethod = MapGeometryMethod(BuildingUnitPositionGeometryMethod.DerivedFromObject);
-                }
 
                 SetVersion(unit, message.Message.Provenance.Timestamp);
             });
@@ -176,11 +171,6 @@ namespace BuildingRegistry.Projections.Wfs.BuildingUnitV2
             {
                 var unit = await context.BuildingUnitsV2.FindAsync(message.Message.BuildingUnitPersistentLocalId);
                 unit!.Status = RealizedStatus;
-                if (!string.IsNullOrWhiteSpace(message.Message.DerivedExtendedWkbGeometry))
-                {
-                    unit.Position = (Point)_wkbReader.Read(message.Message.DerivedExtendedWkbGeometry.ToByteArray());
-                    unit.PositionMethod = MapGeometryMethod(BuildingUnitPositionGeometryMethod.DerivedFromObject);
-                }
 
                 SetVersion(unit, message.Message.Provenance.Timestamp);
             });
