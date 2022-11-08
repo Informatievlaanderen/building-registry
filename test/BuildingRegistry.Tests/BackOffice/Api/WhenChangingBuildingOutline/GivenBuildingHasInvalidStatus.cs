@@ -52,7 +52,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenChangingBuildingOutline
                 .Where(x =>
                     x.Errors.Any(
                         failure => failure.ErrorCode == "GebouwGehistoreerdOfNietGerealiseerd"
-                                   && failure.ErrorMessage == "Deze actie is enkel toegestaan op gebouwen met status 'gepland', 'inAanbouw' of 'gerealiseerd'"));
+                                   && failure.ErrorMessage == "Deze actie is enkel toegestaan op gebouwen met status 'gepland', 'inAanbouw' of 'gerealiseerd'."));
         }
     }
 }

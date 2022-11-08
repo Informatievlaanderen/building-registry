@@ -159,7 +159,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
                 x.Error(
                     It.IsAny<Guid>(),
                     new TicketError(
-                        "Deze actie is enkel toegestaan op gebouwen met status 'gepland', 'inAanbouw' of 'gerealiseerd'",
+                        "Deze actie is enkel toegestaan op gebouwen met status 'gepland', 'inAanbouw' of 'gerealiseerd'.",
                         "GebouwGehistoreerdOfNietGerealiseerd"),
                     CancellationToken.None));
         }
