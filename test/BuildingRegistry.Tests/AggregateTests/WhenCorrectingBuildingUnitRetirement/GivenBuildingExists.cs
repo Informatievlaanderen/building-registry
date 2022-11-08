@@ -66,8 +66,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitRetire
                 .Then(new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
                     new BuildingUnitWasCorrectedFromRetiredToRealized(
                         command.BuildingPersistentLocalId,
-                        command.BuildingUnitPersistentLocalId,
-                        null))));
+                        command.BuildingUnitPersistentLocalId))));
         }
 
         [Fact]
@@ -242,8 +241,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitRetire
 
             var eventToTest = new BuildingUnitWasCorrectedFromRetiredToRealized(
                 command.BuildingPersistentLocalId,
-                command.BuildingUnitPersistentLocalId,
-                null);
+                command.BuildingUnitPersistentLocalId);
             ((ISetProvenance)eventToTest).SetProvenance(Fixture.Create<Provenance>());
 
             // Act

@@ -56,18 +56,17 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitNotRea
                 .When(command)
                 .Then(
                     new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
-                    new BuildingUnitWasCorrectedFromNotRealizedToPlanned(
-                        command.BuildingPersistentLocalId,
-                        command.BuildingUnitPersistentLocalId,
-                        null)),
+                        new BuildingUnitWasCorrectedFromNotRealizedToPlanned(
+                            command.BuildingPersistentLocalId,
+                            command.BuildingUnitPersistentLocalId)),
                     new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
-                    new CommonBuildingUnitWasAddedV2(
-                        command.BuildingPersistentLocalId,
-                        new BuildingUnitPersistentLocalId(1),
-                        BuildingRegistry.Building.BuildingUnitStatus.Parse(expectedStatus),
-                        BuildingUnitPositionGeometryMethod.DerivedFromObject,
-                        buildingGeometry.Center,
-                        hasDeviation: false))));
+                        new CommonBuildingUnitWasAddedV2(
+                            command.BuildingPersistentLocalId,
+                            new BuildingUnitPersistentLocalId(1),
+                            BuildingRegistry.Building.BuildingUnitStatus.Parse(expectedStatus),
+                            BuildingUnitPositionGeometryMethod.DerivedFromObject,
+                            buildingGeometry.Center,
+                            hasDeviation: false))));
         }
 
         [Theory]
@@ -110,13 +109,11 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitNotRea
                     new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
                     new BuildingUnitWasCorrectedFromNotRealizedToPlanned(
                         command.BuildingPersistentLocalId,
-                        command.BuildingUnitPersistentLocalId,
-                        null)),
+                        command.BuildingUnitPersistentLocalId)),
                     new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
                     new BuildingUnitWasCorrectedFromNotRealizedToPlanned(
                         command.BuildingPersistentLocalId,
-                        new BuildingUnitPersistentLocalId(3),
-                        null))));
+                        new BuildingUnitPersistentLocalId(3)))));
         }
 
         [Theory]
@@ -163,15 +160,19 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitNotRea
                 .When(command)
                 .Then(
                     new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
-                    new BuildingUnitWasCorrectedFromNotRealizedToPlanned(
-                        command.BuildingPersistentLocalId,
-                        command.BuildingUnitPersistentLocalId,
-                        null)),
+                        new BuildingUnitWasCorrectedFromNotRealizedToPlanned(
+                            command.BuildingPersistentLocalId,
+                            command.BuildingUnitPersistentLocalId)),
                     new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
-                    new BuildingUnitWasCorrectedFromNotRealizedToPlanned(
-                        command.BuildingPersistentLocalId,
-                        new BuildingUnitPersistentLocalId(1),
-                        buildingGeometry.Center))));
+                        new BuildingUnitPositionWasCorrected(
+                            command.BuildingPersistentLocalId,
+                            new BuildingUnitPersistentLocalId(1),
+                            BuildingUnitPositionGeometryMethod.DerivedFromObject,
+                            buildingGeometry.Center)),
+                    new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
+                        new BuildingUnitWasCorrectedFromNotRealizedToPlanned(
+                            command.BuildingPersistentLocalId,
+                            new BuildingUnitPersistentLocalId(1)))));
         }
 
         [Theory]
@@ -210,8 +211,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitNotRea
                     new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
                         new BuildingUnitWasCorrectedFromNotRealizedToPlanned(
                             command.BuildingPersistentLocalId,
-                            command.BuildingUnitPersistentLocalId,
-                            null)),
+                            command.BuildingUnitPersistentLocalId)),
                     new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
                         new CommonBuildingUnitWasAddedV2(
                             command.BuildingPersistentLocalId,
@@ -260,13 +260,11 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitNotRea
                     new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
                         new BuildingUnitWasCorrectedFromNotRealizedToPlanned(
                             command.BuildingPersistentLocalId,
-                            command.BuildingUnitPersistentLocalId,
-                            null)),
+                            command.BuildingUnitPersistentLocalId)),
                     new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
                         new BuildingUnitWasCorrectedFromNotRealizedToPlanned(
                             command.BuildingPersistentLocalId,
-                            new BuildingUnitPersistentLocalId(1),
-                            null)),
+                            new BuildingUnitPersistentLocalId(1))),
                     new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
                         new BuildingUnitWasRealizedV2(
                             command.BuildingPersistentLocalId,
@@ -317,13 +315,17 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitNotRea
                     new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
                         new BuildingUnitWasCorrectedFromNotRealizedToPlanned(
                             command.BuildingPersistentLocalId,
-                            command.BuildingUnitPersistentLocalId,
-                            null)),
+                            command.BuildingUnitPersistentLocalId)),
+                    new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
+                        new BuildingUnitPositionWasCorrected(
+                            command.BuildingPersistentLocalId,
+                            new BuildingUnitPersistentLocalId(1),
+                            BuildingUnitPositionGeometryMethod.DerivedFromObject,
+                            buildingGeometry.Center)),
                     new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
                         new BuildingUnitWasCorrectedFromNotRealizedToPlanned(
                             command.BuildingPersistentLocalId,
-                            new BuildingUnitPersistentLocalId(1),
-                            buildingGeometry.Center)),
+                            new BuildingUnitPersistentLocalId(1))),
                     new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
                         new BuildingUnitWasRealizedV2(
                             command.BuildingPersistentLocalId,
@@ -364,8 +366,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitNotRea
                     new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
                         new BuildingUnitWasCorrectedFromNotRealizedToPlanned(
                             command.BuildingPersistentLocalId,
-                            command.BuildingUnitPersistentLocalId,
-                            null)),
+                            command.BuildingUnitPersistentLocalId)),
                     new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
                         new CommonBuildingUnitWasAddedV2(
                             command.BuildingPersistentLocalId,
@@ -414,13 +415,11 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitNotRea
                     new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
                         new BuildingUnitWasCorrectedFromNotRealizedToPlanned(
                             command.BuildingPersistentLocalId,
-                            command.BuildingUnitPersistentLocalId,
-                            null)),
+                            command.BuildingUnitPersistentLocalId)),
                     new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
                         new BuildingUnitWasCorrectedFromRetiredToRealized(
                             command.BuildingPersistentLocalId,
-                            new BuildingUnitPersistentLocalId(1),
-                            null))));
+                            new BuildingUnitPersistentLocalId(1)))));
         }
 
         [Fact]
@@ -467,13 +466,17 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitNotRea
                     new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
                         new BuildingUnitWasCorrectedFromNotRealizedToPlanned(
                             command.BuildingPersistentLocalId,
-                            command.BuildingUnitPersistentLocalId,
-                            null)),
+                            command.BuildingUnitPersistentLocalId)),
+                    new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
+                        new BuildingUnitPositionWasCorrected(
+                            command.BuildingPersistentLocalId,
+                            new BuildingUnitPersistentLocalId(1),
+                            BuildingUnitPositionGeometryMethod.DerivedFromObject,
+                            initialBuildingGeometry.Center)),
                     new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
                         new BuildingUnitWasCorrectedFromRetiredToRealized(
                             command.BuildingPersistentLocalId,
-                            new BuildingUnitPersistentLocalId(1),
-                            initialBuildingGeometry.Center))));
+                            new BuildingUnitPersistentLocalId(1)))));
         }
     }
 }

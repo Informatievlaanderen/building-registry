@@ -123,13 +123,6 @@ namespace BuildingRegistry.Building
         {
             Status = BuildingUnitStatus.Planned;
 
-            if (!string.IsNullOrWhiteSpace(@event.DerivedExtendedWkbGeometry))
-            {
-                BuildingUnitPosition = new BuildingUnitPosition(
-                    new ExtendedWkbGeometry(@event.DerivedExtendedWkbGeometry),
-                    BuildingUnitPositionGeometryMethod.DerivedFromObject);
-            }
-
             _lastEvent = @event;
         }
 
@@ -143,13 +136,6 @@ namespace BuildingRegistry.Building
         private void When(BuildingUnitWasCorrectedFromRetiredToRealized @event)
         {
             Status = BuildingUnitStatus.Realized;
-
-            if (!string.IsNullOrWhiteSpace(@event.DerivedExtendedWkbGeometry))
-            {
-                BuildingUnitPosition = new BuildingUnitPosition(
-                    new ExtendedWkbGeometry(@event.DerivedExtendedWkbGeometry),
-                    BuildingUnitPositionGeometryMethod.DerivedFromObject);
-            }
 
             _lastEvent = @event;
         }

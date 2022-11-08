@@ -1,6 +1,7 @@
 namespace BuildingRegistry.Building
 {
     using System.Linq;
+    using BuildingRegistry.Building.Commands;
     using Events;
     using Exceptions;
 
@@ -271,36 +272,50 @@ namespace BuildingRegistry.Building
         private void UpdateStatusCommonBuildingUnit()
         {
             var commonBuildingUnit = _buildingUnits.CommonBuildingUnit;
-            var commonBuildingUnitPosition = commonBuildingUnit.BuildingUnitPosition.Geometry != BuildingGeometry.Center
-                ? BuildingGeometry.Center
-                : null;
+
+            void CheckToUpdateCommonBuildingUnit ()
+            {
+                var commonBuildingUnitPosition = commonBuildingUnit.BuildingUnitPosition.Geometry != BuildingGeometry.Center
+                    ? BuildingGeometry.Center
+                    : null;
+
+                if (commonBuildingUnitPosition is not null)
+                {
+                    ApplyChange(new BuildingUnitPositionWasCorrected(
+                        BuildingPersistentLocalId,
+                        commonBuildingUnit.BuildingUnitPersistentLocalId,
+                        BuildingUnitPositionGeometryMethod.DerivedFromObject,
+                        commonBuildingUnitPosition));
+                }
+            }
 
             if ((BuildingStatus == BuildingStatus.Planned || BuildingStatus == BuildingStatus.UnderConstruction)
                 && commonBuildingUnit.Status == BuildingUnitStatus.NotRealized)
             {
-                ApplyChange(new BuildingUnitWasCorrectedFromNotRealizedToPlanned(
-                    BuildingPersistentLocalId,
-                    commonBuildingUnit.BuildingUnitPersistentLocalId,
-                    commonBuildingUnitPosition));
-            }
+                CheckToUpdateCommonBuildingUnit();
 
-            if (BuildingStatus == BuildingStatus.Realized && commonBuildingUnit.Status == BuildingUnitStatus.NotRealized)
-            {
                 ApplyChange(new BuildingUnitWasCorrectedFromNotRealizedToPlanned(
                     BuildingPersistentLocalId,
-                    commonBuildingUnit.BuildingUnitPersistentLocalId,
-                    commonBuildingUnitPosition));
+                    commonBuildingUnit.BuildingUnitPersistentLocalId));
+            }
+            else if (BuildingStatus == BuildingStatus.Realized && commonBuildingUnit.Status == BuildingUnitStatus.NotRealized)
+            {
+                CheckToUpdateCommonBuildingUnit();
+
+                ApplyChange(new BuildingUnitWasCorrectedFromNotRealizedToPlanned(
+                    BuildingPersistentLocalId,
+                    commonBuildingUnit.BuildingUnitPersistentLocalId));
                 ApplyChange(new BuildingUnitWasRealizedV2(
                     BuildingPersistentLocalId,
                     commonBuildingUnit.BuildingUnitPersistentLocalId));
             }
-
-            if (BuildingStatus == BuildingStatus.Realized && commonBuildingUnit.Status == BuildingUnitStatus.Retired)
+            else if (BuildingStatus == BuildingStatus.Realized && commonBuildingUnit.Status == BuildingUnitStatus.Retired)
             {
+                CheckToUpdateCommonBuildingUnit();
+
                 ApplyChange(new BuildingUnitWasCorrectedFromRetiredToRealized(
                     BuildingPersistentLocalId,
-                    commonBuildingUnit.BuildingUnitPersistentLocalId,
-                    commonBuildingUnitPosition));
+                    commonBuildingUnit.BuildingUnitPersistentLocalId));
             }
         }
 

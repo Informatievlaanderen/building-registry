@@ -387,11 +387,6 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wfs
                     item.Should().NotBeNull();
 
                     item!.Status.Should().Be("Gepland");
-                    if (!string.IsNullOrWhiteSpace(@event.DerivedExtendedWkbGeometry))
-                    {
-                        item.PositionMethod.Should().Be(BuildingUnitV2Projections.MapGeometryMethod(BuildingUnitPositionGeometryMethod.DerivedFromObject));
-                        item.Position.Should().BeEquivalentTo((Point)_wkbReader.Read(@event.DerivedExtendedWkbGeometry.ToByteArray()));
-                    }
                 });
         }
 
@@ -458,11 +453,6 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wfs
                     item.Should().NotBeNull();
 
                     item!.Status.Should().Be("Gerealiseerd");
-                    if (!string.IsNullOrWhiteSpace(@event.DerivedExtendedWkbGeometry))
-                    {
-                        item.PositionMethod.Should().Be(BuildingUnitV2Projections.MapGeometryMethod(BuildingUnitPositionGeometryMethod.DerivedFromObject));
-                        item.Position.Should().BeEquivalentTo((Point)_wkbReader.Read(@event.DerivedExtendedWkbGeometry.ToByteArray()));
-                    }
                 });
         }
 
