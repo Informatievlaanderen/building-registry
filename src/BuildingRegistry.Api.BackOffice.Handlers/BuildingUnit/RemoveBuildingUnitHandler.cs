@@ -7,15 +7,14 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.BuildingUnit
     using Abstractions.BuildingUnit.Requests;
     using Be.Vlaanderen.Basisregisters.CommandHandling;
     using Be.Vlaanderen.Basisregisters.CommandHandling.Idempotency;
-    using Be.Vlaanderen.Basisregisters.Sqs.Responses;
     using BuildingRegistry.Building;
     using MediatR;
 
-    public class RealizeBuildingUnitHandler : BuildingUnitBusHandler, IRequestHandler<RealizeBuildingUnitRequest, ETagResponse>
+    public class RemoveBuildingUnitHandler : BuildingUnitBusHandler, IRequestHandler<RemoveBuildingUnitRequest>
     {
         private readonly IdempotencyContext _idempotencyContext;
 
-        public RealizeBuildingUnitHandler(
+        public RemoveBuildingUnitHandler(
             ICommandHandlerResolver bus,
             IBuildings buildings,
             BackOfficeContext backOfficeContext,
@@ -25,7 +24,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.BuildingUnit
             _idempotencyContext = idempotencyContext;
         }
 
-        public async Task<ETagResponse> Handle(RealizeBuildingUnitRequest request, CancellationToken cancellationToken)
+        public async Task<Unit> Handle(RemoveBuildingUnitRequest request, CancellationToken cancellationToken)
         {
             var buildingUnitPersistentLocalId = new BuildingUnitPersistentLocalId(request.BuildingUnitPersistentLocalId);
             var buildingPersistentLocalId = BackOfficeContext.GetBuildingIdForBuildingUnit(request.BuildingUnitPersistentLocalId);
@@ -42,9 +41,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.BuildingUnit
                 request.Metadata,
                 cancellationToken);
 
-            var buildingUnitLastEventHash = await GetBuildingUnitHash(buildingPersistentLocalId, buildingUnitPersistentLocalId, cancellationToken);
-
-            return new ETagResponse(string.Empty, buildingUnitLastEventHash);
+            return Unit.Value;
         }
     }
 }

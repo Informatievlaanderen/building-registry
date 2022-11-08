@@ -4,7 +4,6 @@ namespace BuildingRegistry.Building
     using System.Collections.Generic;
     using System.Linq;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
-    using BuildingRegistry.Legacy;
     using Events;
     using Exceptions;
 
@@ -246,6 +245,18 @@ namespace BuildingRegistry.Building
                     ? buildingGeometry.Center
                     : null;
             return correctedBuildingUnitPosition;
+        }
+
+        public void Remove()
+        {
+            GuardCommonUnit();
+
+            if (IsRemoved)
+            {
+                return;
+            }
+
+            Apply(new BuildingUnitWasRemovedV2(_buildingPersistentLocalId, BuildingUnitPersistentLocalId));
         }
 
         public void RestoreSnapshot(

@@ -122,6 +122,18 @@ namespace BuildingRegistry.Building
 
                     building.CorrectPositionBuildingUnit(message.Command.BuildingUnitPersistentLocalId, message.Command.PositionGeometryMethod, message.Command.Position);
                 });
+
+            For<RemoveBuildingUnit>()
+                .AddSqlStreamStore(getStreamStore, getUnitOfWork, eventMapping, eventSerializer, getSnapshotStore)
+                .AddEventHash<RemoveBuildingUnit, Building>(getUnitOfWork)
+                .AddProvenance(getUnitOfWork, provenanceFactory)
+                .Handle(async (message, ct) =>
+                {
+                    var streamId = new BuildingStreamId(message.Command.BuildingPersistentLocalId);
+                    var building = await buildingRepository().GetAsync(streamId, ct);
+
+                    building.RemoveBuildingUnit(message.Command.BuildingUnitPersistentLocalId);
+                });
         }
     }
 }

@@ -201,6 +201,22 @@ namespace BuildingRegistry.Building
             NotRealizeOrRetireCommonBuildingUnit();
         }
 
+        public void RemoveBuildingUnit(BuildingUnitPersistentLocalId buildingUnitPersistentLocalId)
+        {
+            var buildingUnit = BuildingUnits.FirstOrDefault(x => x.BuildingUnitPersistentLocalId == buildingUnitPersistentLocalId);
+
+            if (buildingUnit is null)
+            {
+                throw new BuildingUnitIsNotFoundException(
+                    BuildingPersistentLocalId,
+                    buildingUnitPersistentLocalId);
+            }
+
+            buildingUnit.Remove();
+
+            NotRealizeOrRetireCommonBuildingUnit();
+        }
+
         private void AddOrUpdateStatusCommonBuildingUnit()
         {
             GuardRemovedBuilding();

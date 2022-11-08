@@ -77,7 +77,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitNotRea
         {
             var command = new CorrectBuildingUnitNotRealization(
                 Fixture.Create<BuildingPersistentLocalId>(),
-                new BuildingUnitPersistentLocalId(2),
+                new BuildingUnitPersistentLocalId(1),
                 Fixture.Create<Provenance>()
             );
 
@@ -89,7 +89,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitNotRea
                 .WithBuildingPersistentLocalId(command.BuildingPersistentLocalId)
                 .WithBuildingStatus(buildingStatus)
                 .WithBuildingGeometry(buildingGeometry)
-                .WithBuildingUnit(BuildingUnitStatus.Planned)
+                .WithBuildingUnit(BuildingUnitStatus.Planned, new BuildingUnitPersistentLocalId(2))
                 .WithBuildingUnit(
                     BuildingUnitStatus.NotRealized,
                     command.BuildingUnitPersistentLocalId,
@@ -97,7 +97,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitNotRea
                     extendedWkbGeometry: new BuildingRegistry.Legacy.ExtendedWkbGeometry(buildingGeometry.Center.ToString()))
                 .WithBuildingUnit(
                     BuildingUnitStatus.NotRealized,
-                    new BuildingUnitPersistentLocalId(1),
+                    new BuildingUnitPersistentLocalId(3),
                     BuildingUnitFunction.Common)
                 .Build();
 
@@ -115,7 +115,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitNotRea
                     new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
                     new BuildingUnitWasCorrectedFromNotRealizedToPlanned(
                         command.BuildingPersistentLocalId,
-                        new BuildingUnitPersistentLocalId(1),
+                        new BuildingUnitPersistentLocalId(3),
                         null))));
         }
 
