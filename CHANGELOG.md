@@ -1,3 +1,17 @@
+# [3.43.0](https://github.com/informatievlaanderen/building-registry/compare/v3.42.0...v3.43.0) (2022-11-08)
+
+
+### Bug Fixes
+
+* error message missing punctuation mark ([f2fe9e1](https://github.com/informatievlaanderen/building-registry/commit/f2fe9e1a3fa3649d816f3015c9dce1de3d2c52ae))
+* punctuation mark tests ([6359166](https://github.com/informatievlaanderen/building-registry/commit/635916641487b1fbea5c533d973e89e9e201400c))
+
+
+### Features
+
+* building status validation for retire buildingunit ([e06df11](https://github.com/informatievlaanderen/building-registry/commit/e06df117629fc3646a5f02f5aa522e75a9a33619))
+* split position changes into separate event for CorrectedFromRetiredToRealized & WasCorrectedFromNotRealizedToPlanned ([53e511f](https://github.com/informatievlaanderen/building-registry/commit/53e511f5b4a8ecae6d11a28686bc97d2244edd24))
+
 # [3.42.0](https://github.com/informatievlaanderen/building-registry/compare/v3.41.0...v3.42.0) (2022-11-08)
 
 
