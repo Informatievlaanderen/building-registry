@@ -49,12 +49,13 @@ namespace BuildingRegistry.Building
         {
             GuardRemoved();
             GuardCommonUnit();
-            GuardBuildingUnitInvalidStatuses(StatusesWhichCannotBeRealized.ToArray());
 
             if (Status == BuildingUnitStatus.Realized)
             {
                 return;
             }
+
+            GuardBuildingUnitInvalidStatuses(StatusesWhichCannotBeRealized.ToArray());
 
             Apply(new BuildingUnitWasRealizedV2(_buildingPersistentLocalId, BuildingUnitPersistentLocalId));
         }
@@ -96,16 +97,17 @@ namespace BuildingRegistry.Building
         {
             GuardRemoved();
             GuardCommonUnit();
-            GuardBuildingUnitInvalidStatuses(new[]
-            {
-                BuildingUnitStatus.Retired,
-                BuildingUnitStatus.NotRealized
-            });
 
             if (Status == BuildingUnitStatus.Planned)
             {
                 return;
             }
+
+            GuardBuildingUnitInvalidStatuses(new[]
+            {
+                BuildingUnitStatus.Retired,
+                BuildingUnitStatus.NotRealized
+            });
 
             Apply(new BuildingUnitWasCorrectedFromRealizedToPlanned(_buildingPersistentLocalId, BuildingUnitPersistentLocalId));
         }
@@ -114,12 +116,13 @@ namespace BuildingRegistry.Building
         {
             GuardRemoved();
             GuardCommonUnit();
-            GuardBuildingUnitInvalidStatuses(StatusesWhichCannotBeNotRealized.ToArray());
 
             if (Status == BuildingUnitStatus.NotRealized)
             {
                 return;
             }
+
+            GuardBuildingUnitInvalidStatuses(StatusesWhichCannotBeNotRealized.ToArray());
 
             Apply(new BuildingUnitWasNotRealizedV2(_buildingPersistentLocalId, BuildingUnitPersistentLocalId));
         }
@@ -128,16 +131,17 @@ namespace BuildingRegistry.Building
         {
             GuardRemoved();
             GuardCommonUnit();
-            GuardBuildingUnitInvalidStatuses(new[]
-            {
-                BuildingUnitStatus.Realized,
-                BuildingUnitStatus.Retired
-            });
 
             if (Status == BuildingUnitStatus.Planned)
             {
                 return;
             }
+
+            GuardBuildingUnitInvalidStatuses(new[]
+            {
+                BuildingUnitStatus.Realized,
+                BuildingUnitStatus.Retired
+            });
 
             var correctedBuildingUnitPosition = CorrectedBuildingUnitPosition(buildingGeometry);
 
@@ -188,16 +192,17 @@ namespace BuildingRegistry.Building
         {
             GuardRemoved();
             GuardCommonUnit();
-            GuardBuildingUnitInvalidStatuses(new[]
-            {
-                BuildingUnitStatus.Planned,
-                BuildingUnitStatus.NotRealized
-            });
 
             if (Status == BuildingUnitStatus.Retired)
             {
                 return;
             }
+
+            GuardBuildingUnitInvalidStatuses(new[]
+            {
+                BuildingUnitStatus.Planned,
+                BuildingUnitStatus.NotRealized
+            });
 
             Apply(new BuildingUnitWasRetiredV2(_buildingPersistentLocalId, BuildingUnitPersistentLocalId));
         }

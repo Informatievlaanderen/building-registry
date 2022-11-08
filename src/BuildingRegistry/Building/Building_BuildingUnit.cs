@@ -127,7 +127,11 @@ namespace BuildingRegistry.Building
         public void CorrectNotRealizeBuildingUnit(BuildingUnitPersistentLocalId buildingUnitPersistentLocalId)
         {
             GuardRemovedBuilding();
-            GuardBuildingInvalidStatuses(new[] {BuildingStatus.NotRealized, BuildingStatus.Retired});
+            GuardBuildingInvalidStatuses(new[]
+            {
+                BuildingStatus.NotRealized,
+                BuildingStatus.Retired
+            });
 
             var buildingUnit = BuildingUnits.FirstOrDefault(x => x.BuildingUnitPersistentLocalId == buildingUnitPersistentLocalId);
 
@@ -149,7 +153,11 @@ namespace BuildingRegistry.Building
             ExtendedWkbGeometry? position)
         {
             GuardRemovedBuilding();
-            GuardBuildingInvalidStatuses(new[] { BuildingStatus.NotRealized, BuildingStatus.Retired });
+            GuardBuildingInvalidStatuses(new[]
+            {
+                BuildingStatus.NotRealized,
+                BuildingStatus.Retired
+            });
 
             var buildingUnit = BuildingUnits.FirstOrDefault(x => x.BuildingUnitPersistentLocalId == buildingUnitPersistentLocalId);
 
@@ -176,7 +184,11 @@ namespace BuildingRegistry.Building
         public void RetireBuildingUnit(BuildingUnitPersistentLocalId buildingUnitPersistentLocalId)
         {
             GuardRemovedBuilding();
-            GuardBuildingInvalidStatuses(new[] { BuildingStatus.NotRealized, BuildingStatus.Retired });
+            GuardBuildingInvalidStatuses(new[]
+            {
+                BuildingStatus.NotRealized,
+                BuildingStatus.Retired
+            });
 
             var buildingUnit = BuildingUnits.FirstOrDefault(x => x.BuildingUnitPersistentLocalId == buildingUnitPersistentLocalId);
 
@@ -190,14 +202,6 @@ namespace BuildingRegistry.Building
             buildingUnit.Retire();
 
             NotRealizeOrRetireCommonBuildingUnit();
-        }
-
-        private void GuardBuildingInvalidStatuses(BuildingStatus[] invalidStatuses)
-        {
-            if (invalidStatuses.Contains(BuildingStatus))
-            {
-                throw new BuildingHasInvalidStatusException();
-            }
         }
 
         public void RemoveBuildingUnit(BuildingUnitPersistentLocalId buildingUnitPersistentLocalId)
@@ -214,6 +218,14 @@ namespace BuildingRegistry.Building
             buildingUnit.Remove();
 
             NotRealizeOrRetireCommonBuildingUnit();
+        }
+
+        private void GuardBuildingInvalidStatuses(BuildingStatus[] invalidStatuses)
+        {
+            if (invalidStatuses.Contains(BuildingStatus))
+            {
+                throw new BuildingHasInvalidStatusException();
+            }
         }
 
         private void AddOrUpdateStatusCommonBuildingUnit()
