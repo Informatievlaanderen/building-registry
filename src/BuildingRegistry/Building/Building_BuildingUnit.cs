@@ -1,7 +1,6 @@
 namespace BuildingRegistry.Building
 {
     using System.Linq;
-    using BuildingRegistry.Building.Commands;
     using Events;
     using Exceptions;
 
@@ -218,6 +217,14 @@ namespace BuildingRegistry.Building
 
             buildingUnit.Remove();
 
+            if (_buildingUnits.HasCommonBuildingUnit()
+                && !_buildingUnits.NonCommonBuildingUnits().Any())
+            {
+                ApplyChange(new BuildingUnitWasRemovedV2(
+                    BuildingPersistentLocalId,
+                    _buildingUnits.CommonBuildingUnit().BuildingUnitPersistentLocalId));
+            }
+
             NotRealizeOrRetireCommonBuildingUnit();
         }
 
@@ -271,7 +278,7 @@ namespace BuildingRegistry.Building
 
         private void UpdateStatusCommonBuildingUnit()
         {
-            var commonBuildingUnit = _buildingUnits.CommonBuildingUnit;
+            var commonBuildingUnit = _buildingUnits.CommonBuildingUnit();
 
             void CheckToUpdateCommonBuildingUnit ()
             {
@@ -326,7 +333,7 @@ namespace BuildingRegistry.Building
                 return;
             }
 
-            var commonBuildingUnit = _buildingUnits.CommonBuildingUnit;
+            var commonBuildingUnit = _buildingUnits.CommonBuildingUnit();
 
             if (commonBuildingUnit.Status == BuildingUnitStatus.Planned)
             {

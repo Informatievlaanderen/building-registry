@@ -193,6 +193,49 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRemovingBuildingUnit
                             new BuildingUnitPersistentLocalId(commonBuildingUnitWasAddedV2.BuildingUnitPersistentLocalId)))));
         }
 
+        [Fact]
+        public void WithAllBuildingUnitsRemoved_ThenCommonBuildingUnitIsAlsoRemoved()
+        {
+            var command = new RemoveBuildingUnit(
+                Fixture.Create<BuildingPersistentLocalId>(),
+                new BuildingUnitPersistentLocalId(1),
+                Fixture.Create<Provenance>());
+
+            var commonBuildingUnitPersistentLocalId = new BuildingUnitPersistentLocalId(3);
+            var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
+                .WithBuildingUnit(
+                    BuildingRegistry.Legacy.BuildingUnitStatus.Planned,
+                    command.BuildingUnitPersistentLocalId,
+                    BuildingRegistry.Legacy.BuildingUnitFunction.Unknown)
+                .WithBuildingUnit(
+                    BuildingRegistry.Legacy.BuildingUnitStatus.Planned,
+                    new BuildingUnitPersistentLocalId(2),
+                    BuildingRegistry.Legacy.BuildingUnitFunction.Unknown,
+                    isRemoved: true)
+                .WithBuildingUnit(
+                    BuildingRegistry.Legacy.BuildingUnitStatus.NotRealized,
+                    commonBuildingUnitPersistentLocalId,
+                    BuildingRegistry.Legacy.BuildingUnitFunction.Common)
+                .Build();
+
+            Assert(new Scenario()
+                .Given(
+                    new BuildingStreamId(Fixture.Create<BuildingPersistentLocalId>()),
+                    buildingWasMigrated)
+                .When(command)
+                .Then(
+                    new Fact(
+                        new BuildingStreamId(command.BuildingPersistentLocalId),
+                        new BuildingUnitWasRemovedV2(
+                            command.BuildingPersistentLocalId,
+                            command.BuildingUnitPersistentLocalId)),
+                    new Fact(
+                        new BuildingStreamId(command.BuildingPersistentLocalId),
+                        new BuildingUnitWasRemovedV2(
+                            command.BuildingPersistentLocalId,
+                            commonBuildingUnitPersistentLocalId))));
+        }
+
         [Theory]
         [InlineData("Planned")]
         [InlineData("Realized")]
@@ -262,7 +305,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRemovingBuildingUnit
                 commonBuildingUnitWasAdded,
                 buildingUnitWasRemoved
             });
-            
+
             // Assert
             building.BuildingUnits.Should().NotBeEmpty();
             building.BuildingUnits.Count.Should().Be(3);

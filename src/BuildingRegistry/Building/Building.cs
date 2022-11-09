@@ -78,8 +78,8 @@ namespace BuildingRegistry.Building
             }
 
             var newBuildingGeometry = new BuildingGeometry(extendedWkbGeometry, BuildingGeometryMethod.Outlined);
-            var plannedOrRealizedBuildingUnits = _buildingUnits.PlannedBuildingUnits
-                .Concat(_buildingUnits.RealizedBuildingUnits)
+            var plannedOrRealizedBuildingUnits = _buildingUnits.PlannedBuildingUnits()
+                .Concat(_buildingUnits.RealizedBuildingUnits())
                 .ToList();
 
             var buildingUnitsOutsideOfBuildingOutlining = plannedOrRealizedBuildingUnits
@@ -204,7 +204,7 @@ namespace BuildingRegistry.Building
                 throw new BuildingHasInvalidBuildingGeometryMethodException();
             }
 
-            if (_buildingUnits.RetiredBuildingUnits.Any())
+            if (_buildingUnits.RetiredBuildingUnits().Any())
             {
                 throw new BuildingHasRetiredBuildingUnitsException();
             }
@@ -237,7 +237,7 @@ namespace BuildingRegistry.Building
                 throw new BuildingHasInvalidStatusException();
             }
 
-            foreach (var unit in _buildingUnits.PlannedBuildingUnits)
+            foreach (var unit in _buildingUnits.PlannedBuildingUnits())
             {
                 unit.NotRealizeBecauseBuildingWasNotRealized();
             }

@@ -98,7 +98,10 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenNotRealizingBuildingUnit
         [Fact]
         public void WithPlannedCommonBuildingUnitAndTwoOtherBuildingUnits_ThenCommonBuildingUnitWasNotRealized()
         {
-            var command = Fixture.Create<NotRealizeBuildingUnit>();
+            var command = new NotRealizeBuildingUnit(
+                    Fixture.Create<BuildingPersistentLocalId>(),
+                    new BuildingUnitPersistentLocalId(2),
+                    Fixture.Create<Provenance>());
 
             var commonBuildingUnitWasAddedV2 = Fixture.Create<CommonBuildingUnitWasAddedV2>()
                 .WithBuildingUnitStatus(BuildingUnitStatus.Planned)
@@ -110,9 +113,10 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenNotRealizingBuildingUnit
                     Fixture.Create<BuildingWasPlannedV2>(),
                     Fixture.Create<BuildingWasRealizedV2>(),
                     Fixture.Create<BuildingUnitWasPlannedV2>()
+                        .WithBuildingUnitPersistentLocalId(command.BuildingUnitPersistentLocalId)
                         .WithFunction(BuildingUnitFunction.Unknown),
                     Fixture.Create<BuildingUnitWasPlannedV2>()
-                        .WithBuildingUnitPersistentLocalId(new BuildingUnitPersistentLocalId(2))
+                        .WithBuildingUnitPersistentLocalId(new BuildingUnitPersistentLocalId(3))
                         .WithFunction(BuildingUnitFunction.Unknown),
                     commonBuildingUnitWasAddedV2)
                 .When(command)
