@@ -193,7 +193,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenCorrectingBuildingUnitRetire
                 .Result
                 .Where(x =>
                     x.Errors.Any(error
-                        => error.ErrorCode == "GebouweenheidGeplandGerealiseerdOfNietGerealiseerd"
+                        => error.ErrorCode == "GebouweenheidNietGerealiseerdOfGepland"
                            && error.ErrorMessage == "Deze actie is enkel toegestaan op gebouweenheden met status 'gehistoreerd'."));
         }
 

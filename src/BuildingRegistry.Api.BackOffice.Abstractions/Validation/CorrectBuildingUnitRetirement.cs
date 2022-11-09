@@ -6,7 +6,7 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.Validation
         {
             public static class InvalidStatus
             {
-                public const string Code = "GebouweenheidGeplandGerealiseerdOfNietGerealiseerd";
+                public const string Code = "GebouweenheidNietGerealiseerdOfGepland";
                 public const string Message = "Deze actie is enkel toegestaan op gebouweenheden met status 'gehistoreerd'.";
             }
 
