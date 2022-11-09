@@ -27,7 +27,7 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.Building.Validators
             public const string BuildingNotFound = "GebouweenheidGebouwIdNietGekendValidatie";
             public const string BuildingStatusNotInRealized = "GebouwStatusNietInGerealiseerd";
             public const string BuildingUnitCannotBeRealized = "GebouweenheidGehistoreerdOfNietGerealiseerd";
-            public const string BuildingUnitCannotBeRetired = "GebouweenheidGeplandOfNietgerealiseerd";
+            public const string BuildingUnitCannotBeRetired = "GebouweenheidGeplandOfNietGerealiseerd";
             public const string BuildingUnitCannotBeCorrectedFromRealized = "GebouweenheidNietGerealiseerdOfGehistoreerd";
             public const string BuildingUnitCannotBeCorrectedFromNotRealizedToPlanned = "GebouweenheidGerealiseerdOfGehistoreerd";
             public const string BuildingUnitCannotBeCorrectedFromNotRealizedToPlannedBecauseOfInvalidBuildingStatus = "GebouwStatusNietInGeplandOfGerealiseerd";

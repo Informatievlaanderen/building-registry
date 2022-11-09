@@ -156,7 +156,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
                     It.IsAny<Guid>(),
                     new TicketError(
                         "Deze actie is enkel toegestaan op gebouweenheden met status 'gerealiseerd'.",
-                        "GebouweenheidGeplandOfNietgerealiseerd"),
+                        "GebouweenheidGeplandOfNietGerealiseerd"),
                     CancellationToken.None));
         }
 

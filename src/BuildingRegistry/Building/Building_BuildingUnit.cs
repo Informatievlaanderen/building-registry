@@ -218,7 +218,7 @@ namespace BuildingRegistry.Building
             buildingUnit.Remove();
 
             if (_buildingUnits.HasCommonBuildingUnit()
-                && !_buildingUnits.NotCommonBuildingUnits().Any())
+                && !_buildingUnits.NonCommonBuildingUnits().Any())
             {
                 ApplyChange(new BuildingUnitWasRemovedV2(
                     BuildingPersistentLocalId,

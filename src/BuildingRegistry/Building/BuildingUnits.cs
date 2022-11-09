@@ -7,7 +7,7 @@ namespace BuildingRegistry.Building
     {
         private IEnumerable<BuildingUnit> NotRemovedUnits => this.Where(x => !x.IsRemoved);
 
-        public IEnumerable<BuildingUnit> NotCommonBuildingUnits(bool excludeRemoved = true)
+        public IEnumerable<BuildingUnit> NonCommonBuildingUnits(bool excludeRemoved = true)
             => excludeRemoved
                 ? NotRemovedUnits.Where(x => x.Function != BuildingUnitFunction.Common)
                 : this.Where(x => x.Function != BuildingUnitFunction.Common);
