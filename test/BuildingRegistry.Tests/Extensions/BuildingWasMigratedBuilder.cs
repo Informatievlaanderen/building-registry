@@ -73,7 +73,8 @@ namespace BuildingRegistry.Tests.Extensions
             BuildingUnitPersistentLocalId? buildingUnitPersistentLocalId = null,
             BuildingUnitFunction? function = null,
             BuildingUnitPositionGeometryMethod? positionGeometryMethod = null,
-            ExtendedWkbGeometry? extendedWkbGeometry = null)
+            ExtendedWkbGeometry? extendedWkbGeometry = null,
+            bool isRemoved = false)
         {
             var buildingGeometry = _buildingGeometry is not null
                 ? new BuildingGeometry(
@@ -102,7 +103,7 @@ namespace BuildingRegistry.Tests.Extensions
                         new List<AddressPersistentLocalId>(),
                             buildingUnitPosition,
                         buildingGeometry,
-                        isRemoved: false));
+                        isRemoved));
 
             return this;
         }
