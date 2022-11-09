@@ -1,3 +1,17 @@
+# [3.44.0](https://github.com/informatievlaanderen/building-registry/compare/v3.43.0...v3.44.0) (2022-11-09)
+
+
+### Bug Fixes
+
+* points must form a closed linestring ([4fbf478](https://github.com/informatievlaanderen/building-registry/commit/4fbf478ee88d9734fdad53ef95f789db14ce783c))
+* update hash in legacy buildingUnitDetailV2 for BuildingUnitPositionWasCorrected ([8649f99](https://github.com/informatievlaanderen/building-registry/commit/8649f99c1048e7c607714cb751b892a6c93e65f5))
+* validation error code for CorrectBuildingUnitRetirement building… ([#790](https://github.com/informatievlaanderen/building-registry/issues/790)) ([cb383b7](https://github.com/informatievlaanderen/building-registry/commit/cb383b72ae65e0e5d35c60922a6ea4d0aff5561b))
+
+
+### Features
+
+* remove common BU when last not removed BU ([#791](https://github.com/informatievlaanderen/building-registry/issues/791)) ([50557ed](https://github.com/informatievlaanderen/building-registry/commit/50557ed4828e38edc0127d44ede1ed9e9e5296a1))
+
 # [3.43.0](https://github.com/informatievlaanderen/building-registry/compare/v3.42.0...v3.43.0) (2022-11-08)
 
 
