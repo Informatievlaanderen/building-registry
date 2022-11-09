@@ -236,6 +236,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetailV2
                     item.Position = message.Message.ExtendedWkbGeometry.ToByteArray();
                     item.PositionMethod = BuildingRegistry.Building.BuildingUnitPositionGeometryMethod.Parse(message.Message.GeometryMethod);
                     item.Version = message.Message.Provenance.Timestamp;
+                    UpdateHash(item, message);
                 }, ct);
             });
         }
