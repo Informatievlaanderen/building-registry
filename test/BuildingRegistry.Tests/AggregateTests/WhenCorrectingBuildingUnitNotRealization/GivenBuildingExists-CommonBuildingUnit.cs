@@ -398,7 +398,9 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitNotRea
                 .WithBuildingPersistentLocalId(command.BuildingPersistentLocalId)
                 .WithBuildingStatus(BuildingStatus.Realized)
                 .WithBuildingGeometry(buildingGeometry)
-                .WithBuildingUnit(BuildingUnitStatus.Planned)
+                .WithBuildingUnit(
+                    BuildingUnitStatus.Planned,
+                    new BuildingUnitPersistentLocalId(1))
                 .WithBuildingUnit(
                     BuildingUnitStatus.NotRealized,
                     command.BuildingUnitPersistentLocalId,
@@ -406,7 +408,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitNotRea
                     extendedWkbGeometry: new BuildingRegistry.Legacy.ExtendedWkbGeometry(buildingGeometry.Center.ToString()))
                 .WithBuildingUnit(
                     BuildingUnitStatus.Retired,
-                    new BuildingUnitPersistentLocalId(1),
+                    new BuildingUnitPersistentLocalId(3),
                     BuildingUnitFunction.Common)
                 .Build();
 
@@ -423,7 +425,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitNotRea
                     new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
                         new BuildingUnitWasCorrectedFromRetiredToRealized(
                             command.BuildingPersistentLocalId,
-                            new BuildingUnitPersistentLocalId(1)))));
+                            new BuildingUnitPersistentLocalId(3)))));
         }
 
         [Fact]

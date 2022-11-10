@@ -39,6 +39,12 @@ namespace BuildingRegistry.Tests.Extensions
             return this;
         }
 
+        public BuildingWasMigratedBuilder WithBuildingStatus(string status)
+        {
+            _buildingStatus = BuildingStatus.Parse(status);
+            return this;
+        }
+
         public BuildingWasMigratedBuilder WithBuildingStatus(BuildingStatus status)
         {
             _buildingStatus = status;
@@ -48,12 +54,6 @@ namespace BuildingRegistry.Tests.Extensions
         public BuildingWasMigratedBuilder WithIsRemoved()
         {
             _isBuildingRemoved = true;
-            return this;
-        }
-
-        public BuildingWasMigratedBuilder WithBuildingStatus(string status)
-        {
-            _buildingStatus = BuildingStatus.Parse(status);
             return this;
         }
 

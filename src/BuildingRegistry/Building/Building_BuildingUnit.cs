@@ -39,19 +39,14 @@ namespace BuildingRegistry.Building
                 function,
                 hasDeviation));
 
-            AddOrUpdateStatusCommonBuildingUnit();
+            EnsureCommonBuildingUnit();
         }
 
         public void RealizeBuildingUnit(BuildingUnitPersistentLocalId buildingUnitPersistentLocalId)
         {
             GuardRemovedBuilding();
-            GuardBuildingInvalidStatuses(new[]
-            {
-                BuildingStatus.Planned,
-                BuildingStatus.UnderConstruction,
-                BuildingStatus.NotRealized,
-                BuildingStatus.Retired
-            });
+            GuardBuildingInvalidStatuses(
+                BuildingStatus.Planned, BuildingStatus.UnderConstruction, BuildingStatus.NotRealized, BuildingStatus.Retired);
 
             _buildingUnits
                 .GetNotRemovedByPersistentLocalId(buildingUnitPersistentLocalId)
@@ -70,19 +65,14 @@ namespace BuildingRegistry.Building
         public void CorrectRetiredBuildingUnit(BuildingUnitPersistentLocalId buildingUnitPersistentLocalId)
         {
             GuardRemovedBuilding();
-            GuardBuildingInvalidStatuses(new[]
-            {
-                BuildingStatus.Planned,
-                BuildingStatus.UnderConstruction,
-                BuildingStatus.NotRealized,
-                BuildingStatus.Retired
-            });
+            GuardBuildingInvalidStatuses(
+                BuildingStatus.Planned, BuildingStatus.UnderConstruction, BuildingStatus.NotRealized, BuildingStatus.Retired);
 
             _buildingUnits
                 .GetNotRemovedByPersistentLocalId(buildingUnitPersistentLocalId)
                 .CorrectRetiredBuildingUnit(BuildingGeometry);
 
-            AddOrUpdateStatusCommonBuildingUnit();
+            EnsureCommonBuildingUnit();
         }
 
         public void NotRealizeBuildingUnit(BuildingUnitPersistentLocalId buildingUnitPersistentLocalId)
@@ -99,17 +89,13 @@ namespace BuildingRegistry.Building
         public void CorrectNotRealizeBuildingUnit(BuildingUnitPersistentLocalId buildingUnitPersistentLocalId)
         {
             GuardRemovedBuilding();
-            GuardBuildingInvalidStatuses(new[]
-            {
-                BuildingStatus.NotRealized,
-                BuildingStatus.Retired
-            });
+            GuardBuildingInvalidStatuses(BuildingStatus.NotRealized, BuildingStatus.Retired);
 
             _buildingUnits
                 .GetNotRemovedByPersistentLocalId(buildingUnitPersistentLocalId)
                 .CorrectNotRealize(BuildingGeometry);
 
-            AddOrUpdateStatusCommonBuildingUnit();
+            EnsureCommonBuildingUnit();
         }
 
         public void CorrectPositionBuildingUnit(
@@ -118,11 +104,7 @@ namespace BuildingRegistry.Building
             ExtendedWkbGeometry? position)
         {
             GuardRemovedBuilding();
-            GuardBuildingInvalidStatuses(new[]
-            {
-                BuildingStatus.NotRealized,
-                BuildingStatus.Retired
-            });
+            GuardBuildingInvalidStatuses(BuildingStatus.NotRealized, BuildingStatus.Retired);
 
             var buildingUnit = _buildingUnits.GetNotRemovedByPersistentLocalId(buildingUnitPersistentLocalId);
 
@@ -142,11 +124,7 @@ namespace BuildingRegistry.Building
         public void RetireBuildingUnit(BuildingUnitPersistentLocalId buildingUnitPersistentLocalId)
         {
             GuardRemovedBuilding();
-            GuardBuildingInvalidStatuses(new[]
-            {
-                BuildingStatus.NotRealized,
-                BuildingStatus.Retired
-            });
+            GuardBuildingInvalidStatuses(BuildingStatus.NotRealized, BuildingStatus.Retired);
 
             _buildingUnits
                 .GetNotRemovedByPersistentLocalId(buildingUnitPersistentLocalId)
@@ -180,23 +158,36 @@ namespace BuildingRegistry.Building
             }
         }
 
-        private void AddOrUpdateStatusCommonBuildingUnit()
+        private void EnsureCommonBuildingUnit()
         {
-            GuardRemovedBuilding();
-            GuardActiveBuilding();
-
             if (_buildingUnits.HasPlannedOrRealizedCommonBuildingUnit() || !_buildingUnits.RequiresCommonBuildingUnit())
             {
                 return;
             }
 
-            if (!_buildingUnits.HasCommonBuildingUnit())
+            if (!_buildingUnits.HasCommonBuildingUnit(excludeRemoved: false))
             {
                 AddCommonBuildingUnit(_addCommonBuildingUnit);
+                return;
+            }
+
+            var commonBuildingUnit = _buildingUnits.CommonBuildingUnit(excludeRemoved: false);
+            if (commonBuildingUnit.IsRemoved)
+            {
+                ApplyChange(new BuildingUnitRemovalWasCorrected(
+                    BuildingPersistentLocalId,
+                    commonBuildingUnit.BuildingUnitPersistentLocalId,
+                    BuildingStatus == BuildingStatus.Planned || BuildingStatus == BuildingStatus.UnderConstruction
+                        ? BuildingUnitStatus.Planned
+                        : BuildingUnitStatus.Realized,
+                    BuildingUnitFunction.Common,
+                    BuildingUnitPositionGeometryMethod.DerivedFromObject,
+                    BuildingGeometry.Center,
+                    commonBuildingUnit.HasDeviation));
             }
             else
             {
-                UpdateStatusCommonBuildingUnit();
+                CorrectCommonBuildingUnitToPlannedOrRealized();
             }
         }
 
@@ -220,26 +211,14 @@ namespace BuildingRegistry.Building
             addCommonBuildingUnit.AddForBuilding(BuildingPersistentLocalId, commonBuildingUnitPersistentLocalId);
         }
 
-        private void UpdateStatusCommonBuildingUnit()
+        private void CorrectCommonBuildingUnitToPlannedOrRealized()
         {
             var commonBuildingUnit = _buildingUnits.CommonBuildingUnit();
-
-            void CheckToUpdateCommonBuildingUnit()
-            {
-                if (commonBuildingUnit.BuildingUnitPosition.Geometry != BuildingGeometry.Center)
-                {
-                    ApplyChange(new BuildingUnitPositionWasCorrected(
-                        BuildingPersistentLocalId,
-                        commonBuildingUnit.BuildingUnitPersistentLocalId,
-                        BuildingUnitPositionGeometryMethod.DerivedFromObject,
-                        BuildingGeometry.Center));
-                }
-            }
 
             if ((BuildingStatus == BuildingStatus.Planned || BuildingStatus == BuildingStatus.UnderConstruction)
                 && commonBuildingUnit.Status == BuildingUnitStatus.NotRealized)
             {
-                CheckToUpdateCommonBuildingUnit();
+                CorrectBuildingPosition();
 
                 ApplyChange(new BuildingUnitWasCorrectedFromNotRealizedToPlanned(
                     BuildingPersistentLocalId,
@@ -247,7 +226,7 @@ namespace BuildingRegistry.Building
             }
             else if (BuildingStatus == BuildingStatus.Realized && commonBuildingUnit.Status == BuildingUnitStatus.NotRealized)
             {
-                CheckToUpdateCommonBuildingUnit();
+                CorrectBuildingPosition();
 
                 ApplyChange(new BuildingUnitWasCorrectedFromNotRealizedToPlanned(
                     BuildingPersistentLocalId,
@@ -258,11 +237,25 @@ namespace BuildingRegistry.Building
             }
             else if (BuildingStatus == BuildingStatus.Realized && commonBuildingUnit.Status == BuildingUnitStatus.Retired)
             {
-                CheckToUpdateCommonBuildingUnit();
+                CorrectBuildingPosition();
 
                 ApplyChange(new BuildingUnitWasCorrectedFromRetiredToRealized(
                     BuildingPersistentLocalId,
                     commonBuildingUnit.BuildingUnitPersistentLocalId));
+            }
+        }
+
+        private void CorrectBuildingPosition()
+        {
+            var commonBuildingUnit = _buildingUnits.CommonBuildingUnit();
+
+            if (commonBuildingUnit.BuildingUnitPosition.Geometry != BuildingGeometry.Center)
+            {
+                ApplyChange(new BuildingUnitPositionWasCorrected(
+                    BuildingPersistentLocalId,
+                    commonBuildingUnit.BuildingUnitPersistentLocalId,
+                    BuildingUnitPositionGeometryMethod.DerivedFromObject,
+                    BuildingGeometry.Center));
             }
         }
 
