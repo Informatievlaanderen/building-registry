@@ -2,6 +2,7 @@ namespace BuildingRegistry.Building
 {
     using System.Collections.Generic;
     using System.Linq;
+    using Exceptions;
 
     public class BuildingUnits : List<BuildingUnit>
     {
@@ -51,5 +52,29 @@ namespace BuildingRegistry.Building
 
         public bool HasPersistentLocalId(BuildingUnitPersistentLocalId persistentLocalId)
             => this.Any(x => x.BuildingUnitPersistentLocalId == persistentLocalId);
+
+        public BuildingUnit GetByPersistentLocalId(BuildingUnitPersistentLocalId buildingUnitPersistentLocalId)
+        {
+            var buildingUnit = this.SingleOrDefault(x => x.BuildingUnitPersistentLocalId == buildingUnitPersistentLocalId);
+
+            if (buildingUnit is null)
+            {
+                throw new BuildingUnitIsNotFoundException();
+            }
+
+            return buildingUnit;
+        }
+
+        public BuildingUnit GetNotRemovedByPersistentLocalId(BuildingUnitPersistentLocalId buildingUnitPersistentLocalId)
+        {
+            var buildingUnit = GetByPersistentLocalId(buildingUnitPersistentLocalId);
+
+            if (buildingUnit.IsRemoved)
+            {
+                throw new BuildingUnitIsRemovedException(buildingUnitPersistentLocalId);
+            }
+
+            return buildingUnit;
+        }
     }
 }
