@@ -112,7 +112,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuildingUnit
         }
 
         [Fact]
-        public void WithRealizedCommonBuildingUnitAndRealizedBuilding_ThenCommonBuildingUnitIsRealized()
+        public void WithNotRealizedCommonBuildingUnitAndRealizedBuilding_ThenCommonBuildingUnitIsRealized()
         {
             var command = Fixture.Create<PlanBuildingUnit>()
                 .WithoutPosition()
