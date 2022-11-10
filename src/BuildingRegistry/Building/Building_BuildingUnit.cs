@@ -172,7 +172,7 @@ namespace BuildingRegistry.Building
             NotRealizeOrRetireCommonBuildingUnit();
         }
 
-        private void GuardBuildingInvalidStatuses(BuildingStatus[] invalidStatuses)
+        private void GuardBuildingInvalidStatuses(params BuildingStatus[] invalidStatuses)
         {
             if (invalidStatuses.Contains(BuildingStatus))
             {
@@ -224,19 +224,15 @@ namespace BuildingRegistry.Building
         {
             var commonBuildingUnit = _buildingUnits.CommonBuildingUnit();
 
-            void CheckToUpdateCommonBuildingUnit ()
+            void CheckToUpdateCommonBuildingUnit()
             {
-                var commonBuildingUnitPosition = commonBuildingUnit.BuildingUnitPosition.Geometry != BuildingGeometry.Center
-                    ? BuildingGeometry.Center
-                    : null;
-
-                if (commonBuildingUnitPosition is not null)
+                if (commonBuildingUnit.BuildingUnitPosition.Geometry != BuildingGeometry.Center)
                 {
                     ApplyChange(new BuildingUnitPositionWasCorrected(
                         BuildingPersistentLocalId,
                         commonBuildingUnit.BuildingUnitPersistentLocalId,
                         BuildingUnitPositionGeometryMethod.DerivedFromObject,
-                        commonBuildingUnitPosition));
+                        BuildingGeometry.Center));
                 }
             }
 
@@ -285,8 +281,7 @@ namespace BuildingRegistry.Building
                     BuildingPersistentLocalId,
                     commonBuildingUnit.BuildingUnitPersistentLocalId));
             }
-
-            if (commonBuildingUnit.Status == BuildingUnitStatus.Realized)
+            else if (commonBuildingUnit.Status == BuildingUnitStatus.Realized)
             {
                 ApplyChange(new BuildingUnitWasRetiredV2(
                     BuildingPersistentLocalId,
