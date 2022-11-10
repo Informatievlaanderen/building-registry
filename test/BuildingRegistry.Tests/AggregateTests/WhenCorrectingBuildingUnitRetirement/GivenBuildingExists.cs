@@ -12,7 +12,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitRetire
     using Building.Commands;
     using Building.Events;
     using Building.Exceptions;
-    using BuildingRegistry.Tests.Extensions;
+    using Extensions;
     using Fixtures;
     using FluentAssertions;
     using Moq;
@@ -178,7 +178,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitRetire
                     new BuildingStreamId(Fixture.Create<BuildingPersistentLocalId>()),
                     buildingWasMigrated)
                 .When(command)
-                .Throws(new BuildingUnitIsNotFoundException(command.BuildingPersistentLocalId, command.BuildingUnitPersistentLocalId)));
+                .Throws(new BuildingUnitIsNotFoundException()));
         }
 
         [Fact]

@@ -12,7 +12,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRetiringBuildingUnit
     using Building.Commands;
     using Building.Events;
     using Building.Exceptions;
-    using BuildingRegistry.Tests.Extensions;
+    using Extensions;
     using Fixtures;
     using FluentAssertions;
     using Moq;
@@ -68,7 +68,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRetiringBuildingUnit
         public void WithCommonBuilding_ThrowsBuildingUnitHasInvalidFunctionException()
         {
             var command = Fixture.Create<RetireBuildingUnit>();
-            
+
             var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
                 .WithBuildingPersistentLocalId(command.BuildingPersistentLocalId)
                 .WithBuildingStatus(BuildingStatus.Realized)
@@ -132,7 +132,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRetiringBuildingUnit
                     new BuildingStreamId(Fixture.Create<BuildingPersistentLocalId>()),
                     buildingWasMigrated)
                 .When(command)
-                .Throws(new BuildingUnitIsNotFoundException(command.BuildingPersistentLocalId, command.BuildingUnitPersistentLocalId)));
+                .Throws(new BuildingUnitIsNotFoundException()));
         }
 
         [Fact]
@@ -152,7 +152,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRetiringBuildingUnit
                         new BuildingUnit(
                             Fixture.Create<BuildingRegistry.Legacy.BuildingUnitId>(),
                             Fixture.Create<BuildingRegistry.Legacy.PersistentLocalId>(),
-                            Fixture.Create<BuildingRegistry.Legacy.BuildingUnitFunction>(),
+                            Fixture.Create<BuildingUnitFunction>(),
                             BuildingRegistry.Legacy.BuildingUnitStatus.Planned,
                             new List<AddressPersistentLocalId>(),
                             Fixture.Create<BuildingRegistry.Legacy.BuildingUnitPosition>(),

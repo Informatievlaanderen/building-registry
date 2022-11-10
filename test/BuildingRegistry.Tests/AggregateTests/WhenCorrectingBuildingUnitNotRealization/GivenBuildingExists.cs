@@ -278,7 +278,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitNotRea
                     new BuildingStreamId(Fixture.Create<BuildingPersistentLocalId>()),
                     buildingWasMigrated)
                 .When(command)
-                .Throws(new BuildingUnitIsNotFoundException(command.BuildingPersistentLocalId, command.BuildingUnitPersistentLocalId)));
+                .Throws(new BuildingUnitIsNotFoundException()));
         }
 
         [Fact]

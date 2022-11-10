@@ -53,32 +53,18 @@ namespace BuildingRegistry.Building
                 BuildingStatus.Retired
             });
 
-            var buildingUnit = BuildingUnits.FirstOrDefault(x => x.BuildingUnitPersistentLocalId == buildingUnitPersistentLocalId);
-
-            if (buildingUnit is null)
-            {
-                throw new BuildingUnitIsNotFoundException(
-                    BuildingPersistentLocalId,
-                    buildingUnitPersistentLocalId);
-            }
-
-            buildingUnit.Realize();
+            _buildingUnits
+                .GetNotRemovedByPersistentLocalId(buildingUnitPersistentLocalId)
+                .Realize();
         }
 
         public void CorrectRealizeBuildingUnit(BuildingUnitPersistentLocalId buildingUnitPersistentLocalId)
         {
             GuardRemovedBuilding();
 
-            var buildingUnit = BuildingUnits.FirstOrDefault(x => x.BuildingUnitPersistentLocalId == buildingUnitPersistentLocalId);
-
-            if (buildingUnit is null)
-            {
-                throw new BuildingUnitIsNotFoundException(
-                    BuildingPersistentLocalId,
-                    buildingUnitPersistentLocalId);
-            }
-
-            buildingUnit.CorrectRealizeBuildingUnit();
+            _buildingUnits
+                .GetNotRemovedByPersistentLocalId(buildingUnitPersistentLocalId)
+                .CorrectRealizeBuildingUnit();
         }
 
         public void CorrectRetiredBuildingUnit(BuildingUnitPersistentLocalId buildingUnitPersistentLocalId)
@@ -92,16 +78,9 @@ namespace BuildingRegistry.Building
                 BuildingStatus.Retired
             });
 
-            var buildingUnit = BuildingUnits.FirstOrDefault(x => x.BuildingUnitPersistentLocalId == buildingUnitPersistentLocalId);
-
-            if (buildingUnit is null)
-            {
-                throw new BuildingUnitIsNotFoundException(
-                    BuildingPersistentLocalId,
-                    buildingUnitPersistentLocalId);
-            }
-
-            buildingUnit.CorrectRetiredBuildingUnit(BuildingGeometry);
+            _buildingUnits
+                .GetNotRemovedByPersistentLocalId(buildingUnitPersistentLocalId)
+                .CorrectRetiredBuildingUnit(BuildingGeometry);
 
             AddOrUpdateStatusCommonBuildingUnit();
         }
@@ -110,16 +89,9 @@ namespace BuildingRegistry.Building
         {
             GuardRemovedBuilding();
 
-            var buildingUnit = BuildingUnits.FirstOrDefault(x => x.BuildingUnitPersistentLocalId == buildingUnitPersistentLocalId);
-
-            if (buildingUnit is null)
-            {
-                throw new BuildingUnitIsNotFoundException(
-                    BuildingPersistentLocalId,
-                    buildingUnitPersistentLocalId);
-            }
-
-            buildingUnit.NotRealize();
+            _buildingUnits
+                .GetNotRemovedByPersistentLocalId(buildingUnitPersistentLocalId)
+                .NotRealize();
 
             NotRealizeOrRetireCommonBuildingUnit();
         }
@@ -133,16 +105,9 @@ namespace BuildingRegistry.Building
                 BuildingStatus.Retired
             });
 
-            var buildingUnit = BuildingUnits.FirstOrDefault(x => x.BuildingUnitPersistentLocalId == buildingUnitPersistentLocalId);
-
-            if (buildingUnit is null)
-            {
-                throw new BuildingUnitIsNotFoundException(
-                    BuildingPersistentLocalId,
-                    buildingUnitPersistentLocalId);
-            }
-
-            buildingUnit.CorrectNotRealize(BuildingGeometry);
+            _buildingUnits
+                .GetNotRemovedByPersistentLocalId(buildingUnitPersistentLocalId)
+                .CorrectNotRealize(BuildingGeometry);
 
             AddOrUpdateStatusCommonBuildingUnit();
         }
@@ -159,14 +124,7 @@ namespace BuildingRegistry.Building
                 BuildingStatus.Retired
             });
 
-            var buildingUnit = BuildingUnits.FirstOrDefault(x => x.BuildingUnitPersistentLocalId == buildingUnitPersistentLocalId);
-
-            if (buildingUnit is null)
-            {
-                throw new BuildingUnitIsNotFoundException(
-                    BuildingPersistentLocalId,
-                    buildingUnitPersistentLocalId);
-            }
+            var buildingUnit = _buildingUnits.GetNotRemovedByPersistentLocalId(buildingUnitPersistentLocalId);
 
             // validate command
             var finalPosition = positionGeometryMethod != BuildingUnitPositionGeometryMethod.AppointedByAdministrator
@@ -190,32 +148,18 @@ namespace BuildingRegistry.Building
                 BuildingStatus.Retired
             });
 
-            var buildingUnit = BuildingUnits.FirstOrDefault(x => x.BuildingUnitPersistentLocalId == buildingUnitPersistentLocalId);
-
-            if (buildingUnit is null)
-            {
-                throw new BuildingUnitIsNotFoundException(
-                    BuildingPersistentLocalId,
-                    buildingUnitPersistentLocalId);
-            }
-
-            buildingUnit.Retire();
+            _buildingUnits
+                .GetNotRemovedByPersistentLocalId(buildingUnitPersistentLocalId)
+                .Retire();
 
             NotRealizeOrRetireCommonBuildingUnit();
         }
 
         public void RemoveBuildingUnit(BuildingUnitPersistentLocalId buildingUnitPersistentLocalId)
         {
-            var buildingUnit = BuildingUnits.FirstOrDefault(x => x.BuildingUnitPersistentLocalId == buildingUnitPersistentLocalId);
-
-            if (buildingUnit is null)
-            {
-                throw new BuildingUnitIsNotFoundException(
-                    BuildingPersistentLocalId,
-                    buildingUnitPersistentLocalId);
-            }
-
-            buildingUnit.Remove();
+            _buildingUnits
+                .GetByPersistentLocalId(buildingUnitPersistentLocalId)
+                .Remove();
 
             if (_buildingUnits.HasCommonBuildingUnit()
                 && !_buildingUnits.NonCommonBuildingUnits().Any())
