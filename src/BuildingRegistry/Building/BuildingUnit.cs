@@ -4,7 +4,6 @@ namespace BuildingRegistry.Building
     using System.Collections.Generic;
     using System.Linq;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
-    using Commands;
     using Events;
     using Exceptions;
 
