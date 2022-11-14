@@ -92,9 +92,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetailV2
 
                 UpdateHash(buildingUnitDetailItemV2, message);
 
-                await context.BuildingUnitDetailsV2.AddAsync(
-                    buildingUnitDetailItemV2
-                    , ct);
+                await context.BuildingUnitDetailsV2.AddAsync(buildingUnitDetailItemV2, ct);
             });
 
             When<Envelope<BuildingOutlineWasChanged>>(async (context, message, ct) =>
@@ -105,6 +103,8 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetailV2
                     {
                         item.Position = message.Message.ExtendedWkbGeometryBuildingUnits!.ToByteArray();
                         item.PositionMethod = BuildingUnitPositionGeometryMethod.DerivedFromObject;
+
+                        UpdateHash(item, message);
                     }, ct);
                 }
             });
@@ -209,6 +209,20 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetailV2
                 }, ct);
             });
 
+            When<Envelope<BuildingUnitRemovalWasCorrected>>(async (context, message, ct) =>
+            {
+                await Update(context, message.Message.BuildingUnitPersistentLocalId, item =>
+                {
+                    item.Status = BuildingUnitStatus.Parse(message.Message.BuildingUnitStatus);
+                    item.Function = BuildingUnitFunction.Parse(message.Message.Function);
+                    item.Position = message.Message.ExtendedWkbGeometry.ToByteArray();
+                    item.PositionMethod = BuildingUnitPositionGeometryMethod.Parse(message.Message.GeometryMethod);
+                    item.IsRemoved = false;
+                    item.Version = message.Message.Provenance.Timestamp;
+                    UpdateHash(item, message);
+                }, ct);
+            });
+
             When<Envelope<CommonBuildingUnitWasAddedV2>>(async (context, message, ct) =>
             {
                 var commonBuildingUnitDetailItemV2 = new BuildingUnitDetailItemV2(
@@ -234,7 +248,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetailV2
                 await Update(context, message.Message.BuildingUnitPersistentLocalId, item =>
                 {
                     item.Position = message.Message.ExtendedWkbGeometry.ToByteArray();
-                    item.PositionMethod = BuildingRegistry.Building.BuildingUnitPositionGeometryMethod.Parse(message.Message.GeometryMethod);
+                    item.PositionMethod = BuildingUnitPositionGeometryMethod.Parse(message.Message.GeometryMethod);
                     item.Version = message.Message.Provenance.Timestamp;
                     UpdateHash(item, message);
                 }, ct);

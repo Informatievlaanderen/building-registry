@@ -180,6 +180,26 @@ namespace BuildingRegistry.Projections.Wms.BuildingUnitV2
                 context.BuildingUnitsV2.Remove(unit);
             });
 
+            When<Envelope<BuildingUnitRemovalWasCorrected>>(async (context, message, ct) =>
+            {
+                var buildingUnitV2 = new BuildingUnitV2
+                {
+                    Id = PersistentLocalIdHelper.CreateBuildingUnitId(message.Message.BuildingUnitPersistentLocalId),
+                    BuildingPersistentLocalId = message.Message.BuildingPersistentLocalId,
+                    BuildingUnitPersistentLocalId = message.Message.BuildingUnitPersistentLocalId,
+                    Status = BuildingUnitStatus.Parse(message.Message.BuildingUnitStatus),
+                    Function = MapFunction(BuildingUnitFunction.Parse(message.Message.Function)),
+                    Version = message.Message.Provenance.Timestamp,
+                };
+
+                SetPosition(
+                    buildingUnitV2,
+                    message.Message.ExtendedWkbGeometry,
+                    MapGeometryMethod(BuildingUnitPositionGeometryMethod.Parse(message.Message.GeometryMethod)));
+
+                await context.BuildingUnitsV2.AddAsync(buildingUnitV2, ct);
+            });
+
             When<Envelope<CommonBuildingUnitWasAddedV2>>(async (context, message, ct) =>
             {
                 var buildingUnitV2 = new BuildingUnitV2

@@ -1068,6 +1068,30 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
                 }, ct);
             });
 
+            When<Envelope<BuildingUnitRemovalWasCorrected>>(async (context, message, ct) =>
+            {
+                await context.CreateNewBuildingSyndicationItem(
+                    message.Message.BuildingPersistentLocalId,
+                    message,
+                    x =>
+                    {
+                        var buildingUnitSyndicationItem = new BuildingUnitSyndicationItemV2
+                        {
+                            PersistentLocalId = message.Message.BuildingUnitPersistentLocalId,
+                            Status = BuildingRegistry.Building.BuildingUnitStatus.Parse(message.Message.BuildingUnitStatus),
+                            Function = BuildingRegistry.Building.BuildingUnitFunction.Parse(message.Message.Function),
+                            Position = message.Position,
+                            PointPosition = message.Message.ExtendedWkbGeometry.ToByteArray(),
+                            PositionMethod = BuildingRegistry.Building.BuildingUnitPositionGeometryMethod.Parse(message.Message.GeometryMethod),
+                            Version = message.Message.Provenance.Timestamp,
+                            Addresses = new Collection<BuildingUnitAddressSyndicationItemV2>()
+                        };
+
+                        x.BuildingUnitsV2.Add(buildingUnitSyndicationItem);
+                    },
+                    ct);
+            });
+
             When<Envelope<CommonBuildingUnitWasAddedV2>>(async (context, message, ct) =>
             {
                 await context.CreateNewBuildingSyndicationItem(
