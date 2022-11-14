@@ -183,6 +183,19 @@ namespace BuildingRegistry.Projections.Wfs.BuildingUnitV2
                 SetVersion(unit, message.Message.Provenance.Timestamp);
             });
 
+            When<Envelope<BuildingUnitRemovalWasCorrected>>(async (context, message, _) =>
+            {
+                var unit = await context.BuildingUnitsV2.FindAsync(message.Message.BuildingUnitPersistentLocalId);
+
+                unit!.Status = MapStatus(BuildingUnitStatus.Parse(message.Message.BuildingUnitStatus));
+                unit.Function = MapFunction(BuildingUnitFunction.Parse(message.Message.Function));
+                unit.Position = (Point)_wkbReader.Read(message.Message.ExtendedWkbGeometry.ToByteArray());
+                unit.PositionMethod = MapGeometryMethod(BuildingUnitPositionGeometryMethod.Parse(message.Message.GeometryMethod));
+                unit.IsRemoved = false;
+
+                SetVersion(unit, message.Message.Provenance.Timestamp);
+            });
+
             When<Envelope<CommonBuildingUnitWasAddedV2>>(async (context, message, ct) =>
             {
                 var commonBuildingUnitV2 = new BuildingUnitV2
@@ -209,7 +222,7 @@ namespace BuildingRegistry.Projections.Wfs.BuildingUnitV2
             When<Envelope<BuildingUnitPositionWasCorrected>>(async (context, message, ct) =>
             {
                 var unit = await context.BuildingUnitsV2.FindAsync(message.Message.BuildingUnitPersistentLocalId);
-                
+
                 SetPosition(
                     unit,
                     message.Message.ExtendedWkbGeometry,
