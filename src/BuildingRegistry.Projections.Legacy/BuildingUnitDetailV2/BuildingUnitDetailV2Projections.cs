@@ -103,7 +103,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetailV2
                     {
                         item.Position = message.Message.ExtendedWkbGeometryBuildingUnits!.ToByteArray();
                         item.PositionMethod = BuildingUnitPositionGeometryMethod.DerivedFromObject;
-
+                        item.Version = message.Message.Provenance.Timestamp;
                         UpdateHash(item, message);
                     }, ct);
                 }

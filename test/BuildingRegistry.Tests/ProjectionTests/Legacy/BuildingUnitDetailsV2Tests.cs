@@ -174,6 +174,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Legacy
 
                     item!.PositionMethod.Should().Be(BuildingUnitPositionGeometryMethod.DerivedFromObject);
                     item.Position.Should().BeEquivalentTo(@event.ExtendedWkbGeometryBuildingUnits!.ToByteArray());
+                    item.Version.Should().Be(@event.Provenance.Timestamp);
                 });
         }
 
