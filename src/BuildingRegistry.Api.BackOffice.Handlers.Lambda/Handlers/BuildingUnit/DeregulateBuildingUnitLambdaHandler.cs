@@ -14,9 +14,9 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.BuildingUnit
     using Requests.BuildingUnit;
     using TicketingService.Abstractions;
 
-    public sealed class CorrectBuildingUnitRetirementLambdaHandler : BuildingUnitLambdaHandler<CorrectBuildingUnitRetirementLambdaRequest>
+    public sealed class DeregulateBuildingUnitLambdaHandler : BuildingUnitLambdaHandler<DeregulateBuildingUnitLambdaRequest>
     {
-        public CorrectBuildingUnitRetirementLambdaHandler(
+        public DeregulateBuildingUnitLambdaHandler(
             IConfiguration configuration,
             ICustomRetryPolicy retryPolicy,
             ITicketing ticketing,
@@ -30,7 +30,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.BuildingUnit
                 buildings)
         { }
 
-        protected override async Task<ETagResponse> InnerHandle(CorrectBuildingUnitRetirementLambdaRequest request, CancellationToken cancellationToken)
+        protected override async Task<ETagResponse> InnerHandle(DeregulateBuildingUnitLambdaRequest request, CancellationToken cancellationToken)
         {
             var cmd = request.ToCommand();
 
@@ -55,21 +55,16 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.BuildingUnit
             return new ETagResponse(string.Format(DetailUrlFormat, request.BuildingUnitPersistentLocalId), lastHash);
         }
 
-        protected override TicketError? InnerMapDomainException(DomainException exception, CorrectBuildingUnitRetirementLambdaRequest request)
+        protected override TicketError? InnerMapDomainException(DomainException exception, DeregulateBuildingUnitLambdaRequest request)
         {
             return exception switch
             {
-                BuildingHasInvalidStatusException => new TicketError(
-                    ValidationErrors.CorrectBuildingUnitRetirement.BuildingInvalidStatus.Message,
-                    ValidationErrors.CorrectBuildingUnitRetirement.BuildingInvalidStatus.Code),
-
-                BuildingUnitHasInvalidFunctionException => new TicketError(
-                    ValidationErrors.Common.CommonBuildingUnit.InvalidFunction.Message,
-                    ValidationErrors.Common.CommonBuildingUnit.InvalidFunction.Code),
-
-                BuildingUnitHasInvalidStatusException => new TicketError(
-                    ValidationErrors.CorrectBuildingUnitRetirement.InvalidStatus.Message,
-                    ValidationErrors.CorrectBuildingUnitRetirement.InvalidStatus.Code),
+                BuildingUnitHasInvalidFunctionException =>
+                    ValidationErrors.Common.CommonBuildingUnit.InvalidFunction.ToTicketError(),
+                BuildingHasInvalidStatusException =>
+                    ValidationErrors.DeregulateBuildingUnit.BuildingInvalidStatus.ToTicketError(),
+                BuildingUnitHasInvalidStatusException =>
+                    ValidationErrors.DeregulateBuildingUnit.BuildingUnitInvalidStatus.ToTicketError(),
                 _ => null
             };
         }

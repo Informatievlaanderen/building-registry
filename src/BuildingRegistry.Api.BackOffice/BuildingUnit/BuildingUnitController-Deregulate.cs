@@ -28,7 +28,7 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
     public partial class BuildingUnitController
     {
         /// <summary>
-        /// Corrigeer de statuswijzing van een ‘gehistoreerde’ gebouweenheid naar ‘gerealiseerd’
+        /// Deregulariseer een gebouweenheid.
         /// </summary>
         /// <param name="options"></param>
         /// <param name="ifMatchHeaderValidator"></param>
@@ -37,20 +37,23 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
         /// <param name="ifMatchHeaderValue"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        [HttpPost("{buildingUnitPersistentLocalId}/acties/corrigeren/opheffing")]
+        [HttpPost("{buildingUnitPersistentLocalId}/acties/deregulariseren")]
         [ProducesResponseType(StatusCodes.Status202Accepted)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-        [SwaggerResponseHeader(StatusCodes.Status202Accepted, "location", "string", "De url van de gebouweenheid.")]
+        [SwaggerResponseHeader(StatusCodes.Status202Accepted, "location", "string", "De URL van het aangemaakte ticket.")]
         [SwaggerResponseExample(StatusCodes.Status400BadRequest, typeof(BadRequestResponseExamples))]
         [SwaggerResponseExample(StatusCodes.Status500InternalServerError, typeof(InternalServerErrorResponseExamples))]
-        public async Task<IActionResult> CorrectRetirement(
+        public async Task<IActionResult> Deregulate(
             [FromServices] IOptions<ResponseOptions> options,
             [FromServices] IIfMatchHeaderValidator ifMatchHeaderValidator,
-            [FromRoute] CorrectBuildingUnitRetirementRequest request,
+            [FromServices] IValidator<DeregulateBuildingUnitRequest> validator,
+            [FromRoute] DeregulateBuildingUnitRequest request,
             [FromHeader(Name = "If-Match")] string? ifMatchHeaderValue,
             CancellationToken ct = default)
         {
+            await validator.ValidateAndThrowAsync(request, ct);
+
             try
             {
                 if (!await ifMatchHeaderValidator
@@ -62,7 +65,7 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
                 if (UseSqsToggle.FeatureEnabled)
                 {
                     var result = await Mediator.Send(
-                        new CorrectBuildingUnitRetirementSqsRequest()
+                        new DeregulateBuildingUnitSqsRequest
                         {
                             Request = request,
                             Metadata = GetMetadata(),
@@ -99,11 +102,6 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
             {
                 throw exception switch
                 {
-                    BuildingHasInvalidStatusException => CreateValidationException(
-                        ValidationErrors.CorrectBuildingUnitRetirement.BuildingInvalidStatus.Code,
-                        string.Empty,
-                        ValidationErrors.CorrectBuildingUnitRetirement.BuildingInvalidStatus.Message),
-
                     BuildingUnitIsNotFoundException => new ApiException(ValidationErrorMessages.BuildingUnit.BuildingUnitNotFound, StatusCodes.Status404NotFound),
 
                     BuildingUnitIsRemovedException => new ApiException(ValidationErrorMessages.BuildingUnit.BuildingUnitIsRemoved, StatusCodes.Status410Gone),
@@ -114,9 +112,14 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
                         ValidationErrors.Common.CommonBuildingUnit.InvalidFunction.Message),
 
                     BuildingUnitHasInvalidStatusException => CreateValidationException(
-                        ValidationErrors.CorrectBuildingUnitRetirement.InvalidStatus.Code,
+                        ValidationErrors.DeregulateBuildingUnit.BuildingUnitInvalidStatus.Code,
                         string.Empty,
-                        ValidationErrors.CorrectBuildingUnitRetirement.InvalidStatus.Message),
+                        ValidationErrors.DeregulateBuildingUnit.BuildingUnitInvalidStatus.Message),
+
+                    BuildingHasInvalidStatusException => CreateValidationException(
+                        ValidationErrors.DeregulateBuildingUnit.BuildingInvalidStatus.Code,
+                        string.Empty,
+                        ValidationErrors.DeregulateBuildingUnit.BuildingInvalidStatus.Message),
 
                     _ => new ValidationException(new List<ValidationFailure>
                         { new ValidationFailure(string.Empty, exception.Message) })
