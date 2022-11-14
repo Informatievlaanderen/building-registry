@@ -137,6 +137,11 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda
                         new DeregulateBuildingUnitLambdaRequest(messageMetadata.MessageGroupId!, request),
                         cancellationToken);
                     break;
+                case RegularizeBuildingUnitSqsRequest request:
+                    await mediator.Send(
+                        new RegularizeBuildingUnitLambdaRequest(messageMetadata.MessageGroupId!, request),
+                        cancellationToken);
+                    break;
 
                 default:
                     throw new NotImplementedException(
