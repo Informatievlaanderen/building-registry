@@ -1,3 +1,19 @@
+# [3.46.0](https://github.com/informatievlaanderen/building-registry/compare/v3.45.0...v3.46.0) (2022-11-14)
+
+
+### Bug Fixes
+
+* BuildingOutlineWasChanged projections ([f75ee63](https://github.com/informatievlaanderen/building-registry/commit/f75ee6356d5df284c2e4b337834037f7d7390857))
+
+
+### Features
+
+* add regularize bu backoffice ([e70c63a](https://github.com/informatievlaanderen/building-registry/commit/e70c63a47d7f264e48d9cb2b0a98b82d1ac320e8))
+* BuildingUnitRemovalWasCorrected projections ([460e08a](https://github.com/informatievlaanderen/building-registry/commit/460e08a018bf693b62833ba4c9338e9edb1b5eb2))
+* deregulate building unit backoffice ([7d94116](https://github.com/informatievlaanderen/building-registry/commit/7d94116f6ba3d9fec9945acc065e377be6c6f2d0))
+* deregulate building unit domain ([87d3c87](https://github.com/informatievlaanderen/building-registry/commit/87d3c87e031fde17c21673789585bf9fc610323d))
+* regularize bu domain ([dbd5200](https://github.com/informatievlaanderen/building-registry/commit/dbd52000cd6a40723500a18f8cb27b95044b4477))
+
 # [3.45.0](https://github.com/informatievlaanderen/building-registry/compare/v3.44.0...v3.45.0) (2022-11-14)
 
 
