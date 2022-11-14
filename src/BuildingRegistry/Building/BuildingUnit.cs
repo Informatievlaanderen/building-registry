@@ -247,6 +247,27 @@ namespace BuildingRegistry.Building
                 BuildingUnitPersistentLocalId));
         }
 
+        public void Regularize()
+        {
+            GuardRemoved();
+            GuardCommonUnit();
+
+            GuardBuildingUnitInvalidStatuses(new[]
+            {
+                BuildingUnitStatus.Retired,
+                BuildingUnitStatus.NotRealized
+            });
+
+            if (!HasDeviation)
+            {
+                return;
+            }
+
+            Apply(new BuildingUnitWasRegularized(
+                _buildingPersistentLocalId,
+                BuildingUnitPersistentLocalId));
+        }
+
         private void GuardBuildingUnitInvalidStatuses(BuildingUnitStatus[] invalidStatuses)
         {
             if (invalidStatuses.Contains(Status))

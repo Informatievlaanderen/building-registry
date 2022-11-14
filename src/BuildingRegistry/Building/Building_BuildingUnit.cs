@@ -150,6 +150,16 @@ namespace BuildingRegistry.Building
             NotRealizeOrRetireCommonBuildingUnit();
         }
 
+        public void RegularizeBuildingUnit(BuildingUnitPersistentLocalId buildingUnitPersistentLocalId)
+        {
+            GuardRemovedBuilding();
+            GuardBuildingInvalidStatuses(BuildingStatus.NotRealized, BuildingStatus.Retired);
+
+            _buildingUnits
+                .GetNotRemovedByPersistentLocalId(buildingUnitPersistentLocalId)
+                .Regularize();
+        }
+
         private void GuardBuildingInvalidStatuses(params BuildingStatus[] invalidStatuses)
         {
             if (invalidStatuses.Contains(BuildingStatus))
