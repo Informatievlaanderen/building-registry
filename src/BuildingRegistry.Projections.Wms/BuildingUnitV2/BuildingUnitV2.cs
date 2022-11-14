@@ -23,6 +23,7 @@ namespace BuildingRegistry.Projections.Wms.BuildingUnitV2
         public string Function { get; set; }
 
         public BuildingUnitStatus Status { get; set; }
+        public bool HasDeviation { get; set; }
 
         private DateTimeOffset VersionTimestampAsDateTimeOffset { get; set; }
         public Instant Version
@@ -74,6 +75,9 @@ namespace BuildingRegistry.Projections.Wms.BuildingUnitV2
 
             b.Property(p => p.Status)
                 .HasConversion(x => x.Status, y => BuildingUnitStatus.Parse(y));
+
+            b.Property(p => p.HasDeviation)
+                .HasDefaultValue(false);
 
             b.HasIndex(p => p.BuildingPersistentLocalId);
             b.HasIndex(p => p.Status);

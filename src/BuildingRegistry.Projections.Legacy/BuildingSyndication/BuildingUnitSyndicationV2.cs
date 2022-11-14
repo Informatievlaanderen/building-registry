@@ -21,6 +21,8 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
         public BuildingUnitFunction Function { get; set; }
         public BuildingUnitStatus Status { get; set; }
 
+        public bool HasDeviation { get; set; }
+
         public DateTimeOffset VersionTimestampAsDateTimeOffset { get; set; }
         public Instant Version
         {
@@ -45,6 +47,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
                 Function = Function,
                 PositionMethod = PositionMethod,
                 Status = Status,
+                HasDeviation = HasDeviation,
                 Version = Version,
                 Addresses = new Collection<BuildingUnitAddressSyndicationItemV2>(Addresses.Select(x => x.CloneAndApplyEventInfo(position)).ToList()),
             };
@@ -76,6 +79,9 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
 
             b.Property(p => p.Status)
                 .HasConversion(x => x.Status, y => BuildingUnitStatus.Parse(y));
+
+            b.Property(p => p.HasDeviation)
+                .HasDefaultValue(false);
 
             b.Property(p => p.PositionMethod)
                 .HasConversion(x => x.GeometryMethod, y => BuildingUnitPositionGeometryMethod.Parse(y));

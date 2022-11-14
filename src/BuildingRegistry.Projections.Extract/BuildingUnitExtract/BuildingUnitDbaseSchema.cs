@@ -11,6 +11,7 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
         public DbaseField functie => Fields[4];
         public DbaseField status => Fields[5];
         public DbaseField posgeommet => Fields[6];
+        public DbaseField afwijkingvastgesteld => Fields[7];
 
         public BuildingUnitDbaseSchema() => Fields = new[]
         {
@@ -20,7 +21,8 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
             DbaseField.CreateCharacterField(new DbaseFieldName(nameof(gebouwid)), new DbaseFieldLength(10)),
             DbaseField.CreateCharacterField(new DbaseFieldName(nameof(functie)), new DbaseFieldLength(30)),
             DbaseField.CreateCharacterField(new DbaseFieldName(nameof(status)), new DbaseFieldLength(20)),
-            DbaseField.CreateCharacterField(new DbaseFieldName(nameof(posgeommet)), new DbaseFieldLength(30))
+            DbaseField.CreateCharacterField(new DbaseFieldName(nameof(posgeommet)), new DbaseFieldLength(30)),
+            DbaseField.CreateLogicalField(new DbaseFieldName(nameof(afwijkingvastgesteld)))
         };
     }
 }

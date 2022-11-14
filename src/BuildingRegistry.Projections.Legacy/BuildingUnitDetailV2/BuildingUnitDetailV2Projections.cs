@@ -55,6 +55,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetailV2
                         BuildingUnitPositionGeometryMethod.Parse(buildingUnit.GeometryMethod),
                         BuildingUnitFunction.Parse(buildingUnit.Function),
                         BuildingUnitStatus.Parse(buildingUnit.Status),
+                        false,
                         new Collection<BuildingUnitDetailAddressItemV2>(addresses),
                         buildingUnit.IsRemoved,
                         message.Message.Provenance.Timestamp);
@@ -86,6 +87,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetailV2
                     BuildingUnitPositionGeometryMethod.Parse(message.Message.GeometryMethod),
                     BuildingUnitFunction.Parse(message.Message.Function),
                     BuildingUnitStatus.Planned,
+                    message.Message.HasDeviation,
                     new Collection<BuildingUnitDetailAddressItemV2>(),
                     isRemoved: false,
                     message.Message.Provenance.Timestamp);
@@ -232,6 +234,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetailV2
                     BuildingUnitPositionGeometryMethod.Parse(message.Message.GeometryMethod),
                     BuildingUnitFunction.Common,
                     BuildingUnitStatus.Parse(message.Message.BuildingUnitStatus),
+                    message.Message.HasDeviation,
                     new Collection<BuildingUnitDetailAddressItemV2>(),
                     isRemoved: false,
                     message.Message.Provenance.Timestamp);

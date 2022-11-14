@@ -21,6 +21,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetailV2
 
         public BuildingUnitFunction Function { get; set; }
         public BuildingUnitStatus Status { get; set; }
+        public bool HasDeviation { get; set; }
 
         public virtual Collection<BuildingUnitDetailAddressItemV2> Addresses { get; set; }
 
@@ -48,6 +49,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetailV2
             BuildingUnitPositionGeometryMethod positionMethod,
             BuildingUnitFunction function,
             BuildingUnitStatus status,
+            bool hasDeviation,
             Collection<BuildingUnitDetailAddressItemV2> addresses,
             bool isRemoved,
             Instant version)
@@ -58,6 +60,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetailV2
             PositionMethod = positionMethod;
             Function = function;
             Status = status;
+            HasDeviation = hasDeviation;
             Addresses = addresses;
             IsRemoved = isRemoved;
             Version = version;
@@ -92,9 +95,12 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetailV2
             b.Property(p => p.Status)
                  .HasConversion(x => x.Status, y => BuildingUnitStatus.Parse(y));
 
+            b.Property(p => p.HasDeviation)
+                .HasDefaultValue(false);
+
             b.Property(p => p.PositionMethod)
                 .HasConversion(x => x.GeometryMethod, y => BuildingUnitPositionGeometryMethod.Parse(y));
-            
+
             b.Property(p => p.Function)
                 .HasConversion(x => x.Function, y => BuildingUnitFunction.Parse(y));
 
