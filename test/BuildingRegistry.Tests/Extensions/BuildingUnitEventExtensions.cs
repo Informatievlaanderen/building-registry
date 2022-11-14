@@ -127,4 +127,18 @@ namespace BuildingRegistry.Tests.Extensions
             return updatedEvent;
         }
     }
+
+    public static class BuildingUnitWasRegularizedExtensions
+    {
+        public static BuildingUnitWasRegularized WithBuildingUnitPersistentLocalId(this BuildingUnitWasRegularized @event,
+            BuildingUnitPersistentLocalId buildingUnitPersistentLocalId)
+        {
+            var updatedEvent = new BuildingUnitWasRegularized(
+                new BuildingPersistentLocalId(@event.BuildingPersistentLocalId),
+                buildingUnitPersistentLocalId);
+            ((ISetProvenance)updatedEvent).SetProvenance(@event.Provenance.ToProvenance());
+
+            return updatedEvent;
+        }
+    }
 }

@@ -134,6 +134,18 @@ namespace BuildingRegistry.Building
 
                     building.RemoveBuildingUnit(message.Command.BuildingUnitPersistentLocalId);
                 });
+
+            For<RegularizeBuildingUnit>()
+                .AddSqlStreamStore(getStreamStore, getUnitOfWork, eventMapping, eventSerializer, getSnapshotStore)
+                .AddEventHash<RegularizeBuildingUnit, Building>(getUnitOfWork)
+                .AddProvenance(getUnitOfWork, provenanceFactory)
+                .Handle(async (message, ct) =>
+                {
+                    var streamId = new BuildingStreamId(message.Command.BuildingPersistentLocalId);
+                    var building = await buildingRepository().GetAsync(streamId, ct);
+
+                    building.RegularizeBuildingUnit(message.Command.BuildingUnitPersistentLocalId);
+                });
         }
     }
 }

@@ -46,6 +46,7 @@ namespace BuildingRegistry.Building
             Register<CommonBuildingUnitWasAddedV2>(When);
             Register<BuildingUnitPositionWasCorrected>(When);
             Register<BuildingUnitWasRemovedV2>(When);
+            Register<BuildingUnitWasRegularized>(When);
         }
 
         private void When(BuildingWasMigrated @event)
@@ -152,6 +153,13 @@ namespace BuildingRegistry.Building
         private void When(BuildingUnitWasRemovedV2 @event)
         {
             IsRemoved = true;
+
+            _lastEvent = @event;
+        }
+
+        private void When(BuildingUnitWasRegularized @event)
+        {
+            HasDeviation = false;
 
             _lastEvent = @event;
         }
