@@ -38,14 +38,14 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenRegularizingBuildingUnit
             var expectedLocationResult = new LocationResult(CreateTicketUri(ticketId));
 
             MockMediator
-                .Setup(x => x.Send(It.IsAny<NotRealizeBuildingUnitSqsRequest>(), CancellationToken.None))
+                .Setup(x => x.Send(It.IsAny<RegularizeBuildingUnitSqsRequest>(), CancellationToken.None))
                 .Returns(Task.FromResult(expectedLocationResult));
 
-            var result = (AcceptedResult)await _controller.NotRealize(
+            var result = (AcceptedResult)await _controller.Regularize(
                 ResponseOptions,
                 MockIfMatchValidator(true),
-                new NotRealizeBuildingUnitRequestValidator(),
-                Fixture.Create<NotRealizeBuildingUnitRequest>(),
+                new RegularizeBuildingUnitRequestValidator(),
+                Fixture.Create<RegularizeBuildingUnitRequest>(),
                 ifMatchHeaderValue: null);
 
             result.Should().NotBeNull();
@@ -56,11 +56,11 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenRegularizingBuildingUnit
         public async Task WithInvalidIfMatchHeader_ThenPreconditionFailedResponse()
         {
             //Act
-            var result = await _controller.NotRealize(
+            var result = await _controller.Regularize(
                 ResponseOptions,
                 MockIfMatchValidator(false),
-                new NotRealizeBuildingUnitRequestValidator(),
-                Fixture.Create<NotRealizeBuildingUnitRequest>(),
+                new RegularizeBuildingUnitRequestValidator(),
+                Fixture.Create<RegularizeBuildingUnitRequest>(),
                 "IncorrectIfMatchHeader");
 
             //Assert
@@ -71,16 +71,16 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenRegularizingBuildingUnit
         public void WithAggregateIdIsNotFound_ThenThrowsApiException()
         {
             MockMediator
-                .Setup(x => x.Send(It.IsAny<NotRealizeBuildingUnitSqsRequest>(), CancellationToken.None))
+                .Setup(x => x.Send(It.IsAny<RegularizeBuildingUnitSqsRequest>(), CancellationToken.None))
                 .Throws(new AggregateIdIsNotFoundException());
 
-            var request = Fixture.Create<NotRealizeBuildingUnitRequest>();
+            var request = Fixture.Create<RegularizeBuildingUnitRequest>();
             Func<Task> act = async () =>
             {
-                await _controller.NotRealize(
+                await _controller.Regularize(
                     ResponseOptions,
                     MockIfMatchValidator(true),
-                    new NotRealizeBuildingUnitRequestValidator(),
+                    new RegularizeBuildingUnitRequestValidator(),
                     request,
                     string.Empty);
             };

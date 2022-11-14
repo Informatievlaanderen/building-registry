@@ -104,10 +104,11 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
 
                     BuildingUnitIsRemovedException => new ApiException(ValidationErrorMessages.BuildingUnit.BuildingUnitIsRemoved, StatusCodes.Status410Gone),
 
+
                     BuildingUnitHasInvalidFunctionException => CreateValidationException(
-                        ValidationErrorCodes.BuildingUnit.BuildingUnitHasInvalidFunction,
+                        ValidationErrors.Common.CommonBuildingUnit.InvalidFunction.Code,
                         string.Empty,
-                        ValidationErrorMessages.BuildingUnit.BuildingUnitHasInvalidFunction),
+                        ValidationErrors.Common.CommonBuildingUnit.InvalidFunction.Message),
 
                     BuildingUnitHasInvalidStatusException => CreateValidationException(
                         ValidationErrors.RegularizeBuildingUnit.BuildingUnitInvalidStatus.Code,
