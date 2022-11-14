@@ -268,6 +268,27 @@ namespace BuildingRegistry.Building
                 BuildingUnitPersistentLocalId));
         }
 
+        public void Deregulate()
+        {
+            GuardRemoved();
+            GuardCommonUnit();
+
+            GuardBuildingUnitInvalidStatuses(new[]
+            {
+                BuildingUnitStatus.Retired,
+                BuildingUnitStatus.NotRealized
+            });
+
+            if (HasDeviation)
+            {
+                return;
+            }
+
+            Apply(new BuildingUnitWasDeregulated(
+                _buildingPersistentLocalId,
+                BuildingUnitPersistentLocalId));
+        }
+
         private void GuardBuildingUnitInvalidStatuses(BuildingUnitStatus[] invalidStatuses)
         {
             if (invalidStatuses.Contains(Status))
