@@ -1,3 +1,10 @@
+# [3.45.0](https://github.com/informatievlaanderen/building-registry/compare/v3.44.0...v3.45.0) (2022-11-14)
+
+
+### Features
+
+* correct common BU removal on plan BU domain ([cf286b2](https://github.com/informatievlaanderen/building-registry/commit/cf286b26d2e9fd039a3463342f7f241824e4a23f))
+
 # [3.44.0](https://github.com/informatievlaanderen/building-registry/compare/v3.43.0...v3.44.0) (2022-11-09)
 
 
