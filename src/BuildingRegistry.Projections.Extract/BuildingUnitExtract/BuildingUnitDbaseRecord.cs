@@ -13,6 +13,7 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
         public DbaseCharacter functie { get; }
         public DbaseCharacter status { get; }
         public DbaseCharacter posgeommet { get; }
+        public DbaseBoolean afwijkingvastgesteld { get; }
 
         public BuildingUnitDbaseRecord()
         {
@@ -23,6 +24,7 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
             functie = new DbaseCharacter(Schema.functie);
             status = new DbaseCharacter(Schema.status);
             posgeommet = new DbaseCharacter(Schema.posgeommet);
+            afwijkingvastgesteld = new DbaseBoolean(Schema.afwijkingvastgesteld);
 
             Values = new DbaseFieldValue[]
             {
@@ -32,7 +34,8 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
                 gebouwid,
                 functie,
                 status,
-                posgeommet
+                posgeommet,
+                afwijkingvastgesteld
             };
         }
     }

@@ -24,6 +24,7 @@ namespace BuildingRegistry.Projections.Wfs.BuildingUnitV2
         public bool IsRemoved { get; set; }
 
         public string Status { get; set; }
+        public bool HasDeviation { get; set; }
         private DateTimeOffset VersionTimestampAsDateTimeOffset { get; set; }
 
         public Instant Version
@@ -69,6 +70,8 @@ namespace BuildingRegistry.Projections.Wfs.BuildingUnitV2
                 .HasColumnType("sys.geometry");
 
             b.Property(p => p.Status);
+            b.Property(p => p.HasDeviation)
+                .HasDefaultValue(false);
 
             b.HasIndex(p => p.Id);
             b.HasIndex(p => p.Status);

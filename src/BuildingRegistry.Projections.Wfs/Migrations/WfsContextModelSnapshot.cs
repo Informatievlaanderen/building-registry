@@ -230,6 +230,11 @@ namespace BuildingRegistry.Projections.Wfs.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<bool>("HasDeviation")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
 
