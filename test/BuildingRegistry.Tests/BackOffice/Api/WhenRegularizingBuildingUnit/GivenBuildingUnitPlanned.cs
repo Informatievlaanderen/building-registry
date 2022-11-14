@@ -67,21 +67,6 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenRegularizingBuildingUnit
         {
             var buildingUnitPersistentLocalId = new BuildingUnitPersistentLocalId(456);
 
-            Fixture.Register(() => buildingUnitPersistentLocalId);
-
-            var building = new BuildingFactory(NoSnapshotStrategy.Instance, Mock.Of<IAddCommonBuildingUnit>()).Create();
-            var buildingUnitPlanned = Fixture.Create<BuildingUnitWasPlannedV2>();
-            var ifMatchHeader = "IncorrectIfMatchHeader";
-
-            building.Initialize(new[]
-            {
-                buildingUnitPlanned
-            });
-
-            MockMediator
-                .Setup(x => x.Send(It.IsAny<RegularizeBuildingUnitRequest>(), CancellationToken.None).Result)
-                .Returns(new ETagResponse(string.Empty, string.Empty));
-
             var request = new RegularizeBuildingUnitRequest
             {
                 BuildingUnitPersistentLocalId = buildingUnitPersistentLocalId
@@ -94,7 +79,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenRegularizingBuildingUnit
                 MockIfMatchValidator(false),
                 new RegularizeBuildingUnitRequestValidator(),
                 request,
-                new ETag(ETagType.Strong, ifMatchHeader).ToString(),
+                new ETag(ETagType.Strong, "IncorrectIfMatchHeader").ToString(),
                 CancellationToken.None);
 
             //Assert
