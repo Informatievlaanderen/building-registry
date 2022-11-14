@@ -894,6 +894,20 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
                 await context.CreateNewBuildingSyndicationItem(message.Message.BuildingPersistentLocalId, message, item =>
                 {
                     item.Geometry = message.Message.ExtendedWkbGeometryBuilding.ToByteArray();
+
+                    if (!string.IsNullOrWhiteSpace(message.Message.ExtendedWkbGeometryBuildingUnits))
+                    {
+                        var buildingUnitPointPosition = message.Message.ExtendedWkbGeometryBuildingUnits!.ToByteArray();
+
+                        foreach (var buildingUnitId in message.Message.BuildingUnitPersistentLocalIds)
+                        {
+                            var buildingUnit = item.BuildingUnitsV2.Single(x => x.PersistentLocalId == buildingUnitId);
+
+                            buildingUnit.PointPosition = buildingUnitPointPosition;
+                            buildingUnit.PositionMethod = BuildingRegistry.Building.BuildingUnitPositionGeometryMethod.DerivedFromObject;
+                            buildingUnit.Version = message.Message.Provenance.Timestamp;
+                        }
+                    }
                 }, ct);
             });
 
