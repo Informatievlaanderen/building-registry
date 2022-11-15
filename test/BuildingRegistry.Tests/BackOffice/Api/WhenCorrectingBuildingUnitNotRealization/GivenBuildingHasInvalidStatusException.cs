@@ -1,13 +1,14 @@
-namespace BuildingRegistry.Tests.BackOffice.Api.WhenCorrectingBuildingUnitPosition
+namespace BuildingRegistry.Tests.BackOffice.Api.WhenCorrectingBuildingUnitNotRealization
 {
     using System;
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
-    using Be.Vlaanderen.Basisregisters.GrAr.Edit.Contracts;
+    using AutoFixture;
     using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Requests;
     using BuildingRegistry.Api.BackOffice.BuildingUnit;
-    using Building.Exceptions;
+    using BuildingRegistry.Building;
+    using BuildingRegistry.Building.Exceptions;
     using FluentAssertions;
     using FluentValidation;
     using Moq;
@@ -26,21 +27,19 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenCorrectingBuildingUnitPositi
         [Fact]
         public void ThenThrowValidationException()
         {
-            MockMediator.Setup<object?>(x => x.Send(It.IsAny<CorrectBuildingUnitPositionRequest>(), CancellationToken.None).Result)
+            MockMediator.Setup<object?>(x => x.Send(It.IsAny<CorrectBuildingUnitNotRealizationRequest>(), CancellationToken.None).Result)
                 .Throws(new BuildingHasInvalidStatusException());
 
-            var request = new CorrectBuildingUnitPositionRequest
+            var request = new CorrectBuildingUnitNotRealizationRequest()
             {
-                PositieGeometrieMethode = PositieGeometrieMethode.AangeduidDoorBeheerder,
-                Positie = "<gml:Point srsName=\"https://www.opengis.net/def/crs/EPSG/0/31370\" xmlns:gml=\"http://www.opengis.net/gml/3.2\"><gml:pos>103671.37 192046.71</gml:pos></gml:Point>"
+                BuildingUnitPersistentLocalId = Fixture.Create<BuildingUnitPersistentLocalId>()
             };
 
             //Act
-            Func<Task> act = async () => await _controller.CorrectPosition(
+            Func<Task> act = async () => await _controller.CorrectNotRealization(
                 ResponseOptions,
                 MockIfMatchValidator(true),
-                MockValidRequestValidator<CorrectBuildingUnitPositionRequest>(),
-                0,
+                MockValidRequestValidator<CorrectBuildingUnitNotRealizationRequest>(),
                 request,
                 null,
                 CancellationToken.None);
