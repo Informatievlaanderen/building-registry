@@ -48,7 +48,8 @@ namespace BuildingRegistry.Projections.Wms.BuildingUnitV2
                         BuildingUnitPersistentLocalId = buildingUnit.BuildingUnitPersistentLocalId,
                         Function = MapFunction(BuildingUnitFunction.Parse(buildingUnit.Function)),
                         Version = message.Message.Provenance.Timestamp,
-                        Status = BuildingUnitStatus.Parse(buildingUnit.Status)
+                        Status = BuildingUnitStatus.Parse(buildingUnit.Status),
+                        HasDeviation = false
                     };
 
                     SetPosition(buildingUnitV2, buildingUnit.ExtendedWkbGeometry, MapGeometryMethod(BuildingUnitPositionGeometryMethod.Parse(buildingUnit.GeometryMethod)));
@@ -76,7 +77,8 @@ namespace BuildingRegistry.Projections.Wms.BuildingUnitV2
                     BuildingUnitPersistentLocalId = message.Message.BuildingUnitPersistentLocalId,
                     Function = MapFunction(BuildingUnitFunction.Parse(message.Message.Function)),
                     Version = message.Message.Provenance.Timestamp,
-                    Status = BuildingUnitStatus.Planned
+                    Status = BuildingUnitStatus.Planned,
+                    HasDeviation = message.Message.HasDeviation
                 };
 
                 SetPosition(
@@ -188,6 +190,7 @@ namespace BuildingRegistry.Projections.Wms.BuildingUnitV2
                     BuildingPersistentLocalId = message.Message.BuildingPersistentLocalId,
                     BuildingUnitPersistentLocalId = message.Message.BuildingUnitPersistentLocalId,
                     Status = BuildingUnitStatus.Parse(message.Message.BuildingUnitStatus),
+                    HasDeviation = message.Message.HasDeviation,
                     Function = MapFunction(BuildingUnitFunction.Parse(message.Message.Function)),
                     Version = message.Message.Provenance.Timestamp,
                 };
@@ -200,6 +203,20 @@ namespace BuildingRegistry.Projections.Wms.BuildingUnitV2
                 await context.BuildingUnitsV2.AddAsync(buildingUnitV2, ct);
             });
 
+            When<Envelope<BuildingUnitWasRegularized>>(async (context, message, ct) =>
+            {
+                var unit = await context.BuildingUnitsV2.FindAsync(message.Message.BuildingUnitPersistentLocalId);
+                unit!.HasDeviation = false;
+                SetVersion(unit, message.Message.Provenance.Timestamp);
+            });
+
+            When<Envelope<BuildingUnitWasDeregulated>>(async (context, message, ct) =>
+            {
+                var unit = await context.BuildingUnitsV2.FindAsync(message.Message.BuildingUnitPersistentLocalId);
+                unit!.HasDeviation = true;
+                SetVersion(unit, message.Message.Provenance.Timestamp);
+            });
+
             When<Envelope<CommonBuildingUnitWasAddedV2>>(async (context, message, ct) =>
             {
                 var buildingUnitV2 = new BuildingUnitV2
@@ -209,7 +226,8 @@ namespace BuildingRegistry.Projections.Wms.BuildingUnitV2
                     BuildingUnitPersistentLocalId = message.Message.BuildingUnitPersistentLocalId,
                     Function = MapFunction(BuildingUnitFunction.Common),
                     Version = message.Message.Provenance.Timestamp,
-                    Status = BuildingUnitStatus.Parse(message.Message.BuildingUnitStatus)
+                    Status = BuildingUnitStatus.Parse(message.Message.BuildingUnitStatus),
+                    HasDeviation = message.Message.HasDeviation
                 };
 
                 SetPosition(

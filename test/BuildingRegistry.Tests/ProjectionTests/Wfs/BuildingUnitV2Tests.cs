@@ -11,6 +11,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wfs
     using Be.Vlaanderen.Basisregisters.Utilities.HexByteConvertor;
     using Building;
     using Building.Events;
+    using Extensions;
     using Fixtures;
     using FluentAssertions;
     using NetTopologySuite.Geometries;
@@ -60,7 +61,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wfs
                     var buildingUnitBuildingItem = await ct.BuildingUnitsBuildingsV2.FindAsync(buildingWasMigrated.BuildingPersistentLocalId);
                     buildingUnitBuildingItem.Should().NotBeNull();
 
-                    buildingUnitBuildingItem.IsRemoved.Should().Be(buildingWasMigrated.IsRemoved);
+                    buildingUnitBuildingItem!.IsRemoved.Should().Be(buildingWasMigrated.IsRemoved);
                     if (string.IsNullOrEmpty(expectedStatus))
                     {
                         buildingUnitBuildingItem.BuildingRetiredStatus.Should().BeNull();
@@ -82,6 +83,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wfs
                         expectedUnit.BuildingPersistentLocalId.Should().Be(buildingWasMigrated.BuildingPersistentLocalId);
                         expectedUnit.IsRemoved.Should().Be(unit.IsRemoved);
                         expectedUnit.Status.Should().Be(BuildingUnitV2Projections.MapStatus(BuildingUnitStatus.Parse(unit.Status)));
+                        expectedUnit.HasDeviation.Should().BeFalse();
                         expectedUnit.Function.Should().Be(BuildingUnitV2Projections.MapFunction(BuildingUnitFunction.Parse(unit.Function)));
                         expectedUnit.PositionMethod.Should().Be(BuildingUnitV2Projections.MapGeometryMethod(BuildingUnitPositionGeometryMethod.Parse(unit.GeometryMethod)));
                         expectedUnit.Version.Should().Be(buildingWasMigrated.Provenance.Timestamp);
@@ -130,7 +132,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wfs
                 {
                     var item = await ct.BuildingUnitsV2.FindAsync(buildingUnitWasPlannedV2.BuildingUnitPersistentLocalId);
                     item.Should().NotBeNull();
-                    item.BuildingPersistentLocalId.Should().Be(buildingUnitWasPlannedV2.BuildingPersistentLocalId);
+                    item!.BuildingPersistentLocalId.Should().Be(buildingUnitWasPlannedV2.BuildingPersistentLocalId);
                     item.Position.Should().BeEquivalentTo((Point)_wkbReader.Read(buildingUnitWasPlannedV2.ExtendedWkbGeometry.ToByteArray()));
                     item.PositionMethod.Should().Be(BuildingUnitV2Projections.MapGeometryMethod(BuildingUnitPositionGeometryMethod.Parse(buildingUnitWasPlannedV2.GeometryMethod)));
                     item.Function.Should()
@@ -139,6 +141,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wfs
                     item.Version.Should().Be(buildingUnitWasPlannedV2.Provenance.Timestamp);
                     item.IsRemoved.Should().BeFalse();
                     item.Status.Should().Be("Gepland");
+                    item.HasDeviation.Should().Be(buildingUnitWasPlannedV2.HasDeviation);
                 });
         }
 
@@ -564,10 +567,77 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wfs
                     var item = await ct.BuildingUnitsV2.FindAsync(buildingUnitWasRemovedV2.BuildingUnitPersistentLocalId);
                     item.Should().NotBeNull();
                     item!.Status.Should().Be(BuildingUnitV2Projections.MapStatus(BuildingUnitStatus.Parse(@event.BuildingUnitStatus)));
+                    item.HasDeviation.Should().Be(@event.HasDeviation);
                     item.Function.Should().Be(BuildingUnitV2Projections.MapFunction(BuildingUnitFunction.Parse(@event.Function)));
                     item.Position.Should().BeEquivalentTo((Point)_wkbReader.Read(@event.ExtendedWkbGeometry.ToByteArray()));
                     item.PositionMethod.Should().Be(BuildingUnitV2Projections.MapGeometryMethod(BuildingUnitPositionGeometryMethod.Parse(@event.GeometryMethod)));
                     item.IsRemoved.Should().BeFalse();
+                    item.Version.Should().Be(@event.Provenance.Timestamp);
+                });
+        }
+
+        [Fact]
+        public async Task WhenBuildingUnitWasRegularized()
+        {
+            _fixture.Customize(new WithFixedBuildingPersistentLocalId());
+            _fixture.Customize(new WithFixedBuildingUnitPersistentLocalId());
+
+            var buildingUnitWasPlannedV2 = _fixture.Create<BuildingUnitWasPlannedV2>()
+                .WithDeviation(true);
+
+            var @event = new BuildingUnitWasRegularized(
+                new BuildingPersistentLocalId(buildingUnitWasPlannedV2.BuildingPersistentLocalId),
+                new BuildingUnitPersistentLocalId(buildingUnitWasPlannedV2.BuildingUnitPersistentLocalId));
+            ((ISetProvenance)@event).SetProvenance(_fixture.Create<Provenance>());
+
+            await Sut
+                .Given(
+                    new Envelope<BuildingUnitWasPlannedV2>(
+                        new Envelope(
+                            buildingUnitWasPlannedV2,
+                            new Dictionary<string, object> { { AddEventHashPipe.HashMetadataKey, buildingUnitWasPlannedV2.GetHash() } })),
+                    new Envelope<BuildingUnitWasRegularized>(
+                        new Envelope(
+                            @event,
+                            new Dictionary<string, object> { { AddEventHashPipe.HashMetadataKey, @event.GetHash() } })))
+                .Then(async ct =>
+                {
+                    var item = await ct.BuildingUnitsV2.FindAsync(@event.BuildingUnitPersistentLocalId);
+                    item.Should().NotBeNull();
+                    item!.HasDeviation.Should().BeFalse();
+                    item.Version.Should().Be(@event.Provenance.Timestamp);
+                });
+        }
+
+        [Fact]
+        public async Task WhenBuildingUnitWasDeregulated()
+        {
+            _fixture.Customize(new WithFixedBuildingPersistentLocalId());
+            _fixture.Customize(new WithFixedBuildingUnitPersistentLocalId());
+
+            var buildingUnitWasPlannedV2 = _fixture.Create<BuildingUnitWasPlannedV2>()
+                .WithDeviation(false);
+
+            var @event = new BuildingUnitWasDeregulated(
+                new BuildingPersistentLocalId(buildingUnitWasPlannedV2.BuildingPersistentLocalId),
+                new BuildingUnitPersistentLocalId(buildingUnitWasPlannedV2.BuildingUnitPersistentLocalId));
+            ((ISetProvenance)@event).SetProvenance(_fixture.Create<Provenance>());
+
+            await Sut
+                .Given(
+                    new Envelope<BuildingUnitWasPlannedV2>(
+                        new Envelope(
+                            buildingUnitWasPlannedV2,
+                            new Dictionary<string, object> { { AddEventHashPipe.HashMetadataKey, buildingUnitWasPlannedV2.GetHash() } })),
+                    new Envelope<BuildingUnitWasDeregulated>(
+                        new Envelope(
+                            @event,
+                            new Dictionary<string, object> { { AddEventHashPipe.HashMetadataKey, @event.GetHash() } })))
+                .Then(async ct =>
+                {
+                    var item = await ct.BuildingUnitsV2.FindAsync(@event.BuildingUnitPersistentLocalId);
+                    item.Should().NotBeNull();
+                    item!.HasDeviation.Should().BeTrue();
                     item.Version.Should().Be(@event.Provenance.Timestamp);
                 });
         }
@@ -602,6 +672,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wfs
                     item.Version.Should().Be(commonBuildingUnitWasAddedV2.Provenance.Timestamp);
                     item.IsRemoved.Should().BeFalse();
                     item.Status.Should().Be("Gepland");
+                    item.HasDeviation.Should().Be(commonBuildingUnitWasAddedV2.HasDeviation);
                 });
         }
 
