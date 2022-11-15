@@ -16,14 +16,12 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
     using System.Threading.Tasks;
 
     [ConnectedProjectionName("Feed endpoint gebouwen")]
-    [ConnectedProjectionDescription(
-        "Projectie die de gebouwen- en gebouweenheden data voor de gebouwen feed voorziet.")]
+    [ConnectedProjectionDescription("Projectie die de gebouwen- en gebouweenheden data voor de gebouwen feed voorziet.")]
     public class BuildingSyndicationProjections : ConnectedProjection<LegacyContext>
     {
         public BuildingSyndicationProjections()
         {
             #region Legacy
-
             #region Building Events
 
             When<Envelope<BuildingWasRegistered>>(async (context, message, ct) =>
@@ -403,8 +401,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
                 await context.CreateNewBuildingSyndicationItem(
                     message.Message.BuildingId,
                     message,
-                    x => x.BuildingUnits.Remove(
-                        x.BuildingUnits.FirstOrDefault(y => y.BuildingUnitId == message.Message.BuildingUnitId)),
+                    x => x.BuildingUnits.Remove(x.BuildingUnits.FirstOrDefault(y => y.BuildingUnitId == message.Message.BuildingUnitId)),
                     ct);
             });
 
@@ -504,8 +501,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
                     message,
                     x =>
                     {
-                        var unit = x.BuildingUnits.SingleOrDefault(y =>
-                            y.BuildingUnitId == message.Message.BuildingUnitId);
+                        var unit = x.BuildingUnits.SingleOrDefault(y => y.BuildingUnitId == message.Message.BuildingUnitId);
 
                         if (unit != null)
                         {
@@ -835,10 +831,9 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
                         Position = message.Position,
                         PersistentLocalId = buildingUnit.BuildingUnitPersistentLocalId,
                         Status = BuildingRegistry.Building.BuildingUnitStatus.Parse(buildingUnit.Status),
+                        HasDeviation = false,
                         Function = BuildingRegistry.Building.BuildingUnitFunction.Parse(buildingUnit.Function),
-                        PositionMethod =
-                            BuildingRegistry.Building.BuildingUnitPositionGeometryMethod.Parse(buildingUnit
-                                .GeometryMethod),
+                        PositionMethod = BuildingRegistry.Building.BuildingUnitPositionGeometryMethod.Parse(buildingUnit.GeometryMethod),
                         PointPosition = buildingUnit.ExtendedWkbGeometry.ToByteArray(),
                         Version = message.Message.Provenance.Timestamp,
                         Addresses = new Collection<BuildingUnitAddressSyndicationItemV2>(addresses)
@@ -848,13 +843,10 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
                 var newBuildingSyndicationItem = new BuildingSyndicationItem
                 {
                     Position = message.Position,
-                    BuildingId =
-                        null, //while we have the information, we shouldn't identify this resource with its old guid id
+                    BuildingId = null, //while we have the information, we shouldn't identify this resource with its old guid id
                     PersistentLocalId = message.Message.BuildingPersistentLocalId,
-                    Status = MapBuildingStatus(
-                        BuildingRegistry.Building.BuildingStatus.Parse(message.Message.BuildingStatus)),
-                    GeometryMethod = MapBuildingGeometryMethod(
-                        BuildingRegistry.Building.BuildingGeometryMethod.Parse(message.Message.GeometryMethod)),
+                    Status = MapBuildingStatus(BuildingRegistry.Building.BuildingStatus.Parse(message.Message.BuildingStatus)),
+                    GeometryMethod = MapBuildingGeometryMethod(BuildingRegistry.Building.BuildingGeometryMethod.Parse(message.Message.GeometryMethod)),
                     Geometry = message.Message.ExtendedWkbGeometry.ToByteArray(),
                     IsComplete = true,
                     RecordCreatedAt = message.Message.Provenance.Timestamp,
@@ -880,8 +872,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
                     Position = message.Position,
                     PersistentLocalId = message.Message.BuildingPersistentLocalId,
                     Status = MapBuildingStatus(BuildingRegistry.Building.BuildingStatus.Planned),
-                    GeometryMethod =
-                        MapBuildingGeometryMethod(BuildingRegistry.Building.BuildingGeometryMethod.Outlined),
+                    GeometryMethod = MapBuildingGeometryMethod(BuildingRegistry.Building.BuildingGeometryMethod.Outlined),
                     Geometry = message.Message.ExtendedWkbGeometry.ToByteArray(),
                     IsComplete = true,
                     RecordCreatedAt = message.Message.Provenance.Timestamp,
@@ -901,76 +892,72 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
 
             When<Envelope<BuildingOutlineWasChanged>>(async (context, message, ct) =>
             {
-                await context.CreateNewBuildingSyndicationItem(message.Message.BuildingPersistentLocalId, message,
-                    item =>
+                await context.CreateNewBuildingSyndicationItem(message.Message.BuildingPersistentLocalId, message, item =>
+                {
+                    item.Geometry = message.Message.ExtendedWkbGeometryBuilding.ToByteArray();
+
+                    if (!string.IsNullOrWhiteSpace(message.Message.ExtendedWkbGeometryBuildingUnits))
                     {
-                        item.Geometry = message.Message.ExtendedWkbGeometryBuilding.ToByteArray();
+                        var buildingUnitPointPosition = message.Message.ExtendedWkbGeometryBuildingUnits!.ToByteArray();
 
-                        if (!string.IsNullOrWhiteSpace(message.Message.ExtendedWkbGeometryBuildingUnits))
+                        foreach (var buildingUnitId in message.Message.BuildingUnitPersistentLocalIds)
                         {
-                            var buildingUnitPointPosition =
-                                message.Message.ExtendedWkbGeometryBuildingUnits!.ToByteArray();
+                            var buildingUnit = item.BuildingUnitsV2.Single(x => x.PersistentLocalId == buildingUnitId);
 
-                            foreach (var buildingUnitId in message.Message.BuildingUnitPersistentLocalIds)
-                            {
-                                var buildingUnit =
-                                    item.BuildingUnitsV2.Single(x => x.PersistentLocalId == buildingUnitId);
-
-                                buildingUnit.PointPosition = buildingUnitPointPosition;
-                                buildingUnit.PositionMethod = BuildingRegistry.Building
-                                    .BuildingUnitPositionGeometryMethod.DerivedFromObject;
-                                buildingUnit.Version = message.Message.Provenance.Timestamp;
-                            }
+                            buildingUnit.PointPosition = buildingUnitPointPosition;
+                            buildingUnit.PositionMethod = BuildingRegistry.Building.BuildingUnitPositionGeometryMethod.DerivedFromObject;
+                            buildingUnit.Version = message.Message.Provenance.Timestamp;
                         }
-                    }, ct);
+                    }
+                }, ct);
             });
 
             When<Envelope<BuildingBecameUnderConstructionV2>>(async (context, message, ct) =>
             {
-                await context.CreateNewBuildingSyndicationItem(message.Message.BuildingPersistentLocalId, message,
-                    item =>
-                    {
-                        item.Status = MapBuildingStatus(BuildingRegistry.Building.BuildingStatus.UnderConstruction);
-                    }, ct);
+                await context.CreateNewBuildingSyndicationItem(message.Message.BuildingPersistentLocalId, message, item =>
+                {
+                    item.Status = MapBuildingStatus(BuildingRegistry.Building.BuildingStatus.UnderConstruction);
+                }, ct);
             });
 
             When<Envelope<BuildingWasCorrectedFromUnderConstructionToPlanned>>(async (context, message, ct) =>
             {
-                await context.CreateNewBuildingSyndicationItem(message.Message.BuildingPersistentLocalId, message,
-                    item => { item.Status = MapBuildingStatus(BuildingRegistry.Building.BuildingStatus.Planned); },
-                    ct);
+                await context.CreateNewBuildingSyndicationItem(message.Message.BuildingPersistentLocalId, message, item =>
+                {
+                    item.Status = MapBuildingStatus(BuildingRegistry.Building.BuildingStatus.Planned);
+                }, ct);
             });
 
             When<Envelope<BuildingWasRealizedV2>>(async (context, message, ct) =>
             {
-                await context.CreateNewBuildingSyndicationItem(message.Message.BuildingPersistentLocalId, message,
-                    item => { item.Status = MapBuildingStatus(BuildingRegistry.Building.BuildingStatus.Realized); },
-                    ct);
+                await context.CreateNewBuildingSyndicationItem(message.Message.BuildingPersistentLocalId, message, item =>
+                {
+                    item.Status = MapBuildingStatus(BuildingRegistry.Building.BuildingStatus.Realized);
+                }, ct);
             });
 
             When<Envelope<BuildingWasCorrectedFromRealizedToUnderConstruction>>(async (context, message, ct) =>
             {
-                await context.CreateNewBuildingSyndicationItem(message.Message.BuildingPersistentLocalId, message,
-                    item =>
-                    {
-                        item.Status = MapBuildingStatus(BuildingRegistry.Building.BuildingStatus.UnderConstruction);
-                    }, ct);
+                await context.CreateNewBuildingSyndicationItem(message.Message.BuildingPersistentLocalId, message, item =>
+                {
+                    item.Status = MapBuildingStatus(BuildingRegistry.Building.BuildingStatus.UnderConstruction);
+                }, ct);
             });
 
             When<Envelope<BuildingWasNotRealizedV2>>(async (context, message, ct) =>
             {
-                await context.CreateNewBuildingSyndicationItem(message.Message.BuildingPersistentLocalId, message,
-                    item =>
-                    {
-                        item.Status = MapBuildingStatus(BuildingRegistry.Building.BuildingStatus.NotRealized);
-                    }, ct);
+                await context.CreateNewBuildingSyndicationItem(message.Message.BuildingPersistentLocalId, message, item =>
+                {
+                    item.Status = MapBuildingStatus(BuildingRegistry.Building.BuildingStatus.NotRealized);
+                }, ct);
             });
 
             When<Envelope<BuildingWasCorrectedFromNotRealizedToPlanned>>(async (context, message, ct) =>
             {
-                await context.CreateNewBuildingSyndicationItem(message.Message.BuildingPersistentLocalId, message,
-                    item => { item.Status = MapBuildingStatus(BuildingRegistry.Building.BuildingStatus.Planned); },
-                    ct);
+                await context.CreateNewBuildingSyndicationItem(message.Message.BuildingPersistentLocalId, message, item =>
+                {
+                    item.Status = MapBuildingStatus(BuildingRegistry.Building.BuildingStatus.Planned);
+                }, ct);
             });
 
             When<Envelope<BuildingUnitWasPlannedV2>>(async (context, message, ct) =>
@@ -985,11 +972,10 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
                             Position = message.Position,
                             PersistentLocalId = message.Message.BuildingUnitPersistentLocalId,
                             Status = BuildingRegistry.Building.BuildingUnitStatus.Planned,
+                            HasDeviation = message.Message.HasDeviation,
                             Function = BuildingRegistry.Building.BuildingUnitFunction.Parse(message.Message.Function),
                             PointPosition = message.Message.ExtendedWkbGeometry.ToByteArray(),
-                            PositionMethod =
-                                BuildingRegistry.Building.BuildingUnitPositionGeometryMethod.Parse(message.Message
-                                    .GeometryMethod),
+                            PositionMethod = BuildingRegistry.Building.BuildingUnitPositionGeometryMethod.Parse(message.Message.GeometryMethod),
                             Version = message.Message.Provenance.Timestamp,
                             Addresses = new Collection<BuildingUnitAddressSyndicationItemV2>()
                         };
@@ -1001,122 +987,101 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
 
             When<Envelope<BuildingUnitWasRealizedV2>>(async (context, message, ct) =>
             {
-                await context.CreateNewBuildingSyndicationItem(message.Message.BuildingPersistentLocalId, message,
-                    item =>
-                    {
-                        var unit = item.BuildingUnitsV2.Single(y =>
-                            y.PersistentLocalId == message.Message.BuildingUnitPersistentLocalId);
-                        unit.Status = BuildingRegistry.Building.BuildingUnitStatus.Realized;
-                        unit.Version = message.Message.Provenance.Timestamp;
-                    }, ct);
+                await context.CreateNewBuildingSyndicationItem(message.Message.BuildingPersistentLocalId, message, item =>
+                {
+                    var unit = item.BuildingUnitsV2.Single(y => y.PersistentLocalId == message.Message.BuildingUnitPersistentLocalId);
+                    unit.Status = BuildingRegistry.Building.BuildingUnitStatus.Realized;
+                    unit.Version = message.Message.Provenance.Timestamp;
+                }, ct);
             });
 
             When<Envelope<BuildingUnitWasRealizedBecauseBuildingWasRealized>>(async (context, message, ct) =>
             {
-                await context.CreateNewBuildingSyndicationItem(message.Message.BuildingPersistentLocalId, message,
-                    item =>
-                    {
-                        var unit = item.BuildingUnitsV2.Single(y =>
-                            y.PersistentLocalId == message.Message.BuildingUnitPersistentLocalId);
-                        unit.Status = BuildingRegistry.Building.BuildingUnitStatus.Realized;
-                        unit.Version = message.Message.Provenance.Timestamp;
-                    }, ct);
-            });
-
-            When<Envelope<BuildingUnitWasCorrectedFromRealizedToPlanned>>(async (context, message, ct) =>
-            {
-                await context.CreateNewBuildingSyndicationItem(message.Message.BuildingPersistentLocalId, message,
-                    item =>
-                    {
-                        var unit = item.BuildingUnitsV2.Single(y =>
-                            y.PersistentLocalId == message.Message.BuildingUnitPersistentLocalId);
-                        unit.Status = BuildingRegistry.Building.BuildingUnitStatus.Planned;
-                        unit.Version = message.Message.Provenance.Timestamp;
-                    }, ct);
-            });
-
-            When<Envelope<BuildingUnitWasCorrectedFromRealizedToPlannedBecauseBuildingWasCorrected>>(
-                async (context, message, ct) =>
+                await context.CreateNewBuildingSyndicationItem(message.Message.BuildingPersistentLocalId, message, item =>
                 {
-                    await context.CreateNewBuildingSyndicationItem(message.Message.BuildingPersistentLocalId, message,
-                        item =>
-                        {
-                            var unit = item.BuildingUnitsV2.Single(y =>
-                                y.PersistentLocalId == message.Message.BuildingUnitPersistentLocalId);
-                            unit.Status = BuildingRegistry.Building.BuildingUnitStatus.Planned;
-                            unit.Version = message.Message.Provenance.Timestamp;
-                        }, ct);
-                });
+                    var unit = item.BuildingUnitsV2.Single(y => y.PersistentLocalId == message.Message.BuildingUnitPersistentLocalId);
+                    unit.Status = BuildingRegistry.Building.BuildingUnitStatus.Realized;
+                    unit.Version = message.Message.Provenance.Timestamp;
+                }, ct);
+            });
+
+             When<Envelope<BuildingUnitWasCorrectedFromRealizedToPlanned>>(async (context, message, ct) =>
+            {
+                await context.CreateNewBuildingSyndicationItem(message.Message.BuildingPersistentLocalId, message, item =>
+                {
+                    var unit = item.BuildingUnitsV2.Single(y => y.PersistentLocalId == message.Message.BuildingUnitPersistentLocalId);
+                    unit.Status = BuildingRegistry.Building.BuildingUnitStatus.Planned;
+                    unit.Version = message.Message.Provenance.Timestamp;
+                }, ct);
+            });
+
+            When<Envelope<BuildingUnitWasCorrectedFromRealizedToPlannedBecauseBuildingWasCorrected>>(async (context, message, ct) =>
+            {
+                await context.CreateNewBuildingSyndicationItem(message.Message.BuildingPersistentLocalId, message, item =>
+                {
+                    var unit = item.BuildingUnitsV2.Single(y => y.PersistentLocalId == message.Message.BuildingUnitPersistentLocalId);
+                    unit.Status = BuildingRegistry.Building.BuildingUnitStatus.Planned;
+                    unit.Version = message.Message.Provenance.Timestamp;
+                }, ct);
+            });
 
             When<Envelope<BuildingUnitWasNotRealizedV2>>(async (context, message, ct) =>
             {
-                await context.CreateNewBuildingSyndicationItem(message.Message.BuildingPersistentLocalId, message,
-                    item =>
-                    {
-                        var unit = item.BuildingUnitsV2.Single(y =>
-                            y.PersistentLocalId == message.Message.BuildingUnitPersistentLocalId);
-                        unit.Status = BuildingRegistry.Building.BuildingUnitStatus.NotRealized;
-                        unit.Version = message.Message.Provenance.Timestamp;
-                    }, ct);
+                await context.CreateNewBuildingSyndicationItem(message.Message.BuildingPersistentLocalId, message, item =>
+                {
+                    var unit = item.BuildingUnitsV2.Single(y => y.PersistentLocalId == message.Message.BuildingUnitPersistentLocalId);
+                    unit.Status = BuildingRegistry.Building.BuildingUnitStatus.NotRealized;
+                    unit.Version = message.Message.Provenance.Timestamp;
+                }, ct);
             });
 
             When<Envelope<BuildingUnitWasNotRealizedBecauseBuildingWasNotRealized>>(async (context, message, ct) =>
             {
-                await context.CreateNewBuildingSyndicationItem(message.Message.BuildingPersistentLocalId, message,
-                    item =>
-                    {
-                        var unit = item.BuildingUnitsV2.Single(y =>
-                            y.PersistentLocalId == message.Message.BuildingUnitPersistentLocalId);
-                        unit.Status = BuildingRegistry.Building.BuildingUnitStatus.NotRealized;
-                        unit.Version = message.Message.Provenance.Timestamp;
-                    }, ct);
+                await context.CreateNewBuildingSyndicationItem(message.Message.BuildingPersistentLocalId, message, item =>
+                {
+                    var unit = item.BuildingUnitsV2.Single(y => y.PersistentLocalId == message.Message.BuildingUnitPersistentLocalId);
+                    unit.Status = BuildingRegistry.Building.BuildingUnitStatus.NotRealized;
+                    unit.Version = message.Message.Provenance.Timestamp;
+                }, ct);
             });
 
             When<Envelope<BuildingUnitWasCorrectedFromNotRealizedToPlanned>>(async (context, message, ct) =>
             {
-                await context.CreateNewBuildingSyndicationItem(message.Message.BuildingPersistentLocalId, message,
-                    item =>
-                    {
-                        var unit = item.BuildingUnitsV2.Single(y =>
-                            y.PersistentLocalId == message.Message.BuildingUnitPersistentLocalId);
-                        unit.Status = BuildingRegistry.Building.BuildingUnitStatus.Planned;
-                        unit.Version = message.Message.Provenance.Timestamp;
-                    }, ct);
+                await context.CreateNewBuildingSyndicationItem(message.Message.BuildingPersistentLocalId, message, item =>
+                {
+                    var unit = item.BuildingUnitsV2.Single(y => y.PersistentLocalId == message.Message.BuildingUnitPersistentLocalId);
+                    unit.Status = BuildingRegistry.Building.BuildingUnitStatus.Planned;
+                    unit.Version = message.Message.Provenance.Timestamp;
+                }, ct);
             });
 
             When<Envelope<BuildingUnitWasRetiredV2>>(async (context, message, ct) =>
             {
-                await context.CreateNewBuildingSyndicationItem(message.Message.BuildingPersistentLocalId, message,
-                    item =>
-                    {
-                        var unit = item.BuildingUnitsV2.Single(y =>
-                            y.PersistentLocalId == message.Message.BuildingUnitPersistentLocalId);
-                        unit.Status = BuildingRegistry.Building.BuildingUnitStatus.Retired;
-                        unit.Version = message.Message.Provenance.Timestamp;
-                    }, ct);
+                await context.CreateNewBuildingSyndicationItem(message.Message.BuildingPersistentLocalId, message, item =>
+                {
+                    var unit = item.BuildingUnitsV2.Single(y => y.PersistentLocalId == message.Message.BuildingUnitPersistentLocalId);
+                    unit.Status = BuildingRegistry.Building.BuildingUnitStatus.Retired;
+                    unit.Version = message.Message.Provenance.Timestamp;
+                }, ct);
             });
 
             When<Envelope<BuildingUnitWasCorrectedFromRetiredToRealized>>(async (context, message, ct) =>
             {
-                await context.CreateNewBuildingSyndicationItem(message.Message.BuildingPersistentLocalId, message,
-                    item =>
-                    {
-                        var unit = item.BuildingUnitsV2.Single(y =>
-                            y.PersistentLocalId == message.Message.BuildingUnitPersistentLocalId);
-                        unit.Status = BuildingRegistry.Building.BuildingUnitStatus.Realized;
-                        unit.Version = message.Message.Provenance.Timestamp;
-                    }, ct);
+                await context.CreateNewBuildingSyndicationItem(message.Message.BuildingPersistentLocalId, message, item =>
+                {
+                    var unit = item.BuildingUnitsV2.Single(y => y.PersistentLocalId == message.Message.BuildingUnitPersistentLocalId);
+                    unit.Status = BuildingRegistry.Building.BuildingUnitStatus.Realized;
+                    unit.Version = message.Message.Provenance.Timestamp;
+                }, ct);
             });
 
             When<Envelope<BuildingUnitWasRemovedV2>>(async (context, message, ct) =>
             {
-                await context.CreateNewBuildingSyndicationItem(message.Message.BuildingPersistentLocalId, message,
-                    item =>
-                    {
-                        var unit = item.BuildingUnitsV2.Single(y =>
-                            y.PersistentLocalId == message.Message.BuildingUnitPersistentLocalId);
-                        item.BuildingUnitsV2.Remove(unit);
-                    }, ct);
+                await context.CreateNewBuildingSyndicationItem(message.Message.BuildingPersistentLocalId, message, item =>
+                {
+                    var unit = item.BuildingUnitsV2.Single(y => y.PersistentLocalId == message.Message.BuildingUnitPersistentLocalId);
+                    item.BuildingUnitsV2.Remove(unit);
+                }, ct);
             });
 
             When<Envelope<BuildingUnitRemovalWasCorrected>>(async (context, message, ct) =>
@@ -1140,14 +1105,12 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
                         var buildingUnitSyndicationItem = new BuildingUnitSyndicationItemV2
                         {
                             PersistentLocalId = message.Message.BuildingUnitPersistentLocalId,
-                            Status = BuildingRegistry.Building.BuildingUnitStatus.Parse(message.Message
-                                .BuildingUnitStatus),
+                            Status = BuildingRegistry.Building.BuildingUnitStatus.Parse(message.Message.BuildingUnitStatus),
+                            HasDeviation = message.Message.HasDeviation,
                             Function = BuildingRegistry.Building.BuildingUnitFunction.Parse(message.Message.Function),
                             Position = message.Position,
                             PointPosition = message.Message.ExtendedWkbGeometry.ToByteArray(),
-                            PositionMethod =
-                                BuildingRegistry.Building.BuildingUnitPositionGeometryMethod.Parse(message.Message
-                                    .GeometryMethod),
+                            PositionMethod = BuildingRegistry.Building.BuildingUnitPositionGeometryMethod.Parse(message.Message.GeometryMethod),
                             Version = message.Message.Provenance.Timestamp,
                             Addresses = new Collection<BuildingUnitAddressSyndicationItemV2>(addresses)
                         };
@@ -1155,6 +1118,24 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
                         x.BuildingUnitsV2.Add(buildingUnitSyndicationItem);
                     },
                     ct);
+            });
+
+            When<Envelope<BuildingUnitWasRegularized>>(async (context, message, ct) =>
+            {
+                await context.CreateNewBuildingSyndicationItem(message.Message.BuildingPersistentLocalId, message, item =>
+                {
+                    var unit = item.BuildingUnitsV2.Single(y => y.PersistentLocalId == message.Message.BuildingUnitPersistentLocalId);
+                    unit.HasDeviation = false;
+                }, ct);
+            });
+
+            When<Envelope<BuildingUnitWasDeregulated>>(async (context, message, ct) =>
+            {
+                await context.CreateNewBuildingSyndicationItem(message.Message.BuildingPersistentLocalId, message, item =>
+                {
+                    var unit = item.BuildingUnitsV2.Single(y => y.PersistentLocalId == message.Message.BuildingUnitPersistentLocalId);
+                    unit.HasDeviation = true;
+                }, ct);
             });
 
             When<Envelope<CommonBuildingUnitWasAddedV2>>(async (context, message, ct) =>
@@ -1168,13 +1149,11 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
                         {
                             Position = message.Position,
                             PersistentLocalId = message.Message.BuildingUnitPersistentLocalId,
-                            Status = BuildingRegistry.Building.BuildingUnitStatus.Parse(message.Message
-                                .BuildingUnitStatus),
+                            Status = BuildingRegistry.Building.BuildingUnitStatus.Parse(message.Message.BuildingUnitStatus),
+                            HasDeviation = message.Message.HasDeviation,
                             Function = BuildingRegistry.Building.BuildingUnitFunction.Common,
                             PointPosition = message.Message.ExtendedWkbGeometry.ToByteArray(),
-                            PositionMethod =
-                                BuildingRegistry.Building.BuildingUnitPositionGeometryMethod.Parse(message.Message
-                                    .GeometryMethod),
+                            PositionMethod = BuildingRegistry.Building.BuildingUnitPositionGeometryMethod.Parse(message.Message.GeometryMethod),
                             Version = message.Message.Provenance.Timestamp,
                             Addresses = new Collection<BuildingUnitAddressSyndicationItemV2>()
                         };
@@ -1186,29 +1165,22 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
 
             When<Envelope<BuildingUnitPositionWasCorrected>>(async (context, message, ct) =>
             {
-                await context.CreateNewBuildingSyndicationItem(message.Message.BuildingPersistentLocalId, message,
-                    item =>
-                    {
-                        var unit = item.BuildingUnitsV2.Single(y =>
-                            y.PersistentLocalId == message.Message.BuildingUnitPersistentLocalId);
-                        unit.Position = message.Position;
-                        unit.PointPosition = message.Message.ExtendedWkbGeometry.ToByteArray();
-                        unit.PositionMethod =
-                            BuildingRegistry.Building.BuildingUnitPositionGeometryMethod.Parse(message.Message
-                                .GeometryMethod);
-                        unit.Version = message.Message.Provenance.Timestamp;
-                    }, ct);
+                await context.CreateNewBuildingSyndicationItem(message.Message.BuildingPersistentLocalId, message, item =>
+                {
+                    var unit = item.BuildingUnitsV2.Single(y => y.PersistentLocalId == message.Message.BuildingUnitPersistentLocalId);
+                    unit.Position = message.Position;
+                    unit.PointPosition = message.Message.ExtendedWkbGeometry.ToByteArray();
+                    unit.PositionMethod = BuildingRegistry.Building.BuildingUnitPositionGeometryMethod.Parse(message.Message.GeometryMethod);
+                    unit.Version = message.Message.Provenance.Timestamp;
+                }, ct);
             });
         }
 
-        private static BuildingGeometryMethod MapBuildingGeometryMethod(
-            BuildingRegistry.Building.BuildingGeometryMethod buildingGeometryMethod)
+        private static BuildingGeometryMethod MapBuildingGeometryMethod(BuildingRegistry.Building.BuildingGeometryMethod buildingGeometryMethod)
         {
             var dictionary = new Dictionary<BuildingRegistry.Building.BuildingGeometryMethod, BuildingGeometryMethod>
             {
-                {
-                    BuildingRegistry.Building.BuildingGeometryMethod.MeasuredByGrb, BuildingGeometryMethod.MeasuredByGrb
-                },
+                { BuildingRegistry.Building.BuildingGeometryMethod.MeasuredByGrb, BuildingGeometryMethod.MeasuredByGrb },
                 { BuildingRegistry.Building.BuildingGeometryMethod.Outlined, BuildingGeometryMethod.Outlined }
             };
 

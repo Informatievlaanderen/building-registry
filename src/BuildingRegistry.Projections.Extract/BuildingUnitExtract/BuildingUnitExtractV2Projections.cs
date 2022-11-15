@@ -77,6 +77,7 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
                             gebouwid = { Value = message.Message.BuildingPersistentLocalId.ToString() },
                             functie = { Value = MapFunction(BuildingUnitFunction.Parse(buildingUnit.Function)) },
                             status = { Value = MapStatus(BuildingUnitStatus.Parse(buildingUnit.Status)) },
+                            afwijkingvastgesteld = { Value = false },
                             posgeommet = { Value = MapGeometryMethod(BuildingUnitPositionGeometryMethod.Parse(buildingUnit.GeometryMethod)) },
                             versieid = { Value = message.Message.Provenance.Timestamp.ToBelgianDateTimeOffset().FromDateTimeOffset() }
                         }.ToBytes(_encoding)
@@ -115,6 +116,7 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
                         gebouwid = { Value = message.Message.BuildingPersistentLocalId.ToString() },
                         functie = { Value = MapFunction(BuildingUnitFunction.Parse(message.Message.Function)) },
                         status = { Value = Planned },
+                        afwijkingvastgesteld = { Value = message.Message.HasDeviation },
                         posgeommet = { Value = MapGeometryMethod(BuildingUnitPositionGeometryMethod.Parse(message.Message.GeometryMethod)) },
                         versieid = { Value = message.Message.Provenance.Timestamp.ToBelgianDateTimeOffset().FromDateTimeOffset() }
                     }.ToBytes(_encoding)
@@ -251,6 +253,7 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
                         UpdateRecord(itemV2, record =>
                         {
                             record.functie.Value = MapFunction(BuildingUnitFunction.Parse(message.Message.Function));
+                            record.afwijkingvastgesteld.Value = message.Message.HasDeviation;
                             record.IsDeleted = false;
                         });
 
@@ -261,6 +264,26 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
 
                         UpdateVersie(itemV2, message.Message.Provenance.Timestamp);
 
+                    }, ct);
+            });
+
+            When<Envelope<BuildingUnitWasRegularized>>(async (context, message, ct) =>
+            {
+                await context.FindAndUpdateBuildingUnitExtract(message.Message.BuildingUnitPersistentLocalId,
+                    itemV2 =>
+                    {
+                        UpdateRecord(itemV2, record => record.afwijkingvastgesteld.Value = false);
+                        UpdateVersie(itemV2, message.Message.Provenance.Timestamp);
+                    }, ct);
+            });
+
+            When<Envelope<BuildingUnitWasDeregulated>>(async (context, message, ct) =>
+            {
+                await context.FindAndUpdateBuildingUnitExtract(message.Message.BuildingUnitPersistentLocalId,
+                    itemV2 =>
+                    {
+                        UpdateRecord(itemV2, record => record.afwijkingvastgesteld.Value = true);
+                        UpdateVersie(itemV2, message.Message.Provenance.Timestamp);
                     }, ct);
             });
 
@@ -277,6 +300,7 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
                         gebouwid = { Value = message.Message.BuildingPersistentLocalId.ToString() },
                         functie = { Value = MapFunction(BuildingUnitFunction.Common) },
                         status = { Value = MapStatus(BuildingUnitStatus.Parse(message.Message.BuildingUnitStatus)) },
+                        afwijkingvastgesteld = { Value = message.Message.HasDeviation },
                         posgeommet = { Value = MapGeometryMethod(BuildingUnitPositionGeometryMethod.Parse(message.Message.GeometryMethod)) },
                         versieid = { Value = message.Message.Provenance.Timestamp.ToBelgianDateTimeOffset().FromDateTimeOffset() }
                     }.ToBytes(_encoding)

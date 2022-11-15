@@ -48,7 +48,8 @@ namespace BuildingRegistry.Projections.Wfs.BuildingUnitV2
                         Function = MapFunction(BuildingUnitFunction.Parse(buildingUnit.Function)),
                         Version = message.Message.Provenance.Timestamp,
                         IsRemoved = buildingUnit.IsRemoved,
-                        Status = MapStatus(BuildingUnitStatus.Parse(buildingUnit.Status))
+                        Status = MapStatus(BuildingUnitStatus.Parse(buildingUnit.Status)),
+                        HasDeviation = false
                     };
 
                     SetPosition(buildingUnitV2, buildingUnit.ExtendedWkbGeometry, MapGeometryMethod(BuildingUnitPositionGeometryMethod.Parse(buildingUnit.GeometryMethod)));
@@ -79,7 +80,8 @@ namespace BuildingRegistry.Projections.Wfs.BuildingUnitV2
                     Function = MapFunction(BuildingUnitFunction.Parse(message.Message.Function)),
                     Version = message.Message.Provenance.Timestamp,
                     IsRemoved = false,
-                    Status = PlannedStatus
+                    Status = PlannedStatus,
+                    HasDeviation = message.Message.HasDeviation
                 };
 
                 SetPosition(
@@ -188,10 +190,27 @@ namespace BuildingRegistry.Projections.Wfs.BuildingUnitV2
                 var unit = await context.BuildingUnitsV2.FindAsync(message.Message.BuildingUnitPersistentLocalId);
 
                 unit!.Status = MapStatus(BuildingUnitStatus.Parse(message.Message.BuildingUnitStatus));
+                unit.HasDeviation = message.Message.HasDeviation;
                 unit.Function = MapFunction(BuildingUnitFunction.Parse(message.Message.Function));
                 unit.Position = (Point)_wkbReader.Read(message.Message.ExtendedWkbGeometry.ToByteArray());
                 unit.PositionMethod = MapGeometryMethod(BuildingUnitPositionGeometryMethod.Parse(message.Message.GeometryMethod));
                 unit.IsRemoved = false;
+
+                SetVersion(unit, message.Message.Provenance.Timestamp);
+            });
+
+            When<Envelope<BuildingUnitWasRegularized>>(async (context, message, _) =>
+            {
+                var unit = await context.BuildingUnitsV2.FindAsync(message.Message.BuildingUnitPersistentLocalId);
+                unit!.HasDeviation = false;
+
+                SetVersion(unit, message.Message.Provenance.Timestamp);
+            });
+
+            When<Envelope<BuildingUnitWasDeregulated>>(async (context, message, _) =>
+            {
+                var unit = await context.BuildingUnitsV2.FindAsync(message.Message.BuildingUnitPersistentLocalId);
+                unit!.HasDeviation = true;
 
                 SetVersion(unit, message.Message.Provenance.Timestamp);
             });
@@ -208,7 +227,8 @@ namespace BuildingRegistry.Projections.Wfs.BuildingUnitV2
                     Function = MapFunction(BuildingUnitFunction.Common),
                     Version = message.Message.Provenance.Timestamp,
                     IsRemoved = false,
-                    Status = MapStatus(BuildingUnitStatus.Parse(message.Message.BuildingUnitStatus))
+                    Status = MapStatus(BuildingUnitStatus.Parse(message.Message.BuildingUnitStatus)),
+                    HasDeviation = message.Message.HasDeviation
                 };
 
                 SetPosition(
