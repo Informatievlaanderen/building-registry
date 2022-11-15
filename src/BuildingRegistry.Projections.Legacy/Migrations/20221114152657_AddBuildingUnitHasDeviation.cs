@@ -8,11 +8,6 @@ namespace BuildingRegistry.Projections.Legacy.Migrations
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            // migrationBuilder.DropIndex(
-            //     name: "IX_BuildingDetailsV2_PersistentLocalId",
-            //     schema: "BuildingRegistryLegacy",
-            //     table: "BuildingDetailsV2");
-
             migrationBuilder.AddColumn<bool>(
                 name: "HasDeviation",
                 schema: "BuildingRegistryLegacy",
@@ -41,12 +36,6 @@ namespace BuildingRegistry.Projections.Legacy.Migrations
                 name: "HasDeviation",
                 schema: "BuildingRegistryLegacy",
                 table: "BuildingUnitDetailsV2");
-
-            // migrationBuilder.CreateIndex(
-            //     name: "IX_BuildingDetailsV2_PersistentLocalId",
-            //     schema: "BuildingRegistryLegacy",
-            //     table: "BuildingDetailsV2",
-            //     column: "PersistentLocalId");
         }
     }
 }
