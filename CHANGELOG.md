@@ -1,3 +1,19 @@
+# [3.47.0](https://github.com/informatievlaanderen/building-registry/compare/v3.46.0...v3.47.0) (2022-11-15)
+
+
+### Bug Fixes
+
+* error code and messages ([e48d2ae](https://github.com/informatievlaanderen/building-registry/commit/e48d2ae87430628898cac9dbcd2a4dcdfeeda4f0))
+* error code removed bu ([52238cc](https://github.com/informatievlaanderen/building-registry/commit/52238cc513e1996e1877cdf273feb621c39241fc))
+* include AddressPersistentLocalIds in BuildingUnitRemovalWasCorrected ([56d2b7c](https://github.com/informatievlaanderen/building-registry/commit/56d2b7ca4468eee987f81f1945c3c37ac06f7ac3))
+
+
+### Features
+
+* add building unit HasDeviation to api responses ([12d0592](https://github.com/informatievlaanderen/building-registry/commit/12d0592d6807511bf4baab1d407ddaee52304240))
+* add building unit HasDeviation to projections - EF Migrations ([eea4956](https://github.com/informatievlaanderen/building-registry/commit/eea4956c9e0b8263a40d79f7092846fb0fe0e4ba))
+* set building unit HasDeviation in projections ([507bb10](https://github.com/informatievlaanderen/building-registry/commit/507bb1089f440641eae7892e462e6d44dfb95ee2))
+
 # [3.46.0](https://github.com/informatievlaanderen/building-registry/compare/v3.45.0...v3.46.0) (2022-11-14)
 
 
