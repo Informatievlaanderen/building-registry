@@ -50,7 +50,8 @@ namespace BuildingRegistry.Api.Legacy.Handlers.BuildingUnitV2
                         new GebouweenheidDetailAdres(
                             x.AddressPersistentLocalId.ToString(),
                             string.Format(request.ResponseOptions.Value.AdresUrl, x.AddressPersistentLocalId.ToString())))
-                        .ToList()),
+                        .ToList(),
+                    buildingUnit.HasDeviation),
                 buildingUnit.LastEventHash);
         }
     }

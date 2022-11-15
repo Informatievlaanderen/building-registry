@@ -75,6 +75,13 @@ namespace BuildingRegistry.Api.Oslo.Abstractions.BuildingUnit.Responses
         [JsonProperty(Required = Required.DisallowNull)]
         public List<GebouweenheidDetailAdres> Addresses { get; set; }
 
+        /// <summary>
+        /// Gebouweenheid afwijking.
+        /// </summary>
+        [DataMember(Name = "AfwijkingWerdVastgesteld", Order = 8)]
+        [JsonProperty(Required = Required.DisallowNull)]
+        public bool HasDeviation { get; set; }
+
         public BuildingUnitOsloResponse(
             int persistentLocalId,
             string naamruimte,
@@ -84,7 +91,8 @@ namespace BuildingRegistry.Api.Oslo.Abstractions.BuildingUnit.Responses
             GebouweenheidStatus status,
             GebouweenheidFunctie? function,
             GebouweenheidDetailGebouw building,
-            List<GebouweenheidDetailAdres> addresses)
+            List<GebouweenheidDetailAdres> addresses,
+            bool hasDeviation)
         {
             Context = contextUrlUnitDetail;
             Identificator = new GebouweenheidIdentificator(naamruimte, persistentLocalId.ToString(), version);
@@ -93,6 +101,7 @@ namespace BuildingRegistry.Api.Oslo.Abstractions.BuildingUnit.Responses
             Function = function;
             Building = building;
             Addresses = addresses.OrderBy(x => x.ObjectId).ToList();
+            HasDeviation = hasDeviation;
         }
     }
 
@@ -120,7 +129,8 @@ namespace BuildingRegistry.Api.Oslo.Abstractions.BuildingUnit.Responses
                     new GebouweenheidDetailAdres("1", string.Format(_responseOptions.AdresUrl,"1")),
                     new GebouweenheidDetailAdres("7", string.Format(_responseOptions.AdresUrl,"7")),
                     new GebouweenheidDetailAdres("10",string.Format(_responseOptions.AdresUrl,"10"))
-                }
+                },
+                false
             );
     }
 

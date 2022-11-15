@@ -54,7 +54,8 @@ namespace BuildingRegistry.Api.Oslo.Handlers.BuildingUnitV2
                     buildingUnit.Status.Map(),
                     MapBuildingUnitFunction(buildingUnit.Function),
                     new GebouweenheidDetailGebouw(buildingUnit.BuildingPersistentLocalId.ToString(), string.Format(request.ResponseOptions.Value.GebouwDetailUrl, buildingUnit.BuildingPersistentLocalId)),
-                    addressPersistentLocalIds.Select(id => new GebouweenheidDetailAdres(id.ToString(), string.Format(request.ResponseOptions.Value.AdresUrl, id))).ToList()),
+                    addressPersistentLocalIds.Select(id => new GebouweenheidDetailAdres(id.ToString(), string.Format(request.ResponseOptions.Value.AdresUrl, id))).ToList(),
+                    buildingUnit.HasDeviation),
                 buildingUnit.LastEventHash);
         }
 
