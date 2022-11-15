@@ -113,9 +113,9 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
 
                     BuildingHasInvalidStatusException =>
                         throw CreateValidationException(
-                            ValidationErrorCodes.BuildingUnit.BuildingStatusIsNotRealizedOrRetired,
+                            ValidationErrorCodes.BuildingUnit.BuildingStatusIsNotPlannedUnderConstructionOrRealized,
                             string.Empty,
-                            ValidationErrorMessages.BuildingUnit.BuildingStatusIsNotRealizedOrRetired),
+                            ValidationErrorMessages.BuildingUnit.BuildingStatusIsNotPlannedUnderConstructionOrRealized),
 
                     BuildingUnitHasInvalidFunctionException => CreateValidationException(
                         ValidationErrorCodes.BuildingUnit.BuildingUnitHasInvalidFunction,

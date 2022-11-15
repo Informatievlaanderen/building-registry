@@ -207,8 +207,8 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
                 x.Error(
                     It.IsAny<Guid>(),
                     new TicketError(
-                        "Deze actie is enkel toegestaan binnen een gepland of gerealiseerd gebouw.",
-                        "GebouwStatusNietInGeplandOfGerealiseerd"),
+                        "Deze actie is enkel toegestaan binnen een gepland, inAanbouw of gerealiseerd gebouw.",
+                        "GebouwStatusNietInGeplandInAanbouwOfGerealiseerd"),
                     CancellationToken.None));
         }
 

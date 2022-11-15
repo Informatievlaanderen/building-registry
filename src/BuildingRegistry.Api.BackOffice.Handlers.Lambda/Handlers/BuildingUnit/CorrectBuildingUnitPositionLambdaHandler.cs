@@ -67,8 +67,8 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.BuildingUnit
                     ValidationErrorCodes.BuildingUnit.BuildingUnitPositionCannotBeCorrected),
                 BuildingHasInvalidStatusException =>
                     new TicketError(
-                        ValidationErrorMessages.BuildingUnit.BuildingStatusIsNotRealizedOrRetired,
-                        ValidationErrorCodes.BuildingUnit.BuildingStatusIsNotRealizedOrRetired),
+                        ValidationErrorMessages.BuildingUnit.BuildingStatusIsNotPlannedUnderConstructionOrRealized,
+                        ValidationErrorCodes.BuildingUnit.BuildingStatusIsNotPlannedUnderConstructionOrRealized),
                 BuildingUnitPositionIsOutsideBuildingGeometryException =>
                     new TicketError(
                         ValidationErrorMessages.BuildingUnit.BuildingUnitOutsideGeometryBuilding,
