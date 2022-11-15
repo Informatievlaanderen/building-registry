@@ -5,6 +5,7 @@ namespace BuildingRegistry.Projections.Wfs.BuildingUnitV2
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy.Gebouweenheid;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.Connector;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore;
+    using Be.Vlaanderen.Basisregisters.Utilities;
     using Be.Vlaanderen.Basisregisters.Utilities.HexByteConvertor;
     using BuildingRegistry.Building;
     using BuildingRegistry.Building.Events;
@@ -314,9 +315,27 @@ namespace BuildingRegistry.Projections.Wfs.BuildingUnitV2
         private static void SetVersion(BuildingUnitV2 unit, Instant timestamp) => unit.Version = timestamp;
 
         public static string MapFunction(BuildingUnitFunction function)
-            => function == BuildingUnitFunction.Common
-                ? GebouweenheidFunctie.GemeenschappelijkDeel.ToString()
+        {
+            var dictionary = new Dictionary<BuildingUnitFunction, string>
+            {
+                { BuildingUnitFunction.Common, GebouweenheidFunctie.GemeenschappelijkDeel.ToString() },
+                { BuildingUnitFunction.Unknown, GebouweenheidFunctie.NietGekend.ToString() },
+                { BuildingUnitFunction.Residential, GebouweenheidFunctie.NietGekend.ToString() },
+                { BuildingUnitFunction.Lodging, GebouweenheidFunctie.NietGekend.ToString() },
+                { BuildingUnitFunction.DayRecreationSport, GebouweenheidFunctie.NietGekend.ToString() },
+                { BuildingUnitFunction.AgricultureHorticulture, GebouweenheidFunctie.NietGekend.ToString() },
+                { BuildingUnitFunction.Retail, GebouweenheidFunctie.NietGekend.ToString() },
+                { BuildingUnitFunction.DancingRestaurantCafe, GebouweenheidFunctie.NietGekend.ToString() },
+                { BuildingUnitFunction.OfficeServicesLiberalProfession, GebouweenheidFunctie.NietGekend.ToString() },
+                { BuildingUnitFunction.IndustryBusiness, GebouweenheidFunctie.NietGekend.ToString() },
+                { BuildingUnitFunction.CommunityPublicUtility, GebouweenheidFunctie.NietGekend.ToString() },
+                { BuildingUnitFunction.MilitaryFunction, GebouweenheidFunctie.NietGekend.ToString() }
+            };
+
+            return dictionary.ContainsKey(function)
+                ? dictionary[function]
                 : GebouweenheidFunctie.NietGekend.ToString();
+        }
 
         private void SetPosition(BuildingUnitV2 buildingUnit, string extendedWkbPosition, string method)
         {

@@ -1,6 +1,7 @@
 namespace BuildingRegistry.Api.Legacy.Abstractions.Converters
 {
     using System;
+    using System.Collections.Generic;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy.Gebouweenheid;
     using BuildingRegistry.Building;
@@ -141,17 +142,25 @@ namespace BuildingRegistry.Api.Legacy.Abstractions.Converters
 
         public static GebouweenheidFunctie? Map(this BuildingUnitFunction function)
         {
-            if (BuildingUnitFunction.Common == function)
+            var dictionary = new Dictionary<BuildingUnitFunction, GebouweenheidFunctie>
             {
-                return GebouweenheidFunctie.GemeenschappelijkDeel;
-            }
+                { BuildingUnitFunction.Common, GebouweenheidFunctie.GemeenschappelijkDeel },
+                { BuildingUnitFunction.Unknown, GebouweenheidFunctie.NietGekend },
+                { BuildingUnitFunction.Residential, GebouweenheidFunctie.NietGekend },
+                { BuildingUnitFunction.Lodging, GebouweenheidFunctie.NietGekend },
+                { BuildingUnitFunction.DayRecreationSport, GebouweenheidFunctie.NietGekend },
+                { BuildingUnitFunction.AgricultureHorticulture, GebouweenheidFunctie.NietGekend },
+                { BuildingUnitFunction.Retail, GebouweenheidFunctie.NietGekend },
+                { BuildingUnitFunction.DancingRestaurantCafe, GebouweenheidFunctie.NietGekend },
+                { BuildingUnitFunction.OfficeServicesLiberalProfession, GebouweenheidFunctie.NietGekend },
+                { BuildingUnitFunction.IndustryBusiness, GebouweenheidFunctie.NietGekend },
+                { BuildingUnitFunction.CommunityPublicUtility, GebouweenheidFunctie.NietGekend },
+                { BuildingUnitFunction.MilitaryFunction, GebouweenheidFunctie.NietGekend }
+            };
 
-            if (BuildingUnitFunction.Unknown == function)
-            {
-                return GebouweenheidFunctie.NietGekend;
-            }
-
-            throw new ArgumentOutOfRangeException(nameof(function), function, null);
+            return dictionary.ContainsKey(function)
+                ? dictionary[function]
+                : throw new ArgumentOutOfRangeException(nameof(function), function, null);
         }
     }
 }
