@@ -203,7 +203,8 @@ namespace BuildingRegistry.Building
                     BuildingUnitFunction.Common,
                     BuildingUnitPositionGeometryMethod.DerivedFromObject,
                     BuildingGeometry.Center,
-                    commonBuildingUnit.HasDeviation));
+                    commonBuildingUnit.HasDeviation,
+                    commonBuildingUnit.AddressPersistentLocalIds));
             }
             else
             {

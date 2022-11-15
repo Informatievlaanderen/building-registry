@@ -215,11 +215,22 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetailV2
             {
                 await Update(context, message.Message.BuildingUnitPersistentLocalId, item =>
                 {
+                    var addressesIdsGrouped = message.Message.AddressPersistentLocalIds.GroupBy(x => x);
+                    var addresses = addressesIdsGrouped
+                        .Select(groupedAddressId => new BuildingUnitDetailAddressItemV2
+                        {
+                            BuildingUnitPersistentLocalId = message.Message.BuildingUnitPersistentLocalId,
+                            AddressPersistentLocalId = groupedAddressId.Key,
+                            Count = groupedAddressId.Count()
+                        })
+                        .ToList();
+
                     item.Status = BuildingUnitStatus.Parse(message.Message.BuildingUnitStatus);
                     item.Function = BuildingUnitFunction.Parse(message.Message.Function);
                     item.Position = message.Message.ExtendedWkbGeometry.ToByteArray();
                     item.PositionMethod = BuildingUnitPositionGeometryMethod.Parse(message.Message.GeometryMethod);
                     item.IsRemoved = false;
+                    item.Addresses = new Collection<BuildingUnitDetailAddressItemV2>(addresses);
                     item.Version = message.Message.Provenance.Timestamp;
                     UpdateHash(item, message);
                 }, ct);
