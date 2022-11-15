@@ -1,5 +1,6 @@
 namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuildingUnit
 {
+    using System;
     using AutoFixture;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
     using Be.Vlaanderen.Basisregisters.AggregateSource.Testing;
@@ -119,7 +120,8 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuildingUnit
                         BuildingUnitFunction.Common,
                         BuildingUnitPositionGeometryMethod.DerivedFromObject,
                         buildingGeometry.Center,
-                        false))));
+                        false,
+                        Array.Empty<AddressPersistentLocalId>()))));
         }
     }
 }

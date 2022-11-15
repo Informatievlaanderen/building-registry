@@ -45,6 +45,7 @@ namespace BuildingRegistry.Building
             Register<BuildingUnitWasCorrectedFromRetiredToRealized>(When);
             Register<BuildingUnitPositionWasCorrected>(When);
             Register<BuildingUnitWasRemovedV2>(When);
+            Register<BuildingUnitRemovalWasCorrected>(When);
             Register<BuildingUnitWasRegularized>(When);
             Register<BuildingUnitWasDeregulated>(When);
             Register<CommonBuildingUnitWasAddedV2>(When);
@@ -154,6 +155,26 @@ namespace BuildingRegistry.Building
         private void When(BuildingUnitWasRemovedV2 @event)
         {
             IsRemoved = true;
+
+            _lastEvent = @event;
+        }
+
+        private void When(BuildingUnitRemovalWasCorrected @event)
+        {
+            Status = BuildingUnitStatus.Parse(@event.BuildingUnitStatus);
+            Function = BuildingUnitFunction.Parse(@event.Function);
+            BuildingUnitPosition = new BuildingUnitPosition(
+                new ExtendedWkbGeometry(@event.ExtendedWkbGeometry),
+                BuildingUnitPositionGeometryMethod.Parse(@event.GeometryMethod));
+            HasDeviation = @event.HasDeviation;
+
+            _addressPersistentLocalIds.Clear();
+            foreach (var addressPersistentLocalId in @event.AddressPersistentLocalIds)
+            {
+                _addressPersistentLocalIds.Add(new AddressPersistentLocalId(addressPersistentLocalId));
+            }
+
+            IsRemoved = false;
 
             _lastEvent = @event;
         }

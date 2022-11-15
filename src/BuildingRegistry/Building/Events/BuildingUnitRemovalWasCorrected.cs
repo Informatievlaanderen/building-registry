@@ -36,6 +36,9 @@ namespace BuildingRegistry.Building.Events
         [EventPropertyDescription("Gebouweenheid afwijking.")]
         public bool HasDeviation { get; }
 
+        [EventPropertyDescription("Objectidentificatoren van adressen die gekoppeld zijn aan de gebouweenheid.")]
+        public List<int> AddressPersistentLocalIds { get; }
+
         [EventPropertyDescription("Metadata bij het event.")]
         public ProvenanceData Provenance { get; private set; }
 
@@ -46,7 +49,8 @@ namespace BuildingRegistry.Building.Events
             BuildingUnitFunction function,
             BuildingUnitPositionGeometryMethod geometryMethod,
             ExtendedWkbGeometry extendedWkbGeometry,
-            bool hasDeviation)
+            bool hasDeviation,
+            IEnumerable<AddressPersistentLocalId> addressPersistentLocalIds)
         {
             BuildingPersistentLocalId = buildingPersistentLocalId;
             BuildingUnitPersistentLocalId = buildingUnitPersistentLocalId;
@@ -55,6 +59,7 @@ namespace BuildingRegistry.Building.Events
             GeometryMethod = geometryMethod;
             ExtendedWkbGeometry = extendedWkbGeometry;
             HasDeviation = hasDeviation;
+            AddressPersistentLocalIds = addressPersistentLocalIds.Select(x => (int)x).ToList();
         }
 
         [JsonConstructor]
@@ -66,6 +71,7 @@ namespace BuildingRegistry.Building.Events
             string geometryMethod,
             string extendedWkbGeometry,
             bool hasDeviation,
+            IEnumerable<int> addressPersistentLocalIds,
             ProvenanceData provenance)
             : this(
                 new BuildingPersistentLocalId(buildingPersistentLocalId),
@@ -74,7 +80,8 @@ namespace BuildingRegistry.Building.Events
                 BuildingUnitFunction.Parse(function),
                 BuildingUnitPositionGeometryMethod.Parse(geometryMethod),
                 new ExtendedWkbGeometry(extendedWkbGeometry),
-                hasDeviation)
+                hasDeviation,
+                addressPersistentLocalIds.Select(x => new AddressPersistentLocalId(x)))
             => ((ISetProvenance)this).SetProvenance(provenance.ToProvenance());
 
         void ISetProvenance.SetProvenance(Provenance provenance) => Provenance = new ProvenanceData(provenance);
@@ -89,6 +96,7 @@ namespace BuildingRegistry.Building.Events
             fields.Add(GeometryMethod);
             fields.Add(ExtendedWkbGeometry);
             fields.Add(HasDeviation.ToString());
+            fields.AddRange(AddressPersistentLocalIds.Select(x => x.ToString(CultureInfo.InvariantCulture)));
             return fields;
         }
 
