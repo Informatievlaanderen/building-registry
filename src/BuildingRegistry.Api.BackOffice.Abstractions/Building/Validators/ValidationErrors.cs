@@ -23,7 +23,7 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.Building.Validators
         public static class BuildingUnit
         {
             public const string BuildingUnitNotFound = "GebouweenheidNietGevonden";
-            public const string BuildingUnitIsRemoved = "GebouweenheidVerwijderd";
+            public const string BuildingUnitIsRemoved = "VerwijderdeGebouweenheid";
             public const string BuildingNotFound = "GebouweenheidGebouwIdNietGekendValidatie";
             public const string BuildingStatusNotInRealized = "GebouwStatusNietInGerealiseerd";
             public const string BuildingUnitCannotBeRealized = "GebouweenheidGehistoreerdOfNietGerealiseerd";
