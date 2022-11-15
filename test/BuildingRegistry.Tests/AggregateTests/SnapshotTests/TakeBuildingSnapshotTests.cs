@@ -6,6 +6,7 @@ namespace BuildingRegistry.Tests.AggregateTests.SnapshotTests
     using Be.Vlaanderen.Basisregisters.AggregateSource.Snapshotting;
     using Building;
     using Building.Events;
+    using Fixtures;
     using FluentAssertions;
     using Moq;
     using Xunit;
@@ -39,7 +40,7 @@ namespace BuildingRegistry.Tests.AggregateTests.SnapshotTests
             buildingSnapshot.LastEventHash.Should().Be(buildingWasPlanned.GetHash());
             buildingSnapshot.LastProvenanceData.Should().Be(buildingWasPlanned.Provenance);
         }
-        
+
         [Fact]
         public void BuildingWasMigratedIsSavedInSnapshot()
         {
@@ -112,6 +113,44 @@ namespace BuildingRegistry.Tests.AggregateTests.SnapshotTests
 
             buildingUnitData.LastEventHash.Should().Be(buildingUnitWasPlanned.GetHash());
             buildingUnitData.LastProvenanceData.Should().Be(buildingUnitWasPlanned.Provenance);
+        }
+
+        [Fact]
+        public void BuildingUnitWasDeregulatedIsSavedInSnapshot()
+        {
+            var aggregate = new BuildingFactory(IntervalStrategy.Default, Mock.Of<IAddCommonBuildingUnit>()).Create();
+
+            Fixture.Customize(new WithFixedBuildingUnitPersistentLocalId());
+
+            var buildingWasPlanned = Fixture.Create<BuildingWasPlannedV2>();
+            var buildingUnitWasPlanned = Fixture.Create<BuildingUnitWasPlannedV2>();
+            var buildingUnitWasDeregulated = Fixture.Create<BuildingUnitWasDeregulated>();
+
+            aggregate.Initialize(new List<object>
+            {
+                buildingWasPlanned,
+                buildingUnitWasPlanned,
+                buildingUnitWasDeregulated
+            });
+
+            var snapshot = aggregate.TakeSnapshot();
+            snapshot.Should().BeOfType<BuildingSnapshot>();
+
+            var buildingSnapshot = (BuildingSnapshot)snapshot;
+            var buildingUnitData = buildingSnapshot.BuildingUnits.Single(x =>
+                x.BuildingUnitPersistentLocalId == buildingUnitWasPlanned.BuildingUnitPersistentLocalId);
+
+            buildingUnitData.Function.Should().Be(buildingUnitWasPlanned.Function);
+            buildingUnitData.Status.Should().Be(BuildingUnitStatus.Planned);
+            buildingUnitData.AddressPersistentLocalIds.Should().BeNullOrEmpty();
+            buildingUnitData.ExtendedWkbGeometry.Should().Be(buildingUnitWasPlanned.ExtendedWkbGeometry);
+            buildingUnitData.GeometryMethod.Should().Be(buildingUnitWasPlanned.GeometryMethod);
+
+            buildingUnitData.IsRemoved.Should().BeFalse();
+            buildingUnitData.HasDeviation.Should().BeTrue();
+
+            buildingUnitData.LastEventHash.Should().Be(buildingUnitWasDeregulated.GetHash());
+            buildingUnitData.LastProvenanceData.Should().Be(buildingUnitWasDeregulated.Provenance);
         }
     }
 }
