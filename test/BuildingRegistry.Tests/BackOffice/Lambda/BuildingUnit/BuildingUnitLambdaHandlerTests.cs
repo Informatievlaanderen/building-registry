@@ -116,7 +116,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
             //Assert
             ticketing
                 .Verify(x =>
-                    x.Error(lambdaRequest.TicketId, new TicketError("Verwijderde gebouweenheid.", "GebouweenheidVerwijderd"),
+                    x.Error(lambdaRequest.TicketId, new TicketError("Verwijderde gebouweenheid.", "VerwijderdeGebouweenheid"),
                         CancellationToken.None));
             ticketing
                 .Verify(x =>
