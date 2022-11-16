@@ -124,7 +124,8 @@ namespace BuildingRegistry.Api.Legacy.Abstractions.Building.Responses
                             unit.Function.ConvertFromBuildingUnitFunction(),
                             unit.AddressIds.ToList(),
                             unit.Version.ToBelgianDateTimeOffset(),
-                            unit.IsComplete))
+                            unit.IsComplete,
+                            unit.HasDeviation))
                         .ToList());
             }
 
@@ -276,6 +277,12 @@ namespace BuildingRegistry.Api.Legacy.Abstractions.Building.Responses
         [DataMember(Name = "IsCompleet", Order = 8)]
         public bool IsComplete { get; set; }
 
+        /// <summary>
+        /// Gebouweenheid afwijking.
+        /// </summary>
+        [DataMember(Name = "AfwijkingVastgesteld", Order = 8)]
+        public bool HasDeviation { get; set; }
+
         public BuildingUnitSyndicationContent(
             string buildingUnitId,
             string naamruimte,
@@ -286,7 +293,8 @@ namespace BuildingRegistry.Api.Legacy.Abstractions.Building.Responses
             GebouweenheidFunctie? function,
             List<string> addresses,
             DateTimeOffset version,
-            bool isComplete)
+            bool isComplete,
+            bool hasDeviation)
         {
             BuildingUnitId = buildingUnitId;
             Identificator = new GebouweenheidIdentificator(naamruimte, persistentLocalId?.ToString(CultureInfo.InvariantCulture), version);
@@ -296,6 +304,7 @@ namespace BuildingRegistry.Api.Legacy.Abstractions.Building.Responses
             Function = function;
             Addresses = addresses;
             IsComplete = isComplete;
+            HasDeviation = hasDeviation;
         }
     }
 
@@ -331,7 +340,7 @@ namespace BuildingRegistry.Api.Legacy.Abstractions.Building.Responses
         <content>
             <![CDATA[<Content xmlns:i=""http://www.w3.org/2001/XMLSchema-instance""><Event><BuildingWasRegistered><BuildingId>b9a05759-f1aa-5d51-a47d-3adaf62a8b8c</BuildingId><Provenance><Timestamp>2011-05-18T17:59:07Z</Timestamp><Organisation>Municipality</Organisation><Reason>Centrale bijhouding CRAB</Reason></Provenance>
     </BuildingWasRegistered>
-  </Event><Object><Id>b9a05759-f1aa-5d51-a47d-3adaf62a8b8c</Id><Identificator><Id>https://data.vlaanderen.be/id/gebouw/</Id><Naamruimte>https://data.vlaanderen.be/id/gebouw</Naamruimte><ObjectId /><VersieId>2011-05-18T19:59:07+02:00</VersieId></Identificator><GebouwStatus i:nil=""true"" /><GeometrieMethode i:nil=""true"" /><GeometriePolygoon i:nil=""true"" /><Gebouweenheden /><IsCompleet>false</IsCompleet><Creatie><Tijdstip>2011-05-18T19:59:07+02:00</Tijdstip><Organisatie>Gemeente</Organisatie><Reden>Centrale bijhouding CRAB</Reden></Creatie>
+  </Event><Object><Id>b9a05759-f1aa-5d51-a47d-3adaf62a8b8c</Id><Identificator><Id>https://data.vlaanderen.be/id/gebouw/</Id><Naamruimte>https://data.vlaanderen.be/id/gebouw</Naamruimte><ObjectId /><VersieId>2011-05-18T19:59:07+02:00</VersieId></Identificator><GebouwStatus i:nil=""true"" /><GeometrieMethode i:nil=""true"" /><GeometriePolygoon i:nil=""true"" /><Gebouweenheden /><IsCompleet>false</IsCompleet><AfwijkingVastgesteld>false</AfwijkingVastgesteld><Creatie><Tijdstip>2011-05-18T19:59:07+02:00</Tijdstip><Organisatie>Gemeente</Organisatie><Reden>Centrale bijhouding CRAB</Reden></Creatie>
   </Object></Content>]]>
 </content>
 </entry>
