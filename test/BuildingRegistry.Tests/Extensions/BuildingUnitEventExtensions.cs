@@ -143,14 +143,15 @@ namespace BuildingRegistry.Tests.Extensions
         }
     }
 
-    public static class BuildingUnitWasRegularizedExtensions
+    public static class BuildingUnitFunctionWasChangedExtensions
     {
-        public static BuildingUnitWasRegularized WithBuildingUnitPersistentLocalId(this BuildingUnitWasRegularized @event,
-            BuildingUnitPersistentLocalId buildingUnitPersistentLocalId)
+        public static BuildingUnitFunctionWasChanged WithFunction(this BuildingUnitFunctionWasChanged @event,
+            BuildingUnitFunction function)
         {
-            var updatedEvent = new BuildingUnitWasRegularized(
+            var updatedEvent = new BuildingUnitFunctionWasChanged(
                 new BuildingPersistentLocalId(@event.BuildingPersistentLocalId),
-                buildingUnitPersistentLocalId);
+                new BuildingUnitPersistentLocalId(@event.BuildingUnitPersistentLocalId),
+                function);
             ((ISetProvenance)updatedEvent).SetProvenance(@event.Provenance.ToProvenance());
 
             return updatedEvent;

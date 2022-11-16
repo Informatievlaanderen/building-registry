@@ -235,6 +235,16 @@ namespace BuildingRegistry.Building
                 .DetachAddressBecauseAddressWasRetired(addressPersistentLocalId);
         }
 
+        public void ChangeBuildingUnitFunction(BuildingUnitPersistentLocalId buildingUnitPersistentLocalId, BuildingUnitFunction function)
+        {
+            GuardRemovedBuilding();
+            GuardBuildingInvalidStatuses(BuildingStatus.NotRealized, BuildingStatus.Retired);
+
+            _buildingUnits
+                .GetNotRemovedByPersistentLocalId(buildingUnitPersistentLocalId)
+                .ChangeFunction(function);
+        }
+
         private void GuardBuildingInvalidStatuses(params BuildingStatus[] invalidStatuses)
         {
             if (invalidStatuses.Contains(BuildingStatus))
