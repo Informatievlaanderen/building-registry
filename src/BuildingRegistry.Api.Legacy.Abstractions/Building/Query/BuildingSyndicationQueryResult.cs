@@ -122,7 +122,8 @@ namespace BuildingRegistry.Api.Legacy.Abstractions.Building.Query
                 x.Addresses,
                 x.Readdresses,
                 lastChangedOn,
-                x.Version));
+                x.Version,
+                false));
         }
         public BuildingSyndicationQueryResult(
             string buildingId,
@@ -164,7 +165,8 @@ namespace BuildingRegistry.Api.Legacy.Abstractions.Building.Query
                 x.PointPosition,
                 x.Addresses,
                 lastChangedOn,
-                x.Version));
+                x.Version,
+                x.HasDeviation));
         }
 
         public BuildingSyndicationQueryResult(
@@ -249,9 +251,9 @@ namespace BuildingRegistry.Api.Legacy.Abstractions.Building.Query
         public bool IsComplete { get; }
         public Instant Version { get; }
         public IEnumerable<string> AddressIds { get; }
+        public bool HasDeviation { get; }
 
-        public BuildingUnitSyndicationQueryResult(
-            string buildingUnitId,
+        public BuildingUnitSyndicationQueryResult(string buildingUnitId,
             int? persistentLocalId,
             BuildingUnitFunction? function,
             BuildingUnitStatus? status,
@@ -261,7 +263,8 @@ namespace BuildingRegistry.Api.Legacy.Abstractions.Building.Query
             IEnumerable<BuildingUnitAddressSyndicationItem> addresses,
             IEnumerable<BuildingUnitReaddressSyndicationItem> readdresses,
             Instant lastChangedOn,
-            Instant version)
+            Instant version,
+            bool hasDeviation)
         {
             BuildingUnitId = buildingUnitId;
             PersistentLocalId = persistentLocalId;
@@ -271,6 +274,7 @@ namespace BuildingRegistry.Api.Legacy.Abstractions.Building.Query
             Geometry = geometry;
             IsComplete = isComplete;
             Version = version;
+            HasDeviation = hasDeviation;
 
             var datetimeLastChangedOn = lastChangedOn.ToBelgianDateTimeOffset();
             var relevantReaddresses = readdresses.Where(x =>
@@ -286,15 +290,15 @@ namespace BuildingRegistry.Api.Legacy.Abstractions.Building.Query
                 .ToList();
         }
 
-        public BuildingUnitSyndicationQueryResult(
-            int persistentLocalId,
+        public BuildingUnitSyndicationQueryResult(int persistentLocalId,
             BuildingRegistry.Building.BuildingUnitFunction function,
             BuildingRegistry.Building.BuildingUnitStatus status,
             BuildingRegistry.Building.BuildingUnitPositionGeometryMethod geometryMethod,
             byte[] geometry,
             IEnumerable<BuildingUnitAddressSyndicationItemV2> addresses,
             Instant lastChangedOn,
-            Instant version)
+            Instant version,
+            bool hasDeviation)
         {
             BuildingUnitId = persistentLocalId.ToString();
             PersistentLocalId = persistentLocalId;
@@ -304,6 +308,7 @@ namespace BuildingRegistry.Api.Legacy.Abstractions.Building.Query
             Geometry = geometry;
             IsComplete = true;
             Version = version;
+            HasDeviation = hasDeviation;
 
             AddressIds = addresses.Select(address => address.AddressPersistentLocalId.ToString());
         }
