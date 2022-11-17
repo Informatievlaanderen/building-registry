@@ -75,6 +75,22 @@ namespace BuildingRegistry.Api.Oslo.Handlers.BuildingUnitV2
             throw new ArgumentOutOfRangeException(nameof(geometryMethod), geometryMethod, null);
         }
 
+        private static readonly Dictionary<BuildingUnitFunction, GebouweenheidFunctie> BuildingUnitFunctions = new()
+        {
+            { BuildingUnitFunction.Common, GebouweenheidFunctie.GemeenschappelijkDeel },
+            { BuildingUnitFunction.Unknown, GebouweenheidFunctie.NietGekend },
+            { BuildingUnitFunction.Residential, GebouweenheidFunctie.NietGekend },
+            { BuildingUnitFunction.Lodging, GebouweenheidFunctie.NietGekend },
+            { BuildingUnitFunction.DayRecreationSport, GebouweenheidFunctie.NietGekend },
+            { BuildingUnitFunction.AgricultureHorticulture, GebouweenheidFunctie.NietGekend },
+            { BuildingUnitFunction.Retail, GebouweenheidFunctie.NietGekend },
+            { BuildingUnitFunction.DancingRestaurantCafe, GebouweenheidFunctie.NietGekend },
+            { BuildingUnitFunction.OfficeServicesLiberalProfession, GebouweenheidFunctie.NietGekend },
+            { BuildingUnitFunction.IndustryBusiness, GebouweenheidFunctie.NietGekend },
+            { BuildingUnitFunction.CommunityPublicUtility, GebouweenheidFunctie.NietGekend },
+            { BuildingUnitFunction.MilitaryFunction, GebouweenheidFunctie.NietGekend }
+        };
+
         private static GebouweenheidFunctie? MapBuildingUnitFunction(BuildingUnitFunction? function)
         {
             if (function == null)
@@ -82,24 +98,8 @@ namespace BuildingRegistry.Api.Oslo.Handlers.BuildingUnitV2
                 return null;
             }
 
-            var dictionary = new Dictionary<BuildingUnitFunction, GebouweenheidFunctie>
-            {
-                { BuildingUnitFunction.Common, GebouweenheidFunctie.GemeenschappelijkDeel },
-                { BuildingUnitFunction.Unknown, GebouweenheidFunctie.NietGekend },
-                { BuildingUnitFunction.Residential, GebouweenheidFunctie.NietGekend },
-                { BuildingUnitFunction.Lodging, GebouweenheidFunctie.NietGekend },
-                { BuildingUnitFunction.DayRecreationSport, GebouweenheidFunctie.NietGekend },
-                { BuildingUnitFunction.AgricultureHorticulture, GebouweenheidFunctie.NietGekend },
-                { BuildingUnitFunction.Retail, GebouweenheidFunctie.NietGekend },
-                { BuildingUnitFunction.DancingRestaurantCafe, GebouweenheidFunctie.NietGekend },
-                { BuildingUnitFunction.OfficeServicesLiberalProfession, GebouweenheidFunctie.NietGekend },
-                { BuildingUnitFunction.IndustryBusiness, GebouweenheidFunctie.NietGekend },
-                { BuildingUnitFunction.CommunityPublicUtility, GebouweenheidFunctie.NietGekend },
-                { BuildingUnitFunction.MilitaryFunction, GebouweenheidFunctie.NietGekend }
-            };
-
-            return dictionary.ContainsKey(function.Value)
-                ? dictionary[function.Value]
+            return BuildingUnitFunctions.ContainsKey(function.Value)
+                ? BuildingUnitFunctions[function.Value]
                 : throw new ArgumentOutOfRangeException(nameof(function), function, null);
         }
 

@@ -120,6 +120,23 @@ namespace BuildingRegistry.Api.Legacy.Abstractions.Converters
 
     public static class BuildingUnitFunctionExtensions
     {
+        private static readonly Dictionary<BuildingUnitFunction, GebouweenheidFunctie> BuildingUnitFunctions =
+            new()
+        {
+            { BuildingUnitFunction.Common, GebouweenheidFunctie.GemeenschappelijkDeel },
+            { BuildingUnitFunction.Unknown, GebouweenheidFunctie.NietGekend },
+            { BuildingUnitFunction.Residential, GebouweenheidFunctie.NietGekend },
+            { BuildingUnitFunction.Lodging, GebouweenheidFunctie.NietGekend },
+            { BuildingUnitFunction.DayRecreationSport, GebouweenheidFunctie.NietGekend },
+            { BuildingUnitFunction.AgricultureHorticulture, GebouweenheidFunctie.NietGekend },
+            { BuildingUnitFunction.Retail, GebouweenheidFunctie.NietGekend },
+            { BuildingUnitFunction.DancingRestaurantCafe, GebouweenheidFunctie.NietGekend },
+            { BuildingUnitFunction.OfficeServicesLiberalProfession, GebouweenheidFunctie.NietGekend },
+            { BuildingUnitFunction.IndustryBusiness, GebouweenheidFunctie.NietGekend },
+            { BuildingUnitFunction.CommunityPublicUtility, GebouweenheidFunctie.NietGekend },
+            { BuildingUnitFunction.MilitaryFunction, GebouweenheidFunctie.NietGekend }
+        };
+
         public static GebouweenheidFunctie? ConvertFromBuildingUnitFunction(this Legacy.BuildingUnitFunction? function)
         {
             if (function == null)
@@ -142,24 +159,8 @@ namespace BuildingRegistry.Api.Legacy.Abstractions.Converters
 
         public static GebouweenheidFunctie? Map(this BuildingUnitFunction function)
         {
-            var dictionary = new Dictionary<BuildingUnitFunction, GebouweenheidFunctie>
-            {
-                { BuildingUnitFunction.Common, GebouweenheidFunctie.GemeenschappelijkDeel },
-                { BuildingUnitFunction.Unknown, GebouweenheidFunctie.NietGekend },
-                { BuildingUnitFunction.Residential, GebouweenheidFunctie.NietGekend },
-                { BuildingUnitFunction.Lodging, GebouweenheidFunctie.NietGekend },
-                { BuildingUnitFunction.DayRecreationSport, GebouweenheidFunctie.NietGekend },
-                { BuildingUnitFunction.AgricultureHorticulture, GebouweenheidFunctie.NietGekend },
-                { BuildingUnitFunction.Retail, GebouweenheidFunctie.NietGekend },
-                { BuildingUnitFunction.DancingRestaurantCafe, GebouweenheidFunctie.NietGekend },
-                { BuildingUnitFunction.OfficeServicesLiberalProfession, GebouweenheidFunctie.NietGekend },
-                { BuildingUnitFunction.IndustryBusiness, GebouweenheidFunctie.NietGekend },
-                { BuildingUnitFunction.CommunityPublicUtility, GebouweenheidFunctie.NietGekend },
-                { BuildingUnitFunction.MilitaryFunction, GebouweenheidFunctie.NietGekend }
-            };
-
-            return dictionary.ContainsKey(function)
-                ? dictionary[function]
+            return BuildingUnitFunctions.ContainsKey(function)
+                ? BuildingUnitFunctions[function]
                 : throw new ArgumentOutOfRangeException(nameof(function), function, null);
         }
     }

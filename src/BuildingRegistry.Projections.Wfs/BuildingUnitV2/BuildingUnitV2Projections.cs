@@ -322,26 +322,26 @@ namespace BuildingRegistry.Projections.Wfs.BuildingUnitV2
 
         private static void SetVersion(BuildingUnitV2 unit, Instant timestamp) => unit.Version = timestamp;
 
+        private static readonly Dictionary<BuildingUnitFunction, string> BuildingUnitFunctions = new()
+        {
+            { BuildingUnitFunction.Common, GebouweenheidFunctie.GemeenschappelijkDeel.ToString() },
+            { BuildingUnitFunction.Unknown, GebouweenheidFunctie.NietGekend.ToString() },
+            { BuildingUnitFunction.Residential, GebouweenheidFunctie.NietGekend.ToString() },
+            { BuildingUnitFunction.Lodging, GebouweenheidFunctie.NietGekend.ToString() },
+            { BuildingUnitFunction.DayRecreationSport, GebouweenheidFunctie.NietGekend.ToString() },
+            { BuildingUnitFunction.AgricultureHorticulture, GebouweenheidFunctie.NietGekend.ToString() },
+            { BuildingUnitFunction.Retail, GebouweenheidFunctie.NietGekend.ToString() },
+            { BuildingUnitFunction.DancingRestaurantCafe, GebouweenheidFunctie.NietGekend.ToString() },
+            { BuildingUnitFunction.OfficeServicesLiberalProfession, GebouweenheidFunctie.NietGekend.ToString() },
+            { BuildingUnitFunction.IndustryBusiness, GebouweenheidFunctie.NietGekend.ToString() },
+            { BuildingUnitFunction.CommunityPublicUtility, GebouweenheidFunctie.NietGekend.ToString() },
+            { BuildingUnitFunction.MilitaryFunction, GebouweenheidFunctie.NietGekend.ToString() }
+        };
+
         public static string MapFunction(BuildingUnitFunction function)
         {
-            var dictionary = new Dictionary<BuildingUnitFunction, string>
-            {
-                { BuildingUnitFunction.Common, GebouweenheidFunctie.GemeenschappelijkDeel.ToString() },
-                { BuildingUnitFunction.Unknown, GebouweenheidFunctie.NietGekend.ToString() },
-                { BuildingUnitFunction.Residential, GebouweenheidFunctie.NietGekend.ToString() },
-                { BuildingUnitFunction.Lodging, GebouweenheidFunctie.NietGekend.ToString() },
-                { BuildingUnitFunction.DayRecreationSport, GebouweenheidFunctie.NietGekend.ToString() },
-                { BuildingUnitFunction.AgricultureHorticulture, GebouweenheidFunctie.NietGekend.ToString() },
-                { BuildingUnitFunction.Retail, GebouweenheidFunctie.NietGekend.ToString() },
-                { BuildingUnitFunction.DancingRestaurantCafe, GebouweenheidFunctie.NietGekend.ToString() },
-                { BuildingUnitFunction.OfficeServicesLiberalProfession, GebouweenheidFunctie.NietGekend.ToString() },
-                { BuildingUnitFunction.IndustryBusiness, GebouweenheidFunctie.NietGekend.ToString() },
-                { BuildingUnitFunction.CommunityPublicUtility, GebouweenheidFunctie.NietGekend.ToString() },
-                { BuildingUnitFunction.MilitaryFunction, GebouweenheidFunctie.NietGekend.ToString() }
-            };
-
-            return dictionary.ContainsKey(function)
-                ? dictionary[function]
+            return BuildingUnitFunctions.ContainsKey(function)
+                ? BuildingUnitFunctions[function]
                 : GebouweenheidFunctie.NietGekend.ToString();
         }
 

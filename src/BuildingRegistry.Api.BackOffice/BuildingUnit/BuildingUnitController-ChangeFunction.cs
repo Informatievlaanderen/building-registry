@@ -36,7 +36,7 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
         /// <param name="buildingUnitPersistentLocalId"></param>
         /// <param name="request"></param>
         /// <param name="ifMatchHeaderValue"></param>
-        /// <param name="ct"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         [HttpPost("{buildingUnitPersistentLocalId}/acties/wijzigen/functie")]
         [ProducesResponseType(StatusCodes.Status202Accepted)]
@@ -53,16 +53,16 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
             [FromRoute] int buildingUnitPersistentLocalId,
             [FromBody] ChangeBuildingUnitFunctionRequest request,
             [FromHeader(Name = "If-Match")] string? ifMatchHeaderValue,
-            CancellationToken ct = default)
+            CancellationToken cancellationToken = default)
         {
             request.BuildingUnitPersistentLocalId = buildingUnitPersistentLocalId;
 
-            await validator.ValidateAndThrowAsync(request, ct);
+            await validator.ValidateAndThrowAsync(request, cancellationToken);
 
             try
             {
                 if (!await ifMatchHeaderValidator
-                        .IsValidForBuildingUnit(ifMatchHeaderValue, new BuildingUnitPersistentLocalId(request.BuildingUnitPersistentLocalId), ct))
+                        .IsValidForBuildingUnit(ifMatchHeaderValue, new BuildingUnitPersistentLocalId(request.BuildingUnitPersistentLocalId), cancellationToken))
                 {
                     return new PreconditionFailedResult();
                 }
@@ -77,13 +77,13 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
                             Metadata = GetMetadata(),
                             ProvenanceData = new ProvenanceData(CreateFakeProvenance()),
                             IfMatchHeaderValue = ifMatchHeaderValue
-                        }, ct);
+                        }, cancellationToken);
 
                     return Accepted(result);
                 }
 
                 request.Metadata = GetMetadata();
-                var response = await Mediator.Send(request, ct);
+                var response = await Mediator.Send(request, cancellationToken);
 
                 return new AcceptedWithETagResult(
                     new Uri(string.Format(options.Value.BuildingUnitDetailUrl, request.BuildingUnitPersistentLocalId)),

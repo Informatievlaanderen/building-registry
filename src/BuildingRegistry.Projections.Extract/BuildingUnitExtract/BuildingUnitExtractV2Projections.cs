@@ -28,16 +28,6 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
 
         private const string Unknown = "NietGekend";
         private const string Common = "GemeenschappelijkDeel";
-        private const string Residential = "Wonen";
-        private const string Lodging = "Verblijfsrecreatie";
-        private const string DayRecreation = "DagrecreatieSport";
-        private const string AgricultureHorticulture = "LandTuinbouw";
-        private const string Retail = "Detailhandel";
-        private const string DancingRestaurantCafe = "DancingRestaurantCafe";
-        private const string OfficeServicesLiberalProfession = "KantoorDienstverleningVrijBeroep";
-        private const string IndustryBusiness = "IndustrieBedrijvigheid";
-        private const string CommunityPublicUtility = "GemeenschapsOpenbareNutsvoorziening";
-        private const string MilitaryFunction = "MilitaireFunctie";
 
         private const string DerivedFromObject = "AfgeleidVanObject";
         private const string AppointedByAdministrator = "AangeduidDoorBeheerder";
@@ -431,25 +421,25 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
             });
         }
 
+        private static readonly Dictionary<BuildingUnitFunction, string> BuildingUnitFunctions = new()
+        {
+            { BuildingUnitFunction.Common, Common },
+            { BuildingUnitFunction.Unknown, Unknown },
+            { BuildingUnitFunction.Residential, Unknown },
+            { BuildingUnitFunction.Lodging, Unknown },
+            { BuildingUnitFunction.DayRecreationSport, Unknown },
+            { BuildingUnitFunction.AgricultureHorticulture, Unknown },
+            { BuildingUnitFunction.Retail, Unknown },
+            { BuildingUnitFunction.DancingRestaurantCafe, Unknown },
+            { BuildingUnitFunction.OfficeServicesLiberalProfession, Unknown },
+            { BuildingUnitFunction.IndustryBusiness, Unknown },
+            { BuildingUnitFunction.CommunityPublicUtility, Unknown },
+            { BuildingUnitFunction.MilitaryFunction, Unknown }
+        };
+
         private static string MapFunction(BuildingUnitFunction function)
         {
-            var dictionary = new Dictionary<BuildingUnitFunction, string>
-            {
-                { BuildingUnitFunction.Common, Common },
-                { BuildingUnitFunction.Unknown, Unknown },
-                { BuildingUnitFunction.Residential, Residential },
-                { BuildingUnitFunction.Lodging, Lodging },
-                { BuildingUnitFunction.DayRecreationSport, DayRecreation },
-                { BuildingUnitFunction.AgricultureHorticulture, AgricultureHorticulture },
-                { BuildingUnitFunction.Retail, Retail },
-                { BuildingUnitFunction.DancingRestaurantCafe, DancingRestaurantCafe },
-                { BuildingUnitFunction.OfficeServicesLiberalProfession, OfficeServicesLiberalProfession },
-                { BuildingUnitFunction.IndustryBusiness, IndustryBusiness },
-                { BuildingUnitFunction.CommunityPublicUtility, CommunityPublicUtility },
-                { BuildingUnitFunction.MilitaryFunction, MilitaryFunction }
-            };
-
-            return dictionary[function];
+            return BuildingUnitFunctions[function];
         }
 
         private static string MapStatus(BuildingUnitStatus status)
