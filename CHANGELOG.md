@@ -1,3 +1,16 @@
+# [3.48.0](https://github.com/informatievlaanderen/building-registry/compare/v3.47.0...v3.48.0) (2022-11-17)
+
+
+### Bug Fixes
+
+* rename AfwijkingWerdVastgesteld to AfwijkingVastgesteld ([e175621](https://github.com/informatievlaanderen/building-registry/commit/e175621bcc5c0a75680dfc24b911939ac91efe8e))
+* subtitle regulate deregulate bu ([945fb13](https://github.com/informatievlaanderen/building-registry/commit/945fb13fae58a1b3516815a6b5dec3cc21539d24))
+
+
+### Features
+
+* add HasDeviation to building unit syndication response ([dddea49](https://github.com/informatievlaanderen/building-registry/commit/dddea49466c8a33e977cd2aa638454a41986d70f))
+
 # [3.47.0](https://github.com/informatievlaanderen/building-registry/compare/v3.46.0...v3.47.0) (2022-11-15)
 
 
