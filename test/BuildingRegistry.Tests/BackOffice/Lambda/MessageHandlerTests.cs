@@ -490,7 +490,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda
         }
 
         [Fact]
-        public async Task WhenProcessingCorrectBuildingRetirementqsRequest_ThenCorrectBuildingRetirementLambdaRequestRequestIsSent()
+        public async Task WhenProcessingCorrectBuildingRetirementSqsRequest_ThenCorrectBuildingRetirementLambdaRequestRequestIsSent()
         {
             // Arrange
             var mediator = new Mock<IMediator>();
@@ -744,6 +744,72 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda
                     request.MessageGroupId == messageMetadata.MessageGroupId &&
                     request.Request == messageData.Request &&
                     request.BuildingPersistentLocalId == messageData.Request.PersistentLocalId &&
+                    request.IfMatchHeaderValue == messageData.IfMatchHeaderValue &&
+                    request.Provenance == messageData.ProvenanceData.ToProvenance() &&
+                    request.Metadata == messageData.Metadata
+                ), CancellationToken.None), Times.Once);
+        }
+
+        [Fact]
+        public async Task WhenProcessingCorrectBuildingUnitPositionSqsRequest_ThenCorrectBuildingUnitPositionLambdaRequestRequestIsSent()
+        {
+            // Arrange
+            var mediator = new Mock<IMediator>();
+            var containerBuilder = new ContainerBuilder();
+            containerBuilder.Register(_ => mediator.Object);
+            var container = containerBuilder.Build();
+
+            var messageData = Fixture.Create<CorrectBuildingUnitPositionSqsRequest>();
+            var messageMetadata = new MessageMetadata { MessageGroupId = Fixture.Create<string>() };
+
+            var sut = new MessageHandler(container);
+
+            // Act
+            await sut.HandleMessage(
+                messageData,
+                messageMetadata,
+                CancellationToken.None);
+
+            // Assert
+            mediator
+                .Verify(x => x.Send(It.Is<CorrectBuildingUnitPositionLambdaRequest>(request =>
+                    request.TicketId == messageData.TicketId &&
+                    request.MessageGroupId == messageMetadata.MessageGroupId &&
+                    request.Request == messageData.Request &&
+                    request.BuildingUnitPersistentLocalId == messageData.BuildingUnitPersistentLocalId &&
+                    request.IfMatchHeaderValue == messageData.IfMatchHeaderValue &&
+                    request.Provenance == messageData.ProvenanceData.ToProvenance() &&
+                    request.Metadata == messageData.Metadata
+                ), CancellationToken.None), Times.Once);
+        }
+
+        [Fact]
+        public async Task WhenProcessingChangeBuildingUnitFunctionSqsRequest_ThenChangeBuildingUnitFunctionLambdaRequestRequestIsSent()
+        {
+            // Arrange
+            var mediator = new Mock<IMediator>();
+            var containerBuilder = new ContainerBuilder();
+            containerBuilder.Register(_ => mediator.Object);
+            var container = containerBuilder.Build();
+
+            var messageData = Fixture.Create<ChangeBuildingUnitFunctionSqsRequest>();
+            var messageMetadata = new MessageMetadata { MessageGroupId = Fixture.Create<string>() };
+
+            var sut = new MessageHandler(container);
+
+            // Act
+            await sut.HandleMessage(
+                messageData,
+                messageMetadata,
+                CancellationToken.None);
+
+            // Assert
+            mediator
+                .Verify(x => x.Send(It.Is<ChangeBuildingUnitFunctionLambdaRequest>(request =>
+                    request.TicketId == messageData.TicketId &&
+                    request.MessageGroupId == messageMetadata.MessageGroupId &&
+                    request.Request == messageData.Request &&
+                    request.BuildingUnitPersistentLocalId == messageData.BuildingUnitPersistentLocalId &&
                     request.IfMatchHeaderValue == messageData.IfMatchHeaderValue &&
                     request.Provenance == messageData.ProvenanceData.ToProvenance() &&
                     request.Metadata == messageData.Metadata
