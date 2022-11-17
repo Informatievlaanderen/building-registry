@@ -335,6 +335,16 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
                     }, ct);
             });
 
+            When<Envelope<BuildingUnitFunctionWasChanged>>(async (context, message, ct) =>
+            {
+                await context.FindAndUpdateBuildingUnitExtract(message.Message.BuildingUnitPersistentLocalId,
+                    itemV2 =>
+                    {
+                        UpdateRecord(itemV2, record => record.functie.Value = MapFunction(BuildingUnitFunction.Parse(message.Message.Function)));
+                        UpdateVersie(itemV2, message.Message.Provenance.Timestamp);
+                    }, ct);
+            });
+
             When<Envelope<CommonBuildingUnitWasAddedV2>>(async (context, message, ct) =>
             {
                 var commonBuildingUnitItemV2 = new BuildingUnitExtractItemV2
