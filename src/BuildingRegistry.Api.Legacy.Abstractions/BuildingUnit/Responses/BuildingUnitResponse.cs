@@ -71,7 +71,7 @@ namespace BuildingRegistry.Api.Legacy.Abstractions.BuildingUnit.Responses
         /// <summary>
         /// Gebouweenheid afwijking.
         /// </summary>
-        [DataMember(Name = "AfwijkingWerdVastgesteld", Order = 8)]
+        [DataMember(Name = "AfwijkingVastgesteld", Order = 8)]
         [JsonProperty(Required = Required.DisallowNull)]
         public bool HasDeviation { get; set; }
 
