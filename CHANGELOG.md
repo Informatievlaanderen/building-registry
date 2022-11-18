@@ -1,3 +1,11 @@
+## [3.48.1](https://github.com/informatievlaanderen/building-registry/compare/v3.48.0...v3.48.1) (2022-11-18)
+
+
+### Bug Fixes
+
+* change type deviation in extract GAWR-4038 ([74f57e6](https://github.com/informatievlaanderen/building-registry/commit/74f57e65d8932388f07d6f2df24dc161226e30b7))
+* correct docs GAWR-4036 ([1e4f698](https://github.com/informatievlaanderen/building-registry/commit/1e4f698c1dd2e2fb140817681e6576bf06ccb28e))
+
 # [3.48.0](https://github.com/informatievlaanderen/building-registry/compare/v3.47.0...v3.48.0) (2022-11-17)
 
 
