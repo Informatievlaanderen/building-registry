@@ -60,7 +60,8 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
                         {
                             versieid = { Value = message.Message.Provenance.Timestamp.ToBelgianDateTimeOffset().FromDateTimeOffset() },
                             functie = { Value = Common },
-                            gebouwid = { Value = building.BuildingPersistentLocalId.HasValue ? building.BuildingPersistentLocalId.ToString() : null }
+                            gebouwid = { Value = building.BuildingPersistentLocalId.HasValue ? building.BuildingPersistentLocalId.ToString() : null },
+                            afwijking = { Value = false }
                         }.ToBytes(_encoding)
                     }, ct);
             });
@@ -82,7 +83,8 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
                         {
                             versieid = { Value = message.Message.Provenance.Timestamp.ToBelgianDateTimeOffset().FromDateTimeOffset() },
                             functie = { Value = Unknown },
-                            gebouwid = { Value = building.BuildingPersistentLocalId.HasValue ? building.BuildingPersistentLocalId.ToString() : null }
+                            gebouwid = { Value = building.BuildingPersistentLocalId.HasValue ? building.BuildingPersistentLocalId.ToString() : null },
+                            afwijking = { Value = false }
                         }.ToBytes(_encoding)
                     }, ct);
             });
@@ -107,7 +109,8 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
                             versieid = { Value = message.Message.Provenance.Timestamp.ToBelgianDateTimeOffset().FromDateTimeOffset() },
                             functie = { Value = Unknown },
                             gebouwid = { Value = building.BuildingPersistentLocalId.HasValue ? building.BuildingPersistentLocalId.ToString() : null },
-                            status = { Value = retired }
+                            status = { Value = retired },
+                            afwijking = { Value = false }
                         }.ToBytes(_encoding)
                     }, ct);
             });
@@ -129,7 +132,8 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
                         {
                             versieid = { Value = message.Message.Provenance.Timestamp.ToBelgianDateTimeOffset().FromDateTimeOffset() },
                             functie = { Value = Unknown },
-                            gebouwid = { Value = building.BuildingPersistentLocalId.HasValue ? building.BuildingPersistentLocalId.ToString() : null }
+                            gebouwid = { Value = building.BuildingPersistentLocalId.HasValue ? building.BuildingPersistentLocalId.ToString() : null },
+                            afwijking = { Value = false }
                         }.ToBytes(_encoding)
                     }, ct);
             });
