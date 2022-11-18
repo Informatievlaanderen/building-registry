@@ -1,3 +1,10 @@
+## [3.48.2](https://github.com/informatievlaanderen/building-registry/compare/v3.48.1...v3.48.2) (2022-11-18)
+
+
+### Bug Fixes
+
+* extract v1 now has deviation value ([943994c](https://github.com/informatievlaanderen/building-registry/commit/943994c1ed62a91171ff66e56a508184aeb9352a))
+
 ## [3.48.1](https://github.com/informatievlaanderen/building-registry/compare/v3.48.0...v3.48.1) (2022-11-18)
 
 
