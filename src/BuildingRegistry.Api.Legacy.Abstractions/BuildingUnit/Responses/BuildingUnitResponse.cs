@@ -69,7 +69,7 @@ namespace BuildingRegistry.Api.Legacy.Abstractions.BuildingUnit.Responses
         public List<GebouweenheidDetailAdres> Addresses { get; set; }
 
         /// <summary>
-        /// Gebouweenheid afwijking.
+        /// Wanneer de definitie van een gebouweenheid niet werd gevolgd en dus 'afwijkend' is.
         /// </summary>
         [DataMember(Name = "AfwijkingVastgesteld", Order = 8)]
         [JsonProperty(Required = Required.DisallowNull)]
