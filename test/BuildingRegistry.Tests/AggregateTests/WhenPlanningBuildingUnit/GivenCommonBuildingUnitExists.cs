@@ -115,6 +115,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuildingUnit
         public void WithNotRealizedCommonBuildingUnitAndRealizedBuilding_ThenCommonBuildingUnitIsRealized()
         {
             var command = Fixture.Create<PlanBuildingUnit>()
+                .WithPersistentLocalId(new BuildingUnitPersistentLocalId(2))
                 .WithoutPosition()
                 .WithDeviation(false);
 
