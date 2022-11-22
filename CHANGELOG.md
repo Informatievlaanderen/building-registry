@@ -1,3 +1,10 @@
+## [3.48.3](https://github.com/informatievlaanderen/building-registry/compare/v3.48.2...v3.48.3) (2022-11-22)
+
+
+### Bug Fixes
+
+* consume AddressWasCorrectedFromRetiredToCurrent ([1448a97](https://github.com/informatievlaanderen/building-registry/commit/1448a971de41a5dd4f3ab966836aafbf65d88390))
+
 ## [3.48.2](https://github.com/informatievlaanderen/building-registry/compare/v3.48.1...v3.48.2) (2022-11-18)
 
 
