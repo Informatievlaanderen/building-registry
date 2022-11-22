@@ -16,49 +16,46 @@ namespace BuildingRegistry.Tests.ProjectionTests.Consumer.Address
 
     public class AddressConsumerKafkaProjectionTests : KafkaProjectionTest<ConsumerAddressContext, AddressKafkaProjection>
     {
-        private readonly Fixture _fixture;
-
         public AddressConsumerKafkaProjectionTests(ITestOutputHelper outputHelper) : base(outputHelper)
         {
-            _fixture = new Fixture();
-            _fixture.Customize(new InfrastructureCustomization());
+            Fixture.Customize(new InfrastructureCustomization());
         }
 
         [Fact]
         public async Task AddressMigratedToStreetName_AddsAddress()
         {
-            var addressStatus = _fixture
+            var addressStatus = Fixture
                 .Build<AddressStatus>()
                 .FromFactory(() =>
                 {
-                    var statusses = new List<AddressStatus>
+                    var statuses = new List<AddressStatus>
                     {
                         AddressStatus.Current, AddressStatus.Proposed, AddressStatus.Rejected, AddressStatus.Retired
                     };
 
-                    return statusses[new Random(_fixture.Create<int>()).Next(0, statusses.Count - 1)];
+                    return statuses[new Random(Fixture.Create<int>()).Next(0, statuses.Count - 1)];
                 })
                 .Create();
 
-            var addressWasMigratedToStreetName = _fixture
+            var addressWasMigratedToStreetName = Fixture
                 .Build<AddressWasMigratedToStreetName>()
                 .FromFactory(() => new AddressWasMigratedToStreetName(
-                    _fixture.Create<int>(),
-                    _fixture.Create<Guid>().ToString("D"),
-                    _fixture.Create<Guid>().ToString("D"),
-                    _fixture.Create<int>(),
+                    Fixture.Create<int>(),
+                    Fixture.Create<Guid>().ToString("D"),
+                    Fixture.Create<Guid>().ToString("D"),
+                    Fixture.Create<int>(),
                     addressStatus.Status,
-                    _fixture.Create<string>(),
-                    _fixture.Create<string>(),
-                    _fixture.Create<string>(),
-                    _fixture.Create<string>(),
-                    _fixture.Create<string>(),
-                    _fixture.Create<bool>(),
-                    _fixture.Create<string>(),
-                    _fixture.Create<bool>(),
-                    _fixture.Create<bool>(),
-                    _fixture.Create<int?>(),
-                    _fixture.Create<Provenance>()
+                    Fixture.Create<string>(),
+                    Fixture.Create<string>(),
+                    Fixture.Create<string>(),
+                    Fixture.Create<string>(),
+                    Fixture.Create<string>(),
+                    Fixture.Create<bool>(),
+                    Fixture.Create<string>(),
+                    Fixture.Create<bool>(),
+                    Fixture.Create<bool>(),
+                    Fixture.Create<int?>(),
+                    Fixture.Create<Provenance>()
                     ))
                 .Create();
 
@@ -71,7 +68,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Consumer.Address
                         addressWasMigratedToStreetName.AddressPersistentLocalId);
 
                 address.Should().NotBeNull();
-                address.AddressId.Should().Be(Guid.Parse(addressWasMigratedToStreetName.AddressId));
+                address!.AddressId.Should().Be(Guid.Parse(addressWasMigratedToStreetName.AddressId));
                 address.IsRemoved.Should().Be(address.IsRemoved);
                 address.Status.Should().Be(addressStatus);
             });
@@ -80,17 +77,17 @@ namespace BuildingRegistry.Tests.ProjectionTests.Consumer.Address
         [Fact]
         public async Task AddressWasProposedV2_AddsAddress()
         {
-            var addressWasProposed = _fixture.Create<AddressWasProposedV2>();
-            Given(addressWasProposed);
+            var addressWasProposedV2 = Fixture.Create<AddressWasProposedV2>();
+            Given(addressWasProposedV2);
 
             await Then(async context =>
             {
                 var address =
                     await context.AddressConsumerItems.FindAsync(
-                        addressWasProposed.AddressPersistentLocalId);
+                        addressWasProposedV2.AddressPersistentLocalId);
 
                 address.Should().NotBeNull();
-                address.AddressId.Should().BeNull();
+                address!.AddressId.Should().BeNull();
                 address.IsRemoved.Should().Be(false);
                 address.Status.Should().Be(AddressStatus.Proposed);
             });
@@ -99,21 +96,364 @@ namespace BuildingRegistry.Tests.ProjectionTests.Consumer.Address
         [Fact]
         public async Task AddressWasApproved_UpdatesStatusAddress()
         {
-            var addressWasProposed = _fixture.Create<AddressWasProposedV2>();
-            var addressWasApproved = _fixture.Build<AddressWasApproved>()
-                .FromFactory(() => new AddressWasApproved(addressWasProposed.StreetNamePersistentLocalId, addressWasProposed.AddressPersistentLocalId, _fixture.Create<Provenance>()))
+            var addressWasProposedV2 = Fixture.Create<AddressWasProposedV2>();
+            var addressWasApproved = Fixture.Build<AddressWasApproved>()
+                .FromFactory(() => new AddressWasApproved(
+                    addressWasProposedV2.StreetNamePersistentLocalId, addressWasProposedV2.AddressPersistentLocalId, Fixture.Create<Provenance>()))
                 .Create();
 
-            Given(addressWasProposed, addressWasApproved);
+            Given(addressWasProposedV2, addressWasApproved);
 
             await Then(async context =>
             {
                 var address =
                     await context.AddressConsumerItems.FindAsync(
-                        addressWasApproved.AddressPersistentLocalId);
+                        addressWasProposedV2.AddressPersistentLocalId);
 
                 address.Should().NotBeNull();
-                address.Status.Should().Be(AddressStatus.Current);
+                address!.Status.Should().Be(AddressStatus.Current);
+            });
+        }
+
+        [Fact]
+        public async Task AddressWasCorrectedFromApprovedToProposed_UpdatesStatusAddress()
+        {
+            var addressWasProposedV2 = Fixture.Create<AddressWasProposedV2>();
+            var addressWasApproved = Fixture.Build<AddressWasApproved>()
+                .FromFactory(() => new AddressWasApproved(
+                    addressWasProposedV2.StreetNamePersistentLocalId, addressWasProposedV2.AddressPersistentLocalId, Fixture.Create<Provenance>()))
+                .Create();
+            var addressWasCorrectedFromApprovedToProposed = Fixture.Build<AddressWasCorrectedFromApprovedToProposed>()
+                .FromFactory(() => new AddressWasCorrectedFromApprovedToProposed(
+                    addressWasProposedV2.StreetNamePersistentLocalId, addressWasProposedV2.AddressPersistentLocalId, Fixture.Create<Provenance>()))
+                .Create();
+
+            Given(addressWasProposedV2, addressWasApproved, addressWasCorrectedFromApprovedToProposed);
+
+            await Then(async context =>
+            {
+                var address =
+                    await context.AddressConsumerItems.FindAsync(
+                        addressWasProposedV2.AddressPersistentLocalId);
+
+                address.Should().NotBeNull();
+                address!.Status.Should().Be(AddressStatus.Proposed);
+            });
+        }
+
+        [Fact]
+        public async Task AddressWasCorrectedFromApprovedToProposedBecauseHouseNumberWasCorrected_UpdatesStatusAddress()
+        {
+            var addressWasProposedV2 = Fixture.Create<AddressWasProposedV2>();
+            var addressWasApproved = Fixture.Build<AddressWasApproved>()
+                .FromFactory(() => new AddressWasApproved(
+                    addressWasProposedV2.StreetNamePersistentLocalId, addressWasProposedV2.AddressPersistentLocalId, Fixture.Create<Provenance>()))
+                .Create();
+            var addressWasCorrectedFromApprovedToProposed = Fixture.Build<AddressWasCorrectedFromApprovedToProposedBecauseHouseNumberWasCorrected>()
+                .FromFactory(() => new AddressWasCorrectedFromApprovedToProposedBecauseHouseNumberWasCorrected(
+                    addressWasProposedV2.StreetNamePersistentLocalId, addressWasProposedV2.AddressPersistentLocalId, Fixture.Create<Provenance>()))
+                .Create();
+
+            Given(addressWasProposedV2, addressWasApproved, addressWasCorrectedFromApprovedToProposed);
+
+            await Then(async context =>
+            {
+                var address =
+                    await context.AddressConsumerItems.FindAsync(
+                        addressWasProposedV2.AddressPersistentLocalId);
+
+                address.Should().NotBeNull();
+                address!.Status.Should().Be(AddressStatus.Proposed);
+            });
+        }
+
+        [Fact]
+        public async Task AddressWasDeregulated_UpdatesStatusAddress()
+        {
+            var addressWasProposedV2 = Fixture.Create<AddressWasProposedV2>();
+            var addressWasDeregulated = Fixture.Build<AddressWasDeregulated>()
+                .FromFactory(() => new AddressWasDeregulated(
+                    addressWasProposedV2.StreetNamePersistentLocalId, addressWasProposedV2.AddressPersistentLocalId, Fixture.Create<Provenance>()))
+                .Create();
+
+            Given(addressWasProposedV2, addressWasDeregulated);
+
+            await Then(async context =>
+            {
+                var address =
+                    await context.AddressConsumerItems.FindAsync(
+                        addressWasProposedV2.AddressPersistentLocalId);
+
+                address.Should().NotBeNull();
+                address!.Status.Should().Be(AddressStatus.Current);
+            });
+        }
+
+        [Fact]
+        public async Task AddressWasRejected_UpdatesStatusAddress()
+        {
+            var addressWasProposedV2 = Fixture.Create<AddressWasProposedV2>();
+            var addressWasRejected = Fixture.Build<AddressWasRejected>()
+                .FromFactory(() => new AddressWasRejected(
+                    addressWasProposedV2.StreetNamePersistentLocalId, addressWasProposedV2.AddressPersistentLocalId, Fixture.Create<Provenance>()))
+                .Create();
+
+            Given(addressWasProposedV2, addressWasRejected);
+
+            await Then(async context =>
+            {
+                var address =
+                    await context.AddressConsumerItems.FindAsync(
+                        addressWasProposedV2.AddressPersistentLocalId);
+
+                address.Should().NotBeNull();
+                address!.Status.Should().Be(AddressStatus.Rejected);
+            });
+        }
+
+        [Fact]
+        public async Task AddressWasRejectedBecauseHouseNumberWasRejected_UpdatesStatusAddress()
+        {
+            var addressWasProposedV2 = Fixture.Create<AddressWasProposedV2>();
+            var addressWasRejected = Fixture.Build<AddressWasRejectedBecauseHouseNumberWasRejected>()
+                .FromFactory(() => new AddressWasRejectedBecauseHouseNumberWasRejected(
+                    addressWasProposedV2.StreetNamePersistentLocalId, addressWasProposedV2.AddressPersistentLocalId, Fixture.Create<Provenance>()))
+                .Create();
+
+            Given(addressWasProposedV2, addressWasRejected);
+
+            await Then(async context =>
+            {
+                var address =
+                    await context.AddressConsumerItems.FindAsync(
+                        addressWasProposedV2.AddressPersistentLocalId);
+
+                address.Should().NotBeNull();
+                address!.Status.Should().Be(AddressStatus.Rejected);
+            });
+        }
+
+        [Fact]
+        public async Task AddressWasRejectedBecauseHouseNumberWasRetired_UpdatesStatusAddress()
+        {
+            var addressWasProposedV2 = Fixture.Create<AddressWasProposedV2>();
+            var addressWasRejected = Fixture.Build<AddressWasRejectedBecauseHouseNumberWasRetired>()
+                .FromFactory(() => new AddressWasRejectedBecauseHouseNumberWasRetired(
+                    addressWasProposedV2.StreetNamePersistentLocalId, addressWasProposedV2.AddressPersistentLocalId, Fixture.Create<Provenance>()))
+                .Create();
+
+            Given(addressWasProposedV2, addressWasRejected);
+
+            await Then(async context =>
+            {
+                var address =
+                    await context.AddressConsumerItems.FindAsync(
+                        addressWasProposedV2.AddressPersistentLocalId);
+
+                address.Should().NotBeNull();
+                address!.Status.Should().Be(AddressStatus.Rejected);
+            });
+        }
+
+        [Fact]
+        public async Task AddressWasRejectedBecauseStreetNameWasRetired_UpdatesStatusAddress()
+        {
+            var addressWasProposedV2 = Fixture.Create<AddressWasProposedV2>();
+            var addressWasRejected = Fixture.Build<AddressWasRejectedBecauseStreetNameWasRetired>()
+                .FromFactory(() => new AddressWasRejectedBecauseStreetNameWasRetired(
+                    addressWasProposedV2.StreetNamePersistentLocalId, addressWasProposedV2.AddressPersistentLocalId, Fixture.Create<Provenance>()))
+                .Create();
+
+            Given(addressWasProposedV2, addressWasRejected);
+
+            await Then(async context =>
+            {
+                var address =
+                    await context.AddressConsumerItems.FindAsync(
+                        addressWasProposedV2.AddressPersistentLocalId);
+
+                address.Should().NotBeNull();
+                address!.Status.Should().Be(AddressStatus.Rejected);
+            });
+        }
+
+        [Fact]
+        public async Task AddressWasCorrectedFromRejectedToProposed_UpdatesStatusAddress()
+        {
+            var addressWasProposedV2 = Fixture.Create<AddressWasProposedV2>();
+            var addressWasRejected = Fixture.Build<AddressWasRejected>()
+                .FromFactory(() => new AddressWasRejected(
+                    addressWasProposedV2.StreetNamePersistentLocalId, addressWasProposedV2.AddressPersistentLocalId, Fixture.Create<Provenance>()))
+                .Create();
+            var addressWasCorrectedFromRejectedToProposed = Fixture.Build<AddressWasCorrectedFromRejectedToProposed>()
+                .FromFactory(() => new AddressWasCorrectedFromRejectedToProposed(
+                    addressWasProposedV2.StreetNamePersistentLocalId, addressWasProposedV2.AddressPersistentLocalId, Fixture.Create<Provenance>()))
+                .Create();
+
+            Given(addressWasProposedV2, addressWasRejected, addressWasCorrectedFromRejectedToProposed);
+
+            await Then(async context =>
+            {
+                var address =
+                    await context.AddressConsumerItems.FindAsync(
+                        addressWasProposedV2.AddressPersistentLocalId);
+
+                address.Should().NotBeNull();
+                address!.Status.Should().Be(AddressStatus.Proposed);
+            });
+        }
+
+        [Fact]
+        public async Task AddressWasRetiredV2_UpdatesStatusAddress()
+        {
+            var addressWasProposedV2 = Fixture.Create<AddressWasProposedV2>();
+            var addressWasApproved = Fixture.Build<AddressWasApproved>()
+                .FromFactory(() => new AddressWasApproved(
+                    addressWasProposedV2.StreetNamePersistentLocalId, addressWasProposedV2.AddressPersistentLocalId, Fixture.Create<Provenance>()))
+                .Create();
+            var addressWasRetiredV2 = Fixture.Build<AddressWasRetiredV2>()
+                .FromFactory(() => new AddressWasRetiredV2(
+                    addressWasProposedV2.StreetNamePersistentLocalId, addressWasProposedV2.AddressPersistentLocalId, Fixture.Create<Provenance>()))
+                .Create();
+
+            Given(addressWasProposedV2, addressWasApproved, addressWasRetiredV2);
+
+            await Then(async context =>
+            {
+                var address =
+                    await context.AddressConsumerItems.FindAsync(
+                        addressWasProposedV2.AddressPersistentLocalId);
+
+                address.Should().NotBeNull();
+                address!.Status.Should().Be(AddressStatus.Retired);
+            });
+        }
+
+        [Fact]
+        public async Task AddressWasRetiredBecauseHouseNumberWasRetired_UpdatesStatusAddress()
+        {
+            var addressWasProposedV2 = Fixture.Create<AddressWasProposedV2>();
+            var addressWasApproved = Fixture.Build<AddressWasApproved>()
+                .FromFactory(() => new AddressWasApproved(
+                    addressWasProposedV2.StreetNamePersistentLocalId, addressWasProposedV2.AddressPersistentLocalId, Fixture.Create<Provenance>()))
+                .Create();
+            var addressWasRetired = Fixture.Build<AddressWasRetiredBecauseHouseNumberWasRetired>()
+                .FromFactory(() => new AddressWasRetiredBecauseHouseNumberWasRetired(
+                    addressWasProposedV2.StreetNamePersistentLocalId, addressWasProposedV2.AddressPersistentLocalId, Fixture.Create<Provenance>()))
+                .Create();
+
+            Given(addressWasProposedV2, addressWasApproved, addressWasRetired);
+
+            await Then(async context =>
+            {
+                var address =
+                    await context.AddressConsumerItems.FindAsync(
+                        addressWasProposedV2.AddressPersistentLocalId);
+
+                address.Should().NotBeNull();
+                address!.Status.Should().Be(AddressStatus.Retired);
+            });
+        }
+
+        [Fact]
+        public async Task AddressWasRetiredBecauseStreetNameWasRetired_UpdatesStatusAddress()
+        {
+            var addressWasProposedV2 = Fixture.Create<AddressWasProposedV2>();
+            var addressWasApproved = Fixture.Build<AddressWasApproved>()
+                .FromFactory(() => new AddressWasApproved(
+                    addressWasProposedV2.StreetNamePersistentLocalId, addressWasProposedV2.AddressPersistentLocalId, Fixture.Create<Provenance>()))
+                .Create();
+            var addressWasRetired = Fixture.Build<AddressWasRetiredBecauseStreetNameWasRetired>()
+                .FromFactory(() => new AddressWasRetiredBecauseStreetNameWasRetired(
+                    addressWasProposedV2.StreetNamePersistentLocalId, addressWasProposedV2.AddressPersistentLocalId, Fixture.Create<Provenance>()))
+                .Create();
+
+            Given(addressWasProposedV2, addressWasApproved, addressWasRetired);
+
+            await Then(async context =>
+            {
+                var address =
+                    await context.AddressConsumerItems.FindAsync(
+                        addressWasProposedV2.AddressPersistentLocalId);
+
+                address.Should().NotBeNull();
+                address!.Status.Should().Be(AddressStatus.Retired);
+            });
+        }
+
+        [Fact]
+        public async Task AddressWasCorrectedFromRetiredToCurrent_UpdatesStatusAddress()
+        {
+            var addressWasProposedV2 = Fixture.Create<AddressWasProposedV2>();
+            var addressWasApproved = Fixture.Build<AddressWasApproved>()
+                .FromFactory(() => new AddressWasApproved(
+                    addressWasProposedV2.StreetNamePersistentLocalId, addressWasProposedV2.AddressPersistentLocalId, Fixture.Create<Provenance>()))
+                .Create();
+            var addressWasRetiredV2 = Fixture.Build<AddressWasRetiredV2>()
+                .FromFactory(() => new AddressWasRetiredV2(
+                    addressWasProposedV2.StreetNamePersistentLocalId, addressWasProposedV2.AddressPersistentLocalId, Fixture.Create<Provenance>()))
+                .Create();
+            var addressWasCorrectedFromRetiredToCurrent = Fixture.Build<AddressWasCorrectedFromRetiredToCurrent>()
+                .FromFactory(() => new AddressWasCorrectedFromRetiredToCurrent(
+                    addressWasProposedV2.StreetNamePersistentLocalId, addressWasProposedV2.AddressPersistentLocalId, Fixture.Create<Provenance>()))
+                .Create();
+
+            Given(addressWasProposedV2, addressWasApproved, addressWasRetiredV2, addressWasCorrectedFromRetiredToCurrent);
+
+            await Then(async context =>
+            {
+                var address =
+                    await context.AddressConsumerItems.FindAsync(
+                        addressWasProposedV2.AddressPersistentLocalId);
+
+                address.Should().NotBeNull();
+                address!.Status.Should().Be(AddressStatus.Current);
+            });
+        }
+
+        [Fact]
+        public async Task AddressWasRemovedV2_UpdatesStatusAddress()
+        {
+            var addressWasProposedV2 = Fixture.Create<AddressWasProposedV2>();
+            var addressWasRemovedV2 = Fixture.Build<AddressWasRemovedV2>()
+                .FromFactory(() => new AddressWasRemovedV2(
+                    addressWasProposedV2.StreetNamePersistentLocalId, addressWasProposedV2.AddressPersistentLocalId, Fixture.Create<Provenance>()))
+                .Create();
+
+            Given(addressWasProposedV2, addressWasRemovedV2);
+
+            await Then(async context =>
+            {
+                var address =
+                    await context.AddressConsumerItems.FindAsync(
+                        addressWasProposedV2.AddressPersistentLocalId);
+
+                address.Should().NotBeNull();
+                address!.Status.Should().Be(AddressStatus.Proposed);
+                address.IsRemoved.Should().BeTrue();
+            });
+        }
+
+        [Fact]
+        public async Task AddressWasRemovedBecauseHouseNumberWasRemoved_UpdatesStatusAddress()
+        {
+            var addressWasProposedV2 = Fixture.Create<AddressWasProposedV2>();
+            var addressWasRemovedV2 = Fixture.Build<AddressWasRemovedBecauseHouseNumberWasRemoved>()
+                .FromFactory(() => new AddressWasRemovedBecauseHouseNumberWasRemoved(
+                    addressWasProposedV2.StreetNamePersistentLocalId, addressWasProposedV2.AddressPersistentLocalId, Fixture.Create<Provenance>()))
+                .Create();
+
+            Given(addressWasProposedV2, addressWasRemovedV2);
+
+            await Then(async context =>
+            {
+                var address =
+                    await context.AddressConsumerItems.FindAsync(
+                        addressWasProposedV2.AddressPersistentLocalId);
+
+                address.Should().NotBeNull();
+                address!.Status.Should().Be(AddressStatus.Proposed);
+                address.IsRemoved.Should().BeTrue();
             });
         }
 
