@@ -11,7 +11,7 @@ namespace BuildingRegistry.Consumer.Address.Projections
 
     public class AddressKafkaProjection : ConnectedProjection<ConsumerAddressContext>
     {
-        private async Task CatchDbUpdateException(Func<Task> func)
+        private async Task CatchDbUpdateException(Func<Task> func, ConsumerAddressContext context)
         {
             try
             {
@@ -28,6 +28,7 @@ namespace BuildingRegistry.Consumer.Address.Projections
                     // When the service crashes between EF ctx saveChanges and Kafka's commit offset
                     // it will try to reconsume the same message that was already saved to db causing duplicate key exception.
                     // In that case ignore.
+                    context.ChangeTracker.Clear();
                 }
                 else
                 {
@@ -51,7 +52,7 @@ namespace BuildingRegistry.Consumer.Address.Projections
                                 message.IsRemoved)
                             , ct);
                     await context.SaveChangesAsync(CancellationToken.None);
-                });
+                }, context);
             });
 
             When<AddressWasProposedV2>(async (context, message, ct) =>
