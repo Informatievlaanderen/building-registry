@@ -1,3 +1,10 @@
+## [3.48.5](https://github.com/informatievlaanderen/building-registry/compare/v3.48.4...v3.48.5) (2022-11-25)
+
+
+### Bug Fixes
+
+* clear dbcontext in address consumer when primary key violation ([7774051](https://github.com/informatievlaanderen/building-registry/commit/7774051e751b28f086ec9337aad65fb219cfe347))
+
 ## [3.48.4](https://github.com/informatievlaanderen/building-registry/compare/v3.48.3...v3.48.4) (2022-11-25)
 
 
