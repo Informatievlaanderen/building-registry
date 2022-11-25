@@ -1,3 +1,11 @@
+## [3.48.4](https://github.com/informatievlaanderen/building-registry/compare/v3.48.3...v3.48.4) (2022-11-25)
+
+
+### Bug Fixes
+
+* catch sql duplicate key exception in address consumer ([2d922d3](https://github.com/informatievlaanderen/building-registry/commit/2d922d3db039afae95d3e4549247bed018723c6b))
+* how we catch dbUpdateException in address consumer ([#817](https://github.com/informatievlaanderen/building-registry/issues/817)) ([a7a88c4](https://github.com/informatievlaanderen/building-registry/commit/a7a88c4b095e83716e1d735ea7be2b5ff1c7008f))
+
 ## [3.48.3](https://github.com/informatievlaanderen/building-registry/compare/v3.48.2...v3.48.3) (2022-11-22)
 
 
