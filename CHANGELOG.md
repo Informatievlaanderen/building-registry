@@ -1,3 +1,10 @@
+## [3.48.6](https://github.com/informatievlaanderen/building-registry/compare/v3.48.5...v3.48.6) (2022-12-03)
+
+
+### Bug Fixes
+
+* change workflow ([d89d966](https://github.com/informatievlaanderen/building-registry/commit/d89d966e3ddbf71e81a567f6dec203cc6da729ec))
+
 ## [3.48.5](https://github.com/informatievlaanderen/building-registry/compare/v3.48.4...v3.48.5) (2022-11-25)
 
 
