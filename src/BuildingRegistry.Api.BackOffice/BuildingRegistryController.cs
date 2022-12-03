@@ -15,7 +15,7 @@ namespace BuildingRegistry.Api.BackOffice
 
     public class BuildingRegistryController : ApiController
     {
-        protected  IMediator Mediator { get; }
+        protected IMediator Mediator { get; }
         protected UseSqsToggle UseSqsToggle { get; }
 
         private readonly TicketingOptions _ticketingOptions;
