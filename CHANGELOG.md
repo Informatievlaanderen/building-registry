@@ -1,3 +1,10 @@
+## [3.48.10](https://github.com/informatievlaanderen/building-registry/compare/v3.48.9...v3.48.10) (2022-12-04)
+
+
+### Bug Fixes
+
+* fix lambda source folder ([7beb80e](https://github.com/informatievlaanderen/building-registry/commit/7beb80e6f36a8b11b9a1963f3ce73fe8b577672b))
+
 ## [3.48.9](https://github.com/informatievlaanderen/building-registry/compare/v3.48.8...v3.48.9) (2022-12-04)
 
 
