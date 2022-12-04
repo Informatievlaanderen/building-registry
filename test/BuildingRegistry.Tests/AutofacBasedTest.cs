@@ -48,7 +48,7 @@ namespace BuildingRegistry.Tests
                 containerBuilder.RegisterType<XUnitLogger>().AsImplementedInterfaces();
                 containerBuilder.RegisterType<FakePersistentLocalIdGenerator>().As<IPersistentLocalIdGenerator>();
 
-                containerBuilder.Register(c => new FakeBackOfficeContextFactory().CreateDbContext(Array.Empty<string>()))
+                containerBuilder.Register(_ => new FakeBackOfficeContextFactory().CreateDbContext(Array.Empty<string>()))
                     .As<BackOfficeContext>()
                     .InstancePerLifetimeScope();
 
