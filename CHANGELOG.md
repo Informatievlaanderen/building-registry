@@ -1,3 +1,10 @@
+## [3.48.11](https://github.com/informatievlaanderen/building-registry/compare/v3.48.10...v3.48.11) (2022-12-04)
+
+
+### Bug Fixes
+
+* remove projections-legacy & projections-extract ([181a56c](https://github.com/informatievlaanderen/building-registry/commit/181a56cc33dbface8945fbf1d2e483d014fdd653))
+
 ## [3.48.10](https://github.com/informatievlaanderen/building-registry/compare/v3.48.9...v3.48.10) (2022-12-04)
 
 
