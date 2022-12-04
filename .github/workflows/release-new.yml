@@ -112,16 +112,12 @@ jobs:
       if: env.RELEASE_VERSION != 'none'
       shell: bash
       run: |
-        echo docker images
-        docker images
         docker image save $BUILD_DOCKER_REGISTRY/building-registry/projector:$SEMVER -o ~/br-projector-image.tar
         docker image save $BUILD_DOCKER_REGISTRY/building-registry/api-legacy:$SEMVER -o ~/br-api-legacy-image.tar
         docker image save $BUILD_DOCKER_REGISTRY/building-registry/api-oslo:$SEMVER -o ~/br-api-oslo-image.tar
         docker image save $BUILD_DOCKER_REGISTRY/building-registry/api-extract:$SEMVER -o ~/br-api-extract-image.tar
         docker image save $BUILD_DOCKER_REGISTRY/building-registry/api-backoffice:$SEMVER -o ~/br-api-backoffice-image.tar
         docker image save $BUILD_DOCKER_REGISTRY/building-registry/api-crab-import:$SEMVER -o ~/br-api-crab-import-image.tar
-        docker image save $BUILD_DOCKER_REGISTRY/building-registry/projections-legacy:$SEMVER -o ~/br-projections-legacy-image.tar
-        docker image save $BUILD_DOCKER_REGISTRY/building-registry/projections-extract:$SEMVER -o ~/br-projections-extract-image.tar
         docker image save $BUILD_DOCKER_REGISTRY/building-registry/projections-syndication:$SEMVER -o ~/br-projections-syndication-image.tar
         docker image save $BUILD_DOCKER_REGISTRY/building-registry/consumer-address:$SEMVER -o ~/br-consumer-address-image.tar
         docker image save $BUILD_DOCKER_REGISTRY/building-registry/migrator-building:$SEMVER -o ~/br-migrator-building-image.tar
