@@ -1,3 +1,10 @@
+## [3.48.9](https://github.com/informatievlaanderen/building-registry/compare/v3.48.8...v3.48.9) (2022-12-04)
+
+
+### Bug Fixes
+
+* remove unused identifier ([8f84446](https://github.com/informatievlaanderen/building-registry/commit/8f844467bc4e429fdd382ea8d980b1321bc58595))
+
 ## [3.48.8](https://github.com/informatievlaanderen/building-registry/compare/v3.48.7...v3.48.8) (2022-12-04)
 
 
