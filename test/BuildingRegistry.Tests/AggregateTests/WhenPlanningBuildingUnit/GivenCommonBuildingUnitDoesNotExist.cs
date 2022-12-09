@@ -41,7 +41,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuildingUnit
                 .Setup(x => x.GenerateNextPersistentLocalId())
                 .Returns(expectedCommonBuildingUnitPersistentLocalId);
 
-            var building = new BuildingFactory(NoSnapshotStrategy.Instance, addCommonBuilding.Object).Create();
+            var building = new BuildingFactory(NoSnapshotStrategy.Instance, addCommonBuilding.Object, Mock.Of<IAddresses>()).Create();
 
             var buildingWasPlannedV2 = Fixture.Create<BuildingWasPlannedV2>();
             var buildingUnitWasPlannedV2 = Fixture.Create<BuildingUnitWasPlannedV2>().WithFunction(BuildingUnitFunction.Unknown);

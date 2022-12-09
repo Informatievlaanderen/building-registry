@@ -21,6 +21,28 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
 
+            modelBuilder.Entity("BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnitAddressRelation", b =>
+                {
+                    b.Property<int>("BuildingUnitPersistentLocalId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("AddressPersistentLocalId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("BuildingPersistentLocalId")
+                        .HasColumnType("int");
+
+                    b.HasKey("BuildingUnitPersistentLocalId", "AddressPersistentLocalId");
+
+                    SqlServerKeyBuilderExtensions.IsClustered(b.HasKey("BuildingUnitPersistentLocalId", "AddressPersistentLocalId"));
+
+                    b.HasIndex("AddressPersistentLocalId");
+
+                    b.HasIndex("BuildingUnitPersistentLocalId");
+
+                    b.ToTable("BuildingUnitAddressRelation", "BuildingRegistryBackOffice");
+                });
+
             modelBuilder.Entity("BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnitBuilding", b =>
                 {
                     b.Property<int>("BuildingUnitPersistentLocalId")

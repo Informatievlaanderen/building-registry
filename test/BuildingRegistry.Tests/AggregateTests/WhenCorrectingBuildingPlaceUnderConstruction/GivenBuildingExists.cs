@@ -108,7 +108,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingPlaceUnder
         [Fact]
         public void StateCheck()
         {
-            var sut = new BuildingFactory(NoSnapshotStrategy.Instance, Mock.Of<IAddCommonBuildingUnit>()).Create();
+            var sut = new BuildingFactory(NoSnapshotStrategy.Instance, Mock.Of<IAddCommonBuildingUnit>(), Mock.Of<IAddresses>()).Create();
             sut.Initialize(new List<object>{ Fixture.Create<BuildingWasPlannedV2>(), Fixture.Create<PlaceBuildingUnderConstruction>()});
             sut.CorrectBuildingPlaceUnderConstruction();
             sut.BuildingStatus.Should().Be(BuildingStatus.Planned);

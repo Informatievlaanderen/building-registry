@@ -170,6 +170,15 @@ namespace BuildingRegistry.Building
                 .Deregulate();
         }
 
+        public void AttachAddressToBuildingUnit(
+            BuildingUnitPersistentLocalId buildingUnitPersistentLocalId,
+            AddressPersistentLocalId addressPersistentLocalId)
+        {
+            _buildingUnits
+                .GetNotRemovedByPersistentLocalId(buildingUnitPersistentLocalId)
+                .AttachAddress(addressPersistentLocalId, _addresses);
+        }
+
         private void GuardBuildingInvalidStatuses(params BuildingStatus[] invalidStatuses)
         {
             if (invalidStatuses.Contains(BuildingStatus))

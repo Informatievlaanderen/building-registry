@@ -4,6 +4,7 @@ namespace BuildingRegistry.Building
     using System.Collections.Generic;
     using System.Linq;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
+    using Datastructures;
     using Events;
     using Exceptions;
 
@@ -289,9 +290,18 @@ namespace BuildingRegistry.Building
                 BuildingUnitPersistentLocalId));
         }
 
+        //TODO: refactor: use valid statusses instead of this
         private void GuardBuildingUnitInvalidStatuses(BuildingUnitStatus[] invalidStatuses)
         {
             if (invalidStatuses.Contains(Status))
+            {
+                throw new BuildingUnitHasInvalidStatusException();
+            }
+        }
+
+        private void GuardValidBuildingUnitStatuses(BuildingUnitStatus[] validStatuses)
+        {
+            if (!validStatuses.Contains(Status))
             {
                 throw new BuildingUnitHasInvalidStatusException();
             }
@@ -318,6 +328,39 @@ namespace BuildingRegistry.Building
             }
 
             Apply(new BuildingUnitWasRemovedV2(_buildingPersistentLocalId, BuildingUnitPersistentLocalId));
+        }
+
+        public void AttachAddress(AddressPersistentLocalId addressPersistentLocalId, IAddresses addresses)
+        {
+            GuardRemoved();
+
+            GuardValidBuildingUnitStatuses(new []{BuildingUnitStatus.Planned, BuildingUnitStatus.Realized});
+           
+            if (AddressPersistentLocalIds.Contains(addressPersistentLocalId))
+            {
+                return;
+            }
+
+            var address = addresses.GetOptional(addressPersistentLocalId);
+
+            if (address is null)
+            {
+                throw new AddressNotFoundException();
+            }
+
+            if (address.Value.IsRemoved)
+            {
+                throw new AddressIsRemovedException();
+            }
+
+            var validStatuses = new[] { AddressStatus.Current, AddressStatus.Proposed };
+
+            if (!validStatuses.Contains(address.Value.Status))
+            {
+                throw new AddressHasInvalidStatusException();
+            }
+
+            Apply(new BuildingUnitAddressWasAttachedV2(_buildingPersistentLocalId, BuildingUnitPersistentLocalId, addressPersistentLocalId));
         }
 
         public void RestoreSnapshot(

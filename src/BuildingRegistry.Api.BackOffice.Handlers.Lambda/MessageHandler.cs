@@ -142,6 +142,11 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda
                         new RegularizeBuildingUnitLambdaRequest(messageMetadata.MessageGroupId!, request),
                         cancellationToken);
                     break;
+                case AttachAddressToBuildingUnitSqsRequest request:
+                    await mediator.Send(
+                        new AttachAddressToBuildingUnitLambdaRequest(messageMetadata.MessageGroupId!, request),
+                        cancellationToken);
+                    break;
 
                 default:
                     throw new NotImplementedException(

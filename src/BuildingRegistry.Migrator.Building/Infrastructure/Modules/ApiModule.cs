@@ -44,7 +44,7 @@ namespace BuildingRegistry.Migrator.Building.Infrastructure.Modules
                 .RegisterModule(new DataDogModule(_configuration))
                 .RegisterModule<EnvelopeModule>()
                 .RegisterModule(new EditModule(_configuration, _services, _loggerFactory))
-                .RegisterModule(new ConsumerModule(_configuration, _services, _loggerFactory));
+                .RegisterModule(new ConsumerAddressModule(_configuration, _services, _loggerFactory));
 
             builder.RegisterEventstreamModule(_configuration);
             builder.RegisterSnapshotModule(_configuration);

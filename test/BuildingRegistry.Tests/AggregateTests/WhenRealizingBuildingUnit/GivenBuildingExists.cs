@@ -230,7 +230,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRealizingBuildingUnit
         [Fact]
         public void StateCheck_WithoutDeviation()
         {
-            var building = new BuildingFactory(NoSnapshotStrategy.Instance, Mock.Of<IAddCommonBuildingUnit>()).Create();
+            var building = new BuildingFactory(NoSnapshotStrategy.Instance, Mock.Of<IAddCommonBuildingUnit>(), Mock.Of<IAddresses>()).Create();
 
             var buildingWasPlanned = Fixture.Create<BuildingWasPlannedV2>();
             ((ISetProvenance)buildingWasPlanned).SetProvenance(Fixture.Create<Provenance>());
@@ -260,7 +260,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRealizingBuildingUnit
         [Fact]
         public void StateCheck_WithDeviation()
         {
-            var building = new BuildingFactory(NoSnapshotStrategy.Instance, Mock.Of<IAddCommonBuildingUnit>()).Create();
+            var building = new BuildingFactory(NoSnapshotStrategy.Instance, Mock.Of<IAddCommonBuildingUnit>(), Mock.Of<IAddresses>()).Create();
 
             var buildingWasPlanned = Fixture.Create<BuildingWasPlannedV2>();
             ((ISetProvenance)buildingWasPlanned).SetProvenance(Fixture.Create<Provenance>());

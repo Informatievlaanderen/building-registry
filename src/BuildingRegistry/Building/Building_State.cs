@@ -8,6 +8,7 @@ namespace BuildingRegistry.Building
 
     public partial class Building
     {
+        private readonly IAddresses _addresses;
         private readonly IAddCommonBuildingUnit _addCommonBuildingUnit;
         private IBuildingEvent? _lastEvent;
 
@@ -29,11 +30,13 @@ namespace BuildingRegistry.Building
 
         internal Building(
             ISnapshotStrategy snapshotStrategy,
-            IAddCommonBuildingUnit addCommonBuildingUnit)
+            IAddCommonBuildingUnit addCommonBuildingUnit,
+            IAddresses addresses)
             : this()
         {
             Strategy = snapshotStrategy;
             _addCommonBuildingUnit = addCommonBuildingUnit;
+            _addresses = addresses;
         }
 
         private Building()
@@ -64,6 +67,7 @@ namespace BuildingRegistry.Building
             Register<BuildingUnitWasRegularized>(When);
             Register<BuildingUnitWasDeregulated>(When);
             Register<CommonBuildingUnitWasAddedV2>(When);
+            Register<BuildingUnitAddressWasAttachedV2>(When);
 
             Register<BuildingSnapshot>(When);
         }
@@ -278,6 +282,13 @@ namespace BuildingRegistry.Building
         }
 
         private void When(BuildingUnitWasDeregulated @event)
+        {
+            var buildingUnit = _buildingUnits
+                .GetByPersistentLocalId(new BuildingUnitPersistentLocalId(@event.BuildingUnitPersistentLocalId));
+            buildingUnit.Route(@event);
+        }
+
+        private void When(BuildingUnitAddressWasAttachedV2 @event)
         {
             var buildingUnit = _buildingUnits
                 .GetByPersistentLocalId(new BuildingUnitPersistentLocalId(@event.BuildingUnitPersistentLocalId));

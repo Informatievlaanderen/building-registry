@@ -67,7 +67,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenRetiringBuildingUnit
 
             Fixture.Register(() => buildingUnitPersistentLocalId);
 
-            var building = new BuildingFactory(NoSnapshotStrategy.Instance, Mock.Of<IAddCommonBuildingUnit>()).Create();
+            var building = new BuildingFactory(NoSnapshotStrategy.Instance, Mock.Of<IAddCommonBuildingUnit>(), Mock.Of<IAddresses>()).Create();
             var ifMatchHeader = "IncorrectIfMatchHeader";
 
             building.Initialize(new object[]

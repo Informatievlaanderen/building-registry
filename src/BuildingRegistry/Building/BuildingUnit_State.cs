@@ -49,6 +49,7 @@ namespace BuildingRegistry.Building
             Register<BuildingUnitWasRegularized>(When);
             Register<BuildingUnitWasDeregulated>(When);
             Register<CommonBuildingUnitWasAddedV2>(When);
+            Register<BuildingUnitAddressWasAttachedV2>(When);
         }
 
         private void When(BuildingWasMigrated @event)
@@ -204,6 +205,13 @@ namespace BuildingRegistry.Building
                 BuildingUnitPositionGeometryMethod.Parse(@event.GeometryMethod));
 
             HasDeviation = @event.HasDeviation;
+
+            _lastEvent = @event;
+        }
+
+        private void When(BuildingUnitAddressWasAttachedV2 @event)
+        {
+            _addressPersistentLocalIds.Add(new AddressPersistentLocalId(@event.AddressPersistentLocalId));
 
             _lastEvent = @event;
         }
