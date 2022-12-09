@@ -45,7 +45,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenMigratingBuilding
 
             // Act
             var result = Building.MigrateBuilding(
-                new BuildingFactory(NoSnapshotStrategy.Instance, Mock.Of<IAddCommonBuildingUnit>()),
+                new BuildingFactory(NoSnapshotStrategy.Instance, Mock.Of<IAddCommonBuildingUnit>(), Mock.Of<IAddresses>()),
                 command.BuildingId,
                 command.BuildingPersistentLocalId,
                 command.BuildingPersistentLocalIdAssignmentDate,

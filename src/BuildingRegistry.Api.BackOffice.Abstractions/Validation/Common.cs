@@ -16,6 +16,14 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.Validation
                     public static TicketError ToTicketError() => new(Message, Code);
                 }
             }
+
+            public static class AdresIdInvalid
+            {
+                public const string Code = "AdresOngeldig";
+                public const string Message = "Ongeldig AdresId.";
+
+                public static TicketError ToTicketError() => new(Message, Code);
+            }
         }
     }
 }

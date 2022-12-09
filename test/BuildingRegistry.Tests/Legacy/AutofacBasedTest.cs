@@ -90,7 +90,7 @@ namespace BuildingRegistry.Tests.Legacy
                 .As<IAddCommonBuildingUnit>();
 
             containerBuilder
-                .Register(c => new BuildingFactory(NoSnapshotStrategy.Instance, c.Resolve<IAddCommonBuildingUnit>()))
+                .Register(c => new BuildingFactory(NoSnapshotStrategy.Instance, c.Resolve<IAddCommonBuildingUnit>(), Mock.Of<IAddresses>()))
                 .As<IBuildingFactory>();
 
             _container = containerBuilder.Build();

@@ -245,7 +245,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitRetire
             ((ISetProvenance)eventToTest).SetProvenance(Fixture.Create<Provenance>());
 
             // Act
-            var building = new BuildingFactory(NoSnapshotStrategy.Instance, Mock.Of<IAddCommonBuildingUnit>()).Create();
+            var building = new BuildingFactory(NoSnapshotStrategy.Instance, Mock.Of<IAddCommonBuildingUnit>(), Mock.Of<IAddresses>()).Create();
             building.Initialize(new object[]
             {
                 migrateScenario, eventToTest

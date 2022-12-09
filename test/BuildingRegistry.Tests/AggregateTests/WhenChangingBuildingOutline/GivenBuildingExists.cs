@@ -312,7 +312,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenChangingBuildingOutline
                     positionGeometryMethod: BuildingUnitPositionGeometryMethod.DerivedFromObject)
                 .Build();
 
-            var sut = new BuildingFactory(NoSnapshotStrategy.Instance, Mock.Of<IAddCommonBuildingUnit>()).Create();
+            var sut = new BuildingFactory(NoSnapshotStrategy.Instance, Mock.Of<IAddCommonBuildingUnit>(), Mock.Of<IAddresses>()).Create();
             sut.Initialize(new List<object> { buildingWasMigrated });
 
             // Act

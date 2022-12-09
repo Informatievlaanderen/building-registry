@@ -277,7 +277,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRemovingBuildingUnit
         [Fact]
         public void StateCheck()
         {
-            var building = new BuildingFactory(NoSnapshotStrategy.Instance, Mock.Of<IAddCommonBuildingUnit>()).Create();
+            var building = new BuildingFactory(NoSnapshotStrategy.Instance, Mock.Of<IAddCommonBuildingUnit>(), Mock.Of<IAddresses>()).Create();
 
             var buildingWasPlanned = Fixture.Create<BuildingWasPlannedV2>();
             ((ISetProvenance)buildingWasPlanned).SetProvenance(Fixture.Create<Provenance>());

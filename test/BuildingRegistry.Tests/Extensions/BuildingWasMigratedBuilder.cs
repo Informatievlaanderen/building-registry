@@ -74,6 +74,7 @@ namespace BuildingRegistry.Tests.Extensions
             BuildingUnitFunction? function = null,
             BuildingUnitPositionGeometryMethod? positionGeometryMethod = null,
             ExtendedWkbGeometry? extendedWkbGeometry = null,
+            List<AddressPersistentLocalId>? attachedAddress = null,
             bool isRemoved = false)
         {
             var buildingGeometry = _buildingGeometry is not null
@@ -100,7 +101,7 @@ namespace BuildingRegistry.Tests.Extensions
                             : _fixture.Create<PersistentLocalId>(),
                         function ?? BuildingUnitFunction.Unknown,
                         status,
-                        new List<AddressPersistentLocalId>(),
+                        attachedAddress ?? new List<AddressPersistentLocalId>(),
                             buildingUnitPosition,
                         buildingGeometry,
                         isRemoved));

@@ -3,6 +3,7 @@ namespace BuildingRegistry.Consumer.Address
     using System;
     using Autofac;
     using Be.Vlaanderen.Basisregisters.DataDog.Tracing.Sql.EntityFrameworkCore;
+    using BuildingRegistry.Building;
     using BuildingRegistry.Infrastructure;
     using Microsoft.Data.SqlClient;
     using Microsoft.EntityFrameworkCore;
@@ -10,15 +11,15 @@ namespace BuildingRegistry.Consumer.Address
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Logging;
 
-    public class ConsumerModule : Module
+    public class ConsumerAddressModule : Module
     {
-        public ConsumerModule(
+        public ConsumerAddressModule(
             IConfiguration configuration,
             IServiceCollection services,
             ILoggerFactory loggerFactory,
             ServiceLifetime serviceLifetime = ServiceLifetime.Scoped)
         {
-            var logger = loggerFactory.CreateLogger<ConsumerModule>();
+            var logger = loggerFactory.CreateLogger<ConsumerAddressModule>();
             var connectionString = configuration.GetConnectionString("ConsumerAddress");
 
             var hasConnectionString = !string.IsNullOrWhiteSpace(connectionString);
@@ -30,6 +31,8 @@ namespace BuildingRegistry.Consumer.Address
             {
                 RunInMemoryDb(services, loggerFactory, logger);
             }
+
+            services.AddScoped<IAddresses, ConsumerAddressContext>();
         }
 
         private static void RunOnSqlServer(

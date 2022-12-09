@@ -13,6 +13,7 @@ namespace BuildingRegistry.Api.BackOffice.Infrastructure.Modules
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Logging;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Autofac;
+    using Consumer.Address;
     using Handlers.Sqs;
 
     public class ApiModule : Module
@@ -66,6 +67,7 @@ namespace BuildingRegistry.Api.BackOffice.Infrastructure.Modules
             builder.RegisterModule(new EditModule(_configuration, _services, _loggerFactory));
             builder.RegisterModule(new SqsHandlersModule(_configuration[SqsQueueUrlConfigKey]));
             builder.RegisterModule(new TicketingModule(_configuration, _services));
+            builder.RegisterModule(new ConsumerAddressModule(_configuration, _services, _loggerFactory));
 
             builder.Populate(_services);
         }

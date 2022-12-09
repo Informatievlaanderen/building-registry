@@ -4,6 +4,7 @@ namespace BuildingRegistry.Tests
     using System.Collections.Generic;
     using Autofac;
     using AutoFixture;
+    using BackOffice;
     using Be.Vlaanderen.Basisregisters.AggregateSource.Snapshotting;
     using Be.Vlaanderen.Basisregisters.AggregateSource.SqlStreamStore.Autofac;
     using Be.Vlaanderen.Basisregisters.CommandHandling;
@@ -101,7 +102,13 @@ namespace BuildingRegistry.Tests
             builder.RegisterModule(new SqlSnapshotStoreModule());
 
             builder
-                .Register(c => new BuildingFactory(Fixture.Create<ISnapshotStrategy>(), c.Resolve<IAddCommonBuildingUnit>()))
+                .Register(c => new FakeConsumerAddressContextFactory().CreateDbContext())
+                .InstancePerLifetimeScope()
+                .As<IAddresses>()
+                .AsSelf();
+
+            builder
+                .Register(c => new BuildingFactory(Fixture.Create<ISnapshotStrategy>(), c.Resolve<IAddCommonBuildingUnit>(), c.Resolve<IAddresses>()))
                 .As<IBuildingFactory>();
         }
 

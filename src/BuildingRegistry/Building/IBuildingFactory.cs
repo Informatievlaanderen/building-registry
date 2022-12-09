@@ -11,16 +11,18 @@ namespace BuildingRegistry.Building
     {
         private readonly ISnapshotStrategy _snapshotStrategy;
         private readonly IAddCommonBuildingUnit _addCommonBuildingUnit;
+        private readonly IAddresses _addresses;
 
-        public BuildingFactory(ISnapshotStrategy snapshotStrategy, IAddCommonBuildingUnit addCommonBuildingUnit)
+        public BuildingFactory(ISnapshotStrategy snapshotStrategy, IAddCommonBuildingUnit addCommonBuildingUnit, IAddresses addresses)
         {
             _snapshotStrategy = snapshotStrategy;
             _addCommonBuildingUnit = addCommonBuildingUnit;
+            _addresses = addresses;
         }
 
         public Building Create()
         {
-            return new Building(_snapshotStrategy, _addCommonBuildingUnit);
+            return new Building(_snapshotStrategy, _addCommonBuildingUnit, _addresses);
         }
     }
 }

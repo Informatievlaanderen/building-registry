@@ -72,7 +72,7 @@ namespace BuildingRegistry.Tests.AggregateTests.SnapshotTests
 
             Fixture.Customize(new WithValidExtendedWkbPolygon());
 
-            _sut = new BuildingFactory(IntervalStrategy.Default, Mock.Of<IAddCommonBuildingUnit>()).Create();
+            _sut = new BuildingFactory(IntervalStrategy.Default, Mock.Of<IAddCommonBuildingUnit>(), Mock.Of<IAddresses>()).Create();
             _buildingSnapshot = Fixture.Create<BuildingSnapshot>();
             _sut.Initialize(new List<object> { _buildingSnapshot });
         }

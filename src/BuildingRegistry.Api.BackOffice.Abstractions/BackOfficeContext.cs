@@ -15,6 +15,7 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions
             : base(options) { }
 
         public DbSet<BuildingUnitBuilding> BuildingUnitBuildings { get; set; }
+        public DbSet<BuildingUnitAddressRelation> BuildingUnitAddressRelation { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -31,6 +32,28 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions
 
             modelBuilder.Entity<BuildingUnitBuilding>()
                 .Property(x => x.BuildingPersistentLocalId);
+
+
+            modelBuilder.Entity<BuildingUnitAddressRelation>()
+                .ToTable("BuildingUnitAddressRelation", Schema.BackOffice)
+                .HasKey(x => new { x.BuildingUnitPersistentLocalId, x.AddressPersistentLocalId })
+                .IsClustered();
+
+            modelBuilder.Entity<BuildingUnitAddressRelation>()
+                .Property(x => x.BuildingPersistentLocalId)
+                .ValueGeneratedNever();
+
+            modelBuilder.Entity<BuildingUnitAddressRelation>()
+                .HasIndex(x => x.BuildingUnitPersistentLocalId);
+            modelBuilder.Entity<BuildingUnitAddressRelation>()
+                .Property(x => x.BuildingUnitPersistentLocalId)
+                .ValueGeneratedNever();
+
+            modelBuilder.Entity<BuildingUnitAddressRelation>()
+                .HasIndex(x => x.AddressPersistentLocalId);
+            modelBuilder.Entity<BuildingUnitAddressRelation>()
+                .Property(x => x.AddressPersistentLocalId)
+                .ValueGeneratedNever();
         }
     }
 
@@ -47,6 +70,23 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions
         {
             BuildingUnitPersistentLocalId = buildingUnitPersistentLocalId;
             BuildingPersistentLocalId = buildingPersistentLocalId;
+        }
+    }
+
+    public class BuildingUnitAddressRelation
+    {
+        public int BuildingPersistentLocalId { get; set; }
+        public int BuildingUnitPersistentLocalId { get; set; }
+        public int AddressPersistentLocalId { get; set; }
+
+        private BuildingUnitAddressRelation()
+        { }
+
+        public BuildingUnitAddressRelation(int buildingPersistentLocalId,int buildingUnitPersistentLocal, int addressPersistentLocalId)
+        {
+            BuildingPersistentLocalId = buildingPersistentLocalId;
+            BuildingUnitPersistentLocalId = buildingUnitPersistentLocal;
+            AddressPersistentLocalId = addressPersistentLocalId;
         }
     }
 
