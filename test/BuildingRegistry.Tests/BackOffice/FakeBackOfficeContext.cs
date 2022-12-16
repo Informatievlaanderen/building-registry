@@ -31,6 +31,12 @@ namespace BuildingRegistry.Tests.BackOffice
 
             base.OnConfiguring(optionsBuilder);
         }
+
+        public override ValueTask DisposeAsync()
+        {
+            // Prevent object from being disposed for asserting the context.
+            return ValueTask.CompletedTask;
+        }
     }
 
     public class FakeBackOfficeContextFactory : IDesignTimeDbContextFactory<FakeBackOfficeContext>

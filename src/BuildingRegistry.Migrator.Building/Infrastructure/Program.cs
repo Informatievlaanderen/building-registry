@@ -8,7 +8,9 @@ namespace BuildingRegistry.Migrator.Building.Infrastructure
     using Autofac;
     using Autofac.Extensions.DependencyInjection;
     using Be.Vlaanderen.Basisregisters.Aws.DistributedMutex;
+    using Be.Vlaanderen.Basisregisters.Projector.ConnectedProjections;
     using Be.Vlaanderen.Basisregisters.Projector.Modules;
+    using BuildingRegistry.Migrator.Building.Projections;
     using Microsoft.Data.SqlClient;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
@@ -54,6 +56,11 @@ namespace BuildingRegistry.Migrator.Building.Infrastructure
 
             try
             {
+                await MigrationsHelper.RunAsync(
+                    configuration["ConnectionStrings:Events"],
+                    container.GetRequiredService<ILoggerFactory>(),
+                    ct);
+
                 var watch = Stopwatch.StartNew();
 
                 var migrator = new StreamMigrator(
@@ -74,6 +81,13 @@ namespace BuildingRegistry.Migrator.Building.Infrastructure
                                 .ExecuteAsync(async () =>
                                 {
                                     await migrator.ProcessAsync(ct);
+
+                                    var projectorRunner = new ProjectorRunner(
+                                        container.GetRequiredService<IConnectedProjectionsManager>(),
+                                        container.GetRequiredService<ILoggerFactory>());
+                                    Log.Information("The projection consumer was started");
+                                    await projectorRunner.StartAsync(ct);
+
                                 });
 
                             watch.Stop();

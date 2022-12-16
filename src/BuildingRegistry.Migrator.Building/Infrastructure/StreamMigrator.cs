@@ -245,7 +245,6 @@ namespace BuildingRegistry.Migrator.Building.Infrastructure
                         new BuildingUnitBuilding(
                             buildingUnit.BuildingUnitPersistentLocalId,
                             migrateBuilding.BuildingPersistentLocalId), ct);
-                //TODO: add relation address buildingUnit
             }
             await backOfficeContext.SaveChangesAsync(ct);
         }
