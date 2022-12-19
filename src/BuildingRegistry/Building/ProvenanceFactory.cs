@@ -7,7 +7,7 @@ namespace BuildingRegistry.Building
     public class ProvenanceFactory<TAggregateRoot> : IProvenanceFactory<TAggregateRoot>
         where TAggregateRoot : IAggregateRootEntity
     {
-        public bool CanCreateFrom<TCommand>() => typeof(IHasProvenance).IsAssignableFrom(typeof(TCommand));
+        public bool CanCreateFrom<TCommand>() => typeof(IHasCommandProvenance).IsAssignableFrom(typeof(TCommand));
         public Provenance CreateFrom(object provenanceHolder, TAggregateRoot aggregate)
         {
             if (provenanceHolder is not IHasCommandProvenance provenance)
