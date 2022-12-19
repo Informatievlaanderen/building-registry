@@ -179,6 +179,15 @@ namespace BuildingRegistry.Building
                 .AttachAddress(addressPersistentLocalId, _addresses);
         }
 
+        public void DetachAddressFromBuildingUnit(
+            BuildingUnitPersistentLocalId buildingUnitPersistentLocalId,
+            AddressPersistentLocalId addressPersistentLocalId)
+        {
+            _buildingUnits
+                .GetNotRemovedByPersistentLocalId(buildingUnitPersistentLocalId)
+                .DetachAddress(addressPersistentLocalId, _addresses);
+        }
+
         private void GuardBuildingInvalidStatuses(params BuildingStatus[] invalidStatuses)
         {
             if (invalidStatuses.Contains(BuildingStatus))

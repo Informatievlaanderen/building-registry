@@ -96,6 +96,18 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda
                 Fixture.Create<Provenance>()));
         }
 
+        protected void AttachBuildingUnit(
+            BuildingPersistentLocalId buildingPersistentLocalId,
+            BuildingUnitPersistentLocalId buildingUnitPersistentLocalId,
+            AddressPersistentLocalId addressPersistentLocalId)
+        {
+            DispatchArrangeCommand(new AttachAddressToBuildingUnit(
+                buildingPersistentLocalId,
+                buildingUnitPersistentLocalId,
+                addressPersistentLocalId,
+                Fixture.Create<Provenance>()));
+        }
+
         protected Mock<ITicketing> MockTicketing(Action<ETagResponse> ticketingCompleteCallback)
         {
             var ticketing = new Mock<ITicketing>();

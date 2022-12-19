@@ -2,24 +2,24 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.BuildingUnit
 {
     using System.Threading;
     using System.Threading.Tasks;
-    using Abstractions.Validation;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
     using Be.Vlaanderen.Basisregisters.Sqs.Exceptions;
     using Be.Vlaanderen.Basisregisters.Sqs.Lambda.Handlers;
     using Be.Vlaanderen.Basisregisters.Sqs.Lambda.Infrastructure;
     using Be.Vlaanderen.Basisregisters.Sqs.Responses;
-    using BuildingRegistry.Api.BackOffice.Abstractions;
+    using Abstractions;
+    using Abstractions.Validation;
     using BuildingRegistry.Building;
     using BuildingRegistry.Building.Exceptions;
     using Microsoft.Extensions.Configuration;
     using Requests.BuildingUnit;
     using TicketingService.Abstractions;
 
-    public sealed class AttachAddressToBuildingUnitLambdaHandler : BuildingUnitLambdaHandler<AttachAddressToBuildingUnitLambdaRequest>
+    public sealed class DetachAddressFromBuildingUnitLambdaHandler : BuildingUnitLambdaHandler<DetachAddressFromBuildingUnitLambdaRequest>
     {
         private readonly BackOfficeContext _backOfficeContext;
 
-        public AttachAddressToBuildingUnitLambdaHandler(
+        public DetachAddressFromBuildingUnitLambdaHandler(
             IConfiguration configuration,
             ICustomRetryPolicy retryPolicy,
             ITicketing ticketing,
@@ -36,7 +36,8 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.BuildingUnit
             _backOfficeContext = backOfficeContext;
         }
 
-        protected override async Task<ETagResponse> InnerHandle(AttachAddressToBuildingUnitLambdaRequest request, CancellationToken cancellationToken)
+        protected override async Task<ETagResponse> InnerHandle(DetachAddressFromBuildingUnitLambdaRequest request,
+            CancellationToken cancellationToken)
         {
             var cmd = request.ToCommand();
 
@@ -47,14 +48,14 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.BuildingUnit
                     cmd,
                     request.Metadata,
                     cancellationToken);
-
-                await _backOfficeContext.AddIdempotentBuildingUnitAddressRelation(
-                    cmd.BuildingPersistentLocalId, cmd.BuildingUnitPersistentLocalId, cmd.AddressPersistentLocalId, cancellationToken);
             }
             catch (IdempotencyException)
             {
                 // Idempotent: Do Nothing return last etag
             }
+
+            await _backOfficeContext.RemoveIdempotentParcelAddressRelation(cmd.BuildingUnitPersistentLocalId,
+                cmd.AddressPersistentLocalId, cancellationToken);
 
             var lastHash = await GetHash(
                 request.BuildingPersistentLocalId,
@@ -64,21 +65,16 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.BuildingUnit
             return new ETagResponse(string.Format(DetailUrlFormat, request.BuildingUnitPersistentLocalId), lastHash);
         }
 
-        protected override TicketError? InnerMapDomainException(DomainException exception, AttachAddressToBuildingUnitLambdaRequest request)
+        protected override TicketError? InnerMapDomainException(DomainException exception,
+            DetachAddressFromBuildingUnitLambdaRequest request)
         {
             return exception switch
             {
-                BuildingUnitHasInvalidStatusException =>
-                        ValidationErrors.AttachAddressToBuildingUnit.BuildingUnitInvalidStatus.ToTicketError(),
-
                 AddressNotFoundException =>
                     ValidationErrors.Common.AdresIdInvalid.ToTicketError(),
 
                 AddressIsRemovedException =>
                     ValidationErrors.Common.AdresIdInvalid.ToTicketError(),
-
-                AddressHasInvalidStatusException =>
-                    ValidationErrors.AttachAddressToBuildingUnit.AddressInvalidStatus.ToTicketError(),
 
                 _ => null
             };

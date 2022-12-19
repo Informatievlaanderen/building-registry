@@ -103,7 +103,7 @@ namespace BuildingRegistry.Tests
 
             builder
                 .Register(c => new FakeConsumerAddressContextFactory().CreateDbContext())
-                .InstancePerLifetimeScope()
+                .SingleInstance()
                 .As<IAddresses>()
                 .AsSelf();
 

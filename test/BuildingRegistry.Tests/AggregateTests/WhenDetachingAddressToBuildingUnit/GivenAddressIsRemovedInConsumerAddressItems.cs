@@ -1,12 +1,13 @@
-namespace BuildingRegistry.Tests.AggregateTests.WhenAttachingAddressToBuildingUnit
+namespace BuildingRegistry.Tests.AggregateTests.WhenDetachingAddressToBuildingUnit
 {
+    using System.Collections.Generic;
     using Autofac;
     using AutoFixture;
     using Be.Vlaanderen.Basisregisters.AggregateSource.Testing;
     using Building;
     using Building.Commands;
     using Building.Exceptions;
-    using BuildingRegistry.Tests.BackOffice;
+    using BackOffice;
     using Extensions;
     using Xunit;
     using Xunit.Abstractions;
@@ -19,7 +20,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenAttachingAddressToBuildingUn
         [Fact]
         public void ThenThrowsAddressIsRemovedException()
         {
-            var command = Fixture.Create<AttachAddressToBuildingUnit>();
+            var command = Fixture.Create<DetachAddressFromBuildingUnit>();
 
             var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
                 .WithBuildingPersistentLocalId(command.BuildingPersistentLocalId)
@@ -29,7 +30,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenAttachingAddressToBuildingUn
                     null,
                     null,
                     null,
-                    null,
+                    new List<AddressPersistentLocalId>(){command.AddressPersistentLocalId},
                     isRemoved: false)
                 .Build();
 
