@@ -33,5 +33,15 @@ where
 order by
     IdInternal", commandTimeout: 60);
         }
+
+        public async Task<long> GetStartingMigrationPosition()
+        {
+            var query = $@"SELECT min(position)-1
+                            FROM [{Schema.Default}].[Streams]
+                            WHERE IdOriginal like 'building%'";
+
+            await using var conn = new SqlConnection(_connectionString);
+            return await conn.ExecuteScalarAsync<long>(query);
+        }
     }
 }

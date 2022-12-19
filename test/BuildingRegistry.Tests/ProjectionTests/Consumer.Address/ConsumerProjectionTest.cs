@@ -8,22 +8,22 @@ namespace BuildingRegistry.Tests.ProjectionTests.Consumer.Address
     using Xunit.Abstractions;
 
     public abstract class ConsumerProjectionTest<TProjection>  : BuildingRegistryTest
-        where TProjection : ConnectedProjection<MigratorConsumerContext>
+        where TProjection : ConnectedProjection<MigratorProjectionContext>
     {
-        protected ConnectedProjectionTest<MigratorConsumerContext, TProjection> Sut { get; }
+        protected ConnectedProjectionTest<MigratorProjectionContext, TProjection> Sut { get; }
 
         public ConsumerProjectionTest(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
         {
-            Sut = new ConnectedProjectionTest<MigratorConsumerContext, TProjection>(CreateContext, CreateProjection);
+            Sut = new ConnectedProjectionTest<MigratorProjectionContext, TProjection>(CreateContext, CreateProjection);
         }
 
-        protected virtual MigratorConsumerContext CreateContext()
+        protected virtual MigratorProjectionContext CreateContext()
         {
-            var options = new DbContextOptionsBuilder<MigratorConsumerContext>()
+            var options = new DbContextOptionsBuilder<MigratorProjectionContext>()
                 .UseInMemoryDatabase(Guid.NewGuid().ToString())
                 .Options;
 
-            return new MigratorConsumerContext(options);
+            return new MigratorProjectionContext(options);
         }
 
         protected abstract TProjection CreateProjection();

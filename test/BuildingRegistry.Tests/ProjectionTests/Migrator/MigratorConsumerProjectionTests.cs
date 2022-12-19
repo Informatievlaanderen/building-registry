@@ -20,7 +20,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Migrator
     using Xunit.Abstractions;
     using BuildingUnitStatus = BuildingRegistry.Legacy.BuildingUnitStatus;
 
-    public class MigratorConsumerProjectionTests : ConsumerProjectionTest<MigratorConsumerProjection>
+    public class MigratorConsumerProjectionTests : ConsumerProjectionTest<MigratorProjection>
     {
         private readonly Fixture _fixture;
         private readonly ILogger _logger;
@@ -89,14 +89,14 @@ namespace BuildingRegistry.Tests.ProjectionTests.Migrator
                 });
         }
 
-        protected override MigratorConsumerProjection CreateProjection()
+        protected override MigratorProjection CreateProjection()
         {
             var mockDbFactory = new Mock<IDbContextFactory<BackOfficeContext>>();
                 mockDbFactory
                     .Setup(x => x.CreateDbContextAsync(CancellationToken.None))
                     .Returns(Task.FromResult<BackOfficeContext>(_fakeBackOfficeContext));
 
-            return new MigratorConsumerProjection(_logger, mockDbFactory.Object);
+            return new MigratorProjection(_logger, mockDbFactory.Object);
         }
 
         protected override void ConfigureCommandHandling(ContainerBuilder builder)

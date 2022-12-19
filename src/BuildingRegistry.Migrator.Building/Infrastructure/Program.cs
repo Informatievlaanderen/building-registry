@@ -57,7 +57,7 @@ namespace BuildingRegistry.Migrator.Building.Infrastructure
             try
             {
                 await MigrationsHelper.RunAsync(
-                    configuration["ConnectionStrings:Events"],
+                    configuration.GetConnectionString("events"),
                     container.GetRequiredService<ILoggerFactory>(),
                     ct);
 
@@ -82,11 +82,16 @@ namespace BuildingRegistry.Migrator.Building.Infrastructure
                                 {
                                     await migrator.ProcessAsync(ct);
 
+                                    var sqlStreamTable = new SqlStreamsTable(configuration.GetConnectionString("events"));
+                                    var startingMigrationPosition = await sqlStreamTable.GetStartingMigrationPosition();
+
                                     var projectorRunner = new ProjectorRunner(
                                         container.GetRequiredService<IConnectedProjectionsManager>(),
-                                        container.GetRequiredService<ILoggerFactory>());
+                                        container.GetRequiredService<ILoggerFactory>(),
+                                        configuration.GetConnectionString("events")
+                                        );
                                     Log.Information("The projection consumer was started");
-                                    await projectorRunner.StartAsync(ct);
+                                    await projectorRunner.StartAsync(startingMigrationPosition, ct);
 
                                 });
 

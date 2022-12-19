@@ -8,9 +8,9 @@ namespace BuildingRegistry.Migrator.Building.Projections
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Logging;
 
-    public class MigratorConsumerProjection : ConnectedProjection<MigratorConsumerContext>
+    public class MigratorProjection : ConnectedProjection<MigratorProjectionContext>
     {
-        public MigratorConsumerProjection(ILogger logger, IDbContextFactory<BackOfficeContext> backOfficeContextFactory)
+        public MigratorProjection(ILogger logger, IDbContextFactory<BackOfficeContext> backOfficeContextFactory)
         {
             When<Envelope<BuildingWasMigrated>>(async (_, message, ct) =>
             {

@@ -41,18 +41,18 @@ namespace BuildingRegistry.Migrator.Building.Projections
 
         private static async Task RunInternal(string connectionString, ILoggerFactory loggerFactory, CancellationToken cancellationToken)
         {
-            var migratorOptions = new DbContextOptionsBuilder<MigratorConsumerContext>()
+            var migratorOptions = new DbContextOptionsBuilder<MigratorProjectionContext>()
                 .UseSqlServer(
                     connectionString,
                     sqlServerOptions =>
                     {
                         sqlServerOptions.EnableRetryOnFailure();
-                        sqlServerOptions.MigrationsHistoryTable(MigrationTables.MigratorConsumer, Schema.MigrateBuilding);
+                        sqlServerOptions.MigrationsHistoryTable(MigrationTables.MigratorProjection, Schema.MigrateBuilding);
                     });
 
             migratorOptions = migratorOptions.UseLoggerFactory(loggerFactory);
 
-            await using var migrator = new MigratorConsumerContext(migratorOptions.Options);
+            await using var migrator = new MigratorProjectionContext(migratorOptions.Options);
             await migrator.Database.MigrateAsync(cancellationToken);
         }
     }

@@ -49,16 +49,16 @@ namespace BuildingRegistry.Migrator.Building.Infrastructure.Modules
                 .RegisterModule<EnvelopeModule>()
                 .RegisterModule(new EditModule(_configuration, _services, _loggerFactory))
                 .RegisterModule(new ConsumerAddressModule(_configuration, _services, _loggerFactory))
-                .RegisterModule(new MigratorConsumerModule(_configuration, _services, _loggerFactory));
+                .RegisterModule(new MigratorProjectionModule(_configuration, _services, _loggerFactory));
 
             builder.RegisterModule(new ProjectorModule(_configuration));
 
             builder
-                .RegisterProjectionMigrator<MigratorConsumerContextFactory>(
+                .RegisterProjectionMigrator<MigratorProjectionContextFactory>(
                     _configuration,
                     _loggerFactory)
-                .RegisterProjections<MigratorConsumerProjection, MigratorConsumerContext>(
-                    context => new MigratorConsumerProjection(context.Resolve<ILoggerFactory>().CreateLogger<MigratorConsumerProjection>(), context.Resolve<IDbContextFactory<BackOfficeContext>>()),
+                .RegisterProjections<MigratorProjection, MigratorProjectionContext>(
+                    context => new MigratorProjection(context.Resolve<ILoggerFactory>().CreateLogger<MigratorProjection>(), context.Resolve<IDbContextFactory<BackOfficeContext>>()),
                     ConnectedProjectionSettings.Configure(a =>
                     {
                         a.ConfigureCatchUpUpdatePositionMessageInterval(1);

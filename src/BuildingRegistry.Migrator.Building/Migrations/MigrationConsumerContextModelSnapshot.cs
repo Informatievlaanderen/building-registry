@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace BuildingRegistry.Migrator.Building.Migrations
 {
-    [DbContext(typeof(MigratorConsumerContext))]
+    [DbContext(typeof(MigratorProjectionContext))]
     partial class MigrationConsumerContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)
