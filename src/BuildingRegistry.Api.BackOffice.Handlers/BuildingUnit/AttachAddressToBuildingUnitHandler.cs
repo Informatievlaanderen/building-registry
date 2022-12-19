@@ -44,8 +44,8 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.BuildingUnit
                 request.Metadata,
                 cancellationToken);
 
-            _backOfficeContext.BuildingUnitAddressRelation.Add(new BuildingUnitAddressRelation(command.BuildingPersistentLocalId, command.BuildingUnitPersistentLocalId, command.AddressPersistentLocalId));
-            await _backOfficeContext.SaveChangesAsync(cancellationToken);
+            await _backOfficeContext.AddIdempotentBuildingUnitAddressRelation(
+                command.BuildingPersistentLocalId, command.BuildingUnitPersistentLocalId, command.AddressPersistentLocalId, cancellationToken);
 
             var buildingUnitLastEventHash = await GetBuildingUnitHash(buildingPersistentLocalId, buildingUnitPersistentLocalId, cancellationToken);
 

@@ -51,8 +51,8 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.BuildingUnit
                     request.Metadata,
                     cancellationToken);
 
-                _backOfficeContext.BuildingUnitAddressRelation.Add(new BuildingUnitAddressRelation(cmd.BuildingPersistentLocalId, cmd.BuildingUnitPersistentLocalId, cmd.AddressPersistentLocalId));
-                await _backOfficeContext.SaveChangesAsync(cancellationToken);
+                await _backOfficeContext.AddIdempotentBuildingUnitAddressRelation(
+                    cmd.BuildingPersistentLocalId, cmd.BuildingUnitPersistentLocalId, cmd.AddressPersistentLocalId, cancellationToken);
             }
             catch (IdempotencyException)
             {
