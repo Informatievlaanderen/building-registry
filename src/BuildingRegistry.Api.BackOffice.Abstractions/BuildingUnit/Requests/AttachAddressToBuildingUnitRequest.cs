@@ -39,7 +39,7 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Requests
         {
             return new AttachAddressToBuildingUnitRequest
             {
-                AdresId = "https://data.vlaanderen.be/id/adressen/6447380"
+                AdresId = "https://data.vlaanderen.be/id/adres/6447380"
             };
         }
     }
