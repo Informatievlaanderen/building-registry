@@ -7,17 +7,17 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Requests.BuildingUnit
     using BuildingRegistry.Building.Commands;
     using Sqs.Requests.BuildingUnit;
 
-    public sealed record AttachAddressToBuildingUnitLambdaRequest :
+    public sealed record DetachAddressFromBuildingUnitLambdaRequest :
         BuildingUnitLambdaRequest,
-        IHasBackOfficeRequest<AttachAddressToBuildingUnitBackOfficeRequest>
+        IHasBackOfficeRequest<DetachAddressFromBuildingUnitBackOfficeRequest>
     {
-        public AttachAddressToBuildingUnitBackOfficeRequest Request { get; }
+        public DetachAddressFromBuildingUnitBackOfficeRequest Request { get; }
 
         public int BuildingUnitPersistentLocalId { get; }
 
-        public AttachAddressToBuildingUnitLambdaRequest(
+        public DetachAddressFromBuildingUnitLambdaRequest(
             string messageGroupId,
-            AttachAddressToBuildingUnitSqsRequest sqsRequest)
+            DetachAddressFromBuildingUnitSqsRequest sqsRequest)
             : base(messageGroupId,
                 sqsRequest.TicketId,
                 sqsRequest.IfMatchHeaderValue,
@@ -31,12 +31,12 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Requests.BuildingUnit
         /// <summary>
         /// Map to command
         /// </summary>
-        /// <returns>AttachAddressToBuildingUnit.</returns>
-        public AttachAddressToBuildingUnit ToCommand()
+        /// <returns>DetachAddressFromBuildingUnit.</returns>
+        public DetachAddressFromBuildingUnit ToCommand()
         {
             var addressPersistentLocalId = OsloPuriValidatorExtensions.ParsePersistentLocalId(Request.AdresId);
 
-            return new AttachAddressToBuildingUnit(
+            return new DetachAddressFromBuildingUnit(
                 BuildingPersistentLocalId,
                 new BuildingUnitPersistentLocalId(BuildingUnitPersistentLocalId),
                 new AddressPersistentLocalId(addressPersistentLocalId),

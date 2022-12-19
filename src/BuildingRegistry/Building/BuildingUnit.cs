@@ -335,7 +335,7 @@ namespace BuildingRegistry.Building
             GuardRemoved();
 
             GuardValidBuildingUnitStatuses(new []{BuildingUnitStatus.Planned, BuildingUnitStatus.Realized});
-           
+
             if (AddressPersistentLocalIds.Contains(addressPersistentLocalId))
             {
                 return;
@@ -343,15 +343,7 @@ namespace BuildingRegistry.Building
 
             var address = addresses.GetOptional(addressPersistentLocalId);
 
-            if (address is null)
-            {
-                throw new AddressNotFoundException();
-            }
-
-            if (address.Value.IsRemoved)
-            {
-                throw new AddressIsRemovedException();
-            }
+            GuardRemovedAddress(address);
 
             var validStatuses = new[] { AddressStatus.Current, AddressStatus.Proposed };
 
@@ -361,6 +353,35 @@ namespace BuildingRegistry.Building
             }
 
             Apply(new BuildingUnitAddressWasAttachedV2(_buildingPersistentLocalId, BuildingUnitPersistentLocalId, addressPersistentLocalId));
+        }
+
+        public void DetachAddress(AddressPersistentLocalId addressPersistentLocalId, IAddresses addresses)
+        {
+            GuardRemoved();
+
+            if (!AddressPersistentLocalIds.Contains(addressPersistentLocalId))
+            {
+                return;
+            }
+
+            var address = addresses.GetOptional(addressPersistentLocalId);
+
+            GuardRemovedAddress(address);
+
+            Apply(new BuildingUnitAddressWasDetachedV2(_buildingPersistentLocalId, BuildingUnitPersistentLocalId, addressPersistentLocalId));
+        }
+
+        private void GuardRemovedAddress(AddressData? address)
+        {
+            if (address is null)
+            {
+                throw new AddressNotFoundException();
+            }
+
+            if (address.Value.IsRemoved)
+            {
+                throw new AddressIsRemovedException();
+            }
         }
 
         public void RestoreSnapshot(

@@ -38,7 +38,20 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions
 
             return relation;
         }
-        
+
+        public async Task RemoveIdempotentParcelAddressRelation(
+            BuildingUnitPersistentLocalId buildingUnitPersistentLocalId,
+            AddressPersistentLocalId addressPersistentLocalId,
+            CancellationToken cancellationToken)
+        {
+            var relation = await BuildingUnitAddressRelation.FindAsync(new object?[] { (int)buildingUnitPersistentLocalId, (int)addressPersistentLocalId }, cancellationToken);
+            if (relation is not null)
+            {
+                BuildingUnitAddressRelation.Remove(relation);
+                await SaveChangesAsync(cancellationToken);
+            }
+        }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

@@ -50,6 +50,7 @@ namespace BuildingRegistry.Building
             Register<BuildingUnitWasDeregulated>(When);
             Register<CommonBuildingUnitWasAddedV2>(When);
             Register<BuildingUnitAddressWasAttachedV2>(When);
+            Register<BuildingUnitAddressWasDetachedV2>(When);
         }
 
         private void When(BuildingWasMigrated @event)
@@ -212,6 +213,13 @@ namespace BuildingRegistry.Building
         private void When(BuildingUnitAddressWasAttachedV2 @event)
         {
             _addressPersistentLocalIds.Add(new AddressPersistentLocalId(@event.AddressPersistentLocalId));
+
+            _lastEvent = @event;
+        }
+
+        private void When(BuildingUnitAddressWasDetachedV2 @event)
+        {
+            _addressPersistentLocalIds.Remove(new AddressPersistentLocalId(@event.AddressPersistentLocalId));
 
             _lastEvent = @event;
         }
