@@ -15,7 +15,6 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
     using BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.BuildingUnit;
     using BuildingRegistry.Building;
     using BuildingRegistry.Building.Exceptions;
-    using BuildingRegistry.Projections.Syndication.Parcel;
     using Fixtures;
     using FluentAssertions;
     using Microsoft.Extensions.Configuration;
@@ -80,8 +79,8 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
                 .ReadStreamBackwards(new StreamId(new BuildingStreamId(buildingPersistentLocalId)), 4, 1);
             stream.Messages.First().JsonMetadata.Should().Contain(eTagResponse.ETag);
 
-            var addressParcelRelation = _backOfficeContext.BuildingUnitAddressRelation.Find((int)buildingUnitPersistentLocalId, (int) addressId);
-            addressParcelRelation.Should().NotBeNull();
+            var buildingUnitAddressRelation = _backOfficeContext.BuildingUnitAddressRelation.Find((int)buildingUnitPersistentLocalId, (int) addressId);
+            buildingUnitAddressRelation.Should().NotBeNull();
         }
 
         [Fact]
@@ -129,6 +128,55 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
                             string.Format(ConfigDetailUrl, buildingUnitPersistentLocalId),
                             building.LastEventHash)),
                     CancellationToken.None));
+        }
+
+        [Fact]
+        public async Task WhenBuildingUnitAddressRelationAlreadyExists_ThenTicketingCompleteIsExpected()
+        {
+            // Arrange
+            var buildingPersistentLocalId = Fixture.Create<BuildingPersistentLocalId>();
+            var buildingUnitPersistentLocalId = Fixture.Create<BuildingUnitPersistentLocalId>();
+            var addressPersistentLocalId = Fixture.Create<AddressPersistentLocalId>();
+
+            PlanBuilding(buildingPersistentLocalId);
+            PlaceBuildingUnderConstruction(buildingPersistentLocalId);
+            RealizeBuilding(buildingPersistentLocalId);
+            PlanBuildingUnit(buildingPersistentLocalId, buildingUnitPersistentLocalId);
+
+            await _backOfficeContext.AddBuildingUnitAddressRelation(
+                buildingPersistentLocalId, buildingUnitPersistentLocalId, addressPersistentLocalId);
+
+            var eTagResponse = new ETagResponse(string.Empty, Fixture.Create<string>());
+            var handler = new AttachAddressToBuildingUnitLambdaHandler(
+                Container.Resolve<IConfiguration>(),
+                new FakeRetryPolicy(),
+                MockTicketing(response => { eTagResponse = response; }).Object,
+                new IdempotentCommandHandler(Container.Resolve<ICommandHandlerResolver>(), _idempotencyContext),
+                Container.Resolve<IBuildings>(),
+                _backOfficeContext);
+
+            var consumerAddress = Container.Resolve<FakeConsumerAddressContext>();
+            consumerAddress.AddAddress(addressPersistentLocalId, Consumer.Address.AddressStatus.Current, isRemoved: false);
+
+            var request = new AttachAddressToBuildingUnitLambdaRequestBuilder(Fixture)
+                .WithBuildingPersistentLocalId(buildingPersistentLocalId)
+                .WithBuildingUnitPersistentLocalId(buildingUnitPersistentLocalId)
+                .WithAdresId(addressPersistentLocalId)
+                .Build();
+
+            //Act
+            await handler.Handle(request, CancellationToken.None);
+
+            //Assert
+            var stream = await Container.Resolve<IStreamStore>()
+                .ReadStreamBackwards(new StreamId(new BuildingStreamId(buildingPersistentLocalId)), 4, 1);
+            stream.Messages.First().JsonMetadata.Should().Contain(eTagResponse.ETag);
+
+            var buildingUnitAddressRelation = _backOfficeContext.BuildingUnitAddressRelation.SingleOrDefault(
+                x => x.BuildingPersistentLocalId == buildingPersistentLocalId
+                     && x.BuildingUnitPersistentLocalId == buildingUnitPersistentLocalId
+                     && x.AddressPersistentLocalId == addressPersistentLocalId);
+            buildingUnitAddressRelation.Should().NotBeNull();
         }
 
         [Fact]

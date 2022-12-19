@@ -25,11 +25,27 @@ namespace BuildingRegistry.Tests.BackOffice
             await SaveChangesAsync();
         }
 
+        public async Task AddBuildingUnitAddressRelation(
+            BuildingPersistentLocalId buildingPersistentLocalId,
+            BuildingUnitPersistentLocalId buildingUnitPersistentLocalId,
+            AddressPersistentLocalId addressPersistentLocalId)
+        {
+            BuildingUnitAddressRelation.Add(new BuildingUnitAddressRelation(
+                buildingPersistentLocalId, buildingUnitPersistentLocalId, addressPersistentLocalId));
+            await SaveChangesAsync();
+        }
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.ConfigureWarnings(x => x.Ignore(InMemoryEventId.TransactionIgnoredWarning));
 
             base.OnConfiguring(optionsBuilder);
+        }
+
+        public override ValueTask DisposeAsync()
+        {
+            // Prevent object from being disposed for asserting the context.
+            return ValueTask.CompletedTask;
         }
     }
 

@@ -26,5 +26,6 @@ namespace BuildingRegistry.Infrastructure
         public const string Sequence = "__EFMigrationsHistorySequence";
         public const string ConsumerAddress = "__EFMigrationsHistoryConsumerAddress";
         public const string BackOffice = "__EFMigrationsHistoryBackOffice";
+        public const string MigratorProjection = "__EFMigrationsHistoryMigrationProjection";
     }
 }

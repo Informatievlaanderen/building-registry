@@ -2,6 +2,9 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions
 {
     using System;
     using System.IO;
+    using BuildingRegistry.Building;
+    using System.Threading.Tasks;
+    using System.Threading;
     using Infrastructure;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.EntityFrameworkCore.Design;
@@ -17,6 +20,25 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions
         public DbSet<BuildingUnitBuilding> BuildingUnitBuildings { get; set; }
         public DbSet<BuildingUnitAddressRelation> BuildingUnitAddressRelation { get; set; }
 
+
+        public async Task<BuildingUnitAddressRelation> AddIdempotentBuildingUnitAddressRelation(
+            BuildingPersistentLocalId buildingPersistentLocalId,
+            BuildingUnitPersistentLocalId buildingUnitPersistentLocalId,
+            AddressPersistentLocalId addressPersistentLocalId,
+            CancellationToken cancellationToken)
+        {
+            var relation = await BuildingUnitAddressRelation.FindAsync(new object?[] { (int)buildingUnitPersistentLocalId, (int)addressPersistentLocalId }, cancellationToken);
+
+            if (relation is null)
+            {
+                relation = new BuildingUnitAddressRelation(buildingPersistentLocalId, buildingUnitPersistentLocalId, addressPersistentLocalId);
+                await BuildingUnitAddressRelation.AddAsync(relation, cancellationToken);
+                await SaveChangesAsync(cancellationToken);
+            }
+
+            return relation;
+        }
+        
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -32,7 +54,6 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions
 
             modelBuilder.Entity<BuildingUnitBuilding>()
                 .Property(x => x.BuildingPersistentLocalId);
-
 
             modelBuilder.Entity<BuildingUnitAddressRelation>()
                 .ToTable("BuildingUnitAddressRelation", Schema.BackOffice)

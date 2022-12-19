@@ -5,8 +5,12 @@ namespace BuildingRegistry.Migrator.Building.Infrastructure.Modules
     using Autofac.Extensions.DependencyInjection;
     using Be.Vlaanderen.Basisregisters.DataDog.Tracing.Autofac;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Autofac;
+    using Be.Vlaanderen.Basisregisters.Projector;
+    using Be.Vlaanderen.Basisregisters.Projector.ConnectedProjections;
+    using Be.Vlaanderen.Basisregisters.Projector.Modules;
     using BuildingRegistry.Infrastructure;
     using BuildingRegistry.Infrastructure.Modules;
+    using BuildingRegistry.Migrator.Building.Projections;
     using Consumer.Address;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Configuration;
@@ -33,7 +37,7 @@ namespace BuildingRegistry.Migrator.Building.Infrastructure.Modules
         {
             var backOfficeConnectionString = _configuration.GetConnectionString("BackOffice");
             _services
-                .AddDbContext<BackOfficeContext>(options => options
+                .AddDbContextFactory<BackOfficeContext>(options => options
                         .UseLoggerFactory(_loggerFactory)
                         .UseSqlServer(backOfficeConnectionString, sqlServerOptions => sqlServerOptions
                             .EnableRetryOnFailure()
@@ -44,7 +48,21 @@ namespace BuildingRegistry.Migrator.Building.Infrastructure.Modules
                 .RegisterModule(new DataDogModule(_configuration))
                 .RegisterModule<EnvelopeModule>()
                 .RegisterModule(new EditModule(_configuration, _services, _loggerFactory))
-                .RegisterModule(new ConsumerAddressModule(_configuration, _services, _loggerFactory));
+                .RegisterModule(new ConsumerAddressModule(_configuration, _services, _loggerFactory))
+                .RegisterModule(new MigratorProjectionModule(_configuration, _services, _loggerFactory));
+
+            builder.RegisterModule(new ProjectorModule(_configuration));
+
+            builder
+                .RegisterProjectionMigrator<MigratorProjectionContextFactory>(
+                    _configuration,
+                    _loggerFactory)
+                .RegisterProjections<MigratorProjection, MigratorProjectionContext>(
+                    context => new MigratorProjection(context.Resolve<ILoggerFactory>().CreateLogger<MigratorProjection>(), context.Resolve<IDbContextFactory<BackOfficeContext>>()),
+                    ConnectedProjectionSettings.Configure(a =>
+                    {
+                        a.ConfigureCatchUpUpdatePositionMessageInterval(1);
+                    }));
 
             builder.RegisterEventstreamModule(_configuration);
             builder.RegisterSnapshotModule(_configuration);
