@@ -10,7 +10,7 @@ namespace BuildingRegistry.Building.Events
 
     [EventTags(EventTag.For.Sync, EventTag.For.Edit, Tag.Building)]
     [EventName(EventName)]
-    [EventDescription("Er werd een adres gekoppeld aan de gebouweenheid.")]
+    [EventDescription("Het adres werd gekoppeld aan de gebouweenheid.")]
     public sealed class BuildingUnitAddressWasAttachedV2 : IBuildingEvent
     {
         public const string EventName = "BuildingUnitAddressWasAttachedV2"; // BE CAREFUL CHANGING THIS!!
@@ -19,7 +19,7 @@ namespace BuildingRegistry.Building.Events
         public int BuildingPersistentLocalId { get; }
         [EventPropertyDescription("Objectidentificator van de gebouweenheid.")]
         public int BuildingUnitPersistentLocalId { get; }
-        [EventPropertyDescription("Objectidentificator van het adres dat gekoppeld is aan de gebouweenheid.")]
+        [EventPropertyDescription("Objectidentificator van het adres.")]
         public int AddressPersistentLocalId { get; }
         
         [EventPropertyDescription("Metadata bij het event.")]
