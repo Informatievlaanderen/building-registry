@@ -810,6 +810,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
 
             #endregion Legacy
 
+            #region Building
             When<Envelope<BuildingWasMigrated>>(async (context, message, ct) =>
             {
                 var buildingUnitSyndicationItemsV2 = new Collection<BuildingUnitSyndicationItemV2>();
@@ -817,13 +818,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
                 {
                     var addressesIdsGrouped = buildingUnit.AddressPersistentLocalIds.GroupBy(x => x);
                     var addresses = addressesIdsGrouped
-                        .Select(groupedAddressId => new BuildingUnitAddressSyndicationItemV2
-                        {
-                            Position = message.Position,
-                            BuildingUnitPersistentLocalId = buildingUnit.BuildingUnitPersistentLocalId,
-                            AddressPersistentLocalId = groupedAddressId.Key,
-                            Count = groupedAddressId.Count()
-                        })
+                        .Select(groupedAddressId => new BuildingUnitAddressSyndicationItemV2(message.Position, buildingUnit.BuildingUnitPersistentLocalId, groupedAddressId.Key))
                         .ToList();
 
                     buildingUnitSyndicationItemsV2.Add(new BuildingUnitSyndicationItemV2
@@ -959,7 +954,9 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
                     item.Status = MapBuildingStatus(BuildingRegistry.Building.BuildingStatus.Planned);
                 }, ct);
             });
+            #endregion Building
 
+            #region BuildingUnit
             When<Envelope<BuildingUnitWasPlannedV2>>(async (context, message, ct) =>
             {
                 await context.CreateNewBuildingSyndicationItem(
@@ -1005,7 +1002,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
                 }, ct);
             });
 
-             When<Envelope<BuildingUnitWasCorrectedFromRealizedToPlanned>>(async (context, message, ct) =>
+            When<Envelope<BuildingUnitWasCorrectedFromRealizedToPlanned>>(async (context, message, ct) =>
             {
                 await context.CreateNewBuildingSyndicationItem(message.Message.BuildingPersistentLocalId, message, item =>
                 {
@@ -1093,13 +1090,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
                     {
                         var addressesIdsGrouped = message.Message.AddressPersistentLocalIds.GroupBy(i => i);
                         var addresses = addressesIdsGrouped
-                            .Select(groupedAddressId => new BuildingUnitAddressSyndicationItemV2
-                            {
-                                Position = message.Position,
-                                BuildingUnitPersistentLocalId = message.Message.BuildingUnitPersistentLocalId,
-                                AddressPersistentLocalId = groupedAddressId.Key,
-                                Count = groupedAddressId.Count()
-                            })
+                            .Select(groupedAddressId => new BuildingUnitAddressSyndicationItemV2(message.Position, message.Message.BuildingUnitPersistentLocalId, groupedAddressId.Key))
                             .ToList();
 
                         var buildingUnitSyndicationItem = new BuildingUnitSyndicationItemV2
@@ -1168,12 +1159,34 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
                 await context.CreateNewBuildingSyndicationItem(message.Message.BuildingPersistentLocalId, message, item =>
                 {
                     var unit = item.BuildingUnitsV2.Single(y => y.PersistentLocalId == message.Message.BuildingUnitPersistentLocalId);
-                    unit.Position = message.Position;
                     unit.PointPosition = message.Message.ExtendedWkbGeometry.ToByteArray();
                     unit.PositionMethod = BuildingRegistry.Building.BuildingUnitPositionGeometryMethod.Parse(message.Message.GeometryMethod);
                     unit.Version = message.Message.Provenance.Timestamp;
                 }, ct);
             });
+
+            When<Envelope<BuildingUnitAddressWasAttachedV2>>(async (context, message, ct) =>
+            {
+                await context.CreateNewBuildingSyndicationItem(message.Message.BuildingPersistentLocalId, message, item =>
+                {
+                    var unit = item.BuildingUnitsV2.Single(y => y.PersistentLocalId == message.Message.BuildingUnitPersistentLocalId);
+                    unit.Addresses.Add(new BuildingUnitAddressSyndicationItemV2(message.Position, unit.PersistentLocalId, message.Message.AddressPersistentLocalId));
+                    unit.Version = message.Message.Provenance.Timestamp;
+                }, ct);
+            });
+
+            When<Envelope<BuildingUnitAddressWasDetachedV2>>(async (context, message, ct) =>
+            {
+                await context.CreateNewBuildingSyndicationItem(message.Message.BuildingPersistentLocalId, message, item =>
+                {
+                    var unit = item.BuildingUnitsV2.Single(y => y.PersistentLocalId == message.Message.BuildingUnitPersistentLocalId);
+                    var address = unit.Addresses.Single(x => x.AddressPersistentLocalId == message.Message.AddressPersistentLocalId);
+                    unit.Addresses.Remove(address);
+                    unit.Version = message.Message.Provenance.Timestamp;
+                }, ct);
+            });
+
+            #endregion
         }
 
         private static BuildingGeometryMethod MapBuildingGeometryMethod(BuildingRegistry.Building.BuildingGeometryMethod buildingGeometryMethod)

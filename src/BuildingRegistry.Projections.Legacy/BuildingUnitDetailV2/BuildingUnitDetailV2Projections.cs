@@ -40,12 +40,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetailV2
                 {
                     var addressesIdsGrouped = buildingUnit.AddressPersistentLocalIds.GroupBy(x => x);
                     var addresses = addressesIdsGrouped
-                        .Select(groupedAddressId => new BuildingUnitDetailAddressItemV2
-                        {
-                            BuildingUnitPersistentLocalId = buildingUnit.BuildingUnitPersistentLocalId,
-                            AddressPersistentLocalId = groupedAddressId.Key,
-                            Count = groupedAddressId.Count()
-                        })
+                        .Select(groupedAddressId => new BuildingUnitDetailAddressItemV2(buildingUnit.BuildingUnitPersistentLocalId, groupedAddressId.Key))
                         .ToList();
 
                     var buildingUnitDetailItemV2 = new BuildingUnitDetailItemV2(
@@ -215,14 +210,8 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetailV2
             {
                 await Update(context, message.Message.BuildingUnitPersistentLocalId, item =>
                 {
-                    var addressesIdsGrouped = message.Message.AddressPersistentLocalIds.GroupBy(x => x);
-                    var addresses = addressesIdsGrouped
-                        .Select(groupedAddressId => new BuildingUnitDetailAddressItemV2
-                        {
-                            BuildingUnitPersistentLocalId = message.Message.BuildingUnitPersistentLocalId,
-                            AddressPersistentLocalId = groupedAddressId.Key,
-                            Count = groupedAddressId.Count()
-                        })
+                    var addresses = message.Message.AddressPersistentLocalIds
+                        .Select(addressId => new BuildingUnitDetailAddressItemV2(message.Message.BuildingUnitPersistentLocalId, addressId))
                         .ToList();
 
                     item.Status = BuildingUnitStatus.Parse(message.Message.BuildingUnitStatus);
@@ -288,9 +277,34 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetailV2
                     UpdateHash(item, message);
                 }, ct);
             });
+
+            When<Envelope<BuildingUnitAddressWasAttachedV2>>(async (context, message, ct) =>
+            {
+                await Update(context, message.Message.BuildingUnitPersistentLocalId, item =>
+                {
+                    context.Entry(item).Collection(x => x.Addresses).Load();
+
+                    item.Addresses.Add(new BuildingUnitDetailAddressItemV2(message.Message.BuildingUnitPersistentLocalId, message.Message.AddressPersistentLocalId));
+                    item.Version = message.Message.Provenance.Timestamp;
+                    UpdateHash(item, message);
+                }, ct);
+            });
+
+            When<Envelope<BuildingUnitAddressWasDetachedV2>>(async (context, message, ct) =>
+            {
+                await Update(context, message.Message.BuildingUnitPersistentLocalId, item =>
+                {
+                    context.Entry(item).Collection(x => x.Addresses).Load();
+
+                    var itemToRemove = item.Addresses.Single(x => x.AddressPersistentLocalId == message.Message.AddressPersistentLocalId);
+                    item.Addresses.Remove(itemToRemove);
+                    item.Version = message.Message.Provenance.Timestamp;
+                    UpdateHash(item, message);
+                }, ct);
+            });
         }
 
-        private async Task Update(LegacyContext context, int buildingUnitPersistentLocalId, Action<BuildingUnitDetailItemV2> updateAction, CancellationToken ct)
+        private static async Task Update(LegacyContext context, int buildingUnitPersistentLocalId, Action<BuildingUnitDetailItemV2> updateAction, CancellationToken ct)
         {
             var item = await context
                 .BuildingUnitDetailsV2

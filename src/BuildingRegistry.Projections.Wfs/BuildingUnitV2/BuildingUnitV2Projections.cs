@@ -250,6 +250,20 @@ namespace BuildingRegistry.Projections.Wfs.BuildingUnitV2
 
                 SetVersion(unit, message.Message.Provenance.Timestamp);
             });
+
+            When<Envelope<BuildingUnitAddressWasAttachedV2>>(async (context, message, ct) =>
+            {
+                var unit = await context.BuildingUnitsV2.FindAsync(message.Message.BuildingUnitPersistentLocalId);
+
+                SetVersion(unit!, message.Message.Provenance.Timestamp);
+            });
+
+            When<Envelope<BuildingUnitAddressWasDetachedV2>>(async (context, message, ct) =>
+            {
+                var unit = await context.BuildingUnitsV2.FindAsync(message.Message.BuildingUnitPersistentLocalId);
+
+                SetVersion(unit!, message.Message.Provenance.Timestamp);
+            });
         }
 
         private static void SetVersion(BuildingUnitV2 unit, Instant timestamp) => unit.Version = timestamp;

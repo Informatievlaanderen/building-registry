@@ -8,7 +8,15 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetailV2
     {
         public int BuildingUnitPersistentLocalId { get; set; }
         public int AddressPersistentLocalId { get; set; }
-        public int Count { get; set; } //Common units can have multiple of the same address coupled to it
+
+        private BuildingUnitDetailAddressItemV2()
+        { }
+
+        public BuildingUnitDetailAddressItemV2(int buildingUnitPersistentLocalId, int addressPersistentLocalId)
+        {
+            BuildingUnitPersistentLocalId = buildingUnitPersistentLocalId;
+            AddressPersistentLocalId = addressPersistentLocalId;
+        }
     }
 
     public class BuildingUnitDetailAddressItemConfiguration : IEntityTypeConfiguration<BuildingUnitDetailAddressItemV2>
@@ -20,8 +28,6 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetailV2
             b.ToTable(TableName, Schema.Legacy)
                 .HasKey(p => new { p.BuildingUnitPersistentLocalId, p.AddressPersistentLocalId })
                 .IsClustered();
-
-            b.Property(x => x.Count);
 
             b.HasIndex(x => x.AddressPersistentLocalId).IsClustered(false);
             b.HasIndex(x => x.BuildingUnitPersistentLocalId).IsClustered(false);

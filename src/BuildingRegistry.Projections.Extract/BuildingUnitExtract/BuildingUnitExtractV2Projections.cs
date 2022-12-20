@@ -38,6 +38,7 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
         {
             _encoding = encoding ?? throw new ArgumentNullException(nameof(encoding));
 
+            #region Building
             When<Envelope<BuildingWasMigrated>>(async (context, message, ct) =>
             {
                 var buildingUnitBuildingItemV2 = new BuildingUnitBuildingItemV2
@@ -90,7 +91,6 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
                 }
             });
 
-            // TODO: Still required with V2 business rules?
             When<Envelope<BuildingWasPlannedV2>>(async (context, message, ct) =>
             {
                 var buildingUnitBuildingItemV2 = new BuildingUnitBuildingItemV2
@@ -102,6 +102,30 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
 
                 await context.BuildingUnitBuildingsV2.AddAsync(buildingUnitBuildingItemV2, ct);
             });
+
+            When<Envelope<BuildingOutlineWasChanged>>(async (context, message, ct) =>
+            {
+                foreach (var buildingUnitPersistentLocalId in message.Message.BuildingUnitPersistentLocalIds)
+                {
+                    await context.FindAndUpdateBuildingUnitExtract(buildingUnitPersistentLocalId,
+                        itemV2 =>
+                        {
+                            var geometry = wkbReader.Read(message.Message.ExtendedWkbGeometryBuildingUnits!.ToByteArray());
+                            UpdateGeometry(itemV2, geometry);
+                            var geometryMethod = MapGeometryMethod(BuildingUnitPositionGeometryMethod.DerivedFromObject);
+                            UpdatePosition(itemV2, geometryMethod);
+                            UpdateVersie(itemV2, message.Message.Provenance.Timestamp);
+                        }, ct);
+                }
+            });
+
+            When<Envelope<BuildingWasNotRealizedV2>>(async (context, message, ct) =>
+            {
+                var building = await context.BuildingUnitBuildingsV2.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);
+                building.BuildingRetiredStatus = BuildingStatus.NotRealized;
+            });
+
+            #endregion Building
 
             When<Envelope<BuildingUnitWasPlannedV2>>(async (context, message, ct) =>
             {
@@ -127,23 +151,7 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
 
                 await context.BuildingUnitExtractV2.AddAsync(buildingUnitItemV2, ct);
             });
-
-            When<Envelope<BuildingOutlineWasChanged>>(async (context, message, ct) =>
-            {
-                foreach (var buildingUnitPersistentLocalId in message.Message.BuildingUnitPersistentLocalIds)
-                {
-                    await context.FindAndUpdateBuildingUnitExtract(buildingUnitPersistentLocalId,
-                        itemV2 =>
-                        {
-                            var geometry = wkbReader.Read(message.Message.ExtendedWkbGeometryBuildingUnits!.ToByteArray());
-                            UpdateGeometry(itemV2, geometry);
-                            var geometryMethod = MapGeometryMethod(BuildingUnitPositionGeometryMethod.DerivedFromObject);
-                            UpdatePosition(itemV2, geometryMethod);
-                            UpdateVersie(itemV2, message.Message.Provenance.Timestamp);
-                        }, ct);
-                }
-            });
-
+            
             When<Envelope<BuildingUnitWasRealizedV2>>(async (context, message, ct) =>
             {
                 await context.FindAndUpdateBuildingUnitExtract(message.Message.BuildingUnitPersistentLocalId,
@@ -323,6 +331,24 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
                     {
                         UpdatePosition(itemV2, geometryMethod);
                         UpdateGeometry(itemV2, geometry);
+                        UpdateVersie(itemV2, message.Message.Provenance.Timestamp);
+                    }, ct);
+            });
+
+            When<Envelope<BuildingUnitAddressWasAttachedV2>>(async (context, message, ct) =>
+            {
+                await context.FindAndUpdateBuildingUnitExtract(message.Message.BuildingUnitPersistentLocalId,
+                    itemV2 =>
+                    {
+                        UpdateVersie(itemV2, message.Message.Provenance.Timestamp);
+                    }, ct);
+            });
+
+            When<Envelope<BuildingUnitAddressWasDetachedV2>>(async (context, message, ct) =>
+            {
+                await context.FindAndUpdateBuildingUnitExtract(message.Message.BuildingUnitPersistentLocalId,
+                    itemV2 =>
+                    {
                         UpdateVersie(itemV2, message.Message.Provenance.Timestamp);
                     }, ct);
             });
