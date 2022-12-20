@@ -36,12 +36,21 @@ order by
 
         public async Task<long> GetStartingMigrationPosition()
         {
-            var query = $@"SELECT min(position)-1
-                            FROM [{Schema.Default}].[Streams]
-                            WHERE IdOriginal like 'building%'";
+            var query = $@"DECLARE @pos bigint;
+
+SELECT @pos = MIN(position) 
+FROM [{Schema.Default}].[Streams]
+WHERE IdOriginal LIKE 'building-%'
+
+SELECT MIN(position)-1
+FROM [{Schema.Default}].[Messages]
+WHERE StreamIdInternal IN (
+	SELECT IdInternal FROM [{Schema.Default}].[Streams]
+	WHERE IdOriginal LIKE 'building-%') AND Position <= @pos";
 
             await using var conn = new SqlConnection(_connectionString);
-            return await conn.ExecuteScalarAsync<long>(query);
+            var command = new CommandDefinition(query, conn, commandTimeout: 60 * 60); //can take a while to query 200M+ events..
+            return await conn.ExecuteScalarAsync<long>(command);
         }
     }
 }
