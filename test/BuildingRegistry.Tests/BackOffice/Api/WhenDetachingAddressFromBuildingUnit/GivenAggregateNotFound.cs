@@ -1,25 +1,25 @@
-namespace BuildingRegistry.Tests.BackOffice.Api.WhenAttachingAddressToBuildingUnit
+namespace BuildingRegistry.Tests.BackOffice.Api.WhenDetachingAddressFromBuildingUnit
 {
     using System;
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
     using AutoFixture;
-    using Building;
-    using Building.Exceptions;
+    using Be.Vlaanderen.Basisregisters.AggregateSource;
     using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Requests;
     using BuildingRegistry.Api.BackOffice.BuildingUnit;
+    using Building;
     using FluentAssertions;
     using FluentValidation;
     using Moq;
     using Xunit;
     using Xunit.Abstractions;
 
-    public class GivenAddressNotFound : BackOfficeApiTest
+    public class GivenAggregateNotFound : BackOfficeApiTest
     {
         private readonly BuildingUnitController _controller;
 
-        public GivenAddressNotFound(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
+        public GivenAggregateNotFound(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
         {
             _controller = CreateBuildingControllerWithUser<BuildingUnitController>();
         }
@@ -27,11 +27,9 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenAttachingAddressToBuildingUn
         [Fact]
         public void ThenThrowValidationException()
         {
-            var buildingPersistentLocalId = Fixture.Create<BuildingPersistentLocalId>();
-
             MockMediator
                 .Setup(x => x.Send(It.IsAny<AttachAddressToBuildingUnitRequest>(), CancellationToken.None).Result)
-                .Throws(new AddressNotFoundException());
+                .Throws(new AggregateNotFoundException(Fixture.Create<BuildingPersistentLocalId>(), typeof(Building)));
 
             //Act
             Func<Task> act = async () =>
@@ -40,7 +38,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenAttachingAddressToBuildingUn
                     ResponseOptions,
                     MockIfMatchValidator(true),
                     MockValidRequestValidator<AttachAddressToBuildingUnitRequest>(),
-                    buildingPersistentLocalId,
+                    Fixture.Create<BuildingUnitPersistentLocalId>(),
                     new AttachAddressToBuildingUnitRequest(),
                     null,
                     CancellationToken.None);
@@ -52,8 +50,8 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenAttachingAddressToBuildingUn
                 .ThrowAsync<ValidationException>()
                 .Result
                 .Where(x => x.Errors.Any(e =>
-                    e.ErrorCode == "GebouweenheidAdresOngeldig"
-                    && e.ErrorMessage == "Ongeldig adresId."));
+                    e.ErrorCode == "GebouweenheidGebouwIdNietGekendValidatie"
+                    && e.ErrorMessage == "Onbestaand gebouw."));
         }
     }
 }

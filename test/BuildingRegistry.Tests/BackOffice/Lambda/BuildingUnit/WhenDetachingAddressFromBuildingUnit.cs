@@ -12,7 +12,6 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
     using Be.Vlaanderen.Basisregisters.Sqs.Lambda.Handlers;
     using Be.Vlaanderen.Basisregisters.Sqs.Responses;
     using Builders;
-    using BuildingRegistry.Api.BackOffice.Abstractions;
     using BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.BuildingUnit;
     using BuildingRegistry.Building;
     using BuildingRegistry.Building.Exceptions;
@@ -46,12 +45,16 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
             // Arrange
             var buildingPersistentLocalId = Fixture.Create<BuildingPersistentLocalId>();
             var buildingUnitPersistentLocalId = Fixture.Create<BuildingUnitPersistentLocalId>();
+            var addressId = Fixture.Create<AddressPersistentLocalId>();
+
+            var consumerAddressContext = Container.Resolve<FakeConsumerAddressContext>();
+            consumerAddressContext.AddAddress(addressId, Consumer.Address.AddressStatus.Current, isRemoved: false);
 
             PlanBuilding(buildingPersistentLocalId);
             PlaceBuildingUnderConstruction(buildingPersistentLocalId);
             RealizeBuilding(buildingPersistentLocalId);
-
             PlanBuildingUnit(buildingPersistentLocalId, buildingUnitPersistentLocalId);
+            AttachBuildingUnit(buildingPersistentLocalId, buildingUnitPersistentLocalId, addressId);
 
             var eTagResponse = new ETagResponse(string.Empty, Fixture.Create<string>());
             var handler = new DetachAddressFromBuildingUnitLambdaHandler(
@@ -61,12 +64,6 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
                 new IdempotentCommandHandler(Container.Resolve<ICommandHandlerResolver>(), _idempotencyContext),
                 Container.Resolve<IBuildings>(),
                 _backOfficeContext);
-
-            var addressId = Fixture.Create<AddressPersistentLocalId>();
-            var consumerAddress = Container.Resolve<FakeConsumerAddressContext>();
-            consumerAddress.AddAddress(addressId, Consumer.Address.AddressStatus.Current, isRemoved: false);
-
-            AttachBuildingUnit(buildingPersistentLocalId, buildingUnitPersistentLocalId, addressId);
 
             var request = new DetachAddressFromBuildingUnitLambdaRequestBuilder(Fixture)
                 .WithBuildingPersistentLocalId(buildingPersistentLocalId)
@@ -78,11 +75,10 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
             await handler.Handle(request, CancellationToken.None);
 
             //Assert
-            var stream = await Container.Resolve<IStreamStore>()
-                .ReadStreamBackwards(new StreamId(new BuildingStreamId(buildingPersistentLocalId)), 5, 1);
+            var stream = await Container.Resolve<IStreamStore>().ReadStreamBackwards(new StreamId(new BuildingStreamId(buildingPersistentLocalId)), 5, 1);
             stream.Messages.First().JsonMetadata.Should().Contain(eTagResponse.ETag);
 
-            var relation = _backOfficeContext.BuildingUnitAddressRelation.Find((int)buildingUnitPersistentLocalId, (int) addressId);
+            var relation = await _backOfficeContext.BuildingUnitAddressRelation.FindAsync((int)buildingUnitPersistentLocalId, (int) addressId);
             relation.Should().BeNull();
         }
 
@@ -93,6 +89,10 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
             var ticketing = new Mock<ITicketing>();
             var buildingPersistentLocalId = Fixture.Create<BuildingPersistentLocalId>();
             var buildingUnitPersistentLocalId = Fixture.Create<BuildingUnitPersistentLocalId>();
+            var addressId = Fixture.Create<AddressPersistentLocalId>();
+
+            var consumerAddressContext = Container.Resolve<FakeConsumerAddressContext>();
+            consumerAddressContext.AddAddress(addressId, Consumer.Address.AddressStatus.Current, isRemoved: false);
 
             PlanBuilding(buildingPersistentLocalId);
             PlanBuildingUnit(buildingPersistentLocalId, buildingUnitPersistentLocalId);
@@ -106,13 +106,6 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
                 Container.Resolve<IBuildings>(),
                 _backOfficeContext);
 
-            var building =
-                await buildings.GetAsync(new BuildingStreamId(buildingPersistentLocalId), CancellationToken.None);
-
-            var addressId = Fixture.Create<AddressPersistentLocalId>();
-            var consumerAddress = Container.Resolve<FakeConsumerAddressContext>();
-            consumerAddress.AddAddress(addressId, Consumer.Address.AddressStatus.Current, isRemoved: false);
-
             var request = new DetachAddressFromBuildingUnitLambdaRequestBuilder(Fixture)
                 .WithBuildingPersistentLocalId(buildingPersistentLocalId)
                 .WithBuildingUnitPersistentLocalId(buildingUnitPersistentLocalId)
@@ -123,6 +116,8 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
             await handler.Handle(request, CancellationToken.None);
 
             //Assert
+            var building = await buildings.GetAsync(new BuildingStreamId(buildingPersistentLocalId), CancellationToken.None);
+
             ticketing.Verify(x =>
                 x.Complete(
                     It.IsAny<Guid>(),
@@ -141,10 +136,14 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
             var buildingUnitPersistentLocalId = Fixture.Create<BuildingUnitPersistentLocalId>();
             var addressPersistentLocalId = Fixture.Create<AddressPersistentLocalId>();
 
+            var consumerAddressContext = Container.Resolve<FakeConsumerAddressContext>();
+            consumerAddressContext.AddAddress(addressPersistentLocalId, Consumer.Address.AddressStatus.Current, isRemoved: false);
+
             PlanBuilding(buildingPersistentLocalId);
             PlaceBuildingUnderConstruction(buildingPersistentLocalId);
             RealizeBuilding(buildingPersistentLocalId);
             PlanBuildingUnit(buildingPersistentLocalId, buildingUnitPersistentLocalId);
+            AttachBuildingUnit(buildingPersistentLocalId, buildingUnitPersistentLocalId, addressPersistentLocalId);
 
             var eTagResponse = new ETagResponse(string.Empty, Fixture.Create<string>());
             var handler = new DetachAddressFromBuildingUnitLambdaHandler(
@@ -154,11 +153,6 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
                 new IdempotentCommandHandler(Container.Resolve<ICommandHandlerResolver>(), _idempotencyContext),
                 Container.Resolve<IBuildings>(),
                 _backOfficeContext);
-
-            var consumerAddress = Container.Resolve<FakeConsumerAddressContext>();
-            consumerAddress.AddAddress(addressPersistentLocalId, Consumer.Address.AddressStatus.Current, isRemoved: false);
-
-            AttachBuildingUnit(buildingPersistentLocalId, buildingUnitPersistentLocalId, addressPersistentLocalId);
 
             var request = new DetachAddressFromBuildingUnitLambdaRequestBuilder(Fixture)
                 .WithBuildingPersistentLocalId(buildingPersistentLocalId)
@@ -170,14 +164,13 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
             await handler.Handle(request, CancellationToken.None);
 
             //Assert
-            var stream = await Container.Resolve<IStreamStore>()
-                .ReadStreamBackwards(new StreamId(new BuildingStreamId(buildingPersistentLocalId)), 5, 1);
+            var stream = await Container.Resolve<IStreamStore>().ReadStreamBackwards(new StreamId(new BuildingStreamId(buildingPersistentLocalId)), 5, 1);
             stream.Messages.First().JsonMetadata.Should().Contain(eTagResponse.ETag);
 
-            var buildingUnitAddressRelation = _backOfficeContext.BuildingUnitAddressRelation.SingleOrDefault(
-                x => x.BuildingPersistentLocalId == buildingPersistentLocalId
-                     && x.BuildingUnitPersistentLocalId == buildingUnitPersistentLocalId
-                     && x.AddressPersistentLocalId == addressPersistentLocalId);
+            var buildingUnitAddressRelation = _backOfficeContext.BuildingUnitAddressRelation.SingleOrDefault(x =>
+                x.BuildingPersistentLocalId == buildingPersistentLocalId
+                && x.BuildingUnitPersistentLocalId == buildingUnitPersistentLocalId
+                && x.AddressPersistentLocalId == addressPersistentLocalId);
             buildingUnitAddressRelation.Should().BeNull();
         }
 
@@ -201,14 +194,10 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
                 Container.Resolve<IBuildings>(),
                 _backOfficeContext);
 
-            var addressId = Fixture.Create<AddressPersistentLocalId>();
-            var consumerAddress = Container.Resolve<FakeConsumerAddressContext>();
-            consumerAddress.AddAddress(addressId, Consumer.Address.AddressStatus.Current, isRemoved: false);
-
             var request = new DetachAddressFromBuildingUnitLambdaRequestBuilder(Fixture)
                 .WithBuildingPersistentLocalId(buildingPersistentLocalId)
                 .WithBuildingUnitPersistentLocalId(buildingUnitPersistentLocalId)
-                .WithAdresId(addressId)
+                .WithAdresId(Fixture.Create<AddressPersistentLocalId>())
                 .Build();
 
             // Act
@@ -219,8 +208,8 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
                 x.Error(
                     It.IsAny<Guid>(),
                     new TicketError(
-                        "Ongeldig AdresId.",
-                        "AdresOngeldig"),
+                        "Ongeldig adresId.",
+                        "GebouweenheidAdresOngeldig"),
                     CancellationToken.None));
         }
 
@@ -244,14 +233,10 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
                 Container.Resolve<IBuildings>(),
                 _backOfficeContext);
 
-            var addressId = Fixture.Create<AddressPersistentLocalId>();
-            var consumerAddress = Container.Resolve<FakeConsumerAddressContext>();
-            consumerAddress.AddAddress(addressId, Consumer.Address.AddressStatus.Current, isRemoved: false);
-
             var request = new DetachAddressFromBuildingUnitLambdaRequestBuilder(Fixture)
                 .WithBuildingPersistentLocalId(buildingPersistentLocalId)
                 .WithBuildingUnitPersistentLocalId(buildingUnitPersistentLocalId)
-                .WithAdresId(addressId)
+                .WithAdresId(Fixture.Create<AddressPersistentLocalId>())
                 .Build();
 
             // Act
@@ -262,8 +247,8 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
                 x.Error(
                     It.IsAny<Guid>(),
                     new TicketError(
-                        "Ongeldig AdresId.",
-                        "AdresOngeldig"),
+                        "Ongeldig adresId.",
+                        "GebouweenheidAdresOngeldig"),
                     CancellationToken.None));
         }
 

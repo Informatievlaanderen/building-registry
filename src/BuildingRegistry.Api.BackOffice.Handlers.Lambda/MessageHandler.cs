@@ -2,6 +2,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda
 {
     using System.Threading;
     using System.Threading.Tasks;
+    using Abstractions.BuildingUnit.Requests;
     using Autofac;
     using Be.Vlaanderen.Basisregisters.Aws.Lambda;
     using Be.Vlaanderen.Basisregisters.Sqs.Requests;
@@ -145,6 +146,11 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda
                 case AttachAddressToBuildingUnitSqsRequest request:
                     await mediator.Send(
                         new AttachAddressToBuildingUnitLambdaRequest(messageMetadata.MessageGroupId!, request),
+                        cancellationToken);
+                    break;
+                case DetachAddressFromBuildingUnitSqsRequest request:
+                    await mediator.Send(
+                        new DetachAddressFromBuildingUnitLambdaRequest(messageMetadata.MessageGroupId!, request),
                         cancellationToken);
                     break;
 

@@ -52,8 +52,8 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenAttachingAddressToBuildingUn
                 .ThrowAsync<ValidationException>()
                 .Result
                 .Where(x => x.Errors.Any(e =>
-                    e.ErrorCode == "AdresOngeldig"
-                    && e.ErrorMessage == "Ongeldig AdresId."));
+                    e.ErrorCode == "GebouweenheidAdresOngeldig"
+                    && e.ErrorMessage == "Ongeldig adresId."));
         }
     }
 }

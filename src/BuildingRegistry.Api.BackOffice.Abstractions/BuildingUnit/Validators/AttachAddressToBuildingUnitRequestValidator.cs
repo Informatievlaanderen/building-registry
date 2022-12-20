@@ -14,7 +14,7 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Validators
             RuleFor(x => x.AdresId)
                 .Must(adresId =>
                     OsloPuriValidator.TryParseIdentifier(adresId, out var id)
-                    || int.TryParse(id, out _))
+                    && int.TryParse(id, out _))
                 .DependentRules(() =>
                 {
                     RuleFor(x => x.AdresId)

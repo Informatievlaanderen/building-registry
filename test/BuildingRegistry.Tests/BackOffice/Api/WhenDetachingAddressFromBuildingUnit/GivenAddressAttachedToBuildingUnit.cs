@@ -1,4 +1,4 @@
-namespace BuildingRegistry.Tests.BackOffice.Api.WhenAttachingAddressToBuildingUnit
+namespace BuildingRegistry.Tests.BackOffice.Api.WhenDetachingAddressFromBuildingUnit
 {
     using System;
     using System.Threading;
@@ -8,38 +8,35 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenAttachingAddressToBuildingUn
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
     using Be.Vlaanderen.Basisregisters.Sqs.Exceptions;
     using Be.Vlaanderen.Basisregisters.Sqs.Responses;
-    using Building;
-    using Building.Datastructures;
-    using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Extensions;
     using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Requests;
     using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Validators;
     using BuildingRegistry.Api.BackOffice.Building;
     using BuildingRegistry.Api.BackOffice.BuildingUnit;
+    using Building;
+    using Building.Datastructures;
     using Fixtures;
     using FluentAssertions;
-    using Handlers;
     using Microsoft.AspNetCore.Http;
     using Moq;
     using Xunit;
     using Xunit.Abstractions;
 
-    public class GivenAttachAddressToBuildingUnit : BackOfficeApiTest
+    public class GivenAddressAttachedToBuildingUnit : BackOfficeApiTest
     {
         private readonly BuildingUnitController _controller;
 
-        public GivenAttachAddressToBuildingUnit(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
+        public GivenAddressAttachedToBuildingUnit(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
         {
             Fixture.Customize(new WithFixedBuildingPersistentLocalId());
 
-            _controller = CreateBuildingUnitControllerWithUser<BuildingUnitController>(useSqs: false);
+            _controller = CreateBuildingUnitControllerWithUser<BuildingUnitController>();
         }
-
         [Fact]
         public async Task ThenAcceptedResponseIsExpected()
         {
             // Arrange
             MockMediator
-                .Setup(x => x.Send(It.IsAny<AttachAddressToBuildingUnitRequest>(), CancellationToken.None).Result)
+                .Setup(x => x.Send(It.IsAny<DetachAddressFromBuildingUnitRequest>(), CancellationToken.None).Result)
                 .Returns(new ETagResponse(string.Empty, string.Empty));
 
             var buildingUnitPersistentLocalId = Fixture.Create<BuildingUnitPersistentLocalId>();
@@ -48,17 +45,17 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenAttachingAddressToBuildingUn
             addresses.Setup(x => x.GetOptional(address.AddressPersistentLocalId)).Returns(address);
 
             //Act
-            var result = (AcceptedWithETagResult)await _controller.AttachAddress(
+            var result = (AcceptedWithETagResult)await _controller.DetachAddress(
                 ResponseOptions,
                 MockIfMatchValidator(true),
-                new AttachAddressToBuildingUnitRequestValidator(addresses.Object),
+                new DetachAddressFromBuildingUnitRequestValidator(addresses.Object),
                 buildingUnitPersistentLocalId,
-                new AttachAddressToBuildingUnitRequest() { AdresId = PuriCreator.CreateAdresId(address.AddressPersistentLocalId) },
+                new DetachAddressFromBuildingUnitRequest { AdresId = PuriCreator.CreateAdresId(address.AddressPersistentLocalId) },
                 string.Empty,
                 CancellationToken.None);
 
             //Assert
-            MockMediator.Verify(x => x.Send(It.IsAny<AttachAddressToBuildingUnitRequest>(), CancellationToken.None), Times.Once);
+            MockMediator.Verify(x => x.Send(It.IsAny<DetachAddressFromBuildingUnitRequest>(), CancellationToken.None), Times.Once);
 
             result.StatusCode.Should().Be(202);
             result.Location.Should().Be(string.Format(BuildingUnitDetailUrl, buildingUnitPersistentLocalId));
@@ -68,12 +65,12 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenAttachingAddressToBuildingUn
         public async Task WithInvalidIfMatchHeader_ThenPreconditionFailedResponse()
         {
             //Act
-            var result = await _controller.AttachAddress(
+            var result = await _controller.DetachAddress(
                 ResponseOptions,
                 MockIfMatchValidator(false),
-                MockValidRequestValidator<AttachAddressToBuildingUnitRequest>(),
+                MockValidRequestValidator<DetachAddressFromBuildingUnitRequest>(),
                 Fixture.Create<BuildingUnitPersistentLocalId>(),
-                Fixture.Create<AttachAddressToBuildingUnitRequest>(),
+                Fixture.Create<DetachAddressFromBuildingUnitRequest>(),
                 "IncorrectIfMatchHeader");
 
             //Assert
@@ -84,16 +81,16 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenAttachingAddressToBuildingUn
         public void WithAggregateIdIsNotFound_ThenThrowsApiException()
         {
             MockMediator
-                .Setup(x => x.Send(It.IsAny<AttachAddressToBuildingUnitRequest>(), CancellationToken.None))
+                .Setup(x => x.Send(It.IsAny<DetachAddressFromBuildingUnitRequest>(), CancellationToken.None))
                 .Throws(new AggregateIdIsNotFoundException());
 
-            var request = Fixture.Create<AttachAddressToBuildingUnitRequest>();
+            var request = Fixture.Create<DetachAddressFromBuildingUnitRequest>();
             Func<Task> act = async () =>
             {
-                await _controller.AttachAddress(
+                await _controller.DetachAddress(
                     ResponseOptions,
                     MockIfMatchValidator(true),
-                    MockValidRequestValidator<AttachAddressToBuildingUnitRequest>(),
+                    MockValidRequestValidator<DetachAddressFromBuildingUnitRequest>(),
                     Fixture.Create<BuildingUnitPersistentLocalId>(),
                     request,
                     string.Empty);

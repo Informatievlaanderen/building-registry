@@ -19,8 +19,8 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.Validation
 
             public static class AdresIdInvalid
             {
-                public const string Code = "AdresOngeldig";
-                public const string Message = "Ongeldig AdresId.";
+                public const string Code = "GebouweenheidAdresOngeldig";
+                public const string Message = "Ongeldig adresId.";
 
                 public static TicketError ToTicketError() => new(Message, Code);
             }

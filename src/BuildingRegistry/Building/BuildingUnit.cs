@@ -345,9 +345,9 @@ namespace BuildingRegistry.Building
 
             GuardRemovedAddress(address);
 
-            var validStatuses = new[] { AddressStatus.Current, AddressStatus.Proposed };
+            var validAddressStatuses = new[] { AddressStatus.Current, AddressStatus.Proposed };
 
-            if (!validStatuses.Contains(address.Value.Status))
+            if (!validAddressStatuses.Contains(address!.Value.Status))
             {
                 throw new AddressHasInvalidStatusException();
             }
