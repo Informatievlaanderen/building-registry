@@ -167,6 +167,24 @@ jobs:
       env:
         SEMVER: ${{ env.RELEASE_VERSION }}
 
+    - name: Upload NuGet package be-.-vlaanderen-.-basisregisters-.-building-registry-.-api-.-legacy-.-abstractions
+      if: env.RELEASE_VERSION != 'none'
+      uses: actions/upload-artifact@v3
+      with:
+        name: nuget-be-.-vlaanderen-.-basisregisters-.-building-registry-.-api-.-legacy-.-abstractions
+        path: /home/runner/work/building-registry/building-registry/dist/nuget/Be.Vlaanderen.Basisregisters.BuildingRegistry.Api.Legacy.Abstractions.*.nupkg
+      env:
+        SEMVER: ${{ env.RELEASE_VERSION }}
+
+    - name: Upload NuGet package be-.-vlaanderen-.-basisregisters-.-building-registry-.-api-.-oslo-.-abstractions
+      if: env.RELEASE_VERSION != 'none'
+      uses: actions/upload-artifact@v3
+      with:
+        name: nuget-be-.-vlaanderen-.-basisregisters-.-building-registry-.-api-.-oslo-.-abstractions
+        path: /home/runner/work/building-registry/building-registry/dist/nuget/Be.Vlaanderen.Basisregisters.BuildingRegistry.Api.Oslo.Abstractions.*.nupkg
+      env:
+        SEMVER: ${{ env.RELEASE_VERSION }}
+
     - name: Upload NuGet package be-.-vlaanderen-.-basisregisters-.-building-registry-.-api-.-back-office-.-abstractions
       if: env.RELEASE_VERSION != 'none'
       uses: actions/upload-artifact@v3
@@ -449,6 +467,20 @@ jobs:
         name: nuget-be-.-vlaanderen-.-basisregisters-.-building-registry-.-api-.-extract-.-abstractions
         path: ~/
 
+    - name: Download NuGet package be-.-vlaanderen-.-basisregisters-.-building-registry-.-api-.-legacy-.-abstractions
+      if: env.RELEASE_VERSION != 'none'
+      uses: actions/download-artifact@v3
+      with:
+        name: nuget-be-.-vlaanderen-.-basisregisters-.-building-registry-.-api-.-legacy-.-abstractions
+        path: ~/
+
+    - name: Download NuGet package be-.-vlaanderen-.-basisregisters-.-building-registry-.-api-.-oslo-.-abstractions
+      if: env.RELEASE_VERSION != 'none'
+      uses: actions/download-artifact@v3
+      with:
+        name: nuget-be-.-vlaanderen-.-basisregisters-.-building-registry-.-api-.-oslo-.-abstractions
+        path: ~/
+
     - name: Download NuGet package be-.-vlaanderen-.-basisregisters-.-building-registry-.-api-.-back-office-.-abstractions
       if: env.RELEASE_VERSION != 'none'
       uses: actions/download-artifact@v3
@@ -464,6 +496,8 @@ jobs:
         dotnet nuget push ~/Be.Vlaanderen.Basisregisters.BuildingRegistry.Api.BackOffice.$SEMVER.nupkg --source nuget.org --api-key $NUGET_API_KEY
         dotnet nuget push ~/Be.Vlaanderen.Basisregisters.BuildingRegistry.Projector.$SEMVER.nupkg --source nuget.org --api-key $NUGET_API_KEY
         dotnet nuget push ~/Be.Vlaanderen.Basisregisters.BuildingRegistry.Api.Extract.Abstractions.$SEMVER.nupkg --source nuget.org --api-key $NUGET_API_KEY
+        dotnet nuget push ~/Be.Vlaanderen.Basisregisters.BuildingRegistry.Api.Legacy.Abstractions.$SEMVER.nupkg --source nuget.org --api-key $NUGET_API_KEY
+        dotnet nuget push ~/Be.Vlaanderen.Basisregisters.BuildingRegistry.Api.Oslo.Abstractions.$SEMVER.nupkg --source nuget.org --api-key $NUGET_API_KEY
         dotnet nuget push ~/Be.Vlaanderen.Basisregisters.BuildingRegistry.Api.BackOffice.Abstractions.$SEMVER.nupkg --source nuget.org --api-key $NUGET_API_KEY
       env:
         SEMVER: ${{ needs.build.outputs.version }}
