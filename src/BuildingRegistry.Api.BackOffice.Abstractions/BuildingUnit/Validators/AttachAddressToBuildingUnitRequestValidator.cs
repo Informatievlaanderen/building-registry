@@ -3,14 +3,13 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Validators
     using Be.Vlaanderen.Basisregisters.GrAr.Edit.Validators;
     using Building.Validators;
     using BuildingRegistry.Building;
-    using Consumer.Address;
-    using Requests;
     using FluentValidation;
+    using Requests;
     using Validation;
 
     public class AttachAddressToBuildingUnitRequestValidator : AbstractValidator<AttachAddressToBuildingUnitRequest>
     {
-        public AttachAddressToBuildingUnitRequestValidator(ConsumerAddressContext consumerAddressContext)
+        public AttachAddressToBuildingUnitRequestValidator(IAddresses addresses)
         {
             RuleFor(x => x.AdresId)
                 .Must(adresId =>
@@ -23,7 +22,7 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Validators
                         {
                             var addressPersistentLocalId = OsloPuriValidatorExtensions.ParsePersistentLocalId(adresId);
 
-                            var address = consumerAddressContext.GetOptional(new AddressPersistentLocalId(addressPersistentLocalId));
+                            var address = addresses.GetOptional(new AddressPersistentLocalId(addressPersistentLocalId));
                             return address is not null && !address.Value.IsRemoved;
                         }).DependentRules(() =>
                         {
@@ -32,7 +31,7 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Validators
                                 {
                                     var addressPersistentLocalId = OsloPuriValidatorExtensions.ParsePersistentLocalId(adresId);
 
-                                    var address = consumerAddressContext.GetOptional(new AddressPersistentLocalId(addressPersistentLocalId));
+                                    var address = addresses.GetOptional(new AddressPersistentLocalId(addressPersistentLocalId));
                                     return address.Value.Status == BuildingRegistry.Building.Datastructures.AddressStatus.Current
                                            || address.Value.Status == BuildingRegistry.Building.Datastructures.AddressStatus.Proposed;
                                 })
