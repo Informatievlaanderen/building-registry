@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BuildingRegistry.Consumer.Address.Migrations
 {
     [DbContext(typeof(ConsumerAddressContext))]
-    [Migration("20220602152225_Initial")]
+    [Migration("20221221102432_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -23,30 +23,6 @@ namespace BuildingRegistry.Consumer.Address.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
-
-            modelBuilder.Entity("Be.Vlaanderen.Basisregisters.ProjectionHandling.Runner.ProjectionStates.ProjectionStateItem", b =>
-                {
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("DesiredState")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTimeOffset?>("DesiredStateChangedAt")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("ErrorMessage")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<long>("Position")
-                        .HasColumnType("bigint");
-
-                    b.HasKey("Name");
-
-                    SqlServerKeyBuilderExtensions.IsClustered(b.HasKey("Name"));
-
-                    b.ToTable("ProjectionStates", "BuildingRegistryConsumerAddress");
-                });
 
             modelBuilder.Entity("BuildingRegistry.Consumer.Address.AddressConsumerItem", b =>
                 {
@@ -72,6 +48,22 @@ namespace BuildingRegistry.Consumer.Address.Migrations
                     b.HasIndex("IsRemoved");
 
                     b.ToTable("Addresses", "BuildingRegistryConsumerAddress");
+                });
+
+            modelBuilder.Entity("BuildingRegistry.Consumer.Address.ProcessedMessage", b =>
+                {
+                    b.Property<string>("IdempotenceKey")
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
+
+                    b.Property<DateTimeOffset>("DateProcessed")
+                        .HasColumnType("datetimeoffset");
+
+                    b.HasKey("IdempotenceKey");
+
+                    SqlServerKeyBuilderExtensions.IsClustered(b.HasKey("IdempotenceKey"));
+
+                    b.ToTable("ProcessedMessages", "BuildingRegistryConsumerAddress");
                 });
 #pragma warning restore 612, 618
         }

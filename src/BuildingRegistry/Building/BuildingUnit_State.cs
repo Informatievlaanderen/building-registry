@@ -3,6 +3,7 @@ namespace BuildingRegistry.Building
     using System;
     using System.Collections.Generic;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
+    using BuildingRegistry.Building.Commands;
     using Events;
 
     public partial class BuildingUnit
@@ -51,6 +52,9 @@ namespace BuildingRegistry.Building
             Register<CommonBuildingUnitWasAddedV2>(When);
             Register<BuildingUnitAddressWasAttachedV2>(When);
             Register<BuildingUnitAddressWasDetachedV2>(When);
+            Register<BuildingUnitAddressWasDetachedBecauseAddressWasRemoved>(When);
+            Register<BuildingUnitAddressWasDetachedBecauseAddressWasRejected>(When);
+            Register<BuildingUnitAddressWasDetachedBecauseAddressWasRetired>(When);
         }
 
         private void When(BuildingWasMigrated @event)
@@ -218,6 +222,27 @@ namespace BuildingRegistry.Building
         }
 
         private void When(BuildingUnitAddressWasDetachedV2 @event)
+        {
+            _addressPersistentLocalIds.Remove(new AddressPersistentLocalId(@event.AddressPersistentLocalId));
+
+            _lastEvent = @event;
+        }
+
+        private void When(BuildingUnitAddressWasDetachedBecauseAddressWasRemoved @event)
+        {
+            _addressPersistentLocalIds.Remove(new AddressPersistentLocalId(@event.AddressPersistentLocalId));
+
+            _lastEvent = @event;
+        }
+
+        private void When(BuildingUnitAddressWasDetachedBecauseAddressWasRejected @event)
+        {
+            _addressPersistentLocalIds.Remove(new AddressPersistentLocalId(@event.AddressPersistentLocalId));
+
+            _lastEvent = @event;
+        }
+
+        private void When(BuildingUnitAddressWasDetachedBecauseAddressWasRetired @event)
         {
             _addressPersistentLocalIds.Remove(new AddressPersistentLocalId(@event.AddressPersistentLocalId));
 

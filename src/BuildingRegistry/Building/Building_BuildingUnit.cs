@@ -188,6 +188,33 @@ namespace BuildingRegistry.Building
                 .DetachAddress(addressPersistentLocalId, _addresses);
         }
 
+        public void DetachAddressFromBuildingUnitBecauseAddressWasRemoved(
+            BuildingUnitPersistentLocalId buildingUnitPersistentLocalId,
+            AddressPersistentLocalId addressPersistentLocalId)
+        {
+            _buildingUnits
+                .GetNotRemovedByPersistentLocalId(buildingUnitPersistentLocalId)
+                .DetachAddressBecauseAddressWasRemoved(addressPersistentLocalId);
+        }
+
+        public void DetachAddressFromBuildingUnitBecauseAddressWasRejected(
+            BuildingUnitPersistentLocalId buildingUnitPersistentLocalId,
+            AddressPersistentLocalId addressPersistentLocalId)
+        {
+            _buildingUnits
+                .GetNotRemovedByPersistentLocalId(buildingUnitPersistentLocalId)
+                .DetachAddressBecauseAddressWasRejected(addressPersistentLocalId);
+        }
+
+        public void DetachAddressFromBuildingUnitBecauseAddressWasRetired(
+            BuildingUnitPersistentLocalId buildingUnitPersistentLocalId,
+            AddressPersistentLocalId addressPersistentLocalId)
+        {
+            _buildingUnits
+                .GetNotRemovedByPersistentLocalId(buildingUnitPersistentLocalId)
+                .DetachAddressBecauseAddressWasRetired(addressPersistentLocalId);
+        }
+
         private void GuardBuildingInvalidStatuses(params BuildingStatus[] invalidStatuses)
         {
             if (invalidStatuses.Contains(BuildingStatus))

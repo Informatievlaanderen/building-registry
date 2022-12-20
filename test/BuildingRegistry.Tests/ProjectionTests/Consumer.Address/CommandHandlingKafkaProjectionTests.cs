@@ -1,0 +1,429 @@
+namespace BuildingRegistry.Tests.ProjectionTests.Consumer.Address
+{
+    using System;
+    using System.Threading;
+    using System.Threading.Tasks;
+    using Api.BackOffice.Abstractions;
+    using AutoFixture;
+    using BackOffice;
+    using Be.Vlaanderen.Basisregisters.GrAr.Contracts.AddressRegistry;
+    using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
+    using Building;
+    using Building.Commands;
+    using BuildingRegistry.Consumer.Address;
+    using BuildingRegistry.Consumer.Address.Projections;
+    using Microsoft.EntityFrameworkCore;
+    using Microsoft.Extensions.Logging.Abstractions;
+    using Moq;
+    using NodaTime;
+    using Tests.Legacy.Autofixture;
+    using Xunit;
+    using Xunit.Abstractions;
+    using Provenance = Be.Vlaanderen.Basisregisters.GrAr.Contracts.Common.Provenance;
+    
+    public sealed class CommandHandlingKafkaProjectionTests : KafkaProjectionTest<CommandHandler, CommandHandlingKafkaProjection>
+    {
+        private readonly FakeBackOfficeContext _fakeBackOfficeContext;
+        private readonly Mock<FakeCommandHandler> _mockCommandHandler;
+
+        public CommandHandlingKafkaProjectionTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
+        {
+            Fixture.Customize(new InfrastructureCustomization());
+
+            _mockCommandHandler = new Mock<FakeCommandHandler>();
+            _fakeBackOfficeContext = new FakeBackOfficeContextFactory().CreateDbContext(Array.Empty<string>());
+        }
+
+        [Fact]
+        public async Task DetachAddressFromBuildingUnitBecauseRemovedAddressWasMigrated()
+        {
+            var addressPersistentLocalId = 456;
+
+            var @event = new AddressWasMigratedToStreetName(
+                streetNamePersistentLocalId: 0,
+                addressId: string.Empty,
+                streetNameId: string.Empty,
+                addressPersistentLocalId: addressPersistentLocalId,
+                status: string.Empty,
+                houseNumber: string.Empty,
+                boxNumber: string.Empty,
+                geometryMethod: string.Empty,
+                geometrySpecification: string.Empty,
+                extendedWkbGeometry: string.Empty,
+                officiallyAssigned: true,
+                postalCode: string.Empty,
+                isCompleted: false,
+                isRemoved: true,
+                parentPersistentLocalId: null,
+                new Provenance(
+                    Instant.FromDateTimeOffset(DateTimeOffset.Now).ToString(),
+                    Application.ParcelRegistry.ToString(),
+                    Modification.Update.ToString(),
+                    Organisation.Aiv.ToString(),
+                    "test"));
+
+            AddRelations(addressPersistentLocalId,addressPersistentLocalId);
+
+            Given(@event);
+            await Then(async _ =>
+            {
+                _mockCommandHandler.Verify(x => x.Handle(It.IsAny<DetachAddressFromBuildingUnitBecauseAddressWasRemoved>(), CancellationToken.None), Times.Exactly(2));
+                await Task.CompletedTask;
+            });
+        }
+
+        [Fact]
+        public async Task DetachAddressFromBuildingUnitBecauseRejectedAddressWasMigrated()
+        {
+            var addressPersistentLocalId = 456;
+
+            var @event = new AddressWasMigratedToStreetName(
+                streetNamePersistentLocalId: 0,
+                addressId: string.Empty,
+                streetNameId: string.Empty,
+                addressPersistentLocalId: addressPersistentLocalId,
+                status: AddressStatus.Rejected,
+                houseNumber: string.Empty,
+                boxNumber: string.Empty,
+                geometryMethod: string.Empty,
+                geometrySpecification: string.Empty,
+                extendedWkbGeometry: string.Empty,
+                officiallyAssigned: true,
+                postalCode: string.Empty,
+                isCompleted: false,
+                isRemoved: false,
+                parentPersistentLocalId: null,
+                new Provenance(
+                    Instant.FromDateTimeOffset(DateTimeOffset.Now).ToString(),
+                    Application.ParcelRegistry.ToString(),
+                    Modification.Update.ToString(),
+                    Organisation.Aiv.ToString(),
+                    "test"));
+
+            AddRelations(addressPersistentLocalId, addressPersistentLocalId);
+
+            Given(@event);
+            await Then(async _ =>
+            {
+                _mockCommandHandler.Verify(x => x.Handle(It.IsAny<DetachAddressFromBuildingUnitBecauseAddressWasRejected>(), CancellationToken.None), Times.Exactly(2));
+                await Task.CompletedTask;
+            });
+        }
+
+        [Fact]
+        public async Task DetachAddressFromBuildingUnitBecauseRetiredAddressWasMigrated()
+        {
+            var addressPersistentLocalId = 456;
+
+            var @event = new AddressWasMigratedToStreetName(
+                streetNamePersistentLocalId: 0,
+                addressId: string.Empty,
+                streetNameId: string.Empty,
+                addressPersistentLocalId: addressPersistentLocalId,
+                status: AddressStatus.Retired,
+                houseNumber: string.Empty,
+                boxNumber: string.Empty,
+                geometryMethod: string.Empty,
+                geometrySpecification: string.Empty,
+                extendedWkbGeometry: string.Empty,
+                officiallyAssigned: true,
+                postalCode: string.Empty,
+                isCompleted: false,
+                isRemoved: false,
+                parentPersistentLocalId: null,
+                new Provenance(
+                    Instant.FromDateTimeOffset(DateTimeOffset.Now).ToString(),
+                    Application.ParcelRegistry.ToString(),
+                    Modification.Update.ToString(),
+                    Organisation.Aiv.ToString(),
+                    "test"));
+
+            AddRelations(addressPersistentLocalId, addressPersistentLocalId);
+
+            Given(@event);
+            await Then(async _ =>
+            {
+                _mockCommandHandler.Verify(x => x.Handle(It.IsAny<DetachAddressFromBuildingUnitBecauseAddressWasRetired>(), CancellationToken.None), Times.Exactly(2));
+                await Task.CompletedTask;
+            });
+        }
+
+        [Theory]
+        [InlineData("Current")]
+        [InlineData("Proposed")]
+        public async Task DoNothingWhenAddressStatus(string status)
+        {
+            var addressPersistentLocalId = 456;
+
+            var @event = new AddressWasMigratedToStreetName(
+                streetNamePersistentLocalId: 0,
+                addressId: string.Empty,
+                streetNameId: string.Empty,
+                addressPersistentLocalId: addressPersistentLocalId,
+                status: AddressStatus.Parse(status),
+                houseNumber: string.Empty,
+                boxNumber: string.Empty,
+                geometryMethod: string.Empty,
+                geometrySpecification: string.Empty,
+                extendedWkbGeometry: string.Empty,
+                officiallyAssigned: true,
+                postalCode: string.Empty,
+                isCompleted: false,
+                isRemoved: false,
+                parentPersistentLocalId: null,
+                new Provenance(
+                    Instant.FromDateTimeOffset(DateTimeOffset.Now).ToString(),
+                    Application.ParcelRegistry.ToString(),
+                    Modification.Update.ToString(),
+                    Organisation.Aiv.ToString(),
+                    "test"));
+
+            AddRelations(addressPersistentLocalId, addressPersistentLocalId);
+
+            Given(@event);
+            await Then(async _ =>
+            {
+                _mockCommandHandler.Verify(x => x.Handle(It.IsAny<DetachAddressFromBuildingUnitBecauseAddressWasRemoved>(), CancellationToken.None),
+                    Times.Never);
+                _mockCommandHandler.Verify(x => x.Handle(It.IsAny<DetachAddressFromBuildingUnitBecauseAddressWasRejected>(), CancellationToken.None),
+                    Times.Never);
+                _mockCommandHandler.Verify(x => x.Handle(It.IsAny<DetachAddressFromBuildingUnitBecauseAddressWasRetired>(), CancellationToken.None),
+                    Times.Never);
+                await Task.CompletedTask;
+            });
+        }
+
+        [Fact]
+        public async Task DetachAddressFromBuildingUnitBecauseAddressWasRemoved()
+        {
+            var addressIntId = 456;
+
+            var @event = new AddressWasRemovedV2(
+                123,
+                addressIntId,
+                new Provenance(
+                    Instant.FromDateTimeOffset(DateTimeOffset.Now).ToString(),
+                    Application.ParcelRegistry.ToString(),
+                    Modification.Update.ToString(),
+                    Organisation.Aiv.ToString(),
+                    "test"));
+
+            AddRelations(456, 456);
+
+            Given(@event);
+             await Then(async _ =>
+                {
+                    _mockCommandHandler.Verify(x => x.Handle(It.IsAny<DetachAddressFromBuildingUnitBecauseAddressWasRemoved>(), CancellationToken.None), Times.Exactly(2));
+                    await Task.CompletedTask;
+                });
+        }
+
+        [Fact]
+        public async Task DetachAddressFromBuildingUnitBecauseAddressWasRejected()
+        {
+            var addressIntId = 456;
+
+            var @event = new AddressWasRejected(
+                123,
+                addressIntId,
+                new Provenance(
+                    Instant.FromDateTimeOffset(DateTimeOffset.Now).ToString(),
+                    Application.ParcelRegistry.ToString(),
+                    Modification.Update.ToString(),
+                    Organisation.Aiv.ToString(),
+                    "test"));
+
+            AddRelations(456, 456);
+
+            Given(@event);
+            await Then(async _ =>
+            {
+                _mockCommandHandler.Verify(x => x.Handle(It.IsAny<DetachAddressFromBuildingUnitBecauseAddressWasRejected>(), CancellationToken.None), Times.Exactly(2));
+                await Task.CompletedTask;
+            });
+        }
+
+        [Fact]
+        public async Task DetachAddressFromBuildingUnitBecauseHouseNumberWasRejected()
+        {
+            var addressIntId = 456;
+
+            var @event = new AddressWasRejectedBecauseHouseNumberWasRejected(
+                123,
+                addressIntId,
+                new Provenance(
+                    Instant.FromDateTimeOffset(DateTimeOffset.Now).ToString(),
+                    Application.ParcelRegistry.ToString(),
+                    Modification.Update.ToString(),
+                    Organisation.Aiv.ToString(),
+                    "test"));
+
+            AddRelations(456, 456);
+
+            Given(@event);
+            await Then(async _ =>
+            {
+                _mockCommandHandler.Verify(x => x.Handle(It.IsAny<DetachAddressFromBuildingUnitBecauseAddressWasRejected>(), CancellationToken.None), Times.Exactly(2));
+                await Task.CompletedTask;
+            });
+        }
+
+        [Fact]
+        public async Task DetachAddressFromBuildingUnitBecause_AddressWasRejectedBecauseHouseNumberWasRetired()
+        {
+            var addressIntId = 456;
+
+            var @event = new AddressWasRejectedBecauseHouseNumberWasRetired(
+                123,
+                addressIntId,
+                new Provenance(
+                    Instant.FromDateTimeOffset(DateTimeOffset.Now).ToString(),
+                    Application.ParcelRegistry.ToString(),
+                    Modification.Update.ToString(),
+                    Organisation.Aiv.ToString(),
+                    "test"));
+
+            AddRelations(456, 456);
+
+            Given(@event);
+            await Then(async _ =>
+            {
+                _mockCommandHandler.Verify(x => x.Handle(It.IsAny<DetachAddressFromBuildingUnitBecauseAddressWasRejected>(), CancellationToken.None), Times.Exactly(2));
+                await Task.CompletedTask;
+            });
+        }
+
+        [Fact]
+        public async Task DetachAddressFromBuildingUnitBecause_AddressWasRejectedBecauseStreetNameWasRetired()
+        {
+            var addressIntId = 456;
+
+            var @event = new AddressWasRejectedBecauseStreetNameWasRetired(
+                123,
+                addressIntId,
+                new Provenance(
+                    Instant.FromDateTimeOffset(DateTimeOffset.Now).ToString(),
+                    Application.ParcelRegistry.ToString(),
+                    Modification.Update.ToString(),
+                    Organisation.Aiv.ToString(),
+                    "test"));
+
+            AddRelations(456, 456);
+
+            Given(@event);
+            await Then(async _ =>
+            {
+                _mockCommandHandler.Verify(x => x.Handle(It.IsAny<DetachAddressFromBuildingUnitBecauseAddressWasRejected>(), CancellationToken.None), Times.Exactly(2));
+                await Task.CompletedTask;
+            });
+        }
+
+        [Fact]
+        public async Task DetachAddressFromBuildingUnitBecauseAddressWasRetiredV2()
+        {
+            var addressIntId = 456;
+
+            var @event = new AddressWasRetiredV2(
+                123,
+                addressIntId,
+                new Provenance(
+                    Instant.FromDateTimeOffset(DateTimeOffset.Now).ToString(),
+                    Application.ParcelRegistry.ToString(),
+                    Modification.Update.ToString(),
+                    Organisation.Aiv.ToString(),
+                    "test"));
+
+            AddRelations(456, 456);
+
+            Given(@event);
+            await Then(async _ =>
+            {
+                _mockCommandHandler.Verify(x => x.Handle(It.IsAny<DetachAddressFromBuildingUnitBecauseAddressWasRetired>(), CancellationToken.None), Times.Exactly(2));
+                await Task.CompletedTask;
+            });
+        }
+
+        [Fact]
+        public async Task DetachAddressFromBuildingUnitBecauseHouseNumberWasRetired()
+        {
+            var addressIntId = 456;
+
+            var @event = new AddressWasRetiredBecauseHouseNumberWasRetired(
+                123,
+                addressIntId,
+                new Provenance(
+                    Instant.FromDateTimeOffset(DateTimeOffset.Now).ToString(),
+                    Application.ParcelRegistry.ToString(),
+                    Modification.Update.ToString(),
+                    Organisation.Aiv.ToString(),
+                    "test"));
+
+            AddRelations(456, 456);
+
+            Given(@event);
+            await Then(async _ =>
+            {
+                _mockCommandHandler.Verify(x => x.Handle(It.IsAny<DetachAddressFromBuildingUnitBecauseAddressWasRetired>(), CancellationToken.None), Times.Exactly(2));
+                await Task.CompletedTask;
+            });
+        }
+
+        [Fact]
+        public async Task DetachAddressFromBuildingUnitBecauseStreetNameWasRetired()
+        {
+            var addressIntId = 456;
+
+            var @event = new AddressWasRetiredBecauseStreetNameWasRetired(
+                123,
+                addressIntId,
+                new Provenance(
+                    Instant.FromDateTimeOffset(DateTimeOffset.Now).ToString(),
+                    Application.ParcelRegistry.ToString(),
+                    Modification.Update.ToString(),
+                    Organisation.Aiv.ToString(),
+                    "test"));
+
+            AddRelations(456, 456);
+
+            Given(@event);
+            await Then(async _ =>
+            {
+                _mockCommandHandler.Verify(x => x.Handle(It.IsAny<DetachAddressFromBuildingUnitBecauseAddressWasRetired>(), CancellationToken.None), Times.Exactly(2));
+                await Task.CompletedTask;
+            });
+        }
+
+        private void AddRelations(params int[] addressInts)
+        {
+            foreach (var addressInt in addressInts)
+            {
+                _fakeBackOfficeContext.BuildingUnitAddressRelation.Add(
+                    new BuildingUnitAddressRelation(Fixture.Create<BuildingPersistentLocalId>(),
+                        Fixture.Create<BuildingUnitPersistentLocalId>(),
+                        new AddressPersistentLocalId(addressInt)));
+            }
+
+            _fakeBackOfficeContext.SaveChanges();
+        }
+
+        protected override CommandHandler CreateContext()
+        {
+            return _mockCommandHandler.Object;
+        }
+
+        protected override CommandHandlingKafkaProjection CreateProjection()
+        {
+            var factoryMock = new Mock<IDbContextFactory<BackOfficeContext>>();
+            factoryMock
+                .Setup(x => x.CreateDbContextAsync(CancellationToken.None))
+                .Returns(Task.FromResult<BackOfficeContext>(_fakeBackOfficeContext));
+            return new CommandHandlingKafkaProjection(factoryMock.Object);
+        }
+    }
+
+    public class FakeCommandHandler : CommandHandler
+    {
+        public FakeCommandHandler() : base(null, new NullLoggerFactory())
+        { }
+    }
+}

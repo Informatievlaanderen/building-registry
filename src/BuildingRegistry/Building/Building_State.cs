@@ -4,6 +4,7 @@ namespace BuildingRegistry.Building
     using System.Linq;
     using Be.Vlaanderen.Basisregisters.AggregateSource.Snapshotting;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
+    using BuildingRegistry.Building.Commands;
     using Events;
 
     public partial class Building
@@ -69,6 +70,9 @@ namespace BuildingRegistry.Building
             Register<CommonBuildingUnitWasAddedV2>(When);
             Register<BuildingUnitAddressWasAttachedV2>(When);
             Register<BuildingUnitAddressWasDetachedV2>(When);
+            Register<BuildingUnitAddressWasDetachedBecauseAddressWasRemoved>(When);
+            Register<BuildingUnitAddressWasDetachedBecauseAddressWasRejected>(When);
+            Register<BuildingUnitAddressWasDetachedBecauseAddressWasRetired>(When);
 
             Register<BuildingSnapshot>(When);
         }
@@ -300,6 +304,27 @@ namespace BuildingRegistry.Building
         }
 
         private void When(BuildingUnitAddressWasDetachedV2 @event)
+        {
+            var buildingUnit = _buildingUnits
+                .GetByPersistentLocalId(new BuildingUnitPersistentLocalId(@event.BuildingUnitPersistentLocalId));
+            buildingUnit.Route(@event);
+        }
+
+        private void When(BuildingUnitAddressWasDetachedBecauseAddressWasRemoved @event)
+        {
+            var buildingUnit = _buildingUnits
+                .GetByPersistentLocalId(new BuildingUnitPersistentLocalId(@event.BuildingUnitPersistentLocalId));
+            buildingUnit.Route(@event);
+        }
+
+        private void When(BuildingUnitAddressWasDetachedBecauseAddressWasRejected @event)
+        {
+            var buildingUnit = _buildingUnits
+                .GetByPersistentLocalId(new BuildingUnitPersistentLocalId(@event.BuildingUnitPersistentLocalId));
+            buildingUnit.Route(@event);
+        }
+
+        private void When(BuildingUnitAddressWasDetachedBecauseAddressWasRetired @event)
         {
             var buildingUnit = _buildingUnits
                 .GetByPersistentLocalId(new BuildingUnitPersistentLocalId(@event.BuildingUnitPersistentLocalId));

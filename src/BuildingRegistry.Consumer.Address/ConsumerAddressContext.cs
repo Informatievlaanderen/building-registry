@@ -1,14 +1,20 @@
 namespace BuildingRegistry.Consumer.Address
 {
     using System;
+    using System.IO;
     using System.Linq;
-    using Be.Vlaanderen.Basisregisters.ProjectionHandling.Runner;
+    using System.Reflection;
+    using Be.Vlaanderen.Basisregisters.ProjectionHandling.Runner.MigrationExtensions;
     using Building.Datastructures;
-    using BuildingRegistry.Building;
+    using Building;
     using BuildingRegistry.Infrastructure;
     using Microsoft.EntityFrameworkCore;
+    using Microsoft.EntityFrameworkCore.Design;
+    using Microsoft.Extensions.Configuration;
+    using Be.Vlaanderen.Basisregisters.EntityFrameworkCore.EntityTypeConfiguration;
+    using Polly;
 
-    public class ConsumerAddressContext : RunnerDbContext<ConsumerAddressContext>, IAddresses
+    public class ConsumerAddressContext : SqlServerConsumerDbContext<ConsumerAddressContext>, IAddresses
     {
         public DbSet<AddressConsumerItem> AddressConsumerItems { get; set; }
 
@@ -21,7 +27,7 @@ namespace BuildingRegistry.Consumer.Address
             : base(options)
         { }
 
-        public override string ProjectionStateSchema => Schema.ConsumerAddress;
+        public override string ProcessedMessagesSchema => Schema.ConsumerAddress;
 
         public AddressData? GetOptional(AddressPersistentLocalId addressPersistentLocalId)
         {
@@ -58,24 +64,43 @@ namespace BuildingRegistry.Consumer.Address
 
             throw new NotImplementedException($"Cannot parse {status} to AddressStatus");
         }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.AddEntityConfigurationsFromAssembly(typeof(ConsumerAddressContext).GetTypeInfo().Assembly);
+        }
     }
 
-    public class ConsumerContextFactory : RunnerDbContextMigrationFactory<ConsumerAddressContext>
+    public class ConsumerContextFactory : IDesignTimeDbContextFactory<ConsumerAddressContext>
     {
-        public ConsumerContextFactory()
-            : this("ConsumerAddressAdmin")
-        { }
+        public ConsumerAddressContext CreateDbContext(string[] args)
+        {
+            const string migrationConnectionStringName = "ConsumerAddressAdmin";
 
-        public ConsumerContextFactory(string connectionStringName)
-            : base(connectionStringName, new MigrationHistoryConfiguration
-            {
-                Schema = Schema.ConsumerAddress,
-                Table = MigrationTables.ConsumerAddress
-            })
-        { }
+            var configuration = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: false)
+                .AddJsonFile($"appsettings.{Environment.MachineName.ToLowerInvariant()}.json", optional: true, reloadOnChange: false)
+                .AddEnvironmentVariables()
+                .Build();
 
-        protected override ConsumerAddressContext CreateContext(DbContextOptions<ConsumerAddressContext> migrationContextOptions) => new ConsumerAddressContext(migrationContextOptions);
+            var builder = new DbContextOptionsBuilder<ConsumerAddressContext>();
 
-        public ConsumerAddressContext Create(DbContextOptions<ConsumerAddressContext> options) => CreateContext(options);
+            var connectionString = configuration.GetConnectionString(migrationConnectionStringName);
+            if (string.IsNullOrEmpty(connectionString))
+                throw new InvalidOperationException($"Could not find a connection string with name '{migrationConnectionStringName}'");
+
+            builder
+                .UseSqlServer(connectionString, sqlServerOptions =>
+                {
+                    sqlServerOptions.EnableRetryOnFailure();
+                    sqlServerOptions.MigrationsHistoryTable(MigrationTables.ConsumerAddress, Schema.ConsumerAddress);
+                })
+                .UseExtendedSqlServerMigrations();
+
+            return new ConsumerAddressContext(builder.Options);
+        }
     }
 }
