@@ -9,7 +9,16 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
         public long Position { get; set; }
         public int BuildingUnitPersistentLocalId { get; set; }
         public int AddressPersistentLocalId { get; set; }
-        public int Count { get; set; }
+
+        private BuildingUnitAddressSyndicationItemV2()
+        { }
+        
+        public BuildingUnitAddressSyndicationItemV2(long position, int buildingUnitPersistentLocalId, int addressPersistentLocalId)
+        {
+            Position = position;
+            BuildingUnitPersistentLocalId = buildingUnitPersistentLocalId;
+            AddressPersistentLocalId = addressPersistentLocalId;
+        }
 
         public BuildingUnitAddressSyndicationItemV2 CloneAndApplyEventInfo(long position)
         {
@@ -17,8 +26,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
             {
                 Position = position,
                 BuildingUnitPersistentLocalId = BuildingUnitPersistentLocalId,
-                AddressPersistentLocalId = AddressPersistentLocalId,
-                Count = Count
+                AddressPersistentLocalId = AddressPersistentLocalId
             };
 
             return newItem;
@@ -35,8 +43,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
                 .HasKey(p => new { p.Position, p.BuildingUnitPersistentLocalId, p.AddressPersistentLocalId })
                 .IsClustered(false);
 
-            b.Property(x => x.Count);
-
+            b.HasIndex(x => x.Position);
             b.HasIndex(x => x.BuildingUnitPersistentLocalId);
             b.HasIndex(x => x.AddressPersistentLocalId);
         }

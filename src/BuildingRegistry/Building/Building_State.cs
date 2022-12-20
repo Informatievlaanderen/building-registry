@@ -90,7 +90,10 @@ namespace BuildingRegistry.Building
                     new BuildingUnitPersistentLocalId(buildingUnit.BuildingUnitPersistentLocalId),
                     BuildingUnitFunction.Parse(buildingUnit.Function),
                     BuildingUnitStatus.Parse(buildingUnit.Status),
-                    buildingUnit.AddressPersistentLocalIds.ConvertAll(x => new AddressPersistentLocalId(x)),
+                    buildingUnit.AddressPersistentLocalIds
+                        .Distinct()
+                        .ToList()
+                        .ConvertAll(x => new AddressPersistentLocalId(x)),
                     new BuildingUnitPosition(
                         new ExtendedWkbGeometry(buildingUnit.ExtendedWkbGeometry),
                         BuildingUnitPositionGeometryMethod.Parse(buildingUnit.GeometryMethod)),
