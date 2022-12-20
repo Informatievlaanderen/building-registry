@@ -1,3 +1,23 @@
+# [3.49.0](https://github.com/informatievlaanderen/building-registry/compare/v3.48.11...v3.49.0) (2022-12-20)
+
+
+### Bug Fixes
+
+* correct release.yml ([0d19efd](https://github.com/informatievlaanderen/building-registry/commit/0d19efdb89d953e407ad675a24d6ef9264c014b2))
+* description attach address ([2534072](https://github.com/informatievlaanderen/building-registry/commit/253407256d30261c757385d232da467920dccab4))
+* determine start position migration ([8bec901](https://github.com/informatievlaanderen/building-registry/commit/8bec90147e1b03ac0b62969d7ba3f380d0ea8510))
+* remove old workflows ([dbb4b06](https://github.com/informatievlaanderen/building-registry/commit/dbb4b067d17ca87ca7724e6343424b33bb3cd591))
+
+
+### Features
+
+* attach address to building unit ([8c9a407](https://github.com/informatievlaanderen/building-registry/commit/8c9a40786ac5cdbda18c65b2151cc60930b8cbde))
+
+
+### Performance Improvements
+
+* add indexes for boundinbox extract GAWR-4162 ([b7cfe47](https://github.com/informatievlaanderen/building-registry/commit/b7cfe4765455ab783656c7cb87c43e45ad50363b))
+
 ## [3.48.11](https://github.com/informatievlaanderen/building-registry/compare/v3.48.10...v3.48.11) (2022-12-04)
 
 
