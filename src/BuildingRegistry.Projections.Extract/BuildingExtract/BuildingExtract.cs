@@ -39,6 +39,7 @@ namespace BuildingRegistry.Projections.Extract.BuildingExtract
             builder.Property(p => p.MinimumY);
             builder.Property(p => p.MaximumY);
 
+            builder.HasIndex(p => new { p.IsComplete, p.ShapeRecordContentLength });
             builder.HasIndex(p => p.PersistentLocalId).IsClustered();
         }
     }

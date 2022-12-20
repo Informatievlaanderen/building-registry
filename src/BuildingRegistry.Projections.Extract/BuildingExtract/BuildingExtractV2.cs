@@ -37,6 +37,7 @@ namespace BuildingRegistry.Projections.Extract.BuildingExtract
             builder.Property(p => p.MinimumY);
             builder.Property(p => p.MaximumY);
 
+            builder.HasIndex(p => p.ShapeRecordContentLength);
             builder.HasIndex(p => p.MaximumX);
             builder.HasIndex(p => p.MinimumX);
             builder.HasIndex(p => p.MaximumY);
