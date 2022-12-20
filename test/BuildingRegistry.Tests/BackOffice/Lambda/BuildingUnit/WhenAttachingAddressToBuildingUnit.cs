@@ -300,8 +300,8 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
                 x.Error(
                     It.IsAny<Guid>(),
                     new TicketError(
-                        "Ongeldig AdresId.",
-                        "AdresOngeldig"),
+                        "Ongeldig adresId.",
+                        "GebouweenheidAdresOngeldig"),
                     CancellationToken.None));
         }
 
@@ -343,8 +343,8 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
                 x.Error(
                     It.IsAny<Guid>(),
                     new TicketError(
-                        "Ongeldig AdresId.",
-                        "AdresOngeldig"),
+                        "Ongeldig adresId.",
+                        "GebouweenheidAdresOngeldig"),
                     CancellationToken.None));
         }
 

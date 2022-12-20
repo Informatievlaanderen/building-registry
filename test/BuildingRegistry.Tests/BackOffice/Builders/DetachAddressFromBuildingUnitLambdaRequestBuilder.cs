@@ -9,6 +9,7 @@ namespace BuildingRegistry.Tests.BackOffice.Builders
     using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Requests;
     using BuildingRegistry.Api.BackOffice.Handlers.Lambda.Requests.BuildingUnit;
     using BuildingRegistry.Api.BackOffice.Handlers.Sqs.Requests.BuildingUnit;
+    using Handlers;
 
     public class DetachAddressFromBuildingUnitLambdaRequestBuilder
     {

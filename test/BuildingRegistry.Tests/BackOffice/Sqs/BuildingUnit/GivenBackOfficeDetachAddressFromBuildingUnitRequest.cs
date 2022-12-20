@@ -83,12 +83,10 @@ namespace BuildingRegistry.Tests.BackOffice.Sqs.BuildingUnit
 
             // Act
             var act = async () => await sut.Handle(
-                new DetachAddressFromBuildingUnitSqsRequest()
+                new DetachAddressFromBuildingUnitSqsRequest
                 {
                     BuildingUnitPersistentLocalId = Fixture.Create<BuildingUnitPersistentLocalId>(),
                     Request = new DetachAddressFromBuildingUnitBackOfficeRequest()
-                    {
-                    }
                 }, CancellationToken.None);
 
             // Assert

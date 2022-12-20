@@ -616,6 +616,74 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda
                     request.Metadata == messageData.Metadata
                 ), CancellationToken.None), Times.Once);
         }
+
+        [Fact]
+        public async Task WhenProcessingAttachAddressToBuildingUnitSqsRequest_ThenAttachAddressToBuildingUnitLambdaRequestIsSent()
+        {
+            // Arrange
+            var mediator = new Mock<IMediator>();
+            var containerBuilder = new ContainerBuilder();
+            containerBuilder.Register(_ => mediator.Object);
+            var container = containerBuilder.Build();
+
+            var messageData = Fixture.Create<AttachAddressToBuildingUnitSqsRequest>();
+            var messageMetadata = new MessageMetadata { MessageGroupId = Fixture.Create<int>().ToString() };
+
+            var sut = new MessageHandler(container);
+
+            // Act
+            await sut.HandleMessage(
+                messageData,
+                messageMetadata,
+                CancellationToken.None);
+
+            // Assert
+            mediator
+                .Verify(x => x.Send(It.Is<AttachAddressToBuildingUnitLambdaRequest>(request =>
+                    request.TicketId == messageData.TicketId &&
+                    request.BuildingPersistentLocalId == int.Parse(messageMetadata.MessageGroupId) &&
+                    request.BuildingUnitPersistentLocalId == messageData.BuildingUnitPersistentLocalId &&
+                    request.MessageGroupId == messageMetadata.MessageGroupId &&
+                    request.Request == messageData.Request &&
+                    request.IfMatchHeaderValue == messageData.IfMatchHeaderValue &&
+                    request.Provenance == messageData.ProvenanceData.ToProvenance() &&
+                    request.Metadata == messageData.Metadata
+                ), CancellationToken.None), Times.Once);
+        }
+
+        [Fact]
+        public async Task WhenProcessingDetachAddressFromBuildingUnitSqsRequest_ThenDetachAddressFromBuildingUnitLambdaRequestIsSent()
+        {
+            // Arrange
+            var mediator = new Mock<IMediator>();
+            var containerBuilder = new ContainerBuilder();
+            containerBuilder.Register(_ => mediator.Object);
+            var container = containerBuilder.Build();
+
+            var messageData = Fixture.Create<DetachAddressFromBuildingUnitSqsRequest>();
+            var messageMetadata = new MessageMetadata { MessageGroupId = Fixture.Create<int>().ToString() };
+
+            var sut = new MessageHandler(container);
+
+            // Act
+            await sut.HandleMessage(
+                messageData,
+                messageMetadata,
+                CancellationToken.None);
+
+            // Assert
+            mediator
+                .Verify(x => x.Send(It.Is<DetachAddressFromBuildingUnitLambdaRequest>(request =>
+                    request.TicketId == messageData.TicketId &&
+                    request.BuildingPersistentLocalId == int.Parse(messageMetadata.MessageGroupId) &&
+                    request.BuildingUnitPersistentLocalId == messageData.BuildingUnitPersistentLocalId &&
+                    request.MessageGroupId == messageMetadata.MessageGroupId &&
+                    request.Request == messageData.Request &&
+                    request.IfMatchHeaderValue == messageData.IfMatchHeaderValue &&
+                    request.Provenance == messageData.ProvenanceData.ToProvenance() &&
+                    request.Metadata == messageData.Metadata
+                ), CancellationToken.None), Times.Once);
+        }
     }
 
     internal class TestSqsRequest : SqsRequest
