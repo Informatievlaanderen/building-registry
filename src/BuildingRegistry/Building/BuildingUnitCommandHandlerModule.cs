@@ -182,6 +182,42 @@ namespace BuildingRegistry.Building
 
                     building.DetachAddressFromBuildingUnit(message.Command.BuildingUnitPersistentLocalId, message.Command.AddressPersistentLocalId);
                 });
+
+            For<DetachAddressFromBuildingUnitBecauseAddressWasRemoved>()
+                .AddSqlStreamStore(getStreamStore, getUnitOfWork, eventMapping, eventSerializer, getSnapshotStore)
+                .AddEventHash<DetachAddressFromBuildingUnitBecauseAddressWasRemoved, Building>(getUnitOfWork)
+                .AddProvenance(getUnitOfWork, provenanceFactory)
+                .Handle(async (message, ct) =>
+                {
+                    var streamId = new BuildingStreamId(message.Command.BuildingPersistentLocalId);
+                    var building = await buildingRepository().GetAsync(streamId, ct);
+
+                    building.DetachAddressFromBuildingUnitBecauseAddressWasRemoved(message.Command.BuildingUnitPersistentLocalId, message.Command.AddressPersistentLocalId);
+                });
+
+            For<DetachAddressFromBuildingUnitBecauseAddressWasRejected>()
+                .AddSqlStreamStore(getStreamStore, getUnitOfWork, eventMapping, eventSerializer, getSnapshotStore)
+                .AddEventHash<DetachAddressFromBuildingUnitBecauseAddressWasRejected, Building>(getUnitOfWork)
+                .AddProvenance(getUnitOfWork, provenanceFactory)
+                .Handle(async (message, ct) =>
+                {
+                    var streamId = new BuildingStreamId(message.Command.BuildingPersistentLocalId);
+                    var building = await buildingRepository().GetAsync(streamId, ct);
+
+                    building.DetachAddressFromBuildingUnitBecauseAddressWasRejected(message.Command.BuildingUnitPersistentLocalId, message.Command.AddressPersistentLocalId);
+                });
+
+            For<DetachAddressFromBuildingUnitBecauseAddressWasRetired>()
+                .AddSqlStreamStore(getStreamStore, getUnitOfWork, eventMapping, eventSerializer, getSnapshotStore)
+                .AddEventHash<DetachAddressFromBuildingUnitBecauseAddressWasRetired, Building>(getUnitOfWork)
+                .AddProvenance(getUnitOfWork, provenanceFactory)
+                .Handle(async (message, ct) =>
+                {
+                    var streamId = new BuildingStreamId(message.Command.BuildingPersistentLocalId);
+                    var building = await buildingRepository().GetAsync(streamId, ct);
+
+                    building.DetachAddressFromBuildingUnitBecauseAddressWasRetired(message.Command.BuildingUnitPersistentLocalId, message.Command.AddressPersistentLocalId);
+                });
         }
     }
 }

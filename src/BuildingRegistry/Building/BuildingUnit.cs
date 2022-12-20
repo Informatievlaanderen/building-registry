@@ -371,6 +371,36 @@ namespace BuildingRegistry.Building
             Apply(new BuildingUnitAddressWasDetachedV2(_buildingPersistentLocalId, BuildingUnitPersistentLocalId, addressPersistentLocalId));
         }
 
+        public void DetachAddressBecauseAddressWasRemoved(AddressPersistentLocalId addressPersistentLocalId)
+        {
+            if (!AddressPersistentLocalIds.Contains(addressPersistentLocalId))
+            {
+                return;
+            }
+
+            Apply(new BuildingUnitAddressWasDetachedBecauseAddressWasRemoved(_buildingPersistentLocalId, BuildingUnitPersistentLocalId, addressPersistentLocalId));
+        }
+
+        public void DetachAddressBecauseAddressWasRejected(AddressPersistentLocalId addressPersistentLocalId)
+        {
+            if (!AddressPersistentLocalIds.Contains(addressPersistentLocalId))
+            {
+                return;
+            }
+
+            Apply(new BuildingUnitAddressWasDetachedBecauseAddressWasRejected(_buildingPersistentLocalId, BuildingUnitPersistentLocalId, addressPersistentLocalId));
+        }
+
+        public void DetachAddressBecauseAddressWasRetired(AddressPersistentLocalId addressPersistentLocalId)
+        {
+            if (!AddressPersistentLocalIds.Contains(addressPersistentLocalId))
+            {
+                return;
+            }
+
+            Apply(new BuildingUnitAddressWasDetachedBecauseAddressWasRetired(_buildingPersistentLocalId, BuildingUnitPersistentLocalId, addressPersistentLocalId));
+        }
+
         private void GuardRemovedAddress(AddressData? address)
         {
             if (address is null)

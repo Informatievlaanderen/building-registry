@@ -85,7 +85,6 @@ namespace BuildingRegistry.Consumer.Address
                 .HasConversion(
                     addressStatus => addressStatus.Status,
                     status => AddressStatus.Parse(status));
-            
 
             builder.HasIndex(x => x.AddressId);
             builder.HasIndex(x => x.IsRemoved);
