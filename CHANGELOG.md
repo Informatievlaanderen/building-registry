@@ -1,3 +1,17 @@
+# [3.50.0](https://github.com/informatievlaanderen/building-registry/compare/v3.49.0...v3.50.0) (2022-12-20)
+
+
+### Features
+
+* add attach/detach address projections ([7e2ff70](https://github.com/informatievlaanderen/building-registry/commit/7e2ff708d62816577f4a9ab568e02b5ed32e6599))
+* detach addres from building unit backoffice api ([0e131ca](https://github.com/informatievlaanderen/building-registry/commit/0e131cad43a5330fa1f1dddf6b8b7231fe107f4b))
+* detach address from building unit ([84a26b6](https://github.com/informatievlaanderen/building-registry/commit/84a26b6bce7dd4591711cee963fc1fa1ebb3ac27))
+
+
+### Performance Improvements
+
+* add indexes building extract ([4bcc059](https://github.com/informatievlaanderen/building-registry/commit/4bcc05967d968bcd326236ce564b05fb10f13f4f))
+
 # [3.49.0](https://github.com/informatievlaanderen/building-registry/compare/v3.48.11...v3.49.0) (2022-12-20)
 
 
