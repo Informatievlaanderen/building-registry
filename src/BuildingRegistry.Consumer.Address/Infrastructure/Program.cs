@@ -10,10 +10,11 @@ namespace BuildingRegistry.Consumer.Address.Infrastructure
     using Be.Vlaanderen.Basisregisters.DataDog.Tracing.Autofac;
     using Be.Vlaanderen.Basisregisters.DataDog.Tracing.Sql.EntityFrameworkCore;
     using Be.Vlaanderen.Basisregisters.EventHandling;
+    using Be.Vlaanderen.Basisregisters.MessageHandling.Kafka.Consumer;
     using Be.Vlaanderen.Basisregisters.MessageHandling.Kafka.Simple;
-    using BuildingRegistry.Api.BackOffice.Abstractions;
-    using BuildingRegistry.Building;
-    using BuildingRegistry.Consumer.Address;
+    using Api.BackOffice.Abstractions;
+    using Building;
+    using Address;
     using BuildingRegistry.Infrastructure;
     using BuildingRegistry.Infrastructure.Modules;
     using Confluent.Kafka;
@@ -138,8 +139,8 @@ namespace BuildingRegistry.Consumer.Address.Infrastructure
                     });
 
                     builder
-                        .RegisterType<KafkaIdompotencyConsumer<ConsumerAddressContext>>()
-                        .As<IKafkaIdompotencyConsumer<ConsumerAddressContext>>()
+                        .RegisterType<IdempotentConsumer<ConsumerAddressContext>>()
+                        .As<IIdempotentConsumer<ConsumerAddressContext>>()
                         .SingleInstance();
 
                     builder
