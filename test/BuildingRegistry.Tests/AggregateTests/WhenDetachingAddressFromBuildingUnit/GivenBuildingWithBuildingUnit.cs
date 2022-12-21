@@ -1,4 +1,4 @@
-namespace BuildingRegistry.Tests.AggregateTests.WhenDetachingAddressToBuildingUnit
+namespace BuildingRegistry.Tests.AggregateTests.WhenDetachingAddressFromBuildingUnit
 {
     using System.Collections.Generic;
     using System.Linq;
@@ -8,11 +8,11 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenDetachingAddressToBuildingUn
     using Be.Vlaanderen.Basisregisters.AggregateSource.Snapshotting;
     using Be.Vlaanderen.Basisregisters.AggregateSource.Testing;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
-    using Building;
-    using Building.Commands;
-    using Building.Events;
+    using BuildingRegistry.Building;
+    using BuildingRegistry.Building.Commands;
+    using BuildingRegistry.Building.Events;
     using BuildingRegistry.Tests.BackOffice;
-    using Extensions;
+    using BuildingRegistry.Tests.Extensions;
     using FluentAssertions;
     using Moq;
     using Xunit;

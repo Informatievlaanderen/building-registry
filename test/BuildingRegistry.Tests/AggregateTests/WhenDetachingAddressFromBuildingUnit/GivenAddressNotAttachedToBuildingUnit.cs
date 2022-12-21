@@ -1,24 +1,21 @@
-namespace BuildingRegistry.Tests.AggregateTests.WhenDetachingAddressToBuildingUnit
+namespace BuildingRegistry.Tests.AggregateTests.WhenDetachingAddressFromBuildingUnit
 {
     using System.Collections.Generic;
-    using Autofac;
     using AutoFixture;
     using Be.Vlaanderen.Basisregisters.AggregateSource.Testing;
-    using Building;
-    using Building.Commands;
-    using Building.Exceptions;
-    using BackOffice;
-    using Extensions;
+    using BuildingRegistry.Building;
+    using BuildingRegistry.Building.Commands;
+    using BuildingRegistry.Tests.Extensions;
     using Xunit;
     using Xunit.Abstractions;
 
-    public class GivenAddressIsRemovedInConsumerAddressItems : BuildingRegistryTest
+    public class GivenAddressNotAttachedToBuildingUnit : BuildingRegistryTest
     {
-        public GivenAddressIsRemovedInConsumerAddressItems(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
+        public GivenAddressNotAttachedToBuildingUnit(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
         { }
 
         [Fact]
-        public void ThenThrowsAddressIsRemovedException()
+        public void ThenDoNothing()
         {
             var command = Fixture.Create<DetachAddressFromBuildingUnit>();
 
@@ -30,19 +27,16 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenDetachingAddressToBuildingUn
                     null,
                     null,
                     null,
-                    new List<AddressPersistentLocalId>(){command.AddressPersistentLocalId},
+                    new List<AddressPersistentLocalId>(0),
                     isRemoved: false)
                 .Build();
-
-            var consumerAddress = Container.Resolve<FakeConsumerAddressContext>();
-            consumerAddress.AddAddress(command.AddressPersistentLocalId, Consumer.Address.AddressStatus.Current, isRemoved: true);
 
             Assert(new Scenario()
                 .Given(
                     new BuildingStreamId(command.BuildingPersistentLocalId),
                     buildingWasMigrated)
                 .When(command)
-                .Throws(new AddressIsRemovedException()));
+                .ThenNone());
         }
     }
 }

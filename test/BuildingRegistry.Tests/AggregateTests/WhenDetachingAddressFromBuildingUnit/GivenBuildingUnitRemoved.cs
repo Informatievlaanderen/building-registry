@@ -1,22 +1,22 @@
-namespace BuildingRegistry.Tests.AggregateTests.WhenDetachingAddressToBuildingUnit
+namespace BuildingRegistry.Tests.AggregateTests.WhenDetachingAddressFromBuildingUnit
 {
     using System.Collections.Generic;
     using AutoFixture;
     using Be.Vlaanderen.Basisregisters.AggregateSource.Testing;
-    using Building;
-    using Building.Commands;
-    using Building.Exceptions;
-    using Extensions;
+    using BuildingRegistry.Building;
+    using BuildingRegistry.Building.Commands;
+    using BuildingRegistry.Building.Exceptions;
+    using BuildingRegistry.Tests.Extensions;
     using Xunit;
     using Xunit.Abstractions;
 
-    public class GivenAddressNotFoundInConsumerAddressItems : BuildingRegistryTest
+    public class GivenBuildingUnitRemoved : BuildingRegistryTest
     {
-        public GivenAddressNotFoundInConsumerAddressItems(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
+        public GivenBuildingUnitRemoved(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
         { }
 
         [Fact]
-        public void ThenThrowsAddressNotFoundException()
+        public void ThenThrowBuildingUnitRemovedException()
         {
             var command = Fixture.Create<DetachAddressFromBuildingUnit>();
 
@@ -28,8 +28,8 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenDetachingAddressToBuildingUn
                     null,
                     null,
                     null,
-                    new List<AddressPersistentLocalId>() { command.AddressPersistentLocalId },
-                    isRemoved: false)
+                    attachedAddress: new List<AddressPersistentLocalId> { command.AddressPersistentLocalId },
+                    isRemoved: true)
                 .Build();
 
             Assert(new Scenario()
@@ -37,7 +37,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenDetachingAddressToBuildingUn
                     new BuildingStreamId(command.BuildingPersistentLocalId),
                     buildingWasMigrated)
                 .When(command)
-                .Throws(new AddressNotFoundException()));
+                .Throws(new BuildingUnitIsRemovedException(command.BuildingUnitPersistentLocalId)));
         }
     }
 }
