@@ -16,7 +16,6 @@ namespace BuildingRegistry.Consumer.Address
     {
         private readonly ILifetimeScope _lifetimeScope;
         private readonly IHostApplicationLifetime _hostApplicationLifetime;
-        private readonly IDbContextFactory<ConsumerAddressContext> _dbContextFactory;
         private readonly IDbContextFactory<BackOfficeContext> _backOfficeContextFactory;
         private readonly ILoggerFactory _loggerFactory;
         private readonly IIdempotentConsumer<ConsumerAddressContext> _kafkaIdemIdompotencyConsumer;
@@ -25,24 +24,21 @@ namespace BuildingRegistry.Consumer.Address
         public ConsumerAddress(
             ILifetimeScope lifetimeScope,
             IHostApplicationLifetime hostApplicationLifetime,
-            IDbContextFactory<ConsumerAddressContext> dbContextFactory,
             IDbContextFactory<BackOfficeContext> backOfficeContextFactory,
             ILoggerFactory loggerFactory,
             IIdempotentConsumer<ConsumerAddressContext> kafkaIdemIdompotencyConsumer)
         {
             _lifetimeScope = lifetimeScope;
             _hostApplicationLifetime = hostApplicationLifetime;
-            _dbContextFactory = dbContextFactory;
             _backOfficeContextFactory = backOfficeContextFactory;
             _loggerFactory = loggerFactory;
             _kafkaIdemIdompotencyConsumer = kafkaIdemIdompotencyConsumer;
 
             _logger = loggerFactory.CreateLogger<ConsumerAddress>();
         }
+
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            await ValidateConsumerOffset(stoppingToken);
-
             var addressKafkaProjection =
                 new ConnectedProjector<ConsumerAddressContext>(
                     Resolve.WhenEqualToHandlerMessageType(new AddressKafkaProjection().Handlers));
@@ -59,7 +55,8 @@ namespace BuildingRegistry.Consumer.Address
                 {
                     _logger.LogInformation("Handling next message");
 
-                    await commandHandlingProjector.ProjectAsync(commandHandler, message, stoppingToken).ConfigureAwait(false);
+                    await commandHandlingProjector.ProjectAsync(commandHandler, message, stoppingToken)
+                        .ConfigureAwait(false);
                     await addressKafkaProjection.ProjectAsync(context, message, stoppingToken).ConfigureAwait(false);
 
                     //CancellationToken.None to prevent halfway consumption
@@ -72,25 +69,6 @@ namespace BuildingRegistry.Consumer.Address
                 _hostApplicationLifetime.StopApplication();
                 throw;
             }
-        }
-
-        private async Task ValidateConsumerOffset(CancellationToken cancellationToken)
-        {
-            if (_kafkaIdemIdompotencyConsumer.ConsumerOptions.Offset is not null)
-            {
-                await using (var context = await _dbContextFactory.CreateDbContextAsync(cancellationToken))
-                {
-                    if (await context.AddressConsumerItems.AnyAsync(cancellationToken))
-                    {
-                        throw new InvalidOperationException(
-                            "Cannot start consumer from offset, because consumer context already has data. Remove offset or clear data to continue.");
-                    }
-                }
-
-                _logger.LogInformation($"{nameof(ConsumerAddress)} starting {_kafkaIdemIdompotencyConsumer.ConsumerOptions.Topic} from offset {_kafkaIdemIdompotencyConsumer.ConsumerOptions.Offset.Value}.");
-            }
-
-            _logger.LogInformation($"{nameof(ConsumerAddress)} continuing {_kafkaIdemIdompotencyConsumer.ConsumerOptions.Topic} from last offset.");
         }
     }
 }

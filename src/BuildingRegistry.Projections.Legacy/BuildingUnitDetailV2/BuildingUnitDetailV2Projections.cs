@@ -302,6 +302,45 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetailV2
                     UpdateHash(item, message);
                 }, ct);
             });
+
+            When<Envelope<BuildingUnitAddressWasDetachedBecauseAddressWasRejected>>(async (context, message, ct) =>
+            {
+                await Update(context, message.Message.BuildingUnitPersistentLocalId, item =>
+                {
+                    context.Entry(item).Collection(x => x.Addresses).Load();
+
+                    var itemToRemove = item.Addresses.Single(x => x.AddressPersistentLocalId == message.Message.AddressPersistentLocalId);
+                    item.Addresses.Remove(itemToRemove);
+                    item.Version = message.Message.Provenance.Timestamp;
+                    UpdateHash(item, message);
+                }, ct);
+            });
+
+            When<Envelope<BuildingUnitAddressWasDetachedBecauseAddressWasRetired>>(async (context, message, ct) =>
+            {
+                await Update(context, message.Message.BuildingUnitPersistentLocalId, item =>
+                {
+                    context.Entry(item).Collection(x => x.Addresses).Load();
+
+                    var itemToRemove = item.Addresses.Single(x => x.AddressPersistentLocalId == message.Message.AddressPersistentLocalId);
+                    item.Addresses.Remove(itemToRemove);
+                    item.Version = message.Message.Provenance.Timestamp;
+                    UpdateHash(item, message);
+                }, ct);
+            });
+
+            When<Envelope<BuildingUnitAddressWasDetachedBecauseAddressWasRemoved>>(async (context, message, ct) =>
+            {
+                await Update(context, message.Message.BuildingUnitPersistentLocalId, item =>
+                {
+                    context.Entry(item).Collection(x => x.Addresses).Load();
+
+                    var itemToRemove = item.Addresses.Single(x => x.AddressPersistentLocalId == message.Message.AddressPersistentLocalId);
+                    item.Addresses.Remove(itemToRemove);
+                    item.Version = message.Message.Provenance.Timestamp;
+                    UpdateHash(item, message);
+                }, ct);
+            });
         }
 
         private static async Task Update(LegacyContext context, int buildingUnitPersistentLocalId, Action<BuildingUnitDetailItemV2> updateAction, CancellationToken ct)

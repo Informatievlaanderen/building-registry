@@ -264,6 +264,27 @@ namespace BuildingRegistry.Projections.Wfs.BuildingUnitV2
 
                 SetVersion(unit!, message.Message.Provenance.Timestamp);
             });
+
+            When<Envelope<BuildingUnitAddressWasDetachedBecauseAddressWasRejected>>(async (context, message, ct) =>
+            {
+                var unit = await context.BuildingUnitsV2.FindAsync(message.Message.BuildingUnitPersistentLocalId);
+
+                SetVersion(unit!, message.Message.Provenance.Timestamp);
+            });
+
+            When<Envelope<BuildingUnitAddressWasDetachedBecauseAddressWasRetired>>(async (context, message, ct) =>
+            {
+                var unit = await context.BuildingUnitsV2.FindAsync(message.Message.BuildingUnitPersistentLocalId);
+
+                SetVersion(unit!, message.Message.Provenance.Timestamp);
+            });
+
+            When<Envelope<BuildingUnitAddressWasDetachedBecauseAddressWasRemoved>>(async (context, message, ct) =>
+            {
+                var unit = await context.BuildingUnitsV2.FindAsync(message.Message.BuildingUnitPersistentLocalId);
+
+                SetVersion(unit!, message.Message.Provenance.Timestamp);
+            });
         }
 
         private static void SetVersion(BuildingUnitV2 unit, Instant timestamp) => unit.Version = timestamp;

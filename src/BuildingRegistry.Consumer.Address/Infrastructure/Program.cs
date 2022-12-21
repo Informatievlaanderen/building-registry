@@ -4,20 +4,19 @@ namespace BuildingRegistry.Consumer.Address.Infrastructure
     using System.IO;
     using System.Threading;
     using System.Threading.Tasks;
+    using Address;
+    using Api.BackOffice.Abstractions;
     using Autofac;
     using Autofac.Extensions.DependencyInjection;
     using Be.Vlaanderen.Basisregisters.Aws.DistributedMutex;
     using Be.Vlaanderen.Basisregisters.DataDog.Tracing.Autofac;
     using Be.Vlaanderen.Basisregisters.DataDog.Tracing.Sql.EntityFrameworkCore;
     using Be.Vlaanderen.Basisregisters.EventHandling;
+    using Be.Vlaanderen.Basisregisters.MessageHandling.Kafka;
     using Be.Vlaanderen.Basisregisters.MessageHandling.Kafka.Consumer;
-    using Be.Vlaanderen.Basisregisters.MessageHandling.Kafka.Simple;
-    using Api.BackOffice.Abstractions;
     using Building;
-    using Address;
     using BuildingRegistry.Infrastructure;
     using BuildingRegistry.Infrastructure.Modules;
-    using Confluent.Kafka;
     using Destructurama;
     using Microsoft.Data.SqlClient;
     using Microsoft.EntityFrameworkCore;
@@ -113,29 +112,19 @@ namespace BuildingRegistry.Consumer.Address.Infrastructure
                         var bootstrapServers = hostContext.Configuration["Kafka:BootstrapServers"];
                         var topic = $"{hostContext.Configuration["AddressTopic"]}" ?? throw new ArgumentException("Configuration has no AddressTopic.");
                         var suffix = hostContext.Configuration["GroupSuffix"];
-                        var consumerGroupId = $"{nameof(BuildingRegistry)}.{nameof(ConsumerAddress)}.{topic}{suffix}";
+                        var consumerGroupId = $"{nameof(BuildingRegistry)}.ConsumerAddress.{topic}{suffix}";
 
-                        Offset? offset = null;
-                        var offsetString = hostContext.Configuration["TopicOffset"];
-                        if (!string.IsNullOrEmpty(offsetString))
-                        {
-                            if (!long.TryParse(offsetString, out var offsetAsLong))
-                            {
-                                throw new ArgumentException("Configuration TopicOffset is not a valid value.");
-                            }
-
-                            offset = new Offset(offsetAsLong);
-                        }
-
-                        return new IdempotentKafkaConsumerOptions(
-                            bootstrapServers,
-                            hostContext.Configuration["Kafka:SaslUserName"],
-                            hostContext.Configuration["Kafka:SaslPassword"],
-                            consumerGroupId,
-                            topic,
-                            noMessageFoundDelay: 300,
-                            offset,
+                        var consumerOptions = new ConsumerOptions(
+                            new BootstrapServers(bootstrapServers),
+                            new Topic(topic),
+                            new ConsumerGroupId(consumerGroupId),
                             EventsJsonSerializerSettingsProvider.CreateSerializerSettings());
+
+                        consumerOptions.ConfigureSaslAuthentication(new SaslAuthentication(
+                            hostContext.Configuration["Kafka:SaslUserName"],
+                            hostContext.Configuration["Kafka:SaslPassword"]));
+
+                        return consumerOptions;
                     });
 
                     builder
