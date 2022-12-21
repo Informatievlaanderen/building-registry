@@ -4,9 +4,9 @@ namespace BuildingRegistry.Consumer.Address
     using System.Threading;
     using System.Threading.Tasks;
     using Autofac;
-    using Be.Vlaanderen.Basisregisters.MessageHandling.Kafka.Simple;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.Connector;
-    using BuildingRegistry.Api.BackOffice.Abstractions;
+    using Api.BackOffice.Abstractions;
+    using Be.Vlaanderen.Basisregisters.MessageHandling.Kafka.Consumer;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Hosting;
     using Microsoft.Extensions.Logging;
@@ -19,7 +19,7 @@ namespace BuildingRegistry.Consumer.Address
         private readonly IDbContextFactory<ConsumerAddressContext> _dbContextFactory;
         private readonly IDbContextFactory<BackOfficeContext> _backOfficeContextFactory;
         private readonly ILoggerFactory _loggerFactory;
-        private readonly IKafkaIdompotencyConsumer<ConsumerAddressContext> _kafkaIdemIdompotencyConsumer;
+        private readonly IIdempotentConsumer<ConsumerAddressContext> _kafkaIdemIdompotencyConsumer;
         private readonly ILogger<ConsumerAddress> _logger;
 
         public ConsumerAddress(
@@ -28,7 +28,7 @@ namespace BuildingRegistry.Consumer.Address
             IDbContextFactory<ConsumerAddressContext> dbContextFactory,
             IDbContextFactory<BackOfficeContext> backOfficeContextFactory,
             ILoggerFactory loggerFactory,
-            IKafkaIdompotencyConsumer<ConsumerAddressContext> kafkaIdemIdompotencyConsumer)
+            IIdempotentConsumer<ConsumerAddressContext> kafkaIdemIdompotencyConsumer)
         {
             _lifetimeScope = lifetimeScope;
             _hostApplicationLifetime = hostApplicationLifetime;

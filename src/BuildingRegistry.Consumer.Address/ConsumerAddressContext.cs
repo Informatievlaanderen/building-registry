@@ -12,7 +12,7 @@ namespace BuildingRegistry.Consumer.Address
     using Microsoft.EntityFrameworkCore.Design;
     using Microsoft.Extensions.Configuration;
     using Be.Vlaanderen.Basisregisters.EntityFrameworkCore.EntityTypeConfiguration;
-    using Polly;
+    using Be.Vlaanderen.Basisregisters.MessageHandling.Kafka.Consumer.SqlServer;
 
     public class ConsumerAddressContext : SqlServerConsumerDbContext<ConsumerAddressContext>, IAddresses
     {
