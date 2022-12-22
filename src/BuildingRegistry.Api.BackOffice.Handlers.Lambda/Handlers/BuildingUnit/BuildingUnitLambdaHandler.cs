@@ -2,6 +2,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.BuildingUnit
 {
     using System.Configuration;
     using Abstractions.Building.Validators;
+    using Abstractions.Validation;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
     using Be.Vlaanderen.Basisregisters.Api.ETag;
     using Be.Vlaanderen.Basisregisters.Sqs.Exceptions;
@@ -94,9 +95,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.BuildingUnit
 
             return exception switch
             {
-                BuildingIsRemovedException => new TicketError(
-                    ValidationErrorMessages.Building.BuildingRemoved,
-                    ValidationErrorCodes.Building.BuildingRemoved),
+                BuildingIsRemovedException => ValidationErrors.Common.BuildingIsRemoved.ToTicketError(),
                 BuildingUnitIsRemovedException => new TicketError(
                     ValidationErrorMessages.BuildingUnit.BuildingUnitIsRemoved,
                     ValidationErrorCodes.BuildingUnit.BuildingUnitIsRemoved),
