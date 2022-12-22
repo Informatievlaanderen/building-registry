@@ -6,6 +6,7 @@ namespace BuildingRegistry.Api.BackOffice.Building
     using System.Threading.Tasks;
     using Abstractions.Building.Requests;
     using Abstractions.Building.Validators;
+    using Abstractions.Validation;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
     using Be.Vlaanderen.Basisregisters.Api.ETag;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
@@ -78,7 +79,7 @@ namespace BuildingRegistry.Api.BackOffice.Building
                 {
                     if (!await buildingExistsValidator.Exists(new BuildingPersistentLocalId(request.PersistentLocalId), cancellationToken))
                     {
-                        throw new ApiException(ValidationErrorMessages.Building.BuildingNotFound, StatusCodes.Status404NotFound);
+                        throw new ApiException(ValidationErrors.Common.BuildingNotFound.Message, StatusCodes.Status404NotFound);
                     }
 
                     var result = await Mediator.Send(
@@ -106,18 +107,18 @@ namespace BuildingRegistry.Api.BackOffice.Building
             }
             catch (AggregateNotFoundException)
             {
-                throw new ApiException(ValidationErrorMessages.Building.BuildingNotFound, StatusCodes.Status404NotFound);
+                throw new ApiException(ValidationErrors.Common.BuildingNotFound.Message, StatusCodes.Status404NotFound);
             }
             catch (DomainException exception)
             {
                 throw exception switch
                 {
-                    BuildingIsRemovedException => new ApiException(ValidationErrorMessages.Building.BuildingRemoved, StatusCodes.Status410Gone),
+                    BuildingIsRemovedException => new ApiException(ValidationErrors.Common.BuildingIsRemoved.Message, StatusCodes.Status410Gone),
 
                     BuildingHasInvalidStatusException => CreateValidationException(
-                        ValidationErrorCodes.Building.BuildingOutlineCannotBeChanged,
+                        ValidationErrors.ChangeBuildingOutline.BuildingInvalidStatus.Code,
                         string.Empty,
-                        ValidationErrorMessages.Building.BuildingOutlineCannotBeChanged),
+                        ValidationErrors.ChangeBuildingOutline.BuildingInvalidStatus.Message),
 
                     BuildingHasInvalidBuildingGeometryMethodException => CreateValidationException(
                         ValidationErrorCodes.Building.BuildingIsMeasuredByGrb,

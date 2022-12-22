@@ -1,7 +1,7 @@
 namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.Building
 {
     using System.Configuration;
-    using Abstractions.Building.Validators;
+    using Abstractions.Validation;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
     using Be.Vlaanderen.Basisregisters.Api.ETag;
     using Be.Vlaanderen.Basisregisters.Sqs.Exceptions;
@@ -71,11 +71,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.Building
             TSqsLambdaRequest request,
             CancellationToken cancellationToken)
         {
-            await Ticketing.Error(request.TicketId,
-                new TicketError(
-                    ValidationErrorMessages.Building.BuildingNotFound,
-                    ValidationErrorCodes.Building.BuildingNotFound),
-                cancellationToken);
+            await Ticketing.Error(request.TicketId, ValidationErrors.Common.BuildingNotFound.ToTicketError(), cancellationToken);
         }
 
         protected abstract TicketError? InnerMapDomainException(DomainException exception, TSqsLambdaRequest request);
@@ -90,9 +86,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.Building
 
             return exception switch
             {
-                BuildingIsRemovedException => new TicketError(
-                    ValidationErrorMessages.Building.BuildingRemoved,
-                    ValidationErrorCodes.Building.BuildingRemoved),
+                BuildingIsRemovedException => ValidationErrors.Common.BuildingIsRemoved.ToTicketError(),
                 _ => null
             };
         }

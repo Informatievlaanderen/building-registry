@@ -6,6 +6,22 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.Validation
     {
         public static class Common
         {
+            public static class BuildingNotFound
+            {
+                public const string Code = "GebouwNietGevonden";
+                public const string Message = "Onbestaand gebouw.";
+
+                public static TicketError ToTicketError() => new(Message, Code);
+            }
+
+            public static class BuildingIsRemoved
+            {
+                public const string Code = "GebouwIsVerwijderd";
+                public const string Message = "Verwijderd gebouw.";
+
+                public static TicketError ToTicketError() => new(Message, Code);
+            }
+
             public static class CommonBuildingUnit
             {
                 public static class InvalidFunction
