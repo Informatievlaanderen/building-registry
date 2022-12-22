@@ -1,3 +1,10 @@
+# [3.51.0](https://github.com/informatievlaanderen/building-registry/compare/v3.50.0...v3.51.0) (2022-12-22)
+
+
+### Features
+
+* address commandhandling consumer ([c869fcf](https://github.com/informatievlaanderen/building-registry/commit/c869fcfa74dd2ca17b19f8e603392d515dba3411))
+
 # [3.50.0](https://github.com/informatievlaanderen/building-registry/compare/v3.49.0...v3.50.0) (2022-12-20)
 
 
