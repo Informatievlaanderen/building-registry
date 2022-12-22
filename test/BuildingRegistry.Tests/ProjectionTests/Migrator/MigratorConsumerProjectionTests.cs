@@ -5,12 +5,9 @@ namespace BuildingRegistry.Tests.ProjectionTests.Migrator
     using System.Threading.Tasks;
     using Api.BackOffice.Abstractions;
     using Autofac;
-    using AutoFixture;
     using BackOffice;
     using Building;
     using BuildingRegistry.Migrator.Building.Projections;
-    using BuildingRegistry.Tests.Legacy.Autofixture;
-    using Consumer.Address;
     using Extensions;
     using FluentAssertions;
     using Microsoft.EntityFrameworkCore;
@@ -22,15 +19,12 @@ namespace BuildingRegistry.Tests.ProjectionTests.Migrator
 
     public class MigratorConsumerProjectionTests : ConsumerProjectionTest<MigratorProjection>
     {
-        private readonly Fixture _fixture;
         private readonly ILogger _logger;
         private readonly FakeBackOfficeContext _fakeBackOfficeContext;
 
         public MigratorConsumerProjectionTests(ITestOutputHelper outputHelper) : base(outputHelper)
         {
             _logger = new LoggerFactory().CreateLogger(typeof(MigratorConsumerProjectionTests));
-            _fixture = new Fixture();
-            _fixture.Customize(new InfrastructureCustomization());
             _fakeBackOfficeContext = new FakeBackOfficeContextFactory().CreateDbContext();
         }
 

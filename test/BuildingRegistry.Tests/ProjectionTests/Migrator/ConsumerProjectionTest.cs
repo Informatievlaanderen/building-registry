@@ -1,4 +1,4 @@
-namespace BuildingRegistry.Tests.ProjectionTests.Consumer.Address
+namespace BuildingRegistry.Tests.ProjectionTests.Migrator
 {
     using System;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.Connector;
