@@ -18,7 +18,7 @@ namespace BuildingRegistry.Consumer.Address
         private readonly IHostApplicationLifetime _hostApplicationLifetime;
         private readonly IDbContextFactory<BackOfficeContext> _backOfficeContextFactory;
         private readonly ILoggerFactory _loggerFactory;
-        private readonly IIdempotentConsumer<ConsumerAddressContext> _kafkaIdemIdompotencyConsumer;
+        private readonly IIdempotentConsumer<ConsumerAddressContext> _kafkaIdemIdempotencyConsumer;
         private readonly ILogger<ConsumerAddress> _logger;
 
         public ConsumerAddress(
@@ -26,13 +26,13 @@ namespace BuildingRegistry.Consumer.Address
             IHostApplicationLifetime hostApplicationLifetime,
             IDbContextFactory<BackOfficeContext> backOfficeContextFactory,
             ILoggerFactory loggerFactory,
-            IIdempotentConsumer<ConsumerAddressContext> kafkaIdemIdompotencyConsumer)
+            IIdempotentConsumer<ConsumerAddressContext> kafkaIdemIdempotencyConsumer)
         {
             _lifetimeScope = lifetimeScope;
             _hostApplicationLifetime = hostApplicationLifetime;
             _backOfficeContextFactory = backOfficeContextFactory;
             _loggerFactory = loggerFactory;
-            _kafkaIdemIdompotencyConsumer = kafkaIdemIdompotencyConsumer;
+            _kafkaIdemIdempotencyConsumer = kafkaIdemIdempotencyConsumer;
 
             _logger = loggerFactory.CreateLogger<ConsumerAddress>();
         }
@@ -51,7 +51,7 @@ namespace BuildingRegistry.Consumer.Address
 
             try
             {
-                await _kafkaIdemIdompotencyConsumer.ConsumeContinuously(async (message, context) =>
+                await _kafkaIdemIdempotencyConsumer.ConsumeContinuously(async (message, context) =>
                 {
                     _logger.LogInformation("Handling next message");
 
