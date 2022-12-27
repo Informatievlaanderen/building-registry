@@ -123,6 +123,7 @@ jobs:
         docker image save $BUILD_DOCKER_REGISTRY/building-registry/projections-syndication:$SEMVER -o ~/br-projections-syndication-image.tar
         docker image save $BUILD_DOCKER_REGISTRY/building-registry/consumer-address:$SEMVER -o ~/br-consumer-address-image.tar
         docker image save $BUILD_DOCKER_REGISTRY/building-registry/migrator-building:$SEMVER -o ~/br-migrator-building-image.tar
+        docker image save $BUILD_DOCKER_REGISTRY/building-registry/producer:$SEMVER -o ~/br-producer-image.tar
       env:
         BUILD_DOCKER_REGISTRY: ${{ secrets.VBR_BUILD_DOCKER_REGISTRY_TST }}
         SEMVER: ${{ env.RELEASE_VERSION }}
@@ -274,6 +275,13 @@ jobs:
       with:
         name: migrator-building
         path: ~/br-migrator-building-image.tar
+
+    - name: Upload producer artifact
+      if: env.RELEASE_VERSION != 'none'
+      uses: actions/upload-artifact@v3
+      with:
+        name: producer
+        path: ~/br-producer-image.tar
 
     - name: Package Lambda functions        
       if: env.RELEASE_VERSION != 'none'
@@ -592,6 +600,11 @@ jobs:
           name: migrator-building
           path: ~/
 
+      - name: Download producer
+        uses: actions/download-artifact@v3
+        with:
+          name: producer
+          path: ~/
       #
       # Load artifacts
       #
@@ -610,6 +623,7 @@ jobs:
           docker image load -i ~/br-projections-syndication-image.tar
           docker image load -i ~/br-consumer-address-image.tar
           docker image load -i ~/br-migrator-building-image.tar
+          docker image load -i ~/br-producer-image.tar
 
       - name: Push artifacts to ECR Test
         if: needs.build.outputs.version != 'none'
@@ -627,6 +641,7 @@ jobs:
           docker push $BUILD_DOCKER_REGISTRY/building-registry/projections-syndication:$SEMVER
           docker push $BUILD_DOCKER_REGISTRY/building-registry/consumer-address:$SEMVER
           docker push $BUILD_DOCKER_REGISTRY/building-registry/migrator-building:$SEMVER
+          docker push $BUILD_DOCKER_REGISTRY/building-registry/producer:$SEMVER
         env:
           BUILD_DOCKER_REGISTRY: ${{ secrets.VBR_BUILD_DOCKER_REGISTRY_TST }}
           SEMVER: ${{ needs.build.outputs.version }}
@@ -720,6 +735,11 @@ jobs:
           name: migrator-building
           path: ~/
 
+      - name: Download producer
+        uses: actions/download-artifact@v3
+        with:
+          name: producer
+          path: ~/
       #
       # Load artifacts
       #
@@ -738,6 +758,7 @@ jobs:
           docker image load -i ~/br-projections-syndication-image.tar
           docker image load -i ~/br-consumer-address-image.tar
           docker image load -i ~/br-migrator-building-image.tar
+          docker image load -i ~/br-producer-image.tar
 
       - name: Push artifacts to ECR Staging
         if: needs.build.outputs.version != 'none'
@@ -776,6 +797,8 @@ jobs:
           docker tag $BUILD_DOCKER_REGISTRY_TST/building-registry/migrator-building:$SEMVER $BUILD_DOCKER_REGISTRY/building-registry/migrator-building:$SEMVER
           docker push $BUILD_DOCKER_REGISTRY/building-registry/migrator-building:$SEMVER
 
+          docker tag $BUILD_DOCKER_REGISTRY_TST/building-registry/producer:$SEMVER $BUILD_DOCKER_REGISTRY/building-registry/producer:$SEMVER
+          docker push $BUILD_DOCKER_REGISTRY/building-registry/producer:$SEMVER
         env:
           BUILD_DOCKER_REGISTRY_TST: ${{ secrets.VBR_BUILD_DOCKER_REGISTRY_TST }}
           BUILD_DOCKER_REGISTRY: ${{ secrets.VBR_BUILD_DOCKER_REGISTRY }}
@@ -870,6 +893,12 @@ jobs:
           name: migrator-building
           path: ~/
 
+      - name: Download producer
+        uses: actions/download-artifact@v3
+        with:
+          name: producer
+          path: ~/
+
       #
       # Load artifacts
       #
@@ -888,6 +917,7 @@ jobs:
           docker image load -i ~/br-projections-syndication-image.tar
           docker image load -i ~/br-consumer-address-image.tar
           docker image load -i ~/br-migrator-building-image.tar
+          docker image load -i ~/br-producer-image.tar
 
       - name: Push artifacts to ECR Production
         if: needs.build.outputs.version != 'none'
@@ -926,6 +956,8 @@ jobs:
           docker tag $BUILD_DOCKER_REGISTRY_TST/building-registry/migrator-building:$SEMVER $BUILD_DOCKER_REGISTRY_PRD/building-registry/migrator-building:$SEMVER
           docker push $BUILD_DOCKER_REGISTRY_PRD/building-registry/migrator-building:$SEMVER
 
+          docker tag $BUILD_DOCKER_REGISTRY_TST/building-registry/producer:$SEMVER $BUILD_DOCKER_REGISTRY_PRD/building-registry/producer:$SEMVER
+          docker push $BUILD_DOCKER_REGISTRY_PRD/building-registry/producer:$SEMVER
         env:
           BUILD_DOCKER_REGISTRY_TST: ${{ secrets.VBR_BUILD_DOCKER_REGISTRY_TST }}
           BUILD_DOCKER_REGISTRY_PRD: ${{ secrets.VBR_BUILD_DOCKER_REGISTRY_PRD }}
@@ -961,7 +993,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        services: ['building-registry-api', 'building-registry-import-api', 'building-registry-projections']
+        services: ['building-registry-api', 'building-registry-import-api', 'building-registry-projections'] #'building-registry-producer', 'building-registry-producer-snapshot-oslo'
 
     steps:
     - name: Deploy services
@@ -1071,7 +1103,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        services: ['building-registry-api', 'building-registry-projections', 'building-registry-consumer-address', 'building-registry-backoffice-api', 'building-registry-migrator-building']
+        services: ['building-registry-api', 'building-registry-projections', 'building-registry-consumer-address', 'building-registry-backoffice-api', 'building-registry-migrator-building'] #'building-registry-producer', 'building-registry-producer-snapshot-oslo'
 
     steps:
     - name: CD services
