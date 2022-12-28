@@ -64,6 +64,7 @@ Target.create "Publish_Solution" (fun _ ->
     "BuildingRegistry.Projections.Syndication"
     "BuildingRegistry.Migrator.Building"
     "BuildingRegistry.Producer"
+    "BuildingRegistry.Producer.Snapshot.Oslo"
   ] |> List.iter publishSource)
 
 Target.create "Pack_Solution" (fun _ ->
@@ -124,6 +125,9 @@ Target.create "PushContainer_MigratorBuilding" (fun _ -> push "migrator-building
 
 Target.create "Containerize_Producer" (fun _ -> containerize "BuildingRegistry.Producer" "producer")
 Target.create "PushContainer_Producer" (fun _ -> push "producer")
+
+Target.create "Containerize_ProducerSnapshotOslo" (fun _ -> containerize "BuildingRegistry.Producer.Snapshot.Oslo" "producer-snapshot-oslo")
+Target.create "PushContainer_ProducerSnapshotOslo" (fun _ -> push "producer-snapshot-oslo")
 // --------------------------------------------------------------------------------
 
 Target.create "Build" ignore
@@ -163,6 +167,7 @@ Target.create "Push" ignore
   ==> "Containerize_ConsumerAddress"
   ==> "Containerize_MigratorBuilding"
   ==> "Containerize_Producer"
+  ==> "Containerize_ProducerSnapshotOslo"
   ==> "Containerize"
 // Possibly add more projects to containerize here
 
@@ -178,6 +183,7 @@ Target.create "Push" ignore
   ==> "PushContainer_ConsumerAddress"
   ==> "PushContainer_MigratorBuilding"
   ==> "PushContainer_Producer"
+  ==> "PushContainer_ProducerSnapshotOslo"
   ==> "Push"
 // Possibly add more projects to push here
 
