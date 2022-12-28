@@ -13,6 +13,7 @@ namespace BuildingRegistry.Infrastructure
         public const string MigrateBuilding = "BuildingRegistryMigration";
         public const string Sequence = "BuildingRegistrySequence";
         public const string BackOffice = "BuildingRegistryBackOffice";
+        public const string Producer = "BuildingRegistryProducer";
     }
 
     public static class MigrationTables
@@ -27,5 +28,6 @@ namespace BuildingRegistry.Infrastructure
         public const string ConsumerAddress = "__EFMigrationsHistoryConsumerAddress";
         public const string BackOffice = "__EFMigrationsHistoryBackOffice";
         public const string MigratorProjection = "__EFMigrationsHistoryMigrationProjection";
+        public const string Producer = "__EFMigrationsHistoryProducer";
     }
 }

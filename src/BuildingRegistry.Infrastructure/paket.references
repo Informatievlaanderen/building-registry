@@ -20,3 +20,14 @@ Microsoft.EntityFrameworkCore
 
 SourceLink.Embed.AllSourceFiles
 SourceLink.Copy.PdbFiles
+
+Destructurama.JsonNet
+
+Serilog
+Serilog.Settings.Configuration
+Serilog.Extensions.Logging
+Serilog.Sinks.Console
+Serilog.Sinks.File
+Serilog.Enrichers.Thread
+Serilog.Enrichers.Environment
+Serilog.Formatting.Compact
