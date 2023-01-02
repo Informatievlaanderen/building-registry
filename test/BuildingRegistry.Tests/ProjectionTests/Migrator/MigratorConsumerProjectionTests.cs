@@ -25,7 +25,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Migrator
         public MigratorConsumerProjectionTests(ITestOutputHelper outputHelper) : base(outputHelper)
         {
             _logger = new LoggerFactory().CreateLogger(typeof(MigratorConsumerProjectionTests));
-            _fakeBackOfficeContext = new FakeBackOfficeContextFactory().CreateDbContext();
+            _fakeBackOfficeContext = new FakeBackOfficeContextFactory(dontDispose: true).CreateDbContext();
         }
 
         [Fact]

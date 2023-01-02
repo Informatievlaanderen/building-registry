@@ -10,18 +10,23 @@ namespace BuildingRegistry.Tests.BackOffice
 
     public class FakeBackOfficeContext : BackOfficeContext
     {
+        private bool _dontDispose = false;
+
         // This needs to be here to please EF
         public FakeBackOfficeContext() { }
 
         // This needs to be DbContextOptions<T> for Autofac!
-        public FakeBackOfficeContext(DbContextOptions<BackOfficeContext> options)
-            : base(options) { }
+        public FakeBackOfficeContext(DbContextOptions<BackOfficeContext> options, bool dontDispose = false)
+            : base(options)
+        {
+            _dontDispose = dontDispose;
+        }
 
-        public async Task AddBuildingUnitBuilding(BuildingPersistentLocalId buildingPersistentLocalId,
+        public async Task AddBuildingUnitBuilding(
+            BuildingPersistentLocalId buildingPersistentLocalId,
             BuildingUnitPersistentLocalId buildingUnitPersistentLocalId)
         {
-            BuildingUnitBuildings.Add(new BuildingUnitBuilding(
-                buildingUnitPersistentLocalId, buildingPersistentLocalId));
+            BuildingUnitBuildings.Add(new BuildingUnitBuilding(buildingUnitPersistentLocalId, buildingPersistentLocalId));
             await SaveChangesAsync();
         }
 
@@ -30,8 +35,7 @@ namespace BuildingRegistry.Tests.BackOffice
             BuildingUnitPersistentLocalId buildingUnitPersistentLocalId,
             AddressPersistentLocalId addressPersistentLocalId)
         {
-            BuildingUnitAddressRelation.Add(new BuildingUnitAddressRelation(
-                buildingPersistentLocalId, buildingUnitPersistentLocalId, addressPersistentLocalId));
+            BuildingUnitAddressRelation.Add(new BuildingUnitAddressRelation(buildingPersistentLocalId, buildingUnitPersistentLocalId, addressPersistentLocalId));
             await SaveChangesAsync();
         }
 
@@ -44,18 +48,29 @@ namespace BuildingRegistry.Tests.BackOffice
 
         public override ValueTask DisposeAsync()
         {
-            // Prevent object from being disposed for asserting the context.
-            return ValueTask.CompletedTask;
+            if (_dontDispose)
+            {
+                return new ValueTask(Task.CompletedTask);
+            }
+
+            return base.DisposeAsync();
         }
     }
 
     public class FakeBackOfficeContextFactory : IDesignTimeDbContextFactory<FakeBackOfficeContext>
     {
+        private readonly bool _dontDispose;
+
+        public FakeBackOfficeContextFactory(bool dontDispose = false)
+        {
+            _dontDispose = dontDispose;
+        }
+
         public FakeBackOfficeContext CreateDbContext(params string[] args)
         {
             var builder = new DbContextOptionsBuilder<BackOfficeContext>().UseInMemoryDatabase(Guid.NewGuid().ToString());
 
-            return new FakeBackOfficeContext(builder.Options);
+            return new FakeBackOfficeContext(builder.Options, _dontDispose);
         }
     }
 }

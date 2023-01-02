@@ -13,6 +13,7 @@ namespace BuildingRegistry.Infrastructure
         public const string MigrateBuilding = "BuildingRegistryMigration";
         public const string Sequence = "BuildingRegistrySequence";
         public const string BackOffice = "BuildingRegistryBackOffice";
+        public const string BackOfficeProjections = "BuildingRegistryBackOfficeProjections";
         public const string Producer = "BuildingRegistryProducer";
         public const string ProducerSnapshotOslo = "BuildingRegistryProducerSnapshotOslo";
     }
@@ -28,6 +29,7 @@ namespace BuildingRegistry.Infrastructure
         public const string Sequence = "__EFMigrationsHistorySequence";
         public const string ConsumerAddress = "__EFMigrationsHistoryConsumerAddress";
         public const string BackOffice = "__EFMigrationsHistoryBackOffice";
+        public const string BackOfficeProjections = "__EFMigrationsHistoryBackOfficeProjections";
         public const string MigratorProjection = "__EFMigrationsHistoryMigrationProjection";
         public const string Producer = "__EFMigrationsHistoryProducer";
         public const string ProducerSnapshotOslo = "__EFMigrationsHistoryProducerSnapshotOslo";

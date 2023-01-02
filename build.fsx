@@ -62,6 +62,7 @@ Target.create "Publish_Solution" (fun _ ->
     "BuildingRegistry.Projections.Extract"
     "BuildingRegistry.Projections.LastChangedList"
     "BuildingRegistry.Projections.Syndication"
+    "BuildingRegistry.Projections.BackOffice"
     "BuildingRegistry.Migrator.Building"
     "BuildingRegistry.Producer"
     "BuildingRegistry.Producer.Snapshot.Oslo"
@@ -117,6 +118,9 @@ Target.create "PushContainer_ProjectionsExtract" (fun _ -> push "projections-ext
 Target.create "Containerize_ProjectionsSyndication" (fun _ -> containerize "BuildingRegistry.Projections.Syndication" "projections-syndication")
 Target.create "PushContainer_ProjectionsSyndication" (fun _ -> push "projections-syndication")
 
+Target.create "Containerize_ProjectionsBackOffice" (fun _ -> containerize "BuildingRegistry.Projections.BackOffice" "projections-backoffice")
+Target.create "PushContainer_ProjectionsBackOffice" (fun _ -> push "projections-backoffice")
+
 Target.create "Containerize_ConsumerAddress" (fun _ -> containerize "BuildingRegistry.Consumer.Address" "consumer-address")
 Target.create "PushContainer_ConsumerAddress" (fun _ -> push "consumer-address")
 
@@ -164,6 +168,7 @@ Target.create "Push" ignore
   ==> "Containerize_ApiCrabImport"
   ==> "Containerize_ApiBackOffice"
   ==> "Containerize_ProjectionsSyndication"
+  ==> "Containerize_ProjectionsBackOffice"
   ==> "Containerize_ConsumerAddress"
   ==> "Containerize_MigratorBuilding"
   ==> "Containerize_Producer"
@@ -180,6 +185,7 @@ Target.create "Push" ignore
   ==> "PushContainer_ApiCrabImport"
   ==> "PushContainer_ApiBackOffice"
   ==> "PushContainer_ProjectionsSyndication"
+  ==> "PushContainer_ProjectionsBackOffice"
   ==> "PushContainer_ConsumerAddress"
   ==> "PushContainer_MigratorBuilding"
   ==> "PushContainer_Producer"

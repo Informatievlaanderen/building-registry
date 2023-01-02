@@ -20,6 +20,22 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions
         public DbSet<BuildingUnitBuilding> BuildingUnitBuildings { get; set; }
         public DbSet<BuildingUnitAddressRelation> BuildingUnitAddressRelation { get; set; }
 
+        public async Task<BuildingUnitBuilding> AddIdempotentBuildingUnitBuilding(
+            int buildingPersistentLocalId,
+            int buildingUnitPersistentLocalId,
+            CancellationToken cancellationToken)
+        {
+            var relation = await BuildingUnitBuildings.FindAsync(new object?[] { buildingUnitPersistentLocalId }, cancellationToken);
+
+            if (relation is null)
+            {
+                relation = new BuildingUnitBuilding(buildingUnitPersistentLocalId, buildingPersistentLocalId);
+                await BuildingUnitBuildings.AddAsync(relation, cancellationToken);
+                await SaveChangesAsync(cancellationToken);
+            }
+
+            return relation;
+        }
 
         public async Task<BuildingUnitAddressRelation> AddIdempotentBuildingUnitAddressRelation(
             BuildingPersistentLocalId buildingPersistentLocalId,
