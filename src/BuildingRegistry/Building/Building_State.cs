@@ -4,7 +4,6 @@ namespace BuildingRegistry.Building
     using System.Linq;
     using Be.Vlaanderen.Basisregisters.AggregateSource.Snapshotting;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
-    using BuildingRegistry.Building.Commands;
     using Events;
 
     public partial class Building
@@ -51,6 +50,7 @@ namespace BuildingRegistry.Building
             Register<BuildingWasCorrectedFromRealizedToUnderConstruction>(When);
             Register<BuildingWasNotRealizedV2>(When);
             Register<BuildingWasCorrectedFromNotRealizedToPlanned>(When);
+            Register<BuildingWasRemovedV2>(When);
 
             Register<BuildingUnitWasPlannedV2>(When);
             Register<BuildingUnitWasRealizedV2>(When);
@@ -64,6 +64,7 @@ namespace BuildingRegistry.Building
             Register<BuildingUnitWasCorrectedFromRetiredToRealized>(When);
             Register<BuildingUnitPositionWasCorrected>(When);
             Register<BuildingUnitWasRemovedV2>(When);
+            Register<BuildingUnitWasRemovedBecauseBuildingWasRemoved>(When);
             Register<BuildingUnitRemovalWasCorrected>(When);
             Register<BuildingUnitWasRegularized>(When);
             Register<BuildingUnitWasDeregulated>(When);
@@ -180,6 +181,13 @@ namespace BuildingRegistry.Building
             _lastEvent = @event;
         }
 
+        private void When(BuildingWasRemovedV2 @event)
+        {
+            IsRemoved = true;
+
+            _lastEvent = @event;
+        }
+
         private void When(BuildingUnitWasPlannedV2 @event)
         {
             var newBuildingUnit = new BuildingUnit(ApplyChange);
@@ -269,6 +277,13 @@ namespace BuildingRegistry.Building
         }
 
         private void When(BuildingUnitWasRemovedV2 @event)
+        {
+            var buildingUnit = _buildingUnits
+                .GetByPersistentLocalId(new BuildingUnitPersistentLocalId(@event.BuildingUnitPersistentLocalId));
+            buildingUnit.Route(@event);
+        }
+
+        private void When(BuildingUnitWasRemovedBecauseBuildingWasRemoved @event)
         {
             var buildingUnit = _buildingUnits
                 .GetByPersistentLocalId(new BuildingUnitPersistentLocalId(@event.BuildingUnitPersistentLocalId));

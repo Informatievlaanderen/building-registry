@@ -305,6 +305,9 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo
             When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingWasRealizedV2>>(async (_, message, ct) =>
             { });
 
+            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingWasRemovedV2>>(async (_, message, ct) =>
+            { });
+
             When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<CommonBuildingUnitWasAddedV2>>(async (_, message, ct) =>
             {
                 await FindAndProduce(async () =>
@@ -318,6 +321,11 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo
             });
 
             When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingUnitWasRemovedV2>>(async (_, message, ct) =>
+            {
+                await Produce($"{osloNamespace}/{message.Message.BuildingUnitPersistentLocalId}", "{}", message.Position, ct);
+            });
+
+            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingUnitWasRemovedBecauseBuildingWasRemoved>>(async (_, message, ct) =>
             {
                 await Produce($"{osloNamespace}/{message.Message.BuildingUnitPersistentLocalId}", "{}", message.Position, ct);
             });

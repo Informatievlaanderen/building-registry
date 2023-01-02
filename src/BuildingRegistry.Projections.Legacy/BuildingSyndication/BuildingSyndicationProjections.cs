@@ -954,6 +954,15 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
                     item.Status = MapBuildingStatus(BuildingRegistry.Building.BuildingStatus.Planned);
                 }, ct);
             });
+
+            When<Envelope<BuildingWasRemovedV2>>(async (context, message, ct) =>
+            {
+                await context.CreateNewBuildingSyndicationItem(
+                    message.Message.BuildingPersistentLocalId,
+                    message,
+                    _ => { },
+                    ct);
+            });
             #endregion Building
 
             #region BuildingUnit
@@ -1073,6 +1082,15 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
             });
 
             When<Envelope<BuildingUnitWasRemovedV2>>(async (context, message, ct) =>
+            {
+                await context.CreateNewBuildingSyndicationItem(message.Message.BuildingPersistentLocalId, message, item =>
+                {
+                    var unit = item.BuildingUnitsV2.Single(y => y.PersistentLocalId == message.Message.BuildingUnitPersistentLocalId);
+                    item.BuildingUnitsV2.Remove(unit);
+                }, ct);
+            });
+
+            When<Envelope<BuildingUnitWasRemovedBecauseBuildingWasRemoved>>(async (context, message, ct) =>
             {
                 await context.CreateNewBuildingSyndicationItem(message.Message.BuildingPersistentLocalId, message, item =>
                 {

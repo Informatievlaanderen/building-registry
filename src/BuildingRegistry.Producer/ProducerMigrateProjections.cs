@@ -128,6 +128,11 @@ namespace BuildingRegistry.Producer
                 await Produce(message.Message.BuildingPersistentLocalId, message.Message.ToContract(), message.Position, ct);
             });
 
+            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingUnitWasRemovedBecauseBuildingWasRemoved>>(async (_, message, ct) =>
+            {
+                await Produce(message.Message.BuildingPersistentLocalId, message.Message.ToContract(), message.Position, ct);
+            });
+
             When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingUnitWasRetiredV2>>(async (_, message, ct) =>
             {
                 await Produce(message.Message.BuildingPersistentLocalId, message.Message.ToContract(), message.Position, ct);
@@ -164,6 +169,11 @@ namespace BuildingRegistry.Producer
             });
 
             When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingWasRealizedV2>>(async (_, message, ct) =>
+            {
+                await Produce(message.Message.BuildingPersistentLocalId, message.Message.ToContract(), message.Position, ct);
+            });
+
+            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingWasRemovedV2>>(async (_, message, ct) =>
             {
                 await Produce(message.Message.BuildingPersistentLocalId, message.Message.ToContract(), message.Position, ct);
             });

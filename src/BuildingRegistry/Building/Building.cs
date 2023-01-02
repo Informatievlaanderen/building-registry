@@ -267,6 +267,26 @@ namespace BuildingRegistry.Building
             ApplyChange(new BuildingWasCorrectedFromNotRealizedToPlanned(BuildingPersistentLocalId));
         }
 
+        public void RemoveConstruction()
+        {
+            if (IsRemoved)
+            {
+                return;
+            }
+
+            if (BuildingGeometry.Method != BuildingGeometryMethod.Outlined)
+            {
+                throw new BuildingHasInvalidBuildingGeometryMethodException();
+            }
+
+            foreach (var buildingUnit in _buildingUnits.GetNotRemovedUnits())
+            {
+                buildingUnit.RemoveBecauseBuildingWasRemoved();
+            }
+
+            ApplyChange(new BuildingWasRemovedV2(BuildingPersistentLocalId));
+        }
+
         private void GuardActiveBuilding()
         {
             var validStatuses = new[]

@@ -330,6 +330,16 @@ namespace BuildingRegistry.Building
             Apply(new BuildingUnitWasRemovedV2(_buildingPersistentLocalId, BuildingUnitPersistentLocalId));
         }
 
+        public void RemoveBecauseBuildingWasRemoved()
+        {
+            if (IsRemoved)
+            {
+                return;
+            }
+
+            Apply(new BuildingUnitWasRemovedBecauseBuildingWasRemoved(_buildingPersistentLocalId, BuildingUnitPersistentLocalId));
+        }
+
         public void AttachAddress(AddressPersistentLocalId addressPersistentLocalId, IAddresses addresses)
         {
             GuardRemoved();

@@ -106,6 +106,14 @@ namespace BuildingRegistry.Projections.Legacy.BuildingDetailV2
                 UpdateHash(item, message);
             });
 
+            When<Envelope<BuildingWasRemovedV2>>(async (context, message, ct) =>
+            {
+                var item = await context.BuildingDetailsV2.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);
+                item.IsRemoved = true;
+                item.Version = message.Message.Provenance.Timestamp;
+                UpdateHash(item, message);
+            });
+
             When<Envelope<BuildingUnitWasPlannedV2>>(async (context, message, ct) =>
             {
                 var item = await context.BuildingDetailsV2.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);

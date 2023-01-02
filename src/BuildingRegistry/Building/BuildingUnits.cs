@@ -6,38 +6,38 @@ namespace BuildingRegistry.Building
 
     public class BuildingUnits : List<BuildingUnit>
     {
-        private IEnumerable<BuildingUnit> NotRemovedUnits => this.Where(x => !x.IsRemoved);
+        public IEnumerable<BuildingUnit> GetNotRemovedUnits() => this.Where(x => !x.IsRemoved);
 
         public IEnumerable<BuildingUnit> NonCommonBuildingUnits(bool excludeRemoved = true)
             => excludeRemoved
-                ? NotRemovedUnits.Where(x => x.Function != BuildingUnitFunction.Common)
+                ? GetNotRemovedUnits().Where(x => x.Function != BuildingUnitFunction.Common)
                 : this.Where(x => x.Function != BuildingUnitFunction.Common);
         public IEnumerable<BuildingUnit> PlannedBuildingUnits(bool excludeRemoved = true)
             => excludeRemoved
-                ? NotRemovedUnits.Where(x => x.Status == BuildingUnitStatus.Planned)
+                ? GetNotRemovedUnits().Where(x => x.Status == BuildingUnitStatus.Planned)
                 : this.Where(x => x.Status == BuildingUnitStatus.Planned);
         public IEnumerable<BuildingUnit> RealizedBuildingUnits(bool excludeRemoved = true)
             => excludeRemoved
-                ? NotRemovedUnits.Where(x => x.Status == BuildingUnitStatus.Realized)
+                ? GetNotRemovedUnits().Where(x => x.Status == BuildingUnitStatus.Realized)
                 : this.Where(x => x.Status == BuildingUnitStatus.Realized);
         public IEnumerable<BuildingUnit> RetiredBuildingUnits(bool excludeRemoved = true)
             => excludeRemoved
-                ? NotRemovedUnits.Where(x => x.Status == BuildingUnitStatus.Retired)
+                ? GetNotRemovedUnits().Where(x => x.Status == BuildingUnitStatus.Retired)
                 : this.Where(x => x.Status == BuildingUnitStatus.Retired);
 
         public BuildingUnit CommonBuildingUnit(bool excludeRemoved = true)
             => excludeRemoved
-                ? NotRemovedUnits.Single(x => x.Function == BuildingUnitFunction.Common)
+                ? GetNotRemovedUnits().Single(x => x.Function == BuildingUnitFunction.Common)
                 : this.Single(x => x.Function == BuildingUnitFunction.Common);
 
         public bool HasCommonBuildingUnit(bool excludeRemoved = true)
             => excludeRemoved
-                ? NotRemovedUnits.Any(x => x.Function == BuildingUnitFunction.Common)
+                ? GetNotRemovedUnits().Any(x => x.Function == BuildingUnitFunction.Common)
                 : this.Any(x => x.Function == BuildingUnitFunction.Common);
 
         public bool HasPlannedOrRealizedCommonBuildingUnit(bool excludeRemoved = true)
         {
-            var set = excludeRemoved ? NotRemovedUnits : this;
+            var set = excludeRemoved ? GetNotRemovedUnits() : this;
 
             return set.Any(x =>
                 x.Function == BuildingUnitFunction.Common
@@ -45,7 +45,7 @@ namespace BuildingRegistry.Building
         }
 
         public bool RequiresCommonBuildingUnit() =>
-            NotRemovedUnits.Count(x =>
+            GetNotRemovedUnits().Count(x =>
                 x.Function != BuildingUnitFunction.Common &&
                 (x.Status == BuildingUnitStatus.Planned || x.Status == BuildingUnitStatus.Realized))
             >= 2;

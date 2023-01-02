@@ -59,7 +59,6 @@ using System;
                 .RegisterModule(new CommandHandlingModule(_configuration))
 
                 .RegisterModule(new CrabImportModule(
-                    _services,
                     _configuration.GetConnectionString("CrabImport"),
                     Schema.Import,
                     _loggerFactory));
