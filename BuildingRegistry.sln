@@ -96,6 +96,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BuildingRegistry.Producer",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BuildingRegistry.Producer.Snapshot.Oslo", "src\BuildingRegistry.Producer.Snapshot.Oslo\BuildingRegistry.Producer.Snapshot.Oslo.csproj", "{E28CBE56-034C-4C35-AD26-A073B6869ED4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BuildingRegistry.Projections.Backoffice", "src\BuildingRegistry.Projections.Backoffice\BuildingRegistry.Projections.Backoffice.csproj", "{43AC7ABA-CE36-4067-9DC6-366D87618FD5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -238,6 +240,10 @@ Global
 		{E28CBE56-034C-4C35-AD26-A073B6869ED4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E28CBE56-034C-4C35-AD26-A073B6869ED4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E28CBE56-034C-4C35-AD26-A073B6869ED4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{43AC7ABA-CE36-4067-9DC6-366D87618FD5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{43AC7ABA-CE36-4067-9DC6-366D87618FD5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{43AC7ABA-CE36-4067-9DC6-366D87618FD5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{43AC7ABA-CE36-4067-9DC6-366D87618FD5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -277,6 +283,7 @@ Global
 		{984EB1FD-D6EC-4023-8FDF-3BA2B74157BF} = {24B47154-C5F0-4356-B059-49A1E72C38A6}
 		{AC90B2DB-A0F2-4918-9E03-E3D91BB92E36} = {24B47154-C5F0-4356-B059-49A1E72C38A6}
 		{E28CBE56-034C-4C35-AD26-A073B6869ED4} = {24B47154-C5F0-4356-B059-49A1E72C38A6}
+		{43AC7ABA-CE36-4067-9DC6-366D87618FD5} = {24B47154-C5F0-4356-B059-49A1E72C38A6}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {65FA30D5-DDFC-40EC-9BC9-3BF93D1B430F}

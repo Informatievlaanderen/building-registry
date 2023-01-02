@@ -52,18 +52,14 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.BuildingUnit
                                request.Metadata,
                                cancellationToken);
 
-            _backOfficeContext.BuildingUnitBuildings.Add(
-                           new BuildingUnitBuilding(
-                               buildingUnitPersistentLocalId,
-                               request.BuildingPersistentLocalId));
-
-            await _backOfficeContext.SaveChangesAsync(cancellationToken);
+            await _backOfficeContext.AddIdempotentBuildingUnitBuilding(request.BuildingPersistentLocalId, buildingUnitPersistentLocalId, cancellationToken);
             await transaction.CommitAsync(cancellationToken);
 
             var lastHash = await GetHash(
                 request.BuildingPersistentLocalId,
                 new BuildingUnitPersistentLocalId(buildingUnitPersistentLocalId),
                 cancellationToken);
+
             return new ETagResponse(string.Format(DetailUrlFormat, buildingUnitPersistentLocalId), lastHash);
         }
 

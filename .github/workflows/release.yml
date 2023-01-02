@@ -121,6 +121,7 @@ jobs:
         docker image save $BUILD_DOCKER_REGISTRY/building-registry/api-backoffice:$SEMVER -o ~/br-api-backoffice-image.tar
         docker image save $BUILD_DOCKER_REGISTRY/building-registry/api-crab-import:$SEMVER -o ~/br-api-crab-import-image.tar
         docker image save $BUILD_DOCKER_REGISTRY/building-registry/projections-syndication:$SEMVER -o ~/br-projections-syndication-image.tar
+        docker image save $BUILD_DOCKER_REGISTRY/building-registry/projections-backoffice:$SEMVER -o ~/br-projections-backoffice-image.tar
         docker image save $BUILD_DOCKER_REGISTRY/building-registry/consumer-address:$SEMVER -o ~/br-consumer-address-image.tar
         docker image save $BUILD_DOCKER_REGISTRY/building-registry/migrator-building:$SEMVER -o ~/br-migrator-building-image.tar
         docker image save $BUILD_DOCKER_REGISTRY/building-registry/producer:$SEMVER -o ~/br-producer-image.tar
@@ -262,6 +263,13 @@ jobs:
       with:
         name: projections-syndication
         path: ~/br-projections-syndication-image.tar
+
+    - name: Upload projections-backoffice artifact
+      if: env.RELEASE_VERSION != 'none'
+      uses: actions/upload-artifact@v3
+      with:
+        name: projections-backoffice
+        path: ~/br-projections-backoffice-image.tar
 
     - name: Upload consumer-address artifact
       if: env.RELEASE_VERSION != 'none'
@@ -596,6 +604,12 @@ jobs:
           name: projections-syndication
           path: ~/
 
+      - name: Download projections-backoffice
+        uses: actions/download-artifact@v3
+        with:
+          name: projections-backoffice
+          path: ~/
+
       - name: Download consumer-address
         uses: actions/download-artifact@v3
         with:
@@ -636,6 +650,7 @@ jobs:
           #docker image load -i ~/br-projections-legacy-image.tar
           #docker image load -i ~/br-projections-extract-image.tar
           docker image load -i ~/br-projections-syndication-image.tar
+          docker image load -i ~/br-projections-backoffice-image.tar
           docker image load -i ~/br-consumer-address-image.tar
           docker image load -i ~/br-migrator-building-image.tar
           docker image load -i ~/br-producer-image.tar
@@ -655,6 +670,7 @@ jobs:
           #docker push $BUILD_DOCKER_REGISTRY/building-registry/projections-legacy:$SEMVER
           #docker push $BUILD_DOCKER_REGISTRY/building-registry/projections-extract:$SEMVER
           docker push $BUILD_DOCKER_REGISTRY/building-registry/projections-syndication:$SEMVER
+          docker push $BUILD_DOCKER_REGISTRY/building-registry/projections-backoffice:$SEMVER
           docker push $BUILD_DOCKER_REGISTRY/building-registry/consumer-address:$SEMVER
           docker push $BUILD_DOCKER_REGISTRY/building-registry/migrator-building:$SEMVER
           docker push $BUILD_DOCKER_REGISTRY/building-registry/producer:$SEMVER
@@ -740,6 +756,12 @@ jobs:
           name: projections-syndication
           path: ~/
 
+      - name: Download projections-backoffice
+        uses: actions/download-artifact@v3
+        with:
+          name: projections-backoffice
+          path: ~/
+
       - name: Download consumer-address
         uses: actions/download-artifact@v3
         with:
@@ -780,6 +802,7 @@ jobs:
           #docker image load -i ~/br-projections-legacy-image.tar
           #docker image load -i ~/br-projections-extract-image.tar
           docker image load -i ~/br-projections-syndication-image.tar
+          docker image load -i ~/br-projections-backoffice-image.tar
           docker image load -i ~/br-consumer-address-image.tar
           docker image load -i ~/br-migrator-building-image.tar
           docker image load -i ~/br-producer-image.tar
@@ -815,6 +838,9 @@ jobs:
 
           docker tag $BUILD_DOCKER_REGISTRY_TST/building-registry/projections-syndication:$SEMVER $BUILD_DOCKER_REGISTRY/building-registry/projections-syndication:$SEMVER
           docker push $BUILD_DOCKER_REGISTRY/building-registry/projections-syndication:$SEMVER
+
+          docker tag $BUILD_DOCKER_REGISTRY_TST/building-registry/projections-backoffice:$SEMVER $BUILD_DOCKER_REGISTRY/building-registry/projections-backoffice:$SEMVER
+          docker push $BUILD_DOCKER_REGISTRY/building-registry/projections-backoffice:$SEMVER
 
           docker tag $BUILD_DOCKER_REGISTRY_TST/building-registry/consumer-address:$SEMVER $BUILD_DOCKER_REGISTRY/building-registry/consumer-address:$SEMVER
           docker push $BUILD_DOCKER_REGISTRY/building-registry/consumer-address:$SEMVER
@@ -909,6 +935,12 @@ jobs:
           name: projections-syndication
           path: ~/
 
+      - name: Download projections-backoffice
+        uses: actions/download-artifact@v3
+        with:
+          name: projections-backoffice
+          path: ~/
+
       - name: Download consumer-address
         uses: actions/download-artifact@v3
         with:
@@ -949,6 +981,7 @@ jobs:
           #docker image load -i ~/br-projections-legacy-image.tar
           #docker image load -i ~/br-projections-extract-image.tar
           docker image load -i ~/br-projections-syndication-image.tar
+          docker image load -i ~/br-projections-backoffice-image.tar
           docker image load -i ~/br-consumer-address-image.tar
           docker image load -i ~/br-migrator-building-image.tar
           docker image load -i ~/br-producer-image.tar
@@ -984,6 +1017,9 @@ jobs:
 
           docker tag $BUILD_DOCKER_REGISTRY_TST/building-registry/projections-syndication:$SEMVER $BUILD_DOCKER_REGISTRY_PRD/building-registry/projections-syndication:$SEMVER
           docker push $BUILD_DOCKER_REGISTRY_PRD/building-registry/projections-syndication:$SEMVER
+
+          docker tag $BUILD_DOCKER_REGISTRY_TST/building-registry/projections-backoffice:$SEMVER $BUILD_DOCKER_REGISTRY_PRD/building-registry/projections-backoffice:$SEMVER
+          docker push $BUILD_DOCKER_REGISTRY_PRD/building-registry/projections-backoffice:$SEMVER
 
           docker tag $BUILD_DOCKER_REGISTRY_TST/building-registry/consumer-address:$SEMVER $BUILD_DOCKER_REGISTRY_PRD/building-registry/consumer-address:$SEMVER
           docker push $BUILD_DOCKER_REGISTRY_PRD/building-registry/consumer-address:$SEMVER
