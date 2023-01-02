@@ -63,6 +63,7 @@ Target.create "Publish_Solution" (fun _ ->
     "BuildingRegistry.Projections.LastChangedList"
     "BuildingRegistry.Projections.Syndication"
     "BuildingRegistry.Migrator.Building"
+    "BuildingRegistry.Producer"
   ] |> List.iter publishSource)
 
 Target.create "Pack_Solution" (fun _ ->
@@ -121,6 +122,8 @@ Target.create "PushContainer_ConsumerAddress" (fun _ -> push "consumer-address")
 Target.create "Containerize_MigratorBuilding" (fun _ -> containerize "BuildingRegistry.Migrator.Building" "migrator-building")
 Target.create "PushContainer_MigratorBuilding" (fun _ -> push "migrator-building")
 
+Target.create "Containerize_Producer" (fun _ -> containerize "BuildingRegistry.Producer" "producer")
+Target.create "PushContainer_Producer" (fun _ -> push "producer")
 // --------------------------------------------------------------------------------
 
 Target.create "Build" ignore
@@ -159,6 +162,7 @@ Target.create "Push" ignore
   ==> "Containerize_ProjectionsSyndication"
   ==> "Containerize_ConsumerAddress"
   ==> "Containerize_MigratorBuilding"
+  ==> "Containerize_Producer"
   ==> "Containerize"
 // Possibly add more projects to containerize here
 
@@ -173,6 +177,7 @@ Target.create "Push" ignore
   ==> "PushContainer_ProjectionsSyndication"
   ==> "PushContainer_ConsumerAddress"
   ==> "PushContainer_MigratorBuilding"
+  ==> "PushContainer_Producer"
   ==> "Push"
 // Possibly add more projects to push here
 
