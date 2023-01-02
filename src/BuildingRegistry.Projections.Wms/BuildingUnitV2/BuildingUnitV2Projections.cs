@@ -182,6 +182,13 @@ namespace BuildingRegistry.Projections.Wms.BuildingUnitV2
                 context.BuildingUnitsV2.Remove(unit);
             });
 
+            When<Envelope<BuildingUnitWasRemovedBecauseBuildingWasRemoved>>(async (context, message, ct) =>
+            {
+                var unit = await context.BuildingUnitsV2.FindAsync(message.Message.BuildingUnitPersistentLocalId);
+
+                context.BuildingUnitsV2.Remove(unit);
+            });
+
             When<Envelope<BuildingUnitRemovalWasCorrected>>(async (context, message, ct) =>
             {
                 var buildingUnitV2 = new BuildingUnitV2

@@ -365,6 +365,11 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo
                     ct);
             });
 
+            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingWasRemovedV2>>(async (_, message, ct) =>
+            {
+                await Produce($"{osloNamespace}/{message.Message.BuildingPersistentLocalId}", "{}", message.Position, ct);
+            });
+
             When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<CommonBuildingUnitWasAddedV2>>(async (_, message, ct) =>
             {
                 await FindAndProduce(async () =>
@@ -378,6 +383,18 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo
             });
 
             When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingUnitWasRemovedV2>>(async (_, message, ct) =>
+            {
+                await FindAndProduce(async () =>
+                        await snapshotManager.FindMatchingSnapshot(
+                            message.Message.BuildingPersistentLocalId.ToString(),
+                            message.Message.Provenance.Timestamp,
+                            throwStaleWhenGone: false,
+                            ct),
+                    message.Position,
+                    ct);
+            });
+
+            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingUnitWasRemovedBecauseBuildingWasRemoved>>(async (_, message, ct) =>
             {
                 await FindAndProduce(async () =>
                         await snapshotManager.FindMatchingSnapshot(

@@ -315,6 +315,31 @@ namespace BuildingRegistry.Tests.ProjectionTests.Legacy
                 });
         }
 
+        [Fact]
+        public async Task WhenBuildingWasRemovedV2()
+        {
+            var buildingWasPlannedV2 = _fixture.Create<BuildingWasPlannedV2>();
+            var buildingWasRemovedV2 = _fixture.Create<BuildingWasRemovedV2>();
+
+            await Sut
+                .Given(
+                    new Envelope<BuildingWasPlannedV2>(
+                        new Envelope(
+                            buildingWasPlannedV2,
+                            new Dictionary<string, object> { { AddEventHashPipe.HashMetadataKey, buildingWasPlannedV2.GetHash() } })),
+                    new Envelope<BuildingWasRemovedV2>(
+                        new Envelope(
+                            buildingWasRemovedV2,
+                            new Dictionary<string, object> { { AddEventHashPipe.HashMetadataKey, buildingWasRemovedV2.GetHash() } })))
+                .Then(async ct =>
+                {
+                    var buildingDetailItemV2 = await ct.BuildingDetailsV2.FindAsync(buildingWasRemovedV2.BuildingPersistentLocalId);
+                    buildingDetailItemV2.Should().NotBeNull();
+                    buildingDetailItemV2!.IsRemoved.Should().BeTrue();
+                    buildingDetailItemV2.Version.Should().Be(buildingWasRemovedV2.Provenance.Timestamp);
+                });
+        }
+
         protected override BuildingDetailV2Projections CreateProjection() => new BuildingDetailV2Projections();
     }
 }

@@ -427,6 +427,12 @@ namespace BuildingRegistry.Producer.Extensions
                 message.BuildingUnitPersistentLocalId,
                 message.Provenance.ToContract());
 
+        public static Contracts.BuildingUnitWasRemovedBecauseBuildingWasRemoved ToContract(this BuildingUnitWasRemovedBecauseBuildingWasRemoved message)
+            => new Contracts.BuildingUnitWasRemovedBecauseBuildingWasRemoved(
+                message.BuildingPersistentLocalId,
+                message.BuildingUnitPersistentLocalId,
+                message.Provenance.ToContract());
+
         public static Contracts.BuildingUnitWasRetiredV2 ToContract(this BuildingUnitWasRetiredV2 message)
             => new Contracts.BuildingUnitWasRetiredV2(
                 message.BuildingPersistentLocalId,
@@ -493,6 +499,11 @@ namespace BuildingRegistry.Producer.Extensions
                 message.GeometryMethod,
                 message.ExtendedWkbGeometry,
                 message.HasDeviation,
+                message.Provenance.ToContract());
+
+        public static Contracts.BuildingWasRemovedV2 ToContract(this BuildingWasRemovedV2 message)
+            => new Contracts.BuildingWasRemovedV2(
+                message.BuildingPersistentLocalId,
                 message.Provenance.ToContract());
 
         private static Be.Vlaanderen.Basisregisters.GrAr.Contracts.Common.Provenance ToContract(this ProvenanceData provenance)
