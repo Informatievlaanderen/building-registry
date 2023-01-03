@@ -1,4 +1,4 @@
-﻿namespace BuildingRegistry.Projections.Backoffice
+﻿namespace BuildingRegistry.Projections.BackOffice
 {
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.Runner;
     using BuildingRegistry.Infrastructure;

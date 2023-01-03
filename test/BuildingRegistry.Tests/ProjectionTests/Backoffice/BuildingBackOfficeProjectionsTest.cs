@@ -1,11 +1,11 @@
-﻿namespace BuildingRegistry.Tests.ProjectionTests.Backoffice
+﻿namespace BuildingRegistry.Tests.ProjectionTests.BackOffice
 {
     using System;
     using Api.BackOffice.Abstractions;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.Testing;
     using Microsoft.EntityFrameworkCore;
     using Moq;
-    using Projections.Backoffice;
+    using Projections.BackOffice;
 
     public abstract class BuildingBackOfficeProjectionsTest
     {

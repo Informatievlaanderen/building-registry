@@ -5,7 +5,6 @@ namespace BuildingRegistry.Tests.ProjectionTests.Consumer.Address
     using System.Threading.Tasks;
     using Api.BackOffice.Abstractions;
     using AutoFixture;
-    using BackOffice;
     using Be.Vlaanderen.Basisregisters.GrAr.Contracts.AddressRegistry;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Building;
@@ -16,11 +15,12 @@ namespace BuildingRegistry.Tests.ProjectionTests.Consumer.Address
     using Microsoft.Extensions.Logging.Abstractions;
     using Moq;
     using NodaTime;
+    using Tests.BackOffice;
     using Tests.Legacy.Autofixture;
     using Xunit;
     using Xunit.Abstractions;
     using Provenance = Be.Vlaanderen.Basisregisters.GrAr.Contracts.Common.Provenance;
-    
+
     public sealed class CommandHandlingKafkaProjectionTests : KafkaProjectionTest<CommandHandler, CommandHandlingKafkaProjection>
     {
         private readonly FakeBackOfficeContext _fakeBackOfficeContext;

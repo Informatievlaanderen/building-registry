@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace BuildingRegistry.Projections.Backoffice.Migrations
+namespace BuildingRegistry.Projections.BackOffice.Migrations
 {
     public partial class Initial : Migration
     {
