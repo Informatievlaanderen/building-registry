@@ -1,10 +1,9 @@
-﻿namespace BuildingRegistry.Projections.Backoffice
+﻿namespace BuildingRegistry.Projections.BackOffice
 {
     using System;
     using System.IO;
     using System.Threading;
     using System.Threading.Tasks;
-    using Api.BackOffice.Abstractions;
     using Autofac;
     using Autofac.Extensions.DependencyInjection;
     using Be.Vlaanderen.Basisregisters.Aws.DistributedMutex;
@@ -15,6 +14,7 @@
     using Be.Vlaanderen.Basisregisters.Projector;
     using Be.Vlaanderen.Basisregisters.Projector.ConnectedProjections;
     using Be.Vlaanderen.Basisregisters.Projector.Modules;
+    using BuildingRegistry.Api.BackOffice.Abstractions;
     using BuildingRegistry.Infrastructure;
     using Destructurama;
     using Infrastructure;

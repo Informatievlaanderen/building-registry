@@ -1,4 +1,4 @@
-﻿namespace BuildingRegistry.Projections.Backoffice
+﻿namespace BuildingRegistry.Projections.BackOffice
 {
     using System.Threading;
     using System.Threading.Tasks;

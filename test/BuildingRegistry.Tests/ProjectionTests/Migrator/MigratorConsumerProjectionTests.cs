@@ -5,7 +5,6 @@ namespace BuildingRegistry.Tests.ProjectionTests.Migrator
     using System.Threading.Tasks;
     using Api.BackOffice.Abstractions;
     using Autofac;
-    using BackOffice;
     using Building;
     using BuildingRegistry.Migrator.Building.Projections;
     using Extensions;
@@ -13,6 +12,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Migrator
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Logging;
     using Moq;
+    using Tests.BackOffice;
     using Xunit;
     using Xunit.Abstractions;
     using BuildingUnitStatus = BuildingRegistry.Legacy.BuildingUnitStatus;

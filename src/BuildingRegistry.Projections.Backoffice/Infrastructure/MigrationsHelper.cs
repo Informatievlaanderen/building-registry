@@ -1,4 +1,4 @@
-﻿namespace BuildingRegistry.Projections.Backoffice.Infrastructure
+﻿namespace BuildingRegistry.Projections.BackOffice.Infrastructure
 {
     using System;
     using System.Threading;

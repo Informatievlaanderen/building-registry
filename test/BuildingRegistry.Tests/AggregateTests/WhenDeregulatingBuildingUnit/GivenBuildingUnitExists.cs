@@ -1,7 +1,5 @@
 namespace BuildingRegistry.Tests.AggregateTests.WhenDeregulatingBuildingUnit
 {
-    using System;
-    using System.Collections.Generic;
     using System.Linq;
     using AutoFixture;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
@@ -18,7 +16,6 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenDeregulatingBuildingUnit
     using Moq;
     using Xunit;
     using Xunit.Abstractions;
-    using BuildingUnit = Building.Commands.BuildingUnit;
     using BuildingUnitFunction = BuildingRegistry.Legacy.BuildingUnitFunction;
     using BuildingUnitStatus = BuildingRegistry.Legacy.BuildingUnitStatus;
 

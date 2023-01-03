@@ -1,8 +1,8 @@
-﻿namespace BuildingRegistry.Projections.Backoffice
+﻿namespace BuildingRegistry.Projections.BackOffice
 {
-    using Api.BackOffice.Abstractions;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.Connector;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore;
+    using BuildingRegistry.Api.BackOffice.Abstractions;
     using Building;
     using Building.Events;
     using Microsoft.EntityFrameworkCore;
