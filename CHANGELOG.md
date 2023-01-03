@@ -1,3 +1,21 @@
+# [3.52.0](https://github.com/informatievlaanderen/building-registry/compare/v3.51.1...v3.52.0) (2023-01-03)
+
+
+### Bug Fixes
+
+* boo boo ([7e54da3](https://github.com/informatievlaanderen/building-registry/commit/7e54da3c2b9efdf08f305f93a40d73e8272715f8))
+* semantic release ([8db9b69](https://github.com/informatievlaanderen/building-registry/commit/8db9b69e2fd9f7492f282eb1a7fca73bbb3b63de))
+* spelling of backoffice ([54e338d](https://github.com/informatievlaanderen/building-registry/commit/54e338dd0b6368390c2f1bd8bd46bd36dd5dd253))
+* trigger ([51414eb](https://github.com/informatievlaanderen/building-registry/commit/51414ebe15d9c2fa41344cfe082af5082132511f))
+
+
+### Features
+
+* add backoffice projection ([0c951d6](https://github.com/informatievlaanderen/building-registry/commit/0c951d6120ea0a2144dcbc268d3d156af437cbf8))
+* add producer ([#848](https://github.com/informatievlaanderen/building-registry/issues/848)) ([387a432](https://github.com/informatievlaanderen/building-registry/commit/387a432f4564c92b94db56ef71781177d31443f4))
+* add snapshot producer ([8f69a2a](https://github.com/informatievlaanderen/building-registry/commit/8f69a2aac8f9bbd6f10b2868c8cd4052a353b242))
+* remove building ([bda5950](https://github.com/informatievlaanderen/building-registry/commit/bda595014c51c2f6d385de8b6874099d22e7cd26))
+
 ## [3.51.1](https://github.com/informatievlaanderen/building-registry/compare/v3.51.0...v3.51.1) (2022-12-22)
 
 # [3.51.0](https://github.com/informatievlaanderen/building-registry/compare/v3.50.0...v3.51.0) (2022-12-22)
