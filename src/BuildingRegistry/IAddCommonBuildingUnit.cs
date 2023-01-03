@@ -4,8 +4,6 @@
 
     public interface IAddCommonBuildingUnit : IPersistentLocalIdGenerator
     {
-        void AddForBuilding(
-            BuildingPersistentLocalId buildingPersistentLocalId,
-            BuildingUnitPersistentLocalId buildingUnitPersistentLocalId);
+        void AddForBuilding(BuildingPersistentLocalId buildingPersistentLocalId, BuildingUnitPersistentLocalId buildingUnitPersistentLocalId);
     }
 }
