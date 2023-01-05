@@ -24,6 +24,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda
     using Sqs.Requests.Building;
     using TicketingService.Proxy.HttpProxy;
     using Be.Vlaanderen.Basisregisters.Sqs.Lambda.Handlers;
+    using Consumer.Address;
 
     public class Function : FunctionBase
     {
@@ -83,7 +84,8 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda
                 .RegisterModule(new DataDogModule(configuration))
                 .RegisterModule<EnvelopeModule>()
                 .RegisterModule(new EditModule(configuration, services, loggerFactory))
-                .RegisterModule(new BackOfficeModule(configuration, services, loggerFactory));
+                .RegisterModule(new BackOfficeModule(configuration, services, loggerFactory))
+                .RegisterModule(new ConsumerAddressModule(configuration, services, loggerFactory));
 
             builder.RegisterType<IdempotentCommandHandler>()
                 .As<IIdempotentCommandHandler>()
@@ -91,8 +93,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda
                 .InstancePerLifetimeScope();
             builder.RegisterModule(new IdempotencyModule(
                 services,
-                configuration.GetSection(IdempotencyConfiguration.Section).Get<IdempotencyConfiguration>()
-                    .ConnectionString,
+                configuration.GetSection(IdempotencyConfiguration.Section).Get<IdempotencyConfiguration>().ConnectionString!,
                 new IdempotencyMigrationsTableInfo(Schema.Import),
                 new IdempotencyTableInfo(Schema.Import),
                 loggerFactory));
