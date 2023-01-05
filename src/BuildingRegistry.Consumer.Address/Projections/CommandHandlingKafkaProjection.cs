@@ -145,7 +145,7 @@ namespace BuildingRegistry.Consumer.Address.Projections
                     FromProvenance(provenance));
                 await commandHandler.Handle(command, ct);
 
-                await backOfficeContext.RemoveIdempotentParcelAddressRelation(command.BuildingUnitPersistentLocalId, command.AddressPersistentLocalId, ct);
+                await backOfficeContext.RemoveIdempotentBuildingUnitAddressRelation(command.BuildingUnitPersistentLocalId, command.AddressPersistentLocalId, ct);
             }
         }
 
@@ -170,7 +170,7 @@ namespace BuildingRegistry.Consumer.Address.Projections
                     FromProvenance(provenance));
                 await commandHandler.Handle(command, ct);
 
-                await backOfficeContext.RemoveIdempotentParcelAddressRelation(command.BuildingUnitPersistentLocalId, command.AddressPersistentLocalId, ct);
+                await backOfficeContext.RemoveIdempotentBuildingUnitAddressRelation(command.BuildingUnitPersistentLocalId, command.AddressPersistentLocalId, ct);
             }
         }
 
@@ -195,7 +195,7 @@ namespace BuildingRegistry.Consumer.Address.Projections
                     FromProvenance(provenance));
                 await commandHandler.Handle(command, ct);
 
-                await backOfficeContext.RemoveIdempotentParcelAddressRelation(command.BuildingUnitPersistentLocalId, command.AddressPersistentLocalId, ct);
+                await backOfficeContext.RemoveIdempotentBuildingUnitAddressRelation(command.BuildingUnitPersistentLocalId, command.AddressPersistentLocalId, ct);
             }
         }
 

@@ -34,6 +34,15 @@
                     new AddressPersistentLocalId(message.Message.AddressPersistentLocalId),
                     cancellationToken);
             });
+
+            When<Envelope<BuildingUnitAddressWasDetachedV2>>(async (_, message, cancellationToken) =>
+            {
+                await using var backOfficeContext = await backOfficeContextFactory.CreateDbContextAsync(cancellationToken);
+                await backOfficeContext.RemoveIdempotentBuildingUnitAddressRelation(
+                    new BuildingUnitPersistentLocalId(message.Message.BuildingUnitPersistentLocalId),
+                    new AddressPersistentLocalId(message.Message.AddressPersistentLocalId),
+                    cancellationToken);
+            });
         }
     }
 }

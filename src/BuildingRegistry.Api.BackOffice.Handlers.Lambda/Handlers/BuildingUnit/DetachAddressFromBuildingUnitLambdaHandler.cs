@@ -54,8 +54,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.BuildingUnit
                 // Idempotent: Do Nothing return last etag
             }
 
-            await _backOfficeContext.RemoveIdempotentParcelAddressRelation(cmd.BuildingUnitPersistentLocalId,
-                cmd.AddressPersistentLocalId, cancellationToken);
+            await _backOfficeContext.RemoveIdempotentBuildingUnitAddressRelation(cmd.BuildingUnitPersistentLocalId, cmd.AddressPersistentLocalId, cancellationToken);
 
             var lastHash = await GetHash(
                 request.BuildingPersistentLocalId,
