@@ -51,8 +51,8 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenAttachingAddressToBuildingUn
                 .ThrowAsync<ValidationException>()
                 .Result
                 .Where(x => x.Errors.Any(e =>
-                    e.ErrorCode == "AdresAfgekeurdGehistoreerd"
-                    && e.ErrorMessage == "Enkel een voorgesteld of adres in gebruik kan gekoppeld worden."));
+                    e.ErrorCode == "GebouweenheidAdresAfgekeurdOfGehistoreerd"
+                    && e.ErrorMessage == "Het adres is afgekeurd of gehistoreerd."));
         }
     }
 }
