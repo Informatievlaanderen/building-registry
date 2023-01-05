@@ -1,3 +1,10 @@
+## [3.52.1](https://github.com/informatievlaanderen/building-registry/compare/v3.52.0...v3.52.1) (2023-01-05)
+
+
+### Bug Fixes
+
+* misisng IAdresses registration in Lambda ([ae46b29](https://github.com/informatievlaanderen/building-registry/commit/ae46b2952550ced20d9e6218a7d578eb3509eb05))
+
 # [3.52.0](https://github.com/informatievlaanderen/building-registry/compare/v3.51.1...v3.52.0) (2023-01-03)
 
 
