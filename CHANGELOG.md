@@ -1,3 +1,15 @@
+# [3.53.0](https://github.com/informatievlaanderen/building-registry/compare/v3.52.1...v3.53.0) (2023-01-05)
+
+
+### Bug Fixes
+
+* sqs action names ([4fa7884](https://github.com/informatievlaanderen/building-registry/commit/4fa7884997d6d59d5ccc6571ee56ff2b3ff6f7dd))
+
+
+### Features
+
+* handle detach address in back office projection ([4540322](https://github.com/informatievlaanderen/building-registry/commit/45403221c657c778abd3f182436af56da5f7ef1e))
+
 ## [3.52.1](https://github.com/informatievlaanderen/building-registry/compare/v3.52.0...v3.52.1) (2023-01-05)
 
 
