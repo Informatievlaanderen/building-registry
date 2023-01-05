@@ -44,7 +44,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.BuildingUnit
                 request.Metadata,
                 cancellationToken);
 
-            await _backOfficeContext.RemoveIdempotentParcelAddressRelation(command.BuildingUnitPersistentLocalId, command.AddressPersistentLocalId, cancellationToken);
+            await _backOfficeContext.RemoveIdempotentBuildingUnitAddressRelation(command.BuildingUnitPersistentLocalId, command.AddressPersistentLocalId, cancellationToken);
 
             var buildingUnitLastEventHash = await GetBuildingUnitHash(buildingPersistentLocalId, buildingUnitPersistentLocalId, cancellationToken);
 

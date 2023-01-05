@@ -55,7 +55,7 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions
             return relation;
         }
 
-        public async Task RemoveIdempotentParcelAddressRelation(
+        public async Task RemoveIdempotentBuildingUnitAddressRelation(
             BuildingUnitPersistentLocalId buildingUnitPersistentLocalId,
             AddressPersistentLocalId addressPersistentLocalId,
             CancellationToken cancellationToken)
