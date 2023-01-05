@@ -9,7 +9,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Sqs.Handlers.BuildingUnit
 
     public sealed class DetachAddressFromBuildingUnitSqsHandler : SqsHandler<DetachAddressFromBuildingUnitSqsRequest>
     {
-        public const string Action = "DetachAddressFromBuildingUnit";
+        public const string Action = "DetachAddressBuildingUnit";
         private readonly BackOfficeContext _backOfficeContext;
 
         public DetachAddressFromBuildingUnitSqsHandler(

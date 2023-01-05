@@ -9,7 +9,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Sqs.Handlers.BuildingUnit
 
     public sealed class AttachAddressToBuildingUnitSqsHandler : SqsHandler<AttachAddressToBuildingUnitSqsRequest>
     {
-        public const string Action = "AttachAddressToBuildingUnit";
+        public const string Action = "AttachAddressBuildingUnit";
         private readonly BackOfficeContext _backOfficeContext;
 
         public AttachAddressToBuildingUnitSqsHandler(

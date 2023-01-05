@@ -16,8 +16,8 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.Validation
 
             public static class AddressInvalidStatus
             {
-                public const string Code = "AdresAfgekeurdGehistoreerd";
-                public const string Message = "Enkel een voorgesteld of adres in gebruik kan gekoppeld worden.";
+                public const string Code = "GebouweenheidAdresAfgekeurdOfGehistoreerd";
+                public const string Message = "Het adres is afgekeurd of gehistoreerd.";
 
                 public static TicketError ToTicketError() => new(Message, Code);
             }

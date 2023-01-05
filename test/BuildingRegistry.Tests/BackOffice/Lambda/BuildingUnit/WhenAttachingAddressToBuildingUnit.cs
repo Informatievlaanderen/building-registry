@@ -258,8 +258,8 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
                 x.Error(
                     It.IsAny<Guid>(),
                     new TicketError(
-                        "Enkel een voorgesteld of adres in gebruik kan gekoppeld worden.",
-                        "AdresAfgekeurdGehistoreerd"),
+                        "Het adres is afgekeurd of gehistoreerd.",
+                        "GebouweenheidAdresAfgekeurdOfGehistoreerd"),
                     CancellationToken.None));
         }
 
