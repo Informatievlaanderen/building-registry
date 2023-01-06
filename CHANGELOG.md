@@ -1,3 +1,10 @@
+## [3.53.1](https://github.com/informatievlaanderen/building-registry/compare/v3.53.0...v3.53.1) (2023-01-06)
+
+
+### Bug Fixes
+
+* add consumeraddress to appsettings ([2af3c2a](https://github.com/informatievlaanderen/building-registry/commit/2af3c2a3bb20bd529253763f0a8edd73c1ad7430))
+
 # [3.53.0](https://github.com/informatievlaanderen/building-registry/compare/v3.52.1...v3.53.0) (2023-01-05)
 
 
