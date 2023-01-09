@@ -37,7 +37,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Migrator
             var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture).WithBuildingUnit(
                     BuildingUnitStatus.Planned,
                     buildingUnitPersistentLocalId,
-                    attachedAddress: new List<AddressPersistentLocalId> {addressPersistentLocalId})
+                    attachedAddresses: new List<AddressPersistentLocalId> {addressPersistentLocalId})
                 .Build();
 
             await Sut
@@ -61,7 +61,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Migrator
             var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture).WithBuildingUnit(
                     BuildingUnitStatus.Planned,
                     buildingUnitPersistentLocalId,
-                    attachedAddress: new List<AddressPersistentLocalId> {addressPersistentLocalId})
+                    attachedAddresses: new List<AddressPersistentLocalId> {addressPersistentLocalId})
                 .Build();
 
             await _fakeBackOfficeContext.BuildingUnitAddressRelation.AddAsync(new BuildingUnitAddressRelation(

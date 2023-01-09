@@ -1,5 +1,6 @@
 namespace BuildingRegistry.Tests.AggregateTests.WhenRetiringBuildingUnit
 {
+    using System.Collections.Generic;
     using AutoFixture;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
     using Be.Vlaanderen.Basisregisters.AggregateSource.Testing;
@@ -27,6 +28,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRetiringBuildingUnit
 
             var commonBuildingUnitPersistentLocalId = Fixture.Create<BuildingUnitPersistentLocalId>();
 
+            var attachAddressPersistentLocalId = new AddressPersistentLocalId(1);
             var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
                 .WithBuildingPersistentLocalId(command.BuildingPersistentLocalId)
                 .WithBuildingStatus(BuildingStatus.Realized)
@@ -41,7 +43,8 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRetiringBuildingUnit
                 .WithBuildingUnit(
                     BuildingRegistry.Legacy.BuildingUnitStatus.Realized,
                     commonBuildingUnitPersistentLocalId,
-                    BuildingUnitFunction.Common)
+                    BuildingUnitFunction.Common,
+                    attachedAddresses: new List<AddressPersistentLocalId> { attachAddressPersistentLocalId })
                 .Build();
 
             Assert(new Scenario()
@@ -50,8 +53,12 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRetiringBuildingUnit
                     buildingWasMigrated)
                 .When(command)
                 .Then(
-                    new Fact(new BuildingStreamId(command.BuildingPersistentLocalId), new BuildingUnitWasRetiredV2(command.BuildingPersistentLocalId, command.BuildingUnitPersistentLocalId)),
-                    new Fact(new BuildingStreamId(command.BuildingPersistentLocalId), new BuildingUnitWasRetiredV2(command.BuildingPersistentLocalId, commonBuildingUnitPersistentLocalId))
+                    new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
+                        new BuildingUnitWasRetiredV2(command.BuildingPersistentLocalId, command.BuildingUnitPersistentLocalId)),
+                    new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
+                        new BuildingUnitAddressWasDetachedV2(command.BuildingPersistentLocalId, commonBuildingUnitPersistentLocalId, attachAddressPersistentLocalId)),
+                    new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
+                        new BuildingUnitWasRetiredV2(command.BuildingPersistentLocalId, commonBuildingUnitPersistentLocalId))
                 ));
         }
 

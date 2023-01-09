@@ -213,6 +213,14 @@ namespace BuildingRegistry.Building
                 BuildingUnitStatus.NotRealized
             });
 
+            foreach (var addressPersistentLocalId in _addressPersistentLocalIds.ToList())
+            {
+                Apply(new BuildingUnitAddressWasDetachedV2(
+                    _buildingPersistentLocalId,
+                    BuildingUnitPersistentLocalId,
+                    addressPersistentLocalId));
+            }
+
             Apply(new BuildingUnitWasRetiredV2(_buildingPersistentLocalId, BuildingUnitPersistentLocalId));
         }
 

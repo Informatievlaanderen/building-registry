@@ -30,7 +30,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenDetachingRejectedAddressFrom
                 .WithBuildingUnit(
                     BuildingRegistry.Legacy.BuildingUnitStatus.Realized,
                     command.BuildingUnitPersistentLocalId,
-                    attachedAddress: new List<AddressPersistentLocalId> { command.AddressPersistentLocalId },
+                    attachedAddresses: new List<AddressPersistentLocalId> { command.AddressPersistentLocalId },
                     isRemoved: false)
                 .Build();
 
@@ -57,7 +57,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenDetachingRejectedAddressFrom
                 .WithBuildingUnit(
                     BuildingRegistry.Legacy.BuildingUnitStatus.Realized,
                     command.BuildingUnitPersistentLocalId,
-                    attachedAddress: new List<AddressPersistentLocalId>(0),
+                    attachedAddresses: new List<AddressPersistentLocalId>(0),
                     isRemoved: false)
                 .Build();
 
@@ -78,7 +78,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenDetachingRejectedAddressFrom
                 .WithBuildingUnit(
                     BuildingRegistry.Legacy.BuildingUnitStatus.Realized,
                     new BuildingUnitPersistentLocalId(buildingUnitAddressWasDetachedBecauseAddressWasRejected.BuildingUnitPersistentLocalId),
-                    attachedAddress: new List<AddressPersistentLocalId>
+                    attachedAddresses: new List<AddressPersistentLocalId>
                     {
                         new AddressPersistentLocalId(buildingUnitAddressWasDetachedBecauseAddressWasRejected.AddressPersistentLocalId),
                         new AddressPersistentLocalId(123),
