@@ -51,6 +51,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRemovingBuilding
                 .WithBuildingUnit(
                     BuildingRegistry.Legacy.BuildingUnitStatus.Planned,
                     buildingUnitPersistentLocalId,
+                    attachedAddresses: new List<AddressPersistentLocalId>() { new AddressPersistentLocalId(1) },
                     isRemoved: false)
                 .WithBuildingUnit(
                     BuildingRegistry.Legacy.BuildingUnitStatus.Planned,
@@ -63,10 +64,16 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRemovingBuilding
                     new BuildingStreamId(Fixture.Create<BuildingPersistentLocalId>()),
                     buildingWasMigrated)
                 .When(command)
-                .Then(new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
-                    new BuildingUnitWasRemovedBecauseBuildingWasRemoved(
-                        command.BuildingPersistentLocalId,
-                        new BuildingUnitPersistentLocalId(buildingUnitPersistentLocalId))),
+                .Then(
+                    new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
+                        new BuildingUnitAddressWasDetachedV2(
+                            command.BuildingPersistentLocalId,
+                            new BuildingUnitPersistentLocalId(buildingUnitPersistentLocalId),
+                            new AddressPersistentLocalId(1))),
+                    new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
+                        new BuildingUnitWasRemovedBecauseBuildingWasRemoved(
+                            command.BuildingPersistentLocalId,
+                            new BuildingUnitPersistentLocalId(buildingUnitPersistentLocalId))),
                     new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
                         new BuildingWasRemovedV2(command.BuildingPersistentLocalId))));
         }
@@ -118,6 +125,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRemovingBuilding
                 .WithBuildingUnit(
                     BuildingRegistry.Legacy.BuildingUnitStatus.Planned,
                     buildingUnitPersistentLocalId,
+                    attachedAddresses: new List<AddressPersistentLocalId>() { new AddressPersistentLocalId(1) },
                     isRemoved: false)
                 .WithBuildingUnit(
                     BuildingRegistry.Legacy.BuildingUnitStatus.Planned,
@@ -136,6 +144,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRemovingBuilding
             foreach (var buildingUnit in sut.BuildingUnits)
             {
                 buildingUnit.IsRemoved.Should().BeTrue();
+                buildingUnit.AddressPersistentLocalIds.Should().BeEmpty();
             }
         }
     }

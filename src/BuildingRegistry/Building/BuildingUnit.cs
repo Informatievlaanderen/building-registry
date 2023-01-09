@@ -351,6 +351,14 @@ namespace BuildingRegistry.Building
                 return;
             }
 
+            foreach (var addressPersistentLocalId in _addressPersistentLocalIds.ToList())
+            {
+                Apply(new BuildingUnitAddressWasDetachedV2(
+                    _buildingPersistentLocalId,
+                    BuildingUnitPersistentLocalId,
+                    addressPersistentLocalId));
+            }
+
             Apply(new BuildingUnitWasRemovedV2(_buildingPersistentLocalId, BuildingUnitPersistentLocalId));
         }
 
@@ -359,6 +367,14 @@ namespace BuildingRegistry.Building
             if (IsRemoved)
             {
                 return;
+            }
+
+            foreach (var addressPersistentLocalId in _addressPersistentLocalIds.ToList())
+            {
+                Apply(new BuildingUnitAddressWasDetachedV2(
+                    _buildingPersistentLocalId,
+                    BuildingUnitPersistentLocalId,
+                    addressPersistentLocalId));
             }
 
             Apply(new BuildingUnitWasRemovedBecauseBuildingWasRemoved(_buildingPersistentLocalId, BuildingUnitPersistentLocalId));
