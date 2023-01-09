@@ -336,6 +336,14 @@ namespace BuildingRegistry.Building
 
             if (commonBuildingUnit.Status == BuildingUnitStatus.Planned)
             {
+                foreach (var addressPersistentLocalId in commonBuildingUnit.AddressPersistentLocalIds.ToList())
+                {
+                    ApplyChange(new BuildingUnitAddressWasDetachedV2(
+                        BuildingPersistentLocalId,
+                        commonBuildingUnit.BuildingUnitPersistentLocalId,
+                        addressPersistentLocalId));
+                }
+
                 ApplyChange(new BuildingUnitWasNotRealizedV2(
                     BuildingPersistentLocalId,
                     commonBuildingUnit.BuildingUnitPersistentLocalId));

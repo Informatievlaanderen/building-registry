@@ -32,6 +32,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenNotRealizingBuilding
         public GivenBuildingExists(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
         {
             Fixture.Customize(new WithFixedBuildingPersistentLocalId());
+            Fixture.Customize(new WithFixedBuildingUnitPersistentLocalId());
         }
 
         [Fact]
@@ -54,16 +55,25 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenNotRealizingBuilding
             var command = Fixture.Create<NotRealizeBuilding>();
 
             var buildingUnitWasPlannedV2 = Fixture.Create<BuildingUnitWasPlannedV2>();
+            var buildingUnitAddressWasAttachedV2 = Fixture.Create<BuildingUnitAddressWasAttachedV2>();
+
             Assert(new Scenario()
                 .Given(
                     new BuildingStreamId(Fixture.Create<BuildingPersistentLocalId>()),
                     Fixture.Create<BuildingWasPlannedV2>(),
-                    buildingUnitWasPlannedV2)
+                    buildingUnitWasPlannedV2,
+                    buildingUnitAddressWasAttachedV2)
                 .When(command)
-                .Then(new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
-                    new BuildingUnitWasNotRealizedBecauseBuildingWasNotRealized(
-                        command.BuildingPersistentLocalId,
-                        new BuildingUnitPersistentLocalId(buildingUnitWasPlannedV2.BuildingUnitPersistentLocalId))),
+                .Then(
+                    new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
+                        new BuildingUnitAddressWasDetachedV2(
+                            command.BuildingPersistentLocalId,
+                            new BuildingUnitPersistentLocalId(buildingUnitAddressWasAttachedV2.BuildingUnitPersistentLocalId),
+                            new AddressPersistentLocalId(buildingUnitAddressWasAttachedV2.AddressPersistentLocalId))),
+                    new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
+                        new BuildingUnitWasNotRealizedBecauseBuildingWasNotRealized(
+                            command.BuildingPersistentLocalId,
+                            new BuildingUnitPersistentLocalId(buildingUnitWasPlannedV2.BuildingUnitPersistentLocalId))),
                     new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
                         new BuildingWasNotRealizedV2(command.BuildingPersistentLocalId))));
         }
@@ -155,7 +165,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenNotRealizingBuilding
                         plannedBuildingUnitPersistentLocalId,
                         BuildingUnitFunction.Unknown,
                         BuildingUnitStatus.Planned,
-                        new List<AddressPersistentLocalId>(),
+                        new List<AddressPersistentLocalId>  { new AddressPersistentLocalId(5) },
                         Fixture.Create<BuildingUnitPosition>(),
                         Fixture.Create<BuildingRegistry.Legacy.BuildingGeometry>(),
                         false),
@@ -202,6 +212,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenNotRealizingBuilding
             var plannedUnit = sut.BuildingUnits
                 .First(x => x.BuildingUnitPersistentLocalId == new BuildingUnitPersistentLocalId(plannedBuildingUnitPersistentLocalId));
             plannedUnit.Status.Should().Be(BuildingRegistry.Building.BuildingUnitStatus.NotRealized);
+            plannedUnit.AddressPersistentLocalIds.Should().BeEmpty();
 
             var retiredUnit = sut.BuildingUnits
                 .First(x => x.BuildingUnitPersistentLocalId == new BuildingUnitPersistentLocalId(retiredBuildingUnitPersistentLocalId));
