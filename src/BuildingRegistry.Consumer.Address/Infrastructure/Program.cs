@@ -2,6 +2,7 @@ namespace BuildingRegistry.Consumer.Address.Infrastructure
 {
     using System;
     using System.IO;
+    using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
     using Address;
@@ -107,7 +108,7 @@ namespace BuildingRegistry.Consumer.Address.Infrastructure
                     var services = new ServiceCollection();
                     var loggerFactory = new SerilogLoggerFactory(Log.Logger);
 
-                    builder.Register(_ =>
+                    builder.Register(c =>
                     {
                         var bootstrapServers = hostContext.Configuration["Kafka:BootstrapServers"];
                         var topic = $"{hostContext.Configuration["AddressTopic"]}" ?? throw new ArgumentException("Configuration has no AddressTopic.");
@@ -124,6 +125,19 @@ namespace BuildingRegistry.Consumer.Address.Infrastructure
                             hostContext.Configuration["Kafka:SaslUserName"],
                             hostContext.Configuration["Kafka:SaslPassword"]));
 
+                        var offsetStr = hostContext.Configuration["AddressTopicOffset"];
+                        if (!string.IsNullOrEmpty(offsetStr) && long.TryParse(offsetStr, out var offset))
+                        {
+                            using var ctx = c.Resolve<ConsumerAddressContext>();
+
+                            if (ctx.AddressConsumerItems.Any())
+                            {
+                                throw new InvalidOperationException($"Cannot set Kafka offset to {offset} because {nameof(ctx.AddressConsumerItems)} has data.");
+                            }
+
+                            consumerOptions.ConfigureOffset(new Offset(offset));
+                        }
+                        
                         return consumerOptions;
                     });
 
