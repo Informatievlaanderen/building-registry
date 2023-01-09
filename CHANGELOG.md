@@ -1,3 +1,16 @@
+# [3.54.0](https://github.com/informatievlaanderen/building-registry/compare/v3.53.1...v3.54.0) (2023-01-09)
+
+
+### Bug Fixes
+
+* correct default offset address consumer ([4b37ef8](https://github.com/informatievlaanderen/building-registry/commit/4b37ef82ded7c2065f3cdcced5421bf4e25c4b2e))
+
+
+### Features
+
+* add ability to offset to address consumer ([d66a08c](https://github.com/informatievlaanderen/building-registry/commit/d66a08c4db1b9b38af288cbe1ef5bb7051bb47e4))
+* detach address when retiring building unit ([fa39732](https://github.com/informatievlaanderen/building-registry/commit/fa397322142220a340e57af3ef78cae2fdc5f130))
+
 ## [3.53.1](https://github.com/informatievlaanderen/building-registry/compare/v3.53.0...v3.53.1) (2023-01-06)
 
 
