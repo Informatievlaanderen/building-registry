@@ -28,7 +28,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenDetachingAddressFromBuilding
                     null,
                     null,
                     null,
-                    attachedAddress: new List<AddressPersistentLocalId> { command.AddressPersistentLocalId },
+                    attachedAddresses: new List<AddressPersistentLocalId> { command.AddressPersistentLocalId },
                     isRemoved: true)
                 .Build();
 

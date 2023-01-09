@@ -342,6 +342,14 @@ namespace BuildingRegistry.Building
             }
             else if (commonBuildingUnit.Status == BuildingUnitStatus.Realized)
             {
+                foreach (var addressPersistentLocalId in commonBuildingUnit.AddressPersistentLocalIds.ToList())
+                {
+                    ApplyChange(new BuildingUnitAddressWasDetachedV2(
+                        BuildingPersistentLocalId,
+                        commonBuildingUnit.BuildingUnitPersistentLocalId,
+                        addressPersistentLocalId));
+                }
+
                 ApplyChange(new BuildingUnitWasRetiredV2(
                     BuildingPersistentLocalId,
                     commonBuildingUnit.BuildingUnitPersistentLocalId));

@@ -47,6 +47,31 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRetiringBuildingUnit
                     new BuildingUnitWasRetiredV2(command.BuildingPersistentLocalId, command.BuildingUnitPersistentLocalId))));
         }
 
+
+        [Fact]
+        public void WithRealizedBuildingUnitAndAttachedAddresses_ThenBuildingUnitWasRetiredAndAddressesDetached()
+        {
+            var command = Fixture.Create<RetireBuildingUnit>();
+            var buildingUnitAddressWasAttachedV2 = Fixture.Create<BuildingUnitAddressWasAttachedV2>();
+
+            Assert(new Scenario()
+                .Given(
+                    new BuildingStreamId(Fixture.Create<BuildingPersistentLocalId>()),
+                    Fixture.Create<BuildingWasPlannedV2>(),
+                    Fixture.Create<BuildingWasRealizedV2>(),
+                    Fixture.Create<BuildingUnitWasPlannedV2>(),
+                    Fixture.Create<BuildingUnitWasRealizedV2>(),
+                    buildingUnitAddressWasAttachedV2)
+                .When(command)
+                .Then(new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
+                    new BuildingUnitAddressWasDetachedV2(
+                        command.BuildingPersistentLocalId,
+                        command.BuildingUnitPersistentLocalId,
+                        new AddressPersistentLocalId(buildingUnitAddressWasAttachedV2.AddressPersistentLocalId))),
+                    new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
+                        new BuildingUnitWasRetiredV2(command.BuildingPersistentLocalId, command.BuildingUnitPersistentLocalId))));
+        }
+
         [Fact]
         public void WithRetiredBuildingUnit_ThenDoNothing()
         {
@@ -200,20 +225,23 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRetiringBuildingUnit
             var building = new BuildingFactory(NoSnapshotStrategy.Instance, Mock.Of<IAddCommonBuildingUnit>(), Mock.Of<IAddresses>()).Create();
 
             var buildingWasPlanned = Fixture.Create<BuildingWasPlannedV2>();
-            ((ISetProvenance)buildingWasPlanned).SetProvenance(Fixture.Create<Provenance>());
-
             var buildingUnitWasPlanned = Fixture.Create<BuildingUnitWasPlannedV2>();
-            ((ISetProvenance)buildingUnitWasPlanned).SetProvenance(Fixture.Create<Provenance>());
-
+            var buildingUnitAddressWasAttached = Fixture.Create<BuildingUnitAddressWasAttachedV2>();
             var buildingUnitWasRetired = Fixture.Create<BuildingUnitWasRetiredV2>();
-            ((ISetProvenance)buildingUnitWasRetired).SetProvenance(Fixture.Create<Provenance>());
+            var buildingUnitAddressWasDetachedBecauseBuildingUnitWasRetired = new BuildingUnitAddressWasDetachedV2(
+                Fixture.Create<BuildingPersistentLocalId>(),
+                Fixture.Create<BuildingUnitPersistentLocalId>(),
+                new AddressPersistentLocalId(buildingUnitAddressWasAttached.AddressPersistentLocalId));
+            ((ISetProvenance)buildingUnitAddressWasDetachedBecauseBuildingUnitWasRetired).SetProvenance(Fixture.Create<Provenance>());
 
             // Act
             building.Initialize(new object[]
             {
                 buildingWasPlanned,
                 buildingUnitWasPlanned,
-                buildingUnitWasRetired
+                buildingUnitAddressWasAttached,
+                buildingUnitWasRetired,
+                buildingUnitAddressWasDetachedBecauseBuildingUnitWasRetired
             });
 
             // Assert
@@ -221,6 +249,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRetiringBuildingUnit
             building.BuildingUnits.Count.Should().Be(1);
             var buildingUnit = building.BuildingUnits.First();
             buildingUnit.Status.Should().Be(BuildingUnitStatus.Retired);
+            buildingUnit.AddressPersistentLocalIds.Should().BeEmpty();
             buildingUnit.LastEventHash.Should().NotBe(building.LastEventHash);
         }
     }
