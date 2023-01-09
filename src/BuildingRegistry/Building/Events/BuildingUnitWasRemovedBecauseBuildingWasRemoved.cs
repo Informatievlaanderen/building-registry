@@ -13,7 +13,7 @@ namespace BuildingRegistry.Building.Events
     [EventDescription("De gebouweenheid werd verwijderd door verwijdering gebouw.")]
     public sealed class BuildingUnitWasRemovedBecauseBuildingWasRemoved : IBuildingEvent
     {
-        public const string EventName = "BuildingUnitWasRemovedBecauseBuildingWasRemoved.cs"; // BE CAREFUL CHANGING THIS!!
+        public const string EventName = "BuildingUnitWasRemovedBecauseBuildingWasRemoved"; // BE CAREFUL CHANGING THIS!!
 
         [EventPropertyDescription("Objectidentificator van het gebouw.")]
         public int BuildingPersistentLocalId { get; }
