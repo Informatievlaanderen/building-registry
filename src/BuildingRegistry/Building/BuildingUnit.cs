@@ -125,6 +125,14 @@ namespace BuildingRegistry.Building
 
             GuardBuildingUnitInvalidStatuses(StatusesWhichCannotBeNotRealized.ToArray());
 
+            foreach (var addressPersistentLocalId in _addressPersistentLocalIds.ToList())
+            {
+                Apply(new BuildingUnitAddressWasDetachedV2(
+                    _buildingPersistentLocalId,
+                    BuildingUnitPersistentLocalId,
+                    addressPersistentLocalId));
+            }
+
             Apply(new BuildingUnitWasNotRealizedV2(_buildingPersistentLocalId, BuildingUnitPersistentLocalId));
         }
 
@@ -175,6 +183,14 @@ namespace BuildingRegistry.Building
             if (StatusesWhichCannotBeNotRealized.Contains(Status))
             {
                 return;
+            }
+
+            foreach (var addressPersistentLocalId in _addressPersistentLocalIds.ToList())
+            {
+                Apply(new BuildingUnitAddressWasDetachedV2(
+                    _buildingPersistentLocalId,
+                    BuildingUnitPersistentLocalId,
+                    addressPersistentLocalId));
             }
 
             Apply(new BuildingUnitWasNotRealizedBecauseBuildingWasNotRealized(_buildingPersistentLocalId, BuildingUnitPersistentLocalId));
