@@ -11,7 +11,7 @@ namespace BuildingRegistry.Building.Events
     [EventTags(EventTag.For.Sync, EventTag.For.Edit, Tag.Building)]
     [EventName(EventName)]
     [EventDescription("De afwijkingVastgesteld van de gebouweenheid werd op true gezet.")]
-    public sealed class BuildingUnitWasDeregulated : IBuildingEvent
+    public sealed class BuildingUnitWasDeregulated : IBuildingEvent, IHasBuildingUnitPersistentLocalId
     {
         public const string EventName = "BuildingUnitWasDeregulated"; // BE CAREFUL CHANGING THIS!!
 

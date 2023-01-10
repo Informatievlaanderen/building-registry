@@ -11,7 +11,7 @@ namespace BuildingRegistry.Building.Events
     [EventTags(EventTag.For.Sync, EventTag.For.Edit, Tag.Building)]
     [EventName(EventName)]
     [EventDescription("De gebouweenheid werd verwijderd door verwijdering gebouw.")]
-    public sealed class BuildingUnitWasRemovedBecauseBuildingWasRemoved : IBuildingEvent
+    public sealed class BuildingUnitWasRemovedBecauseBuildingWasRemoved : IBuildingEvent, IHasBuildingUnitPersistentLocalId
     {
         public const string EventName = "BuildingUnitWasRemovedBecauseBuildingWasRemoved"; // BE CAREFUL CHANGING THIS!!
 

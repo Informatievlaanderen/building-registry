@@ -67,6 +67,7 @@ namespace BuildingRegistry.Building
             Register<BuildingUnitWasRemovedBecauseBuildingWasRemoved>(When);
             Register<BuildingUnitRemovalWasCorrected>(When);
             Register<BuildingUnitWasRegularized>(When);
+            Register<BuildingUnitRegularizationWasCorrected>(When);
             Register<BuildingUnitWasDeregulated>(When);
             Register<CommonBuildingUnitWasAddedV2>(When);
             Register<BuildingUnitAddressWasAttachedV2>(When);
@@ -206,144 +207,54 @@ namespace BuildingRegistry.Building
             _lastEvent = @event;
         }
 
-        private void When(BuildingUnitWasRealizedV2 @event)
-        {
-            var buildingUnit = _buildingUnits
-                .GetByPersistentLocalId(new BuildingUnitPersistentLocalId(@event.BuildingUnitPersistentLocalId));
-            buildingUnit.Route(@event);
-        }
+        private void When(BuildingUnitWasRealizedV2 @event) => RouteToBuildingUnit(@event);
 
-        private void When(BuildingUnitWasRealizedBecauseBuildingWasRealized @event)
-        {
-            var buildingUnit = _buildingUnits
-                .GetByPersistentLocalId(new BuildingUnitPersistentLocalId(@event.BuildingUnitPersistentLocalId));
-            buildingUnit.Route(@event);
-        }
+        private void When(BuildingUnitWasRealizedBecauseBuildingWasRealized @event) => RouteToBuildingUnit(@event);
 
-        private void When(BuildingUnitWasCorrectedFromRealizedToPlanned @event)
-        {
-            var buildingUnit = _buildingUnits
-                .GetByPersistentLocalId(new BuildingUnitPersistentLocalId(@event.BuildingUnitPersistentLocalId));
-            buildingUnit.Route(@event);
-        }
+        private void When(BuildingUnitWasCorrectedFromRealizedToPlanned @event) => RouteToBuildingUnit(@event);
 
-        private void When(BuildingUnitWasCorrectedFromRealizedToPlannedBecauseBuildingWasCorrected @event)
-        {
-            var buildingUnit = _buildingUnits
-                .GetByPersistentLocalId(new BuildingUnitPersistentLocalId(@event.BuildingUnitPersistentLocalId));
-            buildingUnit.Route(@event);
-        }
+        private void When(BuildingUnitWasCorrectedFromRealizedToPlannedBecauseBuildingWasCorrected @event) => RouteToBuildingUnit(@event);
 
-        private void When(BuildingUnitWasNotRealizedV2 @event)
-        {
-            var buildingUnit = _buildingUnits
-                .GetByPersistentLocalId(new BuildingUnitPersistentLocalId(@event.BuildingUnitPersistentLocalId));
-            buildingUnit.Route(@event);
-        }
+        private void When(BuildingUnitWasNotRealizedV2 @event) => RouteToBuildingUnit(@event);
 
-        private void When(BuildingUnitWasNotRealizedBecauseBuildingWasNotRealized @event)
-        {
-            var buildingUnit = _buildingUnits
-                .GetByPersistentLocalId(new BuildingUnitPersistentLocalId(@event.BuildingUnitPersistentLocalId));
-            buildingUnit.Route(@event);
-        }
+        private void When(BuildingUnitWasNotRealizedBecauseBuildingWasNotRealized @event) => RouteToBuildingUnit(@event);
 
-        private void When(BuildingUnitWasCorrectedFromNotRealizedToPlanned @event)
-        {
-            var buildingUnit = _buildingUnits
-                .GetByPersistentLocalId(new BuildingUnitPersistentLocalId(@event.BuildingUnitPersistentLocalId));
-            buildingUnit.Route(@event);
-        }
+        private void When(BuildingUnitWasCorrectedFromNotRealizedToPlanned @event) => RouteToBuildingUnit(@event);
 
-        private void When(BuildingUnitWasRetiredV2 @event)
-        {
-            var buildingUnit = _buildingUnits
-                .GetByPersistentLocalId(new BuildingUnitPersistentLocalId(@event.BuildingUnitPersistentLocalId));
-            buildingUnit.Route(@event);
-        }
+        private void When(BuildingUnitWasRetiredV2 @event) => RouteToBuildingUnit(@event);
 
-        private void When(BuildingUnitWasCorrectedFromRetiredToRealized @event)
-        {
-            var buildingUnit = _buildingUnits
-                .GetByPersistentLocalId(new BuildingUnitPersistentLocalId(@event.BuildingUnitPersistentLocalId));
-            buildingUnit.Route(@event);
-        }
+        private void When(BuildingUnitWasCorrectedFromRetiredToRealized @event) => RouteToBuildingUnit(@event);
 
-        private void When(BuildingUnitPositionWasCorrected @event)
-        {
-            var buildingUnit = _buildingUnits
-                .GetByPersistentLocalId(new BuildingUnitPersistentLocalId(@event.BuildingUnitPersistentLocalId));
-            buildingUnit.Route(@event);
-        }
+        private void When(BuildingUnitPositionWasCorrected @event) => RouteToBuildingUnit(@event);
 
-        private void When(BuildingUnitWasRemovedV2 @event)
-        {
-            var buildingUnit = _buildingUnits
-                .GetByPersistentLocalId(new BuildingUnitPersistentLocalId(@event.BuildingUnitPersistentLocalId));
-            buildingUnit.Route(@event);
-        }
+        private void When(BuildingUnitWasRemovedV2 @event) => RouteToBuildingUnit(@event);
 
-        private void When(BuildingUnitWasRemovedBecauseBuildingWasRemoved @event)
-        {
-            var buildingUnit = _buildingUnits
-                .GetByPersistentLocalId(new BuildingUnitPersistentLocalId(@event.BuildingUnitPersistentLocalId));
-            buildingUnit.Route(@event);
-        }
+        private void When(BuildingUnitWasRemovedBecauseBuildingWasRemoved @event) => RouteToBuildingUnit(@event);
 
-        private void When(BuildingUnitRemovalWasCorrected @event)
-        {
-            var buildingUnit = _buildingUnits
-                .GetByPersistentLocalId(new BuildingUnitPersistentLocalId(@event.BuildingUnitPersistentLocalId));
-            buildingUnit.Route(@event);
-        }
+        private void When(BuildingUnitRemovalWasCorrected @event) => RouteToBuildingUnit(@event);
 
-        private void When(BuildingUnitWasRegularized @event)
-        {
-            var buildingUnit = _buildingUnits
-                .GetByPersistentLocalId(new BuildingUnitPersistentLocalId(@event.BuildingUnitPersistentLocalId));
-            buildingUnit.Route(@event);
-        }
+        private void When(BuildingUnitWasRegularized @event) => RouteToBuildingUnit(@event);
 
-        private void When(BuildingUnitWasDeregulated @event)
-        {
-            var buildingUnit = _buildingUnits
-                .GetByPersistentLocalId(new BuildingUnitPersistentLocalId(@event.BuildingUnitPersistentLocalId));
-            buildingUnit.Route(@event);
-        }
+        private void When(BuildingUnitRegularizationWasCorrected @event) => RouteToBuildingUnit(@event);
 
-        private void When(BuildingUnitAddressWasAttachedV2 @event)
-        {
-            var buildingUnit = _buildingUnits
-                .GetByPersistentLocalId(new BuildingUnitPersistentLocalId(@event.BuildingUnitPersistentLocalId));
-            buildingUnit.Route(@event);
-        }
+        private void When(BuildingUnitWasDeregulated @event) => RouteToBuildingUnit(@event);
 
-        private void When(BuildingUnitAddressWasDetachedV2 @event)
-        {
-            var buildingUnit = _buildingUnits
-                .GetByPersistentLocalId(new BuildingUnitPersistentLocalId(@event.BuildingUnitPersistentLocalId));
-            buildingUnit.Route(@event);
-        }
+        private void When(BuildingUnitAddressWasAttachedV2 @event) => RouteToBuildingUnit(@event);
 
-        private void When(BuildingUnitAddressWasDetachedBecauseAddressWasRemoved @event)
-        {
-            var buildingUnit = _buildingUnits
-                .GetByPersistentLocalId(new BuildingUnitPersistentLocalId(@event.BuildingUnitPersistentLocalId));
-            buildingUnit.Route(@event);
-        }
+        private void When(BuildingUnitAddressWasDetachedV2 @event) => RouteToBuildingUnit(@event);
 
-        private void When(BuildingUnitAddressWasDetachedBecauseAddressWasRejected @event)
-        {
-            var buildingUnit = _buildingUnits
-                .GetByPersistentLocalId(new BuildingUnitPersistentLocalId(@event.BuildingUnitPersistentLocalId));
-            buildingUnit.Route(@event);
-        }
+        private void When(BuildingUnitAddressWasDetachedBecauseAddressWasRemoved @event) => RouteToBuildingUnit(@event);
 
-        private void When(BuildingUnitAddressWasDetachedBecauseAddressWasRetired @event)
+        private void When(BuildingUnitAddressWasDetachedBecauseAddressWasRejected @event) => RouteToBuildingUnit(@event);
+
+        private void When(BuildingUnitAddressWasDetachedBecauseAddressWasRetired @event) => RouteToBuildingUnit(@event);
+
+        private void RouteToBuildingUnit<TEvent>(TEvent @event)
+            where TEvent : IBuildingEvent, IHasBuildingUnitPersistentLocalId
         {
-            var buildingUnit = _buildingUnits
-                .GetByPersistentLocalId(new BuildingUnitPersistentLocalId(@event.BuildingUnitPersistentLocalId));
-            buildingUnit.Route(@event);
+            _buildingUnits
+                .GetByPersistentLocalId(new BuildingUnitPersistentLocalId(@event.BuildingUnitPersistentLocalId))
+                .Route(@event);
         }
 
         private void When(BuildingSnapshot @event)

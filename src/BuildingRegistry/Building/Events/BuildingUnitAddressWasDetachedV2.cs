@@ -11,7 +11,7 @@ namespace BuildingRegistry.Building.Events
     [EventTags(EventTag.For.Sync, EventTag.For.Edit, Tag.Building)]
     [EventName(EventName)]
     [EventDescription("Het adres werd ontkoppeld van de gebouweenheid.")]
-    public sealed class BuildingUnitAddressWasDetachedV2 : IBuildingEvent
+    public sealed class BuildingUnitAddressWasDetachedV2 : IBuildingEvent, IHasBuildingUnitPersistentLocalId
     {
         public const string EventName = "BuildingUnitAddressWasDetachedV2"; // BE CAREFUL CHANGING THIS!!
 

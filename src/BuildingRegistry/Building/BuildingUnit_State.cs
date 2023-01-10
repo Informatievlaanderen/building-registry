@@ -3,6 +3,7 @@ namespace BuildingRegistry.Building
     using System;
     using System.Collections.Generic;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
+    using Commands;
     using Events;
 
     public partial class BuildingUnit
@@ -48,6 +49,7 @@ namespace BuildingRegistry.Building
             Register<BuildingUnitWasRemovedBecauseBuildingWasRemoved>(When);
             Register<BuildingUnitRemovalWasCorrected>(When);
             Register<BuildingUnitWasRegularized>(When);
+            Register<BuildingUnitRegularizationWasCorrected>(When);
             Register<BuildingUnitWasDeregulated>(When);
             Register<CommonBuildingUnitWasAddedV2>(When);
             Register<BuildingUnitAddressWasAttachedV2>(When);
@@ -195,6 +197,13 @@ namespace BuildingRegistry.Building
         private void When(BuildingUnitWasRegularized @event)
         {
             HasDeviation = false;
+
+            _lastEvent = @event;
+        }
+
+        private void When(BuildingUnitRegularizationWasCorrected @event)
+        {
+            HasDeviation = true;
 
             _lastEvent = @event;
         }

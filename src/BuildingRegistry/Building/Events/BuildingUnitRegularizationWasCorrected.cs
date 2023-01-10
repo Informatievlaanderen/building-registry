@@ -10,50 +10,35 @@ namespace BuildingRegistry.Building.Events
 
     [EventTags(EventTag.For.Sync, EventTag.For.Edit, Tag.Building)]
     [EventName(EventName)]
-    [EventDescription("De positie van de gebouweenheid werd gecorrigeerd.")]
-    public sealed class BuildingUnitPositionWasCorrected : IBuildingEvent, IHasBuildingUnitPersistentLocalId
+    [EventDescription("De afwijkingVastgesteld van de gebouweenheid werd gecorrigeerd naar true.")]
+    public sealed class BuildingUnitRegularizationWasCorrected : IBuildingEvent, IHasBuildingUnitPersistentLocalId
     {
-        public const string EventName = "BuildingUnitPositionWasCorrected"; // BE CAREFUL CHANGING THIS!!
+        public const string EventName = "BuildingUnitRegularizationWasCorrected"; // BE CAREFUL CHANGING THIS!!
 
         [EventPropertyDescription("Objectidentificator van het gebouw.")]
         public int BuildingPersistentLocalId { get; }
-
         [EventPropertyDescription("Objectidentificator van de gebouweenheid.")]
         public int BuildingUnitPersistentLocalId { get; }
-
-        [EventPropertyDescription("Geometriemethode van de gebouweenheidpositie. Mogelijkheden: Outlined of MeasuredByGrb.")]
-        public string GeometryMethod { get; }
-
-        [EventPropertyDescription("Extended WKB-voorstelling van de gebouweenheidpositie (Hexadecimale notatie).")]
-        public string ExtendedWkbGeometry { get; }
 
         [EventPropertyDescription("Metadata bij het event.")]
         public ProvenanceData Provenance { get; private set; }
 
-        public BuildingUnitPositionWasCorrected(
+        public BuildingUnitRegularizationWasCorrected(
             BuildingPersistentLocalId buildingPersistentLocalId,
-            BuildingUnitPersistentLocalId buildingUnitPersistentLocalId,
-            BuildingUnitPositionGeometryMethod geometryMethod,
-            ExtendedWkbGeometry extendedWkbGeometry)
+            BuildingUnitPersistentLocalId buildingUnitPersistentLocalId)
         {
             BuildingPersistentLocalId = buildingPersistentLocalId;
             BuildingUnitPersistentLocalId = buildingUnitPersistentLocalId;
-            GeometryMethod = geometryMethod;
-            ExtendedWkbGeometry = extendedWkbGeometry;
         }
 
         [JsonConstructor]
-        private BuildingUnitPositionWasCorrected(
+        private BuildingUnitRegularizationWasCorrected(
             int buildingPersistentLocalId,
             int buildingUnitPersistentLocalId,
-            string geometryMethod,
-            string extendedWkbGeometry,
             ProvenanceData provenance)
             : this(
                 new BuildingPersistentLocalId(buildingPersistentLocalId),
-                new BuildingUnitPersistentLocalId(buildingUnitPersistentLocalId),
-                BuildingUnitPositionGeometryMethod.Parse(geometryMethod),
-                new ExtendedWkbGeometry(extendedWkbGeometry))
+                new BuildingUnitPersistentLocalId(buildingUnitPersistentLocalId))
             => ((ISetProvenance)this).SetProvenance(provenance.ToProvenance());
 
         void ISetProvenance.SetProvenance(Provenance provenance) => Provenance = new ProvenanceData(provenance);
@@ -63,8 +48,6 @@ namespace BuildingRegistry.Building.Events
             var fields = Provenance.GetHashFields().ToList();
             fields.Add(BuildingPersistentLocalId.ToString(CultureInfo.InvariantCulture));
             fields.Add(BuildingUnitPersistentLocalId.ToString(CultureInfo.InvariantCulture));
-            fields.Add(GeometryMethod);
-            fields.Add(ExtendedWkbGeometry);
             return fields;
         }
 
