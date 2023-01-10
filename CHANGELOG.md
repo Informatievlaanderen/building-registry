@@ -1,3 +1,12 @@
+# [3.55.0](https://github.com/informatievlaanderen/building-registry/compare/v3.54.0...v3.55.0) (2023-01-10)
+
+
+### Features
+
+* detach address on remove building and bu ([5edfb39](https://github.com/informatievlaanderen/building-registry/commit/5edfb39b66375306b9ab25d000cfb279dde1531d))
+* detach address when not realing building or building unit ([25f1697](https://github.com/informatievlaanderen/building-registry/commit/25f16977555691762aa77f78f48fbf21fc1132fe))
+* remove buildingunit address relation from backoffice context ([75813a9](https://github.com/informatievlaanderen/building-registry/commit/75813a9324f0f159e0c59eec2985448ffdaf1a7a))
+
 # [3.54.0](https://github.com/informatievlaanderen/building-registry/compare/v3.53.1...v3.54.0) (2023-01-09)
 
 
