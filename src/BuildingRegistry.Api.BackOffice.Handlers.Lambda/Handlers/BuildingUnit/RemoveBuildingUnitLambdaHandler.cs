@@ -2,6 +2,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.BuildingUnit
 {
     using System.Threading;
     using System.Threading.Tasks;
+    using Abstractions;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
     using Be.Vlaanderen.Basisregisters.Sqs.Exceptions;
     using Be.Vlaanderen.Basisregisters.Sqs.Lambda.Handlers;
@@ -16,19 +17,24 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.BuildingUnit
 
     public sealed class RemoveBuildingUnitLambdaHandler : BuildingUnitLambdaHandler<RemoveBuildingUnitLambdaRequest>
     {
+        private readonly BackOfficeContext _backOfficeContext;
+
         public RemoveBuildingUnitLambdaHandler(
             IConfiguration configuration,
             ICustomRetryPolicy retryPolicy,
             ITicketing ticketing,
             IIdempotentCommandHandler idempotentCommandHandler,
-            IBuildings buildings)
+            IBuildings buildings,
+            BackOfficeContext backOfficeContext)
             : base(
                 configuration,
                 retryPolicy,
                 ticketing,
                 idempotentCommandHandler,
                 buildings)
-        { }
+        {
+            _backOfficeContext = backOfficeContext;
+        }
 
         protected override async Task<ETagResponse> InnerHandle(RemoveBuildingUnitLambdaRequest request, CancellationToken cancellationToken)
         {
@@ -46,6 +52,8 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.BuildingUnit
             {
                 // Idempotent: Do Nothing return last etag
             }
+
+            await _backOfficeContext.RemoveBuildingUnitAddressRelations(cmd.BuildingUnitPersistentLocalId, cancellationToken);
 
             var lastHash = await GetHash(
                 request.BuildingPersistentLocalId,

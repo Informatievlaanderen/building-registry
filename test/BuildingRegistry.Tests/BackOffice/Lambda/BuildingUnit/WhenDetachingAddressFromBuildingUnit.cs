@@ -54,7 +54,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
             PlaceBuildingUnderConstruction(buildingPersistentLocalId);
             RealizeBuilding(buildingPersistentLocalId);
             PlanBuildingUnit(buildingPersistentLocalId, buildingUnitPersistentLocalId);
-            AttachBuildingUnit(buildingPersistentLocalId, buildingUnitPersistentLocalId, addressId);
+            AttachAddressToBuildingUnit(buildingPersistentLocalId, buildingUnitPersistentLocalId, addressId);
 
             var eTagResponse = new ETagResponse(string.Empty, Fixture.Create<string>());
             var handler = new DetachAddressFromBuildingUnitLambdaHandler(
@@ -143,7 +143,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
             PlaceBuildingUnderConstruction(buildingPersistentLocalId);
             RealizeBuilding(buildingPersistentLocalId);
             PlanBuildingUnit(buildingPersistentLocalId, buildingUnitPersistentLocalId);
-            AttachBuildingUnit(buildingPersistentLocalId, buildingUnitPersistentLocalId, addressPersistentLocalId);
+            AttachAddressToBuildingUnit(buildingPersistentLocalId, buildingUnitPersistentLocalId, addressPersistentLocalId);
 
             var eTagResponse = new ETagResponse(string.Empty, Fixture.Create<string>());
             var handler = new DetachAddressFromBuildingUnitLambdaHandler(

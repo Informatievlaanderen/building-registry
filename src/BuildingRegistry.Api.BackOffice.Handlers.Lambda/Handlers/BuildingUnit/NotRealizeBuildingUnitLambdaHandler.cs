@@ -2,6 +2,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.BuildingUnit
 {
     using System.Threading;
     using System.Threading.Tasks;
+    using Abstractions;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
     using BuildingRegistry.Api.BackOffice.Abstractions.Building.Validators;
     using Be.Vlaanderen.Basisregisters.Sqs.Exceptions;
@@ -16,19 +17,24 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.BuildingUnit
 
     public sealed class NotRealizeBuildingUnitLambdaHandler : BuildingUnitLambdaHandler<NotRealizeBuildingUnitLambdaRequest>
     {
+        private readonly BackOfficeContext _backOfficeContext;
+
         public NotRealizeBuildingUnitLambdaHandler(
             IConfiguration configuration,
             ICustomRetryPolicy retryPolicy,
             ITicketing ticketing,
             IIdempotentCommandHandler idempotentCommandHandler,
-            IBuildings buildings)
+            IBuildings buildings,
+            BackOfficeContext backOfficeContext)
             : base(
                 configuration,
                 retryPolicy,
                 ticketing,
                 idempotentCommandHandler,
                 buildings)
-        { }
+        {
+            _backOfficeContext = backOfficeContext;
+        }
 
         protected override async Task<ETagResponse> InnerHandle(NotRealizeBuildingUnitLambdaRequest request, CancellationToken cancellationToken)
         {
@@ -47,10 +53,13 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.BuildingUnit
                 // Idempotent: Do Nothing return last etag
             }
 
+            await _backOfficeContext.RemoveBuildingUnitAddressRelations(cmd.BuildingUnitPersistentLocalId, cancellationToken);
+
             var lastHash = await GetHash(
                 request.BuildingPersistentLocalId,
                 new BuildingUnitPersistentLocalId(request.BuildingUnitPersistentLocalId),
                 cancellationToken);
+
             return new ETagResponse(string.Format(DetailUrlFormat, request.BuildingUnitPersistentLocalId), lastHash);
         }
 

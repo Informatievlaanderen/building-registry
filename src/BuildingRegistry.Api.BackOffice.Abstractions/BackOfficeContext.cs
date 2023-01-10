@@ -2,6 +2,7 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions
 {
     using System;
     using System.IO;
+    using System.Linq;
     using BuildingRegistry.Building;
     using System.Threading.Tasks;
     using System.Threading;
@@ -43,8 +44,7 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions
             AddressPersistentLocalId addressPersistentLocalId,
             CancellationToken cancellationToken)
         {
-            var relation = await BuildingUnitAddressRelation.FindAsync(new object?[] { (int)buildingUnitPersistentLocalId, (int)addressPersistentLocalId }, cancellationToken);
-
+            var relation = await FindBuildingUnitAddressRelation(buildingUnitPersistentLocalId, addressPersistentLocalId, cancellationToken);
             if (relation is null)
             {
                 relation = new BuildingUnitAddressRelation(buildingPersistentLocalId, buildingUnitPersistentLocalId, addressPersistentLocalId);
@@ -60,12 +60,46 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions
             AddressPersistentLocalId addressPersistentLocalId,
             CancellationToken cancellationToken)
         {
-            var relation = await BuildingUnitAddressRelation.FindAsync(new object?[] { (int)buildingUnitPersistentLocalId, (int)addressPersistentLocalId }, cancellationToken);
+            var relation = await FindBuildingUnitAddressRelation(buildingUnitPersistentLocalId, addressPersistentLocalId, cancellationToken);
             if (relation is not null)
             {
                 BuildingUnitAddressRelation.Remove(relation);
                 await SaveChangesAsync(cancellationToken);
             }
+        }
+
+        public async Task<BuildingUnitAddressRelation?> FindBuildingUnitAddressRelation(
+            BuildingUnitPersistentLocalId buildingUnitPersistentLocalId, AddressPersistentLocalId addressPersistentLocalId, CancellationToken cancellationToken)
+        {
+            return await BuildingUnitAddressRelation.FindAsync(new object?[] { (int)buildingUnitPersistentLocalId, (int)addressPersistentLocalId }, cancellationToken);
+        }
+
+        public async Task RemoveBuildingUnitAddressRelations(BuildingUnitPersistentLocalId buildingUnitPersistentLocalId, CancellationToken cancellationToken)
+        {
+            var buildingUnitAddressRelations = await BuildingUnitAddressRelation
+                .Where(x => x.BuildingUnitPersistentLocalId == (int)buildingUnitPersistentLocalId)
+                .ToListAsync(cancellationToken);
+
+            foreach (var buildingUnitAddressRelation in buildingUnitAddressRelations)
+            {
+                BuildingUnitAddressRelation.Remove(buildingUnitAddressRelation);
+            }
+
+            SaveChangesAsync(cancellationToken);
+        }
+
+        public async Task RemoveBuildingUnitAddressRelations(BuildingPersistentLocalId buildingPersistentLocalId, CancellationToken cancellationToken)
+        {
+            var buildingUnitAddressRelations = await BuildingUnitAddressRelation
+                .Where(x => x.BuildingPersistentLocalId == (int)buildingPersistentLocalId)
+                .ToListAsync(cancellationToken);
+
+            foreach (var buildingUnitAddressRelation in buildingUnitAddressRelations)
+            {
+                BuildingUnitAddressRelation.Remove(buildingUnitAddressRelation);
+            }
+
+            SaveChangesAsync(cancellationToken);
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
