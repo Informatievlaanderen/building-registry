@@ -96,7 +96,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda
                 Fixture.Create<Provenance>()));
         }
 
-        protected void AttachBuildingUnit(
+        protected void AttachAddressToBuildingUnit(
             BuildingPersistentLocalId buildingPersistentLocalId,
             BuildingUnitPersistentLocalId buildingUnitPersistentLocalId,
             AddressPersistentLocalId addressPersistentLocalId)
