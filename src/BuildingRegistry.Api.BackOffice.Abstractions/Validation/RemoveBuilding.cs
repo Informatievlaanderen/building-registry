@@ -8,8 +8,8 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.Validation
         {
             public static class BuildingHasInvalidBuildingGeometryMethod
             {
-                public const string Code = "GebouwIngemeten";
-                public const string Message = "Deze actie is enkel toegestaan op geschetste gebouwen.";
+                public const string Code = "GebouwGeometrieMethodeIngemetenGRB";
+                public const string Message = "Deze actie is enkel toegestaan op gebouwen met geometrieMethode 'ingeschetst'.";
 
                 public static TicketError ToTicketError() => new(Message, Code);
             }

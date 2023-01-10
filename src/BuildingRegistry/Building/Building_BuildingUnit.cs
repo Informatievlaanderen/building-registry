@@ -160,6 +160,16 @@ namespace BuildingRegistry.Building
                 .Regularize();
         }
 
+        public void CorrectRegularizationBuildingUnit(BuildingUnitPersistentLocalId buildingUnitPersistentLocalId)
+        {
+            GuardRemovedBuilding();
+            GuardBuildingValidStatuses(BuildingStatus.Planned, BuildingStatus.UnderConstruction, BuildingStatus.Realized);
+
+            _buildingUnits
+                .GetNotRemovedByPersistentLocalId(buildingUnitPersistentLocalId)
+                .CorrectRegularization();
+        }
+
         public void DeregulateBuildingUnit(BuildingUnitPersistentLocalId buildingUnitPersistentLocalId)
         {
             GuardRemovedBuilding();
@@ -218,6 +228,14 @@ namespace BuildingRegistry.Building
         private void GuardBuildingInvalidStatuses(params BuildingStatus[] invalidStatuses)
         {
             if (invalidStatuses.Contains(BuildingStatus))
+            {
+                throw new BuildingHasInvalidStatusException();
+            }
+        }
+
+        private void GuardBuildingValidStatuses(params BuildingStatus[] validStatuses)
+        {
+            if (!validStatuses.Contains(BuildingStatus))
             {
                 throw new BuildingHasInvalidStatusException();
             }

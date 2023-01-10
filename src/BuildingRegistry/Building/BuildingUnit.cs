@@ -277,20 +277,29 @@ namespace BuildingRegistry.Building
             GuardRemoved();
             GuardCommonUnit();
 
-            GuardBuildingUnitInvalidStatuses(new[]
-            {
-                BuildingUnitStatus.Retired,
-                BuildingUnitStatus.NotRealized
-            });
+            GuardBuildingUnitInvalidStatuses(new[] { BuildingUnitStatus.Retired, BuildingUnitStatus.NotRealized });
 
             if (!HasDeviation)
             {
                 return;
             }
 
-            Apply(new BuildingUnitWasRegularized(
-                _buildingPersistentLocalId,
-                BuildingUnitPersistentLocalId));
+            Apply(new BuildingUnitWasRegularized(_buildingPersistentLocalId, BuildingUnitPersistentLocalId));
+        }
+
+        public void CorrectRegularization()
+        {
+            GuardRemoved();
+            GuardCommonUnit();
+
+            GuardValidBuildingUnitStatuses(new[] { BuildingUnitStatus.Planned, BuildingUnitStatus.Realized });
+
+            if (HasDeviation)
+            {
+                return;
+            }
+
+            Apply(new BuildingUnitRegularizationWasCorrected(_buildingPersistentLocalId, BuildingUnitPersistentLocalId));
         }
 
         public void Deregulate()

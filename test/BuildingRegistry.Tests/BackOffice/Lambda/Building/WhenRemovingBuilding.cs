@@ -188,8 +188,8 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
                 x.Error(
                     It.IsAny<Guid>(),
                     new TicketError(
-                        "Deze actie is enkel toegestaan op geschetste gebouwen.",
-                        "GebouwIngemeten"),
+                        "Deze actie is enkel toegestaan op gebouwen met geometrieMethode 'ingeschetst'.",
+                        "GebouwGeometrieMethodeIngemetenGRB"),
                     CancellationToken.None));
         }
     }

@@ -47,7 +47,8 @@ using System;
 
                 .RegisterModule(new IdempotencyModule(
                     _services,
-                    _configuration.GetSection(IdempotencyConfiguration.Section).Get<IdempotencyConfiguration>().ConnectionString,
+                    _configuration.GetSection(IdempotencyConfiguration.Section).Get<IdempotencyConfiguration>()
+                        .ConnectionString,
                     new IdempotencyMigrationsTableInfo(Schema.Import),
                     new IdempotencyTableInfo(Schema.Import),
                     _loggerFactory))
@@ -56,12 +57,12 @@ using System;
 
                 .RegisterModule(new EnvelopeModule())
 
-                .RegisterModule(new CommandHandlingModule(_configuration))
+                .RegisterModule(new CommandHandlingModule(_configuration));
 
-                .RegisterModule(new CrabImportModule(
-                    _configuration.GetConnectionString("CrabImport"),
-                    Schema.Import,
-                    _loggerFactory));
+            _services.ConfigureCrabImport(
+                _configuration.GetConnectionString("CrabImport"),
+                Schema.Import,
+                _loggerFactory);
 
             builder
                 .RegisterType<IdempotentCommandHandlerModule>()
