@@ -295,6 +295,16 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
                     }, ct);
             });
 
+            When<Envelope<BuildingUnitRegularizationWasCorrected>>(async (context, message, ct) =>
+            {
+                await context.FindAndUpdateBuildingUnitExtract(message.Message.BuildingUnitPersistentLocalId,
+                    itemV2 =>
+                    {
+                        UpdateRecord(itemV2, record => record.afwijking.Value = true);
+                        UpdateVersie(itemV2, message.Message.Provenance.Timestamp);
+                    }, ct);
+            });
+
             When<Envelope<BuildingUnitWasDeregulated>>(async (context, message, ct) =>
             {
                 await context.FindAndUpdateBuildingUnitExtract(message.Message.BuildingUnitPersistentLocalId,

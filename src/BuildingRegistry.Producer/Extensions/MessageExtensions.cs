@@ -421,6 +421,12 @@ namespace BuildingRegistry.Producer.Extensions
                 message.BuildingUnitPersistentLocalId,
                 message.Provenance.ToContract());
 
+        public static Contracts.BuildingUnitRegularizationWasCorrected ToContract(this BuildingUnitRegularizationWasCorrected message)
+            => new Contracts.BuildingUnitRegularizationWasCorrected(
+                message.BuildingPersistentLocalId,
+                message.BuildingUnitPersistentLocalId,
+                message.Provenance.ToContract());
+
         public static Contracts.BuildingUnitWasRemovedV2 ToContract(this BuildingUnitWasRemovedV2 message)
             => new Contracts.BuildingUnitWasRemovedV2(
                 message.BuildingPersistentLocalId,

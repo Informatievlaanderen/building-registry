@@ -123,6 +123,11 @@ namespace BuildingRegistry.Producer
                 await Produce(message.Message.BuildingPersistentLocalId, message.Message.ToContract(), message.Position, ct);
             });
 
+            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingUnitRegularizationWasCorrected>>(async (_, message, ct) =>
+            {
+                await Produce(message.Message.BuildingPersistentLocalId, message.Message.ToContract(), message.Position, ct);
+            });
+
             When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingUnitWasRemovedV2>>(async (_, message, ct) =>
             {
                 await Produce(message.Message.BuildingPersistentLocalId, message.Message.ToContract(), message.Position, ct);

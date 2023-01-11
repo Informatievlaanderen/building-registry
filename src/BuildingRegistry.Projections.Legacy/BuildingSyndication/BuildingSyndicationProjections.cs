@@ -1135,6 +1135,17 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
                 {
                     var unit = item.BuildingUnitsV2.Single(y => y.PersistentLocalId == message.Message.BuildingUnitPersistentLocalId);
                     unit.HasDeviation = false;
+                    unit.Version = message.Message.Provenance.Timestamp;
+                }, ct);
+            });
+
+            When<Envelope<BuildingUnitRegularizationWasCorrected>>(async (context, message, ct) =>
+            {
+                await context.CreateNewBuildingSyndicationItem(message.Message.BuildingPersistentLocalId, message, item =>
+                {
+                    var unit = item.BuildingUnitsV2.Single(y => y.PersistentLocalId == message.Message.BuildingUnitPersistentLocalId);
+                    unit.HasDeviation = true;
+                    unit.Version = message.Message.Provenance.Timestamp;
                 }, ct);
             });
 
@@ -1144,6 +1155,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
                 {
                     var unit = item.BuildingUnitsV2.Single(y => y.PersistentLocalId == message.Message.BuildingUnitPersistentLocalId);
                     unit.HasDeviation = true;
+                    unit.Version = message.Message.Provenance.Timestamp;
                 }, ct);
             });
 
