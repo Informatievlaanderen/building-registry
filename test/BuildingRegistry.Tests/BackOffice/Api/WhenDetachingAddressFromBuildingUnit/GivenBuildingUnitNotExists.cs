@@ -19,11 +19,11 @@ namespace BuildingRegistry.Tests.BackOffice.Api.WhenDetachingAddressFromBuilding
     using Xunit;
     using Xunit.Abstractions;
 
-    public class GivenBuildingUnitNotFound : BackOfficeApiTest
+    public class GivenBuildingUnitNotExists : BackOfficeApiTest
     {
         private readonly BuildingUnitController _controller;
 
-        public GivenBuildingUnitNotFound(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
+        public GivenBuildingUnitNotExists(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
         {
             _controller = CreateBuildingControllerWithUser<BuildingUnitController>();
         }
