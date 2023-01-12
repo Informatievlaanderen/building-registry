@@ -171,6 +171,18 @@ namespace BuildingRegistry.Building
                     building.DeregulateBuildingUnit(message.Command.BuildingUnitPersistentLocalId);
                 });
 
+            For<CorrectBuildingUnitDeregulation>()
+                .AddSqlStreamStore(getStreamStore, getUnitOfWork, eventMapping, eventSerializer, getSnapshotStore)
+                .AddEventHash<CorrectBuildingUnitDeregulation, Building>(getUnitOfWork)
+                .AddProvenance(getUnitOfWork, provenanceFactory)
+                .Handle(async (message, ct) =>
+                {
+                    var streamId = new BuildingStreamId(message.Command.BuildingPersistentLocalId);
+                    var building = await buildingRepository().GetAsync(streamId, ct);
+
+                    building.CorrectDeregulationBuildingUnit(message.Command.BuildingUnitPersistentLocalId);
+                });
+
             For<AttachAddressToBuildingUnit>()
                 .AddSqlStreamStore(getStreamStore, getUnitOfWork, eventMapping, eventSerializer, getSnapshotStore)
                 .AddEventHash<AttachAddressToBuildingUnit, Building>(getUnitOfWork)

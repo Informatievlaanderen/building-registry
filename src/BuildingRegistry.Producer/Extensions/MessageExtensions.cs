@@ -381,6 +381,12 @@ namespace BuildingRegistry.Producer.Extensions
                 message.BuildingUnitPersistentLocalId,
                 message.Provenance.ToContract());
 
+        public static Contracts.BuildingUnitDeregulationWasCorrected ToContract(this BuildingUnitDeregulationWasCorrected message)
+            => new Contracts.BuildingUnitDeregulationWasCorrected(
+                message.BuildingPersistentLocalId,
+                message.BuildingUnitPersistentLocalId,
+                message.Provenance.ToContract());
+
         public static Contracts.BuildingUnitWasNotRealizedBecauseBuildingWasNotRealized ToContract(this BuildingUnitWasNotRealizedBecauseBuildingWasNotRealized message)
             => new Contracts.BuildingUnitWasNotRealizedBecauseBuildingWasNotRealized(
                 message.BuildingPersistentLocalId,

@@ -323,6 +323,27 @@ namespace BuildingRegistry.Building
                 BuildingUnitPersistentLocalId));
         }
 
+        public void CorrectDeregulation()
+        {
+            GuardRemoved();
+            GuardCommonUnit();
+
+            GuardValidBuildingUnitStatuses(new[]
+            {
+                BuildingUnitStatus.Planned,
+                BuildingUnitStatus.Realized
+            });
+
+            if (!HasDeviation)
+            {
+                return;
+            }
+
+            Apply(new BuildingUnitDeregulationWasCorrected(
+                _buildingPersistentLocalId,
+                BuildingUnitPersistentLocalId));
+        }
+
         //TODO: refactor: use valid statusses instead of this
         private void GuardBuildingUnitInvalidStatuses(BuildingUnitStatus[] invalidStatuses)
         {

@@ -180,6 +180,16 @@ namespace BuildingRegistry.Building
                 .Deregulate();
         }
 
+        public void CorrectDeregulationBuildingUnit(BuildingUnitPersistentLocalId buildingUnitPersistentLocalId)
+        {
+            GuardRemovedBuilding();
+            GuardBuildingValidStatuses(BuildingStatus.UnderConstruction, BuildingStatus.Realized, BuildingStatus.Planned);
+
+            _buildingUnits
+                .GetNotRemovedByPersistentLocalId(buildingUnitPersistentLocalId)
+                .CorrectDeregulation();
+        }
+
         public void AttachAddressToBuildingUnit(
             BuildingUnitPersistentLocalId buildingUnitPersistentLocalId,
             AddressPersistentLocalId addressPersistentLocalId)
