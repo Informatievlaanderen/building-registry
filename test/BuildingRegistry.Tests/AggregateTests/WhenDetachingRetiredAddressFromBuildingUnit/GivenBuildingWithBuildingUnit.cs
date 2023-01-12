@@ -72,7 +72,10 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenDetachingRetiredAddressFromB
         [Fact]
         public void StateCheck()
         {
-            var buildingUnitAddressWasDetachedBecauseAddressWasRetired = Fixture.Create<BuildingUnitAddressWasDetachedBecauseAddressWasRetired>();
+            var buildingUnitAddressWasDetachedBecauseAddressWasRetired = new BuildingUnitAddressWasDetachedBecauseAddressWasRetired(
+                    Fixture.Create<BuildingPersistentLocalId>(),
+                    Fixture.Create<BuildingUnitPersistentLocalId>(),
+                    new AddressPersistentLocalId(456));
             var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
                 .WithBuildingPersistentLocalId(new BuildingPersistentLocalId(buildingUnitAddressWasDetachedBecauseAddressWasRetired.BuildingPersistentLocalId))
                 .WithBuildingUnit(

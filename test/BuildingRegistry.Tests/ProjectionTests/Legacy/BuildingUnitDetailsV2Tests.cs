@@ -709,6 +709,39 @@ namespace BuildingRegistry.Tests.ProjectionTests.Legacy
         }
 
         [Fact]
+        public async Task WhenBuildingUnitDeregulationWasCorrected()
+        {
+            _fixture.Customize(new WithFixedBuildingPersistentLocalId());
+            _fixture.Customize(new WithFixedBuildingUnitPersistentLocalId());
+
+            var buildingUnitWasPlannedV2 = _fixture.Create<BuildingUnitWasPlannedV2>()
+                .WithDeviation(true);
+
+            var @event = new BuildingUnitDeregulationWasCorrected(
+                new BuildingPersistentLocalId(buildingUnitWasPlannedV2.BuildingPersistentLocalId),
+                new BuildingUnitPersistentLocalId(buildingUnitWasPlannedV2.BuildingUnitPersistentLocalId));
+            ((ISetProvenance)@event).SetProvenance(_fixture.Create<Provenance>());
+
+            await Sut
+                .Given(
+                    new Envelope<BuildingUnitWasPlannedV2>(
+                        new Envelope(
+                            buildingUnitWasPlannedV2,
+                            new Dictionary<string, object> { { AddEventHashPipe.HashMetadataKey, buildingUnitWasPlannedV2.GetHash() } })),
+                    new Envelope<BuildingUnitDeregulationWasCorrected>(
+                        new Envelope(
+                            @event,
+                            new Dictionary<string, object> { { AddEventHashPipe.HashMetadataKey, @event.GetHash() } })))
+                .Then(async ct =>
+                {
+                    var item = await ct.BuildingUnitDetailsV2.FindAsync(@event.BuildingUnitPersistentLocalId);
+                    item.Should().NotBeNull();
+                    item!.HasDeviation.Should().BeFalse();
+                    item.Version.Should().Be(@event.Provenance.Timestamp);
+                });
+        }
+
+        [Fact]
         public async Task WhenCommonBuildingUnitWasAddedV2()
         {
             _fixture.Customize(new WithFixedBuildingPersistentLocalId());

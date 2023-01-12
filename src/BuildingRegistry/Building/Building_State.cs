@@ -69,6 +69,7 @@ namespace BuildingRegistry.Building
             Register<BuildingUnitWasRegularized>(When);
             Register<BuildingUnitRegularizationWasCorrected>(When);
             Register<BuildingUnitWasDeregulated>(When);
+            Register<BuildingUnitDeregulationWasCorrected>(When);
             Register<CommonBuildingUnitWasAddedV2>(When);
             Register<BuildingUnitAddressWasAttachedV2>(When);
             Register<BuildingUnitAddressWasDetachedV2>(When);
@@ -238,6 +239,8 @@ namespace BuildingRegistry.Building
         private void When(BuildingUnitRegularizationWasCorrected @event) => RouteToBuildingUnit(@event);
 
         private void When(BuildingUnitWasDeregulated @event) => RouteToBuildingUnit(@event);
+
+        private void When(BuildingUnitDeregulationWasCorrected @event) => RouteToBuildingUnit(@event);
 
         private void When(BuildingUnitAddressWasAttachedV2 @event) => RouteToBuildingUnit(@event);
 

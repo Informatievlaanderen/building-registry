@@ -1158,6 +1158,16 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
                     unit.Version = message.Message.Provenance.Timestamp;
                 }, ct);
             });
+            
+            When<Envelope<BuildingUnitDeregulationWasCorrected>>(async (context, message, ct) =>
+            {
+                await context.CreateNewBuildingSyndicationItem(message.Message.BuildingPersistentLocalId, message, item =>
+                {
+                    var unit = item.BuildingUnitsV2.Single(y => y.PersistentLocalId == message.Message.BuildingUnitPersistentLocalId);
+                    unit.HasDeviation = false;
+                    unit.Version = message.Message.Provenance.Timestamp;
+                }, ct);
+            });
 
             When<Envelope<CommonBuildingUnitWasAddedV2>>(async (context, message, ct) =>
             {
