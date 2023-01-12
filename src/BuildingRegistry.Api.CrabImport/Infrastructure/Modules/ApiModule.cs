@@ -4,7 +4,7 @@ namespace BuildingRegistry.Api.CrabImport.Infrastructure.Modules
     using Autofac.Extensions.DependencyInjection;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
     using Be.Vlaanderen.Basisregisters.CommandHandling.Idempotency;
-    using Be.Vlaanderen.Basisregisters.DataDog.Tracing.Autofac;
+    using Be.Vlaanderen.Basisregisters.DataDog.Tracing.Microsoft;
     using Be.Vlaanderen.Basisregisters.EventHandling;
     using Be.Vlaanderen.Basisregisters.EventHandling.Autofac;
     using Be.Vlaanderen.Basisregisters.GrAr.Import.Api;
@@ -19,6 +19,7 @@ namespace BuildingRegistry.Api.CrabImport.Infrastructure.Modules
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Logging;
 using System;
+    using Be.Vlaanderen.Basisregisters.DependencyInjection;
 
     public class ApiModule : Module
     {
@@ -40,11 +41,10 @@ using System;
         {
             var eventSerializerSettings = EventsJsonSerializerSettingsProvider.CreateSerializerSettings();
 
+            _services.RegisterModule(new DataDogModule(_configuration));
+
             builder
                 .RegisterModule(new MediatRModule())
-
-                .RegisterModule(new DataDogModule(_configuration))
-
                 .RegisterModule(new IdempotencyModule(
                     _services,
                     _configuration.GetSection(IdempotencyConfiguration.Section).Get<IdempotencyConfiguration>()
@@ -52,11 +52,8 @@ using System;
                     new IdempotencyMigrationsTableInfo(Schema.Import),
                     new IdempotencyTableInfo(Schema.Import),
                     _loggerFactory))
-
                 .RegisterModule(new EventHandlingModule(typeof(DomainAssemblyMarker).Assembly, eventSerializerSettings))
-
                 .RegisterModule(new EnvelopeModule())
-
                 .RegisterModule(new CommandHandlingModule(_configuration));
 
             _services.ConfigureCrabImport(

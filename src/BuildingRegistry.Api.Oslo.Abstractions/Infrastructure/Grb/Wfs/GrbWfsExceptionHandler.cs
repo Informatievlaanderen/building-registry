@@ -6,7 +6,7 @@ namespace BuildingRegistry.Api.Oslo.Abstractions.Infrastructure.Grb.Wfs
 
     public class GrbWfsExceptionHandler : DefaultExceptionHandler<GrbWfsException>
     {
-        protected override ProblemDetails GetApiProblemFor(GrbWfsException exception)
+        protected override ProblemDetails GetApiProblemFor(HttpContext context, GrbWfsException exception)
             => new ProblemDetails
             {
                 HttpStatus = StatusCodes.Status500InternalServerError,
