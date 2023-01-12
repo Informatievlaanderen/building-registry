@@ -1,3 +1,10 @@
+# [3.57.0](https://github.com/informatievlaanderen/building-registry/compare/v3.56.0...v3.57.0) (2023-01-12)
+
+
+### Features
+
+* update Be.Vlaanderen.Basisregisters.Api to 19.0.1 ([0b37006](https://github.com/informatievlaanderen/building-registry/commit/0b3700674fff7f73bafb4d6fce3e597e63d15351))
+
 # [3.56.0](https://github.com/informatievlaanderen/building-registry/compare/v3.55.0...v3.56.0) (2023-01-12)
 
 
