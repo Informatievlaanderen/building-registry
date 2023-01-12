@@ -109,6 +109,8 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
                 {
                     BuildingUnitIsRemovedException => new ApiException(ValidationErrorMessages.BuildingUnit.BuildingUnitIsRemoved, StatusCodes.Status410Gone),
 
+                    BuildingUnitIsNotFoundException => new ApiException(ValidationErrorMessages.BuildingUnit.BuildingUnitNotFound, StatusCodes.Status404NotFound),
+
                     AddressNotFoundException =>
                         throw CreateValidationException(
                             ValidationErrors.Common.AdresIdInvalid.Code,
