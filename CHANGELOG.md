@@ -1,3 +1,16 @@
+# [3.56.0](https://github.com/informatievlaanderen/building-registry/compare/v3.55.0...v3.56.0) (2023-01-12)
+
+
+### Bug Fixes
+
+* catch bu not found in detach controller ([af89a5e](https://github.com/informatievlaanderen/building-registry/commit/af89a5ed0dbbc92de2bcf3fa8c27f303ff17b6ff))
+
+
+### Features
+
+* correct BU regularization backoffice ([e8ffa05](https://github.com/informatievlaanderen/building-registry/commit/e8ffa05eccb62eacdee5ec3559f27ef0ded62db5))
+* correct bu regularization domain ([b456ac5](https://github.com/informatievlaanderen/building-registry/commit/b456ac5b7541c1fc5a8ddd95c29c567ea3c68367))
+
 # [3.55.0](https://github.com/informatievlaanderen/building-registry/compare/v3.54.0...v3.55.0) (2023-01-10)
 
 
