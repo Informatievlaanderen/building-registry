@@ -1,3 +1,10 @@
+## [3.58.1](https://github.com/informatievlaanderen/building-registry/compare/v3.58.0...v3.58.1) (2023-01-13)
+
+
+### Bug Fixes
+
+* add backoffice projections to cd ([77b14dd](https://github.com/informatievlaanderen/building-registry/commit/77b14dd00c55f7330d74c9b61a0b945931a08a79))
+
 # [3.58.0](https://github.com/informatievlaanderen/building-registry/compare/v3.57.0...v3.58.0) (2023-01-13)
 
 
