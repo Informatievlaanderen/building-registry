@@ -134,6 +134,86 @@ namespace BuildingRegistry.Tests.ProjectionTests.Legacy
         }
 
         [Fact]
+        public async Task WhenBuildingUnitWasRemovedV2()
+        {
+            var buildingWasPlannedV2 = _fixture.Create<BuildingWasPlannedV2>();
+            var buildingWasPlannedV2Metadata = new Dictionary<string, object>
+            {
+                { AddEventHashPipe.HashMetadataKey, buildingWasPlannedV2.GetHash() }
+            };
+
+            var buildingUnitWasPlannedV2 = _fixture.Create<BuildingUnitWasPlannedV2>();
+            var buildingUnitWasPlannedV2Metadata = new Dictionary<string, object>
+            {
+                { AddEventHashPipe.HashMetadataKey, buildingUnitWasPlannedV2.GetHash() }
+            };
+
+            var buildingUnitWasRemovedV2 = _fixture.Create<BuildingUnitWasRemovedV2>();
+            var buildingUnitWasRemovedV2Metadata = new Dictionary<string, object>
+            {
+                { AddEventHashPipe.HashMetadataKey, buildingUnitWasRemovedV2.GetHash() }
+            };
+
+            await Sut
+                .Given(
+                    new Envelope<BuildingWasPlannedV2>(new Envelope(buildingWasPlannedV2, buildingWasPlannedV2Metadata)),
+                    new Envelope<BuildingUnitWasPlannedV2>(new Envelope(buildingUnitWasPlannedV2, buildingUnitWasPlannedV2Metadata)),
+                    new Envelope<BuildingUnitWasRemovedV2>(new Envelope(buildingUnitWasRemovedV2, buildingUnitWasRemovedV2Metadata)))
+                .Then(async ct =>
+                {
+                    var buildingDetailItemV2 = await ct.BuildingDetailsV2.FindAsync(buildingUnitWasRemovedV2.BuildingPersistentLocalId);
+                    buildingDetailItemV2.Should().NotBeNull();
+                    buildingDetailItemV2.IsRemoved.Should().BeTrue();
+                    buildingDetailItemV2.Version.Should().Be(buildingUnitWasRemovedV2.Provenance.Timestamp);
+                    buildingDetailItemV2.LastEventHash.Should().Be(buildingUnitWasRemovedV2.GetHash());
+                });
+        }
+
+        [Fact]
+        public async Task WhenBuildingUnitRemovalWasCorrected()
+        {
+            var buildingWasPlannedV2 = _fixture.Create<BuildingWasPlannedV2>();
+            var buildingWasPlannedV2Metadata = new Dictionary<string, object>
+            {
+                { AddEventHashPipe.HashMetadataKey, buildingWasPlannedV2.GetHash() }
+            };
+
+            var buildingUnitWasPlannedV2 = _fixture.Create<BuildingUnitWasPlannedV2>();
+            var buildingUnitWasPlannedV2Metadata = new Dictionary<string, object>
+            {
+                { AddEventHashPipe.HashMetadataKey, buildingUnitWasPlannedV2.GetHash() }
+            };
+
+            var buildingUnitWasRemovedV2 = _fixture.Create<BuildingUnitWasRemovedV2>();
+            var buildingUnitWasRemovedV2Metadata = new Dictionary<string, object>
+            {
+                { AddEventHashPipe.HashMetadataKey, buildingUnitWasRemovedV2.GetHash() }
+            };
+
+            var buildingUnitRemovalWasCorrected = _fixture.Create<BuildingUnitRemovalWasCorrected>();
+            var buildingUnitRemovalWasCorrectedMetadata = new Dictionary<string, object>
+            {
+                { AddEventHashPipe.HashMetadataKey, buildingUnitRemovalWasCorrected.GetHash() }
+            };
+
+            await Sut
+                .Given(
+                    new Envelope<BuildingWasPlannedV2>(new Envelope(buildingWasPlannedV2, buildingWasPlannedV2Metadata)),
+                    new Envelope<BuildingUnitWasPlannedV2>(new Envelope(buildingUnitWasPlannedV2, buildingUnitWasPlannedV2Metadata)),
+                    new Envelope<BuildingUnitWasRemovedV2>(new Envelope(buildingUnitWasRemovedV2, buildingUnitWasRemovedV2Metadata)),
+                    new Envelope<BuildingUnitRemovalWasCorrected>(new Envelope(buildingUnitRemovalWasCorrected, buildingUnitRemovalWasCorrectedMetadata))
+                    )
+                .Then(async ct =>
+                {
+                    var buildingDetailItemV2 = await ct.BuildingDetailsV2.FindAsync(buildingUnitRemovalWasCorrected.BuildingPersistentLocalId);
+                    buildingDetailItemV2.Should().NotBeNull();
+                    buildingDetailItemV2.IsRemoved.Should().BeFalse();
+                    buildingDetailItemV2.Version.Should().Be(buildingUnitRemovalWasCorrected.Provenance.Timestamp);
+                    buildingDetailItemV2.LastEventHash.Should().Be(buildingUnitRemovalWasCorrected.GetHash());
+                });
+        }
+
+        [Fact]
         public async Task WhenBuildingOutlineWasChanged()
         {
             var buildingWasPlannedV2 = _fixture.Create<BuildingWasPlannedV2>();
