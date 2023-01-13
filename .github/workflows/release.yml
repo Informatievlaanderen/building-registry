@@ -1067,7 +1067,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        services: ['building-registry-api', 'building-registry-import-api', 'building-registry-projections', 'building-registry-producer', 'building-registry-producer-snapshot-oslo']
+        services: ['building-registry-api', 'building-registry-import-api', 'building-registry-projections', 'building-registry-producer', 'building-registry-producer-snapshot-oslo', 'building-registry-projections-backoffice']
 
     steps:
     - name: Deploy services
@@ -1177,7 +1177,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        services: ['building-registry-api', 'building-registry-projections', 'building-registry-consumer-address', 'building-registry-backoffice-api', 'building-registry-migrator-building', 'building-registry-producer', 'building-registry-producer-snapshot-oslo']
+        services: ['building-registry-api', 'building-registry-projections', 'building-registry-consumer-address', 'building-registry-backoffice-api', 'building-registry-migrator-building', 'building-registry-producer', 'building-registry-producer-snapshot-oslo', 'building-registry-projections-backoffice']
 
     steps:
     - name: CD services
