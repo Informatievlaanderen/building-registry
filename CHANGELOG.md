@@ -1,3 +1,15 @@
+# [3.58.0](https://github.com/informatievlaanderen/building-registry/compare/v3.57.0...v3.58.0) (2023-01-13)
+
+
+### Bug Fixes
+
+* clean snapshot producers from incompatible events ([e5810e4](https://github.com/informatievlaanderen/building-registry/commit/e5810e4929176e84307789b0c33b4bf52abb94c2))
+
+
+### Features
+
+* add correct bu deregularization ([696b64d](https://github.com/informatievlaanderen/building-registry/commit/696b64db9264cde066cf4c40edf9f0953bfdca19))
+
 # [3.57.0](https://github.com/informatievlaanderen/building-registry/compare/v3.56.0...v3.57.0) (2023-01-12)
 
 
