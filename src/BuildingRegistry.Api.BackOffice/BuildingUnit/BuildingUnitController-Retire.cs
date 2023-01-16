@@ -7,6 +7,7 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
     using Abstractions.Building.Validators;
     using Abstractions.BuildingUnit.Requests;
     using Abstractions.Validation;
+    using Be.Vlaanderen.Basisregisters.AcmIdm;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
     using Be.Vlaanderen.Basisregisters.Api.ETag;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
@@ -20,6 +21,8 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
     using Handlers.Sqs.Requests.BuildingUnit;
     using Infrastructure;
     using Infrastructure.Options;
+    using Microsoft.AspNetCore.Authentication.JwtBearer;
+    using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.Extensions.Options;
@@ -42,6 +45,7 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
         [SwaggerResponseExample(StatusCodes.Status400BadRequest, typeof(BadRequestResponseExamples))]
         [SwaggerResponseExample(StatusCodes.Status500InternalServerError, typeof(InternalServerErrorResponseExamples))]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = PolicyNames.GeschetstGebouw.DecentraleBijwerker)]
         public async Task<IActionResult> Retire(
             [FromServices] IOptions<ResponseOptions> options,
             [FromServices] IIfMatchHeaderValidator ifMatchHeaderValidator,

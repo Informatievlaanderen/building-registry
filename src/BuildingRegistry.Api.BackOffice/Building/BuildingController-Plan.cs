@@ -4,12 +4,15 @@ namespace BuildingRegistry.Api.BackOffice.Building
     using System.Threading;
     using System.Threading.Tasks;
     using Abstractions.Building.Requests;
+    using Be.Vlaanderen.Basisregisters.AcmIdm;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Be.Vlaanderen.Basisregisters.Sqs.Exceptions;
     using FluentValidation;
     using Handlers.Sqs.Requests.Building;
     using Infrastructure.Options;
+    using Microsoft.AspNetCore.Authentication.JwtBearer;
+    using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.Extensions.Options;
@@ -34,6 +37,7 @@ namespace BuildingRegistry.Api.BackOffice.Building
         [SwaggerRequestExample(typeof(PlanBuildingRequest), typeof(PlanBuildingRequestExamples))]
         [SwaggerResponseExample(StatusCodes.Status400BadRequest, typeof(BadRequestResponseExamples))]
         [SwaggerResponseExample(StatusCodes.Status500InternalServerError, typeof(InternalServerErrorResponseExamples))]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = PolicyNames.GeschetstGebouw.DecentraleBijwerker)]
         public async Task<IActionResult> Plan(
             [FromServices] IOptions<ResponseOptions> options,
             [FromServices] IValidator<PlanBuildingRequest> validator,

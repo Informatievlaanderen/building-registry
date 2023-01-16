@@ -16,6 +16,7 @@ namespace BuildingRegistry.Api.BackOffice.Infrastructure.Modules
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Autofac;
     using Consumer.Address;
     using Handlers.Sqs;
+    using Be.Vlaanderen.Basisregisters.AcmIdm;
 
     public class ApiModule : Module
     {
@@ -68,6 +69,8 @@ namespace BuildingRegistry.Api.BackOffice.Infrastructure.Modules
             builder.RegisterModule(new SqsHandlersModule(_configuration[SqsQueueUrlConfigKey]));
             builder.RegisterModule(new TicketingModule(_configuration, _services));
             builder.RegisterModule(new ConsumerAddressModule(_configuration, _services, _loggerFactory));
+
+            _services.AddAcmIdmAuthorizationHandlers();
 
             builder.Populate(_services);
         }

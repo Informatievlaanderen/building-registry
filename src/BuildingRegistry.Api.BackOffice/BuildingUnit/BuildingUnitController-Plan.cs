@@ -6,6 +6,7 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
     using System.Threading.Tasks;
     using Abstractions.Building.Validators;
     using Abstractions.BuildingUnit.Requests;
+    using Be.Vlaanderen.Basisregisters.AcmIdm;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
     using Be.Vlaanderen.Basisregisters.GrAr.Edit.Validators;
@@ -17,6 +18,8 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
     using FluentValidation.Results;
     using Handlers.Sqs.Requests.BuildingUnit;
     using Infrastructure.Options;
+    using Microsoft.AspNetCore.Authentication.JwtBearer;
+    using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.Extensions.Options;
@@ -28,7 +31,6 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
         /// Plan een gebouweenheid in.
         /// </summary>
         /// <param name="options"></param>
-        /// <param name="buildingExistsValidator"></param>
         /// <param name="request"></param>
         /// <param name="validator"></param>
         /// <param name="cancellationToken"></param>
@@ -41,6 +43,7 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
         [SwaggerRequestExample(typeof(PlanBuildingUnitRequest), typeof(PlanBuildingUnitRequestExamples))]
         [SwaggerResponseExample(StatusCodes.Status400BadRequest, typeof(BadRequestResponseExamples))]
         [SwaggerResponseExample(StatusCodes.Status500InternalServerError, typeof(InternalServerErrorResponseExamples))]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = PolicyNames.GeschetstGebouw.DecentraleBijwerker)]
         public async Task<IActionResult> Plan(
             [FromServices] IOptions<ResponseOptions> options,
             [FromServices] IValidator<PlanBuildingUnitRequest> validator,
