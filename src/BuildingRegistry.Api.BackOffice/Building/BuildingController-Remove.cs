@@ -5,12 +5,15 @@ namespace BuildingRegistry.Api.BackOffice.Building
     using Abstractions.Building.Requests;
     using Abstractions.Building.Validators;
     using Abstractions.Validation;
+    using Be.Vlaanderen.Basisregisters.AcmIdm;
     using Be.Vlaanderen.Basisregisters.Api.ETag;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using BuildingRegistry.Building;
     using Handlers.Sqs.Requests.Building;
     using Infrastructure;
+    using Microsoft.AspNetCore.Authentication.JwtBearer;
+    using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
     using Swashbuckle.AspNetCore.Filters;
@@ -35,6 +38,7 @@ namespace BuildingRegistry.Api.BackOffice.Building
         [SwaggerResponseHeader(StatusCodes.Status202Accepted, "location", "string", "De URL van het aangemaakte ticket.")]
         [SwaggerResponseExample(StatusCodes.Status400BadRequest, typeof(BadRequestResponseExamples))]
         [SwaggerResponseExample(StatusCodes.Status500InternalServerError, typeof(InternalServerErrorResponseExamples))]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = PolicyNames.GeschetstGebouw.InterneBijwerker)]
         public async Task<IActionResult> Remove(
             [FromServices] BuildingExistsValidator buildingExistsValidator,
             [FromServices] IIfMatchHeaderValidator ifMatchHeaderValidator,

@@ -6,6 +6,8 @@ Moq
 AutoFixture.Xunit2
 NetTopologySuite
 
+Microsoft.Extensions.Logging.Abstractions
+
 Be.Vlaanderen.Basisregisters.Crab
 
 Be.Vlaanderen.Basisregisters.AggregateSource.Testing.CommandHandling

@@ -7,6 +7,7 @@ namespace BuildingRegistry.Api.BackOffice.Building
     using Abstractions.Building.Requests;
     using Abstractions.Building.Validators;
     using Abstractions.Validation;
+    using Be.Vlaanderen.Basisregisters.AcmIdm;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
     using Be.Vlaanderen.Basisregisters.Api.ETag;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
@@ -19,6 +20,8 @@ namespace BuildingRegistry.Api.BackOffice.Building
     using Handlers.Sqs.Requests.Building;
     using Infrastructure;
     using Infrastructure.Options;
+    using Microsoft.AspNetCore.Authentication.JwtBearer;
+    using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.Extensions.Options;
@@ -49,6 +52,7 @@ namespace BuildingRegistry.Api.BackOffice.Building
         [SwaggerRequestExample(typeof(ChangeBuildingOutlineRequest), typeof(ChangeBuildingOutlineRequestExamples))]
         [SwaggerResponseExample(StatusCodes.Status400BadRequest, typeof(BadRequestResponseExamples))]
         [SwaggerResponseExample(StatusCodes.Status500InternalServerError, typeof(InternalServerErrorResponseExamples))]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = PolicyNames.GeschetstGebouw.DecentraleBijwerker)]
         public async Task<IActionResult> ChangeOutline(
             [FromServices] IOptions<ResponseOptions> options,
             [FromServices] IValidator<ChangeBuildingOutlineRequest> validator,
