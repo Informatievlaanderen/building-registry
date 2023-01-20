@@ -47,7 +47,11 @@ Target.create "Build_Solution" (fun _ ->
   setVersions "SolutionInfo.cs"
   buildSolution "BuildingRegistry")
 
-Target.create "Test_Solution" (fun _ -> test "BuildingRegistry")
+Target.create "Test_Solution" (fun _ ->
+    [
+        "test" @@ "BuildingRegistry.Tests"
+    ] |> List.iter testWithDotNet
+)
 
 Target.create "Publish_Solution" (fun _ ->
   [

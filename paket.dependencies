@@ -117,6 +117,9 @@ nuget FluentAssertions 6.5.1
 nuget Moq 4.17.2
 nuget AutoFixture.Xunit2 4.17.0
 nuget Amazon.Lambda.TestUtilities 2.0.0
+nuget Be.Vlaanderen.Basisregisters.DockerUtilities 1.0.1
+nuget Microsoft.AspNetCore.Mvc.Testing 6.0.11
+nuget Microsoft.AspNetCore.TestHost 6.0.11
 
 // BUILD STUFF
 nuget SourceLink.Embed.AllSourceFiles 2.8.3 copy_local: true
