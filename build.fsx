@@ -80,7 +80,6 @@ Target.create "Publish_Solution" (fun _ ->
 
 Target.create "Pack_Solution" (fun _ ->
   [
-    "BuildingRegistry.Projector"
     "BuildingRegistry.Api.Legacy"
     "BuildingRegistry.Api.Legacy.Abstractions"
     "BuildingRegistry.Api.Oslo"
@@ -90,7 +89,6 @@ Target.create "Pack_Solution" (fun _ ->
     "BuildingRegistry.Api.CrabImport"
     "BuildingRegistry.Api.BackOffice"
     "BuildingRegistry.Api.BackOffice.Abstractions"
-    "BuildingRegistry.Migrator.Building"
   ] |> List.iter pack)
 
 Target.create "Containerize_Projector" (fun _ -> containerize "BuildingRegistry.Projector" "projector")
