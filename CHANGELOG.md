@@ -1,3 +1,16 @@
+# [3.59.0](https://github.com/informatievlaanderen/building-registry/compare/v3.58.1...v3.59.0) (2023-01-23)
+
+
+### Bug Fixes
+
+* add decentraleBijwerker auth attr to remove endpoints ([5ccb1e3](https://github.com/informatievlaanderen/building-registry/commit/5ccb1e339c8b18fae9a32a0b9da357cbe87a1eb6))
+* change encoding docker file ([36f221a](https://github.com/informatievlaanderen/building-registry/commit/36f221ac9f49fa03b956f7cb11f9933c05ee73b1))
+
+
+### Features
+
+* add acm idm auth to endpoints ([8212a69](https://github.com/informatievlaanderen/building-registry/commit/8212a69ebfe1874b8594b2308e63df689d6f780f))
+
 ## [3.58.1](https://github.com/informatievlaanderen/building-registry/compare/v3.58.0...v3.58.1) (2023-01-13)
 
 
