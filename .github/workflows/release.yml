@@ -134,6 +134,24 @@ jobs:
     # Upload NuGet packages
     #
 
+    - name: Upload NuGet package be-.-vlaanderen-.-basisregisters-.-building-registry-.-api-.-crab-import
+      if: env.RELEASE_VERSION != 'none'
+      uses: actions/upload-artifact@v3
+      with:
+        name: nuget-be-.-vlaanderen-.-basisregisters-.-building-registry-.-api-.-crab-import
+        path: /home/runner/work/building-registry/building-registry/dist/nuget/Be.Vlaanderen.Basisregisters.BuildingRegistry.Api.CrabImport.*.nupkg
+      env:
+        SEMVER: ${{ env.RELEASE_VERSION }}
+        
+    - name: Upload NuGet package be-.-vlaanderen-.-basisregisters-.-building-registry-.-api-.-legacy
+      if: env.RELEASE_VERSION != 'none'
+      uses: actions/upload-artifact@v3
+      with:
+        name: nuget-be-.-vlaanderen-.-basisregisters-.-building-registry-.-api-.-legacy
+        path: /home/runner/work/building-registry/building-registry/dist/nuget/Be.Vlaanderen.Basisregisters.BuildingRegistry.Api.Legacy.*.nupkg
+      env:
+        SEMVER: ${{ env.RELEASE_VERSION }}
+
     - name: Upload NuGet package be-.-vlaanderen-.-basisregisters-.-building-registry-.-api-.-oslo
       if: env.RELEASE_VERSION != 'none'
       uses: actions/upload-artifact@v3
@@ -143,21 +161,21 @@ jobs:
       env:
         SEMVER: ${{ env.RELEASE_VERSION }}
 
+    - name: Upload NuGet package be-.-vlaanderen-.-basisregisters-.-building-registry-.-api-.-extract
+      if: env.RELEASE_VERSION != 'none'
+      uses: actions/upload-artifact@v3
+      with:
+        name: nuget-be-.-vlaanderen-.-basisregisters-.-building-registry-.-api-.-extract
+        path: /home/runner/work/building-registry/building-registry/dist/nuget/Be.Vlaanderen.Basisregisters.BuildingRegistry.Api.Extract.*.nupkg
+      env:
+        SEMVER: ${{ env.RELEASE_VERSION }}
+
     - name: Upload NuGet package be-.-vlaanderen-.-basisregisters-.-building-registry-.-api-.-back-office
       if: env.RELEASE_VERSION != 'none'
       uses: actions/upload-artifact@v3
       with:
         name: nuget-be-.-vlaanderen-.-basisregisters-.-building-registry-.-api-.-back-office
         path: /home/runner/work/building-registry/building-registry/dist/nuget/Be.Vlaanderen.Basisregisters.BuildingRegistry.Api.BackOffice.*.nupkg
-      env:
-        SEMVER: ${{ env.RELEASE_VERSION }}
-
-    - name: Upload NuGet package be-.-vlaanderen-.-basisregisters-.-building-registry-.-projector
-      if: env.RELEASE_VERSION != 'none'
-      uses: actions/upload-artifact@v3
-      with:
-        name: nuget-be-.-vlaanderen-.-basisregisters-.-building-registry-.-projector
-        path: /home/runner/work/building-registry/building-registry/dist/nuget/Be.Vlaanderen.Basisregisters.BuildingRegistry.Projector.*.nupkg
       env:
         SEMVER: ${{ env.RELEASE_VERSION }}
 
