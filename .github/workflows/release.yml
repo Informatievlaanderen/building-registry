@@ -487,19 +487,26 @@ jobs:
       with:
         name: nuget-be-.-vlaanderen-.-basisregisters-.-building-registry-.-api-.-oslo
         path: ~/
+    
+    - name: Download NuGet package be-.-vlaanderen-.-basisregisters-.-building-registry-.-api-.-legacy
+      if: env.RELEASE_VERSION != 'none'
+      uses: actions/download-artifact@v3
+      with:
+        name: nuget-be-.-vlaanderen-.-basisregisters-.-building-registry-.-api-.-legacy
+        path: ~/
+    
+    - name: Download NuGet package be-.-vlaanderen-.-basisregisters-.-building-registry-.-api-.-extract
+      if: env.RELEASE_VERSION != 'none'
+      uses: actions/download-artifact@v3
+      with:
+        name: nuget-be-.-vlaanderen-.-basisregisters-.-building-registry-.-api-.-extract
+        path: ~/
 
     - name: Download NuGet package be-.-vlaanderen-.-basisregisters-.-building-registry-.-api-.-back-office
       if: env.RELEASE_VERSION != 'none'
       uses: actions/download-artifact@v3
       with:
         name: nuget-be-.-vlaanderen-.-basisregisters-.-building-registry-.-api-.-back-office
-        path: ~/
-
-    - name: Download NuGet package be-.-vlaanderen-.-basisregisters-.-building-registry-.-projector
-      if: env.RELEASE_VERSION != 'none'
-      uses: actions/download-artifact@v3
-      with:
-        name: nuget-be-.-vlaanderen-.-basisregisters-.-building-registry-.-projector
         path: ~/
 
     - name: Download NuGet package be-.-vlaanderen-.-basisregisters-.-building-registry-.-api-.-extract-.-abstractions
@@ -529,14 +536,22 @@ jobs:
       with:
         name: nuget-be-.-vlaanderen-.-basisregisters-.-building-registry-.-api-.-back-office-.-abstractions
         path: ~/
-
+    
+    - name: Download NuGet package be-.-vlaanderen-.-basisregisters-.-building-registry-.-api-.-crab-import
+      if: env.RELEASE_VERSION != 'none'
+      uses: actions/download-artifact@v3
+      with:
+        name: nuget-be-.-vlaanderen-.-basisregisters-.-building-registry-.-api-.-crab-import
+        path: ~/
 
     - name: Publish packages to NuGet
       shell: bash
       run: |
         dotnet nuget push ~/Be.Vlaanderen.Basisregisters.BuildingRegistry.Api.Oslo.$SEMVER.nupkg --source nuget.org --api-key $NUGET_API_KEY
+        dotnet nuget push ~/Be.Vlaanderen.Basisregisters.BuildingRegistry.Api.Legacy.$SEMVER.nupkg --source nuget.org --api-key $NUGET_API_KEY
+        dotnet nuget push ~/Be.Vlaanderen.Basisregisters.BuildingRegistry.Api.Extract.$SEMVER.nupkg --source nuget.org --api-key $NUGET_API_KEY
         dotnet nuget push ~/Be.Vlaanderen.Basisregisters.BuildingRegistry.Api.BackOffice.$SEMVER.nupkg --source nuget.org --api-key $NUGET_API_KEY
-        dotnet nuget push ~/Be.Vlaanderen.Basisregisters.BuildingRegistry.Projector.$SEMVER.nupkg --source nuget.org --api-key $NUGET_API_KEY
+        dotnet nuget push ~/Be.Vlaanderen.Basisregisters.BuildingRegistry.Api.CrabImport.$SEMVER.nupkg --source nuget.org --api-key $NUGET_API_KEY        
         dotnet nuget push ~/Be.Vlaanderen.Basisregisters.BuildingRegistry.Api.Extract.Abstractions.$SEMVER.nupkg --source nuget.org --api-key $NUGET_API_KEY
         dotnet nuget push ~/Be.Vlaanderen.Basisregisters.BuildingRegistry.Api.Legacy.Abstractions.$SEMVER.nupkg --source nuget.org --api-key $NUGET_API_KEY
         dotnet nuget push ~/Be.Vlaanderen.Basisregisters.BuildingRegistry.Api.Oslo.Abstractions.$SEMVER.nupkg --source nuget.org --api-key $NUGET_API_KEY
