@@ -1,3 +1,11 @@
+## [3.59.1](https://github.com/informatievlaanderen/building-registry/compare/v3.59.0...v3.59.1) (2023-01-26)
+
+
+### Bug Fixes
+
+* remove unnecessary ?? null ([a307410](https://github.com/informatievlaanderen/building-registry/commit/a3074105948992773d72bf83fc9fdcd7aae1eb0e))
+* use return value of Metadata.Add ([f2f5d44](https://github.com/informatievlaanderen/building-registry/commit/f2f5d44410a4447d37a5b0f340b1d94daed24e8e))
+
 # [3.59.0](https://github.com/informatievlaanderen/building-registry/compare/v3.58.1...v3.59.0) (2023-01-23)
 
 
