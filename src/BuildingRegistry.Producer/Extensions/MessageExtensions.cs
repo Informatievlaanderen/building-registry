@@ -120,7 +120,7 @@ namespace BuildingRegistry.Producer.Extensions
                 message.BuildingUnitKey.ToString(),
                 message.AddressId.ToString("D"),
                 message.BuildingUnitVersion.ToString(),
-                message.PredecessorBuildingUnitId?.ToString("D") ?? null,
+                message.PredecessorBuildingUnitId?.ToString("D"),
                 message.Provenance.ToContract());
 
         public static Contracts.BuildingUnitWasAddedToRetiredBuilding ToContract(
@@ -131,7 +131,7 @@ namespace BuildingRegistry.Producer.Extensions
                 message.BuildingUnitKey.ToString(),
                 message.AddressId.ToString("D"),
                 message.BuildingUnitVersion.ToString(),
-                message.PredecessorBuildingUnitId?.ToString("D") ?? null,
+                message.PredecessorBuildingUnitId?.ToString("D"),
                 message.Provenance.ToContract());
 
         public static Contracts.BuildingUnitWasCorrectedToNotRealized ToContract(
