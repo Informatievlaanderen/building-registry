@@ -38,7 +38,7 @@ namespace BuildingRegistry.Tests.Legacy.WhenImportingCrabHouseNumberStatus
                     _fixture.Create<BuildingUnitWasRetired>())
                 .When(importStatus)
                 .Then(buildingId,
-                   importStatus.ToLegacyEvent()));
+                    importStatus.ToLegacyEvent()));
         }
 
         [Theory]

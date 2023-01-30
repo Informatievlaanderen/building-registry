@@ -23,7 +23,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenMigratingBuilding
         public void ThenThrowInvalidOperationException()
         {
             var buildingWasMigrated = Fixture.Create<BuildingWasMigrated>();
-            
+
             Fixture.Register(() => new PersistentLocalId(buildingWasMigrated.BuildingPersistentLocalId));
             var command = Fixture.Create<MigrateBuilding>();
 

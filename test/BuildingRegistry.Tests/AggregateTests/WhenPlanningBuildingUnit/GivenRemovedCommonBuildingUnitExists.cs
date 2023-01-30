@@ -55,13 +55,13 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuildingUnit
                 .When(command)
                 .Then(
                     new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
-                    new BuildingUnitWasPlannedV2(
-                        command.BuildingPersistentLocalId,
-                        command.BuildingUnitPersistentLocalId,
-                        command.PositionGeometryMethod,
-                        buildingGeometry.Center,
-                        command.Function,
-                        false))));
+                        new BuildingUnitWasPlannedV2(
+                            command.BuildingPersistentLocalId,
+                            command.BuildingUnitPersistentLocalId,
+                            command.PositionGeometryMethod,
+                            buildingGeometry.Center,
+                            command.Function,
+                            false))));
         }
 
         [Theory]
@@ -105,23 +105,23 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuildingUnit
                 .When(command)
                 .Then(
                     new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
-                    new BuildingUnitWasPlannedV2(
-                        command.BuildingPersistentLocalId,
-                        command.BuildingUnitPersistentLocalId,
-                        command.PositionGeometryMethod,
-                        buildingGeometry.Center,
-                        command.Function,
-                        false)),
+                        new BuildingUnitWasPlannedV2(
+                            command.BuildingPersistentLocalId,
+                            command.BuildingUnitPersistentLocalId,
+                            command.PositionGeometryMethod,
+                            buildingGeometry.Center,
+                            command.Function,
+                            false)),
                     new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
-                    new BuildingUnitRemovalWasCorrected(
-                        command.BuildingPersistentLocalId,
-                        commonBuildingUnitPersistentLocalId,
-                        BuildingUnitStatus.Parse(expectedCommonBuildingUnitStatus),
-                        BuildingUnitFunction.Common,
-                        BuildingUnitPositionGeometryMethod.DerivedFromObject,
-                        buildingGeometry.Center,
-                        false,
-                        Array.Empty<AddressPersistentLocalId>()))));
+                        new BuildingUnitRemovalWasCorrected(
+                            command.BuildingPersistentLocalId,
+                            commonBuildingUnitPersistentLocalId,
+                            BuildingUnitStatus.Parse(expectedCommonBuildingUnitStatus),
+                            BuildingUnitFunction.Common,
+                            BuildingUnitPositionGeometryMethod.DerivedFromObject,
+                            buildingGeometry.Center,
+                            false,
+                            Array.Empty<AddressPersistentLocalId>()))));
         }
     }
 }

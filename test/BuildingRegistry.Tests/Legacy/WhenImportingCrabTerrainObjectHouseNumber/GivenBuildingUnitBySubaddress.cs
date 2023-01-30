@@ -210,6 +210,4 @@ namespace BuildingRegistry.Tests.Legacy.WhenImportingCrabTerrainObjectHouseNumbe
         //            importTerrainObjectHouseNumber.ToLegacyEvent()));
         //}
     }
-
-
 }

@@ -9,8 +9,8 @@ namespace BuildingRegistry.Tests.BackOffice.Api
     using Be.Vlaanderen.Basisregisters.Api;
     using Building;
     using BuildingRegistry.Api.BackOffice.Infrastructure;
-    using BuildingRegistry.Api.BackOffice.Infrastructure.FeatureToggles;
     using BuildingRegistry.Api.BackOffice.Infrastructure.Options;
+    using BuildingRegistry.Building;
     using FluentAssertions;
     using FluentValidation;
     using FluentValidation.Results;
@@ -89,7 +89,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api
 
         protected T CreateBuildingControllerWithUser<T>(bool useSqs = false) where T : ApiController
         {
-            var controller = Activator.CreateInstance(typeof(T), MockMediator.Object, new UseSqsToggle(useSqs), TicketingOptions) as T;
+            var controller = Activator.CreateInstance(typeof(T), MockMediator.Object, TicketingOptions) as T;
 
             var claims = new List<Claim>
             {
@@ -109,9 +109,9 @@ namespace BuildingRegistry.Tests.BackOffice.Api
             throw new Exception("Could not find controller type");
         }
 
-        protected T CreateBuildingUnitControllerWithUser<T>(bool useSqs = false) where T : ApiController
+        protected T CreateBuildingUnitControllerWithUser<T>() where T : ApiController
         {
-            var controller = Activator.CreateInstance(typeof(T), MockMediator.Object, new UseSqsToggle(useSqs), TicketingOptions) as T;
+            var controller = Activator.CreateInstance(typeof(T), MockMediator.Object, TicketingOptions) as T;
 
             var claims = new List<Claim>
             {

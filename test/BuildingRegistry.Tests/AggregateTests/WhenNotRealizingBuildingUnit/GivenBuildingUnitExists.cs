@@ -128,9 +128,9 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenNotRealizingBuildingUnit
         public void WithPlannedCommonBuildingUnitAndTwoOtherBuildingUnits_ThenCommonBuildingUnitWasNotRealized()
         {
             var command = new NotRealizeBuildingUnit(
-                    Fixture.Create<BuildingPersistentLocalId>(),
-                    new BuildingUnitPersistentLocalId(2),
-                    Fixture.Create<Provenance>());
+                Fixture.Create<BuildingPersistentLocalId>(),
+                new BuildingUnitPersistentLocalId(2),
+                Fixture.Create<Provenance>());
 
             var commonBuildingUnitPersistentLocalId = new BuildingUnitPersistentLocalId(1);
             var commonBuildingUnitWasAddedV2 = Fixture.Create<CommonBuildingUnitWasAddedV2>()

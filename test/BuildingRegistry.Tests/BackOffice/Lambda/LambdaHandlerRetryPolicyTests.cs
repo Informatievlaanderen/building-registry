@@ -132,4 +132,3 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda
         }
     }
 }
-

@@ -23,10 +23,10 @@ namespace BuildingRegistry.Tests.Legacy.Cases
         public TestCase6A(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
         {
             Fixture = new Fixture()
-                .Customize(new InfrastructureCustomization())
-                .Customize(new WithNoDeleteModification())
-                .Customize(new WithInfiniteLifetime())
-                .Customize(new WithFixedBuildingUnitIdFromHouseNumber(1, 16))
+                    .Customize(new InfrastructureCustomization())
+                    .Customize(new WithNoDeleteModification())
+                    .Customize(new WithInfiniteLifetime())
+                    .Customize(new WithFixedBuildingUnitIdFromHouseNumber(1, 16))
                 ;
 
             _ = new TestCase6AData(Fixture);

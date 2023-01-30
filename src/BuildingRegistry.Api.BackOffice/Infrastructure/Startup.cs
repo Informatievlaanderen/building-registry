@@ -11,7 +11,6 @@ namespace BuildingRegistry.Api.BackOffice.Infrastructure
     using Be.Vlaanderen.Basisregisters.CommandHandling.Idempotency;
     using Be.Vlaanderen.Basisregisters.DataDog.Tracing.Microsoft;
     using Configuration;
-    using FeatureToggles;
     using IdentityModel.AspNetCore.OAuth2Introspection;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
@@ -61,64 +60,64 @@ namespace BuildingRegistry.Api.BackOffice.Infrastructure
             services.AddAcmIdmAuthentication(oAuth2IntrospectionOptions!);
             services
                 .ConfigureDefaultForApi<Startup>(new StartupConfigureOptions
-                {
-                    Cors =
                     {
-                        Origins = _configuration
-                            .GetSection("Cors")
-                            .GetChildren()
-                            .Select(c => c.Value)
-                            .ToArray()
-                    },
-                    Server =
-                    {
-                        BaseUrl = baseUrlForExceptions
-                    },
-                    Swagger =
-                    {
-                        ApiInfo = (provider, description) => new OpenApiInfo
+                        Cors =
                         {
-                            Version = description.ApiVersion.ToString(),
-                            Title = "Basisregisters Vlaanderen Building Registry API",
-                            Description = GetApiLeadingText(description),
-                            Contact = new OpenApiContact
+                            Origins = _configuration
+                                .GetSection("Cors")
+                                .GetChildren()
+                                .Select(c => c.Value)
+                                .ToArray()
+                        },
+                        Server =
+                        {
+                            BaseUrl = baseUrlForExceptions
+                        },
+                        Swagger =
+                        {
+                            ApiInfo = (provider, description) => new OpenApiInfo
                             {
-                                Name = "Digitaal Vlaanderen",
-                                Email = "digitaal.vlaanderen@vlaanderen.be",
-                                Url = new Uri("https://backoffice.basisregisters.vlaanderen")
+                                Version = description.ApiVersion.ToString(),
+                                Title = "Basisregisters Vlaanderen Building Registry API",
+                                Description = GetApiLeadingText(description),
+                                Contact = new OpenApiContact
+                                {
+                                    Name = "Digitaal Vlaanderen",
+                                    Email = "digitaal.vlaanderen@vlaanderen.be",
+                                    Url = new Uri("https://backoffice.basisregisters.vlaanderen")
+                                }
+                            },
+                            XmlCommentPaths = new[] { typeof(Startup).GetTypeInfo().Assembly.GetName().Name }
+                        },
+                        MiddlewareHooks =
+                        {
+                            FluentValidation = fv => fv
+                                .RegisterValidatorsFromAssemblyContaining<Startup>()
+                                .RegisterValidatorsFromAssemblyContaining<
+                                    Abstractions.Building.Validators.PlanBuildingRequestValidator>(),
+
+                            AfterHealthChecks = health =>
+                            {
+                                var connectionStrings = _configuration
+                                    .GetSection("ConnectionStrings")
+                                    .GetChildren();
+
+                                foreach (var connectionString in connectionStrings)
+                                    health.AddSqlServer(
+                                        connectionString.Value,
+                                        name: $"sqlserver-{connectionString.Key.ToLowerInvariant()}",
+                                        tags: new[] { DatabaseTag, "sql", "sqlserver" });
+                            },
+                            Authorization = options =>
+                            {
+                                options.AddAcmIdmAuthorization();
                             }
-                        },
-                        XmlCommentPaths = new[] {typeof(Startup).GetTypeInfo().Assembly.GetName().Name}
-                    },
-                    MiddlewareHooks =
-                    {
-                        FluentValidation = fv => fv
-                            .RegisterValidatorsFromAssemblyContaining<Startup>()
-                            .RegisterValidatorsFromAssemblyContaining<Abstractions.Building.Validators.PlanBuildingRequestValidator>(),
-
-                        AfterHealthChecks = health =>
-                        {
-                            var connectionStrings = _configuration
-                                .GetSection("ConnectionStrings")
-                                .GetChildren();
-
-                            foreach (var connectionString in connectionStrings)
-                                health.AddSqlServer(
-                                    connectionString.Value,
-                                    name: $"sqlserver-{connectionString.Key.ToLowerInvariant()}",
-                                    tags: new[] { DatabaseTag, "sql", "sqlserver" });
-                        },
-                        Authorization = options =>
-                        {
-                            options.AddAcmIdmAuthorization();
                         }
                     }
-                }
-                .EnableJsonErrorActionFilterOption())
+                    .EnableJsonErrorActionFilterOption())
                 .Configure<ResponseOptions>(_configuration)
                 .Configure<TicketingOptions>(_configuration.GetSection(TicketingModule.TicketingServiceConfigKey))
-                .Configure<FeatureToggleOptions>(_configuration.GetSection(FeatureToggleOptions.ConfigurationKey))
-                .AddSingleton(c => new UseSqsToggle(c.GetRequiredService<IOptions<FeatureToggleOptions>>().Value.UseSqs));
+                .Configure<FeatureToggleOptions>(_configuration.GetSection(FeatureToggleOptions.ConfigurationKey));
 
             var containerBuilder = new ContainerBuilder();
             containerBuilder.RegisterModule(new ApiModule(_configuration, services, _loggerFactory));

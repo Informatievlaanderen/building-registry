@@ -31,7 +31,7 @@ namespace BuildingRegistry.Tests.AggregateTests.SnapshotTests
             Fixture.Customize(new WithBuildingUnitFunction());
             Fixture.Customize(new WithBuildingUnitPositionGeometryMethod());
             Fixture.Customize(new WithBuildingGeometryMethod());
-            
+
 
             Fixture.Register<Fixture, IEnumerable<BuildingUnit>>(fixture =>
             {
@@ -48,7 +48,7 @@ namespace BuildingRegistry.Tests.AggregateTests.SnapshotTests
                         fixture.Create<bool>(),
                         fixture.Create<string>(),
                         fixture.Create<ProvenanceData>()))
-                  .CreateMany(random.Next(2, 10));
+                    .CreateMany(random.Next(2, 10));
 
                 var streetNames = fixture.Build<IEnumerable<BuildingUnit>>().FromFactory(() =>
                 {
@@ -112,7 +112,7 @@ namespace BuildingRegistry.Tests.AggregateTests.SnapshotTests
                 buildingUnit.AddressPersistentLocalIds
                     .Should()
                     .BeEquivalentTo(
-                    snapshotBuildingUnit.AddressPersistentLocalIds.Select(x => new AddressPersistentLocalId(x)));
+                        snapshotBuildingUnit.AddressPersistentLocalIds.Select(x => new AddressPersistentLocalId(x)));
 
                 buildingUnit.IsRemoved.Should().Be(snapshotBuildingUnit.IsRemoved);
                 buildingUnit.HasDeviation.Should().Be(snapshotBuildingUnit.HasDeviation);

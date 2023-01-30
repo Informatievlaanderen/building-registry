@@ -22,7 +22,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuilding
         public void ThenThrowInvalidOperationException()
         {
             var buildingWasMigrated = Fixture.Create<BuildingWasMigrated>();
-            
+
             var command = Fixture.Create<PlanBuilding>();
 
             Assert(new Scenario()

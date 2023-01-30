@@ -36,10 +36,10 @@ namespace BuildingRegistry.Tests.Legacy.WhenReaddressingHouseNumber
         public GivenStatusBeforeReaddressHouseNumber(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
         {
             Fixture = new Fixture()
-                    .Customize(new InfrastructureCustomization())
-                    .Customize(new WithNoDeleteModification())
-                    .Customize(new WithInfiniteLifetime())
-                    .Customize(new WithFixedBuildingUnitIdFromHouseNumber(1, 16));
+                .Customize(new InfrastructureCustomization())
+                .Customize(new WithNoDeleteModification())
+                .Customize(new WithInfiniteLifetime())
+                .Customize(new WithFixedBuildingUnitIdFromHouseNumber(1, 16));
 
             Gebouw1CrabTerrainObjectId = Fixture.Create<CrabTerrainObjectId>();
             OldHuisNr16KoppelingId = Fixture.Create<CrabTerrainObjectHouseNumberId>();

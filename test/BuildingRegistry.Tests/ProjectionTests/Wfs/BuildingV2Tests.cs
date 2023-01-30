@@ -98,9 +98,9 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wfs
 
             await Sut
                 .Given(new Envelope<BuildingWasPlannedV2>(new Envelope(buildingWasPlannedV2, new Dictionary<string, object>
-                {
-                    { AddEventHashPipe.HashMetadataKey, buildingWasPlannedV2.GetHash() }
-                })),
+                    {
+                        { AddEventHashPipe.HashMetadataKey, buildingWasPlannedV2.GetHash() }
+                    })),
                     new Envelope<BuildingUnitWasPlannedV2>(new Envelope(buildingUnitWasPlannedV2, new Dictionary<string, object>
                     {
                         { AddEventHashPipe.HashMetadataKey, buildingUnitWasPlannedV2.GetHash() }

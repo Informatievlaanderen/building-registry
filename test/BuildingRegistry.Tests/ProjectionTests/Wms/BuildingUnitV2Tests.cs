@@ -533,10 +533,10 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wms
 
 
             var @event = new BuildingUnitPositionWasCorrected(
-               new BuildingPersistentLocalId(buildingUnitWasPlannedV2.BuildingPersistentLocalId),
+                new BuildingPersistentLocalId(buildingUnitWasPlannedV2.BuildingPersistentLocalId),
                 new BuildingUnitPersistentLocalId(buildingUnitWasPlannedV2.BuildingUnitPersistentLocalId),
                 BuildingUnitPositionGeometryMethod.Parse("AppointedByAdministrator"),
-               new ExtendedWkbGeometry(GeometryHelper.ValidPointInPolygon.AsBinary()));
+                new ExtendedWkbGeometry(GeometryHelper.ValidPointInPolygon.AsBinary()));
             ((ISetProvenance)@event).SetProvenance(_fixture.Create<Provenance>());
 
             await Sut
@@ -545,7 +545,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wms
                         new Envelope(
                             buildingUnitWasPlannedV2,
                             new Dictionary<string, object> { { AddEventHashPipe.HashMetadataKey, buildingUnitWasPlannedV2.GetHash() } })),
-                  new Envelope<BuildingUnitPositionWasCorrected>(
+                    new Envelope<BuildingUnitPositionWasCorrected>(
                         new Envelope(
                             @event,
                             new Dictionary<string, object> { { AddEventHashPipe.HashMetadataKey, @event.GetHash() } })))

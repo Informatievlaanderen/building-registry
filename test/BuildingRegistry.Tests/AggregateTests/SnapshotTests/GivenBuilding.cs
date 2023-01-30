@@ -62,8 +62,8 @@ namespace BuildingRegistry.Tests.AggregateTests.SnapshotTests
             var expectedEvent2 = new CommonBuildingUnitWasAddedV2(
                 planBuildingUnit.BuildingPersistentLocalId,
                 new BuildingUnitPersistentLocalId(1),
-                BuildingUnitStatus.Planned, 
-                BuildingUnitPositionGeometryMethod.DerivedFromObject, 
+                BuildingUnitStatus.Planned,
+                BuildingUnitPositionGeometryMethod.DerivedFromObject,
                 buildingGeometry.Center,
                 hasDeviation: false);
             ((ISetProvenance)expectedEvent2).SetProvenance(provenance);

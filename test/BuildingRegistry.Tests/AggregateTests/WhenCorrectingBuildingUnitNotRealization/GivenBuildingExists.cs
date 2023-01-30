@@ -58,9 +58,9 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitNotRea
                 .When(command)
                 .Then(
                     new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
-                    new BuildingUnitWasCorrectedFromNotRealizedToPlanned(
-                        command.BuildingPersistentLocalId,
-                        command.BuildingUnitPersistentLocalId))));
+                        new BuildingUnitWasCorrectedFromNotRealizedToPlanned(
+                            command.BuildingPersistentLocalId,
+                            command.BuildingUnitPersistentLocalId))));
         }
 
         [Fact]
@@ -93,9 +93,9 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitNotRea
                             BuildingUnitPositionGeometryMethod.DerivedFromObject,
                             expectedPosition)),
                     new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
-                    new BuildingUnitWasCorrectedFromNotRealizedToPlanned(
-                        command.BuildingPersistentLocalId,
-                        command.BuildingUnitPersistentLocalId))));
+                        new BuildingUnitWasCorrectedFromNotRealizedToPlanned(
+                            command.BuildingPersistentLocalId,
+                            command.BuildingUnitPersistentLocalId))));
         }
 
         [Fact]
@@ -295,15 +295,15 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitNotRea
                 isRemoved: false,
                 new List<BuildingUnit>
                 {
-                        new BuildingUnit(
-                            Fixture.Create<BuildingRegistry.Legacy.BuildingUnitId>(),
-                            Fixture.Create<BuildingRegistry.Legacy.PersistentLocalId>(),
-                            Fixture.Create<BuildingRegistry.Legacy.BuildingUnitFunction>(),
-                            BuildingRegistry.Legacy.BuildingUnitStatus.Planned,
-                            new List<AddressPersistentLocalId>(),
-                            Fixture.Create<BuildingRegistry.Legacy.BuildingUnitPosition>(),
-                            Fixture.Create<BuildingRegistry.Legacy.BuildingGeometry>(),
-                            isRemoved: true)
+                    new BuildingUnit(
+                        Fixture.Create<BuildingRegistry.Legacy.BuildingUnitId>(),
+                        Fixture.Create<BuildingRegistry.Legacy.PersistentLocalId>(),
+                        Fixture.Create<BuildingRegistry.Legacy.BuildingUnitFunction>(),
+                        BuildingRegistry.Legacy.BuildingUnitStatus.Planned,
+                        new List<AddressPersistentLocalId>(),
+                        Fixture.Create<BuildingRegistry.Legacy.BuildingUnitPosition>(),
+                        Fixture.Create<BuildingRegistry.Legacy.BuildingGeometry>(),
+                        isRemoved: true)
                 }
             );
             ((ISetProvenance)buildingWasMigrated).SetProvenance(Fixture.Create<Provenance>());

@@ -56,7 +56,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Consumer.Address
                     Fixture.Create<bool>(),
                     Fixture.Create<int?>(),
                     Fixture.Create<Provenance>()
-                    ))
+                ))
                 .Create();
 
             Given(addressWasMigratedToStreetName);

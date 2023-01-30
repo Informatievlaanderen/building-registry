@@ -215,7 +215,7 @@ namespace BuildingRegistry.Tests.Legacy.WhenImportingCrabTerrainObject
                         .WithBuildingUnitKey(commonBuildingUnitKey),
                     _fixture.Create<BuildingUnitWasRealized>()
                         .WithBuildingUnitId(commonBuildingUnitId3)
-                    )
+                )
                 .When(importTerrainObjectHouseNumber)
                 .Then(buildingId,
                     new BuildingWasRemoved(buildingId, new[] { buildingUnitId1, buildingUnitId2, commonBuildingUnitId, commonBuildingUnitId2, _fixture.Create<BuildingUnitId>(),

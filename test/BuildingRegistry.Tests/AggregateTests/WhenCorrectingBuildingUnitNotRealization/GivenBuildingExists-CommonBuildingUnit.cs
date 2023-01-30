@@ -36,18 +36,18 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitNotRea
                 BuildingGeometryMethod.Outlined);
 
             var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
-                    .WithBuildingPersistentLocalId(command.BuildingPersistentLocalId)
-                    .WithBuildingStatus(buildingStatus)
-                    .WithBuildingGeometry(buildingGeometry)
-                    .WithBuildingUnit(
-                        BuildingUnitStatus.Planned,
-                        new BuildingUnitPersistentLocalId(3))
-                    .WithBuildingUnit(
-                        BuildingUnitStatus.NotRealized,
-                        command.BuildingUnitPersistentLocalId,
-                        positionGeometryMethod: BuildingRegistry.Legacy.BuildingUnitPositionGeometryMethod.AppointedByAdministrator,
-                        extendedWkbGeometry: new BuildingRegistry.Legacy.ExtendedWkbGeometry(buildingGeometry.Center.ToString()))
-                    .Build();
+                .WithBuildingPersistentLocalId(command.BuildingPersistentLocalId)
+                .WithBuildingStatus(buildingStatus)
+                .WithBuildingGeometry(buildingGeometry)
+                .WithBuildingUnit(
+                    BuildingUnitStatus.Planned,
+                    new BuildingUnitPersistentLocalId(3))
+                .WithBuildingUnit(
+                    BuildingUnitStatus.NotRealized,
+                    command.BuildingUnitPersistentLocalId,
+                    positionGeometryMethod: BuildingRegistry.Legacy.BuildingUnitPositionGeometryMethod.AppointedByAdministrator,
+                    extendedWkbGeometry: new BuildingRegistry.Legacy.ExtendedWkbGeometry(buildingGeometry.Center.ToString()))
+                .Build();
 
             Assert(new Scenario()
                 .Given(
@@ -107,13 +107,13 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitNotRea
                 .When(command)
                 .Then(
                     new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
-                    new BuildingUnitWasCorrectedFromNotRealizedToPlanned(
-                        command.BuildingPersistentLocalId,
-                        command.BuildingUnitPersistentLocalId)),
+                        new BuildingUnitWasCorrectedFromNotRealizedToPlanned(
+                            command.BuildingPersistentLocalId,
+                            command.BuildingUnitPersistentLocalId)),
                     new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
-                    new BuildingUnitWasCorrectedFromNotRealizedToPlanned(
-                        command.BuildingPersistentLocalId,
-                        new BuildingUnitPersistentLocalId(3)))));
+                        new BuildingUnitWasCorrectedFromNotRealizedToPlanned(
+                            command.BuildingPersistentLocalId,
+                            new BuildingUnitPersistentLocalId(3)))));
         }
 
         [Theory]

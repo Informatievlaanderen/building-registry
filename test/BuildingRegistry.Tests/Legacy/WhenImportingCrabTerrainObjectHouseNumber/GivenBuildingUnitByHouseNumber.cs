@@ -175,7 +175,7 @@ namespace BuildingRegistry.Tests.Legacy.WhenImportingCrabTerrainObjectHouseNumbe
                     _fixture.Create<BuildingWasRegistered>(),
                     _fixture.Create<BuildingUnitWasAdded>()
                         .WithAddressId(AddressId.CreateFor(_fixture.Create<CrabHouseNumberId>())),
-            _fixture.Create<BuildingUnitWasCorrectedToNotRealized>())
+                    _fixture.Create<BuildingUnitWasCorrectedToNotRealized>())
                 .When(importTerrainObjectHouseNumber)
                 .Then(buildingId,
                     //new BuildingVersionWasIncreased(buildingId, new Version(1)),
@@ -279,7 +279,7 @@ namespace BuildingRegistry.Tests.Legacy.WhenImportingCrabTerrainObjectHouseNumbe
                 .Given(buildingId,
                     _fixture.Create<BuildingWasRegistered>(),
                     _fixture.Create<BuildingUnitWasAdded>()
-                            .WithAddressId(AddressId.CreateFor(_fixture.Create<CrabHouseNumberId>())))
+                        .WithAddressId(AddressId.CreateFor(_fixture.Create<CrabHouseNumberId>())))
                 .When(importTerrainObjectHouseNumber)
                 .Then(buildingId,
                     new BuildingUnitWasAdded(buildingId, BuildingUnitId.Create(buildingUnitKey, 1), buildingUnitKey, AddressId.CreateFor(importTerrainObjectHouseNumber.HouseNumberId), new BuildingUnitVersion(importTerrainObjectHouseNumber.Timestamp)),
@@ -305,7 +305,7 @@ namespace BuildingRegistry.Tests.Legacy.WhenImportingCrabTerrainObjectHouseNumbe
                 .Given(buildingId,
                     _fixture.Create<BuildingWasRegistered>(),
                     _fixture.Create<BuildingUnitWasAdded>()
-                            .WithAddressId(AddressId.CreateFor(_fixture.Create<CrabHouseNumberId>())))
+                        .WithAddressId(AddressId.CreateFor(_fixture.Create<CrabHouseNumberId>())))
                 .When(importTerrainObjectHouseNumber)
                 .Then(buildingId,
                     new BuildingUnitWasAdded(buildingId, buildingUnitId, buildingUnitKey, AddressId.CreateFor(importTerrainObjectHouseNumber.HouseNumberId), new BuildingUnitVersion(importTerrainObjectHouseNumber.Timestamp)),
@@ -331,7 +331,7 @@ namespace BuildingRegistry.Tests.Legacy.WhenImportingCrabTerrainObjectHouseNumbe
                 .Given(buildingId,
                     _fixture.Create<BuildingWasRegistered>(),
                     _fixture.Create<BuildingUnitWasAdded>()
-                            .WithAddressId(AddressId.CreateFor(_fixture.Create<CrabHouseNumberId>())))
+                        .WithAddressId(AddressId.CreateFor(_fixture.Create<CrabHouseNumberId>())))
                 .When(importTerrainObjectHouseNumber)
                 .Then(buildingId,
                     new BuildingUnitWasRemoved(buildingId, buildingUnitId),

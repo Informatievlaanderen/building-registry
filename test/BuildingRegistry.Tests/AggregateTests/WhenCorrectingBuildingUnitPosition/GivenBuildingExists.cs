@@ -133,7 +133,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitPositi
                 }
             );
             ((ISetProvenance)buildingWasMigrated).SetProvenance(Fixture.Create<Provenance>());
-                
+
             var buildingGeometry = new BuildingGeometry(new ExtendedWkbGeometry(buildingWasMigrated.ExtendedWkbGeometry),
                 BuildingGeometryMethod.Outlined);
 
@@ -207,13 +207,13 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitPositi
                 .WithPersistentLocalId(buildingUnitPersistentLocalId);
 
             var buildingGeometry = "" +
-                           "<gml:Polygon srsName=\"https://www.opengis.net/def/crs/EPSG/0/31370\" xmlns:gml=\"http://www.opengis.net/gml/3.2\">" +
-                           "<gml:exterior>" +
-                           "<gml:LinearRing>" +
-                           "<gml:posList>140284.15277253836 186724.74131567031 140291.06016454101 186726.38355567306 140288.22675654292 186738.25798767805 140281.19098053873 186736.57913967967 140284.15277253836 186724.74131567031</gml:posList>" +
-                           "</gml:LinearRing>" +
-                           "</gml:exterior>" +
-                           "</gml:Polygon>";
+                                   "<gml:Polygon srsName=\"https://www.opengis.net/def/crs/EPSG/0/31370\" xmlns:gml=\"http://www.opengis.net/gml/3.2\">" +
+                                   "<gml:exterior>" +
+                                   "<gml:LinearRing>" +
+                                   "<gml:posList>140284.15277253836 186724.74131567031 140291.06016454101 186726.38355567306 140288.22675654292 186738.25798767805 140281.19098053873 186736.57913967967 140284.15277253836 186724.74131567031</gml:posList>" +
+                                   "</gml:LinearRing>" +
+                                   "</gml:exterior>" +
+                                   "</gml:Polygon>";
             var buildingWasPlanned = new BuildingWasPlannedV2(
                 Fixture.Create<BuildingPersistentLocalId>(),
                 buildingGeometry.ToExtendedWkbGeometry());
@@ -299,7 +299,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitPositi
                 buildingUnitWasPlannedV2,
                 buildingUnitPositionWasCorrected
             });
-            
+
             building.BuildingUnits.Should().NotBeEmpty();
             building.BuildingUnits.Count.Should().Be(1);
             var buildingUnit = building.BuildingUnits.First();

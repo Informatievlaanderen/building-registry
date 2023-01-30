@@ -69,7 +69,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
                 Fixture.Create<Provenance>(),
                 new Dictionary<string, object?>(),
                 new RealizeBuildingUnitBackOfficeRequest { BuildingUnitPersistentLocalId = buildingUnitPersistentLocalId }
-                ), CancellationToken.None);
+            ), CancellationToken.None);
 
             //Assert
             var stream = await Container.Resolve<IStreamStore>()
@@ -146,7 +146,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
                 Fixture.Create<Provenance>(),
                 new Dictionary<string, object?>(),
                 new RealizeBuildingUnitBackOfficeRequest { BuildingUnitPersistentLocalId = buildingUnitPersistentLocalId }
-                ), CancellationToken.None);
+            ), CancellationToken.None);
 
             //Assert
             ticketing.Verify(x =>
@@ -184,7 +184,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
                 Fixture.Create<Provenance>(),
                 new Dictionary<string, object?>(),
                 new RealizeBuildingUnitBackOfficeRequest { BuildingUnitPersistentLocalId = buildingUnitPersistentLocalId }
-                ), CancellationToken.None);
+            ), CancellationToken.None);
 
             //Assert
             ticketing.Verify(x =>

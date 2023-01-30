@@ -7,7 +7,6 @@ namespace BuildingRegistry.Api.BackOffice
     using Be.Vlaanderen.Basisregisters.Sqs.Requests;
     using FluentValidation;
     using FluentValidation.Results;
-    using Infrastructure.FeatureToggles;
     using Infrastructure.Options;
     using MediatR;
     using Microsoft.AspNetCore.Mvc;
@@ -16,17 +15,14 @@ namespace BuildingRegistry.Api.BackOffice
     public class BuildingRegistryController : ApiController
     {
         protected IMediator Mediator { get; }
-        protected UseSqsToggle UseSqsToggle { get; }
 
         private readonly TicketingOptions _ticketingOptions;
 
         public BuildingRegistryController(
             IMediator mediator,
-            UseSqsToggle useSqsToggle,
             IOptions<TicketingOptions> ticketingOptions)
         {
             Mediator = mediator;
-            UseSqsToggle = useSqsToggle;
             _ticketingOptions = ticketingOptions.Value;
         }
 

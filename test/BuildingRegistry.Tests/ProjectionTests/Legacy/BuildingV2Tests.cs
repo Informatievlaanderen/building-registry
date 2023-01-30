@@ -94,9 +94,9 @@ namespace BuildingRegistry.Tests.ProjectionTests.Legacy
 
             await Sut
                 .Given(new Envelope<BuildingWasPlannedV2>(new Envelope(buildingWasPlannedV2, new Dictionary<string, object>
-                        {
-                            { AddEventHashPipe.HashMetadataKey, buildingWasPlannedV2.GetHash() }
-                        })),
+                    {
+                        { AddEventHashPipe.HashMetadataKey, buildingWasPlannedV2.GetHash() }
+                    })),
                     new Envelope<BuildingUnitWasPlannedV2>(new Envelope(buildingUnitWasPlannedV2, metadata)))
                 .Then(async ct =>
                 {
@@ -202,7 +202,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Legacy
                     new Envelope<BuildingUnitWasPlannedV2>(new Envelope(buildingUnitWasPlannedV2, buildingUnitWasPlannedV2Metadata)),
                     new Envelope<BuildingUnitWasRemovedV2>(new Envelope(buildingUnitWasRemovedV2, buildingUnitWasRemovedV2Metadata)),
                     new Envelope<BuildingUnitRemovalWasCorrected>(new Envelope(buildingUnitRemovalWasCorrected, buildingUnitRemovalWasCorrectedMetadata))
-                    )
+                )
                 .Then(async ct =>
                 {
                     var buildingDetailItemV2 = await ct.BuildingDetailsV2.FindAsync(buildingUnitRemovalWasCorrected.BuildingPersistentLocalId);

@@ -76,7 +76,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenAttachingAddressToBuildingUn
                 buildingWasMigrated,
                 buildingUnitAddressWasAttachedV2
             });
-            
+
 
             sut.BuildingUnits.First().AddressPersistentLocalIds.Should().BeEquivalentTo(new List<AddressPersistentLocalId>{ new AddressPersistentLocalId(buildingUnitAddressWasAttachedV2.AddressPersistentLocalId) });
         }

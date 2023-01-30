@@ -1,7 +1,5 @@
 namespace BuildingRegistry.Api.BackOffice.BuildingUnit
 {
-    using System;
-    using System.Collections.Generic;
     using System.Threading;
     using System.Threading.Tasks;
     using Abstractions.Building.Validators;
@@ -12,17 +10,13 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
     using Be.Vlaanderen.Basisregisters.GrAr.Edit.Validators;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Be.Vlaanderen.Basisregisters.Sqs.Exceptions;
-    using Building;
     using BuildingRegistry.Building.Exceptions;
     using FluentValidation;
-    using FluentValidation.Results;
     using Handlers.Sqs.Requests.BuildingUnit;
-    using Infrastructure.Options;
     using Microsoft.AspNetCore.Authentication.JwtBearer;
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
-    using Microsoft.Extensions.Options;
     using Swashbuckle.AspNetCore.Filters;
 
     public partial class BuildingUnitController
@@ -30,7 +24,6 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
         /// <summary>
         /// Plan een gebouweenheid in.
         /// </summary>
-        /// <param name="options"></param>
         /// <param name="request"></param>
         /// <param name="validator"></param>
         /// <param name="cancellationToken"></param>
@@ -39,13 +32,14 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
         [ProducesResponseType(StatusCodes.Status202Accepted)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-        [SwaggerResponseHeader(StatusCodes.Status202Accepted, "location", "string", "De url van de geplande gebouweenheid.")]
+        [SwaggerResponseHeader(StatusCodes.Status202Accepted, "location", "string",
+            "De url van de geplande gebouweenheid.")]
         [SwaggerRequestExample(typeof(PlanBuildingUnitRequest), typeof(PlanBuildingUnitRequestExamples))]
         [SwaggerResponseExample(StatusCodes.Status400BadRequest, typeof(BadRequestResponseExamples))]
         [SwaggerResponseExample(StatusCodes.Status500InternalServerError, typeof(InternalServerErrorResponseExamples))]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = PolicyNames.GeschetstGebouw.DecentraleBijwerker)]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme,
+            Policy = PolicyNames.GeschetstGebouw.DecentraleBijwerker)]
         public async Task<IActionResult> Plan(
-            [FromServices] IOptions<ResponseOptions> options,
             [FromServices] IValidator<PlanBuildingUnitRequest> validator,
             [FromBody] PlanBuildingUnitRequest request,
             CancellationToken cancellationToken = default)
@@ -54,58 +48,25 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
 
             try
             {
-                if (UseSqsToggle.FeatureEnabled)
-                {
-                    OsloPuriValidator.TryParseIdentifier(request.GebouwId, out var buildingIdentifier);
+                OsloPuriValidator.TryParseIdentifier(request.GebouwId, out var buildingIdentifier);
 
-                    var result = await Mediator.Send(
-                        new PlanBuildingUnitSqsRequest
-                        {
-                            Request = request,
-                            Metadata = GetMetadata(),
-                            ProvenanceData = new ProvenanceData(CreateFakeProvenance()),
-                        }, cancellationToken);
+                var result = await Mediator.Send(
+                    new PlanBuildingUnitSqsRequest
+                    {
+                        Request = request,
+                        Metadata = GetMetadata(),
+                        ProvenanceData = new ProvenanceData(CreateFakeProvenance()),
+                    }, cancellationToken);
 
-                    return Accepted(result);
-                }
-
-                request.Metadata = GetMetadata();
-                var response = await Mediator.Send(request, cancellationToken);
-
-                return new AcceptedWithETagResult(
-                    new Uri(string.Format(options.Value.BuildingUnitDetailUrl, response.BuildingUnitPersistentLocalId)),
-                    response.LastEventHash);
+                return Accepted(result);
             }
-            catch (IdempotencyException)
+            catch (AggregateIdIsNotFoundException)
             {
-                return Accepted();
+                throw new ApiException(ValidationErrorMessages.BuildingUnit.BuildingUnitNotFound, StatusCodes.Status404NotFound);
             }
             catch (AggregateNotFoundException)
             {
-                throw CreateValidationException(
-                    ValidationErrorCodes.BuildingUnit.BuildingNotFound,
-                    nameof(request.GebouwId),
-                    ValidationErrorMessages.BuildingUnit.BuildingInvalid(request.GebouwId));
-            }
-            catch (DomainException exception)
-            {
-                throw exception switch
-                {
-                    BuildingHasInvalidStatusException =>
-                        throw CreateValidationException(
-                            ValidationErrorCodes.BuildingUnit.BuildingUnitCannotBePlanned,
-                            nameof(request.GebouwId),
-                            ValidationErrorMessages.BuildingUnit.BuildingUnitCannotBePlanned),
-
-                    BuildingUnitPositionIsOutsideBuildingGeometryException =>
-                        throw CreateValidationException(
-                            ValidationErrorCodes.BuildingUnit.BuildingUnitOutsideGeometryBuilding,
-                            string.Empty,
-                            ValidationErrorMessages.BuildingUnit.BuildingUnitOutsideGeometryBuilding),
-
-                    _ => new ValidationException(new List<ValidationFailure>
-                        { new ValidationFailure(string.Empty, exception.Message) })
-                };
+                throw new ApiException(ValidationErrorMessages.BuildingUnit.BuildingUnitNotFound, StatusCodes.Status404NotFound);
             }
         }
     }

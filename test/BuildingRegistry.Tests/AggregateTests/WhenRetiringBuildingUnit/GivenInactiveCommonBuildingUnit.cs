@@ -50,7 +50,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRetiringBuildingUnit
                     buildingWasMigrated)
                 .When(command)
                 .Then(new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
-                        new BuildingUnitWasRetiredV2(command.BuildingPersistentLocalId, command.BuildingUnitPersistentLocalId)) ));
+                    new BuildingUnitWasRetiredV2(command.BuildingPersistentLocalId, command.BuildingUnitPersistentLocalId)) ));
         }
     }
 }
