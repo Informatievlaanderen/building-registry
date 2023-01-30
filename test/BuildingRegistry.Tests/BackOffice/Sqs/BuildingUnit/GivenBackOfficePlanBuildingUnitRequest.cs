@@ -47,7 +47,7 @@ namespace BuildingRegistry.Tests.BackOffice.Sqs.BuildingUnit
 
             var sqsRequest = new PlanBuildingUnitSqsRequest
             {
-                Request = new PlanBuildingUnitBackOfficeRequest
+                Request = new PlanBuildingUnitRequest
                 {
                     GebouwId = $"https://data.vlaanderen.be/id/gebouw/{Fixture.Create<BuildingPersistentLocalId>()}"
                 }

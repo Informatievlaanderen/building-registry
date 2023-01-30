@@ -4,11 +4,12 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Requests
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using BuildingRegistry.Building;
     using BuildingRegistry.Building.Commands;
-    using MediatR;
     using Newtonsoft.Json;
 
-    public class RemoveBuildingUnitRequest : RemoveBuildingUnitBackOfficeRequest, IRequest
+    public sealed class RemoveBuildingUnitRequest
     {
+        public int BuildingUnitPersistentLocalId { get; set; }
+
         [JsonIgnore]
         public IDictionary<string, object> Metadata { get; set; }
 

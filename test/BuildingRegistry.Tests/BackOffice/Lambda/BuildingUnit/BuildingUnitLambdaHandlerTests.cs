@@ -39,7 +39,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
                 string.Empty,
                 Fixture.Create<Provenance>(),
                 new Dictionary<string, object?>(),
-                new RealizeBuildingUnitBackOfficeRequest { BuildingUnitPersistentLocalId = 1 }
+                new RealizeBuildingUnitRequest { BuildingUnitPersistentLocalId = 1 }
             );
 
             var sut = new FakeBuildingUnitLambdaHandler(
@@ -68,7 +68,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
                 string.Empty,
                 Fixture.Create<Provenance>(),
                 new Dictionary<string, object?>(),
-                new RealizeBuildingUnitBackOfficeRequest { BuildingUnitPersistentLocalId = 1 }
+                new RealizeBuildingUnitRequest { BuildingUnitPersistentLocalId = 1 }
             );
 
             var sut = new FakeBuildingUnitLambdaHandler(
@@ -101,7 +101,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
                 string.Empty,
                 Fixture.Create<Provenance>(),
                 new Dictionary<string, object?>(),
-                new RealizeBuildingUnitBackOfficeRequest { BuildingUnitPersistentLocalId = 1 }
+                new RealizeBuildingUnitRequest { BuildingUnitPersistentLocalId = 1 }
             );
 
             var sut = new FakeBuildingUnitLambdaHandler(
@@ -134,7 +134,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
                 string.Empty,
                 Fixture.Create<Provenance>(),
                 new Dictionary<string, object?>(),
-                new RealizeBuildingUnitBackOfficeRequest { BuildingUnitPersistentLocalId = 1 }
+                new RealizeBuildingUnitRequest { BuildingUnitPersistentLocalId = 1 }
             );
 
             var sut = new FakeBuildingUnitLambdaHandler(
@@ -181,7 +181,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
                     "Outdated",
                     Fixture.Create<Provenance>(),
                     new Dictionary<string, object?>(),
-                    new RealizeBuildingUnitBackOfficeRequest
+                    new RealizeBuildingUnitRequest
                     {
                         BuildingUnitPersistentLocalId = buildingUnitPersistentLocalId
                     })
@@ -214,7 +214,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
                     string.Empty,
                     Fixture.Create<Provenance>(),
                     new Dictionary<string, object?>(),
-                    new RealizeBuildingUnitBackOfficeRequest { BuildingUnitPersistentLocalId = 1 }
+                    new RealizeBuildingUnitRequest { BuildingUnitPersistentLocalId = 1 }
                 ), CancellationToken.None);
 
             //Assert

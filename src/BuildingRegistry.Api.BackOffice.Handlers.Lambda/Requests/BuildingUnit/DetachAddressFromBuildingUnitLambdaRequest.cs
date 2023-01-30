@@ -1,17 +1,14 @@
 namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Requests.BuildingUnit
 {
-    using Abstractions;
     using BuildingRegistry.Api.BackOffice.Abstractions.Building.Validators;
     using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Requests;
     using BuildingRegistry.Building;
     using BuildingRegistry.Building.Commands;
     using Sqs.Requests.BuildingUnit;
 
-    public sealed record DetachAddressFromBuildingUnitLambdaRequest :
-        BuildingUnitLambdaRequest,
-        IHasBackOfficeRequest<DetachAddressFromBuildingUnitBackOfficeRequest>
+    public sealed record DetachAddressFromBuildingUnitLambdaRequest : BuildingUnitLambdaRequest
     {
-        public DetachAddressFromBuildingUnitBackOfficeRequest Request { get; }
+        public DetachAddressFromBuildingUnitRequest Request { get; }
 
         public int BuildingUnitPersistentLocalId { get; }
 

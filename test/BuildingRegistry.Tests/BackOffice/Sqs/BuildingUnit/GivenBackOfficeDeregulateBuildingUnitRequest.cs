@@ -53,7 +53,7 @@ namespace BuildingRegistry.Tests.BackOffice.Sqs.BuildingUnit
 
             var sqsRequest = new DeregulateBuildingUnitSqsRequest
             {
-                Request = new DeregulateBuildingUnitBackOfficeRequest
+                Request = new DeregulateBuildingUnitRequest
                 {
                     BuildingUnitPersistentLocalId = Fixture.Create<BuildingUnitPersistentLocalId>()
                 }
@@ -86,7 +86,7 @@ namespace BuildingRegistry.Tests.BackOffice.Sqs.BuildingUnit
             var act = async () => await sut.Handle(
                 new DeregulateBuildingUnitSqsRequest
                 {
-                    Request = new DeregulateBuildingUnitBackOfficeRequest
+                    Request = new DeregulateBuildingUnitRequest
                     {
                         BuildingUnitPersistentLocalId = Fixture.Create<BuildingUnitPersistentLocalId>()
                     }

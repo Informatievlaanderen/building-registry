@@ -68,7 +68,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
                     null,
                     Fixture.Create<Provenance>(),
                     new Dictionary<string, object?>(),
-                    new CorrectBuildingUnitPositionBackOfficeRequest
+                    new CorrectBuildingUnitPositionRequest
                     {
                         PositieGeometrieMethode = PositieGeometrieMethode.AfgeleidVanObject
                     }),
@@ -110,7 +110,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
                     null,
                     Fixture.Create<Provenance>(),
                     new Dictionary<string, object?>(),
-                    new CorrectBuildingUnitPositionBackOfficeRequest
+                    new CorrectBuildingUnitPositionRequest
                     {
                         PositieGeometrieMethode = PositieGeometrieMethode.AfgeleidVanObject
                     }),
@@ -153,7 +153,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
                     null,
                     Fixture.Create<Provenance>(),
                     new Dictionary<string, object?>(),
-                    new CorrectBuildingUnitPositionBackOfficeRequest
+                    new CorrectBuildingUnitPositionRequest
                     {
                         PositieGeometrieMethode = PositieGeometrieMethode.AfgeleidVanObject
                     }),
@@ -195,7 +195,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
                     null,
                     Fixture.Create<Provenance>(),
                     new Dictionary<string, object?>(),
-                    new CorrectBuildingUnitPositionBackOfficeRequest
+                    new CorrectBuildingUnitPositionRequest
                     {
                         PositieGeometrieMethode = PositieGeometrieMethode.AfgeleidVanObject
                     }),
@@ -237,7 +237,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
                     null,
                     Fixture.Create<Provenance>(),
                     new Dictionary<string, object?>(),
-                    new CorrectBuildingUnitPositionBackOfficeRequest
+                    new CorrectBuildingUnitPositionRequest
                     {
                         PositieGeometrieMethode = PositieGeometrieMethode.AfgeleidVanObject
                     }),
@@ -283,7 +283,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
                     null,
                     Fixture.Create<Provenance>(),
                     new Dictionary<string, object?>(),
-                    new CorrectBuildingUnitPositionBackOfficeRequest
+                    new CorrectBuildingUnitPositionRequest
                     {
                         PositieGeometrieMethode = PositieGeometrieMethode.AfgeleidVanObject
                     }),

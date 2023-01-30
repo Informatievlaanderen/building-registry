@@ -73,7 +73,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
                 Guid.NewGuid(),
                 Fixture.Create<Provenance>(),
                 new Dictionary<string, object?>(),
-                new PlanBuildingUnitBackOfficeRequest
+                new PlanBuildingUnitRequest
                 {
                     GebouwId = $"https://data.vlaanderen.be/id/gebouw/{buildingPersistentLocalId}",
                     PositieGeometrieMethode = PositieGeometrieMethode.AfgeleidVanObject,
@@ -143,7 +143,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
                 Guid.NewGuid(),
                 Fixture.Create<Provenance>(),
                 new Dictionary<string, object?>(),
-                new PlanBuildingUnitBackOfficeRequest
+                new PlanBuildingUnitRequest
                 {
                     GebouwId = $"https://data.vlaanderen.be/id/gebouw/{buildingPersistentLocalId}",
                     PositieGeometrieMethode = PositieGeometrieMethode.AfgeleidVanObject,
@@ -200,7 +200,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
                 Guid.NewGuid(),
                 Fixture.Create<Provenance>(),
                 new Dictionary<string, object?>(),
-                new PlanBuildingUnitBackOfficeRequest
+                new PlanBuildingUnitRequest
                 {
                     GebouwId = $"https://data.vlaanderen.be/id/gebouw/{buildingPersistentLocalId}",
                     PositieGeometrieMethode = PositieGeometrieMethode.AfgeleidVanObject,
@@ -247,7 +247,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
                 Guid.NewGuid(),
                 Fixture.Create<Provenance>(),
                 new Dictionary<string, object?>(),
-                new PlanBuildingUnitBackOfficeRequest
+                new PlanBuildingUnitRequest
                 {
                     GebouwId = $"https://data.vlaanderen.be/id/gebouw/{buildingPersistentLocalId}",
                     PositieGeometrieMethode = PositieGeometrieMethode.AfgeleidVanObject,

@@ -1,6 +1,5 @@
 namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Requests.Building
 {
-    using Abstractions;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using BuildingRegistry.Api.BackOffice.Abstractions.Building;
     using BuildingRegistry.Api.BackOffice.Abstractions.Building.Requests;
@@ -8,11 +7,9 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Requests.Building
     using BuildingRegistry.Building.Commands;
     using Sqs.Requests.Building;
 
-    public sealed record PlanBuildingLambdaRequest :
-        BuildingLambdaRequest,
-        IHasBackOfficeRequest<PlanBuildingBackOfficeRequest>
+    public sealed record PlanBuildingLambdaRequest : BuildingLambdaRequest
     {
-        public PlanBuildingBackOfficeRequest Request { get; }
+        public PlanBuildingRequest Request { get; }
 
         public PlanBuildingLambdaRequest(string messageGroupId, PlanBuildingSqsRequest sqsRequest)
             : this(
@@ -28,7 +25,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Requests.Building
             Guid ticketId,
             Provenance provenance,
             IDictionary<string, object?> metadata,
-            PlanBuildingBackOfficeRequest request)
+            PlanBuildingRequest request)
             : base(messageGroupId, ticketId, null, provenance, metadata)
         {
             Request = request;

@@ -66,7 +66,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
                     string.Empty,
                     Fixture.Create<Provenance>(),
                     new Dictionary<string, object?>(),
-                    new DeregulateBuildingUnitBackOfficeRequest { BuildingUnitPersistentLocalId = buildingUnitPersistentLocalId }),
+                    new DeregulateBuildingUnitRequest { BuildingUnitPersistentLocalId = buildingUnitPersistentLocalId }),
                 CancellationToken.None);
 
             //Assert
@@ -104,7 +104,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
                 string.Empty,
                 Fixture.Create<Provenance>(),
                 new Dictionary<string, object?>(),
-                new DeregulateBuildingUnitBackOfficeRequest { BuildingUnitPersistentLocalId = buildingUnitPersistentLocalId }
+                new DeregulateBuildingUnitRequest { BuildingUnitPersistentLocalId = buildingUnitPersistentLocalId }
             ), CancellationToken.None);
 
             //Assert
@@ -143,7 +143,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
                 string.Empty,
                 Fixture.Create<Provenance>(),
                 new Dictionary<string, object?>(),
-                new DeregulateBuildingUnitBackOfficeRequest { BuildingUnitPersistentLocalId = buildingUnitPersistentLocalId }
+                new DeregulateBuildingUnitRequest { BuildingUnitPersistentLocalId = buildingUnitPersistentLocalId }
             ), CancellationToken.None);
 
             //Assert
@@ -181,7 +181,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
                 string.Empty,
                 Fixture.Create<Provenance>(),
                 new Dictionary<string, object?>(),
-                new DeregulateBuildingUnitBackOfficeRequest { BuildingUnitPersistentLocalId = buildingUnitPersistentLocalId }
+                new DeregulateBuildingUnitRequest { BuildingUnitPersistentLocalId = buildingUnitPersistentLocalId }
             ), CancellationToken.None);
 
             //Assert
@@ -219,7 +219,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
                 string.Empty,
                 Fixture.Create<Provenance>(),
                 new Dictionary<string, object?>(),
-                new DeregulateBuildingUnitBackOfficeRequest { BuildingUnitPersistentLocalId = buildingUnitPersistentLocalId }
+                new DeregulateBuildingUnitRequest { BuildingUnitPersistentLocalId = buildingUnitPersistentLocalId }
             ), CancellationToken.None);
 
             //Assert

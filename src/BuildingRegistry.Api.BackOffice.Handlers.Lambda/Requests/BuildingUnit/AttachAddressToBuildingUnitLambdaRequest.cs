@@ -1,17 +1,14 @@
 namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Requests.BuildingUnit
 {
-    using Abstractions;
     using BuildingRegistry.Api.BackOffice.Abstractions.Building.Validators;
     using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Requests;
     using BuildingRegistry.Building;
     using BuildingRegistry.Building.Commands;
     using Sqs.Requests.BuildingUnit;
 
-    public sealed record AttachAddressToBuildingUnitLambdaRequest :
-        BuildingUnitLambdaRequest,
-        IHasBackOfficeRequest<AttachAddressToBuildingUnitBackOfficeRequest>
+    public sealed record AttachAddressToBuildingUnitLambdaRequest : BuildingUnitLambdaRequest
     {
-        public AttachAddressToBuildingUnitBackOfficeRequest Request { get; }
+        public AttachAddressToBuildingUnitRequest Request { get; }
 
         public int BuildingUnitPersistentLocalId { get; }
 

@@ -55,7 +55,7 @@ namespace BuildingRegistry.Tests.BackOffice.Sqs.BuildingUnit
             var sqsRequest = new DetachAddressFromBuildingUnitSqsRequest()
             {
                 BuildingUnitPersistentLocalId = Fixture.Create<BuildingUnitPersistentLocalId>(),
-                Request = new DetachAddressFromBuildingUnitBackOfficeRequest()
+                Request = new DetachAddressFromBuildingUnitRequest()
             };
 
             // Act
@@ -86,7 +86,7 @@ namespace BuildingRegistry.Tests.BackOffice.Sqs.BuildingUnit
                 new DetachAddressFromBuildingUnitSqsRequest
                 {
                     BuildingUnitPersistentLocalId = Fixture.Create<BuildingUnitPersistentLocalId>(),
-                    Request = new DetachAddressFromBuildingUnitBackOfficeRequest()
+                    Request = new DetachAddressFromBuildingUnitRequest()
                 }, CancellationToken.None);
 
             // Assert

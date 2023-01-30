@@ -1,16 +1,12 @@
 namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Requests.BuildingUnit
 {
-    using Abstractions;
     using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Requests;
     using BuildingRegistry.Building;
     using BuildingRegistry.Building.Commands;
     using Sqs.Requests.BuildingUnit;
     using IHasBuildingUnitPersistentLocalId = Abstractions.IHasBuildingUnitPersistentLocalId;
 
-    public sealed record CorrectBuildingUnitRegularizationLambdaRequest :
-        BuildingUnitLambdaRequest,
-        IHasBackOfficeRequest<CorrectBuildingUnitRegularizationRequest>,
-        IHasBuildingUnitPersistentLocalId
+    public sealed record CorrectBuildingUnitRegularizationLambdaRequest : BuildingUnitLambdaRequest, IHasBuildingUnitPersistentLocalId
     {
         public CorrectBuildingUnitRegularizationRequest Request { get; }
 

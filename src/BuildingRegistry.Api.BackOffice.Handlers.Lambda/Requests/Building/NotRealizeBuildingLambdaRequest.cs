@@ -1,18 +1,14 @@
 namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Requests.Building
 {
-    using Abstractions;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using BuildingRegistry.Api.BackOffice.Abstractions.Building.Requests;
     using BuildingRegistry.Building;
     using BuildingRegistry.Building.Commands;
     using Sqs.Requests.Building;
 
-    public sealed record NotRealizeBuildingLambdaRequest :
-        BuildingLambdaRequest,
-        IHasBackOfficeRequest<NotRealizeBuildingBackOfficeRequest>,
-        Abstractions.IHasBuildingPersistentLocalId
+    public sealed record NotRealizeBuildingLambdaRequest : BuildingLambdaRequest, Abstractions.IHasBuildingPersistentLocalId
     {
-        public NotRealizeBuildingBackOfficeRequest Request { get; }
+        public NotRealizeBuildingRequest Request { get; }
 
         public int BuildingPersistentLocalId => Request.PersistentLocalId;
 
@@ -32,7 +28,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Requests.Building
             string? ifMatchHeaderValue,
             Provenance provenance,
             IDictionary<string, object?> metadata,
-            NotRealizeBuildingBackOfficeRequest request)
+            NotRealizeBuildingRequest request)
             : base(messageGroupId, ticketId, ifMatchHeaderValue, provenance, metadata)
         {
             Request = request;

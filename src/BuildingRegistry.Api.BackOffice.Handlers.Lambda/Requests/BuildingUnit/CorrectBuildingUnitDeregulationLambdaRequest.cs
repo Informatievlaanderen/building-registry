@@ -1,7 +1,5 @@
 namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Requests.BuildingUnit
 {
-    using Abstractions;
-    using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Requests;
     using BuildingRegistry.Building;
     using BuildingRegistry.Building.Commands;
@@ -10,7 +8,6 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Requests.BuildingUnit
 
     public sealed record CorrectBuildingUnitDeregulationLambdaRequest :
         BuildingUnitLambdaRequest,
-        IHasBackOfficeRequest<CorrectBuildingUnitDeregulationRequest>,
         IHasBuildingUnitPersistentLocalId
     {
         public CorrectBuildingUnitDeregulationRequest Request { get; }

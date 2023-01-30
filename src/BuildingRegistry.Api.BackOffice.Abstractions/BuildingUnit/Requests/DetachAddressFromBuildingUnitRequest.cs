@@ -1,17 +1,24 @@
 namespace BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Requests
 {
     using System.Collections.Generic;
+    using System.Runtime.Serialization;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
-    using Be.Vlaanderen.Basisregisters.Sqs.Responses;
     using BuildingRegistry.Api.BackOffice.Abstractions.Building.Validators;
     using BuildingRegistry.Building;
     using BuildingRegistry.Building.Commands;
-    using MediatR;
     using Newtonsoft.Json;
     using Swashbuckle.AspNetCore.Filters;
 
-    public class DetachAddressFromBuildingUnitRequest : DetachAddressFromBuildingUnitBackOfficeRequest, IRequest<ETagResponse>
+    [DataContract(Name = "OntkoppelAdres", Namespace = "")]
+    public sealed class DetachAddressFromBuildingUnitRequest
     {
+        /// <summary>
+        /// De unieke en persistente identificator van het adres.
+        /// </summary>
+        [DataMember(Name = "AdresId", Order = 0)]
+        [JsonProperty(Required = Required.Always)]
+        public string AdresId { get; set; }
+
         [JsonIgnore]
         public int BuildingUnitPersistentLocalId { get; set; }
 

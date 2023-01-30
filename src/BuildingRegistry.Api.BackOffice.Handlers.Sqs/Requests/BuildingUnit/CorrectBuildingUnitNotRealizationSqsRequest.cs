@@ -1,11 +1,10 @@
 namespace BuildingRegistry.Api.BackOffice.Handlers.Sqs.Requests.BuildingUnit
 {
-    using Abstractions;
     using Be.Vlaanderen.Basisregisters.Sqs.Requests;
     using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Requests;
 
-    public sealed class CorrectBuildingUnitNotRealizationSqsRequest : SqsRequest, IHasBackOfficeRequest<CorrectBuildingUnitNotRealizationBackOfficeRequest>
+    public sealed class CorrectBuildingUnitNotRealizationSqsRequest : SqsRequest
     {
-        public CorrectBuildingUnitNotRealizationBackOfficeRequest Request { get; set; }
+        public CorrectBuildingUnitNotRealizationRequest Request { get; set; }
     }
 }
