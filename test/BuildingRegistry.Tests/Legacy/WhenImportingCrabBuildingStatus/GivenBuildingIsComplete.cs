@@ -35,8 +35,8 @@ namespace BuildingRegistry.Tests.Legacy.WhenImportingCrabBuildingStatus
                         .WithGeometry(new WkbGeometry(GeometryHelper.ValidPolygon.AsBinary())),
                     _fixture.Create<BuildingBecameUnderConstruction>(),
                     _fixture.Create<BuildingBecameComplete>())
-            .When(importStatus)
-            .Then(buildingId,
+                .When(importStatus)
+                .Then(buildingId,
                     new BuildingStatusWasRemoved(buildingId),
                     new BuildingBecameIncomplete(buildingId),
                     importStatus.ToLegacyEvent())

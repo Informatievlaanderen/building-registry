@@ -86,9 +86,9 @@ namespace BuildingRegistry.Tests.ProjectionTests.Migrator
         protected override MigratorProjection CreateProjection()
         {
             var mockDbFactory = new Mock<IDbContextFactory<BackOfficeContext>>();
-                mockDbFactory
-                    .Setup(x => x.CreateDbContextAsync(CancellationToken.None))
-                    .Returns(Task.FromResult<BackOfficeContext>(_fakeBackOfficeContext));
+            mockDbFactory
+                .Setup(x => x.CreateDbContextAsync(CancellationToken.None))
+                .Returns(Task.FromResult<BackOfficeContext>(_fakeBackOfficeContext));
 
             return new MigratorProjection(_logger, mockDbFactory.Object);
         }

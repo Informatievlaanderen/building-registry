@@ -58,7 +58,7 @@ namespace BuildingRegistry.Tests.Legacy.WhenImportingCrabTerrainObjectHouseNumbe
                 .Given(buildingId,
                     _fixture.Create<BuildingWasRegistered>(),
                     _fixture.Create<BuildingWasMeasuredByGrb>()
-                                .WithGeometry(_fixture.Create<WkbGeometry>()),
+                        .WithGeometry(_fixture.Create<WkbGeometry>()),
                     _fixture.Create<BuildingWasNotRealized>()
                         .WithNoRetiredUnits())
                 .When(command)

@@ -18,7 +18,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuilding
     {
         public GivenNoBuildingExists(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
         {
-            
+
         }
 
         [Fact]

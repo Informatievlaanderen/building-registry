@@ -162,7 +162,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
                 Fixture.Create<Provenance>(),
                 new Dictionary<string, object?>(),
                 new RetireBuildingUnitBackOfficeRequest { BuildingUnitPersistentLocalId = buildingUnitPersistentLocalId }
-                ), CancellationToken.None);
+            ), CancellationToken.None);
 
             //Assert
             ticketing.Verify(x =>

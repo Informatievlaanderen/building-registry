@@ -37,7 +37,7 @@ namespace BuildingRegistry.Tests.Legacy.WhenImportingCrabSubaddressStatus
                     _fixture.Create<BuildingUnitWasNotRealized>())
                 .When(importStatus)
                 .Then(buildingId,
-                   importStatus.ToLegacyEvent()));
+                    importStatus.ToLegacyEvent()));
         }
 
         [Theory]

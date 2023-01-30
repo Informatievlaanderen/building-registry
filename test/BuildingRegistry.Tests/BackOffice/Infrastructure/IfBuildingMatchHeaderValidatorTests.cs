@@ -46,10 +46,10 @@ namespace BuildingRegistry.Tests.BackOffice.Infrastructure
             var sut = new IfMatchHeaderValidator(Container.Resolve<IBuildings>(), _backOfficeContext);
 
             // Act
-           var result = await sut.IsValidForBuilding(validEtag.ToString(), buildingPersistentLocalId, CancellationToken.None);
+            var result = await sut.IsValidForBuilding(validEtag.ToString(), buildingPersistentLocalId, CancellationToken.None);
 
-           // Assert
-           result.Should().BeTrue();
+            // Assert
+            result.Should().BeTrue();
         }
 
         [Fact]

@@ -325,5 +325,4 @@ namespace BuildingRegistry.Tests.Legacy.Cases
             Assert(DeleteRelationWithHouseNr17());
         }
     }
-
 }

@@ -1,7 +1,5 @@
 namespace BuildingRegistry.Api.BackOffice.BuildingUnit
 {
-    using System;
-    using System.Collections.Generic;
     using System.Threading;
     using System.Threading.Tasks;
     using Abstractions.Building.Validators;
@@ -12,19 +10,15 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Be.Vlaanderen.Basisregisters.Sqs.Exceptions;
-    using Building;
     using BuildingRegistry.Building;
     using BuildingRegistry.Building.Exceptions;
     using FluentValidation;
-    using FluentValidation.Results;
     using Handlers.Sqs.Requests.BuildingUnit;
     using Infrastructure;
-    using Infrastructure.Options;
     using Microsoft.AspNetCore.Authentication.JwtBearer;
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
-    using Microsoft.Extensions.Options;
     using Swashbuckle.AspNetCore.Filters;
 
     public partial class BuildingUnitController
@@ -32,7 +26,6 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
         /// <summary>
         /// Corrigeer de positie van een gebouweenheid.
         /// </summary>
-        /// <param name="options"></param>
         /// <param name="ifMatchHeaderValidator"></param>
         /// <param name="validator"></param>
         /// <param name="buildingUnitPersistentLocalId"></param>
@@ -50,7 +43,6 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
         [SwaggerResponseExample(StatusCodes.Status500InternalServerError, typeof(InternalServerErrorResponseExamples))]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = PolicyNames.GeschetstGebouw.DecentraleBijwerker)]
         public async Task<IActionResult> CorrectPosition(
-            [FromServices] IOptions<ResponseOptions> options,
             [FromServices] IIfMatchHeaderValidator ifMatchHeaderValidator,
             [FromServices] IValidator<CorrectBuildingUnitPositionRequest> validator,
             [FromRoute] int buildingUnitPersistentLocalId,
@@ -70,76 +62,29 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
                     return new PreconditionFailedResult();
                 }
 
-                if (UseSqsToggle.FeatureEnabled)
-                {
-                    var result = await Mediator.Send(
-                        new CorrectBuildingUnitPositionSqsRequest()
-                        {
-                            BuildingUnitPersistentLocalId = request.BuildingUnitPersistentLocalId,
-                            Request = request,
-                            Metadata = GetMetadata(),
-                            ProvenanceData = new ProvenanceData(CreateFakeProvenance()),
-                            IfMatchHeaderValue = ifMatchHeaderValue
-                        }, ct);
+                var result = await Mediator.Send(
+                    new CorrectBuildingUnitPositionSqsRequest()
+                    {
+                        BuildingUnitPersistentLocalId = request.BuildingUnitPersistentLocalId,
+                        Request = request,
+                        Metadata = GetMetadata(),
+                        ProvenanceData = new ProvenanceData(CreateFakeProvenance()),
+                        IfMatchHeaderValue = ifMatchHeaderValue
+                    }, ct);
 
-                    return Accepted(result);
-                }
-
-                request.Metadata = GetMetadata();
-                var response = await Mediator.Send(request, ct);
-
-                return new AcceptedWithETagResult(
-                    new Uri(string.Format(options.Value.BuildingUnitDetailUrl, request.BuildingUnitPersistentLocalId)),
-                    response.ETag);
+                return Accepted(result);
             }
             catch (AggregateIdIsNotFoundException)
             {
                 throw new ApiException(ValidationErrorMessages.BuildingUnit.BuildingUnitNotFound, StatusCodes.Status404NotFound);
             }
-            catch (IdempotencyException)
-            {
-                return Accepted();
-            }
             catch (AggregateNotFoundException)
             {
-                throw CreateValidationException(
-                    ValidationErrorCodes.BuildingUnit.BuildingNotFound,
-                    string.Empty,
-                    ValidationErrorMessages.BuildingUnit.BuildingNotFound);
+                throw new ApiException(ValidationErrorMessages.BuildingUnit.BuildingUnitNotFound, StatusCodes.Status404NotFound);
             }
-            catch (DomainException exception)
+            catch (BuildingUnitIsNotFoundException)
             {
-                throw exception switch
-                {
-                    BuildingUnitIsNotFoundException => new ApiException(ValidationErrorMessages.BuildingUnit.BuildingUnitNotFound, StatusCodes.Status404NotFound),
-
-                    BuildingUnitIsRemovedException => new ApiException(ValidationErrorMessages.BuildingUnit.BuildingUnitIsRemoved, StatusCodes.Status410Gone),
-
-                    BuildingHasInvalidStatusException =>
-                        throw CreateValidationException(
-                            ValidationErrorCodes.BuildingUnit.BuildingStatusIsNotPlannedUnderConstructionOrRealized,
-                            string.Empty,
-                            ValidationErrorMessages.BuildingUnit.BuildingStatusIsNotPlannedUnderConstructionOrRealized),
-
-                    BuildingUnitHasInvalidFunctionException => CreateValidationException(
-                        ValidationErrorCodes.BuildingUnit.BuildingUnitHasInvalidFunction,
-                        string.Empty,
-                        ValidationErrorMessages.BuildingUnit.BuildingUnitHasInvalidFunction),
-
-                    BuildingUnitHasInvalidStatusException => CreateValidationException(
-                        ValidationErrorCodes.BuildingUnit.BuildingUnitPositionCannotBeCorrected,
-                        string.Empty,
-                        ValidationErrorMessages.BuildingUnit.BuildingUnitPositionCannotBeCorrected),
-
-                    BuildingUnitPositionIsOutsideBuildingGeometryException =>
-                        throw CreateValidationException(
-                            ValidationErrorCodes.BuildingUnit.BuildingUnitOutsideGeometryBuilding,
-                            string.Empty,
-                            ValidationErrorMessages.BuildingUnit.BuildingUnitOutsideGeometryBuilding),
-
-                    _ => new ValidationException(new List<ValidationFailure>
-                        { new ValidationFailure(string.Empty, exception.Message) })
-                };
+                throw new ApiException(ValidationErrorMessages.BuildingUnit.BuildingUnitNotFound, StatusCodes.Status404NotFound);
             }
         }
     }

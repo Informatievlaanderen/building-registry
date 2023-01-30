@@ -50,12 +50,12 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuildingUnit
                 .When(command)
                 .Then(new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
                     new BuildingUnitWasPlannedV2(
-                    command.BuildingPersistentLocalId,
-                    command.BuildingUnitPersistentLocalId,
-                    command.PositionGeometryMethod,
-                    buildingGeometry.Center,
-                    command.Function,
-                    false))));
+                        command.BuildingPersistentLocalId,
+                        command.BuildingUnitPersistentLocalId,
+                        command.PositionGeometryMethod,
+                        buildingGeometry.Center,
+                        command.Function,
+                        false))));
         }
     }
 }

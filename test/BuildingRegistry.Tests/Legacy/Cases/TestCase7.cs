@@ -13,17 +13,17 @@ namespace BuildingRegistry.Tests.Legacy.Cases
     using Xunit;
     using Xunit.Abstractions;
 
-    //https://vlaamseoverheid.atlassian.net/browse/GRAR-355
+//https://vlaamseoverheid.atlassian.net/browse/GRAR-355
     public class TestCase7Bug : AutofacBasedTest
     {
         //only covers building 1
         public TestCase7Bug(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
         {
             Fixture = new Fixture()
-                    .Customize(new InfrastructureCustomization())
-                    .Customize(new WithNoDeleteModification())
-                    .Customize(new WithInfiniteLifetime())
-                    .Customize(new WithFixedBuildingUnitIdFromHouseNumber(1, 16));
+                .Customize(new InfrastructureCustomization())
+                .Customize(new WithNoDeleteModification())
+                .Customize(new WithInfiniteLifetime())
+                .Customize(new WithFixedBuildingUnitIdFromHouseNumber(1, 16));
 
             _ = new TestCase7Data(Fixture);
         }

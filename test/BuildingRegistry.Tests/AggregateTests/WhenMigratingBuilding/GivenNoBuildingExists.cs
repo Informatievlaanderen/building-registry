@@ -35,7 +35,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenMigratingBuilding
                         command.BuildingGeometry,
                         command.IsRemoved,
                         command.BuildingUnits
-                        ))));
+                    ))));
         }
 
         [Fact]

@@ -1,7 +1,6 @@
 namespace BuildingRegistry.Api.BackOffice.BuildingUnit
 {
     using Be.Vlaanderen.Basisregisters.Api;
-    using Infrastructure.FeatureToggles;
     using Infrastructure.Options;
     using MediatR;
     using Microsoft.AspNetCore.Mvc;
@@ -15,8 +14,7 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
     {
         public BuildingUnitController(
             IMediator mediator,
-            UseSqsToggle useSqsToggle,
-            IOptions<TicketingOptions> ticketingOptions) : base(mediator, useSqsToggle, ticketingOptions)
+            IOptions<TicketingOptions> ticketingOptions) : base(mediator, ticketingOptions)
         { }
     }
 }

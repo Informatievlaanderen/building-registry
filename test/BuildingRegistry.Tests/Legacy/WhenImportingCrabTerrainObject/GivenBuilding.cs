@@ -33,7 +33,7 @@ namespace BuildingRegistry.Tests.Legacy.WhenImportingCrabTerrainObject
 
             Assert(new Scenario()
                 .Given(buildingId,
-                       _fixture.Create<BuildingWasRegistered>())
+                    _fixture.Create<BuildingWasRegistered>())
                 .When(command)
                 .Then(buildingId,
                     new BuildingWasRemoved(buildingId, new List<BuildingUnitId>()),

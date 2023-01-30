@@ -56,11 +56,11 @@ namespace BuildingRegistry.Tests.Legacy.WhenReaddressingSubaddress
         public GivenPositionAfterReaddressSubaddress(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
         {
             Fixture = new Fixture()
-                    .Customize(new InfrastructureCustomization())
-                    .Customize(new WithNoDeleteModification())
-                    .Customize(new WithInfiniteLifetime())
-                    .Customize(new WithValidPolygon())
-                    .Customize(new WithFixedBuildingUnitIdFromHouseNumber(1, 16));
+                .Customize(new InfrastructureCustomization())
+                .Customize(new WithNoDeleteModification())
+                .Customize(new WithInfiniteLifetime())
+                .Customize(new WithValidPolygon())
+                .Customize(new WithFixedBuildingUnitIdFromHouseNumber(1, 16));
 
             Gebouw1CrabTerrainObjectId = Fixture.Create<CrabTerrainObjectId>();
             HuisNr16KoppelingId = Fixture.Create<CrabTerrainObjectHouseNumberId>();

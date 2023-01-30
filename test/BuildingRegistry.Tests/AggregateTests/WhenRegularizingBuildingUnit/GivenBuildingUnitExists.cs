@@ -177,7 +177,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRegularizingBuildingUnit
                 Fixture.Create<BuildingId>(),
                 command.BuildingPersistentLocalId,
                 Fixture.Create<BuildingPersistentLocalIdAssignmentDate>(),
-                BuildingStatus.Parse(status), 
+                BuildingStatus.Parse(status),
                 Fixture.Create<BuildingGeometry>(),
                 isRemoved: false,
                 new List<BuildingUnit>

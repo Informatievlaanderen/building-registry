@@ -64,10 +64,10 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRetiringBuildingUnit
                     buildingUnitAddressWasAttachedV2)
                 .When(command)
                 .Then(new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
-                    new BuildingUnitAddressWasDetachedV2(
-                        command.BuildingPersistentLocalId,
-                        command.BuildingUnitPersistentLocalId,
-                        new AddressPersistentLocalId(buildingUnitAddressWasAttachedV2.AddressPersistentLocalId))),
+                        new BuildingUnitAddressWasDetachedV2(
+                            command.BuildingPersistentLocalId,
+                            command.BuildingUnitPersistentLocalId,
+                            new AddressPersistentLocalId(buildingUnitAddressWasAttachedV2.AddressPersistentLocalId))),
                     new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
                         new BuildingUnitWasRetiredV2(command.BuildingPersistentLocalId, command.BuildingUnitPersistentLocalId))));
         }
@@ -174,15 +174,15 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRetiringBuildingUnit
                 isRemoved: false,
                 new List<BuildingUnit>
                 {
-                        new BuildingUnit(
-                            Fixture.Create<BuildingRegistry.Legacy.BuildingUnitId>(),
-                            Fixture.Create<BuildingRegistry.Legacy.PersistentLocalId>(),
-                            Fixture.Create<BuildingUnitFunction>(),
-                            BuildingRegistry.Legacy.BuildingUnitStatus.Planned,
-                            new List<AddressPersistentLocalId>(),
-                            Fixture.Create<BuildingRegistry.Legacy.BuildingUnitPosition>(),
-                            Fixture.Create<BuildingRegistry.Legacy.BuildingGeometry>(),
-                            isRemoved: true)
+                    new BuildingUnit(
+                        Fixture.Create<BuildingRegistry.Legacy.BuildingUnitId>(),
+                        Fixture.Create<BuildingRegistry.Legacy.PersistentLocalId>(),
+                        Fixture.Create<BuildingUnitFunction>(),
+                        BuildingRegistry.Legacy.BuildingUnitStatus.Planned,
+                        new List<AddressPersistentLocalId>(),
+                        Fixture.Create<BuildingRegistry.Legacy.BuildingUnitPosition>(),
+                        Fixture.Create<BuildingRegistry.Legacy.BuildingGeometry>(),
+                        isRemoved: true)
                 }
             );
             ((ISetProvenance)buildingWasMigrated).SetProvenance(Fixture.Create<Provenance>());

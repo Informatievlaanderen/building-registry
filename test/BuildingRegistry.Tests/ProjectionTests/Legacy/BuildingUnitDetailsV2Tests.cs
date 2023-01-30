@@ -199,7 +199,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Legacy
                         new Envelope(
                             @event,
                             new Dictionary<string, object> { { AddEventHashPipe.HashMetadataKey, @event.GetHash() }
-                })))
+                            })))
                 .Then(async ct =>
                 {
                     var item = await ct.BuildingUnitDetailsV2.FindAsync(@event.BuildingUnitPersistentLocalId);
@@ -229,7 +229,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Legacy
                         new Envelope(
                             @event,
                             new Dictionary<string, object> { { AddEventHashPipe.HashMetadataKey, @event.GetHash() }
-                })))
+                            })))
                 .Then(async ct =>
                 {
                     var item = await ct.BuildingUnitDetailsV2.FindAsync(@event.BuildingUnitPersistentLocalId);
@@ -252,17 +252,17 @@ namespace BuildingRegistry.Tests.ProjectionTests.Legacy
 
             await Sut
                 .Given(new Envelope<BuildingUnitWasPlannedV2>(new Envelope(buildingUnitWasPlannedV2, new Dictionary<string, object>
-                {
-                    { AddEventHashPipe.HashMetadataKey, buildingUnitWasPlannedV2.GetHash() }
-                })),
+                    {
+                        { AddEventHashPipe.HashMetadataKey, buildingUnitWasPlannedV2.GetHash() }
+                    })),
                     new Envelope<BuildingUnitWasRealizedV2>(new Envelope(buildingUnitWasRealizedV2, new Dictionary<string, object>
-                {
-                    { AddEventHashPipe.HashMetadataKey, buildingUnitWasRealizedV2.GetHash() }
-                })),
+                    {
+                        { AddEventHashPipe.HashMetadataKey, buildingUnitWasRealizedV2.GetHash() }
+                    })),
                     new Envelope<BuildingUnitWasCorrectedFromRealizedToPlanned>(new Envelope(@event, new Dictionary<string, object>
-                {
-                    { AddEventHashPipe.HashMetadataKey, @event.GetHash() }
-                })))
+                    {
+                        { AddEventHashPipe.HashMetadataKey, @event.GetHash() }
+                    })))
                 .Then(async ct =>
                 {
                     var item = await ct.BuildingUnitDetailsV2.FindAsync(@event.BuildingUnitPersistentLocalId);
@@ -475,10 +475,10 @@ namespace BuildingRegistry.Tests.ProjectionTests.Legacy
 
 
             var @event = new BuildingUnitPositionWasCorrected(
-               new BuildingPersistentLocalId(buildingUnitWasPlannedV2.BuildingPersistentLocalId),
+                new BuildingPersistentLocalId(buildingUnitWasPlannedV2.BuildingPersistentLocalId),
                 new BuildingUnitPersistentLocalId(buildingUnitWasPlannedV2.BuildingUnitPersistentLocalId),
                 BuildingUnitPositionGeometryMethod.Parse("AppointedByAdministrator"),
-               new ExtendedWkbGeometry(GeometryHelper.ValidPointInPolygon.AsBinary()));
+                new ExtendedWkbGeometry(GeometryHelper.ValidPointInPolygon.AsBinary()));
             ((ISetProvenance)@event).SetProvenance(_fixture.Create<Provenance>());
 
             await Sut
@@ -487,7 +487,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Legacy
                         new Envelope(
                             buildingUnitWasPlannedV2,
                             new Dictionary<string, object> { { AddEventHashPipe.HashMetadataKey, buildingUnitWasPlannedV2.GetHash() } })),
-                  new Envelope<BuildingUnitPositionWasCorrected>(
+                    new Envelope<BuildingUnitPositionWasCorrected>(
                         new Envelope(
                             @event,
                             new Dictionary<string, object> { { AddEventHashPipe.HashMetadataKey, @event.GetHash() } })))
@@ -516,7 +516,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Legacy
 
 
             var @event = new BuildingUnitWasRemovedV2(
-               new BuildingPersistentLocalId(buildingUnitWasPlannedV2.BuildingPersistentLocalId),
+                new BuildingPersistentLocalId(buildingUnitWasPlannedV2.BuildingPersistentLocalId),
                 new BuildingUnitPersistentLocalId(buildingUnitWasPlannedV2.BuildingUnitPersistentLocalId));
             ((ISetProvenance)@event).SetProvenance(_fixture.Create<Provenance>());
 
@@ -526,7 +526,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Legacy
                         new Envelope(
                             buildingUnitWasPlannedV2,
                             new Dictionary<string, object> { { AddEventHashPipe.HashMetadataKey, buildingUnitWasPlannedV2.GetHash() } })),
-                  new Envelope<BuildingUnitWasRemovedV2>(
+                    new Envelope<BuildingUnitWasRemovedV2>(
                         new Envelope(
                             @event,
                             new Dictionary<string, object> { { AddEventHashPipe.HashMetadataKey, @event.GetHash() } })))
@@ -557,7 +557,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Legacy
                         new Envelope(
                             buildingUnitWasPlannedV2,
                             new Dictionary<string, object> { { AddEventHashPipe.HashMetadataKey, buildingUnitWasPlannedV2.GetHash() } })),
-                  new Envelope<BuildingUnitWasRemovedBecauseBuildingWasRemoved>(
+                    new Envelope<BuildingUnitWasRemovedBecauseBuildingWasRemoved>(
                         new Envelope(
                             @event,
                             new Dictionary<string, object> { { AddEventHashPipe.HashMetadataKey, @event.GetHash() } })))
@@ -586,11 +586,11 @@ namespace BuildingRegistry.Tests.ProjectionTests.Legacy
                         new Envelope(
                             buildingUnitWasPlannedV2,
                             new Dictionary<string, object> { { AddEventHashPipe.HashMetadataKey, buildingUnitWasPlannedV2.GetHash() } })),
-                  new Envelope<BuildingUnitWasRemovedV2>(
+                    new Envelope<BuildingUnitWasRemovedV2>(
                         new Envelope(
                             buildingUnitWasRemovedV2,
                             new Dictionary<string, object> { { AddEventHashPipe.HashMetadataKey, buildingUnitWasRemovedV2.GetHash() } })),
-                  new Envelope<BuildingUnitRemovalWasCorrected>(
+                    new Envelope<BuildingUnitRemovalWasCorrected>(
                         new Envelope(
                             @event,
                             new Dictionary<string, object> { { AddEventHashPipe.HashMetadataKey, @event.GetHash() } })))

@@ -20,10 +20,10 @@ namespace BuildingRegistry.Tests.Legacy.Cases
         public CaseMultipleGeometries(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
         {
             Fixture = new Fixture()
-                .Customize(new InfrastructureCustomization())
-                .Customize(new WithNoDeleteModification())
-                .Customize(new WithInfiniteLifetime())
-                .Customize(new WithFixedBuildingUnitIdFromHouseNumber(1, 16))
+                    .Customize(new InfrastructureCustomization())
+                    .Customize(new WithNoDeleteModification())
+                    .Customize(new WithInfiniteLifetime())
+                    .Customize(new WithFixedBuildingUnitIdFromHouseNumber(1, 16))
                 ;
 
             _ = new TestCase1AData(Fixture);
@@ -67,11 +67,11 @@ namespace BuildingRegistry.Tests.Legacy.Cases
         public IEventCentricTestSpecificationBuilder RetireGeometry()
         {
             var buildingGeometryFromCrab = Fixture.Create<ImportBuildingGeometryFromCrab>()
-                    .WithBuildingGeometryId(new CrabBuildingGeometryId(1))
-                    .WithGeometry(new WkbGeometry(GeometryHelper.ValidPolygon.AsBinary()))
-                    .WithGeometryMethod(CrabBuildingGeometryMethod.Grb)
-                    .WithLifetime(new CrabLifetime(_.FromDateGeometry1, _.ToDateGeometry1))
-                    .WithTimestamp(new CrabTimestamp(Instant.FromDateTimeOffset(DateTimeOffset.Now.AddDays(1)))); ;
+                .WithBuildingGeometryId(new CrabBuildingGeometryId(1))
+                .WithGeometry(new WkbGeometry(GeometryHelper.ValidPolygon.AsBinary()))
+                .WithGeometryMethod(CrabBuildingGeometryMethod.Grb)
+                .WithLifetime(new CrabLifetime(_.FromDateGeometry1, _.ToDateGeometry1))
+                .WithTimestamp(new CrabTimestamp(Instant.FromDateTimeOffset(DateTimeOffset.Now.AddDays(1)))); ;
 
             return new AutoFixtureScenario(Fixture)
                 .Given(AddGeometry())

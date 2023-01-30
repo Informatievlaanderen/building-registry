@@ -243,7 +243,7 @@ namespace BuildingRegistry.Tests.Legacy.Cases
         [Fact]
         public void TestT5()
         {
-           //irrelevant
+            //irrelevant
         }
 
         [Fact]

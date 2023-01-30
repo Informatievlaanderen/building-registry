@@ -94,17 +94,17 @@ namespace BuildingRegistry.Tests.Extensions
                         : _fixture.Create<BuildingUnitPosition>();
 
             _buildingUnits.Add(
-                    new BuildingUnit(
-                        _fixture.Create<BuildingUnitId>(),
-                        buildingUnitPersistentLocalId is not null
-                            ? new PersistentLocalId(buildingUnitPersistentLocalId)
-                            : _fixture.Create<PersistentLocalId>(),
-                        function ?? BuildingUnitFunction.Unknown,
-                        status,
-                        attachedAddresses ?? new List<AddressPersistentLocalId>(),
-                            buildingUnitPosition,
-                        buildingGeometry,
-                        isRemoved));
+                new BuildingUnit(
+                    _fixture.Create<BuildingUnitId>(),
+                    buildingUnitPersistentLocalId is not null
+                        ? new PersistentLocalId(buildingUnitPersistentLocalId)
+                        : _fixture.Create<PersistentLocalId>(),
+                    function ?? BuildingUnitFunction.Unknown,
+                    status,
+                    attachedAddresses ?? new List<AddressPersistentLocalId>(),
+                    buildingUnitPosition,
+                    buildingGeometry,
+                    isRemoved));
 
             return this;
         }

@@ -23,10 +23,10 @@ namespace BuildingRegistry.Tests.Legacy.WhenReaddressingSubaddress
         public DeleteSubaddressOnReaddressedHouseNumber(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
         {
             Fixture = new Fixture()
-                .Customize(new InfrastructureCustomization())
-                .Customize(new WithNoDeleteModification())
-                .Customize(new WithInfiniteLifetime())
-                .Customize(new WithFixedBuildingUnitIdFromHouseNumber(1, 16))
+                    .Customize(new InfrastructureCustomization())
+                    .Customize(new WithNoDeleteModification())
+                    .Customize(new WithInfiniteLifetime())
+                    .Customize(new WithFixedBuildingUnitIdFromHouseNumber(1, 16))
                 ;
 
             _ = new TestCase1AData(Fixture);

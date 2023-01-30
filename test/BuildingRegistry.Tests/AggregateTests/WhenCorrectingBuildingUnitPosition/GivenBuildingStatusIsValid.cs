@@ -56,10 +56,10 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitPositi
                 .When(command)
                 .Then(new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
                     new BuildingUnitPositionWasCorrected(
-                    command.BuildingPersistentLocalId,
-                    command.BuildingUnitPersistentLocalId,
-                    command.PositionGeometryMethod,
-                    buildingGeometry.Center))));
+                        command.BuildingPersistentLocalId,
+                        command.BuildingUnitPersistentLocalId,
+                        command.PositionGeometryMethod,
+                        buildingGeometry.Center))));
         }
     }
 }

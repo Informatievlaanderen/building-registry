@@ -211,11 +211,11 @@ namespace BuildingRegistry.Tests.ProjectionTests.Consumer.Address
             AddRelations(456, 456);
 
             Given(@event);
-             await Then(async _ =>
-                {
-                    _mockCommandHandler.Verify(x => x.Handle(It.IsAny<DetachAddressFromBuildingUnitBecauseAddressWasRemoved>(), CancellationToken.None), Times.Exactly(2));
-                    await Task.CompletedTask;
-                });
+            await Then(async _ =>
+            {
+                _mockCommandHandler.Verify(x => x.Handle(It.IsAny<DetachAddressFromBuildingUnitBecauseAddressWasRemoved>(), CancellationToken.None), Times.Exactly(2));
+                await Task.CompletedTask;
+            });
         }
 
         [Fact]

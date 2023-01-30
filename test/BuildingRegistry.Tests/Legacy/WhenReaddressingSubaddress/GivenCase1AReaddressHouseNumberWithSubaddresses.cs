@@ -16,7 +16,7 @@ namespace BuildingRegistry.Tests.Legacy.WhenReaddressingSubaddress
     using Xunit;
     using Xunit.Abstractions;
 
-    //TODO: fix test collision id's
+//TODO: fix test collision id's
     public class GivenCase1AReaddressHouseNumberWithSubaddresses : AutofacBasedTest
     {
         public GivenCase1AReaddressHouseNumberWithSubaddresses(ITestOutputHelper testOutputHelper) : base(testOutputHelper)

@@ -176,16 +176,16 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
 
             // Act
             await sut.Handle(new RealizeBuildingUnitLambdaRequest(
-                buildingPersistentLocalId.ToString(),
-                Guid.NewGuid(),
-                "Outdated",
-                Fixture.Create<Provenance>(),
-                new Dictionary<string, object?>(),
-                new RealizeBuildingUnitBackOfficeRequest
-                {
-                    BuildingUnitPersistentLocalId = buildingUnitPersistentLocalId
-                })
-            , CancellationToken.None);
+                    buildingPersistentLocalId.ToString(),
+                    Guid.NewGuid(),
+                    "Outdated",
+                    Fixture.Create<Provenance>(),
+                    new Dictionary<string, object?>(),
+                    new RealizeBuildingUnitBackOfficeRequest
+                    {
+                        BuildingUnitPersistentLocalId = buildingUnitPersistentLocalId
+                    })
+                , CancellationToken.None);
 
             //Assert
             ticketing.Verify(x =>
@@ -215,7 +215,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
                     Fixture.Create<Provenance>(),
                     new Dictionary<string, object?>(),
                     new RealizeBuildingUnitBackOfficeRequest { BuildingUnitPersistentLocalId = 1 }
-                    ), CancellationToken.None);
+                ), CancellationToken.None);
 
             //Assert
             idempotentCommandHandler

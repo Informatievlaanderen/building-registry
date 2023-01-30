@@ -20,13 +20,13 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
     using Swashbuckle.AspNetCore.Filters;
     using System.Threading;
     using System.Threading.Tasks;
+    using Be.Vlaanderen.Basisregisters.AggregateSource;
 
     public partial class BuildingUnitController
     {
         /// <summary>
         /// Corrigeer de regularisatie van een gebouweenheid.
         /// </summary>
-        /// <param name="options"></param>
         /// <param name="ifMatchHeaderValidator"></param>
         /// <param name="request"></param>
         /// <param name="ifMatchHeaderValue"></param>
@@ -41,7 +41,6 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
         [SwaggerResponseExample(StatusCodes.Status500InternalServerError, typeof(InternalServerErrorResponseExamples))]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = PolicyNames.GeschetstGebouw.DecentraleBijwerker)]
         public async Task<IActionResult> CorrectRegularization(
-            [FromServices] IOptions<ResponseOptions> options,
             [FromServices] IIfMatchHeaderValidator ifMatchHeaderValidator,
             [FromRoute] CorrectBuildingUnitRegularizationRequest request,
             [FromHeader(Name = "If-Match")] string? ifMatchHeaderValue,
@@ -67,6 +66,10 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
                 return Accepted(result);
             }
             catch (AggregateIdIsNotFoundException)
+            {
+                throw new ApiException(ValidationErrorMessages.BuildingUnit.BuildingUnitNotFound, StatusCodes.Status404NotFound);
+            }
+            catch (AggregateNotFoundException)
             {
                 throw new ApiException(ValidationErrorMessages.BuildingUnit.BuildingUnitNotFound, StatusCodes.Status404NotFound);
             }

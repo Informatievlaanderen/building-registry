@@ -114,7 +114,7 @@ namespace BuildingRegistry.Tests.Legacy.Cases
 
             _building.ImportSubaddressStatusFromCrab(importSubaddressStatusFromCrab.TerrainObjectId,
 
-            importSubaddressStatusFromCrab.TerrainObjectHouseNumberId,
+                importSubaddressStatusFromCrab.TerrainObjectHouseNumberId,
                 importSubaddressStatusFromCrab.SubaddressStatusId,
                 importSubaddressStatusFromCrab.SubaddressId,
                 importSubaddressStatusFromCrab.SubaddressStatus,
@@ -207,7 +207,7 @@ namespace BuildingRegistry.Tests.Legacy.Cases
 
             _building.ImportSubaddressStatusFromCrab(importSubaddressStatusFromCrab.TerrainObjectId,
 
-            importSubaddressStatusFromCrab.TerrainObjectHouseNumberId,
+                importSubaddressStatusFromCrab.TerrainObjectHouseNumberId,
                 importSubaddressStatusFromCrab.SubaddressStatusId,
                 importSubaddressStatusFromCrab.SubaddressId,
                 importSubaddressStatusFromCrab.SubaddressStatus,

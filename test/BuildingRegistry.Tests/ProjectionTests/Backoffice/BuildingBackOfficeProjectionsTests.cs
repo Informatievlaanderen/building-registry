@@ -1,16 +1,16 @@
-﻿namespace BuildingRegistry.Tests.ProjectionTests.BackOffice
+﻿namespace BuildingRegistry.Tests.ProjectionTests.Backoffice
 {
     using System;
     using System.Threading;
     using System.Threading.Tasks;
     using AutoFixture;
-    using Building;
-    using Building.Events;
-    using Fixtures;
+    using BuildingRegistry.Building;
+    using BuildingRegistry.Building.Events;
+    using BuildingRegistry.Tests.BackOffice;
+    using BuildingRegistry.Tests.Fixtures;
+    using BuildingRegistry.Tests.Legacy.Autofixture;
     using FluentAssertions;
     using Moq;
-    using Tests.BackOffice;
-    using Tests.Legacy.Autofixture;
     using Xunit;
 
     public class BuildingBackOfficeProjectionsTests : BuildingBackOfficeProjectionsTest

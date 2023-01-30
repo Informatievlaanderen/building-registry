@@ -5,11 +5,9 @@ namespace BuildingRegistry.Tests.BackOffice.Builders
     using AutoFixture;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Building;
-    using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Extensions;
     using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Requests;
     using BuildingRegistry.Api.BackOffice.Handlers.Lambda.Requests.BuildingUnit;
     using BuildingRegistry.Api.BackOffice.Handlers.Sqs.Requests.BuildingUnit;
-    using Handlers;
 
     public class DetachAddressFromBuildingUnitLambdaRequestBuilder
     {

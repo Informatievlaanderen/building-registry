@@ -67,12 +67,12 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenDeregulatingBuildingUnit
             var command = Fixture.Create<DeregulateBuildingUnit>();
 
             var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
-                    .WithBuildingStatus(BuildingStatus.Planned)
-                    .WithBuildingUnit(
-                        BuildingUnitStatus.Planned,
-                        command.BuildingUnitPersistentLocalId,
-                        BuildingUnitFunction.Common)
-                    .Build();
+                .WithBuildingStatus(BuildingStatus.Planned)
+                .WithBuildingUnit(
+                    BuildingUnitStatus.Planned,
+                    command.BuildingUnitPersistentLocalId,
+                    BuildingUnitFunction.Common)
+                .Build();
 
             Assert(new Scenario()
                 .Given(
