@@ -86,7 +86,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenDetachingRejectedAddressFrom
                     isRemoved: false)
                 .Build();
 
-            var building = new BuildingFactory(NoSnapshotStrategy.Instance, Mock.Of<IAddCommonBuildingUnit>(), Mock.Of<IAddresses>()).Create();
+            var building = new BuildingFactory(NoSnapshotStrategy.Instance).Create();
             building.Initialize(new List<object>
             {
                 buildingWasMigrated,

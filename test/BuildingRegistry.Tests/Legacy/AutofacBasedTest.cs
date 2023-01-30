@@ -4,6 +4,7 @@ namespace BuildingRegistry.Tests.Legacy
     using System.Collections.Generic;
     using Api.BackOffice.Abstractions;
     using Autofac;
+    using Autofac.Extensions.DependencyInjection;
     using BackOffice;
     using Be.Vlaanderen.Basisregisters.AggregateSource.Snapshotting;
     using Be.Vlaanderen.Basisregisters.AggregateSource.SqlStreamStore.Autofac;
@@ -13,10 +14,13 @@ namespace BuildingRegistry.Tests.Legacy
     using Be.Vlaanderen.Basisregisters.EventHandling;
     using Be.Vlaanderen.Basisregisters.EventHandling.Autofac;
     using Building;
+    using Consumer.Address;
     using Infrastructure.Modules;
     using KellermanSoftware.CompareNetObjects;
     using Microsoft.Extensions.Configuration;
+    using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Logging;
+    using Microsoft.Extensions.Logging.Abstractions;
     using Microsoft.Extensions.Primitives;
     using Moq;
     using Xunit.Abstractions;
@@ -86,11 +90,13 @@ namespace BuildingRegistry.Tests.Legacy
             containerBuilder.Register(c => new FakeBackOfficeContextFactory().CreateDbContext(Array.Empty<string>()))
                 .As<BackOfficeContext>();
 
-            containerBuilder.RegisterType<AddCommonBuildingUnit>()
-                .As<IAddCommonBuildingUnit>();
+            containerBuilder.RegisterType<AddCommonBuildingUnit>().As<IAddCommonBuildingUnit>();
+            var sc = new ServiceCollection();
+            containerBuilder.RegisterModule(new ConsumerAddressModule(configuration, sc, new NullLoggerFactory()));
+            containerBuilder.Populate(sc);
 
             containerBuilder
-                .Register(c => new BuildingFactory(NoSnapshotStrategy.Instance, c.Resolve<IAddCommonBuildingUnit>(), Mock.Of<IAddresses>()))
+                .Register(c => new BuildingFactory(NoSnapshotStrategy.Instance))
                 .As<IBuildingFactory>();
 
             _container = containerBuilder.Build();

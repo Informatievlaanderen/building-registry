@@ -5,7 +5,6 @@ namespace BuildingRegistry.Tests
     using System.Linq;
     using System.Reflection;
     using System.Runtime.CompilerServices;
-    using Be.Vlaanderen.Basisregisters.EventHandling;
     using FluentAssertions;
     using Xunit;
     public class InfrastructureCommandsTests

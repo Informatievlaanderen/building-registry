@@ -10,8 +10,8 @@ namespace BuildingRegistry.Tests.BackOffice.Api.BuildingUnit.WhenRemovingBuildin
     using Be.Vlaanderen.Basisregisters.Sqs.Exceptions;
     using Be.Vlaanderen.Basisregisters.Sqs.Requests;
     using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Requests;
+    using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.SqsRequests;
     using BuildingRegistry.Api.BackOffice.BuildingUnit;
-    using BuildingRegistry.Api.BackOffice.Handlers.Sqs.Requests.BuildingUnit;
     using BuildingRegistry.Building;
     using BuildingRegistry.Building.Exceptions;
     using BuildingRegistry.Tests.Fixtures;

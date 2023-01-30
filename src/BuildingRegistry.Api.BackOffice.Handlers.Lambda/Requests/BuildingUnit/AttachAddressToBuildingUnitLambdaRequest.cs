@@ -1,10 +1,11 @@
 namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Requests.BuildingUnit
 {
+    using Abstractions.BuildingUnit.SqsRequests;
     using BuildingRegistry.Api.BackOffice.Abstractions.Building.Validators;
     using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Requests;
+    using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.SqsRequests;
     using BuildingRegistry.Building;
     using BuildingRegistry.Building.Commands;
-    using Sqs.Requests.BuildingUnit;
 
     public sealed record AttachAddressToBuildingUnitLambdaRequest : BuildingUnitLambdaRequest
     {

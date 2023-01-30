@@ -15,9 +15,9 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
     using Be.Vlaanderen.Basisregisters.Sqs.Responses;
     using BuildingRegistry.Api.BackOffice.Abstractions;
     using BuildingRegistry.Api.BackOffice.Abstractions.Building.Requests;
+    using BuildingRegistry.Api.BackOffice.Abstractions.Building.SqsRequests;
     using BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.Building;
     using BuildingRegistry.Api.BackOffice.Handlers.Lambda.Requests.Building;
-    using BuildingRegistry.Api.BackOffice.Handlers.Sqs.Requests.Building;
     using BuildingRegistry.Building;
     using BuildingRegistry.Building.Exceptions;
     using Fixtures;

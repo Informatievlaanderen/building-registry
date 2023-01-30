@@ -28,9 +28,9 @@ namespace BuildingRegistry.Infrastructure.Modules
             {
                 snapshotStrategy = IntervalStrategy.SnapshotEvery(snapshotInterval);
             }
-            
+
             builder
-                .Register(c => new BuildingFactory(snapshotStrategy, c.Resolve<IAddCommonBuildingUnit>(), c.Resolve<IAddresses>()))
+                .Register(c => new BuildingFactory(snapshotStrategy))
                 .As<IBuildingFactory>();
 
             builder

@@ -70,7 +70,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenAttachingAddressToBuildingUn
             var consumerAddress = Container.Resolve<FakeConsumerAddressContext>();
             consumerAddress.AddAddress(new AddressPersistentLocalId(buildingUnitAddressWasAttachedV2.AddressPersistentLocalId), Consumer.Address.AddressStatus.Current, isRemoved: false);
 
-            var sut = new BuildingFactory(NoSnapshotStrategy.Instance, Mock.Of<IAddCommonBuildingUnit>(), consumerAddress).Create();
+            var sut = new BuildingFactory(NoSnapshotStrategy.Instance).Create();
             sut.Initialize(new List<object>
             {
                 buildingWasMigrated,

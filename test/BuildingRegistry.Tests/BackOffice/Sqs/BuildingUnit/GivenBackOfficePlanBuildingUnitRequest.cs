@@ -8,8 +8,8 @@ namespace BuildingRegistry.Tests.BackOffice.Sqs.BuildingUnit
     using Be.Vlaanderen.Basisregisters.MessageHandling.AwsSqs.Simple;
     using Be.Vlaanderen.Basisregisters.Sqs;
     using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Requests;
-    using BuildingRegistry.Api.BackOffice.Handlers.Sqs.Handlers.BuildingUnit;
-    using BuildingRegistry.Api.BackOffice.Handlers.Sqs.Requests.BuildingUnit;
+    using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.SqsRequests;
+    using BuildingRegistry.Api.BackOffice.Handlers.BuildingUnit;
     using BuildingRegistry.Building;
     using Fixtures;
     using FluentAssertions;

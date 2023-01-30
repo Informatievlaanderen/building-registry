@@ -7,11 +7,11 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda
     using AutoFixture;
     using Be.Vlaanderen.Basisregisters.Aws.Lambda;
     using Be.Vlaanderen.Basisregisters.Sqs.Requests;
+    using BuildingRegistry.Api.BackOffice.Abstractions.Building.SqsRequests;
+    using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.SqsRequests;
     using BuildingRegistry.Api.BackOffice.Handlers.Lambda;
     using BuildingRegistry.Api.BackOffice.Handlers.Lambda.Requests.Building;
     using BuildingRegistry.Api.BackOffice.Handlers.Lambda.Requests.BuildingUnit;
-    using BuildingRegistry.Api.BackOffice.Handlers.Sqs.Requests.Building;
-    using BuildingRegistry.Api.BackOffice.Handlers.Sqs.Requests.BuildingUnit;
     using FluentAssertions;
     using MediatR;
     using Moq;

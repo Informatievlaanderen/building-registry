@@ -4,6 +4,7 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
     using System.Threading.Tasks;
     using Abstractions.Building.Validators;
     using Abstractions.BuildingUnit.Requests;
+    using Abstractions.BuildingUnit.SqsRequests;
     using Be.Vlaanderen.Basisregisters.AcmIdm;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
     using Be.Vlaanderen.Basisregisters.Api.ETag;
@@ -13,7 +14,6 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
     using BuildingRegistry.Building;
     using BuildingRegistry.Building.Exceptions;
     using FluentValidation;
-    using Handlers.Sqs.Requests.BuildingUnit;
     using Infrastructure;
     using Microsoft.AspNetCore.Authentication.JwtBearer;
     using Microsoft.AspNetCore.Authorization;

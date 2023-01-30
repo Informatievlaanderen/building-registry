@@ -6,8 +6,8 @@ namespace BuildingRegistry.Tests.BackOffice.Api.Building.WhenPlanningBuilding
     using AutoFixture;
     using Be.Vlaanderen.Basisregisters.Sqs.Requests;
     using BuildingRegistry.Api.BackOffice.Abstractions.Building.Requests;
+    using BuildingRegistry.Api.BackOffice.Abstractions.Building.SqsRequests;
     using BuildingRegistry.Api.BackOffice.Building;
-    using BuildingRegistry.Api.BackOffice.Handlers.Sqs.Requests.Building;
     using BuildingRegistry.Tests.Fixtures;
     using FluentAssertions;
     using Microsoft.AspNetCore.Mvc;

@@ -16,12 +16,12 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda
     using Microsoft.Extensions.Logging;
     using System.Reflection;
     using Abstractions;
+    using Abstractions.Building.SqsRequests;
     using Be.Vlaanderen.Basisregisters.CommandHandling.Idempotency;
     using Be.Vlaanderen.Basisregisters.Sqs.Lambda.Infrastructure;
     using Infrastructure;
     using Infrastructure.Modules;
     using Newtonsoft.Json;
-    using Sqs.Requests.Building;
     using TicketingService.Proxy.HttpProxy;
     using Be.Vlaanderen.Basisregisters.Sqs.Lambda.Handlers;
     using Consumer.Address;

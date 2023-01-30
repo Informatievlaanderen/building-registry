@@ -54,7 +54,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuilding
 
             // Act
             var result = Building.Plan(
-                new BuildingFactory(NoSnapshotStrategy.Instance, Mock.Of<IAddCommonBuildingUnit>(), Mock.Of<IAddresses>()),
+                new BuildingFactory(NoSnapshotStrategy.Instance),
                 command.BuildingPersistentLocalId,
                 command.Geometry);
 

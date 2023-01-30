@@ -4,14 +4,13 @@ namespace BuildingRegistry.Tests.BackOffice.Api.Building.WhenChangingBuildingOut
     using System.Threading;
     using System.Threading.Tasks;
     using AutoFixture;
-    using Be.Vlaanderen.Basisregisters.AggregateSource;
     using Be.Vlaanderen.Basisregisters.Api.ETag;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
     using Be.Vlaanderen.Basisregisters.Sqs.Requests;
     using BuildingRegistry.Api.BackOffice.Abstractions.Building.Requests;
+    using BuildingRegistry.Api.BackOffice.Abstractions.Building.SqsRequests;
     using BuildingRegistry.Api.BackOffice.Abstractions.Building.Validators;
     using BuildingRegistry.Api.BackOffice.Building;
-    using BuildingRegistry.Api.BackOffice.Handlers.Sqs.Requests.Building;
     using BuildingRegistry.Building;
     using BuildingRegistry.Tests.Fixtures;
     using FluentAssertions;

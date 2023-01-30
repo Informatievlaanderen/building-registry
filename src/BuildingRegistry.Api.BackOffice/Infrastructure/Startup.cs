@@ -20,7 +20,6 @@ namespace BuildingRegistry.Api.BackOffice.Infrastructure
     using Microsoft.Extensions.Diagnostics.HealthChecks;
     using Microsoft.Extensions.Hosting;
     using Microsoft.Extensions.Logging;
-    using Microsoft.Extensions.Options;
     using Microsoft.OpenApi.Models;
     using Modules;
     using Options;

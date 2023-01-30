@@ -11,9 +11,9 @@ namespace BuildingRegistry.Tests.BackOffice.Api.BuildingUnit.WhenPlanningBuildin
     using Be.Vlaanderen.Basisregisters.Sqs.Requests;
     using BuildingRegistry.Api.BackOffice.Abstractions.Building.Validators;
     using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Requests;
+    using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.SqsRequests;
     using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Validators;
     using BuildingRegistry.Api.BackOffice.BuildingUnit;
-    using BuildingRegistry.Api.BackOffice.Handlers.Sqs.Requests.BuildingUnit;
     using BuildingRegistry.Building;
     using BuildingRegistry.Tests.Fixtures;
     using FluentAssertions;

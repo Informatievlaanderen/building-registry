@@ -1,5 +1,6 @@
 namespace BuildingRegistry.Building
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
     using Be.Vlaanderen.Basisregisters.AggregateSource.Snapshotting;
@@ -8,8 +9,6 @@ namespace BuildingRegistry.Building
 
     public partial class Building
     {
-        private readonly IAddresses _addresses;
-        private readonly IAddCommonBuildingUnit _addCommonBuildingUnit;
         private IBuildingEvent? _lastEvent;
 
         private string _lastSnapshotEventHash = string.Empty;
@@ -28,15 +27,10 @@ namespace BuildingRegistry.Building
         public ProvenanceData LastProvenanceData =>
             _lastEvent is null ? _lastSnapshotProvenance : _lastEvent.Provenance;
 
-        internal Building(
-            ISnapshotStrategy snapshotStrategy,
-            IAddCommonBuildingUnit addCommonBuildingUnit,
-            IAddresses addresses)
+        internal Building(ISnapshotStrategy snapshotStrategy)
             : this()
         {
             Strategy = snapshotStrategy;
-            _addCommonBuildingUnit = addCommonBuildingUnit;
-            _addresses = addresses;
         }
 
         private Building()

@@ -9,8 +9,8 @@ namespace BuildingRegistry.Tests.BackOffice.Api.BuildingUnit.WhenNotRealizingBui
     using Be.Vlaanderen.Basisregisters.Sqs.Exceptions;
     using Be.Vlaanderen.Basisregisters.Sqs.Requests;
     using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Requests;
+    using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.SqsRequests;
     using BuildingRegistry.Api.BackOffice.BuildingUnit;
-    using BuildingRegistry.Api.BackOffice.Handlers.Sqs.Requests.BuildingUnit;
     using BuildingRegistry.Tests.Fixtures;
     using FluentAssertions;
     using Microsoft.AspNetCore.Http;

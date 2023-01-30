@@ -7,7 +7,6 @@ namespace BuildingRegistry.Tests.BackOffice.Api
     using System.Threading.Tasks;
     using AutoFixture;
     using Be.Vlaanderen.Basisregisters.Api;
-    using Building;
     using BuildingRegistry.Api.BackOffice.Infrastructure;
     using BuildingRegistry.Api.BackOffice.Infrastructure.Options;
     using BuildingRegistry.Building;

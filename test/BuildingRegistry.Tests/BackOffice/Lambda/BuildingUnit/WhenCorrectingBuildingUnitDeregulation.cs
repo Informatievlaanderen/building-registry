@@ -13,11 +13,10 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
     using Be.Vlaanderen.Basisregisters.Sqs.Exceptions;
     using Be.Vlaanderen.Basisregisters.Sqs.Lambda.Handlers;
     using Be.Vlaanderen.Basisregisters.Sqs.Responses;
-    using BuildingRegistry.Api.BackOffice.Abstractions;
     using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Requests;
+    using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.SqsRequests;
     using BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.BuildingUnit;
     using BuildingRegistry.Api.BackOffice.Handlers.Lambda.Requests.BuildingUnit;
-    using BuildingRegistry.Api.BackOffice.Handlers.Sqs.Requests.BuildingUnit;
     using BuildingRegistry.Building;
     using BuildingRegistry.Building.Exceptions;
     using Fixtures;

@@ -108,7 +108,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlacingBuildingUnderConstruc
         [Fact]
         public void StateCheck()
         {
-            var sut = new BuildingFactory(NoSnapshotStrategy.Instance, Mock.Of<IAddCommonBuildingUnit>(), Mock.Of<IAddresses>()).Create();
+            var sut = new BuildingFactory(NoSnapshotStrategy.Instance).Create();
             sut.Initialize(new List<object>{ Fixture.Create<BuildingWasPlannedV2>() });
             sut.PlaceUnderConstruction();
             sut.BuildingStatus.Should().Be(BuildingStatus.UnderConstruction);

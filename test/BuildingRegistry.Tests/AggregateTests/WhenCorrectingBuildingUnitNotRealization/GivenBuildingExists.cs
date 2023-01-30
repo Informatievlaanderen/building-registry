@@ -320,7 +320,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitNotRea
         public void StateCheck()
         {
             // Arrange
-            var building = new BuildingFactory(NoSnapshotStrategy.Instance, Mock.Of<IAddCommonBuildingUnit>(), Mock.Of<IAddresses>()).Create();
+            var building = new BuildingFactory(NoSnapshotStrategy.Instance).Create();
 
             // Act
             building.Initialize(new object[]

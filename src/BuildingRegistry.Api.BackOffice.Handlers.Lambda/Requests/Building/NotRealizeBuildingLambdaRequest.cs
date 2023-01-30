@@ -1,10 +1,11 @@
 namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Requests.Building
 {
+    using Abstractions.Building.SqsRequests;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using BuildingRegistry.Api.BackOffice.Abstractions.Building.Requests;
+    using BuildingRegistry.Api.BackOffice.Abstractions.Building.SqsRequests;
     using BuildingRegistry.Building;
     using BuildingRegistry.Building.Commands;
-    using Sqs.Requests.Building;
 
     public sealed record NotRealizeBuildingLambdaRequest : BuildingLambdaRequest, Abstractions.IHasBuildingPersistentLocalId
     {

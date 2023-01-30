@@ -2,9 +2,9 @@ namespace BuildingRegistry.Api.BackOffice.Infrastructure.Modules
 {
     using System.Reflection;
     using Autofac;
-    using Handlers.Sqs.Handlers.Building;
     using MediatR;
     using Module = Autofac.Module;
+    using PlanBuildingSqsHandler = Handlers.Building.PlanBuildingSqsHandler;
 
     public class MediatRModule : Module
     {
