@@ -152,5 +152,43 @@ namespace BuildingRegistry.Tests.AggregateTests.SnapshotTests
             buildingUnitData.LastEventHash.Should().Be(buildingUnitWasDeregulated.GetHash());
             buildingUnitData.LastProvenanceData.Should().Be(buildingUnitWasDeregulated.Provenance);
         }
+
+        [Fact]
+        public void BuildingUnitFunctionWasChangedIsSavedInSnapshot()
+        {
+            var aggregate = new BuildingFactory(IntervalStrategy.Default, Mock.Of<IAddCommonBuildingUnit>(), Mock.Of<IAddresses>()).Create();
+
+            Fixture.Customize(new WithFixedBuildingUnitPersistentLocalId());
+
+            var buildingWasPlanned = Fixture.Create<BuildingWasPlannedV2>();
+            var buildingUnitWasPlanned = Fixture.Create<BuildingUnitWasPlannedV2>();
+            var buildingUnitFunctionWasChanged = Fixture.Create<BuildingUnitFunctionWasChanged>();
+
+            aggregate.Initialize(new List<object>
+            {
+                buildingWasPlanned,
+                buildingUnitWasPlanned,
+                buildingUnitFunctionWasChanged
+            });
+
+            var snapshot = aggregate.TakeSnapshot();
+            snapshot.Should().BeOfType<BuildingSnapshot>();
+
+            var buildingSnapshot = (BuildingSnapshot)snapshot;
+            var buildingUnitData = buildingSnapshot.BuildingUnits.Single(x =>
+                x.BuildingUnitPersistentLocalId == buildingUnitWasPlanned.BuildingUnitPersistentLocalId);
+
+            buildingUnitData.Function.Should().Be(buildingUnitFunctionWasChanged.Function);
+            buildingUnitData.Status.Should().Be(BuildingUnitStatus.Planned);
+            buildingUnitData.AddressPersistentLocalIds.Should().BeNullOrEmpty();
+            buildingUnitData.ExtendedWkbGeometry.Should().Be(buildingUnitWasPlanned.ExtendedWkbGeometry);
+            buildingUnitData.GeometryMethod.Should().Be(buildingUnitWasPlanned.GeometryMethod);
+
+            buildingUnitData.IsRemoved.Should().BeFalse();
+            buildingUnitData.HasDeviation.Should().Be(buildingUnitWasPlanned.HasDeviation);
+
+            buildingUnitData.LastEventHash.Should().Be(buildingUnitFunctionWasChanged.GetHash());
+            buildingUnitData.LastProvenanceData.Should().Be(buildingUnitFunctionWasChanged.Provenance);
+        }
     }
 }

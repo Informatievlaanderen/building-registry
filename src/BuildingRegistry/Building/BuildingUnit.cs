@@ -345,6 +345,28 @@ namespace BuildingRegistry.Building
         }
 
         //TODO: refactor: use valid statusses instead of this
+        public void ChangeFunction(BuildingUnitFunction function)
+        {
+            GuardRemoved();
+            GuardCommonUnit();
+
+            GuardBuildingUnitInvalidStatuses(new[]
+            {
+                BuildingUnitStatus.Retired,
+                BuildingUnitStatus.NotRealized
+            });
+
+            if (Function == function)
+            {
+                return;
+            }
+
+            Apply(new BuildingUnitFunctionWasChanged(
+                _buildingPersistentLocalId,
+                BuildingUnitPersistentLocalId,
+                function));
+        }
+
         private void GuardBuildingUnitInvalidStatuses(BuildingUnitStatus[] invalidStatuses)
         {
             if (invalidStatuses.Contains(Status))

@@ -325,6 +325,16 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
                     }, ct);
             });
 
+            When<Envelope<BuildingUnitFunctionWasChanged>>(async (context, message, ct) =>
+            {
+                await context.FindAndUpdateBuildingUnitExtract(message.Message.BuildingUnitPersistentLocalId,
+                    itemV2 =>
+                    {
+                        UpdateRecord(itemV2, record => record.functie.Value = MapFunction(BuildingUnitFunction.Parse(message.Message.Function)));
+                        UpdateVersie(itemV2, message.Message.Provenance.Timestamp);
+                    }, ct);
+            });
+
             When<Envelope<CommonBuildingUnitWasAddedV2>>(async (context, message, ct) =>
             {
                 var commonBuildingUnitItemV2 = new BuildingUnitExtractItemV2
@@ -411,15 +421,25 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
             });
         }
 
+        private static readonly Dictionary<BuildingUnitFunction, string> BuildingUnitFunctions = new()
+        {
+            { BuildingUnitFunction.Common, Common },
+            { BuildingUnitFunction.Unknown, Unknown },
+            { BuildingUnitFunction.Residential, Unknown },
+            { BuildingUnitFunction.Lodging, Unknown },
+            { BuildingUnitFunction.DayRecreationSport, Unknown },
+            { BuildingUnitFunction.AgricultureHorticulture, Unknown },
+            { BuildingUnitFunction.Retail, Unknown },
+            { BuildingUnitFunction.DancingRestaurantCafe, Unknown },
+            { BuildingUnitFunction.OfficeServicesLiberalProfession, Unknown },
+            { BuildingUnitFunction.IndustryBusiness, Unknown },
+            { BuildingUnitFunction.CommunityPublicUtility, Unknown },
+            { BuildingUnitFunction.MilitaryFunction, Unknown }
+        };
+
         private static string MapFunction(BuildingUnitFunction function)
         {
-            var dictionary = new Dictionary<BuildingUnitFunction, string>
-            {
-                { BuildingUnitFunction.Common, Common },
-                { BuildingUnitFunction.Unknown, Unknown }
-            };
-
-            return dictionary[function];
+            return BuildingUnitFunctions[function];
         }
 
         private static string MapStatus(BuildingUnitStatus status)

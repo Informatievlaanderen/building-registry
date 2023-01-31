@@ -52,6 +52,7 @@ namespace BuildingRegistry.Building
             Register<BuildingUnitRegularizationWasCorrected>(When);
             Register<BuildingUnitWasDeregulated>(When);
             Register<BuildingUnitDeregulationWasCorrected>(When);
+            Register<BuildingUnitFunctionWasChanged>(When);
             Register<CommonBuildingUnitWasAddedV2>(When);
             Register<BuildingUnitAddressWasAttachedV2>(When);
             Register<BuildingUnitAddressWasDetachedV2>(When);
@@ -219,6 +220,13 @@ namespace BuildingRegistry.Building
         private void When(BuildingUnitDeregulationWasCorrected @event)
         {
             HasDeviation = false;
+
+            _lastEvent = @event;
+        }
+
+        private void When(BuildingUnitFunctionWasChanged @event)
+        {
+            Function = BuildingUnitFunction.Parse(@event.Function);
 
             _lastEvent = @event;
         }

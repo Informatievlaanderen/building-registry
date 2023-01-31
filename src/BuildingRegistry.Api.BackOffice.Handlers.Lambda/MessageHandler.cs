@@ -130,6 +130,11 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda
                 case RemoveBuildingSqsRequest request:
                     await mediator.Send(new RemoveBuildingLambdaRequest(messageMetadata.MessageGroupId!, request), cancellationToken);
                     break;
+                case ChangeBuildingUnitFunctionSqsRequest request:
+                    await mediator.Send(
+                        new ChangeBuildingUnitFunctionLambdaRequest(messageMetadata.MessageGroupId!, request),
+                        cancellationToken);
+                    break;
 
                 default:
                     throw new NotImplementedException(

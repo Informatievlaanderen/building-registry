@@ -5,6 +5,7 @@ namespace BuildingRegistry.Projections.Wfs.BuildingUnitV2
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy.Gebouweenheid;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.Connector;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore;
+    using Be.Vlaanderen.Basisregisters.Utilities;
     using Be.Vlaanderen.Basisregisters.Utilities.HexByteConvertor;
     using BuildingRegistry.Building;
     using BuildingRegistry.Building.Events;
@@ -239,6 +240,14 @@ namespace BuildingRegistry.Projections.Wfs.BuildingUnitV2
                 SetVersion(unit, message.Message.Provenance.Timestamp);
             });
 
+            When<Envelope<BuildingUnitFunctionWasChanged>>(async (context, message, _) =>
+            {
+                var unit = await context.BuildingUnitsV2.FindAsync(message.Message.BuildingUnitPersistentLocalId);
+                unit!.Function = MapFunction(BuildingUnitFunction.Parse(message.Message.Function));
+
+                SetVersion(unit, message.Message.Provenance.Timestamp);
+            });
+
             When<Envelope<CommonBuildingUnitWasAddedV2>>(async (context, message, ct) =>
             {
                 var commonBuildingUnitV2 = new BuildingUnitV2
@@ -313,10 +322,28 @@ namespace BuildingRegistry.Projections.Wfs.BuildingUnitV2
 
         private static void SetVersion(BuildingUnitV2 unit, Instant timestamp) => unit.Version = timestamp;
 
+        private static readonly Dictionary<BuildingUnitFunction, string> BuildingUnitFunctions = new()
+        {
+            { BuildingUnitFunction.Common, GebouweenheidFunctie.GemeenschappelijkDeel.ToString() },
+            { BuildingUnitFunction.Unknown, GebouweenheidFunctie.NietGekend.ToString() },
+            { BuildingUnitFunction.Residential, GebouweenheidFunctie.NietGekend.ToString() },
+            { BuildingUnitFunction.Lodging, GebouweenheidFunctie.NietGekend.ToString() },
+            { BuildingUnitFunction.DayRecreationSport, GebouweenheidFunctie.NietGekend.ToString() },
+            { BuildingUnitFunction.AgricultureHorticulture, GebouweenheidFunctie.NietGekend.ToString() },
+            { BuildingUnitFunction.Retail, GebouweenheidFunctie.NietGekend.ToString() },
+            { BuildingUnitFunction.DancingRestaurantCafe, GebouweenheidFunctie.NietGekend.ToString() },
+            { BuildingUnitFunction.OfficeServicesLiberalProfession, GebouweenheidFunctie.NietGekend.ToString() },
+            { BuildingUnitFunction.IndustryBusiness, GebouweenheidFunctie.NietGekend.ToString() },
+            { BuildingUnitFunction.CommunityPublicUtility, GebouweenheidFunctie.NietGekend.ToString() },
+            { BuildingUnitFunction.MilitaryFunction, GebouweenheidFunctie.NietGekend.ToString() }
+        };
+
         public static string MapFunction(BuildingUnitFunction function)
-            => function == BuildingUnitFunction.Common
-                ? GebouweenheidFunctie.GemeenschappelijkDeel.ToString()
+        {
+            return BuildingUnitFunctions.ContainsKey(function)
+                ? BuildingUnitFunctions[function]
                 : GebouweenheidFunctie.NietGekend.ToString();
+        }
 
         private void SetPosition(BuildingUnitV2 buildingUnit, string extendedWkbPosition, string method)
         {

@@ -1,6 +1,7 @@
 namespace BuildingRegistry.Api.Oslo.Handlers.BuildingUnitV2
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
     using System.Text;
     using System.Threading;
@@ -74,6 +75,22 @@ namespace BuildingRegistry.Api.Oslo.Handlers.BuildingUnitV2
             throw new ArgumentOutOfRangeException(nameof(geometryMethod), geometryMethod, null);
         }
 
+        private static readonly Dictionary<BuildingUnitFunction, GebouweenheidFunctie> BuildingUnitFunctions = new()
+        {
+            { BuildingUnitFunction.Common, GebouweenheidFunctie.GemeenschappelijkDeel },
+            { BuildingUnitFunction.Unknown, GebouweenheidFunctie.NietGekend },
+            { BuildingUnitFunction.Residential, GebouweenheidFunctie.NietGekend },
+            { BuildingUnitFunction.Lodging, GebouweenheidFunctie.NietGekend },
+            { BuildingUnitFunction.DayRecreationSport, GebouweenheidFunctie.NietGekend },
+            { BuildingUnitFunction.AgricultureHorticulture, GebouweenheidFunctie.NietGekend },
+            { BuildingUnitFunction.Retail, GebouweenheidFunctie.NietGekend },
+            { BuildingUnitFunction.DancingRestaurantCafe, GebouweenheidFunctie.NietGekend },
+            { BuildingUnitFunction.OfficeServicesLiberalProfession, GebouweenheidFunctie.NietGekend },
+            { BuildingUnitFunction.IndustryBusiness, GebouweenheidFunctie.NietGekend },
+            { BuildingUnitFunction.CommunityPublicUtility, GebouweenheidFunctie.NietGekend },
+            { BuildingUnitFunction.MilitaryFunction, GebouweenheidFunctie.NietGekend }
+        };
+
         private static GebouweenheidFunctie? MapBuildingUnitFunction(BuildingUnitFunction? function)
         {
             if (function == null)
@@ -81,17 +98,9 @@ namespace BuildingRegistry.Api.Oslo.Handlers.BuildingUnitV2
                 return null;
             }
 
-            if (BuildingUnitFunction.Common == function)
-            {
-                return GebouweenheidFunctie.GemeenschappelijkDeel;
-            }
-
-            if (BuildingUnitFunction.Unknown == function)
-            {
-                return GebouweenheidFunctie.NietGekend;
-            }
-
-            throw new ArgumentOutOfRangeException(nameof(function), function, null);
+            return BuildingUnitFunctions.ContainsKey(function.Value)
+                ? BuildingUnitFunctions[function.Value]
+                : throw new ArgumentOutOfRangeException(nameof(function), function, null);
         }
 
         private static BuildingUnitPosition GetBuildingUnitPoint(byte[] point, BuildingUnitPositionGeometryMethod geometryMethod)
