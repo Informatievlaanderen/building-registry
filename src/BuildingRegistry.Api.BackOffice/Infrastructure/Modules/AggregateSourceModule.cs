@@ -9,6 +9,7 @@
     using BuildingRegistry.Building;
     using BuildingRegistry.Infrastructure;
     using BuildingRegistry.Infrastructure.Modules;
+    using BuildingRegistry.Infrastructure.Repositories;
     using Microsoft.Extensions.Configuration;
 
     public class AggregateSourceModule : Module
@@ -40,7 +41,8 @@
                 .As<IBuildingFactory>();
 
             builder
-                .RegisterModule<RepositoriesModule>();
+                .RegisterType<Buildings>()
+                .As<IBuildings>();
 
             builder
                 .RegisterModule(new EventHandlingModule(typeof(DomainAssemblyMarker).Assembly, eventSerializerSettings));

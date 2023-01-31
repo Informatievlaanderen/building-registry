@@ -1,4 +1,4 @@
-﻿namespace BuildingRegistry.Tests.ProjectionTests.Backoffice
+﻿namespace BuildingRegistry.Tests.ProjectionTests.BackOffice
 {
     using System;
     using System.Threading;

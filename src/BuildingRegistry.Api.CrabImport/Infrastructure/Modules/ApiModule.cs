@@ -39,8 +39,6 @@ using System;
 
         protected override void Load(ContainerBuilder builder)
         {
-            var eventSerializerSettings = EventsJsonSerializerSettingsProvider.CreateSerializerSettings();
-
             _services.RegisterModule(new DataDogModule(_configuration));
 
             builder
@@ -52,9 +50,8 @@ using System;
                     new IdempotencyMigrationsTableInfo(Schema.Import),
                     new IdempotencyTableInfo(Schema.Import),
                     _loggerFactory))
-                .RegisterModule(new EventHandlingModule(typeof(DomainAssemblyMarker).Assembly, eventSerializerSettings))
                 .RegisterModule(new EnvelopeModule())
-                .RegisterModule(new CommandHandlingModule(_configuration));
+                .RegisterModule(new LegacyCommandHandlingModule(_configuration));
 
             _services.ConfigureCrabImport(
                 _configuration.GetConnectionString("CrabImport"),

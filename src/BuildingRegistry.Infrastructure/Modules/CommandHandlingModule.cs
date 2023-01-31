@@ -7,8 +7,8 @@ namespace BuildingRegistry.Infrastructure.Modules
     using Be.Vlaanderen.Basisregisters.CommandHandling;
     using Building;
     using Microsoft.Extensions.Configuration;
+    using Repositories;
 
-    //TODO: split for backoffice & migrator VS crabimport
     public class CommandHandlingModule : Module
     {
         public const string SnapshotIntervalKey = "SnapshotInterval";
@@ -34,7 +34,8 @@ namespace BuildingRegistry.Infrastructure.Modules
                 .As<IBuildingFactory>();
 
             builder
-                .RegisterModule<RepositoriesModule>();
+                .RegisterType<Buildings>()
+                .As<IBuildings>();
 
             builder
                 .RegisterType<ConcurrentUnitOfWork>()
@@ -43,7 +44,6 @@ namespace BuildingRegistry.Infrastructure.Modules
             builder
                 .RegisterEventstreamModule(_configuration);
 
-            Legacy.CommandHandlerModules.Register(builder);
             CommandHandlerModules.Register(builder);
 
             builder
