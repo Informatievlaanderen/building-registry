@@ -4,7 +4,7 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.Validation
 {
     public static partial class ValidationErrors
     {
-        public static class CorrectBuildingUnitRegularization
+        public static class CorrectBuildingUnitNotRealization
         {
             public static class BuildingInvalidStatus
             {
@@ -16,8 +16,8 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.Validation
 
             public static class BuildingUnitInvalidStatus
             {
-                public const string Code = "GebouweenheidNietGerealiseerdOfGehistoreerd";
-                public const string Message = "Deze actie is enkel toegestaan op gebouweenheden met status 'gepland' of 'gerealiseerd'.";
+                public const string Code = "GebouweenheidGerealiseerdOfGehistoreerd";
+                public const string Message = "Deze actie is enkel toegestaan op gebouweenheden met status 'nietGerealiseerd'.";
 
                 public static TicketError ToTicketError() => new(Message, Code);
             }

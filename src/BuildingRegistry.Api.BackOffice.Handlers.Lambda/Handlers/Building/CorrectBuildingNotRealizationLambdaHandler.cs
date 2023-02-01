@@ -2,6 +2,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.Building
 {
     using System.Threading;
     using System.Threading.Tasks;
+    using Abstractions.Validation;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
     using Be.Vlaanderen.Basisregisters.Sqs.Exceptions;
     using Be.Vlaanderen.Basisregisters.Sqs.Lambda.Handlers;
@@ -55,12 +56,8 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.Building
         {
             return exception switch
             {
-                BuildingHasInvalidStatusException => new TicketError(
-                    ValidationErrorMessages.Building.BuildingCannotBeCorrectedFromNotRealizedToPlanned,
-                    ValidationErrorCodes.Building.BuildingCannotBeCorrectedFromNotRealizedToPlanned),
-                BuildingHasInvalidBuildingGeometryMethodException => new TicketError(
-                    ValidationErrorMessages.Building.BuildingIsMeasuredByGrb,
-                    ValidationErrorCodes.Building.BuildingIsMeasuredByGrb),
+                BuildingHasInvalidStatusException => ValidationErrors.CorrectBuildingNotRealization.BuildingInvalidStatus.ToTicketError(),
+                BuildingHasInvalidBuildingGeometryMethodException => ValidationErrors.Common.BuildingIsMeasuredByGrb.ToTicketError(),
                 _ => null
             };
         }

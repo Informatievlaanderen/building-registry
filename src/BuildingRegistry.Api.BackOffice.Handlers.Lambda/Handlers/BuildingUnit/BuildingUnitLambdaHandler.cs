@@ -76,11 +76,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.BuildingUnit
             TSqsLambdaRequest request,
             CancellationToken cancellationToken)
         {
-            await Ticketing.Error(request.TicketId,
-                new TicketError(
-                    ValidationErrorMessages.BuildingUnit.BuildingNotFound,
-                    ValidationErrorCodes.BuildingUnit.BuildingNotFound),
-                cancellationToken);
+            await Ticketing.Error(request.TicketId, ValidationErrors.Common.BuildingNotFound.ToTicketError(), cancellationToken);
         }
 
         protected abstract TicketError? InnerMapDomainException(DomainException exception, TSqsLambdaRequest request);
@@ -96,12 +92,8 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.BuildingUnit
             return exception switch
             {
                 BuildingIsRemovedException => ValidationErrors.Common.BuildingIsRemoved.ToTicketError(),
-                BuildingUnitIsRemovedException => new TicketError(
-                    ValidationErrorMessages.BuildingUnit.BuildingUnitIsRemoved,
-                    ValidationErrorCodes.BuildingUnit.BuildingUnitIsRemoved),
-                BuildingUnitIsNotFoundException => new TicketError(
-                    ValidationErrorMessages.BuildingUnit.BuildingUnitNotFound,
-                    ValidationErrorCodes.BuildingUnit.BuildingUnitNotFound),
+                BuildingUnitIsRemovedException => ValidationErrors.Common.BuildingUnitIsRemoved.ToTicketError(),
+                BuildingUnitIsNotFoundException => ValidationErrors.Common.BuildingUnitNotFound.ToTicketError(),
                 _ => null
             };
         }

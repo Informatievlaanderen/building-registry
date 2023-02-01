@@ -3,6 +3,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.Building
     using System.Threading;
     using System.Threading.Tasks;
     using Abstractions;
+    using Abstractions.Validation;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
     using Be.Vlaanderen.Basisregisters.Sqs.Exceptions;
     using Be.Vlaanderen.Basisregisters.Sqs.Lambda.Handlers;
@@ -63,9 +64,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.Building
         {
             return exception switch
             {
-                BuildingHasInvalidStatusException => new TicketError(
-                    ValidationErrorMessages.Building.BuildingCannotBeNotRealizedException,
-                    ValidationErrorCodes.Building.BuildingCannotBeNotRealizedException),
+                BuildingHasInvalidStatusException => ValidationErrors.NotRealizeBuilding.BuildingInvalidStatus.ToTicketError(),
                 _ => null
             };
         }

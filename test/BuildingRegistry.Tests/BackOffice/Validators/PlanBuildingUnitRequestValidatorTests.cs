@@ -3,6 +3,7 @@ namespace BuildingRegistry.Tests.BackOffice.Validators
     using BuildingRegistry.Api.BackOffice.Abstractions.Building.Validators;
     using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Requests;
     using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Validators;
+    using BuildingRegistry.Api.BackOffice.Abstractions.Validation;
     using FluentValidation.TestHelper;
     using Moq;
     using SqlStreamStore;
@@ -33,8 +34,8 @@ namespace BuildingRegistry.Tests.BackOffice.Validators
             });
 
             result.ShouldHaveValidationErrorFor(nameof(PlanBuildingUnitRequest.GebouwId))
-                .WithErrorCode(ValidationErrorCodes.BuildingUnit.BuildingNotFound)
-                .WithErrorMessage(ValidationErrorMessages.BuildingUnit.BuildingInvalid(buildingId));
+                .WithErrorCode(ValidationErrors.Common.BuildingNotFound.Code)
+                .WithErrorMessage(ValidationErrors.Common.BuildingNotFound.InvalidGebouwId(buildingId));
         }
     }
 }

@@ -2,6 +2,7 @@ namespace BuildingRegistry.Tests.BackOffice.Validators
 {
     using BuildingRegistry.Api.BackOffice.Abstractions.Building.Requests;
     using BuildingRegistry.Api.BackOffice.Abstractions.Building.Validators;
+    using BuildingRegistry.Api.BackOffice.Abstractions.Validation;
     using FluentValidation.TestHelper;
     using Xunit;
 
@@ -23,8 +24,8 @@ namespace BuildingRegistry.Tests.BackOffice.Validators
             });
 
             result.ShouldHaveValidationErrorFor(nameof(PlanBuildingRequest.GeometriePolygoon))
-                .WithErrorCode(ValidationErrorCodes.Building.InvalidPolygonGeometry)
-                .WithErrorMessage(ValidationErrorMessages.Building.InvalidPolygonGeometry);
+                .WithErrorCode(ValidationErrors.Common.InvalidBuildingPolygonGeometry.Code)
+                .WithErrorMessage(ValidationErrors.Common.InvalidBuildingPolygonGeometry.Message);
         }
     }
 }

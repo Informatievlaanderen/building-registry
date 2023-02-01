@@ -5,6 +5,7 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
     using Abstractions.Building.Validators;
     using Abstractions.BuildingUnit.Requests;
     using Abstractions.BuildingUnit.SqsRequests;
+    using Abstractions.Validation;
     using Be.Vlaanderen.Basisregisters.AcmIdm;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
     using Be.Vlaanderen.Basisregisters.Api.ETag;
@@ -69,16 +70,16 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
             }
             catch (AggregateIdIsNotFoundException)
             {
-                throw new ApiException(ValidationErrorMessages.BuildingUnit.BuildingUnitNotFound,
+                throw new ApiException(ValidationErrors.Common.BuildingUnitNotFound.Message,
                     StatusCodes.Status404NotFound);
             }
             catch (AggregateNotFoundException)
             {
-                throw new ApiException(ValidationErrorMessages.BuildingUnit.BuildingUnitNotFound, StatusCodes.Status404NotFound);
+                throw new ApiException(ValidationErrors.Common.BuildingUnitNotFound.Message, StatusCodes.Status404NotFound);
             }
             catch (BuildingUnitIsNotFoundException)
             {
-                throw new ApiException(ValidationErrorMessages.BuildingUnit.BuildingUnitNotFound, StatusCodes.Status404NotFound);
+                throw new ApiException(ValidationErrors.Common.BuildingUnitNotFound.Message, StatusCodes.Status404NotFound);
             }
         }
     }

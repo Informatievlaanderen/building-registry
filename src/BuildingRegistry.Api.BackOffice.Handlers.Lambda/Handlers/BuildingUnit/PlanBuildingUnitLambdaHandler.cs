@@ -4,6 +4,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.BuildingUnit
     using System.Threading.Tasks;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
     using Abstractions;
+    using Abstractions.Validation;
     using Be.Vlaanderen.Basisregisters.Sqs.Lambda.Handlers;
     using Be.Vlaanderen.Basisregisters.Sqs.Lambda.Infrastructure;
     using Be.Vlaanderen.Basisregisters.Sqs.Responses;
@@ -67,13 +68,8 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.BuildingUnit
         {
             return exception switch
             {
-                BuildingHasInvalidStatusException => new TicketError(
-                    ValidationErrorMessages.BuildingUnit.BuildingUnitCannotBePlanned,
-                        ValidationErrorCodes.BuildingUnit.BuildingUnitCannotBePlanned),
-
-                BuildingUnitPositionIsOutsideBuildingGeometryException => new TicketError(
-                        ValidationErrorMessages.BuildingUnit.BuildingUnitOutsideGeometryBuilding,
-                        ValidationErrorCodes.BuildingUnit.BuildingUnitOutsideGeometryBuilding),
+                BuildingHasInvalidStatusException => ValidationErrors.PlanBuildingUnit.BuildingInvalidStatus.ToTicketError(),
+                BuildingUnitPositionIsOutsideBuildingGeometryException => ValidationErrors.PlanBuildingUnit.BuildingUnitPositionOutsideBuildingGeometry.ToTicketError(),
                 _ => null
             };
         }
