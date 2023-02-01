@@ -52,20 +52,11 @@ namespace BuildingRegistry.Building
             return newBuilding;
         }
 
-        private static readonly List<BuildingStatus> ChangeBuildingOutlineInvalidStatuses = new()
-        {
-            BuildingStatus.NotRealized,
-            BuildingStatus.Retired
-        };
-
         public void ChangeOutlining(ExtendedWkbGeometry extendedWkbGeometry)
         {
             GuardRemovedBuilding();
 
-            if (ChangeBuildingOutlineInvalidStatuses.Contains(BuildingStatus))
-            {
-                throw new BuildingHasInvalidStatusException();
-            }
+            GuardValidStatusses(BuildingStatus.Planned, BuildingStatus.Realized, BuildingStatus.UnderConstruction);
 
             if (BuildingGeometry.Method != BuildingGeometryMethod.Outlined)
             {
@@ -117,22 +108,12 @@ namespace BuildingRegistry.Building
                 return;
             }
 
-            var invalidStatuses = new List<BuildingStatus>
-            {
-                BuildingStatus.Retired,
-                BuildingStatus.Realized,
-                BuildingStatus.NotRealized
-            };
-
-            if (invalidStatuses.Contains(BuildingStatus))
-            {
-                throw new BuildingHasInvalidStatusException();
-            }
+            GuardValidStatusses(BuildingStatus.Planned);
 
             ApplyChange(new BuildingBecameUnderConstructionV2(BuildingPersistentLocalId));
         }
 
-        public void CorrectBuildingPlaceUnderConstruction()
+        public void CorrectBuildingUnderConstruction()
         {
             GuardRemovedBuilding();
 
@@ -141,17 +122,7 @@ namespace BuildingRegistry.Building
                 return;
             }
 
-            var invalidStatuses = new List<BuildingStatus>
-            {
-                BuildingStatus.Retired,
-                BuildingStatus.Realized,
-                BuildingStatus.NotRealized
-            };
-
-            if (invalidStatuses.Contains(BuildingStatus))
-            {
-                throw new BuildingHasInvalidStatusException();
-            }
+            GuardValidStatusses(BuildingStatus.UnderConstruction);
 
             ApplyChange(new BuildingWasCorrectedFromUnderConstructionToPlanned(BuildingPersistentLocalId));
         }
@@ -165,17 +136,7 @@ namespace BuildingRegistry.Building
                 return;
             }
 
-            var invalidStatuses = new List<BuildingStatus>
-            {
-                BuildingStatus.Planned,
-                BuildingStatus.Retired,
-                BuildingStatus.NotRealized
-            };
-
-            if (invalidStatuses.Contains(BuildingStatus))
-            {
-                throw new BuildingHasInvalidStatusException();
-            }
+            GuardValidStatusses(BuildingStatus.UnderConstruction);
 
             ApplyChange(new BuildingWasRealizedV2(BuildingPersistentLocalId));
 
@@ -226,16 +187,7 @@ namespace BuildingRegistry.Building
                 return;
             }
 
-            var invalidStatuses = new List<BuildingStatus>
-            {
-                BuildingStatus.Realized,
-                BuildingStatus.Retired
-            };
-
-            if (invalidStatuses.Contains(BuildingStatus))
-            {
-                throw new BuildingHasInvalidStatusException();
-            }
+            GuardValidStatusses(BuildingStatus.Planned, BuildingStatus.UnderConstruction, BuildingStatus.NotRealized);
 
             foreach (var unit in _buildingUnits.PlannedBuildingUnits())
             {
@@ -254,10 +206,7 @@ namespace BuildingRegistry.Building
                 return;
             }
 
-            if (BuildingStatus != BuildingStatus.NotRealized)
-            {
-                throw new BuildingHasInvalidStatusException();
-            }
+            GuardValidStatusses(BuildingStatus.NotRealized);
 
             if (BuildingGeometry.Method != BuildingGeometryMethod.Outlined)
             {
@@ -303,6 +252,14 @@ namespace BuildingRegistry.Building
             if (IsRemoved)
             {
                 throw new BuildingIsRemovedException(BuildingPersistentLocalId);
+            }
+        }
+
+        private void GuardValidStatusses(params BuildingStatus[] validStatuses)
+        {
+            if (!validStatuses.Contains(BuildingStatus))
+            {
+                throw new BuildingHasInvalidStatusException();
             }
         }
 

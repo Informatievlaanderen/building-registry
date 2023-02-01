@@ -110,7 +110,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingPlaceUnder
         {
             var sut = new BuildingFactory(NoSnapshotStrategy.Instance).Create();
             sut.Initialize(new List<object>{ Fixture.Create<BuildingWasPlannedV2>(), Fixture.Create<PlaceBuildingUnderConstruction>()});
-            sut.CorrectBuildingPlaceUnderConstruction();
+            sut.CorrectBuildingUnderConstruction();
             sut.BuildingStatus.Should().Be(BuildingStatus.Planned);
         }
     }

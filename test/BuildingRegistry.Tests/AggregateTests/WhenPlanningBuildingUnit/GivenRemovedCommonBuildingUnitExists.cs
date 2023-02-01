@@ -40,10 +40,11 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuildingUnit
                 .WithBuildingGeometry(buildingGeometry)
                 .WithBuildingUnit(
                     BuildingRegistry.Legacy.BuildingUnitStatus.Planned,
+                    new BuildingUnitPersistentLocalId(123),
                     isRemoved: true)
                 .WithBuildingUnit(
                     BuildingRegistry.Legacy.BuildingUnitStatus.NotRealized,
-                    new BuildingUnitPersistentLocalId(1),
+                    new BuildingUnitPersistentLocalId(456),
                     BuildingRegistry.Legacy.BuildingUnitFunction.Common,
                     isRemoved: true)
                 .Build();
