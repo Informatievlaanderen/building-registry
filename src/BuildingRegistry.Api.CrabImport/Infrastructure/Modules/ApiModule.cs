@@ -18,7 +18,6 @@ namespace BuildingRegistry.Api.CrabImport.Infrastructure.Modules
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Logging;
-using System;
     using Be.Vlaanderen.Basisregisters.DependencyInjection;
 
     public class ApiModule : Module
