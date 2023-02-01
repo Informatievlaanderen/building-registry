@@ -3,6 +3,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.BuildingUnit
     using System.Threading;
     using System.Threading.Tasks;
     using Abstractions;
+    using Abstractions.Validation;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
     using BuildingRegistry.Api.BackOffice.Abstractions.Building.Validators;
     using Be.Vlaanderen.Basisregisters.Sqs.Exceptions;
@@ -67,12 +68,8 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.BuildingUnit
         {
             return exception switch
             {
-                BuildingUnitHasInvalidFunctionException => new TicketError(
-                    ValidationErrorMessages.BuildingUnit.BuildingUnitHasInvalidFunction,
-                    ValidationErrorCodes.BuildingUnit.BuildingUnitHasInvalidFunction),
-                BuildingUnitHasInvalidStatusException => new TicketError(
-                    ValidationErrorMessages.BuildingUnit.BuildingUnitCannotBeNotRealized,
-                    ValidationErrorCodes.BuildingUnit.BuildingUnitCannotBeNotRealized),
+                BuildingUnitHasInvalidFunctionException => ValidationErrors.Common.CommonBuildingUnit.InvalidFunction.ToTicketError(),
+                BuildingUnitHasInvalidStatusException => ValidationErrors.NotRealizeBuildingUnit.BuildingUnitInvalidStatus.ToTicketError(),
                 _ => null
             };
         }

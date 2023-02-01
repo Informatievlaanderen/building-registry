@@ -68,15 +68,9 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.BuildingUnit
         {
             return exception switch
             {
-                BuildingHasInvalidStatusException => new TicketError(
-                    ValidationErrors.RetireBuildingUnit.BuildingInvalidStatus.Message,
-                    ValidationErrors.RetireBuildingUnit.BuildingInvalidStatus.Code),
-                BuildingUnitHasInvalidFunctionException => new TicketError(
-                    ValidationErrorMessages.BuildingUnit.BuildingUnitHasInvalidFunction,
-                    ValidationErrorCodes.BuildingUnit.BuildingUnitHasInvalidFunction),
-                BuildingUnitHasInvalidStatusException => new TicketError(
-                    ValidationErrorMessages.BuildingUnit.BuildingUnitCannotBeRetired,
-                    ValidationErrorCodes.BuildingUnit.BuildingUnitCannotBeRetired),
+                BuildingHasInvalidStatusException => ValidationErrors.RetireBuildingUnit.BuildingInvalidStatus.ToTicketError(),
+                BuildingUnitHasInvalidFunctionException => ValidationErrors.Common.CommonBuildingUnit.InvalidFunction.ToTicketError(),
+                BuildingUnitHasInvalidStatusException => ValidationErrors.RetireBuildingUnit.BuildingUnitInvalidStatus.ToTicketError(),
                 _ => null
             };
         }

@@ -57,12 +57,8 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.Building
             return exception switch
             {
                 BuildingHasInvalidStatusException => ValidationErrors.ChangeBuildingOutline.BuildingInvalidStatus.ToTicketError(),
-                BuildingHasInvalidBuildingGeometryMethodException => new TicketError(
-                    ValidationErrorMessages.Building.BuildingIsMeasuredByGrb,
-                    ValidationErrorCodes.Building.BuildingIsMeasuredByGrb),
-                BuildingHasBuildingUnitsOutsideBuildingGeometryException => new TicketError(
-                    ValidationErrorMessages.Building.BuildingHasBuildingUnitsOutsideChangedGeometry,
-                    ValidationErrorCodes.Building.BuildingHasBuildingUnitsOutsideChangedGeometry),
+                BuildingHasInvalidBuildingGeometryMethodException => ValidationErrors.Common.BuildingIsMeasuredByGrb.ToTicketError(),
+                BuildingHasBuildingUnitsOutsideBuildingGeometryException => ValidationErrors.ChangeBuildingOutline.BuildingHasBuildingUnitsOutsideChangedGeometry.ToTicketError(),
                 _ => null
             };
         }

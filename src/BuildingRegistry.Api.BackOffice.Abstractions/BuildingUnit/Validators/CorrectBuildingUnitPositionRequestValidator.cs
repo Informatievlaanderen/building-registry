@@ -7,6 +7,7 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Validators
     using BuildingRegistry.Building;
     using FluentValidation;
     using Requests;
+    using Validation;
 
     public class CorrectBuildingUnitPositionRequestValidator : AbstractValidator<CorrectBuildingUnitPositionRequest>
     {
@@ -15,14 +16,14 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Validators
            RuleFor(x => x.Positie)
                 .NotEmpty()
                 .When(x => x.PositieGeometrieMethode == PositieGeometrieMethode.AangeduidDoorBeheerder)
-                .WithErrorCode(ValidationErrorCodes.BuildingUnit.MissingRequiredPosition)
-                .WithMessage(ValidationErrorMessages.BuildingUnit.MissingRequiredPosition);
+                .WithErrorCode(ValidationErrors.Common.BuildingUnitRequiredPosition.Code)
+                .WithMessage(ValidationErrors.Common.BuildingUnitRequiredPosition.Message);
 
             RuleFor(x => x.Positie)
                 .Must(gml => GmlPointValidator.IsValid(gml, GmlHelpers.CreateGmlReader()))
                 .When(x => !string.IsNullOrEmpty(x.Positie))
-                .WithErrorCode(ValidationErrorCodes.BuildingUnit.InvalidPositionFormat)
-                .WithMessage(ValidationErrorMessages.BuildingUnit.InvalidPositionFormat);
+                .WithErrorCode(ValidationErrors.Common.InvalidBuildingUnitPosition.Code)
+                .WithMessage(ValidationErrors.Common.InvalidBuildingUnitPosition.Message);
         }
     }
 }

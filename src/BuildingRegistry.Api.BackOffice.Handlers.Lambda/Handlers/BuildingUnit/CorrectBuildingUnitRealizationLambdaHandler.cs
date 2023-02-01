@@ -2,6 +2,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.BuildingUnit
 {
     using System.Threading;
     using System.Threading.Tasks;
+    using Abstractions.Validation;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
     using Be.Vlaanderen.Basisregisters.Sqs.Exceptions;
     using Be.Vlaanderen.Basisregisters.Sqs.Lambda.Handlers;
@@ -59,12 +60,8 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.BuildingUnit
         {
             return exception switch
             {
-                BuildingUnitHasInvalidFunctionException => new TicketError(
-                    ValidationErrorMessages.BuildingUnit.BuildingUnitHasInvalidFunction,
-                    ValidationErrorCodes.BuildingUnit.BuildingUnitHasInvalidFunction),
-                BuildingUnitHasInvalidStatusException => new TicketError(
-                    ValidationErrorMessages.BuildingUnit.BuildingUnitCannotBeCorrectedFromRealized,
-                    ValidationErrorCodes.BuildingUnit.BuildingUnitCannotBeCorrectedFromRealized),
+                BuildingUnitHasInvalidFunctionException => ValidationErrors.Common.CommonBuildingUnit.InvalidFunction.ToTicketError(),
+                BuildingUnitHasInvalidStatusException => ValidationErrors.CorrectBuildingUnitRealization.BuildingUnitInvalidStatus.ToTicketError(),
                 _ => null
             };
         }
