@@ -26,14 +26,16 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\BuildingRegistry.Api.CrabImport.Abstractions\BuildingRegistry.Api.CrabImport.Abstractions.csproj" />
-    <ProjectReference Include="..\BuildingRegistry.Api.CrabImport.Handlers\BuildingRegistry.Api.CrabImport.Handlers.csproj" />
     <ProjectReference Include="..\BuildingRegistry.Infrastructure\BuildingRegistry.Infrastructure.csproj" />
     <ProjectReference Include="..\BuildingRegistry\BuildingRegistry.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <Compile Include="..\..\SolutionInfo.cs" Link="Properties\SolutionInfo.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Handlers" />
   </ItemGroup>
 
   <Import Project="..\..\.paket\Paket.Restore.targets" />
