@@ -27,7 +27,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\BuildingRegistry.Api.Extract.Handlers\BuildingRegistry.Api.Extract.Handlers.csproj" />
     <ProjectReference Include="..\BuildingRegistry.Projections.Extract\BuildingRegistry.Projections.Extract.csproj" />
   </ItemGroup>
 
