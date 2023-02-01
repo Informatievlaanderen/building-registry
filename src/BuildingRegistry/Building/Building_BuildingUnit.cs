@@ -46,8 +46,7 @@ namespace BuildingRegistry.Building
         public void RealizeBuildingUnit(BuildingUnitPersistentLocalId buildingUnitPersistentLocalId)
         {
             GuardRemovedBuilding();
-            GuardBuildingInvalidStatuses(
-                BuildingStatus.Planned, BuildingStatus.UnderConstruction, BuildingStatus.NotRealized, BuildingStatus.Retired);
+            GuardBuildingValidStatuses(BuildingStatus.Realized);
 
             _buildingUnits
                 .GetNotRemovedByPersistentLocalId(buildingUnitPersistentLocalId)
@@ -68,8 +67,7 @@ namespace BuildingRegistry.Building
             BuildingUnitPersistentLocalId buildingUnitPersistentLocalId)
         {
             GuardRemovedBuilding();
-            GuardBuildingInvalidStatuses(
-                BuildingStatus.Planned, BuildingStatus.UnderConstruction, BuildingStatus.NotRealized, BuildingStatus.Retired);
+            GuardBuildingValidStatuses(BuildingStatus.Realized);
 
             _buildingUnits
                 .GetNotRemovedByPersistentLocalId(buildingUnitPersistentLocalId)
@@ -94,7 +92,7 @@ namespace BuildingRegistry.Building
             BuildingUnitPersistentLocalId buildingUnitPersistentLocalId)
         {
             GuardRemovedBuilding();
-            GuardBuildingInvalidStatuses(BuildingStatus.NotRealized, BuildingStatus.Retired);
+            GuardBuildingValidStatuses(BuildingStatus.Realized, BuildingStatus.Planned, BuildingStatus.UnderConstruction);
 
             _buildingUnits
                 .GetNotRemovedByPersistentLocalId(buildingUnitPersistentLocalId)
@@ -109,7 +107,7 @@ namespace BuildingRegistry.Building
             ExtendedWkbGeometry? position)
         {
             GuardRemovedBuilding();
-            GuardBuildingInvalidStatuses(BuildingStatus.NotRealized, BuildingStatus.Retired);
+            GuardBuildingValidStatuses(BuildingStatus.Planned, BuildingStatus.Realized, BuildingStatus.UnderConstruction);
 
             var buildingUnit = _buildingUnits.GetNotRemovedByPersistentLocalId(buildingUnitPersistentLocalId);
 
@@ -129,7 +127,7 @@ namespace BuildingRegistry.Building
         public void RetireBuildingUnit(BuildingUnitPersistentLocalId buildingUnitPersistentLocalId)
         {
             GuardRemovedBuilding();
-            GuardBuildingInvalidStatuses(BuildingStatus.NotRealized, BuildingStatus.Retired);
+            GuardBuildingValidStatuses(BuildingStatus.Planned, BuildingStatus.Realized, BuildingStatus.UnderConstruction);
 
             _buildingUnits
                 .GetNotRemovedByPersistentLocalId(buildingUnitPersistentLocalId)
@@ -158,7 +156,7 @@ namespace BuildingRegistry.Building
         public void RegularizeBuildingUnit(BuildingUnitPersistentLocalId buildingUnitPersistentLocalId)
         {
             GuardRemovedBuilding();
-            GuardBuildingInvalidStatuses(BuildingStatus.NotRealized, BuildingStatus.Retired);
+            GuardBuildingValidStatuses(BuildingStatus.Planned, BuildingStatus.Realized, BuildingStatus.UnderConstruction);
 
             _buildingUnits
                 .GetNotRemovedByPersistentLocalId(buildingUnitPersistentLocalId)
@@ -178,7 +176,7 @@ namespace BuildingRegistry.Building
         public void DeregulateBuildingUnit(BuildingUnitPersistentLocalId buildingUnitPersistentLocalId)
         {
             GuardRemovedBuilding();
-            GuardBuildingInvalidStatuses(BuildingStatus.NotRealized, BuildingStatus.Retired);
+            GuardBuildingValidStatuses(BuildingStatus.Planned, BuildingStatus.Realized, BuildingStatus.UnderConstruction);
 
             _buildingUnits
                 .GetNotRemovedByPersistentLocalId(buildingUnitPersistentLocalId)
@@ -240,14 +238,6 @@ namespace BuildingRegistry.Building
             _buildingUnits
                 .GetNotRemovedByPersistentLocalId(buildingUnitPersistentLocalId)
                 .DetachAddressBecauseAddressWasRetired(addressPersistentLocalId);
-        }
-
-        private void GuardBuildingInvalidStatuses(params BuildingStatus[] invalidStatuses)
-        {
-            if (invalidStatuses.Contains(BuildingStatus))
-            {
-                throw new BuildingHasInvalidStatusException();
-            }
         }
 
         private void GuardBuildingValidStatuses(params BuildingStatus[] validStatuses)
