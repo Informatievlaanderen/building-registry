@@ -133,7 +133,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRemovingBuilding
                     isRemoved: true)
                 .Build();
 
-            var sut = new BuildingFactory(NoSnapshotStrategy.Instance, Mock.Of<IAddCommonBuildingUnit>(), Mock.Of<IAddresses>()).Create();
+            var sut = new BuildingFactory(NoSnapshotStrategy.Instance).Create();
             sut.Initialize(new List<object> { buildingWasMigrated });
 
             // Act

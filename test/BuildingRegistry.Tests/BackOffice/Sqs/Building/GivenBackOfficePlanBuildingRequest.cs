@@ -8,8 +8,8 @@ namespace BuildingRegistry.Tests.BackOffice.Sqs.Building
     using Be.Vlaanderen.Basisregisters.MessageHandling.AwsSqs.Simple;
     using Be.Vlaanderen.Basisregisters.Sqs;
     using BuildingRegistry.Api.BackOffice.Abstractions.Building.Requests;
-    using BuildingRegistry.Api.BackOffice.Handlers.Sqs.Handlers.Building;
-    using BuildingRegistry.Api.BackOffice.Handlers.Sqs.Requests.Building;
+    using BuildingRegistry.Api.BackOffice.Abstractions.Building.SqsRequests;
+    using BuildingRegistry.Api.BackOffice.Handlers.Building;
     using Fixtures;
     using FluentAssertions;
     using Moq;
@@ -45,7 +45,7 @@ namespace BuildingRegistry.Tests.BackOffice.Sqs.Building
 
             var sqsRequest = new PlanBuildingSqsRequest
             {
-                Request = new PlanBuildingBackOfficeRequest()
+                Request = new PlanBuildingRequest()
             };
 
             // Act

@@ -1,7 +1,6 @@
 namespace BuildingRegistry.Tests.AggregateTests.WhenAttachingAddressToBuildingUnit
 {
     using AutoFixture;
-    using Be.Vlaanderen.Basisregisters.AggregateSource;
     using Be.Vlaanderen.Basisregisters.AggregateSource.Testing;
     using Building;
     using Building.Commands;

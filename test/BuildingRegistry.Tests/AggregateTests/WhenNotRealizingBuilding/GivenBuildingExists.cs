@@ -200,7 +200,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenNotRealizingBuilding
             );
             ((ISetProvenance)buildingWasMigrated).SetProvenance(Fixture.Create<Provenance>());
 
-            var sut = new BuildingFactory(NoSnapshotStrategy.Instance, Mock.Of<IAddCommonBuildingUnit>(), Mock.Of<IAddresses>()).Create();
+            var sut = new BuildingFactory(NoSnapshotStrategy.Instance).Create();
             sut.Initialize(new List<object> { buildingWasMigrated });
 
             // Act

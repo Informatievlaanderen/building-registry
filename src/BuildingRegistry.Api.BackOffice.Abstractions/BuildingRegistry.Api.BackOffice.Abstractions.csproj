@@ -22,6 +22,6 @@
   <ItemGroup>
     <ProjectReference Include="..\BuildingRegistry.Infrastructure\BuildingRegistry.Infrastructure.csproj" />
   </ItemGroup>
-
+  
   <Import Project="..\..\.paket\Paket.Restore.targets" />
 </Project>

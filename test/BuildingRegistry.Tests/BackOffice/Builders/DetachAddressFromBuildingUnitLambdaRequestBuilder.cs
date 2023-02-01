@@ -6,8 +6,8 @@ namespace BuildingRegistry.Tests.BackOffice.Builders
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Building;
     using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Requests;
+    using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.SqsRequests;
     using BuildingRegistry.Api.BackOffice.Handlers.Lambda.Requests.BuildingUnit;
-    using BuildingRegistry.Api.BackOffice.Handlers.Sqs.Requests.BuildingUnit;
 
     public class DetachAddressFromBuildingUnitLambdaRequestBuilder
     {

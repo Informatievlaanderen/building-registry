@@ -4,15 +4,14 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
     using System.Threading.Tasks;
     using Abstractions.Building.Validators;
     using Abstractions.BuildingUnit.Requests;
+    using Abstractions.BuildingUnit.SqsRequests;
     using Be.Vlaanderen.Basisregisters.AcmIdm;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
     using Be.Vlaanderen.Basisregisters.GrAr.Edit.Validators;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Be.Vlaanderen.Basisregisters.Sqs.Exceptions;
-    using BuildingRegistry.Building.Exceptions;
     using FluentValidation;
-    using Handlers.Sqs.Requests.BuildingUnit;
     using Microsoft.AspNetCore.Authentication.JwtBearer;
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Http;

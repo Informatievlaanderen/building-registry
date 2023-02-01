@@ -3,11 +3,11 @@ namespace BuildingRegistry.Api.BackOffice.Building
     using System.Threading;
     using System.Threading.Tasks;
     using Abstractions.Building.Requests;
+    using Abstractions.Building.SqsRequests;
     using Be.Vlaanderen.Basisregisters.AcmIdm;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using FluentValidation;
-    using Handlers.Sqs.Requests.Building;
     using Microsoft.AspNetCore.Authentication.JwtBearer;
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Http;

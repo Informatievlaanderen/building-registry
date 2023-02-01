@@ -9,13 +9,10 @@ namespace BuildingRegistry.Api.BackOffice.Infrastructure.Modules
     using Be.Vlaanderen.Basisregisters.DataDog.Tracing.Microsoft;
     using Be.Vlaanderen.Basisregisters.DependencyInjection;
     using BuildingRegistry.Infrastructure;
-    using BuildingRegistry.Infrastructure.Modules;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Logging;
-    using Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Autofac;
     using Consumer.Address;
-    using Handlers.Sqs;
     using Be.Vlaanderen.Basisregisters.AcmIdm;
 
     public class ApiModule : Module
@@ -54,21 +51,21 @@ namespace BuildingRegistry.Api.BackOffice.Infrastructure.Modules
                 .AsSelf()
                 .InstancePerLifetimeScope();
 
-            builder.RegisterModule(new IdempotencyModule(
-                _services,
-                _configuration.GetSection(IdempotencyConfiguration.Section).Get<IdempotencyConfiguration>()
-                    .ConnectionString,
-                new IdempotencyMigrationsTableInfo(Schema.Import),
-                new IdempotencyTableInfo(Schema.Import),
-                _loggerFactory));
-
-            builder.RegisterModule(new EnvelopeModule());
-            builder.RegisterModule(new BackOfficeModule(_configuration, _services, _loggerFactory));
-            builder.RegisterModule(new MediatRModule());
-            builder.RegisterModule(new EditModule(_configuration, _services, _loggerFactory));
-            builder.RegisterModule(new SqsHandlersModule(_configuration[SqsQueueUrlConfigKey]));
-            builder.RegisterModule(new TicketingModule(_configuration, _services));
-            builder.RegisterModule(new ConsumerAddressModule(_configuration, _services, _loggerFactory));
+            builder
+                .RegisterModule(new BackOfficeModule(_configuration, _services, _loggerFactory))
+                .RegisterModule(new MediatRModule())
+                .RegisterModule(new AggregateSourceModule(_configuration))
+                .RegisterModule(new SqsHandlersModule(_configuration[SqsQueueUrlConfigKey]))
+                .RegisterModule(new TicketingModule(_configuration, _services))
+                .RegisterModule(new ConsumerAddressModule(_configuration, _services, _loggerFactory))
+                // Required because backoffice is responsible for running EF migrations
+                .RegisterModule(new IdempotencyModule(
+                    _services,
+                    _configuration.GetSection(IdempotencyConfiguration.Section).Get<IdempotencyConfiguration>()
+                        .ConnectionString,
+                    new IdempotencyMigrationsTableInfo(Schema.Import),
+                    new IdempotencyTableInfo(Schema.Import),
+                    _loggerFactory));
 
             _services.AddAcmIdmAuthorizationHandlers();
 

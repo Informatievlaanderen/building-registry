@@ -64,7 +64,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
                     null,
                     Fixture.Create<Provenance>(),
                     new Dictionary<string, object?>(),
-                    new CorrectBuildingNotRealizationBackOfficeRequest { PersistentLocalId = buildingPersistentLocalId }),
+                    new CorrectBuildingNotRealizationRequest { PersistentLocalId = buildingPersistentLocalId }),
                 CancellationToken.None);
 
             //Assert
@@ -101,7 +101,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
                     null,
                     Fixture.Create<Provenance>(),
                     new Dictionary<string, object?>(),
-                    new CorrectBuildingNotRealizationBackOfficeRequest { PersistentLocalId = buildingPersistentLocalId }),
+                    new CorrectBuildingNotRealizationRequest { PersistentLocalId = buildingPersistentLocalId }),
                 CancellationToken.None);
 
             //Assert
@@ -137,7 +137,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
                     null,
                     Fixture.Create<Provenance>(),
                     new Dictionary<string, object?>(),
-                    new CorrectBuildingNotRealizationBackOfficeRequest { PersistentLocalId = buildingPersistentLocalId }),
+                    new CorrectBuildingNotRealizationRequest { PersistentLocalId = buildingPersistentLocalId }),
                 CancellationToken.None);
 
             //Assert
@@ -172,7 +172,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
                     null,
                     Fixture.Create<Provenance>(),
                     new Dictionary<string, object?>(),
-                    new CorrectBuildingNotRealizationBackOfficeRequest { PersistentLocalId = buildingPersistentLocalId }),
+                    new CorrectBuildingNotRealizationRequest { PersistentLocalId = buildingPersistentLocalId }),
                 CancellationToken.None);
 
             //Assert

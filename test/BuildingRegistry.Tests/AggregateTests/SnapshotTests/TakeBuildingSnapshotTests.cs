@@ -22,7 +22,7 @@ namespace BuildingRegistry.Tests.AggregateTests.SnapshotTests
         [Fact]
         public void BuildingWasPlannedIsSavedInSnapshot()
         {
-            var aggregate = new BuildingFactory(IntervalStrategy.Default, Mock.Of<IAddCommonBuildingUnit>(), Mock.Of<IAddresses>()).Create();
+            var aggregate = new BuildingFactory(IntervalStrategy.Default).Create();
 
             var buildingWasPlanned = Fixture.Create<BuildingWasPlannedV2>();
 
@@ -44,7 +44,7 @@ namespace BuildingRegistry.Tests.AggregateTests.SnapshotTests
         [Fact]
         public void BuildingWasMigratedIsSavedInSnapshot()
         {
-            var aggregate = new BuildingFactory(IntervalStrategy.Default, Mock.Of<IAddCommonBuildingUnit>(), Mock.Of<IAddresses>()).Create();
+            var aggregate = new BuildingFactory(IntervalStrategy.Default).Create();
 
             var buildingWasMigrated = Fixture.Create<BuildingWasMigrated>();
 
@@ -84,7 +84,7 @@ namespace BuildingRegistry.Tests.AggregateTests.SnapshotTests
         [Fact]
         public void BuildingUnitWasPlannedIsSavedInSnapshot()
         {
-            var aggregate = new BuildingFactory(IntervalStrategy.Default, Mock.Of<IAddCommonBuildingUnit>(), Mock.Of<IAddresses>()).Create();
+            var aggregate = new BuildingFactory(IntervalStrategy.Default).Create();
 
             var buildingWasPlanned = Fixture.Create<BuildingWasPlannedV2>();
             var buildingUnitWasPlanned = Fixture.Create<BuildingUnitWasPlannedV2>();
@@ -118,7 +118,7 @@ namespace BuildingRegistry.Tests.AggregateTests.SnapshotTests
         [Fact]
         public void BuildingUnitWasDeregulatedIsSavedInSnapshot()
         {
-            var aggregate = new BuildingFactory(IntervalStrategy.Default, Mock.Of<IAddCommonBuildingUnit>(), Mock.Of<IAddresses>()).Create();
+            var aggregate = new BuildingFactory(IntervalStrategy.Default).Create();
 
             Fixture.Customize(new WithFixedBuildingUnitPersistentLocalId());
 

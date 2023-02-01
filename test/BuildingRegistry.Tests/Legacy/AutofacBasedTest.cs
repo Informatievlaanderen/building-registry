@@ -1,49 +1,18 @@
 namespace BuildingRegistry.Tests.Legacy
 {
-    using System;
     using System.Collections.Generic;
-    using Api.BackOffice.Abstractions;
     using Autofac;
-    using BackOffice;
-    using Be.Vlaanderen.Basisregisters.AggregateSource.Snapshotting;
     using Be.Vlaanderen.Basisregisters.AggregateSource.SqlStreamStore.Autofac;
     using Be.Vlaanderen.Basisregisters.AggregateSource.Testing;
     using Be.Vlaanderen.Basisregisters.AggregateSource.Testing.Comparers;
     using Be.Vlaanderen.Basisregisters.AggregateSource.Testing.SqlStreamStore.Autofac;
     using Be.Vlaanderen.Basisregisters.EventHandling;
     using Be.Vlaanderen.Basisregisters.EventHandling.Autofac;
-    using Building;
     using Infrastructure.Modules;
     using KellermanSoftware.CompareNetObjects;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.Logging;
-    using Microsoft.Extensions.Primitives;
-    using Moq;
     using Xunit.Abstractions;
-
-    public class TestConfig : IConfiguration
-    {
-        public IConfigurationSection GetSection(string key)
-        {
-            return null;
-        }
-
-        public IEnumerable<IConfigurationSection> GetChildren()
-        {
-            return new List<IConfigurationSection>();
-        }
-
-        public IChangeToken GetReloadToken()
-        {
-            throw new NotImplementedException();
-        }
-
-        public string this[string key]
-        {
-            get => null;
-            set => throw new NotImplementedException();
-        }
-    }
 
     public class AutofacBasedTest
     {
@@ -63,35 +32,20 @@ namespace BuildingRegistry.Tests.Legacy
         {
             var configuration = new ConfigurationBuilder()
                 .AddInMemoryCollection(new Dictionary<string, string> { { "ConnectionStrings:Events", "x" } })
-                .AddInMemoryCollection(new Dictionary<string, string> { { "ConnectionStrings:Snapshots", "x" } })
                 .Build();
-
-            var eventSerializerSettings = EventsJsonSerializerSettingsProvider.CreateSerializerSettings();
 
             var containerBuilder = new ContainerBuilder();
 
             containerBuilder
-                .RegisterModule(new EventHandlingModule(typeof(DomainAssemblyMarker).Assembly, eventSerializerSettings))
-                .RegisterModule(new CommandHandlingModule(configuration))
+                .RegisterModule(new LegacyCommandHandlingModule(configuration))
+                // Registered separately because tests use in-memory database
                 .RegisterModule(new SqlStreamStoreModule());
-
-            containerBuilder.RegisterModule(new SqlSnapshotStoreModule());
 
             containerBuilder.UseAggregateSourceTesting(CreateFactComparer(), CreateExceptionComparer());
 
             containerBuilder.RegisterInstance(testOutputHelper);
             containerBuilder.RegisterType<XUnitLogger>().AsImplementedInterfaces();
             containerBuilder.RegisterType<FakePersistentLocalIdGenerator>().As<IPersistentLocalIdGenerator>();
-
-            containerBuilder.Register(c => new FakeBackOfficeContextFactory().CreateDbContext(Array.Empty<string>()))
-                .As<BackOfficeContext>();
-
-            containerBuilder.RegisterType<AddCommonBuildingUnit>()
-                .As<IAddCommonBuildingUnit>();
-
-            containerBuilder
-                .Register(c => new BuildingFactory(NoSnapshotStrategy.Instance, c.Resolve<IAddCommonBuildingUnit>(), Mock.Of<IAddresses>()))
-                .As<IBuildingFactory>();
 
             _container = containerBuilder.Build();
         }

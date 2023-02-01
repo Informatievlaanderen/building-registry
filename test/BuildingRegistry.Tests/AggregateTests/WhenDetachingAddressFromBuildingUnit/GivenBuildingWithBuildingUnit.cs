@@ -75,7 +75,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenDetachingAddressFromBuilding
                     isRemoved: false)
                 .Build();
 
-            var sut = new BuildingFactory(NoSnapshotStrategy.Instance, Mock.Of<IAddCommonBuildingUnit>(), Mock.Of<IAddresses>()).Create();
+            var sut = new BuildingFactory(NoSnapshotStrategy.Instance).Create();
             sut.Initialize(new List<object>
             {
                 buildingWasMigrated,

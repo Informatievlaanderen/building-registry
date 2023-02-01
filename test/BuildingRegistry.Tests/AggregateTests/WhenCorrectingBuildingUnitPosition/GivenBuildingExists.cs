@@ -273,7 +273,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitPositi
                                    "</gml:exterior>" +
                                    "</gml:Polygon>";
 
-            var building = new BuildingFactory(NoSnapshotStrategy.Instance, Mock.Of<IAddCommonBuildingUnit>(), Mock.Of<IAddresses>()).Create();
+            var building = new BuildingFactory(NoSnapshotStrategy.Instance).Create();
 
             var buildingWasPlannedV2 = new BuildingWasPlannedV2(
                 Fixture.Create<BuildingPersistentLocalId>(),

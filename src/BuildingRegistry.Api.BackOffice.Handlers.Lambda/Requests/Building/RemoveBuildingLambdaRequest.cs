@@ -1,15 +1,12 @@
 namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Requests.Building
 {
-    using Abstractions;
+    using Abstractions.Building.SqsRequests;
     using BuildingRegistry.Api.BackOffice.Abstractions.Building.Requests;
+    using BuildingRegistry.Api.BackOffice.Abstractions.Building.SqsRequests;
     using BuildingRegistry.Building;
     using BuildingRegistry.Building.Commands;
-    using Sqs.Requests.Building;
 
-    public sealed record RemoveBuildingLambdaRequest :
-        BuildingLambdaRequest,
-        IHasBackOfficeRequest<RemoveBuildingRequest>,
-        Abstractions.IHasBuildingPersistentLocalId
+    public sealed record RemoveBuildingLambdaRequest : BuildingLambdaRequest, Abstractions.IHasBuildingPersistentLocalId
     {
         public RemoveBuildingRequest Request { get; }
 

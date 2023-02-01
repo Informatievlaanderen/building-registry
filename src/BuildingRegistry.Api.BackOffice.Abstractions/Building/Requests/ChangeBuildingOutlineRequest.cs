@@ -1,16 +1,23 @@
 namespace BuildingRegistry.Api.BackOffice.Abstractions.Building.Requests
 {
     using System.Collections.Generic;
+    using System.Runtime.Serialization;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
-    using Be.Vlaanderen.Basisregisters.Sqs.Responses;
     using BuildingRegistry.Building;
     using BuildingRegistry.Building.Commands;
-    using MediatR;
     using Newtonsoft.Json;
     using Swashbuckle.AspNetCore.Filters;
 
-    public class ChangeBuildingOutlineRequest : ChangeBuildingOutlineBackOfficeRequest, IRequest<ETagResponse>
+    [DataContract(Name = "WijzigGeometrieGeschetstGebouw", Namespace = "")]
+    public sealed class ChangeBuildingOutlineRequest
     {
+        /// <summary>
+        /// De schets van het gebouw in GML-3 formaat met Lambert 72 referentie systeem.
+        /// </summary>
+        [DataMember(Name = "GeometriePolygoon", Order = 0)]
+        [JsonProperty(Required = Required.Always)]
+        public string GeometriePolygoon { get; set; }
+
         /// <summary>
         /// De unieke en persistente identificator van het gebouw.
         /// </summary>

@@ -8,10 +8,10 @@ namespace BuildingRegistry.Tests.BackOffice.Api.Building.WhenCorrectingBuildingN
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
     using Be.Vlaanderen.Basisregisters.Sqs.Requests;
     using BuildingRegistry.Api.BackOffice.Abstractions.Building.Requests;
+    using BuildingRegistry.Api.BackOffice.Abstractions.Building.SqsRequests;
     using BuildingRegistry.Api.BackOffice.Abstractions.Building.Validators;
     using BuildingRegistry.Api.BackOffice.Building;
-    using BuildingRegistry.Api.BackOffice.Handlers.Sqs.Requests.Building;
-    using BuildingRegistry.Tests.Fixtures;
+    using Fixtures;
     using FluentAssertions;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;

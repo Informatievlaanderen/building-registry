@@ -9,8 +9,8 @@ namespace BuildingRegistry.Tests.BackOffice.Sqs.BuildingUnit
     using Be.Vlaanderen.Basisregisters.Sqs;
     using Be.Vlaanderen.Basisregisters.Sqs.Exceptions;
     using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Requests;
-    using BuildingRegistry.Api.BackOffice.Handlers.Sqs.Handlers.BuildingUnit;
-    using BuildingRegistry.Api.BackOffice.Handlers.Sqs.Requests.BuildingUnit;
+    using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.SqsRequests;
+    using BuildingRegistry.Api.BackOffice.Handlers.BuildingUnit;
     using BuildingRegistry.Building;
     using Fixtures;
     using FluentAssertions;
@@ -54,7 +54,7 @@ namespace BuildingRegistry.Tests.BackOffice.Sqs.BuildingUnit
 
             var sqsRequest = new RegularizeBuildingUnitSqsRequest
             {
-                Request = new RegularizeBuildingUnitBackOfficeRequest
+                Request = new RegularizeBuildingUnitRequest
                 {
                     BuildingUnitPersistentLocalId = Fixture.Create<BuildingUnitPersistentLocalId>()
                 }
@@ -87,7 +87,7 @@ namespace BuildingRegistry.Tests.BackOffice.Sqs.BuildingUnit
             var act = async () => await sut.Handle(
                 new RegularizeBuildingUnitSqsRequest
                 {
-                    Request = new RegularizeBuildingUnitBackOfficeRequest
+                    Request = new RegularizeBuildingUnitRequest
                     {
                         BuildingUnitPersistentLocalId = Fixture.Create<BuildingUnitPersistentLocalId>()
                     }

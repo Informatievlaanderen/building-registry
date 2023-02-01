@@ -7,6 +7,7 @@ namespace BuildingRegistry.Building
     public partial class Building
     {
         public void PlanBuildingUnit(
+            IAddCommonBuildingUnit addCommonBuildingUnit,
             BuildingUnitPersistentLocalId buildingUnitPersistentLocalId,
             BuildingUnitPositionGeometryMethod positionGeometryMethod,
             ExtendedWkbGeometry? position,
@@ -39,7 +40,7 @@ namespace BuildingRegistry.Building
                 function,
                 hasDeviation));
 
-            EnsureCommonBuildingUnit();
+            EnsureCommonBuildingUnit(addCommonBuildingUnit);
         }
 
         public void RealizeBuildingUnit(BuildingUnitPersistentLocalId buildingUnitPersistentLocalId)
@@ -62,7 +63,9 @@ namespace BuildingRegistry.Building
                 .CorrectRealizeBuildingUnit();
         }
 
-        public void CorrectRetiredBuildingUnit(BuildingUnitPersistentLocalId buildingUnitPersistentLocalId)
+        public void CorrectRetiredBuildingUnit(
+            IAddCommonBuildingUnit addCommonBuildingUnit,
+            BuildingUnitPersistentLocalId buildingUnitPersistentLocalId)
         {
             GuardRemovedBuilding();
             GuardBuildingInvalidStatuses(
@@ -72,7 +75,7 @@ namespace BuildingRegistry.Building
                 .GetNotRemovedByPersistentLocalId(buildingUnitPersistentLocalId)
                 .CorrectRetiredBuildingUnit(BuildingGeometry);
 
-            EnsureCommonBuildingUnit();
+            EnsureCommonBuildingUnit(addCommonBuildingUnit);
         }
 
         public void NotRealizeBuildingUnit(BuildingUnitPersistentLocalId buildingUnitPersistentLocalId)
@@ -86,7 +89,9 @@ namespace BuildingRegistry.Building
             NotRealizeOrRetireCommonBuildingUnit();
         }
 
-        public void CorrectNotRealizeBuildingUnit(BuildingUnitPersistentLocalId buildingUnitPersistentLocalId)
+        public void CorrectNotRealizeBuildingUnit(
+            IAddCommonBuildingUnit addCommonBuildingUnit,
+            BuildingUnitPersistentLocalId buildingUnitPersistentLocalId)
         {
             GuardRemovedBuilding();
             GuardBuildingInvalidStatuses(BuildingStatus.NotRealized, BuildingStatus.Retired);
@@ -95,7 +100,7 @@ namespace BuildingRegistry.Building
                 .GetNotRemovedByPersistentLocalId(buildingUnitPersistentLocalId)
                 .CorrectNotRealize(BuildingGeometry);
 
-            EnsureCommonBuildingUnit();
+            EnsureCommonBuildingUnit(addCommonBuildingUnit);
         }
 
         public void CorrectPositionBuildingUnit(
@@ -191,21 +196,23 @@ namespace BuildingRegistry.Building
         }
 
         public void AttachAddressToBuildingUnit(
+            IAddresses addresses,
             BuildingUnitPersistentLocalId buildingUnitPersistentLocalId,
             AddressPersistentLocalId addressPersistentLocalId)
         {
             _buildingUnits
                 .GetNotRemovedByPersistentLocalId(buildingUnitPersistentLocalId)
-                .AttachAddress(addressPersistentLocalId, _addresses);
+                .AttachAddress(addressPersistentLocalId, addresses);
         }
 
         public void DetachAddressFromBuildingUnit(
+            IAddresses addresses,
             BuildingUnitPersistentLocalId buildingUnitPersistentLocalId,
             AddressPersistentLocalId addressPersistentLocalId)
         {
             _buildingUnits
                 .GetNotRemovedByPersistentLocalId(buildingUnitPersistentLocalId)
-                .DetachAddress(addressPersistentLocalId, _addresses);
+                .DetachAddress(addressPersistentLocalId, addresses);
         }
 
         public void DetachAddressFromBuildingUnitBecauseAddressWasRemoved(
@@ -251,7 +258,7 @@ namespace BuildingRegistry.Building
             }
         }
 
-        private void EnsureCommonBuildingUnit()
+        private void EnsureCommonBuildingUnit(IAddCommonBuildingUnit addCommonBuildingUnit)
         {
             if (_buildingUnits.HasPlannedOrRealizedCommonBuildingUnit() || !_buildingUnits.RequiresCommonBuildingUnit())
             {
@@ -260,7 +267,7 @@ namespace BuildingRegistry.Building
 
             if (!_buildingUnits.HasCommonBuildingUnit(excludeRemoved: false))
             {
-                AddCommonBuildingUnit(_addCommonBuildingUnit);
+                AddCommonBuildingUnit(addCommonBuildingUnit);
                 return;
             }
 

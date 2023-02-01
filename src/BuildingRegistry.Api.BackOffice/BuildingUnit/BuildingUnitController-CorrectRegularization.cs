@@ -9,17 +9,15 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
     using Be.Vlaanderen.Basisregisters.Sqs.Exceptions;
     using BuildingRegistry.Building;
     using BuildingRegistry.Building.Exceptions;
-    using Handlers.Sqs.Requests.BuildingUnit;
     using Infrastructure;
-    using Infrastructure.Options;
     using Microsoft.AspNetCore.Authentication.JwtBearer;
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
-    using Microsoft.Extensions.Options;
     using Swashbuckle.AspNetCore.Filters;
     using System.Threading;
     using System.Threading.Tasks;
+    using Abstractions.BuildingUnit.SqsRequests;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
 
     public partial class BuildingUnitController

@@ -1,19 +1,16 @@
 namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Requests.BuildingUnit
 {
-    using Abstractions;
+    using Abstractions.BuildingUnit.SqsRequests;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Requests;
+    using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.SqsRequests;
     using BuildingRegistry.Building;
     using BuildingRegistry.Building.Commands;
-    using Sqs.Requests.BuildingUnit;
     using IHasBuildingUnitPersistentLocalId = Abstractions.IHasBuildingUnitPersistentLocalId;
 
-    public sealed record CorrectBuildingUnitRetirementLambdaRequest :
-        BuildingUnitLambdaRequest,
-        IHasBackOfficeRequest<CorrectBuildingUnitRetirementBackOfficeRequest>,
-        IHasBuildingUnitPersistentLocalId
+    public sealed record CorrectBuildingUnitRetirementLambdaRequest : BuildingUnitLambdaRequest, IHasBuildingUnitPersistentLocalId
     {
-        public CorrectBuildingUnitRetirementBackOfficeRequest Request { get; }
+        public CorrectBuildingUnitRetirementRequest Request { get; }
 
         public int BuildingUnitPersistentLocalId => Request.BuildingUnitPersistentLocalId;
 
@@ -35,7 +32,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Requests.BuildingUnit
             string? ifMatchHeaderValue,
             Provenance provenance,
             IDictionary<string, object?> metadata,
-            CorrectBuildingUnitRetirementBackOfficeRequest request)
+            CorrectBuildingUnitRetirementRequest request)
             : base(messageGroupId, ticketId, ifMatchHeaderValue, provenance, metadata)
         {
             Request = request;

@@ -15,7 +15,6 @@ namespace BuildingRegistry.Tests
     using Fixtures;
     using Infrastructure.Modules;
     using Microsoft.Extensions.Configuration;
-    using Moq;
     using Newtonsoft.Json;
     using Xunit.Abstractions;
     using BuildingUnitFunction = BuildingRegistry.Legacy.BuildingUnitFunction;
@@ -108,7 +107,7 @@ namespace BuildingRegistry.Tests
                 .AsSelf();
 
             builder
-                .Register(c => new BuildingFactory(Fixture.Create<ISnapshotStrategy>(), c.Resolve<IAddCommonBuildingUnit>(), c.Resolve<IAddresses>()))
+                .Register(c => new BuildingFactory(Fixture.Create<ISnapshotStrategy>()))
                 .As<IBuildingFactory>();
         }
 
