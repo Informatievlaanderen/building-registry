@@ -1,17 +1,17 @@
-namespace BuildingRegistry.Api.Legacy.Handlers.Building
+namespace BuildingRegistry.Api.Legacy.Building.Handlers
 {
     using System;
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
-    using Abstractions.Building;
-    using Api.Legacy.Abstractions.Building.Query;
     using Be.Vlaanderen.Basisregisters.Api.Search.Filtering;
     using Be.Vlaanderen.Basisregisters.Api.Search.Pagination;
     using Be.Vlaanderen.Basisregisters.Api.Search.Sorting;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy;
     using MediatR;
     using Microsoft.EntityFrameworkCore;
+    using Query;
+    using Requests;
 
     public class CountHandler : IRequestHandler<CountRequest, TotaalAantalResponse>
     {

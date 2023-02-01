@@ -1,4 +1,4 @@
-namespace BuildingRegistry.Api.Legacy.Abstractions.Building.Responses
+namespace BuildingRegistry.Api.Legacy.Building.Responses
 {
     using System;
     using System.Collections.Generic;
@@ -15,12 +15,12 @@ namespace BuildingRegistry.Api.Legacy.Abstractions.Building.Responses
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy.SpatialTools;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using BuildingUnit;
-    using Converters;
     using Infrastructure.Options;
     using Microsoft.Extensions.Options;
     using Microsoft.SyndicationFeed;
     using Microsoft.SyndicationFeed.Atom;
     using Query;
+    using Requests;
     using Swashbuckle.AspNetCore.Filters;
     using Provenance = Be.Vlaanderen.Basisregisters.GrAr.Provenance.Syndication.Provenance;
 

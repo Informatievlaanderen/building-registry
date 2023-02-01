@@ -1,4 +1,4 @@
-namespace BuildingRegistry.Api.Legacy.Abstractions.Building.Query
+namespace BuildingRegistry.Api.Legacy.Building.Query
 {
     using System;
     using System.Collections.Generic;
@@ -7,9 +7,9 @@ namespace BuildingRegistry.Api.Legacy.Abstractions.Building.Query
     using Be.Vlaanderen.Basisregisters.Api.Search;
     using Be.Vlaanderen.Basisregisters.Api.Search.Filtering;
     using Be.Vlaanderen.Basisregisters.Api.Search.Sorting;
+    using BuildingRegistry.Projections.Legacy;
+    using BuildingRegistry.Projections.Legacy.BuildingSyndication;
     using Microsoft.EntityFrameworkCore;
-    using Projections.Legacy;
-    using Projections.Legacy.BuildingSyndication;
 
     public class BuildingSyndicationQuery : Query<BuildingSyndicationItem, BuildingSyndicationFilter, BuildingSyndicationQueryResult>
     {

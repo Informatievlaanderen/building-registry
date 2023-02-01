@@ -1,9 +1,11 @@
-namespace BuildingRegistry.Api.Legacy.Abstractions.Converters
+namespace BuildingRegistry.Api.Legacy.BuildingUnit
 {
     using System;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy.Gebouweenheid;
-    using BuildingRegistry.Building;
+    using BuildingUnitFunction = BuildingRegistry.Building.BuildingUnitFunction;
+    using BuildingUnitPositionGeometryMethod = BuildingRegistry.Building.BuildingUnitPositionGeometryMethod;
+    using BuildingUnitStatus = BuildingRegistry.Building.BuildingUnitStatus;
     using Legacy = BuildingRegistry.Legacy;
 
     public static class BuildingUnitStatusExtensions

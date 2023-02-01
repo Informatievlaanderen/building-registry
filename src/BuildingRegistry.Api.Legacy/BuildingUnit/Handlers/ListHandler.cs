@@ -1,20 +1,19 @@
-namespace BuildingRegistry.Api.Legacy.Handlers.BuildingUnit
+namespace BuildingRegistry.Api.Legacy.BuildingUnit.Handlers
 {
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
-    using Abstractions.BuildingUnit;
-    using Abstractions.Converters;
-    using Abstractions.Infrastructure;
-    using Api.Legacy.Abstractions.BuildingUnit.Query;
-    using Api.Legacy.Abstractions.BuildingUnit.Responses;
     using Be.Vlaanderen.Basisregisters.Api.Search;
     using Be.Vlaanderen.Basisregisters.Api.Search.Filtering;
     using Be.Vlaanderen.Basisregisters.Api.Search.Pagination;
     using Be.Vlaanderen.Basisregisters.Api.Search.Sorting;
     using Be.Vlaanderen.Basisregisters.GrAr.Common;
+    using Infrastructure;
     using MediatR;
     using Microsoft.EntityFrameworkCore;
+    using Query;
+    using Requests;
+    using Responses;
 
     public class ListHandler : IRequestHandler<ListRequest, BuildingUnitListResponse>
     {

@@ -1,8 +1,8 @@
 namespace BuildingRegistry.Api.Legacy.Infrastructure.Modules
 {
-    using Abstractions.Infrastructure.Grb;
     using Autofac;
-    using BuildingRegistry.Api.Legacy.Abstractions.Infrastructure.Grb.Wfs;
+    using Grb;
+    using Grb.Wfs;
     using Microsoft.Extensions.Configuration;
 
     public class GrbModule : Module

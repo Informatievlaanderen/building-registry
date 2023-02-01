@@ -1,14 +1,14 @@
-namespace BuildingRegistry.Api.Legacy.Handlers.Building
+namespace BuildingRegistry.Api.Legacy.Building.Handlers
 {
     using System.Threading;
     using System.Threading.Tasks;
-    using Abstractions.Building;
-    using Api.Legacy.Abstractions.Building.Responses;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
     using Be.Vlaanderen.Basisregisters.GrAr.Common;
     using MediatR;
     using Microsoft.AspNetCore.Http;
     using Microsoft.EntityFrameworkCore;
+    using Requests;
+    using Responses;
 
     public class GetReferencesHandler : IRequestHandler<GetReferencesRequest, BuildingReferencesResponse>
     {

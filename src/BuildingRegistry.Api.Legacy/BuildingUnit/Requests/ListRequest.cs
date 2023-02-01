@@ -1,11 +1,11 @@
-namespace BuildingRegistry.Api.Legacy.Abstractions.BuildingUnit
+namespace BuildingRegistry.Api.Legacy.BuildingUnit.Requests
 {
+    using BuildingRegistry.Projections.Legacy;
+    using BuildingRegistry.Projections.Syndication;
     using Infrastructure.Options;
     using MediatR;
     using Microsoft.AspNetCore.Http;
     using Microsoft.Extensions.Options;
-    using Projections.Legacy;
-    using Projections.Syndication;
     using Responses;
 
     public record ListRequest(

@@ -3,14 +3,13 @@ namespace BuildingRegistry.Api.Oslo.Infrastructure
     using System;
     using System.Linq;
     using System.Reflection;
-    using Abstractions.Infrastructure.Grb.Wfs;
-    using Abstractions.Infrastructure.Options;
     using Autofac;
     using Autofac.Extensions.DependencyInjection;
     using Be.Vlaanderen.Basisregisters.Api;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
     using Be.Vlaanderen.Basisregisters.DataDog.Tracing.Microsoft;
     using Configuration;
+    using Grb.Wfs;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.Mvc.ApiExplorer;
@@ -21,6 +20,7 @@ namespace BuildingRegistry.Api.Oslo.Infrastructure
     using Microsoft.Extensions.Logging;
     using Microsoft.OpenApi.Models;
     using Modules;
+    using Options;
 
     /// <summary>Represents the startup process for the application.</summary>
     public class Startup

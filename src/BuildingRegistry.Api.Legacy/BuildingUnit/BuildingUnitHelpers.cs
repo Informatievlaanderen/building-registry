@@ -1,4 +1,4 @@
-namespace BuildingRegistry.Api.Legacy.Abstractions.BuildingUnit
+namespace BuildingRegistry.Api.Legacy.BuildingUnit
 {
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy.SpatialTools;
 
