@@ -7,12 +7,6 @@ namespace BuildingRegistry.Api.Legacy.Building
     using System.Threading;
     using System.Threading.Tasks;
     using System.Xml;
-    using Abstractions.Building;
-    using Abstractions.Building.Query;
-    using Abstractions.Building.Responses;
-    using Abstractions.Infrastructure;
-    using Abstractions.Infrastructure.Grb;
-    using Abstractions.Infrastructure.Options;
     using Be.Vlaanderen.Basisregisters.Api;
     using Be.Vlaanderen.Basisregisters.Api.ETag;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
@@ -30,7 +24,12 @@ namespace BuildingRegistry.Api.Legacy.Building
     using Projections.Syndication;
     using Swashbuckle.AspNetCore.Filters;
     using Infrastructure;
+    using Infrastructure.Grb;
+    using Infrastructure.Options;
     using MediatR;
+    using Query;
+    using Requests;
+    using Responses;
 
     [ApiVersion("1.0")]
     [AdvertiseApiVersions("1.0")]

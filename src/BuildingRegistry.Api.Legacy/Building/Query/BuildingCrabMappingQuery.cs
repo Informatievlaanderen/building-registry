@@ -1,14 +1,14 @@
-namespace BuildingRegistry.Api.Legacy.Abstractions.Building.Query
+namespace BuildingRegistry.Api.Legacy.Building.Query
 {
     using System.Collections.Generic;
     using System.Linq;
     using Be.Vlaanderen.Basisregisters.Api.Search;
     using Be.Vlaanderen.Basisregisters.Api.Search.Filtering;
     using Be.Vlaanderen.Basisregisters.Api.Search.Sorting;
+    using BuildingRegistry.Projections.Legacy;
+    using BuildingRegistry.Projections.Legacy.BuildingDetail;
+    using BuildingRegistry.Projections.Legacy.BuildingPersistentIdCrabIdMapping;
     using Microsoft.EntityFrameworkCore;
-    using Projections.Legacy;
-    using Projections.Legacy.BuildingDetail;
-    using Projections.Legacy.BuildingPersistentIdCrabIdMapping;
 
     public class BuildingCrabMappingQuery : Query<BuildingPersistentLocalIdCrabIdMapping, BuildingCrabMappingFilter>
     {

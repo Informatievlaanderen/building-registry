@@ -1,8 +1,0 @@
-Be.Vlaanderen.Basisregisters.AggregateSource
-Be.Vlaanderen.Basisregisters.AggregateSource.SqlStreamStore
-Be.Vlaanderen.Basisregisters.Api
-
-MediatR
-
-SourceLink.Embed.AllSourceFiles
-SourceLink.Copy.PdbFiles

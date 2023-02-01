@@ -1,4 +1,4 @@
-namespace BuildingRegistry.Api.Legacy.Abstractions.Infrastructure.Options
+namespace BuildingRegistry.Api.Legacy.Infrastructure.Options
 {
     public class ResponseOptions
     {

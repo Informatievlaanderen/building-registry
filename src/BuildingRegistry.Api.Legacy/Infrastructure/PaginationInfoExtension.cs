@@ -1,4 +1,4 @@
-namespace BuildingRegistry.Api.Legacy.Abstractions.Infrastructure
+namespace BuildingRegistry.Api.Legacy.Infrastructure
 {
     using System;
     using Be.Vlaanderen.Basisregisters.Api.Search.Pagination;

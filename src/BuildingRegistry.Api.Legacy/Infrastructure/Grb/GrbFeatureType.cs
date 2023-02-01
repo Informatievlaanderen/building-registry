@@ -1,4 +1,4 @@
-namespace BuildingRegistry.Api.Legacy.Abstractions.Infrastructure.Grb
+namespace BuildingRegistry.Api.Legacy.Infrastructure.Grb
 {
     public enum GrbFeatureType
     {

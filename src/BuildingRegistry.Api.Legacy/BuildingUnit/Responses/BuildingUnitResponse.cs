@@ -1,4 +1,4 @@
-namespace BuildingRegistry.Api.Legacy.Abstractions.BuildingUnit.Responses
+namespace BuildingRegistry.Api.Legacy.BuildingUnit.Responses
 {
     using System;
     using System.Collections.Generic;

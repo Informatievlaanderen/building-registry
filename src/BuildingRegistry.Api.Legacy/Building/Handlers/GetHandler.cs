@@ -1,17 +1,16 @@
-namespace BuildingRegistry.Api.Legacy.Handlers.Building
+namespace BuildingRegistry.Api.Legacy.Building.Handlers
 {
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
-    using Abstractions.Converters;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
     using Be.Vlaanderen.Basisregisters.GrAr.Common;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy.Gebouw;
-    using BuildingRegistry.Api.Legacy.Abstractions.Building.Responses;
-    using BuildingRegistry.Api.Legacy.Abstractions.Building;
     using MediatR;
     using Microsoft.AspNetCore.Http;
     using Microsoft.EntityFrameworkCore;
+    using Requests;
+    using Responses;
 
     public class GetHandler : IRequestHandler<GetRequest, BuildingResponseWithEtag>
     {

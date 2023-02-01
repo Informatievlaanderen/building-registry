@@ -1,4 +1,4 @@
-namespace BuildingRegistry.Api.Legacy.Abstractions.BuildingUnit.Responses;
+namespace BuildingRegistry.Api.Legacy.BuildingUnit.Responses;
 
 public class BuildingUnitResponseWithEtag
 {

@@ -1,4 +1,4 @@
-namespace BuildingRegistry.Api.Legacy.Abstractions.Infrastructure.Grb.Wfs
+namespace BuildingRegistry.Api.Legacy.Infrastructure.Grb.Wfs
 {
     using System;
     using System.Runtime.Serialization;

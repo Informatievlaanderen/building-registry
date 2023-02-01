@@ -1,4 +1,4 @@
-namespace BuildingRegistry.Api.Legacy.Abstractions.BuildingUnit.Query
+namespace BuildingRegistry.Api.Legacy.BuildingUnit.Query
 {
     using System;
     using System.Collections.Generic;
@@ -9,9 +9,8 @@ namespace BuildingRegistry.Api.Legacy.Abstractions.BuildingUnit.Query
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy.Gebouweenheid;
     using BuildingRegistry.Projections.Legacy;
     using BuildingRegistry.Projections.Legacy.BuildingUnitDetail;
-    using Converters;
+    using BuildingRegistry.Projections.Syndication;
     using Microsoft.EntityFrameworkCore;
-    using Projections.Syndication;
 
     public class BuildingUnitListQuery : Query<BuildingUnitDetailItem, BuildingUnitFilter>
     {

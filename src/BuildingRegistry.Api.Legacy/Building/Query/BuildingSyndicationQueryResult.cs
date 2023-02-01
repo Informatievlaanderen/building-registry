@@ -1,12 +1,12 @@
-namespace BuildingRegistry.Api.Legacy.Abstractions.Building.Query
+namespace BuildingRegistry.Api.Legacy.Building.Query
 {
     using System.Collections.Generic;
     using System.Linq;
     using Be.Vlaanderen.Basisregisters.GrAr.Common;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using BuildingRegistry.Legacy;
+    using BuildingRegistry.Projections.Legacy.BuildingSyndication;
     using NodaTime;
-    using Projections.Legacy.BuildingSyndication;
 
     public class BuildingSyndicationQueryResult
     {

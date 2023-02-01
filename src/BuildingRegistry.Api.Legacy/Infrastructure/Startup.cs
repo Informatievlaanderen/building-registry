@@ -16,11 +16,11 @@ namespace BuildingRegistry.Api.Legacy.Infrastructure
     using System;
     using System.Linq;
     using System.Reflection;
-    using Abstractions.Infrastructure.Grb.Wfs;
-    using Abstractions.Infrastructure.Options;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
+    using Grb.Wfs;
     using Microsoft.Extensions.Diagnostics.HealthChecks;
     using Microsoft.OpenApi.Models;
+    using Options;
 
     /// <summary>Represents the startup process for the application.</summary>
     public class Startup

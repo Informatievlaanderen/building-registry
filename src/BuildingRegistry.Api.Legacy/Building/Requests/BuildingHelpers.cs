@@ -1,11 +1,9 @@
-namespace BuildingRegistry.Api.Legacy.Abstractions.Building
+namespace BuildingRegistry.Api.Legacy.Building.Requests
 {
     using System.Collections.Generic;
     using System.Linq;
     using System.Text;
-    using Be.Vlaanderen.Basisregisters.GrAr.Legacy.Gebouw;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy.SpatialTools;
-    using BuildingRegistry.Legacy;
 
     public static class BuildingHelpers
     {

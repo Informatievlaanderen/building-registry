@@ -1,4 +1,4 @@
-namespace BuildingRegistry.Api.Legacy.Abstractions.Building.Query
+namespace BuildingRegistry.Api.Legacy.Building.Query
 {
     using System;
     using System.Collections.Generic;
@@ -7,10 +7,9 @@ namespace BuildingRegistry.Api.Legacy.Abstractions.Building.Query
     using Be.Vlaanderen.Basisregisters.Api.Search.Filtering;
     using Be.Vlaanderen.Basisregisters.Api.Search.Sorting;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy.Gebouw;
-    using Converters;
+    using BuildingRegistry.Projections.Legacy;
+    using BuildingRegistry.Projections.Legacy.BuildingDetail;
     using Microsoft.EntityFrameworkCore;
-    using Projections.Legacy;
-    using Projections.Legacy.BuildingDetail;
 
     public class BuildingListQuery : Query<BuildingDetailItem, BuildingFilter>
     {
