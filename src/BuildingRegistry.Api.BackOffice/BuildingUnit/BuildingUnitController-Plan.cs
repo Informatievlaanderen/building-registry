@@ -62,11 +62,11 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
             }
             catch (AggregateIdIsNotFoundException)
             {
-                throw new ApiException(ValidationErrors.Common.BuildingUnitNotFound.Message, StatusCodes.Status404NotFound);
+                throw new ApiException(ValidationErrors.Common.BuildingNotFound.Message, StatusCodes.Status400BadRequest);
             }
             catch (AggregateNotFoundException)
             {
-                throw new ApiException(ValidationErrors.Common.BuildingUnitNotFound.Message, StatusCodes.Status404NotFound);
+                throw new ApiException(ValidationErrors.Common.BuildingNotFound.Message, StatusCodes.Status400BadRequest);
             }
         }
     }

@@ -187,7 +187,7 @@ namespace BuildingRegistry.Building
                 return;
             }
 
-            GuardValidStatusses(BuildingStatus.Planned, BuildingStatus.UnderConstruction, BuildingStatus.NotRealized);
+            GuardValidStatusses(BuildingStatus.Planned, BuildingStatus.UnderConstruction);
 
             foreach (var unit in _buildingUnits.PlannedBuildingUnits())
             {

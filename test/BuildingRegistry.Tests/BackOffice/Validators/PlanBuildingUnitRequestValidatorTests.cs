@@ -34,8 +34,8 @@ namespace BuildingRegistry.Tests.BackOffice.Validators
             });
 
             result.ShouldHaveValidationErrorFor(nameof(PlanBuildingUnitRequest.GebouwId))
-                .WithErrorCode(ValidationErrors.Common.BuildingNotFound.Code)
-                .WithErrorMessage(ValidationErrors.Common.BuildingNotFound.InvalidGebouwId(buildingId));
+                .WithErrorCode("GebouweenheidGebouwIdNietGekendValidatie")
+                .WithErrorMessage($"De gebouwId '{buildingId}' is niet gekend in het gebouwenregister.");
         }
     }
 }

@@ -24,8 +24,8 @@ namespace BuildingRegistry.Tests.BackOffice.Validators
             });
 
             result.ShouldHaveValidationErrorFor(nameof(PlanBuildingRequest.GeometriePolygoon))
-                .WithErrorCode(ValidationErrors.Common.InvalidBuildingPolygonGeometry.Code)
-                .WithErrorMessage(ValidationErrors.Common.InvalidBuildingPolygonGeometry.Message);
+                .WithErrorCode("GebouwPolygoonValidatie")
+                .WithErrorMessage("Ongeldig formaat geometriePolygoon.");
         }
     }
 }

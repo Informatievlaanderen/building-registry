@@ -187,8 +187,8 @@ namespace BuildingRegistry.Tests.BackOffice.Api.BuildingUnit.WhenPlanningBuildin
                 .ThrowAsync<ApiException>()
                 .Result
                 .Where(x =>
-                    x.Message.Contains("Onbestaande gebouweenheid.")
-                    && x.StatusCode == StatusCodes.Status404NotFound);
+                    x.Message.Contains("Onbestaand gebouw.")
+                    && x.StatusCode == StatusCodes.Status400BadRequest);
         }
     }
 }
