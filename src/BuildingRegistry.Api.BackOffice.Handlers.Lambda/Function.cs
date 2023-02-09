@@ -91,12 +91,13 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda
                 .As<IIdempotentCommandHandler>()
                 .AsSelf()
                 .InstancePerLifetimeScope();
-            builder.RegisterModule(new IdempotencyModule(
-                services,
-                configuration.GetSection(IdempotencyConfiguration.Section).Get<IdempotencyConfiguration>().ConnectionString!,
+
+            services.ConfigureIdempotency(
+                configuration.GetSection(IdempotencyConfiguration.Section).Get<IdempotencyConfiguration>()
+                    .ConnectionString,
                 new IdempotencyMigrationsTableInfo(Schema.Import),
                 new IdempotencyTableInfo(Schema.Import),
-                loggerFactory));
+                loggerFactory);
 
             builder.RegisterEventstreamModule(configuration);
             builder.RegisterSnapshotModule(configuration);

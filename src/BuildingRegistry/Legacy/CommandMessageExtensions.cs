@@ -15,7 +15,7 @@ namespace BuildingRegistry.Legacy
                     throw new ArgumentException($"Element with key '{key}' already exists.");
                 }
 
-                _ = commandMessage.Metadata.Add(key, value);
+                commandMessage.Metadata.Add(key, value);
             }
         }
 

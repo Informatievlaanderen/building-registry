@@ -70,9 +70,10 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
                 CancellationToken.None);
 
             //Assert
-            var stream = await Container.Resolve<IStreamStore>()
-                .ReadStreamBackwards(new StreamId(new BuildingStreamId(expectedBuildingPersistentLocalId)), 0, 1);
-            stream.Messages.First().JsonMetadata.Should().Contain(eTagResponse.ETag);
+            var stream = await Container.Resolve<IStreamStore>().ReadStreamBackwards(new StreamId(new BuildingStreamId(expectedBuildingPersistentLocalId)), 0, 1);
+            var message = stream.Messages.First();
+            message.JsonMetadata.Should().Contain(eTagResponse.ETag);
+            message.JsonMetadata.Should().Contain(Provenance.ProvenanceMetadataKey.ToLower());
         }
     }
 }
