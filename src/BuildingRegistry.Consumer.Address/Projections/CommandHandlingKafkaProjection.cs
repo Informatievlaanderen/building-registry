@@ -11,7 +11,7 @@ namespace BuildingRegistry.Consumer.Address.Projections
     using Building;
     using Building.Commands;
     using Microsoft.EntityFrameworkCore;
-    using NodaTime.Text;
+    using NodaTime;
     using Contracts = Be.Vlaanderen.Basisregisters.GrAr.Contracts.Common;
     using Provenance = Be.Vlaanderen.Basisregisters.GrAr.Provenance.Provenance;
 
@@ -201,11 +201,11 @@ namespace BuildingRegistry.Consumer.Address.Projections
 
         private static Provenance FromProvenance(Contracts.Provenance provenance) =>
             new Provenance(
-                InstantPattern.General.Parse(provenance.Timestamp).GetValueOrThrow(),
+                SystemClock.Instance.GetCurrentInstant(),
                 Enum.Parse<Application>(Application.AddressRegistry.ToString()),
                 new Reason(provenance.Reason),
                 new Operator(string.Empty),
                 Enum.Parse<Modification>(Modification.Update.ToString()),
-                Enum.Parse<Organisation>(Organisation.DigitaalVlaanderen.ToString()));
+                Enum.Parse<Organisation>(provenance.Organisation));
     }
 }
