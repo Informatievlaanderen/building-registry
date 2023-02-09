@@ -43,15 +43,15 @@ using System;
 
             builder
                 .RegisterModule(new MediatRModule())
-                .RegisterModule(new IdempotencyModule(
-                    _services,
-                    _configuration.GetSection(IdempotencyConfiguration.Section).Get<IdempotencyConfiguration>()
-                        .ConnectionString,
-                    new IdempotencyMigrationsTableInfo(Schema.Import),
-                    new IdempotencyTableInfo(Schema.Import),
-                    _loggerFactory))
                 .RegisterModule(new EnvelopeModule())
                 .RegisterModule(new LegacyCommandHandlingModule(_configuration));
+
+            _services.ConfigureIdempotency(
+                _configuration.GetSection(IdempotencyConfiguration.Section).Get<IdempotencyConfiguration>()
+                    .ConnectionString,
+                new IdempotencyMigrationsTableInfo(Schema.Import),
+                new IdempotencyTableInfo(Schema.Import),
+                _loggerFactory);
 
             _services.ConfigureCrabImport(
                 _configuration.GetConnectionString("CrabImport"),
