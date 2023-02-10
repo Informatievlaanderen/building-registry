@@ -5,6 +5,7 @@ namespace BuildingRegistry
     /// <summary>
     /// Some GRB polygons are Invalid according to NTS Spec (and the world). But GRB decided it is valid.
     /// In order not to invalidate and correct (change) the polygon from the source we use this class.
+    /// https://github.com/NetTopologySuite/NetTopologySuite/issues/259
     /// </summary>
     public class GrbPolygon : Polygon
     {
