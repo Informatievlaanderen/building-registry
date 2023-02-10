@@ -8,6 +8,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.BuildingUnit.WhenDetachingAddres
     using Be.Vlaanderen.Basisregisters.AggregateSource;
     using Be.Vlaanderen.Basisregisters.Api.ETag;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
+    using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Be.Vlaanderen.Basisregisters.Sqs.Exceptions;
     using Be.Vlaanderen.Basisregisters.Sqs.Requests;
     using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Requests;
@@ -16,12 +17,13 @@ namespace BuildingRegistry.Tests.BackOffice.Api.BuildingUnit.WhenDetachingAddres
     using BuildingRegistry.Api.BackOffice.BuildingUnit;
     using BuildingRegistry.Building;
     using BuildingRegistry.Building.Exceptions;
-    using BuildingRegistry.Tests.Fixtures;
+    using Fixtures;
     using FluentAssertions;
     using FluentValidation;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
     using Moq;
+    using NodaTime;
     using Xunit;
     using Xunit.Abstractions;
 
@@ -71,16 +73,29 @@ namespace BuildingRegistry.Tests.BackOffice.Api.BuildingUnit.WhenDetachingAddres
                 .Setup(x => x.Send(It.IsAny<DetachAddressFromBuildingUnitSqsRequest>(), CancellationToken.None))
                 .Returns(Task.FromResult(expectedLocationResult));
 
-            var result = (AcceptedResult)await _controller.DetachAddress(
+            var request = Fixture.Create<DetachAddressFromBuildingUnitRequest>();
+            var expectedIfMatchHeader = Fixture.Create<string>();
 
+            var result = (AcceptedResult)await _controller.DetachAddress(
                 MockIfMatchValidator(true),
                 MockValidRequestValidator<DetachAddressFromBuildingUnitRequest>(),
                 Fixture.Create<BuildingUnitPersistentLocalId>(),
-                Fixture.Create<DetachAddressFromBuildingUnitRequest>(),
-                ifMatchHeaderValue: null);
+                request,
+                expectedIfMatchHeader);
 
             result.Should().NotBeNull();
             AssertLocation(result.Location, ticketId);
+
+            MockMediator.Verify(x =>
+                x.Send(
+                    It.Is<DetachAddressFromBuildingUnitSqsRequest>(sqsRequest =>
+                        sqsRequest.Request == request
+                        && sqsRequest.ProvenanceData.Timestamp != Instant.MinValue
+                        && sqsRequest.ProvenanceData.Application == Application.BuildingRegistry
+                        && sqsRequest.ProvenanceData.Modification == Modification.Update
+                        && sqsRequest.IfMatchHeaderValue == expectedIfMatchHeader
+                    ),
+                    CancellationToken.None));
         }
 
         [Fact]

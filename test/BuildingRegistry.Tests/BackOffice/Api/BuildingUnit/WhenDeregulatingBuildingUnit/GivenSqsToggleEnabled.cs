@@ -7,6 +7,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.BuildingUnit.WhenDeregulatingBui
     using Be.Vlaanderen.Basisregisters.AggregateSource;
     using Be.Vlaanderen.Basisregisters.Api.ETag;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
+    using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Be.Vlaanderen.Basisregisters.Sqs.Exceptions;
     using Be.Vlaanderen.Basisregisters.Sqs.Requests;
     using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Requests;
@@ -14,11 +15,12 @@ namespace BuildingRegistry.Tests.BackOffice.Api.BuildingUnit.WhenDeregulatingBui
     using BuildingRegistry.Api.BackOffice.BuildingUnit;
     using BuildingRegistry.Building;
     using BuildingRegistry.Building.Exceptions;
-    using BuildingRegistry.Tests.Fixtures;
+    using Fixtures;
     using FluentAssertions;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
     using Moq;
+    using NodaTime;
     using Xunit;
     using Xunit.Abstractions;
 
@@ -43,13 +45,27 @@ namespace BuildingRegistry.Tests.BackOffice.Api.BuildingUnit.WhenDeregulatingBui
                 .Setup(x => x.Send(It.IsAny<DeregulateBuildingUnitSqsRequest>(), CancellationToken.None))
                 .Returns(Task.FromResult(expectedLocationResult));
 
+            var request = Fixture.Create<DeregulateBuildingUnitRequest>();
+            var expectedIfMatchHeader = Fixture.Create<string>();
+
             var result = (AcceptedResult)await _controller.Deregulate(
                 MockIfMatchValidator(true),
-                Fixture.Create<DeregulateBuildingUnitRequest>(),
-                ifMatchHeaderValue: null);
+                request,
+                expectedIfMatchHeader);
 
             result.Should().NotBeNull();
             AssertLocation(result.Location, ticketId);
+
+            MockMediator.Verify(x =>
+                x.Send(
+                    It.Is<DeregulateBuildingUnitSqsRequest>(sqsRequest =>
+                        sqsRequest.Request == request
+                        && sqsRequest.ProvenanceData.Timestamp != Instant.MinValue
+                        && sqsRequest.ProvenanceData.Application == Application.BuildingRegistry
+                        && sqsRequest.ProvenanceData.Modification == Modification.Update
+                        && sqsRequest.IfMatchHeaderValue == expectedIfMatchHeader
+                    ),
+                    CancellationToken.None));
         }
 
         [Fact]

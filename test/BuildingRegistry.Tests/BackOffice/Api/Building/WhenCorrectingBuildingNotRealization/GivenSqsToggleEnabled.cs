@@ -6,6 +6,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.Building.WhenCorrectingBuildingN
     using AutoFixture;
     using Be.Vlaanderen.Basisregisters.Api.ETag;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
+    using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Be.Vlaanderen.Basisregisters.Sqs.Requests;
     using BuildingRegistry.Api.BackOffice.Abstractions.Building.Requests;
     using BuildingRegistry.Api.BackOffice.Abstractions.Building.SqsRequests;
@@ -16,6 +17,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.Building.WhenCorrectingBuildingN
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
     using Moq;
+    using NodaTime;
     using SqlStreamStore;
     using Xunit;
     using Xunit.Abstractions;
@@ -45,14 +47,28 @@ namespace BuildingRegistry.Tests.BackOffice.Api.Building.WhenCorrectingBuildingN
 
             _streamStore.SetStreamFound();
 
+            var request = Fixture.Create<CorrectBuildingNotRealizationRequest>();
+            var expectedIfMatchHeader = Fixture.Create<string>();
+
             var result = (AcceptedResult)await _controller.CorrectNotRealization(
                 new BuildingExistsValidator(_streamStore.Object),
                 MockIfMatchValidator(true),
-                Fixture.Create<CorrectBuildingNotRealizationRequest>(),
-                ifMatchHeaderValue: null);
+                request,
+                expectedIfMatchHeader);
 
             result.Should().NotBeNull();
             AssertLocation(result.Location, ticketId);
+
+            MockMediator.Verify(x =>
+                x.Send(
+                    It.Is<CorrectBuildingNotRealizationSqsRequest>(sqsRequest =>
+                        sqsRequest.Request == request
+                        && sqsRequest.ProvenanceData.Timestamp != Instant.MinValue
+                        && sqsRequest.ProvenanceData.Application == Application.BuildingRegistry
+                        && sqsRequest.ProvenanceData.Modification == Modification.Update
+                        && sqsRequest.IfMatchHeaderValue == expectedIfMatchHeader
+                    ),
+                    CancellationToken.None));
         }
 
         [Fact]

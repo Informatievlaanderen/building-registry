@@ -46,7 +46,7 @@ namespace BuildingRegistry.Api.BackOffice.Building
                 {
                     Request = planBuildingRequest,
                     Metadata = GetMetadata(),
-                    ProvenanceData = new ProvenanceData(CreateFakeProvenance()),
+                    ProvenanceData = new ProvenanceData(CreateProvenance(Modification.Insert)),
                 }, cancellationToken);
 
             return Accepted(result);

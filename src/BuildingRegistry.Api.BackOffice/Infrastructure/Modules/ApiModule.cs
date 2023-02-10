@@ -14,6 +14,9 @@ namespace BuildingRegistry.Api.BackOffice.Infrastructure.Modules
     using Microsoft.Extensions.Logging;
     using Consumer.Address;
     using Be.Vlaanderen.Basisregisters.AcmIdm;
+    using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
+    using Be.Vlaanderen.Basisregisters.GrAr.Provenance.AcmIdm;
+    using Microsoft.AspNetCore.Mvc.Infrastructure;
 
     public class ApiModule : Module
     {
@@ -50,6 +53,11 @@ namespace BuildingRegistry.Api.BackOffice.Infrastructure.Modules
                 .RegisterType<BuildingExistsValidator>()
                 .AsSelf()
                 .InstancePerLifetimeScope();
+
+            builder.Register(c => new AcmIdmProvenanceFactory(Application.BuildingRegistry, c.Resolve<IActionContextAccessor>()))
+                .As<IProvenanceFactory>()
+                .InstancePerLifetimeScope()
+                .AsSelf();
 
             builder
                 .RegisterModule(new BackOfficeModule(_configuration, _services, _loggerFactory))
