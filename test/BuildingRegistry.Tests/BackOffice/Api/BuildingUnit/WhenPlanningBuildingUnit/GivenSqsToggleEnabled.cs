@@ -8,6 +8,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.BuildingUnit.WhenPlanningBuildin
     using Be.Vlaanderen.Basisregisters.AggregateSource;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
     using Be.Vlaanderen.Basisregisters.GrAr.Edit.Contracts;
+    using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Be.Vlaanderen.Basisregisters.Sqs.Requests;
     using BuildingRegistry.Api.BackOffice.Abstractions.Building.Validators;
     using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Requests;
@@ -15,12 +16,13 @@ namespace BuildingRegistry.Tests.BackOffice.Api.BuildingUnit.WhenPlanningBuildin
     using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Validators;
     using BuildingRegistry.Api.BackOffice.BuildingUnit;
     using BuildingRegistry.Building;
-    using BuildingRegistry.Tests.Fixtures;
+    using Fixtures;
     using FluentAssertions;
     using FluentValidation;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
     using Moq;
+    using NodaTime;
     using SqlStreamStore;
     using Xunit;
     using Xunit.Abstractions;
@@ -41,8 +43,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.BuildingUnit.WhenPlanningBuildin
         [Theory]
         [InlineData("")]
         [InlineData(null)]
-        public void
-            WithPositionGeometryMethodAppointedByAdministratorAndMissingPosition_ThenValidationExceptionIsThrown(string? position)
+        public void WithPositionGeometryMethodAppointedByAdministratorAndMissingPosition_ThenValidationExceptionIsThrown(string? position)
         {
             var buildingPersistentLocalId = new BuildingPersistentLocalId(123);
 
@@ -121,16 +122,25 @@ namespace BuildingRegistry.Tests.BackOffice.Api.BuildingUnit.WhenPlanningBuildin
 
             _streamStore.SetStreamFound();
 
-            var planBuildingUnitRequest = Fixture.Create<PlanBuildingUnitRequest>();
-            planBuildingUnitRequest.GebouwId = "https://bla/1";
+            var request = Fixture.Create<PlanBuildingUnitRequest>();
+            request.GebouwId = "https://bla/1";
 
             var result = (AcceptedResult)await _controller.Plan(
-
                 MockValidRequestValidator<PlanBuildingUnitRequest>(),
-                planBuildingUnitRequest);
+                request);
 
             result.Should().NotBeNull();
             AssertLocation(result.Location, ticketId);
+
+            MockMediator.Verify(x =>
+                x.Send(
+                    It.Is<PlanBuildingUnitSqsRequest>(sqsRequest =>
+                        sqsRequest.Request == request
+                        && sqsRequest.ProvenanceData.Timestamp != Instant.MinValue
+                        && sqsRequest.ProvenanceData.Application == Application.BuildingRegistry
+                        && sqsRequest.ProvenanceData.Modification == Modification.Insert
+                    ),
+                    CancellationToken.None));
         }
 
         [Fact]

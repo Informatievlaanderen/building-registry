@@ -27,7 +27,6 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
         /// verwijder een gebouweenheid.
         /// </summary>
         /// <param name="ifMatchHeaderValidator"></param>
-        /// <param name="validator"></param>
         /// <param name="request"></param>
         /// <param name="ifMatchHeaderValue"></param>
         /// <param name="ct"></param>
@@ -64,7 +63,7 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
                     {
                         Request = request,
                         Metadata = GetMetadata(),
-                        ProvenanceData = new ProvenanceData(CreateFakeProvenance()),
+                        ProvenanceData = new ProvenanceData(CreateProvenance(Modification.Delete)),
                         IfMatchHeaderValue = ifMatchHeaderValue
                     }, ct);
 

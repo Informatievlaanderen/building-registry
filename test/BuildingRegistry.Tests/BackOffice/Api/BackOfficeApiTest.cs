@@ -7,6 +7,8 @@ namespace BuildingRegistry.Tests.BackOffice.Api
     using System.Threading.Tasks;
     using AutoFixture;
     using Be.Vlaanderen.Basisregisters.Api;
+    using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
+    using Be.Vlaanderen.Basisregisters.GrAr.Provenance.AcmIdm;
     using BuildingRegistry.Api.BackOffice.Infrastructure;
     using BuildingRegistry.Api.BackOffice.Infrastructure.Options;
     using BuildingRegistry.Building;
@@ -15,6 +17,8 @@ namespace BuildingRegistry.Tests.BackOffice.Api
     using FluentValidation.Results;
     using MediatR;
     using Microsoft.AspNetCore.Http;
+    using Microsoft.AspNetCore.Mvc;
+    using Microsoft.AspNetCore.Mvc.Infrastructure;
     using Microsoft.Extensions.Options;
     using Moq;
     using Xunit.Abstractions;
@@ -30,6 +34,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api
         protected IOptions<ResponseOptions> ResponseOptions { get; }
         private IOptions<TicketingOptions> TicketingOptions { get; }
         protected Mock<IMediator> MockMediator { get; }
+        protected Mock<IActionContextAccessor> MockActionContext { get; set; }
 
         private const string Username = "John Doe";
 
@@ -42,6 +47,9 @@ namespace BuildingRegistry.Tests.BackOffice.Api
             TicketingOptions = Options.Create(Fixture.Create<TicketingOptions>());
             TicketingOptions.Value.PublicBaseUrl = PublicTicketUrl;
             TicketingOptions.Value.InternalBaseUrl = InternalTicketUrl;
+
+            MockActionContext = new Mock<IActionContextAccessor>();
+            MockActionContext.SetupProperty(x => x.ActionContext, new ActionContext{ HttpContext = new DefaultHttpContext()});
 
             MockMediator = new Mock<IMediator>();
         }
@@ -88,7 +96,11 @@ namespace BuildingRegistry.Tests.BackOffice.Api
 
         protected T CreateBuildingControllerWithUser<T>(bool useSqs = false) where T : ApiController
         {
-            var controller = Activator.CreateInstance(typeof(T), MockMediator.Object, TicketingOptions) as T;
+            var controller = Activator.CreateInstance(typeof(T),
+                MockMediator.Object,
+                TicketingOptions,
+                MockActionContext.Object,
+                new AcmIdmProvenanceFactory(Application.BuildingRegistry, MockActionContext.Object)) as T;
 
             var claims = new List<Claim>
             {
@@ -110,7 +122,11 @@ namespace BuildingRegistry.Tests.BackOffice.Api
 
         protected T CreateBuildingUnitControllerWithUser<T>() where T : ApiController
         {
-            var controller = Activator.CreateInstance(typeof(T), MockMediator.Object, TicketingOptions) as T;
+            var controller = Activator.CreateInstance(typeof(T),
+                MockMediator.Object,
+                TicketingOptions,
+                MockActionContext.Object,
+                new AcmIdmProvenanceFactory(Application.BuildingRegistry, MockActionContext.Object)) as T;
 
             var claims = new List<Claim>
             {

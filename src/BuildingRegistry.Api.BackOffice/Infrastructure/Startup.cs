@@ -15,6 +15,7 @@ namespace BuildingRegistry.Api.BackOffice.Infrastructure
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.Mvc.ApiExplorer;
+    using Microsoft.AspNetCore.Mvc.Infrastructure;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Diagnostics.HealthChecks;
@@ -116,6 +117,7 @@ namespace BuildingRegistry.Api.BackOffice.Infrastructure
                     .EnableJsonErrorActionFilterOption())
                 .Configure<ResponseOptions>(_configuration)
                 .Configure<TicketingOptions>(_configuration.GetSection(TicketingModule.TicketingServiceConfigKey))
+                .AddSingleton<IActionContextAccessor, ActionContextAccessor>()
                 .Configure<FeatureToggleOptions>(_configuration.GetSection(FeatureToggleOptions.ConfigurationKey));
 
             var containerBuilder = new ContainerBuilder();

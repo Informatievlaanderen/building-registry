@@ -4,14 +4,16 @@ namespace BuildingRegistry.Tests.BackOffice.Api.Building.WhenPlanningBuilding
     using System.Threading;
     using System.Threading.Tasks;
     using AutoFixture;
+    using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Be.Vlaanderen.Basisregisters.Sqs.Requests;
     using BuildingRegistry.Api.BackOffice.Abstractions.Building.Requests;
     using BuildingRegistry.Api.BackOffice.Abstractions.Building.SqsRequests;
     using BuildingRegistry.Api.BackOffice.Building;
-    using BuildingRegistry.Tests.Fixtures;
+    using Fixtures;
     using FluentAssertions;
     using Microsoft.AspNetCore.Mvc;
     using Moq;
+    using NodaTime;
     using Xunit;
     using Xunit.Abstractions;
 
@@ -36,12 +38,24 @@ namespace BuildingRegistry.Tests.BackOffice.Api.Building.WhenPlanningBuilding
                 .Setup(x => x.Send(It.IsAny<PlanBuildingSqsRequest>(), CancellationToken.None))
                 .Returns(Task.FromResult(expectedLocationResult));
 
+            var request = Fixture.Create<PlanBuildingRequest>();
+
             var result = (AcceptedResult)await _controller.Plan(
                 MockValidRequestValidator<PlanBuildingRequest>(),
-                Fixture.Create<PlanBuildingRequest>());
+                request);
 
             result.Should().NotBeNull();
             AssertLocation(result.Location, ticketId);
+
+            MockMediator.Verify(x =>
+                x.Send(
+                    It.Is<PlanBuildingSqsRequest>(sqsRequest =>
+                        sqsRequest.Request == request
+                        && sqsRequest.ProvenanceData.Timestamp != Instant.MinValue
+                        && sqsRequest.ProvenanceData.Application == Application.BuildingRegistry
+                        && sqsRequest.ProvenanceData.Modification == Modification.Insert
+                    ),
+                    CancellationToken.None));
         }
     }
 }
