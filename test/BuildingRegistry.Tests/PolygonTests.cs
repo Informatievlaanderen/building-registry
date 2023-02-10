@@ -1,13 +1,14 @@
 namespace BuildingRegistry.Tests
 {
     using Be.Vlaanderen.Basisregisters.Utilities.HexByteConvertor;
+    using BuildingRegistry.Legacy;
     using FluentAssertions;
     using NetTopologySuite.Geometries;
     using Xunit;
 
     public class PolygonTests
     {
-        private Geometry? _polygonSelfTouchingRingFormingHoles;
+        private readonly Geometry? _polygonSelfTouchingRingFormingHoles;
 
         public PolygonTests()
         {
@@ -30,6 +31,31 @@ namespace BuildingRegistry.Tests
             var polygon = _polygonSelfTouchingRingFormingHoles as Polygon;
             var grbPolygon = new GrbPolygon(polygon);
 
+            grbPolygon.IsValid.Should().BeTrue();
+        }
+
+        /// <summary>
+        /// DATE: 10/02/2023 (polygon could be changed afterwards)
+        /// https://api.basisregisters.vlaanderen.be/v1/gebouwen/15078651
+        /// CrabTerreinObjectId = 15885663
+        /// GrbOIDN = 3267099
+        /// Question client:
+        /// Nu hebben we in onze backend een validatie regel staan die zorgt dat we geen geometriën bewaren die niet aan de 'validity' specificaties voldoen.
+        /// We hadden dit toegevoegd omdat gebruikers ook zelf constructies kunnen tekenen en dus de meest gekke dingen produceerden.
+        /// Deze validatie zorgde echter een paar weken geleden tot een melding van een deskundige die aangaf dat hij de constructie op [REDACTED] in Aalter niet kon selecteren als gebouw om te inspecteren.
+        /// See summary <see cref="GrbPolygon"/> and <see cref="GeometryValidator"/>
+        /// </summary>
+        [Fact]
+        public void GivenGrarBuilding15078651()
+        {
+            var extendedWkbGeometry = new ExtendedWkbGeometry("01030000208A7A0000010000001F0000000018B3F09D89F54000770DBC54B70841001847B09989F540801DA63F75B70841001CF12F8A89F54000705AB274B708410022E2B18789F54000B3B23F8AB708410036B2F69F89F54080EF6E278BB7084100621710A289F540000E2C097AB70841004648A8C189F5400068CCE67BB70841005023F8C789F540803F85E559B7084100881363D189F54080CFB65C57B70841003265ABF389F540804595234EB7084100BCF911F789F54080C321DD51B7084100C8384A268AF54080D0CF9685B7084100F28429028AF54000FE46FD8FB70841007070ED4C8AF54080E8BFC9C8B7084100A087A5A989F540009EA17AFDB7084100DECADD5F89F5408015C919C4B70841003A575F7589F540804F3C29BDB7084100BE7DE85A89F54080A296A8A8B70841003C42984389F54080B4FDED6CB7084100300D8E3A89F540804CBCC555B7084100D42AC54689F54080C323B354B7084100ECF9654889F54080B2054648B70841009427DB4889F540005DD9C744B7084100F066D85089F540807512D307B70841002828109E89F54000AEC9DCFEB6084100507428AB89F5408020C457FDB6084100E04F58DA89F54000ECD1DDF7B6084100FAA373D689F54080D5166021B708410036B020D589F54000A5D37C2FB7084100881363D189F54080CFB65C57B708410018B3F09D89F54000770DBC54B70841".ToByteArray());
+
+            var polygonSelfTouchingRingFormingHoles = extendedWkbGeometry.ToGeometry();
+
+            var polygon = polygonSelfTouchingRingFormingHoles as Polygon;
+            var grbPolygon = new GrbPolygon(polygon);
+
+            polygon.IsValid.Should().BeFalse();
             grbPolygon.IsValid.Should().BeTrue();
         }
     }
