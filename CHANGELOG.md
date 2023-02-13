@@ -1,3 +1,11 @@
+## [3.59.2](https://github.com/informatievlaanderen/building-registry/compare/v3.59.1...v3.59.2) (2023-02-13)
+
+
+### Bug Fixes
+
+* event jsondata should contain provenance ([441d7b8](https://github.com/informatievlaanderen/building-registry/commit/441d7b8b54e339b90b301b30febbcd1d7ba1284d))
+* use correct date in provenance for consumer command handling ([4ecba34](https://github.com/informatievlaanderen/building-registry/commit/4ecba34a9651c53469e3dc5dff892ed837d29006))
+
 ## [3.59.1](https://github.com/informatievlaanderen/building-registry/compare/v3.59.0...v3.59.1) (2023-01-26)
 
 
