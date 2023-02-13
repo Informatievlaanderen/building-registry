@@ -57,13 +57,9 @@ Target.create "Publish_Solution" (fun _ ->
   [
     "BuildingRegistry.Projector"
     "BuildingRegistry.Api.Legacy"
-    "BuildingRegistry.Api.Legacy.Abstractions"
     "BuildingRegistry.Api.Oslo"
-    "BuildingRegistry.Api.Oslo.Abstractions"
     "BuildingRegistry.Api.Extract"
-    "BuildingRegistry.Api.Extract.Abstractions"
     "BuildingRegistry.Api.CrabImport"
-    "BuildingRegistry.Api.CrabImport.Abstractions"
     "BuildingRegistry.Api.BackOffice"
     "BuildingRegistry.Api.BackOffice.Abstractions"
     "BuildingRegistry.Api.BackOffice.Handlers.Lambda"
