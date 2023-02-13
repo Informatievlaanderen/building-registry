@@ -77,11 +77,8 @@ Target.create "Publish_Solution" (fun _ ->
 Target.create "Pack_Solution" (fun _ ->
   [
     "BuildingRegistry.Api.Legacy"
-    "BuildingRegistry.Api.Legacy.Abstractions"
     "BuildingRegistry.Api.Oslo"
-    "BuildingRegistry.Api.Oslo.Abstractions"
     "BuildingRegistry.Api.Extract"
-    "BuildingRegistry.Api.Extract.Abstractions"
     "BuildingRegistry.Api.CrabImport"
     "BuildingRegistry.Api.BackOffice"
     "BuildingRegistry.Api.BackOffice.Abstractions"
