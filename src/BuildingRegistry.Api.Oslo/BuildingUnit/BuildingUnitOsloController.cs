@@ -6,16 +6,17 @@ namespace BuildingRegistry.Api.Oslo.BuildingUnit
     using Be.Vlaanderen.Basisregisters.Api.ETag;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy;
+    using Count;
+    using Detail;
     using Infrastructure;
     using Infrastructure.Options;
+    using List;
     using MediatR;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.Extensions.Options;
     using Projections.Legacy;
     using Projections.Syndication;
-    using Requests;
-    using Responses;
     using Swashbuckle.AspNetCore.Filters;
 
     [ApiVersion("2.0")]

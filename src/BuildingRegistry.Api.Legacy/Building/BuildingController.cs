@@ -14,6 +14,9 @@ namespace BuildingRegistry.Api.Legacy.Building
     using Be.Vlaanderen.Basisregisters.Api.Syndication;
     using Be.Vlaanderen.Basisregisters.GrAr.Common;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy;
+    using Count;
+    using Crab;
+    using Detail;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.Extensions.Configuration;
@@ -26,10 +29,10 @@ namespace BuildingRegistry.Api.Legacy.Building
     using Infrastructure;
     using Infrastructure.Grb;
     using Infrastructure.Options;
+    using List;
     using MediatR;
     using Query;
-    using Requests;
-    using Responses;
+    using Sync;
 
     [ApiVersion("1.0")]
     [AdvertiseApiVersions("1.0")]
@@ -58,7 +61,7 @@ namespace BuildingRegistry.Api.Legacy.Building
         /// <response code="410">Als het gebouw verwijderd werd.</response>
         /// <response code="500">Als er een interne fout is opgetreden.</response>
         [HttpGet("{persistentLocalId}")]
-        [ProducesResponseType(typeof(BuildingResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BuildingDetailResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status410Gone)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
@@ -77,8 +80,8 @@ namespace BuildingRegistry.Api.Legacy.Building
             var response = await _mediator.Send(new GetRequest(context, syndicationContext, responseOptions, grbBuildingParcel, persistentLocalId), cancellationToken);
 
             return string.IsNullOrWhiteSpace(response.LastEventHash)
-                ? Ok(response.BuildingResponse)
-                : new OkWithLastObservedPositionAsETagResult(response.BuildingResponse, response.LastEventHash);
+                ? Ok(response.BuildingDetailResponse)
+                : new OkWithLastObservedPositionAsETagResult(response.BuildingDetailResponse, response.LastEventHash);
         }
 
         /// <summary>
@@ -93,7 +96,7 @@ namespace BuildingRegistry.Api.Legacy.Building
         /// <response code="410">Als het gebouw verwijderd werd.</response>
         /// <response code="500">Als er een interne fout is opgetreden.</response>
         [HttpGet("{persistentLocalId}/referenties")]
-        [ProducesResponseType(typeof(BuildingReferencesResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BuildingDetailReferencesResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status410Gone)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
