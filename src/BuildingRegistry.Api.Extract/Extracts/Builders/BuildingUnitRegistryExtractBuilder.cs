@@ -1,4 +1,4 @@
-namespace BuildingRegistry.Api.Extract.Abstractions.Extracts
+namespace BuildingRegistry.Api.Extract.Extracts.Builders
 {
     using System.Collections.Generic;
     using System.Linq;

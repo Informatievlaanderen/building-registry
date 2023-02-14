@@ -1,4 +1,4 @@
-namespace BuildingRegistry.Api.Extract.Abstractions.Extracts.Responses
+namespace BuildingRegistry.Api.Extract.Extracts.Responses
 {
     using Swashbuckle.AspNetCore.Filters;
 

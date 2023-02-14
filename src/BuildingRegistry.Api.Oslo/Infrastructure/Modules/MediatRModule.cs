@@ -1,7 +1,12 @@
 namespace BuildingRegistry.Api.Oslo.Infrastructure.Modules
 {
     using Autofac;
-    using Building.HandlersV2;
+    using Building.Count;
+    using Building.Detail;
+    using Building.List;
+    using BuildingUnit.Count;
+    using BuildingUnit.Detail;
+    using BuildingUnit.List;
     using MediatR;
     using Module = Autofac.Module;
 
@@ -27,26 +32,26 @@ namespace BuildingRegistry.Api.Oslo.Infrastructure.Modules
                 var ctx = context.Resolve<IComponentContext>();
                 return type => ctx.Resolve(type);
             });
-            
+
             if (_useProjectionsV2)
             {
-                builder.RegisterType<CountHandler>().AsImplementedInterfaces();
-                builder.RegisterType<GetHandler>().AsImplementedInterfaces();
-                builder.RegisterType<ListHandler>().AsImplementedInterfaces();
+                builder.RegisterType<BuildingCountHandlerV2>().AsImplementedInterfaces();
+                builder.RegisterType<BuildingDetailHandlerV2>().AsImplementedInterfaces();
+                builder.RegisterType<BuildingListHandlerV2>().AsImplementedInterfaces();
 
-                builder.RegisterType<BuildingUnit.HandlersV2.CountHandler>().AsImplementedInterfaces();
-                builder.RegisterType<BuildingUnit.HandlersV2.GetHandler>().AsImplementedInterfaces();
-                builder.RegisterType<BuildingUnit.HandlersV2.ListHandler>().AsImplementedInterfaces();
+                builder.RegisterType<BuildingUnitCountHandlerV2>().AsImplementedInterfaces();
+                builder.RegisterType<BuildingUnitDetailHandlerV2>().AsImplementedInterfaces();
+                builder.RegisterType<BuildingUnitListHandlerV2>().AsImplementedInterfaces();
             }
             else
             {
-                builder.RegisterType<Building.Handlers.CountHandler>().AsImplementedInterfaces();
-                builder.RegisterType<Building.Handlers.GetHandler>().AsImplementedInterfaces();
-                builder.RegisterType<Building.Handlers.ListHandler>().AsImplementedInterfaces();
+                builder.RegisterType<BuildingCountHandler>().AsImplementedInterfaces();
+                builder.RegisterType<BuildingDetailHandler>().AsImplementedInterfaces();
+                builder.RegisterType<BuildingListHandler>().AsImplementedInterfaces();
 
-                builder.RegisterType<BuildingUnit.Handlers.CountHandler>().AsImplementedInterfaces();
-                builder.RegisterType<BuildingUnit.Handlers.GetHandler>().AsImplementedInterfaces();
-                builder.RegisterType<BuildingUnit.Handlers.ListHandler>().AsImplementedInterfaces();
+                builder.RegisterType<BuildingUnitCountHandler>().AsImplementedInterfaces();
+                builder.RegisterType<GetHandler>().AsImplementedInterfaces();
+                builder.RegisterType<ListHandler>().AsImplementedInterfaces();
             }
         }
     }

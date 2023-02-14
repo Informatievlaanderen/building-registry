@@ -6,16 +6,17 @@ namespace BuildingRegistry.Api.Legacy.BuildingUnit
     using Be.Vlaanderen.Basisregisters.Api.ETag;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy;
+    using Count;
+    using Detail;
     using Infrastructure;
     using Infrastructure.Options;
+    using List;
     using MediatR;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.Extensions.Options;
     using Projections.Legacy;
     using Projections.Syndication;
-    using Requests;
-    using Responses;
     using Swashbuckle.AspNetCore.Filters;
 
     [ApiVersion("1.0")]
@@ -52,7 +53,7 @@ namespace BuildingRegistry.Api.Legacy.BuildingUnit
             [FromServices] IOptions<ResponseOptions> responseOptions,
             CancellationToken cancellationToken = default)
         {
-            var listResponse = await _mediator.Send(new ListRequest(context, syndicationContext, responseOptions, Request, Response), cancellationToken);
+            var listResponse = await _mediator.Send(new BuildingUnitListRequest(context, syndicationContext, responseOptions, Request, Response), cancellationToken);
             return Ok(listResponse);
         }
 
@@ -106,7 +107,7 @@ namespace BuildingRegistry.Api.Legacy.BuildingUnit
             [FromRoute] int persistentLocalId,
             CancellationToken cancellationToken = default)
         {
-            var response = await _mediator.Send(new GetRequest(context, syndicationContext, responseOptions, persistentLocalId), cancellationToken);
+            var response = await _mediator.Send(new GetBuildingUnitDetailRequest(context, syndicationContext, responseOptions, persistentLocalId), cancellationToken);
 
             return string.IsNullOrWhiteSpace(response.LastEventHash)
                 ? Ok(response.BuildingUnitResponse)

@@ -1,4 +1,4 @@
-namespace BuildingRegistry.Api.Extract.Abstractions.Extracts
+namespace BuildingRegistry.Api.Extract.Extracts
 {
     using System;
 

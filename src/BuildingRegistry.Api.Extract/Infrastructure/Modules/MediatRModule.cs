@@ -1,7 +1,7 @@
 namespace BuildingRegistry.Api.Extract.Infrastructure.Modules
 {
     using Autofac;
-    using Handlers;
+    using Extracts;
     using MediatR;
     using Module = Autofac.Module;
 
