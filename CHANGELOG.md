@@ -1,3 +1,10 @@
+## [3.59.3](https://github.com/informatievlaanderen/building-registry/compare/v3.59.2...v3.59.3) (2023-02-14)
+
+
+### Bug Fixes
+
+* number ksql ([bc81652](https://github.com/informatievlaanderen/building-registry/commit/bc8165290dce7ed3132eba3734afcf17238b5ecd))
+
 ## [3.59.2](https://github.com/informatievlaanderen/building-registry/compare/v3.59.1...v3.59.2) (2023-02-13)
 
 
