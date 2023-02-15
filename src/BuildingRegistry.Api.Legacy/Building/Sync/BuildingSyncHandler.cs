@@ -15,10 +15,6 @@ namespace BuildingRegistry.Api.Legacy.Building.Sync
     {
         public async Task<SyncResponse> Handle(SyncRequest request, CancellationToken cancellationToken)
         {
-            var filtering = request.HttpRequest.ExtractFilteringRequest<BuildingSyndicationFilter>();
-            var sorting = request.HttpRequest.ExtractSortingRequest();
-            var pagination = request.HttpRequest.ExtractPaginationRequest();
-
             var lastFeedUpdate = await request.Context
                 .BuildingSyndication
                 .AsNoTracking()
@@ -33,8 +29,8 @@ namespace BuildingRegistry.Api.Legacy.Building.Sync
 
             var pagedBuildings = new BuildingSyndicationQuery(
                     request.Context,
-                    filtering.Filter?.Embed)
-                .Fetch(filtering, sorting, pagination);
+                    request.FilteringHeader.Filter.Embed)
+                .Fetch(request.FilteringHeader, request.SortingHeader, request.PaginationRequest);
 
             return new SyncResponse(lastFeedUpdate, pagedBuildings);
         }

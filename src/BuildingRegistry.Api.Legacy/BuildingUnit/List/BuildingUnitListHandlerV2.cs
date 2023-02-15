@@ -17,12 +17,8 @@ namespace BuildingRegistry.Api.Legacy.BuildingUnit.List
     {
         public async Task<BuildingUnitListResponse> Handle(BuildingUnitListRequest request, CancellationToken cancellationToken)
         {
-            var filtering = request.HttpRequest.ExtractFilteringRequest<BuildingUnitFilterV2>();
-            var sorting = request.HttpRequest.ExtractSortingRequest();
-            var pagination = request.HttpRequest.ExtractPaginationRequest();
-
             var pagedBuildingUnits = new BuildingUnitListQueryV2(request.Context)
-                .Fetch(filtering, sorting, pagination);
+                .Fetch(request.FilteringHeader, request.SortingHeader, request.PaginationRequest);
 
             request.HttpResponse.AddPagedQueryResultHeaders(pagedBuildingUnits);
 

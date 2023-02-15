@@ -5,6 +5,9 @@ namespace BuildingRegistry.Api.Legacy.BuildingUnit
     using Be.Vlaanderen.Basisregisters.Api;
     using Be.Vlaanderen.Basisregisters.Api.ETag;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
+    using Be.Vlaanderen.Basisregisters.Api.Search.Filtering;
+    using Be.Vlaanderen.Basisregisters.Api.Search.Pagination;
+    using Be.Vlaanderen.Basisregisters.Api.Search.Sorting;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy;
     using Count;
     using Detail;
@@ -17,6 +20,7 @@ namespace BuildingRegistry.Api.Legacy.BuildingUnit
     using Microsoft.Extensions.Options;
     using Projections.Legacy;
     using Projections.Syndication;
+    using Query;
     using Swashbuckle.AspNetCore.Filters;
 
     [ApiVersion("1.0")]
@@ -53,7 +57,16 @@ namespace BuildingRegistry.Api.Legacy.BuildingUnit
             [FromServices] IOptions<ResponseOptions> responseOptions,
             CancellationToken cancellationToken = default)
         {
-            var listResponse = await _mediator.Send(new BuildingUnitListRequest(context, syndicationContext, responseOptions, Request, Response), cancellationToken);
+            var listResponse = await _mediator.Send(new BuildingUnitListRequest(
+                context,
+                syndicationContext,
+                responseOptions,
+                Request.ExtractFilteringRequest<BuildingUnitFilter>(),
+                Request.ExtractSortingRequest(),
+                Request.ExtractPaginationRequest(),
+                Response)
+            , cancellationToken);
+
             return Ok(listResponse);
         }
 
@@ -75,7 +88,13 @@ namespace BuildingRegistry.Api.Legacy.BuildingUnit
             [FromServices] SyndicationContext syndicationContext,
             CancellationToken cancellationToken = default)
         {
-            var response = await _mediator.Send(new CountRequest(context, syndicationContext, Request), cancellationToken);
+            var response =
+                await _mediator.Send(new CountRequest(
+                    context,
+                    syndicationContext,
+                    Request.ExtractFilteringRequest<BuildingUnitFilter>(),
+                    Request.ExtractSortingRequest()
+                    ), cancellationToken);
             return Ok(response);
         }
 
@@ -107,7 +126,10 @@ namespace BuildingRegistry.Api.Legacy.BuildingUnit
             [FromRoute] int persistentLocalId,
             CancellationToken cancellationToken = default)
         {
-            var response = await _mediator.Send(new GetBuildingUnitDetailRequest(context, syndicationContext, responseOptions, persistentLocalId), cancellationToken);
+            var response =
+                await _mediator.Send(
+                    new GetBuildingUnitDetailRequest(context, syndicationContext, responseOptions, persistentLocalId),
+                    cancellationToken);
 
             return string.IsNullOrWhiteSpace(response.LastEventHash)
                 ? Ok(response.BuildingUnitResponse)

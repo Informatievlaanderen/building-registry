@@ -4,9 +4,7 @@ namespace BuildingRegistry.Api.Legacy.BuildingUnit.Count
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
-    using Be.Vlaanderen.Basisregisters.Api.Search.Filtering;
     using Be.Vlaanderen.Basisregisters.Api.Search.Pagination;
-    using Be.Vlaanderen.Basisregisters.Api.Search.Sorting;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy;
     using BuildingRegistry.Api.Legacy.BuildingUnit.Query;
     using MediatR;
@@ -16,14 +14,11 @@ namespace BuildingRegistry.Api.Legacy.BuildingUnit.Count
     {
         public async Task<TotaalAantalResponse> Handle(CountRequest request, CancellationToken cancellationToken)
         {
-            var filtering = request.HttpRequest.ExtractFilteringRequest<BuildingUnitFilter>();
-            var sorting = request.HttpRequest.ExtractSortingRequest();
-            var pagination = new NoPaginationRequest();
             return new TotaalAantalResponse
             {
-                Aantal = filtering.ShouldFilter
+                Aantal = request.FilteringHeader.ShouldFilter
                     ? await new BuildingUnitListQuery(request.Context, request.SyndicationContext)
-                        .Fetch(filtering, sorting, pagination)
+                        .Fetch(request.FilteringHeader, request.SortingHeader, new NoPaginationRequest())
                         .Items
                         .CountAsync(cancellationToken)
                     : Convert.ToInt32(request.Context

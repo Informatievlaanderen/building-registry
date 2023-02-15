@@ -4,9 +4,6 @@ namespace BuildingRegistry.Api.Legacy.Building.List
     using System.Threading;
     using System.Threading.Tasks;
     using Be.Vlaanderen.Basisregisters.Api.Search;
-    using Be.Vlaanderen.Basisregisters.Api.Search.Filtering;
-    using Be.Vlaanderen.Basisregisters.Api.Search.Pagination;
-    using Be.Vlaanderen.Basisregisters.Api.Search.Sorting;
     using Be.Vlaanderen.Basisregisters.GrAr.Common;
     using BuildingRegistry.Api.Legacy.Building.Query;
     using BuildingRegistry.Api.Legacy.Infrastructure;
@@ -17,12 +14,8 @@ namespace BuildingRegistry.Api.Legacy.Building.List
     {
         public async Task<BuildingListResponse> Handle(ListRequest request, CancellationToken cancellationToken)
         {
-            var filtering = request.HttpRequest.ExtractFilteringRequest<BuildingFilter>();
-            var sorting = request.HttpRequest.ExtractSortingRequest();
-            var pagination = request.HttpRequest.ExtractPaginationRequest();
-
             var pagedBuildings = new BuildingListQuery(request.Context)
-                .Fetch(filtering, sorting, pagination);
+                .Fetch(request.FilteringHeader, request.SortingHeader, request.PaginationRequest);
 
             request.HttpResponse.AddPagedQueryResultHeaders(pagedBuildings);
 

@@ -11,7 +11,7 @@ namespace BuildingRegistry.Api.Legacy.Building.Query
     using BuildingRegistry.Projections.Legacy.BuildingDetailV2;
     using Microsoft.EntityFrameworkCore;
 
-    public class BuildingListQueryV2 : Query<BuildingDetailItemV2, BuildingFilterV2>
+    public class BuildingListQueryV2 : Query<BuildingDetailItemV2, BuildingFilter>
     {
         private readonly LegacyContext _context;
 
@@ -22,7 +22,7 @@ namespace BuildingRegistry.Api.Legacy.Building.Query
             _context = context;
         }
 
-        protected override IQueryable<BuildingDetailItemV2> Filter(FilteringHeader<BuildingFilterV2> filtering)
+        protected override IQueryable<BuildingDetailItemV2> Filter(FilteringHeader<BuildingFilter> filtering)
         {
             var buildings = _context
                 .BuildingDetailsV2
@@ -56,10 +56,5 @@ namespace BuildingRegistry.Api.Legacy.Building.Query
         };
 
         public SortingHeader DefaultSortingHeader { get; } = new SortingHeader(nameof(BuildingDetailItemV2.PersistentLocalId), SortOrder.Ascending);
-    }
-
-    public class BuildingFilterV2
-    {
-        public string Status { get; set; }
     }
 }
