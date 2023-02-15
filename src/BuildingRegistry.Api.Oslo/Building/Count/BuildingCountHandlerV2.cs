@@ -4,9 +4,7 @@ namespace BuildingRegistry.Api.Oslo.Building.Count
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
-    using Be.Vlaanderen.Basisregisters.Api.Search.Filtering;
     using Be.Vlaanderen.Basisregisters.Api.Search.Pagination;
-    using Be.Vlaanderen.Basisregisters.Api.Search.Sorting;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy;
     using BuildingRegistry.Api.Oslo.Building.Query;
     using MediatR;
@@ -16,15 +14,11 @@ namespace BuildingRegistry.Api.Oslo.Building.Count
     {
         public async Task<TotaalAantalResponse> Handle(BuildingCountRequest request, CancellationToken cancellationToken)
         {
-            var filtering = request.HttpRequest.ExtractFilteringRequest<BuildingFilterV2>();
-            var sorting = request.HttpRequest.ExtractSortingRequest();
-            var pagination = new NoPaginationRequest();
-
             return new TotaalAantalResponse
             {
-                Aantal = filtering.ShouldFilter
+                Aantal = request.FilteringHeader.ShouldFilter
                     ? await new BuildingListOsloQueryV2(request.Context)
-                        .Fetch(filtering, sorting, pagination)
+                        .Fetch(request.FilteringHeader, request.SortingHeader, new NoPaginationRequest())
                         .Items
                         .CountAsync(cancellationToken)
                     : Convert.ToInt32(request.Context

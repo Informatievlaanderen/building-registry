@@ -18,12 +18,8 @@ namespace BuildingRegistry.Api.Oslo.Building.List
     {
         public async Task<BuildingListOsloResponse> Handle(BuildingListRequest request, CancellationToken cancellationToken)
         {
-            var filtering = request.HttpRequest.ExtractFilteringRequest<BuildingFilterV2>();
-            var sorting = request.HttpRequest.ExtractSortingRequest();
-            var pagination = request.HttpRequest.ExtractPaginationRequest();
-
             var pagedBuildings = new BuildingListOsloQueryV2(request.Context)
-                .Fetch(filtering, sorting, pagination);
+                .Fetch(request.FilteringHeader, request.SortingHeader, request.PaginationRequest);
 
             request.HttpResponse.AddPagedQueryResultHeaders(pagedBuildings);
 
