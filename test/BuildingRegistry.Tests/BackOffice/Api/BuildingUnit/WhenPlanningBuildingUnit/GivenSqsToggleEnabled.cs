@@ -46,7 +46,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.BuildingUnit.WhenPlanningBuildin
         public void WithPositionGeometryMethodAppointedByAdministratorAndMissingPosition_ThenValidationExceptionIsThrown(string? position)
         {
             var buildingPersistentLocalId = new BuildingPersistentLocalId(123);
-
+            
             var request = new PlanBuildingUnitRequest
             {
                 GebouwId = $"/{buildingPersistentLocalId}",
@@ -63,6 +63,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.BuildingUnit.WhenPlanningBuildin
             Func<Task> act = async () => await _controller.Plan(
 
                 new PlanBuildingUnitRequestValidator(new BuildingExistsValidator(streamStoreMock.Object)),
+                new PlanBuildingUnitSqsRequestFactory(new Mock<IPersistentLocalIdGenerator>().Object),
                 request,
                 CancellationToken.None);
 
@@ -97,6 +98,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.BuildingUnit.WhenPlanningBuildin
             Func<Task> act = async () => await _controller.Plan(
 
                 new PlanBuildingUnitRequestValidator(new BuildingExistsValidator(streamStoreMock.Object)),
+                new PlanBuildingUnitSqsRequestFactory(new Mock<IPersistentLocalIdGenerator>().Object),
                 request,
                 CancellationToken.None);
 
@@ -127,6 +129,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.BuildingUnit.WhenPlanningBuildin
 
             var result = (AcceptedResult)await _controller.Plan(
                 MockValidRequestValidator<PlanBuildingUnitRequest>(),
+                new PlanBuildingUnitSqsRequestFactory(new Mock<IPersistentLocalIdGenerator>().Object),
                 request);
 
             result.Should().NotBeNull();
@@ -156,6 +159,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.BuildingUnit.WhenPlanningBuildin
             var act = async () => await _controller.Plan(
 
                 new PlanBuildingUnitRequestValidator(new BuildingExistsValidator(_streamStore.Object)),
+                new PlanBuildingUnitSqsRequestFactory(new Mock<IPersistentLocalIdGenerator>().Object),
                 planBuildingUnitRequest,
                 CancellationToken.None);
 
@@ -188,6 +192,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.BuildingUnit.WhenPlanningBuildin
             Func<Task> act = async () => await _controller.Plan(
 
                 MockValidRequestValidator<PlanBuildingUnitRequest>(),
+                new PlanBuildingUnitSqsRequestFactory(new Mock<IPersistentLocalIdGenerator>().Object),
                 request,
                 CancellationToken.None);
 

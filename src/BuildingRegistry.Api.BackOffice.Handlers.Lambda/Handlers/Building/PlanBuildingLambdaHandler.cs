@@ -13,29 +13,23 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.Building
 
     public sealed class PlanBuildingLambdaHandler : BuildingLambdaHandler<PlanBuildingLambdaRequest>
     {
-        private readonly IPersistentLocalIdGenerator _persistentLocalIdGenerator;
-
         public PlanBuildingLambdaHandler(
             IConfiguration configuration,
             ICustomRetryPolicy retryPolicy,
             ITicketing ticketing,
             IIdempotentCommandHandler idempotentCommandHandler,
-            IBuildings buildings,
-            IPersistentLocalIdGenerator persistentLocalIdGenerator)
+            IBuildings buildings)
             : base(
                 configuration,
                 retryPolicy,
                 ticketing,
                 idempotentCommandHandler,
                 buildings)
-        {
-            _persistentLocalIdGenerator = persistentLocalIdGenerator;
-        }
+        { }
 
         protected override async Task<ETagResponse> InnerHandle(PlanBuildingLambdaRequest request, CancellationToken cancellationToken)
         {
-            var buildingPersistentLocalId = new BuildingPersistentLocalId(_persistentLocalIdGenerator.GenerateNextPersistentLocalId());
-            var cmd = request.ToCommand(buildingPersistentLocalId);
+            var cmd = request.ToCommand();
 
             await IdempotentCommandHandler.Dispatch(
                 cmd.CreateCommandId(),
@@ -43,8 +37,8 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.Building
                 request.Metadata,
                 cancellationToken);
 
-            var lastHash = await GetHash(buildingPersistentLocalId, cancellationToken);
-            return new ETagResponse(string.Format(DetailUrlFormat, buildingPersistentLocalId), lastHash);
+            var lastHash = await GetHash(request.BuildingPersistentLocalId, cancellationToken);
+            return new ETagResponse(string.Format(DetailUrlFormat, request.BuildingPersistentLocalId), lastHash);
         }
 
         protected override TicketError? InnerMapDomainException(DomainException exception, PlanBuildingLambdaRequest request)

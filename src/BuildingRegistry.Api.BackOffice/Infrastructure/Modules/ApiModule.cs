@@ -1,7 +1,9 @@
 namespace BuildingRegistry.Api.BackOffice.Infrastructure.Modules
 {
     using Abstractions;
+    using Abstractions.Building.SqsRequests;
     using Abstractions.Building.Validators;
+    using Abstractions.BuildingUnit.SqsRequests;
     using Autofac;
     using Autofac.Extensions.DependencyInjection;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
@@ -61,9 +63,18 @@ namespace BuildingRegistry.Api.BackOffice.Infrastructure.Modules
                 .AsSelf();
 
             builder
+                .RegisterType<PlanBuildingUnitSqsRequestFactory>()
+                .AsSelf();
+
+            builder
+                .RegisterType<PlanBuildingSqsRequestFactory>()
+                .AsSelf();
+
+            builder
                 .RegisterModule(new BackOfficeModule(_configuration, _services, _loggerFactory))
                 .RegisterModule(new MediatRModule())
                 .RegisterModule(new AggregateSourceModule(_configuration))
+                .RegisterModule(new SequenceModule(_configuration, _services, _loggerFactory))
                 .RegisterModule(new SqsHandlersModule(_configuration[SqsQueueUrlConfigKey]))
                 .RegisterModule(new TicketingModule(_configuration, _services))
                 .RegisterModule(new ConsumerAddressModule(_configuration, _services, _loggerFactory));

@@ -1,17 +1,15 @@
 namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda
 {
-    using System.Threading;
-    using System.Threading.Tasks;
     using Abstractions.Building.SqsRequests;
     using Abstractions.BuildingUnit.SqsRequests;
     using Autofac;
     using Be.Vlaanderen.Basisregisters.Aws.Lambda;
     using Be.Vlaanderen.Basisregisters.Sqs.Requests;
-    using BuildingRegistry.Api.BackOffice.Abstractions.Building.SqsRequests;
-    using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.SqsRequests;
     using MediatR;
     using Requests.Building;
     using Requests.BuildingUnit;
+    using System.Threading;
+    using System.Threading.Tasks;
 
     public class MessageHandler : IMessageHandler
     {

@@ -24,6 +24,7 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
         /// <summary>
         /// Plan een gebouweenheid in.
         /// </summary>
+        /// <param name="planBuildingUnitSqsRequestFactory"></param>
         /// <param name="request"></param>
         /// <param name="validator"></param>
         /// <param name="cancellationToken"></param>
@@ -41,6 +42,7 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
             Policy = PolicyNames.GeschetstGebouw.DecentraleBijwerker)]
         public async Task<IActionResult> Plan(
             [FromServices] IValidator<PlanBuildingUnitRequest> validator,
+            [FromServices] PlanBuildingUnitSqsRequestFactory planBuildingUnitSqsRequestFactory,
             [FromBody] PlanBuildingUnitRequest request,
             CancellationToken cancellationToken = default)
         {
@@ -51,12 +53,8 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
                 OsloPuriValidator.TryParseIdentifier(request.GebouwId, out var buildingIdentifier);
 
                 var result = await Mediator.Send(
-                    new PlanBuildingUnitSqsRequest
-                    {
-                        Request = request,
-                        Metadata = GetMetadata(),
-                        ProvenanceData = new ProvenanceData(CreateProvenance(Modification.Insert)),
-                    }, cancellationToken);
+                    planBuildingUnitSqsRequestFactory.Create(request, GetMetadata(), new ProvenanceData(CreateProvenance(Modification.Insert))),
+                    cancellationToken);
 
                 return Accepted(result);
             }

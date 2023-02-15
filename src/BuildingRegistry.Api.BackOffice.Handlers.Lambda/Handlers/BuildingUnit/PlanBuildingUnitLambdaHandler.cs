@@ -18,7 +18,6 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.BuildingUnit
     public sealed class PlanBuildingUnitLambdaHandler : BuildingUnitLambdaHandler<PlanBuildingUnitLambdaRequest>
     {
         private readonly BackOfficeContext _backOfficeContext;
-        private readonly IPersistentLocalIdGenerator _persistentLocalIdGenerator;
 
         public PlanBuildingUnitLambdaHandler(
             IConfiguration configuration,
@@ -26,8 +25,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.BuildingUnit
             ITicketing ticketing,
             IIdempotentCommandHandler idempotentCommandHandler,
             IBuildings buildings,
-            BackOfficeContext backOfficeContext,
-            IPersistentLocalIdGenerator persistentLocalIdGenerator)
+            BackOfficeContext backOfficeContext)
             : base(
                 configuration,
                 retryPolicy,
@@ -36,14 +34,11 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.BuildingUnit
                 buildings)
         {
             _backOfficeContext = backOfficeContext;
-            _persistentLocalIdGenerator = persistentLocalIdGenerator;
         }
 
         protected override async Task<ETagResponse> InnerHandle(PlanBuildingUnitLambdaRequest request, CancellationToken cancellationToken)
         {
-            var buildingUnitPersistentLocalId = new BuildingUnitPersistentLocalId(_persistentLocalIdGenerator.GenerateNextPersistentLocalId());
-
-            var cmd = request.ToCommand(buildingUnitPersistentLocalId);
+            var cmd = request.ToCommand();
 
             await using var transaction = await _backOfficeContext.Database.BeginTransactionAsync(cancellationToken);
 
@@ -53,15 +48,15 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.BuildingUnit
                                request.Metadata,
                                cancellationToken);
 
-            await _backOfficeContext.AddIdempotentBuildingUnitBuilding(request.BuildingPersistentLocalId, buildingUnitPersistentLocalId, cancellationToken);
+            await _backOfficeContext.AddIdempotentBuildingUnitBuilding(request.BuildingPersistentLocalId, request.BuildingUnitPersistentLocalId, cancellationToken);
             await transaction.CommitAsync(cancellationToken);
 
             var lastHash = await GetHash(
                 request.BuildingPersistentLocalId,
-                new BuildingUnitPersistentLocalId(buildingUnitPersistentLocalId),
+                request.BuildingUnitPersistentLocalId,
                 cancellationToken);
 
-            return new ETagResponse(string.Format(DetailUrlFormat, buildingUnitPersistentLocalId), lastHash);
+            return new ETagResponse(string.Format(DetailUrlFormat, request.BuildingUnitPersistentLocalId), lastHash);
         }
 
         protected override TicketError? InnerMapDomainException(DomainException exception, PlanBuildingUnitLambdaRequest request)
