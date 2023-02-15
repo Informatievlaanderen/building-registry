@@ -13,6 +13,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
     using Be.Vlaanderen.Basisregisters.Sqs.Lambda.Handlers;
     using Be.Vlaanderen.Basisregisters.Sqs.Responses;
     using BuildingRegistry.Api.BackOffice.Abstractions.Building.Requests;
+    using BuildingRegistry.Api.BackOffice.Abstractions.Building.SqsRequests;
     using BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.Building;
     using BuildingRegistry.Api.BackOffice.Handlers.Lambda.Requests.Building;
     using BuildingRegistry.Building;
@@ -52,20 +53,24 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
                 new FakeRetryPolicy(),
                 MockTicketing(response => { eTagResponse = response; }).Object,
                 new IdempotentCommandHandler(Container.Resolve<ICommandHandlerResolver>(), _idempotencyContext),
-                Container.Resolve<IBuildings>(),
-                persistentLocalIdGenerator.Object);
+                Container.Resolve<IBuildings>());
 
             //Act
             await handler.Handle(
                 new PlanBuildingLambdaRequest(
-                    "0",
-                    Guid.NewGuid(),
-                    Fixture.Create<Provenance>(),
-                    new Dictionary<string, object?>(),
-                    new PlanBuildingRequest
+                    expectedBuildingPersistentLocalId,
+                    new PlanBuildingSqsRequest()
                     {
-                        GeometriePolygoon =
-                            "<gml:Polygon srsName=\"https://www.opengis.net/def/crs/EPSG/0/31370\" xmlns:gml=\"http://www.opengis.net/gml/3.2\"><gml:exterior><gml:LinearRing><gml:posList>140284.15277253836 186724.74131567031 140291.06016454101 186726.38355567306 140288.22675654292 186738.25798767805 140281.19098053873 186736.57913967967 140284.15277253836 186724.74131567031</gml:posList></gml:LinearRing></gml:exterior></gml:Polygon>"
+                        BuildingPersistentLocalId = expectedBuildingPersistentLocalId,
+                        IfMatchHeaderValue = null,
+                        Metadata = new Dictionary<string, object?>(),
+                        ProvenanceData = Fixture.Create<ProvenanceData>(),
+                        TicketId = Guid.NewGuid(),
+                        Request = new PlanBuildingRequest
+                        {
+                            GeometriePolygoon =
+                                "<gml:Polygon srsName=\"https://www.opengis.net/def/crs/EPSG/0/31370\" xmlns:gml=\"http://www.opengis.net/gml/3.2\"><gml:exterior><gml:LinearRing><gml:posList>140284.15277253836 186724.74131567031 140291.06016454101 186726.38355567306 140288.22675654292 186738.25798767805 140281.19098053873 186736.57913967967 140284.15277253836 186724.74131567031</gml:posList></gml:LinearRing></gml:exterior></gml:Polygon>"
+                        }
                     }),
                 CancellationToken.None);
 

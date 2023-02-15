@@ -19,6 +19,7 @@ namespace BuildingRegistry.Api.BackOffice.Building
         /// <summary>
         /// Plan een gebouw met schets in.
         /// </summary>
+        /// <param name="planBuildingSqsRequestFactory"></param>
         /// <param name="planBuildingRequest"></param>
         /// <param name="validator"></param>
         /// <param name="cancellationToken"></param>
@@ -36,18 +37,15 @@ namespace BuildingRegistry.Api.BackOffice.Building
             Policy = PolicyNames.GeschetstGebouw.DecentraleBijwerker)]
         public async Task<IActionResult> Plan(
             [FromServices] IValidator<PlanBuildingRequest> validator,
+            [FromServices] PlanBuildingSqsRequestFactory planBuildingSqsRequestFactory,
             [FromBody] PlanBuildingRequest planBuildingRequest,
             CancellationToken cancellationToken = default)
         {
             await validator.ValidateAndThrowAsync(planBuildingRequest, cancellationToken);
 
             var result = await Mediator.Send(
-                new PlanBuildingSqsRequest
-                {
-                    Request = planBuildingRequest,
-                    Metadata = GetMetadata(),
-                    ProvenanceData = new ProvenanceData(CreateProvenance(Modification.Insert)),
-                }, cancellationToken);
+                planBuildingSqsRequestFactory.Create(planBuildingRequest, GetMetadata(), new ProvenanceData(CreateProvenance(Modification.Insert))),
+                cancellationToken);
 
             return Accepted(result);
         }

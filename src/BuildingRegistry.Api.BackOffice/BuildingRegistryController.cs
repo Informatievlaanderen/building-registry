@@ -36,7 +36,7 @@ namespace BuildingRegistry.Api.BackOffice
             _ticketingOptions = ticketingOptions.Value;
         }
 
-        protected IDictionary<string, object> GetMetadata()
+        protected IDictionary<string, object?> GetMetadata()
         {
             var correlationId = _actionContextAccessor
                 .ActionContext?
@@ -44,7 +44,7 @@ namespace BuildingRegistry.Api.BackOffice
                 .Request
                 .Headers["x-correlation-id"].FirstOrDefault() ?? Guid.NewGuid().ToString("D");
 
-            return new Dictionary<string, object>
+            return new Dictionary<string, object?>
             {
                 { "CorrelationId", correlationId }
             };
