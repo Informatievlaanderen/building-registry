@@ -1,12 +1,12 @@
-namespace BuildingRegistry.Api.Extract.Handlers
+namespace BuildingRegistry.Api.Extract.Extracts
 {
     using System.Threading;
     using System.Threading.Tasks;
-    using Abstractions;
-    using Abstractions.Extracts;
     using Be.Vlaanderen.Basisregisters.Api.Extract;
+    using Builders;
     using MediatR;
     using Microsoft.AspNetCore.Mvc;
+    using Requests;
 
     public class GetBuildingsHandlerV2 : IRequestHandler<GetBuildingsRequest, FileResult>
     {

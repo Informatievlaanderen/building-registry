@@ -1,11 +1,13 @@
 namespace BuildingRegistry.Api.Legacy.Infrastructure.Modules
 {
     using Autofac;
-    using Building.Handlers;
+    using Building.Count;
+    using Building.Crab;
+    using Building.Detail;
+    using Building.List;
+    using Building.Sync;
+    using BuildingUnit.Detail;
     using MediatR;
-    using CountHandler = Building.HandlersV2.CountHandler;
-    using GetHandler = Building.HandlersV2.GetHandler;
-    using ListHandler = Building.HandlersV2.ListHandler;
     using Module = Autofac.Module;
 
     public class MediatRModule : Module
@@ -33,28 +35,28 @@ namespace BuildingRegistry.Api.Legacy.Infrastructure.Modules
 
             if (_useProjectionsV2)
             {
-                builder.RegisterType<CountHandler>().AsImplementedInterfaces();
-                builder.RegisterType<GetHandler>().AsImplementedInterfaces();
-                builder.RegisterType<ListHandler>().AsImplementedInterfaces();
+                builder.RegisterType<BuildingCountHandlerV2>().AsImplementedInterfaces();
+                builder.RegisterType<GetDetailHandlerV2>().AsImplementedInterfaces();
+                builder.RegisterType<ListHandlerV2>().AsImplementedInterfaces();
 
-                builder.RegisterType<BuildingUnit.HandlersV2.CountHandler>().AsImplementedInterfaces();
-                builder.RegisterType<BuildingUnit.HandlersV2.GetHandler>().AsImplementedInterfaces();
-                builder.RegisterType<BuildingUnit.HandlersV2.ListHandler>().AsImplementedInterfaces();
+                builder.RegisterType<BuildingUnit.Count.CountHandlerV2>().AsImplementedInterfaces();
+                builder.RegisterType<GetBuildingUnitDetailHandlerV2>().AsImplementedInterfaces();
+                builder.RegisterType<BuildingUnit.List.BuildingUnitListHandlerV2>().AsImplementedInterfaces();
             }
             else
             {
-                builder.RegisterType<Building.Handlers.CountHandler>().AsImplementedInterfaces();
-                builder.RegisterType<Building.Handlers.GetHandler>().AsImplementedInterfaces();
-                builder.RegisterType<Building.Handlers.ListHandler>().AsImplementedInterfaces();
+                builder.RegisterType<BuildingCountHandler>().AsImplementedInterfaces();
+                builder.RegisterType<GetDetailHandler>().AsImplementedInterfaces();
+                builder.RegisterType<ListHandler>().AsImplementedInterfaces();
 
-                builder.RegisterType<BuildingUnit.Handlers.CountHandler>().AsImplementedInterfaces();
-                builder.RegisterType<BuildingUnit.Handlers.GetHandler>().AsImplementedInterfaces();
-                builder.RegisterType<BuildingUnit.Handlers.ListHandler>().AsImplementedInterfaces();
+                builder.RegisterType<BuildingUnit.Count.BuildingUnitCountHandler>().AsImplementedInterfaces();
+                builder.RegisterType<GetBuildingUnitDetailHandler>().AsImplementedInterfaces();
+                builder.RegisterType<BuildingUnit.List.BuildingUnitListHandler>().AsImplementedInterfaces();
             }
 
             builder.RegisterType<CrabGebouwenHandler>().AsImplementedInterfaces();
-            builder.RegisterType<SyncHandler>().AsImplementedInterfaces();
-            builder.RegisterType<GetReferencesHandler>().AsImplementedInterfaces();
+            builder.RegisterType<BuildingSyncHandler>().AsImplementedInterfaces();
+            builder.RegisterType<BuildingDetailReferencesHandler>().AsImplementedInterfaces();
         }
     }
 }

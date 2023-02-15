@@ -5,18 +5,23 @@ namespace BuildingRegistry.Api.Oslo.Building
     using Be.Vlaanderen.Basisregisters.Api;
     using Be.Vlaanderen.Basisregisters.Api.ETag;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
+    using Be.Vlaanderen.Basisregisters.Api.Search.Filtering;
+    using Be.Vlaanderen.Basisregisters.Api.Search.Pagination;
+    using Be.Vlaanderen.Basisregisters.Api.Search.Sorting;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy;
+    using Count;
+    using Detail;
     using Infrastructure;
     using Infrastructure.Grb;
     using Infrastructure.Options;
+    using List;
     using MediatR;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.Extensions.Options;
     using Projections.Legacy;
     using Projections.Syndication;
-    using Requests;
-    using Responses;
+    using Query;
     using Swashbuckle.AspNetCore.Filters;
     using ProblemDetails = Be.Vlaanderen.Basisregisters.BasicApiProblem.ProblemDetails;
 
@@ -64,7 +69,10 @@ namespace BuildingRegistry.Api.Oslo.Building
             [FromRoute] int persistentLocalId,
             CancellationToken cancellationToken = default)
         {
-            var response = await _mediator.Send(new GetRequest(context, syndicationContext, responseOptions, grbBuildingParcel, persistentLocalId), cancellationToken);
+            var response =
+                await _mediator.Send(
+                    new BuildingDetailRequest(context, syndicationContext, responseOptions, grbBuildingParcel,
+                        persistentLocalId), cancellationToken);
 
             return string.IsNullOrWhiteSpace(response.LastEventHash)
                 ? Ok(response.BuildingResponse)
@@ -91,7 +99,14 @@ namespace BuildingRegistry.Api.Oslo.Building
             [FromServices] IOptions<ResponseOptions> responseOptions,
             CancellationToken cancellationToken = default)
         {
-            var listResponse = await _mediator.Send(new ListRequest(Request, Response, context, responseOptions), cancellationToken);
+            var listResponse = await _mediator.Send(new BuildingListRequest(
+                    Request.ExtractFilteringRequest<BuildingFilter>(),
+                    Request.ExtractSortingRequest(),
+                    Request.ExtractPaginationRequest(),
+                    Response,
+                    context,
+                    responseOptions)
+                , cancellationToken);
             return Ok(listResponse);
         }
 
@@ -112,7 +127,11 @@ namespace BuildingRegistry.Api.Oslo.Building
             [FromServices] LegacyContext context,
             CancellationToken cancellationToken = default)
         {
-            var response = await _mediator.Send(new CountRequest(context, Request), cancellationToken);
+            var response = await _mediator.Send(new BuildingCountRequest(
+                context,
+                Request.ExtractFilteringRequest<BuildingFilter>(),
+                Request.ExtractSortingRequest()
+            ), cancellationToken);
             return Ok(response);
         }
     }

@@ -12,7 +12,7 @@ namespace BuildingRegistry.Api.Oslo.Building.Query
     using Converters;
     using Microsoft.EntityFrameworkCore;
 
-    public class BuildingListOsloQueryV2 : Query<BuildingDetailItemV2, BuildingFilterV2>
+    public class BuildingListOsloQueryV2 : Query<BuildingDetailItemV2, BuildingFilter>
     {
         private readonly LegacyContext _context;
 
@@ -23,7 +23,7 @@ namespace BuildingRegistry.Api.Oslo.Building.Query
             _context = context;
         }
 
-        protected override IQueryable<BuildingDetailItemV2> Filter(FilteringHeader<BuildingFilterV2> filtering)
+        protected override IQueryable<BuildingDetailItemV2> Filter(FilteringHeader<BuildingFilter> filtering)
         {
             var buildings = _context
                 .BuildingDetailsV2
@@ -49,20 +49,5 @@ namespace BuildingRegistry.Api.Oslo.Building.Query
 
             return buildings;
         }
-    }
-
-    public class BuildingSortingV2 : ISorting
-    {
-        public IEnumerable<string> SortableFields { get; } = new[]
-        {
-            nameof(BuildingDetailItemV2.PersistentLocalId)
-        };
-
-        public SortingHeader DefaultSortingHeader { get; } = new SortingHeader(nameof(BuildingDetailItemV2.PersistentLocalId), SortOrder.Ascending);
-    }
-
-    public class BuildingFilterV2
-    {
-        public string Status { get; set; }
     }
 }

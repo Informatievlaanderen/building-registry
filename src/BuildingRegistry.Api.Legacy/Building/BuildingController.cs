@@ -10,10 +10,15 @@ namespace BuildingRegistry.Api.Legacy.Building
     using Be.Vlaanderen.Basisregisters.Api;
     using Be.Vlaanderen.Basisregisters.Api.ETag;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
+    using Be.Vlaanderen.Basisregisters.Api.Search.Filtering;
     using Be.Vlaanderen.Basisregisters.Api.Search.Pagination;
+    using Be.Vlaanderen.Basisregisters.Api.Search.Sorting;
     using Be.Vlaanderen.Basisregisters.Api.Syndication;
     using Be.Vlaanderen.Basisregisters.GrAr.Common;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy;
+    using Count;
+    using Crab;
+    using Detail;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.Extensions.Configuration;
@@ -26,10 +31,10 @@ namespace BuildingRegistry.Api.Legacy.Building
     using Infrastructure;
     using Infrastructure.Grb;
     using Infrastructure.Options;
+    using List;
     using MediatR;
     using Query;
-    using Requests;
-    using Responses;
+    using Sync;
 
     [ApiVersion("1.0")]
     [AdvertiseApiVersions("1.0")]
@@ -58,7 +63,7 @@ namespace BuildingRegistry.Api.Legacy.Building
         /// <response code="410">Als het gebouw verwijderd werd.</response>
         /// <response code="500">Als er een interne fout is opgetreden.</response>
         [HttpGet("{persistentLocalId}")]
-        [ProducesResponseType(typeof(BuildingResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BuildingDetailResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status410Gone)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
@@ -74,11 +79,14 @@ namespace BuildingRegistry.Api.Legacy.Building
             [FromRoute] int persistentLocalId,
             CancellationToken cancellationToken = default)
         {
-            var response = await _mediator.Send(new GetRequest(context, syndicationContext, responseOptions, grbBuildingParcel, persistentLocalId), cancellationToken);
+            var response =
+                await _mediator.Send(
+                    new GetRequest(context, syndicationContext, responseOptions, grbBuildingParcel, persistentLocalId),
+                    cancellationToken);
 
             return string.IsNullOrWhiteSpace(response.LastEventHash)
-                ? Ok(response.BuildingResponse)
-                : new OkWithLastObservedPositionAsETagResult(response.BuildingResponse, response.LastEventHash);
+                ? Ok(response.BuildingDetailResponse)
+                : new OkWithLastObservedPositionAsETagResult(response.BuildingDetailResponse, response.LastEventHash);
         }
 
         /// <summary>
@@ -93,7 +101,7 @@ namespace BuildingRegistry.Api.Legacy.Building
         /// <response code="410">Als het gebouw verwijderd werd.</response>
         /// <response code="500">Als er een interne fout is opgetreden.</response>
         [HttpGet("{persistentLocalId}/referenties")]
-        [ProducesResponseType(typeof(BuildingReferencesResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BuildingDetailReferencesResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status410Gone)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
@@ -107,7 +115,8 @@ namespace BuildingRegistry.Api.Legacy.Building
             [FromServices] IOptions<ResponseOptions> responseOptions,
             CancellationToken cancellationToken = default)
         {
-            var response = await _mediator.Send(new GetReferencesRequest(context, persistentLocalId, responseOptions), cancellationToken);
+            var response = await _mediator.Send(new GetReferencesRequest(context, persistentLocalId, responseOptions),
+                cancellationToken);
             return Ok(response);
         }
 
@@ -130,7 +139,14 @@ namespace BuildingRegistry.Api.Legacy.Building
             [FromServices] IOptions<ResponseOptions> responseOptions,
             CancellationToken cancellationToken = default)
         {
-            var listResponse = await _mediator.Send(new ListRequest(context, responseOptions, Request, Response), cancellationToken);
+            var listResponse = await _mediator.Send(new ListRequest(
+                    context,
+                    responseOptions,
+                    Request.ExtractFilteringRequest<BuildingFilter>(),
+                    Request.ExtractSortingRequest(),
+                    Request.ExtractPaginationRequest(),
+                    Response),
+                cancellationToken);
             return Ok(listResponse);
         }
 
@@ -150,7 +166,12 @@ namespace BuildingRegistry.Api.Legacy.Building
             [FromServices] LegacyContext context,
             CancellationToken cancellationToken = default)
         {
-            var response = await _mediator.Send(new CountRequest(context, Request), cancellationToken);
+            var response = await _mediator.Send(new CountRequest(
+                    context,
+                    Request.ExtractFilteringRequest<BuildingFilter>(),
+                    Request.ExtractSortingRequest()),
+                cancellationToken);
+
             return Ok(response);
         }
 
@@ -173,7 +194,12 @@ namespace BuildingRegistry.Api.Legacy.Building
             [FromServices] LegacyContext context,
             CancellationToken cancellationToken = default)
         {
-            var response = await _mediator.Send(new CrabGebouwenRequest(context, Request), cancellationToken);
+            var response = await _mediator.Send(new CrabGebouwenRequest(
+                    context,
+                    Request.ExtractFilteringRequest<BuildingCrabMappingFilter>(),
+                    Request.ExtractSortingRequest()),
+                cancellationToken);
+
             return response is null
                 ? BadRequest("Filter is required")
                 : Ok(response);
@@ -201,10 +227,17 @@ namespace BuildingRegistry.Api.Legacy.Building
             [FromServices] IOptions<ResponseOptions> responseOptions,
             CancellationToken cancellationToken = default)
         {
-            var response = await _mediator.Send(new SyncRequest(context, Request), cancellationToken);
+            var response = await _mediator.Send(new SyncRequest(
+                context,
+                Request.ExtractFilteringRequest<BuildingSyndicationFilter>(),
+                Request.ExtractSortingRequest(),
+                Request.ExtractPaginationRequest()
+            ), cancellationToken);
+
             return new ContentResult
             {
-                Content = await BuildAtomFeed(response.LastFeedUpdate, response.PagedBuildings, responseOptions, configuration),
+                Content = await BuildAtomFeed(response.LastFeedUpdate, response.PagedBuildings, responseOptions,
+                    configuration),
                 ContentType = MediaTypeNames.Text.Xml,
                 StatusCode = StatusCodes.Status200OK
             };
@@ -218,9 +251,10 @@ namespace BuildingRegistry.Api.Legacy.Building
         {
             var sw = new StringWriterWithEncoding(Encoding.UTF8);
 
-            using (var xmlWriter = XmlWriter.Create(sw, new XmlWriterSettings { Async = true, Indent = true, Encoding = sw.Encoding }))
+            using (var xmlWriter = XmlWriter.Create(sw,
+                       new XmlWriterSettings {Async = true, Indent = true, Encoding = sw.Encoding}))
             {
-                var formatter = new AtomFormatter(null, xmlWriter.Settings) { UseCDATA = true };
+                var formatter = new AtomFormatter(null, xmlWriter.Settings) {UseCDATA = true};
                 var writer = new AtomFeedWriter(xmlWriter, null, formatter);
                 var syndicationConfiguration = configuration.GetSection("Syndication");
                 var atomConfiguration = AtomFeedConfigurationBuilder.CreateFrom(syndicationConfiguration, lastUpdate);
@@ -231,7 +265,7 @@ namespace BuildingRegistry.Api.Legacy.Building
 
                 var nextFrom = buildings.Any()
                     ? buildings.Max(x => x.Position) + 1
-                    : (long?)null;
+                    : (long?) null;
 
                 var nextUri = BuildNextSyncUri(pagedBuildings.PaginationInfo.Limit, nextFrom,
                     syndicationConfiguration["NextUri"]);
