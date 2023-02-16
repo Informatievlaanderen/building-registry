@@ -15,7 +15,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\BuildingRegistry.Infrastructure\BuildingRegistry.Infrastructure.csproj" />
-    <ProjectReference Include="..\BuildingRegistry\BuildingRegistry.csproj" />
   </ItemGroup>
 
   <ItemGroup>

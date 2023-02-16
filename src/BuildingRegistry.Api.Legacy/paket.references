@@ -1,11 +1,8 @@
 AspNetCore.HealthChecks.SqlServer
-AsyncEnumerator
 
-Be.Vlaanderen.Basisregisters.AggregateSource
 Be.Vlaanderen.Basisregisters.Api
 Be.Vlaanderen.Basisregisters.EventHandling.Autofac
 Be.Vlaanderen.Basisregisters.DataDog.Tracing.Autofac
-Be.Vlaanderen.Basisregisters.Shaperon
 
 MediatR
 Microsoft.SyndicationFeed.ReaderWriter

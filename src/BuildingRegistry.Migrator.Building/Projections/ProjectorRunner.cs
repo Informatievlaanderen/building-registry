@@ -3,13 +3,11 @@ namespace BuildingRegistry.Migrator.Building.Projections
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
-    using Be.Vlaanderen.Basisregisters.ProjectionHandling.Runner;
     using Be.Vlaanderen.Basisregisters.Projector.ConnectedProjections;
     using BuildingRegistry.Infrastructure;
     using Dapper;
     using Microsoft.Data.SqlClient;
     using Microsoft.Extensions.Logging;
-    using Org.BouncyCastle.Math.EC.Rfc7748;
 
     public class ProjectorRunner
     {

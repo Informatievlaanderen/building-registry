@@ -9,7 +9,7 @@ namespace BuildingRegistry.Building.Commands
     public sealed class PlanBuilding : IHasCommandProvenance
     {
         private static readonly Guid Namespace = new Guid("93e158d7-ac5d-4fa9-9bcc-841ca682281c");
-        
+
         public BuildingPersistentLocalId BuildingPersistentLocalId { get; }
 
         public ExtendedWkbGeometry Geometry { get; }
@@ -34,7 +34,6 @@ namespace BuildingRegistry.Building.Commands
 
         private IEnumerable<object> IdentityFields()
         {
-            yield return BuildingPersistentLocalId;
             yield return Geometry.ToString();
 
             foreach (var field in Provenance.GetIdentityFields())

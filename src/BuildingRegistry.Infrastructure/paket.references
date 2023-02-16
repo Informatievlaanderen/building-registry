@@ -1,25 +1,13 @@
-Autofac
-
-Microsoft.Extensions.Configuration
-
-Be.Vlaanderen.Basisregisters.AggregateSource
 Be.Vlaanderen.Basisregisters.AggregateSource.SqlStreamStore
 Be.Vlaanderen.Basisregisters.AggregateSource.SqlStreamStore.Autofac
-
 Be.Vlaanderen.Basisregisters.CommandHandling.Idempotency
-Be.Vlaanderen.Basisregisters.EventHandling
-Be.Vlaanderen.Basisregisters.EventHandling.Autofac
-
 Be.Vlaanderen.Basisregisters.DataDog.Tracing.SqlStreamStore
+Be.Vlaanderen.Basisregisters.EventHandling.Autofac
 
 Microsoft.Extensions.Configuration.EnvironmentVariables
 Microsoft.Extensions.Configuration.FileExtensions
 Microsoft.Extensions.Configuration.Json
-
 Microsoft.EntityFrameworkCore
-
-SourceLink.Embed.AllSourceFiles
-SourceLink.Copy.PdbFiles
 
 Destructurama.JsonNet
 
@@ -31,3 +19,6 @@ Serilog.Sinks.File
 Serilog.Enrichers.Thread
 Serilog.Enrichers.Environment
 Serilog.Formatting.Compact
+
+SourceLink.Embed.AllSourceFiles
+SourceLink.Copy.PdbFiles

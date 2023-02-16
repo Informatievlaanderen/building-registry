@@ -9,7 +9,7 @@ namespace BuildingRegistry.Building.Commands
     public sealed class PlanBuildingUnit : IHasCommandProvenance
     {
         private static readonly Guid Namespace = new Guid("f7de0c52-a994-43ea-8a94-7114e81b8ceb");
-        
+
         public BuildingPersistentLocalId BuildingPersistentLocalId { get; }
         public BuildingUnitPersistentLocalId BuildingUnitPersistentLocalId { get; }
         public BuildingUnitPositionGeometryMethod PositionGeometryMethod { get; }
@@ -46,7 +46,6 @@ namespace BuildingRegistry.Building.Commands
         private IEnumerable<object> IdentityFields()
         {
             yield return BuildingPersistentLocalId;
-            yield return BuildingUnitPersistentLocalId;
             yield return PositionGeometryMethod.ToString() ?? string.Empty;
             yield return Position ?? string.Empty;
             yield return Function.ToString() ?? string.Empty;

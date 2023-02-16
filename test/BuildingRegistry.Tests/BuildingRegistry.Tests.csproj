@@ -4,10 +4,10 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\BuildingRegistry.Api.BackOffice.Handlers.Lambda\BuildingRegistry.Api.BackOffice.Handlers.Lambda.csproj" />
     <ProjectReference Include="..\..\src\BuildingRegistry.Api.BackOffice\BuildingRegistry.Api.BackOffice.csproj" />
-    <ProjectReference Include="..\..\src\BuildingRegistry.Api.Legacy\BuildingRegistry.Api.Legacy.csproj" />
     <ProjectReference Include="..\..\src\BuildingRegistry.Consumer.Address\BuildingRegistry.Consumer.Address.csproj" />
     <ProjectReference Include="..\..\src\BuildingRegistry.Migrator.Building\BuildingRegistry.Migrator.Building.csproj" />
     <ProjectReference Include="..\..\src\BuildingRegistry.Projections.BackOffice\BuildingRegistry.Projections.BackOffice.csproj" />
+    <ProjectReference Include="..\..\src\BuildingRegistry.Projections.Legacy\BuildingRegistry.Projections.Legacy.csproj" />
     <ProjectReference Include="..\..\src\BuildingRegistry.Projections.Wfs\BuildingRegistry.Projections.Wfs.csproj" />
     <ProjectReference Include="..\..\src\BuildingRegistry.Projections.Wms\BuildingRegistry.Projections.Wms.csproj" />
     <ProjectReference Include="..\..\src\BuildingRegistry\BuildingRegistry.csproj" />
