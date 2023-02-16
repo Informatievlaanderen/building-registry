@@ -9,7 +9,7 @@ Be.Vlaanderen.Basisregisters.GrAr.Contracts
 Be.Vlaanderen.Basisregisters.MessageHandling.Kafka.Producer
 Be.Vlaanderen.Basisregisters.MessageHandling.Kafka.Consumer.SqlServer
 
-Be.Vlaanderen.Basisregisters.ProjectionHandling.Connector 
+Be.Vlaanderen.Basisregisters.ProjectionHandling.Connector
 Be.Vlaanderen.Basisregisters.ProjectionHandling.Runner
 Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Autofac
 
@@ -24,6 +24,7 @@ Serilog.Formatting.Compact
 
 Microsoft.EntityFrameworkCore.SqlServer
 Microsoft.EntityFrameworkCore.InMemory
+
 Microsoft.Extensions.Configuration
 Microsoft.Extensions.Configuration.CommandLine
 Microsoft.Extensions.Configuration.FileExtensions

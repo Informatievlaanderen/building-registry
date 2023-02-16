@@ -31,7 +31,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\BuildingRegistry.Infrastructure\BuildingRegistry.Infrastructure.csproj" />
     <ProjectReference Include="..\BuildingRegistry.Projections.Legacy\BuildingRegistry.Projections.Legacy.csproj" />
     <ProjectReference Include="..\BuildingRegistry.Projections.Syndication\BuildingRegistry.Projections.Syndication.csproj" />
     <ProjectReference Include="..\BuildingRegistry\BuildingRegistry.csproj" />
