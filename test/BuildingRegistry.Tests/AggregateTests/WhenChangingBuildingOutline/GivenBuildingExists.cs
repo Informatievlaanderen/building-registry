@@ -316,7 +316,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenChangingBuildingOutline
             sut.Initialize(new List<object> { buildingWasMigrated });
 
             // Act
-            sut.ChangeOutlining(changedBuildingGeometry);
+            sut.ChangeOutliningConstruction(changedBuildingGeometry);
 
             // Assert
             sut.BuildingGeometry.Should()

@@ -15,7 +15,7 @@ namespace BuildingRegistry.Building
             bool hasDeviation)
         {
             GuardRemovedBuilding();
-            GuardActiveBuilding();
+            GuardValidStatusses(BuildingStatus.Planned, BuildingStatus.UnderConstruction, BuildingStatus.Realized);
 
             if (_buildingUnits.HasPersistentLocalId(new BuildingUnitPersistentLocalId(buildingUnitPersistentLocalId)))
             {

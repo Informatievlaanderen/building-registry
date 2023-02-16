@@ -52,7 +52,144 @@ namespace BuildingRegistry.Building
             return newBuilding;
         }
 
-        public void ChangeOutlining(ExtendedWkbGeometry extendedWkbGeometry)
+        public void PlaceUnderConstruction()
+        {
+            GuardRemovedBuilding();
+
+            if (BuildingStatus == BuildingStatus.UnderConstruction)
+            {
+                return;
+            }
+
+            GuardValidStatusses(BuildingStatus.Planned);
+
+            ApplyChange(new BuildingBecameUnderConstructionV2(BuildingPersistentLocalId));
+        }
+
+        public void RealizeConstruction()
+        {
+            GuardRemovedBuilding();
+
+            if (BuildingStatus == BuildingStatus.Realized)
+            {
+                return;
+            }
+
+            GuardValidStatusses(BuildingStatus.UnderConstruction);
+
+            ApplyChange(new BuildingWasRealizedV2(BuildingPersistentLocalId));
+
+            foreach (var unit in _buildingUnits)
+            {
+                unit.RealizeBecauseBuildingWasRealized();
+            }
+        }
+
+        public void NotRealizeConstruction()
+        {
+            GuardRemovedBuilding();
+
+            if (BuildingStatus == BuildingStatus.NotRealized)
+            {
+                return;
+            }
+
+            GuardValidStatusses(BuildingStatus.Planned, BuildingStatus.UnderConstruction);
+
+            foreach (var unit in _buildingUnits.PlannedBuildingUnits())
+            {
+                unit.NotRealizeBecauseBuildingWasNotRealized();
+            }
+
+            ApplyChange(new BuildingWasNotRealizedV2(BuildingPersistentLocalId));
+        }
+
+        public void CorrectBuildingUnderConstruction()
+        {
+            GuardRemovedBuilding();
+
+            if (BuildingStatus == BuildingStatus.Planned)
+            {
+                return;
+            }
+
+            GuardValidStatusses(BuildingStatus.UnderConstruction);
+
+            ApplyChange(new BuildingWasCorrectedFromUnderConstructionToPlanned(BuildingPersistentLocalId));
+        }
+
+        public void CorrectRealizeConstruction()
+        {
+            GuardRemovedBuilding();
+
+            if (BuildingStatus == BuildingStatus.UnderConstruction)
+            {
+                return;
+            }
+
+            if (BuildingStatus != BuildingStatus.Realized)
+            {
+                throw new BuildingHasInvalidStatusException();
+            }
+
+            if (BuildingGeometry.Method != BuildingGeometryMethod.Outlined)
+            {
+                throw new BuildingHasInvalidBuildingGeometryMethodException();
+            }
+
+            if (_buildingUnits.RetiredBuildingUnits().Any())
+            {
+                throw new BuildingHasRetiredBuildingUnitsException();
+            }
+
+            foreach (var unit in _buildingUnits)
+            {
+                unit.CorrectRealizeBecauseBuildingWasCorrected();
+            }
+
+            ApplyChange(new BuildingWasCorrectedFromRealizedToUnderConstruction(BuildingPersistentLocalId));
+        }
+
+        public void CorrectNotRealizeConstruction()
+        {
+            GuardRemovedBuilding();
+
+            if (BuildingStatus == BuildingStatus.Planned)
+            {
+                return;
+            }
+
+            GuardValidStatusses(BuildingStatus.NotRealized);
+
+            if (BuildingGeometry.Method != BuildingGeometryMethod.Outlined)
+            {
+                throw new BuildingHasInvalidBuildingGeometryMethodException();
+            }
+
+            ApplyChange(new BuildingWasCorrectedFromNotRealizedToPlanned(BuildingPersistentLocalId));
+        }
+
+        public void RemoveConstruction()
+        {
+            if (IsRemoved)
+            {
+                return;
+            }
+
+            if (BuildingGeometry.Method != BuildingGeometryMethod.Outlined)
+            {
+                throw new BuildingHasInvalidBuildingGeometryMethodException();
+            }
+
+            foreach (var buildingUnit in _buildingUnits.GetNotRemovedUnits())
+            {
+                buildingUnit.RemoveBecauseBuildingWasRemoved();
+            }
+
+            ApplyChange(new BuildingWasRemovedV2(BuildingPersistentLocalId));
+        }
+
+        public void ChangeOutliningConstruction(ExtendedWkbGeometry extendedWkbGeometry)
         {
             GuardRemovedBuilding();
 
@@ -97,154 +234,6 @@ namespace BuildingRegistry.Building
                 buildingUnitsWithPositionDerivedFromBuilding,
                 extendedWkbGeometry,
                 buildingUnitsPosition));
-        }
-
-        public void PlaceUnderConstruction()
-        {
-            GuardRemovedBuilding();
-
-            if (BuildingStatus == BuildingStatus.UnderConstruction)
-            {
-                return;
-            }
-
-            GuardValidStatusses(BuildingStatus.Planned);
-
-            ApplyChange(new BuildingBecameUnderConstructionV2(BuildingPersistentLocalId));
-        }
-
-        public void CorrectBuildingUnderConstruction()
-        {
-            GuardRemovedBuilding();
-
-            if (BuildingStatus == BuildingStatus.Planned)
-            {
-                return;
-            }
-
-            GuardValidStatusses(BuildingStatus.UnderConstruction);
-
-            ApplyChange(new BuildingWasCorrectedFromUnderConstructionToPlanned(BuildingPersistentLocalId));
-        }
-
-        public void RealizeConstruction()
-        {
-            GuardRemovedBuilding();
-
-            if (BuildingStatus == BuildingStatus.Realized)
-            {
-                return;
-            }
-
-            GuardValidStatusses(BuildingStatus.UnderConstruction);
-
-            ApplyChange(new BuildingWasRealizedV2(BuildingPersistentLocalId));
-
-            foreach (var unit in _buildingUnits)
-            {
-                unit.RealizeBecauseBuildingWasRealized();
-            }
-        }
-
-        public void CorrectRealizeConstruction()
-        {
-            GuardRemovedBuilding();
-
-            if (BuildingStatus == BuildingStatus.UnderConstruction)
-            {
-                return;
-            }
-
-            if (BuildingStatus != BuildingStatus.Realized)
-            {
-                throw new BuildingHasInvalidStatusException();
-            }
-
-            if (BuildingGeometry.Method != BuildingGeometryMethod.Outlined)
-            {
-                throw new BuildingHasInvalidBuildingGeometryMethodException();
-            }
-
-            if (_buildingUnits.RetiredBuildingUnits().Any())
-            {
-                throw new BuildingHasRetiredBuildingUnitsException();
-            }
-
-            foreach (var unit in _buildingUnits)
-            {
-                unit.CorrectRealizeBecauseBuildingWasCorrected();
-            }
-
-            ApplyChange(new BuildingWasCorrectedFromRealizedToUnderConstruction(BuildingPersistentLocalId));
-        }
-
-        public void NotRealizeConstruction()
-        {
-            GuardRemovedBuilding();
-
-            if (BuildingStatus == BuildingStatus.NotRealized)
-            {
-                return;
-            }
-
-            GuardValidStatusses(BuildingStatus.Planned, BuildingStatus.UnderConstruction);
-
-            foreach (var unit in _buildingUnits.PlannedBuildingUnits())
-            {
-                unit.NotRealizeBecauseBuildingWasNotRealized();
-            }
-
-            ApplyChange(new BuildingWasNotRealizedV2(BuildingPersistentLocalId));
-        }
-
-        public void CorrectNotRealizeConstruction()
-        {
-            GuardRemovedBuilding();
-
-            if (BuildingStatus == BuildingStatus.Planned)
-            {
-                return;
-            }
-
-            GuardValidStatusses(BuildingStatus.NotRealized);
-
-            if (BuildingGeometry.Method != BuildingGeometryMethod.Outlined)
-            {
-                throw new BuildingHasInvalidBuildingGeometryMethodException();
-            }
-
-            ApplyChange(new BuildingWasCorrectedFromNotRealizedToPlanned(BuildingPersistentLocalId));
-        }
-
-        public void RemoveConstruction()
-        {
-            if (IsRemoved)
-            {
-                return;
-            }
-
-            if (BuildingGeometry.Method != BuildingGeometryMethod.Outlined)
-            {
-                throw new BuildingHasInvalidBuildingGeometryMethodException();
-            }
-
-            foreach (var buildingUnit in _buildingUnits.GetNotRemovedUnits())
-            {
-                buildingUnit.RemoveBecauseBuildingWasRemoved();
-            }
-
-            ApplyChange(new BuildingWasRemovedV2(BuildingPersistentLocalId));
-        }
-
-        private void GuardActiveBuilding()
-        {
-            var validStatuses = new[]
-                {BuildingStatus.Planned, BuildingStatus.UnderConstruction, BuildingStatus.Realized};
-
-            if (!validStatuses.Contains(BuildingStatus))
-            {
-                throw new BuildingHasInvalidStatusException();
-            }
         }
 
         private void GuardRemovedBuilding()
