@@ -15,6 +15,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
     using Be.Vlaanderen.Basisregisters.Sqs.Lambda.Handlers;
     using Be.Vlaanderen.Basisregisters.Sqs.Responses;
     using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Requests;
+    using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.SqsRequests;
     using BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.BuildingUnit;
     using BuildingRegistry.Api.BackOffice.Handlers.Lambda.Requests.BuildingUnit;
     using BuildingRegistry.Building;
@@ -49,7 +50,6 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
             var buildingUnitPersistentLocalId = Fixture.Create<BuildingUnitPersistentLocalId>();
 
             PlanBuilding(buildingPersistentLocalId);
-
             PlanBuildingUnit(buildingPersistentLocalId, buildingUnitPersistentLocalId);
 
             var eTagResponse = new ETagResponse(string.Empty, Fixture.Create<string>());
@@ -61,18 +61,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
                 Container.Resolve<IBuildings>());
 
             //Act
-            await handler.Handle(new CorrectBuildingUnitPositionLambdaRequest(
-                    buildingPersistentLocalId,
-                    buildingUnitPersistentLocalId,
-                    Guid.NewGuid(),
-                    null,
-                    Fixture.Create<Provenance>(),
-                    new Dictionary<string, object?>(),
-                    new CorrectBuildingUnitPositionRequest
-                    {
-                        PositieGeometrieMethode = PositieGeometrieMethode.AfgeleidVanObject
-                    }),
-                CancellationToken.None);
+            await handler.Handle(CreateCorrectBuildingUnitPositionLambdaRequest(), CancellationToken.None);
 
             //Assert
             var stream = await Container.Resolve<IStreamStore>()
@@ -103,18 +92,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
                 await buildings.GetAsync(new BuildingStreamId(buildingPersistentLocalId), CancellationToken.None);
 
             // Act
-            await handler.Handle(new CorrectBuildingUnitPositionLambdaRequest(
-                    buildingPersistentLocalId,
-                    buildingUnitPersistentLocalId,
-                    Guid.NewGuid(),
-                    null,
-                    Fixture.Create<Provenance>(),
-                    new Dictionary<string, object?>(),
-                    new CorrectBuildingUnitPositionRequest
-                    {
-                        PositieGeometrieMethode = PositieGeometrieMethode.AfgeleidVanObject
-                    }),
-                CancellationToken.None);
+            await handler.Handle(CreateCorrectBuildingUnitPositionLambdaRequest(), CancellationToken.None);
 
             //Assert
             ticketing.Verify(x =>
@@ -146,18 +124,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
                 Container.Resolve<IBuildings>());
 
             // Act
-            await handler.Handle(new CorrectBuildingUnitPositionLambdaRequest(
-                    buildingPersistentLocalId,
-                    buildingUnitPersistentLocalId,
-                    Guid.NewGuid(),
-                    null,
-                    Fixture.Create<Provenance>(),
-                    new Dictionary<string, object?>(),
-                    new CorrectBuildingUnitPositionRequest
-                    {
-                        PositieGeometrieMethode = PositieGeometrieMethode.AfgeleidVanObject
-                    }),
-                CancellationToken.None);
+            await handler.Handle(CreateCorrectBuildingUnitPositionLambdaRequest(), CancellationToken.None);
 
             //Assert
             ticketing.Verify(x =>
@@ -188,18 +155,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
                 Container.Resolve<IBuildings>());
 
             // Act
-            await handler.Handle(new CorrectBuildingUnitPositionLambdaRequest(
-                    buildingPersistentLocalId,
-                    buildingUnitPersistentLocalId,
-                    Guid.NewGuid(),
-                    null,
-                    Fixture.Create<Provenance>(),
-                    new Dictionary<string, object?>(),
-                    new CorrectBuildingUnitPositionRequest
-                    {
-                        PositieGeometrieMethode = PositieGeometrieMethode.AfgeleidVanObject
-                    }),
-                CancellationToken.None);
+            await handler.Handle(CreateCorrectBuildingUnitPositionLambdaRequest(), CancellationToken.None);
 
             //Assert
             ticketing.Verify(x =>
@@ -230,18 +186,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
                 Container.Resolve<IBuildings>());
 
             // Act
-            await handler.Handle(new CorrectBuildingUnitPositionLambdaRequest(
-                    buildingPersistentLocalId,
-                    buildingUnitPersistentLocalId,
-                    Guid.NewGuid(),
-                    null,
-                    Fixture.Create<Provenance>(),
-                    new Dictionary<string, object?>(),
-                    new CorrectBuildingUnitPositionRequest
-                    {
-                        PositieGeometrieMethode = PositieGeometrieMethode.AfgeleidVanObject
-                    }),
-                CancellationToken.None);
+            await handler.Handle(CreateCorrectBuildingUnitPositionLambdaRequest(), CancellationToken.None);
 
             //Assert
             ticketing.Verify(x =>
@@ -276,18 +221,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
                 Container.Resolve<IBuildings>());
 
             // Act
-            await handler.Handle(new CorrectBuildingUnitPositionLambdaRequest(
-                    buildingPersistentLocalId,
-                    buildingUnitPersistentLocalId,
-                    Guid.NewGuid(),
-                    null,
-                    Fixture.Create<Provenance>(),
-                    new Dictionary<string, object?>(),
-                    new CorrectBuildingUnitPositionRequest
-                    {
-                        PositieGeometrieMethode = PositieGeometrieMethode.AfgeleidVanObject
-                    }),
-                CancellationToken.None);
+            await handler.Handle(CreateCorrectBuildingUnitPositionLambdaRequest(), CancellationToken.None);
 
             //Assert
             ticketing.Verify(x =>
@@ -297,6 +231,24 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
                         "De positie dient binnen de geometrie van het gebouw te liggen.",
                         "GebouweenheidOngeldigePositieValidatie"),
                     CancellationToken.None));
+        }
+
+        private CorrectBuildingUnitPositionLambdaRequest CreateCorrectBuildingUnitPositionLambdaRequest()
+        {
+            return new CorrectBuildingUnitPositionLambdaRequest(Fixture.Create<BuildingPersistentLocalId>(),
+                new CorrectBuildingUnitPositionSqsRequest()
+                {
+                    BuildingUnitPersistentLocalId = Fixture.Create<BuildingUnitPersistentLocalId>(),
+                    IfMatchHeaderValue = null,
+                    Metadata = new Dictionary<string, object?>(),
+                    ProvenanceData = Fixture.Create<ProvenanceData>(),
+                    Request = new CorrectBuildingUnitPositionRequest
+                    {
+                        BuildingUnitPersistentLocalId = Fixture.Create<BuildingUnitPersistentLocalId>(),
+                        PositieGeometrieMethode = PositieGeometrieMethode.AfgeleidVanObject
+                    },
+                    TicketId = Guid.NewGuid()
+                });
         }
     }
 }

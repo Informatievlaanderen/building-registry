@@ -14,6 +14,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
     using Be.Vlaanderen.Basisregisters.Sqs.Lambda.Handlers;
     using Be.Vlaanderen.Basisregisters.Sqs.Responses;
     using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Requests;
+    using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.SqsRequests;
     using BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.BuildingUnit;
     using BuildingRegistry.Api.BackOffice.Handlers.Lambda.Requests.BuildingUnit;
     using BuildingRegistry.Building;
@@ -60,14 +61,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
                 Container.Resolve<IBuildings>());
 
             //Act
-            await handler.Handle(new RegularizeBuildingUnitLambdaRequest(
-                    buildingPersistentLocalId,
-                    Guid.NewGuid(),
-                    null,
-                    Fixture.Create<Provenance>(),
-                    new Dictionary<string, object?>(),
-                    new RegularizeBuildingUnitRequest { BuildingUnitPersistentLocalId = buildingUnitPersistentLocalId }),
-                CancellationToken.None);
+            await handler.Handle(CreateRegularizeBuildingUnitLambdaRequest(), CancellationToken.None);
 
             //Assert
             var stream = await Container.Resolve<IStreamStore>()
@@ -98,14 +92,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
                 await buildings.GetAsync(new BuildingStreamId(buildingPersistentLocalId), CancellationToken.None);
 
             // Act
-            await handler.Handle(new RegularizeBuildingUnitLambdaRequest(
-                    buildingPersistentLocalId,
-                    Guid.NewGuid(),
-                    null,
-                    Fixture.Create<Provenance>(),
-                    new Dictionary<string, object?>(),
-                    new RegularizeBuildingUnitRequest { BuildingUnitPersistentLocalId = buildingUnitPersistentLocalId }),
-                CancellationToken.None);
+            await handler.Handle(CreateRegularizeBuildingUnitLambdaRequest(), CancellationToken.None);
 
             //Assert
             ticketing.Verify(x =>
@@ -137,14 +124,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
                 Container.Resolve<IBuildings>());
 
             // Act
-            await handler.Handle(new RegularizeBuildingUnitLambdaRequest(
-                    buildingPersistentLocalId,
-                    Guid.NewGuid(),
-                    null,
-                    Fixture.Create<Provenance>(),
-                    new Dictionary<string, object?>(),
-                    new RegularizeBuildingUnitRequest { BuildingUnitPersistentLocalId = buildingUnitPersistentLocalId }),
-                CancellationToken.None);
+            await handler.Handle(CreateRegularizeBuildingUnitLambdaRequest(), CancellationToken.None);
 
             //Assert
             ticketing.Verify(x =>
@@ -175,14 +155,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
                 Container.Resolve<IBuildings>());
 
             // Act
-            await handler.Handle(new RegularizeBuildingUnitLambdaRequest(
-                buildingPersistentLocalId,
-                Guid.NewGuid(),
-                string.Empty,
-                Fixture.Create<Provenance>(),
-                new Dictionary<string, object?>(),
-                new RegularizeBuildingUnitRequest { BuildingUnitPersistentLocalId = buildingUnitPersistentLocalId }
-            ), CancellationToken.None);
+            await handler.Handle(CreateRegularizeBuildingUnitLambdaRequest(), CancellationToken.None);
 
             //Assert
             ticketing.Verify(x =>
@@ -192,6 +165,19 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
                         "Deze actie is niet toegestaan op gebouweenheden met functie gemeenschappelijkDeel.",
                         "GebouweenheidGemeenschappelijkDeel"),
                     CancellationToken.None));
+        }
+
+        private RegularizeBuildingUnitLambdaRequest CreateRegularizeBuildingUnitLambdaRequest()
+        {
+            return new RegularizeBuildingUnitLambdaRequest(Fixture.Create<BuildingPersistentLocalId>(),
+                new RegularizeBuildingUnitSqsRequest()
+                {
+                    IfMatchHeaderValue = null,
+                    Metadata = new Dictionary<string, object?>(),
+                    ProvenanceData = Fixture.Create<ProvenanceData>(),
+                    Request = new RegularizeBuildingUnitRequest { BuildingUnitPersistentLocalId = Fixture.Create<BuildingUnitPersistentLocalId>() },
+                    TicketId = Guid.NewGuid()
+                });
         }
     }
 }

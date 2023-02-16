@@ -14,6 +14,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
     using Be.Vlaanderen.Basisregisters.Sqs.Lambda.Handlers;
     using Be.Vlaanderen.Basisregisters.Sqs.Responses;
     using BuildingRegistry.Api.BackOffice.Abstractions.Building.Requests;
+    using BuildingRegistry.Api.BackOffice.Abstractions.Building.SqsRequests;
     using BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.Building;
     using BuildingRegistry.Api.BackOffice.Handlers.Lambda.Requests.Building;
     using BuildingRegistry.Building;
@@ -56,20 +57,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
                 Container.Resolve<IBuildings>());
 
             //Act
-            await handler.Handle(
-                new ChangeBuildingOutlineLambdaRequest(
-                    buildingPersistentLocalId,
-                    buildingPersistentLocalId,
-                    Guid.NewGuid(),
-                    null,
-                    Fixture.Create<Provenance>(),
-                    new Dictionary<string, object?>(),
-                    new ChangeBuildingOutlineRequest
-                    {
-                        GeometriePolygoon =
-                            "<gml:Polygon srsName=\"https://www.opengis.net/def/crs/EPSG/0/31370\" xmlns:gml=\"http://www.opengis.net/gml/3.2\"><gml:exterior><gml:LinearRing><gml:posList>140284.15277253836 186724.74131567031 140291.06016454101 186726.38355567306 140288.22675654292 186738.25798767805 140281.19098053873 186736.57913967967 140284.15277253836 186724.74131567031</gml:posList></gml:LinearRing></gml:exterior></gml:Polygon>"
-                    }),
-                CancellationToken.None);
+            await handler.Handle(CreateChangeBuildingOutlineLambdaRequest(), CancellationToken.None);
 
             //Assert
             var stream = await Container.Resolve<IStreamStore>()
@@ -98,20 +86,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
                 await buildings.GetAsync(new BuildingStreamId(buildingPersistentLocalId), CancellationToken.None);
 
             // Act
-            await handler.Handle(
-                new ChangeBuildingOutlineLambdaRequest(
-                    buildingPersistentLocalId,
-                    buildingPersistentLocalId,
-                    Guid.NewGuid(),
-                    null,
-                    Fixture.Create<Provenance>(),
-                    new Dictionary<string, object?>(),
-                    new ChangeBuildingOutlineRequest
-                    {
-                        GeometriePolygoon =
-                            "<gml:Polygon srsName=\"https://www.opengis.net/def/crs/EPSG/0/31370\" xmlns:gml=\"http://www.opengis.net/gml/3.2\"><gml:exterior><gml:LinearRing><gml:posList>140284.15277253836 186724.74131567031 140291.06016454101 186726.38355567306 140288.22675654292 186738.25798767805 140281.19098053873 186736.57913967967 140284.15277253836 186724.74131567031</gml:posList></gml:LinearRing></gml:exterior></gml:Polygon>"
-                    }),
-                CancellationToken.None);
+            await handler.Handle(CreateChangeBuildingOutlineLambdaRequest(), CancellationToken.None);
 
             //Assert
             ticketing.Verify(x =>
@@ -129,7 +104,6 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
         {
             // Arrange
             var ticketing = new Mock<ITicketing>();
-            var buildingPersistentLocalId = Fixture.Create<BuildingPersistentLocalId>();
 
             var handler = new ChangeBuildingOutlineLambdaHandler(
                 Container.Resolve<IConfiguration>(),
@@ -139,20 +113,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
                 Container.Resolve<IBuildings>());
 
             // Act
-            await handler.Handle(
-                new ChangeBuildingOutlineLambdaRequest(
-                    buildingPersistentLocalId,
-                    buildingPersistentLocalId,
-                    Guid.NewGuid(),
-                    null,
-                    Fixture.Create<Provenance>(),
-                    new Dictionary<string, object?>(),
-                    new ChangeBuildingOutlineRequest
-                    {
-                        GeometriePolygoon =
-                            "<gml:Polygon srsName=\"https://www.opengis.net/def/crs/EPSG/0/31370\" xmlns:gml=\"http://www.opengis.net/gml/3.2\"><gml:exterior><gml:LinearRing><gml:posList>140284.15277253836 186724.74131567031 140291.06016454101 186726.38355567306 140288.22675654292 186738.25798767805 140281.19098053873 186736.57913967967 140284.15277253836 186724.74131567031</gml:posList></gml:LinearRing></gml:exterior></gml:Polygon>"
-                    }),
-                CancellationToken.None);
+            await handler.Handle(CreateChangeBuildingOutlineLambdaRequest(), CancellationToken.None);
 
             //Assert
             ticketing.Verify(x =>
@@ -169,7 +130,6 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
         {
             // Arrange
             var ticketing = new Mock<ITicketing>();
-            var buildingPersistentLocalId = Fixture.Create<BuildingPersistentLocalId>();
 
             var handler = new ChangeBuildingOutlineLambdaHandler(
                 Container.Resolve<IConfiguration>(),
@@ -179,20 +139,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
                 Container.Resolve<IBuildings>());
 
             // Act
-            await handler.Handle(
-                new ChangeBuildingOutlineLambdaRequest(
-                    buildingPersistentLocalId,
-                    buildingPersistentLocalId,
-                    Guid.NewGuid(),
-                    null,
-                    Fixture.Create<Provenance>(),
-                    new Dictionary<string, object?>(),
-                    new ChangeBuildingOutlineRequest
-                    {
-                        GeometriePolygoon =
-                            "<gml:Polygon srsName=\"https://www.opengis.net/def/crs/EPSG/0/31370\" xmlns:gml=\"http://www.opengis.net/gml/3.2\"><gml:exterior><gml:LinearRing><gml:posList>140284.15277253836 186724.74131567031 140291.06016454101 186726.38355567306 140288.22675654292 186738.25798767805 140281.19098053873 186736.57913967967 140284.15277253836 186724.74131567031</gml:posList></gml:LinearRing></gml:exterior></gml:Polygon>"
-                    }),
-                CancellationToken.None);
+            await handler.Handle(CreateChangeBuildingOutlineLambdaRequest(), CancellationToken.None);
 
             //Assert
             ticketing.Verify(x =>
@@ -209,7 +156,6 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
         {
             // Arrange
             var ticketing = new Mock<ITicketing>();
-            var buildingPersistentLocalId = Fixture.Create<BuildingPersistentLocalId>();
 
             var handler = new ChangeBuildingOutlineLambdaHandler(
                 Container.Resolve<IConfiguration>(),
@@ -219,20 +165,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
                 Container.Resolve<IBuildings>());
 
             // Act
-            await handler.Handle(
-                new ChangeBuildingOutlineLambdaRequest(
-                    buildingPersistentLocalId,
-                    buildingPersistentLocalId,
-                    Guid.NewGuid(),
-                    null,
-                    Fixture.Create<Provenance>(),
-                    new Dictionary<string, object?>(),
-                    new ChangeBuildingOutlineRequest
-                    {
-                        GeometriePolygoon =
-                            "<gml:Polygon srsName=\"https://www.opengis.net/def/crs/EPSG/0/31370\" xmlns:gml=\"http://www.opengis.net/gml/3.2\"><gml:exterior><gml:LinearRing><gml:posList>140284.15277253836 186724.74131567031 140291.06016454101 186726.38355567306 140288.22675654292 186738.25798767805 140281.19098053873 186736.57913967967 140284.15277253836 186724.74131567031</gml:posList></gml:LinearRing></gml:exterior></gml:Polygon>"
-                    }),
-                CancellationToken.None);
+            await handler.Handle(CreateChangeBuildingOutlineLambdaRequest(), CancellationToken.None);
 
             //Assert
             ticketing.Verify(x =>
@@ -242,6 +175,26 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
                         "Het gebouw heeft onderliggende gebouweenheden met status 'gepland' of 'gerealiseerd' buiten de nieuw geschetste gebouwgeometrie.",
                         "GebouweenheidGeomtrieBuitenGebouwGeometrie"),
                     CancellationToken.None));
+        }
+
+        private ChangeBuildingOutlineLambdaRequest CreateChangeBuildingOutlineLambdaRequest()
+        {
+            var buildingPersistentLocalId = Fixture.Create<BuildingPersistentLocalId>();
+
+            return new ChangeBuildingOutlineLambdaRequest(buildingPersistentLocalId,
+                new ChangeBuildingOutlineSqsRequest()
+                {
+                    BuildingPersistentLocalId = buildingPersistentLocalId,
+                    IfMatchHeaderValue = null,
+                    Metadata = new Dictionary<string, object?>(),
+                    ProvenanceData = Fixture.Create<ProvenanceData>(),
+                    Request = new ChangeBuildingOutlineRequest
+                    {
+                        GeometriePolygoon =
+                            "<gml:Polygon srsName=\"https://www.opengis.net/def/crs/EPSG/0/31370\" xmlns:gml=\"http://www.opengis.net/gml/3.2\"><gml:exterior><gml:LinearRing><gml:posList>140284.15277253836 186724.74131567031 140291.06016454101 186726.38355567306 140288.22675654292 186738.25798767805 140281.19098053873 186736.57913967967 140284.15277253836 186724.74131567031</gml:posList></gml:LinearRing></gml:exterior></gml:Polygon>"
+                    },
+                    TicketId = Guid.NewGuid()
+                });
         }
     }
 }

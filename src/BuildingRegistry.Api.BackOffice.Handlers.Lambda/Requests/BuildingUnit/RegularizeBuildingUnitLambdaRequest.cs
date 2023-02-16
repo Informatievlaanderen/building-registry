@@ -17,25 +17,10 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Requests.BuildingUnit
         public RegularizeBuildingUnitLambdaRequest(
             string messageGroupId,
             RegularizeBuildingUnitSqsRequest sqsRequest)
-            : this(
-                messageGroupId,
-                sqsRequest.TicketId,
-                sqsRequest.IfMatchHeaderValue,
-                sqsRequest.ProvenanceData.ToProvenance(),
-                sqsRequest.Metadata,
-                sqsRequest.Request)
-        { }
-
-        public RegularizeBuildingUnitLambdaRequest(
-            string messageGroupId,
-            Guid ticketId,
-            string? ifMatchHeaderValue,
-            Provenance provenance,
-            IDictionary<string, object?> metadata,
-            RegularizeBuildingUnitRequest request)
-            : base(messageGroupId, ticketId, ifMatchHeaderValue, provenance, metadata)
+            : base(messageGroupId, sqsRequest.TicketId, sqsRequest.IfMatchHeaderValue,
+                sqsRequest.ProvenanceData.ToProvenance(), sqsRequest.Metadata)
         {
-            Request = request;
+            Request = sqsRequest.Request;
         }
 
         /// <summary>

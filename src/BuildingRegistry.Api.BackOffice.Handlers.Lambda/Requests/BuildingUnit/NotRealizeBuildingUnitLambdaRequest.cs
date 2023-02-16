@@ -17,25 +17,10 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Requests.BuildingUnit
         public NotRealizeBuildingUnitLambdaRequest(
             string messageGroupId,
             NotRealizeBuildingUnitSqsRequest sqsRequest)
-            : this(
-                messageGroupId,
-                sqsRequest.TicketId,
-                sqsRequest.IfMatchHeaderValue,
-                sqsRequest.ProvenanceData.ToProvenance(),
-                sqsRequest.Metadata,
-                sqsRequest.Request)
-        { }
-
-        public NotRealizeBuildingUnitLambdaRequest(
-            string messageGroupId,
-            Guid ticketId,
-            string? ifMatchHeaderValue,
-            Provenance provenance,
-            IDictionary<string, object?> metadata,
-            NotRealizeBuildingUnitRequest request)
-            : base(messageGroupId, ticketId, ifMatchHeaderValue, provenance, metadata)
+            : base(messageGroupId, sqsRequest.TicketId, sqsRequest.IfMatchHeaderValue,
+                sqsRequest.ProvenanceData.ToProvenance(), sqsRequest.Metadata)
         {
-            Request = request;
+            Request = sqsRequest.Request;
         }
 
         /// <summary>

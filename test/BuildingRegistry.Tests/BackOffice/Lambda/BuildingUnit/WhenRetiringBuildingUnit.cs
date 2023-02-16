@@ -15,6 +15,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
     using Be.Vlaanderen.Basisregisters.Sqs.Responses;
     using BuildingRegistry.Api.BackOffice.Abstractions;
     using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Requests;
+    using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.SqsRequests;
     using BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.BuildingUnit;
     using BuildingRegistry.Api.BackOffice.Handlers.Lambda.Requests.BuildingUnit;
     using BuildingRegistry.Building;
@@ -71,15 +72,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
                 _backOfficeContext);
 
             //Act
-            await handler.Handle(
-                new RetireBuildingUnitLambdaRequest(
-                    buildingPersistentLocalId,
-                    Guid.NewGuid(),
-                    string.Empty,
-                    Fixture.Create<Provenance>(),
-                    new Dictionary<string, object?>(),
-                    new RetireBuildingUnitRequest { BuildingUnitPersistentLocalId = buildingUnitPersistentLocalId }),
-                CancellationToken.None);
+            await handler.Handle(CreateRetireBuildingUnitLambdaRequest(), CancellationToken.None);
 
             //Assert
             var stream = await Container.Resolve<IStreamStore>().ReadStreamBackwards(new StreamId(new BuildingStreamId(buildingPersistentLocalId)), 5, 1);
@@ -115,14 +108,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
                 await buildings.GetAsync(new BuildingStreamId(buildingPersistentLocalId), CancellationToken.None);
 
             // Act
-            await handler.Handle(new RetireBuildingUnitLambdaRequest(
-                buildingPersistentLocalId,
-                Guid.NewGuid(),
-                string.Empty,
-                Fixture.Create<Provenance>(),
-                new Dictionary<string, object?>(),
-                new RetireBuildingUnitRequest { BuildingUnitPersistentLocalId = buildingUnitPersistentLocalId }
-            ), CancellationToken.None);
+            await handler.Handle(CreateRetireBuildingUnitLambdaRequest(), CancellationToken.None);
 
             //Assert
             ticketing.Verify(x =>
@@ -155,14 +141,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
                 _backOfficeContext);
 
             // Act
-            await handler.Handle(new RetireBuildingUnitLambdaRequest(
-                buildingPersistentLocalId,
-                Guid.NewGuid(),
-                string.Empty,
-                Fixture.Create<Provenance>(),
-                new Dictionary<string, object?>(),
-                new RetireBuildingUnitRequest { BuildingUnitPersistentLocalId = buildingUnitPersistentLocalId }
-            ), CancellationToken.None);
+            await handler.Handle(CreateRetireBuildingUnitLambdaRequest(), CancellationToken.None);
 
             //Assert
             ticketing.Verify(x =>
@@ -194,14 +173,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
                 _backOfficeContext);
 
             // Act
-            await handler.Handle(new RetireBuildingUnitLambdaRequest(
-                buildingPersistentLocalId,
-                Guid.NewGuid(),
-                string.Empty,
-                Fixture.Create<Provenance>(),
-                new Dictionary<string, object?>(),
-                new RetireBuildingUnitRequest { BuildingUnitPersistentLocalId = buildingUnitPersistentLocalId }
-            ), CancellationToken.None);
+            await handler.Handle(CreateRetireBuildingUnitLambdaRequest(), CancellationToken.None);
 
             //Assert
             ticketing.Verify(x =>
@@ -233,14 +205,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
                 _backOfficeContext);
 
             // Act
-            await handler.Handle(new RetireBuildingUnitLambdaRequest(
-                buildingPersistentLocalId,
-                Guid.NewGuid(),
-                string.Empty,
-                Fixture.Create<Provenance>(),
-                new Dictionary<string, object?>(),
-                new RetireBuildingUnitRequest { BuildingUnitPersistentLocalId = buildingUnitPersistentLocalId }
-            ), CancellationToken.None);
+            await handler.Handle(CreateRetireBuildingUnitLambdaRequest(), CancellationToken.None);
 
             //Assert
             ticketing.Verify(x =>
@@ -250,6 +215,19 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
                         "Deze actie is enkel toegestaan binnen een gepland, inAanbouw of gerealiseerd gebouw.",
                         "GebouwStatusNietInGeplandInAanbouwOfGerealiseerd"),
                     CancellationToken.None));
+        }
+
+        private RetireBuildingUnitLambdaRequest CreateRetireBuildingUnitLambdaRequest()
+        {
+            return new RetireBuildingUnitLambdaRequest(Fixture.Create<BuildingPersistentLocalId>(),
+                new RetireBuildingUnitSqsRequest()
+                {
+                    IfMatchHeaderValue = null,
+                    Metadata = new Dictionary<string, object?>(),
+                    ProvenanceData = Fixture.Create<ProvenanceData>(),
+                    Request = new RetireBuildingUnitRequest { BuildingUnitPersistentLocalId = Fixture.Create<BuildingUnitPersistentLocalId>() },
+                    TicketId = Guid.NewGuid()
+                });
         }
     }
 }
