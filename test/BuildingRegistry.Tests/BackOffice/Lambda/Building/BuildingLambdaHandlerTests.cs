@@ -12,10 +12,12 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
     using Be.Vlaanderen.Basisregisters.Sqs.Lambda.Infrastructure;
     using Be.Vlaanderen.Basisregisters.Sqs.Responses;
     using BuildingRegistry.Api.BackOffice.Abstractions.Building.Requests;
+    using BuildingRegistry.Api.BackOffice.Abstractions.Building.SqsRequests;
     using BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.Building;
     using BuildingRegistry.Api.BackOffice.Handlers.Lambda.Requests.Building;
     using BuildingRegistry.Building;
     using BuildingRegistry.Building.Exceptions;
+    using Fixtures;
     using Microsoft.Extensions.Configuration;
     using Moq;
     using TicketingService.Abstractions;
@@ -25,7 +27,9 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
     public class SqsLambdaBuildingHandlerTests : BackOfficeLambdaTest
     {
         public SqsLambdaBuildingHandlerTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
-        { }
+        {
+            Fixture.Customize(new WithFixedBuildingPersistentLocalId());
+        }
 
         [Fact]
         public async Task TicketShouldBeUpdatedToPendingAndCompleted()
@@ -33,14 +37,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
             var ticketing = new Mock<ITicketing>();
             var idempotentCommandHandler = new Mock<IIdempotentCommandHandler>();
 
-            var lambdaRequest = new RealizeBuildingLambdaRequest(
-                Guid.NewGuid().ToString(),
-                Guid.NewGuid(),
-                null,
-                Fixture.Create<Provenance>(),
-                new Dictionary<string, object?>(),
-                new RealizeBuildingRequest { PersistentLocalId = 1 }
-            );
+            var lambdaRequest = CreateRealizeBuildingLambdaRequest();
 
             var sut = new FakeBuildingLambdaHandler(
                 Container.Resolve<IConfiguration>(),
@@ -62,14 +59,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
         {
             var ticketing = new Mock<ITicketing>();
 
-            var lambdaRequest = new RealizeBuildingLambdaRequest(
-                Guid.NewGuid().ToString(),
-                Guid.NewGuid(),
-                null,
-                Fixture.Create<Provenance>(),
-                new Dictionary<string, object?>(),
-                new RealizeBuildingRequest { PersistentLocalId = 1 }
-            );
+            var lambdaRequest = CreateRealizeBuildingLambdaRequest();
 
             var sut = new FakeBuildingLambdaHandler(
                 Container.Resolve<IConfiguration>(),
@@ -108,16 +98,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
 
             // Act
             await sut.Handle(
-                new RealizeBuildingLambdaRequest(
-                    buildingPersistentLocalId.ToString(),
-                    Guid.Empty,
-                    "Outdated",
-                    Fixture.Create<Provenance>(),
-                    new Dictionary<string, object?>(),
-                    new RealizeBuildingRequest
-                    {
-                        PersistentLocalId = buildingPersistentLocalId
-                    }),
+                CreateRealizeBuildingLambdaRequest("Outdated"),
                 CancellationToken.None);
 
             //Assert
@@ -142,13 +123,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
                 idempotentCommandHandler.Object);
 
             await sut.Handle(
-                new RealizeBuildingLambdaRequest(
-                    Guid.NewGuid().ToString(),
-                    Guid.NewGuid(),
-                    string.Empty,
-                    Fixture.Create<Provenance>(),
-                    new Dictionary<string, object?>(),
-                    new RealizeBuildingRequest { PersistentLocalId = 1 }),
+                CreateRealizeBuildingLambdaRequest(),
                 CancellationToken.None);
 
             //Assert
@@ -156,6 +131,20 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
                 .Verify(
                     x => x.Dispatch(It.IsAny<Guid>(), It.IsAny<object>(), It.IsAny<IDictionary<string, object>>(), new CancellationToken()),
                     Times.Once);
+        }
+
+        private RealizeBuildingLambdaRequest CreateRealizeBuildingLambdaRequest(string? ifMatchHeaderValue = null)
+        {
+            var buildingPersistentLocalId = Fixture.Create<BuildingPersistentLocalId>();
+
+            return new RealizeBuildingLambdaRequest(buildingPersistentLocalId, new RealizeBuildingSqsRequest()
+            {
+                IfMatchHeaderValue = ifMatchHeaderValue,
+                Metadata = new Dictionary<string, object?>(),
+                ProvenanceData = Fixture.Create<ProvenanceData>(),
+                Request = new RealizeBuildingRequest { PersistentLocalId = buildingPersistentLocalId },
+                TicketId = Guid.NewGuid()
+            });
         }
     }
 

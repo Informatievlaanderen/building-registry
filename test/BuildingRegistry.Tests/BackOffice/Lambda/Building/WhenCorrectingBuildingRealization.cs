@@ -14,6 +14,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
     using Be.Vlaanderen.Basisregisters.Sqs.Lambda.Handlers;
     using Be.Vlaanderen.Basisregisters.Sqs.Responses;
     using BuildingRegistry.Api.BackOffice.Abstractions.Building.Requests;
+    using BuildingRegistry.Api.BackOffice.Abstractions.Building.SqsRequests;
     using BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.Building;
     using BuildingRegistry.Api.BackOffice.Handlers.Lambda.Requests.Building;
     using BuildingRegistry.Building;
@@ -58,15 +59,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
                 Container.Resolve<IBuildings>());
 
             //Act
-            await handler.Handle(
-                new CorrectBuildingRealizationLambdaRequest(
-                    buildingPersistentLocalId,
-                    Guid.NewGuid(),
-                    null,
-                    Fixture.Create<Provenance>(),
-                    new Dictionary<string, object?>(),
-                    new CorrectBuildingRealizationRequest { PersistentLocalId = buildingPersistentLocalId }),
-                CancellationToken.None);
+            await handler.Handle(CreateCorrectBuildingRealizationLambdaRequest(), CancellationToken.None);
 
             //Assert
             var stream = await Container.Resolve<IStreamStore>()
@@ -96,15 +89,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
                 await buildings.GetAsync(new BuildingStreamId(buildingPersistentLocalId), CancellationToken.None);
 
             // Act
-            await handler.Handle(
-                new CorrectBuildingRealizationLambdaRequest(
-                    buildingPersistentLocalId,
-                    Guid.NewGuid(),
-                    null,
-                    Fixture.Create<Provenance>(),
-                    new Dictionary<string, object?>(),
-                    new CorrectBuildingRealizationRequest { PersistentLocalId = buildingPersistentLocalId }),
-                CancellationToken.None);
+            await handler.Handle(CreateCorrectBuildingRealizationLambdaRequest(), CancellationToken.None);
 
             //Assert
             ticketing.Verify(x =>
@@ -122,7 +107,6 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
         {
             // Arrange
             var ticketing = new Mock<ITicketing>();
-            var buildingPersistentLocalId = Fixture.Create<BuildingPersistentLocalId>();
 
             var handler = new CorrectBuildingRealizationLambdaHandler(
                 Container.Resolve<IConfiguration>(),
@@ -132,15 +116,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
                 Container.Resolve<IBuildings>());
 
             // Act
-            await handler.Handle(
-                new CorrectBuildingRealizationLambdaRequest(
-                    buildingPersistentLocalId,
-                    Guid.NewGuid(),
-                    null,
-                    Fixture.Create<Provenance>(),
-                    new Dictionary<string, object?>(),
-                    new CorrectBuildingRealizationRequest { PersistentLocalId = buildingPersistentLocalId }),
-                CancellationToken.None);
+            await handler.Handle(CreateCorrectBuildingRealizationLambdaRequest(), CancellationToken.None);
 
             //Assert
             ticketing.Verify(x =>
@@ -157,7 +133,6 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
         {
             // Arrange
             var ticketing = new Mock<ITicketing>();
-            var buildingPersistentLocalId = Fixture.Create<BuildingPersistentLocalId>();
 
             var handler = new CorrectBuildingRealizationLambdaHandler(
                 Container.Resolve<IConfiguration>(),
@@ -167,15 +142,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
                 Container.Resolve<IBuildings>());
 
             // Act
-            await handler.Handle(
-                new CorrectBuildingRealizationLambdaRequest(
-                    buildingPersistentLocalId,
-                    Guid.NewGuid(),
-                    null,
-                    Fixture.Create<Provenance>(),
-                    new Dictionary<string, object?>(),
-                    new CorrectBuildingRealizationRequest { PersistentLocalId = buildingPersistentLocalId }),
-                CancellationToken.None);
+            await handler.Handle(CreateCorrectBuildingRealizationLambdaRequest(), CancellationToken.None);
 
             //Assert
             ticketing.Verify(x =>
@@ -192,7 +159,6 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
         {
             // Arrange
             var ticketing = new Mock<ITicketing>();
-            var buildingPersistentLocalId = Fixture.Create<BuildingPersistentLocalId>();
 
             var handler = new CorrectBuildingRealizationLambdaHandler(
                 Container.Resolve<IConfiguration>(),
@@ -202,15 +168,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
                 Container.Resolve<IBuildings>());
 
             // Act
-            await handler.Handle(
-                new CorrectBuildingRealizationLambdaRequest(
-                    buildingPersistentLocalId,
-                    Guid.NewGuid(),
-                    null,
-                    Fixture.Create<Provenance>(),
-                    new Dictionary<string, object?>(),
-                    new CorrectBuildingRealizationRequest { PersistentLocalId = buildingPersistentLocalId }),
-                CancellationToken.None);
+            await handler.Handle(CreateCorrectBuildingRealizationLambdaRequest(), CancellationToken.None);
 
             //Assert
             ticketing.Verify(x =>
@@ -221,5 +179,20 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
                         "GebouwBevatGehistoreerdeGebouweenheden"),
                     CancellationToken.None));
         }
-    }
+
+        private CorrectBuildingRealizationLambdaRequest CreateCorrectBuildingRealizationLambdaRequest()
+        {
+            var buildingPersistentLocalId = Fixture.Create<BuildingPersistentLocalId>();
+
+            return new CorrectBuildingRealizationLambdaRequest(buildingPersistentLocalId,
+                new CorrectBuildingRealizationSqsRequest()
+                {
+                    IfMatchHeaderValue = null,
+                    Metadata = new Dictionary<string, object?>(),
+                    ProvenanceData = Fixture.Create<ProvenanceData>(),
+                    Request = new CorrectBuildingRealizationRequest { PersistentLocalId = buildingPersistentLocalId },
+                    TicketId = Guid.NewGuid()
+                });
+        }
+}
 }

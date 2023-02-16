@@ -18,28 +18,11 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Requests.BuildingUnit
         public CorrectBuildingUnitPositionLambdaRequest(
             string messageGroupId,
             CorrectBuildingUnitPositionSqsRequest sqsRequest)
-            : this(
-                messageGroupId,
-                sqsRequest.BuildingUnitPersistentLocalId,
-                sqsRequest.TicketId,
-                sqsRequest.IfMatchHeaderValue,
-                sqsRequest.ProvenanceData.ToProvenance(),
-                sqsRequest.Metadata,
-                sqsRequest.Request)
-        { }
-
-        public CorrectBuildingUnitPositionLambdaRequest(
-            string messageGroupId,
-            int buildingUnitPersistentLocalId,
-            Guid ticketId,
-            string? ifMatchHeaderValue,
-            Provenance provenance,
-            IDictionary<string, object?> metadata,
-            CorrectBuildingUnitPositionRequest request)
-            : base(messageGroupId, ticketId, ifMatchHeaderValue, provenance, metadata)
+            : base(messageGroupId, sqsRequest.TicketId, sqsRequest.IfMatchHeaderValue,
+                sqsRequest.ProvenanceData.ToProvenance(), sqsRequest.Metadata)
         {
-            BuildingUnitPersistentLocalId = buildingUnitPersistentLocalId;
-            Request = request;
+            BuildingUnitPersistentLocalId = sqsRequest.BuildingUnitPersistentLocalId;
+            Request = sqsRequest.Request;
         }
 
         /// <summary>
