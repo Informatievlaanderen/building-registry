@@ -1,6 +1,5 @@
 namespace BuildingRegistry.Building
 {
-    using System;
     using System.Collections.Generic;
     using System.Linq;
     using Be.Vlaanderen.Basisregisters.AggregateSource.Snapshotting;
@@ -37,14 +36,14 @@ namespace BuildingRegistry.Building
         {
             Register<BuildingWasMigrated>(When);
             Register<BuildingWasPlannedV2>(When);
-            Register<BuildingOutlineWasChanged>(When);
             Register<BuildingBecameUnderConstructionV2>(When);
-            Register<BuildingWasCorrectedFromUnderConstructionToPlanned>(When);
             Register<BuildingWasRealizedV2>(When);
-            Register<BuildingWasCorrectedFromRealizedToUnderConstruction>(When);
             Register<BuildingWasNotRealizedV2>(When);
-            Register<BuildingWasCorrectedFromNotRealizedToPlanned>(When);
             Register<BuildingWasRemovedV2>(When);
+            Register<BuildingWasCorrectedFromUnderConstructionToPlanned>(When);
+            Register<BuildingWasCorrectedFromRealizedToUnderConstruction>(When);
+            Register<BuildingWasCorrectedFromNotRealizedToPlanned>(When);
+            Register<BuildingOutlineWasChanged>(When);
 
             Register<BuildingUnitWasPlannedV2>(When);
             Register<BuildingUnitWasRealizedV2>(When);
@@ -119,6 +118,55 @@ namespace BuildingRegistry.Building
             _lastEvent = @event;
         }
 
+        private void When(BuildingBecameUnderConstructionV2 @event)
+        {
+            BuildingStatus = BuildingStatus.UnderConstruction;
+
+            _lastEvent = @event;
+        }
+
+        private void When(BuildingWasRealizedV2 @event)
+        {
+            BuildingStatus = BuildingStatus.Realized;
+
+            _lastEvent = @event;
+        }
+
+        private void When(BuildingWasNotRealizedV2 @event)
+        {
+            BuildingStatus = BuildingStatus.NotRealized;
+
+            _lastEvent = @event;
+        }
+
+        private void When(BuildingWasRemovedV2 @event)
+        {
+            IsRemoved = true;
+
+            _lastEvent = @event;
+        }
+
+        private void When(BuildingWasCorrectedFromUnderConstructionToPlanned @event)
+        {
+            BuildingStatus = BuildingStatus.Planned;
+
+            _lastEvent = @event;
+        }
+
+        private void When(BuildingWasCorrectedFromRealizedToUnderConstruction @event)
+        {
+            BuildingStatus = BuildingStatus.UnderConstruction;
+
+            _lastEvent = @event;
+        }
+
+        private void When(BuildingWasCorrectedFromNotRealizedToPlanned @event)
+        {
+            BuildingStatus = BuildingStatus.Planned;
+
+            _lastEvent = @event;
+        }
+
         private void When(BuildingOutlineWasChanged @event)
         {
             BuildingGeometry = new BuildingGeometry(
@@ -131,55 +179,6 @@ namespace BuildingRegistry.Building
 
                 buildingUnit.Route(@event);
             }
-
-            _lastEvent = @event;
-        }
-
-        private void When(BuildingBecameUnderConstructionV2 @event)
-        {
-            BuildingStatus = BuildingStatus.UnderConstruction;
-
-            _lastEvent = @event;
-        }
-
-        private void When(BuildingWasCorrectedFromUnderConstructionToPlanned @event)
-        {
-            BuildingStatus = BuildingStatus.Planned;
-
-            _lastEvent = @event;
-        }
-
-        private void When(BuildingWasRealizedV2 @event)
-        {
-            BuildingStatus = BuildingStatus.Realized;
-
-            _lastEvent = @event;
-        }
-
-        private void When(BuildingWasCorrectedFromRealizedToUnderConstruction @event)
-        {
-            BuildingStatus = BuildingStatus.UnderConstruction;
-
-            _lastEvent = @event;
-        }
-
-        private void When(BuildingWasNotRealizedV2 @event)
-        {
-            BuildingStatus = BuildingStatus.NotRealized;
-
-            _lastEvent = @event;
-        }
-
-        private void When(BuildingWasCorrectedFromNotRealizedToPlanned @event)
-        {
-            BuildingStatus = BuildingStatus.Planned;
-
-            _lastEvent = @event;
-        }
-
-        private void When(BuildingWasRemovedV2 @event)
-        {
-            IsRemoved = true;
 
             _lastEvent = @event;
         }

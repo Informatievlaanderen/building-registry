@@ -3,7 +3,6 @@ namespace BuildingRegistry.Building
     using System;
     using System.Collections.Generic;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
-    using Commands;
     using Events;
 
     public partial class BuildingUnit
