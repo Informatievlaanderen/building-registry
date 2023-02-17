@@ -27,6 +27,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
+    using Be.Vlaanderen.Basisregisters.Sqs.Exceptions;
     using TicketingService.Abstractions;
     using Xunit;
     using Xunit.Abstractions;
@@ -211,6 +212,84 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
                     new TicketError(
                         "De positie dient binnen de geometrie van het gebouw te liggen.",
                         "GebouweenheidOngeldigePositieValidatie"),
+                    CancellationToken.None));
+        }
+
+        [Fact]
+        public async Task WhenIdempotencyException_ThenTicketingCompleteIsExpected()
+        {
+            // Arrange
+            var ticketing = new Mock<ITicketing>();
+
+            var buildingPersistentLocalId = Fixture.Create<BuildingPersistentLocalId>();
+            var buildingUnitPersistentLocalId = Fixture.Create<BuildingUnitPersistentLocalId>();
+
+            PlanBuilding(buildingPersistentLocalId);
+            PlanBuildingUnit(buildingPersistentLocalId,buildingUnitPersistentLocalId);
+
+            var buildings = Container.Resolve<IBuildings>();
+            var eTagResponse = new ETagResponse(string.Empty, Fixture.Create<string>());
+            var handler = new PlanBuildingUnitLambdaHandler(
+                Container.Resolve<IConfiguration>(),
+                new FakeRetryPolicy(),
+                ticketing.Object,
+                MockExceptionIdempotentCommandHandler(() => new IdempotencyException(string.Empty)).Object,
+                Container.Resolve<IBuildings>(),
+                _backOfficeContext);
+
+            var building =
+                await buildings.GetAsync(new BuildingStreamId(buildingPersistentLocalId), CancellationToken.None);
+
+            //Act
+            await handler.Handle(CreatePlanBuildingUnitLambdaRequest(buildingUnitPersistentLocalId), CancellationToken.None);
+
+            //Assert
+            ticketing.Verify(x =>
+                x.Complete(
+                    It.IsAny<Guid>(),
+                    new TicketResult(
+                        new ETagResponse(
+                            string.Format(ConfigDetailUrl, buildingUnitPersistentLocalId),
+                            building.LastEventHash)),
+                    CancellationToken.None));
+        }
+
+        [Fact]
+        public async Task GivenRetryingRequest_ThenBuildingIsPlanned()
+        {
+            // Arrange
+            var ticketing = new Mock<ITicketing>();
+
+            var buildingPersistentLocalId = Fixture.Create<BuildingPersistentLocalId>();
+            var buildingUnitPersistentLocalId = Fixture.Create<BuildingUnitPersistentLocalId>();
+
+            PlanBuilding(buildingPersistentLocalId);
+
+            var buildings = Container.Resolve<IBuildings>();
+            var eTagResponse = new ETagResponse(string.Empty, Fixture.Create<string>());
+            var handler = new PlanBuildingUnitLambdaHandler(
+                Container.Resolve<IConfiguration>(),
+                new FakeRetryPolicy(),
+                ticketing.Object,
+                new IdempotentCommandHandler(Container.Resolve<ICommandHandlerResolver>(), _idempotencyContext),
+                buildings,
+                _backOfficeContext);
+
+            //Act
+            await handler.Handle(CreatePlanBuildingUnitLambdaRequest(buildingUnitPersistentLocalId), CancellationToken.None);
+            await handler.Handle(CreatePlanBuildingUnitLambdaRequest(buildingUnitPersistentLocalId), CancellationToken.None);
+
+            var building =
+                await buildings.GetAsync(new BuildingStreamId(buildingPersistentLocalId), CancellationToken.None);
+            
+            //Assert
+            ticketing.Verify(x =>
+                x.Complete(
+                    It.IsAny<Guid>(),
+                    new TicketResult(
+                        new ETagResponse(
+                            string.Format(ConfigDetailUrl, buildingUnitPersistentLocalId),
+                            building.LastEventHash)),
                     CancellationToken.None));
         }
 

@@ -3,6 +3,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.Building
     using System.Threading;
     using System.Threading.Tasks;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
+    using Be.Vlaanderen.Basisregisters.Sqs.Exceptions;
     using Be.Vlaanderen.Basisregisters.Sqs.Lambda.Handlers;
     using Be.Vlaanderen.Basisregisters.Sqs.Lambda.Infrastructure;
     using Be.Vlaanderen.Basisregisters.Sqs.Responses;
@@ -31,11 +32,18 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.Building
         {
             var cmd = request.ToCommand();
 
-            await IdempotentCommandHandler.Dispatch(
-                cmd.CreateCommandId(),
-                cmd,
-                request.Metadata,
-                cancellationToken);
+            try
+            {
+                await IdempotentCommandHandler.Dispatch(
+                    cmd.CreateCommandId(),
+                    cmd,
+                    request.Metadata,
+                    cancellationToken);
+            }
+            catch (IdempotencyException)
+            {
+                // Idempotent: Do Nothing return last etag
+            }
 
             var lastHash = await GetHash(request.BuildingPersistentLocalId, cancellationToken);
             return new ETagResponse(string.Format(DetailUrlFormat, request.BuildingPersistentLocalId), lastHash);

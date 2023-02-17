@@ -14,6 +14,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.BuildingUnit
     using Microsoft.Extensions.Configuration;
     using Requests.BuildingUnit;
     using TicketingService.Abstractions;
+    using Be.Vlaanderen.Basisregisters.Sqs.Exceptions;
 
     public sealed class PlanBuildingUnitLambdaHandler : BuildingUnitLambdaHandler<PlanBuildingUnitLambdaRequest>
     {
@@ -42,11 +43,18 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.BuildingUnit
 
             await using var transaction = await _backOfficeContext.Database.BeginTransactionAsync(cancellationToken);
 
-            await IdempotentCommandHandler.Dispatch(
-                               cmd.CreateCommandId(),
-                               cmd,
-                               request.Metadata,
-                               cancellationToken);
+            try
+            {
+                await IdempotentCommandHandler.Dispatch(
+                    cmd.CreateCommandId(),
+                    cmd,
+                    request.Metadata,
+                    cancellationToken);
+            }
+            catch (IdempotencyException)
+            {
+                // Idempotent: Do Nothing return last etag
+            }
 
             await _backOfficeContext.AddIdempotentBuildingUnitBuilding(request.BuildingPersistentLocalId, request.BuildingUnitPersistentLocalId, cancellationToken);
             await transaction.CommitAsync(cancellationToken);
