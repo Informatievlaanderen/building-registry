@@ -18,12 +18,15 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda
     using Abstractions;
     using Abstractions.Building.SqsRequests;
     using Be.Vlaanderen.Basisregisters.CommandHandling.Idempotency;
+    using Be.Vlaanderen.Basisregisters.EventHandling.Autofac;
     using Be.Vlaanderen.Basisregisters.Sqs.Lambda.Infrastructure;
     using Infrastructure;
     using Infrastructure.Modules;
     using Newtonsoft.Json;
     using TicketingService.Proxy.HttpProxy;
     using Be.Vlaanderen.Basisregisters.Sqs.Lambda.Handlers;
+    using BuildingRegistry.Infrastructure;
+    using BuildingRegistry.Infrastructure.Modules;
     using Consumer.Address;
 
     public class Function : FunctionBase
@@ -82,8 +85,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda
 
             builder
                 .RegisterModule(new DataDogModule(configuration))
-                .RegisterModule<EnvelopeModule>()
-                .RegisterModule(new EditModule(configuration, services, loggerFactory))
+                .RegisterModule(new CommandHandlingModule(configuration))
                 .RegisterModule(new BackOfficeModule(configuration, services, loggerFactory))
                 .RegisterModule(new ConsumerAddressModule(configuration, services, loggerFactory));
 
@@ -98,9 +100,6 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda
                 new IdempotencyMigrationsTableInfo(Schema.Import),
                 new IdempotencyTableInfo(Schema.Import),
                 loggerFactory);
-
-            builder.RegisterEventstreamModule(configuration);
-            builder.RegisterSnapshotModule(configuration);
 
             builder.Populate(services);
 

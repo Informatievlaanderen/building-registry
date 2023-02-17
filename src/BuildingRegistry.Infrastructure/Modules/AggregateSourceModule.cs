@@ -1,4 +1,4 @@
-﻿namespace BuildingRegistry.Api.BackOffice.Infrastructure.Modules
+﻿namespace BuildingRegistry.Infrastructure.Modules
 {
     using System;
     using Autofac;
@@ -8,7 +8,6 @@
     using Be.Vlaanderen.Basisregisters.EventHandling.Autofac;
     using BuildingRegistry.Building;
     using BuildingRegistry.Infrastructure;
-    using BuildingRegistry.Infrastructure.Modules;
     using BuildingRegistry.Infrastructure.Repositories;
     using Microsoft.Extensions.Configuration;
 
@@ -36,6 +35,8 @@
                 snapshotStrategy = IntervalStrategy.SnapshotEvery(snapshotInterval);
             }
 
+            builder.RegisterSnapshotModule(_configuration);
+
             builder
                 .Register(c => new BuildingFactory(snapshotStrategy))
                 .As<IBuildingFactory>();
@@ -48,8 +49,6 @@
                 .RegisterModule(new EventHandlingModule(typeof(DomainAssemblyMarker).Assembly, eventSerializerSettings));
 
             builder.RegisterEventstreamModule(_configuration);
-
-            builder.RegisterSnapshotModule(_configuration);
 
             builder
                 .RegisterType<ConcurrentUnitOfWork>()

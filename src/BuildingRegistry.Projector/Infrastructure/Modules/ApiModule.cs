@@ -178,7 +178,6 @@ namespace BuildingRegistry.Projector.Infrastructure.Modules
                 .RegisterProjectionMigrator<DataMigrationContextMigrationFactory>(
                     _configuration,
                     _loggerFactory)
-                //.RegisterProjections<BuildingProjections, LastChangedListContext>(ConnectedProjectionSettings.Default)
                 .RegisterProjections<BuildingUnitProjections, LastChangedListContext>(ConnectedProjectionSettings.Default);
         }
 
