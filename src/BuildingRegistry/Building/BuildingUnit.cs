@@ -10,8 +10,8 @@ namespace BuildingRegistry.Building
 
     public partial class BuildingUnit : Entity
     {
-        private static List<BuildingUnitStatus> StatusesWhichCannotBeRealized => new() { BuildingUnitStatus.Retired, BuildingUnitStatus.NotRealized };
-        private static List<BuildingUnitStatus> StatusesWhichCannotBeNotRealized => new() { BuildingUnitStatus.Realized, BuildingUnitStatus.Retired };
+        private static BuildingUnitStatus[] StatusesWhichCanBeRealized => new[] { BuildingUnitStatus.Planned };
+        private static BuildingUnitStatus[] StatusesWhichCanBeNotRealized => new[] { BuildingUnitStatus.Planned };
 
         public static BuildingUnit Migrate(
             Action<object> applier,
@@ -47,7 +47,7 @@ namespace BuildingRegistry.Building
                 return;
             }
 
-            GuardBuildingUnitInvalidStatuses(StatusesWhichCannotBeRealized.ToArray());
+            GuardValidBuildingUnitStatuses(StatusesWhichCanBeRealized);
 
             Apply(new BuildingUnitWasRealizedV2(_buildingPersistentLocalId, BuildingUnitPersistentLocalId));
         }
@@ -64,7 +64,7 @@ namespace BuildingRegistry.Building
                 return;
             }
 
-            if (StatusesWhichCannotBeRealized.Contains(Status))
+            if (!StatusesWhichCanBeRealized.Contains(Status))
             {
                 return;
             }
@@ -82,7 +82,7 @@ namespace BuildingRegistry.Building
                 return;
             }
 
-            GuardBuildingUnitInvalidStatuses(StatusesWhichCannotBeNotRealized.ToArray());
+            GuardValidBuildingUnitStatuses(StatusesWhichCanBeNotRealized);
 
             foreach (var addressPersistentLocalId in _addressPersistentLocalIds.ToList())
             {
@@ -107,7 +107,7 @@ namespace BuildingRegistry.Building
                 return;
             }
 
-            if (StatusesWhichCannotBeNotRealized.Contains(Status))
+            if (!StatusesWhichCanBeNotRealized.Contains(Status))
             {
                 return;
             }
@@ -133,11 +133,7 @@ namespace BuildingRegistry.Building
                 return;
             }
 
-            GuardBuildingUnitInvalidStatuses(new[]
-            {
-                BuildingUnitStatus.Planned,
-                BuildingUnitStatus.NotRealized
-            });
+            GuardValidBuildingUnitStatuses(BuildingUnitStatus.Realized);
 
             foreach (var addressPersistentLocalId in _addressPersistentLocalIds.ToList())
             {
@@ -193,7 +189,7 @@ namespace BuildingRegistry.Building
             GuardRemoved();
             GuardCommonUnit();
 
-            GuardBuildingUnitInvalidStatuses(new[] { BuildingUnitStatus.Retired, BuildingUnitStatus.NotRealized });
+            GuardValidBuildingUnitStatuses(BuildingUnitStatus.Planned, BuildingUnitStatus.Realized);
 
             if (!HasDeviation)
             {
@@ -208,11 +204,7 @@ namespace BuildingRegistry.Building
             GuardRemoved();
             GuardCommonUnit();
 
-            GuardBuildingUnitInvalidStatuses(new[]
-            {
-                BuildingUnitStatus.Retired,
-                BuildingUnitStatus.NotRealized
-            });
+            GuardValidBuildingUnitStatuses(BuildingUnitStatus.Planned, BuildingUnitStatus.Realized);
 
             if (HasDeviation)
             {
@@ -234,11 +226,7 @@ namespace BuildingRegistry.Building
                 return;
             }
 
-            GuardBuildingUnitInvalidStatuses(new[]
-            {
-                BuildingUnitStatus.Retired,
-                BuildingUnitStatus.NotRealized
-            });
+            GuardValidBuildingUnitStatuses(BuildingUnitStatus.Realized);
 
             Apply(new BuildingUnitWasCorrectedFromRealizedToPlanned(_buildingPersistentLocalId, BuildingUnitPersistentLocalId));
         }
@@ -266,11 +254,7 @@ namespace BuildingRegistry.Building
                 return;
             }
 
-            GuardBuildingUnitInvalidStatuses(new[]
-            {
-                BuildingUnitStatus.Realized,
-                BuildingUnitStatus.Retired
-            });
+            GuardValidBuildingUnitStatuses(BuildingUnitStatus.NotRealized);
 
             var correctedBuildingUnitPosition = CorrectedBuildingUnitPosition(buildingGeometry);
 
@@ -298,11 +282,7 @@ namespace BuildingRegistry.Building
                 return;
             }
 
-            GuardBuildingUnitInvalidStatuses(new[]
-            {
-                BuildingUnitStatus.Planned,
-                BuildingUnitStatus.NotRealized
-            });
+            GuardValidBuildingUnitStatuses(BuildingUnitStatus.Retired);
 
             var correctedBuildingUnitPosition = CorrectedBuildingUnitPosition(buildingGeometry);
 
@@ -324,11 +304,7 @@ namespace BuildingRegistry.Building
         {
             GuardRemoved();
             GuardCommonUnit();
-            GuardBuildingUnitInvalidStatuses(new[]
-            {
-                BuildingUnitStatus.NotRealized,
-                BuildingUnitStatus.Retired
-            });
+            GuardValidBuildingUnitStatuses(BuildingUnitStatus.Planned, BuildingUnitStatus.Realized);
 
             Apply(new BuildingUnitPositionWasCorrected(
                 _buildingPersistentLocalId,
@@ -342,7 +318,7 @@ namespace BuildingRegistry.Building
             GuardRemoved();
             GuardCommonUnit();
 
-            GuardValidBuildingUnitStatuses(new[] { BuildingUnitStatus.Planned, BuildingUnitStatus.Realized });
+            GuardValidBuildingUnitStatuses(BuildingUnitStatus.Planned, BuildingUnitStatus.Realized);
 
             if (HasDeviation)
             {
@@ -357,11 +333,7 @@ namespace BuildingRegistry.Building
             GuardRemoved();
             GuardCommonUnit();
 
-            GuardValidBuildingUnitStatuses(new[]
-            {
-                BuildingUnitStatus.Planned,
-                BuildingUnitStatus.Realized
-            });
+            GuardValidBuildingUnitStatuses(BuildingUnitStatus.Planned, BuildingUnitStatus.Realized);
 
             if (!HasDeviation)
             {
@@ -377,7 +349,7 @@ namespace BuildingRegistry.Building
         {
             GuardRemoved();
 
-            GuardValidBuildingUnitStatuses(new []{BuildingUnitStatus.Planned, BuildingUnitStatus.Realized});
+            GuardValidBuildingUnitStatuses(BuildingUnitStatus.Planned, BuildingUnitStatus.Realized);
 
             if (AddressPersistentLocalIds.Contains(addressPersistentLocalId))
             {
@@ -463,16 +435,7 @@ namespace BuildingRegistry.Building
             }
         }
 
-        //TODO: refactor: use valid statusses instead of this
-        private void GuardBuildingUnitInvalidStatuses(BuildingUnitStatus[] invalidStatuses)
-        {
-            if (invalidStatuses.Contains(Status))
-            {
-                throw new BuildingUnitHasInvalidStatusException();
-            }
-        }
-
-        private void GuardValidBuildingUnitStatuses(BuildingUnitStatus[] validStatuses)
+        private void GuardValidBuildingUnitStatuses(params BuildingUnitStatus[] validStatuses)
         {
             if (!validStatuses.Contains(Status))
             {
