@@ -6,8 +6,8 @@ namespace BuildingRegistry.Building
     {
         public static readonly BuildingUnitStatus Planned = new BuildingUnitStatus("Planned");
         public static readonly BuildingUnitStatus Realized = new BuildingUnitStatus("Realized");
-        public static readonly BuildingUnitStatus Retired = new BuildingUnitStatus("Retired");
         public static readonly BuildingUnitStatus NotRealized = new BuildingUnitStatus("NotRealized");
+        public static readonly BuildingUnitStatus Retired = new BuildingUnitStatus("Retired");
 
         public string Status { get; }
 
@@ -17,8 +17,8 @@ namespace BuildingRegistry.Building
         {
             if (status != Planned.Status &&
                status != Realized.Status &&
-               status != Retired.Status &&
-               status != NotRealized.Status)
+               status != NotRealized.Status &&
+               status != Retired.Status)
             {
                 throw new NotImplementedException($"Cannot parse {status} to BuildingUnitStatus");
             }

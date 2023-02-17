@@ -53,29 +53,6 @@ namespace BuildingRegistry.Building
                 .Realize();
         }
 
-        public void CorrectRealizeBuildingUnit(BuildingUnitPersistentLocalId buildingUnitPersistentLocalId)
-        {
-            GuardRemovedBuilding();
-
-            _buildingUnits
-                .GetNotRemovedByPersistentLocalId(buildingUnitPersistentLocalId)
-                .CorrectRealizeBuildingUnit();
-        }
-
-        public void CorrectRetiredBuildingUnit(
-            IAddCommonBuildingUnit addCommonBuildingUnit,
-            BuildingUnitPersistentLocalId buildingUnitPersistentLocalId)
-        {
-            GuardRemovedBuilding();
-            GuardBuildingValidStatuses(BuildingStatus.Realized);
-
-            _buildingUnits
-                .GetNotRemovedByPersistentLocalId(buildingUnitPersistentLocalId)
-                .CorrectRetiredBuildingUnit(BuildingGeometry);
-
-            EnsureCommonBuildingUnit(addCommonBuildingUnit);
-        }
-
         public void NotRealizeBuildingUnit(BuildingUnitPersistentLocalId buildingUnitPersistentLocalId)
         {
             GuardRemovedBuilding();
@@ -85,43 +62,6 @@ namespace BuildingRegistry.Building
                 .NotRealize();
 
             NotRealizeOrRetireCommonBuildingUnit();
-        }
-
-        public void CorrectNotRealizeBuildingUnit(
-            IAddCommonBuildingUnit addCommonBuildingUnit,
-            BuildingUnitPersistentLocalId buildingUnitPersistentLocalId)
-        {
-            GuardRemovedBuilding();
-            GuardBuildingValidStatuses(BuildingStatus.Realized, BuildingStatus.Planned, BuildingStatus.UnderConstruction);
-
-            _buildingUnits
-                .GetNotRemovedByPersistentLocalId(buildingUnitPersistentLocalId)
-                .CorrectNotRealize(BuildingGeometry);
-
-            EnsureCommonBuildingUnit(addCommonBuildingUnit);
-        }
-
-        public void CorrectPositionBuildingUnit(
-            BuildingUnitPersistentLocalId buildingUnitPersistentLocalId,
-            BuildingUnitPositionGeometryMethod positionGeometryMethod,
-            ExtendedWkbGeometry? position)
-        {
-            GuardRemovedBuilding();
-            GuardBuildingValidStatuses(BuildingStatus.Planned, BuildingStatus.Realized, BuildingStatus.UnderConstruction);
-
-            var buildingUnit = _buildingUnits.GetNotRemovedByPersistentLocalId(buildingUnitPersistentLocalId);
-
-            // validate command
-            var finalPosition = positionGeometryMethod != BuildingUnitPositionGeometryMethod.AppointedByAdministrator
-                ? BuildingGeometry.Center
-                : position!;
-
-            if (!BuildingGeometry.Contains(finalPosition))
-            {
-                throw new BuildingUnitPositionIsOutsideBuildingGeometryException();
-            }
-
-            buildingUnit.CorrectPosition(positionGeometryMethod, finalPosition);
         }
 
         public void RetireBuildingUnit(BuildingUnitPersistentLocalId buildingUnitPersistentLocalId)
@@ -163,16 +103,6 @@ namespace BuildingRegistry.Building
                 .Regularize();
         }
 
-        public void CorrectRegularizationBuildingUnit(BuildingUnitPersistentLocalId buildingUnitPersistentLocalId)
-        {
-            GuardRemovedBuilding();
-            GuardBuildingValidStatuses(BuildingStatus.Planned, BuildingStatus.UnderConstruction, BuildingStatus.Realized);
-
-            _buildingUnits
-                .GetNotRemovedByPersistentLocalId(buildingUnitPersistentLocalId)
-                .CorrectRegularization();
-        }
-
         public void DeregulateBuildingUnit(BuildingUnitPersistentLocalId buildingUnitPersistentLocalId)
         {
             GuardRemovedBuilding();
@@ -181,6 +111,76 @@ namespace BuildingRegistry.Building
             _buildingUnits
                 .GetNotRemovedByPersistentLocalId(buildingUnitPersistentLocalId)
                 .Deregulate();
+        }
+
+        public void CorrectRealizeBuildingUnit(BuildingUnitPersistentLocalId buildingUnitPersistentLocalId)
+        {
+            GuardRemovedBuilding();
+
+            _buildingUnits
+                .GetNotRemovedByPersistentLocalId(buildingUnitPersistentLocalId)
+                .CorrectRealization();
+        }
+
+        public void CorrectNotRealizeBuildingUnit(
+            IAddCommonBuildingUnit addCommonBuildingUnit,
+            BuildingUnitPersistentLocalId buildingUnitPersistentLocalId)
+        {
+            GuardRemovedBuilding();
+            GuardBuildingValidStatuses(BuildingStatus.Realized, BuildingStatus.Planned, BuildingStatus.UnderConstruction);
+
+            _buildingUnits
+                .GetNotRemovedByPersistentLocalId(buildingUnitPersistentLocalId)
+                .CorrectNotRealization(BuildingGeometry);
+
+            EnsureCommonBuildingUnit(addCommonBuildingUnit);
+        }
+
+        public void CorrectRetiredBuildingUnit(
+            IAddCommonBuildingUnit addCommonBuildingUnit,
+            BuildingUnitPersistentLocalId buildingUnitPersistentLocalId)
+        {
+            GuardRemovedBuilding();
+            GuardBuildingValidStatuses(BuildingStatus.Realized);
+
+            _buildingUnits
+                .GetNotRemovedByPersistentLocalId(buildingUnitPersistentLocalId)
+                .CorrectRetirement(BuildingGeometry);
+
+            EnsureCommonBuildingUnit(addCommonBuildingUnit);
+        }
+
+        public void CorrectPositionBuildingUnit(
+            BuildingUnitPersistentLocalId buildingUnitPersistentLocalId,
+            BuildingUnitPositionGeometryMethod positionGeometryMethod,
+            ExtendedWkbGeometry? position)
+        {
+            GuardRemovedBuilding();
+            GuardBuildingValidStatuses(BuildingStatus.Planned, BuildingStatus.Realized, BuildingStatus.UnderConstruction);
+
+            var buildingUnit = _buildingUnits.GetNotRemovedByPersistentLocalId(buildingUnitPersistentLocalId);
+
+            // validate command
+            var finalPosition = positionGeometryMethod != BuildingUnitPositionGeometryMethod.AppointedByAdministrator
+                ? BuildingGeometry.Center
+                : position!;
+
+            if (!BuildingGeometry.Contains(finalPosition))
+            {
+                throw new BuildingUnitPositionIsOutsideBuildingGeometryException();
+            }
+
+            buildingUnit.CorrectPosition(positionGeometryMethod, finalPosition);
+        }
+
+        public void CorrectRegularizationBuildingUnit(BuildingUnitPersistentLocalId buildingUnitPersistentLocalId)
+        {
+            GuardRemovedBuilding();
+            GuardBuildingValidStatuses(BuildingStatus.Planned, BuildingStatus.UnderConstruction, BuildingStatus.Realized);
+
+            _buildingUnits
+                .GetNotRemovedByPersistentLocalId(buildingUnitPersistentLocalId)
+                .CorrectRegularization();
         }
 
         public void CorrectDeregulationBuildingUnit(BuildingUnitPersistentLocalId buildingUnitPersistentLocalId)
@@ -212,16 +212,6 @@ namespace BuildingRegistry.Building
                 .GetNotRemovedByPersistentLocalId(buildingUnitPersistentLocalId)
                 .DetachAddress(addressPersistentLocalId, addresses);
         }
-
-        public void DetachAddressFromBuildingUnitBecauseAddressWasRemoved(
-            BuildingUnitPersistentLocalId buildingUnitPersistentLocalId,
-            AddressPersistentLocalId addressPersistentLocalId)
-        {
-            _buildingUnits
-                .GetNotRemovedByPersistentLocalId(buildingUnitPersistentLocalId)
-                .DetachAddressBecauseAddressWasRemoved(addressPersistentLocalId);
-        }
-
         public void DetachAddressFromBuildingUnitBecauseAddressWasRejected(
             BuildingUnitPersistentLocalId buildingUnitPersistentLocalId,
             AddressPersistentLocalId addressPersistentLocalId)
@@ -240,11 +230,35 @@ namespace BuildingRegistry.Building
                 .DetachAddressBecauseAddressWasRetired(addressPersistentLocalId);
         }
 
+        public void DetachAddressFromBuildingUnitBecauseAddressWasRemoved(
+            BuildingUnitPersistentLocalId buildingUnitPersistentLocalId,
+            AddressPersistentLocalId addressPersistentLocalId)
+        {
+            _buildingUnits
+                .GetNotRemovedByPersistentLocalId(buildingUnitPersistentLocalId)
+                .DetachAddressBecauseAddressWasRemoved(addressPersistentLocalId);
+        }
+
+
         private void GuardBuildingValidStatuses(params BuildingStatus[] validStatuses)
         {
             if (!validStatuses.Contains(BuildingStatus))
             {
                 throw new BuildingHasInvalidStatusException();
+            }
+        }
+
+        private void CorrectBuildingPosition()
+        {
+            var commonBuildingUnit = _buildingUnits.CommonBuildingUnit();
+
+            if (commonBuildingUnit.BuildingUnitPosition.Geometry != BuildingGeometry.Center)
+            {
+                ApplyChange(new BuildingUnitPositionWasCorrected(
+                    BuildingPersistentLocalId,
+                    commonBuildingUnit.BuildingUnitPersistentLocalId,
+                    BuildingUnitPositionGeometryMethod.DerivedFromObject,
+                    BuildingGeometry.Center));
             }
         }
 
@@ -333,20 +347,6 @@ namespace BuildingRegistry.Building
                 ApplyChange(new BuildingUnitWasCorrectedFromRetiredToRealized(
                     BuildingPersistentLocalId,
                     commonBuildingUnit.BuildingUnitPersistentLocalId));
-            }
-        }
-
-        private void CorrectBuildingPosition()
-        {
-            var commonBuildingUnit = _buildingUnits.CommonBuildingUnit();
-
-            if (commonBuildingUnit.BuildingUnitPosition.Geometry != BuildingGeometry.Center)
-            {
-                ApplyChange(new BuildingUnitPositionWasCorrected(
-                    BuildingPersistentLocalId,
-                    commonBuildingUnit.BuildingUnitPersistentLocalId,
-                    BuildingUnitPositionGeometryMethod.DerivedFromObject,
-                    BuildingGeometry.Center));
             }
         }
 

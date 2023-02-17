@@ -31,36 +31,45 @@ namespace BuildingRegistry.Building
         public BuildingUnit(Action<object> applier) : base(applier)
         {
             Register<BuildingWasMigrated>(When);
+            Register<BuildingOutlineWasChanged>(When);
 
             Register<BuildingUnitWasPlannedV2>(When);
-            Register<BuildingOutlineWasChanged>(When);
+            Register<CommonBuildingUnitWasAddedV2>(When);
             Register<BuildingUnitWasRealizedV2>(When);
             Register<BuildingUnitWasRealizedBecauseBuildingWasRealized>(When);
-            Register<BuildingUnitWasCorrectedFromRealizedToPlanned>(When);
-            Register<BuildingUnitWasCorrectedFromRealizedToPlannedBecauseBuildingWasCorrected>(When);
             Register<BuildingUnitWasNotRealizedV2>(When);
             Register<BuildingUnitWasNotRealizedBecauseBuildingWasNotRealized>(When);
-            Register<BuildingUnitWasCorrectedFromNotRealizedToPlanned>(When);
             Register<BuildingUnitWasRetiredV2>(When);
-            Register<BuildingUnitWasCorrectedFromRetiredToRealized>(When);
-            Register<BuildingUnitPositionWasCorrected>(When);
             Register<BuildingUnitWasRemovedV2>(When);
             Register<BuildingUnitWasRemovedBecauseBuildingWasRemoved>(When);
-            Register<BuildingUnitRemovalWasCorrected>(When);
             Register<BuildingUnitWasRegularized>(When);
-            Register<BuildingUnitRegularizationWasCorrected>(When);
             Register<BuildingUnitWasDeregulated>(When);
+            Register<BuildingUnitWasCorrectedFromRealizedToPlanned>(When);
+            Register<BuildingUnitWasCorrectedFromRealizedToPlannedBecauseBuildingWasCorrected>(When);
+            Register<BuildingUnitWasCorrectedFromNotRealizedToPlanned>(When);
+            Register<BuildingUnitWasCorrectedFromRetiredToRealized>(When);
+            Register<BuildingUnitRemovalWasCorrected>(When);
+            Register<BuildingUnitPositionWasCorrected>(When);
+            Register<BuildingUnitRegularizationWasCorrected>(When);
             Register<BuildingUnitDeregulationWasCorrected>(When);
-            Register<CommonBuildingUnitWasAddedV2>(When);
             Register<BuildingUnitAddressWasAttachedV2>(When);
             Register<BuildingUnitAddressWasDetachedV2>(When);
-            Register<BuildingUnitAddressWasDetachedBecauseAddressWasRemoved>(When);
             Register<BuildingUnitAddressWasDetachedBecauseAddressWasRejected>(When);
             Register<BuildingUnitAddressWasDetachedBecauseAddressWasRetired>(When);
+            Register<BuildingUnitAddressWasDetachedBecauseAddressWasRemoved>(When);
         }
 
         private void When(BuildingWasMigrated @event)
         {
+            _lastEvent = @event;
+        }
+
+        private void When(BuildingOutlineWasChanged @event)
+        {
+            BuildingUnitPosition = new BuildingUnitPosition(
+                new ExtendedWkbGeometry(@event.ExtendedWkbGeometryBuildingUnits!),
+                BuildingUnitPositionGeometryMethod.DerivedFromObject);
+
             _lastEvent = @event;
         }
 
@@ -79,11 +88,17 @@ namespace BuildingRegistry.Building
             _lastEvent = @event;
         }
 
-        private void When(BuildingOutlineWasChanged @event)
+        private void When(CommonBuildingUnitWasAddedV2 @event)
         {
+            _buildingPersistentLocalId = new BuildingPersistentLocalId(@event.BuildingPersistentLocalId);
+            BuildingUnitPersistentLocalId = new BuildingUnitPersistentLocalId(@event.BuildingUnitPersistentLocalId);
+            Function = BuildingUnitFunction.Common;
+            Status = BuildingUnitStatus.Parse(@event.BuildingUnitStatus);
             BuildingUnitPosition = new BuildingUnitPosition(
-                new ExtendedWkbGeometry(@event.ExtendedWkbGeometryBuildingUnits!),
-                BuildingUnitPositionGeometryMethod.DerivedFromObject);
+                new ExtendedWkbGeometry(@event.ExtendedWkbGeometry),
+                BuildingUnitPositionGeometryMethod.Parse(@event.GeometryMethod));
+
+            HasDeviation = @event.HasDeviation;
 
             _lastEvent = @event;
         }
@@ -102,20 +117,6 @@ namespace BuildingRegistry.Building
             _lastEvent = @event;
         }
 
-        private void When(BuildingUnitWasCorrectedFromRealizedToPlanned @event)
-        {
-            Status = BuildingUnitStatus.Planned;
-
-            _lastEvent = @event;
-        }
-
-        private void When(BuildingUnitWasCorrectedFromRealizedToPlannedBecauseBuildingWasCorrected @event)
-        {
-            Status = BuildingUnitStatus.Planned;
-
-            _lastEvent = @event;
-        }
-
         private void When(BuildingUnitWasNotRealizedV2 @event)
         {
             Status = BuildingUnitStatus.NotRealized;
@@ -130,32 +131,9 @@ namespace BuildingRegistry.Building
             _lastEvent = @event;
         }
 
-        private void When(BuildingUnitWasCorrectedFromNotRealizedToPlanned @event)
-        {
-            Status = BuildingUnitStatus.Planned;
-
-            _lastEvent = @event;
-        }
-
         private void When(BuildingUnitWasRetiredV2 @event)
         {
             Status = BuildingUnitStatus.Retired;
-
-            _lastEvent = @event;
-        }
-
-        private void When(BuildingUnitWasCorrectedFromRetiredToRealized @event)
-        {
-            Status = BuildingUnitStatus.Realized;
-
-            _lastEvent = @event;
-        }
-
-        private void When(BuildingUnitPositionWasCorrected @event)
-        {
-            BuildingUnitPosition = new BuildingUnitPosition(
-                new ExtendedWkbGeometry(@event.ExtendedWkbGeometry),
-                BuildingUnitPositionGeometryMethod.Parse(@event.GeometryMethod));
 
             _lastEvent = @event;
         }
@@ -170,6 +148,48 @@ namespace BuildingRegistry.Building
         private void When(BuildingUnitWasRemovedBecauseBuildingWasRemoved @event)
         {
             IsRemoved = true;
+
+            _lastEvent = @event;
+        }
+
+        private void When(BuildingUnitWasRegularized @event)
+        {
+            HasDeviation = false;
+
+            _lastEvent = @event;
+        }
+
+        private void When(BuildingUnitWasDeregulated @event)
+        {
+            HasDeviation = true;
+
+            _lastEvent = @event;
+        }
+
+        private void When(BuildingUnitWasCorrectedFromRealizedToPlanned @event)
+        {
+            Status = BuildingUnitStatus.Planned;
+
+            _lastEvent = @event;
+        }
+
+        private void When(BuildingUnitWasCorrectedFromRealizedToPlannedBecauseBuildingWasCorrected @event)
+        {
+            Status = BuildingUnitStatus.Planned;
+
+            _lastEvent = @event;
+        }
+
+        private void When(BuildingUnitWasCorrectedFromNotRealizedToPlanned @event)
+        {
+            Status = BuildingUnitStatus.Planned;
+
+            _lastEvent = @event;
+        }
+
+        private void When(BuildingUnitWasCorrectedFromRetiredToRealized @event)
+        {
+            Status = BuildingUnitStatus.Realized;
 
             _lastEvent = @event;
         }
@@ -194,9 +214,11 @@ namespace BuildingRegistry.Building
             _lastEvent = @event;
         }
 
-        private void When(BuildingUnitWasRegularized @event)
+        private void When(BuildingUnitPositionWasCorrected @event)
         {
-            HasDeviation = false;
+            BuildingUnitPosition = new BuildingUnitPosition(
+                new ExtendedWkbGeometry(@event.ExtendedWkbGeometry),
+                BuildingUnitPositionGeometryMethod.Parse(@event.GeometryMethod));
 
             _lastEvent = @event;
         }
@@ -208,31 +230,9 @@ namespace BuildingRegistry.Building
             _lastEvent = @event;
         }
 
-        private void When(BuildingUnitWasDeregulated @event)
-        {
-            HasDeviation = true;
-
-            _lastEvent = @event;
-        }
-
         private void When(BuildingUnitDeregulationWasCorrected @event)
         {
             HasDeviation = false;
-
-            _lastEvent = @event;
-        }
-
-        private void When(CommonBuildingUnitWasAddedV2 @event)
-        {
-            _buildingPersistentLocalId = new BuildingPersistentLocalId(@event.BuildingPersistentLocalId);
-            BuildingUnitPersistentLocalId = new BuildingUnitPersistentLocalId(@event.BuildingUnitPersistentLocalId);
-            Function = BuildingUnitFunction.Common;
-            Status = BuildingUnitStatus.Parse(@event.BuildingUnitStatus);
-            BuildingUnitPosition = new BuildingUnitPosition(
-                new ExtendedWkbGeometry(@event.ExtendedWkbGeometry),
-                BuildingUnitPositionGeometryMethod.Parse(@event.GeometryMethod));
-
-            HasDeviation = @event.HasDeviation;
 
             _lastEvent = @event;
         }
@@ -251,13 +251,6 @@ namespace BuildingRegistry.Building
             _lastEvent = @event;
         }
 
-        private void When(BuildingUnitAddressWasDetachedBecauseAddressWasRemoved @event)
-        {
-            _addressPersistentLocalIds.Remove(new AddressPersistentLocalId(@event.AddressPersistentLocalId));
-
-            _lastEvent = @event;
-        }
-
         private void When(BuildingUnitAddressWasDetachedBecauseAddressWasRejected @event)
         {
             _addressPersistentLocalIds.Remove(new AddressPersistentLocalId(@event.AddressPersistentLocalId));
@@ -266,6 +259,13 @@ namespace BuildingRegistry.Building
         }
 
         private void When(BuildingUnitAddressWasDetachedBecauseAddressWasRetired @event)
+        {
+            _addressPersistentLocalIds.Remove(new AddressPersistentLocalId(@event.AddressPersistentLocalId));
+
+            _lastEvent = @event;
+        }
+
+        private void When(BuildingUnitAddressWasDetachedBecauseAddressWasRemoved @event)
         {
             _addressPersistentLocalIds.Remove(new AddressPersistentLocalId(@event.AddressPersistentLocalId));
 

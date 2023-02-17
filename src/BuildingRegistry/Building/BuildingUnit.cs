@@ -10,6 +10,9 @@ namespace BuildingRegistry.Building
 
     public partial class BuildingUnit : Entity
     {
+        private static List<BuildingUnitStatus> StatusesWhichCannotBeRealized => new() { BuildingUnitStatus.Retired, BuildingUnitStatus.NotRealized };
+        private static List<BuildingUnitStatus> StatusesWhichCannotBeNotRealized => new() { BuildingUnitStatus.Realized, BuildingUnitStatus.Retired };
+
         public static BuildingUnit Migrate(
             Action<object> applier,
             BuildingPersistentLocalId buildingPersistentLocalId,
@@ -33,18 +36,6 @@ namespace BuildingRegistry.Building
 
             return unit;
         }
-
-        private static List<BuildingUnitStatus> StatusesWhichCannotBeRealized => new()
-        {
-            BuildingUnitStatus.Retired,
-            BuildingUnitStatus.NotRealized
-        };
-
-        private static List<BuildingUnitStatus> StatusesWhichCannotBeNotRealized => new()
-        {
-            BuildingUnitStatus.Realized,
-            BuildingUnitStatus.Retired
-        };
 
         public void Realize()
         {
@@ -81,38 +72,6 @@ namespace BuildingRegistry.Building
             Apply(new BuildingUnitWasRealizedBecauseBuildingWasRealized(_buildingPersistentLocalId, BuildingUnitPersistentLocalId));
         }
 
-        public void CorrectRealizeBecauseBuildingWasCorrected()
-        {
-            if (IsRemoved)
-            {
-                return;
-            }
-
-            if (Status == BuildingUnitStatus.Realized)
-            {
-                Apply(new BuildingUnitWasCorrectedFromRealizedToPlannedBecauseBuildingWasCorrected(_buildingPersistentLocalId, BuildingUnitPersistentLocalId));
-            }
-        }
-
-        public void CorrectRealizeBuildingUnit()
-        {
-            GuardRemoved();
-            GuardCommonUnit();
-
-            if (Status == BuildingUnitStatus.Planned)
-            {
-                return;
-            }
-
-            GuardBuildingUnitInvalidStatuses(new[]
-            {
-                BuildingUnitStatus.Retired,
-                BuildingUnitStatus.NotRealized
-            });
-
-            Apply(new BuildingUnitWasCorrectedFromRealizedToPlanned(_buildingPersistentLocalId, BuildingUnitPersistentLocalId));
-        }
-
         public void NotRealize()
         {
             GuardRemoved();
@@ -134,38 +93,6 @@ namespace BuildingRegistry.Building
             }
 
             Apply(new BuildingUnitWasNotRealizedV2(_buildingPersistentLocalId, BuildingUnitPersistentLocalId));
-        }
-
-        public void CorrectNotRealize(BuildingGeometry buildingGeometry)
-        {
-            GuardRemoved();
-            GuardCommonUnit();
-
-            if (Status == BuildingUnitStatus.Planned)
-            {
-                return;
-            }
-
-            GuardBuildingUnitInvalidStatuses(new[]
-            {
-                BuildingUnitStatus.Realized,
-                BuildingUnitStatus.Retired
-            });
-
-            var correctedBuildingUnitPosition = CorrectedBuildingUnitPosition(buildingGeometry);
-
-            if (correctedBuildingUnitPosition is not null)
-            {
-                Apply(new BuildingUnitPositionWasCorrected(
-                    _buildingPersistentLocalId,
-                    BuildingUnitPersistentLocalId,
-                    BuildingUnitPositionGeometryMethod.DerivedFromObject,
-                    correctedBuildingUnitPosition));
-            }
-
-            Apply(new BuildingUnitWasCorrectedFromNotRealizedToPlanned(
-                _buildingPersistentLocalId,
-                BuildingUnitPersistentLocalId));
         }
 
         public void NotRealizeBecauseBuildingWasNotRealized()
@@ -196,23 +123,6 @@ namespace BuildingRegistry.Building
             Apply(new BuildingUnitWasNotRealizedBecauseBuildingWasNotRealized(_buildingPersistentLocalId, BuildingUnitPersistentLocalId));
         }
 
-        public void CorrectPosition(BuildingUnitPositionGeometryMethod positionGeometryMethod, ExtendedWkbGeometry finalPosition)
-        {
-            GuardRemoved();
-            GuardCommonUnit();
-            GuardBuildingUnitInvalidStatuses(new[]
-            {
-                BuildingUnitStatus.NotRealized,
-                BuildingUnitStatus.Retired
-            });
-
-            Apply(new BuildingUnitPositionWasCorrected(
-                _buildingPersistentLocalId,
-                BuildingUnitPersistentLocalId,
-                positionGeometryMethod,
-                finalPosition));
-        }
-
         public void Retire()
         {
             GuardRemoved();
@@ -238,138 +148,6 @@ namespace BuildingRegistry.Building
             }
 
             Apply(new BuildingUnitWasRetiredV2(_buildingPersistentLocalId, BuildingUnitPersistentLocalId));
-        }
-
-        public void CorrectRetiredBuildingUnit(BuildingGeometry buildingGeometry)
-        {
-            GuardRemoved();
-            GuardCommonUnit();
-
-            if (Status == BuildingUnitStatus.Realized)
-            {
-                return;
-            }
-
-            GuardBuildingUnitInvalidStatuses(new[]
-            {
-                BuildingUnitStatus.Planned,
-                BuildingUnitStatus.NotRealized
-            });
-
-            var correctedBuildingUnitPosition = CorrectedBuildingUnitPosition(buildingGeometry);
-
-            if (correctedBuildingUnitPosition is not null)
-            {
-                Apply(new BuildingUnitPositionWasCorrected(
-                    _buildingPersistentLocalId,
-                    BuildingUnitPersistentLocalId,
-                    BuildingUnitPositionGeometryMethod.DerivedFromObject,
-                    correctedBuildingUnitPosition));
-            }
-
-            Apply(new BuildingUnitWasCorrectedFromRetiredToRealized(
-                _buildingPersistentLocalId,
-                BuildingUnitPersistentLocalId));
-        }
-
-        public void Regularize()
-        {
-            GuardRemoved();
-            GuardCommonUnit();
-
-            GuardBuildingUnitInvalidStatuses(new[] { BuildingUnitStatus.Retired, BuildingUnitStatus.NotRealized });
-
-            if (!HasDeviation)
-            {
-                return;
-            }
-
-            Apply(new BuildingUnitWasRegularized(_buildingPersistentLocalId, BuildingUnitPersistentLocalId));
-        }
-
-        public void CorrectRegularization()
-        {
-            GuardRemoved();
-            GuardCommonUnit();
-
-            GuardValidBuildingUnitStatuses(new[] { BuildingUnitStatus.Planned, BuildingUnitStatus.Realized });
-
-            if (HasDeviation)
-            {
-                return;
-            }
-
-            Apply(new BuildingUnitRegularizationWasCorrected(_buildingPersistentLocalId, BuildingUnitPersistentLocalId));
-        }
-
-        public void Deregulate()
-        {
-            GuardRemoved();
-            GuardCommonUnit();
-
-            GuardBuildingUnitInvalidStatuses(new[]
-            {
-                BuildingUnitStatus.Retired,
-                BuildingUnitStatus.NotRealized
-            });
-
-            if (HasDeviation)
-            {
-                return;
-            }
-
-            Apply(new BuildingUnitWasDeregulated(
-                _buildingPersistentLocalId,
-                BuildingUnitPersistentLocalId));
-        }
-
-        public void CorrectDeregulation()
-        {
-            GuardRemoved();
-            GuardCommonUnit();
-
-            GuardValidBuildingUnitStatuses(new[]
-            {
-                BuildingUnitStatus.Planned,
-                BuildingUnitStatus.Realized
-            });
-
-            if (!HasDeviation)
-            {
-                return;
-            }
-
-            Apply(new BuildingUnitDeregulationWasCorrected(
-                _buildingPersistentLocalId,
-                BuildingUnitPersistentLocalId));
-        }
-
-        //TODO: refactor: use valid statusses instead of this
-        private void GuardBuildingUnitInvalidStatuses(BuildingUnitStatus[] invalidStatuses)
-        {
-            if (invalidStatuses.Contains(Status))
-            {
-                throw new BuildingUnitHasInvalidStatusException();
-            }
-        }
-
-        private void GuardValidBuildingUnitStatuses(BuildingUnitStatus[] validStatuses)
-        {
-            if (!validStatuses.Contains(Status))
-            {
-                throw new BuildingUnitHasInvalidStatusException();
-            }
-        }
-
-        private ExtendedWkbGeometry? CorrectedBuildingUnitPosition(BuildingGeometry buildingGeometry)
-        {
-            var correctedBuildingUnitPosition =
-                !buildingGeometry.Contains(BuildingUnitPosition.Geometry)
-                || BuildingUnitPosition.GeometryMethod == BuildingUnitPositionGeometryMethod.DerivedFromObject
-                && BuildingUnitPosition.Geometry != buildingGeometry.Center
-                    ? buildingGeometry.Center
-                    : null;
-            return correctedBuildingUnitPosition;
         }
 
         public void Remove()
@@ -408,6 +186,191 @@ namespace BuildingRegistry.Building
             }
 
             Apply(new BuildingUnitWasRemovedBecauseBuildingWasRemoved(_buildingPersistentLocalId, BuildingUnitPersistentLocalId));
+        }
+
+        public void Regularize()
+        {
+            GuardRemoved();
+            GuardCommonUnit();
+
+            GuardBuildingUnitInvalidStatuses(new[] { BuildingUnitStatus.Retired, BuildingUnitStatus.NotRealized });
+
+            if (!HasDeviation)
+            {
+                return;
+            }
+
+            Apply(new BuildingUnitWasRegularized(_buildingPersistentLocalId, BuildingUnitPersistentLocalId));
+        }
+
+        public void Deregulate()
+        {
+            GuardRemoved();
+            GuardCommonUnit();
+
+            GuardBuildingUnitInvalidStatuses(new[]
+            {
+                BuildingUnitStatus.Retired,
+                BuildingUnitStatus.NotRealized
+            });
+
+            if (HasDeviation)
+            {
+                return;
+            }
+
+            Apply(new BuildingUnitWasDeregulated(
+                _buildingPersistentLocalId,
+                BuildingUnitPersistentLocalId));
+        }
+
+        public void CorrectRealization()
+        {
+            GuardRemoved();
+            GuardCommonUnit();
+
+            if (Status == BuildingUnitStatus.Planned)
+            {
+                return;
+            }
+
+            GuardBuildingUnitInvalidStatuses(new[]
+            {
+                BuildingUnitStatus.Retired,
+                BuildingUnitStatus.NotRealized
+            });
+
+            Apply(new BuildingUnitWasCorrectedFromRealizedToPlanned(_buildingPersistentLocalId, BuildingUnitPersistentLocalId));
+        }
+
+        public void CorrectRealizationBecauseBuildingWasCorrected()
+        {
+            if (IsRemoved)
+            {
+                return;
+            }
+
+            if (Status == BuildingUnitStatus.Realized)
+            {
+                Apply(new BuildingUnitWasCorrectedFromRealizedToPlannedBecauseBuildingWasCorrected(_buildingPersistentLocalId, BuildingUnitPersistentLocalId));
+            }
+        }
+
+        public void CorrectNotRealization(BuildingGeometry buildingGeometry)
+        {
+            GuardRemoved();
+            GuardCommonUnit();
+
+            if (Status == BuildingUnitStatus.Planned)
+            {
+                return;
+            }
+
+            GuardBuildingUnitInvalidStatuses(new[]
+            {
+                BuildingUnitStatus.Realized,
+                BuildingUnitStatus.Retired
+            });
+
+            var correctedBuildingUnitPosition = CorrectedBuildingUnitPosition(buildingGeometry);
+
+            if (correctedBuildingUnitPosition is not null)
+            {
+                Apply(new BuildingUnitPositionWasCorrected(
+                    _buildingPersistentLocalId,
+                    BuildingUnitPersistentLocalId,
+                    BuildingUnitPositionGeometryMethod.DerivedFromObject,
+                    correctedBuildingUnitPosition));
+            }
+
+            Apply(new BuildingUnitWasCorrectedFromNotRealizedToPlanned(
+                _buildingPersistentLocalId,
+                BuildingUnitPersistentLocalId));
+        }
+
+        public void CorrectRetirement(BuildingGeometry buildingGeometry)
+        {
+            GuardRemoved();
+            GuardCommonUnit();
+
+            if (Status == BuildingUnitStatus.Realized)
+            {
+                return;
+            }
+
+            GuardBuildingUnitInvalidStatuses(new[]
+            {
+                BuildingUnitStatus.Planned,
+                BuildingUnitStatus.NotRealized
+            });
+
+            var correctedBuildingUnitPosition = CorrectedBuildingUnitPosition(buildingGeometry);
+
+            if (correctedBuildingUnitPosition is not null)
+            {
+                Apply(new BuildingUnitPositionWasCorrected(
+                    _buildingPersistentLocalId,
+                    BuildingUnitPersistentLocalId,
+                    BuildingUnitPositionGeometryMethod.DerivedFromObject,
+                    correctedBuildingUnitPosition));
+            }
+
+            Apply(new BuildingUnitWasCorrectedFromRetiredToRealized(
+                _buildingPersistentLocalId,
+                BuildingUnitPersistentLocalId));
+        }
+
+        public void CorrectPosition(BuildingUnitPositionGeometryMethod positionGeometryMethod, ExtendedWkbGeometry finalPosition)
+        {
+            GuardRemoved();
+            GuardCommonUnit();
+            GuardBuildingUnitInvalidStatuses(new[]
+            {
+                BuildingUnitStatus.NotRealized,
+                BuildingUnitStatus.Retired
+            });
+
+            Apply(new BuildingUnitPositionWasCorrected(
+                _buildingPersistentLocalId,
+                BuildingUnitPersistentLocalId,
+                positionGeometryMethod,
+                finalPosition));
+        }
+
+        public void CorrectRegularization()
+        {
+            GuardRemoved();
+            GuardCommonUnit();
+
+            GuardValidBuildingUnitStatuses(new[] { BuildingUnitStatus.Planned, BuildingUnitStatus.Realized });
+
+            if (HasDeviation)
+            {
+                return;
+            }
+
+            Apply(new BuildingUnitRegularizationWasCorrected(_buildingPersistentLocalId, BuildingUnitPersistentLocalId));
+        }
+
+        public void CorrectDeregulation()
+        {
+            GuardRemoved();
+            GuardCommonUnit();
+
+            GuardValidBuildingUnitStatuses(new[]
+            {
+                BuildingUnitStatus.Planned,
+                BuildingUnitStatus.Realized
+            });
+
+            if (!HasDeviation)
+            {
+                return;
+            }
+
+            Apply(new BuildingUnitDeregulationWasCorrected(
+                _buildingPersistentLocalId,
+                BuildingUnitPersistentLocalId));
         }
 
         public void AttachAddress(AddressPersistentLocalId addressPersistentLocalId, IAddresses addresses)
@@ -451,16 +414,6 @@ namespace BuildingRegistry.Building
             Apply(new BuildingUnitAddressWasDetachedV2(_buildingPersistentLocalId, BuildingUnitPersistentLocalId, addressPersistentLocalId));
         }
 
-        public void DetachAddressBecauseAddressWasRemoved(AddressPersistentLocalId addressPersistentLocalId)
-        {
-            if (!AddressPersistentLocalIds.Contains(addressPersistentLocalId))
-            {
-                return;
-            }
-
-            Apply(new BuildingUnitAddressWasDetachedBecauseAddressWasRemoved(_buildingPersistentLocalId, BuildingUnitPersistentLocalId, addressPersistentLocalId));
-        }
-
         public void DetachAddressBecauseAddressWasRejected(AddressPersistentLocalId addressPersistentLocalId)
         {
             if (!AddressPersistentLocalIds.Contains(addressPersistentLocalId))
@@ -479,6 +432,60 @@ namespace BuildingRegistry.Building
             }
 
             Apply(new BuildingUnitAddressWasDetachedBecauseAddressWasRetired(_buildingPersistentLocalId, BuildingUnitPersistentLocalId, addressPersistentLocalId));
+        }
+
+        public void DetachAddressBecauseAddressWasRemoved(AddressPersistentLocalId addressPersistentLocalId)
+        {
+            if (!AddressPersistentLocalIds.Contains(addressPersistentLocalId))
+            {
+                return;
+            }
+
+            Apply(new BuildingUnitAddressWasDetachedBecauseAddressWasRemoved(_buildingPersistentLocalId, BuildingUnitPersistentLocalId, addressPersistentLocalId));
+        }
+
+        private ExtendedWkbGeometry? CorrectedBuildingUnitPosition(BuildingGeometry buildingGeometry)
+        {
+            var correctedBuildingUnitPosition =
+                !buildingGeometry.Contains(BuildingUnitPosition.Geometry)
+                || BuildingUnitPosition.GeometryMethod == BuildingUnitPositionGeometryMethod.DerivedFromObject
+                && BuildingUnitPosition.Geometry != buildingGeometry.Center
+                    ? buildingGeometry.Center
+                    : null;
+            return correctedBuildingUnitPosition;
+        }
+
+        private void GuardRemoved()
+        {
+            if (IsRemoved)
+            {
+                throw new BuildingUnitIsRemovedException(BuildingUnitPersistentLocalId);
+            }
+        }
+
+        //TODO: refactor: use valid statusses instead of this
+        private void GuardBuildingUnitInvalidStatuses(BuildingUnitStatus[] invalidStatuses)
+        {
+            if (invalidStatuses.Contains(Status))
+            {
+                throw new BuildingUnitHasInvalidStatusException();
+            }
+        }
+
+        private void GuardValidBuildingUnitStatuses(BuildingUnitStatus[] validStatuses)
+        {
+            if (!validStatuses.Contains(Status))
+            {
+                throw new BuildingUnitHasInvalidStatusException();
+            }
+        }
+
+        private void GuardCommonUnit()
+        {
+            if (Function == BuildingUnitFunction.Common)
+            {
+                throw new BuildingUnitHasInvalidFunctionException();
+            }
         }
 
         private void GuardRemovedAddress(AddressData? address)
@@ -514,22 +521,6 @@ namespace BuildingRegistry.Building
 
             _lastSnapshotEventHash = buildingUnitData.LastEventHash;
             _lastSnapshotProvenance = buildingUnitData.LastProvenanceData;
-        }
-
-        private void GuardRemoved()
-        {
-            if (IsRemoved)
-            {
-                throw new BuildingUnitIsRemovedException(BuildingUnitPersistentLocalId);
-            }
-        }
-
-        private void GuardCommonUnit()
-        {
-            if (Function == BuildingUnitFunction.Common)
-            {
-                throw new BuildingUnitHasInvalidFunctionException();
-            }
         }
     }
 }

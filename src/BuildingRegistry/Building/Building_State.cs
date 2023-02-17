@@ -46,29 +46,29 @@ namespace BuildingRegistry.Building
             Register<BuildingOutlineWasChanged>(When);
 
             Register<BuildingUnitWasPlannedV2>(When);
+            Register<CommonBuildingUnitWasAddedV2>(When);
             Register<BuildingUnitWasRealizedV2>(When);
             Register<BuildingUnitWasRealizedBecauseBuildingWasRealized>(When);
-            Register<BuildingUnitWasCorrectedFromRealizedToPlanned>(When);
-            Register<BuildingUnitWasCorrectedFromRealizedToPlannedBecauseBuildingWasCorrected>(When);
             Register<BuildingUnitWasNotRealizedV2>(When);
             Register<BuildingUnitWasNotRealizedBecauseBuildingWasNotRealized>(When);
-            Register<BuildingUnitWasCorrectedFromNotRealizedToPlanned>(When);
             Register<BuildingUnitWasRetiredV2>(When);
-            Register<BuildingUnitWasCorrectedFromRetiredToRealized>(When);
-            Register<BuildingUnitPositionWasCorrected>(When);
             Register<BuildingUnitWasRemovedV2>(When);
             Register<BuildingUnitWasRemovedBecauseBuildingWasRemoved>(When);
-            Register<BuildingUnitRemovalWasCorrected>(When);
             Register<BuildingUnitWasRegularized>(When);
-            Register<BuildingUnitRegularizationWasCorrected>(When);
             Register<BuildingUnitWasDeregulated>(When);
+            Register<BuildingUnitWasCorrectedFromRealizedToPlanned>(When);
+            Register<BuildingUnitWasCorrectedFromRealizedToPlannedBecauseBuildingWasCorrected>(When);
+            Register<BuildingUnitWasCorrectedFromNotRealizedToPlanned>(When);
+            Register<BuildingUnitWasCorrectedFromRetiredToRealized>(When);
+            Register<BuildingUnitRemovalWasCorrected>(When);
+            Register<BuildingUnitPositionWasCorrected>(When);
+            Register<BuildingUnitRegularizationWasCorrected>(When);
             Register<BuildingUnitDeregulationWasCorrected>(When);
-            Register<CommonBuildingUnitWasAddedV2>(When);
             Register<BuildingUnitAddressWasAttachedV2>(When);
             Register<BuildingUnitAddressWasDetachedV2>(When);
-            Register<BuildingUnitAddressWasDetachedBecauseAddressWasRemoved>(When);
             Register<BuildingUnitAddressWasDetachedBecauseAddressWasRejected>(When);
             Register<BuildingUnitAddressWasDetachedBecauseAddressWasRetired>(When);
+            Register<BuildingUnitAddressWasDetachedBecauseAddressWasRemoved>(When);
 
             Register<BuildingSnapshot>(When);
         }
@@ -205,33 +205,33 @@ namespace BuildingRegistry.Building
 
         private void When(BuildingUnitWasRealizedBecauseBuildingWasRealized @event) => RouteToBuildingUnit(@event);
 
-        private void When(BuildingUnitWasCorrectedFromRealizedToPlanned @event) => RouteToBuildingUnit(@event);
-
-        private void When(BuildingUnitWasCorrectedFromRealizedToPlannedBecauseBuildingWasCorrected @event) => RouteToBuildingUnit(@event);
-
         private void When(BuildingUnitWasNotRealizedV2 @event) => RouteToBuildingUnit(@event);
 
         private void When(BuildingUnitWasNotRealizedBecauseBuildingWasNotRealized @event) => RouteToBuildingUnit(@event);
 
-        private void When(BuildingUnitWasCorrectedFromNotRealizedToPlanned @event) => RouteToBuildingUnit(@event);
-
         private void When(BuildingUnitWasRetiredV2 @event) => RouteToBuildingUnit(@event);
-
-        private void When(BuildingUnitWasCorrectedFromRetiredToRealized @event) => RouteToBuildingUnit(@event);
-
-        private void When(BuildingUnitPositionWasCorrected @event) => RouteToBuildingUnit(@event);
 
         private void When(BuildingUnitWasRemovedV2 @event) => RouteToBuildingUnit(@event);
 
         private void When(BuildingUnitWasRemovedBecauseBuildingWasRemoved @event) => RouteToBuildingUnit(@event);
 
-        private void When(BuildingUnitRemovalWasCorrected @event) => RouteToBuildingUnit(@event);
-
         private void When(BuildingUnitWasRegularized @event) => RouteToBuildingUnit(@event);
 
-        private void When(BuildingUnitRegularizationWasCorrected @event) => RouteToBuildingUnit(@event);
-
         private void When(BuildingUnitWasDeregulated @event) => RouteToBuildingUnit(@event);
+
+        private void When(BuildingUnitWasCorrectedFromRealizedToPlanned @event) => RouteToBuildingUnit(@event);
+
+        private void When(BuildingUnitWasCorrectedFromRealizedToPlannedBecauseBuildingWasCorrected @event) => RouteToBuildingUnit(@event);
+
+        private void When(BuildingUnitWasCorrectedFromNotRealizedToPlanned @event) => RouteToBuildingUnit(@event);
+
+        private void When(BuildingUnitWasCorrectedFromRetiredToRealized @event) => RouteToBuildingUnit(@event);
+
+        private void When(BuildingUnitRemovalWasCorrected @event) => RouteToBuildingUnit(@event);
+
+        private void When(BuildingUnitPositionWasCorrected @event) => RouteToBuildingUnit(@event);
+
+        private void When(BuildingUnitRegularizationWasCorrected @event) => RouteToBuildingUnit(@event);
 
         private void When(BuildingUnitDeregulationWasCorrected @event) => RouteToBuildingUnit(@event);
 
@@ -239,11 +239,11 @@ namespace BuildingRegistry.Building
 
         private void When(BuildingUnitAddressWasDetachedV2 @event) => RouteToBuildingUnit(@event);
 
-        private void When(BuildingUnitAddressWasDetachedBecauseAddressWasRemoved @event) => RouteToBuildingUnit(@event);
-
         private void When(BuildingUnitAddressWasDetachedBecauseAddressWasRejected @event) => RouteToBuildingUnit(@event);
 
         private void When(BuildingUnitAddressWasDetachedBecauseAddressWasRetired @event) => RouteToBuildingUnit(@event);
+
+        private void When(BuildingUnitAddressWasDetachedBecauseAddressWasRemoved @event) => RouteToBuildingUnit(@event);
 
         private void RouteToBuildingUnit<TEvent>(TEvent @event)
             where TEvent : IBuildingEvent, IHasBuildingUnitPersistentLocalId

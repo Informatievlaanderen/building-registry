@@ -54,18 +54,6 @@ namespace BuildingRegistry.Building
                     building.RealizeBuildingUnit(message.Command.BuildingUnitPersistentLocalId);
                 });
 
-            For<CorrectBuildingUnitRealization>()
-                .AddSqlStreamStore(getStreamStore, getUnitOfWork, eventMapping, eventSerializer, getSnapshotStore)
-                .AddEventHash<CorrectBuildingUnitRealization, Building>(getUnitOfWork)
-                .AddProvenance(getUnitOfWork, provenanceFactory)
-                .Handle(async (message, ct) =>
-                {
-                    var streamId = new BuildingStreamId(message.Command.BuildingPersistentLocalId);
-                    var building = await buildingRepository().GetAsync(streamId, ct);
-
-                    building.CorrectRealizeBuildingUnit(message.Command.BuildingUnitPersistentLocalId);
-                });
-
             For<NotRealizeBuildingUnit>()
                 .AddSqlStreamStore(getStreamStore, getUnitOfWork, eventMapping, eventSerializer, getSnapshotStore)
                 .AddEventHash<NotRealizeBuildingUnit, Building>(getUnitOfWork)
@@ -78,18 +66,6 @@ namespace BuildingRegistry.Building
                     building.NotRealizeBuildingUnit(message.Command.BuildingUnitPersistentLocalId);
                 });
 
-            For<CorrectBuildingUnitNotRealization>()
-                .AddSqlStreamStore(getStreamStore, getUnitOfWork, eventMapping, eventSerializer, getSnapshotStore)
-                .AddEventHash<CorrectBuildingUnitNotRealization, Building>(getUnitOfWork)
-                .AddProvenance(getUnitOfWork, provenanceFactory)
-                .Handle(async (message, ct) =>
-                {
-                    var streamId = new BuildingStreamId(message.Command.BuildingPersistentLocalId);
-                    var building = await buildingRepository().GetAsync(streamId, ct);
-
-                    building.CorrectNotRealizeBuildingUnit(addCommonBuildingUnit, message.Command.BuildingUnitPersistentLocalId);
-                });
-
             For<RetireBuildingUnit>()
                 .AddSqlStreamStore(getStreamStore, getUnitOfWork, eventMapping, eventSerializer, getSnapshotStore)
                 .AddEventHash<RetireBuildingUnit, Building>(getUnitOfWork)
@@ -100,30 +76,6 @@ namespace BuildingRegistry.Building
                     var building = await buildingRepository().GetAsync(streamId, ct);
 
                     building.RetireBuildingUnit(message.Command.BuildingUnitPersistentLocalId);
-                });
-
-            For<CorrectBuildingUnitRetirement>()
-                .AddSqlStreamStore(getStreamStore, getUnitOfWork, eventMapping, eventSerializer, getSnapshotStore)
-                .AddEventHash<CorrectBuildingUnitRetirement, Building>(getUnitOfWork)
-                .AddProvenance(getUnitOfWork, provenanceFactory)
-                .Handle(async (message, ct) =>
-                {
-                    var streamId = new BuildingStreamId(message.Command.BuildingPersistentLocalId);
-                    var building = await buildingRepository().GetAsync(streamId, ct);
-
-                    building.CorrectRetiredBuildingUnit(addCommonBuildingUnit, message.Command.BuildingUnitPersistentLocalId);
-                });
-
-            For<CorrectBuildingUnitPosition>()
-                .AddSqlStreamStore(getStreamStore, getUnitOfWork, eventMapping, eventSerializer, getSnapshotStore)
-                .AddEventHash<CorrectBuildingUnitPosition, Building>(getUnitOfWork)
-                .AddProvenance(getUnitOfWork, provenanceFactory)
-                .Handle(async (message, ct) =>
-                {
-                    var streamId = new BuildingStreamId(message.Command.BuildingPersistentLocalId);
-                    var building = await buildingRepository().GetAsync(streamId, ct);
-
-                    building.CorrectPositionBuildingUnit(message.Command.BuildingUnitPersistentLocalId, message.Command.PositionGeometryMethod, message.Command.Position);
                 });
 
             For<RemoveBuildingUnit>()
@@ -150,18 +102,6 @@ namespace BuildingRegistry.Building
                     building.RegularizeBuildingUnit(message.Command.BuildingUnitPersistentLocalId);
                 });
 
-            For<CorrectBuildingUnitRegularization>()
-                .AddSqlStreamStore(getStreamStore, getUnitOfWork, eventMapping, eventSerializer, getSnapshotStore)
-                .AddEventHash<CorrectBuildingUnitRegularization, Building>(getUnitOfWork)
-                .AddProvenance(getUnitOfWork, provenanceFactory)
-                .Handle(async (message, ct) =>
-                {
-                    var streamId = new BuildingStreamId(message.Command.BuildingPersistentLocalId);
-                    var building = await buildingRepository().GetAsync(streamId, ct);
-
-                    building.CorrectRegularizationBuildingUnit(message.Command.BuildingUnitPersistentLocalId);
-                });
-
             For<DeregulateBuildingUnit>()
                 .AddSqlStreamStore(getStreamStore, getUnitOfWork, eventMapping, eventSerializer, getSnapshotStore)
                 .AddEventHash<DeregulateBuildingUnit, Building>(getUnitOfWork)
@@ -172,6 +112,66 @@ namespace BuildingRegistry.Building
                     var building = await buildingRepository().GetAsync(streamId, ct);
 
                     building.DeregulateBuildingUnit(message.Command.BuildingUnitPersistentLocalId);
+                });
+
+            For<CorrectBuildingUnitRealization>()
+                .AddSqlStreamStore(getStreamStore, getUnitOfWork, eventMapping, eventSerializer, getSnapshotStore)
+                .AddEventHash<CorrectBuildingUnitRealization, Building>(getUnitOfWork)
+                .AddProvenance(getUnitOfWork, provenanceFactory)
+                .Handle(async (message, ct) =>
+                {
+                    var streamId = new BuildingStreamId(message.Command.BuildingPersistentLocalId);
+                    var building = await buildingRepository().GetAsync(streamId, ct);
+
+                    building.CorrectRealizeBuildingUnit(message.Command.BuildingUnitPersistentLocalId);
+                });
+
+            For<CorrectBuildingUnitNotRealization>()
+                .AddSqlStreamStore(getStreamStore, getUnitOfWork, eventMapping, eventSerializer, getSnapshotStore)
+                .AddEventHash<CorrectBuildingUnitNotRealization, Building>(getUnitOfWork)
+                .AddProvenance(getUnitOfWork, provenanceFactory)
+                .Handle(async (message, ct) =>
+                {
+                    var streamId = new BuildingStreamId(message.Command.BuildingPersistentLocalId);
+                    var building = await buildingRepository().GetAsync(streamId, ct);
+
+                    building.CorrectNotRealizeBuildingUnit(addCommonBuildingUnit, message.Command.BuildingUnitPersistentLocalId);
+                });
+
+            For<CorrectBuildingUnitRetirement>()
+                .AddSqlStreamStore(getStreamStore, getUnitOfWork, eventMapping, eventSerializer, getSnapshotStore)
+                .AddEventHash<CorrectBuildingUnitRetirement, Building>(getUnitOfWork)
+                .AddProvenance(getUnitOfWork, provenanceFactory)
+                .Handle(async (message, ct) =>
+                {
+                    var streamId = new BuildingStreamId(message.Command.BuildingPersistentLocalId);
+                    var building = await buildingRepository().GetAsync(streamId, ct);
+
+                    building.CorrectRetiredBuildingUnit(addCommonBuildingUnit, message.Command.BuildingUnitPersistentLocalId);
+                });
+
+            For<CorrectBuildingUnitPosition>()
+                .AddSqlStreamStore(getStreamStore, getUnitOfWork, eventMapping, eventSerializer, getSnapshotStore)
+                .AddEventHash<CorrectBuildingUnitPosition, Building>(getUnitOfWork)
+                .AddProvenance(getUnitOfWork, provenanceFactory)
+                .Handle(async (message, ct) =>
+                {
+                    var streamId = new BuildingStreamId(message.Command.BuildingPersistentLocalId);
+                    var building = await buildingRepository().GetAsync(streamId, ct);
+
+                    building.CorrectPositionBuildingUnit(message.Command.BuildingUnitPersistentLocalId, message.Command.PositionGeometryMethod, message.Command.Position);
+                });
+
+            For<CorrectBuildingUnitRegularization>()
+                .AddSqlStreamStore(getStreamStore, getUnitOfWork, eventMapping, eventSerializer, getSnapshotStore)
+                .AddEventHash<CorrectBuildingUnitRegularization, Building>(getUnitOfWork)
+                .AddProvenance(getUnitOfWork, provenanceFactory)
+                .Handle(async (message, ct) =>
+                {
+                    var streamId = new BuildingStreamId(message.Command.BuildingPersistentLocalId);
+                    var building = await buildingRepository().GetAsync(streamId, ct);
+
+                    building.CorrectRegularizationBuildingUnit(message.Command.BuildingUnitPersistentLocalId);
                 });
 
             For<CorrectBuildingUnitDeregulation>()
@@ -210,18 +210,6 @@ namespace BuildingRegistry.Building
                     building.DetachAddressFromBuildingUnit(addresses, message.Command.BuildingUnitPersistentLocalId, message.Command.AddressPersistentLocalId);
                 });
 
-            For<DetachAddressFromBuildingUnitBecauseAddressWasRemoved>()
-                .AddSqlStreamStore(getStreamStore, getUnitOfWork, eventMapping, eventSerializer, getSnapshotStore)
-                .AddEventHash<DetachAddressFromBuildingUnitBecauseAddressWasRemoved, Building>(getUnitOfWork)
-                .AddProvenance(getUnitOfWork, provenanceFactory)
-                .Handle(async (message, ct) =>
-                {
-                    var streamId = new BuildingStreamId(message.Command.BuildingPersistentLocalId);
-                    var building = await buildingRepository().GetAsync(streamId, ct);
-
-                    building.DetachAddressFromBuildingUnitBecauseAddressWasRemoved(message.Command.BuildingUnitPersistentLocalId, message.Command.AddressPersistentLocalId);
-                });
-
             For<DetachAddressFromBuildingUnitBecauseAddressWasRejected>()
                 .AddSqlStreamStore(getStreamStore, getUnitOfWork, eventMapping, eventSerializer, getSnapshotStore)
                 .AddEventHash<DetachAddressFromBuildingUnitBecauseAddressWasRejected, Building>(getUnitOfWork)
@@ -244,6 +232,18 @@ namespace BuildingRegistry.Building
                     var building = await buildingRepository().GetAsync(streamId, ct);
 
                     building.DetachAddressFromBuildingUnitBecauseAddressWasRetired(message.Command.BuildingUnitPersistentLocalId, message.Command.AddressPersistentLocalId);
+                });
+
+            For<DetachAddressFromBuildingUnitBecauseAddressWasRemoved>()
+                .AddSqlStreamStore(getStreamStore, getUnitOfWork, eventMapping, eventSerializer, getSnapshotStore)
+                .AddEventHash<DetachAddressFromBuildingUnitBecauseAddressWasRemoved, Building>(getUnitOfWork)
+                .AddProvenance(getUnitOfWork, provenanceFactory)
+                .Handle(async (message, ct) =>
+                {
+                    var streamId = new BuildingStreamId(message.Command.BuildingPersistentLocalId);
+                    var building = await buildingRepository().GetAsync(streamId, ct);
+
+                    building.DetachAddressFromBuildingUnitBecauseAddressWasRemoved(message.Command.BuildingUnitPersistentLocalId, message.Command.AddressPersistentLocalId);
                 });
         }
     }
