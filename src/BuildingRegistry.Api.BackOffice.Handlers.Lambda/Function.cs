@@ -85,6 +85,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda
 
             builder
                 .RegisterModule(new DataDogModule(configuration))
+                .RegisterModule(new SequenceModule(configuration, services, loggerFactory))
                 .RegisterModule(new CommandHandlingModule(configuration))
                 .RegisterModule(new BackOfficeModule(configuration, services, loggerFactory))
                 .RegisterModule(new ConsumerAddressModule(configuration, services, loggerFactory));
