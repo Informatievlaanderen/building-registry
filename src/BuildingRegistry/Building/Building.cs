@@ -144,7 +144,7 @@ namespace BuildingRegistry.Building
 
             foreach (var unit in _buildingUnits)
             {
-                unit.CorrectRealizeBecauseBuildingWasCorrected();
+                unit.CorrectRealizationBecauseBuildingWasCorrected();
             }
 
             ApplyChange(new BuildingWasCorrectedFromRealizedToUnderConstruction(BuildingPersistentLocalId));
