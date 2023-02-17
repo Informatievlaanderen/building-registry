@@ -4,6 +4,8 @@ namespace BuildingRegistry.Migrator.Building.Infrastructure.Modules
     using Autofac;
     using Autofac.Extensions.DependencyInjection;
     using Be.Vlaanderen.Basisregisters.DataDog.Tracing.Autofac;
+    using Be.Vlaanderen.Basisregisters.EventHandling;
+    using Be.Vlaanderen.Basisregisters.EventHandling.Autofac;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Autofac;
     using Be.Vlaanderen.Basisregisters.Projector;
     using Be.Vlaanderen.Basisregisters.Projector.ConnectedProjections;
@@ -47,7 +49,9 @@ namespace BuildingRegistry.Migrator.Building.Infrastructure.Modules
             builder
                 .RegisterModule(new DataDogModule(_configuration))
                 .RegisterModule<EnvelopeModule>()
-                .RegisterModule(new EditModule(_configuration, _services, _loggerFactory))
+                .RegisterModule(new SequenceModule(_configuration, _services, _loggerFactory))
+                .RegisterModule(new CommandHandlingModule(_configuration))
+                .RegisterModule(new LegacyCommandHandlingModule(_configuration))
                 .RegisterModule(new ConsumerAddressModule(_configuration, _services, _loggerFactory))
                 .RegisterModule(new MigratorProjectionModule(_configuration, _services, _loggerFactory));
 

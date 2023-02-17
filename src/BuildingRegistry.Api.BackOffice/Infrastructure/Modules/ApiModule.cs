@@ -16,6 +16,7 @@ namespace BuildingRegistry.Api.BackOffice.Infrastructure.Modules
     using Be.Vlaanderen.Basisregisters.AcmIdm;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance.AcmIdm;
+    using BuildingRegistry.Infrastructure.Modules;
     using Microsoft.AspNetCore.Mvc.Infrastructure;
 
     public class ApiModule : Module

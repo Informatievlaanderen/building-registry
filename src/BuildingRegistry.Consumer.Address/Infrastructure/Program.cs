@@ -13,6 +13,7 @@ namespace BuildingRegistry.Consumer.Address.Infrastructure
     using Be.Vlaanderen.Basisregisters.DataDog.Tracing.Autofac;
     using Be.Vlaanderen.Basisregisters.DataDog.Tracing.Sql.EntityFrameworkCore;
     using Be.Vlaanderen.Basisregisters.EventHandling;
+    using Be.Vlaanderen.Basisregisters.EventHandling.Autofac;
     using Be.Vlaanderen.Basisregisters.MessageHandling.Kafka;
     using Be.Vlaanderen.Basisregisters.MessageHandling.Kafka.Consumer;
     using Building;
@@ -137,7 +138,7 @@ namespace BuildingRegistry.Consumer.Address.Infrastructure
 
                             consumerOptions.ConfigureOffset(new Offset(offset));
                         }
-                        
+
                         return consumerOptions;
                     });
 
@@ -148,7 +149,7 @@ namespace BuildingRegistry.Consumer.Address.Infrastructure
 
                     builder
                         .RegisterModule(new DataDogModule(hostContext.Configuration))
-                        .RegisterModule(new EditModule(hostContext.Configuration, services, loggerFactory))
+                        .RegisterModule(new CommandHandlingModule(hostContext.Configuration))
                         .RegisterModule(new BackOfficeModule(hostContext.Configuration, services, loggerFactory));
 
                     builder
