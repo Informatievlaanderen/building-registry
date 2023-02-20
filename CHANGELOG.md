@@ -1,3 +1,17 @@
+## [3.59.4](https://github.com/informatievlaanderen/building-registry/compare/v3.59.3...v3.59.4) (2023-02-20)
+
+
+### Bug Fixes
+
+* clean up references + idempotency plan commands ([7f6b5d7](https://github.com/informatievlaanderen/building-registry/commit/7f6b5d72d614f51e3869034149632d5269538592))
+* connectionstring cleanup ([3349910](https://github.com/informatievlaanderen/building-registry/commit/3349910f7c3adba5d062f83085f679846b92e379))
+* consumer should commit if message is already processed ([f7352ba](https://github.com/informatievlaanderen/building-registry/commit/f7352ba7400c1d1b067db9af6a8804cd6aad65dc))
+* dont mark building as deleted when building unit was deleted ([39fd5f8](https://github.com/informatievlaanderen/building-registry/commit/39fd5f88d2528ebd3ca9e330a994d46b641c2799))
+* idempotency on planning building and building unit ([b431ecb](https://github.com/informatievlaanderen/building-registry/commit/b431ecbb53a74a2aa9ed4abd11f4a9a78c38b05a))
+* refactor legacy/oslo ([ddb50c7](https://github.com/informatievlaanderen/building-registry/commit/ddb50c74f2fc056dc96e2837c80f63d25c4e97dc))
+* registrations ([d30045d](https://github.com/informatievlaanderen/building-registry/commit/d30045d70539946ed38ab8431ec52f4f33edf452))
+* use merge queue ([e7e8751](https://github.com/informatievlaanderen/building-registry/commit/e7e875122304e291ab9f5466e5960a6b769752c3))
+
 ## [3.59.3](https://github.com/informatievlaanderen/building-registry/compare/v3.59.2...v3.59.3) (2023-02-14)
 
 
