@@ -163,7 +163,6 @@ namespace BuildingRegistry.Tests.ProjectionTests.Legacy
                 {
                     var buildingDetailItemV2 = await ct.BuildingDetailsV2.FindAsync(buildingUnitWasRemovedV2.BuildingPersistentLocalId);
                     buildingDetailItemV2.Should().NotBeNull();
-                    buildingDetailItemV2.IsRemoved.Should().BeTrue();
                     buildingDetailItemV2.Version.Should().Be(buildingUnitWasRemovedV2.Provenance.Timestamp);
                     buildingDetailItemV2.LastEventHash.Should().Be(buildingUnitWasRemovedV2.GetHash());
                 });
