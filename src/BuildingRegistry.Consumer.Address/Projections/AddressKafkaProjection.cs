@@ -55,6 +55,12 @@ namespace BuildingRegistry.Consumer.Address.Projections
                 address.Status = AddressStatus.Rejected;
             });
 
+            When<AddressWasRejectedBecauseStreetNameWasRejected>(async (context, message, ct) =>
+            {
+                var address = await context.AddressConsumerItems.FindAsync(message.AddressPersistentLocalId, cancellationToken: ct);
+                address.Status = AddressStatus.Rejected;
+            });
+
             When<AddressWasRejectedBecauseStreetNameWasRetired>(async (context, message, ct) =>
             {
                 var address = await context.AddressConsumerItems.FindAsync(message.AddressPersistentLocalId, cancellationToken: ct);
@@ -68,6 +74,12 @@ namespace BuildingRegistry.Consumer.Address.Projections
             });
 
             When<AddressWasRetiredBecauseHouseNumberWasRetired>(async (context, message, ct) =>
+            {
+                var address = await context.AddressConsumerItems.FindAsync(message.AddressPersistentLocalId, cancellationToken: ct);
+                address.Status = AddressStatus.Retired;
+            });
+
+            When<AddressWasRetiredBecauseStreetNameWasRejected>(async (context, message, ct) =>
             {
                 var address = await context.AddressConsumerItems.FindAsync(message.AddressPersistentLocalId, cancellationToken: ct);
                 address.Status = AddressStatus.Retired;

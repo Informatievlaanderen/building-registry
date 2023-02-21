@@ -30,6 +30,7 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo
                             await snapshotManager.FindMatchingSnapshot(
                                 message.Message.BuildingPersistentLocalId.ToString(),
                                 message.Message.Provenance.Timestamp,
+                                message.Position,
                                 throwStaleWhenGone: false,
                                 ct),
                         message.Position,
@@ -47,6 +48,7 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo
                             await snapshotManager.FindMatchingSnapshot(
                                 message.Message.BuildingPersistentLocalId.ToString(),
                                 message.Message.Provenance.Timestamp,
+                                message.Position,
                                 throwStaleWhenGone: false,
                                 ct),
                         message.Position,
@@ -59,6 +61,7 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo
                         await snapshotManager.FindMatchingSnapshot(
                             message.Message.BuildingPersistentLocalId.ToString(),
                             message.Message.Provenance.Timestamp,
+                            message.Position,
                             throwStaleWhenGone: false,
                             ct),
                     message.Position,
@@ -71,6 +74,7 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo
                         await snapshotManager.FindMatchingSnapshot(
                             message.Message.BuildingPersistentLocalId.ToString(),
                             message.Message.Provenance.Timestamp,
+                            message.Position,
                             throwStaleWhenGone: false,
                             ct),
                     message.Position,
@@ -83,6 +87,7 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo
                         await snapshotManager.FindMatchingSnapshot(
                             message.Message.BuildingPersistentLocalId.ToString(),
                             message.Message.Provenance.Timestamp,
+                            message.Position,
                             throwStaleWhenGone: false,
                             ct),
                     message.Position,
@@ -95,6 +100,7 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo
                         await snapshotManager.FindMatchingSnapshot(
                             message.Message.BuildingPersistentLocalId.ToString(),
                             message.Message.Provenance.Timestamp,
+                            message.Position,
                             throwStaleWhenGone: false,
                             ct),
                     message.Position,
@@ -107,6 +113,7 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo
                         await snapshotManager.FindMatchingSnapshot(
                             message.Message.BuildingPersistentLocalId.ToString(),
                             message.Message.Provenance.Timestamp,
+                            message.Position,
                             throwStaleWhenGone: false,
                             ct),
                     message.Position,
@@ -119,6 +126,7 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo
                         await snapshotManager.FindMatchingSnapshot(
                             message.Message.BuildingPersistentLocalId.ToString(),
                             message.Message.Provenance.Timestamp,
+                            message.Position,
                             throwStaleWhenGone: false,
                             ct),
                     message.Position,
@@ -131,6 +139,7 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo
                         await snapshotManager.FindMatchingSnapshot(
                             message.Message.BuildingPersistentLocalId.ToString(),
                             message.Message.Provenance.Timestamp,
+                            message.Position,
                             throwStaleWhenGone: false,
                             ct),
                     message.Position,
@@ -148,6 +157,7 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo
                         await snapshotManager.FindMatchingSnapshot(
                             message.Message.BuildingPersistentLocalId.ToString(),
                             message.Message.Provenance.Timestamp,
+                            message.Position,
                             throwStaleWhenGone: false,
                             ct),
                     message.Position,
@@ -160,6 +170,7 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo
                         await snapshotManager.FindMatchingSnapshot(
                             message.Message.BuildingPersistentLocalId.ToString(),
                             message.Message.Provenance.Timestamp,
+                            message.Position,
                             throwStaleWhenGone: false,
                             ct),
                     message.Position,
@@ -172,6 +183,7 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo
                         await snapshotManager.FindMatchingSnapshot(
                             message.Message.BuildingPersistentLocalId.ToString(),
                             message.Message.Provenance.Timestamp,
+                            message.Position,
                             throwStaleWhenGone: false,
                             ct),
                     message.Position,
@@ -184,6 +196,7 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo
                         await snapshotManager.FindMatchingSnapshot(
                             message.Message.BuildingPersistentLocalId.ToString(),
                             message.Message.Provenance.Timestamp,
+                            message.Position,
                             throwStaleWhenGone: false,
                             ct),
                     message.Position,
