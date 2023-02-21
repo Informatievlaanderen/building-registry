@@ -1,3 +1,10 @@
+# [3.60.0](https://github.com/informatievlaanderen/building-registry/compare/v3.59.4...v3.60.0) (2023-02-21)
+
+
+### Features
+
+* consume streetname rejected address events ([5add190](https://github.com/informatievlaanderen/building-registry/commit/5add1903ce262468671abd83ea4ed3f4cc9ab9fa))
+
 ## [3.59.4](https://github.com/informatievlaanderen/building-registry/compare/v3.59.3...v3.59.4) (2023-02-20)
 
 
