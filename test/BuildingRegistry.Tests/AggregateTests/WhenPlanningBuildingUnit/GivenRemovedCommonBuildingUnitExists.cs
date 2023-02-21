@@ -27,6 +27,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuildingUnit
         public void WithNoOtherNonRemovedPlannedOrRealizedBuildingUnit_ThenNothingForCommonBuildingUnit()
         {
             var command = Fixture.Create<PlanBuildingUnit>()
+                .WithPersistentLocalId(new BuildingUnitPersistentLocalId(789))
                 .WithoutPosition()
                 .WithDeviation(false);
 
