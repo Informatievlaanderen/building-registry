@@ -1,3 +1,10 @@
+## [3.60.1](https://github.com/informatievlaanderen/building-registry/compare/v3.60.0...v3.60.1) (2023-02-23)
+
+
+### Bug Fixes
+
+* use new ci flow ([31f264d](https://github.com/informatievlaanderen/building-registry/commit/31f264d20f69f379d4fef36d961037f964c48d29))
+
 # [3.60.0](https://github.com/informatievlaanderen/building-registry/compare/v3.59.4...v3.60.0) (2023-02-21)
 
 

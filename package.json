@@ -1,6 +1,6 @@
 {
   "name": "building-registry",
-  "version": "3.60.0",
+  "version": "3.60.1",
   "description": "Authentic base registry containing all buildings of Flanders.",
   "author": "Basisregisters Vlaanderen",
   "license": "EUPL-1.2",
@@ -119,7 +119,7 @@
       {
         "path": "@semantic-release/npm",
         "npmPublish": false
-      },      
+      },
       {
         "path": "@semantic-release/git",
         "assets": [
