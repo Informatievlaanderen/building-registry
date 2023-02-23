@@ -26,7 +26,8 @@
             _fixture.Customize(new WithBuildingUnitFunction());
             _fixture.Customize(new WithBuildingUnitStatus());
 
-            _fakeBackOfficeContext = new FakeBackOfficeContextFactory(dontDispose: true).CreateDbContext(Array.Empty<string>());
+            _fakeBackOfficeContext =
+                new FakeBackOfficeContextFactory(dontDispose: true).CreateDbContext(Array.Empty<string>());
             BackOfficeContextMock
                 .Setup(x => x.CreateDbContextAsync(It.IsAny<CancellationToken>()))
                 .ReturnsAsync(_fakeBackOfficeContext);
@@ -41,7 +42,9 @@
                 .Given(buildingUnitWasPlannedV2)
                 .Then(async _ =>
                 {
-                    var result = await _fakeBackOfficeContext.BuildingUnitBuildings.FindAsync(buildingUnitWasPlannedV2.BuildingUnitPersistentLocalId);
+                    var result =
+                        await _fakeBackOfficeContext.BuildingUnitBuildings.FindAsync(buildingUnitWasPlannedV2
+                            .BuildingUnitPersistentLocalId);
 
                     result.Should().NotBeNull();
                     result!.BuildingPersistentLocalId.Should().Be(buildingUnitWasPlannedV2.BuildingPersistentLocalId);
@@ -62,7 +65,9 @@
                 .Given(buildingUnitWasPlannedV2)
                 .Then(async _ =>
                 {
-                    var result = await _fakeBackOfficeContext.BuildingUnitBuildings.FindAsync(buildingUnitWasPlannedV2.BuildingUnitPersistentLocalId);
+                    var result =
+                        await _fakeBackOfficeContext.BuildingUnitBuildings.FindAsync(buildingUnitWasPlannedV2
+                            .BuildingUnitPersistentLocalId);
 
                     result.Should().NotBeNull();
                     result.Should().BeSameAs(expectedRelation);
@@ -78,10 +83,13 @@
                 .Given(commonBuildingUnitWasAddedV2)
                 .Then(async _ =>
                 {
-                    var result = await _fakeBackOfficeContext.BuildingUnitBuildings.FindAsync(commonBuildingUnitWasAddedV2.BuildingUnitPersistentLocalId);
+                    var result =
+                        await _fakeBackOfficeContext.BuildingUnitBuildings.FindAsync(commonBuildingUnitWasAddedV2
+                            .BuildingUnitPersistentLocalId);
 
                     result.Should().NotBeNull();
-                    result!.BuildingPersistentLocalId.Should().Be(commonBuildingUnitWasAddedV2.BuildingPersistentLocalId);
+                    result!.BuildingPersistentLocalId.Should()
+                        .Be(commonBuildingUnitWasAddedV2.BuildingPersistentLocalId);
                 });
         }
 
@@ -99,7 +107,9 @@
                 .Given(commonBuildingUnitWasAddedV2)
                 .Then(async _ =>
                 {
-                    var result = await _fakeBackOfficeContext.BuildingUnitBuildings.FindAsync(commonBuildingUnitWasAddedV2.BuildingUnitPersistentLocalId);
+                    var result =
+                        await _fakeBackOfficeContext.BuildingUnitBuildings.FindAsync(commonBuildingUnitWasAddedV2
+                            .BuildingUnitPersistentLocalId);
 
                     result.Should().NotBeNull();
                     result.Should().BeSameAs(expectedRelation);
@@ -116,10 +126,12 @@
                 .Then(async _ =>
                 {
                     var result = await _fakeBackOfficeContext.BuildingUnitAddressRelation.FindAsync(
-                        buildingUnitAddressWasAttachedV2.BuildingUnitPersistentLocalId, buildingUnitAddressWasAttachedV2.AddressPersistentLocalId);
+                        buildingUnitAddressWasAttachedV2.BuildingUnitPersistentLocalId,
+                        buildingUnitAddressWasAttachedV2.AddressPersistentLocalId);
 
                     result.Should().NotBeNull();
-                    result!.BuildingPersistentLocalId.Should().Be(buildingUnitAddressWasAttachedV2.BuildingPersistentLocalId);
+                    result!.BuildingPersistentLocalId.Should()
+                        .Be(buildingUnitAddressWasAttachedV2.BuildingPersistentLocalId);
                 });
         }
 
@@ -139,7 +151,8 @@
                 .Then(async _ =>
                 {
                     var result = await _fakeBackOfficeContext.BuildingUnitAddressRelation.FindAsync(
-                        buildingUnitAddressWasAttachedV2.BuildingUnitPersistentLocalId, buildingUnitAddressWasAttachedV2.AddressPersistentLocalId);
+                        buildingUnitAddressWasAttachedV2.BuildingUnitPersistentLocalId,
+                        buildingUnitAddressWasAttachedV2.AddressPersistentLocalId);
 
                     result.Should().NotBeNull();
                     result.Should().BeSameAs(expectedRelation);
@@ -147,7 +160,7 @@
         }
 
         [Fact]
-        public async Task GivenBuildingUnitAddressWasDetachedV2_ThenRelationIsRemovedAdded()
+        public async Task GivenBuildingUnitAddressWasDetachedV2_ThenRelationIsRemoved()
         {
             var buildingUnitAddressWasDetachedV2 = _fixture.Create<BuildingUnitAddressWasDetachedV2>();
 
@@ -162,7 +175,8 @@
                 .Then(async _ =>
                 {
                     var result = await _fakeBackOfficeContext.BuildingUnitAddressRelation.FindAsync(
-                        buildingUnitAddressWasDetachedV2.BuildingUnitPersistentLocalId, buildingUnitAddressWasDetachedV2.AddressPersistentLocalId);
+                        buildingUnitAddressWasDetachedV2.BuildingUnitPersistentLocalId,
+                        buildingUnitAddressWasDetachedV2.AddressPersistentLocalId);
 
                     result.Should().BeNull();
                 });
@@ -178,7 +192,74 @@
                 .Then(async _ =>
                 {
                     var result = await _fakeBackOfficeContext.BuildingUnitAddressRelation.FindAsync(
-                        buildingUnitAddressWasDetachedV2.BuildingUnitPersistentLocalId, buildingUnitAddressWasDetachedV2.AddressPersistentLocalId);
+                        buildingUnitAddressWasDetachedV2.BuildingUnitPersistentLocalId,
+                        buildingUnitAddressWasDetachedV2.AddressPersistentLocalId);
+
+                    result.Should().BeNull();
+                });
+        }
+
+        [Fact]
+        public async Task GivenBuildingUnitAddressWasDetachedBecauseAddressWasRejected_ThenRelationIsRemoved()
+        {
+            var @event = _fixture.Create<BuildingUnitAddressWasDetachedBecauseAddressWasRejected>();
+
+            await _fakeBackOfficeContext.AddIdempotentBuildingUnitAddressRelation(
+                new BuildingPersistentLocalId(@event.BuildingPersistentLocalId),
+                new BuildingUnitPersistentLocalId(@event.BuildingUnitPersistentLocalId),
+                new AddressPersistentLocalId(@event.AddressPersistentLocalId),
+                CancellationToken.None);
+
+            await Sut
+                .Given(@event)
+                .Then(async _ =>
+                {
+                    var result = await _fakeBackOfficeContext.BuildingUnitAddressRelation.FindAsync(
+                        @event.BuildingUnitPersistentLocalId, @event.AddressPersistentLocalId);
+
+                    result.Should().BeNull();
+                });
+        }
+
+        [Fact]
+        public async Task GivenBuildingUnitAddressWasDetachedBecauseAddressWasRetired_ThenRelationIsRemoved()
+        {
+            var @event = _fixture.Create<BuildingUnitAddressWasDetachedBecauseAddressWasRetired>();
+
+            await _fakeBackOfficeContext.AddIdempotentBuildingUnitAddressRelation(
+                new BuildingPersistentLocalId(@event.BuildingPersistentLocalId),
+                new BuildingUnitPersistentLocalId(@event.BuildingUnitPersistentLocalId),
+                new AddressPersistentLocalId(@event.AddressPersistentLocalId),
+                CancellationToken.None);
+
+            await Sut
+                .Given(@event)
+                .Then(async _ =>
+                {
+                    var result = await _fakeBackOfficeContext.BuildingUnitAddressRelation.FindAsync(
+                        @event.BuildingUnitPersistentLocalId, @event.AddressPersistentLocalId);
+
+                    result.Should().BeNull();
+                });
+        }
+
+        [Fact]
+        public async Task GivenBuildingUnitAddressWasDetachedBecauseAddressWasRemoved_ThenRelationIsRemoved()
+        {
+            var @event = _fixture.Create<BuildingUnitAddressWasDetachedBecauseAddressWasRemoved>();
+
+            await _fakeBackOfficeContext.AddIdempotentBuildingUnitAddressRelation(
+                new BuildingPersistentLocalId(@event.BuildingPersistentLocalId),
+                new BuildingUnitPersistentLocalId(@event.BuildingUnitPersistentLocalId),
+                new AddressPersistentLocalId(@event.AddressPersistentLocalId),
+                CancellationToken.None);
+
+            await Sut
+                .Given(@event)
+                .Then(async _ =>
+                {
+                    var result = await _fakeBackOfficeContext.BuildingUnitAddressRelation.FindAsync(
+                        @event.BuildingUnitPersistentLocalId, @event.AddressPersistentLocalId);
 
                     result.Should().BeNull();
                 });
