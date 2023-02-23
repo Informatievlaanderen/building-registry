@@ -85,20 +85,10 @@ Target.create "Pack_Solution" (fun _ ->
   ] |> List.iter pack)
 
 Target.create "Containerize_Projector" (fun _ -> containerize "BuildingRegistry.Projector" "projector")
-Target.create "PushContainer_Projector" (fun _ -> push "projector")
-
 Target.create "Containerize_ApiLegacy" (fun _ -> containerize "BuildingRegistry.Api.Legacy" "api-legacy")
-Target.create "PushContainer_ApiLegacy" (fun _ -> push "api-legacy")
-
 Target.create "Containerize_ApiOslo" (fun _ -> containerize "BuildingRegistry.Api.Oslo" "api-oslo")
-Target.create "PushContainer_ApiOslo" (fun _ -> push "api-oslo")
-
 Target.create "Containerize_ApiExtract" (fun _ -> containerize "BuildingRegistry.Api.Extract" "api-extract")
-Target.create "PushContainer_ApiExtract" (fun _ -> push "api-extract")
-
 Target.create "Containerize_ApiBackOffice" (fun _ -> containerize "BuildingRegistry.Api.BackOffice" "api-backoffice")
-Target.create "PushContainer_ApiBackOffice" (fun _ -> push "api-backoffice")
-
 Target.create "Containerize_ApiCrabImport" (fun _ ->
   let dist = (buildDir @@ "BuildingRegistry.Api.CrabImport" @@ "linux")
   let source = "assets" @@ "sss"
@@ -107,32 +97,14 @@ Target.create "Containerize_ApiCrabImport" (fun _ ->
   //Shell.copyFile dist (source @@ "SqlStreamStore.MsSql.dll")
 
   containerize "BuildingRegistry.Api.CrabImport" "api-crab-import")
-
-Target.create "PushContainer_ApiCrabImport" (fun _ -> push "api-crab-import")
-
-Target.create "Containerize_ProjectionsLegacy" (fun _ -> containerize "BuildingRegistry.Projections.Legacy" "projections-legacy")
-Target.create "PushContainer_ProjectionsLegacy" (fun _ -> push "projections-legacy")
-
-Target.create "Containerize_ProjectionsExtract" (fun _ -> containerize "BuildingRegistry.Projections.Extract" "projections-extract")
-Target.create "PushContainer_ProjectionsExtract" (fun _ -> push "projections-extract")
-
 Target.create "Containerize_ProjectionsSyndication" (fun _ -> containerize "BuildingRegistry.Projections.Syndication" "projections-syndication")
-Target.create "PushContainer_ProjectionsSyndication" (fun _ -> push "projections-syndication")
-
 Target.create "Containerize_ProjectionsBackOffice" (fun _ -> containerize "BuildingRegistry.Projections.BackOffice" "projections-backoffice")
-Target.create "PushContainer_ProjectionsBackOffice" (fun _ -> push "projections-backoffice")
-
 Target.create "Containerize_ConsumerAddress" (fun _ -> containerize "BuildingRegistry.Consumer.Address" "consumer-address")
-Target.create "PushContainer_ConsumerAddress" (fun _ -> push "consumer-address")
-
 Target.create "Containerize_MigratorBuilding" (fun _ -> containerize "BuildingRegistry.Migrator.Building" "migrator-building")
-Target.create "PushContainer_MigratorBuilding" (fun _ -> push "migrator-building")
-
 Target.create "Containerize_Producer" (fun _ -> containerize "BuildingRegistry.Producer" "producer")
-Target.create "PushContainer_Producer" (fun _ -> push "producer")
-
 Target.create "Containerize_ProducerSnapshotOslo" (fun _ -> containerize "BuildingRegistry.Producer.Snapshot.Oslo" "producer-snapshot-oslo")
-Target.create "PushContainer_ProducerSnapshotOslo" (fun _ -> push "producer-snapshot-oslo")
+
+Target.create "SetAssemblyVersions" (fun _ -> setVersions "SolutionInfo.cs")
 // --------------------------------------------------------------------------------
 
 Target.create "Build" ignore
@@ -140,7 +112,6 @@ Target.create "Test" ignore
 Target.create "Publish" ignore
 Target.create "Pack" ignore
 Target.create "Containerize" ignore
-Target.create "Push" ignore
 
 "NpmInstall"
   ==> "DotNetCli"
@@ -162,37 +133,20 @@ Target.create "Push" ignore
   ==> "Pack"
 
 "Pack"
-  ==> "Containerize_Projector"
-  ==> "Containerize_ApiLegacy"
-  ==> "Containerize_ApiOslo"
-  ==> "Containerize_ApiExtract"
-  ==> "Containerize_ApiCrabImport"
-  ==> "Containerize_ApiBackOffice"
-  ==> "Containerize_ProjectionsSyndication"
-  ==> "Containerize_ProjectionsBackOffice"
-  ==> "Containerize_ConsumerAddress"
-  ==> "Containerize_MigratorBuilding"
-  ==> "Containerize_Producer"
-  ==> "Containerize_ProducerSnapshotOslo"
+  // ==> "Containerize_Projector"
+  // ==> "Containerize_ApiLegacy"
+  // ==> "Containerize_ApiOslo"
+  // ==> "Containerize_ApiExtract"
+  // ==> "Containerize_ApiCrabImport"
+  // ==> "Containerize_ApiBackOffice"
+  // ==> "Containerize_ProjectionsSyndication"
+  // ==> "Containerize_ProjectionsBackOffice"
+  // ==> "Containerize_ConsumerAddress"
+  // ==> "Containerize_MigratorBuilding"
+  // ==> "Containerize_Producer"
+  // ==> "Containerize_ProducerSnapshotOslo"
   ==> "Containerize"
 // Possibly add more projects to containerize here
-
-"Containerize"
-  ==> "DockerLogin"
-  ==> "PushContainer_Projector"
-  ==> "PushContainer_ApiLegacy"
-  ==> "PushContainer_ApiOslo"
-  ==> "PushContainer_ApiExtract"
-  ==> "PushContainer_ApiCrabImport"
-  ==> "PushContainer_ApiBackOffice"
-  ==> "PushContainer_ProjectionsSyndication"
-  ==> "PushContainer_ProjectionsBackOffice"
-  ==> "PushContainer_ConsumerAddress"
-  ==> "PushContainer_MigratorBuilding"
-  ==> "PushContainer_Producer"
-  ==> "PushContainer_ProducerSnapshotOslo"
-  ==> "Push"
-// Possibly add more projects to push here
 
 // By default we build & test
 Target.runOrDefault "Test"
