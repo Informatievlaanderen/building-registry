@@ -43,6 +43,33 @@
                     new AddressPersistentLocalId(message.Message.AddressPersistentLocalId),
                     cancellationToken);
             });
+
+            When<Envelope<BuildingUnitAddressWasDetachedBecauseAddressWasRejected>>(async (_, message, cancellationToken) =>
+            {
+                await using var backOfficeContext = await backOfficeContextFactory.CreateDbContextAsync(cancellationToken);
+                await backOfficeContext.RemoveIdempotentBuildingUnitAddressRelation(
+                    new BuildingUnitPersistentLocalId(message.Message.BuildingUnitPersistentLocalId),
+                    new AddressPersistentLocalId(message.Message.AddressPersistentLocalId),
+                    cancellationToken);
+            });
+
+            When<Envelope<BuildingUnitAddressWasDetachedBecauseAddressWasRetired>>(async (_, message, cancellationToken) =>
+            {
+                await using var backOfficeContext = await backOfficeContextFactory.CreateDbContextAsync(cancellationToken);
+                await backOfficeContext.RemoveIdempotentBuildingUnitAddressRelation(
+                    new BuildingUnitPersistentLocalId(message.Message.BuildingUnitPersistentLocalId),
+                    new AddressPersistentLocalId(message.Message.AddressPersistentLocalId),
+                    cancellationToken);
+            });
+
+            When<Envelope<BuildingUnitAddressWasDetachedBecauseAddressWasRemoved>>(async (_, message, cancellationToken) =>
+            {
+                await using var backOfficeContext = await backOfficeContextFactory.CreateDbContextAsync(cancellationToken);
+                await backOfficeContext.RemoveIdempotentBuildingUnitAddressRelation(
+                    new BuildingUnitPersistentLocalId(message.Message.BuildingUnitPersistentLocalId),
+                    new AddressPersistentLocalId(message.Message.AddressPersistentLocalId),
+                    cancellationToken);
+            });
         }
     }
 }
