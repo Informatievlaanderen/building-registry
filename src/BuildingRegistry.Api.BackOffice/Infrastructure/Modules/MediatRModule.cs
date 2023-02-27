@@ -15,13 +15,6 @@ namespace BuildingRegistry.Api.BackOffice.Infrastructure.Modules
                 .As<IMediator>()
                 .InstancePerLifetimeScope();
 
-            // request & notification handlers
-            builder.Register<ServiceFactory>(context =>
-            {
-                var ctx = context.Resolve<IComponentContext>();
-                return type => ctx.Resolve(type);
-            });
-
             builder.RegisterAssemblyTypes(typeof(PlanBuildingSqsHandler).GetTypeInfo().Assembly).AsImplementedInterfaces();
         }
     }

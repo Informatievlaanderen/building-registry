@@ -21,13 +21,6 @@ namespace BuildingRegistry.Api.Extract.Infrastructure.Modules
                 .As<IMediator>()
                 .InstancePerLifetimeScope();
 
-            // request & notification handlers
-            builder.Register<ServiceFactory>(context =>
-            {
-                var ctx = context.Resolve<IComponentContext>();
-                return type => ctx.Resolve(type);
-            });
-
             if (_useProjectionsV2)
             {
                 builder.RegisterType<GetBuildingsHandlerV2>().AsImplementedInterfaces();
