@@ -1,3 +1,12 @@
+## [3.60.2](https://github.com/informatievlaanderen/building-registry/compare/v3.60.1...v3.60.2) (2023-02-27)
+
+
+### Bug Fixes
+
+* add missing detach address events in backoffice projections ([d13139a](https://github.com/informatievlaanderen/building-registry/commit/d13139ab91a339d5d448f8004f31b2c8d0846af7))
+* bump grar common to 18.1.1 ([0854d80](https://github.com/informatievlaanderen/building-registry/commit/0854d8023f0800ff3ac691c1c183756733b18a9e))
+* missing mediatr dependency ([c76c0db](https://github.com/informatievlaanderen/building-registry/commit/c76c0db22f76a546a1096db0551dc0972d9c402b))
+
 ## [3.60.1](https://github.com/informatievlaanderen/building-registry/compare/v3.60.0...v3.60.1) (2023-02-23)
 
 
