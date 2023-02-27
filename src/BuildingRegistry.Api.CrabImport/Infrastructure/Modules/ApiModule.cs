@@ -41,6 +41,7 @@ namespace BuildingRegistry.Api.CrabImport.Infrastructure.Modules
             _services.RegisterModule(new DataDogModule(_configuration));
 
             builder
+                .RegisterModule(new MediatRModule())
                 .RegisterModule(new EnvelopeModule())
                 .RegisterModule(new LegacyCommandHandlingModule(_configuration));
 
