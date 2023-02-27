@@ -1,4 +1,4 @@
-﻿namespace BuildingRegistry.Api.CrabImport.Infrastructure.Modules
+namespace BuildingRegistry.Api.CrabImport.Infrastructure.Modules
 {
     using System.Reflection;
     using Autofac;
@@ -14,13 +14,6 @@
                 .RegisterType<Mediator>()
                 .As<IMediator>()
                 .InstancePerLifetimeScope();
-
-            // request & notification handlers
-            builder.Register<ServiceFactory>(context =>
-            {
-                var ctx = context.Resolve<IComponentContext>();
-                return type => ctx.Resolve(type);
-            });
 
             builder.RegisterAssemblyTypes(typeof(PostHandler).GetTypeInfo().Assembly).AsImplementedInterfaces();
         }
