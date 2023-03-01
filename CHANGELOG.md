@@ -1,3 +1,17 @@
+# [3.61.0](https://github.com/informatievlaanderen/building-registry/compare/v3.60.2...v3.61.0) (2023-03-01)
+
+
+### Bug Fixes
+
+* bump mediatr ([d62c103](https://github.com/informatievlaanderen/building-registry/commit/d62c10395b103799295cceb41dc8d67392b4c003))
+* no merge group for ksql ([cbf5ffc](https://github.com/informatievlaanderen/building-registry/commit/cbf5ffc499a8bbbfd52acc458a3f430d330ba603))
+* remove ServiceFactory block ([3fe9677](https://github.com/informatievlaanderen/building-registry/commit/3fe96779d170e98da1df1a6ac9e70b603d7d2a8e))
+
+
+### Features
+
+* add v2 examples ([#937](https://github.com/informatievlaanderen/building-registry/issues/937)) ([477ddbd](https://github.com/informatievlaanderen/building-registry/commit/477ddbd65fb94de94e718550e9b4d0dd608821c3))
+
 ## [3.60.2](https://github.com/informatievlaanderen/building-registry/compare/v3.60.1...v3.60.2) (2023-02-27)
 
 
