@@ -123,16 +123,13 @@ namespace BuildingRegistry.Api.Legacy.Building.Detail
 
     public class BuildingNotFoundResponseExamples : IExamplesProvider<ProblemDetails>
     {
-        protected string ApiVersion { get; }
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly ProblemDetailsHelper _problemDetailsHelper;
 
         public BuildingNotFoundResponseExamples(
             IHttpContextAccessor httpContextAccessor,
-            ProblemDetailsHelper problemDetailsHelper,
-            string apiVersion = "v1")
+            ProblemDetailsHelper problemDetailsHelper)
         {
-            ApiVersion = apiVersion;
             _httpContextAccessor = httpContextAccessor;
             _problemDetailsHelper = problemDetailsHelper;
         }
@@ -144,30 +141,19 @@ namespace BuildingRegistry.Api.Legacy.Building.Detail
                 HttpStatus = StatusCodes.Status404NotFound,
                 Title = ProblemDetails.DefaultTitle,
                 Detail = "Onbestaand gebouw.",
-                ProblemInstanceUri = _problemDetailsHelper.GetInstanceUri(_httpContextAccessor.HttpContext, ApiVersion)
+                ProblemInstanceUri = _problemDetailsHelper.GetInstanceUri(_httpContextAccessor.HttpContext, "v1")
             };
-    }
-
-    public class BuildingNotFoundResponseExamplesV2 : BuildingNotFoundResponseExamples
-    {
-        public BuildingNotFoundResponseExamplesV2(
-            IHttpContextAccessor httpContextAccessor,
-            ProblemDetailsHelper problemDetailsHelper) : base(httpContextAccessor, problemDetailsHelper, "v2")
-        { }
     }
 
     public class BuildingGoneResponseExamples : IExamplesProvider<ProblemDetails>
     {
-        protected string ApiVersion { get; }
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly ProblemDetailsHelper _problemDetailsHelper;
 
         public BuildingGoneResponseExamples(
             IHttpContextAccessor httpContextAccessor,
-            ProblemDetailsHelper problemDetailsHelper,
-            string apiVersion = "v1")
+            ProblemDetailsHelper problemDetailsHelper)
         {
-            ApiVersion = apiVersion;
             _httpContextAccessor = httpContextAccessor;
             _problemDetailsHelper = problemDetailsHelper;
         }
@@ -179,15 +165,7 @@ namespace BuildingRegistry.Api.Legacy.Building.Detail
                 HttpStatus = StatusCodes.Status410Gone,
                 Title = ProblemDetails.DefaultTitle,
                 Detail = "Verwijderd gebouw.",
-                ProblemInstanceUri = _problemDetailsHelper.GetInstanceUri(_httpContextAccessor.HttpContext, ApiVersion)
+                ProblemInstanceUri = _problemDetailsHelper.GetInstanceUri(_httpContextAccessor.HttpContext, "v1")
             };
-    }
-
-    public class BuildingGoneResponseExamplesV2 : BuildingGoneResponseExamples
-    {
-        public BuildingGoneResponseExamplesV2(
-            IHttpContextAccessor httpContextAccessor,
-            ProblemDetailsHelper problemDetailsHelper) : base(httpContextAccessor, problemDetailsHelper, "v2")
-        { }
     }
 }

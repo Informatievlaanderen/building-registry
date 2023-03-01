@@ -134,12 +134,12 @@ namespace BuildingRegistry.Api.Oslo.BuildingUnit.Detail
             );
     }
 
-    public class BuildingUnitNotFoundOsloResponseExamples : IExamplesProvider<ProblemDetails>
+     public class BuildingUnitNotFoundResponseExamples : IExamplesProvider<ProblemDetails>
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly ProblemDetailsHelper _problemDetailsHelper;
 
-        public BuildingUnitNotFoundOsloResponseExamples(
+        public BuildingUnitNotFoundResponseExamples(
             IHttpContextAccessor httpContextAccessor,
             ProblemDetailsHelper problemDetailsHelper)
         {
@@ -154,16 +154,16 @@ namespace BuildingRegistry.Api.Oslo.BuildingUnit.Detail
                 HttpStatus = StatusCodes.Status404NotFound,
                 Title = ProblemDetails.DefaultTitle,
                 Detail = "Onbestaande gebouweenheid.",
-                ProblemInstanceUri = _problemDetailsHelper.GetInstanceUri(_httpContextAccessor.HttpContext)
+                ProblemInstanceUri = _problemDetailsHelper.GetInstanceUri(_httpContextAccessor.HttpContext, "v2")
             };
     }
 
-    public class BuildingUnitGoneOsloResponseExamples : IExamplesProvider<ProblemDetails>
+     public class BuildingUnitGoneResponseExamples : IExamplesProvider<ProblemDetails>
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly ProblemDetailsHelper _problemDetailsHelper;
 
-        public BuildingUnitGoneOsloResponseExamples(
+        public BuildingUnitGoneResponseExamples(
             IHttpContextAccessor httpContextAccessor,
             ProblemDetailsHelper problemDetailsHelper)
         {
@@ -178,7 +178,7 @@ namespace BuildingRegistry.Api.Oslo.BuildingUnit.Detail
                 HttpStatus = StatusCodes.Status410Gone,
                 Title = ProblemDetails.DefaultTitle,
                 Detail = "Verwijderde gebouweenheid.",
-                ProblemInstanceUri = _problemDetailsHelper.GetInstanceUri(_httpContextAccessor.HttpContext)
+                ProblemInstanceUri = _problemDetailsHelper.GetInstanceUri(_httpContextAccessor.HttpContext, "v2")
             };
     }
 }

@@ -100,8 +100,8 @@ namespace BuildingRegistry.Api.Oslo.BuildingUnit
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status410Gone)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
         [SwaggerResponseExample(StatusCodes.Status200OK, typeof(BuildingUnitOsloResponseExamples))]
-        [SwaggerResponseExample(StatusCodes.Status404NotFound, typeof(BuildingUnitNotFoundOsloResponseExamples))]
-        [SwaggerResponseExample(StatusCodes.Status410Gone, typeof(BuildingUnitGoneOsloResponseExamples))]
+        [SwaggerResponseExample(StatusCodes.Status404NotFound, typeof(BuildingUnitNotFoundResponseExamples))]
+        [SwaggerResponseExample(StatusCodes.Status410Gone, typeof(BuildingUnitGoneResponseExamples))]
         [SwaggerResponseExample(StatusCodes.Status500InternalServerError, typeof(InternalServerErrorResponseExamples))]
         public async Task<IActionResult> Get(
             [FromServices] LegacyContext context,
