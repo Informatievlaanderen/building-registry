@@ -1,3 +1,10 @@
+# [3.62.0](https://github.com/informatievlaanderen/building-registry/compare/v3.61.0...v3.62.0) (2023-03-06)
+
+
+### Features
+
+* detach address when address is removed because streetname was removed ([4c2784d](https://github.com/informatievlaanderen/building-registry/commit/4c2784df306f07328f0bc9631942648e101202ee))
+
 # [3.61.0](https://github.com/informatievlaanderen/building-registry/compare/v3.60.2...v3.61.0) (2023-03-01)
 
 
