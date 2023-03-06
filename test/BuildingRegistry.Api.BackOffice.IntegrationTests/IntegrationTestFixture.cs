@@ -43,7 +43,7 @@ namespace BuildingRegistry.Api.BackOffice.IntegrationTests
 
         public async Task InitializeAsync()
         {
-            _ = DockerComposer.Compose("sqlserver.yml", "building-integration-tests");
+            using var _ = DockerComposer.Compose("sqlserver.yml", "building-integration-tests");
             await WaitForSqlServerToBecomeAvailable();
 
             await CreateDatabase();
