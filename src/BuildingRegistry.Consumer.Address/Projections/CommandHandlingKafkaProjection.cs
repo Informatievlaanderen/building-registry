@@ -132,6 +132,15 @@ namespace BuildingRegistry.Consumer.Address.Projections
                     ct);
             });
 
+            When<AddressWasRemovedBecauseStreetNameWasRemoved>(async (commandHandler, message, ct) =>
+            {
+                await DetachBecauseRemoved(
+                    commandHandler,
+                    new AddressPersistentLocalId(message.AddressPersistentLocalId),
+                    message.Provenance,
+                    ct);
+            });
+
             When<AddressWasRemovedV2>(async (commandHandler, message, ct) =>
             {
                 await DetachBecauseRemoved(
