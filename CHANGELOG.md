@@ -1,3 +1,10 @@
+## [3.62.1](https://github.com/informatievlaanderen/building-registry/compare/v3.62.0...v3.62.1) (2023-03-07)
+
+
+### Bug Fixes
+
+* make producer reliable ([fab5228](https://github.com/informatievlaanderen/building-registry/commit/fab5228240e361c6294cb6a0108b9305a0c3cf48))
+
 # [3.62.0](https://github.com/informatievlaanderen/building-registry/compare/v3.61.0...v3.62.0) (2023-03-06)
 
 
