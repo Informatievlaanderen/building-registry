@@ -43,7 +43,7 @@ namespace BuildingRegistry.Api.Legacy.BuildingUnit.List
                     .ToList(),
                 Volgende = pagedBuildingUnits
                     .PaginationInfo
-                    .BuildNextUri(request.ResponseOptions.Value.GebouweenheidVolgendeUrl)
+                    .BuildNextUri(units.Count, request.ResponseOptions.Value.GebouweenheidVolgendeUrl)
             };
         }
     }

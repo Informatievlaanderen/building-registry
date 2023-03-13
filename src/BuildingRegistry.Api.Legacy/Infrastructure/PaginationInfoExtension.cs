@@ -5,12 +5,12 @@ namespace BuildingRegistry.Api.Legacy.Infrastructure
 
     public static class PaginationInfoExtension
     {
-        public static Uri BuildNextUri(this PaginationInfo paginationInfo, string nextUrlBase)
+        public static Uri? BuildNextUri(this PaginationInfo paginationInfo, int itemsInCollection, string nextUrlBase)
         {
             var offset = paginationInfo.Offset;
             var limit = paginationInfo.Limit;
 
-            return paginationInfo.HasNextPage
+            return paginationInfo.HasNextPage(itemsInCollection)
                 ? new Uri(string.Format(nextUrlBase, offset + limit, limit))
                 : null;
         }

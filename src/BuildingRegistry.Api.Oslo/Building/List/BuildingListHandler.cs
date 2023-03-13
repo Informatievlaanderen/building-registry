@@ -42,7 +42,7 @@ namespace BuildingRegistry.Api.Oslo.Building.List
                         x.Status.Value.MapToGebouwStatus(),
                         x.Version.ToBelgianDateTimeOffset()))
                     .ToList(),
-                Volgende = pagedBuildings.PaginationInfo.BuildNextUri(request.ResponseOptions.Value.GebouwVolgendeUrl),
+                Volgende = pagedBuildings.PaginationInfo.BuildNextUri(buildings.Count, request.ResponseOptions.Value.GebouwVolgendeUrl),
                 Context = request.ResponseOptions.Value.ContextUrlList
             };
         }

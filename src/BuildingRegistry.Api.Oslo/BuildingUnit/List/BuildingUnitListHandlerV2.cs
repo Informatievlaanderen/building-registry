@@ -48,7 +48,7 @@ namespace BuildingRegistry.Api.Oslo.BuildingUnit.List
                     .ToList(),
                 Volgende = pagedBuildingUnits
                     .PaginationInfo
-                    .BuildNextUri(request.ResponseOptions.Value.GebouweenheidVolgendeUrl),
+                    .BuildNextUri(units.Count, request.ResponseOptions.Value.GebouweenheidVolgendeUrl),
                 Context = request.ResponseOptions.Value.ContextUrlUnitList
             };
         }
