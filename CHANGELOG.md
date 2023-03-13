@@ -1,3 +1,10 @@
+## [3.62.2](https://github.com/informatievlaanderen/building-registry/compare/v3.62.1...v3.62.2) (2023-03-13)
+
+
+### Bug Fixes
+
+* ksl geolocation GEBOUWEENHEDEN_OBJECTIDS ([d8fa16e](https://github.com/informatievlaanderen/building-registry/commit/d8fa16e73b43c189fe74ea656a5b2a198cee4f80))
+
 ## [3.62.1](https://github.com/informatievlaanderen/building-registry/compare/v3.62.0...v3.62.1) (2023-03-07)
 
 
