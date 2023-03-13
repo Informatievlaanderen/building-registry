@@ -38,7 +38,7 @@ namespace BuildingRegistry.Api.Legacy.Building.List
                         x.Status.Map(),
                         x.Version.ToBelgianDateTimeOffset()))
                     .ToList(),
-                Volgende = pagedBuildings.PaginationInfo.BuildNextUri(request.ResponseOptions.Value.GebouwVolgendeUrl)
+                Volgende = pagedBuildings.PaginationInfo.BuildNextUri(buildings.Count, request.ResponseOptions.Value.GebouwVolgendeUrl)
             };
         }
     }
