@@ -55,8 +55,7 @@ namespace BuildingRegistry.Consumer.Address
                 {
                     _logger.LogInformation("Handling next message");
 
-                    await commandHandlingProjector.ProjectAsync(commandHandler, message, stoppingToken)
-                        .ConfigureAwait(false);
+                    await commandHandlingProjector.ProjectAsync(commandHandler, message, stoppingToken).ConfigureAwait(false);
                     await addressKafkaProjection.ProjectAsync(context, message, stoppingToken).ConfigureAwait(false);
 
                     //CancellationToken.None to prevent halfway consumption
