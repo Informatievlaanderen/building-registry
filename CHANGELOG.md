@@ -1,3 +1,10 @@
+## [3.62.3](https://github.com/informatievlaanderen/building-registry/compare/v3.62.2...v3.62.3) (2023-03-14)
+
+
+### Bug Fixes
+
+* consumer address missing SequenceModule registration ([394bcf6](https://github.com/informatievlaanderen/building-registry/commit/394bcf61c8ad566a7503330d949dc600235d5891))
+
 ## [3.62.2](https://github.com/informatievlaanderen/building-registry/compare/v3.62.1...v3.62.2) (2023-03-13)
 
 
