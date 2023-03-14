@@ -150,7 +150,8 @@ namespace BuildingRegistry.Consumer.Address.Infrastructure
                     builder
                         .RegisterModule(new DataDogModule(hostContext.Configuration))
                         .RegisterModule(new CommandHandlingModule(hostContext.Configuration))
-                        .RegisterModule(new BackOfficeModule(hostContext.Configuration, services, loggerFactory));
+                        .RegisterModule(new BackOfficeModule(hostContext.Configuration, services, loggerFactory))
+                        .RegisterModule(new SequenceModule(hostContext.Configuration, services, loggerFactory));
 
                     builder
                         .RegisterType<ConsumerAddress>()
