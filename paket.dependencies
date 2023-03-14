@@ -1,5 +1,5 @@
 framework: net6.0, net472
-
+strategy: min
 source https://api.nuget.org/v3/index.json
 
 // PRODUCTION STUFF
@@ -19,6 +19,9 @@ nuget Microsoft.EntityFrameworkCore.SqlServer.NetTopologySuite 6.0.3
 nuget NetTopologySuite 2.4.0
 
 nuget Microsoft.EntityFrameworkCore.Design 6.0.3
+
+nuget AWSSDK.S3 3.7.103.26
+nuget AWSSDK.Extensions.NETCore.Setup 3.7.5
 
 // VBR STUFF
 nuget Be.Vlaanderen.Basisregisters.Build.Pipeline 6.0.5

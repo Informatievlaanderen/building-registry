@@ -1,0 +1,14 @@
+AspNetCore.HealthChecks.SqlServer
+AWSSDK.S3
+AWSSDK.Extensions.NETCore.Setup
+
+Be.Vlaanderen.Basisregisters.AcmIdm
+Be.Vlaanderen.Basisregisters.Api
+
+Be.Vlaanderen.Basisregisters.TicketingService.Abstractions
+Be.Vlaanderen.Basisregisters.TicketingService.Proxy.HttpProxy
+
+MediatR
+
+SourceLink.Embed.AllSourceFiles
+SourceLink.Copy.PdbFiles
