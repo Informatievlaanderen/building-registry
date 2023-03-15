@@ -2,7 +2,6 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
 {
     using System.Threading;
     using System.Threading.Tasks;
-    using Abstractions.Building.Validators;
     using Abstractions.BuildingUnit.Requests;
     using Abstractions.BuildingUnit.SqsRequests;
     using Abstractions.Validation;
@@ -13,7 +12,6 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Be.Vlaanderen.Basisregisters.Sqs.Exceptions;
     using BuildingRegistry.Building;
-    using BuildingRegistry.Building.Exceptions;
     using Infrastructure;
     using Microsoft.AspNetCore.Authentication.JwtBearer;
     using Microsoft.AspNetCore.Authorization;
@@ -48,15 +46,14 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
         {
             try
             {
-                if (!await ifMatchHeaderValidator
-                        .IsValidForBuildingUnit(ifMatchHeaderValue,
-                            new BuildingUnitPersistentLocalId(request.BuildingUnitPersistentLocalId), ct))
+                if (!await ifMatchHeaderValidator.IsValidForBuildingUnit(
+                        ifMatchHeaderValue, new BuildingUnitPersistentLocalId(request.BuildingUnitPersistentLocalId), ct))
                 {
                     return new PreconditionFailedResult();
                 }
 
                 var result = await Mediator.Send(
-                    new CorrectBuildingUnitRetirementSqsRequest()
+                    new CorrectBuildingUnitRetirementSqsRequest
                     {
                         Request = request,
                         Metadata = GetMetadata(),
@@ -74,11 +71,6 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
             catch (AggregateNotFoundException)
             {
                 throw new ApiException(ValidationErrors.Common.BuildingUnitNotFound.Message, StatusCodes.Status404NotFound);
-            }
-            catch (BuildingUnitIsNotFoundException)
-            {
-                throw new ApiException(ValidationErrors.Common.BuildingUnitNotFound.Message,
-                    StatusCodes.Status404NotFound);
             }
         }
     }

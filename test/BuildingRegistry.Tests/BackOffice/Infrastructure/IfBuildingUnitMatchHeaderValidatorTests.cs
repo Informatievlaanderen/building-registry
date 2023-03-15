@@ -8,6 +8,7 @@ namespace BuildingRegistry.Tests.BackOffice.Infrastructure
     using AutoFixture;
     using Be.Vlaanderen.Basisregisters.Api.ETag;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
+    using Be.Vlaanderen.Basisregisters.Sqs.Exceptions;
     using Building;
     using Building.Commands;
     using Building.Events;
@@ -40,7 +41,7 @@ namespace BuildingRegistry.Tests.BackOffice.Infrastructure
             _backOfficeContext.BuildingUnitBuildings.Add(new BuildingUnitBuilding(
                 buildingUnitPersistentLocalId,
                 buildingPersistentLocalId));
-            _backOfficeContext.SaveChanges();
+            await _backOfficeContext.SaveChangesAsync();
 
             var planBuilding = Fixture.Create<PlanBuilding>();
             var buildingGeometry = new BuildingGeometry(planBuilding.Geometry, BuildingGeometryMethod.Outlined);
@@ -80,7 +81,7 @@ namespace BuildingRegistry.Tests.BackOffice.Infrastructure
             _backOfficeContext.BuildingUnitBuildings.Add(new BuildingUnitBuilding(
                 buildingUnitPersistentLocalId,
                 buildingPersistentLocalId));
-            _backOfficeContext.SaveChanges();
+            await _backOfficeContext.SaveChangesAsync();
 
             DispatchArrangeCommand(Fixture.Create<PlanBuilding>());
             DispatchArrangeCommand(Fixture.Create<PlanBuildingUnit>()
@@ -97,7 +98,6 @@ namespace BuildingRegistry.Tests.BackOffice.Infrastructure
             result.Should().BeFalse();
         }
 
-
         [Theory]
         [InlineData("")]
         [InlineData(" ")]
@@ -112,6 +112,22 @@ namespace BuildingRegistry.Tests.BackOffice.Infrastructure
 
             // Assert
             result.Should().BeTrue();
+        }
+
+        [Fact]
+        public async Task WhenBuildingCantBeFoundThroughBuildingUnitPersistentLocalId_ThenThrowsAggregateIdIsNotFoundException()
+        {
+            // Arrange
+            var buildingUnitPersistentLocalId = Fixture.Create<BuildingUnitPersistentLocalId>();
+
+            var eTag = new ETag(ETagType.Strong, "SomeHash");
+            var sut = new IfMatchHeaderValidator(Container.Resolve<IBuildings>(), _backOfficeContext);
+
+            // Act
+            var act = async () => await sut.IsValidForBuildingUnit(eTag.ToString(), buildingUnitPersistentLocalId, CancellationToken.None);
+
+            // Assert
+            act.Should().ThrowAsync<AggregateIdIsNotFoundException>();
         }
     }
 }

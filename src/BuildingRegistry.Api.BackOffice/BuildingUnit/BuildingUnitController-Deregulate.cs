@@ -27,7 +27,6 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
         /// Deregulariseer een gebouweenheid.
         /// </summary>
         /// <param name="ifMatchHeaderValidator"></param>
-        /// <param name="validator"></param>
         /// <param name="request"></param>
         /// <param name="ifMatchHeaderValue"></param>
         /// <param name="ct"></param>
@@ -36,12 +35,10 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
         [ProducesResponseType(StatusCodes.Status202Accepted)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-        [SwaggerResponseHeader(StatusCodes.Status202Accepted, "location", "string",
-            "De URL van het aangemaakte ticket.")]
+        [SwaggerResponseHeader(StatusCodes.Status202Accepted, "location", "string", "De URL van het aangemaakte ticket.")]
         [SwaggerResponseExample(StatusCodes.Status400BadRequest, typeof(BadRequestResponseExamples))]
         [SwaggerResponseExample(StatusCodes.Status500InternalServerError, typeof(InternalServerErrorResponseExamples))]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme,
-            Policy = PolicyNames.GeschetstGebouw.DecentraleBijwerker)]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = PolicyNames.GeschetstGebouw.DecentraleBijwerker)]
         public async Task<IActionResult> Deregulate(
             [FromServices] IIfMatchHeaderValidator ifMatchHeaderValidator,
             [FromRoute] DeregulateBuildingUnitRequest request,
@@ -50,9 +47,8 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
         {
             try
             {
-                if (!await ifMatchHeaderValidator
-                        .IsValidForBuildingUnit(ifMatchHeaderValue,
-                            new BuildingUnitPersistentLocalId(request.BuildingUnitPersistentLocalId), ct))
+                if (!await ifMatchHeaderValidator.IsValidForBuildingUnit(
+                        ifMatchHeaderValue, new BuildingUnitPersistentLocalId(request.BuildingUnitPersistentLocalId), ct))
                 {
                     return new PreconditionFailedResult();
                 }
@@ -74,10 +70,6 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
                     StatusCodes.Status404NotFound);
             }
             catch (AggregateNotFoundException)
-            {
-                throw new ApiException(ValidationErrors.Common.BuildingUnitNotFound.Message, StatusCodes.Status404NotFound);
-            }
-            catch (BuildingUnitIsNotFoundException)
             {
                 throw new ApiException(ValidationErrors.Common.BuildingUnitNotFound.Message, StatusCodes.Status404NotFound);
             }

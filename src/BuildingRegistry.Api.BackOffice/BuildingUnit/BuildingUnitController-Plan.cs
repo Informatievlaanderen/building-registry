@@ -2,7 +2,6 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
 {
     using System.Threading;
     using System.Threading.Tasks;
-    using Abstractions.Building.Validators;
     using Abstractions.BuildingUnit.Requests;
     using Abstractions.BuildingUnit.SqsRequests;
     using Abstractions.Validation;
@@ -33,13 +32,11 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
         [ProducesResponseType(StatusCodes.Status202Accepted)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-        [SwaggerResponseHeader(StatusCodes.Status202Accepted, "location", "string",
-            "De url van de geplande gebouweenheid.")]
+        [SwaggerResponseHeader(StatusCodes.Status202Accepted, "location", "string", "De url van de geplande gebouweenheid.")]
         [SwaggerRequestExample(typeof(PlanBuildingUnitRequest), typeof(PlanBuildingUnitRequestExamples))]
         [SwaggerResponseExample(StatusCodes.Status400BadRequest, typeof(BadRequestResponseExamples))]
         [SwaggerResponseExample(StatusCodes.Status500InternalServerError, typeof(InternalServerErrorResponseExamples))]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme,
-            Policy = PolicyNames.GeschetstGebouw.DecentraleBijwerker)]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = PolicyNames.GeschetstGebouw.DecentraleBijwerker)]
         public async Task<IActionResult> Plan(
             [FromServices] IValidator<PlanBuildingUnitRequest> validator,
             [FromServices] PlanBuildingUnitSqsRequestFactory planBuildingUnitSqsRequestFactory,
@@ -50,7 +47,7 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
 
             try
             {
-                OsloPuriValidator.TryParseIdentifier(request.GebouwId, out var buildingIdentifier);
+                OsloPuriValidator.TryParseIdentifier(request.GebouwId, out _);
 
                 var result = await Mediator.Send(
                     planBuildingUnitSqsRequestFactory.Create(request, GetMetadata(), new ProvenanceData(CreateProvenance(Modification.Insert))),
