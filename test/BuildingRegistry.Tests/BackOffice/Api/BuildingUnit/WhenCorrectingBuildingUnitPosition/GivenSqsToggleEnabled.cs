@@ -16,7 +16,6 @@ namespace BuildingRegistry.Tests.BackOffice.Api.BuildingUnit.WhenCorrectingBuild
     using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Validators;
     using BuildingRegistry.Api.BackOffice.BuildingUnit;
     using BuildingRegistry.Building;
-    using BuildingRegistry.Building.Exceptions;
     using Fixtures;
     using FluentAssertions;
     using FluentValidation;
@@ -192,35 +191,6 @@ namespace BuildingRegistry.Tests.BackOffice.Api.BuildingUnit.WhenCorrectingBuild
                 request,
                 null,
                 CancellationToken.None);
-
-            //Assert
-            act
-                .Should()
-                .ThrowAsync<ApiException>()
-                .Result
-                .Where(x =>
-                    x.Message.Contains("Onbestaande gebouweenheid.")
-                    && x.StatusCode == StatusCodes.Status404NotFound);
-        }
-
-        [Fact]
-        public void WithBuildingUnitNotFound_ThenThrowsApiException()
-        {
-            MockMediator
-                .Setup(x => x.Send(It.IsAny<CorrectBuildingUnitPositionSqsRequest>(), CancellationToken.None))
-                .Throws(new BuildingUnitIsNotFoundException());
-
-            var request = Fixture.Create<CorrectBuildingUnitPositionRequest>();
-            Func<Task> act = async () =>
-            {
-                await _controller.CorrectPosition(
-                    MockIfMatchValidator(true),
-                    MockValidRequestValidator<CorrectBuildingUnitPositionRequest>(),
-                    0,
-                    request,
-                    null,
-                    CancellationToken.None);
-            };
 
             //Assert
             act

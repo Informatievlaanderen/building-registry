@@ -1,25 +1,23 @@
 namespace BuildingRegistry.Api.BackOffice.BuildingUnit
 {
-    using Abstractions.Building.Validators;
+    using System.Threading;
+    using System.Threading.Tasks;
     using Abstractions.BuildingUnit.Requests;
+    using Abstractions.BuildingUnit.SqsRequests;
+    using Abstractions.Validation;
     using Be.Vlaanderen.Basisregisters.AcmIdm;
+    using Be.Vlaanderen.Basisregisters.AggregateSource;
     using Be.Vlaanderen.Basisregisters.Api.ETag;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Be.Vlaanderen.Basisregisters.Sqs.Exceptions;
     using BuildingRegistry.Building;
-    using BuildingRegistry.Building.Exceptions;
     using Infrastructure;
     using Microsoft.AspNetCore.Authentication.JwtBearer;
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
     using Swashbuckle.AspNetCore.Filters;
-    using System.Threading;
-    using System.Threading.Tasks;
-    using Abstractions.BuildingUnit.SqsRequests;
-    using Abstractions.Validation;
-    using Be.Vlaanderen.Basisregisters.AggregateSource;
 
     public partial class BuildingUnitController
     {
@@ -54,7 +52,7 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
                 }
 
                 var result = await Mediator.Send(
-                    new CorrectBuildingUnitRegularizationSqsRequest()
+                    new CorrectBuildingUnitRegularizationSqsRequest
                     {
                         Request = request,
                         Metadata = GetMetadata(),
@@ -69,10 +67,6 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
                 throw new ApiException(ValidationErrors.Common.BuildingUnitNotFound.Message, StatusCodes.Status404NotFound);
             }
             catch (AggregateNotFoundException)
-            {
-                throw new ApiException(ValidationErrors.Common.BuildingUnitNotFound.Message, StatusCodes.Status404NotFound);
-            }
-            catch (BuildingUnitIsNotFoundException)
             {
                 throw new ApiException(ValidationErrors.Common.BuildingUnitNotFound.Message, StatusCodes.Status404NotFound);
             }

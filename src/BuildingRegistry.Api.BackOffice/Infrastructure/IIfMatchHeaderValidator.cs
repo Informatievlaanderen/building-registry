@@ -6,8 +6,8 @@ namespace BuildingRegistry.Api.BackOffice.Infrastructure
     using Abstractions;
     using Abstractions.BuildingUnit.Extensions;
     using Be.Vlaanderen.Basisregisters.Api.ETag;
+    using Be.Vlaanderen.Basisregisters.Sqs.Exceptions;
     using BuildingRegistry.Building;
-    using BuildingRegistry.Building.Exceptions;
 
     public interface IIfMatchHeaderValidator
     {
@@ -53,8 +53,7 @@ namespace BuildingRegistry.Api.BackOffice.Infrastructure
                 return true;
             }
 
-            var buildingPersistentLocalId =
-                _backOfficeContext.GetBuildingIdForBuildingUnit(buildingUnitPersistentLocalId);
+            var buildingPersistentLocalId = _backOfficeContext.GetBuildingIdForBuildingUnit(buildingUnitPersistentLocalId);
 
             var etag = await GetBuildingUnitEtag(buildingPersistentLocalId, buildingUnitPersistentLocalId, ct);
 
@@ -74,7 +73,7 @@ namespace BuildingRegistry.Api.BackOffice.Infrastructure
 
             if (buildingUnit is null)
             {
-                throw new BuildingUnitIsNotFoundException();
+                throw new AggregateIdIsNotFoundException();
             }
 
             return new ETag(ETagType.Strong, buildingUnit.LastEventHash);

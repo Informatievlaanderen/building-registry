@@ -2,7 +2,6 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
 {
     using System.Threading;
     using System.Threading.Tasks;
-    using Abstractions.Building.Validators;
     using Abstractions.BuildingUnit.Requests;
     using Abstractions.BuildingUnit.SqsRequests;
     using Abstractions.Validation;
@@ -13,7 +12,6 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Be.Vlaanderen.Basisregisters.Sqs.Exceptions;
     using BuildingRegistry.Building;
-    using BuildingRegistry.Building.Exceptions;
     using FluentValidation;
     using Infrastructure;
     using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -64,7 +62,7 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
                 }
 
                 var result = await Mediator.Send(
-                    new CorrectBuildingUnitPositionSqsRequest()
+                    new CorrectBuildingUnitPositionSqsRequest
                     {
                         BuildingUnitPersistentLocalId = request.BuildingUnitPersistentLocalId,
                         Request = request,
@@ -80,10 +78,6 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
                 throw new ApiException(ValidationErrors.Common.BuildingUnitNotFound.Message, StatusCodes.Status404NotFound);
             }
             catch (AggregateNotFoundException)
-            {
-                throw new ApiException(ValidationErrors.Common.BuildingUnitNotFound.Message, StatusCodes.Status404NotFound);
-            }
-            catch (BuildingUnitIsNotFoundException)
             {
                 throw new ApiException(ValidationErrors.Common.BuildingUnitNotFound.Message, StatusCodes.Status404NotFound);
             }

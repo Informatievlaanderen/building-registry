@@ -16,7 +16,6 @@ namespace BuildingRegistry.Tests.BackOffice.Api.BuildingUnit.WhenDetachingAddres
     using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Validators;
     using BuildingRegistry.Api.BackOffice.BuildingUnit;
     using BuildingRegistry.Building;
-    using BuildingRegistry.Building.Exceptions;
     using Fixtures;
     using FluentAssertions;
     using FluentValidation;
@@ -173,36 +172,5 @@ namespace BuildingRegistry.Tests.BackOffice.Api.BuildingUnit.WhenDetachingAddres
                     x.Message.Contains("Onbestaande gebouweenheid.")
                     && x.StatusCode == StatusCodes.Status404NotFound);
         }
-
-
-        [Fact]
-        public void WhenBuildingUnitNotFound_ThenThrowValidationException()
-        {
-            MockMediator
-                .Setup(x => x.Send(It.IsAny<DetachAddressFromBuildingUnitSqsRequest>(), CancellationToken.None).Result)
-                .Throws(new BuildingUnitIsNotFoundException());
-
-            //Act
-            Func<Task> act = async () =>
-            {
-                await _controller.DetachAddress(
-                    MockIfMatchValidator(true),
-                    MockValidRequestValidator<DetachAddressFromBuildingUnitRequest>(),
-                    Fixture.Create<BuildingUnitPersistentLocalId>(),
-                    new DetachAddressFromBuildingUnitRequest(),
-                    null,
-                    CancellationToken.None);
-            };
-
-            // Assert
-            act
-                .Should()
-                .ThrowAsync<ApiException>()
-                .Result
-                .Where(x =>
-                    x.Message == "Onbestaande gebouweenheid."
-                    && x.StatusCode == StatusCodes.Status404NotFound);
-        }
-
     }
 }

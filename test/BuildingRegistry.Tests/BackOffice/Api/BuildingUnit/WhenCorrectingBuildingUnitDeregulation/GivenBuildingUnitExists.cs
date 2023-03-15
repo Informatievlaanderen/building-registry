@@ -14,7 +14,6 @@ namespace BuildingRegistry.Tests.BackOffice.Api.BuildingUnit.WhenCorrectingBuild
     using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.SqsRequests;
     using BuildingRegistry.Api.BackOffice.BuildingUnit;
     using BuildingRegistry.Building;
-    using BuildingRegistry.Building.Exceptions;
     using Fixtures;
     using FluentAssertions;
     using Microsoft.AspNetCore.Http;
@@ -123,34 +122,6 @@ namespace BuildingRegistry.Tests.BackOffice.Api.BuildingUnit.WhenCorrectingBuild
             Func<Task> act = async () =>
             {
                 await _controller.CorrectDeregulation(
-                    MockIfMatchValidator(true),
-                    request,
-                    string.Empty,
-                    CancellationToken.None);
-            };
-
-            //Assert
-            act
-                .Should()
-                .ThrowAsync<ApiException>()
-                .Result
-                .Where(x =>
-                    x.Message.Contains("Onbestaande gebouweenheid.")
-                    && x.StatusCode == StatusCodes.Status404NotFound);
-        }
-
-        [Fact]
-        public void WithBuildingUnitNotFound_ThenThrowsApiException()
-        {
-            MockMediator
-                .Setup(x => x.Send(It.IsAny<CorrectBuildingUnitDeregulationSqsRequest>(), CancellationToken.None))
-                .Throws(new BuildingUnitIsNotFoundException());
-
-            var request = Fixture.Create<CorrectBuildingUnitDeregulationRequest>();
-            Func<Task> act = async () =>
-            {
-                await _controller.CorrectDeregulation(
-
                     MockIfMatchValidator(true),
                     request,
                     string.Empty,
