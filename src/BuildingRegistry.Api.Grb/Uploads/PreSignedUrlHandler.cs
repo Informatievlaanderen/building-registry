@@ -12,7 +12,7 @@
 
     public sealed record GetPreSignedUrlRequest : IRequest<GetPreSignedUrlResponse>;
 
-    public sealed record GetPreSignedUrlResponse(Guid JobId, string PreSignedUrl, string TicketUrl);
+    public sealed record GetPreSignedUrlResponse(Guid JobId, string PreSignedUrl, Dictionary<string, string> PreSignedUrlHeaders, string TicketUrl);
 
     public sealed class PreSignedUrlHandler : IRequestHandler<GetPreSignedUrlRequest, GetPreSignedUrlResponse>
     {
@@ -56,7 +56,7 @@
                 cancellationToken);
 
             var ticketUrl = _ticketingUrl.For(ticketId);
-            return new GetPreSignedUrlResponse(jobId, preSignedUrl.Url.ToString(), ticketUrl.ToString());
+            return new GetPreSignedUrlResponse(jobId, preSignedUrl.Url.ToString(), preSignedUrl.Fields, ticketUrl.ToString());
         }
     }
 }
