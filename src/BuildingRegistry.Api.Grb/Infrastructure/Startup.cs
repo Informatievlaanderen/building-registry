@@ -113,6 +113,7 @@ namespace BuildingRegistry.Api.Grb.Infrastructure
                     }
                     .EnableJsonErrorActionFilterOption())
                 .Configure<TicketingOptions>(_configuration.GetSection(TicketingModule.TicketingServiceConfigKey))
+                .Configure<BucketOptions>(_configuration.GetSection(BucketOptions.ConfigKey))
                 .AddAWSService<IAmazonS3Extended>(_configuration.GetAWSOptions())
                 .AddSingleton<IActionContextAccessor, ActionContextAccessor>();
 
