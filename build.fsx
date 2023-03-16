@@ -61,6 +61,7 @@ Target.create "Publish_Solution" (fun _ ->
     "BuildingRegistry.Api.Extract"
     "BuildingRegistry.Api.CrabImport"
     "BuildingRegistry.Api.BackOffice"
+    "BuildingRegistry.Api.Grb"
     "BuildingRegistry.Api.BackOffice.Abstractions"
     "BuildingRegistry.Api.BackOffice.Handlers.Lambda"
     "BuildingRegistry.Consumer.Address"
@@ -97,6 +98,7 @@ Target.create "Containerize_ApiCrabImport" (fun _ ->
   //Shell.copyFile dist (source @@ "SqlStreamStore.MsSql.dll")
 
   containerize "BuildingRegistry.Api.CrabImport" "api-crab-import")
+Target.create "Containerize_ApiGrb" (fun _ -> containerize "BuildingRegistry.Api.Grb" "api-grb")
 Target.create "Containerize_ProjectionsSyndication" (fun _ -> containerize "BuildingRegistry.Projections.Syndication" "projections-syndication")
 Target.create "Containerize_ProjectionsBackOffice" (fun _ -> containerize "BuildingRegistry.Projections.BackOffice" "projections-backoffice")
 Target.create "Containerize_ConsumerAddress" (fun _ -> containerize "BuildingRegistry.Consumer.Address" "consumer-address")
@@ -139,6 +141,7 @@ Target.create "Containerize" ignore
   // ==> "Containerize_ApiExtract"
   // ==> "Containerize_ApiCrabImport"
   // ==> "Containerize_ApiBackOffice"
+  // ==> "Containerize_ApiGrb"
   // ==> "Containerize_ProjectionsSyndication"
   // ==> "Containerize_ProjectionsBackOffice"
   // ==> "Containerize_ConsumerAddress"

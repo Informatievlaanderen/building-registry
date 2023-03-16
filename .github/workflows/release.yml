@@ -127,6 +127,21 @@ jobs:
       build-project: BuildingRegistry.Api.Extract
       semver: ${{ needs.set-release-version.outputs.version }}
     secrets: inherit
+  
+  build-api-grb:
+    name: Build Api Grb
+    uses: Informatievlaanderen/build-pipeline/.github/workflows/build-image.yml@main
+    needs: [ set-release-version ]
+    if: ${{ (github.repository_owner == 'Informatievlaanderen') && (needs.set-release-version.outputs.version != 'none') }}
+    with:
+      registry: building-registry
+      build-target: Containerize_ApiGrb
+      image-file: br-api-grb-image.tar
+      image-name: api-grb
+      test-project: BuildingRegistry.Tests
+      build-project: BuildingRegistry.Api.Grb
+      semver: ${{ needs.set-release-version.outputs.version }}
+    secrets: inherit
 
   build-projector:
     name: Build Projector
@@ -332,6 +347,7 @@ jobs:
       build-api-legacy,
       build-api-oslo,
       build-api-extract,
+      build-api-grb,
       build-api-crab-import,
       build-projector,
       build-projections-backoffice,
@@ -671,6 +687,7 @@ jobs:
           'api-oslo',
           'api-crab-import',
           'api-extract',
+          'api-grb',
           'projector',
           'projections-syndication',
           'projections-backoffice',
@@ -730,6 +747,7 @@ jobs:
           'api-oslo',
           'api-crab-import',
           'api-extract',
+          'api-grb',
           'projector',
           'projections-syndication',
           'projections-backoffice',
@@ -791,6 +809,7 @@ jobs:
           'api-oslo',
           'api-crab-import',
           'api-extract',
+          'api-grb',
           'projector',
           'projections-syndication',
           'projections-backoffice',
@@ -868,7 +887,12 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        services: ['building-registry-api', 'building-registry-import-api', 'building-registry-projections', 'building-registry-producer', 'building-registry-producer-snapshot-oslo']
+        services: ['building-registry-api',
+        'building-registry-import-api',
+        'building-registry-grb-api',
+        'building-registry-projections',
+        'building-registry-producer',
+        'building-registry-producer-snapshot-oslo']
 
     steps:
     - name: Deploy services
@@ -983,6 +1007,7 @@ jobs:
           'building-registry-backoffice-api',
           'building-registry-consumer-address',
           'building-registry-migrator-building',
+          'building-registry-grb-api',
           'building-registry-producer',
           'building-registry-producer-snapshot-oslo',
           'building-registry-projections',
