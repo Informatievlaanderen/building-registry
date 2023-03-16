@@ -1,3 +1,10 @@
+## [3.64.1](https://github.com/informatievlaanderen/building-registry/compare/v3.64.0...v3.64.1) (2023-03-16)
+
+
+### Bug Fixes
+
+* correct aws config ([73d2a1e](https://github.com/informatievlaanderen/building-registry/commit/73d2a1eb917b7f7ecae9e72499575391e372411d))
+
 # [3.64.0](https://github.com/informatievlaanderen/building-registry/compare/v3.63.0...v3.64.0) (2023-03-16)
 
 
