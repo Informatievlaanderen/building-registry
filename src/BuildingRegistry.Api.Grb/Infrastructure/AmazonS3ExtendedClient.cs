@@ -24,16 +24,15 @@
 
         public AmazonS3ExtendedClient(
             ILoggerFactory loggerFactory,
-            AWSCredentials credentials,
-            AmazonS3ExtendedConfig config)
-            : base(credentials, config)
+            AmazonS3Config config)
+            : base(config)
         {
             _logger = loggerFactory.CreateLogger<AmazonS3ExtendedClient>();
         }
 
         public CreatePresignedPostResponse CreatePresignedPost(CreatePresignedPostRequest request)
         {
-            var regionName = Config.RegionEndpoint.SystemName ??  RegionEndpoint.EUWest1.SystemName;
+            var regionName = Config.RegionEndpoint.SystemName;
 
             _logger.LogWarning($"region: {regionName}");
 
