@@ -73,6 +73,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenDetachingRejectedAddressFrom
         public void StateCheck()
         {
             var buildingUnitAddressWasDetachedBecauseAddressWasRejected = Fixture.Create<BuildingUnitAddressWasDetachedBecauseAddressWasRejected>();
+            var expectedPersistentLocalId = buildingUnitAddressWasDetachedBecauseAddressWasRejected.AddressPersistentLocalId + 1;
             var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
                 .WithBuildingPersistentLocalId(new BuildingPersistentLocalId(buildingUnitAddressWasDetachedBecauseAddressWasRejected.BuildingPersistentLocalId))
                 .WithBuildingUnit(
@@ -81,7 +82,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenDetachingRejectedAddressFrom
                     attachedAddresses: new List<AddressPersistentLocalId>
                     {
                         new AddressPersistentLocalId(buildingUnitAddressWasDetachedBecauseAddressWasRejected.AddressPersistentLocalId),
-                        new AddressPersistentLocalId(123),
+                        new AddressPersistentLocalId(expectedPersistentLocalId),
                     },
                     isRemoved: false)
                 .Build();
@@ -94,7 +95,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenDetachingRejectedAddressFrom
             });
 
             building.BuildingUnits.First().AddressPersistentLocalIds.Should().BeEquivalentTo(
-                new List<AddressPersistentLocalId>{ new AddressPersistentLocalId(123) });
+                new List<AddressPersistentLocalId>{ new AddressPersistentLocalId(expectedPersistentLocalId) });
         }
     }
 }

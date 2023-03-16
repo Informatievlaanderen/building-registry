@@ -127,7 +127,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuildingUnit
                 .WithBuildingPersistentLocalId(command.BuildingPersistentLocalId)
                 .WithBuildingStatus(BuildingStatus.Realized)
                 .WithBuildingGeometry(buildingGeometry)
-                .WithBuildingUnit(BuildingRegistry.Legacy.BuildingUnitStatus.Planned)
+                .WithBuildingUnit(BuildingRegistry.Legacy.BuildingUnitStatus.Planned, new BuildingUnitPersistentLocalId(3))
                 .WithBuildingUnit(
                     BuildingRegistry.Legacy.BuildingUnitStatus.NotRealized,
                     new BuildingUnitPersistentLocalId(1),
