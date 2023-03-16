@@ -1,3 +1,10 @@
+# [3.63.0](https://github.com/informatievlaanderen/building-registry/compare/v3.62.3...v3.63.0) (2023-03-16)
+
+
+### Features
+
+* add grb api ([86d6ac2](https://github.com/informatievlaanderen/building-registry/commit/86d6ac2820c1b57496f55677fef902cae471f502))
+
 ## [3.62.3](https://github.com/informatievlaanderen/building-registry/compare/v3.62.2...v3.62.3) (2023-03-14)
 
 
