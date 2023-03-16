@@ -1,3 +1,10 @@
+# [3.64.0](https://github.com/informatievlaanderen/building-registry/compare/v3.63.0...v3.64.0) (2023-03-16)
+
+
+### Features
+
+* make bucket options configurable in grb api ([3e69fa2](https://github.com/informatievlaanderen/building-registry/commit/3e69fa2e58bbe88c582e9b0c4376d87063218153))
+
 # [3.63.0](https://github.com/informatievlaanderen/building-registry/compare/v3.62.3...v3.63.0) (2023-03-16)
 
 
