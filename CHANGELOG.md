@@ -1,3 +1,10 @@
+## [3.64.2](https://github.com/informatievlaanderen/building-registry/compare/v3.64.1...v3.64.2) (2023-03-16)
+
+
+### Bug Fixes
+
+* api grb presigned response ([37ae862](https://github.com/informatievlaanderen/building-registry/commit/37ae862b9cb03ad136b0df274e65dd2949b14c74))
+
 ## [3.64.1](https://github.com/informatievlaanderen/building-registry/compare/v3.64.0...v3.64.1) (2023-03-16)
 
 
