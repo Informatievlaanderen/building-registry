@@ -3,6 +3,7 @@ namespace BuildingRegistry.Api.Grb.Infrastructure
     using System;
     using System.Linq;
     using System.Reflection;
+    using Amazon.S3;
     using Autofac;
     using Autofac.Extensions.DependencyInjection;
     using Be.Vlaanderen.Basisregisters.AcmIdm;
@@ -114,7 +115,10 @@ namespace BuildingRegistry.Api.Grb.Infrastructure
                     .EnableJsonErrorActionFilterOption())
                 .Configure<TicketingOptions>(_configuration.GetSection(TicketingModule.TicketingServiceConfigKey))
                 .Configure<BucketOptions>(_configuration.GetSection(BucketOptions.ConfigKey))
-                .AddAWSService<IAmazonS3Extended>(_configuration.GetAWSOptions())
+                .AddTransient<IAmazonS3Extended>(c => new AmazonS3ExtendedClient(c.GetRequiredService<ILoggerFactory>(), new AmazonS3Config
+                {
+                    RegionEndpoint = _configuration.GetAWSOptions().Region,
+                }))
                 .AddSingleton<IActionContextAccessor, ActionContextAccessor>();
 
             var containerBuilder = new ContainerBuilder();
