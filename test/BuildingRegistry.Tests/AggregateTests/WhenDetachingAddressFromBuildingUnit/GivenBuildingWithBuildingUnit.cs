@@ -62,6 +62,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenDetachingAddressFromBuilding
                 new AddressPersistentLocalId(Fixture.Create<AddressPersistentLocalId>()));
             ((ISetProvenance)buildingUnitAddressWasDetachedV2).SetProvenance(Fixture.Create<Provenance>());
 
+            var expectedPersistentLocalId = buildingUnitAddressWasDetachedV2.AddressPersistentLocalId + 1;
             var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
                 .WithBuildingPersistentLocalId(new BuildingPersistentLocalId(buildingUnitAddressWasDetachedV2.BuildingPersistentLocalId))
                 .WithBuildingUnit(
@@ -70,7 +71,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenDetachingAddressFromBuilding
                     attachedAddresses: new List<AddressPersistentLocalId>
                     {
                         new AddressPersistentLocalId(buildingUnitAddressWasDetachedV2.AddressPersistentLocalId),
-                        new AddressPersistentLocalId(123)
+                        new AddressPersistentLocalId(expectedPersistentLocalId)
                     },
                     isRemoved: false)
                 .Build();
@@ -83,7 +84,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenDetachingAddressFromBuilding
             });
 
             sut.BuildingUnits.First().AddressPersistentLocalIds.Should().BeEquivalentTo(
-                new List<AddressPersistentLocalId>{ new AddressPersistentLocalId(123) });
+                new List<AddressPersistentLocalId>{ new AddressPersistentLocalId(expectedPersistentLocalId) });
         }
     }
 }
