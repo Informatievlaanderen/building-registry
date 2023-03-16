@@ -42,9 +42,9 @@ namespace BuildingRegistry.Tests.Legacy.WhenReaddressingHouseNumber
 
             Gebouw1CrabTerrainObjectId = Fixture.Create<CrabTerrainObjectId>();
             OldHuisNr16KoppelingId = Fixture.Create<CrabTerrainObjectHouseNumberId>();
-            NewHuisNr16KoppelingId = new CrabTerrainObjectHouseNumberId(Fixture.Create<int>());
+            NewHuisNr16KoppelingId = new CrabTerrainObjectHouseNumberId(Fixture.Create<int>() + OldHuisNr16KoppelingId);
             OldHuisNr16Id = Fixture.Create<CrabHouseNumberId>();
-            NewHuisNr16Id = new CrabHouseNumberId(Fixture.Create<int>());
+            NewHuisNr16Id = new CrabHouseNumberId(Fixture.Create<int>() + OldHuisNr16Id);
             ReaddressingBeginDate = new ReaddressingBeginDate(Fixture.Create<LocalDate>());
         }
 

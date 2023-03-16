@@ -42,8 +42,8 @@ namespace BuildingRegistry.Tests.Legacy.WhenReaddressingSubaddress
                 SubaddressNr16Bus1Id = new CrabSubaddressId(161);
                 SubaddressNr16Bus2Id = new CrabSubaddressId(162);
 
-                NewHuisNr16Id = new CrabHouseNumberId(customizedFixture.Create<int>());
-                NewHuisNr16KoppelingId = new CrabTerrainObjectHouseNumberId(customizedFixture.Create<int>());
+                NewHuisNr16Id = new CrabHouseNumberId(customizedFixture.Create<int>() + HuisNr16Id);
+                NewHuisNr16KoppelingId = new CrabTerrainObjectHouseNumberId(customizedFixture.Create<int>() + HuisNr16KoppelingId);
                 NewSubaddressNr16Bus1Id = new CrabSubaddressId(261);
                 NewSubaddressNr16Bus2Id = new CrabSubaddressId(262);
                 ReaddressingBeginLocalDate = customizedFixture.Create<LocalDate>();
