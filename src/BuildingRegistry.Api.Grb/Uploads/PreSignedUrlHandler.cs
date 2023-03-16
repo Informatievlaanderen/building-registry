@@ -5,7 +5,9 @@
     using System.Threading;
     using System.Threading.Tasks;
     using Infrastructure;
+    using Infrastructure.Options;
     using MediatR;
+    using Microsoft.Extensions.Options;
     using TicketingService.Abstractions;
 
     public sealed record GetPreSignedUrlRequest : IRequest<GetPreSignedUrlResponse>;
@@ -17,15 +19,18 @@
         private readonly ITicketing _ticketing;
         private readonly ITicketingUrl _ticketingUrl;
         private readonly IAmazonS3Extended _s3Extended;
+        private readonly BucketOptions _bucketOptions;
 
         public PreSignedUrlHandler(
             ITicketing ticketing,
             ITicketingUrl ticketingUrl,
-            IAmazonS3Extended s3Extended)
+            IAmazonS3Extended s3Extended,
+            IOptions<BucketOptions> bucketOptions)
         {
             _ticketing = ticketing;
             _ticketingUrl = ticketingUrl;
             _s3Extended = s3Extended;
+            _bucketOptions = bucketOptions.Value ?? throw new ArgumentNullException(nameof(bucketOptions));
         }
 
         public async Task<GetPreSignedUrlResponse> Handle(
@@ -36,10 +41,10 @@
 
             var preSignedUrl = _s3Extended.CreatePresignedPost(
                 new CreatePresignedPostRequest(
-                    "basisregisters-staging-building-grb-uploads",
+                    _bucketOptions.BucketName,
                     jobId.ToString("D"),
                     new List<ExactMatchCondition>(),
-                    TimeSpan.FromHours(1))); //config?
+                    TimeSpan.FromMinutes(_bucketOptions.UrlExpirationInMinutes)));
 
             var ticketId= await _ticketing.CreateTicket(
                 new Dictionary<string, string>
