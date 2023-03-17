@@ -20,6 +20,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
     using BuildingRegistry.Api.BackOffice.Handlers.Lambda.Requests.BuildingUnit;
     using BuildingRegistry.Building;
     using BuildingRegistry.Building.Exceptions;
+    using Consumer.Address;
     using Fixtures;
     using FluentAssertions;
     using Microsoft.Extensions.Configuration;
@@ -34,6 +35,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
     {
         private readonly IdempotencyContext _idempotencyContext;
         private readonly BackOfficeContext _backOfficeContext;
+        private readonly FakeConsumerAddressContext _addressConsumerContext;
 
         public WhenRetiringBuildingUnit(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
         {
@@ -42,6 +44,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
 
             _idempotencyContext = new FakeIdempotencyContextFactory().CreateDbContext(Array.Empty<string>());
             _backOfficeContext = Container.Resolve<BackOfficeContext>();
+            _addressConsumerContext = Container.Resolve<FakeConsumerAddressContext>();
         }
 
         [Fact]
@@ -58,8 +61,9 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
 
             PlanBuildingUnit(buildingPersistentLocalId, buildingUnitPersistentLocalId);
             RealizeBuildingUnit(buildingPersistentLocalId, buildingUnitPersistentLocalId);
+            _addressConsumerContext.AddAddress(addressPersistentLocalId, AddressStatus.Current);
             AttachAddressToBuildingUnit(buildingPersistentLocalId, buildingUnitPersistentLocalId, addressPersistentLocalId);
-            _backOfficeContext.AddIdempotentBuildingUnitAddressRelation(
+            await _backOfficeContext.AddIdempotentBuildingUnitAddressRelation(
                 buildingPersistentLocalId, buildingUnitPersistentLocalId, addressPersistentLocalId, CancellationToken.None);
 
             var eTagResponse = new ETagResponse(string.Empty, Fixture.Create<string>());
@@ -75,7 +79,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
             await handler.Handle(CreateRetireBuildingUnitLambdaRequest(), CancellationToken.None);
 
             //Assert
-            var stream = await Container.Resolve<IStreamStore>().ReadStreamBackwards(new StreamId(new BuildingStreamId(buildingPersistentLocalId)), 5, 1);
+            var stream = await Container.Resolve<IStreamStore>().ReadStreamBackwards(new StreamId(new BuildingStreamId(buildingPersistentLocalId)), 7, 1);
             stream.Messages.First().JsonMetadata.Should().Contain(eTagResponse.ETag);
 
             var buildingUnitAddressRelation = await _backOfficeContext.FindBuildingUnitAddressRelation(
@@ -92,6 +96,8 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
             var buildingUnitPersistentLocalId = Fixture.Create<BuildingUnitPersistentLocalId>();
 
             PlanBuilding(buildingPersistentLocalId);
+            PlaceBuildingUnderConstruction(buildingPersistentLocalId);
+            RealizeBuilding(buildingPersistentLocalId);
             PlanBuildingUnit(buildingPersistentLocalId, buildingUnitPersistentLocalId);
             RealizeBuildingUnit(buildingPersistentLocalId, buildingUnitPersistentLocalId);
 
@@ -106,6 +112,8 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
 
             var building =
                 await buildings.GetAsync(new BuildingStreamId(buildingPersistentLocalId), CancellationToken.None);
+            var buildingUnit =
+                building.BuildingUnits.Single(y => y.BuildingUnitPersistentLocalId == buildingUnitPersistentLocalId);
 
             // Act
             await handler.Handle(CreateRetireBuildingUnitLambdaRequest(), CancellationToken.None);
@@ -117,7 +125,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
                     new TicketResult(
                         new ETagResponse(
                             string.Format(ConfigDetailUrl, buildingUnitPersistentLocalId),
-                            building.LastEventHash)),
+                            buildingUnit.LastEventHash)),
                     CancellationToken.None));
         }
 

@@ -35,7 +35,7 @@ namespace BuildingRegistry.Tests.Legacy.Cases
                 Gebouw1CrabTerrainObjectId = customizedFixture.Create<CrabTerrainObjectId>();
                 HuisNr16KoppelingId = customizedFixture.Create<CrabTerrainObjectHouseNumberId>();
                 HuisNr16Id = customizedFixture.Create<CrabHouseNumberId>();
-                HuisNr18Id = new CrabHouseNumberId(171);
+                HuisNr18Id = new CrabHouseNumberId(HuisNr16Id + 1);
                 SubaddressNr16Bus1Id = new CrabSubaddressId(161);
             }
 

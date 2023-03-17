@@ -20,6 +20,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
     using BuildingRegistry.Api.BackOffice.Handlers.Lambda.Requests.BuildingUnit;
     using BuildingRegistry.Building;
     using BuildingRegistry.Building.Exceptions;
+    using Consumer.Address;
     using Fixtures;
     using FluentAssertions;
     using Microsoft.Extensions.Configuration;
@@ -34,6 +35,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
     {
         private readonly IdempotencyContext _idempotencyContext;
         private readonly BackOfficeContext _backOfficeContext;
+        private readonly FakeConsumerAddressContext _addressConsumerContext;
 
         public WhenNotRealizingBuildingUnit(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
         {
@@ -42,6 +44,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
 
             _idempotencyContext = new FakeIdempotencyContextFactory().CreateDbContext(Array.Empty<string>());
             _backOfficeContext = Container.Resolve<BackOfficeContext>();
+            _addressConsumerContext = Container.Resolve<FakeConsumerAddressContext>();
         }
 
         [Fact]
@@ -57,8 +60,9 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
             RealizeBuilding(buildingPersistentLocalId);
 
             PlanBuildingUnit(buildingPersistentLocalId, buildingUnitPersistentLocalId);
+            _addressConsumerContext.AddAddress(addressPersistentLocalId, AddressStatus.Current);
             AttachAddressToBuildingUnit(buildingPersistentLocalId, buildingUnitPersistentLocalId, addressPersistentLocalId);
-            _backOfficeContext.AddIdempotentBuildingUnitAddressRelation(
+            await _backOfficeContext.AddIdempotentBuildingUnitAddressRelation(
                 buildingPersistentLocalId, buildingUnitPersistentLocalId, addressPersistentLocalId, CancellationToken.None);
 
             var eTagResponse = new ETagResponse(string.Empty, Fixture.Create<string>());
@@ -74,7 +78,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
             await handler.Handle(CreateNotRealizeBuildingUnitLambdaRequest(), CancellationToken.None);
 
             //Assert
-            var stream = await Container.Resolve<IStreamStore>().ReadStreamBackwards(new StreamId(new BuildingStreamId(buildingPersistentLocalId)), 4, 1);
+            var stream = await Container.Resolve<IStreamStore>().ReadStreamBackwards(new StreamId(new BuildingStreamId(buildingPersistentLocalId)), 6, 1);
             stream.Messages.First().JsonMetadata.Should().Contain(eTagResponse.ETag);
 
             var buildingUnitAddressRelation = await _backOfficeContext.FindBuildingUnitAddressRelation(
