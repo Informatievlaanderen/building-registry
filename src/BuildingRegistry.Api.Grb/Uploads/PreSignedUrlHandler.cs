@@ -1,4 +1,4 @@
-﻿namespace BuildingRegistry.Api.Grb.Uploads
+namespace BuildingRegistry.Api.Grb.Uploads
 {
     using System;
     using System.Collections.Generic;
@@ -43,7 +43,10 @@
                 new CreatePresignedPostRequest(
                     _bucketOptions.BucketName,
                     jobId.ToString("D"),
-                    new List<ExactMatchCondition>(),
+                    new List<ExactMatchCondition>()
+                    {
+                        new ExactMatchCondition("content-type", "application/zip")
+                    },
                     TimeSpan.FromMinutes(_bucketOptions.UrlExpirationInMinutes)));
 
             var ticketId= await _ticketing.CreateTicket(
