@@ -1,3 +1,11 @@
+## [3.64.3](https://github.com/informatievlaanderen/building-registry/compare/v3.64.2...v3.64.3) (2023-03-17)
+
+
+### Bug Fixes
+
+* api grb contract + flaky tests ([9c342a1](https://github.com/informatievlaanderen/building-registry/commit/9c342a191d1cede4871ab57dc081c72e4b2bf754))
+* buildingunit ifmatch validator exception ([a467a0d](https://github.com/informatievlaanderen/building-registry/commit/a467a0d462528b4d12587b4c1ab541f5cb8ded0a))
+
 ## [3.64.2](https://github.com/informatievlaanderen/building-registry/compare/v3.64.1...v3.64.2) (2023-03-16)
 
 
