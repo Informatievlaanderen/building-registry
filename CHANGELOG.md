@@ -1,3 +1,11 @@
+# [3.65.0](https://github.com/informatievlaanderen/building-registry/compare/v3.64.3...v3.65.0) (2023-03-17)
+
+
+### Features
+
+* add authorization for grb upload ([f75fb27](https://github.com/informatievlaanderen/building-registry/commit/f75fb271ee15c9ef7811a130dd0a22f83d78026d))
+* grb upload should have content type zip ([7f8d2f6](https://github.com/informatievlaanderen/building-registry/commit/7f8d2f68814059fd510d817906e913662c71d70d))
+
 ## [3.64.3](https://github.com/informatievlaanderen/building-registry/compare/v3.64.2...v3.64.3) (2023-03-17)
 
 
