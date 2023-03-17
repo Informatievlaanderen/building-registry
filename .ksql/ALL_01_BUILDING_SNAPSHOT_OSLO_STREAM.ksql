@@ -7,4 +7,4 @@ CREATE OR REPLACE STREAM IF NOT EXISTS building_snapshot_oslo_stream (
   gebouwStatus varchar,
   gebouweenheden ARRAY<STRUCT<objectId varchar, detail varchar>>,
   percelen ARRAY<STRUCT<objectId varchar, detail varchar>>
-) WITH (KAFKA_TOPIC='stg.building.snapshot.oslo', VALUE_FORMAT='JSON');
+) WITH (KAFKA_TOPIC='building.snapshot.oslo', VALUE_FORMAT='JSON');
