@@ -1,3 +1,10 @@
+## [3.65.1](https://github.com/informatievlaanderen/building-registry/compare/v3.65.0...v3.65.1) (2023-03-17)
+
+
+### Bug Fixes
+
+* grb upload remove content-type condition ([af11336](https://github.com/informatievlaanderen/building-registry/commit/af113367bb07b05e2566fc3a202db64946ef0931))
+
 # [3.65.0](https://github.com/informatievlaanderen/building-registry/compare/v3.64.3...v3.65.0) (2023-03-17)
 
 
