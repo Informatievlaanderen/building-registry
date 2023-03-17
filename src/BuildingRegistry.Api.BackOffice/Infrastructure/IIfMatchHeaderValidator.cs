@@ -4,7 +4,6 @@ namespace BuildingRegistry.Api.BackOffice.Infrastructure
     using System.Threading;
     using System.Threading.Tasks;
     using Abstractions;
-    using Abstractions.BuildingUnit.Extensions;
     using Be.Vlaanderen.Basisregisters.Api.ETag;
     using Be.Vlaanderen.Basisregisters.Sqs.Exceptions;
     using BuildingRegistry.Building;
@@ -53,9 +52,16 @@ namespace BuildingRegistry.Api.BackOffice.Infrastructure
                 return true;
             }
 
-            var buildingPersistentLocalId = _backOfficeContext.GetBuildingIdForBuildingUnit(buildingUnitPersistentLocalId);
+            var buildingPersistentLocalId = await _backOfficeContext
+                .BuildingUnitBuildings
+                .FindAsync(new object?[] { (int)buildingUnitPersistentLocalId }, cancellationToken: ct);
 
-            var etag = await GetBuildingUnitEtag(buildingPersistentLocalId, buildingUnitPersistentLocalId, ct);
+            if (buildingPersistentLocalId is null)
+            {
+                throw new AggregateIdIsNotFoundException();
+            }
+
+            var etag = await GetBuildingUnitEtag(buildingPersistentLocalId.BuildingPersistentLocalId, buildingUnitPersistentLocalId, ct);
 
             return IfMatchHeaderMatchesEtag(ifMatchHeaderValue, etag);
         }
