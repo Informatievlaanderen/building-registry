@@ -20,6 +20,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
     using BuildingRegistry.Api.BackOffice.Handlers.Lambda.Requests.Building;
     using BuildingRegistry.Building;
     using BuildingRegistry.Building.Exceptions;
+    using Consumer.Address;
     using Fixtures;
     using FluentAssertions;
     using Microsoft.Extensions.Configuration;
@@ -34,6 +35,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
     {
         private readonly IdempotencyContext _idempotencyContext;
         private readonly BackOfficeContext _backOfficeContext;
+        private readonly FakeConsumerAddressContext _addressConsumerContext;
 
         public WhenNotRealizingBuilding(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
         {
@@ -41,6 +43,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
 
             _idempotencyContext = new FakeIdempotencyContextFactory().CreateDbContext(Array.Empty<string>());
             _backOfficeContext = Container.Resolve<BackOfficeContext>();
+            _addressConsumerContext = Container.Resolve<FakeConsumerAddressContext>();
         }
 
         [Fact]
@@ -50,17 +53,19 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
             var buildingPersistentLocalId = Fixture.Create<BuildingPersistentLocalId>();
             var firstBuildingUnitPersistentLocalId = Fixture.Create<BuildingUnitPersistentLocalId>();
             var firstAddressPersistentLocalId = Fixture.Create<AddressPersistentLocalId>();
-            var secondBuildingUnitPersistentLocalId = Fixture.Create<BuildingUnitPersistentLocalId>();
-            var secondAddressPersistentLocalId = Fixture.Create<AddressPersistentLocalId>();
+            var secondBuildingUnitPersistentLocalId = new BuildingUnitPersistentLocalId(firstBuildingUnitPersistentLocalId + 1);
+            var secondAddressPersistentLocalId = new AddressPersistentLocalId(firstAddressPersistentLocalId +1);
 
             PlanBuilding(buildingPersistentLocalId);
             PlanBuildingUnit(buildingPersistentLocalId, firstBuildingUnitPersistentLocalId);
+            _addressConsumerContext.AddAddress(firstAddressPersistentLocalId, AddressStatus.Current);
             AttachAddressToBuildingUnit(buildingPersistentLocalId, firstBuildingUnitPersistentLocalId, firstAddressPersistentLocalId);
-            _backOfficeContext.AddIdempotentBuildingUnitAddressRelation(
+            await _backOfficeContext.AddIdempotentBuildingUnitAddressRelation(
                 buildingPersistentLocalId, firstBuildingUnitPersistentLocalId, firstAddressPersistentLocalId, CancellationToken.None);
             PlanBuildingUnit(buildingPersistentLocalId, secondBuildingUnitPersistentLocalId);
+            _addressConsumerContext.AddAddress(secondAddressPersistentLocalId, AddressStatus.Current);
             AttachAddressToBuildingUnit(buildingPersistentLocalId, secondBuildingUnitPersistentLocalId, secondAddressPersistentLocalId);
-            _backOfficeContext.AddIdempotentBuildingUnitAddressRelation(
+            await _backOfficeContext.AddIdempotentBuildingUnitAddressRelation(
                 buildingPersistentLocalId, secondBuildingUnitPersistentLocalId, secondAddressPersistentLocalId, CancellationToken.None);
 
             var eTagResponse = new ETagResponse(string.Empty, Fixture.Create<string>());
@@ -76,7 +81,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
             await handler.Handle(CreateNotRealizeBuildingLambdaRequest(), CancellationToken.None);
 
             //Assert
-            var stream = await Container.Resolve<IStreamStore>().ReadStreamBackwards(new StreamId(new BuildingStreamId(buildingPersistentLocalId)), 7, 1);
+            var stream = await Container.Resolve<IStreamStore>().ReadStreamBackwards(new StreamId(new BuildingStreamId(buildingPersistentLocalId)), 11, 1);
             stream.Messages.First().JsonMetadata.Should().Contain(eTagResponse.ETag);
 
             var firstBuildingUnitAddressRelation = await _backOfficeContext.FindBuildingUnitAddressRelation(
