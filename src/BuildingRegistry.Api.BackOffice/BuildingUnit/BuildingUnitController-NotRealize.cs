@@ -65,8 +65,7 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
             }
             catch (AggregateIdIsNotFoundException)
             {
-                throw new ApiException(ValidationErrors.Common.BuildingUnitNotFound.Message,
-                    StatusCodes.Status404NotFound);
+                throw new ApiException(ValidationErrors.Common.BuildingUnitNotFound.Message, StatusCodes.Status404NotFound);
             }
             catch (AggregateNotFoundException)
             {
