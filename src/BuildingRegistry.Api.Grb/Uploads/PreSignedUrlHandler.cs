@@ -42,7 +42,7 @@ namespace BuildingRegistry.Api.Grb.Uploads
             var preSignedUrl = _s3Extended.CreatePresignedPost(
                 new CreatePresignedPostRequest(
                     _bucketOptions.BucketName,
-                    jobId.ToString("D"),
+                    $"upload_{jobId:D}",
                     new List<ExactMatchCondition>(),
                     TimeSpan.FromMinutes(_bucketOptions.UrlExpirationInMinutes)));
 
