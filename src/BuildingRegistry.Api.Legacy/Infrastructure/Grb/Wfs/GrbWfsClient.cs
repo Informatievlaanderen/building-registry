@@ -109,9 +109,16 @@ namespace BuildingRegistry.Api.Legacy.Infrastructure.Grb.Wfs
         private Tuple<Geometry, IReadOnlyDictionary<string, string>?> MapFeature(GrbFeatureName name, XElement data)
         {
             var featureElement = data.Element(XName.Get(name.ToString(), GrbWfsNameSpaces.Grb));
+            var grbNamespace = GrbWfsNameSpaces.Grb;
+
+            if (featureElement is null)
+            {
+                featureElement = data.Element(XName.Get(name.ToString(), GrbWfsNameSpaces.GeoGrb));
+                grbNamespace = GrbWfsNameSpaces.GeoGrb;
+            }
 
             var gml = featureElement
-                ?.Element(XName.Get("SHAPE", GrbWfsNameSpaces.Grb))
+                ?.Element(XName.Get("SHAPE", grbNamespace))
                 ?.Elements()
                 .First();
 
@@ -134,7 +141,7 @@ namespace BuildingRegistry.Api.Legacy.Infrastructure.Grb.Wfs
 
             var attributes = featureElement
                 ?.Elements()
-                .Where(el => el.Name.Namespace == GrbWfsNameSpaces.Grb && el.Name.LocalName != "SHAPE")
+                .Where(el => el.Name.Namespace == grbNamespace && el.Name.LocalName != "SHAPE")
                 .ToDictionary(el => el.Name.LocalName, el => el.Value) as IReadOnlyDictionary<string,string>;
 
             return Tuple.Create(geometry, attributes);
