@@ -1,3 +1,11 @@
+# [3.67.0](https://github.com/informatievlaanderen/building-registry/compare/v3.66.0...v3.67.0) (2023-03-29)
+
+
+### Features
+
+* add new grbwfs namespace and make backwards compatible ([d1359d6](https://github.com/informatievlaanderen/building-registry/commit/d1359d68c74955fd4a4e6dd85b63ce0d2bda045e))
+* add new grbwfs namespace and make backwards compatible ([1d9ded9](https://github.com/informatievlaanderen/building-registry/commit/1d9ded9a1942f24f9a96a3a724eda71464095018))
+
 # [3.66.0](https://github.com/informatievlaanderen/building-registry/compare/v3.65.1...v3.66.0) (2023-03-29)
 
 
