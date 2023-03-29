@@ -3,15 +3,19 @@ namespace BuildingRegistry.Tests.AggregateTests.SnapshotTests
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Threading;
+    using Autofac;
     using AutoFixture;
     using Be.Vlaanderen.Basisregisters.AggregateSource.Snapshotting;
+    using Be.Vlaanderen.Basisregisters.EventHandling;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Building;
     using Building.Events;
     using Fixtures;
     using FluentAssertions;
     using Legacy.Autofixture;
-    using Moq;
+    using SqlStreamStore;
+    using SqlStreamStore.Streams;
     using Xunit;
     using Xunit.Abstractions;
 
@@ -72,9 +76,27 @@ namespace BuildingRegistry.Tests.AggregateTests.SnapshotTests
 
             Fixture.Customize(new WithValidExtendedWkbPolygon());
 
-            _sut = new BuildingFactory(IntervalStrategy.Default).Create();
+
             _buildingSnapshot = Fixture.Create<BuildingSnapshot>();
-            _sut.Initialize(new List<object> { _buildingSnapshot });
+            var eventSerializer = Container.Resolve<EventSerializer>();
+            var eventMapping = Container.Resolve<EventMapping>();
+
+            var streamId = new BuildingStreamId(Fixture.Create<BuildingPersistentLocalId>());
+            Container.Resolve<ISnapshotStore>().SaveSnapshotAsync(streamId,
+                new SnapshotContainer
+                {
+                    Data = eventSerializer.SerializeObject(_buildingSnapshot),
+                    Info = new SnapshotInfo
+                    {
+                        StreamVersion = 1,
+                        Type = eventMapping.GetEventName(_buildingSnapshot.GetType()),
+                    }
+                },
+                CancellationToken.None);
+
+            Container.Resolve<IStreamStore>().AppendToStream(new StreamId(streamId), ExpectedVersion.NoStream, Fixture.Create<NewStreamMessage>());
+
+            _sut = Container.Resolve<IBuildings>().GetAsync(streamId, CancellationToken.None).GetAwaiter().GetResult();
         }
 
         [Fact]
@@ -89,7 +111,7 @@ namespace BuildingRegistry.Tests.AggregateTests.SnapshotTests
             _sut.BuildingStatus.Should().Be(BuildingStatus.Parse(_buildingSnapshot.BuildingStatus));
             _sut.IsRemoved.Should().Be(_buildingSnapshot.IsRemoved);
             _sut.LastEventHash.Should().Be(_buildingSnapshot.LastEventHash);
-            _sut.LastProvenanceData.Should().Be(_buildingSnapshot.LastProvenanceData);
+            _sut.LastProvenanceData.Should().BeEquivalentTo(_buildingSnapshot.LastProvenanceData);
         }
 
         [Fact]
@@ -102,7 +124,7 @@ namespace BuildingRegistry.Tests.AggregateTests.SnapshotTests
 
                 snapshotBuildingUnit.Should().NotBeNull();
 
-                buildingUnit.Function.Should().Be(BuildingUnitFunction.Parse(snapshotBuildingUnit.Function));
+                buildingUnit.Function.Should().Be(BuildingUnitFunction.Parse(snapshotBuildingUnit!.Function));
                 buildingUnit.Status.Should().Be(BuildingUnitStatus.Parse(snapshotBuildingUnit.Status));
 
                 buildingUnit.BuildingUnitPosition.Should().Be(new BuildingUnitPosition(
@@ -117,7 +139,7 @@ namespace BuildingRegistry.Tests.AggregateTests.SnapshotTests
                 buildingUnit.IsRemoved.Should().Be(snapshotBuildingUnit.IsRemoved);
                 buildingUnit.HasDeviation.Should().Be(snapshotBuildingUnit.HasDeviation);
 
-                buildingUnit.LastProvenanceData.Should().Be(snapshotBuildingUnit.LastProvenanceData);
+                buildingUnit.LastProvenanceData.Should().BeEquivalentTo(snapshotBuildingUnit.LastProvenanceData);
                 buildingUnit.LastEventHash.Should().Be(snapshotBuildingUnit.LastEventHash);
             }
         }
