@@ -109,6 +109,13 @@ namespace BuildingRegistry.Api.Oslo.Infrastructure.Grb.Wfs
         private Tuple<Geometry, IReadOnlyDictionary<string, string>?> MapFeature(GrbFeatureName name, XElement data)
         {
             var featureElement = data.Element(XName.Get(name.ToString(), GrbWfsNameSpaces.Grb));
+            var grbNamespace = GrbWfsNameSpaces.Grb;
+
+            if (featureElement is null)
+            {
+                featureElement = data.Element(XName.Get(name.ToString(), GrbWfsNameSpaces.GeoGrb));
+                grbNamespace = GrbWfsNameSpaces.GeoGrb;
+            }
 
             var gml = featureElement
                 ?.Element(XName.Get("SHAPE", GrbWfsNameSpaces.Grb))
