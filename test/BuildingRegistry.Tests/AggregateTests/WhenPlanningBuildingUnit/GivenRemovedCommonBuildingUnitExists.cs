@@ -1,6 +1,7 @@
 namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuildingUnit
 {
     using System;
+    using System.Collections.Generic;
     using AutoFixture;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
     using Be.Vlaanderen.Basisregisters.AggregateSource.Testing;
@@ -86,6 +87,8 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuildingUnit
                 BuildingGeometryMethod.Outlined);
 
             var commonBuildingUnitPersistentLocalId = new BuildingUnitPersistentLocalId(2);
+            var addressPersistentLocalIds = new List<AddressPersistentLocalId>{ new AddressPersistentLocalId(1) };
+
             var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
                 .WithBuildingPersistentLocalId(command.BuildingPersistentLocalId)
                 .WithBuildingStatus(buildingStatus)
@@ -97,6 +100,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuildingUnit
                     BuildingRegistry.Legacy.BuildingUnitStatus.Planned, // Doesn't matter what the original status was
                     commonBuildingUnitPersistentLocalId,
                     BuildingRegistry.Legacy.BuildingUnitFunction.Common,
+                    attachedAddresses: addressPersistentLocalIds,
                     isRemoved: true)
                 .Build();
 
@@ -123,7 +127,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuildingUnit
                             BuildingUnitPositionGeometryMethod.DerivedFromObject,
                             buildingGeometry.Center,
                             false,
-                            Array.Empty<AddressPersistentLocalId>()))));
+                            addressPersistentLocalIds))));
         }
     }
 }
