@@ -1,3 +1,15 @@
+# [3.66.0](https://github.com/informatievlaanderen/building-registry/compare/v3.65.1...v3.66.0) (2023-03-29)
+
+
+### Bug Fixes
+
+* enable snapshotting + add tests ([e022525](https://github.com/informatievlaanderen/building-registry/commit/e022525b789da8a6b42ffadf2c8b5afee4de07f8))
+
+
+### Features
+
+* Add prefix to grb file ([9587db8](https://github.com/informatievlaanderen/building-registry/commit/9587db85fcb5ca93cc5680ea1d7b286ad1ac1f04))
+
 ## [3.65.1](https://github.com/informatievlaanderen/building-registry/compare/v3.65.0...v3.65.1) (2023-03-17)
 
 
