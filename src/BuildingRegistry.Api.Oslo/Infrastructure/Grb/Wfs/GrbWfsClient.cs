@@ -118,7 +118,7 @@ namespace BuildingRegistry.Api.Oslo.Infrastructure.Grb.Wfs
             }
 
             var gml = featureElement
-                ?.Element(XName.Get("SHAPE", GrbWfsNameSpaces.Grb))
+                ?.Element(XName.Get("SHAPE", grbNamespace))
                 ?.Elements()
                 .First();
 
@@ -141,7 +141,7 @@ namespace BuildingRegistry.Api.Oslo.Infrastructure.Grb.Wfs
 
             var attributes = featureElement
                 ?.Elements()
-                .Where(el => el.Name.Namespace == GrbWfsNameSpaces.Grb && el.Name.LocalName != "SHAPE")
+                .Where(el => el.Name.Namespace == grbNamespace && el.Name.LocalName != "SHAPE")
                 .ToDictionary(el => el.Name.LocalName, el => el.Value) as IReadOnlyDictionary<string,string>;
 
             return Tuple.Create(geometry, attributes);
