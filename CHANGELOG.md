@@ -1,3 +1,10 @@
+## [3.67.1](https://github.com/informatievlaanderen/building-registry/compare/v3.67.0...v3.67.1) (2023-03-30)
+
+
+### Bug Fixes
+
+* wfs grb in oslo api ([13b985f](https://github.com/informatievlaanderen/building-registry/commit/13b985f4e68ba01a690e71ec64b515bd047eb403))
+
 # [3.67.0](https://github.com/informatievlaanderen/building-registry/compare/v3.66.0...v3.67.0) (2023-03-29)
 
 
