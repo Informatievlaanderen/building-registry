@@ -1,3 +1,10 @@
+# [3.68.0](https://github.com/informatievlaanderen/building-registry/compare/v3.67.1...v3.68.0) (2023-03-31)
+
+
+### Features
+
+* add wms views v2 ([7a0b247](https://github.com/informatievlaanderen/building-registry/commit/7a0b2470071a67b6473f8fdc88a0f184ae831da0))
+
 ## [3.67.1](https://github.com/informatievlaanderen/building-registry/compare/v3.67.0...v3.67.1) (2023-03-30)
 
 
