@@ -1,3 +1,10 @@
+## [3.68.1](https://github.com/informatievlaanderen/building-registry/compare/v3.68.0...v3.68.1) (2023-03-31)
+
+
+### Bug Fixes
+
+* wms views v2 migration ([b4b14b3](https://github.com/informatievlaanderen/building-registry/commit/b4b14b31b98b7954e754e8b4eded5c4bd1cedba4))
+
 # [3.68.0](https://github.com/informatievlaanderen/building-registry/compare/v3.67.1...v3.68.0) (2023-03-31)
 
 
