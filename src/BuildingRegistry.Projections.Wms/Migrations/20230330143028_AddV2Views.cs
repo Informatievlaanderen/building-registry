@@ -153,8 +153,7 @@ namespace BuildingRegistry.Projections.Wms.Migrations
                     [CalculatedGeometry] AS [Geometry],
                     [HasDeviation] As [AfwijkingVastgesteld],
                     [Version] AS RawVersion
-                FROM [wms].[buildingUnits]
-                WHERE (IsComplete = 1) AND (IsBuildingComplete = 1)
+                FROM [wms].[buildingUnitsV2]                
                 GO");
 
             foreach (var view in _buildingUnitViews.Views)
