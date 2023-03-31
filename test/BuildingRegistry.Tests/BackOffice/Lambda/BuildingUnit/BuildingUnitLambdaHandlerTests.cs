@@ -77,7 +77,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
             //Assert
             ticketing
                 .Verify(x =>
-                    x.Error(lambdaRequest.TicketId, new TicketError("Verwijderd gebouw.", "GebouwIsVerwijderd"),
+                    x.Error(lambdaRequest.TicketId, new TicketError("Verwijderd gebouw.", "VerwijderdGebouw"),
                         CancellationToken.None));
             ticketing
                 .Verify(x =>
