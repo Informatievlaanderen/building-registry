@@ -1,3 +1,10 @@
+## [3.68.2](https://github.com/informatievlaanderen/building-registry/compare/v3.68.1...v3.68.2) (2023-03-31)
+
+
+### Bug Fixes
+
+* correct errorcode when building is removed ([f7397df](https://github.com/informatievlaanderen/building-registry/commit/f7397df476faabe0d8172a65d9fab0a9f7b0b193))
+
 ## [3.68.1](https://github.com/informatievlaanderen/building-registry/compare/v3.68.0...v3.68.1) (2023-03-31)
 
 
