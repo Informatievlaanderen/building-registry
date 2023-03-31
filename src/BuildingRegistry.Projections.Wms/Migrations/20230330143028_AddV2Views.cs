@@ -1,28 +1,29 @@
+﻿using Microsoft.EntityFrameworkCore.Migrations;
+
+#nullable disable
+
 namespace BuildingRegistry.Projections.Wms.Migrations
 {
-    using Microsoft.EntityFrameworkCore.Migrations;
-    using System.Collections.Generic;
     using System.Linq;
 
-    public partial class AddViews : Migration
+    public partial class AddV2Views : Migration
     {
-        private readonly StatusViews _buildingViews = new StatusViews(
-            "GebouwView",
-            new StatusView { Name = "GebouwGepland", DisplayedStatus = "Gepland", Criteria = "Planned" },
-            new StatusView { Name = "GebouwGehistoreerd", DisplayedStatus = "Gehistoreerd", Criteria = "Retired" },
-            new StatusView { Name = "GebouwGerealiseerd", DisplayedStatus = "Gerealiseerd", Criteria = "Realized" },
-            new StatusView { Name = "GebouwNietGerealiseerd", DisplayedStatus = "NietGerealiseerd", Criteria = "NotRealized" },
-            new StatusView { Name = "GebouwInAanbouw", DisplayedStatus = "InAanbouw", Criteria = "UnderConstruction" }
+        private readonly AddViews.StatusViews _buildingViews = new AddViews.StatusViews(
+            "GebouwViewV2",
+            new AddViews.StatusView { Name = "GebouwGeplandV2", DisplayedStatus = "Gepland", Criteria = "Planned" },
+            new AddViews.StatusView { Name = "GebouwGehistoreerdV2", DisplayedStatus = "Gehistoreerd", Criteria = "Retired" },
+            new AddViews.StatusView { Name = "GebouwGerealiseerdV2", DisplayedStatus = "Gerealiseerd", Criteria = "Realized" },
+            new AddViews.StatusView { Name = "GebouwNietGerealiseerdV2", DisplayedStatus = "NietGerealiseerd", Criteria = "NotRealized" },
+            new AddViews.StatusView { Name = "GebouwInAanbouwV2", DisplayedStatus = "InAanbouw", Criteria = "UnderConstruction" }
         );
 
-        private readonly StatusViews _buildingUnitViews = new StatusViews(
-            "GebouweenheidView",
-            new StatusView { Name = "GebouweenheidGehistoreerd", DisplayedStatus = "Gehistoreerd", Criteria = "Retired" },
-            new StatusView { Name = "GebouweenheidGepland", DisplayedStatus = "Gepland", Criteria = "Planned" },
-            new StatusView { Name = "GebouweenheidGerealiseerd", DisplayedStatus = "Gerealiseerd", Criteria = "Realized" },
-            new StatusView { Name = "GebouweenheidNietGerealiseerd", DisplayedStatus = "NietGerealiseerd", Criteria = "NotRealized" }
+        private readonly AddViews.StatusViews _buildingUnitViews = new AddViews.StatusViews(
+            "GebouweenheidViewV2",
+            new AddViews.StatusView { Name = "GebouweenheidGehistoreerdV2", DisplayedStatus = "Gehistoreerd", Criteria = "Retired" },
+            new AddViews.StatusView { Name = "GebouweenheidGeplandV2", DisplayedStatus = "Gepland", Criteria = "Planned" },
+            new AddViews.StatusView { Name = "GebouweenheidGerealiseerdV2", DisplayedStatus = "Gerealiseerd", Criteria = "Realized" },
+            new AddViews.StatusView { Name = "GebouweenheidNietGerealiseerdV2", DisplayedStatus = "NietGerealiseerd", Criteria = "NotRealized" }
         );
-
 
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -32,7 +33,7 @@ namespace BuildingRegistry.Projections.Wms.Migrations
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            void Drop(StatusViews statusViews)
+            void Drop(AddViews.StatusViews statusViews)
             {
                 var query = statusViews.Views
                     .Select(view => view.Name)
@@ -46,19 +47,19 @@ namespace BuildingRegistry.Projections.Wms.Migrations
 
             Drop(_buildingUnitViews);
             migrationBuilder.Sql(@"
-                DROP INDEX [SPATIAL_Gebouweenheid_Geometry] ON [wms].[buildingUnits]
+                DROP INDEX [SPATIAL_GebouweenheidV2_Geometry] ON [wms].[buildingUnitsV2]
                 GO
 
-	            ALTER TABLE [wms].[buildingUnits]
+	            ALTER TABLE [wms].[buildingUnitsV2]
 		            DROP COLUMN CalculatedGeometry
 	            GO");
 
             Drop(_buildingViews);
             migrationBuilder.Sql(@"
-                DROP INDEX [SPATIAL_Gebouw_Geometrie] ON [wms].[buildings]
+                DROP INDEX [SPATIAL_GebouwV2_Geometrie] ON [wms].[buildingsV2]
                 GO
 
-                ALTER TABLE [wms].[buildings]
+                ALTER TABLE [wms].[buildingsV2]
 		            DROP COLUMN CalculatedGeometry
 	            GO");
         }
@@ -66,12 +67,12 @@ namespace BuildingRegistry.Projections.Wms.Migrations
         private void CreateBuildingViews(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.Sql(@"
-	            ALTER TABLE [wms].[buildings]
+	            ALTER TABLE [wms].[buildingsV2]
 		            ADD CalculatedGeometry AS (geometry::STGeomFromWKB([Geometry], 31370)) PERSISTED
 	            GO");
 
             migrationBuilder.Sql(@"
-	            CREATE SPATIAL INDEX [SPATIAL_Gebouw_Geometrie] ON [wms].[buildings] ([CalculatedGeometry])
+	            CREATE SPATIAL INDEX [SPATIAL_GebouwV2_Geometrie] ON [wms].[buildingsV2] ([CalculatedGeometry])
 	            USING  GEOMETRY_GRID
 	            WITH (
 		            BOUNDING_BOX =(22279.17, 153050.23, 258873.3, 244022.31),
@@ -95,9 +96,8 @@ namespace BuildingRegistry.Projections.Wms.Migrations
                     [GeometryMethod] AS [GeometrieMethode],
                     [Status],
                     [Version] AS RawVersion
-                FROM [wms].[Buildings]
-                WHERE (IsComplete = 1)
-                    AND ([CalculatedGeometry] IS NOT NULL)
+                FROM [wms].[BuildingsV2]
+                WHERE ([CalculatedGeometry] IS NOT NULL)
                 GO");
 
             foreach (var view in _buildingViews.Views)
@@ -120,12 +120,12 @@ namespace BuildingRegistry.Projections.Wms.Migrations
         private void CreateBuildingUnitViews(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.Sql(@"
-	            ALTER TABLE [wms].[buildingUnits]
+	            ALTER TABLE [wms].[buildingUnitsV2]
 		            ADD CalculatedGeometry AS (geometry::STGeomFromWKB([Position], 31370)) PERSISTED
 	            GO");
 
             migrationBuilder.Sql(@"
-                CREATE SPATIAL INDEX [SPATIAL_Gebouweenheid_Geometry] ON [wms].[buildingUnits] ([CalculatedGeometry])
+                CREATE SPATIAL INDEX [SPATIAL_GebouweenheidV2_Geometry] ON [wms].[buildingUnitsV2] ([CalculatedGeometry])
                 USING  GEOMETRY_GRID
                 WITH (
                     BOUNDING_BOX =(22279.17, 153050.23, 258873.3, 244022.31),
@@ -151,6 +151,7 @@ namespace BuildingRegistry.Projections.Wms.Migrations
                     [Function] AS [Functie],
                     [BuildingPersistentLocalId] AS [GebouwObjectId],
                     [CalculatedGeometry] AS [Geometry],
+                    [HasDeviation] As [AfwijkingVastgesteld],
                     [Version] AS RawVersion
                 FROM [wms].[buildingUnits]
                 WHERE (IsComplete = 1) AND (IsBuildingComplete = 1)
@@ -168,30 +169,12 @@ namespace BuildingRegistry.Projections.Wms.Migrations
                         [PositieGeometrieMethode],
                         '{view.DisplayedStatus}' as [GebouweenheidStatus],
                         [Functie],
+                        [AfwijkingVastgesteld],
                         [GebouwObjectId],
                         [Geometry]
                     FROM [wms].[{_buildingUnitViews.SourceViewName}]
                     WHERE GebouweenheidStatus = '{view.Criteria}'
                     GO");
-        }
-
-        internal sealed class StatusViews
-        {
-            public StatusViews(string sourceViewName, params StatusView[] views)
-            {
-                SourceViewName = sourceViewName;
-                Views = views;
-            }
-
-            public string SourceViewName { get; }
-            public IEnumerable<StatusView> Views { get; }
-        }
-
-        internal sealed class StatusView
-        {
-            public string Name { get; set; }
-            public string DisplayedStatus { get; set; }
-            public string Criteria { get; set; }
         }
     }
 }
