@@ -18,7 +18,7 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.Validation
 
             public static class BuildingIsRemoved
             {
-                public const string Code = "GebouwIsVerwijderd";
+                public const string Code = "VerwijderdGebouw";
                 public const string Message = "Verwijderd gebouw.";
 
                 public static TicketError ToTicketError() => new(Message, Code);
