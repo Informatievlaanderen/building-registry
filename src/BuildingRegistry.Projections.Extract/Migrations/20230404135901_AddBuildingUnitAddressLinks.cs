@@ -10,37 +10,38 @@ namespace BuildingRegistry.Projections.Extract.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "BuildingUnitV2",
+                name: "BuildingUnitAddressLinks",
                 schema: "BuildingRegistryExtract",
                 columns: table => new
                 {
                     BuildingUnitPersistentLocalId = table.Column<int>(type: "int", nullable: false),
+                    AddressPersistentLocalId = table.Column<int>(type: "int", nullable: false),
                     BuildingPersistentLocalId = table.Column<int>(type: "int", nullable: false),
-                    DbaseRecord = table.Column<byte[]>(type: "varbinary(max)", nullable: false),
-                    ShapeRecordContent = table.Column<byte[]>(type: "varbinary(max)", nullable: true),
-                    ShapeRecordContentLength = table.Column<int>(type: "int", nullable: false),
-                    MinimumX = table.Column<double>(type: "float", nullable: false),
-                    MaximumX = table.Column<double>(type: "float", nullable: false),
-                    MinimumY = table.Column<double>(type: "float", nullable: false),
-                    MaximumY = table.Column<double>(type: "float", nullable: false)
+                    DbaseRecord = table.Column<byte[]>(type: "varbinary(max)", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_BuildingUnitV2", x => x.BuildingUnitPersistentLocalId)
-                        .Annotation("SqlServer:Clustered", true);
+                    table.PrimaryKey("PK_BuildingUnitAddressLinks", x => new { x.BuildingUnitPersistentLocalId, x.AddressPersistentLocalId })
+                        .Annotation("SqlServer:Clustered", false);
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_BuildingUnitV2_BuildingPersistentLocalId",
+                name: "IX_BuildingUnitAddressLinks_AddressPersistentLocalId",
                 schema: "BuildingRegistryExtract",
-                table: "BuildingUnitV2",
+                table: "BuildingUnitAddressLinks",
+                column: "AddressPersistentLocalId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_BuildingUnitAddressLinks_BuildingPersistentLocalId",
+                schema: "BuildingRegistryExtract",
+                table: "BuildingUnitAddressLinks",
                 column: "BuildingPersistentLocalId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "BuildingUnitV2",
+                name: "BuildingUnitAddressLinks",
                 schema: "BuildingRegistryExtract");
         }
     }

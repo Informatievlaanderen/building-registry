@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BuildingRegistry.Projections.Extract.Migrations
 {
     [DbContext(typeof(ExtractContext))]
-    [Migration("20230404090227_AddBuildingUnitAddressLinks")]
+    [Migration("20230404135901_AddBuildingUnitAddressLinks")]
     partial class AddBuildingUnitAddressLinks
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
