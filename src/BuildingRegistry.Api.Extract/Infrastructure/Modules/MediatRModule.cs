@@ -24,6 +24,7 @@ namespace BuildingRegistry.Api.Extract.Infrastructure.Modules
             if (_useProjectionsV2)
             {
                 builder.RegisterType<GetBuildingsHandlerV2>().AsImplementedInterfaces();
+                builder.RegisterType<GetBuildingUnitAddressLinksHandler>().AsImplementedInterfaces();
             }
             else
             {

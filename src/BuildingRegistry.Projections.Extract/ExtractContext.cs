@@ -2,6 +2,7 @@ namespace BuildingRegistry.Projections.Extract
 {
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.Runner;
     using BuildingExtract;
+    using BuildingUnitAddressLinkExtract;
     using BuildingUnitExtract;
     using Infrastructure;
     using Microsoft.EntityFrameworkCore;
@@ -16,6 +17,7 @@ namespace BuildingRegistry.Projections.Extract
         public DbSet<BuildingUnitExtractItemV2> BuildingUnitExtractV2 { get; set; }
         public DbSet<BuildingUnitBuildingItem> BuildingUnitBuildings { get; set; }
         public DbSet<BuildingUnitBuildingItemV2> BuildingUnitBuildingsV2 { get; set; }
+        public DbSet<BuildingUnitAddressLinkExtractItem> BuildingUnitAddressLinkExtract { get; set; }
 
         // This needs to be here to please EF
         public ExtractContext() { }

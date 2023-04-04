@@ -17,6 +17,7 @@ namespace BuildingRegistry.Projector.Infrastructure.Modules
     using BuildingRegistry.Infrastructure;
     using BuildingRegistry.Projections.Extract;
     using BuildingRegistry.Projections.Extract.BuildingExtract;
+    using BuildingRegistry.Projections.Extract.BuildingUnitAddressLinkExtract;
     using BuildingRegistry.Projections.Extract.BuildingUnitExtract;
     using BuildingRegistry.Projections.LastChangedList;
     using BuildingRegistry.Projections.Legacy;
@@ -155,6 +156,12 @@ namespace BuildingRegistry.Projector.Infrastructure.Modules
                             context.Resolve<IOptions<ExtractConfig>>(),
                             DbaseCodePage.Western_European_ANSI.ToEncoding(),
                             WKBReaderFactory.Create()),
+                    ConnectedProjectionSettings.Default)
+
+                .RegisterProjections<BuildingUnitAddressLinkExtractProjections, ExtractContext>(
+                    context => new BuildingUnitAddressLinkExtractProjections(
+                        context.Resolve<IOptions<ExtractConfig>>(),
+                        DbaseCodePage.Western_European_ANSI.ToEncoding()),
                     ConnectedProjectionSettings.Default);
         }
 

@@ -40,5 +40,21 @@ namespace BuildingRegistry.Api.Extract.Extracts
         public async Task<IActionResult> GetBuildings(
             [FromServices] ExtractContext context,
             CancellationToken cancellationToken = default) => await _mediator.Send(new GetBuildingsRequest(context), cancellationToken);
+
+        /// <summary>
+        /// Vraag een dump van alle adreskoppelingen in het gebouwenregister op.
+        /// </summary>
+        /// <param name="mediator"></param>
+        /// <param name="cancellationToken"></param>
+        /// <response code="200">Als gebouwenregister adreskoppelingen kan gedownload worden.</response>
+        /// <response code="500">Als er een interne fout is opgetreden.</response>
+        [HttpGet("adreskoppelingen")]
+        [ProducesResponseType(typeof(FileStreamResult), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
+        [SwaggerResponseExample(StatusCodes.Status500InternalServerError, typeof(InternalServerErrorResponseExamples))]
+        public async Task<IActionResult> GetLinks(
+            [FromServices] IMediator mediator,
+            CancellationToken cancellationToken = default)
+            => (await mediator.Send(new GetBuildingUnitAddressLinksRequest(), cancellationToken)).CreateFileCallbackResult(cancellationToken);
     }
 }
