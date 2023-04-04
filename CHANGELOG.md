@@ -1,3 +1,10 @@
+## [3.69.1](https://github.com/informatievlaanderen/building-registry/compare/v3.69.0...v3.69.1) (2023-04-04)
+
+
+### Bug Fixes
+
+* extract addresslink migration ([f463b2f](https://github.com/informatievlaanderen/building-registry/commit/f463b2f32f998180abb1efbd2399b52c05ef248b))
+
 # [3.69.0](https://github.com/informatievlaanderen/building-registry/compare/v3.68.2...v3.69.0) (2023-04-04)
 
 
