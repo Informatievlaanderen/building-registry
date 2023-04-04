@@ -29,14 +29,14 @@ namespace BuildingRegistry.Api.Extract.Extracts.Builders
             };
 
             yield return ExtractBuilder.CreateDbfFile<BuildingExtractItem, BuildingDbaseRecord>(
-                ExtractFileNames.Building,
+                ExtractFileNames.BuildingExtractZipName,
                 new BuildingDbaseSchema(),
                 extractItems,
                 extractItems.Count,
                 x => x.DbaseRecord);
 
             yield return ExtractBuilder.CreateMetadataDbfFile(
-                ExtractFileNames.Building,
+                ExtractFileNames.BuildingExtractZipName,
                 extractMetadata);
 
         var boundingBox = new BoundingBox3D(
@@ -50,7 +50,7 @@ namespace BuildingRegistry.Api.Extract.Extracts.Builders
                 double.PositiveInfinity);
 
             yield return ExtractBuilder.CreateShapeFile<PolygonShapeContent>(
-                ExtractFileNames.Building,
+                ExtractFileNames.BuildingExtractZipName,
                 ShapeType.Polygon,
                 extractItems.Select(x => x.ShapeRecordContent),
                 ShapeContent.Read,
@@ -58,14 +58,14 @@ namespace BuildingRegistry.Api.Extract.Extracts.Builders
                 boundingBox);
 
             yield return ExtractBuilder.CreateShapeIndexFile(
-                ExtractFileNames.Building,
+                ExtractFileNames.BuildingExtractZipName,
                 ShapeType.Polygon,
                 extractItems.Select(x => x.ShapeRecordContentLength),
                 extractItems.Count,
                 boundingBox);
 
             yield return ExtractBuilder.CreateProjectedCoordinateSystemFile(
-                ExtractFileNames.Building,
+                ExtractFileNames.BuildingExtractZipName,
                 ProjectedCoordinateSystem.Belge_Lambert_1972);
         }
     }
