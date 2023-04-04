@@ -1,3 +1,15 @@
+# [3.69.0](https://github.com/informatievlaanderen/building-registry/compare/v3.68.2...v3.69.0) (2023-04-04)
+
+
+### Bug Fixes
+
+* run containers as non-root ([8997cac](https://github.com/informatievlaanderen/building-registry/commit/8997cac8e7e7a7f816e8a95575e791d94e55797e))
+
+
+### Features
+
+* add buildingunit-address links extract ([2afe36a](https://github.com/informatievlaanderen/building-registry/commit/2afe36a40d9faab9e6501a1bdd42c2dd4026cef3))
+
 ## [3.68.2](https://github.com/informatievlaanderen/building-registry/compare/v3.68.1...v3.68.2) (2023-03-31)
 
 
