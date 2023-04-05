@@ -158,6 +158,67 @@ namespace BuildingRegistry.Consumer.Address.Projections
                     message.Provenance,
                     ct);
             });
+
+            When<AddressHouseNumberWasReaddressed>(async (commandHandler, message, ct) =>
+            {
+
+                await using var backOfficeContext = await _backOfficeContextFactory.CreateDbContextAsync(ct);
+
+                await DetachAttachReaddressedAddress(
+                    backOfficeContext,
+                    commandHandler,
+                    message.ReaddressedHouseNumber.SourceAddressPersistentLocalId,
+                    message.ReaddressedHouseNumber.DestinationAddressPersistentLocalId,
+                    message.Provenance,
+                    ct);
+
+                foreach (var readdressedBoxNumber in message.ReaddressedBoxNumbers)
+                {
+                    await DetachAttachReaddressedAddress(
+                        backOfficeContext,
+                        commandHandler,
+                        readdressedBoxNumber.SourceAddressPersistentLocalId,
+                        readdressedBoxNumber.DestinationAddressPersistentLocalId,
+                        message.Provenance,
+                        ct);
+                }
+            });
+        }
+
+        private static async Task DetachAttachReaddressedAddress(
+            BackOfficeContext backOfficeContext,
+            CommandHandler commandHandler,
+            int sourceAddressPersistentLocalId,
+            int destinationAddressPersistentLocalId,
+            Contracts.Provenance provenance,
+            CancellationToken ct)
+        {
+            var sourceRelation = backOfficeContext.BuildingUnitAddressRelation
+                .AsNoTracking()
+                .Where(x => x.AddressPersistentLocalId == new AddressPersistentLocalId(sourceAddressPersistentLocalId))
+                .ToList();
+
+            foreach (var relation in sourceRelation)
+            {
+                var command = new ReplaceAddressAttachmentFromBuildingUnitBecauseAddressWasReaddressed(
+                    new BuildingPersistentLocalId(relation.BuildingPersistentLocalId),
+                    new BuildingUnitPersistentLocalId(relation.BuildingUnitPersistentLocalId),
+                    sourceAddressPersistentLocalId: new AddressPersistentLocalId(relation.AddressPersistentLocalId),
+                    destinationAddressPersistentLocalId: new AddressPersistentLocalId(destinationAddressPersistentLocalId),
+                    FromProvenance(provenance));
+                await commandHandler.Handle(command, ct);
+
+                await backOfficeContext.RemoveIdempotentBuildingUnitAddressRelation(
+                    command.BuildingUnitPersistentLocalId,
+                    command.SourceAddressPersistentLocalId,
+                    ct);
+
+                await backOfficeContext.AddIdempotentBuildingUnitAddressRelation(
+                    command.BuildingPersistentLocalId,
+                    command.BuildingUnitPersistentLocalId,
+                    command.DestinationAddressPersistentLocalId,
+                    ct);
+            }
         }
 
         private async Task DetachBecauseRemoved(

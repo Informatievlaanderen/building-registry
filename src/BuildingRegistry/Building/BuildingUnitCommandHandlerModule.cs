@@ -245,6 +245,21 @@ namespace BuildingRegistry.Building
 
                     building.DetachAddressFromBuildingUnitBecauseAddressWasRemoved(message.Command.BuildingUnitPersistentLocalId, message.Command.AddressPersistentLocalId);
                 });
+
+            For<ReplaceAddressAttachmentFromBuildingUnitBecauseAddressWasReaddressed>()
+                .AddSqlStreamStore(getStreamStore, getUnitOfWork, eventMapping, eventSerializer, getSnapshotStore)
+                .AddEventHash<ReplaceAddressAttachmentFromBuildingUnitBecauseAddressWasReaddressed, Building>(getUnitOfWork)
+                .AddProvenance(getUnitOfWork, provenanceFactory)
+                .Handle(async (message, ct) =>
+                {
+                    var streamId = new BuildingStreamId(message.Command.BuildingPersistentLocalId);
+                    var building = await buildingRepository().GetAsync(streamId, ct);
+
+                    building.ReplaceAddressAttachmentFromBuildingUnitBecauseStreetNameWasReaddressed(
+                        message.Command.BuildingUnitPersistentLocalId,
+                        message.Command.SourceAddressPersistentLocalId,
+                        message.Command.DestinationAddressPersistentLocalId);
+                });
         }
     }
 }

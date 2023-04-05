@@ -527,6 +527,61 @@ namespace BuildingRegistry.Tests.ProjectionTests.Consumer.Address
             });
         }
 
+        [Fact]
+        public async Task AddressHouseNumberWasReaddressed_UpdatesStatusAddress()
+        {
+            var destinationHouseNumberAddressWasProposed = Fixture.Create<AddressWasProposedV2>();
+            var destinationBoxNumberAddressWasProposed = Fixture.Create<AddressWasProposedV2>();
+
+            var addressWasReaddressed = new AddressHouseNumberWasReaddressed(
+                streetNamePersistentLocalId: 0,
+                addressPersistentLocalId: destinationHouseNumberAddressWasProposed.AddressPersistentLocalId,
+                readdressedHouseNumber: new ReaddressedAddressData(
+                    1,
+                    destinationHouseNumberAddressWasProposed.AddressPersistentLocalId,
+                    false,
+                    AddressStatus.Current,
+                    string.Empty,
+                    string.Empty,
+                    string.Empty,
+                    string.Empty,
+                    string.Empty,
+                    string.Empty,
+                    false
+                ),
+                readdressedBoxNumbers: new List<ReaddressedAddressData>
+                {
+                    new ReaddressedAddressData(
+                        1,
+                        destinationBoxNumberAddressWasProposed.AddressPersistentLocalId,
+                        false,
+                        AddressStatus.Current,
+                        string.Empty,
+                        string.Empty,
+                        string.Empty,
+                        string.Empty,
+                        string.Empty,
+                        string.Empty,
+                        false)
+                },
+                rejectedBoxNumberAddressPersistentLocalIds: new List<int>(),
+                retiredBoxNumberAddressPersistentLocalIds: new List<int>(),
+                provenance: Fixture.Create<Provenance>());
+
+            Given(destinationHouseNumberAddressWasProposed, destinationBoxNumberAddressWasProposed, addressWasReaddressed);
+
+            await Then(async context =>
+            {
+                var houseNumberAddress = await context.AddressConsumerItems.FindAsync(destinationHouseNumberAddressWasProposed.AddressPersistentLocalId);
+                houseNumberAddress.Should().NotBeNull();
+                houseNumberAddress!.Status.Should().Be(AddressStatus.Current);
+
+                var boxNumberAddress = await context.AddressConsumerItems.FindAsync(destinationBoxNumberAddressWasProposed.AddressPersistentLocalId);
+                boxNumberAddress.Should().NotBeNull();
+                boxNumberAddress!.Status.Should().Be(AddressStatus.Current);
+            });
+        }
+
         protected override ConsumerAddressContext CreateContext()
         {
             var options = new DbContextOptionsBuilder<ConsumerAddressContext>()
