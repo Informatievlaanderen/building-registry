@@ -416,14 +416,20 @@ namespace BuildingRegistry.Building
             Apply(new BuildingUnitAddressWasDetachedBecauseAddressWasRemoved(_buildingPersistentLocalId, BuildingUnitPersistentLocalId, addressPersistentLocalId));
         }
 
-        public void ReplaceAddressAttachmentFromBuildingUnitBecauseStreetNameWasReaddressed(AddressPersistentLocalId sourceAddressPersistentLocalId, AddressPersistentLocalId destinationAddressPersistentLocalId)
+        public void ReplaceAddressAttachmentFromBuildingUnitBecauseStreetNameWasReaddressed(
+            AddressPersistentLocalId previousAddressPersistentLocalId,
+            AddressPersistentLocalId newAddressPersistentLocalId)
         {
-            if (!AddressPersistentLocalIds.Contains(sourceAddressPersistentLocalId) && AddressPersistentLocalIds.Contains(destinationAddressPersistentLocalId))
+            if (!AddressPersistentLocalIds.Contains(previousAddressPersistentLocalId) && AddressPersistentLocalIds.Contains(newAddressPersistentLocalId))
             {
                 return;
             }
 
-            Apply(new BuildingUnitAddressAttachmentWasReplacedBecauseAddressWasReaddressed(_buildingPersistentLocalId, BuildingUnitPersistentLocalId, sourceAddressPersistentLocalId, destinationAddressPersistentLocalId));
+            Apply(new BuildingUnitAddressWasReplacedBecauseAddressWasReaddressed(
+                _buildingPersistentLocalId,
+                BuildingUnitPersistentLocalId,
+                previousAddressPersistentLocalId,
+                newAddressPersistentLocalId));
         }
 
         private ExtendedWkbGeometry? CorrectedBuildingUnitPosition(BuildingGeometry buildingGeometry)

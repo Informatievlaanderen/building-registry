@@ -241,12 +241,12 @@ namespace BuildingRegistry.Building
 
         public void ReplaceAddressAttachmentFromBuildingUnitBecauseStreetNameWasReaddressed(
             BuildingUnitPersistentLocalId buildingUnitPersistentLocalId,
-            AddressPersistentLocalId sourceAddressPersistentLocalId,
-            AddressPersistentLocalId destinationAddressPersistentLocalId)
+            AddressPersistentLocalId previousAddressPersistentLocalId,
+            AddressPersistentLocalId newAddressPersistentLocalId)
         {
             _buildingUnits
                 .GetByPersistentLocalId(buildingUnitPersistentLocalId)
-                .ReplaceAddressAttachmentFromBuildingUnitBecauseStreetNameWasReaddressed(sourceAddressPersistentLocalId, destinationAddressPersistentLocalId);
+                .ReplaceAddressAttachmentFromBuildingUnitBecauseStreetNameWasReaddressed(previousAddressPersistentLocalId, newAddressPersistentLocalId);
         }
 
         private void GuardBuildingValidStatuses(params BuildingStatus[] validStatuses)

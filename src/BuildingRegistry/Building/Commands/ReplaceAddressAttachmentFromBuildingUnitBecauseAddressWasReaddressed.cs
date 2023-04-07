@@ -12,21 +12,21 @@ namespace BuildingRegistry.Building.Commands
 
         public BuildingPersistentLocalId BuildingPersistentLocalId { get; }
         public BuildingUnitPersistentLocalId BuildingUnitPersistentLocalId { get; }
-        public AddressPersistentLocalId SourceAddressPersistentLocalId { get; }
-        public AddressPersistentLocalId DestinationAddressPersistentLocalId { get; }
+        public AddressPersistentLocalId PreviousAddressPersistentLocalId { get; }
+        public AddressPersistentLocalId NewAddressPersistentLocalId { get; }
         public Provenance Provenance { get; }
 
         public ReplaceAddressAttachmentFromBuildingUnitBecauseAddressWasReaddressed(
             BuildingPersistentLocalId buildingPersistentLocalId,
             BuildingUnitPersistentLocalId buildingUnitPersistentLocalId,
-            AddressPersistentLocalId sourceAddressPersistentLocalId,
-            AddressPersistentLocalId destinationAddressPersistentLocalId,
+            AddressPersistentLocalId previousAddressPersistentLocalId,
+            AddressPersistentLocalId newAddressPersistentLocalId,
             Provenance provenance)
         {
             BuildingPersistentLocalId = buildingPersistentLocalId;
             BuildingUnitPersistentLocalId = buildingUnitPersistentLocalId;
-            SourceAddressPersistentLocalId = sourceAddressPersistentLocalId;
-            DestinationAddressPersistentLocalId = destinationAddressPersistentLocalId;
+            PreviousAddressPersistentLocalId = previousAddressPersistentLocalId;
+            NewAddressPersistentLocalId = newAddressPersistentLocalId;
             Provenance = provenance;
         }
 
@@ -40,8 +40,8 @@ namespace BuildingRegistry.Building.Commands
         {
             yield return BuildingPersistentLocalId;
             yield return BuildingUnitPersistentLocalId;
-            yield return SourceAddressPersistentLocalId;
-            yield return DestinationAddressPersistentLocalId;
+            yield return PreviousAddressPersistentLocalId;
+            yield return NewAddressPersistentLocalId;
 
             foreach (var field in Provenance.GetIdentityFields())
             {

@@ -85,15 +85,15 @@ namespace BuildingRegistry.Tests.ProjectionTests.Consumer.Address.CommandHandlin
             {
                 MockCommandHandler.Verify(x => x.Handle(
                     It.Is<ReplaceAddressAttachmentFromBuildingUnitBecauseAddressWasReaddressed>(x =>
-                        x.SourceAddressPersistentLocalId == readdressedHouseNumber.SourceAddressPersistentLocalId &&
-                        x.DestinationAddressPersistentLocalId == readdressedHouseNumber.DestinationAddressPersistentLocalId),
+                        x.PreviousAddressPersistentLocalId == readdressedHouseNumber.SourceAddressPersistentLocalId &&
+                        x.NewAddressPersistentLocalId == readdressedHouseNumber.DestinationAddressPersistentLocalId),
                     CancellationToken.None), Times.Exactly(1));
 
 
                 MockCommandHandler.Verify(x => x.Handle(
                     It.Is<ReplaceAddressAttachmentFromBuildingUnitBecauseAddressWasReaddressed>(x =>
-                        x.SourceAddressPersistentLocalId == readdressedBoxNumber.SourceAddressPersistentLocalId &&
-                        x.DestinationAddressPersistentLocalId == readdressedBoxNumber.DestinationAddressPersistentLocalId),
+                        x.PreviousAddressPersistentLocalId == readdressedBoxNumber.SourceAddressPersistentLocalId &&
+                        x.NewAddressPersistentLocalId == readdressedBoxNumber.DestinationAddressPersistentLocalId),
                     CancellationToken.None), Times.Exactly(1));
 
                 await Task.CompletedTask;

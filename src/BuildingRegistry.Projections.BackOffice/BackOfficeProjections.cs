@@ -70,6 +70,22 @@
                     new AddressPersistentLocalId(message.Message.AddressPersistentLocalId),
                     cancellationToken);
             });
+
+            When<Envelope<BuildingUnitAddressWasReplacedBecauseAddressWasReaddressed>>(async (_, message, cancellationToken) =>
+            {
+                await using var backOfficeContext = await backOfficeContextFactory.CreateDbContextAsync(cancellationToken);
+
+                await backOfficeContext.RemoveIdempotentBuildingUnitAddressRelation(
+                    new BuildingUnitPersistentLocalId(message.Message.BuildingUnitPersistentLocalId),
+                    new AddressPersistentLocalId(message.Message.PreviousAddressPersistentLocalId),
+                    cancellationToken);
+
+                await backOfficeContext.AddIdempotentBuildingUnitAddressRelation(
+                    new BuildingPersistentLocalId(message.Message.BuildingPersistentLocalId),
+                    new BuildingUnitPersistentLocalId(message.Message.BuildingUnitPersistentLocalId),
+                    new AddressPersistentLocalId(message.Message.NewAddressPersistentLocalId),
+                    cancellationToken);
+            });
         }
     }
 }

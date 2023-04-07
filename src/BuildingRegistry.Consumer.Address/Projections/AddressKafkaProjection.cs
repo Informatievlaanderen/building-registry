@@ -142,13 +142,13 @@ namespace BuildingRegistry.Consumer.Address.Projections
 
             When<AddressHouseNumberWasReaddressed>(async (context, message, ct) =>
             {
-                var destinationHouseNumberAddress = await context.AddressConsumerItems.FindAsync(message.ReaddressedHouseNumber.DestinationAddressPersistentLocalId);
-                destinationHouseNumberAddress.Status = AddressStatus.Parse(message.ReaddressedHouseNumber.SourceStatus);
+                var houseNumberAddress = await context.AddressConsumerItems.FindAsync(message.ReaddressedHouseNumber.DestinationAddressPersistentLocalId);
+                houseNumberAddress.Status = AddressStatus.Parse(message.ReaddressedHouseNumber.SourceStatus);
 
                 foreach (var boxNumber in message.ReaddressedBoxNumbers)
                 {
-                    var destinationBoxNumberAddress = await context.AddressConsumerItems.FindAsync(boxNumber.DestinationAddressPersistentLocalId);
-                    destinationBoxNumberAddress.Status = AddressStatus.Parse(boxNumber.SourceStatus);
+                    var boxNumberAddress = await context.AddressConsumerItems.FindAsync(boxNumber.DestinationAddressPersistentLocalId);
+                    boxNumberAddress.Status = AddressStatus.Parse(boxNumber.SourceStatus);
                 }
             });
         }

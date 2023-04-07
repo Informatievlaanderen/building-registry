@@ -257,8 +257,8 @@ namespace BuildingRegistry.Building
 
                     building.ReplaceAddressAttachmentFromBuildingUnitBecauseStreetNameWasReaddressed(
                         message.Command.BuildingUnitPersistentLocalId,
-                        message.Command.SourceAddressPersistentLocalId,
-                        message.Command.DestinationAddressPersistentLocalId);
+                        message.Command.PreviousAddressPersistentLocalId,
+                        message.Command.NewAddressPersistentLocalId);
                 });
         }
     }

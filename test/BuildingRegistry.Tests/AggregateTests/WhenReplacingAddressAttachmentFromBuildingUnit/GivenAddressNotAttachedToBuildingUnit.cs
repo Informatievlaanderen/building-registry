@@ -29,14 +29,13 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenReplacingAddressAttachmentFr
                 .WithBuildingUnit(
                     BuildingRegistry.Legacy.BuildingUnitStatus.Realized,
                     command.BuildingUnitPersistentLocalId,
-                    attachedAddresses: new List<AddressPersistentLocalId>(){ command.SourceAddressPersistentLocalId },
+                    attachedAddresses: new List<AddressPersistentLocalId>(){ command.PreviousAddressPersistentLocalId },
                     isRemoved: false)
                 .Build();
             
             var consumerAddress = Container.Resolve<FakeConsumerAddressContext>();
-            consumerAddress.AddAddress(command.SourceAddressPersistentLocalId, Consumer.Address.AddressStatus.Current, isRemoved: false);
-            consumerAddress.AddAddress(command.DestinationAddressPersistentLocalId, Consumer.Address.AddressStatus.Current, isRemoved: false);
-
+            consumerAddress.AddAddress(command.PreviousAddressPersistentLocalId, Consumer.Address.AddressStatus.Current, isRemoved: false);
+            consumerAddress.AddAddress(command.NewAddressPersistentLocalId, Consumer.Address.AddressStatus.Current, isRemoved: false);
 
             var buildingUnit = buildingWasMigrated.BuildingUnits.First();
             Assert(new Scenario()
@@ -46,11 +45,11 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenReplacingAddressAttachmentFr
                 .When(command)
                 .Then(new Fact(
                     new BuildingStreamId(command.BuildingPersistentLocalId),
-                   new BuildingUnitAddressAttachmentWasReplacedBecauseAddressWasReaddressed(
+                   new BuildingUnitAddressWasReplacedBecauseAddressWasReaddressed(
                        new BuildingPersistentLocalId(buildingWasMigrated.BuildingPersistentLocalId),
                        new BuildingUnitPersistentLocalId(buildingUnit.BuildingUnitPersistentLocalId),
-                       new AddressPersistentLocalId(command.SourceAddressPersistentLocalId),
-                       new AddressPersistentLocalId(command.DestinationAddressPersistentLocalId)
+                       new AddressPersistentLocalId(command.PreviousAddressPersistentLocalId),
+                       new AddressPersistentLocalId(command.NewAddressPersistentLocalId)
                        ))));
         }
 
@@ -64,13 +63,13 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenReplacingAddressAttachmentFr
                 .WithBuildingUnit(
                     BuildingRegistry.Legacy.BuildingUnitStatus.Realized,
                     command.BuildingUnitPersistentLocalId,
-                    attachedAddresses: new List<AddressPersistentLocalId>(){ command.DestinationAddressPersistentLocalId },
+                    attachedAddresses: new List<AddressPersistentLocalId>(){ command.NewAddressPersistentLocalId },
                     isRemoved: false)
                 .Build();
             
             var consumerAddress = Container.Resolve<FakeConsumerAddressContext>();
-            consumerAddress.AddAddress(command.SourceAddressPersistentLocalId, Consumer.Address.AddressStatus.Current, isRemoved: false);
-            consumerAddress.AddAddress(command.DestinationAddressPersistentLocalId, Consumer.Address.AddressStatus.Current, isRemoved: false);
+            consumerAddress.AddAddress(command.PreviousAddressPersistentLocalId, Consumer.Address.AddressStatus.Current, isRemoved: false);
+            consumerAddress.AddAddress(command.NewAddressPersistentLocalId, Consumer.Address.AddressStatus.Current, isRemoved: false);
 
 
             var buildingUnit = buildingWasMigrated.BuildingUnits.First();

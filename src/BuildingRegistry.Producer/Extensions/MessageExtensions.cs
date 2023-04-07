@@ -518,6 +518,14 @@ namespace BuildingRegistry.Producer.Extensions
                 message.BuildingPersistentLocalId,
                 message.Provenance.ToContract());
 
+        public static Contracts.BuildingUnitAddressWasReplacedBecauseAddressWasReaddressed ToContract(this BuildingUnitAddressWasReplacedBecauseAddressWasReaddressed message)
+            => new Contracts.BuildingUnitAddressWasReplacedBecauseAddressWasReaddressed(
+                message.BuildingPersistentLocalId,
+                message.BuildingUnitPersistentLocalId,
+                message.NewAddressPersistentLocalId,
+                message.PreviousAddressPersistentLocalId,
+                message.Provenance.ToContract());
+
         private static Be.Vlaanderen.Basisregisters.GrAr.Contracts.Common.Provenance ToContract(this ProvenanceData provenance)
         => new Be.Vlaanderen.Basisregisters.GrAr.Contracts.Common.Provenance(
             provenance.Timestamp.ToString(),

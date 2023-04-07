@@ -1,6 +1,9 @@
 namespace BuildingRegistry.Projections.Extract
 {
+    using System.Threading;
+    using System.Threading.Tasks;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.Runner;
+    using Building;
     using BuildingExtract;
     using BuildingUnitAddressLinkExtract;
     using BuildingUnitExtract;
@@ -25,5 +28,13 @@ namespace BuildingRegistry.Projections.Extract
         // This needs to be DbContextOptions<T> for Autofac!
         public ExtractContext(DbContextOptions<ExtractContext> options)
             : base(options) { }
+
+        public async Task<BuildingUnitAddressLinkExtractItem?> FindBuildingUnitAddressExtractItem(
+            BuildingUnitPersistentLocalId buildingUnitPersistentLocalId,
+            AddressPersistentLocalId addressPersistentLocalId,
+            CancellationToken ct)
+        {
+            return await BuildingUnitAddressLinkExtract.FindAsync(new object?[] {buildingUnitPersistentLocalId, addressPersistentLocalId}, ct);
+        }
     }
 }

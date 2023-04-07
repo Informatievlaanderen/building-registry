@@ -5,7 +5,6 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore;
     using Be.Vlaanderen.Basisregisters.Utilities.HexByteConvertor;
     using Building.Events;
-    using BuildingRegistry.Legacy;
     using BuildingRegistry.Legacy.Events;
     using BuildingRegistry.Legacy.Events.Crab;
     using NodaTime;
@@ -13,7 +12,14 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Linq;
+    using System.Reactive;
     using System.Threading.Tasks;
+    using Building;
+    using BuildingGeometryMethod = BuildingRegistry.Legacy.BuildingGeometryMethod;
+    using BuildingStatus = BuildingRegistry.Legacy.BuildingStatus;
+    using BuildingUnitFunction = BuildingRegistry.Legacy.BuildingUnitFunction;
+    using BuildingUnitPositionGeometryMethod = BuildingRegistry.Legacy.BuildingUnitPositionGeometryMethod;
+    using BuildingUnitStatus = BuildingRegistry.Legacy.BuildingUnitStatus;
 
     [ConnectedProjectionName("Feed endpoint gebouwen")]
     [ConnectedProjectionDescription("Projectie die de gebouwen- en gebouweenheden data voor de gebouwen feed voorziet.")]
@@ -1158,7 +1164,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
                     unit.Version = message.Message.Provenance.Timestamp;
                 }, ct);
             });
-            
+
             When<Envelope<BuildingUnitDeregulationWasCorrected>>(async (context, message, ct) =>
             {
                 await context.CreateNewBuildingSyndicationItem(message.Message.BuildingPersistentLocalId, message, item =>
@@ -1259,7 +1265,44 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
                 }, ct);
             });
 
+            // source attached && destination attached => event applied
+            // source attached && destination not attached => event applied
+            // source not attached && destination attached => no event
+            // source not attached && destination not attached => event applied
+            When<Envelope<BuildingUnitAddressWasReplacedBecauseAddressWasReaddressed>>(async (context, message, ct) =>
+            {
+                await context.CreateNewBuildingSyndicationItem(message.Message.BuildingPersistentLocalId, message, item =>
+                {
+                    var unit = item.BuildingUnitsV2.Single(y => y.PersistentLocalId == message.Message.BuildingUnitPersistentLocalId);
+
+                    RemoveIdempotentAddress(unit, new AddressPersistentLocalId(message.Message.PreviousAddressPersistentLocalId));
+                    AddIdempotentAddress(unit, new BuildingUnitAddressSyndicationItemV2(message.Position, unit.PersistentLocalId, message.Message.NewAddressPersistentLocalId));
+
+                    unit.Version = message.Message.Provenance.Timestamp;
+                }, ct);
+            });
+
             #endregion
+        }
+
+        private static void RemoveIdempotentAddress(BuildingUnitSyndicationItemV2 buildingUnit, AddressPersistentLocalId addressPersistentLocalId)
+        {
+            var address = buildingUnit.Addresses.FirstOrDefault(x => x.AddressPersistentLocalId == addressPersistentLocalId);
+
+            if (address is not null)
+            {
+                buildingUnit.Addresses.Remove(address);
+            }
+        }
+
+        private static void AddIdempotentAddress(BuildingUnitSyndicationItemV2 buildingUnit, BuildingUnitAddressSyndicationItemV2 syndicationItemAddress)
+        {
+            var address = buildingUnit.Addresses.FirstOrDefault(x => x.AddressPersistentLocalId == syndicationItemAddress.AddressPersistentLocalId);
+
+            if (address is null)
+            {
+                buildingUnit.Addresses.Add(syndicationItemAddress);
+            }
         }
 
         private static BuildingGeometryMethod MapBuildingGeometryMethod(BuildingRegistry.Building.BuildingGeometryMethod buildingGeometryMethod)

@@ -193,30 +193,30 @@ namespace BuildingRegistry.Consumer.Address.Projections
             Contracts.Provenance provenance,
             CancellationToken ct)
         {
-            var sourceRelation = backOfficeContext.BuildingUnitAddressRelation
+            var relations = backOfficeContext.BuildingUnitAddressRelation
                 .AsNoTracking()
                 .Where(x => x.AddressPersistentLocalId == new AddressPersistentLocalId(sourceAddressPersistentLocalId))
                 .ToList();
 
-            foreach (var relation in sourceRelation)
+            foreach (var relation in relations)
             {
                 var command = new ReplaceAddressAttachmentFromBuildingUnitBecauseAddressWasReaddressed(
                     new BuildingPersistentLocalId(relation.BuildingPersistentLocalId),
                     new BuildingUnitPersistentLocalId(relation.BuildingUnitPersistentLocalId),
-                    sourceAddressPersistentLocalId: new AddressPersistentLocalId(relation.AddressPersistentLocalId),
-                    destinationAddressPersistentLocalId: new AddressPersistentLocalId(destinationAddressPersistentLocalId),
+                    previousAddressPersistentLocalId: new AddressPersistentLocalId(relation.AddressPersistentLocalId),
+                    newAddressPersistentLocalId: new AddressPersistentLocalId(destinationAddressPersistentLocalId),
                     FromProvenance(provenance));
                 await commandHandler.Handle(command, ct);
 
                 await backOfficeContext.RemoveIdempotentBuildingUnitAddressRelation(
                     command.BuildingUnitPersistentLocalId,
-                    command.SourceAddressPersistentLocalId,
+                    command.PreviousAddressPersistentLocalId,
                     ct);
 
                 await backOfficeContext.AddIdempotentBuildingUnitAddressRelation(
                     command.BuildingPersistentLocalId,
                     command.BuildingUnitPersistentLocalId,
-                    command.DestinationAddressPersistentLocalId,
+                    command.NewAddressPersistentLocalId,
                     ct);
             }
         }
