@@ -126,8 +126,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuildingUnit
                             BuildingUnitFunction.Common,
                             BuildingUnitPositionGeometryMethod.DerivedFromObject,
                             buildingGeometry.Center,
-                            false,
-                            addressPersistentLocalIds))));
+                            false))));
         }
     }
 }

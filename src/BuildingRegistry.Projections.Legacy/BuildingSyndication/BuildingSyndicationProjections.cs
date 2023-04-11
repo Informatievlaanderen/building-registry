@@ -1112,11 +1112,6 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
                     message,
                     x =>
                     {
-                        var addressesIdsGrouped = message.Message.AddressPersistentLocalIds.GroupBy(i => i);
-                        var addresses = addressesIdsGrouped
-                            .Select(groupedAddressId => new BuildingUnitAddressSyndicationItemV2(message.Position, message.Message.BuildingUnitPersistentLocalId, groupedAddressId.Key))
-                            .ToList();
-
                         var buildingUnitSyndicationItem = new BuildingUnitSyndicationItemV2
                         {
                             PersistentLocalId = message.Message.BuildingUnitPersistentLocalId,
@@ -1127,7 +1122,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
                             PointPosition = message.Message.ExtendedWkbGeometry.ToByteArray(),
                             PositionMethod = BuildingRegistry.Building.BuildingUnitPositionGeometryMethod.Parse(message.Message.GeometryMethod),
                             Version = message.Message.Provenance.Timestamp,
-                            Addresses = new Collection<BuildingUnitAddressSyndicationItemV2>(addresses)
+                            Addresses = new Collection<BuildingUnitAddressSyndicationItemV2>()
                         };
 
                         x.BuildingUnitsV2.Add(buildingUnitSyndicationItem);

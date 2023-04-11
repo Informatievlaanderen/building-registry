@@ -605,7 +605,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Legacy
                     item.PositionMethod.Should().Be(BuildingUnitPositionGeometryMethod.Parse(@event.GeometryMethod));
                     item.IsRemoved.Should().BeFalse();
                     item.Version.Should().Be(@event.Provenance.Timestamp);
-                    item.Addresses.Should().BeEquivalentTo(@event.AddressPersistentLocalIds.Select(x => new BuildingUnitDetailAddressItemV2(@event.BuildingUnitPersistentLocalId, x)));
+                    item.Addresses.Should().BeEmpty();
                 });
         }
 
