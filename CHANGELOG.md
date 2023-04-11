@@ -1,3 +1,10 @@
+## [3.70.2](https://github.com/informatievlaanderen/building-registry/compare/v3.70.1...v3.70.2) (2023-04-11)
+
+
+### Bug Fixes
+
+* remove removed building buildingunits from extract ([2e6fc30](https://github.com/informatievlaanderen/building-registry/commit/2e6fc30b4a9abd7294b0d0a16a3ee25e4638de00))
+
 ## [3.70.1](https://github.com/informatievlaanderen/building-registry/compare/v3.70.0...v3.70.1) (2023-04-11)
 
 
