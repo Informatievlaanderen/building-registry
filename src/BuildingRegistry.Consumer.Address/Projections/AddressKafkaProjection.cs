@@ -4,6 +4,7 @@ namespace BuildingRegistry.Consumer.Address.Projections
     using Address;
     using Be.Vlaanderen.Basisregisters.GrAr.Contracts.AddressRegistry;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.Connector;
+    using Building.Commands;
 
     public class AddressKafkaProjection : ConnectedProjection<ConsumerAddressContext>
     {
@@ -137,6 +138,18 @@ namespace BuildingRegistry.Consumer.Address.Projections
             {
                 var address = await context.AddressConsumerItems.FindAsync(message.AddressPersistentLocalId, cancellationToken: ct);
                 address.Status = AddressStatus.Current;
+            });
+
+            When<AddressHouseNumberWasReaddressed>(async (context, message, ct) =>
+            {
+                var houseNumberAddress = await context.AddressConsumerItems.FindAsync(message.ReaddressedHouseNumber.DestinationAddressPersistentLocalId);
+                houseNumberAddress.Status = AddressStatus.Parse(message.ReaddressedHouseNumber.SourceStatus);
+
+                foreach (var boxNumber in message.ReaddressedBoxNumbers)
+                {
+                    var boxNumberAddress = await context.AddressConsumerItems.FindAsync(boxNumber.DestinationAddressPersistentLocalId);
+                    boxNumberAddress.Status = AddressStatus.Parse(boxNumber.SourceStatus);
+                }
             });
         }
     }

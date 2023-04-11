@@ -1,22 +1,22 @@
-namespace BuildingRegistry.Tests.ProjectionTests.Consumer.Address
+namespace BuildingRegistry.Tests.ProjectionTests.Consumer.Address.CommandHandlingProjection
 {
     using System;
     using System.Threading;
     using System.Threading.Tasks;
-    using Api.BackOffice.Abstractions;
     using AutoFixture;
     using Be.Vlaanderen.Basisregisters.GrAr.Contracts.AddressRegistry;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
-    using Building;
-    using Building.Commands;
+    using BuildingRegistry.Api.BackOffice.Abstractions;
+    using BuildingRegistry.Building;
+    using BuildingRegistry.Building.Commands;
     using BuildingRegistry.Consumer.Address;
     using BuildingRegistry.Consumer.Address.Projections;
+    using BuildingRegistry.Tests.BackOffice;
+    using BuildingRegistry.Tests.Legacy.Autofixture;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Logging.Abstractions;
     using Moq;
     using NodaTime;
-    using Tests.BackOffice;
-    using Tests.Legacy.Autofixture;
     using Xunit;
     using Xunit.Abstractions;
     using Provenance = Be.Vlaanderen.Basisregisters.GrAr.Contracts.Common.Provenance;
@@ -31,7 +31,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Consumer.Address
             Fixture.Customize(new InfrastructureCustomization());
 
             _mockCommandHandler = new Mock<FakeCommandHandler>();
-            _fakeBackOfficeContext = new FakeBackOfficeContextFactory().CreateDbContext(Array.Empty<string>());
+            _fakeBackOfficeContext = new FakeBackOfficeContextFactory(true).CreateDbContext(Array.Empty<string>());
         }
 
         [Fact]

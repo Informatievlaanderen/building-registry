@@ -8,6 +8,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetailV2
     using Be.Vlaanderen.Basisregisters.Utilities.HexByteConvertor;
     using Building;
     using Building.Events;
+    using BuildingRegistry.Projections.Legacy.BuildingSyndication;
     using System;
     using System.Collections.ObjectModel;
     using System.Linq;
@@ -371,6 +372,40 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetailV2
                     UpdateHash(item, message);
                 }, ct);
             });
+
+            When<Envelope<BuildingUnitAddressWasReplacedBecauseAddressWasReaddressed>>(async (context, message, ct) =>
+            {
+                await Update(context, message.Message.BuildingUnitPersistentLocalId, item =>
+                {
+                    context.Entry(item).Collection(x => x.Addresses).Load();
+
+                    RemoveIdempotentAddress(item, message.Message.PreviousAddressPersistentLocalId);
+                    AddIdempotentAddress(item, new BuildingUnitDetailAddressItemV2(message.Message.BuildingUnitPersistentLocalId, message.Message.NewAddressPersistentLocalId));
+
+                    item.Version = message.Message.Provenance.Timestamp;
+                    UpdateHash(item, message);
+                }, ct);
+            });
+        }
+
+        private static void RemoveIdempotentAddress(BuildingUnitDetailItemV2 buildingUnit, int addressPersistentLocalId)
+        {
+            var address = buildingUnit.Addresses.FirstOrDefault(x => x.AddressPersistentLocalId == addressPersistentLocalId);
+
+            if (address is not null)
+            {
+                buildingUnit.Addresses.Remove(address);
+            }
+        }
+
+        private static void AddIdempotentAddress(BuildingUnitDetailItemV2 buildingUnit, BuildingUnitDetailAddressItemV2 buildingUnitDetailAddressItemV2)
+        {
+            var address = buildingUnit.Addresses.FirstOrDefault(x => x.AddressPersistentLocalId == buildingUnitDetailAddressItemV2.AddressPersistentLocalId);
+
+            if (address is null)
+            {
+                buildingUnit.Addresses.Add(buildingUnitDetailAddressItemV2);
+            }
         }
 
         private static async Task Update(LegacyContext context, int buildingUnitPersistentLocalId, Action<BuildingUnitDetailItemV2> updateAction, CancellationToken ct)

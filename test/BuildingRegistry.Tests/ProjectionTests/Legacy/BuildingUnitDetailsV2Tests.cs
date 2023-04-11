@@ -954,6 +954,51 @@ namespace BuildingRegistry.Tests.ProjectionTests.Legacy
                 });
         }
 
+        [Fact]
+        public async Task WhenBuildingUnitAddressWasReplacedBecauseAddressWasReaddressed()
+        {
+            _fixture.Customize(new WithFixedBuildingPersistentLocalId());
+            _fixture.Customize(new WithFixedBuildingUnitPersistentLocalId());
+            _fixture.Customize(new WithFixedAddressPersistentLocalId());
+
+            var buildingUnitWasPlannedV2 = _fixture.Create<BuildingUnitWasPlannedV2>();
+            var buildingUnitAddressWasAttached = _fixture.Create<BuildingUnitAddressWasAttachedV2>();
+            var @event = new BuildingUnitAddressWasReplacedBecauseAddressWasReaddressed(
+                _fixture.Create<BuildingPersistentLocalId>(),
+                _fixture.Create<BuildingUnitPersistentLocalId>(),
+                new AddressPersistentLocalId(buildingUnitAddressWasAttached.AddressPersistentLocalId),
+                new AddressPersistentLocalId(1234));
+            ((ISetProvenance)@event).SetProvenance(_fixture.Create<Provenance>());
+
+            await Sut
+                .Given(
+                    new Envelope<BuildingUnitWasPlannedV2>(
+                        new Envelope(
+                            buildingUnitWasPlannedV2,
+                            new Dictionary<string, object> { { AddEventHashPipe.HashMetadataKey, buildingUnitWasPlannedV2.GetHash() } })),
+                    new Envelope<BuildingUnitAddressWasAttachedV2>(
+                        new Envelope(
+                            buildingUnitAddressWasAttached,
+                            new Dictionary<string, object> { { AddEventHashPipe.HashMetadataKey, buildingUnitAddressWasAttached.GetHash() } })),
+                    new Envelope<BuildingUnitAddressWasReplacedBecauseAddressWasReaddressed>(
+                        new Envelope(
+                            @event,
+                            new Dictionary<string, object> { { AddEventHashPipe.HashMetadataKey, @event.GetHash() } })))
+                .Then(async ct =>
+                {
+                    var item = await ct.BuildingUnitDetailsV2.FindAsync(@event.BuildingUnitPersistentLocalId);
+                    item.Should().NotBeNull();
+                    item.Version.Should().Be(@event.Provenance.Timestamp);
+                    item.LastEventHash.Should().Be(@event.GetHash());
+
+                    var newAddress = item!.Addresses.FirstOrDefault(x => x.AddressPersistentLocalId == @event.NewAddressPersistentLocalId);
+                    newAddress.Should().NotBeNull();
+
+                    var oldAddress = item!.Addresses.FirstOrDefault(x => x.AddressPersistentLocalId == @event.PreviousAddressPersistentLocalId);
+                    oldAddress.Should().BeNull();
+                });
+        }
+
         protected override BuildingUnitDetailV2Projections CreateProjection() => new BuildingUnitDetailV2Projections();
     }
 }

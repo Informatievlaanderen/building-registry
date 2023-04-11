@@ -2,6 +2,7 @@ namespace BuildingRegistry.Building
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Events;
 
@@ -57,6 +58,7 @@ namespace BuildingRegistry.Building
             Register<BuildingUnitAddressWasDetachedBecauseAddressWasRejected>(When);
             Register<BuildingUnitAddressWasDetachedBecauseAddressWasRetired>(When);
             Register<BuildingUnitAddressWasDetachedBecauseAddressWasRemoved>(When);
+            Register<BuildingUnitAddressWasReplacedBecauseAddressWasReaddressed>(When);
         }
 
         private void When(BuildingWasMigrated @event)
@@ -268,6 +270,21 @@ namespace BuildingRegistry.Building
         private void When(BuildingUnitAddressWasDetachedBecauseAddressWasRemoved @event)
         {
             _addressPersistentLocalIds.Remove(new AddressPersistentLocalId(@event.AddressPersistentLocalId));
+
+            _lastEvent = @event;
+        }
+
+        private void When(BuildingUnitAddressWasReplacedBecauseAddressWasReaddressed @event)
+        {
+            if (_addressPersistentLocalIds.Contains(new AddressPersistentLocalId(@event.PreviousAddressPersistentLocalId)))
+            {
+                _addressPersistentLocalIds.Remove(new AddressPersistentLocalId(@event.PreviousAddressPersistentLocalId));
+            }
+
+            if (!_addressPersistentLocalIds.Contains(new AddressPersistentLocalId(@event.NewAddressPersistentLocalId)))
+            {
+                _addressPersistentLocalIds.Add(new AddressPersistentLocalId(@event.NewAddressPersistentLocalId));
+            }
 
             _lastEvent = @event;
         }

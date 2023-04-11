@@ -239,6 +239,15 @@ namespace BuildingRegistry.Building
                 .DetachAddressBecauseAddressWasRemoved(addressPersistentLocalId);
         }
 
+        public void ReplaceAddressAttachmentFromBuildingUnitBecauseStreetNameWasReaddressed(
+            BuildingUnitPersistentLocalId buildingUnitPersistentLocalId,
+            AddressPersistentLocalId previousAddressPersistentLocalId,
+            AddressPersistentLocalId newAddressPersistentLocalId)
+        {
+            _buildingUnits
+                .GetByPersistentLocalId(buildingUnitPersistentLocalId)
+                .ReplaceAddressAttachmentFromBuildingUnitBecauseStreetNameWasReaddressed(previousAddressPersistentLocalId, newAddressPersistentLocalId);
+        }
 
         private void GuardBuildingValidStatuses(params BuildingStatus[] validStatuses)
         {
