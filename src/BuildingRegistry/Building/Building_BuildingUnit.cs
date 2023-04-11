@@ -296,8 +296,7 @@ namespace BuildingRegistry.Building
                     BuildingUnitFunction.Common,
                     BuildingUnitPositionGeometryMethod.DerivedFromObject,
                     BuildingGeometry.Center,
-                    commonBuildingUnit.HasDeviation,
-                    commonBuildingUnit.AddressPersistentLocalIds));
+                    commonBuildingUnit.HasDeviation));
             }
             else
             {

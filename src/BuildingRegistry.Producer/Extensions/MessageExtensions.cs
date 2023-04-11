@@ -1,5 +1,6 @@
 namespace BuildingRegistry.Producer.Extensions
 {
+    using System.Collections.Generic;
     using System.Linq;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Building.Events;
@@ -348,7 +349,6 @@ namespace BuildingRegistry.Producer.Extensions
                 message.GeometryMethod,
                 message.ExtendedWkbGeometry,
                 message.HasDeviation,
-                message.AddressPersistentLocalIds,
                 message.Provenance.ToContract());
 
         public static Contracts.BuildingUnitWasCorrectedFromNotRealizedToPlanned ToContract(this BuildingUnitWasCorrectedFromNotRealizedToPlanned message)

@@ -204,13 +204,7 @@ namespace BuildingRegistry.Building
                 new ExtendedWkbGeometry(@event.ExtendedWkbGeometry),
                 BuildingUnitPositionGeometryMethod.Parse(@event.GeometryMethod));
             HasDeviation = @event.HasDeviation;
-
             _addressPersistentLocalIds.Clear();
-            foreach (var addressPersistentLocalId in @event.AddressPersistentLocalIds)
-            {
-                _addressPersistentLocalIds.Add(new AddressPersistentLocalId(addressPersistentLocalId));
-            }
-
             IsRemoved = false;
 
             _lastEvent = @event;

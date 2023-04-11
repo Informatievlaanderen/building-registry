@@ -221,17 +221,13 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetailV2
             {
                 await Update(context, message.Message.BuildingUnitPersistentLocalId, item =>
                 {
-                    var addresses = message.Message.AddressPersistentLocalIds
-                        .Select(addressId => new BuildingUnitDetailAddressItemV2(message.Message.BuildingUnitPersistentLocalId, addressId))
-                        .ToList();
-
                     item.Status = BuildingUnitStatus.Parse(message.Message.BuildingUnitStatus);
                     item.HasDeviation = message.Message.HasDeviation;
                     item.Function = BuildingUnitFunction.Parse(message.Message.Function);
                     item.Position = message.Message.ExtendedWkbGeometry.ToByteArray();
                     item.PositionMethod = BuildingUnitPositionGeometryMethod.Parse(message.Message.GeometryMethod);
                     item.IsRemoved = false;
-                    item.Addresses = new Collection<BuildingUnitDetailAddressItemV2>(addresses);
+                    item.Addresses = new Collection<BuildingUnitDetailAddressItemV2>();
                     item.Version = message.Message.Provenance.Timestamp;
                     UpdateHash(item, message);
                 }, ct);
