@@ -244,45 +244,44 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
 
             When<Envelope<BuildingUnitWasRemovedV2>>(async (context, message, ct) =>
             {
-                await context.FindAndUpdateBuildingUnitExtract(message.Message.BuildingUnitPersistentLocalId,
-                    itemV2 =>
-                    {
-                        UpdateRecord(itemV2, record => record.IsDeleted = true);
-                        UpdateVersie(itemV2, message.Message.Provenance.Timestamp);
-                    }, ct);
+                var itemV2 = await context
+                    .BuildingUnitExtractV2
+                    .FindAsync(message.Message.BuildingUnitPersistentLocalId, cancellationToken: ct);
+
+                context.BuildingUnitExtractV2.Remove(itemV2);
             });
 
             When<Envelope<BuildingUnitWasRemovedBecauseBuildingWasRemoved>>(async (context, message, ct) =>
             {
-                await context.FindAndUpdateBuildingUnitExtract(message.Message.BuildingUnitPersistentLocalId,
-                    itemV2 =>
-                    {
-                        UpdateRecord(itemV2, record => record.IsDeleted = true);
-                        UpdateVersie(itemV2, message.Message.Provenance.Timestamp);
-                    }, ct);
+                var itemV2 = await context.BuildingUnitExtractV2
+                    .FindAsync(message.Message.BuildingUnitPersistentLocalId, cancellationToken: ct);
+
+                context.BuildingUnitExtractV2.Remove(itemV2);
             });
 
             When<Envelope<BuildingUnitRemovalWasCorrected>>(async (context, message, ct) =>
             {
-                await context.FindAndUpdateBuildingUnitExtract(message.Message.BuildingUnitPersistentLocalId,
-                    itemV2 =>
+                var buildingUnitItemV2 = new BuildingUnitExtractItemV2
+                {
+                    BuildingPersistentLocalId = message.Message.BuildingPersistentLocalId,
+                    BuildingUnitPersistentLocalId = message.Message.BuildingUnitPersistentLocalId,
+                    DbaseRecord = new BuildingUnitDbaseRecord
                     {
-                        UpdateStatus(itemV2, MapStatus(BuildingUnitStatus.Parse(message.Message.BuildingUnitStatus)));
-                        UpdateRecord(itemV2, record =>
-                        {
-                            record.functie.Value = MapFunction(BuildingUnitFunction.Parse(message.Message.Function));
-                            record.afwijking.Value = message.Message.HasDeviation;
-                            record.IsDeleted = false;
-                        });
+                        id = { Value = $"{extractConfig.Value.DataVlaanderenNamespaceBuildingUnit}/{message.Message.BuildingUnitPersistentLocalId}" },
+                        gebouwehid = { Value = message.Message.BuildingUnitPersistentLocalId },
+                        gebouwid = { Value = message.Message.BuildingPersistentLocalId.ToString() },
+                        functie = { Value = MapFunction(BuildingUnitFunction.Parse(message.Message.Function)) },
+                        status = { Value = MapStatus(BuildingUnitStatus.Parse(message.Message.BuildingUnitStatus)) },
+                        afwijking = { Value = message.Message.HasDeviation },
+                        posgeommet = { Value = MapGeometryMethod(BuildingUnitPositionGeometryMethod.Parse(message.Message.GeometryMethod)) },
+                        versieid = { Value = message.Message.Provenance.Timestamp.ToBelgianDateTimeOffset().FromDateTimeOffset() }
+                    }.ToBytes(_encoding)
+                };
 
-                        var geometry = wkbReader.Read(message.Message.ExtendedWkbGeometry.ToByteArray());
-                        var geometryMethod = MapGeometryMethod(BuildingUnitPositionGeometryMethod.Parse(message.Message.GeometryMethod));
-                        UpdateGeometry(itemV2, geometry);
-                        UpdatePosition(itemV2, geometryMethod);
+                var geometry = wkbReader.Read(message.Message.ExtendedWkbGeometry.ToByteArray());
+                UpdateGeometry(buildingUnitItemV2, geometry);
 
-                        UpdateVersie(itemV2, message.Message.Provenance.Timestamp);
-
-                    }, ct);
+                await context.BuildingUnitExtractV2.AddAsync(buildingUnitItemV2, ct);
             });
 
             When<Envelope<BuildingUnitWasRegularized>>(async (context, message, ct) =>

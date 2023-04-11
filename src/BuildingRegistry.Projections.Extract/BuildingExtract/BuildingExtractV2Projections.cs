@@ -168,8 +168,7 @@ namespace BuildingRegistry.Projections.Extract.BuildingExtract
             When<Envelope<BuildingWasRemovedV2>>(async (context, message, ct) =>
             {
                 var item = await context.BuildingExtractV2.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);
-                UpdateRecord(item, record => record.IsDeleted = true);
-                UpdateVersie(item, message.Message.Provenance.Timestamp);
+                context.BuildingExtractV2.Remove(item);
             });
 
             When<Envelope<BuildingUnitWasPlannedV2>>(async (context, message, ct) =>
