@@ -1,3 +1,11 @@
+## [3.70.1](https://github.com/informatievlaanderen/building-registry/compare/v3.70.0...v3.70.1) (2023-04-11)
+
+
+### Bug Fixes
+
+* fix flaky test WithActiveBuildingUnit_ThenCommonBuildingUnitWasNotAdded ([f72396d](https://github.com/informatievlaanderen/building-registry/commit/f72396d81821c193be60163f6411bf2fcc179ce7))
+* remove addressPersistentLocalIds from buildingUnitRemovalWasCorrected event ([374b22d](https://github.com/informatievlaanderen/building-registry/commit/374b22d786524e4cee8188e3bede99ab45600dbc))
+
 # [3.70.0](https://github.com/informatievlaanderen/building-registry/compare/v3.69.2...v3.70.0) (2023-04-11)
 
 
