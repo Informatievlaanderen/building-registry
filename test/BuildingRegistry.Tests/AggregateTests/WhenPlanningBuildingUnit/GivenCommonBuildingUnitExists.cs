@@ -31,8 +31,8 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuildingUnit
             var command = Fixture.Create<PlanBuildingUnit>();
 
             var buildingWasPlanned = Fixture.Create<BuildingWasPlannedV2>();
-            var buildingUnitWasPlanned = Fixture.Create<BuildingUnitWasPlannedV2>();
-            var buildingUnitWasPlanned2 = Fixture.Create<BuildingUnitWasPlannedV2>();
+            var buildingUnitWasPlanned = Fixture.Create<BuildingUnitWasPlannedV2>().WithBuildingUnitPersistentLocalId(new BuildingUnitPersistentLocalId(1234));
+            var buildingUnitWasPlanned2 = Fixture.Create<BuildingUnitWasPlannedV2>().WithBuildingUnitPersistentLocalId(new BuildingUnitPersistentLocalId(5678));
 
             var buildingGeometry = new BuildingGeometry(
                 new ExtendedWkbGeometry(buildingWasPlanned.ExtendedWkbGeometry),
