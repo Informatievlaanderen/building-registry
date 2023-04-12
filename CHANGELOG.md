@@ -1,3 +1,10 @@
+## [3.70.3](https://github.com/informatievlaanderen/building-registry/compare/v3.70.2...v3.70.3) (2023-04-12)
+
+
+### Bug Fixes
+
+* only expose edit contract GebouweenheidFunctie NietGekend ([e3aabc4](https://github.com/informatievlaanderen/building-registry/commit/e3aabc4a058dfc7f6677ea92b4c858fe01493ae5))
+
 ## [3.70.2](https://github.com/informatievlaanderen/building-registry/compare/v3.70.1...v3.70.2) (2023-04-11)
 
 
