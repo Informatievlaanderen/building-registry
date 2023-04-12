@@ -8,7 +8,6 @@ namespace BuildingRegistry.Api.BackOffice.IntegrationTests
     using System.Threading.Tasks;
     using Be.Vlaanderen.Basisregisters.DockerUtilities;
     using IdentityModel;
-    using IdentityModel.AspNetCore.OAuth2Introspection;
     using IdentityModel.Client;
     using Infrastructure;
     using Microsoft.AspNetCore.Hosting;
@@ -20,7 +19,9 @@ namespace BuildingRegistry.Api.BackOffice.IntegrationTests
 
     public class IntegrationTestFixture : IAsyncLifetime
     {
-        public OAuth2IntrospectionOptions OAuth2IntrospectionOptions { get; private set; }
+        private string _clientId;
+        private string _clientSecret;
+
         public TestServer TestServer { get; private set; }
         public SqlConnection SqlConnection { get; private set; }
 
@@ -31,8 +32,8 @@ namespace BuildingRegistry.Api.BackOffice.IntegrationTests
                 new TokenClientOptions
                 {
                     Address = "https://authenticatie-ti.vlaanderen.be/op/v1/token",
-                    ClientId = OAuth2IntrospectionOptions.ClientId,
-                    ClientSecret = OAuth2IntrospectionOptions.ClientSecret,
+                    ClientId = _clientId,
+                    ClientSecret = _clientSecret,
                     Parameters = new Parameters(new[] { new KeyValuePair<string, string>("scope", requiredScopes ?? string.Empty) })
                 });
 
@@ -43,24 +44,23 @@ namespace BuildingRegistry.Api.BackOffice.IntegrationTests
 
         public async Task InitializeAsync()
         {
+            var configuration = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: false)
+                .AddJsonFile($"appsettings.{Environment.MachineName.ToLowerInvariant()}.json", optional: true, reloadOnChange: false)
+                .AddEnvironmentVariables()
+                .Build();
+
+            _clientId = configuration.GetValue<string>("ClientId");
+            _clientSecret = configuration.GetValue<string>("ClientSecret");
+
             using var _ = DockerComposer.Compose("sqlserver.yml", "building-integration-tests");
             await WaitForSqlServerToBecomeAvailable();
 
             await CreateDatabase();
 
             var hostBuilder = new WebHostBuilder()
-                .ConfigureAppConfiguration(configurationBuilder =>
-                {
-                    var configuration = configurationBuilder.SetBasePath(Directory.GetCurrentDirectory())
-                        .AddJsonFile("appsettings.json")
-                        .AddJsonFile($"appsettings.{Environment.MachineName.ToLowerInvariant()}.json", optional: true)
-                        .AddEnvironmentVariables()
-                        .Build();
-
-                    OAuth2IntrospectionOptions = configuration
-                        .GetSection(nameof(OAuth2IntrospectionOptions))
-                        .Get<OAuth2IntrospectionOptions>()!;
-                })
+                .UseConfiguration(configuration)
                 .UseStartup<Startup>()
                 .ConfigureLogging(loggingBuilder => loggingBuilder.AddConsole())
                 .UseTestServer();
