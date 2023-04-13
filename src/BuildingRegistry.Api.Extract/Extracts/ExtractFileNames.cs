@@ -6,7 +6,7 @@ namespace BuildingRegistry.Api.Extract.Extracts
     {
         public const string BuildingExtractZipName = "Gebouw";
         public const string BuildingUnitExtractZipName = "Gebouweenheid";
-        public const string AddressLinkExtractZipName = "Adreskoppelingen";
+        public const string AddressLinkExtractZipName = "AdresGebouweenheidKoppelingen";
 
         public static string GetBuildingZipName() => $"Gebouw-{DateTime.Today:yyyy-MM-dd}";
         public static string AddressLinkExtractFileName => $"{AddressLinkExtractZipName}-{DateTime.Today:yyyy-MM-dd}";
