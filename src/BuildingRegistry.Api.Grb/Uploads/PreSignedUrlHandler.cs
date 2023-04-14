@@ -12,7 +12,7 @@ namespace BuildingRegistry.Api.Grb.Uploads
 
     public sealed record GetPreSignedUrlRequest : IRequest<GetPreSignedUrlResponse>;
 
-    public sealed record GetPreSignedUrlResponse(Guid JobId, string PreSignedUrl, Dictionary<string, string> PreSignedUrlFormData, string TicketUrl);
+    public sealed record GetPreSignedUrlResponse(Guid JobId, string UploadUrl, Dictionary<string, string> UploadUrlFormData, string TicketUrl);
 
     public sealed class PreSignedUrlHandler : IRequestHandler<GetPreSignedUrlRequest, GetPreSignedUrlResponse>
     {
