@@ -1,3 +1,10 @@
+# [3.71.0](https://github.com/informatievlaanderen/building-registry/compare/v3.70.4...v3.71.0) (2023-04-18)
+
+
+### Features
+
+* consume new readdress events ([36910e3](https://github.com/informatievlaanderen/building-registry/commit/36910e321e8676cd697c6dac5ad7c99f4a4954b2))
+
 ## [3.70.4](https://github.com/informatievlaanderen/building-registry/compare/v3.70.3...v3.70.4) (2023-04-13)
 
 ## [3.70.3](https://github.com/informatievlaanderen/building-registry/compare/v3.70.2...v3.70.3) (2023-04-12)
