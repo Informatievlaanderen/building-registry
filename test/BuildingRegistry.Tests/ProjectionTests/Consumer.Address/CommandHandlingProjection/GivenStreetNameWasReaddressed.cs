@@ -69,9 +69,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Consumer.Address.CommandHandlin
                 streetNamePersistentLocalId: 0,
                 addressPersistentLocalId: 1,
                 readdressedHouseNumber : readdressedHouseNumber,
-                readdressedBoxNumbers: new List<ReaddressedAddressData>(){ readdressedBoxNumber },
-                rejectedBoxNumberAddressPersistentLocalIds: new List<int>(),
-                retiredBoxNumberAddressPersistentLocalIds: new List<int>(),
+                readdressedBoxNumbers: new List<ReaddressedAddressData>{ readdressedBoxNumber },
                 new Provenance(
                     Instant.FromDateTimeOffset(DateTimeOffset.Now).ToString(),
                     Application.ParcelRegistry.ToString(),
