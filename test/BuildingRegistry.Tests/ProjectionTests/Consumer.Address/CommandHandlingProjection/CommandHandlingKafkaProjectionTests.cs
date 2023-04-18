@@ -493,6 +493,56 @@ namespace BuildingRegistry.Tests.ProjectionTests.Consumer.Address.CommandHandlin
             });
         }
 
+        [Fact]
+        public async Task DetachAddressFromBuildingUnit_BecauseAddressWasRejectedBecauseOfReaddress()
+        {
+            var addressIntId = 456;
+
+            var @event = new AddressWasRejectedBecauseOfReaddress(
+                123,
+                addressIntId,
+                new Provenance(
+                    Instant.FromDateTimeOffset(DateTimeOffset.Now).ToString(),
+                    Application.ParcelRegistry.ToString(),
+                    Modification.Update.ToString(),
+                    Organisation.Aiv.ToString(),
+                    "test"));
+
+            AddRelations(456, 456);
+
+            Given(@event);
+            await Then(async _ =>
+            {
+                _mockCommandHandler.Verify(x => x.Handle(It.IsAny<DetachAddressFromBuildingUnitBecauseAddressWasRejected>(), CancellationToken.None), Times.Exactly(2));
+                await Task.CompletedTask;
+            });
+        }
+
+        [Fact]
+        public async Task DetachAddressFromBuildingUnit_BecauseAddressWasRetiredBecauseOfReaddress()
+        {
+            var addressIntId = 456;
+
+            var @event = new AddressWasRetiredBecauseOfReaddress(
+                123,
+                addressIntId,
+                new Provenance(
+                    Instant.FromDateTimeOffset(DateTimeOffset.Now).ToString(),
+                    Application.ParcelRegistry.ToString(),
+                    Modification.Update.ToString(),
+                    Organisation.Aiv.ToString(),
+                    "test"));
+
+            AddRelations(456, 456);
+
+            Given(@event);
+            await Then(async _ =>
+            {
+                _mockCommandHandler.Verify(x => x.Handle(It.IsAny<DetachAddressFromBuildingUnitBecauseAddressWasRetired>(), CancellationToken.None), Times.Exactly(2));
+                await Task.CompletedTask;
+            });
+        }
+
         private void AddRelations(params int[] addressInts)
         {
             foreach (var addressInt in addressInts)

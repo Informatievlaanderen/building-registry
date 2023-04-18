@@ -564,8 +564,6 @@ namespace BuildingRegistry.Tests.ProjectionTests.Consumer.Address
                         string.Empty,
                         false)
                 },
-                rejectedBoxNumberAddressPersistentLocalIds: new List<int>(),
-                retiredBoxNumberAddressPersistentLocalIds: new List<int>(),
                 provenance: Fixture.Create<Provenance>());
 
             Given(destinationHouseNumberAddressWasProposed, destinationBoxNumberAddressWasProposed, addressWasReaddressed);
@@ -579,6 +577,73 @@ namespace BuildingRegistry.Tests.ProjectionTests.Consumer.Address
                 var boxNumberAddress = await context.AddressConsumerItems.FindAsync(destinationBoxNumberAddressWasProposed.AddressPersistentLocalId);
                 boxNumberAddress.Should().NotBeNull();
                 boxNumberAddress!.Status.Should().Be(AddressStatus.Current);
+            });
+        }
+
+        [Fact]
+        public async Task AddressWasProposedBecauseOfReaddress_AddsAddress()
+        {
+            var addressWasProposed = Fixture.Create<AddressWasProposedBecauseOfReaddress>();
+            Given(addressWasProposed);
+
+            await Then(async context =>
+            {
+                var address =
+                    await context.AddressConsumerItems.FindAsync(
+                        addressWasProposed.AddressPersistentLocalId);
+
+                address.Should().NotBeNull();
+                address!.AddressId.Should().BeNull();
+                address.IsRemoved.Should().Be(false);
+                address.Status.Should().Be(AddressStatus.Proposed);
+            });
+        }
+
+        [Fact]
+        public async Task AddressWasRejectedBecauseOfReaddress_UpdatesStatusAddress()
+        {
+            var addressWasProposedV2 = Fixture.Create<AddressWasProposedV2>();
+            var addressWasRejected = Fixture.Build<AddressWasRejectedBecauseOfReaddress>()
+                .FromFactory(() => new AddressWasRejectedBecauseOfReaddress(
+                    addressWasProposedV2.StreetNamePersistentLocalId, addressWasProposedV2.AddressPersistentLocalId, Fixture.Create<Provenance>()))
+                .Create();
+
+            Given(addressWasProposedV2, addressWasRejected);
+
+            await Then(async context =>
+            {
+                var address =
+                    await context.AddressConsumerItems.FindAsync(
+                        addressWasProposedV2.AddressPersistentLocalId);
+
+                address.Should().NotBeNull();
+                address!.Status.Should().Be(AddressStatus.Rejected);
+            });
+        }
+
+        [Fact]
+        public async Task AddressWasRetiredBecauseOfReaddress_UpdatesStatusAddress()
+        {
+            var addressWasProposedV2 = Fixture.Create<AddressWasProposedV2>();
+            var addressWasApproved = Fixture.Build<AddressWasApproved>()
+                .FromFactory(() => new AddressWasApproved(
+                    addressWasProposedV2.StreetNamePersistentLocalId, addressWasProposedV2.AddressPersistentLocalId, Fixture.Create<Provenance>()))
+                .Create();
+            var addressWasRetired = Fixture.Build<AddressWasRetiredBecauseOfReaddress>()
+                .FromFactory(() => new AddressWasRetiredBecauseOfReaddress(
+                    addressWasProposedV2.StreetNamePersistentLocalId, addressWasProposedV2.AddressPersistentLocalId, Fixture.Create<Provenance>()))
+                .Create();
+
+            Given(addressWasProposedV2, addressWasApproved, addressWasRetired);
+
+            await Then(async context =>
+            {
+                var address =
+                    await context.AddressConsumerItems.FindAsync(
+                        addressWasProposedV2.AddressPersistentLocalId);
+
+                address.Should().NotBeNull();
+                address!.Status.Should().Be(AddressStatus.Retired);
             });
         }
 
