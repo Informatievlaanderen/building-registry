@@ -4,12 +4,9 @@ namespace BuildingRegistry.Api.BackOffice.Building
     using System.Threading.Tasks;
     using Abstractions.Building.Requests;
     using Abstractions.Building.SqsRequests;
-    using Be.Vlaanderen.Basisregisters.AcmIdm;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using FluentValidation;
-    using Microsoft.AspNetCore.Authentication.JwtBearer;
-    using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
     using Swashbuckle.AspNetCore.Filters;
@@ -19,32 +16,25 @@ namespace BuildingRegistry.Api.BackOffice.Building
         /// <summary>
         /// Stel een gebouw vast.
         /// </summary>
-        /// <param name="planBuildingSqsRequestFactory"></param>
-        /// <param name="planBuildingRequest"></param>
         /// <param name="validator"></param>
-        /// <param name="cancellationToken"></param>
-        /// <response code="202">Als het gebouw (reeds) ingepland is.</response>
-        /// <returns></returns>
+        /// <param name="request"></param>
         [HttpPost("acties/vaststellen")]
         [ProducesResponseType(StatusCodes.Status202Accepted)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-        [SwaggerResponseHeader(StatusCodes.Status202Accepted, "location", "string", "De url van het geplande gebouw.")]
-        [SwaggerRequestExample(typeof(PlanBuildingRequest), typeof(PlanBuildingRequestExamples))]
+        [SwaggerRequestExample(typeof(RealizeAndMeasureUnplannedBuildingRequest), typeof(RealizeAndMeasureUnplannedBuildingRequestExamples))]
         [SwaggerResponseExample(StatusCodes.Status400BadRequest, typeof(BadRequestResponseExamples))]
         [SwaggerResponseExample(StatusCodes.Status500InternalServerError, typeof(InternalServerErrorResponseExamples))]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme,
-            Policy = PolicyNames.GeschetstGebouw.DecentraleBijwerker)]
-        public async Task<IActionResult> Plan(
-            [FromServices] IValidator<PlanBuildingRequest> validator,
-            [FromServices] PlanBuildingSqsRequestFactory planBuildingSqsRequestFactory,
-            [FromBody] PlanBuildingRequest planBuildingRequest,
+        public async Task<IActionResult> RealizeAndMeasureUnplannedBuilding(
+            [FromServices] IValidator<RealizeAndMeasureUnplannedBuildingRequest> validator,
+            [FromServices] RealizeAndMeasureUnplannedBuildingSqsRequestFactory sqsRequestFactory,
+            [FromBody] RealizeAndMeasureUnplannedBuildingRequest request,
             CancellationToken cancellationToken = default)
         {
-            await validator.ValidateAndThrowAsync(planBuildingRequest, cancellationToken);
+            await validator.ValidateAndThrowAsync(request, cancellationToken);
 
             var result = await Mediator.Send(
-                planBuildingSqsRequestFactory.Create(planBuildingRequest, GetMetadata(), new ProvenanceData(CreateProvenance(Modification.Insert))),
+                sqsRequestFactory.Create(request, GetMetadata(), new ProvenanceData(CreateProvenance(Modification.Insert))),
                 cancellationToken);
 
             return Accepted(result);
