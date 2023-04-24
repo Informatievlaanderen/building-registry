@@ -6,11 +6,11 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Building
     using Be.Vlaanderen.Basisregisters.Sqs.Handlers;
     using TicketingService.Abstractions;
 
-    public sealed class PlanBuildingSqsHandler : SqsHandler<PlanBuildingSqsRequest>
+    public sealed class RealizeAndMeasureUnplannedBuildingSqsHandler : SqsHandler<PlanBuildingSqsRequest>
     {
-        public const string Action = "PlanBuilding";
+        public const string Action = "RealizeAndMeasureUnplannedBuilding";
 
-        public PlanBuildingSqsHandler(
+        public RealizeAndMeasureUnplannedBuildingSqsHandler(
             ISqsQueue sqsQueue,
             ITicketing ticketing,
             ITicketingUrl ticketingUrl)

@@ -9,6 +9,7 @@ namespace BuildingRegistry.Api.BackOffice.Building
     using FluentValidation;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
+    using NodaTime;
     using Swashbuckle.AspNetCore.Filters;
 
     public partial class BuildingController
@@ -17,7 +18,9 @@ namespace BuildingRegistry.Api.BackOffice.Building
         /// Stel een gebouw vast.
         /// </summary>
         /// <param name="validator"></param>
+        /// <param name="sqsRequestFactory"></param>
         /// <param name="request"></param>
+        /// <param name="cancellationToken"></param>
         [HttpPost("acties/vaststellen")]
         [ProducesResponseType(StatusCodes.Status202Accepted)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
@@ -34,7 +37,13 @@ namespace BuildingRegistry.Api.BackOffice.Building
             await validator.ValidateAndThrowAsync(request, cancellationToken);
 
             var result = await Mediator.Send(
-                sqsRequestFactory.Create(request, GetMetadata(), new ProvenanceData(CreateProvenance(Modification.Insert))),
+                sqsRequestFactory.Create(request, GetMetadata(), new ProvenanceData(new Provenance(
+                    SystemClock.Instance.GetCurrentInstant(),
+                    Application.Grb,
+                    new Reason(""),
+                    new Operator(""),
+                    Modification.Insert,
+                    Organisation.DigitaalVlaanderen))),
                 cancellationToken);
 
             return Accepted(result);

@@ -4,7 +4,7 @@ namespace BuildingRegistry.Api.BackOffice.Building
     using System.Threading.Tasks;
     using Abstractions.Building.Requests;
     using Abstractions.Building.SqsRequests;
-    using Be.Vlaanderen.Basisregisters.AcmIdm;
+    using Be.Vlaanderen.Basisregisters.Auth.AcmIdm;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using FluentValidation;

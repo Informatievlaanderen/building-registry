@@ -14,9 +14,9 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.Building
     using Requests.Building;
     using TicketingService.Abstractions;
 
-    public sealed class PlanBuildingLambdaHandler : BuildingLambdaHandler<PlanBuildingLambdaRequest>
+    public sealed class RealizeAndMeasureUnplannedBuildingLambdaHandler : BuildingLambdaHandler<RealizeAndMeasureUnplannedBuildingLambdaRequest>
     {
-        public PlanBuildingLambdaHandler(
+        public RealizeAndMeasureUnplannedBuildingLambdaHandler(
             IConfiguration configuration,
             ICustomRetryPolicy retryPolicy,
             ITicketing ticketing,
@@ -30,7 +30,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.Building
                 buildings)
         { }
 
-        protected override async Task<ETagResponse> InnerHandle(PlanBuildingLambdaRequest request, CancellationToken cancellationToken)
+        protected override async Task<ETagResponse> InnerHandle(RealizeAndMeasureUnplannedBuildingLambdaRequest request, CancellationToken cancellationToken)
         {
             var cmd = request.ToCommand();
 
@@ -51,7 +51,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.Building
             return new ETagResponse(string.Format(DetailUrlFormat, request.BuildingPersistentLocalId), lastHash);
         }
 
-        protected override TicketError? InnerMapDomainException(DomainException exception, PlanBuildingLambdaRequest request)
+        protected override TicketError? InnerMapDomainException(DomainException exception, RealizeAndMeasureUnplannedBuildingLambdaRequest request)
         {
             return exception switch
             {

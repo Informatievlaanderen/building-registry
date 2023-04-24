@@ -131,6 +131,10 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda
                     await mediator.Send(new RemoveBuildingLambdaRequest(messageMetadata.MessageGroupId!, request), cancellationToken);
                     break;
 
+                case RealizeAndMeasureUnplannedBuildingSqsRequest request:
+                    await mediator.Send(new RealizeAndMeasureUnplannedBuildingLambdaRequest(messageMetadata.MessageGroupId!, request), cancellationToken);
+                    break;
+
                 default:
                     throw new NotImplementedException(
                         $"{sqsRequest.GetType().Name} has no corresponding SqsLambdaRequest defined.");

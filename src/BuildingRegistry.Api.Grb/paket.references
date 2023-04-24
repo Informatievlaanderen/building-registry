@@ -2,7 +2,7 @@ AspNetCore.HealthChecks.SqlServer
 AWSSDK.S3
 AWSSDK.Extensions.NETCore.Setup
 
-Be.Vlaanderen.Basisregisters.AcmIdm
+Be.Vlaanderen.Basisregisters.Auth.AcmIdm
 Be.Vlaanderen.Basisregisters.Api
 
 Be.Vlaanderen.Basisregisters.TicketingService.Abstractions

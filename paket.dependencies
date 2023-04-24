@@ -40,7 +40,7 @@ nuget Be.Vlaanderen.Basisregisters.CommandHandling.SqlStreamStore 8.0.0
 
 nuget Be.Vlaanderen.Basisregisters.Api 20.0.0
 
-nuget Be.Vlaanderen.Basisregisters.AcmIdm 1.3.6
+nuget Be.Vlaanderen.Basisregisters.Auth.AcmIdm 1.4.0
 
 nuget Be.Vlaanderen.Basisregisters.Aws.DistributedMutex 3.0.1
 nuget Be.Vlaanderen.Basisregisters.Aws.Lambda 1.2.4
@@ -70,15 +70,15 @@ nuget Be.Vlaanderen.Basisregisters.DataDog.Tracing.SqlStreamStore 5.0.3
 
 nuget Be.Vlaanderen.Basisregisters.Crab 3.0.0
 
-nuget Be.Vlaanderen.Basisregisters.GrAr.Common 18.9.7
-nuget Be.Vlaanderen.Basisregisters.GrAr.Contracts 18.9.7
-nuget Be.Vlaanderen.Basisregisters.GrAr.Edit 18.9.7
-nuget Be.Vlaanderen.Basisregisters.GrAr.Import 18.9.7
-nuget Be.Vlaanderen.Basisregisters.GrAr.Legacy 18.9.7
-nuget Be.Vlaanderen.Basisregisters.GrAr.Provenance 18.9.7
-nuget Be.Vlaanderen.Basisregisters.GrAr.Extracts 18.9.7
-nuget Be.Vlaanderen.Basisregisters.GrAr.Oslo 18.9.7
-nuget Be.Vlaanderen.Basisregisters.GrAr.Provenance.AcmIdm 18.9.7
+nuget Be.Vlaanderen.Basisregisters.GrAr.Common 18.11.0
+nuget Be.Vlaanderen.Basisregisters.GrAr.Contracts 18.11.0
+nuget Be.Vlaanderen.Basisregisters.GrAr.Edit 18.11.0
+nuget Be.Vlaanderen.Basisregisters.GrAr.Import 18.11.0
+nuget Be.Vlaanderen.Basisregisters.GrAr.Legacy 18.11.0
+nuget Be.Vlaanderen.Basisregisters.GrAr.Provenance 18.11.0
+nuget Be.Vlaanderen.Basisregisters.GrAr.Extracts 18.11.0
+nuget Be.Vlaanderen.Basisregisters.GrAr.Oslo 18.11.0
+nuget Be.Vlaanderen.Basisregisters.GrAr.Provenance.AcmIdm 18.11.0
 
 nuget Be.Vlaanderen.Basisregisters.DependencyInjection 1.0.3
 

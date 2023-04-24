@@ -749,6 +749,39 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda
                     request.Metadata == messageData.Metadata
                 ), CancellationToken.None), Times.Once);
         }
+
+        [Fact]
+        public async Task WhenProcessingRealizingAndMeasuringUnplannedBuildingSqsRequest_ThenLambdaRequestIsSent()
+        {
+            // Arrange
+            var mediator = new Mock<IMediator>();
+            var containerBuilder = new ContainerBuilder();
+            containerBuilder.Register(_ => mediator.Object);
+            var container = containerBuilder.Build();
+
+            var sqsRequest = Fixture.Create<RealizeAndMeasureUnplannedBuildingSqsRequest>();
+            var messageMetadata = new MessageMetadata { MessageGroupId = Fixture.Create<int>().ToString() };
+
+            var sut = new MessageHandler(container);
+
+            // Act
+            await sut.HandleMessage(
+                sqsRequest,
+                messageMetadata,
+                CancellationToken.None);
+
+            // Assert
+            mediator
+                .Verify(x => x.Send(It.Is<RealizeAndMeasureUnplannedBuildingLambdaRequest>(request =>
+                    request.TicketId == sqsRequest.TicketId &&
+                    request.MessageGroupId == messageMetadata.MessageGroupId &&
+                    request.Request == sqsRequest.Request &&
+                    request.BuildingPersistentLocalId == sqsRequest.BuildingPersistentLocalId &&
+                    request.IfMatchHeaderValue == null &&
+                    request.Provenance == sqsRequest.ProvenanceData.ToProvenance() &&
+                    request.Metadata == sqsRequest.Metadata
+                ), CancellationToken.None), Times.Once);
+        }
     }
 
     internal class TestSqsRequest : SqsRequest
