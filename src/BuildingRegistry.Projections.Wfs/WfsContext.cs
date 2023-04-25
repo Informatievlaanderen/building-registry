@@ -13,7 +13,6 @@ namespace BuildingRegistry.Projections.Wfs
         public DbSet<BuildingUnit.BuildingUnit> BuildingUnits { get; set; }
         public DbSet<BuildingUnit.BuildingUnitBuildingItem> BuildingUnitsBuildings { get; set; }
         public DbSet<BuildingUnitV2.BuildingUnitV2> BuildingUnitsV2 { get; set; }
-        public DbSet<BuildingUnitV2.BuildingUnitBuildingItemV2> BuildingUnitsBuildingsV2 { get; set; }
 
         public WfsContext() { }
 

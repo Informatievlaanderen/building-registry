@@ -4,6 +4,7 @@ using BuildingRegistry.Projections.Wms;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BuildingRegistry.Projections.Wms.Migrations
 {
     [DbContext(typeof(WmsContext))]
-    partial class WmsContextModelSnapshot : ModelSnapshot
+    [Migration("20230425115938_RemoveBuildingUnitBuildingsV2")]
+    partial class RemoveBuildingUnitBuildingsV2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
