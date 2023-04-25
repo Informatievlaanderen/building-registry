@@ -57,7 +57,6 @@ namespace BuildingRegistry.Api.BackOffice.Infrastructure.Modules
                 .AsSelf()
                 .InstancePerLifetimeScope();
 
-            // TODO: new implementation of provenanceFactory to take parameter for Application
             builder.Register(c => new AcmIdmProvenanceFactory(Application.BuildingRegistry, c.Resolve<IActionContextAccessor>()))
                 .As<IProvenanceFactory>()
                 .InstancePerLifetimeScope()

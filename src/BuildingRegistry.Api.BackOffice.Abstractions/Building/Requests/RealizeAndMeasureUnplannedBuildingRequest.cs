@@ -14,9 +14,6 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.Building.Requests
     [DataContract(Name = "StelGebouwVast", Namespace = "")]
     public sealed class RealizeAndMeasureUnplannedBuildingRequest
     {
-        /// <summary>
-        /// De inmeting van het gebouw in GML-3 formaat met Lambert 72 referentie systeem.
-        /// </summary>
         [DataMember(Name = "GeometriePolygoon", Order = 0)]
         [JsonProperty(Required = Required.Always)]
         public string GeometriePolygoon { get; set; }
