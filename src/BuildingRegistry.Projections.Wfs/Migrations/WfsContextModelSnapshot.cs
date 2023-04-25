@@ -198,26 +198,6 @@ namespace BuildingRegistry.Projections.Wfs.Migrations
                     b.ToTable("BuildingUnit_Buildings", "wfs");
                 });
 
-            modelBuilder.Entity("BuildingRegistry.Projections.Wfs.BuildingUnitV2.BuildingUnitBuildingItemV2", b =>
-                {
-                    b.Property<int>("BuildingPersistentLocalId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("BuildingRetiredStatus")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsRemoved")
-                        .HasColumnType("bit");
-
-                    b.HasKey("BuildingPersistentLocalId");
-
-                    SqlServerKeyBuilderExtensions.IsClustered(b.HasKey("BuildingPersistentLocalId"), false);
-
-                    b.HasIndex("BuildingPersistentLocalId");
-
-                    b.ToTable("BuildingUnit_BuildingsV2", "wfs");
-                });
-
             modelBuilder.Entity("BuildingRegistry.Projections.Wfs.BuildingUnitV2.BuildingUnitV2", b =>
                 {
                     b.Property<int>("BuildingUnitPersistentLocalId")

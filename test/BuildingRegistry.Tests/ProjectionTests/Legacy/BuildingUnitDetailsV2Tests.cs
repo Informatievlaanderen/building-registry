@@ -52,19 +52,6 @@ namespace BuildingRegistry.Tests.ProjectionTests.Legacy
                 .Given(new Envelope<BuildingWasMigrated>(new Envelope(buildingWasMigrated, metadata)))
                 .Then(async ct =>
                 {
-                    var buildingUnitBuildingItem = await ct.BuildingUnitBuildingsV2.FindAsync(buildingWasMigrated.BuildingPersistentLocalId);
-                    buildingUnitBuildingItem.Should().NotBeNull();
-
-                    buildingUnitBuildingItem!.IsRemoved.Should().Be(buildingWasMigrated.IsRemoved);
-                    if (string.IsNullOrEmpty(expectedStatus))
-                    {
-                        buildingUnitBuildingItem.BuildingRetiredStatus.Should().BeNull();
-                    }
-                    else
-                    {
-                        buildingUnitBuildingItem.BuildingRetiredStatus.Value.Value.Should().Be(expectedStatus);
-                    }
-
                     var buildingUnits = ct.BuildingUnitDetailsV2
                         .Where(unit => unit.BuildingPersistentLocalId == buildingWasMigrated.BuildingPersistentLocalId)
                         .ToList();
@@ -91,83 +78,6 @@ namespace BuildingRegistry.Tests.ProjectionTests.Legacy
 
                         expectedUnit.LastEventHash.Should().Be(buildingWasMigrated.GetHash());
                     }
-                });
-        }
-
-        [Fact]
-        public async Task WhenBuildingWasPlannedV2()
-        {
-            _fixture.Customize(new WithFixedBuildingPersistentLocalId());
-            _fixture.Customize(new WithFixedBuildingUnitPersistentLocalId());
-
-            var buildingWasPlannedV2 = _fixture.Create<BuildingWasPlannedV2>();
-            var metadata = new Dictionary<string, object>
-            {
-                { AddEventHashPipe.HashMetadataKey, buildingWasPlannedV2.GetHash() }
-            };
-
-            await Sut
-                .Given(new Envelope<BuildingWasPlannedV2>(new Envelope(buildingWasPlannedV2, metadata)))
-                .Then(async ct =>
-                {
-                    var buildingDetailItemV2 = await ct.BuildingUnitBuildingsV2.FindAsync(buildingWasPlannedV2.BuildingPersistentLocalId);
-                    buildingDetailItemV2.Should().NotBeNull();
-
-                    buildingDetailItemV2.IsRemoved.Should().BeFalse();
-                    buildingDetailItemV2.BuildingRetiredStatus.Should().BeNull();
-                });
-        }
-
-        [Fact]
-        public async Task WhenUnplannedBuildingWasRealizedAndMeasured()
-        {
-            _fixture.Customize(new WithFixedBuildingPersistentLocalId());
-            _fixture.Customize(new WithFixedBuildingUnitPersistentLocalId());
-
-            var @event = _fixture.Create<UnplannedBuildingWasRealizedAndMeasured>();
-            var metadata = new Dictionary<string, object>
-            {
-                { AddEventHashPipe.HashMetadataKey, @event.GetHash() }
-            };
-
-            await Sut
-                .Given(new Envelope<UnplannedBuildingWasRealizedAndMeasured>(new Envelope(@event, metadata)))
-                .Then(async ct =>
-                {
-                    var buildingDetailItemV2 = await ct.BuildingUnitBuildingsV2.FindAsync(@event.BuildingPersistentLocalId);
-                    buildingDetailItemV2.Should().NotBeNull();
-
-                    buildingDetailItemV2.IsRemoved.Should().BeFalse();
-                    buildingDetailItemV2.BuildingRetiredStatus.Should().BeNull();
-                });
-        }
-
-        [Fact]
-        public async Task WhenBuildingUnitWasPlannedV2()
-        {
-            _fixture.Customize(new WithFixedBuildingPersistentLocalId());
-            _fixture.Customize(new WithFixedBuildingUnitPersistentLocalId());
-
-            var buildingUnitWasPlannedV2 = _fixture.Create<BuildingUnitWasPlannedV2>();
-            var metadata = new Dictionary<string, object>
-            {
-                { AddEventHashPipe.HashMetadataKey, buildingUnitWasPlannedV2.GetHash() }
-            };
-
-            await Sut
-                .Given(new Envelope<BuildingUnitWasPlannedV2>(new Envelope(buildingUnitWasPlannedV2, metadata)))
-                .Then(async ct =>
-                {
-                    var item = await ct.BuildingUnitDetailsV2.FindAsync(buildingUnitWasPlannedV2.BuildingUnitPersistentLocalId);
-                    item.Should().NotBeNull();
-                    item!.BuildingPersistentLocalId.Should().Be(buildingUnitWasPlannedV2.BuildingPersistentLocalId);
-                    item.Position.Should().BeEquivalentTo(buildingUnitWasPlannedV2.ExtendedWkbGeometry.ToByteArray());
-                    item.PositionMethod.Should().Be(BuildingUnitPositionGeometryMethod.Parse(buildingUnitWasPlannedV2.GeometryMethod));
-                    item.Function.Should().Be(BuildingUnitFunction.Parse(buildingUnitWasPlannedV2.Function));
-                    item.Version.Should().Be(buildingUnitWasPlannedV2.Provenance.Timestamp);
-                    item.IsRemoved.Should().BeFalse();
-                    item.Status.Should().Be(BuildingUnitStatus.Planned);
-                    item.HasDeviation.Should().Be(buildingUnitWasPlannedV2.HasDeviation);
                 });
         }
 
@@ -200,6 +110,35 @@ namespace BuildingRegistry.Tests.ProjectionTests.Legacy
                     item!.PositionMethod.Should().Be(BuildingUnitPositionGeometryMethod.DerivedFromObject);
                     item.Position.Should().BeEquivalentTo(@event.ExtendedWkbGeometryBuildingUnits!.ToByteArray());
                     item.Version.Should().Be(@event.Provenance.Timestamp);
+                });
+        }
+
+        [Fact]
+        public async Task WhenBuildingUnitWasPlannedV2()
+        {
+            _fixture.Customize(new WithFixedBuildingPersistentLocalId());
+            _fixture.Customize(new WithFixedBuildingUnitPersistentLocalId());
+
+            var buildingUnitWasPlannedV2 = _fixture.Create<BuildingUnitWasPlannedV2>();
+            var metadata = new Dictionary<string, object>
+            {
+                { AddEventHashPipe.HashMetadataKey, buildingUnitWasPlannedV2.GetHash() }
+            };
+
+            await Sut
+                .Given(new Envelope<BuildingUnitWasPlannedV2>(new Envelope(buildingUnitWasPlannedV2, metadata)))
+                .Then(async ct =>
+                {
+                    var item = await ct.BuildingUnitDetailsV2.FindAsync(buildingUnitWasPlannedV2.BuildingUnitPersistentLocalId);
+                    item.Should().NotBeNull();
+                    item!.BuildingPersistentLocalId.Should().Be(buildingUnitWasPlannedV2.BuildingPersistentLocalId);
+                    item.Position.Should().BeEquivalentTo(buildingUnitWasPlannedV2.ExtendedWkbGeometry.ToByteArray());
+                    item.PositionMethod.Should().Be(BuildingUnitPositionGeometryMethod.Parse(buildingUnitWasPlannedV2.GeometryMethod));
+                    item.Function.Should().Be(BuildingUnitFunction.Parse(buildingUnitWasPlannedV2.Function));
+                    item.Version.Should().Be(buildingUnitWasPlannedV2.Provenance.Timestamp);
+                    item.IsRemoved.Should().BeFalse();
+                    item.Status.Should().Be(BuildingUnitStatus.Planned);
+                    item.HasDeviation.Should().Be(buildingUnitWasPlannedV2.HasDeviation);
                 });
         }
 

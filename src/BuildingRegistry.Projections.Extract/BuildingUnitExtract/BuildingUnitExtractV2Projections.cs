@@ -39,22 +39,9 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
             _encoding = encoding ?? throw new ArgumentNullException(nameof(encoding));
 
             #region Building
+
             When<Envelope<BuildingWasMigrated>>(async (context, message, ct) =>
             {
-                var buildingUnitBuildingItemV2 = new BuildingUnitBuildingItemV2
-                {
-                    BuildingPersistentLocalId = message.Message.BuildingPersistentLocalId,
-                    IsRemoved = message.Message.IsRemoved
-                };
-
-                var buildingStatus = BuildingStatus.Parse(message.Message.BuildingStatus);
-                if (buildingStatus == BuildingStatus.Retired || buildingStatus == BuildingStatus.NotRealized)
-                {
-                    buildingUnitBuildingItemV2.BuildingRetiredStatus = buildingStatus;
-                }
-
-                await context.BuildingUnitBuildingsV2.AddAsync(buildingUnitBuildingItemV2, ct);
-
                 if (message.Message.IsRemoved)
                 {
                     return;
@@ -91,30 +78,6 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
                 }
             });
 
-            When<Envelope<BuildingWasPlannedV2>>(async (context, message, ct) =>
-            {
-                var buildingUnitBuildingItemV2 = new BuildingUnitBuildingItemV2
-                {
-                    BuildingPersistentLocalId = message.Message.BuildingPersistentLocalId,
-                    IsRemoved = false,
-                    BuildingRetiredStatus = null
-                };
-
-                await context.BuildingUnitBuildingsV2.AddAsync(buildingUnitBuildingItemV2, ct);
-            });
-
-            When<Envelope<UnplannedBuildingWasRealizedAndMeasured>>(async (context, message, ct) =>
-            {
-                var buildingUnitBuildingItemV2 = new BuildingUnitBuildingItemV2
-                {
-                    BuildingPersistentLocalId = message.Message.BuildingPersistentLocalId,
-                    IsRemoved = false,
-                    BuildingRetiredStatus = null
-                };
-
-                await context.BuildingUnitBuildingsV2.AddAsync(buildingUnitBuildingItemV2, ct);
-            });
-
             When<Envelope<BuildingOutlineWasChanged>>(async (context, message, ct) =>
             {
                 foreach (var buildingUnitPersistentLocalId in message.Message.BuildingUnitPersistentLocalIds)
@@ -129,12 +92,6 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
                             UpdateVersie(itemV2, message.Message.Provenance.Timestamp);
                         }, ct);
                 }
-            });
-
-            When<Envelope<BuildingWasNotRealizedV2>>(async (context, message, ct) =>
-            {
-                var building = await context.BuildingUnitBuildingsV2.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);
-                building.BuildingRetiredStatus = BuildingStatus.NotRealized;
             });
 
             #endregion Building

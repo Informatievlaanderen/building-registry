@@ -30,7 +30,6 @@ namespace BuildingRegistry.Projections.Legacy
         public DbSet<BuildingUnitBuildingItem> BuildingUnitBuildings { get; set; }
         public DbSet<BuildingUnitDetailAddressItem> BuildingUnitAddresses { get; set; }
         public DbSet<BuildingUnitDetailItemV2> BuildingUnitDetailsV2 { get; set; }
-        public DbSet<BuildingUnitBuildingItemV2> BuildingUnitBuildingsV2 { get; set; }
         public DbSet<BuildingUnitDetailAddressItemV2> BuildingUnitAddressesV2 { get; set; }
 
         public DbSet<RemovedPersistentLocalId> RemovedPersistentLocalIds { get; set; }

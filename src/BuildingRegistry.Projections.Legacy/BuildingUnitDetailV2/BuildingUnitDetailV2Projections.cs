@@ -20,22 +20,10 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetailV2
     {
         public BuildingUnitDetailV2Projections()
         {
+            #region Building
+
             When<Envelope<BuildingWasMigrated>>(async (context, message, ct) =>
             {
-                BuildingStatus? retiredStatus = null;
-                var buildingStatus = BuildingStatus.Parse(message.Message.BuildingStatus);
-                if (buildingStatus == BuildingStatus.Retired || buildingStatus == BuildingStatus.NotRealized)
-                {
-                    retiredStatus = buildingStatus;
-                }
-
-                var building = new BuildingUnitBuildingItemV2(
-                    message.Message.BuildingPersistentLocalId,
-                    message.Message.IsRemoved,
-                    retiredStatus);
-
-                await context.BuildingUnitBuildingsV2.AddAsync(building, ct);
-
                 foreach (var buildingUnit in message.Message.BuildingUnits)
                 {
                     var addressesIdsGrouped = buildingUnit.AddressPersistentLocalIds.GroupBy(x => x);
@@ -63,25 +51,21 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetailV2
                 }
             });
 
-            When<Envelope<BuildingWasPlannedV2>>(async (context, message, ct) =>
+            When<Envelope<BuildingOutlineWasChanged>>(async (context, message, ct) =>
             {
-                var building = new BuildingUnitBuildingItemV2(
-                    message.Message.BuildingPersistentLocalId,
-                    false,
-                    null);
-
-                await context.BuildingUnitBuildingsV2.AddAsync(building, ct);
+                foreach (var buildingUnitPersistentLocalId in message.Message.BuildingUnitPersistentLocalIds)
+                {
+                    await Update(context, buildingUnitPersistentLocalId, item =>
+                    {
+                        item.Position = message.Message.ExtendedWkbGeometryBuildingUnits!.ToByteArray();
+                        item.PositionMethod = BuildingUnitPositionGeometryMethod.DerivedFromObject;
+                        item.Version = message.Message.Provenance.Timestamp;
+                        UpdateHash(item, message);
+                    }, ct);
+                }
             });
 
-            When<Envelope<UnplannedBuildingWasRealizedAndMeasured>>(async (context, message, ct) =>
-            {
-                var building = new BuildingUnitBuildingItemV2(
-                    message.Message.BuildingPersistentLocalId,
-                    false,
-                    null);
-
-                await context.BuildingUnitBuildingsV2.AddAsync(building, ct);
-            });
+            #endregion
 
             When<Envelope<BuildingUnitWasPlannedV2>>(async (context, message, ct) =>
             {
@@ -100,20 +84,6 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetailV2
                 UpdateHash(buildingUnitDetailItemV2, message);
 
                 await context.BuildingUnitDetailsV2.AddAsync(buildingUnitDetailItemV2, ct);
-            });
-
-            When<Envelope<BuildingOutlineWasChanged>>(async (context, message, ct) =>
-            {
-                foreach (var buildingUnitPersistentLocalId in message.Message.BuildingUnitPersistentLocalIds)
-                {
-                    await Update(context, buildingUnitPersistentLocalId, item =>
-                    {
-                        item.Position = message.Message.ExtendedWkbGeometryBuildingUnits!.ToByteArray();
-                        item.PositionMethod = BuildingUnitPositionGeometryMethod.DerivedFromObject;
-                        item.Version = message.Message.Provenance.Timestamp;
-                        UpdateHash(item, message);
-                    }, ct);
-                }
             });
 
             When<Envelope<BuildingUnitWasRealizedV2>>(async (context, message, ct) =>

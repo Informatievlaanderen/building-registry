@@ -29,15 +29,10 @@ namespace BuildingRegistry.Projections.Wfs.BuildingUnitV2
         {
             _wkbReader = wkbReader;
 
+            #region Building
+
             When<Envelope<BuildingWasMigrated>>(async (context, message, ct) =>
             {
-                await context.BuildingUnitsBuildingsV2.AddAsync(new BuildingUnitBuildingItemV2
-                {
-                    BuildingPersistentLocalId = message.Message.BuildingPersistentLocalId,
-                    IsRemoved = message.Message.IsRemoved,
-                    BuildingRetiredStatus = MapBuildingRetiredStatus(BuildingStatus.Parse(message.Message.BuildingStatus))
-                }, ct);
-
                 foreach (var buildingUnit in message.Message.BuildingUnits)
                 {
                     var buildingUnitV2 = new BuildingUnitV2
@@ -58,25 +53,19 @@ namespace BuildingRegistry.Projections.Wfs.BuildingUnitV2
                 }
             });
 
-            When<Envelope<BuildingWasPlannedV2>>(async (context, message, ct) =>
+            When<Envelope<BuildingOutlineWasChanged>>(async (context, message, _) =>
             {
-                await context.BuildingUnitsBuildingsV2.AddAsync(new BuildingUnitBuildingItemV2
+                foreach (var buildingUnitPersistentLocalId in message.Message.BuildingUnitPersistentLocalIds)
                 {
-                    BuildingPersistentLocalId = message.Message.BuildingPersistentLocalId,
-                    IsRemoved = false,
-                    BuildingRetiredStatus = null
-                }, ct);
+                    var unit = await context.BuildingUnitsV2.FindAsync(buildingUnitPersistentLocalId);
+                    unit!.Position = (Point)_wkbReader.Read(message.Message.ExtendedWkbGeometryBuildingUnits!.ToByteArray());
+                    unit.PositionMethod = MapGeometryMethod(BuildingUnitPositionGeometryMethod.DerivedFromObject);
+
+                    SetVersion(unit, message.Message.Provenance.Timestamp);
+                }
             });
 
-            When<Envelope<UnplannedBuildingWasRealizedAndMeasured>>(async (context, message, ct) =>
-            {
-                await context.BuildingUnitsBuildingsV2.AddAsync(new BuildingUnitBuildingItemV2
-                {
-                    BuildingPersistentLocalId = message.Message.BuildingPersistentLocalId,
-                    IsRemoved = false,
-                    BuildingRetiredStatus = null
-                }, ct);
-            });
+            #endregion
 
             When<Envelope<BuildingUnitWasPlannedV2>>(async (context, message, ct) =>
             {
@@ -100,18 +89,6 @@ namespace BuildingRegistry.Projections.Wfs.BuildingUnitV2
                     MapGeometryMethod(BuildingUnitPositionGeometryMethod.Parse(message.Message.GeometryMethod)));
 
                 await context.BuildingUnitsV2.AddAsync(buildingUnitV2, ct);
-            });
-
-            When<Envelope<BuildingOutlineWasChanged>>(async (context, message, _) =>
-            {
-                foreach (var buildingUnitPersistentLocalId in message.Message.BuildingUnitPersistentLocalIds)
-                {
-                    var unit = await context.BuildingUnitsV2.FindAsync(buildingUnitPersistentLocalId);
-                    unit!.Position = (Point)_wkbReader.Read(message.Message.ExtendedWkbGeometryBuildingUnits!.ToByteArray());
-                    unit.PositionMethod = MapGeometryMethod(BuildingUnitPositionGeometryMethod.DerivedFromObject);
-
-                    SetVersion(unit, message.Message.Provenance.Timestamp);
-                }
             });
 
             When<Envelope<BuildingUnitWasRealizedV2>>(async (context, message, _) =>
