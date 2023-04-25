@@ -498,6 +498,12 @@ namespace BuildingRegistry.Producer.Extensions
                 message.ExtendedWkbGeometry,
                 message.Provenance.ToContract());
 
+        public static Contracts.UnplannedBuildingWasRealizedAndMeasured ToContract(this UnplannedBuildingWasRealizedAndMeasured message)
+            => new Contracts.UnplannedBuildingWasRealizedAndMeasured(
+                message.BuildingPersistentLocalId,
+                message.ExtendedWkbGeometry,
+                message.Provenance.ToContract());
+
         public static Contracts.BuildingWasRealizedV2 ToContract(this BuildingWasRealizedV2 message)
             => new Contracts.BuildingWasRealizedV2(
                 message.BuildingPersistentLocalId,

@@ -50,6 +50,23 @@ namespace BuildingRegistry.Projections.Legacy.BuildingDetailV2
                     .AddAsync(building, ct);
             });
 
+            When<Envelope<UnplannedBuildingWasRealizedAndMeasured>>(async (context, message, ct) =>
+            {
+                var building = new BuildingDetailItemV2(
+                    message.Message.BuildingPersistentLocalId,
+                    BuildingGeometryMethod.MeasuredByGrb,
+                    message.Message.ExtendedWkbGeometry.ToByteArray(),
+                    BuildingStatus.Realized,
+                    false,
+                    message.Message.Provenance.Timestamp);
+
+                UpdateHash(building, message);
+
+                await context
+                    .BuildingDetailsV2
+                    .AddAsync(building, ct);
+            });
+
             When<Envelope<BuildingOutlineWasChanged>>(async (context, message, ct) =>
             {
                 var item = await context.BuildingDetailsV2.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);

@@ -68,6 +68,16 @@ namespace BuildingRegistry.Projections.Wms.BuildingUnitV2
                 }, ct);
             });
 
+            When<Envelope<UnplannedBuildingWasRealizedAndMeasured>>(async (context, message, ct) =>
+            {
+                await context.BuildingUnitBuildingsV2.AddAsync(new BuildingUnitBuildingItemV2
+                {
+                    BuildingPersistentLocalId = message.Message.BuildingPersistentLocalId,
+                    IsRemoved = false,
+                    BuildingRetiredStatus = null
+                }, ct);
+            });
+
             When<Envelope<BuildingUnitWasPlannedV2>>(async (context, message, ct) =>
             {
                 var buildingUnitV2 = new BuildingUnitV2

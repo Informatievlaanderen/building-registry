@@ -103,6 +103,18 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
                 await context.BuildingUnitBuildingsV2.AddAsync(buildingUnitBuildingItemV2, ct);
             });
 
+            When<Envelope<UnplannedBuildingWasRealizedAndMeasured>>(async (context, message, ct) =>
+            {
+                var buildingUnitBuildingItemV2 = new BuildingUnitBuildingItemV2
+                {
+                    BuildingPersistentLocalId = message.Message.BuildingPersistentLocalId,
+                    IsRemoved = false,
+                    BuildingRetiredStatus = null
+                };
+
+                await context.BuildingUnitBuildingsV2.AddAsync(buildingUnitBuildingItemV2, ct);
+            });
+
             When<Envelope<BuildingOutlineWasChanged>>(async (context, message, ct) =>
             {
                 foreach (var buildingUnitPersistentLocalId in message.Message.BuildingUnitPersistentLocalIds)

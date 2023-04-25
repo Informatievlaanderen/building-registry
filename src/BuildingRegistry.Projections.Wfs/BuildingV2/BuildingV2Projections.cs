@@ -66,6 +66,24 @@ namespace BuildingRegistry.Projections.Wfs.BuildingV2
                 await context.BuildingsV2.AddAsync(buildingV2, ct);
             });
 
+            When<Envelope<UnplannedBuildingWasRealizedAndMeasured>>(async (context, message, ct) =>
+            {
+                var buildingV2 = new BuildingV2
+                {
+                    PersistentLocalId = message.Message.BuildingPersistentLocalId,
+                    Id = PersistentLocalIdHelper.CreateBuildingId(message.Message.BuildingPersistentLocalId),
+                    Status = RealizedStatus,
+                    IsRemoved = false,
+                    Version = message.Message.Provenance.Timestamp
+                };
+
+                SetGeometry(
+                    buildingV2, message.Message.ExtendedWkbGeometry,
+                    MapGeometryMethod(BuildingGeometryMethod.MeasuredByGrb));
+
+                await context.BuildingsV2.AddAsync(buildingV2, ct);
+            });
+
             When<Envelope<BuildingOutlineWasChanged>>(async (context, message, ct) =>
             {
                 var item = await context.BuildingsV2.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);

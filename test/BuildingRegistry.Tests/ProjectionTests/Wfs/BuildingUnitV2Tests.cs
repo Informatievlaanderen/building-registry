@@ -118,6 +118,29 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wfs
         }
 
         [Fact]
+        public async Task WhenUnplannedBuildingWasRealizedAndMeasured()
+        {
+            _fixture.Customize(new WithFixedBuildingPersistentLocalId());
+            _fixture.Customize(new WithFixedBuildingUnitPersistentLocalId());
+
+            var @event = _fixture.Create<UnplannedBuildingWasRealizedAndMeasured>();
+            var metadata = new Dictionary<string, object>
+            {
+                { AddEventHashPipe.HashMetadataKey, @event.GetHash() }
+            };
+
+            await Sut
+                .Given(new Envelope<UnplannedBuildingWasRealizedAndMeasured>(new Envelope(@event, metadata)))
+                .Then(async ct =>
+                {
+                    var buildingDetailItemV2 = await ct.BuildingUnitsBuildingsV2.FindAsync(@event.BuildingPersistentLocalId);
+                    buildingDetailItemV2.Should().NotBeNull();
+                    buildingDetailItemV2.BuildingRetiredStatus.Should().BeNull();
+                    buildingDetailItemV2.IsRemoved.Should().BeFalse();
+                });
+        }
+
+        [Fact]
         public async Task WhenBuildingUnitWasPlannedV2()
         {
             var buildingUnitWasPlannedV2 = _fixture.Create<BuildingUnitWasPlannedV2>();

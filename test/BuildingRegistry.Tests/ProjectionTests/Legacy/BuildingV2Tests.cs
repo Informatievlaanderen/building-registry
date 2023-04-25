@@ -57,7 +57,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Legacy
         }
 
         [Fact]
-        public async Task WhenBuildingWasPlanned()
+        public async Task WhenBuildingWasPlannedV2()
         {
             var buildingWasPlannedV2 = _fixture.Create<BuildingWasPlannedV2>();
             var metadata = new Dictionary<string, object>
@@ -78,6 +78,31 @@ namespace BuildingRegistry.Tests.ProjectionTests.Legacy
                     buildingDetailItemV2.Geometry.Should().BeEquivalentTo(buildingWasPlannedV2.ExtendedWkbGeometry.ToByteArray());
                     buildingDetailItemV2.GeometryMethod.Should().Be(BuildingGeometryMethod.Outlined);
                     buildingDetailItemV2.LastEventHash.Should().Be(buildingWasPlannedV2.GetHash());
+                });
+        }
+
+        [Fact]
+        public async Task WhenUnplannedBuildingWasRealizedAndMeasured()
+        {
+            var @event = _fixture.Create<UnplannedBuildingWasRealizedAndMeasured>();
+            var metadata = new Dictionary<string, object>
+            {
+                { AddEventHashPipe.HashMetadataKey, @event.GetHash() }
+            };
+
+            await Sut
+                .Given(new Envelope<UnplannedBuildingWasRealizedAndMeasured>(new Envelope(@event, metadata)))
+                .Then(async ct =>
+                {
+                    var buildingDetailItemV2 = await ct.BuildingDetailsV2.FindAsync(@event.BuildingPersistentLocalId);
+                    buildingDetailItemV2.Should().NotBeNull();
+
+                    buildingDetailItemV2.Status.Should().Be(BuildingStatus.Realized);
+                    buildingDetailItemV2.GeometryMethod.Should().Be(BuildingGeometryMethod.MeasuredByGrb);
+                    buildingDetailItemV2.Geometry.Should().BeEquivalentTo(@event.ExtendedWkbGeometry.ToByteArray());
+                    buildingDetailItemV2.IsRemoved.Should().BeFalse();
+                    buildingDetailItemV2.Version.Should().Be(@event.Provenance.Timestamp);
+                    buildingDetailItemV2.LastEventHash.Should().Be(@event.GetHash());
                 });
         }
 
