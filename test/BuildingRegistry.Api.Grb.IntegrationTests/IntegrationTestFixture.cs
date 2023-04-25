@@ -63,10 +63,10 @@ namespace BuildingRegistry.Api.Grb.IntegrationTests
             _clientId = configuration.GetValue<string>("ClientId");
             _clientSecret = configuration.GetValue<string>("ClientSecret");
 
-            using var _ = DockerComposer.Compose("sqlserver.yml", "building-integration-tests");
+            using var _ = DockerComposer.Compose("sqlserver.yml", "building-grb-integration-tests");
             await WaitForSqlServerToBecomeAvailable();
 
-           // await CreateDatabase();
+           await CreateDatabase();
 
             var hostBuilder = new WebHostBuilder()
                 .UseConfiguration(configuration)

@@ -13,7 +13,7 @@ using NetTopologySuite.Geometries;
 namespace BuildingRegistry.Grb.Abstractions.Migrations
 {
     [DbContext(typeof(BuildingGrbContext))]
-    [Migration("20230424142003_Initial")]
+    [Migration("20230426123432_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -41,7 +41,6 @@ namespace BuildingRegistry.Grb.Abstractions.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("TicketUrl")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");

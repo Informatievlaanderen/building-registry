@@ -69,7 +69,7 @@ namespace BuildingRegistry.Grb.Abstractions.Migrations
                     Created = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
                     LastChanged = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
                     Status = table.Column<int>(type: "int", nullable: false),
-                    TicketUrl = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    TicketUrl = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
