@@ -70,6 +70,7 @@ namespace BuildingRegistry.Building
             Register<BuildingUnitAddressWasDetachedBecauseAddressWasRetired>(When);
             Register<BuildingUnitAddressWasDetachedBecauseAddressWasRemoved>(When);
             Register<BuildingUnitAddressWasReplacedBecauseAddressWasReaddressed>(When);
+            Register<UnplannedBuildingWasRealizedAndMeasured>(When);
 
             Register<BuildingSnapshot>(When);
         }
@@ -198,6 +199,18 @@ namespace BuildingRegistry.Building
             var commonBuildingUnit = new BuildingUnit(ApplyChange);
             commonBuildingUnit.Route(@event);
             _buildingUnits.Add(commonBuildingUnit);
+
+            _lastEvent = @event;
+        }
+
+        private void When(UnplannedBuildingWasRealizedAndMeasured @event)
+        {
+            BuildingPersistentLocalId = new BuildingPersistentLocalId(@event.BuildingPersistentLocalId);
+            BuildingGeometry = new BuildingGeometry(
+                new ExtendedWkbGeometry(@event.ExtendedWkbGeometry),
+                BuildingGeometryMethod.MeasuredByGrb);
+
+            BuildingStatus = BuildingStatus.Realized;
 
             _lastEvent = @event;
         }

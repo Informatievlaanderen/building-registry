@@ -2,7 +2,7 @@ namespace BuildingRegistry.Api.Grb.Uploads
 {
     using System.Threading;
     using System.Threading.Tasks;
-    using Be.Vlaanderen.Basisregisters.AcmIdm;
+    using Be.Vlaanderen.Basisregisters.Auth.AcmIdm;
     using Be.Vlaanderen.Basisregisters.Api;
     using MediatR;
     using Microsoft.AspNetCore.Authentication.JwtBearer;

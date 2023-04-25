@@ -1,5 +1,10 @@
 namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetailV2
 {
+    using System;
+    using System.Collections.ObjectModel;
+    using System.Linq;
+    using System.Threading;
+    using System.Threading.Tasks;
     using Be.Vlaanderen.Basisregisters.EventHandling;
     using Be.Vlaanderen.Basisregisters.GrAr.Common;
     using Be.Vlaanderen.Basisregisters.GrAr.Common.Pipes;
@@ -8,12 +13,6 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetailV2
     using Be.Vlaanderen.Basisregisters.Utilities.HexByteConvertor;
     using Building;
     using Building.Events;
-    using BuildingRegistry.Projections.Legacy.BuildingSyndication;
-    using System;
-    using System.Collections.ObjectModel;
-    using System.Linq;
-    using System.Threading;
-    using System.Threading.Tasks;
 
     [ConnectedProjectionName("API endpoint detail/lijst gebouweenheden")]
     [ConnectedProjectionDescription("Projectie die de gebouweenheden data voor het gebouweenheden detail & lijst voorziet.")]
@@ -65,6 +64,16 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetailV2
             });
 
             When<Envelope<BuildingWasPlannedV2>>(async (context, message, ct) =>
+            {
+                var building = new BuildingUnitBuildingItemV2(
+                    message.Message.BuildingPersistentLocalId,
+                    false,
+                    null);
+
+                await context.BuildingUnitBuildingsV2.AddAsync(building, ct);
+            });
+
+            When<Envelope<UnplannedBuildingWasRealizedAndMeasured>>(async (context, message, ct) =>
             {
                 var building = new BuildingUnitBuildingItemV2(
                     message.Message.BuildingPersistentLocalId,

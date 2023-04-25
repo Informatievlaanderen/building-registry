@@ -15,7 +15,7 @@ namespace BuildingRegistry.Api.BackOffice.Infrastructure.Modules
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Logging;
     using Consumer.Address;
-    using Be.Vlaanderen.Basisregisters.AcmIdm;
+    using Be.Vlaanderen.Basisregisters.Auth.AcmIdm;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance.AcmIdm;
     using BuildingRegistry.Infrastructure.Modules;
@@ -68,6 +68,10 @@ namespace BuildingRegistry.Api.BackOffice.Infrastructure.Modules
 
             builder
                 .RegisterType<PlanBuildingSqsRequestFactory>()
+                .AsSelf();
+
+            builder
+                .RegisterType<RealizeAndMeasureUnplannedBuildingSqsRequestFactory>()
                 .AsSelf();
 
             builder

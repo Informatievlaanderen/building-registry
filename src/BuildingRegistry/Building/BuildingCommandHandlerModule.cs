@@ -167,6 +167,29 @@ namespace BuildingRegistry.Building
 
                     building.ChangeOutliningConstruction(message.Command.Geometry);
                 });
+
+            For<RealizeAndMeasureUnplannedBuilding>()
+                .AddSqlStreamStore(getStreamStore, getUnitOfWork, eventMapping, eventSerializer, getSnapshotStore)
+                .AddEventHash<RealizeAndMeasureUnplannedBuilding, Building>(getUnitOfWork)
+                .AddProvenance(getUnitOfWork, provenanceFactory)
+                .Handle(async (message, ct) =>
+                {
+                    var streamId = new BuildingStreamId(message.Command.BuildingPersistentLocalId);
+                    var building = await buildingRepository().GetOptionalAsync(streamId, ct);
+
+                    if (building.HasValue)
+                    {
+                        throw new AggregateSourceException($"Building with id {message.Command.BuildingPersistentLocalId} already exists");
+                    }
+
+                    var newBuilding = Building.RealizeAndMeasureUnplannedBuilding(
+                        buildingFactory,
+                        message.Command.BuildingPersistentLocalId,
+                        message.Command.Geometry,
+                        message.Command.BuildingGrbData);
+
+                    buildingRepository().Add(streamId, newBuilding);
+                });
         }
     }
 }

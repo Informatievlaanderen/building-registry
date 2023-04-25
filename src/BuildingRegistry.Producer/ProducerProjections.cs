@@ -435,6 +435,11 @@ namespace BuildingRegistry.Producer
                 await Produce(message.Message.BuildingPersistentLocalId, message.Message.ToContract(), message.Position, ct);
             });
 
+            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingDomain.UnplannedBuildingWasRealizedAndMeasured>>(async (_, message, ct) =>
+            {
+                await Produce(message.Message.BuildingPersistentLocalId, message.Message.ToContract(), message.Position, ct);
+            });
+
             When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingDomain.BuildingWasRealizedV2>>(async (_, message, ct) =>
             {
                 await Produce(message.Message.BuildingPersistentLocalId, message.Message.ToContract(), message.Position, ct);

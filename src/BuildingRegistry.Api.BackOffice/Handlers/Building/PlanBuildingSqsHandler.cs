@@ -20,7 +20,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Building
 
         protected override string WithAggregateId(PlanBuildingSqsRequest request)
         {
-            return "0";
+            return request.BuildingPersistentLocalId.ToString();
         }
 
         protected override IDictionary<string, string> WithTicketMetadata(string aggregateId, PlanBuildingSqsRequest sqsRequest)
@@ -28,7 +28,9 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Building
             return new Dictionary<string, string>
             {
                 { RegistryKey, nameof(BuildingRegistry) },
-                { ActionKey, Action }
+                { ActionKey, Action },
+                { AggregateIdKey, aggregateId },
+                { ObjectIdKey, sqsRequest.BuildingPersistentLocalId.ToString() }
             };
         }
     }

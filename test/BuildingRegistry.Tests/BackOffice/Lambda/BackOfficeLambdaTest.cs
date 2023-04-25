@@ -9,6 +9,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda
     using Be.Vlaanderen.Basisregisters.Sqs.Responses;
     using BuildingRegistry.Building;
     using BuildingRegistry.Building.Commands;
+    using BuildingRegistry.Building.Datastructures;
     using Moq;
     using Newtonsoft.Json;
     using TicketingService.Abstractions;
@@ -24,6 +25,15 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda
             DispatchArrangeCommand(new PlanBuilding(
                 buildingPersistentLocalId,
                 wkbGeometry ?? new ExtendedWkbGeometry(GeometryHelper.ValidPolygon.AsBinary()),
+                Fixture.Create<Provenance>()));
+        }
+
+        protected void RealizeAndMeasureUnplannedBuilding(BuildingPersistentLocalId buildingPersistentLocalId, ExtendedWkbGeometry? wkbGeometry = null)
+        {
+            DispatchArrangeCommand(new RealizeAndMeasureUnplannedBuilding(
+                buildingPersistentLocalId,
+                wkbGeometry ?? new ExtendedWkbGeometry(GeometryHelper.ValidPolygon.AsBinary()),
+                Fixture.Create<BuildingGrbData>(),
                 Fixture.Create<Provenance>()));
         }
 

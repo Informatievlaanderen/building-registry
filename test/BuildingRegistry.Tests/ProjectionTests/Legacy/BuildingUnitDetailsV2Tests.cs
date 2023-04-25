@@ -95,7 +95,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Legacy
         }
 
         [Fact]
-        public async Task WhenBuildingWasPlanned()
+        public async Task WhenBuildingWasPlannedV2()
         {
             _fixture.Customize(new WithFixedBuildingPersistentLocalId());
             _fixture.Customize(new WithFixedBuildingUnitPersistentLocalId());
@@ -111,6 +111,30 @@ namespace BuildingRegistry.Tests.ProjectionTests.Legacy
                 .Then(async ct =>
                 {
                     var buildingDetailItemV2 = await ct.BuildingUnitBuildingsV2.FindAsync(buildingWasPlannedV2.BuildingPersistentLocalId);
+                    buildingDetailItemV2.Should().NotBeNull();
+
+                    buildingDetailItemV2.IsRemoved.Should().BeFalse();
+                    buildingDetailItemV2.BuildingRetiredStatus.Should().BeNull();
+                });
+        }
+
+        [Fact]
+        public async Task WhenUnplannedBuildingWasRealizedAndMeasured()
+        {
+            _fixture.Customize(new WithFixedBuildingPersistentLocalId());
+            _fixture.Customize(new WithFixedBuildingUnitPersistentLocalId());
+
+            var @event = _fixture.Create<UnplannedBuildingWasRealizedAndMeasured>();
+            var metadata = new Dictionary<string, object>
+            {
+                { AddEventHashPipe.HashMetadataKey, @event.GetHash() }
+            };
+
+            await Sut
+                .Given(new Envelope<UnplannedBuildingWasRealizedAndMeasured>(new Envelope(@event, metadata)))
+                .Then(async ct =>
+                {
+                    var buildingDetailItemV2 = await ct.BuildingUnitBuildingsV2.FindAsync(@event.BuildingPersistentLocalId);
                     buildingDetailItemV2.Should().NotBeNull();
 
                     buildingDetailItemV2.IsRemoved.Should().BeFalse();

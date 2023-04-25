@@ -80,7 +80,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wms
         }
 
         [Fact]
-        public async Task WhenBuildingWasPlanned()
+        public async Task WhenBuildingWasPlannedV2()
         {
             var buildingWasPlannedV2 = _fixture.Create<BuildingWasPlannedV2>();
             var metadata = new Dictionary<string, object>
@@ -103,6 +103,33 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wms
                     var polygon = wkbReader.Read(buildingWasPlannedV2.ExtendedWkbGeometry.ToByteArray());
                     buildingDetailItemV2.Geometry.Should().BeEquivalentTo(polygon.AsBinary());
                     buildingDetailItemV2.GeometryMethod.Should().Be("Ingeschetst");
+                });
+        }
+
+        [Fact]
+        public async Task WhenUnplannedBuildingWasRealizedAndMeasured()
+        {
+            var @event = _fixture.Create<UnplannedBuildingWasRealizedAndMeasured>();
+            var metadata = new Dictionary<string, object>
+            {
+                { AddEventHashPipe.HashMetadataKey, @event.GetHash() }
+            };
+
+            await Sut
+                .Given(new Envelope<UnplannedBuildingWasRealizedAndMeasured>(new Envelope(@event, metadata)))
+                .Then(async ct =>
+                {
+                    var buildingDetailItemV2 = await ct.BuildingsV2.FindAsync(@event.BuildingPersistentLocalId);
+                    buildingDetailItemV2.Should().NotBeNull();
+
+                    buildingDetailItemV2.Id.Should().Be(PersistentLocalIdHelper.CreateBuildingId(@event.BuildingPersistentLocalId));
+                    buildingDetailItemV2.Status.Should().Be(BuildingStatus.Realized);
+                    buildingDetailItemV2.GeometryMethod.Should().Be("IngemetenGRB");
+                    buildingDetailItemV2.Version.Should().Be(@event.Provenance.Timestamp);
+
+                    var wkbReader = WKBReaderFactory.Create();
+                    var polygon = wkbReader.Read(@event.ExtendedWkbGeometry.ToByteArray());
+                    buildingDetailItemV2.Geometry.Should().BeEquivalentTo(polygon.AsBinary());
                 });
         }
 

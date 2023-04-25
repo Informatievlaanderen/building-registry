@@ -5,7 +5,7 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
     using Abstractions.BuildingUnit.Requests;
     using Abstractions.BuildingUnit.SqsRequests;
     using Abstractions.Validation;
-    using Be.Vlaanderen.Basisregisters.AcmIdm;
+using Be.Vlaanderen.Basisregisters.Auth.AcmIdm;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
     using Be.Vlaanderen.Basisregisters.GrAr.Edit.Validators;

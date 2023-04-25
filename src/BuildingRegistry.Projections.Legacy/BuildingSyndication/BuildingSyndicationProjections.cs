@@ -1,20 +1,19 @@
 namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
 {
-    using Be.Vlaanderen.Basisregisters.EventHandling;
-    using Be.Vlaanderen.Basisregisters.ProjectionHandling.Connector;
-    using Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore;
-    using Be.Vlaanderen.Basisregisters.Utilities.HexByteConvertor;
-    using Building.Events;
-    using BuildingRegistry.Legacy.Events;
-    using BuildingRegistry.Legacy.Events.Crab;
-    using NodaTime;
     using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Linq;
-    using System.Reactive;
     using System.Threading.Tasks;
+    using Be.Vlaanderen.Basisregisters.EventHandling;
+    using Be.Vlaanderen.Basisregisters.ProjectionHandling.Connector;
+    using Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore;
+    using Be.Vlaanderen.Basisregisters.Utilities.HexByteConvertor;
     using Building;
+    using Building.Events;
+    using BuildingRegistry.Legacy.Events;
+    using BuildingRegistry.Legacy.Events.Crab;
+    using NodaTime;
     using BuildingGeometryMethod = BuildingRegistry.Legacy.BuildingGeometryMethod;
     using BuildingStatus = BuildingRegistry.Legacy.BuildingStatus;
     using BuildingUnitFunction = BuildingRegistry.Legacy.BuildingUnitFunction;
@@ -889,6 +888,38 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
                 await context
                     .BuildingSyndication
                     .AddAsync(newBuildingSyndicationItem, ct);
+            });
+
+            When<Envelope<UnplannedBuildingWasRealizedAndMeasured>>(async (context, message, ct) =>
+            {
+                var newBuildingSyndicationItem = new BuildingSyndicationItem
+                {
+                    Position = message.Position,
+                    PersistentLocalId = message.Message.BuildingPersistentLocalId,
+                    Status = MapBuildingStatus(BuildingRegistry.Building.BuildingStatus.Realized),
+                    GeometryMethod = MapBuildingGeometryMethod(BuildingRegistry.Building.BuildingGeometryMethod.MeasuredByGrb),
+                    Geometry = message.Message.ExtendedWkbGeometry.ToByteArray(),
+                    IsComplete = true,
+                    RecordCreatedAt = message.Message.Provenance.Timestamp,
+                    LastChangedOn = message.Message.Provenance.Timestamp,
+                    ChangeType = message.EventName,
+                    SyndicationItemCreatedAt = DateTimeOffset.Now,
+                    BuildingUnitsV2 = new Collection<BuildingUnitSyndicationItemV2>()
+                };
+
+                newBuildingSyndicationItem.ApplyProvenance(message.Message.Provenance);
+                newBuildingSyndicationItem.SetEventData(message.Message, message.EventName);
+
+                await context
+                    .BuildingSyndication
+                    .AddAsync(newBuildingSyndicationItem, ct);
+            });
+
+            When<Envelope<BuildingGeometryWasImportedFromGrb>>(async (context, message, ct) =>
+            {
+                await context.CreateNewBuildingSyndicationItem(message.Message.BuildingPersistentLocalId, message, _ =>
+                {
+                }, ct);
             });
 
             When<Envelope<BuildingOutlineWasChanged>>(async (context, message, ct) =>
