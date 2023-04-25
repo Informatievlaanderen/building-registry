@@ -9,6 +9,7 @@
     public class BuildingGrbContext : DbContext
     {
         public const string Schema = "BuildingRegistryGrb";
+        public const string MigrationsTableName = "__EFMigrationsHistoryBuildingGrb";
 
         public DbSet<Job> Jobs => Set<Job>();
         public DbSet<JobRecord> JobRecords => Set<JobRecord>();
@@ -51,7 +52,7 @@
                 .UseSqlServer(connectionString, sqlServerOptions =>
                 {
                     sqlServerOptions.EnableRetryOnFailure();
-                    sqlServerOptions.MigrationsHistoryTable("__EFMigrationsHistoryBackOffice", BuildingGrbContext.Schema);
+                    sqlServerOptions.MigrationsHistoryTable(BuildingGrbContext.MigrationsTableName, BuildingGrbContext.Schema);
                     sqlServerOptions.UseNetTopologySuite();
                 });
 

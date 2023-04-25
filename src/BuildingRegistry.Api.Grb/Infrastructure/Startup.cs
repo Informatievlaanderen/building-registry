@@ -122,7 +122,7 @@ namespace BuildingRegistry.Api.Grb.Infrastructure
                 .AddSingleton<IActionContextAccessor, ActionContextAccessor>();
 
             var containerBuilder = new ContainerBuilder();
-            containerBuilder.RegisterModule(new ApiModule(_configuration, services));
+            containerBuilder.RegisterModule(new ApiModule(_configuration, services, _loggerFactory));
             _applicationContainer = containerBuilder.Build();
 
             return new AutofacServiceProvider(_applicationContainer);
@@ -193,10 +193,9 @@ namespace BuildingRegistry.Api.Grb.Infrastructure
                     }
                 });
 
-            // MigrationsHelper.Run(
-            //     _configuration.GetConnectionString("Sequences"),
-            //     _configuration.GetConnectionString("BackOffice"),
-            //     serviceProvider.GetService<ILoggerFactory>());
+            MigrationsHelper.Run(
+                _configuration.GetConnectionString("BuildingGrbAdmin"),
+                serviceProvider.GetService<ILoggerFactory>());
 
             StartupHelpers.CheckDatabases(healthCheckService, DatabaseTag, loggerFactory).GetAwaiter().GetResult();
         }

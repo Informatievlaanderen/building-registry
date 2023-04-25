@@ -39,7 +39,6 @@ namespace BuildingRegistry.Grb.Abstractions.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("TicketUrl")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");

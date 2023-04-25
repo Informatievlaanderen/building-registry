@@ -3,6 +3,7 @@
     using System;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.EntityFrameworkCore.Metadata.Builders;
+    using Microsoft.EntityFrameworkCore.ValueGeneration;
 
     public sealed class Job
     {
@@ -10,13 +11,12 @@
         public DateTimeOffset Created { get; set; }
         public DateTimeOffset LastChanged { get; set; }
         public JobStatus Status { get; set; }
-        public string TicketUrl { get; set; }
+        public string? TicketUrl { get; set; }
 
         private Job() { }
 
-        public Job(Guid id, DateTimeOffset created, JobStatus status, string ticketUrl)
+        public Job(DateTimeOffset created, JobStatus status, string? ticketUrl = null)
         {
-            Id = id;
             Created = created;
             LastChanged = created;
             Status = status;
