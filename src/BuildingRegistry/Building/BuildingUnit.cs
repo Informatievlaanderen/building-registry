@@ -432,6 +432,32 @@ namespace BuildingRegistry.Building
                 newAddressPersistentLocalId));
         }
 
+        public void Demolish()
+        {
+            if (IsRemoved)
+            {
+                return;
+            }
+
+            if (Status == BuildingUnitStatus.NotRealized || Status == BuildingUnitStatus.Retired)
+            {
+                return;
+            }
+
+            if (Status == BuildingUnitStatus.Planned)
+            {
+                Apply(new BuildingUnitWasNotRealizedBecauseBuildingWasDemolished(
+                    _buildingPersistentLocalId,
+                    BuildingUnitPersistentLocalId));
+            }
+            else if (Status == BuildingUnitStatus.Realized)
+            {
+                Apply(new BuildingUnitWasRetiredBecauseBuildingWasDemolished(
+                    _buildingPersistentLocalId,
+                    BuildingUnitPersistentLocalId));
+            }
+        }
+
         private ExtendedWkbGeometry? CorrectedBuildingUnitPosition(BuildingGeometry buildingGeometry)
         {
             var correctedBuildingUnitPosition =

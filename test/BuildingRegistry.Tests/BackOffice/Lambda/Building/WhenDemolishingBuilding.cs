@@ -29,11 +29,11 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
     using Xunit;
     using Xunit.Abstractions;
 
-    public class WhenCorrectingBuildingNotRealization : BackOfficeLambdaTest
+    public class WhenDemolishingBuilding : BackOfficeLambdaTest
     {
         private readonly IdempotencyContext _idempotencyContext;
 
-        public WhenCorrectingBuildingNotRealization(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
+        public WhenDemolishingBuilding(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
         {
             Fixture.Customize(new WithFixedBuildingPersistentLocalId());
 
@@ -41,16 +41,15 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
         }
 
         [Fact]
-        public async Task ThenBuildingIsCorrectedToUnderConstruction()
+        public async Task ThenBuildingIsDemolished()
         {
             // Arrange
             var buildingPersistentLocalId = Fixture.Create<BuildingPersistentLocalId>();
 
-            PlanBuilding(buildingPersistentLocalId);
-            NotRealizeBuilding(buildingPersistentLocalId);
+            RealizeAndMeasureUnplannedBuilding(buildingPersistentLocalId);
 
             var eTagResponse = new ETagResponse(string.Empty, Fixture.Create<string>());
-            var handler = new CorrectBuildingNotRealizationLambdaHandler(
+            var handler = new DemolishBuildingLambdaHandler(
                 Container.Resolve<IConfiguration>(),
                 new FakeRetryPolicy(),
                 MockTicketing(response => { eTagResponse = response; }).Object,
@@ -58,7 +57,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
                 Container.Resolve<IBuildings>());
 
             //Act
-            await handler.Handle(CreateCorrectBuildingNotRealizationLambdaRequest(), CancellationToken.None);
+            await handler.Handle(CreateDemolishBuildingLambdaRequest(), CancellationToken.None);
 
             //Assert
             var stream = await Container.Resolve<IStreamStore>()
@@ -74,9 +73,10 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
             var buildingPersistentLocalId = Fixture.Create<BuildingPersistentLocalId>();
 
             PlanBuilding(buildingPersistentLocalId);
+            PlaceBuildingUnderConstruction(buildingPersistentLocalId);
 
             var buildings = Container.Resolve<IBuildings>();
-            var handler = new CorrectBuildingNotRealizationLambdaHandler(
+            var handler = new DemolishBuildingLambdaHandler(
                 Container.Resolve<IConfiguration>(),
                 new FakeRetryPolicy(),
                 ticketing.Object,
@@ -87,7 +87,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
                 await buildings.GetAsync(new BuildingStreamId(buildingPersistentLocalId), CancellationToken.None);
 
             // Act
-            await handler.Handle(CreateCorrectBuildingNotRealizationLambdaRequest(), CancellationToken.None);
+            await handler.Handle(CreateDemolishBuildingLambdaRequest(), CancellationToken.None);
 
             //Assert
             ticketing.Verify(x =>
@@ -106,7 +106,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
             // Arrange
             var ticketing = new Mock<ITicketing>();
 
-            var handler = new CorrectBuildingNotRealizationLambdaHandler(
+            var handler = new DemolishBuildingLambdaHandler(
                 Container.Resolve<IConfiguration>(),
                 new FakeRetryPolicy(),
                 ticketing.Object,
@@ -114,25 +114,25 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
                 Container.Resolve<IBuildings>());
 
             // Act
-            await handler.Handle(CreateCorrectBuildingNotRealizationLambdaRequest(), CancellationToken.None);
+            await handler.Handle(CreateDemolishBuildingLambdaRequest(), CancellationToken.None);
 
             //Assert
             ticketing.Verify(x =>
                 x.Error(
                     It.IsAny<Guid>(),
                     new TicketError(
-                        "Deze actie is enkel toegestaan op geschetste gebouwen met status 'nietGerealiseerd'.",
-                        "GebouwInAanbouwGerealiseerdOfGehistoreerd"),
+                        "Deze actie is enkel toegestaan op gebouwen met status 'gerealiseerd'.",
+                        "GebouwStatusGeplandInaanbouwNietgerealiseerdGehistoreerd"),
                     CancellationToken.None));
         }
 
         [Fact]
-        public async Task WhenBuildingGeometryMethodIsMeasuredByGrb_ThenTicketingErrorIsExpected()
+        public async Task WhenBuildingHasInvalidGeometryMethod_ThenTicketingErrorIsExpected()
         {
             // Arrange
             var ticketing = new Mock<ITicketing>();
 
-            var handler = new CorrectBuildingNotRealizationLambdaHandler(
+            var handler = new DemolishBuildingLambdaHandler(
                 Container.Resolve<IConfiguration>(),
                 new FakeRetryPolicy(),
                 ticketing.Object,
@@ -140,29 +140,29 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
                 Container.Resolve<IBuildings>());
 
             // Act
-            await handler.Handle(CreateCorrectBuildingNotRealizationLambdaRequest(), CancellationToken.None);
+            await handler.Handle(CreateDemolishBuildingLambdaRequest(), CancellationToken.None);
 
             //Assert
             ticketing.Verify(x =>
                 x.Error(
                     It.IsAny<Guid>(),
                     new TicketError(
-                        "Deze actie is enkel toegestaan op gebouwen met geometrieMethode 'ingeschetst'.",
-                        "GebouwGeometrieMethodeIngemetenGRB"),
+                        "Deze actie is enkel toegestaan op gebouwen met geometrieMethode 'ingemeten'.",
+                        "GebouwGeometrieMethodeGeschetst"),
                     CancellationToken.None));
         }
 
-        private CorrectBuildingNotRealizationLambdaRequest CreateCorrectBuildingNotRealizationLambdaRequest()
+        private DemolishBuildingLambdaRequest CreateDemolishBuildingLambdaRequest()
         {
             var buildingPersistentLocalId = Fixture.Create<BuildingPersistentLocalId>();
 
-            return new CorrectBuildingNotRealizationLambdaRequest(buildingPersistentLocalId,
-                new CorrectBuildingNotRealizationSqsRequest()
+            return new DemolishBuildingLambdaRequest(buildingPersistentLocalId,
+                new DemolishBuildingSqsRequest()
                 {
                     IfMatchHeaderValue = null,
                     Metadata = new Dictionary<string, object?>(),
                     ProvenanceData = Fixture.Create<ProvenanceData>(),
-                    Request = new CorrectBuildingNotRealizationRequest { PersistentLocalId = buildingPersistentLocalId },
+                    Request = new DemolishBuildingRequest { PersistentLocalId = buildingPersistentLocalId },
                     TicketId = Guid.NewGuid()
                 });
         }

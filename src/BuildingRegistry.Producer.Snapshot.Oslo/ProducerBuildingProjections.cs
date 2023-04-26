@@ -215,6 +215,19 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo
                     message.Position,
                     ct);
             });
+
+            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingWasDemolished>>(async (_, message, ct) =>
+            {
+                await FindAndProduce(async () =>
+                        await snapshotManager.FindMatchingSnapshot(
+                            message.Message.BuildingPersistentLocalId.ToString(),
+                            message.Message.Provenance.Timestamp,
+                            message.Position,
+                            throwStaleWhenGone: false,
+                            ct),
+                    message.Position,
+                    ct);
+            });
         }
 
         private async Task FindAndProduce(Func<Task<OsloResult?>> findMatchingSnapshot, long storePosition, CancellationToken ct)

@@ -57,7 +57,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.Building
             return exception switch
             {
                 BuildingHasInvalidStatusException => ValidationErrors.ChangeBuildingOutline.BuildingInvalidStatus.ToTicketError(),
-                BuildingHasInvalidBuildingGeometryMethodException => ValidationErrors.Common.BuildingIsMeasuredByGrb.ToTicketError(),
+                BuildingHasInvalidGeometryMethodException => ValidationErrors.Common.BuildingIsMeasuredByGrb.ToTicketError(),
                 BuildingHasBuildingUnitsOutsideBuildingGeometryException => ValidationErrors.ChangeBuildingOutline.BuildingHasBuildingUnitsOutsideChangedGeometry.ToTicketError(),
                 _ => null
             };

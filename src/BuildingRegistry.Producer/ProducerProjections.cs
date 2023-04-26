@@ -5,6 +5,7 @@ namespace BuildingRegistry.Producer
     using System.Threading;
     using System.Threading.Tasks;
     using Be.Vlaanderen.Basisregisters.GrAr.Contracts;
+    using Be.Vlaanderen.Basisregisters.GrAr.Contracts.BuildingRegistry;
     using Be.Vlaanderen.Basisregisters.MessageHandling.Kafka;
     using Be.Vlaanderen.Basisregisters.MessageHandling.Kafka.Producer;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.Connector;

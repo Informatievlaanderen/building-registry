@@ -532,6 +532,23 @@ namespace BuildingRegistry.Producer.Extensions
                 message.PreviousAddressPersistentLocalId,
                 message.Provenance.ToContract());
 
+        public static Contracts.BuildingWasDemolished ToContract(this BuildingWasDemolished message)
+            => new Contracts.BuildingWasDemolished(
+                message.BuildingPersistentLocalId,
+                message.Provenance.ToContract());
+
+        public static Contracts.BuildingUnitWasNotRealizedBecauseBuildingWasDemolished ToContract(this BuildingUnitWasNotRealizedBecauseBuildingWasDemolished message)
+            => new Contracts.BuildingUnitWasNotRealizedBecauseBuildingWasDemolished(
+                message.BuildingPersistentLocalId,
+                message.BuildingUnitPersistentLocalId,
+                message.Provenance.ToContract());
+
+        public static Contracts.BuildingUnitWasRetiredBecauseBuildingWasDemolished ToContract(this BuildingUnitWasRetiredBecauseBuildingWasDemolished message)
+            => new Contracts.BuildingUnitWasRetiredBecauseBuildingWasDemolished(
+                message.BuildingPersistentLocalId,
+                message.BuildingUnitPersistentLocalId,
+                message.Provenance.ToContract());
+
         private static Be.Vlaanderen.Basisregisters.GrAr.Contracts.Common.Provenance ToContract(this ProvenanceData provenance)
         => new Be.Vlaanderen.Basisregisters.GrAr.Contracts.Common.Provenance(
             provenance.Timestamp.ToString(),

@@ -15,9 +15,9 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.Building
     using Requests.Building;
     using TicketingService.Abstractions;
 
-    public sealed class CorrectBuildingNotRealizationLambdaHandler : BuildingLambdaHandler<CorrectBuildingNotRealizationLambdaRequest>
+    public sealed class DemolishBuildingLambdaHandler : BuildingLambdaHandler<DemolishBuildingLambdaRequest>
     {
-        public CorrectBuildingNotRealizationLambdaHandler(
+        public DemolishBuildingLambdaHandler(
             IConfiguration configuration,
             ICustomRetryPolicy retryPolicy,
             ITicketing ticketing,
@@ -31,7 +31,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.Building
                 buildings)
         { }
 
-        protected override async Task<ETagResponse> InnerHandle(CorrectBuildingNotRealizationLambdaRequest request, CancellationToken cancellationToken)
+        protected override async Task<ETagResponse> InnerHandle(DemolishBuildingLambdaRequest request, CancellationToken cancellationToken)
         {
             var cmd = request.ToCommand();
 
@@ -52,12 +52,12 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.Building
             return new ETagResponse(string.Format(DetailUrlFormat, request.BuildingPersistentLocalId), lastHash);
         }
 
-        protected override TicketError? InnerMapDomainException(DomainException exception, CorrectBuildingNotRealizationLambdaRequest request)
+        protected override TicketError? InnerMapDomainException(DomainException exception, DemolishBuildingLambdaRequest request)
         {
             return exception switch
             {
-                BuildingHasInvalidStatusException => ValidationErrors.CorrectBuildingNotRealization.BuildingInvalidStatus.ToTicketError(),
-                BuildingHasInvalidGeometryMethodException => ValidationErrors.Common.BuildingIsMeasuredByGrb.ToTicketError(),
+                BuildingHasInvalidStatusException => ValidationErrors.DemolishBuilding.BuildingInvalidStatus.ToTicketError(),
+                BuildingHasInvalidGeometryMethodException => ValidationErrors.DemolishBuilding.InvalidGeometryMethod.ToTicketError(),
                 _ => null
             };
         }

@@ -71,6 +71,9 @@ namespace BuildingRegistry.Building
             Register<BuildingUnitAddressWasDetachedBecauseAddressWasRemoved>(When);
             Register<BuildingUnitAddressWasReplacedBecauseAddressWasReaddressed>(When);
             Register<UnplannedBuildingWasRealizedAndMeasured>(When);
+            Register<BuildingWasDemolished>(When);
+            Register<BuildingUnitWasNotRealizedBecauseBuildingWasDemolished>(When);
+            Register<BuildingUnitWasRetiredBecauseBuildingWasDemolished>(When);
 
             Register<BuildingSnapshot>(When);
         }
@@ -260,6 +263,16 @@ namespace BuildingRegistry.Building
         private void When(BuildingUnitAddressWasDetachedBecauseAddressWasRemoved @event) => RouteToBuildingUnit(@event);
 
         private void When(BuildingUnitAddressWasReplacedBecauseAddressWasReaddressed @event) => RouteToBuildingUnit(@event);
+
+        private void When(BuildingWasDemolished @event)
+        {
+            BuildingStatus = BuildingStatus.Retired;
+
+            _lastEvent = @event;
+        }
+
+        private void When(BuildingUnitWasNotRealizedBecauseBuildingWasDemolished @event) => RouteToBuildingUnit(@event);
+        private void When(BuildingUnitWasRetiredBecauseBuildingWasDemolished @event) => RouteToBuildingUnit(@event);
 
         private void RouteToBuildingUnit<TEvent>(TEvent @event)
             where TEvent : IBuildingEvent, IHasBuildingUnitPersistentLocalId
