@@ -134,7 +134,7 @@ namespace BuildingRegistry.Building
 
             if (BuildingGeometry.Method != BuildingGeometryMethod.Outlined)
             {
-                throw new BuildingHasInvalidBuildingGeometryMethodException();
+                throw new BuildingHasInvalidGeometryMethodException();
             }
 
             if (_buildingUnits.RetiredBuildingUnits().Any())
@@ -163,7 +163,7 @@ namespace BuildingRegistry.Building
 
             if (BuildingGeometry.Method != BuildingGeometryMethod.Outlined)
             {
-                throw new BuildingHasInvalidBuildingGeometryMethodException();
+                throw new BuildingHasInvalidGeometryMethodException();
             }
 
             ApplyChange(new BuildingWasCorrectedFromNotRealizedToPlanned(BuildingPersistentLocalId));
@@ -178,7 +178,7 @@ namespace BuildingRegistry.Building
 
             if (BuildingGeometry.Method != BuildingGeometryMethod.Outlined)
             {
-                throw new BuildingHasInvalidBuildingGeometryMethodException();
+                throw new BuildingHasInvalidGeometryMethodException();
             }
 
             foreach (var buildingUnit in _buildingUnits.GetNotRemovedUnits())
@@ -197,7 +197,7 @@ namespace BuildingRegistry.Building
 
             if (BuildingGeometry.Method != BuildingGeometryMethod.Outlined)
             {
-                throw new BuildingHasInvalidBuildingGeometryMethodException();
+                throw new BuildingHasInvalidGeometryMethodException();
             }
 
             if (BuildingGeometry.Geometry == extendedWkbGeometry)
