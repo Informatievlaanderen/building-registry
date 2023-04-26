@@ -23,6 +23,7 @@ namespace BuildingRegistry.Tests
 
     public class BuildingRegistryTest : AutofacBasedTest
     {
+        protected FakeConsumerAddressContext FakeConsumerAddressContext;
         protected Fixture Fixture { get; }
         protected string ConfigDetailUrl => "http://base/{0}";
         protected JsonSerializerSettings EventSerializerSettings { get; } = EventsJsonSerializerSettingsProvider.CreateSerializerSettings();
@@ -100,8 +101,10 @@ namespace BuildingRegistry.Tests
 
             builder.RegisterModule(new SqlSnapshotStoreModule());
 
+            FakeConsumerAddressContext = new FakeConsumerAddressContextFactory().CreateDbContext();
+
             builder
-                .Register(c => new FakeConsumerAddressContextFactory().CreateDbContext())
+                .Register(_ => FakeConsumerAddressContext)
                 .SingleInstance()
                 .As<IAddresses>()
                 .AsSelf();

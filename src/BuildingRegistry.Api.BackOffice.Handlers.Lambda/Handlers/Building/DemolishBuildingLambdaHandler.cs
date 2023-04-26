@@ -2,6 +2,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.Building
 {
     using System.Threading;
     using System.Threading.Tasks;
+    using Abstractions;
     using Abstractions.Validation;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
     using Be.Vlaanderen.Basisregisters.Sqs.Exceptions;
@@ -15,23 +16,28 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.Building
     using Requests.Building;
     using TicketingService.Abstractions;
 
-    public sealed class CorrectBuildingNotRealizationLambdaHandler : BuildingLambdaHandler<CorrectBuildingNotRealizationLambdaRequest>
+    public sealed class DemolishBuildingLambdaHandler : BuildingLambdaHandler<DemolishBuildingLambdaRequest>
     {
-        public CorrectBuildingNotRealizationLambdaHandler(
+        private readonly BackOfficeContext _backOfficeContext;
+
+        public DemolishBuildingLambdaHandler(
             IConfiguration configuration,
             ICustomRetryPolicy retryPolicy,
             ITicketing ticketing,
             IIdempotentCommandHandler idempotentCommandHandler,
-            IBuildings buildings)
+            IBuildings buildings,
+            BackOfficeContext backOfficeContext)
             : base(
                 configuration,
                 retryPolicy,
                 ticketing,
                 idempotentCommandHandler,
                 buildings)
-        { }
+        {
+            _backOfficeContext = backOfficeContext;
+        }
 
-        protected override async Task<ETagResponse> InnerHandle(CorrectBuildingNotRealizationLambdaRequest request, CancellationToken cancellationToken)
+        protected override async Task<ETagResponse> InnerHandle(DemolishBuildingLambdaRequest request, CancellationToken cancellationToken)
         {
             var cmd = request.ToCommand();
 
@@ -48,16 +54,18 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.Building
                 // Idempotent: Do Nothing return last etag
             }
 
+            await _backOfficeContext.RemoveBuildingUnitAddressRelations(cmd.BuildingPersistentLocalId, cancellationToken);
+
             var lastHash = await GetHash(new BuildingPersistentLocalId(request.BuildingPersistentLocalId), cancellationToken);
             return new ETagResponse(string.Format(DetailUrlFormat, request.BuildingPersistentLocalId), lastHash);
         }
 
-        protected override TicketError? InnerMapDomainException(DomainException exception, CorrectBuildingNotRealizationLambdaRequest request)
+        protected override TicketError? InnerMapDomainException(DomainException exception, DemolishBuildingLambdaRequest request)
         {
             return exception switch
             {
-                BuildingHasInvalidStatusException => ValidationErrors.CorrectBuildingNotRealization.BuildingInvalidStatus.ToTicketError(),
-                BuildingHasInvalidGeometryMethodException => ValidationErrors.Common.BuildingIsMeasuredByGrb.ToTicketError(),
+                BuildingHasInvalidStatusException => ValidationErrors.DemolishBuilding.BuildingInvalidStatus.ToTicketError(),
+                BuildingHasInvalidGeometryMethodException => ValidationErrors.DemolishBuilding.InvalidGeometryMethod.ToTicketError(),
                 _ => null
             };
         }

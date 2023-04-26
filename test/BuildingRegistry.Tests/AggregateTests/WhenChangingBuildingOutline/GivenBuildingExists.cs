@@ -246,7 +246,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenChangingBuildingOutline
                     new BuildingStreamId(Fixture.Create<BuildingPersistentLocalId>()),
                     buildingWasMigrated)
                 .When(command)
-                .Throws(new BuildingHasInvalidBuildingGeometryMethodException()));
+                .Throws(new BuildingHasInvalidGeometryMethodException()));
         }
 
         [Theory]

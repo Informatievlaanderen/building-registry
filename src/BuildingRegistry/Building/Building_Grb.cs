@@ -2,6 +2,7 @@ namespace BuildingRegistry.Building
 {
     using Datastructures;
     using Events;
+    using Exceptions;
 
     public sealed partial class Building
     {
@@ -25,6 +26,31 @@ namespace BuildingRegistry.Building
                 new BuildingGeometryWasImportedFromGrb(buildingPersistentLocalId, buildingGrbData));
 
             return newBuilding;
+        }
+
+        public void Demolish(BuildingGrbData grbData)
+        {
+            GuardRemovedBuilding();
+
+            if (BuildingGeometry.Method != BuildingGeometryMethod.MeasuredByGrb)
+            {
+                throw new BuildingHasInvalidGeometryMethodException();
+            }
+
+            if (BuildingStatus == BuildingStatus.Retired)
+            {
+                return;
+            }
+
+            GuardValidStatusses(BuildingStatus.Realized);
+
+            foreach (var unit in _buildingUnits)
+            {
+                unit.Demolish();
+            }
+
+            ApplyChange(new BuildingWasDemolished(BuildingPersistentLocalId));
+            ApplyChange(new BuildingGeometryWasImportedFromGrb(BuildingPersistentLocalId, grbData));
         }
     }
 }

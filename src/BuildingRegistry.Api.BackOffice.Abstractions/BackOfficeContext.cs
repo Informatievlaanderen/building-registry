@@ -85,7 +85,7 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions
                 BuildingUnitAddressRelation.Remove(buildingUnitAddressRelation);
             }
 
-            SaveChangesAsync(cancellationToken);
+            await SaveChangesAsync(cancellationToken);
         }
 
         public async Task RemoveBuildingUnitAddressRelations(BuildingPersistentLocalId buildingPersistentLocalId, CancellationToken cancellationToken)
@@ -99,7 +99,7 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions
                 BuildingUnitAddressRelation.Remove(buildingUnitAddressRelation);
             }
 
-            SaveChangesAsync(cancellationToken);
+            await SaveChangesAsync(cancellationToken);
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

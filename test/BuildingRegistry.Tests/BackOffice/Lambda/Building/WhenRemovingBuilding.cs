@@ -168,7 +168,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
                 Container.Resolve<IConfiguration>(),
                 new FakeRetryPolicy(),
                 ticketing.Object,
-                MockExceptionIdempotentCommandHandler<BuildingHasInvalidBuildingGeometryMethodException>().Object,
+                MockExceptionIdempotentCommandHandler<BuildingHasInvalidGeometryMethodException>().Object,
                 Container.Resolve<IBuildings>(),
                 _backOfficeContext);
 

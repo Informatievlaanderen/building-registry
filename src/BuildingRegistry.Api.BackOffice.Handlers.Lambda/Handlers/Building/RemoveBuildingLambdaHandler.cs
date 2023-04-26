@@ -63,7 +63,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.Building
         {
             return exception switch
             {
-                BuildingHasInvalidBuildingGeometryMethodException => ValidationErrors.RemoveBuilding.BuildingHasInvalidBuildingGeometryMethod.ToTicketError(),
+                BuildingHasInvalidGeometryMethodException => ValidationErrors.RemoveBuilding.BuildingHasInvalidBuildingGeometryMethod.ToTicketError(),
                 _ => null
             };
         }
