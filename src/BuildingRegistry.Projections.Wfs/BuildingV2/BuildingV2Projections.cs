@@ -135,6 +135,13 @@ namespace BuildingRegistry.Projections.Wfs.BuildingV2
                 item.Version = message.Message.Provenance.Timestamp;
             });
 
+            When<Envelope<BuildingWasDemolished>>(async (context, message, ct) =>
+            {
+                var item = await context.BuildingsV2.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);
+                item.Status = RetiredStatus;
+                item.Version = message.Message.Provenance.Timestamp;
+            });
+
             When<Envelope<BuildingWasRemovedV2>>(async (context, message, ct) =>
             {
                 var item = await context.BuildingsV2.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);

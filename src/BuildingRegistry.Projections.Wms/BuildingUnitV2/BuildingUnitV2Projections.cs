@@ -299,6 +299,20 @@ namespace BuildingRegistry.Projections.Wms.BuildingUnitV2
 
                 SetVersion(unit!, message.Message.Provenance.Timestamp);
             });
+
+            When<Envelope<BuildingUnitWasRetiredBecauseBuildingWasDemolished>>(async (context, message, ct) =>
+            {
+                var unit = await context.BuildingUnitsV2.FindAsync(message.Message.BuildingUnitPersistentLocalId);
+                unit.Status = BuildingUnitStatus.Retired;
+                SetVersion(unit!, message.Message.Provenance.Timestamp);
+            });
+
+            When<Envelope<BuildingUnitWasNotRealizedBecauseBuildingWasDemolished>>(async (context, message, ct) =>
+            {
+                var unit = await context.BuildingUnitsV2.FindAsync(message.Message.BuildingUnitPersistentLocalId);
+                unit.Status = BuildingUnitStatus.NotRealized;
+                SetVersion(unit!, message.Message.Provenance.Timestamp);
+            });
         }
 
         private static void SetVersion(BuildingUnitV2 unit, Instant timestamp)

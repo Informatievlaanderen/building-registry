@@ -2,6 +2,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetailV2
 {
     using System;
     using System.Collections.ObjectModel;
+    using System.Data;
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
@@ -357,6 +358,26 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetailV2
                     RemoveIdempotentAddress(item, message.Message.PreviousAddressPersistentLocalId);
                     AddIdempotentAddress(item, new BuildingUnitDetailAddressItemV2(message.Message.BuildingUnitPersistentLocalId, message.Message.NewAddressPersistentLocalId));
 
+                    item.Version = message.Message.Provenance.Timestamp;
+                    UpdateHash(item, message);
+                }, ct);
+            });
+
+            When<Envelope<BuildingUnitWasRetiredBecauseBuildingWasDemolished>>(async (context, message, ct) =>
+            {
+                await Update(context, message.Message.BuildingUnitPersistentLocalId, item =>
+                {
+                    item.Status = BuildingUnitStatus.Retired;
+                    item.Version = message.Message.Provenance.Timestamp;
+                    UpdateHash(item, message);
+                }, ct);
+            });
+
+            When<Envelope<BuildingUnitWasNotRealizedBecauseBuildingWasDemolished>>(async (context, message, ct) =>
+            {
+                await Update(context, message.Message.BuildingUnitPersistentLocalId, item =>
+                {
+                    item.Status = BuildingUnitStatus.NotRealized;
                     item.Version = message.Message.Provenance.Timestamp;
                     UpdateHash(item, message);
                 }, ct);

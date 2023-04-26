@@ -1,9 +1,11 @@
 namespace BuildingRegistry.Producer.Extensions
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Building.Events;
+    using NodaTime;
     using Contracts = Be.Vlaanderen.Basisregisters.GrAr.Contracts.BuildingRegistry;
     using Legacy = Legacy.Events;
 
@@ -547,6 +549,21 @@ namespace BuildingRegistry.Producer.Extensions
             => new Contracts.BuildingUnitWasRetiredBecauseBuildingWasDemolished(
                 message.BuildingPersistentLocalId,
                 message.BuildingUnitPersistentLocalId,
+                message.Provenance.ToContract());
+
+        public static Contracts.BuildingGeometryWasImportedFromGrb ToContract(
+            this BuildingGeometryWasImportedFromGrb message)
+            => new Contracts.BuildingGeometryWasImportedFromGrb(
+                message.BuildingPersistentLocalId,
+                message.Idn,
+                message.VersionDate.ToString(),
+                message.EndDate?.ToString(),
+                message.IdnVersion,
+                message.GrbObject,
+                message.GrbObjectType,
+                message.EventType,
+                message.Geometry,
+                message.Overlap,
                 message.Provenance.ToContract());
 
         private static Be.Vlaanderen.Basisregisters.GrAr.Contracts.Common.Provenance ToContract(this ProvenanceData provenance)

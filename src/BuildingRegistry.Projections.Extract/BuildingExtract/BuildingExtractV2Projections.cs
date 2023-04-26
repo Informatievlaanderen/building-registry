@@ -195,6 +195,13 @@ namespace BuildingRegistry.Projections.Extract.BuildingExtract
                 UpdateVersie(item, message.Message.Provenance.Timestamp);
             });
 
+            When<Envelope<BuildingWasDemolished>>(async (context, message, ct) =>
+            {
+                var item = await context.BuildingExtractV2.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);
+                UpdateStatus(item, MapStatus((BuildingStatus.Retired)));
+                UpdateVersie(item, message.Message.Provenance.Timestamp);
+            });
+
             When<Envelope<BuildingWasRemovedV2>>(async (context, message, ct) =>
             {
                 var item = await context.BuildingExtractV2.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);

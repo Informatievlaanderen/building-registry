@@ -14,7 +14,7 @@ namespace BuildingRegistry.Producer
 
     [ConnectedProjectionName("Kafka producer")]
     [ConnectedProjectionDescription("Projectie die berichten naar de kafka broker stuurt.")]
-    public class ProducerProjections : ConnectedProjection<ProducerContext>
+    public class ProducerProjections : V2Producer
     {
         public const string TopicKey = "Topic";
 
@@ -279,186 +279,6 @@ namespace BuildingRegistry.Producer
             });
 
             #endregion
-
-            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingDomain.BuildingBecameUnderConstructionV2>>(async (_, message, ct) =>
-            {
-                await Produce(message.Message.BuildingPersistentLocalId, message.Message.ToContract(), message.Position, ct);
-            });
-
-            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingDomain.BuildingOutlineWasChanged>>(async (_, message, ct) =>
-            {
-                await Produce(message.Message.BuildingPersistentLocalId, message.Message.ToContract(), message.Position, ct);
-            });
-
-            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingDomain.BuildingUnitAddressWasAttachedV2>>(async (_, message, ct) =>
-            {
-                await Produce(message.Message.BuildingPersistentLocalId, message.Message.ToContract(), message.Position, ct);
-            });
-
-            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingDomain.BuildingUnitAddressWasDetachedV2>>(async (_, message, ct) =>
-            {
-                await Produce(message.Message.BuildingPersistentLocalId, message.Message.ToContract(), message.Position, ct);
-            });
-
-            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingDomain.BuildingUnitAddressWasDetachedBecauseAddressWasRemoved>>(async (_, message, ct) =>
-            {
-                await Produce(message.Message.BuildingPersistentLocalId, message.Message.ToContract(), message.Position, ct);
-            });
-
-            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingDomain.BuildingUnitAddressWasDetachedBecauseAddressWasRejected>>(async (_, message, ct) =>
-            {
-                await Produce(message.Message.BuildingPersistentLocalId, message.Message.ToContract(), message.Position, ct);
-            });
-
-            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingDomain.BuildingUnitAddressWasDetachedBecauseAddressWasRetired>>(async (_, message, ct) =>
-            {
-                await Produce(message.Message.BuildingPersistentLocalId, message.Message.ToContract(), message.Position, ct);
-            });
-
-            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingDomain.BuildingUnitPositionWasCorrected>>(async (_, message, ct) =>
-            {
-                await Produce(message.Message.BuildingPersistentLocalId, message.Message.ToContract(), message.Position, ct);
-            });
-
-            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingDomain.BuildingUnitRemovalWasCorrected>>(async (_, message, ct) =>
-            {
-                await Produce(message.Message.BuildingPersistentLocalId, message.Message.ToContract(), message.Position, ct);
-            });
-
-            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingDomain.BuildingUnitWasCorrectedFromNotRealizedToPlanned>>(async (_, message, ct) =>
-            {
-                await Produce(message.Message.BuildingPersistentLocalId, message.Message.ToContract(), message.Position, ct);
-            });
-
-            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingDomain.BuildingUnitWasCorrectedFromRealizedToPlanned>>(async (_, message, ct) =>
-            {
-                await Produce(message.Message.BuildingPersistentLocalId, message.Message.ToContract(), message.Position, ct);
-            });
-
-            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingDomain.BuildingUnitWasCorrectedFromRealizedToPlannedBecauseBuildingWasCorrected>>(async (_, message, ct) =>
-            {
-                await Produce(message.Message.BuildingPersistentLocalId, message.Message.ToContract(), message.Position, ct);
-            });
-
-            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingDomain.BuildingUnitWasCorrectedFromRetiredToRealized>>(async (_, message, ct) =>
-            {
-                await Produce(message.Message.BuildingPersistentLocalId, message.Message.ToContract(), message.Position, ct);
-            });
-
-            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingDomain.BuildingUnitWasDeregulated>>(async (_, message, ct) =>
-            {
-                await Produce(message.Message.BuildingPersistentLocalId, message.Message.ToContract(), message.Position, ct);
-            });
-
-             When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingDomain.BuildingUnitDeregulationWasCorrected>>(async (_, message, ct) =>
-            {
-                await Produce(message.Message.BuildingPersistentLocalId, message.Message.ToContract(), message.Position, ct);
-            });
-
-            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingDomain.BuildingUnitWasNotRealizedBecauseBuildingWasNotRealized>>(async (_, message, ct) =>
-            {
-                await Produce(message.Message.BuildingPersistentLocalId, message.Message.ToContract(), message.Position, ct);
-            });
-
-            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingDomain.BuildingUnitWasNotRealizedV2>>(async (_, message, ct) =>
-            {
-                await Produce(message.Message.BuildingPersistentLocalId, message.Message.ToContract(), message.Position, ct);
-            });
-
-            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingDomain.BuildingUnitWasPlannedV2>>(async (_, message, ct) =>
-            {
-                await Produce(message.Message.BuildingPersistentLocalId, message.Message.ToContract(), message.Position, ct);
-            });
-
-            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingDomain.BuildingUnitWasRealizedBecauseBuildingWasRealized>>(async (_, message, ct) =>
-            {
-                await Produce(message.Message.BuildingPersistentLocalId, message.Message.ToContract(), message.Position, ct);
-            });
-
-            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingDomain.BuildingUnitWasRealizedV2>>(async (_, message, ct) =>
-            {
-                await Produce(message.Message.BuildingPersistentLocalId, message.Message.ToContract(), message.Position, ct);
-            });
-
-            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingDomain.BuildingUnitWasRegularized>>(async (_, message, ct) =>
-            {
-                await Produce(message.Message.BuildingPersistentLocalId, message.Message.ToContract(), message.Position, ct);
-            });
-
-            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingDomain.BuildingUnitRegularizationWasCorrected>>(async (_, message, ct) =>
-            {
-                await Produce(message.Message.BuildingPersistentLocalId, message.Message.ToContract(), message.Position, ct);
-            });
-
-            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingDomain.BuildingUnitWasRemovedV2>>(async (_, message, ct) =>
-            {
-                await Produce(message.Message.BuildingPersistentLocalId, message.Message.ToContract(), message.Position, ct);
-            });
-
-            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingDomain.BuildingUnitWasRemovedBecauseBuildingWasRemoved>>(async (_, message, ct) =>
-            {
-                await Produce(message.Message.BuildingPersistentLocalId, message.Message.ToContract(), message.Position, ct);
-            });
-
-            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingDomain.BuildingUnitWasRetiredV2>>(async (_, message, ct) =>
-            {
-                await Produce(message.Message.BuildingPersistentLocalId, message.Message.ToContract(), message.Position, ct);
-            });
-
-            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingDomain.BuildingWasCorrectedFromNotRealizedToPlanned>>(async (_, message, ct) =>
-            {
-                await Produce(message.Message.BuildingPersistentLocalId, message.Message.ToContract(), message.Position, ct);
-            });
-
-            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingDomain.BuildingWasCorrectedFromRealizedToUnderConstruction>>(async (_, message, ct) =>
-            {
-                await Produce(message.Message.BuildingPersistentLocalId, message.Message.ToContract(), message.Position, ct);
-            });
-
-            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingDomain.BuildingWasCorrectedFromUnderConstructionToPlanned>>(async (_, message, ct) =>
-            {
-                await Produce(message.Message.BuildingPersistentLocalId, message.Message.ToContract(), message.Position, ct);
-            });
-
-            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingDomain.BuildingWasMigrated>>(async (_, message, ct) =>
-            {
-                await Produce(message.Message.BuildingPersistentLocalId, message.Message.ToContract(), message.Position, ct);
-            });
-
-            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingDomain.BuildingWasNotRealizedV2>>(async (_, message, ct) =>
-            {
-                await Produce(message.Message.BuildingPersistentLocalId, message.Message.ToContract(), message.Position, ct);
-            });
-
-            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingDomain.BuildingWasPlannedV2>>(async (_, message, ct) =>
-            {
-                await Produce(message.Message.BuildingPersistentLocalId, message.Message.ToContract(), message.Position, ct);
-            });
-
-            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingDomain.UnplannedBuildingWasRealizedAndMeasured>>(async (_, message, ct) =>
-            {
-                await Produce(message.Message.BuildingPersistentLocalId, message.Message.ToContract(), message.Position, ct);
-            });
-
-            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingDomain.BuildingWasRealizedV2>>(async (_, message, ct) =>
-            {
-                await Produce(message.Message.BuildingPersistentLocalId, message.Message.ToContract(), message.Position, ct);
-            });
-
-            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingDomain.BuildingWasRemovedV2>>(async (_, message, ct) =>
-            {
-                await Produce(message.Message.BuildingPersistentLocalId, message.Message.ToContract(), message.Position, ct);
-            });
-
-            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingDomain.CommonBuildingUnitWasAddedV2>>(async (_, message, ct) =>
-            {
-                await Produce(message.Message.BuildingPersistentLocalId, message.Message.ToContract(), message.Position, ct);
-            });
-
-            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingDomain.BuildingUnitAddressWasReplacedBecauseAddressWasReaddressed>>(async (_, message, ct) =>
-            {
-                await Produce(message.Message.BuildingPersistentLocalId, message.Message.ToContract(), message.Position, ct);
-            });
         }
 
         private async Task Produce<T>(string id, T message, long storePosition, CancellationToken cancellationToken = default)
@@ -482,8 +302,7 @@ namespace BuildingRegistry.Producer
             await Produce(buildingId.ToString("D"), message, storePosition, cancellationToken);
         }
 
-        private async Task Produce<T>(int persistentLocalId, T message, long storePosition, CancellationToken cancellationToken = default)
-            where T : class, IQueueMessage
+        protected override async Task Produce<T>(int persistentLocalId, T message, long storePosition, CancellationToken cancellationToken = default)
         {
             await Produce(persistentLocalId.ToString(), message, storePosition, cancellationToken);
         }
