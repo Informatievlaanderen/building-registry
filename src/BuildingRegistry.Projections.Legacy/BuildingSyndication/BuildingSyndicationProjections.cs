@@ -992,6 +992,14 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
                 }, ct);
             });
 
+            When<Envelope<BuildingWasDemolished>>(async (context, message, ct) =>
+            {
+                await context.CreateNewBuildingSyndicationItem(message.Message.BuildingPersistentLocalId, message, item =>
+                {
+                    item.Status = MapBuildingStatus(BuildingRegistry.Building.BuildingStatus.Retired);
+                }, ct);
+            });
+
             When<Envelope<BuildingWasRemovedV2>>(async (context, message, ct) =>
             {
                 await context.CreateNewBuildingSyndicationItem(
@@ -1308,6 +1316,25 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
                 }, ct);
             });
 
+            When<Envelope<BuildingUnitWasRetiredBecauseBuildingWasDemolished>>(async (context, message, ct) =>
+            {
+                await context.CreateNewBuildingSyndicationItem(message.Message.BuildingPersistentLocalId, message, item =>
+                {
+                    var unit = item.BuildingUnitsV2.Single(y => y.PersistentLocalId == message.Message.BuildingUnitPersistentLocalId);
+                    unit.Status = BuildingRegistry.Building.BuildingUnitStatus.Retired;
+                    unit.Version = message.Message.Provenance.Timestamp;
+                }, ct);
+            });
+
+            When<Envelope<BuildingUnitWasNotRealizedBecauseBuildingWasDemolished>>(async (context, message, ct) =>
+            {
+                await context.CreateNewBuildingSyndicationItem(message.Message.BuildingPersistentLocalId, message, item =>
+                {
+                    var unit = item.BuildingUnitsV2.Single(y => y.PersistentLocalId == message.Message.BuildingUnitPersistentLocalId);
+                    unit.Status = BuildingRegistry.Building.BuildingUnitStatus.NotRealized;
+                    unit.Version = message.Message.Provenance.Timestamp;
+                }, ct);
+            });
             #endregion
         }
 

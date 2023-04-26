@@ -386,6 +386,26 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
                         UpdateVersie(itemV2, message.Message.Provenance.Timestamp);
                     }, ct);
             });
+
+            When<Envelope<BuildingUnitWasRetiredBecauseBuildingWasDemolished>>(async (context, message, ct) =>
+            {
+                await context.FindAndUpdateBuildingUnitExtract(message.Message.BuildingUnitPersistentLocalId,
+                    itemV2 =>
+                    {
+                        UpdateStatus(itemV2, Retired);
+                        UpdateVersie(itemV2, message.Message.Provenance.Timestamp);
+                    }, ct);
+            });
+
+            When<Envelope<BuildingUnitWasNotRealizedBecauseBuildingWasDemolished>>(async (context, message, ct) =>
+            {
+                await context.FindAndUpdateBuildingUnitExtract(message.Message.BuildingUnitPersistentLocalId,
+                    itemV2 =>
+                    {
+                        UpdateStatus(itemV2, NotRealized);
+                        UpdateVersie(itemV2, message.Message.Provenance.Timestamp);
+                    }, ct);
+            });
         }
 
         private static string MapFunction(BuildingUnitFunction function)

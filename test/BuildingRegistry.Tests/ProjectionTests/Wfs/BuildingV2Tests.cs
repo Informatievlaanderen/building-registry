@@ -373,6 +373,35 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wfs
                 });
         }
 
+        [Fact]
+        public async Task WhenBuildingWasDemolished()
+        {
+            _fixture.Customize(new WithFixedBuildingPersistentLocalId());
+            _fixture.Customize(new WithFixedBuildingUnitPersistentLocalId());
+
+            var buildingWasPlannedV2 = _fixture.Create<BuildingWasPlannedV2>();
+
+            var buildingWasDemolished = _fixture.Create<BuildingWasDemolished>();
+
+            await Sut
+                .Given(
+                    new Envelope<BuildingWasPlannedV2>(
+                        new Envelope(
+                            buildingWasPlannedV2,
+                            new Dictionary<string, object> { { AddEventHashPipe.HashMetadataKey, buildingWasPlannedV2.GetHash() } })),
+                    new Envelope<BuildingWasDemolished>(
+                        new Envelope(
+                            buildingWasDemolished,
+                            new Dictionary<string, object> { { AddEventHashPipe.HashMetadataKey, buildingWasDemolished.GetHash() } })))
+                .Then(async ct =>
+                {
+                    var item = await ct.BuildingsV2.FindAsync(buildingWasDemolished.BuildingPersistentLocalId);
+                    item.Should().NotBeNull();
+
+                    item!.Status.Should().Be("Gehistoreerd");
+                });
+        }
+
         protected override BuildingV2Projections CreateProjection() => new BuildingV2Projections(WKBReaderFactory.Create());
     }
 }
