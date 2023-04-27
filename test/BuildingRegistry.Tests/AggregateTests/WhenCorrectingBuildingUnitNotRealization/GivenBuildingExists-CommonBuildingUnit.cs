@@ -280,7 +280,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitNotRea
         {
             var command = new CorrectBuildingUnitNotRealization(
                 Fixture.Create<BuildingPersistentLocalId>(),
-                new BuildingUnitPersistentLocalId(2),
+                new BuildingUnitPersistentLocalId(1002),
                 Fixture.Create<Provenance>()
             );
 
@@ -341,7 +341,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitNotRea
         {
             var command = new CorrectBuildingUnitNotRealization(
                 Fixture.Create<BuildingPersistentLocalId>(),
-                new BuildingUnitPersistentLocalId(2),
+                new BuildingUnitPersistentLocalId(1002),
                 Fixture.Create<Provenance>()
             );
 
@@ -386,7 +386,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitNotRea
         {
             var command = new CorrectBuildingUnitNotRealization(
                 Fixture.Create<BuildingPersistentLocalId>(),
-                new BuildingUnitPersistentLocalId(2),
+                new BuildingUnitPersistentLocalId(1002),
                 Fixture.Create<Provenance>()
             );
 
@@ -433,7 +433,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitNotRea
         {
             var command = new CorrectBuildingUnitNotRealization(
                 Fixture.Create<BuildingPersistentLocalId>(),
-                new BuildingUnitPersistentLocalId(2),
+                new BuildingUnitPersistentLocalId(1002),
                 Fixture.Create<Provenance>()
             );
 
