@@ -1,3 +1,14 @@
+# [3.72.0](https://github.com/informatievlaanderen/building-registry/compare/v3.71.0...v3.72.0) (2023-04-27)
+
+
+### Features
+
+* add GRB abstractions ([a3b49dd](https://github.com/informatievlaanderen/building-registry/commit/a3b49dd02ec5368a78baf8a3112bef001b6b16f0))
+* demolish building ([0534e67](https://github.com/informatievlaanderen/building-registry/commit/0534e679b5ce32f14bf5ed45dd28d9cd66db75d3))
+* realize and measure unplanned building ([dd51c31](https://github.com/informatievlaanderen/building-registry/commit/dd51c313ef0b6daad39c427a402ba97217399549))
+* refactor producer to share v2 + demolishBuilding projections ([cd60570](https://github.com/informatievlaanderen/building-registry/commit/cd605700fb2ecc5abfd8d6a930b918169249d63d))
+* save job when creating presignedurl ([d242eee](https://github.com/informatievlaanderen/building-registry/commit/d242eee89e8b7bc58370e64f883af5583105f0c9))
+
 # [3.71.0](https://github.com/informatievlaanderen/building-registry/compare/v3.70.4...v3.71.0) (2023-04-18)
 
 
