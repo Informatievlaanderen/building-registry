@@ -98,7 +98,7 @@ namespace BuildingRegistry.Tests.Extensions
                     _fixture.Create<BuildingUnitId>(),
                     buildingUnitPersistentLocalId is not null
                         ? new PersistentLocalId(buildingUnitPersistentLocalId)
-                        : _fixture.Create<PersistentLocalId>(),
+                        : new PersistentLocalId(_fixture.Create<int>()),
                     function ?? BuildingUnitFunction.Unknown,
                     status,
                     attachedAddresses ?? new List<AddressPersistentLocalId>(),

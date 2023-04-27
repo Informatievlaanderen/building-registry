@@ -34,12 +34,12 @@ namespace BuildingRegistry.Tests.ProjectionTests.Legacy
         }
 
         [Theory]
-        [InlineData("Planned", null)]
-        [InlineData("UnderConstruction", null)]
-        [InlineData("Realized", null)]
-        [InlineData("Retired", "Retired")]
-        [InlineData("NotRealized", "NotRealized")]
-        public async Task WhenBuildingWasMigrated(string buildingStatus, string? expectedStatus)
+        [InlineData("Planned")]
+        [InlineData("UnderConstruction")]
+        [InlineData("Realized")]
+        [InlineData("Retired")]
+        [InlineData("NotRealized")]
+        public async Task WhenBuildingWasMigrated(string buildingStatus)
         {
             _fixture.Register(() => BuildingStatus.Parse(buildingStatus));
 

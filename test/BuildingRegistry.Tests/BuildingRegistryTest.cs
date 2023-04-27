@@ -46,6 +46,7 @@ namespace BuildingRegistry.Tests
             Fixture.Customize(new WithBuildingGeometryMethod());
             Fixture.Customize(new WithBuildingUnitStatus());
             Fixture.Customize(new SetProvenanceImplementationsCallSetProvenance());
+            Fixture.Customizations.Add(new RandomUniqueIntegerGenerator());
             Fixture.Register(() => (ISnapshotStrategy)NoSnapshotStrategy.Instance);
 
             Fixture.Register(() =>
