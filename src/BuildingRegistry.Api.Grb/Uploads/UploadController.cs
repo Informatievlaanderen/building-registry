@@ -1,5 +1,6 @@
 namespace BuildingRegistry.Api.Grb.Uploads
 {
+    using System;
     using System.Threading;
     using System.Threading.Tasks;
     using Be.Vlaanderen.Basisregisters.Auth.AcmIdm;
@@ -29,6 +30,14 @@ namespace BuildingRegistry.Api.Grb.Uploads
             return Ok(await _mediator.Send(new GetPreSignedUrlRequest(), cancellationToken));
         }
 
-        //TODO: GetResult (uploads/{id:guid})
+        //TODO: Cancel Job
+
+        [HttpGet("jobs/{jobId:guid}")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = PolicyNames.IngemetenGebouw.GrbBijwerker)]
+        public async Task<IActionResult> GetResult(Guid jobId, CancellationToken cancellationToken)
+        {
+            return (await _mediator.Send(new GetJobResultRequest(jobId), cancellationToken))
+                .CreateFileCallbackResult(cancellationToken);
+        }
     }
 }

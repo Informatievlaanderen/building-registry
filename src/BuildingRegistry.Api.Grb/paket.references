@@ -4,6 +4,7 @@ AWSSDK.Extensions.NETCore.Setup
 
 Be.Vlaanderen.Basisregisters.Auth.AcmIdm
 Be.Vlaanderen.Basisregisters.Api
+Be.Vlaanderen.Basisregisters.GrAr.Extracts
 
 Be.Vlaanderen.Basisregisters.TicketingService.Abstractions
 Be.Vlaanderen.Basisregisters.TicketingService.Proxy.HttpProxy
