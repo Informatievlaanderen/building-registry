@@ -33,6 +33,7 @@ namespace BuildingRegistry.Building
         {
             Register<BuildingWasMigrated>(When);
             Register<BuildingOutlineWasChanged>(When);
+            Register<BuildingWasMeasured>(When);
 
             Register<BuildingUnitWasPlannedV2>(When);
             Register<CommonBuildingUnitWasAddedV2>(When);
@@ -69,6 +70,15 @@ namespace BuildingRegistry.Building
         }
 
         private void When(BuildingOutlineWasChanged @event)
+        {
+            BuildingUnitPosition = new BuildingUnitPosition(
+                new ExtendedWkbGeometry(@event.ExtendedWkbGeometryBuildingUnits!),
+                BuildingUnitPositionGeometryMethod.DerivedFromObject);
+
+            _lastEvent = @event;
+        }
+
+        private void When(BuildingWasMeasured @event)
         {
             BuildingUnitPosition = new BuildingUnitPosition(
                 new ExtendedWkbGeometry(@event.ExtendedWkbGeometryBuildingUnits!),
