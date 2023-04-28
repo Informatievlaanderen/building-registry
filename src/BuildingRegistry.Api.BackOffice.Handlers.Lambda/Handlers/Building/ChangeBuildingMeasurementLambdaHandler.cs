@@ -8,15 +8,16 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.Building
     using Be.Vlaanderen.Basisregisters.Sqs.Lambda.Handlers;
     using Be.Vlaanderen.Basisregisters.Sqs.Lambda.Infrastructure;
     using Be.Vlaanderen.Basisregisters.Sqs.Responses;
+    using BuildingRegistry.Api.BackOffice.Abstractions.Building.Validators;
     using BuildingRegistry.Building;
     using BuildingRegistry.Building.Exceptions;
     using Microsoft.Extensions.Configuration;
     using Requests.Building;
     using TicketingService.Abstractions;
 
-    public sealed class RealizeAndMeasureUnplannedBuildingLambdaHandler : BuildingLambdaHandler<RealizeAndMeasureUnplannedBuildingLambdaRequest>
+    public sealed class ChangeBuildingMeasurementLambdaHandler : BuildingLambdaHandler<ChangeBuildingMeasurementLambdaRequest>
     {
-        public RealizeAndMeasureUnplannedBuildingLambdaHandler(
+        public ChangeBuildingMeasurementLambdaHandler(
             IConfiguration configuration,
             ICustomRetryPolicy retryPolicy,
             ITicketing ticketing,
@@ -30,7 +31,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.Building
                 buildings)
         { }
 
-        protected override async Task<ETagResponse> InnerHandle(RealizeAndMeasureUnplannedBuildingLambdaRequest request, CancellationToken cancellationToken)
+        protected override async Task<ETagResponse> InnerHandle(ChangeBuildingMeasurementLambdaRequest request, CancellationToken cancellationToken)
         {
             var cmd = request.ToCommand();
 
@@ -51,11 +52,13 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.Building
             return new ETagResponse(string.Format(DetailUrlFormat, request.BuildingPersistentLocalId), lastHash);
         }
 
-        protected override TicketError? InnerMapDomainException(DomainException exception, RealizeAndMeasureUnplannedBuildingLambdaRequest request)
+        protected override TicketError? InnerMapDomainException(DomainException exception, ChangeBuildingMeasurementLambdaRequest request)
         {
             return exception switch
             {
-                PolygonIsInvalidException => ValidationErrors.Common.InvalidBuildingPolygonGeometry.ToTicketError(),
+                BuildingHasInvalidStatusException => ValidationErrors.ChangeBuildingMeasurement.BuildingInvalidStatus.ToTicketError(),
+                BuildingHasInvalidGeometryMethodException => ValidationErrors.ChangeBuildingMeasurement.BuildingIsOutlined.ToTicketError(),
+                BuildingHasBuildingUnitsOutsideBuildingGeometryException => ValidationErrors.ChangeBuildingMeasurement.BuildingHasBuildingUnitsOutsideChangedGeometry.ToTicketError(),
                 _ => null
             };
         }

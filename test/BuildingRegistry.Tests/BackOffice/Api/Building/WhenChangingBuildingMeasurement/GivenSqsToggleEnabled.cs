@@ -1,4 +1,4 @@
-namespace BuildingRegistry.Tests.BackOffice.Api.Building.WhenDemolishingBuilding
+namespace BuildingRegistry.Tests.BackOffice.Api.Building.WhenChangingBuildingMeasurement
 {
     using System;
     using System.Threading;
@@ -12,6 +12,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.Building.WhenDemolishingBuilding
     using BuildingRegistry.Api.BackOffice.Abstractions.Building.SqsRequests;
     using BuildingRegistry.Api.BackOffice.Abstractions.Building.Validators;
     using BuildingRegistry.Api.BackOffice.Building;
+    using BuildingRegistry.Building;
     using BuildingRegistry.Tests.Fixtures;
     using FluentAssertions;
     using Microsoft.AspNetCore.Http;
@@ -42,19 +43,20 @@ namespace BuildingRegistry.Tests.BackOffice.Api.Building.WhenDemolishingBuilding
             var expectedLocationResult = new LocationResult(CreateTicketUri(ticketId));
 
             MockMediator
-                .Setup(x => x.Send(It.IsAny<DemolishBuildingSqsRequest>(), CancellationToken.None))
+                .Setup(x => x.Send(It.IsAny<ChangeBuildingMeasurementSqsRequest>(), CancellationToken.None))
                 .Returns(Task.FromResult(expectedLocationResult));
 
             _streamStore.SetStreamFound();
 
-            var request = Fixture.Create<DemolishBuildingRequest>();
+            var request = Fixture.Create<ChangeBuildingMeasurementRequest>();
             var expectedIfMatchHeader = Fixture.Create<string>();
 
-            var result = (AcceptedResult)await _controller.Demolish(
+            var result = (AcceptedResult) await _controller.ChangeMeasurement(
+                MockValidRequestValidator<ChangeBuildingMeasurementRequest>(),
                 new BuildingExistsValidator(_streamStore.Object),
                 MockIfMatchValidator(true),
+                Fixture.Create<BuildingPersistentLocalId>(),
                 request,
-                1,
                 expectedIfMatchHeader);
 
             result.Should().NotBeNull();
@@ -62,7 +64,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.Building.WhenDemolishingBuilding
 
             MockMediator.Verify(x =>
                 x.Send(
-                    It.Is<DemolishBuildingSqsRequest>(sqsRequest =>
+                    It.Is<ChangeBuildingMeasurementSqsRequest>(sqsRequest =>
                         sqsRequest.Request == request
                         && sqsRequest.ProvenanceData.Timestamp != Instant.MinValue
                         && sqsRequest.ProvenanceData.Application == Application.Grb
@@ -78,11 +80,12 @@ namespace BuildingRegistry.Tests.BackOffice.Api.Building.WhenDemolishingBuilding
             _streamStore.SetStreamFound();
 
             //Act
-            var result = await _controller.Demolish(
+            var result = await _controller.ChangeMeasurement(
+                MockValidRequestValidator<ChangeBuildingMeasurementRequest>(),
                 new BuildingExistsValidator(_streamStore.Object),
                 MockIfMatchValidator(false),
-                Fixture.Create<DemolishBuildingRequest>(),
-                1,
+                Fixture.Create<BuildingPersistentLocalId>(),
+                Fixture.Create<ChangeBuildingMeasurementRequest>(),
                 "IncorrectIfMatchHeader");
 
             //Assert
@@ -90,17 +93,18 @@ namespace BuildingRegistry.Tests.BackOffice.Api.Building.WhenDemolishingBuilding
         }
 
         [Fact]
-        public async Task WithNonExistingBuildingPersistentLocalId_ThenValidationErrorIsThrown()
+        public void WithNonExistingBuildingPersistentLocalId_ThenThrowsApiException()
         {
             //Arrange
             _streamStore.SetStreamNotFound();
 
             //Act
-            var act = async () => await _controller.Demolish(
+            var act = async () => await _controller.ChangeMeasurement(
+                MockValidRequestValidator<ChangeBuildingMeasurementRequest>(),
                 new BuildingExistsValidator(_streamStore.Object),
                 MockIfMatchValidator(true),
-                Fixture.Create<DemolishBuildingRequest>(),
-                1,
+                Fixture.Create<BuildingPersistentLocalId>(),
+                Fixture.Create<ChangeBuildingMeasurementRequest>(),
                 null,
                 CancellationToken.None);
 

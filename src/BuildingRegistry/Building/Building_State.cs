@@ -76,6 +76,7 @@ namespace BuildingRegistry.Building
             Register<BuildingUnitAddressWasReplacedBecauseAddressWasReaddressed>(When);
             Register<BuildingUnitWasNotRealizedBecauseBuildingWasDemolished>(When);
             Register<BuildingUnitWasRetiredBecauseBuildingWasDemolished>(When);
+            Register<BuildingMeasurementWasChanged>(When);
 
             Register<BuildingSnapshot>(When);
         }
@@ -307,6 +308,24 @@ namespace BuildingRegistry.Building
 
         private void When(BuildingUnitWasNotRealizedBecauseBuildingWasDemolished @event) => RouteToBuildingUnit(@event);
         private void When(BuildingUnitWasRetiredBecauseBuildingWasDemolished @event) => RouteToBuildingUnit(@event);
+
+        private void When(BuildingMeasurementWasChanged @event)
+        {
+            BuildingGeometry = new BuildingGeometry(
+                new ExtendedWkbGeometry(@event.ExtendedWkbGeometryBuilding),
+                BuildingGeometryMethod.MeasuredByGrb);
+
+            var buildingUnitPersistentLocalIds = @event.BuildingUnitPersistentLocalIds.Concat(@event.BuildingUnitPersistentLocalIdsWhichBecameDerived);
+
+            foreach (var buildingUnitPersistentLocalId in buildingUnitPersistentLocalIds)
+            {
+                var buildingUnit = BuildingUnits.Single(x => x.BuildingUnitPersistentLocalId == buildingUnitPersistentLocalId);
+
+                buildingUnit.Route(@event);
+            }
+
+            _lastEvent = @event;
+        }
 
         private void RouteToBuildingUnit<TEvent>(TEvent @event)
             where TEvent : IBuildingEvent, IHasBuildingUnitPersistentLocalId

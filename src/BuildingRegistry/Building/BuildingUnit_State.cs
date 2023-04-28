@@ -62,6 +62,7 @@ namespace BuildingRegistry.Building
             Register<BuildingUnitAddressWasReplacedBecauseAddressWasReaddressed>(When);
             Register<BuildingUnitWasNotRealizedBecauseBuildingWasDemolished>(When);
             Register<BuildingUnitWasRetiredBecauseBuildingWasDemolished>(When);
+            Register<BuildingMeasurementWasChanged>(When);
         }
 
         private void When(BuildingWasMigrated @event)
@@ -314,6 +315,15 @@ namespace BuildingRegistry.Building
         private void When(BuildingUnitWasRetiredBecauseBuildingWasDemolished @event)
         {
             Status = BuildingUnitStatus.Retired;
+
+            _lastEvent = @event;
+        }
+
+        private void When(BuildingMeasurementWasChanged @event)
+        {
+            BuildingUnitPosition = new BuildingUnitPosition(
+                new ExtendedWkbGeometry(@event.ExtendedWkbGeometryBuildingUnits),
+                BuildingUnitPositionGeometryMethod.DerivedFromObject);
 
             _lastEvent = @event;
         }
