@@ -43,8 +43,6 @@ namespace BuildingRegistry.Api.BackOffice.Building
         {
             await validator.ValidateAndThrowAsync(request, cancellationToken);
 
-            request.Metadata = GetMetadata();
-
             if (!await buildingExistsValidator.Exists(
                     new BuildingPersistentLocalId(persistentLocalId), cancellationToken))
             {
