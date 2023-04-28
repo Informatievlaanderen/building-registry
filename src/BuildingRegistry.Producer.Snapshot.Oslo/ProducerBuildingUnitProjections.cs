@@ -2,6 +2,7 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
     using Be.Vlaanderen.Basisregisters.GrAr.Oslo.SnapshotProducer;
@@ -48,6 +49,22 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo
             When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingOutlineWasChanged>>(async (_, message, ct) =>
             {
                 foreach (var buildingUnitPersistentLocalId in message.Message.BuildingUnitPersistentLocalIds)
+                {
+                    await FindAndProduce(async () =>
+                            await snapshotManager.FindMatchingSnapshot(
+                                buildingUnitPersistentLocalId.ToString(),
+                                message.Message.Provenance.Timestamp,
+                                message.Position,
+                                throwStaleWhenGone: false,
+                                ct),
+                        message.Position,
+                        ct);
+                }
+            });
+
+            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingWasMeasured>>(async (_, message, ct) =>
+            {
+                foreach (var buildingUnitPersistentLocalId in message.Message.BuildingUnitPersistentLocalIds.Concat(message.Message.BuildingUnitPersistentLocalIdsWhichBecameDerived))
                 {
                     await FindAndProduce(async () =>
                             await snapshotManager.FindMatchingSnapshot(

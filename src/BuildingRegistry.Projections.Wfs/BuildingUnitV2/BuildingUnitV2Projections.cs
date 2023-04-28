@@ -1,6 +1,7 @@
 namespace BuildingRegistry.Projections.Wfs.BuildingUnitV2
 {
     using System.Collections.Generic;
+    using System.Linq;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy.Gebouweenheid;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.Connector;
@@ -56,6 +57,18 @@ namespace BuildingRegistry.Projections.Wfs.BuildingUnitV2
             When<Envelope<BuildingOutlineWasChanged>>(async (context, message, _) =>
             {
                 foreach (var buildingUnitPersistentLocalId in message.Message.BuildingUnitPersistentLocalIds)
+                {
+                    var unit = await context.BuildingUnitsV2.FindAsync(buildingUnitPersistentLocalId);
+                    unit!.Position = (Point)_wkbReader.Read(message.Message.ExtendedWkbGeometryBuildingUnits!.ToByteArray());
+                    unit.PositionMethod = MapGeometryMethod(BuildingUnitPositionGeometryMethod.DerivedFromObject);
+
+                    SetVersion(unit, message.Message.Provenance.Timestamp);
+                }
+            });
+
+            When<Envelope<BuildingWasMeasured>>(async (context, message, _) =>
+            {
+                foreach (var buildingUnitPersistentLocalId in message.Message.BuildingUnitPersistentLocalIds.Concat(message.Message.BuildingUnitPersistentLocalIdsWhichBecameDerived))
                 {
                     var unit = await context.BuildingUnitsV2.FindAsync(buildingUnitPersistentLocalId);
                     unit!.Position = (Point)_wkbReader.Read(message.Message.ExtendedWkbGeometryBuildingUnits!.ToByteArray());

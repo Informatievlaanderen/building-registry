@@ -2,6 +2,7 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Text;
     using Be.Vlaanderen.Basisregisters.GrAr.Common;
     using Be.Vlaanderen.Basisregisters.GrAr.Extracts;
@@ -81,6 +82,22 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
             When<Envelope<BuildingOutlineWasChanged>>(async (context, message, ct) =>
             {
                 foreach (var buildingUnitPersistentLocalId in message.Message.BuildingUnitPersistentLocalIds)
+                {
+                    await context.FindAndUpdateBuildingUnitExtract(buildingUnitPersistentLocalId,
+                        itemV2 =>
+                        {
+                            var geometry = wkbReader.Read(message.Message.ExtendedWkbGeometryBuildingUnits!.ToByteArray());
+                            UpdateGeometry(itemV2, geometry);
+                            var geometryMethod = MapGeometryMethod(BuildingUnitPositionGeometryMethod.DerivedFromObject);
+                            UpdatePosition(itemV2, geometryMethod);
+                            UpdateVersie(itemV2, message.Message.Provenance.Timestamp);
+                        }, ct);
+                }
+            });
+
+            When<Envelope<BuildingWasMeasured>>(async (context, message, ct) =>
+            {
+                foreach (var buildingUnitPersistentLocalId in message.Message.BuildingUnitPersistentLocalIds.Concat(message.Message.BuildingUnitPersistentLocalIdsWhichBecameDerived))
                 {
                     await context.FindAndUpdateBuildingUnitExtract(buildingUnitPersistentLocalId,
                         itemV2 =>
