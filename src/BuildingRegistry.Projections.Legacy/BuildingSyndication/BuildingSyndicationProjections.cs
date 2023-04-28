@@ -1008,6 +1008,30 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
                     _ => { },
                     ct);
             });
+
+            When<Envelope<BuildingWasMeasured>>(async (context, message, ct) =>
+            {
+                await context.CreateNewBuildingSyndicationItem(message.Message.BuildingPersistentLocalId, message, item =>
+                {
+                    item.Geometry = message.Message.ExtendedWkbGeometryBuilding.ToByteArray();
+                    item.GeometryMethod = BuildingGeometryMethod.MeasuredByGrb;
+
+                    if (!string.IsNullOrWhiteSpace(message.Message.ExtendedWkbGeometryBuildingUnits))
+                    {
+                        var buildingUnitPointPosition = message.Message.ExtendedWkbGeometryBuildingUnits!.ToByteArray();
+
+                        foreach (var buildingUnitId in message.Message.BuildingUnitPersistentLocalIds.Concat(message.Message.BuildingUnitPersistentLocalIdsWhichBecameDerived))
+                        {
+                            var buildingUnit = item.BuildingUnitsV2.Single(x => x.PersistentLocalId == buildingUnitId);
+
+                            buildingUnit.PointPosition = buildingUnitPointPosition;
+                            buildingUnit.PositionMethod = BuildingRegistry.Building.BuildingUnitPositionGeometryMethod.DerivedFromObject;
+                            buildingUnit.Version = message.Message.Provenance.Timestamp;
+                        }
+                    }
+                }, ct);
+            });
+
             #endregion Building
 
             #region BuildingUnit

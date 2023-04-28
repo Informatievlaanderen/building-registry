@@ -195,6 +195,17 @@ namespace BuildingRegistry.Projections.Extract.BuildingExtract
                 UpdateVersie(item, message.Message.Provenance.Timestamp);
             });
 
+            When<Envelope<BuildingWasMeasured>>(async (context, message, ct) =>
+            {
+                var item = await context.BuildingExtractV2.FindAsync(message.Message.BuildingPersistentLocalId,
+                    cancellationToken: ct);
+                var geometry = wkbReader.Read(message.Message.ExtendedWkbGeometryBuilding.ToByteArray()) as Polygon;
+
+                UpdateGeometry(geometry, item);
+                UpdateRecord(item, record => record.geommet.Value = MapGeometryMethod(BuildingGeometryMethod.MeasuredByGrb));
+                UpdateVersie(item, message.Message.Provenance.Timestamp);
+            });
+
             When<Envelope<BuildingWasDemolished>>(async (context, message, ct) =>
             {
                 var item = await context.BuildingExtractV2.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);

@@ -1,13 +1,11 @@
 namespace BuildingRegistry.Producer.Extensions
 {
-    using System;
-    using System.Collections.Generic;
     using System.Linq;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Building.Events;
-    using NodaTime;
     using Contracts = Be.Vlaanderen.Basisregisters.GrAr.Contracts.BuildingRegistry;
     using Legacy = Legacy.Events;
+    using Provenance = Be.Vlaanderen.Basisregisters.GrAr.Contracts.Common.Provenance;
 
     public static class MessageExtensions
     {
@@ -534,6 +532,15 @@ namespace BuildingRegistry.Producer.Extensions
                 message.PreviousAddressPersistentLocalId,
                 message.Provenance.ToContract());
 
+        public static Contracts.BuildingWasMeasured ToContract(this BuildingWasMeasured message)
+            => new Contracts.BuildingWasMeasured(
+                message.BuildingPersistentLocalId,
+                message.BuildingUnitPersistentLocalIds.ToList(),
+                message.BuildingUnitPersistentLocalIdsWhichBecameDerived.ToList(),
+                message.ExtendedWkbGeometryBuilding,
+                message.ExtendedWkbGeometryBuildingUnits,
+                message.Provenance.ToContract());
+
         public static Contracts.BuildingWasDemolished ToContract(this BuildingWasDemolished message)
             => new Contracts.BuildingWasDemolished(
                 message.BuildingPersistentLocalId,
@@ -566,8 +573,8 @@ namespace BuildingRegistry.Producer.Extensions
                 message.Overlap,
                 message.Provenance.ToContract());
 
-        private static Be.Vlaanderen.Basisregisters.GrAr.Contracts.Common.Provenance ToContract(this ProvenanceData provenance)
-        => new Be.Vlaanderen.Basisregisters.GrAr.Contracts.Common.Provenance(
+        private static Provenance ToContract(this ProvenanceData provenance)
+        => new Provenance(
             provenance.Timestamp.ToString(),
             provenance.Application.ToString(),
             provenance.Modification.ToString(),
