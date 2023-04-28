@@ -135,6 +135,10 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda
                     await mediator.Send(new RealizeAndMeasureUnplannedBuildingLambdaRequest(messageMetadata.MessageGroupId!, request), cancellationToken);
                     break;
 
+                case MeasureBuildingSqsRequest request:
+                    await mediator.Send(new MeasureBuildingLambdaRequest(messageMetadata.MessageGroupId!, request), cancellationToken);
+                    break;
+
                 case DemolishBuildingSqsRequest request:
                     await mediator.Send(new DemolishBuildingLambdaRequest(messageMetadata.MessageGroupId!, request), cancellationToken);
                     break;
