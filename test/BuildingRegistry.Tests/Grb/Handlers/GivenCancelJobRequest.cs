@@ -6,18 +6,17 @@
     using Api.Grb.Uploads;
     using AutoFixture;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
-    using Be.Vlaanderen.Basisregisters.Api.Extract;
     using BuildingRegistry.Grb.Abstractions;
     using FluentAssertions;
     using Microsoft.AspNetCore.Http;
     using Xunit;
 
-    public class GivenGetJobResultRequest
+    public class GivenCancelJobRequest
     {
         private readonly Fixture _fixture;
         private readonly FakeBuildingGrbContext _fakeBuildingGrbContext;
 
-        public GivenGetJobResultRequest()
+        public GivenCancelJobRequest()
         {
             _fixture = new Fixture();
             _fakeBuildingGrbContext = new FakeBuildingGrbContextFactory().CreateDbContext();
@@ -27,8 +26,8 @@
         public void WithNotExistingJobId_ThenReturnsNotFound()
         {
             var jobId = _fixture.Create<Guid>();
-            var request = new GetJobResultRequest(jobId);
-            var handler = new JobResultHandler(_fakeBuildingGrbContext);
+            var request = new CancelJobRequest(jobId);
+            var handler = new CancelJobHandler(_fakeBuildingGrbContext);
 
             var act = () => handler.Handle(request, CancellationToken.None);
 
@@ -37,19 +36,19 @@
                 .Result
                 .Where(x =>
                     x.StatusCode == StatusCodes.Status404NotFound
-                    && x.Message == $"Upload job with id {jobId} not found or not completed.");
+                    && x.Message == $"Upload job with id {jobId} not found.");
         }
 
         [Fact]
-        public void WithNonCompleteJob_ThenReturnsNotFound()
+        public void WithNonCreatedJob_ThenReturnsBadRequest()
         {
             // Arrange
             var job = _fixture.Create<Job>();
             job.Status = JobStatus.Prepared;
             _fakeBuildingGrbContext.Jobs.Add(job);
 
-            var request = new GetJobResultRequest(job.Id);
-            var handler = new JobResultHandler(_fakeBuildingGrbContext);
+            var request = new CancelJobRequest(job.Id);
+            var handler = new CancelJobHandler(_fakeBuildingGrbContext);
 
             // Act
             var act = () => handler.Handle(request, CancellationToken.None);
@@ -59,39 +58,26 @@
                 .ThrowAsync<ApiException>()
                 .Result
                 .Where(x =>
-                    x.StatusCode == StatusCodes.Status404NotFound
-                    && x.Message == $"Upload job with id {job.Id} not found or not completed.");
+                    x.StatusCode == StatusCodes.Status400BadRequest
+                    && x.Message == $"Upload job with id {job.Id} is being processed and cannot be cancelled.");
         }
 
         [Fact]
-        public async Task ThenReturnsExtractArchive()
+        public async Task ThenJobIsCancelled()
         {
             // Arrange
             var job = _fixture.Create<Job>();
-            job.Status = JobStatus.Completed;
+            job.Status = JobStatus.Created;
             _fakeBuildingGrbContext.Jobs.Add(job);
 
-            _fixture.Register(() => job.Id);
-            var jobResults = _fixture.CreateMany<JobResult>(10);
-            _fakeBuildingGrbContext.JobResults.AddRange(jobResults);
-
-            var request = new GetJobResultRequest(job.Id);
-            var handler = new JobResultHandler(_fakeBuildingGrbContext);
+            var request = new CancelJobRequest(job.Id);
+            var handler = new CancelJobHandler(_fakeBuildingGrbContext);
 
             // Act
-            var result = await handler.Handle(request, CancellationToken.None);
+            await handler.Handle(request, CancellationToken.None);
 
             // Assert
-            result.Should().NotBeNull();
-            foreach (var r in result)
-            {
-                r.Should().NotBeNull();
-                r.Should().BeOfType<ExtractFile>();
-
-                var file = r as ExtractFile;
-                file.Name.ToString().Should().NotBeNullOrEmpty();
-                file.Name.ToString().Should().Be("IdnGrResults.dbf");
-            }
+            job.Status.Should().Be(JobStatus.Cancelled);
         }
     }
 }

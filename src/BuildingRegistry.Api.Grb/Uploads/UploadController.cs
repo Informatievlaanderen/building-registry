@@ -30,14 +30,20 @@ namespace BuildingRegistry.Api.Grb.Uploads
             return Ok(await _mediator.Send(new GetPreSignedUrlRequest(), cancellationToken));
         }
 
-        //TODO: Cancel Job
-
         [HttpGet("jobs/{jobId:guid}")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = PolicyNames.IngemetenGebouw.GrbBijwerker)]
         public async Task<IActionResult> GetResult(Guid jobId, CancellationToken cancellationToken)
         {
             return (await _mediator.Send(new GetJobResultRequest(jobId), cancellationToken))
                 .CreateFileCallbackResult(cancellationToken);
+        }
+
+        [HttpDelete("jobs/{jobId:guid}")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = PolicyNames.IngemetenGebouw.GrbBijwerker)]
+        public async Task<IActionResult> CancelJob(Guid jobId, CancellationToken cancellationToken)
+        {
+            await _mediator.Send(new CancelJobRequest(jobId), cancellationToken);
+            return NoContent();
         }
     }
 }
