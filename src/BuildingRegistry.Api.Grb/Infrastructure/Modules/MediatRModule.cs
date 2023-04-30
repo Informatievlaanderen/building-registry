@@ -1,5 +1,6 @@
 namespace BuildingRegistry.Api.Grb.Infrastructure.Modules
 {
+    using System.Linq;
     using Autofac;
     using MediatR;
     using Uploads;
@@ -13,7 +14,14 @@ namespace BuildingRegistry.Api.Grb.Infrastructure.Modules
                 .As<IMediator>()
                 .InstancePerLifetimeScope();
 
-            builder.RegisterType<PreSignedUrlHandler>().AsImplementedInterfaces();
+            builder
+                .RegisterAssemblyTypes(typeof(PreSignedUrlHandler).Assembly)
+                .Where(t => t
+                    .GetInterfaces()
+                    .Any(i => i.IsGenericType
+                              && (i.GetGenericTypeDefinition() == typeof(IRequestHandler<,>)
+                                  || i.GetGenericTypeDefinition() == typeof(IRequestHandler<>))))
+                .AsImplementedInterfaces();
         }
     }
 }
