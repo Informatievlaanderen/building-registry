@@ -1,3 +1,22 @@
+# [3.73.0](https://github.com/informatievlaanderen/building-registry/compare/v3.72.0...v3.73.0) (2023-05-02)
+
+
+### Bug Fixes
+
+* don't produce BuildingGeometryWasImportedFromGrb to Oslo topic ([ed09788](https://github.com/informatievlaanderen/building-registry/commit/ed0978870c352db3fae217fb21fb8feba1e56f95))
+
+
+### Features
+
+* add GRB cancel job endpoint ([4f3f7b2](https://github.com/informatievlaanderen/building-registry/commit/4f3f7b2567794e1ec5bfbecbc0e2e22c9e2a3c6e))
+* correct building measurement api ([aade06f](https://github.com/informatievlaanderen/building-registry/commit/aade06f10d282ff02ad82121f43e3dfe897c9971))
+* correct building measurement domain ([064adc4](https://github.com/informatievlaanderen/building-registry/commit/064adc470da7a2b3e28fbbee343f8174b6ea6b36))
+* correcting building measurement projections ([769fdff](https://github.com/informatievlaanderen/building-registry/commit/769fdff9b65aac86683a6161a42aceb00cce0f17))
+* grb api add GetResult ([f726c15](https://github.com/informatievlaanderen/building-registry/commit/f726c1586f305870bcf2aa1ad2bae982df4a235a))
+* measure building api + handlers ([d2b5f39](https://github.com/informatievlaanderen/building-registry/commit/d2b5f3947a0ed32ee8545a7789aa7145d7d380cb))
+* measure building domain ([e48e3e2](https://github.com/informatievlaanderen/building-registry/commit/e48e3e2c22aba5c7074f5bf3549af5945b62a751))
+* measure building projections ([671c207](https://github.com/informatievlaanderen/building-registry/commit/671c2074d75976942c372e81c8dec43dcf4e2146))
+
 # [3.72.0](https://github.com/informatievlaanderen/building-registry/compare/v3.71.0...v3.72.0) (2023-04-27)
 
 
