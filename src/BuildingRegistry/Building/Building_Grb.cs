@@ -110,5 +110,56 @@ namespace BuildingRegistry.Building
                 buildingUnitsPosition));
             ApplyChange(new BuildingGeometryWasImportedFromGrb(BuildingPersistentLocalId, buildingGrbData));
         }
+
+        public void CorrectBuildingMeasurement(
+            ExtendedWkbGeometry extendedWkbGeometry,
+            BuildingGrbData buildingGrbData)
+        {
+            GuardRemovedBuilding();
+            GuardValidStatusses(BuildingStatus.Realized);
+
+            if (BuildingGeometry.Method != BuildingGeometryMethod.MeasuredByGrb)
+            {
+                throw new BuildingHasInvalidGeometryMethodException();
+            }
+
+            GuardPolygon(WKBReaderFactory.Create().Read(extendedWkbGeometry));
+
+            if (BuildingGeometry.Geometry == extendedWkbGeometry)
+            {
+                return;
+            }
+
+            var newBuildingGeometry = new BuildingGeometry(extendedWkbGeometry, BuildingGeometryMethod.MeasuredByGrb);
+            var plannedOrRealizedBuildingUnits = _buildingUnits.PlannedBuildingUnits()
+                .Concat(_buildingUnits.RealizedBuildingUnits())
+                .ToList();
+
+            var buildingUnitsWithPositionDerivedFromBuilding = plannedOrRealizedBuildingUnits
+                .Where(x => x.BuildingUnitPosition.GeometryMethod == BuildingUnitPositionGeometryMethod.DerivedFromObject)
+                .Select(x => x.BuildingUnitPersistentLocalId)
+                .ToList();
+
+            var buildingUnitsOutsideOfBuildingOutlining = plannedOrRealizedBuildingUnits
+                .Where(x =>
+                    x.BuildingUnitPosition.GeometryMethod == BuildingUnitPositionGeometryMethod.AppointedByAdministrator
+                    && !newBuildingGeometry.Contains(x.BuildingUnitPosition.Geometry))
+                .Select(x => x.BuildingUnitPersistentLocalId)
+                .ToList();
+
+            var buildingUnitsPosition =
+                buildingUnitsWithPositionDerivedFromBuilding.Any() || buildingUnitsOutsideOfBuildingOutlining.Any()
+                    ? newBuildingGeometry.Center
+                    : null;
+
+            ApplyChange(new BuildingMeasurementWasCorrected(
+                BuildingPersistentLocalId,
+                buildingUnitsWithPositionDerivedFromBuilding,
+                buildingUnitsOutsideOfBuildingOutlining,
+                extendedWkbGeometry,
+                buildingUnitsPosition));
+
+            ApplyChange(new BuildingGeometryWasImportedFromGrb(BuildingPersistentLocalId, buildingGrbData));
+        }
     }
 }
