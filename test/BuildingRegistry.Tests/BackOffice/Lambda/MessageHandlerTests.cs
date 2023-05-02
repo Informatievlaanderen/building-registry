@@ -817,6 +817,39 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda
         }
 
         [Fact]
+        public async Task WhenProcessingCorrectBuildingMeasurementSqsRequest_ThenLambdaRequestIsSent()
+        {
+            // Arrange
+            var mediator = new Mock<IMediator>();
+            var containerBuilder = new ContainerBuilder();
+            containerBuilder.Register(_ => mediator.Object);
+            var container = containerBuilder.Build();
+
+            var sqsRequest = Fixture.Create<CorrectBuildingMeasurementSqsRequest>();
+            var messageMetadata = new MessageMetadata { MessageGroupId = Fixture.Create<int>().ToString() };
+
+            var sut = new MessageHandler(container);
+
+            // Act
+            await sut.HandleMessage(
+                sqsRequest,
+                messageMetadata,
+                CancellationToken.None);
+
+            // Assert
+            mediator
+                .Verify(x => x.Send(It.Is<CorrectBuildingMeasurementLambdaRequest>(request =>
+                    request.TicketId == sqsRequest.TicketId &&
+                    request.MessageGroupId == messageMetadata.MessageGroupId &&
+                    request.Request == sqsRequest.Request &&
+                    request.BuildingPersistentLocalId == sqsRequest.BuildingPersistentLocalId &&
+                    request.IfMatchHeaderValue == null &&
+                    request.Provenance == sqsRequest.ProvenanceData.ToProvenance() &&
+                    request.Metadata == sqsRequest.Metadata
+                ), CancellationToken.None), Times.Once);
+        }
+
+        [Fact]
         public async Task WhenProcessingDemolishBuildingSqsRequest_ThenLambdaRequestIsSent()
         {
             // Arrange
