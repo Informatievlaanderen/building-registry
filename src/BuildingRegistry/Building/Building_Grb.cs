@@ -161,5 +161,50 @@ namespace BuildingRegistry.Building
 
             ApplyChange(new BuildingGeometryWasImportedFromGrb(BuildingPersistentLocalId, buildingGrbData));
         }
+
+        public void ChangeMeasurement(ExtendedWkbGeometry extendedWkbGeometry, BuildingGrbData buildingGrbData)
+        {
+            GuardRemovedBuilding();
+            GuardValidStatusses(BuildingStatus.Realized);
+
+            if (BuildingGeometry.Method != BuildingGeometryMethod.MeasuredByGrb)
+            {
+                throw new BuildingHasInvalidGeometryMethodException();
+            }
+
+            if (BuildingGeometry.Geometry == extendedWkbGeometry)
+            {
+                return;
+            }
+
+            var newBuildingGeometry = new BuildingGeometry(extendedWkbGeometry, BuildingGeometryMethod.MeasuredByGrb);
+            var plannedOrRealizedBuildingUnits = _buildingUnits.PlannedBuildingUnits()
+                .Concat(_buildingUnits.RealizedBuildingUnits())
+                .ToList();
+
+            var buildingUnitsOutsideOfBuildingMeasurement = plannedOrRealizedBuildingUnits
+                .Where(x =>
+                    x.BuildingUnitPosition.GeometryMethod == BuildingUnitPositionGeometryMethod.AppointedByAdministrator
+                    && !newBuildingGeometry.Contains(x.BuildingUnitPosition.Geometry))
+                .Select(x => x.BuildingUnitPersistentLocalId)
+                .ToList();
+
+            var buildingUnitsWithPositionDerivedFromBuilding = plannedOrRealizedBuildingUnits
+                .Where(x => x.BuildingUnitPosition.GeometryMethod == BuildingUnitPositionGeometryMethod.DerivedFromObject)
+                .Select(x => x.BuildingUnitPersistentLocalId)
+                .ToList();
+
+            var buildingUnitsPosition = buildingUnitsOutsideOfBuildingMeasurement.Any() || buildingUnitsWithPositionDerivedFromBuilding.Any()
+                ? newBuildingGeometry.Center
+                : null;
+
+            ApplyChange(new BuildingMeasurementWasChanged(
+                BuildingPersistentLocalId,
+                buildingUnitsWithPositionDerivedFromBuilding,
+                buildingUnitsOutsideOfBuildingMeasurement,
+                extendedWkbGeometry,
+                buildingUnitsPosition));
+            ApplyChange(new BuildingGeometryWasImportedFromGrb(BuildingPersistentLocalId, buildingGrbData));
+        }
     }
 }

@@ -875,7 +875,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda
                     request.TicketId == sqsRequest.TicketId &&
                     request.MessageGroupId == messageMetadata.MessageGroupId &&
                     request.Request == sqsRequest.Request &&
-                    request.BuildingPersistentLocalId == sqsRequest.Request.PersistentLocalId &&
+                    request.BuildingPersistentLocalId == sqsRequest.BuildingPersistentLocalId &&
                     request.IfMatchHeaderValue == sqsRequest.IfMatchHeaderValue &&
                     request.Provenance == sqsRequest.ProvenanceData.ToProvenance() &&
                     request.Metadata == sqsRequest.Metadata

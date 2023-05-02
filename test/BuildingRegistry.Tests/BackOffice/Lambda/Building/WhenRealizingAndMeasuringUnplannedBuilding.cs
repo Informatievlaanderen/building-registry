@@ -14,6 +14,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
     using Be.Vlaanderen.Basisregisters.Sqs.Exceptions;
     using Be.Vlaanderen.Basisregisters.Sqs.Lambda.Handlers;
     using Be.Vlaanderen.Basisregisters.Sqs.Responses;
+    using BuildingRegistry.Api.BackOffice.Abstractions.Building;
     using BuildingRegistry.Api.BackOffice.Abstractions.Building.Requests;
     using BuildingRegistry.Api.BackOffice.Abstractions.Building.SqsRequests;
     using BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.Building;
@@ -69,9 +70,12 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
                         TicketId = Guid.NewGuid(),
                         Request = new RealizeAndMeasureUnplannedBuildingRequest
                         {
-                            GeometriePolygoon =
-                                "<gml:Polygon srsName=\"https://www.opengis.net/def/crs/EPSG/0/31370\" xmlns:gml=\"http://www.opengis.net/gml/3.2\"><gml:exterior><gml:LinearRing><gml:posList>140284.15277253836 186724.74131567031 140291.06016454101 186726.38355567306 140288.22675654292 186738.25798767805 140281.19098053873 186736.57913967967 140284.15277253836 186724.74131567031</gml:posList></gml:LinearRing></gml:exterior></gml:Polygon>",
-                            VersionDate = SystemClock.Instance.GetCurrentInstant().ToString()
+                            GrbData = new GrbData
+                            {
+                                VersionDate = SystemClock.Instance.GetCurrentInstant().ToString(),
+                                GeometriePolygoon =  "<gml:Polygon srsName=\"https://www.opengis.net/def/crs/EPSG/0/31370\" xmlns:gml=\"http://www.opengis.net/gml/3.2\"><gml:exterior><gml:LinearRing><gml:posList>140284.15277253836 186724.74131567031 140291.06016454101 186726.38355567306 140288.22675654292 186738.25798767805 140281.19098053873 186736.57913967967 140284.15277253836 186724.74131567031</gml:posList></gml:LinearRing></gml:exterior></gml:Polygon>",
+                            },
+
                         }
                     }),
                 CancellationToken.None);
@@ -116,9 +120,11 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
                         TicketId = Guid.NewGuid(),
                         Request = new RealizeAndMeasureUnplannedBuildingRequest
                         {
-                            GeometriePolygoon =
-                                "<gml:Polygon srsName=\"https://www.opengis.net/def/crs/EPSG/0/31370\" xmlns:gml=\"http://www.opengis.net/gml/3.2\"><gml:exterior><gml:LinearRing><gml:posList>140284.15277253836 186724.74131567031 140291.06016454101 186726.38355567306 140288.22675654292 186738.25798767805 140281.19098053873 186736.57913967967 140284.15277253836 186724.74131567031</gml:posList></gml:LinearRing></gml:exterior></gml:Polygon>",
-                            VersionDate = SystemClock.Instance.GetCurrentInstant().ToString()
+                            GrbData = new GrbData
+                            {
+                                VersionDate = SystemClock.Instance.GetCurrentInstant().ToString(),
+                                GeometriePolygoon =  "<gml:Polygon srsName=\"https://www.opengis.net/def/crs/EPSG/0/31370\" xmlns:gml=\"http://www.opengis.net/gml/3.2\"><gml:exterior><gml:LinearRing><gml:posList>140284.15277253836 186724.74131567031 140291.06016454101 186726.38355567306 140288.22675654292 186738.25798767805 140281.19098053873 186736.57913967967 140284.15277253836 186724.74131567031</gml:posList></gml:LinearRing></gml:exterior></gml:Polygon>",
+                            }
                         }
                     }),
                 CancellationToken.None);
@@ -161,9 +167,11 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
                     TicketId = Guid.NewGuid(),
                     Request = new RealizeAndMeasureUnplannedBuildingRequest
                     {
-                        GeometriePolygoon =
-                            "<gml:Polygon srsName=\"https://www.opengis.net/def/crs/EPSG/0/31370\" xmlns:gml=\"http://www.opengis.net/gml/3.2\"><gml:exterior><gml:LinearRing><gml:posList>140284.15277253836 186724.74131567031 140291.06016454101 186726.38355567306 140288.22675654292 186738.25798767805 140281.19098053873 186736.57913967967 140284.15277253836 186724.74131567031</gml:posList></gml:LinearRing></gml:exterior></gml:Polygon>",
-                        VersionDate = SystemClock.Instance.GetCurrentInstant().ToString()
+                        GrbData = new GrbData
+                        {
+                            VersionDate = SystemClock.Instance.GetCurrentInstant().ToString(),
+                            GeometriePolygoon =  "<gml:Polygon srsName=\"https://www.opengis.net/def/crs/EPSG/0/31370\" xmlns:gml=\"http://www.opengis.net/gml/3.2\"><gml:exterior><gml:LinearRing><gml:posList>140284.15277253836 186724.74131567031 140291.06016454101 186726.38355567306 140288.22675654292 186738.25798767805 140281.19098053873 186736.57913967967 140284.15277253836 186724.74131567031</gml:posList></gml:LinearRing></gml:exterior></gml:Polygon>",
+                        }
                     }
                 });
 

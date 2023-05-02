@@ -7,26 +7,25 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.Building.Requests
     using Newtonsoft.Json;
     using Swashbuckle.AspNetCore.Filters;
 
-    [DataContract(Name = "StelGebouwVast", Namespace = "")]
-    public sealed class RealizeAndMeasureUnplannedBuildingRequest
+    [DataContract(Name = "WijzigGeometrieIngemetenGebouw", Namespace = "")]
+    public sealed class ChangeBuildingMeasurementRequest
     {
         [DataMember(Name = "GrbData", Order = 0)]
         [JsonProperty(Required = Required.Always)]
         public GrbData GrbData { get; set; }
 
-        public RealizeAndMeasureUnplannedBuilding ToCommand(int persistentLocalId, Provenance provenance)
-            => new RealizeAndMeasureUnplannedBuilding(
-                new BuildingPersistentLocalId(persistentLocalId),
+        public ChangeBuildingMeasurement ToCommand(int persistentLocalId, Provenance provenance)
+            => new ChangeBuildingMeasurement(new BuildingPersistentLocalId(persistentLocalId),
                 GrbData.GeometriePolygoon.ToExtendedWkbGeometry(),
                 GrbData.ToBuildingGrbData(),
                 provenance);
     }
 
-    public class RealizeAndMeasureUnplannedBuildingRequestExamples : IExamplesProvider<RealizeAndMeasureUnplannedBuildingRequest>
+    public class ChangeBuildingMeasurementRequestExamples : IExamplesProvider<ChangeBuildingMeasurementRequest>
     {
-        public RealizeAndMeasureUnplannedBuildingRequest GetExamples()
+        public ChangeBuildingMeasurementRequest GetExamples()
         {
-            return new RealizeAndMeasureUnplannedBuildingRequest
+            return new ChangeBuildingMeasurementRequest
             {
                 GrbData = new GrbData
                 {

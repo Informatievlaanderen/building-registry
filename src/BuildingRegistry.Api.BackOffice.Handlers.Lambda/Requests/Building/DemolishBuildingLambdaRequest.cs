@@ -8,7 +8,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Requests.Building
     {
         public DemolishBuildingRequest Request { get; }
 
-        public int BuildingPersistentLocalId => Request.PersistentLocalId;
+        public int BuildingPersistentLocalId { get; }
 
         public DemolishBuildingLambdaRequest(
             string messageGroupId,
@@ -17,15 +17,13 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Requests.Building
                 sqsRequest.ProvenanceData.ToProvenance(), sqsRequest.Metadata)
         {
             Request = sqsRequest.Request;
+            BuildingPersistentLocalId = sqsRequest.BuildingPersistentLocalId;
         }
 
         /// <summary>
         /// Map to DemolishBuilding command
         /// </summary>
         /// <returns>DemolishBuilding.</returns>
-        public DemolishBuilding ToCommand()
-        {
-            return Request.ToCommand(Provenance);
-        }
+        public DemolishBuilding ToCommand() => Request.ToCommand(BuildingPersistentLocalId, Provenance);
     }
 }

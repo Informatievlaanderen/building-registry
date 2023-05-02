@@ -5,9 +5,9 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Requests.Building
     using BuildingRegistry.Building;
     using BuildingRegistry.Building.Commands;
 
-    public sealed record RealizeAndMeasureUnplannedBuildingLambdaRequest : BuildingLambdaRequest
+    public sealed record RealizeAndMeasureUnplannedBuildingLambdaRequest : BuildingLambdaRequest, IHasBuildingPersistentLocalId
     {
-        public BuildingPersistentLocalId BuildingPersistentLocalId { get; }
+        public int BuildingPersistentLocalId { get; }
 
         public RealizeAndMeasureUnplannedBuildingRequest Request { get; }
 

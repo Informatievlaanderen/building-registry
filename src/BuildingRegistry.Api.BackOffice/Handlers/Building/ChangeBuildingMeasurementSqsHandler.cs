@@ -6,24 +6,23 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Building
     using Be.Vlaanderen.Basisregisters.Sqs.Handlers;
     using TicketingService.Abstractions;
 
-    public sealed class DemolishBuildingSqsHandler : SqsHandler<DemolishBuildingSqsRequest>
+    public sealed class ChangeBuildingMeasurementSqsHandler : SqsHandler<ChangeBuildingMeasurementSqsRequest>
     {
-        public const string Action = "DemolishBuilding";
+        public const string Action = "ChangeBuildingMeasurement";
 
-        public DemolishBuildingSqsHandler(
+        public ChangeBuildingMeasurementSqsHandler(
             ISqsQueue sqsQueue,
             ITicketing ticketing,
             ITicketingUrl ticketingUrl)
             : base(sqsQueue, ticketing, ticketingUrl)
-        {
-        }
+        { }
 
-        protected override string WithAggregateId(DemolishBuildingSqsRequest request)
+        protected override string WithAggregateId(ChangeBuildingMeasurementSqsRequest request)
         {
             return request.BuildingPersistentLocalId.ToString();
         }
 
-        protected override IDictionary<string, string> WithTicketMetadata(string aggregateId, DemolishBuildingSqsRequest sqsRequest)
+        protected override IDictionary<string, string> WithTicketMetadata(string aggregateId, ChangeBuildingMeasurementSqsRequest sqsRequest)
         {
             return new Dictionary<string, string>
             {
