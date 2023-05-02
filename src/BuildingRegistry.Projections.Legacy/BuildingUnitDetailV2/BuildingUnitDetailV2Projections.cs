@@ -2,7 +2,6 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetailV2
 {
     using System;
     using System.Collections.ObjectModel;
-    using System.Data;
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
@@ -67,6 +66,20 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetailV2
             });
 
             When<Envelope<BuildingWasMeasured>>(async (context, message, ct) =>
+            {
+                foreach (var buildingUnitPersistentLocalId in message.Message.BuildingUnitPersistentLocalIds.Concat(message.Message.BuildingUnitPersistentLocalIdsWhichBecameDerived))
+                {
+                    await Update(context, buildingUnitPersistentLocalId, item =>
+                    {
+                        item.Position = message.Message.ExtendedWkbGeometryBuildingUnits!.ToByteArray();
+                        item.PositionMethod = BuildingUnitPositionGeometryMethod.DerivedFromObject;
+                        item.Version = message.Message.Provenance.Timestamp;
+                        UpdateHash(item, message);
+                    }, ct);
+                }
+            });
+
+            When<Envelope<BuildingMeasurementWasCorrected>>(async (context, message, ct) =>
             {
                 foreach (var buildingUnitPersistentLocalId in message.Message.BuildingUnitPersistentLocalIds.Concat(message.Message.BuildingUnitPersistentLocalIdsWhichBecameDerived))
                 {

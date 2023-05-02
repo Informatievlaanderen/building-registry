@@ -10,7 +10,6 @@ namespace BuildingRegistry.Projections.Wfs.BuildingV2
     using Infrastructure;
     using NetTopologySuite.Geometries;
     using NetTopologySuite.IO;
-    using NodaTime;
 
     [ConnectedProjectionName("WFS gebouwen")]
     [ConnectedProjectionDescription("Projectie die de gebouwen data voor het WFS gebouwenregister voorziet.")]
@@ -140,6 +139,25 @@ namespace BuildingRegistry.Projections.Wfs.BuildingV2
                 var item = await context.BuildingsV2.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);
                 SetGeometry(
                     item, message.Message.ExtendedWkbGeometryBuilding,
+                    MapGeometryMethod(BuildingGeometryMethod.MeasuredByGrb));
+                item.Version = message.Message.Provenance.Timestamp;
+            });
+
+            When<Envelope<BuildingWasMeasured>>(async (context, message, ct) =>
+            {
+                var item = await context.BuildingsV2.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);
+                SetGeometry(
+                    item, message.Message.ExtendedWkbGeometryBuilding,
+                    MapGeometryMethod(BuildingGeometryMethod.MeasuredByGrb));
+                item.Version = message.Message.Provenance.Timestamp;
+            });
+
+            When<Envelope<BuildingMeasurementWasCorrected>>(async (context, message, ct) =>
+            {
+                var item = await context.BuildingsV2.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);
+                SetGeometry(
+                    item,
+                    message.Message.ExtendedWkbGeometryBuilding,
                     MapGeometryMethod(BuildingGeometryMethod.MeasuredByGrb));
                 item.Version = message.Message.Provenance.Timestamp;
             });

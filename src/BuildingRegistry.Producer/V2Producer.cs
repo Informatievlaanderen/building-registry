@@ -199,6 +199,11 @@
                 await Produce(message.Message.BuildingPersistentLocalId, message.Message.ToContract(), message.Position, ct);
             });
 
+            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingMeasurementWasCorrected>>(async (_, message, ct) =>
+            {
+                await Produce(message.Message.BuildingPersistentLocalId, message.Message.ToContract(), message.Position, ct);
+            });
+
             When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingWasDemolished>>(async (_, message, ct) =>
             {
                 await Produce(message.Message.BuildingPersistentLocalId, message.Message.ToContract(), message.Position, ct);

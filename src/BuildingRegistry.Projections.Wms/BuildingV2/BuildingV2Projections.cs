@@ -129,6 +129,13 @@ namespace BuildingRegistry.Projections.Wms.BuildingV2
                 item.Version = message.Message.Provenance.Timestamp;
             });
 
+            When<Envelope<BuildingMeasurementWasCorrected>>(async (context, message, ct) =>
+            {
+                var item = await context.BuildingsV2.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);
+                SetGeometry(item, message.Message.ExtendedWkbGeometryBuilding, MeasuredByGrbMethod);
+                item.Version = message.Message.Provenance.Timestamp;
+            });
+
             When<Envelope<BuildingWasDemolished>>(async (context, message, ct) =>
             {
                 var item = await context.BuildingsV2.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);

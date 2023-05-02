@@ -82,6 +82,20 @@ namespace BuildingRegistry.Projections.Wms.BuildingUnitV2
                 }
             });
 
+            When<Envelope<BuildingMeasurementWasCorrected>>(async (context, message, ct) =>
+            {
+                foreach (var buildingUnitPersistentLocalId in message.Message.BuildingUnitPersistentLocalIds.Concat(message.Message.BuildingUnitPersistentLocalIdsWhichBecameDerived))
+                {
+                    var unit = await context.BuildingUnitsV2.FindAsync(buildingUnitPersistentLocalId);
+                    SetPosition(
+                        unit!,
+                        message.Message.ExtendedWkbGeometryBuildingUnits!,
+                        MapGeometryMethod(BuildingUnitPositionGeometryMethod.DerivedFromObject));
+
+                    SetVersion(unit!, message.Message.Provenance.Timestamp);
+                }
+            });
+
             #endregion
 
             When<Envelope<BuildingUnitWasPlannedV2>>(async (context, message, ct) =>
