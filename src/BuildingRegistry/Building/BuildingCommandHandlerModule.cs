@@ -214,6 +214,18 @@ namespace BuildingRegistry.Building
 
                     building.MeasureBuilding(message.Command.Geometry, message.Command.BuildingGrbData);
                 });
+
+            For<CorrectBuildingMeasurement>()
+                .AddSqlStreamStore(getStreamStore, getUnitOfWork, eventMapping, eventSerializer, getSnapshotStore)
+                .AddEventHash<CorrectBuildingMeasurement, Building>(getUnitOfWork)
+                .AddProvenance(getUnitOfWork, provenanceFactory)
+                .Handle(async (message, ct) =>
+                {
+                    var streamId = new BuildingStreamId(message.Command.BuildingPersistentLocalId);
+                    var building = await buildingRepository().GetAsync(streamId, ct);
+
+                    building.CorrectBuildingMeasurement(message.Command.Geometry, message.Command.BuildingGrbData);
+                });
         }
     }
 }

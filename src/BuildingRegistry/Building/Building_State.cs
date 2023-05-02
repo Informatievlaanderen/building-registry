@@ -47,6 +47,7 @@ namespace BuildingRegistry.Building
             Register<UnplannedBuildingWasRealizedAndMeasured>(When);
             Register<BuildingWasDemolished>(When);
             Register<BuildingWasMeasured>(When);
+            Register<BuildingMeasurementWasCorrected>(When);
 
             Register<BuildingUnitWasPlannedV2>(When);
             Register<CommonBuildingUnitWasAddedV2>(When);
@@ -220,6 +221,22 @@ namespace BuildingRegistry.Building
         }
 
         private void When(BuildingWasMeasured @event)
+        {
+            BuildingGeometry = new BuildingGeometry(
+                new ExtendedWkbGeometry(@event.ExtendedWkbGeometryBuilding),
+                BuildingGeometryMethod.MeasuredByGrb);
+
+            foreach (var buildingUnitPersistentLocalId in @event.BuildingUnitPersistentLocalIds.Concat(@event.BuildingUnitPersistentLocalIdsWhichBecameDerived))
+            {
+                var buildingUnit = BuildingUnits.Single(x => x.BuildingUnitPersistentLocalId == buildingUnitPersistentLocalId);
+
+                buildingUnit.Route(@event);
+            }
+
+            _lastEvent = @event;
+        }
+
+        private void When(BuildingMeasurementWasCorrected @event)
         {
             BuildingGeometry = new BuildingGeometry(
                 new ExtendedWkbGeometry(@event.ExtendedWkbGeometryBuilding),
