@@ -541,6 +541,15 @@ namespace BuildingRegistry.Producer.Extensions
                 message.ExtendedWkbGeometryBuildingUnits,
                 message.Provenance.ToContract());
 
+        public static Contracts.BuildingMeasurementWasCorrected ToContract(this BuildingMeasurementWasCorrected message)
+            => new Contracts.BuildingMeasurementWasCorrected(
+                message.BuildingPersistentLocalId,
+                message.BuildingUnitPersistentLocalIds.ToList(),
+                message.BuildingUnitPersistentLocalIdsWhichBecameDerived.ToList(),
+                message.ExtendedWkbGeometryBuilding,
+                message.ExtendedWkbGeometryBuildingUnits,
+                message.Provenance.ToContract());
+
         public static Contracts.BuildingWasDemolished ToContract(this BuildingWasDemolished message)
             => new Contracts.BuildingWasDemolished(
                 message.BuildingPersistentLocalId,

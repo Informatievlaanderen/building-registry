@@ -403,6 +403,39 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wfs
         }
 
         [Fact]
+        public async Task WhenBuildingMeasurementWasCorrected()
+        {
+            var buildingWasPlannedV2 = _fixture.Create<BuildingWasPlannedV2>();
+            var buildingWasMeasured = _fixture.Create<BuildingWasMeasured>();
+            var @event = _fixture.Create<BuildingMeasurementWasCorrected>();
+
+            await Sut
+                .Given(new Envelope<BuildingWasPlannedV2>(
+                        new Envelope(
+                            buildingWasPlannedV2,
+                            new Dictionary<string, object> { { AddEventHashPipe.HashMetadataKey, buildingWasPlannedV2.GetHash() } })),
+                    new Envelope<BuildingWasMeasured>(
+                        new Envelope(
+                            buildingWasMeasured,
+                            new Dictionary<string, object> { { AddEventHashPipe.HashMetadataKey, @event.GetHash() } })),
+                    new Envelope<BuildingMeasurementWasCorrected>(
+                        new Envelope(
+                            @event,
+                            new Dictionary<string, object> { { AddEventHashPipe.HashMetadataKey, @event.GetHash() } })))
+                .Then(async ct =>
+                {
+                    var buildingDetailItemV2 = await ct.BuildingsV2.FindAsync(@event.BuildingPersistentLocalId);
+                    buildingDetailItemV2.Should().NotBeNull();
+                    buildingDetailItemV2!.Version.Should().Be(@event.Provenance.Timestamp);
+
+                    var wkbReader = WKBReaderFactory.Create();
+                    var polygon = wkbReader.Read(@event.ExtendedWkbGeometryBuilding.ToByteArray());
+                    buildingDetailItemV2.Geometry!.AsBinary().Should().BeEquivalentTo(polygon.AsBinary());
+                    buildingDetailItemV2.GeometryMethod.Should().Be(GeometrieMethode.IngemetenGRB.ToString());
+                });
+        }
+
+        [Fact]
         public async Task WhenBuildingWasDemolished()
         {
             _fixture.Customize(new WithFixedBuildingPersistentLocalId());
