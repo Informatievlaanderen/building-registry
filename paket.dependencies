@@ -93,6 +93,8 @@ nuget Be.Vlaanderen.Basisregisters.Sqs.Lambda 1.3.1
 nuget Be.Vlaanderen.Basisregisters.TicketingService.Abstractions 1.7.11
 nuget Be.Vlaanderen.Basisregisters.TicketingService.Proxy.HttpProxy 1.7.11
 
+nuget Be.Vlaanderen.Basisregisters.BlobStore 3.0.0
+
 // LAMBDA STUFF
 nuget Amazon.Lambda.Core 2.1.0
 nuget Amazon.Lambda.Serialization.Json 2.0.0

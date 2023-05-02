@@ -51,7 +51,7 @@ namespace BuildingRegistry.Api.Grb.Uploads
                 var preSignedUrl = _s3Extended.CreatePresignedPost(
                     new CreatePresignedPostRequest(
                         _bucketOptions.BucketName,
-                        $"upload_{job.Id:D}",
+                        job.BlobName,
                         new List<ExactMatchCondition>(),
                         TimeSpan.FromMinutes(_bucketOptions.UrlExpirationInMinutes)));
 
@@ -66,7 +66,7 @@ namespace BuildingRegistry.Api.Grb.Uploads
 
                 var ticketUrl = _ticketingUrl.For(ticketId).ToString();
 
-                await UpdateJobWithTicketUrl(job, ticketUrl, cancellationToken);
+                await UpdateJobWithTicketUrl(job, ticketId, cancellationToken);
                 await transaction.CommitAsync(cancellationToken);
 
                 return new GetPreSignedUrlResponse(job.Id, preSignedUrl.Url.ToString(), preSignedUrl.Fields, ticketUrl);
@@ -90,9 +90,9 @@ namespace BuildingRegistry.Api.Grb.Uploads
             return job;
         }
 
-        private async Task UpdateJobWithTicketUrl(Job job, string ticketUrl, CancellationToken cancellationToken)
+        private async Task UpdateJobWithTicketUrl(Job job, Guid ticketId, CancellationToken cancellationToken)
         {
-            job.TicketUrl = ticketUrl;
+            job.TicketId = ticketId;
             await _buildingGrbContext.SaveChangesAsync(cancellationToken);
         }
     }
