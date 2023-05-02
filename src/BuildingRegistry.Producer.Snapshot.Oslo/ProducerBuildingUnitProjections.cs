@@ -453,6 +453,23 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo
                     message.Position,
                     ct);
             });
+
+            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingMeasurementWasChanged>>(async (_, message, ct) =>
+            {
+                foreach (var buildingUnitPersistentLocalId in
+                         message.Message.BuildingUnitPersistentLocalIds.Concat(message.Message.BuildingUnitPersistentLocalIdsWhichBecameDerived))
+                {
+                    await FindAndProduce(async () =>
+                            await snapshotManager.FindMatchingSnapshot(
+                                buildingUnitPersistentLocalId.ToString(),
+                                message.Message.Provenance.Timestamp,
+                                message.Position,
+                                throwStaleWhenGone: false,
+                                ct),
+                        message.Position,
+                        ct);
+                }
+            });
         }
 
         private async Task FindAndProduce(Func<Task<OsloResult?>> findMatchingSnapshot, long storePosition, CancellationToken ct)

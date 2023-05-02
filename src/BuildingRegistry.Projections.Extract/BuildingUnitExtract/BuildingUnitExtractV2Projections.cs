@@ -128,6 +128,23 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
                 }
             });
 
+            When<Envelope<BuildingMeasurementWasChanged>>(async (context, message, ct) =>
+            {
+                foreach (var buildingUnitPersistentLocalId in
+                         message.Message.BuildingUnitPersistentLocalIds.Concat(message.Message.BuildingUnitPersistentLocalIdsWhichBecameDerived))
+                {
+                    await context.FindAndUpdateBuildingUnitExtract(buildingUnitPersistentLocalId,
+                        itemV2 =>
+                        {
+                            var geometry = wkbReader.Read(message.Message.ExtendedWkbGeometryBuildingUnits!.ToByteArray());
+                            UpdateGeometry(itemV2, geometry);
+                            var geometryMethod = MapGeometryMethod(BuildingUnitPositionGeometryMethod.DerivedFromObject);
+                            UpdatePosition(itemV2, geometryMethod);
+                            UpdateVersie(itemV2, message.Message.Provenance.Timestamp);
+                        }, ct);
+                }
+            });
+
             #endregion Building
 
             When<Envelope<BuildingUnitWasPlannedV2>>(async (context, message, ct) =>

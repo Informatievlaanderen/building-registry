@@ -58,7 +58,6 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.Building
             {
                 BuildingHasInvalidStatusException => ValidationErrors.ChangeBuildingMeasurement.BuildingInvalidStatus.ToTicketError(),
                 BuildingHasInvalidGeometryMethodException => ValidationErrors.ChangeBuildingMeasurement.BuildingIsOutlined.ToTicketError(),
-                BuildingHasBuildingUnitsOutsideBuildingGeometryException => ValidationErrors.ChangeBuildingMeasurement.BuildingHasBuildingUnitsOutsideChangedGeometry.ToTicketError(),
                 _ => null
             };
         }

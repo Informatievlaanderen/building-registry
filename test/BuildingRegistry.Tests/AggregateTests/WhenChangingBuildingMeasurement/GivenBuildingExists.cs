@@ -33,7 +33,8 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenChangingBuildingMeasurement
         [Fact]
         public void ThenBuildingGeometryWasChanged()
         {
-            var extendedWkbGeometryBuilding = new BuildingRegistry.Building.ExtendedWkbGeometry(GeometryHelper.SecondValidPolygon.AsBinary());
+            var extendedWkbGeometryBuilding =
+                new BuildingRegistry.Building.ExtendedWkbGeometry(GeometryHelper.SecondValidPolygon.AsBinary());
 
             var command = new ChangeBuildingMeasurement(
                 Fixture.Create<BuildingPersistentLocalId>(),
@@ -53,19 +54,25 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenChangingBuildingMeasurement
                     buildingWasMigrated)
                 .When(command)
                 .Then(new Fact(
-                    new BuildingStreamId(command.BuildingPersistentLocalId),
-                    new BuildingMeasurementWasChanged(
-                        command.BuildingPersistentLocalId,
-                        Array.Empty<BuildingUnitPersistentLocalId>(),
-                        Array.Empty<BuildingUnitPersistentLocalId>(),
-                        extendedWkbGeometryBuilding,
-                        null))));
+                        new BuildingStreamId(command.BuildingPersistentLocalId),
+                        new BuildingMeasurementWasChanged(
+                            command.BuildingPersistentLocalId,
+                            Array.Empty<BuildingUnitPersistentLocalId>(),
+                            Array.Empty<BuildingUnitPersistentLocalId>(),
+                            extendedWkbGeometryBuilding,
+                            null)),
+                    new Fact(
+                        new BuildingStreamId(command.BuildingPersistentLocalId),
+                        new BuildingGeometryWasImportedFromGrb(
+                            command.BuildingPersistentLocalId,
+                            command.GrbData))));
         }
 
         [Fact]
         public void WithSameGeometry_ThenNothing()
         {
-            var extendedWkbGeometry = new BuildingRegistry.Building.ExtendedWkbGeometry(GeometryHelper.ValidPolygon.AsBinary());
+            var extendedWkbGeometry =
+                new BuildingRegistry.Building.ExtendedWkbGeometry(GeometryHelper.ValidPolygon.AsBinary());
 
             var command = new ChangeBuildingMeasurement(
                 Fixture.Create<BuildingPersistentLocalId>(),
@@ -88,10 +95,13 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenChangingBuildingMeasurement
         }
 
         [Fact]
-        public void WithPlannedOrRealizedBuildingUnitsForWhichThePositionIsDerived_ThenBuildingUnitsPositionWasAlsoChanged()
+        public void
+            WithPlannedOrRealizedBuildingUnitsForWhichThePositionIsDerived_ThenBuildingUnitsPositionWasAlsoChanged()
         {
-            var changedBuildingGeometry = new BuildingRegistry.Building.ExtendedWkbGeometry(GeometryHelper.SecondValidPolygon.AsBinary());
-            var changedBuildingUnitGeometry = new BuildingGeometry(changedBuildingGeometry, BuildingGeometryMethod.MeasuredByGrb).Center;
+            var changedBuildingGeometry =
+                new BuildingRegistry.Building.ExtendedWkbGeometry(GeometryHelper.SecondValidPolygon.AsBinary());
+            var changedBuildingUnitGeometry =
+                new BuildingGeometry(changedBuildingGeometry, BuildingGeometryMethod.MeasuredByGrb).Center;
 
             var command = new ChangeBuildingMeasurement(
                 Fixture.Create<BuildingPersistentLocalId>(),
@@ -128,13 +138,20 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenChangingBuildingMeasurement
                     buildingWasMigrated)
                 .When(command)
                 .Then(new Fact(
-                    new BuildingStreamId(command.BuildingPersistentLocalId),
-                    new BuildingMeasurementWasChanged(
-                        command.BuildingPersistentLocalId,
-                        buildingUnitPersistentLocalIds: new[] { new BuildingUnitPersistentLocalId(1), new BuildingUnitPersistentLocalId(3) },
-                        buildingUnitPersistentLocalIdsWhichBecameDerived: new[] { new BuildingUnitPersistentLocalId(2) },
-                        changedBuildingGeometry,
-                        changedBuildingUnitGeometry))));
+                        new BuildingStreamId(command.BuildingPersistentLocalId),
+                        new BuildingMeasurementWasChanged(
+                            command.BuildingPersistentLocalId,
+                            buildingUnitPersistentLocalIds: new[]
+                                {new BuildingUnitPersistentLocalId(1), new BuildingUnitPersistentLocalId(3)},
+                            buildingUnitPersistentLocalIdsWhichBecameDerived: new[]
+                                {new BuildingUnitPersistentLocalId(2)},
+                            changedBuildingGeometry,
+                            changedBuildingUnitGeometry)),
+                    new Fact(
+                        new BuildingStreamId(command.BuildingPersistentLocalId),
+                        new BuildingGeometryWasImportedFromGrb(
+                            command.BuildingPersistentLocalId,
+                            command.GrbData))));
         }
 
         [Fact]
@@ -166,7 +183,8 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenChangingBuildingMeasurement
         [InlineData("Retired")]
         [InlineData("UnderConstruction")]
         [InlineData("Planned")]
-        public void WhenBuildingHasInvalidStatus_ThenThrowsBuildingHasInvalidStatusException(string invalidBuildingStatus)
+        public void WhenBuildingHasInvalidStatus_ThenThrowsBuildingHasInvalidStatusException(
+            string invalidBuildingStatus)
         {
             var command = new ChangeBuildingMeasurement(
                 Fixture.Create<BuildingPersistentLocalId>(),
@@ -186,7 +204,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenChangingBuildingMeasurement
                     new BuildingStreamId(Fixture.Create<BuildingPersistentLocalId>()),
                     buildingWasMigrated)
                 .When(command)
-                .Throws(new BuildingHasInvalidStatusException ()));
+                .Throws(new BuildingHasInvalidStatusException()));
         }
 
         [Fact]
@@ -199,7 +217,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenChangingBuildingMeasurement
                 Fixture.Create<Provenance>());
 
             var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
-                .WithBuildingGeometry( new BuildingGeometry(
+                .WithBuildingGeometry(new BuildingGeometry(
                     new BuildingRegistry.Building.ExtendedWkbGeometry(GeometryHelper.ValidPolygon.AsBinary()),
                     BuildingGeometryMethod.Outlined))
                 .WithBuildingStatus(BuildingStatus.Realized)
@@ -216,7 +234,9 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenChangingBuildingMeasurement
         [Theory]
         [InlineData("Planned")]
         [InlineData("Realized")]
-        public void WithBuildingUnitsOutsideOfChangedBuildingGeometry_ThenThrowsBuildingUnitPositionIsOutsideBuildingGeometryException(string buildingUnitStatus)
+        public void
+            WithBuildingUnitsOutsideOfChangedBuildingGeometry_ThenThrowsBuildingUnitPositionIsOutsideBuildingGeometryException(
+                string buildingUnitStatus)
         {
             var command = new ChangeBuildingOutline(
                 Fixture.Create<BuildingPersistentLocalId>(),
@@ -247,8 +267,10 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenChangingBuildingMeasurement
         [Fact]
         public void StateCheck()
         {
-            var changedBuildingGeometry = new BuildingRegistry.Building.ExtendedWkbGeometry(GeometryHelper.SecondValidPolygon.AsBinary());
-            var changedBuildingUnitGeometry = new BuildingGeometry(changedBuildingGeometry, BuildingGeometryMethod.Outlined).Center;
+            var changedBuildingGeometry =
+                new BuildingRegistry.Building.ExtendedWkbGeometry(GeometryHelper.SecondValidPolygon.AsBinary());
+            var changedBuildingUnitGeometry =
+                new BuildingGeometry(changedBuildingGeometry, BuildingGeometryMethod.Outlined).Center;
 
             var initialBuildingGeometry = new BuildingGeometry(
                 new BuildingRegistry.Building.ExtendedWkbGeometry(GeometryHelper.ValidPolygon.AsBinary()),
@@ -277,7 +299,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenChangingBuildingMeasurement
                 .Build();
 
             var sut = new BuildingFactory(NoSnapshotStrategy.Instance).Create();
-            sut.Initialize(new List<object> { buildingWasMigrated });
+            sut.Initialize(new List<object> {buildingWasMigrated});
 
             // Act
             sut.ChangeOutliningConstruction(changedBuildingGeometry);

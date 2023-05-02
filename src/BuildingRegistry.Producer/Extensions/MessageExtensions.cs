@@ -582,6 +582,15 @@ namespace BuildingRegistry.Producer.Extensions
                 message.Overlap,
                 message.Provenance.ToContract());
 
+        public static Contracts.BuildingMeasurementWasChanged ToContract(this BuildingMeasurementWasChanged message)
+            => new Contracts.BuildingMeasurementWasChanged(
+                message.BuildingPersistentLocalId,
+                message.BuildingUnitPersistentLocalIds,
+                message.BuildingUnitPersistentLocalIdsWhichBecameDerived,
+                message.ExtendedWkbGeometryBuilding,
+                message.ExtendedWkbGeometryBuildingUnits,
+                message.Provenance.ToContract());
+
         private static Provenance ToContract(this ProvenanceData provenance)
         => new Provenance(
             provenance.Timestamp.ToString(),

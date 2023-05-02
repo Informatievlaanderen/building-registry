@@ -20,8 +20,8 @@ namespace BuildingRegistry.Projections.Wfs.BuildingV2
         private static readonly string RetiredStatus = GebouwStatus.Gehistoreerd.ToString();
         private static readonly string NotRealizedStatus = GebouwStatus.NietGerealiseerd.ToString();
         private static readonly string UnderConstructionStatus = GebouwStatus.InAanbouw.ToString();
-        private static readonly string MeasuredMethod = GeometrieMethode.IngemetenGRB.ToString();
-        private static readonly string OutlinedMethod = GeometrieMethode.Ingeschetst.ToString();
+        public static readonly string MeasuredMethod = GeometrieMethode.IngemetenGRB.ToString();
+        public static readonly string OutlinedMethod = GeometrieMethode.Ingeschetst.ToString();
 
         private readonly WKBReader _wkbReader;
 
@@ -89,6 +89,15 @@ namespace BuildingRegistry.Projections.Wfs.BuildingV2
                 SetGeometry(
                     item, message.Message.ExtendedWkbGeometryBuilding,
                     MapGeometryMethod(BuildingGeometryMethod.Outlined));
+                item.Version = message.Message.Provenance.Timestamp;
+            });
+
+            When<Envelope<BuildingMeasurementWasChanged>>(async (context, message, ct) =>
+            {
+                var item = await context.BuildingsV2.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);
+                SetGeometry(
+                    item, message.Message.ExtendedWkbGeometryBuilding,
+                    MapGeometryMethod(BuildingGeometryMethod.MeasuredByGrb));
                 item.Version = message.Message.Provenance.Timestamp;
             });
 

@@ -203,18 +203,6 @@ namespace BuildingRegistry.Building
                     building.Demolish(message.Command.BuildingGrbData);
                 });
 
-            For<ChangeBuildingMeasurement>()
-                .AddSqlStreamStore(getStreamStore, getUnitOfWork, eventMapping, eventSerializer, getSnapshotStore)
-                .AddEventHash<ChangeBuildingMeasurement, Building>(getUnitOfWork)
-                .AddProvenance(getUnitOfWork, provenanceFactory)
-                .Handle(async (message, ct) =>
-                {
-                    var streamId = new BuildingStreamId(message.Command.BuildingPersistentLocalId);
-                    var building = await buildingRepository().GetAsync(streamId, ct);
-
-                    building.ChangeMeasurement(message.Command.Geometry);
-                });
-
             For<MeasureBuilding>()
                 .AddSqlStreamStore(getStreamStore, getUnitOfWork, eventMapping, eventSerializer, getSnapshotStore)
                 .AddEventHash<MeasureBuilding, Building>(getUnitOfWork)
@@ -248,7 +236,7 @@ namespace BuildingRegistry.Building
                     var streamId = new BuildingStreamId(message.Command.BuildingPersistentLocalId);
                     var building = await buildingRepository().GetAsync(streamId, ct);
 
-                    building.ChangeMeasurement(message.Command.Geometry);
+                    building.ChangeMeasurement(message.Command.Geometry, message.Command.GrbData);
                 });
         }
     }

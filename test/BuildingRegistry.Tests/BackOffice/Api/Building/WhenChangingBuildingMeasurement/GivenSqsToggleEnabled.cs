@@ -54,10 +54,8 @@ namespace BuildingRegistry.Tests.BackOffice.Api.Building.WhenChangingBuildingMea
             var result = (AcceptedResult) await _controller.ChangeMeasurement(
                 MockValidRequestValidator<ChangeBuildingMeasurementRequest>(),
                 new BuildingExistsValidator(_streamStore.Object),
-                MockIfMatchValidator(true),
                 Fixture.Create<BuildingPersistentLocalId>(),
-                request,
-                expectedIfMatchHeader);
+                request);
 
             result.Should().NotBeNull();
             AssertLocation(result.Location, ticketId);
@@ -69,27 +67,8 @@ namespace BuildingRegistry.Tests.BackOffice.Api.Building.WhenChangingBuildingMea
                         && sqsRequest.ProvenanceData.Timestamp != Instant.MinValue
                         && sqsRequest.ProvenanceData.Application == Application.Grb
                         && sqsRequest.ProvenanceData.Modification == Modification.Update
-                        && sqsRequest.IfMatchHeaderValue == expectedIfMatchHeader
                     ),
                     CancellationToken.None));
-        }
-
-        [Fact]
-        public async Task WithInvalidIfMatchHeader_ThenPreconditionFailedResponse()
-        {
-            _streamStore.SetStreamFound();
-
-            //Act
-            var result = await _controller.ChangeMeasurement(
-                MockValidRequestValidator<ChangeBuildingMeasurementRequest>(),
-                new BuildingExistsValidator(_streamStore.Object),
-                MockIfMatchValidator(false),
-                Fixture.Create<BuildingPersistentLocalId>(),
-                Fixture.Create<ChangeBuildingMeasurementRequest>(),
-                "IncorrectIfMatchHeader");
-
-            //Assert
-            result.Should().BeOfType<PreconditionFailedResult>();
         }
 
         [Fact]
@@ -102,10 +81,8 @@ namespace BuildingRegistry.Tests.BackOffice.Api.Building.WhenChangingBuildingMea
             var act = async () => await _controller.ChangeMeasurement(
                 MockValidRequestValidator<ChangeBuildingMeasurementRequest>(),
                 new BuildingExistsValidator(_streamStore.Object),
-                MockIfMatchValidator(true),
                 Fixture.Create<BuildingPersistentLocalId>(),
                 Fixture.Create<ChangeBuildingMeasurementRequest>(),
-                null,
                 CancellationToken.None);
 
             //Assert

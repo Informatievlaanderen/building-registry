@@ -3,18 +3,12 @@ namespace BuildingRegistry.Api.BackOffice.Building
     using System.Threading;
     using System.Threading.Tasks;
     using Abstractions.Building.Requests;
-    using Abstractions.Building.Validators;
     using Abstractions.Building.SqsRequests;
+    using Abstractions.Building.Validators;
     using Abstractions.Validation;
-    using Be.Vlaanderen.Basisregisters.Auth.AcmIdm;
-    using Be.Vlaanderen.Basisregisters.Api.ETag;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using BuildingRegistry.Building;
-    using Infrastructure;
-    using Legacy;
-    using Microsoft.AspNetCore.Authentication.JwtBearer;
-    using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
     using NodaTime;
@@ -26,9 +20,8 @@ namespace BuildingRegistry.Api.BackOffice.Building
         /// Gebouw slopen.
         /// </summary>
         /// <param name="buildingExistsValidator"></param>
-        /// <param name="ifMatchHeaderValidator"></param>
         /// <param name="request"></param>
-        /// <param name="ifMatchHeaderValue"></param>
+        /// <param name="persistentLocalId"></param>
         /// <param name="cancellationToken"></param>
         [HttpPost("{persistentLocalId}/acties/slopen")]
         [ProducesResponseType(StatusCodes.Status202Accepted)]
@@ -39,20 +32,13 @@ namespace BuildingRegistry.Api.BackOffice.Building
         [SwaggerResponseExample(StatusCodes.Status500InternalServerError, typeof(InternalServerErrorResponseExamples))]
         public async Task<IActionResult> Demolish(
             [FromServices] BuildingExistsValidator buildingExistsValidator,
-            [FromServices] IIfMatchHeaderValidator ifMatchHeaderValidator,
-            [FromRoute] DemolishBuildingRequest request,
+            [FromBody] DemolishBuildingRequest request,
             [FromRoute] int persistentLocalId,
-            [FromHeader(Name = "If-Match")] string? ifMatchHeaderValue,
             CancellationToken cancellationToken = default)
         {
             if (!await buildingExistsValidator.Exists(new BuildingPersistentLocalId(persistentLocalId), cancellationToken))
             {
                 throw new ApiException(ValidationErrors.Common.BuildingNotFound.Message, StatusCodes.Status404NotFound);
-            }
-
-            if (!await ifMatchHeaderValidator.IsValidForBuilding(ifMatchHeaderValue, new BuildingPersistentLocalId(persistentLocalId), cancellationToken))
-            {
-                return new PreconditionFailedResult();
             }
 
             var result = await Mediator.Send(
@@ -67,8 +53,7 @@ namespace BuildingRegistry.Api.BackOffice.Building
                         new Reason(""),
                         new Operator(""),
                         Modification.Update,
-                        Organisation.DigitaalVlaanderen)),
-                    IfMatchHeaderValue = ifMatchHeaderValue
+                        Organisation.DigitaalVlaanderen))
                 }, cancellationToken);
 
             return Accepted(result);

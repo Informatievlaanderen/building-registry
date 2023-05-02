@@ -6,7 +6,7 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.Building.SqsRequests
 
     public sealed class DemolishBuildingSqsRequest : SqsRequest
     {
-        public BuildingPersistentLocalId BuildingPersistentLocalId { get; set; }
+        public int BuildingPersistentLocalId { get; set; }
         public DemolishBuildingRequest Request { get; set; }
     }
 }

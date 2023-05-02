@@ -21,14 +21,6 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.Validation
 
                 public static TicketError ToTicketError() => new(Message, Code);
             }
-
-            public static class BuildingHasBuildingUnitsOutsideChangedGeometry
-            {
-                public const string Code = "GebouweenheidGeomtrieBuitenGebouwGeometrie";
-                public const string Message = "Het gebouw heeft onderliggende gebouweenheden met status 'gepland' of 'gerealiseerd' buiten de nieuw ingemeten gebouwgeometrie.";
-
-                public static TicketError ToTicketError() => new(Message, Code);
-            }
         }
     }
 }

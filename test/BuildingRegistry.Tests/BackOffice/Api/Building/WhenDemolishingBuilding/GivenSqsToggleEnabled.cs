@@ -48,14 +48,11 @@ namespace BuildingRegistry.Tests.BackOffice.Api.Building.WhenDemolishingBuilding
             _streamStore.SetStreamFound();
 
             var request = Fixture.Create<DemolishBuildingRequest>();
-            var expectedIfMatchHeader = Fixture.Create<string>();
 
             var result = (AcceptedResult)await _controller.Demolish(
                 new BuildingExistsValidator(_streamStore.Object),
-                MockIfMatchValidator(true),
                 request,
-                1,
-                expectedIfMatchHeader);
+                1);
 
             result.Should().NotBeNull();
             AssertLocation(result.Location, ticketId);
@@ -67,26 +64,8 @@ namespace BuildingRegistry.Tests.BackOffice.Api.Building.WhenDemolishingBuilding
                         && sqsRequest.ProvenanceData.Timestamp != Instant.MinValue
                         && sqsRequest.ProvenanceData.Application == Application.Grb
                         && sqsRequest.ProvenanceData.Modification == Modification.Update
-                        && sqsRequest.IfMatchHeaderValue == expectedIfMatchHeader
                     ),
                     CancellationToken.None));
-        }
-
-        [Fact]
-        public async Task WithInvalidIfMatchHeader_ThenPreconditionFailedResponse()
-        {
-            _streamStore.SetStreamFound();
-
-            //Act
-            var result = await _controller.Demolish(
-                new BuildingExistsValidator(_streamStore.Object),
-                MockIfMatchValidator(false),
-                Fixture.Create<DemolishBuildingRequest>(),
-                1,
-                "IncorrectIfMatchHeader");
-
-            //Assert
-            result.Should().BeOfType<PreconditionFailedResult>();
         }
 
         [Fact]
@@ -98,10 +77,8 @@ namespace BuildingRegistry.Tests.BackOffice.Api.Building.WhenDemolishingBuilding
             //Act
             var act = async () => await _controller.Demolish(
                 new BuildingExistsValidator(_streamStore.Object),
-                MockIfMatchValidator(true),
                 Fixture.Create<DemolishBuildingRequest>(),
                 1,
-                null,
                 CancellationToken.None);
 
             //Assert

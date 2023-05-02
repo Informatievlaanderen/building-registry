@@ -11,7 +11,7 @@ namespace BuildingRegistry.Building.Events
 
     [EventTags(EventTag.For.Sync, EventTag.For.Edit, Tag.Building)]
     [EventName(EventName)]
-    [EventDescription("De geometrie van het geschetst gebouw werd gewijzigd.")]
+    [EventDescription("De geometrie van het ingemeten gebouw werd gewijzigd.")]
     public sealed class BuildingMeasurementWasChanged : IBuildingEvent
     {
         public const string EventName = "BuildingMeasurementWasChanged"; // BE CAREFUL CHANGING THIS!!

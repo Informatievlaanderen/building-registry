@@ -153,32 +153,6 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
                     CancellationToken.None));
         }
 
-        [Fact]
-        public async Task WhenBuildingHasBuildingUnitsOutsideBuildingGeometry_ThenTicketingErrorIsExpected()
-        {
-            // Arrange
-            var ticketing = new Mock<ITicketing>();
-
-            var handler = new ChangeBuildingMeasurementLambdaHandler(
-                Container.Resolve<IConfiguration>(),
-                new FakeRetryPolicy(),
-                ticketing.Object,
-                MockExceptionIdempotentCommandHandler<BuildingHasBuildingUnitsOutsideBuildingGeometryException>().Object,
-                Container.Resolve<IBuildings>());
-
-            // Act
-            await handler.Handle(CreateChangeBuildingMeasurementLambdaRequest(), CancellationToken.None);
-
-            //Assert
-            ticketing.Verify(x =>
-                x.Error(
-                    It.IsAny<Guid>(),
-                    new TicketError(
-                        "Het gebouw heeft onderliggende gebouweenheden met status 'gepland' of 'gerealiseerd' buiten de nieuw ingemeten gebouwgeometrie.",
-                        "GebouweenheidGeomtrieBuitenGebouwGeometrie"),
-                    CancellationToken.None));
-        }
-
         private ChangeBuildingMeasurementLambdaRequest CreateChangeBuildingMeasurementLambdaRequest()
         {
             var buildingPersistentLocalId = Fixture.Create<BuildingPersistentLocalId>();

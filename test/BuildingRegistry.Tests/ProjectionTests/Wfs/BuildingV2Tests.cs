@@ -193,6 +193,34 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wfs
         }
 
         [Fact]
+        public async Task WhenBuildingMeasurementWasChanged()
+        {
+            var buildingWasPlannedV2 = _fixture.Create<BuildingWasPlannedV2>();
+            var buildingMeasurementWasChanged = _fixture.Create<BuildingMeasurementWasChanged>();
+
+            await Sut
+                .Given(new Envelope<BuildingWasPlannedV2>(
+                        new Envelope(
+                            buildingWasPlannedV2,
+                            new Dictionary<string, object> { { AddEventHashPipe.HashMetadataKey, buildingWasPlannedV2.GetHash() } })),
+                    new Envelope<BuildingMeasurementWasChanged>(
+                        new Envelope(
+                            buildingMeasurementWasChanged,
+                            new Dictionary<string, object> { { AddEventHashPipe.HashMetadataKey, buildingMeasurementWasChanged.GetHash() } })))
+                .Then(async ct =>
+                {
+                    var buildingDetailItemV2 = await ct.BuildingsV2.FindAsync(buildingMeasurementWasChanged.BuildingPersistentLocalId);
+                    buildingDetailItemV2.Should().NotBeNull();
+                    buildingDetailItemV2!.Version.Should().Be(buildingMeasurementWasChanged.Provenance.Timestamp);
+                    buildingDetailItemV2.GeometryMethod.Should().Be(BuildingV2Projections.MeasuredMethod);
+
+                    var wkbReader = WKBReaderFactory.Create();
+                    var polygon = wkbReader.Read(buildingMeasurementWasChanged.ExtendedWkbGeometryBuilding.ToByteArray());
+                    buildingDetailItemV2.Geometry!.AsBinary().Should().BeEquivalentTo(polygon.AsBinary());
+                });
+        }
+
+        [Fact]
         public async Task WhenBuildingBecameUnderConstructionV2()
         {
             var buildingWasPlannedV2 = _fixture.Create<BuildingWasPlannedV2>();
