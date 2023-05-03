@@ -27,10 +27,9 @@ public class ZipArchiveDbaseEntryValidator<TDbaseRecord> : IZipArchiveDbaseEntry
     public DbaseFileHeaderReadBehavior HeaderReadBehavior { get; }
     public DbaseSchema Schema { get; }
 
-    public (ZipArchiveProblems, ZipArchiveValidationContext) Validate(ZipArchiveEntry entry, ZipArchiveValidationContext context)
+    public ZipArchiveProblems Validate(ZipArchiveEntry entry)
     {
         ArgumentNullException.ThrowIfNull(entry);
-        ArgumentNullException.ThrowIfNull(context);
 
         var problems = ZipArchiveProblems.None;
         using (var stream = entry.Open())
@@ -56,14 +55,13 @@ public class ZipArchiveDbaseEntryValidator<TDbaseRecord> : IZipArchiveDbaseEntry
                 {
                     using (var records = header.CreateDbaseRecordEnumerator<TDbaseRecord>(reader))
                     {
-                        var (recordProblems, recordContext) = _recordValidator.Validate(entry, records, context);
+                        var (recordProblems, recordContext) = _recordValidator.Validate(entry, records);
                         problems += recordProblems;
-                        context = recordContext;
                     }
                 }
             }
         }
 
-        return (problems, context);
+        return problems;
     }
 }

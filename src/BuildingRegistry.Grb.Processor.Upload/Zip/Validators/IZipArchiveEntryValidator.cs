@@ -1,8 +1,11 @@
-namespace BuildingRegistry.Grb.Processor.Upload.Zip.Validators;
-
-using System.IO.Compression;
-
-public interface IZipArchiveEntryValidator
+namespace BuildingRegistry.Grb.Processor.Upload.Zip.Validators
 {
-    ZipArchiveProblems Validate(ZipArchiveEntry entry);
+    using System.Collections.Generic;
+    using System.IO.Compression;
+    using Be.Vlaanderen.Basisregisters.Shaperon;
+
+    public interface IZipArchiveEntryValidator
+    {
+        IDictionary<RecordNumber, List<ValidationErrorType>> Validate(ZipArchiveEntry entry);
+    }
 }

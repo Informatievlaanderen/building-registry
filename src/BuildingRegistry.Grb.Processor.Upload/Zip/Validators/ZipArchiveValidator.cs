@@ -13,12 +13,12 @@ namespace BuildingRegistry.Grb.Processor.Upload.Zip.Validators
 
     public class ZipArchiveValidator : IZipArchiveValidator
     {
-        private static readonly string[] TranslationOrder = {
+        private static readonly string[] ValidationOrder = {
             "GEBOUW_ALL.DBF",
             "GEBOUW_ALL.SHP",
         };
 
-        private readonly Dictionary<string, IZipArchiveEntryValidator> _translators;
+        private readonly Dictionary<string, IZipArchiveEntryValidator> _validators;
 
         public ZipArchiveValidator(
             Encoding encoding,
@@ -26,18 +26,18 @@ namespace BuildingRegistry.Grb.Processor.Upload.Zip.Validators
         {
             ArgumentNullException.ThrowIfNull(encoding);
 
-            _translators = new Dictionary<string, IZipArchiveEntryValidator>(StringComparer.InvariantCultureIgnoreCase)
+            _validators = new Dictionary<string, IZipArchiveEntryValidator>(StringComparer.InvariantCultureIgnoreCase)
             {
-                // {
-                //     "gebouw_ALL.dbf",
-                //     new ZipArchiveEntryValidator(
-                //         encoding,
-                //         new DbaseFileHeaderReadBehavior(true),
-                //         new GrbDbaseRecordsTranslator())
-                // },
+                {
+                    "gebouw_ALL.dbf",
+                    new ZipArchiveEntryValidator(
+                        encoding,
+                        new DbaseFileHeaderReadBehavior(true),
+                        new GrbDbaseRecordsTranslator())
+                },
                 {
                     "gebouw_ALL.shp",
-                    new ZipArchiveShapeEntryValidator(encoding, new GrbShapeRecordsTranslator())
+                    new ZipArchiveShapeEntryValidator(encoding, new GrbShapeRecordsValidator())
                 }
             };
         }
@@ -46,7 +46,7 @@ namespace BuildingRegistry.Grb.Processor.Upload.Zip.Validators
         {
             ArgumentNullException.ThrowIfNull(archive);
 
-            var problems = ZipArchiveProblems.None;
+            var problems = new Dictionary<RecordNumber, List<ValidationErrorType>>();
 
             // Report all missing required files
             var missingRequiredFiles = new HashSet<string>(
@@ -78,17 +78,17 @@ namespace BuildingRegistry.Grb.Processor.Upload.Zip.Validators
                     )
                 );
 
-                var context = ZipArchiveValidationContext.Empty.WithZipArchiveMetadata(metadata);
-
-                foreach (var file in
-                         requiredFiles
-                             .OrderBy(file => Array.IndexOf(ValidationOrder, file.ToUpperInvariant())))
+                foreach (var file in requiredFiles.OrderBy(file => Array.IndexOf(ValidationOrder, file.ToUpperInvariant())))
+                {
                     if (_validators.TryGetValue(file, out var validator))
                     {
-                        var (fileProblems, fileContext) = validator.Validate(archive.GetEntry(file), context);
+                        var fileProblems = validator.Validate(archive.GetEntry(file));
+
+
+
                         problems = problems.AddRange(fileProblems);
-                        context = fileContext;
                     }
+                }
             }
 
             return problems;
