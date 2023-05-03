@@ -18,9 +18,9 @@ namespace BuildingRegistry.Tests.BackOffice.Sqs.Building
     using Xunit;
     using Xunit.Abstractions;
 
-    public sealed class GivenBackOfficePlanBuildingRequest : BuildingRegistryTest
+    public sealed class GivenRealizeAndMeasureUnplannedBuildingSqsRequest : BuildingRegistryTest
     {
-        public GivenBackOfficePlanBuildingRequest(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
+        public GivenRealizeAndMeasureUnplannedBuildingSqsRequest(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
         {
             Fixture.Customize(new WithFixedBuildingPersistentLocalId());
         }
@@ -39,16 +39,16 @@ namespace BuildingRegistry.Tests.BackOffice.Sqs.Building
 
             var sqsQueue = new Mock<ISqsQueue>();
 
-            var sut = new PlanBuildingSqsHandler(
+            var sut = new RealizeAndMeasureUnplannedBuildingSqsHandler(
                 sqsQueue.Object,
                 ticketingMock.Object,
                 ticketingUrl);
 
             var buildingPersistentLocalId = Fixture.Create<BuildingPersistentLocalId>();
-            var sqsRequest = new PlanBuildingSqsRequest
+            var sqsRequest = new RealizeAndMeasureUnplannedBuildingSqsRequest
             {
                 BuildingPersistentLocalId = buildingPersistentLocalId,
-                Request = new PlanBuildingRequest()
+                Request = new RealizeAndMeasureUnplannedBuildingRequest()
             };
 
             // Act
