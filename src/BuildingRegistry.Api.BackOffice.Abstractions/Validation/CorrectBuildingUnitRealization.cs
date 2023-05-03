@@ -8,7 +8,7 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.Validation
         {
             public static class BuildingUnitInvalidStatus
             {
-                public const string Code = "GebouweenheidNietGerealiseerdOfGehistoreerd";
+                public const string Code = "GebouweenheidGehistoreerdNietGerealiseerd";
                 public const string Message = "Deze actie is enkel toegestaan op gebouweenheden met status 'gerealiseerd'.";
 
                 public static TicketError ToTicketError() => new(Message, Code);
