@@ -6,6 +6,6 @@ namespace BuildingRegistry.Grb.Processor.Upload.Zip.Validators
 
     public interface IZipArchiveEntryValidator
     {
-        IDictionary<RecordNumber, List<ValidationErrorType>> Validate(ZipArchiveEntry entry);
+        IDictionary<RecordNumber, List<ValidationErrorType>> Validate(ZipArchiveEntry? entry);
     }
 }

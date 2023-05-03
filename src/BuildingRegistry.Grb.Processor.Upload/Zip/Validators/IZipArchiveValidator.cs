@@ -1,8 +1,9 @@
-namespace BuildingRegistry.Grb.Processor.Upload.Zip.Validators;
-
-using System.IO.Compression;
-
-public interface IZipArchiveValidator
+namespace BuildingRegistry.Grb.Processor.Upload.Zip.Validators
 {
-    ZipArchiveProblems Validate(ZipArchive archive);
+    using System.IO.Compression;
+
+    public interface IZipArchiveValidator
+    {
+        ZipArchiveProblems Validate(ZipArchive archive);
+    }
 }

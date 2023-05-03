@@ -19,7 +19,7 @@ namespace BuildingRegistry.Grb.Processor.Upload.Zip.Validators
             _recordValidator = recordValidator ?? throw new ArgumentNullException(nameof(recordValidator));
         }
 
-        public IDictionary<RecordNumber, List<ValidationErrorType>> Validate(ZipArchiveEntry entry)
+        public IDictionary<RecordNumber, List<ValidationErrorType>> Validate(ZipArchiveEntry? entry)
         {
             ArgumentNullException.ThrowIfNull(entry);
 
@@ -36,7 +36,7 @@ namespace BuildingRegistry.Grb.Processor.Upload.Zip.Validators
             }
             catch (Exception exception)
             {
-                throw new ShapeHeaderFormatException(exception);
+                throw new ShapeHeaderFormatException(entry.Name, exception);
             }
 
             using var records = header.CreateShapeRecordEnumerator(reader);

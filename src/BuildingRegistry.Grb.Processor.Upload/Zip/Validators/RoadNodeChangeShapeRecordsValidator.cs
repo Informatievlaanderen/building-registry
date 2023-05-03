@@ -9,12 +9,4 @@ namespace BuildingRegistry.Grb.Processor.Upload.Zip.Validators
         IDictionary<RecordNumber, List<ValidationErrorType>> Validate(ZipArchiveEntry entry,
             IEnumerator<ShapeRecord> records);
     }
-
-    public enum ValidationErrorType
-    {
-        GeometryIsNotPolygon,
-        PolygonNotValid,
-        UnknownEventType,
-        InvalidGrId
-    }
 }

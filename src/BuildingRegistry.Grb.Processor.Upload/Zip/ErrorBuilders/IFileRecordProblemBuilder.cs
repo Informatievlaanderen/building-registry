@@ -1,7 +1,8 @@
-namespace BuildingRegistry.Grb.Processor.Upload.Zip.ErrorBuilders;
-
-public interface IFileRecordProblemBuilder
+namespace BuildingRegistry.Grb.Processor.Upload.Zip.ErrorBuilders
 {
-    IFileErrorBuilder Error(string reason);
-    IFileWarningBuilder Warning(string reason);
+    public interface IFileRecordProblemBuilder
+    {
+        IFileErrorBuilder Error(string reason);
+        IFileWarningBuilder Warning(string reason);
+    }
 }

@@ -1,7 +1,8 @@
-namespace BuildingRegistry.Grb.Processor.Upload.Zip.Messages;
-
-public enum ProblemSeverity
+namespace BuildingRegistry.Grb.Processor.Upload.Zip.Messages
 {
-    Error,
-    Warning
+    public enum ProblemSeverity
+    {
+        Error,
+        Warning
+    }
 }

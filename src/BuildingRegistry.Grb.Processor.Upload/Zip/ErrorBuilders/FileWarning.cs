@@ -1,24 +1,25 @@
-namespace BuildingRegistry.Grb.Processor.Upload.Zip.ErrorBuilders;
-
-using System.Linq;
-using Messages;
-using ProblemParameter = Core.ProblemParameter;
-
-public class FileWarning : FileProblem
+namespace BuildingRegistry.Grb.Processor.Upload.Zip.ErrorBuilders
 {
-    public FileWarning(string file, string reason, params ProblemParameter[] parameters)
-        : base(file, reason, parameters)
-    {
-    }
+    using System.Linq;
+    using Messages;
+    using ProblemParameter = Core.ProblemParameter;
 
-    public override Messages.FileProblem Translate()
+    public class FileWarning : FileProblem
     {
-        return new Messages.FileProblem
+        public FileWarning(string file, string reason, params ProblemParameter[] parameters)
+            : base(file, reason, parameters)
         {
-            File = File,
-            Severity = ProblemSeverity.Warning,
-            Reason = Reason,
-            Parameters = Parameters.Select(parameter => parameter.Translate()).ToArray()
-        };
+        }
+
+        public override Messages.FileProblem Translate()
+        {
+            return new Messages.FileProblem
+            {
+                File = File,
+                Severity = ProblemSeverity.Warning,
+                Reason = Reason,
+                Parameters = Parameters.Select(parameter => parameter.Translate()).ToArray()
+            };
+        }
     }
 }
