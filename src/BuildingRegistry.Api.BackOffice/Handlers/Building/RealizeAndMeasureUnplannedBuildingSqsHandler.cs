@@ -6,7 +6,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Building
     using Be.Vlaanderen.Basisregisters.Sqs.Handlers;
     using TicketingService.Abstractions;
 
-    public sealed class RealizeAndMeasureUnplannedBuildingSqsHandler : SqsHandler<PlanBuildingSqsRequest>
+    public sealed class RealizeAndMeasureUnplannedBuildingSqsHandler : SqsHandler<RealizeAndMeasureUnplannedBuildingSqsRequest>
     {
         public const string Action = "RealizeAndMeasureUnplannedBuilding";
 
@@ -18,12 +18,12 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Building
         {
         }
 
-        protected override string WithAggregateId(PlanBuildingSqsRequest request)
+        protected override string WithAggregateId(RealizeAndMeasureUnplannedBuildingSqsRequest request)
         {
             return request.BuildingPersistentLocalId.ToString();
         }
 
-        protected override IDictionary<string, string> WithTicketMetadata(string aggregateId, PlanBuildingSqsRequest sqsRequest)
+        protected override IDictionary<string, string> WithTicketMetadata(string aggregateId, RealizeAndMeasureUnplannedBuildingSqsRequest sqsRequest)
         {
             return new Dictionary<string, string>
             {
