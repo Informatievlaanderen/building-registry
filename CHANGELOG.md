@@ -1,3 +1,16 @@
+# [3.74.0](https://github.com/informatievlaanderen/building-registry/compare/v3.73.0...v3.74.0) (2023-05-03)
+
+
+### Bug Fixes
+
+* building unit status error code when correcting realization ([a002cc6](https://github.com/informatievlaanderen/building-registry/commit/a002cc691d5b54105fae856d995d6fdf0ad8dc5b))
+* RealizeAndMeasureUnplannedBuildingSqsHandler handles correct request ([f51591c](https://github.com/informatievlaanderen/building-registry/commit/f51591ce11696631d17983a25bbaa4b39dfe604b))
+
+
+### Features
+
+* changeBuildingMeasurement ([0c98421](https://github.com/informatievlaanderen/building-registry/commit/0c98421e26803b68a0da794268e1a62908406b64))
+
 # [3.73.0](https://github.com/informatievlaanderen/building-registry/compare/v3.72.0...v3.73.0) (2023-05-02)
 
 
