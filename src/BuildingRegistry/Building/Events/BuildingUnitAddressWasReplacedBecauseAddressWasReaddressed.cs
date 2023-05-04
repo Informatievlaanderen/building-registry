@@ -10,7 +10,7 @@ namespace BuildingRegistry.Building.Events
 
     [EventTags(EventTag.For.Sync, EventTag.For.Edit, Tag.Building)]
     [EventName(EventName)]
-    [EventDescription("Het adres werd ontkoppeld van de gebouweenheid door heradressering adres.")]
+    [EventDescription("Het adres werd ontkoppeld van de gebouweenheid door heradressering.")]
     public sealed class BuildingUnitAddressWasReplacedBecauseAddressWasReaddressed : IBuildingEvent, IHasBuildingUnitPersistentLocalId
     {
         public const string EventName = "BuildingUnitAddressWasReplacedBecauseAddressWasReaddressed"; // BE CAREFUL CHANGING THIS!!
@@ -19,9 +19,9 @@ namespace BuildingRegistry.Building.Events
         public int BuildingPersistentLocalId { get; }
         [EventPropertyDescription("Objectidentificator van de gebouweenheid.")]
         public int BuildingUnitPersistentLocalId { get; }
-        [EventPropertyDescription("Objectidentificator van het bron adres.")]
+        [EventPropertyDescription("Objectidentificator van het oude gekoppelde adres.")]
         public int PreviousAddressPersistentLocalId { get; }
-        [EventPropertyDescription("Objectidentificator van het doel adres.")]
+        [EventPropertyDescription("Objectidentificator van het nieuwe gekoppelde adres.")]
         public int NewAddressPersistentLocalId { get; }
 
         [EventPropertyDescription("Metadata bij het event.")]
