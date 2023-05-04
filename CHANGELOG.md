@@ -1,3 +1,10 @@
+## [3.74.1](https://github.com/informatievlaanderen/building-registry/compare/v3.74.0...v3.74.1) (2023-05-04)
+
+
+### Bug Fixes
+
+* change docs event readdress ([2a9d52a](https://github.com/informatievlaanderen/building-registry/commit/2a9d52a6aef6f33897c66be1a5f938c40043df34))
+
 # [3.74.0](https://github.com/informatievlaanderen/building-registry/compare/v3.73.0...v3.74.0) (2023-05-03)
 
 
