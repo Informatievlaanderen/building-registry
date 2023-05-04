@@ -40,7 +40,7 @@ namespace BuildingRegistry.Grb.Processor.Upload.Zip.Validators
             }
 
             using var records = header.CreateShapeRecordEnumerator(reader);
-            var recordProblems = _recordValidator.Validate(entry, records);
+            var recordProblems = _recordValidator.Validate(entry.FullName, records);
 
             foreach (var (key, value) in recordProblems)
             {

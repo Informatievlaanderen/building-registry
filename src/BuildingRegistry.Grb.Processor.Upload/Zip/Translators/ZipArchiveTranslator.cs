@@ -13,8 +13,8 @@ namespace BuildingRegistry.Grb.Processor.Upload.Zip.Translators
     public class ZipArchiveTranslator : IZipArchiveTranslator
     {
         private static readonly string[] TranslationOrder = {
-            "GEBOUW_ALL.DBF",
-            "GEBOUW_ALL.SHP",
+            ZipArchiveConstants.DBF_FILENAME.ToUpperInvariant(),
+            ZipArchiveConstants.SHP_FILENAME.ToUpperInvariant(),
         };
 
         private readonly ILogger? _logger;
@@ -30,14 +30,14 @@ namespace BuildingRegistry.Grb.Processor.Upload.Zip.Translators
             _translators = new Dictionary<string, IZipArchiveEntryTranslator>(StringComparer.InvariantCultureIgnoreCase)
             {
                 {
-                    "gebouw_ALL.dbf",
+                    ZipArchiveConstants.DBF_FILENAME,
                     new ZipArchiveDbaseEntryTranslator(
                         encoding,
                         new DbaseFileHeaderReadBehavior(true),
                         new GrbDbaseRecordsTranslator())
                 },
                 {
-                    "gebouw_ALL.shp",
+                    ZipArchiveConstants.SHP_FILENAME,
                     new ZipArchiveShapeEntryTranslator(encoding, new GrbShapeRecordsTranslator())
                 }
             };

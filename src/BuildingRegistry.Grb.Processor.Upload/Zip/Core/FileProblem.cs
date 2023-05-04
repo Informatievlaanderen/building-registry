@@ -1,9 +1,8 @@
-namespace BuildingRegistry.Grb.Processor.Upload.Zip.ErrorBuilders
+namespace BuildingRegistry.Grb.Processor.Upload.Zip.Core
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using Core;
 
     public abstract class FileProblem : IEquatable<FileProblem>, IEqualityComparer<FileProblem>
     {

@@ -1,14 +1,14 @@
 ﻿namespace BuildingRegistry.Grb.Processor.Upload.Zip.Validators
 {
     using System.Collections.Generic;
-    using System.IO.Compression;
     using Be.Vlaanderen.Basisregisters.Shaperon;
     using Be.Vlaanderen.Basisregisters.Shaperon.Geometries;
+    using Exceptions;
 
     public class GrbShapeRecordsValidator : IZipArchiveShapeRecordsValidator
     {
         public IDictionary<RecordNumber, List<ValidationErrorType>> Validate(
-            ZipArchiveEntry entry,
+            string zipArchiveEntryName,
             IEnumerator<ShapeRecord> records)
         {
             var validationErrors = new Dictionary<RecordNumber, List<ValidationErrorType>>();
@@ -17,7 +17,7 @@
 
             if (!moved)
             {
-                return validationErrors;
+                throw new NoShapeRecordsException(zipArchiveEntryName);
             }
 
             while (moved)
@@ -30,8 +30,7 @@
                         ValidationErrorType.GeometryIsNotPolygon
                     });
                 }
-                else if (record.Content is not PolygonShapeContent content
-                         || !GeometryValidator.IsValid(GeometryTranslator.ToGeometryPolygon(content.Shape)))
+                else if (!GeometryValidator.IsValid(GeometryTranslator.ToGeometryPolygon((record.Content as PolygonShapeContent)!.Shape)))
                 {
                     validationErrors.Add(record.Header.RecordNumber, new List<ValidationErrorType>
                     {

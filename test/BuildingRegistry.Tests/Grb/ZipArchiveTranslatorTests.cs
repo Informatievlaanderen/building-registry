@@ -1,8 +1,6 @@
 ﻿namespace BuildingRegistry.Tests.Grb
 {
     using System;
-    using System.IO;
-    using System.IO.Compression;
     using System.Linq;
     using System.Text;
     using System.Threading.Tasks;
@@ -11,19 +9,24 @@
     using FluentAssertions;
     using Xunit;
 
+    [Collection(ZipArchiveCollectionFixture.COLLECTION)]
     public class ZipArchiveTranslatorTests
     {
+        private readonly ZipArchiveFixture _fixture;
+
+        public ZipArchiveTranslatorTests(ZipArchiveFixture fixture)
+        {
+            _fixture = fixture;
+        }
+
         [Fact]
         public async Task ExtractingGebouwAllZip_ReturnsJobRecords()
         {
             // Arrange
             var zipArchiveTranslator = new ZipArchiveTranslator(Encoding.UTF8);
 
-            await using var zipFile = new FileStream($"{AppContext.BaseDirectory}/Grb/gebouw_ALL.zip", FileMode.Open);
-            using var zipArchive = new ZipArchive(zipFile, ZipArchiveMode.Read, false);
-
             // Act
-            var jobRecords = zipArchiveTranslator.Translate(zipArchive).ToList();
+            var jobRecords = zipArchiveTranslator.Translate(_fixture.ZipArchive).ToList();
 
             // Assert
             jobRecords.Should().HaveCount(10);

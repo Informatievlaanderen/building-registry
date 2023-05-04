@@ -1,12 +1,11 @@
-namespace BuildingRegistry.Grb.Processor.Upload.Zip.ErrorBuilders
+namespace BuildingRegistry.Grb.Processor.Upload.Zip.Core
 {
     using System.Linq;
-    using Messages;
-    using ProblemParameter = Core.ProblemParameter;
+    using BuildingRegistry.Grb.Processor.Upload.Zip.Messages;
 
     public class FileError : FileProblem
     {
-        public FileError(string file, string reason, params ProblemParameter[] parameters)
+        public FileError(string file, string reason, params Core.ProblemParameter[] parameters)
             : base(file, reason, parameters)
         {
         }

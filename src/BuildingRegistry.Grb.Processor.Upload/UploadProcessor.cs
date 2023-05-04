@@ -2,7 +2,6 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.IO;
     using System.IO.Compression;
     using System.Linq;
     using System.Text;
@@ -15,7 +14,9 @@
     using Microsoft.Extensions.Hosting;
     using Microsoft.Extensions.Logging;
     using TicketingService.Abstractions;
+    using Zip;
     using Zip.Translators;
+    using Zip.Validators;
 
     public sealed class UploadProcessor : BackgroundService
     {
@@ -40,7 +41,7 @@
         {
             // Check created jobs
             var createdJobs = await _buildingGrbContext.Jobs
-                .Where(x => x.Status == JobStatus.Created)
+                .Where(x => x.Status == JobStatus.Created || x.Status == JobStatus.Preparing)
                 .OrderBy(x => x.Created)
                 .ToListAsync(stoppingToken);
 
@@ -72,8 +73,34 @@
                     await using var stream = await blobObject.OpenAsync(stoppingToken);
                     using var archive = new ZipArchive(stream, ZipArchiveMode.Read, false);
 
-                    var archiveTranslator = new ZipArchiveTranslator(Encoding.GetEncoding(1252));
-                    archiveTranslator.Translate(archive);
+                    var archiveValidator = new ZipArchiveValidator(GrbArchiveEntryStructure);
+
+                    var problems = archiveValidator.Validate(archive);
+                    if (problems.Any())
+                    {
+                        var ticketingErrors = problems.Select(x =>
+                                x.Parameters.Any()
+                                    ? new TicketError(string.Join(',', x.Parameters.Select(y => y.Value)), x.Reason)
+                                    : new TicketError(x.File, x.Reason))
+                            .ToList();
+
+                        await _ticketing.Error(job.TicketId!.Value, new TicketError(ticketingErrors), stoppingToken);
+
+                        job.Status = JobStatus.Error;
+                        await _buildingGrbContext.SaveChangesAsync(stoppingToken);
+
+                        continue;
+                    }
+
+                    var archiveTranslator = new ZipArchiveTranslator(Encoding.UTF8);
+                    var jobRecords = archiveTranslator.Translate(archive);
+
+                    foreach (var jobRecord in jobRecords)
+                    {
+                        jobRecord.JobId = job.Id;
+                    }
+                    await _buildingGrbContext.JobRecords.AddRangeAsync(jobRecords, stoppingToken);
+                    await _buildingGrbContext.SaveChangesAsync(stoppingToken);
                 }
                 catch (BlobNotFoundException)
                 {
@@ -84,12 +111,23 @@
                 job.Status = JobStatus.Prepared;
                 await _buildingGrbContext.SaveChangesAsync(stoppingToken);
             }
-
-
-            // extract, verify, and store data as job records
-            // update job status => prepared
-            // trigger job processor
-            throw new System.NotImplementedException();
         }
+
+        public static Dictionary<string, IZipArchiveEntryValidator> GrbArchiveEntryStructure =>
+            new Dictionary<string, IZipArchiveEntryValidator>(StringComparer.InvariantCultureIgnoreCase)
+            {
+                {
+                    ZipArchiveConstants.DBF_FILENAME,
+                    new ZipArchiveDbaseEntryValidator<GrbDbaseRecord>(
+                        Encoding.UTF8,
+                        new DbaseFileHeaderReadBehavior(true),
+                        new GrbDbaseSchema(),
+                        new GrbDbaseRecordsValidator())
+                },
+                {
+                    ZipArchiveConstants.SHP_FILENAME,
+                    new ZipArchiveShapeEntryValidator(Encoding.UTF8, new GrbShapeRecordsValidator())
+                }
+            };
     }
 }

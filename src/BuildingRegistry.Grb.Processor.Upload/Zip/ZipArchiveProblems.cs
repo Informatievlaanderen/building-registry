@@ -5,7 +5,8 @@ namespace BuildingRegistry.Grb.Processor.Upload.Zip
     using System.Collections.Generic;
     using System.Collections.Immutable;
     using System.Linq;
-    using ErrorBuilders;
+    using System.Runtime.CompilerServices;
+    using Core;
 
     public sealed class ZipArchiveProblems : IReadOnlyCollection<FileProblem>, IEquatable<ZipArchiveProblems>
     {

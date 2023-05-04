@@ -46,21 +46,16 @@ namespace BuildingRegistry.Grb.Processor.Upload.Zip.Validators
                 throw new DbaseHeaderFormatException(entry.Name, exception);
             }
 
-            if (header != null)
+            if (!header.Schema.Equals(Schema))
             {
-                if (!header.Schema.Equals(Schema))
-                {
-                    throw new DbaseHeaderSchemaMismatchException(entry.Name);
-                }
-                else
-                {
-                    using var records = header.CreateDbaseRecordEnumerator<TDbaseRecord>(reader);
-                    var recordProblems = _recordValidator.Validate(entry, records);
-                    foreach (var (key, value) in recordProblems)
-                    {
-                        problems.Add(key, value);
-                    }
-                }
+                throw new DbaseHeaderSchemaMismatchException(entry.Name);
+            }
+
+            using var records = header.CreateDbaseRecordEnumerator<TDbaseRecord>(reader);
+            var recordProblems = _recordValidator.Validate(entry.FullName, records);
+            foreach (var (key, value) in recordProblems)
+            {
+                problems.Add(key, value);
             }
 
             return problems;

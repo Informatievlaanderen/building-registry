@@ -4,43 +4,22 @@ namespace BuildingRegistry.Grb.Processor.Upload.Zip.Validators
     using System.Collections.Generic;
     using System.IO.Compression;
     using System.Linq;
-    using System.Text;
-    using Be.Vlaanderen.Basisregisters.Shaperon;
     using Core;
-    using ErrorBuilders;
     using Exceptions;
-    using Microsoft.Extensions.Logging;
 
     public class ZipArchiveValidator : IZipArchiveValidator
     {
-        private static readonly string[] ValidationOrder = {
-            "GEBOUW_ALL.DBF",
-            "GEBOUW_ALL.SHP",
+        private static readonly string[] ValidationOrder =
+        {
+            ZipArchiveConstants.DBF_FILENAME.ToUpperInvariant(),
+            ZipArchiveConstants.SHP_FILENAME.ToUpperInvariant(),
         };
 
         private readonly Dictionary<string, IZipArchiveEntryValidator> _validators;
 
-        public ZipArchiveValidator(
-            Encoding encoding,
-            ILogger? logger = null)
+        public ZipArchiveValidator(Dictionary<string, IZipArchiveEntryValidator> archiveEntries)
         {
-            ArgumentNullException.ThrowIfNull(encoding);
-
-            _validators = new Dictionary<string, IZipArchiveEntryValidator>(StringComparer.InvariantCultureIgnoreCase)
-            {
-                {
-                    "gebouw_ALL.dbf",
-                    new ZipArchiveDbaseEntryValidator<GrbDbaseRecord>(
-                        encoding,
-                        new DbaseFileHeaderReadBehavior(true),
-                        new GrbDbaseSchema(),
-                        new GrbDbaseRecordsValidator())
-                },
-                {
-                    "gebouw_ALL.shp",
-                    new ZipArchiveShapeEntryValidator(encoding, new GrbShapeRecordsValidator())
-                }
-            };
+            _validators = archiveEntries;
         }
 
         public ZipArchiveProblems Validate(ZipArchive archive)
@@ -104,15 +83,21 @@ namespace BuildingRegistry.Grb.Processor.Upload.Zip.Validators
             }
             catch (ShapeHeaderFormatException ex)
             {
-                problems += new FileError(ex.FileName, nameof(ShapeHeaderFormatException), new ProblemParameter("Exception", ex.InnerException!.ToString()));
+                problems += new FileError(ex.FileName, nameof(ShapeHeaderFormatException),
+                    new ProblemParameter("Exception", ex.InnerException!.ToString()));
             }
             catch (DbaseHeaderFormatException ex)
             {
-                problems += new FileError(ex.FileName, nameof(ShapeHeaderFormatException), new ProblemParameter("Exception", ex.InnerException!.ToString()));
+                problems += new FileError(ex.FileName, nameof(DbaseHeaderFormatException),
+                    new ProblemParameter("Exception", ex.InnerException!.ToString()));
             }
             catch (DbaseHeaderSchemaMismatchException ex)
             {
-                problems += new FileError(ex.FileName, nameof(ShapeHeaderFormatException));
+                problems += new FileError(ex.FileName, nameof(DbaseHeaderSchemaMismatchException));
+            }
+            catch (NoDbaseRecordsException ex)
+            {
+                problems += new FileError(ex.FileName, nameof(NoDbaseRecordsException));
             }
 
             return problems;
