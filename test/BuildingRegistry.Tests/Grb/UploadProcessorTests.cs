@@ -4,17 +4,22 @@
     using System.IO;
     using System.Linq;
     using System.Threading;
-    using System.Threading.Tasks;
+    using Amazon.ECS;
+    using Amazon.ECS.Model;
     using Be.Vlaanderen.Basisregisters.BlobStore;
     using BuildingRegistry.Grb.Abstractions;
     using BuildingRegistry.Grb.Processor.Upload;
     using BuildingRegistry.Grb.Processor.Upload.Zip;
     using FluentAssertions;
     using Handlers;
+    using Microsoft.Extensions.Hosting;
     using Microsoft.Extensions.Logging.Abstractions;
+    using Microsoft.Extensions.Options;
+    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Moq;
     using TicketingService.Abstractions;
     using Xunit;
+    using Task = System.Threading.Tasks.Task;
 
     [Collection(ZipArchiveCollectionFixture.COLLECTION)]
     public class UploadProcessorTests
@@ -31,15 +36,16 @@
         [Fact]
         public async Task FlowTest()
         {
-            var ct = CancellationToken.None;
             var mockTicketing = new Mock<ITicketing>();
             var mockIBlobClient = new Mock<IBlobClient>();
+            var mockAmazonClient = new Mock<IAmazonECS>();
+            var mockIHostApplicationLifeTime = new Mock<IHostApplicationLifetime>();
 
             var ticketId = Guid.NewGuid();
             var job = new Job(DateTimeOffset.Now, JobStatus.Created, ticketId);
 
             _buildingGrbContext.Jobs.Add(job);
-            await _buildingGrbContext.SaveChangesAsync(ct);
+            await _buildingGrbContext.SaveChangesAsync(CancellationToken.None);
 
             var blobName = new BlobName("received/" + job.BlobName);
 
@@ -55,10 +61,21 @@
                     ContentType.Parse("X-multipart/abc"),
                     _  => Task.FromResult((Stream)new FileStream($"{AppContext.BaseDirectory}/Grb/gebouw_ALL.zip", FileMode.Open, FileAccess.Read))));
 
-            var sut = new UploadProcessor(_buildingGrbContext, mockTicketing.Object, mockIBlobClient.Object, new NullLoggerFactory());
+            mockAmazonClient
+                .Setup(x => x.StartTaskAsync(It.IsAny<StartTaskRequest>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new StartTaskResponse());
+
+            var sut = new UploadProcessor(
+                _buildingGrbContext,
+                mockTicketing.Object,
+                mockIBlobClient.Object,
+                mockAmazonClient.Object,
+                new NullLoggerFactory(),
+                mockIHostApplicationLifeTime.Object,
+                Options.Create(new EcsTaskOptions()));
 
             // Act
-            await sut.StartAsync(ct);
+            await sut.StartAsync(CancellationToken.None);
 
             // Assert
             mockTicketing.Verify(x => x.Pending(ticketId, It.IsAny<CancellationToken>()), Times.Once );
@@ -66,7 +83,47 @@
             var jobRecords = _buildingGrbContext.JobRecords.Where(x => x.JobId == job.Id);
             jobRecords.Should().HaveCount(10);
             _buildingGrbContext.Jobs.First().Status.Should().Be(JobStatus.Prepared);
+
+            mockAmazonClient.Verify(x => x.StartTaskAsync(It.IsAny<StartTaskRequest>(), It.IsAny<CancellationToken>()), Times.Once);
+            mockIHostApplicationLifeTime.Verify(x => x.StopApplication(), Times.Once);
         }
+
+         [Fact]
+        public async Task WhenBlobNotFound()
+        {
+            var mockTicketing = new Mock<ITicketing>();
+            var mockIBlobClient = new Mock<IBlobClient>();
+            var mockAmazonClient = new Mock<IAmazonECS>();
+            var mockIHostApplicationLifeTime = new Mock<IHostApplicationLifetime>();
+
+            var ticketId = Guid.NewGuid();
+            var job = new Job(DateTimeOffset.Now, JobStatus.Created, ticketId);
+
+            _buildingGrbContext.Jobs.Add(job);
+            await _buildingGrbContext.SaveChangesAsync(CancellationToken.None);
+
+            var blobName = new BlobName("received/" + job.BlobName);
+
+            mockIBlobClient
+                .Setup(x => x.BlobExistsAsync(blobName, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(false);
+
+            var sut = new UploadProcessor(
+                _buildingGrbContext,
+                mockTicketing.Object,
+                mockIBlobClient.Object,
+                mockAmazonClient.Object,
+                new NullLoggerFactory(),
+                mockIHostApplicationLifeTime.Object,
+                Options.Create(new EcsTaskOptions()));
+
+            // Act
+            await sut.StartAsync(CancellationToken.None);
+
+            // Assert
+            mockTicketing.Verify(x => x.Pending(ticketId, It.IsAny<CancellationToken>()), Times.Never);
+        }
+
 
         [Fact]
         public async Task WhenBlobObjectIsNull_ThenLogErrorAndContinue()
@@ -74,6 +131,8 @@
             var ct = CancellationToken.None;
             var mockTicketing = new Mock<ITicketing>();
             var mockIBlobClient = new Mock<IBlobClient>();
+            var mockAmazonClient = new Mock<IAmazonECS>();
+            var mockIHostApplicationLifeTime = new Mock<IHostApplicationLifetime>();
 
             var ticketId = Guid.NewGuid();
             var job = new Job(DateTimeOffset.Now, JobStatus.Created, ticketId);
@@ -91,7 +150,14 @@
                 .Setup(x => x.GetBlobAsync(blobName, It.IsAny<CancellationToken>()))
                 .ReturnsAsync((BlobObject?)null);
 
-            var sut = new UploadProcessor(_buildingGrbContext, mockTicketing.Object, mockIBlobClient.Object, new NullLoggerFactory());
+            var sut = new UploadProcessor(
+                _buildingGrbContext,
+                mockTicketing.Object,
+                mockIBlobClient.Object,
+                mockAmazonClient.Object,
+                new NullLoggerFactory(),
+                mockIHostApplicationLifeTime.Object,
+                Options.Create(new EcsTaskOptions()));
 
             // Act
             await sut.StartAsync(ct);
@@ -107,6 +173,8 @@
             var ct = CancellationToken.None;
             var mockTicketing = new Mock<ITicketing>();
             var mockIBlobClient = new Mock<IBlobClient>();
+            var mockAmazonClient = new Mock<IAmazonECS>();
+            var mockIHostApplicationLifeTime = new Mock<IHostApplicationLifetime>();
 
             var ticketId = Guid.NewGuid();
             var job = new Job(DateTimeOffset.Now, JobStatus.Created, ticketId);
@@ -126,7 +194,14 @@
                 .Setup(x => x.GetBlobAsync(blobName, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new BlobObject(blobName, null, ContentType.Parse("X-multipart/abc"), _ => Task.FromResult((Stream)zipFileStream)));
 
-            var sut = new UploadProcessor(_buildingGrbContext, mockTicketing.Object, mockIBlobClient.Object, new NullLoggerFactory());
+            var sut = new UploadProcessor(
+                _buildingGrbContext,
+                mockTicketing.Object,
+                mockIBlobClient.Object,
+                mockAmazonClient.Object,
+                new NullLoggerFactory(),
+                mockIHostApplicationLifeTime.Object,
+                Options.Create(new EcsTaskOptions()));
 
             // Act
             await sut.StartAsync(ct);
@@ -149,6 +224,8 @@
             var ct = CancellationToken.None;
             var mockTicketing = new Mock<ITicketing>();
             var mockIBlobClient = new Mock<IBlobClient>();
+            var mockAmazonClient = new Mock<IAmazonECS>();
+            var mockIHostApplicationLifeTime = new Mock<IHostApplicationLifetime>();
 
             var ticketId = Guid.NewGuid();
             var job = new Job(DateTimeOffset.Now, JobStatus.Created, ticketId);
@@ -166,7 +243,14 @@
                 .Setup(x => x.GetBlobAsync(blobName, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new BlobObject(blobName, null, ContentType.Parse("X-multipart/abc"), _ => throw new BlobNotFoundException(blobName)));
 
-            var sut = new UploadProcessor(_buildingGrbContext, mockTicketing.Object, mockIBlobClient.Object, new NullLoggerFactory());
+            var sut = new UploadProcessor(
+                _buildingGrbContext,
+                mockTicketing.Object,
+                mockIBlobClient.Object,
+                mockAmazonClient.Object,
+                new NullLoggerFactory(),
+                mockIHostApplicationLifeTime.Object,
+                Options.Create(new EcsTaskOptions()));
 
             // Act
             await sut.StartAsync(ct);

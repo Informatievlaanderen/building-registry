@@ -35,14 +35,14 @@ namespace BuildingRegistry.Grb.Processor.Upload.Zip.Core
                    && string.Equals(Value, other.Value);
         }
 
-        public int GetHashCode(ProblemParameter obj)
-        {
-            return HashCode.Combine(obj.Name, obj.Value);
-        }
-
         public override bool Equals(object obj)
         {
             return obj is ProblemParameter other && Equals(other);
+        }
+
+        public int GetHashCode(ProblemParameter obj)
+        {
+            return HashCode.Combine(obj.Name, obj.Value);
         }
 
         public override int GetHashCode()

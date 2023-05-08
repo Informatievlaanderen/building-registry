@@ -41,14 +41,14 @@ namespace BuildingRegistry.Grb.Processor.Upload.Zip.Core
                    && Parameters.SequenceEqual(other.Parameters);
         }
 
-        public int GetHashCode(FileProblem obj)
-        {
-            return HashCode.Combine(obj.File, obj.Reason, obj.Parameters);
-        }
-
         public override bool Equals(object obj)
         {
             return obj is FileProblem other && Equals(other);
+        }
+
+        public int GetHashCode(FileProblem obj)
+        {
+            return HashCode.Combine(obj.File, obj.Reason, obj.Parameters);
         }
 
         public override int GetHashCode()

@@ -1,8 +1,10 @@
 ﻿namespace BuildingRegistry.Grb.Processor.Upload.Zip.Exceptions
 {
     using System;
+    using System.Runtime.Serialization;
 
-    public class DbaseHeaderFormatException : Exception
+    [Serializable]
+    public sealed class DbaseHeaderFormatException : Exception
     {
         public string FileName { get; }
 
@@ -10,15 +12,9 @@
         {
             FileName = fileName;
         }
-    }
 
-    public class DbaseHeaderSchemaMismatchException : Exception
-    {
-        public string FileName { get; }
-
-        public DbaseHeaderSchemaMismatchException(string fileName) : base("")
-        {
-            FileName = fileName;
-        }
+        private DbaseHeaderFormatException(SerializationInfo info, StreamingContext context)
+            : base(info, context)
+        { }
     }
 }

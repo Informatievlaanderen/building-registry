@@ -25,6 +25,11 @@ namespace BuildingRegistry.Grb.Processor.Upload.Zip
             return other != null && _problems.SequenceEqual(other._problems);
         }
 
+        public override bool Equals(object obj)
+        {
+            return obj is ZipArchiveProblems other && Equals(other);
+        }
+
         public IEnumerator<FileProblem> GetEnumerator()
         {
             return _problems.GetEnumerator();
@@ -47,11 +52,6 @@ namespace BuildingRegistry.Grb.Processor.Upload.Zip
             if (problems == null) throw new ArgumentNullException(nameof(problems));
 
             return new ZipArchiveProblems(_problems.AddRange(problems));
-        }
-
-        public override bool Equals(object obj)
-        {
-            return obj is ZipArchiveProblems other && Equals(other);
         }
 
         public override int GetHashCode()

@@ -1,8 +1,10 @@
 namespace BuildingRegistry.Grb.Processor.Upload.Zip.Exceptions
 {
     using System;
+    using System.Runtime.Serialization;
 
-    public class NoShapeRecordsException : Exception
+    [Serializable]
+    public sealed class NoShapeRecordsException : Exception
     {
         public string FileName { get; }
 
@@ -10,5 +12,9 @@ namespace BuildingRegistry.Grb.Processor.Upload.Zip.Exceptions
         {
             FileName = fileName;
         }
+
+        private NoShapeRecordsException(SerializationInfo info, StreamingContext context)
+            : base(info, context)
+        { }
     }
 }

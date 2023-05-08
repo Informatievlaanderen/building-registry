@@ -1,12 +1,17 @@
 namespace BuildingRegistry.Grb.Processor.Upload.Infrastructure
 {
     using System;
+    using System.Collections.Immutable;
     using System.IO;
     using System.Threading.Tasks;
     using Abstractions;
+    using Amazon.ECS;
+    using Amazon.S3;
     using Autofac;
     using Autofac.Extensions.DependencyInjection;
     using Be.Vlaanderen.Basisregisters.Aws.DistributedMutex;
+    using Be.Vlaanderen.Basisregisters.BlobStore;
+    using Be.Vlaanderen.Basisregisters.BlobStore.Aws;
     using Be.Vlaanderen.Basisregisters.DataDog.Tracing.Autofac;
     using Be.Vlaanderen.Basisregisters.DataDog.Tracing.Sql.EntityFrameworkCore;
     using Destructurama;
@@ -16,6 +21,7 @@ namespace BuildingRegistry.Grb.Processor.Upload.Infrastructure
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Hosting;
     using Microsoft.Extensions.Logging;
+    using Microsoft.Extensions.Options;
     using Serilog;
     using Serilog.Debugging;
     using Serilog.Extensions.Logging;
@@ -74,20 +80,34 @@ namespace BuildingRegistry.Grb.Processor.Upload.Infrastructure
                             hostContext.Configuration["DataDog:ServiceName"]))
                         .AddDbContextFactory<BuildingGrbContext>((provider, options) => options
                             .UseLoggerFactory(loggerFactory)
-                            .UseSqlServer(provider.GetRequiredService<TraceDbConnection<BuildingGrbContext>>(), sqlServerOptions => sqlServerOptions
-                                .EnableRetryOnFailure()
-                                .MigrationsHistoryTable(BuildingGrbContext.MigrationsTableName, BuildingGrbContext.Schema)
-                            ));
+                            .UseSqlServer(provider.GetRequiredService<TraceDbConnection<BuildingGrbContext>>(),
+                                sqlServerOptions => sqlServerOptions
+                                    .EnableRetryOnFailure()
+                                    .MigrationsHistoryTable(BuildingGrbContext.MigrationsTableName,
+                                        BuildingGrbContext.Schema)
+                            ))
+                        .Configure<EcsTaskOptions>(hostContext.Configuration.GetSection("ECSTaskOptions"));
                 })
                 .UseServiceProviderFactory(new AutofacServiceProviderFactory())
                 .ConfigureContainer<ContainerBuilder>((hostContext, builder) =>
                 {
                     var services = new ServiceCollection();
                     var loggerFactory = new SerilogLoggerFactory(Log.Logger);
-
                     builder
                         .RegisterModule(new DataDogModule(hostContext.Configuration))
-                        .RegisterModule(new BuildingGrbModule(hostContext.Configuration, services, loggerFactory));
+                        .RegisterModule(new BuildingGrbModule(hostContext.Configuration, services, loggerFactory))
+                        .RegisterModule(new TicketingModule(hostContext.Configuration, services));
+
+                    builder
+                        .Register(c =>
+                        new S3BlobClient(new AmazonS3Client(), hostContext.Configuration["BucketName"]))
+                        .As<IBlobClient>()
+                        .SingleInstance();
+
+                    builder
+                        .RegisterType<AmazonECSClient>()
+                        .As<IAmazonECS>()
+                        .SingleInstance();
 
                     builder
                         .RegisterType<UploadProcessor>()

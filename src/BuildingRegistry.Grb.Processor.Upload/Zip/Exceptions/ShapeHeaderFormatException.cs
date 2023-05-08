@@ -1,8 +1,10 @@
 ﻿namespace BuildingRegistry.Grb.Processor.Upload.Zip.Exceptions
 {
     using System;
+    using System.Runtime.Serialization;
 
-    public class ShapeHeaderFormatException : Exception
+    [Serializable]
+    public sealed class ShapeHeaderFormatException : Exception
     {
         public string FileName { get; }
 
@@ -10,5 +12,9 @@
         {
             FileName = fileName;
         }
+
+        private ShapeHeaderFormatException(SerializationInfo info, StreamingContext context)
+            : base(info, context)
+        { }
     }
 }

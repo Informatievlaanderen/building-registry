@@ -1,5 +1,6 @@
 AWSSDK.S3
 AWSSDK.Extensions.NETCore.Setup
+AWSSDK.ECS
 
 Be.Vlaanderen.Basisregisters.Aws.DistributedMutex
 Be.Vlaanderen.Basisregisters.BlobStore

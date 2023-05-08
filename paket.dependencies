@@ -24,6 +24,7 @@ nuget Microsoft.EntityFrameworkCore.Design 6.0.3
 
 nuget AWSSDK.S3 3.7.103.26
 nuget AWSSDK.Extensions.NETCore.Setup 3.7.5
+nuget AWSSDK.ECS 3.7.108
 
 // VBR STUFF
 nuget Be.Vlaanderen.Basisregisters.Build.Pipeline 6.0.5
