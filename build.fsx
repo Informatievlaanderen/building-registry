@@ -66,6 +66,7 @@ Target.create "Publish_Solution" (fun _ ->
     "BuildingRegistry.Api.BackOffice.Handlers.Lambda"
     "BuildingRegistry.Consumer.Address"
     "BuildingRegistry.Grb.Processor.Upload"
+    "BuildingRegistry.Grb.Processor.Job"
     "BuildingRegistry.Projections.Legacy"
     "BuildingRegistry.Projections.Extract"
     "BuildingRegistry.Projections.LastChangedList"
@@ -101,6 +102,7 @@ Target.create "Containerize_ApiCrabImport" (fun _ ->
   containerize "BuildingRegistry.Api.CrabImport" "api-crab-import")
 Target.create "Containerize_ApiGrb" (fun _ -> containerize "BuildingRegistry.Api.Grb" "api-grb")
 Target.create "Containerize_GrbProcessorUpload" (fun _ -> containerize "BuildingRegistry.Grb.Processor.Upload" "grb-processor-upload")
+Target.create "Containerize_GrbProcessorJob" (fun _ -> containerize "BuildingRegistry.Grb.Processor.Job" "grb-processor-job")
 Target.create "Containerize_ProjectionsSyndication" (fun _ -> containerize "BuildingRegistry.Projections.Syndication" "projections-syndication")
 Target.create "Containerize_ProjectionsBackOffice" (fun _ -> containerize "BuildingRegistry.Projections.BackOffice" "projections-backoffice")
 Target.create "Containerize_ConsumerAddress" (fun _ -> containerize "BuildingRegistry.Consumer.Address" "consumer-address")
