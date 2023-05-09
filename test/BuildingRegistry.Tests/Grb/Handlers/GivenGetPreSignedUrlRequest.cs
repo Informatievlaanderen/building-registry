@@ -72,7 +72,7 @@
             var job = await buildingGrbContext.Jobs.SingleOrDefaultAsync();
 
             job.Should().NotBeNull();
-            job!.TicketUrl.Should().Be(ticketUrl);
+            job!.TicketId.Should().Be(ticketId);
             job.Status.Should().Be(JobStatus.Created);
             response.JobId.Should().Be(job.Id);
             response.TicketUrl.Should().Be(ticketUrl);

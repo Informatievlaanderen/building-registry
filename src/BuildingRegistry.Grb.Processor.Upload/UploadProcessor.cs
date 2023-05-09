@@ -1,20 +1,195 @@
 ﻿namespace BuildingRegistry.Grb.Processor.Upload
 {
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.IO.Compression;
+    using System.Linq;
+    using System.Net;
+    using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
+    using Abstractions;
+    using Amazon.ECS;
+    using Amazon.ECS.Model;
+    using Be.Vlaanderen.Basisregisters.BlobStore;
+    using Be.Vlaanderen.Basisregisters.Shaperon;
+    using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Hosting;
+    using Microsoft.Extensions.Logging;
+    using Microsoft.Extensions.Options;
+    using TicketingService.Abstractions;
+    using Zip;
+    using Zip.Translators;
+    using Zip.Validators;
+    using Task = System.Threading.Tasks.Task;
 
     public sealed class UploadProcessor : BackgroundService
     {
-        protected override Task ExecuteAsync(CancellationToken stoppingToken)
+        private readonly BuildingGrbContext _buildingGrbContext;
+        private readonly ITicketing _ticketing;
+        private readonly IBlobClient _blobClient;
+        private readonly IAmazonECS _amazonEcs;
+        private readonly ILogger<UploadProcessor> _logger;
+        private readonly IHostApplicationLifetime _hostApplicationLifetime;
+        private readonly EcsTaskOptions _ecsTaskOptions;
+
+        public UploadProcessor(
+            BuildingGrbContext buildingGrbContext,
+            ITicketing ticketing,
+            IBlobClient blobClient,
+            IAmazonECS amazonEcs,
+            ILoggerFactory loggerFactory,
+            IHostApplicationLifetime hostApplicationLifetime,
+            IOptions<EcsTaskOptions> ecsTaskOptions)
+        {
+            _buildingGrbContext = buildingGrbContext;
+            _ticketing = ticketing;
+            _blobClient = blobClient;
+            _amazonEcs = amazonEcs;
+            _logger = loggerFactory.CreateLogger<UploadProcessor>();
+            _hostApplicationLifetime = hostApplicationLifetime;
+            _ecsTaskOptions = ecsTaskOptions.Value;
+        }
+
+        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             // Check created jobs
-            // See if there's a S3 object with job id
-            // If so, update ticket status and job status => preparing
-            // extract, verify, and store data as job records
-            // update job status => prepared
-            // trigger job processor
-            throw new System.NotImplementedException();
+            var jobs = await _buildingGrbContext.Jobs
+                .Where(x => x.Status == JobStatus.Created || x.Status == JobStatus.Preparing)
+                .OrderBy(x => x.Created)
+                .ToListAsync(stoppingToken);
+
+            if (!jobs.Any())
+            {
+                _hostApplicationLifetime.StopApplication();
+                return;
+            }
+
+            foreach (var job in jobs)
+            {
+                await using var stream = await GetZipArchiveStream(job, stoppingToken);
+
+                if (stream == null)
+                {
+                    continue;
+                }
+
+                // If so, update ticket status and job status => preparing
+                await _ticketing.Pending(job.TicketId!.Value, stoppingToken);
+                job.Status = JobStatus.Preparing;
+                await _buildingGrbContext.SaveChangesAsync(stoppingToken);
+
+                using var archive = new ZipArchive(stream, ZipArchiveMode.Read, false);
+
+                var archiveValidator = new ZipArchiveValidator(GrbArchiveEntryStructure);
+
+                var problems = archiveValidator.Validate(archive);
+                if (problems.Any())
+                {
+                    var ticketingErrors = problems.Select(x =>
+                            x.Parameters.Any()
+                                ? new TicketError(string.Join(',', x.Parameters.Select(y => y.Value)), x.Reason)
+                                : new TicketError(x.File, x.Reason))
+                        .ToList();
+
+                    await _ticketing.Error(job.TicketId!.Value, new TicketError(ticketingErrors), stoppingToken);
+
+                    job.Status = JobStatus.Error;
+                    await _buildingGrbContext.SaveChangesAsync(stoppingToken);
+
+                    continue;
+                }
+
+                var archiveTranslator = new ZipArchiveTranslator(Encoding.UTF8);
+                var jobRecords = archiveTranslator.Translate(archive);
+
+                foreach (var jobRecord in jobRecords)
+                {
+                    jobRecord.JobId = job.Id;
+                }
+
+                await _buildingGrbContext.JobRecords.AddRangeAsync(jobRecords, stoppingToken);
+                await _buildingGrbContext.SaveChangesAsync(stoppingToken);
+
+                job.Status = JobStatus.Prepared;
+                await _buildingGrbContext.SaveChangesAsync(stoppingToken);
+            }
+
+            if (jobs.Any(x => x.Status == JobStatus.Prepared))
+            {
+                await StartJobProcessor(stoppingToken);
+            }
+
+            _hostApplicationLifetime.StopApplication();
         }
+
+        private async Task StartJobProcessor(CancellationToken stoppingToken)
+        {
+            var taskResponse = await _amazonEcs.StartTaskAsync(new StartTaskRequest()
+            {
+                TaskDefinition = _ecsTaskOptions.TaskDefinition,
+                Cluster = _ecsTaskOptions.Cluster
+            }, stoppingToken);
+
+            if (taskResponse.HttpStatusCode != HttpStatusCode.OK)
+            {
+                _logger.LogError($"Starting ECS Task return HttpStatusCode:{taskResponse.HttpStatusCode.ToString()}");
+            }
+
+            string FailureToString(Failure failure) => $"Reason: {failure.Reason}{Environment.NewLine}Failure:{failure.Detail}";
+
+            if (taskResponse.Failures.Any())
+            {
+                foreach (var failure in taskResponse.Failures)
+                {
+                    _logger.LogError(FailureToString(failure));
+                }
+            }
+        }
+
+        private async Task<Stream?> GetZipArchiveStream(Job job, CancellationToken stoppingToken)
+        {
+            var blobName = new BlobName("received/" + job.BlobName);
+
+            if (!await _blobClient.BlobExistsAsync(blobName, stoppingToken))
+            {
+                return null;
+            }
+
+            var blobObject = await _blobClient.GetBlobAsync(blobName, stoppingToken);
+            if (blobObject is null)
+            {
+                _logger.LogError($"No blob found with name: {job.BlobName}");
+                return null;
+            }
+
+            try
+            {
+                return await blobObject.OpenAsync(stoppingToken);
+            }
+            catch (BlobNotFoundException)
+            {
+                _logger.LogError($"No blob found with name: {job.BlobName}");
+                return null;
+            }
+        }
+
+        public static Dictionary<string, IZipArchiveEntryValidator> GrbArchiveEntryStructure =>
+            new Dictionary<string, IZipArchiveEntryValidator>(StringComparer.InvariantCultureIgnoreCase)
+            {
+                {
+                    ZipArchiveConstants.DBF_FILENAME,
+                    new ZipArchiveDbaseEntryValidator<GrbDbaseRecord>(
+                        Encoding.UTF8,
+                        new DbaseFileHeaderReadBehavior(true),
+                        new GrbDbaseSchema(),
+                        new GrbDbaseRecordsValidator())
+                },
+                {
+                    ZipArchiveConstants.SHP_FILENAME,
+                    new ZipArchiveShapeEntryValidator(Encoding.UTF8, new GrbShapeRecordsValidator())
+                }
+            };
     }
 }

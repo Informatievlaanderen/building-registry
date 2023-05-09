@@ -24,6 +24,7 @@ nuget Microsoft.EntityFrameworkCore.Design 6.0.3
 
 nuget AWSSDK.S3 3.7.103.26
 nuget AWSSDK.Extensions.NETCore.Setup 3.7.5
+nuget AWSSDK.ECS 3.7.108
 
 // VBR STUFF
 nuget Be.Vlaanderen.Basisregisters.Build.Pipeline 6.0.5
@@ -90,8 +91,10 @@ nuget Be.Vlaanderen.Basisregisters.Shaperon.Geometries 9.0.1
 nuget Be.Vlaanderen.Basisregisters.Sqs 1.3.1
 nuget Be.Vlaanderen.Basisregisters.Sqs.Lambda 1.3.1
 
-nuget Be.Vlaanderen.Basisregisters.TicketingService.Abstractions 1.7.11
-nuget Be.Vlaanderen.Basisregisters.TicketingService.Proxy.HttpProxy 1.7.11
+nuget Be.Vlaanderen.Basisregisters.TicketingService.Abstractions 1.11.1
+nuget Be.Vlaanderen.Basisregisters.TicketingService.Proxy.HttpProxy 1.11.1
+
+nuget Be.Vlaanderen.Basisregisters.BlobStore 3.0.0
 
 // LAMBDA STUFF
 nuget Amazon.Lambda.Core 2.1.0

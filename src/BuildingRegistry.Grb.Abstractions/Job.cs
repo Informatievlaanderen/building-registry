@@ -11,16 +11,18 @@
         public DateTimeOffset Created { get; set; }
         public DateTimeOffset LastChanged { get; set; }
         public JobStatus Status { get; set; }
-        public string? TicketUrl { get; set; }
+        public Guid? TicketId { get; set; }
+
+        public string BlobName => $"upload_{Id:D}";
 
         private Job() { }
 
-        public Job(DateTimeOffset created, JobStatus status, string? ticketUrl = null)
+        public Job(DateTimeOffset created, JobStatus status, Guid? ticketId = null)
         {
             Created = created;
             LastChanged = created;
             Status = status;
-            TicketUrl = ticketUrl;
+            TicketId = ticketId;
         }
     }
 
@@ -39,7 +41,7 @@
             builder.Property(x => x.Created);
             builder.Property(x => x.LastChanged);
             builder.Property(x => x.Status);
-            builder.Property(x => x.TicketUrl);
+            builder.Property(x => x.TicketId);
 
             builder.HasIndex(x => x.Status);
         }

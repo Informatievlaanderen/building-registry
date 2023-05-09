@@ -143,6 +143,21 @@ jobs:
       semver: ${{ needs.set-release-version.outputs.version }}
     secrets: inherit
 
+  build-grb-processor-upload:
+    name: Build Grb Processor Upload
+    uses: Informatievlaanderen/build-pipeline/.github/workflows/build-image.yml@main
+    needs: [ set-release-version ]
+    if: ${{ (github.repository_owner == 'Informatievlaanderen') && (needs.set-release-version.outputs.version != 'none') }}
+    with:
+      registry: building-registry
+      build-target: Containerize_GrbProcessorUpload
+      image-file: br-grb-processor-upload-image.tar
+      image-name: grb-processor-upload
+      test-project: BuildingRegistry.Tests
+      build-project: BuildingRegistry.Grb.Processor.Upload
+      semver: ${{ needs.set-release-version.outputs.version }}
+    secrets: inherit
+
   build-projector:
     name: Build Projector
     uses: Informatievlaanderen/build-pipeline/.github/workflows/build-image.yml@main
@@ -348,6 +363,7 @@ jobs:
       build-api-oslo,
       build-api-extract,
       build-api-grb,
+      build-grb-processor-upload,
       build-api-crab-import,
       build-projector,
       build-projections-backoffice,
@@ -688,6 +704,7 @@ jobs:
           'api-crab-import',
           'api-extract',
           'api-grb',
+          'grb-processor-upload',
           'projector',
           'projections-syndication',
           'projections-backoffice',
@@ -748,6 +765,7 @@ jobs:
           'api-crab-import',
           'api-extract',
           'api-grb',
+          'grb-processor-upload',
           'projector',
           'projections-syndication',
           'projections-backoffice',
@@ -810,6 +828,7 @@ jobs:
           'api-crab-import',
           'api-extract',
           'api-grb',
+          'grb-processor-upload',
           'projector',
           'projections-syndication',
           'projections-backoffice',
