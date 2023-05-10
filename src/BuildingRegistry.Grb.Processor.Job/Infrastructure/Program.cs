@@ -77,7 +77,8 @@ namespace BuildingRegistry.Grb.Processor.Job.Infrastructure
                             .UseSqlServer(provider.GetRequiredService<TraceDbConnection<BuildingGrbContext>>(), sqlServerOptions => sqlServerOptions
                                 .EnableRetryOnFailure()
                                 .MigrationsHistoryTable(BuildingGrbContext.MigrationsTableName, BuildingGrbContext.Schema)
-                            ));
+                            ))
+                        .AddHttpClient(); //TODO: replace this to register backoffice proxy client
                 })
                 .UseServiceProviderFactory(new AutofacServiceProviderFactory())
                 .ConfigureContainer<ContainerBuilder>((hostContext, builder) =>
@@ -87,7 +88,16 @@ namespace BuildingRegistry.Grb.Processor.Job.Infrastructure
 
                     builder
                         .RegisterModule(new DataDogModule(hostContext.Configuration))
-                        .RegisterModule(new BuildingGrbModule(hostContext.Configuration, services, loggerFactory));
+                        .RegisterModule(new BuildingGrbModule(hostContext.Configuration, services, loggerFactory))
+                        .RegisterModule(new TicketingModule(hostContext.Configuration, services));
+
+                    builder.RegisterType<BackOfficeApiProxy>()
+                        .As<IBackOfficeApiProxy>()
+                        .SingleInstance();
+
+                    builder.RegisterType<JobRecordsProcessor>()
+                        .As<IJobRecordsProcessor>()
+                        .SingleInstance();
 
                     builder
                         .RegisterType<JobProcessor>()

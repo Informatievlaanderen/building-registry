@@ -1,4 +1,4 @@
-﻿namespace BuildingRegistry.Tests.Grb
+﻿namespace BuildingRegistry.Tests.Grb.UploadProcessor
 {
     using System;
     using System.Collections.Generic;
@@ -28,7 +28,7 @@
         [Fact]
         public void WhenMissingFile_ThenValidationError()
         {
-            using var zipFile = new FileStream($"{AppContext.BaseDirectory}/Grb/gebouw_dbf_missing.zip", FileMode.Open, FileAccess.Read);
+            using var zipFile = new FileStream($"{AppContext.BaseDirectory}/Grb/UploadProcessor/gebouw_dbf_missing.zip", FileMode.Open, FileAccess.Read);
             using var archive = new ZipArchive(zipFile, ZipArchiveMode.Read, false);
 
             // Act

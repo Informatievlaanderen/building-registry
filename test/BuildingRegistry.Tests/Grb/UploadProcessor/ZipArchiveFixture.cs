@@ -1,4 +1,4 @@
-﻿namespace BuildingRegistry.Tests.Grb
+﻿namespace BuildingRegistry.Tests.Grb.UploadProcessor
 {
     using System;
     using System.IO;
@@ -11,7 +11,7 @@
 
         public ZipArchiveFixture()
         {
-            ZipFileStream = new FileStream($"{AppContext.BaseDirectory}/Grb/gebouw_ALL.zip", FileMode.Open, FileAccess.Read);
+            ZipFileStream = new FileStream($"{AppContext.BaseDirectory}/Grb/UploadProcessor/gebouw_ALL.zip", FileMode.Open, FileAccess.Read);
             ZipArchive = new ZipArchive(ZipFileStream, ZipArchiveMode.Read, false);
         }
 

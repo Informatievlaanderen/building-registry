@@ -2,6 +2,8 @@
 {
     using System;
     using System.IO;
+    using System.Threading;
+    using System.Threading.Tasks;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.EntityFrameworkCore.Design;
     using Microsoft.Extensions.Configuration;
@@ -20,6 +22,11 @@
         public BuildingGrbContext(DbContextOptions<BuildingGrbContext> options)
             : base(options)
         { }
+
+        public async Task<Job?> FindJob(Guid jobId, CancellationToken cancellationToken)
+        {
+            return await Jobs.FindAsync(new object[] { jobId }, cancellationToken);
+        }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

@@ -9,8 +9,8 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.Building.Requests
     {
         public GrbData GrbData { get; set; }
 
-        public DemolishBuilding ToCommand(int PersistentLocalId, Provenance provenance)
-            => new DemolishBuilding(new BuildingPersistentLocalId(PersistentLocalId),
+        public DemolishBuilding ToCommand(int persistentLocalId, Provenance provenance)
+            => new DemolishBuilding(new BuildingPersistentLocalId(persistentLocalId),
                 GrbData.ToBuildingGrbData(),
                 provenance);
     }

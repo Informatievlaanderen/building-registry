@@ -25,7 +25,7 @@
 
         public async Task<ExtractArchive> Handle(GetJobResultRequest request, CancellationToken cancellationToken)
         {
-            var job = await _buildingGrbContext.Jobs.FindAsync(new object[] { request.JobId }, cancellationToken);
+            var job = await _buildingGrbContext.FindJob(request.JobId, cancellationToken);
 
             if (job is not { Status: JobStatus.Completed })
             {

@@ -42,7 +42,7 @@ namespace BuildingRegistry.Grb.Processor.Upload.Infrastructure
             AppDomain.CurrentDomain.UnhandledException += (sender, eventArgs) =>
                 Log.Fatal((Exception)eventArgs.ExceptionObject, "Encountered a fatal exception, exiting program.");
 
-            Log.Information("Starting BuildingRegistry.Grb.Processor.Upload.");
+            Log.Information("Starting Upload Processor.");
 
             var host = new HostBuilder()
                 .ConfigureAppConfiguration((hostContext, builder) =>

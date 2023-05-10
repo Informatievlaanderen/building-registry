@@ -77,7 +77,7 @@
 
                 // If so, update ticket status and job status => preparing
                 await _ticketing.Pending(job.TicketId!.Value, stoppingToken);
-                job.Status = JobStatus.Preparing;
+                job.UpdateStatus(JobStatus.Preparing);
                 await _buildingGrbContext.SaveChangesAsync(stoppingToken);
 
                 using var archive = new ZipArchive(stream, ZipArchiveMode.Read, false);
@@ -95,14 +95,14 @@
 
                     await _ticketing.Error(job.TicketId!.Value, new TicketError(ticketingErrors), stoppingToken);
 
-                    job.Status = JobStatus.Error;
+                    job.UpdateStatus(JobStatus.Error);
                     await _buildingGrbContext.SaveChangesAsync(stoppingToken);
 
                     continue;
                 }
 
                 var archiveTranslator = new ZipArchiveTranslator(Encoding.UTF8);
-                var jobRecords = archiveTranslator.Translate(archive);
+                var jobRecords = archiveTranslator.Translate(archive).ToList();
 
                 foreach (var jobRecord in jobRecords)
                 {
@@ -112,7 +112,7 @@
                 await _buildingGrbContext.JobRecords.AddRangeAsync(jobRecords, stoppingToken);
                 await _buildingGrbContext.SaveChangesAsync(stoppingToken);
 
-                job.Status = JobStatus.Prepared;
+                job.UpdateStatus(JobStatus.Prepared);
                 await _buildingGrbContext.SaveChangesAsync(stoppingToken);
             }
 

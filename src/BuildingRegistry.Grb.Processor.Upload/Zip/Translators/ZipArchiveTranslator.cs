@@ -68,7 +68,9 @@ namespace BuildingRegistry.Grb.Processor.Upload.Zip.Translators
                         _logger?.LogInformation("Translating entry {Entry} completed in {Elapsed}", entry.FullName, sw.Elapsed);
 
                         return result;
-                    }).Values;
+                    })
+                .OrderBy(x => x.Key.ToInt32()) // Make sure records maintain their order by RecordNumber
+                .Select(x => x.Value);
         }
     }
 }
