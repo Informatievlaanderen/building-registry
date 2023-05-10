@@ -1,3 +1,16 @@
+# [3.75.0](https://github.com/informatievlaanderen/building-registry/compare/v3.74.1...v3.75.0) (2023-05-10)
+
+
+### Bug Fixes
+
+* produce oslo snapshot based upon timestamp and etag ([3fd0e0a](https://github.com/informatievlaanderen/building-registry/commit/3fd0e0a6f940afd30c673b77aebea758ea46dc81))
+
+
+### Features
+
+* initial job processor ([43eae4f](https://github.com/informatievlaanderen/building-registry/commit/43eae4f38282486e4a0b1a01448cec7700eee332))
+* upload processor grb ([0e8274c](https://github.com/informatievlaanderen/building-registry/commit/0e8274c98bdc18b57afa5ef06d37036a54e59110))
+
 ## [3.74.1](https://github.com/informatievlaanderen/building-registry/compare/v3.74.0...v3.74.1) (2023-05-04)
 
 
