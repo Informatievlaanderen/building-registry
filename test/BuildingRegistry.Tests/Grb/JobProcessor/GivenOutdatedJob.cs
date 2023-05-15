@@ -7,10 +7,11 @@
     using System.Threading.Tasks;
     using BuildingRegistry.Grb.Abstractions;
     using BuildingRegistry.Grb.Processor.Job;
-    using BuildingRegistry.Tests.Grb.Handlers;
     using FluentAssertions;
+    using Handlers;
     using Microsoft.Extensions.Hosting;
     using Microsoft.Extensions.Logging.Abstractions;
+    using Microsoft.Extensions.Options;
     using Moq;
     using TicketingService.Abstractions;
     using Xunit;
@@ -30,7 +31,10 @@
                 buildingGrbContext,
                 jobRecordsProcessor.Object,
                 jobRecordsMonitor.Object,
-                Mock.Of<ITicketing>(), hostApplicationLifetime.Object, new NullLoggerFactory());
+                Mock.Of<ITicketing>(),
+                new OptionsWrapper<GrbApiOptions>(new GrbApiOptions { GrbApiUrl = "https://api-vlaanderen.be/gebouwen/uploads"}),
+                hostApplicationLifetime.Object,
+                new NullLoggerFactory());
 
             const int maxLifeTimeJob = 65;
             var expiredDateTime = DateTimeOffset.Now.AddMinutes(-1 * (maxLifeTimeJob + 1));

@@ -68,15 +68,11 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
         }
 
         [Fact]
-        public async Task WhenIdempotencyException_ThenTicketingCompleteIsExpected()
+        public async Task WhenIdempotencyException_ThenTicketingErrorIsExpected()
         {
             // Arrange
             var ticketing = new Mock<ITicketing>();
-            var buildingPersistentLocalId = Fixture.Create<BuildingPersistentLocalId>();
 
-            PlanBuilding(buildingPersistentLocalId);
-
-            var buildings = Container.Resolve<IBuildings>();
             var handler = new ChangeBuildingMeasurementLambdaHandler(
                 Container.Resolve<IConfiguration>(),
                 new FakeRetryPolicy(),
@@ -84,20 +80,16 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
                 MockExceptionIdempotentCommandHandler(() => new IdempotencyException(string.Empty)).Object,
                 Container.Resolve<IBuildings>());
 
-            var building =
-                await buildings.GetAsync(new BuildingStreamId(buildingPersistentLocalId), CancellationToken.None);
-
             // Act
             await handler.Handle(CreateChangeBuildingMeasurementLambdaRequest(), CancellationToken.None);
 
             //Assert
             ticketing.Verify(x =>
-                x.Complete(
+                x.Error(
                     It.IsAny<Guid>(),
-                    new TicketResult(
-                        new ETagResponse(
-                            string.Format(ConfigDetailUrl, buildingPersistentLocalId),
-                            building.LastEventHash)),
+                    new TicketError(
+                        "",
+                        "Idempotency"),
                     CancellationToken.None));
         }
 

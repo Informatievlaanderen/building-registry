@@ -16,7 +16,6 @@
     using NetTopologySuite.Geometries;
     using NetTopologySuite.Utilities;
     using NodaTime;
-    using TicketingService.Abstractions;
 
     public interface IJobRecordsProcessor
     {
@@ -26,17 +25,17 @@
     public sealed class JobRecordsProcessor : IJobRecordsProcessor
     {
         private readonly BuildingGrbContext _buildingGrbContext;
-        private readonly ITicketing _ticketing;
         private readonly IBackOfficeApiProxy _backOfficeApiProxy;
+        private readonly IErrorWarningEvaluator _errorWarningEvaluator;
 
         public JobRecordsProcessor(
             BuildingGrbContext buildingGrbContext,
-            ITicketing ticketing,
-            IBackOfficeApiProxy backOfficeApiProxy)
+            IBackOfficeApiProxy backOfficeApiProxy,
+            IErrorWarningEvaluator errorWarningEvaluator)
         {
             _buildingGrbContext = buildingGrbContext;
-            _ticketing = ticketing;
             _backOfficeApiProxy = backOfficeApiProxy;
+            _errorWarningEvaluator = errorWarningEvaluator;
         }
 
         public async Task Process(IEnumerable<JobRecord> jobRecords, CancellationToken ct)
@@ -79,14 +78,13 @@
                 }
                 else
                 {
-                    // Determine if its a warning or an error
+                    var evaluation = _errorWarningEvaluator.Evaluate(backOfficeApiResult.ValidationErrors);
+                    jobRecord.Status = evaluation.jobRecordStatus;
+                    jobRecord.ErrorMessage = evaluation.message;
                 }
 
                 await _buildingGrbContext.SaveChangesAsync(ct);
             }
-
-            // if error list any then send notification and stop job processing
-            // else create job result, complete job ticket, archive jobrecords
         }
 
         private GrbData Map(JobRecord jobRecord)

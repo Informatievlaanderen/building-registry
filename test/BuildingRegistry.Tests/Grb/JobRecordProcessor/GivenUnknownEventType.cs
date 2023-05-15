@@ -55,8 +55,7 @@
 
             var jobRecordsProcessor = new JobRecordsProcessor(
                 buildingGrbContext,
-                ticketing.Object,
-                backOfficeApiProxy.Object);
+                backOfficeApiProxy.Object, Mock.Of<IErrorWarningEvaluator>());
 
             //act
             var func = async () => await jobRecordsProcessor.Process(new List<JobRecord> { jobRecord }, CancellationToken.None);

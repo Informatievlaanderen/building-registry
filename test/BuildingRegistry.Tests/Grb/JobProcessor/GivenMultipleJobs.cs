@@ -7,10 +7,11 @@
     using System.Threading.Tasks;
     using BuildingRegistry.Grb.Abstractions;
     using BuildingRegistry.Grb.Processor.Job;
-    using BuildingRegistry.Tests.Grb.Handlers;
     using FluentAssertions;
+    using Handlers;
     using Microsoft.Extensions.Hosting;
     using Microsoft.Extensions.Logging.Abstractions;
+    using Microsoft.Extensions.Options;
     using Moq;
     using NetTopologySuite.Geometries;
     using TicketingService.Abstractions;
@@ -31,7 +32,10 @@
                 buildingGrbContext,
                 jobRecordsProcessor.Object,
                 jobRecordsMonitor.Object,
-                Mock.Of<ITicketing>(), hostApplicationLifetime.Object, new NullLoggerFactory());
+                Mock.Of<ITicketing>(),
+                new OptionsWrapper<GrbApiOptions>(new GrbApiOptions { GrbApiUrl = "https://api-vlaanderen.be/gebouwen/uploads"}),
+                hostApplicationLifetime.Object,
+                new NullLoggerFactory());
 
             buildingGrbContext.Jobs.Add(new Job(DateTimeOffset.Now.AddMinutes(-10), JobStatus.Created));
             buildingGrbContext.Jobs.Add(new Job(DateTimeOffset.Now.AddMinutes(-9), JobStatus.Prepared));
@@ -58,9 +62,12 @@
                 buildingGrbContext,
                 jobRecordsProcessor.Object,
                 jobRecordsMonitor.Object,
-                Mock.Of<ITicketing>(), hostApplicationLifetime.Object, new NullLoggerFactory());
+                Mock.Of<ITicketing>(),
+                new OptionsWrapper<GrbApiOptions>(new GrbApiOptions { GrbApiUrl = "https://api-vlaanderen.be/gebouwen/uploads"}),
+                hostApplicationLifetime.Object,
+                new NullLoggerFactory());
 
-            var firstJob = new Job(DateTimeOffset.Now.AddMinutes(-10), JobStatus.Prepared) { Id = Guid.NewGuid() };
+            var firstJob = new Job(DateTimeOffset.Now.AddMinutes(-10), JobStatus.Prepared, ticketId: Guid.NewGuid()) { Id = Guid.NewGuid() };
             var secondJob = new Job(DateTimeOffset.Now.AddMinutes(-9), JobStatus.Created) { Id = Guid.NewGuid() };
             buildingGrbContext.Jobs.Add(firstJob);
             buildingGrbContext.Jobs.Add(secondJob);
@@ -77,12 +84,16 @@
             await jobProcessor.ExecuteTask;
 
             //assert
-            jobRecordsProcessor.Verify(x => x.Process(It.Is<IEnumerable<JobRecord>>(x => x.First() == jobRecordOfFirstJob), It.IsAny<CancellationToken>()), Times.Once);
-            jobRecordsProcessor.Verify(x => x.Process(It.Is<IEnumerable<JobRecord>>(x => x.First() == jobRecordOfSecondJob), It.IsAny<CancellationToken>()), Times.Never);
+            jobRecordsProcessor.Verify(x =>
+                x.Process(It.Is<IEnumerable<JobRecord>>(y => y.First() == jobRecordOfFirstJob), It.IsAny<CancellationToken>()), Times.Once);
+            jobRecordsProcessor.Verify(x =>
+                x.Process(It.Is<IEnumerable<JobRecord>>(y => y.First() == jobRecordOfSecondJob), It.IsAny<CancellationToken>()), Times.Never);
             firstJob.Status.Should().Be(JobStatus.Completed);
             firstJob.LastChanged.Should().BeAfter(firstJob.Created);
-            jobRecordsMonitor.Verify(x => x.Monitor(It.Is<IEnumerable<JobRecord>>(x => x.First() == jobRecordOfFirstJob), It.IsAny<CancellationToken>()), Times.Once);
-            jobRecordsMonitor.Verify(x => x.Monitor(It.Is<IEnumerable<JobRecord>>(x => x.First() == jobRecordOfSecondJob), It.IsAny<CancellationToken>()), Times.Never);
+            jobRecordsMonitor.Verify(x =>
+                x.Monitor(It.Is<IEnumerable<JobRecord>>(y => y.First() == jobRecordOfFirstJob), It.IsAny<CancellationToken>()), Times.Once);
+            jobRecordsMonitor.Verify(x =>
+                x.Monitor(It.Is<IEnumerable<JobRecord>>(y => y.First() == jobRecordOfSecondJob), It.IsAny<CancellationToken>()), Times.Never);
             hostApplicationLifetime.Verify(x => x.StopApplication(), Times.Once);
         }
 
@@ -103,10 +114,13 @@
                 buildingGrbContext,
                 jobRecordsProcessor.Object,
                 jobRecordsMonitor.Object,
-                Mock.Of<ITicketing>(), hostApplicationLifetime.Object, new NullLoggerFactory());
+                Mock.Of<ITicketing>(),
+                new OptionsWrapper<GrbApiOptions>(new GrbApiOptions { GrbApiUrl = "https://api-vlaanderen.be/gebouwen/uploads"}),
+                hostApplicationLifetime.Object,
+                new NullLoggerFactory());
 
-            var firstJob = new Job(DateTimeOffset.Now.AddMinutes(-10), JobStatus.Prepared) { Id = Guid.NewGuid() };
-            var secondJob = new Job(DateTimeOffset.Now.AddMinutes(-9), JobStatus.Prepared) { Id = Guid.NewGuid() };
+            var firstJob = new Job(DateTimeOffset.Now.AddMinutes(-10), JobStatus.Prepared, ticketId: Guid.NewGuid()) { Id = Guid.NewGuid() };
+            var secondJob = new Job(DateTimeOffset.Now.AddMinutes(-9), JobStatus.Prepared, ticketId: Guid.NewGuid()) { Id = Guid.NewGuid() };
             buildingGrbContext.Jobs.Add(firstJob);
             buildingGrbContext.Jobs.Add(secondJob);
 
@@ -122,16 +136,20 @@
             await jobProcessor.ExecuteTask;
 
             //assert
-            jobRecordsProcessor.Verify(x => x.Process(It.Is<IEnumerable<JobRecord>>(x => x.First() == jobRecordOfFirstJob), It.IsAny<CancellationToken>()), Times.Once);
-            jobRecordsProcessor.Verify(x => x.Process(It.Is<IEnumerable<JobRecord>>(x => x.First() == jobRecordOfSecondJob), It.IsAny<CancellationToken>()), Times.Once);
+            jobRecordsProcessor.Verify(x =>
+                x.Process(It.Is<IEnumerable<JobRecord>>(y => y.First() == jobRecordOfFirstJob), It.IsAny<CancellationToken>()), Times.Once);
+            jobRecordsProcessor.Verify(x =>
+                x.Process(It.Is<IEnumerable<JobRecord>>(y => y.First() == jobRecordOfSecondJob), It.IsAny<CancellationToken>()), Times.Once);
             jobRecordExecutionSequence.First().Should().Be(firstJob.Id);
             jobRecordExecutionSequence.Last().Should().Be(secondJob.Id);
             firstJob.Status.Should().Be(JobStatus.Completed);
             firstJob.LastChanged.Should().BeAfter(firstJob.Created);
             secondJob.Status.Should().Be(JobStatus.Completed);
             secondJob.LastChanged.Should().BeAfter(firstJob.Created);
-            jobRecordsMonitor.Verify(x => x.Monitor(It.Is<IEnumerable<JobRecord>>(x => x.First() == jobRecordOfFirstJob), It.IsAny<CancellationToken>()), Times.Once);
-            jobRecordsMonitor.Verify(x => x.Monitor(It.Is<IEnumerable<JobRecord>>(x => x.First() == jobRecordOfSecondJob), It.IsAny<CancellationToken>()), Times.Once);
+            jobRecordsMonitor.Verify(x =>
+                x.Monitor(It.Is<IEnumerable<JobRecord>>(y => y.First() == jobRecordOfFirstJob), It.IsAny<CancellationToken>()), Times.Once);
+            jobRecordsMonitor.Verify(x =>
+                x.Monitor(It.Is<IEnumerable<JobRecord>>(y => y.First() == jobRecordOfSecondJob), It.IsAny<CancellationToken>()), Times.Once);
             hostApplicationLifetime.Verify(x => x.StopApplication(), Times.Once);
         }
 

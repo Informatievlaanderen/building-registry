@@ -16,10 +16,10 @@
     using TicketingService.Abstractions;
     using Xunit;
 
-    public class GivenCorrectBuildingMeasurement
+    public class GivenApiError
     {
         [Fact]
-        public async Task ThenCorrectBuildingMeasurementRequestIsSent()
+        public async Task ThenJobRecordInError()
         {
             var buildingGrbContext = new FakeBuildingGrbContextFactory().CreateDbContext();
             var ticketing = new Mock<ITicketing>();
@@ -32,7 +32,7 @@
             {
                 JobId = job.Id,
                 Status = JobRecordStatus.Created,
-                EventType = GrbEventType.CorrectBuildingMeasurement,
+                EventType = GrbEventType.ChangeBuildingMeasurement,
                 Geometry = (Polygon)GeometryHelper.ValidPolygon,
                 GrbObject = GrbObject.ArtWork,
                 GrbObjectType = GrbObjectType.MainBuilding,
@@ -44,30 +44,25 @@
             await buildingGrbContext.JobRecords.AddAsync(jobRecord);
             await buildingGrbContext.SaveChangesAsync();
 
-            var ticketId = Guid.NewGuid();
             backOfficeApiProxy
-                .Setup(x => x.CorrectBuildingMeasurement(
+                .Setup(x => x.ChangeBuildingMeasurement(
                     jobRecord.GrId,
-                    It.Is<CorrectBuildingMeasurementRequest>(y => y.GrbData.Idn == jobRecord.Idn),
+                    It.Is<ChangeBuildingMeasurementRequest>(y => y.GrbData.Idn == jobRecord.Idn),
                     It.IsAny<CancellationToken>()))
-                .ReturnsAsync(new BackOfficeApiResult($"https://ticketing.be/{ticketId}", new List<ValidationError>()));
+                .ReturnsAsync(new BackOfficeApiResult(string.Empty, new List<ValidationError>{new ValidationError("error1", "reason1")}));
 
             var jobRecordsProcessor = new JobRecordsProcessor(
                 buildingGrbContext,
-                backOfficeApiProxy.Object, Mock.Of<IErrorWarningEvaluator>());
+                backOfficeApiProxy.Object,
+                new ErrorWarningEvaluator());
 
             //act
             await jobRecordsProcessor.Process(new List<JobRecord> { jobRecord }, CancellationToken.None);
 
             //assert
-            backOfficeApiProxy.Verify(x => x.CorrectBuildingMeasurement(
-                    jobRecord.GrId,
-                    It.Is<CorrectBuildingMeasurementRequest>(y => y.GrbData.Idn == jobRecord.Idn),
-                    It.IsAny<CancellationToken>()),
-                Times.Once);
             var jobRecordEntity = buildingGrbContext.JobRecords.First(x => x.Id == jobRecord.Id);
-            jobRecordEntity.Status.Should().Be(JobRecordStatus.Pending);
-            jobRecordEntity.TicketId.Should().Be(ticketId);
+            jobRecordEntity.Status.Should().Be(JobRecordStatus.Error);
+            jobRecordEntity.ErrorMessage.Should().Be("reason1");
         }
     }
 }

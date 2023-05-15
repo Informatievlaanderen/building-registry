@@ -13,30 +13,27 @@
 
     public interface IJobRecordsMonitor
     {
-        Task Monitor(IEnumerable<JobRecord> jobRecords, CancellationToken cancellationToken);
+        Task Monitor(IEnumerable<JobRecord> jobRecords, CancellationToken ct);
     }
 
     public class JobRecordsMonitor : IJobRecordsMonitor
     {
         private readonly BuildingGrbContext _buildingGrbContext;
         private readonly ITicketing _ticketing;
+        private readonly IErrorWarningEvaluator _errorWarningEvaluator;
 
         public JobRecordsMonitor(
             BuildingGrbContext buildingGrbContext,
-            ITicketing ticketing)
+            ITicketing ticketing,
+            IErrorWarningEvaluator errorWarningEvaluator)
         {
             _buildingGrbContext = buildingGrbContext;
             _ticketing = ticketing;
+            _errorWarningEvaluator = errorWarningEvaluator;
         }
 
-        public async Task Monitor(IEnumerable<JobRecord> jobRecords, CancellationToken cancellationToken)
+        public async Task Monitor(IEnumerable<JobRecord> jobRecords, CancellationToken ct)
         {
-            // loop over pending tickets
-            // poll ticket status
-            // complete
-            // error
-            // warning
-
             var pendingJobRecords = jobRecords.Where(x => x.Status == JobRecordStatus.Pending).ToList();
             while (pendingJobRecords.Any())
             {
@@ -58,7 +55,10 @@
                                 jobRecord.Status = JobRecordStatus.Complete;
                                 break;
                             case TicketStatus.Error:
-                                // error or warning?
+                                var ticketError = JsonConvert.DeserializeObject<TicketError>(ticket.Result.ResultAsJson);
+                                var evaluation = _errorWarningEvaluator.Evaluate(ticketError);
+                                jobRecord.Status = evaluation.jobRecordStatus;
+                                jobRecord.ErrorMessage = evaluation.message;
                                 break;
                             default:
                                 throw new ArgumentOutOfRangeException();
@@ -68,6 +68,10 @@
                     });
 
                 pendingJobRecords = pendingJobRecords.Where(x => x.Status == JobRecordStatus.Pending).ToList();
+                if (pendingJobRecords.Any())
+                {
+                    await Task.Delay(TimeSpan.FromSeconds(5), ct);
+                }
             }
         }
     }

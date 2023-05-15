@@ -8,6 +8,7 @@
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Hosting;
     using Microsoft.Extensions.Logging;
+    using Microsoft.Extensions.Options;
     using TicketingService.Abstractions;
 
     public sealed class JobProcessor : BackgroundService
@@ -16,20 +17,24 @@
         private readonly IJobRecordsProcessor _jobRecordsProcessor;
         private readonly IJobRecordsMonitor _jobRecordsMonitor;
         private readonly ITicketing _ticketing;
+        private readonly GrbApiOptions _grbApiOptions;
         private readonly IHostApplicationLifetime _hostApplicationLifetime;
         private readonly ILogger<JobProcessor> _logger;
 
-        public JobProcessor(BuildingGrbContext buildingGrbContext,
+        public JobProcessor(
+            BuildingGrbContext buildingGrbContext,
             IJobRecordsProcessor jobRecordsProcessor,
             IJobRecordsMonitor jobRecordsMonitor,
             ITicketing ticketing,
+            IOptions<GrbApiOptions> grbApiOptions,
             IHostApplicationLifetime hostApplicationLifetime,
             ILoggerFactory loggerFactory)
         {
             _buildingGrbContext = buildingGrbContext;
-            _ticketing = ticketing;
             _jobRecordsProcessor = jobRecordsProcessor;
             _jobRecordsMonitor = jobRecordsMonitor;
+            _ticketing = ticketing;
+            _grbApiOptions = grbApiOptions.Value;
             _hostApplicationLifetime = hostApplicationLifetime;
             _logger = loggerFactory.CreateLogger<JobProcessor>();
         }
@@ -40,7 +45,7 @@
 
             // Monitor Job, start in sequence
             // Process Job Records
-            // Process Job Records tickets
+            // Monitor Job Records tickets
             // Create result set
             // Archive Job
             _logger.LogInformation("JobProcessor started");
@@ -80,10 +85,36 @@
                 await _jobRecordsProcessor.Process(jobRecords, stoppingToken);
                 await _jobRecordsMonitor.Monitor(jobRecords, stoppingToken);
 
+                if (jobRecords.Any(x => x.Status == JobRecordStatus.Error))
+                {
+                    job.UpdateStatus(JobStatus.Error);
+                    await _buildingGrbContext.SaveChangesAsync(stoppingToken);
+                }
+                else
+                {
+                    foreach (var jobRecord in jobRecords.Where(x => x.Status is JobRecordStatus.Complete or JobRecordStatus.Warning))
+                    {
+                        var jobResult = new JobResult
+                        {
+                            // BuildingPersistentLocalId = jobRecord.BuildingPersistentLocalId // Can be null when warning. E.g. gebouw is verwijderd
+                            GrbIdn = (int)jobRecord.Idn,
+                            IsBuildingCreated = jobRecord.EventType == GrbEventType.DefineBuilding,
+                            JobId = jobRecord.JobId
+                        };
+                        _buildingGrbContext.JobResults.Add(jobResult);
+                    }
 
-                // Todo: if result has errors -> place job in error with error message
-                // Todo: update ticket with result location
-                job.UpdateStatus(JobStatus.Completed);
+                    job.UpdateStatus(JobStatus.Completed);
+                    await _buildingGrbContext.SaveChangesAsync(stoppingToken);
+
+                    await _ticketing.Complete(
+                        job.TicketId!.Value,
+                        new TicketResult(new
+                        {
+                            JobResultLocation = new Uri(new Uri(_grbApiOptions.GrbApiUrl), $"/uploads/jobs/{job.Id}").ToString()
+                        }),
+                        stoppingToken);
+                }
             }
 
             _hostApplicationLifetime.StopApplication();
