@@ -61,7 +61,7 @@
                                 jobRecord.ErrorMessage = evaluation.message;
                                 break;
                             default:
-                                throw new ArgumentOutOfRangeException();
+                                throw new ArgumentOutOfRangeException(nameof(TicketStatus), ticket.Status, null);
                         }
 
                         await _buildingGrbContext.SaveChangesAsync(innerCt);
