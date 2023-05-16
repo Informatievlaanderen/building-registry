@@ -4,9 +4,12 @@ namespace BuildingRegistry.Grb.Processor.Job.Infrastructure
     using System.IO;
     using System.Threading.Tasks;
     using Abstractions;
+    using Amazon.S3;
     using Autofac;
     using Autofac.Extensions.DependencyInjection;
     using Be.Vlaanderen.Basisregisters.Aws.DistributedMutex;
+    using Be.Vlaanderen.Basisregisters.BlobStore;
+    using Be.Vlaanderen.Basisregisters.BlobStore.Aws;
     using Be.Vlaanderen.Basisregisters.DataDog.Tracing.Autofac;
     using Be.Vlaanderen.Basisregisters.DataDog.Tracing.Sql.EntityFrameworkCore;
     using Destructurama;
@@ -90,6 +93,12 @@ namespace BuildingRegistry.Grb.Processor.Job.Infrastructure
                         .RegisterModule(new DataDogModule(hostContext.Configuration))
                         .RegisterModule(new BuildingGrbModule(hostContext.Configuration, services, loggerFactory))
                         .RegisterModule(new TicketingModule(hostContext.Configuration, services));
+
+                    builder
+                        .Register(c =>
+                            new S3BlobClient(new AmazonS3Client(), hostContext.Configuration["JobResultBucketName"]))
+                        .As<IBlobClient>()
+                        .SingleInstance();
 
                     builder.RegisterType<BackOfficeApiProxy>()
                         .As<IBackOfficeApiProxy>()

@@ -17,6 +17,7 @@
         private readonly IJobRecordsProcessor _jobRecordsProcessor;
         private readonly IJobRecordsMonitor _jobRecordsMonitor;
         private readonly ITicketing _ticketing;
+        private readonly IJobResultUploader _jobResultUploader;
         private readonly GrbApiOptions _grbApiOptions;
         private readonly IHostApplicationLifetime _hostApplicationLifetime;
         private readonly ILogger<JobProcessor> _logger;
@@ -25,6 +26,7 @@
             BuildingGrbContext buildingGrbContext,
             IJobRecordsProcessor jobRecordsProcessor,
             IJobRecordsMonitor jobRecordsMonitor,
+            IJobResultUploader jobResultUploader,
             ITicketing ticketing,
             IOptions<GrbApiOptions> grbApiOptions,
             IHostApplicationLifetime hostApplicationLifetime,
@@ -34,6 +36,7 @@
             _jobRecordsProcessor = jobRecordsProcessor;
             _jobRecordsMonitor = jobRecordsMonitor;
             _ticketing = ticketing;
+            _jobResultUploader = jobResultUploader;
             _grbApiOptions = grbApiOptions.Value;
             _hostApplicationLifetime = hostApplicationLifetime;
             _logger = loggerFactory.CreateLogger<JobProcessor>();
@@ -43,15 +46,10 @@
         {
             const int maxLifeTimeJob = 65;
 
-            // Monitor Job, start in sequence
-            // Process Job Records
-            // Monitor Job Records tickets
-            // Create result set
-            // Archive Job
             _logger.LogInformation("JobProcessor started");
 
             // Check for jobs with status prepared
-            var inactiveJobStatuses = new JobStatus[] { JobStatus.Completed, JobStatus.Cancelled };
+            var inactiveJobStatuses = new JobStatus[] {JobStatus.Completed, JobStatus.Cancelled};
             var jobsToProcess = _buildingGrbContext.Jobs
                 .Where(x => !inactiveJobStatuses.Contains(x.Status))
                 .OrderBy(x => x.Created);
@@ -71,7 +69,8 @@
 
                 if (job.Status is JobStatus.Preparing or JobStatus.Error)
                 {
-                    _logger.LogWarning("Job '{jobId}' cannot be processed because it has status '{jobStatus}'.", job.Id, job.Status);
+                    _logger.LogWarning("Job '{jobId}' cannot be processed because it has status '{jobStatus}'.", job.Id,
+                        job.Status);
                     break;
                 }
 
@@ -99,16 +98,18 @@
                         job.TicketId!.Value,
                         new TicketResult(new
                         {
-                            JobResultLocation = new Uri(new Uri(_grbApiOptions.GrbApiUrl), $"/uploads/jobs/{job.Id}").ToString()
+                            JobResultLocation = new Uri(new Uri(_grbApiOptions.GrbApiUrl), $"/uploads/jobs/{job.Id}")
+                                .ToString()
                         }),
                         stoppingToken);
 
-                    foreach (var jobRecord in jobRecords.Where(x => x.Status is JobRecordStatus.Complete or JobRecordStatus.Warning))
+                    foreach (var jobRecord in jobRecords.Where(x =>
+                                 x.Status is JobRecordStatus.Complete or JobRecordStatus.Warning))
                     {
                         var jobResult = new JobResult
                         {
                             BuildingPersistentLocalId = jobRecord.BuildingPersistentLocalId ?? jobRecord.GrId,
-                            GrbIdn = (int)jobRecord.Idn,
+                            GrbIdn = (int) jobRecord.Idn,
                             IsBuildingCreated = jobRecord.EventType == GrbEventType.DefineBuilding,
                             JobId = jobRecord.JobId
                         };
@@ -117,7 +118,9 @@
 
                     await _buildingGrbContext.SaveChangesAsync(stoppingToken);
 
-                    // stream new records in dbf als zip naar s3
+                    await _jobResultUploader.UploadJob(job, stoppingToken);
+
+
                     // in one transaction add records to archiveJobRecords & remove job records (w dapper)
                 }
             }

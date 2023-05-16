@@ -34,6 +34,14 @@ namespace BuildingRegistry.Api.Grb.Uploads
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = PolicyNames.IngemetenGebouw.GrbBijwerker)]
         public async Task<IActionResult> GetResult(Guid jobId, CancellationToken cancellationToken)
         {
+            // todo: replace with s3 redirect to download resultset zipfile
+            return Ok();
+        }
+
+        [HttpPost("jobs/{jobId:guid}/result")]
+        public async Task<IActionResult> CreateResult(Guid jobId, CancellationToken cancellationToken)
+        {
+            // create file from resultset
             return (await _mediator.Send(new GetJobResultRequest(jobId), cancellationToken))
                 .CreateFileCallbackResult(cancellationToken);
         }
