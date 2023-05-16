@@ -51,7 +51,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.Building
             }
             catch (IdempotencyException)
             {
-                throw new GrbIdempotencyException();
+                // Idempotent: Do Nothing return last etag
             }
 
             await _backOfficeContext.RemoveBuildingUnitAddressRelations(cmd.BuildingPersistentLocalId, cancellationToken);
@@ -66,8 +66,6 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.Building
             {
                 BuildingHasInvalidStatusException => ValidationErrors.DemolishBuilding.BuildingInvalidStatus.ToTicketError(),
                 BuildingHasInvalidGeometryMethodException => ValidationErrors.DemolishBuilding.InvalidGeometryMethod.ToTicketError(),
-
-                GrbIdempotencyException => ValidationErrors.CommonGrb.Idempotency.ToTicketError(),
                 _ => null
             };
         }

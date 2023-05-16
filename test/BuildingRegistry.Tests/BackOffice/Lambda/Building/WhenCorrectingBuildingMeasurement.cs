@@ -137,19 +137,13 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
             await handler.Handle(request, CancellationToken.None);
 
             //Assert
-            // ticketing.Verify(x =>
-            //     x.Complete(
-            //         It.IsAny<Guid>(),
-            //         new TicketResult(
-            //             new ETagResponse(
-            //                 string.Format(ConfigDetailUrl, buildingPersistentLocalId),
-            //                 building.LastEventHash)),
-            //         CancellationToken.None));
-
             ticketing.Verify(x =>
-                x.Error(
+                x.Complete(
                     It.IsAny<Guid>(),
-                    new TicketError(string.Empty, "Idempotency"),
+                    new TicketResult(
+                        new ETagResponse(
+                            string.Format(ConfigDetailUrl, buildingPersistentLocalId),
+                            building.LastEventHash)),
                     CancellationToken.None));
         }
 

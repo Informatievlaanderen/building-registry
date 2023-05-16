@@ -42,7 +42,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.Building
             }
             catch (IdempotencyException)
             {
-                throw new GrbIdempotencyException();
+                // Idempotent: Do Nothing return last etag
             }
 
             var lastHash = await GetHash(new BuildingPersistentLocalId(request.BuildingPersistentLocalId), cancellationToken);
@@ -55,8 +55,6 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.Building
             {
                 BuildingHasInvalidStatusException => ValidationErrors.ChangeBuildingMeasurement.BuildingInvalidStatus.ToTicketError(),
                 BuildingHasInvalidGeometryMethodException => ValidationErrors.ChangeBuildingMeasurement.BuildingIsOutlined.ToTicketError(),
-
-                GrbIdempotencyException => ValidationErrors.CommonGrb.Idempotency.ToTicketError(),
                 _ => null
             };
         }

@@ -72,6 +72,13 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
         {
             // Arrange
             var ticketing = new Mock<ITicketing>();
+            var buildingPersistentLocalId = Fixture.Create<BuildingPersistentLocalId>();
+            var buildings = Container.Resolve<IBuildings>();
+
+            PlanBuilding(buildingPersistentLocalId);
+
+            var building =
+                await buildings.GetAsync(new BuildingStreamId(buildingPersistentLocalId), CancellationToken.None);
 
             var handler = new ChangeBuildingMeasurementLambdaHandler(
                 Container.Resolve<IConfiguration>(),
@@ -85,11 +92,12 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
 
             //Assert
             ticketing.Verify(x =>
-                x.Error(
+                x.Complete(
                     It.IsAny<Guid>(),
-                    new TicketError(
-                        "",
-                        "Idempotency"),
+                    new TicketResult(
+                        new ETagResponse(
+                            string.Format(ConfigDetailUrl, buildingPersistentLocalId),
+                            building.LastEventHash)),
                     CancellationToken.None));
         }
 

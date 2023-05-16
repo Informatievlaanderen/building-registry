@@ -17,7 +17,6 @@
     {
         public static readonly IReadOnlyCollection<string> Warnings = new[]
         {
-            "Idempotency",
             "VerwijderdGebouw"
         };
 

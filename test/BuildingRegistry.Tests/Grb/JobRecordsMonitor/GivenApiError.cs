@@ -61,7 +61,7 @@
                 .Setup(x => x.Get(jobRecord.TicketId!.Value, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new Ticket(jobRecord.TicketId!.Value, TicketStatus.Error,
                     new Dictionary<string, string>(),
-                    new TicketResult(new TicketError("message", "Idempotency"))));
+                    new TicketResult(new TicketError("message", "VerwijderdGebouw"))));
 
             var monitor = new JobRecordsMonitor(buildingGrbContext, ticketing.Object, new ErrorWarningEvaluator());
 

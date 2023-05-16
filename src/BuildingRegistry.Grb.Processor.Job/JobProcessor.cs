@@ -92,18 +92,6 @@
                 }
                 else
                 {
-                    foreach (var jobRecord in jobRecords.Where(x => x.Status is JobRecordStatus.Complete or JobRecordStatus.Warning))
-                    {
-                        var jobResult = new JobResult
-                        {
-                            // BuildingPersistentLocalId = jobRecord.BuildingPersistentLocalId // Can be null when warning. E.g. gebouw is verwijderd
-                            GrbIdn = (int)jobRecord.Idn,
-                            IsBuildingCreated = jobRecord.EventType == GrbEventType.DefineBuilding,
-                            JobId = jobRecord.JobId
-                        };
-                        _buildingGrbContext.JobResults.Add(jobResult);
-                    }
-
                     job.UpdateStatus(JobStatus.Completed);
                     await _buildingGrbContext.SaveChangesAsync(stoppingToken);
 
@@ -114,6 +102,23 @@
                             JobResultLocation = new Uri(new Uri(_grbApiOptions.GrbApiUrl), $"/uploads/jobs/{job.Id}").ToString()
                         }),
                         stoppingToken);
+
+                    foreach (var jobRecord in jobRecords.Where(x => x.Status is JobRecordStatus.Complete or JobRecordStatus.Warning))
+                    {
+                        var jobResult = new JobResult
+                        {
+                            BuildingPersistentLocalId = jobRecord.BuildingPersistentLocalId ?? jobRecord.GrId,
+                            GrbIdn = (int)jobRecord.Idn,
+                            IsBuildingCreated = jobRecord.EventType == GrbEventType.DefineBuilding,
+                            JobId = jobRecord.JobId
+                        };
+                        _buildingGrbContext.JobResults.Add(jobResult);
+                    }
+
+                    await _buildingGrbContext.SaveChangesAsync(stoppingToken);
+
+                    // stream new records in dbf als zip naar s3
+                    // in one transaction add records to archiveJobRecords & remove job records (w dapper)
                 }
             }
 

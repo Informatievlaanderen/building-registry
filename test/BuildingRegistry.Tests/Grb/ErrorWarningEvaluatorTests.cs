@@ -32,7 +32,6 @@ public class ErrorWarningEvaluatorTests
 ;    }
 
     [Theory]
-    [InlineData("Idempotency", "idempotency message")]
     [InlineData("VerwijderdGebouw", "verwijderdeGebouw message")]
     public void GivenOnlyWarningsInValidationErrors_ThenOutputWarning(string code, string message)
     {
@@ -87,7 +86,6 @@ public class ErrorWarningEvaluatorTests
     }
 
     [Theory]
-    [InlineData("Idempotency", "idempotency message")]
     [InlineData("VerwijderdGebouw", "verwijderdeGebouw message")]
     public void GivenWarningInTicketError_ThenOutputWarning(string code, string message)
     {

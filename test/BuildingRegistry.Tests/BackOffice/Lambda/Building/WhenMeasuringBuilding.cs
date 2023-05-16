@@ -136,9 +136,12 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
 
             //Assert
             ticketing.Verify(x =>
-                x.Error(
+                x.Complete(
                     It.IsAny<Guid>(),
-                    new TicketError(string.Empty, "Idempotency"),
+                    new TicketResult(
+                        new ETagResponse(
+                            string.Format(ConfigDetailUrl, buildingPersistentLocalId),
+                            building.LastEventHash)),
                     CancellationToken.None));
         }
 
