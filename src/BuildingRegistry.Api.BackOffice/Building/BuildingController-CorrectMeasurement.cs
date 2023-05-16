@@ -27,7 +27,7 @@ namespace BuildingRegistry.Api.BackOffice.Building
         /// <param name="cancellationToken"></param>
         /// <response code="202">Als het ticket succesvol is aangemaakt.</response>
         /// <returns></returns>
-        [HttpPost("{persistentLocalId}/acties/inmeten")]
+        [HttpPost("{persistentLocalId}/acties/corrigeren/ingemetengeometriepolygoon")]
         [ProducesResponseType(StatusCodes.Status202Accepted)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]

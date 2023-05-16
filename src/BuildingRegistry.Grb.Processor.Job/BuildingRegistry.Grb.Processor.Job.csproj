@@ -17,6 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\BuildingRegistry.Api.BackOffice.Abstractions\BuildingRegistry.Api.BackOffice.Abstractions.csproj" />
     <ProjectReference Include="..\BuildingRegistry.Grb.Abstractions\BuildingRegistry.Grb.Abstractions.csproj" />
     <ProjectReference Include="..\BuildingRegistry.Infrastructure\BuildingRegistry.Infrastructure.csproj" />
   </ItemGroup>

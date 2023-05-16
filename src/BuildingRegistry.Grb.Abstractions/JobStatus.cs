@@ -2,8 +2,7 @@ namespace BuildingRegistry.Grb.Abstractions
 {
     public enum JobStatus
     {
-        Unknown = 0,
-        Created,
+        Created = 1,
         Preparing,
         Prepared,
         Processing,

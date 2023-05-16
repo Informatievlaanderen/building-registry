@@ -44,7 +44,7 @@
         {
             // Arrange
             var job = _fixture.Create<Job>();
-            job.Status = JobStatus.Prepared;
+            job.UpdateStatus(JobStatus.Prepared);
             _fakeBuildingGrbContext.Jobs.Add(job);
 
             var request = new CancelJobRequest(job.Id);
@@ -67,7 +67,7 @@
         {
             // Arrange
             var job = _fixture.Create<Job>();
-            job.Status = JobStatus.Created;
+            job.UpdateStatus(JobStatus.Created);
             _fakeBuildingGrbContext.Jobs.Add(job);
 
             var request = new CancelJobRequest(job.Id);

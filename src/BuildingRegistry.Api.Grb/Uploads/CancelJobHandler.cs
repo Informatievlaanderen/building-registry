@@ -24,11 +24,17 @@
             var job = await _buildingGrbContext.Jobs.FindAsync(new object[] { request.JobId }, cancellationToken);
 
             if (job is null)
+            {
                 throw new ApiException($"Upload job with id {request.JobId} not found.", StatusCodes.Status404NotFound);
-            if(job.Status != JobStatus.Created)
-                throw new ApiException($"Upload job with id {request.JobId} is being processed and cannot be cancelled.", StatusCodes.Status400BadRequest);
+            }
+            if (job.Status != JobStatus.Created)
+            {
+                throw new ApiException(
+                    $"Upload job with id {request.JobId} is being processed and cannot be cancelled.",
+                    StatusCodes.Status400BadRequest);
+            }
 
-            job.Status = JobStatus.Cancelled;
+            job.UpdateStatus(JobStatus.Cancelled);
             await _buildingGrbContext.SaveChangesAsync(cancellationToken);
         }
     }

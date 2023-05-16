@@ -1,4 +1,4 @@
-﻿namespace BuildingRegistry.Tests.Grb;
+﻿namespace BuildingRegistry.Tests.Grb.UploadProcessor;
 
 using Xunit;
 

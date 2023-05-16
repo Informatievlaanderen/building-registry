@@ -1,4 +1,4 @@
-﻿namespace BuildingRegistry.Tests.Grb
+﻿namespace BuildingRegistry.Tests.Grb.UploadProcessor
 {
     using System;
     using System.IO;
@@ -10,26 +10,22 @@
     using BuildingRegistry.Grb.Abstractions;
     using BuildingRegistry.Grb.Processor.Upload;
     using BuildingRegistry.Grb.Processor.Upload.Zip;
-    using FluentAssertions;
     using Handlers;
+    using FluentAssertions;
     using Microsoft.Extensions.Hosting;
     using Microsoft.Extensions.Logging.Abstractions;
     using Microsoft.Extensions.Options;
-    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Moq;
     using TicketingService.Abstractions;
     using Xunit;
     using Task = System.Threading.Tasks.Task;
 
-    [Collection(ZipArchiveCollectionFixture.COLLECTION)]
     public class UploadProcessorTests
     {
-        private readonly ZipArchiveFixture _fixture;
         private readonly FakeBuildingGrbContext _buildingGrbContext;
 
-        public UploadProcessorTests(ZipArchiveFixture fixture)
+        public UploadProcessorTests()
         {
-            _fixture = fixture;
             _buildingGrbContext = new FakeBuildingGrbContextFactory().CreateDbContext();
         }
 
@@ -59,7 +55,7 @@
                     blobName,
                     null,
                     ContentType.Parse("X-multipart/abc"),
-                    _  => Task.FromResult((Stream)new FileStream($"{AppContext.BaseDirectory}/Grb/gebouw_ALL.zip", FileMode.Open, FileAccess.Read))));
+                    _  => Task.FromResult((Stream)new FileStream($"{AppContext.BaseDirectory}/Grb/UploadProcessor/gebouw_ALL.zip", FileMode.Open, FileAccess.Read))));
 
             mockAmazonClient
                 .Setup(x => x.StartTaskAsync(It.IsAny<StartTaskRequest>(), It.IsAny<CancellationToken>()))
@@ -188,7 +184,7 @@
                 .Setup(x => x.BlobExistsAsync(blobName, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(true);
 
-            var zipFileStream = new FileStream($"{AppContext.BaseDirectory}/Grb/gebouw_dbf_missing.zip", FileMode.Open, FileAccess.Read);
+            var zipFileStream = new FileStream($"{AppContext.BaseDirectory}/Grb/UploadProcessor/gebouw_dbf_missing.zip", FileMode.Open, FileAccess.Read);
 
             mockIBlobClient
                 .Setup(x => x.GetBlobAsync(blobName, It.IsAny<CancellationToken>()))

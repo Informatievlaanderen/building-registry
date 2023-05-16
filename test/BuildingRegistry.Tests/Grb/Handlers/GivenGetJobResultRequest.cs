@@ -45,7 +45,7 @@
         {
             // Arrange
             var job = _fixture.Create<Job>();
-            job.Status = JobStatus.Prepared;
+            job.UpdateStatus(JobStatus.Prepared);
             _fakeBuildingGrbContext.Jobs.Add(job);
 
             var request = new GetJobResultRequest(job.Id);
@@ -68,7 +68,7 @@
         {
             // Arrange
             var job = _fixture.Create<Job>();
-            job.Status = JobStatus.Completed;
+            job.UpdateStatus(JobStatus.Completed);
             _fakeBuildingGrbContext.Jobs.Add(job);
 
             _fixture.Register(() => job.Id);

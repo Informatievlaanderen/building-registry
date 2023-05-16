@@ -22,7 +22,7 @@ namespace BuildingRegistry.Grb.Abstractions
         public Polygon Geometry { get; set; }
         public decimal? Overlap { get; set; }
 
-        public string? TicketUrl { get; set; }
+        public Guid? TicketId { get; set; }
         public JobRecordStatus Status { get; set; }
         public string? ErrorMessage { get; set; }
         public int? BuildingPersistentLocalId { get; set; }
@@ -59,7 +59,7 @@ namespace BuildingRegistry.Grb.Abstractions
             builder.Property(x => x.Overlap)
                 .HasPrecision(8, 5);
 
-            builder.Property(x => x.TicketUrl);
+            builder.Property(x => x.TicketId);
             builder.Property(x => x.Status);
             builder.Property(x => x.ErrorMessage);
             builder.Property(x => x.BuildingPersistentLocalId);
