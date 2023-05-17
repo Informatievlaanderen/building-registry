@@ -20,12 +20,12 @@
     {
         private readonly BuildingGrbContext _buildingGrbContext;
         private readonly ITicketing _ticketing;
-        private readonly IErrorWarningEvaluator _errorWarningEvaluator;
+        private readonly ErrorWarningEvaluator _errorWarningEvaluator;
 
         public JobRecordsMonitor(
             BuildingGrbContext buildingGrbContext,
             ITicketing ticketing,
-            IErrorWarningEvaluator errorWarningEvaluator)
+            ErrorWarningEvaluator errorWarningEvaluator)
         {
             _buildingGrbContext = buildingGrbContext;
             _ticketing = ticketing;

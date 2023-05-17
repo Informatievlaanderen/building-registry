@@ -22,7 +22,6 @@
         public async Task ThenChangeBuildingMeasurementRequestIsSent()
         {
             var buildingGrbContext = new FakeBuildingGrbContextFactory().CreateDbContext();
-            var ticketing = new Mock<ITicketing>();
             var backOfficeApiProxy = new Mock<IBackOfficeApiProxy>();
 
             var job = new Job(DateTimeOffset.Now, JobStatus.Prepared, Guid.NewGuid());
@@ -54,7 +53,7 @@
 
             var jobRecordsProcessor = new JobRecordsProcessor(
                 buildingGrbContext,
-                backOfficeApiProxy.Object, Mock.Of<IErrorWarningEvaluator>());
+                backOfficeApiProxy.Object, new ErrorWarningEvaluator());
 
             //act
             await jobRecordsProcessor.Process(new List<JobRecord> { jobRecord }, CancellationToken.None);

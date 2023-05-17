@@ -36,11 +36,10 @@
             jobResultsZipArchive.WriteTo(stream, ct);
 
             var metadata = Metadata.None.Add(
-                new KeyValuePair<MetadataKey, string>(new MetadataKey("filename"),
-                    jobResultsZipArchive.Name));
+                new KeyValuePair<MetadataKey, string>(new MetadataKey("filename"), jobResultsZipArchive.Name));
 
             await _blobClient.CreateBlobAsync(
-                new BlobName($"jobresults/{job.BlobName}"),
+                new BlobName(Job.JobResultsBlobName(job.Id)),
                 metadata,
                 ContentType.Parse("application/zip"),
                 stream,

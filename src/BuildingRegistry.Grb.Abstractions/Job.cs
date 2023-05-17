@@ -14,6 +14,8 @@
 
         public string BlobName => $"upload_{Id:D}";
 
+        public static string JobResultsBlobName(Guid id) => $"jobresults/{id:D}";
+
         private Job() { }
 
         public Job(DateTimeOffset created, JobStatus status, Guid? ticketId = null)

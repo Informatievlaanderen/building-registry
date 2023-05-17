@@ -15,7 +15,7 @@ namespace BuildingRegistry.Api.Grb.Infrastructure.Modules
                 .InstancePerLifetimeScope();
 
             builder
-                .RegisterAssemblyTypes(typeof(PreSignedUrlHandler).Assembly)
+                .RegisterAssemblyTypes(typeof(UploadPreSignedUrlHandler).Assembly)
                 .Where(t => t
                     .GetInterfaces()
                     .Any(i => i.IsGenericType

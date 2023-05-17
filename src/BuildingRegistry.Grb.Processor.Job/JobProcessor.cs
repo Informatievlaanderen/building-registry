@@ -18,6 +18,7 @@
         private readonly IJobRecordsMonitor _jobRecordsMonitor;
         private readonly ITicketing _ticketing;
         private readonly IJobResultUploader _jobResultUploader;
+        private readonly IJobRecordsArchiver _jobRecordsArchiver;
         private readonly GrbApiOptions _grbApiOptions;
         private readonly IHostApplicationLifetime _hostApplicationLifetime;
         private readonly ILogger<JobProcessor> _logger;
@@ -27,6 +28,7 @@
             IJobRecordsProcessor jobRecordsProcessor,
             IJobRecordsMonitor jobRecordsMonitor,
             IJobResultUploader jobResultUploader,
+            IJobRecordsArchiver jobRecordsArchiver,
             ITicketing ticketing,
             IOptions<GrbApiOptions> grbApiOptions,
             IHostApplicationLifetime hostApplicationLifetime,
@@ -37,6 +39,7 @@
             _jobRecordsMonitor = jobRecordsMonitor;
             _ticketing = ticketing;
             _jobResultUploader = jobResultUploader;
+            _jobRecordsArchiver = jobRecordsArchiver;
             _grbApiOptions = grbApiOptions.Value;
             _hostApplicationLifetime = hostApplicationLifetime;
             _logger = loggerFactory.CreateLogger<JobProcessor>();
@@ -91,21 +94,10 @@
                 }
                 else
                 {
-                    job.UpdateStatus(JobStatus.Completed);
-                    await _buildingGrbContext.SaveChangesAsync(stoppingToken);
-
-                    await _ticketing.Complete(
-                        job.TicketId!.Value,
-                        new TicketResult(new
-                        {
-                            JobResultLocation = new Uri(new Uri(_grbApiOptions.GrbApiUrl), $"/uploads/jobs/{job.Id}")
-                                .ToString()
-                        }),
-                        stoppingToken);
-
                     foreach (var jobRecord in jobRecords.Where(x =>
                                  x.Status is JobRecordStatus.Complete or JobRecordStatus.Warning))
                     {
+                        // Check if jobresult exsits before adding it
                         var jobResult = new JobResult
                         {
                             BuildingPersistentLocalId = jobRecord.BuildingPersistentLocalId ?? jobRecord.GrId,
@@ -120,8 +112,19 @@
 
                     await _jobResultUploader.UploadJob(job, stoppingToken);
 
+                    await _ticketing.Complete(
+                        job.TicketId!.Value,
+                        new TicketResult(new
+                        {
+                            JobResultLocation = new Uri(new Uri(_grbApiOptions.GrbApiUrl), $"/uploads/jobs/{job.Id}")
+                                .ToString()
+                        }),
+                        stoppingToken);
 
-                    // in one transaction add records to archiveJobRecords & remove job records (w dapper)
+                    job.UpdateStatus(JobStatus.Completed);
+                    await _buildingGrbContext.SaveChangesAsync(stoppingToken);
+
+                    _jobRecordsArchiver.Archive(job.Id);
                 }
             }
 

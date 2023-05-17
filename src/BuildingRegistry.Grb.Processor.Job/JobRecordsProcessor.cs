@@ -26,12 +26,12 @@
     {
         private readonly BuildingGrbContext _buildingGrbContext;
         private readonly IBackOfficeApiProxy _backOfficeApiProxy;
-        private readonly IErrorWarningEvaluator _errorWarningEvaluator;
+        private readonly ErrorWarningEvaluator _errorWarningEvaluator;
 
         public JobRecordsProcessor(
             BuildingGrbContext buildingGrbContext,
             IBackOfficeApiProxy backOfficeApiProxy,
-            IErrorWarningEvaluator errorWarningEvaluator)
+            ErrorWarningEvaluator errorWarningEvaluator)
         {
             _buildingGrbContext = buildingGrbContext;
             _backOfficeApiProxy = backOfficeApiProxy;

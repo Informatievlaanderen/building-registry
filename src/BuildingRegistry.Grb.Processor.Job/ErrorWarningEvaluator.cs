@@ -7,13 +7,7 @@
     using Be.Vlaanderen.Basisregisters.BasicApiProblem;
     using TicketingService.Abstractions;
 
-    public interface IErrorWarningEvaluator
-    {
-        (JobRecordStatus jobRecordStatus, string message) Evaluate(IEnumerable<ValidationError> validationErrors);
-        (JobRecordStatus jobRecordStatus, string message) Evaluate(TicketError ticketError);
-    }
-
-    public class ErrorWarningEvaluator : IErrorWarningEvaluator
+    public class ErrorWarningEvaluator
     {
         public static readonly IReadOnlyCollection<string> Warnings = new[]
         {

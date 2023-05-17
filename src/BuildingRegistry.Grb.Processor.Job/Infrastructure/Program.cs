@@ -96,7 +96,7 @@ namespace BuildingRegistry.Grb.Processor.Job.Infrastructure
 
                     builder
                         .Register(c =>
-                            new S3BlobClient(new AmazonS3Client(), hostContext.Configuration["JobResultBucketName"]))
+                            new S3BlobClient(new AmazonS3Client(),hostContext.Configuration.GetConnectionString("BuildingGrb")))
                         .As<IBlobClient>()
                         .SingleInstance();
 
@@ -106,6 +106,15 @@ namespace BuildingRegistry.Grb.Processor.Job.Infrastructure
 
                     builder.RegisterType<JobRecordsProcessor>()
                         .As<IJobRecordsProcessor>()
+                        .SingleInstance();
+
+                    builder.RegisterType<JobResultUploader>()
+                        .As<IJobResultUploader>()
+                        .SingleInstance();
+
+                    builder
+                        .Register(c => new JobRecordsArchiver(hostContext.Configuration.GetConnectionString("BuildingGrb"), loggerFactory))
+                        .As<IJobRecordsArchiver>()
                         .SingleInstance();
 
                     builder

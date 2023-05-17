@@ -26,20 +26,25 @@
 
             var jobRecordsProcessor = new Mock<IJobRecordsProcessor>();
             var jobRecordsMonitor = new Mock<IJobRecordsMonitor>();
+            var mockJobResultsUploader = new Mock<IJobResultUploader>();
+            var mockJobRecordsArchiver = new Mock<IJobRecordsArchiver>();
             var hostApplicationLifetime = new Mock<IHostApplicationLifetime>();
 
             var jobProcessor = new JobProcessor(
                 buildingGrbContext,
                 jobRecordsProcessor.Object,
                 jobRecordsMonitor.Object,
-                Mock.Of<IJobResultUploader>(),
+                mockJobResultsUploader.Object,
+                mockJobRecordsArchiver.Object,
                 Mock.Of<ITicketing>(),
                 new OptionsWrapper<GrbApiOptions>(new GrbApiOptions { GrbApiUrl = "https://api-vlaanderen.be/gebouwen/uploads"}),
                 hostApplicationLifetime.Object,
                 new NullLoggerFactory());
 
-            buildingGrbContext.Jobs.Add(new Job(DateTimeOffset.Now.AddMinutes(-10), JobStatus.Created));
-            buildingGrbContext.Jobs.Add(new Job(DateTimeOffset.Now.AddMinutes(-9), JobStatus.Prepared));
+            var job1 = new Job(DateTimeOffset.Now.AddMinutes(-10), JobStatus.Created);
+            buildingGrbContext.Jobs.Add(job1);
+            var job2 = new Job(DateTimeOffset.Now.AddMinutes(-9), JobStatus.Prepared);
+            buildingGrbContext.Jobs.Add(job2);
             await buildingGrbContext.SaveChangesAsync();
 
             await jobProcessor.StartAsync(CancellationToken.None);
@@ -47,6 +52,12 @@
 
             jobRecordsProcessor.Verify(x => x.Process(It.IsAny<IEnumerable<JobRecord>>(), It.IsAny<CancellationToken>()), Times.Never);
             jobRecordsMonitor.Verify(x => x.Monitor(It.IsAny<IEnumerable<JobRecord>>(), It.IsAny<CancellationToken>()), Times.Never);
+
+            mockJobResultsUploader.Verify(x => x.UploadJob(job1, It.IsAny<CancellationToken>()), Times.Never);
+            mockJobRecordsArchiver.Verify(x => x.Archive(job1.Id), Times.Never);
+            mockJobResultsUploader.Verify(x => x.UploadJob(job2, It.IsAny<CancellationToken>()), Times.Never);
+            mockJobRecordsArchiver.Verify(x => x.Archive(job2.Id), Times.Never);
+
             hostApplicationLifetime.Verify(x => x.StopApplication(), Times.Once);
         }
 
@@ -57,13 +68,16 @@
 
             var jobRecordsProcessor = new Mock<IJobRecordsProcessor>();
             var jobRecordsMonitor = new Mock<IJobRecordsMonitor>();
+            var mockJobResultsUploader = new Mock<IJobResultUploader>();
+            var mockJobRecordsArchiver = new Mock<IJobRecordsArchiver>();
             var hostApplicationLifetime = new Mock<IHostApplicationLifetime>();
 
             var jobProcessor = new JobProcessor(
                 buildingGrbContext,
                 jobRecordsProcessor.Object,
                 jobRecordsMonitor.Object,
-                Mock.Of<IJobResultUploader>(),
+                mockJobResultsUploader.Object,
+                mockJobRecordsArchiver.Object,
                 Mock.Of<ITicketing>(),
                 new OptionsWrapper<GrbApiOptions>(new GrbApiOptions { GrbApiUrl = "https://api-vlaanderen.be/gebouwen/uploads"}),
                 hostApplicationLifetime.Object,
@@ -97,6 +111,10 @@
             jobRecordsMonitor.Verify(x =>
                 x.Monitor(It.Is<IEnumerable<JobRecord>>(y => y.First() == jobRecordOfSecondJob), It.IsAny<CancellationToken>()), Times.Never);
             hostApplicationLifetime.Verify(x => x.StopApplication(), Times.Once);
+            mockJobResultsUploader.Verify(x => x.UploadJob(firstJob, It.IsAny<CancellationToken>()), Times.Once);
+            mockJobRecordsArchiver.Verify(x => x.Archive(firstJob.Id), Times.Once);
+            mockJobResultsUploader.Verify(x => x.UploadJob(secondJob, It.IsAny<CancellationToken>()), Times.Never);
+            mockJobRecordsArchiver.Verify(x => x.Archive(secondJob.Id), Times.Never);
         }
 
         [Fact]
@@ -110,13 +128,16 @@
                 .Setup(x => x.Process(It.IsAny<IEnumerable<JobRecord>>(), It.IsAny<CancellationToken>()))
                 .Callback<IEnumerable<JobRecord>, CancellationToken>((jobRecords, _) => jobRecordExecutionSequence.Add(jobRecords.First().JobId));
             var jobRecordsMonitor = new Mock<IJobRecordsMonitor>();
+            var mockJobResultsUploader = new Mock<IJobResultUploader>();
+            var mockJobRecordsArchiver = new Mock<IJobRecordsArchiver>();
             var hostApplicationLifetime = new Mock<IHostApplicationLifetime>();
 
             var jobProcessor = new JobProcessor(
                 buildingGrbContext,
                 jobRecordsProcessor.Object,
                 jobRecordsMonitor.Object,
-                Mock.Of<IJobResultUploader>(),
+                mockJobResultsUploader.Object,
+                mockJobRecordsArchiver.Object,
                 Mock.Of<ITicketing>(),
                 new OptionsWrapper<GrbApiOptions>(new GrbApiOptions { GrbApiUrl = "https://api-vlaanderen.be/gebouwen/uploads"}),
                 hostApplicationLifetime.Object,
@@ -153,7 +174,12 @@
                 x.Monitor(It.Is<IEnumerable<JobRecord>>(y => y.First() == jobRecordOfFirstJob), It.IsAny<CancellationToken>()), Times.Once);
             jobRecordsMonitor.Verify(x =>
                 x.Monitor(It.Is<IEnumerable<JobRecord>>(y => y.First() == jobRecordOfSecondJob), It.IsAny<CancellationToken>()), Times.Once);
+            mockJobResultsUploader.Verify(x => x.UploadJob(firstJob, It.IsAny<CancellationToken>()));
+            mockJobRecordsArchiver.Verify(x => x.Archive(firstJob.Id));
+            mockJobResultsUploader.Verify(x => x.UploadJob(secondJob, It.IsAny<CancellationToken>()));
+            mockJobRecordsArchiver.Verify(x => x.Archive(secondJob.Id));
             hostApplicationLifetime.Verify(x => x.StopApplication(), Times.Once);
+
         }
 
         private JobRecord CreateJobRecord(Guid jobId, int id)
