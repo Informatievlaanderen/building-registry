@@ -1,3 +1,15 @@
+# [3.76.0](https://github.com/informatievlaanderen/building-registry/compare/v3.75.0...v3.76.0) (2023-05-17)
+
+
+### Bug Fixes
+
+* buildingunitaddresslinkextract types GAWR-4855 ([6bf481f](https://github.com/informatievlaanderen/building-registry/commit/6bf481fe8e6ac133350edbfe76b7dabd07514548))
+
+
+### Features
+
+* add job processor GAWR-3120 ([e1bfa34](https://github.com/informatievlaanderen/building-registry/commit/e1bfa34c10a7e05f097adf67a7c463a6482c9be1))
+
 # [3.75.0](https://github.com/informatievlaanderen/building-registry/compare/v3.74.1...v3.75.0) (2023-05-10)
 
 
