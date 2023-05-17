@@ -29,8 +29,8 @@ namespace BuildingRegistry.Projections.Extract
             : base(options) { }
 
         public async Task<BuildingUnitAddressLinkExtractItem?> FindBuildingUnitAddressExtractItem(
-            BuildingUnitPersistentLocalId buildingUnitPersistentLocalId,
-            AddressPersistentLocalId addressPersistentLocalId,
+            int buildingUnitPersistentLocalId,
+            int addressPersistentLocalId,
             CancellationToken ct)
         {
             return await BuildingUnitAddressLinkExtract.FindAsync(new object?[] {buildingUnitPersistentLocalId, addressPersistentLocalId}, ct);

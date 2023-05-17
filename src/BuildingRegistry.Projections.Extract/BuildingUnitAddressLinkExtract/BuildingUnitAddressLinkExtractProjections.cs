@@ -69,29 +69,29 @@
             When<Envelope<BuildingUnitAddressWasDetachedV2>>(async (context, message, ct) =>
             {
                 await RemoveIdempotentLink(context,
-                    new BuildingUnitPersistentLocalId(message.Message.BuildingUnitPersistentLocalId),
-                    new AddressPersistentLocalId(message.Message.AddressPersistentLocalId), ct);
+                    message.Message.BuildingUnitPersistentLocalId,
+                    message.Message.AddressPersistentLocalId, ct);
             });
 
             When<Envelope<BuildingUnitAddressWasDetachedBecauseAddressWasRemoved>>(async (context, message, ct) =>
             {
                 await RemoveIdempotentLink(context,
-                    new BuildingUnitPersistentLocalId(message.Message.BuildingUnitPersistentLocalId),
-                    new AddressPersistentLocalId(message.Message.AddressPersistentLocalId), ct);
+                    message.Message.BuildingUnitPersistentLocalId,
+                    message.Message.AddressPersistentLocalId, ct);
             });
 
             When<Envelope<BuildingUnitAddressWasDetachedBecauseAddressWasRejected>>(async (context, message, ct) =>
             {
                 await RemoveIdempotentLink(context,
-                    new BuildingUnitPersistentLocalId(message.Message.BuildingUnitPersistentLocalId),
-                    new AddressPersistentLocalId(message.Message.AddressPersistentLocalId), ct);
+                    message.Message.BuildingUnitPersistentLocalId,
+                    message.Message.AddressPersistentLocalId, ct);
             });
 
             When<Envelope<BuildingUnitAddressWasDetachedBecauseAddressWasRetired>>(async (context, message, ct) =>
             {
                 await RemoveIdempotentLink(context,
-                    new BuildingUnitPersistentLocalId(message.Message.BuildingUnitPersistentLocalId),
-                    new AddressPersistentLocalId(message.Message.AddressPersistentLocalId), ct);
+                    message.Message.BuildingUnitPersistentLocalId,
+                    message.Message.AddressPersistentLocalId, ct);
             });
 
             When<Envelope<BuildingUnitAddressWasReplacedBecauseAddressWasReaddressed>>(async (context, message, ct) =>
@@ -121,8 +121,8 @@
             CancellationToken ct)
         {
             var extractItem = await context.FindBuildingUnitAddressExtractItem(
-                new BuildingUnitPersistentLocalId(linkItem.BuildingUnitPersistentLocalId),
-                new AddressPersistentLocalId(linkItem.AddressPersistentLocalId), ct);
+                linkItem.BuildingUnitPersistentLocalId,
+                linkItem.AddressPersistentLocalId, ct);
 
             if (extractItem is null)
             {
@@ -132,8 +132,8 @@
 
         private static async Task RemoveIdempotentLink(
             ExtractContext context,
-            BuildingUnitPersistentLocalId buildingUnitPersistentLocalId,
-            AddressPersistentLocalId addressPersistentLocalId,
+            int buildingUnitPersistentLocalId,
+            int addressPersistentLocalId,
             CancellationToken ct)
         {
             var linkExtractItem = await context.FindBuildingUnitAddressExtractItem(
