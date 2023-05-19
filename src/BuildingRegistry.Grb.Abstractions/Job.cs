@@ -12,7 +12,8 @@
         public JobStatus Status { get; private set; }
         public Guid? TicketId { get; set; }
 
-        public string BlobName => $"upload_{Id:D}";
+        public string UploadBlobName => $"upload_{Id:D}";
+        public string ReceivedBlobName => $"received/{Id:D}";
 
         public static string JobResultsBlobName(Guid id) => $"jobresults/{id:D}";
 

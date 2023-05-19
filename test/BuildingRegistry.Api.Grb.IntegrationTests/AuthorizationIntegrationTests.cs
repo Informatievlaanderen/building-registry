@@ -19,7 +19,7 @@ using Be.Vlaanderen.Basisregisters.Auth.AcmIdm;
         }
 
         [Theory]
-        [InlineData("/v2/uploads/job", Scopes.DvGrIngemetengebouwBeheer)]
+        [InlineData("/v2/uploads/jobs", Scopes.DvGrIngemetengebouwBeheer)]
         public async Task Post_ReturnsSuccess(string endpoint, string requiredScopes)
         {
             var client = _fixture.TestServer.CreateClient();
@@ -34,7 +34,7 @@ using Be.Vlaanderen.Basisregisters.Auth.AcmIdm;
         }
 
         [Theory]
-        [InlineData("/v2/uploads/job")]
+        [InlineData("/v2/uploads/jobs")]
         public async Task Post_ReturnsUnauthorized(string endpoint)
         {
             var client = _fixture.TestServer.CreateClient();
@@ -46,8 +46,8 @@ using Be.Vlaanderen.Basisregisters.Auth.AcmIdm;
         }
 
         [Theory]
-        [InlineData("/v2/uploads/job")]
-        [InlineData("/v2/uploads/job", "dv_gr_geschetstgebouw_beheer")]
+        [InlineData("/v2/uploads/jobs")]
+        [InlineData("/v2/uploads/jobs", "dv_gr_geschetstgebouw_beheer")]
         public async Task Post_ReturnsForbidden(string endpoint, string scope = "")
         {
             var client = _fixture.TestServer.CreateClient();
@@ -61,7 +61,7 @@ using Be.Vlaanderen.Basisregisters.Auth.AcmIdm;
         }
 
         [Theory]
-        [InlineData("/v2/uploads/jobs/00000000-0000-0000-0000-000000000000", Scopes.DvGrIngemetengebouwBeheer)]
+        [InlineData("/v2/uploads/jobs/00000000-0000-0000-0000-000000000000/results", Scopes.DvGrIngemetengebouwBeheer)]
         public async Task Get_ReturnsSuccess(string endpoint, string requiredScopes)
         {
             var client = _fixture.TestServer.CreateClient();
@@ -72,10 +72,11 @@ using Be.Vlaanderen.Basisregisters.Auth.AcmIdm;
             Assert.NotNull(response);
             Assert.NotEqual(HttpStatusCode.Unauthorized, response.StatusCode);
             Assert.NotEqual(HttpStatusCode.Forbidden, response.StatusCode);
+            Assert.NotEqual(HttpStatusCode.NotFound, response.StatusCode);
         }
 
         [Theory]
-        [InlineData("/v2/uploads/jobs/00000000-0000-0000-0000-000000000000")]
+        [InlineData("/v2/uploads/jobs/00000000-0000-0000-0000-000000000000/results")]
         public async Task Get_ReturnsUnauthorized(string endpoint)
         {
             var client = _fixture.TestServer.CreateClient();
@@ -86,8 +87,8 @@ using Be.Vlaanderen.Basisregisters.Auth.AcmIdm;
         }
 
         [Theory]
-        [InlineData("/v2/uploads/jobs/00000000-0000-0000-0000-000000000000")]
-        [InlineData("/v2/uploads/jobs/00000000-0000-0000-0000-000000000000", "dv_gr_geschetstgebouw_beheer")]
+        [InlineData("/v2/uploads/jobs/00000000-0000-0000-0000-000000000000/results")]
+        [InlineData("/v2/uploads/jobs/00000000-0000-0000-0000-000000000000/results", "dv_gr_geschetstgebouw_beheer")]
         public async Task Get_ReturnsForbidden(string endpoint, string scope = "")
         {
             var client = _fixture.TestServer.CreateClient();

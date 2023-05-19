@@ -51,8 +51,7 @@
 
             _logger.LogInformation("JobProcessor started");
 
-            // Check for jobs with status prepared
-            var inactiveJobStatuses = new JobStatus[] {JobStatus.Completed, JobStatus.Cancelled};
+            var inactiveJobStatuses = new[] {JobStatus.Completed, JobStatus.Cancelled};
             var jobsToProcess = _buildingGrbContext.Jobs
                 .Where(x => !inactiveJobStatuses.Contains(x.Status))
                 .OrderBy(x => x.Created);
@@ -66,7 +65,6 @@
                         await CancelJob(job, stoppingToken);
                         continue;
                     }
-
                     break;
                 }
 
@@ -76,38 +74,7 @@
                     break;
                 }
 
-                job.UpdateStatus(JobStatus.Processing);
-                await _buildingGrbContext.SaveChangesAsync(stoppingToken);
-
-                var jobRecords = await _buildingGrbContext.JobRecords
-                    .Where(x => x.JobId == job.Id)
-                    .ToListAsync(stoppingToken);
-
-                await _jobRecordsProcessor.Process(jobRecords, stoppingToken);
-                await _jobRecordsMonitor.Monitor(jobRecords, stoppingToken);
-
-                if (jobRecords.Any(x => x.Status == JobRecordStatus.Error))
-                {
-                    job.UpdateStatus(JobStatus.Error);
-                    await _buildingGrbContext.SaveChangesAsync(stoppingToken);
-                }
-                else
-                {
-                    await _jobResultUploader.UploadJobResults(jobRecords, stoppingToken);
-
-                    await _ticketing.Complete(
-                        job.TicketId!.Value,
-                        new TicketResult(new
-                        {
-                            JobResultLocation = new Uri(new Uri(_grbApiOptions.GrbApiUrl), $"/uploads/jobs/{job.Id}").ToString()
-                        }),
-                        stoppingToken);
-
-                    job.UpdateStatus(JobStatus.Completed);
-                    await _buildingGrbContext.SaveChangesAsync(stoppingToken);
-
-                    _jobRecordsArchiver.Archive(job.Id);
-                }
+                await ProcessJob(job, stoppingToken);
             }
 
             _hostApplicationLifetime.StopApplication();
@@ -115,11 +82,53 @@
             await Task.FromResult(stoppingToken);
         }
 
+        private async Task ProcessJob(Job job, CancellationToken stoppingToken)
+        {
+            await UpdateJobStatus(job, JobStatus.Processing, stoppingToken);
+
+            await _jobRecordsProcessor.Process(job.Id, stoppingToken);
+            await _jobRecordsMonitor.Monitor(job.Id, stoppingToken);
+
+            var jobRecordErrors = await _buildingGrbContext.JobRecords
+                .Where(x =>
+                    x.JobId == job.Id
+                    && x.Status == JobRecordStatus.Error)
+                .ToListAsync(stoppingToken);
+
+            if (jobRecordErrors.Any())
+            {
+                var jobErrors = jobRecordErrors.Select(x => new TicketError(x.ErrorMessage!, string.Empty)).ToList();
+                await _ticketing.Error(job.TicketId!.Value, new TicketError(jobErrors), stoppingToken);
+
+                await UpdateJobStatus(job, JobStatus.Error, stoppingToken);
+
+                return;
+            }
+
+            await _jobResultUploader.UploadJobResults(job.Id, stoppingToken);
+
+            await _ticketing.Complete(
+                job.TicketId!.Value,
+                new TicketResult(new
+                {
+                    JobResultLocation = new Uri(new Uri(_grbApiOptions.GrbApiUrl), $"/uploads/jobs/{job.Id:D}/results").ToString()
+                }),
+                stoppingToken);
+            await UpdateJobStatus(job, JobStatus.Completed, stoppingToken);
+
+            await _jobRecordsArchiver.Archive(job.Id, stoppingToken);
+        }
+
         private async Task CancelJob(Job job, CancellationToken stoppingToken)
         {
-            job.UpdateStatus(JobStatus.Cancelled);
-            await _buildingGrbContext.SaveChangesAsync(stoppingToken);
+            await UpdateJobStatus(job, JobStatus.Cancelled, stoppingToken);
             _logger.LogWarning("Cancelled expired job '{jobId}'.", job.Id);
+        }
+
+        private async Task UpdateJobStatus(Job job, JobStatus jobStatus, CancellationToken stoppingToken)
+        {
+            job.UpdateStatus(jobStatus);
+            await _buildingGrbContext.SaveChangesAsync(stoppingToken);
         }
     }
 }

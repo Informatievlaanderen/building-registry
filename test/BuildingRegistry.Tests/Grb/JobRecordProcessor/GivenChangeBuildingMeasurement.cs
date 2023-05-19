@@ -13,7 +13,6 @@
     using Handlers;
     using Moq;
     using NetTopologySuite.Geometries;
-    using TicketingService.Abstractions;
     using Xunit;
 
     public class GivenChangeBuildingMeasurement
@@ -53,10 +52,10 @@
 
             var jobRecordsProcessor = new JobRecordsProcessor(
                 buildingGrbContext,
-                backOfficeApiProxy.Object, new ErrorWarningEvaluator());
+                backOfficeApiProxy.Object);
 
             //act
-            await jobRecordsProcessor.Process(new List<JobRecord> { jobRecord }, CancellationToken.None);
+            await jobRecordsProcessor.Process(job.Id, CancellationToken.None);
 
             //assert
             backOfficeApiProxy.Verify(x => x.ChangeBuildingMeasurement(

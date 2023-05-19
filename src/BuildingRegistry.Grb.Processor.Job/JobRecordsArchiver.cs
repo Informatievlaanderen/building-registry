@@ -1,6 +1,8 @@
 ﻿namespace BuildingRegistry.Grb.Processor.Job
 {
     using System;
+    using System.Threading;
+    using System.Threading.Tasks;
     using Abstractions;
     using Dapper;
     using Microsoft.Data.SqlClient;
@@ -8,7 +10,7 @@
 
     public interface IJobRecordsArchiver
     {
-        void Archive(Guid jobId);
+        Task Archive(Guid jobId, CancellationToken ct);
     }
 
     public class JobRecordsArchiver : IJobRecordsArchiver
@@ -22,40 +24,44 @@
             _logger = loggerFactory.CreateLogger<JobRecordsArchiver>();
         }
 
-        public void Archive(Guid jobId)
+        public async Task Archive(Guid jobId, CancellationToken ct)
         {
-            using var connection = new SqlConnection(_connectionString);
-            connection.Open();
+            await using var connection = new SqlConnection(_connectionString);
+            await connection.OpenAsync(ct);
 
-            using var transaction = connection.BeginTransaction();
+            await using var transaction = connection.BeginTransaction();
 
                 try
                 {
-                    ArchiveRecords(connection, jobId, transaction);
-                    RemoveRecords(connection, jobId, transaction);
+                    await ArchiveRecords(connection, transaction, jobId);
+                    await RemoveRecords(connection, transaction, jobId);
                 }
                 catch (Exception ex)
                 {
                     _logger.LogError($"Rolling back archiving of jobRecords for job '{jobId}' because of Exception:", ex);
                     transaction.Rollback();
-
                     throw;
                 }
 
                 transaction.Commit();
         }
 
-        private static void RemoveRecords(SqlConnection connection, Guid jobId, SqlTransaction transaction)
+        private static async Task RemoveRecords(SqlConnection connection,
+            SqlTransaction transaction,
+            Guid jobId)
         {
-            connection.Execute(
+            await connection.ExecuteAsync(
                 $"DELETE FROM [{JobRecordConfiguration.TableName}] WHERE [JobId] = @jobId;",
                 new { jobId },
                 transaction);
         }
 
-        private static void ArchiveRecords(SqlConnection connection, Guid jobId, SqlTransaction transaction)
+        private static async Task ArchiveRecords(
+            SqlConnection connection,
+            SqlTransaction transaction,
+            Guid jobId)
         {
-            connection.Execute($@"
+            await connection.ExecuteAsync($@"
 INSERT INTO [{JobRecordConfiguration.ArchiveTableName}] ([Id]
     ,[JobId]
     ,[Idn]

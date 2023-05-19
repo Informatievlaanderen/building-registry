@@ -1,5 +1,6 @@
 ﻿namespace BuildingRegistry.Grb.Processor.Job
 {
+    using System;
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
@@ -13,7 +14,7 @@
 
     public interface IJobResultUploader
     {
-        Task UploadJobResults(IEnumerable<JobRecord> jobRecords, CancellationToken ct);
+        Task UploadJobResults(Guid jobId, CancellationToken ct);
     }
 
     public class JobResultUploader : IJobResultUploader
@@ -27,9 +28,9 @@
             _blobClient = blobClient;
         }
 
-        public async Task UploadJobResults(IEnumerable<JobRecord> jobRecords, CancellationToken ct)
+        public async Task UploadJobResults(Guid jobId, CancellationToken ct)
         {
-            var jobResultsZipArchive = await CreateResultFile(jobRecords, ct);
+            var jobResultsZipArchive = await CreateResultFile(jobId, ct);
 
             var stream = new MemoryStream();
             jobResultsZipArchive.WriteTo(stream, ct);
@@ -38,16 +39,16 @@
                 new KeyValuePair<MetadataKey, string>(new MetadataKey("filename"), jobResultsZipArchive.Name));
 
             await _blobClient.CreateBlobAsync(
-                new BlobName(Job.JobResultsBlobName(jobRecords.First().JobId)),
+                new BlobName(Job.JobResultsBlobName(jobId)),
                 metadata,
                 ContentType.Parse("application/zip"),
                 stream,
                 ct);
         }
 
-        private async Task<ExtractFile> CreateResultFile(IEnumerable<JobRecord> jobRecords, CancellationToken ct)
+        private async Task<ExtractFile> CreateResultFile(Guid jobId, CancellationToken ct)
         {
-            var jobResults = await GetJobResults(jobRecords, ct);
+            var jobResults = await GetJobResults(jobId, ct);
 
             byte[] TransformRecord(JobResult jobResult)
             {
@@ -68,21 +69,16 @@
                 TransformRecord);
         }
 
-        private async Task<IEnumerable<JobResult>> GetJobResults(IEnumerable<JobRecord> jobRecords, CancellationToken ct)
+        private async Task<IEnumerable<JobResult>> GetJobResults(Guid jobId, CancellationToken ct)
         {
-            // return _buildingGrbContext
-            //     .JobResults
-            //     .AsNoTracking()
-            //     .Where(result => result.JobId == jobId && result.IsBuildingCreated);
-
-            var filteredJobRecords = await _buildingGrbContext.JobRecords
+            var jobRecords = await _buildingGrbContext.JobRecords
+                .AsNoTracking()
                 .Where(x =>
-                    (x.Status == JobRecordStatus.Complete || x.Status == JobRecordStatus.Warning)
+                    x.JobId == jobId
                     && x.EventType == GrbEventType.DefineBuilding)
                 .ToListAsync(ct);
 
-            return filteredJobRecords
-                .Where(x => x.Status is JobRecordStatus.Complete or JobRecordStatus.Warning)
+            return jobRecords
                 .Select(jobRecord =>
                     new JobResult
                     {

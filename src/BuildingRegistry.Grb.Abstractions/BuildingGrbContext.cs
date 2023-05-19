@@ -16,7 +16,6 @@
 
         public DbSet<Job> Jobs => Set<Job>();
         public DbSet<JobRecord> JobRecords => Set<JobRecord>();
-        public DbSet<JobResult> JobResults => Set<JobResult>();
 
         public BuildingGrbContext() { }
 
@@ -27,20 +26,6 @@
         public async Task<Job?> FindJob(Guid jobId, CancellationToken cancellationToken)
         {
             return await Jobs.FindAsync(new object[] { jobId }, cancellationToken);
-        }
-
-        public void AddIdempotentJobResult(JobResult jobResult)
-        {
-            if (JobResults.Any(x =>
-                    x.JobId == jobResult.JobId
-                    && x.GrbIdn == jobResult.GrbIdn
-                    && x.BuildingPersistentLocalId == jobResult.BuildingPersistentLocalId
-                    && x.IsBuildingCreated == jobResult.IsBuildingCreated))
-            {
-                return;
-            }
-
-            JobResults.Add(jobResult);
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

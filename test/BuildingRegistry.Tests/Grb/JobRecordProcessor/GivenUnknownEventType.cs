@@ -2,10 +2,8 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
-    using Api.BackOffice.Abstractions.Building;
     using Api.BackOffice.Abstractions.Building.Requests;
     using Be.Vlaanderen.Basisregisters.BasicApiProblem;
     using BuildingRegistry.Grb.Abstractions;
@@ -14,7 +12,6 @@
     using Handlers;
     using Moq;
     using NetTopologySuite.Geometries;
-    using TicketingService.Abstractions;
     using Xunit;
 
     public class GivenUnknown
@@ -23,7 +20,6 @@
         public async Task ThenThrowsNotImplementedException()
         {
             var buildingGrbContext = new FakeBuildingGrbContextFactory().CreateDbContext();
-            var ticketing = new Mock<ITicketing>();
             var backOfficeApiProxy = new Mock<IBackOfficeApiProxy>();
 
             var job = new Job(DateTimeOffset.Now, JobStatus.Prepared, Guid.NewGuid());
@@ -55,10 +51,10 @@
 
             var jobRecordsProcessor = new JobRecordsProcessor(
                 buildingGrbContext,
-                backOfficeApiProxy.Object, new ErrorWarningEvaluator());
+                backOfficeApiProxy.Object);
 
             //act
-            var func = async () => await jobRecordsProcessor.Process(new List<JobRecord> { jobRecord }, CancellationToken.None);
+            var func = async () => await jobRecordsProcessor.Process(job.Id, CancellationToken.None);
 
             //assert
             await func.Should().ThrowAsync<NotImplementedException>();

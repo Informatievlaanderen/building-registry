@@ -51,7 +51,7 @@ namespace BuildingRegistry.Api.Grb.Uploads
                 var preSignedUrl = _s3Extended.CreatePresignedPost(
                     new CreatePresignedPostRequest(
                         _bucketOptions.BucketName,
-                        job.BlobName,
+                        job.UploadBlobName,
                         new List<ExactMatchCondition>(),
                         TimeSpan.FromMinutes(_bucketOptions.UrlExpirationInMinutes)));
 
