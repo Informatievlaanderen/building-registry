@@ -72,8 +72,7 @@
 
                 if (job.Status is JobStatus.Preparing or JobStatus.Error)
                 {
-                    _logger.LogWarning("Job '{jobId}' cannot be processed because it has status '{jobStatus}'.", job.Id,
-                        job.Status);
+                    _logger.LogWarning("Job '{jobId}' cannot be processed because it has status '{jobStatus}'.", job.Id, job.Status);
                     break;
                 }
 
@@ -94,30 +93,13 @@
                 }
                 else
                 {
-                    foreach (var jobRecord in jobRecords.Where(x =>
-                                 x.Status is JobRecordStatus.Complete or JobRecordStatus.Warning))
-                    {
-                        // Check if jobresult exsits before adding it
-                        var jobResult = new JobResult
-                        {
-                            BuildingPersistentLocalId = jobRecord.BuildingPersistentLocalId ?? jobRecord.GrId,
-                            GrbIdn = (int) jobRecord.Idn,
-                            IsBuildingCreated = jobRecord.EventType == GrbEventType.DefineBuilding,
-                            JobId = jobRecord.JobId
-                        };
-                        _buildingGrbContext.JobResults.Add(jobResult);
-                    }
-
-                    await _buildingGrbContext.SaveChangesAsync(stoppingToken);
-
-                    await _jobResultUploader.UploadJob(job, stoppingToken);
+                    await _jobResultUploader.UploadJobResults(jobRecords, stoppingToken);
 
                     await _ticketing.Complete(
                         job.TicketId!.Value,
                         new TicketResult(new
                         {
-                            JobResultLocation = new Uri(new Uri(_grbApiOptions.GrbApiUrl), $"/uploads/jobs/{job.Id}")
-                                .ToString()
+                            JobResultLocation = new Uri(new Uri(_grbApiOptions.GrbApiUrl), $"/uploads/jobs/{job.Id}").ToString()
                         }),
                         stoppingToken);
 

@@ -1,6 +1,5 @@
 ﻿namespace BuildingRegistry.Grb.Processor.Job
 {
-    using System;
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
@@ -14,7 +13,7 @@
 
     public interface IJobResultUploader
     {
-        Task UploadJob(Job job, CancellationToken ct);
+        Task UploadJobResults(IEnumerable<JobRecord> jobRecords, CancellationToken ct);
     }
 
     public class JobResultUploader : IJobResultUploader
@@ -28,9 +27,9 @@
             _blobClient = blobClient;
         }
 
-        public async Task UploadJob(Job job, CancellationToken ct)
+        public async Task UploadJobResults(IEnumerable<JobRecord> jobRecords, CancellationToken ct)
         {
-            var jobResultsZipArchive = CreateResultFile(job.Id);
+            var jobResultsZipArchive = await CreateResultFile(jobRecords, ct);
 
             var stream = new MemoryStream();
             jobResultsZipArchive.WriteTo(stream, ct);
@@ -39,19 +38,16 @@
                 new KeyValuePair<MetadataKey, string>(new MetadataKey("filename"), jobResultsZipArchive.Name));
 
             await _blobClient.CreateBlobAsync(
-                new BlobName(Job.JobResultsBlobName(job.Id)),
+                new BlobName(Job.JobResultsBlobName(jobRecords.First().JobId)),
                 metadata,
                 ContentType.Parse("application/zip"),
                 stream,
                 ct);
         }
 
-        private ExtractFile CreateResultFile(Guid jobId)
+        private async Task<ExtractFile> CreateResultFile(IEnumerable<JobRecord> jobRecords, CancellationToken ct)
         {
-            var resultItems = _buildingGrbContext
-                .JobResults
-                .AsNoTracking()
-                .Where(result => result.JobId == jobId && result.IsBuildingCreated);
+            var jobResults = await GetJobResults(jobRecords, ct);
 
             byte[] TransformRecord(JobResult jobResult)
             {
@@ -67,9 +63,34 @@
             return ExtractBuilder.CreateDbfFile<JobResult, JobResultDbaseRecord>(
                 "IdnGrResults",
                 new JobResultDbaseSchema(),
-                resultItems,
-                resultItems.Count,
+                jobResults,
+                jobResults.Count,
                 TransformRecord);
+        }
+
+        private async Task<IEnumerable<JobResult>> GetJobResults(IEnumerable<JobRecord> jobRecords, CancellationToken ct)
+        {
+            // return _buildingGrbContext
+            //     .JobResults
+            //     .AsNoTracking()
+            //     .Where(result => result.JobId == jobId && result.IsBuildingCreated);
+
+            var filteredJobRecords = await _buildingGrbContext.JobRecords
+                .Where(x =>
+                    (x.Status == JobRecordStatus.Complete || x.Status == JobRecordStatus.Warning)
+                    && x.EventType == GrbEventType.DefineBuilding)
+                .ToListAsync(ct);
+
+            return filteredJobRecords
+                .Where(x => x.Status is JobRecordStatus.Complete or JobRecordStatus.Warning)
+                .Select(jobRecord =>
+                    new JobResult
+                    {
+                        JobId = jobRecord.JobId,
+                        BuildingPersistentLocalId = jobRecord.BuildingPersistentLocalId ?? jobRecord.GrId,
+                        GrbIdn = (int)jobRecord.Idn,
+                        IsBuildingCreated = jobRecord.EventType == GrbEventType.DefineBuilding
+                    }).ToList();
         }
     }
 }

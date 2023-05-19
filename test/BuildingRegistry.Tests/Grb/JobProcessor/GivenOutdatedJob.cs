@@ -54,7 +54,7 @@
             buildingGrbContext.Jobs.All(x => x.Status == JobStatus.Cancelled).Should().BeTrue();
             jobRecordsProcessor.Verify(x => x.Process(It.IsAny<IEnumerable<JobRecord>>(), It.IsAny<CancellationToken>()), Times.Never);
             jobRecordsMonitor.Verify(x => x.Monitor(It.IsAny<IEnumerable<JobRecord>>(), It.IsAny<CancellationToken>()), Times.Never);
-            mockJobResultsUploader.Verify(x => x.UploadJob(job, It.IsAny<CancellationToken>()), Times.Never);
+            mockJobResultsUploader.Verify(x => x.UploadJobResults(It.IsAny<IEnumerable<JobRecord>>(), It.IsAny<CancellationToken>()), Times.Never);
             mockJobRecordsArchiver.Verify(x => x.Archive(job.Id), Times.Never);
             job.Status.Should().Be(JobStatus.Cancelled);
             job.LastChanged.Should().BeAfter(job.Created);

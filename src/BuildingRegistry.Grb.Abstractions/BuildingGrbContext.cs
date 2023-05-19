@@ -2,6 +2,7 @@
 {
     using System;
     using System.IO;
+    using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
     using Microsoft.EntityFrameworkCore;
@@ -26,6 +27,20 @@
         public async Task<Job?> FindJob(Guid jobId, CancellationToken cancellationToken)
         {
             return await Jobs.FindAsync(new object[] { jobId }, cancellationToken);
+        }
+
+        public void AddIdempotentJobResult(JobResult jobResult)
+        {
+            if (JobResults.Any(x =>
+                    x.JobId == jobResult.JobId
+                    && x.GrbIdn == jobResult.GrbIdn
+                    && x.BuildingPersistentLocalId == jobResult.BuildingPersistentLocalId
+                    && x.IsBuildingCreated == jobResult.IsBuildingCreated))
+            {
+                return;
+            }
+
+            JobResults.Add(jobResult);
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

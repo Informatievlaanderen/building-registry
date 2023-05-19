@@ -53,10 +53,9 @@
             jobRecordsProcessor.Verify(x => x.Process(It.IsAny<IEnumerable<JobRecord>>(), It.IsAny<CancellationToken>()), Times.Never);
             jobRecordsMonitor.Verify(x => x.Monitor(It.IsAny<IEnumerable<JobRecord>>(), It.IsAny<CancellationToken>()), Times.Never);
 
-            mockJobResultsUploader.Verify(x => x.UploadJob(job1, It.IsAny<CancellationToken>()), Times.Never);
             mockJobRecordsArchiver.Verify(x => x.Archive(job1.Id), Times.Never);
-            mockJobResultsUploader.Verify(x => x.UploadJob(job2, It.IsAny<CancellationToken>()), Times.Never);
             mockJobRecordsArchiver.Verify(x => x.Archive(job2.Id), Times.Never);
+            mockJobResultsUploader.Verify(x => x.UploadJobResults(It.IsAny<IEnumerable<JobRecord>>(), It.IsAny<CancellationToken>()), Times.Never);
 
             hostApplicationLifetime.Verify(x => x.StopApplication(), Times.Once);
         }
@@ -111,9 +110,9 @@
             jobRecordsMonitor.Verify(x =>
                 x.Monitor(It.Is<IEnumerable<JobRecord>>(y => y.First() == jobRecordOfSecondJob), It.IsAny<CancellationToken>()), Times.Never);
             hostApplicationLifetime.Verify(x => x.StopApplication(), Times.Once);
-            mockJobResultsUploader.Verify(x => x.UploadJob(firstJob, It.IsAny<CancellationToken>()), Times.Once);
+            mockJobResultsUploader.Verify(x => x.UploadJobResults(new []{ jobRecordOfFirstJob }, It.IsAny<CancellationToken>()), Times.Once);
             mockJobRecordsArchiver.Verify(x => x.Archive(firstJob.Id), Times.Once);
-            mockJobResultsUploader.Verify(x => x.UploadJob(secondJob, It.IsAny<CancellationToken>()), Times.Never);
+            mockJobResultsUploader.Verify(x => x.UploadJobResults(new []{ jobRecordOfSecondJob }, It.IsAny<CancellationToken>()), Times.Never);
             mockJobRecordsArchiver.Verify(x => x.Archive(secondJob.Id), Times.Never);
         }
 
@@ -174,9 +173,9 @@
                 x.Monitor(It.Is<IEnumerable<JobRecord>>(y => y.First() == jobRecordOfFirstJob), It.IsAny<CancellationToken>()), Times.Once);
             jobRecordsMonitor.Verify(x =>
                 x.Monitor(It.Is<IEnumerable<JobRecord>>(y => y.First() == jobRecordOfSecondJob), It.IsAny<CancellationToken>()), Times.Once);
-            mockJobResultsUploader.Verify(x => x.UploadJob(firstJob, It.IsAny<CancellationToken>()));
+            mockJobResultsUploader.Verify(x => x.UploadJobResults(new []{ jobRecordOfFirstJob }, It.IsAny<CancellationToken>()));
             mockJobRecordsArchiver.Verify(x => x.Archive(firstJob.Id));
-            mockJobResultsUploader.Verify(x => x.UploadJob(secondJob, It.IsAny<CancellationToken>()));
+            mockJobResultsUploader.Verify(x => x.UploadJobResults(new []{ jobRecordOfSecondJob }, It.IsAny<CancellationToken>()));
             mockJobRecordsArchiver.Verify(x => x.Archive(secondJob.Id));
             hostApplicationLifetime.Verify(x => x.StopApplication(), Times.Once);
 

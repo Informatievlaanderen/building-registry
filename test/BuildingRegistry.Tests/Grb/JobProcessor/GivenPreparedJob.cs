@@ -39,7 +39,7 @@
                 new NullLoggerFactory());
 
             var job = new Job(DateTimeOffset.Now.AddMinutes(-10), JobStatus.Prepared, ticketId: Guid.NewGuid());
-            var entityEntry = buildingGrbContext.Jobs.Add(job);
+            buildingGrbContext.Jobs.Add(job);
             await buildingGrbContext.SaveChangesAsync();
 
             //act
@@ -49,7 +49,7 @@
             //assert
             jobRecordsProcessor.Verify(x => x.Process(It.IsAny<IEnumerable<JobRecord>>(), It.IsAny<CancellationToken>()), Times.Once);
             jobRecordsMonitor.Verify(x => x.Monitor(It.IsAny<IEnumerable<JobRecord>>(), It.IsAny<CancellationToken>()), Times.Once);
-            mockJobResultsUploader.Verify(x => x.UploadJob(job, It.IsAny<CancellationToken>()));
+            mockJobResultsUploader.Verify(x => x.UploadJobResults(It.IsAny<IEnumerable<JobRecord>>(), It.IsAny<CancellationToken>()));
             mockJobRecordsArchiver.Verify(x => x.Archive(job.Id));
             hostApplicationLifetime.Verify(x => x.StopApplication(), Times.Once);
         }

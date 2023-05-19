@@ -49,7 +49,7 @@
             //assert
             jobRecordsProcessor.Verify(x => x.Process(It.IsAny<IEnumerable<JobRecord>>(), It.IsAny<CancellationToken>()), Times.Never);
             jobRecordsMonitor.Verify(x => x.Monitor(It.IsAny<IEnumerable<JobRecord>>(), It.IsAny<CancellationToken>()), Times.Never);
-            mockJobResultsUploader.Verify(x => x.UploadJob(job, It.IsAny<CancellationToken>()), Times.Never);
+            mockJobResultsUploader.Verify(x => x.UploadJobResults(It.IsAny<IEnumerable<JobRecord>>(), It.IsAny<CancellationToken>()), Times.Never);
             mockJobRecordsArchiver.Verify(x => x.Archive(job.Id), Times.Never);
             hostApplicationLifetime.Verify(x => x.StopApplication(), Times.Once);
         }
