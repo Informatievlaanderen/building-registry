@@ -23,8 +23,8 @@
             var ticketing = new Mock<ITicketing>();
 
             var job = new Job(DateTimeOffset.Now, JobStatus.Prepared, Guid.NewGuid());
-            var jobRecord = CreateJobRecord(job.Id, 1);
             await buildingGrbContext.Jobs.AddAsync(job);
+            var jobRecord = CreateJobRecord(job.Id, 1);
             await buildingGrbContext.JobRecords.AddAsync(jobRecord);
             await buildingGrbContext.SaveChangesAsync();
 
@@ -34,10 +34,10 @@
                     new Dictionary<string, string>(),
                     new TicketResult(new TicketError("message", "code"))));
 
-            var monitor = new JobRecordsMonitor(buildingGrbContext, ticketing.Object, new ErrorWarningEvaluator());
+            var monitor = new JobRecordsMonitor(buildingGrbContext, ticketing.Object);
 
             //act
-            await monitor.Monitor(new List<JobRecord> {jobRecord}, CancellationToken.None);
+            await monitor.Monitor(job.Id, CancellationToken.None);
 
             //assert
             var jobRecordEntity = buildingGrbContext.JobRecords.First(x => x.Id == jobRecord.Id);
@@ -52,8 +52,8 @@
             var ticketing = new Mock<ITicketing>();
 
             var job = new Job(DateTimeOffset.Now, JobStatus.Prepared, Guid.NewGuid());
-            var jobRecord = CreateJobRecord(job.Id, 1);
             await buildingGrbContext.Jobs.AddAsync(job);
+            var jobRecord = CreateJobRecord(job.Id, 1);
             await buildingGrbContext.JobRecords.AddAsync(jobRecord);
             await buildingGrbContext.SaveChangesAsync();
 
@@ -63,10 +63,10 @@
                     new Dictionary<string, string>(),
                     new TicketResult(new TicketError("message", "VerwijderdGebouw"))));
 
-            var monitor = new JobRecordsMonitor(buildingGrbContext, ticketing.Object, new ErrorWarningEvaluator());
+            var monitor = new JobRecordsMonitor(buildingGrbContext, ticketing.Object);
 
             //act
-            await monitor.Monitor(new List<JobRecord> {jobRecord}, CancellationToken.None);
+            await monitor.Monitor(job.Id, CancellationToken.None);
 
             //assert
             var jobRecordEntity = buildingGrbContext.JobRecords.First(x => x.Id == jobRecord.Id);
@@ -79,6 +79,7 @@
         {
             return new JobRecord
             {
+                Id = id,
                 JobId = jobId,
                 Status = JobRecordStatus.Pending,
                 EventType = GrbEventType.DefineBuilding,
@@ -86,7 +87,6 @@
                 GrbObject = GrbObject.ArtWork,
                 GrbObjectType = GrbObjectType.MainBuilding,
                 GrId = 1,
-                Id = id,
                 Idn = 3,
                 TicketId = Guid.NewGuid()
             };

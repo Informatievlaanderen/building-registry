@@ -43,7 +43,7 @@
             _buildingGrbContext.Jobs.Add(job);
             await _buildingGrbContext.SaveChangesAsync(CancellationToken.None);
 
-            var blobName = new BlobName("received/" + job.BlobName);
+            var blobName = new BlobName(job.ReceivedBlobName);
 
             mockIBlobClient
                 .Setup(x => x.BlobExistsAsync(blobName, It.IsAny<CancellationToken>()))
@@ -98,7 +98,7 @@
             _buildingGrbContext.Jobs.Add(job);
             await _buildingGrbContext.SaveChangesAsync(CancellationToken.None);
 
-            var blobName = new BlobName("received/" + job.BlobName);
+            var blobName = new BlobName(job.ReceivedBlobName);
 
             mockIBlobClient
                 .Setup(x => x.BlobExistsAsync(blobName, It.IsAny<CancellationToken>()))
@@ -136,7 +136,7 @@
             _buildingGrbContext.Jobs.Add(job);
             await _buildingGrbContext.SaveChangesAsync(ct);
 
-            var blobName = new BlobName("received/" + job.BlobName);
+            var blobName = new BlobName(job.ReceivedBlobName);
 
             mockIBlobClient
                 .Setup(x => x.BlobExistsAsync(blobName, It.IsAny<CancellationToken>()))
@@ -178,7 +178,7 @@
             _buildingGrbContext.Jobs.Add(job);
             await _buildingGrbContext.SaveChangesAsync(ct);
 
-            var blobName = new BlobName("received/" + job.BlobName);
+            var blobName = new BlobName(job.ReceivedBlobName);
 
             mockIBlobClient
                 .Setup(x => x.BlobExistsAsync(blobName, It.IsAny<CancellationToken>()))
@@ -229,7 +229,7 @@
             _buildingGrbContext.Jobs.Add(job);
             await _buildingGrbContext.SaveChangesAsync(ct);
 
-            var blobName = new BlobName("received/" + job.BlobName);
+            var blobName = new BlobName(job.ReceivedBlobName);
 
             mockIBlobClient
                 .Setup(x => x.BlobExistsAsync(blobName, It.IsAny<CancellationToken>()))

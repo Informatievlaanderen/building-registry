@@ -1,7 +1,6 @@
 ﻿namespace BuildingRegistry.Tests.Grb.JobProcessor
 {
     using System;
-    using System.Collections.Generic;
     using System.Threading;
     using System.Threading.Tasks;
     using BuildingRegistry.Grb.Abstractions;
@@ -23,18 +22,23 @@
 
             var jobRecordsProcessor = new Mock<IJobRecordsProcessor>();
             var jobRecordsMonitor = new Mock<IJobRecordsMonitor>();
+            var mockJobResultsUploader = new Mock<IJobResultUploader>();
+            var mockJobRecordsArchiver = new Mock<IJobRecordsArchiver>();
             var hostApplicationLifetime = new Mock<IHostApplicationLifetime>();
 
             var jobProcessor = new JobProcessor(
                 buildingGrbContext,
                 jobRecordsProcessor.Object,
                 jobRecordsMonitor.Object,
+                mockJobResultsUploader.Object,
+                mockJobRecordsArchiver.Object,
                 Mock.Of<ITicketing>(),
                 new OptionsWrapper<GrbApiOptions>(new GrbApiOptions { GrbApiUrl = "https://api-vlaanderen.be/gebouwen/uploads"}),
                 hostApplicationLifetime.Object,
                 new NullLoggerFactory());
 
-            buildingGrbContext.Jobs.Add(new Job(DateTimeOffset.Now.AddMinutes(-10), JobStatus.Preparing));
+            var job = new Job(DateTimeOffset.Now.AddMinutes(-10), JobStatus.Preparing);
+            buildingGrbContext.Jobs.Add(job);
             await buildingGrbContext.SaveChangesAsync();
 
             //act
@@ -42,8 +46,10 @@
             await jobProcessor.ExecuteTask;
 
             //assert
-            jobRecordsProcessor.Verify(x => x.Process(It.IsAny<IEnumerable<JobRecord>>(), It.IsAny<CancellationToken>()), Times.Never);
-            jobRecordsMonitor.Verify(x => x.Monitor(It.IsAny<IEnumerable<JobRecord>>(), It.IsAny<CancellationToken>()), Times.Never);
+            jobRecordsProcessor.Verify(x => x.Process(job.Id, It.IsAny<CancellationToken>()), Times.Never);
+            jobRecordsMonitor.Verify(x => x.Monitor(job.Id, It.IsAny<CancellationToken>()), Times.Never);
+            mockJobResultsUploader.Verify(x => x.UploadJobResults(job.Id, It.IsAny<CancellationToken>()), Times.Never);
+            mockJobRecordsArchiver.Verify(x => x.Archive(job.Id, It.IsAny<CancellationToken>()), Times.Never);
             hostApplicationLifetime.Verify(x => x.StopApplication(), Times.Once);
         }
     }

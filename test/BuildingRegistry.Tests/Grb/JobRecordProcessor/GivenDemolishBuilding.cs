@@ -5,7 +5,6 @@
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
-    using Api.BackOffice.Abstractions.Building;
     using Api.BackOffice.Abstractions.Building.Requests;
     using Be.Vlaanderen.Basisregisters.BasicApiProblem;
     using BuildingRegistry.Grb.Abstractions;
@@ -14,7 +13,6 @@
     using Handlers;
     using Moq;
     using NetTopologySuite.Geometries;
-    using TicketingService.Abstractions;
     using Xunit;
 
     public class GivenDemolishBuilding
@@ -23,7 +21,6 @@
         public async Task ThenDemolishBuildingRequestIsSent()
         {
             var buildingGrbContext = new FakeBuildingGrbContextFactory().CreateDbContext();
-            var ticketing = new Mock<ITicketing>();
             var backOfficeApiProxy = new Mock<IBackOfficeApiProxy>();
 
             var job = new Job(DateTimeOffset.Now, JobStatus.Prepared, Guid.NewGuid());
@@ -55,10 +52,10 @@
 
             var jobRecordsProcessor = new JobRecordsProcessor(
                 buildingGrbContext,
-                backOfficeApiProxy.Object, Mock.Of<IErrorWarningEvaluator>());
+                backOfficeApiProxy.Object);
 
             //act
-            await jobRecordsProcessor.Process(new List<JobRecord> { jobRecord }, CancellationToken.None);
+            await jobRecordsProcessor.Process(job.Id, CancellationToken.None);
 
             //assert
             backOfficeApiProxy.Verify(x => x.DemolishBuilding(

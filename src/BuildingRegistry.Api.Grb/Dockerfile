@@ -17,7 +17,7 @@ RUN apt-get update && \
     apt-get install curl jq -y && \
     chmod +x ./init.sh
 
-EXPOSE 6010/tcp
+EXPOSE 6018/tcp
 ENV ASPNETCORE_URLS http://*:6018
 
 # switch to created user

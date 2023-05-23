@@ -2,6 +2,7 @@
 {
     using System;
     using System.IO;
+    using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
     using Microsoft.EntityFrameworkCore;
@@ -15,7 +16,6 @@
 
         public DbSet<Job> Jobs => Set<Job>();
         public DbSet<JobRecord> JobRecords => Set<JobRecord>();
-        public DbSet<JobResult> JobResults => Set<JobResult>();
 
         public BuildingGrbContext() { }
 

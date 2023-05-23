@@ -7,34 +7,28 @@
     using Be.Vlaanderen.Basisregisters.BasicApiProblem;
     using TicketingService.Abstractions;
 
-    public interface IErrorWarningEvaluator
-    {
-        (JobRecordStatus jobRecordStatus, string message) Evaluate(IEnumerable<ValidationError> validationErrors);
-        (JobRecordStatus jobRecordStatus, string message) Evaluate(TicketError ticketError);
-    }
-
-    public class ErrorWarningEvaluator : IErrorWarningEvaluator
+    public static class ErrorWarningEvaluator
     {
         public static readonly IReadOnlyCollection<string> Warnings = new[]
         {
             "VerwijderdGebouw"
         };
 
-        public (JobRecordStatus jobRecordStatus, string message) Evaluate(IEnumerable<ValidationError> validationErrors)
+        public static (JobRecordStatus jobRecordStatus, string message) Evaluate(IEnumerable<ValidationError> validationErrors)
         {
-            var errors = validationErrors!
+            var errors = validationErrors
                 .Where(x => x.Code is not null && !Warnings.Contains(x.Code))
                 .ToList();
 
             return errors.Any()
                 ? (JobRecordStatus.Error,
                     errors.Select(x => x.Reason).Aggregate((result, error) => $"{result}{Environment.NewLine}{error}"))
-                : (JobRecordStatus.Warning, validationErrors!
+                : (JobRecordStatus.Warning, validationErrors
                     .Select(x => x.Reason)
                     .Aggregate((warning, result) => $"{result}{Environment.NewLine}{warning}"));
         }
 
-        public (JobRecordStatus jobRecordStatus, string message) Evaluate(TicketError ticketError)
+        public static (JobRecordStatus jobRecordStatus, string message) Evaluate(TicketError ticketError)
         {
             return Warnings.Contains(ticketError.ErrorCode)
                 ? (JobRecordStatus.Warning, ticketError.ErrorMessage)

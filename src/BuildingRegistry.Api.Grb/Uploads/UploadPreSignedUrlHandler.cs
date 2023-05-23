@@ -12,11 +12,11 @@ namespace BuildingRegistry.Api.Grb.Uploads
     using NodaTime;
     using TicketingService.Abstractions;
 
-    public sealed record GetPreSignedUrlRequest : IRequest<GetPreSignedUrlResponse>;
+    public sealed record UploadPreSignedUrlRequest : IRequest<UploadPreSignedUrlResponse>;
 
-    public sealed record GetPreSignedUrlResponse(Guid JobId, string UploadUrl, Dictionary<string, string> UploadUrlFormData, string TicketUrl);
+    public sealed record UploadPreSignedUrlResponse(Guid JobId, string UploadUrl, Dictionary<string, string> UploadUrlFormData, string TicketUrl);
 
-    public sealed class PreSignedUrlHandler : IRequestHandler<GetPreSignedUrlRequest, GetPreSignedUrlResponse>
+    public sealed class UploadPreSignedUrlHandler : IRequestHandler<UploadPreSignedUrlRequest, UploadPreSignedUrlResponse>
     {
         private readonly BuildingGrbContext _buildingGrbContext;
         private readonly ITicketing _ticketing;
@@ -24,7 +24,7 @@ namespace BuildingRegistry.Api.Grb.Uploads
         private readonly IAmazonS3Extended _s3Extended;
         private readonly BucketOptions _bucketOptions;
 
-        public PreSignedUrlHandler(
+        public UploadPreSignedUrlHandler(
             BuildingGrbContext buildingGrbContext,
             ITicketing ticketing,
             ITicketingUrl ticketingUrl,
@@ -38,8 +38,8 @@ namespace BuildingRegistry.Api.Grb.Uploads
             _bucketOptions = bucketOptions.Value ?? throw new ArgumentNullException(nameof(bucketOptions));
         }
 
-        public async Task<GetPreSignedUrlResponse> Handle(
-            GetPreSignedUrlRequest request,
+        public async Task<UploadPreSignedUrlResponse> Handle(
+            UploadPreSignedUrlRequest request,
             CancellationToken cancellationToken)
         {
             await using var transaction = await _buildingGrbContext.Database.BeginTransactionAsync(cancellationToken);
@@ -51,7 +51,7 @@ namespace BuildingRegistry.Api.Grb.Uploads
                 var preSignedUrl = _s3Extended.CreatePresignedPost(
                     new CreatePresignedPostRequest(
                         _bucketOptions.BucketName,
-                        job.BlobName,
+                        job.UploadBlobName,
                         new List<ExactMatchCondition>(),
                         TimeSpan.FromMinutes(_bucketOptions.UrlExpirationInMinutes)));
 
@@ -69,7 +69,7 @@ namespace BuildingRegistry.Api.Grb.Uploads
                 await UpdateJobWithTicketUrl(job, ticketId, cancellationToken);
                 await transaction.CommitAsync(cancellationToken);
 
-                return new GetPreSignedUrlResponse(job.Id, preSignedUrl.Url.ToString(), preSignedUrl.Fields, ticketUrl);
+                return new UploadPreSignedUrlResponse(job.Id, preSignedUrl.Url.ToString(), preSignedUrl.Fields, ticketUrl);
             }
             catch (Exception)
             {

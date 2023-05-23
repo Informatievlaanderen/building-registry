@@ -37,10 +37,10 @@
                     new Dictionary<string, string>(),
                     new TicketResult(new ETagResponse($"https://building.be/{buildingPersistentLocalId}", "etag"))));
 
-            var monitor = new JobRecordsMonitor(buildingGrbContext, ticketing.Object, Mock.Of<IErrorWarningEvaluator>());
+            var monitor = new JobRecordsMonitor(buildingGrbContext, ticketing.Object);
 
             //act
-            await monitor.Monitor(new List<JobRecord> {jobRecord}, CancellationToken.None);
+            await monitor.Monitor(job.Id, CancellationToken.None);
 
             //assert
             var jobRecordEntity = buildingGrbContext.JobRecords.First(x => x.Id == jobRecord.Id);
@@ -61,6 +61,7 @@
 
             await buildingGrbContext.JobRecords.AddAsync(jobRecord);
             await buildingGrbContext.SaveChangesAsync();
+
             var buildingPersistentLocalId = 11111;
             ticketing
                 .SetupSequence(x => x.Get(jobRecord.TicketId!.Value, It.IsAny<CancellationToken>()))
@@ -72,10 +73,10 @@
                     new Dictionary<string, string>(),
                     new TicketResult(new ETagResponse($"https://building.be/{buildingPersistentLocalId}", "etag"))));
 
-            var monitor = new JobRecordsMonitor(buildingGrbContext, ticketing.Object, Mock.Of<IErrorWarningEvaluator>());
+            var monitor = new JobRecordsMonitor(buildingGrbContext, ticketing.Object);
 
             //act
-            await monitor.Monitor(new List<JobRecord> {jobRecord}, CancellationToken.None);
+            await monitor.Monitor(job.Id, CancellationToken.None);
 
             //assert
             var jobRecordEntity = buildingGrbContext.JobRecords.First(x => x.Id == jobRecord.Id);

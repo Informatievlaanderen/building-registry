@@ -150,7 +150,7 @@
 
         private async Task<Stream?> GetZipArchiveStream(Job job, CancellationToken stoppingToken)
         {
-            var blobName = new BlobName("received/" + job.BlobName);
+            var blobName = new BlobName(job.ReceivedBlobName);
 
             if (!await _blobClient.BlobExistsAsync(blobName, stoppingToken))
             {
@@ -160,7 +160,7 @@
             var blobObject = await _blobClient.GetBlobAsync(blobName, stoppingToken);
             if (blobObject is null)
             {
-                _logger.LogError($"No blob found with name: {job.BlobName}");
+                _logger.LogError($"No blob found with name: {job.ReceivedBlobName}");
                 return null;
             }
 
@@ -170,7 +170,7 @@
             }
             catch (BlobNotFoundException)
             {
-                _logger.LogError($"No blob found with name: {job.BlobName}");
+                _logger.LogError($"No blob found with name: {job.ReceivedBlobName}");
                 return null;
             }
         }

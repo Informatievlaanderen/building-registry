@@ -1,7 +1,6 @@
 ﻿namespace BuildingRegistry.Tests.Grb.JobProcessor
 {
     using System;
-    using System.Collections.Generic;
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
@@ -25,12 +24,16 @@
 
             var jobRecordsProcessor = new Mock<IJobRecordsProcessor>();
             var jobRecordsMonitor = new Mock<IJobRecordsMonitor>();
+            var jobResultsUploader = new Mock<IJobResultUploader>();
+            var jobRecordsArchiver = new Mock<IJobRecordsArchiver>();
             var hostApplicationLifetime = new Mock<IHostApplicationLifetime>();
 
             var jobProcessor = new JobProcessor(
                 buildingGrbContext,
                 jobRecordsProcessor.Object,
                 jobRecordsMonitor.Object,
+                jobResultsUploader.Object,
+                jobRecordsArchiver.Object,
                 Mock.Of<ITicketing>(),
                 new OptionsWrapper<GrbApiOptions>(new GrbApiOptions { GrbApiUrl = "https://api-vlaanderen.be/gebouwen/uploads"}),
                 hostApplicationLifetime.Object,
@@ -48,8 +51,10 @@
 
             //assert
             buildingGrbContext.Jobs.All(x => x.Status == JobStatus.Cancelled).Should().BeTrue();
-            jobRecordsProcessor.Verify(x => x.Process(It.IsAny<IEnumerable<JobRecord>>(), It.IsAny<CancellationToken>()), Times.Never);
-            jobRecordsMonitor.Verify(x => x.Monitor(It.IsAny<IEnumerable<JobRecord>>(), It.IsAny<CancellationToken>()), Times.Never);
+            jobRecordsProcessor.Verify(x => x.Process(job.Id, It.IsAny<CancellationToken>()), Times.Never);
+            jobRecordsMonitor.Verify(x => x.Monitor(job.Id, It.IsAny<CancellationToken>()), Times.Never);
+            jobResultsUploader.Verify(x => x.UploadJobResults(job.Id, It.IsAny<CancellationToken>()), Times.Never);
+            jobRecordsArchiver.Verify(x => x.Archive(job.Id, It.IsAny<CancellationToken>()), Times.Never);
             job.Status.Should().Be(JobStatus.Cancelled);
             job.LastChanged.Should().BeAfter(job.Created);
             hostApplicationLifetime.Verify(x => x.StopApplication(), Times.Once);

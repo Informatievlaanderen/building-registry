@@ -4,6 +4,7 @@ using BuildingRegistry.Grb.Abstractions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NetTopologySuite.Geometries;
 
@@ -12,9 +13,10 @@ using NetTopologySuite.Geometries;
 namespace BuildingRegistry.Grb.Abstractions.Migrations
 {
     [DbContext(typeof(BuildingGrbContext))]
-    partial class BuildingGrbContextModelSnapshot : ModelSnapshot
+    [Migration("20230522081617_AddJobRecordsArchiveTable")]
+    partial class AddJobRecordsArchiveTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -110,6 +112,33 @@ namespace BuildingRegistry.Grb.Abstractions.Migrations
                     b.HasIndex("JobId");
 
                     b.ToTable("JobRecords", "BuildingRegistryGrb");
+                });
+
+            modelBuilder.Entity("BuildingRegistry.Grb.Abstractions.JobResult", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"), 1L, 1);
+
+                    b.Property<int>("BuildingPersistentLocalId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("GrbIdn")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsBuildingCreated")
+                        .HasColumnType("bit");
+
+                    b.Property<Guid>("JobId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    SqlServerKeyBuilderExtensions.IsClustered(b.HasKey("Id"));
+
+                    b.ToTable("JobResults", "BuildingRegistryGrb");
                 });
 #pragma warning restore 612, 618
         }

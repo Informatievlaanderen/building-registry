@@ -33,9 +33,9 @@
             _s3Extended = new Mock<IAmazonS3Extended>();
         }
 
-        private PreSignedUrlHandler CreatePreSignedUrlHandler(BuildingGrbContext buildingGrbContext)
+        private UploadPreSignedUrlHandler CreatePreSignedUrlHandler(BuildingGrbContext buildingGrbContext)
         {
-            return new PreSignedUrlHandler(
+            return new UploadPreSignedUrlHandler(
                 buildingGrbContext,
                 _ticketing.Object,
                 _ticketingUrl.Object,
@@ -67,7 +67,7 @@
             var databaseName = nameof(ReturnsGetPreSignedUrlResponse);
             var buildingGrbContext = new FakeBuildingGrbContextFactory(databaseName).CreateDbContext(Array.Empty<string>());
             var handler = CreatePreSignedUrlHandler(buildingGrbContext);
-            var response = await handler.Handle(new GetPreSignedUrlRequest(), CancellationToken.None);
+            var response = await handler.Handle(new UploadPreSignedUrlRequest(), CancellationToken.None);
 
             var job = await buildingGrbContext.Jobs.SingleOrDefaultAsync();
 
@@ -95,7 +95,7 @@
 
             try
             {
-                await handler.Handle(new GetPreSignedUrlRequest(), CancellationToken.None);
+                await handler.Handle(new UploadPreSignedUrlRequest(), CancellationToken.None);
             }
             catch (Exception)
             {
