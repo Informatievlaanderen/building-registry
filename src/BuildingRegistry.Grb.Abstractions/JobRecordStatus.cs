@@ -6,6 +6,7 @@
         Pending,
         Warning,
         Error,
+        ErrorResolved,
         Complete
     }
 }

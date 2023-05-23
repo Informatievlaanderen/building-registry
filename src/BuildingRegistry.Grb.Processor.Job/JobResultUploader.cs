@@ -32,7 +32,7 @@
         {
             var jobResultsZipArchive = await CreateResultFile(jobId, ct);
 
-            var stream = new MemoryStream();
+            using var stream = new MemoryStream();
             jobResultsZipArchive.WriteTo(stream, ct);
 
             var metadata = Metadata.None.Add(
@@ -75,6 +75,7 @@
                 .AsNoTracking()
                 .Where(x =>
                     x.JobId == jobId
+                    && (x.Status == JobRecordStatus.Complete || x.Status == JobRecordStatus.Warning)
                     && x.EventType == GrbEventType.DefineBuilding)
                 .ToListAsync(ct);
 
