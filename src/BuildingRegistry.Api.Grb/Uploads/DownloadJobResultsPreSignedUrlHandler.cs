@@ -16,7 +16,7 @@
     public sealed record DownloadJobResultsPreSignedUrlRequest
         (Guid JobId) : IRequest<DownloadJobResultsPreSignedUrlResponse>;
 
-    public sealed record DownloadJobResultsPreSignedUrlResponse(Guid JobId, string GetUrl, Dictionary<string, string> GetUrlFormData);
+    public sealed record DownloadJobResultsPreSignedUrlResponse(Guid JobId, string GetUrl);
 
     public sealed class DownloadJobResultsPreSignedUrlHandler
         : IRequestHandler<DownloadJobResultsPreSignedUrlRequest, DownloadJobResultsPreSignedUrlResponse>
@@ -62,8 +62,7 @@
 
             return new DownloadJobResultsPreSignedUrlResponse(
                 request.JobId,
-                urlString,
-                new Dictionary<string, string>());
+                urlString);
         }
     }
 }
