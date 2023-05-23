@@ -1,3 +1,16 @@
+# [3.77.0](https://github.com/informatievlaanderen/building-registry/compare/v3.76.0...v3.77.0) (2023-05-23)
+
+
+### Bug Fixes
+
+* grb response remove unused metadata ([8f0c355](https://github.com/informatievlaanderen/building-registry/commit/8f0c355ccd8e4fc4192a70928090e50bb000682a))
+
+
+### Features
+
+* add grb jobrecord status ErrorResolved ([f4f0e62](https://github.com/informatievlaanderen/building-registry/commit/f4f0e6230ef650aeda50672e3d65ca14224cbeb9))
+* upload grb job result + archive grb job records ([ee1f705](https://github.com/informatievlaanderen/building-registry/commit/ee1f70505cbac5f4b164a36318b707d050673411))
+
 # [3.76.0](https://github.com/informatievlaanderen/building-registry/compare/v3.75.0...v3.76.0) (2023-05-17)
 
 
