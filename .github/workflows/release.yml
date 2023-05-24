@@ -928,6 +928,8 @@ jobs:
         services: ['building-registry-api',
         'building-registry-import-api',
         'building-registry-grb-api',
+        'building-registry-grb-processor-job',
+        'building-registry-grb-processor-upload',
         'building-registry-projections',
         'building-registry-producer',
         'building-registry-producer-snapshot-oslo']
@@ -1046,6 +1048,8 @@ jobs:
           'building-registry-consumer-address',
           'building-registry-migrator-building',
           'building-registry-grb-api',
+          'building-registry-grb-processor-job',
+          'building-registry-grb-processor-upload',
           'building-registry-producer',
           'building-registry-producer-snapshot-oslo',
           'building-registry-projections',
