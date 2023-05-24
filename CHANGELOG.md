@@ -1,3 +1,15 @@
+# [3.78.0](https://github.com/informatievlaanderen/building-registry/compare/v3.77.0...v3.78.0) (2023-05-24)
+
+
+### Bug Fixes
+
+* change name status page bu projections ([ebe2d7e](https://github.com/informatievlaanderen/building-registry/commit/ebe2d7e93c42810988dd23e3ff08616e2602dbbd))
+
+
+### Features
+
+* add grb realeases ([57512b3](https://github.com/informatievlaanderen/building-registry/commit/57512b315d778b2b74fcfcc00a6968c4363159b4))
+
 # [3.77.0](https://github.com/informatievlaanderen/building-registry/compare/v3.76.0...v3.77.0) (2023-05-23)
 
 
