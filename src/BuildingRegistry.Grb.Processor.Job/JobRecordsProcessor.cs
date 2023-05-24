@@ -7,6 +7,7 @@
     using Abstractions;
     using Api.BackOffice.Abstractions.Building.Requests;
     using Be.Vlaanderen.Basisregisters.GrAr.Common.Oslo.Extensions;
+    using Microsoft.EntityFrameworkCore;
 
     public interface IJobRecordsProcessor
     {
@@ -28,8 +29,11 @@
 
         public async Task Process(Guid jobId, CancellationToken ct)
         {
-            foreach (var jobRecord in _buildingGrbContext.JobRecords
-                         .Where(x => x.JobId == jobId && x.Status == JobRecordStatus.Created))
+            var jobRecords = await _buildingGrbContext.JobRecords
+                .Where(x => x.JobId == jobId && x.Status == JobRecordStatus.Created)
+                .ToListAsync(ct);
+
+            foreach (var jobRecord in jobRecords)
             {
                 BackOfficeApiResult backOfficeApiResult;
 

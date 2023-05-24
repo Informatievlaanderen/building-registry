@@ -52,9 +52,10 @@
             _logger.LogInformation("JobProcessor started");
 
             var inactiveJobStatuses = new[] {JobStatus.Completed, JobStatus.Cancelled};
-            var jobsToProcess = _buildingGrbContext.Jobs
+            var jobsToProcess = await _buildingGrbContext.Jobs
                 .Where(x => !inactiveJobStatuses.Contains(x.Status))
-                .OrderBy(x => x.Created);
+                .OrderBy(x => x.Created)
+                .ToListAsync(stoppingToken);
 
             foreach (var job in jobsToProcess)
             {
