@@ -12,7 +12,7 @@
     using Building.Events;
     using Microsoft.Extensions.Options;
 
-    [ConnectedProjectionName("Extract gebouweenheid adres koppelingen")]
+    [ConnectedProjectionName("Extract gebouweenheidkoppelingen met adres")]
     [ConnectedProjectionDescription("Projectie die een extract voorziet voor gebouweenheid en adres koppelingen.")]
     public sealed class BuildingUnitAddressLinkExtractProjections : ConnectedProjection<ExtractContext>
     {
