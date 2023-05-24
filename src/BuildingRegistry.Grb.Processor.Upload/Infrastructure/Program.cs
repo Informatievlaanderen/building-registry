@@ -1,7 +1,6 @@
 namespace BuildingRegistry.Grb.Processor.Upload.Infrastructure
 {
     using System;
-    using System.Collections.Immutable;
     using System.IO;
     using System.Threading.Tasks;
     using Abstractions;
@@ -21,7 +20,6 @@ namespace BuildingRegistry.Grb.Processor.Upload.Infrastructure
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Hosting;
     using Microsoft.Extensions.Logging;
-    using Microsoft.Extensions.Options;
     using Serilog;
     using Serilog.Debugging;
     using Serilog.Extensions.Logging;
@@ -83,8 +81,7 @@ namespace BuildingRegistry.Grb.Processor.Upload.Infrastructure
                             .UseSqlServer(provider.GetRequiredService<TraceDbConnection<BuildingGrbContext>>(),
                                 sqlServerOptions => sqlServerOptions
                                     .EnableRetryOnFailure()
-                                    .MigrationsHistoryTable(BuildingGrbContext.MigrationsTableName,
-                                        BuildingGrbContext.Schema)
+                                    .MigrationsHistoryTable(BuildingGrbContext.MigrationsTableName, BuildingGrbContext.Schema)
                             ))
                         .Configure<EcsTaskOptions>(hostContext.Configuration.GetSection("ECSTaskOptions"));
                 })

@@ -7,6 +7,7 @@
     using Abstractions;
     using Be.Vlaanderen.Basisregisters.GrAr.Common.Oslo.Extensions;
     using Be.Vlaanderen.Basisregisters.Sqs.Responses;
+    using Microsoft.EntityFrameworkCore;
     using Newtonsoft.Json;
     using TicketingService.Abstractions;
 
@@ -30,9 +31,9 @@
 
         public async Task Monitor(Guid jobId, CancellationToken ct)
         {
-            var pendingJobRecords = _buildingGrbContext.JobRecords.Where(x =>
-                x.JobId == jobId
-                && x.Status == JobRecordStatus.Pending).ToList();
+            var pendingJobRecords = await _buildingGrbContext.JobRecords
+                .Where(x => x.JobId == jobId && x.Status == JobRecordStatus.Pending)
+                .ToListAsync(ct);
 
             while (pendingJobRecords.Any())
             {
