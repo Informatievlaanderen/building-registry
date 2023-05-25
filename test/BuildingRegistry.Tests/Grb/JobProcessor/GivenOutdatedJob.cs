@@ -26,6 +26,7 @@
             var jobRecordsMonitor = new Mock<IJobRecordsMonitor>();
             var jobResultsUploader = new Mock<IJobResultUploader>();
             var jobRecordsArchiver = new Mock<IJobRecordsArchiver>();
+            var ticketing = new Mock<ITicketing>();
             var hostApplicationLifetime = new Mock<IHostApplicationLifetime>();
 
             var jobProcessor = new JobProcessor(
@@ -34,14 +35,14 @@
                 jobRecordsMonitor.Object,
                 jobResultsUploader.Object,
                 jobRecordsArchiver.Object,
-                Mock.Of<ITicketing>(),
+                ticketing.Object,
                 new OptionsWrapper<GrbApiOptions>(new GrbApiOptions { GrbApiUrl = "https://api-vlaanderen.be/gebouwen/uploads"}),
                 hostApplicationLifetime.Object,
                 new NullLoggerFactory());
 
             const int maxLifeTimeJob = 65;
             var expiredDateTime = DateTimeOffset.Now.AddMinutes(-1 * (maxLifeTimeJob + 1));
-            var job = new Job(expiredDateTime, JobStatus.Created);
+            var job = new Job(expiredDateTime, JobStatus.Created) { TicketId = Guid.NewGuid() } ;
             buildingGrbContext.Jobs.Add(job);
             await buildingGrbContext.SaveChangesAsync();
 
@@ -57,6 +58,10 @@
             jobRecordsArchiver.Verify(x => x.Archive(job.Id, It.IsAny<CancellationToken>()), Times.Never);
             job.Status.Should().Be(JobStatus.Cancelled);
             job.LastChanged.Should().BeAfter(job.Created);
+            ticketing.Verify(x => x.Complete(
+                job.TicketId!.Value,
+                new TicketResult(new { JobStatus = "Cancelled" }),
+                It.IsAny<CancellationToken>()));
             hostApplicationLifetime.Verify(x => x.StopApplication(), Times.Once);
         }
     }
