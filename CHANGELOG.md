@@ -1,3 +1,11 @@
+## [3.78.1](https://github.com/informatievlaanderen/building-registry/compare/v3.78.0...v3.78.1) (2023-05-25)
+
+
+### Bug Fixes
+
+* already an open DataReader associated with this Connection + migration tablename ([be86c25](https://github.com/informatievlaanderen/building-registry/commit/be86c257ab85222bd8e8cffdaeeb884dd8024e8a))
+* register AmazonS3Client with configured region ([50d58e1](https://github.com/informatievlaanderen/building-registry/commit/50d58e19c392444450e84141936d3e9a10603b2b))
+
 # [3.78.0](https://github.com/informatievlaanderen/building-registry/compare/v3.77.0...v3.78.0) (2023-05-24)
 
 
