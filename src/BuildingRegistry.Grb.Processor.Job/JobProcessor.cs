@@ -122,7 +122,13 @@
 
         private async Task CancelJob(Job job, CancellationToken stoppingToken)
         {
+            await _ticketing.Complete(
+                job.TicketId!.Value,
+                new TicketResult(new { JobStatus = "Cancelled" }),
+                stoppingToken);
+
             await UpdateJobStatus(job, JobStatus.Cancelled, stoppingToken);
+
             _logger.LogWarning("Cancelled expired job '{jobId}'.", job.Id);
         }
 
