@@ -84,6 +84,17 @@ namespace BuildingRegistry.Grb.Processor.Upload.Infrastructure
                                     .MigrationsHistoryTable(BuildingGrbContext.MigrationsTableName, BuildingGrbContext.Schema)
                             ))
                         .Configure<EcsTaskOptions>(hostContext.Configuration.GetSection("ECSTaskOptions"));
+
+                    services.AddSingleton<IBlobClient>(_ => new S3BlobClient(
+                        new AmazonS3Client(new AmazonS3Config
+                        {
+                            RegionEndpoint = hostContext.Configuration.GetAWSOptions().Region,
+                        }),
+                        hostContext.Configuration["BucketName"]));
+
+                    services.AddSingleton<IAmazonECS, AmazonECSClient>();
+                    services.AddHostedService<UploadProcessor>();
+
                 })
                 .UseServiceProviderFactory(new AutofacServiceProviderFactory())
                 .ConfigureContainer<ContainerBuilder>((hostContext, builder) =>
@@ -94,27 +105,6 @@ namespace BuildingRegistry.Grb.Processor.Upload.Infrastructure
                         .RegisterModule(new DataDogModule(hostContext.Configuration))
                         .RegisterModule(new BuildingGrbModule(hostContext.Configuration, services, loggerFactory))
                         .RegisterModule(new TicketingModule(hostContext.Configuration, services));
-
-                    builder
-                        .Register(c =>
-                        new S3BlobClient(
-                            new AmazonS3Client(new AmazonS3Config
-                            {
-                                RegionEndpoint = hostContext.Configuration.GetAWSOptions().Region,
-                            }),
-                            hostContext.Configuration["BucketName"]))
-                        .As<IBlobClient>()
-                        .SingleInstance();
-
-                    builder
-                        .RegisterType<AmazonECSClient>()
-                        .As<IAmazonECS>()
-                        .SingleInstance();
-
-                    builder
-                        .RegisterType<UploadProcessor>()
-                        .As<IHostedService>()
-                        .SingleInstance();
 
                     builder.Populate(services);
                 })
