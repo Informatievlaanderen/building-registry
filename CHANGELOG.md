@@ -1,3 +1,10 @@
+## [3.78.2](https://github.com/informatievlaanderen/building-registry/compare/v3.78.1...v3.78.2) (2023-05-26)
+
+
+### Bug Fixes
+
+* complete ticket when grb job is cancelled ([7f1eaa9](https://github.com/informatievlaanderen/building-registry/commit/7f1eaa979913010d848c2ac9b5d053229fbb4fed))
+
 ## [3.78.1](https://github.com/informatievlaanderen/building-registry/compare/v3.78.0...v3.78.1) (2023-05-25)
 
 
