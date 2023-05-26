@@ -1,3 +1,10 @@
+## [3.78.3](https://github.com/informatievlaanderen/building-registry/compare/v3.78.2...v3.78.3) (2023-05-26)
+
+
+### Bug Fixes
+
+* support binary file types in s3 getblobasync ([604f3e3](https://github.com/informatievlaanderen/building-registry/commit/604f3e32b270af1bcf110871802a92f296c8ce7d))
+
 ## [3.78.2](https://github.com/informatievlaanderen/building-registry/compare/v3.78.1...v3.78.2) (2023-05-26)
 
 
