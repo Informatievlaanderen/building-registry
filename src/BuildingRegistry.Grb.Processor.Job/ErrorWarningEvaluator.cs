@@ -14,10 +14,10 @@
             "VerwijderdGebouw"
         };
 
-        public static (JobRecordStatus jobRecordStatus, string message) Evaluate(IEnumerable<ValidationError> validationErrors)
+        public static (JobRecordStatus jobRecordStatus, string message) Evaluate(IList<ValidationError> validationErrors)
         {
             var errors = validationErrors
-                .Where(x => x.Code is not null && !Warnings.Contains(x.Code))
+                .Where(x => x.Code is null || !Warnings.Contains(x.Code))
                 .ToList();
 
             return errors.Any()
