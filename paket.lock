@@ -218,7 +218,7 @@ NUGET
       Microsoft.Extensions.Configuration.Json (>= 6.0) - restriction: || (&& (== net472) (>= net6.0)) (== net6.0)
       Microsoft.Extensions.DependencyInjection (>= 6.0) - restriction: || (&& (== net472) (>= net6.0)) (== net6.0)
       Microsoft.Extensions.Logging (>= 6.0) - restriction: || (&& (== net472) (>= net6.0)) (== net6.0)
-    Be.Vlaanderen.Basisregisters.BlobStore (3.0)
+    Be.Vlaanderen.Basisregisters.BlobStore (3.1)
       AWSSDK.S3 (>= 3.7.8.14) - restriction: || (&& (== net472) (>= net6.0)) (== net6.0)
       Microsoft.Data.SqlClient (>= 4.1) - restriction: || (&& (== net472) (>= net6.0)) (== net6.0)
       System.Collections.Immutable (>= 6.0) - restriction: || (&& (== net472) (>= net6.0)) (== net6.0)
