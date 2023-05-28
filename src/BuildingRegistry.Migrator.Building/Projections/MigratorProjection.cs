@@ -27,7 +27,7 @@ namespace BuildingRegistry.Migrator.Building.Projections
                     }
                 }
 
-                await dbContext.SaveChangesAsync();
+                await dbContext.SaveChangesAsync(ct);
             });
         }
     }
