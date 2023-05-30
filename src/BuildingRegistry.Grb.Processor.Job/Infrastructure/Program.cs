@@ -85,6 +85,8 @@ namespace BuildingRegistry.Grb.Processor.Job.Infrastructure
                         {
                             client.BaseAddress = new Uri(hostContext.Configuration["BackOfficeApiUrl"]);
                         });
+
+                        services.Configure<GrbApiOptions>(hostContext.Configuration);
                 })
                 .UseServiceProviderFactory(new AutofacServiceProviderFactory())
                 .ConfigureContainer<ContainerBuilder>((hostContext, builder) =>

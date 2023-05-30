@@ -68,52 +68,53 @@
 
             foreach (var job in jobs)
             {
-                await using var stream = await GetZipArchiveStream(job, stoppingToken);
-
-                if (stream == null)
+                try
                 {
-                    continue;
-                }
+                    await using var stream = await GetZipArchiveStream(job, stoppingToken);
 
-                // If so, update ticket status and job status => preparing
-                await _ticketing.Pending(job.TicketId!.Value, stoppingToken);
-                job.UpdateStatus(JobStatus.Preparing);
-                await _buildingGrbContext.SaveChangesAsync(stoppingToken);
+                    if (stream == null)
+                    {
+                        continue;
+                    }
 
-                using var archive = new ZipArchive(stream, ZipArchiveMode.Read, false);
+                    // If so, update ticket status and job status => preparing
+                    await _ticketing.Pending(job.TicketId!.Value, stoppingToken);
+                    await UpdateJobStatus(job, JobStatus.Preparing, stoppingToken);
 
-                var archiveValidator = new ZipArchiveValidator(GrbArchiveEntryStructure);
+                    using var archive = new ZipArchive(stream, ZipArchiveMode.Read, false);
 
-                var problems = archiveValidator.Validate(archive);
-                if (problems.Any())
-                {
-                    var ticketingErrors = problems.Select(x =>
-                            x.Parameters.Any()
-                                ? new TicketError(string.Join(',', x.Parameters.Select(y => y.Value)), x.Reason)
-                                : new TicketError(x.File, x.Reason))
-                        .ToList();
+                    var archiveValidator = new ZipArchiveValidator(GrbArchiveEntryStructure);
 
-                    await _ticketing.Error(job.TicketId!.Value, new TicketError(ticketingErrors), stoppingToken);
+                    var problems = archiveValidator.Validate(archive);
+                    if (problems.Any())
+                    {
+                        var ticketingErrors = problems.Select(x =>
+                                x.Parameters.Any()
+                                    ? new TicketError(string.Join(',', x.Parameters.Select(y => y.Value)), x.Reason)
+                                    : new TicketError(x.File, x.Reason))
+                            .ToList();
 
-                    job.UpdateStatus(JobStatus.Error);
+                        await _ticketing.Error(job.TicketId!.Value, new TicketError(ticketingErrors), stoppingToken);
+                        await UpdateJobStatus(job, JobStatus.Error, stoppingToken);
+
+                        continue;
+                    }
+
+                    var archiveTranslator = new ZipArchiveTranslator(Encoding.UTF8);
+                    var jobRecords = archiveTranslator.Translate(archive).ToList();
+                    jobRecords.ForEach(x => x.JobId = job.Id);
+
+                    await _buildingGrbContext.JobRecords.AddRangeAsync(jobRecords, stoppingToken);
                     await _buildingGrbContext.SaveChangesAsync(stoppingToken);
 
-                    continue;
+                    await UpdateJobStatus(job, JobStatus.Prepared, stoppingToken);
                 }
-
-                var archiveTranslator = new ZipArchiveTranslator(Encoding.UTF8);
-                var jobRecords = archiveTranslator.Translate(archive).ToList();
-
-                foreach (var jobRecord in jobRecords)
+                catch (Exception ex)
                 {
-                    jobRecord.JobId = job.Id;
+                    _logger.LogError($"Unexpected exception for job '{job.Id}'", ex);
+                    await _ticketing.Error(job.TicketId!.Value, new TicketError($"Onverwachte fout bij de verwerking van het zip-bestand.", string.Empty), stoppingToken);
+                    await UpdateJobStatus(job, JobStatus.Error, stoppingToken);
                 }
-
-                await _buildingGrbContext.JobRecords.AddRangeAsync(jobRecords, stoppingToken);
-                await _buildingGrbContext.SaveChangesAsync(stoppingToken);
-
-                job.UpdateStatus(JobStatus.Prepared);
-                await _buildingGrbContext.SaveChangesAsync(stoppingToken);
             }
 
             if (jobs.Any(x => x.Status == JobStatus.Prepared))
@@ -122,6 +123,12 @@
             }
 
             _hostApplicationLifetime.StopApplication();
+        }
+
+        private async Task UpdateJobStatus(Job job, JobStatus status, CancellationToken stoppingToken)
+        {
+            job.UpdateStatus(status);
+            await _buildingGrbContext.SaveChangesAsync(stoppingToken);
         }
 
         private async Task StartJobProcessor(CancellationToken stoppingToken)
@@ -137,7 +144,8 @@
                 _logger.LogError($"Starting ECS Task return HttpStatusCode:{taskResponse.HttpStatusCode.ToString()}");
             }
 
-            string FailureToString(Failure failure) => $"Reason: {failure.Reason}{Environment.NewLine}Failure:{failure.Detail}";
+            string FailureToString(Failure failure) =>
+                $"Reason: {failure.Reason}{Environment.NewLine}Failure:{failure.Detail}";
 
             if (taskResponse.Failures.Any())
             {
