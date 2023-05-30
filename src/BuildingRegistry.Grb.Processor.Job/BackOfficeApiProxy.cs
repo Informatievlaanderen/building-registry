@@ -141,6 +141,6 @@
 
     public record BackOfficeApiResult(string? TicketUrl, IEnumerable<ValidationError>? ValidationErrors)
     {
-        public bool IsSuccess => ValidationErrors is not null && !ValidationErrors.Any();
+        public bool IsSuccess => ValidationErrors is null || !ValidationErrors.Any();
     }
 }
