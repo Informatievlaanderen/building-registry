@@ -1,3 +1,10 @@
+## [3.78.4](https://github.com/informatievlaanderen/building-registry/compare/v3.78.3...v3.78.4) (2023-05-30)
+
+
+### Bug Fixes
+
+* register grbApiOptions + routes backoffice api ([fa1738b](https://github.com/informatievlaanderen/building-registry/commit/fa1738bbe459caaeaf69396dcc3b351ed352cd9b))
+
 ## [3.78.3](https://github.com/informatievlaanderen/building-registry/compare/v3.78.2...v3.78.3) (2023-05-26)
 
 
