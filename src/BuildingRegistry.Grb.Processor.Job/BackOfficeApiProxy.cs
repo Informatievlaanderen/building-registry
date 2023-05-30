@@ -50,7 +50,7 @@
             RealizeAndMeasureUnplannedBuildingRequest request,
             CancellationToken cancellationToken)
         {
-            return await Execute(request, "acties/vaststellen", cancellationToken);
+            return await Execute(request, "v2/gebouwen/acties/vaststellen", cancellationToken);
         }
 
         public async Task<BackOfficeApiResult> DemolishBuilding(
@@ -58,7 +58,7 @@
             DemolishBuildingRequest request,
             CancellationToken cancellationToken)
         {
-            return await Execute(request, $"{buildingPersistentLocalId}/acties/slopen", cancellationToken);
+            return await Execute(request, $"v2/gebouwen/{buildingPersistentLocalId}/acties/slopen", cancellationToken);
         }
 
         public async  Task<BackOfficeApiResult> MeasureBuilding(
@@ -66,7 +66,7 @@
             MeasureBuildingRequest request,
             CancellationToken cancellationToken)
         {
-            return await Execute(request, $"{buildingPersistentLocalId}/acties/inmeten", cancellationToken);
+            return await Execute(request, $"v2/gebouwen/{buildingPersistentLocalId}/acties/inmeten", cancellationToken);
         }
 
         public async Task<BackOfficeApiResult> ChangeBuildingMeasurement(
@@ -74,7 +74,7 @@
             ChangeBuildingMeasurementRequest request,
             CancellationToken cancellationToken)
         {
-            return await Execute(request, $"{buildingPersistentLocalId}/acties/wijzigen/ingemetengeometriepolygoon", cancellationToken);
+            return await Execute(request, $"v2/gebouwen/{buildingPersistentLocalId}/acties/wijzigen/ingemetengeometriepolygoon", cancellationToken);
         }
 
         public async  Task<BackOfficeApiResult> CorrectBuildingMeasurement(
@@ -82,7 +82,7 @@
             CorrectBuildingMeasurementRequest request,
             CancellationToken cancellationToken)
         {
-            return await Execute(request, $"{buildingPersistentLocalId}/acties/corrigeren/ingemetengeometriepolygoon", cancellationToken);
+            return await Execute(request, $"v2/gebouwen/{buildingPersistentLocalId}/acties/corrigeren/ingemetengeometriepolygoon", cancellationToken);
         }
 
         private async Task<BackOfficeApiResult> Execute<TRequest>(
