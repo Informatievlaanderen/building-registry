@@ -1,3 +1,10 @@
+## [3.78.5](https://github.com/informatievlaanderen/building-registry/compare/v3.78.4...v3.78.5) (2023-05-30)
+
+
+### Bug Fixes
+
+* BackOfficeApiResult IsSuccess evaluation ([b383118](https://github.com/informatievlaanderen/building-registry/commit/b383118b305d42242476057b7870f63a252728ba))
+
 ## [3.78.4](https://github.com/informatievlaanderen/building-registry/compare/v3.78.3...v3.78.4) (2023-05-30)
 
 
