@@ -62,7 +62,8 @@
             Guid jobId)
         {
             await connection.ExecuteAsync($@"
-INSERT INTO [{JobRecordConfiguration.ArchiveTableName}] ([Id]
+INSERT INTO [{BuildingGrbContext.Schema}].[{JobRecordConfiguration.ArchiveTableName}]
+    ([Id]
     ,[JobId]
     ,[Idn]
     ,[IdnVersion]
@@ -94,7 +95,7 @@ SELECT [Id]
     ,[ErrorMessage]
     ,[BuildingPersistentLocalId]
     ,[TicketId]
-FROM [{JobRecordConfiguration.TableName}]
+FROM [{BuildingGrbContext.Schema}].[{JobRecordConfiguration.TableName}]
 WHERE [JobId] = @jobId", new { jobId }, transaction);
         }
     }
