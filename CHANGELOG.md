@@ -1,3 +1,15 @@
+## [3.78.6](https://github.com/informatievlaanderen/building-registry/compare/v3.78.5...v3.78.6) (2023-05-31)
+
+
+### Bug Fixes
+
+* error code null in errorWarningEvaluator ([d3afea1](https://github.com/informatievlaanderen/building-registry/commit/d3afea16fb56b2a352a99dfc058f546e17009afd))
+
+
+### Performance Improvements
+
+* run migrator in parallel ([17cca58](https://github.com/informatievlaanderen/building-registry/commit/17cca581bf42c3a252bab39939461d8222d7c89d))
+
 ## [3.78.5](https://github.com/informatievlaanderen/building-registry/compare/v3.78.4...v3.78.5) (2023-05-30)
 
 
