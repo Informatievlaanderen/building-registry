@@ -112,7 +112,7 @@
                 job.TicketId!.Value,
                 new TicketResult(new
                 {
-                    JobResultLocation = new Uri(new Uri(_grbApiOptions.GrbApiUrl), $"/uploads/jobs/{job.Id:D}/results").ToString()
+                    JobResultLocation = new Uri(new Uri(_grbApiOptions.PublicApiUrl), $"/v2/gebouwen/uploads/jobs/{job.Id:D}/results").ToString()
                 }),
                 stoppingToken);
             await UpdateJobStatus(job, JobStatus.Completed, stoppingToken);
