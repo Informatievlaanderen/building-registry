@@ -7,7 +7,6 @@
     using Api.Grb.Infrastructure;
     using Api.Grb.Infrastructure.Options;
     using Api.Grb.Uploads;
-    using AutoFixture;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
     using BuildingRegistry.Grb.Abstractions;
     using FluentAssertions;
@@ -16,19 +15,19 @@
     using Moq;
     using Xunit;
 
-    public class GivenDownloadJobResultPreSignedUrlRequest
+    public class GivenJobResultPreSignedUrlRequest
     {
         private readonly FakeBuildingGrbContext _fakeBuildingGrbContext;
         private readonly BucketOptions _bucketOptions;
         private readonly Mock<IAmazonS3Extended> _s3Extended;
-        private readonly DownloadJobResultsPreSignedUrlHandler _handler;
+        private readonly JobResultsPreSignedUrlHandler _handler;
 
-        public GivenDownloadJobResultPreSignedUrlRequest()
+        public GivenJobResultPreSignedUrlRequest()
         {
             _fakeBuildingGrbContext = new FakeBuildingGrbContextFactory().CreateDbContext();
             _s3Extended = new Mock<IAmazonS3Extended>();
             _bucketOptions = new BucketOptions { BucketName = "Test", UrlExpirationInMinutes = 60 };
-            _handler = new DownloadJobResultsPreSignedUrlHandler(
+            _handler = new JobResultsPreSignedUrlHandler(
                 _fakeBuildingGrbContext,
                 Options.Create(_bucketOptions),
                 _s3Extended.Object);
@@ -45,10 +44,10 @@
 
             _s3Extended
                 .Setup(x => x.GetPreSignedURL(It.Is<GetPreSignedUrlRequest>(
-                    x => x.BucketName == _bucketOptions.BucketName && x.Key == $"jobresults/{job.Id:D}")))
+                    y => y.BucketName == _bucketOptions.BucketName && y.Key == $"jobresults/{job.Id:D}")))
                 .Returns(expectedPresignedUrl);
 
-            var request = new DownloadJobResultsPreSignedUrlRequest(job.Id);
+            var request = new JobResultsPreSignedUrlRequest(job.Id);
             var result = await _handler.Handle(request, CancellationToken.None);
 
             result.JobId.Should().Be(job.Id);
@@ -58,7 +57,7 @@
         [Fact]
         public void WithNonExistingJob_ThenThrowsApiException()
         {
-            var request = new DownloadJobResultsPreSignedUrlRequest(Guid.NewGuid());
+            var request = new JobResultsPreSignedUrlRequest(Guid.NewGuid());
             var act = async () => await _handler.Handle(request, CancellationToken.None);
 
             act
@@ -83,7 +82,7 @@
             _fakeBuildingGrbContext.Jobs.Add(job);
             _fakeBuildingGrbContext.SaveChanges();
 
-            var request = new DownloadJobResultsPreSignedUrlRequest(job.Id);
+            var request = new JobResultsPreSignedUrlRequest(job.Id);
             var act = async () => await _handler.Handle(request, CancellationToken.None);
 
             act
