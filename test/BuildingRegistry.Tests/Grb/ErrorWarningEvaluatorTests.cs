@@ -29,6 +29,22 @@
             message.Should().Be($"reason{Environment.NewLine}reason2");
         }
 
+        [Fact]
+        public void GivenErrorCodeNull_ThenOutputError()
+        {
+            var validationErrors = new List<ValidationError>
+            {
+                new ValidationError(null, "reason")
+            };
+
+            // Act
+            var (status, message) = ErrorWarningEvaluator.Evaluate(validationErrors);
+
+            // Assert
+            status.Should().Be(JobRecordStatus.Error);
+            message.Should().Be($"reason");
+        }
+
         [Theory]
         [InlineData("VerwijderdGebouw", "verwijderdeGebouw message")]
         public void GivenOnlyWarningsInValidationErrors_ThenOutputWarning(string code, string message)
