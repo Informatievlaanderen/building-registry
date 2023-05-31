@@ -71,7 +71,7 @@
                 }
                 else
                 {
-                    var evaluation = ErrorWarningEvaluator.Evaluate(backOfficeApiResult.ValidationErrors!);
+                    var evaluation = ErrorWarningEvaluator.Evaluate(backOfficeApiResult.ValidationErrors!.ToList());
                     jobRecord.Status = evaluation.jobRecordStatus;
                     jobRecord.ErrorMessage = evaluation.message;
                 }
