@@ -1,3 +1,12 @@
+## [3.78.7](https://github.com/informatievlaanderen/building-registry/compare/v3.78.6...v3.78.7) (2023-05-31)
+
+
+### Bug Fixes
+
+* add db schema to query ([2da7cc0](https://github.com/informatievlaanderen/building-registry/commit/2da7cc058d1c68c3b5510a7527f6093b64d7b4ca))
+* don't use parallelization in jobrecordmonitor ([d83c6d6](https://github.com/informatievlaanderen/building-registry/commit/d83c6d6879a1734f80a576c43e3aaa8204131888))
+* job results should use public api url ([0453459](https://github.com/informatievlaanderen/building-registry/commit/0453459639e788bd1b905db3c735a1d0b8959e1e))
+
 ## [3.78.6](https://github.com/informatievlaanderen/building-registry/compare/v3.78.5...v3.78.6) (2023-05-31)
 
 
