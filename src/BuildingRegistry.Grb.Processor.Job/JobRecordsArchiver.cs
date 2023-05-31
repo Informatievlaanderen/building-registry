@@ -51,7 +51,7 @@
             Guid jobId)
         {
             await connection.ExecuteAsync(
-                $"DELETE FROM [{JobRecordConfiguration.TableName}] WHERE [JobId] = @jobId;",
+                $"DELETE FROM [{BuildingGrbContext.Schema}].[{JobRecordConfiguration.TableName}] WHERE [JobId] = @jobId;",
                 new { jobId },
                 transaction);
         }
