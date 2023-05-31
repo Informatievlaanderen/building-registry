@@ -36,7 +36,7 @@
                 jobResultsUploader.Object,
                 jobRecordsArchiver.Object,
                 ticketing.Object,
-                new OptionsWrapper<GrbApiOptions>(new GrbApiOptions { PublicApiUrl = "https://api-vlaanderen.be/gebouwen/uploads"}),
+                new OptionsWrapper<GrbApiOptions>(new GrbApiOptions { PublicApiUrl = "https://api-vlaanderen.be"}),
                 hostApplicationLifetime.Object,
                 new NullLoggerFactory());
 
