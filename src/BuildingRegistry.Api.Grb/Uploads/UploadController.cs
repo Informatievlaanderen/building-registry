@@ -25,16 +25,16 @@ namespace BuildingRegistry.Api.Grb.Uploads
 
         [HttpPost("jobs")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = PolicyNames.IngemetenGebouw.GrbBijwerker)]
-        public async Task<IActionResult> GetPreSignedUrl(CancellationToken cancellationToken)
+        public async Task<IActionResult> GetUploadPreSignedUrl(CancellationToken cancellationToken)
         {
             return Ok(await _mediator.Send(new UploadPreSignedUrlRequest(), cancellationToken));
         }
 
         [HttpGet("jobs/{jobId:guid}/results")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = PolicyNames.IngemetenGebouw.GrbBijwerker)]
-        public async Task<IActionResult> GetResult(Guid jobId, CancellationToken cancellationToken)
+        public async Task<IActionResult> GetResultsPreSignedUrl(Guid jobId, CancellationToken cancellationToken)
         {
-            return Ok(await _mediator.Send(new DownloadJobResultsPreSignedUrlRequest(jobId), cancellationToken));
+            return Ok(await _mediator.Send(new JobResultsPreSignedUrlRequest(jobId), cancellationToken));
         }
 
         [HttpDelete("jobs/{jobId:guid}")]

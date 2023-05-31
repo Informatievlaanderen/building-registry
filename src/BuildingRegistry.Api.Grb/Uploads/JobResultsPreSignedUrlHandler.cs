@@ -1,7 +1,6 @@
 ﻿namespace BuildingRegistry.Api.Grb.Uploads
 {
     using System;
-    using System.Collections.Generic;
     using System.Threading;
     using System.Threading.Tasks;
     using Amazon.S3.Model;
@@ -13,19 +12,19 @@
     using Microsoft.AspNetCore.Http;
     using Microsoft.Extensions.Options;
 
-    public sealed record DownloadJobResultsPreSignedUrlRequest
-        (Guid JobId) : IRequest<DownloadJobResultsPreSignedUrlResponse>;
+    public sealed record JobResultsPreSignedUrlRequest
+        (Guid JobId) : IRequest<JobResultsPreSignedUrlResponse>;
 
-    public sealed record DownloadJobResultsPreSignedUrlResponse(Guid JobId, string GetUrl);
+    public sealed record JobResultsPreSignedUrlResponse(Guid JobId, string GetUrl);
 
-    public sealed class DownloadJobResultsPreSignedUrlHandler
-        : IRequestHandler<DownloadJobResultsPreSignedUrlRequest, DownloadJobResultsPreSignedUrlResponse>
+    public sealed class JobResultsPreSignedUrlHandler
+        : IRequestHandler<JobResultsPreSignedUrlRequest, JobResultsPreSignedUrlResponse>
     {
         private readonly BuildingGrbContext _buildingGrbContext;
         private readonly BucketOptions _bucketOptions;
         private readonly IAmazonS3Extended _s3Extended;
 
-        public DownloadJobResultsPreSignedUrlHandler(
+        public JobResultsPreSignedUrlHandler(
             BuildingGrbContext buildingGrbContext,
             IOptions<BucketOptions> bucketOptions,
             IAmazonS3Extended s3Extended)
@@ -35,8 +34,8 @@
             _s3Extended = s3Extended;
         }
 
-        public async Task<DownloadJobResultsPreSignedUrlResponse> Handle(
-            DownloadJobResultsPreSignedUrlRequest request,
+        public async Task<JobResultsPreSignedUrlResponse> Handle(
+            JobResultsPreSignedUrlRequest request,
             CancellationToken cancellationToken)
         {
             var job = await _buildingGrbContext.FindJob(request.JobId, cancellationToken);
@@ -60,7 +59,7 @@
                 Expires = DateTime.UtcNow.AddHours(_bucketOptions.UrlExpirationInMinutes)
             });
 
-            return new DownloadJobResultsPreSignedUrlResponse(
+            return new JobResultsPreSignedUrlResponse(
                 request.JobId,
                 urlString);
         }
