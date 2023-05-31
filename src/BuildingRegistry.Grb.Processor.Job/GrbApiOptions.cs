@@ -2,6 +2,6 @@
 {
     public class GrbApiOptions
     {
-        public string GrbApiUrl { get; set; }
+        public string PublicApiUrl { get; set; }
     }
 }
