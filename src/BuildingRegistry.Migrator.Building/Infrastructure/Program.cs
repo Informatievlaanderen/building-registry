@@ -1,8 +1,10 @@
 namespace BuildingRegistry.Migrator.Building.Infrastructure
 {
     using System;
+    using System.Collections.Generic;
     using System.Diagnostics;
     using System.IO;
+    using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
     using Autofac;
@@ -11,7 +13,9 @@ namespace BuildingRegistry.Migrator.Building.Infrastructure
     using Be.Vlaanderen.Basisregisters.Projector.ConnectedProjections;
     using Be.Vlaanderen.Basisregisters.Projector.Modules;
     using BuildingRegistry.Migrator.Building.Projections;
+    using Consumer.Address;
     using Microsoft.Data.SqlClient;
+    using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Logging;
@@ -23,7 +27,7 @@ namespace BuildingRegistry.Migrator.Building.Infrastructure
     {
         protected Program()
         { }
-        
+
         public static async Task Main(string[] args)
         {
             var cancellationTokenSource = new CancellationTokenSource();
@@ -63,10 +67,21 @@ namespace BuildingRegistry.Migrator.Building.Infrastructure
 
                 var watch = Stopwatch.StartNew();
 
+                Dictionary<Guid, int> consumedAddressItems;
+                await using (var consumerContext = container.GetRequiredService<ConsumerAddressContext>())
+                {
+                    consumedAddressItems = await consumerContext
+                        .AddressConsumerItems
+                        .Where(x => x.AddressId.HasValue)
+                        .Select(x => new { AddressId = x.AddressId!.Value, x.AddressPersistentLocalId })
+                        .ToDictionaryAsync(x => x.AddressId, y => y.AddressPersistentLocalId, ct);
+                }
+
                 var migrator = new StreamMigrator(
                     container.GetRequiredService<ILoggerFactory>(),
                     configuration,
-                    container.GetRequiredService<ILifetimeScope>());
+                    container.GetRequiredService<ILifetimeScope>(),
+                    consumedAddressItems);
 
                 await DistributedLock<Program>.RunAsync(
                     async () =>

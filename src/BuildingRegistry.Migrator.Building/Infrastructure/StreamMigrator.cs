@@ -32,15 +32,20 @@ namespace BuildingRegistry.Migrator.Building.Infrastructure
         private readonly ILogger _logger;
         private readonly ProcessedIdsTable _processedIdsTable;
         private readonly SqlStreamsTable _sqlStreamTable;
-        private Dictionary<Guid, int> _consumedAddressItems;
+        private readonly Dictionary<Guid, int> _consumedAddressItems;
         private readonly bool _skipIncomplete;
 
         private List<(int processedId, bool isPageCompleted)> _processedIds;
         private readonly Stopwatch _stopwatch = new Stopwatch();
 
-        public StreamMigrator(ILoggerFactory loggerFactory, IConfiguration configuration, ILifetimeScope lifetimeScope)
+        public StreamMigrator(
+            ILoggerFactory loggerFactory,
+            IConfiguration configuration,
+            ILifetimeScope lifetimeScope,
+            Dictionary<Guid, int> consumedAddressItems)
         {
             _lifetimeScope = lifetimeScope;
+            _consumedAddressItems = consumedAddressItems;
             _logger = loggerFactory.CreateLogger("BuildingMigrator");
 
             var connectionString = configuration.GetConnectionString("events");
@@ -53,15 +58,6 @@ namespace BuildingRegistry.Migrator.Building.Infrastructure
         public async Task ProcessAsync(CancellationToken ct)
         {
             await _processedIdsTable.CreateTableIfNotExists();
-
-            await using (var consumerContext = _lifetimeScope.Resolve<ConsumerAddressContext>())
-            {
-                _consumedAddressItems = await consumerContext
-                    .AddressConsumerItems
-                    .Where(x => x.AddressId.HasValue)
-                    .Select(x => new { AddressId = x.AddressId!.Value, x.AddressPersistentLocalId })
-                    .ToDictionaryAsync(x => x.AddressId, y => y.AddressPersistentLocalId, ct);
-            }
 
             var processedIdsList = await _processedIdsTable.GetProcessedIds();
             _processedIds = new List<(int, bool)>(processedIdsList);
