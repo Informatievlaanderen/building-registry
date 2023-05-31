@@ -1,3 +1,10 @@
+## [3.78.8](https://github.com/informatievlaanderen/building-registry/compare/v3.78.7...v3.78.8) (2023-05-31)
+
+
+### Bug Fixes
+
+* set grb results stream position to 0 before uploading ([32d460f](https://github.com/informatievlaanderen/building-registry/commit/32d460f8315769116d796c9d9f3df0fa6834a6b9))
+
 ## [3.78.7](https://github.com/informatievlaanderen/building-registry/compare/v3.78.6...v3.78.7) (2023-05-31)
 
 
