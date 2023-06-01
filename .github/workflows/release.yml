@@ -1003,7 +1003,7 @@ jobs:
 
   deploy_to_test:
     if: github.repository_owner == 'Informatievlaanderen'
-    needs: [ push_images_to_test, release ]
+    needs: [ deploy_to_test_start_slack, release ]
     name: Deploy to test
     runs-on: ubuntu-latest
     strategy:
@@ -1121,7 +1121,7 @@ jobs:
 
   deploy_to_staging:
     if: github.repository_owner == 'Informatievlaanderen'
-    needs: [ push_images_to_staging, deploy_to_test_finish_slack, release ]
+    needs: [ deploy_to_staging_start_slack, release ]
     name: Deploy to staging
     runs-on: ubuntu-latest
     strategy:
@@ -1241,7 +1241,7 @@ jobs:
 
   deploy_to_newproduction:
     if: github.repository_owner == 'Informatievlaanderen'
-    needs: [ deploy_to_newproduction_start_slack ]
+    needs: [ deploy_to_newproduction_start_slack, release ]
     name: Deploy to new production
     runs-on: ubuntu-latest
     strategy:
@@ -1298,8 +1298,8 @@ jobs:
   #   - name: Prepare Lambda(s)
   #     shell: bash
   #     run: |
-  #       echo aws s3 cp s3://s3-vbr-stg-basisregisters-lam-br-sqsbackofficefunction/$VERSION/lambda.zip s3://s3-vbr-stg-basisregisters-lam-br-sqsbackofficefunction/lambda.zip --copy-props none
-  #       aws s3 cp s3://s3-vbr-stg-basisregisters-lam-br-sqsbackofficefunction/$VERSION/lambda.zip s3://s3-vbr-stg-basisregisters-lam-br-sqsbackofficefunction/lambda.zip --copy-props none
+  #       echo aws s3 cp s3://s3-vbr-prd-basisregisters-lam-br-sqsbackofficefunction/$VERSION/lambda.zip s3://s3-vbr-prd-basisregisters-lam-br-sqsbackofficefunction/lambda.zip --copy-props none
+  #       aws s3 cp s3://s3-vbr-prd-basisregisters-lam-br-sqsbackofficefunction/$VERSION/lambda.zip s3://s3-vbr-prd-basisregisters-lam-br-sqsbackofficefunction/lambda.zip --copy-props none
   #     env:
   #       VERSION: ${{ needs.release.outputs.version }}
 
