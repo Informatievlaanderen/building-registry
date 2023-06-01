@@ -1,3 +1,10 @@
+## [3.78.10](https://github.com/informatievlaanderen/building-registry/compare/v3.78.9...v3.78.10) (2023-06-01)
+
+
+### Bug Fixes
+
+* zip job results dbf file ([4a15918](https://github.com/informatievlaanderen/building-registry/commit/4a15918d3a22568dfd9865652e69f65655cf009f))
+
 ## [3.78.9](https://github.com/informatievlaanderen/building-registry/compare/v3.78.8...v3.78.9) (2023-06-01)
 
 
