@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.IO;
+    using System.IO.Compression;
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
@@ -32,18 +33,23 @@
         {
             var jobResultsZipArchive = await CreateResultFile(jobId, ct);
 
-            using var stream = new MemoryStream();
-            jobResultsZipArchive.WriteTo(stream, ct);
+            using var archiveStream = new MemoryStream();
+            using (var archive = new ZipArchive(archiveStream, ZipArchiveMode.Create, leaveOpen: true))
+            {
+                await using (var entryStream = archive.CreateEntry($"{jobId:D}.dbf").Open())
+                    jobResultsZipArchive.WriteTo(entryStream, ct);
+            }
+
+            archiveStream.Seek(0, SeekOrigin.Begin);
 
             var metadata = Metadata.None.Add(
                 new KeyValuePair<MetadataKey, string>(new MetadataKey("filename"), jobResultsZipArchive.Name));
 
-            stream.Seek(0, SeekOrigin.Begin);
             await _blobClient.CreateBlobAsync(
                 new BlobName(Job.JobResultsBlobName(jobId)),
                 metadata,
                 ContentType.Parse("application/zip"),
-                stream,
+                archiveStream,
                 ct);
         }
 
