@@ -1,3 +1,11 @@
+## [3.78.9](https://github.com/informatievlaanderen/building-registry/compare/v3.78.8...v3.78.9) (2023-06-01)
+
+
+### Bug Fixes
+
+* add db schema to delete job records sql statement ([199642d](https://github.com/informatievlaanderen/building-registry/commit/199642dcfa0b4f1c73f4330c185151257f8dc17e))
+* get consumerItems before processing migrator ([7b6c4c8](https://github.com/informatievlaanderen/building-registry/commit/7b6c4c8a2e3069446eba37523a669c4c314ee86d))
+
 ## [3.78.8](https://github.com/informatievlaanderen/building-registry/compare/v3.78.7...v3.78.8) (2023-05-31)
 
 
