@@ -1,3 +1,10 @@
+## [3.78.11](https://github.com/informatievlaanderen/building-registry/compare/v3.78.10...v3.78.11) (2023-06-01)
+
+
+### Bug Fixes
+
+* to trigger build ci/cd new prd ([ae1463d](https://github.com/informatievlaanderen/building-registry/commit/ae1463db877b2d40f496d35afc0f867c803fbd03))
+
 ## [3.78.10](https://github.com/informatievlaanderen/building-registry/compare/v3.78.9...v3.78.10) (2023-06-01)
 
 
