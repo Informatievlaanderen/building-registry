@@ -3,6 +3,7 @@
     using System;
     using System.IO;
     using System.Linq;
+    using System.Net;
     using System.Threading;
     using Amazon.ECS;
     using Amazon.ECS.Model;
@@ -58,8 +59,8 @@
                     _  => Task.FromResult((Stream)new FileStream($"{AppContext.BaseDirectory}/Grb/UploadProcessor/gebouw_ALL.zip", FileMode.Open, FileAccess.Read))));
 
             mockAmazonClient
-                .Setup(x => x.StartTaskAsync(It.IsAny<StartTaskRequest>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(new StartTaskResponse());
+                .Setup(x => x.RunTaskAsync(It.IsAny<RunTaskRequest>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new RunTaskResponse { HttpStatusCode = HttpStatusCode.OK });
 
             var sut = new UploadProcessor(
                 _buildingGrbContext,
@@ -80,7 +81,7 @@
             jobRecords.Should().HaveCount(10);
             _buildingGrbContext.Jobs.First().Status.Should().Be(JobStatus.Prepared);
 
-            mockAmazonClient.Verify(x => x.StartTaskAsync(It.IsAny<StartTaskRequest>(), It.IsAny<CancellationToken>()), Times.Once);
+            mockAmazonClient.Verify(x => x.RunTaskAsync(It.IsAny<RunTaskRequest>(), It.IsAny<CancellationToken>()), Times.Once);
             mockIHostApplicationLifeTime.Verify(x => x.StopApplication(), Times.Once);
         }
 
