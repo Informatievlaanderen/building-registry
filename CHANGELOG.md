@@ -1,3 +1,10 @@
+## [3.78.12](https://github.com/informatievlaanderen/building-registry/compare/v3.78.11...v3.78.12) (2023-06-02)
+
+
+### Bug Fixes
+
+* run task instead of start task + retry with network configuration ([37d7c0f](https://github.com/informatievlaanderen/building-registry/commit/37d7c0f13998c89a597f1871da62dcfceee0df1f))
+
 ## [3.78.11](https://github.com/informatievlaanderen/building-registry/compare/v3.78.10...v3.78.11) (2023-06-01)
 
 
