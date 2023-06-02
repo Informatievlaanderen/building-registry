@@ -69,7 +69,11 @@
                 mockAmazonClient.Object,
                 new NullLoggerFactory(),
                 mockIHostApplicationLifeTime.Object,
-                Options.Create(new EcsTaskOptions()));
+                Options.Create(new EcsTaskOptions
+                {
+                    Subnets = "",
+                    SecurityGroups = "",
+                }));
 
             // Act
             await sut.StartAsync(CancellationToken.None);

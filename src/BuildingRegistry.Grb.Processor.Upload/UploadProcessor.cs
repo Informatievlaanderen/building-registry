@@ -133,82 +133,37 @@
 
         private async Task StartJobProcessor(CancellationToken stoppingToken)
         {
-            var success = true;
-
-            try
-            {
-                _logger.LogInformation("Trying to run task without NetworkConfiguration.");
-
-                var taskResponse = await _amazonEcs.RunTaskAsync(
-                    new RunTaskRequest
-                    {
-                        Cluster = _ecsTaskOptions.Cluster,
-                        TaskDefinition = _ecsTaskOptions.TaskDefinition,
-                        LaunchType = LaunchType.FARGATE,
-                        Count = 1
-                    },
-                    stoppingToken);
-
-                if (taskResponse.HttpStatusCode != HttpStatusCode.OK)
+            var taskResponse = await _amazonEcs.RunTaskAsync(
+                new RunTaskRequest
                 {
-                    _logger.LogError($"Starting ECS Task return HttpStatusCode: {taskResponse.HttpStatusCode.ToString()}");
-                    success = false;
-                }
-
-                string FailureToString(Failure failure) => $"Reason: {failure.Reason}{Environment.NewLine}Failure: {failure.Detail}";
-
-                if (taskResponse.Failures.Any())
-                {
-                    foreach (var failure in taskResponse.Failures)
+                    Cluster = _ecsTaskOptions.Cluster,
+                    TaskDefinition = _ecsTaskOptions.TaskDefinition,
+                    LaunchType = LaunchType.FARGATE,
+                    Count = 1,
+                    NetworkConfiguration = new NetworkConfiguration
                     {
-                        _logger.LogError(FailureToString(failure));
-                    }
-
-                    success = false;
-                }
-            }
-            catch (Exception exception)
-            {
-                _logger.LogError(exception, "Failed to start task");
-                success = false;
-            }
-
-            if (!success)
-            {
-                _logger.LogInformation("Trying to run task with NetworkConfiguration.");
-
-                var taskResponse = await _amazonEcs.RunTaskAsync(
-                    new RunTaskRequest
-                    {
-                        Cluster = _ecsTaskOptions.Cluster,
-                        TaskDefinition = _ecsTaskOptions.TaskDefinition,
-                        LaunchType = LaunchType.FARGATE,
-                        Count = 1,
-                        NetworkConfiguration = new NetworkConfiguration
+                        AwsvpcConfiguration = new AwsVpcConfiguration
                         {
-                            AwsvpcConfiguration = new AwsVpcConfiguration
-                            {
-                                Subnets = new List<string> { "subnet-0b01bf78b2f3d6ba4","subnet-0f0b0060dc6f00877","subnet-093703e6d0850fbfe" },
-                                SecurityGroups = new List<string> { "sg-0e4fe33bb59c209e6" },
-                                AssignPublicIp = AssignPublicIp.DISABLED
-                            }
+                            Subnets = _ecsTaskOptions.Subnets.Split(',', StringSplitOptions.RemoveEmptyEntries).ToList(),
+                            SecurityGroups = _ecsTaskOptions.SecurityGroups.Split(',', StringSplitOptions.RemoveEmptyEntries).ToList(),
+                            AssignPublicIp = AssignPublicIp.DISABLED
                         }
-                    },
-                    stoppingToken);
-
-                if (taskResponse.HttpStatusCode != HttpStatusCode.OK)
-                {
-                    _logger.LogError($"Starting ECS Task return HttpStatusCode: {taskResponse.HttpStatusCode.ToString()}");
-                }
-
-                string FailureToString(Failure failure) => $"Reason: {failure.Reason}{Environment.NewLine}Failure: {failure.Detail}";
-
-                if (taskResponse.Failures.Any())
-                {
-                    foreach (var failure in taskResponse.Failures)
-                    {
-                        _logger.LogError(FailureToString(failure));
                     }
+                },
+                stoppingToken);
+
+            if (taskResponse.HttpStatusCode != HttpStatusCode.OK)
+            {
+                _logger.LogError($"Starting ECS Task return HttpStatusCode: {taskResponse.HttpStatusCode.ToString()}");
+            }
+
+            string FailureToString(Failure failure) => $"Reason: {failure.Reason}{Environment.NewLine}Failure: {failure.Detail}";
+
+            if (taskResponse.Failures.Any())
+            {
+                foreach (var failure in taskResponse.Failures)
+                {
+                    _logger.LogError(FailureToString(failure));
                 }
             }
         }
