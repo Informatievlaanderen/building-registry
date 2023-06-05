@@ -12,14 +12,15 @@ namespace BuildingRegistry.Migrator.Building.Infrastructure
     public class ProcessedIdsTable
     {
         private readonly string _connectionString;
+        private readonly string _tableName;
         private readonly ILogger<ProcessedIdsTable> _logger;
 
-        private const string ProcessedIdsTableName = "ProcessedIds";
-        private const string Table = $"[{Schema.MigrateBuilding}].[{ProcessedIdsTableName}]";
+        private string Table => $"[{Schema.MigrateBuilding}].[{_tableName}]";
 
-        public ProcessedIdsTable(string connectionString, ILoggerFactory loggerFactory)
+        public ProcessedIdsTable(string connectionString, string tableName, ILoggerFactory loggerFactory)
         {
             _connectionString = connectionString;
+            _tableName = tableName;
             _logger = loggerFactory.CreateLogger<ProcessedIdsTable>();
         }
 
@@ -32,11 +33,11 @@ IF NOT EXISTS ( SELECT  *
                 WHERE   name = N'{Schema.MigrateBuilding}')
     EXEC('CREATE SCHEMA [{Schema.MigrateBuilding}]');
 
-IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='{ProcessedIdsTableName}' and xtype='U')
+IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='{_tableName}' and xtype='U')
 CREATE TABLE {Table}(
 [Id] [int] NOT NULL,
 [IsPageCompleted] [bit] NOT NULL DEFAULT 0,
-CONSTRAINT [PK_ProcessedIds] PRIMARY KEY CLUSTERED 
+CONSTRAINT [PK_{_tableName}] PRIMARY KEY CLUSTERED
 (
 	[Id] ASC
 ))");

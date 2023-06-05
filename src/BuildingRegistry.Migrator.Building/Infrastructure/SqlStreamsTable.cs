@@ -6,39 +6,73 @@ namespace BuildingRegistry.Migrator.Building.Infrastructure
     using Dapper;
     using Microsoft.Data.SqlClient;
 
-    public class SqlStreamsTable
+    public class SqlBigStreamsTable : SqlStreamsTable
     {
-        private readonly string _connectionString;
-        private readonly int _pageSize;
+        public SqlBigStreamsTable(string connectionString, int pageSize = 1)
+            : base(connectionString, pageSize)
+        { }
 
-        public SqlStreamsTable(string connectionString, int pageSize = 500)
+        public override async Task<IEnumerable<(int internalId, string aggregateId)>> ReadNextStreamPage(int lastCursorPosition)
         {
-            _connectionString = connectionString;
-            _pageSize = pageSize;
-        }
-
-        public async Task<IEnumerable<(int internalId, string aggregateId)>> ReadNextBuildingStreamPage(int lastCursorPosition)
-        {
-            await using var conn = new SqlConnection(_connectionString);
+            await using var conn = new SqlConnection(ConnectionString);
 
             return await conn.QueryAsync<(int, string)>($@"
-select top ({_pageSize}) 
+select top ({PageSize})
 	[IdInternal]
     ,[IdOriginal]
 from
     [{Schema.Default}].[Streams]
 where
     IdOriginal not like 'building-%'
-    and IdInternal > {lastCursorPosition}
+    and IdInternal > {lastCursorPosition} and version >= {BigBuildingVersionThreshold}
 order by
     IdInternal", commandTimeout: 60);
         }
+    }
 
-        public async Task<long> GetStartingMigrationPosition()
+    public class SqlSmallStreamsTable : SqlStreamsTable
+    {
+        public SqlSmallStreamsTable(string connectionString, int pageSize = 1000)
+            : base(connectionString, pageSize)
+        { }
+
+        public override async Task<IEnumerable<(int internalId, string aggregateId)>> ReadNextStreamPage(int lastCursorPosition)
+        {
+            await using var conn = new SqlConnection(ConnectionString);
+
+            return await conn.QueryAsync<(int, string)>($@"
+select top ({PageSize})
+	[IdInternal]
+    ,[IdOriginal]
+from
+    [{Schema.Default}].[Streams]
+where
+    IdOriginal not like 'building-%'
+    and IdInternal > {lastCursorPosition} and version < {BigBuildingVersionThreshold}
+order by
+    IdInternal", commandTimeout: 60);
+        }
+    }
+
+    public abstract class SqlStreamsTable
+    {
+        protected readonly string ConnectionString;
+        protected readonly int PageSize;
+        protected const int BigBuildingVersionThreshold = 1000;
+
+        public SqlStreamsTable(string connectionString, int pageSize = 500)
+        {
+            ConnectionString = connectionString;
+            PageSize = pageSize;
+        }
+
+        public abstract Task<IEnumerable<(int internalId, string aggregateId)>> ReadNextStreamPage(int lastCursorPosition);
+
+        public static async Task<long> GetStartingMigrationPosition(string connectionString)
         {
             var query = $@"DECLARE @pos bigint;
 
-SELECT @pos = MIN(position) 
+SELECT @pos = MIN(position)
 FROM [{Schema.Default}].[Streams]
 WHERE IdOriginal LIKE 'building-%'
 
@@ -48,7 +82,7 @@ WHERE StreamIdInternal IN (
 	SELECT IdInternal FROM [{Schema.Default}].[Streams]
 	WHERE IdOriginal LIKE 'building-%') AND Position <= @pos";
 
-            await using var conn = new SqlConnection(_connectionString);
+            await using var conn = new SqlConnection(connectionString);
             var command = new CommandDefinition(query, conn, commandTimeout: 60 * 60); //can take a while to query 200M+ events..
             return await conn.ExecuteScalarAsync<long>(command);
         }
