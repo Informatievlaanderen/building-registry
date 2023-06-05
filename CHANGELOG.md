@@ -1,3 +1,10 @@
+## [3.78.14](https://github.com/informatievlaanderen/building-registry/compare/v3.78.13...v3.78.14) (2023-06-05)
+
+
+### Bug Fixes
+
+* add registration iaddcommonbuildingunit to migrator ([2e3f0d9](https://github.com/informatievlaanderen/building-registry/commit/2e3f0d9f9423f68a1040c053ceff97cf0183f618))
+
 ## [3.78.13](https://github.com/informatievlaanderen/building-registry/compare/v3.78.12...v3.78.13) (2023-06-02)
 
 
