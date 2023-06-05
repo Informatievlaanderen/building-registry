@@ -4,11 +4,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\BuildingRegistry.Api.BackOffice.Handlers.Lambda\BuildingRegistry.Api.BackOffice.Handlers.Lambda.csproj" />
     <ProjectReference Include="..\..\src\BuildingRegistry.Api.BackOffice\BuildingRegistry.Api.BackOffice.csproj" />
-    <ProjectReference Include="..\..\src\BuildingRegistry.Api.Grb\BuildingRegistry.Api.Grb.csproj" />
     <ProjectReference Include="..\..\src\BuildingRegistry.Consumer.Address\BuildingRegistry.Consumer.Address.csproj" />
-    <ProjectReference Include="..\..\src\BuildingRegistry.Grb.Abstractions\BuildingRegistry.Grb.Abstractions.csproj" />
-    <ProjectReference Include="..\..\src\BuildingRegistry.Grb.Processor.Job\BuildingRegistry.Grb.Processor.Job.csproj" />
-    <ProjectReference Include="..\..\src\BuildingRegistry.Grb.Processor.Upload\BuildingRegistry.Grb.Processor.Upload.csproj" />
     <ProjectReference Include="..\..\src\BuildingRegistry.Migrator.Building\BuildingRegistry.Migrator.Building.csproj" />
     <ProjectReference Include="..\..\src\BuildingRegistry.Projections.BackOffice\BuildingRegistry.Projections.BackOffice.csproj" />
     <ProjectReference Include="..\..\src\BuildingRegistry.Projections.Legacy\BuildingRegistry.Projections.Legacy.csproj" />
@@ -27,12 +23,6 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Grb\Upload\gebouw_dbf_missing.zip">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Grb\UploadProcessor\gebouw_ALL.zip">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Grb\UploadProcessor\gebouw_dbf_missing.zip">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
