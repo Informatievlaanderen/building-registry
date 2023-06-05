@@ -26,7 +26,8 @@ namespace BuildingRegistry.Migrator.Building.Infrastructure
     public class Program
     {
         protected Program()
-        { }
+        {
+        }
 
         public static async Task Main(string[] args)
         {
@@ -44,12 +45,13 @@ namespace BuildingRegistry.Migrator.Building.Infrastructure
                     AppDomain.CurrentDomain.FriendlyName);
 
             AppDomain.CurrentDomain.UnhandledException += (sender, eventArgs) =>
-                Log.Fatal((Exception)eventArgs.ExceptionObject, "Encountered a fatal exception, exiting program.");
+                Log.Fatal((Exception) eventArgs.ExceptionObject, "Encountered a fatal exception, exiting program.");
 
             var configuration = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: false)
-                .AddJsonFile($"appsettings.{Environment.MachineName.ToLowerInvariant()}.json", optional: true, reloadOnChange: false)
+                .AddJsonFile($"appsettings.{Environment.MachineName.ToLowerInvariant()}.json", optional: true,
+                    reloadOnChange: false)
                 .AddEnvironmentVariables()
                 .AddCommandLine(args)
                 .Build();
@@ -73,11 +75,17 @@ namespace BuildingRegistry.Migrator.Building.Infrastructure
                     consumedAddressItems = await consumerContext
                         .AddressConsumerItems
                         .Where(x => x.AddressId.HasValue)
-                        .Select(x => new { AddressId = x.AddressId!.Value, x.AddressPersistentLocalId })
+                        .Select(x => new {AddressId = x.AddressId!.Value, x.AddressPersistentLocalId})
                         .ToDictionaryAsync(x => x.AddressId, y => y.AddressPersistentLocalId, ct);
                 }
 
-                var migrator = new StreamMigrator(
+                var bigBuildingMigrator = new BigBuildingStreamMigrator(
+                    container.GetRequiredService<ILoggerFactory>(),
+                    configuration,
+                    container.GetRequiredService<ILifetimeScope>(),
+                    consumedAddressItems);
+
+                var smallBuildingMigrator = new SmallBuildingStreamMigrator(
                     container.GetRequiredService<ILoggerFactory>(),
                     configuration,
                     container.GetRequiredService<ILifetimeScope>(),
@@ -92,22 +100,25 @@ namespace BuildingRegistry.Migrator.Building.Infrastructure
                                 .Handle<SqlException>()
                                 .WaitAndRetryAsync(60, _ => TimeSpan.FromSeconds(60),
                                     (_, timespan) =>
-                                        Log.Information($"SqlException occurred retrying after {timespan.Seconds} seconds."))
+                                        Log.Information(
+                                            $"SqlException occurred retrying after {timespan.Seconds} seconds."))
                                 .ExecuteAsync(async () =>
                                 {
-                                    await migrator.ProcessAsync(ct);
+                                    await Task.WhenAll(
+                                        Task.Run(async () => { await bigBuildingMigrator.ProcessAsync(ct); }, ct),
+                                        Task.Run(async () => { await smallBuildingMigrator.ProcessAsync(ct); }, ct));
 
-                                    var sqlStreamTable = new SqlStreamsTable(configuration.GetConnectionString("events"));
-                                    var startingMigrationPosition = await sqlStreamTable.GetStartingMigrationPosition();
+                                    var startingMigrationPosition =
+                                        await SqlStreamsTable.GetStartingMigrationPosition(
+                                            configuration.GetConnectionString("events"));
 
                                     var projectorRunner = new ProjectorRunner(
                                         container.GetRequiredService<IConnectedProjectionsManager>(),
                                         container.GetRequiredService<ILoggerFactory>(),
                                         configuration.GetConnectionString("events")
-                                        );
+                                    );
                                     Log.Information("The projection consumer was started");
                                     await projectorRunner.StartAsync(startingMigrationPosition, ct);
-
                                 });
 
                             watch.Stop();

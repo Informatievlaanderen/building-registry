@@ -13,11 +13,9 @@ namespace BuildingRegistry.Migrator.Building.Infrastructure
     using Be.Vlaanderen.Basisregisters.CommandHandling;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using BuildingRegistry.Building;
-    using Consumer.Address;
     using Legacy;
     using Legacy.Commands;
     using Microsoft.Data.SqlClient;
-    using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.Logging;
     using Polly;
@@ -26,31 +24,37 @@ namespace BuildingRegistry.Migrator.Building.Infrastructure
     using BuildingUnit = BuildingRegistry.Building.Commands.BuildingUnit;
     using ILogger = Microsoft.Extensions.Logging.ILogger;
 
-    internal class StreamMigrator
+    public abstract class StreamMigrator
     {
         private readonly ILifetimeScope _lifetimeScope;
         private readonly ILogger _logger;
+
+        private readonly SqlStreamsTable _sqlStreamsTable;
         private readonly ProcessedIdsTable _processedIdsTable;
-        private readonly SqlStreamsTable _sqlStreamTable;
         private readonly Dictionary<Guid, int> _consumedAddressItems;
         private readonly bool _skipIncomplete;
 
-        private List<(int processedId, bool isPageCompleted)> _processedIds;
         private readonly Stopwatch _stopwatch = new Stopwatch();
 
-        public StreamMigrator(
+        private List<(int processedId, bool isPageCompleted)> _processedIds = new List<(int processedId, bool isPageCompleted)>();
+
+        protected StreamMigrator(
             ILoggerFactory loggerFactory,
             IConfiguration configuration,
             ILifetimeScope lifetimeScope,
-            Dictionary<Guid, int> consumedAddressItems)
+            Dictionary<Guid, int> consumedAddressItems,
+            SqlStreamsTable streamsTable,
+            ILogger logger,
+            string processedIdsTableName)
         {
             _lifetimeScope = lifetimeScope;
             _consumedAddressItems = consumedAddressItems;
-            _logger = loggerFactory.CreateLogger("BuildingMigrator");
 
             var connectionString = configuration.GetConnectionString("events");
-            _processedIdsTable = new ProcessedIdsTable(connectionString, loggerFactory);
-            _sqlStreamTable = new SqlStreamsTable(connectionString);
+            _processedIdsTable = new ProcessedIdsTable(connectionString, processedIdsTableName, loggerFactory);
+
+            _logger = logger;
+            _sqlStreamsTable = streamsTable;
 
             _skipIncomplete = bool.Parse(configuration["SkipIncomplete"]);
         }
@@ -70,7 +74,7 @@ namespace BuildingRegistry.Migrator.Building.Infrastructure
                     .Max()
                 : 0;
 
-            var pageOfStreams = (await _sqlStreamTable.ReadNextBuildingStreamPage(lastCursorPosition)).ToList();
+            var pageOfStreams = (await _sqlStreamsTable.ReadNextStreamPage(lastCursorPosition)).ToList();
 
             while (pageOfStreams.Any() && !ct.IsCancellationRequested)
             {
@@ -89,7 +93,7 @@ namespace BuildingRegistry.Migrator.Building.Infrastructure
                         lastCursorPosition = _processedIds.Max(x => x.processedId);
                     }
 
-                    pageOfStreams = (await _sqlStreamTable.ReadNextBuildingStreamPage(lastCursorPosition)).ToList();
+                    pageOfStreams = (await _sqlStreamsTable.ReadNextStreamPage(lastCursorPosition)).ToList();
                 }
                 catch (OperationCanceledException)
                 {
