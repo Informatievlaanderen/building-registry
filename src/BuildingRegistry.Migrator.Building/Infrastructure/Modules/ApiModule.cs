@@ -55,6 +55,10 @@ namespace BuildingRegistry.Migrator.Building.Infrastructure.Modules
                 .RegisterModule(new ConsumerAddressModule(_configuration, _services, _loggerFactory))
                 .RegisterModule(new MigratorProjectionModule(_configuration, _services, _loggerFactory));
 
+            builder
+                .RegisterType<AddCommonBuildingUnit>()
+                .As<IAddCommonBuildingUnit>();
+
             builder.RegisterModule(new ProjectorModule(_configuration));
 
             builder
