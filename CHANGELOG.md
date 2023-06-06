@@ -1,3 +1,10 @@
+## [3.78.15](https://github.com/informatievlaanderen/building-registry/compare/v3.78.14...v3.78.15) (2023-06-06)
+
+
+### Bug Fixes
+
+* split migrator into small/big building migration ([fa382ec](https://github.com/informatievlaanderen/building-registry/commit/fa382ec9720d3302e71f3d11a1c64533a9ec4d6e))
+
 ## [3.78.14](https://github.com/informatievlaanderen/building-registry/compare/v3.78.13...v3.78.14) (2023-06-05)
 
 
