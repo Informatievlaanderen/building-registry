@@ -1,10 +1,17 @@
+AspNetCore.HealthChecks.SqlServer
+
 Be.Vlaanderen.Basisregisters.AggregateSource
 Be.Vlaanderen.Basisregisters.Api
 Be.Vlaanderen.Basisregisters.EventHandling.Autofac
 Be.Vlaanderen.Basisregisters.DataDog.Tracing.Autofac
 Be.Vlaanderen.Basisregisters.Projector
 
-AspNetCore.HealthChecks.SqlServer
+Elastic.Apm
+Elastic.Apm.AspNetCore
+Elastic.Apm.EntityFrameworkCore
+Elastic.Apm.Extensions.Hosting
+Elastic.Apm.SqlClient
+Elastic.Apm.StackExchange.Redis
 
 SourceLink.Embed.AllSourceFiles
 SourceLink.Copy.PdbFiles
