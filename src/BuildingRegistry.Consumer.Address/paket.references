@@ -13,6 +13,11 @@ Be.Vlaanderen.Basisregisters.ProjectionHandling.Connector
 Be.Vlaanderen.Basisregisters.ProjectionHandling.Runner
 Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Autofac
 
+Elastic.Apm
+Elastic.Apm.EntityFrameworkCore
+Elastic.Apm.Extensions.Hosting
+Elastic.Apm.SqlClient
+
 Serilog
 Serilog.Settings.Configuration
 Serilog.Extensions.Logging

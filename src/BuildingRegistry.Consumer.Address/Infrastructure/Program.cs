@@ -5,7 +5,6 @@ namespace BuildingRegistry.Consumer.Address.Infrastructure
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
-    using Address;
     using Api.BackOffice.Abstractions;
     using Autofac;
     using Autofac.Extensions.DependencyInjection;
@@ -13,13 +12,16 @@ namespace BuildingRegistry.Consumer.Address.Infrastructure
     using Be.Vlaanderen.Basisregisters.DataDog.Tracing.Autofac;
     using Be.Vlaanderen.Basisregisters.DataDog.Tracing.Sql.EntityFrameworkCore;
     using Be.Vlaanderen.Basisregisters.EventHandling;
-    using Be.Vlaanderen.Basisregisters.EventHandling.Autofac;
     using Be.Vlaanderen.Basisregisters.MessageHandling.Kafka;
     using Be.Vlaanderen.Basisregisters.MessageHandling.Kafka.Consumer;
     using Building;
     using BuildingRegistry.Infrastructure;
     using BuildingRegistry.Infrastructure.Modules;
     using Destructurama;
+    using Elastic.Apm.DiagnosticSource;
+    using Elastic.Apm.EntityFrameworkCore;
+    using Elastic.Apm.Extensions.Hosting;
+    using Elastic.Apm.SqlClient;
     using Microsoft.Data.SqlClient;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Configuration;
@@ -160,6 +162,10 @@ namespace BuildingRegistry.Consumer.Address.Infrastructure
 
                     builder.Populate(services);
                 })
+                .UseElasticApm(
+                    new EfCoreDiagnosticsSubscriber(),
+                    new HttpDiagnosticsSubscriber(),
+                    new SqlClientDiagnosticSubscriber())
                 .UseConsoleLifetime()
                 .Build();
 
