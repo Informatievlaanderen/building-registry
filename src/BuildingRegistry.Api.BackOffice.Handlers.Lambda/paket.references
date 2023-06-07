@@ -1,13 +1,19 @@
+Amazon.Lambda.Core
+Amazon.Lambda.Serialization.Json
+
 Be.Vlaanderen.Basisregisters.Aws.Lambda
 Be.Vlaanderen.Basisregisters.CommandHandling.Idempotency
 Be.Vlaanderen.Basisregisters.Sqs.Lambda
 Be.Vlaanderen.Basisregisters.TicketingService.Abstractions
 Be.Vlaanderen.Basisregisters.TicketingService.Proxy.HttpProxy
 
+Elastic.Apm
+Elastic.Apm.EntityFrameworkCore
+Elastic.Apm.SqlClient
+ElasticApm.MediatR
+
 MediatR
 
-Amazon.Lambda.Core
-Amazon.Lambda.Serialization.Json
 Microsoft.Extensions.Configuration.Binder
 Microsoft.Extensions.Configuration.EnvironmentVariables
 Microsoft.Extensions.Configuration.FileExtensions
