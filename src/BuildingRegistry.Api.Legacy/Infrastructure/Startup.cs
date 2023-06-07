@@ -1,25 +1,31 @@
 namespace BuildingRegistry.Api.Legacy.Infrastructure
 {
+    using System;
+    using System.Linq;
+    using System.Reflection;
     using Autofac;
     using Autofac.Extensions.DependencyInjection;
     using Be.Vlaanderen.Basisregisters.Api;
+    using Be.Vlaanderen.Basisregisters.Api.Exceptions;
     using Be.Vlaanderen.Basisregisters.DataDog.Tracing.Microsoft;
     using Configuration;
+    using Elastic.Apm.AspNetCore;
+    using Elastic.Apm.AspNetCore.DiagnosticListener;
+    using Elastic.Apm.DiagnosticSource;
+    using Elastic.Apm.EntityFrameworkCore;
+    using Elastic.Apm.SqlClient;
+    using ElasticApm.MediatR;
+    using Grb.Wfs;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.Mvc.ApiExplorer;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
-    using Microsoft.Extensions.Logging;
-    using Microsoft.Extensions.Hosting;
-    using Modules;
-    using System;
-    using System.Linq;
-    using System.Reflection;
-    using Be.Vlaanderen.Basisregisters.Api.Exceptions;
-    using Grb.Wfs;
     using Microsoft.Extensions.Diagnostics.HealthChecks;
+    using Microsoft.Extensions.Hosting;
+    using Microsoft.Extensions.Logging;
     using Microsoft.OpenApi.Models;
+    using Modules;
     using Options;
 
     /// <summary>Represents the startup process for the application.</summary>
@@ -136,6 +142,14 @@ namespace BuildingRegistry.Api.Legacy.Infrastructure
                         ServiceName = _configuration["DataDog:ServiceName"],
                     }
                 })
+
+                .UseElasticApm(_configuration,
+                    new AspNetCoreDiagnosticSubscriber(),
+                    new AspNetCoreErrorDiagnosticsSubscriber(),
+                    new EfCoreDiagnosticsSubscriber(),
+                    new HttpDiagnosticsSubscriber(),
+                    new SqlClientDiagnosticSubscriber(),
+                    new MediatrDiagnosticsSubscriber())
 
                 .UseDefaultForApi(new StartupUseOptions
                 {
