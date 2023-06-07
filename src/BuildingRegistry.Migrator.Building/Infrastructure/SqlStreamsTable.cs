@@ -8,7 +8,7 @@ namespace BuildingRegistry.Migrator.Building.Infrastructure
 
     public class SqlBigStreamsTable : SqlStreamsTable
     {
-        public SqlBigStreamsTable(string connectionString, int pageSize = 1)
+        public SqlBigStreamsTable(string connectionString, int pageSize = 6)
             : base(connectionString, pageSize)
         { }
 
@@ -58,7 +58,7 @@ order by
     {
         protected readonly string ConnectionString;
         protected readonly int PageSize;
-        protected const int BigBuildingVersionThreshold = 1000;
+        protected const int BigBuildingVersionThreshold = 5000;
 
         public SqlStreamsTable(string connectionString, int pageSize = 500)
         {
