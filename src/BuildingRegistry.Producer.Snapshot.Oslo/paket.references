@@ -1,3 +1,5 @@
+AspNetCore.HealthChecks.SqlServer
+
 Be.Vlaanderen.Basisregisters.Api
 Be.Vlaanderen.Basisregisters.EventHandling.Autofac
 Be.Vlaanderen.Basisregisters.DataDog.Tracing.Sql
@@ -7,9 +9,13 @@ Be.Vlaanderen.BasisRegisters.MessageHandling.Kafka.Producer
 Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Autofac
 Be.Vlaanderen.Basisregisters.Projector
 
-Microsoft.Extensions.DependencyInjection
+Elastic.Apm
+Elastic.Apm.AspNetCore
+Elastic.Apm.EntityFrameworkCore
+Elastic.Apm.Extensions.Hosting
+Elastic.Apm.SqlClient
 
-AspNetCore.HealthChecks.SqlServer
+Microsoft.Extensions.DependencyInjection
 
 SourceLink.Embed.AllSourceFiles
 SourceLink.Copy.PdbFiles
