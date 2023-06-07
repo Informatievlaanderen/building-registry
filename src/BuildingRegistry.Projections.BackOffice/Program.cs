@@ -4,6 +4,7 @@
     using System.IO;
     using System.Threading;
     using System.Threading.Tasks;
+    using Api.BackOffice.Abstractions;
     using Autofac;
     using Autofac.Extensions.DependencyInjection;
     using Be.Vlaanderen.Basisregisters.Aws.DistributedMutex;
@@ -14,9 +15,12 @@
     using Be.Vlaanderen.Basisregisters.Projector;
     using Be.Vlaanderen.Basisregisters.Projector.ConnectedProjections;
     using Be.Vlaanderen.Basisregisters.Projector.Modules;
-    using BuildingRegistry.Api.BackOffice.Abstractions;
     using BuildingRegistry.Infrastructure;
     using Destructurama;
+    using Elastic.Apm.DiagnosticSource;
+    using Elastic.Apm.EntityFrameworkCore;
+    using Elastic.Apm.Extensions.Hosting;
+    using Elastic.Apm.SqlClient;
     using Infrastructure;
     using Microsoft.Data.SqlClient;
     using Microsoft.EntityFrameworkCore;
@@ -109,6 +113,10 @@
                         c => new BackOfficeProjections(c.Resolve<IDbContextFactory<BackOfficeContext>>()),
                         ConnectedProjectionSettings.Default);
                 })
+                .UseElasticApm(
+                    new EfCoreDiagnosticsSubscriber(),
+                    new HttpDiagnosticsSubscriber(),
+                    new SqlClientDiagnosticSubscriber())
                 .UseConsoleLifetime()
                 .Build();
 
