@@ -4,15 +4,7 @@ Be.Vlaanderen.Basisregisters.Api
 Be.Vlaanderen.Basisregisters.EventHandling.Autofac
 Be.Vlaanderen.Basisregisters.DataDog.Tracing.Autofac
 
-Elastic.Apm
-Elastic.Apm.AspNetCore
-Elastic.Apm.EntityFrameworkCore
-Elastic.Apm.Extensions.Hosting
-Elastic.Apm.SqlClient
-ElasticApm.MediatR
-
 MediatR
-
 Microsoft.SyndicationFeed.ReaderWriter
 
 SourceLink.Embed.AllSourceFiles

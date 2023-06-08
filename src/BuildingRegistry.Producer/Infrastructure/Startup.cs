@@ -8,13 +8,7 @@ namespace BuildingRegistry.Producer.Infrastructure
     using Be.Vlaanderen.Basisregisters.Api;
     using Be.Vlaanderen.Basisregisters.DataDog.Tracing.Microsoft;
     using Be.Vlaanderen.Basisregisters.Projector;
-    using BuildingRegistry.Infrastructure.Modules;
     using Configuration;
-    using Elastic.Apm.AspNetCore;
-    using Elastic.Apm.AspNetCore.DiagnosticListener;
-    using Elastic.Apm.DiagnosticSource;
-    using Elastic.Apm.EntityFrameworkCore;
-    using Elastic.Apm.SqlClient;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.Mvc.ApiExplorer;
@@ -25,6 +19,7 @@ namespace BuildingRegistry.Producer.Infrastructure
     using Microsoft.Extensions.Logging;
     using Microsoft.OpenApi.Models;
     using Modules;
+    using BuildingRegistry.Infrastructure.Modules;
 
     /// <summary>Represents the startup process for the application.</summary>
     public class Startup
@@ -149,13 +144,6 @@ namespace BuildingRegistry.Producer.Infrastructure
                         ServiceName = _configuration["DataDog:ServiceName"]
                     }
                 })
-
-                .UseElasticApm(_configuration,
-                    new AspNetCoreDiagnosticSubscriber(),
-                    new AspNetCoreErrorDiagnosticsSubscriber(),
-                    new EfCoreDiagnosticsSubscriber(),
-                    new HttpDiagnosticsSubscriber(),
-                    new SqlClientDiagnosticSubscriber())
 
                 .UseDefaultForApi(new StartupUseOptions
                 {

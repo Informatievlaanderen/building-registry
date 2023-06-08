@@ -4,43 +4,36 @@ using Amazon.Lambda.Core;
 
 namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda
 {
-    using System.Reflection;
-    using Abstractions;
-    using Abstractions.Building.SqsRequests;
     using Autofac;
     using Autofac.Extensions.DependencyInjection;
     using Be.Vlaanderen.Basisregisters.Aws.Lambda;
-    using Be.Vlaanderen.Basisregisters.CommandHandling.Idempotency;
     using Be.Vlaanderen.Basisregisters.DataDog.Tracing.Autofac;
     using Be.Vlaanderen.Basisregisters.EventHandling;
-    using Be.Vlaanderen.Basisregisters.Sqs.Lambda.Handlers;
-    using Be.Vlaanderen.Basisregisters.Sqs.Lambda.Infrastructure;
-    using Consumer.Address;
-    using Elastic.Apm;
-    using Elastic.Apm.DiagnosticSource;
-    using Elastic.Apm.EntityFrameworkCore;
-    using Elastic.Apm.SqlClient;
-    using ElasticApm.MediatR;
-    using Infrastructure;
-    using Infrastructure.Modules;
+    using Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Autofac;
     using MediatR;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Logging;
+    using System.Reflection;
+    using Abstractions;
+    using Abstractions.Building.SqsRequests;
+    using Be.Vlaanderen.Basisregisters.CommandHandling.Idempotency;
+    using Be.Vlaanderen.Basisregisters.EventHandling.Autofac;
+    using Be.Vlaanderen.Basisregisters.Sqs.Lambda.Infrastructure;
+    using Infrastructure;
+    using Infrastructure.Modules;
     using Newtonsoft.Json;
     using TicketingService.Proxy.HttpProxy;
+    using Be.Vlaanderen.Basisregisters.Sqs.Lambda.Handlers;
+    using BuildingRegistry.Infrastructure;
+    using BuildingRegistry.Infrastructure.Modules;
+    using Consumer.Address;
 
     public class Function : FunctionBase
     {
         public Function()
-            : base(new List<Assembly> { typeof(PlanBuildingSqsRequest).Assembly })
-        {
-            Agent.Setup(new AgentComponents());
-            Agent.Subscribe(new SqlClientDiagnosticSubscriber(),
-                new EfCoreDiagnosticsSubscriber(),
-                new HttpDiagnosticsSubscriber(),
-                new MediatrDiagnosticsSubscriber());
-        }
+            : base(new List<Assembly>{ typeof(PlanBuildingSqsRequest).Assembly })
+        { }
 
         protected override IServiceProvider ConfigureServices(IServiceCollection services)
         {
