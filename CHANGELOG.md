@@ -1,3 +1,15 @@
+# [3.79.0](https://github.com/informatievlaanderen/building-registry/compare/v3.78.15...v3.79.0) (2023-06-08)
+
+
+### Bug Fixes
+
+* check if big building wasn't already migrated with the small buildings ([0b80e3a](https://github.com/informatievlaanderen/building-registry/commit/0b80e3aef041e8c830627779cfb724171f5556d0))
+
+
+### Features
+
+* add elastic apm ([49b66a7](https://github.com/informatievlaanderen/building-registry/commit/49b66a7d412129b8e327667e9d670fb8e87c7809))
+
 ## [3.78.15](https://github.com/informatievlaanderen/building-registry/compare/v3.78.14...v3.78.15) (2023-06-06)
 
 
