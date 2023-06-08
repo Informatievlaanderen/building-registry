@@ -15,11 +15,6 @@ namespace BuildingRegistry.Projector.Infrastructure
     using BuildingRegistry.Projections.Wfs;
     using BuildingRegistry.Projections.Wms;
     using Configuration;
-    using Elastic.Apm.AspNetCore;
-    using Elastic.Apm.AspNetCore.DiagnosticListener;
-    using Elastic.Apm.DiagnosticSource;
-    using Elastic.Apm.EntityFrameworkCore;
-    using Elastic.Apm.SqlClient;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.Mvc.ApiExplorer;
@@ -172,14 +167,6 @@ namespace BuildingRegistry.Projector.Infrastructure
                         ServiceName = _configuration["DataDog:ServiceName"],
                     }
                 })
-
-                .UseElasticApm(_configuration,
-                    new AspNetCoreDiagnosticSubscriber(),
-                    new AspNetCoreErrorDiagnosticsSubscriber(),
-                    new EfCoreDiagnosticsSubscriber(),
-                    new HttpDiagnosticsSubscriber(),
-                    new SqlClientDiagnosticSubscriber())
-
                 .UseDefaultForApi(new StartupUseOptions
                 {
                     Common =

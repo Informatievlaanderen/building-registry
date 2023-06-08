@@ -3,18 +3,14 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo.Infrastructure
     using System;
     using System.Linq;
     using System.Reflection;
+    using BuildingRegistry.Infrastructure.Modules;
     using Autofac;
     using Autofac.Extensions.DependencyInjection;
     using Be.Vlaanderen.Basisregisters.Api;
     using Be.Vlaanderen.Basisregisters.DataDog.Tracing.Microsoft;
+    using Be.Vlaanderen.Basisregisters.GrAr.Oslo.SnapshotProducer;
     using Be.Vlaanderen.Basisregisters.Projector;
-    using BuildingRegistry.Infrastructure.Modules;
     using Configuration;
-    using Elastic.Apm.AspNetCore;
-    using Elastic.Apm.AspNetCore.DiagnosticListener;
-    using Elastic.Apm.DiagnosticSource;
-    using Elastic.Apm.EntityFrameworkCore;
-    using Elastic.Apm.SqlClient;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.Mvc.ApiExplorer;
@@ -149,13 +145,6 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo.Infrastructure
                         ServiceName = _configuration["DataDog:ServiceName"]
                     }
                 })
-
-                .UseElasticApm(_configuration,
-                    new AspNetCoreDiagnosticSubscriber(),
-                    new AspNetCoreErrorDiagnosticsSubscriber(),
-                    new EfCoreDiagnosticsSubscriber(),
-                    new HttpDiagnosticsSubscriber(),
-                    new SqlClientDiagnosticSubscriber())
 
                 .UseDefaultForApi(new StartupUseOptions
                 {
