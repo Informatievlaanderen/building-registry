@@ -1,3 +1,10 @@
+## [3.79.1](https://github.com/informatievlaanderen/building-registry/compare/v3.79.0...v3.79.1) (2023-06-08)
+
+
+### Bug Fixes
+
+* big building migration threshold to 5000 & pagesize 6 ([795598f](https://github.com/informatievlaanderen/building-registry/commit/795598f2d107b57da75ec995e4ae4731a235fab0))
+
 # [3.79.0](https://github.com/informatievlaanderen/building-registry/compare/v3.78.15...v3.79.0) (2023-06-08)
 
 
