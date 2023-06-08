@@ -132,21 +132,33 @@ namespace BuildingRegistry.Migrator.Building.Infrastructure
             return processedItems.ToList();
         }
 
+
+        protected virtual Task<bool> IsMigrated(int idInternal)
+        {
+            return Task.FromResult(false);
+        }
+
         private async Task ProcessStream(
             (int, string) stream,
             ConcurrentBag<int> processedItems,
             CancellationToken ct)
         {
-            var (internalId, aggregateId) = stream;
+            var (idInternal, aggregateId) = stream;
 
             if (ct.IsCancellationRequested)
             {
                 return;
             }
 
-            if (_processedIds.Contains((internalId, false)))
+            if (_processedIds.Contains((idInternal, false)))
             {
-                _logger.LogDebug($"Already migrated '{internalId}', skipping...");
+                _logger.LogDebug($"Already migrated '{idInternal}', skipping...");
+                return;
+            }
+
+            if (await IsMigrated(idInternal))
+            {
+                _logger.LogDebug($"Building Already migrated in Small buildings '{idInternal}', skipping...");
                 return;
             }
 
@@ -232,8 +244,8 @@ namespace BuildingRegistry.Migrator.Building.Infrastructure
             await DispatchCommand(markMigrated, ct);
             await DispatchCommand(migrateBuilding, ct);
 
-            await _processedIdsTable.Add(internalId);
-            processedItems.Add(internalId);
+            await _processedIdsTable.Add(idInternal);
+            processedItems.Add(idInternal);
 
             await using var backOfficeContext = streamLifetimeScope.Resolve<BackOfficeContext>();
             foreach (var buildingUnit in migrateBuilding.BuildingUnits)

@@ -24,6 +24,17 @@ namespace BuildingRegistry.Migrator.Building.Infrastructure
             _logger = loggerFactory.CreateLogger<ProcessedIdsTable>();
         }
 
+        public async Task<bool> IsMigrated(int idInternal)
+        {
+            await using var conn = new SqlConnection(_connectionString);
+            var result = await conn.ExecuteScalarAsync<int>($@"
+                SELECT count(*)
+                FROM {Table}
+                WHERE Id = {idInternal}
+");
+            return result == 1;
+        }
+
         public async Task CreateTableIfNotExists()
         {
             await using var conn = new SqlConnection(_connectionString);
