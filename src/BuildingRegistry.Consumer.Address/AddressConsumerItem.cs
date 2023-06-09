@@ -66,7 +66,7 @@ namespace BuildingRegistry.Consumer.Address
 
     public class AddressConsumerItemConfiguration : IEntityTypeConfiguration<AddressConsumerItem>
     {
-        private const string TableName = "Addresses";
+        public const string TableName = "Addresses";
 
         public void Configure(EntityTypeBuilder<AddressConsumerItem> builder)
         {
