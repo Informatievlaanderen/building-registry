@@ -1,3 +1,10 @@
+## [3.80.1](https://github.com/informatievlaanderen/building-registry/compare/v3.80.0...v3.80.1) (2023-06-12)
+
+
+### Bug Fixes
+
+* set projection migrator saveinterval to 10000 ([2b4c22a](https://github.com/informatievlaanderen/building-registry/commit/2b4c22a5c2ef827796e1903c11dff3820685123f))
+
 # [3.80.0](https://github.com/informatievlaanderen/building-registry/compare/v3.79.1...v3.80.0) (2023-06-12)
 
 
