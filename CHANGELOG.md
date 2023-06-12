@@ -1,3 +1,10 @@
+## [3.80.2](https://github.com/informatievlaanderen/building-registry/compare/v3.80.1...v3.80.2) (2023-06-12)
+
+
+### Performance Improvements
+
+* set migrator catchuppagesize to increase performance ([172b1c9](https://github.com/informatievlaanderen/building-registry/commit/172b1c9add4128fdf82c1021bf60f1fdd0e220fb))
+
 ## [3.80.1](https://github.com/informatievlaanderen/building-registry/compare/v3.80.0...v3.80.1) (2023-06-12)
 
 
