@@ -1,3 +1,16 @@
+# [3.80.0](https://github.com/informatievlaanderen/building-registry/compare/v3.79.1...v3.80.0) (2023-06-12)
+
+
+### Bug Fixes
+
+* revert add elastic apm ([d192a72](https://github.com/informatievlaanderen/building-registry/commit/d192a72dfec6cb84453a211f973b993f8daf4c13))
+* set bigbuilding threshold to 50000 for building migrator ([bb99639](https://github.com/informatievlaanderen/building-registry/commit/bb99639a8442383c2e3315e9a990386ba5705f3a))
+
+
+### Features
+
+* add controller consumer ([e7e70c5](https://github.com/informatievlaanderen/building-registry/commit/e7e70c5d070b3a603fb509c8d0d1ce7c2075c484))
+
 ## [3.79.1](https://github.com/informatievlaanderen/building-registry/compare/v3.79.0...v3.79.1) (2023-06-08)
 
 
