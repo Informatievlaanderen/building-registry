@@ -69,7 +69,7 @@ namespace BuildingRegistry.Migrator.Building.Infrastructure.Modules
                     context => new MigratorProjection(context.Resolve<ILoggerFactory>().CreateLogger<MigratorProjection>(), context.Resolve<IDbContextFactory<BackOfficeContext>>()),
                     ConnectedProjectionSettings.Configure(a =>
                     {
-                        a.ConfigureCatchUpUpdatePositionMessageInterval(1);
+                        a.ConfigureCatchUpUpdatePositionMessageInterval(10000);
                     }));
 
             builder.RegisterEventstreamModule(_configuration);
