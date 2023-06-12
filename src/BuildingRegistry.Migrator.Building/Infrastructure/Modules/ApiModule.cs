@@ -70,6 +70,7 @@ namespace BuildingRegistry.Migrator.Building.Infrastructure.Modules
                     ConnectedProjectionSettings.Configure(a =>
                     {
                         a.ConfigureCatchUpUpdatePositionMessageInterval(10000);
+                        a.ConfigureCatchUpPageSize(10000);
                     }));
 
             builder.RegisterEventstreamModule(_configuration);
