@@ -1,3 +1,10 @@
+## [3.80.3](https://github.com/informatievlaanderen/building-registry/compare/v3.80.2...v3.80.3) (2023-06-13)
+
+
+### Bug Fixes
+
+* big building migration threshold to 30k ([18394cb](https://github.com/informatievlaanderen/building-registry/commit/18394cb417c3a7a03f525cbba312730eef20ac9f))
+
 ## [3.80.2](https://github.com/informatievlaanderen/building-registry/compare/v3.80.1...v3.80.2) (2023-06-12)
 
 
