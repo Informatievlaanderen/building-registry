@@ -2,6 +2,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.BuildingUnit
 {
     using System.Threading;
     using System.Threading.Tasks;
+    using Abstractions;
     using Abstractions.Validation;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
     using Be.Vlaanderen.Basisregisters.Sqs.Exceptions;
@@ -16,23 +17,31 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.BuildingUnit
 
     public sealed class CorrectBuildingUnitRetirementLambdaHandler : BuildingUnitLambdaHandler<CorrectBuildingUnitRetirementLambdaRequest>
     {
+        private readonly BackOfficeContext _backOfficeContext;
+
         public CorrectBuildingUnitRetirementLambdaHandler(
             IConfiguration configuration,
             ICustomRetryPolicy retryPolicy,
             ITicketing ticketing,
             IIdempotentCommandHandler idempotentCommandHandler,
-            IBuildings buildings)
+            IBuildings buildings,
+            BackOfficeContext backOfficeContext)
             : base(
                 configuration,
                 retryPolicy,
                 ticketing,
                 idempotentCommandHandler,
                 buildings)
-        { }
+        {
+            _backOfficeContext = backOfficeContext;
+        }
 
         protected override async Task<ETagResponse> InnerHandle(CorrectBuildingUnitRetirementLambdaRequest request, CancellationToken cancellationToken)
         {
             var cmd = request.ToCommand();
+
+            // Transaction because a commonBuildingUnit is sometimes added
+            await using var transaction = await _backOfficeContext.Database.BeginTransactionAsync(cancellationToken);
 
             try
             {
@@ -46,6 +55,8 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.BuildingUnit
             {
                 // Idempotent: Do Nothing return last etag
             }
+
+            await transaction.CommitAsync(cancellationToken);
 
             var lastHash = await GetHash(
                 request.BuildingPersistentLocalId,

@@ -55,7 +55,8 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
                 new FakeRetryPolicy(),
                 MockTicketing(response => { eTagResponse = response; }).Object,
                 new IdempotentCommandHandler(Container.Resolve<ICommandHandlerResolver>(), _idempotencyContext),
-                Container.Resolve<IBuildings>());
+                Container.Resolve<IBuildings>(),
+                new FakeBackOfficeContextFactory().CreateDbContext());
 
             //Act
             await handler.Handle(CreateCorrectBuildingNotRealizationLambdaRequest(), CancellationToken.None);
@@ -81,7 +82,8 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
                 new FakeRetryPolicy(),
                 ticketing.Object,
                 MockExceptionIdempotentCommandHandler(() => new IdempotencyException(string.Empty)).Object,
-                Container.Resolve<IBuildings>());
+                Container.Resolve<IBuildings>(),
+                new FakeBackOfficeContextFactory().CreateDbContext());
 
             var building =
                 await buildings.GetAsync(new BuildingStreamId(buildingPersistentLocalId), CancellationToken.None);
@@ -111,7 +113,8 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
                 new FakeRetryPolicy(),
                 ticketing.Object,
                 MockExceptionIdempotentCommandHandler<BuildingHasInvalidStatusException>().Object,
-                Container.Resolve<IBuildings>());
+                Container.Resolve<IBuildings>(),
+                new FakeBackOfficeContextFactory().CreateDbContext());
 
             // Act
             await handler.Handle(CreateCorrectBuildingNotRealizationLambdaRequest(), CancellationToken.None);
@@ -137,7 +140,8 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
                 new FakeRetryPolicy(),
                 ticketing.Object,
                 MockExceptionIdempotentCommandHandler<BuildingHasInvalidGeometryMethodException>().Object,
-                Container.Resolve<IBuildings>());
+                Container.Resolve<IBuildings>(),
+                new FakeBackOfficeContextFactory().CreateDbContext());
 
             // Act
             await handler.Handle(CreateCorrectBuildingNotRealizationLambdaRequest(), CancellationToken.None);

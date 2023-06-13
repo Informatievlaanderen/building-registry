@@ -41,6 +41,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.BuildingUnit
         {
             var cmd = request.ToCommand();
 
+            // Transaction because a commonBuildingUnit is sometimes added
             await using var transaction = await _backOfficeContext.Database.BeginTransactionAsync(cancellationToken);
 
             try
