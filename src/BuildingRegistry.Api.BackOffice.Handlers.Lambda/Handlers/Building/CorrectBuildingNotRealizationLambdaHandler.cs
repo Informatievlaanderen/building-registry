@@ -2,6 +2,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.Building
 {
     using System.Threading;
     using System.Threading.Tasks;
+    using Abstractions;
     using Abstractions.Validation;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
     using Be.Vlaanderen.Basisregisters.Sqs.Exceptions;
@@ -17,23 +18,31 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.Building
 
     public sealed class CorrectBuildingNotRealizationLambdaHandler : BuildingLambdaHandler<CorrectBuildingNotRealizationLambdaRequest>
     {
+        private readonly BackOfficeContext _backOfficeContext;
+
         public CorrectBuildingNotRealizationLambdaHandler(
             IConfiguration configuration,
             ICustomRetryPolicy retryPolicy,
             ITicketing ticketing,
             IIdempotentCommandHandler idempotentCommandHandler,
-            IBuildings buildings)
+            IBuildings buildings,
+            BackOfficeContext backOfficeContext)
             : base(
                 configuration,
                 retryPolicy,
                 ticketing,
                 idempotentCommandHandler,
                 buildings)
-        { }
+        {
+            _backOfficeContext = backOfficeContext;
+        }
 
         protected override async Task<ETagResponse> InnerHandle(CorrectBuildingNotRealizationLambdaRequest request, CancellationToken cancellationToken)
         {
             var cmd = request.ToCommand();
+
+            // Transaction because a commonBuildingUnit is sometimes added
+            await using var transaction = await _backOfficeContext.Database.BeginTransactionAsync(cancellationToken);
 
             try
             {
@@ -47,6 +56,8 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.Building
             {
                 // Idempotent: Do Nothing return last etag
             }
+
+            await transaction.CommitAsync(cancellationToken);
 
             var lastHash = await GetHash(new BuildingPersistentLocalId(request.BuildingPersistentLocalId), cancellationToken);
             return new ETagResponse(string.Format(DetailUrlFormat, request.BuildingPersistentLocalId), lastHash);

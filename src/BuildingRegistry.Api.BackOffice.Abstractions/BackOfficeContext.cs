@@ -7,6 +7,7 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions
     using System.Threading.Tasks;
     using System.Threading;
     using Infrastructure;
+    using Microsoft.Data.SqlClient;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.EntityFrameworkCore.Design;
     using Microsoft.Extensions.Configuration;
@@ -28,11 +29,30 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions
         {
             var relation = await BuildingUnitBuildings.FindAsync(new object?[] { buildingUnitPersistentLocalId }, cancellationToken);
 
-            if (relation is null)
+            if (relation is not null)
+            {
+                return relation;
+            }
+
+            try
             {
                 relation = new BuildingUnitBuilding(buildingUnitPersistentLocalId, buildingPersistentLocalId);
                 await BuildingUnitBuildings.AddAsync(relation, cancellationToken);
                 await SaveChangesAsync(cancellationToken);
+            }
+            catch (DbUpdateException exception)
+            {
+                if (exception.InnerException is not SqlException { Number: 2627 })
+                {
+                    throw;
+                }
+
+                relation = await BuildingUnitBuildings.FirstOrDefaultAsync(x => x.BuildingUnitPersistentLocalId == buildingUnitPersistentLocalId, cancellationToken);
+
+                if (relation is null)
+                {
+                    throw;
+                }
             }
 
             return relation;
@@ -45,11 +65,31 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions
             CancellationToken cancellationToken)
         {
             var relation = await FindBuildingUnitAddressRelation(buildingUnitPersistentLocalId, addressPersistentLocalId, cancellationToken);
-            if (relation is null)
+            if (relation is not null)
             {
-                relation = new BuildingUnitAddressRelation(buildingPersistentLocalId, buildingUnitPersistentLocalId, addressPersistentLocalId);
+                return relation;
+            }
+
+            try
+            {
+                relation = new BuildingUnitAddressRelation(buildingPersistentLocalId, buildingUnitPersistentLocalId,
+                    addressPersistentLocalId);
                 await BuildingUnitAddressRelation.AddAsync(relation, cancellationToken);
                 await SaveChangesAsync(cancellationToken);
+            }
+            catch (DbUpdateException exception)
+            {
+                if (exception.InnerException is not SqlException { Number: 2627 })
+                {
+                    throw;
+                }
+
+                relation = await BuildingUnitAddressRelation.FirstOrDefaultAsync(x => x.AddressPersistentLocalId == addressPersistentLocalId, cancellationToken);
+
+                if (relation is null)
+                {
+                    throw;
+                }
             }
 
             return relation;
@@ -61,11 +101,14 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions
             CancellationToken cancellationToken)
         {
             var relation = await FindBuildingUnitAddressRelation(buildingUnitPersistentLocalId, addressPersistentLocalId, cancellationToken);
-            if (relation is not null)
+
+            if (relation is null)
             {
-                BuildingUnitAddressRelation.Remove(relation);
-                await SaveChangesAsync(cancellationToken);
+                return;
             }
+
+            BuildingUnitAddressRelation.Remove(relation);
+            await SaveChangesAsync(cancellationToken);
         }
 
         public async Task<BuildingUnitAddressRelation?> FindBuildingUnitAddressRelation(

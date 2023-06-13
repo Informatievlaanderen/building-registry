@@ -41,22 +41,23 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.BuildingUnit
         {
             var cmd = request.ToCommand();
 
+            // Transaction because a commonBuildingUnit is sometimes added
+            await using var transaction = await _backOfficeContext.Database.BeginTransactionAsync(cancellationToken);
+
             try
             {
-                await using var transaction = await _backOfficeContext.Database.BeginTransactionAsync(cancellationToken);
-
                 await IdempotentCommandHandler.Dispatch(
                     cmd.CreateCommandId(),
                     cmd,
                     request.Metadata,
                     cancellationToken);
-
-                await transaction.CommitAsync(cancellationToken);
             }
             catch (IdempotencyException)
             {
                 // Idempotent: Do Nothing return last etag
             }
+
+            await transaction.CommitAsync(cancellationToken);
 
             var lastHash = await GetHash(
                 request.BuildingPersistentLocalId,
