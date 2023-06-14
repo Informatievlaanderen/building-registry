@@ -3,29 +3,33 @@ namespace BuildingRegistry.Api.Oslo.BuildingUnit.List
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
-    using Be.Vlaanderen.Basisregisters.Api.Search;
-    using Be.Vlaanderen.Basisregisters.Api.Search.Filtering;
-    using Be.Vlaanderen.Basisregisters.Api.Search.Pagination;
-    using Be.Vlaanderen.Basisregisters.Api.Search.Sorting;
     using Be.Vlaanderen.Basisregisters.GrAr.Common;
-    using BuildingRegistry.Api.Oslo.BuildingUnit.Query;
-    using BuildingRegistry.Api.Oslo.Converters;
-    using BuildingRegistry.Api.Oslo.Infrastructure;
+    using Converters;
+    using Infrastructure;
+    using Infrastructure.Options;
     using MediatR;
     using Microsoft.EntityFrameworkCore;
+    using Microsoft.Extensions.Options;
+    using Projections.Legacy;
+    using Query;
 
     public class BuildingUnitListHandlerV2 : IRequestHandler<ListRequest, BuildingUnitListOsloResponse>
     {
+        private readonly LegacyContext _context;
+        private readonly IOptions<ResponseOptions> _responseOptions;
+
+        public BuildingUnitListHandlerV2(
+            LegacyContext context,
+            IOptions<ResponseOptions> responseOptions)
+        {
+            _context = context;
+            _responseOptions = responseOptions;
+        }
+
         public async Task<BuildingUnitListOsloResponse> Handle(ListRequest request, CancellationToken cancellationToken)
         {
-            var filtering = request.HttpRequest.ExtractFilteringRequest<BuildingUnitFilterV2>();
-            var sorting = request.HttpRequest.ExtractSortingRequest();
-            var pagination = request.HttpRequest.ExtractPaginationRequest();
-
-            var pagedBuildingUnits = new BuildingUnitListOsloQueryV2(request.Context)
-                .Fetch(filtering, sorting, pagination);
-
-            request.HttpResponse.AddPagedQueryResultHeaders(pagedBuildingUnits);
+            var pagedBuildingUnits = new BuildingUnitListOsloQueryV2(_context)
+                .Fetch(request.FilteringHeader, request.SortingHeader, request.PaginationRequest);
 
             var units = await pagedBuildingUnits.Items
                 .Select(a => new
@@ -41,15 +45,17 @@ namespace BuildingRegistry.Api.Oslo.BuildingUnit.List
                 Gebouweenheden = units
                     .Select(x => new GebouweenheidCollectieItemOslo(
                         x.BuildingUnitPersistentLocalId,
-                        request.ResponseOptions.Value.GebouweenheidNaamruimte,
-                        request.ResponseOptions.Value.GebouweenheidDetailUrl,
+                        _responseOptions.Value.GebouweenheidNaamruimte,
+                        _responseOptions.Value.GebouweenheidDetailUrl,
                         x.Status.Map(),
                         x.Version.ToBelgianDateTimeOffset()))
                     .ToList(),
                 Volgende = pagedBuildingUnits
                     .PaginationInfo
-                    .BuildNextUri(units.Count, request.ResponseOptions.Value.GebouweenheidVolgendeUrl),
-                Context = request.ResponseOptions.Value.ContextUrlUnitList
+                    .BuildNextUri(units.Count, _responseOptions.Value.GebouweenheidVolgendeUrl),
+                Context = _responseOptions.Value.ContextUrlUnitList,
+                Sorting = pagedBuildingUnits.Sorting,
+                Pagination = pagedBuildingUnits.PaginationInfo
             };
         }
     }

@@ -3,10 +3,12 @@ namespace BuildingRegistry.Api.Oslo.BuildingUnit.List
     using System;
     using System.Collections.Generic;
     using System.Runtime.Serialization;
+    using Be.Vlaanderen.Basisregisters.Api.Search.Pagination;
+    using Be.Vlaanderen.Basisregisters.Api.Search.Sorting;
     using Be.Vlaanderen.Basisregisters.GrAr.Common;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy.Gebouweenheid;
-    using BuildingRegistry.Api.Oslo.Infrastructure.Options;
+    using Infrastructure.Options;
     using Microsoft.Extensions.Options;
     using Newtonsoft.Json;
     using Swashbuckle.AspNetCore.Filters;
@@ -41,6 +43,14 @@ namespace BuildingRegistry.Api.Oslo.BuildingUnit.List
         [DataMember(Name = "Volgende", Order = 2, EmitDefaultValue = false)]
         [JsonProperty(Required = Required.Default, DefaultValueHandling = DefaultValueHandling.Ignore)]
         public Uri Volgende { get; set; }
+
+        [JsonIgnore]
+        [IgnoreDataMember]
+        public SortingHeader Sorting { get; set; }
+
+        [JsonIgnore]
+        [IgnoreDataMember]
+        public PaginationInfo Pagination { get; set; }
     }
 
     [DataContract(Name = "Gebouweenheid", Namespace = "")]

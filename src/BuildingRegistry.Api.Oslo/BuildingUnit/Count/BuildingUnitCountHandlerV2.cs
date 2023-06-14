@@ -11,23 +11,30 @@ namespace BuildingRegistry.Api.Oslo.BuildingUnit.Count
     using BuildingRegistry.Api.Oslo.BuildingUnit.Query;
     using MediatR;
     using Microsoft.EntityFrameworkCore;
+    using Projections.Legacy;
 
     public class BuildingUnitCountHandlerV2 : IRequestHandler<CountRequest, TotaalAantalResponse>
     {
+        private readonly LegacyContext _context;
+
+        public BuildingUnitCountHandlerV2(
+            LegacyContext context)
+        {
+            _context = context;
+        }
+
         public async Task<TotaalAantalResponse> Handle(CountRequest request, CancellationToken cancellationToken)
         {
-            var filtering = request.HttpRequest.ExtractFilteringRequest<BuildingUnitFilterV2>();
-            var sorting = request.HttpRequest.ExtractSortingRequest();
             var pagination = new NoPaginationRequest();
 
             return new TotaalAantalResponse
             {
-                Aantal = filtering.ShouldFilter
-                    ? await new BuildingUnitListOsloQueryV2(request.Context)
-                        .Fetch(filtering, sorting, pagination)
+                Aantal = request.FilteringHeader.ShouldFilter
+                    ? await new BuildingUnitListOsloQueryV2(_context)
+                        .Fetch(request.FilteringHeader, request.SortingHeader, pagination)
                         .Items
                         .CountAsync(cancellationToken)
-                    : Convert.ToInt32(request.Context
+                    : Convert.ToInt32(_context
                         .BuildingUnitDetailListCountViewV2
                         .First()
                         .Count)

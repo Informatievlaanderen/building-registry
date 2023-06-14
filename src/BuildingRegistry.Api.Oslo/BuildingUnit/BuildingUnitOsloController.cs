@@ -5,6 +5,9 @@ namespace BuildingRegistry.Api.Oslo.BuildingUnit
     using Be.Vlaanderen.Basisregisters.Api;
     using Be.Vlaanderen.Basisregisters.Api.ETag;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
+    using Be.Vlaanderen.Basisregisters.Api.Search.Filtering;
+    using Be.Vlaanderen.Basisregisters.Api.Search.Pagination;
+    using Be.Vlaanderen.Basisregisters.Api.Search.Sorting;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy;
     using Count;
     using Detail;
@@ -17,6 +20,7 @@ namespace BuildingRegistry.Api.Oslo.BuildingUnit
     using Microsoft.Extensions.Options;
     using Projections.Legacy;
     using Projections.Syndication;
+    using Query;
     using Swashbuckle.AspNetCore.Filters;
 
     [ApiVersion("2.0")]
@@ -54,15 +58,21 @@ namespace BuildingRegistry.Api.Oslo.BuildingUnit
             [FromServices] IOptions<ResponseOptions> responseOptions,
             CancellationToken cancellationToken = default)
         {
-            var listResponse = await _mediator.Send(new ListRequest(context, syndicationContext, responseOptions, Request, Response), cancellationToken);
+            var filtering = Request.ExtractFilteringRequest<BuildingUnitFilter>();
+            var sorting = Request.ExtractSortingRequest();
+            var pagination = Request.ExtractPaginationRequest();
+
+            var listResponse = await _mediator.Send(new ListRequest(filtering, sorting, pagination), cancellationToken);
+
+            Response.AddPaginationResponse(listResponse.Pagination);
+            Response.AddSortingResponse(listResponse.Sorting);
+
             return Ok(listResponse);
         }
 
         /// <summary>
         /// Vraag het totaal aantal actieve gebouweenheden op.
         /// </summary>
-        /// <param name="context"></param>
-        /// <param name="syndicationContext"></param>
         /// <param name="cancellationToken"></param>
         /// <response code="200">Als de opvraging van het totaal aantal gelukt is.</response>
         /// <response code="500">Als er een interne fout is opgetreden.</response>
@@ -72,21 +82,19 @@ namespace BuildingRegistry.Api.Oslo.BuildingUnit
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
         [SwaggerResponseExample(StatusCodes.Status200OK, typeof(TotalCountOsloResponseExample))]
         [SwaggerResponseExample(StatusCodes.Status500InternalServerError, typeof(InternalServerErrorResponseExamples))]
-        public async Task<IActionResult> Count(
-            [FromServices] LegacyContext context,
-            [FromServices] SyndicationContext syndicationContext,
-            CancellationToken cancellationToken = default)
+        public async Task<IActionResult> Count(CancellationToken cancellationToken = default)
         {
-            var response = await _mediator.Send(new CountRequest(context, syndicationContext, Request), cancellationToken);
+            var filtering = Request.ExtractFilteringRequest<BuildingUnitFilter>();
+            var sorting = Request.ExtractSortingRequest();
+
+            var response = await _mediator.Send(new CountRequest(filtering, sorting), cancellationToken);
+
             return Ok(response);
         }
 
         /// <summary>
         /// Vraag een gebouweenheid op.
         /// </summary>
-        /// <param name="context"></param>
-        /// <param name="syndicationContext"></param>
-        /// <param name="responseOptions"></param>
         /// <param name="persistentLocalId"></param>
         /// <param name="cancellationToken"></param>
         /// <response code="200">Als de gebouweenheid gevonden is.</response>
@@ -104,13 +112,10 @@ namespace BuildingRegistry.Api.Oslo.BuildingUnit
         [SwaggerResponseExample(StatusCodes.Status410Gone, typeof(BuildingUnitGoneResponseExamples))]
         [SwaggerResponseExample(StatusCodes.Status500InternalServerError, typeof(InternalServerErrorResponseExamples))]
         public async Task<IActionResult> Get(
-            [FromServices] LegacyContext context,
-            [FromServices] SyndicationContext syndicationContext,
-            [FromServices] IOptions<ResponseOptions> responseOptions,
             [FromRoute] int persistentLocalId,
             CancellationToken cancellationToken = default)
         {
-            var response = await _mediator.Send(new GetRequest(context, syndicationContext, responseOptions, persistentLocalId), cancellationToken);
+            var response = await _mediator.Send(new GetRequest(persistentLocalId), cancellationToken);
 
             return string.IsNullOrWhiteSpace(response.LastEventHash)
                 ? Ok(response.BuildingUnitResponse)

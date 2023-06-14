@@ -1,11 +1,14 @@
 namespace BuildingRegistry.Api.Oslo.BuildingUnit.List
 {
-    using BuildingRegistry.Api.Oslo.Infrastructure.Options;
-    using BuildingRegistry.Projections.Legacy;
-    using BuildingRegistry.Projections.Syndication;
+    using Be.Vlaanderen.Basisregisters.Api.Search.Filtering;
+    using Be.Vlaanderen.Basisregisters.Api.Search.Pagination;
+    using Be.Vlaanderen.Basisregisters.Api.Search.Sorting;
     using MediatR;
-    using Microsoft.AspNetCore.Http;
-    using Microsoft.Extensions.Options;
+    using Query;
 
-    public record ListRequest(LegacyContext Context, SyndicationContext SyndicationContext, IOptions<ResponseOptions> ResponseOptions, HttpRequest HttpRequest, HttpResponse HttpResponse) : IRequest<BuildingUnitListOsloResponse>;
+    public record ListRequest(
+            FilteringHeader<BuildingUnitFilter> FilteringHeader,
+            SortingHeader SortingHeader,
+            IPaginationRequest PaginationRequest)
+        : IRequest<BuildingUnitListOsloResponse>;
 }
