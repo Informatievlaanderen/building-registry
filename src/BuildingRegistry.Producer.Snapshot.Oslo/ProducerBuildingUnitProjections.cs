@@ -11,7 +11,7 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.Connector;
     using Building.Events;
 
-    [ConnectedProjectionName("Kafka producer")]
+    [ConnectedProjectionName("Kafka producer snapshot oslo gebouweenheden")]
     [ConnectedProjectionDescription("Projectie die berichten naar de kafka broker stuurt.")]
     public sealed class ProducerBuildingUnitProjections : ConnectedProjection<ProducerContext>
     {
