@@ -6,15 +6,37 @@ namespace BuildingRegistry.Api.Legacy.Building.Detail
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
     using Be.Vlaanderen.Basisregisters.GrAr.Common;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy.Gebouw;
+    using Consumer.Read.Parcel;
+    using Infrastructure.Grb;
+    using Infrastructure.Options;
     using MediatR;
     using Microsoft.AspNetCore.Http;
     using Microsoft.EntityFrameworkCore;
+    using Microsoft.Extensions.Options;
+    using Projections.Legacy;
 
     public class GetDetailHandlerV2 : IRequestHandler<GetRequest, BuildingDetailResponseWithEtag>
     {
+        private readonly LegacyContext _context;
+        private readonly ConsumerParcelContext _consumerParcelContext;
+        private readonly IOptions<ResponseOptions> _responseOptions;
+        private readonly IGrbBuildingParcel _grbBuildingParcel;
+
+        public GetDetailHandlerV2(
+            LegacyContext context,
+            ConsumerParcelContext consumerParcelContext,
+            IOptions<ResponseOptions> responseOptions,
+            IGrbBuildingParcel grbBuildingParcel)
+        {
+            _context = context;
+            _consumerParcelContext = consumerParcelContext;
+            _responseOptions = responseOptions;
+            _grbBuildingParcel = grbBuildingParcel;
+        }
+
         public async Task<BuildingDetailResponseWithEtag> Handle(GetRequest request, CancellationToken cancellationToken)
         {
-            var building = await request.Context
+            var building = await _context
                 .BuildingDetailsV2
                 .AsNoTracking()
                 .SingleOrDefaultAsync(item => item.PersistentLocalId == request.PersistentLocalId, cancellationToken);
@@ -29,20 +51,20 @@ namespace BuildingRegistry.Api.Legacy.Building.Detail
                 throw new ApiException("Onbestaand gebouw.", StatusCodes.Status404NotFound);
             }
 
-            var buildingUnitPersistentLocalIdsTask = request.Context
+            var buildingUnitPersistentLocalIdsTask = _context
                 .BuildingUnitDetailsV2
                 .Where(x => x.BuildingPersistentLocalId == building.PersistentLocalId)
                 .Where(x => !x.IsRemoved)
                 .Select(x => x.BuildingUnitPersistentLocalId)
                 .ToListAsync(cancellationToken);
 
-            var parcels = request.GrbBuildingParcel
+            var parcels = _grbBuildingParcel
                 .GetUnderlyingParcels(building.Geometry)
                 .Select(s => CaPaKey.CreateFrom(s).VbrCaPaKey)
                 .Distinct();
 
-            var caPaKeysTask = request.SyndicationContext
-                .BuildingParcelLatestItems
+            var caPaKeysTask = _consumerParcelContext
+                .ParcelConsumerItems
                 .Where(x => !x.IsRemoved && parcels.Contains(x.CaPaKey))
                 .Select(x => x.CaPaKey)
                 .ToListAsync(cancellationToken);
@@ -55,7 +77,7 @@ namespace BuildingRegistry.Api.Legacy.Building.Detail
             return new BuildingDetailResponseWithEtag(
                 new BuildingDetailResponse(
                     building.PersistentLocalId,
-                    request.ResponseOptions.Value.GebouwNaamruimte,
+                    _responseOptions.Value.GebouwNaamruimte,
                     building.Version.ToBelgianDateTimeOffset(),
                     BuildingHelpers.GetBuildingPolygon(building.Geometry),
                     building.GeometryMethod.Map(),
@@ -65,10 +87,10 @@ namespace BuildingRegistry.Api.Legacy.Building.Detail
                         .Select(x =>
                             new GebouwDetailGebouweenheid(
                                 x.ToString(),
-                                string.Format(request.ResponseOptions.Value.GebouweenheidDetailUrl, x)))
+                                string.Format(_responseOptions.Value.GebouweenheidDetailUrl, x)))
                         .ToList(),
                     caPaKeys.Select(x =>
-                            new GebouwDetailPerceel(x, string.Format(request.ResponseOptions.Value.PerceelUrl, x)))
+                            new GebouwDetailPerceel(x, string.Format(_responseOptions.Value.PerceelUrl, x)))
                         .ToList()),
                 building.LastEventHash);
         }

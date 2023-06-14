@@ -6,15 +6,37 @@ namespace BuildingRegistry.Api.Legacy.Building.Detail
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
     using Be.Vlaanderen.Basisregisters.GrAr.Common;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy.Gebouw;
+    using Infrastructure.Grb;
+    using Infrastructure.Options;
     using MediatR;
     using Microsoft.AspNetCore.Http;
     using Microsoft.EntityFrameworkCore;
+    using Microsoft.Extensions.Options;
+    using Projections.Legacy;
+    using Projections.Syndication;
 
     public class GetDetailHandler : IRequestHandler<GetRequest, BuildingDetailResponseWithEtag>
     {
+        private readonly LegacyContext _context;
+        private readonly SyndicationContext _syndicationContext;
+        private readonly IOptions<ResponseOptions> _responseOptions;
+        private readonly IGrbBuildingParcel _grbBuildingParcel;
+
+        public GetDetailHandler(
+            LegacyContext context,
+            SyndicationContext syndicationContext,
+            IOptions<ResponseOptions> responseOptions,
+            IGrbBuildingParcel grbBuildingParcel)
+        {
+            _context = context;
+            _syndicationContext = syndicationContext;
+            _responseOptions = responseOptions;
+            _grbBuildingParcel = grbBuildingParcel;
+        }
+
         public async Task<BuildingDetailResponseWithEtag> Handle(GetRequest request, CancellationToken cancellationToken)
         {
-            var building = await request.Context
+            var building = await _context
                 .BuildingDetails
                 .AsNoTracking()
                 .SingleOrDefaultAsync(item => item.PersistentLocalId == request.PersistentLocalId, cancellationToken);
@@ -30,19 +52,19 @@ namespace BuildingRegistry.Api.Legacy.Building.Detail
             }
 
             //TODO: improvement getting buildingunits and parcels in parallel.
-            var buildingUnits = await request.Context
+            var buildingUnits = await _context
                 .BuildingUnitDetails
                 .Where(x => x.BuildingId == building.BuildingId)
                 .Where(x => x.IsComplete && !x.IsRemoved)
                 .Select(x => x.PersistentLocalId)
                 .ToListAsync(cancellationToken);
 
-            var parcels = request.GrbBuildingParcel
+            var parcels = _grbBuildingParcel
                 .GetUnderlyingParcels(building.Geometry)
                 .Select(s => CaPaKey.CreateFrom(s).VbrCaPaKey)
                 .Distinct();
 
-            var caPaKeys = await request.SyndicationContext
+            var caPaKeys = await _syndicationContext
                 .BuildingParcelLatestItems
                 .Where(x => !x.IsRemoved && parcels.Contains(x.CaPaKey))
                 .Select(x => x.CaPaKey)
@@ -51,13 +73,13 @@ namespace BuildingRegistry.Api.Legacy.Building.Detail
             return new BuildingDetailResponseWithEtag(
                 new BuildingDetailResponse(
                     building.PersistentLocalId.Value,
-                    request.ResponseOptions.Value.GebouwNaamruimte,
+                    _responseOptions.Value.GebouwNaamruimte,
                     building.Version.ToBelgianDateTimeOffset(),
                     BuildingHelpers.GetBuildingPolygon(building.Geometry),
                     building.GeometryMethod.Value.ConvertFromBuildingGeometryMethod(),
                     building.Status.Value.ConvertFromBuildingStatus(),
-                    buildingUnits.OrderBy(x => x.Value).Select(x => new GebouwDetailGebouweenheid(x.ToString(), string.Format(request.ResponseOptions.Value.GebouweenheidDetailUrl, x))).ToList(),
-                    caPaKeys.Select(x => new GebouwDetailPerceel(x, string.Format(request.ResponseOptions.Value.PerceelUrl, x))).ToList()));
+                    buildingUnits.OrderBy(x => x.Value).Select(x => new GebouwDetailGebouweenheid(x.ToString(), string.Format(_responseOptions.Value.GebouweenheidDetailUrl, x))).ToList(),
+                    caPaKeys.Select(x => new GebouwDetailPerceel(x, string.Format(_responseOptions.Value.PerceelUrl, x))).ToList()));
         }
     }
 }
