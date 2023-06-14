@@ -26,10 +26,8 @@ namespace BuildingRegistry.Api.Legacy.Building
     using Microsoft.SyndicationFeed;
     using Microsoft.SyndicationFeed.Atom;
     using Projections.Legacy;
-    using Projections.Syndication;
     using Swashbuckle.AspNetCore.Filters;
     using Infrastructure;
-    using Infrastructure.Grb;
     using Infrastructure.Options;
     using List;
     using MediatR;
@@ -52,10 +50,6 @@ namespace BuildingRegistry.Api.Legacy.Building
         /// <summary>
         /// Vraag een gebouw op.
         /// </summary>
-        /// <param name="context"></param>
-        /// <param name="syndicationContext"></param>
-        /// <param name="responseOptions"></param>
-        /// <param name="grbBuildingParcel"></param>
         /// <param name="persistentLocalId"></param>
         /// <param name="cancellationToken"></param>
         /// <response code="200">Als het gebouw gevonden is.</response>
@@ -72,16 +66,12 @@ namespace BuildingRegistry.Api.Legacy.Building
         [SwaggerResponseExample(StatusCodes.Status410Gone, typeof(BuildingGoneResponseExamples))]
         [SwaggerResponseExample(StatusCodes.Status500InternalServerError, typeof(InternalServerErrorResponseExamples))]
         public async Task<IActionResult> Get(
-            [FromServices] LegacyContext context,
-            [FromServices] SyndicationContext syndicationContext,
-            [FromServices] IOptions<ResponseOptions> responseOptions,
-            [FromServices] IGrbBuildingParcel grbBuildingParcel,
             [FromRoute] int persistentLocalId,
             CancellationToken cancellationToken = default)
         {
             var response =
                 await _mediator.Send(
-                    new GetRequest(context, syndicationContext, responseOptions, grbBuildingParcel, persistentLocalId),
+                    new GetRequest(persistentLocalId),
                     cancellationToken);
 
             return string.IsNullOrWhiteSpace(response.LastEventHash)
