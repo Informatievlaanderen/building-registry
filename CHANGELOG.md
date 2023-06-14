@@ -1,3 +1,19 @@
+# [3.81.0](https://github.com/informatievlaanderen/building-registry/compare/v3.80.3...v3.81.0) (2023-06-14)
+
+
+### Bug Fixes
+
+* fallbacks for idempotent relation add ([3f03b2c](https://github.com/informatievlaanderen/building-registry/commit/3f03b2caf3c00e246d864459eaaff7a0d861ac3d))
+* producer naming building ([9784329](https://github.com/informatievlaanderen/building-registry/commit/9784329493edbc8172682c78084c4018c8717f37))
+* producer naming buildingunit ([be6f410](https://github.com/informatievlaanderen/building-registry/commit/be6f410ae125bd07c5473c1635550b335e835a03))
+* register consumer parcel module in legacy and oslo api ([9aec638](https://github.com/informatievlaanderen/building-registry/commit/9aec63840a1968488124144cf779448cb45a41e9))
+
+
+### Features
+
+* consume parcel topic ([b91e5c5](https://github.com/informatievlaanderen/building-registry/commit/b91e5c5ce98ae9226014cd59176cf3ff70176cac))
+* replace syndication parcel items by kafka consumed parcel items ([e8f988c](https://github.com/informatievlaanderen/building-registry/commit/e8f988c2b34426f5a307d47da6164a2b382474f3))
+
 ## [3.80.3](https://github.com/informatievlaanderen/building-registry/compare/v3.80.2...v3.80.3) (2023-06-13)
 
 
