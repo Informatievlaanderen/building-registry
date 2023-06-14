@@ -64,6 +64,7 @@ Target.create "Publish_Solution" (fun _ ->
     "BuildingRegistry.Api.BackOffice.Abstractions"
     "BuildingRegistry.Api.BackOffice.Handlers.Lambda"
     "BuildingRegistry.Consumer.Address"
+    "BuildingRegistry.Consumer.Read.Parcel"
     "BuildingRegistry.Projections.Legacy"
     "BuildingRegistry.Projections.Extract"
     "BuildingRegistry.Projections.LastChangedList"
@@ -100,6 +101,7 @@ Target.create "Containerize_ApiCrabImport" (fun _ ->
 Target.create "Containerize_ProjectionsSyndication" (fun _ -> containerize "BuildingRegistry.Projections.Syndication" "projections-syndication")
 Target.create "Containerize_ProjectionsBackOffice" (fun _ -> containerize "BuildingRegistry.Projections.BackOffice" "projections-backoffice")
 Target.create "Containerize_ConsumerAddress" (fun _ -> containerize "BuildingRegistry.Consumer.Address" "consumer-address")
+Target.create "Containerize_ConsumerParcel" (fun _ -> containerize "BuildingRegistry.Consumer.Read.Parcel" "consumer-read-parcel")
 Target.create "Containerize_MigratorBuilding" (fun _ -> containerize "BuildingRegistry.Migrator.Building" "migrator-building")
 Target.create "Containerize_Producer" (fun _ -> containerize "BuildingRegistry.Producer" "producer")
 Target.create "Containerize_ProducerSnapshotOslo" (fun _ -> containerize "BuildingRegistry.Producer.Snapshot.Oslo" "producer-snapshot-oslo")
