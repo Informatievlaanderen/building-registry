@@ -53,8 +53,8 @@ nuget Be.Vlaanderen.Basisregisters.EventHandling 4.2.3
 nuget Be.Vlaanderen.Basisregisters.EventHandling.Autofac 4.2.3
 
 nuget Be.Vlaanderen.Basisregisters.MessageHandling.AwsSqs.Simple 4.8.3
-nuget Be.Vlaanderen.Basisregisters.MessageHandling.Kafka.Simple 4.8.3
 nuget Be.Vlaanderen.Basisregisters.MessageHandling.Kafka.Producer 4.8.3
+nuget Be.Vlaanderen.Basisregisters.MessageHandling.Kafka.Consumer 4.8.3
 nuget Be.Vlaanderen.Basisregisters.MessageHandling.Kafka.Consumer.SqlServer 4.8.3
 
 nuget Be.Vlaanderen.Basisregisters.ProjectionHandling.LastChangedList 11.0.7

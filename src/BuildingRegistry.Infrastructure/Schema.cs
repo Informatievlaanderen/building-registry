@@ -10,6 +10,7 @@ namespace BuildingRegistry.Infrastructure
         public const string Wms = "wms";
         public const string Wfs = "wfs";
         public const string ConsumerAddress = "BuildingRegistryConsumerAddress";
+        public const string ConsumerReadParcel = "BuildingRegistryConsumerReadParcel";
         public const string MigrateBuilding = "BuildingRegistryMigration";
         public const string Sequence = "BuildingRegistrySequence";
         public const string BackOffice = "BuildingRegistryBackOffice";
@@ -28,6 +29,7 @@ namespace BuildingRegistry.Infrastructure
         public const string RedisDataMigration = "__EFMigrationsHistoryDataMigration";
         public const string Sequence = "__EFMigrationsHistorySequence";
         public const string ConsumerAddress = "__EFMigrationsHistoryConsumerAddress";
+        public const string ConsumerReadParcel = "__EFMigrationsHistoryConsumerReadParcel";
         public const string BackOffice = "__EFMigrationsHistoryBackOffice";
         public const string BackOfficeProjections = "__EFMigrationsHistoryBackOfficeProjections";
         public const string MigratorProjection = "__EFMigrationsHistoryMigrationProjection";
