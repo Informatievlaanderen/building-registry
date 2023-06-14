@@ -19,6 +19,10 @@ namespace BuildingRegistry.Api.Legacy.Building
     using Count;
     using Crab;
     using Detail;
+    using Infrastructure;
+    using Infrastructure.Options;
+    using List;
+    using MediatR;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.Extensions.Configuration;
@@ -26,12 +30,8 @@ namespace BuildingRegistry.Api.Legacy.Building
     using Microsoft.SyndicationFeed;
     using Microsoft.SyndicationFeed.Atom;
     using Projections.Legacy;
-    using Swashbuckle.AspNetCore.Filters;
-    using Infrastructure;
-    using Infrastructure.Options;
-    using List;
-    using MediatR;
     using Query;
+    using Swashbuckle.AspNetCore.Filters;
     using Sync;
 
     [ApiVersion("1.0")]
@@ -82,9 +82,7 @@ namespace BuildingRegistry.Api.Legacy.Building
         /// <summary>
         /// Vraag de referenties van een gebouw op.
         /// </summary>
-        /// <param name="context"></param>
         /// <param name="persistentLocalId"></param>
-        /// <param name="responseOptions"></param>
         /// <param name="cancellationToken"></param>
         /// <response code="200">De referenties van het gebouw.</response>
         /// <response code="404">Als het gebouw niet gevonden kan worden.</response>
@@ -100,12 +98,10 @@ namespace BuildingRegistry.Api.Legacy.Building
         [SwaggerResponseExample(StatusCodes.Status410Gone, typeof(BuildingGoneResponseExamples))]
         [SwaggerResponseExample(StatusCodes.Status500InternalServerError, typeof(InternalServerErrorResponseExamples))]
         public async Task<IActionResult> GetReferences(
-            [FromServices] LegacyContext context,
             [FromRoute] int persistentLocalId,
-            [FromServices] IOptions<ResponseOptions> responseOptions,
             CancellationToken cancellationToken = default)
         {
-            var response = await _mediator.Send(new GetReferencesRequest(context, persistentLocalId, responseOptions),
+            var response = await _mediator.Send(new GetReferencesRequest(persistentLocalId),
                 cancellationToken);
             return Ok(response);
         }
@@ -129,21 +125,22 @@ namespace BuildingRegistry.Api.Legacy.Building
             [FromServices] IOptions<ResponseOptions> responseOptions,
             CancellationToken cancellationToken = default)
         {
-            var listResponse = await _mediator.Send(new ListRequest(
-                    context,
-                    responseOptions,
+            var listResponse = await _mediator.Send(
+                new ListRequest(
                     Request.ExtractFilteringRequest<BuildingFilter>(),
                     Request.ExtractSortingRequest(),
-                    Request.ExtractPaginationRequest(),
-                    Response),
+                    Request.ExtractPaginationRequest()),
                 cancellationToken);
+
+            Response.AddPaginationResponse(listResponse.Pagination);
+            Response.AddSortingResponse(listResponse.Sorting);
+
             return Ok(listResponse);
         }
 
         /// <summary>
         /// Vraag het totaal aantal actieve gebouwen op.
         /// </summary>
-        /// <param name="context"></param>
         /// <param name="cancellationToken"></param>
         /// <response code="200">Als de opvraging van het totaal aantal gelukt is.</response>
         /// <response code="500">Als er een interne fout is opgetreden.</response>
@@ -152,12 +149,9 @@ namespace BuildingRegistry.Api.Legacy.Building
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
         [SwaggerResponseExample(StatusCodes.Status200OK, typeof(TotalCountResponseExample))]
         [SwaggerResponseExample(StatusCodes.Status500InternalServerError, typeof(InternalServerErrorResponseExamples))]
-        public async Task<IActionResult> Count(
-            [FromServices] LegacyContext context,
-            CancellationToken cancellationToken = default)
+        public async Task<IActionResult> Count(CancellationToken cancellationToken = default)
         {
             var response = await _mediator.Send(new CountRequest(
-                    context,
                     Request.ExtractFilteringRequest<BuildingFilter>(),
                     Request.ExtractSortingRequest()),
                 cancellationToken);
@@ -168,7 +162,6 @@ namespace BuildingRegistry.Api.Legacy.Building
         /// <summary>
         /// Vraag de koppeling tussen CRAB/GRB-gebouwen en GR-gebouwen
         /// </summary>
-        /// <param name="context"></param>
         /// <param name="cancellationToken"></param>
         /// <response code="200">Als de opvraging van de CRAB/GRB-gebouwen gelukt is.</response>
         /// <response code="400">Als er geen parameters zijn opgegeven.</response>
@@ -180,12 +173,9 @@ namespace BuildingRegistry.Api.Legacy.Building
         [SwaggerResponseExample(StatusCodes.Status200OK, typeof(BuildingCrabMappingResponseExamples))]
         [SwaggerResponseExample(StatusCodes.Status400BadRequest, typeof(BadRequestResponseExamples))]
         [SwaggerResponseExample(StatusCodes.Status500InternalServerError, typeof(InternalServerErrorResponseExamples))]
-        public async Task<IActionResult> CrabGebouwen(
-            [FromServices] LegacyContext context,
-            CancellationToken cancellationToken = default)
+        public async Task<IActionResult> CrabGebouwen(CancellationToken cancellationToken = default)
         {
             var response = await _mediator.Send(new CrabGebouwenRequest(
-                    context,
                     Request.ExtractFilteringRequest<BuildingCrabMappingFilter>(),
                     Request.ExtractSortingRequest()),
                 cancellationToken);
@@ -199,7 +189,6 @@ namespace BuildingRegistry.Api.Legacy.Building
         /// Vraag een lijst met wijzigingen van gebouwen op.
         /// </summary>
         /// <param name="configuration"></param>
-        /// <param name="context"></param>
         /// <param name="responseOptions"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
@@ -213,12 +202,10 @@ namespace BuildingRegistry.Api.Legacy.Building
         [SwaggerResponseExample(StatusCodes.Status500InternalServerError, typeof(InternalServerErrorResponseExamples))]
         public async Task<IActionResult> Sync(
             [FromServices] IConfiguration configuration,
-            [FromServices] LegacyContext context,
             [FromServices] IOptions<ResponseOptions> responseOptions,
             CancellationToken cancellationToken = default)
         {
             var response = await _mediator.Send(new SyncRequest(
-                context,
                 Request.ExtractFilteringRequest<BuildingSyndicationFilter>(),
                 Request.ExtractSortingRequest(),
                 Request.ExtractPaginationRequest()
@@ -226,8 +213,7 @@ namespace BuildingRegistry.Api.Legacy.Building
 
             return new ContentResult
             {
-                Content = await BuildAtomFeed(response.LastFeedUpdate, response.PagedBuildings, responseOptions,
-                    configuration),
+                Content = await BuildAtomFeed(response.LastFeedUpdate, response.PagedBuildings, responseOptions, configuration),
                 ContentType = MediaTypeNames.Text.Xml,
                 StatusCode = StatusCodes.Status200OK
             };

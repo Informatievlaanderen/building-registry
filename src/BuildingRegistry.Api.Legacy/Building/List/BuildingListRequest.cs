@@ -11,11 +11,8 @@ namespace BuildingRegistry.Api.Legacy.Building.List
     using Query;
 
     public record ListRequest(
-        LegacyContext Context,
-        IOptions<ResponseOptions> ResponseOptions,
         FilteringHeader<BuildingFilter> FilteringHeader,
         SortingHeader SortingHeader,
-        IPaginationRequest PaginationRequest,
-        HttpResponse HttpResponse
-        ) : IRequest<BuildingListResponse>;
+        IPaginationRequest PaginationRequest)
+        : IRequest<BuildingListResponse>;
 }

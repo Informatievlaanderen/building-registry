@@ -3,6 +3,8 @@ namespace BuildingRegistry.Api.Legacy.Building.List
     using System;
     using System.Collections.Generic;
     using System.Runtime.Serialization;
+    using Be.Vlaanderen.Basisregisters.Api.Search.Pagination;
+    using Be.Vlaanderen.Basisregisters.Api.Search.Sorting;
     using Be.Vlaanderen.Basisregisters.GrAr.Common;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy.Gebouw;
@@ -34,6 +36,14 @@ namespace BuildingRegistry.Api.Legacy.Building.List
         [DataMember(Name = "Volgende", Order = 3, EmitDefaultValue = false)]
         [JsonProperty(Required = Required.Default, DefaultValueHandling = DefaultValueHandling.Ignore)]
         public Uri Volgende { get; set; }
+
+        [JsonIgnore]
+        [IgnoreDataMember]
+        public PaginationInfo Pagination { get; set; }
+
+        [JsonIgnore]
+        [IgnoreDataMember]
+        public SortingHeader Sorting { get; set; }
     }
 
     [DataContract(Name = "Gebouw", Namespace = "")]
