@@ -3,21 +3,32 @@ namespace BuildingRegistry.Api.Legacy.Building.List
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
-    using Be.Vlaanderen.Basisregisters.Api.Search;
     using Be.Vlaanderen.Basisregisters.GrAr.Common;
-    using BuildingRegistry.Api.Legacy.Building.Query;
-    using BuildingRegistry.Api.Legacy.Infrastructure;
+    using Infrastructure;
+    using Infrastructure.Options;
     using MediatR;
     using Microsoft.EntityFrameworkCore;
+    using Microsoft.Extensions.Options;
+    using Projections.Legacy;
+    using Query;
 
     public class ListHandler : IRequestHandler<ListRequest, BuildingListResponse>
     {
+        private readonly LegacyContext _context;
+        private readonly IOptions<ResponseOptions> _responseOptions;
+
+        public ListHandler(
+            LegacyContext context,
+            IOptions<ResponseOptions> responseOptions)
+        {
+            _context = context;
+            _responseOptions = responseOptions;
+        }
+
         public async Task<BuildingListResponse> Handle(ListRequest request, CancellationToken cancellationToken)
         {
-            var pagedBuildings = new BuildingListQuery(request.Context)
+            var pagedBuildings = new BuildingListQuery(_context)
                 .Fetch(request.FilteringHeader, request.SortingHeader, request.PaginationRequest);
-
-            request.HttpResponse.AddPagedQueryResultHeaders(pagedBuildings);
 
             var buildings = await pagedBuildings.Items
                 .Select(a => new
@@ -33,12 +44,14 @@ namespace BuildingRegistry.Api.Legacy.Building.List
                 Gebouwen = buildings
                     .Select(x => new GebouwCollectieItem(
                         x.PersistentLocalId.Value,
-                        request.ResponseOptions.Value.GebouwNaamruimte,
-                        request.ResponseOptions.Value.GebouwDetailUrl,
+                        _responseOptions.Value.GebouwNaamruimte,
+                        _responseOptions.Value.GebouwDetailUrl,
                         x.Status.Value.ConvertFromBuildingStatus(),
                         x.Version.ToBelgianDateTimeOffset()))
                     .ToList(),
-                Volgende = pagedBuildings.PaginationInfo.BuildNextUri(buildings.Count, request.ResponseOptions.Value.GebouwVolgendeUrl)
+                Volgende = pagedBuildings.PaginationInfo.BuildNextUri(buildings.Count, _responseOptions.Value.GebouwVolgendeUrl),
+                Sorting = pagedBuildings.Sorting,
+                Pagination = pagedBuildings.PaginationInfo
             };
         }
     }

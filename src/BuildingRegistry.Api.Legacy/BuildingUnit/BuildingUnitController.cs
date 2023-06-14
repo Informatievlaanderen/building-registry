@@ -12,14 +12,10 @@ namespace BuildingRegistry.Api.Legacy.BuildingUnit
     using Count;
     using Detail;
     using Infrastructure;
-    using Infrastructure.Options;
     using List;
     using MediatR;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
-    using Microsoft.Extensions.Options;
-    using Projections.Legacy;
-    using Projections.Syndication;
     using Query;
     using Swashbuckle.AspNetCore.Filters;
 
@@ -39,9 +35,6 @@ namespace BuildingRegistry.Api.Legacy.BuildingUnit
         /// <summary>
         /// Vraag een lijst met actieve gebouweenheden op.
         /// </summary>
-        /// <param name="context"></param>
-        /// <param name="syndicationContext"></param>
-        /// <param name="responseOptions"></param>
         /// <param name="cancellationToken"></param>
         /// <response code="200">Als de opvraging van een lijst met gebouweenheden gelukt is.</response>
         /// <response code="500">Als er een interne fout is opgetreden.</response>
@@ -51,21 +44,17 @@ namespace BuildingRegistry.Api.Legacy.BuildingUnit
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
         [SwaggerResponseExample(StatusCodes.Status200OK, typeof(BuildingUnitListResponseExamples))]
         [SwaggerResponseExample(StatusCodes.Status500InternalServerError, typeof(InternalServerErrorResponseExamples))]
-        public async Task<IActionResult> List(
-            [FromServices] LegacyContext context,
-            [FromServices] SyndicationContext syndicationContext,
-            [FromServices] IOptions<ResponseOptions> responseOptions,
-            CancellationToken cancellationToken = default)
+        public async Task<IActionResult> List(CancellationToken cancellationToken = default)
         {
-            var listResponse = await _mediator.Send(new BuildingUnitListRequest(
-                context,
-                syndicationContext,
-                responseOptions,
-                Request.ExtractFilteringRequest<BuildingUnitFilter>(),
-                Request.ExtractSortingRequest(),
-                Request.ExtractPaginationRequest(),
-                Response)
-            , cancellationToken);
+            var listResponse = await _mediator.Send(
+                new BuildingUnitListRequest(
+                    Request.ExtractFilteringRequest<BuildingUnitFilter>(),
+                    Request.ExtractSortingRequest(),
+                    Request.ExtractPaginationRequest()),
+                cancellationToken);
+
+            Response.AddPaginationResponse(listResponse.Pagination);
+            Response.AddSortingResponse(listResponse.Sorting);
 
             return Ok(listResponse);
         }
@@ -73,8 +62,6 @@ namespace BuildingRegistry.Api.Legacy.BuildingUnit
         /// <summary>
         /// Vraag het totaal aantal actieve gebouweenheden op.
         /// </summary>
-        /// <param name="context"></param>
-        /// <param name="syndicationContext"></param>
         /// <param name="cancellationToken"></param>
         /// <response code="200">Als de opvraging van het totaal aantal gelukt is.</response>
         /// <response code="500">Als er een interne fout is opgetreden.</response>
@@ -83,15 +70,10 @@ namespace BuildingRegistry.Api.Legacy.BuildingUnit
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
         [SwaggerResponseExample(StatusCodes.Status200OK, typeof(TotalCountResponseExample))]
         [SwaggerResponseExample(StatusCodes.Status500InternalServerError, typeof(InternalServerErrorResponseExamples))]
-        public async Task<IActionResult> Count(
-            [FromServices] LegacyContext context,
-            [FromServices] SyndicationContext syndicationContext,
-            CancellationToken cancellationToken = default)
+        public async Task<IActionResult> Count(CancellationToken cancellationToken = default)
         {
             var response =
                 await _mediator.Send(new CountRequest(
-                    context,
-                    syndicationContext,
                     Request.ExtractFilteringRequest<BuildingUnitFilter>(),
                     Request.ExtractSortingRequest()
                     ), cancellationToken);
@@ -101,9 +83,6 @@ namespace BuildingRegistry.Api.Legacy.BuildingUnit
         /// <summary>
         /// Vraag een gebouweenheid op.
         /// </summary>
-        /// <param name="context"></param>
-        /// <param name="syndicationContext"></param>
-        /// <param name="responseOptions"></param>
         /// <param name="persistentLocalId"></param>
         /// <param name="cancellationToken"></param>
         /// <response code="200">Als de gebouweenheid gevonden is.</response>
@@ -120,15 +99,12 @@ namespace BuildingRegistry.Api.Legacy.BuildingUnit
         [SwaggerResponseExample(StatusCodes.Status410Gone, typeof(BuildingUnitGoneResponseExamples))]
         [SwaggerResponseExample(StatusCodes.Status500InternalServerError, typeof(InternalServerErrorResponseExamples))]
         public async Task<IActionResult> Get(
-            [FromServices] LegacyContext context,
-            [FromServices] SyndicationContext syndicationContext,
-            [FromServices] IOptions<ResponseOptions> responseOptions,
             [FromRoute] int persistentLocalId,
             CancellationToken cancellationToken = default)
         {
             var response =
                 await _mediator.Send(
-                    new GetBuildingUnitDetailRequest(context, syndicationContext, responseOptions, persistentLocalId),
+                    new GetBuildingUnitDetailRequest(persistentLocalId),
                     cancellationToken);
 
             return string.IsNullOrWhiteSpace(response.LastEventHash)

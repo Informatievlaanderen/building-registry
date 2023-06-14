@@ -6,15 +6,33 @@ namespace BuildingRegistry.Api.Legacy.BuildingUnit.Detail
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
     using Be.Vlaanderen.Basisregisters.GrAr.Common;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy.Gebouweenheid;
+    using Infrastructure.Options;
     using MediatR;
     using Microsoft.AspNetCore.Http;
     using Microsoft.EntityFrameworkCore;
+    using Microsoft.Extensions.Options;
+    using Projections.Legacy;
+    using Projections.Syndication;
 
     public class GetBuildingUnitDetailHandler : IRequestHandler<GetBuildingUnitDetailRequest, BuildingUnitResponseWithEtag>
     {
+        private readonly LegacyContext _context;
+        private readonly SyndicationContext _syndicationContext;
+        private readonly IOptions<ResponseOptions> _responseOptions;
+
+        public GetBuildingUnitDetailHandler(
+            LegacyContext context,
+            SyndicationContext syndicationContext,
+            IOptions<ResponseOptions> responseOptions)
+        {
+            _context = context;
+            _syndicationContext = syndicationContext;
+            _responseOptions = responseOptions;
+        }
+
         public async Task<BuildingUnitResponseWithEtag> Handle(GetBuildingUnitDetailRequest buildingUnitDetailRequest, CancellationToken cancellationToken)
         {
-            var buildingUnit = await buildingUnitDetailRequest.Context
+            var buildingUnit = await _context
                 .BuildingUnitDetails
                 .Include(x => x.Addresses)
                 .AsNoTracking()
@@ -31,7 +49,7 @@ namespace BuildingRegistry.Api.Legacy.BuildingUnit.Detail
             }
 
             var addressIds = buildingUnit.Addresses.Select(x => x.AddressId).ToList();
-            var addressPersistentLocalIds = await buildingUnitDetailRequest.SyndicationContext
+            var addressPersistentLocalIds = await _syndicationContext
                 .AddressPersistentLocalIds
                 .Where(x => addressIds.Contains(x.AddressId))
                 .Select(x => x.PersistentLocalId)
@@ -40,14 +58,14 @@ namespace BuildingRegistry.Api.Legacy.BuildingUnit.Detail
             return new BuildingUnitResponseWithEtag(
                 new BuildingUnitResponse(
                     buildingUnit.PersistentLocalId.Value,
-                    buildingUnitDetailRequest.ResponseOptions.Value.GebouweenheidNaamruimte,
+                    _responseOptions.Value.GebouweenheidNaamruimte,
                     buildingUnit.Version.ToBelgianDateTimeOffset(),
                     BuildingUnitHelpers.GetBuildingUnitPoint(buildingUnit.Position),
                     buildingUnit.PositionMethod.Value.ConvertFromBuildingUnitGeometryMethod(),
                     buildingUnit.Status.Value.ConvertFromBuildingUnitStatus(),
                     buildingUnit.Function.ConvertFromBuildingUnitFunction(),
-                    new GebouweenheidDetailGebouw(buildingUnit.BuildingPersistentLocalId.Value.ToString(), string.Format(buildingUnitDetailRequest.ResponseOptions.Value.GebouwDetailUrl, buildingUnit.BuildingPersistentLocalId.Value)),
-                    addressPersistentLocalIds.Select(id => new GebouweenheidDetailAdres(id, string.Format(buildingUnitDetailRequest.ResponseOptions.Value.AdresUrl, id))).ToList(),
+                    new GebouweenheidDetailGebouw(buildingUnit.BuildingPersistentLocalId.Value.ToString(), string.Format(_responseOptions.Value.GebouwDetailUrl, buildingUnit.BuildingPersistentLocalId.Value)),
+                    addressPersistentLocalIds.Select(id => new GebouweenheidDetailAdres(id, string.Format(_responseOptions.Value.AdresUrl, id))).ToList(),
                     false));
         }
     }
