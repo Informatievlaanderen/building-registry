@@ -11,18 +11,33 @@ namespace BuildingRegistry.Api.Oslo.BuildingUnit.Detail
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy.Gebouweenheid;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy.SpatialTools;
-    using BuildingRegistry.Api.Oslo.Converters;
     using BuildingRegistry.Building;
+    using Converters;
+    using Infrastructure.Options;
     using MediatR;
     using Microsoft.AspNetCore.Http;
     using Microsoft.EntityFrameworkCore;
+    using Microsoft.Extensions.Options;
     using NetTopologySuite.Geometries;
+    using NetTopologySuite.Utilities;
+    using Projections.Legacy;
 
     public class BuildingUnitDetailHandlerV2 : IRequestHandler<GetRequest, BuildingUnitOsloResponseWithEtag>
     {
+        private readonly LegacyContext _context;
+        private readonly IOptions<ResponseOptions> _responseOptions;
+
+        public BuildingUnitDetailHandlerV2(
+            LegacyContext context,
+            IOptions<ResponseOptions> responseOptions)
+        {
+            _context = context;
+            _responseOptions = responseOptions;
+        }
+
         public async Task<BuildingUnitOsloResponseWithEtag> Handle(GetRequest request, CancellationToken cancellationToken)
         {
-            var buildingUnit = await request.Context
+            var buildingUnit = await _context
                 .BuildingUnitDetailsV2
                 .Include(x => x.Addresses)
                 .AsNoTracking()
@@ -44,14 +59,14 @@ namespace BuildingRegistry.Api.Oslo.BuildingUnit.Detail
             return new BuildingUnitOsloResponseWithEtag(
                 new BuildingUnitOsloResponse(
                     buildingUnit.BuildingUnitPersistentLocalId,
-                    request.ResponseOptions.Value.GebouweenheidNaamruimte,
-                    request.ResponseOptions.Value.ContextUrlUnitDetail,
+                    _responseOptions.Value.GebouweenheidNaamruimte,
+                    _responseOptions.Value.ContextUrlUnitDetail,
                     buildingUnit.Version.ToBelgianDateTimeOffset(),
                     GetBuildingUnitPoint(buildingUnit.Position, buildingUnit.PositionMethod),
                     buildingUnit.Status.Map(),
                     MapBuildingUnitFunction(buildingUnit.Function),
-                    new GebouweenheidDetailGebouw(buildingUnit.BuildingPersistentLocalId.ToString(), string.Format(request.ResponseOptions.Value.GebouwDetailUrl, buildingUnit.BuildingPersistentLocalId)),
-                    addressPersistentLocalIds.Select(id => new GebouweenheidDetailAdres(id.ToString(), string.Format(request.ResponseOptions.Value.AdresUrl, id))).ToList(),
+                    new GebouweenheidDetailGebouw(buildingUnit.BuildingPersistentLocalId.ToString(), string.Format(_responseOptions.Value.GebouwDetailUrl, buildingUnit.BuildingPersistentLocalId)),
+                    addressPersistentLocalIds.Select(id => new GebouweenheidDetailAdres(id.ToString(), string.Format(_responseOptions.Value.AdresUrl, id))).ToList(),
                     buildingUnit.HasDeviation),
                 buildingUnit.LastEventHash);
         }
@@ -91,11 +106,11 @@ namespace BuildingRegistry.Api.Oslo.BuildingUnit.Detail
             throw new ArgumentOutOfRangeException(nameof(function), function, null);
         }
 
-        private static Detail.BuildingUnitPosition GetBuildingUnitPoint(byte[] point, BuildingUnitPositionGeometryMethod geometryMethod)
+        private static BuildingUnitPosition GetBuildingUnitPoint(byte[] point, BuildingUnitPositionGeometryMethod geometryMethod)
         {
             var geometry = WKBReaderFactory.Create().Read(point);
             var gml = GetGml(geometry);
-            return new Detail.BuildingUnitPosition(new GmlJsonPoint(gml), MapBuildingUnitGeometryMethod(geometryMethod));
+            return new BuildingUnitPosition(new GmlJsonPoint(gml), MapBuildingUnitGeometryMethod(geometryMethod));
         }
 
         private static string GetGml(Geometry geometry)
@@ -115,7 +130,7 @@ namespace BuildingRegistry.Api.Oslo.BuildingUnit.Detail
         private static void Write(Coordinate coordinate, XmlWriter writer)
         {
             writer.WriteStartElement("gml", "pos", "http://www.opengis.net/gml/3.2");
-            writer.WriteValue(string.Format(NetTopologySuite.Utilities.Global.GetNfi(), "{0} {1}",
+            writer.WriteValue(string.Format(Global.GetNfi(), "{0} {1}",
                 coordinate.X.ToPointGeometryCoordinateValueFormat(), coordinate.Y.ToPointGeometryCoordinateValueFormat()));
             writer.WriteEndElement();
         }

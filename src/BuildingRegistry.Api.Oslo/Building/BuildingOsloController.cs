@@ -88,14 +88,16 @@ namespace BuildingRegistry.Api.Oslo.Building
             [FromServices] IOptions<ResponseOptions> responseOptions,
             CancellationToken cancellationToken = default)
         {
-            var listResponse = await _mediator.Send(new BuildingListRequest(
+            var listResponse = await _mediator.Send(
+                new BuildingListRequest(
                     Request.ExtractFilteringRequest<BuildingFilter>(),
                     Request.ExtractSortingRequest(),
-                    Request.ExtractPaginationRequest(),
-                    Response,
-                    context,
-                    responseOptions)
-                , cancellationToken);
+                    Request.ExtractPaginationRequest()),
+                cancellationToken);
+
+            Response.AddPaginationResponse(listResponse.Pagination);
+            Response.AddSortingResponse(listResponse.Sorting);
+
             return Ok(listResponse);
         }
 
@@ -117,7 +119,6 @@ namespace BuildingRegistry.Api.Oslo.Building
             CancellationToken cancellationToken = default)
         {
             var response = await _mediator.Send(new BuildingCountRequest(
-                context,
                 Request.ExtractFilteringRequest<BuildingFilter>(),
                 Request.ExtractSortingRequest()
             ), cancellationToken);

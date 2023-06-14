@@ -12,18 +12,36 @@ namespace BuildingRegistry.Api.Oslo.BuildingUnit.Detail
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy.Gebouweenheid;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy.SpatialTools;
     using BuildingRegistry.Api.Oslo.Converters;
+    using Infrastructure.Options;
     using MediatR;
     using Microsoft.AspNetCore.Http;
     using Microsoft.EntityFrameworkCore;
+    using Microsoft.Extensions.Options;
     using NetTopologySuite.Geometries;
+    using Projections.Legacy;
+    using Projections.Syndication;
     using BuildingUnitFunction = Legacy.BuildingUnitFunction;
     using BuildingUnitPositionGeometryMethod = Legacy.BuildingUnitPositionGeometryMethod;
 
     public class GetHandler : IRequestHandler<GetRequest, BuildingUnitOsloResponseWithEtag>
     {
+        private readonly LegacyContext _context;
+        private readonly SyndicationContext _syndicationContext;
+        private readonly IOptions<ResponseOptions> _responseOptions;
+
+        public GetHandler(
+            LegacyContext context,
+            SyndicationContext syndicationContext,
+            IOptions<ResponseOptions> responseOptions)
+        {
+            _context = context;
+            _syndicationContext = syndicationContext;
+            _responseOptions = responseOptions;
+        }
+
         public async Task<BuildingUnitOsloResponseWithEtag> Handle(GetRequest request, CancellationToken cancellationToken)
         {
-            var buildingUnit = await request.Context
+            var buildingUnit = await _context
                 .BuildingUnitDetails
                 .Include(x => x.Addresses)
                 .AsNoTracking()
@@ -40,7 +58,7 @@ namespace BuildingRegistry.Api.Oslo.BuildingUnit.Detail
             }
 
             var addressIds = buildingUnit.Addresses.Select(x => x.AddressId).ToList();
-            var addressPersistentLocalIds = await request.SyndicationContext
+            var addressPersistentLocalIds = await _syndicationContext
                 .AddressPersistentLocalIds
                 .Where(x => addressIds.Contains(x.AddressId))
                 .Select(x => x.PersistentLocalId)
@@ -49,14 +67,14 @@ namespace BuildingRegistry.Api.Oslo.BuildingUnit.Detail
             return new BuildingUnitOsloResponseWithEtag(
                 new BuildingUnitOsloResponse(
                     buildingUnit.PersistentLocalId.Value,
-                    request.ResponseOptions.Value.GebouweenheidNaamruimte,
-                    request.ResponseOptions.Value.ContextUrlUnitDetail,
+                    _responseOptions.Value.GebouweenheidNaamruimte,
+                    _responseOptions.Value.ContextUrlUnitDetail,
                     buildingUnit.Version.ToBelgianDateTimeOffset(),
                     GetBuildingUnitPoint(buildingUnit.Position, buildingUnit.PositionMethod.Value),
                     buildingUnit.Status.Value.Map(),
                     MapBuildingUnitFunction(buildingUnit.Function),
-                    new GebouweenheidDetailGebouw(buildingUnit.BuildingPersistentLocalId.Value.ToString(), string.Format(request.ResponseOptions.Value.GebouwDetailUrl, buildingUnit.BuildingPersistentLocalId.Value)),
-                    addressPersistentLocalIds.Select(id => new GebouweenheidDetailAdres(id, string.Format(request.ResponseOptions.Value.AdresUrl, id))).ToList(),
+                    new GebouweenheidDetailGebouw(buildingUnit.BuildingPersistentLocalId.Value.ToString(), string.Format(_responseOptions.Value.GebouwDetailUrl, buildingUnit.BuildingPersistentLocalId.Value)),
+                    addressPersistentLocalIds.Select(id => new GebouweenheidDetailAdres(id, string.Format(_responseOptions.Value.AdresUrl, id))).ToList(),
                     false));
         }
 
