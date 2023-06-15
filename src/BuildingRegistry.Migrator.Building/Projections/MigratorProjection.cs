@@ -20,10 +20,16 @@ namespace BuildingRegistry.Migrator.Building.Projections
                 {
                     foreach (var addressPersistentLocalId in buildingUnit.AddressPersistentLocalIds)
                     {
-                        await dbContext.AddIdempotentBuildingUnitAddressRelation(
-                            new BuildingPersistentLocalId(message.Message.BuildingPersistentLocalId),
+                        var relation = await dbContext.FindBuildingUnitAddressRelation(
                             new BuildingUnitPersistentLocalId(buildingUnit.BuildingUnitPersistentLocalId),
-                            new AddressPersistentLocalId(addressPersistentLocalId), ct);
+                            new AddressPersistentLocalId(addressPersistentLocalId),
+                            ct);
+
+                        if (relation is null)
+                        {
+                            relation = new BuildingUnitAddressRelation(message.Message.BuildingPersistentLocalId, buildingUnit.BuildingUnitPersistentLocalId, addressPersistentLocalId);
+                            await dbContext.BuildingUnitAddressRelation.AddAsync(relation, ct);
+                        }
                     }
                 }
 
