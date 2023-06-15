@@ -1,3 +1,10 @@
+## [3.81.3](https://github.com/informatievlaanderen/building-registry/compare/v3.81.2...v3.81.3) (2023-06-15)
+
+
+### Bug Fixes
+
+* registration of IConsumer in parcel consumer ([6d66fdf](https://github.com/informatievlaanderen/building-registry/commit/6d66fdf53e2391648a85692cae125059581fa54f))
+
 ## [3.81.2](https://github.com/informatievlaanderen/building-registry/compare/v3.81.1...v3.81.2) (2023-06-15)
 
 
