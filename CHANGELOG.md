@@ -1,3 +1,15 @@
+## [3.81.1](https://github.com/informatievlaanderen/building-registry/compare/v3.81.0...v3.81.1) (2023-06-15)
+
+
+### Bug Fixes
+
+* use AddressRegistry addressDetail Legacy projections for migrator ([e655dba](https://github.com/informatievlaanderen/building-registry/commit/e655dba9ada6c9392a55e8ffd24b3034d8809ea9))
+
+
+### Performance Improvements
+
+* migrate projections in batch ([1697416](https://github.com/informatievlaanderen/building-registry/commit/1697416c492b1d4e164adfa32a1ae86f326c104b))
+
 # [3.81.0](https://github.com/informatievlaanderen/building-registry/compare/v3.80.3...v3.81.0) (2023-06-14)
 
 
