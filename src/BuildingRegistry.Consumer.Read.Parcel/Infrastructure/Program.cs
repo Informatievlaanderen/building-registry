@@ -90,38 +90,41 @@ namespace BuildingRegistry.Consumer.Read.Parcel.Infrastructure
                 {
                     var services = new ServiceCollection();
 
-                    builder.Register(c =>
-                    {
-                        var bootstrapServers = hostContext.Configuration["Kafka:BootstrapServers"];
-                        var topic = $"{hostContext.Configuration["Topic"]}" ?? throw new ArgumentException("Configuration has no Topic.");
-                        var suffix = hostContext.Configuration["GroupSuffix"];
-                        var consumerGroupId = $"BuildingRegistry.ConsumerParcelItem.{topic}{suffix}";
-
-                        var consumerOptions = new ConsumerOptions(
-                            new BootstrapServers(bootstrapServers),
-                            new Topic(topic),
-                            new ConsumerGroupId(consumerGroupId),
-                            EventsJsonSerializerSettingsProvider.CreateSerializerSettings());
-
-                        consumerOptions.ConfigureSaslAuthentication(new SaslAuthentication(
-                            hostContext.Configuration["Kafka:SaslUserName"],
-                            hostContext.Configuration["Kafka:SaslPassword"]));
-
-                        var offsetStr = hostContext.Configuration["TopicOffset"];
-                        if (!string.IsNullOrEmpty(offsetStr) && long.TryParse(offsetStr, out var offset))
+                    builder
+                        .Register(c =>
                         {
-                            using var ctx = c.Resolve<ConsumerParcelContext>();
+                            var bootstrapServers = hostContext.Configuration["Kafka:BootstrapServers"];
+                            var topic = $"{hostContext.Configuration["Topic"]}" ?? throw new ArgumentException("Configuration has no Topic.");
+                            var suffix = hostContext.Configuration["GroupSuffix"];
+                            var consumerGroupId = $"BuildingRegistry.ConsumerParcelItem.{topic}{suffix}";
 
-                            if (ctx.ParcelConsumerItems.Any())
+                            var consumerOptions = new ConsumerOptions(
+                                new BootstrapServers(bootstrapServers),
+                                new Topic(topic),
+                                new ConsumerGroupId(consumerGroupId),
+                                EventsJsonSerializerSettingsProvider.CreateSerializerSettings());
+
+                            consumerOptions.ConfigureSaslAuthentication(new SaslAuthentication(
+                                hostContext.Configuration["Kafka:SaslUserName"],
+                                hostContext.Configuration["Kafka:SaslPassword"]));
+
+                            var offsetStr = hostContext.Configuration["TopicOffset"];
+                            if (!string.IsNullOrEmpty(offsetStr) && long.TryParse(offsetStr, out var offset))
                             {
-                                throw new InvalidOperationException($"Cannot set Kafka offset to {offset} because {nameof(ctx.ParcelConsumerItems)} has data.");
+                                using var ctx = c.Resolve<ConsumerParcelContext>();
+
+                                if (ctx.ParcelConsumerItems.Any())
+                                {
+                                    throw new InvalidOperationException($"Cannot set Kafka offset to {offset} because {nameof(ctx.ParcelConsumerItems)} has data.");
+                                }
+
+                                consumerOptions.ConfigureOffset(new Offset(offset));
                             }
 
-                            consumerOptions.ConfigureOffset(new Offset(offset));
-                        }
-
-                        return new Consumer(consumerOptions, c.Resolve<ILoggerFactory>());
-                    });
+                            return new Consumer(consumerOptions, c.Resolve<ILoggerFactory>());
+                        })
+                        .As<IConsumer>()
+                        .SingleInstance();
 
                     builder
                         .RegisterModule(new DataDogModule(hostContext.Configuration));
