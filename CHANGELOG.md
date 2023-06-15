@@ -1,3 +1,10 @@
+## [3.81.2](https://github.com/informatievlaanderen/building-registry/compare/v3.81.1...v3.81.2) (2023-06-15)
+
+
+### Bug Fixes
+
+* name of consumer parcel service in release ([fa9d163](https://github.com/informatievlaanderen/building-registry/commit/fa9d163bc678ff6425086c7c451bb703acf798c4))
+
 ## [3.81.1](https://github.com/informatievlaanderen/building-registry/compare/v3.81.0...v3.81.1) (2023-06-15)
 
 
