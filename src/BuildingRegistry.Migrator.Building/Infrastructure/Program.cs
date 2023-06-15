@@ -69,15 +69,20 @@ namespace BuildingRegistry.Migrator.Building.Infrastructure
 
                 var watch = Stopwatch.StartNew();
 
-                Dictionary<Guid, int> consumedAddressItems;
-                await using (var consumerContext = container.GetRequiredService<ConsumerAddressContext>())
-                {
-                    consumedAddressItems = await consumerContext
-                        .AddressConsumerItems
-                        .Where(x => x.AddressId.HasValue)
-                        .Select(x => new {AddressId = x.AddressId!.Value, x.AddressPersistentLocalId})
-                        .ToDictionaryAsync(x => x.AddressId, y => y.AddressPersistentLocalId, ct);
-                }
+
+                // NOTE: Previous implementation for getting addressItems from kafka consumer
+                //
+                // await using (var consumerContext = container.GetRequiredService<ConsumerAddressContext>())
+                // {
+                //     consumedAddressItems = await consumerContext
+                //         .AddressConsumerItems
+                //         .Where(x => x.AddressId.HasValue)
+                //         .Select(x => new {AddressId = x.AddressId!.Value, x.AddressPersistentLocalId})
+                //         .ToDictionaryAsync(x => x.AddressId, y => y.AddressPersistentLocalId, ct);
+                // }
+
+                Dictionary<Guid, int> consumedAddressItems = await new AddressDetails(configuration.GetConnectionString("AddressLegacyProjections"))
+                    .GetActualAddresses();
 
                 var bigBuildingMigrator = new BigBuildingStreamMigrator(
                     container.GetRequiredService<ILoggerFactory>(),
