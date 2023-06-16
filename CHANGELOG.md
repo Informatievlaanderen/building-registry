@@ -1,3 +1,11 @@
+## [3.81.4](https://github.com/informatievlaanderen/building-registry/compare/v3.81.3...v3.81.4) (2023-06-16)
+
+
+### Bug Fixes
+
+* consume parcels idempotent ([2e0f451](https://github.com/informatievlaanderen/building-registry/commit/2e0f451d61c1844047d336ba05f0ea3fb140a697))
+* consume parcels idempotent the right way ([306421b](https://github.com/informatievlaanderen/building-registry/commit/306421bbf0bce75231aafa03e4fc4c8266b3e4a3))
+
 ## [3.81.3](https://github.com/informatievlaanderen/building-registry/compare/v3.81.2...v3.81.3) (2023-06-15)
 
 
