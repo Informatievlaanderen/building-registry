@@ -10,7 +10,12 @@ namespace BuildingRegistry.Consumer.Read.Parcel.Projections
         {
             When<ParcelWasMigrated>(async (context, message, ct) =>
             {
-                await context
+                var parcel = await context
+                    .ParcelConsumerItems.FindAsync(new[] { Guid.Parse(message.ParcelId) }, ct);
+
+                if (parcel is not null)
+                {
+                    await context
                         .ParcelConsumerItems
                         .AddAsync(new ParcelConsumerItem(
                                 Guid.Parse(message.ParcelId),
@@ -18,6 +23,7 @@ namespace BuildingRegistry.Consumer.Read.Parcel.Projections
                                 ParcelStatus.Parse(message.ParcelStatus),
                                 message.IsRemoved)
                             , ct);
+                }
             });
         }
     }
