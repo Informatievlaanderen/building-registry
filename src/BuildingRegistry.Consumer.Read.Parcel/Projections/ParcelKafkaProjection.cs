@@ -11,9 +11,9 @@ namespace BuildingRegistry.Consumer.Read.Parcel.Projections
             When<ParcelWasMigrated>(async (context, message, ct) =>
             {
                 var parcel = await context
-                    .ParcelConsumerItems.FindAsync(new[] { Guid.Parse(message.ParcelId) }, ct);
+                    .ParcelConsumerItems.FindAsync(new object?[] { Guid.Parse(message.ParcelId) }, cancellationToken: ct);
 
-                if (parcel is not null)
+                if (parcel is null)
                 {
                     await context
                         .ParcelConsumerItems
