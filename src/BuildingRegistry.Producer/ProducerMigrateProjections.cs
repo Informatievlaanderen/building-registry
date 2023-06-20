@@ -8,7 +8,7 @@ namespace BuildingRegistry.Producer
     using Be.Vlaanderen.Basisregisters.MessageHandling.Kafka.Producer;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.Connector;
 
-    [ConnectedProjectionName("Kafka producer start from migrate")]
+    [ConnectedProjectionName("Kafka producer start vanaf migratie")]
     [ConnectedProjectionDescription("Projectie die berichten naar de kafka broker stuurt startende vanaf migratie.")]
     public class ProducerMigrateProjections : V2Producer
     {
