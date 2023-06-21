@@ -1,3 +1,10 @@
+## [3.81.5](https://github.com/informatievlaanderen/building-registry/compare/v3.81.4...v3.81.5) (2023-06-21)
+
+
+### Bug Fixes
+
+* naming producers migration ([622cfc8](https://github.com/informatievlaanderen/building-registry/commit/622cfc8df94a533c0a0716cc01bddd28787f20b4))
+
 ## [3.81.4](https://github.com/informatievlaanderen/building-registry/compare/v3.81.3...v3.81.4) (2023-06-16)
 
 
