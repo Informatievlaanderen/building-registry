@@ -54,6 +54,7 @@ namespace BuildingRegistry.Building
 
         public static Building MergeBuildings(
             IBuildingFactory buildingFactory,
+            IAddCommonBuildingUnit addCommonBuildingUnit,
             BuildingPersistentLocalId buildingPersistentLocalId,
             ExtendedWkbGeometry extendedWkbGeometry,
             List<Building> buildingsToMerge)
@@ -73,7 +74,8 @@ namespace BuildingRegistry.Building
                     throw new BuildingToMergeHasInvalidGeometryMethodException();
             }
 
-            GuardPolygon(WKBReaderFactory.Create().Read(extendedWkbGeometry));
+            var buildingGeometry = WKBReaderFactory.Create().Read(extendedWkbGeometry);
+            GuardPolygon(buildingGeometry);
 
             var newBuilding = buildingFactory.Create();
             newBuilding.ApplyChange(
@@ -83,7 +85,53 @@ namespace BuildingRegistry.Building
                     buildingsToMerge.Select(x => x.BuildingPersistentLocalId)));
 
             //TODO: transfer buildingunits to new building
-            // status check
+
+            foreach (var buildingToMerge in buildingsToMerge)
+            {
+                var buildingUnitsToTransfer =
+                    buildingToMerge._buildingUnits.PlannedBuildingUnits().Concat(buildingToMerge._buildingUnits.RealizedBuildingUnits());
+
+                foreach (var buildingUnit in buildingUnitsToTransfer.Where(x => x.Function != BuildingUnitFunction.Common))
+                {
+                    var geometryMethod = buildingUnit.BuildingUnitPosition.GeometryMethod;
+
+                    if (!newBuilding.BuildingGeometry.Contains(buildingUnit.BuildingUnitPosition.Geometry))
+                    {
+                        geometryMethod = BuildingUnitPositionGeometryMethod.DerivedFromObject;
+                    }
+
+                    var geometryPosition = buildingUnit.BuildingUnitPosition.Geometry;
+
+                    if (geometryMethod == BuildingUnitPositionGeometryMethod.DerivedFromObject)
+                    {
+                        geometryPosition = newBuilding.BuildingGeometry.Center;
+                    }
+
+                    newBuilding.ApplyChange(new BuildingUnitWasTransferred(
+                        buildingPersistentLocalId,
+                        buildingUnit,
+                        buildingToMerge.BuildingPersistentLocalId,
+                        new BuildingUnitPosition(geometryPosition, geometryMethod)));
+
+                    newBuilding.EnsureCommonBuildingUnit(addCommonBuildingUnit);
+                }
+
+                if (buildingToMerge._buildingUnits.HasCommonBuildingUnit())
+                {
+                    var commonBuildingUnitToMerge = buildingToMerge._buildingUnits.CommonBuildingUnit();
+                    var newCommonBuildingUnit = newBuilding._buildingUnits.CommonBuildingUnit();
+
+                    foreach (var addressToTransfer in commonBuildingUnitToMerge.AddressPersistentLocalIds)
+                    {
+                        newBuilding._buildingUnits.CommonBuildingUnit();
+                        newBuilding.ApplyChange(new BuildingUnitAddressWasAttachedV2(
+                            buildingPersistentLocalId,
+                            newCommonBuildingUnit.BuildingUnitPersistentLocalId,
+                            addressToTransfer
+                        ));
+                    }
+                }
+            }
 
             return newBuilding;
         }

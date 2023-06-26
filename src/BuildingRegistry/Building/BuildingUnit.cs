@@ -37,6 +37,30 @@ namespace BuildingRegistry.Building
             return unit;
         }
 
+        public static BuildingUnit Transfer(
+            Action<object> applier,
+            BuildingPersistentLocalId buildingPersistentLocalId,
+            BuildingUnitPersistentLocalId buildingUnitPersistentLocalId,
+            BuildingUnitFunction function,
+            BuildingUnitStatus status,
+            List<AddressPersistentLocalId> addressPersistentLocalIds,
+            BuildingUnitPosition buildingUnitPosition,
+            bool hasDeviation)
+        {
+            var unit = new BuildingUnit(applier)
+            {
+                _buildingPersistentLocalId = buildingPersistentLocalId,
+                BuildingUnitPersistentLocalId = buildingUnitPersistentLocalId,
+                Function = function,
+                Status = status,
+                _addressPersistentLocalIds = addressPersistentLocalIds,
+                BuildingUnitPosition = buildingUnitPosition,
+                HasDeviation = hasDeviation,
+            };
+
+            return unit;
+        }
+
         public void Realize()
         {
             GuardRemoved();

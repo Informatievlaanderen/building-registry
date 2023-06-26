@@ -1,15 +1,16 @@
-﻿namespace BuildingRegistry.Tests.AggregateTests.WhenMergingBuildings;
-
-using Building.Commands;
-using Building.Events;
-
-public static class MergeBuildingsExtensions
+﻿namespace BuildingRegistry.Tests.AggregateTests.WhenMergingBuildings
 {
-    public static BuildingMergerWasRealized ToBuildingMergerWasRealizedEvent(this MergeBuildings command)
+    using Building.Commands;
+    using Building.Events;
+
+    public static class MergeBuildingsExtensions
     {
-        return new BuildingMergerWasRealized(
-            command.NewBuildingPersistentLocalId,
-            command.NewExtendedWkbGeometry,
-            command.BuildingPersistentLocalIdsToMerge);
+        public static BuildingMergerWasRealized ToBuildingMergerWasRealizedEvent(this MergeBuildings command)
+        {
+            return new BuildingMergerWasRealized(
+                command.NewBuildingPersistentLocalId,
+                command.NewExtendedWkbGeometry,
+                command.BuildingPersistentLocalIdsToMerge);
+        }
     }
 }
