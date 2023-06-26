@@ -1,6 +1,7 @@
 namespace BuildingRegistry.Building
 {
     using System;
+    using System.Collections.Generic;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
     using Be.Vlaanderen.Basisregisters.AggregateSource.Snapshotting;
     using Be.Vlaanderen.Basisregisters.CommandHandling;
@@ -9,6 +10,7 @@ namespace BuildingRegistry.Building
     using Be.Vlaanderen.Basisregisters.GrAr.Common.Pipes;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Commands;
+    using Exceptions;
     using SqlStreamStore;
 
     public sealed class BuildingCommandHandlerModule : CommandHandlerModule
@@ -237,6 +239,36 @@ namespace BuildingRegistry.Building
                     var building = await buildingRepository().GetAsync(streamId, ct);
 
                     building.ChangeMeasurement(message.Command.Geometry, message.Command.GrbData);
+                });
+
+            For<MergeBuildings>()
+                .AddSqlStreamStore(getStreamStore, getUnitOfWork, eventMapping, eventSerializer, getSnapshotStore)
+                .AddEventHash<MergeBuildings, Building>(getUnitOfWork)
+                .AddProvenance(getUnitOfWork, provenanceFactory)
+                .Handle(async (message, ct) =>
+                {
+                    var buildingsToMerge = new List<Building>();
+                    foreach (var buildingPersistentLocalId in message.Command.BuildingPersistentLocalIdsToMerge)
+                    {
+                        var streamId = new BuildingStreamId(buildingPersistentLocalId);
+                        var building = await buildingRepository().GetAsync(streamId, ct);
+
+                        buildingsToMerge.Add(building);
+                    }
+
+                    var newBuildingStreamId = new BuildingStreamId(message.Command.NewBuildingPersistentLocalId);
+                    if((await buildingRepository().GetOptionalAsync(newBuildingStreamId, ct)).HasValue)
+                    {
+                        throw new AggregateSourceException($"Building with id {message.Command.NewBuildingPersistentLocalId} already exists");
+                    }
+
+                    var newBuilding = Building.MergeBuildings(
+                        buildingFactory,
+                        message.Command.NewBuildingPersistentLocalId,
+                        message.Command.NewExtendedWkbGeometry,
+                        buildingsToMerge);
+
+                    buildingRepository().Add(newBuildingStreamId, newBuilding);
                 });
         }
     }

@@ -77,6 +77,7 @@ namespace BuildingRegistry.Building
             Register<BuildingUnitWasNotRealizedBecauseBuildingWasDemolished>(When);
             Register<BuildingUnitWasRetiredBecauseBuildingWasDemolished>(When);
             Register<BuildingMeasurementWasChanged>(When);
+            Register<BuildingMergerWasRealized>(When);
 
             Register<BuildingSnapshot>(When);
         }
@@ -323,6 +324,18 @@ namespace BuildingRegistry.Building
 
                 buildingUnit.Route(@event);
             }
+
+            _lastEvent = @event;
+        }
+
+        private void When(BuildingMergerWasRealized @event)
+        {
+            BuildingPersistentLocalId = new BuildingPersistentLocalId(@event.BuildingPersistentLocalId);
+            BuildingGeometry = new BuildingGeometry(
+                new ExtendedWkbGeometry(@event.ExtendedWkbGeometry),
+                BuildingGeometryMethod.MeasuredByGrb);
+
+            BuildingStatus = BuildingStatus.Realized;
 
             _lastEvent = @event;
         }

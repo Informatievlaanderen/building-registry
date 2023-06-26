@@ -52,6 +52,42 @@ namespace BuildingRegistry.Building
             return newBuilding;
         }
 
+        public static Building MergeBuildings(
+            IBuildingFactory buildingFactory,
+            BuildingPersistentLocalId buildingPersistentLocalId,
+            ExtendedWkbGeometry extendedWkbGeometry,
+            List<Building> buildingsToMerge)
+        {
+            if (buildingsToMerge.Count <= 1)
+                throw new BuildingMergerNeedsMoreThanOneBuildingException();
+
+            if (buildingsToMerge.Count > BuildingMergerHasTooManyBuildingsException.MaxNumberOfBuildingsToMerge)
+                throw new BuildingMergerHasTooManyBuildingsException();
+
+            foreach (var building in buildingsToMerge)
+            {
+                if (building.BuildingStatus != BuildingStatus.Realized)
+                    throw new BuildingToMergeHasInvalidStatusException();
+
+                if (building.BuildingGeometry.Method != BuildingGeometryMethod.MeasuredByGrb)
+                    throw new BuildingToMergeHasInvalidGeometryMethodException();
+            }
+
+            GuardPolygon(WKBReaderFactory.Create().Read(extendedWkbGeometry));
+
+            var newBuilding = buildingFactory.Create();
+            newBuilding.ApplyChange(
+                new BuildingMergerWasRealized(
+                    buildingPersistentLocalId,
+                    extendedWkbGeometry,
+                    buildingsToMerge.Select(x => x.BuildingPersistentLocalId)));
+
+            //TODO: transfer buildingunits to new building
+            // status check
+
+            return newBuilding;
+        }
+
         public void PlaceUnderConstruction()
         {
             GuardRemovedBuilding();
@@ -221,7 +257,8 @@ namespace BuildingRegistry.Building
             }
 
             var buildingUnitsWithPositionDerivedFromBuilding = plannedOrRealizedBuildingUnits
-                .Where(x => x.BuildingUnitPosition.GeometryMethod == BuildingUnitPositionGeometryMethod.DerivedFromObject)
+                .Where(x => x.BuildingUnitPosition.GeometryMethod ==
+                            BuildingUnitPositionGeometryMethod.DerivedFromObject)
                 .Select(x => x.BuildingUnitPersistentLocalId)
                 .ToList();
 
@@ -264,11 +301,13 @@ namespace BuildingRegistry.Building
         }
 
         #region Metadata
+
         protected override void BeforeApplyChange(object @event)
         {
             _ = new EventMetadataContext(new Dictionary<string, object>());
             base.BeforeApplyChange(@event);
         }
+
         #endregion
 
         #region Snapshot
