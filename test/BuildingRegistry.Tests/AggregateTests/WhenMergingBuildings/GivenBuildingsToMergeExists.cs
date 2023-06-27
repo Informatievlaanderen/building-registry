@@ -18,7 +18,6 @@
     using Moq;
     using Xunit;
     using Xunit.Abstractions;
-    using BuildingUnit = Building.BuildingUnit;
 
     public partial class GivenBuildingsToMergeExists : BuildingRegistryTest
     {
@@ -184,64 +183,11 @@
                     command.ToBuildingMergerWasRealizedEvent())));
         }
 
-        // Units with random status
-
-        // [Fact]
-        // public void WithBuildingUnits_ThenBuildingUnitsWereTransferred()
-        // {
-        //     var buildingWasPlannedEvents = Fixture.CreateMany<BuildingWasPlannedV2>(_random.Next(2, 20)).ToList();
-        //     var givenPlannedFacts = buildingWasPlannedEvents
-        //         .Select(x =>
-        //             new Fact(new BuildingStreamId(new BuildingPersistentLocalId(x.BuildingPersistentLocalId)), x));
-        //
-        //     var expectedBuildingUnitFacts = new List<Fact>();
-        //     var buildingUnitFacts = new List<Fact>();
-        //     foreach (var buildingWasPlannedEvent in buildingWasPlannedEvents)
-        //     {
-        //         const int maxBuildingUnits = 1;
-        //
-        //         var buildingPersistentLocalId = new BuildingPersistentLocalId(buildingWasPlannedEvent.BuildingPersistentLocalId);
-        //
-        //         var buildingUnitWasPlannedEvents = Fixture.CreateMany<BuildingUnitWasPlannedV2>(_random.Next(1, maxBuildingUnits)).ToList();
-        //         var givenBuildingUnitPlannedFacts = buildingUnitWasPlannedEvents
-        //             .Select(x => new Fact(new BuildingStreamId(buildingPersistentLocalId), x));
-        //
-        //         var givenBuildingUnitRealizedFacts = buildingUnitWasPlannedEvents.Skip(_random.Next(0, maxBuildingUnits))
-        //             .Select(x =>
-        //                 new Fact(
-        //                     new BuildingStreamId(buildingPersistentLocalId),
-        //                     new BuildingUnitWasRealizedV2(buildingPersistentLocalId, new BuildingUnitPersistentLocalId(x.BuildingUnitPersistentLocalId))));
-        //
-        //         foreach (var givenBuildingUnitRealizedFact in givenBuildingUnitRealizedFacts)
-        //         {
-        //
-        //         }
-        //
-        //         buildingUnitFacts.AddRange(givenBuildingUnitPlannedFacts);
-        //         buildingUnitFacts.AddRange(givenBuildingUnitRealizedFacts);
-        //     }
-        //
-        //     var command = new MergeBuildings(
-        //         Fixture.Create<BuildingPersistentLocalId>(),
-        //         Fixture.Create<ExtendedWkbGeometry>(),
-        //         buildingWasPlannedEvents.Select(x => new BuildingPersistentLocalId(x.BuildingPersistentLocalId)),
-        //         Fixture.Create<Provenance>()
-        //     );
-        //
-        //     Assert(new Scenario()
-        //         .Given(givenPlannedFacts
-        //             .Concat(RealizePlannedBuildingsEvents(buildingWasPlannedEvents))
-        //             .Concat(MeasurePlannedBuildingsEvents(buildingWasPlannedEvents))
-        //             .Concat(buildingUnitFacts)
-        //             .ToArray())
-        //         .When(command)
-        //         .Then(new Fact(new BuildingStreamId(command.NewBuildingPersistentLocalId), command.ToBuildingMergerWasRealizedEvent())));
-        // }
-
         [Fact]
         public void StateCheck()
         {
             var command = Fixture.Create<MergeBuildings>();
+            //TODO: add multiple units and addresses
 
             var building = new BuildingFactory(NoSnapshotStrategy.Instance).Create();
             var buildingPersistentLocalId = Fixture.Create<BuildingPersistentLocalId>();
@@ -284,6 +230,7 @@
             result.BuildingGeometry.Geometry.Should().Be(command.NewExtendedWkbGeometry);
             result.BuildingGeometry.Method.Should().Be(BuildingGeometryMethod.MeasuredByGrb);
 
+            //TODO: extend assertions
             result.BuildingUnits.Should().HaveCount(1);
         }
 

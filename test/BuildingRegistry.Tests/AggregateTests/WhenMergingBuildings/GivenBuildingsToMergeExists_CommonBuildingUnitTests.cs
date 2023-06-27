@@ -14,6 +14,10 @@
 
     public partial class GivenBuildingsToMergeExists
     {
+        private static ExtendedWkbGeometry NewBuildingCenter => new BuildingGeometry(
+            new ExtendedWkbGeometry(GeometryHelper.ValidPolygon.AsBinary()),
+            BuildingGeometryMethod.MeasuredByGrb).Center;
+
         [Fact]
         public void WithTwoBuildingsWithOneUnit_ThenCommonBuildingUnitWasAdded()
         {
@@ -42,10 +46,6 @@
                     TransferUnit(command.NewBuildingPersistentLocalId, buildingUnitWasPlannedV2)));
             }
 
-            var expectedPosition = new BuildingGeometry(
-                new ExtendedWkbGeometry(GeometryHelper.ValidPolygon.AsBinary()),
-                BuildingGeometryMethod.MeasuredByGrb).Center;
-
             Assert(new Scenario()
                 .Given(givenPlannedFacts
                     .Concat(RealizePlannedBuildingsEvents(buildingWasPlannedEvents))
@@ -63,7 +63,7 @@
                         new BuildingUnitPersistentLocalId(1),
                         BuildingUnitStatus.Realized,
                         BuildingUnitPositionGeometryMethod.DerivedFromObject,
-                        expectedPosition,
+                        NewBuildingCenter,
                         false))
                 ));
         }
@@ -119,10 +119,6 @@
                         new AddressPersistentLocalId(commonBuildingUnitAddressWasAttached.AddressPersistentLocalId))));
             }
 
-            var expectedPosition = new BuildingGeometry(
-                new ExtendedWkbGeometry(GeometryHelper.ValidPolygon.AsBinary()),
-                BuildingGeometryMethod.MeasuredByGrb).Center;
-
             Assert(new Scenario()
                 .Given(givenPlannedFacts
                     .Concat(RealizePlannedBuildingsEvents(buildingWasPlannedEvents))
@@ -140,7 +136,7 @@
                             new BuildingUnitPersistentLocalId(1),
                             BuildingUnitStatus.Realized,
                             BuildingUnitPositionGeometryMethod.DerivedFromObject,
-                            expectedPosition,
+                            NewBuildingCenter,
                             false)),
                     buildingUnitTransferAssertions[2],
                     buildingUnitTransferAssertions[3],
