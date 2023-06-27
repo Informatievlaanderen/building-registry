@@ -318,6 +318,26 @@ namespace BuildingRegistry.Building
                 buildingUnitsPosition));
         }
 
+        public void MarkAsMerged(BuildingPersistentLocalId destinationBuildingPersistentLocalId)
+        {
+            foreach (var buildingUnit in _buildingUnits.PlannedBuildingUnits()
+                         .Concat(_buildingUnits.RealizedBuildingUnits())
+                         .Where(x => x.Function != BuildingUnitFunction.Common)
+                         .ToList())
+            {
+                ApplyChange(new BuildingUnitWasMoved(
+                    BuildingPersistentLocalId,
+                    buildingUnit.BuildingUnitPersistentLocalId,
+                    destinationBuildingPersistentLocalId));
+
+                NotRealizeOrRetireCommonBuildingUnit();
+            }
+
+            ApplyChange(new BuildingWasMerged(
+                BuildingPersistentLocalId,
+                destinationBuildingPersistentLocalId));
+        }
+
         private void GuardRemovedBuilding()
         {
             if (IsRemoved)
