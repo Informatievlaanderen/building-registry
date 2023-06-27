@@ -93,7 +93,7 @@
 
                 var commonBuildingUnitWasAdded = AddCommonUnit(buildingWasPlanned.BuildingPersistentLocalId, Fixture.Create<BuildingUnitPersistentLocalId>());
 
-                var commonBuildingUnitAddressWasAttached = AttachCommonUnitAddress(
+                var commonBuildingUnitAddressWasAttached = AttachBuildingUnitAddress(
                     buildingWasPlanned.BuildingPersistentLocalId,
                     commonBuildingUnitWasAdded.BuildingUnitPersistentLocalId);
 
@@ -167,16 +167,16 @@
                 buildingUnitPosition);
         }
 
-        private BuildingUnitAddressWasAttachedV2 AttachCommonUnitAddress(
+        private BuildingUnitAddressWasAttachedV2 AttachBuildingUnitAddress(
             int buildingPersistentLocalId,
             int buildingUnitPersistentLocalId)
         {
-            var commonBuildingUnitAddressWasAttached = new BuildingUnitAddressWasAttachedV2(
+            var buildingUnitAddressWasAttached = new BuildingUnitAddressWasAttachedV2(
                 new BuildingPersistentLocalId(buildingPersistentLocalId),
                 new BuildingUnitPersistentLocalId(buildingUnitPersistentLocalId),
                 Fixture.Create<AddressPersistentLocalId>());
-            ((ISetProvenance) commonBuildingUnitAddressWasAttached).SetProvenance(Fixture.Create<Provenance>());
-            return commonBuildingUnitAddressWasAttached;
+            ((ISetProvenance) buildingUnitAddressWasAttached).SetProvenance(Fixture.Create<Provenance>());
+            return buildingUnitAddressWasAttached;
         }
 
         private BuildingUnitWasPlannedV2 PlanUnit(int buildingPersistentLocalId)

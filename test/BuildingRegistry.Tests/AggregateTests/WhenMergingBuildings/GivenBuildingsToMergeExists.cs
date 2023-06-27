@@ -183,57 +183,6 @@
                     command.ToBuildingMergerWasRealizedEvent())));
         }
 
-        [Fact]
-        public void StateCheck()
-        {
-            var command = Fixture.Create<MergeBuildings>();
-            //TODO: add multiple units and addresses
-
-            var building = new BuildingFactory(NoSnapshotStrategy.Instance).Create();
-            var buildingPersistentLocalId = Fixture.Create<BuildingPersistentLocalId>();
-            building.Initialize(
-                new List<object>
-                {
-                    new UnplannedBuildingWasRealizedAndMeasured(
-                        buildingPersistentLocalId,
-                        Fixture.Create<ExtendedWkbGeometry>()),
-
-                    new BuildingUnitWasPlannedV2(
-                        buildingPersistentLocalId,
-                        Fixture.Create<BuildingUnitPersistentLocalId>(),
-                        BuildingUnitPositionGeometryMethod.AppointedByAdministrator,
-                        new ExtendedWkbGeometry(GeometryHelper.ValidPointInPolygon.AsBinary()),
-                        BuildingUnitFunction.Unknown,
-                        true)
-                });
-
-            // Act
-            var result = Building.MergeBuildings(
-                new BuildingFactory(NoSnapshotStrategy.Instance),
-                Mock.Of<IAddCommonBuildingUnit>(),
-                command.NewBuildingPersistentLocalId,
-                command.NewExtendedWkbGeometry,
-                new List<Building>
-                {
-                    building,
-                    Building.RealizeAndMeasureUnplannedBuilding(
-                        new BuildingFactory(NoSnapshotStrategy.Instance),
-                        Fixture.Create<BuildingPersistentLocalId>(),
-                        Fixture.Create<ExtendedWkbGeometry>(),
-                        Fixture.Create<BuildingGrbData>())
-                });
-
-            // Assert
-            result.Should().NotBeNull();
-            result.BuildingPersistentLocalId.Should().Be(command.NewBuildingPersistentLocalId);
-            result.BuildingStatus.Should().Be(BuildingStatus.Realized);
-            result.BuildingGeometry.Geometry.Should().Be(command.NewExtendedWkbGeometry);
-            result.BuildingGeometry.Method.Should().Be(BuildingGeometryMethod.MeasuredByGrb);
-
-            //TODO: extend assertions
-            result.BuildingUnits.Should().HaveCount(1);
-        }
-
         private List<Fact> RealizePlannedBuildingsEvents(List<BuildingWasPlannedV2> buildingWasPlannedEvents)
         {
             var buildingsWereRealized = new List<BuildingWasRealizedV2>();

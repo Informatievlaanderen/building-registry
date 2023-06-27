@@ -57,7 +57,7 @@
 
                         for (var addressIndex = 0; addressIndex < _random.Next(0, 3); addressIndex++)
                         {
-                            var commonBuildingUnitAddressWasAttached = AttachCommonUnitAddress(
+                            var commonBuildingUnitAddressWasAttached = AttachBuildingUnitAddress(
                                 buildingWasPlanned.BuildingPersistentLocalId, commonBuildingUnitPersistentLocalId);
                             givenBuildingUnitFacts.Add(CreateFact(buildingUnitWasPlanned.BuildingPersistentLocalId,
                                 commonBuildingUnitAddressWasAttached));

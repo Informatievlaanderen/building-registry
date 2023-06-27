@@ -1,5 +1,6 @@
 ﻿namespace BuildingRegistry.Tests.Extensions
 {
+    using AutoFixture;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Building;
     using Building.Events;
@@ -15,6 +16,11 @@
             ((ISetProvenance)updatedEvent).SetProvenance(@event.Provenance.ToProvenance());
 
             return updatedEvent;
+        }
+
+        public static void SetFixtureProvenance(this IBuildingEvent @event, Fixture fixture)
+        {
+            @event.SetProvenance(fixture.Create<Provenance>());
         }
     }
 }

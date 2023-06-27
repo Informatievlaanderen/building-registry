@@ -27,7 +27,7 @@ namespace BuildingRegistry.Building.Events
         [EventPropertyDescription("Extended WKB-voorstelling van de gebouweenheidpositie (Hexadecimale notatie).")]
         public string ExtendedWkbGeometry { get; }
 
-        [EventPropertyDescription("Functie van de gebouweenheid.")] // todo: correct description?
+        [EventPropertyDescription("Functie van de gebouweenheid.")]
         public string Function { get; }
 
         [EventPropertyDescription("Gebouweenheid afwijking.")]

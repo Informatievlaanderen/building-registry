@@ -84,8 +84,6 @@ namespace BuildingRegistry.Building
                     extendedWkbGeometry,
                     buildingsToMerge.Select(x => x.BuildingPersistentLocalId)));
 
-            //TODO: transfer buildingunits to new building
-
             foreach (var buildingToMerge in buildingsToMerge)
             {
                 var buildingUnitsToTransfer =
