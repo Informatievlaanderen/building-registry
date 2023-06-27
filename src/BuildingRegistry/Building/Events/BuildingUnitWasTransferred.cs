@@ -11,15 +11,17 @@
     [EventTags(EventTag.For.Sync, EventTag.For.Edit, Tag.Building)]
     [EventName(EventName)]
     [EventDescription("Gebouweenheid werd overgedragen naar het gebouw.")]
-    public class BuildingUnitWasTransferred : IBuildingEvent
+    public class BuildingUnitWasTransferred : IBuildingEvent, IHasBuildingUnitPersistentLocalId
     {
         public const string EventName = "BuildingUnitWasTransferred"; // BE CAREFUL CHANGING THIS!!
 
+        [EventPropertyDescription("Objectidentificator van het gebouw.")]
         public int BuildingPersistentLocalId { get; }
 
         [EventPropertyDescription("Objectidentificator van de gebouweenheid.")]
         public int BuildingUnitPersistentLocalId { get; }
 
+        [EventPropertyDescription("Objectidentificator van het gebouw van waar de gebouweenheid werd overgedragen.")]
         public int SourceBuildingPersistentLocalId { get; }
 
         [EventPropertyDescription("Functie van de gebouweenheid. Mogelijkheden: Common of Unknown.")]
@@ -37,8 +39,10 @@
         [EventPropertyDescription("Extended WKB-voorstelling van de gebouweenheidpositie (Hexadecimale notatie).")]
         public string ExtendedWkbGeometry { get; }
 
+        [EventPropertyDescription("Geeft aan of de gebouweenheid een afwijking heeft.")]
         public bool HasDeviation { get; }
 
+        [EventPropertyDescription("Metadata bij het event.")]
         public ProvenanceData Provenance { get; private set; }
 
         public BuildingUnitWasTransferred(

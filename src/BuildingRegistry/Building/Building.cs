@@ -121,7 +121,6 @@ namespace BuildingRegistry.Building
 
                     foreach (var addressToTransfer in commonBuildingUnitToMerge.AddressPersistentLocalIds)
                     {
-                        newBuilding._buildingUnits.CommonBuildingUnit();
                         newBuilding.ApplyChange(new BuildingUnitAddressWasAttachedV2(
                             buildingPersistentLocalId,
                             newCommonBuildingUnit.BuildingUnitPersistentLocalId,

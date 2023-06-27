@@ -15,10 +15,16 @@
     {
         public const string EventName = "BuildingMergerWasRealized"; // BE CAREFUL CHANGING THIS!!
 
+        [EventPropertyDescription("Objectidentificator van het gebouw.")]
         public int BuildingPersistentLocalId { get; }
+
+        [EventPropertyDescription("Extended WKB-voorstelling van de gebouwgeometrie (Hexadecimale notatie).")]
         public string ExtendedWkbGeometry { get; }
+
+        [EventPropertyDescription("Objectidentificatoren van de samengevoegde gebouwen.")]
         public IList<int> MergedBuildingPersistentLocalIds { get; }
 
+        [EventPropertyDescription("Metadata bij het event.")]
         public ProvenanceData Provenance { get; private set; }
 
         public BuildingMergerWasRealized(
