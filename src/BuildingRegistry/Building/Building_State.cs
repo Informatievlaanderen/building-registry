@@ -81,6 +81,9 @@ namespace BuildingRegistry.Building
             Register<BuildingMergerWasRealized>(When);
             Register<BuildingUnitWasTransferred>(When);
 
+            Register<BuildingWasMerged>(When);
+            Register<BuildingUnitWasMoved>(When);
+
             Register<BuildingSnapshot>(When);
         }
 
@@ -359,6 +362,20 @@ namespace BuildingRegistry.Building
             transferredBuildingUnit.Route(@event);
             _buildingUnits.Add(transferredBuildingUnit);
 
+            _lastEvent = @event;
+        }
+
+        private void When(BuildingWasMerged @event)
+        {
+            BuildingStatus = BuildingStatus.Retired;
+            _lastEvent = @event;
+        }
+
+        private void When(BuildingUnitWasMoved @event)
+        {
+            var buildingUnit =
+                BuildingUnits.Single(x => x.BuildingUnitPersistentLocalId == @event.BuildingUnitPersistentLocalId);
+            _buildingUnits.Remove(buildingUnit);
             _lastEvent = @event;
         }
 

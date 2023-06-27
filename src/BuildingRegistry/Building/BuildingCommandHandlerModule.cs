@@ -271,6 +271,18 @@ namespace BuildingRegistry.Building
 
                     buildingRepository().Add(newBuildingStreamId, newBuilding);
                 });
+
+            For<MarkBuildingAsMerged>()
+                .AddSqlStreamStore(getStreamStore, getUnitOfWork, eventMapping, eventSerializer, getSnapshotStore)
+                .AddEventHash<MarkBuildingAsMerged, Building>(getUnitOfWork)
+                .AddProvenance(getUnitOfWork, provenanceFactory)
+                .Handle(async (message, ct) =>
+                {
+                    var streamId = new BuildingStreamId(message.Command.BuildingPersistentLocalId);
+                    var building = await buildingRepository().GetAsync(streamId, ct);
+
+                    building.MarkAsMerged(message.Command.DestinationBuildingPersistentLocalId);
+                });
         }
     }
 }
