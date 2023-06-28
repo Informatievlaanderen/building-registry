@@ -1,11 +1,7 @@
 namespace BuildingRegistry.Api.BackOffice.Abstractions.Building.Requests
 {
     using System.Collections.Generic;
-    using System.Linq;
     using System.Runtime.Serialization;
-    using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
-    using BuildingRegistry.Building;
-    using BuildingRegistry.Building.Commands;
     using Newtonsoft.Json;
     using Swashbuckle.AspNetCore.Filters;
 
@@ -20,7 +16,7 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.Building.Requests
         public string GeometriePolygoon { get; set; }
 
         /// <summary>
-        /// Lijst met gebouwen dat wordt samengevoegd tot het doelgebouw.
+        /// Lijst met gebouwen die worden samengevoegd tot één doelgebouw.
         /// </summary>
         [DataMember(Name = "SamenvoegenGebouwen", Order = 1)]
         [JsonProperty(Required = Required.Always)]
