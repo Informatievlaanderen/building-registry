@@ -1,6 +1,7 @@
-namespace BuildingRegistry.Building;
-
-public interface IHasBuildingUnitPersistentLocalId
+namespace BuildingRegistry.Building
 {
-    public int BuildingUnitPersistentLocalId { get; }
+    public interface IHasBuildingUnitPersistentLocalId
+    {
+        public int BuildingUnitPersistentLocalId { get; }
+    }
 }

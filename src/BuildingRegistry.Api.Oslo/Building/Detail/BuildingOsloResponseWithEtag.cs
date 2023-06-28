@@ -1,13 +1,14 @@
-namespace BuildingRegistry.Api.Oslo.Building.Detail;
-
-public class BuildingOsloResponseWithEtag
+namespace BuildingRegistry.Api.Oslo.Building.Detail
 {
-    public BuildingOsloResponse BuildingResponse { get; }
-    public string? LastEventHash { get; }
-
-    public BuildingOsloResponseWithEtag(BuildingOsloResponse buildingResponse, string? lastEventHash = null)
+    public class BuildingOsloResponseWithEtag
     {
-        BuildingResponse = buildingResponse;
-        LastEventHash = lastEventHash;
+        public BuildingOsloResponse BuildingResponse { get; }
+        public string? LastEventHash { get; }
+
+        public BuildingOsloResponseWithEtag(BuildingOsloResponse buildingResponse, string? lastEventHash = null)
+        {
+            BuildingResponse = buildingResponse;
+            LastEventHash = lastEventHash;
+        }
     }
 }

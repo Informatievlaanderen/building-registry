@@ -1,13 +1,14 @@
-namespace BuildingRegistry.Api.Legacy.BuildingUnit.Detail;
-
-public class BuildingUnitResponseWithEtag
+namespace BuildingRegistry.Api.Legacy.BuildingUnit.Detail
 {
-    public BuildingUnitResponse BuildingUnitResponse { get; }
-    public string? LastEventHash { get; }
-
-    public BuildingUnitResponseWithEtag(BuildingUnitResponse buildingUnitResponse, string? lastEventHash = null)
+    public class BuildingUnitResponseWithEtag
     {
-        BuildingUnitResponse = buildingUnitResponse;
-        LastEventHash = lastEventHash;
+        public BuildingUnitResponse BuildingUnitResponse { get; }
+        public string? LastEventHash { get; }
+
+        public BuildingUnitResponseWithEtag(BuildingUnitResponse buildingUnitResponse, string? lastEventHash = null)
+        {
+            BuildingUnitResponse = buildingUnitResponse;
+            LastEventHash = lastEventHash;
+        }
     }
 }
