@@ -23,10 +23,7 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.Building.Requests
         /// </summary>
         [JsonIgnore]
         public int PersistentLocalId { get; set; }
-
-        [JsonIgnore]
-        public IDictionary<string, object> Metadata { get; set; }
-
+        
         public ChangeBuildingOutline ToCommand(
             BuildingPersistentLocalId buildingPersistentLocalId,
             Provenance provenance)

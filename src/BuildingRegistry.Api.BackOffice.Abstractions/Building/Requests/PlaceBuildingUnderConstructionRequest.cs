@@ -10,9 +10,6 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.Building.Requests
     {
         public int PersistentLocalId { get; set; }
 
-        [JsonIgnore]
-        public IDictionary<string, object> Metadata { get; set; }
-
         public PlaceBuildingUnderConstruction ToCommand(
             BuildingPersistentLocalId buildingPersistentLocalId,
             Provenance provenance)

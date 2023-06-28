@@ -18,9 +18,6 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.Building.Requests
         [JsonProperty(Required = Required.Always)]
         public string GeometriePolygoon { get; set; }
 
-        [JsonIgnore]
-        public IDictionary<string, object> Metadata { get; set; }
-
         public PlanBuilding ToCommand(
             BuildingPersistentLocalId buildingPersistentLocalId,
             Provenance provenance)
