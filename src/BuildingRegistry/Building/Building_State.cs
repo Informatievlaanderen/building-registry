@@ -269,7 +269,12 @@ namespace BuildingRegistry.Building
 
         private void When(BuildingUnitWasRetiredV2 @event) => RouteToBuildingUnit(@event);
 
-        private void When(BuildingUnitWasRemovedV2 @event) => RouteToBuildingUnit(@event);
+        private void When(BuildingUnitWasRemovedV2 @event)
+        {
+            RouteToBuildingUnit(@event);
+
+            _lastEvent = @event;
+        }
 
         private void When(BuildingUnitWasRemovedBecauseBuildingWasRemoved @event) => RouteToBuildingUnit(@event);
 
@@ -285,7 +290,12 @@ namespace BuildingRegistry.Building
 
         private void When(BuildingUnitWasCorrectedFromRetiredToRealized @event) => RouteToBuildingUnit(@event);
 
-        private void When(BuildingUnitRemovalWasCorrected @event) => RouteToBuildingUnit(@event);
+        private void When(BuildingUnitRemovalWasCorrected @event)
+        {
+            RouteToBuildingUnit(@event);
+
+            _lastEvent = @event;
+        }
 
         private void When(BuildingUnitPositionWasCorrected @event) => RouteToBuildingUnit(@event);
 
