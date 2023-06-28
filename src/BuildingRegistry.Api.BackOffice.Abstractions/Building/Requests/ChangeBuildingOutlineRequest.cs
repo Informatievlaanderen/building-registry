@@ -1,10 +1,6 @@
 namespace BuildingRegistry.Api.BackOffice.Abstractions.Building.Requests
 {
-    using System.Collections.Generic;
     using System.Runtime.Serialization;
-    using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
-    using BuildingRegistry.Building;
-    using BuildingRegistry.Building.Commands;
     using Newtonsoft.Json;
     using Swashbuckle.AspNetCore.Filters;
 
@@ -23,16 +19,6 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.Building.Requests
         /// </summary>
         [JsonIgnore]
         public int PersistentLocalId { get; set; }
-        
-        public ChangeBuildingOutline ToCommand(
-            BuildingPersistentLocalId buildingPersistentLocalId,
-            Provenance provenance)
-        {
-            return new ChangeBuildingOutline(
-                buildingPersistentLocalId,
-                GeometriePolygoon.ToExtendedWkbGeometry(),
-                provenance);
-        }
     }
 
     public class ChangeBuildingOutlineRequestExamples : IExamplesProvider<ChangeBuildingOutlineRequest>

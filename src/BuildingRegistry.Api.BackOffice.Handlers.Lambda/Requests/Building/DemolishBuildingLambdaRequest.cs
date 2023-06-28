@@ -1,10 +1,12 @@
 namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Requests.Building
 {
+    using Abstractions.Building.Requests;
     using Abstractions.Building.SqsRequests;
-    using BuildingRegistry.Api.BackOffice.Abstractions.Building.Requests;
+    using BuildingRegistry.Building;
     using BuildingRegistry.Building.Commands;
+    using IHasBuildingPersistentLocalId = Abstractions.IHasBuildingPersistentLocalId;
 
-    public sealed record DemolishBuildingLambdaRequest : BuildingLambdaRequest, Abstractions.IHasBuildingPersistentLocalId
+    public sealed record DemolishBuildingLambdaRequest : BuildingLambdaRequest, IHasBuildingPersistentLocalId
     {
         public DemolishBuildingRequest Request { get; }
 
@@ -24,6 +26,11 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Requests.Building
         /// Map to DemolishBuilding command
         /// </summary>
         /// <returns>DemolishBuilding.</returns>
-        public DemolishBuilding ToCommand() => Request.ToCommand(BuildingPersistentLocalId, Provenance);
+        public DemolishBuilding ToCommand()
+        {
+            return new DemolishBuilding(new BuildingPersistentLocalId(BuildingPersistentLocalId),
+                Request.GrbData.ToBuildingGrbData(),
+                Provenance);
+        }
     }
 }
