@@ -1,6 +1,7 @@
 namespace BuildingRegistry.Api.BackOffice.Abstractions.Building.Requests
 {
     using System.Collections.Generic;
+    using System.Linq;
     using System.Runtime.Serialization;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using BuildingRegistry.Building;
@@ -24,15 +25,6 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.Building.Requests
         [DataMember(Name = "SamenvoegenGebouwen", Order = 1)]
         [JsonProperty(Required = Required.Always)]
         public List<string> SamenvoegenGebouwen { get; set; }
-
-        // public MergeBuildings ToCommand(
-        //     BuildingPersistentLocalId buildingPersistentLocalId,
-        //     Provenance provenance)
-        // {
-        //     return new MergeBuilding(buildingPersistentLocalId,
-        //         GeometriePolygoon.ToExtendedWkbGeometry(),
-        //         provenance);
-        // }
     }
 
     public class MergeBuildingRequestExamples : IExamplesProvider<MergeBuildingRequest>

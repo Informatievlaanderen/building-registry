@@ -58,6 +58,21 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions
             return relation;
         }
 
+        public async Task RemoveIdempotentBuildingUnitBuildingRelation(
+            BuildingUnitPersistentLocalId buildingUnitPersistentLocalId,
+            CancellationToken cancellationToken)
+        {
+            var relation = await BuildingUnitBuildings.FindAsync(new object?[] { (int)buildingUnitPersistentLocalId }, cancellationToken);
+
+            if (relation is null)
+            {
+                return;
+            }
+
+            BuildingUnitBuildings.Remove(relation);
+            await SaveChangesAsync(cancellationToken);
+        }
+
         public async Task<BuildingUnitAddressRelation> AddIdempotentBuildingUnitAddressRelation(
             BuildingPersistentLocalId buildingPersistentLocalId,
             BuildingUnitPersistentLocalId buildingUnitPersistentLocalId,
