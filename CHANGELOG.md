@@ -1,3 +1,12 @@
+# [3.82.0](https://github.com/informatievlaanderen/building-registry/compare/v3.81.5...v3.82.0) (2023-06-28)
+
+
+### Features
+
+* add MergeBuilding api contract ([70ddf16](https://github.com/informatievlaanderen/building-registry/commit/70ddf16a6126576c7b501e85ba6fdaf0ca4c233c))
+* add new building by merger ([d8d8a0b](https://github.com/informatievlaanderen/building-registry/commit/d8d8a0bcfefea500267ca289b590b7de53765734))
+* mark building as merged ([8444594](https://github.com/informatievlaanderen/building-registry/commit/8444594636aa8cc1e387a1beec0f8a9149deda98))
+
 ## [3.81.5](https://github.com/informatievlaanderen/building-registry/compare/v3.81.4...v3.81.5) (2023-06-21)
 
 
