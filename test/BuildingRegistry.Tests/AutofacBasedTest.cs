@@ -52,7 +52,8 @@ namespace BuildingRegistry.Tests
                     .As<BackOfficeContext>()
                     .InstancePerLifetimeScope();
 
-                containerBuilder.RegisterType<AddCommonBuildingUnit>()
+                containerBuilder
+                    .RegisterType<AddCommonBuildingUnit>()
                     .As<IAddCommonBuildingUnit>();
 
                 return containerBuilder.Build();

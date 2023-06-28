@@ -10,7 +10,6 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuilding
     using Building.Exceptions;
     using Fixtures;
     using FluentAssertions;
-    using Moq;
     using Xunit;
     using Xunit.Abstractions;
 
