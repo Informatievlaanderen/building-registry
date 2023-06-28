@@ -49,9 +49,6 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Requests
         [JsonProperty(Required = Required.Always)]
         public bool AfwijkingVastgesteld { get; set; }
 
-        [JsonIgnore]
-        public IDictionary<string, object> Metadata { get; set; }
-
         public PlanBuildingUnit ToCommand(
             BuildingPersistentLocalId buildingPersistentLocalId,
             BuildingUnitPersistentLocalId buildingUnitPersistentLocalId,

@@ -22,9 +22,6 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Requests
         [JsonIgnore]
         public int BuildingUnitPersistentLocalId { get; set; }
 
-        [JsonIgnore]
-        public IDictionary<string, object> Metadata { get; set; }
-
         public AttachAddressToBuildingUnit ToCommand(
             BuildingPersistentLocalId buildingPersistentLocalId,
             BuildingUnitPersistentLocalId buildingUnitPersistentLocalId,

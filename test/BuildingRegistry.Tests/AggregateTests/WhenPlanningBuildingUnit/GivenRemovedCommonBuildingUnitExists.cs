@@ -2,14 +2,17 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuildingUnit
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using AutoFixture;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
+    using Be.Vlaanderen.Basisregisters.AggregateSource.Snapshotting;
     using Be.Vlaanderen.Basisregisters.AggregateSource.Testing;
     using Building;
     using Building.Commands;
     using Building.Events;
     using Extensions;
     using Fixtures;
+    using FluentAssertions;
     using Xunit;
     using Xunit.Abstractions;
     using BuildingGeometry = Building.BuildingGeometry;
@@ -127,6 +130,65 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuildingUnit
                             BuildingUnitPositionGeometryMethod.DerivedFromObject,
                             buildingGeometry.Center,
                             false))));
+        }
+
+        [Fact]
+        public void StateCheck()
+        {
+            var buildingPersistentLocalId = Fixture.Create<BuildingPersistentLocalId>();
+            var buildingGeometry = new BuildingGeometry(
+                new ExtendedWkbGeometry(GeometryHelper.ValidPolygon.AsBinary()),
+                BuildingGeometryMethod.Outlined);
+
+            var commonBuildingUnitPersistentLocalId = new BuildingUnitPersistentLocalId(3);
+            var addressPersistentLocalIds = new List<AddressPersistentLocalId>{ new AddressPersistentLocalId(1) };
+
+            var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
+                .WithBuildingPersistentLocalId(buildingPersistentLocalId)
+                .WithBuildingStatus(BuildingStatus.Planned)
+                .WithBuildingGeometry(buildingGeometry)
+                .WithBuildingUnit(
+                    BuildingRegistry.Legacy.BuildingUnitStatus.Parse(BuildingUnitStatus.Planned)!.Value,
+                    new BuildingUnitPersistentLocalId(1))
+                .WithBuildingUnit(
+                    BuildingRegistry.Legacy.BuildingUnitStatus.Planned, // Doesn't matter what the original status was
+                    commonBuildingUnitPersistentLocalId,
+                    BuildingRegistry.Legacy.BuildingUnitFunction.Common,
+                    attachedAddresses: addressPersistentLocalIds,
+                    isRemoved: true)
+                .Build();
+
+            var buildingUnitWasPlanned = new BuildingUnitWasPlannedV2(
+                buildingPersistentLocalId,
+                new BuildingUnitPersistentLocalId(2),
+                Fixture.Create<BuildingUnitPositionGeometryMethod>(),
+                Fixture.Create<ExtendedWkbGeometry>(),
+                BuildingUnitFunction.Unknown,
+                false);
+
+            var buildingUnitRemovalWasCorrected = new BuildingUnitRemovalWasCorrected(buildingPersistentLocalId,
+                commonBuildingUnitPersistentLocalId,
+                BuildingUnitStatus.Planned,
+                BuildingUnitFunction.Common,
+                Fixture.Create<BuildingUnitPositionGeometryMethod>(),
+                Fixture.Create<ExtendedWkbGeometry>(),
+                false);
+            buildingUnitRemovalWasCorrected.SetFixtureProvenance(Fixture);
+
+            var building = new BuildingFactory(NoSnapshotStrategy.Instance).Create();
+            building.Initialize(new object[]
+            {
+                buildingWasMigrated,
+                buildingUnitWasPlanned,
+                buildingUnitRemovalWasCorrected
+            });
+
+            // Assert
+            var buildingUnit = building.BuildingUnits.First(x => x.BuildingUnitPersistentLocalId == commonBuildingUnitPersistentLocalId);
+
+            buildingUnit.IsRemoved.Should().BeFalse();
+            buildingUnit.LastEventHash.Should().Be(buildingUnitRemovalWasCorrected.GetHash());
+            building.LastEventHash.Should().Be(buildingUnitRemovalWasCorrected.GetHash());
         }
     }
 }

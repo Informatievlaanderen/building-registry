@@ -23,6 +23,7 @@ namespace BuildingRegistry.Building
         public IReadOnlyList<BuildingUnit> BuildingUnits => _buildingUnits;
 
         public string LastEventHash => _lastEvent is null ? _lastSnapshotEventHash : _lastEvent.GetHash();
+
         public ProvenanceData LastProvenanceData =>
             _lastEvent is null ? _lastSnapshotProvenance : _lastEvent.Provenance;
 
@@ -233,7 +234,8 @@ namespace BuildingRegistry.Building
                 new ExtendedWkbGeometry(@event.ExtendedWkbGeometryBuilding),
                 BuildingGeometryMethod.MeasuredByGrb);
 
-            foreach (var buildingUnitPersistentLocalId in @event.BuildingUnitPersistentLocalIds.Concat(@event.BuildingUnitPersistentLocalIdsWhichBecameDerived))
+            foreach (var buildingUnitPersistentLocalId in @event.BuildingUnitPersistentLocalIds.Concat(@event
+                         .BuildingUnitPersistentLocalIdsWhichBecameDerived))
             {
                 var buildingUnit = BuildingUnits.Single(x => x.BuildingUnitPersistentLocalId == buildingUnitPersistentLocalId);
 
@@ -249,7 +251,8 @@ namespace BuildingRegistry.Building
                 new ExtendedWkbGeometry(@event.ExtendedWkbGeometryBuilding),
                 BuildingGeometryMethod.MeasuredByGrb);
 
-            foreach (var buildingUnitPersistentLocalId in @event.BuildingUnitPersistentLocalIds.Concat(@event.BuildingUnitPersistentLocalIdsWhichBecameDerived))
+            foreach (var buildingUnitPersistentLocalId in @event.BuildingUnitPersistentLocalIds.Concat(@event
+                         .BuildingUnitPersistentLocalIdsWhichBecameDerived))
             {
                 var buildingUnit = BuildingUnits.Single(x => x.BuildingUnitPersistentLocalId == buildingUnitPersistentLocalId);
 
@@ -331,7 +334,8 @@ namespace BuildingRegistry.Building
                 new ExtendedWkbGeometry(@event.ExtendedWkbGeometryBuilding),
                 BuildingGeometryMethod.MeasuredByGrb);
 
-            var buildingUnitPersistentLocalIds = @event.BuildingUnitPersistentLocalIds.Concat(@event.BuildingUnitPersistentLocalIdsWhichBecameDerived);
+            var buildingUnitPersistentLocalIds =
+                @event.BuildingUnitPersistentLocalIds.Concat(@event.BuildingUnitPersistentLocalIdsWhichBecameDerived);
 
             foreach (var buildingUnitPersistentLocalId in buildingUnitPersistentLocalIds)
             {

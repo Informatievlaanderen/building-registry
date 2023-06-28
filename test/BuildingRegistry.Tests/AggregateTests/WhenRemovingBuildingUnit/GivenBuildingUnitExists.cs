@@ -357,6 +357,8 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRemovingBuildingUnit
             var commonBuildingUnit = building.BuildingUnits
                 .Single(x => x.BuildingUnitPersistentLocalId == commonBuildingUnitWasAdded.BuildingUnitPersistentLocalId);
             commonBuildingUnit.Status.Should().Be(BuildingUnitStatus.Realized);
+
+            building.LastEventHash.Should().Be(buildingUnitWasRemoved.GetHash());
         }
     }
 }

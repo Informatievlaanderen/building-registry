@@ -10,9 +10,6 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Requests
     {
         public int BuildingUnitPersistentLocalId { get; set; }
 
-        [JsonIgnore]
-        public IDictionary<string, object> Metadata { get; set; }
-
         public RealizeBuildingUnit ToCommand(
             BuildingPersistentLocalId buildingPersistentLocalId,
             BuildingUnitPersistentLocalId buildingUnitPersistentLocalId,
