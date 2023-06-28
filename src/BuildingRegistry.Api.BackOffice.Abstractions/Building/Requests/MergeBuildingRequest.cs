@@ -1,6 +1,7 @@
 namespace BuildingRegistry.Api.BackOffice.Abstractions.Building.Requests
 {
     using System.Collections.Generic;
+    using System.Linq;
     using System.Runtime.Serialization;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using BuildingRegistry.Building;
