@@ -457,6 +457,36 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
                         UpdateVersie(itemV2, message.Message.Provenance.Timestamp);
                     }, ct);
             });
+
+            When<Envelope<BuildingUnitWasTransferred>>(async (context, message, ct) =>
+            {
+                var geometryMethod =
+                    MapGeometryMethod(BuildingUnitPositionGeometryMethod.Parse(message.Message.GeometryMethod));
+                var geometry = wkbReader.Read(message.Message.ExtendedWkbGeometry.ToByteArray());
+
+                await context.FindAndUpdateBuildingUnitExtract(message.Message.BuildingUnitPersistentLocalId,
+                    itemV2 =>
+                    {
+                        itemV2.BuildingPersistentLocalId = message.Message.BuildingPersistentLocalId;
+                        UpdateRecord(itemV2, record => record.gebouwid.Value = message.Message.BuildingPersistentLocalId.ToString());
+                        UpdateRecord(itemV2, record => record.functie.Value = message.Message.Function);
+                        UpdateRecord(itemV2, record => record.status.Value = message.Message.Status);
+                        UpdateRecord(itemV2, record => record.afwijking.Value = message.Message.HasDeviation);
+                        UpdatePosition(itemV2, geometryMethod);
+                        UpdateGeometry(itemV2, geometry);
+                        UpdateVersie(itemV2, message.Message.Provenance.Timestamp);
+                    }, ct);
+            });
+
+            When<Envelope<BuildingUnitWasMoved>>(async (context, message, ct) =>
+            {
+                // Bu state is already updated in BuildingUnitWasTransferred
+                await context.FindAndUpdateBuildingUnitExtract(message.Message.BuildingUnitPersistentLocalId,
+                    itemV2 =>
+                    {
+                        UpdateVersie(itemV2, message.Message.Provenance.Timestamp);
+                    }, ct);
+            });
         }
 
         private static string MapFunction(BuildingUnitFunction function)

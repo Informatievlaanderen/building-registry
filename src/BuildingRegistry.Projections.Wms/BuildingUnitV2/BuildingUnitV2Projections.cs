@@ -48,7 +48,8 @@ namespace BuildingRegistry.Projections.Wms.BuildingUnitV2
                         HasDeviation = false
                     };
 
-                    SetPosition(buildingUnitV2, buildingUnit.ExtendedWkbGeometry, MapGeometryMethod(BuildingUnitPositionGeometryMethod.Parse(buildingUnit.GeometryMethod)));
+                    SetPosition(buildingUnitV2, buildingUnit.ExtendedWkbGeometry,
+                        MapGeometryMethod(BuildingUnitPositionGeometryMethod.Parse(buildingUnit.GeometryMethod)));
 
                     await context.BuildingUnitsV2.AddAsync(buildingUnitV2, ct);
                 }
@@ -70,7 +71,8 @@ namespace BuildingRegistry.Projections.Wms.BuildingUnitV2
 
             When<Envelope<BuildingWasMeasured>>(async (context, message, ct) =>
             {
-                foreach (var buildingUnitPersistentLocalId in message.Message.BuildingUnitPersistentLocalIds.Concat(message.Message.BuildingUnitPersistentLocalIdsWhichBecameDerived))
+                foreach (var buildingUnitPersistentLocalId in message.Message.BuildingUnitPersistentLocalIds.Concat(message.Message
+                             .BuildingUnitPersistentLocalIdsWhichBecameDerived))
                 {
                     var unit = await context.BuildingUnitsV2.FindAsync(buildingUnitPersistentLocalId);
                     SetPosition(
@@ -84,7 +86,8 @@ namespace BuildingRegistry.Projections.Wms.BuildingUnitV2
 
             When<Envelope<BuildingMeasurementWasCorrected>>(async (context, message, ct) =>
             {
-                foreach (var buildingUnitPersistentLocalId in message.Message.BuildingUnitPersistentLocalIds.Concat(message.Message.BuildingUnitPersistentLocalIdsWhichBecameDerived))
+                foreach (var buildingUnitPersistentLocalId in message.Message.BuildingUnitPersistentLocalIds.Concat(message.Message
+                             .BuildingUnitPersistentLocalIdsWhichBecameDerived))
                 {
                     var unit = await context.BuildingUnitsV2.FindAsync(buildingUnitPersistentLocalId);
                     SetPosition(
@@ -357,18 +360,37 @@ namespace BuildingRegistry.Projections.Wms.BuildingUnitV2
                 unit.Status = BuildingUnitStatus.NotRealized;
                 SetVersion(unit!, message.Message.Provenance.Timestamp);
             });
+
+            When<Envelope<BuildingUnitWasTransferred>>(async (context, message, ct) =>
+            {
+                var unit = await context.BuildingUnitsV2.FindAsync(message.Message.BuildingUnitPersistentLocalId);
+                unit.BuildingPersistentLocalId = message.Message.BuildingPersistentLocalId;
+                unit.Position = message.Message.ExtendedWkbGeometry.ToByteArray();
+                unit.PositionMethod = BuildingUnitPositionGeometryMethod.Parse(message.Message.GeometryMethod);
+                unit.Function = BuildingUnitFunction.Parse(message.Message.Function);
+                unit.Status = BuildingUnitStatus.Parse(message.Message.Status);
+                unit.HasDeviation = message.Message.HasDeviation;
+                SetVersion(unit!, message.Message.Provenance.Timestamp);
+            });
+
+            When<Envelope<BuildingUnitWasMoved>>(async (context, message, ct) =>
+            {
+                var unit = await context.BuildingUnitsV2.FindAsync(message.Message.BuildingUnitPersistentLocalId);
+                SetVersion(unit!, message.Message.Provenance.Timestamp);
+            });
         }
 
         private static void SetVersion(BuildingUnitV2 unit, Instant timestamp)
         {
             unit.Version = timestamp;
         }
+
         public static string MapGeometryMethod(BuildingUnitPositionGeometryMethod geometryMethod)
         {
             var dictionary = new Dictionary<BuildingUnitPositionGeometryMethod, string>
             {
-                {BuildingUnitPositionGeometryMethod.DerivedFromObject, DerivedFromObjectMethod},
-                {BuildingUnitPositionGeometryMethod.AppointedByAdministrator, AppointedByAdministratorMethod}
+                { BuildingUnitPositionGeometryMethod.DerivedFromObject, DerivedFromObjectMethod },
+                { BuildingUnitPositionGeometryMethod.AppointedByAdministrator, AppointedByAdministratorMethod }
             };
 
             return dictionary[geometryMethod];
@@ -379,7 +401,7 @@ namespace BuildingRegistry.Projections.Wms.BuildingUnitV2
 
         private void SetPosition(BuildingUnitV2 buildingUnit, string extendedWkbPosition, string method)
         {
-            var geometry = (Point)_wkbReader.Read(extendedWkbPosition.ToByteArray());
+            var geometry = (Point) _wkbReader.Read(extendedWkbPosition.ToByteArray());
 
             buildingUnit.PositionMethod = method;
             buildingUnit.Position = geometry.AsBinary();
