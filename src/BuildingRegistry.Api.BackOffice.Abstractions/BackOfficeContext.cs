@@ -1,6 +1,7 @@
 namespace BuildingRegistry.Api.BackOffice.Abstractions
 {
     using System;
+    using System.Collections.Generic;
     using System.IO;
     using System.Linq;
     using BuildingRegistry.Building;
@@ -134,9 +135,7 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions
 
         public async Task RemoveBuildingUnitAddressRelations(BuildingUnitPersistentLocalId buildingUnitPersistentLocalId, CancellationToken cancellationToken)
         {
-            var buildingUnitAddressRelations = await BuildingUnitAddressRelation
-                .Where(x => x.BuildingUnitPersistentLocalId == (int)buildingUnitPersistentLocalId)
-                .ToListAsync(cancellationToken);
+            var buildingUnitAddressRelations = await FindAllBuildingUnitAddressRelations(buildingUnitPersistentLocalId, cancellationToken);
 
             foreach (var buildingUnitAddressRelation in buildingUnitAddressRelations)
             {
@@ -144,6 +143,15 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions
             }
 
             await SaveChangesAsync(cancellationToken);
+        }
+
+        public async Task<List<BuildingUnitAddressRelation>> FindAllBuildingUnitAddressRelations(
+            BuildingUnitPersistentLocalId buildingUnitPersistentLocalId,
+            CancellationToken cancellationToken)
+        {
+            return await BuildingUnitAddressRelation
+                .Where(x => x.BuildingUnitPersistentLocalId == (int)buildingUnitPersistentLocalId)
+                .ToListAsync(cancellationToken);
         }
 
         public async Task RemoveBuildingUnitAddressRelations(BuildingPersistentLocalId buildingPersistentLocalId, CancellationToken cancellationToken)
