@@ -15,7 +15,7 @@
     {
         public const string EventName = "BuildingUnitWasTransferred"; // BE CAREFUL CHANGING THIS!!
 
-        [EventPropertyDescription("Objectidentificator van het gebouw.")]
+        [EventPropertyDescription("Objectidentificator van het doelgebouw.")]
         public int BuildingPersistentLocalId { get; }
 
         [EventPropertyDescription("Objectidentificator van de gebouweenheid.")]

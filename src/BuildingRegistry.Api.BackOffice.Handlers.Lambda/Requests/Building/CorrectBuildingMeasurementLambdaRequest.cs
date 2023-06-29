@@ -1,5 +1,6 @@
 namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Requests.Building
 {
+    using Abstractions.Building;
     using Abstractions.Building.Requests;
     using Abstractions.Building.SqsRequests;
     using BuildingRegistry.Building;
@@ -31,6 +32,12 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Requests.Building
         /// </summary>
         /// <returns>CorrectBuildingMeasurement.</returns>
         public CorrectBuildingMeasurement ToCommand()
-            => Request.ToCommand(new BuildingPersistentLocalId(BuildingPersistentLocalId), Provenance);
+        {
+            return new CorrectBuildingMeasurement(
+                new BuildingPersistentLocalId(BuildingPersistentLocalId),
+                Request.GrbData.GeometriePolygoon.ToExtendedWkbGeometry(),
+                Request.GrbData.ToBuildingGrbData(),
+                Provenance);
+        }
     }
 }

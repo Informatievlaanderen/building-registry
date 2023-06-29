@@ -18,7 +18,7 @@
         [EventPropertyDescription("Objectidentificator van het gebouw.")]
         public int BuildingPersistentLocalId { get; }
 
-        [EventPropertyDescription("Objectidentificator van het het doel gebouw.")]
+        [EventPropertyDescription("Objectidentificator van het het doelgebouw.")]
         public int DestinationBuildingPersistentLocalId { get; }
 
         [EventPropertyDescription("Metadata bij het event.")]

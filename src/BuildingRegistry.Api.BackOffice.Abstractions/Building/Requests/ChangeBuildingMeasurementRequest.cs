@@ -1,9 +1,6 @@
 namespace BuildingRegistry.Api.BackOffice.Abstractions.Building.Requests
 {
     using System.Runtime.Serialization;
-    using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
-    using BuildingRegistry.Building;
-    using BuildingRegistry.Building.Commands;
     using Newtonsoft.Json;
     using Swashbuckle.AspNetCore.Filters;
 
@@ -13,12 +10,6 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.Building.Requests
         [DataMember(Name = "GrbData", Order = 0)]
         [JsonProperty(Required = Required.Always)]
         public GrbData GrbData { get; set; }
-
-        public ChangeBuildingMeasurement ToCommand(int persistentLocalId, Provenance provenance)
-            => new ChangeBuildingMeasurement(new BuildingPersistentLocalId(persistentLocalId),
-                GrbData.GeometriePolygoon.ToExtendedWkbGeometry(),
-                GrbData.ToBuildingGrbData(),
-                provenance);
     }
 
     public class ChangeBuildingMeasurementRequestExamples : IExamplesProvider<ChangeBuildingMeasurementRequest>

@@ -1,10 +1,6 @@
 namespace BuildingRegistry.Api.BackOffice.Abstractions.Building.Requests
 {
-    using System.Collections.Generic;
     using System.Runtime.Serialization;
-    using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
-    using BuildingRegistry.Building;
-    using BuildingRegistry.Building.Commands;
     using Newtonsoft.Json;
     using Swashbuckle.AspNetCore.Filters;
 
@@ -17,18 +13,6 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.Building.Requests
         [DataMember(Name = "GeometriePolygoon", Order = 0)]
         [JsonProperty(Required = Required.Always)]
         public string GeometriePolygoon { get; set; }
-
-        [JsonIgnore]
-        public IDictionary<string, object> Metadata { get; set; }
-
-        public PlanBuilding ToCommand(
-            BuildingPersistentLocalId buildingPersistentLocalId,
-            Provenance provenance)
-        {
-            return new PlanBuilding(buildingPersistentLocalId,
-                GeometriePolygoon.ToExtendedWkbGeometry(),
-                provenance);
-        }
     }
 
     public class PlanBuildingRequestExamples : IExamplesProvider<PlanBuildingRequest>

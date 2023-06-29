@@ -23,6 +23,7 @@ namespace BuildingRegistry.Building
         public IReadOnlyList<BuildingUnit> BuildingUnits => _buildingUnits;
 
         public string LastEventHash => _lastEvent is null ? _lastSnapshotEventHash : _lastEvent.GetHash();
+
         public ProvenanceData LastProvenanceData =>
             _lastEvent is null ? _lastSnapshotProvenance : _lastEvent.Provenance;
 
@@ -233,7 +234,8 @@ namespace BuildingRegistry.Building
                 new ExtendedWkbGeometry(@event.ExtendedWkbGeometryBuilding),
                 BuildingGeometryMethod.MeasuredByGrb);
 
-            foreach (var buildingUnitPersistentLocalId in @event.BuildingUnitPersistentLocalIds.Concat(@event.BuildingUnitPersistentLocalIdsWhichBecameDerived))
+            foreach (var buildingUnitPersistentLocalId in @event.BuildingUnitPersistentLocalIds.Concat(@event
+                         .BuildingUnitPersistentLocalIdsWhichBecameDerived))
             {
                 var buildingUnit = BuildingUnits.Single(x => x.BuildingUnitPersistentLocalId == buildingUnitPersistentLocalId);
 
@@ -249,7 +251,8 @@ namespace BuildingRegistry.Building
                 new ExtendedWkbGeometry(@event.ExtendedWkbGeometryBuilding),
                 BuildingGeometryMethod.MeasuredByGrb);
 
-            foreach (var buildingUnitPersistentLocalId in @event.BuildingUnitPersistentLocalIds.Concat(@event.BuildingUnitPersistentLocalIdsWhichBecameDerived))
+            foreach (var buildingUnitPersistentLocalId in @event.BuildingUnitPersistentLocalIds.Concat(@event
+                         .BuildingUnitPersistentLocalIdsWhichBecameDerived))
             {
                 var buildingUnit = BuildingUnits.Single(x => x.BuildingUnitPersistentLocalId == buildingUnitPersistentLocalId);
 
@@ -269,7 +272,12 @@ namespace BuildingRegistry.Building
 
         private void When(BuildingUnitWasRetiredV2 @event) => RouteToBuildingUnit(@event);
 
-        private void When(BuildingUnitWasRemovedV2 @event) => RouteToBuildingUnit(@event);
+        private void When(BuildingUnitWasRemovedV2 @event)
+        {
+            RouteToBuildingUnit(@event);
+
+            _lastEvent = @event;
+        }
 
         private void When(BuildingUnitWasRemovedBecauseBuildingWasRemoved @event) => RouteToBuildingUnit(@event);
 
@@ -285,7 +293,12 @@ namespace BuildingRegistry.Building
 
         private void When(BuildingUnitWasCorrectedFromRetiredToRealized @event) => RouteToBuildingUnit(@event);
 
-        private void When(BuildingUnitRemovalWasCorrected @event) => RouteToBuildingUnit(@event);
+        private void When(BuildingUnitRemovalWasCorrected @event)
+        {
+            RouteToBuildingUnit(@event);
+
+            _lastEvent = @event;
+        }
 
         private void When(BuildingUnitPositionWasCorrected @event) => RouteToBuildingUnit(@event);
 
@@ -321,7 +334,8 @@ namespace BuildingRegistry.Building
                 new ExtendedWkbGeometry(@event.ExtendedWkbGeometryBuilding),
                 BuildingGeometryMethod.MeasuredByGrb);
 
-            var buildingUnitPersistentLocalIds = @event.BuildingUnitPersistentLocalIds.Concat(@event.BuildingUnitPersistentLocalIdsWhichBecameDerived);
+            var buildingUnitPersistentLocalIds =
+                @event.BuildingUnitPersistentLocalIds.Concat(@event.BuildingUnitPersistentLocalIdsWhichBecameDerived);
 
             foreach (var buildingUnitPersistentLocalId in buildingUnitPersistentLocalIds)
             {

@@ -1,13 +1,7 @@
 namespace BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Requests
 {
-    using System.Collections.Generic;
     using System.Runtime.Serialization;
     using Be.Vlaanderen.Basisregisters.GrAr.Edit.Contracts;
-    using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
-    using Building;
-    using BuildingRegistry.Building;
-    using BuildingRegistry.Building.Commands;
-    using Converters;
     using Newtonsoft.Json;
     using Swashbuckle.AspNetCore.Filters;
 
@@ -48,22 +42,6 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Requests
         [DataMember(Name = "AfwijkingVastgesteld", Order = 4)]
         [JsonProperty(Required = Required.Always)]
         public bool AfwijkingVastgesteld { get; set; }
-
-        [JsonIgnore]
-        public IDictionary<string, object> Metadata { get; set; }
-
-        public PlanBuildingUnit ToCommand(
-            BuildingPersistentLocalId buildingPersistentLocalId,
-            BuildingUnitPersistentLocalId buildingUnitPersistentLocalId,
-            Provenance provenance)
-            => new PlanBuildingUnit(
-                buildingPersistentLocalId,
-                buildingUnitPersistentLocalId,
-                PositieGeometrieMethode.Map(),
-                string.IsNullOrWhiteSpace(Positie) ? null : Positie.ToExtendedWkbGeometry(),
-                Functie.Map(),
-                AfwijkingVastgesteld,
-                provenance);
     }
 
     public class PlanBuildingUnitRequestExamples : IExamplesProvider<PlanBuildingUnitRequest>

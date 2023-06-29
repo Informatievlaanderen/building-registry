@@ -1,5 +1,6 @@
 namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Requests.Building
 {
+    using Abstractions.Building;
     using Abstractions.Building.Requests;
     using Abstractions.Building.SqsRequests;
     using BuildingRegistry.Building;
@@ -23,6 +24,13 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Requests.Building
         /// Map to command
         /// </summary>
         /// <returns>RealizeAndMeasureUnplannedBuilding.</returns>
-        public RealizeAndMeasureUnplannedBuilding ToCommand() =>  Request.ToCommand(BuildingPersistentLocalId, Provenance);
+        public RealizeAndMeasureUnplannedBuilding ToCommand()
+        {
+           return new RealizeAndMeasureUnplannedBuilding(
+                new BuildingPersistentLocalId(BuildingPersistentLocalId),
+                Request.GrbData.GeometriePolygoon.ToExtendedWkbGeometry(),
+                Request.GrbData.ToBuildingGrbData(),
+                Provenance);
+        }
     }
 }

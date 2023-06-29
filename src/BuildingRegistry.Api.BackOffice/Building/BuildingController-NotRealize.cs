@@ -48,8 +48,6 @@ namespace BuildingRegistry.Api.BackOffice.Building
             [FromHeader(Name = "If-Match")] string? ifMatchHeaderValue,
             CancellationToken cancellationToken = default)
         {
-            request.Metadata = GetMetadata();
-
             if (!await buildingExistsValidator.Exists(new BuildingPersistentLocalId(request.PersistentLocalId),
                     cancellationToken))
             {

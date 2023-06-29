@@ -1,15 +1,9 @@
 namespace BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Requests
 {
+    using System.Runtime.Serialization;
     using Be.Vlaanderen.Basisregisters.GrAr.Edit.Contracts;
-    using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
-    using Building;
-    using BuildingRegistry.Building;
-    using BuildingRegistry.Building.Commands;
-    using Converters;
     using Newtonsoft.Json;
     using Swashbuckle.AspNetCore.Filters;
-    using System.Collections.Generic;
-    using System.Runtime.Serialization;
 
     [DataContract(Name = "CorrigeerGebouweenheidPositie", Namespace = "")]
     public sealed class CorrectBuildingUnitPositionRequest
@@ -30,22 +24,6 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Requests
 
         [JsonIgnore]
         public int BuildingUnitPersistentLocalId { get; set; }
-
-        [JsonIgnore]
-        public IDictionary<string, object> Metadata { get; set; }
-
-        public CorrectBuildingUnitPosition ToCommand(
-            BuildingPersistentLocalId buildingPersistentLocalId,
-            BuildingUnitPersistentLocalId buildingUnitPersistentLocalId,
-            Provenance provenance)
-        {
-            return new CorrectBuildingUnitPosition(
-                buildingPersistentLocalId,
-                buildingUnitPersistentLocalId,
-                PositieGeometrieMethode.Map(),
-                string.IsNullOrWhiteSpace(Positie) ? null : Positie.ToExtendedWkbGeometry(),
-                provenance);
-        }
     }
 
     public class CorrectBuildingUnitPositionRequestExamples : IExamplesProvider<CorrectBuildingUnitPositionRequest>
