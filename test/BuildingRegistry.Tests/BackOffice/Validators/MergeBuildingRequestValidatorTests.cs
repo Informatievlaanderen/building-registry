@@ -10,6 +10,9 @@ namespace BuildingRegistry.Tests.BackOffice.Validators
     {
         private readonly MergeBuildingRequestValidator _validator;
 
+        private const string ValidGml =
+            "<gml:Polygon srsName=\"https://www.opengis.net/def/crs/EPSG/0/31370\" xmlns:gml=\"http://www.opengis.net/gml/3.2\"><gml:exterior><gml:LinearRing><gml:posList>140284.15277253836 186724.74131567031 140291.06016454101 186726.38355567306 140288.22675654292 186738.25798767805 140281.19098053873 186736.57913967967 140284.15277253836 186724.74131567031</gml:posList></gml:LinearRing></gml:exterior></gml:Polygon>";
+
         public MergeBuildingRequestValidatorTests()
         {
             _validator = new MergeBuildingRequestValidator();
@@ -34,13 +37,31 @@ namespace BuildingRegistry.Tests.BackOffice.Validators
         {
             var result = _validator.TestValidate(new MergeBuildingRequest
             {
-                GeometriePolygoon = "<gml:Polygon srsName=\"https://www.opengis.net/def/crs/EPSG/0/31370\" xmlns:gml=\"http://www.opengis.net/gml/3.2\"><gml:exterior><gml:LinearRing><gml:posList>140284.15277253836 186724.74131567031 140291.06016454101 186726.38355567306 140288.22675654292 186738.25798767805 140281.19098053873 186736.57913967967 140284.15277253836 186724.74131567031</gml:posList></gml:LinearRing></gml:exterior></gml:Polygon>",
-                SamenvoegenGebouwen = new List<string>(){"1"}
+                GeometriePolygoon = ValidGml,
+                SamenvoegenGebouwen = new List<string>() { "1" }
             });
 
             result.ShouldHaveValidationErrorFor(nameof(MergeBuildingRequest.SamenvoegenGebouwen))
                 .WithErrorCode("TooFewBuildings")
                 .WithErrorMessage("TooFewBuildings");
+        }
+
+        [Fact]
+        public void GivenInvalidBuildingPuri_ThenReturnsExpectedFailure()
+        {
+            var result = _validator.TestValidate(new MergeBuildingRequest
+            {
+                GeometriePolygoon = ValidGml,
+                SamenvoegenGebouwen = new List<string>
+                {
+                    "http://invalidp",
+                    "http://invalidpuriformat./102"
+                }
+            });
+
+            result.ShouldHaveValidationErrorFor(nameof(MergeBuildingRequest.SamenvoegenGebouwen))
+                .WithErrorCode("GebouwIdOngeldig")
+                .WithErrorMessage("Ongeldig gebouwId.");
         }
 
         [Fact]
@@ -55,7 +76,7 @@ namespace BuildingRegistry.Tests.BackOffice.Validators
 
             var result = _validator.TestValidate(new MergeBuildingRequest
             {
-                GeometriePolygoon = "<gml:Polygon srsName=\"https://www.opengis.net/def/crs/EPSG/0/31370\" xmlns:gml=\"http://www.opengis.net/gml/3.2\"><gml:exterior><gml:LinearRing><gml:posList>140284.15277253836 186724.74131567031 140291.06016454101 186726.38355567306 140288.22675654292 186738.25798767805 140281.19098053873 186736.57913967967 140284.15277253836 186724.74131567031</gml:posList></gml:LinearRing></gml:exterior></gml:Polygon>",
+                GeometriePolygoon = ValidGml,
                 SamenvoegenGebouwen = samenvoegenGebouwen
             });
 

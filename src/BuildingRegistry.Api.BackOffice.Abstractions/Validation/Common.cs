@@ -75,6 +75,14 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.Validation
                 public static TicketError ToTicketError() => new(Message, Code);
             }
 
+            public static class BuildingIdInvalid
+            {
+                public const string Code = "GebouwIdOngeldig";
+                public const string Message = "Ongeldig gebouwId.";
+
+                public static TicketError ToTicketError() => new(Message, Code);
+            }
+
             public static class InvalidBuildingPolygonGeometry
             {
                 public const string Code = "GebouwPolygoonValidatie";

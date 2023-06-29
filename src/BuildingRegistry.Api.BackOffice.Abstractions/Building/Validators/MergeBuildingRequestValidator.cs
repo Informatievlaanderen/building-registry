@@ -16,6 +16,13 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.Building.Validators
                 .WithMessage(ValidationErrors.Common.InvalidBuildingPolygonGeometry.Message);
 
             RuleFor(x => x.SamenvoegenGebouwen)
+                .Must(y => y.All(puri =>
+                    OsloPuriValidator.TryParseIdentifier(puri, out var id)
+                    && int.TryParse(id, out _)))
+                .WithErrorCode(ValidationErrors.Common.BuildingIdInvalid.Code)
+                .WithMessage(ValidationErrors.Common.BuildingIdInvalid.Message);
+
+            RuleFor(x => x.SamenvoegenGebouwen)
                 .Must(y => y.Any() && y.Count >= 2)
                 .WithErrorCode(ValidationErrors.MergeBuildings.TooFewBuildings.Code)
                 .WithMessage(ValidationErrors.MergeBuildings.TooFewBuildings.Message);

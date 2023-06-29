@@ -66,7 +66,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.Building
 
             foreach (var mergedBuildingPersistentLocalId in cmd.BuildingPersistentLocalIdsToMerge)
             {
-                await MarkBuildingsAsMigrated(
+                await MarkBuildingAsMerged(
                     request,
                     mergedBuildingPersistentLocalId,
                     cmd.NewBuildingPersistentLocalId,
@@ -97,7 +97,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.Building
             };
         }
 
-        private async Task MarkBuildingsAsMigrated(
+        private async Task MarkBuildingAsMerged(
             MergeBuildingsLambdaRequest request,
             BuildingPersistentLocalId buildingPersistentLocalId,
             BuildingPersistentLocalId newBuildingPersistentLocalId,
