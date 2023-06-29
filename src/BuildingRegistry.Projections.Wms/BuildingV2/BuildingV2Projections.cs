@@ -168,6 +168,26 @@ namespace BuildingRegistry.Projections.Wms.BuildingV2
                 var item = await context.BuildingsV2.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);
                 item.Version = message.Message.Provenance.Timestamp;
             });
+
+            When<Envelope<BuildingMergerWasRealized>>(async (context, message, ct) =>
+            {
+                var item = new BuildingV2
+                {
+                    PersistentLocalId = message.Message.BuildingPersistentLocalId,
+                    Id = PersistentLocalIdHelper.CreateBuildingId(message.Message.BuildingPersistentLocalId),
+                    Status = BuildingStatus.Realized,
+                };
+                SetGeometry(item, message.Message.ExtendedWkbGeometry, MeasuredByGrbMethod);
+                item.Version = message.Message.Provenance.Timestamp;
+                await context.BuildingsV2.AddAsync(item, ct);
+            });
+
+            When<Envelope<BuildingWasMerged>>(async (context, message, ct) =>
+            {
+                var item = await context.BuildingsV2.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);
+                item.Status = BuildingStatus.Retired;
+                item.Version = message.Message.Provenance.Timestamp;
+            });
         }
 
         public static string MapMethod(BuildingGeometryMethod method)
