@@ -8,6 +8,8 @@ namespace BuildingRegistry.Tests
     using Be.Vlaanderen.Basisregisters.AggregateSource.Testing;
     using Be.Vlaanderen.Basisregisters.AggregateSource.Testing.Comparers;
     using Be.Vlaanderen.Basisregisters.AggregateSource.Testing.SqlStreamStore.Autofac;
+    using Be.Vlaanderen.Basisregisters.CommandHandling.Idempotency;
+    using Be.Vlaanderen.Basisregisters.Sqs.Lambda.Handlers;
     using KellermanSoftware.CompareNetObjects;
     using Legacy;
     using Microsoft.Extensions.Logging;
@@ -55,6 +57,15 @@ namespace BuildingRegistry.Tests
                 containerBuilder
                     .RegisterType<AddCommonBuildingUnit>()
                     .As<IAddCommonBuildingUnit>();
+
+                containerBuilder.Register(_ => new FakeIdempotencyContextFactory().CreateDbContext(Array.Empty<string>()))
+                    .As<IdempotencyContext>()
+                    .InstancePerLifetimeScope();
+
+                containerBuilder.RegisterType<IdempotentCommandHandler>()
+                    .As<IIdempotentCommandHandler>()
+                    .AsSelf()
+                    .InstancePerLifetimeScope();
 
                 return containerBuilder.Build();
             });
