@@ -9,6 +9,7 @@
     using AutoFixture;
     using Be.Vlaanderen.Basisregisters.CommandHandling;
     using Be.Vlaanderen.Basisregisters.CommandHandling.Idempotency;
+    using Be.Vlaanderen.Basisregisters.GrAr.Common.Oslo.Extensions;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Be.Vlaanderen.Basisregisters.Sqs.Lambda.Handlers;
     using Be.Vlaanderen.Basisregisters.Sqs.Responses;
@@ -163,6 +164,37 @@
         }
 
         [Fact]
+        public async Task WhenBuildingToMergeIsNotFound_ThenTicketError()
+        {
+            // Arrange
+            var ticketing = new Mock<ITicketing>();
+            var buildingPersistentLocalId = Fixture.Create<BuildingPersistentLocalId>();
+            var puri = $"http://validpuriformat/{buildingPersistentLocalId}";
+            var lambdaRequest = CreateMergeBuildingsLambdaRequest(puri);
+
+            var handler = new MergeBuildingsLambdaHandler(
+                Container.Resolve<IConfiguration>(),
+                new FakeRetryPolicy(),
+                ticketing.Object,
+                MockExceptionIdempotentCommandHandler(() => new BuildingToMergeNotFoundException(buildingPersistentLocalId)).Object,
+                Container.Resolve<IBuildings>(),
+                _backOfficeContext,
+                Container);
+
+            // Act
+            await handler.Handle(lambdaRequest, CancellationToken.None);
+
+            //Assert
+            ticketing.Verify(x =>
+                x.Error(
+                    It.IsAny<Guid>(),
+                    new TicketError(
+                        $"De gebouwId '{puri}' is niet gekend in het gebouwenregister.",
+                        "GebouwIdNietGekendValidatie"),
+                    CancellationToken.None));
+        }
+
+        [Fact]
         public async Task WhenBuildingToMergeHasInvalidStatus_ThenThrowsBuildingToMergeHasInvalidStatusException()
         {
             // Arrange
@@ -275,7 +307,7 @@
                     CancellationToken.None));
         }
 
-        private MergeBuildingsLambdaRequest CreateMergeBuildingsLambdaRequest()
+        private MergeBuildingsLambdaRequest CreateMergeBuildingsLambdaRequest(string puri = "")
         {
             return new MergeBuildingsLambdaRequest(
                 "123",
@@ -286,7 +318,7 @@
                     {
                         GeometriePolygoon =
                             "<gml:Polygon srsName=\"https://www.opengis.net/def/crs/EPSG/0/31370\" xmlns:gml=\"http://www.opengis.net/gml/3.2\"><gml:exterior><gml:LinearRing><gml:posList>140284.15277253836 186724.74131567031 140291.06016454101 186726.38355567306 140288.22675654292 186738.25798767805 140281.19098053873 186736.57913967967 140284.15277253836 186724.74131567031</gml:posList></gml:LinearRing></gml:exterior></gml:Polygon>",
-                        SamenvoegenGebouwen = new List<string>()
+                        SamenvoegenGebouwen = new List<string> { puri }
                     },
                     Metadata = new Dictionary<string, object?>(),
                     ProvenanceData = Fixture.Create<ProvenanceData>(),

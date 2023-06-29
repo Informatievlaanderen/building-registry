@@ -9,14 +9,7 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.Building.Validators
 
     public class MergeBuildingRequestValidator : AbstractValidator<MergeBuildingRequest>
     {
-        private readonly BuildingExistsValidator _buildingExistsValidator;
-
         public MergeBuildingRequestValidator(BuildingExistsValidator buildingExistsValidator)
-        {
-            _buildingExistsValidator = buildingExistsValidator;
-        }
-
-        public MergeBuildingRequestValidator()
         {
             RuleFor(x => x.SamenvoegenGebouwen)
                 .Must(y => y.Any() && y.Count >= 2)
@@ -29,20 +22,20 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.Building.Validators
                 .WithMessage(ValidationErrors.MergeBuildings.TooManyBuildings.Message);
 
             RuleForEach(x => x.SamenvoegenGebouwen)
-                .Must(puri => OsloPuriValidator.TryParseIdentifier(puri, out var id)
-                    && int.TryParse(id, out _))
+                .Must(puri => OsloPuriValidator.TryParseIdentifier(puri, out var id) && int.TryParse(id, out _))
+                .DependentRules(() =>
+                {
+                    RuleForEach(x => x.SamenvoegenGebouwen)
+                        .MustAsync(async (puri, cancellationToken) =>
+                            OsloPuriValidator.TryParseIdentifier(puri, out var id)
+                            && int.TryParse(id, out var buildingPersistentLocalId)
+                            && await buildingExistsValidator.Exists(new BuildingPersistentLocalId(buildingPersistentLocalId), cancellationToken))
+                        .WithErrorCode(ValidationErrors.MergeBuildings.BuildingNotFound.Code)
+                        .WithMessage((_, puri) => ValidationErrors.MergeBuildings.BuildingNotFound.MessageWithPuri(puri));
+                })
                 .WithErrorCode(ValidationErrors.Common.BuildingIdInvalid.Code)
                 .WithMessage(ValidationErrors.Common.BuildingIdInvalid.Message);
 
-            RuleForEach(x => x.SamenvoegenGebouwen)
-                .MustAsync(async (puri, cancellationToken) =>
-                {
-                    return OsloPuriValidator.TryParseIdentifier(puri, out var id)
-                        && int.TryParse(id, out var buildingPersistentLocalId)
-                        && !await _buildingExistsValidator.Exists(new BuildingPersistentLocalId(buildingPersistentLocalId), cancellationToken);
-                })
-                .WithErrorCode(ValidationErrors.MergeBuildings.BuildingNotFound.Code)
-                .WithMessage((_, puri) => ValidationErrors.MergeBuildings.BuildingNotFound.MessageWithPuri(puri));
 
             RuleFor(x => x.GeometriePolygoon)
                 .Must(gml => GmlPolygonValidator.IsValid(gml, GmlHelpers.CreateGmlReader()))
