@@ -16,7 +16,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.Building
     public abstract class BuildingLambdaHandler<TSqsLambdaRequest> : SqsLambdaHandlerBase<TSqsLambdaRequest>
         where TSqsLambdaRequest : BuildingLambdaRequest
     {
-        private readonly IBuildings _buildings;
+        protected IBuildings Buildings { get; }
 
         protected string DetailUrlFormat { get; }
 
@@ -28,7 +28,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.Building
             IBuildings buildings)
             : base(retryPolicy, ticketing, idempotentCommandHandler)
         {
-            _buildings = buildings;
+            Buildings = buildings;
 
             DetailUrlFormat = configuration["BuildingDetailUrl"];
             if (string.IsNullOrEmpty(DetailUrlFormat))
@@ -62,7 +62,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.Building
             CancellationToken cancellationToken)
         {
             var aggregate =
-                await _buildings.GetAsync(new BuildingStreamId(buildingPersistentLocalId), cancellationToken);
+                await Buildings.GetAsync(new BuildingStreamId(buildingPersistentLocalId), cancellationToken);
 
             return aggregate.LastEventHash;
         }
