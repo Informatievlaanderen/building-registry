@@ -9,7 +9,6 @@
     using AutoFixture;
     using Be.Vlaanderen.Basisregisters.CommandHandling;
     using Be.Vlaanderen.Basisregisters.CommandHandling.Idempotency;
-    using Be.Vlaanderen.Basisregisters.GrAr.Common.Oslo.Extensions;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Be.Vlaanderen.Basisregisters.Sqs.Lambda.Handlers;
     using Be.Vlaanderen.Basisregisters.Sqs.Responses;
@@ -21,6 +20,7 @@
     using BuildingRegistry.Building;
     using BuildingRegistry.Building.Exceptions;
     using Consumer.Address;
+    using Fixtures;
     using FluentAssertions;
     using Microsoft.Extensions.Configuration;
     using Moq;
@@ -39,6 +39,8 @@
 
         public WhenMergingBuildings(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
         {
+            Fixture.Customizations.Add(new WithUniqueInteger());
+
             _backOfficeContext = Container.Resolve<BackOfficeContext>();
             _idempotencyContext = new FakeIdempotencyContextFactory().CreateDbContext(Array.Empty<string>());
             _addressConsumerContext = Container.Resolve<FakeConsumerAddressContext>();
@@ -307,18 +309,24 @@
                     CancellationToken.None));
         }
 
-        private MergeBuildingsLambdaRequest CreateMergeBuildingsLambdaRequest(string puri = "")
+        private MergeBuildingsLambdaRequest CreateMergeBuildingsLambdaRequest(params string[] puris)
         {
+            var buildingsToMerge = puris.Any()
+                ? puris.ToList()
+                : new[] { Fixture.Create<int>(), Fixture.Create<int>() }
+                    .Select(x => $"http://validpuriformat/{x}")
+                    .ToList();
+
             return new MergeBuildingsLambdaRequest(
                 "123",
                 new MergeBuildingsSqsRequest
                 {
-                    BuildingPersistentLocalId = new BuildingPersistentLocalId(123),
+                    BuildingPersistentLocalId = new BuildingPersistentLocalId(Fixture.Create<int>()),
                     Request = new MergeBuildingRequest
                     {
                         GeometriePolygoon =
                             "<gml:Polygon srsName=\"https://www.opengis.net/def/crs/EPSG/0/31370\" xmlns:gml=\"http://www.opengis.net/gml/3.2\"><gml:exterior><gml:LinearRing><gml:posList>140284.15277253836 186724.74131567031 140291.06016454101 186726.38355567306 140288.22675654292 186738.25798767805 140281.19098053873 186736.57913967967 140284.15277253836 186724.74131567031</gml:posList></gml:LinearRing></gml:exterior></gml:Polygon>",
-                        SamenvoegenGebouwen = new List<string> { puri }
+                        SamenvoegenGebouwen = buildingsToMerge
                     },
                     Metadata = new Dictionary<string, object?>(),
                     ProvenanceData = Fixture.Create<ProvenanceData>(),
