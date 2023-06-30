@@ -10,6 +10,7 @@ namespace BuildingRegistry.Building
     using Be.Vlaanderen.Basisregisters.GrAr.Common.Pipes;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Commands;
+    using Exceptions;
     using SqlStreamStore;
 
     public sealed class BuildingCommandHandlerModule : CommandHandlerModule
@@ -251,9 +252,13 @@ namespace BuildingRegistry.Building
                     foreach (var buildingPersistentLocalId in message.Command.BuildingPersistentLocalIdsToMerge)
                     {
                         var streamId = new BuildingStreamId(buildingPersistentLocalId);
-                        var building = await buildingRepository().GetAsync(streamId, ct);
+                        var buildingToMerge = await buildingRepository().GetOptionalAsync(streamId, ct);
+                        if (!buildingToMerge.HasValue)
+                        {
+                            throw new BuildingToMergeNotFoundException(buildingPersistentLocalId);
+                        }
 
-                        buildingsToMerge.Add(building);
+                        buildingsToMerge.Add(buildingToMerge.Value);
                     }
 
                     var newBuildingStreamId = new BuildingStreamId(message.Command.NewBuildingPersistentLocalId);

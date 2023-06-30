@@ -2,10 +2,9 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenMergingBuildings
 {
     using System.Linq;
     using AutoFixture;
-    using Be.Vlaanderen.Basisregisters.AggregateSource;
     using Be.Vlaanderen.Basisregisters.AggregateSource.Testing;
-    using Building;
     using Building.Commands;
+    using Building.Exceptions;
     using Xunit;
     using Xunit.Abstractions;
 
@@ -16,16 +15,14 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenMergingBuildings
         }
 
         [Fact]
-        public void ThenAggregateNotFoundExceptionWasThrown()
+        public void BuildingToMergeNotFoundExceptionWasThrown()
         {
             var command = Fixture.Create<MergeBuildings>();
 
             Assert(new Scenario()
                 .GivenNone()
                 .When(command)
-                .Throws(new AggregateNotFoundException(
-                    new BuildingStreamId(command.BuildingPersistentLocalIdsToMerge.First()),
-                    typeof(Building))));
+                .Throws(new BuildingToMergeNotFoundException(command.BuildingPersistentLocalIdsToMerge.First())));
         }
     }
 }

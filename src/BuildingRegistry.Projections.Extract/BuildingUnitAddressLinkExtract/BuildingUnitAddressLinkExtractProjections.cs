@@ -113,6 +113,18 @@
                     }.ToBytes(_encoding)
                 }, ct);
             });
+
+            When<Envelope<BuildingUnitWasTransferred>>(async (context, message, ct) =>
+            {
+                foreach (var addressPersistentLocalId in message.Message.AddressPersistentLocalIds)
+                {
+                    var linkExtractItem = await context.FindBuildingUnitAddressExtractItem(
+                        message.Message.BuildingUnitPersistentLocalId,
+                        addressPersistentLocalId, ct);
+
+                    linkExtractItem.BuildingPersistentLocalId = message.Message.BuildingPersistentLocalId;
+                }
+            });
         }
 
         private static async Task AddIdempotentLink(

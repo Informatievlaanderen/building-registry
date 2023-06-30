@@ -6,6 +6,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.Building
     using Abstractions.Validation;
     using Autofac;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
+    using Be.Vlaanderen.Basisregisters.GrAr.Common.Oslo.Extensions;
     using Be.Vlaanderen.Basisregisters.Sqs.Exceptions;
     using Be.Vlaanderen.Basisregisters.Sqs.Lambda.Handlers;
     using Be.Vlaanderen.Basisregisters.Sqs.Lambda.Infrastructure;
@@ -89,12 +90,25 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.Building
         {
             return exception switch
             {
+                BuildingToMergeNotFoundException e => ValidationErrors.MergeBuildings.BuildingNotFound.ToTicketError(CreatePuri(request, e.BuildingPersistentLocalId)),
                 BuildingToMergeHasInvalidStatusException => ValidationErrors.MergeBuildings.BuildingInvalidStatus.ToTicketError(),
                 BuildingMergerNeedsMoreThanOneBuildingException => ValidationErrors.MergeBuildings.TooFewBuildings.ToTicketError(),
                 BuildingMergerHasTooManyBuildingsException => ValidationErrors.MergeBuildings.TooManyBuildings.ToTicketError(),
                 BuildingToMergeHasInvalidGeometryMethodException => ValidationErrors.Common.InvalidBuildingPolygonGeometry.ToTicketError(),
                 _ => null
             };
+        }
+
+        private string CreatePuri(MergeBuildingsLambdaRequest request, int buildingPersistentLocalId)
+        {
+            return request.Request.SamenvoegenGebouwen
+                .Select(puri => new
+                {
+                    PersistentLocalId = Convert.ToInt32(puri.AsIdentifier().Map(x => x).Value),
+                    Puri = puri
+                })
+                .Single(x => x.PersistentLocalId == buildingPersistentLocalId)
+                .Puri;
         }
 
         private async Task MarkBuildingAsMerged(

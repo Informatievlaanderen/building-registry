@@ -191,6 +191,45 @@ namespace BuildingRegistry.Projections.Legacy.BuildingDetailV2
                 item.Version = message.Message.Provenance.Timestamp;
                 UpdateHash(item, message);
             });
+
+            When<Envelope<BuildingMergerWasRealized>>(async (context, message, ct) =>
+            {
+                var building = new BuildingDetailItemV2(
+                    message.Message.BuildingPersistentLocalId,
+                    BuildingGeometryMethod.MeasuredByGrb,
+                    message.Message.ExtendedWkbGeometry.ToByteArray(),
+                    BuildingStatus.Realized,
+                    false,
+                    message.Message.Provenance.Timestamp);
+
+                UpdateHash(building, message);
+
+                await context
+                    .BuildingDetailsV2
+                    .AddAsync(building, ct);
+            });
+
+            When<Envelope<BuildingUnitWasTransferred>>(async (context, message, ct) =>
+            {
+                var item = await context.BuildingDetailsV2.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);
+                item.Version = message.Message.Provenance.Timestamp;
+                UpdateHash(item, message);
+            });
+
+            When<Envelope<BuildingUnitWasMoved>>(async (context, message, ct) =>
+            {
+                var item = await context.BuildingDetailsV2.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);
+                item.Version = message.Message.Provenance.Timestamp;
+                UpdateHash(item, message);
+            });
+
+            When<Envelope<BuildingWasMerged>>(async (context, message, ct) =>
+            {
+                var item = await context.BuildingDetailsV2.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);
+                item.Status = BuildingStatus.Retired;
+                item.Version = message.Message.Provenance.Timestamp;
+                UpdateHash(item, message);
+            });
         }
 
         private static void UpdateHash<T>(BuildingDetailItemV2 entity, Envelope<T> wrappedEvent) where T : IHaveHash, IMessage

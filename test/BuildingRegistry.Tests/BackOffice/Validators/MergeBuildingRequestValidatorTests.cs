@@ -4,18 +4,40 @@ namespace BuildingRegistry.Tests.BackOffice.Validators
     using BuildingRegistry.Api.BackOffice.Abstractions.Building.Requests;
     using BuildingRegistry.Api.BackOffice.Abstractions.Building.Validators;
     using FluentValidation.TestHelper;
+    using Moq;
+    using SqlStreamStore;
     using Xunit;
 
     public class MergeBuildingRequestValidatorTests
     {
         private readonly MergeBuildingRequestValidator _validator;
+        private readonly Mock<IStreamStore> _streamStore;
 
         private const string ValidGml =
             "<gml:Polygon srsName=\"https://www.opengis.net/def/crs/EPSG/0/31370\" xmlns:gml=\"http://www.opengis.net/gml/3.2\"><gml:exterior><gml:LinearRing><gml:posList>140284.15277253836 186724.74131567031 140291.06016454101 186726.38355567306 140288.22675654292 186738.25798767805 140281.19098053873 186736.57913967967 140284.15277253836 186724.74131567031</gml:posList></gml:LinearRing></gml:exterior></gml:Polygon>";
 
         public MergeBuildingRequestValidatorTests()
         {
-            _validator = new MergeBuildingRequestValidator();
+            _streamStore = new Mock<IStreamStore>();
+            _validator = new MergeBuildingRequestValidator(new BuildingExistsValidator(_streamStore.Object));
+        }
+
+        [Fact]
+        public void GivenValidRequest()
+        {
+            _streamStore.SetStreamFound();
+
+            var result = _validator.TestValidate(new MergeBuildingRequest
+            {
+                GeometriePolygoon = ValidGml,
+                SamenvoegenGebouwen = new List<string>
+                {
+                    "http://validpuriformat/102",
+                    "http://validpuriformat/103"
+                }
+            });
+
+            result.ShouldNotHaveAnyValidationErrors();
         }
 
         [Fact]
@@ -59,9 +81,29 @@ namespace BuildingRegistry.Tests.BackOffice.Validators
                 }
             });
 
-            result.ShouldHaveValidationErrorFor(nameof(MergeBuildingRequest.SamenvoegenGebouwen))
+            result.ShouldHaveValidationErrorFor(x => x.SamenvoegenGebouwen)
                 .WithErrorCode("GebouwIdOngeldig")
                 .WithErrorMessage("Ongeldig gebouwId.");
+        }
+
+        [Fact]
+        public void GivenNonExistingBuilding_ThenReturnsExpectedFailure()
+        {
+            _streamStore.SetStreamNotFound();
+
+            var puri = "http://validpuriformat/102";
+            var result = _validator.TestValidate(new MergeBuildingRequest
+            {
+                GeometriePolygoon = ValidGml,
+                SamenvoegenGebouwen = new List<string>
+                {
+                    puri
+                }
+            });
+
+            result.ShouldHaveValidationErrorFor(x => x.SamenvoegenGebouwen)
+                .WithErrorCode("GebouwIdNietGekendValidatie")
+                .WithErrorMessage($"Het gebouwId '{puri}' is niet gekend in het gebouwenregister.");
         }
 
         [Fact]

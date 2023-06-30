@@ -66,7 +66,8 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo
 
             When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingWasMeasured>>(async (_, message, ct) =>
             {
-                foreach (var buildingUnitPersistentLocalId in message.Message.BuildingUnitPersistentLocalIds.Concat(message.Message.BuildingUnitPersistentLocalIdsWhichBecameDerived))
+                foreach (var buildingUnitPersistentLocalId in message.Message.BuildingUnitPersistentLocalIds.Concat(message.Message
+                             .BuildingUnitPersistentLocalIdsWhichBecameDerived))
                 {
                     await FindAndProduce(async () =>
                             await snapshotManager.FindMatchingSnapshot(
@@ -127,47 +128,50 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo
                     ct);
             });
 
-            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingUnitAddressWasDetachedBecauseAddressWasRemoved>>(async (_, message, ct) =>
-            {
-                await FindAndProduce(async () =>
-                        await snapshotManager.FindMatchingSnapshot(
-                            message.Message.BuildingUnitPersistentLocalId.ToString(),
-                            message.Message.Provenance.Timestamp,
-                            message.Message.GetHash(),
-                            message.Position,
-                            throwStaleWhenGone: false,
-                            ct),
-                    message.Position,
-                    ct);
-            });
+            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingUnitAddressWasDetachedBecauseAddressWasRemoved>>(
+                async (_, message, ct) =>
+                {
+                    await FindAndProduce(async () =>
+                            await snapshotManager.FindMatchingSnapshot(
+                                message.Message.BuildingUnitPersistentLocalId.ToString(),
+                                message.Message.Provenance.Timestamp,
+                                message.Message.GetHash(),
+                                message.Position,
+                                throwStaleWhenGone: false,
+                                ct),
+                        message.Position,
+                        ct);
+                });
 
-            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingUnitAddressWasDetachedBecauseAddressWasRejected>>(async (_, message, ct) =>
-            {
-                await FindAndProduce(async () =>
-                        await snapshotManager.FindMatchingSnapshot(
-                            message.Message.BuildingUnitPersistentLocalId.ToString(),
-                            message.Message.Provenance.Timestamp,
-                            message.Message.GetHash(),
-                            message.Position,
-                            throwStaleWhenGone: false,
-                            ct),
-                    message.Position,
-                    ct);
-            });
+            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingUnitAddressWasDetachedBecauseAddressWasRejected>>(
+                async (_, message, ct) =>
+                {
+                    await FindAndProduce(async () =>
+                            await snapshotManager.FindMatchingSnapshot(
+                                message.Message.BuildingUnitPersistentLocalId.ToString(),
+                                message.Message.Provenance.Timestamp,
+                                message.Message.GetHash(),
+                                message.Position,
+                                throwStaleWhenGone: false,
+                                ct),
+                        message.Position,
+                        ct);
+                });
 
-            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingUnitAddressWasDetachedBecauseAddressWasRetired>>(async (_, message, ct) =>
-            {
-                await FindAndProduce(async () =>
-                        await snapshotManager.FindMatchingSnapshot(
-                            message.Message.BuildingUnitPersistentLocalId.ToString(),
-                            message.Message.Provenance.Timestamp,
-                            message.Message.GetHash(),
-                            message.Position,
-                            throwStaleWhenGone: false,
-                            ct),
-                    message.Position,
-                    ct);
-            });
+            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingUnitAddressWasDetachedBecauseAddressWasRetired>>(
+                async (_, message, ct) =>
+                {
+                    await FindAndProduce(async () =>
+                            await snapshotManager.FindMatchingSnapshot(
+                                message.Message.BuildingUnitPersistentLocalId.ToString(),
+                                message.Message.Provenance.Timestamp,
+                                message.Message.GetHash(),
+                                message.Position,
+                                throwStaleWhenGone: false,
+                                ct),
+                        message.Position,
+                        ct);
+                });
 
             When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingUnitPositionWasCorrected>>(async (_, message, ct) =>
             {
@@ -197,7 +201,38 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo
                     ct);
             });
 
-            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingUnitWasCorrectedFromNotRealizedToPlanned>>(async (_, message, ct) =>
+            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingUnitWasCorrectedFromNotRealizedToPlanned>>(
+                async (_, message, ct) =>
+                {
+                    await FindAndProduce(async () =>
+                            await snapshotManager.FindMatchingSnapshot(
+                                message.Message.BuildingUnitPersistentLocalId.ToString(),
+                                message.Message.Provenance.Timestamp,
+                                message.Message.GetHash(),
+                                message.Position,
+                                throwStaleWhenGone: false,
+                                ct),
+                        message.Position,
+                        ct);
+                });
+
+            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingUnitWasCorrectedFromRealizedToPlanned>>(
+                async (_, message, ct) =>
+                {
+                    await FindAndProduce(async () =>
+                            await snapshotManager.FindMatchingSnapshot(
+                                message.Message.BuildingUnitPersistentLocalId.ToString(),
+                                message.Message.Provenance.Timestamp,
+                                message.Message.GetHash(),
+                                message.Position,
+                                throwStaleWhenGone: false,
+                                ct),
+                        message.Position,
+                        ct);
+                });
+
+            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<
+                BuildingUnitWasCorrectedFromRealizedToPlannedBecauseBuildingWasCorrected>>(async (_, message, ct) =>
             {
                 await FindAndProduce(async () =>
                         await snapshotManager.FindMatchingSnapshot(
@@ -211,47 +246,20 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo
                     ct);
             });
 
-            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingUnitWasCorrectedFromRealizedToPlanned>>(async (_, message, ct) =>
-            {
-                await FindAndProduce(async () =>
-                        await snapshotManager.FindMatchingSnapshot(
-                            message.Message.BuildingUnitPersistentLocalId.ToString(),
-                            message.Message.Provenance.Timestamp,
-                            message.Message.GetHash(),
-                            message.Position,
-                            throwStaleWhenGone: false,
-                            ct),
-                    message.Position,
-                    ct);
-            });
-
-            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingUnitWasCorrectedFromRealizedToPlannedBecauseBuildingWasCorrected>>(async (_, message, ct) =>
-            {
-                await FindAndProduce(async () =>
-                        await snapshotManager.FindMatchingSnapshot(
-                            message.Message.BuildingUnitPersistentLocalId.ToString(),
-                            message.Message.Provenance.Timestamp,
-                            message.Message.GetHash(),
-                            message.Position,
-                            throwStaleWhenGone: false,
-                            ct),
-                    message.Position,
-                    ct);
-            });
-
-            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingUnitWasCorrectedFromRetiredToRealized>>(async (_, message, ct) =>
-            {
-                await FindAndProduce(async () =>
-                        await snapshotManager.FindMatchingSnapshot(
-                            message.Message.BuildingUnitPersistentLocalId.ToString(),
-                            message.Message.Provenance.Timestamp,
-                            message.Message.GetHash(),
-                            message.Position,
-                            throwStaleWhenGone: false,
-                            ct),
-                    message.Position,
-                    ct);
-            });
+            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingUnitWasCorrectedFromRetiredToRealized>>(
+                async (_, message, ct) =>
+                {
+                    await FindAndProduce(async () =>
+                            await snapshotManager.FindMatchingSnapshot(
+                                message.Message.BuildingUnitPersistentLocalId.ToString(),
+                                message.Message.Provenance.Timestamp,
+                                message.Message.GetHash(),
+                                message.Position,
+                                throwStaleWhenGone: false,
+                                ct),
+                        message.Position,
+                        ct);
+                });
 
             When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingUnitWasDeregulated>>(async (_, message, ct) =>
             {
@@ -267,33 +275,35 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo
                     ct);
             });
 
-            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingUnitDeregulationWasCorrected>>(async (_, message, ct) =>
-            {
-                await FindAndProduce(async () =>
-                        await snapshotManager.FindMatchingSnapshot(
-                            message.Message.BuildingUnitPersistentLocalId.ToString(),
-                            message.Message.Provenance.Timestamp,
-                            message.Message.GetHash(),
-                            message.Position,
-                            throwStaleWhenGone: false,
-                            ct),
-                    message.Position,
-                    ct);
-            });
+            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingUnitDeregulationWasCorrected>>(
+                async (_, message, ct) =>
+                {
+                    await FindAndProduce(async () =>
+                            await snapshotManager.FindMatchingSnapshot(
+                                message.Message.BuildingUnitPersistentLocalId.ToString(),
+                                message.Message.Provenance.Timestamp,
+                                message.Message.GetHash(),
+                                message.Position,
+                                throwStaleWhenGone: false,
+                                ct),
+                        message.Position,
+                        ct);
+                });
 
-            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingUnitWasNotRealizedBecauseBuildingWasNotRealized>>(async (_, message, ct) =>
-            {
-                await FindAndProduce(async () =>
-                        await snapshotManager.FindMatchingSnapshot(
-                            message.Message.BuildingUnitPersistentLocalId.ToString(),
-                            message.Message.Provenance.Timestamp,
-                            message.Message.GetHash(),
-                            message.Position,
-                            throwStaleWhenGone: false,
-                            ct),
-                    message.Position,
-                    ct);
-            });
+            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingUnitWasNotRealizedBecauseBuildingWasNotRealized>>(
+                async (_, message, ct) =>
+                {
+                    await FindAndProduce(async () =>
+                            await snapshotManager.FindMatchingSnapshot(
+                                message.Message.BuildingUnitPersistentLocalId.ToString(),
+                                message.Message.Provenance.Timestamp,
+                                message.Message.GetHash(),
+                                message.Position,
+                                throwStaleWhenGone: false,
+                                ct),
+                        message.Position,
+                        ct);
+                });
 
             When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingUnitWasNotRealizedV2>>(async (_, message, ct) =>
             {
@@ -323,19 +333,20 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo
                     ct);
             });
 
-            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingUnitWasRealizedBecauseBuildingWasRealized>>(async (_, message, ct) =>
-            {
-                await FindAndProduce(async () =>
-                        await snapshotManager.FindMatchingSnapshot(
-                            message.Message.BuildingUnitPersistentLocalId.ToString(),
-                            message.Message.Provenance.Timestamp,
-                            message.Message.GetHash(),
-                            message.Position,
-                            throwStaleWhenGone: false,
-                            ct),
-                    message.Position,
-                    ct);
-            });
+            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingUnitWasRealizedBecauseBuildingWasRealized>>(
+                async (_, message, ct) =>
+                {
+                    await FindAndProduce(async () =>
+                            await snapshotManager.FindMatchingSnapshot(
+                                message.Message.BuildingUnitPersistentLocalId.ToString(),
+                                message.Message.Provenance.Timestamp,
+                                message.Message.GetHash(),
+                                message.Position,
+                                throwStaleWhenGone: false,
+                                ct),
+                        message.Position,
+                        ct);
+                });
 
             When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingUnitWasRealizedV2>>(async (_, message, ct) =>
             {
@@ -365,19 +376,20 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo
                     ct);
             });
 
-            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingUnitRegularizationWasCorrected>>(async (_, message, ct) =>
-            {
-                await FindAndProduce(async () =>
-                        await snapshotManager.FindMatchingSnapshot(
-                            message.Message.BuildingUnitPersistentLocalId.ToString(),
-                            message.Message.Provenance.Timestamp,
-                            message.Message.GetHash(),
-                            message.Position,
-                            throwStaleWhenGone: false,
-                            ct),
-                    message.Position,
-                    ct);
-            });
+            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingUnitRegularizationWasCorrected>>(
+                async (_, message, ct) =>
+                {
+                    await FindAndProduce(async () =>
+                            await snapshotManager.FindMatchingSnapshot(
+                                message.Message.BuildingUnitPersistentLocalId.ToString(),
+                                message.Message.Provenance.Timestamp,
+                                message.Message.GetHash(),
+                                message.Position,
+                                throwStaleWhenGone: false,
+                                ct),
+                        message.Position,
+                        ct);
+                });
 
             When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingUnitWasRetiredV2>>(async (_, message, ct) =>
             {
@@ -393,29 +405,27 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo
                     ct);
             });
 
-            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingWasCorrectedFromNotRealizedToPlanned>>(async (_, message, ct) =>
-            { });
+            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingWasCorrectedFromNotRealizedToPlanned>>(async (_,
+                    message, ct) =>
+                { });
 
-            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingWasCorrectedFromRealizedToUnderConstruction>>(async (_, message, ct) =>
-            { });
+            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingWasCorrectedFromRealizedToUnderConstruction>>(
+                async (_, message, ct) => { });
 
-            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingWasCorrectedFromUnderConstructionToPlanned>>(async (_, message, ct) =>
-            { });
+            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingWasCorrectedFromUnderConstructionToPlanned>>(
+                async (_, message, ct) => { });
 
-            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingWasNotRealizedV2>>(async (_, message, ct) =>
-            { });
+            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingWasNotRealizedV2>>(async (_, message, ct) => { });
 
-            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingWasPlannedV2>>(async (_, message, ct) =>
-            { });
+            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingWasPlannedV2>>(async (_, message, ct) => { });
 
-            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<UnplannedBuildingWasRealizedAndMeasured>>(async (_, message, ct) =>
-            { });
+            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<UnplannedBuildingWasRealizedAndMeasured>>(async (_, message,
+                    ct) =>
+                { });
 
-            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingWasRealizedV2>>(async (_, message, ct) =>
-            { });
+            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingWasRealizedV2>>(async (_, message, ct) => { });
 
-            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingWasRemovedV2>>(async (_, message, ct) =>
-            { });
+            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingWasRemovedV2>>(async (_, message, ct) => { });
 
             When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<CommonBuildingUnitWasAddedV2>>(async (_, message, ct) =>
             {
@@ -436,52 +446,56 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo
                 await Produce($"{osloNamespace}/{message.Message.BuildingUnitPersistentLocalId}", "{}", message.Position, ct);
             });
 
-            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingUnitWasRemovedBecauseBuildingWasRemoved>>(async (_, message, ct) =>
-            {
-                await Produce($"{osloNamespace}/{message.Message.BuildingUnitPersistentLocalId}", "{}", message.Position, ct);
-            });
+            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingUnitWasRemovedBecauseBuildingWasRemoved>>(
+                async (_, message, ct) =>
+                {
+                    await Produce($"{osloNamespace}/{message.Message.BuildingUnitPersistentLocalId}", "{}", message.Position, ct);
+                });
 
-            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingUnitAddressWasReplacedBecauseAddressWasReaddressed>>(async (_, message, ct) =>
-            {
-                await FindAndProduce(async () =>
-                        await snapshotManager.FindMatchingSnapshot(
-                            message.Message.BuildingUnitPersistentLocalId.ToString(),
-                            message.Message.Provenance.Timestamp,
-                            message.Message.GetHash(),
-                            message.Position,
-                            throwStaleWhenGone: false,
-                            ct),
-                    message.Position,
-                    ct);
-            });
+            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingUnitAddressWasReplacedBecauseAddressWasReaddressed>>(
+                async (_, message, ct) =>
+                {
+                    await FindAndProduce(async () =>
+                            await snapshotManager.FindMatchingSnapshot(
+                                message.Message.BuildingUnitPersistentLocalId.ToString(),
+                                message.Message.Provenance.Timestamp,
+                                message.Message.GetHash(),
+                                message.Position,
+                                throwStaleWhenGone: false,
+                                ct),
+                        message.Position,
+                        ct);
+                });
 
-            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingUnitWasNotRealizedBecauseBuildingWasDemolished>>(async (_, message, ct) =>
-            {
-                await FindAndProduce(async () =>
-                        await snapshotManager.FindMatchingSnapshot(
-                            message.Message.BuildingPersistentLocalId.ToString(),
-                            message.Message.Provenance.Timestamp,
-                            message.Message.GetHash(),
-                            message.Position,
-                            throwStaleWhenGone: false,
-                            ct),
-                    message.Position,
-                    ct);
-            });
+            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingUnitWasNotRealizedBecauseBuildingWasDemolished>>(
+                async (_, message, ct) =>
+                {
+                    await FindAndProduce(async () =>
+                            await snapshotManager.FindMatchingSnapshot(
+                                message.Message.BuildingPersistentLocalId.ToString(),
+                                message.Message.Provenance.Timestamp,
+                                message.Message.GetHash(),
+                                message.Position,
+                                throwStaleWhenGone: false,
+                                ct),
+                        message.Position,
+                        ct);
+                });
 
-            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingUnitWasRetiredBecauseBuildingWasDemolished>>(async (_, message, ct) =>
-            {
-                await FindAndProduce(async () =>
-                        await snapshotManager.FindMatchingSnapshot(
-                            message.Message.BuildingPersistentLocalId.ToString(),
-                            message.Message.Provenance.Timestamp,
-                            message.Message.GetHash(),
-                            message.Position,
-                            throwStaleWhenGone: false,
-                            ct),
-                    message.Position,
-                    ct);
-            });
+            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingUnitWasRetiredBecauseBuildingWasDemolished>>(
+                async (_, message, ct) =>
+                {
+                    await FindAndProduce(async () =>
+                            await snapshotManager.FindMatchingSnapshot(
+                                message.Message.BuildingPersistentLocalId.ToString(),
+                                message.Message.Provenance.Timestamp,
+                                message.Message.GetHash(),
+                                message.Position,
+                                throwStaleWhenGone: false,
+                                ct),
+                        message.Position,
+                        ct);
+                });
 
             When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingMeasurementWasChanged>>(async (_, message, ct) =>
             {
@@ -499,6 +513,34 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo
                         message.Position,
                         ct);
                 }
+            });
+
+            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingUnitWasTransferred>>(async (_, message, ct) =>
+            {
+                await FindAndProduce(async () =>
+                        await snapshotManager.FindMatchingSnapshot(
+                            message.Message.BuildingUnitPersistentLocalId.ToString(),
+                            message.Message.Provenance.Timestamp,
+                            message.Message.GetHash(),
+                            message.Position,
+                            throwStaleWhenGone: false,
+                            ct),
+                    message.Position,
+                    ct);
+            });
+
+            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingUnitWasMoved>>(async (_, message, ct) =>
+            {
+                await FindAndProduce(async () =>
+                        await snapshotManager.FindMatchingSnapshot(
+                            message.Message.BuildingUnitPersistentLocalId.ToString(),
+                            message.Message.Provenance.Timestamp,
+                            message.Message.GetHash(),
+                            message.Position,
+                            throwStaleWhenGone: false,
+                            ct),
+                    message.Position,
+                    ct);
             });
         }
 

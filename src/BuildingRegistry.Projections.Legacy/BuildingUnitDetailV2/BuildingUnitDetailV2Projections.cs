@@ -28,7 +28,8 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetailV2
                 {
                     var addressesIdsGrouped = buildingUnit.AddressPersistentLocalIds.GroupBy(x => x);
                     var addresses = addressesIdsGrouped
-                        .Select(groupedAddressId => new BuildingUnitDetailAddressItemV2(buildingUnit.BuildingUnitPersistentLocalId, groupedAddressId.Key))
+                        .Select(groupedAddressId =>
+                            new BuildingUnitDetailAddressItemV2(buildingUnit.BuildingUnitPersistentLocalId, groupedAddressId.Key))
                         .ToList();
 
                     var buildingUnitDetailItemV2 = new BuildingUnitDetailItemV2(
@@ -67,7 +68,8 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetailV2
 
             When<Envelope<BuildingWasMeasured>>(async (context, message, ct) =>
             {
-                foreach (var buildingUnitPersistentLocalId in message.Message.BuildingUnitPersistentLocalIds.Concat(message.Message.BuildingUnitPersistentLocalIdsWhichBecameDerived))
+                foreach (var buildingUnitPersistentLocalId in message.Message.BuildingUnitPersistentLocalIds.Concat(message.Message
+                             .BuildingUnitPersistentLocalIdsWhichBecameDerived))
                 {
                     await Update(context, buildingUnitPersistentLocalId, item =>
                     {
@@ -81,7 +83,8 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetailV2
 
             When<Envelope<BuildingMeasurementWasCorrected>>(async (context, message, ct) =>
             {
-                foreach (var buildingUnitPersistentLocalId in message.Message.BuildingUnitPersistentLocalIds.Concat(message.Message.BuildingUnitPersistentLocalIdsWhichBecameDerived))
+                foreach (var buildingUnitPersistentLocalId in message.Message.BuildingUnitPersistentLocalIds.Concat(message.Message
+                             .BuildingUnitPersistentLocalIdsWhichBecameDerived))
                 {
                     await Update(context, buildingUnitPersistentLocalId, item =>
                     {
@@ -333,7 +336,8 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetailV2
                 {
                     context.Entry(item).Collection(x => x.Addresses).Load();
 
-                    item.Addresses.Add(new BuildingUnitDetailAddressItemV2(message.Message.BuildingUnitPersistentLocalId, message.Message.AddressPersistentLocalId));
+                    item.Addresses.Add(new BuildingUnitDetailAddressItemV2(message.Message.BuildingUnitPersistentLocalId,
+                        message.Message.AddressPersistentLocalId));
                     item.Version = message.Message.Provenance.Timestamp;
                     UpdateHash(item, message);
                 }, ct);
@@ -398,7 +402,9 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetailV2
                     context.Entry(item).Collection(x => x.Addresses).Load();
 
                     RemoveIdempotentAddress(item, message.Message.PreviousAddressPersistentLocalId);
-                    AddIdempotentAddress(item, new BuildingUnitDetailAddressItemV2(message.Message.BuildingUnitPersistentLocalId, message.Message.NewAddressPersistentLocalId));
+                    AddIdempotentAddress(item,
+                        new BuildingUnitDetailAddressItemV2(message.Message.BuildingUnitPersistentLocalId,
+                            message.Message.NewAddressPersistentLocalId));
 
                     item.Version = message.Message.Provenance.Timestamp;
                     UpdateHash(item, message);
@@ -424,6 +430,30 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetailV2
                     UpdateHash(item, message);
                 }, ct);
             });
+
+            When<Envelope<BuildingUnitWasTransferred>>(async (context, message, ct) =>
+            {
+                await Update(context, message.Message.BuildingUnitPersistentLocalId, item =>
+                {
+                    item.BuildingPersistentLocalId = message.Message.BuildingPersistentLocalId;
+                    item.Position = message.Message.ExtendedWkbGeometry.ToByteArray();
+                    item.PositionMethod = BuildingUnitPositionGeometryMethod.Parse(message.Message.GeometryMethod);
+                    item.Function = BuildingUnitFunction.Parse(message.Message.Function);
+                    item.Status = BuildingUnitStatus.Parse(message.Message.Status);
+                    item.HasDeviation = message.Message.HasDeviation;
+                    item.Addresses = new Collection<BuildingUnitDetailAddressItemV2>(
+                        message.Message.AddressPersistentLocalIds
+                            .Select(x => new BuildingUnitDetailAddressItemV2(message.Message.BuildingUnitPersistentLocalId, x))
+                            .ToList());
+                    item.Version = message.Message.Provenance.Timestamp;
+                    UpdateHash(item, message);
+                }, ct);
+            });
+
+            When<Envelope<BuildingUnitWasMoved>>(async (_, _, _) =>
+            {
+                // BuildingUnitWasTransferred couples the unit to another building and BuildingUnitMoved is an event applicable on the old building.
+            });
         }
 
         private static void RemoveIdempotentAddress(BuildingUnitDetailItemV2 buildingUnit, int addressPersistentLocalId)
@@ -436,9 +466,11 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetailV2
             }
         }
 
-        private static void AddIdempotentAddress(BuildingUnitDetailItemV2 buildingUnit, BuildingUnitDetailAddressItemV2 buildingUnitDetailAddressItemV2)
+        private static void AddIdempotentAddress(BuildingUnitDetailItemV2 buildingUnit,
+            BuildingUnitDetailAddressItemV2 buildingUnitDetailAddressItemV2)
         {
-            var address = buildingUnit.Addresses.FirstOrDefault(x => x.AddressPersistentLocalId == buildingUnitDetailAddressItemV2.AddressPersistentLocalId);
+            var address = buildingUnit.Addresses.FirstOrDefault(x =>
+                x.AddressPersistentLocalId == buildingUnitDetailAddressItemV2.AddressPersistentLocalId);
 
             if (address is null)
             {
@@ -446,7 +478,8 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetailV2
             }
         }
 
-        private static async Task Update(LegacyContext context, int buildingUnitPersistentLocalId, Action<BuildingUnitDetailItemV2> updateAction, CancellationToken ct)
+        private static async Task Update(LegacyContext context, int buildingUnitPersistentLocalId, Action<BuildingUnitDetailItemV2> updateAction,
+            CancellationToken ct)
         {
             var item = await context
                 .BuildingUnitDetailsV2
