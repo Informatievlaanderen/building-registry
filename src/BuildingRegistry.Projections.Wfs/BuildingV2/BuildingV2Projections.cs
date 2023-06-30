@@ -221,6 +221,18 @@ namespace BuildingRegistry.Projections.Wfs.BuildingV2
                 item.Status = RetiredStatus;
                 item.Version = message.Message.Provenance.Timestamp;
             });
+
+            When<Envelope<BuildingUnitWasTransferred>>(async (context, message, ct) =>
+            {
+                var item = await context.BuildingsV2.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);
+                item.Version = message.Message.Provenance.Timestamp;
+            });
+
+            When<Envelope<BuildingUnitWasMoved>>(async (context, message, ct) =>
+            {
+                var item = await context.BuildingsV2.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);
+                item.Version = message.Message.Provenance.Timestamp;
+            });
         }
 
         private void SetGeometry(BuildingV2 building, string extendedWkbGeometry, string method)

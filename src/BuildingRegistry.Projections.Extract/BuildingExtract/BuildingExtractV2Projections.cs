@@ -54,12 +54,12 @@ namespace BuildingRegistry.Projections.Extract.BuildingExtract
                             Value =
                                 $"{extractConfigValue.DataVlaanderenNamespaceBuilding}/{message.Message.BuildingPersistentLocalId}"
                         },
-                        gebouwid = {Value = message.Message.BuildingPersistentLocalId},
+                        gebouwid = { Value = message.Message.BuildingPersistentLocalId },
                         geommet =
                         {
                             Value = MapGeometryMethod(BuildingGeometryMethod.Parse(message.Message.GeometryMethod))
                         },
-                        status = {Value = MapStatus(BuildingStatus.Parse(message.Message.BuildingStatus))},
+                        status = { Value = MapStatus(BuildingStatus.Parse(message.Message.BuildingStatus)) },
                         versieid =
                         {
                             Value = message.Message.Provenance.Timestamp.ToBelgianDateTimeOffset().FromDateTimeOffset()
@@ -87,9 +87,9 @@ namespace BuildingRegistry.Projections.Extract.BuildingExtract
                             Value =
                                 $"{extractConfigValue.DataVlaanderenNamespaceBuilding}/{message.Message.BuildingPersistentLocalId}"
                         },
-                        gebouwid = {Value = message.Message.BuildingPersistentLocalId},
-                        geommet = {Value = MapGeometryMethod(BuildingGeometryMethod.Outlined)},
-                        status = {Value = MapStatus(BuildingStatus.Planned)},
+                        gebouwid = { Value = message.Message.BuildingPersistentLocalId },
+                        geommet = { Value = MapGeometryMethod(BuildingGeometryMethod.Outlined) },
+                        status = { Value = MapStatus(BuildingStatus.Planned) },
                         versieid =
                         {
                             Value = message.Message.Provenance.Timestamp.ToBelgianDateTimeOffset().FromDateTimeOffset()
@@ -117,9 +117,9 @@ namespace BuildingRegistry.Projections.Extract.BuildingExtract
                             Value =
                                 $"{extractConfigValue.DataVlaanderenNamespaceBuilding}/{message.Message.BuildingPersistentLocalId}"
                         },
-                        gebouwid = {Value = message.Message.BuildingPersistentLocalId},
-                        geommet = {Value = MapGeometryMethod(BuildingGeometryMethod.MeasuredByGrb)},
-                        status = {Value = MapStatus(BuildingStatus.Realized)},
+                        gebouwid = { Value = message.Message.BuildingPersistentLocalId },
+                        geommet = { Value = MapGeometryMethod(BuildingGeometryMethod.MeasuredByGrb) },
+                        status = { Value = MapStatus(BuildingStatus.Realized) },
                         versieid =
                         {
                             Value = message.Message.Provenance.Timestamp.ToBelgianDateTimeOffset().FromDateTimeOffset()
@@ -264,9 +264,9 @@ namespace BuildingRegistry.Projections.Extract.BuildingExtract
                             Value =
                                 $"{extractConfigValue.DataVlaanderenNamespaceBuilding}/{message.Message.BuildingPersistentLocalId}"
                         },
-                        gebouwid = {Value = message.Message.BuildingPersistentLocalId},
-                        geommet = {Value = MapGeometryMethod(BuildingGeometryMethod.MeasuredByGrb)},
-                        status = {Value = MapStatus(BuildingStatus.Realized)},
+                        gebouwid = { Value = message.Message.BuildingPersistentLocalId },
+                        geommet = { Value = MapGeometryMethod(BuildingGeometryMethod.MeasuredByGrb) },
+                        status = { Value = MapStatus(BuildingStatus.Realized) },
                         versieid =
                         {
                             Value = message.Message.Provenance.Timestamp.ToBelgianDateTimeOffset().FromDateTimeOffset()
@@ -284,22 +284,19 @@ namespace BuildingRegistry.Projections.Extract.BuildingExtract
 
             When<Envelope<BuildingUnitWasTransferred>>(async (context, message, ct) =>
             {
-                var item = await context.BuildingExtractV2.FindAsync(message.Message.BuildingPersistentLocalId,
-                    cancellationToken: ct);
+                var item = await context.BuildingExtractV2.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);
                 UpdateVersie(item, message.Message.Provenance.Timestamp);
             });
 
             When<Envelope<BuildingUnitWasMoved>>(async (context, message, ct) =>
             {
-                var item = await context.BuildingExtractV2.FindAsync(message.Message.BuildingPersistentLocalId,
-                    cancellationToken: ct);
+                var item = await context.BuildingExtractV2.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);
                 UpdateVersie(item, message.Message.Provenance.Timestamp);
             });
 
             When<Envelope<BuildingWasMerged>>(async (context, message, ct) =>
             {
-                var item = await context.BuildingExtractV2.FindAsync(message.Message.BuildingPersistentLocalId,
-                    cancellationToken: ct);
+                var item = await context.BuildingExtractV2.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);
                 UpdateStatus(item, MapStatus(BuildingStatus.Retired));
                 UpdateVersie(item, message.Message.Provenance.Timestamp);
             });

@@ -450,7 +450,6 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetailV2
             {
                 await Update(context, message.Message.BuildingUnitPersistentLocalId, item =>
                 {
-                    item.Status = BuildingUnitStatus.Retired;
                     item.Version = message.Message.Provenance.Timestamp;
                     UpdateHash(item, message);
                 }, ct);

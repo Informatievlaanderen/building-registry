@@ -360,11 +360,13 @@ namespace BuildingRegistry.Projections.Wfs.BuildingUnitV2
             When<Envelope<BuildingUnitWasTransferred>>(async (context, message, ct) =>
             {
                 var unit = await context.BuildingUnitsV2.FindAsync(message.Message.BuildingUnitPersistentLocalId);
+
                 unit.BuildingPersistentLocalId = message.Message.BuildingPersistentLocalId;
                 unit.Status = MapStatus(BuildingUnitStatus .Parse(message.Message.Status));
                 unit.Position = (Point) _wkbReader.Read(message.Message.ExtendedWkbGeometry.ToByteArray());
                 unit.PositionMethod = MapGeometryMethod(BuildingUnitPositionGeometryMethod.Parse(message.Message.GeometryMethod));
                 unit.Function = MapFunction(BuildingUnitFunction.Parse(message.Message.Function));
+                unit.HasDeviation = message.Message.HasDeviation;
                 SetVersion(unit!, message.Message.Provenance.Timestamp);
             });
 
