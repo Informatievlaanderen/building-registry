@@ -1,3 +1,17 @@
+# [3.83.0](https://github.com/informatievlaanderen/building-registry/compare/v3.82.0...v3.83.0) (2023-06-30)
+
+
+### Bug Fixes
+
+* remove metadata from requests ([b6f06a7](https://github.com/informatievlaanderen/building-registry/commit/b6f06a784a207b74489a82a29aed48a026c2b391))
+
+
+### Features
+
+* add projections merge building ([f32d843](https://github.com/informatievlaanderen/building-registry/commit/f32d843e69d9c066d271f2b191b19ca9eacc7898))
+* merge buildings backoffice ([10f7798](https://github.com/informatievlaanderen/building-registry/commit/10f779847291a9295772d9a1077333b4bed6d167))
+* set lastevent on bu (correct)removal ([79705b9](https://github.com/informatievlaanderen/building-registry/commit/79705b9c66bd5b255a979a9a52553fa46e63615d))
+
 # [3.82.0](https://github.com/informatievlaanderen/building-registry/compare/v3.81.5...v3.82.0) (2023-06-28)
 
 
