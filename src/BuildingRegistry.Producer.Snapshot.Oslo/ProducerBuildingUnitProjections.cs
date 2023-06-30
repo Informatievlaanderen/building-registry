@@ -531,7 +531,16 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo
 
             When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingUnitWasMoved>>(async (_, message, ct) =>
             {
-                await Produce($"{osloNamespace}/{message.Message.BuildingUnitPersistentLocalId}", "{}", message.Position, ct);
+                await FindAndProduce(async () =>
+                        await snapshotManager.FindMatchingSnapshot(
+                            message.Message.BuildingUnitPersistentLocalId.ToString(),
+                            message.Message.Provenance.Timestamp,
+                            message.Message.GetHash(),
+                            message.Position,
+                            throwStaleWhenGone: false,
+                            ct),
+                    message.Position,
+                    ct);
             });
         }
 

@@ -479,14 +479,9 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
                     }, ct);
             });
 
-            When<Envelope<BuildingUnitWasMoved>>(async (context, message, ct) =>
+            When<Envelope<BuildingUnitWasMoved>>(async (_, _, _) =>
             {
-                // Bu state is already updated in BuildingUnitWasTransferred
-                await context.FindAndUpdateBuildingUnitExtract(message.Message.BuildingUnitPersistentLocalId,
-                    itemV2 =>
-                    {
-                        UpdateVersie(itemV2, message.Message.Provenance.Timestamp);
-                    }, ct);
+                // BuildingUnitWasTransferred couples the unit to another building and BuildingUnitMoved is an event applicable on the old building.
             });
         }
 

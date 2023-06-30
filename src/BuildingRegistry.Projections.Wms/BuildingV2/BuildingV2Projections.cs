@@ -176,9 +176,9 @@ namespace BuildingRegistry.Projections.Wms.BuildingV2
                     PersistentLocalId = message.Message.BuildingPersistentLocalId,
                     Id = PersistentLocalIdHelper.CreateBuildingId(message.Message.BuildingPersistentLocalId),
                     Status = BuildingStatus.Realized,
+                    Version = message.Message.Provenance.Timestamp
                 };
                 SetGeometry(item, message.Message.ExtendedWkbGeometry, MeasuredByGrbMethod);
-                item.Version = message.Message.Provenance.Timestamp;
                 await context.BuildingsV2.AddAsync(item, ct);
             });
 

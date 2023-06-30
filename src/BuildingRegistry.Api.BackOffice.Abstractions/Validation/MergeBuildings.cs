@@ -11,7 +11,7 @@
             public static class BuildingNotFound
             {
                 public const string Code = "GebouwIdNietGekendValidatie";
-                public static string MessageWithPuri(string puri) => $"De gebouwId '{puri}' is niet gekend in het gebouwenregister.";
+                public static string MessageWithPuri(string puri) => $"Het gebouwId '{puri}' is niet gekend in het gebouwenregister.";
                 public static TicketError ToTicketError(string puri) => new TicketError(MessageWithPuri(puri), Code);
             }
 

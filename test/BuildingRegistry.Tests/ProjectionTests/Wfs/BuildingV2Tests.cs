@@ -9,6 +9,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wfs
     using Be.Vlaanderen.Basisregisters.Utilities.HexByteConvertor;
     using Building;
     using Building.Events;
+    using Extensions;
     using Fixtures;
     using FluentAssertions;
     using Infrastructure;
@@ -53,13 +54,15 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wfs
 
                     buildingDetailItemV2.Id.Should().Be(PersistentLocalIdHelper.CreateBuildingId(buildingWasMigrated.BuildingPersistentLocalId));
                     buildingDetailItemV2.IsRemoved.Should().Be(buildingWasMigrated.IsRemoved);
-                    buildingDetailItemV2.Status.Should().Be(BuildingV2Projections.MapStatus(BuildingStatus.Parse(buildingWasMigrated.BuildingStatus)));
+                    buildingDetailItemV2.Status.Should()
+                        .Be(BuildingV2Projections.MapStatus(BuildingStatus.Parse(buildingWasMigrated.BuildingStatus)));
                     buildingDetailItemV2.Version.Should().Be(buildingWasMigrated.Provenance.Timestamp);
 
                     var wkbReader = WKBReaderFactory.Create();
                     var polygon = wkbReader.Read(buildingWasMigrated.ExtendedWkbGeometry.ToByteArray()) as Polygon;
                     buildingDetailItemV2.Geometry.Should().Be(new GrbPolygon(polygon));
-                    buildingDetailItemV2.GeometryMethod.Should().Be(BuildingV2Projections.MapGeometryMethod(BuildingGeometryMethod.Parse(buildingWasMigrated.GeometryMethod)));
+                    buildingDetailItemV2.GeometryMethod.Should()
+                        .Be(BuildingV2Projections.MapGeometryMethod(BuildingGeometryMethod.Parse(buildingWasMigrated.GeometryMethod)));
                 });
         }
 
@@ -255,13 +258,15 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wfs
                     {
                         { AddEventHashPipe.HashMetadataKey, buildingWasPlannedV2.GetHash() }
                     })),
-                    new Envelope<BuildingWasCorrectedFromUnderConstructionToPlanned>(new Envelope(buildingWasCorrectedFromUnderConstructionToPlanned, new Dictionary<string, object>
-                    {
-                        { AddEventHashPipe.HashMetadataKey, buildingWasCorrectedFromUnderConstructionToPlanned.GetHash() }
-                    })))
+                    new Envelope<BuildingWasCorrectedFromUnderConstructionToPlanned>(new Envelope(buildingWasCorrectedFromUnderConstructionToPlanned,
+                        new Dictionary<string, object>
+                        {
+                            { AddEventHashPipe.HashMetadataKey, buildingWasCorrectedFromUnderConstructionToPlanned.GetHash() }
+                        })))
                 .Then(async ct =>
                 {
-                    var buildingDetailItemV2 = await ct.BuildingsV2.FindAsync(buildingWasCorrectedFromUnderConstructionToPlanned.BuildingPersistentLocalId);
+                    var buildingDetailItemV2 =
+                        await ct.BuildingsV2.FindAsync(buildingWasCorrectedFromUnderConstructionToPlanned.BuildingPersistentLocalId);
                     buildingDetailItemV2.Should().NotBeNull();
                     buildingDetailItemV2.Version.Should().Be(buildingWasCorrectedFromUnderConstructionToPlanned.Provenance.Timestamp);
                     buildingDetailItemV2.Status.Should().Be(BuildingV2Projections.MapStatus(BuildingStatus.Planned));
@@ -313,7 +318,8 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wfs
                     new Envelope<BuildingWasCorrectedFromRealizedToUnderConstruction>(
                         new Envelope(
                             buildingWasCorrectedFromRealizedToUnderConstruction,
-                            new Dictionary<string, object> { { AddEventHashPipe.HashMetadataKey, buildingWasCorrectedFromRealizedToUnderConstruction.GetHash() } })))
+                            new Dictionary<string, object>
+                                { { AddEventHashPipe.HashMetadataKey, buildingWasCorrectedFromRealizedToUnderConstruction.GetHash() } })))
                 .Then(async ct =>
                 {
                     var buildingDetailItemV2 = await ct.BuildingsV2.FindAsync(buildingWasRealizedV2.BuildingPersistentLocalId);
@@ -367,7 +373,8 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wfs
                     new Envelope<BuildingWasCorrectedFromNotRealizedToPlanned>(
                         new Envelope(
                             buildingWasCorrectedFromNotRealizedToPlanned,
-                            new Dictionary<string, object> { { AddEventHashPipe.HashMetadataKey, buildingWasCorrectedFromNotRealizedToPlanned.GetHash() } })))
+                            new Dictionary<string, object>
+                                { { AddEventHashPipe.HashMetadataKey, buildingWasCorrectedFromNotRealizedToPlanned.GetHash() } })))
                 .Then(async ct =>
                 {
                     var buildingDetailItemV2 = await ct.BuildingsV2.FindAsync(buildingWasNotRealizedV2.BuildingPersistentLocalId);
@@ -489,6 +496,132 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wfs
                     item.Should().NotBeNull();
 
                     item!.Status.Should().Be("Gehistoreerd");
+                });
+        }
+
+        [Fact]
+        public async Task WhenBuildingMergerWasRealized()
+        {
+            var @event = _fixture.Create<BuildingMergerWasRealized>();
+
+            await Sut
+                .Given(
+                    new Envelope<BuildingMergerWasRealized>(
+                        new Envelope(
+                            @event,
+                            new Dictionary<string, object> { { AddEventHashPipe.HashMetadataKey, @event.GetHash() } })))
+                .Then(async ct =>
+                {
+                    var item = await ct.BuildingsV2.FindAsync(@event.BuildingPersistentLocalId);
+                    item.Should().NotBeNull();
+
+                    item.Status.Should().Be(BuildingV2Projections.MapStatus(BuildingStatus.Realized));
+                    var wkbReader = WKBReaderFactory.Create();
+                    var polygon = wkbReader.Read(@event.ExtendedWkbGeometry.ToByteArray());
+                    item.Geometry!.AsBinary().Should().BeEquivalentTo(polygon.AsBinary());
+                    item.GeometryMethod.Should().Be(GeometrieMethode.IngemetenGRB.ToString());
+
+                    item!.Version.Should().Be(@event.Provenance.Timestamp);
+                });
+        }
+
+        [Fact]
+        public async Task WhenBuildingWasMerged()
+        {
+            var buildingWasPlanned = _fixture.Create<BuildingWasPlannedV2>();
+            var @event = _fixture.Create<BuildingWasMerged>();
+
+            await Sut
+                .Given(
+                    new Envelope<BuildingWasPlannedV2>(
+                        new Envelope(
+                            buildingWasPlanned,
+                            new Dictionary<string, object> { { AddEventHashPipe.HashMetadataKey, buildingWasPlanned.GetHash() } })),
+                    new Envelope<BuildingWasMerged>(
+                        new Envelope(
+                            @event,
+                            new Dictionary<string, object> { { AddEventHashPipe.HashMetadataKey, @event.GetHash() } })))
+                .Then(async ct =>
+                {
+                    var item = await ct.BuildingsV2.FindAsync(@event.BuildingPersistentLocalId);
+                    item.Should().NotBeNull();
+
+                    item.Status.Should().Be(BuildingV2Projections.MapStatus(BuildingStatus.Retired));
+                    item!.Version.Should().Be(@event.Provenance.Timestamp);
+                });
+        }
+
+        [Fact]
+        public async Task WhenBuildingUnitWasTransferred()
+        {
+            var buildingWasPlannedV2 = _fixture.Create<BuildingWasPlannedV2>();
+
+            var oldBuildingPersistentLocalId = new BuildingPersistentLocalId(2);
+            var buildingUnitPersistentLocalId = new BuildingUnitPersistentLocalId(3);
+
+            var @event = new BuildingUnitWasTransferred(
+                new BuildingPersistentLocalId(buildingWasPlannedV2.BuildingPersistentLocalId),
+                BuildingUnit.Transfer(
+                    _ => { },
+                    new BuildingPersistentLocalId(buildingWasPlannedV2.BuildingPersistentLocalId),
+                    buildingUnitPersistentLocalId,
+                    BuildingUnitFunction.Unknown,
+                    BuildingUnitStatus.Realized,
+                    new List<AddressPersistentLocalId>(),
+                    new BuildingUnitPosition(new ExtendedWkbGeometry("".ToByteArray()), BuildingUnitPositionGeometryMethod.AppointedByAdministrator),
+                    false), oldBuildingPersistentLocalId,
+                new BuildingUnitPosition(new ExtendedWkbGeometry("".ToByteArray()), BuildingUnitPositionGeometryMethod.AppointedByAdministrator));
+            @event.SetFixtureProvenance(_fixture);
+
+            await Sut
+                .Given(
+                    new Envelope<BuildingWasPlannedV2>(new Envelope(buildingWasPlannedV2, new Dictionary<string, object>
+                    {
+                        { AddEventHashPipe.HashMetadataKey, buildingWasPlannedV2.GetHash() }
+                    })),
+                    new Envelope<BuildingUnitWasTransferred>(
+                        new Envelope(
+                            @event,
+                            new Dictionary<string, object> { { AddEventHashPipe.HashMetadataKey, @event.GetHash() } })))
+                .Then(async ct =>
+                {
+                    var item = await ct.BuildingsV2.FindAsync(buildingWasPlannedV2.BuildingPersistentLocalId);
+                    item.Should().NotBeNull();
+
+                    item!.Version.Should().Be(@event.Provenance.Timestamp);
+                });
+        }
+
+        [Fact]
+        public async Task WhenBuildingUnitWasMoved()
+        {
+            var buildingWasPlannedV2 = _fixture.Create<BuildingWasPlannedV2>();
+
+            var newBuildingPersistentLocalId = new BuildingPersistentLocalId(2);
+            var buildingUnitPersistentLocalId = new BuildingUnitPersistentLocalId(3);
+
+            var @event = new BuildingUnitWasMoved(
+                new BuildingPersistentLocalId(buildingWasPlannedV2.BuildingPersistentLocalId),
+                buildingUnitPersistentLocalId,
+                newBuildingPersistentLocalId);
+            @event.SetFixtureProvenance(_fixture);
+
+            await Sut
+                .Given(
+                    new Envelope<BuildingWasPlannedV2>(new Envelope(buildingWasPlannedV2, new Dictionary<string, object>
+                    {
+                        { AddEventHashPipe.HashMetadataKey, buildingWasPlannedV2.GetHash() }
+                    })),
+                    new Envelope<BuildingUnitWasMoved>(
+                        new Envelope(
+                            @event,
+                            new Dictionary<string, object> { { AddEventHashPipe.HashMetadataKey, @event.GetHash() } })))
+                .Then(async ct =>
+                {
+                    var item = await ct.BuildingsV2.FindAsync(buildingWasPlannedV2.BuildingPersistentLocalId);
+                    item.Should().NotBeNull();
+
+                    item!.Version.Should().Be(@event.Provenance.Timestamp);
                 });
         }
 

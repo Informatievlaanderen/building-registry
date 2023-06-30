@@ -191,7 +191,7 @@
                 x.Error(
                     It.IsAny<Guid>(),
                     new TicketError(
-                        $"De gebouwId '{puri}' is niet gekend in het gebouwenregister.",
+                        $"Het gebouwId '{puri}' is niet gekend in het gebouwenregister.",
                         "GebouwIdNietGekendValidatie"),
                     CancellationToken.None));
         }

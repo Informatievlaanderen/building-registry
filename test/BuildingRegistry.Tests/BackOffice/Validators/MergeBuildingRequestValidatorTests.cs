@@ -103,7 +103,7 @@ namespace BuildingRegistry.Tests.BackOffice.Validators
 
             result.ShouldHaveValidationErrorFor(x => x.SamenvoegenGebouwen)
                 .WithErrorCode("GebouwIdNietGekendValidatie")
-                .WithErrorMessage($"De gebouwId '{puri}' is niet gekend in het gebouwenregister.");
+                .WithErrorMessage($"Het gebouwId '{puri}' is niet gekend in het gebouwenregister.");
         }
 
         [Fact]

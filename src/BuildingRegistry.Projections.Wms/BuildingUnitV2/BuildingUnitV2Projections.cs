@@ -373,10 +373,9 @@ namespace BuildingRegistry.Projections.Wms.BuildingUnitV2
                 SetVersion(unit!, message.Message.Provenance.Timestamp);
             });
 
-            When<Envelope<BuildingUnitWasMoved>>(async (context, message, ct) =>
+            When<Envelope<BuildingUnitWasMoved>>(async (_, _, _) =>
             {
-                var unit = await context.BuildingUnitsV2.FindAsync(message.Message.BuildingUnitPersistentLocalId);
-                SetVersion(unit!, message.Message.Provenance.Timestamp);
+                // BuildingUnitWasTransferred couples the unit to another building and BuildingUnitMoved is an event applicable on the old building.
             });
         }
 

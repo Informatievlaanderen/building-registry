@@ -441,18 +441,18 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetailV2
                     item.Function = BuildingUnitFunction.Parse(message.Message.Function);
                     item.Status = BuildingUnitStatus.Parse(message.Message.Status);
                     item.HasDeviation = message.Message.HasDeviation;
+                    item.Addresses = new Collection<BuildingUnitDetailAddressItemV2>(
+                        message.Message.AddressPersistentLocalIds
+                            .Select(x => new BuildingUnitDetailAddressItemV2(message.Message.BuildingUnitPersistentLocalId, x))
+                            .ToList());
                     item.Version = message.Message.Provenance.Timestamp;
                     UpdateHash(item, message);
                 }, ct);
             });
 
-            When<Envelope<BuildingUnitWasMoved>>(async (context, message, ct) =>
+            When<Envelope<BuildingUnitWasMoved>>(async (_, _, _) =>
             {
-                await Update(context, message.Message.BuildingUnitPersistentLocalId, item =>
-                {
-                    item.Version = message.Message.Provenance.Timestamp;
-                    UpdateHash(item, message);
-                }, ct);
+                // BuildingUnitWasTransferred couples the unit to another building and BuildingUnitMoved is an event applicable on the old building.
             });
         }
 

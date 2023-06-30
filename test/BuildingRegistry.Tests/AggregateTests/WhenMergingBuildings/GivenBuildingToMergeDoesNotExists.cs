@@ -15,7 +15,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenMergingBuildings
         }
 
         [Fact]
-        public void ThenAggregateNotFoundExceptionWasThrown()
+        public void BuildingToMergeNotFoundExceptionWasThrown()
         {
             var command = Fixture.Create<MergeBuildings>();
 
