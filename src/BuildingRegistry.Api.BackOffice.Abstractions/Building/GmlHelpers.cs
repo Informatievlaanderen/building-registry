@@ -21,7 +21,7 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.Building
 
             geometry.SRID = ExtendedWkbGeometry.SridLambert72;
 
-            return new ExtendedWkbGeometry(geometry.AsBinary());
+            return ExtendedWkbGeometry.CreateEWkb(geometry.AsBinary());
         }
     }
 }
