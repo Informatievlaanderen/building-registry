@@ -1,3 +1,10 @@
+## [3.83.1](https://github.com/informatievlaanderen/building-registry/compare/v3.83.0...v3.83.1) (2023-07-03)
+
+
+### Bug Fixes
+
+* GmlHelpers ToExtendedWkbGeometry method ([3835849](https://github.com/informatievlaanderen/building-registry/commit/3835849821daa1ba988c52b44943423dc2814cf0))
+
 # [3.83.0](https://github.com/informatievlaanderen/building-registry/compare/v3.82.0...v3.83.0) (2023-06-30)
 
 
