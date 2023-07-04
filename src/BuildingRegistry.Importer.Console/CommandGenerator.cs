@@ -4,11 +4,11 @@ namespace BuildingRegistry.Importer.Console
     using Aiv.Vbr.CentraalBeheer.Crab.Entity;
     using Be.Vlaanderen.Basisregisters.Crab;
     using Be.Vlaanderen.Basisregisters.GrAr.Import.Processing.Generate;
-    using BuildingRegistry.Building.Commands.Crab;
+    using BuildingRegistry.Legacy;
+    using BuildingRegistry.Legacy.Commands.Crab;
     using Crab;
     using Crab.HouseNumber;
-    using Crab.Subaddress;
-    using ValueObjects;
+    using Crab.Subaddress;    
     using Dapper;
     using Microsoft.Data.SqlClient;
     using NodaTime;

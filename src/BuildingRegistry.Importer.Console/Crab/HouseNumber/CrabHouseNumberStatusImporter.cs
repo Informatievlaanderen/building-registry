@@ -4,8 +4,8 @@ namespace BuildingRegistry.Importer.Console.Crab.HouseNumber
     using Aiv.Vbr.CentraalBeheer.Crab.Entity;
     using Aiv.Vbr.CrabModel;
     using Be.Vlaanderen.Basisregisters.Crab;
-    using BuildingRegistry.Building.Commands.Crab;
-    using BuildingRegistry.ValueObjects.Crab;
+    using BuildingRegistry.Legacy.Crab;
+    using BuildingRegistry.Legacy.Commands.Crab;    
     using NodaTime;
     using System;
     using System.Collections.Generic;

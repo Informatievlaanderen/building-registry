@@ -69,7 +69,8 @@ namespace BuildingRegistry.Importer.Console
                             rollOnFileSizeLimit: true,
                             rollingInterval: RollingInterval.Day)
                         .WriteTo.Console(LogEventLevel.Information))
-                    .UseHttpApiProxyConfig(settings)
+                    //.UseHttpApiProxyConfig(settings)
+                    .UseApiProxyFactory(FileBasedProxyFactory.BuildFileBasedProxyFactory)
                     .UseCommandProcessorConfig(settings)
                     .UseDefaultSerializerSettingsForCrabImports()
                     .UseImportFeed(new ImportFeed { Name = settings.FeedName })
