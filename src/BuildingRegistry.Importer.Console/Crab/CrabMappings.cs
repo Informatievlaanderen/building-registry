@@ -2,7 +2,7 @@ namespace BuildingRegistry.Importer.Console.Crab
 {
     using Aiv.Vbr.CrabModel;
     using Be.Vlaanderen.Basisregisters.Crab;
-    using BuildingRegistry.ValueObjects.Crab;
+    using BuildingRegistry.Legacy.Crab;
     using System;
 
     public static class CrabMappings

@@ -2,9 +2,9 @@ namespace BuildingRegistry.Importer.Console.Crab
 {
     using Aiv.Vbr.CentraalBeheer.Crab.Entity;
     using Be.Vlaanderen.Basisregisters.Crab;
-    using BuildingRegistry.Building.Commands.Crab;
-    using ValueObjects;
-    using BuildingRegistry.ValueObjects.Crab;
+    using BuildingRegistry.Legacy;
+    using BuildingRegistry.Legacy.Crab;
+    using BuildingRegistry.Legacy.Commands.Crab;    
     using System;
     using System.Collections.Generic;
     using System.Linq;

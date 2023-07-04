@@ -3,9 +3,9 @@ namespace BuildingRegistry.Importer.Console.Crab.Subaddress
     using Aiv.Vbr.CentraalBeheer.Crab.CrabHist;
     using Aiv.Vbr.CentraalBeheer.Crab.Entity;
     using Be.Vlaanderen.Basisregisters.Crab;
-    using BuildingRegistry.Building.Commands.Crab;
-    using ValueObjects;
-    using BuildingRegistry.ValueObjects.Crab;
+    using BuildingRegistry.Legacy;
+    using BuildingRegistry.Legacy.Crab;
+    using BuildingRegistry.Legacy.Commands.Crab;
     using NodaTime;
     using System;
     using System.Collections.Generic;
