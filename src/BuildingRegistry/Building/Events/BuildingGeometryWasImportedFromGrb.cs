@@ -10,7 +10,7 @@ namespace BuildingRegistry.Building.Events
     using Newtonsoft.Json;
     using NodaTime;
 
-    [EventTags(EventTag.For.Sync, EventTag.For.Edit, Tag.Building)]
+    [EventTags(Tag.Building)]
     [EventName(EventName)]
     [EventDescription("Het gebouw werd geïmporteerd door GRB.")]
     public sealed class BuildingGeometryWasImportedFromGrb : IBuildingEvent
