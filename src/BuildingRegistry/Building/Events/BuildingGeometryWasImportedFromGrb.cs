@@ -12,7 +12,7 @@ namespace BuildingRegistry.Building.Events
 
     [EventTags(EventTag.For.Sync, EventTag.For.Edit, Tag.Building)]
     [EventName(EventName)]
-    [EventDescription("Het gebouw werd geimporteerd door GRB.")]
+    [EventDescription("Het gebouw werd geïmporteerd door GRB.")]
     public sealed class BuildingGeometryWasImportedFromGrb : IBuildingEvent
     {
         public const string EventName = "BuildingGeometryWasImportedFromGrb"; // BE CAREFUL CHANGING THIS!!
@@ -20,30 +20,32 @@ namespace BuildingRegistry.Building.Events
         [EventPropertyDescription("Objectidentificator van het gebouw.")]
         public int BuildingPersistentLocalId { get; }
 
-        [EventPropertyDescription("GRB identificator.")]
+        [EventPropertyDescription("De gebouw identificator van het GRB.")]
         public long Idn { get; }
 
-        [EventPropertyDescription("Versiedatum.")]
+        [EventPropertyDescription("De versiedatum van het gebouw.")]
         public Instant VersionDate { get; }
 
-        [EventPropertyDescription("Einddatum (null indien niet van toepassing).")]
+        [EventPropertyDescription("De einddatum van het GRB gebouw, indien geen einddatum dan is dit veld leeg.")]
         public Instant? EndDate { get; }
 
-        [EventPropertyDescription("Versie GRB identificator.")]
+        [EventPropertyDescription("Versie van de gebouw identificator van het GRB.")]
         public int IdnVersion { get; }
 
-        [EventPropertyDescription("TODO")] public string GrbObject { get; }
+        [EventPropertyDescription("Het soort GRB object.")]
+        public string GrbObject { get; }
 
-        [EventPropertyDescription("Type afhankelijk van grbobject.")]
+        [EventPropertyDescription("Type afhankelijk van GrbObject.")]
         public string GrbObjectType { get; }
 
-        [EventPropertyDescription("Objectidentificator van het gebouw.")]
+        [EventPropertyDescription("Het soort event afkomstig van het GRB.")]
         public string EventType { get; }
 
-        [EventPropertyDescription("Extended WKB-voorstelling van de gebouwgeometrie (Hexadecimale notatie).")]
+        [EventPropertyDescription("De geometrie van het gebouw afkomstig van het GRB.")]
         public string Geometry { get; }
 
-        [EventPropertyDescription("TODO")] public decimal? Overlap { get; }
+        [EventPropertyDescription("Percentage van overlap welke door de GRB matching werd gedetecteerd, indien geen overlap dan is dit veld leeg.")]
+        public decimal? Overlap { get; }
 
         [EventPropertyDescription("Metadata bij het event.")]
         public ProvenanceData Provenance { get; private set; }
