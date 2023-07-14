@@ -915,13 +915,6 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
                     .AddAsync(newBuildingSyndicationItem, ct);
             });
 
-            When<Envelope<BuildingGeometryWasImportedFromGrb>>(async (context, message, ct) =>
-            {
-                await context.CreateNewBuildingSyndicationItem(message.Message.BuildingPersistentLocalId, message, _ =>
-                {
-                }, ct);
-            });
-
             When<Envelope<BuildingOutlineWasChanged>>(async (context, message, ct) =>
             {
                 await context.CreateNewBuildingSyndicationItem(message.Message.BuildingPersistentLocalId, message, item =>
