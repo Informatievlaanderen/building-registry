@@ -1,3 +1,13 @@
+## [3.83.2](https://github.com/informatievlaanderen/building-registry/compare/v3.83.1...v3.83.2) (2023-07-14)
+
+
+### Bug Fixes
+
+* BuildingGeometryWasImportedFromGrb event description ([b64b245](https://github.com/informatievlaanderen/building-registry/commit/b64b24595b8b47a276654953fca11db6371c9ce9))
+* don't project BuildingGeometryWasImportedFromGrb in syndication ([58900ee](https://github.com/informatievlaanderen/building-registry/commit/58900ee213d2bc808ff0c677e80376b7645c4e5a))
+* importer legacy ([5c19b30](https://github.com/informatievlaanderen/building-registry/commit/5c19b30eebb5703bac57fde73520a35aa167cfef))
+* the BuildingGeometryWasImportedFromGrb event should not be visible in sync or docs ([7b7d6d4](https://github.com/informatievlaanderen/building-registry/commit/7b7d6d4a841ee252cc092bfc3e1f475fff279f22))
+
 ## [3.83.1](https://github.com/informatievlaanderen/building-registry/compare/v3.83.0...v3.83.1) (2023-07-03)
 
 
