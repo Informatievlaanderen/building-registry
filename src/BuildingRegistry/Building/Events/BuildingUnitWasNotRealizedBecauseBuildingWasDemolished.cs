@@ -10,7 +10,7 @@ namespace BuildingRegistry.Building.Events
 
     [EventTags(EventTag.For.Sync, EventTag.For.Edit, Tag.Building)]
     [EventName(EventName)]
-    [EventDescription("De gebouweenheid werd niet gerealiseerd omdat het gebouw gesloopt werd.")]
+    [EventDescription("De gebouweenheid met status gepland werd niet gerealiseerd door sloop gebouw.")]
     public sealed class BuildingUnitWasNotRealizedBecauseBuildingWasDemolished : IBuildingEvent, IHasBuildingUnitPersistentLocalId
     {
         public const string EventName = "BuildingUnitWasNotRealizedBecauseBuildingWasDemolished"; // BE CAREFUL CHANGING THIS!!

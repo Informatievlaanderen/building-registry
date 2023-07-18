@@ -11,9 +11,9 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenDetachingRemovedAddressFromB
     using Building.Events;
     using Extensions;
     using FluentAssertions;
-    using Moq;
     using Xunit;
     using Xunit.Abstractions;
+    using BuildingUnitStatus = BuildingRegistry.Legacy.BuildingUnitStatus;
 
     public class GivenBuildingWithBuildingUnit : BuildingRegistryTest
     {
@@ -28,7 +28,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenDetachingRemovedAddressFromB
             var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
                 .WithBuildingPersistentLocalId(command.BuildingPersistentLocalId)
                 .WithBuildingUnit(
-                    BuildingRegistry.Legacy.BuildingUnitStatus.Realized,
+                    BuildingUnitStatus.Realized,
                     command.BuildingUnitPersistentLocalId,
                     attachedAddresses: new List<AddressPersistentLocalId> { command.AddressPersistentLocalId },
                     isRemoved: false)
@@ -55,7 +55,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenDetachingRemovedAddressFromB
             var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
                 .WithBuildingPersistentLocalId(command.BuildingPersistentLocalId)
                 .WithBuildingUnit(
-                    BuildingRegistry.Legacy.BuildingUnitStatus.Realized,
+                    BuildingUnitStatus.Realized,
                     command.BuildingUnitPersistentLocalId,
                     attachedAddresses: new List<AddressPersistentLocalId>(0),
                     isRemoved: false)
@@ -76,7 +76,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenDetachingRemovedAddressFromB
             var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
                 .WithBuildingPersistentLocalId(new BuildingPersistentLocalId(buildingUnitAddressWasDetachedBecauseAddressWasRemoved.BuildingPersistentLocalId))
                 .WithBuildingUnit(
-                    BuildingRegistry.Legacy.BuildingUnitStatus.Realized,
+                    BuildingUnitStatus.Realized,
                     new BuildingUnitPersistentLocalId(buildingUnitAddressWasDetachedBecauseAddressWasRemoved.BuildingUnitPersistentLocalId),
                     attachedAddresses: new List<AddressPersistentLocalId>
                     {
