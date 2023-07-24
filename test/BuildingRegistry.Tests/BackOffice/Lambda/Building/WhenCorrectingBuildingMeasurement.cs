@@ -339,7 +339,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
                     It.IsAny<Guid>(),
                     new TicketError(
                         "Deze actie is enkel toegestaan op gebouwen met status 'gerealiseerd'.",
-                        "GebouwGeplandOfInAanbouwOfNietGerealiseerdOfGehistoreerd"),
+                        "GebouwGeplandInAanbouwGehistoreerdOfNietGerealiseerd"),
                     CancellationToken.None));
         }
     }
