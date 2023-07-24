@@ -1,3 +1,10 @@
+## [3.83.3](https://github.com/informatievlaanderen/building-registry/compare/v3.83.2...v3.83.3) (2023-07-24)
+
+
+### Bug Fixes
+
+* change event descriptions ([957cbb4](https://github.com/informatievlaanderen/building-registry/commit/957cbb488176790db0fcc6d993cee029bfc65f40))
+
 ## [3.83.2](https://github.com/informatievlaanderen/building-registry/compare/v3.83.1...v3.83.2) (2023-07-14)
 
 
