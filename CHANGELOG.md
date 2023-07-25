@@ -1,3 +1,10 @@
+## [3.83.4](https://github.com/informatievlaanderen/building-registry/compare/v3.83.3...v3.83.4) (2023-07-25)
+
+
+### Bug Fixes
+
+* errorcode when correcting/changing building geometry ([2474b5e](https://github.com/informatievlaanderen/building-registry/commit/2474b5eb9faaae97fe9bed5e9e185d742b2665d8))
+
 ## [3.83.3](https://github.com/informatievlaanderen/building-registry/compare/v3.83.2...v3.83.3) (2023-07-24)
 
 
