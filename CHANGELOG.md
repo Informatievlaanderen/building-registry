@@ -1,3 +1,10 @@
+## [3.83.5](https://github.com/informatievlaanderen/building-registry/compare/v3.83.4...v3.83.5) (2023-07-28)
+
+
+### Bug Fixes
+
+* use buildingUnitPLID instead of buildingPLID in buildingUnit snapshot methods ([b1c99e5](https://github.com/informatievlaanderen/building-registry/commit/b1c99e5dd41290b21c7e2b5b2424a9ffcc474721))
+
 ## [3.83.4](https://github.com/informatievlaanderen/building-registry/compare/v3.83.3...v3.83.4) (2023-07-25)
 
 
