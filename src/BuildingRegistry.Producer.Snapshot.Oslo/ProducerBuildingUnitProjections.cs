@@ -472,7 +472,7 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo
                 {
                     await FindAndProduce(async () =>
                             await snapshotManager.FindMatchingSnapshot(
-                                message.Message.BuildingPersistentLocalId.ToString(),
+                                message.Message.BuildingUnitPersistentLocalId.ToString(),
                                 message.Message.Provenance.Timestamp,
                                 message.Message.GetHash(),
                                 message.Position,
@@ -487,7 +487,7 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo
                 {
                     await FindAndProduce(async () =>
                             await snapshotManager.FindMatchingSnapshot(
-                                message.Message.BuildingPersistentLocalId.ToString(),
+                                message.Message.BuildingUnitPersistentLocalId.ToString(),
                                 message.Message.Provenance.Timestamp,
                                 message.Message.GetHash(),
                                 message.Position,
