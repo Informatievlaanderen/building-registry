@@ -1,3 +1,15 @@
+# [3.84.0](https://github.com/informatievlaanderen/building-registry/compare/v3.83.5...v3.84.0) (2023-08-08)
+
+
+### Bug Fixes
+
+* change how lambda is deployed in test ([ce24544](https://github.com/informatievlaanderen/building-registry/commit/ce245448dba550e5755fd5fc7134dc09ce82c152))
+
+
+### Features
+
+* add BUILDINGUNIT_SNAPSHOT_OSLO_STREAM_FLATTEN.ksql ([4e1d2cc](https://github.com/informatievlaanderen/building-registry/commit/4e1d2cc4bb1f192202ddb737afaf1f6ff76659ba))
+
 ## [3.83.5](https://github.com/informatievlaanderen/building-registry/compare/v3.83.4...v3.83.5) (2023-07-28)
 
 
