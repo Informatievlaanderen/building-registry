@@ -107,6 +107,7 @@ Target.create "Containerize_Producer" (fun _ -> containerize "BuildingRegistry.P
 Target.create "Containerize_ProducerSnapshotOslo" (fun _ -> containerize "BuildingRegistry.Producer.Snapshot.Oslo" "producer-snapshot-oslo")
 
 Target.create "SetAssemblyVersions" (fun _ -> setVersions "SolutionInfo.cs")
+
 // --------------------------------------------------------------------------------
 
 Target.create "Build" ignore
