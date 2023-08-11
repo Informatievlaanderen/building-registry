@@ -17,7 +17,7 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.Validation
             public static class InvalidGeometryMethod
             {
                 public const string Code = "GebouwGeometrieMethodeGeschetst";
-                public const string Message = "Deze actie is enkel toegestaan op gebouwen met geometrieMethode 'ingemeten'.";
+                public const string Message = "Deze actie is enkel toegestaan op gebouwen met geometrieMethode 'ingemetenGRB'.";
 
                 public static TicketError ToTicketError() => new(Message, Code);
             }
