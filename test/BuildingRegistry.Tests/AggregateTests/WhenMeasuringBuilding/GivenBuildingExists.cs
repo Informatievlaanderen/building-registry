@@ -92,6 +92,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenMeasuringBuilding
 
         [Theory]
         [InlineData("Planned")]
+        [InlineData("NotRealized")]
         [InlineData("UnderConstruction")]
         public void WithBuildingStatus_ThenBuildingWasRealizedAndMeasured(string buildingStatus)
         {
@@ -212,7 +213,6 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenMeasuringBuilding
         }
 
         [Theory]
-        [InlineData("NotRealized")]
         [InlineData("Retired")]
         public void WithInvalidBuildingStatus_ThenBuildingHasInvalidStatusExceptionWasThrown(string status)
         {
