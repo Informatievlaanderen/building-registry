@@ -1,3 +1,11 @@
+## [3.84.2](https://github.com/informatievlaanderen/building-registry/compare/v3.84.1...v3.84.2) (2023-08-14)
+
+
+### Bug Fixes
+
+* change measure building validation rule for notrealized building ([2a82c28](https://github.com/informatievlaanderen/building-registry/commit/2a82c284b2783c2a5467e5405746cc3af11d4dfc))
+* errormessage ([0837bce](https://github.com/informatievlaanderen/building-registry/commit/0837bce4e81d7266c610aab79e62d2df0d827a16))
+
 ## [3.84.1](https://github.com/informatievlaanderen/building-registry/compare/v3.84.0...v3.84.1) (2023-08-11)
 
 
