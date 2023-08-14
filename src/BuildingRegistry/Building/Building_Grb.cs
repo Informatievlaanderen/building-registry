@@ -60,7 +60,7 @@ namespace BuildingRegistry.Building
         {
             GuardRemovedBuilding();
 
-            GuardValidStatusses(BuildingStatus.Planned, BuildingStatus.UnderConstruction, BuildingStatus.Realized);
+            GuardValidStatusses(BuildingStatus.Planned, BuildingStatus.UnderConstruction, BuildingStatus.Realized, BuildingStatus.NotRealized);
 
             var geometry = WKBReaderFactory.Create().Read(extendedWkbGeometry);
 
@@ -71,7 +71,7 @@ namespace BuildingRegistry.Building
                 return;
             }
 
-            if (BuildingStatus == BuildingStatus.Planned || BuildingStatus == BuildingStatus.UnderConstruction)
+            if (BuildingStatus != BuildingStatus.Realized)
             {
                 ApplyChange(new BuildingWasRealizedV2(BuildingPersistentLocalId));
             }
