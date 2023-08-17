@@ -27,6 +27,7 @@ namespace BuildingRegistry.Api.BackOffice.IntegrationTests
         [InlineData("/v2/gebouwen/1/acties/corrigeren/inaanbouwplaatsing", "dv_gr_geschetstgebouw_beheer")]
         [InlineData("/v2/gebouwen/1/acties/wijzigen/schetsgeometriepolygoon", "dv_gr_geschetstgebouw_beheer")]
         [InlineData("/v2/gebouwen/1/acties/verwijderen", "dv_gr_geschetstgebouw_beheer dv_gr_geschetstgebouw_uitzonderingen")]
+        [InlineData("/v2/gebouwen/acties/samenvoegen", "dv_gr_geschetstgebouw_uitzonderingen")]
         [InlineData("/v2/gebouweenheden/acties/plannen", "dv_gr_geschetstgebouw_beheer")]
         [InlineData("/v2/gebouweenheden/1/acties/realiseren", "dv_gr_geschetstgebouw_beheer")]
         [InlineData("/v2/gebouweenheden/1/acties/corrigeren/realisering", "dv_gr_geschetstgebouw_beheer")]
@@ -53,6 +54,7 @@ namespace BuildingRegistry.Api.BackOffice.IntegrationTests
             Assert.NotNull(response);
             Assert.NotEqual(HttpStatusCode.Unauthorized, response.StatusCode);
             Assert.NotEqual(HttpStatusCode.Forbidden, response.StatusCode);
+            Assert.NotEqual(HttpStatusCode.NotFound, response.StatusCode);
         }
 
         [Theory]
@@ -65,6 +67,7 @@ namespace BuildingRegistry.Api.BackOffice.IntegrationTests
         [InlineData("/v2/gebouwen/1/acties/corrigeren/inaanbouwplaatsing")]
         [InlineData("/v2/gebouwen/1/acties/wijzigen/schetsgeometriepolygoon")]
         [InlineData("/v2/gebouwen/1/acties/verwijderen")]
+        [InlineData("/v2/gebouwen/acties/samenvoegen")]
         [InlineData("/v2/gebouweenheden/acties/plannen")]
         [InlineData("/v2/gebouweenheden/1/acties/realiseren")]
         [InlineData("/v2/gebouweenheden/1/acties/corrigeren/realisering")]
@@ -102,6 +105,7 @@ namespace BuildingRegistry.Api.BackOffice.IntegrationTests
         [InlineData("/v2/gebouwen/1/acties/verwijderen")]
         [InlineData("/v2/gebouwen/1/acties/verwijderen", "dv_gr_geschetstgebouw_beheer")]
         [InlineData("/v2/gebouwen/1/acties/verwijderen", "dv_gr_geschetstgebouw_uitzonderingen")]
+        [InlineData("/v2/gebouwen/acties/samenvoegen", "dv_gr_geschetstgebouw_beheer")]
         [InlineData("/v2/gebouweenheden/acties/plannen")]
         [InlineData("/v2/gebouweenheden/1/acties/realiseren")]
         [InlineData("/v2/gebouweenheden/1/acties/corrigeren/realisering")]

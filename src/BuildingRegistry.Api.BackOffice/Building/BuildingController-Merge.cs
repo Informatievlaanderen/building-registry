@@ -5,8 +5,11 @@ namespace BuildingRegistry.Api.BackOffice.Building
     using Abstractions.Building.Requests;
     using Abstractions.Building.SqsRequests;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
+    using Be.Vlaanderen.Basisregisters.Auth.AcmIdm;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using FluentValidation;
+    using Microsoft.AspNetCore.Authentication.JwtBearer;
+    using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
     using Swashbuckle.AspNetCore.Filters;
@@ -27,6 +30,8 @@ namespace BuildingRegistry.Api.BackOffice.Building
         [SwaggerRequestExample(typeof(MergeBuildingRequest), typeof(MergeBuildingRequestExamples))]
         [SwaggerResponseExample(StatusCodes.Status400BadRequest, typeof(BadRequestResponseExamples))]
         [SwaggerResponseExample(StatusCodes.Status500InternalServerError, typeof(InternalServerErrorResponseExamples))]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme,
+            Policy = PolicyNames.GeschetstGebouw.InterneBijwerker)]
         public async Task<IActionResult> Merge(
             [FromServices] IValidator<MergeBuildingRequest> validator,
             [FromServices] MergeBuildingsSqsRequestFactory mergeBuildingsSqsRequestFactory,
