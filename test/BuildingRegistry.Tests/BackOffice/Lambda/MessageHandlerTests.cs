@@ -41,7 +41,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda
             await sut.HandleMessage(
                 messageData,
                 messageMetadata,
-                CancellationToken.None);
+                It.IsAny<CancellationToken>());
 
             // Assert
             mediator.VerifyNoOtherCalls();
@@ -65,7 +65,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda
             var act = async () => await sut.HandleMessage(
                 messageData,
                 messageMetadata,
-                CancellationToken.None);
+                It.IsAny<CancellationToken>());
 
             // Assert
             await act.Should().ThrowAsync<NotImplementedException>();
@@ -89,7 +89,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda
             await sut.HandleMessage(
                 messageData,
                 messageMetadata,
-                CancellationToken.None);
+                It.IsAny<CancellationToken>());
 
             // Assert
             mediator
@@ -100,7 +100,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda
                     request.IfMatchHeaderValue == messageData.IfMatchHeaderValue &&
                     request.Provenance == messageData.ProvenanceData.ToProvenance() &&
                     request.Metadata == messageData.Metadata
-                ), CancellationToken.None), Times.Once);
+                ), It.IsAny<CancellationToken>()), Times.Once);
         }
 
         [Fact]
@@ -121,7 +121,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda
             await sut.HandleMessage(
                 messageData,
                 messageMetadata,
-                CancellationToken.None);
+                It.IsAny<CancellationToken>());
 
             // Assert
             mediator
@@ -132,7 +132,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda
                     request.IfMatchHeaderValue == messageData.IfMatchHeaderValue &&
                     request.Provenance == messageData.ProvenanceData.ToProvenance() &&
                     request.Metadata == messageData.Metadata
-                ), CancellationToken.None), Times.Once);
+                ), It.IsAny<CancellationToken>()), Times.Once);
         }
 
         [Fact]
@@ -153,7 +153,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda
             await sut.HandleMessage(
                 messageData,
                 messageMetadata,
-                CancellationToken.None);
+                It.IsAny<CancellationToken>());
 
             // Assert
             mediator
@@ -164,7 +164,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda
                     request.IfMatchHeaderValue == messageData.IfMatchHeaderValue &&
                     request.Provenance == messageData.ProvenanceData.ToProvenance() &&
                     request.Metadata == messageData.Metadata
-                ), CancellationToken.None), Times.Once);
+                ), It.IsAny<CancellationToken>()), Times.Once);
         }
 
         [Fact]
@@ -185,7 +185,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda
             await sut.HandleMessage(
                 messageData,
                 messageMetadata,
-                CancellationToken.None);
+                It.IsAny<CancellationToken>());
 
             // Assert
             mediator
@@ -196,7 +196,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda
                     request.IfMatchHeaderValue == messageData.IfMatchHeaderValue &&
                     request.Provenance == messageData.ProvenanceData.ToProvenance() &&
                     request.Metadata == messageData.Metadata
-                ), CancellationToken.None), Times.Once);
+                ), It.IsAny<CancellationToken>()), Times.Once);
         }
 
         [Fact]
@@ -217,7 +217,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda
             await sut.HandleMessage(
                 messageData,
                 messageMetadata,
-                CancellationToken.None);
+                It.IsAny<CancellationToken>());
 
             // Assert
             mediator
@@ -228,7 +228,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda
                     request.IfMatchHeaderValue == null &&
                     request.Provenance == messageData.ProvenanceData.ToProvenance() &&
                     request.Metadata == messageData.Metadata
-                ), CancellationToken.None), Times.Once);
+                ), It.IsAny<CancellationToken>()), Times.Once);
         }
 
         [Fact]
@@ -249,7 +249,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda
             await sut.HandleMessage(
                 messageData,
                 messageMetadata,
-                CancellationToken.None);
+                It.IsAny<CancellationToken>());
 
             // Assert
             mediator
@@ -261,7 +261,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda
                     request.IfMatchHeaderValue == messageData.IfMatchHeaderValue &&
                     request.Provenance == messageData.ProvenanceData.ToProvenance() &&
                     request.Metadata == messageData.Metadata
-                ), CancellationToken.None), Times.Once);
+                ), It.IsAny<CancellationToken>()), Times.Once);
         }
 
         [Fact]
@@ -282,7 +282,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda
             await sut.HandleMessage(
                 messageData,
                 messageMetadata,
-                CancellationToken.None);
+                It.IsAny<CancellationToken>());
 
             // Assert
             mediator
@@ -293,7 +293,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda
                     request.IfMatchHeaderValue == messageData.IfMatchHeaderValue &&
                     request.Provenance == messageData.ProvenanceData.ToProvenance() &&
                     request.Metadata == messageData.Metadata
-                ), CancellationToken.None), Times.Once);
+                ), It.IsAny<CancellationToken>()), Times.Once);
         }
 
         [Fact]
@@ -314,7 +314,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda
             await sut.HandleMessage(
                 messageData,
                 messageMetadata,
-                CancellationToken.None);
+                It.IsAny<CancellationToken>());
 
             // Assert
             mediator
@@ -325,7 +325,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda
                     request.IfMatchHeaderValue == messageData.IfMatchHeaderValue &&
                     request.Provenance == messageData.ProvenanceData.ToProvenance() &&
                     request.Metadata == messageData.Metadata
-                ), CancellationToken.None), Times.Once);
+                ), It.IsAny<CancellationToken>()), Times.Once);
         }
 
         [Fact]
@@ -346,7 +346,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda
             await sut.HandleMessage(
                 messageData,
                 messageMetadata,
-                CancellationToken.None);
+                It.IsAny<CancellationToken>());
 
             // Assert
             mediator
@@ -357,7 +357,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda
                     request.IfMatchHeaderValue == messageData.IfMatchHeaderValue &&
                     request.Provenance == messageData.ProvenanceData.ToProvenance() &&
                     request.Metadata == messageData.Metadata
-                ), CancellationToken.None), Times.Once);
+                ), It.IsAny<CancellationToken>()), Times.Once);
         }
 
         [Fact]
@@ -378,7 +378,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda
             await sut.HandleMessage(
                 messageData,
                 messageMetadata,
-                CancellationToken.None);
+                It.IsAny<CancellationToken>());
 
             // Assert
             mediator
@@ -389,7 +389,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda
                     request.IfMatchHeaderValue == messageData.IfMatchHeaderValue &&
                     request.Provenance == messageData.ProvenanceData.ToProvenance() &&
                     request.Metadata == messageData.Metadata
-                ), CancellationToken.None), Times.Once);
+                ), It.IsAny<CancellationToken>()), Times.Once);
         }
 
         [Fact]
@@ -410,7 +410,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda
             await sut.HandleMessage(
                 messageData,
                 messageMetadata,
-                CancellationToken.None);
+                It.IsAny<CancellationToken>());
 
             // Assert
             mediator
@@ -421,7 +421,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda
                     request.IfMatchHeaderValue == null &&
                     request.Provenance == messageData.ProvenanceData.ToProvenance() &&
                     request.Metadata == messageData.Metadata
-                ), CancellationToken.None), Times.Once);
+                ), It.IsAny<CancellationToken>()), Times.Once);
         }
 
         [Fact]
@@ -442,7 +442,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda
             await sut.HandleMessage(
                 messageData,
                 messageMetadata,
-                CancellationToken.None);
+                It.IsAny<CancellationToken>());
 
             // Assert
             mediator
@@ -453,7 +453,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda
                     request.IfMatchHeaderValue == messageData.IfMatchHeaderValue &&
                     request.Provenance == messageData.ProvenanceData.ToProvenance() &&
                     request.Metadata == messageData.Metadata
-                ), CancellationToken.None), Times.Once);
+                ), It.IsAny<CancellationToken>()), Times.Once);
         }
 
 
@@ -475,7 +475,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda
             await sut.HandleMessage(
                 messageData,
                 messageMetadata,
-                CancellationToken.None);
+                It.IsAny<CancellationToken>());
 
             // Assert
             mediator
@@ -486,7 +486,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda
                     request.IfMatchHeaderValue == messageData.IfMatchHeaderValue &&
                     request.Provenance == messageData.ProvenanceData.ToProvenance() &&
                     request.Metadata == messageData.Metadata
-                ), CancellationToken.None), Times.Once);
+                ), It.IsAny<CancellationToken>()), Times.Once);
         }
 
         [Fact]
@@ -507,7 +507,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda
             await sut.HandleMessage(
                 messageData,
                 messageMetadata,
-                CancellationToken.None);
+                It.IsAny<CancellationToken>());
 
             // Assert
             mediator
@@ -518,7 +518,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda
                     request.IfMatchHeaderValue == messageData.IfMatchHeaderValue &&
                     request.Provenance == messageData.ProvenanceData.ToProvenance() &&
                     request.Metadata == messageData.Metadata
-                ), CancellationToken.None), Times.Once);
+                ), It.IsAny<CancellationToken>()), Times.Once);
         }
 
         [Fact]
@@ -539,7 +539,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda
             await sut.HandleMessage(
                 messageData,
                 messageMetadata,
-                CancellationToken.None);
+                It.IsAny<CancellationToken>());
 
             // Assert
             mediator
@@ -550,7 +550,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda
                     request.IfMatchHeaderValue == messageData.IfMatchHeaderValue &&
                     request.Provenance == messageData.ProvenanceData.ToProvenance() &&
                     request.Metadata == messageData.Metadata
-                ), CancellationToken.None), Times.Once);
+                ), It.IsAny<CancellationToken>()), Times.Once);
         }
 
         [Fact]
@@ -571,7 +571,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda
             await sut.HandleMessage(
                 messageData,
                 messageMetadata,
-                CancellationToken.None);
+                It.IsAny<CancellationToken>());
 
             // Assert
             mediator
@@ -582,7 +582,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda
                     request.IfMatchHeaderValue == messageData.IfMatchHeaderValue &&
                     request.Provenance == messageData.ProvenanceData.ToProvenance() &&
                     request.Metadata == messageData.Metadata
-                ), CancellationToken.None), Times.Once);
+                ), It.IsAny<CancellationToken>()), Times.Once);
         }
 
         [Fact]
@@ -603,7 +603,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda
             await sut.HandleMessage(
                 messageData,
                 messageMetadata,
-                CancellationToken.None);
+                It.IsAny<CancellationToken>());
 
             // Assert
             mediator
@@ -614,7 +614,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda
                     request.IfMatchHeaderValue == messageData.IfMatchHeaderValue &&
                     request.Provenance == messageData.ProvenanceData.ToProvenance() &&
                     request.Metadata == messageData.Metadata
-                ), CancellationToken.None), Times.Once);
+                ), It.IsAny<CancellationToken>()), Times.Once);
         }
 
         [Fact]
@@ -635,7 +635,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda
             await sut.HandleMessage(
                 messageData,
                 messageMetadata,
-                CancellationToken.None);
+                It.IsAny<CancellationToken>());
 
             // Assert
             mediator
@@ -646,7 +646,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda
                     request.IfMatchHeaderValue == messageData.IfMatchHeaderValue &&
                     request.Provenance == messageData.ProvenanceData.ToProvenance() &&
                     request.Metadata == messageData.Metadata
-                ), CancellationToken.None), Times.Once);
+                ), It.IsAny<CancellationToken>()), Times.Once);
         }
 
         [Fact]
@@ -667,7 +667,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda
             await sut.HandleMessage(
                 messageData,
                 messageMetadata,
-                CancellationToken.None);
+                It.IsAny<CancellationToken>());
 
             // Assert
             mediator
@@ -680,7 +680,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda
                     request.IfMatchHeaderValue == messageData.IfMatchHeaderValue &&
                     request.Provenance == messageData.ProvenanceData.ToProvenance() &&
                     request.Metadata == messageData.Metadata
-                ), CancellationToken.None), Times.Once);
+                ), It.IsAny<CancellationToken>()), Times.Once);
         }
 
         [Fact]
@@ -701,7 +701,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda
             await sut.HandleMessage(
                 messageData,
                 messageMetadata,
-                CancellationToken.None);
+                It.IsAny<CancellationToken>());
 
             // Assert
             mediator
@@ -714,7 +714,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda
                     request.IfMatchHeaderValue == messageData.IfMatchHeaderValue &&
                     request.Provenance == messageData.ProvenanceData.ToProvenance() &&
                     request.Metadata == messageData.Metadata
-                ), CancellationToken.None), Times.Once);
+                ), It.IsAny<CancellationToken>()), Times.Once);
         }
 
         [Fact]
@@ -735,7 +735,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda
             await sut.HandleMessage(
                 messageData,
                 messageMetadata,
-                CancellationToken.None);
+                It.IsAny<CancellationToken>());
 
             // Assert
             mediator
@@ -747,7 +747,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda
                     request.IfMatchHeaderValue == messageData.IfMatchHeaderValue &&
                     request.Provenance == messageData.ProvenanceData.ToProvenance() &&
                     request.Metadata == messageData.Metadata
-                ), CancellationToken.None), Times.Once);
+                ), It.IsAny<CancellationToken>()), Times.Once);
         }
 
         [Fact]
@@ -768,7 +768,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda
             await sut.HandleMessage(
                 sqsRequest,
                 messageMetadata,
-                CancellationToken.None);
+                It.IsAny<CancellationToken>());
 
             // Assert
             mediator
@@ -780,7 +780,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda
                     request.IfMatchHeaderValue == null &&
                     request.Provenance == sqsRequest.ProvenanceData.ToProvenance() &&
                     request.Metadata == sqsRequest.Metadata
-                ), CancellationToken.None), Times.Once);
+                ), It.IsAny<CancellationToken>()), Times.Once);
         }
 
         [Fact]
@@ -801,7 +801,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda
             await sut.HandleMessage(
                 sqsRequest,
                 messageMetadata,
-                CancellationToken.None);
+                It.IsAny<CancellationToken>());
 
             // Assert
             mediator
@@ -813,7 +813,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda
                     request.IfMatchHeaderValue == null &&
                     request.Provenance == sqsRequest.ProvenanceData.ToProvenance() &&
                     request.Metadata == sqsRequest.Metadata
-                ), CancellationToken.None), Times.Once);
+                ), It.IsAny<CancellationToken>()), Times.Once);
         }
 
         [Fact]
@@ -834,7 +834,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda
             await sut.HandleMessage(
                 sqsRequest,
                 messageMetadata,
-                CancellationToken.None);
+                It.IsAny<CancellationToken>());
 
             // Assert
             mediator
@@ -846,7 +846,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda
                     request.IfMatchHeaderValue == null &&
                     request.Provenance == sqsRequest.ProvenanceData.ToProvenance() &&
                     request.Metadata == sqsRequest.Metadata
-                ), CancellationToken.None), Times.Once);
+                ), It.IsAny<CancellationToken>()), Times.Once);
         }
 
         [Fact]
@@ -867,7 +867,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda
             await sut.HandleMessage(
                 sqsRequest,
                 messageMetadata,
-                CancellationToken.None);
+                It.IsAny<CancellationToken>());
 
             // Assert
             mediator
@@ -879,7 +879,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda
                     request.IfMatchHeaderValue == sqsRequest.IfMatchHeaderValue &&
                     request.Provenance == sqsRequest.ProvenanceData.ToProvenance() &&
                     request.Metadata == sqsRequest.Metadata
-                ), CancellationToken.None), Times.Once);
+                ), It.IsAny<CancellationToken>()), Times.Once);
         }
 
         [Fact]
@@ -900,7 +900,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda
             await sut.HandleMessage(
                 messageData,
                 messageMetadata,
-                CancellationToken.None);
+                It.IsAny<CancellationToken>());
 
             // Assert
             mediator
@@ -910,7 +910,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda
                     request.Request == messageData.Request &&
                     request.Provenance == messageData.ProvenanceData.ToProvenance() &&
                     request.Metadata == messageData.Metadata
-                ), CancellationToken.None), Times.Once);
+                ), It.IsAny<CancellationToken>()), Times.Once);
         }
     }
 
