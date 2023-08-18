@@ -1,3 +1,16 @@
+# [3.85.0](https://github.com/informatievlaanderen/building-registry/compare/v3.84.2...v3.85.0) (2023-08-18)
+
+
+### Bug Fixes
+
+* call cancel on lambda cancellationToken after 5 minutes ([2d28d3d](https://github.com/informatievlaanderen/building-registry/commit/2d28d3dde3b0e63bf9a7cd451ee1da93dbf656c9))
+* error codes ([bf6bc48](https://github.com/informatievlaanderen/building-registry/commit/bf6bc482757039c6753f59cd812ec69b1a1c43ed))
+
+
+### Features
+
+* add auth merge building ([957ce37](https://github.com/informatievlaanderen/building-registry/commit/957ce37796400e52dc606e4b92ec6920be08a8bb))
+
 ## [3.84.2](https://github.com/informatievlaanderen/building-registry/compare/v3.84.1...v3.84.2) (2023-08-14)
 
 
