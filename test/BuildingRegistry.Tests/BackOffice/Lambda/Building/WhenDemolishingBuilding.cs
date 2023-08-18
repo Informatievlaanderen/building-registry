@@ -180,7 +180,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
                     It.IsAny<Guid>(),
                     new TicketError(
                         "Deze actie is enkel toegestaan op gebouwen met status 'gerealiseerd'.",
-                        "GebouwStatusGeplandInaanbouwNietgerealiseerdGehistoreerd"),
+                        "GebouwGeplandInAanbouwOfNietGerealiseerd"),
                     CancellationToken.None));
         }
 
@@ -207,7 +207,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
                     It.IsAny<Guid>(),
                     new TicketError(
                         "Deze actie is enkel toegestaan op gebouwen met geometrieMethode 'ingemetenGRB'.",
-                        "GebouwGeometrieMethodeGeschetst"),
+                        "GebouwGeometrieMethodeIngeschetst"),
                     CancellationToken.None));
         }
 
