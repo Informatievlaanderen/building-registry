@@ -293,7 +293,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
                     It.IsAny<Guid>(),
                     new TicketError(
                         "Deze actie is enkel toegestaan op gebouwen met geometrieMethode 'ingemetenGRB'.",
-                        "GebouwGeometrieGeschetst"),
+                        "GebouwGeometrieMethodeIngeschetst"),
                     CancellationToken.None));
         }
 
