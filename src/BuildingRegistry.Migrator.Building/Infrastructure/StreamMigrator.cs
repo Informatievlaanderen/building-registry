@@ -21,7 +21,6 @@ namespace BuildingRegistry.Migrator.Building.Infrastructure
     using Polly;
     using Serilog;
     using BuildingGeometry = Legacy.BuildingGeometry;
-    using BuildingGeometryMethod = Legacy.BuildingGeometryMethod;
     using BuildingUnit = BuildingRegistry.Building.Commands.BuildingUnit;
     using ILogger = Microsoft.Extensions.Logging.ILogger;
 
@@ -57,7 +56,7 @@ namespace BuildingRegistry.Migrator.Building.Infrastructure
             _logger = logger;
             _sqlStreamsTable = streamsTable;
 
-            // _skipIncomplete = bool.Parse(configuration["SkipIncomplete"]);
+            _skipIncomplete = bool.Parse(configuration["SkipIncomplete"]);
         }
 
         public async Task ProcessAsync(CancellationToken ct)
@@ -182,10 +181,10 @@ namespace BuildingRegistry.Migrator.Building.Infrastructure
                     return;
                 }
 
-                // if (_skipIncomplete)
-                // {
-                //     return;
-                // }
+                if (_skipIncomplete)
+                {
+                    return;
+                }
 
                 throw new InvalidOperationException($"Incomplete but not removed Building '{aggregateId}'.");
             }
