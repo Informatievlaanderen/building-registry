@@ -1,3 +1,10 @@
+## [3.85.1](https://github.com/informatievlaanderen/building-registry/compare/v3.85.0...v3.85.1) (2023-08-21)
+
+
+### Bug Fixes
+
+* **migration:** retired outlined buildings should be notRealized ([ef398e8](https://github.com/informatievlaanderen/building-registry/commit/ef398e89bdc7cdd94d6c8942db9654fd9991f96d))
+
 # [3.85.0](https://github.com/informatievlaanderen/building-registry/compare/v3.84.2...v3.85.0) (2023-08-18)
 
 
