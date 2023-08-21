@@ -23,6 +23,11 @@ namespace BuildingRegistry.Legacy
         {
             var status = _status ?? throw new InvalidOperationException($"No status found for Building '{_persistentLocalId}'");
 
+            if (_status == BuildingStatus.Retired && Geometry.Method == BuildingGeometryMethod.Outlined)
+            {
+                status = BuildingStatus.NotRealized;
+            }
+
             return new MigrateBuilding(
                _buildingId,
                _persistentLocalId,
