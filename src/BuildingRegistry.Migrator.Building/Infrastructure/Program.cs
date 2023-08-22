@@ -4,7 +4,6 @@ namespace BuildingRegistry.Migrator.Building.Infrastructure
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.IO;
-    using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
     using Autofac;
@@ -12,15 +11,13 @@ namespace BuildingRegistry.Migrator.Building.Infrastructure
     using Be.Vlaanderen.Basisregisters.Aws.DistributedMutex;
     using Be.Vlaanderen.Basisregisters.Projector.ConnectedProjections;
     using Be.Vlaanderen.Basisregisters.Projector.Modules;
-    using BuildingRegistry.Migrator.Building.Projections;
-    using Consumer.Address;
     using Microsoft.Data.SqlClient;
-    using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Logging;
     using Modules;
     using Polly;
+    using Projections;
     using Serilog;
 
     public class Program

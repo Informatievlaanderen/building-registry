@@ -33,6 +33,7 @@ namespace BuildingRegistry.Migrator.Building.Infrastructure
         private readonly ProcessedIdsTable _processedIdsTable;
         private readonly Dictionary<Guid, int> _consumedAddressItems;
         private readonly bool _skipIncomplete;
+        private readonly List<Guid> _buildingsAllowedToBeSkipped;
 
         private readonly Stopwatch _stopwatch = new Stopwatch();
 
@@ -57,6 +58,10 @@ namespace BuildingRegistry.Migrator.Building.Infrastructure
             _sqlStreamsTable = streamsTable;
 
             _skipIncomplete = bool.Parse(configuration["SkipIncomplete"]);
+            _buildingsAllowedToBeSkipped = configuration["BuildingsAllowedToBeSkipped"]
+                .Split(',')
+                .Select(Guid.Parse)
+                .ToList();
         }
 
         public async Task ProcessAsync(CancellationToken ct)
@@ -178,6 +183,12 @@ namespace BuildingRegistry.Migrator.Building.Infrastructure
                 if (legacyBuildingAggregate.IsRemoved)
                 {
                     _logger.LogDebug($"Skipping incomplete & removed Building '{aggregateId}'.");
+                    return;
+                }
+
+                if(_buildingsAllowedToBeSkipped.Contains(buildingId))
+                {
+                    _logger.LogDebug($"Skipping incomplete Building '{aggregateId}'.");
                     return;
                 }
 
