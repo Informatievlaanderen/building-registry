@@ -9,12 +9,7 @@ namespace BuildingRegistry.Projections.Wfs.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.Sql(@"
-	            ALTER TABLE [wfs].[buildingsV2]
-		            ADD CalculatedGeometry AS (geometry::STGeomFromWKB([Geometry], 31370)) PERSISTED
-	            GO");
-
-            migrationBuilder.Sql(@"
-	            CREATE SPATIAL INDEX [SPATIAL_GebouwV2_Geometrie] ON [wfs].[buildingsV2] ([CalculatedGeometry])
+	            CREATE SPATIAL INDEX [SPATIAL_GebouwV2_Geometrie] ON [wfs].[buildingsV2] ([Geometry])
 	            USING  GEOMETRY_GRID
 	            WITH (
 		            BOUNDING_BOX =(22279.17, 153050.23, 258873.3, 244022.31),
@@ -27,12 +22,7 @@ namespace BuildingRegistry.Projections.Wfs.Migrations
 	            GO");
 
             migrationBuilder.Sql(@"
-	            ALTER TABLE [wfs].[buildingUnitsV2]
-		            ADD CalculatedGeometry AS (geometry::STGeomFromWKB([Position], 31370)) PERSISTED
-	            GO");
-
-            migrationBuilder.Sql(@"
-                CREATE SPATIAL INDEX [SPATIAL_GebouweenheidV2_Geometry] ON [wfs].[buildingUnitsV2] ([CalculatedGeometry])
+                CREATE SPATIAL INDEX [SPATIAL_GebouweenheidV2_Geometrie] ON [wfs].[buildingUnitsV2] ([Position])
                 USING  GEOMETRY_GRID
                 WITH (
                     BOUNDING_BOX =(22279.17, 153050.23, 258873.3, 244022.31),
@@ -49,20 +39,12 @@ namespace BuildingRegistry.Projections.Wfs.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.Sql(@"
-                DROP INDEX [SPATIAL_GebouweenheidV2_Geometry] ON [wfs].[buildingUnitsV2]
-                GO
-
-	            ALTER TABLE [wfs].[buildingUnitsV2]
-		            DROP COLUMN CalculatedGeometry
-	            GO");
+                DROP INDEX [SPATIAL_GebouweenheidV2_Geometrie] ON [wfs].[buildingUnitsV2]
+                GO");
 
             migrationBuilder.Sql(@"
                 DROP INDEX [SPATIAL_GebouwV2_Geometrie] ON [wfs].[buildingsV2]
-                GO
-
-                ALTER TABLE [wfs].[buildingsV2]
-		            DROP COLUMN CalculatedGeometry
-	            GO");
+                GO");
         }
     }
 }
