@@ -1,3 +1,15 @@
+# [3.86.0](https://github.com/informatievlaanderen/building-registry/compare/v3.85.1...v3.86.0) (2023-08-29)
+
+
+### Bug Fixes
+
+* **migrator:** allow skip of certain buildings if they're incomplete ([620faec](https://github.com/informatievlaanderen/building-registry/commit/620faec688225c67debd4e7a07e93c39d5430abb))
+
+
+### Features
+
+* add spatial indexes wfs ([d2b9c70](https://github.com/informatievlaanderen/building-registry/commit/d2b9c7039b604265e92d8c3ae36e72bbc997fc40))
+
 ## [3.85.1](https://github.com/informatievlaanderen/building-registry/compare/v3.85.0...v3.85.1) (2023-08-21)
 
 
