@@ -312,5 +312,32 @@ namespace BuildingRegistry.Legacy
         {
             Apply(new BuildingUnitPersistentLocalIdWasAssigned(_buildingId, BuildingUnitId, persistentLocalId, assignmentDate));
         }
+
+        // Temporarily completes the object (no events are triggered)
+        public void Complete()
+        {
+            if (Status is null)
+            {
+                Status = _parent.Status switch
+                {
+                    BuildingStatus.Planned => BuildingUnitStatus.Planned,
+                    BuildingStatus.UnderConstruction => BuildingUnitStatus.Planned,
+                    BuildingStatus.Realized => BuildingUnitStatus.Realized,
+                    BuildingStatus.Retired => BuildingUnitStatus.Retired,
+                    BuildingStatus.NotRealized => BuildingUnitStatus.NotRealized,
+                    _ => throw new NotImplementedException("Can't translate building status to complete building unit")
+                };
+            }
+
+            if (BuildingUnitPosition is null)
+            {
+                if(_parent.Geometry is null)
+                    throw new NotImplementedException("Can't find building geometry to complete building unit");
+
+                BuildingUnitPosition = new BuildingUnitPosition(_parent.Geometry.Center, BuildingUnitPositionGeometryMethod.DerivedFromObject);
+            }
+
+            IsComplete = true;
+        }
     }
 }

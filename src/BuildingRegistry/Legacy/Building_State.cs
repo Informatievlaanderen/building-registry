@@ -17,6 +17,8 @@ namespace BuildingRegistry.Legacy
         private PersistentLocalIdAssignmentDate _persistentLocalIdAssignmentDate;
         private BuildingStatus? _status;
 
+        public BuildingStatus? Status => _status;
+
         public bool IsMigrated { get; private set; }
         public bool IsRemoved { get; private set; }
         public bool IsComplete { get; private set; }
