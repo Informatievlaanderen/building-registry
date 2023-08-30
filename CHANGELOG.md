@@ -1,3 +1,10 @@
+## [3.86.2](https://github.com/informatievlaanderen/building-registry/compare/v3.86.1...v3.86.2) (2023-08-30)
+
+
+### Bug Fixes
+
+* **migrator:** complete BuildingUnits when not removed ([1d1bf74](https://github.com/informatievlaanderen/building-registry/commit/1d1bf746a20d6be1a013e08158d3095eb248530e))
+
 ## [3.86.1](https://github.com/informatievlaanderen/building-registry/compare/v3.86.0...v3.86.1) (2023-08-30)
 
 
