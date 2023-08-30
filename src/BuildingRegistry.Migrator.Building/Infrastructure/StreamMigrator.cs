@@ -229,12 +229,14 @@ namespace BuildingRegistry.Migrator.Building.Infrastructure
                     {
                         if (!_consumedAddressItems.TryGetValue(addressId, out var addressPersistentLocalId))
                         {
-                            if (_skipIncomplete)
-                            {
-                                continue;
-                            }
-
-                            throw new InvalidOperationException($"AddressConsumerItem for addressId '{addressId}' was not found in the ConsumerAddressContext.");
+                            // if (_skipIncomplete)
+                            // {
+                            //     continue;
+                            // }
+                            //removed OR incomplete OR incorrect status
+                            _logger.LogWarning($"Not migrating address '{addressId}' because it was not found in the AddressDetails table.");
+                            continue;
+                            //throw new InvalidOperationException($"AddressConsumerItem for addressId '{addressId}' was not found in the ConsumerAddressContext.");
                         }
 
                         addressPersistentLocalIds.Add(new AddressPersistentLocalId(addressPersistentLocalId));
