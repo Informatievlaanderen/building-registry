@@ -214,12 +214,9 @@ namespace BuildingRegistry.Migrator.Building.Infrastructure
                             continue;
                         }
 
-                        if (_skipIncomplete)
-                        {
-                            continue;
-                        }
+                        legacyBuildingUnit.Complete();
 
-                        throw new InvalidOperationException($"Incomplete but not removed BuildingUnit '{legacyBuildingUnit.PersistentLocalId}'.");
+                        //throw new InvalidOperationException($"Incomplete but not removed BuildingUnit '{legacyBuildingUnit.PersistentLocalId}'.");
                     }
 
                     var status = legacyBuildingUnit.Status ?? throw new InvalidOperationException($"No status found for BuildingUnit '{legacyBuildingUnit.PersistentLocalId}'");
@@ -229,14 +226,9 @@ namespace BuildingRegistry.Migrator.Building.Infrastructure
                     {
                         if (!_consumedAddressItems.TryGetValue(addressId, out var addressPersistentLocalId))
                         {
-                            // if (_skipIncomplete)
-                            // {
-                            //     continue;
-                            // }
                             //removed OR incomplete OR incorrect status
                             _logger.LogWarning($"Not migrating address '{addressId}' because it was not found in the AddressDetails table.");
                             continue;
-                            //throw new InvalidOperationException($"AddressConsumerItem for addressId '{addressId}' was not found in the ConsumerAddressContext.");
                         }
 
                         addressPersistentLocalIds.Add(new AddressPersistentLocalId(addressPersistentLocalId));
