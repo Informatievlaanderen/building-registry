@@ -1,3 +1,10 @@
+## [3.86.1](https://github.com/informatievlaanderen/building-registry/compare/v3.86.0...v3.86.1) (2023-08-30)
+
+
+### Bug Fixes
+
+* **migrator:** don't migrate address not in list ([e4cefb6](https://github.com/informatievlaanderen/building-registry/commit/e4cefb64273c1e7db42d0c3d91e72875cdf26d57))
+
 # [3.86.0](https://github.com/informatievlaanderen/building-registry/compare/v3.85.1...v3.86.0) (2023-08-29)
 
 
