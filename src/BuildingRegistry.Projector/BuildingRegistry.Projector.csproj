@@ -29,6 +29,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\BuildingRegistry.Consumer.Address\BuildingRegistry.Consumer.Address.csproj" />
+    <ProjectReference Include="..\BuildingRegistry.Consumer.Read.Parcel\BuildingRegistry.Consumer.Read.Parcel.csproj" />
     <ProjectReference Include="..\BuildingRegistry.Infrastructure\BuildingRegistry.Infrastructure.csproj" />
     <ProjectReference Include="..\BuildingRegistry.Projections.Extract\BuildingRegistry.Projections.Extract.csproj" />
     <ProjectReference Include="..\BuildingRegistry.Projections.LastChangedList\BuildingRegistry.Projections.LastChangedList.csproj" />

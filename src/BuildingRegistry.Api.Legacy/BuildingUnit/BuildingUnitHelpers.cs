@@ -1,5 +1,6 @@
 namespace BuildingRegistry.Api.Legacy.BuildingUnit
 {
+    using Be.Vlaanderen.Basisregisters.GrAr.Common.SpatialTools.GeometryCoordinates;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy.SpatialTools;
 
     public static class BuildingUnitHelpers

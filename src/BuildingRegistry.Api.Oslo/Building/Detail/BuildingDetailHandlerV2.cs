@@ -7,6 +7,7 @@ namespace BuildingRegistry.Api.Oslo.Building.Detail
     using System.Xml;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
     using Be.Vlaanderen.Basisregisters.GrAr.Common;
+    using Be.Vlaanderen.Basisregisters.GrAr.Common.SpatialTools.GeometryCoordinates;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy.Gebouw;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy.SpatialTools;
     using BuildingRegistry.Building;
