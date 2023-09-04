@@ -3,6 +3,7 @@ namespace BuildingRegistry.Api.Legacy.Building
     using System.Collections.Generic;
     using System.Linq;
     using System.Text;
+    using Be.Vlaanderen.Basisregisters.GrAr.Common.SpatialTools.GeometryCoordinates;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy.SpatialTools;
 
     public static class BuildingHelpers
