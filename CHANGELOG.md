@@ -1,3 +1,12 @@
+## [3.86.3](https://github.com/informatievlaanderen/building-registry/compare/v3.86.2...v3.86.3) (2023-09-04)
+
+
+### Bug Fixes
+
+* add missing parcel projections ([9d2df25](https://github.com/informatievlaanderen/building-registry/commit/9d2df25d9fc5c055185fad2b3ced0941a1208808))
+* bump lambda ([e63daf4](https://github.com/informatievlaanderen/building-registry/commit/e63daf4c42c3ea57e2efa19888d2c31807b37211))
+* bump lambda packages ([73d95e6](https://github.com/informatievlaanderen/building-registry/commit/73d95e63fda0285aa44be42490fa9f273c7fe0cc))
+
 ## [3.86.2](https://github.com/informatievlaanderen/building-registry/compare/v3.86.1...v3.86.2) (2023-08-30)
 
 
