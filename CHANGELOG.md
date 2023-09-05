@@ -1,3 +1,10 @@
+# [3.87.0](https://github.com/informatievlaanderen/building-registry/compare/v3.86.3...v3.87.0) (2023-09-05)
+
+
+### Features
+
+* add building unit v2 events to last changed list projection ([5a4a0d6](https://github.com/informatievlaanderen/building-registry/commit/5a4a0d6959d4c5ab31d0a7802234d86e9753aad7))
+
 ## [3.86.3](https://github.com/informatievlaanderen/building-registry/compare/v3.86.2...v3.86.3) (2023-09-04)
 
 
