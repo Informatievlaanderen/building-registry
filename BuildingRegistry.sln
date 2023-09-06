@@ -82,6 +82,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BuildingRegistry.Api.BackOf
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BuildingRegistry.Consumer.Read.Parcel", "src\BuildingRegistry.Consumer.Read.Parcel\BuildingRegistry.Consumer.Read.Parcel.csproj", "{7ADEA3CC-89A7-40B2-936A-3DC0BBF755B5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BuildingRegistry.Snapshot.Verifier", "src\BuildingRegistry.Snapshot.Verifier\BuildingRegistry.Snapshot.Verifier.csproj", "{6F18B5C9-0E57-4352-B320-7976094B0738}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -196,6 +198,10 @@ Global
 		{7ADEA3CC-89A7-40B2-936A-3DC0BBF755B5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7ADEA3CC-89A7-40B2-936A-3DC0BBF755B5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7ADEA3CC-89A7-40B2-936A-3DC0BBF755B5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6F18B5C9-0E57-4352-B320-7976094B0738}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6F18B5C9-0E57-4352-B320-7976094B0738}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6F18B5C9-0E57-4352-B320-7976094B0738}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6F18B5C9-0E57-4352-B320-7976094B0738}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -228,6 +234,7 @@ Global
 		{DDF8DF3B-E22E-4E7B-857C-086A9D22ED95} = {24B47154-C5F0-4356-B059-49A1E72C38A6}
 		{72C98F9C-C576-4DFC-BAD6-4249E2AB64F1} = {1A034126-30E6-416B-BB2E-F5786E07B178}
 		{7ADEA3CC-89A7-40B2-936A-3DC0BBF755B5} = {24B47154-C5F0-4356-B059-49A1E72C38A6}
+		{6F18B5C9-0E57-4352-B320-7976094B0738} = {24B47154-C5F0-4356-B059-49A1E72C38A6}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {65FA30D5-DDFC-40EC-9BC9-3BF93D1B430F}
