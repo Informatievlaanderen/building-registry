@@ -3,18 +3,15 @@ namespace BuildingRegistry.Snapshot.Verifier.Infrastructure
     using System;
     using System.Collections.Generic;
     using System.IO;
-    using System.Linq;
     using System.Threading.Tasks;
     using Autofac;
     using Autofac.Extensions.DependencyInjection;
     using Be.Vlaanderen.Basisregisters.AggregateSource.Snapshotting;
     using Be.Vlaanderen.Basisregisters.Aws.DistributedMutex;
-    using Be.Vlaanderen.Basisregisters.EventHandling;
     using Be.Vlaanderen.Basisregisters.SnapshotVerifier;
     using Building;
     using BuildingRegistry.Infrastructure;
     using Destructurama;
-    using KellermanSoftware.CompareNetObjects;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Hosting;
@@ -23,7 +20,6 @@ namespace BuildingRegistry.Snapshot.Verifier.Infrastructure
     using Serilog;
     using Serilog.Debugging;
     using Serilog.Extensions.Logging;
-    using SqlStreamStore;
 
     public sealed class Program
     {
@@ -76,6 +72,7 @@ namespace BuildingRegistry.Snapshot.Verifier.Infrastructure
                     services.AddSnapshotVerificationServices(hostContext.Configuration.GetConnectionString("Snapshots"), Schema.Default);
                     var config = DefaultComparisonConfig.Instance;
                     config.MembersToIgnore.AddRange(new List<string> { "_lastSnapshotEventHash", "_lastSnapshotProvenance" });
+                    config.CollectionMatchingSpec.Add(typeof(BuildingUnit), new [] { nameof(BuildingUnit.BuildingUnitPersistentLocalId) });
                     services.AddHostedSnapshotVerifierService<Building, BuildingStreamId>(
                         () => new BuildingFactory(NoSnapshotStrategy.Instance).Create(),
                         aggregate => new BuildingStreamId(aggregate.BuildingPersistentLocalId),
