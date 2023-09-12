@@ -16,7 +16,7 @@ namespace BuildingRegistry.Projections.LastChangedList
     [ConnectedProjectionDescription("Projectie die markeert voor hoeveel gebouwen en gebouweenheden de gecachte data nog geüpdated moeten worden.")]
     public class BuildingUnitProjections : LastChangedListConnectedProjection
     {
-        private static readonly AcceptType[] SupportedAcceptTypes = { AcceptType.Json, AcceptType.Xml, AcceptType.JsonLd };
+        private static readonly AcceptType[] SupportedAcceptTypes = { AcceptType.JsonLd };
 
         public BuildingUnitProjections()
             : base(SupportedAcceptTypes)
@@ -381,8 +381,6 @@ namespace BuildingRegistry.Projections.LastChangedList
             var shortenedAcceptType = acceptType.ToString().ToLowerInvariant();
             return acceptType switch
             {
-                AcceptType.Json => $"legacy/buildingunit:{{0}}.{shortenedAcceptType}",
-                AcceptType.Xml => $"legacy/buildingunit:{{0}}.{shortenedAcceptType}",
                 AcceptType.JsonLd => $"oslo/buildingunit:{{0}}.{shortenedAcceptType}",
                 _ => throw new NotImplementedException($"Cannot build CacheKey for type {typeof(AcceptType)}")
             };
@@ -392,8 +390,6 @@ namespace BuildingRegistry.Projections.LastChangedList
         {
             return acceptType switch
             {
-                AcceptType.Json => "/v1/gebouweenheden/{0}",
-                AcceptType.Xml => "/v1/gebouweenheden/{0}",
                 AcceptType.JsonLd => "/v2/gebouweenheden/{0}",
                 _ => throw new NotImplementedException($"Cannot build Uri for type {typeof(AcceptType)}")
             };
