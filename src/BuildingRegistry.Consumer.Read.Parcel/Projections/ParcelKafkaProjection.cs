@@ -13,8 +13,9 @@ namespace BuildingRegistry.Consumer.Read.Parcel.Projections
 
             When<ParcelWasMigrated>(async (context, message, ct) =>
             {
+                var parcelId = Guid.Parse(message.ParcelId);
                 var parcel = await context
-                    .ParcelConsumerItems.FindAsync(new object?[] { Guid.Parse(message.ParcelId) }, cancellationToken: ct);
+                    .ParcelConsumerItems.FindAsync(new object?[] { parcelId }, cancellationToken: ct);
 
                 if (parcel is null)
                 {
@@ -22,13 +23,18 @@ namespace BuildingRegistry.Consumer.Read.Parcel.Projections
                     await context
                         .ParcelConsumerItems
                         .AddAsync(new ParcelConsumerItem(
-                                Guid.Parse(message.ParcelId),
+                                parcelId,
                                 message.CaPaKey,
                                 ParcelStatus.Parse(message.ParcelStatus),
                                 extendedWkbGeometry,
                                 wkbReader.Read(extendedWkbGeometry),
                                 message.IsRemoved)
                             , ct);
+
+                    foreach (var addressPersistentLocalId in message.AddressPersistentLocalIds)
+                    {
+                        await context.AddIdempotentParcelAddress(parcelId, addressPersistentLocalId, ct);
+                    }
                 }
             });
 
