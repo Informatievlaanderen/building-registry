@@ -1,30 +1,39 @@
 namespace BuildingRegistry.Consumer.Read.Parcel
 {
     using System;
+    using Building;
     using BuildingRegistry.Infrastructure;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.EntityFrameworkCore.Metadata.Builders;
+    using NetTopologySuite.Geometries;
 
     public class ParcelConsumerItem
     {
         public Guid ParcelId { get; set; }
         public string CaPaKey { get; set; }
         public ParcelStatus Status { get; set; }
+        public byte[] ExtendedWkbGeometry { get; set; }
+        public Geometry Geometry { get; set; }
         public bool IsRemoved { get; set; }
 
         //Needed for EF
         private ParcelConsumerItem()
-        { }
+        {
+        }
 
         public ParcelConsumerItem(
             Guid parcelId,
             string caPaKey,
             ParcelStatus status,
+            byte[] extendedWkbGeometry,
+            Geometry geometry,
             bool isRemoved = false)
         {
             ParcelId = parcelId;
             CaPaKey = caPaKey;
             Status = status;
+            ExtendedWkbGeometry = extendedWkbGeometry;
+            Geometry = geometry;
             IsRemoved = isRemoved;
         }
     }
@@ -64,6 +73,8 @@ namespace BuildingRegistry.Consumer.Read.Parcel
 
             builder.Property(x => x.CaPaKey);
             builder.Property(x => x.IsRemoved);
+            builder.Property(x => x.ExtendedWkbGeometry);
+            builder.Property(p => p.Geometry).HasColumnType("sys.geometry");
 
             builder
                 .Property(x => x.Status)
