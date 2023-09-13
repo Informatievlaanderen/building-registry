@@ -24,7 +24,8 @@ namespace BuildingRegistry.Consumer.Read.Parcel.Migrations
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-
+            migrationBuilder.Sql(@$"
+            DROP INDEX [SPATIAL_ParcelItems_Geometry] ON [{Schema.ConsumerReadParcel}].[{ParcelConsumerItemConfiguration.TableName}]");
         }
     }
 }
