@@ -83,6 +83,7 @@ namespace BuildingRegistry.Consumer.Read.Parcel.Infrastructure
                             {
                                 sqlServerOptions.EnableRetryOnFailure();
                                 sqlServerOptions.MigrationsHistoryTable(MigrationTables.ConsumerReadParcel, Schema.ConsumerReadParcel);
+                                sqlServerOptions.UseNetTopologySuite();
                             }));
                 })
                 .UseServiceProviderFactory(new AutofacServiceProviderFactory())
