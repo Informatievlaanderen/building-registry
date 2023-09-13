@@ -1,7 +1,6 @@
 namespace BuildingRegistry.Consumer.Read.Parcel
 {
     using System;
-    using Building;
     using BuildingRegistry.Infrastructure;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.EntityFrameworkCore.Metadata.Builders;

@@ -78,6 +78,37 @@ namespace BuildingRegistry.Consumer.Read.Parcel.Projections
                             , ct);
                 }
             });
+
+            When<ParcelAddressWasAttachedV2>(async (context, message, ct) =>
+            {
+                await context.AddIdempotentParcelAddress(Guid.Parse(message.ParcelId), message.AddressPersistentLocalId, ct);
+            });
+
+            When<ParcelAddressWasDetachedBecauseAddressWasRejected>(async (context, message, ct) =>
+            {
+                await context.RemoveIdempotentParcelAddress(Guid.Parse(message.ParcelId), message.AddressPersistentLocalId, ct);
+            });
+
+            When<ParcelAddressWasDetachedBecauseAddressWasRemoved>(async (context, message, ct) =>
+            {
+                await context.RemoveIdempotentParcelAddress(Guid.Parse(message.ParcelId), message.AddressPersistentLocalId, ct);
+            });
+
+            When<ParcelAddressWasDetachedBecauseAddressWasRetired>(async (context, message, ct) =>
+            {
+                await context.RemoveIdempotentParcelAddress(Guid.Parse(message.ParcelId), message.AddressPersistentLocalId, ct);
+            });
+
+            When<ParcelAddressWasDetachedV2>(async (context, message, ct) =>
+            {
+                await context.RemoveIdempotentParcelAddress(Guid.Parse(message.ParcelId), message.AddressPersistentLocalId, ct);
+            });
+
+            When<ParcelAddressWasReplacedBecauseAddressWasReaddressed>(async (context, message, ct) =>
+            {
+                await context.RemoveIdempotentParcelAddress(Guid.Parse(message.ParcelId), message.PreviousAddressPersistentLocalId, ct);
+                await context.AddIdempotentParcelAddress(Guid.Parse(message.ParcelId), message.NewAddressPersistentLocalId, ct);
+            });
         }
     }
 }
