@@ -2,6 +2,8 @@ namespace BuildingRegistry.Consumer.Read.Parcel
 {
     using System;
     using System.IO;
+    using System.Threading;
+    using System.Threading.Tasks;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.Runner;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.Runner.MigrationExtensions;
     using BuildingRegistry.Infrastructure;
@@ -12,6 +14,7 @@ namespace BuildingRegistry.Consumer.Read.Parcel
     public class ConsumerParcelContext : RunnerDbContext<ConsumerParcelContext>
     {
         public DbSet<ParcelConsumerItem> ParcelConsumerItems { get; set; }
+        public DbSet<ParcelAddressItem> ParcelAddressItems { get; set; }
 
         // This needs to be here to please EF
         public ConsumerParcelContext()
@@ -21,6 +24,28 @@ namespace BuildingRegistry.Consumer.Read.Parcel
         public ConsumerParcelContext(DbContextOptions<ConsumerParcelContext> options)
             : base(options)
         { }
+
+        public async Task AddIdempotentParcelAddress(Guid parcelId, int addressPersistentLocalId, CancellationToken ct)
+        {
+            var parcelAddressItem =
+                await ParcelAddressItems.FindAsync(new object?[] { parcelId, addressPersistentLocalId }, cancellationToken: ct);
+
+            if (parcelAddressItem is null)
+            {
+                ParcelAddressItems.Add(new ParcelAddressItem(parcelId, addressPersistentLocalId));
+            }
+        }
+
+        public async Task RemoveIdempotentParcelAddress(Guid parcelId, int addressPersistentLocalId, CancellationToken ct)
+        {
+            var parcelAddressItem =
+                await ParcelAddressItems.FindAsync(new object?[] { parcelId, addressPersistentLocalId }, cancellationToken: ct);
+
+            if (parcelAddressItem is not null)
+            {
+                ParcelAddressItems.Remove(parcelAddressItem);
+            }
+        }
 
         public override string ProjectionStateSchema => Schema.ConsumerReadParcel;
     }
@@ -49,6 +74,7 @@ namespace BuildingRegistry.Consumer.Read.Parcel
                 {
                     sqlServerOptions.EnableRetryOnFailure();
                     sqlServerOptions.MigrationsHistoryTable(MigrationTables.ConsumerReadParcel, Schema.ConsumerReadParcel);
+                    sqlServerOptions.UseNetTopologySuite();
                 })
                 .UseExtendedSqlServerMigrations();
 

@@ -48,6 +48,7 @@ namespace BuildingRegistry.Consumer.Read.Parcel.Infrastructure
                     {
                         sqlServerOptions.EnableRetryOnFailure();
                         sqlServerOptions.MigrationsHistoryTable(MigrationTables.ConsumerReadParcel, Schema.ConsumerReadParcel);
+                        sqlServerOptions.UseNetTopologySuite();
                     });
 
             migratorOptions = migratorOptions.UseLoggerFactory(loggerFactory);

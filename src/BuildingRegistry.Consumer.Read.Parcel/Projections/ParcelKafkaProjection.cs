@@ -3,26 +3,38 @@ namespace BuildingRegistry.Consumer.Read.Parcel.Projections
     using System;
     using Be.Vlaanderen.Basisregisters.GrAr.Contracts.ParcelRegistry;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.Connector;
+    using Be.Vlaanderen.Basisregisters.Utilities.HexByteConvertor;
 
     public class ParcelKafkaProjection : ConnectedProjection<ConsumerParcelContext>
     {
         public ParcelKafkaProjection()
         {
+            var wkbReader = WKBReaderFactory.Create();
+
             When<ParcelWasMigrated>(async (context, message, ct) =>
             {
+                var parcelId = Guid.Parse(message.ParcelId);
                 var parcel = await context
-                    .ParcelConsumerItems.FindAsync(new object?[] { Guid.Parse(message.ParcelId) }, cancellationToken: ct);
+                    .ParcelConsumerItems.FindAsync(new object?[] { parcelId }, cancellationToken: ct);
 
                 if (parcel is null)
                 {
+                    var extendedWkbGeometry = message.ExtendedWkbGeometry.ToByteArray();
                     await context
                         .ParcelConsumerItems
                         .AddAsync(new ParcelConsumerItem(
-                                Guid.Parse(message.ParcelId),
+                                parcelId,
                                 message.CaPaKey,
                                 ParcelStatus.Parse(message.ParcelStatus),
+                                extendedWkbGeometry,
+                                wkbReader.Read(extendedWkbGeometry),
                                 message.IsRemoved)
                             , ct);
+
+                    foreach (var addressPersistentLocalId in message.AddressPersistentLocalIds)
+                    {
+                        await context.AddIdempotentParcelAddress(parcelId, addressPersistentLocalId, ct);
+                    }
                 }
             });
 
@@ -31,21 +43,7 @@ namespace BuildingRegistry.Consumer.Read.Parcel.Projections
                 var parcel = await context
                     .ParcelConsumerItems.FindAsync(new object?[] { Guid.Parse(message.ParcelId) }, cancellationToken: ct);
 
-                if (parcel is null)
-                {
-                    await context
-                        .ParcelConsumerItems
-                        .AddAsync(new ParcelConsumerItem(
-                                Guid.Parse(message.ParcelId),
-                                message.CaPaKey,
-                                ParcelStatus.Retired,
-                                false)
-                            , ct);
-                }
-                else
-                {
-                    parcel.Status = ParcelStatus.Retired;
-                }
+                parcel!.Status = ParcelStatus.Retired;
             });
 
             When<ParcelWasCorrectedFromRetiredToRealized>(async (context, message, ct) =>
@@ -53,21 +51,17 @@ namespace BuildingRegistry.Consumer.Read.Parcel.Projections
                 var parcel = await context
                     .ParcelConsumerItems.FindAsync(new object?[] { Guid.Parse(message.ParcelId) }, cancellationToken: ct);
 
-                if (parcel is null)
-                {
-                    await context
-                        .ParcelConsumerItems
-                        .AddAsync(new ParcelConsumerItem(
-                                Guid.Parse(message.ParcelId),
-                                message.CaPaKey,
-                                ParcelStatus.Realized,
-                                false)
-                            , ct);
-                }
-                else
-                {
-                    parcel.Status = ParcelStatus.Realized;
-                }
+                parcel!.Status = ParcelStatus.Realized;
+            });
+
+            When<ParcelGeometryWasChanged>(async (context, message, ct) =>
+            {
+                var parcel = await context
+                    .ParcelConsumerItems.FindAsync(new object?[] { Guid.Parse(message.ParcelId) }, cancellationToken: ct);
+
+                var extendedWkbGeometry = message.ExtendedWkbGeometry.ToByteArray();
+                parcel!.ExtendedWkbGeometry = extendedWkbGeometry;
+                parcel.Geometry = wkbReader.Read(extendedWkbGeometry);
             });
 
             When<ParcelWasImported>(async (context, message, ct) =>
@@ -77,15 +71,49 @@ namespace BuildingRegistry.Consumer.Read.Parcel.Projections
 
                 if (parcel is null)
                 {
+                    var extendedWkbGeometry = message.ExtendedWkbGeometry.ToByteArray();
                     await context
                         .ParcelConsumerItems
                         .AddAsync(new ParcelConsumerItem(
                                 Guid.Parse(message.ParcelId),
                                 message.CaPaKey,
                                 ParcelStatus.Realized,
+                                extendedWkbGeometry,
+                                wkbReader.Read(extendedWkbGeometry),
                                 false)
                             , ct);
                 }
+            });
+
+            When<ParcelAddressWasAttachedV2>(async (context, message, ct) =>
+            {
+                await context.AddIdempotentParcelAddress(Guid.Parse(message.ParcelId), message.AddressPersistentLocalId, ct);
+            });
+
+            When<ParcelAddressWasDetachedBecauseAddressWasRejected>(async (context, message, ct) =>
+            {
+                await context.RemoveIdempotentParcelAddress(Guid.Parse(message.ParcelId), message.AddressPersistentLocalId, ct);
+            });
+
+            When<ParcelAddressWasDetachedBecauseAddressWasRemoved>(async (context, message, ct) =>
+            {
+                await context.RemoveIdempotentParcelAddress(Guid.Parse(message.ParcelId), message.AddressPersistentLocalId, ct);
+            });
+
+            When<ParcelAddressWasDetachedBecauseAddressWasRetired>(async (context, message, ct) =>
+            {
+                await context.RemoveIdempotentParcelAddress(Guid.Parse(message.ParcelId), message.AddressPersistentLocalId, ct);
+            });
+
+            When<ParcelAddressWasDetachedV2>(async (context, message, ct) =>
+            {
+                await context.RemoveIdempotentParcelAddress(Guid.Parse(message.ParcelId), message.AddressPersistentLocalId, ct);
+            });
+
+            When<ParcelAddressWasReplacedBecauseAddressWasReaddressed>(async (context, message, ct) =>
+            {
+                await context.RemoveIdempotentParcelAddress(Guid.Parse(message.ParcelId), message.PreviousAddressPersistentLocalId, ct);
+                await context.AddIdempotentParcelAddress(Guid.Parse(message.ParcelId), message.NewAddressPersistentLocalId, ct);
             });
         }
     }

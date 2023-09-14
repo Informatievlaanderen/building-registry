@@ -49,6 +49,7 @@ namespace BuildingRegistry.Consumer.Read.Parcel.Infrastructure.Modules
                     {
                         sqlServerOptions.EnableRetryOnFailure();
                         sqlServerOptions.MigrationsHistoryTable(MigrationTables.ConsumerReadParcel, Schema.ConsumerReadParcel);
+                        sqlServerOptions.UseNetTopologySuite();
                     }), serviceLifetime);
         }
 

@@ -6,25 +6,25 @@ namespace BuildingRegistry.Tests.ProjectionTests.Consumer.Parcel
     using AutoFixture;
     using Be.Vlaanderen.Basisregisters.GrAr.Contracts.Common;
     using Be.Vlaanderen.Basisregisters.GrAr.Contracts.ParcelRegistry;
+    using Be.Vlaanderen.Basisregisters.Utilities.HexByteConvertor;
     using BuildingRegistry.Consumer.Read.Parcel;
     using BuildingRegistry.Consumer.Read.Parcel.Projections;
+    using Fixtures;
     using FluentAssertions;
     using Microsoft.EntityFrameworkCore;
-    using Parlot.Fluent;
     using Tests.Legacy.Autofixture;
     using Xunit;
     using Xunit.Abstractions;
 
     public class ParcelConsumerKafkaProjectionTests : KafkaProjectionTest<ConsumerParcelContext, ParcelKafkaProjection>
     {
+        private readonly ParcelWasMigrated _parcelWasMigrated;
+
         public ParcelConsumerKafkaProjectionTests(ITestOutputHelper outputHelper) : base(outputHelper)
         {
             Fixture.Customize(new InfrastructureCustomization());
-        }
+            Fixture.Customizations.Add(new WithUniqueInteger());
 
-        [Fact]
-        public async Task ParcelWasMigrated_AddsParcel()
-        {
             var parcelStatus = Fixture
                 .Build<ParcelStatus>()
                 .FromFactory(() =>
@@ -38,57 +38,193 @@ namespace BuildingRegistry.Tests.ProjectionTests.Consumer.Parcel
                 })
                 .Create();
 
-            var parcelWasMigrated = Fixture
-                .Build<ParcelWasMigrated>()
-                .FromFactory(() => new ParcelWasMigrated(
-                    Fixture.Create<Guid>().ToString("D"),
-                    Fixture.Create<Guid>().ToString("D"),
-                    Fixture.Create<string>(),
-                    parcelStatus.Status,
-                    Fixture.Create<bool>(),
-                    Fixture.Create<IEnumerable<int>>(),
-                    Fixture.Create<string>(),
-                    Fixture.Create<Provenance>()
-                ))
-                .Create();
+            _parcelWasMigrated = new ParcelWasMigrated(
+                Fixture.Create<Guid>().ToString("D"),
+                Fixture.Create<Guid>().ToString("D"),
+                Fixture.Create<string>(),
+                parcelStatus.Status,
+                Fixture.Create<bool>(),
+                Fixture.Create<IEnumerable<int>>(),
+                GeometryHelper.ValidPolygon.AsBinary().ToHexString(),
+                Fixture.Create<Provenance>());
 
-            Given(parcelWasMigrated);
+            _addressPersistentLocalId = Fixture.Create<int>();
+
+            _parcelAddressWasDetachedV2 = new ParcelAddressWasDetachedV2(
+                _parcelWasMigrated.ParcelId,
+                _parcelWasMigrated.CaPaKey,
+                _addressPersistentLocalId,
+                Fixture.Create<Provenance>());
+            _parcelAddressWasDetachedBecauseAddressWasRejected = new ParcelAddressWasDetachedBecauseAddressWasRejected(
+                _parcelWasMigrated.ParcelId,
+                _parcelWasMigrated.CaPaKey,
+                _addressPersistentLocalId,
+                Fixture.Create<Provenance>());
+            _parcelAddressWasDetachedBecauseAddressWasRemoved = new ParcelAddressWasDetachedBecauseAddressWasRemoved(
+                _parcelWasMigrated.ParcelId,
+                _parcelWasMigrated.CaPaKey,
+                _addressPersistentLocalId,
+                Fixture.Create<Provenance>());
+            _parcelAddressWasDetachedBecauseAddressWasRetired = new ParcelAddressWasDetachedBecauseAddressWasRetired(
+                _parcelWasMigrated.ParcelId,
+                _parcelWasMigrated.CaPaKey,
+                _addressPersistentLocalId,
+                Fixture.Create<Provenance>());
+        }
+
+        [Fact]
+        public async Task ParcelWasMigrated_AddsParcel()
+        {
+            Given(_parcelWasMigrated);
 
             await Then(async context =>
             {
+                var parcelId = Guid.Parse(_parcelWasMigrated.ParcelId);
                 var parcel =
-                    await context.ParcelConsumerItems.FindAsync(Guid.Parse(parcelWasMigrated.ParcelId));
+                    await context.ParcelConsumerItems.FindAsync(parcelId);
 
                 parcel.Should().NotBeNull();
-                parcel!.CaPaKey.Should().Be(parcelWasMigrated.CaPaKey);
-                parcel.Status.Should().Be(parcelStatus);
+                parcel!.CaPaKey.Should().Be(_parcelWasMigrated.CaPaKey);
+                parcel.Status.Should().Be(ParcelStatus.Parse(_parcelWasMigrated.ParcelStatus));
                 parcel.IsRemoved.Should().Be(parcel.IsRemoved);
+
+                foreach (var addressPersistentLocalId in _parcelWasMigrated.AddressPersistentLocalIds)
+                {
+                    var parcelAddressItem =
+                        await context.ParcelAddressItems.FindAsync(parcelId, addressPersistentLocalId);
+
+                    parcelAddressItem.Should().NotBeNull();
+                }
             });
         }
 
         [Fact]
-        public async Task ParcelWasRetiredV2_AddsParcelIfNotExists()
+        public async Task ParcelAddressWasAttachedV2_AddsParcelAddress()
         {
-            var parcelWasRetiredV2 = Fixture
-                .Build<ParcelWasRetiredV2>()
-                .FromFactory(() => new ParcelWasRetiredV2(
-                    Fixture.Create<Guid>().ToString("D"),
-                    Fixture.Create<Guid>().ToString("D"),
-                    Fixture.Create<Provenance>()
-                ))
+            var parcelAddressWasAttachedV2 = Fixture
+                .Build<ParcelAddressWasAttachedV2>()
+                .FromFactory(() => new ParcelAddressWasAttachedV2(
+                    _parcelWasMigrated.ParcelId,
+                    _parcelWasMigrated.CaPaKey,
+                    Fixture.Create<int>(),
+                    Fixture.Create<Provenance>()))
                 .Create();
 
-            Given(parcelWasRetiredV2);
+            Given(_parcelWasMigrated, parcelAddressWasAttachedV2);
 
             await Then(async context =>
             {
+                var parcelId = Guid.Parse(_parcelWasMigrated.ParcelId);
                 var parcel =
-                    await context.ParcelConsumerItems.FindAsync(Guid.Parse(parcelWasRetiredV2.ParcelId));
+                    await context.ParcelConsumerItems.FindAsync(parcelId);
 
                 parcel.Should().NotBeNull();
-                parcel!.CaPaKey.Should().Be(parcelWasRetiredV2.CaPaKey);
-                parcel.Status.Should().Be(ParcelStatus.Retired);
-                parcel.IsRemoved.Should().Be(parcel.IsRemoved);
+
+                var parcelAddressItem =
+                    await context.ParcelAddressItems.FindAsync(parcelId, parcelAddressWasAttachedV2.AddressPersistentLocalId);
+
+                parcelAddressItem.Should().NotBeNull();
+            });
+        }
+
+        [Theory]
+        [MemberData(nameof(DetachedEvents))]
+        public async Task ParcelAddressWasDetachedV2_RemovesParcelAddress(Func<object> addressDetachedFactory)
+        {
+            var parcelAddressWasAttachedV2 = Fixture
+                .Build<ParcelAddressWasAttachedV2>()
+                .FromFactory(() => new ParcelAddressWasAttachedV2(
+                    _parcelWasMigrated.ParcelId,
+                    _parcelWasMigrated.CaPaKey,
+                    _addressPersistentLocalId,
+                    Fixture.Create<Provenance>()))
+                .Create();
+
+            Given(_parcelWasMigrated, parcelAddressWasAttachedV2, addressDetachedFactory());
+
+            await Then(async context =>
+            {
+                var parcelId = Guid.Parse(_parcelWasMigrated.ParcelId);
+                var parcel = await context.ParcelConsumerItems.FindAsync(parcelId);
+
+                parcel.Should().NotBeNull();
+
+                var parcelAddressItem = await context.ParcelAddressItems.FindAsync(parcelId, _addressPersistentLocalId);
+                parcelAddressItem.Should().BeNull();
+            });
+        }
+
+        private readonly int _addressPersistentLocalId;
+        private static ParcelAddressWasDetachedV2 _parcelAddressWasDetachedV2;
+        private static ParcelAddressWasDetachedBecauseAddressWasRejected _parcelAddressWasDetachedBecauseAddressWasRejected;
+        private static ParcelAddressWasDetachedBecauseAddressWasRemoved _parcelAddressWasDetachedBecauseAddressWasRemoved;
+        private static ParcelAddressWasDetachedBecauseAddressWasRetired _parcelAddressWasDetachedBecauseAddressWasRetired;
+        public static IEnumerable<object[]> DetachedEvents
+        {
+            get
+            {
+                yield return new object[]
+                {
+                    new Func<object>(() => _parcelAddressWasDetachedV2)
+                };
+                yield return new object[]
+                {
+                    new Func<object>(() => _parcelAddressWasDetachedBecauseAddressWasRejected)
+                };
+                yield return new object[]
+                {
+                    new Func<object>(() => _parcelAddressWasDetachedBecauseAddressWasRemoved)
+                };
+                yield return new object[]
+                {
+                    new Func<object>(() => _parcelAddressWasDetachedBecauseAddressWasRetired)
+                };
+            }
+        }
+
+        [Fact]
+        public async Task ParcelAddressWasReplacedBecauseAddressWasReaddressed_ReplacesParcelAddress()
+        {
+            var parcelAddressWasAttachedV2 = Fixture
+                .Build<ParcelAddressWasAttachedV2>()
+                .FromFactory(() => new ParcelAddressWasAttachedV2(
+                    _parcelWasMigrated.ParcelId,
+                    _parcelWasMigrated.CaPaKey,
+                    Fixture.Create<int>(),
+                    Fixture.Create<Provenance>()))
+                .Create();
+
+            var parcelAddressWasReplacedBecauseAddressWasReaddressed = Fixture
+                .Build<ParcelAddressWasReplacedBecauseAddressWasReaddressed>()
+                .FromFactory(() => new ParcelAddressWasReplacedBecauseAddressWasReaddressed(
+                    _parcelWasMigrated.ParcelId,
+                    _parcelWasMigrated.CaPaKey,
+                    parcelAddressWasAttachedV2.AddressPersistentLocalId + 1,
+                    parcelAddressWasAttachedV2.AddressPersistentLocalId,
+                    Fixture.Create<Provenance>()))
+                .Create();
+
+            Given(_parcelWasMigrated, parcelAddressWasReplacedBecauseAddressWasReaddressed);
+
+            await Then(async context =>
+            {
+                var parcelId = Guid.Parse(_parcelWasMigrated.ParcelId);
+                var parcel =
+                    await context.ParcelConsumerItems.FindAsync(parcelId);
+
+                parcel.Should().NotBeNull();
+
+                var previousParcelAddressItem =
+                    await context.ParcelAddressItems.FindAsync(parcelId,
+                        parcelAddressWasReplacedBecauseAddressWasReaddressed.PreviousAddressPersistentLocalId);
+
+                previousParcelAddressItem.Should().BeNull();
+
+                var newParcelAddressItem =
+                    await context.ParcelAddressItems.FindAsync(parcelId,
+                        parcelAddressWasReplacedBecauseAddressWasReaddressed.NewAddressPersistentLocalId);
+
+                newParcelAddressItem.Should().NotBeNull();
             });
         }
 
@@ -103,7 +239,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Consumer.Parcel
                 .FromFactory(() => new ParcelWasImported(
                     parcelId,
                     capakey,
-                    Fixture.Create<string>(),
+                    GeometryHelper.ValidPolygon.AsBinary().ToHexString(),
                     Fixture.Create<Provenance>()
                 ))
                 .Create();
@@ -132,33 +268,6 @@ namespace BuildingRegistry.Tests.ProjectionTests.Consumer.Parcel
         }
 
         [Fact]
-        public async Task ParcelWasCorrectedFromRetiredToRealized_AddsParcelIfNotExists()
-        {
-            var parcelWasCorrectedFromRetiredToRealized = Fixture
-                .Build<ParcelWasCorrectedFromRetiredToRealized>()
-                .FromFactory(() => new ParcelWasCorrectedFromRetiredToRealized(
-                    Fixture.Create<Guid>().ToString("D"),
-                    Fixture.Create<Guid>().ToString("D"),
-                    Fixture.Create<string>(),
-                    Fixture.Create<Provenance>()
-                ))
-                .Create();
-
-            Given(parcelWasCorrectedFromRetiredToRealized);
-
-            await Then(async context =>
-            {
-                var parcel =
-                    await context.ParcelConsumerItems.FindAsync(Guid.Parse(parcelWasCorrectedFromRetiredToRealized.ParcelId));
-
-                parcel.Should().NotBeNull();
-                parcel!.CaPaKey.Should().Be(parcelWasCorrectedFromRetiredToRealized.CaPaKey);
-                parcel.Status.Should().Be(ParcelStatus.Realized);
-                parcel.IsRemoved.Should().Be(parcel.IsRemoved);
-            });
-        }
-
-        [Fact]
         public async Task ParcelWasCorrectedFromRetiredToRealized_SetsParcelStatusToRealized()
         {
             var parcelId = Fixture.Create<Guid>().ToString("D");
@@ -168,7 +277,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Consumer.Parcel
                 .FromFactory(() => new ParcelWasImported(
                     parcelId,
                     capakey,
-                    Fixture.Create<string>(),
+                    GeometryHelper.ValidPolygon.AsBinary().ToHexString(),
                     Fixture.Create<Provenance>()
                 ))
                 .Create();
@@ -187,12 +296,10 @@ namespace BuildingRegistry.Tests.ProjectionTests.Consumer.Parcel
                 .FromFactory(() => new ParcelWasCorrectedFromRetiredToRealized(
                     parcelId,
                     capakey,
-                    Fixture.Create<string>(),
+                    GeometryHelper.ValidPolygon.AsBinary().ToHexString(),
                     Fixture.Create<Provenance>()
                 ))
                 .Create();
-
-
 
             Given(parcelWasImported, parcelWasRetiredV2, parcelWasCorrectedFromRetiredToRealized);
 
@@ -216,7 +323,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Consumer.Parcel
                 .FromFactory(() => new ParcelWasImported(
                     Fixture.Create<Guid>().ToString("D"),
                     Fixture.Create<Guid>().ToString("D"),
-                    Fixture.Create<string>(),
+                    GeometryHelper.ValidPolygon.AsBinary().ToHexString(),
                     Fixture.Create<Provenance>()
                 ))
                 .Create();

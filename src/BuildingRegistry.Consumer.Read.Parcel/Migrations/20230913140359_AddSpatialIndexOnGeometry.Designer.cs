@@ -4,6 +4,7 @@ using BuildingRegistry.Consumer.Read.Parcel;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NetTopologySuite.Geometries;
 
@@ -12,9 +13,10 @@ using NetTopologySuite.Geometries;
 namespace BuildingRegistry.Consumer.Read.Parcel.Migrations
 {
     [DbContext(typeof(ConsumerParcelContext))]
-    partial class ConsumerParcelContextModelSnapshot : ModelSnapshot
+    [Migration("20230913140359_AddSpatialIndexOnGeometry")]
+    partial class AddSpatialIndexOnGeometry
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -45,25 +47,6 @@ namespace BuildingRegistry.Consumer.Read.Parcel.Migrations
                     SqlServerKeyBuilderExtensions.IsClustered(b.HasKey("Name"));
 
                     b.ToTable("ProjectionStates", "BuildingRegistryConsumerReadParcel");
-                });
-
-            modelBuilder.Entity("BuildingRegistry.Consumer.Read.Parcel.ParcelAddressItem", b =>
-                {
-                    b.Property<Guid>("ParcelId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("AddressPersistentLocalId")
-                        .HasColumnType("int");
-
-                    b.HasKey("ParcelId", "AddressPersistentLocalId");
-
-                    SqlServerKeyBuilderExtensions.IsClustered(b.HasKey("ParcelId", "AddressPersistentLocalId"), false);
-
-                    b.HasIndex("ParcelId");
-
-                    SqlServerIndexBuilderExtensions.IsClustered(b.HasIndex("ParcelId"));
-
-                    b.ToTable("ParcelAddressItems", "BuildingRegistryConsumerReadParcel");
                 });
 
             modelBuilder.Entity("BuildingRegistry.Consumer.Read.Parcel.ParcelConsumerItem", b =>
