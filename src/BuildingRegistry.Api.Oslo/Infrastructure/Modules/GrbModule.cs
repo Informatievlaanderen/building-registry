@@ -1,9 +1,9 @@
 namespace BuildingRegistry.Api.Oslo.Infrastructure.Modules
 {
     using Autofac;
-    using Grb;
-    using Grb.Wfs;
     using Microsoft.Extensions.Configuration;
+    using ParcelMatching;
+    using ParcelMatching.Wfs;
 
     public class GrbModule : Module
     {
@@ -17,13 +17,13 @@ namespace BuildingRegistry.Api.Oslo.Infrastructure.Modules
             builder
                 .RegisterInstance(new GrbWfsConfiguration(_configuration["Grb:Wfs:Url"]))
                 .AsSelf();
-                
+
             builder
                 .RegisterType<GrbWfsClient>()
                 .AsImplementedInterfaces();
-                
+
             builder
-                .RegisterType<GrbBuildingParcel>()
+                .RegisterType<WfsParcelMatching>()
                 .AsImplementedInterfaces();
         }
     }

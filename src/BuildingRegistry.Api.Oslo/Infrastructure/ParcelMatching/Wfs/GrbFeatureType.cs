@@ -1,4 +1,4 @@
-namespace BuildingRegistry.Api.Oslo.Infrastructure.Grb
+namespace BuildingRegistry.Api.Oslo.Infrastructure.ParcelMatching.Wfs
 {
     public enum GrbFeatureType
     {

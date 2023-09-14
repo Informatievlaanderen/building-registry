@@ -13,8 +13,8 @@ namespace BuildingRegistry.Api.Oslo.Building.Detail
     using BuildingRegistry.Building;
     using Consumer.Read.Parcel;
     using Converters;
-    using Infrastructure.Grb;
     using Infrastructure.Options;
+    using Infrastructure.ParcelMatching;
     using MediatR;
     using Microsoft.AspNetCore.Http;
     using Microsoft.EntityFrameworkCore;
@@ -30,18 +30,18 @@ namespace BuildingRegistry.Api.Oslo.Building.Detail
         private readonly LegacyContext _context;
         private readonly ConsumerParcelContext _consumerParcelContext;
         private readonly IOptions<ResponseOptions> _responseOptions;
-        private readonly IGrbBuildingParcel _grbBuildingParcel;
+        private readonly IParcelMatching _parcelMatching;
 
         public BuildingDetailHandlerV2(
             LegacyContext context,
             ConsumerParcelContext consumerParcelContext,
             IOptions<ResponseOptions> responseOptions,
-            IGrbBuildingParcel grbBuildingParcel)
+            IParcelMatching parcelMatching)
         {
             _context = context;
             _consumerParcelContext = consumerParcelContext;
             _responseOptions = responseOptions;
-            _grbBuildingParcel = grbBuildingParcel;
+            _parcelMatching = parcelMatching;
         }
 
         public async Task<BuildingOsloResponseWithEtag> Handle(BuildingDetailRequest buildingDetailRequest, CancellationToken cancellationToken)
@@ -68,7 +68,7 @@ namespace BuildingRegistry.Api.Oslo.Building.Detail
                 .Select(x => x.BuildingUnitPersistentLocalId)
                 .ToListAsync(cancellationToken);
 
-            var parcels = _grbBuildingParcel
+            var parcels = _parcelMatching
                 .GetUnderlyingParcels(building.Geometry)
                 .Select(s => CaPaKey.CreateFrom(s).VbrCaPaKey)
                 .Distinct();
