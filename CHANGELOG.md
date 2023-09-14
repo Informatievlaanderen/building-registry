@@ -1,3 +1,18 @@
+# [3.88.0](https://github.com/informatievlaanderen/building-registry/compare/v3.87.0...v3.88.0) (2023-09-14)
+
+
+### Bug Fixes
+
+* remove sequences from snapshot verifier ([c785b0b](https://github.com/informatievlaanderen/building-registry/commit/c785b0bb9edf3e413f5d690bba2dd85d40391b97))
+* snapshot verifier compare building units by persistent local id ([b800b23](https://github.com/informatievlaanderen/building-registry/commit/b800b23d2c4cb3e93b9a1a38cc34289daa9306c1))
+
+
+### Features
+
+* add snapshot verifier ([e03ef30](https://github.com/informatievlaanderen/building-registry/commit/e03ef303197a76f6f2f7883d60096be37977367c))
+* consume parcel geometry & addresses ([df8ee24](https://github.com/informatievlaanderen/building-registry/commit/df8ee24a6a20eb336f2bfb2ea4aca42556224ac2))
+* don't cache legacy GAWR-5195 ([a641286](https://github.com/informatievlaanderen/building-registry/commit/a6412867cb972b65fafd40b2ffdf16a416fa6001))
+
 # [3.87.0](https://github.com/informatievlaanderen/building-registry/compare/v3.86.3...v3.87.0) (2023-09-05)
 
 
