@@ -9,6 +9,7 @@ namespace BuildingRegistry.Api.Oslo.Infrastructure.Modules
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Logging;
+    using ParcelMatching;
     using Projections.Legacy;
     using Projections.Syndication;
 
@@ -44,12 +45,15 @@ namespace BuildingRegistry.Api.Oslo.Infrastructure.Modules
                 .RegisterModule(new MediatRModule(useProjectionsV2))
                 .RegisterModule(new LegacyModule(_configuration, _services, _loggerFactory))
                 .RegisterModule(new SyndicationModule(_configuration, _services, _loggerFactory))
-                .RegisterModule(new GrbModule(_configuration))
                 .RegisterModule(new ConsumerParcelModule(_configuration, _services, _loggerFactory));
 
             builder
                 .RegisterType<ProblemDetailsHelper>()
                 .AsSelf();
+
+            builder
+                .RegisterType<ParcelMatching>()
+                .AsImplementedInterfaces();
 
             builder.Populate(_services);
         }

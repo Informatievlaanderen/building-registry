@@ -1,4 +1,4 @@
-namespace BuildingRegistry.Api.Oslo.Infrastructure.Grb
+namespace BuildingRegistry.Api.Oslo.Infrastructure.ParcelMatching
 {
     using System;
     using System.Collections.Generic;
@@ -6,20 +6,15 @@ namespace BuildingRegistry.Api.Oslo.Infrastructure.Grb
     using NetTopologySuite.Geometries;
     using Wfs;
 
-    public interface IGrbBuildingParcel
-    {
-        IEnumerable<string> GetUnderlyingParcels(byte[] buildingGeometry);
-    }
-
-    public class GrbBuildingParcel : IGrbBuildingParcel
+    public class WfsParcelMatching : IParcelMatching
     {
         private readonly IGrbWfsClient _wfsClient;
 
-        public GrbBuildingParcel(IGrbWfsClient wfsClient) => _wfsClient = wfsClient;
+        public WfsParcelMatching(IGrbWfsClient wfsClient) => _wfsClient = wfsClient;
 
-        public IEnumerable<string> GetUnderlyingParcels(byte[] buildingGeometry)
+        public IEnumerable<string> GetUnderlyingParcels(byte[] buildingGeometryBytes)
         {
-            var building = WKBReaderFactory.Create().Read(buildingGeometry);
+            var building = WKBReaderFactory.Create().Read(buildingGeometryBytes);
 
             var parcelFeatures = _wfsClient.GetFeaturesInBoundingBox(GrbFeatureType.Parcel, building.EnvelopeInternal);
             var uniqueParcels = new Dictionary<string, Geometry>();

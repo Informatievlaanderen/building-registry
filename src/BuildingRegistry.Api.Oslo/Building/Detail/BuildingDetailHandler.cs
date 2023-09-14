@@ -12,8 +12,8 @@ namespace BuildingRegistry.Api.Oslo.Building.Detail
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy.Gebouw;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy.SpatialTools;
     using Converters;
-    using Infrastructure.Grb;
     using Infrastructure.Options;
+    using Infrastructure.ParcelMatching;
     using Legacy;
     using MediatR;
     using Microsoft.AspNetCore.Http;
@@ -31,18 +31,18 @@ namespace BuildingRegistry.Api.Oslo.Building.Detail
         private readonly LegacyContext _context;
         private readonly SyndicationContext _syndicationContext;
         private readonly IOptions<ResponseOptions> _responseOptions;
-        private readonly IGrbBuildingParcel _grbBuildingParcel;
+        private readonly IParcelMatching _parcelMatching;
 
         public BuildingDetailHandler(
             LegacyContext context,
             SyndicationContext syndicationContext,
             IOptions<ResponseOptions> responseOptions,
-            IGrbBuildingParcel grbBuildingParcel)
+            IParcelMatching parcelMatching)
         {
             _context = context;
             _syndicationContext = syndicationContext;
             _responseOptions = responseOptions;
-            _grbBuildingParcel = grbBuildingParcel;
+            _parcelMatching = parcelMatching;
         }
 
         public async Task<BuildingOsloResponseWithEtag> Handle(BuildingDetailRequest buildingDetailRequest, CancellationToken cancellationToken)
@@ -70,7 +70,7 @@ namespace BuildingRegistry.Api.Oslo.Building.Detail
                 .Select(x => x.PersistentLocalId)
                 .ToListAsync(cancellationToken);
 
-            var parcels = _grbBuildingParcel
+            var parcels = _parcelMatching
                 .GetUnderlyingParcels(building.Geometry)
                 .Select(s => CaPaKey.CreateFrom(s).VbrCaPaKey)
                 .Distinct();

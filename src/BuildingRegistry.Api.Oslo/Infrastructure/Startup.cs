@@ -9,7 +9,6 @@ namespace BuildingRegistry.Api.Oslo.Infrastructure
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
     using Be.Vlaanderen.Basisregisters.DataDog.Tracing.Microsoft;
     using Configuration;
-    using Grb.Wfs;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.Mvc.ApiExplorer;
@@ -21,6 +20,7 @@ namespace BuildingRegistry.Api.Oslo.Infrastructure
     using Microsoft.OpenApi.Models;
     using Modules;
     using Options;
+    using ParcelMatching.Wfs;
 
     /// <summary>Represents the startup process for the application.</summary>
     public class Startup

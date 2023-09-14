@@ -12,7 +12,7 @@ namespace BuildingRegistry.Consumer.Read.Parcel
         public string CaPaKey { get; set; }
         public ParcelStatus Status { get; set; }
         public byte[] ExtendedWkbGeometry { get; set; }
-        public Geometry Geometry { get; set; }
+        public Geometry Geometry { get; private set; }
         public bool IsRemoved { get; set; }
 
         //Needed for EF
@@ -32,8 +32,13 @@ namespace BuildingRegistry.Consumer.Read.Parcel
             CaPaKey = caPaKey;
             Status = status;
             ExtendedWkbGeometry = extendedWkbGeometry;
-            Geometry = geometry;
+            SetGeometry(geometry);
             IsRemoved = isRemoved;
+        }
+
+        public void SetGeometry(Geometry geometry)
+        {
+            Geometry = NetTopologySuite.Geometries.Utilities.GeometryFixer.Fix(geometry);
         }
     }
 

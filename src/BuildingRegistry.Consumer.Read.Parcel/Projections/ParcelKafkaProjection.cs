@@ -61,7 +61,7 @@ namespace BuildingRegistry.Consumer.Read.Parcel.Projections
 
                 var extendedWkbGeometry = message.ExtendedWkbGeometry.ToByteArray();
                 parcel!.ExtendedWkbGeometry = extendedWkbGeometry;
-                parcel.Geometry = wkbReader.Read(extendedWkbGeometry);
+                parcel.SetGeometry(wkbReader.Read(extendedWkbGeometry));
             });
 
             When<ParcelWasImported>(async (context, message, ct) =>
@@ -72,6 +72,7 @@ namespace BuildingRegistry.Consumer.Read.Parcel.Projections
                 if (parcel is null)
                 {
                     var extendedWkbGeometry = message.ExtendedWkbGeometry.ToByteArray();
+
                     await context
                         .ParcelConsumerItems
                         .AddAsync(new ParcelConsumerItem(

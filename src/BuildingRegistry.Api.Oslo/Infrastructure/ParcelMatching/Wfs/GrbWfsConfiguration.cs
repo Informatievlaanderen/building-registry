@@ -1,4 +1,4 @@
-namespace BuildingRegistry.Api.Oslo.Infrastructure.Grb.Wfs
+namespace BuildingRegistry.Api.Oslo.Infrastructure.ParcelMatching.Wfs
 {
     using System;
 
