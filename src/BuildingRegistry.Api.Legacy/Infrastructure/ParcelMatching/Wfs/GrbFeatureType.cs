@@ -1,4 +1,4 @@
-namespace BuildingRegistry.Api.Legacy.Infrastructure.Grb
+namespace BuildingRegistry.Api.Legacy.Infrastructure.ParcelMatching
 {
     public enum GrbFeatureType
     {

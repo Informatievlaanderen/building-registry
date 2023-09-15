@@ -1,4 +1,4 @@
-namespace BuildingRegistry.Api.Legacy.Infrastructure.Grb
+namespace BuildingRegistry.Api.Legacy.Infrastructure.ParcelMatching
 {
     using System;
     using System.Collections.Generic;
@@ -6,16 +6,11 @@ namespace BuildingRegistry.Api.Legacy.Infrastructure.Grb
     using NetTopologySuite.Geometries;
     using Wfs;
 
-    public interface IGrbBuildingParcel
-    {
-        IEnumerable<string> GetUnderlyingParcels(byte[] buildingGeometry);
-    }
-
-    public class GrbBuildingParcel : IGrbBuildingParcel
+    public class WfsParcelMatching : IParcelMatching
     {
         private readonly IGrbWfsClient _wfsClient;
 
-        public GrbBuildingParcel(IGrbWfsClient wfsClient) => _wfsClient = wfsClient;
+        public WfsParcelMatching(IGrbWfsClient wfsClient) => _wfsClient = wfsClient;
 
         public IEnumerable<string> GetUnderlyingParcels(byte[] buildingGeometry)
         {
