@@ -1,4 +1,4 @@
-namespace BuildingRegistry.Api.Legacy.Infrastructure.Grb.Wfs
+namespace BuildingRegistry.Api.Legacy.Infrastructure.ParcelMatching.Wfs
 {
     using System;
 

@@ -1,4 +1,4 @@
-namespace BuildingRegistry.Api.Legacy.Infrastructure.Grb
+namespace BuildingRegistry.Api.Legacy.Infrastructure.ParcelMatching
 {
     using System;
     using System.Collections.Generic;

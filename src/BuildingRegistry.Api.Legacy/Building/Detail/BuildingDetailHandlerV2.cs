@@ -7,8 +7,8 @@ namespace BuildingRegistry.Api.Legacy.Building.Detail
     using Be.Vlaanderen.Basisregisters.GrAr.Common;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy.Gebouw;
     using Consumer.Read.Parcel;
-    using Infrastructure.Grb;
     using Infrastructure.Options;
+    using Infrastructure.ParcelMatching;
     using MediatR;
     using Microsoft.AspNetCore.Http;
     using Microsoft.EntityFrameworkCore;
@@ -20,13 +20,13 @@ namespace BuildingRegistry.Api.Legacy.Building.Detail
         private readonly LegacyContext _context;
         private readonly ConsumerParcelContext _consumerParcelContext;
         private readonly IOptions<ResponseOptions> _responseOptions;
-        private readonly IGrbBuildingParcel _grbBuildingParcel;
+        private readonly IParcelMatching _grbBuildingParcel;
 
         public GetDetailHandlerV2(
             LegacyContext context,
             ConsumerParcelContext consumerParcelContext,
             IOptions<ResponseOptions> responseOptions,
-            IGrbBuildingParcel grbBuildingParcel)
+            IParcelMatching grbBuildingParcel)
         {
             _context = context;
             _consumerParcelContext = consumerParcelContext;
