@@ -44,6 +44,29 @@
         }
 
         [Fact]
+        public void WithRetiredParcelOverlapping100Percent_ThenReturnsNothing()
+        {
+            var parcelGeometry = CreateGeometry("100 100 100 200 200 200 200 100 100 100");
+            var buildingGeometry100PercentOverlap = parcelGeometry;
+
+            _consumerParcelContext.ParcelConsumerItems.Add(
+                new ParcelConsumerItem(
+                    Guid.NewGuid(),
+                    Guid.NewGuid().ToString(),
+                    ParcelStatus.Retired,
+                    parcelGeometry.AsBinary(),
+                    parcelGeometry));
+
+            _consumerParcelContext.SaveChanges();
+
+            var parcelMatching = new ParcelMatching(_consumerParcelContext);
+
+            var result = parcelMatching.GetUnderlyingParcels(buildingGeometry100PercentOverlap.AsBinary());
+
+            result.Should().BeEmpty();
+        }
+
+        [Fact]
         public void WithParcelLessThan80PercentOverlap_ThenReturnsNothing()
         {
             var parcelGeometry = CreateGeometry("100 100 100 200 200 200 200 100 100 100");
