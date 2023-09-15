@@ -1,3 +1,11 @@
+# [3.89.0](https://github.com/informatievlaanderen/building-registry/compare/v3.88.0...v3.89.0) (2023-09-15)
+
+
+### Features
+
+* add consumer parcel matching to legacy api ([74b884c](https://github.com/informatievlaanderen/building-registry/commit/74b884c2e9b4923f5f030f5b483a227a67437b62))
+* add parcel matching from consumer ([2107089](https://github.com/informatievlaanderen/building-registry/commit/2107089c4fb4f95a990c97410883efdc61d1bde3))
+
 # [3.88.0](https://github.com/informatievlaanderen/building-registry/compare/v3.87.0...v3.88.0) (2023-09-14)
 
 
