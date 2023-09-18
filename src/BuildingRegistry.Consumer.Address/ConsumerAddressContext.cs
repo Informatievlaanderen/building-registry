@@ -1,9 +1,11 @@
 namespace BuildingRegistry.Consumer.Address
 {
     using System;
+    using System.Collections.Generic;
     using System.IO;
     using System.Linq;
     using System.Reflection;
+    using System.Threading.Tasks;
     using Be.Vlaanderen.Basisregisters.EntityFrameworkCore.EntityTypeConfiguration;
     using Be.Vlaanderen.Basisregisters.MessageHandling.Kafka.Consumer.SqlServer;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.Runner.SqlServer.MigrationExtensions;
@@ -41,6 +43,17 @@ namespace BuildingRegistry.Consumer.Address
             }
 
             return new AddressData(new AddressPersistentLocalId(item.AddressPersistentLocalId), Map(item.Status), item.IsRemoved);
+        }
+
+        public async Task<List<AddressData>> GetAddresses(List<AddressPersistentLocalId> addressPersistentLocalIds)
+        {
+            var items = AddressConsumerItems
+                .AsNoTracking()
+                .Where(x => addressPersistentLocalIds.Contains(new AddressPersistentLocalId(x.AddressPersistentLocalId)));
+
+            return await items
+                .Select(x => new AddressData(new AddressPersistentLocalId(x.AddressPersistentLocalId), Map(x.Status), x.IsRemoved))
+                .ToListAsync();
         }
 
         public BuildingRegistry.Building.Datastructures.AddressStatus Map(AddressStatus status)

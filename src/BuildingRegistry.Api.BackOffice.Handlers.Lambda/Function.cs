@@ -25,9 +25,12 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda
     using Newtonsoft.Json;
     using TicketingService.Proxy.HttpProxy;
     using Be.Vlaanderen.Basisregisters.Sqs.Lambda.Handlers;
+    using Building;
     using BuildingRegistry.Infrastructure;
     using BuildingRegistry.Infrastructure.Modules;
     using Consumer.Address;
+    using Consumer.Read.Parcel;
+    using Consumer.Read.Parcel.Infrastructure.Modules;
 
     public class Function : FunctionBase
     {
@@ -81,11 +84,17 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda
                 .RegisterModule(new SequenceModule(configuration, services, loggerFactory))
                 .RegisterModule(new CommandHandlingModule(configuration))
                 .RegisterModule(new BackOfficeModule(configuration, services, loggerFactory))
-                .RegisterModule(new ConsumerAddressModule(configuration, services, loggerFactory));
+                .RegisterModule(new ConsumerAddressModule(configuration, services, loggerFactory))
+                .RegisterModule(new ConsumerParcelModule(configuration, services, loggerFactory));
 
             builder.RegisterType<IdempotentCommandHandler>()
                 .As<IIdempotentCommandHandler>()
                 .AsSelf()
+                .InstancePerLifetimeScope();
+
+            builder
+                .RegisterType<ParcelMatching>()
+                .As<IParcelMatching>()
                 .InstancePerLifetimeScope();
 
             services.ConfigureIdempotency(

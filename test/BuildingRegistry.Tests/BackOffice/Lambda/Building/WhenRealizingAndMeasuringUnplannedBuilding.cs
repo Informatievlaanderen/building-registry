@@ -13,6 +13,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
     using Be.Vlaanderen.Basisregisters.Sqs.Exceptions;
     using Be.Vlaanderen.Basisregisters.Sqs.Lambda.Handlers;
     using Be.Vlaanderen.Basisregisters.Sqs.Responses;
+    using BuildingRegistry.Api.BackOffice.Abstractions;
     using BuildingRegistry.Api.BackOffice.Abstractions.Building;
     using BuildingRegistry.Api.BackOffice.Abstractions.Building.Requests;
     using BuildingRegistry.Api.BackOffice.Abstractions.Building.SqsRequests;
@@ -30,15 +31,19 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
     using Xunit;
     using Xunit.Abstractions;
 
-    public class WhenRealizingAndMeasuringUnplannedBuilding : BackOfficeLambdaTest
+    public partial class WhenRealizingAndMeasuringUnplannedBuilding : BackOfficeLambdaTest
     {
         private readonly IdempotencyContext _idempotencyContext;
+        private readonly BackOfficeContext _backOfficeContext;
+        private readonly Mock<IPersistentLocalIdGenerator> _persistentLocalIdGenerator;
 
         public WhenRealizingAndMeasuringUnplannedBuilding(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
         {
             Fixture.Customize(new WithFixedBuildingPersistentLocalId());
 
             _idempotencyContext = new FakeIdempotencyContextFactory().CreateDbContext(Array.Empty<string>());
+            _backOfficeContext = new FakeBackOfficeContextFactory().CreateDbContext(Array.Empty<string>());
+            _persistentLocalIdGenerator = new Mock<IPersistentLocalIdGenerator>();
         }
 
         [Fact]
@@ -53,7 +58,12 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
                 new FakeRetryPolicy(),
                 MockTicketing(response => { eTagResponse = response; }).Object,
                 new IdempotentCommandHandler(Container.Resolve<ICommandHandlerResolver>(), _idempotencyContext),
-                Container.Resolve<IBuildings>());
+                Container.Resolve<IBuildings>(),
+                Mock.Of<IParcelMatching>(),
+                Mock.Of<IAddresses>(),
+                _backOfficeContext,
+                _persistentLocalIdGenerator.Object,
+                Container);
 
             //Act
             await handler.Handle(
@@ -72,6 +82,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
                             {
                                 VersionDate = SystemClock.Instance.GetCurrentInstant().ToString(),
                                 GeometriePolygoon =  "<gml:Polygon srsName=\"https://www.opengis.net/def/crs/EPSG/0/31370\" xmlns:gml=\"http://www.opengis.net/gml/3.2\"><gml:exterior><gml:LinearRing><gml:posList>140284.15277253836 186724.74131567031 140291.06016454101 186726.38355567306 140288.22675654292 186738.25798767805 140281.19098053873 186736.57913967967 140284.15277253836 186724.74131567031</gml:posList></gml:LinearRing></gml:exterior></gml:Polygon>",
+                                GrbObjectType = "0"
                             },
 
                         }
@@ -103,7 +114,12 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
                 new FakeRetryPolicy(),
                 ticketing.Object,
                 MockExceptionIdempotentCommandHandler(() => new IdempotencyException(string.Empty)).Object,
-                buildings);
+                buildings,
+                Mock.Of<IParcelMatching>(),
+                Mock.Of<IAddresses>(),
+                _backOfficeContext,
+                _persistentLocalIdGenerator.Object,
+                Container);
 
             //Act
             await handler.Handle(
@@ -151,7 +167,12 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
                 new FakeRetryPolicy(),
                 ticketing.Object,
                 new IdempotentCommandHandler(Container.Resolve<ICommandHandlerResolver>(), _idempotencyContext),
-                buildings);
+                buildings,
+                Mock.Of<IParcelMatching>(),
+                Mock.Of<IAddresses>(),
+                _backOfficeContext,
+                _persistentLocalIdGenerator.Object,
+                Container);
 
             var request = new RealizeAndMeasureUnplannedBuildingLambdaRequest(
                 buildingPersistentLocalId,

@@ -396,5 +396,21 @@ namespace BuildingRegistry.Building
                     commonBuildingUnit.BuildingUnitPersistentLocalId));
             }
         }
+
+        public void RealizeUnplannedBuildingUnit(
+            BuildingUnitPersistentLocalId buildingUnitPersistentLocalId,
+            AddressPersistentLocalId addressPersistentLocalId)
+        {
+            ApplyChange(new BuildingUnitWasPlannedV2(
+                BuildingPersistentLocalId,
+                buildingUnitPersistentLocalId,
+                BuildingUnitPositionGeometryMethod.DerivedFromObject,
+                BuildingGeometry.Center,
+                BuildingUnitFunction.Unknown,
+                hasDeviation: false));
+
+            ApplyChange(new BuildingUnitWasRealizedV2(BuildingPersistentLocalId, buildingUnitPersistentLocalId));
+            ApplyChange(new BuildingUnitAddressWasAttachedV2(BuildingPersistentLocalId, buildingUnitPersistentLocalId, addressPersistentLocalId));
+        }
     }
 }

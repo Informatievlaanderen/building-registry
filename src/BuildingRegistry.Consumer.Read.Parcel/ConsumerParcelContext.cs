@@ -1,17 +1,20 @@
 namespace BuildingRegistry.Consumer.Read.Parcel
 {
     using System;
+    using System.Collections.Generic;
     using System.IO;
+    using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.Runner;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.Runner.SqlServer.MigrationExtensions;
+    using Building;
     using BuildingRegistry.Infrastructure;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.EntityFrameworkCore.Design;
     using Microsoft.Extensions.Configuration;
-
-    public class ConsumerParcelContext : RunnerDbContext<ConsumerParcelContext>
+    using NetTopologySuite.Geometries;
+    public class ConsumerParcelContext : RunnerDbContext<ConsumerParcelContext>, IParcels
     {
         public DbSet<ParcelConsumerItem> ParcelConsumerItems { get; set; }
         public DbSet<ParcelAddressItem> ParcelAddressItems { get; set; }
@@ -48,6 +51,24 @@ namespace BuildingRegistry.Consumer.Read.Parcel
         }
 
         public override string ProjectionStateSchema => Schema.ConsumerReadParcel;
+
+        public async Task<IEnumerable<ParcelData>> GetUnderlyingParcelsUnderBoundingBox(Geometry buildingGeometry)
+        {
+            var boundingBox = buildingGeometry.Factory.ToGeometry(buildingGeometry.EnvelopeInternal);
+
+            return await ParcelConsumerItems
+                .Where(parcel => boundingBox.Intersects(parcel.Geometry))
+                .Select(x => new ParcelData(
+                    x.ParcelId,
+                    x.CaPaKey,
+                    x.Geometry,
+                    x.Status,
+                    ParcelAddressItems
+                        .Where(y => y.ParcelId == x.ParcelId)
+                        .Select(y => new AddressPersistentLocalId(y.AddressPersistentLocalId))
+                        .ToList()))
+                .ToListAsync();
+        }
     }
 
     public class ConsumerContextFactory : IDesignTimeDbContextFactory<ConsumerParcelContext>
