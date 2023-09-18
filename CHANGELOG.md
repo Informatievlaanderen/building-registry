@@ -1,3 +1,10 @@
+## [3.89.1](https://github.com/informatievlaanderen/building-registry/compare/v3.89.0...v3.89.1) (2023-09-18)
+
+
+### Bug Fixes
+
+* only match realized parcels when parcelMatching ([1cde393](https://github.com/informatievlaanderen/building-registry/commit/1cde39388613e7c65a0ce3b126f62c9271b70a12))
+
 # [3.89.0](https://github.com/informatievlaanderen/building-registry/compare/v3.88.0...v3.89.0) (2023-09-15)
 
 
