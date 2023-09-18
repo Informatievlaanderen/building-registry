@@ -3,6 +3,7 @@ namespace BuildingRegistry.Consumer.Read.Parcel.Infrastructure.Modules
     using System;
     using Autofac;
     using Be.Vlaanderen.Basisregisters.DataDog.Tracing.Sql.EntityFrameworkCore;
+    using Building;
     using BuildingRegistry.Infrastructure;
     using Microsoft.Data.SqlClient;
     using Microsoft.EntityFrameworkCore;
@@ -30,6 +31,8 @@ namespace BuildingRegistry.Consumer.Read.Parcel.Infrastructure.Modules
             {
                 RunInMemoryDb(services, loggerFactory, logger);
             }
+
+            services.AddScoped<IParcels, ConsumerParcelContext>();
         }
 
         private static void RunOnSqlServer(

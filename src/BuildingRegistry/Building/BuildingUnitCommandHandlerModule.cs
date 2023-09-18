@@ -260,6 +260,20 @@ namespace BuildingRegistry.Building
                         message.Command.PreviousAddressPersistentLocalId,
                         message.Command.NewAddressPersistentLocalId);
                 });
+
+            For<RealizeUnplannedBuildingUnit>()
+                .AddSqlStreamStore(getStreamStore, getUnitOfWork, eventMapping, eventSerializer, getSnapshotStore)
+                .AddEventHash<RealizeUnplannedBuildingUnit, Building>(getUnitOfWork)
+                .AddProvenance(getUnitOfWork, provenanceFactory)
+                .Handle(async (message, ct) =>
+                {
+                    var streamId = new BuildingStreamId(message.Command.BuildingPersistentLocalId);
+                    var building = await buildingRepository().GetAsync(streamId, ct);
+
+                    building.RealizeUnplannedBuildingUnit(
+                        message.Command.BuildingUnitPersistentLocalId,
+                        message.Command.AddressPersistentLocalId);
+                });
         }
     }
 }

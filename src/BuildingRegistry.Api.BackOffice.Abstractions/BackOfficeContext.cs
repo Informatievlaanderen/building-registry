@@ -28,7 +28,8 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions
             int buildingUnitPersistentLocalId,
             CancellationToken cancellationToken)
         {
-            var relation = await BuildingUnitBuildings.FindAsync(new object?[] { buildingUnitPersistentLocalId }, cancellationToken);
+            var relation = await FindBuildingUnitBuildingRelation(
+                new BuildingUnitPersistentLocalId(buildingUnitPersistentLocalId), cancellationToken);
 
             if (relation is not null)
             {
@@ -63,7 +64,7 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions
             BuildingUnitPersistentLocalId buildingUnitPersistentLocalId,
             CancellationToken cancellationToken)
         {
-            var relation = await BuildingUnitBuildings.FindAsync(new object?[] { (int)buildingUnitPersistentLocalId }, cancellationToken);
+            var relation = await FindBuildingUnitBuildingRelation(buildingUnitPersistentLocalId, cancellationToken);
 
             if (relation is null)
             {
@@ -72,6 +73,13 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions
 
             BuildingUnitBuildings.Remove(relation);
             await SaveChangesAsync(cancellationToken);
+        }
+
+        public async Task<BuildingUnitBuilding?> FindBuildingUnitBuildingRelation(
+            BuildingUnitPersistentLocalId buildingUnitPersistentLocalId,
+            CancellationToken cancellationToken)
+        {
+            return await BuildingUnitBuildings.FindAsync(new object?[] { (int)buildingUnitPersistentLocalId }, cancellationToken);
         }
 
         public async Task<BuildingUnitAddressRelation> AddIdempotentBuildingUnitAddressRelation(
