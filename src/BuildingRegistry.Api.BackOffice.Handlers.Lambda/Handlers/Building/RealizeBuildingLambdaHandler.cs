@@ -1,14 +1,14 @@
 namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.Building
 {
-    using System.Threading;
-    using System.Threading.Tasks;
+    using Abstractions.Building.SqsRequests;
     using Abstractions.Validation;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
+    using Be.Vlaanderen.Basisregisters.MessageHandling.AwsSqs.Simple;
+    using Be.Vlaanderen.Basisregisters.Sqs;
     using Be.Vlaanderen.Basisregisters.Sqs.Exceptions;
     using Be.Vlaanderen.Basisregisters.Sqs.Lambda.Handlers;
     using Be.Vlaanderen.Basisregisters.Sqs.Lambda.Infrastructure;
     using Be.Vlaanderen.Basisregisters.Sqs.Responses;
-    using BuildingRegistry.Api.BackOffice.Abstractions.Building.Validators;
     using BuildingRegistry.Building;
     using BuildingRegistry.Building.Exceptions;
     using Microsoft.Extensions.Configuration;
@@ -17,19 +17,24 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.Building
 
     public sealed class RealizeBuildingLambdaHandler : BuildingLambdaHandler<RealizeBuildingLambdaRequest>
     {
+        private readonly ISqsQueue _sqsQueue;
+
         public RealizeBuildingLambdaHandler(
             IConfiguration configuration,
             ICustomRetryPolicy retryPolicy,
             ITicketing ticketing,
             IIdempotentCommandHandler idempotentCommandHandler,
-            IBuildings buildings)
+            IBuildings buildings,
+            ISqsQueue sqsQueue)
             : base(
                 configuration,
                 retryPolicy,
                 ticketing,
                 idempotentCommandHandler,
                 buildings)
-        { }
+        {
+            _sqsQueue = sqsQueue;
+        }
 
         protected override async Task<ETagResponse> InnerHandle(RealizeBuildingLambdaRequest request, CancellationToken cancellationToken)
         {
@@ -37,11 +42,24 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.Building
 
             try
             {
-                await IdempotentCommandHandler.Dispatch(
+                var streamPositionIncrements = await IdempotentCommandHandler.Dispatch(
                     cmd.CreateCommandId(),
                     cmd,
                     request.Metadata,
                     cancellationToken);
+
+                if (streamPositionIncrements > 0)
+                {
+                    var building =
+                        await Buildings.GetAsync(new BuildingStreamId(cmd.BuildingPersistentLocalId), cancellationToken);
+
+                    var sqsRequest = new NotifyOutlinedRealizedBuildingSqsRequest(
+                        cmd.BuildingPersistentLocalId,
+                        request.Provenance.Organisation.ToString(),
+                        DateTimeOffset.UtcNow,
+                        building.BuildingGeometry.Geometry.ToString());
+                    await _sqsQueue.Copy(sqsRequest, new SqsQueueOptions(), cancellationToken);
+                }
             }
             catch (IdempotencyException)
             {

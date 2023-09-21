@@ -10,6 +10,8 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
     using Be.Vlaanderen.Basisregisters.CommandHandling;
     using Be.Vlaanderen.Basisregisters.CommandHandling.Idempotency;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
+    using Be.Vlaanderen.Basisregisters.MessageHandling.AwsSqs.Simple;
+    using Be.Vlaanderen.Basisregisters.Sqs;
     using Be.Vlaanderen.Basisregisters.Sqs.Exceptions;
     using Be.Vlaanderen.Basisregisters.Sqs.Lambda.Handlers;
     using Be.Vlaanderen.Basisregisters.Sqs.Responses;
@@ -55,7 +57,8 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
                 new FakeRetryPolicy(),
                 MockTicketing(response => { eTagResponse = response; }).Object,
                 new IdempotentCommandHandler(Container.Resolve<ICommandHandlerResolver>(), _idempotencyContext),
-                Container.Resolve<IBuildings>());
+                Container.Resolve<IBuildings>(),
+                Mock.Of<ISqsQueue>());
 
             //Act
             await handler.Handle(CreateRealizeBuildingLambdaRequest(), CancellationToken.None);
@@ -64,6 +67,65 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
             var stream = await Container.Resolve<IStreamStore>()
                 .ReadStreamBackwards(new StreamId(new BuildingStreamId(buildingPersistentLocalId)), 2, 1);
             stream.Messages.First().JsonMetadata.Should().Contain(eTagResponse.ETag);
+        }
+
+        [Fact]
+        public async Task ThenNotificationShouldBeSend()
+        {
+            // Arrange
+            var buildingPersistentLocalId = Fixture.Create<BuildingPersistentLocalId>();
+
+            var sqsQueue = new Mock<ISqsQueue>();
+            PlanBuilding(buildingPersistentLocalId);
+            PlaceBuildingUnderConstruction(buildingPersistentLocalId);
+
+            var handler = new RealizeBuildingLambdaHandler(
+                Container.Resolve<IConfiguration>(),
+                new FakeRetryPolicy(),
+                Mock.Of<ITicketing>(),
+                new IdempotentCommandHandler(Container.Resolve<ICommandHandlerResolver>(), _idempotencyContext),
+                Container.Resolve<IBuildings>(),
+                sqsQueue.Object);
+
+            //Act
+            await handler.Handle(CreateRealizeBuildingLambdaRequest(), CancellationToken.None);
+
+            //Assert
+            sqsQueue.Verify(x => x.Copy(
+                It.IsAny<NotifyOutlinedRealizedBuildingSqsRequest>(),
+                It.IsAny<SqsQueueOptions>(),
+                It.IsAny<CancellationToken>()),
+                Times.Once);
+        }
+
+        [Fact]
+        public async Task WhenAlreadyRealized_ThenNotificationShouldNotBeSend()
+        {
+            // Arrange
+            var buildingPersistentLocalId = Fixture.Create<BuildingPersistentLocalId>();
+
+            var sqsQueue = new Mock<ISqsQueue>();
+            PlanBuilding(buildingPersistentLocalId);
+            PlaceBuildingUnderConstruction(buildingPersistentLocalId);
+            RealizeBuilding(buildingPersistentLocalId);
+
+            var handler = new RealizeBuildingLambdaHandler(
+                Container.Resolve<IConfiguration>(),
+                new FakeRetryPolicy(),
+                Mock.Of<ITicketing>(),
+                new IdempotentCommandHandler(Container.Resolve<ICommandHandlerResolver>(), _idempotencyContext),
+                Container.Resolve<IBuildings>(),
+                sqsQueue.Object);
+
+            //Act
+            await handler.Handle(CreateRealizeBuildingLambdaRequest(), CancellationToken.None);
+
+            //Assert
+            sqsQueue.Verify(x => x.Copy(
+                    It.IsAny<NotifyOutlinedRealizedBuildingSqsRequest>(),
+                    It.IsAny<SqsQueueOptions>(),
+                    It.IsAny<CancellationToken>()),
+                Times.Never);
         }
 
         [Fact]
@@ -82,7 +144,8 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
                 new FakeRetryPolicy(),
                 ticketing.Object,
                 MockExceptionIdempotentCommandHandler(() => new IdempotencyException(string.Empty)).Object,
-                Container.Resolve<IBuildings>());
+                Container.Resolve<IBuildings>(),
+                Mock.Of<ISqsQueue>());
 
             var building =
                 await buildings.GetAsync(new BuildingStreamId(buildingPersistentLocalId), CancellationToken.None);
@@ -102,7 +165,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
         }
 
         [Fact]
-        public async Task WithInvalidBuildingStatus_ThenTicketingErrorIsExpected()
+        public async Task WhenBuildingHasInvalidStatus_ThenTicketingErrorIsExpected()
         {
             // Arrange
             var ticketing = new Mock<ITicketing>();
@@ -112,7 +175,8 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
                 new FakeRetryPolicy(),
                 ticketing.Object,
                 MockExceptionIdempotentCommandHandler<BuildingHasInvalidStatusException>().Object,
-                Container.Resolve<IBuildings>());
+                Container.Resolve<IBuildings>(),
+                Mock.Of<ISqsQueue>());
 
             // Act
             await handler.Handle(CreateRealizeBuildingLambdaRequest(), CancellationToken.None);

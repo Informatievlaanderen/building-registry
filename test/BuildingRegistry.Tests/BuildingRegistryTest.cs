@@ -14,6 +14,7 @@ namespace BuildingRegistry.Tests
     using Building;
     using Fixtures;
     using Infrastructure.Modules;
+    using MediatR;
     using Microsoft.Extensions.Configuration;
     using Newtonsoft.Json;
     using Xunit.Abstractions;

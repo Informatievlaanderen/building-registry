@@ -1,36 +1,31 @@
 using Amazon.Lambda.Core;
+using Amazon.Lambda.Serialization.Json;
 
-[assembly: LambdaSerializer(typeof(Amazon.Lambda.Serialization.Json.JsonSerializer))]
+[assembly: LambdaSerializer(typeof(JsonSerializer))]
 
 namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda
 {
+    using System.Reflection;
+    using Abstractions;
+    using Abstractions.Building.SqsRequests;
     using Autofac;
     using Autofac.Extensions.DependencyInjection;
     using Be.Vlaanderen.Basisregisters.Aws.Lambda;
+    using Be.Vlaanderen.Basisregisters.CommandHandling.Idempotency;
     using Be.Vlaanderen.Basisregisters.DataDog.Tracing.Autofac;
     using Be.Vlaanderen.Basisregisters.EventHandling;
-    using Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Autofac;
+    using Be.Vlaanderen.Basisregisters.Sqs.Lambda.Handlers;
+    using Be.Vlaanderen.Basisregisters.Sqs.Lambda.Infrastructure;
+    using Consumer.Address;
+    using Consumer.Read.Parcel.Infrastructure.Modules;
+    using Infrastructure;
+    using Infrastructure.Modules;
     using MediatR;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Logging;
-    using System.Reflection;
-    using Abstractions;
-    using Abstractions.Building.SqsRequests;
-    using Be.Vlaanderen.Basisregisters.CommandHandling.Idempotency;
-    using Be.Vlaanderen.Basisregisters.EventHandling.Autofac;
-    using Be.Vlaanderen.Basisregisters.Sqs.Lambda.Infrastructure;
-    using Infrastructure;
-    using Infrastructure.Modules;
     using Newtonsoft.Json;
     using TicketingService.Proxy.HttpProxy;
-    using Be.Vlaanderen.Basisregisters.Sqs.Lambda.Handlers;
-    using Building;
-    using BuildingRegistry.Infrastructure;
-    using BuildingRegistry.Infrastructure.Modules;
-    using Consumer.Address;
-    using Consumer.Read.Parcel;
-    using Consumer.Read.Parcel.Infrastructure.Modules;
 
     public class Function : FunctionBase
     {
@@ -51,6 +46,9 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda
 
             var tempProvider = services.BuildServiceProvider();
             var loggerFactory = tempProvider.GetRequiredService<ILoggerFactory>();
+
+            services.AddHttpClient();
+            services.Configure<AnoApiOptions>(configuration.GetSection("AnoApi"));
 
             builder
                 .RegisterType<Mediator>()
@@ -98,8 +96,10 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda
                 .InstancePerLifetimeScope();
 
             services.ConfigureIdempotency(
-                configuration.GetSection(IdempotencyConfiguration.Section).Get<IdempotencyConfiguration>()
-                    .ConnectionString,
+                configuration
+                    .GetSection(IdempotencyConfiguration.Section)
+                    .Get<IdempotencyConfiguration>()
+                    .ConnectionString!,
                 new IdempotencyMigrationsTableInfo(Schema.Import),
                 new IdempotencyTableInfo(Schema.Import),
                 loggerFactory);
