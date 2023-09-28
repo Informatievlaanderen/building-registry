@@ -58,7 +58,7 @@ order by
     {
         protected readonly string ConnectionString;
         protected readonly int PageSize;
-        protected const int BigBuildingVersionThreshold = 30000;
+        protected const int BigBuildingVersionThreshold = 27000;
 
         public SqlStreamsTable(string connectionString, int pageSize = 500)
         {
