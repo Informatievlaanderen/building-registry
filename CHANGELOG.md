@@ -1,3 +1,10 @@
+## [3.89.2](https://github.com/informatievlaanderen/building-registry/compare/v3.89.1...v3.89.2) (2023-09-29)
+
+
+### Bug Fixes
+
+* set migrator bigbuilding threshold to 27000 ([11f005e](https://github.com/informatievlaanderen/building-registry/commit/11f005edba840ed5936f3b433a7c692251800cb4))
+
 ## [3.89.1](https://github.com/informatievlaanderen/building-registry/compare/v3.89.0...v3.89.1) (2023-09-18)
 
 
