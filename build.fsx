@@ -7,7 +7,6 @@ nuget Microsoft.Build 17.3.2
 nuget Microsoft.Build.Framework 17.3.2
 nuget Microsoft.Build.Tasks.Core 17.3.2
 nuget Microsoft.Build.Utilities.Core 17.3.2
-
 nuget Be.Vlaanderen.Basisregisters.Build.Pipeline 6.0.6 //"
 
 #load "packages/Be.Vlaanderen.Basisregisters.Build.Pipeline/Content/build-generic.fsx"
@@ -72,7 +71,7 @@ Target.create "Publish_Solution" (fun _ ->
     "BuildingRegistry.Projections.BackOffice"
     "BuildingRegistry.Migrator.Building"
     "BuildingRegistry.Producer"
-    "BuildingRegistry.Producer.Snapshot.Oslo",
+    "BuildingRegistry.Producer.Snapshot.Oslo"
     "BuildingRegistry.Snapshot.Verifier"
   ] |> List.iter publishSource)
 
