@@ -47,7 +47,9 @@ jobs:
           'building-registry-producer',
           'building-registry-producer-snapshot-oslo',
           'building-registry-projections',
-          'building-registry-projections-backoffice' ]
+          'building-registry-projections-backoffice',
+          'building-registry-snapshot-verifier'
+          ]
 
     steps:
     - name: CD services

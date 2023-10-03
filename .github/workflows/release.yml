@@ -248,6 +248,21 @@ jobs:
       semver: ${{ needs.set-release-version.outputs.version }}
     secrets: inherit
 
+  build-snapshot-verifier:
+    name: Build Snapshot Verifier
+    uses: Informatievlaanderen/build-pipeline/.github/workflows/build-image.yml@main
+    needs: [ set-release-version ]
+    if: ${{ (github.repository_owner == 'Informatievlaanderen') && (needs.set-release-version.outputs.version != 'none') }}
+    with:
+      registry: building-registry
+      build-target: Containerize_SnapshotVerifier
+      image-file: br-snapshot-verifier-image.tar
+      image-name: snapshot-verifier
+      test-project: BuildingRegistry.Tests
+      build-project: BuildingRegistry.Snapshot.Verifier
+      semver: ${{ needs.set-release-version.outputs.version }}
+    secrets: inherit
+
   pack-api-backoffice:
     name: Pack Api BackOffice
     uses: Informatievlaanderen/build-pipeline/.github/workflows/pack.yml@main
@@ -356,7 +371,9 @@ jobs:
       build-producer,
       build-producer-snapshot-oslo,
       build-migrator-building,
-      build-lambda-backoffice ]
+      build-lambda-backoffice,
+      build-snapshot-verifier
+      ]
     outputs:
       version: ${{ steps.set-version.outputs.version }}
     steps:
@@ -713,7 +730,9 @@ jobs:
           'consumer-read-parcel',
           'producer',
           'producer-snapshot-oslo',
-          'migrator-building' ]
+          'migrator-building',
+          'snapshot-verifier'
+          ]
     steps:
       - name: Configure AWS credentials (Test)
         uses: aws-actions/configure-aws-credentials@v1-node16
@@ -773,7 +792,9 @@ jobs:
           'consumer-read-parcel',
           'producer',
           'producer-snapshot-oslo',
-          'migrator-building' ]
+          'migrator-building',
+          'snapshot-verifier'
+          ]
     steps:
       - name: Configure AWS credentials (Staging)
         uses: aws-actions/configure-aws-credentials@v1-node16
@@ -835,7 +856,8 @@ jobs:
           'consumer-read-parcel',
           'producer',
           'producer-snapshot-oslo',
-          'migrator-building' ]
+          'migrator-building'
+          ]
     steps:
       - name: Configure AWS credentials (Production)
         uses: aws-actions/configure-aws-credentials@v1-node16
@@ -897,7 +919,9 @@ jobs:
           'consumer-read-parcel',
           'producer',
           'producer-snapshot-oslo',
-          'migrator-building' ]
+          'migrator-building',
+          'snapshot-verifier' 
+          ]
     steps:
       - name: Configure AWS credentials (New Production)
         uses: aws-actions/configure-aws-credentials@v1-node16
@@ -973,7 +997,9 @@ jobs:
           'building-registry-import-api',
           'building-registry-projections',
           'building-registry-producer',
-          'building-registry-producer-snapshot-oslo']
+          'building-registry-producer-snapshot-oslo',
+          'building-registry-snapshot-verifier'
+          ]
 
     steps:
     - name: Deploy services
@@ -1092,7 +1118,9 @@ jobs:
           'building-registry-producer',
           'building-registry-producer-snapshot-oslo',
           'building-registry-projections',
-          'building-registry-projections-backoffice' ]
+          'building-registry-projections-backoffice', 
+          'building-registry-snapshot-verifier'
+          ]
     steps:
     - name: CD services
       env:
@@ -1210,7 +1238,9 @@ jobs:
           'building-registry-producer',
           'building-registry-producer-snapshot-oslo',
           'building-registry-projections',
-          'building-registry-projections-backoffice' ]
+          'building-registry-projections-backoffice', 
+          'building-registry-snapshot-verifier'
+          ]
     steps:
     - name: CD services
       env:

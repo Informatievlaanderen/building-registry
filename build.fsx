@@ -72,7 +72,8 @@ Target.create "Publish_Solution" (fun _ ->
     "BuildingRegistry.Projections.BackOffice"
     "BuildingRegistry.Migrator.Building"
     "BuildingRegistry.Producer"
-    "BuildingRegistry.Producer.Snapshot.Oslo"
+    "BuildingRegistry.Producer.Snapshot.Oslo",
+    "BuildingRegistry.Snapshot.Verifier"
   ] |> List.iter publishSource)
 
 Target.create "Pack_Solution" (fun _ ->
@@ -105,6 +106,7 @@ Target.create "Containerize_ConsumerParcel" (fun _ -> containerize "BuildingRegi
 Target.create "Containerize_MigratorBuilding" (fun _ -> containerize "BuildingRegistry.Migrator.Building" "migrator-building")
 Target.create "Containerize_Producer" (fun _ -> containerize "BuildingRegistry.Producer" "producer")
 Target.create "Containerize_ProducerSnapshotOslo" (fun _ -> containerize "BuildingRegistry.Producer.Snapshot.Oslo" "producer-snapshot-oslo")
+Target.create "Containerize_SnapshotVerifier" (fun _ -> containerize "BuildingRegistry.Snapshot.Verifier" "snapshot-verifier")
 
 Target.create "SetAssemblyVersions" (fun _ -> setVersions "SolutionInfo.cs")
 
