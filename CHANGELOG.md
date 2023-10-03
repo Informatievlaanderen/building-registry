@@ -1,3 +1,10 @@
+# [3.90.0](https://github.com/informatievlaanderen/building-registry/compare/v3.89.2...v3.90.0) (2023-10-03)
+
+
+### Features
+
+* add status to building bu detail in read api GAWR-672 ([f1a25ff](https://github.com/informatievlaanderen/building-registry/commit/f1a25ff33bde0a05192f29de3db00b520cbf54dc))
+
 ## [3.89.2](https://github.com/informatievlaanderen/building-registry/compare/v3.89.1...v3.89.2) (2023-09-29)
 
 
