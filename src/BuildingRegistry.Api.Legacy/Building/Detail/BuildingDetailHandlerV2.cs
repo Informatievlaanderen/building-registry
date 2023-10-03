@@ -6,6 +6,7 @@ namespace BuildingRegistry.Api.Legacy.Building.Detail
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
     using Be.Vlaanderen.Basisregisters.GrAr.Common;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy.Gebouw;
+    using BuildingUnit;
     using Consumer.Read.Parcel;
     using Infrastructure.Options;
     using Infrastructure.ParcelMatching;
@@ -55,7 +56,7 @@ namespace BuildingRegistry.Api.Legacy.Building.Detail
                 .BuildingUnitDetailsV2
                 .Where(x => x.BuildingPersistentLocalId == building.PersistentLocalId)
                 .Where(x => !x.IsRemoved)
-                .Select(x => x.BuildingUnitPersistentLocalId)
+                .Select(x => new { x.BuildingUnitPersistentLocalId, x.Status })
                 .ToListAsync(cancellationToken);
 
             var parcels = _grbBuildingParcel
@@ -83,11 +84,12 @@ namespace BuildingRegistry.Api.Legacy.Building.Detail
                     building.GeometryMethod.Map(),
                     building.Status.Map(),
                     buildingUnitPersistentLocalIds
-                        .OrderBy(x => x)
+                        .OrderBy(x => x.BuildingUnitPersistentLocalId)
                         .Select(x =>
                             new GebouwDetailGebouweenheid(
-                                x.ToString(),
-                                string.Format(_responseOptions.Value.GebouweenheidDetailUrl, x)))
+                                x.BuildingUnitPersistentLocalId.ToString(),
+                                x.Status.Map().ToString(),
+                                string.Format(_responseOptions.Value.GebouweenheidDetailUrl, x.BuildingUnitPersistentLocalId)))
                         .ToList(),
                     caPaKeys.Select(x =>
                             new GebouwDetailPerceel(x, string.Format(_responseOptions.Value.PerceelUrl, x)))

@@ -67,7 +67,7 @@ namespace BuildingRegistry.Api.Oslo.Building.Detail
                 .BuildingUnitDetails
                 .Where(x => x.BuildingId == building.BuildingId)
                 .Where(x => x.IsComplete && !x.IsRemoved)
-                .Select(x => x.PersistentLocalId)
+                .Select(x => new { BuildingUnitPersistentLocalId = x.PersistentLocalId, x.Status })
                 .ToListAsync(cancellationToken);
 
             var parcels = _parcelMatching
@@ -90,7 +90,14 @@ namespace BuildingRegistry.Api.Oslo.Building.Detail
                     building.Version.ToBelgianDateTimeOffset(),
                     GetBuildingPolygon(building.Geometry, building.GeometryMethod.Value),
                     building.Status.Value.MapToGebouwStatus(),
-                    buildingUnits.OrderBy(x => x.Value).Select(x => new GebouwDetailGebouweenheid(x.ToString(), string.Format(_responseOptions.Value.GebouweenheidDetailUrl, x))).ToList(),
+                    buildingUnits
+                        .OrderBy(x => x.BuildingUnitPersistentLocalId.Value)
+                        .Select(x =>
+                            new GebouwDetailGebouweenheid(
+                                x.BuildingUnitPersistentLocalId.ToString(),
+                                x.Status is not null ? x.Status.Value.ConvertFromBuildingUnitStatus().ToString() : string.Empty,
+                                string.Format(_responseOptions.Value.GebouweenheidDetailUrl, x.BuildingUnitPersistentLocalId)))
+                        .ToList(),
                     caPaKeys.Select(x => new GebouwDetailPerceel(x, string.Format(_responseOptions.Value.PerceelUrl, x))).ToList()));
         }
 
