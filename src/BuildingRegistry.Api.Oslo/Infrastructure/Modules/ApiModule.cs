@@ -43,6 +43,7 @@ namespace BuildingRegistry.Api.Oslo.Infrastructure.Modules
 
             builder
                 .RegisterModule(new MediatRModule(useProjectionsV2))
+                .RegisterModule(new ParcelMatchingModule(_configuration, useProjectionsV2))
                 .RegisterModule(new LegacyModule(_configuration, _services, _loggerFactory))
                 .RegisterModule(new SyndicationModule(_configuration, _services, _loggerFactory))
                 .RegisterModule(new ConsumerParcelModule(_configuration, _services, _loggerFactory));
@@ -50,10 +51,6 @@ namespace BuildingRegistry.Api.Oslo.Infrastructure.Modules
             builder
                 .RegisterType<ProblemDetailsHelper>()
                 .AsSelf();
-
-            builder
-                .RegisterType<ParcelMatching>()
-                .AsImplementedInterfaces();
 
             builder.Populate(_services);
         }

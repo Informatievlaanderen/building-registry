@@ -43,13 +43,10 @@ namespace BuildingRegistry.Api.Legacy.Infrastructure.Modules
 
             builder
                 .RegisterModule(new MediatRModule(useProjectionsV2))
+                .RegisterModule(new ParcelMatchingModule(_configuration, useProjectionsV2))
                 .RegisterModule(new LegacyModule(_configuration, _services, _loggerFactory))
                 .RegisterModule(new SyndicationModule(_configuration, _services, _loggerFactory))
                 .RegisterModule(new ConsumerParcelModule(_configuration, _services, _loggerFactory));
-
-            builder
-                .RegisterType<ParcelMatching>()
-                .AsImplementedInterfaces();
 
             builder
                 .RegisterType<ProblemDetailsHelper>()
