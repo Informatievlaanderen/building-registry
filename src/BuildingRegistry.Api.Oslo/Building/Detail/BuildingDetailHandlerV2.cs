@@ -10,6 +10,7 @@ namespace BuildingRegistry.Api.Oslo.Building.Detail
     using Be.Vlaanderen.Basisregisters.GrAr.Common.SpatialTools.GeometryCoordinates;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy.Gebouw;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy.SpatialTools;
+    using Be.Vlaanderen.Basisregisters.Utilities;
     using BuildingRegistry.Building;
     using Consumer.Read.Parcel;
     using Converters;
@@ -65,7 +66,7 @@ namespace BuildingRegistry.Api.Oslo.Building.Detail
                 .BuildingUnitDetailsV2
                 .Where(x => x.BuildingPersistentLocalId == building.PersistentLocalId)
                 .Where(x => !x.IsRemoved)
-                .Select(x => x.BuildingUnitPersistentLocalId)
+                .Select(x => new {x.BuildingUnitPersistentLocalId, x.Status})
                 .ToListAsync(cancellationToken);
 
             var parcels = _parcelMatching
@@ -92,7 +93,13 @@ namespace BuildingRegistry.Api.Oslo.Building.Detail
                     building.Version.ToBelgianDateTimeOffset(),
                     GetBuildingPolygon(building.Geometry, building.GeometryMethod),
                     building.Status.Map(),
-                    buildingUnits.OrderBy(x => x).Select(x => new GebouwDetailGebouweenheid(x.ToString(), string.Format(_responseOptions.Value.GebouweenheidDetailUrl, x))).ToList(),
+                    buildingUnits
+                        .OrderBy(x => x.BuildingUnitPersistentLocalId)
+                        .Select(x =>
+                            new GebouwDetailGebouweenheid(
+                                x.BuildingUnitPersistentLocalId.ToString(),
+                                x.Status.Map().ToString(),
+                                string.Format(_responseOptions.Value.GebouweenheidDetailUrl, x.BuildingUnitPersistentLocalId))).ToList(),
                     caPaKeys.Select(x => new GebouwDetailPerceel(x, string.Format(_responseOptions.Value.PerceelUrl, x))).ToList()),
                 building.LastEventHash);
         }

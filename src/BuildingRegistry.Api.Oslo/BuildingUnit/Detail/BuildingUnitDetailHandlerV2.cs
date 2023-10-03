@@ -66,8 +66,11 @@ namespace BuildingRegistry.Api.Oslo.BuildingUnit.Detail
                     GetBuildingUnitPoint(buildingUnit.Position, buildingUnit.PositionMethod),
                     buildingUnit.Status.Map(),
                     MapBuildingUnitFunction(buildingUnit.Function),
-                    new GebouweenheidDetailGebouw(buildingUnit.BuildingPersistentLocalId.ToString(), string.Format(_responseOptions.Value.GebouwDetailUrl, buildingUnit.BuildingPersistentLocalId)),
-                    addressPersistentLocalIds.Select(id => new GebouweenheidDetailAdres(id.ToString(), string.Format(_responseOptions.Value.AdresUrl, id))).ToList(),
+                    new GebouweenheidDetailGebouw(
+                        buildingUnit.BuildingPersistentLocalId.ToString(),
+                        string.Format(_responseOptions.Value.GebouwDetailUrl, buildingUnit.BuildingPersistentLocalId)),
+                    addressPersistentLocalIds
+                        .Select(id => new GebouweenheidDetailAdres(id.ToString(), string.Format(_responseOptions.Value.AdresUrl, id))).ToList(),
                     buildingUnit.HasDeviation),
                 buildingUnit.LastEventHash);
         }
@@ -125,6 +128,7 @@ namespace BuildingRegistry.Api.Oslo.BuildingUnit.Detail
                 Write(geometry.Coordinate, xmlwriter);
                 xmlwriter.WriteEndElement();
             }
+
             return builder.ToString();
         }
 

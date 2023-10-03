@@ -30,7 +30,8 @@ namespace BuildingRegistry.Api.Legacy.BuildingUnit.Detail
             _responseOptions = responseOptions;
         }
 
-        public async Task<BuildingUnitResponseWithEtag> Handle(GetBuildingUnitDetailRequest buildingUnitDetailRequest, CancellationToken cancellationToken)
+        public async Task<BuildingUnitResponseWithEtag> Handle(GetBuildingUnitDetailRequest buildingUnitDetailRequest,
+            CancellationToken cancellationToken)
         {
             var buildingUnit = await _context
                 .BuildingUnitDetails
@@ -64,8 +65,11 @@ namespace BuildingRegistry.Api.Legacy.BuildingUnit.Detail
                     buildingUnit.PositionMethod.Value.ConvertFromBuildingUnitGeometryMethod(),
                     buildingUnit.Status.Value.ConvertFromBuildingUnitStatus(),
                     buildingUnit.Function.ConvertFromBuildingUnitFunction(),
-                    new GebouweenheidDetailGebouw(buildingUnit.BuildingPersistentLocalId.Value.ToString(), string.Format(_responseOptions.Value.GebouwDetailUrl, buildingUnit.BuildingPersistentLocalId.Value)),
-                    addressPersistentLocalIds.Select(id => new GebouweenheidDetailAdres(id, string.Format(_responseOptions.Value.AdresUrl, id))).ToList(),
+                    new GebouweenheidDetailGebouw(
+                        buildingUnit.BuildingPersistentLocalId.Value.ToString(),
+                        string.Format(_responseOptions.Value.GebouwDetailUrl, buildingUnit.BuildingPersistentLocalId.Value)),
+                    addressPersistentLocalIds.Select(id => new GebouweenheidDetailAdres(id, string.Format(_responseOptions.Value.AdresUrl, id)))
+                        .ToList(),
                     false));
         }
     }

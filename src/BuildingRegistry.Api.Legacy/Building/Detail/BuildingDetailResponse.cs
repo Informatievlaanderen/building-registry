@@ -8,6 +8,7 @@ namespace BuildingRegistry.Api.Legacy.Building.Detail
     using Be.Vlaanderen.Basisregisters.GrAr.Common;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy.Gebouw;
+    using Be.Vlaanderen.Basisregisters.GrAr.Legacy.Gebouweenheid;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy.SpatialTools;
     using BuildingRegistry.Api.Legacy.Infrastructure.Options;
     using Microsoft.AspNetCore.Http;
@@ -111,8 +112,8 @@ namespace BuildingRegistry.Api.Legacy.Building.Detail
                 GebouwStatus.Gerealiseerd,
                 new List<GebouwDetailGebouweenheid>
                 {
-                    new GebouwDetailGebouweenheid("1", string.Format(_responseOptions.GebouweenheidDetailUrl,"1")),
-                    new GebouwDetailGebouweenheid("2", string.Format(_responseOptions.GebouweenheidDetailUrl,"2"))
+                    new GebouwDetailGebouweenheid("1", GebouweenheidStatus.Gerealiseerd.ToString(), string.Format(_responseOptions.GebouweenheidDetailUrl,"1")),
+                    new GebouwDetailGebouweenheid("2", GebouweenheidStatus.Gerealiseerd.ToString(), string.Format(_responseOptions.GebouweenheidDetailUrl,"2"))
                 },
                 new List<GebouwDetailPerceel>
                 {

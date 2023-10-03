@@ -56,7 +56,8 @@ namespace BuildingRegistry.Api.Legacy.BuildingUnit.Detail
                     new GebouweenheidDetailGebouw(
                         buildingUnit.BuildingPersistentLocalId.ToString(),
                         string.Format(_responseOptions.Value.GebouwDetailUrl,
-                            buildingUnit.BuildingPersistentLocalId)),
+                            buildingUnit.BuildingPersistentLocalId)
+                        ),
                     buildingUnit.Addresses.Select(x =>
                         new GebouweenheidDetailAdres(
                             x.AddressPersistentLocalId.ToString(),
