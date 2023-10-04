@@ -39,14 +39,19 @@ namespace BuildingRegistry.Api.Legacy.BuildingUnit.Query
             {
                 if (int.TryParse(filtering.Filter.AddressPersistentLocalId, out var addressPersistentLocalId))
                 {
-                    buildingUnits = _context
-                        .BuildingUnitDetailsV2
+                    buildingUnits = buildingUnits
                         .Where(unit => unit.Addresses.Any(address => address.AddressPersistentLocalId == addressPersistentLocalId));
                 }
                 else
                 {
                     return new List<BuildingUnitDetailItemV2>().AsQueryable();
                 }
+            }
+
+            if (filtering.Filter?.BuildingPersistentLocalId is not null)
+            {
+                buildingUnits = buildingUnits
+                    .Where(unit => unit.BuildingPersistentLocalId == filtering.Filter.BuildingPersistentLocalId.Value);
             }
 
             if (!string.IsNullOrEmpty(filtering.Filter.Status))
