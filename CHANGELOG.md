@@ -1,3 +1,10 @@
+## [3.91.1](https://github.com/informatievlaanderen/building-registry/compare/v3.91.0...v3.91.1) (2023-10-04)
+
+
+### Bug Fixes
+
+* GebouwDetailGebouweenheid Status should be enum ([5a5337e](https://github.com/informatievlaanderen/building-registry/commit/5a5337e13e93817c2677c413efe3bda0b3d6ab52))
+
 # [3.91.0](https://github.com/informatievlaanderen/building-registry/compare/v3.90.1...v3.91.0) (2023-10-04)
 
 
