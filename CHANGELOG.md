@@ -1,3 +1,12 @@
+## [3.90.1](https://github.com/informatievlaanderen/building-registry/compare/v3.90.0...v3.90.1) (2023-10-04)
+
+
+### Bug Fixes
+
+* add snapshot verifier release ([406cdec](https://github.com/informatievlaanderen/building-registry/commit/406cdec1379c7e9f415380b24f2e28a04664e93c))
+* build.fsx typo ([6dd437c](https://github.com/informatievlaanderen/building-registry/commit/6dd437cb0749462f81aeb63a5bb29130a125a584))
+* status to building bu detail in read api ([e4e89a3](https://github.com/informatievlaanderen/building-registry/commit/e4e89a3e57eb9d8bc2773d8e64aceea2b48a5131))
+
 # [3.90.0](https://github.com/informatievlaanderen/building-registry/compare/v3.89.2...v3.90.0) (2023-10-03)
 
 
