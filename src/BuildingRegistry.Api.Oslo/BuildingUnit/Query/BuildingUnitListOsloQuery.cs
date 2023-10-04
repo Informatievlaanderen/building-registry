@@ -47,9 +47,14 @@ namespace BuildingRegistry.Api.Oslo.BuildingUnit.Query
                     .Select(x => x.AddressId)
                     .ToList();
 
-                buildingUnits = _context
-                    .BuildingUnitDetails
+                buildingUnits = buildingUnits
                     .Where(unit => unit.Addresses.Any(address => addressPersistentLocalIds.Contains(address.AddressId)));
+            }
+
+            if (filtering.Filter?.BuildingPersistentLocalId is not null)
+            {
+                buildingUnits = buildingUnits
+                    .Where(unit => unit.BuildingPersistentLocalId == filtering.Filter.BuildingPersistentLocalId.Value);
             }
 
             if (!string.IsNullOrEmpty(filtering.Filter.Status))
@@ -80,6 +85,7 @@ namespace BuildingRegistry.Api.Oslo.BuildingUnit.Query
 
     public class BuildingUnitFilter
     {
+        public int? BuildingPersistentLocalId { get; set; }
         public string AddressPersistentLocalId { get; set; }
         public string Status { get; set; }
     }
