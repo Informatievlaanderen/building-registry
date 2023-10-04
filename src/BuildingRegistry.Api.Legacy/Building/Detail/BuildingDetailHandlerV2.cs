@@ -88,7 +88,7 @@ namespace BuildingRegistry.Api.Legacy.Building.Detail
                         .Select(x =>
                             new GebouwDetailGebouweenheid(
                                 x.BuildingUnitPersistentLocalId.ToString(),
-                                x.Status.Map().ToString(),
+                                x.Status.Map(),
                                 string.Format(_responseOptions.Value.GebouweenheidDetailUrl, x.BuildingUnitPersistentLocalId)))
                         .ToList(),
                     caPaKeys.Select(x =>

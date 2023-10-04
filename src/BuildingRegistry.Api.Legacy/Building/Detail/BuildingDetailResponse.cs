@@ -112,8 +112,8 @@ namespace BuildingRegistry.Api.Legacy.Building.Detail
                 GebouwStatus.Gerealiseerd,
                 new List<GebouwDetailGebouweenheid>
                 {
-                    new GebouwDetailGebouweenheid("1", GebouweenheidStatus.Gerealiseerd.ToString(), string.Format(_responseOptions.GebouweenheidDetailUrl,"1")),
-                    new GebouwDetailGebouweenheid("2", GebouweenheidStatus.Gerealiseerd.ToString(), string.Format(_responseOptions.GebouweenheidDetailUrl,"2"))
+                    new GebouwDetailGebouweenheid("1", GebouweenheidStatus.Gerealiseerd, string.Format(_responseOptions.GebouweenheidDetailUrl,"1")),
+                    new GebouwDetailGebouweenheid("2", GebouweenheidStatus.Gerealiseerd, string.Format(_responseOptions.GebouweenheidDetailUrl,"2"))
                 },
                 new List<GebouwDetailPerceel>
                 {

@@ -95,7 +95,7 @@ namespace BuildingRegistry.Api.Oslo.Building.Detail
                         .Select(x =>
                             new GebouwDetailGebouweenheid(
                                 x.BuildingUnitPersistentLocalId.ToString(),
-                                x.Status is not null ? x.Status.Value.ConvertFromBuildingUnitStatus().ToString() : string.Empty,
+                                x.Status.Value.ConvertFromBuildingUnitStatus(),
                                 string.Format(_responseOptions.Value.GebouweenheidDetailUrl, x.BuildingUnitPersistentLocalId)))
                         .ToList(),
                     caPaKeys.Select(x => new GebouwDetailPerceel(x, string.Format(_responseOptions.Value.PerceelUrl, x))).ToList()));
