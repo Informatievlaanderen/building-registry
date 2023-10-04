@@ -1,3 +1,10 @@
+# [3.91.0](https://github.com/informatievlaanderen/building-registry/compare/v3.90.1...v3.91.0) (2023-10-04)
+
+
+### Features
+
+* add building filter on list building units ([2233832](https://github.com/informatievlaanderen/building-registry/commit/2233832a15ee21275eec1810aeaca130b7100243))
+
 ## [3.90.1](https://github.com/informatievlaanderen/building-registry/compare/v3.90.0...v3.90.1) (2023-10-04)
 
 
