@@ -26,7 +26,6 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetail
             get => BuildingUnitFunction.Parse(FunctionAsString);
             set => FunctionAsString = value.HasValue ? value.Value.Function : string.Empty;
         }
-
         public string? FunctionAsString { get; set; }
 
         public BuildingUnitPositionGeometryMethod? PositionMethod

@@ -69,6 +69,18 @@ namespace BuildingRegistry.Api.Oslo.BuildingUnit.Query
                     buildingUnits = buildingUnits.Where(m => m.StatusAsString == "-1");
             }
 
+            if (!string.IsNullOrEmpty(filtering.Filter.Functie))
+            {
+                if (Enum.TryParse(typeof(GebouweenheidFunctie), filtering.Filter.Functie, true, out var functie))
+                {
+                    var buildingUnitFunction = ((GebouweenheidFunctie)functie).ConvertFromGebouweenheidFunctie();
+                    buildingUnits = buildingUnits.Where(m => m.FunctionAsString == buildingUnitFunction.Function);
+                }
+                else
+                    //have to filter on EF cannot return new List<>().AsQueryable() cause non-EF provider does not support .CountAsync()
+                    buildingUnits = buildingUnits.Where(m => m.FunctionAsString == "-1");
+            }
+
             return buildingUnits;
         }
     }
@@ -88,5 +100,6 @@ namespace BuildingRegistry.Api.Oslo.BuildingUnit.Query
         public int? BuildingPersistentLocalId { get; set; }
         public string AddressPersistentLocalId { get; set; }
         public string Status { get; set; }
+        public string? Functie { get; set; }
     }
 }
