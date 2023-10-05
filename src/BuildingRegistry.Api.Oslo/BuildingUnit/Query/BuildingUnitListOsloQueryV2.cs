@@ -68,6 +68,19 @@ namespace BuildingRegistry.Api.Oslo.BuildingUnit.Query
                 }
             }
 
+            if (!string.IsNullOrEmpty(filtering.Filter.Functie))
+            {
+                if (Enum.TryParse(typeof(GebouweenheidFunctie), filtering.Filter.Functie, true, out var functie))
+                {
+                    var buildingUnitFunction = ((GebouweenheidFunctie)functie).Map();
+                    buildingUnits = buildingUnits.Where(m => m.Function == buildingUnitFunction.Function);
+                }
+                else
+                {
+                    return new List<BuildingUnitDetailItemV2>().AsQueryable();
+                }
+            }
+
             return buildingUnits;
         }
     }

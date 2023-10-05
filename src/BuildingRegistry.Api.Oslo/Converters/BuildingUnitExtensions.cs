@@ -154,5 +154,30 @@ namespace BuildingRegistry.Api.Oslo.Converters
 
             throw new ArgumentOutOfRangeException(nameof(function), function, null);
         }
+
+        public static Legacy.BuildingUnitFunction ConvertFromGebouweenheidFunctie(this GebouweenheidFunctie functie)
+        {
+            if (functie == GebouweenheidFunctie.NietGekend)
+            {
+                return Legacy.BuildingUnitFunction.Unknown;
+            }
+
+            if (functie == GebouweenheidFunctie.GemeenschappelijkDeel)
+            {
+                return Legacy.BuildingUnitFunction.Common;
+            }
+
+            throw new ArgumentOutOfRangeException(nameof(functie), functie, null);
+        }
+
+        public static BuildingUnitFunction Map(this GebouweenheidFunctie functie)
+        {
+            switch (functie)
+            {
+                case GebouweenheidFunctie.NietGekend: return BuildingUnitFunction.Unknown;
+                case GebouweenheidFunctie.GemeenschappelijkDeel: return BuildingUnitFunction.Common;
+                default: throw new ArgumentOutOfRangeException(nameof(functie), functie, null);
+            }
+        }
     }
 }

@@ -141,6 +141,31 @@ namespace BuildingRegistry.Api.Legacy.BuildingUnit
             throw new ArgumentOutOfRangeException(nameof(function), function, null);
         }
 
+        public static Legacy.BuildingUnitFunction ConvertFromGebouweenheidFunctie(this GebouweenheidFunctie functie)
+        {
+            if (functie == GebouweenheidFunctie.NietGekend)
+            {
+                return Legacy.BuildingUnitFunction.Unknown;
+            }
+
+            if (functie == GebouweenheidFunctie.GemeenschappelijkDeel)
+            {
+                return Legacy.BuildingUnitFunction.Common;
+            }
+
+            throw new ArgumentOutOfRangeException(nameof(functie), functie, null);
+        }
+
+        public static BuildingUnitFunction Map(this GebouweenheidFunctie functie)
+        {
+            return functie switch
+            {
+                GebouweenheidFunctie.NietGekend => BuildingUnitFunction.Unknown,
+                GebouweenheidFunctie.GemeenschappelijkDeel => BuildingUnitFunction.Common,
+                _ => throw new ArgumentOutOfRangeException(nameof(functie), functie, null)
+            };
+        }
+
         public static GebouweenheidFunctie? Map(this BuildingUnitFunction function)
         {
             if (BuildingUnitFunction.Common == function)
