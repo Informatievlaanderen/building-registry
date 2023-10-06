@@ -1,3 +1,16 @@
+# [3.92.0](https://github.com/informatievlaanderen/building-registry/compare/v3.91.1...v3.92.0) (2023-10-06)
+
+
+### Bug Fixes
+
+* gebouweenheidfunctie filter should be in Dutch ([af15d15](https://github.com/informatievlaanderen/building-registry/commit/af15d15135c5a4faa1c8d08170f621399e79925c))
+* grb buildingunit stream ([8892dd2](https://github.com/informatievlaanderen/building-registry/commit/8892dd2c4f817601a7be41cb9f6bd777c7944bae))
+
+
+### Features
+
+* gebouweenheidfunctie filter ([d7d1eff](https://github.com/informatievlaanderen/building-registry/commit/d7d1effc7dd2b354fa53d3d74b7fc5535b03971d))
+
 ## [3.91.1](https://github.com/informatievlaanderen/building-registry/compare/v3.91.0...v3.91.1) (2023-10-04)
 
 
