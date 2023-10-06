@@ -67,9 +67,9 @@ namespace BuildingRegistry.Api.Legacy.BuildingUnit.Query
                 }
             }
 
-            if (!string.IsNullOrEmpty(filtering.Filter.Function))
+            if (!string.IsNullOrEmpty(filtering.Filter.Functie))
             {
-                if (Enum.TryParse(typeof(GebouweenheidFunctie), filtering.Filter.Function, true, out var functie))
+                if (Enum.TryParse(typeof(GebouweenheidFunctie), filtering.Filter.Functie, true, out var functie))
                 {
                     var buildingUnitFunction = ((GebouweenheidFunctie) functie).Map();
                     buildingUnits = buildingUnits.Where(m => m.Function == buildingUnitFunction.Function);
