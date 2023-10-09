@@ -1,10 +1,10 @@
-CREATE SINK CONNECTOR `BuildingOsloGeolocationConnector` with (
-    "topics"= 'building.snapshot.oslo.flatten.geolocation',
+CREATE SINK CONNECTOR `BuildingUnitOsloGeolocationConnector` with (
+    "topics"= 'buildingunit.snapshot.oslo.flatten.geolocation',
     "input.data.format"= 'JSON_SR',
     "input.key.format"= 'JSON_SR',
     "delete.enabled"= false,
     "connector.class"= 'MicrosoftSqlServerSink',
-    "name"= 'BuildingOsloGeolocationConnector',
+    "name"= 'BuildingUnitOsloGeolocationConnector',
     "kafka.auth.mode"= 'KAFKA_API_KEY',
     "kafka.api.key"= '***', -- clear value
     "kafka.api.secret"= '***', -- clear value
@@ -15,7 +15,7 @@ CREATE SINK CONNECTOR `BuildingOsloGeolocationConnector` with (
     "db.name"= 'vbr-wms',
     "ssl.mode"= 'require',
     "insert.mode"= 'UPSERT',
-    "table.name.format"= 'vbr-wms.geolocation.BuildingOsloGeolocation',
+    "table.name.format"= 'vbr-wms.geolocation.BuildingUnitOsloGeolocation',
     "table.types"= 'TABLE',
     "db.timezone"= 'UTC',
     "pk.mode"= 'record_key',
