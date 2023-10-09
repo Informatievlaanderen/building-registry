@@ -6,12 +6,12 @@ CREATE SINK CONNECTOR `BuildingOsloGeolocationConnector` with (
     "connector.class"= 'MicrosoftSqlServerSink',
     "name"= 'BuildingOsloGeolocationConnector',
     "kafka.auth.mode"= 'KAFKA_API_KEY',
-    "kafka.api.key"= 'B65LDWZMQCZNM6P6',
-    "kafka.api.secret"= '***',
-    "connection.host"= 'vbr-wms-staging.database.windows.net',
+    "kafka.api.key"= '***', -- clear value
+    "kafka.api.secret"= '***', -- clear value
+    "connection.host"= '***', -- clear value
     "connection.port"= '1433',
     "connection.user"= 'geolocation',
-    "connection.password"= '***',
+    "connection.password"= '***', -- clear value
     "db.name"= 'vbr-wms',
     "ssl.mode"= 'require',
     "insert.mode"= 'UPSERT',
