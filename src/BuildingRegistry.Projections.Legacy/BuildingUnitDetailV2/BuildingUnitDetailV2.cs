@@ -19,8 +19,20 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetailV2
         public byte[] Position { get; set; }
         public BuildingUnitPositionGeometryMethod PositionMethod { get; set; }
 
-        public BuildingUnitFunction Function { get; set; }
-        public BuildingUnitStatus Status { get; set; }
+        public BuildingUnitFunction Function
+        {
+            get => BuildingUnitFunction.Parse(FunctionAsString);
+            set => FunctionAsString = value.Function;
+        }
+        public string FunctionAsString { get; private set; }
+
+        public BuildingUnitStatus Status
+        {
+            get => BuildingUnitStatus.Parse(StatusAsString);
+            set => StatusAsString = value.Status;
+        }
+        public string StatusAsString { get; private set; }
+
         public bool HasDeviation { get; set; }
 
         public virtual Collection<BuildingUnitDetailAddressItemV2> Addresses { get; set; }
@@ -92,17 +104,11 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetailV2
             b.Property(BuildingUnitDetailItemV2.VersionTimestampBackingPropertyName)
                 .HasColumnName("Version");
 
-            b.Property(p => p.Status)
-                 .HasConversion(x => x.Status, y => BuildingUnitStatus.Parse(y));
-
             b.Property(p => p.HasDeviation)
                 .HasDefaultValue(false);
 
             b.Property(p => p.PositionMethod)
                 .HasConversion(x => x.GeometryMethod, y => BuildingUnitPositionGeometryMethod.Parse(y));
-
-            b.Property(p => p.Function)
-                .HasConversion(x => x.Function, y => BuildingUnitFunction.Parse(y));
 
             b.Property(p => p.IsRemoved);
 
@@ -113,7 +119,16 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetailV2
 
             b.HasIndex(p => p.BuildingPersistentLocalId);
             b.HasIndex(p => new { p.IsRemoved, p.BuildingUnitPersistentLocalId, p.BuildingPersistentLocalId });
-            b.HasIndex(p => p.Status);
+
+            b.Ignore(p => p.Status);
+            b.Property(x => x.StatusAsString).HasMaxLength(450)
+                .HasColumnName("Status");
+            b.HasIndex(x => x.StatusAsString);
+
+            b.Ignore(p => p.Function);
+            b.Property(x => x.FunctionAsString)
+                .HasColumnName("Function");
+            b.HasIndex(x => x.FunctionAsString);
         }
     }
 }
