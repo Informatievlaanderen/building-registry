@@ -60,7 +60,7 @@ namespace BuildingRegistry.Api.Oslo.BuildingUnit.Query
                 if (Enum.TryParse(typeof(GebouweenheidStatus), filtering.Filter.Status, true, out var status))
                 {
                     var buildingUnitStatus = ((GebouweenheidStatus)status).Map();
-                    buildingUnits = buildingUnits.Where(m => m.Status == buildingUnitStatus.Status);
+                    buildingUnits = buildingUnits.Where(m => m.StatusAsString == buildingUnitStatus.Status);
                 }
                 else
                 {
@@ -73,7 +73,7 @@ namespace BuildingRegistry.Api.Oslo.BuildingUnit.Query
                 if (Enum.TryParse(typeof(GebouweenheidFunctie), filtering.Filter.Functie, true, out var functie))
                 {
                     var buildingUnitFunction = ((GebouweenheidFunctie)functie).Map();
-                    buildingUnits = buildingUnits.Where(m => m.Function == buildingUnitFunction.Function);
+                    buildingUnits = buildingUnits.Where(m => m.FunctionAsString == buildingUnitFunction.Function);
                 }
                 else
                 {

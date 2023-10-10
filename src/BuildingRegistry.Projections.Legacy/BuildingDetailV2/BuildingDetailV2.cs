@@ -15,7 +15,15 @@ namespace BuildingRegistry.Projections.Legacy.BuildingDetailV2
         public int PersistentLocalId { get; set; }
         public BuildingGeometryMethod GeometryMethod { get; set; }
         public byte[] Geometry { get; set; }
-        public BuildingStatus Status { get; set; }
+
+        public BuildingStatus Status
+        {
+            get => BuildingStatus.Parse(StatusAsString);
+            set => StatusAsString = value.Value;
+        }
+
+        public string StatusAsString { get; private set; }
+
         public bool IsRemoved { get; set; }
 
         private DateTimeOffset VersionTimestampAsDateTimeOffset { get; set; }
@@ -76,12 +84,15 @@ namespace BuildingRegistry.Projections.Legacy.BuildingDetailV2
             b.Property(p => p.GeometryMethod)
                 .HasConversion(x => x.Value, y => BuildingGeometryMethod.Parse(y));
             b.Property(p => p.Geometry);
-            b.Property(p => p.Status)
-                .HasConversion(x => x.Value, y => BuildingStatus.Parse(y));
             b.Property(p => p.IsRemoved);
 
             b.HasIndex(p => new { p.IsRemoved, p.PersistentLocalId });
-            b.HasIndex(p => p.Status);
+
+            b.Property(x => x.StatusAsString).HasMaxLength(450)
+                .HasColumnName("Status");
+
+            b.Ignore(p => p.Status);
+            b.HasIndex(x => x.StatusAsString);
         }
     }
 }
