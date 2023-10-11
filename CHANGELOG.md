@@ -1,3 +1,11 @@
+## [3.92.2](https://github.com/informatievlaanderen/building-registry/compare/v3.92.1...v3.92.2) (2023-10-11)
+
+
+### Performance Improvements
+
+* add indexes on legacy projections ([cf38821](https://github.com/informatievlaanderen/building-registry/commit/cf38821e43341b9edb7fa221dd08a702615fcc6e))
+* only select required columns in oslo ([40fe6e2](https://github.com/informatievlaanderen/building-registry/commit/40fe6e23bf91489390ce2632f00a69c5eb89cb25))
+
 ## [3.92.1](https://github.com/informatievlaanderen/building-registry/compare/v3.92.0...v3.92.1) (2023-10-11)
 
 
