@@ -7,12 +7,12 @@ namespace BuildingRegistry.Api.Oslo.BuildingUnit.Query
     using Be.Vlaanderen.Basisregisters.Api.Search.Filtering;
     using Be.Vlaanderen.Basisregisters.Api.Search.Sorting;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy.Gebouweenheid;
-    using BuildingRegistry.Projections.Legacy;
-    using BuildingRegistry.Projections.Legacy.BuildingUnitDetailV2;
     using Converters;
     using Microsoft.EntityFrameworkCore;
+    using Projections.Legacy;
+    using Projections.Legacy.BuildingUnitDetailV2;
 
-    public class BuildingUnitListOsloQueryV2 : Query<BuildingUnitDetailItemV2, BuildingUnitFilter>
+    public class BuildingUnitListOsloQueryV2 : Query<BuildingUnitQueryItem, BuildingUnitFilter>
     {
         private readonly LegacyContext _context;
 
@@ -23,7 +23,7 @@ namespace BuildingRegistry.Api.Oslo.BuildingUnit.Query
             _context = context;
         }
 
-        protected override IQueryable<BuildingUnitDetailItemV2> Filter(FilteringHeader<BuildingUnitFilter> filtering)
+        protected override IQueryable<BuildingUnitQueryItem> Filter(FilteringHeader<BuildingUnitFilter> filtering)
         {
             var buildingUnits = _context
                 .BuildingUnitDetailsV2
@@ -33,7 +33,12 @@ namespace BuildingRegistry.Api.Oslo.BuildingUnit.Query
 
             if (!filtering.ShouldFilter)
             {
-                return buildingUnits;
+                return buildingUnits.Select(x => new BuildingUnitQueryItem
+                {
+                    BuildingUnitPersistentLocalId = x.BuildingUnitPersistentLocalId,
+                    StatusAsString = x.StatusAsString,
+                    VersionTimestampAsDateTimeOffset = x.VersionTimestampAsDateTimeOffset
+                });
             }
 
             if (!string.IsNullOrEmpty(filtering.Filter?.AddressPersistentLocalId))
@@ -45,7 +50,7 @@ namespace BuildingRegistry.Api.Oslo.BuildingUnit.Query
                 }
                 else
                 {
-                    return new List<BuildingUnitDetailItemV2>().AsQueryable();
+                    return new List<BuildingUnitQueryItem>().AsQueryable();
                 }
             }
 
@@ -64,7 +69,7 @@ namespace BuildingRegistry.Api.Oslo.BuildingUnit.Query
                 }
                 else
                 {
-                    return new List<BuildingUnitDetailItemV2>().AsQueryable();
+                    return new List<BuildingUnitQueryItem>().AsQueryable();
                 }
             }
 
@@ -77,11 +82,16 @@ namespace BuildingRegistry.Api.Oslo.BuildingUnit.Query
                 }
                 else
                 {
-                    return new List<BuildingUnitDetailItemV2>().AsQueryable();
+                    return new List<BuildingUnitQueryItem>().AsQueryable();
                 }
             }
 
-            return buildingUnits;
+            return buildingUnits.Select(x => new BuildingUnitQueryItem
+            {
+                BuildingUnitPersistentLocalId = x.BuildingUnitPersistentLocalId,
+                StatusAsString = x.StatusAsString,
+                VersionTimestampAsDateTimeOffset = x.VersionTimestampAsDateTimeOffset
+            });
         }
     }
 

@@ -7,12 +7,11 @@ namespace BuildingRegistry.Api.Oslo.Building.Query
     using Be.Vlaanderen.Basisregisters.Api.Search.Filtering;
     using Be.Vlaanderen.Basisregisters.Api.Search.Sorting;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy.Gebouw;
-    using BuildingRegistry.Projections.Legacy;
-    using BuildingRegistry.Projections.Legacy.BuildingDetailV2;
     using Converters;
     using Microsoft.EntityFrameworkCore;
+    using Projections.Legacy;
 
-    public class BuildingListOsloQueryV2 : Query<BuildingDetailItemV2, BuildingFilter>
+    public class BuildingListOsloQueryV2 : Query<BuildingQueryItem, BuildingFilter>
     {
         private readonly LegacyContext _context;
 
@@ -23,7 +22,7 @@ namespace BuildingRegistry.Api.Oslo.Building.Query
             _context = context;
         }
 
-        protected override IQueryable<BuildingDetailItemV2> Filter(FilteringHeader<BuildingFilter> filtering)
+        protected override IQueryable<BuildingQueryItem> Filter(FilteringHeader<BuildingFilter> filtering)
         {
             var buildings = _context
                 .BuildingDetailsV2
@@ -32,7 +31,12 @@ namespace BuildingRegistry.Api.Oslo.Building.Query
                 .AsNoTracking();
 
             if (!filtering.ShouldFilter)
-                return buildings;
+                return buildings.Select(x => new BuildingQueryItem
+                {
+                    PersistentLocalId = x.PersistentLocalId,
+                    StatusAsString = x.StatusAsString,
+                    VersionTimestampAsDateTimeOffset = x.VersionTimestampAsDateTimeOffset
+                });
 
             if (!string.IsNullOrEmpty(filtering.Filter.Status))
             {
@@ -43,11 +47,16 @@ namespace BuildingRegistry.Api.Oslo.Building.Query
                 }
                 else
                 {
-                    return new List<BuildingDetailItemV2>().AsQueryable();
+                    return new List<BuildingQueryItem>().AsQueryable();
                 }
             }
 
-            return buildings;
+            return buildings.Select(x => new BuildingQueryItem
+            {
+                PersistentLocalId = x.PersistentLocalId,
+                StatusAsString = x.StatusAsString,
+                VersionTimestampAsDateTimeOffset = x.VersionTimestampAsDateTimeOffset
+            });
         }
     }
 }

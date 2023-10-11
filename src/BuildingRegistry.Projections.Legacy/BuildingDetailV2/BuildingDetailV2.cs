@@ -26,7 +26,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingDetailV2
 
         public bool IsRemoved { get; set; }
 
-        private DateTimeOffset VersionTimestampAsDateTimeOffset { get; set; }
+        public DateTimeOffset VersionTimestampAsDateTimeOffset { get; set; }
 
         public Instant Version
         {
