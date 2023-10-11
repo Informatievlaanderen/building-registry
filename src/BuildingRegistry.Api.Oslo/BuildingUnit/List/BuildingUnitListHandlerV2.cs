@@ -31,14 +31,7 @@ namespace BuildingRegistry.Api.Oslo.BuildingUnit.List
             var pagedBuildingUnits = new BuildingUnitListOsloQueryV2(_context)
                 .Fetch(request.FilteringHeader, request.SortingHeader, request.PaginationRequest);
 
-            var units = await pagedBuildingUnits.Items
-                .Select(a => new
-                {
-                    a.BuildingUnitPersistentLocalId,
-                    a.Version,
-                    a.Status
-                })
-                .ToListAsync(cancellationToken);
+            var units = await pagedBuildingUnits.Items.ToListAsync(cancellationToken);
 
             return new BuildingUnitListOsloResponse
             {
@@ -52,7 +45,7 @@ namespace BuildingRegistry.Api.Oslo.BuildingUnit.List
                     .ToList(),
                 Volgende = pagedBuildingUnits
                     .PaginationInfo
-                    .BuildNextUri(units.Count, _responseOptions.Value.GebouweenheidVolgendeUrl),
+                    .BuildNextUri(units.Count, _responseOptions.Value.GebouweenheidVolgendeUrl)!,
                 Context = _responseOptions.Value.ContextUrlUnitList,
                 Sorting = pagedBuildingUnits.Sorting,
                 Pagination = pagedBuildingUnits.PaginationInfo

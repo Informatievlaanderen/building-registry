@@ -31,14 +31,7 @@ namespace BuildingRegistry.Api.Oslo.Building.List
             var pagedBuildings = new BuildingListOsloQueryV2(_context)
                 .Fetch(request.FilteringHeader, request.SortingHeader, request.PaginationRequest);
 
-            var buildings = await pagedBuildings.Items
-                .Select(a => new
-                {
-                    a.PersistentLocalId,
-                    a.Version,
-                    a.Status
-                })
-                .ToListAsync(cancellationToken);
+            var buildings = await pagedBuildings.Items.ToListAsync(cancellationToken);
 
             return new BuildingListOsloResponse
             {
@@ -50,7 +43,7 @@ namespace BuildingRegistry.Api.Oslo.Building.List
                         x.Status.Map(),
                         x.Version.ToBelgianDateTimeOffset()))
                     .ToList(),
-                Volgende = pagedBuildings.PaginationInfo.BuildNextUri(buildings.Count, _responseOptions.Value.GebouwVolgendeUrl),
+                Volgende = pagedBuildings.PaginationInfo.BuildNextUri(buildings.Count, _responseOptions.Value.GebouwVolgendeUrl)!,
                 Context = _responseOptions.Value.ContextUrlList,
                 Sorting = pagedBuildings.Sorting,
                 Pagination = pagedBuildings.PaginationInfo
