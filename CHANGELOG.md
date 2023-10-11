@@ -1,3 +1,10 @@
+## [3.92.1](https://github.com/informatievlaanderen/building-registry/compare/v3.92.0...v3.92.1) (2023-10-11)
+
+
+### Bug Fixes
+
+* filter on string instead of enum on detailv2 list ([17a94e0](https://github.com/informatievlaanderen/building-registry/commit/17a94e021d845b81fe7b51a137cbbcde93e28c0d))
+
 # [3.92.0](https://github.com/informatievlaanderen/building-registry/compare/v3.91.1...v3.92.0) (2023-10-06)
 
 
