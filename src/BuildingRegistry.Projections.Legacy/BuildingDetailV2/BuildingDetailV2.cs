@@ -86,13 +86,12 @@ namespace BuildingRegistry.Projections.Legacy.BuildingDetailV2
             b.Property(p => p.Geometry);
             b.Property(p => p.IsRemoved);
 
-            b.HasIndex(p => new { p.IsRemoved, p.PersistentLocalId });
-
-            b.Property(x => x.StatusAsString).HasMaxLength(450)
-                .HasColumnName("Status");
-
+            b.Property(x => x.StatusAsString).HasColumnName("Status");
             b.Ignore(p => p.Status);
+
+            b.HasIndex(x => x.IsRemoved);
             b.HasIndex(x => x.StatusAsString);
+            b.HasIndex(x => new { x.IsRemoved, x.StatusAsString });
         }
     }
 }

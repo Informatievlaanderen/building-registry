@@ -24,6 +24,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetailV2
             get => BuildingUnitFunction.Parse(FunctionAsString);
             set => FunctionAsString = value.Function;
         }
+
         public string FunctionAsString { get; private set; }
 
         public BuildingUnitStatus Status
@@ -31,6 +32,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetailV2
             get => BuildingUnitStatus.Parse(StatusAsString);
             set => StatusAsString = value.Status;
         }
+
         public string StatusAsString { get; private set; }
 
         public bool HasDeviation { get; set; }
@@ -40,6 +42,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetailV2
         public bool IsRemoved { get; set; }
 
         private DateTimeOffset VersionTimestampAsDateTimeOffset { get; set; }
+
         public Instant Version
         {
             get => Instant.FromDateTimeOffset(VersionTimestampAsDateTimeOffset);
@@ -91,12 +94,12 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetailV2
 
         public void Configure(EntityTypeBuilder<BuildingUnitDetailItemV2> b)
         {
-           b.ToTable(TableName, Schema.Legacy)
+            b.ToTable(TableName, Schema.Legacy)
                 .HasKey(p => p.BuildingUnitPersistentLocalId)
                 .IsClustered();
 
-           b.Property(p => p.BuildingUnitPersistentLocalId)
-               .ValueGeneratedNever();
+            b.Property(p => p.BuildingUnitPersistentLocalId)
+                .ValueGeneratedNever();
 
             b.Property(p => p.Position);
 
@@ -117,18 +120,16 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetailV2
                 .IsRequired()
                 .HasForeignKey(x => x.BuildingUnitPersistentLocalId);
 
-            b.HasIndex(p => p.BuildingPersistentLocalId);
-            b.HasIndex(p => new { p.IsRemoved, p.BuildingUnitPersistentLocalId, p.BuildingPersistentLocalId });
-
             b.Ignore(p => p.Status);
-            b.Property(x => x.StatusAsString).HasMaxLength(450)
-                .HasColumnName("Status");
-            b.HasIndex(x => x.StatusAsString);
+            b.Property(x => x.StatusAsString).HasColumnName("Status");
 
             b.Ignore(p => p.Function);
-            b.Property(x => x.FunctionAsString)
-                .HasColumnName("Function");
+            b.Property(x => x.FunctionAsString).HasColumnName("Function");
+
+            b.HasIndex(x => x.BuildingPersistentLocalId);
             b.HasIndex(x => x.FunctionAsString);
+            b.HasIndex(x => x.IsRemoved);
+            b.HasIndex(x => x.StatusAsString);
         }
     }
 }
