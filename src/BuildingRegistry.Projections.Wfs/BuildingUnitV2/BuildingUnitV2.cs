@@ -18,8 +18,8 @@ namespace BuildingRegistry.Projections.Wfs.BuildingUnitV2
 
         public int BuildingPersistentLocalId { get; set; }
 
-        public Geometry? Position { get; set; }
-        public string? PositionMethod { get; set; }
+        public Geometry Position { get; set; }
+        public string PositionMethod { get; set; }
         public string Function { get; set; }
         public bool IsRemoved { get; set; }
 
