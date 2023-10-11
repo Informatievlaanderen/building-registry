@@ -17,7 +17,7 @@ namespace BuildingRegistry.Projections.Wfs.BuildingV2
         public string Id { get; set; }
 
         public Geometry? Geometry { get; set; }
-        public string? GeometryMethod { get; set; }
+        public string GeometryMethod { get; set; }
         public bool IsRemoved { get; set; }
 
         public string Status { get; set; }
