@@ -1,3 +1,10 @@
+## [3.93.1](https://github.com/informatievlaanderen/building-registry/compare/v3.93.0...v3.93.1) (2023-10-12)
+
+
+### Bug Fixes
+
+* include persistentlocalid in command hash ([928cc1a](https://github.com/informatievlaanderen/building-registry/commit/928cc1a2e9b17277957f9499c99d9f9146582303))
+
 # [3.93.0](https://github.com/informatievlaanderen/building-registry/compare/v3.92.2...v3.93.0) (2023-10-12)
 
 
