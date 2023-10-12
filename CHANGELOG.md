@@ -1,3 +1,10 @@
+# [3.93.0](https://github.com/informatievlaanderen/building-registry/compare/v3.92.2...v3.93.0) (2023-10-12)
+
+
+### Features
+
+* add WFS views ([c72334e](https://github.com/informatievlaanderen/building-registry/commit/c72334e6b588c54995cb84cfa720bffb964be81a))
+
 ## [3.92.2](https://github.com/informatievlaanderen/building-registry/compare/v3.92.1...v3.92.2) (2023-10-11)
 
 
