@@ -34,6 +34,7 @@ namespace BuildingRegistry.Building.Commands
 
         private IEnumerable<object> IdentityFields()
         {
+            yield return BuildingPersistentLocalId;
             yield return Geometry.ToString();
 
             foreach (var field in Provenance.GetIdentityFields())

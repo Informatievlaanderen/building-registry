@@ -46,6 +46,7 @@ namespace BuildingRegistry.Building.Commands
         private IEnumerable<object> IdentityFields()
         {
             yield return BuildingPersistentLocalId;
+            yield return BuildingUnitPersistentLocalId;
             yield return PositionGeometryMethod.ToString() ?? string.Empty;
             yield return Position ?? string.Empty;
             yield return Function.ToString() ?? string.Empty;
