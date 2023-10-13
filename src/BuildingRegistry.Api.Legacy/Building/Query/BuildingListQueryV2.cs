@@ -38,7 +38,7 @@ namespace BuildingRegistry.Api.Legacy.Building.Query
                 if (Enum.TryParse(typeof(GebouwStatus), filtering.Filter.Status, true, out var status))
                 {
                     var buildingStatus = ((GebouwStatus)status).MapToV2();
-                    buildings = buildings.Where(m =>  m.Status == buildingStatus);
+                    buildings = buildings.Where(m =>  m.StatusAsString == buildingStatus.Value);
                 }
                 else
                     buildings =  new List<BuildingDetailItemV2>().AsQueryable();
