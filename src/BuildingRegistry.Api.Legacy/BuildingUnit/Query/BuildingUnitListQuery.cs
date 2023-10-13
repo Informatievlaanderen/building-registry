@@ -7,10 +7,10 @@ namespace BuildingRegistry.Api.Legacy.BuildingUnit.Query
     using Be.Vlaanderen.Basisregisters.Api.Search.Filtering;
     using Be.Vlaanderen.Basisregisters.Api.Search.Sorting;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy.Gebouweenheid;
-    using BuildingRegistry.Projections.Legacy;
-    using BuildingRegistry.Projections.Legacy.BuildingUnitDetail;
-    using BuildingRegistry.Projections.Syndication;
     using Microsoft.EntityFrameworkCore;
+    using Projections.Legacy;
+    using Projections.Legacy.BuildingUnitDetail;
+    using Projections.Syndication;
 
     public class BuildingUnitListQuery : Query<BuildingUnitDetailItem, BuildingUnitFilter>
     {
