@@ -1,3 +1,10 @@
+## [3.93.2](https://github.com/informatievlaanderen/building-registry/compare/v3.93.1...v3.93.2) (2023-10-13)
+
+
+### Bug Fixes
+
+* legacy filters ([8a39302](https://github.com/informatievlaanderen/building-registry/commit/8a39302ae40508fe0149769fec9db85f0f5c7019))
+
 ## [3.93.1](https://github.com/informatievlaanderen/building-registry/compare/v3.93.0...v3.93.1) (2023-10-12)
 
 
