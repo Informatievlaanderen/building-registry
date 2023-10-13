@@ -1,3 +1,10 @@
+## [3.93.3](https://github.com/informatievlaanderen/building-registry/compare/v3.93.2...v3.93.3) (2023-10-13)
+
+
+### Bug Fixes
+
+* drop & recreate index for alter column ([7ea1805](https://github.com/informatievlaanderen/building-registry/commit/7ea1805c8356a1526e03b426e435b1358c1fbd69))
+
 ## [3.93.2](https://github.com/informatievlaanderen/building-registry/compare/v3.93.1...v3.93.2) (2023-10-13)
 
 
