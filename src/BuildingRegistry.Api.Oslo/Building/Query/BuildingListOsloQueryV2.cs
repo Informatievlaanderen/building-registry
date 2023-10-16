@@ -7,19 +7,26 @@ namespace BuildingRegistry.Api.Oslo.Building.Query
     using Be.Vlaanderen.Basisregisters.Api.Search.Filtering;
     using Be.Vlaanderen.Basisregisters.Api.Search.Sorting;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy.Gebouw;
+    using Consumer.Read.Parcel;
     using Converters;
+    using Infrastructure.ParcelMatching;
     using Microsoft.EntityFrameworkCore;
+    using NetTopologySuite.Geometries;
     using Projections.Legacy;
+    using Projections.Legacy.BuildingDetailV2;
 
     public class BuildingListOsloQueryV2 : Query<BuildingQueryItem, BuildingFilter>
     {
         private readonly LegacyContext _context;
-
+        private readonly ConsumerParcelContext _consumerParcelContext;
+        private readonly IParcelMatching _parcelMatching;
         protected override ISorting Sorting => new BuildingSorting();
 
-        public BuildingListOsloQueryV2(LegacyContext context)
+        public BuildingListOsloQueryV2(LegacyContext context, ConsumerParcelContext consumerParcelContext, IParcelMatching parcelMatching)
         {
             _context = context;
+            _consumerParcelContext = consumerParcelContext;
+            _parcelMatching = parcelMatching;
         }
 
         protected override IQueryable<BuildingQueryItem> Filter(FilteringHeader<BuildingFilter> filtering)
@@ -48,6 +55,20 @@ namespace BuildingRegistry.Api.Oslo.Building.Query
                 else
                 {
                     return new List<BuildingQueryItem>().AsQueryable();
+                }
+            }
+
+            if (!string.IsNullOrEmpty(filtering.Filter.CaPaKey))
+            {
+                var parcel = _consumerParcelContext.ParcelConsumerItems.FirstOrDefault(x => x.CaPaKey == filtering.Filter.CaPaKey );
+                if(parcel is not null && parcel.Status == ParcelStatus.Realized)
+                {
+                    var underlyingBuildings = _parcelMatching.GetUnderlyingBuildings(parcel.Geometry);
+                    buildings = buildings.Where(x => underlyingBuildings.Contains(x.PersistentLocalId));
+                }
+                else
+                {
+                    buildings = new List<BuildingDetailItemV2>().AsQueryable();
                 }
             }
 

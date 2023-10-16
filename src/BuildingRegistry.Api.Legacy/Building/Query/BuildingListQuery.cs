@@ -7,14 +7,13 @@ namespace BuildingRegistry.Api.Legacy.Building.Query
     using Be.Vlaanderen.Basisregisters.Api.Search.Filtering;
     using Be.Vlaanderen.Basisregisters.Api.Search.Sorting;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy.Gebouw;
-    using BuildingRegistry.Projections.Legacy;
-    using BuildingRegistry.Projections.Legacy.BuildingDetail;
     using Microsoft.EntityFrameworkCore;
+    using Projections.Legacy;
+    using Projections.Legacy.BuildingDetail;
 
     public class BuildingListQuery : Query<BuildingDetailItem, BuildingFilter>
     {
         private readonly LegacyContext _context;
-
         protected override ISorting Sorting => new BuildingSorting();
 
         public BuildingListQuery(LegacyContext context)

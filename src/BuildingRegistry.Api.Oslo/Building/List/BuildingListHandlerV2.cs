@@ -4,9 +4,11 @@ namespace BuildingRegistry.Api.Oslo.Building.List
     using System.Threading;
     using System.Threading.Tasks;
     using Be.Vlaanderen.Basisregisters.GrAr.Common;
+    using Consumer.Read.Parcel;
     using Converters;
     using Infrastructure;
     using Infrastructure.Options;
+    using Infrastructure.ParcelMatching;
     using MediatR;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Options;
@@ -15,20 +17,26 @@ namespace BuildingRegistry.Api.Oslo.Building.List
 
     public class BuildingListHandlerV2 : IRequestHandler<BuildingListRequest, BuildingListOsloResponse>
     {
-        private readonly LegacyContext _context;
+        private readonly LegacyContext _legacyContext;
+        private readonly ConsumerParcelContext _consumerParcelContext;
+        private readonly IParcelMatching _parcelMatching;
         private readonly IOptions<ResponseOptions> _responseOptions;
 
         public BuildingListHandlerV2(
-            LegacyContext context,
-            IOptions<ResponseOptions> responseOptions)
+            LegacyContext legacyContext,
+            IOptions<ResponseOptions> responseOptions,
+            ConsumerParcelContext consumerParcelContext,
+            IParcelMatching parcelMatching)
         {
-            _context = context;
+            _legacyContext = legacyContext;
             _responseOptions = responseOptions;
+            _consumerParcelContext = consumerParcelContext;
+            _parcelMatching = parcelMatching;
         }
 
         public async Task<BuildingListOsloResponse> Handle(BuildingListRequest request, CancellationToken cancellationToken)
         {
-            var pagedBuildings = new BuildingListOsloQueryV2(_context)
+            var pagedBuildings = new BuildingListOsloQueryV2(_legacyContext, _consumerParcelContext, _parcelMatching)
                 .Fetch(request.FilteringHeader, request.SortingHeader, request.PaginationRequest);
 
             var buildings = await pagedBuildings.Items.ToListAsync(cancellationToken);

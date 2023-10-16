@@ -10,13 +10,16 @@
     using NetTopologySuite.Geometries;
     using Xunit;
 
-    public class ParcelMatchingTests
+    public class GetUnderlyingParcelsTests
     {
         private readonly FakeConsumerParcelContext _consumerParcelContext;
+        private readonly FakeLegacyContext _legacyContext;
 
-        public ParcelMatchingTests()
+        public GetUnderlyingParcelsTests()
         {
             _consumerParcelContext = new FakeConsumerParcelContextFactory()
+                .CreateDbContext(Array.Empty<string>());
+            _legacyContext = new FakeLegacyContextFactory()
                 .CreateDbContext(Array.Empty<string>());
         }
 
@@ -36,7 +39,7 @@
 
             _consumerParcelContext.SaveChanges();
 
-            var parcelMatching = new ParcelMatching(_consumerParcelContext);
+            var parcelMatching = new ParcelMatching(_consumerParcelContext, _legacyContext);
 
             var result = parcelMatching.GetUnderlyingParcels(buildingGeometry100PercentOverlap.AsBinary());
 
@@ -59,7 +62,7 @@
 
             _consumerParcelContext.SaveChanges();
 
-            var parcelMatching = new ParcelMatching(_consumerParcelContext);
+            var parcelMatching = new ParcelMatching(_consumerParcelContext, _legacyContext);
 
             var result = parcelMatching.GetUnderlyingParcels(buildingGeometry100PercentOverlap.AsBinary());
 
@@ -82,7 +85,7 @@
 
             _consumerParcelContext.SaveChanges();
 
-            var parcelMatching = new ParcelMatching(_consumerParcelContext);
+            var parcelMatching = new ParcelMatching(_consumerParcelContext, _legacyContext);
 
             var result = parcelMatching.GetUnderlyingParcels(buildingGeometry.AsBinary());
 
@@ -113,7 +116,7 @@
 
             _consumerParcelContext.SaveChanges();
 
-            var parcelMatching = new ParcelMatching(_consumerParcelContext);
+            var parcelMatching = new ParcelMatching(_consumerParcelContext, _legacyContext);
 
             var result = parcelMatching.GetUnderlyingParcels(buildingGeometry50PercentOverlap.AsBinary());
 
@@ -146,7 +149,7 @@
 
             _consumerParcelContext.SaveChanges();
 
-            var parcelMatching = new ParcelMatching(_consumerParcelContext);
+            var parcelMatching = new ParcelMatching(_consumerParcelContext, _legacyContext);
 
             var result = parcelMatching.GetUnderlyingParcels(building.AsBinary()).ToList();
 

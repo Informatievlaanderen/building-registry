@@ -38,6 +38,11 @@ namespace BuildingRegistry.Api.Oslo.Infrastructure.ParcelMatching
                 .Select(parcelPair => parcelPair.Key);
         }
 
+        public IEnumerable<int> GetUnderlyingBuildings(Geometry parcelGeometry)
+        {
+            throw new NotImplementedException();
+        }
+
         private static double CalculateOverlap(Geometry building, Geometry parcel)
         {
             try

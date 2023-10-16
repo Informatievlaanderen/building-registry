@@ -64,5 +64,6 @@ namespace BuildingRegistry.Api.Oslo.Building.Query
     public class BuildingFilter
     {
         public string Status { get; set; }
+        public string? CaPaKey { get; set; }
     }
 }

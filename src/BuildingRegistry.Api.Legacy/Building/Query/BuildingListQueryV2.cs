@@ -7,14 +7,13 @@ namespace BuildingRegistry.Api.Legacy.Building.Query
     using Be.Vlaanderen.Basisregisters.Api.Search.Filtering;
     using Be.Vlaanderen.Basisregisters.Api.Search.Sorting;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy.Gebouw;
-    using BuildingRegistry.Projections.Legacy;
-    using BuildingRegistry.Projections.Legacy.BuildingDetailV2;
     using Microsoft.EntityFrameworkCore;
+    using Projections.Legacy;
+    using Projections.Legacy.BuildingDetailV2;
 
     public class BuildingListQueryV2 : Query<BuildingDetailItemV2, BuildingFilter>
     {
         private readonly LegacyContext _context;
-
         protected override ISorting Sorting => new BuildingSorting();
 
         public BuildingListQueryV2(LegacyContext context)
@@ -41,7 +40,9 @@ namespace BuildingRegistry.Api.Legacy.Building.Query
                     buildings = buildings.Where(m =>  m.StatusAsString == buildingStatus.Value);
                 }
                 else
-                    buildings =  new List<BuildingDetailItemV2>().AsQueryable();
+                {
+                    buildings = new List<BuildingDetailItemV2>().AsQueryable();
+                }
             }
 
             return buildings;
