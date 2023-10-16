@@ -3,7 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using BuildingRegistry.Consumer.Read.Parcel;
+    using Consumer.Read.Parcel;
     using NetTopologySuite.Geometries;
 
     public class ParcelMatching : IParcelMatching

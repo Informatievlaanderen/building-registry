@@ -6,6 +6,8 @@ namespace BuildingRegistry.Api.Oslo.Building.Count
     using System.Threading.Tasks;
     using Be.Vlaanderen.Basisregisters.Api.Search.Pagination;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy;
+    using Consumer.Read.Parcel;
+    using Infrastructure.ParcelMatching;
     using MediatR;
     using Microsoft.EntityFrameworkCore;
     using Projections.Legacy;
@@ -13,12 +15,16 @@ namespace BuildingRegistry.Api.Oslo.Building.Count
 
     public class BuildingCountHandlerV2 : IRequestHandler<BuildingCountRequest, TotaalAantalResponse>
     {
-        private readonly LegacyContext _context;
+        private readonly LegacyContext _legacyContext;
+        private readonly ConsumerParcelContext _consumerParcelContext;
+        private readonly IParcelMatching _parcelMatching;
 
         public BuildingCountHandlerV2(
-            LegacyContext context)
+            LegacyContext legacyContext, ConsumerParcelContext consumerParcelContext, IParcelMatching parcelMatching)
         {
-            _context = context;
+            _legacyContext = legacyContext;
+            _consumerParcelContext = consumerParcelContext;
+            _parcelMatching = parcelMatching;
         }
 
         public async Task<TotaalAantalResponse> Handle(BuildingCountRequest request, CancellationToken cancellationToken)
@@ -26,11 +32,11 @@ namespace BuildingRegistry.Api.Oslo.Building.Count
             return new TotaalAantalResponse
             {
                 Aantal = request.FilteringHeader.ShouldFilter
-                    ? await new BuildingListOsloQueryV2(_context)
+                    ? await new BuildingListOsloQueryV2(_legacyContext, _consumerParcelContext, _parcelMatching)
                         .Fetch(request.FilteringHeader, request.SortingHeader, new NoPaginationRequest())
                         .Items
                         .CountAsync(cancellationToken)
-                    : Convert.ToInt32(_context
+                    : Convert.ToInt32(_legacyContext
                         .BuildingDetailListCountViewV2
                         .First()
                         .Count)

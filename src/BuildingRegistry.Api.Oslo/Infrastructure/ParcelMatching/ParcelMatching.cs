@@ -5,14 +5,18 @@
     using System.Linq;
     using Consumer.Read.Parcel;
     using NetTopologySuite.Geometries;
+    using Projections.Legacy;
+    using Projections.Legacy.BuildingDetailV2;
 
     public class ParcelMatching : IParcelMatching
     {
-        private readonly ConsumerParcelContext _context;
+        private readonly ConsumerParcelContext _consumerParcelContext;
+        private readonly LegacyContext _legacyContext;
 
-        public ParcelMatching(ConsumerParcelContext context)
+        public ParcelMatching(ConsumerParcelContext consumerParcelContext, LegacyContext legacyContext)
         {
-            _context = context;
+            _consumerParcelContext = consumerParcelContext;
+            _legacyContext = legacyContext;
         }
 
         public IEnumerable<string> GetUnderlyingParcels(byte[] buildingGeometryBytes)
@@ -20,7 +24,7 @@
             var buildingGeometry = WKBReaderFactory.Create().Read(buildingGeometryBytes);
             var boundingBox = buildingGeometry.Factory.ToGeometry(buildingGeometry.EnvelopeInternal);
 
-            var underlyingParcels = _context
+            var underlyingParcels = _consumerParcelContext
                 .ParcelConsumerItems
                 .Where(parcel => boundingBox.Intersects(parcel.Geometry))
                 .ToList()
@@ -37,11 +41,37 @@
                 .Select(parcel => parcel.CaPaKey);
         }
 
-        private static double CalculateOverlap(Geometry building, Geometry parcel)
+        public IEnumerable<int> GetUnderlyingBuildings(Geometry parcelGeometry)
         {
+            var boundingBox = parcelGeometry.Factory.ToGeometry(parcelGeometry.EnvelopeInternal);
+
+            var underlyingBuildings = _legacyContext
+                .BuildingDetailsV2
+                .Where(building => boundingBox.Intersects(building.SysGeometry))
+                .ToList()
+                .Where(building => parcelGeometry.Intersects(building.SysGeometry))
+                .Select(building =>
+                    new {
+                        building.PersistentLocalId,
+                        Overlap = CalculateOverlap(building.SysGeometry, parcelGeometry)
+                    })
+                .ToList();
+
+            return underlyingBuildings
+                .Where(building => building.Overlap >= 0.8 / underlyingBuildings.Count)
+                .Select(building => building.PersistentLocalId);
+        }
+
+        private static double CalculateOverlap(Geometry? buildingGeometry, Geometry parcel)
+        {
+            if (buildingGeometry is null)
+            {
+                return 0;
+            }
+
             try
             {
-                return building.Intersection(parcel).Area / building.Area;
+                return buildingGeometry.Intersection(parcel).Area / buildingGeometry.Area;
             }
             catch (TopologyException topologyException)
             {
