@@ -6,6 +6,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingDetailV2
     using Infrastructure;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.EntityFrameworkCore.Metadata.Builders;
+    using NetTopologySuite.Geometries;
     using NodaTime;
 
     public class BuildingDetailItemV2
@@ -15,6 +16,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingDetailV2
         public int PersistentLocalId { get; set; }
         public BuildingGeometryMethod GeometryMethod { get; set; }
         public byte[] Geometry { get; set; }
+        public Geometry? SysGeometry { get; set; }
 
         public BuildingStatus Status
         {
@@ -45,6 +47,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingDetailV2
             int persistentLocalId,
             BuildingGeometryMethod buildingGeometryMethod,
             byte[] geometry,
+            Geometry sysGeometry,
             BuildingStatus status,
             bool isRemoved,
             Instant version)
@@ -52,6 +55,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingDetailV2
             PersistentLocalId = persistentLocalId;
             GeometryMethod = buildingGeometryMethod;
             Geometry = geometry;
+            SysGeometry = sysGeometry is Polygon ? sysGeometry : null;
             Status = status;
             IsRemoved = isRemoved;
             Version = version;
@@ -84,6 +88,9 @@ namespace BuildingRegistry.Projections.Legacy.BuildingDetailV2
             b.Property(p => p.GeometryMethod)
                 .HasConversion(x => x.Value, y => BuildingGeometryMethod.Parse(y));
             b.Property(p => p.Geometry);
+
+            b.Property(p => p.SysGeometry).HasColumnType("sys.geometry");
+
             b.Property(p => p.IsRemoved);
 
             b.Property(x => x.StatusAsString).HasColumnName("Status");
