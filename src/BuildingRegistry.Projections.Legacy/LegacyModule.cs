@@ -52,6 +52,7 @@ namespace BuildingRegistry.Projections.Legacy
                     {
                         sqlServerOptions.EnableRetryOnFailure();
                         sqlServerOptions.MigrationsHistoryTable(MigrationTables.Extract, Schema.Extract);
+                        sqlServerOptions.UseNetTopologySuite();
                     })
                     .UseExtendedSqlServerMigrations());
             //.ConfigureWarnings(x => x

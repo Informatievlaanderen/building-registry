@@ -5,5 +5,7 @@ Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Autofac
 
 Be.Vlaanderen.Basisregisters.GrAr.Common
 
+Microsoft.EntityFrameworkCore.SqlServer.NetTopologySuite
+
 SourceLink.Embed.AllSourceFiles
 SourceLink.Copy.PdbFiles

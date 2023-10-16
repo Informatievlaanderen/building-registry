@@ -16,12 +16,16 @@ namespace BuildingRegistry.Projections.Legacy.BuildingDetailV2
     {
         public BuildingDetailV2Projections()
         {
+            var wkbReader = WKBReaderFactory.Create();
+
             When<Envelope<BuildingWasMigrated>>(async (context, message, ct) =>
             {
+                var geometryAsBinary = message.Message.ExtendedWkbGeometry.ToByteArray();
                 var building = new BuildingDetailItemV2(
                     message.Message.BuildingPersistentLocalId,
                     BuildingGeometryMethod.Parse(message.Message.GeometryMethod),
-                    message.Message.ExtendedWkbGeometry.ToByteArray(),
+                    geometryAsBinary,
+                    wkbReader.Read(geometryAsBinary),
                     BuildingStatus.Parse(message.Message.BuildingStatus),
                     message.Message.IsRemoved,
                     message.Message.Provenance.Timestamp);
@@ -35,10 +39,13 @@ namespace BuildingRegistry.Projections.Legacy.BuildingDetailV2
 
             When<Envelope<BuildingWasPlannedV2>>(async (context, message, ct) =>
             {
+                var geometryAsBinary = message.Message.ExtendedWkbGeometry.ToByteArray();
+
                 var building = new BuildingDetailItemV2(
                     message.Message.BuildingPersistentLocalId,
                     BuildingGeometryMethod.Outlined,
-                    message.Message.ExtendedWkbGeometry.ToByteArray(),
+                    geometryAsBinary,
+                    wkbReader.Read(geometryAsBinary),
                     BuildingStatus.Planned,
                     false,
                     message.Message.Provenance.Timestamp);
@@ -52,10 +59,13 @@ namespace BuildingRegistry.Projections.Legacy.BuildingDetailV2
 
             When<Envelope<UnplannedBuildingWasRealizedAndMeasured>>(async (context, message, ct) =>
             {
+                var geometryAsBinary = message.Message.ExtendedWkbGeometry.ToByteArray();
+
                 var building = new BuildingDetailItemV2(
                     message.Message.BuildingPersistentLocalId,
                     BuildingGeometryMethod.MeasuredByGrb,
-                    message.Message.ExtendedWkbGeometry.ToByteArray(),
+                    geometryAsBinary,
+                    wkbReader.Read(geometryAsBinary),
                     BuildingStatus.Realized,
                     false,
                     message.Message.Provenance.Timestamp);
@@ -69,16 +79,22 @@ namespace BuildingRegistry.Projections.Legacy.BuildingDetailV2
 
             When<Envelope<BuildingOutlineWasChanged>>(async (context, message, ct) =>
             {
+                var geometryAsBinary = message.Message.ExtendedWkbGeometryBuilding.ToByteArray();
+
                 var item = await context.BuildingDetailsV2.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);
-                item.Geometry = message.Message.ExtendedWkbGeometryBuilding.ToByteArray();
+                item.Geometry = geometryAsBinary;
+                item.SysGeometry = wkbReader.Read(geometryAsBinary);
                 item.Version = message.Message.Provenance.Timestamp;
                 UpdateHash(item, message);
             });
 
             When<Envelope<BuildingMeasurementWasChanged>>(async (context, message, ct) =>
             {
+                var geometryAsBinary = message.Message.ExtendedWkbGeometryBuilding.ToByteArray();
+
                 var item = await context.BuildingDetailsV2.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);
-                item.Geometry = message.Message.ExtendedWkbGeometryBuilding.ToByteArray();
+                item.Geometry = geometryAsBinary;
+                item.SysGeometry = wkbReader.Read(geometryAsBinary);
                 item.Version = message.Message.Provenance.Timestamp;
                 UpdateHash(item, message);
             });
@@ -133,8 +149,11 @@ namespace BuildingRegistry.Projections.Legacy.BuildingDetailV2
 
             When<Envelope<BuildingWasMeasured>>(async (context, message, ct) =>
             {
+                var geometryAsBinary = message.Message.ExtendedWkbGeometryBuilding.ToByteArray();
+
                 var item = await context.BuildingDetailsV2.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);
-                item.Geometry = message.Message.ExtendedWkbGeometryBuilding.ToByteArray();
+                item.Geometry = geometryAsBinary;
+                item.SysGeometry = wkbReader.Read(geometryAsBinary);;
                 item.GeometryMethod = BuildingGeometryMethod.MeasuredByGrb;
                 item.Version = message.Message.Provenance.Timestamp;
                 UpdateHash(item, message);
@@ -142,8 +161,11 @@ namespace BuildingRegistry.Projections.Legacy.BuildingDetailV2
 
             When<Envelope<BuildingMeasurementWasCorrected>>(async (context, message, ct) =>
             {
+                var geometryAsBinary = message.Message.ExtendedWkbGeometryBuilding.ToByteArray();
+
                 var item = await context.BuildingDetailsV2.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);
-                item.Geometry = message.Message.ExtendedWkbGeometryBuilding.ToByteArray();
+                item.Geometry = geometryAsBinary;
+                item.SysGeometry = wkbReader.Read(geometryAsBinary);;
                 item.Version = message.Message.Provenance.Timestamp;
                 UpdateHash(item, message);
             });
@@ -194,10 +216,13 @@ namespace BuildingRegistry.Projections.Legacy.BuildingDetailV2
 
             When<Envelope<BuildingMergerWasRealized>>(async (context, message, ct) =>
             {
+                var geometryAsBinary = message.Message.ExtendedWkbGeometry.ToByteArray();
+
                 var building = new BuildingDetailItemV2(
                     message.Message.BuildingPersistentLocalId,
                     BuildingGeometryMethod.MeasuredByGrb,
-                    message.Message.ExtendedWkbGeometry.ToByteArray(),
+                    geometryAsBinary,
+                    wkbReader.Read(geometryAsBinary),
                     BuildingStatus.Realized,
                     false,
                     message.Message.Provenance.Timestamp);
