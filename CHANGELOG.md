@@ -1,3 +1,10 @@
+# [3.94.0](https://github.com/informatievlaanderen/building-registry/compare/v3.93.3...v3.94.0) (2023-10-16)
+
+
+### Features
+
+* add sysgeometry to buildingv2 projections ([1e5a4ce](https://github.com/informatievlaanderen/building-registry/commit/1e5a4cee506458d2e136a8c727dcc83fafcedc83))
+
 ## [3.93.3](https://github.com/informatievlaanderen/building-registry/compare/v3.93.2...v3.93.3) (2023-10-13)
 
 
