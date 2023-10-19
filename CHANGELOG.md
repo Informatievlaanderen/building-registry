@@ -1,3 +1,10 @@
+# [3.95.0](https://github.com/informatievlaanderen/building-registry/compare/v3.94.0...v3.95.0) (2023-10-19)
+
+
+### Features
+
+* add building matching ([6602555](https://github.com/informatievlaanderen/building-registry/commit/66025550d119c26caee15ba7a6c91e6699de6846))
+
 # [3.94.0](https://github.com/informatievlaanderen/building-registry/compare/v3.93.3...v3.94.0) (2023-10-16)
 
 
