@@ -88,7 +88,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.Building.WhenRealizingBuilding
         }
 
         [Fact]
-        public async Task WithNonExistingBuildingPersistentLocalId_ThenValidationErrorIsThrown()
+        public void WithNonExistingBuildingPersistentLocalId_ThenValidationErrorIsThrown()
         {
             //Arrange
             _streamStore.SetStreamNotFound();

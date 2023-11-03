@@ -1,17 +1,14 @@
 namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitDeregulation
 {
-    using System.Collections.Generic;
     using AutoFixture;
     using Be.Vlaanderen.Basisregisters.AggregateSource.Testing;
-    using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Building;
     using Building.Commands;
-    using Building.Events;
     using Building.Exceptions;
+    using Extensions;
     using Fixtures;
     using Xunit;
     using Xunit.Abstractions;
-    using BuildingUnit = Building.Commands.BuildingUnit;
 
     public class GivenBuildingRemoved : BuildingRegistryTest
     {
@@ -21,20 +18,16 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitDeregu
         }
 
         [Fact]
-        public void BuildingIsRemoved_ThrowsBuildingIsRemovedException()
+        public void ThenThrowsBuildingIsRemovedException()
         {
             var command = Fixture.Create<CorrectBuildingUnitDeregulation>();
 
-            var buildingWasMigrated = new BuildingWasMigrated(
-                Fixture.Create<BuildingId>(),
-                command.BuildingPersistentLocalId,
-                Fixture.Create<BuildingPersistentLocalIdAssignmentDate>(),
-                BuildingStatus.Planned,
-                Fixture.Create<BuildingGeometry>(),
-                isRemoved: true,
-                new List<BuildingUnit>()
-            );
-            ((ISetProvenance)buildingWasMigrated).SetProvenance(Fixture.Create<Provenance>());
+            var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
+                    .WithBuildingPersistentLocalId(command.BuildingPersistentLocalId)
+                    .WithBuildingStatus(BuildingStatus.Planned)
+                    .WithBuildingGeometry(Fixture.Create<BuildingGeometry>())
+                    .WithIsRemoved()
+                    .Build();
 
             Assert(new Scenario()
                 .Given(

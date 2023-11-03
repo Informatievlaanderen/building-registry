@@ -6,12 +6,12 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitRetire
     using Building;
     using Building.Commands;
     using Building.Events;
-    using BuildingRegistry.Tests.Extensions;
+    using Extensions;
     using Fixtures;
     using Xunit;
     using Xunit.Abstractions;
-    using BuildingGeometry = Building.BuildingGeometry;
-    using BuildingStatus = Building.BuildingStatus;
+    using BuildingUnitPositionGeometryMethod = BuildingRegistry.Legacy.BuildingUnitPositionGeometryMethod;
+    using BuildingUnitStatus = BuildingRegistry.Legacy.BuildingUnitStatus;
 
     public class GivenBuildingUnitOutsideOfBuilding : BuildingRegistryTest
     {
@@ -39,9 +39,9 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitRetire
                 .WithBuildingStatus(BuildingStatus.Realized)
                 .WithBuildingGeometry(buildingGeometry)
                 .WithBuildingUnit(
-                    BuildingRegistry.Legacy.BuildingUnitStatus.Retired,
+                    BuildingUnitStatus.Retired,
                     command.BuildingUnitPersistentLocalId,
-                    positionGeometryMethod: BuildingRegistry.Legacy.BuildingUnitPositionGeometryMethod.AppointedByAdministrator,
+                    positionGeometryMethod: BuildingUnitPositionGeometryMethod.AppointedByAdministrator,
                     extendedWkbGeometry: pointNotInPolygon)
                 .Build();
 
@@ -54,7 +54,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitRetire
                     new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
                         new BuildingUnitPositionWasCorrected(command.BuildingPersistentLocalId,
                             command.BuildingUnitPersistentLocalId,
-                            BuildingUnitPositionGeometryMethod.DerivedFromObject,
+                            BuildingRegistry.Building.BuildingUnitPositionGeometryMethod.DerivedFromObject,
                             buildingGeometry.Center)),
                     new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
                         new BuildingUnitWasCorrectedFromRetiredToRealized(

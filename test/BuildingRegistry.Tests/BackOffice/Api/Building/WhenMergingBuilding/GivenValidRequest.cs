@@ -9,7 +9,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.Building.WhenMergingBuilding
     using BuildingRegistry.Api.BackOffice.Abstractions.Building.Requests;
     using BuildingRegistry.Api.BackOffice.Abstractions.Building.SqsRequests;
     using BuildingRegistry.Api.BackOffice.Building;
-    using BuildingRegistry.Tests.Fixtures;
+    using Fixtures;
     using FluentAssertions;
     using Microsoft.AspNetCore.Mvc;
     using Moq;

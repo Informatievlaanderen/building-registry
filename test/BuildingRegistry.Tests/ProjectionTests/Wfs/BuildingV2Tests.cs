@@ -21,7 +21,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wfs
 
     public class BuildingV2Tests : BuildingWfsProjectionTest<BuildingV2Projections>
     {
-        private readonly Fixture? _fixture;
+        private readonly Fixture _fixture;
 
         public BuildingV2Tests()
         {
@@ -52,7 +52,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wfs
                     var buildingDetailItemV2 = await ct.BuildingsV2.FindAsync(buildingWasMigrated.BuildingPersistentLocalId);
                     buildingDetailItemV2.Should().NotBeNull();
 
-                    buildingDetailItemV2.Id.Should().Be(PersistentLocalIdHelper.CreateBuildingId(buildingWasMigrated.BuildingPersistentLocalId));
+                    buildingDetailItemV2!.Id.Should().Be(PersistentLocalIdHelper.CreateBuildingId(buildingWasMigrated.BuildingPersistentLocalId));
                     buildingDetailItemV2.IsRemoved.Should().Be(buildingWasMigrated.IsRemoved);
                     buildingDetailItemV2.Status.Should()
                         .Be(BuildingV2Projections.MapStatus(BuildingStatus.Parse(buildingWasMigrated.BuildingStatus)));
@@ -60,7 +60,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wfs
 
                     var wkbReader = WKBReaderFactory.Create();
                     var polygon = wkbReader.Read(buildingWasMigrated.ExtendedWkbGeometry.ToByteArray()) as Polygon;
-                    buildingDetailItemV2.Geometry.Should().Be(new GrbPolygon(polygon));
+                    buildingDetailItemV2.Geometry.Should().Be(new GrbPolygon(polygon!));
                     buildingDetailItemV2.GeometryMethod.Should()
                         .Be(BuildingV2Projections.MapGeometryMethod(BuildingGeometryMethod.Parse(buildingWasMigrated.GeometryMethod)));
                 });
@@ -82,14 +82,14 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wfs
                     var buildingDetailItemV2 = await ct.BuildingsV2.FindAsync(buildingWasPlannedV2.BuildingPersistentLocalId);
                     buildingDetailItemV2.Should().NotBeNull();
 
-                    buildingDetailItemV2.Id.Should().Be(PersistentLocalIdHelper.CreateBuildingId(buildingWasPlannedV2.BuildingPersistentLocalId));
+                    buildingDetailItemV2!.Id.Should().Be(PersistentLocalIdHelper.CreateBuildingId(buildingWasPlannedV2.BuildingPersistentLocalId));
                     buildingDetailItemV2.IsRemoved.Should().BeFalse();
                     buildingDetailItemV2.Status.Should().Be(BuildingV2Projections.MapStatus(BuildingStatus.Planned));
                     buildingDetailItemV2.Version.Should().Be(buildingWasPlannedV2.Provenance.Timestamp);
 
                     var wkbReader = WKBReaderFactory.Create();
                     var polygon = wkbReader.Read(buildingWasPlannedV2.ExtendedWkbGeometry.ToByteArray());
-                    buildingDetailItemV2.Geometry.AsBinary().Should().BeEquivalentTo(polygon.AsBinary());
+                    buildingDetailItemV2.Geometry!.AsBinary().Should().BeEquivalentTo(polygon.AsBinary());
                     buildingDetailItemV2.GeometryMethod.Should().Be(BuildingV2Projections.MapGeometryMethod(BuildingGeometryMethod.Outlined));
                 });
         }
@@ -110,7 +110,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wfs
                     var buildingDetailItemV2 = await ct.BuildingsV2.FindAsync(@event.BuildingPersistentLocalId);
                     buildingDetailItemV2.Should().NotBeNull();
 
-                    buildingDetailItemV2.Id.Should().Be(PersistentLocalIdHelper.CreateBuildingId(@event.BuildingPersistentLocalId));
+                    buildingDetailItemV2!.Id.Should().Be(PersistentLocalIdHelper.CreateBuildingId(@event.BuildingPersistentLocalId));
                     buildingDetailItemV2.Status.Should().Be(BuildingV2Projections.MapStatus(BuildingStatus.Realized));
                     buildingDetailItemV2.GeometryMethod.Should().Be(BuildingV2Projections.MapGeometryMethod(BuildingGeometryMethod.MeasuredByGrb));
                     buildingDetailItemV2.IsRemoved.Should().BeFalse();
@@ -118,7 +118,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wfs
 
                     var wkbReader = WKBReaderFactory.Create();
                     var polygon = wkbReader.Read(@event.ExtendedWkbGeometry.ToByteArray());
-                    buildingDetailItemV2.Geometry.AsBinary().Should().BeEquivalentTo(polygon.AsBinary());
+                    buildingDetailItemV2.Geometry!.AsBinary().Should().BeEquivalentTo(polygon.AsBinary());
                 });
         }
 
@@ -141,7 +141,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wfs
                 {
                     var buildingDetailItemV2 = await ct.BuildingsV2.FindAsync(buildingUnitWasPlannedV2.BuildingPersistentLocalId);
                     buildingDetailItemV2.Should().NotBeNull();
-                    buildingDetailItemV2.Version.Should().Be(buildingUnitWasPlannedV2.Provenance.Timestamp);
+                    buildingDetailItemV2!.Version.Should().Be(buildingUnitWasPlannedV2.Provenance.Timestamp);
                 });
         }
 
@@ -164,7 +164,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wfs
                 {
                     var buildingDetailItemV2 = await ct.BuildingsV2.FindAsync(commonBuildingUnitWasAddedV2.BuildingPersistentLocalId);
                     buildingDetailItemV2.Should().NotBeNull();
-                    buildingDetailItemV2.Version.Should().Be(commonBuildingUnitWasAddedV2.Provenance.Timestamp);
+                    buildingDetailItemV2!.Version.Should().Be(commonBuildingUnitWasAddedV2.Provenance.Timestamp);
                 });
         }
 
@@ -242,7 +242,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wfs
                 {
                     var buildingDetailItemV2 = await ct.BuildingsV2.FindAsync(buildingBecameUnderConstructionV2.BuildingPersistentLocalId);
                     buildingDetailItemV2.Should().NotBeNull();
-                    buildingDetailItemV2.Version.Should().Be(buildingBecameUnderConstructionV2.Provenance.Timestamp);
+                    buildingDetailItemV2!.Version.Should().Be(buildingBecameUnderConstructionV2.Provenance.Timestamp);
                     buildingDetailItemV2.Status.Should().Be(BuildingV2Projections.MapStatus(BuildingStatus.UnderConstruction));
                 });
         }
@@ -268,7 +268,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wfs
                     var buildingDetailItemV2 =
                         await ct.BuildingsV2.FindAsync(buildingWasCorrectedFromUnderConstructionToPlanned.BuildingPersistentLocalId);
                     buildingDetailItemV2.Should().NotBeNull();
-                    buildingDetailItemV2.Version.Should().Be(buildingWasCorrectedFromUnderConstructionToPlanned.Provenance.Timestamp);
+                    buildingDetailItemV2!.Version.Should().Be(buildingWasCorrectedFromUnderConstructionToPlanned.Provenance.Timestamp);
                     buildingDetailItemV2.Status.Should().Be(BuildingV2Projections.MapStatus(BuildingStatus.Planned));
                 });
         }
@@ -348,7 +348,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wfs
                 {
                     var buildingDetailItemV2 = await ct.BuildingsV2.FindAsync(buildingWasNotRealizedV2.BuildingPersistentLocalId);
                     buildingDetailItemV2.Should().NotBeNull();
-                    buildingDetailItemV2.Version.Should().Be(buildingWasNotRealizedV2.Provenance.Timestamp);
+                    buildingDetailItemV2!.Version.Should().Be(buildingWasNotRealizedV2.Provenance.Timestamp);
                     buildingDetailItemV2.Status.Should().Be(BuildingV2Projections.MapStatus(BuildingStatus.NotRealized));
                 });
         }
@@ -515,13 +515,13 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wfs
                     var item = await ct.BuildingsV2.FindAsync(@event.BuildingPersistentLocalId);
                     item.Should().NotBeNull();
 
-                    item.Status.Should().Be(BuildingV2Projections.MapStatus(BuildingStatus.Realized));
+                    item!.Status.Should().Be(BuildingV2Projections.MapStatus(BuildingStatus.Realized));
                     var wkbReader = WKBReaderFactory.Create();
                     var polygon = wkbReader.Read(@event.ExtendedWkbGeometry.ToByteArray());
                     item.Geometry!.AsBinary().Should().BeEquivalentTo(polygon.AsBinary());
                     item.GeometryMethod.Should().Be(GeometrieMethode.IngemetenGRB.ToString());
 
-                    item!.Version.Should().Be(@event.Provenance.Timestamp);
+                    item.Version.Should().Be(@event.Provenance.Timestamp);
                 });
         }
 
@@ -546,8 +546,8 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wfs
                     var item = await ct.BuildingsV2.FindAsync(@event.BuildingPersistentLocalId);
                     item.Should().NotBeNull();
 
-                    item.Status.Should().Be(BuildingV2Projections.MapStatus(BuildingStatus.Retired));
-                    item!.Version.Should().Be(@event.Provenance.Timestamp);
+                    item!.Status.Should().Be(BuildingV2Projections.MapStatus(BuildingStatus.Retired));
+                    item.Version.Should().Be(@event.Provenance.Timestamp);
                 });
         }
 

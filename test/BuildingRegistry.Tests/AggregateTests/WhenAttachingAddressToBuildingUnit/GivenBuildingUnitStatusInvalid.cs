@@ -17,19 +17,15 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenAttachingAddressToBuildingUn
         [Theory]
         [InlineData("Retired")]
         [InlineData("NotRealized")]
-        public void ThenThrowBuildingUnitRemovedException(string status)
+        public void ThenThrowsBuildingUnitRemovedException(string status)
         {
             var command = Fixture.Create<AttachAddressToBuildingUnit>();
 
             var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
                 .WithBuildingPersistentLocalId(command.BuildingPersistentLocalId)
                 .WithBuildingUnit(
-                    BuildingRegistry.Legacy.BuildingUnitStatus.Parse(status).Value,
-                    command.BuildingUnitPersistentLocalId,
-                    null,
-                    null,
-                    null,
-                    isRemoved: false)
+                    BuildingRegistry.Legacy.BuildingUnitStatus.Parse(status)!.Value,
+                    command.BuildingUnitPersistentLocalId)
                 .Build();
 
             Assert(new Scenario()

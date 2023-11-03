@@ -4,7 +4,6 @@ namespace BuildingRegistry.Tests.BackOffice.Api.Building.WhenChangingBuildingMea
     using System.Threading;
     using System.Threading.Tasks;
     using AutoFixture;
-    using Be.Vlaanderen.Basisregisters.Api.ETag;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Be.Vlaanderen.Basisregisters.Sqs.Requests;
@@ -13,7 +12,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.Building.WhenChangingBuildingMea
     using BuildingRegistry.Api.BackOffice.Abstractions.Building.Validators;
     using BuildingRegistry.Api.BackOffice.Building;
     using BuildingRegistry.Building;
-    using BuildingRegistry.Tests.Fixtures;
+    using Fixtures;
     using FluentAssertions;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
@@ -49,7 +48,6 @@ namespace BuildingRegistry.Tests.BackOffice.Api.Building.WhenChangingBuildingMea
             _streamStore.SetStreamFound();
 
             var request = Fixture.Create<ChangeBuildingMeasurementRequest>();
-            var expectedIfMatchHeader = Fixture.Create<string>();
 
             var result = (AcceptedResult) await _controller.ChangeMeasurement(
                 MockValidRequestValidator<ChangeBuildingMeasurementRequest>(),

@@ -1,6 +1,5 @@
 namespace BuildingRegistry.Tests.AggregateTests.WhenRemovingBuildingUnit
 {
-    using System.Collections.Generic;
     using System.Linq;
     using AutoFixture;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
@@ -11,21 +10,15 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRemovingBuildingUnit
     using Building.Commands;
     using Building.Events;
     using Building.Exceptions;
-    using BuildingRegistry.Legacy;
     using Extensions;
     using Fixtures;
     using FluentAssertions;
-    using Moq;
     using Xunit;
     using Xunit.Abstractions;
-    using BuildingGeometry = Building.BuildingGeometry;
-    using BuildingId = Building.BuildingId;
-    using BuildingStatus = Building.BuildingStatus;
-    using BuildingUnit = Building.Commands.BuildingUnit;
-    using BuildingUnitFunction = Building.BuildingUnitFunction;
-    using BuildingUnitStatus = Building.BuildingUnitStatus;
+    using BuildingUnitFunction = BuildingRegistry.Legacy.BuildingUnitFunction;
+    using BuildingUnitStatus = BuildingRegistry.Legacy.BuildingUnitStatus;
 
-    public class GivenBuildingUnitExists: BuildingRegistryTest
+    public class GivenBuildingUnitExists : BuildingRegistryTest
     {
         public GivenBuildingUnitExists(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
         {
@@ -53,11 +46,10 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRemovingBuildingUnit
         {
             var command = Fixture.Create<RemoveBuildingUnit>();
 
-            var buildingUnitAddressWasAttachedV2 = new BuildingUnitAddressWasAttachedV2(
-                Fixture.Create<BuildingPersistentLocalId>(),
-                Fixture.Create<BuildingUnitPersistentLocalId>(),
-                new AddressPersistentLocalId(123));
-            ((ISetProvenance)buildingUnitAddressWasAttachedV2).SetProvenance(Fixture.Create<Provenance>());
+            var buildingUnitAddressWasAttachedV2 = new BuildingUnitAddressWasAttachedBuilder(Fixture)
+                .WithBuildingUnitPersistentLocalId(command.BuildingUnitPersistentLocalId)
+                .WithAddressPersistentLocalId(123)
+                .Build();
 
             Assert(new Scenario()
                 .Given(
@@ -68,7 +60,8 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRemovingBuildingUnit
                 .When(command)
                 .Then(
                     new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
-                        new BuildingUnitAddressWasDetachedV2(command.BuildingPersistentLocalId, command.BuildingUnitPersistentLocalId, new AddressPersistentLocalId(123))),
+                        new BuildingUnitAddressWasDetachedV2(command.BuildingPersistentLocalId, command.BuildingUnitPersistentLocalId,
+                            new AddressPersistentLocalId(123))),
                     new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
                         new BuildingUnitWasRemovedV2(command.BuildingPersistentLocalId, command.BuildingUnitPersistentLocalId))));
         }
@@ -78,27 +71,14 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRemovingBuildingUnit
         {
             var command = Fixture.Create<RemoveBuildingUnit>();
 
-            var buildingWasMigrated = new BuildingWasMigrated(
-                Fixture.Create<BuildingId>(),
-                command.BuildingPersistentLocalId,
-                Fixture.Create<BuildingPersistentLocalIdAssignmentDate>(),
-                BuildingStatus.Realized,
-                Fixture.Create<BuildingGeometry>(),
-                isRemoved: false,
-                new List<BuildingUnit>
-                {
-                    new BuildingUnit(
-                        Fixture.Create<BuildingRegistry.Legacy.BuildingUnitId>(),
-                        new PersistentLocalId(command.BuildingUnitPersistentLocalId),
-                        BuildingRegistry.Legacy.BuildingUnitFunction.Unknown,
-                        BuildingRegistry.Legacy.BuildingUnitStatus.Planned,
-                        new List<AddressPersistentLocalId>(),
-                        Fixture.Create<BuildingRegistry.Legacy.BuildingUnitPosition>(),
-                        Fixture.Create<BuildingRegistry.Legacy.BuildingGeometry>(),
-                        isRemoved: true)
-                }
-            );
-            ((ISetProvenance)buildingWasMigrated).SetProvenance(Fixture.Create<Provenance>());
+            var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
+                .WithBuildingStatus(BuildingStatus.Realized)
+                .WithBuildingUnit(new BuildingUnitBuilder(Fixture)
+                    .WithStatus(BuildingUnitStatus.Planned)
+                    .WithFunction(BuildingUnitFunction.Unknown)
+                    .WithIsRemoved()
+                    .Build())
+                .Build();
 
             Assert(new Scenario()
                 .Given(new BuildingStreamId(Fixture.Create<BuildingPersistentLocalId>()),
@@ -108,31 +88,17 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRemovingBuildingUnit
         }
 
         [Fact]
-        public void WithCommonBuilding_ThrowsBuildingUnitHasInvalidFunctionException()
+        public void WithCommonBuilding_ThenThrowsBuildingUnitHasInvalidFunctionException()
         {
             var command = Fixture.Create<RemoveBuildingUnit>();
 
-            var buildingWasMigrated = new BuildingWasMigrated(
-                Fixture.Create<BuildingId>(),
-                command.BuildingPersistentLocalId,
-                Fixture.Create<BuildingPersistentLocalIdAssignmentDate>(),
-                BuildingStatus.Realized,
-                Fixture.Create<BuildingGeometry>(),
-                isRemoved: false,
-                new List<BuildingUnit>
-                {
-                    new BuildingUnit(
-                        Fixture.Create<BuildingRegistry.Legacy.BuildingUnitId>(),
-                        Fixture.Create<BuildingRegistry.Legacy.PersistentLocalId>(),
-                        BuildingRegistry.Legacy.BuildingUnitFunction.Common,
-                        BuildingRegistry.Legacy.BuildingUnitStatus.Planned,
-                        new List<AddressPersistentLocalId>(),
-                        Fixture.Create<BuildingRegistry.Legacy.BuildingUnitPosition>(),
-                        Fixture.Create<BuildingRegistry.Legacy.BuildingGeometry>(),
-                        isRemoved: false)
-                }
-            );
-            ((ISetProvenance)buildingWasMigrated).SetProvenance(Fixture.Create<Provenance>());
+            var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
+                .WithBuildingStatus(BuildingStatus.Realized)
+                .WithBuildingUnit(new BuildingUnitBuilder(Fixture)
+                    .WithStatus(BuildingUnitStatus.Planned)
+                    .WithFunction(BuildingUnitFunction.Common)
+                    .Build())
+                .Build();
 
             Assert(new Scenario()
                 .Given(
@@ -151,7 +117,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRemovingBuildingUnit
                 Fixture.Create<Provenance>());
 
             var commonBuildingUnitWasAddedV2 = Fixture.Create<CommonBuildingUnitWasAddedV2>()
-                .WithBuildingUnitStatus(BuildingUnitStatus.Planned)
+                .WithBuildingUnitStatus(BuildingRegistry.Building.BuildingUnitStatus.Planned)
                 .WithBuildingUnitPersistentLocalId(new BuildingUnitPersistentLocalId(3));
 
             Assert(new Scenario()
@@ -161,10 +127,10 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRemovingBuildingUnit
                     Fixture.Create<BuildingWasRealizedV2>(),
                     Fixture.Create<BuildingUnitWasPlannedV2>()
                         .WithBuildingUnitPersistentLocalId(command.BuildingUnitPersistentLocalId)
-                        .WithFunction(BuildingUnitFunction.Unknown),
+                        .WithFunction(BuildingRegistry.Building.BuildingUnitFunction.Unknown),
                     Fixture.Create<BuildingUnitWasPlannedV2>()
                         .WithBuildingUnitPersistentLocalId(new BuildingUnitPersistentLocalId(2))
-                        .WithFunction(BuildingUnitFunction.Unknown),
+                        .WithFunction(BuildingRegistry.Building.BuildingUnitFunction.Unknown),
                     commonBuildingUnitWasAddedV2)
                 .When(command)
                 .Then(
@@ -189,7 +155,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRemovingBuildingUnit
                 Fixture.Create<Provenance>());
 
             var commonBuildingUnitWasAddedV2 = Fixture.Create<CommonBuildingUnitWasAddedV2>()
-                .WithBuildingUnitStatus(BuildingUnitStatus.Realized)
+                .WithBuildingUnitStatus(BuildingRegistry.Building.BuildingUnitStatus.Realized)
                 .WithBuildingUnitPersistentLocalId(new BuildingUnitPersistentLocalId(3));
 
             Assert(new Scenario()
@@ -199,10 +165,10 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRemovingBuildingUnit
                     Fixture.Create<BuildingWasRealizedV2>(),
                     Fixture.Create<BuildingUnitWasPlannedV2>()
                         .WithBuildingUnitPersistentLocalId(command.BuildingUnitPersistentLocalId)
-                        .WithFunction(BuildingUnitFunction.Unknown),
+                        .WithFunction(BuildingRegistry.Building.BuildingUnitFunction.Unknown),
                     Fixture.Create<BuildingUnitWasPlannedV2>()
                         .WithBuildingUnitPersistentLocalId(new BuildingUnitPersistentLocalId(2))
-                        .WithFunction(BuildingUnitFunction.Unknown),
+                        .WithFunction(BuildingRegistry.Building.BuildingUnitFunction.Unknown),
                     commonBuildingUnitWasAddedV2)
                 .When(command)
                 .Then(
@@ -229,18 +195,18 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRemovingBuildingUnit
             var commonBuildingUnitPersistentLocalId = new BuildingUnitPersistentLocalId(3);
             var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
                 .WithBuildingUnit(
-                    BuildingRegistry.Legacy.BuildingUnitStatus.Planned,
+                    BuildingUnitStatus.Planned,
                     command.BuildingUnitPersistentLocalId,
-                    BuildingRegistry.Legacy.BuildingUnitFunction.Unknown)
+                    BuildingUnitFunction.Unknown)
                 .WithBuildingUnit(
-                    BuildingRegistry.Legacy.BuildingUnitStatus.Planned,
+                    BuildingUnitStatus.Planned,
                     new BuildingUnitPersistentLocalId(2),
-                    BuildingRegistry.Legacy.BuildingUnitFunction.Unknown,
+                    BuildingUnitFunction.Unknown,
                     isRemoved: true)
                 .WithBuildingUnit(
-                    BuildingRegistry.Legacy.BuildingUnitStatus.NotRealized,
+                    BuildingUnitStatus.NotRealized,
                     commonBuildingUnitPersistentLocalId,
-                    BuildingRegistry.Legacy.BuildingUnitFunction.Common)
+                    BuildingUnitFunction.Common)
                 .Build();
 
             Assert(new Scenario()
@@ -272,7 +238,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRemovingBuildingUnit
                 Fixture.Create<Provenance>());
 
             var commonBuildingUnitWasAddedV2 = Fixture.Create<CommonBuildingUnitWasAddedV2>()
-                .WithBuildingUnitStatus(BuildingUnitStatus.Parse(buildingUnitStatus))
+                .WithBuildingUnitStatus(BuildingRegistry.Building.BuildingUnitStatus.Parse(buildingUnitStatus))
                 .WithBuildingUnitPersistentLocalId(new BuildingUnitPersistentLocalId(4));
 
             Assert(new Scenario()
@@ -281,14 +247,14 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRemovingBuildingUnit
                     Fixture.Create<BuildingWasPlannedV2>(),
                     Fixture.Create<BuildingWasRealizedV2>(),
                     Fixture.Create<BuildingUnitWasPlannedV2>()
-                        .WithFunction(BuildingUnitFunction.Unknown)
+                        .WithFunction(BuildingRegistry.Building.BuildingUnitFunction.Unknown)
                         .WithBuildingUnitPersistentLocalId(command.BuildingUnitPersistentLocalId),
                     Fixture.Create<BuildingUnitWasPlannedV2>()
                         .WithBuildingUnitPersistentLocalId(new BuildingUnitPersistentLocalId(2))
-                        .WithFunction(BuildingUnitFunction.Unknown),
+                        .WithFunction(BuildingRegistry.Building.BuildingUnitFunction.Unknown),
                     Fixture.Create<BuildingUnitWasPlannedV2>()
                         .WithBuildingUnitPersistentLocalId(new BuildingUnitPersistentLocalId(3))
-                        .WithFunction(BuildingUnitFunction.Unknown),
+                        .WithFunction(BuildingRegistry.Building.BuildingUnitFunction.Unknown),
                     commonBuildingUnitWasAddedV2)
                 .When(command)
                 .Then(
@@ -305,33 +271,26 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRemovingBuildingUnit
             var building = new BuildingFactory(NoSnapshotStrategy.Instance).Create();
 
             var buildingWasPlanned = Fixture.Create<BuildingWasPlannedV2>();
-            ((ISetProvenance)buildingWasPlanned).SetProvenance(Fixture.Create<Provenance>());
             var buildingUnitWasPlanned = Fixture.Create<BuildingUnitWasPlannedV2>()
                 .WithBuildingUnitPersistentLocalId(new BuildingUnitPersistentLocalId(1));
-            ((ISetProvenance)buildingUnitWasPlanned).SetProvenance(Fixture.Create<Provenance>());
             var secondBuildingUnitWasPlanned = Fixture.Create<BuildingUnitWasPlannedV2>()
                 .WithBuildingUnitPersistentLocalId(new BuildingUnitPersistentLocalId(2));
-            ((ISetProvenance)secondBuildingUnitWasPlanned).SetProvenance(Fixture.Create<Provenance>());
             var commonBuildingUnitWasAdded = Fixture.Create<CommonBuildingUnitWasAddedV2>()
-                .WithBuildingUnitStatus(BuildingUnitStatus.Realized)
+                .WithBuildingUnitStatus(BuildingRegistry.Building.BuildingUnitStatus.Realized)
                 .WithBuildingUnitPersistentLocalId(new BuildingUnitPersistentLocalId(3));
-            ((ISetProvenance)commonBuildingUnitWasAdded).SetProvenance(Fixture.Create<Provenance>());
 
-            var buildingUnitAddressWasAttachedV2 = new BuildingUnitAddressWasAttachedV2(
-                Fixture.Create<BuildingPersistentLocalId>(),
-                new BuildingUnitPersistentLocalId(1),
-                new AddressPersistentLocalId(123));
-            ((ISetProvenance)buildingUnitAddressWasAttachedV2).SetProvenance(Fixture.Create<Provenance>());
+            var buildingUnitAddressWasAttachedV2 = new BuildingUnitAddressWasAttachedBuilder(Fixture)
+                .WithBuildingUnitPersistentLocalId(1)
+                .WithAddressPersistentLocalId(123)
+                .Build();
 
-            var buildingUnitAddressWasDetachedV2 = new BuildingUnitAddressWasDetachedV2(
-                Fixture.Create<BuildingPersistentLocalId>(),
-                new BuildingUnitPersistentLocalId(1),
-                new AddressPersistentLocalId(123));
-            ((ISetProvenance)buildingUnitAddressWasDetachedV2).SetProvenance(Fixture.Create<Provenance>());
+            var buildingUnitAddressWasDetachedV2 = new BuildingUnitAddressWasDetachedBuilder(Fixture)
+                .WithBuildingUnitPersistentLocalId(1)
+                .WithAddressPersistentLocalId(123)
+                .Build();
 
             var buildingUnitWasRemoved = Fixture.Create<BuildingUnitWasRemovedV2>()
                 .WithBuildingUnitPersistentLocalId(new BuildingUnitPersistentLocalId(1));
-            ((ISetProvenance)buildingUnitWasRemoved).SetProvenance(Fixture.Create<Provenance>());
 
             // Act
             building.Initialize(new object[]
@@ -356,7 +315,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRemovingBuildingUnit
 
             var commonBuildingUnit = building.BuildingUnits
                 .Single(x => x.BuildingUnitPersistentLocalId == commonBuildingUnitWasAdded.BuildingUnitPersistentLocalId);
-            commonBuildingUnit.Status.Should().Be(BuildingUnitStatus.Realized);
+            commonBuildingUnit.Status.Should().Be(BuildingRegistry.Building.BuildingUnitStatus.Realized);
 
             building.LastEventHash.Should().Be(buildingUnitWasRemoved.GetHash());
         }

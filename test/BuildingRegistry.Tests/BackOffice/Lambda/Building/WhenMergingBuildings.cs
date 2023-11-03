@@ -54,48 +54,48 @@
             // BUILDING 1
             var buildingToMerge1 = Fixture.Create<BuildingPersistentLocalId>();
             var buildingUnitToTransfer1 = Fixture.Create<BuildingUnitPersistentLocalId>();
-            var buildingUnitToTransfer1_Address1 = Fixture.Create<AddressPersistentLocalId>();
-            var buildingUnitToTransfer1_Address2 = Fixture.Create<AddressPersistentLocalId>();
+            var buildingUnitToTransfer1Address1 = Fixture.Create<AddressPersistentLocalId>();
+            var buildingUnitToTransfer1Address2 = Fixture.Create<AddressPersistentLocalId>();
 
             PlanBuilding(buildingToMerge1);
             MeasureBuilding(buildingToMerge1, Fixture.Create<ExtendedWkbGeometry>());
             PlanBuildingUnit(buildingToMerge1, buildingUnitToTransfer1);
             await _backOfficeContext.AddIdempotentBuildingUnitBuilding(buildingToMerge1, buildingUnitToTransfer1, _ct);
-            _addressConsumerContext.AddAddress(buildingUnitToTransfer1_Address1, AddressStatus.Current);
-            _addressConsumerContext.AddAddress(buildingUnitToTransfer1_Address2, AddressStatus.Current);
-            AttachAddressToBuildingUnit(buildingToMerge1, buildingUnitToTransfer1, buildingUnitToTransfer1_Address1);
-            AttachAddressToBuildingUnit(buildingToMerge1, buildingUnitToTransfer1, buildingUnitToTransfer1_Address2);
+            _addressConsumerContext.AddAddress(buildingUnitToTransfer1Address1, AddressStatus.Current);
+            _addressConsumerContext.AddAddress(buildingUnitToTransfer1Address2, AddressStatus.Current);
+            AttachAddressToBuildingUnit(buildingToMerge1, buildingUnitToTransfer1, buildingUnitToTransfer1Address1);
+            AttachAddressToBuildingUnit(buildingToMerge1, buildingUnitToTransfer1, buildingUnitToTransfer1Address2);
             await _backOfficeContext.AddIdempotentBuildingUnitAddressRelation(
                 buildingToMerge1,
                 buildingUnitToTransfer1,
-                buildingUnitToTransfer1_Address1, _ct);
+                buildingUnitToTransfer1Address1, _ct);
             await _backOfficeContext.AddIdempotentBuildingUnitAddressRelation(
                 buildingToMerge1,
                 buildingUnitToTransfer1,
-                buildingUnitToTransfer1_Address2, _ct);
+                buildingUnitToTransfer1Address2, _ct);
 
             // BUILDING 2
             var buildingToMerge2 = Fixture.Create<BuildingPersistentLocalId>();
             var buildingUnitToTransfer2 = Fixture.Create<BuildingUnitPersistentLocalId>();
-            var buildingUnitToTransfer2_Address1 = Fixture.Create<AddressPersistentLocalId>();
-            var buildingUnitToTransfer2_Address2 = Fixture.Create<AddressPersistentLocalId>();
+            var buildingUnitToTransfer2Address1 = Fixture.Create<AddressPersistentLocalId>();
+            var buildingUnitToTransfer2Address2 = Fixture.Create<AddressPersistentLocalId>();
 
             PlanBuilding(buildingToMerge2);
             MeasureBuilding(buildingToMerge2, Fixture.Create<ExtendedWkbGeometry>());
             PlanBuildingUnit(buildingToMerge2, buildingUnitToTransfer2);
             await _backOfficeContext.AddIdempotentBuildingUnitBuilding(buildingToMerge2, buildingUnitToTransfer2, _ct);
-            _addressConsumerContext.AddAddress(buildingUnitToTransfer2_Address1, AddressStatus.Current);
-            _addressConsumerContext.AddAddress(buildingUnitToTransfer2_Address2, AddressStatus.Current);
-            AttachAddressToBuildingUnit(buildingToMerge2, buildingUnitToTransfer2, buildingUnitToTransfer2_Address1);
-            AttachAddressToBuildingUnit(buildingToMerge2, buildingUnitToTransfer2, buildingUnitToTransfer2_Address2);
+            _addressConsumerContext.AddAddress(buildingUnitToTransfer2Address1, AddressStatus.Current);
+            _addressConsumerContext.AddAddress(buildingUnitToTransfer2Address2, AddressStatus.Current);
+            AttachAddressToBuildingUnit(buildingToMerge2, buildingUnitToTransfer2, buildingUnitToTransfer2Address1);
+            AttachAddressToBuildingUnit(buildingToMerge2, buildingUnitToTransfer2, buildingUnitToTransfer2Address2);
             await _backOfficeContext.AddIdempotentBuildingUnitAddressRelation(
                 buildingToMerge2,
                 buildingUnitToTransfer2,
-                buildingUnitToTransfer2_Address1, _ct);
+                buildingUnitToTransfer2Address1, _ct);
             await _backOfficeContext.AddIdempotentBuildingUnitAddressRelation(
                 buildingToMerge2,
                 buildingUnitToTransfer2,
-                buildingUnitToTransfer2_Address2, _ct);
+                buildingUnitToTransfer2Address2, _ct);
 
             var request = new MergeBuildingsLambdaRequest(
                 newBuildingPersistentLocalId,
@@ -140,33 +140,33 @@
             _backOfficeContext.BuildingUnitBuildings.Should().HaveCount(3);
 
             var relation = _backOfficeContext.BuildingUnitBuildings.Find((int) buildingUnitToTransfer1);
-            relation.BuildingPersistentLocalId.Should().Be(newBuildingPersistentLocalId);
+            relation!.BuildingPersistentLocalId.Should().Be(newBuildingPersistentLocalId);
 
-            AssertBuildingUnitAddressRelation(buildingUnitToTransfer1, buildingUnitToTransfer1_Address1, newBuildingPersistentLocalId);
-            AssertBuildingUnitAddressRelation(buildingUnitToTransfer1, buildingUnitToTransfer1_Address2, newBuildingPersistentLocalId);
+            AssertBuildingUnitAddressRelation(buildingUnitToTransfer1, buildingUnitToTransfer1Address1, newBuildingPersistentLocalId);
+            AssertBuildingUnitAddressRelation(buildingUnitToTransfer1, buildingUnitToTransfer1Address2, newBuildingPersistentLocalId);
 
             relation = _backOfficeContext.BuildingUnitBuildings.Find((int) buildingUnitToTransfer2);
-            relation.BuildingPersistentLocalId.Should().Be(newBuildingPersistentLocalId);
+            relation!.BuildingPersistentLocalId.Should().Be(newBuildingPersistentLocalId);
 
-            AssertBuildingUnitAddressRelation(buildingUnitToTransfer2, buildingUnitToTransfer2_Address1, newBuildingPersistentLocalId);
-            AssertBuildingUnitAddressRelation(buildingUnitToTransfer2, buildingUnitToTransfer2_Address2, newBuildingPersistentLocalId);
+            AssertBuildingUnitAddressRelation(buildingUnitToTransfer2, buildingUnitToTransfer2Address1, newBuildingPersistentLocalId);
+            AssertBuildingUnitAddressRelation(buildingUnitToTransfer2, buildingUnitToTransfer2Address2, newBuildingPersistentLocalId);
 
             relation = _backOfficeContext.BuildingUnitBuildings.Find(1); // CommonBuildingUnit persistentLocalId
-            relation.BuildingPersistentLocalId.Should().Be(newBuildingPersistentLocalId);
+            relation!.BuildingPersistentLocalId.Should().Be(newBuildingPersistentLocalId);
         }
 
         private void AssertBuildingUnitAddressRelation(BuildingUnitPersistentLocalId buildingUnitToTransfer1,
-            AddressPersistentLocalId buildingUnitToTransfer1_Address1, BuildingPersistentLocalId newBuildingPersistentLocalId)
+            AddressPersistentLocalId buildingUnitToTransfer1Address1, BuildingPersistentLocalId newBuildingPersistentLocalId)
         {
             var unitAddressRelation = _backOfficeContext.BuildingUnitAddressRelation.Find(
                 (int) buildingUnitToTransfer1,
-                (int) buildingUnitToTransfer1_Address1);
+                (int) buildingUnitToTransfer1Address1);
             unitAddressRelation.Should().NotBeNull();
-            unitAddressRelation.BuildingPersistentLocalId.Should().Be(newBuildingPersistentLocalId);
+            unitAddressRelation!.BuildingPersistentLocalId.Should().Be(newBuildingPersistentLocalId);
         }
 
         [Fact]
-        public async Task WhenBuildingToMergeIsNotFound_ThenTicketError()
+        public async Task WithoutBuildingToMerge_ThenTicketError()
         {
             // Arrange
             var ticketing = new Mock<ITicketing>();
@@ -197,7 +197,7 @@
         }
 
         [Fact]
-        public async Task WhenBuildingToMergeHasInvalidStatus_ThenThrowsBuildingToMergeHasInvalidStatusException()
+        public async Task WithBuildingToMergeHasInvalidStatus_ThenThrowsBuildingToMergeHasInvalidStatusException()
         {
             // Arrange
             var ticketing = new Mock<ITicketing>();
@@ -225,7 +225,7 @@
         }
 
         [Fact]
-        public async Task WhenOnlyOneBuildingToMerge_ThenThrowsBuildingMergerNeedsMoreThanOneBuildingException()
+        public async Task WithOnlyOneBuildingToMerge_ThenThrowsBuildingMergerNeedsMoreThanOneBuildingException()
         {
             // Arrange
             var ticketing = new Mock<ITicketing>();

@@ -27,12 +27,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenAttachingAddressToBuildingUn
                 .WithBuildingPersistentLocalId(command.BuildingPersistentLocalId)
                 .WithBuildingUnit(
                     BuildingRegistry.Legacy.BuildingUnitStatus.Realized,
-                    command.BuildingUnitPersistentLocalId,
-                    null,
-                    null,
-                    null,
-                    null,
-                    isRemoved: false)
+                    command.BuildingUnitPersistentLocalId)
                 .Build();
 
             var consumerAddress = Container.Resolve<FakeConsumerAddressContext>();

@@ -21,7 +21,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitNotRea
         }
 
         [Fact]
-        public void BuildingIsRemoved_ThrowsBuildingIsRemovedException()
+        public void BuildingIsRemoved_ThenThrowsBuildingIsRemovedException()
         {
             var command = Fixture.Create<CorrectBuildingUnitNotRealization>();
 

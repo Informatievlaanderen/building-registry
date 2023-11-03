@@ -3,11 +3,12 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenDetachingAddressFromBuilding
     using System.Collections.Generic;
     using AutoFixture;
     using Be.Vlaanderen.Basisregisters.AggregateSource.Testing;
-    using BuildingRegistry.Building;
-    using BuildingRegistry.Building.Commands;
-    using BuildingRegistry.Tests.Extensions;
+    using Building;
+    using Building.Commands;
+    using Extensions;
     using Xunit;
     using Xunit.Abstractions;
+    using BuildingUnitStatus = BuildingRegistry.Legacy.BuildingUnitStatus;
 
     public class GivenAddressNotAttachedToBuildingUnit : BuildingRegistryTest
     {
@@ -22,7 +23,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenDetachingAddressFromBuilding
             var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
                 .WithBuildingPersistentLocalId(command.BuildingPersistentLocalId)
                 .WithBuildingUnit(
-                    BuildingRegistry.Legacy.BuildingUnitStatus.Realized,
+                    BuildingUnitStatus.Realized,
                     command.BuildingUnitPersistentLocalId,
                     null,
                     null,

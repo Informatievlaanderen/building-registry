@@ -80,8 +80,8 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenMeasuringBuilding
                     new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
                         new BuildingWasMeasured(
                             command.BuildingPersistentLocalId,
-                            new []{ firstPlannedBuildingUnitPersistentLocalId },
-                            new []{ secondPlannedBuildingUnitPersistentLocalId },
+                            new[] { firstPlannedBuildingUnitPersistentLocalId },
+                            new[] { secondPlannedBuildingUnitPersistentLocalId },
                             command.Geometry,
                             new BuildingGeometry(measuredExtendedWkbGeometry, BuildingGeometryMethod.MeasuredByGrb).Center)),
                     new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
@@ -108,7 +108,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenMeasuringBuilding
             var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
                 .WithBuildingGeometry(
                     new BuildingGeometry(Fixture.Create<ExtendedWkbGeometry>(),
-                    BuildingGeometryMethod.Outlined))
+                        BuildingGeometryMethod.Outlined))
                 .WithBuildingStatus(BuildingStatus.Parse(buildingStatus))
                 .WithBuildingUnit(
                     BuildingUnitStatus.Planned,
@@ -164,20 +164,14 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenMeasuringBuilding
         }
 
         [Fact]
-        public void AndBuildingIsRemoved_ThenThrowsBuildingIsRemovedException()
+        public void WithBuildingIsRemoved_ThenThrowsBuildingIsRemovedException()
         {
             var command = Fixture.Create<MeasureBuilding>();
 
-            var buildingWasMigrated = new BuildingWasMigrated(
-                Fixture.Create<BuildingId>(),
-                command.BuildingPersistentLocalId,
-                Fixture.Create<BuildingPersistentLocalIdAssignmentDate>(),
-                BuildingStatus.Planned,
-                Fixture.Create<BuildingGeometry>(),
-                isRemoved: true,
-                new List<BuildingUnit>()
-            );
-            ((ISetProvenance)buildingWasMigrated).SetProvenance(Fixture.Create<Provenance>());
+            var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
+                .WithBuildingStatus(BuildingStatus.Planned)
+                .WithIsRemoved()
+                .Build();
 
             Assert(new Scenario()
                 .Given(
@@ -193,16 +187,10 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenMeasuringBuilding
             Fixture.Customize(new WithValidPoint());
             var command = Fixture.Create<MeasureBuilding>();
 
-            var buildingWasMigrated = new BuildingWasMigrated(
-                Fixture.Create<BuildingId>(),
-                command.BuildingPersistentLocalId,
-                Fixture.Create<BuildingPersistentLocalIdAssignmentDate>(),
-                BuildingStatus.Realized,
-                Fixture.Create<BuildingGeometry>(),
-                isRemoved: false,
-                new List<BuildingUnit>()
-            );
-            ((ISetProvenance)buildingWasMigrated).SetProvenance(Fixture.Create<Provenance>());
+            var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
+                .WithBuildingStatus(BuildingStatus.Realized)
+                .WithBuildingGeometry(Fixture.Create<BuildingGeometry>())
+                .Build();
 
             Assert(new Scenario()
                 .Given(
@@ -212,23 +200,15 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenMeasuringBuilding
                 .Throws(new PolygonIsInvalidException()));
         }
 
-        [Theory]
-        [InlineData("Retired")]
-        public void WithInvalidBuildingStatus_ThenBuildingHasInvalidStatusExceptionWasThrown(string status)
+        [Fact]
+        public void WithInvalidBuildingStatus_ThenBuildingHasInvalidStatusExceptionWasThrown()
         {
             Fixture.Customize(new WithValidPoint());
             var command = Fixture.Create<MeasureBuilding>();
 
-            var buildingWasMigrated = new BuildingWasMigrated(
-                Fixture.Create<BuildingId>(),
-                command.BuildingPersistentLocalId,
-                Fixture.Create<BuildingPersistentLocalIdAssignmentDate>(),
-                BuildingStatus.Parse(status),
-                Fixture.Create<BuildingGeometry>(),
-                isRemoved: false,
-                new List<BuildingUnit>()
-            );
-            ((ISetProvenance)buildingWasMigrated).SetProvenance(Fixture.Create<Provenance>());
+            var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
+                .WithBuildingStatus(BuildingStatus.Retired)
+                .Build();
 
             Assert(new Scenario()
                 .Given(
@@ -264,21 +244,21 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenMeasuringBuilding
                 .Build();
 
             var firstBuildingUnitWasRealized = new BuildingUnitWasRealizedBecauseBuildingWasRealized(
-                    Fixture.Create<BuildingPersistentLocalId>(),
-                    firstPlannedBuildingUnitPersistentLocalId);
+                Fixture.Create<BuildingPersistentLocalId>(),
+                firstPlannedBuildingUnitPersistentLocalId);
 
             var secondBuildingUnitWasRealized = new BuildingUnitWasRealizedBecauseBuildingWasRealized(
-                    Fixture.Create<BuildingPersistentLocalId>(),
-                    secondPlannedBuildingUnitPersistentLocalId);
+                Fixture.Create<BuildingPersistentLocalId>(),
+                secondPlannedBuildingUnitPersistentLocalId);
 
             var measuredExtendedWkbGeometry = new ExtendedWkbGeometry(GeometryHelper.SecondValidPolygon.AsBinary());
             var buildingUnitsExtendedWkbGeometry = new BuildingGeometry(measuredExtendedWkbGeometry, BuildingGeometryMethod.MeasuredByGrb).Center;
             var buildingWasMeasured = new BuildingWasMeasured(
-                    Fixture.Create<BuildingPersistentLocalId>(),
-                    new []{ firstPlannedBuildingUnitPersistentLocalId },
-                    new []{ secondPlannedBuildingUnitPersistentLocalId },
-                    measuredExtendedWkbGeometry,
-                    buildingUnitsExtendedWkbGeometry);
+                Fixture.Create<BuildingPersistentLocalId>(),
+                new[] { firstPlannedBuildingUnitPersistentLocalId },
+                new[] { secondPlannedBuildingUnitPersistentLocalId },
+                measuredExtendedWkbGeometry,
+                buildingUnitsExtendedWkbGeometry);
 
             // Act
             building.Initialize(new object[]

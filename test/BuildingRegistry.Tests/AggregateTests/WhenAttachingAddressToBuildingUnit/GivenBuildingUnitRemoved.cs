@@ -15,7 +15,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenAttachingAddressToBuildingUn
         { }
 
         [Fact]
-        public void ThenThrowBuildingUnitRemovedException()
+        public void ThenThrowsBuildingUnitRemovedException()
         {
             var command = Fixture.Create<AttachAddressToBuildingUnit>();
 
@@ -24,9 +24,6 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenAttachingAddressToBuildingUn
                 .WithBuildingUnit(
                     BuildingRegistry.Legacy.BuildingUnitStatus.Realized,
                     command.BuildingUnitPersistentLocalId,
-                    null,
-                    null,
-                    null,
                     isRemoved: true)
                 .Build();
 

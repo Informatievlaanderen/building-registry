@@ -1,22 +1,22 @@
 namespace BuildingRegistry.Tests.AggregateTests.WhenAttachingAddressToBuildingUnit
 {
+    using System.Collections.Generic;
+    using System.Linq;
     using Autofac;
     using AutoFixture;
+    using BackOffice;
+    using Be.Vlaanderen.Basisregisters.AggregateSource;
+    using Be.Vlaanderen.Basisregisters.AggregateSource.Snapshotting;
     using Be.Vlaanderen.Basisregisters.AggregateSource.Testing;
     using Building;
     using Building.Commands;
-    using BackOffice;
-    using Be.Vlaanderen.Basisregisters.AggregateSource;
     using Building.Events;
+    using Consumer.Address;
     using Extensions;
+    using FluentAssertions;
     using Xunit;
     using Xunit.Abstractions;
-    using Be.Vlaanderen.Basisregisters.AggregateSource.Snapshotting;
-    using Moq;
-    using System.Collections.Generic;
-    using System.Linq;
-    using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
-    using FluentAssertions;
+    using BuildingUnitStatus = BuildingRegistry.Legacy.BuildingUnitStatus;
 
     public class GivenBuildingWithBuildingUnit : BuildingRegistryTest
     {
@@ -31,13 +31,13 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenAttachingAddressToBuildingUn
             var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
                 .WithBuildingPersistentLocalId(command.BuildingPersistentLocalId)
                 .WithBuildingUnit(
-                    BuildingRegistry.Legacy.BuildingUnitStatus.Realized,
+                    BuildingUnitStatus.Realized,
                     command.BuildingUnitPersistentLocalId,
                     isRemoved: false)
                 .Build();
 
             var consumerAddress = Container.Resolve<FakeConsumerAddressContext>();
-            consumerAddress.AddAddress(command.AddressPersistentLocalId, Consumer.Address.AddressStatus.Current, isRemoved: false);
+            consumerAddress.AddAddress(command.AddressPersistentLocalId, AddressStatus.Current, isRemoved: false);
 
             Assert(new Scenario()
                 .Given(
@@ -53,22 +53,22 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenAttachingAddressToBuildingUn
         [Fact]
         public void StateCheck()
         {
-            var buildingUnitAddressWasAttachedV2 = new BuildingUnitAddressWasAttachedV2(
-                new BuildingPersistentLocalId(Fixture.Create<BuildingPersistentLocalId>()),
-                new BuildingUnitPersistentLocalId(Fixture.Create<BuildingUnitPersistentLocalId>()),
-                new AddressPersistentLocalId(Fixture.Create<AddressPersistentLocalId>()));
-            ((ISetProvenance)buildingUnitAddressWasAttachedV2).SetProvenance(Fixture.Create<Provenance>());
+            var buildingUnitAddressWasAttachedV2 = new BuildingUnitAddressWasAttachedBuilder(Fixture)
+                .WithBuildingPersistentLocalId(Fixture.Create<BuildingPersistentLocalId>())
+                .WithBuildingUnitPersistentLocalId(Fixture.Create<BuildingUnitPersistentLocalId>())
+                .WithAddressPersistentLocalId(Fixture.Create<AddressPersistentLocalId>())
+                .Build();
 
             var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
                 .WithBuildingPersistentLocalId(new BuildingPersistentLocalId(buildingUnitAddressWasAttachedV2.BuildingPersistentLocalId))
                 .WithBuildingUnit(
-                    BuildingRegistry.Legacy.BuildingUnitStatus.Realized,
+                    BuildingUnitStatus.Realized,
                     new BuildingUnitPersistentLocalId(buildingUnitAddressWasAttachedV2.BuildingUnitPersistentLocalId),
                     isRemoved: false)
                 .Build();
 
             var consumerAddress = Container.Resolve<FakeConsumerAddressContext>();
-            consumerAddress.AddAddress(new AddressPersistentLocalId(buildingUnitAddressWasAttachedV2.AddressPersistentLocalId), Consumer.Address.AddressStatus.Current, isRemoved: false);
+            consumerAddress.AddAddress(new AddressPersistentLocalId(buildingUnitAddressWasAttachedV2.AddressPersistentLocalId), AddressStatus.Current, isRemoved: false);
 
             var sut = new BuildingFactory(NoSnapshotStrategy.Instance).Create();
             sut.Initialize(new List<object>
@@ -77,8 +77,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenAttachingAddressToBuildingUn
                 buildingUnitAddressWasAttachedV2
             });
 
-
-            sut.BuildingUnits.First().AddressPersistentLocalIds.Should().BeEquivalentTo(new List<AddressPersistentLocalId>{ new AddressPersistentLocalId(buildingUnitAddressWasAttachedV2.AddressPersistentLocalId) });
+            sut.BuildingUnits.First().AddressPersistentLocalIds.Should().BeEquivalentTo(new List<AddressPersistentLocalId>{ new(buildingUnitAddressWasAttachedV2.AddressPersistentLocalId) });
         }
     }
 }

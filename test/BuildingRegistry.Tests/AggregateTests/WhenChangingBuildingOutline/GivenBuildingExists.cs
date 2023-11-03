@@ -15,13 +15,11 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenChangingBuildingOutline
     using Extensions;
     using Fixtures;
     using FluentAssertions;
-    using Moq;
     using Xunit;
     using Xunit.Abstractions;
     using BuildingUnitFunction = BuildingRegistry.Legacy.BuildingUnitFunction;
     using BuildingUnitPositionGeometryMethod = BuildingRegistry.Legacy.BuildingUnitPositionGeometryMethod;
     using BuildingUnitStatus = BuildingRegistry.Legacy.BuildingUnitStatus;
-    using ExtendedWkbGeometry = BuildingRegistry.Legacy.ExtendedWkbGeometry;
 
     public class GivenBuildingExists : BuildingRegistryTest
     {
@@ -35,11 +33,11 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenChangingBuildingOutline
         {
             var command = new ChangeBuildingOutline(
                 Fixture.Create<BuildingPersistentLocalId>(),
-                new BuildingRegistry.Building.ExtendedWkbGeometry(GeometryHelper.SecondValidPolygon.AsBinary()),
+                new ExtendedWkbGeometry(GeometryHelper.SecondValidPolygon.AsBinary()),
                 Fixture.Create<Provenance>());
 
             var initialBuildingGeometry = new BuildingGeometry(
-                new BuildingRegistry.Building.ExtendedWkbGeometry(GeometryHelper.ValidPolygon.AsBinary()),
+                new ExtendedWkbGeometry(GeometryHelper.ValidPolygon.AsBinary()),
                 BuildingGeometryMethod.Outlined);
 
             var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
@@ -55,7 +53,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenChangingBuildingOutline
                     new BuildingOutlineWasChanged(
                         command.BuildingPersistentLocalId,
                         Array.Empty<BuildingUnitPersistentLocalId>(),
-                        new BuildingRegistry.Building.ExtendedWkbGeometry(GeometryHelper.SecondValidPolygon.AsBinary()),
+                        new ExtendedWkbGeometry(GeometryHelper.SecondValidPolygon.AsBinary()),
                         null))));
         }
 
@@ -64,11 +62,11 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenChangingBuildingOutline
         {
             var command = new ChangeBuildingOutline(
                 Fixture.Create<BuildingPersistentLocalId>(),
-                new BuildingRegistry.Building.ExtendedWkbGeometry(GeometryHelper.ValidPolygon.AsBinary()),
+                new ExtendedWkbGeometry(GeometryHelper.ValidPolygon.AsBinary()),
                 Fixture.Create<Provenance>());
 
             var initialBuildingGeometry = new BuildingGeometry(
-                new BuildingRegistry.Building.ExtendedWkbGeometry(GeometryHelper.ValidPolygon.AsBinary()),
+                new ExtendedWkbGeometry(GeometryHelper.ValidPolygon.AsBinary()),
                 BuildingGeometryMethod.Outlined);
 
             var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
@@ -85,7 +83,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenChangingBuildingOutline
         [Fact]
         public void WithPlannedOrRealizedBuildingUnitsForWhichThePositionIsDerived_ThenBuildingUnitsPositionWasAlsoChanged()
         {
-            var changedBuildingGeometry = new BuildingRegistry.Building.ExtendedWkbGeometry(GeometryHelper.SecondValidPolygon.AsBinary());
+            var changedBuildingGeometry = new ExtendedWkbGeometry(GeometryHelper.SecondValidPolygon.AsBinary());
             var changedBuildingUnitGeometry = new BuildingGeometry(changedBuildingGeometry, BuildingGeometryMethod.Outlined).Center;
 
             var command = new ChangeBuildingOutline(
@@ -94,7 +92,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenChangingBuildingOutline
                 Fixture.Create<Provenance>());
 
             var initialBuildingGeometry = new BuildingGeometry(
-                new BuildingRegistry.Building.ExtendedWkbGeometry(GeometryHelper.ValidPolygon.AsBinary()),
+                new ExtendedWkbGeometry(GeometryHelper.ValidPolygon.AsBinary()),
                 BuildingGeometryMethod.Outlined);
 
             var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
@@ -107,7 +105,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenChangingBuildingOutline
                     BuildingUnitStatus.Planned,
                     new BuildingUnitPersistentLocalId(2),
                     positionGeometryMethod: BuildingUnitPositionGeometryMethod.AppointedByAdministrator,
-                    extendedWkbGeometry: new ExtendedWkbGeometry(changedBuildingUnitGeometry.ToString()))
+                    extendedWkbGeometry: new BuildingRegistry.Legacy.ExtendedWkbGeometry(changedBuildingUnitGeometry.ToString()))
                 .WithBuildingUnit(
                     BuildingUnitStatus.Realized,
                     new BuildingUnitPersistentLocalId(3),
@@ -134,7 +132,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenChangingBuildingOutline
         [Fact]
         public void WithPlannedOrRealizedBuildingUnitsForWhichThePositionIsAppointedByAdministrator_ThenBuildingUnitsPositionRemainsUnchanged()
         {
-            var changedBuildingGeometry = new BuildingRegistry.Building.ExtendedWkbGeometry(GeometryHelper.SecondValidPolygon.AsBinary());
+            var changedBuildingGeometry = new ExtendedWkbGeometry(GeometryHelper.SecondValidPolygon.AsBinary());
             var changedBuildingUnitGeometry = new BuildingGeometry(changedBuildingGeometry, BuildingGeometryMethod.Outlined).Center;
 
             var command = new ChangeBuildingOutline(
@@ -143,7 +141,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenChangingBuildingOutline
                 Fixture.Create<Provenance>());
 
             var initialBuildingGeometry = new BuildingGeometry(
-                new BuildingRegistry.Building.ExtendedWkbGeometry(GeometryHelper.ValidPolygon.AsBinary()),
+                new ExtendedWkbGeometry(GeometryHelper.ValidPolygon.AsBinary()),
                 BuildingGeometryMethod.Outlined);
 
             var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
@@ -152,12 +150,12 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenChangingBuildingOutline
                     BuildingUnitStatus.Planned,
                     new BuildingUnitPersistentLocalId(2),
                     positionGeometryMethod: BuildingUnitPositionGeometryMethod.AppointedByAdministrator,
-                    extendedWkbGeometry: new ExtendedWkbGeometry(changedBuildingUnitGeometry.ToString()))
+                    extendedWkbGeometry: new BuildingRegistry.Legacy.ExtendedWkbGeometry(changedBuildingUnitGeometry.ToString()))
                 .WithBuildingUnit(
                     BuildingUnitStatus.NotRealized,
                     new BuildingUnitPersistentLocalId(3),
                     positionGeometryMethod: BuildingUnitPositionGeometryMethod.AppointedByAdministrator,
-                    extendedWkbGeometry: new ExtendedWkbGeometry(changedBuildingUnitGeometry.ToString()))
+                    extendedWkbGeometry: new BuildingRegistry.Legacy.ExtendedWkbGeometry(changedBuildingUnitGeometry.ToString()))
                 .Build();
 
             Assert(new Scenario()
@@ -178,11 +176,11 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenChangingBuildingOutline
         {
             var command = new ChangeBuildingOutline(
                 Fixture.Create<BuildingPersistentLocalId>(),
-                new BuildingRegistry.Building.ExtendedWkbGeometry(GeometryHelper.SecondValidPolygon.AsBinary()),
+                new ExtendedWkbGeometry(GeometryHelper.SecondValidPolygon.AsBinary()),
                 Fixture.Create<Provenance>());
 
             var initialBuildingGeometry = new BuildingGeometry(
-                new BuildingRegistry.Building.ExtendedWkbGeometry(GeometryHelper.ValidPolygon.AsBinary()),
+                new ExtendedWkbGeometry(GeometryHelper.ValidPolygon.AsBinary()),
                 BuildingGeometryMethod.Outlined);
 
             var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
@@ -205,11 +203,11 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenChangingBuildingOutline
         {
             var command = new ChangeBuildingOutline(
                 Fixture.Create<BuildingPersistentLocalId>(),
-                new BuildingRegistry.Building.ExtendedWkbGeometry(GeometryHelper.SecondValidPolygon.AsBinary()),
+                new ExtendedWkbGeometry(GeometryHelper.SecondValidPolygon.AsBinary()),
                 Fixture.Create<Provenance>());
 
             var initialBuildingGeometry = new BuildingGeometry(
-                new BuildingRegistry.Building.ExtendedWkbGeometry(GeometryHelper.ValidPolygon.AsBinary()),
+                new ExtendedWkbGeometry(GeometryHelper.ValidPolygon.AsBinary()),
                 BuildingGeometryMethod.MeasuredByGrb);
 
             var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
@@ -230,11 +228,11 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenChangingBuildingOutline
         {
             var command = new ChangeBuildingOutline(
                 Fixture.Create<BuildingPersistentLocalId>(),
-                new BuildingRegistry.Building.ExtendedWkbGeometry(GeometryHelper.SecondValidPolygon.AsBinary()),
+                new ExtendedWkbGeometry(GeometryHelper.SecondValidPolygon.AsBinary()),
                 Fixture.Create<Provenance>());
 
             var initialBuildingGeometry = new BuildingGeometry(
-                new BuildingRegistry.Building.ExtendedWkbGeometry(GeometryHelper.ValidPolygon.AsBinary()),
+                new ExtendedWkbGeometry(GeometryHelper.ValidPolygon.AsBinary()),
                 BuildingGeometryMethod.MeasuredByGrb);
 
             var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
@@ -256,11 +254,11 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenChangingBuildingOutline
         {
             var command = new ChangeBuildingOutline(
                 Fixture.Create<BuildingPersistentLocalId>(),
-                new BuildingRegistry.Building.ExtendedWkbGeometry(GeometryHelper.SecondValidPolygon.AsBinary()),
+                new ExtendedWkbGeometry(GeometryHelper.SecondValidPolygon.AsBinary()),
                 Fixture.Create<Provenance>());
 
             var initialBuildingGeometry = new BuildingGeometry(
-                new BuildingRegistry.Building.ExtendedWkbGeometry(GeometryHelper.ValidPolygon.AsBinary()),
+                new ExtendedWkbGeometry(GeometryHelper.ValidPolygon.AsBinary()),
                 BuildingGeometryMethod.Outlined);
 
             var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
@@ -269,7 +267,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenChangingBuildingOutline
                     BuildingUnitStatus.Parse(buildingUnitStatus)!.Value,
                     new BuildingUnitPersistentLocalId(1),
                     positionGeometryMethod: BuildingUnitPositionGeometryMethod.AppointedByAdministrator,
-                    extendedWkbGeometry: new ExtendedWkbGeometry(GeometryHelper.PointNotInPolygon.AsBinary()))
+                    extendedWkbGeometry: new BuildingRegistry.Legacy.ExtendedWkbGeometry(GeometryHelper.PointNotInPolygon.AsBinary()))
                 .Build();
 
             Assert(new Scenario()
@@ -283,11 +281,11 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenChangingBuildingOutline
         [Fact]
         public void StateCheck()
         {
-            var changedBuildingGeometry = new BuildingRegistry.Building.ExtendedWkbGeometry(GeometryHelper.SecondValidPolygon.AsBinary());
+            var changedBuildingGeometry = new ExtendedWkbGeometry(GeometryHelper.SecondValidPolygon.AsBinary());
             var changedBuildingUnitGeometry = new BuildingGeometry(changedBuildingGeometry, BuildingGeometryMethod.Outlined).Center;
 
             var initialBuildingGeometry = new BuildingGeometry(
-                new BuildingRegistry.Building.ExtendedWkbGeometry(GeometryHelper.ValidPolygon.AsBinary()),
+                new ExtendedWkbGeometry(GeometryHelper.ValidPolygon.AsBinary()),
                 BuildingGeometryMethod.Outlined);
 
             var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
@@ -300,7 +298,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenChangingBuildingOutline
                     BuildingUnitStatus.Planned,
                     new BuildingUnitPersistentLocalId(2),
                     positionGeometryMethod: BuildingUnitPositionGeometryMethod.AppointedByAdministrator,
-                    extendedWkbGeometry: new ExtendedWkbGeometry(changedBuildingUnitGeometry.ToString()))
+                    extendedWkbGeometry: new BuildingRegistry.Legacy.ExtendedWkbGeometry(changedBuildingUnitGeometry.ToString()))
                 .WithBuildingUnit(
                     BuildingUnitStatus.Realized,
                     new BuildingUnitPersistentLocalId(3),

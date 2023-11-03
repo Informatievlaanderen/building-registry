@@ -8,6 +8,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuildingUnit
     using Building;
     using Building.Commands;
     using Building.Events;
+    using Extensions;
     using Fixtures;
     using Xunit;
     using Xunit.Abstractions;
@@ -30,16 +31,9 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuildingUnit
                 .WithoutPosition()
                 .WithDeviation(false);
 
-            var buildingWasMigrated = new BuildingWasMigrated(
-                Fixture.Create<BuildingId>(),
-                Fixture.Create<BuildingPersistentLocalId>(),
-                Fixture.Create<BuildingPersistentLocalIdAssignmentDate>(),
-                BuildingStatus.Parse(buildingStatus),
-                Fixture.Create<BuildingGeometry>(),
-                false,
-                new List<BuildingUnit>()
-            );
-            ((ISetProvenance)buildingWasMigrated).SetProvenance(Fixture.Create<Provenance>());
+            var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
+                .WithBuildingStatus(BuildingStatus.Parse(buildingStatus))
+                .Build();
 
             var buildingGeometry = new BuildingGeometry(new ExtendedWkbGeometry(buildingWasMigrated.ExtendedWkbGeometry),
                 BuildingGeometryMethod.Outlined);

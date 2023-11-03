@@ -1,7 +1,5 @@
 namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitPosition
 {
-    using System;
-    using System.Collections.Generic;
     using System.Linq;
     using Api.BackOffice.Abstractions.Building;
     using AutoFixture;
@@ -13,21 +11,13 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitPositi
     using Building.Commands;
     using Building.Events;
     using Building.Exceptions;
-    using BuildingRegistry.Legacy;
     using Extensions;
     using Fixtures;
     using FluentAssertions;
-    using Moq;
     using Xunit;
     using Xunit.Abstractions;
-    using BuildingGeometry = Building.BuildingGeometry;
-    using BuildingGeometryMethod = Building.BuildingGeometryMethod;
-    using BuildingId = Building.BuildingId;
-    using BuildingStatus = Building.BuildingStatus;
-    using BuildingUnitFunction = Building.BuildingUnitFunction;
-    using BuildingUnitPositionGeometryMethod = Building.BuildingUnitPositionGeometryMethod;
-    using BuildingUnitStatus = Building.BuildingUnitStatus;
-    using ExtendedWkbGeometry = Building.ExtendedWkbGeometry;
+    using BuildingUnitFunction = BuildingRegistry.Legacy.BuildingUnitFunction;
+    using BuildingUnitStatus = BuildingRegistry.Legacy.BuildingUnitStatus;
 
     public class GivenBuildingExists : BuildingRegistryTest
     {
@@ -71,31 +61,17 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitPositi
         [Theory]
         [InlineData("NotRealized")]
         [InlineData("Retired")]
-        public void WithInvalidBuildingUnitStatus_ThrowsBuildingUnitHasInvalidStatusException(string status)
+        public void WithInvalidBuildingUnitStatus_ThenThrowsBuildingUnitHasInvalidStatusException(string status)
         {
             var command = Fixture.Create<CorrectBuildingUnitPosition>();
 
-            var buildingWasMigrated = new BuildingWasMigrated(
-                Fixture.Create<BuildingId>(),
-                new BuildingPersistentLocalId(command.BuildingPersistentLocalId),
-                Fixture.Create<BuildingPersistentLocalIdAssignmentDate>(),
-                BuildingStatus.Planned,
-                Fixture.Create<BuildingGeometry>(),
-                isRemoved: false,
-                new List<BuildingRegistry.Building.Commands.BuildingUnit>
-                {
-                    new  BuildingRegistry.Building.Commands.BuildingUnit(
-                        Fixture.Create<BuildingRegistry.Legacy.BuildingUnitId>(),
-                        new PersistentLocalId(command.BuildingUnitPersistentLocalId),
-                        BuildingRegistry.Legacy.BuildingUnitFunction.Unknown,
-                        BuildingRegistry.Legacy.BuildingUnitStatus.Parse(status) ?? throw new ArgumentException(),
-                        new List<AddressPersistentLocalId>(),
-                        Fixture.Create<BuildingRegistry.Legacy.BuildingUnitPosition>(),
-                        Fixture.Create<BuildingRegistry.Legacy.BuildingGeometry>(),
-                        isRemoved: false)
-                }
-            );
-            ((ISetProvenance)buildingWasMigrated).SetProvenance(Fixture.Create<Provenance>());
+            var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
+                .WithBuildingPersistentLocalId(command.BuildingPersistentLocalId)
+                .WithBuildingStatus(BuildingStatus.Planned)
+                .WithBuildingUnit(BuildingUnitStatus.Parse(status)!.Value,
+                    command.BuildingUnitPersistentLocalId,
+                    BuildingUnitFunction.Unknown)
+                .Build();
 
             Assert(new Scenario()
                 .Given(
@@ -112,27 +88,14 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitPositi
         {
             var command = Fixture.Create<CorrectBuildingUnitPosition>();
 
-            var buildingWasMigrated = new BuildingWasMigrated(
-                Fixture.Create<BuildingId>(),
-                new BuildingPersistentLocalId(command.BuildingPersistentLocalId),
-                Fixture.Create<BuildingPersistentLocalIdAssignmentDate>(),
-                BuildingStatus.Planned,
-                Fixture.Create<BuildingGeometry>(),
-                isRemoved: false,
-                new List<BuildingRegistry.Building.Commands.BuildingUnit>
-                {
-                    new  BuildingRegistry.Building.Commands.BuildingUnit(
-                        Fixture.Create<BuildingRegistry.Legacy.BuildingUnitId>(),
-                        new PersistentLocalId(command.BuildingUnitPersistentLocalId),
-                        BuildingRegistry.Legacy.BuildingUnitFunction.Unknown,
-                        BuildingRegistry.Legacy.BuildingUnitStatus.Parse(status) ?? throw new ArgumentException(),
-                        new List<AddressPersistentLocalId>(),
-                        Fixture.Create<BuildingRegistry.Legacy.BuildingUnitPosition>(),
-                        Fixture.Create<BuildingRegistry.Legacy.BuildingGeometry>(),
-                        isRemoved: false)
-                }
-            );
-            ((ISetProvenance)buildingWasMigrated).SetProvenance(Fixture.Create<Provenance>());
+            var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
+                .WithBuildingPersistentLocalId(command.BuildingPersistentLocalId)
+                .WithBuildingStatus(BuildingStatus.Planned)
+                .WithBuildingUnit(
+                    BuildingUnitStatus.Parse(status)!.Value,
+                    command.BuildingUnitPersistentLocalId,
+                    BuildingUnitFunction.Unknown)
+                .Build();
 
             var buildingGeometry = new BuildingGeometry(new ExtendedWkbGeometry(buildingWasMigrated.ExtendedWkbGeometry),
                 BuildingGeometryMethod.Outlined);
@@ -160,8 +123,9 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitPositi
 
             var command = Fixture.Create<CorrectBuildingUnitPosition>()
                 .WithPositionGeometryMethod(BuildingUnitPositionGeometryMethod.AppointedByAdministrator)
-                .WithPointPosition("<gml:Point srsName=\"https://www.opengis.net/def/crs/EPSG/0/3137\" xmlns:gml=\"http://www.opengis.net/gml/3.2\">" +
-                                   $"<gml:pos>{correctPointCoordinateX} {correctPointCoordinateY}</gml:pos></gml:Point>")
+                .WithPointPosition(
+                    "<gml:Point srsName=\"https://www.opengis.net/def/crs/EPSG/0/3137\" xmlns:gml=\"http://www.opengis.net/gml/3.2\">" +
+                    $"<gml:pos>{correctPointCoordinateX} {correctPointCoordinateY}</gml:pos></gml:Point>")
                 .WithPersistentLocalId(buildingUnitPersistentLocalId);
 
             var buildingGeometry = "" +
@@ -194,7 +158,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitPositi
         }
 
         [Fact]
-        public void WithBuildingUnitPositionOutsideOfBuildingGeometry_ThrowsBuildingUnitOutsideGeometryBuildingException()
+        public void WithBuildingUnitPositionOutsideOfBuildingGeometry_ThenThrowsBuildingUnitOutsideGeometryBuildingException()
         {
             var wrongPointCoordinateX = "666666.77777777777";
             var wrongPointCoordinateY = "777777.66666666666";
@@ -202,8 +166,9 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitPositi
 
             var command = Fixture.Create<CorrectBuildingUnitPosition>()
                 .WithPositionGeometryMethod(BuildingUnitPositionGeometryMethod.AppointedByAdministrator)
-                .WithPointPosition("<gml:Point srsName=\"https://www.opengis.net/def/crs/EPSG/0/3137\" xmlns:gml=\"http://www.opengis.net/gml/3.2\">" +
-                                   $"<gml:pos>{wrongPointCoordinateX} {wrongPointCoordinateY}</gml:pos></gml:Point>")
+                .WithPointPosition(
+                    "<gml:Point srsName=\"https://www.opengis.net/def/crs/EPSG/0/3137\" xmlns:gml=\"http://www.opengis.net/gml/3.2\">" +
+                    $"<gml:pos>{wrongPointCoordinateX} {wrongPointCoordinateY}</gml:pos></gml:Point>")
                 .WithPersistentLocalId(buildingUnitPersistentLocalId);
 
             var buildingGeometry = "" +
@@ -231,7 +196,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitPositi
         }
 
         [Fact]
-        public void WithCommonBuilding_ThrowsBuildingUnitHasInvalidFunctionException()
+        public void WithCommonBuilding_ThenThrowsBuildingUnitHasInvalidFunctionException()
         {
             var buildingUnitPersistentLocalId = Fixture.Create<BuildingUnitPersistentLocalId>();
 
@@ -241,7 +206,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitPositi
             var buildingWasPlanned = Fixture.Create<BuildingWasPlannedV2>();
             var buildingUnitWasPlanned = Fixture.Create<BuildingUnitWasPlannedV2>()
                 .WithBuildingUnitPersistentLocalId(buildingUnitPersistentLocalId)
-                .WithFunction(BuildingUnitFunction.Common);
+                .WithFunction(BuildingRegistry.Building.BuildingUnitFunction.Common);
 
             Assert(new Scenario()
                 .Given(
@@ -260,8 +225,9 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitPositi
             var buildingUnitPersistentLocalId = Fixture.Create<BuildingUnitPersistentLocalId>();
             var command = Fixture.Create<CorrectBuildingUnitPosition>()
                 .WithPositionGeometryMethod(BuildingUnitPositionGeometryMethod.AppointedByAdministrator)
-                .WithPointPosition("<gml:Point srsName=\"https://www.opengis.net/def/crs/EPSG/0/3137\" xmlns:gml=\"http://www.opengis.net/gml/3.2\">" +
-                                   $"<gml:pos>{correctPointCoordinateX} {correctPointCoordinateY}</gml:pos></gml:Point>")
+                .WithPointPosition(
+                    "<gml:Point srsName=\"https://www.opengis.net/def/crs/EPSG/0/3137\" xmlns:gml=\"http://www.opengis.net/gml/3.2\">" +
+                    $"<gml:pos>{correctPointCoordinateX} {correctPointCoordinateY}</gml:pos></gml:Point>")
                 .WithPersistentLocalId(buildingUnitPersistentLocalId);
 
             var buildingGeometry = "" +
@@ -278,7 +244,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitPositi
             var buildingWasPlannedV2 = new BuildingWasPlannedV2(
                 Fixture.Create<BuildingPersistentLocalId>(),
                 buildingGeometry.ToExtendedWkbGeometry());
-            ;
+
             ((ISetProvenance)buildingWasPlannedV2).SetProvenance(Fixture.Create<Provenance>());
 
             var buildingUnitWasPlannedV2 = Fixture.Create<BuildingUnitWasPlannedV2>()
@@ -290,7 +256,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitPositi
                 command.BuildingPersistentLocalId,
                 buildingUnitPersistentLocalId,
                 command.PositionGeometryMethod,
-                command.Position);
+                command.Position!);
             ((ISetProvenance)buildingUnitPositionWasCorrected).SetProvenance(Fixture.Create<Provenance>());
 
             building.Initialize(new object[]
@@ -303,8 +269,8 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitPositi
             building.BuildingUnits.Should().NotBeEmpty();
             building.BuildingUnits.Count.Should().Be(1);
             var buildingUnit = building.BuildingUnits.First();
-            buildingUnit.Status.Should().Be(BuildingUnitStatus.Planned);
-            buildingUnit.BuildingUnitPosition.Geometry.ToString().Should().Be(command.Position.ToString());
+            buildingUnit.Status.Should().Be(BuildingRegistry.Building.BuildingUnitStatus.Planned);
+            buildingUnit.BuildingUnitPosition.Geometry.ToString().Should().Be(command.Position!.ToString());
             buildingUnit.BuildingUnitPosition.GeometryMethod.ToString().Should().Be(command.PositionGeometryMethod.ToString());
             buildingUnit.IsRemoved.Should().BeFalse();
             buildingUnit.LastEventHash.Should().Be(buildingUnitPositionWasCorrected.GetHash());

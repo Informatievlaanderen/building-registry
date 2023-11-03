@@ -5,17 +5,15 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingPlaceUnder
     using Be.Vlaanderen.Basisregisters.AggregateSource;
     using Be.Vlaanderen.Basisregisters.AggregateSource.Snapshotting;
     using Be.Vlaanderen.Basisregisters.AggregateSource.Testing;
-    using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Building;
     using Building.Commands;
     using Building.Events;
     using Building.Exceptions;
+    using Extensions;
     using Fixtures;
     using FluentAssertions;
-    using Moq;
     using Xunit;
     using Xunit.Abstractions;
-    using BuildingUnit = Building.Commands.BuildingUnit;
 
     public class GivenBuildingExists : BuildingRegistryTest
     {
@@ -56,20 +54,15 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingPlaceUnder
         [InlineData("Realized")]
         [InlineData("Retired")]
         [InlineData("NotRealized")]
-        public void WithInvalidStatus_ThrowsBuildingHasInvalidStatusException(string status)
+        public void WithInvalidStatus_ThenThrowsBuildingHasInvalidStatusException(string status)
         {
             var command = Fixture.Create<CorrectBuildingPlaceUnderConstruction>();
 
-            var buildingWasMigrated = new BuildingWasMigrated(
-                Fixture.Create<BuildingId>(),
-                command.BuildingPersistentLocalId,
-                Fixture.Create<BuildingPersistentLocalIdAssignmentDate>(),
-                BuildingStatus.Parse(status),
-                Fixture.Create<BuildingGeometry>(),
-                isRemoved: false,
-                new List<BuildingUnit>()
-            );
-            ((ISetProvenance)buildingWasMigrated).SetProvenance(Fixture.Create<Provenance>());
+            var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
+                .WithBuildingPersistentLocalId(command.BuildingPersistentLocalId)
+                .WithBuildingStatus(BuildingStatus.Parse(status))
+                .WithBuildingGeometry(Fixture.Create<BuildingGeometry>())
+                .Build();
 
             Assert(new Scenario()
                 .Given(
@@ -79,22 +72,17 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingPlaceUnder
                 .Throws(new BuildingHasInvalidStatusException()));
         }
 
-
         [Fact]
-        public void BuildingIsRemoved_ThrowsBuildingIsRemovedException()
+        public void BuildingIsRemoved_ThenThrowsBuildingIsRemovedException()
         {
             var command = Fixture.Create<CorrectBuildingPlaceUnderConstruction>();
 
-            var buildingWasMigrated = new BuildingWasMigrated(
-                Fixture.Create<BuildingId>(),
-                command.BuildingPersistentLocalId,
-                Fixture.Create<BuildingPersistentLocalIdAssignmentDate>(),
-                BuildingStatus.Planned,
-                Fixture.Create<BuildingGeometry>(),
-                isRemoved: true,
-                new List<BuildingUnit>()
-            );
-            ((ISetProvenance)buildingWasMigrated).SetProvenance(Fixture.Create<Provenance>());
+            var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
+                .WithBuildingPersistentLocalId(command.BuildingPersistentLocalId)
+                .WithBuildingStatus(BuildingStatus.Planned)
+                .WithBuildingGeometry(Fixture.Create<BuildingGeometry>())
+                .WithIsRemoved()
+                .Build();
 
             Assert(new Scenario()
                 .Given(
@@ -109,7 +97,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingPlaceUnder
         public void StateCheck()
         {
             var sut = new BuildingFactory(NoSnapshotStrategy.Instance).Create();
-            sut.Initialize(new List<object>{ Fixture.Create<BuildingWasPlannedV2>(), Fixture.Create<PlaceBuildingUnderConstruction>()});
+            sut.Initialize(new List<object> { Fixture.Create<BuildingWasPlannedV2>(), Fixture.Create<PlaceBuildingUnderConstruction>() });
             sut.CorrectBuildingUnderConstruction();
             sut.BuildingStatus.Should().Be(BuildingStatus.Planned);
         }

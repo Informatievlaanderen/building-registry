@@ -10,6 +10,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlacingBuildingUnderConstruc
     using Building.Commands;
     using Building.Events;
     using Building.Exceptions;
+    using Extensions;
     using Fixtures;
     using FluentAssertions;
     using Moq;
@@ -56,20 +57,13 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlacingBuildingUnderConstruc
         [InlineData("Realized")]
         [InlineData("Retired")]
         [InlineData("NotRealized")]
-        public void WithInvalidStatus_ThrowsBuildingHasInvalidStatusException(string status)
+        public void WithInvalidStatus_ThenThrowsBuildingHasInvalidStatusException(string status)
         {
             var command = Fixture.Create<PlaceBuildingUnderConstruction>();
 
-            var buildingWasMigrated = new BuildingWasMigrated(
-                Fixture.Create<BuildingId>(),
-                command.BuildingPersistentLocalId,
-                Fixture.Create<BuildingPersistentLocalIdAssignmentDate>(),
-                BuildingStatus.Parse(status),
-                Fixture.Create<BuildingGeometry>(),
-                isRemoved: false,
-                new List<BuildingUnit>()
-            );
-            ((ISetProvenance)buildingWasMigrated).SetProvenance(Fixture.Create<Provenance>());
+            var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
+                .WithBuildingStatus(BuildingStatus.Parse(status))
+                .Build();
 
             Assert(new Scenario()
                 .Given(
@@ -81,20 +75,14 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlacingBuildingUnderConstruc
 
 
         [Fact]
-        public void BuildingIsRemoved_ThrowsBuildingIsRemovedException()
+        public void BuildingIsRemoved_ThenThrowsBuildingIsRemovedException()
         {
             var command = Fixture.Create<PlaceBuildingUnderConstruction>();
 
-            var buildingWasMigrated = new BuildingWasMigrated(
-                Fixture.Create<BuildingId>(),
-                command.BuildingPersistentLocalId,
-                Fixture.Create<BuildingPersistentLocalIdAssignmentDate>(),
-                BuildingStatus.Planned,
-                Fixture.Create<BuildingGeometry>(),
-                isRemoved: true,
-                new List<BuildingUnit>()
-            );
-            ((ISetProvenance)buildingWasMigrated).SetProvenance(Fixture.Create<Provenance>());
+            var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
+                .WithBuildingStatus(BuildingStatus.Planned)
+                .WithIsRemoved()
+                .Build();
 
             Assert(new Scenario()
                 .Given(
@@ -109,7 +97,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlacingBuildingUnderConstruc
         public void StateCheck()
         {
             var sut = new BuildingFactory(NoSnapshotStrategy.Instance).Create();
-            sut.Initialize(new List<object>{ Fixture.Create<BuildingWasPlannedV2>() });
+            sut.Initialize(new List<object> { Fixture.Create<BuildingWasPlannedV2>() });
             sut.PlaceUnderConstruction();
             sut.BuildingStatus.Should().Be(BuildingStatus.UnderConstruction);
         }

@@ -1,7 +1,6 @@
 namespace BuildingRegistry.Tests.AggregateTests.WhenRetiringBuildingUnit
 {
     using System;
-    using System.Collections.Generic;
     using System.Linq;
     using AutoFixture;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
@@ -15,11 +14,10 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRetiringBuildingUnit
     using Extensions;
     using Fixtures;
     using FluentAssertions;
-    using Moq;
     using Xunit;
     using Xunit.Abstractions;
-    using BuildingUnit = Building.Commands.BuildingUnit;
     using BuildingUnitFunction = BuildingRegistry.Legacy.BuildingUnitFunction;
+    using BuildingUnitStatus = BuildingRegistry.Legacy.BuildingUnitStatus;
 
     public class GivenBuildingExists : BuildingRegistryTest
     {
@@ -90,7 +88,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRetiringBuildingUnit
         }
 
         [Fact]
-        public void WithCommonBuilding_ThrowsBuildingUnitHasInvalidFunctionException()
+        public void WithCommonBuilding_ThenThrowsBuildingUnitHasInvalidFunctionException()
         {
             var command = Fixture.Create<RetireBuildingUnit>();
 
@@ -98,7 +96,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRetiringBuildingUnit
                 .WithBuildingPersistentLocalId(command.BuildingPersistentLocalId)
                 .WithBuildingStatus(BuildingStatus.Realized)
                 .WithBuildingUnit(
-                    BuildingRegistry.Legacy.BuildingUnitStatus.Realized,
+                    BuildingUnitStatus.Realized,
                     Fixture.Create<BuildingUnitPersistentLocalId>(),
                     BuildingUnitFunction.Common)
                 .Build();
@@ -114,7 +112,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRetiringBuildingUnit
         [Theory]
         [InlineData("Planned")]
         [InlineData("NotRealized")]
-        public void WithInvalidBuildingUnitStatus_ThrowsBuildingUnitHasInvalidStatusException(string status)
+        public void WithInvalidBuildingUnitStatus_ThenThrowsBuildingUnitHasInvalidStatusException(string status)
         {
             var command = Fixture.Create<RetireBuildingUnit>();
 
@@ -122,7 +120,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRetiringBuildingUnit
                 .WithBuildingPersistentLocalId(command.BuildingPersistentLocalId)
                 .WithBuildingStatus(BuildingStatus.Realized)
                 .WithBuildingUnit(
-                    BuildingRegistry.Legacy.BuildingUnitStatus.Parse(status) ?? throw new ArgumentException(),
+                    BuildingUnitStatus.Parse(status) ?? throw new ArgumentException(),
                     Fixture.Create<BuildingUnitPersistentLocalId>(),
                     BuildingUnitFunction.Unknown)
                 .Build();
@@ -137,20 +135,13 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRetiringBuildingUnit
 
 
         [Fact]
-        public void NonExistentBuildingUnit_ThrowsBuildingUnitNotFoundException()
+        public void WithNonExistentBuildingUnit_ThenThrowsBuildingUnitNotFoundException()
         {
             var command = Fixture.Create<RetireBuildingUnit>();
 
-            var buildingWasMigrated = new BuildingWasMigrated(
-                Fixture.Create<BuildingId>(),
-                command.BuildingPersistentLocalId,
-                Fixture.Create<BuildingPersistentLocalIdAssignmentDate>(),
-                BuildingStatus.Realized,
-                Fixture.Create<BuildingGeometry>(),
-                isRemoved: false,
-                new List<BuildingUnit>()
-            );
-            ((ISetProvenance)buildingWasMigrated).SetProvenance(Fixture.Create<Provenance>());
+            var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
+                .WithBuildingStatus(BuildingStatus.Realized)
+                .Build();
 
             Assert(new Scenario()
                 .Given(
@@ -161,31 +152,16 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRetiringBuildingUnit
         }
 
         [Fact]
-        public void BuildingUnitIsRemoved_ThrowsBuildingUnitIsRemovedException()
+        public void WithRemovedBuildingUnit_ThenThrowsBuildingUnitIsRemovedException()
         {
             var command = Fixture.Create<RetireBuildingUnit>();
 
-            var buildingWasMigrated = new BuildingWasMigrated(
-                Fixture.Create<BuildingId>(),
-                command.BuildingPersistentLocalId,
-                Fixture.Create<BuildingPersistentLocalIdAssignmentDate>(),
-                BuildingStatus.Realized,
-                Fixture.Create<BuildingGeometry>(),
-                isRemoved: false,
-                new List<BuildingUnit>
-                {
-                    new BuildingUnit(
-                        Fixture.Create<BuildingRegistry.Legacy.BuildingUnitId>(),
-                        Fixture.Create<BuildingRegistry.Legacy.PersistentLocalId>(),
-                        Fixture.Create<BuildingUnitFunction>(),
-                        BuildingRegistry.Legacy.BuildingUnitStatus.Planned,
-                        new List<AddressPersistentLocalId>(),
-                        Fixture.Create<BuildingRegistry.Legacy.BuildingUnitPosition>(),
-                        Fixture.Create<BuildingRegistry.Legacy.BuildingGeometry>(),
-                        isRemoved: true)
-                }
-            );
-            ((ISetProvenance)buildingWasMigrated).SetProvenance(Fixture.Create<Provenance>());
+            var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
+                .WithBuildingStatus(BuildingStatus.Realized)
+                .WithBuildingUnit(new BuildingUnitBuilder(Fixture)
+                    .WithIsRemoved()
+                    .Build())
+                .Build();
 
             Assert(new Scenario()
                 .Given(
@@ -198,7 +174,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRetiringBuildingUnit
         [Theory]
         [InlineData("Retired")]
         [InlineData("NotRealized")]
-        public void WithInvalidBuildingStatus_ThrowsBuildingHasInvalidStatusException(string status)
+        public void WithInvalidBuildingStatus_ThenThrowsBuildingHasInvalidStatusException(string status)
         {
             var command = Fixture.Create<RetireBuildingUnit>();
 
@@ -206,7 +182,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRetiringBuildingUnit
                 .WithBuildingPersistentLocalId(command.BuildingPersistentLocalId)
                 .WithBuildingStatus(BuildingStatus.Parse(status))
                 .WithBuildingUnit(
-                    BuildingRegistry.Legacy.BuildingUnitStatus.Realized,
+                    BuildingUnitStatus.Realized,
                     Fixture.Create<BuildingUnitPersistentLocalId>(),
                     BuildingUnitFunction.Unknown)
                 .Build();
@@ -248,7 +224,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRetiringBuildingUnit
             building.BuildingUnits.Should().NotBeEmpty();
             building.BuildingUnits.Count.Should().Be(1);
             var buildingUnit = building.BuildingUnits.First();
-            buildingUnit.Status.Should().Be(BuildingUnitStatus.Retired);
+            buildingUnit.Status.Should().Be(BuildingRegistry.Building.BuildingUnitStatus.Retired);
             buildingUnit.AddressPersistentLocalIds.Should().BeEmpty();
             buildingUnit.LastEventHash.Should().NotBe(building.LastEventHash);
         }

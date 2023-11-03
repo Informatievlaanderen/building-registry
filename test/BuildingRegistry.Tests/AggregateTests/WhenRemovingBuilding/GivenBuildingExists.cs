@@ -12,9 +12,9 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRemovingBuilding
     using Extensions;
     using Fixtures;
     using FluentAssertions;
-    using Moq;
     using Xunit;
     using Xunit.Abstractions;
+    using BuildingUnitStatus = BuildingRegistry.Legacy.BuildingUnitStatus;
 
     public class GivenBuildingExists : BuildingRegistryTest
     {
@@ -49,12 +49,12 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRemovingBuilding
                     new ExtendedWkbGeometry(GeometryHelper.ValidPolygon.AsBinary()),
                     BuildingGeometryMethod.Outlined))
                 .WithBuildingUnit(
-                    BuildingRegistry.Legacy.BuildingUnitStatus.Planned,
+                    BuildingUnitStatus.Planned,
                     buildingUnitPersistentLocalId,
                     attachedAddresses: new List<AddressPersistentLocalId>() { new AddressPersistentLocalId(1) },
                     isRemoved: false)
                 .WithBuildingUnit(
-                    BuildingRegistry.Legacy.BuildingUnitStatus.Planned,
+                    BuildingUnitStatus.Planned,
                     Fixture.Create<BuildingUnitPersistentLocalId>(),
                     isRemoved: true)
                 .Build();
@@ -123,12 +123,12 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRemovingBuilding
                     new ExtendedWkbGeometry(GeometryHelper.ValidPolygon.AsBinary()),
                     BuildingGeometryMethod.Outlined))
                 .WithBuildingUnit(
-                    BuildingRegistry.Legacy.BuildingUnitStatus.Planned,
+                    BuildingUnitStatus.Planned,
                     buildingUnitPersistentLocalId,
                     attachedAddresses: new List<AddressPersistentLocalId>() { new AddressPersistentLocalId(1) },
                     isRemoved: false)
                 .WithBuildingUnit(
-                    BuildingRegistry.Legacy.BuildingUnitStatus.Planned,
+                    BuildingUnitStatus.Planned,
                     Fixture.Create<BuildingUnitPersistentLocalId>(),
                     isRemoved: true)
                 .Build();

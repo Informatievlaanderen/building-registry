@@ -8,16 +8,21 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenMigratingBuilding
     using Be.Vlaanderen.Basisregisters.AggregateSource.Testing;
     using Building;
     using Building.Commands;
-    using Building.Datastructures;
     using Building.Events;
     using BuildingRegistry.Legacy;
+    using Extensions;
     using FluentAssertions;
-    using Moq;
     using Xunit;
     using Xunit.Abstractions;
     using Building = Building.Building;
+    using BuildingGeometry = BuildingRegistry.Legacy.BuildingGeometry;
     using BuildingUnit = Building.Commands.BuildingUnit;
+    using BuildingUnitFunction = BuildingRegistry.Legacy.BuildingUnitFunction;
+    using BuildingUnitId = BuildingRegistry.Legacy.BuildingUnitId;
+    using BuildingUnitPosition = BuildingRegistry.Legacy.BuildingUnitPosition;
     using BuildingUnitPositionGeometryMethod = BuildingRegistry.Legacy.BuildingUnitPositionGeometryMethod;
+    using BuildingUnitStatus = BuildingRegistry.Legacy.BuildingUnitStatus;
+    using ExtendedWkbGeometry = BuildingRegistry.Legacy.ExtendedWkbGeometry;
 
     public class GivenNoBuildingExists : BuildingRegistryTest
     {
@@ -85,17 +90,11 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenMigratingBuilding
         public void WithBuildingUnitOutsideBuilding_ThenBuildingWasCorrectlyMutated()
         {
             var command = Fixture.Create<MigrateBuilding>();
-            var buildingUnitWithInvalidPositionToMigrate = new BuildingUnit(
-                Fixture.Create<BuildingRegistry.Legacy.BuildingUnitId>(),
-                Fixture.Create<BuildingRegistry.Legacy.PersistentLocalId>(),
-                Fixture.Create<BuildingRegistry.Legacy.BuildingUnitFunction>(),
-                Fixture.Create<BuildingRegistry.Legacy.BuildingUnitStatus>(),
-                Fixture.Create<List<AddressPersistentLocalId>>(),
-                new BuildingRegistry.Legacy.BuildingUnitPosition(
-                    new BuildingRegistry.Legacy.ExtendedWkbGeometry(GeometryHelper.PointNotInPolygon.AsBinary()),
-                    BuildingUnitPositionGeometryMethod.DerivedFromObject),
-                Fixture.Create<BuildingRegistry.Legacy.BuildingGeometry>(),
-                false);
+            var buildingUnitWithInvalidPositionToMigrate = new BuildingUnitBuilder(Fixture)
+                .WithPosition(new BuildingUnitPosition(
+                    new ExtendedWkbGeometry(GeometryHelper.PointNotInPolygon.AsBinary()),
+                    BuildingUnitPositionGeometryMethod.DerivedFromObject))
+                .Build();
 
             command.BuildingUnits.Clear();
             command.BuildingUnits.Add(buildingUnitWithInvalidPositionToMigrate);

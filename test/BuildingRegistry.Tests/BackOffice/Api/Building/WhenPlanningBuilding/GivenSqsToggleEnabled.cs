@@ -8,7 +8,6 @@ namespace BuildingRegistry.Tests.BackOffice.Api.Building.WhenPlanningBuilding
     using Be.Vlaanderen.Basisregisters.Sqs.Requests;
     using BuildingRegistry.Api.BackOffice.Abstractions.Building.Requests;
     using BuildingRegistry.Api.BackOffice.Abstractions.Building.SqsRequests;
-    using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.SqsRequests;
     using BuildingRegistry.Api.BackOffice.Building;
     using Fixtures;
     using FluentAssertions;

@@ -19,7 +19,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wms
 
     public class BuildingUnitV2Tests : BuildingWmsProjectionTest<BuildingUnitV2Projections>
     {
-        private readonly Fixture _fixture = new Fixture();
+        private readonly Fixture _fixture = new();
 
         public BuildingUnitV2Tests()
         {
@@ -33,12 +33,12 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wms
         }
 
         [Theory]
-        [InlineData("Planned", null)]
-        [InlineData("UnderConstruction", null)]
-        [InlineData("Realized", null)]
-        [InlineData("Retired", "Retired")]
-        [InlineData("NotRealized", "NotRealized")]
-        public async Task WhenNonRemovedBuildingWasMigrated(string buildingStatus, string? expectedStatus)
+        [InlineData("Planned")]
+        [InlineData("UnderConstruction")]
+        [InlineData("Realized")]
+        [InlineData("Retired")]
+        [InlineData("NotRealized")]
+        public async Task WhenNonRemovedBuildingWasMigrated(string buildingStatus)
         {
             _fixture.Register(() => false);
             _fixture.Register(() => BuildingStatus.Parse(buildingStatus));
@@ -128,7 +128,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wms
                         }
                         else
                         {
-                            expectedUnit.BuildingPersistentLocalId.Should().Be(buildingWasMigrated.BuildingPersistentLocalId);
+                            expectedUnit!.BuildingPersistentLocalId.Should().Be(buildingWasMigrated.BuildingPersistentLocalId);
                             expectedUnit.Status.Should().Be(BuildingUnitStatus.Parse(unit.Status));
                             expectedUnit.Function.Should().Be(BuildingUnitV2Projections.MapFunction(BuildingUnitFunction.Parse(unit.Function)));
                             expectedUnit.PositionMethod.Should().Be(BuildingUnitV2Projections.MapGeometryMethod(BuildingUnitPositionGeometryMethod.Parse(unit.GeometryMethod)));
@@ -376,7 +376,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wms
                 {
                     var item = await ct.BuildingUnitsV2.FindAsync(@event.BuildingUnitPersistentLocalId);
                     item.Should().NotBeNull();
-                    item.Status.Should().Be(BuildingUnitStatus.Planned);
+                    item!.Status.Should().Be(BuildingUnitStatus.Planned);
                 });
         }
 
@@ -601,7 +601,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wms
                 {
                     var item = await ct.BuildingUnitsV2.FindAsync(@event.BuildingUnitPersistentLocalId);
                     item.Should().NotBeNull();
-                    item.BuildingPersistentLocalId.Should().Be(@event.BuildingPersistentLocalId);
+                    item!.BuildingPersistentLocalId.Should().Be(@event.BuildingPersistentLocalId);
                     item.Position.Should().BeEquivalentTo(@event.ExtendedWkbGeometry.ToByteArray());
                     item.PositionMethod.Should().Be(
                         Projections.Wfs.BuildingUnitV2.BuildingUnitV2Projections.MapGeometryMethod(

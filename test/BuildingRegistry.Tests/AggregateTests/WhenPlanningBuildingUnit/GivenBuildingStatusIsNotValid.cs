@@ -1,17 +1,14 @@
 namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuildingUnit
 {
-    using System.Collections.Generic;
     using AutoFixture;
     using Be.Vlaanderen.Basisregisters.AggregateSource.Testing;
-    using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Building;
     using Building.Commands;
-    using Building.Events;
     using Building.Exceptions;
+    using Extensions;
     using Fixtures;
     using Xunit;
     using Xunit.Abstractions;
-    using BuildingUnit = Building.Commands.BuildingUnit;
 
     public class GivenBuildingStatusIsNotValid : BuildingRegistryTest
     {
@@ -27,16 +24,9 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuildingUnit
         {
             var command = Fixture.Create<PlanBuildingUnit>().WithoutPosition();
 
-            var buildingWasMigrated = new BuildingWasMigrated(
-                Fixture.Create<BuildingId>(),
-                Fixture.Create<BuildingPersistentLocalId>(),
-                Fixture.Create<BuildingPersistentLocalIdAssignmentDate>(),
-                BuildingStatus.Parse(buildingStatus),
-                Fixture.Create<BuildingGeometry>(),
-                false,
-                new List<BuildingUnit>()
-            );
-            ((ISetProvenance)buildingWasMigrated).SetProvenance(Fixture.Create<Provenance>());
+            var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
+                .WithBuildingStatus(BuildingStatus.Parse(buildingStatus))
+                .Build();
 
             Assert(new Scenario()
                 .Given(new BuildingStreamId(Fixture.Create<BuildingPersistentLocalId>()),
