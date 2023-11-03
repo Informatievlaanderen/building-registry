@@ -11,16 +11,13 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
     using Be.Vlaanderen.Basisregisters.Sqs.Lambda.Handlers;
     using Be.Vlaanderen.Basisregisters.Sqs.Lambda.Infrastructure;
     using Be.Vlaanderen.Basisregisters.Sqs.Responses;
-    using BuildingRegistry.Api.BackOffice.Abstractions.Building.Requests;
-    using BuildingRegistry.Api.BackOffice.Abstractions.Building.SqsRequests;
     using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Requests;
     using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.SqsRequests;
     using BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.BuildingUnit;
-    using BuildingRegistry.Api.BackOffice.Handlers.Lambda.Requests.Building;
     using BuildingRegistry.Api.BackOffice.Handlers.Lambda.Requests.BuildingUnit;
     using BuildingRegistry.Building;
     using BuildingRegistry.Building.Exceptions;
-    using BuildingRegistry.Tests.Fixtures;
+    using Fixtures;
     using Microsoft.Extensions.Configuration;
     using Moq;
     using TicketingService.Abstractions;
@@ -36,7 +33,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
         }
 
         [Fact]
-        public async Task TicketShouldBeUpdatedToPendingAndCompleted()
+        public async Task ThenTicketIsUpdatedToPendingAndCompleted()
         {
             var ticketing = new Mock<ITicketing>();
             var idempotentCommandHandler = new Mock<IIdempotentCommandHandler>();
@@ -59,7 +56,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
         }
 
         [Fact]
-        public async Task WhenBuildingIsRemovedException_ThenTicketingErrorIsExpected()
+        public async Task WithRemovedBuilding_ThenTicketingErrorIsExpected()
         {
             var ticketing = new Mock<ITicketing>();
 
@@ -85,7 +82,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
         }
 
         [Fact]
-        public async Task WhenBuildingUnitIsRemovedException_ThenTicketingErrorIsExpected()
+        public async Task WithRemovedBuildingUnit_ThenTicketingErrorIsExpected()
         {
             var ticketing = new Mock<ITicketing>();
 
@@ -111,7 +108,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
         }
 
         [Fact]
-        public async Task WhenBuildingUnitIsNotFoundException_ThenTicketingErrorIsExpected()
+        public async Task WithNotFoundBuildingUnit_ThenTicketingErrorIsExpected()
         {
             var ticketing = new Mock<ITicketing>();
 
@@ -137,7 +134,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
         }
 
         [Fact]
-        public async Task WhenIfMatchHeaderValueIsMismatch_ThenTicketingErrorIsExpected()
+        public async Task WithMisMatchingIfHeaderValue_ThenTicketingErrorIsExpected()
         {
             // Arrange
             var ticketing = new Mock<ITicketing>();
@@ -167,7 +164,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
         }
 
         [Fact]
-        public async Task WhenNoIfMatchHeaderValueIsPresent_ThenInnerHandleIsCalled()
+        public async Task WithoutIfMatchHeaderValue_ThenInnerHandleIsCalled()
         {
             var idempotentCommandHandler = new Mock<IIdempotentCommandHandler>();
 
@@ -187,12 +184,12 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
                     Times.Once);
         }
 
-        private RealizeBuildingUnitLambdaRequest CreateRealizeBuildingUnitLambdaRequest(string? IfMatchHeaderValue = null)
+        private RealizeBuildingUnitLambdaRequest CreateRealizeBuildingUnitLambdaRequest(string? ifMatchHeaderValue = null)
         {
             return new RealizeBuildingUnitLambdaRequest(Fixture.Create<BuildingPersistentLocalId>(),
                 new RealizeBuildingUnitSqsRequest()
                 {
-                    IfMatchHeaderValue = IfMatchHeaderValue ?? string.Empty,
+                    IfMatchHeaderValue = ifMatchHeaderValue ?? string.Empty,
                     Metadata = new Dictionary<string, object?>(),
                     ProvenanceData = Fixture.Create<ProvenanceData>(),
                     Request = new RealizeBuildingUnitRequest { BuildingUnitPersistentLocalId = Fixture.Create<BuildingUnitPersistentLocalId>() },

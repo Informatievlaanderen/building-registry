@@ -11,9 +11,9 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuildingUnit
     using Building.Commands;
     using Building.Events;
     using Building.Exceptions;
+    using Extensions;
     using Fixtures;
     using FluentAssertions;
-    using Moq;
     using Xunit;
     using Xunit.Abstractions;
 
@@ -47,7 +47,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuildingUnit
             building.BuildingUnits.Count.Should().Be(1);
             var buildingUnit = building.BuildingUnits.First();
             buildingUnit.Status.Should().Be(BuildingUnitStatus.Planned);
-            buildingUnit.BuildingUnitPosition.Geometry.ToString().Should().Be(command.Position.ToString());
+            buildingUnit.BuildingUnitPosition.Geometry.ToString().Should().Be(command.Position!.ToString());
             buildingUnit.BuildingUnitPosition.GeometryMethod.ToString().Should().Be(command.PositionGeometryMethod.ToString());
             buildingUnit.Function.Should().Be(command.Function);
             buildingUnit.HasDeviation.Should().BeFalse();
@@ -124,7 +124,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuildingUnit
         }
 
         [Fact]
-        public void WithBuildingUnitPositionOutsideOfBuildingGeometry_ThrowsBuildingUnitOutsideGeometryBuildingException()
+        public void WithBuildingUnitPositionOutsideOfBuildingGeometry_ThenThrowsBuildingUnitOutsideGeometryBuildingException()
         {
             var wrongPointCoordinateX = "666666.77777777777";
             var wrongPointCoordinateY = "777777.66666666666";
@@ -155,7 +155,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuildingUnit
         }
 
         [Fact]
-        public void WithDuplicateBuildingUnitPersistentLocalId_ThrowsBuildingUnitPersistentIdAlreadyExistsException()
+        public void WithDuplicateBuildingUnitPersistentLocalId_ThenThrowsBuildingUnitPersistentIdAlreadyExistsException()
         {
             var buildingGeometry = "" +
                                    "<gml:Polygon srsName=\"https://www.opengis.net/def/crs/EPSG/0/31370\" xmlns:gml=\"http://www.opengis.net/gml/3.2\">" +
@@ -180,14 +180,11 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuildingUnit
                 buildingGeometry.ToExtendedWkbGeometry());
             ((ISetProvenance)buildingWasPlanned).SetProvenance(Fixture.Create<Provenance>());
 
-            var buildingUnitWasPlanned = new BuildingUnitWasPlannedV2(
-                Fixture.Create<BuildingPersistentLocalId>(),
-                buildingUnitPersistentLocalId,
-                BuildingUnitPositionGeometryMethod.AppointedByAdministrator,
-                pointCoordinateInsideBuildingGeometry.ToExtendedWkbGeometry(),
-                Fixture.Create<BuildingUnitFunction>(),
-                hasDeviation: false);
-            ((ISetProvenance)buildingUnitWasPlanned).SetProvenance(Fixture.Create<Provenance>());
+            var buildingUnitWasPlanned = new BuildingUnitWasPlannedV2Builder(Fixture)
+                .WithBuildingUnitPersistentLocalId(buildingUnitPersistentLocalId)
+                .WithPositionGeometryMethod(BuildingUnitPositionGeometryMethod.AppointedByAdministrator)
+                .WithExtendedWkbGeometry(pointCoordinateInsideBuildingGeometry.ToExtendedWkbGeometry())
+                .Build();
 
             var command = Fixture.Create<PlanBuildingUnit>()
                 .WithPersistentLocalId(buildingUnitPersistentLocalId)

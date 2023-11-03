@@ -3,14 +3,16 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenDetachingAddressFromBuilding
     using System.Collections.Generic;
     using Autofac;
     using AutoFixture;
+    using BackOffice;
     using Be.Vlaanderen.Basisregisters.AggregateSource.Testing;
-    using BuildingRegistry.Building;
-    using BuildingRegistry.Building.Commands;
-    using BuildingRegistry.Building.Exceptions;
-    using BuildingRegistry.Tests.BackOffice;
-    using BuildingRegistry.Tests.Extensions;
+    using Building;
+    using Building.Commands;
+    using Building.Exceptions;
+    using Consumer.Address;
+    using Extensions;
     using Xunit;
     using Xunit.Abstractions;
+    using BuildingUnitStatus = BuildingRegistry.Legacy.BuildingUnitStatus;
 
     public class GivenAddressIsRemovedInConsumerAddressItems : BuildingRegistryTest
     {
@@ -25,7 +27,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenDetachingAddressFromBuilding
             var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
                 .WithBuildingPersistentLocalId(command.BuildingPersistentLocalId)
                 .WithBuildingUnit(
-                    BuildingRegistry.Legacy.BuildingUnitStatus.Realized,
+                    BuildingUnitStatus.Realized,
                     command.BuildingUnitPersistentLocalId,
                     null,
                     null,
@@ -35,7 +37,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenDetachingAddressFromBuilding
                 .Build();
 
             var consumerAddress = Container.Resolve<FakeConsumerAddressContext>();
-            consumerAddress.AddAddress(command.AddressPersistentLocalId, Consumer.Address.AddressStatus.Current, isRemoved: true);
+            consumerAddress.AddAddress(command.AddressPersistentLocalId, AddressStatus.Current, isRemoved: true);
 
             Assert(new Scenario()
                 .Given(

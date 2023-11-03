@@ -16,7 +16,6 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wfs
     using FluentAssertions;
     using NetTopologySuite.Geometries;
     using NetTopologySuite.IO;
-    using Projections.Legacy.BuildingUnitDetailV2;
     using Projections.Wfs.BuildingUnitV2;
     using Tests.Legacy.Autofixture;
     using Xunit;
@@ -25,7 +24,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wfs
     public class BuildingUnitV2Tests : BuildingWfsProjectionTest<BuildingUnitV2Projections>
     {
         private readonly WKBReader _wkbReader;
-        private readonly Fixture _fixture = new Fixture();
+        private readonly Fixture _fixture = new();
 
         public BuildingUnitV2Tests()
         {
@@ -40,12 +39,12 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wfs
         }
 
         [Theory]
-        [InlineData("Planned", null)]
-        [InlineData("UnderConstruction", null)]
-        [InlineData("Realized", null)]
-        [InlineData("Retired", "Retired")]
-        [InlineData("NotRealized", "NotRealized")]
-        public async Task WhenBuildingWasMigrated(string buildingStatus, string? expectedStatus)
+        [InlineData("Planned")]
+        [InlineData("UnderConstruction")]
+        [InlineData("Realized")]
+        [InlineData("Retired")]
+        [InlineData("NotRealized")]
+        public async Task WhenBuildingWasMigrated(string buildingStatus)
         {
             _fixture.Register(() => BuildingStatus.Parse(buildingStatus));
 
@@ -547,7 +546,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wfs
                 {
                     var item = await ct.BuildingUnitsV2.FindAsync(@event.BuildingUnitPersistentLocalId);
                     item.Should().NotBeNull();
-                    item.BuildingPersistentLocalId.Should().Be(@event.BuildingPersistentLocalId);
+                    item!.BuildingPersistentLocalId.Should().Be(@event.BuildingPersistentLocalId);
                     item.Position.Should().BeEquivalentTo((Point)_wkbReader.Read(@event.ExtendedWkbGeometry.ToByteArray()));
                     item.PositionMethod.Should().Be(BuildingUnitV2Projections.MapGeometryMethod(BuildingUnitPositionGeometryMethod.Parse(@event.GeometryMethod)));
                     item.Function.Should()

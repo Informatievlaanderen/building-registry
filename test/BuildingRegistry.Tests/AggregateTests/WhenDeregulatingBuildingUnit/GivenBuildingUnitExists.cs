@@ -62,7 +62,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenDeregulatingBuildingUnit
         }
 
         [Fact]
-        public void WithCommonBuilding_ThrowsBuildingUnitHasInvalidFunctionException()
+        public void WithCommonBuilding_ThenThrowsBuildingUnitHasInvalidFunctionException()
         {
             var command = Fixture.Create<DeregulateBuildingUnit>();
 
@@ -83,7 +83,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenDeregulatingBuildingUnit
         }
 
         [Fact]
-        public void BuildingUnitIsRemoved_ThrowsBuildingUnitIsRemovedException()
+        public void BuildingUnitIsRemoved_ThenThrowsBuildingUnitIsRemovedException()
         {
             var command = Fixture.Create<DeregulateBuildingUnit>();
 
@@ -107,7 +107,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenDeregulatingBuildingUnit
         [Theory]
         [InlineData("Retired")]
         [InlineData("NotRealized")]
-        public void WithInvalidBuildingUnitStatus_ThrowsBuildingUnitHasInvalidStatusException(string status)
+        public void WithInvalidBuildingUnitStatus_ThenThrowsBuildingUnitHasInvalidStatusException(string status)
         {
             var command = Fixture.Create<DeregulateBuildingUnit>();
 
@@ -130,7 +130,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenDeregulatingBuildingUnit
         [Theory]
         [InlineData("Retired")]
         [InlineData("NotRealized")]
-        public void BuildingStatusNotValid_ThrowsBuildingHasInvalidStatusException(string status)
+        public void WithInvalidBuildingStatus_ThenThrowsBuildingHasInvalidStatusException(string status)
         {
             var command = Fixture.Create<DeregulateBuildingUnit>();
 

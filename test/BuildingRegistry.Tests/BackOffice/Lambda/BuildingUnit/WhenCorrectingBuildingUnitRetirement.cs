@@ -75,7 +75,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
         }
 
         [Fact]
-        public async Task WhenIdempotencyException_ThenTicketingCompleteIsExpected()
+        public async Task WithIdempotentRequest_ThenTicketingCompleteIsExpected()
         {
             // Arrange
             var ticketing = new Mock<ITicketing>();
@@ -112,12 +112,10 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
         }
 
         [Fact]
-        public async Task WhenBuildingHasInvalidStatus_ThenTicketingErrorIsExpected()
+        public async Task WithInvalidBuildingStatus_ThenTicketingErrorIsExpected()
         {
             // Arrange
             var ticketing = new Mock<ITicketing>();
-            var buildingPersistentLocalId = Fixture.Create<BuildingPersistentLocalId>();
-            var buildingUnitPersistentLocalId = Fixture.Create<BuildingUnitPersistentLocalId>();
 
             var handler = new CorrectBuildingUnitRetirementLambdaHandler(
                 Container.Resolve<IConfiguration>(),
@@ -141,12 +139,10 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
         }
 
         [Fact]
-        public async Task WhenBuildingUnitHasInvalidStatus_ThenTicketingErrorIsExpected()
+        public async Task WithInvalidBuildingUnitStatus_ThenTicketingErrorIsExpected()
         {
             // Arrange
             var ticketing = new Mock<ITicketing>();
-            var buildingPersistentLocalId = Fixture.Create<BuildingPersistentLocalId>();
-            var buildingUnitPersistentLocalId = Fixture.Create<BuildingUnitPersistentLocalId>();
 
             var handler = new CorrectBuildingUnitRetirementLambdaHandler(
                 Container.Resolve<IConfiguration>(),
@@ -170,7 +166,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
         }
 
         [Fact]
-        public async Task WhenBuildingUnitHasInvalidFunction_ThenTicketingErrorIsExpected()
+        public async Task WithInvalidBuildingUnitFunction_ThenTicketingErrorIsExpected()
         {
             // Arrange
             var ticketing = new Mock<ITicketing>();

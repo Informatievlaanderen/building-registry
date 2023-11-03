@@ -21,6 +21,21 @@ namespace BuildingRegistry.Tests.Extensions
             return updatedEvent;
         }
 
+        public static BuildingUnitWasPlannedV2 WithBuildingUnitPersistentLocalId(this BuildingUnitWasPlannedV2 @event,
+            int buildingUnitPersistentLocalId)
+        {
+            var updatedEvent = new BuildingUnitWasPlannedV2(
+                new BuildingPersistentLocalId(@event.BuildingPersistentLocalId),
+                new BuildingUnitPersistentLocalId(buildingUnitPersistentLocalId),
+                BuildingUnitPositionGeometryMethod.Parse(@event.GeometryMethod),
+                new ExtendedWkbGeometry(@event.ExtendedWkbGeometry),
+                BuildingUnitFunction.Parse(@event.Function),
+                @event.HasDeviation);
+            ((ISetProvenance)updatedEvent).SetProvenance(@event.Provenance.ToProvenance());
+
+            return updatedEvent;
+        }
+
         public static BuildingUnitWasPlannedV2 WithFunction(this BuildingUnitWasPlannedV2 @event,
             BuildingUnitFunction function)
         {
@@ -90,6 +105,20 @@ namespace BuildingRegistry.Tests.Extensions
             var updatedEvent = new BuildingUnitWasRealizedV2(
                 new BuildingPersistentLocalId(@event.BuildingPersistentLocalId),
                 buildingUnitPersistentLocalId);
+            ((ISetProvenance)updatedEvent).SetProvenance(@event.Provenance.ToProvenance());
+
+            return updatedEvent;
+        }
+    }
+
+    public static class BuildingUnitWasNotRealizedV2Extensions
+    {
+        public static BuildingUnitWasNotRealizedV2 WithBuildingUnitPersistentLocalId(this BuildingUnitWasNotRealizedV2 @event,
+            int buildingUnitPersistentLocalId)
+        {
+            var updatedEvent = new BuildingUnitWasNotRealizedV2(
+                new BuildingPersistentLocalId(@event.BuildingPersistentLocalId),
+                new BuildingUnitPersistentLocalId(buildingUnitPersistentLocalId));
             ((ISetProvenance)updatedEvent).SetProvenance(@event.Provenance.ToProvenance());
 
             return updatedEvent;

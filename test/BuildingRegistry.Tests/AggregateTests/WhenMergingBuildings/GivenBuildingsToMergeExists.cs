@@ -5,17 +5,13 @@
     using System.Linq;
     using AutoFixture;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
-    using Be.Vlaanderen.Basisregisters.AggregateSource.Snapshotting;
     using Be.Vlaanderen.Basisregisters.AggregateSource.Testing;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Building;
     using Building.Commands;
-    using Building.Datastructures;
     using Building.Events;
     using Building.Exceptions;
     using Fixtures;
-    using FluentAssertions;
-    using Moq;
     using Xunit;
     using Xunit.Abstractions;
 
@@ -35,7 +31,7 @@
 
             var givenPlannedFacts = new List<Fact>
             {
-                new Fact(new BuildingStreamId(new BuildingPersistentLocalId(buildingWasPlanned.BuildingPersistentLocalId)),
+                new(new BuildingStreamId(new BuildingPersistentLocalId(buildingWasPlanned.BuildingPersistentLocalId)),
                     buildingWasPlanned)
             };
 
@@ -43,7 +39,7 @@
                 Fixture.Create<BuildingPersistentLocalId>(),
                 Fixture.Create<ExtendedWkbGeometry>(),
                 new List<BuildingPersistentLocalId>
-                    { new BuildingPersistentLocalId(buildingWasPlanned.BuildingPersistentLocalId) },
+                    { new(buildingWasPlanned.BuildingPersistentLocalId) },
                 Fixture.Create<Provenance>()
             );
 

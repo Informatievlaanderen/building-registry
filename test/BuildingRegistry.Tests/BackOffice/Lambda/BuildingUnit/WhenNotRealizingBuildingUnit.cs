@@ -87,7 +87,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
         }
 
         [Fact]
-        public async Task WhenIdempotencyException_ThenTicketingCompleteIsExpected()
+        public async Task WithIdempotentRequest_ThenTicketingCompleteIsExpected()
         {
             // Arrange
             var ticketing = new Mock<ITicketing>();
@@ -124,7 +124,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
         }
 
         [Fact]
-        public async Task WhenBuildingUnitHasInvalidStatus_ThenTicketingErrorIsExpected()
+        public async Task WithInvalidBuildingUnitStatus_ThenTicketingErrorIsExpected()
         {
             // Arrange
             var ticketing = new Mock<ITicketing>();
@@ -156,7 +156,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
         }
 
         [Fact]
-        public async Task WhenBuildingUnitHasInvalidFunction_ThenTicketingErrorIsExpected()
+        public async Task WithInvalidBuildingUnitFunction_ThenTicketingErrorIsExpected()
         {
             // Arrange
             var ticketing = new Mock<ITicketing>();

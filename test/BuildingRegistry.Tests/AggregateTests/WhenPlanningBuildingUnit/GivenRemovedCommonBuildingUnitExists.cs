@@ -1,6 +1,5 @@
 namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuildingUnit
 {
-    using System;
     using System.Collections.Generic;
     using System.Linq;
     using AutoFixture;
@@ -15,10 +14,8 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuildingUnit
     using FluentAssertions;
     using Xunit;
     using Xunit.Abstractions;
-    using BuildingGeometry = Building.BuildingGeometry;
-    using BuildingGeometryMethod = Building.BuildingGeometryMethod;
-    using BuildingStatus = Building.BuildingStatus;
-    using ExtendedWkbGeometry = Building.ExtendedWkbGeometry;
+    using BuildingUnitFunction = BuildingRegistry.Legacy.BuildingUnitFunction;
+    using BuildingUnitStatus = BuildingRegistry.Legacy.BuildingUnitStatus;
 
     public class GivenRemovedCommonBuildingUnitExists : BuildingRegistryTest
     {
@@ -44,13 +41,13 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuildingUnit
                 .WithBuildingStatus(BuildingStatus.Planned)
                 .WithBuildingGeometry(buildingGeometry)
                 .WithBuildingUnit(
-                    BuildingRegistry.Legacy.BuildingUnitStatus.Planned,
+                    BuildingUnitStatus.Planned,
                     new BuildingUnitPersistentLocalId(123),
                     isRemoved: true)
                 .WithBuildingUnit(
-                    BuildingRegistry.Legacy.BuildingUnitStatus.NotRealized,
+                    BuildingUnitStatus.NotRealized,
                     new BuildingUnitPersistentLocalId(456),
-                    BuildingRegistry.Legacy.BuildingUnitFunction.Common,
+                    BuildingUnitFunction.Common,
                     isRemoved: true)
                 .Build();
 
@@ -97,12 +94,12 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuildingUnit
                 .WithBuildingStatus(buildingStatus)
                 .WithBuildingGeometry(buildingGeometry)
                 .WithBuildingUnit(
-                    BuildingRegistry.Legacy.BuildingUnitStatus.Parse(buildingUnitStatus)!.Value,
+                    BuildingUnitStatus.Parse(buildingUnitStatus)!.Value,
                     new BuildingUnitPersistentLocalId(1))
                 .WithBuildingUnit(
-                    BuildingRegistry.Legacy.BuildingUnitStatus.Planned, // Doesn't matter what the original status was
+                    BuildingUnitStatus.Planned, // Doesn't matter what the original status was
                     commonBuildingUnitPersistentLocalId,
-                    BuildingRegistry.Legacy.BuildingUnitFunction.Common,
+                    BuildingUnitFunction.Common,
                     attachedAddresses: addressPersistentLocalIds,
                     isRemoved: true)
                 .Build();
@@ -125,8 +122,8 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuildingUnit
                         new BuildingUnitRemovalWasCorrected(
                             command.BuildingPersistentLocalId,
                             commonBuildingUnitPersistentLocalId,
-                            BuildingUnitStatus.Parse(expectedCommonBuildingUnitStatus),
-                            BuildingUnitFunction.Common,
+                            BuildingRegistry.Building.BuildingUnitStatus.Parse(expectedCommonBuildingUnitStatus),
+                            BuildingRegistry.Building.BuildingUnitFunction.Common,
                             BuildingUnitPositionGeometryMethod.DerivedFromObject,
                             buildingGeometry.Center,
                             false))));
@@ -148,28 +145,26 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuildingUnit
                 .WithBuildingStatus(BuildingStatus.Planned)
                 .WithBuildingGeometry(buildingGeometry)
                 .WithBuildingUnit(
-                    BuildingRegistry.Legacy.BuildingUnitStatus.Parse(BuildingUnitStatus.Planned)!.Value,
+                    BuildingUnitStatus.Parse(BuildingRegistry.Building.BuildingUnitStatus.Planned)!.Value,
                     new BuildingUnitPersistentLocalId(1))
                 .WithBuildingUnit(
-                    BuildingRegistry.Legacy.BuildingUnitStatus.Planned, // Doesn't matter what the original status was
+                    BuildingUnitStatus.Planned, // Doesn't matter what the original status was
                     commonBuildingUnitPersistentLocalId,
-                    BuildingRegistry.Legacy.BuildingUnitFunction.Common,
+                    BuildingUnitFunction.Common,
                     attachedAddresses: addressPersistentLocalIds,
                     isRemoved: true)
                 .Build();
 
-            var buildingUnitWasPlanned = new BuildingUnitWasPlannedV2(
-                buildingPersistentLocalId,
-                new BuildingUnitPersistentLocalId(2),
-                Fixture.Create<BuildingUnitPositionGeometryMethod>(),
-                Fixture.Create<ExtendedWkbGeometry>(),
-                BuildingUnitFunction.Unknown,
-                false);
+            var buildingUnitWasPlanned = new BuildingUnitWasPlannedV2Builder(Fixture)
+                .WithBuildingPersistentLocalId(buildingPersistentLocalId)
+                .WithBuildingUnitPersistentLocalId(2)
+                .WithFunction(BuildingRegistry.Building.BuildingUnitFunction.Unknown)
+                .Build();
 
             var buildingUnitRemovalWasCorrected = new BuildingUnitRemovalWasCorrected(buildingPersistentLocalId,
                 commonBuildingUnitPersistentLocalId,
-                BuildingUnitStatus.Planned,
-                BuildingUnitFunction.Common,
+                BuildingRegistry.Building.BuildingUnitStatus.Planned,
+                BuildingRegistry.Building.BuildingUnitFunction.Common,
                 Fixture.Create<BuildingUnitPositionGeometryMethod>(),
                 Fixture.Create<ExtendedWkbGeometry>(),
                 false);

@@ -40,7 +40,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
         }
 
         [Fact]
-        public async Task ThenAddressIsAttacchedToBuildingUnit()
+        public async Task ThenAddressIsAttachedToBuildingUnit()
         {
             // Arrange
             var buildingPersistentLocalId = Fixture.Create<BuildingPersistentLocalId>();
@@ -84,7 +84,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
         }
 
         [Fact]
-        public async Task WhenIdempotencyException_ThenTicketingCompleteIsExpected()
+        public async Task WithIdempotentRequest_ThenTicketingCompleteIsExpected()
         {
             // Arrange
             var ticketing = new Mock<ITicketing>();
@@ -131,7 +131,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
         }
 
         [Fact]
-        public async Task WhenBuildingUnitAddressRelationAlreadyExists_ThenTicketingCompleteIsExpected()
+        public async Task WithAlreadyExistingBuildingUnitAddressRelation_ThenTicketingCompleteIsExpected()
         {
             // Arrange
             var buildingPersistentLocalId = Fixture.Create<BuildingPersistentLocalId>();
@@ -180,7 +180,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
         }
 
         [Fact]
-        public async Task WhenBuildingUnitHasInvalidStatus_ThenTicketingErrorIsExpected()
+        public async Task WithInvalidBuildingUnitStatus_ThenTicketingErrorIsExpected()
         {
             // Arrange
             var ticketing = new Mock<ITicketing>();
@@ -222,7 +222,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
         }
 
         [Fact]
-        public async Task WhenAddressHasInvalidStatus_ThenTicketingErrorIsExpected()
+        public async Task WithInvalidAddressStatus_ThenTicketingErrorIsExpected()
         {
             // Arrange
             var ticketing = new Mock<ITicketing>();
@@ -264,7 +264,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
         }
 
         [Fact]
-        public async Task WhenAddressNotFound_ThenTicketingErrorIsExpected()
+        public async Task WithAddressNotFound_ThenTicketingErrorIsExpected()
         {
             // Arrange
             var ticketing = new Mock<ITicketing>();
@@ -307,7 +307,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
 
 
         [Fact]
-        public async Task WhenAddressIsRemoved_ThenTicketingErrorIsExpected()
+        public async Task WithRemovedAddress_ThenTicketingErrorIsExpected()
         {
             // Arrange
             var ticketing = new Mock<ITicketing>();

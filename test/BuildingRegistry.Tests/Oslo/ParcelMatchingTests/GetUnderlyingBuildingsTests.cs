@@ -41,7 +41,6 @@
                     false,
                     new Instant()));
             _legacyContext.SaveChanges();
-            var buildings = _legacyContext.BuildingDetailsV2.Where(x => true);
 
             var parcelMatching = new ParcelMatching(_consumerParcelContext, _legacyContext);
 
@@ -66,7 +65,6 @@
                     false,
                     new Instant()));
             _legacyContext.SaveChanges();
-            var buildings = _legacyContext.BuildingDetailsV2.Where(x => true);
 
             var parcelMatching = new ParcelMatching(_consumerParcelContext, _legacyContext);
 
@@ -100,7 +98,6 @@
                     false,
                     new Instant()));
             _legacyContext.SaveChanges();
-            var buildings = _legacyContext.BuildingDetailsV2.Where(x => true);
 
             var parcelMatching = new ParcelMatching(_consumerParcelContext, _legacyContext);
 
@@ -136,11 +133,10 @@
                     false,
                     new Instant()));
             _legacyContext.SaveChanges();
-            var buildings = _legacyContext.BuildingDetailsV2.Where(x => true);
 
             var parcelMatching = new ParcelMatching(_consumerParcelContext, _legacyContext);
 
-            var result = parcelMatching.GetUnderlyingBuildings(parcelGeometry);
+            var result = parcelMatching.GetUnderlyingBuildings(parcelGeometry).ToList();
 
             result.Count().Should().Be(1);
             result.First().Should().Be(buildingAbove40PercentPersistentLocalId);

@@ -109,7 +109,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.BuildingUnit.WhenCorrectingBuild
         }
 
         [Fact]
-        public void WithAggregateNotFoundExcption_ThenThrowsApiException()
+        public void WithAggregateNotFound_ThenThrowsApiException()
         {
             var buildingPersistentLocalId = Fixture.Create<BuildingUnitPersistentLocalId>();
 

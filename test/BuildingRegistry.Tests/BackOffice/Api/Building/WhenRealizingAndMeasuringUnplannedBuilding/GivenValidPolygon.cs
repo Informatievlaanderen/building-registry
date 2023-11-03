@@ -10,7 +10,6 @@ namespace BuildingRegistry.Tests.BackOffice.Api.Building.WhenRealizingAndMeasuri
     using BuildingRegistry.Api.BackOffice.Abstractions.Building.SqsRequests;
     using BuildingRegistry.Api.BackOffice.Building;
     using Fixtures;
-    using Microsoft.AspNetCore.Mvc;
     using Moq;
     using NodaTime;
     using Xunit;
@@ -39,7 +38,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.Building.WhenRealizingAndMeasuri
 
             var request = Fixture.Create<RealizeAndMeasureUnplannedBuildingRequest>();
 
-            var result = (AcceptedResult)await _controller.RealizeAndMeasureUnplannedBuilding(
+            await _controller.RealizeAndMeasureUnplannedBuilding(
                 MockValidRequestValidator<RealizeAndMeasureUnplannedBuildingRequest>(),
                 new RealizeAndMeasureUnplannedBuildingSqsRequestFactory(new Mock<IPersistentLocalIdGenerator>().Object),
                 request);

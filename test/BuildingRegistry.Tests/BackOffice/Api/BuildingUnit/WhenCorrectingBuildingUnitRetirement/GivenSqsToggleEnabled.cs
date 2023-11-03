@@ -107,7 +107,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.BuildingUnit.WhenCorrectingBuild
         }
 
         [Fact]
-        public void AggregateNotFoundException_ThrowApiException()
+        public void WithAggregateNotFound_ThenThrowsApiException()
         {
             var buildingPersistentLocalId = new BuildingUnitPersistentLocalId(456);
 

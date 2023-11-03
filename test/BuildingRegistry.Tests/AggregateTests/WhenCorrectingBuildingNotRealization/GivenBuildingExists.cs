@@ -5,20 +5,15 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingNotRealiza
     using Be.Vlaanderen.Basisregisters.AggregateSource;
     using Be.Vlaanderen.Basisregisters.AggregateSource.Snapshotting;
     using Be.Vlaanderen.Basisregisters.AggregateSource.Testing;
-    using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Building;
     using Building.Commands;
     using Building.Events;
     using Building.Exceptions;
+    using Extensions;
     using Fixtures;
     using FluentAssertions;
-    using Moq;
     using Xunit;
     using Xunit.Abstractions;
-    using BuildingGeometry = Building.BuildingGeometry;
-    using BuildingId = Building.BuildingId;
-    using BuildingStatus = Building.BuildingStatus;
-    using BuildingUnit = Building.Commands.BuildingUnit;
 
     public class GivenBuildingExists : BuildingRegistryTest
     {
@@ -56,20 +51,16 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingNotRealiza
         }
 
         [Fact]
-        public void WhenBuildingIsRemoved_ThrowsBuildingIsRemovedException()
+        public void WhenBuildingIsRemoved_ThenThrowsBuildingIsRemovedException()
         {
             var command = Fixture.Create<CorrectBuildingNotRealization>();
 
-            var buildingWasMigrated = new BuildingWasMigrated(
-                Fixture.Create<BuildingId>(),
-                command.BuildingPersistentLocalId,
-                Fixture.Create<BuildingPersistentLocalIdAssignmentDate>(),
-                BuildingStatus.NotRealized,
-                Fixture.Create<BuildingGeometry>(),
-                isRemoved: true,
-                new List<BuildingUnit>()
-            );
-            ((ISetProvenance)buildingWasMigrated).SetProvenance(Fixture.Create<Provenance>());
+            var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
+                .WithBuildingPersistentLocalId(command.BuildingPersistentLocalId)
+                .WithBuildingStatus(BuildingStatus.NotRealized)
+                .WithBuildingGeometry(Fixture.Create<BuildingGeometry>())
+                .WithIsRemoved()
+                .Build();
 
             Assert(new Scenario()
                 .Given(
@@ -83,20 +74,15 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingNotRealiza
         [InlineData("UnderConstruction")]
         [InlineData("Realized")]
         [InlineData("Retired")]
-        public void WithInvalidStatus_ThrowsBuildingHasInvalidStatusException(string status)
+        public void WithInvalidStatus_ThenThrowsBuildingHasInvalidStatusException(string status)
         {
             var command = Fixture.Create<CorrectBuildingNotRealization>();
 
-            var buildingWasMigrated = new BuildingWasMigrated(
-                Fixture.Create<BuildingId>(),
-                command.BuildingPersistentLocalId,
-                Fixture.Create<BuildingPersistentLocalIdAssignmentDate>(),
-                BuildingStatus.Parse(status),
-                Fixture.Create<BuildingGeometry>(),
-                isRemoved: false,
-                new List<BuildingUnit>()
-            );
-            ((ISetProvenance)buildingWasMigrated).SetProvenance(Fixture.Create<Provenance>());
+            var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
+                .WithBuildingPersistentLocalId(command.BuildingPersistentLocalId)
+                .WithBuildingStatus(BuildingStatus.Parse(status))
+                .WithBuildingGeometry(Fixture.Create<BuildingGeometry>())
+                .Build();
 
             Assert(new Scenario()
                 .Given(
@@ -107,22 +93,17 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingNotRealiza
         }
 
         [Fact]
-        public void WhenBuildingGeometryMethodIsMeasuredByGrb_ThrowsBuildingHasInvalidBuildingGeometryMethodException()
+        public void WhenBuildingGeometryMethodIsMeasuredByGrb_ThenThrowsBuildingHasInvalidBuildingGeometryMethodException()
         {
             var command = Fixture.Create<CorrectBuildingNotRealization>();
 
-            var buildingWasMigrated = new BuildingWasMigrated(
-                Fixture.Create<BuildingId>(),
-                Fixture.Create<BuildingPersistentLocalId>(),
-                Fixture.Create<BuildingPersistentLocalIdAssignmentDate>(),
-                BuildingStatus.NotRealized,
-                new BuildingGeometry(
+            var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
+                .WithBuildingPersistentLocalId(Fixture.Create<BuildingPersistentLocalId>())
+                .WithBuildingStatus(BuildingStatus.NotRealized)
+                .WithBuildingGeometry(new BuildingGeometry(
                     Fixture.Create<ExtendedWkbGeometry>(),
-                    BuildingGeometryMethod.MeasuredByGrb),
-                isRemoved: false,
-                new List<BuildingUnit>()
-            );
-            ((ISetProvenance)buildingWasMigrated).SetProvenance(Fixture.Create<Provenance>());
+                    BuildingGeometryMethod.MeasuredByGrb))
+                .Build();
 
             Assert(new Scenario()
                 .Given(
@@ -135,17 +116,13 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingNotRealiza
         [Fact]
         public void StateCheck()
         {
-            var buildingWasMigrated = new BuildingWasMigrated(
-                Fixture.Create<BuildingId>(),
-                Fixture.Create<BuildingPersistentLocalId>(),
-                Fixture.Create<BuildingPersistentLocalIdAssignmentDate>(),
-                BuildingStatus.NotRealized,
-                new BuildingGeometry(
+            var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
+                .WithBuildingPersistentLocalId(Fixture.Create<BuildingPersistentLocalId>())
+                .WithBuildingStatus(BuildingStatus.NotRealized)
+                .WithBuildingGeometry(new BuildingGeometry(
                     Fixture.Create<ExtendedWkbGeometry>(),
-                    BuildingGeometryMethod.Outlined),
-                isRemoved: false,
-                new List<BuildingUnit>());
-            ((ISetProvenance)buildingWasMigrated).SetProvenance(Fixture.Create<Provenance>());
+                    BuildingGeometryMethod.Outlined))
+                .Build();
 
             var sut = new BuildingFactory(NoSnapshotStrategy.Instance).Create();
             sut.Initialize(new List<object> { buildingWasMigrated });

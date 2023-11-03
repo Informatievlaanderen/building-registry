@@ -12,17 +12,23 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitRetire
     using Building.Commands;
     using Building.Events;
     using Building.Exceptions;
+    using BuildingRegistry.Legacy;
     using Extensions;
     using Fixtures;
     using FluentAssertions;
-    using Moq;
     using Xunit;
     using Xunit.Abstractions;
     using BuildingGeometry = Building.BuildingGeometry;
+    using BuildingGeometryMethod = Building.BuildingGeometryMethod;
     using BuildingId = Building.BuildingId;
     using BuildingStatus = Building.BuildingStatus;
     using BuildingUnit = Building.Commands.BuildingUnit;
-    using BuildingUnitStatus = Building.BuildingUnitStatus;
+    using BuildingUnitFunction = BuildingRegistry.Legacy.BuildingUnitFunction;
+    using BuildingUnitId = BuildingRegistry.Legacy.BuildingUnitId;
+    using BuildingUnitPosition = BuildingRegistry.Legacy.BuildingUnitPosition;
+    using BuildingUnitPositionGeometryMethod = BuildingRegistry.Legacy.BuildingUnitPositionGeometryMethod;
+    using BuildingUnitStatus = BuildingRegistry.Legacy.BuildingUnitStatus;
+    using ExtendedWkbGeometry = Building.ExtendedWkbGeometry;
 
     public class GivenBuildingExists : BuildingRegistryTest
     {
@@ -52,9 +58,9 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitRetire
                 .WithBuildingStatus(BuildingStatus.Realized)
                 .WithBuildingGeometry(buildingGeometry)
                 .WithBuildingUnit(
-                    BuildingRegistry.Legacy.BuildingUnitStatus.Retired,
+                    BuildingUnitStatus.Retired,
                     command.BuildingUnitPersistentLocalId,
-                    positionGeometryMethod: BuildingRegistry.Legacy.BuildingUnitPositionGeometryMethod.AppointedByAdministrator,
+                    positionGeometryMethod: BuildingUnitPositionGeometryMethod.AppointedByAdministrator,
                     extendedWkbGeometry: validPointInPolygon)
                 .Build();
 
@@ -88,7 +94,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitRetire
         [Theory]
         [InlineData("Planned")]
         [InlineData("NotRealized")]
-        public void WithInvalidBuildingUnitStatus_ThrowsBuildingUnitHasInvalidStatusException(string status)
+        public void WithInvalidBuildingUnitStatus_ThenThrowsBuildingUnitHasInvalidStatusException(string status)
         {
             var command = Fixture.Create<CorrectBuildingUnitRetirement>();
 
@@ -102,12 +108,12 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitRetire
                 new List<BuildingUnit>
                 {
                     new BuildingUnit(
-                        Fixture.Create<BuildingRegistry.Legacy.BuildingUnitId>(),
-                        Fixture.Create<BuildingRegistry.Legacy.PersistentLocalId>(),
-                        BuildingRegistry.Legacy.BuildingUnitFunction.Unknown,
-                        BuildingRegistry.Legacy.BuildingUnitStatus.Parse(status) ?? throw new ArgumentException(),
+                        Fixture.Create<BuildingUnitId>(),
+                        Fixture.Create<PersistentLocalId>(),
+                        BuildingUnitFunction.Unknown,
+                        BuildingUnitStatus.Parse(status) ?? throw new ArgumentException(),
                         new List<AddressPersistentLocalId>(),
-                        Fixture.Create<BuildingRegistry.Legacy.BuildingUnitPosition>(),
+                        Fixture.Create<BuildingUnitPosition>(),
                         Fixture.Create<BuildingRegistry.Legacy.BuildingGeometry>(),
                         isRemoved: false)
                 }
@@ -123,31 +129,18 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitRetire
         }
 
         [Fact]
-        public void WithCommonBuilding_ThrowsBuildingUnitHasInvalidFunctionException()
+        public void WithCommonBuilding_ThenThrowsBuildingUnitHasInvalidFunctionException()
         {
             var command = Fixture.Create<CorrectBuildingUnitRetirement>();
 
-            var buildingWasMigrated = new BuildingWasMigrated(
-                Fixture.Create<BuildingId>(),
-                command.BuildingPersistentLocalId,
-                Fixture.Create<BuildingPersistentLocalIdAssignmentDate>(),
-                BuildingStatus.Realized,
-                Fixture.Create<BuildingGeometry>(),
-                isRemoved: false,
-                new List<BuildingUnit>
-                {
-                    new BuildingUnit(
-                        Fixture.Create<BuildingRegistry.Legacy.BuildingUnitId>(),
-                        Fixture.Create<BuildingRegistry.Legacy.PersistentLocalId>(),
-                        BuildingRegistry.Legacy.BuildingUnitFunction.Common,
-                        BuildingRegistry.Legacy.BuildingUnitStatus.Realized,
-                        new List<AddressPersistentLocalId>(),
-                        Fixture.Create<BuildingRegistry.Legacy.BuildingUnitPosition>(),
-                        Fixture.Create<BuildingRegistry.Legacy.BuildingGeometry>(),
-                        isRemoved: false)
-                }
-            );
-            ((ISetProvenance)buildingWasMigrated).SetProvenance(Fixture.Create<Provenance>());
+            var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
+                    .WithBuildingPersistentLocalId(command.BuildingPersistentLocalId)
+                    .WithBuildingStatus(BuildingStatus.Realized)
+                    .WithBuildingUnit(
+                        BuildingUnitStatus.Realized,
+                        command.BuildingUnitPersistentLocalId,
+                        BuildingUnitFunction.Common)
+                    .Build();
 
             Assert(new Scenario()
                 .Given(
@@ -158,20 +151,14 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitRetire
         }
 
         [Fact]
-        public void NonExistentBuildingUnit_ThrowsBuildingUnitNotFoundException()
+        public void NonExistentBuildingUnit_ThenThrowsBuildingUnitNotFoundException()
         {
             var command = Fixture.Create<CorrectBuildingUnitRetirement>();
 
-            var buildingWasMigrated = new BuildingWasMigrated(
-                Fixture.Create<BuildingId>(),
-                command.BuildingPersistentLocalId,
-                Fixture.Create<BuildingPersistentLocalIdAssignmentDate>(),
-                BuildingStatus.Realized,
-                Fixture.Create<BuildingGeometry>(),
-                isRemoved: false,
-                new List<BuildingUnit>()
-            );
-            ((ISetProvenance)buildingWasMigrated).SetProvenance(Fixture.Create<Provenance>());
+            var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
+                .WithBuildingPersistentLocalId(command.BuildingPersistentLocalId)
+                .WithBuildingStatus(BuildingStatus.Realized)
+                .Build();
 
             Assert(new Scenario()
                 .Given(
@@ -182,31 +169,19 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitRetire
         }
 
         [Fact]
-        public void BuildingUnitIsRemoved_ThrowsBuildingUnitIsRemovedException()
+        public void WithRemovedBuildingUnit_ThenThrowsBuildingUnitIsRemovedException()
         {
             var command = Fixture.Create<CorrectBuildingUnitRetirement>();
 
-            var buildingWasMigrated = new BuildingWasMigrated(
-                Fixture.Create<BuildingId>(),
-                command.BuildingPersistentLocalId,
-                Fixture.Create<BuildingPersistentLocalIdAssignmentDate>(),
-                BuildingStatus.Realized,
-                Fixture.Create<BuildingGeometry>(),
-                isRemoved: false,
-                new List<BuildingUnit>
-                {
-                    new BuildingUnit(
-                        Fixture.Create<BuildingRegistry.Legacy.BuildingUnitId>(),
-                        Fixture.Create<BuildingRegistry.Legacy.PersistentLocalId>(),
-                        Fixture.Create<BuildingRegistry.Legacy.BuildingUnitFunction>(),
-                        BuildingRegistry.Legacy.BuildingUnitStatus.Planned,
-                        new List<AddressPersistentLocalId>(),
-                        Fixture.Create<BuildingRegistry.Legacy.BuildingUnitPosition>(),
-                        Fixture.Create<BuildingRegistry.Legacy.BuildingGeometry>(),
-                        isRemoved: true)
-                }
-            );
-            ((ISetProvenance)buildingWasMigrated).SetProvenance(Fixture.Create<Provenance>());
+            var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
+                .WithBuildingPersistentLocalId(command.BuildingPersistentLocalId)
+                .WithBuildingStatus(BuildingStatus.Realized)
+                .WithBuildingUnit(
+                    BuildingUnitStatus.Planned,
+                    command.BuildingUnitPersistentLocalId,
+                    BuildingUnitFunction.Unknown,
+                    isRemoved: true)
+                .Build();
 
             Assert(new Scenario()
                 .Given(
@@ -233,9 +208,9 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitRetire
                 .WithBuildingStatus(BuildingStatus.Realized)
                 .WithBuildingGeometry(buildingGeometry)
                 .WithBuildingUnit(
-                    BuildingRegistry.Legacy.BuildingUnitStatus.Retired,
+                    BuildingUnitStatus.Retired,
                     command.BuildingUnitPersistentLocalId,
-                    positionGeometryMethod: BuildingRegistry.Legacy.BuildingUnitPositionGeometryMethod.AppointedByAdministrator,
+                    positionGeometryMethod: BuildingUnitPositionGeometryMethod.AppointedByAdministrator,
                     extendedWkbGeometry: validPointInBuildingGeometry)
                 .Build();
 
@@ -254,9 +229,9 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitRetire
             // Assert
             var buildingUnit = building.BuildingUnits.First();
 
-            buildingUnit.Status.Should().Be(BuildingUnitStatus.Realized);
+            buildingUnit.Status.Should().Be(BuildingRegistry.Building.BuildingUnitStatus.Realized);
             buildingUnit.BuildingUnitPosition.Geometry.Should().Be(new ExtendedWkbGeometry(GeometryHelper.ValidPointInPolygon.AsBinary()));
-            buildingUnit.BuildingUnitPosition.GeometryMethod.Should().Be(BuildingUnitPositionGeometryMethod.AppointedByAdministrator);
+            buildingUnit.BuildingUnitPosition.GeometryMethod.Should().Be(BuildingRegistry.Building.BuildingUnitPositionGeometryMethod.AppointedByAdministrator);
 
             buildingUnit.LastEventHash.Should().NotBe(building.LastEventHash);
         }

@@ -12,14 +12,16 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitDeregu
     using Building.Commands;
     using Building.Events;
     using Building.Exceptions;
+    using Extensions;
     using Fixtures;
     using FluentAssertions;
     using Moq;
     using Xunit;
     using Xunit.Abstractions;
     using BuildingUnit = Building.Commands.BuildingUnit;
+    using BuildingUnitFunction = BuildingRegistry.Legacy.BuildingUnitFunction;
 
-    public class GivenBuildingUnitExists: BuildingRegistryTest
+    public class GivenBuildingUnitExists : BuildingRegistryTest
     {
         public GivenBuildingUnitExists(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
         {
@@ -60,31 +62,18 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitDeregu
         }
 
         [Fact]
-        public void WithCommonBuilding_ThrowsBuildingUnitHasInvalidFunctionException()
+        public void WithCommonBuilding_ThenThrowsBuildingUnitHasInvalidFunctionException()
         {
             var command = Fixture.Create<CorrectBuildingUnitDeregulation>();
 
-            var buildingWasMigrated = new BuildingWasMigrated(
-                Fixture.Create<BuildingId>(),
-                command.BuildingPersistentLocalId,
-                Fixture.Create<BuildingPersistentLocalIdAssignmentDate>(),
-                BuildingStatus.Realized,
-                Fixture.Create<BuildingGeometry>(),
-                isRemoved: false,
-                new List<BuildingUnit>
-                {
-                    new BuildingUnit(
-                        Fixture.Create<BuildingRegistry.Legacy.BuildingUnitId>(),
-                        Fixture.Create<BuildingRegistry.Legacy.PersistentLocalId>(),
-                        BuildingRegistry.Legacy.BuildingUnitFunction.Common,
-                        BuildingRegistry.Legacy.BuildingUnitStatus.Planned,
-                        new List<AddressPersistentLocalId>(),
-                        Fixture.Create<BuildingRegistry.Legacy.BuildingUnitPosition>(),
-                        Fixture.Create<BuildingRegistry.Legacy.BuildingGeometry>(),
-                        isRemoved: false)
-                }
-            );
-            ((ISetProvenance)buildingWasMigrated).SetProvenance(Fixture.Create<Provenance>());
+            var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
+                .WithBuildingPersistentLocalId(command.BuildingPersistentLocalId)
+                .WithBuildingStatus(BuildingStatus.Realized)
+                .WithBuildingUnit(
+                    BuildingRegistry.Legacy.BuildingUnitStatus.Planned,
+                    command.BuildingUnitPersistentLocalId,
+                    BuildingUnitFunction.Common)
+                .Build();
 
             Assert(new Scenario()
                 .Given(
@@ -95,31 +84,19 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitDeregu
         }
 
         [Fact]
-        public void BuildingUnitIsRemoved_ThrowsBuildingUnitIsRemovedException()
+        public void WithBuildingUnitIsRemoved_ThenThrowsBuildingUnitIsRemovedException()
         {
             var command = Fixture.Create<CorrectBuildingUnitDeregulation>();
 
-            var buildingWasMigrated = new BuildingWasMigrated(
-                Fixture.Create<BuildingId>(),
-                command.BuildingPersistentLocalId,
-                Fixture.Create<BuildingPersistentLocalIdAssignmentDate>(),
-                BuildingStatus.Realized,
-                Fixture.Create<BuildingGeometry>(),
-                isRemoved: false,
-                new List<BuildingUnit>
-                {
-                    new BuildingUnit(
-                        Fixture.Create<BuildingRegistry.Legacy.BuildingUnitId>(),
-                        Fixture.Create<BuildingRegistry.Legacy.PersistentLocalId>(),
-                        Fixture.Create<BuildingRegistry.Legacy.BuildingUnitFunction>(),
-                        BuildingRegistry.Legacy.BuildingUnitStatus.Planned,
-                        new List<AddressPersistentLocalId>(),
-                        Fixture.Create<BuildingRegistry.Legacy.BuildingUnitPosition>(),
-                        Fixture.Create<BuildingRegistry.Legacy.BuildingGeometry>(),
-                        isRemoved: true)
-                }
-            );
-            ((ISetProvenance)buildingWasMigrated).SetProvenance(Fixture.Create<Provenance>());
+            var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
+                .WithBuildingPersistentLocalId(command.BuildingPersistentLocalId)
+                .WithBuildingStatus(BuildingStatus.Realized)
+                .WithBuildingUnit(
+                    BuildingRegistry.Legacy.BuildingUnitStatus.Planned,
+                    command.BuildingUnitPersistentLocalId,
+                    BuildingUnitFunction.Unknown,
+                    isRemoved: true)
+                .Build();
 
             Assert(new Scenario()
                 .Given(
@@ -132,31 +109,17 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitDeregu
         [Theory]
         [InlineData("Retired")]
         [InlineData("NotRealized")]
-        public void WithInvalidBuildingUnitStatus_ThrowsBuildingUnitHasInvalidStatusException(string status)
+        public void WithInvalidBuildingUnitStatus_ThenThrowsBuildingUnitHasInvalidStatusException(string status)
         {
             var command = Fixture.Create<CorrectBuildingUnitDeregulation>();
 
-            var buildingWasMigrated = new BuildingWasMigrated(
-                Fixture.Create<BuildingId>(),
-                command.BuildingPersistentLocalId,
-                Fixture.Create<BuildingPersistentLocalIdAssignmentDate>(),
-                BuildingStatus.Realized,
-                Fixture.Create<BuildingGeometry>(),
-                isRemoved: false,
-                new List<BuildingUnit>
-                {
-                    new BuildingUnit(
-                        Fixture.Create<BuildingRegistry.Legacy.BuildingUnitId>(),
-                        Fixture.Create<BuildingRegistry.Legacy.PersistentLocalId>(),
-                        BuildingRegistry.Legacy.BuildingUnitFunction.Unknown,
-                        BuildingRegistry.Legacy.BuildingUnitStatus.Parse(status) ?? throw new ArgumentException(),
-                        new List<AddressPersistentLocalId>(),
-                        Fixture.Create<BuildingRegistry.Legacy.BuildingUnitPosition>(),
-                        Fixture.Create<BuildingRegistry.Legacy.BuildingGeometry>(),
-                        isRemoved: false)
-                }
-            );
-            ((ISetProvenance)buildingWasMigrated).SetProvenance(Fixture.Create<Provenance>());
+            var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
+                .WithBuildingPersistentLocalId(command.BuildingPersistentLocalId)
+                .WithBuildingStatus(BuildingStatus.Realized)
+                .WithBuildingUnit(BuildingRegistry.Legacy.BuildingUnitStatus.Parse(status)!.Value,
+                    command.BuildingUnitPersistentLocalId,
+                    BuildingUnitFunction.Unknown)
+                .Build();
 
             Assert(new Scenario()
                 .Given(
@@ -169,31 +132,17 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitDeregu
         [Theory]
         [InlineData("Retired")]
         [InlineData("NotRealized")]
-        public void BuildingStatusNotValid_ThrowsBuildingHasInvalidStatusException(string status)
+        public void BuildingStatusNotValid_ThenThrowsBuildingHasInvalidStatusException(string status)
         {
             var command = Fixture.Create<CorrectBuildingUnitDeregulation>();
 
-            var buildingWasMigrated = new BuildingWasMigrated(
-                Fixture.Create<BuildingId>(),
-                command.BuildingPersistentLocalId,
-                Fixture.Create<BuildingPersistentLocalIdAssignmentDate>(),
-                BuildingStatus.Parse(status),
-                Fixture.Create<BuildingGeometry>(),
-                isRemoved: false,
-                new List<BuildingUnit>
-                {
-                    new BuildingUnit(
-                        Fixture.Create<BuildingRegistry.Legacy.BuildingUnitId>(),
-                        Fixture.Create<BuildingRegistry.Legacy.PersistentLocalId>(),
-                        Fixture.Create<BuildingRegistry.Legacy.BuildingUnitFunction>(),
-                        BuildingRegistry.Legacy.BuildingUnitStatus.Planned,
-                        new List<AddressPersistentLocalId>(),
-                        Fixture.Create<BuildingRegistry.Legacy.BuildingUnitPosition>(),
-                        Fixture.Create<BuildingRegistry.Legacy.BuildingGeometry>(),
-                        isRemoved: false)
-                }
-            );
-            ((ISetProvenance)buildingWasMigrated).SetProvenance(Fixture.Create<Provenance>());
+            var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
+                .WithBuildingPersistentLocalId(command.BuildingPersistentLocalId)
+                .WithBuildingStatus(BuildingStatus.Parse(status))
+                .WithBuildingUnit(
+                    BuildingRegistry.Legacy.BuildingUnitStatus.Planned,
+                    command.BuildingUnitPersistentLocalId)
+                .Build();
 
             Assert(new Scenario()
                 .Given(

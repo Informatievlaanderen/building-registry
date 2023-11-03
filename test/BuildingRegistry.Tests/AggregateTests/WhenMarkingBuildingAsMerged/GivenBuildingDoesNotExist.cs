@@ -3,7 +3,6 @@
     using AutoFixture;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
     using Be.Vlaanderen.Basisregisters.AggregateSource.Testing;
-    using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Building;
     using Building.Commands;
     using Xunit;
@@ -18,9 +17,7 @@
         [Fact]
         public void ThenThrowsAggregateNotFoundException()
         {
-            var command = new MarkBuildingAsMerged(Fixture.Create<BuildingPersistentLocalId>(),
-                Fixture.Create<BuildingPersistentLocalId>(),
-                Fixture.Create<Provenance>());
+            var command = Fixture.Create<MarkBuildingAsMerged>();
 
             Assert(new Scenario()
                 .GivenNone()

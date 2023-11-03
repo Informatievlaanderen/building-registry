@@ -2,7 +2,6 @@
 {
     using AutoFixture;
     using Be.Vlaanderen.Basisregisters.AggregateSource.Testing;
-    using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Building;
     using Building.Commands;
     using Building.Events;
@@ -20,15 +19,10 @@
         [Fact]
         public void ThenBuildingWasMerged()
         {
-            var command = new MarkBuildingAsMerged(
-                Fixture.Create<BuildingPersistentLocalId>(),
-                Fixture.Create<BuildingPersistentLocalId>(),
-                Fixture.Create<Provenance>());
+            var command = Fixture.Create<MarkBuildingAsMerged>();
 
-            var plannedBuilding = new BuildingWasPlannedV2(
-                command.BuildingPersistentLocalId,
-                Fixture.Create<ExtendedWkbGeometry>());
-            ((ISetProvenance)plannedBuilding).SetProvenance(Fixture.Create<Provenance>());
+            var plannedBuilding = Fixture.Create<BuildingWasPlannedV2>()
+                .WithBuildingPersistentLocalId(command.BuildingPersistentLocalId);
 
             Assert(new Scenario()
                 .Given(new BuildingStreamId(command.BuildingPersistentLocalId),
@@ -42,24 +36,13 @@
         [Fact]
         public void WithOneBuildingUnit_ThenBuildingUnitWasMoved()
         {
-            var command = new MarkBuildingAsMerged(
-                Fixture.Create<BuildingPersistentLocalId>(),
-                Fixture.Create<BuildingPersistentLocalId>(),
-                Fixture.Create<Provenance>());
+            var command = Fixture.Create<MarkBuildingAsMerged>();
 
-            var plannedBuilding = new BuildingWasPlannedV2(
-                command.BuildingPersistentLocalId,
-                Fixture.Create<ExtendedWkbGeometry>());
-            ((ISetProvenance)plannedBuilding).SetProvenance(Fixture.Create<Provenance>());
+            var plannedBuilding = Fixture.Create<BuildingWasPlannedV2>()
+                .WithBuildingPersistentLocalId(command.BuildingPersistentLocalId);
 
-            var plannedBuildingUnit = new BuildingUnitWasPlannedV2(
-                command.BuildingPersistentLocalId,
-                Fixture.Create<BuildingUnitPersistentLocalId>(),
-                Fixture.Create<BuildingUnitPositionGeometryMethod>(),
-                Fixture.Create<ExtendedWkbGeometry>(),
-                BuildingUnitFunction.Unknown,
-                false);
-            ((ISetProvenance)plannedBuildingUnit).SetProvenance(Fixture.Create<Provenance>());
+            var plannedBuildingUnit = Fixture.Create<BuildingUnitWasPlannedV2>()
+                .WithFunction(BuildingUnitFunction.Unknown);
 
             Assert(new Scenario()
                 .Given(new BuildingStreamId(command.BuildingPersistentLocalId),
@@ -76,58 +59,34 @@
         }
 
         [Fact]
-        public void WithThreeBuildingUnit_ThenBuildingUnitWasMoved()
+        public void WithThreeBuildingUnits_ThenBuildingUnitWasMoved()
         {
-            var command = new MarkBuildingAsMerged(
-                Fixture.Create<BuildingPersistentLocalId>(),
-                Fixture.Create<BuildingPersistentLocalId>(),
-                Fixture.Create<Provenance>());
+            var command = Fixture.Create<MarkBuildingAsMerged>();
 
-            var plannedBuilding = new BuildingWasPlannedV2(
-                command.BuildingPersistentLocalId,
-                Fixture.Create<ExtendedWkbGeometry>());
-            ((ISetProvenance)plannedBuilding).SetProvenance(Fixture.Create<Provenance>());
+            var plannedBuilding = Fixture.Create<BuildingWasPlannedV2>()
+                .WithBuildingPersistentLocalId(command.BuildingPersistentLocalId);
 
-            var plannedBuildingUnit1 = new BuildingUnitWasPlannedV2(
-                command.BuildingPersistentLocalId,
-                Fixture.Create<BuildingUnitPersistentLocalId>(),
-                Fixture.Create<BuildingUnitPositionGeometryMethod>(),
-                Fixture.Create<ExtendedWkbGeometry>(),
-                BuildingUnitFunction.Unknown,
-                false);
-            ((ISetProvenance)plannedBuildingUnit1).SetProvenance(Fixture.Create<Provenance>());
+            var plannedBuildingUnit1 = Fixture.Create<BuildingUnitWasPlannedV2>()
+                .WithBuildingUnitPersistentLocalId(1)
+                .WithFunction(BuildingUnitFunction.Unknown);
 
-            var plannedBuildingUnit2 = new BuildingUnitWasPlannedV2(
-                command.BuildingPersistentLocalId,
-                Fixture.Create<BuildingUnitPersistentLocalId>(),
-                Fixture.Create<BuildingUnitPositionGeometryMethod>(),
-                Fixture.Create<ExtendedWkbGeometry>(),
-                BuildingUnitFunction.Unknown,
-                false);
-            ((ISetProvenance)plannedBuildingUnit2).SetProvenance(Fixture.Create<Provenance>());
+            var plannedBuildingUnit2 = Fixture.Create<BuildingUnitWasPlannedV2>()
+                .WithBuildingUnitPersistentLocalId(2)
+                .WithFunction(BuildingUnitFunction.Unknown);
 
-            var commonBuildingUnit = new BuildingUnitWasPlannedV2(
-                command.BuildingPersistentLocalId,
-                Fixture.Create<BuildingUnitPersistentLocalId>(),
-                Fixture.Create<BuildingUnitPositionGeometryMethod>(),
-                Fixture.Create<ExtendedWkbGeometry>(),
-                BuildingUnitFunction.Common,
-                false);
-            ((ISetProvenance)commonBuildingUnit).SetProvenance(Fixture.Create<Provenance>());
+            var plannedBuildingUnit3 = Fixture.Create<BuildingUnitWasPlannedV2>()
+                .WithBuildingUnitPersistentLocalId(3)
+                .WithFunction(BuildingUnitFunction.Unknown);
 
-            var plannedBuildingUnit3 = new BuildingUnitWasPlannedV2(
-                command.BuildingPersistentLocalId,
-                Fixture.Create<BuildingUnitPersistentLocalId>(),
-                Fixture.Create<BuildingUnitPositionGeometryMethod>(),
-                Fixture.Create<ExtendedWkbGeometry>(),
-                BuildingUnitFunction.Unknown,
-                false);
-            ((ISetProvenance)plannedBuildingUnit3).SetProvenance(Fixture.Create<Provenance>());
+            var commonBuildingUnit = Fixture.Create<BuildingUnitWasPlannedV2>()
+                .WithBuildingUnitPersistentLocalId(4)
+                .WithFunction(BuildingUnitFunction.Common);
 
-            var buildingUnitAddressWasAttached = new BuildingUnitAddressWasAttachedV2(command.BuildingPersistentLocalId,
-                new BuildingUnitPersistentLocalId(commonBuildingUnit.BuildingUnitPersistentLocalId),
-                new AddressPersistentLocalId(1));
-            ((ISetProvenance)buildingUnitAddressWasAttached).SetProvenance(Fixture.Create<Provenance>());
+            var buildingUnitAddressWasAttached = new BuildingUnitAddressWasAttachedBuilder(Fixture)
+                .WithBuildingPersistentLocalId(command.BuildingPersistentLocalId)
+                .WithBuildingUnitPersistentLocalId(commonBuildingUnit.BuildingUnitPersistentLocalId)
+                .WithAddressPersistentLocalId(1)
+                .Build();
 
             Assert(new Scenario()
                 .Given(new BuildingStreamId(command.BuildingPersistentLocalId),
@@ -163,14 +122,11 @@
         [InlineData("NotRealized")]
         public void WithInvalidBuildingUnitStatus_ThenBuildingUnitWasNotMoved(string buildingUnitStatus)
         {
-            var command = new MarkBuildingAsMerged(
-                Fixture.Create<BuildingPersistentLocalId>(),
-                Fixture.Create<BuildingPersistentLocalId>(),
-                Fixture.Create<Provenance>());
+            var command = Fixture.Create<MarkBuildingAsMerged>();
 
             var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
                 .WithBuildingPersistentLocalId(command.BuildingPersistentLocalId)
-                .WithBuildingUnit(BuildingUnitStatus.Parse(buildingUnitStatus).Value)
+                .WithBuildingUnit(BuildingUnitStatus.Parse(buildingUnitStatus)!.Value)
                 .Build();
 
             Assert(new Scenario()
@@ -186,10 +142,7 @@
         [Fact]
         public void WithRemovedBuildingUnitStatus_ThenBuildingUnitWasNotMoved()
         {
-            var command = new MarkBuildingAsMerged(
-                Fixture.Create<BuildingPersistentLocalId>(),
-                Fixture.Create<BuildingPersistentLocalId>(),
-                Fixture.Create<Provenance>());
+            var command = Fixture.Create<MarkBuildingAsMerged>();
 
             var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
                 .WithBuildingPersistentLocalId(command.BuildingPersistentLocalId)
@@ -205,9 +158,5 @@
                         command.DestinationBuildingPersistentLocalId)
                 ));
         }
-
-        // TODO:
-        // building units in invalid statuses (notRealized, retired, removed)
-        // state check (remove bu from list)
     }
 }

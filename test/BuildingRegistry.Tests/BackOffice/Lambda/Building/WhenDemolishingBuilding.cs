@@ -19,8 +19,8 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
     using BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.Building;
     using BuildingRegistry.Api.BackOffice.Handlers.Lambda.Requests.Building;
     using BuildingRegistry.Building;
-    using BuildingRegistry.Building.Datastructures;
     using BuildingRegistry.Building.Exceptions;
+    using Consumer.Address;
     using Fixtures;
     using FluentAssertions;
     using Microsoft.Extensions.Configuration;
@@ -89,7 +89,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
 
             var addressPersistentLocalId = new AddressPersistentLocalId(222);
 
-            FakeConsumerAddressContext.AddAddress(addressPersistentLocalId, Consumer.Address.AddressStatus.Current);
+            FakeConsumerAddressContext.AddAddress(addressPersistentLocalId, AddressStatus.Current);
 
             AttachAddressToBuildingUnit(buildingPersistentLocalId, buildingUnitPersistentLocalId, addressPersistentLocalId);
 

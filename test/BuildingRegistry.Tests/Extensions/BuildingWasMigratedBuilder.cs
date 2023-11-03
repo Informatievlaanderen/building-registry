@@ -109,6 +109,13 @@ namespace BuildingRegistry.Tests.Extensions
             return this;
         }
 
+        public BuildingWasMigratedBuilder WithBuildingUnit(BuildingUnit buildingUnit)
+        {
+            _buildingUnits.Add(buildingUnit);
+
+            return this;
+        }
+
         public BuildingWasMigrated Build()
         {
             if (_buildingUnits

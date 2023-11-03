@@ -4,19 +4,20 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenDetachingAddressFromBuilding
     using System.Linq;
     using Autofac;
     using AutoFixture;
+    using BackOffice;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
     using Be.Vlaanderen.Basisregisters.AggregateSource.Snapshotting;
     using Be.Vlaanderen.Basisregisters.AggregateSource.Testing;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
-    using BuildingRegistry.Building;
-    using BuildingRegistry.Building.Commands;
-    using BuildingRegistry.Building.Events;
-    using BuildingRegistry.Tests.BackOffice;
-    using BuildingRegistry.Tests.Extensions;
+    using Building;
+    using Building.Commands;
+    using Building.Events;
+    using Consumer.Address;
+    using Extensions;
     using FluentAssertions;
-    using Moq;
     using Xunit;
     using Xunit.Abstractions;
+    using BuildingUnitStatus = BuildingRegistry.Legacy.BuildingUnitStatus;
 
     public class GivenBuildingWithBuildingUnit : BuildingRegistryTest
     {
@@ -29,12 +30,12 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenDetachingAddressFromBuilding
             var command = Fixture.Create<DetachAddressFromBuildingUnit>();
 
             var consumerAddress = Container.Resolve<FakeConsumerAddressContext>();
-            consumerAddress.AddAddress(command.AddressPersistentLocalId, Consumer.Address.AddressStatus.Current, isRemoved: false);
+            consumerAddress.AddAddress(command.AddressPersistentLocalId, AddressStatus.Current, isRemoved: false);
 
             var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
                 .WithBuildingPersistentLocalId(command.BuildingPersistentLocalId)
                 .WithBuildingUnit(
-                    BuildingRegistry.Legacy.BuildingUnitStatus.Realized,
+                    BuildingUnitStatus.Realized,
                     command.BuildingUnitPersistentLocalId,
                     attachedAddresses: new List<AddressPersistentLocalId> { command.AddressPersistentLocalId },
                     isRemoved: false)
@@ -66,7 +67,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenDetachingAddressFromBuilding
             var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
                 .WithBuildingPersistentLocalId(new BuildingPersistentLocalId(buildingUnitAddressWasDetachedV2.BuildingPersistentLocalId))
                 .WithBuildingUnit(
-                    BuildingRegistry.Legacy.BuildingUnitStatus.Realized,
+                    BuildingUnitStatus.Realized,
                     new BuildingUnitPersistentLocalId(buildingUnitAddressWasDetachedV2.BuildingUnitPersistentLocalId),
                     attachedAddresses: new List<AddressPersistentLocalId>
                     {

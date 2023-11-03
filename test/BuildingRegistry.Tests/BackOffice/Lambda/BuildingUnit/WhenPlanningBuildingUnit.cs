@@ -146,7 +146,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
         }
 
         [Fact]
-        public async Task WhenBuildingHasInvalidStatus_ThenTicketingErrorIsExpected()
+        public async Task WithInvalidBuildingStatus_ThenTicketingErrorIsExpected()
         {
             // Arrange
             var ticketing = new Mock<ITicketing>();
@@ -216,7 +216,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
         }
 
         [Fact]
-        public async Task WhenIdempotencyException_ThenTicketingCompleteIsExpected()
+        public async Task WithIdempotentRequest_ThenTicketingCompleteIsExpected()
         {
             // Arrange
             var ticketing = new Mock<ITicketing>();
@@ -228,7 +228,6 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
             PlanBuildingUnit(buildingPersistentLocalId,buildingUnitPersistentLocalId);
 
             var buildings = Container.Resolve<IBuildings>();
-            var eTagResponse = new ETagResponse(string.Empty, Fixture.Create<string>());
             var handler = new PlanBuildingUnitLambdaHandler(
                 Container.Resolve<IConfiguration>(),
                 new FakeRetryPolicy(),
@@ -266,7 +265,6 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
             PlanBuilding(buildingPersistentLocalId);
 
             var buildings = Container.Resolve<IBuildings>();
-            var eTagResponse = new ETagResponse(string.Empty, Fixture.Create<string>());
             var handler = new PlanBuildingUnitLambdaHandler(
                 Container.Resolve<IConfiguration>(),
                 new FakeRetryPolicy(),
@@ -281,7 +279,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
 
             var building =
                 await buildings.GetAsync(new BuildingStreamId(buildingPersistentLocalId), CancellationToken.None);
-            
+
             //Assert
             ticketing.Verify(x =>
                 x.Complete(

@@ -81,7 +81,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.BuildingUnit.WhenDeregulatingBui
         }
 
         [Fact]
-        public void WhenAggregateIdIsNotFoundException_ThenThrowsApiException()
+        public void WithAggregateIdIsNotFound_ThenThrowsApiException()
         {
             MockMediator
                 .Setup(x => x.Send(It.IsAny<DeregulateBuildingUnitSqsRequest>(), CancellationToken.None))
@@ -107,7 +107,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.BuildingUnit.WhenDeregulatingBui
         }
 
         [Fact]
-        public void WhenAggregateNotFoundException_ThenThrowApiException()
+        public void WithAggregateNotFound_ThenThrowsApiException()
         {
             var buildingPersistentLocalId = Fixture.Create<BuildingUnitPersistentLocalId>();
 

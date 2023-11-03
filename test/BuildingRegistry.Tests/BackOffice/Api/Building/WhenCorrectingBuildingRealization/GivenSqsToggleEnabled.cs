@@ -95,8 +95,6 @@ namespace BuildingRegistry.Tests.BackOffice.Api.Building.WhenCorrectingBuildingR
 
             //Act
             var act = async () => await _controller.CorrectRealization(
-
-
                 new BuildingExistsValidator(_streamStore.Object),
                 MockIfMatchValidator(true),
                 Fixture.Create<CorrectBuildingRealizationRequest>(),

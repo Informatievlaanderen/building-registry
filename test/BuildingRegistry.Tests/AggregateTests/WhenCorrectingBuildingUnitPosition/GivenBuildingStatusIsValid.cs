@@ -32,16 +32,10 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitPositi
             var command = Fixture.Create<CorrectBuildingUnitPosition>()
                 .WithPersistentLocalId(buildingUnitPersistentLocalId);
 
-            var buildingWasMigrated = new BuildingWasMigrated(
-                Fixture.Create<BuildingId>(),
-                Fixture.Create<BuildingPersistentLocalId>(),
-                Fixture.Create<BuildingPersistentLocalIdAssignmentDate>(),
-                BuildingStatus.Parse(buildingStatus),
-                Fixture.Create<BuildingGeometry>(),
-                false,
-                new List<BuildingUnit>()
-            );
-            ((ISetProvenance)buildingWasMigrated).SetProvenance(Fixture.Create<Provenance>());
+            var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
+                .WithBuildingPersistentLocalId(command.BuildingPersistentLocalId)
+                .WithBuildingStatus(BuildingStatus.Parse(buildingStatus))
+                .Build();
 
             var buildingUnitWasPlanned = Fixture.Create<BuildingUnitWasPlannedV2>()
                 .WithBuildingUnitPersistentLocalId(buildingUnitPersistentLocalId);

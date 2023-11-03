@@ -74,7 +74,7 @@ namespace BuildingRegistry.Tests.BackOffice.Sqs.BuildingUnit
 
 
         [Fact]
-        public void WithNoBuildingFoundByBuildingUnitPersistentLocalId_ThrowsAggregateIdNotFound()
+        public void WithNoBuildingFoundByBuildingUnitPersistentLocalId_ThenThrowsAggregateIdNotFound()
         {
             // Arrange
             var sut = new RegularizeBuildingUnitSqsHandler(
