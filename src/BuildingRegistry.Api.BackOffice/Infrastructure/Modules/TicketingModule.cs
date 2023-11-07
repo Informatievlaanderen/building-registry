@@ -24,7 +24,7 @@ namespace BuildingRegistry.Api.BackOffice.Infrastructure.Modules
         protected override void Load(ContainerBuilder builder)
         {
             builder
-                .Register(c => new TicketingUrl(_baseUrl))
+                .Register(_ => new TicketingUrl(_baseUrl))
                 .As<ITicketingUrl>()
                 .SingleInstance();
         }

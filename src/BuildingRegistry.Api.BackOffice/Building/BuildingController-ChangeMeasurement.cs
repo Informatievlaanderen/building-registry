@@ -6,12 +6,10 @@ namespace BuildingRegistry.Api.BackOffice.Building
     using Abstractions.Building.SqsRequests;
     using Abstractions.Building.Validators;
     using Abstractions.Validation;
-    using Be.Vlaanderen.Basisregisters.Api.ETag;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using BuildingRegistry.Building;
     using FluentValidation;
-    using Infrastructure;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
     using NodaTime;
