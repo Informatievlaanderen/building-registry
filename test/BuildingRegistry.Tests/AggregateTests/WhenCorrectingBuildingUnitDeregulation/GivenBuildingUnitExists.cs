@@ -1,13 +1,10 @@
 namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitDeregulation
 {
-    using System;
-    using System.Collections.Generic;
     using System.Linq;
     using AutoFixture;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
     using Be.Vlaanderen.Basisregisters.AggregateSource.Snapshotting;
     using Be.Vlaanderen.Basisregisters.AggregateSource.Testing;
-    using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Building;
     using Building.Commands;
     using Building.Events;
@@ -15,11 +12,10 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitDeregu
     using Extensions;
     using Fixtures;
     using FluentAssertions;
-    using Moq;
     using Xunit;
     using Xunit.Abstractions;
-    using BuildingUnit = Building.Commands.BuildingUnit;
     using BuildingUnitFunction = BuildingRegistry.Legacy.BuildingUnitFunction;
+    using BuildingUnitStatus = BuildingRegistry.Legacy.BuildingUnitStatus;
 
     public class GivenBuildingUnitExists : BuildingRegistryTest
     {
@@ -70,7 +66,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitDeregu
                 .WithBuildingPersistentLocalId(command.BuildingPersistentLocalId)
                 .WithBuildingStatus(BuildingStatus.Realized)
                 .WithBuildingUnit(
-                    BuildingRegistry.Legacy.BuildingUnitStatus.Planned,
+                    BuildingUnitStatus.Planned,
                     command.BuildingUnitPersistentLocalId,
                     BuildingUnitFunction.Common)
                 .Build();
@@ -92,7 +88,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitDeregu
                 .WithBuildingPersistentLocalId(command.BuildingPersistentLocalId)
                 .WithBuildingStatus(BuildingStatus.Realized)
                 .WithBuildingUnit(
-                    BuildingRegistry.Legacy.BuildingUnitStatus.Planned,
+                    BuildingUnitStatus.Planned,
                     command.BuildingUnitPersistentLocalId,
                     BuildingUnitFunction.Unknown,
                     isRemoved: true)
@@ -116,7 +112,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitDeregu
             var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
                 .WithBuildingPersistentLocalId(command.BuildingPersistentLocalId)
                 .WithBuildingStatus(BuildingStatus.Realized)
-                .WithBuildingUnit(BuildingRegistry.Legacy.BuildingUnitStatus.Parse(status)!.Value,
+                .WithBuildingUnit(BuildingUnitStatus.Parse(status)!.Value,
                     command.BuildingUnitPersistentLocalId,
                     BuildingUnitFunction.Unknown)
                 .Build();
@@ -140,7 +136,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitDeregu
                 .WithBuildingPersistentLocalId(command.BuildingPersistentLocalId)
                 .WithBuildingStatus(BuildingStatus.Parse(status))
                 .WithBuildingUnit(
-                    BuildingRegistry.Legacy.BuildingUnitStatus.Planned,
+                    BuildingUnitStatus.Planned,
                     command.BuildingUnitPersistentLocalId)
                 .Build();
 

@@ -26,7 +26,6 @@ namespace BuildingRegistry.Api.BackOffice.Building
         /// <param name="buildingExistsValidator"></param>
         /// <param name="ifMatchHeaderValidator"></param>
         /// <param name="request"></param>
-        /// <param name="validator"></param>
         /// <param name="ifMatchHeaderValue"></param>
         /// <param name="cancellationToken"></param>
         /// <response code="202">Aanvraag tot correctie realisatie wordt reeds verwerkt.</response>

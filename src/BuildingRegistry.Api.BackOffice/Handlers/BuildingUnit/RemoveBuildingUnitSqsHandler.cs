@@ -1,10 +1,10 @@
 namespace BuildingRegistry.Api.BackOffice.Handlers.BuildingUnit
 {
     using System.Collections.Generic;
+    using Abstractions;
+    using Abstractions.BuildingUnit.SqsRequests;
     using Be.Vlaanderen.Basisregisters.Sqs;
     using Be.Vlaanderen.Basisregisters.Sqs.Handlers;
-    using BuildingRegistry.Api.BackOffice.Abstractions;
-    using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.SqsRequests;
     using TicketingService.Abstractions;
 
     public sealed class RemoveBuildingUnitSqsHandler : SqsHandler<RemoveBuildingUnitSqsRequest>
