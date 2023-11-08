@@ -1,3 +1,10 @@
+# [3.96.0](https://github.com/informatievlaanderen/building-registry/compare/v3.95.0...v3.96.0) (2023-11-08)
+
+
+### Features
+
+* switch wms views GAWR-4041 ([1a2beba](https://github.com/informatievlaanderen/building-registry/commit/1a2bebaa25270eb52ccb391fce6f48fce8cd991d))
+
 # [3.95.0](https://github.com/informatievlaanderen/building-registry/compare/v3.94.0...v3.95.0) (2023-10-19)
 
 
