@@ -1,3 +1,10 @@
+## [3.96.2](https://github.com/informatievlaanderen/building-registry/compare/v3.96.1...v3.96.2) (2023-11-10)
+
+
+### Bug Fixes
+
+* allow cors for producer ([4a5ad24](https://github.com/informatievlaanderen/building-registry/commit/4a5ad24f49df1983bf8e2fe9cf010d77909cc0a1))
+
 ## [3.96.1](https://github.com/informatievlaanderen/building-registry/compare/v3.96.0...v3.96.1) (2023-11-10)
 
 # [3.96.0](https://github.com/informatievlaanderen/building-registry/compare/v3.95.0...v3.96.0) (2023-11-08)
