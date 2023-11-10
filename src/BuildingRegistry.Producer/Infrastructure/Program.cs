@@ -2,6 +2,7 @@ namespace BuildingRegistry.Producer.Infrastructure
 {
     using System;
     using System.IO;
+    using System.Linq;
     using System.Threading.Tasks;
     using Autofac;
     using Autofac.Extensions.DependencyInjection;
@@ -79,6 +80,23 @@ namespace BuildingRegistry.Producer.Infrastructure
                     healthChecksBuilder.AddDbContextCheck<ProducerContext>(
                         $"dbcontext-{nameof(ProducerContext).ToLowerInvariant()}",
                         tags: new[] { "db", "sql", "sqlserver" });
+
+                    var origins = hostContext.Configuration
+                        .GetSection("Cors")
+                        .GetChildren()
+                        .Select(c => c.Value)
+                        .ToArray();
+
+                    foreach (var origin in origins)
+                    {
+                        services.AddCors(options =>
+                        {
+                            options.AddDefaultPolicy(builder =>
+                            {
+                                builder.WithOrigins(origin);
+                            });
+                        });
+                    }
                 })
                 .UseServiceProviderFactory(new AutofacServiceProviderFactory())
                 .ConfigureContainer<ContainerBuilder>((hostContext, builder) =>
@@ -97,22 +115,7 @@ namespace BuildingRegistry.Producer.Infrastructure
                 })
                 .ConfigureWebHostDefaults(webHostBuilder =>
                     webHostBuilder
-                        .UseStartup<Startup>()
-                        .UseKestrel((context, builder) =>
-                        {
-                            if (context.HostingEnvironment.IsDevelopment())
-                            {
-                                builder.ListenLocalhost(5000);
-                            }
-                            else
-                            {
-                                var url = context.Configuration.GetValue<string>("Kestrel:Endpoints:Https:Url");
-                                if (string.IsNullOrEmpty(url))
-                                {
-                                    builder.ListenLocalhost(5000);
-                                }
-                            }
-                        }))
+                        .UseStartup<Startup>())
                 .UseConsoleLifetime()
                 .Build();
 
