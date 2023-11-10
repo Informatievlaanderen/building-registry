@@ -1,191 +1,60 @@
-namespace BuildingRegistry.Producer.Infrastructure
+﻿namespace BuildingRegistry.Producer.Infrastructure
 {
-    using System;
+    using System.Collections.Generic;
     using System.Linq;
-    using System.Reflection;
-    using Autofac;
-    using Autofac.Extensions.DependencyInjection;
-    using Be.Vlaanderen.Basisregisters.Api;
-    using Be.Vlaanderen.Basisregisters.DataDog.Tracing.Microsoft;
-    using Be.Vlaanderen.Basisregisters.Projector;
-    using Configuration;
+    using System.Threading;
+    using Be.Vlaanderen.Basisregisters.Projector.ConnectedProjections;
+    using Be.Vlaanderen.Basisregisters.Projector.Controllers;
     using Microsoft.AspNetCore.Builder;
-    using Microsoft.AspNetCore.Hosting;
-    using Microsoft.AspNetCore.Mvc.ApiExplorer;
+    using Microsoft.AspNetCore.Http;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
-    using Microsoft.Extensions.Diagnostics.HealthChecks;
-    using Microsoft.Extensions.Hosting;
-    using Microsoft.Extensions.Logging;
-    using Microsoft.OpenApi.Models;
-    using Modules;
-    using BuildingRegistry.Infrastructure.Modules;
+    using SqlStreamStore;
 
-    /// <summary>Represents the startup process for the application.</summary>
     public class Startup
     {
-        private const string DatabaseTag = "db";
-
-        private IContainer _applicationContainer;
-
-        private readonly IConfiguration _configuration;
-        private readonly ILoggerFactory _loggerFactory;
-
-        public Startup(
-            IConfiguration configuration,
-            ILoggerFactory loggerFactory)
+        public void Configure(IApplicationBuilder app)
         {
-            _configuration = configuration;
-            _loggerFactory = loggerFactory;
-        }
+            app.UseRouting();
 
-        /// <summary>Configures services for the application.</summary>
-        /// <param name="services">The collection of services to configure the application with.</param>
-        public IServiceProvider ConfigureServices(IServiceCollection services)
-        {
-            var baseUrl = _configuration.GetValue<string>("BaseUrl");
-            var baseUrlForExceptions = baseUrl.EndsWith("/")
-                ? baseUrl.Substring(0, baseUrl.Length - 1)
-                : baseUrl;
+            app.UseHealthChecks("/health");
 
-            services
-                .ConfigureDefaultForApi<Startup>(
-                    new StartupConfigureOptions
-                    {
-                        Cors =
-                        {
-                            Origins = _configuration
-                                .GetSection("Cors")
-                                .GetChildren()
-                                .Select(c => c.Value)
-                                .ToArray()
-                        },
-                        Server =
-                        {
-                            BaseUrl = baseUrlForExceptions
-                        },
-                        Swagger =
-                        {
-                            ApiInfo = (provider, description) => new OpenApiInfo
-                            {
-                                Version = description.ApiVersion.ToString(),
-                                Title = "Basisregisters Vlaanderen Building Registry API",
-                                Description = GetApiLeadingText(description),
-                                Contact = new OpenApiContact
-                                {
-                                    Name = "Digitaal Vlaanderen",
-                                    Email = "digitaal.vlaanderen@vlaanderen.be",
-                                    Url = new Uri("https://legacy.basisregisters.vlaanderen")
-                                }
-                            },
-                            XmlCommentPaths = new[] { typeof(Startup).GetTypeInfo().Assembly.GetName().Name }
-                        },
-                        MiddlewareHooks =
-                        {
-                            FluentValidation = fv => fv.RegisterValidatorsFromAssemblyContaining<Startup>(),
-
-                            AfterHealthChecks = health =>
-                            {
-                                var connectionStrings = _configuration
-                                    .GetSection("ConnectionStrings")
-                                    .GetChildren();
-
-                                foreach (var connectionString in connectionStrings)
-                                {
-                                    health.AddSqlServer(
-                                        connectionString.Value,
-                                        name: $"sqlserver-{connectionString.Key.ToLowerInvariant()}",
-                                        tags: new[] { DatabaseTag, "sql", "sqlserver" });
-                                }
-
-                                health.AddDbContextCheck<ProducerContext>(
-                                    $"dbcontext-{nameof(ProducerContext).ToLowerInvariant()}",
-                                    tags: new[] { DatabaseTag, "sql", "sqlserver" });
-                            }
-                        }
-                    });
-
-            var containerBuilder = new ContainerBuilder();
-            containerBuilder.RegisterModule(new LoggingModule(_configuration, services));
-            containerBuilder.RegisterModule(new ApiModule(_configuration, services, _loggerFactory));
-            _applicationContainer = containerBuilder.Build();
-
-            return new AutofacServiceProvider(_applicationContainer);
-        }
-
-        public void Configure(
-            IServiceProvider serviceProvider,
-            IApplicationBuilder app,
-            IWebHostEnvironment env,
-            IHostApplicationLifetime appLifetime,
-            ILoggerFactory loggerFactory,
-            IApiVersionDescriptionProvider apiVersionProvider,
-            ApiDataDogToggle datadogToggle,
-            ApiDebugDataDogToggle debugDataDogToggle,
-            HealthCheckService healthCheckService)
-        {
-            StartupHelpers.CheckDatabases(healthCheckService, DatabaseTag, loggerFactory).GetAwaiter().GetResult();
-
-            app
-                .UseDataDog<Startup>(new DataDogOptions
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapGet("v1/projections", async context =>
                 {
-                    Common =
-                    {
-                        ServiceProvider = serviceProvider,
-                        LoggerFactory = loggerFactory
-                    },
-                    Toggles =
-                    {
-                        Enable = datadogToggle,
-                        Debug = debugDataDogToggle
-                    },
-                    Tracing =
-                    {
-                        ServiceName = _configuration["DataDog:ServiceName"]
-                    }
-                })
+                    var configuration = app.ApplicationServices.GetRequiredService<IConfiguration>();
+                    var manager = app.ApplicationServices.GetRequiredService<IConnectedProjectionsManager>();
+                    var streamStore = app.ApplicationServices.GetRequiredService<IStreamStore>();
 
-                .UseDefaultForApi(new StartupUseOptions
-                {
-                    Common =
-                    {
-                        ApplicationContainer = _applicationContainer,
-                        ServiceProvider = serviceProvider,
-                        HostingEnvironment = env,
-                        ApplicationLifetime = appLifetime,
-                        LoggerFactory = loggerFactory
-                    },
-                    Api =
-                    {
-                        VersionProvider = apiVersionProvider,
-                        Info = groupName => $"Basisregisters Vlaanderen - Building Registry API {groupName}",
-                        CSharpClientOptions =
-                        {
-                            ClassName = "BuildingRegistryProducer",
-                            Namespace = "Be.Vlaanderen.Basisregisters"
-                        },
-                        TypeScriptClientOptions =
-                        {
-                            ClassName = "BuildingRegistryProducer"
-                        }
-                    },
-                    MiddlewareHooks =
-                    {
-                        AfterMiddleware = x => x.UseMiddleware<AddNoCacheHeadersMiddleware>()
-                    }
-                })
+                    var baseUri = configuration.GetValue<string>("BaseUrl");
 
-                .UseProjectionsManager(new ProjectionsManagerOptions
-                {
-                    Common =
+                    var registeredConnectedProjections = manager
+                        .GetRegisteredProjections()
+                        .ToList();
+                    var projectionStates = await manager.GetProjectionStates(CancellationToken.None);
+                    var responses = registeredConnectedProjections.Aggregate(
+                        new List<ProjectionResponse>(),
+                        (list, projection) =>
+                        {
+                            var projectionState = projectionStates.SingleOrDefault(x => x.Name == projection.Id);
+                            list.Add(new ProjectionResponse(
+                                projection,
+                                projectionState,
+                                baseUri));
+                            return list;
+                        });
+
+                    var streamPosition = await streamStore.ReadHeadPosition();
+
+                    var projectionResponseList = new ProjectionResponseList(responses, baseUri)
                     {
-                        ServiceProvider = serviceProvider,
-                        ApplicationLifetime = appLifetime
-                    }
+                        StreamPosition = streamPosition
+                    };
+
+                    await context.Response.WriteAsJsonAsync(projectionResponseList);
                 });
+            });
         }
-
-        private static string GetApiLeadingText(ApiVersionDescription description)
-            => $"Momenteel leest u de documentatie voor versie {description.ApiVersion} van de Basisregisters Vlaanderen Building Registry Producer API{string.Format(description.IsDeprecated ? ", **deze API versie is niet meer ondersteund * *." : ".")}";
     }
 }
