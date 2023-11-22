@@ -1,3 +1,10 @@
+## [3.96.3](https://github.com/informatievlaanderen/building-registry/compare/v3.96.2...v3.96.3) (2023-11-22)
+
+
+### Bug Fixes
+
+* sysgeometry projecitons ([a3f6143](https://github.com/informatievlaanderen/building-registry/commit/a3f6143ee3407cadbb220b0474967e4156d65603))
+
 ## [3.96.2](https://github.com/informatievlaanderen/building-registry/compare/v3.96.1...v3.96.2) (2023-11-10)
 
 
