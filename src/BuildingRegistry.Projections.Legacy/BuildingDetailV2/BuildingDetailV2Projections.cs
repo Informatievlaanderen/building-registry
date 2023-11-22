@@ -21,11 +21,13 @@ namespace BuildingRegistry.Projections.Legacy.BuildingDetailV2
             When<Envelope<BuildingWasMigrated>>(async (context, message, ct) =>
             {
                 var geometryAsBinary = message.Message.ExtendedWkbGeometry.ToByteArray();
+                var sysGeometry = wkbReader.Read(geometryAsBinary);
+                var fixedGeometry = NetTopologySuite.Geometries.Utilities.GeometryFixer.Fix(sysGeometry);
                 var building = new BuildingDetailItemV2(
                     message.Message.BuildingPersistentLocalId,
                     BuildingGeometryMethod.Parse(message.Message.GeometryMethod),
                     geometryAsBinary,
-                    wkbReader.Read(geometryAsBinary),
+                    fixedGeometry,
                     BuildingStatus.Parse(message.Message.BuildingStatus),
                     message.Message.IsRemoved,
                     message.Message.Provenance.Timestamp);
@@ -40,12 +42,13 @@ namespace BuildingRegistry.Projections.Legacy.BuildingDetailV2
             When<Envelope<BuildingWasPlannedV2>>(async (context, message, ct) =>
             {
                 var geometryAsBinary = message.Message.ExtendedWkbGeometry.ToByteArray();
-
+                var sysGeometry = wkbReader.Read(geometryAsBinary);
+                var fixedGeometry = NetTopologySuite.Geometries.Utilities.GeometryFixer.Fix(sysGeometry);
                 var building = new BuildingDetailItemV2(
                     message.Message.BuildingPersistentLocalId,
                     BuildingGeometryMethod.Outlined,
                     geometryAsBinary,
-                    wkbReader.Read(geometryAsBinary),
+                    fixedGeometry,
                     BuildingStatus.Planned,
                     false,
                     message.Message.Provenance.Timestamp);
@@ -60,12 +63,13 @@ namespace BuildingRegistry.Projections.Legacy.BuildingDetailV2
             When<Envelope<UnplannedBuildingWasRealizedAndMeasured>>(async (context, message, ct) =>
             {
                 var geometryAsBinary = message.Message.ExtendedWkbGeometry.ToByteArray();
-
+                var sysGeometry = wkbReader.Read(geometryAsBinary);
+                var fixedGeometry = NetTopologySuite.Geometries.Utilities.GeometryFixer.Fix(sysGeometry);
                 var building = new BuildingDetailItemV2(
                     message.Message.BuildingPersistentLocalId,
                     BuildingGeometryMethod.MeasuredByGrb,
                     geometryAsBinary,
-                    wkbReader.Read(geometryAsBinary),
+                    fixedGeometry,
                     BuildingStatus.Realized,
                     false,
                     message.Message.Provenance.Timestamp);
@@ -80,10 +84,11 @@ namespace BuildingRegistry.Projections.Legacy.BuildingDetailV2
             When<Envelope<BuildingOutlineWasChanged>>(async (context, message, ct) =>
             {
                 var geometryAsBinary = message.Message.ExtendedWkbGeometryBuilding.ToByteArray();
-
+                var sysGeometry = wkbReader.Read(geometryAsBinary);
+                var fixedGeometry = NetTopologySuite.Geometries.Utilities.GeometryFixer.Fix(sysGeometry);
                 var item = await context.BuildingDetailsV2.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);
                 item.Geometry = geometryAsBinary;
-                item.SysGeometry = wkbReader.Read(geometryAsBinary);
+                item.SysGeometry = fixedGeometry;
                 item.Version = message.Message.Provenance.Timestamp;
                 UpdateHash(item, message);
             });
@@ -91,10 +96,11 @@ namespace BuildingRegistry.Projections.Legacy.BuildingDetailV2
             When<Envelope<BuildingMeasurementWasChanged>>(async (context, message, ct) =>
             {
                 var geometryAsBinary = message.Message.ExtendedWkbGeometryBuilding.ToByteArray();
-
+                var sysGeometry = wkbReader.Read(geometryAsBinary);
+                var fixedGeometry = NetTopologySuite.Geometries.Utilities.GeometryFixer.Fix(sysGeometry);
                 var item = await context.BuildingDetailsV2.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);
                 item.Geometry = geometryAsBinary;
-                item.SysGeometry = wkbReader.Read(geometryAsBinary);
+                item.SysGeometry = fixedGeometry;
                 item.Version = message.Message.Provenance.Timestamp;
                 UpdateHash(item, message);
             });
@@ -150,10 +156,11 @@ namespace BuildingRegistry.Projections.Legacy.BuildingDetailV2
             When<Envelope<BuildingWasMeasured>>(async (context, message, ct) =>
             {
                 var geometryAsBinary = message.Message.ExtendedWkbGeometryBuilding.ToByteArray();
-
+                var sysGeometry = wkbReader.Read(geometryAsBinary);
+                var fixedGeometry = NetTopologySuite.Geometries.Utilities.GeometryFixer.Fix(sysGeometry);
                 var item = await context.BuildingDetailsV2.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);
                 item.Geometry = geometryAsBinary;
-                item.SysGeometry = wkbReader.Read(geometryAsBinary);;
+                item.SysGeometry = fixedGeometry;
                 item.GeometryMethod = BuildingGeometryMethod.MeasuredByGrb;
                 item.Version = message.Message.Provenance.Timestamp;
                 UpdateHash(item, message);
@@ -162,10 +169,11 @@ namespace BuildingRegistry.Projections.Legacy.BuildingDetailV2
             When<Envelope<BuildingMeasurementWasCorrected>>(async (context, message, ct) =>
             {
                 var geometryAsBinary = message.Message.ExtendedWkbGeometryBuilding.ToByteArray();
-
+                var sysGeometry = wkbReader.Read(geometryAsBinary);
+                var fixedGeometry = NetTopologySuite.Geometries.Utilities.GeometryFixer.Fix(sysGeometry);
                 var item = await context.BuildingDetailsV2.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);
                 item.Geometry = geometryAsBinary;
-                item.SysGeometry = wkbReader.Read(geometryAsBinary);;
+                item.SysGeometry = fixedGeometry;
                 item.Version = message.Message.Provenance.Timestamp;
                 UpdateHash(item, message);
             });
@@ -217,12 +225,13 @@ namespace BuildingRegistry.Projections.Legacy.BuildingDetailV2
             When<Envelope<BuildingMergerWasRealized>>(async (context, message, ct) =>
             {
                 var geometryAsBinary = message.Message.ExtendedWkbGeometry.ToByteArray();
-
+                var sysGeometry = wkbReader.Read(geometryAsBinary);
+                var fixedGeometry = NetTopologySuite.Geometries.Utilities.GeometryFixer.Fix(sysGeometry);
                 var building = new BuildingDetailItemV2(
                     message.Message.BuildingPersistentLocalId,
                     BuildingGeometryMethod.MeasuredByGrb,
                     geometryAsBinary,
-                    wkbReader.Read(geometryAsBinary),
+                    fixedGeometry,
                     BuildingStatus.Realized,
                     false,
                     message.Message.Provenance.Timestamp);
