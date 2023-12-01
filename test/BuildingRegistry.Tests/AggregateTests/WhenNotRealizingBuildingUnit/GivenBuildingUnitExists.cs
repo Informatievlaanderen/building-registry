@@ -91,14 +91,15 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenNotRealizingBuildingUnit
         {
             var command = Fixture.Create<NotRealizeBuildingUnit>();
 
-            var buildingUnit = new BuildingUnitBuilder(Fixture)
+            var commonBuildingUnit = new BuildingUnitBuilder(Fixture)
                 .WithStatus(BuildingUnitStatus.Planned)
+                .WithFunction(BuildingRegistry.Legacy.BuildingUnitFunction.Common)
                 .Build();
 
             var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
                 .WithBuildingPersistentLocalId(command.BuildingPersistentLocalId)
                 .WithBuildingStatus(BuildingStatus.Realized)
-                .WithBuildingUnit(buildingUnit)
+                .WithBuildingUnit(commonBuildingUnit)
                 .Build();
 
             Assert(new Scenario()

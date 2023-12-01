@@ -53,7 +53,6 @@ namespace BuildingRegistry.Tests
             {
                 var functions = new List<BuildingUnitFunction>
                 {
-                    BuildingUnitFunction.Common,
                     BuildingUnitFunction.Unknown,
                 };
 

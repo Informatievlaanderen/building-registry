@@ -96,5 +96,44 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRetiringBuildingUnit
                     new Fact(new BuildingStreamId(command.BuildingPersistentLocalId), new BuildingUnitWasNotRealizedV2(command.BuildingPersistentLocalId, commonBuildingUnitPersistentLocalId))
                 ));
         }
+
+        [Fact]
+        public void WithPlannedAndRetiredCommonBuildingUnits_ThenPlannedCommonBuildingUnitWasNotRealized()
+        {
+            var command = Fixture.Create<RetireBuildingUnit>();
+
+            var plannedCommonBuildingUnitPersistentLocalId = Fixture.Create<BuildingUnitPersistentLocalId>();
+
+            var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
+                .WithBuildingPersistentLocalId(command.BuildingPersistentLocalId)
+                .WithBuildingStatus(BuildingStatus.Realized)
+                .WithBuildingUnit(
+                    BuildingRegistry.Legacy.BuildingUnitStatus.Realized,
+                    command.BuildingUnitPersistentLocalId,
+                    BuildingUnitFunction.Unknown)
+                .WithBuildingUnit(
+                    BuildingRegistry.Legacy.BuildingUnitStatus.Realized,
+                    Fixture.Create<BuildingUnitPersistentLocalId>(),
+                    BuildingUnitFunction.Unknown)
+                .WithBuildingUnit(
+                    BuildingRegistry.Legacy.BuildingUnitStatus.Planned,
+                    plannedCommonBuildingUnitPersistentLocalId,
+                    BuildingUnitFunction.Common)
+                .WithBuildingUnit(
+                    BuildingRegistry.Legacy.BuildingUnitStatus.Retired,
+                    Fixture.Create<BuildingUnitPersistentLocalId>(),
+                    BuildingUnitFunction.Common)
+                .Build();
+
+            Assert(new Scenario()
+                .Given(
+                    new BuildingStreamId(Fixture.Create<BuildingPersistentLocalId>()),
+                    buildingWasMigrated)
+                .When(command)
+                .Then(
+                    new Fact(new BuildingStreamId(command.BuildingPersistentLocalId), new BuildingUnitWasRetiredV2(command.BuildingPersistentLocalId, command.BuildingUnitPersistentLocalId)),
+                    new Fact(new BuildingStreamId(command.BuildingPersistentLocalId), new BuildingUnitWasNotRealizedV2(command.BuildingPersistentLocalId, plannedCommonBuildingUnitPersistentLocalId))
+                ));
+        }
     }
 }
