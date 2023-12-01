@@ -1,6 +1,5 @@
 namespace BuildingRegistry.Tests.AggregateTests.WhenMigratingBuilding
 {
-    using System.Collections.Generic;
     using System.Linq;
     using AutoFixture;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
@@ -9,19 +8,12 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenMigratingBuilding
     using Building;
     using Building.Commands;
     using Building.Events;
-    using BuildingRegistry.Legacy;
     using Extensions;
     using FluentAssertions;
     using Xunit;
     using Xunit.Abstractions;
-    using Building = Building.Building;
-    using BuildingGeometry = BuildingRegistry.Legacy.BuildingGeometry;
-    using BuildingUnit = Building.Commands.BuildingUnit;
-    using BuildingUnitFunction = BuildingRegistry.Legacy.BuildingUnitFunction;
-    using BuildingUnitId = BuildingRegistry.Legacy.BuildingUnitId;
     using BuildingUnitPosition = BuildingRegistry.Legacy.BuildingUnitPosition;
     using BuildingUnitPositionGeometryMethod = BuildingRegistry.Legacy.BuildingUnitPositionGeometryMethod;
-    using BuildingUnitStatus = BuildingRegistry.Legacy.BuildingUnitStatus;
     using ExtendedWkbGeometry = BuildingRegistry.Legacy.ExtendedWkbGeometry;
 
     public class GivenNoBuildingExists : BuildingRegistryTest

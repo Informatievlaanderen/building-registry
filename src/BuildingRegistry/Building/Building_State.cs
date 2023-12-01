@@ -1,5 +1,6 @@
 namespace BuildingRegistry.Building
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
     using Be.Vlaanderen.Basisregisters.AggregateSource.Snapshotting;
@@ -97,7 +98,54 @@ namespace BuildingRegistry.Building
                 BuildingGeometryMethod.Parse(@event.GeometryMethod));
             IsRemoved = @event.IsRemoved;
 
-            foreach (var buildingUnit in @event.BuildingUnits)
+            var nonCommonBuildingUnits = @event.BuildingUnits.Where(x => x.Function != BuildingUnitFunction.Common);
+            var commonBuildingUnits = @event.BuildingUnits.Where(x => x.Function == BuildingUnitFunction.Common).ToList();
+
+            var commonBuildingUnit = commonBuildingUnits.FirstOrDefault();
+            if (commonBuildingUnits.Count > 1)
+            {
+                var nonRemovedCommonBuildingUnits = commonBuildingUnits.Where(x => !x.IsRemoved).ToList();
+                commonBuildingUnit = nonRemovedCommonBuildingUnits.FirstOrDefault();
+
+                if (nonRemovedCommonBuildingUnits.Count > 1)
+                {
+                    var activeBuildingUnitStatuses = new[] { BuildingStatus.Planned, BuildingStatus.Realized };
+
+                    var plannedOrRealizedCommonBuildingUnits = nonRemovedCommonBuildingUnits
+                        .Where(x => activeBuildingUnitStatuses.Contains(BuildingStatus.Parse(x.Status)))
+                        .ToList();
+                    commonBuildingUnit = plannedOrRealizedCommonBuildingUnits.FirstOrDefault();
+
+                    if (plannedOrRealizedCommonBuildingUnits.Count > 1)
+                    {
+                        throw new InvalidOperationException(
+                            $"Building {@event.BuildingPersistentLocalId} contains more than one active common building unit.");
+                    }
+
+                    if (commonBuildingUnit is null)
+                    {
+                        var notRealizedOrRetiredCommonBuildingUnits = nonRemovedCommonBuildingUnits
+                            .Where(x =>!activeBuildingUnitStatuses.Contains(BuildingStatus.Parse(x.Status)))
+                            .ToList();
+
+                        commonBuildingUnit = notRealizedOrRetiredCommonBuildingUnits
+                            .OrderByDescending(x => x.BuildingUnitPersistentLocalId)
+                            .FirstOrDefault();
+                    }
+                }
+                else if (commonBuildingUnit is null)
+                {
+                    commonBuildingUnit = commonBuildingUnits
+                        .OrderByDescending(x => x.BuildingUnitPersistentLocalId)
+                        .FirstOrDefault();
+                }
+            }
+
+            var buildingUnits = commonBuildingUnit is not null
+                ? nonCommonBuildingUnits.Concat(new[] { commonBuildingUnit })
+                : nonCommonBuildingUnits;
+
+            foreach (var buildingUnit in buildingUnits)
             {
                 var newBuildingUnit = BuildingUnit.Migrate(
                     ApplyChange,
