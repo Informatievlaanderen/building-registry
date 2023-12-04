@@ -1,3 +1,15 @@
+# [3.97.0](https://github.com/informatievlaanderen/building-registry/compare/v3.96.3...v3.97.0) (2023-12-04)
+
+
+### Bug Fixes
+
+* multiple common building units in BuildingWasMigrated ([c97c617](https://github.com/informatievlaanderen/building-registry/commit/c97c617420836c2e73d46b6679729277cd59180c))
+
+
+### Features
+
+* add integrationdb ksql scripts ([2517d4c](https://github.com/informatievlaanderen/building-registry/commit/2517d4c2589baade4aa24bb277e9d179f4d0ca7d))
+
 ## [3.96.3](https://github.com/informatievlaanderen/building-registry/compare/v3.96.2...v3.96.3) (2023-11-22)
 
 
