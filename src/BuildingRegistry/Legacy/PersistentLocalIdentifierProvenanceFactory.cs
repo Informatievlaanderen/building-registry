@@ -6,6 +6,7 @@ namespace BuildingRegistry.Legacy
     using Commands.Crab;
     using NodaTime;
 
+    [Obsolete("This is a legacy class and should not be used anymore.")]
     public class PersistentLocalIdentifierProvenanceFactory : IProvenanceFactory<Building>
     {
         private static readonly List<Type> AllowedTypes = new List<Type>

@@ -4,6 +4,7 @@ namespace BuildingRegistry.Legacy
     using System.Collections.Generic;
     using Be.Vlaanderen.Basisregisters.CommandHandling;
 
+    [Obsolete("This is a legacy class and should not be used anymore.")]
     public static class CommandMessageExtensions
     {
         public static void AddMetadata(this CommandMessage commandMessage, string key, object value)

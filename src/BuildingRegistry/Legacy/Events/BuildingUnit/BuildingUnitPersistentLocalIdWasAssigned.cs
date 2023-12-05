@@ -6,6 +6,7 @@ namespace BuildingRegistry.Legacy.Events
     using Newtonsoft.Json;
     using NodaTime;
 
+    [Obsolete("CRAB events are obsolete.")]
     [EventTags(EventTag.For.Sync)]
     [EventName("BuildingUnitPersistentLocalIdentifierWasAssigned")]
     [EventDescription("De gebouweenheid kreeg een persistente lokale identificator toegekend.")]

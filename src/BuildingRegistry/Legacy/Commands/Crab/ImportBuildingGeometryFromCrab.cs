@@ -8,6 +8,7 @@ namespace BuildingRegistry.Legacy.Commands.Crab
     using Be.Vlaanderen.Basisregisters.Utilities;
     using Legacy.Crab;
 
+    [Obsolete("This is a legacy command and should not be used anymore.")]
     public class ImportBuildingGeometryFromCrab : IHasCrabProvenance
     {
         private static readonly Guid Namespace = new Guid("f2d68df2-c23b-4db7-9f31-34dd45eca87b");

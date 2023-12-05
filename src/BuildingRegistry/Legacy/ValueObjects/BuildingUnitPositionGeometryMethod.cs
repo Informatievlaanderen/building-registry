@@ -2,6 +2,7 @@ namespace BuildingRegistry.Legacy
 {
     using System;
 
+    [Obsolete("This is a legacy valueobject and should not be used anymore.")]
     public struct BuildingUnitPositionGeometryMethod
     {
         public static readonly BuildingUnitPositionGeometryMethod AppointedByAdministrator = new BuildingUnitPositionGeometryMethod("AppointedByAdministrator");

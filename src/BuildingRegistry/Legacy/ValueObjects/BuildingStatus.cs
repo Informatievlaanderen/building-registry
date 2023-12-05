@@ -1,6 +1,8 @@
 namespace BuildingRegistry.Legacy
 {
     using System;
+
+    [Obsolete("This is a legacy valueobject and should not be used anymore.")]
     public enum BuildingStatus
     {
         Planned = 0,

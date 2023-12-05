@@ -12,6 +12,7 @@ namespace BuildingRegistry.Legacy
     using Commands.Crab;
     using SqlStreamStore;
 
+    [Obsolete("This is a legacy class and should not be used anymore.")]
     public sealed class BuildingCommandHandlerModule : CommandHandlerModule
     {
         private readonly Func<IBuildings> _getBuildings;

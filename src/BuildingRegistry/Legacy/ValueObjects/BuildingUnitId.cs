@@ -6,6 +6,7 @@ namespace BuildingRegistry.Legacy
     using Be.Vlaanderen.Basisregisters.Generators.Guid;
     using Newtonsoft.Json;
 
+    [Obsolete("This is a legacy valueobject and should not be used anymore.")]
     public class BuildingUnitId : GuidValueObject<BuildingUnitId>
     {
         private static readonly Guid Namespace = new Guid("50609103-0399-4717-b8e9-e13986bc5370");

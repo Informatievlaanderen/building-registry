@@ -1,8 +1,10 @@
 namespace BuildingRegistry.Legacy
 {
+    using System;
     using System.Collections.Generic;
     using Be.Vlaanderen.Basisregisters.Crab;
 
+    [Obsolete("This is a legacy class and should not be used anymore.")]
     public class CrabAddressPositionComparer : IComparer<CrabAddressPositionOrigin?>
     {
         private readonly Dictionary<CrabAddressPositionOrigin, int> _addressPositionQualityByOrigins = new Dictionary<CrabAddressPositionOrigin, int>

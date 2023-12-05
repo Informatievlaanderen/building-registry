@@ -5,6 +5,7 @@ namespace BuildingRegistry.Legacy.Events
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Newtonsoft.Json;
 
+    [Obsolete("CRAB events are obsolete.")]
     [EventTags(EventTag.For.Sync)]
     [EventName("BuildingBecameComplete")]
     [EventDescription("Het gebouw voldoet aan het informatiemodel (wegens volledig).")]

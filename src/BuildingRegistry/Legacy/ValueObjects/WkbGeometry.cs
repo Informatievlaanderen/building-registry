@@ -7,6 +7,7 @@ namespace BuildingRegistry.Legacy
     using NetTopologySuite.IO;
     using Newtonsoft.Json;
 
+    [Obsolete("This is a legacy valueobject and should not be used anymore.")]
     public class WkbGeometry : ByteArrayValueObject<WkbGeometry>
     {
         public const int SridLambert72 = 31370;
@@ -19,6 +20,7 @@ namespace BuildingRegistry.Legacy
         public override string ToString() => Value.ToHexString();
     }
 
+    [Obsolete("This is a legacy valueobject and should not be used anymore.")]
     public class ExtendedWkbGeometry : ByteArrayValueObject<ExtendedWkbGeometry>
     {
         private static readonly WKBReader WkbReader = WKBReaderFactory.Create();

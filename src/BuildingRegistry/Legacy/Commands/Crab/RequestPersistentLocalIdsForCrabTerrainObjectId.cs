@@ -6,6 +6,7 @@ namespace BuildingRegistry.Legacy.Commands.Crab
     using Be.Vlaanderen.Basisregisters.Generators.Guid;
     using Be.Vlaanderen.Basisregisters.Utilities;
 
+    [Obsolete("This is a legacy command and should not be used anymore.")]
     public class RequestPersistentLocalIdsForCrabTerrainObjectId
     {
         private static readonly Guid Namespace = new Guid("d238d19f-7a23-4376-8a32-803e1aaabf6b");

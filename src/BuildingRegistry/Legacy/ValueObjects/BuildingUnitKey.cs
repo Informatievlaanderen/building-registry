@@ -5,6 +5,7 @@ namespace BuildingRegistry.Legacy
     using Be.Vlaanderen.Basisregisters.Crab;
     using Newtonsoft.Json;
 
+    [Obsolete("This is a legacy valueobject and should not be used anymore.")]
     public struct BuildingUnitKeyType
     {
         public int Building { get; }
@@ -23,6 +24,7 @@ namespace BuildingRegistry.Legacy
         public override string ToString() => $"{Building}_{HouseNumber}_{Subaddress}";
     }
 
+    [Obsolete("This is a legacy valueobject and should not be used anymore.")]
     public class BuildingUnitKey : StructDataTypeValueObject<BuildingUnitKey, BuildingUnitKeyType>
     {
         public BuildingUnitKey([JsonProperty("value")] BuildingUnitKeyType value) : base(value)

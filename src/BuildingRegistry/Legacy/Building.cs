@@ -14,6 +14,7 @@ namespace BuildingRegistry.Legacy
     using NetTopologySuite.IO;
     using NodaTime;
 
+    [Obsolete("This is a legacy class and should not be used anymore.")]
     public partial class Building
     {
         private static readonly WKBReader WkbReader = WKBReaderFactory.Create();

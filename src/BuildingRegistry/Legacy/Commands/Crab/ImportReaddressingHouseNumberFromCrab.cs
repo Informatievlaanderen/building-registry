@@ -7,6 +7,7 @@ namespace BuildingRegistry.Legacy.Commands.Crab
     using Be.Vlaanderen.Basisregisters.Utilities;
     using Legacy.Crab;
 
+    [Obsolete("This is a legacy command and should not be used anymore.")]
     public class ImportReaddressingHouseNumberFromCrab
     {
         private static readonly Guid Namespace = new Guid("d68f43de-d158-498b-a438-c66d7394eb3e");
