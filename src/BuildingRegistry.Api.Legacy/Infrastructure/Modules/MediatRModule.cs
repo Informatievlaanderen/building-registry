@@ -12,12 +12,8 @@ namespace BuildingRegistry.Api.Legacy.Infrastructure.Modules
 
     public class MediatRModule : Module
     {
-        private readonly bool _useProjectionsV2;
-
-        public MediatRModule(bool useProjectionsV2)
-        {
-            _useProjectionsV2 = useProjectionsV2;
-        }
+        public MediatRModule()
+        { }
 
         protected override void Load(ContainerBuilder builder)
         {
@@ -26,26 +22,13 @@ namespace BuildingRegistry.Api.Legacy.Infrastructure.Modules
                 .As<IMediator>()
                 .InstancePerLifetimeScope();
 
-            if (_useProjectionsV2)
-            {
-                builder.RegisterType<BuildingCountHandlerV2>().AsImplementedInterfaces();
-                builder.RegisterType<GetDetailHandlerV2>().AsImplementedInterfaces();
-                builder.RegisterType<ListHandlerV2>().AsImplementedInterfaces();
+            builder.RegisterType<BuildingCountHandlerV2>().AsImplementedInterfaces();
+            builder.RegisterType<GetDetailHandlerV2>().AsImplementedInterfaces();
+            builder.RegisterType<ListHandlerV2>().AsImplementedInterfaces();
 
-                builder.RegisterType<BuildingUnit.Count.CountHandlerV2>().AsImplementedInterfaces();
-                builder.RegisterType<GetBuildingUnitDetailHandlerV2>().AsImplementedInterfaces();
-                builder.RegisterType<BuildingUnit.List.BuildingUnitListHandlerV2>().AsImplementedInterfaces();
-            }
-            else
-            {
-                builder.RegisterType<BuildingCountHandler>().AsImplementedInterfaces();
-                builder.RegisterType<GetDetailHandler>().AsImplementedInterfaces();
-                builder.RegisterType<ListHandler>().AsImplementedInterfaces();
-
-                builder.RegisterType<BuildingUnit.Count.BuildingUnitCountHandler>().AsImplementedInterfaces();
-                builder.RegisterType<GetBuildingUnitDetailHandler>().AsImplementedInterfaces();
-                builder.RegisterType<BuildingUnit.List.BuildingUnitListHandler>().AsImplementedInterfaces();
-            }
+            builder.RegisterType<BuildingUnit.Count.CountHandlerV2>().AsImplementedInterfaces();
+            builder.RegisterType<GetBuildingUnitDetailHandlerV2>().AsImplementedInterfaces();
+            builder.RegisterType<BuildingUnit.List.BuildingUnitListHandlerV2>().AsImplementedInterfaces();
 
             builder.RegisterType<CrabGebouwenHandler>().AsImplementedInterfaces();
             builder.RegisterType<BuildingSyncHandler>().AsImplementedInterfaces();
