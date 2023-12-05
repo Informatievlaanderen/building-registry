@@ -7,12 +7,8 @@ namespace BuildingRegistry.Api.Extract.Infrastructure.Modules
 
     public class MediatRModule : Module
     {
-        private readonly bool _useProjectionsV2;
-
-        public MediatRModule(bool useProjectionsV2)
-        {
-            _useProjectionsV2 = useProjectionsV2;
-        }
+        public MediatRModule()
+        { }
 
         protected override void Load(ContainerBuilder builder)
         {
@@ -21,15 +17,8 @@ namespace BuildingRegistry.Api.Extract.Infrastructure.Modules
                 .As<IMediator>()
                 .InstancePerLifetimeScope();
 
-            if (_useProjectionsV2)
-            {
-                builder.RegisterType<GetBuildingsHandlerV2>().AsImplementedInterfaces();
-                builder.RegisterType<GetBuildingUnitAddressLinksHandler>().AsImplementedInterfaces();
-            }
-            else
-            {
-                builder.RegisterType<GetBuildingsHandler>().AsImplementedInterfaces();
-            }
+            builder.RegisterType<GetBuildingsHandlerV2>().AsImplementedInterfaces();
+            builder.RegisterType<GetBuildingUnitAddressLinksHandler>().AsImplementedInterfaces();
         }
     }
 }
