@@ -11,7 +11,6 @@ namespace BuildingRegistry.Api.Oslo.Building.Query
     using Converters;
     using Infrastructure.ParcelMatching;
     using Microsoft.EntityFrameworkCore;
-    using NetTopologySuite.Geometries;
     using Projections.Legacy;
     using Projections.Legacy.BuildingDetailV2;
 
