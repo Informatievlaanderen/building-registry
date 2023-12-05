@@ -6,6 +6,7 @@ namespace BuildingRegistry.Legacy
     using Newtonsoft.Json;
     using NodaTime;
 
+    [Obsolete("This is a legacy valueobject and should not be used anymore.")]
     public class ReaddressingBeginDate : StructDataTypeValueObject<ReaddressingBeginDate, LocalDate>, IComparable
     {
         public ReaddressingBeginDate([JsonProperty("value")] LocalDate readdressingBeginDate) : base(readdressingBeginDate)  { }

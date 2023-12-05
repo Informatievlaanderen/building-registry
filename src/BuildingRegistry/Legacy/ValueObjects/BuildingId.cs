@@ -5,6 +5,7 @@ namespace BuildingRegistry.Legacy
     using Be.Vlaanderen.Basisregisters.Crab;
     using Newtonsoft.Json;
 
+    [Obsolete("This is a legacy valueobject and should not be used anymore.")]
     public class BuildingId : GuidValueObject<BuildingId>
     {
         public BuildingId([JsonProperty("value")] Guid buildingId) : base(buildingId) { }

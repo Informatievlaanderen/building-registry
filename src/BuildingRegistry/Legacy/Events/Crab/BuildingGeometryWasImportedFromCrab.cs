@@ -1,42 +1,44 @@
 namespace BuildingRegistry.Legacy.Events.Crab
 {
+    using System;
     using Be.Vlaanderen.Basisregisters.Crab;
     using Be.Vlaanderen.Basisregisters.EventHandling;
     using Legacy.Crab;
     using Newtonsoft.Json;
     using NodaTime;
 
+    [Obsolete("CRAB events are obsolete.")]
     [EventName("BuildingGeometryWasImportedFromCrab")]
     [EventDescription("Legacy event om tblgebouwgeometrie en tblgebouwgeometrie_hist te importeren.")]
     public class BuildingGeometryWasImportedFromCrab : ICrabEvent, IHasCrabKey<int>, IMessage
     {
         [EventPropertyDescription("CRAB-identificator van de gebouwgeometrie.")]
         public int BuildingGeometryId { get; }
-        
+
         [EventPropertyDescription("CRAB-identificator van het terreinobject.")]
         public int TerrainObjectId { get; }
-        
+
         [EventPropertyDescription("Gebouwgeometrie.")]
         public string Geometry { get; }
-        
+
         [EventPropertyDescription("Methode gebruikt voor bepalen van de gebouwgeometrie.")]
         public CrabBuildingGeometryMethod BuildingGeometryMethod { get; }
-        
+
         [EventPropertyDescription("Datum waarop het object is ontstaan in werkelijkheid.")]
         public LocalDateTime? BeginDateTime { get; }
-        
+
         [EventPropertyDescription("Datum waarop het object in werkelijkheid ophoudt te bestaan.")]
         public LocalDateTime? EndDateTime { get; }
-        
+
         [EventPropertyDescription("Tijdstip waarop het object werd ingevoerd in de databank.")]
         public Instant Timestamp { get; }
-        
+
         [EventPropertyDescription("Operator door wie het object werd ingevoerd in de databank.")]
         public string Operator { get; }
-        
-        [EventPropertyDescription("Bewerking waarmee het object werd ingevoerd in de databank.")] 
+
+        [EventPropertyDescription("Bewerking waarmee het object werd ingevoerd in de databank.")]
         public CrabModification? Modification { get; }
-        
+
         [EventPropertyDescription("Organisatie die het object heeft ingevoerd in de databank.")]
         public CrabOrganisation? Organisation { get; }
 

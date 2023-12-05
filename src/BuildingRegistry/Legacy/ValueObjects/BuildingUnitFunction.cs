@@ -2,6 +2,7 @@ namespace BuildingRegistry.Legacy
 {
     using System;
 
+    [Obsolete("This is a legacy valueobject and should not be used anymore.")]
     public struct BuildingUnitFunction
     {
         public static readonly BuildingUnitFunction Common = new BuildingUnitFunction("Common");

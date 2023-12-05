@@ -1,9 +1,11 @@
 namespace BuildingRegistry.Legacy
 {
+    using System;
     using System.Collections.Generic;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
     using Newtonsoft.Json;
 
+    [Obsolete("This is a legacy valueobject and should not be used anymore.")]
     public class BuildingUnitPosition : ValueObject<BuildingUnitPosition>
     {
         public ExtendedWkbGeometry Geometry { get; }

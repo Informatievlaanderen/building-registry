@@ -10,6 +10,7 @@ namespace BuildingRegistry.Legacy
     using Events.Crab;
     using NodaTime;
 
+    [Obsolete("This is a legacy class and should not be used anymore.")]
     public partial class BuildingUnit : Entity
     {
         private static readonly List<CrabAddressPositionOrigin> CrabAppointedAddressPositionOrigins = new List<CrabAddressPositionOrigin>

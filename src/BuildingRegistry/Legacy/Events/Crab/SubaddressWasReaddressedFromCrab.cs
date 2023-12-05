@@ -1,39 +1,41 @@
 namespace BuildingRegistry.Legacy.Events.Crab
 {
+    using System;
     using Be.Vlaanderen.Basisregisters.Crab;
     using Be.Vlaanderen.Basisregisters.EventHandling;
     using Legacy.Crab;
     using Newtonsoft.Json;
     using NodaTime;
 
+    [Obsolete("CRAB events are obsolete.")]
     [EventName("SubaddressWasReaddressedFromCrab")]
     [EventDescription("Legacy event om heradressing van subadressen te importeren.")]
     public class SubaddressWasReaddressedFromCrab : IMessage
     {
         [EventPropertyDescription("CRAB-identificator van het terreinobject.")]
         public int TerrainObjectId { get; }
-        
+
         [EventPropertyDescription("Identificator van een individuele heradressering.")]
         public int ReaddressingId { get; }
-        
+
         [EventPropertyDescription("Datum waarop de heradressering plaatsvond in werkelijkheid.")]
         public LocalDate BeginDate { get; }
-        
+
         [EventPropertyDescription("CRAB-identificator van de terreinobject-huisnummerrelatie vóór hernummering.")]
         public int OldTerrainObjectHouseNumberId { get; }
-        
+
         [EventPropertyDescription("Aard van het adres vóór hernummering.")]
         public string OldAddressNature { get; }
-        
+
         [EventPropertyDescription("CRAB-identificator van het subadres (bus- of appartementsnummer) vóór hernummering.")]
         public int OldSubaddressId { get; }
-        
+
         [EventPropertyDescription("CRAB-identificator van de terreinobject-huisnummerrelatie na hernummering.")]
         public int NewTerrainObjectHouseNumberId { get; }
-        
+
         [EventPropertyDescription("Aard van het adres na hernummering.")]
         public string NewAddressNature { get; }
-        
+
         [EventPropertyDescription("CRAB-identificator van het subadres (bus- of appartementsnummer) na hernummering.")]
         public int NewSubaddressId { get; }
 

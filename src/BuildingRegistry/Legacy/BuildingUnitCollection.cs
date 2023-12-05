@@ -4,6 +4,7 @@ namespace BuildingRegistry.Legacy
     using System.Collections.Generic;
     using System.Linq;
 
+    [Obsolete("This is a legacy class and should not be used anymore.")]
     public class BuildingUnitCollection
     {
         private readonly List<BuildingUnit> _allBuildingUnits = new List<BuildingUnit>();

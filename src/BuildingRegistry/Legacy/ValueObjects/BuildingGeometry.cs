@@ -1,5 +1,6 @@
 namespace BuildingRegistry.Legacy
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
@@ -7,6 +8,7 @@ namespace BuildingRegistry.Legacy
     using NetTopologySuite.IO;
     using Newtonsoft.Json;
 
+    [Obsolete("This is a legacy valueobject and should not be used anymore.")]
     public class BuildingGeometry : ValueObject<BuildingGeometry>
     {
         private readonly WKBReader _wkbReader = new WKBReader { HandleSRID = true };

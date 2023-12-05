@@ -1,10 +1,12 @@
 namespace BuildingRegistry.Legacy
 {
+    using System;
     using System.Collections.Generic;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
     using Be.Vlaanderen.Basisregisters.Crab;
     using Newtonsoft.Json;
 
+    [Obsolete("This is a legacy valueobject and should not be used anymore.")]
     public class AssignBuildingUnitPersistentLocalIdForCrabTerrainObjectId : ValueObject<AssignBuildingUnitPersistentLocalIdForCrabTerrainObjectId>
     {
         public CrabTerrainObjectHouseNumberId CrabTerrainObjectHouseNumberId { get; }

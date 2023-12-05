@@ -5,6 +5,7 @@ namespace BuildingRegistry.Legacy
     using System.Linq;
     using System.Runtime.Serialization;
 
+    [Obsolete("This is a legacy class and should not be used anymore.")]
     [Serializable]
     public sealed class DeduplicatedBuildingUnitPersistentLocalIdCollection : HashSet<AssignBuildingUnitPersistentLocalIdForCrabTerrainObjectId>
     {
@@ -95,7 +96,7 @@ namespace BuildingRegistry.Legacy
             //    }
             //}
         }
-        
+
         private DeduplicatedBuildingUnitPersistentLocalIdCollection(SerializationInfo info, StreamingContext context)
             : base(info, context)
         { }

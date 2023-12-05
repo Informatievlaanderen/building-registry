@@ -5,6 +5,7 @@ namespace BuildingRegistry.Legacy.Events
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Newtonsoft.Json;
 
+    [Obsolete("CRAB events are obsolete.")]
     [EventTags(EventTag.For.Sync)]
     [EventName("BuildingWasRealized")]
     [EventDescription("Het gebouw kreeg status 'gerealiseerd'.")]

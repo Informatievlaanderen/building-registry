@@ -5,6 +5,7 @@ namespace BuildingRegistry.Legacy
     using Commands.Crab;
     using NodaTime;
 
+    [Obsolete("This is a legacy class and should not be used anymore.")]
     public class BuildingProvenanceFactory : CrabProvenanceFactory, IProvenanceFactory<Building>
     {
         public bool CanCreateFrom<TCommand>() => typeof(IHasCrabProvenance).IsAssignableFrom(typeof(TCommand));

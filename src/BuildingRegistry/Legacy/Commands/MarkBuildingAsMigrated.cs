@@ -6,6 +6,7 @@ namespace BuildingRegistry.Legacy.Commands
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Be.Vlaanderen.Basisregisters.Utilities;
 
+    [Obsolete("This is a legacy command and should not be used anymore.")]
     public class MarkBuildingAsMigrated : IHasCommandProvenance
     {
         private static readonly Guid Namespace = new Guid("90d3c976-3fa8-4f93-8c73-fef103706e05");

@@ -6,6 +6,7 @@ namespace BuildingRegistry.Legacy.Events
     using Newtonsoft.Json;
     using NodaTime;
 
+    [Obsolete("CRAB events are obsolete.")]
     [EventTags(EventTag.For.Sync)]
     [EventName("CommonBuildingUnitWasAdded")]
     [EventDescription("De gebouweenheid met functie 'gemeenschappelijk deel' werd toegevoegd.")]
