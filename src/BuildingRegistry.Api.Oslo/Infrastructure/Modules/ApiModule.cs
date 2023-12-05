@@ -42,7 +42,7 @@ namespace BuildingRegistry.Api.Oslo.Infrastructure.Modules
             _services.RegisterModule(new DataDogModule(_configuration));
 
             builder
-                .RegisterModule(new MediatRModule(useProjectionsV2))
+                .RegisterModule(new MediatRModule())
                 .RegisterModule(new ParcelMatchingModule(_configuration, useProjectionsV2))
                 .RegisterModule(new LegacyModule(_configuration, _services, _loggerFactory))
                 .RegisterModule(new SyndicationModule(_configuration, _services, _loggerFactory))
