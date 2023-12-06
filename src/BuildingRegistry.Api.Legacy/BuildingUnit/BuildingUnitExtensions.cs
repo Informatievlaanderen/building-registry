@@ -3,31 +3,28 @@ namespace BuildingRegistry.Api.Legacy.BuildingUnit
     using System;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy.Gebouweenheid;
-    using BuildingUnitFunction = BuildingRegistry.Building.BuildingUnitFunction;
-    using BuildingUnitPositionGeometryMethod = BuildingRegistry.Building.BuildingUnitPositionGeometryMethod;
-    using BuildingUnitStatus = BuildingRegistry.Building.BuildingUnitStatus;
-    using Legacy = BuildingRegistry.Legacy;
+    using BuildingRegistry.Legacy;
 
     public static class BuildingUnitStatusExtensions
     {
-        public static GebouweenheidStatus ConvertFromBuildingUnitStatus(this Legacy.BuildingUnitStatus status)
+        public static GebouweenheidStatus ConvertFromBuildingUnitStatus(this BuildingUnitStatus status)
         {
-            if (status == Legacy.BuildingUnitStatus.NotRealized)
+            if (status == BuildingUnitStatus.NotRealized)
             {
                 return GebouweenheidStatus.NietGerealiseerd;
             }
 
-            if (status == Legacy.BuildingUnitStatus.Planned)
+            if (status == BuildingUnitStatus.Planned)
             {
                 return GebouweenheidStatus.Gepland;
             }
 
-            if (status == Legacy.BuildingUnitStatus.Realized)
+            if (status == BuildingUnitStatus.Realized)
             {
                 return GebouweenheidStatus.Gerealiseerd;
             }
 
-            if (status == Legacy.BuildingUnitStatus.Retired)
+            if (status == BuildingUnitStatus.Retired)
             {
                 return GebouweenheidStatus.Gehistoreerd;
             }
@@ -35,49 +32,49 @@ namespace BuildingRegistry.Api.Legacy.BuildingUnit
             throw new ArgumentOutOfRangeException(nameof(status), status, null);
         }
 
-        public static Legacy.BuildingUnitStatus ConvertFromGebouweenheidStatus(this GebouweenheidStatus status)
+        public static BuildingUnitStatus ConvertFromGebouweenheidStatus(this GebouweenheidStatus status)
         {
             if (status == GebouweenheidStatus.NietGerealiseerd)
             {
-                return Legacy.BuildingUnitStatus.NotRealized;
+                return BuildingUnitStatus.NotRealized;
             }
 
             if (status == GebouweenheidStatus.Gepland)
             {
-                return Legacy.BuildingUnitStatus.Planned;
+                return BuildingUnitStatus.Planned;
             }
 
             if (status == GebouweenheidStatus.Gerealiseerd)
             {
-                return Legacy.BuildingUnitStatus.Realized;
+                return BuildingUnitStatus.Realized;
             }
 
             if (status == GebouweenheidStatus.Gehistoreerd)
             {
-                return Legacy.BuildingUnitStatus.Retired;
+                return BuildingUnitStatus.Retired;
             }
 
             throw new ArgumentOutOfRangeException(nameof(status), status, null);
         }
 
-        public static GebouweenheidStatus Map(this BuildingUnitStatus status)
+        public static GebouweenheidStatus Map(this BuildingRegistry.Building.BuildingUnitStatus status)
         {
-            if (BuildingUnitStatus.Planned == status)
+            if (BuildingRegistry.Building.BuildingUnitStatus.Planned == status)
             {
                 return GebouweenheidStatus.Gepland;
             }
 
-            if (BuildingUnitStatus.NotRealized == status)
+            if (BuildingRegistry.Building.BuildingUnitStatus.NotRealized == status)
             {
                 return GebouweenheidStatus.NietGerealiseerd;
             }
 
-            if (BuildingUnitStatus.Realized == status)
+            if (BuildingRegistry.Building.BuildingUnitStatus.Realized == status)
             {
                 return GebouweenheidStatus.Gerealiseerd;
             }
 
-            if (BuildingUnitStatus.Retired == status)
+            if (BuildingRegistry.Building.BuildingUnitStatus.Retired == status)
             {
                 return GebouweenheidStatus.Gehistoreerd;
             }
@@ -88,22 +85,7 @@ namespace BuildingRegistry.Api.Legacy.BuildingUnit
 
     public static class BuildingUnitPositionGeometryMethodExtensions
     {
-        public static PositieGeometrieMethode ConvertFromBuildingUnitGeometryMethod(this Legacy.BuildingUnitPositionGeometryMethod method)
-        {
-            if (method == Legacy.BuildingUnitPositionGeometryMethod.DerivedFromObject)
-            {
-                return PositieGeometrieMethode.AfgeleidVanObject;
-            }
-
-            if (method == Legacy.BuildingUnitPositionGeometryMethod.AppointedByAdministrator)
-            {
-                return PositieGeometrieMethode.AangeduidDoorBeheerder;
-            }
-
-            throw new ArgumentOutOfRangeException(nameof(method), method, null);
-        }
-
-        public static PositieGeometrieMethode Map(this BuildingUnitPositionGeometryMethod method)
+        public static PositieGeometrieMethode ConvertFromBuildingUnitGeometryMethod(this BuildingUnitPositionGeometryMethod method)
         {
             if (method == BuildingUnitPositionGeometryMethod.DerivedFromObject)
             {
@@ -117,23 +99,38 @@ namespace BuildingRegistry.Api.Legacy.BuildingUnit
 
             throw new ArgumentOutOfRangeException(nameof(method), method, null);
         }
+
+        public static PositieGeometrieMethode Map(this BuildingRegistry.Building.BuildingUnitPositionGeometryMethod method)
+        {
+            if (method == BuildingRegistry.Building.BuildingUnitPositionGeometryMethod.DerivedFromObject)
+            {
+                return PositieGeometrieMethode.AfgeleidVanObject;
+            }
+
+            if (method == BuildingRegistry.Building.BuildingUnitPositionGeometryMethod.AppointedByAdministrator)
+            {
+                return PositieGeometrieMethode.AangeduidDoorBeheerder;
+            }
+
+            throw new ArgumentOutOfRangeException(nameof(method), method, null);
+        }
     }
 
     public static class BuildingUnitFunctionExtensions
     {
-        public static GebouweenheidFunctie? ConvertFromBuildingUnitFunction(this Legacy.BuildingUnitFunction? function)
+        public static GebouweenheidFunctie? ConvertFromBuildingUnitFunction(this BuildingUnitFunction? function)
         {
             if (function == null)
             {
                 return null;
             }
 
-            if (function == Legacy.BuildingUnitFunction.Unknown)
+            if (function == BuildingUnitFunction.Unknown)
             {
                 return GebouweenheidFunctie.NietGekend;
             }
 
-            if (function == Legacy.BuildingUnitFunction.Common)
+            if (function == BuildingUnitFunction.Common)
             {
                 return GebouweenheidFunctie.GemeenschappelijkDeel;
             }
@@ -141,39 +138,24 @@ namespace BuildingRegistry.Api.Legacy.BuildingUnit
             throw new ArgumentOutOfRangeException(nameof(function), function, null);
         }
 
-        public static Legacy.BuildingUnitFunction ConvertFromGebouweenheidFunctie(this GebouweenheidFunctie functie)
-        {
-            if (functie == GebouweenheidFunctie.NietGekend)
-            {
-                return Legacy.BuildingUnitFunction.Unknown;
-            }
-
-            if (functie == GebouweenheidFunctie.GemeenschappelijkDeel)
-            {
-                return Legacy.BuildingUnitFunction.Common;
-            }
-
-            throw new ArgumentOutOfRangeException(nameof(functie), functie, null);
-        }
-
-        public static BuildingUnitFunction Map(this GebouweenheidFunctie functie)
+        public static BuildingRegistry.Building.BuildingUnitFunction Map(this GebouweenheidFunctie functie)
         {
             return functie switch
             {
-                GebouweenheidFunctie.NietGekend => BuildingUnitFunction.Unknown,
-                GebouweenheidFunctie.GemeenschappelijkDeel => BuildingUnitFunction.Common,
+                GebouweenheidFunctie.NietGekend => BuildingRegistry.Building.BuildingUnitFunction.Unknown,
+                GebouweenheidFunctie.GemeenschappelijkDeel => BuildingRegistry.Building.BuildingUnitFunction.Common,
                 _ => throw new ArgumentOutOfRangeException(nameof(functie), functie, null)
             };
         }
 
-        public static GebouweenheidFunctie? Map(this BuildingUnitFunction function)
+        public static GebouweenheidFunctie? Map(this BuildingRegistry.Building.BuildingUnitFunction function)
         {
-            if (BuildingUnitFunction.Common == function)
+            if (BuildingRegistry.Building.BuildingUnitFunction.Common == function)
             {
                 return GebouweenheidFunctie.GemeenschappelijkDeel;
             }
 
-            if (BuildingUnitFunction.Unknown == function)
+            if (BuildingRegistry.Building.BuildingUnitFunction.Unknown == function)
             {
                 return GebouweenheidFunctie.NietGekend;
             }

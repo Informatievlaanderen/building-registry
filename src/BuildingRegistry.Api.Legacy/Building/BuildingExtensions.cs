@@ -2,29 +2,27 @@ namespace BuildingRegistry.Api.Legacy.Building
 {
     using System;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy.Gebouw;
-    using BuildingGeometryMethod = BuildingRegistry.Building.BuildingGeometryMethod;
-    using BuildingStatus = BuildingRegistry.Building.BuildingStatus;
-    using Legacy = BuildingRegistry.Legacy;
+    using BuildingRegistry.Legacy;
 
     public static class BuildingStatusExtensions
     {
-        public static GebouwStatus ConvertFromBuildingStatus(this Legacy.BuildingStatus status)
+        public static GebouwStatus ConvertFromBuildingStatus(this BuildingStatus status)
         {
             switch (status)
             {
-                case Legacy.BuildingStatus.Planned:
+                case BuildingStatus.Planned:
                     return GebouwStatus.Gepland;
 
-                case Legacy.BuildingStatus.UnderConstruction:
+                case BuildingStatus.UnderConstruction:
                     return GebouwStatus.InAanbouw;
 
-                case Legacy.BuildingStatus.Realized:
+                case BuildingStatus.Realized:
                     return GebouwStatus.Gerealiseerd;
 
-                case Legacy.BuildingStatus.Retired:
+                case BuildingStatus.Retired:
                     return GebouwStatus.Gehistoreerd;
 
-                case Legacy.BuildingStatus.NotRealized:
+                case BuildingStatus.NotRealized:
                     return GebouwStatus.NietGerealiseerd;
 
                 default:
@@ -32,25 +30,25 @@ namespace BuildingRegistry.Api.Legacy.Building
             }
         }
 
-        public static GebouwStatus Map(this BuildingStatus status)
+        public static GebouwStatus Map(this BuildingRegistry.Building.BuildingStatus status)
         {
-            if (status == BuildingStatus.Planned)
+            if (status == BuildingRegistry.Building.BuildingStatus.Planned)
             {
                 return GebouwStatus.Gepland;
             }
-            if (status == BuildingStatus.UnderConstruction)
+            if (status == BuildingRegistry.Building.BuildingStatus.UnderConstruction)
             {
                 return GebouwStatus.InAanbouw;
             }
-            if (status == BuildingStatus.NotRealized)
+            if (status == BuildingRegistry.Building.BuildingStatus.NotRealized)
             {
                 return GebouwStatus.NietGerealiseerd;
             }
-            if (status == BuildingStatus.Realized)
+            if (status == BuildingRegistry.Building.BuildingStatus.Realized)
             {
                 return GebouwStatus.Gerealiseerd;
             }
-            if (status == BuildingStatus.Retired)
+            if (status == BuildingRegistry.Building.BuildingStatus.Retired)
             {
                 return GebouwStatus.Gehistoreerd;
             }
@@ -58,48 +56,24 @@ namespace BuildingRegistry.Api.Legacy.Building
             throw new ArgumentOutOfRangeException(nameof(status), status, null);
         }
 
-        public static Legacy.BuildingStatus ConvertFromGebouwStatus(this GebouwStatus status)
+        public static BuildingRegistry.Building.BuildingStatus MapToV2(this GebouwStatus status)
         {
             switch (status)
             {
                 case GebouwStatus.Gepland:
-                    return Legacy.BuildingStatus.Planned;
+                    return BuildingRegistry.Building.BuildingStatus.Planned;
 
                 case GebouwStatus.InAanbouw:
-                    return Legacy.BuildingStatus.UnderConstruction;
+                    return BuildingRegistry.Building.BuildingStatus.UnderConstruction;
 
                 case GebouwStatus.Gerealiseerd:
-                    return Legacy.BuildingStatus.Realized;
+                    return BuildingRegistry.Building.BuildingStatus.Realized;
 
                 case GebouwStatus.Gehistoreerd:
-                    return Legacy.BuildingStatus.Retired;
+                    return BuildingRegistry.Building.BuildingStatus.Retired;
 
                 case GebouwStatus.NietGerealiseerd:
-                    return Legacy.BuildingStatus.NotRealized;
-
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(status), status, null);
-            }
-        }
-
-        public static BuildingStatus MapToV2(this GebouwStatus status)
-        {
-            switch (status)
-            {
-                case GebouwStatus.Gepland:
-                    return BuildingStatus.Planned;
-
-                case GebouwStatus.InAanbouw:
-                    return BuildingStatus.UnderConstruction;
-
-                case GebouwStatus.Gerealiseerd:
-                    return BuildingStatus.Realized;
-
-                case GebouwStatus.Gehistoreerd:
-                    return BuildingStatus.Retired;
-
-                case GebouwStatus.NietGerealiseerd:
-                    return BuildingStatus.NotRealized;
+                    return BuildingRegistry.Building.BuildingStatus.NotRealized;
 
                 default:
                     throw new ArgumentOutOfRangeException(nameof(status), status, null);
@@ -109,14 +83,14 @@ namespace BuildingRegistry.Api.Legacy.Building
 
     public static class BuildingGeometryMethodExtensions
     {
-        public static GeometrieMethode ConvertFromBuildingGeometryMethod(this Legacy.BuildingGeometryMethod method)
+        public static GeometrieMethode ConvertFromBuildingGeometryMethod(this BuildingGeometryMethod method)
         {
             switch (method)
             {
-                case Legacy.BuildingGeometryMethod.Outlined:
+                case BuildingGeometryMethod.Outlined:
                     return GeometrieMethode.Ingeschetst;
 
-                case Legacy.BuildingGeometryMethod.MeasuredByGrb:
+                case BuildingGeometryMethod.MeasuredByGrb:
                     return GeometrieMethode.IngemetenGRB;
 
                 default:
@@ -124,14 +98,14 @@ namespace BuildingRegistry.Api.Legacy.Building
             }
         }
 
-        public static GeometrieMethode Map(this BuildingGeometryMethod method)
+        public static GeometrieMethode Map(this BuildingRegistry.Building.BuildingGeometryMethod method)
         {
-            if (method == BuildingGeometryMethod.Outlined)
+            if (method == BuildingRegistry.Building.BuildingGeometryMethod.Outlined)
             {
                 return GeometrieMethode.Ingeschetst;
             }
 
-            if (method == BuildingGeometryMethod.MeasuredByGrb)
+            if (method == BuildingRegistry.Building.BuildingGeometryMethod.MeasuredByGrb)
             {
                 return GeometrieMethode.IngemetenGRB;
             }
