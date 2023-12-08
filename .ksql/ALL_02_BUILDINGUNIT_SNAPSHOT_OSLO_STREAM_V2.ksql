@@ -1,0 +1,13 @@
+CREATE OR REPLACE STREAM IF NOT EXISTS buildingunit_snapshot_oslo_stream_v2 (
+  messagekey varchar KEY,
+  headers ARRAY<STRUCT<key STRING, value BYTES>> HEADERS,
+  `@context` varchar,
+  `@type` varchar,
+  identificator STRUCT<id varchar, naamruimte varchar, objectId varchar, versieId varchar>,
+  gebouweenheidPositie STRUCT<geometrie STRUCT<type varchar, gml varchar>, positieGeometrieMethode varchar>,
+  gebouweenheidStatus varchar,
+  functie varchar,
+  gebouw STRUCT<objectId varchar, detail varchar>,
+  adressen ARRAY<STRUCT<objectId varchar, detail varchar>>,
+  afwijkingvastgesteld boolean
+) WITH (KAFKA_TOPIC='buildingunit.snapshot.oslo', VALUE_FORMAT='JSON');
