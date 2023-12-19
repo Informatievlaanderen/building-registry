@@ -4,7 +4,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
     using System.Collections.ObjectModel;
     using System.Linq;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
-    using Be.Vlaanderen.Basisregisters.ProjectionHandling.Runner.MigrationExtensions;
+    using Be.Vlaanderen.Basisregisters.ProjectionHandling.Runner.SqlServer.MigrationExtensions;
     using BuildingRegistry.Legacy;
     using Infrastructure;
     using Microsoft.EntityFrameworkCore;

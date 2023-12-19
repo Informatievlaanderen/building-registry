@@ -10,7 +10,7 @@ Be.Vlaanderen.Basisregisters.MessageHandling.Kafka.Producer
 Be.Vlaanderen.Basisregisters.MessageHandling.Kafka.Consumer.SqlServer
 
 Be.Vlaanderen.Basisregisters.ProjectionHandling.Connector
-Be.Vlaanderen.Basisregisters.ProjectionHandling.Runner
+Be.Vlaanderen.Basisregisters.ProjectionHandling.Runner.SqlServer
 Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Autofac
 
 Serilog
