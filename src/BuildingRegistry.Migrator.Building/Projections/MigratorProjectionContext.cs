@@ -1,6 +1,7 @@
 namespace BuildingRegistry.Migrator.Building.Projections
 {
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.Runner;
+    using Be.Vlaanderen.Basisregisters.ProjectionHandling.Runner.SqlServer;
     using BuildingRegistry.Infrastructure;
     using Microsoft.EntityFrameworkCore;
 
@@ -17,7 +18,7 @@ namespace BuildingRegistry.Migrator.Building.Projections
         public override string ProjectionStateSchema => Schema.MigrateBuilding;
     }
 
-    public class MigratorProjectionContextFactory : RunnerDbContextMigrationFactory<MigratorProjectionContext>
+    public class MigratorProjectionContextFactory : SqlServerRunnerDbContextMigrationFactory<MigratorProjectionContext>
     {
         public MigratorProjectionContextFactory()
             : this("Events")
