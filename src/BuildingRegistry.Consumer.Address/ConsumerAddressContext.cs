@@ -4,15 +4,15 @@ namespace BuildingRegistry.Consumer.Address
     using System.IO;
     using System.Linq;
     using System.Reflection;
-    using Be.Vlaanderen.Basisregisters.ProjectionHandling.Runner.MigrationExtensions;
-    using Building.Datastructures;
+    using Be.Vlaanderen.Basisregisters.EntityFrameworkCore.EntityTypeConfiguration;
+    using Be.Vlaanderen.Basisregisters.MessageHandling.Kafka.Consumer.SqlServer;
+    using Be.Vlaanderen.Basisregisters.ProjectionHandling.Runner.SqlServer.MigrationExtensions;
     using Building;
+    using Building.Datastructures;
     using BuildingRegistry.Infrastructure;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.EntityFrameworkCore.Design;
     using Microsoft.Extensions.Configuration;
-    using Be.Vlaanderen.Basisregisters.EntityFrameworkCore.EntityTypeConfiguration;
-    using Be.Vlaanderen.Basisregisters.MessageHandling.Kafka.Consumer.SqlServer;
 
     public class ConsumerAddressContext : SqlServerConsumerDbContext<ConsumerAddressContext>, IAddresses
     {

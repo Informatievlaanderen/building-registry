@@ -1,13 +1,13 @@
 namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
 {
-    using Infrastructure;
-    using Microsoft.EntityFrameworkCore;
-    using Microsoft.EntityFrameworkCore.Metadata.Builders;
     using System;
     using System.Collections.ObjectModel;
     using System.Linq;
-    using Be.Vlaanderen.Basisregisters.ProjectionHandling.Runner.MigrationExtensions;
+    using Be.Vlaanderen.Basisregisters.ProjectionHandling.Runner.SqlServer.MigrationExtensions;
     using BuildingRegistry.Legacy;
+    using Infrastructure;
+    using Microsoft.EntityFrameworkCore;
+    using Microsoft.EntityFrameworkCore.Metadata.Builders;
     using NodaTime;
 
     public class BuildingUnitSyndicationItem

@@ -4,7 +4,7 @@ namespace BuildingRegistry.Projections.Syndication
     using System.IO;
     using Address;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.Runner;
-    using Be.Vlaanderen.Basisregisters.ProjectionHandling.Runner.MigrationExtensions;
+    using Be.Vlaanderen.Basisregisters.ProjectionHandling.Runner.SqlServer.MigrationExtensions;
     using Infrastructure;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.EntityFrameworkCore.Design;

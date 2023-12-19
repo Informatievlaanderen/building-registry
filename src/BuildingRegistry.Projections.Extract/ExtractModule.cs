@@ -1,11 +1,11 @@
 namespace BuildingRegistry.Projections.Extract
 {
     using System;
-    using Microsoft.Data.SqlClient;
-    using Be.Vlaanderen.Basisregisters.DataDog.Tracing.Sql.EntityFrameworkCore;
     using Autofac;
-    using Be.Vlaanderen.Basisregisters.ProjectionHandling.Runner.MigrationExtensions;
+    using Be.Vlaanderen.Basisregisters.DataDog.Tracing.Sql.EntityFrameworkCore;
+    using Be.Vlaanderen.Basisregisters.ProjectionHandling.Runner.SqlServer.MigrationExtensions;
     using Infrastructure;
+    using Microsoft.Data.SqlClient;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
@@ -54,7 +54,7 @@ namespace BuildingRegistry.Projections.Extract
                     {
                         if (enableRetry)
                             sqlServerOptions.EnableRetryOnFailure();
-                            
+
                         sqlServerOptions.MigrationsHistoryTable(MigrationTables.Extract, Schema.Extract);
                     })
                     .UseExtendedSqlServerMigrations());
