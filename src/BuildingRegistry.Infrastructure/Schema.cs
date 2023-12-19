@@ -17,6 +17,7 @@ namespace BuildingRegistry.Infrastructure
         public const string BackOfficeProjections = "BuildingRegistryBackOfficeProjections";
         public const string Producer = "BuildingRegistryProducer";
         public const string ProducerSnapshotOslo = "BuildingRegistryProducerSnapshotOslo";
+        public const string Integration = "integration";
     }
 
     public static class MigrationTables
@@ -35,5 +36,6 @@ namespace BuildingRegistry.Infrastructure
         public const string MigratorProjection = "__EFMigrationsHistoryMigrationProjection";
         public const string Producer = "__EFMigrationsHistoryProducer";
         public const string ProducerSnapshotOslo = "__EFMigrationsHistoryProducerSnapshotOslo";
+        public const string Integration = "__EFMigrationsHistoryIntegrationMunicipality";
     }
 }

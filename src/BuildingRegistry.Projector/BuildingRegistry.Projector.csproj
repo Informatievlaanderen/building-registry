@@ -32,6 +32,7 @@
     <ProjectReference Include="..\BuildingRegistry.Consumer.Read.Parcel\BuildingRegistry.Consumer.Read.Parcel.csproj" />
     <ProjectReference Include="..\BuildingRegistry.Infrastructure\BuildingRegistry.Infrastructure.csproj" />
     <ProjectReference Include="..\BuildingRegistry.Projections.Extract\BuildingRegistry.Projections.Extract.csproj" />
+    <ProjectReference Include="..\BuildingRegistry.Projections.Integration\BuildingRegistry.Projections.Integration.csproj" />
     <ProjectReference Include="..\BuildingRegistry.Projections.LastChangedList\BuildingRegistry.Projections.LastChangedList.csproj" />
     <ProjectReference Include="..\BuildingRegistry.Projections.Legacy\BuildingRegistry.Projections.Legacy.csproj" />
     <ProjectReference Include="..\BuildingRegistry.Projections.Wfs\BuildingRegistry.Projections.Wfs.csproj" />
