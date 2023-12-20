@@ -36,7 +36,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Requests.BuildingUnit
                 new BuildingUnitPersistentLocalId(BuildingUnitPersistentLocalId),
                 Request.PositieGeometrieMethode.Map(),
                 string.IsNullOrWhiteSpace(Request.Positie) ? null : Request.Positie.ToExtendedWkbGeometry(),
-                Provenance);
+                CommandProvenance);
         }
     }
 }

@@ -29,7 +29,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Requests.BuildingUnit
         /// <returns>RetireBuildingUnit.</returns>
         public RetireBuildingUnit ToCommand()
         {
-            return new RetireBuildingUnit(BuildingPersistentLocalId, new BuildingUnitPersistentLocalId(BuildingUnitPersistentLocalId), Provenance);
+            return new RetireBuildingUnit(BuildingPersistentLocalId, new BuildingUnitPersistentLocalId(BuildingUnitPersistentLocalId), CommandProvenance);
         }
     }
 }

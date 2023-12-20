@@ -24,7 +24,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Requests.Building
         /// <returns>NotRealizeBuilding.</returns>
         public NotRealizeBuilding ToCommand()
         {
-            return new NotRealizeBuilding(new BuildingPersistentLocalId(BuildingPersistentLocalId), Provenance);
+            return new NotRealizeBuilding(new BuildingPersistentLocalId(BuildingPersistentLocalId), CommandProvenance);
         }
     }
 }

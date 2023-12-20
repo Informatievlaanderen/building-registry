@@ -26,7 +26,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Requests.Building
         /// <returns>RealizeBuilding.</returns>
         public RealizeBuilding ToCommand()
         {
-            return new RealizeBuilding(new BuildingPersistentLocalId(BuildingPersistentLocalId), Provenance);
+            return new RealizeBuilding(new BuildingPersistentLocalId(BuildingPersistentLocalId), CommandProvenance);
         }
     }
 }

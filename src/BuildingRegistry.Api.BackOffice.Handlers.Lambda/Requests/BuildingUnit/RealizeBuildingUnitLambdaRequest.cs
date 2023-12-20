@@ -29,7 +29,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Requests.BuildingUnit
         /// <returns>RealizeBuildingUnit.</returns>
         public RealizeBuildingUnit ToCommand()
         {
-            return new RealizeBuildingUnit(BuildingPersistentLocalId, new BuildingUnitPersistentLocalId(BuildingUnitPersistentLocalId), Provenance);
+            return new RealizeBuildingUnit(BuildingPersistentLocalId, new BuildingUnitPersistentLocalId(BuildingUnitPersistentLocalId), CommandProvenance);
         }
     }
 }

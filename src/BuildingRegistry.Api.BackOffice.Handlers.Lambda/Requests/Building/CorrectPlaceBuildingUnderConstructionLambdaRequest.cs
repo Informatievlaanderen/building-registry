@@ -26,7 +26,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Requests.Building
         /// <returns>CorrectBuildingPlaceUnderConstruction.</returns>
         public CorrectBuildingPlaceUnderConstruction ToCommand()
         {
-            return new CorrectBuildingPlaceUnderConstruction(new BuildingPersistentLocalId(BuildingPersistentLocalId), Provenance);
+            return new CorrectBuildingPlaceUnderConstruction(new BuildingPersistentLocalId(BuildingPersistentLocalId), CommandProvenance);
         }
     }
 }

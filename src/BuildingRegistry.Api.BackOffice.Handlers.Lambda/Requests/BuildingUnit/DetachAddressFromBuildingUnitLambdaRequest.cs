@@ -38,7 +38,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Requests.BuildingUnit
                 BuildingPersistentLocalId,
                 new BuildingUnitPersistentLocalId(BuildingUnitPersistentLocalId),
                 new AddressPersistentLocalId(addressPersistentLocalId),
-                Provenance);
+                CommandProvenance);
         }
     }
 }

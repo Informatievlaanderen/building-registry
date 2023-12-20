@@ -30,7 +30,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Requests.Building
         {
             return new DemolishBuilding(new BuildingPersistentLocalId(BuildingPersistentLocalId),
                 Request.GrbData.ToBuildingGrbData(),
-                Provenance);
+                CommandProvenance);
         }
     }
 }

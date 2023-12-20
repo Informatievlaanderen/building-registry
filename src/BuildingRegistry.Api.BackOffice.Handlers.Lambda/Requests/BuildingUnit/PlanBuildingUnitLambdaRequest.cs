@@ -34,7 +34,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Requests.BuildingUnit
                 string.IsNullOrWhiteSpace(Request.Positie) ? null : Request.Positie.ToExtendedWkbGeometry(),
                 Request.Functie.Map(),
                 Request.AfwijkingVastgesteld,
-                Provenance);
+                CommandProvenance);
         }
     }
 }
