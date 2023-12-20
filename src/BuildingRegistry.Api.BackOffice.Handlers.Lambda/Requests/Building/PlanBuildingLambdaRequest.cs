@@ -29,7 +29,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Requests.Building
             return new PlanBuilding(
                 BuildingPersistentLocalId,
                 Request.GeometriePolygoon.ToExtendedWkbGeometry(),
-                Provenance);
+                CommandProvenance);
         }
     }
 }

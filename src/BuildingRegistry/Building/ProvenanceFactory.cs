@@ -3,6 +3,7 @@ namespace BuildingRegistry.Building
     using System;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
+    using NodaTime;
 
     public class ProvenanceFactory<TAggregateRoot> : IProvenanceFactory<TAggregateRoot>
         where TAggregateRoot : IAggregateRootEntity

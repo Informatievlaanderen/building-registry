@@ -27,7 +27,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Requests.BuildingUnit
         /// <returns>CorrectBuildingUnitRealization.</returns>
         public CorrectBuildingUnitRegularization ToCommand()
         {
-            return new CorrectBuildingUnitRegularization(BuildingPersistentLocalId, new BuildingUnitPersistentLocalId(BuildingUnitPersistentLocalId), Provenance);
+            return new CorrectBuildingUnitRegularization(BuildingPersistentLocalId, new BuildingUnitPersistentLocalId(BuildingUnitPersistentLocalId), CommandProvenance);
         }
     }
 }

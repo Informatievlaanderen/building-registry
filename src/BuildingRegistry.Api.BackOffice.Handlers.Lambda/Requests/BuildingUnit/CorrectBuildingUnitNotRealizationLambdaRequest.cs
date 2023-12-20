@@ -34,7 +34,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Requests.BuildingUnit
             return new CorrectBuildingUnitNotRealization(
                 BuildingPersistentLocalId,
                 new BuildingUnitPersistentLocalId(BuildingUnitPersistentLocalId),
-                Provenance);
+                CommandProvenance);
         }
     }
 }
