@@ -82,6 +82,7 @@ namespace BuildingRegistry.Projector.Infrastructure.Modules
 
             RegisterExtractProjectionsV2(builder);
             RegisterLegacyProjectionsV2(builder);
+            RegisterIntegrationProjections(builder);
             RegisterWmsProjectionsV2(builder);
             RegisterWfsProjectionsV2(builder);
         }
@@ -183,7 +184,11 @@ namespace BuildingRegistry.Projector.Infrastructure.Modules
                 .RegisterProjections<BuildingLatestItemProjections, IntegrationContext>(
                     context => new BuildingLatestItemProjections(context.Resolve<IOptions<IntegrationOptions>>()), ConnectedProjectionSettings.Default)
                 .RegisterProjections<BuildingVersionProjections, IntegrationContext>(
-                    context => new BuildingVersionProjections(context.Resolve<IOptions<IntegrationOptions>>()), ConnectedProjectionSettings.Default);
+                    context => new BuildingVersionProjections(context.Resolve<IOptions<IntegrationOptions>>()), ConnectedProjectionSettings.Default)
+                .RegisterProjections<BuildingUnitLatestItemProjections, IntegrationContext>(
+                    context => new BuildingUnitLatestItemProjections(context.Resolve<IOptions<IntegrationOptions>>()), ConnectedProjectionSettings.Default)
+                .RegisterProjections<BuildingUnitVersionProjections, IntegrationContext>(
+                    context => new BuildingUnitVersionProjections(context.Resolve<IOptions<IntegrationOptions>>()), ConnectedProjectionSettings.Default);
         }
 
         private void RegisterWmsProjectionsV2(ContainerBuilder builder)

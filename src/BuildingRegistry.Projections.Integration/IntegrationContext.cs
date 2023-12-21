@@ -4,8 +4,8 @@ namespace BuildingRegistry.Projections.Integration
     using System.Threading;
     using System.Threading.Tasks;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.Runner;
-    using Microsoft.EntityFrameworkCore;
     using BuildingRegistry.Infrastructure;
+    using Microsoft.EntityFrameworkCore;
     using NetTopologySuite.Geometries;
 
     public class IntegrationContext : RunnerDbContext<IntegrationContext>
@@ -14,6 +14,11 @@ namespace BuildingRegistry.Projections.Integration
 
         public DbSet<BuildingLatestItem> BuildingLatestItems => Set<BuildingLatestItem>();
         public DbSet<BuildingVersion> BuildingVersions => Set<BuildingVersion>();
+
+        public DbSet<BuildingUnitLatestItem> BuildingUnitLatestItems => Set<BuildingUnitLatestItem>();
+        public DbSet<BuildingUnitAddress> BuildingUnitAddresses => Set<BuildingUnitAddress>();
+
+        public DbSet<BuildingUnitVersion> BuildingUnitVersions => Set<BuildingUnitVersion>();
 
         private DbSet<MunicipalityGeometry> MunicipalityGeometries => Set<MunicipalityGeometry>();
 
@@ -25,6 +30,38 @@ namespace BuildingRegistry.Projections.Integration
 
             // What if multiple municipalities are found? Should we calculate an overlap and order by largest overlap?
             return municipalityGeometries.Count == 1 ? municipalityGeometries.Single().NisCode : null;
+        }
+
+        public async Task AddIdempotentBuildingUnitAddress(
+            BuildingUnitLatestItem buildingUnit,
+            int addressPersistentLocalId,
+            CancellationToken ct)
+        {
+            var buildingUnitAddress = await BuildingUnitAddresses.FindAsync(
+                new object[] { buildingUnit.BuildingUnitPersistentLocalId, addressPersistentLocalId }, ct);
+
+            if (buildingUnitAddress is null)
+            {
+                BuildingUnitAddresses.Add(new BuildingUnitAddress
+                {
+                    BuildingUnitPersistentLocalId = buildingUnit.BuildingUnitPersistentLocalId,
+                    AddressPersistentLocalId = addressPersistentLocalId
+                });
+            }
+        }
+
+        public async Task RemoveIdempotentBuildingUnitAddress(
+            BuildingUnitLatestItem buildingUnit,
+            int addressPersistentLocalId,
+            CancellationToken ct)
+        {
+            var buildingUnitAddress = await BuildingUnitAddresses.FindAsync(
+                new object[] { buildingUnit.BuildingUnitPersistentLocalId, addressPersistentLocalId }, ct);
+
+            if (buildingUnitAddress is not null)
+            {
+                BuildingUnitAddresses.Remove(buildingUnitAddress);
+            }
         }
 
         // This needs to be here to please EF

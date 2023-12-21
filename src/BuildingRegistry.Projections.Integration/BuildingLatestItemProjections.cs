@@ -34,8 +34,8 @@
                     NisCode = nisCode,
                     IsRemoved = message.Message.IsRemoved,
                     VersionTimestamp = message.Message.Provenance.Timestamp,
-                    Namespace = options.Value.Namespace,
-                    PuriId = $"{options.Value.Namespace}/{message.Message.BuildingPersistentLocalId}",
+                    Namespace = options.Value.BuildingNamespace,
+                    PuriId = $"{options.Value.BuildingNamespace}/{message.Message.BuildingPersistentLocalId}",
                     IdempotenceKey = message.Position
                 };
 
@@ -60,8 +60,8 @@
                     NisCode = nisCode,
                     IsRemoved = false,
                     VersionTimestamp = message.Message.Provenance.Timestamp,
-                    Namespace = options.Value.Namespace,
-                    PuriId = $"{options.Value.Namespace}/{message.Message.BuildingPersistentLocalId}",
+                    Namespace = options.Value.BuildingNamespace,
+                    PuriId = $"{options.Value.BuildingNamespace}/{message.Message.BuildingPersistentLocalId}",
                     IdempotenceKey = message.Position
                 };
 
@@ -86,8 +86,8 @@
                     NisCode = nisCode,
                     IsRemoved = false,
                     VersionTimestamp = message.Message.Provenance.Timestamp,
-                    Namespace = options.Value.Namespace,
-                    PuriId = $"{options.Value.Namespace}/{message.Message.BuildingPersistentLocalId}",
+                    Namespace = options.Value.BuildingNamespace,
+                    PuriId = $"{options.Value.BuildingNamespace}/{message.Message.BuildingPersistentLocalId}",
                     IdempotenceKey = message.Position
                 };
 
@@ -332,8 +332,8 @@
                     NisCode = nisCode,
                     IsRemoved = false,
                     VersionTimestamp = message.Message.Provenance.Timestamp,
-                    Namespace = options.Value.Namespace,
-                    PuriId = $"{options.Value.Namespace}/{message.Message.BuildingPersistentLocalId}",
+                    Namespace = options.Value.BuildingNamespace,
+                    PuriId = $"{options.Value.BuildingNamespace}/{message.Message.BuildingPersistentLocalId}",
                     IdempotenceKey = message.Position
                 };
 

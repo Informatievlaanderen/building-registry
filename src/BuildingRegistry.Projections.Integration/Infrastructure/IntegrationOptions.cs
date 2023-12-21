@@ -2,6 +2,7 @@
 {
     public class IntegrationOptions
     {
-        public string Namespace { get; set; }
+        public string BuildingNamespace { get; set; }
+        public string BuildingUnitNamespace { get; set; }
     }
 }
