@@ -1,12 +1,17 @@
 ﻿namespace BuildingRegistry.Projections.Integration.Building.Version
 {
+    using System;
+    using System.Threading.Tasks;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.Connector;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore;
     using Be.Vlaanderen.Basisregisters.Utilities.HexByteConvertor;
     using BuildingRegistry.Building;
     using BuildingRegistry.Building.Events;
-    using BuildingRegistry.Projections.Integration.Converters;
-    using BuildingRegistry.Projections.Integration.Infrastructure;
+    using Converters;
+    using Dapper;
+    using Infrastructure;
+    using Legacy.Events;
+    using Microsoft.Data.SqlClient;
     using Microsoft.Extensions.Options;
 
     [ConnectedProjectionName("Integratie gebouw versie")]
@@ -16,6 +21,324 @@
         public BuildingVersionProjections(IOptions<IntegrationOptions> options)
         {
             var wkbReader = WKBReaderFactory.Create();
+
+            #region Legacy
+
+            When<Envelope<BuildingWasRegistered>>(async (context, message, ct) =>
+            {
+                var buildingPersistentLocalId = await FindBuildingPersistentLocalId(
+                    options.Value,
+                    message.Message.BuildingId);
+
+                if (buildingPersistentLocalId is null)
+                {
+                    return;
+                }
+
+                var building = new BuildingVersion
+                {
+                    Position = message.Position,
+                    BuildingPersistentLocalId = buildingPersistentLocalId.Value,
+                    BuildingId = message.Message.BuildingId,
+                    VersionTimestamp = message.Message.Provenance.Timestamp,
+                    Namespace = options.Value.BuildingNamespace,
+                    PuriId = $"{options.Value.BuildingNamespace}/{buildingPersistentLocalId}"
+                };
+
+                await context
+                    .BuildingVersions
+                    .AddAsync(building, ct);
+            });
+
+            When<Envelope<BuildingPersistentLocalIdWasAssigned>>(async (context, message, ct) =>
+            {
+                await context.CreateNewBuildingVersion(
+                    message.Message.BuildingId,
+                    message,
+                    building =>
+                    {
+                        building.BuildingPersistentLocalId = message.Message.PersistentLocalId;
+                    },
+                    ct);
+            });
+
+            When<Envelope<BuildingWasRemoved>>(async (context, message, ct) =>
+            {
+                await context.CreateNewBuildingVersion(
+                    message.Message.BuildingId,
+                    message,
+                    building =>
+                    {
+                        building.IsRemoved = true;
+                    },
+                    ct);
+            });
+
+            #region Complete/Incomplete
+
+            When<Envelope<BuildingBecameComplete>>(async (context, message, ct) =>
+            {
+                await context.CreateNewBuildingVersion(
+                    message.Message.BuildingId,
+                    message,
+                    _ => { },
+                    ct);
+            });
+
+            When<Envelope<BuildingBecameIncomplete>>(async (context, message, ct) =>
+            {
+                await context.CreateNewBuildingVersion(
+                    message.Message.BuildingId,
+                    message,
+                    _ => { },
+                    ct);
+            });
+
+            #endregion
+
+            #region Status
+
+            When<Envelope<BuildingBecameUnderConstruction>>(async (context, message, ct) =>
+            {
+                await context.CreateNewBuildingVersion(
+                    message.Message.BuildingId,
+                    message,
+                    building =>
+                    {
+                        building.Status = BuildingStatus.UnderConstruction.Map();
+                    },
+                    ct);
+            });
+
+            When<Envelope<BuildingWasNotRealized>>(async (context, message, ct) =>
+            {
+                await context.CreateNewBuildingVersion(
+                    message.Message.BuildingId,
+                    message,
+                    building =>
+                    {
+                        building.Status = BuildingStatus.NotRealized.Map();
+                    },
+                    ct);
+            });
+
+            When<Envelope<BuildingWasPlanned>>(async (context, message, ct) =>
+            {
+                await context.CreateNewBuildingVersion(
+                    message.Message.BuildingId,
+                    message,
+                    building =>
+                    {
+                        building.Status = BuildingStatus.Planned.Map();
+                    },
+                    ct);
+            });
+
+            When<Envelope<BuildingWasRealized>>(async (context, message, ct) =>
+            {
+                await context.CreateNewBuildingVersion(
+                    message.Message.BuildingId,
+                    message,
+                    building =>
+                    {
+                        building.Status = BuildingStatus.Realized.Map();
+                    },
+                    ct);
+            });
+
+            When<Envelope<BuildingWasRetired>>(async (context, message, ct) =>
+            {
+                await context.CreateNewBuildingVersion(
+                    message.Message.BuildingId,
+                    message,
+                    building =>
+                    {
+                        building.Status = BuildingStatus.Retired.Map();
+                    },
+                    ct);
+            });
+
+            When<Envelope<BuildingWasCorrectedToNotRealized>>(async (context, message, ct) =>
+            {
+                await context.CreateNewBuildingVersion(
+                    message.Message.BuildingId,
+                    message,
+                    building =>
+                    {
+                        building.Status = BuildingStatus.NotRealized.Map();
+                    },
+                    ct);
+            });
+
+            When<Envelope<BuildingWasCorrectedToPlanned>>(async (context, message, ct) =>
+            {
+                await context.CreateNewBuildingVersion(
+                    message.Message.BuildingId,
+                    message,
+                    building =>
+                    {
+                        building.Status = BuildingStatus.Planned.Map();
+                    },
+                    ct);
+            });
+
+            When<Envelope<BuildingWasCorrectedToRetired>>(async (context, message, ct) =>
+            {
+                await context.CreateNewBuildingVersion(
+                    message.Message.BuildingId,
+                    message,
+                    building =>
+                    {
+                        building.Status = BuildingStatus.Retired.Map();
+                    },
+                    ct);
+            });
+
+            When<Envelope<BuildingWasCorrectedToRealized>>(async (context, message, ct) =>
+            {
+                await context.CreateNewBuildingVersion(
+                    message.Message.BuildingId,
+                    message,
+                    building =>
+                    {
+                        building.Status = BuildingStatus.Realized.Map();
+                    },
+                    ct);
+            });
+
+            When<Envelope<BuildingWasCorrectedToUnderConstruction>>(async (context, message, ct) =>
+            {
+                await context.CreateNewBuildingVersion(
+                    message.Message.BuildingId,
+                    message,
+                    building =>
+                    {
+                        building.Status = BuildingStatus.UnderConstruction.Map();
+                    },
+                    ct);
+            });
+
+            When<Envelope<BuildingStatusWasRemoved>>(async (context, message, ct) =>
+            {
+                await context.CreateNewBuildingVersion(
+                    message.Message.BuildingId,
+                    message,
+                    building =>
+                    {
+                        building.Status = null;
+                    },
+                    ct);
+            });
+
+            When<Envelope<BuildingStatusWasCorrectedToRemoved>>(async (context, message, ct) =>
+            {
+                await context.CreateNewBuildingVersion(
+                    message.Message.BuildingId,
+                    message,
+                    building =>
+                    {
+                        building.Status = null;
+                    },
+                    ct);
+            });
+
+            #endregion
+
+            #region Geometry
+
+            When<Envelope<BuildingGeometryWasRemoved>>(async (context, message, ct) =>
+            {
+                await context.CreateNewBuildingVersion(
+                    message.Message.BuildingId,
+                    message,
+                    building =>
+                    {
+                        building.Geometry = null;
+                        building.GeometryMethod = null;
+                        building.NisCode = null;
+                    },
+                    ct);
+            });
+
+            When<Envelope<BuildingWasMeasuredByGrb>>(async (context, message, ct) =>
+            {
+                var geometryAsBinary = message.Message.ExtendedWkbGeometry.ToByteArray();
+                var sysGeometry = wkbReader.Read(geometryAsBinary);
+
+                var nisCode = await context.FindNiscode(sysGeometry, ct);
+
+                await context.CreateNewBuildingVersion(
+                    message.Message.BuildingId,
+                    message,
+                    building =>
+                    {
+                        building.Geometry = sysGeometry;
+                        building.GeometryMethod = BuildingGeometryMethod.MeasuredByGrb.Map();
+                        building.NisCode = nisCode;
+                    },
+                    ct);
+            });
+
+            When<Envelope<BuildingWasOutlined>>(async (context, message, ct) =>
+            {
+                var geometryAsBinary = message.Message.ExtendedWkbGeometry.ToByteArray();
+                var sysGeometry = wkbReader.Read(geometryAsBinary);
+
+                var nisCode = await context.FindNiscode(sysGeometry, ct);
+
+                await context.CreateNewBuildingVersion(
+                    message.Message.BuildingId,
+                    message,
+                    building =>
+                    {
+                        building.Geometry = sysGeometry;
+                        building.GeometryMethod = BuildingGeometryMethod.Outlined.Map();
+                        building.NisCode = nisCode;
+                    },
+                    ct);
+            });
+
+            When<Envelope<BuildingMeasurementByGrbWasCorrected>>(async (context, message, ct) =>
+            {
+                var geometryAsBinary = message.Message.ExtendedWkbGeometry.ToByteArray();
+                var sysGeometry = wkbReader.Read(geometryAsBinary);
+
+                var nisCode = await context.FindNiscode(sysGeometry, ct);
+
+                await context.CreateNewBuildingVersion(
+                    message.Message.BuildingId,
+                    message,
+                    building =>
+                    {
+                        building.Geometry = sysGeometry;
+                        building.GeometryMethod = BuildingGeometryMethod.MeasuredByGrb.Map();
+                        building.NisCode = nisCode;
+                    },
+                    ct);
+            });
+
+            When<Envelope<BuildingOutlineWasCorrected>>(async (context, message, ct) =>
+            {
+                var geometryAsBinary = message.Message.ExtendedWkbGeometry.ToByteArray();
+                var sysGeometry = wkbReader.Read(geometryAsBinary);
+
+                var nisCode = await context.FindNiscode(sysGeometry, ct);
+
+                await context.CreateNewBuildingVersion(
+                    message.Message.BuildingId,
+                    message,
+                    building =>
+                    {
+                        building.Geometry = sysGeometry;
+                        building.GeometryMethod = BuildingGeometryMethod.Outlined.Map();
+                        building.NisCode = nisCode;
+                    },
+                    ct);
+            });
+
+            #endregion
+
+            #endregion
 
             When<Envelope<BuildingWasMigrated>>(async (context, message, ct) =>
             {
@@ -138,10 +461,7 @@
                 await context.CreateNewBuildingVersion(
                     message.Message.BuildingPersistentLocalId,
                     message,
-                    building =>
-                    {
-                        building.Status = BuildingStatus.UnderConstruction.Map();
-                    },
+                    building => { building.Status = BuildingStatus.UnderConstruction.Map(); },
                     ct);
             });
 
@@ -150,10 +470,7 @@
                 await context.CreateNewBuildingVersion(
                     message.Message.BuildingPersistentLocalId,
                     message,
-                    building =>
-                    {
-                        building.Status = BuildingStatus.Planned.Map();
-                    },
+                    building => { building.Status = BuildingStatus.Planned.Map(); },
                     ct);
             });
 
@@ -162,10 +479,7 @@
                 await context.CreateNewBuildingVersion(
                     message.Message.BuildingPersistentLocalId,
                     message,
-                    building =>
-                    {
-                        building.Status = BuildingStatus.Realized.Map();
-                    },
+                    building => { building.Status = BuildingStatus.Realized.Map(); },
                     ct);
             });
 
@@ -174,10 +488,7 @@
                 await context.CreateNewBuildingVersion(
                     message.Message.BuildingPersistentLocalId,
                     message,
-                    building =>
-                    {
-                        building.Status = BuildingStatus.UnderConstruction.Map();
-                    },
+                    building => { building.Status = BuildingStatus.UnderConstruction.Map(); },
                     ct);
             });
 
@@ -186,10 +497,7 @@
                 await context.CreateNewBuildingVersion(
                     message.Message.BuildingPersistentLocalId,
                     message,
-                    building =>
-                    {
-                        building.Status = BuildingStatus.NotRealized.Map();
-                    },
+                    building => { building.Status = BuildingStatus.NotRealized.Map(); },
                     ct);
             });
 
@@ -198,10 +506,7 @@
                 await context.CreateNewBuildingVersion(
                     message.Message.BuildingPersistentLocalId,
                     message,
-                    building =>
-                    {
-                        building.Status = BuildingStatus.Planned.Map();
-                    },
+                    building => { building.Status = BuildingStatus.Planned.Map(); },
                     ct);
             });
 
@@ -248,10 +553,7 @@
                 await context.CreateNewBuildingVersion(
                     message.Message.BuildingPersistentLocalId,
                     message,
-                    building =>
-                    {
-                        building.Status = BuildingStatus.Retired.Map();
-                    },
+                    building => { building.Status = BuildingStatus.Retired.Map(); },
                     ct);
             });
 
@@ -260,10 +562,7 @@
                 await context.CreateNewBuildingVersion(
                     message.Message.BuildingPersistentLocalId,
                     message,
-                    building =>
-                    {
-                        building.IsRemoved = true;
-                    },
+                    building => { building.IsRemoved = true; },
                     ct);
             });
 
@@ -281,7 +580,7 @@
                 await context.CreateNewBuildingVersion(
                     message.Message.BuildingPersistentLocalId,
                     message,
-                    _ => {  },
+                    _ => { },
                     ct);
             });
 
@@ -352,12 +651,27 @@
                 await context.CreateNewBuildingVersion(
                     message.Message.BuildingPersistentLocalId,
                     message,
-                    building =>
-                    {
-                        building.Status = BuildingStatus.Retired.Map();
-                    },
+                    building => { building.Status = BuildingStatus.Retired.Map(); },
                     ct);
             });
+        }
+
+        private async Task<int?> FindBuildingPersistentLocalId(
+            IntegrationOptions options,
+            Guid buildingId)
+        {
+            await using var connection = new SqlConnection(options.EventsConnectionString);
+
+            var sql = @"
+SELECT top 1 Json_Value(JsonData, '$.persistentLocalId') AS ""BuildingPersistentLocalId""
+FROM [building-registry-events].[BuildingRegistry].[Streams] as s
+INNER JOIN [building-registry-events].[BuildingRegistry].[Messages] as m
+    on s.IdInternal = m.StreamIdInternal and m.[Type] = 'BuildingPersistentLocalIdentifierWasAssigned'
+WHERE IdOriginal = @BuildingId";
+
+            var buildingPersistentLocalId = await connection.QuerySingleAsync<int>(sql, new { BuildingId = buildingId });
+
+            return buildingPersistentLocalId;
         }
     }
 }

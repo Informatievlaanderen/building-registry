@@ -18,12 +18,13 @@
         public long Position { get; set; }
 
         public Guid? BuildingUnitId { get; set; }
+        public Guid? BuildingId { get; set; }
         public int BuildingUnitPersistentLocalId { get; set; }
         public int BuildingPersistentLocalId { get; set; }
-        public string Status { get; set; }
+        public string? Status { get; set; }
         public string Function { get; set; }
-        public string GeometryMethod { get; set; }
-        public Geometry Geometry { get; set; }
+        public string? GeometryMethod { get; set; }
+        public Geometry? Geometry { get; set; }
         public bool HasDeviation { get; set; }
         public bool IsRemoved { get; set; }
 
@@ -60,6 +61,8 @@
             {
                 Position = newPosition,
 
+                BuildingUnitId = BuildingUnitId,
+                BuildingId = BuildingId,
                 BuildingUnitPersistentLocalId = BuildingUnitPersistentLocalId,
                 BuildingPersistentLocalId = BuildingPersistentLocalId,
                 Status = Status,
@@ -99,6 +102,8 @@
             builder.Property(x => x.Position).ValueGeneratedNever();
 
             builder.Property(x => x.Position).HasColumnName("position");
+            builder.Property(x => x.BuildingUnitId).HasColumnName("building_unit_id");
+            builder.Property(x => x.BuildingId).HasColumnName("building_id");
             builder.Property(x => x.BuildingUnitPersistentLocalId).HasColumnName("building_unit_persistent_local_id");
             builder.Property(x => x.BuildingPersistentLocalId).HasColumnName("building_persistent_local_id");
             builder.Property(x => x.Status).HasColumnName("status");

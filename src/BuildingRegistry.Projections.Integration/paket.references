@@ -10,5 +10,7 @@ Npgsql.EntityFrameworkCore.PostgreSQL.NetTopologySuite
 Be.Vlaanderen.Basisregisters.GrAr.Common
 Be.Vlaanderen.Basisregisters.GrAr.Legacy
 
+Dapper
+
 SourceLink.Embed.AllSourceFiles
 SourceLink.Copy.PdbFiles

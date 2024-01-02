@@ -14,6 +14,32 @@
     {
         public static async Task CreateNewBuildingUnitVersion<T>(
             this IntegrationContext context,
+            Guid buildingUnitId,
+            Envelope<T> message,
+            Action<BuildingUnitVersion> applyEventInfoOn,
+            CancellationToken ct) where T : IHasProvenance, IMessage
+        {
+            var buildingUnitVersion = await context.LatestPosition(buildingUnitId, ct);
+
+            if (buildingUnitVersion is null)
+            {
+                throw DatabaseItemNotFound(buildingUnitId);
+            }
+
+            var provenance = message.Message.Provenance;
+
+            var newBuildingUnitVersion = buildingUnitVersion.CloneAndApplyEventInfo(
+                message.Position,
+                provenance.Timestamp,
+                applyEventInfoOn);
+
+            await context
+                .BuildingUnitVersions
+                .AddAsync(newBuildingUnitVersion, ct);
+        }
+
+        public static async Task CreateNewBuildingUnitVersion<T>(
+            this IntegrationContext context,
             int buildingUnitPersistentLocalId,
             Envelope<T> message,
             Action<BuildingUnitVersion> applyEventInfoOn,
@@ -40,6 +66,22 @@
 
         private static async Task<BuildingUnitVersion?> LatestPosition(
             this IntegrationContext context,
+            Guid buildingUnitId,
+            CancellationToken ct)
+            => context
+                   .BuildingUnitVersions
+                   .Local
+                   .Where(x => x.BuildingUnitId == buildingUnitId)
+                   .OrderByDescending(x => x.Position)
+                   .FirstOrDefault()
+               ?? await context
+                   .BuildingUnitVersions
+                   .Where(x => x.BuildingUnitId == buildingUnitId)
+                   .OrderByDescending(x => x.Position)
+                   .FirstOrDefaultAsync(ct);
+
+        private static async Task<BuildingUnitVersion?> LatestPosition(
+            this IntegrationContext context,
             int buildingUnitPersistentLocalId,
             CancellationToken ct)
             => context
@@ -53,6 +95,9 @@
                    .Where(x => x.BuildingUnitPersistentLocalId == buildingUnitPersistentLocalId)
                    .OrderByDescending(x => x.Position)
                    .FirstOrDefaultAsync(ct);
+
+        private static ProjectionItemNotFoundException<BuildingUnitVersionProjections> DatabaseItemNotFound(Guid buildingUnitId)
+            => new(buildingUnitId.ToString("D"));
 
         private static ProjectionItemNotFoundException<BuildingUnitVersionProjections> DatabaseItemNotFound(int buildingUnitPersistentLocalId)
             => new(buildingUnitPersistentLocalId.ToString());

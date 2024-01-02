@@ -1,5 +1,7 @@
 ﻿namespace BuildingRegistry.Projections.Integration.BuildingUnit.Version
 {
+    using System;
+    using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Linq;
     using System.Threading.Tasks;
@@ -8,8 +10,11 @@
     using Be.Vlaanderen.Basisregisters.Utilities.HexByteConvertor;
     using BuildingRegistry.Building;
     using BuildingRegistry.Building.Events;
-    using BuildingRegistry.Projections.Integration.Converters;
-    using BuildingRegistry.Projections.Integration.Infrastructure;
+    using Converters;
+    using Dapper;
+    using Infrastructure;
+    using Legacy.Events;
+    using Microsoft.Data.SqlClient;
     using Microsoft.Extensions.Options;
 
     [ConnectedProjectionName("Integratie gebouweenheid latest item")]
@@ -22,7 +27,641 @@
 
             #region Legacy
 
+            #region Building
 
+            When<Envelope<BuildingWasRemoved>>(async (context, message, ct) =>
+            {
+                foreach (var buildingUnitId in message.Message.BuildingUnitIds)
+                {
+                    await context.CreateNewBuildingUnitVersion(
+                        buildingUnitId,
+                        message,
+                        buildingUnit =>
+                        {
+                            buildingUnit.IsRemoved = true;
+                            buildingUnit.LegacyAddresses.Clear();
+                            buildingUnit.Addresses.Clear();
+                        },
+                        ct);
+                }
+            });
+
+            When<Envelope<BuildingWasRetired>>(async (context, message, ct) =>
+            {
+                foreach (var buildingUnitId in message.Message.BuildingUnitIdsToNotRealize)
+                {
+                    await context.CreateNewBuildingUnitVersion(
+                        buildingUnitId,
+                        message,
+                        buildingUnit =>
+                        {
+                            buildingUnit.Status = BuildingUnitStatus.NotRealized.Map();
+                            buildingUnit.LegacyAddresses.Clear();
+                            buildingUnit.Addresses.Clear();
+                        },
+                        ct);
+                }
+
+                foreach (var buildingUnitId in message.Message.BuildingUnitIdsToRetire)
+                {
+                    await context.CreateNewBuildingUnitVersion(
+                        buildingUnitId,
+                        message,
+                        buildingUnit =>
+                        {
+                            buildingUnit.Status = BuildingUnitStatus.Retired.Map();
+                            buildingUnit.LegacyAddresses.Clear();
+                            buildingUnit.Addresses.Clear();
+                        },
+                        ct);
+                }
+            });
+
+            When<Envelope<BuildingWasCorrectedToRetired>>(async (context, message, ct) =>
+            {
+                foreach (var buildingUnitId in message.Message.BuildingUnitIdsToNotRealize)
+                {
+                    await context.CreateNewBuildingUnitVersion(
+                        buildingUnitId,
+                        message,
+                        buildingUnit =>
+                        {
+                            buildingUnit.Status = BuildingUnitStatus.NotRealized.Map();
+                            buildingUnit.LegacyAddresses.Clear();
+                            buildingUnit.Addresses.Clear();
+                        },
+                        ct);
+                }
+
+                foreach (var buildingUnitId in message.Message.BuildingUnitIdsToRetire)
+                {
+                    await context.CreateNewBuildingUnitVersion(
+                        buildingUnitId,
+                        message,
+                        buildingUnit =>
+                        {
+                            buildingUnit.Status = BuildingUnitStatus.Retired.Map();
+                            buildingUnit.LegacyAddresses.Clear();
+                            buildingUnit.Addresses.Clear();
+                        },
+                        ct);
+                }
+            });
+
+            When<Envelope<BuildingWasNotRealized>>(async (context, message, ct) =>
+            {
+                foreach (var buildingUnitId in message.Message.BuildingUnitIdsToNotRealize)
+                {
+                    await context.CreateNewBuildingUnitVersion(
+                        buildingUnitId,
+                        message,
+                        buildingUnit =>
+                        {
+                            buildingUnit.Status = BuildingUnitStatus.NotRealized.Map();
+                            buildingUnit.LegacyAddresses.Clear();
+                            buildingUnit.Addresses.Clear();
+                        },
+                        ct);
+                }
+
+                foreach (var buildingUnitId in message.Message.BuildingUnitIdsToRetire)
+                {
+                    await context.CreateNewBuildingUnitVersion(
+                        buildingUnitId,
+                        message,
+                        buildingUnit =>
+                        {
+                            buildingUnit.Status = BuildingUnitStatus.Retired.Map();
+                            buildingUnit.LegacyAddresses.Clear();
+                            buildingUnit.Addresses.Clear();
+                        },
+                        ct);
+                }
+            });
+
+            When<Envelope<BuildingWasCorrectedToNotRealized>>(async (context, message, ct) =>
+            {
+                foreach (var buildingUnitId in message.Message.BuildingUnitIdsToNotRealize)
+                {
+                    await context.CreateNewBuildingUnitVersion(
+                        buildingUnitId,
+                        message,
+                        buildingUnit =>
+                        {
+                            buildingUnit.Status = BuildingUnitStatus.NotRealized.Map();
+                            buildingUnit.LegacyAddresses.Clear();
+                            buildingUnit.Addresses.Clear();
+                        },
+                        ct);
+                }
+
+                foreach (var buildingUnitId in message.Message.BuildingUnitIdsToRetire)
+                {
+                    await context.CreateNewBuildingUnitVersion(
+                        buildingUnitId,
+                        message,
+                        buildingUnit =>
+                        {
+                            buildingUnit.Status = BuildingUnitStatus.Retired.Map();
+                            buildingUnit.LegacyAddresses.Clear();
+                            buildingUnit.Addresses.Clear();
+                        },
+                        ct);
+                }
+            });
+
+            When<Envelope<BuildingGeometryWasRemoved>>(async (context, message, ct) =>
+            {
+                var buildingUnits = GetAllBuildingUnitsByBuildingId(context, message.Message.BuildingId);
+                foreach (var buildingUnit in buildingUnits)
+                {
+                    await context.CreateNewBuildingUnitVersion(
+                        buildingUnit.BuildingUnitId!.Value,
+                        message,
+                        x =>
+                        {
+                            x.Geometry = null;
+                            x.GeometryMethod = null;
+                        },
+                        ct);
+                }
+            });
+
+            When<Envelope<BuildingBecameComplete>>(async (context, message, ct) =>
+            {
+                var buildingUnits = GetAllBuildingUnitsByBuildingId(context, message.Message.BuildingId);
+                foreach (var buildingUnit in buildingUnits)
+                {
+                    await context.CreateNewBuildingUnitVersion(
+                        buildingUnit.BuildingUnitId!.Value,
+                        message,
+                        _ => { },
+                        ct);
+                }
+            });
+
+            When<Envelope<BuildingBecameIncomplete>>(async (context, message, ct) =>
+            {
+                var buildingUnits = GetAllBuildingUnitsByBuildingId(context, message.Message.BuildingId);
+                foreach (var buildingUnit in buildingUnits)
+                {
+                    await context.CreateNewBuildingUnitVersion(
+                        buildingUnit.BuildingUnitId!.Value,
+                        message,
+                        _ => { },
+                        ct);
+                }
+            });
+
+            When<Envelope<BuildingPersistentLocalIdWasAssigned>>(async (context, message, ct) =>
+            {
+                var buildingUnits = GetAllBuildingUnitsByBuildingId(context, message.Message.BuildingId);
+                foreach (var buildingUnit in buildingUnits)
+                {
+                    await context.CreateNewBuildingUnitVersion(
+                        buildingUnit.BuildingUnitId!.Value,
+                        message,
+                        x =>
+                        {
+                            x.BuildingPersistentLocalId = message.Message.PersistentLocalId;
+                        },
+                        ct);
+                }
+            });
+            #endregion
+
+            When<Envelope<BuildingUnitPersistentLocalIdWasAssigned>>(async (context, message, ct) =>
+            {
+                await context.CreateNewBuildingUnitVersion(
+                    message.Message.BuildingUnitId,
+                    message,
+                    buildingUnit =>
+                    {
+                        buildingUnit.BuildingUnitPersistentLocalId = message.Message.PersistentLocalId;
+                    },
+                    ct);
+            });
+
+            When<Envelope<BuildingUnitBecameComplete>>(async (context, message, ct) =>
+            {
+                await context.CreateNewBuildingUnitVersion(
+                    message.Message.BuildingUnitId,
+                    message,
+                    _ => { },
+                    ct);
+            });
+
+            When<Envelope<BuildingUnitBecameIncomplete>>(async (context, message, ct) =>
+            {
+                await context.CreateNewBuildingUnitVersion(
+                    message.Message.BuildingUnitId,
+                    message,
+                    _ => { },
+                    ct);
+            });
+
+            When<Envelope<BuildingUnitWasAdded>>(async (context, message, ct) =>
+            {
+                var buildingPersistentLocalId = await FindBuildingPersistentLocalId(
+                    options.Value, message.Message.BuildingId);
+                var buildingUnitPersistentLocalId = await FindBuildingUnitPersistentLocalId(
+                    options.Value, message.Message.BuildingId, message.Message.BuildingUnitId);
+
+                if (buildingPersistentLocalId is null || buildingUnitPersistentLocalId is null)
+                {
+                    return;
+                }
+                var buildingUnitVersion = new BuildingUnitVersion
+                {
+                    Position = message.Position,
+                    BuildingId = message.Message.BuildingId,
+                    BuildingUnitId = message.Message.BuildingUnitId,
+                    BuildingUnitPersistentLocalId = buildingUnitPersistentLocalId.Value,
+                    BuildingPersistentLocalId = buildingPersistentLocalId.Value,
+                    Function = BuildingUnitFunction.Unknown.Map(),
+                    VersionTimestamp = message.Message.Provenance.Timestamp,
+                    Namespace = options.Value.BuildingUnitNamespace,
+                    PuriId = $"{options.Value.BuildingUnitNamespace}/{buildingUnitPersistentLocalId}",
+                    LegacyAddresses = new Collection<BuildingUnitAddressLegacyVersion>(new[]
+                    {
+                        new BuildingUnitAddressLegacyVersion
+                        {
+                            BuildingUnitPersistentLocalId = buildingUnitPersistentLocalId.Value,
+                            AddressId = message.Message.AddressId,
+                            Position = message.Position
+                        }
+                    })
+                };
+
+                await context
+                    .BuildingUnitVersions
+                    .AddAsync(buildingUnitVersion, ct);
+            });
+
+            When<Envelope<BuildingUnitWasReaddedByOtherUnitRemoval>>(async (context, message, ct) =>
+            {
+                var buildingPersistentLocalId = await FindBuildingPersistentLocalId(
+                    options.Value, message.Message.BuildingId);
+                var buildingUnitPersistentLocalId = await FindBuildingUnitPersistentLocalId(
+                    options.Value, message.Message.BuildingId, message.Message.BuildingUnitId);
+
+                if (buildingPersistentLocalId is null || buildingUnitPersistentLocalId is null)
+                {
+                    return;
+                }
+                var buildingUnitVersion = new BuildingUnitVersion
+                {
+                    Position = message.Position,
+                    BuildingId = message.Message.BuildingId,
+                    BuildingUnitId = message.Message.BuildingUnitId,
+                    BuildingUnitPersistentLocalId = buildingUnitPersistentLocalId.Value,
+                    BuildingPersistentLocalId = buildingPersistentLocalId.Value,
+                    Function = BuildingUnitFunction.Unknown.Map(),
+                    VersionTimestamp = message.Message.Provenance.Timestamp,
+                    Namespace = options.Value.BuildingUnitNamespace,
+                    PuriId = $"{options.Value.BuildingUnitNamespace}/{buildingUnitPersistentLocalId}",
+                    LegacyAddresses = new Collection<BuildingUnitAddressLegacyVersion>(new[]
+                    {
+                        new BuildingUnitAddressLegacyVersion
+                        {
+                            BuildingUnitPersistentLocalId = buildingUnitPersistentLocalId.Value,
+                            AddressId = message.Message.AddressId,
+                            Position = message.Position
+                        }
+                    })
+                };
+
+                await context
+                    .BuildingUnitVersions
+                    .AddAsync(buildingUnitVersion, ct);
+            });
+
+            When<Envelope<CommonBuildingUnitWasAdded>>(async (context, message, ct) =>
+            {
+                var buildingPersistentLocalId = await FindBuildingPersistentLocalId(
+                    options.Value, message.Message.BuildingId);
+                var buildingUnitPersistentLocalId = await FindBuildingUnitPersistentLocalId(
+                    options.Value, message.Message.BuildingId, message.Message.BuildingUnitId);
+
+                if (buildingPersistentLocalId is null || buildingUnitPersistentLocalId is null)
+                {
+                    return;
+                }
+                var buildingUnitVersion = new BuildingUnitVersion
+                {
+                    Position = message.Position,
+                    BuildingId = message.Message.BuildingId,
+                    BuildingUnitId = message.Message.BuildingUnitId,
+                    BuildingUnitPersistentLocalId = buildingUnitPersistentLocalId.Value,
+                    BuildingPersistentLocalId = buildingPersistentLocalId.Value,
+                    Function = BuildingUnitFunction.Common.Map(),
+                    VersionTimestamp = message.Message.Provenance.Timestamp,
+                    Namespace = options.Value.BuildingUnitNamespace,
+                    PuriId = $"{options.Value.BuildingUnitNamespace}/{buildingUnitPersistentLocalId}"
+                };
+
+                await context
+                    .BuildingUnitVersions
+                    .AddAsync(buildingUnitVersion, ct);
+            });
+
+            When<Envelope<BuildingUnitWasAddedToRetiredBuilding>>(async (context, message, ct) =>
+            {
+                // await AddUnit(context, message.Message.BuildingId, message.Message.BuildingUnitId, null, message.Message.Provenance.Timestamp, false, ct);
+                // var addedUnit = await context.BuildingUnitDetails.FindAsync(message.Message.BuildingUnitId, cancellationToken: ct);
+                // var building = await context.BuildingUnitBuildings.FindAsync(message.Message.BuildingId, cancellationToken: ct);
+                //
+                // addedUnit.Status = building.BuildingRetiredStatus == BuildingStatus.NotRealized
+                //     ? BuildingUnitStatus.NotRealized
+                //     : BuildingUnitStatus.Retired;
+            });
+
+            When<Envelope<BuildingUnitWasRemoved>>(async (context, message, ct) =>
+            {
+                await context.CreateNewBuildingUnitVersion(
+                    message.Message.BuildingUnitId,
+                    message,
+                    buildingUnit =>
+                    {
+                        buildingUnit.IsRemoved = true;
+                        buildingUnit.LegacyAddresses.Clear();
+                        buildingUnit.Addresses.Clear();
+                    },
+                    ct);
+            });
+
+            When<Envelope<BuildingUnitAddressWasAttached>>(async (context, message, ct) =>
+            {
+                await context.CreateNewBuildingUnitVersion(
+                    message.Message.To,
+                    message,
+                    buildingUnit =>
+                    {
+                        if (buildingUnit.LegacyAddresses.Any(x => x.AddressId == message.Message.AddressId))
+                        {
+                            return;
+                        }
+
+                        buildingUnit.LegacyAddresses.Add(new BuildingUnitAddressLegacyVersion
+                        {
+                            Position = message.Position,
+                            BuildingUnitPersistentLocalId = buildingUnit.BuildingUnitPersistentLocalId,
+                            AddressId = message.Message.AddressId
+                        });
+                    },
+                    ct);
+            });
+
+            When<Envelope<BuildingUnitAddressWasDetached>>(async (context, message, ct) =>
+            {
+                await context.CreateNewBuildingUnitVersion(
+                    message.Message.From,
+                    message,
+                    buildingUnit =>
+                    {
+                        foreach (var addressId in message.Message.AddressIds)
+                        {
+                            var address = buildingUnit.LegacyAddresses.SingleOrDefault(x => x.AddressId == addressId);
+                            if (address is not null)
+                            {
+                                buildingUnit.LegacyAddresses.Remove(address);
+                            }
+                        }
+                    },
+                    ct);
+
+            });
+
+            When<Envelope<BuildingUnitWasReaddressed>>(async (context, message, ct) =>
+            {
+                await context.CreateNewBuildingUnitVersion(
+                    message.Message.BuildingUnitId,
+                    message,
+                    buildingUnit =>
+                    {
+                        var oldAddress =
+                            buildingUnit.LegacyAddresses.SingleOrDefault(x => x.AddressId == message.Message.OldAddressId);
+                        if (oldAddress is not null)
+                        {
+                            buildingUnit.LegacyAddresses.Remove(oldAddress);
+                        }
+
+                        if (buildingUnit.LegacyAddresses.All(x => x.AddressId != message.Message.NewAddressId))
+                        {
+                            buildingUnit.LegacyAddresses.Add(new BuildingUnitAddressLegacyVersion
+                            {
+                                Position = message.Position,
+                                BuildingUnitPersistentLocalId = buildingUnit.BuildingUnitPersistentLocalId,
+                                AddressId = message.Message.NewAddressId
+                            });
+                        }
+                    },
+                    ct);
+            });
+
+            #region Position
+
+            When<Envelope<BuildingUnitPositionWasAppointedByAdministrator>>(async (context, message, ct) =>
+            {
+                await context.CreateNewBuildingUnitVersion(
+                    message.Message.BuildingUnitId,
+                    message,
+                    buildingUnit =>
+                    {
+                        var geometryAsBinary = message.Message.ExtendedWkbGeometry.ToByteArray();
+                        var sysGeometry = wkbReader.Read(geometryAsBinary);
+
+                        buildingUnit.Geometry = sysGeometry;
+                        buildingUnit.GeometryMethod = BuildingUnitPositionGeometryMethod.AppointedByAdministrator.Map();
+                    },
+                    ct);
+            });
+
+            When<Envelope<BuildingUnitPositionWasCorrectedToAppointedByAdministrator>>(async (context, message, ct) =>
+            {
+                await context.CreateNewBuildingUnitVersion(
+                    message.Message.BuildingUnitId,
+                    message,
+                    buildingUnit =>
+                    {
+                        var geometryAsBinary = message.Message.ExtendedWkbGeometry.ToByteArray();
+                        var sysGeometry = wkbReader.Read(geometryAsBinary);
+
+                        buildingUnit.Geometry = sysGeometry;
+                        buildingUnit.GeometryMethod = BuildingUnitPositionGeometryMethod.AppointedByAdministrator.Map();
+                    },
+                    ct);
+            });
+
+            When<Envelope<BuildingUnitPositionWasCorrectedToDerivedFromObject>>(async (context, message, ct) =>
+            {
+                await context.CreateNewBuildingUnitVersion(
+                    message.Message.BuildingUnitId,
+                    message,
+                    buildingUnit =>
+                    {
+                        var geometryAsBinary = message.Message.ExtendedWkbGeometry.ToByteArray();
+                        var sysGeometry = wkbReader.Read(geometryAsBinary);
+
+                        buildingUnit.Geometry = sysGeometry;
+                        buildingUnit.GeometryMethod = BuildingUnitPositionGeometryMethod.DerivedFromObject.Map();
+                    },
+                    ct);
+            });
+
+            When<Envelope<BuildingUnitPositionWasDerivedFromObject>>(async (context, message, ct) =>
+            {
+                await context.CreateNewBuildingUnitVersion(
+                    message.Message.BuildingUnitId,
+                    message,
+                    buildingUnit =>
+                    {
+                        var geometryAsBinary = message.Message.ExtendedWkbGeometry.ToByteArray();
+                        var sysGeometry = wkbReader.Read(geometryAsBinary);
+
+                        buildingUnit.Geometry = sysGeometry;
+                        buildingUnit.GeometryMethod = BuildingUnitPositionGeometryMethod.DerivedFromObject.Map();
+                    },
+                    ct);
+            });
+
+            #endregion
+
+            #region Status
+
+            When<Envelope<BuildingUnitStatusWasRemoved>>(async (context, message, ct) =>
+            {
+                await context.CreateNewBuildingUnitVersion(
+                    message.Message.BuildingUnitId,
+                    message,
+                    buildingUnit =>
+                    {
+                        buildingUnit.Status = null;
+                    },
+                    ct);
+            });
+
+            When<Envelope<BuildingUnitWasRealized>>(async (context, message, ct) =>
+            {
+                await context.CreateNewBuildingUnitVersion(
+                    message.Message.BuildingUnitId,
+                    message,
+                    buildingUnit =>
+                    {
+                        buildingUnit.Status = BuildingUnitStatus.Realized.Map();
+                    },
+                    ct);
+            });
+
+            When<Envelope<BuildingUnitWasRetired>>(async (context, message, ct) =>
+            {
+                await context.CreateNewBuildingUnitVersion(
+                    message.Message.BuildingUnitId,
+                    message,
+                    buildingUnit =>
+                    {
+                        buildingUnit.Status = BuildingUnitStatus.Retired.Map();
+                    },
+                    ct);
+            });
+
+            When<Envelope<BuildingUnitWasRetiredByParent>>(async (context, message, ct) =>
+            {
+                await context.CreateNewBuildingUnitVersion(
+                    message.Message.BuildingUnitId,
+                    message,
+                    buildingUnit =>
+                    {
+                        buildingUnit.Status = BuildingUnitStatus.Retired.Map();
+                    },
+                    ct);
+            });
+
+            When<Envelope<BuildingUnitWasNotRealized>>(async (context, message, ct) =>
+            {
+                await context.CreateNewBuildingUnitVersion(
+                    message.Message.BuildingUnitId,
+                    message,
+                    buildingUnit =>
+                    {
+                        buildingUnit.Status = BuildingUnitStatus.NotRealized.Map();
+                    },
+                    ct);
+            });
+
+            When<Envelope<BuildingUnitWasNotRealizedByParent>>(async (context, message, ct) =>
+            {
+                await context.CreateNewBuildingUnitVersion(
+                    message.Message.BuildingUnitId,
+                    message,
+                    buildingUnit =>
+                    {
+                        buildingUnit.Status = BuildingUnitStatus.NotRealized.Map();
+                    },
+                    ct);
+            });
+
+            When<Envelope<BuildingUnitWasPlanned>>(async (context, message, ct) =>
+            {
+                await context.CreateNewBuildingUnitVersion(
+                    message.Message.BuildingUnitId,
+                    message,
+                    buildingUnit =>
+                    {
+                        buildingUnit.Status = BuildingUnitStatus.Planned.Map();
+                    },
+                    ct);
+            });
+
+            When<Envelope<BuildingUnitWasCorrectedToRealized>>(async (context, message, ct) =>
+            {
+                await context.CreateNewBuildingUnitVersion(
+                    message.Message.BuildingUnitId,
+                    message,
+                    buildingUnit =>
+                    {
+                        buildingUnit.Status = BuildingUnitStatus.Realized.Map();
+                    },
+                    ct);
+            });
+
+            When<Envelope<BuildingUnitWasCorrectedToNotRealized>>(async (context, message, ct) =>
+            {
+                await context.CreateNewBuildingUnitVersion(
+                    message.Message.BuildingUnitId,
+                    message,
+                    buildingUnit =>
+                    {
+                        buildingUnit.Status = BuildingUnitStatus.NotRealized.Map();
+                    },
+                    ct);
+            });
+
+            When<Envelope<BuildingUnitWasCorrectedToRetired>>(async (context, message, ct) =>
+            {
+                await context.CreateNewBuildingUnitVersion(
+                    message.Message.BuildingUnitId,
+                    message,
+                    buildingUnit =>
+                    {
+                        buildingUnit.Status = BuildingUnitStatus.Retired.Map();
+                    },
+                    ct);
+            });
+
+            When<Envelope<BuildingUnitWasCorrectedToPlanned>>(async (context, message, ct) =>
+            {
+                await context.CreateNewBuildingUnitVersion(
+                    message.Message.BuildingUnitId,
+                    message,
+                    buildingUnit =>
+                    {
+                        buildingUnit.Status = BuildingUnitStatus.Planned.Map();
+                    },
+                    ct);
+            });
+
+            #endregion
 
             #endregion
 
@@ -591,6 +1230,67 @@
 
             // BuildingUnitWasTransferred couples the unit to another building and BuildingUnitMoved is an event applicable on the old building.
             When<Envelope<BuildingUnitWasMoved>>((_, _, _) => Task.CompletedTask);
+        }
+
+        private IEnumerable<BuildingUnitVersion> GetAllBuildingUnitsByBuildingId(
+            IntegrationContext context,
+            Guid buildingId)
+        {
+            var buildingUnits =
+                context.BuildingUnitVersions
+                    .Where(x => x.BuildingId == buildingId)
+                    .ToList()
+                    .Union(
+                        context.BuildingUnitVersions.Local
+                            .Where(x => x.BuildingId == buildingId)
+                            .ToList());
+
+            return buildingUnits;
+        }
+
+        private async Task<int?> FindBuildingPersistentLocalId(
+            IntegrationOptions options,
+            Guid buildingId)
+        {
+            await using var connection = new SqlConnection(options.EventsConnectionString);
+
+            var sql = @"
+SELECT top 1 Json_Value(JsonData, '$.persistentLocalId') AS ""BuildingPersistentLocalId""
+FROM [building-registry-events].[BuildingRegistry].[Streams] as s
+INNER JOIN [building-registry-events].[BuildingRegistry].[Messages] as m
+    on s.IdInternal = m.StreamIdInternal and m.[Type] = 'BuildingPersistentLocalIdentifierWasAssigned'
+WHERE IdOriginal = @BuildingId";
+
+            var buildingPersistentLocalId = await connection.QuerySingleAsync<int>(sql, new { BuildingId = buildingId });
+
+            return buildingPersistentLocalId;
+        }
+
+        private async Task<int?> FindBuildingUnitPersistentLocalId(
+            IntegrationOptions options,
+            Guid buildingId,
+            Guid buildingUnitId)
+        {
+            await using var connection = new SqlConnection(options.EventsConnectionString);
+
+            var sql = @"
+SELECT top 1 Json_Value(JsonData, '$.persistentLocalId') AS ""BuildingUnitPersistentLocalId""
+FROM [building-registry-events].[BuildingRegistry].[Streams] as s
+INNER JOIN [building-registry-events].[BuildingRegistry].[Messages] as m
+    on s.IdInternal = m.StreamIdInternal and m.[Type] = 'BuildingUnitPersistentLocalIdentifierWasAssigned'
+WHERE
+    IdOriginal = @BuildingId
+    AND Json_Value(JsonData, '$.buildingUnitId') = @BuildingUnitId";
+
+            var buildingPersistentLocalId = await connection.QuerySingleAsync<int>(
+                sql,
+                new
+                {
+                    BuildingId = buildingId,
+                    BuildingUnitId = buildingUnitId
+                });
+
+            return buildingPersistentLocalId;
         }
     }
 }
