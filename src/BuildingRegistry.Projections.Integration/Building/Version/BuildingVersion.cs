@@ -1,30 +1,27 @@
-﻿namespace BuildingRegistry.Projections.Integration
+﻿namespace BuildingRegistry.Projections.Integration.Building.Version
 {
     using System;
-    using System.Collections.ObjectModel;
-    using System.Linq;
     using Be.Vlaanderen.Basisregisters.GrAr.Common;
     using Be.Vlaanderen.Basisregisters.Utilities;
     using BuildingRegistry.Infrastructure;
+    using LatestItem;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.EntityFrameworkCore.Metadata.Builders;
     using NetTopologySuite.Geometries;
     using NodaTime;
 
-    public sealed class BuildingUnitVersion
+    public sealed class BuildingVersion
     {
         public const string VersionTimestampBackingPropertyName = nameof(VersionTimestampAsDateTimeOffset);
 
         public long Position { get; set; }
 
-        public Guid? BuildingUnitId { get; set; }
-        public int BuildingUnitPersistentLocalId { get; set; }
+        public Guid? BuildingId { get; set; }
         public int BuildingPersistentLocalId { get; set; }
-        public string Status { get; set; }
-        public string Function { get; set; }
-        public string GeometryMethod { get; set; }
-        public Geometry Geometry { get; set; }
-        public bool HasDeviation { get; set; }
+        public string? Status { get; set; }
+        public string? GeometryMethod { get; set; }
+        public Geometry? Geometry { get; set; }
+        public string? NisCode { get; set; }
         public bool IsRemoved { get; set; }
 
         public string PuriId { get; set; }
@@ -42,42 +39,30 @@
             }
         }
 
-        public Collection<BuildingUnitAddressLegacyVersion> LegacyAddresses { get; set; }
-        public Collection<BuildingUnitAddressVersion> Addresses { get; set; }
+        public BuildingVersion()
+        { }
 
-        public BuildingUnitVersion()
-        {
-            LegacyAddresses = new Collection<BuildingUnitAddressLegacyVersion>();
-            Addresses = new Collection<BuildingUnitAddressVersion>();
-        }
-
-        public BuildingUnitVersion CloneAndApplyEventInfo(
+        public BuildingVersion CloneAndApplyEventInfo(
             long newPosition,
             Instant lastChangedOn,
-            Action<BuildingUnitVersion> editFunc)
+            Action<BuildingVersion> editFunc)
         {
-            var newItem = new BuildingUnitVersion
+            var newItem = new BuildingVersion
             {
                 Position = newPosition,
 
-                BuildingUnitPersistentLocalId = BuildingUnitPersistentLocalId,
+                BuildingId = BuildingId,
                 BuildingPersistentLocalId = BuildingPersistentLocalId,
                 Status = Status,
-                Function = Function,
                 GeometryMethod = GeometryMethod,
                 Geometry = Geometry,
-                HasDeviation = HasDeviation,
+                NisCode = NisCode,
                 IsRemoved = IsRemoved,
 
                 PuriId = PuriId,
                 Namespace = Namespace,
 
-                VersionTimestamp = lastChangedOn,
-
-                Addresses = new Collection<BuildingUnitAddressVersion>(
-                    Addresses.Select(x => x.CloneAndApplyEventInfo(newPosition)).ToList()),
-                LegacyAddresses = new Collection<BuildingUnitAddressLegacyVersion>(
-                    LegacyAddresses.Select(x => x.CloneAndApplyEventInfo(newPosition)).ToList()),
+                VersionTimestamp = lastChangedOn
             };
 
             editFunc(newItem);
@@ -86,48 +71,37 @@
         }
     }
 
-    public sealed class BuildingUnitVersionConfiguration : IEntityTypeConfiguration<BuildingUnitVersion>
+    public sealed class BuildingLatestEventConfiguration : IEntityTypeConfiguration<BuildingVersion>
     {
-        public void Configure(EntityTypeBuilder<BuildingUnitVersion> builder)
+        public void Configure(EntityTypeBuilder<BuildingVersion> builder)
         {
-            const string tableName = "building_unit_versions";
+            const string tableName = "building_versions";
 
             builder
                 .ToTable(tableName, Schema.Integration) // to schema per type
-                .HasKey(x => new { x.Position, x.BuildingUnitPersistentLocalId });
+                .HasKey(x => x.Position);
 
             builder.Property(x => x.Position).ValueGeneratedNever();
 
             builder.Property(x => x.Position).HasColumnName("position");
-            builder.Property(x => x.BuildingUnitPersistentLocalId).HasColumnName("building_unit_persistent_local_id");
+            builder.Property(x => x.BuildingId).HasColumnName("building_id");
             builder.Property(x => x.BuildingPersistentLocalId).HasColumnName("building_persistent_local_id");
             builder.Property(x => x.Status).HasColumnName("status");
-            builder.Property(x => x.Function).HasColumnName("function");
             builder.Property(x => x.GeometryMethod).HasColumnName("geometry_method");
             builder.Property(x => x.Geometry).HasColumnName("geometry");
-            builder.Property(x => x.HasDeviation).HasColumnName("has_deviation");
+            builder.Property(x => x.NisCode).HasColumnName("nis_code");
             builder.Property(x => x.IsRemoved).HasColumnName("is_removed");
             builder.Property(x => x.PuriId).HasColumnName("puri_id");
             builder.Property(x => x.Namespace).HasColumnName("namespace");
             builder.Property(x => x.VersionAsString).HasColumnName("version_as_string");
-            builder.Property(BuildingUnitVersion.VersionTimestampBackingPropertyName).HasColumnName("version_timestamp");
-
-            builder.HasMany(x => x.LegacyAddresses)
-                .WithOne()
-                .IsRequired()
-                .HasForeignKey(x => new { x.Position, x.BuildingUnitPersistentLocalId });
-
-            builder.HasMany(x => x.Addresses)
-                .WithOne()
-                .IsRequired()
-                .HasForeignKey(x => new { x.Position, x.BuildingUnitPersistentLocalId });
+            builder.Property(BuildingLatestItem.VersionTimestampBackingPropertyName).HasColumnName("version_timestamp");
 
             builder.Ignore(x => x.VersionTimestamp);
 
-            builder.HasIndex(x => x.BuildingUnitPersistentLocalId);
             builder.HasIndex(x => x.BuildingPersistentLocalId);
             builder.HasIndex(x => x.Status);
             builder.HasIndex(x => x.IsRemoved);
+            builder.HasIndex(x => x.NisCode);
         }
     }
 }

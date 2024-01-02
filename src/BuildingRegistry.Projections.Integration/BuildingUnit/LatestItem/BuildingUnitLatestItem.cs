@@ -1,11 +1,11 @@
-﻿namespace BuildingRegistry.Projections.Integration
+﻿namespace BuildingRegistry.Projections.Integration.BuildingUnit.LatestItem
 {
     using System;
     using Be.Vlaanderen.Basisregisters.GrAr.Common;
     using Be.Vlaanderen.Basisregisters.Utilities;
+    using BuildingRegistry.Infrastructure;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.EntityFrameworkCore.Metadata.Builders;
-    using BuildingRegistry.Infrastructure;
     using NetTopologySuite.Geometries;
     using NodaTime;
 

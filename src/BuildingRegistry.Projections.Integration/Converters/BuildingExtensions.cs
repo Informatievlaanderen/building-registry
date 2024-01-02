@@ -2,7 +2,7 @@
 {
     using System;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy.Gebouw;
-    using Building;
+    using BuildingRegistry.Building;
 
     public static class BuildingStatusExtensions
     {

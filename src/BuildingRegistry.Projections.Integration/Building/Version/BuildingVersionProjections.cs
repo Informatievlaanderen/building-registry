@@ -1,12 +1,12 @@
-﻿namespace BuildingRegistry.Projections.Integration
+﻿namespace BuildingRegistry.Projections.Integration.Building.Version
 {
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.Connector;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore;
     using Be.Vlaanderen.Basisregisters.Utilities.HexByteConvertor;
-    using Building;
-    using Building.Events;
-    using Converters;
-    using Infrastructure;
+    using BuildingRegistry.Building;
+    using BuildingRegistry.Building.Events;
+    using BuildingRegistry.Projections.Integration.Converters;
+    using BuildingRegistry.Projections.Integration.Infrastructure;
     using Microsoft.Extensions.Options;
 
     [ConnectedProjectionName("Integratie gebouw versie")]

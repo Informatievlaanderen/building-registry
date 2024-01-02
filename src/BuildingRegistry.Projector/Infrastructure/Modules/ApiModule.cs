@@ -19,6 +19,10 @@ namespace BuildingRegistry.Projector.Infrastructure.Modules
     using BuildingRegistry.Projections.Extract.BuildingUnitAddressLinkExtract;
     using BuildingRegistry.Projections.Extract.BuildingUnitExtract;
     using BuildingRegistry.Projections.Integration;
+    using BuildingRegistry.Projections.Integration.Building.LatestItem;
+    using BuildingRegistry.Projections.Integration.Building.Version;
+    using BuildingRegistry.Projections.Integration.BuildingUnit.LatestItem;
+    using BuildingRegistry.Projections.Integration.BuildingUnit.Version;
     using BuildingRegistry.Projections.Integration.Infrastructure;
     using BuildingRegistry.Projections.LastChangedList;
     using BuildingRegistry.Projections.Legacy;

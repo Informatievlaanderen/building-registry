@@ -1,4 +1,4 @@
-﻿namespace BuildingRegistry.Projections.Integration
+﻿namespace BuildingRegistry.Projections.Integration.BuildingUnit.Version
 {
     using System;
     using System.Linq;

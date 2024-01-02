@@ -1,4 +1,4 @@
-﻿namespace BuildingRegistry.Projections.Integration
+﻿namespace BuildingRegistry.Projections.Integration.BuildingUnit.LatestItem
 {
     using System.Linq;
     using System.Threading.Tasks;
@@ -6,8 +6,8 @@
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.Connector;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore;
     using Be.Vlaanderen.Basisregisters.Utilities.HexByteConvertor;
-    using Building;
-    using Building.Events;
+    using BuildingRegistry.Building;
+    using BuildingRegistry.Building.Events;
     using Converters;
     using Infrastructure;
     using Microsoft.Extensions.Options;

@@ -4,7 +4,11 @@ namespace BuildingRegistry.Projections.Integration
     using System.Threading;
     using System.Threading.Tasks;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.Runner;
+    using Building.LatestItem;
+    using Building.Version;
     using BuildingRegistry.Infrastructure;
+    using BuildingUnit.LatestItem;
+    using BuildingUnit.Version;
     using Microsoft.EntityFrameworkCore;
     using NetTopologySuite.Geometries;
 

@@ -1,11 +1,11 @@
-﻿namespace BuildingRegistry.Projections.Integration
+﻿namespace BuildingRegistry.Projections.Integration.Building.LatestItem
 {
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.Connector;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore;
     using Be.Vlaanderen.Basisregisters.Utilities.HexByteConvertor;
-    using Building;
-    using Building.Events;
+    using BuildingRegistry.Building;
+    using BuildingRegistry.Building.Events;
     using Converters;
     using Infrastructure;
     using Microsoft.Extensions.Options;

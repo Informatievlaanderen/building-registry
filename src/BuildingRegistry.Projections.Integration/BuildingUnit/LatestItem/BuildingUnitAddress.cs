@@ -1,4 +1,4 @@
-﻿namespace BuildingRegistry.Projections.Integration
+﻿namespace BuildingRegistry.Projections.Integration.BuildingUnit.LatestItem
 {
     using BuildingRegistry.Infrastructure;
     using Microsoft.EntityFrameworkCore;
