@@ -186,13 +186,22 @@ namespace BuildingRegistry.Projector.Infrastructure.Modules
                     _configuration,
                     _loggerFactory)
                 .RegisterProjections<BuildingLatestItemProjections, IntegrationContext>(
-                    context => new BuildingLatestItemProjections(context.Resolve<IOptions<IntegrationOptions>>()), ConnectedProjectionSettings.Default)
+                    context => new BuildingLatestItemProjections(
+                        context.Resolve<IOptions<IntegrationOptions>>()), ConnectedProjectionSettings.Default)
                 .RegisterProjections<BuildingVersionProjections, IntegrationContext>(
-                    context => new BuildingVersionProjections(context.Resolve<IOptions<IntegrationOptions>>()), ConnectedProjectionSettings.Default)
+                    context =>
+                    {
+                        var options = context.Resolve<IOptions<IntegrationOptions>>();
+                        return new BuildingVersionProjections(options, new PersistentLocalIdFinder(options.Value.EventsConnectionString));
+                    }, ConnectedProjectionSettings.Default)
                 .RegisterProjections<BuildingUnitLatestItemProjections, IntegrationContext>(
                     context => new BuildingUnitLatestItemProjections(context.Resolve<IOptions<IntegrationOptions>>()), ConnectedProjectionSettings.Default)
                 .RegisterProjections<BuildingUnitVersionProjections, IntegrationContext>(
-                    context => new BuildingUnitVersionProjections(context.Resolve<IOptions<IntegrationOptions>>()), ConnectedProjectionSettings.Default);
+                    context =>
+                    {
+                        var options = context.Resolve<IOptions<IntegrationOptions>>();
+                        return new BuildingUnitVersionProjections(options, new PersistentLocalIdFinder(options.Value.EventsConnectionString));
+                    }, ConnectedProjectionSettings.Default);
         }
 
         private void RegisterWmsProjectionsV2(ContainerBuilder builder)

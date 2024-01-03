@@ -11,17 +11,17 @@
     using BuildingRegistry.Building;
     using BuildingRegistry.Building.Events;
     using Converters;
-    using Dapper;
     using Infrastructure;
     using Legacy.Events;
-    using Microsoft.Data.SqlClient;
     using Microsoft.Extensions.Options;
 
     [ConnectedProjectionName("Integratie gebouweenheid latest item")]
     [ConnectedProjectionDescription("Projectie die de laatste gebouweenheid data voor de integratie database bijhoudt.")]
     public sealed class BuildingUnitVersionProjections : ConnectedProjection<IntegrationContext>
     {
-        public BuildingUnitVersionProjections(IOptions<IntegrationOptions> options)
+        public BuildingUnitVersionProjections(
+            IOptions<IntegrationOptions> options,
+            IPersistentLocalIdFinder persistentLocalIdFinder)
         {
             var wkbReader = WKBReaderFactory.Create();
 
@@ -262,10 +262,10 @@
 
             When<Envelope<BuildingUnitWasAdded>>(async (context, message, ct) =>
             {
-                var buildingPersistentLocalId = await FindBuildingPersistentLocalId(
-                    options.Value, message.Message.BuildingId);
-                var buildingUnitPersistentLocalId = await FindBuildingUnitPersistentLocalId(
-                    options.Value, message.Message.BuildingId, message.Message.BuildingUnitId);
+                var buildingPersistentLocalId = await persistentLocalIdFinder.FindBuildingPersistentLocalId(
+                    message.Message.BuildingId, ct);
+                var buildingUnitPersistentLocalId = await persistentLocalIdFinder.FindBuildingUnitPersistentLocalId(
+                    message.Message.BuildingId, message.Message.BuildingUnitId, ct);
 
                 if (buildingPersistentLocalId is null || buildingUnitPersistentLocalId is null)
                 {
@@ -300,10 +300,10 @@
 
             When<Envelope<BuildingUnitWasReaddedByOtherUnitRemoval>>(async (context, message, ct) =>
             {
-                var buildingPersistentLocalId = await FindBuildingPersistentLocalId(
-                    options.Value, message.Message.BuildingId);
-                var buildingUnitPersistentLocalId = await FindBuildingUnitPersistentLocalId(
-                    options.Value, message.Message.BuildingId, message.Message.BuildingUnitId);
+                var buildingPersistentLocalId = await persistentLocalIdFinder.FindBuildingPersistentLocalId(
+                    message.Message.BuildingId, ct);
+                var buildingUnitPersistentLocalId = await persistentLocalIdFinder.FindBuildingUnitPersistentLocalId(
+                    message.Message.BuildingId, message.Message.BuildingUnitId, ct);
 
                 if (buildingPersistentLocalId is null || buildingUnitPersistentLocalId is null)
                 {
@@ -338,10 +338,10 @@
 
             When<Envelope<CommonBuildingUnitWasAdded>>(async (context, message, ct) =>
             {
-                var buildingPersistentLocalId = await FindBuildingPersistentLocalId(
-                    options.Value, message.Message.BuildingId);
-                var buildingUnitPersistentLocalId = await FindBuildingUnitPersistentLocalId(
-                    options.Value, message.Message.BuildingId, message.Message.BuildingUnitId);
+                var buildingPersistentLocalId = await persistentLocalIdFinder.FindBuildingPersistentLocalId(
+                    message.Message.BuildingId, ct);
+                var buildingUnitPersistentLocalId = await persistentLocalIdFinder.FindBuildingUnitPersistentLocalId(
+                    message.Message.BuildingId, message.Message.BuildingUnitId, ct);
 
                 if (buildingPersistentLocalId is null || buildingUnitPersistentLocalId is null)
                 {
@@ -1246,51 +1246,6 @@
                             .ToList());
 
             return buildingUnits;
-        }
-
-        private async Task<int?> FindBuildingPersistentLocalId(
-            IntegrationOptions options,
-            Guid buildingId)
-        {
-            await using var connection = new SqlConnection(options.EventsConnectionString);
-
-            var sql = @"
-SELECT top 1 Json_Value(JsonData, '$.persistentLocalId') AS ""BuildingPersistentLocalId""
-FROM [building-registry-events].[BuildingRegistry].[Streams] as s
-INNER JOIN [building-registry-events].[BuildingRegistry].[Messages] as m
-    on s.IdInternal = m.StreamIdInternal and m.[Type] = 'BuildingPersistentLocalIdentifierWasAssigned'
-WHERE IdOriginal = @BuildingId";
-
-            var buildingPersistentLocalId = await connection.QuerySingleAsync<int>(sql, new { BuildingId = buildingId });
-
-            return buildingPersistentLocalId;
-        }
-
-        private async Task<int?> FindBuildingUnitPersistentLocalId(
-            IntegrationOptions options,
-            Guid buildingId,
-            Guid buildingUnitId)
-        {
-            await using var connection = new SqlConnection(options.EventsConnectionString);
-
-            var sql = @"
-SELECT top 1 Json_Value(JsonData, '$.persistentLocalId') AS ""BuildingUnitPersistentLocalId""
-FROM [building-registry-events].[BuildingRegistry].[Streams] as s
-INNER JOIN [building-registry-events].[BuildingRegistry].[Messages] as m
-    on s.IdInternal = m.StreamIdInternal and m.[Type] = 'BuildingUnitPersistentLocalIdentifierWasAssigned'
-WHERE
-    IdOriginal = @BuildingId
-    AND Json_Value(JsonData, '$.buildingUnitId') = @BuildingUnitId";
-
-            var buildingPersistentLocalId = await connection.QuerySingleAsync<int>(
-                sql,
-                new
-                {
-                    BuildingId = buildingId,
-                    BuildingUnitId = buildingUnitId
-                });
-
-            return buildingPersistentLocalId;
         }
     }
 }

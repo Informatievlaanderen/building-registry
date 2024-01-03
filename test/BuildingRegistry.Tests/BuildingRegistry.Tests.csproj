@@ -9,6 +9,7 @@
     <ProjectReference Include="..\..\src\BuildingRegistry.Consumer.Read.Parcel\BuildingRegistry.Consumer.Read.Parcel.csproj" />
     <ProjectReference Include="..\..\src\BuildingRegistry.Migrator.Building\BuildingRegistry.Migrator.Building.csproj" />
     <ProjectReference Include="..\..\src\BuildingRegistry.Projections.BackOffice\BuildingRegistry.Projections.BackOffice.csproj" />
+    <ProjectReference Include="..\..\src\BuildingRegistry.Projections.Integration\BuildingRegistry.Projections.Integration.csproj" />
     <ProjectReference Include="..\..\src\BuildingRegistry.Projections.Legacy\BuildingRegistry.Projections.Legacy.csproj" />
     <ProjectReference Include="..\..\src\BuildingRegistry.Projections.Wfs\BuildingRegistry.Projections.Wfs.csproj" />
     <ProjectReference Include="..\..\src\BuildingRegistry.Projections.Wms\BuildingRegistry.Projections.Wms.csproj" />

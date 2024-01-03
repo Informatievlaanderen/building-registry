@@ -1,24 +1,22 @@
 ﻿namespace BuildingRegistry.Projections.Integration.Building.Version
 {
-    using System;
-    using System.Threading.Tasks;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.Connector;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore;
     using Be.Vlaanderen.Basisregisters.Utilities.HexByteConvertor;
     using BuildingRegistry.Building;
     using BuildingRegistry.Building.Events;
     using Converters;
-    using Dapper;
     using Infrastructure;
     using Legacy.Events;
-    using Microsoft.Data.SqlClient;
     using Microsoft.Extensions.Options;
 
     [ConnectedProjectionName("Integratie gebouw versie")]
     [ConnectedProjectionDescription("Projectie die de laatste gebouw data voor de integratie database bijhoudt.")]
     public sealed class BuildingVersionProjections : ConnectedProjection<IntegrationContext>
     {
-        public BuildingVersionProjections(IOptions<IntegrationOptions> options)
+        public BuildingVersionProjections(
+            IOptions<IntegrationOptions> options,
+            IPersistentLocalIdFinder persistentLocalIdFinder)
         {
             var wkbReader = WKBReaderFactory.Create();
 
@@ -26,9 +24,8 @@
 
             When<Envelope<BuildingWasRegistered>>(async (context, message, ct) =>
             {
-                var buildingPersistentLocalId = await FindBuildingPersistentLocalId(
-                    options.Value,
-                    message.Message.BuildingId);
+                var buildingPersistentLocalId = await persistentLocalIdFinder.FindBuildingPersistentLocalId(
+                    message.Message.BuildingId, ct);
 
                 if (buildingPersistentLocalId is null)
                 {
@@ -347,23 +344,22 @@
 
                 var nisCode = await context.FindNiscode(sysGeometry, ct);
 
-                var building = new BuildingVersion
-                {
-                    Position = message.Position,
-                    BuildingPersistentLocalId = message.Message.BuildingPersistentLocalId,
-                    Status = BuildingStatus.Parse(message.Message.BuildingStatus).Map(),
-                    GeometryMethod = BuildingGeometryMethod.Parse(message.Message.GeometryMethod).Map(),
-                    Geometry = sysGeometry,
-                    NisCode = nisCode,
-                    IsRemoved = message.Message.IsRemoved,
-                    VersionTimestamp = message.Message.Provenance.Timestamp,
-                    Namespace = options.Value.BuildingNamespace,
-                    PuriId = $"{options.Value.BuildingNamespace}/{message.Message.BuildingPersistentLocalId}"
-                };
-
-                await context
-                    .BuildingVersions
-                    .AddAsync(building, ct);
+                await context.CreateNewBuildingVersion(
+                    message.Message.BuildingId,
+                    message,
+                    building =>
+                    {
+                        building.BuildingPersistentLocalId = message.Message.BuildingPersistentLocalId;
+                        building.Status = BuildingStatus.Parse(message.Message.BuildingStatus).Map();
+                        building.GeometryMethod = BuildingGeometryMethod.Parse(message.Message.GeometryMethod).Map();
+                        building.Geometry = sysGeometry;
+                        building.NisCode = nisCode;
+                        building.IsRemoved = message.Message.IsRemoved;
+                        building.VersionTimestamp = message.Message.Provenance.Timestamp;
+                        building.Namespace = options.Value.BuildingNamespace;
+                        building.PuriId = $"{options.Value.BuildingNamespace}/{message.Message.BuildingPersistentLocalId}";
+                    },
+                    ct);
             });
 
             When<Envelope<BuildingWasPlannedV2>>(async (context, message, ct) =>
@@ -654,24 +650,6 @@
                     building => { building.Status = BuildingStatus.Retired.Map(); },
                     ct);
             });
-        }
-
-        private async Task<int?> FindBuildingPersistentLocalId(
-            IntegrationOptions options,
-            Guid buildingId)
-        {
-            await using var connection = new SqlConnection(options.EventsConnectionString);
-
-            var sql = @"
-SELECT top 1 Json_Value(JsonData, '$.persistentLocalId') AS ""BuildingPersistentLocalId""
-FROM [building-registry-events].[BuildingRegistry].[Streams] as s
-INNER JOIN [building-registry-events].[BuildingRegistry].[Messages] as m
-    on s.IdInternal = m.StreamIdInternal and m.[Type] = 'BuildingPersistentLocalIdentifierWasAssigned'
-WHERE IdOriginal = @BuildingId";
-
-            var buildingPersistentLocalId = await connection.QuerySingleAsync<int>(sql, new { BuildingId = buildingId });
-
-            return buildingPersistentLocalId;
         }
     }
 }

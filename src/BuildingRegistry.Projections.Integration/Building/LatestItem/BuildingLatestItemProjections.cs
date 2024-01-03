@@ -303,7 +303,10 @@
                 await context.FindAndUpdateBuilding(
                     message.Message.BuildingPersistentLocalId,
                     message.Position,
-                    building => { UpdateVersionTimestamp(building, message.Message); },
+                    building =>
+                    {
+                        UpdateVersionTimestamp(building, message.Message);
+                    },
                     ct);
             });
 
