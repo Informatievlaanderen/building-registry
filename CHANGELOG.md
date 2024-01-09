@@ -1,3 +1,11 @@
+## [3.97.1](https://github.com/informatievlaanderen/building-registry/compare/v3.97.0...v3.97.1) (2024-01-09)
+
+
+### Bug Fixes
+
+* command provenance should be set after idempotency check ([63aeceb](https://github.com/informatievlaanderen/building-registry/commit/63aecebac0f2fad80c8cf237e463b5b99ee5d8eb))
+* event timestamp ([167f0d7](https://github.com/informatievlaanderen/building-registry/commit/167f0d77a1794c857c20dffba46f3b01bbdf3713))
+
 # [3.97.0](https://github.com/informatievlaanderen/building-registry/compare/v3.96.3...v3.97.0) (2023-12-04)
 
 
