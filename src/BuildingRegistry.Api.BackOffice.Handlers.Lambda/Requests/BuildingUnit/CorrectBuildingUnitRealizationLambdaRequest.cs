@@ -1,9 +1,7 @@
 namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Requests.BuildingUnit
 {
+    using Abstractions.BuildingUnit.Requests;
     using Abstractions.BuildingUnit.SqsRequests;
-    using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
-    using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Requests;
-    using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.SqsRequests;
     using BuildingRegistry.Building;
     using BuildingRegistry.Building.Commands;
     using IHasBuildingUnitPersistentLocalId = Abstractions.IHasBuildingUnitPersistentLocalId;
@@ -29,7 +27,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Requests.BuildingUnit
         /// <returns>CorrectBuildingUnitRealization.</returns>
         public CorrectBuildingUnitRealization ToCommand()
         {
-            return new CorrectBuildingUnitRealization(BuildingPersistentLocalId, new BuildingUnitPersistentLocalId(BuildingUnitPersistentLocalId), CommandProvenance);
+            return new CorrectBuildingUnitRealization(BuildingPersistentLocalId, new BuildingUnitPersistentLocalId(BuildingUnitPersistentLocalId), Provenance);
         }
     }
 }

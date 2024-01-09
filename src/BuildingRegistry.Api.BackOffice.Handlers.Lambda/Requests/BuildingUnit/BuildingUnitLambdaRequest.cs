@@ -18,13 +18,5 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Requests.BuildingUnit
             IDictionary<string, object?> metadata)
             : base(messageGroupId, ticketId, ifMatchHeaderValue, provenance, metadata)
         { }
-
-        protected Provenance CommandProvenance => new Provenance(
-            SystemClock.Instance.GetCurrentInstant(),
-            Provenance.Application,
-            Provenance.Reason,
-            Provenance.Operator,
-            Provenance.Modification,
-            Provenance.Organisation);
     }
 }

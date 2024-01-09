@@ -31,7 +31,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Requests.Building
             return new ChangeBuildingOutline(
                 new BuildingPersistentLocalId(BuildingPersistentLocalId),
                 Request.GeometriePolygoon.ToExtendedWkbGeometry(),
-                CommandProvenance);
+                Provenance);
         }
     }
 }

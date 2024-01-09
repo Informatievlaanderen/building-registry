@@ -16,7 +16,13 @@ namespace BuildingRegistry.Building
                 throw new InvalidOperationException($"Cannot create provenance from {provenanceHolder.GetType().Name}");
             }
 
-            return provenance.Provenance;
+            return new Provenance(
+                SystemClock.Instance.GetCurrentInstant(),
+                provenance.Provenance.Application,
+                provenance.Provenance.Reason,
+                provenance.Provenance.Operator,
+                provenance.Provenance.Modification,
+                provenance.Provenance.Organisation);
         }
     }
 }

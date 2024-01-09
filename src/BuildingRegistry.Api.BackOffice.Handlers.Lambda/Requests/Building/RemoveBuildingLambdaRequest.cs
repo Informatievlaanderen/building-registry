@@ -28,7 +28,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Requests.Building
         /// <returns>RemoveBuilding.</returns>
         public RemoveBuilding ToCommand()
         {
-            return new RemoveBuilding(new BuildingPersistentLocalId(BuildingPersistentLocalId), CommandProvenance);
+            return new RemoveBuilding(new BuildingPersistentLocalId(BuildingPersistentLocalId), Provenance);
         }
     }
 }

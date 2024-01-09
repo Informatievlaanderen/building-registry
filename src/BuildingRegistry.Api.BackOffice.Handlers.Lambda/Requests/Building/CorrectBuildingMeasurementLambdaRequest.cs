@@ -37,7 +37,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Requests.Building
                 new BuildingPersistentLocalId(BuildingPersistentLocalId),
                 Request.GrbData.GeometriePolygoon.ToExtendedWkbGeometry(),
                 Request.GrbData.ToBuildingGrbData(),
-                CommandProvenance);
+                Provenance);
         }
     }
 }

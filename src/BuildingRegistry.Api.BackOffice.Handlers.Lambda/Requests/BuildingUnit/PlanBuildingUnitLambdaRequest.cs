@@ -1,10 +1,9 @@
 namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Requests.BuildingUnit
 {
+    using Abstractions.Building;
+    using Abstractions.BuildingUnit.Converters;
+    using Abstractions.BuildingUnit.Requests;
     using Abstractions.BuildingUnit.SqsRequests;
-    using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
-    using BuildingRegistry.Api.BackOffice.Abstractions.Building;
-    using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Converters;
-    using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Requests;
     using BuildingRegistry.Building;
     using BuildingRegistry.Building.Commands;
 
@@ -34,7 +33,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Requests.BuildingUnit
                 string.IsNullOrWhiteSpace(Request.Positie) ? null : Request.Positie.ToExtendedWkbGeometry(),
                 Request.Functie.Map(),
                 Request.AfwijkingVastgesteld,
-                CommandProvenance);
+                Provenance);
         }
     }
 }
