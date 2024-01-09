@@ -26,7 +26,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Requests.Building
         /// <returns>CorrectBuildingNotRealization.</returns>
         public CorrectBuildingNotRealization ToCommand()
         {
-            return new CorrectBuildingNotRealization(new BuildingPersistentLocalId(BuildingPersistentLocalId), CommandProvenance);
+            return new CorrectBuildingNotRealization(new BuildingPersistentLocalId(BuildingPersistentLocalId), Provenance);
         }
     }
 }

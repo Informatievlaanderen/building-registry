@@ -7,7 +7,6 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
     using System.Threading.Tasks;
     using Autofac;
     using AutoFixture;
-    using Be.Vlaanderen.Basisregisters.AggregateSource.Snapshotting;
     using Be.Vlaanderen.Basisregisters.CommandHandling;
     using Be.Vlaanderen.Basisregisters.CommandHandling.Idempotency;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
@@ -20,7 +19,6 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
     using BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.Building;
     using BuildingRegistry.Api.BackOffice.Handlers.Lambda.Requests.Building;
     using BuildingRegistry.Building;
-    using BuildingRegistry.Building.Events;
     using Fixtures;
     using FluentAssertions;
     using Microsoft.Extensions.Configuration;
@@ -148,7 +146,6 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
             var buildingPersistentLocalId = Fixture.Create<BuildingPersistentLocalId>();
 
             var buildings = Container.Resolve<IBuildings>();
-            var eTagResponse = new ETagResponse(string.Empty, Fixture.Create<string>());
             var handler = new RealizeAndMeasureUnplannedBuildingLambdaHandler(
                 Container.Resolve<IConfiguration>(),
                 new FakeRetryPolicy(),
@@ -158,7 +155,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
 
             var request = new RealizeAndMeasureUnplannedBuildingLambdaRequest(
                 buildingPersistentLocalId,
-                new RealizeAndMeasureUnplannedBuildingSqsRequest()
+                new RealizeAndMeasureUnplannedBuildingSqsRequest
                 {
                     BuildingPersistentLocalId = buildingPersistentLocalId,
                     IfMatchHeaderValue = null,
@@ -177,6 +174,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
 
             //Act
             await handler.Handle(request, CancellationToken.None);
+            await Task.Delay(TimeSpan.FromMilliseconds(200)); // Verify Idempotency timestamp.
             await handler.Handle(request, CancellationToken.None);
 
             var building =

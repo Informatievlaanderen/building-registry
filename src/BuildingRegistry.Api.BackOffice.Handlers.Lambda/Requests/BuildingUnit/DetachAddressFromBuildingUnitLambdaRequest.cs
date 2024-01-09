@@ -1,9 +1,8 @@
 namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Requests.BuildingUnit
 {
+    using Abstractions.Building.Validators;
+    using Abstractions.BuildingUnit.Requests;
     using Abstractions.BuildingUnit.SqsRequests;
-    using BuildingRegistry.Api.BackOffice.Abstractions.Building.Validators;
-    using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Requests;
-    using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.SqsRequests;
     using BuildingRegistry.Building;
     using BuildingRegistry.Building.Commands;
 
@@ -38,7 +37,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Requests.BuildingUnit
                 BuildingPersistentLocalId,
                 new BuildingUnitPersistentLocalId(BuildingUnitPersistentLocalId),
                 new AddressPersistentLocalId(addressPersistentLocalId),
-                CommandProvenance);
+                Provenance);
         }
     }
 }

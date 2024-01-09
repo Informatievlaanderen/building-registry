@@ -1,11 +1,13 @@
 namespace BuildingRegistry.Tests.BackOffice.Infrastructure
 {
     using System;
+    using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
     using Autofac;
     using AutoFixture;
     using Be.Vlaanderen.Basisregisters.Api.ETag;
+    using Be.Vlaanderen.Basisregisters.EventHandling;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Building;
     using Building.Commands;
@@ -13,6 +15,9 @@ namespace BuildingRegistry.Tests.BackOffice.Infrastructure
     using BuildingRegistry.Api.BackOffice.Infrastructure;
     using Fixtures;
     using FluentAssertions;
+    using Newtonsoft.Json;
+    using SqlStreamStore;
+    using SqlStreamStore.Streams;
     using Xunit;
     using Xunit.Abstractions;
 
@@ -39,10 +44,14 @@ namespace BuildingRegistry.Tests.BackOffice.Infrastructure
             var placeBuildingUnderConstruction = Fixture.Create<PlaceBuildingUnderConstruction>();
             DispatchArrangeCommand(placeBuildingUnderConstruction);
 
-            var lastEvent = new BuildingBecameUnderConstructionV2(buildingPersistentLocalId);
-            ((ISetProvenance)lastEvent).SetProvenance(placeBuildingUnderConstruction.Provenance);
+            var stream = await Container.Resolve<IStreamStore>()
+                .ReadStreamBackwards(new StreamId(new BuildingStreamId(buildingPersistentLocalId)), 1, 1);
 
-            var validEtag = new ETag(ETagType.Strong, lastEvent.GetHash());
+            var lastEvent = JsonConvert.DeserializeObject<BuildingBecameUnderConstructionV2>(
+                await stream.Messages.First().GetJsonData(),
+                EventSerializerSettings);
+
+            var validEtag = new ETag(ETagType.Strong, lastEvent!.GetHash());
             var sut = new IfMatchHeaderValidator(Container.Resolve<IBuildings>(), _backOfficeContext);
 
             // Act
@@ -69,7 +78,6 @@ namespace BuildingRegistry.Tests.BackOffice.Infrastructure
             // Assert
             result.Should().BeFalse();
         }
-
 
         [Theory]
         [InlineData("")]

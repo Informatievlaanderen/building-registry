@@ -1,13 +1,13 @@
 namespace BuildingRegistry.Tests.BackOffice.Infrastructure
 {
     using System;
+    using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
     using AggregateTests.WhenPlanningBuildingUnit;
     using Autofac;
     using AutoFixture;
     using Be.Vlaanderen.Basisregisters.Api.ETag;
-    using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Be.Vlaanderen.Basisregisters.Sqs.Exceptions;
     using Building;
     using Building.Commands;
@@ -16,6 +16,9 @@ namespace BuildingRegistry.Tests.BackOffice.Infrastructure
     using BuildingRegistry.Api.BackOffice.Infrastructure;
     using Fixtures;
     using FluentAssertions;
+    using Newtonsoft.Json;
+    using SqlStreamStore;
+    using SqlStreamStore.Streams;
     using Xunit;
     using Xunit.Abstractions;
 
@@ -44,7 +47,6 @@ namespace BuildingRegistry.Tests.BackOffice.Infrastructure
             await _backOfficeContext.SaveChangesAsync();
 
             var planBuilding = Fixture.Create<PlanBuilding>();
-            var buildingGeometry = new BuildingGeometry(planBuilding.Geometry, BuildingGeometryMethod.Outlined);
             DispatchArrangeCommand(planBuilding);
 
             var planBuildingUnit = Fixture.Create<PlanBuildingUnit>()
@@ -52,16 +54,14 @@ namespace BuildingRegistry.Tests.BackOffice.Infrastructure
                 .WithPositionGeometryMethod(BuildingUnitPositionGeometryMethod.DerivedFromObject);
             DispatchArrangeCommand(planBuildingUnit);
 
-            var lastEvent = new BuildingUnitWasPlannedV2(
-                buildingPersistentLocalId,
-                buildingUnitPersistentLocalId,
-                planBuildingUnit.PositionGeometryMethod,
-                buildingGeometry.Center,
-                planBuildingUnit.Function,
-                planBuildingUnit.HasDeviation);
-            ((ISetProvenance)lastEvent).SetProvenance(planBuildingUnit.Provenance);
+            var stream = await Container.Resolve<IStreamStore>()
+                .ReadStreamBackwards(new StreamId(new BuildingStreamId(buildingPersistentLocalId)), 1, 1);
 
-            var validEtag = new ETag(ETagType.Strong, lastEvent.GetHash());
+            var lastEvent = JsonConvert.DeserializeObject<BuildingUnitWasPlannedV2>(
+                await stream.Messages.First().GetJsonData(),
+                EventSerializerSettings);
+
+            var validEtag = new ETag(ETagType.Strong, lastEvent!.GetHash());
             var sut = new IfMatchHeaderValidator(Container.Resolve<IBuildings>(), _backOfficeContext);
 
             // Act

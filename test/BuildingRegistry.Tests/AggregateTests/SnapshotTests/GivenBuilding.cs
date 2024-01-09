@@ -16,6 +16,7 @@ namespace BuildingRegistry.Tests.AggregateTests.SnapshotTests
     using FluentAssertions;
     using Legacy.Autofixture;
     using Newtonsoft.Json;
+    using NodaTime;
     using WhenPlanningBuildingUnit;
     using Xunit;
     using Xunit.Abstractions;
@@ -68,6 +69,15 @@ namespace BuildingRegistry.Tests.AggregateTests.SnapshotTests
                 hasDeviation: false);
             ((ISetProvenance)expectedEvent2).SetProvenance(provenance);
 
+            Assert(new Scenario()
+                .Given(_streamId,
+                    buildingWasPlanned,
+                    buildingUnitWasPlanned)
+                .When(planBuildingUnit)
+                .Then(
+                    new Fact(_streamId, expectedEvent),
+                    new Fact(_streamId, expectedEvent2)));
+
             var plannedBuildingUnit = new BuildingUnit(o => { });
             plannedBuildingUnit.Route(buildingUnitWasPlanned);
             var buildingUnit = new BuildingUnit(o => { });
@@ -89,26 +99,18 @@ namespace BuildingRegistry.Tests.AggregateTests.SnapshotTests
                     commonBuildingUnit
                 });
 
-            Assert(new Scenario()
-                .Given(_streamId,
-                    buildingWasPlanned,
-                    buildingUnitWasPlanned)
-                .When(planBuildingUnit)
-                .Then(
-                    new Fact(_streamId, expectedEvent),
-                    new Fact(_streamId, expectedEvent2)));
-
             var snapshotStore = (ISnapshotStore)Container.Resolve(typeof(ISnapshotStore));
             var latestSnapshot = await snapshotStore.FindLatestSnapshotAsync(_streamId, CancellationToken.None);
 
             latestSnapshot.Should().NotBeNull();
-            latestSnapshot
-                .Should()
-                .BeEquivalentTo(
-                    Build(
-                        expectedSnapshot,
-                        3,
-                        EventSerializerSettings));
+            var snapshot = JsonConvert.DeserializeObject<BuildingSnapshot>(latestSnapshot!.Data, EventSerializerSettings);
+
+            snapshot.Should().BeEquivalentTo(expectedSnapshot, options =>
+            {
+                options.Excluding(x => x.Path.EndsWith("LastEventHash"));
+                options.Excluding(x => x.Type == typeof(Instant));
+                return options;
+            });
         }
 
         private static SnapshotContainer Build(

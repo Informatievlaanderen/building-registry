@@ -35,7 +35,7 @@
                 Request.GeometriePolygoon.ToExtendedWkbGeometry(),
                 Request.SamenvoegenGebouwen
                     .Select(x => new BuildingPersistentLocalId(Convert.ToInt32(x.AsIdentifier().Map(s => s).Value))),
-                CommandProvenance);
+                Provenance);
         }
     }
 }
