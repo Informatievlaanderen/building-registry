@@ -1,6 +1,5 @@
 namespace BuildingRegistry.Projector.Infrastructure.Modules
 {
-    using System;
     using Autofac;
     using Autofac.Extensions.DependencyInjection;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
@@ -19,21 +18,25 @@ namespace BuildingRegistry.Projector.Infrastructure.Modules
     using BuildingRegistry.Projections.Extract.BuildingExtract;
     using BuildingRegistry.Projections.Extract.BuildingUnitAddressLinkExtract;
     using BuildingRegistry.Projections.Extract.BuildingUnitExtract;
+    using BuildingRegistry.Projections.Integration;
+    using BuildingRegistry.Projections.Integration.Building.LatestItem;
+    using BuildingRegistry.Projections.Integration.BuildingUnit.LatestItem;
+    using BuildingRegistry.Projections.Integration.Infrastructure;
     using BuildingRegistry.Projections.LastChangedList;
     using BuildingRegistry.Projections.Legacy;
-    using BuildingRegistry.Projections.Legacy.BuildingDetail;
     using BuildingRegistry.Projections.Legacy.BuildingDetailV2;
-    using BuildingRegistry.Projections.Legacy.BuildingPersistentIdCrabIdMapping;
     using BuildingRegistry.Projections.Legacy.BuildingSyndication;
-    using BuildingRegistry.Projections.Legacy.BuildingUnitDetail;
     using BuildingRegistry.Projections.Legacy.BuildingUnitDetailV2;
     using BuildingRegistry.Projections.Wfs;
     using BuildingRegistry.Projections.Wms;
+    using BuildingRegistry.Projections.Wms.BuildingUnitV2;
+    using BuildingRegistry.Projections.Wms.BuildingV2;
     using Microsoft.Data.SqlClient;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Logging;
     using Microsoft.Extensions.Options;
+    using LastChangedListContextMigrationFactory = BuildingRegistry.Projections.LastChangedList.LastChangedListContextMigrationFactory;
 
     public class ApiModule : Module
     {
@@ -83,6 +86,11 @@ namespace BuildingRegistry.Projector.Infrastructure.Modules
             RegisterLegacyProjectionsV2(builder);
             RegisterWmsProjectionsV2(builder);
             RegisterWfsProjectionsV2(builder);
+
+            if (_configuration.GetSection("Integration").GetValue("Enabled", false))
+            {
+                RegisterIntegrationProjections(builder);
+            }
         }
 
         private void RegisterExtractProjectionsV2(ContainerBuilder builder)
@@ -130,7 +138,7 @@ namespace BuildingRegistry.Projector.Infrastructure.Modules
                         _loggerFactory));
 
             builder
-                .RegisterProjectionMigrator<BuildingRegistry.Projections.LastChangedList.LastChangedListContextMigrationFactory>(
+                .RegisterProjectionMigrator<LastChangedListContextMigrationFactory>(
                     _configuration,
                     _loggerFactory)
                 .RegisterProjectionMigrator<DataMigrationContextMigrationFactory>(
@@ -184,11 +192,11 @@ namespace BuildingRegistry.Projector.Infrastructure.Modules
                 .RegisterProjectionMigrator<WmsContextMigrationFactory>(
                     _configuration,
                     _loggerFactory)
-                .RegisterProjections<BuildingRegistry.Projections.Wms.BuildingV2.BuildingV2Projections, WmsContext>(() =>
-                        new BuildingRegistry.Projections.Wms.BuildingV2.BuildingV2Projections(WKBReaderFactory.Create()),
+                .RegisterProjections<BuildingV2Projections, WmsContext>(() =>
+                        new BuildingV2Projections(WKBReaderFactory.Create()),
                     wmsProjectionSettings)
-                .RegisterProjections<BuildingRegistry.Projections.Wms.BuildingUnitV2.BuildingUnitV2Projections, WmsContext>(() =>
-                        new BuildingRegistry.Projections.Wms.BuildingUnitV2.BuildingUnitV2Projections(WKBReaderFactory.Create()),
+                .RegisterProjections<BuildingUnitV2Projections, WmsContext>(() =>
+                        new BuildingUnitV2Projections(WKBReaderFactory.Create()),
                     wmsProjectionSettings);
         }
 
@@ -215,6 +223,26 @@ namespace BuildingRegistry.Projector.Infrastructure.Modules
                 .RegisterProjections<BuildingRegistry.Projections.Wfs.BuildingUnitV2.BuildingUnitV2Projections, WfsContext>(() =>
                         new BuildingRegistry.Projections.Wfs.BuildingUnitV2.BuildingUnitV2Projections(WKBReaderFactory.Create()),
                     wfsProjectionSettings);
+        }
+
+        private void RegisterIntegrationProjections(ContainerBuilder builder)
+        {
+            builder
+                .RegisterModule(
+                    new IntegrationModule(
+                        _configuration,
+                        _services,
+                        _loggerFactory));
+            builder
+                .RegisterProjectionMigrator<IntegrationContextMigrationFactory>(
+                    _configuration,
+                    _loggerFactory)
+                .RegisterProjections<BuildingLatestItemProjections, IntegrationContext>(
+                    context => new BuildingLatestItemProjections(context.Resolve<IOptions<IntegrationOptions>>()),
+                    ConnectedProjectionSettings.Default)
+                .RegisterProjections<BuildingUnitLatestItemProjections, IntegrationContext>(
+                    context => new BuildingUnitLatestItemProjections(context.Resolve<IOptions<IntegrationOptions>>()),
+                    ConnectedProjectionSettings.Default);
         }
     }
 }
