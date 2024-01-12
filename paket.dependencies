@@ -19,6 +19,7 @@ nuget MediatR.Contracts 2.0.1
 nuget MediatR.Extensions.Microsoft.DependencyInjection 10.0.1
 
 nuget Microsoft.EntityFrameworkCore.SqlServer.NetTopologySuite 6.0.3
+nuget Npgsql.EntityFrameworkCore.PostgreSQL.NetTopologySuite 6.0.3
 nuget NetTopologySuite 2.4.0
 
 nuget NodaTime 3.1.6

@@ -11,6 +11,7 @@ namespace BuildingRegistry.Projector.Infrastructure
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.LastChangedList;
     using Be.Vlaanderen.Basisregisters.Projector.ConnectedProjections;
     using BuildingRegistry.Projections.Extract;
+    using BuildingRegistry.Projections.Integration.Infrastructure;
     using BuildingRegistry.Projections.Legacy;
     using BuildingRegistry.Projections.Wfs;
     using BuildingRegistry.Projections.Wms;
@@ -94,13 +95,33 @@ namespace BuildingRegistry.Projector.Infrastructure
                         {
                             var connectionStrings = _configuration
                                 .GetSection("ConnectionStrings")
-                                .GetChildren();
+                                .GetChildren()
+                                .ToList();
 
-                            foreach (var connectionString in connectionStrings)
+                            if (!_configuration.GetSection("Integration").GetValue("Enabled", false))
+                            {
+                                connectionStrings = connectionStrings
+                                    .Where(x => !x.Key.StartsWith("Integration", StringComparison.OrdinalIgnoreCase))
+                                    .ToList();
+                            }
+
+                            foreach (var connectionString in connectionStrings
+                                         .Where(x => !x.Value.Contains("host", StringComparison.OrdinalIgnoreCase)))
+                            {
                                 health.AddSqlServer(
                                     connectionString.Value,
                                     name: $"sqlserver-{connectionString.Key.ToLowerInvariant()}",
                                     tags: new[] {DatabaseTag, "sql", "sqlserver"});
+                            }
+
+                            foreach (var connectionString in connectionStrings
+                                         .Where(x => x.Value.Contains("host", StringComparison.OrdinalIgnoreCase)))
+                            {
+                                health.AddNpgSql(
+                                    connectionString.Value,
+                                    name: $"npgsql-{connectionString.Key.ToLowerInvariant()}",
+                                    tags: new[] {DatabaseTag, "sql", "npgsql"});
+                            }
 
                             health.AddDbContextCheck<ExtractContext>(
                                 $"dbcontext-{nameof(ExtractContext).ToLowerInvariant()}",
@@ -125,6 +146,7 @@ namespace BuildingRegistry.Projector.Infrastructure
                     }
                 })
                 .Configure<ExtractConfig>(_configuration.GetSection("Extract"))
+                .Configure<IntegrationOptions>(_configuration.GetSection("Integration"))
                 .Configure<FeatureToggleOptions>(_configuration.GetSection(FeatureToggleOptions.ConfigurationKey))
                 .AddSingleton(c => new UseProjectionsV2Toggle(c.GetRequiredService<IOptions<FeatureToggleOptions>>().Value.UseProjectionsV2));
 
