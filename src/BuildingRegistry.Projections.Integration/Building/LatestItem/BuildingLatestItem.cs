@@ -22,7 +22,7 @@
         public string? NisCode { get; set; }
         public bool IsRemoved { get; set; }
 
-        public string PuriId { get; set; }
+        public string Puri { get; set; }
         public string Namespace { get; set; }
 
         public string VersionAsString { get; set; }
@@ -59,7 +59,7 @@
             builder.Property(x => x.Geometry).HasColumnName("geometry");
             builder.Property(x => x.NisCode).HasColumnName("nis_code");
             builder.Property(x => x.IsRemoved).HasColumnName("is_removed");
-            builder.Property(x => x.PuriId).HasColumnName("puri_id");
+            builder.Property(x => x.Puri).HasColumnName("puri");
             builder.Property(x => x.Namespace).HasColumnName("namespace");
             builder.Property(x => x.VersionAsString).HasColumnName("version_as_string");
             builder.Property(BuildingLatestItem.VersionTimestampBackingPropertyName).HasColumnName("version_timestamp");
