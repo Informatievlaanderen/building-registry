@@ -85,7 +85,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration
                         buildingUnitLatestItem.HasDeviation.Should().BeFalse();
                         buildingUnitLatestItem.IsRemoved.Should().Be(buildingUnit.IsRemoved);
                         buildingUnitLatestItem.Namespace.Should().Be(BuildingUnitNamespace);
-                        buildingUnitLatestItem.PuriId.Should().Be($"{BuildingUnitNamespace}/{buildingUnitLatestItem.BuildingUnitPersistentLocalId}");
+                        buildingUnitLatestItem.Puri.Should().Be($"{BuildingUnitNamespace}/{buildingUnitLatestItem.BuildingUnitPersistentLocalId}");
                         buildingUnitLatestItem.VersionTimestamp.Should().Be(buildingWasMigrated.Provenance.Timestamp);
 
                         var buildingUnitAddresses = context.BuildingUnitAddresses

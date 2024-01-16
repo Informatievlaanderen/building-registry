@@ -37,7 +37,7 @@
                     IsRemoved = message.Message.IsRemoved,
                     VersionTimestamp = message.Message.Provenance.Timestamp,
                     Namespace = options.Value.BuildingNamespace,
-                    PuriId = $"{options.Value.BuildingNamespace}/{message.Message.BuildingPersistentLocalId}"
+                    Puri = $"{options.Value.BuildingNamespace}/{message.Message.BuildingPersistentLocalId}"
                 };
 
                 await context
@@ -64,7 +64,7 @@
                     IsRemoved = false,
                     VersionTimestamp = message.Message.Provenance.Timestamp,
                     Namespace = options.Value.BuildingNamespace,
-                    PuriId = $"{options.Value.BuildingNamespace}/{message.Message.BuildingPersistentLocalId}"
+                    Puri = $"{options.Value.BuildingNamespace}/{message.Message.BuildingPersistentLocalId}"
                 };
 
                 await context
@@ -91,7 +91,7 @@
                     IsRemoved = false,
                     VersionTimestamp = message.Message.Provenance.Timestamp,
                     Namespace = options.Value.BuildingNamespace,
-                    PuriId = $"{options.Value.BuildingNamespace}/{message.Message.BuildingPersistentLocalId}"
+                    Puri = $"{options.Value.BuildingNamespace}/{message.Message.BuildingPersistentLocalId}"
                 };
 
                 await context
@@ -336,7 +336,7 @@
                     IsRemoved = false,
                     VersionTimestamp = message.Message.Provenance.Timestamp,
                     Namespace = options.Value.BuildingNamespace,
-                    PuriId = $"{options.Value.BuildingNamespace}/{message.Message.BuildingPersistentLocalId}"
+                    Puri = $"{options.Value.BuildingNamespace}/{message.Message.BuildingPersistentLocalId}"
                 };
 
                 await context

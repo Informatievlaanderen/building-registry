@@ -65,7 +65,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration
                     buildingLatestItem.OsloGeometryMethod.Should().Be(buildingWasMigrated.GeometryMethod);
                     buildingLatestItem.IsRemoved.Should().Be(buildingWasMigrated.IsRemoved);
                     buildingLatestItem.Namespace.Should().Be(BuildingNamespace);
-                    buildingLatestItem.PuriId.Should().Be($"{BuildingNamespace}/{buildingWasMigrated.BuildingPersistentLocalId}");
+                    buildingLatestItem.Puri.Should().Be($"{BuildingNamespace}/{buildingWasMigrated.BuildingPersistentLocalId}");
                     buildingLatestItem.VersionTimestamp.Should().Be(buildingWasMigrated.Provenance.Timestamp);
                 });
         }
@@ -96,7 +96,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration
                     buildingLatestItem.OsloGeometryMethod.Should().Be("Outlined");
                     buildingLatestItem.IsRemoved.Should().BeFalse();
                     buildingLatestItem.Namespace.Should().Be(BuildingNamespace);
-                    buildingLatestItem.PuriId.Should().Be($"{BuildingNamespace}/{buildingWasPlannedV2.BuildingPersistentLocalId}");
+                    buildingLatestItem.Puri.Should().Be($"{BuildingNamespace}/{buildingWasPlannedV2.BuildingPersistentLocalId}");
                     buildingLatestItem.VersionTimestamp.Should().Be(buildingWasPlannedV2.Provenance.Timestamp);
                 });
         }
@@ -129,7 +129,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration
                         .BeEquivalentTo(_wkbReader.Read(unplannedBuildingWasRealizedAndMeasured.ExtendedWkbGeometry.ToByteArray()));
                     buildingLatestItem.IsRemoved.Should().BeFalse();
                     buildingLatestItem.Namespace.Should().Be(BuildingNamespace);
-                    buildingLatestItem.PuriId.Should().Be($"{BuildingNamespace}/{unplannedBuildingWasRealizedAndMeasured.BuildingPersistentLocalId}");
+                    buildingLatestItem.Puri.Should().Be($"{BuildingNamespace}/{unplannedBuildingWasRealizedAndMeasured.BuildingPersistentLocalId}");
                     buildingLatestItem.VersionTimestamp.Should().Be(unplannedBuildingWasRealizedAndMeasured.Provenance.Timestamp);
                 });
         }
