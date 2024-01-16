@@ -58,11 +58,11 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration
                     var buildingLatestItem = await ct.BuildingLatestItems.FindAsync(buildingWasMigrated.BuildingPersistentLocalId);
                     buildingLatestItem.Should().NotBeNull();
 
-                    buildingLatestItem!.Status.Should().Be(BuildingStatus.Parse(buildingWasMigrated.BuildingStatus).Map());
-                    buildingLatestItem.OsloStatus.Should().Be(buildingWasMigrated.BuildingStatus);
+                    buildingLatestItem!.OsloStatus.Should().Be(BuildingStatus.Parse(buildingWasMigrated.BuildingStatus).Map());
+                    buildingLatestItem.Status.Should().Be(buildingWasMigrated.BuildingStatus);
                     buildingLatestItem.Geometry.Should().BeEquivalentTo(_wkbReader.Read(buildingWasMigrated.ExtendedWkbGeometry.ToByteArray()));
-                    buildingLatestItem.GeometryMethod.Should().Be(BuildingGeometryMethod.Parse(buildingWasMigrated.GeometryMethod).Map());
-                    buildingLatestItem.OsloGeometryMethod.Should().Be(buildingWasMigrated.GeometryMethod);
+                    buildingLatestItem.OsloGeometryMethod.Should().Be(BuildingGeometryMethod.Parse(buildingWasMigrated.GeometryMethod).Map());
+                    buildingLatestItem.GeometryMethod.Should().Be(buildingWasMigrated.GeometryMethod);
                     buildingLatestItem.IsRemoved.Should().Be(buildingWasMigrated.IsRemoved);
                     buildingLatestItem.Namespace.Should().Be(BuildingNamespace);
                     buildingLatestItem.Puri.Should().Be($"{BuildingNamespace}/{buildingWasMigrated.BuildingPersistentLocalId}");
@@ -89,11 +89,11 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration
                     var buildingLatestItem = await ct.BuildingLatestItems.FindAsync(buildingWasPlannedV2.BuildingPersistentLocalId);
                     buildingLatestItem.Should().NotBeNull();
 
-                    buildingLatestItem!.Status.Should().Be(BuildingStatus.Planned.Map());
-                    buildingLatestItem.OsloStatus.Should().Be("Planned");
+                    buildingLatestItem!.OsloStatus.Should().Be(BuildingStatus.Planned.Map());
+                    buildingLatestItem.Status.Should().Be("Planned");
                     buildingLatestItem.Geometry.Should().BeEquivalentTo(_wkbReader.Read(buildingWasPlannedV2.ExtendedWkbGeometry.ToByteArray()));
-                    buildingLatestItem.GeometryMethod.Should().Be(BuildingGeometryMethod.Outlined.Map());
-                    buildingLatestItem.OsloGeometryMethod.Should().Be("Outlined");
+                    buildingLatestItem.OsloGeometryMethod.Should().Be(BuildingGeometryMethod.Outlined.Map());
+                    buildingLatestItem.GeometryMethod.Should().Be("Outlined");
                     buildingLatestItem.IsRemoved.Should().BeFalse();
                     buildingLatestItem.Namespace.Should().Be(BuildingNamespace);
                     buildingLatestItem.Puri.Should().Be($"{BuildingNamespace}/{buildingWasPlannedV2.BuildingPersistentLocalId}");
@@ -121,10 +121,10 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration
                         await ct.BuildingLatestItems.FindAsync(unplannedBuildingWasRealizedAndMeasured.BuildingPersistentLocalId);
                     buildingLatestItem.Should().NotBeNull();
 
-                    buildingLatestItem!.Status.Should().Be(BuildingStatus.Realized.Map());
-                    buildingLatestItem.OsloStatus.Should().Be("Realized");
-                    buildingLatestItem.GeometryMethod.Should().Be(BuildingGeometryMethod.MeasuredByGrb.Map());
-                    buildingLatestItem.OsloGeometryMethod.Should().Be("MeasuredByGrb");
+                    buildingLatestItem!.OsloStatus.Should().Be(BuildingStatus.Realized.Map());
+                    buildingLatestItem.Status.Should().Be("Realized");
+                    buildingLatestItem.OsloGeometryMethod.Should().Be(BuildingGeometryMethod.MeasuredByGrb.Map());
+                    buildingLatestItem.GeometryMethod.Should().Be("MeasuredByGrb");
                     buildingLatestItem.Geometry.Should()
                         .BeEquivalentTo(_wkbReader.Read(unplannedBuildingWasRealizedAndMeasured.ExtendedWkbGeometry.ToByteArray()));
                     buildingLatestItem.IsRemoved.Should().BeFalse();
@@ -315,8 +315,8 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration
 
                     buildingLatestItem!.Geometry.Should()
                         .BeEquivalentTo(_wkbReader.Read(buildingOutlineWasChanged.ExtendedWkbGeometryBuilding.ToByteArray()));
-                    buildingLatestItem.GeometryMethod.Should().Be(BuildingGeometryMethod.Outlined.Map());
-                    buildingLatestItem.OsloGeometryMethod.Should().Be("Outlined");
+                    buildingLatestItem.OsloGeometryMethod.Should().Be(BuildingGeometryMethod.Outlined.Map());
+                    buildingLatestItem.GeometryMethod.Should().Be("Outlined");
                     buildingLatestItem.VersionTimestamp.Should().Be(buildingOutlineWasChanged.Provenance.Timestamp);
                 });
         }
@@ -352,8 +352,8 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration
 
                     buildingLatestItem!.Geometry.Should()
                         .BeEquivalentTo(_wkbReader.Read(buildingOMeasurementWasChanged.ExtendedWkbGeometryBuilding.ToByteArray()));
-                    buildingLatestItem.GeometryMethod.Should().Be(BuildingGeometryMethod.MeasuredByGrb.Map());
-                    buildingLatestItem.OsloGeometryMethod.Should().Be("MeasuredByGrb");
+                    buildingLatestItem.OsloGeometryMethod.Should().Be(BuildingGeometryMethod.MeasuredByGrb.Map());
+                    buildingLatestItem.GeometryMethod.Should().Be("MeasuredByGrb");
                     buildingLatestItem.VersionTimestamp.Should().Be(buildingOMeasurementWasChanged.Provenance.Timestamp);
                 });
         }
@@ -388,8 +388,8 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration
                     var buildingLatestItem = await ct.BuildingLatestItems.FindAsync(buildingBecameUnderConstructionV2.BuildingPersistentLocalId);
                     buildingLatestItem.Should().NotBeNull();
 
-                    buildingLatestItem!.Status.Should().Be(BuildingStatus.UnderConstruction.Map());
-                    buildingLatestItem.OsloStatus.Should().Be("UnderConstruction");
+                    buildingLatestItem!.OsloStatus.Should().Be(BuildingStatus.UnderConstruction.Map());
+                    buildingLatestItem.Status.Should().Be("UnderConstruction");
                     buildingLatestItem.VersionTimestamp.Should().Be(buildingBecameUnderConstructionV2.Provenance.Timestamp);
                 });
         }
@@ -425,8 +425,8 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration
                         await ct.BuildingLatestItems.FindAsync(buildingWasCorrectedFromUnderConstructionToPlanned.BuildingPersistentLocalId);
                     buildingLatestItem.Should().NotBeNull();
 
-                    buildingLatestItem!.Status.Should().Be(BuildingStatus.Planned.Map());
-                    buildingLatestItem.OsloStatus.Should().Be("Planned");
+                    buildingLatestItem!.OsloStatus.Should().Be(BuildingStatus.Planned.Map());
+                    buildingLatestItem.Status.Should().Be("Planned");
                     buildingLatestItem.VersionTimestamp.Should().Be(buildingWasCorrectedFromUnderConstructionToPlanned.Provenance.Timestamp);
                 });
         }
@@ -460,8 +460,8 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration
                     var buildingLatestItem = await ct.BuildingLatestItems.FindAsync(buildingWasRealizedV2.BuildingPersistentLocalId);
                     buildingLatestItem.Should().NotBeNull();
 
-                    buildingLatestItem!.Status.Should().Be(BuildingStatus.Realized.Map());
-                    buildingLatestItem.OsloStatus.Should().Be("Realized");
+                    buildingLatestItem!.OsloStatus.Should().Be(BuildingStatus.Realized.Map());
+                    buildingLatestItem.Status.Should().Be("Realized");
                     buildingLatestItem.VersionTimestamp.Should().Be(buildingWasRealizedV2.Provenance.Timestamp);
                 });
         }
@@ -510,8 +510,8 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration
                     var buildingLatestItem = await ct.BuildingLatestItems.FindAsync(buildingWasRealizedV2.BuildingPersistentLocalId);
                     buildingLatestItem.Should().NotBeNull();
 
-                    buildingLatestItem!.Status.Should().Be(BuildingStatus.UnderConstruction.Map());
-                    buildingLatestItem.OsloStatus.Should().Be("UnderConstruction");
+                    buildingLatestItem!.OsloStatus.Should().Be(BuildingStatus.UnderConstruction.Map());
+                    buildingLatestItem.Status.Should().Be("UnderConstruction");
                     buildingLatestItem.VersionTimestamp.Should().Be(buildingWasCorrectedFromRealizedToUnderConstruction.Provenance.Timestamp);
                 });
         }
@@ -542,8 +542,8 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration
                     var buildingLatestItem = await ct.BuildingLatestItems.FindAsync(buildingWasNotRealizedV2.BuildingPersistentLocalId);
                     buildingLatestItem.Should().NotBeNull();
 
-                    buildingLatestItem!.Status.Should().Be(BuildingStatus.NotRealized.Map());
-                    buildingLatestItem.OsloStatus.Should().Be("NotRealized");
+                    buildingLatestItem!.OsloStatus.Should().Be(BuildingStatus.NotRealized.Map());
+                    buildingLatestItem.Status.Should().Be("NotRealized");
                     buildingLatestItem.VersionTimestamp.Should().Be(buildingWasNotRealizedV2.Provenance.Timestamp);
                 });
         }
@@ -592,8 +592,8 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration
                     var buildingLatestItem = await ct.BuildingLatestItems.FindAsync(buildingWasNotRealizedV2.BuildingPersistentLocalId);
                     buildingLatestItem.Should().NotBeNull();
 
-                    buildingLatestItem!.Status.Should().Be(BuildingStatus.Planned.Map());
-                    buildingLatestItem.OsloStatus.Should().Be("Planned");
+                    buildingLatestItem!.OsloStatus.Should().Be(BuildingStatus.Planned.Map());
+                    buildingLatestItem.Status.Should().Be("Planned");
                     buildingLatestItem.VersionTimestamp.Should().Be(buildingWasCorrectedFromNotRealizedToPlanned.Provenance.Timestamp);
                 });
         }
@@ -671,8 +671,8 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration
                     buildingLatestItem.Should().NotBeNull();
 
                     buildingLatestItem!.Geometry.Should().BeEquivalentTo(_wkbReader.Read(buildingWasMeasured.ExtendedWkbGeometryBuilding.ToByteArray()));
-                    buildingLatestItem.GeometryMethod.Should().Be(BuildingGeometryMethod.MeasuredByGrb.Map());
-                    buildingLatestItem.OsloGeometryMethod.Should().Be("MeasuredByGrb");
+                    buildingLatestItem.OsloGeometryMethod.Should().Be(BuildingGeometryMethod.MeasuredByGrb.Map());
+                    buildingLatestItem.GeometryMethod.Should().Be("MeasuredByGrb");
                     buildingLatestItem.VersionTimestamp.Should().Be(buildingWasMeasured.Provenance.Timestamp);
                 });
         }
@@ -719,8 +719,8 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration
                     buildingLatestItem.Should().NotBeNull();
 
                     buildingLatestItem!.Geometry.Should().BeEquivalentTo(_wkbReader.Read(buildingMeasurementWasCorrected.ExtendedWkbGeometryBuilding.ToByteArray()));
-                    buildingLatestItem.GeometryMethod.Should().Be(BuildingGeometryMethod.MeasuredByGrb.Map());
-                    buildingLatestItem.OsloGeometryMethod.Should().Be("MeasuredByGrb");
+                    buildingLatestItem.OsloGeometryMethod.Should().Be(BuildingGeometryMethod.MeasuredByGrb.Map());
+                    buildingLatestItem.GeometryMethod.Should().Be("MeasuredByGrb");
                     buildingLatestItem.VersionTimestamp.Should().Be(buildingMeasurementWasCorrected.Provenance.Timestamp);
                 });
         }
@@ -762,8 +762,8 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration
                     var buildingLatestItem = await ct.BuildingLatestItems.FindAsync(buildingWasDemolished.BuildingPersistentLocalId);
                     buildingLatestItem.Should().NotBeNull();
 
-                    buildingLatestItem!.Status.Should().Be(BuildingStatus.Retired.Map());
-                    buildingLatestItem.OsloStatus.Should().Be("Retired");
+                    buildingLatestItem!.OsloStatus.Should().Be(BuildingStatus.Retired.Map());
+                    buildingLatestItem.Status.Should().Be("Retired");
                     buildingLatestItem.VersionTimestamp.Should().Be(buildingWasDemolished.Provenance.Timestamp);
                 });
         }
@@ -793,11 +793,11 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration
                     buildingLatestItem.Should().NotBeNull();
 
                     buildingLatestItem!.BuildingPersistentLocalId.Should().Be(buildingMergerWasRealized.BuildingPersistentLocalId);
-                    buildingLatestItem.Status.Should().Be(BuildingStatus.Realized.Map());
-                    buildingLatestItem.OsloStatus.Should().Be("Realized");
+                    buildingLatestItem.OsloStatus.Should().Be(BuildingStatus.Realized.Map());
+                    buildingLatestItem.Status.Should().Be("Realized");
                     buildingLatestItem.Geometry.Should().BeEquivalentTo(_wkbReader.Read(buildingMergerWasRealized.ExtendedWkbGeometry.ToByteArray()));
-                    buildingLatestItem.GeometryMethod.Should().Be(BuildingGeometryMethod.MeasuredByGrb.Map());
-                    buildingLatestItem.OsloGeometryMethod.Should().Be("MeasuredByGrb");
+                    buildingLatestItem.OsloGeometryMethod.Should().Be(BuildingGeometryMethod.MeasuredByGrb.Map());
+                    buildingLatestItem.GeometryMethod.Should().Be("MeasuredByGrb");
                     buildingLatestItem.VersionTimestamp.Should().Be(buildingMergerWasRealized.Provenance.Timestamp);
                 });
         }
@@ -878,8 +878,8 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration
                     var buildingLatestItem = await ct.BuildingLatestItems.FindAsync(buildingWasMerged.BuildingPersistentLocalId);
                     buildingLatestItem.Should().NotBeNull();
 
-                    buildingLatestItem!.Status.Should().Be(BuildingStatus.Retired.Map());
-                    buildingLatestItem.OsloStatus.Should().Be("Retired");
+                    buildingLatestItem!.OsloStatus.Should().Be(BuildingStatus.Retired.Map());
+                    buildingLatestItem.Status.Should().Be("Retired");
                     buildingLatestItem.VersionTimestamp.Should().Be(buildingWasMerged.Provenance.Timestamp);
                 });
         }
