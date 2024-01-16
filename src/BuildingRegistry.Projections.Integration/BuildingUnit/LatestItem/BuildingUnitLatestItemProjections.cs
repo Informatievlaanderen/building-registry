@@ -33,12 +33,12 @@
                     {
                         BuildingUnitPersistentLocalId = buildingUnit.BuildingUnitPersistentLocalId,
                         BuildingPersistentLocalId = message.Message.BuildingPersistentLocalId,
-                        Status = BuildingUnitStatus.Parse(buildingUnit.Status).Map(),
-                        OsloStatus = buildingUnit.Status,
-                        Function = BuildingUnitFunction.Parse(buildingUnit.Function).Map(),
-                        OsloFunction = buildingUnit.Function,
-                        GeometryMethod = BuildingUnitPositionGeometryMethod.Parse(buildingUnit.GeometryMethod).Map(),
-                        OsloGeometryMethod = buildingUnit.GeometryMethod,
+                        OsloStatus = BuildingUnitStatus.Parse(buildingUnit.Status).Map(),
+                        Status = buildingUnit.Status,
+                        OsloFunction = BuildingUnitFunction.Parse(buildingUnit.Function).Map(),
+                        Function = buildingUnit.Function,
+                        OsloGeometryMethod = BuildingUnitPositionGeometryMethod.Parse(buildingUnit.GeometryMethod).Map(),
+                        GeometryMethod = buildingUnit.GeometryMethod,
                         Geometry = sysGeometry,
                         HasDeviation = false,
                         IsRemoved = buildingUnit.IsRemoved,
@@ -76,8 +76,8 @@
                         buildingUnit =>
                         {
                             buildingUnit.Geometry = sysGeometry;
-                            buildingUnit.GeometryMethod = BuildingUnitPositionGeometryMethod.DerivedFromObject.Map();
-                            buildingUnit.OsloGeometryMethod = BuildingUnitPositionGeometryMethod.DerivedFromObject.GeometryMethod;
+                            buildingUnit.OsloGeometryMethod = BuildingUnitPositionGeometryMethod.DerivedFromObject.Map();
+                            buildingUnit.GeometryMethod = BuildingUnitPositionGeometryMethod.DerivedFromObject.GeometryMethod;
                             UpdateVersionTimestamp(buildingUnit, message.Message);
                             return Task.CompletedTask;
                         },
@@ -104,8 +104,8 @@
                         buildingUnit =>
                         {
                             buildingUnit.Geometry = sysGeometry;
-                            buildingUnit.GeometryMethod = BuildingUnitPositionGeometryMethod.DerivedFromObject.Map();
-                            buildingUnit.OsloGeometryMethod = BuildingUnitPositionGeometryMethod.DerivedFromObject.GeometryMethod;
+                            buildingUnit.OsloGeometryMethod = BuildingUnitPositionGeometryMethod.DerivedFromObject.Map();
+                            buildingUnit.GeometryMethod = BuildingUnitPositionGeometryMethod.DerivedFromObject.GeometryMethod;
                             UpdateVersionTimestamp(buildingUnit, message.Message);
                             return Task.CompletedTask;
                         },
@@ -132,8 +132,8 @@
                         buildingUnit =>
                         {
                             buildingUnit.Geometry = sysGeometry;
-                            buildingUnit.GeometryMethod = BuildingUnitPositionGeometryMethod.DerivedFromObject.Map();
-                            buildingUnit.OsloGeometryMethod = BuildingUnitPositionGeometryMethod.DerivedFromObject.GeometryMethod;
+                            buildingUnit.OsloGeometryMethod = BuildingUnitPositionGeometryMethod.DerivedFromObject.Map();
+                            buildingUnit.GeometryMethod = BuildingUnitPositionGeometryMethod.DerivedFromObject.GeometryMethod;
                             UpdateVersionTimestamp(buildingUnit, message.Message);
                             return Task.CompletedTask;
                         },
@@ -160,8 +160,8 @@
                         buildingUnit =>
                         {
                             buildingUnit.Geometry = sysGeometry;
-                            buildingUnit.GeometryMethod = BuildingUnitPositionGeometryMethod.DerivedFromObject.Map();
-                            buildingUnit.OsloGeometryMethod = BuildingUnitPositionGeometryMethod.DerivedFromObject.GeometryMethod;
+                            buildingUnit.OsloGeometryMethod = BuildingUnitPositionGeometryMethod.DerivedFromObject.Map();
+                            buildingUnit.GeometryMethod = BuildingUnitPositionGeometryMethod.DerivedFromObject.GeometryMethod;
                             UpdateVersionTimestamp(buildingUnit, message.Message);
                             return Task.CompletedTask;
                         },
@@ -180,12 +180,12 @@
                 {
                     BuildingUnitPersistentLocalId = message.Message.BuildingUnitPersistentLocalId,
                     BuildingPersistentLocalId = message.Message.BuildingPersistentLocalId,
-                    Status = BuildingUnitStatus.Planned.Map(),
-                    OsloStatus = BuildingUnitStatus.Planned.Status,
-                    Function = BuildingUnitFunction.Parse(message.Message.Function).Map(),
-                    OsloFunction = message.Message.Function,
-                    GeometryMethod = BuildingUnitPositionGeometryMethod.Parse(message.Message.GeometryMethod).Map(),
-                    OsloGeometryMethod = message.Message.GeometryMethod,
+                    OsloStatus = BuildingUnitStatus.Planned.Map(),
+                    Status = BuildingUnitStatus.Planned.Status,
+                    OsloFunction = BuildingUnitFunction.Parse(message.Message.Function).Map(),
+                    Function = message.Message.Function,
+                    OsloGeometryMethod = BuildingUnitPositionGeometryMethod.Parse(message.Message.GeometryMethod).Map(),
+                    GeometryMethod = message.Message.GeometryMethod,
                     Geometry = sysGeometry,
                     HasDeviation = message.Message.HasDeviation,
                     IsRemoved = false,
@@ -205,8 +205,8 @@
                     message.Message.BuildingUnitPersistentLocalId,
                     buildingUnit =>
                     {
-                        buildingUnit.Status = BuildingUnitStatus.Realized.Map();
-                        buildingUnit.OsloStatus = BuildingUnitStatus.Realized.Status;
+                        buildingUnit.OsloStatus = BuildingUnitStatus.Realized.Map();
+                        buildingUnit.Status = BuildingUnitStatus.Realized.Status;
                         UpdateVersionTimestamp(buildingUnit, message.Message);
                         return Task.CompletedTask;
                     },
@@ -219,8 +219,8 @@
                     message.Message.BuildingUnitPersistentLocalId,
                     buildingUnit =>
                     {
-                        buildingUnit.Status = BuildingUnitStatus.Realized.Map();
-                        buildingUnit.OsloStatus = BuildingUnitStatus.Realized.Status;
+                        buildingUnit.OsloStatus = BuildingUnitStatus.Realized.Map();
+                        buildingUnit.Status = BuildingUnitStatus.Realized.Status;
                         UpdateVersionTimestamp(buildingUnit, message.Message);
                         return Task.CompletedTask;
                     },
@@ -233,8 +233,8 @@
                     message.Message.BuildingUnitPersistentLocalId,
                     buildingUnit =>
                     {
-                        buildingUnit.Status = BuildingUnitStatus.Planned.Map();
-                        buildingUnit.OsloStatus = BuildingUnitStatus.Planned.Status;
+                        buildingUnit.OsloStatus = BuildingUnitStatus.Planned.Map();
+                        buildingUnit.Status = BuildingUnitStatus.Planned.Status;
                         UpdateVersionTimestamp(buildingUnit, message.Message);
                         return Task.CompletedTask;
                     },
@@ -247,8 +247,8 @@
                     message.Message.BuildingUnitPersistentLocalId,
                     buildingUnit =>
                     {
-                        buildingUnit.Status = BuildingUnitStatus.Planned.Map();
-                        buildingUnit.OsloStatus = BuildingUnitStatus.Planned.Status;
+                        buildingUnit.OsloStatus = BuildingUnitStatus.Planned.Map();
+                        buildingUnit.Status = BuildingUnitStatus.Planned.Status;
                         UpdateVersionTimestamp(buildingUnit, message.Message);
                         return Task.CompletedTask;
                     },
@@ -261,8 +261,8 @@
                     message.Message.BuildingUnitPersistentLocalId,
                     buildingUnit =>
                     {
-                        buildingUnit.Status = BuildingUnitStatus.NotRealized.Map();
-                        buildingUnit.OsloStatus = BuildingUnitStatus.NotRealized.Status;
+                        buildingUnit.OsloStatus = BuildingUnitStatus.NotRealized.Map();
+                        buildingUnit.Status = BuildingUnitStatus.NotRealized.Status;
                         UpdateVersionTimestamp(buildingUnit, message.Message);
                         return Task.CompletedTask;
                     },
@@ -275,8 +275,8 @@
                     message.Message.BuildingUnitPersistentLocalId,
                     buildingUnit =>
                     {
-                        buildingUnit.Status = BuildingUnitStatus.NotRealized.Map();
-                        buildingUnit.OsloStatus = BuildingUnitStatus.NotRealized.Status;
+                        buildingUnit.OsloStatus = BuildingUnitStatus.NotRealized.Map();
+                        buildingUnit.Status = BuildingUnitStatus.NotRealized.Status;
                         UpdateVersionTimestamp(buildingUnit, message.Message);
                         return Task.CompletedTask;
                     },
@@ -289,8 +289,8 @@
                     message.Message.BuildingUnitPersistentLocalId,
                     buildingUnit =>
                     {
-                        buildingUnit.Status = BuildingUnitStatus.Planned.Map();
-                        buildingUnit.OsloStatus = BuildingUnitStatus.Planned.Status;
+                        buildingUnit.OsloStatus = BuildingUnitStatus.Planned.Map();
+                        buildingUnit.Status = BuildingUnitStatus.Planned.Status;
                         UpdateVersionTimestamp(buildingUnit, message.Message);
                         return Task.CompletedTask;
                     },
@@ -303,8 +303,8 @@
                     message.Message.BuildingUnitPersistentLocalId,
                     buildingUnit =>
                     {
-                        buildingUnit.Status = BuildingUnitStatus.Retired.Map();
-                        buildingUnit.OsloStatus = BuildingUnitStatus.Retired.Status;
+                        buildingUnit.OsloStatus = BuildingUnitStatus.Retired.Map();
+                        buildingUnit.Status = BuildingUnitStatus.Retired.Status;
                         UpdateVersionTimestamp(buildingUnit, message.Message);
                         return Task.CompletedTask;
                     },
@@ -317,8 +317,8 @@
                     message.Message.BuildingUnitPersistentLocalId,
                     buildingUnit =>
                     {
-                        buildingUnit.Status = BuildingUnitStatus.Realized.Map();
-                        buildingUnit.OsloStatus = BuildingUnitStatus.Realized.Status;
+                        buildingUnit.OsloStatus = BuildingUnitStatus.Realized.Map();
+                        buildingUnit.Status = BuildingUnitStatus.Realized.Status;
                         UpdateVersionTimestamp(buildingUnit, message.Message);
                         return Task.CompletedTask;
                     },
@@ -360,13 +360,13 @@
                         var geometryAsBinary = message.Message.ExtendedWkbGeometry.ToByteArray();
                         var sysGeometry = wkbReader.Read(geometryAsBinary);
 
-                        buildingUnit.Status = BuildingUnitStatus.Parse(message.Message.BuildingUnitStatus).Map();
-                        buildingUnit.OsloStatus = message.Message.BuildingUnitStatus;
-                        buildingUnit.Function = BuildingUnitFunction.Parse(message.Message.Function).Map();
-                        buildingUnit.OsloFunction = message.Message.Function;
+                        buildingUnit.OsloStatus = BuildingUnitStatus.Parse(message.Message.BuildingUnitStatus).Map();
+                        buildingUnit.Status = message.Message.BuildingUnitStatus;
+                        buildingUnit.OsloFunction = BuildingUnitFunction.Parse(message.Message.Function).Map();
+                        buildingUnit.Function = message.Message.Function;
                         buildingUnit.Geometry = sysGeometry;
-                        buildingUnit.GeometryMethod = BuildingUnitPositionGeometryMethod.Parse(message.Message.GeometryMethod).Map();
-                        buildingUnit.OsloGeometryMethod = message.Message.GeometryMethod;
+                        buildingUnit.OsloGeometryMethod = BuildingUnitPositionGeometryMethod.Parse(message.Message.GeometryMethod).Map();
+                        buildingUnit.GeometryMethod = message.Message.GeometryMethod;
                         buildingUnit.HasDeviation = message.Message.HasDeviation;
                         buildingUnit.IsRemoved = false;
                         UpdateVersionTimestamp(buildingUnit, message.Message);
@@ -436,12 +436,12 @@
                 {
                     BuildingUnitPersistentLocalId = message.Message.BuildingUnitPersistentLocalId,
                     BuildingPersistentLocalId = message.Message.BuildingPersistentLocalId,
-                    Status =  BuildingUnitStatus.Parse(message.Message.BuildingUnitStatus).Map(),
-                    OsloStatus =  message.Message.BuildingUnitStatus,
-                    Function = BuildingUnitFunction.Common.Map(),
-                    OsloFunction = BuildingUnitFunction.Common.Function,
-                    GeometryMethod = BuildingUnitPositionGeometryMethod.Parse(message.Message.GeometryMethod).Map(),
-                    OsloGeometryMethod = message.Message.GeometryMethod,
+                    Status = message.Message.BuildingUnitStatus,
+                    OsloStatus = BuildingUnitStatus.Parse(message.Message.BuildingUnitStatus).Map(),
+                    OsloFunction = BuildingUnitFunction.Common.Map(),
+                    Function = BuildingUnitFunction.Common.Function,
+                    OsloGeometryMethod = BuildingUnitPositionGeometryMethod.Parse(message.Message.GeometryMethod).Map(),
+                    GeometryMethod = message.Message.GeometryMethod,
                     Geometry = sysGeometry,
                     HasDeviation = message.Message.HasDeviation,
                     IsRemoved = false,
@@ -465,8 +465,8 @@
                     buildingUnit =>
                     {
                         buildingUnit.Geometry = sysGeometry;
-                        buildingUnit.GeometryMethod = BuildingUnitPositionGeometryMethod.Parse(message.Message.GeometryMethod).Map();
-                        buildingUnit.OsloGeometryMethod = message.Message.GeometryMethod;
+                        buildingUnit.OsloGeometryMethod = BuildingUnitPositionGeometryMethod.Parse(message.Message.GeometryMethod).Map();
+                        buildingUnit.GeometryMethod = message.Message.GeometryMethod;
                         UpdateVersionTimestamp(buildingUnit, message.Message);
                         return Task.CompletedTask;
                     },
@@ -552,8 +552,8 @@
                     message.Message.BuildingUnitPersistentLocalId,
                     buildingUnit =>
                     {
-                        buildingUnit.Status = BuildingUnitStatus.Retired.Map();
-                        buildingUnit.OsloStatus = BuildingUnitStatus.Retired.Status;
+                        buildingUnit.OsloStatus = BuildingUnitStatus.Retired.Map();
+                        buildingUnit.Status = BuildingUnitStatus.Retired.Status;
                         UpdateVersionTimestamp(buildingUnit, message.Message);
                         return Task.CompletedTask;
                     },
@@ -566,8 +566,8 @@
                     message.Message.BuildingUnitPersistentLocalId,
                     buildingUnit =>
                     {
-                        buildingUnit.Status = BuildingUnitStatus.NotRealized.Map();
-                        buildingUnit.OsloStatus = BuildingUnitStatus.NotRealized.Status;
+                        buildingUnit.OsloStatus = BuildingUnitStatus.NotRealized.Map();
+                        buildingUnit.Status = BuildingUnitStatus.NotRealized.Status;
                         UpdateVersionTimestamp(buildingUnit, message.Message);
                         return Task.CompletedTask;
                     },
@@ -584,13 +584,13 @@
                         var sysGeometry = wkbReader.Read(geometryAsBinary);
 
                         buildingUnit.BuildingPersistentLocalId = message.Message.BuildingPersistentLocalId;
-                        buildingUnit.Status = BuildingUnitStatus.Parse(message.Message.Status).Map();
-                        buildingUnit.OsloStatus = message.Message.Status;
-                        buildingUnit.Function = BuildingUnitFunction.Parse(message.Message.Function).Map();
-                        buildingUnit.OsloFunction = message.Message.Function;
+                        buildingUnit.OsloStatus = BuildingUnitStatus.Parse(message.Message.Status).Map();
+                        buildingUnit.Status = message.Message.Status;
+                        buildingUnit.OsloFunction = BuildingUnitFunction.Parse(message.Message.Function).Map();
+                        buildingUnit.Function = message.Message.Function;
                         buildingUnit.Geometry = sysGeometry;
-                        buildingUnit.GeometryMethod = BuildingUnitPositionGeometryMethod.Parse(message.Message.GeometryMethod).Map();
-                        buildingUnit.OsloGeometryMethod = message.Message.GeometryMethod;
+                        buildingUnit.OsloGeometryMethod = BuildingUnitPositionGeometryMethod.Parse(message.Message.GeometryMethod).Map();
+                        buildingUnit.GeometryMethod = message.Message.GeometryMethod;
                         buildingUnit.HasDeviation = message.Message.HasDeviation;
                         UpdateVersionTimestamp(buildingUnit, message.Message);
 

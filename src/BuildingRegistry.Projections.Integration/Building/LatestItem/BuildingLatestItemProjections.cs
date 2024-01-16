@@ -28,10 +28,10 @@
                 var building = new BuildingLatestItem
                 {
                     BuildingPersistentLocalId = message.Message.BuildingPersistentLocalId,
-                    Status = BuildingStatus.Parse(message.Message.BuildingStatus).Map(),
-                    OsloStatus = message.Message.BuildingStatus,
-                    GeometryMethod = BuildingGeometryMethod.Parse(message.Message.GeometryMethod).Map(),
-                    OsloGeometryMethod = message.Message.GeometryMethod,
+                    OsloStatus = BuildingStatus.Parse(message.Message.BuildingStatus).Map(),
+                    Status = message.Message.BuildingStatus,
+                    OsloGeometryMethod = BuildingGeometryMethod.Parse(message.Message.GeometryMethod).Map(),
+                    GeometryMethod = message.Message.GeometryMethod,
                     Geometry = sysGeometry,
                     NisCode = nisCode,
                     IsRemoved = message.Message.IsRemoved,
@@ -55,10 +55,10 @@
                 var building = new BuildingLatestItem
                 {
                     BuildingPersistentLocalId = message.Message.BuildingPersistentLocalId,
-                    Status = BuildingStatus.Planned.Map(),
-                    OsloStatus = BuildingStatus.Planned.Value,
-                    GeometryMethod = BuildingGeometryMethod.Outlined.Map(),
-                    OsloGeometryMethod = BuildingGeometryMethod.Outlined.Value,
+                    OsloStatus = BuildingStatus.Planned.Map(),
+                    Status = BuildingStatus.Planned.Value,
+                    OsloGeometryMethod = BuildingGeometryMethod.Outlined.Map(),
+                    GeometryMethod = BuildingGeometryMethod.Outlined.Value,
                     Geometry = sysGeometry,
                     NisCode = nisCode,
                     IsRemoved = false,
@@ -82,10 +82,10 @@
                 var building = new BuildingLatestItem
                 {
                     BuildingPersistentLocalId = message.Message.BuildingPersistentLocalId,
-                    Status = BuildingStatus.Realized.Map(),
-                    OsloStatus = BuildingStatus.Realized.Value,
-                    GeometryMethod = BuildingGeometryMethod.MeasuredByGrb.Map(),
-                    OsloGeometryMethod = BuildingGeometryMethod.MeasuredByGrb.Value,
+                    OsloStatus = BuildingStatus.Realized.Map(),
+                    Status = BuildingStatus.Realized.Value,
+                    OsloGeometryMethod = BuildingGeometryMethod.MeasuredByGrb.Map(),
+                    GeometryMethod = BuildingGeometryMethod.MeasuredByGrb.Value,
                     Geometry = sysGeometry,
                     NisCode = nisCode,
                     IsRemoved = false,
@@ -111,8 +111,8 @@
                     building =>
                     {
                         building.Geometry = sysGeometry;
-                        building.GeometryMethod = BuildingGeometryMethod.Outlined.Map();
-                        building.OsloGeometryMethod = BuildingGeometryMethod.Outlined.Value;
+                        building.OsloGeometryMethod = BuildingGeometryMethod.Outlined.Map();
+                        building.GeometryMethod = BuildingGeometryMethod.Outlined.Value;
                         building.NisCode = nisCode;
                         UpdateVersionTimestamp(building, message.Message);
                     },
@@ -131,8 +131,8 @@
                     building =>
                     {
                         building.Geometry = sysGeometry;
-                        building.GeometryMethod = BuildingGeometryMethod.MeasuredByGrb.Map();
-                        building.OsloGeometryMethod = BuildingGeometryMethod.MeasuredByGrb.Value;
+                        building.OsloGeometryMethod = BuildingGeometryMethod.MeasuredByGrb.Map();
+                        building.GeometryMethod = BuildingGeometryMethod.MeasuredByGrb.Value;
                         building.NisCode = nisCode;
                         UpdateVersionTimestamp(building, message.Message);
                     },
@@ -145,8 +145,8 @@
                     message.Message.BuildingPersistentLocalId,
                     building =>
                     {
-                        building.Status = BuildingStatus.UnderConstruction.Map();
-                        building.OsloStatus = BuildingStatus.UnderConstruction.Value;
+                        building.OsloStatus = BuildingStatus.UnderConstruction.Map();
+                        building.Status = BuildingStatus.UnderConstruction.Value;
                         UpdateVersionTimestamp(building, message.Message);
                     },
                     ct);
@@ -158,8 +158,8 @@
                     message.Message.BuildingPersistentLocalId,
                     building =>
                     {
-                        building.Status = BuildingStatus.Planned.Map();
-                        building.OsloStatus = BuildingStatus.Planned.Value;
+                        building.OsloStatus = BuildingStatus.Planned.Map();
+                        building.Status = BuildingStatus.Planned.Value;
                         UpdateVersionTimestamp(building, message.Message);
                     },
                     ct);
@@ -171,8 +171,8 @@
                     message.Message.BuildingPersistentLocalId,
                     building =>
                     {
-                        building.Status = BuildingStatus.Realized.Map();
-                        building.OsloStatus = BuildingStatus.Realized.Value;
+                        building.OsloStatus = BuildingStatus.Realized.Map();
+                        building.Status = BuildingStatus.Realized.Value;
                         UpdateVersionTimestamp(building, message.Message);
                     },
                     ct);
@@ -184,8 +184,8 @@
                     message.Message.BuildingPersistentLocalId,
                     building =>
                     {
-                        building.Status = BuildingStatus.UnderConstruction.Map();
-                        building.OsloStatus = BuildingStatus.UnderConstruction.Value;
+                        building.OsloStatus = BuildingStatus.UnderConstruction.Map();
+                        building.Status = BuildingStatus.UnderConstruction.Value;
                         UpdateVersionTimestamp(building, message.Message);
                     },
                     ct);
@@ -197,8 +197,8 @@
                     message.Message.BuildingPersistentLocalId,
                     building =>
                     {
-                        building.Status = BuildingStatus.NotRealized.Map();
-                        building.OsloStatus = BuildingStatus.NotRealized.Value;
+                        building.OsloStatus = BuildingStatus.NotRealized.Map();
+                        building.Status = BuildingStatus.NotRealized.Value;
                         UpdateVersionTimestamp(building, message.Message);
                     },
                     ct);
@@ -210,8 +210,8 @@
                     message.Message.BuildingPersistentLocalId,
                     building =>
                     {
-                        building.Status = BuildingStatus.Planned.Map();
-                        building.OsloStatus = BuildingStatus.Planned.Value;
+                        building.OsloStatus = BuildingStatus.Planned.Map();
+                        building.Status = BuildingStatus.Planned.Value;
                         UpdateVersionTimestamp(building, message.Message);
                     },
                     ct);
@@ -229,8 +229,8 @@
                     building =>
                     {
                         building.Geometry = sysGeometry;
-                        building.GeometryMethod = BuildingGeometryMethod.MeasuredByGrb.Map();
-                        building.OsloGeometryMethod = BuildingGeometryMethod.MeasuredByGrb.Value;
+                        building.OsloGeometryMethod = BuildingGeometryMethod.MeasuredByGrb.Map();
+                        building.GeometryMethod = BuildingGeometryMethod.MeasuredByGrb.Value;
                         building.NisCode = nisCode;
                         UpdateVersionTimestamp(building, message.Message);
                     },
@@ -249,8 +249,8 @@
                     building =>
                     {
                         building.Geometry = sysGeometry;
-                        building.GeometryMethod = BuildingGeometryMethod.MeasuredByGrb.Map();
-                        building.OsloGeometryMethod = BuildingGeometryMethod.MeasuredByGrb.Value;
+                        building.OsloGeometryMethod = BuildingGeometryMethod.MeasuredByGrb.Map();
+                        building.GeometryMethod = BuildingGeometryMethod.MeasuredByGrb.Value;
                         building.NisCode = nisCode;
                         UpdateVersionTimestamp(building, message.Message);
                     },
@@ -263,8 +263,8 @@
                     message.Message.BuildingPersistentLocalId,
                     building =>
                     {
-                        building.Status = BuildingStatus.Retired.Map();
-                        building.OsloStatus = BuildingStatus.Retired.Value;
+                        building.OsloStatus = BuildingStatus.Retired.Map();
+                        building.Status = BuildingStatus.Retired.Value;
                         UpdateVersionTimestamp(building, message.Message);
                     },
                     ct);
@@ -327,10 +327,10 @@
                 var building = new BuildingLatestItem
                 {
                     BuildingPersistentLocalId = message.Message.BuildingPersistentLocalId,
-                    Status = BuildingStatus.Realized.Map(),
-                    OsloStatus = BuildingStatus.Realized.Value,
-                    GeometryMethod = BuildingGeometryMethod.MeasuredByGrb.Map(),
-                    OsloGeometryMethod = BuildingGeometryMethod.MeasuredByGrb.Value,
+                    OsloStatus = BuildingStatus.Realized.Map(),
+                    Status = BuildingStatus.Realized.Value,
+                    OsloGeometryMethod = BuildingGeometryMethod.MeasuredByGrb.Map(),
+                    GeometryMethod = BuildingGeometryMethod.MeasuredByGrb.Value,
                     Geometry = sysGeometry,
                     NisCode = nisCode,
                     IsRemoved = false,
@@ -366,8 +366,8 @@
                     message.Message.BuildingPersistentLocalId,
                     building =>
                     {
-                        building.Status = BuildingStatus.Retired.Map();
-                        building.OsloStatus = BuildingStatus.Retired.Value;
+                        building.OsloStatus = BuildingStatus.Retired.Map();
+                        building.Status = BuildingStatus.Retired.Value;
                         UpdateVersionTimestamp(building, message.Message);
                     },
                     ct);
