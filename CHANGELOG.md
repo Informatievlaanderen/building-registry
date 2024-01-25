@@ -1,3 +1,17 @@
+# [3.98.0](https://github.com/informatievlaanderen/building-registry/compare/v3.97.1...v3.98.0) (2024-01-25)
+
+
+### Bug Fixes
+
+* add new test ci + bump ([464766b](https://github.com/informatievlaanderen/building-registry/commit/464766bbd8fb0c9eb35e3b92e00348be348794a4))
+* Integration database Oslo column values ([0dd5c58](https://github.com/informatievlaanderen/building-registry/commit/0dd5c58b5d5c721fd7dd1067e2a23e97079d7b3a))
+* rename PuriId to Puri ([f782fde](https://github.com/informatievlaanderen/building-registry/commit/f782fdebf09bd36596b2d4a536e2f32e39c1f8cc))
+
+
+### Features
+
+* add integration database latest item projections ([832381a](https://github.com/informatievlaanderen/building-registry/commit/832381af25cb9dcefca74d8834beb743727f3b14))
+
 ## [3.97.1](https://github.com/informatievlaanderen/building-registry/compare/v3.97.0...v3.97.1) (2024-01-09)
 
 
