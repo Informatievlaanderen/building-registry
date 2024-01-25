@@ -667,10 +667,10 @@ jobs:
      #     JIRA_PROJECT: GAWR
      #     JIRA_VERSION: ${{ needs.release.outputs.version }}
 
-  push_images_to_test:
+  push_images:
     if: needs.release.outputs.version != 'none'
     needs: [ release ]
-    name: Push images to Test
+    name: Push images
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -686,18 +686,17 @@ jobs:
           'consumer-read-parcel',
           'producer',
           'producer-snapshot-oslo',
-          'migrator-building',
           'snapshot-verifier'
           ]
     steps:
-      - name: Configure AWS credentials (Test)
+      - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1-node16
         with:
-          aws-access-key-id: ${{ secrets.VBR_AWS_ACCESS_KEY_ID_TST }}
-          aws-secret-access-key: ${{ secrets.VBR_AWS_SECRET_ACCESS_KEY_TST }}
+          aws-access-key-id: ${{ secrets.VBR_AWS_ACCESS_KEY_ID_DEVOPS }}
+          aws-secret-access-key: ${{ secrets.VBR_AWS_SECRET_ACCESS_KEY_DEVOPS }}
           aws-region: ${{ secrets.VBR_AWS_REGION_PRD }}
 
-      - name: Login to Amazon ECR (Test)
+      - name: Login to Amazon ECR
         uses: aws-actions/amazon-ecr-login@v1.5.3
 
       # Download artifact
@@ -721,9 +720,11 @@ jobs:
         shell: bash
         run: |
           echo $IMAGE:$SEMVER
-          docker push $BUILD_DOCKER_REGISTRY/building-registry/$IMAGE:$SEMVER
+          docker tag $BUILD_DOCKER_REGISTRY_TST/parcel-registry/$IMAGE:$SEMVER $BUILD_DOCKER_REGISTRY/parcel-registry/$IMAGE:$SEMVER
+          docker push $BUILD_DOCKER_REGISTRY/parcel-registry/$IMAGE:$SEMVER
         env:
-          BUILD_DOCKER_REGISTRY: ${{ secrets.VBR_BUILD_DOCKER_REGISTRY_TST }}
+          BUILD_DOCKER_REGISTRY_TST: ${{ secrets.VBR_BUILD_DOCKER_REGISTRY_TST }}
+          BUILD_DOCKER_REGISTRY: ${{ secrets.VBR_DEVOPS_DOCKER_REGISTRY }}
           IMAGE: ${{ matrix.image }}
           SEMVER: ${{ needs.release.outputs.version }}
           WORKSPACE: ${{ github.workspace }}
@@ -918,7 +919,7 @@ jobs:
 
   deploy_to_test_start_slack:
     if: github.repository_owner == 'Informatievlaanderen'
-    needs: [ push_images_to_test ]
+    needs: [ push_images, upload-lambda ]
     name: Deploy to test started
     environment: test
     runs-on: ubuntu-latest
@@ -938,35 +939,39 @@ jobs:
         SLACK_CHANNEL: ${{ secrets.VBR_NOTIFIER_CHANNEL_NAME }}
         REPOSITORY_NAME: ${{ env.REPOSITORY_NAME }}
 
-  deploy_to_test:
+  deploy_services_to_test:
     if: github.repository_owner == 'Informatievlaanderen'
     needs: [ deploy_to_test_start_slack, release ]
-    name: Deploy to test
+    name: Deploy to services test
     runs-on: ubuntu-latest
     strategy:
       matrix:
         services: [
-          'building-registry-api',
-          'building-registry-projections',
-          'building-registry-producer',
-          'building-registry-producer-snapshot-oslo',
-          'building-registry-snapshot-verifier'
+          'buildingapi',
+          'buildingbackofficeapi',
+          'buildingconsumeraddress',
+          'buildingconsumerparcel',
+          'buildingproducer',
+          'buildingproducersnapshotoslo',
+          'buildingprojections',
+          'buildingprojectionsbackoffice'
           ]
 
     steps:
     - name: Deploy services
       env:
-        BUILD_URL: ${{ secrets.VBR_AWS_BUILD_API }}/${{matrix.services}}
-        STATUS_URL: ${{ secrets.VBR_AWS_BUILD_STATUS_API }}/${{matrix.services}}
+        BUILD_URL: ${{ vars.VBR_AWS_BUILD_API_DEVOPS }}/${{matrix.services}}
+        STATUS_URL: ${{ vars.VBR_AWS_BUILD_STATUS_API_DEVOPS  }}/${{matrix.services}}
       uses: informatievlaanderen/awscurl-polling-action/polling-action@main
       with:
-          environment: test
+          environment: tst
           version: ${{ needs.release.outputs.version }}
           status-url: $STATUS_URL
           deploy-url: $BUILD_URL
-          access-key: ${{ secrets.VBR_AWS_BUILD_USER_ACCESS_KEY_ID }}
-          secret-key: ${{ secrets.VBR_AWS_BUILD_USER_SECRET_ACCESS_KEY }}
+          access-key: ${{ secrets.VBR_AWS_ACCESS_KEY_ID_DEVOPS  }}
+          secret-key: ${{ secrets.VBR_AWS_SECRET_ACCESS_KEY_DEVOPS  }}
           region: eu-west-1
+          deploy-target: 'agb_ecs_service'
           interval: 2
 
     - name: Deploy services output
@@ -976,9 +981,44 @@ jobs:
         echo Status: ${{ steps.awscurl-polling-action.outputs.status }}
         echo ${{ steps.awscurl-polling-action.outputs.final-message }}
 
+  deploy_tasks_to_test:
+    if: github.repository_owner == 'Informatievlaanderen'
+    needs: [ deploy_to_test_start_slack, release ]
+    name: Deploy to tasks test
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        services: [
+          'buildingsnapshotverifier'
+          ]
+
+    steps:
+    - name: Deploy tasks
+      env:
+        BUILD_URL: ${{ vars.VBR_AWS_BUILD_API_DEVOPS }}/${{matrix.services}}
+        STATUS_URL: ${{ vars.VBR_AWS_BUILD_STATUS_API_DEVOPS  }}/${{matrix.services}}
+      uses: informatievlaanderen/awscurl-polling-action/polling-action@main
+      with:
+          environment: tst
+          version: ${{ needs.release.outputs.version }}
+          status-url: $STATUS_URL
+          deploy-url: $BUILD_URL
+          access-key: ${{ secrets.VBR_AWS_ACCESS_KEY_ID_DEVOPS  }}
+          secret-key: ${{ secrets.VBR_AWS_SECRET_ACCESS_KEY_DEVOPS  }}
+          region: eu-west-1
+          deploy-target: 'agb_ecs_service'
+          interval: 2
+
+    - name: Deploy tasks output
+      shell: bash
+      run: |
+        echo build-uuid: ${{ steps.awscurl-polling-action.outputs.build-uuid }}
+        echo Status: ${{ steps.awscurl-polling-action.outputs.status }}
+        echo ${{ steps.awscurl-polling-action.outputs.final-message }}
+
   deploy_lambda_to_test:
     if: github.repository_owner == 'Informatievlaanderen'
-    needs: [ deploy_to_test, release ]
+    needs: [ deploy_to_test_start_slack, release ]
     name: Deploy lambda to test
     runs-on: ubuntu-latest
 
@@ -1013,7 +1053,7 @@ jobs:
 
   deploy_to_test_finish_slack:
     if: github.repository_owner == 'Informatievlaanderen'
-    needs: [ deploy_lambda_to_test ]
+    needs: [ deploy_lambda_to_test, deploy_services_to_test, deploy_tasks_to_test ]
     name: Deploy to test finished
     runs-on: ubuntu-latest
 
@@ -1034,7 +1074,7 @@ jobs:
 
   deploy_to_staging_start_slack:
     if: github.repository_owner == 'Informatievlaanderen'
-    needs: [ push_images_to_staging, deploy_to_test_finish_slack ]
+    needs: [ push_images_to_staging, upload-lambda ]
     name: Deploy to staging started
     environment: stg
     runs-on: ubuntu-latest
