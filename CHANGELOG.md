@@ -1,3 +1,10 @@
+## [3.98.1](https://github.com/informatievlaanderen/building-registry/compare/v3.98.0...v3.98.1) (2024-01-25)
+
+
+### Bug Fixes
+
+* push images to test ci + bump ([190a65e](https://github.com/informatievlaanderen/building-registry/commit/190a65e2d2d3033b847e8cd603eba0cf9f74b417))
+
 # [3.98.0](https://github.com/informatievlaanderen/building-registry/compare/v3.97.1...v3.98.0) (2024-01-25)
 
 
