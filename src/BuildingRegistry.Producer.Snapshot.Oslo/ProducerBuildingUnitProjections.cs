@@ -9,6 +9,7 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo
     using Be.Vlaanderen.Basisregisters.MessageHandling.Kafka;
     using Be.Vlaanderen.Basisregisters.MessageHandling.Kafka.Producer;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.Connector;
+    using Be.Vlaanderen.Basisregisters.Utilities;
     using Building.Events;
 
     [ConnectedProjectionName("Kafka producer snapshot oslo gebouweenheden")]
@@ -42,7 +43,7 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo
                     }
                     else
                     {
-                        await Produce($"{osloNamespace}/{buildingUnit.BuildingUnitPersistentLocalId}", "{}", message.Position, ct);
+                        await Produce($"{osloNamespace}/{buildingUnit.BuildingUnitPersistentLocalId}", buildingUnit.BuildingUnitPersistentLocalId.ToString(), "{}", message.Position, ct);
                     }
                 }
             });
@@ -443,13 +444,13 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo
 
             When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingUnitWasRemovedV2>>(async (_, message, ct) =>
             {
-                await Produce($"{osloNamespace}/{message.Message.BuildingUnitPersistentLocalId}", "{}", message.Position, ct);
+                await Produce($"{osloNamespace}/{message.Message.BuildingUnitPersistentLocalId}", message.Message.BuildingUnitPersistentLocalId.ToString(), "{}", message.Position, ct);
             });
 
             When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingUnitWasRemovedBecauseBuildingWasRemoved>>(
                 async (_, message, ct) =>
                 {
-                    await Produce($"{osloNamespace}/{message.Message.BuildingUnitPersistentLocalId}", "{}", message.Position, ct);
+                    await Produce($"{osloNamespace}/{message.Message.BuildingUnitPersistentLocalId}", message.Message.BuildingUnitPersistentLocalId.ToString(), "{}", message.Position, ct);
                 });
 
             When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingUnitAddressWasReplacedBecauseAddressWasReaddressed>>(
@@ -550,16 +551,16 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo
 
             if (result != null)
             {
-                await Produce(result.Identificator.Id, result.JsonContent, storePosition, ct);
+                await Produce(result.Identificator.Id, result.Identificator.ObjectId, result.JsonContent, storePosition, ct);
             }
         }
 
-        private async Task Produce(string objectId, string jsonContent, long storePosition, CancellationToken cancellationToken = default)
+        private async Task Produce(string puri, string objectId, string jsonContent, long storePosition, CancellationToken cancellationToken = default)
         {
             var result = await _producer.Produce(
-                new MessageKey(objectId),
+                new MessageKey(puri),
                 jsonContent,
-                new List<MessageHeader> { new MessageHeader(MessageHeader.IdempotenceKey, storePosition.ToString()) },
+                new List<MessageHeader> { new MessageHeader(MessageHeader.IdempotenceKey, $"{objectId}-{storePosition.ToString()}") },
                 cancellationToken);
 
             if (!result.IsSuccess)
