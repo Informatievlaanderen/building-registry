@@ -28,25 +28,25 @@
 
                 var nisCode = await context.FindMostIntersectingNisCodeBy(sysGeometry, ct);
 
-                await context.CreateNewBuildingVersion(
-                    message.Message.BuildingId,
-                    message,
-                    building =>
-                    {
-                        building.BuildingPersistentLocalId = message.Message.BuildingPersistentLocalId;
-                        building.Status = BuildingStatus.Parse(message.Message.BuildingStatus).Value;
-                        building.OsloStatus = BuildingStatus.Parse(message.Message.BuildingStatus).Map();
-                        building.GeometryMethod = BuildingGeometryMethod.Parse(message.Message.GeometryMethod).Value;
-                        building.OsloGeometryMethod = BuildingGeometryMethod.Parse(message.Message.GeometryMethod).Map();
-                        building.Geometry = sysGeometry;
-                        building.NisCode = nisCode;
-                        building.IsRemoved = message.Message.IsRemoved;
-                        building.VersionTimestamp = message.Message.Provenance.Timestamp;
-                        building.CreatedOnTimestamp = message.Message.Provenance.Timestamp;
-                        building.Namespace = options.Value.BuildingNamespace;
-                        building.PuriId = $"{options.Value.BuildingNamespace}/{message.Message.BuildingPersistentLocalId}";
-                    },
-                    ct);
+                var building = new BuildingVersion
+                {
+                    BuildingPersistentLocalId = message.Message.BuildingPersistentLocalId,
+                    Status = BuildingStatus.Parse(message.Message.BuildingStatus).Value,
+                    OsloStatus = BuildingStatus.Parse(message.Message.BuildingStatus).Map(),
+                    GeometryMethod = BuildingGeometryMethod.Parse(message.Message.GeometryMethod).Value,
+                    OsloGeometryMethod = BuildingGeometryMethod.Parse(message.Message.GeometryMethod).Map(),
+                    Geometry = sysGeometry,
+                    NisCode = nisCode,
+                    IsRemoved = message.Message.IsRemoved,
+                    VersionTimestamp = message.Message.Provenance.Timestamp,
+                    CreatedOnTimestamp = message.Message.Provenance.Timestamp,
+                    Namespace = options.Value.BuildingNamespace,
+                    PuriId = $"{options.Value.BuildingNamespace}/{message.Message.BuildingPersistentLocalId}",
+                };
+
+                await context
+                    .BuildingVersions
+                    .AddAsync(building, ct);
             });
 
             When<Envelope<BuildingWasPlannedV2>>(async (context, message, ct) =>
