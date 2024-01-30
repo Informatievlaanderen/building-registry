@@ -90,6 +90,7 @@
                         buildingUnitVersion.Namespace.Should().Be(BuildingUnitNamespace);
                         buildingUnitVersion.PuriId.Should().Be($"{BuildingUnitNamespace}/{buildingUnitVersion.BuildingUnitPersistentLocalId}");
                         buildingUnitVersion.VersionTimestamp.Should().Be(buildingWasMigrated.Provenance.Timestamp);
+                        buildingUnitVersion.CreatedOnTimestamp.Should().Be(buildingWasMigrated.Provenance.Timestamp);
 
                         buildingUnitVersion.Addresses.Should().HaveCount(3);
                         foreach (var addressPersistentLocalId in buildingUnit.AddressPersistentLocalIds)
@@ -357,6 +358,7 @@
                     buildingUnitVersion.HasDeviation.Should().Be(buildingUnitWasPlannedV2.HasDeviation);
                     buildingUnitVersion.IsRemoved.Should().BeFalse();
                     buildingUnitVersion.VersionTimestamp.Should().Be(buildingUnitWasPlannedV2.Provenance.Timestamp);
+                    buildingUnitVersion.CreatedOnTimestamp.Should().Be(buildingUnitWasPlannedV2.Provenance.Timestamp);
                     buildingUnitVersion.Namespace.Should().Be(BuildingUnitNamespace);
                     buildingUnitVersion.PuriId.Should().Be($"{BuildingUnitNamespace}/{buildingUnitWasPlannedV2.BuildingUnitPersistentLocalId}");
                 });
@@ -1098,6 +1100,7 @@
                     buildingUnitVersion.HasDeviation.Should().Be(commonBuildingUnitWasAddedV2.HasDeviation);
                     buildingUnitVersion.IsRemoved.Should().BeFalse();
                     buildingUnitVersion.VersionTimestamp.Should().Be(commonBuildingUnitWasAddedV2.Provenance.Timestamp);
+                    buildingUnitVersion.CreatedOnTimestamp.Should().Be(commonBuildingUnitWasAddedV2.Provenance.Timestamp);
                     buildingUnitVersion.Namespace.Should().Be(BuildingUnitNamespace);
                     buildingUnitVersion.PuriId.Should().Be($"{BuildingUnitNamespace}/{commonBuildingUnitWasAddedV2.BuildingUnitPersistentLocalId}");
                 });

@@ -40,6 +40,7 @@
                         building.NisCode = nisCode;
                         building.IsRemoved = message.Message.IsRemoved;
                         building.VersionTimestamp = message.Message.Provenance.Timestamp;
+                        building.CreatedOnTimestamp = message.Message.Provenance.Timestamp;
                         building.Namespace = options.Value.BuildingNamespace;
                         building.PuriId = $"{options.Value.BuildingNamespace}/{message.Message.BuildingPersistentLocalId}";
                     },
@@ -63,6 +64,7 @@
                     NisCode = nisCode,
                     IsRemoved = false,
                     VersionTimestamp = message.Message.Provenance.Timestamp,
+                    CreatedOnTimestamp = message.Message.Provenance.Timestamp,
                     Namespace = options.Value.BuildingNamespace,
                     PuriId = $"{options.Value.BuildingNamespace}/{message.Message.BuildingPersistentLocalId}"
                 };
@@ -89,6 +91,7 @@
                     NisCode = nisCode,
                     IsRemoved = false,
                     VersionTimestamp = message.Message.Provenance.Timestamp,
+                    CreatedOnTimestamp = message.Message.Provenance.Timestamp,
                     Namespace = options.Value.BuildingNamespace,
                     PuriId = $"{options.Value.BuildingNamespace}/{message.Message.BuildingPersistentLocalId}"
                 };
@@ -299,6 +302,7 @@
                     NisCode = nisCode,
                     IsRemoved = false,
                     VersionTimestamp = message.Message.Provenance.Timestamp,
+                    CreatedOnTimestamp = message.Message.Provenance.Timestamp,
                     Namespace = options.Value.BuildingNamespace,
                     PuriId = $"{options.Value.BuildingNamespace}/{message.Message.BuildingPersistentLocalId}"
                 };

@@ -43,6 +43,7 @@
                         HasDeviation = false,
                         IsRemoved = buildingUnit.IsRemoved,
                         VersionTimestamp = message.Message.Provenance.Timestamp,
+                        CreatedOnTimestamp = message.Message.Provenance.Timestamp,
                         Namespace = options.BuildingUnitNamespace,
                         PuriId = $"{options.BuildingUnitNamespace}/{buildingUnit.BuildingUnitPersistentLocalId}",
                         Addresses = new Collection<BuildingUnitAddressVersion>(addresses)

@@ -43,6 +43,7 @@
                     HasDeviation = message.Message.HasDeviation,
                     IsRemoved = false,
                     VersionTimestamp = message.Message.Provenance.Timestamp,
+                    CreatedOnTimestamp = message.Message.Provenance.Timestamp,
                     Namespace = options.Value.BuildingUnitNamespace,
                     PuriId = $"{options.Value.BuildingUnitNamespace}/{message.Message.BuildingUnitPersistentLocalId}",
                 };
@@ -269,6 +270,7 @@
                     HasDeviation = message.Message.HasDeviation,
                     IsRemoved = false,
                     VersionTimestamp = message.Message.Provenance.Timestamp,
+                    CreatedOnTimestamp = message.Message.Provenance.Timestamp,
                     Namespace = options.Value.BuildingUnitNamespace,
                     PuriId = $"{options.Value.BuildingUnitNamespace}/{message.Message.BuildingUnitPersistentLocalId}"
                 };

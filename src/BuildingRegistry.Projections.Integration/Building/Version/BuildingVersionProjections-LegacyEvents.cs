@@ -31,6 +31,7 @@
                     BuildingPersistentLocalId = buildingPersistentLocalId.Value,
                     BuildingId = message.Message.BuildingId,
                     VersionTimestamp = message.Message.Provenance.Timestamp,
+                    CreatedOnTimestamp = message.Message.Provenance.Timestamp,
                     Namespace = options.BuildingNamespace,
                     PuriId = $"{options.BuildingNamespace}/{buildingPersistentLocalId}"
                 };

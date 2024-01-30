@@ -70,6 +70,7 @@
                     buildingVersion.Namespace.Should().Be(BuildingNamespace);
                     buildingVersion.PuriId.Should().Be($"{BuildingNamespace}/{buildingWasPlannedV2.BuildingPersistentLocalId}");
                     buildingVersion.VersionTimestamp.Should().Be(buildingWasPlannedV2.Provenance.Timestamp);
+                    buildingVersion.CreatedOnTimestamp.Should().Be(buildingWasPlannedV2.Provenance.Timestamp);
                 });
         }
 
@@ -100,6 +101,7 @@
                     buildingVersion.Namespace.Should().Be(BuildingNamespace);
                     buildingVersion.PuriId.Should().Be($"{BuildingNamespace}/{unplannedBuildingWasRealizedAndMeasured.BuildingPersistentLocalId}");
                     buildingVersion.VersionTimestamp.Should().Be(unplannedBuildingWasRealizedAndMeasured.Provenance.Timestamp);
+                    buildingVersion.CreatedOnTimestamp.Should().Be(unplannedBuildingWasRealizedAndMeasured.Provenance.Timestamp);
                 });
         }
 
@@ -744,6 +746,7 @@
                     buildingVersion.Geometry.Should().BeEquivalentTo(_wkbReader.Read(buildingMergerWasRealized.ExtendedWkbGeometry.ToByteArray()));
                     buildingVersion.GeometryMethod.Should().Be(BuildingGeometryMethod.MeasuredByGrb.Map());
                     buildingVersion.VersionTimestamp.Should().Be(buildingMergerWasRealized.Provenance.Timestamp);
+                    buildingVersion.CreatedOnTimestamp.Should().Be(buildingMergerWasRealized.Provenance.Timestamp);
                 });
         }
 

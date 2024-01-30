@@ -67,6 +67,7 @@
                     BuildingPersistentLocalId = buildingPersistentLocalId.Value,
                     Function = BuildingUnitFunction.Unknown.Map(),
                     VersionTimestamp = message.Message.Provenance.Timestamp,
+                    CreatedOnTimestamp = message.Message.Provenance.Timestamp,
                     Namespace = options.BuildingUnitNamespace,
                     PuriId = $"{options.BuildingUnitNamespace}/{buildingUnitPersistentLocalId}",
                     LegacyAddresses = new Collection<BuildingUnitAddressLegacyVersion>(new[]
@@ -105,6 +106,7 @@
                     BuildingPersistentLocalId = buildingPersistentLocalId.Value,
                     Function = BuildingUnitFunction.Unknown.Map(),
                     VersionTimestamp = message.Message.Provenance.Timestamp,
+                    CreatedOnTimestamp = message.Message.Provenance.Timestamp,
                     Namespace = options.BuildingUnitNamespace,
                     PuriId = $"{options.BuildingUnitNamespace}/{buildingUnitPersistentLocalId}",
                     LegacyAddresses = new Collection<BuildingUnitAddressLegacyVersion>(new[]
@@ -143,6 +145,7 @@
                     BuildingPersistentLocalId = buildingPersistentLocalId.Value,
                     Function = BuildingUnitFunction.Common.Map(),
                     VersionTimestamp = message.Message.Provenance.Timestamp,
+                    CreatedOnTimestamp = message.Message.Provenance.Timestamp,
                     Namespace = options.BuildingUnitNamespace,
                     PuriId = $"{options.BuildingUnitNamespace}/{buildingUnitPersistentLocalId}"
                 };

@@ -14,6 +14,7 @@
     public sealed class BuildingUnitVersion
     {
         public const string VersionTimestampBackingPropertyName = nameof(VersionTimestampAsDateTimeOffset);
+        public const string CreatedOnTimestampBackingPropertyName = nameof(CreatedOnTimestampAsDateTimeOffset);
 
         public long Position { get; set; }
 
@@ -30,6 +31,7 @@
 
         public string PuriId { get; set; }
         public string Namespace { get; set; }
+
         public string VersionAsString { get; set; }
         private DateTimeOffset VersionTimestampAsDateTimeOffset { get; set; }
 
@@ -40,6 +42,19 @@
             {
                 VersionTimestampAsDateTimeOffset = value.ToDateTimeOffset();
                 VersionAsString = new Rfc3339SerializableDateTimeOffset(value.ToBelgianDateTimeOffset()).ToString();
+            }
+        }
+
+        public string CreatedOnAsString { get; set; }
+        private DateTimeOffset CreatedOnTimestampAsDateTimeOffset { get; set; }
+
+        public Instant CreatedOnTimestamp
+        {
+            get => Instant.FromDateTimeOffset(CreatedOnTimestampAsDateTimeOffset);
+            set
+            {
+                CreatedOnTimestampAsDateTimeOffset = value.ToDateTimeOffset();
+                CreatedOnAsString = new Rfc3339SerializableDateTimeOffset(value.ToBelgianDateTimeOffset()).ToString();
             }
         }
 
@@ -76,6 +91,7 @@
                 Namespace = Namespace,
 
                 VersionTimestamp = lastChangedOn,
+                CreatedOnTimestamp = CreatedOnTimestamp,
 
                 Addresses = new Collection<BuildingUnitAddressVersion>(
                     Addresses.Select(x => x.CloneAndApplyEventInfo(newPosition)).ToList()),
@@ -116,6 +132,8 @@
             builder.Property(x => x.Namespace).HasColumnName("namespace");
             builder.Property(x => x.VersionAsString).HasColumnName("version_as_string");
             builder.Property(BuildingUnitVersion.VersionTimestampBackingPropertyName).HasColumnName("version_timestamp");
+            builder.Property(x => x.CreatedOnAsString).HasColumnName("created_on_as_string");
+            builder.Property(BuildingUnitVersion.CreatedOnTimestampBackingPropertyName).HasColumnName("created_on_timestamp");
 
             builder.HasMany(x => x.LegacyAddresses)
                 .WithOne()
@@ -128,12 +146,14 @@
                 .HasForeignKey(x => new { x.Position, x.BuildingUnitPersistentLocalId });
 
             builder.Ignore(x => x.VersionTimestamp);
+            builder.Ignore(x => x.CreatedOnTimestamp);
 
             builder.HasIndex(x => x.BuildingUnitPersistentLocalId);
             builder.HasIndex(x => x.BuildingPersistentLocalId);
             builder.HasIndex(x => x.Status);
             builder.HasIndex(x => x.IsRemoved);
             builder.HasIndex(x => x.Geometry).HasMethod("GIST");
+            builder.HasIndex(BuildingUnitVersion.VersionTimestampBackingPropertyName);
         }
     }
 }
