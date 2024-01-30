@@ -96,7 +96,8 @@
                     message,
                     building =>
                     {
-                        building.Status = BuildingStatus.UnderConstruction.Map();
+                        building.Status = BuildingStatus.UnderConstruction.Value;
+                        building.OsloStatus = BuildingStatus.UnderConstruction.Map();
                     },
                     ct);
             });
@@ -108,7 +109,8 @@
                     message,
                     building =>
                     {
-                        building.Status = BuildingStatus.NotRealized.Map();
+                        building.Status = BuildingStatus.NotRealized.Value;
+                        building.OsloStatus = BuildingStatus.NotRealized.Map();
                     },
                     ct);
             });
@@ -120,7 +122,8 @@
                     message,
                     building =>
                     {
-                        building.Status = BuildingStatus.Planned.Map();
+                        building.Status = BuildingStatus.Planned.Value;
+                        building.OsloStatus = BuildingStatus.Planned.Map();
                     },
                     ct);
             });
@@ -132,7 +135,8 @@
                     message,
                     building =>
                     {
-                        building.Status = BuildingStatus.Realized.Map();
+                        building.Status = BuildingStatus.Realized.Value;
+                        building.OsloStatus = BuildingStatus.Realized.Map();
                     },
                     ct);
             });
@@ -144,7 +148,8 @@
                     message,
                     building =>
                     {
-                        building.Status = BuildingStatus.Retired.Map();
+                        building.Status = BuildingStatus.Retired.Value;
+                        building.OsloStatus = BuildingStatus.Retired.Map();
                     },
                     ct);
             });
@@ -156,7 +161,8 @@
                     message,
                     building =>
                     {
-                        building.Status = BuildingStatus.NotRealized.Map();
+                        building.Status = BuildingStatus.NotRealized.Value;
+                        building.OsloStatus = BuildingStatus.NotRealized.Map();
                     },
                     ct);
             });
@@ -168,7 +174,8 @@
                     message,
                     building =>
                     {
-                        building.Status = BuildingStatus.Planned.Map();
+                        building.Status = BuildingStatus.Planned.Value;
+                        building.OsloStatus = BuildingStatus.Planned.Map();
                     },
                     ct);
             });
@@ -180,7 +187,8 @@
                     message,
                     building =>
                     {
-                        building.Status = BuildingStatus.Retired.Map();
+                        building.Status = BuildingStatus.Retired.Value;
+                        building.OsloStatus = BuildingStatus.Retired.Map();
                     },
                     ct);
             });
@@ -192,7 +200,8 @@
                     message,
                     building =>
                     {
-                        building.Status = BuildingStatus.Realized.Map();
+                        building.Status = BuildingStatus.Realized.Value;
+                        building.OsloStatus = BuildingStatus.Realized.Map();
                     },
                     ct);
             });
@@ -204,7 +213,8 @@
                     message,
                     building =>
                     {
-                        building.Status = BuildingStatus.UnderConstruction.Map();
+                        building.Status = BuildingStatus.UnderConstruction.Value;
+                        building.OsloStatus = BuildingStatus.UnderConstruction.Map();
                     },
                     ct);
             });
@@ -217,6 +227,7 @@
                     building =>
                     {
                         building.Status = null;
+                        building.OsloStatus = null;
                     },
                     ct);
             });
@@ -229,6 +240,7 @@
                     building =>
                     {
                         building.Status = null;
+                        building.OsloStatus = null;
                     },
                     ct);
             });

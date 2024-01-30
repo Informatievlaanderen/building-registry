@@ -19,6 +19,7 @@
         public Guid? BuildingId { get; set; }
         public int BuildingPersistentLocalId { get; set; }
         public string? Status { get; set; }
+        public string? OsloStatus { get; set; }
         public string? GeometryMethod { get; set; }
         public Geometry? Geometry { get; set; }
         public string? NisCode { get; set; }
@@ -68,6 +69,7 @@
                 BuildingId = BuildingId,
                 BuildingPersistentLocalId = BuildingPersistentLocalId,
                 Status = Status,
+                OsloStatus = OsloStatus,
                 GeometryMethod = GeometryMethod,
                 Geometry = Geometry,
                 NisCode = NisCode,
@@ -102,6 +104,7 @@
             builder.Property(x => x.BuildingId).HasColumnName("building_id");
             builder.Property(x => x.BuildingPersistentLocalId).HasColumnName("building_persistent_local_id");
             builder.Property(x => x.Status).HasColumnName("status");
+            builder.Property(x => x.OsloStatus).HasColumnName("oslo_status");
             builder.Property(x => x.GeometryMethod).HasColumnName("geometry_method");
             builder.Property(x => x.Geometry).HasColumnName("geometry");
             builder.Property(x => x.NisCode).HasColumnName("nis_code");
@@ -118,6 +121,7 @@
 
             builder.HasIndex(x => x.BuildingPersistentLocalId);
             builder.HasIndex(x => x.Status);
+            builder.HasIndex(x => x.OsloStatus);
             builder.HasIndex(x => x.IsRemoved);
             builder.HasIndex(x => x.NisCode);
             builder.HasIndex(x => x.Geometry).HasMethod("GIST");

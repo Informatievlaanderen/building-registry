@@ -63,7 +63,8 @@
                     var buildingVersion = await ct.BuildingVersions.FindAsync(position);
                     buildingVersion.Should().NotBeNull();
 
-                    buildingVersion!.Status.Should().Be(BuildingStatus.Planned.Map());
+                    buildingVersion!.Status.Should().Be(BuildingStatus.Planned.Value);
+                    buildingVersion.OsloStatus.Should().Be(BuildingStatus.Planned.Map());
                     buildingVersion.Geometry.Should().BeEquivalentTo(_wkbReader.Read(buildingWasPlannedV2.ExtendedWkbGeometry.ToByteArray()));
                     buildingVersion.GeometryMethod.Should().Be(BuildingGeometryMethod.Outlined.Map());
                     buildingVersion.IsRemoved.Should().BeFalse();
@@ -93,7 +94,8 @@
                     var buildingVersion = await ct.BuildingVersions.FindAsync(position);
                     buildingVersion.Should().NotBeNull();
 
-                    buildingVersion!.Status.Should().Be(BuildingStatus.Realized.Map());
+                    buildingVersion!.Status.Should().Be(BuildingStatus.Realized.Value);
+                    buildingVersion.OsloStatus.Should().Be(BuildingStatus.Realized.Map());
                     buildingVersion.GeometryMethod.Should().Be(BuildingGeometryMethod.MeasuredByGrb.Map());
                     buildingVersion.Geometry.Should()
                         .BeEquivalentTo(_wkbReader.Read(unplannedBuildingWasRealizedAndMeasured.ExtendedWkbGeometry.ToByteArray()));
@@ -355,7 +357,8 @@
                     var buildingVersion = await ct.BuildingVersions.FindAsync(position + 1);
                     buildingVersion.Should().NotBeNull();
 
-                    buildingVersion!.Status.Should().Be(BuildingStatus.UnderConstruction.Map());
+                    buildingVersion!.Status.Should().Be(BuildingStatus.UnderConstruction.Value);
+                    buildingVersion.OsloStatus.Should().Be(BuildingStatus.UnderConstruction.Map());
                     buildingVersion.VersionTimestamp.Should().Be(buildingBecameUnderConstructionV2.Provenance.Timestamp);
                 });
         }
@@ -390,7 +393,8 @@
                     var buildingVersion = await ct.BuildingVersions.FindAsync(position + 1);
                     buildingVersion.Should().NotBeNull();
 
-                    buildingVersion!.Status.Should().Be(BuildingStatus.Planned.Map());
+                    buildingVersion!.Status.Should().Be(BuildingStatus.Planned.Value);
+                    buildingVersion.OsloStatus.Should().Be(BuildingStatus.Planned.Map());
                     buildingVersion.VersionTimestamp.Should().Be(buildingWasCorrectedFromUnderConstructionToPlanned.Provenance.Timestamp);
                 });
         }
@@ -424,7 +428,8 @@
                     var buildingVersion = await ct.BuildingVersions.FindAsync(position + 1);
                     buildingVersion.Should().NotBeNull();
 
-                    buildingVersion!.Status.Should().Be(BuildingStatus.Realized.Map());
+                    buildingVersion!.Status.Should().Be(BuildingStatus.Realized.Value);
+                    buildingVersion.OsloStatus.Should().Be(BuildingStatus.Realized.Map());
                     buildingVersion.VersionTimestamp.Should().Be(buildingWasRealizedV2.Provenance.Timestamp);
                 });
         }
@@ -473,7 +478,8 @@
                     var buildingVersion = await ct.BuildingVersions.FindAsync(position + 2);
                     buildingVersion.Should().NotBeNull();
 
-                    buildingVersion!.Status.Should().Be(BuildingStatus.UnderConstruction.Map());
+                    buildingVersion!.Status.Should().Be(BuildingStatus.UnderConstruction.Value);
+                    buildingVersion.OsloStatus.Should().Be(BuildingStatus.UnderConstruction.Map());
                     buildingVersion.VersionTimestamp.Should().Be(buildingWasCorrectedFromRealizedToUnderConstruction.Provenance.Timestamp);
                 });
         }
@@ -504,7 +510,8 @@
                     var buildingVersion = await ct.BuildingVersions.FindAsync(position + 1);
                     buildingVersion.Should().NotBeNull();
 
-                    buildingVersion!.Status.Should().Be(BuildingStatus.NotRealized.Map());
+                    buildingVersion!.Status.Should().Be(BuildingStatus.NotRealized.Value);
+                    buildingVersion.OsloStatus.Should().Be(BuildingStatus.NotRealized.Map());
                     buildingVersion.VersionTimestamp.Should().Be(buildingWasNotRealizedV2.Provenance.Timestamp);
                 });
         }
@@ -545,7 +552,8 @@
                     var buildingVersion = await ct.BuildingVersions.FindAsync(position + 2);
                     buildingVersion.Should().NotBeNull();
 
-                    buildingVersion!.Status.Should().Be(BuildingStatus.Planned.Map());
+                    buildingVersion!.Status.Should().Be(BuildingStatus.Planned.Value);
+                    buildingVersion.OsloStatus.Should().Be(BuildingStatus.Planned.Map());
                     buildingVersion.VersionTimestamp.Should().Be(buildingWasCorrectedFromNotRealizedToPlanned.Provenance.Timestamp);
                 });
         }
@@ -712,7 +720,8 @@
                     var buildingVersion = await ct.BuildingVersions.FindAsync(position + 1);
                     buildingVersion.Should().NotBeNull();
 
-                    buildingVersion!.Status.Should().Be(BuildingStatus.Retired.Map());
+                    buildingVersion!.Status.Should().Be(BuildingStatus.Retired.Value);
+                    buildingVersion.OsloStatus.Should().Be(BuildingStatus.Retired.Map());
                     buildingVersion.VersionTimestamp.Should().Be(buildingWasDemolished.Provenance.Timestamp);
                 });
         }
@@ -742,7 +751,8 @@
                     buildingVersion.Should().NotBeNull();
 
                     buildingVersion!.BuildingPersistentLocalId.Should().Be(buildingMergerWasRealized.BuildingPersistentLocalId);
-                    buildingVersion.Status.Should().Be(BuildingStatus.Realized.Map());
+                    buildingVersion.Status.Should().Be(BuildingStatus.Realized.Value);
+                    buildingVersion.OsloStatus.Should().Be(BuildingStatus.Realized.Map());
                     buildingVersion.Geometry.Should().BeEquivalentTo(_wkbReader.Read(buildingMergerWasRealized.ExtendedWkbGeometry.ToByteArray()));
                     buildingVersion.GeometryMethod.Should().Be(BuildingGeometryMethod.MeasuredByGrb.Map());
                     buildingVersion.VersionTimestamp.Should().Be(buildingMergerWasRealized.Provenance.Timestamp);
@@ -826,7 +836,8 @@
                     var buildingVersion = await ct.BuildingVersions.FindAsync(position + 1);
                     buildingVersion.Should().NotBeNull();
 
-                    buildingVersion!.Status.Should().Be(BuildingStatus.Retired.Map());
+                    buildingVersion!.Status.Should().Be(BuildingStatus.Retired.Value);
+                    buildingVersion.OsloStatus.Should().Be(BuildingStatus.Retired.Map());
                     buildingVersion.VersionTimestamp.Should().Be(buildingWasMerged.Provenance.Timestamp);
                 });
         }

@@ -34,7 +34,8 @@
                     building =>
                     {
                         building.BuildingPersistentLocalId = message.Message.BuildingPersistentLocalId;
-                        building.Status = BuildingStatus.Parse(message.Message.BuildingStatus).Map();
+                        building.Status = BuildingStatus.Parse(message.Message.BuildingStatus).Value;
+                        building.OsloStatus = BuildingStatus.Parse(message.Message.BuildingStatus).Map();
                         building.GeometryMethod = BuildingGeometryMethod.Parse(message.Message.GeometryMethod).Map();
                         building.Geometry = sysGeometry;
                         building.NisCode = nisCode;
@@ -58,7 +59,8 @@
                 {
                     Position = message.Position,
                     BuildingPersistentLocalId = message.Message.BuildingPersistentLocalId,
-                    Status = BuildingStatus.Planned.Map(),
+                    Status = BuildingStatus.Planned.Value,
+                    OsloStatus = BuildingStatus.Planned.Map(),
                     GeometryMethod = BuildingGeometryMethod.Outlined.Map(),
                     Geometry = sysGeometry,
                     NisCode = nisCode,
@@ -85,7 +87,8 @@
                 {
                     Position = message.Position,
                     BuildingPersistentLocalId = message.Message.BuildingPersistentLocalId,
-                    Status = BuildingStatus.Realized.Map(),
+                    Status = BuildingStatus.Realized.Value,
+                    OsloStatus = BuildingStatus.Realized.Map(),
                     GeometryMethod = BuildingGeometryMethod.MeasuredByGrb.Map(),
                     Geometry = sysGeometry,
                     NisCode = nisCode,
@@ -144,7 +147,11 @@
                 await context.CreateNewBuildingVersion(
                     message.Message.BuildingPersistentLocalId,
                     message,
-                    building => { building.Status = BuildingStatus.UnderConstruction.Map(); },
+                    building =>
+                    {
+                        building.Status = BuildingStatus.UnderConstruction.Value;
+                        building.OsloStatus = BuildingStatus.UnderConstruction.Map();
+                    },
                     ct);
             });
 
@@ -153,7 +160,11 @@
                 await context.CreateNewBuildingVersion(
                     message.Message.BuildingPersistentLocalId,
                     message,
-                    building => { building.Status = BuildingStatus.Planned.Map(); },
+                    building =>
+                    {
+                        building.Status = BuildingStatus.Planned.Value;
+                        building.OsloStatus = BuildingStatus.Planned.Map();
+                    },
                     ct);
             });
 
@@ -162,7 +173,11 @@
                 await context.CreateNewBuildingVersion(
                     message.Message.BuildingPersistentLocalId,
                     message,
-                    building => { building.Status = BuildingStatus.Realized.Map(); },
+                    building =>
+                    {
+                        building.Status = BuildingStatus.Realized.Value;
+                        building.OsloStatus = BuildingStatus.Realized.Map();
+                    },
                     ct);
             });
 
@@ -171,7 +186,11 @@
                 await context.CreateNewBuildingVersion(
                     message.Message.BuildingPersistentLocalId,
                     message,
-                    building => { building.Status = BuildingStatus.UnderConstruction.Map(); },
+                    building =>
+                    {
+                        building.Status = BuildingStatus.UnderConstruction.Value;
+                        building.OsloStatus = BuildingStatus.UnderConstruction.Map();
+                    },
                     ct);
             });
 
@@ -180,7 +199,11 @@
                 await context.CreateNewBuildingVersion(
                     message.Message.BuildingPersistentLocalId,
                     message,
-                    building => { building.Status = BuildingStatus.NotRealized.Map(); },
+                    building =>
+                    {
+                        building.Status = BuildingStatus.NotRealized.Value;
+                        building.OsloStatus = BuildingStatus.NotRealized.Map();
+                    },
                     ct);
             });
 
@@ -189,7 +212,11 @@
                 await context.CreateNewBuildingVersion(
                     message.Message.BuildingPersistentLocalId,
                     message,
-                    building => { building.Status = BuildingStatus.Planned.Map(); },
+                    building =>
+                    {
+                        building.Status = BuildingStatus.Planned.Value;
+                        building.OsloStatus = BuildingStatus.Planned.Map();
+                    },
                     ct);
             });
 
@@ -236,7 +263,11 @@
                 await context.CreateNewBuildingVersion(
                     message.Message.BuildingPersistentLocalId,
                     message,
-                    building => { building.Status = BuildingStatus.Retired.Map(); },
+                    building =>
+                    {
+                        building.Status = BuildingStatus.Retired.Value;
+                        building.OsloStatus = BuildingStatus.Retired.Map();
+                    },
                     ct);
             });
 
@@ -296,7 +327,8 @@
                 {
                     Position = message.Position,
                     BuildingPersistentLocalId = message.Message.BuildingPersistentLocalId,
-                    Status = BuildingStatus.Realized.Map(),
+                    Status = BuildingStatus.Realized.Value,
+                    OsloStatus = BuildingStatus.Realized.Map(),
                     GeometryMethod = BuildingGeometryMethod.MeasuredByGrb.Map(),
                     Geometry = sysGeometry,
                     NisCode = nisCode,
@@ -335,7 +367,11 @@
                 await context.CreateNewBuildingVersion(
                     message.Message.BuildingPersistentLocalId,
                     message,
-                    building => { building.Status = BuildingStatus.Retired.Map(); },
+                    building =>
+                    {
+                        building.Status = BuildingStatus.Retired.Value;
+                        building.OsloStatus = BuildingStatus.Retired.Map();
+                    },
                     ct);
             });
         }
