@@ -66,7 +66,8 @@
                     buildingVersion!.Status.Should().Be(BuildingStatus.Planned.Value);
                     buildingVersion.OsloStatus.Should().Be(BuildingStatus.Planned.Map());
                     buildingVersion.Geometry.Should().BeEquivalentTo(_wkbReader.Read(buildingWasPlannedV2.ExtendedWkbGeometry.ToByteArray()));
-                    buildingVersion.GeometryMethod.Should().Be(BuildingGeometryMethod.Outlined.Map());
+                    buildingVersion.GeometryMethod.Should().Be(BuildingGeometryMethod.Outlined.Value);
+                    buildingVersion.OsloGeometryMethod.Should().Be(BuildingGeometryMethod.Outlined.Map());
                     buildingVersion.IsRemoved.Should().BeFalse();
                     buildingVersion.Namespace.Should().Be(BuildingNamespace);
                     buildingVersion.PuriId.Should().Be($"{BuildingNamespace}/{buildingWasPlannedV2.BuildingPersistentLocalId}");
@@ -96,7 +97,8 @@
 
                     buildingVersion!.Status.Should().Be(BuildingStatus.Realized.Value);
                     buildingVersion.OsloStatus.Should().Be(BuildingStatus.Realized.Map());
-                    buildingVersion.GeometryMethod.Should().Be(BuildingGeometryMethod.MeasuredByGrb.Map());
+                    buildingVersion.GeometryMethod.Should().Be(BuildingGeometryMethod.MeasuredByGrb.Value);
+                    buildingVersion.OsloGeometryMethod.Should().Be(BuildingGeometryMethod.MeasuredByGrb.Map());
                     buildingVersion.Geometry.Should()
                         .BeEquivalentTo(_wkbReader.Read(unplannedBuildingWasRealizedAndMeasured.ExtendedWkbGeometry.ToByteArray()));
                     buildingVersion.IsRemoved.Should().BeFalse();
@@ -631,7 +633,8 @@
                     buildingVersion.Should().NotBeNull();
 
                     buildingVersion!.Geometry.Should().BeEquivalentTo(_wkbReader.Read(buildingWasMeasured.ExtendedWkbGeometryBuilding.ToByteArray()));
-                    buildingVersion.GeometryMethod.Should().Be(BuildingGeometryMethod.MeasuredByGrb.Map());
+                    buildingVersion.GeometryMethod.Should().Be(BuildingGeometryMethod.MeasuredByGrb.Value);
+                    buildingVersion.OsloGeometryMethod.Should().Be(BuildingGeometryMethod.MeasuredByGrb.Map());
                     buildingVersion.VersionTimestamp.Should().Be(buildingWasMeasured.Provenance.Timestamp);
                 });
         }
@@ -678,7 +681,8 @@
                     buildingVersion.Should().NotBeNull();
 
                     buildingVersion!.Geometry.Should().BeEquivalentTo(_wkbReader.Read(buildingMeasurementWasCorrected.ExtendedWkbGeometryBuilding.ToByteArray()));
-                    buildingVersion.GeometryMethod.Should().Be(BuildingGeometryMethod.MeasuredByGrb.Map());
+                    buildingVersion.GeometryMethod.Should().Be(BuildingGeometryMethod.MeasuredByGrb.Value);
+                    buildingVersion.OsloGeometryMethod.Should().Be(BuildingGeometryMethod.MeasuredByGrb.Map());
                     buildingVersion.VersionTimestamp.Should().Be(buildingMeasurementWasCorrected.Provenance.Timestamp);
                 });
         }
@@ -754,7 +758,8 @@
                     buildingVersion.Status.Should().Be(BuildingStatus.Realized.Value);
                     buildingVersion.OsloStatus.Should().Be(BuildingStatus.Realized.Map());
                     buildingVersion.Geometry.Should().BeEquivalentTo(_wkbReader.Read(buildingMergerWasRealized.ExtendedWkbGeometry.ToByteArray()));
-                    buildingVersion.GeometryMethod.Should().Be(BuildingGeometryMethod.MeasuredByGrb.Map());
+                    buildingVersion.GeometryMethod.Should().Be(BuildingGeometryMethod.MeasuredByGrb.Value);
+                    buildingVersion.OsloGeometryMethod.Should().Be(BuildingGeometryMethod.MeasuredByGrb.Map());
                     buildingVersion.VersionTimestamp.Should().Be(buildingMergerWasRealized.Provenance.Timestamp);
                     buildingVersion.CreatedOnTimestamp.Should().Be(buildingMergerWasRealized.Provenance.Timestamp);
                 });

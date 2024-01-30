@@ -21,6 +21,7 @@
         public string? Status { get; set; }
         public string? OsloStatus { get; set; }
         public string? GeometryMethod { get; set; }
+        public string? OsloGeometryMethod { get; set; }
         public Geometry? Geometry { get; set; }
         public string? NisCode { get; set; }
         public bool IsRemoved { get; set; }
@@ -71,6 +72,7 @@
                 Status = Status,
                 OsloStatus = OsloStatus,
                 GeometryMethod = GeometryMethod,
+                OsloGeometryMethod = OsloGeometryMethod,
                 Geometry = Geometry,
                 NisCode = NisCode,
                 IsRemoved = IsRemoved,
@@ -106,6 +108,7 @@
             builder.Property(x => x.Status).HasColumnName("status");
             builder.Property(x => x.OsloStatus).HasColumnName("oslo_status");
             builder.Property(x => x.GeometryMethod).HasColumnName("geometry_method");
+            builder.Property(x => x.OsloGeometryMethod).HasColumnName("oslo_geometry_method");
             builder.Property(x => x.Geometry).HasColumnName("geometry");
             builder.Property(x => x.NisCode).HasColumnName("nis_code");
             builder.Property(x => x.IsRemoved).HasColumnName("is_removed");

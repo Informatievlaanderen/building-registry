@@ -258,6 +258,8 @@
                     {
                         building.Geometry = null;
                         building.GeometryMethod = null;
+                        building.OsloGeometryMethod = null;
+                        building.OsloGeometryMethod = null;
                         building.NisCode = null;
                     },
                     ct);
@@ -276,7 +278,8 @@
                     building =>
                     {
                         building.Geometry = sysGeometry;
-                        building.GeometryMethod = BuildingGeometryMethod.MeasuredByGrb.Map();
+                        building.GeometryMethod = BuildingGeometryMethod.MeasuredByGrb.Value;
+                        building.OsloGeometryMethod = BuildingGeometryMethod.MeasuredByGrb.Map();
                         building.NisCode = nisCode;
                     },
                     ct);
@@ -295,7 +298,8 @@
                     building =>
                     {
                         building.Geometry = sysGeometry;
-                        building.GeometryMethod = BuildingGeometryMethod.Outlined.Map();
+                        building.GeometryMethod = BuildingGeometryMethod.Outlined.Value;
+                        building.OsloGeometryMethod = BuildingGeometryMethod.Outlined.Map();
                         building.NisCode = nisCode;
                     },
                     ct);
@@ -314,7 +318,8 @@
                     building =>
                     {
                         building.Geometry = sysGeometry;
-                        building.GeometryMethod = BuildingGeometryMethod.MeasuredByGrb.Map();
+                        building.GeometryMethod = BuildingGeometryMethod.MeasuredByGrb.Value;
+                        building.OsloGeometryMethod = BuildingGeometryMethod.MeasuredByGrb.Map();
                         building.NisCode = nisCode;
                     },
                     ct);
@@ -333,7 +338,8 @@
                     building =>
                     {
                         building.Geometry = sysGeometry;
-                        building.GeometryMethod = BuildingGeometryMethod.Outlined.Map();
+                        building.GeometryMethod = BuildingGeometryMethod.Outlined.Value;
+                        building.OsloGeometryMethod = BuildingGeometryMethod.Outlined.Map();
                         building.NisCode = nisCode;
                     },
                     ct);

@@ -36,7 +36,8 @@
                         building.BuildingPersistentLocalId = message.Message.BuildingPersistentLocalId;
                         building.Status = BuildingStatus.Parse(message.Message.BuildingStatus).Value;
                         building.OsloStatus = BuildingStatus.Parse(message.Message.BuildingStatus).Map();
-                        building.GeometryMethod = BuildingGeometryMethod.Parse(message.Message.GeometryMethod).Map();
+                        building.GeometryMethod = BuildingGeometryMethod.Parse(message.Message.GeometryMethod).Value;
+                        building.OsloGeometryMethod = BuildingGeometryMethod.Parse(message.Message.GeometryMethod).Map();
                         building.Geometry = sysGeometry;
                         building.NisCode = nisCode;
                         building.IsRemoved = message.Message.IsRemoved;
@@ -61,7 +62,8 @@
                     BuildingPersistentLocalId = message.Message.BuildingPersistentLocalId,
                     Status = BuildingStatus.Planned.Value,
                     OsloStatus = BuildingStatus.Planned.Map(),
-                    GeometryMethod = BuildingGeometryMethod.Outlined.Map(),
+                    GeometryMethod = BuildingGeometryMethod.Outlined.Value,
+                    OsloGeometryMethod = BuildingGeometryMethod.Outlined.Map(),
                     Geometry = sysGeometry,
                     NisCode = nisCode,
                     IsRemoved = false,
@@ -89,7 +91,8 @@
                     BuildingPersistentLocalId = message.Message.BuildingPersistentLocalId,
                     Status = BuildingStatus.Realized.Value,
                     OsloStatus = BuildingStatus.Realized.Map(),
-                    GeometryMethod = BuildingGeometryMethod.MeasuredByGrb.Map(),
+                    GeometryMethod = BuildingGeometryMethod.MeasuredByGrb.Value,
+                    OsloGeometryMethod = BuildingGeometryMethod.MeasuredByGrb.Map(),
                     Geometry = sysGeometry,
                     NisCode = nisCode,
                     IsRemoved = false,
@@ -117,7 +120,8 @@
                     building =>
                     {
                         building.Geometry = sysGeometry;
-                        building.GeometryMethod = BuildingGeometryMethod.Outlined.Map();
+                        building.GeometryMethod = BuildingGeometryMethod.Outlined.Value;
+                        building.OsloGeometryMethod = BuildingGeometryMethod.Outlined.Map();
                         building.NisCode = nisCode;
                     },
                     ct);
@@ -136,7 +140,8 @@
                     building =>
                     {
                         building.Geometry = sysGeometry;
-                        building.GeometryMethod = BuildingGeometryMethod.MeasuredByGrb.Map();
+                        building.GeometryMethod = BuildingGeometryMethod.MeasuredByGrb.Value;
+                        building.OsloGeometryMethod = BuildingGeometryMethod.MeasuredByGrb.Map();
                         building.NisCode = nisCode;
                     },
                     ct);
@@ -233,7 +238,8 @@
                     building =>
                     {
                         building.Geometry = sysGeometry;
-                        building.GeometryMethod = BuildingGeometryMethod.MeasuredByGrb.Map();
+                        building.GeometryMethod = BuildingGeometryMethod.MeasuredByGrb.Value;
+                        building.OsloGeometryMethod = BuildingGeometryMethod.MeasuredByGrb.Map();
                         building.NisCode = nisCode;
                     },
                     ct);
@@ -252,7 +258,8 @@
                     building =>
                     {
                         building.Geometry = sysGeometry;
-                        building.GeometryMethod = BuildingGeometryMethod.MeasuredByGrb.Map();
+                        building.GeometryMethod = BuildingGeometryMethod.MeasuredByGrb.Value;
+                        building.OsloGeometryMethod = BuildingGeometryMethod.MeasuredByGrb.Map();
                         building.NisCode = nisCode;
                     },
                     ct);
@@ -329,7 +336,8 @@
                     BuildingPersistentLocalId = message.Message.BuildingPersistentLocalId,
                     Status = BuildingStatus.Realized.Value,
                     OsloStatus = BuildingStatus.Realized.Map(),
-                    GeometryMethod = BuildingGeometryMethod.MeasuredByGrb.Map(),
+                    GeometryMethod = BuildingGeometryMethod.MeasuredByGrb.Value,
+                    OsloGeometryMethod = BuildingGeometryMethod.MeasuredByGrb.Map(),
                     Geometry = sysGeometry,
                     NisCode = nisCode,
                     IsRemoved = false,
