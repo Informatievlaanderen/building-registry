@@ -22,7 +22,6 @@
                         buildingUnit =>
                         {
                             buildingUnit.IsRemoved = true;
-                            buildingUnit.LegacyAddresses.Clear();
                             buildingUnit.Addresses.Clear();
                         },
                         ct);
@@ -40,7 +39,6 @@
                         {
                             buildingUnit.Status = BuildingUnitStatus.NotRealized.Status;
                             buildingUnit.OsloStatus = BuildingUnitStatus.NotRealized.Map();
-                            buildingUnit.LegacyAddresses.Clear();
                             buildingUnit.Addresses.Clear();
                         },
                         ct);
@@ -55,7 +53,6 @@
                         {
                             buildingUnit.Status = BuildingUnitStatus.Retired.Status;
                             buildingUnit.OsloStatus = BuildingUnitStatus.Retired.Map();
-                            buildingUnit.LegacyAddresses.Clear();
                             buildingUnit.Addresses.Clear();
                         },
                         ct);
@@ -73,7 +70,6 @@
                         {
                             buildingUnit.Status = BuildingUnitStatus.NotRealized.Status;
                             buildingUnit.OsloStatus = BuildingUnitStatus.NotRealized.Map();
-                            buildingUnit.LegacyAddresses.Clear();
                             buildingUnit.Addresses.Clear();
                         },
                         ct);
@@ -88,7 +84,6 @@
                         {
                             buildingUnit.Status = BuildingUnitStatus.Retired.Status;
                             buildingUnit.OsloStatus = BuildingUnitStatus.Retired.Map();
-                            buildingUnit.LegacyAddresses.Clear();
                             buildingUnit.Addresses.Clear();
                         },
                         ct);
@@ -106,7 +101,6 @@
                         {
                             buildingUnit.Status = BuildingUnitStatus.NotRealized.Status;
                             buildingUnit.OsloStatus = BuildingUnitStatus.NotRealized.Map();
-                            buildingUnit.LegacyAddresses.Clear();
                             buildingUnit.Addresses.Clear();
                         },
                         ct);
@@ -121,7 +115,6 @@
                         {
                             buildingUnit.Status = BuildingUnitStatus.Retired.Status;
                             buildingUnit.OsloStatus = BuildingUnitStatus.Retired.Map();
-                            buildingUnit.LegacyAddresses.Clear();
                             buildingUnit.Addresses.Clear();
                         },
                         ct);
@@ -139,7 +132,6 @@
                         {
                             buildingUnit.Status = BuildingUnitStatus.NotRealized.Status;
                             buildingUnit.OsloStatus = BuildingUnitStatus.NotRealized.Map();
-                            buildingUnit.LegacyAddresses.Clear();
                             buildingUnit.Addresses.Clear();
                         },
                         ct);
@@ -154,7 +146,6 @@
                         {
                             buildingUnit.Status = BuildingUnitStatus.Retired.Status;
                             buildingUnit.OsloStatus = BuildingUnitStatus.Retired.Map();
-                            buildingUnit.LegacyAddresses.Clear();
                             buildingUnit.Addresses.Clear();
                         },
                         ct);

@@ -18,6 +18,8 @@ namespace BuildingRegistry.Projections.Integration.Infrastructure
             var logger = loggerFactory.CreateLogger<IntegrationModule>();
             var connectionString = configuration.GetConnectionString("IntegrationProjections");
 
+            services.AddScoped<IAddresses, Addresses>(_ => new Addresses(connectionString));
+
             var hasConnectionString = !string.IsNullOrWhiteSpace(connectionString);
             if (hasConnectionString)
                 RunOnNpgSqlServer(services, connectionString);

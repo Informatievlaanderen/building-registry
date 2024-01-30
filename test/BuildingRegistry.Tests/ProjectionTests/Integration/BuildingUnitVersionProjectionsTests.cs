@@ -1,5 +1,6 @@
 ﻿namespace BuildingRegistry.Tests.ProjectionTests.Integration
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
@@ -22,6 +23,7 @@
     using Projections.Integration.Infrastructure;
     using Tests.Legacy.Autofixture;
     using Xunit;
+    using IAddresses = Projections.Integration.IAddresses;
 
     public class BuildingUnitVersionProjectionsTests : IntegrationProjectionTest<BuildingUnitVersionProjections>
     {
@@ -1550,11 +1552,21 @@
         }
 
         protected override BuildingUnitVersionProjections CreateProjection() =>
-            new BuildingUnitVersionProjections(new OptionsWrapper<IntegrationOptions>(new IntegrationOptions
-            {
-                BuildingNamespace = BuildingNamespace,
-                BuildingUnitNamespace = BuildingUnitNamespace,
-            }),
-            _persistentLocalIdFinder.Object);
+            new BuildingUnitVersionProjections(
+                new OptionsWrapper<IntegrationOptions>(new IntegrationOptions
+                {
+                    BuildingNamespace = BuildingNamespace,
+                    BuildingUnitNamespace = BuildingUnitNamespace,
+                }),
+                _persistentLocalIdFinder.Object,
+                new FakeAddresses());
+    }
+
+    public class FakeAddresses : IAddresses
+    {
+        public Task<int?> GetAddressPersistentLocalId(Guid addressId)
+        {
+            return Task.FromResult(1 as int?);
+        }
     }
 }

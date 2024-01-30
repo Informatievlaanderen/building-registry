@@ -61,12 +61,10 @@
             }
         }
 
-        public Collection<BuildingUnitAddressLegacyVersion> LegacyAddresses { get; set; }
         public Collection<BuildingUnitAddressVersion> Addresses { get; set; }
 
         public BuildingUnitVersion()
         {
-            LegacyAddresses = new Collection<BuildingUnitAddressLegacyVersion>();
             Addresses = new Collection<BuildingUnitAddressVersion>();
         }
 
@@ -101,8 +99,6 @@
 
                 Addresses = new Collection<BuildingUnitAddressVersion>(
                     Addresses.Select(x => x.CloneAndApplyEventInfo(newPosition)).ToList()),
-                LegacyAddresses = new Collection<BuildingUnitAddressLegacyVersion>(
-                    LegacyAddresses.Select(x => x.CloneAndApplyEventInfo(newPosition)).ToList()),
             };
 
             editFunc(newItem);
@@ -143,11 +139,6 @@
             builder.Property(BuildingUnitVersion.VersionTimestampBackingPropertyName).HasColumnName("version_timestamp");
             builder.Property(x => x.CreatedOnAsString).HasColumnName("created_on_as_string");
             builder.Property(BuildingUnitVersion.CreatedOnTimestampBackingPropertyName).HasColumnName("created_on_timestamp");
-
-            builder.HasMany(x => x.LegacyAddresses)
-                .WithOne()
-                .IsRequired()
-                .HasForeignKey(x => new { x.Position, x.BuildingUnitPersistentLocalId });
 
             builder.HasMany(x => x.Addresses)
                 .WithOne()

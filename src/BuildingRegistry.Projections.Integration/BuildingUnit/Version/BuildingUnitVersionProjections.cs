@@ -11,6 +11,7 @@
     using Converters;
     using Infrastructure;
     using Microsoft.Extensions.Options;
+    using IAddresses = IAddresses;
 
     [ConnectedProjectionName("Integratie gebouweenheid latest item")]
     [ConnectedProjectionDescription("Projectie die de laatste gebouweenheid data voor de integratie database bijhoudt.")]
@@ -18,12 +19,13 @@
     {
         public BuildingUnitVersionProjections(
             IOptions<IntegrationOptions> options,
-            IPersistentLocalIdFinder persistentLocalIdFinder)
+            IPersistentLocalIdFinder persistentLocalIdFinder,
+            IAddresses addresses)
         {
             var wkbReader = WKBReaderFactory.Create();
 
             RegisterLegacyBuildingEvents();
-            RegisterLegacyBuildingUnitEvents(options.Value, persistentLocalIdFinder, wkbReader);
+            RegisterLegacyBuildingUnitEvents(options.Value, persistentLocalIdFinder, addresses, wkbReader);
             RegisterBuildingEvents(options.Value, wkbReader);
 
             When<Envelope<BuildingUnitWasPlannedV2>>(async (context, message, ct) =>

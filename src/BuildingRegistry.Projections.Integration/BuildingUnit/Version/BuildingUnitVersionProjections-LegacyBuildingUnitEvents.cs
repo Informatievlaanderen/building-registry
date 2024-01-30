@@ -10,12 +10,14 @@
     using Infrastructure;
     using Legacy.Events;
     using NetTopologySuite.IO;
+    using IAddresses = IAddresses;
 
     public sealed partial class BuildingUnitVersionProjections
     {
         private void RegisterLegacyBuildingUnitEvents(
             IntegrationOptions options,
             IPersistentLocalIdFinder persistentLocalIdFinder,
+            IAddresses addresses,
             WKBReader wkbReader)
         {
             When<Envelope<BuildingUnitPersistentLocalIdWasAssigned>>(async (context, message, ct) =>
@@ -66,6 +68,13 @@
                     throw new InvalidOperationException($"No building unit persistent local id found for {message.Message.BuildingUnitId}");
                 }
 
+                var addressPersistentLocalId = await addresses.GetAddressPersistentLocalId(message.Message.AddressId);
+
+                if (addressPersistentLocalId is null)
+                {
+                    throw new InvalidOperationException($"No address persistent local id found for {message.Message.AddressId}");
+                }
+
                 var buildingUnitVersion = new BuildingUnitVersion
                 {
                     Position = message.Position,
@@ -79,12 +88,12 @@
                     CreatedOnTimestamp = message.Message.Provenance.Timestamp,
                     Namespace = options.BuildingUnitNamespace,
                     PuriId = $"{options.BuildingUnitNamespace}/{buildingUnitPersistentLocalId}",
-                    LegacyAddresses = new Collection<BuildingUnitAddressLegacyVersion>(new[]
+                    Addresses = new Collection<BuildingUnitAddressVersion>(new[]
                     {
-                        new BuildingUnitAddressLegacyVersion
+                        new BuildingUnitAddressVersion
                         {
                             BuildingUnitPersistentLocalId = buildingUnitPersistentLocalId.Value,
-                            AddressId = message.Message.AddressId,
+                            AddressPersistentLocalId = addressPersistentLocalId.Value,
                             Position = message.Position
                         }
                     })
@@ -113,6 +122,13 @@
                     throw new InvalidOperationException($"No building unit persistent local id found for {message.Message.BuildingUnitId}");
                 }
 
+                var addressPersistentLocalId = await addresses.GetAddressPersistentLocalId(message.Message.AddressId);
+
+                if (addressPersistentLocalId is null)
+                {
+                    throw new InvalidOperationException($"No address persistent local id found for {message.Message.AddressId}");
+                }
+
                 var buildingUnitVersion = new BuildingUnitVersion
                 {
                     Position = message.Position,
@@ -126,12 +142,12 @@
                     CreatedOnTimestamp = message.Message.Provenance.Timestamp,
                     Namespace = options.BuildingUnitNamespace,
                     PuriId = $"{options.BuildingUnitNamespace}/{buildingUnitPersistentLocalId}",
-                    LegacyAddresses = new Collection<BuildingUnitAddressLegacyVersion>(new[]
+                    Addresses = new Collection<BuildingUnitAddressVersion>(new[]
                     {
-                        new BuildingUnitAddressLegacyVersion
+                        new BuildingUnitAddressVersion
                         {
                             BuildingUnitPersistentLocalId = buildingUnitPersistentLocalId.Value,
-                            AddressId = message.Message.AddressId,
+                            AddressPersistentLocalId = addressPersistentLocalId.Value,
                             Position = message.Position
                         }
                     })
@@ -199,7 +215,6 @@
                     buildingUnit =>
                     {
                         buildingUnit.IsRemoved = true;
-                        buildingUnit.LegacyAddresses.Clear();
                         buildingUnit.Addresses.Clear();
                     },
                     ct);
@@ -207,21 +222,28 @@
 
             When<Envelope<BuildingUnitAddressWasAttached>>(async (context, message, ct) =>
             {
+                var addressPersistentLocalId = await addresses.GetAddressPersistentLocalId(message.Message.AddressId);
+
+                if (addressPersistentLocalId is null)
+                {
+                    throw new InvalidOperationException($"No address persistent local id found for {message.Message.AddressId}");
+                }
+
                 await context.CreateNewBuildingUnitVersion(
                     message.Message.To,
                     message,
                     buildingUnit =>
                     {
-                        if (buildingUnit.LegacyAddresses.Any(x => x.AddressId == message.Message.AddressId))
+                        if (buildingUnit.Addresses.Any(x => x.AddressPersistentLocalId == addressPersistentLocalId.Value))
                         {
                             return;
                         }
 
-                        buildingUnit.LegacyAddresses.Add(new BuildingUnitAddressLegacyVersion
+                        buildingUnit.Addresses.Add(new BuildingUnitAddressVersion
                         {
                             Position = message.Position,
                             BuildingUnitPersistentLocalId = buildingUnit.BuildingUnitPersistentLocalId,
-                            AddressId = message.Message.AddressId
+                            AddressPersistentLocalId = addressPersistentLocalId.Value
                         });
                     },
                     ct);
@@ -236,10 +258,19 @@
                     {
                         foreach (var addressId in message.Message.AddressIds)
                         {
-                            var address = buildingUnit.LegacyAddresses.SingleOrDefault(x => x.AddressId == addressId);
+                            var addressPersistentLocalId = addresses.GetAddressPersistentLocalId(addressId).GetAwaiter().GetResult();
+
+                            if (addressPersistentLocalId is null)
+                            {
+                                throw new InvalidOperationException($"No address persistent local id found for {addressId}");
+                            }
+
+                            var address = buildingUnit.Addresses
+                                .SingleOrDefault(x => x.AddressPersistentLocalId == addressPersistentLocalId.Value);
+
                             if (address is not null)
                             {
-                                buildingUnit.LegacyAddresses.Remove(address);
+                                buildingUnit.Addresses.Remove(address);
                             }
                         }
                     },
@@ -249,25 +280,39 @@
 
             When<Envelope<BuildingUnitWasReaddressed>>(async (context, message, ct) =>
             {
+                var oldAddressPersistentLocalId = await addresses.GetAddressPersistentLocalId(message.Message.OldAddressId);
+
+                if (oldAddressPersistentLocalId is null)
+                {
+                    throw new InvalidOperationException($"No address persistent local id found for {message.Message.OldAddressId}");
+                }
+
+                var newAddressPersistentLocalId = await addresses.GetAddressPersistentLocalId(message.Message.NewAddressId);
+
+                if (newAddressPersistentLocalId is null)
+                {
+                    throw new InvalidOperationException($"No address persistent local id found for {message.Message.NewAddressId}");
+                }
+
                 await context.CreateNewBuildingUnitVersion(
                     message.Message.BuildingUnitId,
                     message,
                     buildingUnit =>
                     {
                         var oldAddress =
-                            buildingUnit.LegacyAddresses.SingleOrDefault(x => x.AddressId == message.Message.OldAddressId);
+                            buildingUnit.Addresses.SingleOrDefault(x => x.AddressPersistentLocalId == oldAddressPersistentLocalId);
                         if (oldAddress is not null)
                         {
-                            buildingUnit.LegacyAddresses.Remove(oldAddress);
+                            buildingUnit.Addresses.Remove(oldAddress);
                         }
 
-                        if (buildingUnit.LegacyAddresses.All(x => x.AddressId != message.Message.NewAddressId))
+                        if (buildingUnit.Addresses.All(x => x.AddressPersistentLocalId != newAddressPersistentLocalId))
                         {
-                            buildingUnit.LegacyAddresses.Add(new BuildingUnitAddressLegacyVersion
+                            buildingUnit.Addresses.Add(new BuildingUnitAddressVersion
                             {
                                 Position = message.Position,
                                 BuildingUnitPersistentLocalId = buildingUnit.BuildingUnitPersistentLocalId,
-                                AddressId = message.Message.NewAddressId
+                                AddressPersistentLocalId = newAddressPersistentLocalId.Value
                             });
                         }
                     },
