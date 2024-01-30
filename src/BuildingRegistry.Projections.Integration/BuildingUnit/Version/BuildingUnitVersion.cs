@@ -25,6 +25,7 @@
         public string? Status { get; set; }
         public string? OsloStatus { get; set; }
         public string Function { get; set; }
+        public string OsloFunction { get; set; }
         public string? GeometryMethod { get; set; }
         public Geometry? Geometry { get; set; }
         public bool HasDeviation { get; set; }
@@ -84,6 +85,7 @@
                 Status = Status,
                 OsloStatus = OsloStatus,
                 Function = Function,
+                OsloFunction = OsloFunction,
                 GeometryMethod = GeometryMethod,
                 Geometry = Geometry,
                 HasDeviation = HasDeviation,
@@ -127,6 +129,7 @@
             builder.Property(x => x.Status).HasColumnName("status");
             builder.Property(x => x.OsloStatus).HasColumnName("oslo_status");
             builder.Property(x => x.Function).HasColumnName("function");
+            builder.Property(x => x.OsloFunction).HasColumnName("oslo_function");
             builder.Property(x => x.GeometryMethod).HasColumnName("geometry_method");
             builder.Property(x => x.Geometry).HasColumnName("geometry");
             builder.Property(x => x.HasDeviation).HasColumnName("has_deviation");

@@ -38,7 +38,8 @@
                     BuildingPersistentLocalId = message.Message.BuildingPersistentLocalId,
                     Status = BuildingUnitStatus.Planned.Status,
                     OsloStatus = BuildingUnitStatus.Planned.Map(),
-                    Function = BuildingUnitFunction.Parse(message.Message.Function).Map(),
+                    Function = BuildingUnitFunction.Parse(message.Message.Function).Function,
+                    OsloFunction = BuildingUnitFunction.Parse(message.Message.Function).Map(),
                     GeometryMethod = BuildingUnitPositionGeometryMethod.Parse(message.Message.GeometryMethod).Map(),
                     Geometry = sysGeometry,
                     HasDeviation = message.Message.HasDeviation,
@@ -207,7 +208,8 @@
 
                         buildingUnit.Status = BuildingUnitStatus.Parse(message.Message.BuildingUnitStatus).Status;
                         buildingUnit.OsloStatus = BuildingUnitStatus.Parse(message.Message.BuildingUnitStatus).Map();
-                        buildingUnit.Function = BuildingUnitFunction.Parse(message.Message.Function).Map();
+                        buildingUnit.Function = BuildingUnitFunction.Parse(message.Message.Function).Function;
+                        buildingUnit.OsloFunction = BuildingUnitFunction.Parse(message.Message.Function).Map();
                         buildingUnit.Geometry = sysGeometry;
                         buildingUnit.GeometryMethod = BuildingUnitPositionGeometryMethod.Parse(message.Message.GeometryMethod).Map();
                         buildingUnit.HasDeviation = message.Message.HasDeviation;
@@ -276,7 +278,8 @@
                     BuildingPersistentLocalId = message.Message.BuildingPersistentLocalId,
                     Status =  BuildingUnitStatus.Parse(message.Message.BuildingUnitStatus).Status,
                     OsloStatus =  BuildingUnitStatus.Parse(message.Message.BuildingUnitStatus).Map(),
-                    Function = BuildingUnitFunction.Common.Map(),
+                    Function = BuildingUnitFunction.Common.Function,
+                    OsloFunction = BuildingUnitFunction.Common.Map(),
                     GeometryMethod = BuildingUnitPositionGeometryMethod.Parse(message.Message.GeometryMethod).Map(),
                     Geometry = sysGeometry,
                     HasDeviation = message.Message.HasDeviation,
@@ -452,7 +455,8 @@
                         buildingUnit.BuildingPersistentLocalId = message.Message.BuildingPersistentLocalId;
                         buildingUnit.Status = BuildingUnitStatus.Parse(message.Message.Status).Status;
                         buildingUnit.OsloStatus = BuildingUnitStatus.Parse(message.Message.Status).Map();
-                        buildingUnit.Function = BuildingUnitFunction.Parse(message.Message.Function).Map();
+                        buildingUnit.Function = BuildingUnitFunction.Parse(message.Message.Function).Function;
+                        buildingUnit.OsloFunction = BuildingUnitFunction.Parse(message.Message.Function).Map();
                         buildingUnit.Geometry = sysGeometry;
                         buildingUnit.GeometryMethod = BuildingUnitPositionGeometryMethod.Parse(message.Message.GeometryMethod).Map();
                         buildingUnit.HasDeviation = message.Message.HasDeviation;

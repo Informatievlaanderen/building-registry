@@ -82,7 +82,8 @@
                         buildingUnitVersion.BuildingPersistentLocalId.Should().Be(buildingWasMigrated.BuildingPersistentLocalId);
                         buildingUnitVersion.Status.Should().Be(BuildingUnitStatus.Parse(buildingUnit.Status).Status);
                         buildingUnitVersion.OsloStatus.Should().Be(BuildingUnitStatus.Parse(buildingUnit.Status).Map());
-                        buildingUnitVersion.Function.Should().Be(BuildingUnitFunction.Parse(buildingUnit.Function).Map());
+                        buildingUnitVersion.Function.Should().Be(BuildingUnitFunction.Parse(buildingUnit.Function).Function);
+                        buildingUnitVersion.OsloFunction.Should().Be(BuildingUnitFunction.Parse(buildingUnit.Function).Map());
                         buildingUnitVersion.GeometryMethod.Should()
                             .Be(BuildingUnitPositionGeometryMethod.Parse(buildingUnit.GeometryMethod).Map());
                         buildingUnitVersion.Geometry.Should().BeEquivalentTo(_wkbReader.Read(buildingUnit.ExtendedWkbGeometry.ToByteArray()));
@@ -354,7 +355,8 @@
                     buildingUnitVersion!.BuildingPersistentLocalId.Should().Be(buildingUnitWasPlannedV2.BuildingPersistentLocalId);
                     buildingUnitVersion.Geometry.Should().BeEquivalentTo(_wkbReader.Read(buildingUnitWasPlannedV2.ExtendedWkbGeometry.ToByteArray()));
                     buildingUnitVersion.GeometryMethod.Should().Be(BuildingUnitPositionGeometryMethod.Parse(buildingUnitWasPlannedV2.GeometryMethod).Map());
-                    buildingUnitVersion.Function.Should().Be(BuildingUnitFunction.Parse(buildingUnitWasPlannedV2.Function).Map());
+                    buildingUnitVersion.Function.Should().Be(BuildingUnitFunction.Parse(buildingUnitWasPlannedV2.Function).Function);
+                    buildingUnitVersion.OsloFunction.Should().Be(BuildingUnitFunction.Parse(buildingUnitWasPlannedV2.Function).Map());
                     buildingUnitVersion.Status.Should().Be(BuildingUnitStatus.Planned.Status);
                     buildingUnitVersion.OsloStatus.Should().Be(BuildingUnitStatus.Planned.Map());
                     buildingUnitVersion.HasDeviation.Should().Be(buildingUnitWasPlannedV2.HasDeviation);
@@ -910,7 +912,8 @@
 
                     buildingUnitVersion!.Status.Should().Be(BuildingUnitStatus.Parse(buildingUnitRemovalWasCorrected.BuildingUnitStatus).Status);
                     buildingUnitVersion.OsloStatus.Should().Be(BuildingUnitStatus.Parse(buildingUnitRemovalWasCorrected.BuildingUnitStatus).Map());
-                    buildingUnitVersion.Function.Should().Be(BuildingUnitFunction.Parse(buildingUnitRemovalWasCorrected.Function).Map());
+                    buildingUnitVersion.Function.Should().Be(BuildingUnitFunction.Parse(buildingUnitRemovalWasCorrected.Function).Function);
+                    buildingUnitVersion.OsloFunction.Should().Be(BuildingUnitFunction.Parse(buildingUnitRemovalWasCorrected.Function).Map());
                     buildingUnitVersion.Geometry.Should().BeEquivalentTo(
                         _wkbReader.Read(buildingUnitRemovalWasCorrected.ExtendedWkbGeometry.ToByteArray()));
                     buildingUnitVersion.GeometryMethod.Should()
@@ -1104,7 +1107,8 @@
                     buildingUnitVersion.Geometry.Should().BeEquivalentTo(
                         _wkbReader.Read(commonBuildingUnitWasAddedV2.ExtendedWkbGeometry.ToByteArray()));
                     buildingUnitVersion.GeometryMethod.Should().Be(BuildingUnitPositionGeometryMethod.Parse(commonBuildingUnitWasAddedV2.GeometryMethod).Map());
-                    buildingUnitVersion.Function.Should().Be(BuildingUnitFunction.Common.Map());
+                    buildingUnitVersion.Function.Should().Be(BuildingUnitFunction.Common.Function);
+                    buildingUnitVersion.OsloFunction.Should().Be(BuildingUnitFunction.Common.Map());
                     buildingUnitVersion.Status.Should().Be(BuildingUnitStatus.Parse(commonBuildingUnitWasAddedV2.BuildingUnitStatus).Status);
                     buildingUnitVersion.OsloStatus.Should().Be(BuildingUnitStatus.Parse(commonBuildingUnitWasAddedV2.BuildingUnitStatus).Map());
                     buildingUnitVersion.HasDeviation.Should().Be(commonBuildingUnitWasAddedV2.HasDeviation);
@@ -1518,7 +1522,8 @@
                     buildingUnitVersion!.BuildingPersistentLocalId.Should().Be(buildingUnitWasTransferred.BuildingPersistentLocalId);
                     buildingUnitVersion.Status.Should().Be(BuildingUnitStatus.Parse(buildingUnitWasTransferred.Status).Status);
                     buildingUnitVersion.OsloStatus.Should().Be(BuildingUnitStatus.Parse(buildingUnitWasTransferred.Status).Map());
-                    buildingUnitVersion.Function.Should().Be(BuildingUnitFunction.Parse(buildingUnitWasTransferred.Function).Map());
+                    buildingUnitVersion.Function.Should().Be(BuildingUnitFunction.Parse(buildingUnitWasTransferred.Function).Function);
+                    buildingUnitVersion.OsloFunction.Should().Be(BuildingUnitFunction.Parse(buildingUnitWasTransferred.Function).Map());
                     buildingUnitVersion.GeometryMethod.Should().Be(BuildingUnitPositionGeometryMethod.Parse(buildingUnitWasTransferred.GeometryMethod).Map());
                     buildingUnitVersion.Geometry.Should().BeEquivalentTo(
                         _wkbReader.Read(buildingUnitWasTransferred.ExtendedWkbGeometry.ToByteArray()));
