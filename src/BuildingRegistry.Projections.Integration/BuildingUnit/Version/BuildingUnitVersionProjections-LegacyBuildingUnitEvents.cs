@@ -1,5 +1,6 @@
 ﻿namespace BuildingRegistry.Projections.Integration.BuildingUnit.Version
 {
+    using System;
     using System.Collections.ObjectModel;
     using System.Linq;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore;
@@ -51,13 +52,20 @@
             {
                 var buildingPersistentLocalId = await persistentLocalIdFinder.FindBuildingPersistentLocalId(
                     message.Message.BuildingId, ct);
+
+                if (buildingPersistentLocalId is null)
+                {
+                    throw new InvalidOperationException($"No building persistent local id found for {message.Message.BuildingId}");
+                }
+
                 var buildingUnitPersistentLocalId = await persistentLocalIdFinder.FindBuildingUnitPersistentLocalId(
                     message.Message.BuildingId, message.Message.BuildingUnitId, ct);
 
-                if (buildingPersistentLocalId is null || buildingUnitPersistentLocalId is null)
+                if (buildingUnitPersistentLocalId is null)
                 {
-                    return;
+                    throw new InvalidOperationException($"No building unit persistent local id found for {message.Message.BuildingUnitId}");
                 }
+
                 var buildingUnitVersion = new BuildingUnitVersion
                 {
                     Position = message.Position,
@@ -91,13 +99,20 @@
             {
                 var buildingPersistentLocalId = await persistentLocalIdFinder.FindBuildingPersistentLocalId(
                     message.Message.BuildingId, ct);
+
+                if (buildingPersistentLocalId is null)
+                {
+                    throw new InvalidOperationException($"No building persistent local id found for {message.Message.BuildingId}");
+                }
+
                 var buildingUnitPersistentLocalId = await persistentLocalIdFinder.FindBuildingUnitPersistentLocalId(
                     message.Message.BuildingId, message.Message.BuildingUnitId, ct);
 
-                if (buildingPersistentLocalId is null || buildingUnitPersistentLocalId is null)
+                if (buildingUnitPersistentLocalId is null)
                 {
-                    return;
+                    throw new InvalidOperationException($"No building unit persistent local id found for {message.Message.BuildingUnitId}");
                 }
+
                 var buildingUnitVersion = new BuildingUnitVersion
                 {
                     Position = message.Position,
@@ -131,13 +146,20 @@
             {
                 var buildingPersistentLocalId = await persistentLocalIdFinder.FindBuildingPersistentLocalId(
                     message.Message.BuildingId, ct);
+
+                if (buildingPersistentLocalId is null)
+                {
+                    throw new InvalidOperationException($"No building persistent local id found for {message.Message.BuildingId}");
+                }
+
                 var buildingUnitPersistentLocalId = await persistentLocalIdFinder.FindBuildingUnitPersistentLocalId(
                     message.Message.BuildingId, message.Message.BuildingUnitId, ct);
 
-                if (buildingPersistentLocalId is null || buildingUnitPersistentLocalId is null)
+                if (buildingUnitPersistentLocalId is null)
                 {
-                    return;
+                    throw new InvalidOperationException($"No building unit persistent local id found for {message.Message.BuildingUnitId}");
                 }
+
                 var buildingUnitVersion = new BuildingUnitVersion
                 {
                     Position = message.Position,

@@ -1,5 +1,6 @@
 ﻿namespace BuildingRegistry.Projections.Integration.Building.Version
 {
+    using System;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore;
     using Be.Vlaanderen.Basisregisters.Utilities.HexByteConvertor;
     using BuildingRegistry.Building;
@@ -22,7 +23,7 @@
 
                 if (buildingPersistentLocalId is null)
                 {
-                    return;
+                    throw new InvalidOperationException($"No persistent local id found for {message.Message.BuildingId}");
                 }
 
                 var building = new BuildingVersion
