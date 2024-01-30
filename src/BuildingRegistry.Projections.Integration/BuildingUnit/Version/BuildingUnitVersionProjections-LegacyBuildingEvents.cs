@@ -173,6 +173,7 @@
                         {
                             x.Geometry = null;
                             x.GeometryMethod = null;
+                            x.OsloGeometryMethod = null;
                         },
                         ct);
                 }

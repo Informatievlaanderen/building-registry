@@ -40,7 +40,8 @@
                         OsloStatus = BuildingUnitStatus.Parse(buildingUnit.Status).Map(),
                         Function = BuildingUnitFunction.Parse(buildingUnit.Function).Function,
                         OsloFunction = BuildingUnitFunction.Parse(buildingUnit.Function).Map(),
-                        GeometryMethod = BuildingUnitPositionGeometryMethod.Parse(buildingUnit.GeometryMethod).Map(),
+                        GeometryMethod = BuildingUnitPositionGeometryMethod.Parse(buildingUnit.GeometryMethod).GeometryMethod,
+                        OsloGeometryMethod = BuildingUnitPositionGeometryMethod.Parse(buildingUnit.GeometryMethod).Map(),
                         Geometry = sysGeometry,
                         HasDeviation = false,
                         IsRemoved = buildingUnit.IsRemoved,
@@ -75,7 +76,8 @@
                         buildingUnit =>
                         {
                             buildingUnit.Geometry = sysGeometry;
-                            buildingUnit.GeometryMethod = BuildingUnitPositionGeometryMethod.DerivedFromObject.Map();
+                            buildingUnit.GeometryMethod = BuildingUnitPositionGeometryMethod.DerivedFromObject.GeometryMethod;
+                            buildingUnit.OsloGeometryMethod = BuildingUnitPositionGeometryMethod.DerivedFromObject.Map();
                         },
                         ct);
                 }
@@ -101,7 +103,8 @@
                         buildingUnit =>
                         {
                             buildingUnit.Geometry = sysGeometry;
-                            buildingUnit.GeometryMethod = BuildingUnitPositionGeometryMethod.DerivedFromObject.Map();
+                            buildingUnit.GeometryMethod = BuildingUnitPositionGeometryMethod.DerivedFromObject.GeometryMethod;
+                            buildingUnit.OsloGeometryMethod = BuildingUnitPositionGeometryMethod.DerivedFromObject.Map();
                         },
                         ct);
                 }
@@ -127,7 +130,8 @@
                         buildingUnit =>
                         {
                             buildingUnit.Geometry = sysGeometry;
-                            buildingUnit.GeometryMethod = BuildingUnitPositionGeometryMethod.DerivedFromObject.Map();
+                            buildingUnit.GeometryMethod = BuildingUnitPositionGeometryMethod.DerivedFromObject.GeometryMethod;
+                            buildingUnit.OsloGeometryMethod = BuildingUnitPositionGeometryMethod.DerivedFromObject.Map();
                         },
                         ct);
                 }
@@ -153,7 +157,8 @@
                         buildingUnit =>
                         {
                             buildingUnit.Geometry = sysGeometry;
-                            buildingUnit.GeometryMethod = BuildingUnitPositionGeometryMethod.DerivedFromObject.Map();
+                            buildingUnit.GeometryMethod = BuildingUnitPositionGeometryMethod.DerivedFromObject.GeometryMethod;
+                            buildingUnit.OsloGeometryMethod = BuildingUnitPositionGeometryMethod.DerivedFromObject.Map();
                         },
                         ct);
                 }

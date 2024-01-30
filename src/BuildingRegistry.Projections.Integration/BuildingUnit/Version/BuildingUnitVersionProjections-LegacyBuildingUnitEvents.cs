@@ -265,7 +265,8 @@
                         var sysGeometry = wkbReader.Read(geometryAsBinary);
 
                         buildingUnit.Geometry = sysGeometry;
-                        buildingUnit.GeometryMethod = BuildingUnitPositionGeometryMethod.AppointedByAdministrator.Map();
+                        buildingUnit.GeometryMethod = BuildingUnitPositionGeometryMethod.AppointedByAdministrator.GeometryMethod;
+                        buildingUnit.OsloGeometryMethod = BuildingUnitPositionGeometryMethod.AppointedByAdministrator.Map();
                     },
                     ct);
             });
@@ -281,7 +282,8 @@
                         var sysGeometry = wkbReader.Read(geometryAsBinary);
 
                         buildingUnit.Geometry = sysGeometry;
-                        buildingUnit.GeometryMethod = BuildingUnitPositionGeometryMethod.AppointedByAdministrator.Map();
+                        buildingUnit.GeometryMethod = BuildingUnitPositionGeometryMethod.AppointedByAdministrator.GeometryMethod;
+                        buildingUnit.OsloGeometryMethod = BuildingUnitPositionGeometryMethod.AppointedByAdministrator.Map();
                     },
                     ct);
             });
@@ -297,7 +299,8 @@
                         var sysGeometry = wkbReader.Read(geometryAsBinary);
 
                         buildingUnit.Geometry = sysGeometry;
-                        buildingUnit.GeometryMethod = BuildingUnitPositionGeometryMethod.DerivedFromObject.Map();
+                        buildingUnit.GeometryMethod = BuildingUnitPositionGeometryMethod.DerivedFromObject.GeometryMethod;
+                        buildingUnit.OsloGeometryMethod = BuildingUnitPositionGeometryMethod.DerivedFromObject.Map();
                     },
                     ct);
             });
@@ -313,7 +316,8 @@
                         var sysGeometry = wkbReader.Read(geometryAsBinary);
 
                         buildingUnit.Geometry = sysGeometry;
-                        buildingUnit.GeometryMethod = BuildingUnitPositionGeometryMethod.DerivedFromObject.Map();
+                        buildingUnit.GeometryMethod = BuildingUnitPositionGeometryMethod.DerivedFromObject.GeometryMethod;
+                        buildingUnit.OsloGeometryMethod = BuildingUnitPositionGeometryMethod.DerivedFromObject.Map();
                     },
                     ct);
             });

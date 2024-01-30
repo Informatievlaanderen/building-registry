@@ -27,6 +27,7 @@
         public string Function { get; set; }
         public string OsloFunction { get; set; }
         public string? GeometryMethod { get; set; }
+        public string? OsloGeometryMethod { get; set; }
         public Geometry? Geometry { get; set; }
         public bool HasDeviation { get; set; }
         public bool IsRemoved { get; set; }
@@ -87,6 +88,7 @@
                 Function = Function,
                 OsloFunction = OsloFunction,
                 GeometryMethod = GeometryMethod,
+                OsloGeometryMethod = OsloGeometryMethod,
                 Geometry = Geometry,
                 HasDeviation = HasDeviation,
                 IsRemoved = IsRemoved,
@@ -131,6 +133,7 @@
             builder.Property(x => x.Function).HasColumnName("function");
             builder.Property(x => x.OsloFunction).HasColumnName("oslo_function");
             builder.Property(x => x.GeometryMethod).HasColumnName("geometry_method");
+            builder.Property(x => x.OsloGeometryMethod).HasColumnName("oslo_geometry_method");
             builder.Property(x => x.Geometry).HasColumnName("geometry");
             builder.Property(x => x.HasDeviation).HasColumnName("has_deviation");
             builder.Property(x => x.IsRemoved).HasColumnName("is_removed");
