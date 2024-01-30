@@ -23,6 +23,7 @@
         public int BuildingUnitPersistentLocalId { get; set; }
         public int BuildingPersistentLocalId { get; set; }
         public string? Status { get; set; }
+        public string? OsloStatus { get; set; }
         public string Function { get; set; }
         public string? GeometryMethod { get; set; }
         public Geometry? Geometry { get; set; }
@@ -81,6 +82,7 @@
                 BuildingUnitPersistentLocalId = BuildingUnitPersistentLocalId,
                 BuildingPersistentLocalId = BuildingPersistentLocalId,
                 Status = Status,
+                OsloStatus = OsloStatus,
                 Function = Function,
                 GeometryMethod = GeometryMethod,
                 Geometry = Geometry,
@@ -123,6 +125,7 @@
             builder.Property(x => x.BuildingUnitPersistentLocalId).HasColumnName("building_unit_persistent_local_id");
             builder.Property(x => x.BuildingPersistentLocalId).HasColumnName("building_persistent_local_id");
             builder.Property(x => x.Status).HasColumnName("status");
+            builder.Property(x => x.OsloStatus).HasColumnName("oslo_status");
             builder.Property(x => x.Function).HasColumnName("function");
             builder.Property(x => x.GeometryMethod).HasColumnName("geometry_method");
             builder.Property(x => x.Geometry).HasColumnName("geometry");
@@ -151,6 +154,7 @@
             builder.HasIndex(x => x.BuildingUnitPersistentLocalId);
             builder.HasIndex(x => x.BuildingPersistentLocalId);
             builder.HasIndex(x => x.Status);
+            builder.HasIndex(x => x.OsloStatus);
             builder.HasIndex(x => x.IsRemoved);
             builder.HasIndex(x => x.Geometry).HasMethod("GIST");
             builder.HasIndex(BuildingUnitVersion.VersionTimestampBackingPropertyName);

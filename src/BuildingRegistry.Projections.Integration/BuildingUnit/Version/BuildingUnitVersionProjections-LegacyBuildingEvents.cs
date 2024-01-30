@@ -38,7 +38,8 @@
                         message,
                         buildingUnit =>
                         {
-                            buildingUnit.Status = BuildingUnitStatus.NotRealized.Map();
+                            buildingUnit.Status = BuildingUnitStatus.NotRealized.Status;
+                            buildingUnit.OsloStatus = BuildingUnitStatus.NotRealized.Map();
                             buildingUnit.LegacyAddresses.Clear();
                             buildingUnit.Addresses.Clear();
                         },
@@ -52,7 +53,8 @@
                         message,
                         buildingUnit =>
                         {
-                            buildingUnit.Status = BuildingUnitStatus.Retired.Map();
+                            buildingUnit.Status = BuildingUnitStatus.Retired.Status;
+                            buildingUnit.OsloStatus = BuildingUnitStatus.Retired.Map();
                             buildingUnit.LegacyAddresses.Clear();
                             buildingUnit.Addresses.Clear();
                         },
@@ -69,7 +71,8 @@
                         message,
                         buildingUnit =>
                         {
-                            buildingUnit.Status = BuildingUnitStatus.NotRealized.Map();
+                            buildingUnit.Status = BuildingUnitStatus.NotRealized.Status;
+                            buildingUnit.OsloStatus = BuildingUnitStatus.NotRealized.Map();
                             buildingUnit.LegacyAddresses.Clear();
                             buildingUnit.Addresses.Clear();
                         },
@@ -83,7 +86,8 @@
                         message,
                         buildingUnit =>
                         {
-                            buildingUnit.Status = BuildingUnitStatus.Retired.Map();
+                            buildingUnit.Status = BuildingUnitStatus.Retired.Status;
+                            buildingUnit.OsloStatus = BuildingUnitStatus.Retired.Map();
                             buildingUnit.LegacyAddresses.Clear();
                             buildingUnit.Addresses.Clear();
                         },
@@ -100,7 +104,8 @@
                         message,
                         buildingUnit =>
                         {
-                            buildingUnit.Status = BuildingUnitStatus.NotRealized.Map();
+                            buildingUnit.Status = BuildingUnitStatus.NotRealized.Status;
+                            buildingUnit.OsloStatus = BuildingUnitStatus.NotRealized.Map();
                             buildingUnit.LegacyAddresses.Clear();
                             buildingUnit.Addresses.Clear();
                         },
@@ -114,7 +119,8 @@
                         message,
                         buildingUnit =>
                         {
-                            buildingUnit.Status = BuildingUnitStatus.Retired.Map();
+                            buildingUnit.Status = BuildingUnitStatus.Retired.Status;
+                            buildingUnit.OsloStatus = BuildingUnitStatus.Retired.Map();
                             buildingUnit.LegacyAddresses.Clear();
                             buildingUnit.Addresses.Clear();
                         },
@@ -131,7 +137,8 @@
                         message,
                         buildingUnit =>
                         {
-                            buildingUnit.Status = BuildingUnitStatus.NotRealized.Map();
+                            buildingUnit.Status = BuildingUnitStatus.NotRealized.Status;
+                            buildingUnit.OsloStatus = BuildingUnitStatus.NotRealized.Map();
                             buildingUnit.LegacyAddresses.Clear();
                             buildingUnit.Addresses.Clear();
                         },
@@ -145,7 +152,8 @@
                         message,
                         buildingUnit =>
                         {
-                            buildingUnit.Status = BuildingUnitStatus.Retired.Map();
+                            buildingUnit.Status = BuildingUnitStatus.Retired.Status;
+                            buildingUnit.OsloStatus = BuildingUnitStatus.Retired.Map();
                             buildingUnit.LegacyAddresses.Clear();
                             buildingUnit.Addresses.Clear();
                         },

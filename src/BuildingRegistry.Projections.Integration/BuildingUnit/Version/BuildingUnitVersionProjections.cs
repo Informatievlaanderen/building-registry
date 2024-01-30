@@ -36,7 +36,8 @@
                     Position = message.Position,
                     BuildingUnitPersistentLocalId = message.Message.BuildingUnitPersistentLocalId,
                     BuildingPersistentLocalId = message.Message.BuildingPersistentLocalId,
-                    Status = BuildingUnitStatus.Planned.Map(),
+                    Status = BuildingUnitStatus.Planned.Status,
+                    OsloStatus = BuildingUnitStatus.Planned.Map(),
                     Function = BuildingUnitFunction.Parse(message.Message.Function).Map(),
                     GeometryMethod = BuildingUnitPositionGeometryMethod.Parse(message.Message.GeometryMethod).Map(),
                     Geometry = sysGeometry,
@@ -60,7 +61,8 @@
                     message,
                     buildingUnit =>
                     {
-                        buildingUnit.Status = BuildingUnitStatus.Realized.Map();
+                        buildingUnit.Status = BuildingUnitStatus.Realized.Status;
+                        buildingUnit.OsloStatus = BuildingUnitStatus.Realized.Map();
                     },
                     ct);
             });
@@ -72,7 +74,8 @@
                     message,
                     buildingUnit =>
                     {
-                        buildingUnit.Status = BuildingUnitStatus.Realized.Map();
+                        buildingUnit.Status = BuildingUnitStatus.Realized.Status;
+                        buildingUnit.OsloStatus = BuildingUnitStatus.Realized.Map();
                     },
                     ct);
             });
@@ -84,7 +87,8 @@
                     message,
                     buildingUnit =>
                     {
-                        buildingUnit.Status = BuildingUnitStatus.Planned.Map();
+                        buildingUnit.Status = BuildingUnitStatus.Planned.Status;
+                        buildingUnit.OsloStatus = BuildingUnitStatus.Planned.Map();
                     },
                     ct);
             });
@@ -96,7 +100,8 @@
                     message,
                     buildingUnit =>
                     {
-                        buildingUnit.Status = BuildingUnitStatus.Planned.Map();
+                        buildingUnit.Status = BuildingUnitStatus.Planned.Status;
+                        buildingUnit.OsloStatus = BuildingUnitStatus.Planned.Map();
                     },
                     ct);
             });
@@ -108,7 +113,8 @@
                     message,
                     buildingUnit =>
                     {
-                        buildingUnit.Status = BuildingUnitStatus.NotRealized.Map();
+                        buildingUnit.Status = BuildingUnitStatus.NotRealized.Status;
+                        buildingUnit.OsloStatus = BuildingUnitStatus.NotRealized.Map();
                     },
                     ct);
             });
@@ -120,7 +126,8 @@
                     message,
                     buildingUnit =>
                     {
-                        buildingUnit.Status = BuildingUnitStatus.NotRealized.Map();
+                        buildingUnit.Status = BuildingUnitStatus.NotRealized.Status;
+                        buildingUnit.OsloStatus = BuildingUnitStatus.NotRealized.Map();
                     },
                     ct);
             });
@@ -132,7 +139,8 @@
                     message,
                     buildingUnit =>
                     {
-                        buildingUnit.Status = BuildingUnitStatus.Planned.Map();
+                        buildingUnit.Status = BuildingUnitStatus.Planned.Status;
+                        buildingUnit.OsloStatus = BuildingUnitStatus.Planned.Map();
                     },
                     ct);
             });
@@ -144,7 +152,8 @@
                     message,
                     buildingUnit =>
                     {
-                        buildingUnit.Status = BuildingUnitStatus.Retired.Map();
+                        buildingUnit.Status = BuildingUnitStatus.Retired.Status;
+                        buildingUnit.OsloStatus = BuildingUnitStatus.Retired.Map();
                     },
                     ct);
             });
@@ -156,7 +165,8 @@
                     message,
                     buildingUnit =>
                     {
-                        buildingUnit.Status = BuildingUnitStatus.Realized.Map();
+                        buildingUnit.Status = BuildingUnitStatus.Realized.Status;
+                        buildingUnit.OsloStatus = BuildingUnitStatus.Realized.Map();
                     },
                     ct);
             });
@@ -195,7 +205,8 @@
                         var geometryAsBinary = message.Message.ExtendedWkbGeometry.ToByteArray();
                         var sysGeometry = wkbReader.Read(geometryAsBinary);
 
-                        buildingUnit.Status = BuildingUnitStatus.Parse(message.Message.BuildingUnitStatus).Map();
+                        buildingUnit.Status = BuildingUnitStatus.Parse(message.Message.BuildingUnitStatus).Status;
+                        buildingUnit.OsloStatus = BuildingUnitStatus.Parse(message.Message.BuildingUnitStatus).Map();
                         buildingUnit.Function = BuildingUnitFunction.Parse(message.Message.Function).Map();
                         buildingUnit.Geometry = sysGeometry;
                         buildingUnit.GeometryMethod = BuildingUnitPositionGeometryMethod.Parse(message.Message.GeometryMethod).Map();
@@ -263,7 +274,8 @@
                     Position = message.Position,
                     BuildingUnitPersistentLocalId = message.Message.BuildingUnitPersistentLocalId,
                     BuildingPersistentLocalId = message.Message.BuildingPersistentLocalId,
-                    Status =  BuildingUnitStatus.Parse(message.Message.BuildingUnitStatus).Map(),
+                    Status =  BuildingUnitStatus.Parse(message.Message.BuildingUnitStatus).Status,
+                    OsloStatus =  BuildingUnitStatus.Parse(message.Message.BuildingUnitStatus).Map(),
                     Function = BuildingUnitFunction.Common.Map(),
                     GeometryMethod = BuildingUnitPositionGeometryMethod.Parse(message.Message.GeometryMethod).Map(),
                     Geometry = sysGeometry,
@@ -408,7 +420,8 @@
                     message,
                     buildingUnit =>
                     {
-                        buildingUnit.Status = BuildingStatus.Retired.Map();
+                        buildingUnit.Status = BuildingUnitStatus.Retired.Status;
+                        buildingUnit.OsloStatus = BuildingUnitStatus.Retired.Map();
                     },
                     ct);
             });
@@ -420,7 +433,8 @@
                     message,
                     buildingUnit =>
                     {
-                        buildingUnit.Status = BuildingStatus.NotRealized.Map();
+                        buildingUnit.Status = BuildingUnitStatus.NotRealized.Status;
+                        buildingUnit.OsloStatus = BuildingUnitStatus.NotRealized.Map();
                     },
                     ct);
             });
@@ -436,7 +450,8 @@
                         var sysGeometry = wkbReader.Read(geometryAsBinary);
 
                         buildingUnit.BuildingPersistentLocalId = message.Message.BuildingPersistentLocalId;
-                        buildingUnit.Status = BuildingUnitStatus.Parse(message.Message.Status).Map();
+                        buildingUnit.Status = BuildingUnitStatus.Parse(message.Message.Status).Status;
+                        buildingUnit.OsloStatus = BuildingUnitStatus.Parse(message.Message.Status).Map();
                         buildingUnit.Function = BuildingUnitFunction.Parse(message.Message.Function).Map();
                         buildingUnit.Geometry = sysGeometry;
                         buildingUnit.GeometryMethod = BuildingUnitPositionGeometryMethod.Parse(message.Message.GeometryMethod).Map();

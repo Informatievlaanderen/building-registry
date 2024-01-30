@@ -327,6 +327,7 @@
                     buildingUnit =>
                     {
                         buildingUnit.Status = null;
+                        buildingUnit.OsloStatus = null;
                     },
                     ct);
             });
@@ -338,7 +339,8 @@
                     message,
                     buildingUnit =>
                     {
-                        buildingUnit.Status = BuildingUnitStatus.Realized.Map();
+                        buildingUnit.Status = BuildingUnitStatus.Realized.Status;
+                        buildingUnit.OsloStatus = BuildingUnitStatus.Realized.Map();
                     },
                     ct);
             });
@@ -350,7 +352,8 @@
                     message,
                     buildingUnit =>
                     {
-                        buildingUnit.Status = BuildingUnitStatus.Retired.Map();
+                        buildingUnit.Status = BuildingUnitStatus.Retired.Status;
+                        buildingUnit.OsloStatus = BuildingUnitStatus.Retired.Map();
                     },
                     ct);
             });
@@ -362,7 +365,8 @@
                     message,
                     buildingUnit =>
                     {
-                        buildingUnit.Status = BuildingUnitStatus.Retired.Map();
+                        buildingUnit.Status = BuildingUnitStatus.Retired.Status;
+                        buildingUnit.OsloStatus = BuildingUnitStatus.Retired.Map();
                     },
                     ct);
             });
@@ -374,7 +378,8 @@
                     message,
                     buildingUnit =>
                     {
-                        buildingUnit.Status = BuildingUnitStatus.NotRealized.Map();
+                        buildingUnit.Status = BuildingUnitStatus.NotRealized.Status;
+                        buildingUnit.OsloStatus = BuildingUnitStatus.NotRealized.Map();
                     },
                     ct);
             });
@@ -386,7 +391,8 @@
                     message,
                     buildingUnit =>
                     {
-                        buildingUnit.Status = BuildingUnitStatus.NotRealized.Map();
+                        buildingUnit.Status = BuildingUnitStatus.NotRealized.Status;
+                        buildingUnit.OsloStatus = BuildingUnitStatus.NotRealized.Map();
                     },
                     ct);
             });
@@ -398,7 +404,8 @@
                     message,
                     buildingUnit =>
                     {
-                        buildingUnit.Status = BuildingUnitStatus.Planned.Map();
+                        buildingUnit.Status = BuildingUnitStatus.Planned.Status;
+                        buildingUnit.OsloStatus = BuildingUnitStatus.Planned.Map();
                     },
                     ct);
             });
@@ -410,7 +417,8 @@
                     message,
                     buildingUnit =>
                     {
-                        buildingUnit.Status = BuildingUnitStatus.Realized.Map();
+                        buildingUnit.Status = BuildingUnitStatus.Realized.Status;
+                        buildingUnit.OsloStatus = BuildingUnitStatus.Realized.Map();
                     },
                     ct);
             });
@@ -422,7 +430,8 @@
                     message,
                     buildingUnit =>
                     {
-                        buildingUnit.Status = BuildingUnitStatus.NotRealized.Map();
+                        buildingUnit.Status = BuildingUnitStatus.NotRealized.Status;
+                        buildingUnit.OsloStatus = BuildingUnitStatus.NotRealized.Map();
                     },
                     ct);
             });
@@ -434,7 +443,8 @@
                     message,
                     buildingUnit =>
                     {
-                        buildingUnit.Status = BuildingUnitStatus.Retired.Map();
+                        buildingUnit.Status = BuildingUnitStatus.Retired.Status;
+                        buildingUnit.OsloStatus = BuildingUnitStatus.Retired.Map();
                     },
                     ct);
             });
@@ -446,7 +456,8 @@
                     message,
                     buildingUnit =>
                     {
-                        buildingUnit.Status = BuildingUnitStatus.Planned.Map();
+                        buildingUnit.Status = BuildingUnitStatus.Planned.Status;
+                        buildingUnit.OsloStatus = BuildingUnitStatus.Planned.Map();
                     },
                     ct);
             });

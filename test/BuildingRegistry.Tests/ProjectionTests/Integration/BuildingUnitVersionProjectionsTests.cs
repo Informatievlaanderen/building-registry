@@ -80,7 +80,8 @@
                             .Single(x => x.BuildingUnitPersistentLocalId == buildingUnit.BuildingUnitPersistentLocalId);
 
                         buildingUnitVersion.BuildingPersistentLocalId.Should().Be(buildingWasMigrated.BuildingPersistentLocalId);
-                        buildingUnitVersion.Status.Should().Be(BuildingUnitStatus.Parse(buildingUnit.Status).Map());
+                        buildingUnitVersion.Status.Should().Be(BuildingUnitStatus.Parse(buildingUnit.Status).Status);
+                        buildingUnitVersion.OsloStatus.Should().Be(BuildingUnitStatus.Parse(buildingUnit.Status).Map());
                         buildingUnitVersion.Function.Should().Be(BuildingUnitFunction.Parse(buildingUnit.Function).Map());
                         buildingUnitVersion.GeometryMethod.Should()
                             .Be(BuildingUnitPositionGeometryMethod.Parse(buildingUnit.GeometryMethod).Map());
@@ -354,7 +355,8 @@
                     buildingUnitVersion.Geometry.Should().BeEquivalentTo(_wkbReader.Read(buildingUnitWasPlannedV2.ExtendedWkbGeometry.ToByteArray()));
                     buildingUnitVersion.GeometryMethod.Should().Be(BuildingUnitPositionGeometryMethod.Parse(buildingUnitWasPlannedV2.GeometryMethod).Map());
                     buildingUnitVersion.Function.Should().Be(BuildingUnitFunction.Parse(buildingUnitWasPlannedV2.Function).Map());
-                    buildingUnitVersion.Status.Should().Be(BuildingUnitStatus.Planned.Map());
+                    buildingUnitVersion.Status.Should().Be(BuildingUnitStatus.Planned.Status);
+                    buildingUnitVersion.OsloStatus.Should().Be(BuildingUnitStatus.Planned.Map());
                     buildingUnitVersion.HasDeviation.Should().Be(buildingUnitWasPlannedV2.HasDeviation);
                     buildingUnitVersion.IsRemoved.Should().BeFalse();
                     buildingUnitVersion.VersionTimestamp.Should().Be(buildingUnitWasPlannedV2.Provenance.Timestamp);
@@ -396,7 +398,8 @@
                         await context.BuildingUnitVersions.FindAsync(position + 1, buildingUnitWasRealizedV2.BuildingUnitPersistentLocalId);
                     buildingUnitVersion.Should().NotBeNull();
 
-                    buildingUnitVersion!.Status.Should().Be(BuildingUnitStatus.Realized.Map());
+                    buildingUnitVersion!.Status.Should().Be(BuildingUnitStatus.Realized.Status);
+                    buildingUnitVersion.OsloStatus.Should().Be(BuildingUnitStatus.Realized.Map());
                     buildingUnitVersion.VersionTimestamp.Should().Be(buildingUnitWasRealizedV2.Provenance.Timestamp);
                 });
         }
@@ -433,7 +436,8 @@
                         await context.BuildingUnitVersions.FindAsync(position + 1, buildingUnitWasRealized.BuildingUnitPersistentLocalId);
                     buildingUnitVersion.Should().NotBeNull();
 
-                    buildingUnitVersion!.Status.Should().Be(BuildingUnitStatus.Realized.Map());
+                    buildingUnitVersion!.Status.Should().Be(BuildingUnitStatus.Realized.Status);
+                    buildingUnitVersion.OsloStatus.Should().Be(BuildingUnitStatus.Realized.Map());
                     buildingUnitVersion.VersionTimestamp.Should().Be(buildingUnitWasRealized.Provenance.Timestamp);
                 });
         }
@@ -478,7 +482,8 @@
                         await context.BuildingUnitVersions.FindAsync(position + 2, buildingUnitWasCorrectedFromRealizedToPlanned.BuildingUnitPersistentLocalId);
                     buildingUnitVersion.Should().NotBeNull();
 
-                    buildingUnitVersion!.Status.Should().Be(BuildingUnitStatus.Planned.Map());
+                    buildingUnitVersion!.Status.Should().Be(BuildingUnitStatus.Planned.Status);
+                    buildingUnitVersion.OsloStatus.Should().Be(BuildingUnitStatus.Planned.Map());
                     buildingUnitVersion.VersionTimestamp.Should().Be(buildingUnitWasCorrectedFromRealizedToPlanned.Provenance.Timestamp);
                 });
         }
@@ -523,7 +528,8 @@
                         await context.BuildingUnitVersions.FindAsync(position + 2, buildingUnitWasCorrectedToPlanned.BuildingUnitPersistentLocalId);
                     buildingUnitVersion.Should().NotBeNull();
 
-                    buildingUnitVersion!.Status.Should().Be(BuildingUnitStatus.Planned.Map());
+                    buildingUnitVersion!.Status.Should().Be(BuildingUnitStatus.Planned.Status);
+                    buildingUnitVersion.OsloStatus.Should().Be(BuildingUnitStatus.Planned.Map());
                     buildingUnitVersion.VersionTimestamp.Should().Be(buildingUnitWasCorrectedToPlanned.Provenance.Timestamp);
                 });
         }
@@ -560,7 +566,8 @@
                         await context.BuildingUnitVersions.FindAsync(position + 1, buildingUnitWasNotRealizedV2.BuildingUnitPersistentLocalId);
                     buildingUnitVersion.Should().NotBeNull();
 
-                    buildingUnitVersion!.Status.Should().Be(BuildingUnitStatus.NotRealized.Map());
+                    buildingUnitVersion!.Status.Should().Be(BuildingUnitStatus.NotRealized.Status);
+                    buildingUnitVersion.OsloStatus.Should().Be(BuildingUnitStatus.NotRealized.Map());
                     buildingUnitVersion.VersionTimestamp.Should().Be(buildingUnitWasNotRealizedV2.Provenance.Timestamp);
                 });
         }
@@ -598,7 +605,8 @@
                         await context.BuildingUnitVersions.FindAsync(position + 1, buildingUnitWasNotRealized.BuildingUnitPersistentLocalId);
                     buildingUnitVersion.Should().NotBeNull();
 
-                    buildingUnitVersion!.Status.Should().Be(BuildingUnitStatus.NotRealized.Map());
+                    buildingUnitVersion!.Status.Should().Be(BuildingUnitStatus.NotRealized.Status);
+                    buildingUnitVersion.OsloStatus.Should().Be(BuildingUnitStatus.NotRealized.Map());
                     buildingUnitVersion.VersionTimestamp.Should().Be(buildingUnitWasNotRealized.Provenance.Timestamp);
                 });
         }
@@ -643,7 +651,8 @@
                         await context.BuildingUnitVersions.FindAsync(position + 2, buildingUnitWasCorrectedToPlanned.BuildingUnitPersistentLocalId);
                     buildingUnitVersion.Should().NotBeNull();
 
-                    buildingUnitVersion!.Status.Should().Be(BuildingUnitStatus.Planned.Map());
+                    buildingUnitVersion!.Status.Should().Be(BuildingUnitStatus.Planned.Status);
+                    buildingUnitVersion.OsloStatus.Should().Be(BuildingUnitStatus.Planned.Map());
                     buildingUnitVersion.VersionTimestamp.Should().Be(buildingUnitWasCorrectedToPlanned.Provenance.Timestamp);
                 });
         }
@@ -687,7 +696,8 @@
                         await context.BuildingUnitVersions.FindAsync(position + 2, buildingUnitWasRetiredV2.BuildingUnitPersistentLocalId);
                     buildingUnitVersion.Should().NotBeNull();
 
-                    buildingUnitVersion!.Status.Should().Be(BuildingUnitStatus.Retired.Map());
+                    buildingUnitVersion!.Status.Should().Be(BuildingUnitStatus.Retired.Status);
+                    buildingUnitVersion.OsloStatus.Should().Be(BuildingUnitStatus.Retired.Map());
                     buildingUnitVersion.VersionTimestamp.Should().Be(buildingUnitWasRetiredV2.Provenance.Timestamp);
                 });
         }
@@ -739,7 +749,8 @@
                         await context.BuildingUnitVersions.FindAsync(position + 3, buildingUnitWasCorrectedToRealized.BuildingUnitPersistentLocalId);
                     buildingUnitVersion.Should().NotBeNull();
 
-                    buildingUnitVersion!.Status.Should().Be(BuildingUnitStatus.Realized.Map());
+                    buildingUnitVersion!.Status.Should().Be(BuildingUnitStatus.Realized.Status);
+                    buildingUnitVersion.OsloStatus.Should().Be(BuildingUnitStatus.Realized.Map());
                     buildingUnitVersion.VersionTimestamp.Should().Be(buildingUnitWasCorrectedToRealized.Provenance.Timestamp);
                 });
         }
@@ -897,7 +908,8 @@
                         await context.BuildingUnitVersions.FindAsync(position + 2, buildingUnitRemovalWasCorrected.BuildingUnitPersistentLocalId);
                     buildingUnitVersion.Should().NotBeNull();
 
-                    buildingUnitVersion!.Status.Should().Be(BuildingUnitStatus.Parse(buildingUnitRemovalWasCorrected.BuildingUnitStatus).Map());
+                    buildingUnitVersion!.Status.Should().Be(BuildingUnitStatus.Parse(buildingUnitRemovalWasCorrected.BuildingUnitStatus).Status);
+                    buildingUnitVersion.OsloStatus.Should().Be(BuildingUnitStatus.Parse(buildingUnitRemovalWasCorrected.BuildingUnitStatus).Map());
                     buildingUnitVersion.Function.Should().Be(BuildingUnitFunction.Parse(buildingUnitRemovalWasCorrected.Function).Map());
                     buildingUnitVersion.Geometry.Should().BeEquivalentTo(
                         _wkbReader.Read(buildingUnitRemovalWasCorrected.ExtendedWkbGeometry.ToByteArray()));
@@ -1091,12 +1103,10 @@
                     buildingUnitVersion!.BuildingPersistentLocalId.Should().Be(commonBuildingUnitWasAddedV2.BuildingPersistentLocalId);
                     buildingUnitVersion.Geometry.Should().BeEquivalentTo(
                         _wkbReader.Read(commonBuildingUnitWasAddedV2.ExtendedWkbGeometry.ToByteArray()));
-                    buildingUnitVersion.GeometryMethod.Should()
-                        .Be(BuildingUnitPositionGeometryMethod.Parse(commonBuildingUnitWasAddedV2.GeometryMethod).Map());
-                    buildingUnitVersion.Function.Should()
-                        .Be(BuildingUnitFunction.Common.Map());
-                    buildingUnitVersion.Status.Should().Be(
-                        BuildingUnitStatus.Parse(commonBuildingUnitWasAddedV2.BuildingUnitStatus).Map());
+                    buildingUnitVersion.GeometryMethod.Should().Be(BuildingUnitPositionGeometryMethod.Parse(commonBuildingUnitWasAddedV2.GeometryMethod).Map());
+                    buildingUnitVersion.Function.Should().Be(BuildingUnitFunction.Common.Map());
+                    buildingUnitVersion.Status.Should().Be(BuildingUnitStatus.Parse(commonBuildingUnitWasAddedV2.BuildingUnitStatus).Status);
+                    buildingUnitVersion.OsloStatus.Should().Be(BuildingUnitStatus.Parse(commonBuildingUnitWasAddedV2.BuildingUnitStatus).Map());
                     buildingUnitVersion.HasDeviation.Should().Be(commonBuildingUnitWasAddedV2.HasDeviation);
                     buildingUnitVersion.IsRemoved.Should().BeFalse();
                     buildingUnitVersion.VersionTimestamp.Should().Be(commonBuildingUnitWasAddedV2.Provenance.Timestamp);
@@ -1427,7 +1437,8 @@
                         await context.BuildingUnitVersions.FindAsync(position + 1, buildingUnitWasRetired.BuildingUnitPersistentLocalId);
                     buildingUnitVersion.Should().NotBeNull();
 
-                    buildingUnitVersion!.Status.Should().Be(BuildingUnitStatus.Retired.Map());
+                    buildingUnitVersion!.Status.Should().Be(BuildingUnitStatus.Retired.Status);
+                    buildingUnitVersion.OsloStatus.Should().Be(BuildingUnitStatus.Retired.Map());
                     buildingUnitVersion.VersionTimestamp.Should().Be(buildingUnitWasRetired.Provenance.Timestamp);
                 });
         }
@@ -1464,7 +1475,8 @@
                         await context.BuildingUnitVersions.FindAsync(position + 1, buildingUnitWasNotRealized.BuildingUnitPersistentLocalId);
                     buildingUnitVersion.Should().NotBeNull();
 
-                    buildingUnitVersion!.Status.Should().Be(BuildingUnitStatus.NotRealized.Map());
+                    buildingUnitVersion!.Status.Should().Be(BuildingUnitStatus.NotRealized.Status);
+                    buildingUnitVersion.OsloStatus.Should().Be(BuildingUnitStatus.NotRealized.Map());
                     buildingUnitVersion.VersionTimestamp.Should().Be(buildingUnitWasNotRealized.Provenance.Timestamp);
                 });
         }
@@ -1504,12 +1516,10 @@
                     buildingUnitVersion.Should().NotBeNull();
 
                     buildingUnitVersion!.BuildingPersistentLocalId.Should().Be(buildingUnitWasTransferred.BuildingPersistentLocalId);
-                    buildingUnitVersion.Status.Should().Be(
-                        BuildingUnitStatus.Parse(buildingUnitWasTransferred.Status).Map());
-                    buildingUnitVersion.Function.Should().Be(
-                        BuildingUnitFunction.Parse(buildingUnitWasTransferred.Function).Map());
-                    buildingUnitVersion.GeometryMethod.Should().Be(
-                        BuildingUnitPositionGeometryMethod.Parse(buildingUnitWasTransferred.GeometryMethod).Map());
+                    buildingUnitVersion.Status.Should().Be(BuildingUnitStatus.Parse(buildingUnitWasTransferred.Status).Status);
+                    buildingUnitVersion.OsloStatus.Should().Be(BuildingUnitStatus.Parse(buildingUnitWasTransferred.Status).Map());
+                    buildingUnitVersion.Function.Should().Be(BuildingUnitFunction.Parse(buildingUnitWasTransferred.Function).Map());
+                    buildingUnitVersion.GeometryMethod.Should().Be(BuildingUnitPositionGeometryMethod.Parse(buildingUnitWasTransferred.GeometryMethod).Map());
                     buildingUnitVersion.Geometry.Should().BeEquivalentTo(
                         _wkbReader.Read(buildingUnitWasTransferred.ExtendedWkbGeometry.ToByteArray()));
                     buildingUnitVersion.HasDeviation.Should().BeFalse();
