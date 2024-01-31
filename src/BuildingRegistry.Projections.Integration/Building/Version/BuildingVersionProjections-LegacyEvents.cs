@@ -260,7 +260,6 @@
                         building.Geometry = null;
                         building.GeometryMethod = null;
                         building.OsloGeometryMethod = null;
-                        building.OsloGeometryMethod = null;
                         building.NisCode = null;
                     },
                     ct);

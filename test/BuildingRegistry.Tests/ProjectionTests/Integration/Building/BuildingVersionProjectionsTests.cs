@@ -8,16 +8,16 @@
     using Be.Vlaanderen.Basisregisters.Utilities.HexByteConvertor;
     using BuildingRegistry.Building;
     using BuildingRegistry.Building.Events;
-    using BuildingRegistry.Projections.Integration;
-    using BuildingRegistry.Projections.Integration.Building.Version;
-    using BuildingRegistry.Projections.Integration.Converters;
-    using BuildingRegistry.Projections.Integration.Infrastructure;
-    using BuildingRegistry.Tests.Fixtures;
-    using BuildingRegistry.Tests.Legacy.Autofixture;
+    using Fixtures;
     using FluentAssertions;
     using Microsoft.Extensions.Options;
     using Moq;
     using NetTopologySuite.IO;
+    using Projections.Integration;
+    using Projections.Integration.Building.Version;
+    using Projections.Integration.Converters;
+    using Projections.Integration.Infrastructure;
+    using Tests.Legacy.Autofixture;
     using Xunit;
 
     public partial class BuildingVersionProjectionsTests : IntegrationProjectionTest<BuildingVersionProjections>
