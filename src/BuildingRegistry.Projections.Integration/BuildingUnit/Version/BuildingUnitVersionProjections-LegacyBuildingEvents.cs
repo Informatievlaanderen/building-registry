@@ -154,11 +154,11 @@
 
             When<Envelope<BuildingGeometryWasRemoved>>(async (context, message, ct) =>
             {
-                var buildingUnits = GetAllBuildingUnitsByBuildingId(context, message.Message.BuildingId);
-                foreach (var buildingUnit in buildingUnits)
+                var buildingUnitIds = GetAllBuildingUnitsByBuildingId(context, message.Message.BuildingId);
+                foreach (var buildingUnitId in buildingUnitIds)
                 {
                     await context.CreateNewBuildingUnitVersion(
-                        buildingUnit.BuildingUnitId!.Value,
+                        buildingUnitId,
                         message,
                         x =>
                         {
@@ -172,11 +172,11 @@
 
             When<Envelope<BuildingBecameComplete>>(async (context, message, ct) =>
             {
-                var buildingUnits = GetAllBuildingUnitsByBuildingId(context, message.Message.BuildingId);
-                foreach (var buildingUnit in buildingUnits)
+                var buildingUnitIds = GetAllBuildingUnitsByBuildingId(context, message.Message.BuildingId);
+                foreach (var buildingUnitId in buildingUnitIds)
                 {
                     await context.CreateNewBuildingUnitVersion(
-                        buildingUnit.BuildingUnitId!.Value,
+                        buildingUnitId,
                         message,
                         _ => { },
                         ct);
@@ -185,11 +185,11 @@
 
             When<Envelope<BuildingBecameIncomplete>>(async (context, message, ct) =>
             {
-                var buildingUnits = GetAllBuildingUnitsByBuildingId(context, message.Message.BuildingId);
-                foreach (var buildingUnit in buildingUnits)
+                var buildingUnitIds = GetAllBuildingUnitsByBuildingId(context, message.Message.BuildingId);
+                foreach (var buildingUnitId in buildingUnitIds)
                 {
                     await context.CreateNewBuildingUnitVersion(
-                        buildingUnit.BuildingUnitId!.Value,
+                        buildingUnitId,
                         message,
                         _ => { },
                         ct);
@@ -198,11 +198,11 @@
 
             When<Envelope<BuildingPersistentLocalIdWasAssigned>>(async (context, message, ct) =>
             {
-                var buildingUnits = GetAllBuildingUnitsByBuildingId(context, message.Message.BuildingId);
-                foreach (var buildingUnit in buildingUnits)
+                var buildingUnitIds = GetAllBuildingUnitsByBuildingId(context, message.Message.BuildingId);
+                foreach (var buildingUnitId in buildingUnitIds)
                 {
                     await context.CreateNewBuildingUnitVersion(
-                        buildingUnit.BuildingUnitId!.Value,
+                        buildingUnitId,
                         message,
                         x =>
                         {
@@ -213,20 +213,24 @@
             });
         }
 
-        private IEnumerable<BuildingUnitVersion> GetAllBuildingUnitsByBuildingId(
+        private IEnumerable<Guid> GetAllBuildingUnitsByBuildingId(
             IntegrationContext context,
             Guid buildingId)
         {
-            var buildingUnits =
+            var buildingUnitIds =
                 context.BuildingUnitVersions
                     .Where(x => x.BuildingId == buildingId)
+                    .Where(x => x.BuildingUnitId.HasValue)
+                    .Select(x => x.BuildingUnitId!.Value)
                     .ToList()
                     .Union(
                         context.BuildingUnitVersions.Local
                             .Where(x => x.BuildingId == buildingId)
+                            .Where(x => x.BuildingUnitId.HasValue)
+                            .Select(x => x.BuildingUnitId!.Value)
                             .ToList());
 
-            return buildingUnits;
+            return buildingUnitIds.Distinct();
         }
     }
 }

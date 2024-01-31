@@ -11,17 +11,17 @@
     using Be.Vlaanderen.Basisregisters.Utilities.HexByteConvertor;
     using BuildingRegistry.Building;
     using BuildingRegistry.Building.Events;
-    using BuildingRegistry.Projections.Integration;
-    using BuildingRegistry.Projections.Integration.BuildingUnit.Version;
-    using BuildingRegistry.Projections.Integration.Converters;
-    using BuildingRegistry.Projections.Integration.Infrastructure;
-    using BuildingRegistry.Tests.Extensions;
-    using BuildingRegistry.Tests.Fixtures;
-    using BuildingRegistry.Tests.Legacy.Autofixture;
+    using Extensions;
+    using Fixtures;
     using FluentAssertions;
     using Microsoft.Extensions.Options;
     using Moq;
     using NetTopologySuite.IO;
+    using Projections.Integration;
+    using Projections.Integration.BuildingUnit.Version;
+    using Projections.Integration.Converters;
+    using Projections.Integration.Infrastructure;
+    using Tests.Legacy.Autofixture;
     using Xunit;
     using IAddresses = Projections.Integration.IAddresses;
 
@@ -33,10 +33,12 @@
         private readonly Fixture _fixture;
         private readonly WKBReader _wkbReader = WKBReaderFactory.Create();
         private readonly Mock<IPersistentLocalIdFinder> _persistentLocalIdFinder;
+        private readonly FakeAddresses _fakeAddresses;
 
         public BuildingUnitVersionProjectionsTests()
         {
             _persistentLocalIdFinder = new Mock<IPersistentLocalIdFinder>();
+            _fakeAddresses = new FakeAddresses();
 
             _fixture = new Fixture();
             _fixture.Customizations.Add(new WithUniqueInteger());
@@ -1551,22 +1553,26 @@
                 });
         }
 
-        protected override BuildingUnitVersionProjections CreateProjection() =>
-            new BuildingUnitVersionProjections(
+        protected override BuildingUnitVersionProjections CreateProjection()
+        {
+            return new BuildingUnitVersionProjections(
                 new OptionsWrapper<IntegrationOptions>(new IntegrationOptions
                 {
                     BuildingNamespace = BuildingNamespace,
                     BuildingUnitNamespace = BuildingUnitNamespace,
                 }),
                 _persistentLocalIdFinder.Object,
-                new FakeAddresses());
+                _fakeAddresses);
+        }
     }
 
     public class FakeAddresses : IAddresses
     {
+        public const int AddressPersistentLocalId = 1;
+
         public Task<int?> GetAddressPersistentLocalId(Guid addressId)
         {
-            return Task.FromResult(1 as int?);
+            return Task.FromResult(AddressPersistentLocalId as int?);
         }
     }
 }

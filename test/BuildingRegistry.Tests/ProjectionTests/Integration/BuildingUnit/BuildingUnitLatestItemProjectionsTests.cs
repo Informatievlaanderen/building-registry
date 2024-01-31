@@ -10,15 +10,15 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.BuildingUnit
     using Be.Vlaanderen.Basisregisters.Utilities.HexByteConvertor;
     using BuildingRegistry.Building;
     using BuildingRegistry.Building.Events;
-    using BuildingRegistry.Projections.Integration.BuildingUnit.LatestItem;
-    using BuildingRegistry.Projections.Integration.Converters;
-    using BuildingRegistry.Projections.Integration.Infrastructure;
-    using BuildingRegistry.Tests.Extensions;
-    using BuildingRegistry.Tests.Fixtures;
-    using BuildingRegistry.Tests.Legacy.Autofixture;
+    using Extensions;
+    using Fixtures;
     using FluentAssertions;
     using Microsoft.Extensions.Options;
     using NetTopologySuite.IO;
+    using Projections.Integration.BuildingUnit.LatestItem;
+    using Projections.Integration.Converters;
+    using Projections.Integration.Infrastructure;
+    using Tests.Legacy.Autofixture;
     using Xunit;
 
     public class BuildingUnitLatestItemProjectionsTests : IntegrationProjectionTest<BuildingUnitLatestItemProjections>
