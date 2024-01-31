@@ -1,6 +1,5 @@
-﻿namespace BuildingRegistry.Tests.ProjectionTests.Integration
+namespace BuildingRegistry.Tests.ProjectionTests.Integration.BuildingUnit
 {
-    using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
@@ -9,35 +8,29 @@
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore;
     using Be.Vlaanderen.Basisregisters.Utilities.HexByteConvertor;
-    using Building;
-    using Building.Events;
-    using Extensions;
-    using Fixtures;
+    using BuildingRegistry.Building;
+    using BuildingRegistry.Building.Events;
+    using BuildingRegistry.Projections.Integration.BuildingUnit.LatestItem;
+    using BuildingRegistry.Projections.Integration.Converters;
+    using BuildingRegistry.Projections.Integration.Infrastructure;
+    using BuildingRegistry.Tests.Extensions;
+    using BuildingRegistry.Tests.Fixtures;
+    using BuildingRegistry.Tests.Legacy.Autofixture;
     using FluentAssertions;
     using Microsoft.Extensions.Options;
-    using Moq;
     using NetTopologySuite.IO;
-    using Projections.Integration;
-    using Projections.Integration.BuildingUnit.Version;
-    using Projections.Integration.Converters;
-    using Projections.Integration.Infrastructure;
-    using Tests.Legacy.Autofixture;
     using Xunit;
-    using IAddresses = Projections.Integration.IAddresses;
 
-    public class BuildingUnitVersionProjectionsTests : IntegrationProjectionTest<BuildingUnitVersionProjections>
+    public class BuildingUnitLatestItemProjectionsTests : IntegrationProjectionTest<BuildingUnitLatestItemProjections>
     {
         private const string BuildingNamespace = "https://data.vlaanderen.be/id/gebouw";
         private const string BuildingUnitNamespace = "https://data.vlaanderen.be/id/gebouweenheid";
 
         private readonly Fixture _fixture;
         private readonly WKBReader _wkbReader = WKBReaderFactory.Create();
-        private readonly Mock<IPersistentLocalIdFinder> _persistentLocalIdFinder;
 
-        public BuildingUnitVersionProjectionsTests()
+        public BuildingUnitLatestItemProjectionsTests()
         {
-            _persistentLocalIdFinder = new Mock<IPersistentLocalIdFinder>();
-
             _fixture = new Fixture();
             _fixture.Customizations.Add(new WithUniqueInteger());
             _fixture.Customize(new InfrastructureCustomization());
@@ -72,34 +65,37 @@
                 .Given(new Envelope<BuildingWasMigrated>(new Envelope(buildingWasMigrated, metadata)))
                 .Then(context =>
                 {
-                    var buildingUnits = context.BuildingUnitVersions
+                    var buildingUnits = context.BuildingUnitLatestItems
                         .Where(x => x.BuildingPersistentLocalId == buildingWasMigrated.BuildingPersistentLocalId)
                         .ToList();
 
                     foreach (var buildingUnit in buildingWasMigrated.BuildingUnits)
                     {
-                        var buildingUnitVersion = buildingUnits
+                        var buildingUnitLatestItem = buildingUnits
                             .Single(x => x.BuildingUnitPersistentLocalId == buildingUnit.BuildingUnitPersistentLocalId);
 
-                        buildingUnitVersion.BuildingPersistentLocalId.Should().Be(buildingWasMigrated.BuildingPersistentLocalId);
-                        buildingUnitVersion.Status.Should().Be(BuildingUnitStatus.Parse(buildingUnit.Status).Status);
-                        buildingUnitVersion.OsloStatus.Should().Be(BuildingUnitStatus.Parse(buildingUnit.Status).Map());
-                        buildingUnitVersion.Function.Should().Be(BuildingUnitFunction.Parse(buildingUnit.Function).Function);
-                        buildingUnitVersion.OsloFunction.Should().Be(BuildingUnitFunction.Parse(buildingUnit.Function).Map());
-                        buildingUnitVersion.GeometryMethod.Should().Be(BuildingUnitPositionGeometryMethod.Parse(buildingUnit.GeometryMethod).GeometryMethod);
-                        buildingUnitVersion.OsloGeometryMethod.Should().Be(BuildingUnitPositionGeometryMethod.Parse(buildingUnit.GeometryMethod).Map());
-                        buildingUnitVersion.Geometry.Should().BeEquivalentTo(_wkbReader.Read(buildingUnit.ExtendedWkbGeometry.ToByteArray()));
-                        buildingUnitVersion.HasDeviation.Should().BeFalse();
-                        buildingUnitVersion.IsRemoved.Should().Be(buildingUnit.IsRemoved);
-                        buildingUnitVersion.Namespace.Should().Be(BuildingUnitNamespace);
-                        buildingUnitVersion.PuriId.Should().Be($"{BuildingUnitNamespace}/{buildingUnitVersion.BuildingUnitPersistentLocalId}");
-                        buildingUnitVersion.VersionTimestamp.Should().Be(buildingWasMigrated.Provenance.Timestamp);
-                        buildingUnitVersion.CreatedOnTimestamp.Should().Be(buildingWasMigrated.Provenance.Timestamp);
+                        buildingUnitLatestItem.BuildingPersistentLocalId.Should().Be(buildingWasMigrated.BuildingPersistentLocalId);
+                        buildingUnitLatestItem.OsloStatus.Should().Be(BuildingUnitStatus.Parse(buildingUnit.Status).Map());
+                        buildingUnitLatestItem.Status.Should().Be(buildingUnit.Status);
+                        buildingUnitLatestItem.OsloFunction.Should().Be(BuildingUnitFunction.Parse(buildingUnit.Function).Map());
+                        buildingUnitLatestItem.Function.Should().Be(buildingUnit.Function);
+                        buildingUnitLatestItem.OsloGeometryMethod.Should().Be(BuildingUnitPositionGeometryMethod.Parse(buildingUnit.GeometryMethod).Map());
+                        buildingUnitLatestItem.GeometryMethod.Should().Be(buildingUnit.GeometryMethod);
+                        buildingUnitLatestItem.Geometry.Should().BeEquivalentTo(_wkbReader.Read(buildingUnit.ExtendedWkbGeometry.ToByteArray()));
+                        buildingUnitLatestItem.HasDeviation.Should().BeFalse();
+                        buildingUnitLatestItem.IsRemoved.Should().Be(buildingUnit.IsRemoved);
+                        buildingUnitLatestItem.Namespace.Should().Be(BuildingUnitNamespace);
+                        buildingUnitLatestItem.Puri.Should().Be($"{BuildingUnitNamespace}/{buildingUnitLatestItem.BuildingUnitPersistentLocalId}");
+                        buildingUnitLatestItem.VersionTimestamp.Should().Be(buildingWasMigrated.Provenance.Timestamp);
 
-                        buildingUnitVersion.Addresses.Should().HaveCount(3);
+                        var buildingUnitAddresses = context.BuildingUnitAddresses
+                            .Where(x => x.BuildingUnitPersistentLocalId == buildingUnitLatestItem.BuildingUnitPersistentLocalId)
+                            .ToList();
+
+                        buildingUnitAddresses.Should().HaveCount(buildingUnit.AddressPersistentLocalIds.Count);
                         foreach (var addressPersistentLocalId in buildingUnit.AddressPersistentLocalIds)
                         {
-                            buildingUnitVersion.Addresses.SingleOrDefault(x => x.AddressPersistentLocalId == addressPersistentLocalId)
+                            buildingUnitAddresses.SingleOrDefault(x => x.AddressPersistentLocalId == addressPersistentLocalId)
                                 .Should().NotBeNull();
                         }
                     }
@@ -115,12 +111,7 @@
             _fixture.Customize(new WithFixedBuildingUnitPersistentLocalId());
 
             var buildingUnitWasPlannedV2 = _fixture.Create<BuildingUnitWasPlannedV2>();
-            var buildingOutlineWasChanged = new BuildingOutlineWasChanged(
-                _fixture.Create<BuildingPersistentLocalId>(),
-                new []{ _fixture.Create<BuildingUnitPersistentLocalId>() },
-                _fixture.Create<ExtendedWkbGeometry>(),
-                _fixture.Create<ExtendedWkbGeometry>());
-            ((ISetProvenance)buildingOutlineWasChanged).SetProvenance(_fixture.Create<Provenance>());
+            var buildingOutlineWasChanged = _fixture.Create<BuildingOutlineWasChanged>();
 
             var position = _fixture.Create<long>();
 
@@ -141,15 +132,15 @@
                     new Envelope<BuildingOutlineWasChanged>(new Envelope(buildingOutlineWasChanged, buildingOutLineWasChangedMetadata)))
                 .Then(async context =>
                 {
-                    var buildingUnitVersion =
-                        await context.BuildingUnitVersions.FindAsync(position + 1, buildingUnitWasPlannedV2.BuildingUnitPersistentLocalId);
-                    buildingUnitVersion.Should().NotBeNull();
+                    var buildingUnitLatestItem =
+                        await context.BuildingUnitLatestItems.FindAsync(buildingUnitWasPlannedV2.BuildingUnitPersistentLocalId);
+                    buildingUnitLatestItem.Should().NotBeNull();
 
-                    buildingUnitVersion!.GeometryMethod.Should().Be(BuildingUnitPositionGeometryMethod.DerivedFromObject.GeometryMethod);
-                    buildingUnitVersion.OsloGeometryMethod.Should().Be(BuildingUnitPositionGeometryMethod.DerivedFromObject.Map());
-                    buildingUnitVersion.Geometry.Should().BeEquivalentTo(
+                    buildingUnitLatestItem!.OsloGeometryMethod.Should().Be(BuildingUnitPositionGeometryMethod.DerivedFromObject.Map());
+                    buildingUnitLatestItem.GeometryMethod.Should().Be("DerivedFromObject");
+                    buildingUnitLatestItem.Geometry.Should().BeEquivalentTo(
                         _wkbReader.Read(buildingOutlineWasChanged.ExtendedWkbGeometryBuildingUnits!.ToByteArray()));
-                    buildingUnitVersion.VersionTimestamp.Should().Be(buildingOutlineWasChanged.Provenance.Timestamp);
+                    buildingUnitLatestItem.VersionTimestamp.Should().Be(buildingOutlineWasChanged.Provenance.Timestamp);
                 });
         }
 
@@ -157,61 +148,38 @@
         public async Task WhenBuildingWasMeasured()
         {
             _fixture.Customize(new WithFixedBuildingPersistentLocalId());
+            _fixture.Customize(new WithFixedBuildingUnitPersistentLocalId());
 
-            var firstBuildingUnitWasPlannedV2 = _fixture.Create<BuildingUnitWasPlannedV2>();
-            var secondBuildingUnitWasPlannedV2 = _fixture.Create<BuildingUnitWasPlannedV2>();
-            var buildingWasMeasured = new BuildingWasMeasured(
-                _fixture.Create<BuildingPersistentLocalId>(),
-                new []{ new BuildingUnitPersistentLocalId(firstBuildingUnitWasPlannedV2.BuildingUnitPersistentLocalId) },
-                new []{ new BuildingUnitPersistentLocalId(secondBuildingUnitWasPlannedV2.BuildingUnitPersistentLocalId) },
-                _fixture.Create<ExtendedWkbGeometry>(),
-                _fixture.Create<ExtendedWkbGeometry>());
-            ((ISetProvenance)buildingWasMeasured).SetProvenance(_fixture.Create<Provenance>());
+            var buildingUnitWasPlannedV2 = _fixture.Create<BuildingUnitWasPlannedV2>();
+            var buildingWasMeasured = _fixture.Create<BuildingWasMeasured>();
 
             var position = _fixture.Create<long>();
 
-            var firstBuildingUnitWasPlannedMetadata = new Dictionary<string, object>
+            var buildingUnitWasPlannedMetadata = new Dictionary<string, object>
             {
-                { AddEventHashPipe.HashMetadataKey, firstBuildingUnitWasPlannedV2.GetHash() },
+                { AddEventHashPipe.HashMetadataKey, buildingUnitWasPlannedV2.GetHash() },
                 { Envelope.PositionMetadataKey, position }
-            };
-            var secondBuildingUnitWasPlannedMetadata = new Dictionary<string, object>
-            {
-                { AddEventHashPipe.HashMetadataKey, firstBuildingUnitWasPlannedV2.GetHash() },
-                { Envelope.PositionMetadataKey, position + 1 }
             };
             var buildingWasMeasuredMetadata = new Dictionary<string, object>
             {
                 { AddEventHashPipe.HashMetadataKey, buildingWasMeasured.GetHash() },
-                { Envelope.PositionMetadataKey, position + 2 }
+                { Envelope.PositionMetadataKey, position + 1 }
             };
-
             await Sut
                 .Given(
-                    new Envelope<BuildingUnitWasPlannedV2>(new Envelope(firstBuildingUnitWasPlannedV2, firstBuildingUnitWasPlannedMetadata)),
-                    new Envelope<BuildingUnitWasPlannedV2>(new Envelope(secondBuildingUnitWasPlannedV2, secondBuildingUnitWasPlannedMetadata)),
+                    new Envelope<BuildingUnitWasPlannedV2>(new Envelope(buildingUnitWasPlannedV2, buildingUnitWasPlannedMetadata)),
                     new Envelope<BuildingWasMeasured>(new Envelope(buildingWasMeasured, buildingWasMeasuredMetadata)))
                 .Then(async context =>
                 {
-                    var firstBuildingUnitVersion =
-                        await context.BuildingUnitVersions.FindAsync(position + 2, firstBuildingUnitWasPlannedV2.BuildingUnitPersistentLocalId);
-                    firstBuildingUnitVersion.Should().NotBeNull();
+                    var buildingUnitLatestItem =
+                        await context.BuildingUnitLatestItems.FindAsync(buildingUnitWasPlannedV2.BuildingUnitPersistentLocalId);
+                    buildingUnitLatestItem.Should().NotBeNull();
 
-                    firstBuildingUnitVersion!.GeometryMethod.Should().Be(BuildingUnitPositionGeometryMethod.DerivedFromObject.GeometryMethod);
-                    firstBuildingUnitVersion.OsloGeometryMethod.Should().Be(BuildingUnitPositionGeometryMethod.DerivedFromObject.Map());
-                    firstBuildingUnitVersion.Geometry.Should().BeEquivalentTo(
+                    buildingUnitLatestItem!.OsloGeometryMethod.Should().Be(BuildingUnitPositionGeometryMethod.DerivedFromObject.Map());
+                    buildingUnitLatestItem.GeometryMethod.Should().Be("DerivedFromObject");
+                    buildingUnitLatestItem.Geometry.Should().BeEquivalentTo(
                         _wkbReader.Read(buildingWasMeasured.ExtendedWkbGeometryBuildingUnits!.ToByteArray()));
-                    firstBuildingUnitVersion.VersionTimestamp.Should().Be(buildingWasMeasured.Provenance.Timestamp);
-
-                    var secondBuildingUnitVersion =
-                        await context.BuildingUnitVersions.FindAsync(position + 2, secondBuildingUnitWasPlannedV2.BuildingUnitPersistentLocalId);
-                    secondBuildingUnitVersion.Should().NotBeNull();
-
-                    secondBuildingUnitVersion!.GeometryMethod.Should().Be(BuildingUnitPositionGeometryMethod.DerivedFromObject.GeometryMethod);
-                    secondBuildingUnitVersion.OsloGeometryMethod.Should().Be(BuildingUnitPositionGeometryMethod.DerivedFromObject.Map());
-                    secondBuildingUnitVersion.Geometry.Should().BeEquivalentTo(
-                        _wkbReader.Read(buildingWasMeasured.ExtendedWkbGeometryBuildingUnits!.ToByteArray()));
-                    secondBuildingUnitVersion.VersionTimestamp.Should().Be(buildingWasMeasured.Provenance.Timestamp);
+                    buildingUnitLatestItem.VersionTimestamp.Should().Be(buildingWasMeasured.Provenance.Timestamp);
                 });
         }
 
@@ -219,61 +187,39 @@
         public async Task WhenBuildingMeasurementWasCorrected()
         {
             _fixture.Customize(new WithFixedBuildingPersistentLocalId());
+            _fixture.Customize(new WithFixedBuildingUnitPersistentLocalId());
 
-            var firstBuildingUnitWasPlannedV2 = _fixture.Create<BuildingUnitWasPlannedV2>();
-            var secondBuildingUnitWasPlannedV2 = _fixture.Create<BuildingUnitWasPlannedV2>();
-            var buildingMeasurementWasCorrected = new BuildingMeasurementWasCorrected(
-                _fixture.Create<BuildingPersistentLocalId>(),
-                new []{ new BuildingUnitPersistentLocalId(firstBuildingUnitWasPlannedV2.BuildingUnitPersistentLocalId) },
-                new []{ new BuildingUnitPersistentLocalId(secondBuildingUnitWasPlannedV2.BuildingUnitPersistentLocalId) },
-                _fixture.Create<ExtendedWkbGeometry>(),
-                _fixture.Create<ExtendedWkbGeometry>());
-            ((ISetProvenance)buildingMeasurementWasCorrected).SetProvenance(_fixture.Create<Provenance>());
+            var buildingUnitWasPlannedV2 = _fixture.Create<BuildingUnitWasPlannedV2>();
+            var buildingMeasurementWasCorrected = _fixture.Create<BuildingMeasurementWasCorrected>();
 
             var position = _fixture.Create<long>();
 
-            var firstBuildingUnitWasPlannedMetadata = new Dictionary<string, object>
+            var buildingUnitWasPlannedMetadata = new Dictionary<string, object>
             {
-                { AddEventHashPipe.HashMetadataKey, firstBuildingUnitWasPlannedV2.GetHash() },
+                { AddEventHashPipe.HashMetadataKey, buildingUnitWasPlannedV2.GetHash() },
                 { Envelope.PositionMetadataKey, position }
-            };
-            var secondBuildingUnitWasPlannedMetadata = new Dictionary<string, object>
-            {
-                { AddEventHashPipe.HashMetadataKey, firstBuildingUnitWasPlannedV2.GetHash() },
-                { Envelope.PositionMetadataKey, position + 1 }
             };
             var buildingMeasurementWasCorrectedMetadata = new Dictionary<string, object>
             {
                 { AddEventHashPipe.HashMetadataKey, buildingMeasurementWasCorrected.GetHash() },
-                { Envelope.PositionMetadataKey, position + 2 }
+                { Envelope.PositionMetadataKey, position + 1 }
             };
 
             await Sut
                 .Given(
-                    new Envelope<BuildingUnitWasPlannedV2>(new Envelope(firstBuildingUnitWasPlannedV2, firstBuildingUnitWasPlannedMetadata)),
-                    new Envelope<BuildingUnitWasPlannedV2>(new Envelope(secondBuildingUnitWasPlannedV2, secondBuildingUnitWasPlannedMetadata)),
+                    new Envelope<BuildingUnitWasPlannedV2>(new Envelope(buildingUnitWasPlannedV2, buildingUnitWasPlannedMetadata)),
                     new Envelope<BuildingMeasurementWasCorrected>(new Envelope(buildingMeasurementWasCorrected, buildingMeasurementWasCorrectedMetadata)))
                 .Then(async context =>
                 {
-                    var firstBuildingUnitVersion =
-                        await context.BuildingUnitVersions.FindAsync(position + 2, firstBuildingUnitWasPlannedV2.BuildingUnitPersistentLocalId);
-                    firstBuildingUnitVersion.Should().NotBeNull();
+                    var buildingUnitLatestItem =
+                        await context.BuildingUnitLatestItems.FindAsync(buildingUnitWasPlannedV2.BuildingUnitPersistentLocalId);
+                    buildingUnitLatestItem.Should().NotBeNull();
 
-                    firstBuildingUnitVersion!.GeometryMethod.Should().Be(BuildingUnitPositionGeometryMethod.DerivedFromObject.GeometryMethod);
-                    firstBuildingUnitVersion.OsloGeometryMethod.Should().Be(BuildingUnitPositionGeometryMethod.DerivedFromObject.Map());
-                    firstBuildingUnitVersion.Geometry.Should().BeEquivalentTo(
-                        _wkbReader.Read(buildingMeasurementWasCorrected.ExtendedWkbGeometryBuildingUnits!.ToByteArray()));
-                    firstBuildingUnitVersion.VersionTimestamp.Should().Be(buildingMeasurementWasCorrected.Provenance.Timestamp);
-
-                    var secondBuildingUnitVersion =
-                        await context.BuildingUnitVersions.FindAsync(position + 2, secondBuildingUnitWasPlannedV2.BuildingUnitPersistentLocalId);
-                    secondBuildingUnitVersion.Should().NotBeNull();
-
-                    secondBuildingUnitVersion!.GeometryMethod.Should().Be(BuildingUnitPositionGeometryMethod.DerivedFromObject.GeometryMethod);
-                    secondBuildingUnitVersion.OsloGeometryMethod.Should().Be(BuildingUnitPositionGeometryMethod.DerivedFromObject.Map());
-                    secondBuildingUnitVersion.Geometry.Should().BeEquivalentTo(
-                        _wkbReader.Read(buildingMeasurementWasCorrected.ExtendedWkbGeometryBuildingUnits!.ToByteArray()));
-                    secondBuildingUnitVersion.VersionTimestamp.Should().Be(buildingMeasurementWasCorrected.Provenance.Timestamp);
+                    buildingUnitLatestItem!.OsloGeometryMethod.Should().Be(BuildingUnitPositionGeometryMethod.DerivedFromObject.Map());
+                    buildingUnitLatestItem.GeometryMethod.Should().Be("DerivedFromObject");
+                    buildingUnitLatestItem.Geometry.Should()
+                        .BeEquivalentTo(_wkbReader.Read(buildingMeasurementWasCorrected.ExtendedWkbGeometryBuildingUnits!.ToByteArray()));
+                    buildingUnitLatestItem.VersionTimestamp.Should().Be(buildingMeasurementWasCorrected.Provenance.Timestamp);
                 });
         }
 
@@ -281,61 +227,39 @@
         public async Task WhenBuildingMeasurementWasChanged()
         {
             _fixture.Customize(new WithFixedBuildingPersistentLocalId());
+            _fixture.Customize(new WithFixedBuildingUnitPersistentLocalId());
 
-            var firstBuildingUnitWasPlannedV2 = _fixture.Create<BuildingUnitWasPlannedV2>();
-            var secondBuildingUnitWasPlannedV2 = _fixture.Create<BuildingUnitWasPlannedV2>();
-            var buildingMeasurementWasChanged = new BuildingMeasurementWasChanged(
-                _fixture.Create<BuildingPersistentLocalId>(),
-                new []{ new BuildingUnitPersistentLocalId(firstBuildingUnitWasPlannedV2.BuildingUnitPersistentLocalId) },
-                new []{ new BuildingUnitPersistentLocalId(secondBuildingUnitWasPlannedV2.BuildingUnitPersistentLocalId) },
-                _fixture.Create<ExtendedWkbGeometry>(),
-                _fixture.Create<ExtendedWkbGeometry>());
-            ((ISetProvenance)buildingMeasurementWasChanged).SetProvenance(_fixture.Create<Provenance>());
+            var buildingUnitWasPlannedV2 = _fixture.Create<BuildingUnitWasPlannedV2>();
+            var buildingMeasurementWasChanged = _fixture.Create<BuildingMeasurementWasChanged>();
 
             var position = _fixture.Create<long>();
 
-            var firstBuildingUnitWasPlannedMetadata = new Dictionary<string, object>
+            var buildingUnitWasPlannedMetadata = new Dictionary<string, object>
             {
-                { AddEventHashPipe.HashMetadataKey, firstBuildingUnitWasPlannedV2.GetHash() },
+                { AddEventHashPipe.HashMetadataKey, buildingUnitWasPlannedV2.GetHash() },
                 { Envelope.PositionMetadataKey, position }
-            };
-            var secondBuildingUnitWasPlannedMetadata = new Dictionary<string, object>
-            {
-                { AddEventHashPipe.HashMetadataKey, firstBuildingUnitWasPlannedV2.GetHash() },
-                { Envelope.PositionMetadataKey, position + 1 }
             };
             var buildingMeasurementWasChangedMetadata = new Dictionary<string, object>
             {
                 { AddEventHashPipe.HashMetadataKey, buildingMeasurementWasChanged.GetHash() },
-                { Envelope.PositionMetadataKey, position + 2 }
+                { Envelope.PositionMetadataKey, position + 1 }
             };
 
             await Sut
                 .Given(
-                    new Envelope<BuildingUnitWasPlannedV2>(new Envelope(firstBuildingUnitWasPlannedV2, firstBuildingUnitWasPlannedMetadata)),
-                    new Envelope<BuildingUnitWasPlannedV2>(new Envelope(secondBuildingUnitWasPlannedV2, secondBuildingUnitWasPlannedMetadata)),
+                    new Envelope<BuildingUnitWasPlannedV2>(new Envelope(buildingUnitWasPlannedV2, buildingUnitWasPlannedMetadata)),
                     new Envelope<BuildingMeasurementWasChanged>(new Envelope(buildingMeasurementWasChanged, buildingMeasurementWasChangedMetadata)))
                 .Then(async context =>
                 {
-                    var firstBuildingUnitVersion =
-                        await context.BuildingUnitVersions.FindAsync(position + 2, firstBuildingUnitWasPlannedV2.BuildingUnitPersistentLocalId);
-                    firstBuildingUnitVersion.Should().NotBeNull();
+                    var buildingUnitLatestItem = await context.BuildingUnitLatestItems.FindAsync(buildingUnitWasPlannedV2
+                        .BuildingUnitPersistentLocalId);
+                    buildingUnitLatestItem.Should().NotBeNull();
 
-                    firstBuildingUnitVersion!.GeometryMethod.Should().Be(BuildingUnitPositionGeometryMethod.DerivedFromObject.GeometryMethod);
-                    firstBuildingUnitVersion.OsloGeometryMethod.Should().Be(BuildingUnitPositionGeometryMethod.DerivedFromObject.Map());
-                    firstBuildingUnitVersion.Geometry.Should().BeEquivalentTo(
+                    buildingUnitLatestItem!.OsloGeometryMethod.Should().Be(BuildingUnitPositionGeometryMethod.DerivedFromObject.Map());
+                    buildingUnitLatestItem.GeometryMethod.Should().Be("DerivedFromObject");
+                    buildingUnitLatestItem.Geometry.Should().BeEquivalentTo(
                         _wkbReader.Read(buildingMeasurementWasChanged.ExtendedWkbGeometryBuildingUnits!.ToByteArray()));
-                    firstBuildingUnitVersion.VersionTimestamp.Should().Be(buildingMeasurementWasChanged.Provenance.Timestamp);
-
-                    var secondBuildingUnitVersion =
-                        await context.BuildingUnitVersions.FindAsync(position + 2, secondBuildingUnitWasPlannedV2.BuildingUnitPersistentLocalId);
-                    secondBuildingUnitVersion.Should().NotBeNull();
-
-                    secondBuildingUnitVersion!.GeometryMethod.Should().Be(BuildingUnitPositionGeometryMethod.DerivedFromObject.GeometryMethod);
-                    secondBuildingUnitVersion.OsloGeometryMethod.Should().Be(BuildingUnitPositionGeometryMethod.DerivedFromObject.Map());
-                    secondBuildingUnitVersion.Geometry.Should().BeEquivalentTo(
-                        _wkbReader.Read(buildingMeasurementWasChanged.ExtendedWkbGeometryBuildingUnits!.ToByteArray()));
-                    secondBuildingUnitVersion.VersionTimestamp.Should().Be(buildingMeasurementWasChanged.Provenance.Timestamp);
+                    buildingUnitLatestItem.VersionTimestamp.Should().Be(buildingMeasurementWasChanged.Provenance.Timestamp);
                 });
         }
 
@@ -358,23 +282,21 @@
                 .Given(new Envelope<BuildingUnitWasPlannedV2>(new Envelope(buildingUnitWasPlannedV2, metadata)))
                 .Then(async context =>
                 {
-                    var buildingUnitVersion = await context.BuildingUnitVersions.FindAsync(position, buildingUnitWasPlannedV2.BuildingUnitPersistentLocalId);
-                    buildingUnitVersion.Should().NotBeNull();
+                    var buildingUnitLatestItem = await context.BuildingUnitLatestItems.FindAsync(buildingUnitWasPlannedV2.BuildingUnitPersistentLocalId);
+                    buildingUnitLatestItem.Should().NotBeNull();
 
-                    buildingUnitVersion!.BuildingPersistentLocalId.Should().Be(buildingUnitWasPlannedV2.BuildingPersistentLocalId);
-                    buildingUnitVersion.Geometry.Should().BeEquivalentTo(_wkbReader.Read(buildingUnitWasPlannedV2.ExtendedWkbGeometry.ToByteArray()));
-                    buildingUnitVersion.GeometryMethod.Should().Be(BuildingUnitPositionGeometryMethod.Parse(buildingUnitWasPlannedV2.GeometryMethod).GeometryMethod);
-                    buildingUnitVersion.OsloGeometryMethod.Should().Be(BuildingUnitPositionGeometryMethod.Parse(buildingUnitWasPlannedV2.GeometryMethod).Map());
-                    buildingUnitVersion.Function.Should().Be(BuildingUnitFunction.Parse(buildingUnitWasPlannedV2.Function).Function);
-                    buildingUnitVersion.OsloFunction.Should().Be(BuildingUnitFunction.Parse(buildingUnitWasPlannedV2.Function).Map());
-                    buildingUnitVersion.Status.Should().Be(BuildingUnitStatus.Planned.Status);
-                    buildingUnitVersion.OsloStatus.Should().Be(BuildingUnitStatus.Planned.Map());
-                    buildingUnitVersion.HasDeviation.Should().Be(buildingUnitWasPlannedV2.HasDeviation);
-                    buildingUnitVersion.IsRemoved.Should().BeFalse();
-                    buildingUnitVersion.VersionTimestamp.Should().Be(buildingUnitWasPlannedV2.Provenance.Timestamp);
-                    buildingUnitVersion.CreatedOnTimestamp.Should().Be(buildingUnitWasPlannedV2.Provenance.Timestamp);
-                    buildingUnitVersion.Namespace.Should().Be(BuildingUnitNamespace);
-                    buildingUnitVersion.PuriId.Should().Be($"{BuildingUnitNamespace}/{buildingUnitWasPlannedV2.BuildingUnitPersistentLocalId}");
+                    buildingUnitLatestItem!.BuildingPersistentLocalId.Should().Be(buildingUnitWasPlannedV2.BuildingPersistentLocalId);
+                    buildingUnitLatestItem.Geometry.Should().BeEquivalentTo(
+                        _wkbReader.Read(buildingUnitWasPlannedV2.ExtendedWkbGeometry.ToByteArray()));
+                    buildingUnitLatestItem.OsloGeometryMethod.Should().Be(BuildingUnitPositionGeometryMethod.Parse(buildingUnitWasPlannedV2.GeometryMethod).Map());
+                    buildingUnitLatestItem.GeometryMethod.Should().Be(buildingUnitWasPlannedV2.GeometryMethod);
+                    buildingUnitLatestItem.OsloFunction.Should().Be(BuildingUnitFunction.Parse(buildingUnitWasPlannedV2.Function).Map());
+                    buildingUnitLatestItem.Function.Should().Be(buildingUnitWasPlannedV2.Function);
+                    buildingUnitLatestItem.OsloStatus.Should().Be(BuildingUnitStatus.Planned.Map());
+                    buildingUnitLatestItem.Status.Should().Be("Planned");
+                    buildingUnitLatestItem.HasDeviation.Should().Be(buildingUnitWasPlannedV2.HasDeviation);
+                    buildingUnitLatestItem.IsRemoved.Should().BeFalse();
+                    buildingUnitLatestItem.VersionTimestamp.Should().Be(buildingUnitWasPlannedV2.Provenance.Timestamp);
                 });
         }
 
@@ -406,13 +328,13 @@
                     new Envelope<BuildingUnitWasRealizedV2>(new Envelope(buildingUnitWasRealizedV2, buildingUnitWasRealizedMetadata)))
                 .Then(async context =>
                 {
-                    var buildingUnitVersion =
-                        await context.BuildingUnitVersions.FindAsync(position + 1, buildingUnitWasRealizedV2.BuildingUnitPersistentLocalId);
-                    buildingUnitVersion.Should().NotBeNull();
+                    var buildingUnitLatestItem =
+                        await context.BuildingUnitLatestItems.FindAsync(buildingUnitWasRealizedV2.BuildingUnitPersistentLocalId);
+                    buildingUnitLatestItem.Should().NotBeNull();
 
-                    buildingUnitVersion!.Status.Should().Be(BuildingUnitStatus.Realized.Status);
-                    buildingUnitVersion.OsloStatus.Should().Be(BuildingUnitStatus.Realized.Map());
-                    buildingUnitVersion.VersionTimestamp.Should().Be(buildingUnitWasRealizedV2.Provenance.Timestamp);
+                    buildingUnitLatestItem!.OsloStatus.Should().Be(BuildingUnitStatus.Realized.Map());
+                    buildingUnitLatestItem.Status.Should().Be("Realized");
+                    buildingUnitLatestItem.VersionTimestamp.Should().Be(buildingUnitWasRealizedV2.Provenance.Timestamp);
                 });
         }
 
@@ -444,13 +366,13 @@
                     new Envelope<BuildingUnitWasRealizedBecauseBuildingWasRealized>(new Envelope(buildingUnitWasRealized, buildingUnitWasRealizedMetadata)))
                 .Then(async context =>
                 {
-                    var buildingUnitVersion =
-                        await context.BuildingUnitVersions.FindAsync(position + 1, buildingUnitWasRealized.BuildingUnitPersistentLocalId);
-                    buildingUnitVersion.Should().NotBeNull();
+                    var buildingUnitLatestItem =
+                        await context.BuildingUnitLatestItems.FindAsync(buildingUnitWasRealized.BuildingUnitPersistentLocalId);
+                    buildingUnitLatestItem.Should().NotBeNull();
 
-                    buildingUnitVersion!.Status.Should().Be(BuildingUnitStatus.Realized.Status);
-                    buildingUnitVersion.OsloStatus.Should().Be(BuildingUnitStatus.Realized.Map());
-                    buildingUnitVersion.VersionTimestamp.Should().Be(buildingUnitWasRealized.Provenance.Timestamp);
+                    buildingUnitLatestItem!.OsloStatus.Should().Be(BuildingUnitStatus.Realized.Map());
+                    buildingUnitLatestItem.Status.Should().Be("Realized");
+                    buildingUnitLatestItem.VersionTimestamp.Should().Be(buildingUnitWasRealized.Provenance.Timestamp);
                 });
         }
 
@@ -490,13 +412,13 @@
                         new Envelope(buildingUnitWasCorrectedFromRealizedToPlanned, buildingUnitWasCorrectedToPlannedMetadata)))
                 .Then(async context =>
                 {
-                    var buildingUnitVersion =
-                        await context.BuildingUnitVersions.FindAsync(position + 2, buildingUnitWasCorrectedFromRealizedToPlanned.BuildingUnitPersistentLocalId);
-                    buildingUnitVersion.Should().NotBeNull();
+                    var buildingUnitLatestItem =
+                        await context.BuildingUnitLatestItems.FindAsync(buildingUnitWasCorrectedFromRealizedToPlanned.BuildingUnitPersistentLocalId);
+                    buildingUnitLatestItem.Should().NotBeNull();
 
-                    buildingUnitVersion!.Status.Should().Be(BuildingUnitStatus.Planned.Status);
-                    buildingUnitVersion.OsloStatus.Should().Be(BuildingUnitStatus.Planned.Map());
-                    buildingUnitVersion.VersionTimestamp.Should().Be(buildingUnitWasCorrectedFromRealizedToPlanned.Provenance.Timestamp);
+                    buildingUnitLatestItem!.OsloStatus.Should().Be(BuildingUnitStatus.Planned.Map());
+                    buildingUnitLatestItem.Status.Should().Be("Planned");
+                    buildingUnitLatestItem.VersionTimestamp.Should().Be(buildingUnitWasCorrectedFromRealizedToPlanned.Provenance.Timestamp);
                 });
         }
 
@@ -536,13 +458,13 @@
                         new Envelope(buildingUnitWasCorrectedToPlanned, buildingUnitWasCorrectedToPlannedMetadata)))
                 .Then(async context =>
                 {
-                    var buildingUnitVersion =
-                        await context.BuildingUnitVersions.FindAsync(position + 2, buildingUnitWasCorrectedToPlanned.BuildingUnitPersistentLocalId);
-                    buildingUnitVersion.Should().NotBeNull();
+                    var buildingUnitLatestItem =
+                        await context.BuildingUnitLatestItems.FindAsync(buildingUnitWasCorrectedToPlanned.BuildingUnitPersistentLocalId);
+                    buildingUnitLatestItem.Should().NotBeNull();
 
-                    buildingUnitVersion!.Status.Should().Be(BuildingUnitStatus.Planned.Status);
-                    buildingUnitVersion.OsloStatus.Should().Be(BuildingUnitStatus.Planned.Map());
-                    buildingUnitVersion.VersionTimestamp.Should().Be(buildingUnitWasCorrectedToPlanned.Provenance.Timestamp);
+                    buildingUnitLatestItem!.OsloStatus.Should().Be(BuildingUnitStatus.Planned.Map());
+                    buildingUnitLatestItem.Status.Should().Be("Planned");
+                    buildingUnitLatestItem.VersionTimestamp.Should().Be(buildingUnitWasCorrectedToPlanned.Provenance.Timestamp);
                 });
         }
 
@@ -574,13 +496,13 @@
                     new Envelope<BuildingUnitWasNotRealizedV2>(new Envelope(buildingUnitWasNotRealizedV2, buildingUnitWasNotRealizedMetadata)))
                 .Then(async context =>
                 {
-                    var buildingUnitVersion =
-                        await context.BuildingUnitVersions.FindAsync(position + 1, buildingUnitWasNotRealizedV2.BuildingUnitPersistentLocalId);
-                    buildingUnitVersion.Should().NotBeNull();
+                    var buildingUnitLatestItem =
+                        await context.BuildingUnitLatestItems.FindAsync(buildingUnitWasNotRealizedV2.BuildingUnitPersistentLocalId);
+                    buildingUnitLatestItem.Should().NotBeNull();
 
-                    buildingUnitVersion!.Status.Should().Be(BuildingUnitStatus.NotRealized.Status);
-                    buildingUnitVersion.OsloStatus.Should().Be(BuildingUnitStatus.NotRealized.Map());
-                    buildingUnitVersion.VersionTimestamp.Should().Be(buildingUnitWasNotRealizedV2.Provenance.Timestamp);
+                    buildingUnitLatestItem!.OsloStatus.Should().Be(BuildingUnitStatus.NotRealized.Map());
+                    buildingUnitLatestItem.Status.Should().Be("NotRealized");
+                    buildingUnitLatestItem.VersionTimestamp.Should().Be(buildingUnitWasNotRealizedV2.Provenance.Timestamp);
                 });
         }
 
@@ -613,13 +535,13 @@
                         new Envelope(buildingUnitWasNotRealized, buildingUnitWasNotRealizedMetadata)))
                 .Then(async context =>
                 {
-                    var buildingUnitVersion =
-                        await context.BuildingUnitVersions.FindAsync(position + 1, buildingUnitWasNotRealized.BuildingUnitPersistentLocalId);
-                    buildingUnitVersion.Should().NotBeNull();
+                    var buildingUnitLatestItem =
+                        await context.BuildingUnitLatestItems.FindAsync(buildingUnitWasNotRealized.BuildingUnitPersistentLocalId);
+                    buildingUnitLatestItem.Should().NotBeNull();
 
-                    buildingUnitVersion!.Status.Should().Be(BuildingUnitStatus.NotRealized.Status);
-                    buildingUnitVersion.OsloStatus.Should().Be(BuildingUnitStatus.NotRealized.Map());
-                    buildingUnitVersion.VersionTimestamp.Should().Be(buildingUnitWasNotRealized.Provenance.Timestamp);
+                    buildingUnitLatestItem!.OsloStatus.Should().Be(BuildingUnitStatus.NotRealized.Map());
+                    buildingUnitLatestItem.Status.Should().Be("NotRealized");
+                    buildingUnitLatestItem.VersionTimestamp.Should().Be(buildingUnitWasNotRealized.Provenance.Timestamp);
                 });
         }
 
@@ -659,13 +581,13 @@
                         new Envelope(buildingUnitWasCorrectedToPlanned, buildingUnitWasCorrectedToPlannedMetadata)))
                 .Then(async context =>
                 {
-                    var buildingUnitVersion =
-                        await context.BuildingUnitVersions.FindAsync(position + 2, buildingUnitWasCorrectedToPlanned.BuildingUnitPersistentLocalId);
-                    buildingUnitVersion.Should().NotBeNull();
+                    var buildingUnitLatestItem =
+                        await context.BuildingUnitLatestItems.FindAsync(buildingUnitWasCorrectedToPlanned.BuildingUnitPersistentLocalId);
+                    buildingUnitLatestItem.Should().NotBeNull();
 
-                    buildingUnitVersion!.Status.Should().Be(BuildingUnitStatus.Planned.Status);
-                    buildingUnitVersion.OsloStatus.Should().Be(BuildingUnitStatus.Planned.Map());
-                    buildingUnitVersion.VersionTimestamp.Should().Be(buildingUnitWasCorrectedToPlanned.Provenance.Timestamp);
+                    buildingUnitLatestItem!.OsloStatus.Should().Be(BuildingUnitStatus.Planned.Map());
+                    buildingUnitLatestItem.Status.Should().Be("Planned");
+                    buildingUnitLatestItem.VersionTimestamp.Should().Be(buildingUnitWasCorrectedToPlanned.Provenance.Timestamp);
                 });
         }
 
@@ -704,13 +626,13 @@
                     new Envelope<BuildingUnitWasRetiredV2>(new Envelope(buildingUnitWasRetiredV2, buildingUnitWasRetiredMetadata)))
                 .Then(async context =>
                 {
-                    var buildingUnitVersion =
-                        await context.BuildingUnitVersions.FindAsync(position + 2, buildingUnitWasRetiredV2.BuildingUnitPersistentLocalId);
-                    buildingUnitVersion.Should().NotBeNull();
+                    var buildingUnitLatestItem =
+                        await context.BuildingUnitLatestItems.FindAsync(buildingUnitWasRetiredV2.BuildingUnitPersistentLocalId);
+                    buildingUnitLatestItem.Should().NotBeNull();
 
-                    buildingUnitVersion!.Status.Should().Be(BuildingUnitStatus.Retired.Status);
-                    buildingUnitVersion.OsloStatus.Should().Be(BuildingUnitStatus.Retired.Map());
-                    buildingUnitVersion.VersionTimestamp.Should().Be(buildingUnitWasRetiredV2.Provenance.Timestamp);
+                    buildingUnitLatestItem!.OsloStatus.Should().Be(BuildingUnitStatus.Retired.Map());
+                    buildingUnitLatestItem.Status.Should().Be("Retired");
+                    buildingUnitLatestItem.VersionTimestamp.Should().Be(buildingUnitWasRetiredV2.Provenance.Timestamp);
                 });
         }
 
@@ -722,7 +644,6 @@
 
             var buildingUnitWasPlannedV2 = _fixture.Create<BuildingUnitWasPlannedV2>();
             var buildingUnitWasRetiredV2 = _fixture.Create<BuildingUnitWasRetiredV2>();
-            var buildingUnitWasRealizedV2 = _fixture.Create<BuildingUnitWasRealizedV2>();
             var buildingUnitWasCorrectedToRealized = _fixture.Create<BuildingUnitWasCorrectedFromRetiredToRealized>();
 
             var position = _fixture.Create<long>();
@@ -732,38 +653,32 @@
                 { AddEventHashPipe.HashMetadataKey, buildingUnitWasPlannedV2.GetHash() },
                 { Envelope.PositionMetadataKey, position }
             };
-            var buildingUnitWasRealizedMetadata = new Dictionary<string, object>
-            {
-                { AddEventHashPipe.HashMetadataKey, buildingUnitWasPlannedV2.GetHash() },
-                { Envelope.PositionMetadataKey, position + 1 }
-            };
             var buildingUnitWasRetiredMetadata = new Dictionary<string, object>
             {
                 { AddEventHashPipe.HashMetadataKey, buildingUnitWasRetiredV2.GetHash() },
-                { Envelope.PositionMetadataKey, position + 2 }
+                { Envelope.PositionMetadataKey, position + 1 }
             };
             var buildingUnitWasCorrectedToRealizedMetadata = new Dictionary<string, object>
             {
                 { AddEventHashPipe.HashMetadataKey, buildingUnitWasCorrectedToRealized.GetHash() },
-                { Envelope.PositionMetadataKey, position + 3 }
+                { Envelope.PositionMetadataKey, position + 2 }
             };
 
             await Sut
                 .Given(
                     new Envelope<BuildingUnitWasPlannedV2>(new Envelope(buildingUnitWasPlannedV2, buildingUnitWasPlannedMetadata)),
-                    new Envelope<BuildingUnitWasRealizedV2>(new Envelope(buildingUnitWasRealizedV2, buildingUnitWasRealizedMetadata)),
                     new Envelope<BuildingUnitWasRetiredV2>(new Envelope(buildingUnitWasRetiredV2, buildingUnitWasRetiredMetadata)),
                     new Envelope<BuildingUnitWasCorrectedFromRetiredToRealized>(
                         new Envelope(buildingUnitWasCorrectedToRealized, buildingUnitWasCorrectedToRealizedMetadata)))
                 .Then(async context =>
                 {
-                    var buildingUnitVersion =
-                        await context.BuildingUnitVersions.FindAsync(position + 3, buildingUnitWasCorrectedToRealized.BuildingUnitPersistentLocalId);
-                    buildingUnitVersion.Should().NotBeNull();
+                    var buildingUnitLatestItem =
+                        await context.BuildingUnitLatestItems.FindAsync(buildingUnitWasCorrectedToRealized.BuildingUnitPersistentLocalId);
+                    buildingUnitLatestItem.Should().NotBeNull();
 
-                    buildingUnitVersion!.Status.Should().Be(BuildingUnitStatus.Realized.Status);
-                    buildingUnitVersion.OsloStatus.Should().Be(BuildingUnitStatus.Realized.Map());
-                    buildingUnitVersion.VersionTimestamp.Should().Be(buildingUnitWasCorrectedToRealized.Provenance.Timestamp);
+                    buildingUnitLatestItem!.OsloStatus.Should().Be(BuildingUnitStatus.Realized.Map());
+                    buildingUnitLatestItem.Status.Should().Be("Realized");
+                    buildingUnitLatestItem.VersionTimestamp.Should().Be(buildingUnitWasCorrectedToRealized.Provenance.Timestamp);
                 });
         }
 
@@ -794,16 +709,16 @@
                     new Envelope<BuildingUnitPositionWasCorrected>(new Envelope(buildingUnitPositionWasCorrected, buildingUnitPositionWasCorrectedMetadata)))
                 .Then(async context =>
                 {
-                    var buildingUnitVersion =
-                        await context.BuildingUnitVersions.FindAsync(position + 1, buildingUnitPositionWasCorrected.BuildingUnitPersistentLocalId);
-                    buildingUnitVersion.Should().NotBeNull();
+                    var buildingUnitLatestItem =
+                        await context.BuildingUnitLatestItems.FindAsync(buildingUnitPositionWasCorrected.BuildingUnitPersistentLocalId);
+                    buildingUnitLatestItem.Should().NotBeNull();
 
-                    buildingUnitVersion!.BuildingPersistentLocalId.Should().Be(buildingUnitPositionWasCorrected.BuildingPersistentLocalId);
-                    buildingUnitVersion.Geometry.Should().BeEquivalentTo(
+                    buildingUnitLatestItem!.BuildingPersistentLocalId.Should().Be(buildingUnitPositionWasCorrected.BuildingPersistentLocalId);
+                    buildingUnitLatestItem.Geometry.Should().BeEquivalentTo(
                         _wkbReader.Read(buildingUnitPositionWasCorrected.ExtendedWkbGeometry.ToByteArray()));
-                    buildingUnitVersion.GeometryMethod.Should().Be(BuildingUnitPositionGeometryMethod.Parse(buildingUnitPositionWasCorrected.GeometryMethod).GeometryMethod);
-                    buildingUnitVersion.OsloGeometryMethod.Should().Be(BuildingUnitPositionGeometryMethod.Parse(buildingUnitPositionWasCorrected.GeometryMethod).Map());
-                    buildingUnitVersion.VersionTimestamp.Should().Be(buildingUnitPositionWasCorrected.Provenance.Timestamp);
+                    buildingUnitLatestItem.OsloGeometryMethod.Should().Be(BuildingUnitPositionGeometryMethod.Parse(buildingUnitPositionWasCorrected.GeometryMethod).Map());
+                    buildingUnitLatestItem.GeometryMethod.Should().Be(buildingUnitPositionWasCorrected.GeometryMethod);
+                    buildingUnitLatestItem.VersionTimestamp.Should().Be(buildingUnitPositionWasCorrected.Provenance.Timestamp);
                 });
         }
 
@@ -835,12 +750,12 @@
                     new Envelope<BuildingUnitWasRemovedV2>(new Envelope(buildingUnitWasRemovedV2, buildingUnitWasRemovedMetadata)))
                 .Then(async context =>
                 {
-                    var buildingUnitVersion =
-                        await context.BuildingUnitVersions.FindAsync(position + 1, buildingUnitWasRemovedV2.BuildingUnitPersistentLocalId);
-                    buildingUnitVersion.Should().NotBeNull();
+                    var buildingUnitLatestItem =
+                        await context.BuildingUnitLatestItems.FindAsync(buildingUnitWasRemovedV2.BuildingUnitPersistentLocalId);
+                    buildingUnitLatestItem.Should().NotBeNull();
 
-                    buildingUnitVersion!.IsRemoved.Should().BeTrue();
-                    buildingUnitVersion.VersionTimestamp.Should().Be(buildingUnitWasRemovedV2.Provenance.Timestamp);
+                    buildingUnitLatestItem!.IsRemoved.Should().BeTrue();
+                    buildingUnitLatestItem.VersionTimestamp.Should().Be(buildingUnitWasRemovedV2.Provenance.Timestamp);
                 });
         }
 
@@ -872,12 +787,12 @@
                     new Envelope<BuildingUnitWasRemovedBecauseBuildingWasRemoved>(new Envelope(buildingUnitWasRemoved, buildingUnitWasRemovedMetadata)))
                 .Then(async context =>
                 {
-                    var buildingUnitVersion =
-                        await context.BuildingUnitVersions.FindAsync(position + 1, buildingUnitWasRemoved.BuildingUnitPersistentLocalId);
-                    buildingUnitVersion.Should().NotBeNull();
+                    var buildingUnitLatestItem =
+                        await context.BuildingUnitLatestItems.FindAsync(buildingUnitWasRemoved.BuildingUnitPersistentLocalId);
+                    buildingUnitLatestItem.Should().NotBeNull();
 
-                    buildingUnitVersion!.IsRemoved.Should().BeTrue();
-                    buildingUnitVersion.VersionTimestamp.Should().Be(buildingUnitWasRemoved.Provenance.Timestamp);
+                    buildingUnitLatestItem!.IsRemoved.Should().BeTrue();
+                    buildingUnitLatestItem.VersionTimestamp.Should().Be(buildingUnitWasRemoved.Provenance.Timestamp);
                 });
         }
 
@@ -916,21 +831,21 @@
                     new Envelope<BuildingUnitRemovalWasCorrected>(new Envelope(buildingUnitRemovalWasCorrected, buildingUnitRemovalWasCorrectedMetadata)))
                 .Then(async context =>
                 {
-                    var buildingUnitVersion =
-                        await context.BuildingUnitVersions.FindAsync(position + 2, buildingUnitRemovalWasCorrected.BuildingUnitPersistentLocalId);
-                    buildingUnitVersion.Should().NotBeNull();
+                    var buildingUnitLatestItem =
+                        await context.BuildingUnitLatestItems.FindAsync(buildingUnitRemovalWasCorrected.BuildingUnitPersistentLocalId);
+                    buildingUnitLatestItem.Should().NotBeNull();
 
-                    buildingUnitVersion!.Status.Should().Be(BuildingUnitStatus.Parse(buildingUnitRemovalWasCorrected.BuildingUnitStatus).Status);
-                    buildingUnitVersion.OsloStatus.Should().Be(BuildingUnitStatus.Parse(buildingUnitRemovalWasCorrected.BuildingUnitStatus).Map());
-                    buildingUnitVersion.Function.Should().Be(BuildingUnitFunction.Parse(buildingUnitRemovalWasCorrected.Function).Function);
-                    buildingUnitVersion.OsloFunction.Should().Be(BuildingUnitFunction.Parse(buildingUnitRemovalWasCorrected.Function).Map());
-                    buildingUnitVersion.Geometry.Should().BeEquivalentTo(
+                    buildingUnitLatestItem!.OsloStatus.Should().Be(BuildingUnitStatus.Parse(buildingUnitRemovalWasCorrected.BuildingUnitStatus).Map());
+                    buildingUnitLatestItem.Status.Should().Be(buildingUnitRemovalWasCorrected.BuildingUnitStatus);
+                    buildingUnitLatestItem.OsloFunction.Should().Be(BuildingUnitFunction.Parse(buildingUnitRemovalWasCorrected.Function).Map());
+                    buildingUnitLatestItem.Function.Should().Be(buildingUnitRemovalWasCorrected.Function);
+                    buildingUnitLatestItem.Geometry.Should().BeEquivalentTo(
                         _wkbReader.Read(buildingUnitRemovalWasCorrected.ExtendedWkbGeometry.ToByteArray()));
-                    buildingUnitVersion.GeometryMethod.Should().Be(BuildingUnitPositionGeometryMethod.Parse(buildingUnitRemovalWasCorrected.GeometryMethod).GeometryMethod);
-                    buildingUnitVersion.OsloGeometryMethod.Should().Be(BuildingUnitPositionGeometryMethod.Parse(buildingUnitRemovalWasCorrected.GeometryMethod).Map());
-                    buildingUnitVersion.HasDeviation.Should().Be(buildingUnitRemovalWasCorrected.HasDeviation);
-                    buildingUnitVersion.IsRemoved.Should().BeFalse();
-                    buildingUnitVersion.VersionTimestamp.Should().Be(buildingUnitRemovalWasCorrected.Provenance.Timestamp);
+                    buildingUnitLatestItem.OsloGeometryMethod.Should().Be(BuildingUnitPositionGeometryMethod.Parse(buildingUnitRemovalWasCorrected.GeometryMethod).Map());
+                    buildingUnitLatestItem.GeometryMethod.Should().Be(buildingUnitRemovalWasCorrected.GeometryMethod);
+                    buildingUnitLatestItem.HasDeviation.Should().Be(buildingUnitRemovalWasCorrected.HasDeviation);
+                    buildingUnitLatestItem.IsRemoved.Should().BeFalse();
+                    buildingUnitLatestItem.VersionTimestamp.Should().Be(buildingUnitRemovalWasCorrected.Provenance.Timestamp);
                 });
         }
 
@@ -962,12 +877,12 @@
                     new Envelope<BuildingUnitWasRegularized>(new Envelope(buildingUnitWasRegularized, buildingUnitWasRegularizedMetadata)))
                 .Then(async context =>
                 {
-                    var buildingUnitVersion =
-                        await context.BuildingUnitVersions.FindAsync(position + 1, buildingUnitWasRegularized.BuildingUnitPersistentLocalId);
-                    buildingUnitVersion.Should().NotBeNull();
+                    var buildingUnitLatestItem =
+                        await context.BuildingUnitLatestItems.FindAsync(buildingUnitWasRegularized.BuildingUnitPersistentLocalId);
+                    buildingUnitLatestItem.Should().NotBeNull();
 
-                    buildingUnitVersion!.HasDeviation.Should().BeFalse();
-                    buildingUnitVersion.VersionTimestamp.Should().Be(buildingUnitWasRegularized.Provenance.Timestamp);
+                    buildingUnitLatestItem!.HasDeviation.Should().BeFalse();
+                    buildingUnitLatestItem.VersionTimestamp.Should().Be(buildingUnitWasRegularized.Provenance.Timestamp);
                 });
         }
 
@@ -1000,12 +915,12 @@
                         new Envelope(buildingUnitRegularizationWasCorrected, buildingUnitRegularizationWasCorrectedMetadata)))
                 .Then(async context =>
                 {
-                    var buildingUnitVersion =
-                        await context.BuildingUnitVersions.FindAsync(position + 1, buildingUnitRegularizationWasCorrected.BuildingUnitPersistentLocalId);
-                    buildingUnitVersion.Should().NotBeNull();
+                    var buildingUnitLatestItem =
+                        await context.BuildingUnitLatestItems.FindAsync(buildingUnitRegularizationWasCorrected.BuildingUnitPersistentLocalId);
+                    buildingUnitLatestItem.Should().NotBeNull();
 
-                    buildingUnitVersion!.HasDeviation.Should().BeTrue();
-                    buildingUnitVersion.VersionTimestamp.Should().Be(buildingUnitRegularizationWasCorrected.Provenance.Timestamp);
+                    buildingUnitLatestItem!.HasDeviation.Should().BeTrue();
+                    buildingUnitLatestItem.VersionTimestamp.Should().Be(buildingUnitRegularizationWasCorrected.Provenance.Timestamp);
                 });
         }
 
@@ -1037,12 +952,12 @@
                     new Envelope<BuildingUnitWasDeregulated>(new Envelope(buildingUnitWasDeregulated, buildingUnitWasDeregulatedMetadata)))
                 .Then(async context =>
                 {
-                    var buildingUnitVersion =
-                        await context.BuildingUnitVersions.FindAsync(position + 1, buildingUnitWasDeregulated.BuildingUnitPersistentLocalId);
-                    buildingUnitVersion.Should().NotBeNull();
+                    var buildingUnitLatestItem =
+                        await context.BuildingUnitLatestItems.FindAsync(buildingUnitWasDeregulated.BuildingUnitPersistentLocalId);
+                    buildingUnitLatestItem.Should().NotBeNull();
 
-                    buildingUnitVersion!.HasDeviation.Should().BeTrue();
-                    buildingUnitVersion.VersionTimestamp.Should().Be(buildingUnitWasDeregulated.Provenance.Timestamp);
+                    buildingUnitLatestItem!.HasDeviation.Should().BeTrue();
+                    buildingUnitLatestItem.VersionTimestamp.Should().Be(buildingUnitWasDeregulated.Provenance.Timestamp);
                 });
         }
 
@@ -1074,12 +989,12 @@
                         new Envelope(buildingUnitDeregulationWasCorrected, buildingUnitDeregulationWasCorrectedMetadata)))
                 .Then(async context =>
                 {
-                    var buildingUnitVersion =
-                        await context.BuildingUnitVersions.FindAsync(position + 1, buildingUnitDeregulationWasCorrected.BuildingUnitPersistentLocalId);
-                    buildingUnitVersion.Should().NotBeNull();
+                    var buildingUnitLatestItem =
+                        await context.BuildingUnitLatestItems.FindAsync(buildingUnitDeregulationWasCorrected.BuildingUnitPersistentLocalId);
+                    buildingUnitLatestItem.Should().NotBeNull();
 
-                    buildingUnitVersion!.HasDeviation.Should().BeFalse();
-                    buildingUnitVersion.VersionTimestamp.Should().Be(buildingUnitDeregulationWasCorrected.Provenance.Timestamp);
+                    buildingUnitLatestItem!.HasDeviation.Should().BeFalse();
+                    buildingUnitLatestItem.VersionTimestamp.Should().Be(buildingUnitDeregulationWasCorrected.Provenance.Timestamp);
                 });
         }
 
@@ -1110,24 +1025,22 @@
                 .Given(new Envelope<CommonBuildingUnitWasAddedV2>(new Envelope(commonBuildingUnitWasAddedV2, commonBuildingUnitWasAddedMetadata)))
                 .Then(async context =>
                 {
-                    var buildingUnitVersion = await context.BuildingUnitVersions.FindAsync(position, commonBuildingUnitWasAddedV2.BuildingUnitPersistentLocalId);
-                    buildingUnitVersion.Should().NotBeNull();
+                    var buildingUnitLatestItem = await context.BuildingUnitLatestItems.FindAsync(commonBuildingUnitWasAddedV2
+                        .BuildingUnitPersistentLocalId);
+                    buildingUnitLatestItem.Should().NotBeNull();
 
-                    buildingUnitVersion!.BuildingPersistentLocalId.Should().Be(commonBuildingUnitWasAddedV2.BuildingPersistentLocalId);
-                    buildingUnitVersion.Geometry.Should().BeEquivalentTo(
+                    buildingUnitLatestItem!.BuildingPersistentLocalId.Should().Be(commonBuildingUnitWasAddedV2.BuildingPersistentLocalId);
+                    buildingUnitLatestItem.Geometry.Should().BeEquivalentTo(
                         _wkbReader.Read(commonBuildingUnitWasAddedV2.ExtendedWkbGeometry.ToByteArray()));
-                    buildingUnitVersion.GeometryMethod.Should().Be(BuildingUnitPositionGeometryMethod.Parse(commonBuildingUnitWasAddedV2.GeometryMethod).GeometryMethod);
-                    buildingUnitVersion.OsloGeometryMethod.Should().Be(BuildingUnitPositionGeometryMethod.Parse(commonBuildingUnitWasAddedV2.GeometryMethod).Map());
-                    buildingUnitVersion.Function.Should().Be(BuildingUnitFunction.Common.Function);
-                    buildingUnitVersion.OsloFunction.Should().Be(BuildingUnitFunction.Common.Map());
-                    buildingUnitVersion.Status.Should().Be(BuildingUnitStatus.Parse(commonBuildingUnitWasAddedV2.BuildingUnitStatus).Status);
-                    buildingUnitVersion.OsloStatus.Should().Be(BuildingUnitStatus.Parse(commonBuildingUnitWasAddedV2.BuildingUnitStatus).Map());
-                    buildingUnitVersion.HasDeviation.Should().Be(commonBuildingUnitWasAddedV2.HasDeviation);
-                    buildingUnitVersion.IsRemoved.Should().BeFalse();
-                    buildingUnitVersion.VersionTimestamp.Should().Be(commonBuildingUnitWasAddedV2.Provenance.Timestamp);
-                    buildingUnitVersion.CreatedOnTimestamp.Should().Be(commonBuildingUnitWasAddedV2.Provenance.Timestamp);
-                    buildingUnitVersion.Namespace.Should().Be(BuildingUnitNamespace);
-                    buildingUnitVersion.PuriId.Should().Be($"{BuildingUnitNamespace}/{commonBuildingUnitWasAddedV2.BuildingUnitPersistentLocalId}");
+                    buildingUnitLatestItem.OsloGeometryMethod.Should().Be(BuildingUnitPositionGeometryMethod.Parse(commonBuildingUnitWasAddedV2.GeometryMethod).Map());
+                    buildingUnitLatestItem.GeometryMethod.Should().Be(commonBuildingUnitWasAddedV2.GeometryMethod);
+                    buildingUnitLatestItem.OsloFunction.Should().Be(BuildingUnitFunction.Common.Map());
+                    buildingUnitLatestItem.Function.Should().Be(BuildingUnitFunction.Common.Function);
+                    buildingUnitLatestItem.OsloStatus.Should().Be(BuildingUnitStatus.Parse(commonBuildingUnitWasAddedV2.BuildingUnitStatus).Map());
+                    buildingUnitLatestItem.Status.Should().Be(commonBuildingUnitWasAddedV2.BuildingUnitStatus);
+                    buildingUnitLatestItem.HasDeviation.Should().Be(commonBuildingUnitWasAddedV2.HasDeviation);
+                    buildingUnitLatestItem.IsRemoved.Should().BeFalse();
+                    buildingUnitLatestItem.VersionTimestamp.Should().Be(commonBuildingUnitWasAddedV2.Provenance.Timestamp);
                 });
         }
 
@@ -1159,14 +1072,17 @@
                     new Envelope<BuildingUnitAddressWasAttachedV2>(new Envelope(buildingUnitAddressWasAttachedV2, buildingUnitAddressWasAttachedMetadata)))
                 .Then(async context =>
                 {
-                    var buildingUnitVersion =
-                        await context.BuildingUnitVersions.FindAsync(position + 1, buildingUnitAddressWasAttachedV2.BuildingUnitPersistentLocalId);
-                    buildingUnitVersion.Should().NotBeNull();
+                    var buildingUnitLatestItem =
+                        await context.BuildingUnitLatestItems.FindAsync(buildingUnitAddressWasAttachedV2.BuildingUnitPersistentLocalId);
+                    buildingUnitLatestItem.Should().NotBeNull();
 
-                    buildingUnitVersion!.VersionTimestamp.Should().Be(buildingUnitAddressWasAttachedV2.Provenance.Timestamp);
+                    buildingUnitLatestItem!.VersionTimestamp.Should().Be(buildingUnitAddressWasAttachedV2.Provenance.Timestamp);
 
-                    buildingUnitVersion.Addresses.Should().HaveCount(1);
-                    buildingUnitVersion.Addresses.Single().AddressPersistentLocalId.Should().Be(buildingUnitAddressWasAttachedV2.AddressPersistentLocalId);
+                    var buildingUnitAddresses = context.BuildingUnitAddresses
+                        .Where(x => x.BuildingUnitPersistentLocalId == buildingUnitLatestItem.BuildingUnitPersistentLocalId)
+                        .ToList();
+                    buildingUnitAddresses.Should().HaveCount(1);
+                    buildingUnitAddresses.Single().AddressPersistentLocalId.Should().Be(buildingUnitAddressWasAttachedV2.AddressPersistentLocalId);
                 });
         }
 
@@ -1206,13 +1122,16 @@
                     new Envelope<BuildingUnitAddressWasDetachedV2>(new Envelope(buildingUnitAddressWasDetachedV2, buildingUnitAddressWasDetachedMetadata)))
                 .Then(async context =>
                 {
-                    var buildingUnitVersion =
-                        await context.BuildingUnitVersions.FindAsync(position + 2, buildingUnitAddressWasDetachedV2.BuildingUnitPersistentLocalId);
-                    buildingUnitVersion.Should().NotBeNull();
+                    var buildingUnitLatestItem =
+                        await context.BuildingUnitLatestItems.FindAsync(buildingUnitAddressWasDetachedV2.BuildingUnitPersistentLocalId);
+                    buildingUnitLatestItem.Should().NotBeNull();
 
-                    buildingUnitVersion!.VersionTimestamp.Should().Be(buildingUnitAddressWasDetachedV2.Provenance.Timestamp);
+                    buildingUnitLatestItem!.VersionTimestamp.Should().Be(buildingUnitAddressWasDetachedV2.Provenance.Timestamp);
 
-                    buildingUnitVersion.Addresses.Should().BeEmpty();
+                    var buildingUnitAddresses = context.BuildingUnitAddresses
+                        .Where(x => x.BuildingUnitPersistentLocalId == buildingUnitLatestItem.BuildingUnitPersistentLocalId)
+                        .ToList();
+                    buildingUnitAddresses.Should().BeEmpty();
                 });
         }
 
@@ -1255,13 +1174,16 @@
                         new Envelope(buildingUnitAddressWasDetached, buildingUnitAddressWasDetachedMetadata)))
                 .Then(async context =>
                 {
-                    var buildingUnitVersion =
-                        await context.BuildingUnitVersions.FindAsync(position + 2, buildingUnitAddressWasDetached.BuildingUnitPersistentLocalId);
-                    buildingUnitVersion.Should().NotBeNull();
+                    var buildingUnitLatestItem =
+                        await context.BuildingUnitLatestItems.FindAsync(buildingUnitAddressWasDetached.BuildingUnitPersistentLocalId);
+                    buildingUnitLatestItem.Should().NotBeNull();
 
-                    buildingUnitVersion!.VersionTimestamp.Should().Be(buildingUnitAddressWasDetached.Provenance.Timestamp);
+                    buildingUnitLatestItem!.VersionTimestamp.Should().Be(buildingUnitAddressWasDetached.Provenance.Timestamp);
 
-                    buildingUnitVersion.Addresses.Should().BeEmpty();
+                    var buildingUnitAddresses = context.BuildingUnitAddresses
+                        .Where(x => x.BuildingUnitPersistentLocalId == buildingUnitLatestItem.BuildingUnitPersistentLocalId)
+                        .ToList();
+                    buildingUnitAddresses.Should().BeEmpty();
                 });
         }
 
@@ -1303,13 +1225,16 @@
                         new Envelope(buildingUnitAddressWasDetached, buildingUnitAddressWasDetachedMetadata)))
                 .Then(async context =>
                 {
-                    var buildingUnitVersion =
-                        await context.BuildingUnitVersions.FindAsync(position + 2, buildingUnitAddressWasDetached.BuildingUnitPersistentLocalId);
-                    buildingUnitVersion.Should().NotBeNull();
+                    var buildingUnitLatestItem =
+                        await context.BuildingUnitLatestItems.FindAsync(buildingUnitAddressWasDetached.BuildingUnitPersistentLocalId);
+                    buildingUnitLatestItem.Should().NotBeNull();
 
-                    buildingUnitVersion!.VersionTimestamp.Should().Be(buildingUnitAddressWasDetached.Provenance.Timestamp);
+                    buildingUnitLatestItem!.VersionTimestamp.Should().Be(buildingUnitAddressWasDetached.Provenance.Timestamp);
 
-                    buildingUnitVersion.Addresses.Should().BeEmpty();
+                    var buildingUnitAddresses = context.BuildingUnitAddresses
+                        .Where(x => x.BuildingUnitPersistentLocalId == buildingUnitLatestItem.BuildingUnitPersistentLocalId)
+                        .ToList();
+                    buildingUnitAddresses.Should().BeEmpty();
                 });
         }
 
@@ -1351,13 +1276,16 @@
                         new Envelope(buildingUnitAddressWasDetached, buildingUnitAddressWasDetachedMetadata)))
                 .Then(async context =>
                 {
-                    var buildingUnitVersion =
-                        await context.BuildingUnitVersions.FindAsync(position + 2, buildingUnitAddressWasDetached.BuildingUnitPersistentLocalId);
-                    buildingUnitVersion.Should().NotBeNull();
+                    var buildingUnitLatestItem =
+                        await context.BuildingUnitLatestItems.FindAsync(buildingUnitAddressWasDetached.BuildingUnitPersistentLocalId);
+                    buildingUnitLatestItem.Should().NotBeNull();
 
-                    buildingUnitVersion!.VersionTimestamp.Should().Be(buildingUnitAddressWasDetached.Provenance.Timestamp);
+                    buildingUnitLatestItem!.VersionTimestamp.Should().Be(buildingUnitAddressWasDetached.Provenance.Timestamp);
 
-                    buildingUnitVersion.Addresses.Should().BeEmpty();
+                    var buildingUnitAddresses = context.BuildingUnitAddresses
+                        .Where(x => x.BuildingUnitPersistentLocalId == buildingUnitLatestItem.BuildingUnitPersistentLocalId)
+                        .ToList();
+                    buildingUnitAddresses.Should().BeEmpty();
                 });
         }
 
@@ -1404,17 +1332,17 @@
                             buildingUnitAddressWasReplacedBecauseAddressWasReaddressedMetadata)))
                 .Then(async context =>
                 {
-                    var buildingUnitVersion =
-                        await context.BuildingUnitVersions.FindAsync(position + 2, buildingUnitAddressWasReplacedBecauseAddressWasReaddressed.BuildingUnitPersistentLocalId);
-                    buildingUnitVersion.Should().NotBeNull();
+                    var buildingUnitLatestItem =
+                        await context.BuildingUnitLatestItems.FindAsync(buildingUnitAddressWasReplacedBecauseAddressWasReaddressed.BuildingUnitPersistentLocalId);
+                    buildingUnitLatestItem.Should().NotBeNull();
 
-                    buildingUnitVersion!.VersionTimestamp.Should().Be(buildingUnitAddressWasReplacedBecauseAddressWasReaddressed.Provenance.Timestamp);
+                    buildingUnitLatestItem!.VersionTimestamp.Should().Be(buildingUnitAddressWasReplacedBecauseAddressWasReaddressed.Provenance.Timestamp);
 
-                    var newAddress = buildingUnitVersion.Addresses.SingleOrDefault(x =>
+                    var newAddress = context.BuildingUnitAddresses.SingleOrDefault(x =>
                         x.AddressPersistentLocalId == buildingUnitAddressWasReplacedBecauseAddressWasReaddressed.NewAddressPersistentLocalId);
                     newAddress.Should().NotBeNull();
 
-                    var oldAddress = buildingUnitVersion.Addresses.SingleOrDefault(x =>
+                    var oldAddress = context.BuildingUnitAddresses.SingleOrDefault(x =>
                         x.AddressPersistentLocalId == buildingUnitAddressWasReplacedBecauseAddressWasReaddressed.PreviousAddressPersistentLocalId);
                     oldAddress.Should().BeNull();
                 });
@@ -1448,13 +1376,13 @@
                     new Envelope<BuildingUnitWasRetiredBecauseBuildingWasDemolished>(new Envelope(buildingUnitWasRetired, buildingUnitWasRetiredMetadata)))
                 .Then(async context =>
                 {
-                    var buildingUnitVersion =
-                        await context.BuildingUnitVersions.FindAsync(position + 1, buildingUnitWasRetired.BuildingUnitPersistentLocalId);
-                    buildingUnitVersion.Should().NotBeNull();
+                    var buildingUnitLatestItem =
+                        await context.BuildingUnitLatestItems.FindAsync(buildingUnitWasRetired.BuildingUnitPersistentLocalId);
+                    buildingUnitLatestItem.Should().NotBeNull();
 
-                    buildingUnitVersion!.Status.Should().Be(BuildingUnitStatus.Retired.Status);
-                    buildingUnitVersion.OsloStatus.Should().Be(BuildingUnitStatus.Retired.Map());
-                    buildingUnitVersion.VersionTimestamp.Should().Be(buildingUnitWasRetired.Provenance.Timestamp);
+                    buildingUnitLatestItem!.OsloStatus.Should().Be(BuildingUnitStatus.Retired.Map());
+                    buildingUnitLatestItem.Status.Should().Be("Retired");
+                    buildingUnitLatestItem.VersionTimestamp.Should().Be(buildingUnitWasRetired.Provenance.Timestamp);
                 });
         }
 
@@ -1486,13 +1414,13 @@
                     new Envelope<BuildingUnitWasNotRealizedBecauseBuildingWasDemolished>(new Envelope(buildingUnitWasNotRealized, buildingUnitWasNotRealizedMetadata)))
                 .Then(async context =>
                 {
-                    var buildingUnitVersion =
-                        await context.BuildingUnitVersions.FindAsync(position + 1, buildingUnitWasNotRealized.BuildingUnitPersistentLocalId);
-                    buildingUnitVersion.Should().NotBeNull();
+                    var buildingUnitLatestItem =
+                        await context.BuildingUnitLatestItems.FindAsync(buildingUnitWasNotRealized.BuildingUnitPersistentLocalId);
+                    buildingUnitLatestItem.Should().NotBeNull();
 
-                    buildingUnitVersion!.Status.Should().Be(BuildingUnitStatus.NotRealized.Status);
-                    buildingUnitVersion.OsloStatus.Should().Be(BuildingUnitStatus.NotRealized.Map());
-                    buildingUnitVersion.VersionTimestamp.Should().Be(buildingUnitWasNotRealized.Provenance.Timestamp);
+                    buildingUnitLatestItem!.OsloStatus.Should().Be(BuildingUnitStatus.NotRealized.Map());
+                    buildingUnitLatestItem.Status.Should().Be("NotRealized");
+                    buildingUnitLatestItem.VersionTimestamp.Should().Be(buildingUnitWasNotRealized.Provenance.Timestamp);
                 });
         }
 
@@ -1526,47 +1454,42 @@
                     new Envelope<BuildingUnitWasTransferred>(new Envelope(buildingUnitWasTransferred, buildingUnitWasTransferredMetadata)))
                 .Then(async context =>
                 {
-                    var buildingUnitVersion =
-                        await context.BuildingUnitVersions.FindAsync(position + 1, buildingUnitWasTransferred.BuildingUnitPersistentLocalId);
-                    buildingUnitVersion.Should().NotBeNull();
+                    var buildingUnitLatestItem =
+                        await context.BuildingUnitLatestItems.FindAsync(buildingUnitWasTransferred.BuildingUnitPersistentLocalId);
+                    buildingUnitLatestItem.Should().NotBeNull();
 
-                    buildingUnitVersion!.BuildingPersistentLocalId.Should().Be(buildingUnitWasTransferred.BuildingPersistentLocalId);
-                    buildingUnitVersion.Status.Should().Be(BuildingUnitStatus.Parse(buildingUnitWasTransferred.Status).Status);
-                    buildingUnitVersion.OsloStatus.Should().Be(BuildingUnitStatus.Parse(buildingUnitWasTransferred.Status).Map());
-                    buildingUnitVersion.Function.Should().Be(BuildingUnitFunction.Parse(buildingUnitWasTransferred.Function).Function);
-                    buildingUnitVersion.OsloFunction.Should().Be(BuildingUnitFunction.Parse(buildingUnitWasTransferred.Function).Map());
-                    buildingUnitVersion.GeometryMethod.Should().Be(BuildingUnitPositionGeometryMethod.Parse(buildingUnitWasTransferred.GeometryMethod).GeometryMethod);
-                    buildingUnitVersion.OsloGeometryMethod.Should().Be(BuildingUnitPositionGeometryMethod.Parse(buildingUnitWasTransferred.GeometryMethod).Map());
-                    buildingUnitVersion.Geometry.Should().BeEquivalentTo(
+                    buildingUnitLatestItem!.BuildingPersistentLocalId.Should().Be(buildingUnitWasTransferred.BuildingPersistentLocalId);
+                    buildingUnitLatestItem.OsloStatus.Should().Be(
+                        BuildingUnitStatus.Parse(buildingUnitWasTransferred.Status).Map());
+                    buildingUnitLatestItem.Status.Should().Be(buildingUnitWasTransferred.Status);
+                    buildingUnitLatestItem.OsloFunction.Should().Be(
+                        BuildingUnitFunction.Parse(buildingUnitWasTransferred.Function).Map());
+                    buildingUnitLatestItem.Function.Should().Be(buildingUnitWasTransferred.Function);
+                    buildingUnitLatestItem.OsloGeometryMethod.Should().Be(BuildingUnitPositionGeometryMethod.Parse(buildingUnitWasTransferred.GeometryMethod).Map());
+                    buildingUnitLatestItem.GeometryMethod.Should().Be(buildingUnitWasTransferred.GeometryMethod);
+                    buildingUnitLatestItem.Geometry.Should().BeEquivalentTo(
                         _wkbReader.Read(buildingUnitWasTransferred.ExtendedWkbGeometry.ToByteArray()));
-                    buildingUnitVersion.HasDeviation.Should().BeFalse();
-                    buildingUnitVersion.VersionTimestamp.Should().Be(buildingUnitWasTransferred.Provenance.Timestamp);
+                    buildingUnitLatestItem.HasDeviation.Should().BeFalse();
+                    buildingUnitLatestItem.VersionTimestamp.Should().Be(buildingUnitWasTransferred.Provenance.Timestamp);
 
-                    buildingUnitVersion.Addresses.Should().HaveCount(buildingUnitWasTransferred.AddressPersistentLocalIds.Count);
+                    var buildingUnitAddresses = context.BuildingUnitAddresses
+                        .Where(x => x.BuildingUnitPersistentLocalId == buildingUnitLatestItem.BuildingUnitPersistentLocalId)
+                        .ToList();
+
+                    buildingUnitAddresses.Should().HaveCount(buildingUnitWasTransferred.AddressPersistentLocalIds.Count);
                     foreach (var addressPersistentLocalId in buildingUnitWasTransferred.AddressPersistentLocalIds)
                     {
-                        buildingUnitVersion.Addresses.SingleOrDefault(x => x.AddressPersistentLocalId == addressPersistentLocalId)
+                        buildingUnitAddresses.SingleOrDefault(x => x.AddressPersistentLocalId == addressPersistentLocalId)
                             .Should().NotBeNull();
                     }
                 });
         }
 
-        protected override BuildingUnitVersionProjections CreateProjection() =>
-            new BuildingUnitVersionProjections(
-                new OptionsWrapper<IntegrationOptions>(new IntegrationOptions
-                {
-                    BuildingNamespace = BuildingNamespace,
-                    BuildingUnitNamespace = BuildingUnitNamespace,
-                }),
-                _persistentLocalIdFinder.Object,
-                new FakeAddresses());
-    }
-
-    public class FakeAddresses : IAddresses
-    {
-        public Task<int?> GetAddressPersistentLocalId(Guid addressId)
-        {
-            return Task.FromResult(1 as int?);
-        }
+        protected override BuildingUnitLatestItemProjections CreateProjection() =>
+            new BuildingUnitLatestItemProjections(new OptionsWrapper<IntegrationOptions>(new IntegrationOptions
+            {
+                BuildingNamespace = BuildingNamespace,
+                BuildingUnitNamespace = BuildingUnitNamespace
+            }));
     }
 }
