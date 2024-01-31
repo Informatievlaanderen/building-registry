@@ -1,6 +1,5 @@
 ﻿namespace BuildingRegistry.Tests.ProjectionTests.Integration.BuildingUnit
 {
-    using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
@@ -33,12 +32,12 @@
         private readonly Fixture _fixture;
         private readonly WKBReader _wkbReader = WKBReaderFactory.Create();
         private readonly Mock<IPersistentLocalIdFinder> _persistentLocalIdFinder;
-        private readonly FakeAddresses _fakeAddresses;
+        private readonly Mock<IAddresses> _addresses;
 
         public BuildingUnitVersionProjectionsTests()
         {
             _persistentLocalIdFinder = new Mock<IPersistentLocalIdFinder>();
-            _fakeAddresses = new FakeAddresses();
+            _addresses = new Mock<IAddresses>();
 
             _fixture = new Fixture();
             _fixture.Customizations.Add(new WithUniqueInteger());
@@ -1562,17 +1561,7 @@
                     BuildingUnitNamespace = BuildingUnitNamespace,
                 }),
                 _persistentLocalIdFinder.Object,
-                _fakeAddresses);
-        }
-    }
-
-    public class FakeAddresses : IAddresses
-    {
-        public const int AddressPersistentLocalId = 1;
-
-        public Task<int?> GetAddressPersistentLocalId(Guid addressId)
-        {
-            return Task.FromResult(AddressPersistentLocalId as int?);
+                _addresses.Object);
         }
     }
 }

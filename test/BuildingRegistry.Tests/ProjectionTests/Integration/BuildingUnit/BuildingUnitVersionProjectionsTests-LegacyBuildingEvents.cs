@@ -44,6 +44,10 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.BuildingUnit
                 new [] { _fixture.Create<BuildingUnitId>() });
             ((ISetProvenance)buildingWasRemoved).SetProvenance(_fixture.Create<Provenance>());
 
+            _addresses
+                .Setup(x => x.GetAddressPersistentLocalId(buildingUnitWasAdded.AddressId))
+                .ReturnsAsync(1);
+
             var position = _fixture.Create<long>();
 
             var buildingUnitWasAddedMetadata = new Dictionary<string, object>
@@ -100,6 +104,14 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.BuildingUnit
                 .Setup(x =>
                     x.FindBuildingUnitPersistentLocalId(It.IsAny<Guid>(), buildingUnitToRetireWasAdded.BuildingUnitId, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(buildingUnitToRetirePersistentLocalId);
+
+            _addresses
+                .Setup(x => x.GetAddressPersistentLocalId(buildingUnitToNotRealizeWasAdded.AddressId))
+                .ReturnsAsync(1);
+
+            _addresses
+                .Setup(x => x.GetAddressPersistentLocalId(buildingUnitToRetireWasAdded.AddressId))
+                .ReturnsAsync(2);
 
             var position = _fixture.Create<long>();
 
@@ -168,6 +180,14 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.BuildingUnit
                     x.FindBuildingUnitPersistentLocalId(It.IsAny<Guid>(), buildingUnitToRetireWasAdded.BuildingUnitId, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(buildingUnitToRetirePersistentLocalId);
 
+            _addresses
+                .Setup(x => x.GetAddressPersistentLocalId(buildingUnitToNotRealizeWasAdded.AddressId))
+                .ReturnsAsync(1);
+
+            _addresses
+                .Setup(x => x.GetAddressPersistentLocalId(buildingUnitToRetireWasAdded.AddressId))
+                .ReturnsAsync(2);
+
             var position = _fixture.Create<long>();
 
             var buildingUnitWasAddedMetadata = new Dictionary<string, object>
@@ -234,6 +254,14 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.BuildingUnit
                 .Setup(x =>
                     x.FindBuildingUnitPersistentLocalId(It.IsAny<Guid>(), buildingUnitToRetireWasAdded.BuildingUnitId, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(buildingUnitToRetirePersistentLocalId);
+
+            _addresses
+                .Setup(x => x.GetAddressPersistentLocalId(buildingUnitToNotRealizeWasAdded.AddressId))
+                .ReturnsAsync(1);
+
+            _addresses
+                .Setup(x => x.GetAddressPersistentLocalId(buildingUnitToRetireWasAdded.AddressId))
+                .ReturnsAsync(2);
 
             var position = _fixture.Create<long>();
 
@@ -302,6 +330,14 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.BuildingUnit
                     x.FindBuildingUnitPersistentLocalId(It.IsAny<Guid>(), buildingUnitToRetireWasAdded.BuildingUnitId, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(buildingUnitToRetirePersistentLocalId);
 
+            _addresses
+                .Setup(x => x.GetAddressPersistentLocalId(buildingUnitToNotRealizeWasAdded.AddressId))
+                .ReturnsAsync(1);
+
+            _addresses
+                .Setup(x => x.GetAddressPersistentLocalId(buildingUnitToRetireWasAdded.AddressId))
+                .ReturnsAsync(2);
+
             var position = _fixture.Create<long>();
 
             var buildingUnitWasAddedMetadata = new Dictionary<string, object>
@@ -358,6 +394,10 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.BuildingUnit
             var buildingUnitPositionWasAppointedByAdministrator = _fixture.Create<BuildingUnitPositionWasAppointedByAdministrator>();
             var buildingGeometryWasRemoved = _fixture.Create<BuildingGeometryWasRemoved>();
 
+            _addresses
+                .Setup(x => x.GetAddressPersistentLocalId(buildingUnitWasAdded.AddressId))
+                .ReturnsAsync(1);
+
             var position = _fixture.Create<long>();
 
             var buildingUnitWasAddedMetadata = new Dictionary<string, object>
@@ -410,6 +450,10 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.BuildingUnit
             var buildingUnitWasAdded = _fixture.Create<BuildingUnitWasAdded>();
             var buildingBecameComplete = _fixture.Create<BuildingBecameComplete>();
 
+            _addresses
+                .Setup(x => x.GetAddressPersistentLocalId(buildingUnitWasAdded.AddressId))
+                .ReturnsAsync(1);
+
             var position = _fixture.Create<long>();
 
             var buildingUnitWasAddedMetadata = new Dictionary<string, object>
@@ -453,6 +497,10 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.BuildingUnit
             var buildingUnitWasAdded = _fixture.Create<BuildingUnitWasAdded>();
             var buildingBecameIncomplete = _fixture.Create<BuildingBecameIncomplete>();
 
+            _addresses
+                .Setup(x => x.GetAddressPersistentLocalId(buildingUnitWasAdded.AddressId))
+                .ReturnsAsync(1);
+
             var position = _fixture.Create<long>();
 
             var buildingUnitWasAddedMetadata = new Dictionary<string, object>
@@ -495,6 +543,10 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.BuildingUnit
 
             var buildingUnitWasAdded = _fixture.Create<BuildingUnitWasAdded>();
             var buildingPersistentLocalIdWasAssigned = _fixture.Create<BuildingPersistentLocalIdWasAssigned>();
+
+            _addresses
+                .Setup(x => x.GetAddressPersistentLocalId(buildingUnitWasAdded.AddressId))
+                .ReturnsAsync(1);
 
             var position = _fixture.Create<long>();
 
