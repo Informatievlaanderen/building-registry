@@ -2,9 +2,7 @@
 #pragma warning disable CS0618 // Type or member is obsolete
 namespace BuildingRegistry.Tests.ProjectionTests.Integration.BuildingUnit
 {
-    using System;
     using System.Collections.Generic;
-    using System.Threading;
     using System.Threading.Tasks;
     using AutoFixture;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
@@ -12,7 +10,6 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.BuildingUnit
     using BuildingRegistry.Building;
     using BuildingRegistry.Legacy.Events;
     using FluentAssertions;
-    using Moq;
     using Projections.Integration.Converters;
     using Tests.Legacy.Autofixture;
     using Xunit;
@@ -28,15 +25,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.BuildingUnit
             _fixture.Customize(new WithFixedBuildingId());
             _fixture.Customize(new WithFixedBuildingUnitIdFromHouseNumber());
 
-            _persistentLocalIdFinder
-                .Setup(x => x.FindBuildingPersistentLocalId(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync((int) _fixture.Create<BuildingPersistentLocalId>());
-
             var buildingUnitPersistentLocalId = (int) _fixture.Create<BuildingUnitPersistentLocalId>();
-
-            _persistentLocalIdFinder
-                .Setup(x => x.FindBuildingUnitPersistentLocalId(It.IsAny<Guid>(), It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(buildingUnitPersistentLocalId);
 
             var buildingUnitWasAdded = _fixture.Create<BuildingUnitWasAdded>();
             var buildingWasRemoved =  new BuildingWasRemoved(
@@ -44,9 +33,9 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.BuildingUnit
                 new [] { _fixture.Create<BuildingUnitId>() });
             ((ISetProvenance)buildingWasRemoved).SetProvenance(_fixture.Create<Provenance>());
 
-            _addresses
-                .Setup(x => x.GetAddressPersistentLocalId(buildingUnitWasAdded.AddressId))
-                .ReturnsAsync(1);
+            AddBuildingPersistentLocalId();
+            AddBuildingUnitPersistentLocalId(buildingUnitPersistentLocalId);
+            AddAddressPersistentLocalId(buildingUnitWasAdded.AddressId);
 
             var position = _fixture.Create<long>();
 
@@ -79,9 +68,8 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.BuildingUnit
         {
             _fixture.Customize(new WithFixedBuildingId());
 
-            _persistentLocalIdFinder
-                .Setup(x => x.FindBuildingPersistentLocalId(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync((int) _fixture.Create<BuildingPersistentLocalId>());
+            var buildingUnitToNotRealizePersistentLocalId = (int) _fixture.Create<BuildingUnitPersistentLocalId>();
+            var buildingUnitToRetirePersistentLocalId = (int) _fixture.Create<BuildingUnitPersistentLocalId>();
 
             var buildingUnitToNotRealizeWasAdded = _fixture.Create<BuildingUnitWasAdded>();
             var buildingUnitToRetireWasAdded = _fixture.Create<BuildingUnitWasAdded>();
@@ -91,27 +79,11 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.BuildingUnit
                 new [] { new BuildingUnitId(buildingUnitToNotRealizeWasAdded.BuildingUnitId) });
             ((ISetProvenance)buildingWasRetired).SetProvenance(_fixture.Create<Provenance>());
 
-            var buildingUnitToNotRealizePersistentLocalId = (int) _fixture.Create<BuildingUnitPersistentLocalId>();
-
-            _persistentLocalIdFinder
-                .Setup(x =>
-                    x.FindBuildingUnitPersistentLocalId(It.IsAny<Guid>(), buildingUnitToNotRealizeWasAdded.BuildingUnitId, It.IsAny<CancellationToken>()))
-                .ReturnsAsync(buildingUnitToNotRealizePersistentLocalId);
-
-            var buildingUnitToRetirePersistentLocalId = (int) _fixture.Create<BuildingUnitPersistentLocalId>();
-
-            _persistentLocalIdFinder
-                .Setup(x =>
-                    x.FindBuildingUnitPersistentLocalId(It.IsAny<Guid>(), buildingUnitToRetireWasAdded.BuildingUnitId, It.IsAny<CancellationToken>()))
-                .ReturnsAsync(buildingUnitToRetirePersistentLocalId);
-
-            _addresses
-                .Setup(x => x.GetAddressPersistentLocalId(buildingUnitToNotRealizeWasAdded.AddressId))
-                .ReturnsAsync(1);
-
-            _addresses
-                .Setup(x => x.GetAddressPersistentLocalId(buildingUnitToRetireWasAdded.AddressId))
-                .ReturnsAsync(2);
+            AddBuildingPersistentLocalId();
+            AddBuildingUnitPersistentLocalId(buildingUnitToNotRealizeWasAdded.BuildingUnitId, buildingUnitToNotRealizePersistentLocalId);
+            AddBuildingUnitPersistentLocalId(buildingUnitToRetireWasAdded.BuildingUnitId, buildingUnitToRetirePersistentLocalId);
+            AddAddressPersistentLocalId(buildingUnitToNotRealizeWasAdded.AddressId, 1);
+            AddAddressPersistentLocalId(buildingUnitToRetireWasAdded.AddressId, 2);
 
             var position = _fixture.Create<long>();
 
@@ -154,9 +126,8 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.BuildingUnit
         {
             _fixture.Customize(new WithFixedBuildingId());
 
-            _persistentLocalIdFinder
-                .Setup(x => x.FindBuildingPersistentLocalId(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync((int) _fixture.Create<BuildingPersistentLocalId>());
+            var buildingUnitToNotRealizePersistentLocalId = (int) _fixture.Create<BuildingUnitPersistentLocalId>();
+            var buildingUnitToRetirePersistentLocalId = (int) _fixture.Create<BuildingUnitPersistentLocalId>();
 
             var buildingUnitToNotRealizeWasAdded = _fixture.Create<BuildingUnitWasAdded>();
             var buildingUnitToRetireWasAdded = _fixture.Create<BuildingUnitWasAdded>();
@@ -166,27 +137,11 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.BuildingUnit
                 new [] { new BuildingUnitId(buildingUnitToNotRealizeWasAdded.BuildingUnitId) });
             ((ISetProvenance)buildingWasCorrectedToRetired).SetProvenance(_fixture.Create<Provenance>());
 
-            var buildingUnitToNotRealizePersistentLocalId = (int) _fixture.Create<BuildingUnitPersistentLocalId>();
-
-            _persistentLocalIdFinder
-                .Setup(x =>
-                    x.FindBuildingUnitPersistentLocalId(It.IsAny<Guid>(), buildingUnitToNotRealizeWasAdded.BuildingUnitId, It.IsAny<CancellationToken>()))
-                .ReturnsAsync(buildingUnitToNotRealizePersistentLocalId);
-
-            var buildingUnitToRetirePersistentLocalId = (int) _fixture.Create<BuildingUnitPersistentLocalId>();
-
-            _persistentLocalIdFinder
-                .Setup(x =>
-                    x.FindBuildingUnitPersistentLocalId(It.IsAny<Guid>(), buildingUnitToRetireWasAdded.BuildingUnitId, It.IsAny<CancellationToken>()))
-                .ReturnsAsync(buildingUnitToRetirePersistentLocalId);
-
-            _addresses
-                .Setup(x => x.GetAddressPersistentLocalId(buildingUnitToNotRealizeWasAdded.AddressId))
-                .ReturnsAsync(1);
-
-            _addresses
-                .Setup(x => x.GetAddressPersistentLocalId(buildingUnitToRetireWasAdded.AddressId))
-                .ReturnsAsync(2);
+            AddBuildingPersistentLocalId();
+            AddBuildingUnitPersistentLocalId(buildingUnitToNotRealizeWasAdded.BuildingUnitId, buildingUnitToNotRealizePersistentLocalId);
+            AddBuildingUnitPersistentLocalId(buildingUnitToRetireWasAdded.BuildingUnitId, buildingUnitToRetirePersistentLocalId);
+            AddAddressPersistentLocalId(buildingUnitToNotRealizeWasAdded.AddressId, 1);
+            AddAddressPersistentLocalId(buildingUnitToRetireWasAdded.AddressId, 2);
 
             var position = _fixture.Create<long>();
 
@@ -229,9 +184,8 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.BuildingUnit
         {
             _fixture.Customize(new WithFixedBuildingId());
 
-            _persistentLocalIdFinder
-                .Setup(x => x.FindBuildingPersistentLocalId(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync((int) _fixture.Create<BuildingPersistentLocalId>());
+            var buildingUnitToNotRealizePersistentLocalId = (int) _fixture.Create<BuildingUnitPersistentLocalId>();
+            var buildingUnitToRetirePersistentLocalId = (int) _fixture.Create<BuildingUnitPersistentLocalId>();
 
             var buildingUnitToNotRealizeWasAdded = _fixture.Create<BuildingUnitWasAdded>();
             var buildingUnitToRetireWasAdded = _fixture.Create<BuildingUnitWasAdded>();
@@ -241,27 +195,11 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.BuildingUnit
                 new [] { new BuildingUnitId(buildingUnitToNotRealizeWasAdded.BuildingUnitId) });
             ((ISetProvenance)buildingWasNotRealized).SetProvenance(_fixture.Create<Provenance>());
 
-            var buildingUnitToNotRealizePersistentLocalId = (int) _fixture.Create<BuildingUnitPersistentLocalId>();
-
-            _persistentLocalIdFinder
-                .Setup(x =>
-                    x.FindBuildingUnitPersistentLocalId(It.IsAny<Guid>(), buildingUnitToNotRealizeWasAdded.BuildingUnitId, It.IsAny<CancellationToken>()))
-                .ReturnsAsync(buildingUnitToNotRealizePersistentLocalId);
-
-            var buildingUnitToRetirePersistentLocalId = (int) _fixture.Create<BuildingUnitPersistentLocalId>();
-
-            _persistentLocalIdFinder
-                .Setup(x =>
-                    x.FindBuildingUnitPersistentLocalId(It.IsAny<Guid>(), buildingUnitToRetireWasAdded.BuildingUnitId, It.IsAny<CancellationToken>()))
-                .ReturnsAsync(buildingUnitToRetirePersistentLocalId);
-
-            _addresses
-                .Setup(x => x.GetAddressPersistentLocalId(buildingUnitToNotRealizeWasAdded.AddressId))
-                .ReturnsAsync(1);
-
-            _addresses
-                .Setup(x => x.GetAddressPersistentLocalId(buildingUnitToRetireWasAdded.AddressId))
-                .ReturnsAsync(2);
+            AddBuildingPersistentLocalId();
+            AddBuildingUnitPersistentLocalId(buildingUnitToNotRealizeWasAdded.BuildingUnitId, buildingUnitToNotRealizePersistentLocalId);
+            AddBuildingUnitPersistentLocalId(buildingUnitToRetireWasAdded.BuildingUnitId, buildingUnitToRetirePersistentLocalId);
+            AddAddressPersistentLocalId(buildingUnitToNotRealizeWasAdded.AddressId, 1);
+            AddAddressPersistentLocalId(buildingUnitToRetireWasAdded.AddressId, 2);
 
             var position = _fixture.Create<long>();
 
@@ -304,9 +242,8 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.BuildingUnit
         {
             _fixture.Customize(new WithFixedBuildingId());
 
-            _persistentLocalIdFinder
-                .Setup(x => x.FindBuildingPersistentLocalId(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync((int) _fixture.Create<BuildingPersistentLocalId>());
+            var buildingUnitToNotRealizePersistentLocalId = (int) _fixture.Create<BuildingUnitPersistentLocalId>();
+            var buildingUnitToRetirePersistentLocalId = (int) _fixture.Create<BuildingUnitPersistentLocalId>();
 
             var buildingUnitToNotRealizeWasAdded = _fixture.Create<BuildingUnitWasAdded>();
             var buildingUnitToRetireWasAdded = _fixture.Create<BuildingUnitWasAdded>();
@@ -316,27 +253,11 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.BuildingUnit
                 new [] { new BuildingUnitId(buildingUnitToNotRealizeWasAdded.BuildingUnitId) });
             ((ISetProvenance)buildingWasCorrectedToNotRealized).SetProvenance(_fixture.Create<Provenance>());
 
-            var buildingUnitToNotRealizePersistentLocalId = (int) _fixture.Create<BuildingUnitPersistentLocalId>();
-
-            _persistentLocalIdFinder
-                .Setup(x =>
-                    x.FindBuildingUnitPersistentLocalId(It.IsAny<Guid>(), buildingUnitToNotRealizeWasAdded.BuildingUnitId, It.IsAny<CancellationToken>()))
-                .ReturnsAsync(buildingUnitToNotRealizePersistentLocalId);
-
-            var buildingUnitToRetirePersistentLocalId = (int) _fixture.Create<BuildingUnitPersistentLocalId>();
-
-            _persistentLocalIdFinder
-                .Setup(x =>
-                    x.FindBuildingUnitPersistentLocalId(It.IsAny<Guid>(), buildingUnitToRetireWasAdded.BuildingUnitId, It.IsAny<CancellationToken>()))
-                .ReturnsAsync(buildingUnitToRetirePersistentLocalId);
-
-            _addresses
-                .Setup(x => x.GetAddressPersistentLocalId(buildingUnitToNotRealizeWasAdded.AddressId))
-                .ReturnsAsync(1);
-
-            _addresses
-                .Setup(x => x.GetAddressPersistentLocalId(buildingUnitToRetireWasAdded.AddressId))
-                .ReturnsAsync(2);
+            AddBuildingPersistentLocalId();
+            AddBuildingUnitPersistentLocalId(buildingUnitToNotRealizeWasAdded.BuildingUnitId, buildingUnitToNotRealizePersistentLocalId);
+            AddBuildingUnitPersistentLocalId(buildingUnitToRetireWasAdded.BuildingUnitId, buildingUnitToRetirePersistentLocalId);
+            AddAddressPersistentLocalId(buildingUnitToNotRealizeWasAdded.AddressId, 1);
+            AddAddressPersistentLocalId(buildingUnitToRetireWasAdded.AddressId, 2);
 
             var position = _fixture.Create<long>();
 
@@ -380,23 +301,15 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.BuildingUnit
             _fixture.Customize(new WithFixedBuildingId());
             _fixture.Customize(new WithFixedBuildingUnitIdFromHouseNumber());
 
-            _persistentLocalIdFinder
-                .Setup(x => x.FindBuildingPersistentLocalId(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync((int) _fixture.Create<BuildingPersistentLocalId>());
-
             var buildingUnitPersistentLocalId = (int) _fixture.Create<BuildingUnitPersistentLocalId>();
-
-            _persistentLocalIdFinder
-                .Setup(x => x.FindBuildingUnitPersistentLocalId(It.IsAny<Guid>(), It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(buildingUnitPersistentLocalId);
 
             var buildingUnitWasAdded = _fixture.Create<BuildingUnitWasAdded>();
             var buildingUnitPositionWasAppointedByAdministrator = _fixture.Create<BuildingUnitPositionWasAppointedByAdministrator>();
             var buildingGeometryWasRemoved = _fixture.Create<BuildingGeometryWasRemoved>();
 
-            _addresses
-                .Setup(x => x.GetAddressPersistentLocalId(buildingUnitWasAdded.AddressId))
-                .ReturnsAsync(1);
+            AddBuildingPersistentLocalId();
+            AddBuildingUnitPersistentLocalId(buildingUnitPersistentLocalId);
+            AddAddressPersistentLocalId(buildingUnitWasAdded.AddressId);
 
             var position = _fixture.Create<long>();
 
@@ -437,22 +350,14 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.BuildingUnit
             _fixture.Customize(new WithFixedBuildingId());
             _fixture.Customize(new WithFixedBuildingUnitIdFromHouseNumber());
 
-            _persistentLocalIdFinder
-                .Setup(x => x.FindBuildingPersistentLocalId(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync((int) _fixture.Create<BuildingPersistentLocalId>());
-
             var buildingUnitPersistentLocalId = (int) _fixture.Create<BuildingUnitPersistentLocalId>();
-
-            _persistentLocalIdFinder
-                .Setup(x => x.FindBuildingUnitPersistentLocalId(It.IsAny<Guid>(), It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(buildingUnitPersistentLocalId);
 
             var buildingUnitWasAdded = _fixture.Create<BuildingUnitWasAdded>();
             var buildingBecameComplete = _fixture.Create<BuildingBecameComplete>();
 
-            _addresses
-                .Setup(x => x.GetAddressPersistentLocalId(buildingUnitWasAdded.AddressId))
-                .ReturnsAsync(1);
+            AddBuildingPersistentLocalId();
+            AddBuildingUnitPersistentLocalId(buildingUnitPersistentLocalId);
+            AddAddressPersistentLocalId(buildingUnitWasAdded.AddressId);
 
             var position = _fixture.Create<long>();
 
@@ -484,22 +389,14 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.BuildingUnit
             _fixture.Customize(new WithFixedBuildingId());
             _fixture.Customize(new WithFixedBuildingUnitIdFromHouseNumber());
 
-            _persistentLocalIdFinder
-                .Setup(x => x.FindBuildingPersistentLocalId(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync((int) _fixture.Create<BuildingPersistentLocalId>());
-
             var buildingUnitPersistentLocalId = (int) _fixture.Create<BuildingUnitPersistentLocalId>();
-
-            _persistentLocalIdFinder
-                .Setup(x => x.FindBuildingUnitPersistentLocalId(It.IsAny<Guid>(), It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(buildingUnitPersistentLocalId);
 
             var buildingUnitWasAdded = _fixture.Create<BuildingUnitWasAdded>();
             var buildingBecameIncomplete = _fixture.Create<BuildingBecameIncomplete>();
 
-            _addresses
-                .Setup(x => x.GetAddressPersistentLocalId(buildingUnitWasAdded.AddressId))
-                .ReturnsAsync(1);
+            AddBuildingPersistentLocalId();
+            AddBuildingUnitPersistentLocalId(buildingUnitPersistentLocalId);
+            AddAddressPersistentLocalId(buildingUnitWasAdded.AddressId);
 
             var position = _fixture.Create<long>();
 
@@ -531,22 +428,14 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.BuildingUnit
             _fixture.Customize(new WithFixedBuildingId());
             _fixture.Customize(new WithFixedBuildingUnitIdFromHouseNumber());
 
-            _persistentLocalIdFinder
-                .Setup(x => x.FindBuildingPersistentLocalId(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync((int) _fixture.Create<BuildingPersistentLocalId>());
-
             var buildingUnitPersistentLocalId = (int) _fixture.Create<BuildingUnitPersistentLocalId>();
-
-            _persistentLocalIdFinder
-                .Setup(x => x.FindBuildingUnitPersistentLocalId(It.IsAny<Guid>(), It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(buildingUnitPersistentLocalId);
 
             var buildingUnitWasAdded = _fixture.Create<BuildingUnitWasAdded>();
             var buildingPersistentLocalIdWasAssigned = _fixture.Create<BuildingPersistentLocalIdWasAssigned>();
 
-            _addresses
-                .Setup(x => x.GetAddressPersistentLocalId(buildingUnitWasAdded.AddressId))
-                .ReturnsAsync(1);
+            AddBuildingPersistentLocalId();
+            AddBuildingUnitPersistentLocalId(buildingUnitPersistentLocalId);
+            AddAddressPersistentLocalId(buildingUnitWasAdded.AddressId);
 
             var position = _fixture.Create<long>();
 
