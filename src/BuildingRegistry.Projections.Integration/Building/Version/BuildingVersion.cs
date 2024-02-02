@@ -23,7 +23,6 @@
         public string? GeometryMethod { get; set; }
         public string? OsloGeometryMethod { get; set; }
         public Geometry? Geometry { get; set; }
-        public string? NisCode { get; set; }
         public bool IsRemoved { get; set; }
 
         public string PuriId { get; set; }
@@ -74,7 +73,6 @@
                 GeometryMethod = GeometryMethod,
                 OsloGeometryMethod = OsloGeometryMethod,
                 Geometry = Geometry,
-                NisCode = NisCode,
                 IsRemoved = IsRemoved,
 
                 PuriId = PuriId,
@@ -110,7 +108,6 @@
             builder.Property(x => x.GeometryMethod).HasColumnName("geometry_method");
             builder.Property(x => x.OsloGeometryMethod).HasColumnName("oslo_geometry_method");
             builder.Property(x => x.Geometry).HasColumnName("geometry");
-            builder.Property(x => x.NisCode).HasColumnName("nis_code");
             builder.Property(x => x.IsRemoved).HasColumnName("is_removed");
             builder.Property(x => x.PuriId).HasColumnName("puri_id");
             builder.Property(x => x.Namespace).HasColumnName("namespace");
@@ -126,7 +123,6 @@
             builder.HasIndex(x => x.Status);
             builder.HasIndex(x => x.OsloStatus);
             builder.HasIndex(x => x.IsRemoved);
-            builder.HasIndex(x => x.NisCode);
             builder.HasIndex(x => x.Geometry).HasMethod("GIST");
             builder.HasIndex(BuildingVersion.VersionTimestampBackingPropertyName);
         }

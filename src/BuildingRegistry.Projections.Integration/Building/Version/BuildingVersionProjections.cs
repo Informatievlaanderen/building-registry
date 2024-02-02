@@ -26,17 +26,16 @@
                 var geometryAsBinary = message.Message.ExtendedWkbGeometry.ToByteArray();
                 var sysGeometry = wkbReader.Read(geometryAsBinary);
 
-                var nisCode = await context.FindMostIntersectingNisCodeBy(sysGeometry, ct);
-
                 var building = new BuildingVersion
                 {
                     BuildingPersistentLocalId = message.Message.BuildingPersistentLocalId,
+                    Position = message.Position,
+                    BuildingId = message.Message.BuildingId,
                     Status = BuildingStatus.Parse(message.Message.BuildingStatus).Value,
                     OsloStatus = BuildingStatus.Parse(message.Message.BuildingStatus).Map(),
                     GeometryMethod = BuildingGeometryMethod.Parse(message.Message.GeometryMethod).Value,
                     OsloGeometryMethod = BuildingGeometryMethod.Parse(message.Message.GeometryMethod).Map(),
                     Geometry = sysGeometry,
-                    NisCode = nisCode,
                     IsRemoved = message.Message.IsRemoved,
                     VersionTimestamp = message.Message.Provenance.Timestamp,
                     CreatedOnTimestamp = message.Message.Provenance.Timestamp,
@@ -54,8 +53,6 @@
                 var geometryAsBinary = message.Message.ExtendedWkbGeometry.ToByteArray();
                 var sysGeometry = wkbReader.Read(geometryAsBinary);
 
-                var nisCode = await context.FindMostIntersectingNisCodeBy(sysGeometry, ct);
-
                 var building = new BuildingVersion
                 {
                     Position = message.Position,
@@ -65,7 +62,6 @@
                     GeometryMethod = BuildingGeometryMethod.Outlined.Value,
                     OsloGeometryMethod = BuildingGeometryMethod.Outlined.Map(),
                     Geometry = sysGeometry,
-                    NisCode = nisCode,
                     IsRemoved = false,
                     VersionTimestamp = message.Message.Provenance.Timestamp,
                     CreatedOnTimestamp = message.Message.Provenance.Timestamp,
@@ -83,8 +79,6 @@
                 var geometryAsBinary = message.Message.ExtendedWkbGeometry.ToByteArray();
                 var sysGeometry = wkbReader.Read(geometryAsBinary);
 
-                var nisCode = await context.FindMostIntersectingNisCodeBy(sysGeometry, ct);
-
                 var building = new BuildingVersion
                 {
                     Position = message.Position,
@@ -94,7 +88,6 @@
                     GeometryMethod = BuildingGeometryMethod.MeasuredByGrb.Value,
                     OsloGeometryMethod = BuildingGeometryMethod.MeasuredByGrb.Map(),
                     Geometry = sysGeometry,
-                    NisCode = nisCode,
                     IsRemoved = false,
                     VersionTimestamp = message.Message.Provenance.Timestamp,
                     CreatedOnTimestamp = message.Message.Provenance.Timestamp,
@@ -112,8 +105,6 @@
                 var geometryAsBinary = message.Message.ExtendedWkbGeometryBuilding.ToByteArray();
                 var sysGeometry = wkbReader.Read(geometryAsBinary);
 
-                var nisCode = await context.FindMostIntersectingNisCodeBy(sysGeometry, ct);
-
                 await context.CreateNewBuildingVersion(
                     message.Message.BuildingPersistentLocalId,
                     message,
@@ -122,7 +113,6 @@
                         building.Geometry = sysGeometry;
                         building.GeometryMethod = BuildingGeometryMethod.Outlined.Value;
                         building.OsloGeometryMethod = BuildingGeometryMethod.Outlined.Map();
-                        building.NisCode = nisCode;
                     },
                     ct);
             });
@@ -132,8 +122,6 @@
                 var geometryAsBinary = message.Message.ExtendedWkbGeometryBuilding.ToByteArray();
                 var sysGeometry = wkbReader.Read(geometryAsBinary);
 
-                var nisCode = await context.FindMostIntersectingNisCodeBy(sysGeometry, ct);
-
                 await context.CreateNewBuildingVersion(
                     message.Message.BuildingPersistentLocalId,
                     message,
@@ -142,7 +130,6 @@
                         building.Geometry = sysGeometry;
                         building.GeometryMethod = BuildingGeometryMethod.MeasuredByGrb.Value;
                         building.OsloGeometryMethod = BuildingGeometryMethod.MeasuredByGrb.Map();
-                        building.NisCode = nisCode;
                     },
                     ct);
             });
@@ -230,8 +217,6 @@
                 var geometryAsBinary = message.Message.ExtendedWkbGeometryBuilding.ToByteArray();
                 var sysGeometry = wkbReader.Read(geometryAsBinary);
 
-                var nisCode = await context.FindMostIntersectingNisCodeBy(sysGeometry, ct);
-
                 await context.CreateNewBuildingVersion(
                     message.Message.BuildingPersistentLocalId,
                     message,
@@ -240,7 +225,6 @@
                         building.Geometry = sysGeometry;
                         building.GeometryMethod = BuildingGeometryMethod.MeasuredByGrb.Value;
                         building.OsloGeometryMethod = BuildingGeometryMethod.MeasuredByGrb.Map();
-                        building.NisCode = nisCode;
                     },
                     ct);
             });
@@ -250,8 +234,6 @@
                 var geometryAsBinary = message.Message.ExtendedWkbGeometryBuilding.ToByteArray();
                 var sysGeometry = wkbReader.Read(geometryAsBinary);
 
-                var nisCode = await context.FindMostIntersectingNisCodeBy(sysGeometry, ct);
-
                 await context.CreateNewBuildingVersion(
                     message.Message.BuildingPersistentLocalId,
                     message,
@@ -260,7 +242,6 @@
                         building.Geometry = sysGeometry;
                         building.GeometryMethod = BuildingGeometryMethod.MeasuredByGrb.Value;
                         building.OsloGeometryMethod = BuildingGeometryMethod.MeasuredByGrb.Map();
-                        building.NisCode = nisCode;
                     },
                     ct);
             });
@@ -328,8 +309,6 @@
                 var geometryAsBinary = message.Message.ExtendedWkbGeometry.ToByteArray();
                 var sysGeometry = wkbReader.Read(geometryAsBinary);
 
-                var nisCode = await context.FindMostIntersectingNisCodeBy(sysGeometry, ct);
-
                 var building = new BuildingVersion
                 {
                     Position = message.Position,
@@ -339,7 +318,6 @@
                     GeometryMethod = BuildingGeometryMethod.MeasuredByGrb.Value,
                     OsloGeometryMethod = BuildingGeometryMethod.MeasuredByGrb.Map(),
                     Geometry = sysGeometry,
-                    NisCode = nisCode,
                     IsRemoved = false,
                     VersionTimestamp = message.Message.Provenance.Timestamp,
                     CreatedOnTimestamp = message.Message.Provenance.Timestamp,

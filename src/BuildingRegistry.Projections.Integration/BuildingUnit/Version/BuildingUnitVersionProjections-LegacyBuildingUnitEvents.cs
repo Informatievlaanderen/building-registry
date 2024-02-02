@@ -25,10 +25,7 @@
                 await context.CreateNewBuildingUnitVersion(
                     message.Message.BuildingUnitId,
                     message,
-                    buildingUnit =>
-                    {
-                        buildingUnit.BuildingUnitPersistentLocalId = message.Message.PersistentLocalId;
-                    },
+                    buildingUnit => { buildingUnit.BuildingUnitPersistentLocalId = message.Message.PersistentLocalId; },
                     ct);
             });
 
@@ -198,13 +195,25 @@
 
             When<Envelope<BuildingUnitWasAddedToRetiredBuilding>>(async (context, message, ct) =>
             {
-                // await AddUnit(context, message.Message.BuildingId, message.Message.BuildingUnitId, null, message.Message.Provenance.Timestamp, false, ct);
-                // var addedUnit = await context.BuildingUnitDetails.FindAsync(message.Message.BuildingUnitId, cancellationToken: ct);
-                // var building = await context.BuildingUnitBuildings.FindAsync(message.Message.BuildingId, cancellationToken: ct);
-                //
-                // addedUnit.Status = building.BuildingRetiredStatus == BuildingStatus.NotRealized
-                //     ? BuildingUnitStatus.NotRealized
-                //     : BuildingUnitStatus.Retired;
+                var building = await context.LatestPosition(message.Message.BuildingId, ct);
+
+                if (building is null)
+                {
+                    throw new InvalidOperationException($"No building found for {message.Message.BuildingId}");
+                }
+
+                var buildingUnitStatus = building.Status == BuildingStatus.NotRealized
+                    ? BuildingUnitStatus.NotRealized
+                    : BuildingUnitStatus.Retired;
+                await context.CreateNewBuildingUnitVersion(
+                    message.Message.BuildingUnitId,
+                    message,
+                    buildingUnit =>
+                    {
+                        buildingUnit.Status = buildingUnitStatus;
+                        buildingUnit.OsloStatus = buildingUnitStatus.Map();
+                    },
+                    ct);
             });
 
             When<Envelope<BuildingUnitWasRemoved>>(async (context, message, ct) =>
@@ -275,7 +284,6 @@
                         }
                     },
                     ct);
-
             });
 
             When<Envelope<BuildingUnitWasReaddressed>>(async (context, message, ct) =>

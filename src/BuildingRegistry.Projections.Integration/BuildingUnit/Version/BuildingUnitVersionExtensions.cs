@@ -64,7 +64,7 @@
                 .AddAsync(newBuildingUnitVersion, ct);
         }
 
-        private static async Task<BuildingUnitVersion?> LatestPosition(
+        public static async Task<BuildingUnitVersion?> LatestPosition(
             this IntegrationContext context,
             Guid buildingUnitId,
             CancellationToken ct)

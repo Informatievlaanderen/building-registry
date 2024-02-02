@@ -731,7 +731,6 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
                     buildingVersion.Geometry.Should().BeNull();
                     buildingVersion.GeometryMethod.Should().BeNull();
                     buildingVersion.OsloGeometryMethod.Should().BeNull();
-                    buildingVersion.NisCode.Should().BeNull();
                     buildingVersion.VersionTimestamp.Should().Be(buildingGeometryWasRemoved.Provenance.Timestamp);
                 });
         }
