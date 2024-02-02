@@ -1,6 +1,8 @@
 ﻿namespace BuildingRegistry.Projections.Integration.Building.Version
 {
     using System;
+    using System.Collections.ObjectModel;
+    using System.Linq;
     using Be.Vlaanderen.Basisregisters.GrAr.Common;
     using Be.Vlaanderen.Basisregisters.Utilities;
     using BuildingRegistry.Infrastructure;
@@ -13,6 +15,7 @@
     {
         public const string VersionTimestampBackingPropertyName = nameof(VersionTimestampAsDateTimeOffset);
         public const string CreatedOnTimestampBackingPropertyName = nameof(CreatedOnTimestampAsDateTimeOffset);
+        public const string LastChangedOnTimeStampBackingPropertyName = nameof(LastChangedOnAsDateTimeOffset);
 
         public long Position { get; set; }
 
@@ -54,14 +57,34 @@
             }
         }
 
+        public string LastChangedOnAsString { get; set; }
+        private DateTimeOffset LastChangedOnAsDateTimeOffset { get; set; }
+
+        public Instant LastChangedOnTimestamp
+        {
+            get => Instant.FromDateTimeOffset(LastChangedOnAsDateTimeOffset);
+            set
+            {
+                LastChangedOnAsDateTimeOffset = value.ToDateTimeOffset();
+                LastChangedOnAsString = new Rfc3339SerializableDateTimeOffset(value.ToBelgianDateTimeOffset()).ToString();
+            }
+        }
+
+        public Collection<BuildingUnitVersion> BuildingUnits { get; set; }
+
         public BuildingVersion()
-        { }
+        {
+            BuildingUnits = new Collection<BuildingUnitVersion>();
+        }
 
         public BuildingVersion CloneAndApplyEventInfo(
             long newPosition,
             Instant lastChangedOn,
             Action<BuildingVersion> editFunc)
         {
+            var buildingUnits =
+                BuildingUnits.Select(x => x.CloneAndApplyEventInfo(newPosition));
+
             var newItem = new BuildingVersion
             {
                 Position = newPosition,
@@ -78,8 +101,11 @@
                 PuriId = PuriId,
                 Namespace = Namespace,
 
-                VersionTimestamp = lastChangedOn,
-                CreatedOnTimestamp = CreatedOnTimestamp
+                VersionTimestamp = VersionTimestamp,
+                CreatedOnTimestamp = CreatedOnTimestamp,
+                LastChangedOnTimestamp = lastChangedOn,
+
+                BuildingUnits = new Collection<BuildingUnitVersion>(buildingUnits.ToList()),
             };
 
             editFunc(newItem);
@@ -115,9 +141,17 @@
             builder.Property(BuildingVersion.VersionTimestampBackingPropertyName).HasColumnName("version_timestamp");
             builder.Property(x => x.CreatedOnAsString).HasColumnName("created_on_as_string");
             builder.Property(BuildingVersion.CreatedOnTimestampBackingPropertyName).HasColumnName("created_on_timestamp");
+            builder.Property(x => x.LastChangedOnAsString).HasColumnName("last_changed_on_as_string");
+            builder.Property(BuildingVersion.LastChangedOnTimeStampBackingPropertyName).HasColumnName("last_changed_on_timestamp");
+
+            builder.HasMany(x => x.BuildingUnits)
+                .WithOne()
+                .HasForeignKey(x => x.Position)
+                .IsRequired();
 
             builder.Ignore(x => x.VersionTimestamp);
             builder.Ignore(x => x.CreatedOnTimestamp);
+            builder.Ignore(x => x.LastChangedOnTimestamp);
 
             builder.HasIndex(x => x.BuildingPersistentLocalId);
             builder.HasIndex(x => x.Status);

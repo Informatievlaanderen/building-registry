@@ -1,6 +1,8 @@
-﻿namespace BuildingRegistry.Projections.Integration.Building.Version
+﻿#pragma warning disable CS0618 // Type or member is obsolete
+namespace BuildingRegistry.Projections.Integration.Building.Version
 {
     using System;
+    using System.Linq;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore;
     using Be.Vlaanderen.Basisregisters.Utilities.HexByteConvertor;
     using BuildingRegistry.Building;
@@ -19,7 +21,7 @@
             When<Envelope<BuildingWasRegistered>>(async (context, message, ct) =>
             {
                 var buildingPersistentLocalId = await persistentLocalIdFinder.FindBuildingPersistentLocalId(
-                    message.Message.BuildingId, ct);
+                    message.Message.BuildingId);
 
                 if (buildingPersistentLocalId is null)
                 {
@@ -33,6 +35,7 @@
                     BuildingId = message.Message.BuildingId,
                     VersionTimestamp = message.Message.Provenance.Timestamp,
                     CreatedOnTimestamp = message.Message.Provenance.Timestamp,
+                    LastChangedOnTimestamp = message.Message.Provenance.Timestamp,
                     Namespace = options.BuildingNamespace,
                     PuriId = $"{options.BuildingNamespace}/{buildingPersistentLocalId}"
                 };
@@ -49,7 +52,14 @@
                     message,
                     building =>
                     {
+                        foreach (var buildingUnitVersion in building.BuildingUnits)
+                        {
+                            buildingUnitVersion.BuildingPersistentLocalId = message.Message.PersistentLocalId;
+                            buildingUnitVersion.VersionTimestamp = message.Message.Provenance.Timestamp;
+                        }
+
                         building.BuildingPersistentLocalId = message.Message.PersistentLocalId;
+                        building.VersionTimestamp = message.Message.Provenance.Timestamp;
                     },
                     ct);
             });
@@ -61,32 +71,20 @@
                     message,
                     building =>
                     {
+                        foreach (var buildingUnitId in message.Message.BuildingUnitIds)
+                        {
+                            var buildingUnitVersion = building.BuildingUnits.Single(x => x.BuildingUnitId == buildingUnitId);
+
+                            buildingUnitVersion.IsRemoved = true;
+                            buildingUnitVersion.Addresses.Clear();
+                            buildingUnitVersion.VersionTimestamp = message.Message.Provenance.Timestamp;
+                        }
+
                         building.IsRemoved = true;
+                        building.VersionTimestamp = message.Message.Provenance.Timestamp;
                     },
                     ct);
             });
-
-            #region Complete/Incomplete
-
-            When<Envelope<BuildingBecameComplete>>(async (context, message, ct) =>
-            {
-                await context.CreateNewBuildingVersion(
-                    message.Message.BuildingId,
-                    message,
-                    _ => { },
-                    ct);
-            });
-
-            When<Envelope<BuildingBecameIncomplete>>(async (context, message, ct) =>
-            {
-                await context.CreateNewBuildingVersion(
-                    message.Message.BuildingId,
-                    message,
-                    _ => { },
-                    ct);
-            });
-
-            #endregion
 
             #region Status
 
@@ -99,6 +97,7 @@
                     {
                         building.Status = BuildingStatus.UnderConstruction.Value;
                         building.OsloStatus = BuildingStatus.UnderConstruction.Map();
+                        building.VersionTimestamp = message.Message.Provenance.Timestamp;
                     },
                     ct);
             });
@@ -110,8 +109,29 @@
                     message,
                     building =>
                     {
+                        foreach (var buildingUnitId in message.Message.BuildingUnitIdsToNotRealize)
+                        {
+                            var buildingUnit = building.BuildingUnits.Single(x => x.BuildingUnitId == buildingUnitId);
+
+                            buildingUnit.Status = BuildingUnitStatus.NotRealized.Status;
+                            buildingUnit.OsloStatus = BuildingUnitStatus.NotRealized.Map();
+                            buildingUnit.Addresses.Clear();
+                            buildingUnit.VersionTimestamp = message.Message.Provenance.Timestamp;
+                        }
+
+                        foreach (var buildingUnitId in message.Message.BuildingUnitIdsToRetire)
+                        {
+                            var buildingUnit = building.BuildingUnits.Single(x => x.BuildingUnitId == buildingUnitId);
+
+                            buildingUnit.Status = BuildingUnitStatus.Retired.Status;
+                            buildingUnit.OsloStatus = BuildingUnitStatus.Retired.Map();
+                            buildingUnit.Addresses.Clear();
+                            buildingUnit.VersionTimestamp = message.Message.Provenance.Timestamp;
+                        }
+
                         building.Status = BuildingStatus.NotRealized.Value;
                         building.OsloStatus = BuildingStatus.NotRealized.Map();
+                        building.VersionTimestamp = message.Message.Provenance.Timestamp;
                     },
                     ct);
             });
@@ -125,6 +145,7 @@
                     {
                         building.Status = BuildingStatus.Planned.Value;
                         building.OsloStatus = BuildingStatus.Planned.Map();
+                        building.VersionTimestamp = message.Message.Provenance.Timestamp;
                     },
                     ct);
             });
@@ -138,6 +159,7 @@
                     {
                         building.Status = BuildingStatus.Realized.Value;
                         building.OsloStatus = BuildingStatus.Realized.Map();
+                        building.VersionTimestamp = message.Message.Provenance.Timestamp;
                     },
                     ct);
             });
@@ -149,8 +171,29 @@
                     message,
                     building =>
                     {
+                        foreach (var buildingUnitId in message.Message.BuildingUnitIdsToNotRealize)
+                        {
+                            var buildingUnit = building.BuildingUnits.Single(x => x.BuildingUnitId == buildingUnitId);
+
+                            buildingUnit.Status = BuildingUnitStatus.NotRealized.Status;
+                            buildingUnit.OsloStatus = BuildingUnitStatus.NotRealized.Map();
+                            buildingUnit.Addresses.Clear();
+                            buildingUnit.VersionTimestamp = message.Message.Provenance.Timestamp;
+                        }
+
+                        foreach (var buildingUnitId in message.Message.BuildingUnitIdsToRetire)
+                        {
+                            var buildingUnit = building.BuildingUnits.Single(x => x.BuildingUnitId == buildingUnitId);
+
+                            buildingUnit.Status = BuildingUnitStatus.Retired.Status;
+                            buildingUnit.OsloStatus = BuildingUnitStatus.Retired.Map();
+                            buildingUnit.Addresses.Clear();
+                            buildingUnit.VersionTimestamp = message.Message.Provenance.Timestamp;
+                        }
+
                         building.Status = BuildingStatus.Retired.Value;
                         building.OsloStatus = BuildingStatus.Retired.Map();
+                        building.VersionTimestamp = message.Message.Provenance.Timestamp;
                     },
                     ct);
             });
@@ -162,8 +205,29 @@
                     message,
                     building =>
                     {
+                        foreach (var buildingUnitId in message.Message.BuildingUnitIdsToNotRealize)
+                        {
+                            var buildingUnit = building.BuildingUnits.Single(x => x.BuildingUnitId == buildingUnitId);
+
+                            buildingUnit.Status = BuildingUnitStatus.NotRealized.Status;
+                            buildingUnit.OsloStatus = BuildingUnitStatus.NotRealized.Map();
+                            buildingUnit.Addresses.Clear();
+                            buildingUnit.VersionTimestamp = message.Message.Provenance.Timestamp;
+                        }
+
+                        foreach (var buildingUnitId in message.Message.BuildingUnitIdsToRetire)
+                        {
+                            var buildingUnit = building.BuildingUnits.Single(x => x.BuildingUnitId == buildingUnitId);
+
+                            buildingUnit.Status = BuildingUnitStatus.Retired.Status;
+                            buildingUnit.OsloStatus = BuildingUnitStatus.Retired.Map();
+                            buildingUnit.Addresses.Clear();
+                            buildingUnit.VersionTimestamp = message.Message.Provenance.Timestamp;
+                        }
+
                         building.Status = BuildingStatus.NotRealized.Value;
                         building.OsloStatus = BuildingStatus.NotRealized.Map();
+                        building.VersionTimestamp = message.Message.Provenance.Timestamp;
                     },
                     ct);
             });
@@ -177,6 +241,7 @@
                     {
                         building.Status = BuildingStatus.Planned.Value;
                         building.OsloStatus = BuildingStatus.Planned.Map();
+                        building.VersionTimestamp = message.Message.Provenance.Timestamp;
                     },
                     ct);
             });
@@ -188,8 +253,29 @@
                     message,
                     building =>
                     {
+                        foreach (var buildingUnitId in message.Message.BuildingUnitIdsToNotRealize)
+                        {
+                            var buildingUnit = building.BuildingUnits.Single(x => x.BuildingUnitId == buildingUnitId);
+
+                            buildingUnit.Status = BuildingUnitStatus.NotRealized.Status;
+                            buildingUnit.OsloStatus = BuildingUnitStatus.NotRealized.Map();
+                            buildingUnit.Addresses.Clear();
+                            buildingUnit.VersionTimestamp = message.Message.Provenance.Timestamp;
+                        }
+
+                        foreach (var buildingUnitId in message.Message.BuildingUnitIdsToRetire)
+                        {
+                            var buildingUnit = building.BuildingUnits.Single(x => x.BuildingUnitId == buildingUnitId);
+
+                            buildingUnit.Status = BuildingUnitStatus.Retired.Status;
+                            buildingUnit.OsloStatus = BuildingUnitStatus.Retired.Map();
+                            buildingUnit.Addresses.Clear();
+                            buildingUnit.VersionTimestamp = message.Message.Provenance.Timestamp;
+                        }
+
                         building.Status = BuildingStatus.Retired.Value;
                         building.OsloStatus = BuildingStatus.Retired.Map();
+                        building.VersionTimestamp = message.Message.Provenance.Timestamp;
                     },
                     ct);
             });
@@ -203,6 +289,7 @@
                     {
                         building.Status = BuildingStatus.Realized.Value;
                         building.OsloStatus = BuildingStatus.Realized.Map();
+                        building.VersionTimestamp = message.Message.Provenance.Timestamp;
                     },
                     ct);
             });
@@ -216,6 +303,7 @@
                     {
                         building.Status = BuildingStatus.UnderConstruction.Value;
                         building.OsloStatus = BuildingStatus.UnderConstruction.Map();
+                        building.VersionTimestamp = message.Message.Provenance.Timestamp;
                     },
                     ct);
             });
@@ -229,6 +317,7 @@
                     {
                         building.Status = null;
                         building.OsloStatus = null;
+                        building.VersionTimestamp = message.Message.Provenance.Timestamp;
                     },
                     ct);
             });
@@ -242,6 +331,7 @@
                     {
                         building.Status = null;
                         building.OsloStatus = null;
+                        building.VersionTimestamp = message.Message.Provenance.Timestamp;
                     },
                     ct);
             });
@@ -257,9 +347,18 @@
                     message,
                     building =>
                     {
+                        foreach (var buildingUnitVersion in building.BuildingUnits)
+                        {
+                            buildingUnitVersion.Geometry = null;
+                            buildingUnitVersion.GeometryMethod = null;
+                            buildingUnitVersion.OsloGeometryMethod = null;
+                            buildingUnitVersion.VersionTimestamp = message.Message.Provenance.Timestamp;
+                        }
+
                         building.Geometry = null;
                         building.GeometryMethod = null;
                         building.OsloGeometryMethod = null;
+                        building.VersionTimestamp = message.Message.Provenance.Timestamp;
                     },
                     ct);
             });
@@ -277,6 +376,7 @@
                         building.Geometry = sysGeometry;
                         building.GeometryMethod = BuildingGeometryMethod.MeasuredByGrb.Value;
                         building.OsloGeometryMethod = BuildingGeometryMethod.MeasuredByGrb.Map();
+                        building.VersionTimestamp = message.Message.Provenance.Timestamp;
                     },
                     ct);
             });
@@ -294,6 +394,7 @@
                         building.Geometry = sysGeometry;
                         building.GeometryMethod = BuildingGeometryMethod.Outlined.Value;
                         building.OsloGeometryMethod = BuildingGeometryMethod.Outlined.Map();
+                        building.VersionTimestamp = message.Message.Provenance.Timestamp;
                     },
                     ct);
             });
@@ -311,6 +412,7 @@
                         building.Geometry = sysGeometry;
                         building.GeometryMethod = BuildingGeometryMethod.MeasuredByGrb.Value;
                         building.OsloGeometryMethod = BuildingGeometryMethod.MeasuredByGrb.Map();
+                        building.VersionTimestamp = message.Message.Provenance.Timestamp;
                     },
                     ct);
             });
@@ -328,6 +430,7 @@
                         building.Geometry = sysGeometry;
                         building.GeometryMethod = BuildingGeometryMethod.Outlined.Value;
                         building.OsloGeometryMethod = BuildingGeometryMethod.Outlined.Map();
+                        building.VersionTimestamp = message.Message.Provenance.Timestamp;
                     },
                     ct);
             });

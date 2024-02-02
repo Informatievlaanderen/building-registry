@@ -1,15 +1,14 @@
 ﻿namespace BuildingRegistry.Projections.Integration
 {
     using System;
-    using System.Threading;
     using System.Threading.Tasks;
     using Dapper;
     using Microsoft.Data.SqlClient;
 
     public interface IPersistentLocalIdFinder
     {
-        Task<int?> FindBuildingPersistentLocalId(Guid buildingId, CancellationToken ct);
-        Task<int?> FindBuildingUnitPersistentLocalId(Guid buildingId, Guid buildingUnitId, CancellationToken ct);
+        Task<int?> FindBuildingPersistentLocalId(Guid buildingId);
+        Task<int?> FindBuildingUnitPersistentLocalId(Guid buildingId, Guid buildingUnitId);
     }
 
     public class PersistentLocalIdFinder : IPersistentLocalIdFinder
@@ -21,7 +20,7 @@
             _eventsConnectionString = eventsConnectionString;
         }
 
-        public async Task<int?> FindBuildingPersistentLocalId(Guid buildingId, CancellationToken ct)
+        public async Task<int?> FindBuildingPersistentLocalId(Guid buildingId)
         {
             await using var connection = new SqlConnection(_eventsConnectionString);
 
@@ -37,7 +36,7 @@ WHERE Id = @BuildingId";
             return buildingPersistentLocalId;
         }
 
-        public async Task<int?> FindBuildingUnitPersistentLocalId(Guid buildingId, Guid buildingUnitId, CancellationToken ct)
+        public async Task<int?> FindBuildingUnitPersistentLocalId(Guid buildingId, Guid buildingUnitId)
         {
             await using var connection = new SqlConnection(_eventsConnectionString);
 

@@ -1,9 +1,11 @@
-﻿namespace BuildingRegistry.Tests.ProjectionTests.Integration.BuildingUnit
+﻿// ReSharper disable EntityFramework.NPlusOne.IncompleteDataUsage
+// ReSharper disable EntityFramework.NPlusOne.IncompleteDataQuery
+#pragma warning disable CS0618 // Type or member is obsolete
+namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Threading;
     using System.Threading.Tasks;
     using AutoFixture;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
@@ -13,7 +15,6 @@
     using BuildingRegistry.Legacy;
     using BuildingRegistry.Legacy.Events;
     using FluentAssertions;
-    using Moq;
     using NodaTime;
     using Tests.Legacy.Autofixture;
     using Xunit;
@@ -21,122 +22,8 @@
     using BuildingUnitId = BuildingRegistry.Legacy.BuildingUnitId;
     using ReaddressingBeginDate = BuildingRegistry.Legacy.ReaddressingBeginDate;
 
-    public partial class BuildingUnitVersionProjectionsTests
+    public sealed partial class BuildingVersionProjectionsTests
     {
-        [Fact]
-        public async Task WhenBuildingUnitPersistentLocalIdWasAssigned()
-        {
-            _fixture.Customize(new WithFixedBuildingUnitIdFromHouseNumber());
-
-            var buildingUnitPersistentLocalId = (int) _fixture.Create<BuildingUnitPersistentLocalId>();
-
-            var buildingUnitWasAdded = _fixture.Create<BuildingUnitWasAdded>();
-            var buildingUnitPersistentLocalIdWasAssigned = _fixture.Create<BuildingUnitPersistentLocalIdWasAssigned>();
-
-            AddBuildingPersistentLocalId();
-            AddBuildingUnitPersistentLocalId(buildingUnitPersistentLocalId);
-            AddAddressPersistentLocalId(buildingUnitWasAdded.AddressId);
-
-            var position = _fixture.Create<long>();
-
-            var buildingUnitWasAddedMetadata = new Dictionary<string, object>
-            {
-                { Envelope.PositionMetadataKey, position }
-            };
-            var buildingUnitPersistentLocalIdWasAssignedMetadata = new Dictionary<string, object>
-            {
-                { Envelope.PositionMetadataKey, position + 1 }
-            };
-
-            await Sut
-                .Given(
-                    new Envelope<BuildingUnitWasAdded>(new Envelope(buildingUnitWasAdded, buildingUnitWasAddedMetadata)),
-                    new Envelope<BuildingUnitPersistentLocalIdWasAssigned>(new Envelope(buildingUnitPersistentLocalIdWasAssigned, buildingUnitPersistentLocalIdWasAssignedMetadata)))
-                .Then(async context =>
-                {
-                    var buildingUnitVersion = await context.BuildingUnitVersions.FindAsync(position + 1, buildingUnitPersistentLocalIdWasAssigned.PersistentLocalId);
-                    buildingUnitVersion.Should().NotBeNull();
-
-                    buildingUnitVersion!.VersionTimestamp.Should().Be(buildingUnitPersistentLocalIdWasAssigned.Provenance.Timestamp);
-                });
-        }
-
-        [Fact]
-        public async Task WhenBuildingUnitBecameComplete()
-        {
-            _fixture.Customize(new WithFixedBuildingUnitIdFromHouseNumber());
-
-            var buildingUnitPersistentLocalId = (int) _fixture.Create<BuildingUnitPersistentLocalId>();
-
-            var buildingUnitWasAdded = _fixture.Create<BuildingUnitWasAdded>();
-            var buildingUnitBecameComplete = _fixture.Create<BuildingUnitBecameComplete>();
-
-            AddBuildingPersistentLocalId();
-            AddBuildingUnitPersistentLocalId(buildingUnitPersistentLocalId);
-            AddAddressPersistentLocalId(buildingUnitWasAdded.AddressId);
-
-            var position = _fixture.Create<long>();
-
-            var buildingUnitWasAddedMetadata = new Dictionary<string, object>
-            {
-                { Envelope.PositionMetadataKey, position }
-            };
-            var buildingUnitBecameCompleteMetadata = new Dictionary<string, object>
-            {
-                { Envelope.PositionMetadataKey, position + 1 }
-            };
-
-            await Sut
-                .Given(
-                    new Envelope<BuildingUnitWasAdded>(new Envelope(buildingUnitWasAdded, buildingUnitWasAddedMetadata)),
-                    new Envelope<BuildingUnitBecameComplete>(new Envelope(buildingUnitBecameComplete, buildingUnitBecameCompleteMetadata)))
-                .Then(async context =>
-                {
-                    var buildingUnitVersion = await context.BuildingUnitVersions.FindAsync(position + 1, buildingUnitPersistentLocalId);
-                    buildingUnitVersion.Should().NotBeNull();
-
-                    buildingUnitVersion!.VersionTimestamp.Should().Be(buildingUnitBecameComplete.Provenance.Timestamp);
-                });
-        }
-
-        [Fact]
-        public async Task WhenBuildingUnitBecameIncomplete()
-        {
-            _fixture.Customize(new WithFixedBuildingUnitIdFromHouseNumber());
-
-            var buildingUnitPersistentLocalId = (int) _fixture.Create<BuildingUnitPersistentLocalId>();
-
-            var buildingUnitWasAdded = _fixture.Create<BuildingUnitWasAdded>();
-            var buildingUnitBecameIncomplete = _fixture.Create<BuildingUnitBecameIncomplete>();
-
-            AddBuildingPersistentLocalId();
-            AddBuildingUnitPersistentLocalId(buildingUnitPersistentLocalId);
-            AddAddressPersistentLocalId(buildingUnitWasAdded.AddressId);
-
-            var position = _fixture.Create<long>();
-
-            var buildingUnitWasAddedMetadata = new Dictionary<string, object>
-            {
-                { Envelope.PositionMetadataKey, position }
-            };
-            var buildingUnitBecameIncompleteMetadata = new Dictionary<string, object>
-            {
-                { Envelope.PositionMetadataKey, position + 1 }
-            };
-
-            await Sut
-                .Given(
-                    new Envelope<BuildingUnitWasAdded>(new Envelope(buildingUnitWasAdded, buildingUnitWasAddedMetadata)),
-                    new Envelope<BuildingUnitBecameIncomplete>(new Envelope(buildingUnitBecameIncomplete, buildingUnitBecameIncompleteMetadata)))
-                .Then(async context =>
-                {
-                    var buildingUnitVersion = await context.BuildingUnitVersions.FindAsync(position + 1, buildingUnitPersistentLocalId);
-                    buildingUnitVersion.Should().NotBeNull();
-
-                    buildingUnitVersion!.VersionTimestamp.Should().Be(buildingUnitBecameIncomplete.Provenance.Timestamp);
-                });
-        }
-
         [Fact]
         public async Task WhenBuildingUnitWasAdded()
         {
@@ -146,6 +33,7 @@
             var addressPersistentLocalId = (int)_fixture.Create<AddressPersistentLocalId>();
             var buildingUnitPersistentLocalId = (int) _fixture.Create<BuildingUnitPersistentLocalId>();
 
+            var buildingWasRegistered = _fixture.Create<BuildingWasRegistered>();
             var buildingUnitWasAdded = _fixture.Create<BuildingUnitWasAdded>();
 
             AddBuildingPersistentLocalId(buildingPersistentLocalId);
@@ -154,21 +42,28 @@
 
             var position = _fixture.Create<long>();
 
-            var buildingUnitWasAddedMetadata = new Dictionary<string, object>
+            var buildingWasRegisteredMetadata = new Dictionary<string, object>
             {
                 { Envelope.PositionMetadataKey, position }
+            };
+            var buildingUnitWasAddedMetadata = new Dictionary<string, object>
+            {
+                { Envelope.PositionMetadataKey, ++position }
             };
 
             await Sut
                 .Given(
+                    new Envelope<BuildingWasRegistered>(new Envelope(buildingWasRegistered, buildingWasRegisteredMetadata)),
                     new Envelope<BuildingUnitWasAdded>(new Envelope(buildingUnitWasAdded, buildingUnitWasAddedMetadata)))
                 .Then(async context =>
                 {
-                    var buildingUnitVersion = await context.BuildingUnitVersions.FindAsync(position, buildingUnitPersistentLocalId);
+                    var buildingVersion = await context.BuildingVersions.FindAsync(position);
+                    buildingVersion.Should().NotBeNull();
+                    var buildingUnitVersion = buildingVersion!.BuildingUnits
+                        .SingleOrDefault(x => x.BuildingUnitId == buildingUnitWasAdded.BuildingUnitId);
                     buildingUnitVersion.Should().NotBeNull();
 
-                    buildingUnitVersion!.BuildingId.Should().Be(buildingUnitWasAdded.BuildingId);
-                    buildingUnitVersion.BuildingUnitId.Should().Be(buildingUnitWasAdded.BuildingUnitId);
+                    buildingUnitVersion!.BuildingUnitId.Should().Be(buildingUnitWasAdded.BuildingUnitId);
                     buildingUnitVersion.BuildingPersistentLocalId.Should().Be(buildingPersistentLocalId);
                     buildingUnitVersion.BuildingUnitPersistentLocalId.Should().Be(buildingUnitPersistentLocalId);
                     buildingUnitVersion.Function.Should().Be("Unknown");
@@ -180,6 +75,56 @@
                     buildingUnitVersion.Addresses.Should().ContainSingle();
                     buildingUnitVersion.Addresses.Single().AddressPersistentLocalId.Should().Be(addressPersistentLocalId);
                     buildingUnitVersion.Addresses.Single().Position.Should().Be(position);
+
+                    buildingVersion.VersionTimestamp.Should().Be(buildingUnitWasAdded.Provenance.Timestamp);
+                    buildingVersion.LastChangedOnTimestamp.Should().Be(buildingUnitWasAdded.Provenance.Timestamp);
+                });
+        }
+
+        [Fact]
+        public async Task WhenBuildingUnitPersistentLocalIdWasAssigned()
+        {
+            _fixture.Customize(new WithFixedBuildingUnitIdFromHouseNumber());
+
+            var buildingWasRegistered = _fixture.Create<BuildingWasRegistered>();
+            var buildingUnitWasAdded = _fixture.Create<BuildingUnitWasAdded>();
+            var buildingUnitPersistentLocalIdWasAssigned = _fixture.Create<BuildingUnitPersistentLocalIdWasAssigned>();
+
+            AddBuildingPersistentLocalId();
+            AddBuildingUnitPersistentLocalId();
+            AddAddressPersistentLocalId(buildingUnitWasAdded.AddressId);
+
+            var position = _fixture.Create<long>();
+
+            var buildingWasRegisteredMetadata = new Dictionary<string, object>
+            {
+                { Envelope.PositionMetadataKey, position }
+            };
+            var buildingUnitWasAddedMetadata = new Dictionary<string, object>
+            {
+                { Envelope.PositionMetadataKey, ++position }
+            };
+            var buildingUnitPersistentLocalIdWasAssignedMetadata = new Dictionary<string, object>
+            {
+                { Envelope.PositionMetadataKey, ++position }
+            };
+
+            await Sut
+                .Given(
+                    new Envelope<BuildingWasRegistered>(new Envelope(buildingWasRegistered, buildingWasRegisteredMetadata)),
+                    new Envelope<BuildingUnitWasAdded>(new Envelope(buildingUnitWasAdded, buildingUnitWasAddedMetadata)),
+                    new Envelope<BuildingUnitPersistentLocalIdWasAssigned>(new Envelope(buildingUnitPersistentLocalIdWasAssigned, buildingUnitPersistentLocalIdWasAssignedMetadata)))
+                .Then(async context =>
+                {
+                    var buildingVersion = await context.BuildingVersions.FindAsync(position);
+                    buildingVersion.Should().NotBeNull();
+                    var buildingUnitVersion = buildingVersion!.BuildingUnits
+                        .SingleOrDefault(x => x.BuildingUnitId == buildingUnitWasAdded.BuildingUnitId);
+                    buildingUnitVersion.Should().NotBeNull();
+
+                    buildingUnitVersion!.BuildingUnitPersistentLocalId.Should().Be(buildingUnitPersistentLocalIdWasAssigned.PersistentLocalId);
+                    buildingUnitVersion.VersionTimestamp.Should().Be(buildingUnitPersistentLocalIdWasAssigned.Provenance.Timestamp);
+                    buildingVersion.LastChangedOnTimestamp.Should().Be(buildingUnitPersistentLocalIdWasAssigned.Provenance.Timestamp);
                 });
         }
 
@@ -192,6 +137,7 @@
             var buildingUnitPersistentLocalId = (int) _fixture.Create<BuildingUnitPersistentLocalId>();
             var addressPersistentLocalId = (int) _fixture.Create<AddressPersistentLocalId>();
 
+            var buildingWasRegistered = _fixture.Create<BuildingWasRegistered>();
             var buildingUnitWasReaddedByOtherUnitRemoval = _fixture.Create<BuildingUnitWasReaddedByOtherUnitRemoval>();
 
             AddBuildingPersistentLocalId(buildingPersistentLocalId);
@@ -200,21 +146,28 @@
 
             var position = _fixture.Create<long>();
 
-            var buildingUnitWasAddedMetadata = new Dictionary<string, object>
+            var buildingWasRegisteredMetadata = new Dictionary<string, object>
             {
                 { Envelope.PositionMetadataKey, position }
+            };
+            var buildingUnitWasAddedMetadata = new Dictionary<string, object>
+            {
+                { Envelope.PositionMetadataKey, ++position }
             };
 
             await Sut
                 .Given(
+                    new Envelope<BuildingWasRegistered>(new Envelope(buildingWasRegistered, buildingWasRegisteredMetadata)),
                     new Envelope<BuildingUnitWasReaddedByOtherUnitRemoval>(new Envelope(buildingUnitWasReaddedByOtherUnitRemoval, buildingUnitWasAddedMetadata)))
                 .Then(async context =>
                 {
-                    var buildingUnitVersion = await context.BuildingUnitVersions.FindAsync(position, buildingUnitPersistentLocalId);
+                    var buildingVersion = await context.BuildingVersions.FindAsync(position);
+                    buildingVersion.Should().NotBeNull();
+                    var buildingUnitVersion = buildingVersion!.BuildingUnits
+                        .SingleOrDefault(x => x.BuildingUnitId == buildingUnitWasReaddedByOtherUnitRemoval.BuildingUnitId);
                     buildingUnitVersion.Should().NotBeNull();
 
-                    buildingUnitVersion!.BuildingId.Should().Be(buildingUnitWasReaddedByOtherUnitRemoval.BuildingId);
-                    buildingUnitVersion.BuildingUnitId.Should().Be(buildingUnitWasReaddedByOtherUnitRemoval.BuildingUnitId);
+                    buildingUnitVersion!.BuildingUnitId.Should().Be(buildingUnitWasReaddedByOtherUnitRemoval.BuildingUnitId);
                     buildingUnitVersion.BuildingPersistentLocalId.Should().Be(buildingPersistentLocalId);
                     buildingUnitVersion.BuildingUnitPersistentLocalId.Should().Be(buildingUnitPersistentLocalId);
                     buildingUnitVersion.Function.Should().Be("Unknown");
@@ -226,6 +179,9 @@
                     buildingUnitVersion.Addresses.Should().ContainSingle();
                     buildingUnitVersion.Addresses.Single().AddressPersistentLocalId.Should().Be(addressPersistentLocalId);
                     buildingUnitVersion.Addresses.Single().Position.Should().Be(position);
+
+                    buildingVersion.VersionTimestamp.Should().Be(buildingUnitWasReaddedByOtherUnitRemoval.Provenance.Timestamp);
+                    buildingVersion.LastChangedOnTimestamp.Should().Be(buildingUnitWasReaddedByOtherUnitRemoval.Provenance.Timestamp);
                 });
         }
 
@@ -237,6 +193,7 @@
             var buildingPersistentLocalId = (int) _fixture.Create<BuildingPersistentLocalId>();
             var buildingUnitPersistentLocalId = (int) _fixture.Create<BuildingUnitPersistentLocalId>();
 
+            var buildingWasRegistered = _fixture.Create<BuildingWasRegistered>();
             var commonBuildingUnitWasAdded = _fixture.Create<CommonBuildingUnitWasAdded>();
 
             AddBuildingPersistentLocalId(buildingPersistentLocalId);
@@ -244,21 +201,28 @@
 
             var position = _fixture.Create<long>();
 
-            var commonBuildingUnitWasAddedMetadata = new Dictionary<string, object>
+            var buildingWasRegisteredMetadata = new Dictionary<string, object>
             {
                 { Envelope.PositionMetadataKey, position }
+            };
+            var commonBuildingUnitWasAddedMetadata = new Dictionary<string, object>
+            {
+                { Envelope.PositionMetadataKey, ++position }
             };
 
             await Sut
                 .Given(
+                    new Envelope<BuildingWasRegistered>(new Envelope(buildingWasRegistered, buildingWasRegisteredMetadata)),
                     new Envelope<CommonBuildingUnitWasAdded>(new Envelope(commonBuildingUnitWasAdded, commonBuildingUnitWasAddedMetadata)))
                 .Then(async context =>
                 {
-                    var buildingUnitVersion = await context.BuildingUnitVersions.FindAsync(position, buildingUnitPersistentLocalId);
+                    var buildingVersion = await context.BuildingVersions.FindAsync(position);
+                    buildingVersion.Should().NotBeNull();
+                    var buildingUnitVersion = buildingVersion!.BuildingUnits
+                        .SingleOrDefault(x => x.BuildingUnitId == commonBuildingUnitWasAdded.BuildingUnitId);
                     buildingUnitVersion.Should().NotBeNull();
 
-                    buildingUnitVersion!.BuildingId.Should().Be(commonBuildingUnitWasAdded.BuildingId);
-                    buildingUnitVersion.BuildingUnitId.Should().Be(commonBuildingUnitWasAdded.BuildingUnitId);
+                    buildingUnitVersion!.BuildingUnitId.Should().Be(commonBuildingUnitWasAdded.BuildingUnitId);
                     buildingUnitVersion.BuildingPersistentLocalId.Should().Be(buildingPersistentLocalId);
                     buildingUnitVersion.BuildingUnitPersistentLocalId.Should().Be(buildingUnitPersistentLocalId);
                     buildingUnitVersion.Function.Should().Be("Common");
@@ -267,6 +231,135 @@
                     buildingUnitVersion.VersionTimestamp.Should().Be(commonBuildingUnitWasAdded.Provenance.Timestamp);
                     buildingUnitVersion.Namespace.Should().Be(BuildingUnitNamespace);
                     buildingUnitVersion.PuriId.Should().Be($"{BuildingUnitNamespace}/{buildingUnitPersistentLocalId}");
+
+                    buildingVersion.VersionTimestamp.Should().Be(commonBuildingUnitWasAdded.Provenance.Timestamp);
+                    buildingVersion.LastChangedOnTimestamp.Should().Be(commonBuildingUnitWasAdded.Provenance.Timestamp);
+                });
+        }
+
+        [Fact]
+        public async Task WhenBuildingUnitWasAddedToRetiredBuilding_RetiredBuilding()
+        {
+            _fixture.Customize(new WithFixedBuildingUnitIdFromHouseNumber());
+
+            var buildingPersistentLocalId = (int) _fixture.Create<BuildingPersistentLocalId>();
+            var buildingUnitPersistentLocalId = (int) _fixture.Create<BuildingUnitPersistentLocalId>();
+
+            var buildingWasRegistered = _fixture.Create<BuildingWasRegistered>();
+            var buildingWasRetired = new BuildingWasRetired(
+                _fixture.Create<BuildingId>(), Array.Empty<BuildingUnitId>(), Array.Empty<BuildingUnitId>());
+            ((ISetProvenance)buildingWasRetired).SetProvenance(_fixture.Create<Provenance>());
+            var buildingUnitWasAddedToRetiredBuilding = _fixture.Create<BuildingUnitWasAddedToRetiredBuilding>();
+
+            AddBuildingPersistentLocalId(buildingPersistentLocalId);
+            AddBuildingUnitPersistentLocalId(buildingUnitPersistentLocalId);
+
+            var position = _fixture.Create<long>();
+
+            var buildingWasRegisteredMetadata = new Dictionary<string, object>
+            {
+                { Envelope.PositionMetadataKey, position }
+            };
+            var buildingWasRetiredMetadata = new Dictionary<string, object>
+            {
+                { Envelope.PositionMetadataKey, ++position }
+            };
+            var buildingUnitWasAddedToRetiredBuildingMetadata = new Dictionary<string, object>
+            {
+                { Envelope.PositionMetadataKey, ++position }
+            };
+
+            await Sut
+                .Given(
+                    new Envelope<BuildingWasRegistered>(new Envelope(buildingWasRegistered, buildingWasRegisteredMetadata)),
+                    new Envelope<BuildingWasRetired>(new Envelope(buildingWasRetired, buildingWasRetiredMetadata)),
+                    new Envelope<BuildingUnitWasAddedToRetiredBuilding>(
+                        new Envelope(buildingUnitWasAddedToRetiredBuilding, buildingUnitWasAddedToRetiredBuildingMetadata)))
+                .Then(async context =>
+                {
+                    var buildingVersion = await context.BuildingVersions.FindAsync(position);
+                    buildingVersion.Should().NotBeNull();
+                    var buildingUnitVersion = buildingVersion!.BuildingUnits
+                        .SingleOrDefault(x => x.BuildingUnitId == buildingUnitWasAddedToRetiredBuilding.BuildingUnitId);
+                    buildingUnitVersion.Should().NotBeNull();
+
+                    buildingUnitVersion!.BuildingUnitId.Should().Be(buildingUnitWasAddedToRetiredBuilding.BuildingUnitId);
+                    buildingUnitVersion.BuildingPersistentLocalId.Should().Be(buildingPersistentLocalId);
+                    buildingUnitVersion.BuildingUnitPersistentLocalId.Should().Be(buildingUnitPersistentLocalId);
+                    buildingUnitVersion.Status.Should().Be("Retired");
+                    buildingUnitVersion.OsloStatus.Should().Be("Gehistoreerd");
+                    buildingUnitVersion.Function.Should().Be("Unknown");
+                    buildingUnitVersion.OsloFunction.Should().Be("NietGekend");
+                    buildingUnitVersion.CreatedOnTimestamp.Should().Be(buildingUnitWasAddedToRetiredBuilding.Provenance.Timestamp);
+                    buildingUnitVersion.VersionTimestamp.Should().Be(buildingUnitWasAddedToRetiredBuilding.Provenance.Timestamp);
+                    buildingUnitVersion.Namespace.Should().Be(BuildingUnitNamespace);
+                    buildingUnitVersion.PuriId.Should().Be($"{BuildingUnitNamespace}/{buildingUnitPersistentLocalId}");
+
+                    buildingVersion.VersionTimestamp.Should().Be(buildingUnitWasAddedToRetiredBuilding.Provenance.Timestamp);
+                    buildingVersion.LastChangedOnTimestamp.Should().Be(buildingUnitWasAddedToRetiredBuilding.Provenance.Timestamp);
+                });
+        }
+
+        [Fact]
+        public async Task WhenBuildingUnitWasAddedToRetiredBuilding_NotRealizedBuilding()
+        {
+            _fixture.Customize(new WithFixedBuildingUnitIdFromHouseNumber());
+
+            var buildingPersistentLocalId = (int) _fixture.Create<BuildingPersistentLocalId>();
+            var buildingUnitPersistentLocalId = (int) _fixture.Create<BuildingUnitPersistentLocalId>();
+
+            var buildingWasRegistered = _fixture.Create<BuildingWasRegistered>();
+            var buildingWasRetired = new BuildingWasNotRealized(
+                _fixture.Create<BuildingId>(), Array.Empty<BuildingUnitId>(), Array.Empty<BuildingUnitId>());
+            ((ISetProvenance)buildingWasRetired).SetProvenance(_fixture.Create<Provenance>());
+            var buildingUnitWasAddedToRetiredBuilding = _fixture.Create<BuildingUnitWasAddedToRetiredBuilding>();
+
+            AddBuildingPersistentLocalId(buildingPersistentLocalId);
+            AddBuildingUnitPersistentLocalId(buildingUnitPersistentLocalId);
+
+            var position = _fixture.Create<long>();
+
+            var buildingWasRegisteredMetadata = new Dictionary<string, object>
+            {
+                { Envelope.PositionMetadataKey, position }
+            };
+            var buildingWasRetiredMetadata = new Dictionary<string, object>
+            {
+                { Envelope.PositionMetadataKey, ++position }
+            };
+            var buildingUnitWasAddedToRetiredBuildingMetadata = new Dictionary<string, object>
+            {
+                { Envelope.PositionMetadataKey, ++position }
+            };
+
+            await Sut
+                .Given(
+                    new Envelope<BuildingWasRegistered>(new Envelope(buildingWasRegistered, buildingWasRegisteredMetadata)),
+                    new Envelope<BuildingWasNotRealized>(new Envelope(buildingWasRetired, buildingWasRetiredMetadata)),
+                    new Envelope<BuildingUnitWasAddedToRetiredBuilding>(
+                        new Envelope(buildingUnitWasAddedToRetiredBuilding, buildingUnitWasAddedToRetiredBuildingMetadata)))
+                .Then(async context =>
+                {
+                    var buildingVersion = await context.BuildingVersions.FindAsync(position);
+                    buildingVersion.Should().NotBeNull();
+                    var buildingUnitVersion = buildingVersion!.BuildingUnits
+                        .SingleOrDefault(x => x.BuildingUnitId == buildingUnitWasAddedToRetiredBuilding.BuildingUnitId);
+                    buildingUnitVersion.Should().NotBeNull();
+
+                    buildingUnitVersion!.BuildingUnitId.Should().Be(buildingUnitWasAddedToRetiredBuilding.BuildingUnitId);
+                    buildingUnitVersion.BuildingPersistentLocalId.Should().Be(buildingPersistentLocalId);
+                    buildingUnitVersion.BuildingUnitPersistentLocalId.Should().Be(buildingUnitPersistentLocalId);
+                    buildingUnitVersion.Status.Should().Be("NotRealized");
+                    buildingUnitVersion.OsloStatus.Should().Be("NietGerealiseerd");
+                    buildingUnitVersion.Function.Should().Be("Unknown");
+                    buildingUnitVersion.OsloFunction.Should().Be("NietGekend");
+                    buildingUnitVersion.CreatedOnTimestamp.Should().Be(buildingUnitWasAddedToRetiredBuilding.Provenance.Timestamp);
+                    buildingUnitVersion.VersionTimestamp.Should().Be(buildingUnitWasAddedToRetiredBuilding.Provenance.Timestamp);
+                    buildingUnitVersion.Namespace.Should().Be(BuildingUnitNamespace);
+                    buildingUnitVersion.PuriId.Should().Be($"{BuildingUnitNamespace}/{buildingUnitPersistentLocalId}");
+
+                    buildingVersion.VersionTimestamp.Should().Be(buildingUnitWasAddedToRetiredBuilding.Provenance.Timestamp);
+                    buildingVersion.LastChangedOnTimestamp.Should().Be(buildingUnitWasAddedToRetiredBuilding.Provenance.Timestamp);
                 });
         }
 
@@ -277,6 +370,7 @@
 
             var buildingUnitPersistentLocalId = (int) _fixture.Create<BuildingUnitPersistentLocalId>();
 
+            var buildingWasRegistered = _fixture.Create<BuildingWasRegistered>();
             var buildingUnitWasAdded = _fixture.Create<BuildingUnitWasAdded>();
             var buildingUnitWasRemoved = _fixture.Create<BuildingUnitWasRemoved>();
 
@@ -286,27 +380,38 @@
 
             var position = _fixture.Create<long>();
 
-            var buildingUnitWasAddedMetadata = new Dictionary<string, object>
+            var buildingWasRegisteredMetadata = new Dictionary<string, object>
             {
                 { Envelope.PositionMetadataKey, position }
             };
+            var buildingUnitWasAddedMetadata = new Dictionary<string, object>
+            {
+                { Envelope.PositionMetadataKey, ++position }
+            };
             var buildingUnitWasRemovedMetadata = new Dictionary<string, object>
             {
-                { Envelope.PositionMetadataKey, position + 1 }
+                { Envelope.PositionMetadataKey, ++position }
             };
 
             await Sut
                 .Given(
+                    new Envelope<BuildingWasRegistered>(new Envelope(buildingWasRegistered, buildingWasRegisteredMetadata)),
                     new Envelope<BuildingUnitWasAdded>(new Envelope(buildingUnitWasAdded, buildingUnitWasAddedMetadata)),
                     new Envelope<BuildingUnitWasRemoved>(new Envelope(buildingUnitWasRemoved, buildingUnitWasRemovedMetadata)))
                 .Then(async context =>
                 {
-                    var buildingUnitVersion = await context.BuildingUnitVersions.FindAsync(position + 1, buildingUnitPersistentLocalId);
+                    var buildingVersion = await context.BuildingVersions.FindAsync(position);
+                    buildingVersion.Should().NotBeNull();
+                    var buildingUnitVersion = buildingVersion!.BuildingUnits
+                        .SingleOrDefault(x => x.BuildingUnitId == buildingUnitWasAdded.BuildingUnitId);
                     buildingUnitVersion.Should().NotBeNull();
 
                     buildingUnitVersion!.IsRemoved.Should().BeTrue();
                     buildingUnitVersion.Addresses.Should().BeEmpty();
                     buildingUnitVersion.VersionTimestamp.Should().Be(buildingUnitWasRemoved.Provenance.Timestamp);
+
+                    buildingVersion.VersionTimestamp.Should().Be(buildingUnitWasRemoved.Provenance.Timestamp);
+                    buildingVersion.LastChangedOnTimestamp.Should().Be(buildingUnitWasRemoved.Provenance.Timestamp);
                 });
         }
 
@@ -318,6 +423,7 @@
             var buildingUnitPersistentLocalId = (int) _fixture.Create<BuildingUnitPersistentLocalId>();
             var attachedAddressPersistentLocalId = 2;
 
+            var buildingWasRegistered = _fixture.Create<BuildingWasRegistered>();
             var buildingUnitWasAdded = _fixture.Create<BuildingUnitWasAdded>();
             var buildingUnitAddressWasAttached = _fixture.Create<BuildingUnitAddressWasAttached>();
 
@@ -328,22 +434,30 @@
 
             var position = _fixture.Create<long>();
 
-            var buildingUnitWasAddedMetadata = new Dictionary<string, object>
+            var buildingWasRegisteredMetadata = new Dictionary<string, object>
             {
                 { Envelope.PositionMetadataKey, position }
             };
+            var buildingUnitWasAddedMetadata = new Dictionary<string, object>
+            {
+                { Envelope.PositionMetadataKey, ++position }
+            };
             var buildingUnitAddressWasAttachedMetadata = new Dictionary<string, object>
             {
-                { Envelope.PositionMetadataKey, position + 1 }
+                { Envelope.PositionMetadataKey, ++position }
             };
 
             await Sut
                 .Given(
+                    new Envelope<BuildingWasRegistered>(new Envelope(buildingWasRegistered, buildingWasRegisteredMetadata)),
                     new Envelope<BuildingUnitWasAdded>(new Envelope(buildingUnitWasAdded, buildingUnitWasAddedMetadata)),
                     new Envelope<BuildingUnitAddressWasAttached>(new Envelope(buildingUnitAddressWasAttached, buildingUnitAddressWasAttachedMetadata)))
                 .Then(async context =>
                 {
-                    var buildingUnitVersion = await context.BuildingUnitVersions.FindAsync(position + 1, buildingUnitPersistentLocalId);
+                    var buildingVersion = await context.BuildingVersions.FindAsync(position);
+                    buildingVersion.Should().NotBeNull();
+                    var buildingUnitVersion = buildingVersion!.BuildingUnits
+                        .SingleOrDefault(x => x.BuildingUnitId == buildingUnitWasAdded.BuildingUnitId);
                     buildingUnitVersion.Should().NotBeNull();
 
                     buildingUnitVersion!.Addresses.Should().HaveCount(2);
@@ -361,6 +475,7 @@
 
             var buildingUnitPersistentLocalId = (int) _fixture.Create<BuildingUnitPersistentLocalId>();
 
+            var buildingWasRegistered = _fixture.Create<BuildingWasRegistered>();
             var buildingUnitWasAdded = _fixture.Create<BuildingUnitWasAdded>();
             var buildingUnitAddressWasDetached = new BuildingUnitAddressWasDetached(
                 new BuildingId(buildingUnitWasAdded.BuildingId),
@@ -374,22 +489,30 @@
 
             var position = _fixture.Create<long>();
 
-            var buildingUnitWasAddedMetadata = new Dictionary<string, object>
+            var buildingWasRegisteredMetadata = new Dictionary<string, object>
             {
                 { Envelope.PositionMetadataKey, position }
             };
+            var buildingUnitWasAddedMetadata = new Dictionary<string, object>
+            {
+                { Envelope.PositionMetadataKey, ++position }
+            };
             var buildingUnitAddressWasAttachedMetadata = new Dictionary<string, object>
             {
-                { Envelope.PositionMetadataKey, position + 1 }
+                { Envelope.PositionMetadataKey, ++position }
             };
 
             await Sut
                 .Given(
+                    new Envelope<BuildingWasRegistered>(new Envelope(buildingWasRegistered, buildingWasRegisteredMetadata)),
                     new Envelope<BuildingUnitWasAdded>(new Envelope(buildingUnitWasAdded, buildingUnitWasAddedMetadata)),
                     new Envelope<BuildingUnitAddressWasDetached>(new Envelope(buildingUnitAddressWasDetached, buildingUnitAddressWasAttachedMetadata)))
                 .Then(async context =>
                 {
-                    var buildingUnitVersion = await context.BuildingUnitVersions.FindAsync(position + 1, buildingUnitPersistentLocalId);
+                    var buildingVersion = await context.BuildingVersions.FindAsync(position);
+                    buildingVersion.Should().NotBeNull();
+                    var buildingUnitVersion = buildingVersion!.BuildingUnits
+                        .SingleOrDefault(x => x.BuildingUnitId == buildingUnitWasAdded.BuildingUnitId);
                     buildingUnitVersion.Should().NotBeNull();
 
                     buildingUnitVersion!.Addresses.Should().BeEmpty();
@@ -402,46 +525,51 @@
         {
             _fixture.Customize(new WithFixedBuildingUnitIdFromHouseNumber());
 
-            var newAddressId = new AddressId(Guid.NewGuid());
-            var newAddressPersistentLocalId = 2;
-            var buildingUnitPersistentLocalId = (int) _fixture.Create<BuildingUnitPersistentLocalId>();
-
+            var buildingWasRegistered = _fixture.Create<BuildingWasRegistered>();
             var buildingUnitWasAdded = _fixture.Create<BuildingUnitWasAdded>();
             var buildingUnitWasReaddressed = new BuildingUnitWasReaddressed(
                 new BuildingId(buildingUnitWasAdded.BuildingId),
                 new BuildingUnitId(buildingUnitWasAdded.BuildingUnitId),
-                new AddressId(buildingUnitWasAdded.AddressId),
-                newAddressId,
+                _fixture.Create<AddressId>(),
+                _fixture.Create<AddressId>(),
                 new ReaddressingBeginDate(_fixture.Create<LocalDate>()));
             ((ISetProvenance)buildingUnitWasReaddressed).SetProvenance(_fixture.Create<Provenance>());
 
             AddBuildingPersistentLocalId();
-            AddBuildingUnitPersistentLocalId(buildingUnitPersistentLocalId);
+            AddBuildingUnitPersistentLocalId();
             AddAddressPersistentLocalId(buildingUnitWasAdded.AddressId);
-            AddAddressPersistentLocalId(newAddressId, newAddressPersistentLocalId);
 
             var position = _fixture.Create<long>();
 
-            var buildingUnitWasAddedMetadata = new Dictionary<string, object>
+            var buildingWasRegisteredMetadata = new Dictionary<string, object>
             {
                 { Envelope.PositionMetadataKey, position }
             };
+            var buildingUnitWasAddedMetadata = new Dictionary<string, object>
+            {
+                { Envelope.PositionMetadataKey, ++position }
+            };
             var buildingUnitWasReaddressedMetadata = new Dictionary<string, object>
             {
-                { Envelope.PositionMetadataKey, position + 1 }
+                { Envelope.PositionMetadataKey, ++position }
             };
 
             await Sut
                 .Given(
+                    new Envelope<BuildingWasRegistered>(new Envelope(buildingWasRegistered, buildingWasRegisteredMetadata)),
                     new Envelope<BuildingUnitWasAdded>(new Envelope(buildingUnitWasAdded, buildingUnitWasAddedMetadata)),
                     new Envelope<BuildingUnitWasReaddressed>(new Envelope(buildingUnitWasReaddressed, buildingUnitWasReaddressedMetadata)))
                 .Then(async context =>
                 {
-                    var buildingUnitVersion = await context.BuildingUnitVersions.FindAsync(position + 1, buildingUnitPersistentLocalId);
+                    var buildingVersion = await context.BuildingVersions.FindAsync(position);
+                    buildingVersion.Should().NotBeNull();
+                    var buildingUnitVersion = buildingVersion!.BuildingUnits
+                        .SingleOrDefault(x => x.BuildingUnitId == buildingUnitWasAdded.BuildingUnitId);
                     buildingUnitVersion.Should().NotBeNull();
 
-                    buildingUnitVersion!.Addresses.Should().ContainSingle();
-                    buildingUnitVersion.Addresses.Single().AddressPersistentLocalId.Should().Be(newAddressPersistentLocalId);
+                    buildingUnitVersion!.Readdresses.Should().ContainSingle();
+                    buildingUnitVersion.Readdresses.Single().OldAddressId.Should().Be(buildingUnitWasReaddressed.OldAddressId);
+                    buildingUnitVersion.Readdresses.Single().NewAddressId.Should().Be(buildingUnitWasReaddressed.NewAddressId);
 
                     buildingUnitVersion.VersionTimestamp.Should().Be(buildingUnitWasReaddressed.Provenance.Timestamp);
                 });
@@ -454,6 +582,7 @@
 
             var buildingUnitPersistentLocalId = (int) _fixture.Create<BuildingUnitPersistentLocalId>();
 
+            var buildingWasRegistered = _fixture.Create<BuildingWasRegistered>();
             var buildingUnitWasAdded = _fixture.Create<BuildingUnitWasAdded>();
             var buildingUnitPositionWasAppointedByAdministrator = _fixture.Create<BuildingUnitPositionWasAppointedByAdministrator>();
 
@@ -463,24 +592,32 @@
 
             var position = _fixture.Create<long>();
 
-            var buildingUnitWasAddedMetadata = new Dictionary<string, object>
+            var buildingWasRegisteredMetadata = new Dictionary<string, object>
             {
                 { Envelope.PositionMetadataKey, position }
             };
+            var buildingUnitWasAddedMetadata = new Dictionary<string, object>
+            {
+                { Envelope.PositionMetadataKey, ++position }
+            };
             var buildingUnitPositionWasAppointedByAdministratorMetadata = new Dictionary<string, object>
             {
-                { Envelope.PositionMetadataKey, position + 1 }
+                { Envelope.PositionMetadataKey, ++position }
             };
 
             await Sut
                 .Given(
+                    new Envelope<BuildingWasRegistered>(new Envelope(buildingWasRegistered, buildingWasRegisteredMetadata)),
                     new Envelope<BuildingUnitWasAdded>(new Envelope(buildingUnitWasAdded, buildingUnitWasAddedMetadata)),
                     new Envelope<BuildingUnitPositionWasAppointedByAdministrator>(
                         new Envelope(buildingUnitPositionWasAppointedByAdministrator, buildingUnitPositionWasAppointedByAdministratorMetadata))
                     )
                 .Then(async context =>
                 {
-                    var buildingUnitVersion = await context.BuildingUnitVersions.FindAsync(position + 1, buildingUnitPersistentLocalId);
+                    var buildingVersion = await context.BuildingVersions.FindAsync(position);
+                    buildingVersion.Should().NotBeNull();
+                    var buildingUnitVersion = buildingVersion!.BuildingUnits
+                        .SingleOrDefault(x => x.BuildingUnitId == buildingUnitWasAdded.BuildingUnitId);
                     buildingUnitVersion.Should().NotBeNull();
 
                     buildingUnitVersion!.Geometry.Should().BeEquivalentTo(
@@ -498,6 +635,7 @@
 
             var buildingUnitPersistentLocalId = (int) _fixture.Create<BuildingUnitPersistentLocalId>();
 
+            var buildingWasRegistered = _fixture.Create<BuildingWasRegistered>();
             var buildingUnitWasAdded = _fixture.Create<BuildingUnitWasAdded>();
             var buildingUnitPositionWasCorrectedToAppointedByAdministrator = _fixture.Create<BuildingUnitPositionWasCorrectedToAppointedByAdministrator>();
 
@@ -507,24 +645,32 @@
 
             var position = _fixture.Create<long>();
 
-            var buildingUnitWasAddedMetadata = new Dictionary<string, object>
+            var buildingWasRegisteredMetadata = new Dictionary<string, object>
             {
                 { Envelope.PositionMetadataKey, position }
             };
+            var buildingUnitWasAddedMetadata = new Dictionary<string, object>
+            {
+                { Envelope.PositionMetadataKey, ++position }
+            };
             var buildingUnitPositionWasCorrectedToAppointedByAdministratorMetadata = new Dictionary<string, object>
             {
-                { Envelope.PositionMetadataKey, position + 1 }
+                { Envelope.PositionMetadataKey, ++position }
             };
 
             await Sut
                 .Given(
+                    new Envelope<BuildingWasRegistered>(new Envelope(buildingWasRegistered, buildingWasRegisteredMetadata)),
                     new Envelope<BuildingUnitWasAdded>(new Envelope(buildingUnitWasAdded, buildingUnitWasAddedMetadata)),
                     new Envelope<BuildingUnitPositionWasCorrectedToAppointedByAdministrator>(
                         new Envelope(buildingUnitPositionWasCorrectedToAppointedByAdministrator, buildingUnitPositionWasCorrectedToAppointedByAdministratorMetadata))
                     )
                 .Then(async context =>
                 {
-                    var buildingUnitVersion = await context.BuildingUnitVersions.FindAsync(position + 1, buildingUnitPersistentLocalId);
+                    var buildingVersion = await context.BuildingVersions.FindAsync(position);
+                    buildingVersion.Should().NotBeNull();
+                    var buildingUnitVersion = buildingVersion!.BuildingUnits
+                        .SingleOrDefault(x => x.BuildingUnitId == buildingUnitWasAdded.BuildingUnitId);
                     buildingUnitVersion.Should().NotBeNull();
 
                     buildingUnitVersion!.Geometry.Should().BeEquivalentTo(
@@ -542,6 +688,7 @@
 
             var buildingUnitPersistentLocalId = (int) _fixture.Create<BuildingUnitPersistentLocalId>();
 
+            var buildingWasRegistered = _fixture.Create<BuildingWasRegistered>();
             var buildingUnitWasAdded = _fixture.Create<BuildingUnitWasAdded>();
             var buildingUnitPositionWasCorrectedToDerivedFromObject = _fixture.Create<BuildingUnitPositionWasCorrectedToDerivedFromObject>();
 
@@ -551,24 +698,32 @@
 
             var position = _fixture.Create<long>();
 
-            var buildingUnitWasAddedMetadata = new Dictionary<string, object>
+            var buildingWasRegisteredMetadata = new Dictionary<string, object>
             {
                 { Envelope.PositionMetadataKey, position }
             };
+            var buildingUnitWasAddedMetadata = new Dictionary<string, object>
+            {
+                { Envelope.PositionMetadataKey, ++position }
+            };
             var buildingUnitPositionWasCorrectedToDerivedFromObjectMetadata = new Dictionary<string, object>
             {
-                { Envelope.PositionMetadataKey, position + 1 }
+                { Envelope.PositionMetadataKey, ++position }
             };
 
             await Sut
                 .Given(
+                    new Envelope<BuildingWasRegistered>(new Envelope(buildingWasRegistered, buildingWasRegisteredMetadata)),
                     new Envelope<BuildingUnitWasAdded>(new Envelope(buildingUnitWasAdded, buildingUnitWasAddedMetadata)),
                     new Envelope<BuildingUnitPositionWasCorrectedToDerivedFromObject>(
                         new Envelope(buildingUnitPositionWasCorrectedToDerivedFromObject, buildingUnitPositionWasCorrectedToDerivedFromObjectMetadata))
                     )
                 .Then(async context =>
                 {
-                    var buildingUnitVersion = await context.BuildingUnitVersions.FindAsync(position + 1, buildingUnitPersistentLocalId);
+                    var buildingVersion = await context.BuildingVersions.FindAsync(position);
+                    buildingVersion.Should().NotBeNull();
+                    var buildingUnitVersion = buildingVersion!.BuildingUnits
+                        .SingleOrDefault(x => x.BuildingUnitId == buildingUnitWasAdded.BuildingUnitId);
                     buildingUnitVersion.Should().NotBeNull();
 
                     buildingUnitVersion!.Geometry.Should().BeEquivalentTo(
@@ -586,6 +741,7 @@
 
             var buildingUnitPersistentLocalId = (int) _fixture.Create<BuildingUnitPersistentLocalId>();
 
+            var buildingWasRegistered = _fixture.Create<BuildingWasRegistered>();
             var buildingUnitWasAdded = _fixture.Create<BuildingUnitWasAdded>();
             var buildingUnitPositionWasDerivedFromObject = _fixture.Create<BuildingUnitPositionWasDerivedFromObject>();
 
@@ -595,24 +751,32 @@
 
             var position = _fixture.Create<long>();
 
-            var buildingUnitWasAddedMetadata = new Dictionary<string, object>
+            var buildingWasRegisteredMetadata = new Dictionary<string, object>
             {
                 { Envelope.PositionMetadataKey, position }
             };
+            var buildingUnitWasAddedMetadata = new Dictionary<string, object>
+            {
+                { Envelope.PositionMetadataKey, ++position }
+            };
             var buildingUnitPositionWasDerivedFromObjectMetadata = new Dictionary<string, object>
             {
-                { Envelope.PositionMetadataKey, position + 1 }
+                { Envelope.PositionMetadataKey, ++position }
             };
 
             await Sut
                 .Given(
+                    new Envelope<BuildingWasRegistered>(new Envelope(buildingWasRegistered, buildingWasRegisteredMetadata)),
                     new Envelope<BuildingUnitWasAdded>(new Envelope(buildingUnitWasAdded, buildingUnitWasAddedMetadata)),
                     new Envelope<BuildingUnitPositionWasDerivedFromObject>(
                         new Envelope(buildingUnitPositionWasDerivedFromObject, buildingUnitPositionWasDerivedFromObjectMetadata))
                     )
                 .Then(async context =>
                 {
-                    var buildingUnitVersion = await context.BuildingUnitVersions.FindAsync(position + 1, buildingUnitPersistentLocalId);
+                    var buildingVersion = await context.BuildingVersions.FindAsync(position);
+                    buildingVersion.Should().NotBeNull();
+                    var buildingUnitVersion = buildingVersion!.BuildingUnits
+                        .SingleOrDefault(x => x.BuildingUnitId == buildingUnitWasAdded.BuildingUnitId);
                     buildingUnitVersion.Should().NotBeNull();
 
                     buildingUnitVersion!.Geometry.Should().BeEquivalentTo(
@@ -630,6 +794,7 @@
 
             var buildingUnitPersistentLocalId = (int) _fixture.Create<BuildingUnitPersistentLocalId>();
 
+            var buildingWasRegistered = _fixture.Create<BuildingWasRegistered>();
             var buildingUnitWasAdded = _fixture.Create<BuildingUnitWasAdded>();
             var buildingUnitWasRealized = _fixture.Create<BuildingUnitWasRealized>();
             var buildingUnitStatusWasRemoved = _fixture.Create<BuildingUnitStatusWasRemoved>();
@@ -640,28 +805,36 @@
 
             var position = _fixture.Create<long>();
 
-            var buildingUnitWasAddedMetadata = new Dictionary<string, object>
+            var buildingWasRegisteredMetadata = new Dictionary<string, object>
             {
                 { Envelope.PositionMetadataKey, position }
             };
+            var buildingUnitWasAddedMetadata = new Dictionary<string, object>
+            {
+                { Envelope.PositionMetadataKey, ++position }
+            };
             var buildingUnitWasRealizedMetadata = new Dictionary<string, object>
             {
-                { Envelope.PositionMetadataKey, position + 1 }
+                { Envelope.PositionMetadataKey, ++position }
             };
             var buildingUnitPositionWasDerivedFromObjectMetadata = new Dictionary<string, object>
             {
-                { Envelope.PositionMetadataKey, position + 2 }
+                { Envelope.PositionMetadataKey, ++position }
             };
 
             await Sut
                 .Given(
+                    new Envelope<BuildingWasRegistered>(new Envelope(buildingWasRegistered, buildingWasRegisteredMetadata)),
                     new Envelope<BuildingUnitWasAdded>(new Envelope(buildingUnitWasAdded, buildingUnitWasAddedMetadata)),
                     new Envelope<BuildingUnitWasRealized>(new Envelope(buildingUnitWasRealized, buildingUnitWasRealizedMetadata)),
                     new Envelope<BuildingUnitStatusWasRemoved>(new Envelope(buildingUnitStatusWasRemoved, buildingUnitPositionWasDerivedFromObjectMetadata))
                     )
                 .Then(async context =>
                 {
-                    var buildingUnitVersion = await context.BuildingUnitVersions.FindAsync(position + 2, buildingUnitPersistentLocalId);
+                    var buildingVersion = await context.BuildingVersions.FindAsync(position);
+                    buildingVersion.Should().NotBeNull();
+                    var buildingUnitVersion = buildingVersion!.BuildingUnits
+                        .SingleOrDefault(x => x.BuildingUnitId == buildingUnitWasAdded.BuildingUnitId);
                     buildingUnitVersion.Should().NotBeNull();
 
                     buildingUnitVersion!.Status.Should().BeNull();
@@ -677,6 +850,7 @@
 
             var buildingUnitPersistentLocalId = (int) _fixture.Create<BuildingUnitPersistentLocalId>();
 
+            var buildingWasRegistered = _fixture.Create<BuildingWasRegistered>();
             var buildingUnitWasAdded = _fixture.Create<BuildingUnitWasAdded>();
             var buildingUnitWasRealized = _fixture.Create<BuildingUnitWasRealized>();
 
@@ -686,22 +860,30 @@
 
             var position = _fixture.Create<long>();
 
-            var buildingUnitWasAddedMetadata = new Dictionary<string, object>
+            var buildingWasRegisteredMetadata = new Dictionary<string, object>
             {
                 { Envelope.PositionMetadataKey, position }
             };
+            var buildingUnitWasAddedMetadata = new Dictionary<string, object>
+            {
+                { Envelope.PositionMetadataKey, ++position }
+            };
             var buildingUnitWasRealizedMetadata = new Dictionary<string, object>
             {
-                { Envelope.PositionMetadataKey, position + 1 }
+                { Envelope.PositionMetadataKey, ++position }
             };
 
             await Sut
                 .Given(
+                    new Envelope<BuildingWasRegistered>(new Envelope(buildingWasRegistered, buildingWasRegisteredMetadata)),
                     new Envelope<BuildingUnitWasAdded>(new Envelope(buildingUnitWasAdded, buildingUnitWasAddedMetadata)),
                     new Envelope<BuildingUnitWasRealized>(new Envelope(buildingUnitWasRealized, buildingUnitWasRealizedMetadata)))
                 .Then(async context =>
                 {
-                    var buildingUnitVersion = await context.BuildingUnitVersions.FindAsync(position + 1, buildingUnitPersistentLocalId);
+                    var buildingVersion = await context.BuildingVersions.FindAsync(position);
+                    buildingVersion.Should().NotBeNull();
+                    var buildingUnitVersion = buildingVersion!.BuildingUnits
+                        .SingleOrDefault(x => x.BuildingUnitId == buildingUnitWasAdded.BuildingUnitId);
                     buildingUnitVersion.Should().NotBeNull();
 
                     buildingUnitVersion!.Status.Should().Be("Realized");
@@ -717,6 +899,7 @@
 
             var buildingUnitPersistentLocalId = (int) _fixture.Create<BuildingUnitPersistentLocalId>();
 
+            var buildingWasRegistered = _fixture.Create<BuildingWasRegistered>();
             var buildingUnitWasAdded = _fixture.Create<BuildingUnitWasAdded>();
             var buildingUnitWasRetired = _fixture.Create<BuildingUnitWasRetired>();
 
@@ -726,22 +909,30 @@
 
             var position = _fixture.Create<long>();
 
-            var buildingUnitWasAddedMetadata = new Dictionary<string, object>
+            var buildingWasRegisteredMetadata = new Dictionary<string, object>
             {
                 { Envelope.PositionMetadataKey, position }
             };
+            var buildingUnitWasAddedMetadata = new Dictionary<string, object>
+            {
+                { Envelope.PositionMetadataKey, ++position }
+            };
             var buildingUnitWasRetiredMetadata = new Dictionary<string, object>
             {
-                { Envelope.PositionMetadataKey, position + 1 }
+                { Envelope.PositionMetadataKey, ++position }
             };
 
             await Sut
                 .Given(
+                    new Envelope<BuildingWasRegistered>(new Envelope(buildingWasRegistered, buildingWasRegisteredMetadata)),
                     new Envelope<BuildingUnitWasAdded>(new Envelope(buildingUnitWasAdded, buildingUnitWasAddedMetadata)),
                     new Envelope<BuildingUnitWasRetired>(new Envelope(buildingUnitWasRetired, buildingUnitWasRetiredMetadata)))
                 .Then(async context =>
                 {
-                    var buildingUnitVersion = await context.BuildingUnitVersions.FindAsync(position + 1, buildingUnitPersistentLocalId);
+                    var buildingVersion = await context.BuildingVersions.FindAsync(position);
+                    buildingVersion.Should().NotBeNull();
+                    var buildingUnitVersion = buildingVersion!.BuildingUnits
+                        .SingleOrDefault(x => x.BuildingUnitId == buildingUnitWasAdded.BuildingUnitId);
                     buildingUnitVersion.Should().NotBeNull();
 
                     buildingUnitVersion!.Status.Should().Be("Retired");
@@ -757,6 +948,7 @@
 
             var buildingUnitPersistentLocalId = (int) _fixture.Create<BuildingUnitPersistentLocalId>();
 
+            var buildingWasRegistered = _fixture.Create<BuildingWasRegistered>();
             var buildingUnitWasAdded = _fixture.Create<BuildingUnitWasAdded>();
             var buildingUnitWasRetiredByParent = _fixture.Create<BuildingUnitWasRetiredByParent>();
 
@@ -766,22 +958,30 @@
 
             var position = _fixture.Create<long>();
 
-            var buildingUnitWasAddedMetadata = new Dictionary<string, object>
+            var buildingWasRegisteredMetadata = new Dictionary<string, object>
             {
                 { Envelope.PositionMetadataKey, position }
             };
+            var buildingUnitWasAddedMetadata = new Dictionary<string, object>
+            {
+                { Envelope.PositionMetadataKey, ++position }
+            };
             var buildingUnitWasRetiredByParentMetadata = new Dictionary<string, object>
             {
-                { Envelope.PositionMetadataKey, position + 1 }
+                { Envelope.PositionMetadataKey, ++position }
             };
 
             await Sut
                 .Given(
+                    new Envelope<BuildingWasRegistered>(new Envelope(buildingWasRegistered, buildingWasRegisteredMetadata)),
                     new Envelope<BuildingUnitWasAdded>(new Envelope(buildingUnitWasAdded, buildingUnitWasAddedMetadata)),
                     new Envelope<BuildingUnitWasRetiredByParent>(new Envelope(buildingUnitWasRetiredByParent, buildingUnitWasRetiredByParentMetadata)))
                 .Then(async context =>
                 {
-                    var buildingUnitVersion = await context.BuildingUnitVersions.FindAsync(position + 1, buildingUnitPersistentLocalId);
+                    var buildingVersion = await context.BuildingVersions.FindAsync(position);
+                    buildingVersion.Should().NotBeNull();
+                    var buildingUnitVersion = buildingVersion!.BuildingUnits
+                        .SingleOrDefault(x => x.BuildingUnitId == buildingUnitWasAdded.BuildingUnitId);
                     buildingUnitVersion.Should().NotBeNull();
 
                     buildingUnitVersion!.Status.Should().Be("Retired");
@@ -797,6 +997,7 @@
 
             var buildingUnitPersistentLocalId = (int) _fixture.Create<BuildingUnitPersistentLocalId>();
 
+            var buildingWasRegistered = _fixture.Create<BuildingWasRegistered>();
             var buildingUnitWasAdded = _fixture.Create<BuildingUnitWasAdded>();
             var buildingUnitWasNotRealized = _fixture.Create<BuildingUnitWasNotRealized>();
 
@@ -806,22 +1007,30 @@
 
             var position = _fixture.Create<long>();
 
-            var buildingUnitWasAddedMetadata = new Dictionary<string, object>
+            var buildingWasRegisteredMetadata = new Dictionary<string, object>
             {
                 { Envelope.PositionMetadataKey, position }
             };
+            var buildingUnitWasAddedMetadata = new Dictionary<string, object>
+            {
+                { Envelope.PositionMetadataKey, ++position }
+            };
             var buildingUnitWasNotRealizedMetadata = new Dictionary<string, object>
             {
-                { Envelope.PositionMetadataKey, position + 1 }
+                { Envelope.PositionMetadataKey, ++position }
             };
 
             await Sut
                 .Given(
+                    new Envelope<BuildingWasRegistered>(new Envelope(buildingWasRegistered, buildingWasRegisteredMetadata)),
                     new Envelope<BuildingUnitWasAdded>(new Envelope(buildingUnitWasAdded, buildingUnitWasAddedMetadata)),
                     new Envelope<BuildingUnitWasNotRealized>(new Envelope(buildingUnitWasNotRealized, buildingUnitWasNotRealizedMetadata)))
                 .Then(async context =>
                 {
-                    var buildingUnitVersion = await context.BuildingUnitVersions.FindAsync(position + 1, buildingUnitPersistentLocalId);
+                    var buildingVersion = await context.BuildingVersions.FindAsync(position);
+                    buildingVersion.Should().NotBeNull();
+                    var buildingUnitVersion = buildingVersion!.BuildingUnits
+                        .SingleOrDefault(x => x.BuildingUnitId == buildingUnitWasAdded.BuildingUnitId);
                     buildingUnitVersion.Should().NotBeNull();
 
                     buildingUnitVersion!.Status.Should().Be("NotRealized");
@@ -837,6 +1046,7 @@
 
             var buildingUnitPersistentLocalId = (int) _fixture.Create<BuildingUnitPersistentLocalId>();
 
+            var buildingWasRegistered = _fixture.Create<BuildingWasRegistered>();
             var buildingUnitWasAdded = _fixture.Create<BuildingUnitWasAdded>();
             var buildingUnitWasNotRealizedByParent = _fixture.Create<BuildingUnitWasNotRealizedByParent>();
 
@@ -846,22 +1056,30 @@
 
             var position = _fixture.Create<long>();
 
-            var buildingUnitWasAddedMetadata = new Dictionary<string, object>
+            var buildingWasRegisteredMetadata = new Dictionary<string, object>
             {
                 { Envelope.PositionMetadataKey, position }
             };
+            var buildingUnitWasAddedMetadata = new Dictionary<string, object>
+            {
+                { Envelope.PositionMetadataKey, ++position }
+            };
             var buildingUnitWasNotRealizedByParentMetadata = new Dictionary<string, object>
             {
-                { Envelope.PositionMetadataKey, position + 1 }
+                { Envelope.PositionMetadataKey, ++position }
             };
 
             await Sut
                 .Given(
+                    new Envelope<BuildingWasRegistered>(new Envelope(buildingWasRegistered, buildingWasRegisteredMetadata)),
                     new Envelope<BuildingUnitWasAdded>(new Envelope(buildingUnitWasAdded, buildingUnitWasAddedMetadata)),
                     new Envelope<BuildingUnitWasNotRealizedByParent>(new Envelope(buildingUnitWasNotRealizedByParent, buildingUnitWasNotRealizedByParentMetadata)))
                 .Then(async context =>
                 {
-                    var buildingUnitVersion = await context.BuildingUnitVersions.FindAsync(position + 1, buildingUnitPersistentLocalId);
+                    var buildingVersion = await context.BuildingVersions.FindAsync(position);
+                    buildingVersion.Should().NotBeNull();
+                    var buildingUnitVersion = buildingVersion!.BuildingUnits
+                        .SingleOrDefault(x => x.BuildingUnitId == buildingUnitWasAdded.BuildingUnitId);
                     buildingUnitVersion.Should().NotBeNull();
 
                     buildingUnitVersion!.Status.Should().Be("NotRealized");
@@ -877,6 +1095,7 @@
 
             var buildingUnitPersistentLocalId = (int) _fixture.Create<BuildingUnitPersistentLocalId>();
 
+            var buildingWasRegistered = _fixture.Create<BuildingWasRegistered>();
             var buildingUnitWasAdded = _fixture.Create<BuildingUnitWasAdded>();
             var buildingUnitWasPlanned = _fixture.Create<BuildingUnitWasPlanned>();
 
@@ -886,22 +1105,30 @@
 
             var position = _fixture.Create<long>();
 
-            var buildingUnitWasAddedMetadata = new Dictionary<string, object>
+            var buildingWasRegisteredMetadata = new Dictionary<string, object>
             {
                 { Envelope.PositionMetadataKey, position }
             };
+            var buildingUnitWasAddedMetadata = new Dictionary<string, object>
+            {
+                { Envelope.PositionMetadataKey, ++position }
+            };
             var buildingUnitWasPlannedMetadata = new Dictionary<string, object>
             {
-                { Envelope.PositionMetadataKey, position + 1 }
+                { Envelope.PositionMetadataKey, ++position }
             };
 
             await Sut
                 .Given(
+                    new Envelope<BuildingWasRegistered>(new Envelope(buildingWasRegistered, buildingWasRegisteredMetadata)),
                     new Envelope<BuildingUnitWasAdded>(new Envelope(buildingUnitWasAdded, buildingUnitWasAddedMetadata)),
                     new Envelope<BuildingUnitWasPlanned>(new Envelope(buildingUnitWasPlanned, buildingUnitWasPlannedMetadata)))
                 .Then(async context =>
                 {
-                    var buildingUnitVersion = await context.BuildingUnitVersions.FindAsync(position + 1, buildingUnitPersistentLocalId);
+                    var buildingVersion = await context.BuildingVersions.FindAsync(position);
+                    buildingVersion.Should().NotBeNull();
+                    var buildingUnitVersion = buildingVersion!.BuildingUnits
+                        .SingleOrDefault(x => x.BuildingUnitId == buildingUnitWasAdded.BuildingUnitId);
                     buildingUnitVersion.Should().NotBeNull();
 
                     buildingUnitVersion!.Status.Should().Be("Planned");
@@ -917,6 +1144,7 @@
 
             var buildingUnitPersistentLocalId = (int) _fixture.Create<BuildingUnitPersistentLocalId>();
 
+            var buildingWasRegistered = _fixture.Create<BuildingWasRegistered>();
             var buildingUnitWasAdded = _fixture.Create<BuildingUnitWasAdded>();
             var buildingUnitWasCorrectedToRealized = _fixture.Create<BuildingUnitWasCorrectedToRealized>();
 
@@ -926,22 +1154,30 @@
 
             var position = _fixture.Create<long>();
 
-            var buildingUnitWasAddedMetadata = new Dictionary<string, object>
+            var buildingWasRegisteredMetadata = new Dictionary<string, object>
             {
                 { Envelope.PositionMetadataKey, position }
             };
+            var buildingUnitWasAddedMetadata = new Dictionary<string, object>
+            {
+                { Envelope.PositionMetadataKey, ++position }
+            };
             var buildingUnitWasCorrectedToRealizedMetadata = new Dictionary<string, object>
             {
-                { Envelope.PositionMetadataKey, position + 1 }
+                { Envelope.PositionMetadataKey, ++position }
             };
 
             await Sut
                 .Given(
+                    new Envelope<BuildingWasRegistered>(new Envelope(buildingWasRegistered, buildingWasRegisteredMetadata)),
                     new Envelope<BuildingUnitWasAdded>(new Envelope(buildingUnitWasAdded, buildingUnitWasAddedMetadata)),
                     new Envelope<BuildingUnitWasCorrectedToRealized>(new Envelope(buildingUnitWasCorrectedToRealized, buildingUnitWasCorrectedToRealizedMetadata)))
                 .Then(async context =>
                 {
-                    var buildingUnitVersion = await context.BuildingUnitVersions.FindAsync(position + 1, buildingUnitPersistentLocalId);
+                    var buildingVersion = await context.BuildingVersions.FindAsync(position);
+                    buildingVersion.Should().NotBeNull();
+                    var buildingUnitVersion = buildingVersion!.BuildingUnits
+                        .SingleOrDefault(x => x.BuildingUnitId == buildingUnitWasAdded.BuildingUnitId);
                     buildingUnitVersion.Should().NotBeNull();
 
                     buildingUnitVersion!.Status.Should().Be("Realized");
@@ -957,6 +1193,7 @@
 
             var buildingUnitPersistentLocalId = (int) _fixture.Create<BuildingUnitPersistentLocalId>();
 
+            var buildingWasRegistered = _fixture.Create<BuildingWasRegistered>();
             var buildingUnitWasAdded = _fixture.Create<BuildingUnitWasAdded>();
             var buildingUnitWasCorrectedToNotRealized = _fixture.Create<BuildingUnitWasCorrectedToNotRealized>();
 
@@ -966,22 +1203,30 @@
 
             var position = _fixture.Create<long>();
 
-            var buildingUnitWasAddedMetadata = new Dictionary<string, object>
+            var buildingWasRegisteredMetadata = new Dictionary<string, object>
             {
                 { Envelope.PositionMetadataKey, position }
             };
+            var buildingUnitWasAddedMetadata = new Dictionary<string, object>
+            {
+                { Envelope.PositionMetadataKey, ++position }
+            };
             var buildingUnitWasCorrectedToNotRealizedMetadata = new Dictionary<string, object>
             {
-                { Envelope.PositionMetadataKey, position + 1 }
+                { Envelope.PositionMetadataKey, ++position }
             };
 
             await Sut
                 .Given(
+                    new Envelope<BuildingWasRegistered>(new Envelope(buildingWasRegistered, buildingWasRegisteredMetadata)),
                     new Envelope<BuildingUnitWasAdded>(new Envelope(buildingUnitWasAdded, buildingUnitWasAddedMetadata)),
                     new Envelope<BuildingUnitWasCorrectedToNotRealized>(new Envelope(buildingUnitWasCorrectedToNotRealized, buildingUnitWasCorrectedToNotRealizedMetadata)))
                 .Then(async context =>
                 {
-                    var buildingUnitVersion = await context.BuildingUnitVersions.FindAsync(position + 1, buildingUnitPersistentLocalId);
+                    var buildingVersion = await context.BuildingVersions.FindAsync(position);
+                    buildingVersion.Should().NotBeNull();
+                    var buildingUnitVersion = buildingVersion!.BuildingUnits
+                        .SingleOrDefault(x => x.BuildingUnitId == buildingUnitWasAdded.BuildingUnitId);
                     buildingUnitVersion.Should().NotBeNull();
 
                     buildingUnitVersion!.Status.Should().Be("NotRealized");
@@ -997,6 +1242,7 @@
 
             var buildingUnitPersistentLocalId = (int) _fixture.Create<BuildingUnitPersistentLocalId>();
 
+            var buildingWasRegistered = _fixture.Create<BuildingWasRegistered>();
             var buildingUnitWasAdded = _fixture.Create<BuildingUnitWasAdded>();
             var buildingUnitWasCorrectedToRetired = _fixture.Create<BuildingUnitWasCorrectedToRetired>();
 
@@ -1006,22 +1252,30 @@
 
             var position = _fixture.Create<long>();
 
-            var buildingUnitWasAddedMetadata = new Dictionary<string, object>
+            var buildingWasRegisteredMetadata = new Dictionary<string, object>
             {
                 { Envelope.PositionMetadataKey, position }
             };
+            var buildingUnitWasAddedMetadata = new Dictionary<string, object>
+            {
+                { Envelope.PositionMetadataKey, ++position }
+            };
             var buildingUnitWasCorrectedToRetiredMetadata = new Dictionary<string, object>
             {
-                { Envelope.PositionMetadataKey, position + 1 }
+                { Envelope.PositionMetadataKey, ++position }
             };
 
             await Sut
                 .Given(
+                    new Envelope<BuildingWasRegistered>(new Envelope(buildingWasRegistered, buildingWasRegisteredMetadata)),
                     new Envelope<BuildingUnitWasAdded>(new Envelope(buildingUnitWasAdded, buildingUnitWasAddedMetadata)),
                     new Envelope<BuildingUnitWasCorrectedToRetired>(new Envelope(buildingUnitWasCorrectedToRetired, buildingUnitWasCorrectedToRetiredMetadata)))
                 .Then(async context =>
                 {
-                    var buildingUnitVersion = await context.BuildingUnitVersions.FindAsync(position + 1, buildingUnitPersistentLocalId);
+                    var buildingVersion = await context.BuildingVersions.FindAsync(position);
+                    buildingVersion.Should().NotBeNull();
+                    var buildingUnitVersion = buildingVersion!.BuildingUnits
+                        .SingleOrDefault(x => x.BuildingUnitId == buildingUnitWasAdded.BuildingUnitId);
                     buildingUnitVersion.Should().NotBeNull();
 
                     buildingUnitVersion!.Status.Should().Be("Retired");
@@ -1037,6 +1291,7 @@
 
             var buildingUnitPersistentLocalId = (int) _fixture.Create<BuildingUnitPersistentLocalId>();
 
+            var buildingWasRegistered = _fixture.Create<BuildingWasRegistered>();
             var buildingUnitWasAdded = _fixture.Create<BuildingUnitWasAdded>();
             var buildingUnitWasCorrectedToPlanned = _fixture.Create<BuildingUnitWasCorrectedToPlanned>();
 
@@ -1046,58 +1301,36 @@
 
             var position = _fixture.Create<long>();
 
-            var buildingUnitWasAddedMetadata = new Dictionary<string, object>
+            var buildingWasRegisteredMetadata = new Dictionary<string, object>
             {
                 { Envelope.PositionMetadataKey, position }
             };
+            var buildingUnitWasAddedMetadata = new Dictionary<string, object>
+            {
+                { Envelope.PositionMetadataKey, ++position }
+            };
             var buildingUnitWasCorrectedToPlannedMetadata = new Dictionary<string, object>
             {
-                { Envelope.PositionMetadataKey, position + 1 }
+                { Envelope.PositionMetadataKey, ++position }
             };
 
             await Sut
                 .Given(
+                    new Envelope<BuildingWasRegistered>(new Envelope(buildingWasRegistered, buildingWasRegisteredMetadata)),
                     new Envelope<BuildingUnitWasAdded>(new Envelope(buildingUnitWasAdded, buildingUnitWasAddedMetadata)),
                     new Envelope<BuildingUnitWasCorrectedToPlanned>(new Envelope(buildingUnitWasCorrectedToPlanned, buildingUnitWasCorrectedToPlannedMetadata)))
                 .Then(async context =>
                 {
-                    var buildingUnitVersion = await context.BuildingUnitVersions.FindAsync(position + 1, buildingUnitPersistentLocalId);
+                    var buildingVersion = await context.BuildingVersions.FindAsync(position);
+                    buildingVersion.Should().NotBeNull();
+                    var buildingUnitVersion = buildingVersion!.BuildingUnits
+                        .SingleOrDefault(x => x.BuildingUnitId == buildingUnitWasAdded.BuildingUnitId);
                     buildingUnitVersion.Should().NotBeNull();
 
                     buildingUnitVersion!.Status.Should().Be("Planned");
                     buildingUnitVersion.OsloStatus.Should().Be("Gepland");
                     buildingUnitVersion.VersionTimestamp.Should().Be(buildingUnitWasCorrectedToPlanned.Provenance.Timestamp);
                 });
-        }
-
-        private void AddBuildingUnitPersistentLocalId(Guid buildingUnitId, int buildingUnitPersistentLocalId)
-        {
-            _persistentLocalIdFinder
-                .Setup(x => x.FindBuildingUnitPersistentLocalId(It.IsAny<Guid>(), buildingUnitId, It.IsAny<CancellationToken>()))
-                .ReturnsAsync(buildingUnitPersistentLocalId);
-        }
-
-        private void AddBuildingUnitPersistentLocalId(int buildingUnitPersistentLocalId)
-        {
-            _persistentLocalIdFinder
-                .Setup(x => x.FindBuildingUnitPersistentLocalId(It.IsAny<Guid>(), It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(buildingUnitPersistentLocalId);
-        }
-
-        private void AddBuildingPersistentLocalId(int? buildingPersistentLocalId = null)
-        {
-            var persistentLocalId = buildingPersistentLocalId ?? (int) _fixture.Create<BuildingPersistentLocalId>();
-
-            _persistentLocalIdFinder
-                .Setup(x => x.FindBuildingPersistentLocalId(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(persistentLocalId);
-        }
-
-        private void AddAddressPersistentLocalId(Guid addressId, int addressPersistentLocalId = 1)
-        {
-            _addresses
-                .Setup(x => x.GetAddressPersistentLocalId(addressId))
-                .ReturnsAsync(addressPersistentLocalId);
         }
     }
 }

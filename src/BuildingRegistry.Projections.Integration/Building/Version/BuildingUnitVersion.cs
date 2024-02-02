@@ -1,4 +1,4 @@
-﻿namespace BuildingRegistry.Projections.Integration.BuildingUnit.Version
+﻿namespace BuildingRegistry.Projections.Integration.Building.Version
 {
     using System;
     using System.Collections.ObjectModel;
@@ -19,7 +19,6 @@
         public long Position { get; set; }
 
         public Guid? BuildingUnitId { get; set; }
-        public Guid? BuildingId { get; set; }
         public int BuildingUnitPersistentLocalId { get; set; }
         public int BuildingPersistentLocalId { get; set; }
         public string? Status { get; set; }
@@ -62,23 +61,21 @@
         }
 
         public Collection<BuildingUnitAddressVersion> Addresses { get; set; }
+        public Collection<BuildingUnitReaddressVersion> Readdresses { get; set; }
 
         public BuildingUnitVersion()
         {
             Addresses = new Collection<BuildingUnitAddressVersion>();
+            Readdresses = new Collection<BuildingUnitReaddressVersion>();
         }
 
-        public BuildingUnitVersion CloneAndApplyEventInfo(
-            long newPosition,
-            Instant lastChangedOn,
-            Action<BuildingUnitVersion> editFunc)
+        public BuildingUnitVersion CloneAndApplyEventInfo(long newPosition)
         {
             var newItem = new BuildingUnitVersion
             {
                 Position = newPosition,
 
                 BuildingUnitId = BuildingUnitId,
-                BuildingId = BuildingId,
                 BuildingUnitPersistentLocalId = BuildingUnitPersistentLocalId,
                 BuildingPersistentLocalId = BuildingPersistentLocalId,
                 Status = Status,
@@ -94,14 +91,15 @@
                 PuriId = PuriId,
                 Namespace = Namespace,
 
-                VersionTimestamp = lastChangedOn,
+                VersionTimestamp = VersionTimestamp,
                 CreatedOnTimestamp = CreatedOnTimestamp,
 
                 Addresses = new Collection<BuildingUnitAddressVersion>(
                     Addresses.Select(x => x.CloneAndApplyEventInfo(newPosition)).ToList()),
-            };
 
-            editFunc(newItem);
+                Readdresses = new Collection<BuildingUnitReaddressVersion>(
+                    Readdresses.Select(x => x.CloneAndApplyEventInfo(newPosition)).ToList())
+            };
 
             return newItem;
         }
@@ -121,7 +119,6 @@
 
             builder.Property(x => x.Position).HasColumnName("position");
             builder.Property(x => x.BuildingUnitId).HasColumnName("building_unit_id");
-            builder.Property(x => x.BuildingId).HasColumnName("building_id");
             builder.Property(x => x.BuildingUnitPersistentLocalId).HasColumnName("building_unit_persistent_local_id");
             builder.Property(x => x.BuildingPersistentLocalId).HasColumnName("building_persistent_local_id");
             builder.Property(x => x.Status).HasColumnName("status");
@@ -141,6 +138,11 @@
             builder.Property(BuildingUnitVersion.CreatedOnTimestampBackingPropertyName).HasColumnName("created_on_timestamp");
 
             builder.HasMany(x => x.Addresses)
+                .WithOne()
+                .IsRequired()
+                .HasForeignKey(x => new { x.Position, x.BuildingUnitPersistentLocalId });
+
+            builder.HasMany(x => x.Readdresses)
                 .WithOne()
                 .IsRequired()
                 .HasForeignKey(x => new { x.Position, x.BuildingUnitPersistentLocalId });

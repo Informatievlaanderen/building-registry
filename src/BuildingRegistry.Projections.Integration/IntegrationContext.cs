@@ -8,7 +8,6 @@ namespace BuildingRegistry.Projections.Integration
     using Building.Version;
     using BuildingRegistry.Infrastructure;
     using BuildingUnit.LatestItem;
-    using BuildingUnit.Version;
     using Microsoft.EntityFrameworkCore;
     using NetTopologySuite.Geometries;
 
@@ -22,8 +21,6 @@ namespace BuildingRegistry.Projections.Integration
         public DbSet<BuildingUnitAddress> BuildingUnitAddresses => Set<BuildingUnitAddress>();
 
         public DbSet<BuildingVersion> BuildingVersions => Set<BuildingVersion>();
-
-        public DbSet<BuildingUnitVersion> BuildingUnitVersions => Set<BuildingUnitVersion>();
 
         private DbSet<MunicipalityGeometry> MunicipalityGeometries => Set<MunicipalityGeometry>();
 

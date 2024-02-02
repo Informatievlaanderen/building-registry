@@ -1,4 +1,4 @@
-﻿namespace BuildingRegistry.Projections.Integration.BuildingUnit.Version
+﻿namespace BuildingRegistry.Projections.Integration.Building.Version
 {
     using BuildingRegistry.Infrastructure;
     using Microsoft.EntityFrameworkCore;
