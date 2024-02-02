@@ -66,6 +66,12 @@ namespace BuildingRegistry.Projector.Infrastructure.Modules
                 .RegisterType<ProblemDetailsHelper>()
                 .AsSelf();
 
+            builder.Register(c =>
+                    new LastChangedListBuildingUnitCacheValidator(
+                        c.Resolve<LegacyContext>(),
+                        typeof(BuildingUnitDetailV2Projections).FullName))
+                .AsSelf();
+
             builder.Populate(_services);
         }
 
@@ -144,7 +150,9 @@ namespace BuildingRegistry.Projector.Infrastructure.Modules
                 .RegisterProjectionMigrator<DataMigrationContextMigrationFactory>(
                     _configuration,
                     _loggerFactory)
-                .RegisterProjections<BuildingUnitProjections, LastChangedListContext>(ConnectedProjectionSettings.Default);
+                .RegisterProjections<BuildingUnitProjections, LastChangedListContext>(
+                    context => new BuildingUnitProjections(context.Resolve<LastChangedListBuildingUnitCacheValidator>()),
+                    ConnectedProjectionSettings.Default);
         }
 
         private void RegisterLegacyProjectionsV2(ContainerBuilder builder)

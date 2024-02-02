@@ -18,8 +18,8 @@ namespace BuildingRegistry.Projections.LastChangedList
     {
         private static readonly AcceptType[] SupportedAcceptTypes = { AcceptType.JsonLd };
 
-        public BuildingUnitProjections()
-            : base(SupportedAcceptTypes)
+        public BuildingUnitProjections(ICacheValidator cacheValidator)
+            : base(SupportedAcceptTypes, cacheValidator)
         {
             #region Legacy
             When<Envelope<BuildingUnitPersistentLocalIdWasAssigned>>(async (context, message, ct) =>
