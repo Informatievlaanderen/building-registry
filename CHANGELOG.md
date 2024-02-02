@@ -1,3 +1,15 @@
+# [3.99.0](https://github.com/informatievlaanderen/building-registry/compare/v3.98.1...v3.99.0) (2024-02-02)
+
+
+### Bug Fixes
+
+* add objectid to idempotencekey snapshot oslo ([78a9a15](https://github.com/informatievlaanderen/building-registry/commit/78a9a155e113b6d5bc29e9febe18328ee6c3f428))
+
+
+### Features
+
+* add cachevalidator lastchangedlist GAWR-5407 ([3037a11](https://github.com/informatievlaanderen/building-registry/commit/3037a1179343276727680530f4a9d1f4db3a44ae))
+
 ## [3.98.1](https://github.com/informatievlaanderen/building-registry/compare/v3.98.0...v3.98.1) (2024-01-25)
 
 
