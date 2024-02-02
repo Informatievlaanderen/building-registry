@@ -10,7 +10,6 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.BuildingUnit
     using BuildingRegistry.Building;
     using BuildingRegistry.Legacy.Events;
     using FluentAssertions;
-    using Projections.Integration.Converters;
     using Tests.Legacy.Autofixture;
     using Xunit;
     using BuildingId = BuildingRegistry.Legacy.BuildingId;
@@ -106,16 +105,16 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.BuildingUnit
                     var notRealizedBuildingUnitVersion = await context.BuildingUnitVersions.FindAsync(position + 1, buildingUnitToNotRealizePersistentLocalId);
                     notRealizedBuildingUnitVersion.Should().NotBeNull();
 
-                    notRealizedBuildingUnitVersion!.Status.Should().Be(BuildingUnitStatus.NotRealized.Status);
-                    notRealizedBuildingUnitVersion.OsloStatus.Should().Be(BuildingUnitStatus.NotRealized.Map());
+                    notRealizedBuildingUnitVersion!.Status.Should().Be("NotRealized");
+                    notRealizedBuildingUnitVersion.OsloStatus.Should().Be("NietGerealiseerd");
                     notRealizedBuildingUnitVersion.Addresses.Should().BeEmpty();
                     notRealizedBuildingUnitVersion.VersionTimestamp.Should().Be(buildingWasRetired.Provenance.Timestamp);
 
                     var retiredBuildingUnitVersion = await context.BuildingUnitVersions.FindAsync(position + 1, buildingUnitToRetirePersistentLocalId);
                     retiredBuildingUnitVersion.Should().NotBeNull();
 
-                    retiredBuildingUnitVersion!.Status.Should().Be(BuildingUnitStatus.Retired.Status);
-                    retiredBuildingUnitVersion.OsloStatus.Should().Be(BuildingUnitStatus.Retired.Map());
+                    retiredBuildingUnitVersion!.Status.Should().Be("Retired");
+                    retiredBuildingUnitVersion.OsloStatus.Should().Be("Gehistoreerd");
                     retiredBuildingUnitVersion.Addresses.Should().BeEmpty();
                     retiredBuildingUnitVersion.VersionTimestamp.Should().Be(buildingWasRetired.Provenance.Timestamp);
                 });
@@ -164,16 +163,16 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.BuildingUnit
                     var notRealizedBuildingUnitVersion = await context.BuildingUnitVersions.FindAsync(position + 1, buildingUnitToNotRealizePersistentLocalId);
                     notRealizedBuildingUnitVersion.Should().NotBeNull();
 
-                    notRealizedBuildingUnitVersion!.Status.Should().Be(BuildingUnitStatus.NotRealized.Status);
-                    notRealizedBuildingUnitVersion.OsloStatus.Should().Be(BuildingUnitStatus.NotRealized.Map());
+                    notRealizedBuildingUnitVersion!.Status.Should().Be("NotRealized");
+                    notRealizedBuildingUnitVersion.OsloStatus.Should().Be("NietGerealiseerd");
                     notRealizedBuildingUnitVersion.Addresses.Should().BeEmpty();
                     notRealizedBuildingUnitVersion.VersionTimestamp.Should().Be(buildingWasCorrectedToRetired.Provenance.Timestamp);
 
                     var retiredBuildingUnitVersion = await context.BuildingUnitVersions.FindAsync(position + 1, buildingUnitToRetirePersistentLocalId);
                     retiredBuildingUnitVersion.Should().NotBeNull();
 
-                    retiredBuildingUnitVersion!.Status.Should().Be(BuildingUnitStatus.Retired.Status);
-                    retiredBuildingUnitVersion.OsloStatus.Should().Be(BuildingUnitStatus.Retired.Map());
+                    retiredBuildingUnitVersion!.Status.Should().Be("Retired");
+                    retiredBuildingUnitVersion.OsloStatus.Should().Be("Gehistoreerd");
                     retiredBuildingUnitVersion.Addresses.Should().BeEmpty();
                     retiredBuildingUnitVersion.VersionTimestamp.Should().Be(buildingWasCorrectedToRetired.Provenance.Timestamp);
                 });
@@ -222,16 +221,16 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.BuildingUnit
                     var notRealizedBuildingUnitVersion = await context.BuildingUnitVersions.FindAsync(position + 1, buildingUnitToNotRealizePersistentLocalId);
                     notRealizedBuildingUnitVersion.Should().NotBeNull();
 
-                    notRealizedBuildingUnitVersion!.Status.Should().Be(BuildingUnitStatus.NotRealized.Status);
-                    notRealizedBuildingUnitVersion.OsloStatus.Should().Be(BuildingUnitStatus.NotRealized.Map());
+                    notRealizedBuildingUnitVersion!.Status.Should().Be("NotRealized");
+                    notRealizedBuildingUnitVersion.OsloStatus.Should().Be("NietGerealiseerd");
                     notRealizedBuildingUnitVersion.Addresses.Should().BeEmpty();
                     notRealizedBuildingUnitVersion.VersionTimestamp.Should().Be(buildingWasNotRealized.Provenance.Timestamp);
 
                     var retiredBuildingUnitVersion = await context.BuildingUnitVersions.FindAsync(position + 1, buildingUnitToRetirePersistentLocalId);
                     retiredBuildingUnitVersion.Should().NotBeNull();
 
-                    retiredBuildingUnitVersion!.Status.Should().Be(BuildingUnitStatus.Retired.Status);
-                    retiredBuildingUnitVersion.OsloStatus.Should().Be(BuildingUnitStatus.Retired.Map());
+                    retiredBuildingUnitVersion!.Status.Should().Be("Retired");
+                    retiredBuildingUnitVersion.OsloStatus.Should().Be("Gehistoreerd");
                     retiredBuildingUnitVersion.Addresses.Should().BeEmpty();
                     retiredBuildingUnitVersion.VersionTimestamp.Should().Be(buildingWasNotRealized.Provenance.Timestamp);
                 });
@@ -280,16 +279,16 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.BuildingUnit
                     var notRealizedBuildingUnitVersion = await context.BuildingUnitVersions.FindAsync(position + 1, buildingUnitToNotRealizePersistentLocalId);
                     notRealizedBuildingUnitVersion.Should().NotBeNull();
 
-                    notRealizedBuildingUnitVersion!.Status.Should().Be(BuildingUnitStatus.NotRealized.Status);
-                    notRealizedBuildingUnitVersion.OsloStatus.Should().Be(BuildingUnitStatus.NotRealized.Map());
+                    notRealizedBuildingUnitVersion!.Status.Should().Be("NotRealized");
+                    notRealizedBuildingUnitVersion.OsloStatus.Should().Be("NietGerealiseerd");
                     notRealizedBuildingUnitVersion.Addresses.Should().BeEmpty();
                     notRealizedBuildingUnitVersion.VersionTimestamp.Should().Be(buildingWasCorrectedToNotRealized.Provenance.Timestamp);
 
                     var retiredBuildingUnitVersion = await context.BuildingUnitVersions.FindAsync(position + 1, buildingUnitToRetirePersistentLocalId);
                     retiredBuildingUnitVersion.Should().NotBeNull();
 
-                    retiredBuildingUnitVersion!.Status.Should().Be(BuildingUnitStatus.Retired.Status);
-                    retiredBuildingUnitVersion.OsloStatus.Should().Be(BuildingUnitStatus.Retired.Map());
+                    retiredBuildingUnitVersion!.Status.Should().Be("Retired");
+                    retiredBuildingUnitVersion.OsloStatus.Should().Be("Gehistoreerd");
                     retiredBuildingUnitVersion.Addresses.Should().BeEmpty();
                     retiredBuildingUnitVersion.VersionTimestamp.Should().Be(buildingWasCorrectedToNotRealized.Provenance.Timestamp);
                 });

@@ -6,7 +6,6 @@
     using Be.Vlaanderen.Basisregisters.GrAr.Common.Pipes;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore;
     using Be.Vlaanderen.Basisregisters.Utilities.HexByteConvertor;
-    using BuildingRegistry.Building;
     using BuildingRegistry.Building.Events;
     using Fixtures;
     using FluentAssertions;
@@ -15,7 +14,6 @@
     using NetTopologySuite.IO;
     using Projections.Integration;
     using Projections.Integration.Building.Version;
-    using Projections.Integration.Converters;
     using Projections.Integration.Infrastructure;
     using Tests.Legacy.Autofixture;
     using Xunit;
@@ -63,11 +61,11 @@
                     var buildingVersion = await ct.BuildingVersions.FindAsync(position);
                     buildingVersion.Should().NotBeNull();
 
-                    buildingVersion!.Status.Should().Be(BuildingStatus.Planned.Value);
-                    buildingVersion.OsloStatus.Should().Be(BuildingStatus.Planned.Map());
+                    buildingVersion!.Status.Should().Be("Planned");
+                    buildingVersion.OsloStatus.Should().Be("Gepland");
                     buildingVersion.Geometry.Should().BeEquivalentTo(_wkbReader.Read(buildingWasPlannedV2.ExtendedWkbGeometry.ToByteArray()));
-                    buildingVersion.GeometryMethod.Should().Be(BuildingGeometryMethod.Outlined.Value);
-                    buildingVersion.OsloGeometryMethod.Should().Be(BuildingGeometryMethod.Outlined.Map());
+                    buildingVersion.GeometryMethod.Should().Be("Outlined");
+                    buildingVersion.OsloGeometryMethod.Should().Be("Ingeschetst");
                     buildingVersion.IsRemoved.Should().BeFalse();
                     buildingVersion.Namespace.Should().Be(BuildingNamespace);
                     buildingVersion.PuriId.Should().Be($"{BuildingNamespace}/{buildingWasPlannedV2.BuildingPersistentLocalId}");
@@ -95,10 +93,10 @@
                     var buildingVersion = await ct.BuildingVersions.FindAsync(position);
                     buildingVersion.Should().NotBeNull();
 
-                    buildingVersion!.Status.Should().Be(BuildingStatus.Realized.Value);
-                    buildingVersion.OsloStatus.Should().Be(BuildingStatus.Realized.Map());
-                    buildingVersion.GeometryMethod.Should().Be(BuildingGeometryMethod.MeasuredByGrb.Value);
-                    buildingVersion.OsloGeometryMethod.Should().Be(BuildingGeometryMethod.MeasuredByGrb.Map());
+                    buildingVersion!.Status.Should().Be("Realized");
+                    buildingVersion.OsloStatus.Should().Be("Gerealiseerd");
+                    buildingVersion.GeometryMethod.Should().Be("MeasuredByGrb");
+                    buildingVersion.OsloGeometryMethod.Should().Be("IngemetenGRB");
                     buildingVersion.Geometry.Should()
                         .BeEquivalentTo(_wkbReader.Read(unplannedBuildingWasRealizedAndMeasured.ExtendedWkbGeometry.ToByteArray()));
                     buildingVersion.IsRemoved.Should().BeFalse();
@@ -359,8 +357,8 @@
                     var buildingVersion = await ct.BuildingVersions.FindAsync(position + 1);
                     buildingVersion.Should().NotBeNull();
 
-                    buildingVersion!.Status.Should().Be(BuildingStatus.UnderConstruction.Value);
-                    buildingVersion.OsloStatus.Should().Be(BuildingStatus.UnderConstruction.Map());
+                    buildingVersion!.Status.Should().Be("UnderConstruction");
+                    buildingVersion.OsloStatus.Should().Be("InAanbouw");
                     buildingVersion.VersionTimestamp.Should().Be(buildingBecameUnderConstructionV2.Provenance.Timestamp);
                 });
         }
@@ -395,8 +393,8 @@
                     var buildingVersion = await ct.BuildingVersions.FindAsync(position + 1);
                     buildingVersion.Should().NotBeNull();
 
-                    buildingVersion!.Status.Should().Be(BuildingStatus.Planned.Value);
-                    buildingVersion.OsloStatus.Should().Be(BuildingStatus.Planned.Map());
+                    buildingVersion!.Status.Should().Be("Planned");
+                    buildingVersion.OsloStatus.Should().Be("Gepland");
                     buildingVersion.VersionTimestamp.Should().Be(buildingWasCorrectedFromUnderConstructionToPlanned.Provenance.Timestamp);
                 });
         }
@@ -430,8 +428,8 @@
                     var buildingVersion = await ct.BuildingVersions.FindAsync(position + 1);
                     buildingVersion.Should().NotBeNull();
 
-                    buildingVersion!.Status.Should().Be(BuildingStatus.Realized.Value);
-                    buildingVersion.OsloStatus.Should().Be(BuildingStatus.Realized.Map());
+                    buildingVersion!.Status.Should().Be("Realized");
+                    buildingVersion.OsloStatus.Should().Be("Gerealiseerd");
                     buildingVersion.VersionTimestamp.Should().Be(buildingWasRealizedV2.Provenance.Timestamp);
                 });
         }
@@ -480,8 +478,8 @@
                     var buildingVersion = await ct.BuildingVersions.FindAsync(position + 2);
                     buildingVersion.Should().NotBeNull();
 
-                    buildingVersion!.Status.Should().Be(BuildingStatus.UnderConstruction.Value);
-                    buildingVersion.OsloStatus.Should().Be(BuildingStatus.UnderConstruction.Map());
+                    buildingVersion!.Status.Should().Be("UnderConstruction");
+                    buildingVersion.OsloStatus.Should().Be("InAanbouw");
                     buildingVersion.VersionTimestamp.Should().Be(buildingWasCorrectedFromRealizedToUnderConstruction.Provenance.Timestamp);
                 });
         }
@@ -512,8 +510,8 @@
                     var buildingVersion = await ct.BuildingVersions.FindAsync(position + 1);
                     buildingVersion.Should().NotBeNull();
 
-                    buildingVersion!.Status.Should().Be(BuildingStatus.NotRealized.Value);
-                    buildingVersion.OsloStatus.Should().Be(BuildingStatus.NotRealized.Map());
+                    buildingVersion!.Status.Should().Be("NotRealized");
+                    buildingVersion.OsloStatus.Should().Be("NietGerealiseerd");
                     buildingVersion.VersionTimestamp.Should().Be(buildingWasNotRealizedV2.Provenance.Timestamp);
                 });
         }
@@ -554,8 +552,8 @@
                     var buildingVersion = await ct.BuildingVersions.FindAsync(position + 2);
                     buildingVersion.Should().NotBeNull();
 
-                    buildingVersion!.Status.Should().Be(BuildingStatus.Planned.Value);
-                    buildingVersion.OsloStatus.Should().Be(BuildingStatus.Planned.Map());
+                    buildingVersion!.Status.Should().Be("Planned");
+                    buildingVersion.OsloStatus.Should().Be("Gepland");
                     buildingVersion.VersionTimestamp.Should().Be(buildingWasCorrectedFromNotRealizedToPlanned.Provenance.Timestamp);
                 });
         }
@@ -633,8 +631,8 @@
                     buildingVersion.Should().NotBeNull();
 
                     buildingVersion!.Geometry.Should().BeEquivalentTo(_wkbReader.Read(buildingWasMeasured.ExtendedWkbGeometryBuilding.ToByteArray()));
-                    buildingVersion.GeometryMethod.Should().Be(BuildingGeometryMethod.MeasuredByGrb.Value);
-                    buildingVersion.OsloGeometryMethod.Should().Be(BuildingGeometryMethod.MeasuredByGrb.Map());
+                    buildingVersion.GeometryMethod.Should().Be("MeasuredByGrb");
+                    buildingVersion.OsloGeometryMethod.Should().Be("IngemetenGRB");
                     buildingVersion.VersionTimestamp.Should().Be(buildingWasMeasured.Provenance.Timestamp);
                 });
         }
@@ -681,8 +679,8 @@
                     buildingVersion.Should().NotBeNull();
 
                     buildingVersion!.Geometry.Should().BeEquivalentTo(_wkbReader.Read(buildingMeasurementWasCorrected.ExtendedWkbGeometryBuilding.ToByteArray()));
-                    buildingVersion.GeometryMethod.Should().Be(BuildingGeometryMethod.MeasuredByGrb.Value);
-                    buildingVersion.OsloGeometryMethod.Should().Be(BuildingGeometryMethod.MeasuredByGrb.Map());
+                    buildingVersion.GeometryMethod.Should().Be("MeasuredByGrb");
+                    buildingVersion.OsloGeometryMethod.Should().Be("IngemetenGRB");
                     buildingVersion.VersionTimestamp.Should().Be(buildingMeasurementWasCorrected.Provenance.Timestamp);
                 });
         }
@@ -724,8 +722,8 @@
                     var buildingVersion = await ct.BuildingVersions.FindAsync(position + 1);
                     buildingVersion.Should().NotBeNull();
 
-                    buildingVersion!.Status.Should().Be(BuildingStatus.Retired.Value);
-                    buildingVersion.OsloStatus.Should().Be(BuildingStatus.Retired.Map());
+                    buildingVersion!.Status.Should().Be("Retired");
+                    buildingVersion.OsloStatus.Should().Be("Gehistoreerd");
                     buildingVersion.VersionTimestamp.Should().Be(buildingWasDemolished.Provenance.Timestamp);
                 });
         }
@@ -755,11 +753,11 @@
                     buildingVersion.Should().NotBeNull();
 
                     buildingVersion!.BuildingPersistentLocalId.Should().Be(buildingMergerWasRealized.BuildingPersistentLocalId);
-                    buildingVersion.Status.Should().Be(BuildingStatus.Realized.Value);
-                    buildingVersion.OsloStatus.Should().Be(BuildingStatus.Realized.Map());
+                    buildingVersion.Status.Should().Be("Realized");
+                    buildingVersion.OsloStatus.Should().Be("Gerealiseerd");
                     buildingVersion.Geometry.Should().BeEquivalentTo(_wkbReader.Read(buildingMergerWasRealized.ExtendedWkbGeometry.ToByteArray()));
-                    buildingVersion.GeometryMethod.Should().Be(BuildingGeometryMethod.MeasuredByGrb.Value);
-                    buildingVersion.OsloGeometryMethod.Should().Be(BuildingGeometryMethod.MeasuredByGrb.Map());
+                    buildingVersion.GeometryMethod.Should().Be("MeasuredByGrb");
+                    buildingVersion.OsloGeometryMethod.Should().Be("IngemetenGRB");
                     buildingVersion.VersionTimestamp.Should().Be(buildingMergerWasRealized.Provenance.Timestamp);
                     buildingVersion.CreatedOnTimestamp.Should().Be(buildingMergerWasRealized.Provenance.Timestamp);
                 });
@@ -841,8 +839,8 @@
                     var buildingVersion = await ct.BuildingVersions.FindAsync(position + 1);
                     buildingVersion.Should().NotBeNull();
 
-                    buildingVersion!.Status.Should().Be(BuildingStatus.Retired.Value);
-                    buildingVersion.OsloStatus.Should().Be(BuildingStatus.Retired.Map());
+                    buildingVersion!.Status.Should().Be("Retired");
+                    buildingVersion.OsloStatus.Should().Be("Gehistoreerd");
                     buildingVersion.VersionTimestamp.Should().Be(buildingWasMerged.Provenance.Timestamp);
                 });
         }
