@@ -1,3 +1,10 @@
+## [3.99.1](https://github.com/informatievlaanderen/building-registry/compare/v3.99.0...v3.99.1) (2024-02-06)
+
+
+### Bug Fixes
+
+* bump projectionhandling ([554122c](https://github.com/informatievlaanderen/building-registry/commit/554122c3197c9b84ea1f4e72317d0bb674836e2d))
+
 # [3.99.0](https://github.com/informatievlaanderen/building-registry/compare/v3.98.1...v3.99.0) (2024-02-02)
 
 
