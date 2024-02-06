@@ -2,6 +2,7 @@
 {
     using System;
     using System.Threading.Tasks;
+    using Be.Vlaanderen.Basisregisters.Utilities;
     using Dapper;
     using Microsoft.Data.SqlClient;
 
@@ -29,7 +30,7 @@ SELECT top 1 Json_Value(JsonData, '$.persistentLocalId') AS ""BuildingPersistent
 FROM [building-registry-events].[BuildingRegistry].[Streams] as s
 INNER JOIN [building-registry-events].[BuildingRegistry].[Messages] as m
     on s.IdInternal = m.StreamIdInternal and m.[Type] = 'BuildingPersistentLocalIdentifierWasAssigned'
-WHERE Id = @BuildingId";
+WHERE s.Id = @BuildingId";
 
             var buildingPersistentLocalId = await connection.QuerySingleAsync<int>(sql, new { BuildingId = buildingId });
 
@@ -46,16 +47,11 @@ FROM [building-registry-events].[BuildingRegistry].[Streams] as s
 INNER JOIN [building-registry-events].[BuildingRegistry].[Messages] as m
     on s.IdInternal = m.StreamIdInternal and m.[Type] = 'BuildingUnitPersistentLocalIdentifierWasAssigned'
 WHERE
-    IdOriginal = @BuildingId
-    AND Json_Value(JsonData, '$.buildingUnitId') = @BuildingUnitId";
+    s.Id = @BuildingId
+    AND  JSON_VALUE(JsonData, '$.buildingUnitId') = @BuildingUnitId";
 
             var buildingPersistentLocalId = await connection.QuerySingleAsync<int>(
-                sql,
-                new
-                {
-                    BuildingId = buildingId,
-                    BuildingUnitId = buildingUnitId
-                });
+                sql, new { BuildingId = buildingId.ToString("D") , BuildingUnitId = buildingUnitId });
 
             return buildingPersistentLocalId;
         }
