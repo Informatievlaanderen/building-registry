@@ -5,6 +5,7 @@ namespace BuildingRegistry.Projections.Integration
     using System.Threading.Tasks;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.Runner;
     using Building.LatestItem;
+    using Building.Version;
     using BuildingRegistry.Infrastructure;
     using BuildingUnit.LatestItem;
     using Microsoft.EntityFrameworkCore;
@@ -18,6 +19,8 @@ namespace BuildingRegistry.Projections.Integration
 
         public DbSet<BuildingUnitLatestItem> BuildingUnitLatestItems => Set<BuildingUnitLatestItem>();
         public DbSet<BuildingUnitAddress> BuildingUnitAddresses => Set<BuildingUnitAddress>();
+
+        public DbSet<BuildingVersion> BuildingVersions => Set<BuildingVersion>();
 
         private DbSet<MunicipalityGeometry> MunicipalityGeometries => Set<MunicipalityGeometry>();
 

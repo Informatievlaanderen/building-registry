@@ -20,6 +20,7 @@ namespace BuildingRegistry.Projector.Infrastructure.Modules
     using BuildingRegistry.Projections.Extract.BuildingUnitExtract;
     using BuildingRegistry.Projections.Integration;
     using BuildingRegistry.Projections.Integration.Building.LatestItem;
+    using BuildingRegistry.Projections.Integration.Building.Version;
     using BuildingRegistry.Projections.Integration.BuildingUnit.LatestItem;
     using BuildingRegistry.Projections.Integration.Infrastructure;
     using BuildingRegistry.Projections.LastChangedList;
@@ -250,6 +251,12 @@ namespace BuildingRegistry.Projector.Infrastructure.Modules
                     ConnectedProjectionSettings.Default)
                 .RegisterProjections<BuildingUnitLatestItemProjections, IntegrationContext>(
                     context => new BuildingUnitLatestItemProjections(context.Resolve<IOptions<IntegrationOptions>>()),
+                    ConnectedProjectionSettings.Default)
+                .RegisterProjections<BuildingVersionProjections, IntegrationContext>(
+                    context => new BuildingVersionProjections(
+                        context.Resolve<IOptions<IntegrationOptions>>(),
+                        context.Resolve<IPersistentLocalIdFinder>(),
+                        context.Resolve<IAddresses>()),
                     ConnectedProjectionSettings.Default);
         }
     }

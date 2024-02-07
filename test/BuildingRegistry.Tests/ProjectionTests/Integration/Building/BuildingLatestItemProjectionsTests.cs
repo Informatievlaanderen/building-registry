@@ -1,4 +1,4 @@
-namespace BuildingRegistry.Tests.ProjectionTests.Integration
+namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
 {
     using System.Collections.Generic;
     using System.Threading.Tasks;
@@ -6,8 +6,8 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration
     using Be.Vlaanderen.Basisregisters.GrAr.Common.Pipes;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore;
     using Be.Vlaanderen.Basisregisters.Utilities.HexByteConvertor;
-    using Building;
-    using Building.Events;
+    using BuildingRegistry.Building;
+    using BuildingRegistry.Building.Events;
     using Fixtures;
     using FluentAssertions;
     using Microsoft.Extensions.Options;

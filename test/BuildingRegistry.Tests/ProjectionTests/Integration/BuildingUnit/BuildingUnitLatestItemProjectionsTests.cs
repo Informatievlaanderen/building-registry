@@ -1,4 +1,4 @@
-namespace BuildingRegistry.Tests.ProjectionTests.Integration
+namespace BuildingRegistry.Tests.ProjectionTests.Integration.BuildingUnit
 {
     using System.Collections.Generic;
     using System.Linq;
@@ -8,8 +8,8 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore;
     using Be.Vlaanderen.Basisregisters.Utilities.HexByteConvertor;
-    using Building;
-    using Building.Events;
+    using BuildingRegistry.Building;
+    using BuildingRegistry.Building.Events;
     using Extensions;
     using Fixtures;
     using FluentAssertions;

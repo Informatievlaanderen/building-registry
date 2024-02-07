@@ -1,6 +1,5 @@
-﻿namespace BuildingRegistry.Projections.Integration.Building.LatestItem
+﻿namespace BuildingRegistry.Projections.Integration
 {
-    using BuildingRegistry.Infrastructure;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.EntityFrameworkCore.Metadata.Builders;
     using NetTopologySuite.Geometries;
