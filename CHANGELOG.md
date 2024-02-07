@@ -1,3 +1,17 @@
+# [3.100.0](https://github.com/informatievlaanderen/building-registry/compare/v3.99.1...v3.100.0) (2024-02-07)
+
+
+### Bug Fixes
+
+* bump projector + projectionhandling ([ca8e8b9](https://github.com/informatievlaanderen/building-registry/commit/ca8e8b9543e2f9cd155ba7f4bddecfc90f08ba4b))
+
+
+### Features
+
+* add backoffice projections status ([b608ce3](https://github.com/informatievlaanderen/building-registry/commit/b608ce34250e22212a5418768cb7f1d6a68914da))
+* add integration database version projections ([d528f5d](https://github.com/informatievlaanderen/building-registry/commit/d528f5d29ceb130e198164eef54b26d4ff009799))
+* disable merge building with all dependencies GAWR-5417 ([93fa2fb](https://github.com/informatievlaanderen/building-registry/commit/93fa2fb945e3e60351b34f9c2d20131923103b27))
+
 ## [3.99.1](https://github.com/informatievlaanderen/building-registry/compare/v3.99.0...v3.99.1) (2024-02-06)
 
 
