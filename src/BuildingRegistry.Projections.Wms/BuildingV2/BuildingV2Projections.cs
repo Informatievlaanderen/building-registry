@@ -169,37 +169,37 @@ namespace BuildingRegistry.Projections.Wms.BuildingV2
                 item.Version = message.Message.Provenance.Timestamp;
             });
 
-            When<Envelope<BuildingMergerWasRealized>>(async (context, message, ct) =>
-            {
-                var item = new BuildingV2
-                {
-                    PersistentLocalId = message.Message.BuildingPersistentLocalId,
-                    Id = PersistentLocalIdHelper.CreateBuildingId(message.Message.BuildingPersistentLocalId),
-                    Status = BuildingStatus.Realized,
-                    Version = message.Message.Provenance.Timestamp
-                };
-                SetGeometry(item, message.Message.ExtendedWkbGeometry, MeasuredByGrbMethod);
-                await context.BuildingsV2.AddAsync(item, ct);
-            });
-
-            When<Envelope<BuildingWasMerged>>(async (context, message, ct) =>
-            {
-                var item = await context.BuildingsV2.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);
-                item.Status = BuildingStatus.Retired;
-                item.Version = message.Message.Provenance.Timestamp;
-            });
-
-            When<Envelope<BuildingUnitWasTransferred>>(async (context, message, ct) =>
-            {
-                var item = await context.BuildingsV2.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);
-                item.Version = message.Message.Provenance.Timestamp;
-            });
-
-            When<Envelope<BuildingUnitWasMoved>>(async (context, message, ct) =>
-            {
-                var item = await context.BuildingsV2.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);
-                item.Version = message.Message.Provenance.Timestamp;
-            });
+            // When<Envelope<BuildingMergerWasRealized>>(async (context, message, ct) =>
+            // {
+            //     var item = new BuildingV2
+            //     {
+            //         PersistentLocalId = message.Message.BuildingPersistentLocalId,
+            //         Id = PersistentLocalIdHelper.CreateBuildingId(message.Message.BuildingPersistentLocalId),
+            //         Status = BuildingStatus.Realized,
+            //         Version = message.Message.Provenance.Timestamp
+            //     };
+            //     SetGeometry(item, message.Message.ExtendedWkbGeometry, MeasuredByGrbMethod);
+            //     await context.BuildingsV2.AddAsync(item, ct);
+            // });
+            //
+            // When<Envelope<BuildingWasMerged>>(async (context, message, ct) =>
+            // {
+            //     var item = await context.BuildingsV2.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);
+            //     item.Status = BuildingStatus.Retired;
+            //     item.Version = message.Message.Provenance.Timestamp;
+            // });
+            //
+            // When<Envelope<BuildingUnitWasTransferred>>(async (context, message, ct) =>
+            // {
+            //     var item = await context.BuildingsV2.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);
+            //     item.Version = message.Message.Provenance.Timestamp;
+            // });
+            //
+            // When<Envelope<BuildingUnitWasMoved>>(async (context, message, ct) =>
+            // {
+            //     var item = await context.BuildingsV2.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);
+            //     item.Version = message.Message.Provenance.Timestamp;
+            // });
         }
 
         public static string MapMethod(BuildingGeometryMethod method)

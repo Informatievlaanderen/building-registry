@@ -458,31 +458,31 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
                     }, ct);
             });
 
-            When<Envelope<BuildingUnitWasTransferred>>(async (context, message, ct) =>
-            {
-                var geometryMethod = MapGeometryMethod(BuildingUnitPositionGeometryMethod.Parse(message.Message.GeometryMethod));
-                var geometry = wkbReader.Read(message.Message.ExtendedWkbGeometry.ToByteArray());
-
-                await context.FindAndUpdateBuildingUnitExtract(message.Message.BuildingUnitPersistentLocalId,
-                    itemV2 =>
-                    {
-                        itemV2.BuildingPersistentLocalId = message.Message.BuildingPersistentLocalId;
-                        UpdateRecord(itemV2, record =>
-                            record.id.Value = $"{extractConfig.Value.DataVlaanderenNamespaceBuildingUnit}/{message.Message.BuildingUnitPersistentLocalId}");
-                        UpdateRecord(itemV2, record => record.gebouwid.Value = message.Message.BuildingPersistentLocalId.ToString());
-                        UpdateRecord(itemV2, record => record.functie.Value = MapFunction(BuildingUnitFunction.Parse(message.Message.Function)));
-                        UpdateRecord(itemV2, record => record.status.Value = MapStatus(BuildingUnitStatus.Parse(message.Message.Status)));
-                        UpdateRecord(itemV2, record => record.afwijking.Value = message.Message.HasDeviation);
-                        UpdatePosition(itemV2, geometryMethod);
-                        UpdateGeometry(itemV2, geometry);
-                        UpdateVersie(itemV2, message.Message.Provenance.Timestamp);
-                    }, ct);
-            });
-
-            When<Envelope<BuildingUnitWasMoved>>(async (_, _, _) =>
-            {
-                // BuildingUnitWasTransferred couples the unit to another building and BuildingUnitMoved is an event applicable on the old building.
-            });
+            // When<Envelope<BuildingUnitWasTransferred>>(async (context, message, ct) =>
+            // {
+            //     var geometryMethod = MapGeometryMethod(BuildingUnitPositionGeometryMethod.Parse(message.Message.GeometryMethod));
+            //     var geometry = wkbReader.Read(message.Message.ExtendedWkbGeometry.ToByteArray());
+            //
+            //     await context.FindAndUpdateBuildingUnitExtract(message.Message.BuildingUnitPersistentLocalId,
+            //         itemV2 =>
+            //         {
+            //             itemV2.BuildingPersistentLocalId = message.Message.BuildingPersistentLocalId;
+            //             UpdateRecord(itemV2, record =>
+            //                 record.id.Value = $"{extractConfig.Value.DataVlaanderenNamespaceBuildingUnit}/{message.Message.BuildingUnitPersistentLocalId}");
+            //             UpdateRecord(itemV2, record => record.gebouwid.Value = message.Message.BuildingPersistentLocalId.ToString());
+            //             UpdateRecord(itemV2, record => record.functie.Value = MapFunction(BuildingUnitFunction.Parse(message.Message.Function)));
+            //             UpdateRecord(itemV2, record => record.status.Value = MapStatus(BuildingUnitStatus.Parse(message.Message.Status)));
+            //             UpdateRecord(itemV2, record => record.afwijking.Value = message.Message.HasDeviation);
+            //             UpdatePosition(itemV2, geometryMethod);
+            //             UpdateGeometry(itemV2, geometry);
+            //             UpdateVersie(itemV2, message.Message.Provenance.Timestamp);
+            //         }, ct);
+            // });
+            //
+            // When<Envelope<BuildingUnitWasMoved>>(async (_, _, _) =>
+            // {
+            //     // BuildingUnitWasTransferred couples the unit to another building and BuildingUnitMoved is an event applicable on the old building.
+            // });
         }
 
         private static string MapFunction(BuildingUnitFunction function)

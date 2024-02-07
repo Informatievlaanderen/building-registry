@@ -1070,39 +1070,39 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
                 }, ct);
             });
 
-            When<Envelope<BuildingMergerWasRealized>>(async (context, message, ct) =>
-            {
-                var buildingUnitSyndicationItems = new Collection<BuildingUnitSyndicationItemV2>();
-                var newBuildingSyndicationItem = new BuildingSyndicationItem
-                {
-                    PersistentLocalId = message.Message.BuildingPersistentLocalId,
-                    Position = message.Position,
-                    Status = MapBuildingStatus(BuildingRegistry.Building.BuildingStatus.Realized),
-                    GeometryMethod = MapBuildingGeometryMethod(BuildingRegistry.Building.BuildingGeometryMethod.MeasuredByGrb),
-                    Geometry = message.Message.ExtendedWkbGeometry.ToByteArray(),
-                    IsComplete = true,
-                    RecordCreatedAt = message.Message.Provenance.Timestamp,
-                    LastChangedOn = message.Message.Provenance.Timestamp,
-                    ChangeType = message.EventName,
-                    SyndicationItemCreatedAt = DateTimeOffset.Now,
-                    BuildingUnitsV2 = buildingUnitSyndicationItems
-                };
+            // When<Envelope<BuildingMergerWasRealized>>(async (context, message, ct) =>
+            // {
+            //     var buildingUnitSyndicationItems = new Collection<BuildingUnitSyndicationItemV2>();
+            //     var newBuildingSyndicationItem = new BuildingSyndicationItem
+            //     {
+            //         PersistentLocalId = message.Message.BuildingPersistentLocalId,
+            //         Position = message.Position,
+            //         Status = MapBuildingStatus(BuildingRegistry.Building.BuildingStatus.Realized),
+            //         GeometryMethod = MapBuildingGeometryMethod(BuildingRegistry.Building.BuildingGeometryMethod.MeasuredByGrb),
+            //         Geometry = message.Message.ExtendedWkbGeometry.ToByteArray(),
+            //         IsComplete = true,
+            //         RecordCreatedAt = message.Message.Provenance.Timestamp,
+            //         LastChangedOn = message.Message.Provenance.Timestamp,
+            //         ChangeType = message.EventName,
+            //         SyndicationItemCreatedAt = DateTimeOffset.Now,
+            //         BuildingUnitsV2 = buildingUnitSyndicationItems
+            //     };
+            //
+            //     newBuildingSyndicationItem.ApplyProvenance(message.Message.Provenance);
+            //     newBuildingSyndicationItem.SetEventData(message.Message, message.EventName);
+            //
+            //     await context
+            //         .BuildingSyndication
+            //         .AddAsync(newBuildingSyndicationItem, ct);
+            // });
 
-                newBuildingSyndicationItem.ApplyProvenance(message.Message.Provenance);
-                newBuildingSyndicationItem.SetEventData(message.Message, message.EventName);
-
-                await context
-                    .BuildingSyndication
-                    .AddAsync(newBuildingSyndicationItem, ct);
-            });
-
-            When<Envelope<BuildingWasMerged>>(async (context, message, ct) =>
-            {
-                await context.CreateNewBuildingSyndicationItem(message.Message.BuildingPersistentLocalId, message, item =>
-                {
-                    item.Status = MapBuildingStatus(BuildingRegistry.Building.BuildingStatus.Retired);
-                }, ct);
-            });
+            // When<Envelope<BuildingWasMerged>>(async (context, message, ct) =>
+            // {
+            //     await context.CreateNewBuildingSyndicationItem(message.Message.BuildingPersistentLocalId, message, item =>
+            //     {
+            //         item.Status = MapBuildingStatus(BuildingRegistry.Building.BuildingStatus.Retired);
+            //     }, ct);
+            // });
 
             #endregion Building
 
@@ -1432,44 +1432,45 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
                 }, ct);
             });
 
-            When<Envelope<BuildingUnitWasTransferred>>(async (context, message, ct) =>
-            {
-                await context.CreateNewBuildingSyndicationItem(
-                    message.Message.BuildingPersistentLocalId,
-                    message,
-                    x =>
-                    {
-                        var buildingUnitSyndicationItem = new BuildingUnitSyndicationItemV2
-                        {
-                            Position = message.Position,
-                            PersistentLocalId = message.Message.BuildingUnitPersistentLocalId,
-                            Status = BuildingRegistry.Building.BuildingUnitStatus.Parse(message.Message.Status),
-                            HasDeviation = message.Message.HasDeviation,
-                            Function = BuildingRegistry.Building.BuildingUnitFunction.Parse(message.Message.Function),
-                            PointPosition = message.Message.ExtendedWkbGeometry.ToByteArray(),
-                            PositionMethod = BuildingRegistry.Building.BuildingUnitPositionGeometryMethod.Parse(message.Message.GeometryMethod),
-                            Version = message.Message.Provenance.Timestamp,
-                            Addresses = new Collection<BuildingUnitAddressSyndicationItemV2>(message.Message.AddressPersistentLocalIds.Select(addressPersistentLocalId =>
-                                new BuildingUnitAddressSyndicationItemV2(
-                                    message.Position,
-                                    message.Message.BuildingUnitPersistentLocalId,
-                                    addressPersistentLocalId))
-                                .ToList())
-                        };
-
-                        x.BuildingUnitsV2.Add(buildingUnitSyndicationItem);
-                    },
-                    ct);
-
-                When<Envelope<BuildingUnitWasMoved>>(async (context, message, ct) =>
-                {
-                    await context.CreateNewBuildingSyndicationItem(message.Message.BuildingPersistentLocalId, message, item =>
-                    {
-                        var unit = item.BuildingUnitsV2.Single(y => y.PersistentLocalId == message.Message.BuildingUnitPersistentLocalId);
-                        item.BuildingUnitsV2.Remove(unit);
-                    }, ct);
-                });
-            });
+            // When<Envelope<BuildingUnitWasTransferred>>(async (context, message, ct) =>
+            // {
+            //     await context.CreateNewBuildingSyndicationItem(
+            //         message.Message.BuildingPersistentLocalId,
+            //         message,
+            //         x =>
+            //         {
+            //             var buildingUnitSyndicationItem = new BuildingUnitSyndicationItemV2
+            //             {
+            //                 Position = message.Position,
+            //                 PersistentLocalId = message.Message.BuildingUnitPersistentLocalId,
+            //                 Status = BuildingRegistry.Building.BuildingUnitStatus.Parse(message.Message.Status),
+            //                 HasDeviation = message.Message.HasDeviation,
+            //                 Function = BuildingRegistry.Building.BuildingUnitFunction.Parse(message.Message.Function),
+            //                 PointPosition = message.Message.ExtendedWkbGeometry.ToByteArray(),
+            //                 PositionMethod = BuildingRegistry.Building.BuildingUnitPositionGeometryMethod.Parse(message.Message.GeometryMethod),
+            //                 Version = message.Message.Provenance.Timestamp,
+            //                 Addresses = new Collection<BuildingUnitAddressSyndicationItemV2>(message.Message.AddressPersistentLocalIds.Select(
+            //                         addressPersistentLocalId =>
+            //                             new BuildingUnitAddressSyndicationItemV2(
+            //                                 message.Position,
+            //                                 message.Message.BuildingUnitPersistentLocalId,
+            //                                 addressPersistentLocalId))
+            //                     .ToList())
+            //             };
+            //
+            //             x.BuildingUnitsV2.Add(buildingUnitSyndicationItem);
+            //         },
+            //         ct);
+            // });
+            //
+            // When<Envelope<BuildingUnitWasMoved>>(async (context, message, ct) =>
+            // {
+            //     await context.CreateNewBuildingSyndicationItem(message.Message.BuildingPersistentLocalId, message, item =>
+            //     {
+            //         var unit = item.BuildingUnitsV2.Single(y => y.PersistentLocalId == message.Message.BuildingUnitPersistentLocalId);
+            //         item.BuildingUnitsV2.Remove(unit);
+            //     }, ct);
+            // });
             #endregion
         }
 

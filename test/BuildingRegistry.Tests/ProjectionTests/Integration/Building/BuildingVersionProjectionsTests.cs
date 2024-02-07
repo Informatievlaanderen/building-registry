@@ -796,84 +796,84 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
                 });
         }
 
-        [Fact]
-        public async Task WhenBuildingMergerWasRealized()
-        {
-            var buildingMergerWasRealized = _fixture.Create<BuildingMergerWasRealized>();
-
-            var position = _fixture.Create<long>();
-
-            var buildingMergerWasRealizedMetadata = new Dictionary<string, object>
-            {
-                { AddEventHashPipe.HashMetadataKey, buildingMergerWasRealized.GetHash() },
-                { Envelope.PositionMetadataKey, position }
-            };
-
-            await Sut
-                .Given(
-                    new Envelope<BuildingMergerWasRealized>(
-                        new Envelope(
-                            buildingMergerWasRealized,
-                            buildingMergerWasRealizedMetadata)))
-                .Then(async ct =>
-                {
-                    var buildingVersion = await ct.BuildingVersions.FindAsync(position);
-                    buildingVersion.Should().NotBeNull();
-
-                    buildingVersion!.BuildingPersistentLocalId.Should().Be(buildingMergerWasRealized.BuildingPersistentLocalId);
-                    buildingVersion.Status.Should().Be("Realized");
-                    buildingVersion.OsloStatus.Should().Be("Gerealiseerd");
-                    buildingVersion.Geometry.Should()
-                        .BeEquivalentTo(_wkbReader.Read(buildingMergerWasRealized.ExtendedWkbGeometry.ToByteArray()));
-                    buildingVersion.GeometryMethod.Should().Be("MeasuredByGrb");
-                    buildingVersion.OsloGeometryMethod.Should().Be("IngemetenGRB");
-                    buildingVersion.VersionTimestamp.Should().Be(buildingMergerWasRealized.Provenance.Timestamp);
-                    buildingVersion.CreatedOnTimestamp.Should().Be(buildingMergerWasRealized.Provenance.Timestamp);
-                    buildingVersion.LastChangedOnTimestamp.Should().Be(buildingMergerWasRealized.Provenance.Timestamp);
-                });
-        }
-
-        [Fact]
-        public async Task WhenBuildingWasMerged()
-        {
-            _fixture.Customize(new WithFixedBuildingPersistentLocalId());
-
-            var buildingWasPlanned = _fixture.Create<BuildingWasPlannedV2>();
-            var buildingWasMerged = _fixture.Create<BuildingWasMerged>();
-
-            var position = _fixture.Create<long>();
-
-            var buildingWasPlannedMetadata = new Dictionary<string, object>
-            {
-                { AddEventHashPipe.HashMetadataKey, buildingWasPlanned.GetHash() },
-                { Envelope.PositionMetadataKey, position }
-            };
-            var buildingWasMergedMetadata = new Dictionary<string, object>
-            {
-                { AddEventHashPipe.HashMetadataKey, buildingWasMerged.GetHash() },
-                { Envelope.PositionMetadataKey, ++position }
-            };
-
-            await Sut
-                .Given(
-                    new Envelope<BuildingWasPlannedV2>(
-                        new Envelope(
-                            buildingWasPlanned,
-                            buildingWasPlannedMetadata)),
-                    new Envelope<BuildingWasMerged>(
-                        new Envelope(
-                            buildingWasMerged,
-                            buildingWasMergedMetadata)))
-                .Then(async ct =>
-                {
-                    var buildingVersion = await ct.BuildingVersions.FindAsync(position);
-                    buildingVersion.Should().NotBeNull();
-
-                    buildingVersion!.Status.Should().Be("Retired");
-                    buildingVersion.OsloStatus.Should().Be("Gehistoreerd");
-                    buildingVersion.VersionTimestamp.Should().Be(buildingWasMerged.Provenance.Timestamp);
-                });
-        }
+        // [Fact]
+        // public async Task WhenBuildingMergerWasRealized()
+        // {
+        //     var buildingMergerWasRealized = _fixture.Create<BuildingMergerWasRealized>();
+        //
+        //     var position = _fixture.Create<long>();
+        //
+        //     var buildingMergerWasRealizedMetadata = new Dictionary<string, object>
+        //     {
+        //         { AddEventHashPipe.HashMetadataKey, buildingMergerWasRealized.GetHash() },
+        //         { Envelope.PositionMetadataKey, position }
+        //     };
+        //
+        //     await Sut
+        //         .Given(
+        //             new Envelope<BuildingMergerWasRealized>(
+        //                 new Envelope(
+        //                     buildingMergerWasRealized,
+        //                     buildingMergerWasRealizedMetadata)))
+        //         .Then(async ct =>
+        //         {
+        //             var buildingVersion = await ct.BuildingVersions.FindAsync(position);
+        //             buildingVersion.Should().NotBeNull();
+        //
+        //             buildingVersion!.BuildingPersistentLocalId.Should().Be(buildingMergerWasRealized.BuildingPersistentLocalId);
+        //             buildingVersion.Status.Should().Be("Realized");
+        //             buildingVersion.OsloStatus.Should().Be("Gerealiseerd");
+        //             buildingVersion.Geometry.Should()
+        //                 .BeEquivalentTo(_wkbReader.Read(buildingMergerWasRealized.ExtendedWkbGeometry.ToByteArray()));
+        //             buildingVersion.GeometryMethod.Should().Be("MeasuredByGrb");
+        //             buildingVersion.OsloGeometryMethod.Should().Be("IngemetenGRB");
+        //             buildingVersion.VersionTimestamp.Should().Be(buildingMergerWasRealized.Provenance.Timestamp);
+        //             buildingVersion.CreatedOnTimestamp.Should().Be(buildingMergerWasRealized.Provenance.Timestamp);
+        //             buildingVersion.LastChangedOnTimestamp.Should().Be(buildingMergerWasRealized.Provenance.Timestamp);
+        //         });
+        // }
+        //
+        // [Fact]
+        // public async Task WhenBuildingWasMerged()
+        // {
+        //     _fixture.Customize(new WithFixedBuildingPersistentLocalId());
+        //
+        //     var buildingWasPlanned = _fixture.Create<BuildingWasPlannedV2>();
+        //     var buildingWasMerged = _fixture.Create<BuildingWasMerged>();
+        //
+        //     var position = _fixture.Create<long>();
+        //
+        //     var buildingWasPlannedMetadata = new Dictionary<string, object>
+        //     {
+        //         { AddEventHashPipe.HashMetadataKey, buildingWasPlanned.GetHash() },
+        //         { Envelope.PositionMetadataKey, position }
+        //     };
+        //     var buildingWasMergedMetadata = new Dictionary<string, object>
+        //     {
+        //         { AddEventHashPipe.HashMetadataKey, buildingWasMerged.GetHash() },
+        //         { Envelope.PositionMetadataKey, ++position }
+        //     };
+        //
+        //     await Sut
+        //         .Given(
+        //             new Envelope<BuildingWasPlannedV2>(
+        //                 new Envelope(
+        //                     buildingWasPlanned,
+        //                     buildingWasPlannedMetadata)),
+        //             new Envelope<BuildingWasMerged>(
+        //                 new Envelope(
+        //                     buildingWasMerged,
+        //                     buildingWasMergedMetadata)))
+        //         .Then(async ct =>
+        //         {
+        //             var buildingVersion = await ct.BuildingVersions.FindAsync(position);
+        //             buildingVersion.Should().NotBeNull();
+        //
+        //             buildingVersion!.Status.Should().Be("Retired");
+        //             buildingVersion.OsloStatus.Should().Be("Gehistoreerd");
+        //             buildingVersion.VersionTimestamp.Should().Be(buildingWasMerged.Provenance.Timestamp);
+        //         });
+        // }
 
         protected override BuildingVersionProjections CreateProjection() =>
             new BuildingVersionProjections(

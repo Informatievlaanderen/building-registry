@@ -155,9 +155,9 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda
                     await mediator.Send(new ChangeBuildingMeasurementLambdaRequest(messageMetadata.MessageGroupId!, request), cancellationToken);
                     break;
 
-                case MergeBuildingsSqsRequest request:
-                    await mediator.Send(new MergeBuildingsLambdaRequest(messageMetadata.MessageGroupId!, request), cancellationToken);
-                    break;
+                // case MergeBuildingsSqsRequest request:
+                //     await mediator.Send(new MergeBuildingsLambdaRequest(messageMetadata.MessageGroupId!, request), cancellationToken);
+                //     break;
 
                 default:
                     throw new NotImplementedException(
