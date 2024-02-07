@@ -274,10 +274,10 @@ namespace BuildingRegistry.Projections.LastChangedList
                 await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingUnitPersistentLocalId.ToString(), message.Position, context, ct);
             });
 
-            When<Envelope<BuildingUnitWasMoved>>(async (context, message, ct) =>
-            {
-                await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingUnitPersistentLocalId.ToString(), message.Position, context, ct);
-            });
+            // When<Envelope<BuildingUnitWasMoved>>(async (context, message, ct) =>
+            // {
+            //     await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingUnitPersistentLocalId.ToString(), message.Position, context, ct);
+            // });
 
             When<Envelope<BuildingUnitWasNotRealizedBecauseBuildingWasDemolished>>(async (context, message, ct) =>
             {
@@ -335,10 +335,10 @@ namespace BuildingRegistry.Projections.LastChangedList
                 await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingUnitPersistentLocalId.ToString(), message.Position, context, ct);
             });
 
-            When<Envelope<BuildingUnitWasTransferred>>(async (context, message, ct) =>
-            {
-                await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingUnitPersistentLocalId.ToString(), message.Position, context, ct);
-            });
+            // When<Envelope<BuildingUnitWasTransferred>>(async (context, message, ct) =>
+            // {
+            //     await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingUnitPersistentLocalId.ToString(), message.Position, context, ct);
+            // });
 
             When<Envelope<BuildingWasMeasured>>(async (context, message, ct) =>
             {

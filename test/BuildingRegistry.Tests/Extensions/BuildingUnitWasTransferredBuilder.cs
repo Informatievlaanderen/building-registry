@@ -37,27 +37,27 @@
             return this;
         }
 
-        public BuildingUnitWasTransferred Build()
-        {
-            var buildingPersistentLocalId = new BuildingPersistentLocalId(_buildingPersistentLocalId ?? _fixture.Create<int>());
-            var buildingUnitPosition = _fixture.Create<BuildingUnitPosition>();
-
-            var @event = new BuildingUnitWasTransferred(
-                buildingPersistentLocalId,
-                BuildingUnit.Transfer(_ => { },
-                    buildingPersistentLocalId,
-                    new BuildingUnitPersistentLocalId(_buildingUnitPersistentLocalId ?? _fixture.Create<int>()),
-                    BuildingUnitFunction.Unknown,
-                    BuildingUnitStatus.Realized,
-                    _fixture.Create<List<AddressPersistentLocalId>>(),
-                    buildingUnitPosition,
-                    false),
-                new BuildingPersistentLocalId(_sourceBuildingPersistentLocalId ?? _fixture.Create<int>()),
-                buildingUnitPosition);
-
-            ((ISetProvenance)@event).SetProvenance(_fixture.Create<Provenance>());
-
-            return @event;
-        }
+        // public BuildingUnitWasTransferred Build()
+        // {
+        //     var buildingPersistentLocalId = new BuildingPersistentLocalId(_buildingPersistentLocalId ?? _fixture.Create<int>());
+        //     var buildingUnitPosition = _fixture.Create<BuildingUnitPosition>();
+        //
+        //     var @event = new BuildingUnitWasTransferred(
+        //         buildingPersistentLocalId,
+        //         BuildingUnit.Transfer(_ => { },
+        //             buildingPersistentLocalId,
+        //             new BuildingUnitPersistentLocalId(_buildingUnitPersistentLocalId ?? _fixture.Create<int>()),
+        //             BuildingUnitFunction.Unknown,
+        //             BuildingUnitStatus.Realized,
+        //             _fixture.Create<List<AddressPersistentLocalId>>(),
+        //             buildingUnitPosition,
+        //             false),
+        //         new BuildingPersistentLocalId(_sourceBuildingPersistentLocalId ?? _fixture.Create<int>()),
+        //         buildingUnitPosition);
+        //
+        //     ((ISetProvenance)@event).SetProvenance(_fixture.Create<Provenance>());
+        //
+        //     return @event;
+        // }
     }
 }

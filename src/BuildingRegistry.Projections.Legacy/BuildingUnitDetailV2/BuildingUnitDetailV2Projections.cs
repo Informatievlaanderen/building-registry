@@ -431,29 +431,29 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetailV2
                 }, ct);
             });
 
-            When<Envelope<BuildingUnitWasTransferred>>(async (context, message, ct) =>
-            {
-                await Update(context, message.Message.BuildingUnitPersistentLocalId, item =>
-                {
-                    item.BuildingPersistentLocalId = message.Message.BuildingPersistentLocalId;
-                    item.Position = message.Message.ExtendedWkbGeometry.ToByteArray();
-                    item.PositionMethod = BuildingUnitPositionGeometryMethod.Parse(message.Message.GeometryMethod);
-                    item.Function = BuildingUnitFunction.Parse(message.Message.Function);
-                    item.Status = BuildingUnitStatus.Parse(message.Message.Status);
-                    item.HasDeviation = message.Message.HasDeviation;
-                    item.Addresses = new Collection<BuildingUnitDetailAddressItemV2>(
-                        message.Message.AddressPersistentLocalIds
-                            .Select(x => new BuildingUnitDetailAddressItemV2(message.Message.BuildingUnitPersistentLocalId, x))
-                            .ToList());
-                    item.Version = message.Message.Provenance.Timestamp;
-                    UpdateHash(item, message);
-                }, ct);
-            });
-
-            When<Envelope<BuildingUnitWasMoved>>(async (_, _, _) =>
-            {
-                // BuildingUnitWasTransferred couples the unit to another building and BuildingUnitMoved is an event applicable on the old building.
-            });
+            // When<Envelope<BuildingUnitWasTransferred>>(async (context, message, ct) =>
+            // {
+            //     await Update(context, message.Message.BuildingUnitPersistentLocalId, item =>
+            //     {
+            //         item.BuildingPersistentLocalId = message.Message.BuildingPersistentLocalId;
+            //         item.Position = message.Message.ExtendedWkbGeometry.ToByteArray();
+            //         item.PositionMethod = BuildingUnitPositionGeometryMethod.Parse(message.Message.GeometryMethod);
+            //         item.Function = BuildingUnitFunction.Parse(message.Message.Function);
+            //         item.Status = BuildingUnitStatus.Parse(message.Message.Status);
+            //         item.HasDeviation = message.Message.HasDeviation;
+            //         item.Addresses = new Collection<BuildingUnitDetailAddressItemV2>(
+            //             message.Message.AddressPersistentLocalIds
+            //                 .Select(x => new BuildingUnitDetailAddressItemV2(message.Message.BuildingUnitPersistentLocalId, x))
+            //                 .ToList());
+            //         item.Version = message.Message.Provenance.Timestamp;
+            //         UpdateHash(item, message);
+            //     }, ct);
+            // });
+            //
+            // When<Envelope<BuildingUnitWasMoved>>(async (_, _, _) =>
+            // {
+            //     // BuildingUnitWasTransferred couples the unit to another building and BuildingUnitMoved is an event applicable on the old building.
+            // });
         }
 
         private static void RemoveIdempotentAddress(BuildingUnitDetailItemV2 buildingUnit, int addressPersistentLocalId)

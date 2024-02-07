@@ -80,11 +80,11 @@ namespace BuildingRegistry.Building
             Register<BuildingUnitWasRetiredBecauseBuildingWasDemolished>(When);
             Register<BuildingMeasurementWasChanged>(When);
 
-            Register<BuildingMergerWasRealized>(When);
-            Register<BuildingUnitWasTransferred>(When);
-
-            Register<BuildingWasMerged>(When);
-            Register<BuildingUnitWasMoved>(When);
+            // Register<BuildingMergerWasRealized>(When);
+            // Register<BuildingUnitWasTransferred>(When);
+            //
+            // Register<BuildingWasMerged>(When);
+            // Register<BuildingUnitWasMoved>(When);
 
             Register<BuildingSnapshot>(When);
         }
@@ -395,51 +395,51 @@ namespace BuildingRegistry.Building
             _lastEvent = @event;
         }
 
-        private void When(BuildingMergerWasRealized @event)
-        {
-            BuildingPersistentLocalId = new BuildingPersistentLocalId(@event.BuildingPersistentLocalId);
-            BuildingGeometry = new BuildingGeometry(
-                new ExtendedWkbGeometry(@event.ExtendedWkbGeometry),
-                BuildingGeometryMethod.MeasuredByGrb);
-
-            BuildingStatus = BuildingStatus.Realized;
-
-            _lastEvent = @event;
-        }
-
-        private void When(BuildingUnitWasTransferred @event)
-        {
-            var transferredBuildingUnit = BuildingUnit.Transfer(
-                ApplyChange,
-                new BuildingPersistentLocalId(@event.BuildingPersistentLocalId),
-                new BuildingUnitPersistentLocalId(@event.BuildingUnitPersistentLocalId),
-                BuildingUnitFunction.Parse(@event.Function),
-                BuildingUnitStatus.Parse(@event.Status),
-                @event.AddressPersistentLocalIds.Select(x => new AddressPersistentLocalId(x)).ToList(),
-                new BuildingUnitPosition(
-                    new ExtendedWkbGeometry(@event.ExtendedWkbGeometry),
-                    BuildingUnitPositionGeometryMethod.Parse(@event.GeometryMethod)),
-                @event.HasDeviation);
-
-            transferredBuildingUnit.Route(@event);
-            _buildingUnits.Add(transferredBuildingUnit);
-
-            _lastEvent = @event;
-        }
-
-        private void When(BuildingWasMerged @event)
-        {
-            BuildingStatus = BuildingStatus.Retired;
-            _lastEvent = @event;
-        }
-
-        private void When(BuildingUnitWasMoved @event)
-        {
-            var buildingUnit =
-                BuildingUnits.Single(x => x.BuildingUnitPersistentLocalId == @event.BuildingUnitPersistentLocalId);
-            _buildingUnits.Remove(buildingUnit);
-            _lastEvent = @event;
-        }
+        // private void When(BuildingMergerWasRealized @event)
+        // {
+        //     BuildingPersistentLocalId = new BuildingPersistentLocalId(@event.BuildingPersistentLocalId);
+        //     BuildingGeometry = new BuildingGeometry(
+        //         new ExtendedWkbGeometry(@event.ExtendedWkbGeometry),
+        //         BuildingGeometryMethod.MeasuredByGrb);
+        //
+        //     BuildingStatus = BuildingStatus.Realized;
+        //
+        //     _lastEvent = @event;
+        // }
+        //
+        // private void When(BuildingUnitWasTransferred @event)
+        // {
+        //     var transferredBuildingUnit = BuildingUnit.Transfer(
+        //         ApplyChange,
+        //         new BuildingPersistentLocalId(@event.BuildingPersistentLocalId),
+        //         new BuildingUnitPersistentLocalId(@event.BuildingUnitPersistentLocalId),
+        //         BuildingUnitFunction.Parse(@event.Function),
+        //         BuildingUnitStatus.Parse(@event.Status),
+        //         @event.AddressPersistentLocalIds.Select(x => new AddressPersistentLocalId(x)).ToList(),
+        //         new BuildingUnitPosition(
+        //             new ExtendedWkbGeometry(@event.ExtendedWkbGeometry),
+        //             BuildingUnitPositionGeometryMethod.Parse(@event.GeometryMethod)),
+        //         @event.HasDeviation);
+        //
+        //     transferredBuildingUnit.Route(@event);
+        //     _buildingUnits.Add(transferredBuildingUnit);
+        //
+        //     _lastEvent = @event;
+        // }
+        //
+        // private void When(BuildingWasMerged @event)
+        // {
+        //     BuildingStatus = BuildingStatus.Retired;
+        //     _lastEvent = @event;
+        // }
+        //
+        // private void When(BuildingUnitWasMoved @event)
+        // {
+        //     var buildingUnit =
+        //         BuildingUnits.Single(x => x.BuildingUnitPersistentLocalId == @event.BuildingUnitPersistentLocalId);
+        //     _buildingUnits.Remove(buildingUnit);
+        //     _lastEvent = @event;
+        // }
 
         private void RouteToBuildingUnit<TEvent>(TEvent @event)
             where TEvent : IBuildingEvent, IHasBuildingUnitPersistentLocalId

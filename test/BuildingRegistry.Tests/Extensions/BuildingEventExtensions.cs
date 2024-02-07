@@ -35,28 +35,28 @@
         }
     }
 
-    public static class BuildingWasMergedV2Extensions
-    {
-        public static BuildingWasMerged WithSourceBuildingPersistentLocalId(this BuildingWasMerged @event,
-            int sourceBuildingPersistentLocalId)
-        {
-            var updatedEvent = new BuildingWasMerged(
-                new BuildingPersistentLocalId(sourceBuildingPersistentLocalId),
-                new BuildingPersistentLocalId(@event.DestinationBuildingPersistentLocalId));
-            ((ISetProvenance)updatedEvent).SetProvenance(@event.Provenance.ToProvenance());
-
-            return updatedEvent;
-        }
-
-        public static BuildingWasMerged WithDestinationBuildingPersistentLocalId(this BuildingWasMerged @event,
-            int destinationBuildingPersistentLocalId)
-        {
-            var updatedEvent = new BuildingWasMerged(
-                new BuildingPersistentLocalId(@event.BuildingPersistentLocalId),
-                new BuildingPersistentLocalId(destinationBuildingPersistentLocalId));
-            ((ISetProvenance)updatedEvent).SetProvenance(@event.Provenance.ToProvenance());
-
-            return updatedEvent;
-        }
-    }
+    // public static class BuildingWasMergedV2Extensions
+    // {
+    //     public static BuildingWasMerged WithSourceBuildingPersistentLocalId(this BuildingWasMerged @event,
+    //         int sourceBuildingPersistentLocalId)
+    //     {
+    //         var updatedEvent = new BuildingWasMerged(
+    //             new BuildingPersistentLocalId(sourceBuildingPersistentLocalId),
+    //             new BuildingPersistentLocalId(@event.DestinationBuildingPersistentLocalId));
+    //         ((ISetProvenance)updatedEvent).SetProvenance(@event.Provenance.ToProvenance());
+    //
+    //         return updatedEvent;
+    //     }
+    //
+    //     public static BuildingWasMerged WithDestinationBuildingPersistentLocalId(this BuildingWasMerged @event,
+    //         int destinationBuildingPersistentLocalId)
+    //     {
+    //         var updatedEvent = new BuildingWasMerged(
+    //             new BuildingPersistentLocalId(@event.BuildingPersistentLocalId),
+    //             new BuildingPersistentLocalId(destinationBuildingPersistentLocalId));
+    //         ((ISetProvenance)updatedEvent).SetProvenance(@event.Provenance.ToProvenance());
+    //
+    //         return updatedEvent;
+    //     }
+    // }
 }

@@ -229,25 +229,25 @@
                 await Produce(message.Message.BuildingPersistentLocalId, message.Message.ToContract(), message.Position, ct);
             });
 
-            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingMergerWasRealized>>(async (_, message, ct) =>
-            {
-                await Produce(message.Message.BuildingPersistentLocalId, message.Message.ToContract(), message.Position, ct);
-            });
-
-            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingUnitWasTransferred>>(async (_, message, ct) =>
-            {
-                await Produce(message.Message.BuildingPersistentLocalId, message.Message.ToContract(), message.Position, ct);
-            });
-
-            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingUnitWasMoved>>(async (_, message, ct) =>
-            {
-                await Produce(message.Message.BuildingPersistentLocalId, message.Message.ToContract(), message.Position, ct);
-            });
-
-            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingWasMerged>>(async (_, message, ct) =>
-            {
-                await Produce(message.Message.BuildingPersistentLocalId, message.Message.ToContract(), message.Position, ct);
-            });
+            // When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingMergerWasRealized>>(async (_, message, ct) =>
+            // {
+            //     await Produce(message.Message.BuildingPersistentLocalId, message.Message.ToContract(), message.Position, ct);
+            // });
+            //
+            // When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingUnitWasTransferred>>(async (_, message, ct) =>
+            // {
+            //     await Produce(message.Message.BuildingPersistentLocalId, message.Message.ToContract(), message.Position, ct);
+            // });
+            //
+            // When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingUnitWasMoved>>(async (_, message, ct) =>
+            // {
+            //     await Produce(message.Message.BuildingPersistentLocalId, message.Message.ToContract(), message.Position, ct);
+            // });
+            //
+            // When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingWasMerged>>(async (_, message, ct) =>
+            // {
+            //     await Produce(message.Message.BuildingPersistentLocalId, message.Message.ToContract(), message.Position, ct);
+            // });
         }
     }
 }

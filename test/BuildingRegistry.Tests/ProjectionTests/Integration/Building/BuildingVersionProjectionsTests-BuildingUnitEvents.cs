@@ -1431,102 +1431,102 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
                 });
         }
 
-        [Fact]
-        public async Task WhenBuildingUnitWasTransferred()
-        {
-            var buildingWasPlannedV2 = _fixture.Create<BuildingWasPlannedV2>();
-            var buildingUnitWasTransferred = new BuildingUnitWasTransferredBuilder(_fixture)
-                .WithBuildingPersistentLocalId(buildingWasPlannedV2.BuildingPersistentLocalId)
-                .Build();
-
-            var position = _fixture.Create<long>();
-
-            var buildingWasPlannedV2Metadata = new Dictionary<string, object>
-            {
-                { AddEventHashPipe.HashMetadataKey, buildingWasPlannedV2.GetHash() },
-                { Envelope.PositionMetadataKey, position }
-            };
-            var buildingUnitWasTransferredMetadata = new Dictionary<string, object>
-            {
-                { AddEventHashPipe.HashMetadataKey, buildingUnitWasTransferred.GetHash() },
-                { Envelope.PositionMetadataKey, ++position }
-            };
-
-            await Sut
-                .Given(
-                    new Envelope<BuildingWasPlannedV2>(new Envelope(buildingWasPlannedV2, buildingWasPlannedV2Metadata)),
-                    new Envelope<BuildingUnitWasTransferred>(new Envelope(buildingUnitWasTransferred, buildingUnitWasTransferredMetadata)))
-                .Then(async context =>
-                {
-                    var buildingVersion = await context.BuildingVersions.FindAsync(position);
-                    buildingVersion.Should().NotBeNull();
-                    var buildingUnitVersion = buildingVersion!.BuildingUnits.SingleOrDefault(x =>
-                        x.BuildingUnitPersistentLocalId == buildingUnitWasTransferred.BuildingUnitPersistentLocalId);
-                    buildingUnitVersion.Should().NotBeNull();
-
-                    buildingUnitVersion!.BuildingPersistentLocalId.Should().Be(buildingUnitWasTransferred.BuildingPersistentLocalId);
-                    buildingUnitVersion.Status.Should().Be(BuildingUnitStatus.Parse(buildingUnitWasTransferred.Status).Status);
-                    buildingUnitVersion.OsloStatus.Should().Be(BuildingUnitStatus.Parse(buildingUnitWasTransferred.Status).Map());
-                    buildingUnitVersion.Function.Should().Be(BuildingUnitFunction.Parse(buildingUnitWasTransferred.Function).Function);
-                    buildingUnitVersion.OsloFunction.Should().Be(BuildingUnitFunction.Parse(buildingUnitWasTransferred.Function).Map());
-                    buildingUnitVersion.GeometryMethod.Should().Be(BuildingUnitPositionGeometryMethod.Parse(buildingUnitWasTransferred.GeometryMethod).GeometryMethod);
-                    buildingUnitVersion.OsloGeometryMethod.Should().Be(BuildingUnitPositionGeometryMethod.Parse(buildingUnitWasTransferred.GeometryMethod).Map());
-                    buildingUnitVersion.Geometry.Should().BeEquivalentTo(
-                        _wkbReader.Read(buildingUnitWasTransferred.ExtendedWkbGeometry.ToByteArray()));
-                    buildingUnitVersion.HasDeviation.Should().BeFalse();
-                    buildingUnitVersion.VersionTimestamp.Should().Be(buildingUnitWasTransferred.Provenance.Timestamp);
-
-                    buildingUnitVersion.Addresses.Should().HaveCount(buildingUnitWasTransferred.AddressPersistentLocalIds.Count);
-                    foreach (var addressPersistentLocalId in buildingUnitWasTransferred.AddressPersistentLocalIds)
-                    {
-                        buildingUnitVersion.Addresses.SingleOrDefault(x => x.AddressPersistentLocalId == addressPersistentLocalId)
-                            .Should().NotBeNull();
-                    }
-
-                    buildingVersion.VersionTimestamp.Should().Be(buildingUnitWasTransferred.Provenance.Timestamp);
-                });
-        }
-
-        [Fact]
-        public async Task WhenBuildingUnitWasMoved()
-        {
-            _fixture.Customize(new WithFixedBuildingUnitPersistentLocalId());
-
-            var buildingWasPlanned = _fixture.Create<BuildingWasPlannedV2>();
-            var buildingUnitWasPlanned = _fixture.Create<BuildingUnitWasPlannedV2>();
-            var buildingUnitWasMoved = _fixture.Create<BuildingUnitWasMoved>();
-
-            var position = _fixture.Create<long>();
-
-            var buildingWasPlannedMetadata = new Dictionary<string, object>
-            {
-                { AddEventHashPipe.HashMetadataKey, buildingWasPlanned.GetHash() },
-                { Envelope.PositionMetadataKey, position }
-            };
-            var buildingUnitWasPlannedMetadata = new Dictionary<string, object>
-            {
-                { AddEventHashPipe.HashMetadataKey, buildingUnitWasPlanned.GetHash() },
-                { Envelope.PositionMetadataKey, ++position }
-            };
-            var buildingUnitWasMovedMetadata = new Dictionary<string, object>
-            {
-                { AddEventHashPipe.HashMetadataKey, buildingUnitWasMoved.GetHash() },
-                { Envelope.PositionMetadataKey, ++position }
-            };
-
-            await Sut
-                .Given(
-                    new Envelope<BuildingWasPlannedV2>(new Envelope(buildingWasPlanned, buildingWasPlannedMetadata)),
-                    new Envelope<BuildingUnitWasPlannedV2>(new Envelope(buildingUnitWasPlanned, buildingUnitWasPlannedMetadata)),
-                    new Envelope<BuildingUnitWasMoved>(new Envelope(buildingUnitWasMoved, buildingUnitWasMovedMetadata)))
-                .Then(async ct =>
-                {
-                    var buildingVersion = await ct.BuildingVersions.FindAsync(position);
-                    buildingVersion.Should().NotBeNull();
-
-                    buildingVersion!.BuildingUnits.Should().BeEmpty();
-                    buildingVersion.VersionTimestamp.Should().Be(buildingUnitWasMoved.Provenance.Timestamp);
-                });
-        }
+        // [Fact]
+        // public async Task WhenBuildingUnitWasTransferred()
+        // {
+        //     var buildingWasPlannedV2 = _fixture.Create<BuildingWasPlannedV2>();
+        //     var buildingUnitWasTransferred = new BuildingUnitWasTransferredBuilder(_fixture)
+        //         .WithBuildingPersistentLocalId(buildingWasPlannedV2.BuildingPersistentLocalId)
+        //         .Build();
+        //
+        //     var position = _fixture.Create<long>();
+        //
+        //     var buildingWasPlannedV2Metadata = new Dictionary<string, object>
+        //     {
+        //         { AddEventHashPipe.HashMetadataKey, buildingWasPlannedV2.GetHash() },
+        //         { Envelope.PositionMetadataKey, position }
+        //     };
+        //     var buildingUnitWasTransferredMetadata = new Dictionary<string, object>
+        //     {
+        //         { AddEventHashPipe.HashMetadataKey, buildingUnitWasTransferred.GetHash() },
+        //         { Envelope.PositionMetadataKey, ++position }
+        //     };
+        //
+        //     await Sut
+        //         .Given(
+        //             new Envelope<BuildingWasPlannedV2>(new Envelope(buildingWasPlannedV2, buildingWasPlannedV2Metadata)),
+        //             new Envelope<BuildingUnitWasTransferred>(new Envelope(buildingUnitWasTransferred, buildingUnitWasTransferredMetadata)))
+        //         .Then(async context =>
+        //         {
+        //             var buildingVersion = await context.BuildingVersions.FindAsync(position);
+        //             buildingVersion.Should().NotBeNull();
+        //             var buildingUnitVersion = buildingVersion!.BuildingUnits.SingleOrDefault(x =>
+        //                 x.BuildingUnitPersistentLocalId == buildingUnitWasTransferred.BuildingUnitPersistentLocalId);
+        //             buildingUnitVersion.Should().NotBeNull();
+        //
+        //             buildingUnitVersion!.BuildingPersistentLocalId.Should().Be(buildingUnitWasTransferred.BuildingPersistentLocalId);
+        //             buildingUnitVersion.Status.Should().Be(BuildingUnitStatus.Parse(buildingUnitWasTransferred.Status).Status);
+        //             buildingUnitVersion.OsloStatus.Should().Be(BuildingUnitStatus.Parse(buildingUnitWasTransferred.Status).Map());
+        //             buildingUnitVersion.Function.Should().Be(BuildingUnitFunction.Parse(buildingUnitWasTransferred.Function).Function);
+        //             buildingUnitVersion.OsloFunction.Should().Be(BuildingUnitFunction.Parse(buildingUnitWasTransferred.Function).Map());
+        //             buildingUnitVersion.GeometryMethod.Should().Be(BuildingUnitPositionGeometryMethod.Parse(buildingUnitWasTransferred.GeometryMethod).GeometryMethod);
+        //             buildingUnitVersion.OsloGeometryMethod.Should().Be(BuildingUnitPositionGeometryMethod.Parse(buildingUnitWasTransferred.GeometryMethod).Map());
+        //             buildingUnitVersion.Geometry.Should().BeEquivalentTo(
+        //                 _wkbReader.Read(buildingUnitWasTransferred.ExtendedWkbGeometry.ToByteArray()));
+        //             buildingUnitVersion.HasDeviation.Should().BeFalse();
+        //             buildingUnitVersion.VersionTimestamp.Should().Be(buildingUnitWasTransferred.Provenance.Timestamp);
+        //
+        //             buildingUnitVersion.Addresses.Should().HaveCount(buildingUnitWasTransferred.AddressPersistentLocalIds.Count);
+        //             foreach (var addressPersistentLocalId in buildingUnitWasTransferred.AddressPersistentLocalIds)
+        //             {
+        //                 buildingUnitVersion.Addresses.SingleOrDefault(x => x.AddressPersistentLocalId == addressPersistentLocalId)
+        //                     .Should().NotBeNull();
+        //             }
+        //
+        //             buildingVersion.VersionTimestamp.Should().Be(buildingUnitWasTransferred.Provenance.Timestamp);
+        //         });
+        // }
+        //
+        // [Fact]
+        // public async Task WhenBuildingUnitWasMoved()
+        // {
+        //     _fixture.Customize(new WithFixedBuildingUnitPersistentLocalId());
+        //
+        //     var buildingWasPlanned = _fixture.Create<BuildingWasPlannedV2>();
+        //     var buildingUnitWasPlanned = _fixture.Create<BuildingUnitWasPlannedV2>();
+        //     var buildingUnitWasMoved = _fixture.Create<BuildingUnitWasMoved>();
+        //
+        //     var position = _fixture.Create<long>();
+        //
+        //     var buildingWasPlannedMetadata = new Dictionary<string, object>
+        //     {
+        //         { AddEventHashPipe.HashMetadataKey, buildingWasPlanned.GetHash() },
+        //         { Envelope.PositionMetadataKey, position }
+        //     };
+        //     var buildingUnitWasPlannedMetadata = new Dictionary<string, object>
+        //     {
+        //         { AddEventHashPipe.HashMetadataKey, buildingUnitWasPlanned.GetHash() },
+        //         { Envelope.PositionMetadataKey, ++position }
+        //     };
+        //     var buildingUnitWasMovedMetadata = new Dictionary<string, object>
+        //     {
+        //         { AddEventHashPipe.HashMetadataKey, buildingUnitWasMoved.GetHash() },
+        //         { Envelope.PositionMetadataKey, ++position }
+        //     };
+        //
+        //     await Sut
+        //         .Given(
+        //             new Envelope<BuildingWasPlannedV2>(new Envelope(buildingWasPlanned, buildingWasPlannedMetadata)),
+        //             new Envelope<BuildingUnitWasPlannedV2>(new Envelope(buildingUnitWasPlanned, buildingUnitWasPlannedMetadata)),
+        //             new Envelope<BuildingUnitWasMoved>(new Envelope(buildingUnitWasMoved, buildingUnitWasMovedMetadata)))
+        //         .Then(async ct =>
+        //         {
+        //             var buildingVersion = await ct.BuildingVersions.FindAsync(position);
+        //             buildingVersion.Should().NotBeNull();
+        //
+        //             buildingVersion!.BuildingUnits.Should().BeEmpty();
+        //             buildingVersion.VersionTimestamp.Should().Be(buildingUnitWasMoved.Provenance.Timestamp);
+        //         });
+        // }
     }
 }
