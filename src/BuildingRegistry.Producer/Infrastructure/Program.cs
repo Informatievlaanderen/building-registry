@@ -115,7 +115,11 @@ namespace BuildingRegistry.Producer.Infrastructure
                 })
                 .ConfigureWebHostDefaults(webHostBuilder =>
                     webHostBuilder
-                        .UseStartup<Startup>())
+                        .UseStartup<Startup>()
+                        .UseKestrel(options =>
+                        {
+                            options.ListenAnyIP(6014);
+                        }))
                 .UseConsoleLifetime()
                 .Build();
 
