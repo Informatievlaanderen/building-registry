@@ -1,3 +1,5 @@
+## [3.100.3](https://github.com/informatievlaanderen/building-registry/compare/v3.100.2...v3.100.3) (2024-02-08)
+
 ## [3.100.2](https://github.com/informatievlaanderen/building-registry/compare/v3.100.1...v3.100.2) (2024-02-08)
 
 
