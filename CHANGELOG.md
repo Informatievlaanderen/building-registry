@@ -1,3 +1,10 @@
+## [3.100.4](https://github.com/informatievlaanderen/building-registry/compare/v3.100.3...v3.100.4) (2024-02-08)
+
+
+### Bug Fixes
+
+* uri producer projections response ([a4cc994](https://github.com/informatievlaanderen/building-registry/commit/a4cc9947ad65ce3a63643098ab2c99fc7e6cb443))
+
 ## [3.100.3](https://github.com/informatievlaanderen/building-registry/compare/v3.100.2...v3.100.3) (2024-02-08)
 
 ## [3.100.2](https://github.com/informatievlaanderen/building-registry/compare/v3.100.1...v3.100.2) (2024-02-08)
