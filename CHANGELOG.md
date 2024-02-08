@@ -1,3 +1,10 @@
+## [3.100.2](https://github.com/informatievlaanderen/building-registry/compare/v3.100.1...v3.100.2) (2024-02-08)
+
+
+### Bug Fixes
+
+* json output producer projection status ([adaf256](https://github.com/informatievlaanderen/building-registry/commit/adaf256e192f4c128be2aa10a2e72974cefc6f9b))
+
 ## [3.100.1](https://github.com/informatievlaanderen/building-registry/compare/v3.100.0...v3.100.1) (2024-02-08)
 
 
