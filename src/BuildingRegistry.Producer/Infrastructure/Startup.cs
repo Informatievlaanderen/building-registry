@@ -3,6 +3,7 @@
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading;
+    using Be.Vlaanderen.Basisregisters.AspNetCore.Mvc.Formatters.Json;
     using Be.Vlaanderen.Basisregisters.Projector.ConnectedProjections;
     using Be.Vlaanderen.Basisregisters.Projector.Controllers;
     using Microsoft.AspNetCore.Builder;
@@ -10,7 +11,6 @@
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Newtonsoft.Json;
-    using Newtonsoft.Json.Serialization;
     using SqlStreamStore;
 
     public class Startup
@@ -30,7 +30,7 @@
                     var manager = app.ApplicationServices.GetRequiredService<IConnectedProjectionsManager>();
                     var streamStore = app.ApplicationServices.GetRequiredService<IStreamStore>();
 
-                    var baseUri = configuration.GetValue<string>("BaseUrl");
+                    var baseUri = configuration.GetValue<string>("BaseUrl").TrimEnd('/');
 
                     var registeredConnectedProjections = manager
                         .GetRegisteredProjections()
@@ -55,10 +55,7 @@
                         StreamPosition = streamPosition
                     };
 
-                    var json = JsonConvert.SerializeObject(projectionResponseList, new JsonSerializerSettings()
-                    {
-                        ContractResolver = new CamelCasePropertyNamesContractResolver()
-                    });
+                    var json = JsonConvert.SerializeObject(projectionResponseList, new JsonSerializerSettings().ConfigureDefaultForApi());
 
                     await context.Response.WriteAsync(json);
                 });
