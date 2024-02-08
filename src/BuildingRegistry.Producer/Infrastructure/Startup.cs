@@ -9,6 +9,8 @@
     using Microsoft.AspNetCore.Http;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
+    using Newtonsoft.Json;
+    using Newtonsoft.Json.Serialization;
     using SqlStreamStore;
 
     public class Startup
@@ -53,7 +55,12 @@
                         StreamPosition = streamPosition
                     };
 
-                    await context.Response.WriteAsJsonAsync(projectionResponseList);
+                    var json = JsonConvert.SerializeObject(projectionResponseList, new JsonSerializerSettings()
+                    {
+                        ContractResolver = new CamelCasePropertyNamesContractResolver()
+                    });
+
+                    await context.Response.WriteAsync(json);
                 });
             });
         }
