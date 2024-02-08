@@ -1,3 +1,11 @@
+## [3.100.1](https://github.com/informatievlaanderen/building-registry/compare/v3.100.0...v3.100.1) (2024-02-08)
+
+
+### Bug Fixes
+
+* producer port ([9531462](https://github.com/informatievlaanderen/building-registry/commit/9531462c8f94baf75b3524bf165349f39a1f8980))
+* remove listen ip port ([772f7c3](https://github.com/informatievlaanderen/building-registry/commit/772f7c3653892b15fba99b4148e8041e2fe9236a))
+
 # [3.100.0](https://github.com/informatievlaanderen/building-registry/compare/v3.99.1...v3.100.0) (2024-02-07)
 
 
