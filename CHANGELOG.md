@@ -1,3 +1,10 @@
+## [3.100.5](https://github.com/informatievlaanderen/building-registry/compare/v3.100.4...v3.100.5) (2024-02-12)
+
+
+### Bug Fixes
+
+* try projector fix ([7933da0](https://github.com/informatievlaanderen/building-registry/commit/7933da0e6c0b82ff40548ad38733318a21966d4e))
+
 ## [3.100.4](https://github.com/informatievlaanderen/building-registry/compare/v3.100.3...v3.100.4) (2024-02-08)
 
 
