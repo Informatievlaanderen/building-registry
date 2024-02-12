@@ -4,6 +4,7 @@ namespace BuildingRegistry.Projector.Infrastructure
     using System.Linq;
     using System.Reflection;
     using System.Threading;
+    using System.Threading.Tasks;
     using Autofac;
     using Autofac.Extensions.DependencyInjection;
     using Be.Vlaanderen.Basisregisters.Api;
@@ -228,7 +229,9 @@ namespace BuildingRegistry.Projector.Infrastructure
             appLifetime.ApplicationStarted.Register(() =>
             {
                 var projectionsManager = _applicationContainer.Resolve<IConnectedProjectionsManager>();
-                projectionsManager.Resume(_projectionsCancellationTokenSource.Token);
+                Task.Run(async () =>
+                    await projectionsManager.Resume(_projectionsCancellationTokenSource.Token).ConfigureAwait(false)
+                ).ConfigureAwait(false);
             });
         }
 
