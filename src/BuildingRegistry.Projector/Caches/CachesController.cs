@@ -1,23 +1,32 @@
 namespace BuildingRegistry.Projector.Caches
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
     using Be.Vlaanderen.Basisregisters.Api;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.LastChangedList;
+    using BuildingRegistry.Projections.LastChangedList;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Configuration;
+    using SqlStreamStore;
 
     [ApiVersion("1.0")]
     [ApiRoute("caches")]
     public class CachesController : ApiController
     {
+        private static Dictionary<string, string> _projectionNameMapper = new Dictionary<string, string>()
+        {
+            {"BuildingRegistry.Projections.LastChangedList.BuildingUnitProjections", BuildingUnitProjections.ProjectionName}
+        };
+
         [HttpGet]
         public async Task<IActionResult> Get(
             [FromServices] IConfiguration configuration,
             [FromServices] LastChangedListContext lastChangedListContext,
+            [FromServices] IReadonlyStreamStore streamStore,
             CancellationToken cancellationToken)
         {
             var maxErrorTimeInSeconds = configuration.GetValue<int?>("Caches:LastChangedList:MaxErrorTimeInSeconds") ?? 60;
@@ -29,13 +38,28 @@ namespace BuildingRegistry.Projector.Caches
                 .Where(r => r.ToBeIndexed && (r.LastError == null || r.LastError < maxErrorTime))
                 .CountAsync(cancellationToken);
 
-            return Ok(new[]
+            var positions = await lastChangedListContext.ProjectionStates.ToListAsync(cancellationToken);
+            var streamPosition = await streamStore.ReadHeadPosition(cancellationToken);
+
+            var response = new List<dynamic>
             {
-                new {
-                    name = "Cache detail gebouwen & gebouweenheden  ",
+                new
+                {
+                    name = "Cache detail gebouwen & gebouweenheden",
                     numberOfRecordsToProcess = numberOfRecords
                 }
-            });
+            };
+
+            foreach (var position in positions)
+            {
+                response.Add(new
+                {
+                    name = _projectionNameMapper.ContainsKey(position.Name) ? _projectionNameMapper[position.Name] : position.Name,
+                    numberOfRecordsToProcess = streamPosition - position.Position
+                });
+            }
+
+            return Ok(response);
         }
     }
 }
