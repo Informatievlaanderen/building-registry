@@ -13,10 +13,11 @@ namespace BuildingRegistry.Projections.LastChangedList
     using Legacy.Events;
     using Legacy.Events.Crab;
 
-    [ConnectedProjectionName("Cache markering gebouwen en gebouweenheden")]
+    [ConnectedProjectionName(ProjectionName)]
     [ConnectedProjectionDescription("Projectie die markeert voor hoeveel gebouwen en gebouweenheden de gecachte data nog geüpdated moeten worden.")]
     public class BuildingUnitProjections : LastChangedListConnectedProjection
     {
+        public const string ProjectionName = "Cache markering gebouweenheden";
         private readonly ICacheValidator _cacheValidator;
         private static readonly AcceptType[] SupportedAcceptTypes = { AcceptType.JsonLd };
 
