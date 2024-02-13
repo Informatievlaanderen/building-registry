@@ -1,3 +1,11 @@
+# [3.101.0](https://github.com/informatievlaanderen/building-registry/compare/v3.100.6...v3.101.0) (2024-02-13)
+
+
+### Features
+
+* add lastchangedlist console ([60c318b](https://github.com/informatievlaanderen/building-registry/commit/60c318b4cc2e2efc0fae25c17cbd6affb5765154))
+* add number of records to status cache ([cefce1a](https://github.com/informatievlaanderen/building-registry/commit/cefce1a91faef127566955b38e1fd21cb529fa32))
+
 ## [3.100.6](https://github.com/informatievlaanderen/building-registry/compare/v3.100.5...v3.100.6) (2024-02-13)
 
 
