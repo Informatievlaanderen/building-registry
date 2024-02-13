@@ -128,6 +128,21 @@ jobs:
       semver: ${{ needs.set-release-version.outputs.version }}
     secrets: inherit
 
+  build-projections-last-changed-list:
+    name: Build projections last changed list
+    uses: Informatievlaanderen/build-pipeline/.github/workflows/build-image.yml@main
+    needs: [ set-release-version ]
+    if: ${{ (github.repository_owner == 'Informatievlaanderen') && (needs.set-release-version.outputs.version != 'none') }}
+    with:
+      registry: building-registry
+      build-target: Containerize_ProjectionsLastChangedList
+      image-file: br-projections-last-changed-list-console-image.tar
+      image-name: projections-last-changed-list-console
+      test-project: BuildingRegistry.Tests
+      build-project: BuildingRegistry.Projections.LastChangedList.Console
+      semver: ${{ needs.set-release-version.outputs.version }}
+    secrets: inherit
+
   build-projections-backoffice:
     name: Build Projections BackOffice
     uses: Informatievlaanderen/build-pipeline/.github/workflows/build-image.yml@main
@@ -337,6 +352,7 @@ jobs:
       build-projector,
       build-projections-backoffice,
       build-projections-syndication,
+      build-projections-last-changed-list,
       build-consumer-address,
       build-consumer-read-parcel,
       build-producer,
@@ -682,6 +698,7 @@ jobs:
           'projector',
           'projections-syndication',
           'projections-backoffice',
+          'projections-last-changed-list-console',
           'consumer-address',
           'consumer-read-parcel',
           'producer',
@@ -744,6 +761,7 @@ jobs:
           'projector',
           'projections-syndication',
           'projections-backoffice',
+          'projections-last-changed-list-console',
           'consumer-address',
           'consumer-read-parcel',
           'producer',
@@ -792,68 +810,6 @@ jobs:
           SEMVER: ${{ needs.release.outputs.version }}
           WORKSPACE: ${{ github.workspace }}
 
-  push_images_to_production:
-    if: needs.release.outputs.version != 'none'
-    needs: [ release ]
-    name: Push images to Production
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        image: [
-          'api-backoffice',
-          'api-legacy',
-          'api-oslo',
-          'api-extract',
-          'projector',
-          'projections-syndication',
-          'projections-backoffice',
-          'consumer-address',
-          'consumer-read-parcel',
-          'producer',
-          'producer-snapshot-oslo',
-          'migrator-building'
-          ]
-    steps:
-      - name: Configure AWS credentials (Production)
-        uses: aws-actions/configure-aws-credentials@v1-node16
-        with:
-          aws-access-key-id: ${{ secrets.VBR_AWS_ACCESS_KEY_ID_PRD }}
-          aws-secret-access-key: ${{ secrets.VBR_AWS_SECRET_ACCESS_KEY_PRD }}
-          aws-region: ${{ secrets.VBR_AWS_REGION_PRD }}
-
-      - name: Login to Amazon ECR (Production)
-        uses: aws-actions/amazon-ecr-login@v1.5.3
-
-      # Download artifact
-      - name: Download artifact
-        uses: actions/download-artifact@v3
-        continue-on-error: false
-        with:
-          name: ${{ matrix.image }}-${{ needs.release.outputs.version }}
-          path: ~/
-
-      # Load artifact
-      - name: Load artifact
-        shell: bash
-        run: |
-          echo br-$IMAGE-image.tar
-          docker image load -i ~/br-$IMAGE-image.tar
-        env:
-          IMAGE: ${{ matrix.image }}
-
-      - name: Push artifacts to ECR Production
-        shell: bash
-        run: |
-          echo $IMAGE:$SEMVER
-          docker tag $BUILD_DOCKER_REGISTRY_TST/building-registry/$IMAGE:$SEMVER $BUILD_DOCKER_REGISTRY_PRD/building-registry/$IMAGE:$SEMVER
-          docker push $BUILD_DOCKER_REGISTRY_PRD/building-registry/$IMAGE:$SEMVER
-        env:
-          BUILD_DOCKER_REGISTRY_TST: ${{ secrets.VBR_BUILD_DOCKER_REGISTRY_TST }}
-          BUILD_DOCKER_REGISTRY_PRD: ${{ secrets.VBR_BUILD_DOCKER_REGISTRY_PRD }}
-          IMAGE: ${{ matrix.image }}
-          SEMVER: ${{ needs.release.outputs.version }}
-          WORKSPACE: ${{ github.workspace }}
-
   push_images_to_newproduction:
     if: needs.release.outputs.version != 'none'
     needs: [ release ]
@@ -869,6 +825,7 @@ jobs:
           'projector',
           'projections-syndication',
           'projections-backoffice',
+          'projections-last-changed-list-console',
           'consumer-address',
           'consumer-read-parcel',
           'producer',
