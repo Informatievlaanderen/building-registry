@@ -115,10 +115,10 @@ namespace BuildingRegistry.Projections.LastChangedList.Console.Infrastructure
 
                     builder.Populate(services);
                 })
-                .ConfigureWebHostDefaults(webHostBuilder =>
-                    webHostBuilder
-                        .UseStartup<Startup>()
-                        .UseKestrel())
+                // .ConfigureWebHostDefaults(webHostBuilder =>
+                //     webHostBuilder
+                //         .UseStartup<Startup>()
+                //         .UseKestrel())
                 .UseConsoleLifetime()
                 .Build();
 
