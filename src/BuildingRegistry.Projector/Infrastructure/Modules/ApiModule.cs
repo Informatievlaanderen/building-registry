@@ -7,7 +7,6 @@ namespace BuildingRegistry.Projector.Infrastructure.Modules
     using Be.Vlaanderen.Basisregisters.DependencyInjection;
     using Be.Vlaanderen.Basisregisters.EventHandling;
     using Be.Vlaanderen.Basisregisters.EventHandling.Autofac;
-    using Be.Vlaanderen.Basisregisters.ProjectionHandling.LastChangedList;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Autofac;
     using Be.Vlaanderen.Basisregisters.Projector;
     using Be.Vlaanderen.Basisregisters.Projector.ConnectedProjections;
@@ -37,7 +36,6 @@ namespace BuildingRegistry.Projector.Infrastructure.Modules
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Logging;
     using Microsoft.Extensions.Options;
-    using LastChangedListContextMigrationFactory = BuildingRegistry.Projections.LastChangedList.LastChangedListContextMigrationFactory;
 
     public class ApiModule : Module
     {
@@ -65,12 +63,6 @@ namespace BuildingRegistry.Projector.Infrastructure.Modules
 
             builder
                 .RegisterType<ProblemDetailsHelper>()
-                .AsSelf();
-
-            builder.Register(c =>
-                    new LastChangedListBuildingUnitCacheValidator(
-                        c.Resolve<LegacyContext>(),
-                        typeof(BuildingUnitDetailV2Projections).FullName))
                 .AsSelf();
 
             builder.Populate(_services);
@@ -143,17 +135,17 @@ namespace BuildingRegistry.Projector.Infrastructure.Modules
                         _configuration["DataDog:ServiceName"],
                         _services,
                         _loggerFactory));
-
-            builder
-                .RegisterProjectionMigrator<LastChangedListContextMigrationFactory>(
-                    _configuration,
-                    _loggerFactory)
-                .RegisterProjectionMigrator<DataMigrationContextMigrationFactory>(
-                    _configuration,
-                    _loggerFactory)
-                .RegisterProjections<BuildingUnitProjections, LastChangedListContext>(
-                    context => new BuildingUnitProjections(context.Resolve<LastChangedListBuildingUnitCacheValidator>()),
-                    ConnectedProjectionSettings.Default);
+            //
+            // builder
+            //     .RegisterProjectionMigrator<LastChangedListContextMigrationFactory>(
+            //         _configuration,
+            //         _loggerFactory)
+            //     .RegisterProjectionMigrator<DataMigrationContextMigrationFactory>(
+            //         _configuration,
+            //         _loggerFactory)
+            //     .RegisterProjections<BuildingUnitProjections, LastChangedListContext>(
+            //         context => new BuildingUnitProjections(context.Resolve<LastChangedListBuildingUnitCacheValidator>()),
+            //         ConnectedProjectionSettings.Default);
         }
 
         private void RegisterLegacyProjectionsV2(ContainerBuilder builder)
