@@ -25,7 +25,8 @@
                 .AsNoTracking()
                 .Where(ps => ps.Name == _projectionName)
                 .Select(ps => ps.Position)
-                .FirstOrDefaultAsync(ct);
+                .FirstOrDefaultAsync(ct)
+                .ConfigureAwait(false);
 
             return projectionPosition >= position;
         }
