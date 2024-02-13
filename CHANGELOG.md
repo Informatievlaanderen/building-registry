@@ -1,3 +1,10 @@
+## [3.101.1](https://github.com/informatievlaanderen/building-registry/compare/v3.101.0...v3.101.1) (2024-02-13)
+
+
+### Bug Fixes
+
+* remove startup ([83fbcfe](https://github.com/informatievlaanderen/building-registry/commit/83fbcfe899a2cecff775481459b85b16b9ba6e27))
+
 # [3.101.0](https://github.com/informatievlaanderen/building-registry/compare/v3.100.6...v3.101.0) (2024-02-13)
 
 
