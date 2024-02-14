@@ -16,6 +16,7 @@ namespace BuildingRegistry.Projections.Extract
 
         public DbSet<BuildingExtractItem> BuildingExtract { get; set; }
         public DbSet<BuildingExtractItemV2> BuildingExtractV2 { get; set; }
+        public DbSet<BuildingExtractItemV2Esri> BuildingExtractV2Esri { get; set; }
         public DbSet<BuildingUnitExtractItem> BuildingUnitExtract { get; set; }
         public DbSet<BuildingUnitExtractItemV2> BuildingUnitExtractV2 { get; set; }
         public DbSet<BuildingUnitBuildingItem> BuildingUnitBuildings { get; set; }

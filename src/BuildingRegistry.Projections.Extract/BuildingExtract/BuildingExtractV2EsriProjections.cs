@@ -12,13 +12,14 @@ namespace BuildingRegistry.Projections.Extract.BuildingExtract
     using Building;
     using Building.Events;
     using Microsoft.Extensions.Options;
+    using NetTopologySuite.Geometries;
     using NetTopologySuite.IO;
     using NodaTime;
     using Polygon = NetTopologySuite.Geometries.Polygon;
 
     [ConnectedProjectionName("Extract gebouwen")]
     [ConnectedProjectionDescription("Projectie die de gebouwen data voor het gebouwen extract voorziet.")]
-    public class BuildingExtractV2Projections : ConnectedProjection<ExtractContext>
+    public class BuildingExtractV2EsriProjections : ConnectedProjection<ExtractContext>
     {
         private const string NotRealized = "NietGerealiseerd";
         private const string Planned = "Gepland";
@@ -31,7 +32,7 @@ namespace BuildingRegistry.Projections.Extract.BuildingExtract
 
         private readonly Encoding _encoding;
 
-        public BuildingExtractV2Projections(IOptions<ExtractConfig> extractConfig, Encoding encoding,
+        public BuildingExtractV2EsriProjections(IOptions<ExtractConfig> extractConfig, Encoding encoding,
             WKBReader wkbReader)
         {
             var extractConfigValue = extractConfig.Value;
@@ -44,7 +45,7 @@ namespace BuildingRegistry.Projections.Extract.BuildingExtract
                     return;
                 }
 
-                var buildingExtractItemV2 = new BuildingExtractItemV2
+                var buildingExtractItemV2 = new BuildingExtractItemV2Esri
                 {
                     PersistentLocalId = message.Message.BuildingPersistentLocalId,
                     DbaseRecord = new BuildingDbaseRecord
@@ -71,13 +72,13 @@ namespace BuildingRegistry.Projections.Extract.BuildingExtract
                 UpdateGeometry(geometry, buildingExtractItemV2);
 
                 await context
-                    .BuildingExtractV2
+                    .BuildingExtractV2Esri
                     .AddAsync(buildingExtractItemV2, ct);
             });
 
             When<Envelope<BuildingWasPlannedV2>>(async (context, message, ct) =>
             {
-                var buildingExtractItemV2 = new BuildingExtractItemV2
+                var buildingExtractItemV2 = new BuildingExtractItemV2Esri
                 {
                     PersistentLocalId = message.Message.BuildingPersistentLocalId,
                     DbaseRecord = new BuildingDbaseRecord
@@ -101,13 +102,13 @@ namespace BuildingRegistry.Projections.Extract.BuildingExtract
                 UpdateGeometry(geometry, buildingExtractItemV2);
 
                 await context
-                    .BuildingExtractV2
+                    .BuildingExtractV2Esri
                     .AddAsync(buildingExtractItemV2, ct);
             });
 
             When<Envelope<UnplannedBuildingWasRealizedAndMeasured>>(async (context, message, ct) =>
             {
-                var buildingExtractItemV2 = new BuildingExtractItemV2
+                var buildingExtractItemV2 = new BuildingExtractItemV2Esri
                 {
                     PersistentLocalId = message.Message.BuildingPersistentLocalId,
                     DbaseRecord = new BuildingDbaseRecord
@@ -131,13 +132,13 @@ namespace BuildingRegistry.Projections.Extract.BuildingExtract
                 UpdateGeometry(geometry, buildingExtractItemV2);
 
                 await context
-                    .BuildingExtractV2
+                    .BuildingExtractV2Esri
                     .AddAsync(buildingExtractItemV2, ct);
             });
 
             When<Envelope<BuildingOutlineWasChanged>>(async (context, message, ct) =>
             {
-                var item = await context.BuildingExtractV2.FindAsync(message.Message.BuildingPersistentLocalId,
+                var item = await context.BuildingExtractV2Esri.FindAsync(message.Message.BuildingPersistentLocalId,
                     cancellationToken: ct);
 
                 var geometry = wkbReader.Read(message.Message.ExtendedWkbGeometryBuilding.ToByteArray()) as Polygon;
@@ -148,7 +149,7 @@ namespace BuildingRegistry.Projections.Extract.BuildingExtract
 
             When<Envelope<BuildingMeasurementWasChanged>>(async (context, message, ct) =>
             {
-                var item = await context.BuildingExtractV2.FindAsync(message.Message.BuildingPersistentLocalId,
+                var item = await context.BuildingExtractV2Esri.FindAsync(message.Message.BuildingPersistentLocalId,
                     cancellationToken: ct);
 
                 var geometry = wkbReader.Read(message.Message.ExtendedWkbGeometryBuilding.ToByteArray()) as Polygon;
@@ -158,7 +159,7 @@ namespace BuildingRegistry.Projections.Extract.BuildingExtract
 
             When<Envelope<BuildingBecameUnderConstructionV2>>(async (context, message, ct) =>
             {
-                var item = await context.BuildingExtractV2.FindAsync(message.Message.BuildingPersistentLocalId,
+                var item = await context.BuildingExtractV2Esri.FindAsync(message.Message.BuildingPersistentLocalId,
                     cancellationToken: ct);
                 UpdateStatus(item, MapStatus(BuildingStatus.UnderConstruction));
                 UpdateVersie(item, message.Message.Provenance.Timestamp);
@@ -166,7 +167,7 @@ namespace BuildingRegistry.Projections.Extract.BuildingExtract
 
             When<Envelope<BuildingWasCorrectedFromUnderConstructionToPlanned>>(async (context, message, ct) =>
             {
-                var item = await context.BuildingExtractV2.FindAsync(message.Message.BuildingPersistentLocalId,
+                var item = await context.BuildingExtractV2Esri.FindAsync(message.Message.BuildingPersistentLocalId,
                     cancellationToken: ct);
                 UpdateStatus(item, MapStatus(BuildingStatus.Planned));
                 UpdateVersie(item, message.Message.Provenance.Timestamp);
@@ -174,7 +175,7 @@ namespace BuildingRegistry.Projections.Extract.BuildingExtract
 
             When<Envelope<BuildingWasRealizedV2>>(async (context, message, ct) =>
             {
-                var item = await context.BuildingExtractV2.FindAsync(message.Message.BuildingPersistentLocalId,
+                var item = await context.BuildingExtractV2Esri.FindAsync(message.Message.BuildingPersistentLocalId,
                     cancellationToken: ct);
                 UpdateStatus(item, MapStatus(BuildingStatus.Realized));
                 UpdateVersie(item, message.Message.Provenance.Timestamp);
@@ -182,7 +183,7 @@ namespace BuildingRegistry.Projections.Extract.BuildingExtract
 
             When<Envelope<BuildingWasCorrectedFromRealizedToUnderConstruction>>(async (context, message, ct) =>
             {
-                var item = await context.BuildingExtractV2.FindAsync(
+                var item = await context.BuildingExtractV2Esri.FindAsync(
                     message.Message.BuildingPersistentLocalId,
                     cancellationToken: ct);
                 UpdateStatus(item, MapStatus(BuildingStatus.UnderConstruction));
@@ -191,7 +192,7 @@ namespace BuildingRegistry.Projections.Extract.BuildingExtract
 
             When<Envelope<BuildingWasNotRealizedV2>>(async (context, message, ct) =>
             {
-                var item = await context.BuildingExtractV2.FindAsync(message.Message.BuildingPersistentLocalId,
+                var item = await context.BuildingExtractV2Esri.FindAsync(message.Message.BuildingPersistentLocalId,
                     cancellationToken: ct);
                 UpdateStatus(item, MapStatus(BuildingStatus.NotRealized));
                 UpdateVersie(item, message.Message.Provenance.Timestamp);
@@ -199,7 +200,7 @@ namespace BuildingRegistry.Projections.Extract.BuildingExtract
 
             When<Envelope<BuildingWasCorrectedFromNotRealizedToPlanned>>(async (context, message, ct) =>
             {
-                var item = await context.BuildingExtractV2.FindAsync(message.Message.BuildingPersistentLocalId,
+                var item = await context.BuildingExtractV2Esri.FindAsync(message.Message.BuildingPersistentLocalId,
                     cancellationToken: ct);
                 UpdateStatus(item, MapStatus(BuildingStatus.Planned));
                 UpdateVersie(item, message.Message.Provenance.Timestamp);
@@ -207,7 +208,7 @@ namespace BuildingRegistry.Projections.Extract.BuildingExtract
 
             When<Envelope<BuildingWasMeasured>>(async (context, message, ct) =>
             {
-                var item = await context.BuildingExtractV2.FindAsync(message.Message.BuildingPersistentLocalId,
+                var item = await context.BuildingExtractV2Esri.FindAsync(message.Message.BuildingPersistentLocalId,
                     cancellationToken: ct);
                 var geometry = wkbReader.Read(message.Message.ExtendedWkbGeometryBuilding.ToByteArray()) as Polygon;
 
@@ -218,7 +219,7 @@ namespace BuildingRegistry.Projections.Extract.BuildingExtract
 
             When<Envelope<BuildingMeasurementWasCorrected>>(async (context, message, ct) =>
             {
-                var item = await context.BuildingExtractV2.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);
+                var item = await context.BuildingExtractV2Esri.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);
                 var geometry = wkbReader.Read(message.Message.ExtendedWkbGeometryBuilding.ToByteArray()) as Polygon;
 
                 UpdateGeometry(geometry, item);
@@ -227,48 +228,48 @@ namespace BuildingRegistry.Projections.Extract.BuildingExtract
 
             When<Envelope<BuildingWasDemolished>>(async (context, message, ct) =>
             {
-                var item = await context.BuildingExtractV2.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);
+                var item = await context.BuildingExtractV2Esri.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);
                 UpdateStatus(item, MapStatus((BuildingStatus.Retired)));
                 UpdateVersie(item, message.Message.Provenance.Timestamp);
             });
 
             When<Envelope<BuildingWasRemovedV2>>(async (context, message, ct) =>
             {
-                var item = await context.BuildingExtractV2.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);
-                context.BuildingExtractV2.Remove(item);
+                var item = await context.BuildingExtractV2Esri.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);
+                context.BuildingExtractV2Esri.Remove(item);
             });
 
             When<Envelope<BuildingUnitWasPlannedV2>>(async (context, message, ct) =>
             {
-                var item = await context.BuildingExtractV2.FindAsync(message.Message.BuildingPersistentLocalId,
+                var item = await context.BuildingExtractV2Esri.FindAsync(message.Message.BuildingPersistentLocalId,
                     cancellationToken: ct);
                 UpdateVersie(item, message.Message.Provenance.Timestamp);
             });
 
             When<Envelope<CommonBuildingUnitWasAddedV2>>(async (context, message, ct) =>
             {
-                var item = await context.BuildingExtractV2.FindAsync(message.Message.BuildingPersistentLocalId,
+                var item = await context.BuildingExtractV2Esri.FindAsync(message.Message.BuildingPersistentLocalId,
                     cancellationToken: ct);
                 UpdateVersie(item, message.Message.Provenance.Timestamp);
             });
 
             When<Envelope<BuildingUnitWasRemovedV2>>(async (context, message, ct) =>
             {
-                var item = await context.BuildingExtractV2.FindAsync(message.Message.BuildingPersistentLocalId,
+                var item = await context.BuildingExtractV2Esri.FindAsync(message.Message.BuildingPersistentLocalId,
                     cancellationToken: ct);
                 UpdateVersie(item, message.Message.Provenance.Timestamp);
             });
 
             When<Envelope<BuildingUnitRemovalWasCorrected>>(async (context, message, ct) =>
             {
-                var item = await context.BuildingExtractV2.FindAsync(message.Message.BuildingPersistentLocalId,
+                var item = await context.BuildingExtractV2Esri.FindAsync(message.Message.BuildingPersistentLocalId,
                     cancellationToken: ct);
                 UpdateVersie(item, message.Message.Provenance.Timestamp);
             });
 
             // When<Envelope<BuildingMergerWasRealized>>(async (context, message, ct) =>
             // {
-            //     var buildingExtractItemV2 = new BuildingExtractItemV2
+            //     var buildingExtractItemV2 = new BuildingExtractItemV2Esri
             //     {
             //         PersistentLocalId = message.Message.BuildingPersistentLocalId,
             //         DbaseRecord = new BuildingDbaseRecord
@@ -292,25 +293,25 @@ namespace BuildingRegistry.Projections.Extract.BuildingExtract
             //     UpdateGeometry(geometry, buildingExtractItemV2);
             //
             //     await context
-            //         .BuildingExtractV2
+            //         .BuildingExtractV2Esri
             //         .AddAsync(buildingExtractItemV2, ct);
             // });
             //
             // When<Envelope<BuildingUnitWasTransferred>>(async (context, message, ct) =>
             // {
-            //     var item = await context.BuildingExtractV2.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);
+            //     var item = await context.BuildingExtractV2Esri.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);
             //     UpdateVersie(item, message.Message.Provenance.Timestamp);
             // });
             //
             // When<Envelope<BuildingUnitWasMoved>>(async (context, message, ct) =>
             // {
-            //     var item = await context.BuildingExtractV2.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);
+            //     var item = await context.BuildingExtractV2Esri.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);
             //     UpdateVersie(item, message.Message.Provenance.Timestamp);
             // });
             //
             // When<Envelope<BuildingWasMerged>>(async (context, message, ct) =>
             // {
-            //     var item = await context.BuildingExtractV2.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);
+            //     var item = await context.BuildingExtractV2Esri.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);
             //     UpdateStatus(item, MapStatus(BuildingStatus.Retired));
             //     UpdateVersie(item, message.Message.Provenance.Timestamp);
             // });
@@ -341,7 +342,7 @@ namespace BuildingRegistry.Projections.Extract.BuildingExtract
             return dictionary[buildingStatus];
         }
 
-        private static void UpdateGeometry(Polygon? geometry, BuildingExtractItemV2 item)
+        private static void UpdateGeometry(Polygon? geometry, BuildingExtractItemV2Esri item)
         {
             if (geometry == null)
             {
@@ -349,6 +350,9 @@ namespace BuildingRegistry.Projections.Extract.BuildingExtract
             }
             else
             {
+                if (geometry.Shell.IsCCW) // NTS default orientation is counter-clockwise
+                    geometry = (Polygon)((Geometry)geometry).Reverse(); //Reverse has to be called on Geometry
+
                 var env = EnvelopePartialRecord.From(geometry.EnvelopeInternal);
 
                 var polygon =
@@ -364,13 +368,13 @@ namespace BuildingRegistry.Projections.Extract.BuildingExtract
             }
         }
 
-        private void UpdateStatus(BuildingExtractItemV2 building, string status)
+        private void UpdateStatus(BuildingExtractItemV2Esri building, string status)
             => UpdateRecord(building, record => record.status.Value = status);
 
-        private void UpdateVersie(BuildingExtractItemV2 building, Instant timestamp)
+        private void UpdateVersie(BuildingExtractItemV2Esri building, Instant timestamp)
             => UpdateRecord(building, record => record.versieid.SetValue(timestamp.ToBelgianDateTimeOffset()));
 
-        private void UpdateRecord(BuildingExtractItemV2 building, Action<BuildingDbaseRecord> updateFunc)
+        private void UpdateRecord(BuildingExtractItemV2Esri building, Action<BuildingDbaseRecord> updateFunc)
         {
             var record = new BuildingDbaseRecord();
             record.FromBytes(building.DbaseRecord, _encoding);

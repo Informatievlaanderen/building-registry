@@ -112,6 +112,13 @@ namespace BuildingRegistry.Projector.Infrastructure.Modules
                             DbaseCodePage.Western_European_ANSI.ToEncoding(),
                             WKBReaderFactory.Create()),
                     ConnectedProjectionSettings.Default)
+                .RegisterProjections<BuildingExtractV2EsriProjections, ExtractContext>(
+                    context =>
+                        new BuildingExtractV2EsriProjections(
+                            context.Resolve<IOptions<ExtractConfig>>(),
+                            DbaseCodePage.Western_European_ANSI.ToEncoding(),
+                            WKBReaderFactory.Create()),
+                    ConnectedProjectionSettings.Default)
                 .RegisterProjections<BuildingUnitExtractV2Projections, ExtractContext>(
                     context =>
                         new BuildingUnitExtractV2Projections(
