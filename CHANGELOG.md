@@ -1,3 +1,10 @@
+# [3.102.0](https://github.com/informatievlaanderen/building-registry/compare/v3.101.1...v3.102.0) (2024-02-16)
+
+
+### Features
+
+* add building polygon projection ESRI format ([28ad353](https://github.com/informatievlaanderen/building-registry/commit/28ad353153cada964049e2d97313bf5b46ededbb))
+
 ## [3.101.1](https://github.com/informatievlaanderen/building-registry/compare/v3.101.0...v3.101.1) (2024-02-13)
 
 
