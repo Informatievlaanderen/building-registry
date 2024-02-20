@@ -112,11 +112,16 @@ namespace BuildingRegistry.Consumer.Read.Parcel.Infrastructure
                             var offsetStr = hostContext.Configuration["TopicOffset"];
                             if (!string.IsNullOrEmpty(offsetStr) && long.TryParse(offsetStr, out var offset))
                             {
-                                using var ctx = c.Resolve<ConsumerParcelContext>();
-
-                                if (ctx.ParcelConsumerItems.Any())
+                                var ignoreDataCheck = hostContext.Configuration.GetValue<bool>("IgnoreTopicOffsetDataCheck", false);
+                                if (!ignoreDataCheck)
                                 {
-                                    throw new InvalidOperationException($"Cannot set Kafka offset to {offset} because {nameof(ctx.ParcelConsumerItems)} has data.");
+                                    using var ctx = c.Resolve<ConsumerParcelContext>();
+
+                                    if (ctx.ParcelConsumerItems.Any())
+                                    {
+                                        throw new InvalidOperationException(
+                                            $"Cannot set Kafka offset to {offset} because {nameof(ctx.ParcelConsumerItems)} has data.");
+                                    }
                                 }
 
                                 consumerOptions.ConfigureOffset(new Offset(offset));

@@ -129,11 +129,17 @@ namespace BuildingRegistry.Consumer.Address.Infrastructure
                         var offsetStr = hostContext.Configuration["AddressTopicOffset"];
                         if (!string.IsNullOrEmpty(offsetStr) && long.TryParse(offsetStr, out var offset))
                         {
-                            using var ctx = c.Resolve<ConsumerAddressContext>();
+                            var ignoreDataCheck = hostContext.Configuration.GetValue<bool>("IgnoreAddressTopicOffsetDataCheck", false);
 
-                            if (ctx.AddressConsumerItems.Any())
+                            if (!ignoreDataCheck)
                             {
-                                throw new InvalidOperationException($"Cannot set Kafka offset to {offset} because {nameof(ctx.AddressConsumerItems)} has data.");
+                                using var ctx = c.Resolve<ConsumerAddressContext>();
+
+                                if (ctx.AddressConsumerItems.Any())
+                                {
+                                    throw new InvalidOperationException(
+                                        $"Cannot set Kafka offset to {offset} because {nameof(ctx.AddressConsumerItems)} has data.");
+                                }
                             }
 
                             consumerOptions.ConfigureOffset(new Offset(offset));
