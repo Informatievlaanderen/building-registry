@@ -1,3 +1,10 @@
+# [3.103.0](https://github.com/informatievlaanderen/building-registry/compare/v3.102.0...v3.103.0) (2024-02-20)
+
+
+### Features
+
+* shutdown backoffice projections service when projection is stopped ([7c83c95](https://github.com/informatievlaanderen/building-registry/commit/7c83c95f9e0cd8b9bfda05541e8e78808819c307))
+
 # [3.102.0](https://github.com/informatievlaanderen/building-registry/compare/v3.101.1...v3.102.0) (2024-02-16)
 
 
