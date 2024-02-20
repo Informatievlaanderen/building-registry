@@ -1,3 +1,10 @@
+# [3.104.0](https://github.com/informatievlaanderen/building-registry/compare/v3.103.0...v3.104.0) (2024-02-20)
+
+
+### Features
+
+* add ignore data check when setting offset ([d6db01c](https://github.com/informatievlaanderen/building-registry/commit/d6db01c36a390e185413ff72940d8381d25a2fbe))
+
 # [3.103.0](https://github.com/informatievlaanderen/building-registry/compare/v3.102.0...v3.103.0) (2024-02-20)
 
 
