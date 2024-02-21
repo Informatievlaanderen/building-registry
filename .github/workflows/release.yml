@@ -541,25 +541,6 @@ jobs:
       env:
         SEMVER: ${{ needs.release.outputs.version }}
 
-    - name: Configure AWS credentials (Production)
-      uses: aws-actions/configure-aws-credentials@v1-node16
-      with:
-        aws-access-key-id: ${{ secrets.VBR_AWS_ACCESS_KEY_ID_PRD }}
-        aws-secret-access-key: ${{ secrets.VBR_AWS_SECRET_ACCESS_KEY_PRD }}
-        aws-region: ${{ secrets.VBR_AWS_REGION_PRD }}
-
-    - name: Login to Amazon ECR (Production)
-      uses: aws-actions/amazon-ecr-login@v1.5.3
-
-    - name: Push Lambda functions to S3 Production
-      shell: bash
-      run: |
-        echo Push Lambda functions to S3 Production
-        echo aws s3 cp ~/lambda.zip s3://s3-vbr-prd-basisregisters-lam-br-sqsbackofficehandlerfunction/$SEMVER/lambda.zip
-        aws s3 cp ~/lambda.zip s3://s3-vbr-prd-basisregisters-lam-br-sqsbackofficehandlerfunction/$SEMVER/lambda.zip
-      env:
-       SEMVER: ${{ needs.release.outputs.version }}
-
   publish_to_nuget:
     needs: [ release ]
     if: ${{ (github.repository_owner == 'Informatievlaanderen') && (needs.release.outputs.version != 'none') }}
