@@ -37,7 +37,8 @@ namespace BuildingRegistry.Projections.Integration.Building.Version
                     CreatedOnTimestamp = message.Message.Provenance.Timestamp,
                     LastChangedOnTimestamp = message.Message.Provenance.Timestamp,
                     Namespace = options.BuildingNamespace,
-                    PuriId = $"{options.BuildingNamespace}/{buildingPersistentLocalId}"
+                    PuriId = $"{options.BuildingNamespace}/{buildingPersistentLocalId}",
+                    Type = message.EventName
                 };
 
                 await context

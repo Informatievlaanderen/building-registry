@@ -46,7 +46,8 @@
                     LastChangedOnTimestamp = message.Message.Provenance.Timestamp,
                     Namespace = options.Value.BuildingNamespace,
                     PuriId = $"{options.Value.BuildingNamespace}/{message.Message.BuildingPersistentLocalId}",
-                    BuildingUnits = new Collection<BuildingUnitVersion>()
+                    BuildingUnits = new Collection<BuildingUnitVersion>(),
+                    Type = message.EventName
                 };
 
                 foreach (var buildingUnit in message.Message.BuildingUnits)
@@ -81,7 +82,8 @@
                         CreatedOnTimestamp = message.Message.Provenance.Timestamp,
                         Namespace = options.Value.BuildingUnitNamespace,
                         PuriId = $"{options.Value.BuildingUnitNamespace}/{buildingUnit.BuildingUnitPersistentLocalId}",
-                        Addresses = new Collection<BuildingUnitAddressVersion>(buildingUnitAddressVersions)
+                        Addresses = new Collection<BuildingUnitAddressVersion>(buildingUnitAddressVersions),
+                        Type = message.EventName
                     };
 
                     building.BuildingUnits.Add(buildingUnitVersion);
@@ -111,7 +113,9 @@
                     CreatedOnTimestamp = message.Message.Provenance.Timestamp,
                     LastChangedOnTimestamp = message.Message.Provenance.Timestamp,
                     Namespace = options.Value.BuildingNamespace,
-                    PuriId = $"{options.Value.BuildingNamespace}/{message.Message.BuildingPersistentLocalId}"
+                    PuriId = $"{options.Value.BuildingNamespace}/{message.Message.BuildingPersistentLocalId}",
+                    Type = message.EventName
+
                 };
 
                 await context
@@ -138,7 +142,8 @@
                     CreatedOnTimestamp = message.Message.Provenance.Timestamp,
                     LastChangedOnTimestamp = message.Message.Provenance.Timestamp,
                     Namespace = options.Value.BuildingNamespace,
-                    PuriId = $"{options.Value.BuildingNamespace}/{message.Message.BuildingPersistentLocalId}"
+                    PuriId = $"{options.Value.BuildingNamespace}/{message.Message.BuildingPersistentLocalId}",
+                    Type = message.EventName
                 };
 
                 await context

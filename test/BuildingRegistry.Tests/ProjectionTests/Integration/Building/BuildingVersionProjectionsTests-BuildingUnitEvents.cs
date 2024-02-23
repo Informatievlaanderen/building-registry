@@ -33,12 +33,14 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
             var buildingWasPlannedV2Metadata = new Dictionary<string, object>
             {
                 { AddEventHashPipe.HashMetadataKey, buildingWasPlannedV2.GetHash() },
-                { Envelope.PositionMetadataKey, position }
+                { Envelope.PositionMetadataKey, position },
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
             };
             var buildingUnitWasPlannedV2Metadata = new Dictionary<string, object>
             {
                 { AddEventHashPipe.HashMetadataKey, buildingUnitWasPlannedV2.GetHash() },
-                { Envelope.PositionMetadataKey, ++position }
+                { Envelope.PositionMetadataKey, ++position },
+                { Envelope.EventNameMetadataKey, "EventName"}
             };
 
             await Sut
@@ -67,6 +69,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
                     buildingUnitVersion.CreatedOnTimestamp.Should().Be(buildingUnitWasPlannedV2.Provenance.Timestamp);
                     buildingUnitVersion.Namespace.Should().Be(BuildingUnitNamespace);
                     buildingUnitVersion.PuriId.Should().Be($"{BuildingUnitNamespace}/{buildingUnitWasPlannedV2.BuildingUnitPersistentLocalId}");
+                    buildingUnitVersion.Type.Should().Be("EventName");
 
                     buildingVersion.VersionTimestamp.Should().Be(buildingUnitWasPlannedV2.Provenance.Timestamp);
                 });
@@ -87,17 +90,20 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
             var buildingWasPlannedV2Metadata = new Dictionary<string, object>
             {
                 { AddEventHashPipe.HashMetadataKey, buildingWasPlannedV2.GetHash() },
-                { Envelope.PositionMetadataKey, position }
+                { Envelope.PositionMetadataKey, position },
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
             };
             var buildingUnitWasPlannedMetadata = new Dictionary<string, object>
             {
                 { AddEventHashPipe.HashMetadataKey, buildingUnitWasPlannedV2.GetHash() },
-                { Envelope.PositionMetadataKey, ++position }
+                { Envelope.PositionMetadataKey, ++position },
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
             };
             var buildingUnitWasRealizedMetadata = new Dictionary<string, object>
             {
                 { AddEventHashPipe.HashMetadataKey, buildingUnitWasRealizedV2.GetHash() },
-                { Envelope.PositionMetadataKey, ++position }
+                { Envelope.PositionMetadataKey, ++position },
+                { Envelope.EventNameMetadataKey, "EventName"}
             };
 
             await Sut
@@ -115,6 +121,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
 
                     buildingUnitVersion!.Status.Should().Be("Realized");
                     buildingUnitVersion.OsloStatus.Should().Be("Gerealiseerd");
+                    buildingUnitVersion.Type.Should().Be("EventName");
                     buildingUnitVersion.VersionTimestamp.Should().Be(buildingUnitWasRealizedV2.Provenance.Timestamp);
                 });
         }
@@ -134,17 +141,20 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
             var buildingWasPlannedV2Metadata = new Dictionary<string, object>
             {
                 { AddEventHashPipe.HashMetadataKey, buildingWasPlannedV2.GetHash() },
-                { Envelope.PositionMetadataKey, position }
+                { Envelope.PositionMetadataKey, position },
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
             };
             var buildingUnitWasPlannedMetadata = new Dictionary<string, object>
             {
                 { AddEventHashPipe.HashMetadataKey, buildingUnitWasPlannedV2.GetHash() },
-                { Envelope.PositionMetadataKey, ++position }
+                { Envelope.PositionMetadataKey, ++position },
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
             };
             var buildingUnitWasRealizedMetadata = new Dictionary<string, object>
             {
                 { AddEventHashPipe.HashMetadataKey, buildingUnitWasRealized.GetHash() },
-                { Envelope.PositionMetadataKey, ++position }
+                { Envelope.PositionMetadataKey, ++position },
+                { Envelope.EventNameMetadataKey, "EventName"}
             };
 
             await Sut
@@ -163,6 +173,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
                     buildingUnitVersion!.Status.Should().Be("Realized");
                     buildingUnitVersion.OsloStatus.Should().Be("Gerealiseerd");
                     buildingUnitVersion.VersionTimestamp.Should().Be(buildingUnitWasRealized.Provenance.Timestamp);
+                    buildingUnitVersion.Type.Should().Be("EventName");
                 });
         }
 
@@ -182,22 +193,26 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
             var buildingWasPlannedV2Metadata = new Dictionary<string, object>
             {
                 { AddEventHashPipe.HashMetadataKey, buildingWasPlannedV2.GetHash() },
-                { Envelope.PositionMetadataKey, position }
+                { Envelope.PositionMetadataKey, position },
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
             };
             var buildingUnitWasPlannedMetadata = new Dictionary<string, object>
             {
                 { AddEventHashPipe.HashMetadataKey, buildingUnitWasPlannedV2.GetHash() },
-                { Envelope.PositionMetadataKey, ++position }
+                { Envelope.PositionMetadataKey, ++position },
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
             };
             var buildingUnitWasRealizedMetadata = new Dictionary<string, object>
             {
                 { AddEventHashPipe.HashMetadataKey, buildingUnitWasRealizedV2.GetHash() },
-                { Envelope.PositionMetadataKey, ++position }
+                { Envelope.PositionMetadataKey, ++position },
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
             };
             var buildingUnitWasCorrectedToPlannedMetadata = new Dictionary<string, object>
             {
                 { AddEventHashPipe.HashMetadataKey, buildingUnitWasCorrectedFromRealizedToPlanned.GetHash() },
-                { Envelope.PositionMetadataKey, ++position }
+                { Envelope.PositionMetadataKey, ++position },
+                { Envelope.EventNameMetadataKey, "EventName"}
             };
 
             await Sut
@@ -218,6 +233,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
                     buildingUnitVersion!.Status.Should().Be("Planned");
                     buildingUnitVersion.OsloStatus.Should().Be("Gepland");
                     buildingUnitVersion.VersionTimestamp.Should().Be(buildingUnitWasCorrectedFromRealizedToPlanned.Provenance.Timestamp);
+                    buildingUnitVersion.Type.Should().Be("EventName");
                 });
         }
 
@@ -237,22 +253,26 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
             var buildingWasPlannedV2Metadata = new Dictionary<string, object>
             {
                 { AddEventHashPipe.HashMetadataKey, buildingWasPlannedV2.GetHash() },
-                { Envelope.PositionMetadataKey, position }
+                { Envelope.PositionMetadataKey, position },
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
             };
             var buildingUnitWasPlannedMetadata = new Dictionary<string, object>
             {
                 { AddEventHashPipe.HashMetadataKey, buildingUnitWasPlannedV2.GetHash() },
-                { Envelope.PositionMetadataKey, ++position }
+                { Envelope.PositionMetadataKey, ++position },
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
             };
             var buildingUnitWasRealizedMetadata = new Dictionary<string, object>
             {
                 { AddEventHashPipe.HashMetadataKey, buildingUnitWasRealizedV2.GetHash() },
-                { Envelope.PositionMetadataKey, ++position }
+                { Envelope.PositionMetadataKey, ++position },
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
             };
             var buildingUnitWasCorrectedToPlannedMetadata = new Dictionary<string, object>
             {
                 { AddEventHashPipe.HashMetadataKey, buildingUnitWasCorrectedToPlanned.GetHash() },
-                { Envelope.PositionMetadataKey, ++position }
+                { Envelope.PositionMetadataKey, ++position },
+                { Envelope.EventNameMetadataKey, "EventName"}
             };
 
             await Sut
@@ -273,6 +293,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
                     buildingUnitVersion!.Status.Should().Be("Planned");
                     buildingUnitVersion.OsloStatus.Should().Be("Gepland");
                     buildingUnitVersion.VersionTimestamp.Should().Be(buildingUnitWasCorrectedToPlanned.Provenance.Timestamp);
+                    buildingUnitVersion.Type.Should().Be("EventName");
                 });
         }
 
@@ -291,17 +312,20 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
             var buildingWasPlannedV2Metadata = new Dictionary<string, object>
             {
                 { AddEventHashPipe.HashMetadataKey, buildingWasPlannedV2.GetHash() },
-                { Envelope.PositionMetadataKey, position }
+                { Envelope.PositionMetadataKey, position },
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
             };
             var buildingUnitWasPlannedMetadata = new Dictionary<string, object>
             {
                 { AddEventHashPipe.HashMetadataKey, buildingUnitWasPlannedV2.GetHash() },
-                { Envelope.PositionMetadataKey, ++position }
+                { Envelope.PositionMetadataKey, ++position },
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
             };
             var buildingUnitWasNotRealizedMetadata = new Dictionary<string, object>
             {
                 { AddEventHashPipe.HashMetadataKey, buildingUnitWasNotRealizedV2.GetHash() },
-                { Envelope.PositionMetadataKey, ++position }
+                { Envelope.PositionMetadataKey, ++position },
+                { Envelope.EventNameMetadataKey, "EventName"}
             };
 
             await Sut
@@ -320,6 +344,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
                     buildingUnitVersion!.Status.Should().Be("NotRealized");
                     buildingUnitVersion.OsloStatus.Should().Be("NietGerealiseerd");
                     buildingUnitVersion.VersionTimestamp.Should().Be(buildingUnitWasNotRealizedV2.Provenance.Timestamp);
+                    buildingUnitVersion.Type.Should().Be("EventName");
                 });
         }
 
@@ -338,17 +363,20 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
             var buildingWasPlannedV2Metadata = new Dictionary<string, object>
             {
                 { AddEventHashPipe.HashMetadataKey, buildingWasPlannedV2.GetHash() },
-                { Envelope.PositionMetadataKey, position }
+                { Envelope.PositionMetadataKey, position },
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
             };
             var buildingUnitWasPlannedMetadata = new Dictionary<string, object>
             {
                 { AddEventHashPipe.HashMetadataKey, buildingUnitWasPlannedV2.GetHash() },
-                { Envelope.PositionMetadataKey, ++position }
+                { Envelope.PositionMetadataKey, ++position },
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
             };
             var buildingUnitWasNotRealizedMetadata = new Dictionary<string, object>
             {
                 { AddEventHashPipe.HashMetadataKey, buildingUnitWasNotRealized.GetHash() },
-                { Envelope.PositionMetadataKey, ++position }
+                { Envelope.PositionMetadataKey, ++position },
+                { Envelope.EventNameMetadataKey, "EventName"}
             };
 
             await Sut
@@ -368,6 +396,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
                     buildingUnitVersion!.Status.Should().Be("NotRealized");
                     buildingUnitVersion.OsloStatus.Should().Be("NietGerealiseerd");
                     buildingUnitVersion.VersionTimestamp.Should().Be(buildingUnitWasNotRealized.Provenance.Timestamp);
+                    buildingUnitVersion.Type.Should().Be("EventName");
                 });
         }
 
@@ -387,22 +416,26 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
             var buildingWasPlannedV2Metadata = new Dictionary<string, object>
             {
                 { AddEventHashPipe.HashMetadataKey, buildingWasPlannedV2.GetHash() },
-                { Envelope.PositionMetadataKey, position }
+                { Envelope.PositionMetadataKey, position },
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
             };
             var buildingUnitWasPlannedMetadata = new Dictionary<string, object>
             {
                 { AddEventHashPipe.HashMetadataKey, buildingUnitWasPlannedV2.GetHash() },
-                { Envelope.PositionMetadataKey, ++position }
+                { Envelope.PositionMetadataKey, ++position },
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
             };
             var buildingUnitWasNotRealizedMetadata = new Dictionary<string, object>
             {
                 { AddEventHashPipe.HashMetadataKey, buildingUnitWasNotRealizedV2.GetHash() },
-                { Envelope.PositionMetadataKey, ++position }
+                { Envelope.PositionMetadataKey, ++position },
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
             };
             var buildingUnitWasCorrectedToPlannedMetadata = new Dictionary<string, object>
             {
                 { AddEventHashPipe.HashMetadataKey, buildingUnitWasCorrectedToPlanned.GetHash() },
-                { Envelope.PositionMetadataKey, ++position }
+                { Envelope.PositionMetadataKey, ++position },
+                { Envelope.EventNameMetadataKey, "EventName"}
             };
 
             await Sut
@@ -423,6 +456,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
                     buildingUnitVersion!.Status.Should().Be("Planned");
                     buildingUnitVersion.OsloStatus.Should().Be("Gepland");
                     buildingUnitVersion.VersionTimestamp.Should().Be(buildingUnitWasCorrectedToPlanned.Provenance.Timestamp);
+                    buildingUnitVersion.Type.Should().Be("EventName");
                 });
         }
 
@@ -442,22 +476,26 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
             var buildingWasPlannedV2Metadata = new Dictionary<string, object>
             {
                 { AddEventHashPipe.HashMetadataKey, buildingWasPlannedV2.GetHash() },
-                { Envelope.PositionMetadataKey, position }
+                { Envelope.PositionMetadataKey, position },
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
             };
             var buildingUnitWasPlannedMetadata = new Dictionary<string, object>
             {
                 { AddEventHashPipe.HashMetadataKey, buildingUnitWasPlannedV2.GetHash() },
-                { Envelope.PositionMetadataKey, ++position }
+                { Envelope.PositionMetadataKey, ++position },
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
             };
             var buildingUnitWasRealizedMetadata = new Dictionary<string, object>
             {
                 { AddEventHashPipe.HashMetadataKey, buildingUnitWasRealizedV2.GetHash() },
-                { Envelope.PositionMetadataKey, ++position }
+                { Envelope.PositionMetadataKey, ++position },
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
             };
             var buildingUnitWasRetiredMetadata = new Dictionary<string, object>
             {
                 { AddEventHashPipe.HashMetadataKey, buildingUnitWasRetiredV2.GetHash() },
-                { Envelope.PositionMetadataKey, ++position }
+                { Envelope.PositionMetadataKey, ++position },
+                { Envelope.EventNameMetadataKey, "EventName"}
             };
 
             await Sut
@@ -477,6 +515,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
                     buildingUnitVersion!.Status.Should().Be("Retired");
                     buildingUnitVersion.OsloStatus.Should().Be("Gehistoreerd");
                     buildingUnitVersion.VersionTimestamp.Should().Be(buildingUnitWasRetiredV2.Provenance.Timestamp);
+                    buildingUnitVersion.Type.Should().Be("EventName");
                 });
         }
 
@@ -497,27 +536,32 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
             var buildingWasPlannedV2Metadata = new Dictionary<string, object>
             {
                 { AddEventHashPipe.HashMetadataKey, buildingWasPlannedV2.GetHash() },
-                { Envelope.PositionMetadataKey, position }
+                { Envelope.PositionMetadataKey, position },
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
             };
             var buildingUnitWasPlannedMetadata = new Dictionary<string, object>
             {
                 { AddEventHashPipe.HashMetadataKey, buildingUnitWasPlannedV2.GetHash() },
-                { Envelope.PositionMetadataKey, ++position }
+                { Envelope.PositionMetadataKey, ++position },
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
             };
             var buildingUnitWasRealizedMetadata = new Dictionary<string, object>
             {
                 { AddEventHashPipe.HashMetadataKey, buildingUnitWasPlannedV2.GetHash() },
-                { Envelope.PositionMetadataKey, ++position }
+                { Envelope.PositionMetadataKey, ++position },
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
             };
             var buildingUnitWasRetiredMetadata = new Dictionary<string, object>
             {
                 { AddEventHashPipe.HashMetadataKey, buildingUnitWasRetiredV2.GetHash() },
-                { Envelope.PositionMetadataKey, ++position }
+                { Envelope.PositionMetadataKey, ++position },
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
             };
             var buildingUnitWasCorrectedToRealizedMetadata = new Dictionary<string, object>
             {
                 { AddEventHashPipe.HashMetadataKey, buildingUnitWasCorrectedToRealized.GetHash() },
-                { Envelope.PositionMetadataKey, ++position }
+                { Envelope.PositionMetadataKey, ++position },
+                { Envelope.EventNameMetadataKey, "EventName"}
             };
 
             await Sut
@@ -539,6 +583,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
                     buildingUnitVersion!.Status.Should().Be("Realized");
                     buildingUnitVersion.OsloStatus.Should().Be("Gerealiseerd");
                     buildingUnitVersion.VersionTimestamp.Should().Be(buildingUnitWasCorrectedToRealized.Provenance.Timestamp);
+                    buildingUnitVersion.Type.Should().Be("EventName");
                 });
         }
 
@@ -557,17 +602,20 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
             var buildingWasPlannedV2Metadata = new Dictionary<string, object>
             {
                 { AddEventHashPipe.HashMetadataKey, buildingWasPlannedV2.GetHash() },
-                { Envelope.PositionMetadataKey, position }
+                { Envelope.PositionMetadataKey, position },
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
             };
             var buildingUnitWasPlannedMetadata = new Dictionary<string, object>
             {
                 { AddEventHashPipe.HashMetadataKey, buildingUnitWasPlannedV2.GetHash() },
-                { Envelope.PositionMetadataKey, ++position }
+                { Envelope.PositionMetadataKey, ++position },
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
             };
             var buildingUnitPositionWasCorrectedMetadata = new Dictionary<string, object>
             {
                 { AddEventHashPipe.HashMetadataKey, buildingUnitPositionWasCorrected.GetHash() },
-                { Envelope.PositionMetadataKey, ++position }
+                { Envelope.PositionMetadataKey, ++position },
+                { Envelope.EventNameMetadataKey, "EventName"}
             };
             await Sut
                 .Given(
@@ -588,6 +636,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
                     buildingUnitVersion.GeometryMethod.Should().Be(BuildingUnitPositionGeometryMethod.Parse(buildingUnitPositionWasCorrected.GeometryMethod).GeometryMethod);
                     buildingUnitVersion.OsloGeometryMethod.Should().Be(BuildingUnitPositionGeometryMethod.Parse(buildingUnitPositionWasCorrected.GeometryMethod).Map());
                     buildingUnitVersion.VersionTimestamp.Should().Be(buildingUnitPositionWasCorrected.Provenance.Timestamp);
+                    buildingUnitVersion.Type.Should().Be("EventName");
                 });
         }
 
@@ -606,17 +655,20 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
             var buildingWasPlannedV2Metadata = new Dictionary<string, object>
             {
                 { AddEventHashPipe.HashMetadataKey, buildingWasPlannedV2.GetHash() },
-                { Envelope.PositionMetadataKey, position }
+                { Envelope.PositionMetadataKey, position },
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
             };
             var buildingUnitWasPlannedMetadata = new Dictionary<string, object>
             {
                 { AddEventHashPipe.HashMetadataKey, buildingUnitWasPlannedV2.GetHash() },
-                { Envelope.PositionMetadataKey, ++position }
+                { Envelope.PositionMetadataKey, ++position },
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
             };
             var buildingUnitWasRemovedMetadata = new Dictionary<string, object>
             {
                 { AddEventHashPipe.HashMetadataKey, buildingUnitWasRemovedV2.GetHash() },
-                { Envelope.PositionMetadataKey, ++position }
+                { Envelope.PositionMetadataKey, ++position },
+                { Envelope.EventNameMetadataKey, "EventName"}
             };
 
             await Sut
@@ -634,6 +686,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
 
                     buildingUnitVersion!.IsRemoved.Should().BeTrue();
                     buildingUnitVersion.VersionTimestamp.Should().Be(buildingUnitWasRemovedV2.Provenance.Timestamp);
+                    buildingUnitVersion.Type.Should().Be("EventName");
 
                     buildingVersion.VersionTimestamp.Should().Be(buildingUnitWasRemovedV2.Provenance.Timestamp);
                 });
@@ -654,17 +707,20 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
             var buildingWasPlannedV2Metadata = new Dictionary<string, object>
             {
                 { AddEventHashPipe.HashMetadataKey, buildingWasPlannedV2.GetHash() },
-                { Envelope.PositionMetadataKey, position }
+                { Envelope.PositionMetadataKey, position },
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
             };
             var buildingUnitWasPlannedMetadata = new Dictionary<string, object>
             {
                 { AddEventHashPipe.HashMetadataKey, buildingUnitWasPlannedV2.GetHash() },
-                { Envelope.PositionMetadataKey, ++position }
+                { Envelope.PositionMetadataKey, ++position },
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
             };
             var buildingUnitWasRemovedMetadata = new Dictionary<string, object>
             {
                 { AddEventHashPipe.HashMetadataKey, buildingUnitWasRemoved.GetHash() },
-                { Envelope.PositionMetadataKey, ++position }
+                { Envelope.PositionMetadataKey, ++position },
+                { Envelope.EventNameMetadataKey, "EventName"}
             };
 
             await Sut
@@ -682,6 +738,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
 
                     buildingUnitVersion!.IsRemoved.Should().BeTrue();
                     buildingUnitVersion.VersionTimestamp.Should().Be(buildingUnitWasRemoved.Provenance.Timestamp);
+                    buildingUnitVersion.Type.Should().Be("EventName");
 
                     buildingVersion.VersionTimestamp.Should().Be(buildingUnitWasRemoved.Provenance.Timestamp);
                 });
@@ -703,22 +760,26 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
             var buildingWasPlannedV2Metadata = new Dictionary<string, object>
             {
                 { AddEventHashPipe.HashMetadataKey, buildingWasPlannedV2.GetHash() },
-                { Envelope.PositionMetadataKey, position }
+                { Envelope.PositionMetadataKey, position },
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
             };
             var buildingUnitWasPlannedMetadata = new Dictionary<string, object>
             {
                 { AddEventHashPipe.HashMetadataKey, buildingUnitWasPlannedV2.GetHash() },
-                { Envelope.PositionMetadataKey, ++position }
+                { Envelope.PositionMetadataKey, ++position },
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
             };
             var buildingUnitWasRemovedMetadata = new Dictionary<string, object>
             {
                 { AddEventHashPipe.HashMetadataKey, buildingUnitWasRemovedV2.GetHash() },
-                { Envelope.PositionMetadataKey, ++position }
+                { Envelope.PositionMetadataKey, ++position },
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
             };
             var buildingUnitRemovalWasCorrectedMetadata = new Dictionary<string, object>
             {
                 { AddEventHashPipe.HashMetadataKey, buildingUnitRemovalWasCorrected.GetHash() },
-                { Envelope.PositionMetadataKey, ++position }
+                { Envelope.PositionMetadataKey, ++position },
+                { Envelope.EventNameMetadataKey, "EventName"}
             };
 
             await Sut
@@ -746,6 +807,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
                     buildingUnitVersion.HasDeviation.Should().Be(buildingUnitRemovalWasCorrected.HasDeviation);
                     buildingUnitVersion.IsRemoved.Should().BeFalse();
                     buildingUnitVersion.VersionTimestamp.Should().Be(buildingUnitRemovalWasCorrected.Provenance.Timestamp);
+                    buildingUnitVersion.Type.Should().Be("EventName");
 
                     buildingVersion.VersionTimestamp.Should().Be(buildingUnitRemovalWasCorrected.Provenance.Timestamp);
                 });
@@ -766,17 +828,20 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
             var buildingWasPlannedV2Metadata = new Dictionary<string, object>
             {
                 { AddEventHashPipe.HashMetadataKey, buildingWasPlannedV2.GetHash() },
-                { Envelope.PositionMetadataKey, position }
+                { Envelope.PositionMetadataKey, position },
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
             };
             var buildingUnitWasPlannedMetadata = new Dictionary<string, object>
             {
                 { AddEventHashPipe.HashMetadataKey, buildingUnitWasPlannedV2.GetHash() },
-                { Envelope.PositionMetadataKey, ++position }
+                { Envelope.PositionMetadataKey, ++position },
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
             };
             var buildingUnitWasRegularizedMetadata = new Dictionary<string, object>
             {
                 { AddEventHashPipe.HashMetadataKey, buildingUnitWasRegularized.GetHash() },
-                { Envelope.PositionMetadataKey, ++position }
+                { Envelope.PositionMetadataKey, ++position },
+                { Envelope.EventNameMetadataKey, "EventName"}
             };
 
             await Sut
@@ -794,6 +859,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
 
                     buildingUnitVersion!.HasDeviation.Should().BeFalse();
                     buildingUnitVersion.VersionTimestamp.Should().Be(buildingUnitWasRegularized.Provenance.Timestamp);
+                    buildingUnitVersion.Type.Should().Be("EventName");
                 });
         }
 
@@ -812,17 +878,20 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
             var buildingWasPlannedV2Metadata = new Dictionary<string, object>
             {
                 { AddEventHashPipe.HashMetadataKey, buildingWasPlannedV2.GetHash() },
-                { Envelope.PositionMetadataKey, position }
+                { Envelope.PositionMetadataKey, position },
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
             };
             var buildingUnitWasPlannedMetadata = new Dictionary<string, object>
             {
                 { AddEventHashPipe.HashMetadataKey, buildingUnitWasPlannedV2.GetHash() },
-                { Envelope.PositionMetadataKey, ++position }
+                { Envelope.PositionMetadataKey, ++position },
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
             };
             var buildingUnitRegularizationWasCorrectedMetadata = new Dictionary<string, object>
             {
                 { AddEventHashPipe.HashMetadataKey, buildingUnitRegularizationWasCorrected.GetHash() },
-                { Envelope.PositionMetadataKey, ++position }
+                { Envelope.PositionMetadataKey, ++position },
+                { Envelope.EventNameMetadataKey, "EventName"}
             };
 
             await Sut
@@ -841,6 +910,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
 
                     buildingUnitVersion!.HasDeviation.Should().BeTrue();
                     buildingUnitVersion.VersionTimestamp.Should().Be(buildingUnitRegularizationWasCorrected.Provenance.Timestamp);
+                    buildingUnitVersion.Type.Should().Be("EventName");
                 });
         }
 
@@ -859,17 +929,20 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
             var buildingWasPlannedV2Metadata = new Dictionary<string, object>
             {
                 { AddEventHashPipe.HashMetadataKey, buildingWasPlannedV2.GetHash() },
-                { Envelope.PositionMetadataKey, position }
+                { Envelope.PositionMetadataKey, position },
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
             };
             var buildingUnitWasPlannedMetadata = new Dictionary<string, object>
             {
                 { AddEventHashPipe.HashMetadataKey, buildingUnitWasPlannedV2.GetHash() },
-                { Envelope.PositionMetadataKey, ++position }
+                { Envelope.PositionMetadataKey, ++position },
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
             };
             var buildingUnitWasDeregulatedMetadata = new Dictionary<string, object>
             {
                 { AddEventHashPipe.HashMetadataKey, buildingUnitWasDeregulated.GetHash() },
-                { Envelope.PositionMetadataKey, ++position }
+                { Envelope.PositionMetadataKey, ++position },
+                { Envelope.EventNameMetadataKey, "EventName"}
             };
 
             await Sut
@@ -887,6 +960,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
 
                     buildingUnitVersion!.HasDeviation.Should().BeTrue();
                     buildingUnitVersion.VersionTimestamp.Should().Be(buildingUnitWasDeregulated.Provenance.Timestamp);
+                    buildingUnitVersion.Type.Should().Be("EventName");
                 });
         }
 
@@ -905,17 +979,20 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
             var buildingWasPlannedV2Metadata = new Dictionary<string, object>
             {
                 { AddEventHashPipe.HashMetadataKey, buildingWasPlannedV2.GetHash() },
-                { Envelope.PositionMetadataKey, position }
+                { Envelope.PositionMetadataKey, position },
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
             };
             var buildingUnitWasPlannedMetadata = new Dictionary<string, object>
             {
                 { AddEventHashPipe.HashMetadataKey, buildingUnitWasPlannedV2.GetHash() },
-                { Envelope.PositionMetadataKey, ++position }
+                { Envelope.PositionMetadataKey, ++position },
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
             };
             var buildingUnitDeregulationWasCorrectedMetadata = new Dictionary<string, object>
             {
                 { AddEventHashPipe.HashMetadataKey, buildingUnitDeregulationWasCorrected.GetHash() },
-                { Envelope.PositionMetadataKey, ++position }
+                { Envelope.PositionMetadataKey, ++position },
+                { Envelope.EventNameMetadataKey, "EventName"}
             };
             await Sut
                 .Given(
@@ -933,6 +1010,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
 
                     buildingUnitVersion!.HasDeviation.Should().BeFalse();
                     buildingUnitVersion.VersionTimestamp.Should().Be(buildingUnitDeregulationWasCorrected.Provenance.Timestamp);
+                    buildingUnitVersion.Type.Should().Be("EventName");
                 });
         }
 
@@ -957,12 +1035,14 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
             var buildingWasPlannedV2Metadata = new Dictionary<string, object>
             {
                 { AddEventHashPipe.HashMetadataKey, buildingWasPlannedV2.GetHash() },
-                { Envelope.PositionMetadataKey, position }
+                { Envelope.PositionMetadataKey, position },
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
             };
             var commonBuildingUnitWasAddedMetadata = new Dictionary<string, object>
             {
                 { AddEventHashPipe.HashMetadataKey, commonBuildingUnitWasAddedV2.GetHash() },
-                { Envelope.PositionMetadataKey, ++position }
+                { Envelope.PositionMetadataKey, ++position },
+                { Envelope.EventNameMetadataKey, "EventName"}
             };
 
             await Sut
@@ -992,6 +1072,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
                     buildingUnitVersion.CreatedOnTimestamp.Should().Be(commonBuildingUnitWasAddedV2.Provenance.Timestamp);
                     buildingUnitVersion.Namespace.Should().Be(BuildingUnitNamespace);
                     buildingUnitVersion.PuriId.Should().Be($"{BuildingUnitNamespace}/{commonBuildingUnitWasAddedV2.BuildingUnitPersistentLocalId}");
+                    buildingUnitVersion.Type.Should().Be("EventName");
 
                     buildingVersion.VersionTimestamp.Should().Be(commonBuildingUnitWasAddedV2.Provenance.Timestamp);
                 });
@@ -1012,17 +1093,20 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
             var buildingWasPlannedV2Metadata = new Dictionary<string, object>
             {
                 { AddEventHashPipe.HashMetadataKey, buildingWasPlannedV2.GetHash() },
-                { Envelope.PositionMetadataKey, position }
+                { Envelope.PositionMetadataKey, position },
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
             };
             var buildingUnitWasPlannedMetadata = new Dictionary<string, object>
             {
                 { AddEventHashPipe.HashMetadataKey, buildingUnitWasPlannedV2.GetHash() },
-                { Envelope.PositionMetadataKey, ++position }
+                { Envelope.PositionMetadataKey, ++position },
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
             };
             var buildingUnitAddressWasAttachedMetadata = new Dictionary<string, object>
             {
                 { AddEventHashPipe.HashMetadataKey, buildingUnitAddressWasAttachedV2.GetHash() },
-                { Envelope.PositionMetadataKey, ++position }
+                { Envelope.PositionMetadataKey, ++position },
+                { Envelope.EventNameMetadataKey, "EventName"}
             };
 
             await Sut
@@ -1042,6 +1126,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
 
                     buildingUnitVersion.Addresses.Should().HaveCount(1);
                     buildingUnitVersion.Addresses.Single().AddressPersistentLocalId.Should().Be(buildingUnitAddressWasAttachedV2.AddressPersistentLocalId);
+                    buildingUnitVersion.Type.Should().Be("EventName");
                 });
         }
 
@@ -1062,22 +1147,26 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
             var buildingWasPlannedV2Metadata = new Dictionary<string, object>
             {
                 { AddEventHashPipe.HashMetadataKey, buildingWasPlannedV2.GetHash() },
-                { Envelope.PositionMetadataKey, position }
+                { Envelope.PositionMetadataKey, position },
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
             };
             var buildingUnitWasPlannedMetadata = new Dictionary<string, object>
             {
                 { AddEventHashPipe.HashMetadataKey, buildingUnitWasPlannedV2.GetHash() },
-                { Envelope.PositionMetadataKey, ++position }
+                { Envelope.PositionMetadataKey, ++position },
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
             };
             var buildingUnitAddressWasAttachedMetadata = new Dictionary<string, object>
             {
                 { AddEventHashPipe.HashMetadataKey, buildingUnitAddressWasAttached.GetHash() },
-                { Envelope.PositionMetadataKey, ++position }
+                { Envelope.PositionMetadataKey, ++position },
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
             };
             var buildingUnitAddressWasDetachedMetadata = new Dictionary<string, object>
             {
                 { AddEventHashPipe.HashMetadataKey, buildingUnitAddressWasDetachedV2.GetHash() },
-                { Envelope.PositionMetadataKey, ++position }
+                { Envelope.PositionMetadataKey, ++position },
+                { Envelope.EventNameMetadataKey, "EventName"}
             };
 
             await Sut
@@ -1097,6 +1186,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
                     buildingUnitVersion!.VersionTimestamp.Should().Be(buildingUnitAddressWasDetachedV2.Provenance.Timestamp);
 
                     buildingUnitVersion.Addresses.Should().BeEmpty();
+                    buildingUnitVersion.Type.Should().Be("EventName");
                 });
         }
 
@@ -1117,22 +1207,26 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
             var buildingWasPlannedV2Metadata = new Dictionary<string, object>
             {
                 { AddEventHashPipe.HashMetadataKey, buildingWasPlannedV2.GetHash() },
-                { Envelope.PositionMetadataKey, position }
+                { Envelope.PositionMetadataKey, position },
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
             };
             var buildingUnitWasPlannedMetadata = new Dictionary<string, object>
             {
                 { AddEventHashPipe.HashMetadataKey, buildingUnitWasPlannedV2.GetHash() },
-                { Envelope.PositionMetadataKey, ++position }
+                { Envelope.PositionMetadataKey, ++position },
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
             };
             var buildingUnitAddressWasAttachedMetadata = new Dictionary<string, object>
             {
                 { AddEventHashPipe.HashMetadataKey, buildingUnitAddressWasAttached.GetHash() },
-                { Envelope.PositionMetadataKey, ++position }
+                { Envelope.PositionMetadataKey, ++position },
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
             };
             var buildingUnitAddressWasDetachedMetadata = new Dictionary<string, object>
             {
                 { AddEventHashPipe.HashMetadataKey, buildingUnitAddressWasDetached.GetHash() },
-                { Envelope.PositionMetadataKey, ++position }
+                { Envelope.PositionMetadataKey, ++position },
+                { Envelope.EventNameMetadataKey, "EventName"}
             };
 
             await Sut
@@ -1153,6 +1247,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
                     buildingUnitVersion!.VersionTimestamp.Should().Be(buildingUnitAddressWasDetached.Provenance.Timestamp);
 
                     buildingUnitVersion.Addresses.Should().BeEmpty();
+                    buildingUnitVersion.Type.Should().Be("EventName");
                 });
         }
 
@@ -1173,22 +1268,26 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
             var buildingWasPlannedV2Metadata = new Dictionary<string, object>
             {
                 { AddEventHashPipe.HashMetadataKey, buildingWasPlannedV2.GetHash() },
-                { Envelope.PositionMetadataKey, position }
+                { Envelope.PositionMetadataKey, position },
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
             };
             var buildingUnitWasPlannedMetadata = new Dictionary<string, object>
             {
                 { AddEventHashPipe.HashMetadataKey, buildingUnitWasPlannedV2.GetHash() },
-                { Envelope.PositionMetadataKey, ++position }
+                { Envelope.PositionMetadataKey, ++position },
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
             };
             var buildingUnitAddressWasAttachedMetadata = new Dictionary<string, object>
             {
                 { AddEventHashPipe.HashMetadataKey, buildingUnitAddressWasAttached.GetHash() },
-                { Envelope.PositionMetadataKey, ++position }
+                { Envelope.PositionMetadataKey, ++position },
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
             };
             var buildingUnitAddressWasDetachedMetadata = new Dictionary<string, object>
             {
                 { AddEventHashPipe.HashMetadataKey, buildingUnitAddressWasDetached.GetHash() },
-                { Envelope.PositionMetadataKey, ++position }
+                { Envelope.PositionMetadataKey, ++position },
+                { Envelope.EventNameMetadataKey, "EventName"}
             };
 
             await Sut
@@ -1210,6 +1309,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
                     buildingUnitVersion!.VersionTimestamp.Should().Be(buildingUnitAddressWasDetached.Provenance.Timestamp);
 
                     buildingUnitVersion.Addresses.Should().BeEmpty();
+                    buildingUnitVersion.Type.Should().Be("EventName");
                 });
         }
 
@@ -1230,22 +1330,26 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
             var buildingWasPlannedV2Metadata = new Dictionary<string, object>
             {
                 { AddEventHashPipe.HashMetadataKey, buildingWasPlannedV2.GetHash() },
-                { Envelope.PositionMetadataKey, position }
+                { Envelope.PositionMetadataKey, position },
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
             };
             var buildingUnitWasPlannedMetadata = new Dictionary<string, object>
             {
                 { AddEventHashPipe.HashMetadataKey, buildingUnitWasPlannedV2.GetHash() },
-                { Envelope.PositionMetadataKey, ++position }
+                { Envelope.PositionMetadataKey, ++position },
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
             };
             var buildingUnitAddressWasAttachedMetadata = new Dictionary<string, object>
             {
                 { AddEventHashPipe.HashMetadataKey, buildingUnitAddressWasAttached.GetHash() },
-                { Envelope.PositionMetadataKey, ++position }
+                { Envelope.PositionMetadataKey, ++position },
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
             };
             var buildingUnitAddressWasDetachedMetadata = new Dictionary<string, object>
             {
                 { AddEventHashPipe.HashMetadataKey, buildingUnitAddressWasDetached.GetHash() },
-                { Envelope.PositionMetadataKey, ++position }
+                { Envelope.PositionMetadataKey, ++position },
+                { Envelope.EventNameMetadataKey, "EventName"}
             };
 
             await Sut
@@ -1266,6 +1370,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
                     buildingUnitVersion!.VersionTimestamp.Should().Be(buildingUnitAddressWasDetached.Provenance.Timestamp);
 
                     buildingUnitVersion.Addresses.Should().BeEmpty();
+                    buildingUnitVersion.Type.Should().Be("EventName");
                 });
         }
 
@@ -1291,22 +1396,26 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
             var buildingWasPlannedV2Metadata = new Dictionary<string, object>
             {
                 { AddEventHashPipe.HashMetadataKey, buildingWasPlannedV2.GetHash() },
-                { Envelope.PositionMetadataKey, position }
+                { Envelope.PositionMetadataKey, position },
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
             };
             var buildingUnitWasPlannedMetadata = new Dictionary<string, object>
             {
                 { AddEventHashPipe.HashMetadataKey, buildingUnitWasPlannedV2.GetHash() },
-                { Envelope.PositionMetadataKey, ++position }
+                { Envelope.PositionMetadataKey, ++position },
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
             };
             var buildingUnitAddressWasAttachedMetadata = new Dictionary<string, object>
             {
                 { AddEventHashPipe.HashMetadataKey, buildingUnitAddressWasAttached.GetHash() },
-                { Envelope.PositionMetadataKey, ++position }
+                { Envelope.PositionMetadataKey, ++position },
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
             };
             var buildingUnitAddressWasReplacedBecauseAddressWasReaddressedMetadata = new Dictionary<string, object>
             {
                 { AddEventHashPipe.HashMetadataKey, buildingUnitAddressWasReplacedBecauseAddressWasReaddressed.GetHash() },
-                { Envelope.PositionMetadataKey, ++position }
+                { Envelope.PositionMetadataKey, ++position },
+                { Envelope.EventNameMetadataKey, "EventName"}
             };
             await Sut
                 .Given(
@@ -1326,6 +1435,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
                     buildingUnitVersion.Should().NotBeNull();
 
                     buildingUnitVersion!.VersionTimestamp.Should().Be(buildingUnitAddressWasReplacedBecauseAddressWasReaddressed.Provenance.Timestamp);
+                    buildingUnitVersion.Type.Should().Be("EventName");
 
                     var newAddress = buildingUnitVersion.Addresses.SingleOrDefault(x =>
                         x.AddressPersistentLocalId == buildingUnitAddressWasReplacedBecauseAddressWasReaddressed.NewAddressPersistentLocalId);
@@ -1352,17 +1462,20 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
             var buildingWasPlannedV2Metadata = new Dictionary<string, object>
             {
                 { AddEventHashPipe.HashMetadataKey, buildingWasPlannedV2.GetHash() },
-                { Envelope.PositionMetadataKey, position }
+                { Envelope.PositionMetadataKey, position },
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
             };
             var buildingUnitWasPlannedMetadata = new Dictionary<string, object>
             {
                 { AddEventHashPipe.HashMetadataKey, buildingUnitWasPlannedV2.GetHash() },
-                { Envelope.PositionMetadataKey, ++position }
+                { Envelope.PositionMetadataKey, ++position },
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
             };
             var buildingUnitWasRetiredMetadata = new Dictionary<string, object>
             {
                 { AddEventHashPipe.HashMetadataKey, buildingUnitWasRetired.GetHash() },
-                { Envelope.PositionMetadataKey, ++position }
+                { Envelope.PositionMetadataKey, ++position },
+                { Envelope.EventNameMetadataKey, "EventName"}
             };
 
             await Sut
@@ -1381,6 +1494,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
                     buildingUnitVersion!.Status.Should().Be("Retired");
                     buildingUnitVersion.OsloStatus.Should().Be("Gehistoreerd");
                     buildingUnitVersion.VersionTimestamp.Should().Be(buildingUnitWasRetired.Provenance.Timestamp);
+                    buildingUnitVersion.Type.Should().Be("EventName");
                 });
         }
 
@@ -1399,17 +1513,20 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
             var buildingWasPlannedV2Metadata = new Dictionary<string, object>
             {
                 { AddEventHashPipe.HashMetadataKey, buildingWasPlannedV2.GetHash() },
-                { Envelope.PositionMetadataKey, position }
+                { Envelope.PositionMetadataKey, position },
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
             };
             var buildingUnitWasPlannedMetadata = new Dictionary<string, object>
             {
                 { AddEventHashPipe.HashMetadataKey, buildingUnitWasPlannedV2.GetHash() },
-                { Envelope.PositionMetadataKey, ++position }
+                { Envelope.PositionMetadataKey, ++position },
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
             };
             var buildingUnitWasNotRealizedMetadata = new Dictionary<string, object>
             {
                 { AddEventHashPipe.HashMetadataKey, buildingUnitWasNotRealized.GetHash() },
-                { Envelope.PositionMetadataKey, ++position }
+                { Envelope.PositionMetadataKey, ++position },
+                { Envelope.EventNameMetadataKey, "EventName"}
             };
 
             await Sut
@@ -1428,6 +1545,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
                     buildingUnitVersion!.Status.Should().Be("NotRealized");
                     buildingUnitVersion.OsloStatus.Should().Be("NietGerealiseerd");
                     buildingUnitVersion.VersionTimestamp.Should().Be(buildingUnitWasNotRealized.Provenance.Timestamp);
+                    buildingUnitVersion.Type.Should().Be("EventName");
                 });
         }
 

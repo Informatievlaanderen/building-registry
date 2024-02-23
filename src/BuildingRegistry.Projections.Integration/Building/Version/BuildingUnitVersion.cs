@@ -25,6 +25,7 @@
         public string? OsloStatus { get; set; }
         public string Function { get; set; }
         public string OsloFunction { get; set; }
+        public string Type { get; set; }
         public string? GeometryMethod { get; set; }
         public string? OsloGeometryMethod { get; set; }
         public Geometry? Geometry { get; set; }
@@ -69,7 +70,7 @@
             Readdresses = new Collection<BuildingUnitReaddressVersion>();
         }
 
-        public BuildingUnitVersion CloneAndApplyEventInfo(long newPosition)
+        public BuildingUnitVersion CloneAndApplyEventInfo(long newPosition, string eventName)
         {
             var newItem = new BuildingUnitVersion
             {
@@ -80,6 +81,7 @@
                 BuildingPersistentLocalId = BuildingPersistentLocalId,
                 Status = Status,
                 OsloStatus = OsloStatus,
+                Type = eventName,
                 Function = Function,
                 OsloFunction = OsloFunction,
                 GeometryMethod = GeometryMethod,
@@ -123,6 +125,7 @@
             builder.Property(x => x.BuildingPersistentLocalId).HasColumnName("building_persistent_local_id");
             builder.Property(x => x.Status).HasColumnName("status");
             builder.Property(x => x.OsloStatus).HasColumnName("oslo_status");
+            builder.Property(x => x.Type).HasColumnName("type");
             builder.Property(x => x.Function).HasColumnName("function");
             builder.Property(x => x.OsloFunction).HasColumnName("oslo_function");
             builder.Property(x => x.GeometryMethod).HasColumnName("geometry_method");
@@ -154,6 +157,7 @@
             builder.HasIndex(x => x.BuildingPersistentLocalId);
             builder.HasIndex(x => x.Status);
             builder.HasIndex(x => x.OsloStatus);
+            builder.HasIndex(x => x.Type);
             builder.HasIndex(x => x.IsRemoved);
             builder.HasIndex(x => x.Geometry).HasMethod("GIST");
             builder.HasIndex(BuildingUnitVersion.VersionTimestampBackingPropertyName);

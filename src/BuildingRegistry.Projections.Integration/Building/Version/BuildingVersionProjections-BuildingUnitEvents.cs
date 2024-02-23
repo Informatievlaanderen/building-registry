@@ -44,6 +44,7 @@
                             CreatedOnTimestamp = message.Message.Provenance.Timestamp,
                             Namespace = options.BuildingUnitNamespace,
                             PuriId = $"{options.BuildingUnitNamespace}/{message.Message.BuildingUnitPersistentLocalId}",
+                            Type = message.EventName
                         };
 
                         building.BuildingUnits.Add(buildingUnitVersion);
@@ -361,7 +362,8 @@
                             VersionTimestamp = message.Message.Provenance.Timestamp,
                             CreatedOnTimestamp = message.Message.Provenance.Timestamp,
                             Namespace = options.BuildingUnitNamespace,
-                            PuriId = $"{options.BuildingUnitNamespace}/{message.Message.BuildingUnitPersistentLocalId}"
+                            PuriId = $"{options.BuildingUnitNamespace}/{message.Message.BuildingUnitPersistentLocalId}",
+                            Type = message.EventName
                         };
 
                         building.BuildingUnits.Add(buildingUnitVersion);

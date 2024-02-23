@@ -35,7 +35,8 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
             var position = _fixture.Create<long>();
             var metadata = new Dictionary<string, object>
             {
-                { Envelope.PositionMetadataKey, position }
+                { Envelope.PositionMetadataKey, position },
+                { Envelope.EventNameMetadataKey, "EventName"}
             };
 
             await Sut
@@ -52,6 +53,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
                     buildingVersion.VersionTimestamp.Should().Be(buildingWasRegistered.Provenance.Timestamp);
                     buildingVersion.CreatedOnTimestamp.Should().Be(buildingWasRegistered.Provenance.Timestamp);
                     buildingVersion.LastChangedOnTimestamp.Should().Be(buildingWasRegistered.Provenance.Timestamp);
+                    buildingVersion.Type.Should().Be("EventName");
                 });
         }
 
@@ -71,15 +73,18 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
             var position = _fixture.Create<long>();
             var buildingWasRegisteredMetadata = new Dictionary<string, object>
             {
-                { Envelope.PositionMetadataKey, position }
+                { Envelope.PositionMetadataKey, position },
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
             };
             var buildingUnitWasAddedMetadata = new Dictionary<string, object>
             {
-                { Envelope.PositionMetadataKey, ++position }
+                { Envelope.PositionMetadataKey, ++position },
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
             };
             var buildingPersistentLocalIdWasAssignedMetadata = new Dictionary<string, object>
             {
-                { Envelope.PositionMetadataKey, ++position }
+                { Envelope.PositionMetadataKey, ++position },
+                { Envelope.EventNameMetadataKey, "EventName"}
             };
 
             await Sut
@@ -96,11 +101,13 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
                     buildingVersion.BuildingPersistentLocalId.Should().Be(buildingPersistentLocalIdWasAssigned.PersistentLocalId);
                     buildingVersion.VersionTimestamp.Should().Be(buildingPersistentLocalIdWasAssigned.Provenance.Timestamp);
                     buildingVersion.LastChangedOnTimestamp.Should().Be(buildingPersistentLocalIdWasAssigned.Provenance.Timestamp);
+                    buildingVersion.Type.Should().Be("EventName");
 
                     foreach (var buildingUnitVersion in buildingVersion.BuildingUnits)
                     {
                         buildingUnitVersion.BuildingPersistentLocalId.Should().Be(buildingPersistentLocalIdWasAssigned.PersistentLocalId);
                         buildingUnitVersion.VersionTimestamp.Should().Be(buildingPersistentLocalIdWasAssigned.Provenance.Timestamp);
+                        buildingUnitVersion.Type.Should().Be("EventName");
                     }
                 });
         }
@@ -127,15 +134,18 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
             var position = _fixture.Create<long>();
             var buildingWasRegisteredMetadata = new Dictionary<string, object>
             {
-                { Envelope.PositionMetadataKey, position }
+                { Envelope.PositionMetadataKey, position },
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
             };
             var buildingUnitWasAddedMetadata = new Dictionary<string, object>
             {
-                { Envelope.PositionMetadataKey, ++position }
+                { Envelope.PositionMetadataKey, ++position },
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
             };
             var buildingWasRemovedMetadata = new Dictionary<string, object>
             {
-                { Envelope.PositionMetadataKey, ++position }
+                { Envelope.PositionMetadataKey, ++position },
+                { Envelope.EventNameMetadataKey, "EventName"}
             };
 
             await Sut
@@ -152,12 +162,14 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
                     buildingVersion.IsRemoved.Should().BeTrue();
                     buildingVersion.VersionTimestamp.Should().Be(buildingWasRemoved.Provenance.Timestamp);
                     buildingVersion.LastChangedOnTimestamp.Should().Be(buildingWasRemoved.Provenance.Timestamp);
+                    buildingVersion.Type.Should().Be("EventName");
 
                     foreach (var buildingUnitVersion in buildingVersion.BuildingUnits)
                     {
                         buildingUnitVersion.IsRemoved.Should().BeTrue();
                         buildingUnitVersion.Addresses.Should().BeEmpty();
                         buildingUnitVersion.VersionTimestamp.Should().Be(buildingWasRemoved.Provenance.Timestamp);
+                        buildingUnitVersion.Type.Should().Be("EventName");
                     }
                 });
         }
@@ -175,11 +187,13 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
             var position = _fixture.Create<long>();
             var buildingWasRegisteredMetadata = new Dictionary<string, object>
             {
-                { Envelope.PositionMetadataKey, position }
+                { Envelope.PositionMetadataKey, position },
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
             };
             var buildingBecameUnderConstructionMetadata = new Dictionary<string, object>
             {
-                { Envelope.PositionMetadataKey, ++position }
+                { Envelope.PositionMetadataKey, ++position },
+                { Envelope.EventNameMetadataKey, "EventName"}
             };
 
             await Sut
@@ -196,6 +210,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
                     buildingVersion.OsloStatus.Should().Be("InAanbouw");
                     buildingVersion.VersionTimestamp.Should().Be(buildingBecameUnderConstruction.Provenance.Timestamp);
                     buildingVersion.LastChangedOnTimestamp.Should().Be(buildingBecameUnderConstruction.Provenance.Timestamp);
+                    buildingVersion.Type.Should().Be("EventName");
                 });
         }
 
@@ -212,11 +227,13 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
             var position = _fixture.Create<long>();
             var buildingWasRegisteredMetadata = new Dictionary<string, object>
             {
-                { Envelope.PositionMetadataKey, position }
+                { Envelope.PositionMetadataKey, position },
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
             };
             var buildingWasCorrectedToUnderConstructionMetadata = new Dictionary<string, object>
             {
-                { Envelope.PositionMetadataKey, ++position }
+                { Envelope.PositionMetadataKey, ++position },
+                { Envelope.EventNameMetadataKey, "EventName"}
             };
 
             await Sut
@@ -233,6 +250,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
                     buildingVersion.OsloStatus.Should().Be("InAanbouw");
                     buildingVersion.VersionTimestamp.Should().Be(buildingWasCorrectedToUnderConstruction.Provenance.Timestamp);
                     buildingVersion.LastChangedOnTimestamp.Should().Be(buildingWasCorrectedToUnderConstruction.Provenance.Timestamp);
+                    buildingVersion.Type.Should().Be("EventName");
                 });
         }
 
@@ -262,19 +280,23 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
             var position = _fixture.Create<long>();
             var buildingWasRegisteredMetadata = new Dictionary<string, object>
             {
-                { Envelope.PositionMetadataKey, position }
+                { Envelope.PositionMetadataKey, position },
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
             };
             var plannedBuildingUnitWasAddedMetadata = new Dictionary<string, object>
             {
-                { Envelope.PositionMetadataKey, ++position }
+                { Envelope.PositionMetadataKey, ++position },
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
             };
             var realizedBuildingUnitWasAddedMetadata = new Dictionary<string, object>
             {
-                { Envelope.PositionMetadataKey, ++position }
+                { Envelope.PositionMetadataKey, ++position },
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
             };
             var buildingWasNotRealizedMetadata = new Dictionary<string, object>
             {
-                { Envelope.PositionMetadataKey, ++position }
+                { Envelope.PositionMetadataKey, ++position },
+                { Envelope.EventNameMetadataKey, "EventName"}
             };
 
             await Sut
@@ -293,6 +315,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
                     buildingVersion.OsloStatus.Should().Be("NietGerealiseerd");
                     buildingVersion.VersionTimestamp.Should().Be(buildingWasNotRealized.Provenance.Timestamp);
                     buildingVersion.LastChangedOnTimestamp.Should().Be(buildingWasNotRealized.Provenance.Timestamp);
+                    buildingVersion.Type.Should().Be("EventName");
 
                     var notRealizedBuildingUnit = buildingVersion.BuildingUnits.SingleOrDefault(x =>
                         x.BuildingUnitId == plannedBuildingUnitWasAdded.BuildingUnitId);
@@ -301,6 +324,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
                     notRealizedBuildingUnit.OsloStatus.Should().Be("NietGerealiseerd");
                     notRealizedBuildingUnit.Addresses.Should().BeEmpty();
                     notRealizedBuildingUnit.VersionTimestamp.Should().Be(buildingWasNotRealized.Provenance.Timestamp);
+                    notRealizedBuildingUnit.Type.Should().Be("EventName");
 
                     var retiredBuildingUnit = buildingVersion.BuildingUnits.SingleOrDefault(x =>
                         x.BuildingUnitId == realizedBuildingUnitWasAdded.BuildingUnitId);
@@ -309,6 +333,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
                     retiredBuildingUnit.OsloStatus.Should().Be("Gehistoreerd");
                     retiredBuildingUnit.Addresses.Should().BeEmpty();
                     retiredBuildingUnit.VersionTimestamp.Should().Be(buildingWasNotRealized.Provenance.Timestamp);
+                    retiredBuildingUnit.Type.Should().Be("EventName");
                 });
         }
 
@@ -338,19 +363,23 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
             var position = _fixture.Create<long>();
             var buildingWasRegisteredMetadata = new Dictionary<string, object>
             {
-                { Envelope.PositionMetadataKey, position }
+                { Envelope.PositionMetadataKey, position },
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
             };
             var plannedBuildingUnitWasAddedMetadata = new Dictionary<string, object>
             {
-                { Envelope.PositionMetadataKey, ++position }
+                { Envelope.PositionMetadataKey, ++position },
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
             };
             var realizedBuildingUnitWasAddedMetadata = new Dictionary<string, object>
             {
-                { Envelope.PositionMetadataKey, ++position }
+                { Envelope.PositionMetadataKey, ++position },
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
             };
             var buildingWasCorrectedToNotRealizedMetadata = new Dictionary<string, object>
             {
-                { Envelope.PositionMetadataKey, ++position }
+                { Envelope.PositionMetadataKey, ++position },
+                { Envelope.EventNameMetadataKey, "EventName"}
             };
 
             await Sut
@@ -369,6 +398,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
                     buildingVersion.OsloStatus.Should().Be("NietGerealiseerd");
                     buildingVersion.VersionTimestamp.Should().Be(buildingWasCorrectedToNotRealized.Provenance.Timestamp);
                     buildingVersion.LastChangedOnTimestamp.Should().Be(buildingWasCorrectedToNotRealized.Provenance.Timestamp);
+                    buildingVersion.Type.Should().Be("EventName");
 
                     var notRealizedBuildingUnit = buildingVersion.BuildingUnits.SingleOrDefault(x =>
                         x.BuildingUnitId == plannedBuildingUnitWasAdded.BuildingUnitId);
@@ -377,6 +407,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
                     notRealizedBuildingUnit.OsloStatus.Should().Be("NietGerealiseerd");
                     notRealizedBuildingUnit.Addresses.Should().BeEmpty();
                     notRealizedBuildingUnit.VersionTimestamp.Should().Be(buildingWasCorrectedToNotRealized.Provenance.Timestamp);
+                    notRealizedBuildingUnit.Type.Should().Be("EventName");
 
                     var retiredBuildingUnit = buildingVersion.BuildingUnits.SingleOrDefault(x =>
                         x.BuildingUnitId == realizedBuildingUnitWasAdded.BuildingUnitId);
@@ -385,6 +416,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
                     retiredBuildingUnit.OsloStatus.Should().Be("Gehistoreerd");
                     retiredBuildingUnit.Addresses.Should().BeEmpty();
                     retiredBuildingUnit.VersionTimestamp.Should().Be(buildingWasCorrectedToNotRealized.Provenance.Timestamp);
+                    retiredBuildingUnit.Type.Should().Be("EventName");
                 });
         }
 
@@ -403,11 +435,13 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
             var position = _fixture.Create<long>();
             var buildingWasRegisteredMetadata = new Dictionary<string, object>
             {
-                { Envelope.PositionMetadataKey, position }
+                { Envelope.PositionMetadataKey, position },
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
             };
             var buildingWasPlannedMetadata = new Dictionary<string, object>
             {
-                { Envelope.PositionMetadataKey, ++position }
+                { Envelope.PositionMetadataKey, ++position },
+                { Envelope.EventNameMetadataKey, "EventName"}
             };
 
             await Sut
@@ -424,6 +458,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
                     buildingVersion.OsloStatus.Should().Be("Gepland");
                     buildingVersion.VersionTimestamp.Should().Be(buildingWasPlanned.Provenance.Timestamp);
                     buildingVersion.LastChangedOnTimestamp.Should().Be(buildingWasPlanned.Provenance.Timestamp);
+                    buildingVersion.Type.Should().Be("EventName");
                 });
         }
 
@@ -442,11 +477,13 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
             var position = _fixture.Create<long>();
             var buildingWasRegisteredMetadata = new Dictionary<string, object>
             {
-                { Envelope.PositionMetadataKey, position }
+                { Envelope.PositionMetadataKey, position },
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
             };
             var buildingWasCorrectedToPlannedMetadata = new Dictionary<string, object>
             {
-                { Envelope.PositionMetadataKey, ++position }
+                { Envelope.PositionMetadataKey, ++position },
+                { Envelope.EventNameMetadataKey, "EventName"}
             };
 
             await Sut
@@ -463,6 +500,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
                     buildingVersion.OsloStatus.Should().Be("Gepland");
                     buildingVersion.VersionTimestamp.Should().Be(buildingWasCorrectedToPlanned.Provenance.Timestamp);
                     buildingVersion.LastChangedOnTimestamp.Should().Be(buildingWasCorrectedToPlanned.Provenance.Timestamp);
+                    buildingVersion.Type.Should().Be("EventName");
                 });
         }
 
@@ -481,11 +519,13 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
             var position = _fixture.Create<long>();
             var buildingWasRegisteredMetadata = new Dictionary<string, object>
             {
-                { Envelope.PositionMetadataKey, position }
+                { Envelope.PositionMetadataKey, position },
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
             };
             var buildingWasRealizedMetadata = new Dictionary<string, object>
             {
-                { Envelope.PositionMetadataKey, ++position }
+                { Envelope.PositionMetadataKey, ++position },
+                { Envelope.EventNameMetadataKey, "EventName"}
             };
 
             await Sut
@@ -502,6 +542,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
                     buildingVersion.OsloStatus.Should().Be("Gerealiseerd");
                     buildingVersion.VersionTimestamp.Should().Be(buildingWasRealized.Provenance.Timestamp);
                     buildingVersion.LastChangedOnTimestamp.Should().Be(buildingWasRealized.Provenance.Timestamp);
+                    buildingVersion.Type.Should().Be("EventName");
                 });
         }
 
@@ -520,11 +561,13 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
             var position = _fixture.Create<long>();
             var buildingWasRegisteredMetadata = new Dictionary<string, object>
             {
-                { Envelope.PositionMetadataKey, position }
+                { Envelope.PositionMetadataKey, position },
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
             };
             var buildingWasCorrectedToRealizedMetadata = new Dictionary<string, object>
             {
-                { Envelope.PositionMetadataKey, ++position }
+                { Envelope.PositionMetadataKey, ++position },
+                { Envelope.EventNameMetadataKey, "EventName"}
             };
 
             await Sut
@@ -541,6 +584,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
                     buildingVersion.OsloStatus.Should().Be("Gerealiseerd");
                     buildingVersion.VersionTimestamp.Should().Be(buildingWasCorrectedToRealized.Provenance.Timestamp);
                     buildingVersion.LastChangedOnTimestamp.Should().Be(buildingWasCorrectedToRealized.Provenance.Timestamp);
+                    buildingVersion.Type.Should().Be("EventName");
                 });
         }
 
@@ -570,19 +614,23 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
             var position = _fixture.Create<long>();
             var buildingWasRegisteredMetadata = new Dictionary<string, object>
             {
-                { Envelope.PositionMetadataKey, position }
+                { Envelope.PositionMetadataKey, position },
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
             };
             var plannedBuildingUnitWasAddedMetadata = new Dictionary<string, object>
             {
-                { Envelope.PositionMetadataKey, ++position }
+                { Envelope.PositionMetadataKey, ++position },
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
             };
             var realizedBuildingUnitWasAddedMetadata = new Dictionary<string, object>
             {
-                { Envelope.PositionMetadataKey, ++position }
+                { Envelope.PositionMetadataKey, ++position },
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
             };
             var buildingWasRetiredMetadata = new Dictionary<string, object>
             {
-                { Envelope.PositionMetadataKey, ++position }
+                { Envelope.PositionMetadataKey, ++position },
+                { Envelope.EventNameMetadataKey, "EventName"}
             };
 
             await Sut
@@ -601,6 +649,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
                     buildingVersion.OsloStatus.Should().Be("Gehistoreerd");
                     buildingVersion.VersionTimestamp.Should().Be(buildingWasRetired.Provenance.Timestamp);
                     buildingVersion.LastChangedOnTimestamp.Should().Be(buildingWasRetired.Provenance.Timestamp);
+                    buildingVersion.Type.Should().Be("EventName");
 
                     var notRealizedBuildingUnit = buildingVersion.BuildingUnits.SingleOrDefault(x =>
                         x.BuildingUnitId == plannedBuildingUnitWasAdded.BuildingUnitId);
@@ -609,6 +658,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
                     notRealizedBuildingUnit.OsloStatus.Should().Be("NietGerealiseerd");
                     notRealizedBuildingUnit.Addresses.Should().BeEmpty();
                     notRealizedBuildingUnit.VersionTimestamp.Should().Be(buildingWasRetired.Provenance.Timestamp);
+                    notRealizedBuildingUnit.Type.Should().Be("EventName");
 
                     var retiredBuildingUnit = buildingVersion.BuildingUnits.SingleOrDefault(x =>
                         x.BuildingUnitId == realizedBuildingUnitWasAdded.BuildingUnitId);
@@ -617,6 +667,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
                     retiredBuildingUnit.OsloStatus.Should().Be("Gehistoreerd");
                     retiredBuildingUnit.Addresses.Should().BeEmpty();
                     retiredBuildingUnit.VersionTimestamp.Should().Be(buildingWasRetired.Provenance.Timestamp);
+                    retiredBuildingUnit.Type.Should().Be("EventName");
                 });
         }
 
@@ -646,19 +697,23 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
             var position = _fixture.Create<long>();
             var buildingWasRegisteredMetadata = new Dictionary<string, object>
             {
-                { Envelope.PositionMetadataKey, position }
+                { Envelope.PositionMetadataKey, position },
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
             };
             var plannedBuildingUnitWasAddedMetadata = new Dictionary<string, object>
             {
-                { Envelope.PositionMetadataKey, ++position }
+                { Envelope.PositionMetadataKey, ++position },
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
             };
             var realizedBuildingUnitWasAddedMetadata = new Dictionary<string, object>
             {
-                { Envelope.PositionMetadataKey, ++position }
+                { Envelope.PositionMetadataKey, ++position },
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
             };
             var buildingWasCorrectedToRetiredMetadata = new Dictionary<string, object>
             {
-                { Envelope.PositionMetadataKey, ++position }
+                { Envelope.PositionMetadataKey, ++position },
+                { Envelope.EventNameMetadataKey, "EventName"}
             };
 
             await Sut
@@ -677,6 +732,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
                     buildingVersion.OsloStatus.Should().Be("Gehistoreerd");
                     buildingVersion.VersionTimestamp.Should().Be(buildingWasCorrectedToRetired.Provenance.Timestamp);
                     buildingVersion.LastChangedOnTimestamp.Should().Be(buildingWasCorrectedToRetired.Provenance.Timestamp);
+                    buildingVersion.Type.Should().Be("EventName");
 
                     var notRealizedBuildingUnit = buildingVersion.BuildingUnits.SingleOrDefault(x =>
                         x.BuildingUnitId == plannedBuildingUnitWasAdded.BuildingUnitId);
@@ -685,6 +741,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
                     notRealizedBuildingUnit.OsloStatus.Should().Be("NietGerealiseerd");
                     notRealizedBuildingUnit.Addresses.Should().BeEmpty();
                     notRealizedBuildingUnit.VersionTimestamp.Should().Be(buildingWasCorrectedToRetired.Provenance.Timestamp);
+                    notRealizedBuildingUnit.Type.Should().Be("EventName");
 
                     var retiredBuildingUnit = buildingVersion.BuildingUnits.SingleOrDefault(x =>
                         x.BuildingUnitId == realizedBuildingUnitWasAdded.BuildingUnitId);
@@ -693,6 +750,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
                     retiredBuildingUnit.OsloStatus.Should().Be("Gehistoreerd");
                     retiredBuildingUnit.Addresses.Should().BeEmpty();
                     retiredBuildingUnit.VersionTimestamp.Should().Be(buildingWasCorrectedToRetired.Provenance.Timestamp);
+                    retiredBuildingUnit.Type.Should().Be("EventName");
                 });
         }
 
@@ -711,11 +769,13 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
             var position = _fixture.Create<long>();
             var buildingWasRegisteredMetadata = new Dictionary<string, object>
             {
-                { Envelope.PositionMetadataKey, position }
+                { Envelope.PositionMetadataKey, position },
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
             };
             var buildingStatusWasRemovedMetadata = new Dictionary<string, object>
             {
-                { Envelope.PositionMetadataKey, ++position }
+                { Envelope.PositionMetadataKey, ++position },
+                { Envelope.EventNameMetadataKey, "EventName"}
             };
 
             await Sut
@@ -732,6 +792,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
                     buildingVersion.OsloStatus.Should().BeNull();
                     buildingVersion.VersionTimestamp.Should().Be(buildingStatusWasRemoved.Provenance.Timestamp);
                     buildingVersion.LastChangedOnTimestamp.Should().Be(buildingStatusWasRemoved.Provenance.Timestamp);
+                    buildingVersion.Type.Should().Be("EventName");
                 });
         }
 
@@ -750,11 +811,13 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
             var position = _fixture.Create<long>();
             var buildingWasRegisteredMetadata = new Dictionary<string, object>
             {
-                { Envelope.PositionMetadataKey, position }
+                { Envelope.PositionMetadataKey, position },
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
             };
             var buildingStatusWasCorrectedToRemovedMetadata = new Dictionary<string, object>
             {
-                { Envelope.PositionMetadataKey, ++position }
+                { Envelope.PositionMetadataKey, ++position },
+                { Envelope.EventNameMetadataKey, "EventName"}
             };
 
             await Sut
@@ -771,6 +834,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
                     buildingVersion.OsloStatus.Should().BeNull();
                     buildingVersion.VersionTimestamp.Should().Be(buildingStatusWasCorrectedToRemoved.Provenance.Timestamp);
                     buildingVersion.LastChangedOnTimestamp.Should().Be(buildingStatusWasCorrectedToRemoved.Provenance.Timestamp);
+                    buildingVersion.Type.Should().Be("EventName");
                 });
         }
 
@@ -789,11 +853,13 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
             var position = _fixture.Create<long>();
             var buildingWasRegisteredMetadata = new Dictionary<string, object>
             {
-                { Envelope.PositionMetadataKey, position }
+                { Envelope.PositionMetadataKey, position },
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
             };
             var buildingWasMeasuredByGrbMetadata = new Dictionary<string, object>
             {
-                { Envelope.PositionMetadataKey, ++position }
+                { Envelope.PositionMetadataKey, ++position },
+                { Envelope.EventNameMetadataKey, "EventName"}
             };
 
             await Sut
@@ -811,6 +877,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
                     buildingVersion.OsloGeometryMethod.Should().Be("IngemetenGRB");
                     buildingVersion.VersionTimestamp.Should().Be(buildingWasMeasuredByGrb.Provenance.Timestamp);
                     buildingVersion.LastChangedOnTimestamp.Should().Be(buildingWasMeasuredByGrb.Provenance.Timestamp);
+                    buildingVersion.Type.Should().Be("EventName");
                 });
         }
 
@@ -833,23 +900,28 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
             var position = _fixture.Create<long>();
             var buildingWasRegisteredMetadata = new Dictionary<string, object>
             {
-                { Envelope.PositionMetadataKey, position }
+                { Envelope.PositionMetadataKey, position },
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
             };
             var buildingUnitWasAddedMetadata = new Dictionary<string, object>
             {
-                { Envelope.PositionMetadataKey, ++position }
+                { Envelope.PositionMetadataKey, ++position },
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
             };
             var buildingUnitPositionWasDerivedFromObjectMetadata = new Dictionary<string, object>
             {
-                { Envelope.PositionMetadataKey, ++position }
+                { Envelope.PositionMetadataKey, ++position },
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
             };
             var buildingWasMeasuredByGrbMetadata = new Dictionary<string, object>
             {
-                { Envelope.PositionMetadataKey, ++position }
+                { Envelope.PositionMetadataKey, ++position },
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
             };
             var buildingStatusWasCorrectedToRemovedMetadata = new Dictionary<string, object>
             {
-                { Envelope.PositionMetadataKey, ++position }
+                { Envelope.PositionMetadataKey, ++position },
+                { Envelope.EventNameMetadataKey, "EventName"}
             };
 
             await Sut
@@ -870,6 +942,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
                     buildingVersion.OsloGeometryMethod.Should().BeNull();
                     buildingVersion.VersionTimestamp.Should().Be(buildingGeometryWasRemoved.Provenance.Timestamp);
                     buildingVersion.LastChangedOnTimestamp.Should().Be(buildingGeometryWasRemoved.Provenance.Timestamp);
+                    buildingVersion.Type.Should().Be("EventName");
 
                     foreach (var buildingUnitVersion in buildingVersion.BuildingUnits)
                     {
@@ -877,6 +950,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
                         buildingUnitVersion.GeometryMethod.Should().BeNull();
                         buildingUnitVersion.OsloGeometryMethod.Should().BeNull();
                         buildingUnitVersion.VersionTimestamp.Should().Be(buildingGeometryWasRemoved.Provenance.Timestamp);
+                        buildingUnitVersion.Type.Should().Be("EventName");
                     }
                 });
         }
@@ -896,11 +970,13 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
             var position = _fixture.Create<long>();
             var buildingWasRegisteredMetadata = new Dictionary<string, object>
             {
-                { Envelope.PositionMetadataKey, position }
+                { Envelope.PositionMetadataKey, position },
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
             };
             var buildingWasOutlinedMetadata = new Dictionary<string, object>
             {
-                { Envelope.PositionMetadataKey, ++position }
+                { Envelope.PositionMetadataKey, ++position },
+                { Envelope.EventNameMetadataKey, "EventName"}
             };
 
             await Sut
@@ -918,6 +994,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
                     buildingVersion.OsloGeometryMethod.Should().Be("Ingeschetst");
                     buildingVersion.VersionTimestamp.Should().Be(buildingWasOutlined.Provenance.Timestamp);
                     buildingVersion.LastChangedOnTimestamp.Should().Be(buildingWasOutlined.Provenance.Timestamp);
+                    buildingVersion.Type.Should().Be("EventName");
                 });
         }
 
@@ -936,11 +1013,13 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
             var position = _fixture.Create<long>();
             var buildingWasRegisteredMetadata = new Dictionary<string, object>
             {
-                { Envelope.PositionMetadataKey, position }
+                { Envelope.PositionMetadataKey, position },
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
             };
             var buildingMeasurementByGrbWasCorrectedMetadata = new Dictionary<string, object>
             {
-                { Envelope.PositionMetadataKey, ++position }
+                { Envelope.PositionMetadataKey, ++position },
+                { Envelope.EventNameMetadataKey, "EventName"}
             };
 
             await Sut
@@ -958,6 +1037,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
                     buildingVersion.OsloGeometryMethod.Should().Be("IngemetenGRB");
                     buildingVersion.VersionTimestamp.Should().Be(buildingMeasurementByGrbWasCorrected.Provenance.Timestamp);
                     buildingVersion.LastChangedOnTimestamp.Should().Be(buildingMeasurementByGrbWasCorrected.Provenance.Timestamp);
+                    buildingVersion.Type.Should().Be("EventName");
                 });
         }
 
@@ -976,11 +1056,13 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
             var position = _fixture.Create<long>();
             var buildingWasRegisteredMetadata = new Dictionary<string, object>
             {
-                { Envelope.PositionMetadataKey, position }
+                { Envelope.PositionMetadataKey, position },
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
             };
             var buildingOutlineWasCorrectedMetadata = new Dictionary<string, object>
             {
-                { Envelope.PositionMetadataKey, ++position }
+                { Envelope.PositionMetadataKey, ++position },
+                { Envelope.EventNameMetadataKey, "EventName"}
             };
 
             await Sut
@@ -998,6 +1080,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
                     buildingVersion.OsloGeometryMethod.Should().Be("Ingeschetst");
                     buildingVersion.VersionTimestamp.Should().Be(buildingOutlineWasCorrected.Provenance.Timestamp);
                     buildingVersion.LastChangedOnTimestamp.Should().Be(buildingOutlineWasCorrected.Provenance.Timestamp);
+                    buildingVersion.Type.Should().Be("EventName");
                 });
         }
 
