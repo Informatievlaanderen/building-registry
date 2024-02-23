@@ -63,7 +63,8 @@ namespace BuildingRegistry.Projections.Integration.Building.Version
                                     AddressPersistentLocalId = addressPersistentLocalId.Value,
                                     Position = message.Position
                                 }
-                            })
+                            }),
+                            Type = message.EventName
                         };
 
                         building.BuildingUnits.Add(buildingUnitVersion);
@@ -130,7 +131,8 @@ namespace BuildingRegistry.Projections.Integration.Building.Version
                                     AddressPersistentLocalId = addressPersistentLocalId.Value,
                                     Position = message.Position
                                 }
-                            })
+                            }),
+                            Type = message.EventName
                         };
 
                         building.BuildingUnits.Add(buildingUnitVersion);
@@ -165,7 +167,8 @@ namespace BuildingRegistry.Projections.Integration.Building.Version
                             VersionTimestamp = message.Message.Provenance.Timestamp,
                             CreatedOnTimestamp = message.Message.Provenance.Timestamp,
                             Namespace = options.BuildingUnitNamespace,
-                            PuriId = $"{options.BuildingUnitNamespace}/{buildingUnitPersistentLocalId}"
+                            PuriId = $"{options.BuildingUnitNamespace}/{buildingUnitPersistentLocalId}",
+                            Type = message.EventName
                         };
 
                         building.BuildingUnits.Add(buildingUnitVersion);
@@ -206,7 +209,8 @@ namespace BuildingRegistry.Projections.Integration.Building.Version
                             VersionTimestamp = message.Message.Provenance.Timestamp,
                             CreatedOnTimestamp = message.Message.Provenance.Timestamp,
                             Namespace = options.BuildingUnitNamespace,
-                            PuriId = $"{options.BuildingUnitNamespace}/{buildingUnitPersistentLocalId}"
+                            PuriId = $"{options.BuildingUnitNamespace}/{buildingUnitPersistentLocalId}",
+                            Type = message.EventName
                         };
 
                         building.BuildingUnits.Add(buildingUnitVersion);
