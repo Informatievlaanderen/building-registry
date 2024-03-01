@@ -12,7 +12,7 @@
     using Microsoft.Extensions.Options;
 
     [ConnectedProjectionName("Integratie gebouw versie")]
-    [ConnectedProjectionDescription("Projectie die de laatste gebouw data voor de integratie database bijhoudt.")]
+    [ConnectedProjectionDescription("Projectie die de versie gebouw data voor de integratie database bijhoudt.")]
     public sealed partial class BuildingVersionProjections : ConnectedProjection<IntegrationContext>
     {
         public BuildingVersionProjections(
