@@ -49,6 +49,10 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda
 
             services.AddHttpClient();
             services.Configure<AnoApiOptions>(configuration.GetSection("AnoApi"));
+            builder.RegisterType<AnoApiProxy>()
+                .As<IAnoApiProxy>()
+                .AsSelf()
+                .SingleInstance();
 
             builder
                 .RegisterType<Mediator>()
