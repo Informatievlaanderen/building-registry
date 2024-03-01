@@ -8,6 +8,7 @@
     using Building;
     using IdentityModel;
     using IdentityModel.Client;
+    using Microsoft.Extensions.Options;
     using Polygon = NetTopologySuite.Geometries.Polygon;
 
     public interface IAnoApiProxy
@@ -27,10 +28,10 @@
 
         public AnoApiProxy(
             IHttpClientFactory httpClientFactory,
-            AnoApiOptions options)
+            IOptions<AnoApiOptions> options)
         {
             _httpClientFactory = httpClientFactory;
-            _options = options;
+            _options = options.Value;
         }
 
         public async Task CreateAnomaly(
@@ -44,7 +45,7 @@
             httpClient.DefaultRequestHeaders.Authorization =
                 new AuthenticationHeaderValue("Bearer", await GetAccessToken(ct));
 
-            var anoRequest = new AnoRequest(
+            var request = new AnoRequest(
                 buildingPersistentLocalId,
                 organisation,
                 dateTimeStatusChange,
@@ -57,7 +58,7 @@
 
             await httpClient.PostAsJsonAsync(
                 new Uri(_options.BaseUrl + "/api/processing/anomalies"),
-                anoRequest,
+                request,
                 jsonSerializerOptions,
                 ct);
         }
