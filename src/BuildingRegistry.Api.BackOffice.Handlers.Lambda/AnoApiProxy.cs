@@ -73,7 +73,7 @@
                     ClientSecret = _options.TokenClientSecret,
                     Parameters = new Parameters(new[]
                     {
-                        new KeyValuePair<string, string>("scope", "GRB_operator Gecko_datavalidator")
+                        new KeyValuePair<string, string>("scope", "dv_gecko")
                     })
                 });
 
