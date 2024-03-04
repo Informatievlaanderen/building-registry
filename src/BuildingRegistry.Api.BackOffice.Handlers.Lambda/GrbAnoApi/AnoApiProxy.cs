@@ -1,4 +1,4 @@
-﻿namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda
+﻿namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.GrbAnoApi
 {
     using System.Net.Http.Headers;
     using System.Net.Http.Json;
@@ -51,16 +51,13 @@
                 dateTimeStatusChange,
                 geometry);
 
-            var jsonSerializerOptions = new JsonSerializerOptions
-            {
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-            };
-
-            await httpClient.PostAsJsonAsync(
+            var response = await httpClient.PostAsJsonAsync(
                 new Uri(_options.BaseUrl + "/api/processing/anomalies"),
                 request,
-                jsonSerializerOptions,
+                new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase },
                 ct);
+
+            response.EnsureSuccessStatusCode();
         }
 
         private async Task<string> GetAccessToken(CancellationToken cancellationToken)
@@ -88,11 +85,9 @@
 
     internal class AnoRequest
     {
-        [JsonPropertyName("type")]
-        public string Type { get; } = "FeatureCollection";
+        [JsonPropertyName("type")] public string Type { get; } = "FeatureCollection";
 
-        [JsonPropertyName("features")]
-        public Feature[] Features { get; }
+        [JsonPropertyName("features")] public Feature[] Features { get; }
 
         public AnoRequest(
             int buildingPersistentLocalId,
@@ -106,18 +101,15 @@
 
     internal class Feature
     {
-        [JsonPropertyName("type")]
-        public string Type { get; } = "Feature";
+        [JsonPropertyName("type")] public string Type { get; } = "Feature";
 
-        [JsonPropertyName("geometry")]
-        public GeoJSONPolygon Geometry { get; }
+        [JsonPropertyName("geometry")] public GeoJSONPolygon Geometry { get; }
 
-        [JsonPropertyName("properties")]
-        public Properties Properties { get; }
+        [JsonPropertyName("properties")] public Properties Properties { get; }
 
         public Feature(int buildingPersistentLocalId, string organisation, DateTimeOffset dateTimeStatusChange, ExtendedWkbGeometry geometry)
         {
-            Geometry = MapToGeoJsonPolygon((Polygon) WKBReaderFactory.Create().Read(geometry));
+            Geometry = MapToGeoJsonPolygon((Polygon)WKBReaderFactory.Create().Read(geometry));
             Properties = new Properties(buildingPersistentLocalId, organisation, dateTimeStatusChange);
         }
 
@@ -145,44 +137,31 @@
 
     internal class Properties
     {
-        [JsonPropertyName("GVC")]
-        public int GVC { get; } = 1;
+        [JsonPropertyName("GVC")] public int GVC { get; } = 1;
 
-        [JsonPropertyName("GVS")]
-        public string GVS { get; }
+        [JsonPropertyName("GVS")] public string GVS { get; }
 
-        [JsonPropertyName("GROIDA")]
-        public string GROIDA { get; }
+        [JsonPropertyName("GROIDA")] public string GROIDA { get; }
 
-        [JsonPropertyName("GVCASB")]
-        public int GVCASB { get; } = 2;
+        [JsonPropertyName("GVCASB")] public int GVCASB { get; } = 2;
 
-        [JsonPropertyName("TPC")]
-        public int TPC { get; } = 2;
+        [JsonPropertyName("TPC")] public int TPC { get; } = 2;
 
-        [JsonPropertyName("TPCV")]
-        public int TPCV { get; } = -9;
+        [JsonPropertyName("TPCV")] public int TPCV { get; } = -9;
 
-        [JsonPropertyName("GVDOPM")]
-        public string GVDOPM { get; }
+        [JsonPropertyName("GVDOPM")] public DateTimeOffset GVDOPM { get; }
 
-        [JsonPropertyName("SHAPE")]
-        public object SHAPE { get; } = "polygoon";
+        [JsonPropertyName("SHAPE")] public object SHAPE { get; } = "polygoon";
 
-        [JsonPropertyName("INVCB")]
-        public int INVCB { get; } = 4;
+        [JsonPropertyName("INVCB")] public int INVCB { get; } = 4;
 
-        [JsonPropertyName("EXNIA")]
-        public string EXNIA { get; } = "nvt";
+        [JsonPropertyName("EXNIA")] public string EXNIA { get; } = "nvt";
 
-        [JsonPropertyName("EXNWO")]
-        public int EXNWO { get; } = -9;
+        [JsonPropertyName("EXNWO")] public int EXNWO { get; } = -9;
 
-        [JsonPropertyName("GVCO")]
-        public int GVCO { get; } = 1;
+        [JsonPropertyName("GVCO")] public int GVCO { get; } = 1;
 
-        [JsonPropertyName("GVSB")]
-        public string GVSB { get; } = "nvt";
+        [JsonPropertyName("GVSB")] public string GVSB { get; } = "nvt";
 
         public Properties(
             int buildingPersistentLocalId,
@@ -191,7 +170,7 @@
         {
             GVS = $"GR gebouw gerealiseerd | {buildingPersistentLocalId}";
             GROIDA = organisation;
-            GVDOPM = $"{dateTimeStatusChange:O}Z";
+            GVDOPM = dateTimeStatusChange;
         }
     }
 }

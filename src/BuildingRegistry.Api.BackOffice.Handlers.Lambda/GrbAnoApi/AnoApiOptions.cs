@@ -1,4 +1,4 @@
-﻿namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda
+﻿namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.GrbAnoApi
 {
     public class AnoApiOptions
     {

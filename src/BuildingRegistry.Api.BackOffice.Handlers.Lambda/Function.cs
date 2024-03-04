@@ -18,6 +18,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda
     using Be.Vlaanderen.Basisregisters.Sqs.Lambda.Infrastructure;
     using Consumer.Address;
     using Consumer.Read.Parcel.Infrastructure.Modules;
+    using GrbAnoApi;
     using Infrastructure;
     using Infrastructure.Modules;
     using MediatR;
@@ -25,6 +26,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Logging;
     using Newtonsoft.Json;
+    using OrWegwijsApi;
     using TicketingService.Proxy.HttpProxy;
 
     public class Function : FunctionBase
@@ -47,10 +49,16 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda
             var tempProvider = services.BuildServiceProvider();
             var loggerFactory = tempProvider.GetRequiredService<ILoggerFactory>();
 
-            services.AddHttpClient();
+            services.AddHttpClient<IAnoApiProxy, AnoApiProxy>();
             services.Configure<AnoApiOptions>(configuration.GetSection("AnoApi"));
             builder.RegisterType<AnoApiProxy>()
                 .As<IAnoApiProxy>()
+                .AsSelf()
+                .SingleInstance();
+
+            services.AddHttpClient<IWegwijsApiProxy, WegwijsApiProxy>();
+            builder.RegisterType<WegwijsApiProxy>()
+                .As<IWegwijsApiProxy>()
                 .AsSelf()
                 .SingleInstance();
 
