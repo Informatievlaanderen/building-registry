@@ -1,3 +1,10 @@
+## [3.105.1](https://github.com/informatievlaanderen/building-registry/compare/v3.105.0...v3.105.1) (2024-03-05)
+
+
+### Bug Fixes
+
+* persistentlocalid finder ([e4d4642](https://github.com/informatievlaanderen/building-registry/commit/e4d464273def17cadd860d3ea66f382e2f8872cd))
+
 # [3.105.0](https://github.com/informatievlaanderen/building-registry/compare/v3.104.0...v3.105.0) (2024-03-05)
 
 
