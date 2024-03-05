@@ -81,10 +81,13 @@ namespace BuildingRegistry.Projections.Integration.Building.Version
                     building =>
                     {
                         var buildingUnit = building.BuildingUnits
-                            .Single(x => x.BuildingUnitId == message.Message.BuildingUnitId);
+                            .SingleOrDefault(x => x.BuildingUnitId == message.Message.BuildingUnitId);
 
-                        buildingUnit.BuildingUnitPersistentLocalId = message.Message.PersistentLocalId;
-                        buildingUnit.VersionTimestamp = message.Message.Provenance.Timestamp;
+                        if (buildingUnit is not null)
+                        {
+                            buildingUnit.BuildingUnitPersistentLocalId = message.Message.PersistentLocalId;
+                            buildingUnit.VersionTimestamp = message.Message.Provenance.Timestamp;
+                        }
                     },
                     ct);
             });
