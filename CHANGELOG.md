@@ -1,3 +1,10 @@
+## [3.105.2](https://github.com/informatievlaanderen/building-registry/compare/v3.105.1...v3.105.2) (2024-03-05)
+
+
+### Bug Fixes
+
+* add null check when assigning ID in integration version ([bf1aecb](https://github.com/informatievlaanderen/building-registry/commit/bf1aecbeedeef7099b576fc25a9758a295d93a44))
+
 ## [3.105.1](https://github.com/informatievlaanderen/building-registry/compare/v3.105.0...v3.105.1) (2024-03-05)
 
 
