@@ -1,3 +1,10 @@
+# [3.106.0](https://github.com/informatievlaanderen/building-registry/compare/v3.105.2...v3.106.0) (2024-03-05)
+
+
+### Features
+
+* realize unplanned building unit GAWR-2809 ([f63a293](https://github.com/informatievlaanderen/building-registry/commit/f63a2938db467558645795e152eeedb908d15ffb))
+
 ## [3.105.2](https://github.com/informatievlaanderen/building-registry/compare/v3.105.1...v3.105.2) (2024-03-05)
 
 
