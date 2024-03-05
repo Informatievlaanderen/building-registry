@@ -32,7 +32,8 @@ INNER JOIN [building-registry-events].[BuildingRegistry].[Messages] as m
     on s.IdInternal = m.StreamIdInternal and m.[Type] = 'BuildingPersistentLocalIdentifierWasAssigned'
 WHERE s.Id = @BuildingId";
 
-            var buildingPersistentLocalId = await connection.QuerySingleAsync<int>(sql, new { BuildingId = buildingId });
+            var buildingPersistentLocalId = await connection.QuerySingleAsync<int>(
+                sql, new { BuildingId = buildingId.ToString("D") });
 
             return buildingPersistentLocalId;
         }
@@ -51,7 +52,7 @@ WHERE
     AND  JSON_VALUE(JsonData, '$.buildingUnitId') = @BuildingUnitId";
 
             var buildingPersistentLocalId = await connection.QuerySingleAsync<int>(
-                sql, new { BuildingId = buildingId.ToString("D") , BuildingUnitId = buildingUnitId });
+                sql, new { BuildingId = buildingId.ToString("D"), BuildingUnitId = buildingUnitId });
 
             return buildingPersistentLocalId;
         }
