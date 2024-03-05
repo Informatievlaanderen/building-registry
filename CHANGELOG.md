@@ -1,3 +1,15 @@
+# [3.105.0](https://github.com/informatievlaanderen/building-registry/compare/v3.104.0...v3.105.0) (2024-03-05)
+
+
+### Bug Fixes
+
+* addressrepository integration db ([4447dbb](https://github.com/informatievlaanderen/building-registry/commit/4447dbb103c6fe6c552bfcf4258921e734cfca61))
+
+
+### Features
+
+* add type to latest versions integration ([6d61778](https://github.com/informatievlaanderen/building-registry/commit/6d617785047f983a1ab6f5c66a17e4b7deb6515b))
+
 # [3.104.0](https://github.com/informatievlaanderen/building-registry/compare/v3.103.0...v3.104.0) (2024-02-20)
 
 
