@@ -1,3 +1,15 @@
+## [3.106.1](https://github.com/informatievlaanderen/building-registry/compare/v3.106.0...v3.106.1) (2024-03-06)
+
+
+### Bug Fixes
+
+* include building unit versions in integration projections ([9f4af8f](https://github.com/informatievlaanderen/building-registry/commit/9f4af8fdf4aaa41bec1e82209bbe597b80780f2d))
+
+
+### Performance Improvements
+
+* eager load building unit versions in syndication projections ([9a5af97](https://github.com/informatievlaanderen/building-registry/commit/9a5af97226971625d8888b2ec6b4c8bd7b998be8))
+
 # [3.106.0](https://github.com/informatievlaanderen/building-registry/compare/v3.105.2...v3.106.0) (2024-03-05)
 
 
