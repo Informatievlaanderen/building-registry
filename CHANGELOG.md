@@ -1,3 +1,10 @@
+## [3.106.2](https://github.com/informatievlaanderen/building-registry/compare/v3.106.1...v3.106.2) (2024-03-06)
+
+
+### Bug Fixes
+
+* bump fix download artifact ([f518330](https://github.com/informatievlaanderen/building-registry/commit/f51833010da474a55b99479e2816fb92e152bf98))
+
 ## [3.106.1](https://github.com/informatievlaanderen/building-registry/compare/v3.106.0...v3.106.1) (2024-03-06)
 
 
