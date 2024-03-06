@@ -414,35 +414,35 @@ jobs:
         pip install requests markdown argparse
 
     - name: Download NuGet Api BackOffice
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       continue-on-error: false
       with:
         name: nuget-Be.Vlaanderen.Basisregisters.BuildingRegistry.Api.BackOffice-${{ needs.set-release-version.outputs.version }}
         path: dist/nuget/
 
     - name: Download NuGet Api BackOffice Abstractions
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       continue-on-error: false
       with:
         name: nuget-Be.Vlaanderen.Basisregisters.BuildingRegistry.Api.BackOffice.Abstractions-${{ needs.set-release-version.outputs.version }}
         path: dist/nuget/
 
     - name: Download NuGet Api Legacy
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       continue-on-error: false
       with:
         name: nuget-Be.Vlaanderen.Basisregisters.BuildingRegistry.Api.Legacy-${{ needs.set-release-version.outputs.version }}
         path: dist/nuget/
 
     - name: Download NuGet Api Oslo
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       continue-on-error: false
       with:
         name: nuget-Be.Vlaanderen.Basisregisters.BuildingRegistry.Api.Oslo-${{ needs.set-release-version.outputs.version }}
         path: dist/nuget/
 
     - name: Download NuGet Api Extract
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       continue-on-error: false
       with:
         name: nuget-Be.Vlaanderen.Basisregisters.BuildingRegistry.Api.Extract-${{ needs.set-release-version.outputs.version }}
@@ -478,7 +478,7 @@ jobs:
     if: ${{ (github.repository_owner == 'Informatievlaanderen') && (needs.release.outputs.version != 'none') }}
     steps:
     - name: Download Lambda
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       continue-on-error: false
       with:
         name: lambda-backoffice-${{ needs.release.outputs.version }}
@@ -561,19 +561,19 @@ jobs:
       run: dotnet --info
 
     - name: Download NuGet package api-backoffice
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         name: nuget-Be.Vlaanderen.Basisregisters.BuildingRegistry.Api.BackOffice-${{ needs.release.outputs.version }}
         path: ~/
 
     - name: Download NuGet package api-backoffice-abstractions
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         name: nuget-Be.Vlaanderen.Basisregisters.BuildingRegistry.Api.BackOffice.Abstractions-${{ needs.release.outputs.version }}
         path: ~/
 
     - name: Download NuGet package api-legacy
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         name: nuget-Be.Vlaanderen.Basisregisters.BuildingRegistry.Api.Legacy-${{ needs.release.outputs.version }}
         path: ~/
@@ -585,7 +585,7 @@ jobs:
         path: ~/
 
     - name: Download NuGet package api-extract
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         name: nuget-Be.Vlaanderen.Basisregisters.BuildingRegistry.Api.Extract-${{ needs.release.outputs.version }}
         path: ~/
