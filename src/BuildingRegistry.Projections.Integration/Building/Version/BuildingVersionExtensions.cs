@@ -77,7 +77,10 @@
                    .MaxBy(x => x.Position)
                ?? await context
                    .BuildingVersions
+                   .AsNoTracking()
                    .Where(x => x.BuildingId == buildingId)
+                   .Include(x => x.BuildingUnits).ThenInclude(y => y.Addresses)
+                   .Include(x => x.BuildingUnits).ThenInclude(y => y.Readdresses)
                    .OrderByDescending(x => x.Position)
                    .FirstOrDefaultAsync(ct);
 
