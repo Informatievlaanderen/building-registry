@@ -85,6 +85,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
                    .Where(x => x.BuildingId == buildingId)
                    .Include(x => x.BuildingUnits).ThenInclude(y => y.Addresses)
                    .Include(x => x.BuildingUnits).ThenInclude(y => y.Readdresses)
+                   .Include(x => x.BuildingUnitsV2).ThenInclude(y => y.Addresses)
                    .OrderByDescending(x => x.Position)
                    .FirstOrDefaultAsync(ct);
 
