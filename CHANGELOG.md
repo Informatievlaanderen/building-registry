@@ -1,3 +1,11 @@
+## [3.106.3](https://github.com/informatievlaanderen/building-registry/compare/v3.106.2...v3.106.3) (2024-03-07)
+
+
+### Bug Fixes
+
+* building version readdress date as date ([8c476eb](https://github.com/informatievlaanderen/building-registry/commit/8c476eb5739cacb2bed563dadbfbdafe18d37387))
+* column name readdress old date ([3cad671](https://github.com/informatievlaanderen/building-registry/commit/3cad671e6bcfc75f2815e8a6f521ee483a204299))
+
 ## [3.106.2](https://github.com/informatievlaanderen/building-registry/compare/v3.106.1...v3.106.2) (2024-03-06)
 
 
