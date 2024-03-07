@@ -49,7 +49,9 @@
             builder.Property(x => x.BuildingUnitPersistentLocalId).HasColumnName("building_unit_persistent_id");
             builder.Property(x => x.NewAddressId).HasColumnName("new_address_id");
             builder.Property(x => x.OldAddressId).HasColumnName("new_address_id");
-            builder.Property(x => x.ReaddressBeginDateAsDateTimeOffset).HasColumnName("readdress_date");
+            builder.Property(x => x.ReaddressBeginDateAsDateTimeOffset)
+                .HasColumnName("readdress_date")
+                .HasColumnType("date");
 
             builder.Ignore(x => x.ReaddressBeginDate);
         }
