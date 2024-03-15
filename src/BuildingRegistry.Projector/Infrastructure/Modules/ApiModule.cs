@@ -241,6 +241,11 @@ namespace BuildingRegistry.Projector.Infrastructure.Modules
                         _configuration,
                         _services,
                         _loggerFactory));
+
+            var buildingIntegrationCatchUpSize = _configuration.GetSection(CatchUpSizesConfigKey).GetValue<int>("BuildingIntegration");
+            var buildingProjectionSettings =
+                ConnectedProjectionSettings.Configure(settings => settings.ConfigureCatchUpPageSize(buildingIntegrationCatchUpSize));
+
             builder
                 .RegisterProjectionMigrator<IntegrationContextMigrationFactory>(
                     _configuration,
@@ -256,7 +261,7 @@ namespace BuildingRegistry.Projector.Infrastructure.Modules
                         context.Resolve<IOptions<IntegrationOptions>>(),
                         context.Resolve<IPersistentLocalIdFinder>(),
                         context.Resolve<IAddresses>()),
-                    ConnectedProjectionSettings.Default);
+                    buildingProjectionSettings);
         }
     }
 }
