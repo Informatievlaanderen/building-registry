@@ -1,3 +1,10 @@
+## [3.106.4](https://github.com/informatievlaanderen/building-registry/compare/v3.106.3...v3.106.4) (2024-03-15)
+
+
+### Bug Fixes
+
+* catching up size integration ([6944511](https://github.com/informatievlaanderen/building-registry/commit/6944511a7250351ef76351484179c2f7e1e0fef4))
+
 ## [3.106.3](https://github.com/informatievlaanderen/building-registry/compare/v3.106.2...v3.106.3) (2024-03-07)
 
 
