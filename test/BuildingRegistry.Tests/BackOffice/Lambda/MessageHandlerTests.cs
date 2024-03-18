@@ -12,6 +12,8 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda
     using BuildingRegistry.Api.BackOffice.Handlers.Lambda;
     using BuildingRegistry.Api.BackOffice.Handlers.Lambda.Requests.Building;
     using BuildingRegistry.Api.BackOffice.Handlers.Lambda.Requests.BuildingUnit;
+    using BuildingRegistry.Building;
+    using Fixtures;
     using FluentAssertions;
     using MediatR;
     using Moq;
@@ -68,7 +70,10 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda
                 It.IsAny<CancellationToken>());
 
             // Assert
-            await act.Should().ThrowAsync<NotImplementedException>();
+            await act
+                .Should()
+                .ThrowAsync<NotImplementedException>()
+                .WithMessage($"{nameof(TestSqsRequest)} has no corresponding SqsLambdaRequest defined.");
         }
 
         [Fact]
@@ -912,6 +917,42 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda
         //             request.Metadata == messageData.Metadata
         //         ), It.IsAny<CancellationToken>()), Times.Once);
         // }
+
+        [Fact]
+        public async Task WhenProcessingNotifyOutlinedRealizedBuildingSqsRequestSqsRequest_ThenLambdaRequestIsSent()
+        {
+            // Arrange
+            var mediator = new Mock<IMediator>();
+            var containerBuilder = new ContainerBuilder();
+            containerBuilder.Register(_ => mediator.Object);
+            var container = containerBuilder.Build();
+
+            Fixture.Customize(new WithValidExtendedWkbPolygon());
+            var messageData = new NotifyOutlinedRealizedBuildingSqsRequest(
+                Fixture.Create<int>(),
+                Fixture.Create<string>(),
+                Fixture.Create<DateTimeOffset>(),
+                Fixture.Create<ExtendedWkbGeometry>().ToString());
+            var messageMetadata = new MessageMetadata { MessageGroupId = Fixture.Create<string>() };
+
+            var sut = new MessageHandler(container);
+
+            // Act
+            await sut.HandleMessage(
+                messageData,
+                messageMetadata,
+                It.IsAny<CancellationToken>());
+
+            // Assert
+            mediator
+                .Verify(x =>
+                    x.Send(It.Is<NotifyOutlinedRealizedBuildingLambdaRequest>(request =>
+                            request.BuildingPersistentLocalId == messageData.BuildingPersistentLocalId &&
+                            request.Organisation == messageData.Organisation &&
+                            request.ExtendedWkbGeometry == new ExtendedWkbGeometry(messageData.ExtendedWkbGeometry) &&
+                            request.DateTimeStatusChange == messageData.DateTimeStatusChange),
+                        It.IsAny<CancellationToken>()), Times.Once);
+        }
     }
 
     internal class TestSqsRequest : SqsRequest

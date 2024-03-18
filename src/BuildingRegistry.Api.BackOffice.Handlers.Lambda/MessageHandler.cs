@@ -10,6 +10,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda
     using Requests.BuildingUnit;
     using System.Threading;
     using System.Threading.Tasks;
+    using Building;
 
     public class MessageHandler : IMessageHandler
     {
@@ -24,9 +25,10 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda
         {
             messageMetadata.Logger?.LogInformation($"Handling message {messageData?.GetType().Name}");
 
-            if (messageData is not SqsRequest sqsRequest)
+            if (messageData is not SqsRequest &&
+                messageData is not NotifyOutlinedRealizedBuildingSqsRequest)
             {
-                messageMetadata.Logger?.LogInformation($"Unable to cast {nameof(messageData)} as {nameof(sqsRequest)}.");
+                messageMetadata.Logger?.LogInformation($"Unable to cast {nameof(messageData)} as {nameof(SqsRequest)} or {nameof(NotifyOutlinedRealizedBuildingSqsRequest)}.");
                 return;
             }
 
@@ -37,7 +39,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda
             cancellationTokenSource.CancelAfter(TimeSpan.FromMinutes(5));
             var cancellationToken = cancellationTokenSource.Token;
 
-            switch (sqsRequest)
+            switch (messageData)
             {
                 case PlanBuildingSqsRequest request:
                     await mediator.Send(new PlanBuildingLambdaRequest(messageMetadata.MessageGroupId!, request), cancellationToken);
@@ -159,9 +161,17 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda
                 //     await mediator.Send(new MergeBuildingsLambdaRequest(messageMetadata.MessageGroupId!, request), cancellationToken);
                 //     break;
 
+                case NotifyOutlinedRealizedBuildingSqsRequest request:
+                    await mediator.Send(new NotifyOutlinedRealizedBuildingLambdaRequest(
+                        request.BuildingPersistentLocalId,
+                        request.Organisation,
+                        request.DateTimeStatusChange,
+                        new ExtendedWkbGeometry(request.ExtendedWkbGeometry)), cancellationToken);
+                    break;
+
                 default:
                     throw new NotImplementedException(
-                        $"{sqsRequest.GetType().Name} has no corresponding SqsLambdaRequest defined.");
+                        $"{messageData.GetType().Name} has no corresponding SqsLambdaRequest defined.");
             }
         }
     }
