@@ -1,5 +1,6 @@
 ﻿// ReSharper disable EntityFramework.NPlusOne.IncompleteDataUsage
 // ReSharper disable EntityFramework.NPlusOne.IncompleteDataQuery
+
 #pragma warning disable CS0618 // Type or member is obsolete
 namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
 {
@@ -31,7 +32,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
 
             var buildingPersistentLocalId = (int)_fixture.Create<BuildingPersistentLocalId>();
             var addressPersistentLocalId = (int)_fixture.Create<AddressPersistentLocalId>();
-            var buildingUnitPersistentLocalId = (int) _fixture.Create<BuildingUnitPersistentLocalId>();
+            var buildingUnitPersistentLocalId = (int)_fixture.Create<BuildingUnitPersistentLocalId>();
 
             var buildingWasRegistered = _fixture.Create<BuildingWasRegistered>();
             var buildingUnitWasAdded = _fixture.Create<BuildingUnitWasAdded>();
@@ -45,12 +46,12 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
             var buildingWasRegisteredMetadata = new Dictionary<string, object>
             {
                 { Envelope.PositionMetadataKey, position },
-                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>() }
             };
             var buildingUnitWasAddedMetadata = new Dictionary<string, object>
             {
                 { Envelope.PositionMetadataKey, ++position },
-                { Envelope.EventNameMetadataKey, "EventName"}
+                { Envelope.EventNameMetadataKey, "EventName" }
             };
 
             await Sut
@@ -102,24 +103,25 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
             var buildingWasRegisteredMetadata = new Dictionary<string, object>
             {
                 { Envelope.PositionMetadataKey, position },
-                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>() }
             };
             var buildingUnitWasAddedMetadata = new Dictionary<string, object>
             {
                 { Envelope.PositionMetadataKey, ++position },
-                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>() }
             };
             var buildingUnitPersistentLocalIdWasAssignedMetadata = new Dictionary<string, object>
             {
                 { Envelope.PositionMetadataKey, ++position },
-                { Envelope.EventNameMetadataKey, "EventName"}
+                { Envelope.EventNameMetadataKey, "EventName" }
             };
 
             await Sut
                 .Given(
                     new Envelope<BuildingWasRegistered>(new Envelope(buildingWasRegistered, buildingWasRegisteredMetadata)),
                     new Envelope<BuildingUnitWasAdded>(new Envelope(buildingUnitWasAdded, buildingUnitWasAddedMetadata)),
-                    new Envelope<BuildingUnitPersistentLocalIdWasAssigned>(new Envelope(buildingUnitPersistentLocalIdWasAssigned, buildingUnitPersistentLocalIdWasAssignedMetadata)))
+                    new Envelope<BuildingUnitPersistentLocalIdWasAssigned>(new Envelope(buildingUnitPersistentLocalIdWasAssigned,
+                        buildingUnitPersistentLocalIdWasAssignedMetadata)))
                 .Then(async context =>
                 {
                     var buildingVersion = await context.BuildingVersions.FindAsync(position);
@@ -140,9 +142,9 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
         {
             _fixture.Customize(new WithFixedBuildingUnitIdFromHouseNumber());
 
-            var buildingPersistentLocalId = (int) _fixture.Create<BuildingPersistentLocalId>();
-            var buildingUnitPersistentLocalId = (int) _fixture.Create<BuildingUnitPersistentLocalId>();
-            var addressPersistentLocalId = (int) _fixture.Create<AddressPersistentLocalId>();
+            var buildingPersistentLocalId = (int)_fixture.Create<BuildingPersistentLocalId>();
+            var buildingUnitPersistentLocalId = (int)_fixture.Create<BuildingUnitPersistentLocalId>();
+            var addressPersistentLocalId = (int)_fixture.Create<AddressPersistentLocalId>();
 
             var buildingWasRegistered = _fixture.Create<BuildingWasRegistered>();
             var buildingUnitWasReaddedByOtherUnitRemoval = _fixture.Create<BuildingUnitWasReaddedByOtherUnitRemoval>();
@@ -156,18 +158,19 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
             var buildingWasRegisteredMetadata = new Dictionary<string, object>
             {
                 { Envelope.PositionMetadataKey, position },
-                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>() }
             };
             var buildingUnitWasAddedMetadata = new Dictionary<string, object>
             {
                 { Envelope.PositionMetadataKey, ++position },
-                { Envelope.EventNameMetadataKey, "EventName"}
+                { Envelope.EventNameMetadataKey, "EventName" }
             };
 
             await Sut
                 .Given(
                     new Envelope<BuildingWasRegistered>(new Envelope(buildingWasRegistered, buildingWasRegisteredMetadata)),
-                    new Envelope<BuildingUnitWasReaddedByOtherUnitRemoval>(new Envelope(buildingUnitWasReaddedByOtherUnitRemoval, buildingUnitWasAddedMetadata)))
+                    new Envelope<BuildingUnitWasReaddedByOtherUnitRemoval>(new Envelope(buildingUnitWasReaddedByOtherUnitRemoval,
+                        buildingUnitWasAddedMetadata)))
                 .Then(async context =>
                 {
                     var buildingVersion = await context.BuildingVersions.FindAsync(position);
@@ -200,8 +203,8 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
         {
             _fixture.Customize(new WithFixedBuildingUnitIdFromHouseNumber());
 
-            var buildingPersistentLocalId = (int) _fixture.Create<BuildingPersistentLocalId>();
-            var buildingUnitPersistentLocalId = (int) _fixture.Create<BuildingUnitPersistentLocalId>();
+            var buildingPersistentLocalId = (int)_fixture.Create<BuildingPersistentLocalId>();
+            var buildingUnitPersistentLocalId = (int)_fixture.Create<BuildingUnitPersistentLocalId>();
 
             var buildingWasRegistered = _fixture.Create<BuildingWasRegistered>();
             var commonBuildingUnitWasAdded = _fixture.Create<CommonBuildingUnitWasAdded>();
@@ -214,12 +217,12 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
             var buildingWasRegisteredMetadata = new Dictionary<string, object>
             {
                 { Envelope.PositionMetadataKey, position },
-                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>() }
             };
             var commonBuildingUnitWasAddedMetadata = new Dictionary<string, object>
             {
                 { Envelope.PositionMetadataKey, ++position },
-                { Envelope.EventNameMetadataKey, "EventName"}
+                { Envelope.EventNameMetadataKey, "EventName" }
             };
 
             await Sut
@@ -255,8 +258,8 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
         {
             _fixture.Customize(new WithFixedBuildingUnitIdFromHouseNumber());
 
-            var buildingPersistentLocalId = (int) _fixture.Create<BuildingPersistentLocalId>();
-            var buildingUnitPersistentLocalId = (int) _fixture.Create<BuildingUnitPersistentLocalId>();
+            var buildingPersistentLocalId = (int)_fixture.Create<BuildingPersistentLocalId>();
+            var buildingUnitPersistentLocalId = (int)_fixture.Create<BuildingUnitPersistentLocalId>();
 
             var buildingWasRegistered = _fixture.Create<BuildingWasRegistered>();
             var buildingWasRetired = new BuildingWasRetired(
@@ -272,17 +275,17 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
             var buildingWasRegisteredMetadata = new Dictionary<string, object>
             {
                 { Envelope.PositionMetadataKey, position },
-                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>() }
             };
             var buildingWasRetiredMetadata = new Dictionary<string, object>
             {
                 { Envelope.PositionMetadataKey, ++position },
-                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>() }
             };
             var buildingUnitWasAddedToRetiredBuildingMetadata = new Dictionary<string, object>
             {
                 { Envelope.PositionMetadataKey, ++position },
-                { Envelope.EventNameMetadataKey, "EventName"}
+                { Envelope.EventNameMetadataKey, "EventName" }
             };
 
             await Sut
@@ -322,8 +325,8 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
         {
             _fixture.Customize(new WithFixedBuildingUnitIdFromHouseNumber());
 
-            var buildingPersistentLocalId = (int) _fixture.Create<BuildingPersistentLocalId>();
-            var buildingUnitPersistentLocalId = (int) _fixture.Create<BuildingUnitPersistentLocalId>();
+            var buildingPersistentLocalId = (int)_fixture.Create<BuildingPersistentLocalId>();
+            var buildingUnitPersistentLocalId = (int)_fixture.Create<BuildingUnitPersistentLocalId>();
 
             var buildingWasRegistered = _fixture.Create<BuildingWasRegistered>();
             var buildingWasRetired = new BuildingWasNotRealized(
@@ -339,17 +342,17 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
             var buildingWasRegisteredMetadata = new Dictionary<string, object>
             {
                 { Envelope.PositionMetadataKey, position },
-                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>() }
             };
             var buildingWasRetiredMetadata = new Dictionary<string, object>
             {
                 { Envelope.PositionMetadataKey, ++position },
-                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>() }
             };
             var buildingUnitWasAddedToRetiredBuildingMetadata = new Dictionary<string, object>
             {
                 { Envelope.PositionMetadataKey, ++position },
-                { Envelope.EventNameMetadataKey, "EventName"}
+                { Envelope.EventNameMetadataKey, "EventName" }
             };
 
             await Sut
@@ -389,7 +392,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
         {
             _fixture.Customize(new WithFixedBuildingUnitIdFromHouseNumber());
 
-            var buildingUnitPersistentLocalId = (int) _fixture.Create<BuildingUnitPersistentLocalId>();
+            var buildingUnitPersistentLocalId = (int)_fixture.Create<BuildingUnitPersistentLocalId>();
 
             var buildingWasRegistered = _fixture.Create<BuildingWasRegistered>();
             var buildingUnitWasAdded = _fixture.Create<BuildingUnitWasAdded>();
@@ -404,17 +407,17 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
             var buildingWasRegisteredMetadata = new Dictionary<string, object>
             {
                 { Envelope.PositionMetadataKey, position },
-                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>() }
             };
             var buildingUnitWasAddedMetadata = new Dictionary<string, object>
             {
                 { Envelope.PositionMetadataKey, ++position },
-                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>() }
             };
             var buildingUnitWasRemovedMetadata = new Dictionary<string, object>
             {
                 { Envelope.PositionMetadataKey, ++position },
-                { Envelope.EventNameMetadataKey, "EventName"}
+                { Envelope.EventNameMetadataKey, "EventName" }
             };
 
             await Sut
@@ -445,7 +448,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
         {
             _fixture.Customize(new WithFixedBuildingUnitIdFromHouseNumber());
 
-            var buildingUnitPersistentLocalId = (int) _fixture.Create<BuildingUnitPersistentLocalId>();
+            var buildingUnitPersistentLocalId = (int)_fixture.Create<BuildingUnitPersistentLocalId>();
             var attachedAddressPersistentLocalId = 2;
 
             var buildingWasRegistered = _fixture.Create<BuildingWasRegistered>();
@@ -462,24 +465,25 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
             var buildingWasRegisteredMetadata = new Dictionary<string, object>
             {
                 { Envelope.PositionMetadataKey, position },
-                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>() }
             };
             var buildingUnitWasAddedMetadata = new Dictionary<string, object>
             {
                 { Envelope.PositionMetadataKey, ++position },
-                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>() }
             };
             var buildingUnitAddressWasAttachedMetadata = new Dictionary<string, object>
             {
                 { Envelope.PositionMetadataKey, ++position },
-                { Envelope.EventNameMetadataKey, "EventName"}
+                { Envelope.EventNameMetadataKey, "EventName" }
             };
 
             await Sut
                 .Given(
                     new Envelope<BuildingWasRegistered>(new Envelope(buildingWasRegistered, buildingWasRegisteredMetadata)),
                     new Envelope<BuildingUnitWasAdded>(new Envelope(buildingUnitWasAdded, buildingUnitWasAddedMetadata)),
-                    new Envelope<BuildingUnitAddressWasAttached>(new Envelope(buildingUnitAddressWasAttached, buildingUnitAddressWasAttachedMetadata)))
+                    new Envelope<BuildingUnitAddressWasAttached>(new Envelope(buildingUnitAddressWasAttached,
+                        buildingUnitAddressWasAttachedMetadata)))
                 .Then(async context =>
                 {
                     var buildingVersion = await context.BuildingVersions.FindAsync(position);
@@ -498,11 +502,78 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
         }
 
         [Fact]
+        public async Task WhenBuildingUnitAddressWasAttachedTwice()
+        {
+            _fixture.Customize(new WithFixedBuildingUnitIdFromHouseNumber());
+
+            var buildingUnitPersistentLocalId = (int)_fixture.Create<BuildingUnitPersistentLocalId>();
+            var attachedAddressPersistentLocalId = 2;
+
+            var buildingWasRegistered = _fixture.Create<BuildingWasRegistered>();
+            var buildingUnitWasAdded = _fixture.Create<BuildingUnitWasAdded>();
+            var buildingUnitAddressWasAttached = _fixture.Create<BuildingUnitAddressWasAttached>();
+
+            AddBuildingPersistentLocalId();
+            AddBuildingUnitPersistentLocalId(buildingUnitPersistentLocalId);
+            AddAddressPersistentLocalId(buildingUnitWasAdded.AddressId);
+            AddAddressPersistentLocalId(buildingUnitAddressWasAttached.AddressId, attachedAddressPersistentLocalId);
+
+            var position = _fixture.Create<long>();
+
+            var buildingWasRegisteredMetadata = new Dictionary<string, object>
+            {
+                { Envelope.PositionMetadataKey, position },
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>() }
+            };
+            var buildingUnitWasAddedMetadata = new Dictionary<string, object>
+            {
+                { Envelope.PositionMetadataKey, ++position },
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>() }
+            };
+            var buildingUnitAddressWasAttachedMetadata = new Dictionary<string, object>
+            {
+                { Envelope.PositionMetadataKey, ++position },
+                { Envelope.EventNameMetadataKey, "EventName" }
+            };
+            var buildingUnitAddressWasAttached2Metadata = new Dictionary<string, object>
+            {
+                { Envelope.PositionMetadataKey, ++position },
+                { Envelope.EventNameMetadataKey, "EventName" }
+            };
+
+            await Sut
+                .Given(
+                    new Envelope<BuildingWasRegistered>(new Envelope(buildingWasRegistered, buildingWasRegisteredMetadata)),
+                    new Envelope<BuildingUnitWasAdded>(new Envelope(buildingUnitWasAdded, buildingUnitWasAddedMetadata)),
+                    new Envelope<BuildingUnitAddressWasAttached>(new Envelope(buildingUnitAddressWasAttached,
+                        buildingUnitAddressWasAttachedMetadata)),
+                    new Envelope<BuildingUnitAddressWasAttached>(
+                        new Envelope(buildingUnitAddressWasAttached, buildingUnitAddressWasAttached2Metadata)))
+                .Then(async context =>
+                {
+                    var buildingVersion = await context.BuildingVersions.FindAsync(position);
+                    buildingVersion.Should().NotBeNull();
+                    var buildingUnitVersion = buildingVersion!.BuildingUnits
+                        .SingleOrDefault(x => x.BuildingUnitId == buildingUnitWasAdded.BuildingUnitId);
+                    buildingUnitVersion.Should().NotBeNull();
+
+                    buildingUnitVersion!.Addresses.Should().HaveCount(2);
+                    buildingUnitVersion.Addresses
+                        .SingleOrDefault(x => x.AddressPersistentLocalId == attachedAddressPersistentLocalId).Should().NotBeNull();
+                    buildingUnitVersion.Addresses
+                        .Single(x => x.AddressPersistentLocalId == attachedAddressPersistentLocalId).Count.Should().Be(2);
+
+                    buildingUnitVersion.VersionTimestamp.Should().Be(buildingUnitAddressWasAttached.Provenance.Timestamp);
+                    buildingUnitVersion.Type.Should().Be("EventName");
+                });
+        }
+
+        [Fact]
         public async Task WhenBuildingUnitAddressWasDetached()
         {
             _fixture.Customize(new WithFixedBuildingUnitIdFromHouseNumber());
 
-            var buildingUnitPersistentLocalId = (int) _fixture.Create<BuildingUnitPersistentLocalId>();
+            var buildingUnitPersistentLocalId = (int)_fixture.Create<BuildingUnitPersistentLocalId>();
 
             var buildingWasRegistered = _fixture.Create<BuildingWasRegistered>();
             var buildingUnitWasAdded = _fixture.Create<BuildingUnitWasAdded>();
@@ -521,24 +592,25 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
             var buildingWasRegisteredMetadata = new Dictionary<string, object>
             {
                 { Envelope.PositionMetadataKey, position },
-                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>() }
             };
             var buildingUnitWasAddedMetadata = new Dictionary<string, object>
             {
                 { Envelope.PositionMetadataKey, ++position },
-                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>() }
             };
             var buildingUnitAddressWasAttachedMetadata = new Dictionary<string, object>
             {
                 { Envelope.PositionMetadataKey, ++position },
-                { Envelope.EventNameMetadataKey, "EventName"}
+                { Envelope.EventNameMetadataKey, "EventName" }
             };
 
             await Sut
                 .Given(
                     new Envelope<BuildingWasRegistered>(new Envelope(buildingWasRegistered, buildingWasRegisteredMetadata)),
                     new Envelope<BuildingUnitWasAdded>(new Envelope(buildingUnitWasAdded, buildingUnitWasAddedMetadata)),
-                    new Envelope<BuildingUnitAddressWasDetached>(new Envelope(buildingUnitAddressWasDetached, buildingUnitAddressWasAttachedMetadata)))
+                    new Envelope<BuildingUnitAddressWasDetached>(new Envelope(buildingUnitAddressWasDetached,
+                        buildingUnitAddressWasAttachedMetadata)))
                 .Then(async context =>
                 {
                     var buildingVersion = await context.BuildingVersions.FindAsync(position);
@@ -550,6 +622,77 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
                     buildingUnitVersion!.Addresses.Should().BeEmpty();
                     buildingUnitVersion.VersionTimestamp.Should().Be(buildingUnitAddressWasDetached.Provenance.Timestamp);
                     buildingUnitVersion.Type.Should().Be("EventName");
+                });
+        }
+
+        [Fact]
+        public async Task WhenBuildingUnitAddressWasDetached_WithAttachedTwice()
+        {
+            _fixture.Customize(new WithFixedBuildingUnitIdFromHouseNumber());
+
+            var buildingUnitPersistentLocalId = (int)_fixture.Create<BuildingUnitPersistentLocalId>();
+
+
+            var buildingWasRegistered = _fixture.Create<BuildingWasRegistered>();
+            var buildingUnitWasAdded = _fixture.Create<BuildingUnitWasAdded>();
+            var buildingUnitAddressWasDetached = new BuildingUnitAddressWasDetached(
+                new BuildingId(buildingUnitWasAdded.BuildingId),
+                new AddressId(buildingUnitWasAdded.AddressId),
+                new BuildingUnitId(buildingUnitWasAdded.BuildingUnitId));
+            ((ISetProvenance)buildingUnitAddressWasDetached).SetProvenance(_fixture.Create<Provenance>());
+
+            var buildingUnitAddressWasAttached = new BuildingUnitAddressWasAttached(
+                new BuildingId(buildingUnitWasAdded.BuildingId),
+                new AddressId(buildingUnitWasAdded.AddressId),
+                new BuildingUnitId(buildingUnitWasAdded.BuildingUnitId));
+            ((ISetProvenance)buildingUnitAddressWasAttached).SetProvenance(_fixture.Create<Provenance>());
+
+            AddBuildingPersistentLocalId();
+            AddBuildingUnitPersistentLocalId(buildingUnitPersistentLocalId);
+            AddAddressPersistentLocalId(buildingUnitWasAdded.AddressId);
+
+            var position = _fixture.Create<long>();
+
+            var buildingWasRegisteredMetadata = new Dictionary<string, object>
+            {
+                { Envelope.PositionMetadataKey, position },
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>() }
+            };
+            var buildingUnitWasAddedMetadata = new Dictionary<string, object>
+            {
+                { Envelope.PositionMetadataKey, ++position },
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>() }
+            };
+            var buildingUnitAddressWasAttachedMetadata = new Dictionary<string, object>
+            {
+                { Envelope.PositionMetadataKey, ++position },
+                { Envelope.EventNameMetadataKey, "EventName" }
+            };
+            var buildingUnitAddressWasDetachedMetadata = new Dictionary<string, object>
+            {
+                { Envelope.PositionMetadataKey, ++position },
+                { Envelope.EventNameMetadataKey, "EventName" }
+            };
+
+            await Sut
+                .Given(
+                    new Envelope<BuildingWasRegistered>(new Envelope(buildingWasRegistered, buildingWasRegisteredMetadata)),
+                    new Envelope<BuildingUnitWasAdded>(new Envelope(buildingUnitWasAdded, buildingUnitWasAddedMetadata)),
+                    new Envelope<BuildingUnitAddressWasAttached>(new Envelope(buildingUnitAddressWasAttached, buildingUnitAddressWasAttachedMetadata)),
+                    new Envelope<BuildingUnitAddressWasDetached>(new Envelope(buildingUnitAddressWasDetached, buildingUnitAddressWasDetachedMetadata)))
+                .Then(async context =>
+                {
+                    var buildingVersion = await context.BuildingVersions.FindAsync(position);
+                    buildingVersion.Should().NotBeNull();
+                    var buildingUnitVersion = buildingVersion!.BuildingUnits
+                        .SingleOrDefault(x => x.BuildingUnitId == buildingUnitWasAdded.BuildingUnitId);
+                    buildingUnitVersion.Should().NotBeNull();
+
+                    buildingUnitVersion!.Addresses.Single().Count.Should().Be(1);
+                    buildingUnitVersion.VersionTimestamp.Should().Be(buildingUnitAddressWasDetached.Provenance.Timestamp);
+                    buildingUnitVersion.Type.Should().Be("EventName");
+
+
                 });
         }
 
@@ -577,17 +720,17 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
             var buildingWasRegisteredMetadata = new Dictionary<string, object>
             {
                 { Envelope.PositionMetadataKey, position },
-                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>() }
             };
             var buildingUnitWasAddedMetadata = new Dictionary<string, object>
             {
                 { Envelope.PositionMetadataKey, ++position },
-                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>() }
             };
             var buildingUnitWasReaddressedMetadata = new Dictionary<string, object>
             {
                 { Envelope.PositionMetadataKey, ++position },
-                { Envelope.EventNameMetadataKey, "EventName"}
+                { Envelope.EventNameMetadataKey, "EventName" }
             };
 
             await Sut
@@ -617,7 +760,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
         {
             _fixture.Customize(new WithFixedBuildingUnitIdFromHouseNumber());
 
-            var buildingUnitPersistentLocalId = (int) _fixture.Create<BuildingUnitPersistentLocalId>();
+            var buildingUnitPersistentLocalId = (int)_fixture.Create<BuildingUnitPersistentLocalId>();
 
             var buildingWasRegistered = _fixture.Create<BuildingWasRegistered>();
             var buildingUnitWasAdded = _fixture.Create<BuildingUnitWasAdded>();
@@ -632,17 +775,17 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
             var buildingWasRegisteredMetadata = new Dictionary<string, object>
             {
                 { Envelope.PositionMetadataKey, position },
-                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>() }
             };
             var buildingUnitWasAddedMetadata = new Dictionary<string, object>
             {
                 { Envelope.PositionMetadataKey, ++position },
-                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>() }
             };
             var buildingUnitPositionWasAppointedByAdministratorMetadata = new Dictionary<string, object>
             {
                 { Envelope.PositionMetadataKey, ++position },
-                { Envelope.EventNameMetadataKey, "EventName"}
+                { Envelope.EventNameMetadataKey, "EventName" }
             };
 
             await Sut
@@ -651,7 +794,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
                     new Envelope<BuildingUnitWasAdded>(new Envelope(buildingUnitWasAdded, buildingUnitWasAddedMetadata)),
                     new Envelope<BuildingUnitPositionWasAppointedByAdministrator>(
                         new Envelope(buildingUnitPositionWasAppointedByAdministrator, buildingUnitPositionWasAppointedByAdministratorMetadata))
-                    )
+                )
                 .Then(async context =>
                 {
                     var buildingVersion = await context.BuildingVersions.FindAsync(position);
@@ -674,11 +817,12 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
         {
             _fixture.Customize(new WithFixedBuildingUnitIdFromHouseNumber());
 
-            var buildingUnitPersistentLocalId = (int) _fixture.Create<BuildingUnitPersistentLocalId>();
+            var buildingUnitPersistentLocalId = (int)_fixture.Create<BuildingUnitPersistentLocalId>();
 
             var buildingWasRegistered = _fixture.Create<BuildingWasRegistered>();
             var buildingUnitWasAdded = _fixture.Create<BuildingUnitWasAdded>();
-            var buildingUnitPositionWasCorrectedToAppointedByAdministrator = _fixture.Create<BuildingUnitPositionWasCorrectedToAppointedByAdministrator>();
+            var buildingUnitPositionWasCorrectedToAppointedByAdministrator =
+                _fixture.Create<BuildingUnitPositionWasCorrectedToAppointedByAdministrator>();
 
             AddBuildingPersistentLocalId();
             AddBuildingUnitPersistentLocalId(buildingUnitPersistentLocalId);
@@ -689,17 +833,17 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
             var buildingWasRegisteredMetadata = new Dictionary<string, object>
             {
                 { Envelope.PositionMetadataKey, position },
-                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>() }
             };
             var buildingUnitWasAddedMetadata = new Dictionary<string, object>
             {
                 { Envelope.PositionMetadataKey, ++position },
-                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>() }
             };
             var buildingUnitPositionWasCorrectedToAppointedByAdministratorMetadata = new Dictionary<string, object>
             {
                 { Envelope.PositionMetadataKey, ++position },
-                { Envelope.EventNameMetadataKey, "EventName"}
+                { Envelope.EventNameMetadataKey, "EventName" }
             };
 
             await Sut
@@ -707,8 +851,9 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
                     new Envelope<BuildingWasRegistered>(new Envelope(buildingWasRegistered, buildingWasRegisteredMetadata)),
                     new Envelope<BuildingUnitWasAdded>(new Envelope(buildingUnitWasAdded, buildingUnitWasAddedMetadata)),
                     new Envelope<BuildingUnitPositionWasCorrectedToAppointedByAdministrator>(
-                        new Envelope(buildingUnitPositionWasCorrectedToAppointedByAdministrator, buildingUnitPositionWasCorrectedToAppointedByAdministratorMetadata))
-                    )
+                        new Envelope(buildingUnitPositionWasCorrectedToAppointedByAdministrator,
+                            buildingUnitPositionWasCorrectedToAppointedByAdministratorMetadata))
+                )
                 .Then(async context =>
                 {
                     var buildingVersion = await context.BuildingVersions.FindAsync(position);
@@ -731,7 +876,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
         {
             _fixture.Customize(new WithFixedBuildingUnitIdFromHouseNumber());
 
-            var buildingUnitPersistentLocalId = (int) _fixture.Create<BuildingUnitPersistentLocalId>();
+            var buildingUnitPersistentLocalId = (int)_fixture.Create<BuildingUnitPersistentLocalId>();
 
             var buildingWasRegistered = _fixture.Create<BuildingWasRegistered>();
             var buildingUnitWasAdded = _fixture.Create<BuildingUnitWasAdded>();
@@ -746,17 +891,17 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
             var buildingWasRegisteredMetadata = new Dictionary<string, object>
             {
                 { Envelope.PositionMetadataKey, position },
-                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>() }
             };
             var buildingUnitWasAddedMetadata = new Dictionary<string, object>
             {
                 { Envelope.PositionMetadataKey, ++position },
-                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>() }
             };
             var buildingUnitPositionWasCorrectedToDerivedFromObjectMetadata = new Dictionary<string, object>
             {
                 { Envelope.PositionMetadataKey, ++position },
-                { Envelope.EventNameMetadataKey, "EventName"}
+                { Envelope.EventNameMetadataKey, "EventName" }
             };
 
             await Sut
@@ -764,8 +909,9 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
                     new Envelope<BuildingWasRegistered>(new Envelope(buildingWasRegistered, buildingWasRegisteredMetadata)),
                     new Envelope<BuildingUnitWasAdded>(new Envelope(buildingUnitWasAdded, buildingUnitWasAddedMetadata)),
                     new Envelope<BuildingUnitPositionWasCorrectedToDerivedFromObject>(
-                        new Envelope(buildingUnitPositionWasCorrectedToDerivedFromObject, buildingUnitPositionWasCorrectedToDerivedFromObjectMetadata))
-                    )
+                        new Envelope(buildingUnitPositionWasCorrectedToDerivedFromObject,
+                            buildingUnitPositionWasCorrectedToDerivedFromObjectMetadata))
+                )
                 .Then(async context =>
                 {
                     var buildingVersion = await context.BuildingVersions.FindAsync(position);
@@ -788,7 +934,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
         {
             _fixture.Customize(new WithFixedBuildingUnitIdFromHouseNumber());
 
-            var buildingUnitPersistentLocalId = (int) _fixture.Create<BuildingUnitPersistentLocalId>();
+            var buildingUnitPersistentLocalId = (int)_fixture.Create<BuildingUnitPersistentLocalId>();
 
             var buildingWasRegistered = _fixture.Create<BuildingWasRegistered>();
             var buildingUnitWasAdded = _fixture.Create<BuildingUnitWasAdded>();
@@ -803,17 +949,17 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
             var buildingWasRegisteredMetadata = new Dictionary<string, object>
             {
                 { Envelope.PositionMetadataKey, position },
-                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>() }
             };
             var buildingUnitWasAddedMetadata = new Dictionary<string, object>
             {
                 { Envelope.PositionMetadataKey, ++position },
-                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>() }
             };
             var buildingUnitPositionWasDerivedFromObjectMetadata = new Dictionary<string, object>
             {
                 { Envelope.PositionMetadataKey, ++position },
-                { Envelope.EventNameMetadataKey, "EventName"}
+                { Envelope.EventNameMetadataKey, "EventName" }
             };
 
             await Sut
@@ -822,7 +968,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
                     new Envelope<BuildingUnitWasAdded>(new Envelope(buildingUnitWasAdded, buildingUnitWasAddedMetadata)),
                     new Envelope<BuildingUnitPositionWasDerivedFromObject>(
                         new Envelope(buildingUnitPositionWasDerivedFromObject, buildingUnitPositionWasDerivedFromObjectMetadata))
-                    )
+                )
                 .Then(async context =>
                 {
                     var buildingVersion = await context.BuildingVersions.FindAsync(position);
@@ -845,7 +991,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
         {
             _fixture.Customize(new WithFixedBuildingUnitIdFromHouseNumber());
 
-            var buildingUnitPersistentLocalId = (int) _fixture.Create<BuildingUnitPersistentLocalId>();
+            var buildingUnitPersistentLocalId = (int)_fixture.Create<BuildingUnitPersistentLocalId>();
 
             var buildingWasRegistered = _fixture.Create<BuildingWasRegistered>();
             var buildingUnitWasAdded = _fixture.Create<BuildingUnitWasAdded>();
@@ -861,22 +1007,22 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
             var buildingWasRegisteredMetadata = new Dictionary<string, object>
             {
                 { Envelope.PositionMetadataKey, position },
-                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>() }
             };
             var buildingUnitWasAddedMetadata = new Dictionary<string, object>
             {
                 { Envelope.PositionMetadataKey, ++position },
-                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>() }
             };
             var buildingUnitWasRealizedMetadata = new Dictionary<string, object>
             {
                 { Envelope.PositionMetadataKey, ++position },
-                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>() }
             };
             var buildingUnitPositionWasDerivedFromObjectMetadata = new Dictionary<string, object>
             {
                 { Envelope.PositionMetadataKey, ++position },
-                { Envelope.EventNameMetadataKey, "EventName"}
+                { Envelope.EventNameMetadataKey, "EventName" }
             };
 
             await Sut
@@ -884,8 +1030,9 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
                     new Envelope<BuildingWasRegistered>(new Envelope(buildingWasRegistered, buildingWasRegisteredMetadata)),
                     new Envelope<BuildingUnitWasAdded>(new Envelope(buildingUnitWasAdded, buildingUnitWasAddedMetadata)),
                     new Envelope<BuildingUnitWasRealized>(new Envelope(buildingUnitWasRealized, buildingUnitWasRealizedMetadata)),
-                    new Envelope<BuildingUnitStatusWasRemoved>(new Envelope(buildingUnitStatusWasRemoved, buildingUnitPositionWasDerivedFromObjectMetadata))
-                    )
+                    new Envelope<BuildingUnitStatusWasRemoved>(new Envelope(buildingUnitStatusWasRemoved,
+                        buildingUnitPositionWasDerivedFromObjectMetadata))
+                )
                 .Then(async context =>
                 {
                     var buildingVersion = await context.BuildingVersions.FindAsync(position);
@@ -906,7 +1053,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
         {
             _fixture.Customize(new WithFixedBuildingUnitIdFromHouseNumber());
 
-            var buildingUnitPersistentLocalId = (int) _fixture.Create<BuildingUnitPersistentLocalId>();
+            var buildingUnitPersistentLocalId = (int)_fixture.Create<BuildingUnitPersistentLocalId>();
 
             var buildingWasRegistered = _fixture.Create<BuildingWasRegistered>();
             var buildingUnitWasAdded = _fixture.Create<BuildingUnitWasAdded>();
@@ -921,17 +1068,17 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
             var buildingWasRegisteredMetadata = new Dictionary<string, object>
             {
                 { Envelope.PositionMetadataKey, position },
-                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>() }
             };
             var buildingUnitWasAddedMetadata = new Dictionary<string, object>
             {
                 { Envelope.PositionMetadataKey, ++position },
-                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>() }
             };
             var buildingUnitWasRealizedMetadata = new Dictionary<string, object>
             {
                 { Envelope.PositionMetadataKey, ++position },
-                { Envelope.EventNameMetadataKey, "EventName"}
+                { Envelope.EventNameMetadataKey, "EventName" }
             };
 
             await Sut
@@ -959,7 +1106,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
         {
             _fixture.Customize(new WithFixedBuildingUnitIdFromHouseNumber());
 
-            var buildingUnitPersistentLocalId = (int) _fixture.Create<BuildingUnitPersistentLocalId>();
+            var buildingUnitPersistentLocalId = (int)_fixture.Create<BuildingUnitPersistentLocalId>();
 
             var buildingWasRegistered = _fixture.Create<BuildingWasRegistered>();
             var buildingUnitWasAdded = _fixture.Create<BuildingUnitWasAdded>();
@@ -974,17 +1121,17 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
             var buildingWasRegisteredMetadata = new Dictionary<string, object>
             {
                 { Envelope.PositionMetadataKey, position },
-                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>() }
             };
             var buildingUnitWasAddedMetadata = new Dictionary<string, object>
             {
                 { Envelope.PositionMetadataKey, ++position },
-                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>() }
             };
             var buildingUnitWasRetiredMetadata = new Dictionary<string, object>
             {
                 { Envelope.PositionMetadataKey, ++position },
-                { Envelope.EventNameMetadataKey, "EventName"}
+                { Envelope.EventNameMetadataKey, "EventName" }
             };
 
             await Sut
@@ -1012,7 +1159,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
         {
             _fixture.Customize(new WithFixedBuildingUnitIdFromHouseNumber());
 
-            var buildingUnitPersistentLocalId = (int) _fixture.Create<BuildingUnitPersistentLocalId>();
+            var buildingUnitPersistentLocalId = (int)_fixture.Create<BuildingUnitPersistentLocalId>();
 
             var buildingWasRegistered = _fixture.Create<BuildingWasRegistered>();
             var buildingUnitWasAdded = _fixture.Create<BuildingUnitWasAdded>();
@@ -1027,24 +1174,25 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
             var buildingWasRegisteredMetadata = new Dictionary<string, object>
             {
                 { Envelope.PositionMetadataKey, position },
-                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>() }
             };
             var buildingUnitWasAddedMetadata = new Dictionary<string, object>
             {
                 { Envelope.PositionMetadataKey, ++position },
-                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>() }
             };
             var buildingUnitWasRetiredByParentMetadata = new Dictionary<string, object>
             {
                 { Envelope.PositionMetadataKey, ++position },
-                { Envelope.EventNameMetadataKey, "EventName"}
+                { Envelope.EventNameMetadataKey, "EventName" }
             };
 
             await Sut
                 .Given(
                     new Envelope<BuildingWasRegistered>(new Envelope(buildingWasRegistered, buildingWasRegisteredMetadata)),
                     new Envelope<BuildingUnitWasAdded>(new Envelope(buildingUnitWasAdded, buildingUnitWasAddedMetadata)),
-                    new Envelope<BuildingUnitWasRetiredByParent>(new Envelope(buildingUnitWasRetiredByParent, buildingUnitWasRetiredByParentMetadata)))
+                    new Envelope<BuildingUnitWasRetiredByParent>(new Envelope(buildingUnitWasRetiredByParent,
+                        buildingUnitWasRetiredByParentMetadata)))
                 .Then(async context =>
                 {
                     var buildingVersion = await context.BuildingVersions.FindAsync(position);
@@ -1065,7 +1213,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
         {
             _fixture.Customize(new WithFixedBuildingUnitIdFromHouseNumber());
 
-            var buildingUnitPersistentLocalId = (int) _fixture.Create<BuildingUnitPersistentLocalId>();
+            var buildingUnitPersistentLocalId = (int)_fixture.Create<BuildingUnitPersistentLocalId>();
 
             var buildingWasRegistered = _fixture.Create<BuildingWasRegistered>();
             var buildingUnitWasAdded = _fixture.Create<BuildingUnitWasAdded>();
@@ -1080,17 +1228,17 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
             var buildingWasRegisteredMetadata = new Dictionary<string, object>
             {
                 { Envelope.PositionMetadataKey, position },
-                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>() }
             };
             var buildingUnitWasAddedMetadata = new Dictionary<string, object>
             {
                 { Envelope.PositionMetadataKey, ++position },
-                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>() }
             };
             var buildingUnitWasNotRealizedMetadata = new Dictionary<string, object>
             {
                 { Envelope.PositionMetadataKey, ++position },
-                { Envelope.EventNameMetadataKey, "EventName"}
+                { Envelope.EventNameMetadataKey, "EventName" }
             };
 
             await Sut
@@ -1118,7 +1266,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
         {
             _fixture.Customize(new WithFixedBuildingUnitIdFromHouseNumber());
 
-            var buildingUnitPersistentLocalId = (int) _fixture.Create<BuildingUnitPersistentLocalId>();
+            var buildingUnitPersistentLocalId = (int)_fixture.Create<BuildingUnitPersistentLocalId>();
 
             var buildingWasRegistered = _fixture.Create<BuildingWasRegistered>();
             var buildingUnitWasAdded = _fixture.Create<BuildingUnitWasAdded>();
@@ -1133,24 +1281,25 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
             var buildingWasRegisteredMetadata = new Dictionary<string, object>
             {
                 { Envelope.PositionMetadataKey, position },
-                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>() }
             };
             var buildingUnitWasAddedMetadata = new Dictionary<string, object>
             {
                 { Envelope.PositionMetadataKey, ++position },
-                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>() }
             };
             var buildingUnitWasNotRealizedByParentMetadata = new Dictionary<string, object>
             {
                 { Envelope.PositionMetadataKey, ++position },
-                { Envelope.EventNameMetadataKey, "EventName"}
+                { Envelope.EventNameMetadataKey, "EventName" }
             };
 
             await Sut
                 .Given(
                     new Envelope<BuildingWasRegistered>(new Envelope(buildingWasRegistered, buildingWasRegisteredMetadata)),
                     new Envelope<BuildingUnitWasAdded>(new Envelope(buildingUnitWasAdded, buildingUnitWasAddedMetadata)),
-                    new Envelope<BuildingUnitWasNotRealizedByParent>(new Envelope(buildingUnitWasNotRealizedByParent, buildingUnitWasNotRealizedByParentMetadata)))
+                    new Envelope<BuildingUnitWasNotRealizedByParent>(new Envelope(buildingUnitWasNotRealizedByParent,
+                        buildingUnitWasNotRealizedByParentMetadata)))
                 .Then(async context =>
                 {
                     var buildingVersion = await context.BuildingVersions.FindAsync(position);
@@ -1171,7 +1320,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
         {
             _fixture.Customize(new WithFixedBuildingUnitIdFromHouseNumber());
 
-            var buildingUnitPersistentLocalId = (int) _fixture.Create<BuildingUnitPersistentLocalId>();
+            var buildingUnitPersistentLocalId = (int)_fixture.Create<BuildingUnitPersistentLocalId>();
 
             var buildingWasRegistered = _fixture.Create<BuildingWasRegistered>();
             var buildingUnitWasAdded = _fixture.Create<BuildingUnitWasAdded>();
@@ -1186,17 +1335,17 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
             var buildingWasRegisteredMetadata = new Dictionary<string, object>
             {
                 { Envelope.PositionMetadataKey, position },
-                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>() }
             };
             var buildingUnitWasAddedMetadata = new Dictionary<string, object>
             {
                 { Envelope.PositionMetadataKey, ++position },
-                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>() }
             };
             var buildingUnitWasPlannedMetadata = new Dictionary<string, object>
             {
                 { Envelope.PositionMetadataKey, ++position },
-                { Envelope.EventNameMetadataKey, "EventName"}
+                { Envelope.EventNameMetadataKey, "EventName" }
             };
 
             await Sut
@@ -1224,7 +1373,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
         {
             _fixture.Customize(new WithFixedBuildingUnitIdFromHouseNumber());
 
-            var buildingUnitPersistentLocalId = (int) _fixture.Create<BuildingUnitPersistentLocalId>();
+            var buildingUnitPersistentLocalId = (int)_fixture.Create<BuildingUnitPersistentLocalId>();
 
             var buildingWasRegistered = _fixture.Create<BuildingWasRegistered>();
             var buildingUnitWasAdded = _fixture.Create<BuildingUnitWasAdded>();
@@ -1239,24 +1388,25 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
             var buildingWasRegisteredMetadata = new Dictionary<string, object>
             {
                 { Envelope.PositionMetadataKey, position },
-                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>() }
             };
             var buildingUnitWasAddedMetadata = new Dictionary<string, object>
             {
                 { Envelope.PositionMetadataKey, ++position },
-                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>() }
             };
             var buildingUnitWasCorrectedToRealizedMetadata = new Dictionary<string, object>
             {
                 { Envelope.PositionMetadataKey, ++position },
-                { Envelope.EventNameMetadataKey, "EventName"}
+                { Envelope.EventNameMetadataKey, "EventName" }
             };
 
             await Sut
                 .Given(
                     new Envelope<BuildingWasRegistered>(new Envelope(buildingWasRegistered, buildingWasRegisteredMetadata)),
                     new Envelope<BuildingUnitWasAdded>(new Envelope(buildingUnitWasAdded, buildingUnitWasAddedMetadata)),
-                    new Envelope<BuildingUnitWasCorrectedToRealized>(new Envelope(buildingUnitWasCorrectedToRealized, buildingUnitWasCorrectedToRealizedMetadata)))
+                    new Envelope<BuildingUnitWasCorrectedToRealized>(new Envelope(buildingUnitWasCorrectedToRealized,
+                        buildingUnitWasCorrectedToRealizedMetadata)))
                 .Then(async context =>
                 {
                     var buildingVersion = await context.BuildingVersions.FindAsync(position);
@@ -1277,7 +1427,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
         {
             _fixture.Customize(new WithFixedBuildingUnitIdFromHouseNumber());
 
-            var buildingUnitPersistentLocalId = (int) _fixture.Create<BuildingUnitPersistentLocalId>();
+            var buildingUnitPersistentLocalId = (int)_fixture.Create<BuildingUnitPersistentLocalId>();
 
             var buildingWasRegistered = _fixture.Create<BuildingWasRegistered>();
             var buildingUnitWasAdded = _fixture.Create<BuildingUnitWasAdded>();
@@ -1292,24 +1442,25 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
             var buildingWasRegisteredMetadata = new Dictionary<string, object>
             {
                 { Envelope.PositionMetadataKey, position },
-                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>() }
             };
             var buildingUnitWasAddedMetadata = new Dictionary<string, object>
             {
                 { Envelope.PositionMetadataKey, ++position },
-                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>() }
             };
             var buildingUnitWasCorrectedToNotRealizedMetadata = new Dictionary<string, object>
             {
                 { Envelope.PositionMetadataKey, ++position },
-                { Envelope.EventNameMetadataKey, "EventName"}
+                { Envelope.EventNameMetadataKey, "EventName" }
             };
 
             await Sut
                 .Given(
                     new Envelope<BuildingWasRegistered>(new Envelope(buildingWasRegistered, buildingWasRegisteredMetadata)),
                     new Envelope<BuildingUnitWasAdded>(new Envelope(buildingUnitWasAdded, buildingUnitWasAddedMetadata)),
-                    new Envelope<BuildingUnitWasCorrectedToNotRealized>(new Envelope(buildingUnitWasCorrectedToNotRealized, buildingUnitWasCorrectedToNotRealizedMetadata)))
+                    new Envelope<BuildingUnitWasCorrectedToNotRealized>(new Envelope(buildingUnitWasCorrectedToNotRealized,
+                        buildingUnitWasCorrectedToNotRealizedMetadata)))
                 .Then(async context =>
                 {
                     var buildingVersion = await context.BuildingVersions.FindAsync(position);
@@ -1330,7 +1481,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
         {
             _fixture.Customize(new WithFixedBuildingUnitIdFromHouseNumber());
 
-            var buildingUnitPersistentLocalId = (int) _fixture.Create<BuildingUnitPersistentLocalId>();
+            var buildingUnitPersistentLocalId = (int)_fixture.Create<BuildingUnitPersistentLocalId>();
 
             var buildingWasRegistered = _fixture.Create<BuildingWasRegistered>();
             var buildingUnitWasAdded = _fixture.Create<BuildingUnitWasAdded>();
@@ -1345,24 +1496,25 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
             var buildingWasRegisteredMetadata = new Dictionary<string, object>
             {
                 { Envelope.PositionMetadataKey, position },
-                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>() }
             };
             var buildingUnitWasAddedMetadata = new Dictionary<string, object>
             {
                 { Envelope.PositionMetadataKey, ++position },
-                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>() }
             };
             var buildingUnitWasCorrectedToRetiredMetadata = new Dictionary<string, object>
             {
                 { Envelope.PositionMetadataKey, ++position },
-                { Envelope.EventNameMetadataKey, "EventName"}
+                { Envelope.EventNameMetadataKey, "EventName" }
             };
 
             await Sut
                 .Given(
                     new Envelope<BuildingWasRegistered>(new Envelope(buildingWasRegistered, buildingWasRegisteredMetadata)),
                     new Envelope<BuildingUnitWasAdded>(new Envelope(buildingUnitWasAdded, buildingUnitWasAddedMetadata)),
-                    new Envelope<BuildingUnitWasCorrectedToRetired>(new Envelope(buildingUnitWasCorrectedToRetired, buildingUnitWasCorrectedToRetiredMetadata)))
+                    new Envelope<BuildingUnitWasCorrectedToRetired>(new Envelope(buildingUnitWasCorrectedToRetired,
+                        buildingUnitWasCorrectedToRetiredMetadata)))
                 .Then(async context =>
                 {
                     var buildingVersion = await context.BuildingVersions.FindAsync(position);
@@ -1383,7 +1535,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
         {
             _fixture.Customize(new WithFixedBuildingUnitIdFromHouseNumber());
 
-            var buildingUnitPersistentLocalId = (int) _fixture.Create<BuildingUnitPersistentLocalId>();
+            var buildingUnitPersistentLocalId = (int)_fixture.Create<BuildingUnitPersistentLocalId>();
 
             var buildingWasRegistered = _fixture.Create<BuildingWasRegistered>();
             var buildingUnitWasAdded = _fixture.Create<BuildingUnitWasAdded>();
@@ -1398,24 +1550,25 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
             var buildingWasRegisteredMetadata = new Dictionary<string, object>
             {
                 { Envelope.PositionMetadataKey, position },
-                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>() }
             };
             var buildingUnitWasAddedMetadata = new Dictionary<string, object>
             {
                 { Envelope.PositionMetadataKey, ++position },
-                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>() }
             };
             var buildingUnitWasCorrectedToPlannedMetadata = new Dictionary<string, object>
             {
                 { Envelope.PositionMetadataKey, ++position },
-                { Envelope.EventNameMetadataKey, "EventName"}
+                { Envelope.EventNameMetadataKey, "EventName" }
             };
 
             await Sut
                 .Given(
                     new Envelope<BuildingWasRegistered>(new Envelope(buildingWasRegistered, buildingWasRegisteredMetadata)),
                     new Envelope<BuildingUnitWasAdded>(new Envelope(buildingUnitWasAdded, buildingUnitWasAddedMetadata)),
-                    new Envelope<BuildingUnitWasCorrectedToPlanned>(new Envelope(buildingUnitWasCorrectedToPlanned, buildingUnitWasCorrectedToPlannedMetadata)))
+                    new Envelope<BuildingUnitWasCorrectedToPlanned>(new Envelope(buildingUnitWasCorrectedToPlanned,
+                        buildingUnitWasCorrectedToPlannedMetadata)))
                 .Then(async context =>
                 {
                     var buildingVersion = await context.BuildingVersions.FindAsync(position);

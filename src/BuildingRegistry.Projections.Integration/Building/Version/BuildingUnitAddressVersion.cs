@@ -10,8 +10,12 @@
         public int BuildingUnitPersistentLocalId { get; set; }
         public int AddressPersistentLocalId { get; set; }
 
+        public int Count { get; set; }
+
         public BuildingUnitAddressVersion()
-        { }
+        {
+            Count = 1;
+        }
 
         public BuildingUnitAddressVersion CloneAndApplyEventInfo(
             long newPosition)
@@ -20,7 +24,8 @@
             {
                 Position = newPosition,
                 BuildingUnitPersistentLocalId = BuildingUnitPersistentLocalId,
-                AddressPersistentLocalId = AddressPersistentLocalId
+                AddressPersistentLocalId = AddressPersistentLocalId,
+                Count = Count
             };
 
             return newItem;
@@ -47,6 +52,11 @@
             builder.Property(x => x.Position).HasColumnName("position");
             builder.Property(x => x.BuildingUnitPersistentLocalId).HasColumnName("building_unit_persistent_local_id");
             builder.Property(x => x.AddressPersistentLocalId).HasColumnName("address_persistent_local_id");
+
+            builder.Property(e => e.Count)
+                .HasColumnName("count")
+                .HasDefaultValue(1)
+                .IsRequired();
 
             builder.HasIndex(x => x.Position);
             builder.HasIndex(x => x.BuildingUnitPersistentLocalId);
