@@ -258,17 +258,22 @@ namespace BuildingRegistry.Projections.Integration.Building.Version
                         var buildingUnitVersion =
                             building.BuildingUnits.Single(x => x.BuildingUnitId == message.Message.To);
 
-                        if (buildingUnitVersion.Addresses.Any(x => x.AddressPersistentLocalId == addressPersistentLocalId.Value))
-                        {
-                            return;
-                        }
+                        var buildingUnitAddress =
+                            buildingUnitVersion.Addresses.FirstOrDefault(x => x.AddressPersistentLocalId == addressPersistentLocalId.Value);
 
-                        buildingUnitVersion.Addresses.Add(new BuildingUnitAddressVersion
+                        if (buildingUnitAddress is not null)
                         {
-                            Position = message.Position,
-                            BuildingUnitPersistentLocalId = buildingUnitVersion.BuildingUnitPersistentLocalId,
-                            AddressPersistentLocalId = addressPersistentLocalId.Value
-                        });
+                            buildingUnitAddress.Count++;
+                        }
+                        else
+                        {
+                            buildingUnitVersion.Addresses.Add(new BuildingUnitAddressVersion
+                            {
+                                Position = message.Position,
+                                BuildingUnitPersistentLocalId = buildingUnitVersion.BuildingUnitPersistentLocalId,
+                                AddressPersistentLocalId = addressPersistentLocalId.Value
+                            });
+                        }
 
                         buildingUnitVersion.VersionTimestamp = message.Message.Provenance.Timestamp;
                     },
@@ -298,11 +303,21 @@ namespace BuildingRegistry.Projections.Integration.Building.Version
                             var address = buildingUnitVersion.Addresses
                                 .SingleOrDefault(x => x.AddressPersistentLocalId == addressPersistentLocalId.Value);
 
-                            if (address is not null)
+                            if (address is null)
+                            {
+                                continue;
+                            }
+
+                            if (address.Count > 1)
+                            {
+                                address.Count--;
+                            }
+                            else
                             {
                                 buildingUnitVersion.Addresses.Remove(address);
-                                changed = true;
                             }
+
+                            changed = true;
                         }
 
                         if (changed)
