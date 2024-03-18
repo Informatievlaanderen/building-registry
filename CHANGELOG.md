@@ -1,3 +1,10 @@
+# [3.107.0](https://github.com/informatievlaanderen/building-registry/compare/v3.106.5...v3.107.0) (2024-03-18)
+
+
+### Features
+
+* notify outlined realized building GAWR-2327 ([246a485](https://github.com/informatievlaanderen/building-registry/commit/246a485eded375f2967db6ee861262993fa2f148))
+
 ## [3.106.5](https://github.com/informatievlaanderen/building-registry/compare/v3.106.4...v3.106.5) (2024-03-18)
 
 
