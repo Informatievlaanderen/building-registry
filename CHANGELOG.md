@@ -1,3 +1,10 @@
+## [3.106.5](https://github.com/informatievlaanderen/building-registry/compare/v3.106.4...v3.106.5) (2024-03-18)
+
+
+### Bug Fixes
+
+* add count to buildingunit address version ([cdb685c](https://github.com/informatievlaanderen/building-registry/commit/cdb685cb4047a37f111fcbba54d19e7b0a96bfde))
+
 ## [3.106.4](https://github.com/informatievlaanderen/building-registry/compare/v3.106.3...v3.106.4) (2024-03-15)
 
 
