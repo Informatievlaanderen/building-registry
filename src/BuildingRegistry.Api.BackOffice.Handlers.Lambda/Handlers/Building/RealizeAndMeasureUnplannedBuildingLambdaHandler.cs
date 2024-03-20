@@ -1,14 +1,11 @@
 namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.Building
 {
-    using System.Threading;
-    using System.Threading.Tasks;
     using Abstractions;
     using Abstractions.Building;
     using Abstractions.Validation;
     using Autofac;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
-    using Be.Vlaanderen.Basisregisters.Sqs.Exceptions;
-    using Be.Vlaanderen.Basisregisters.Sqs.Lambda.Handlers;
+    using Be.Vlaanderen.Basisregisters.CommandHandling.Idempotency;
     using Be.Vlaanderen.Basisregisters.Sqs.Lambda.Infrastructure;
     using Be.Vlaanderen.Basisregisters.Sqs.Responses;
     using BuildingRegistry.Building;
@@ -57,7 +54,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.Building
             _toggleAutomaticBuildingUnitCreationEnabled = configuration.GetValue<bool>("AutomaticBuildingUnitCreationToggle", false);
         }
 
-        protected override async Task<ETagResponse> InnerHandle(RealizeAndMeasureUnplannedBuildingLambdaRequest request,
+        protected override async Task<object> InnerHandle(RealizeAndMeasureUnplannedBuildingLambdaRequest request,
             CancellationToken cancellationToken)
         {
             var cmd = request.ToCommand();

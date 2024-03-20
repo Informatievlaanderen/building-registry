@@ -15,14 +15,14 @@ licenseUrl https://opensource.org/licenses/EUPL-1.2
 description Building Registry.
 
 dependencies
-  framework: net6.0
+  framework: net8.0
     Be.Vlaanderen.Basisregisters.GrAr.Legacy >= LOCKEDVERSION
 
 files
-  BuildingRegistry.Api.BackOffice.dll => lib\net6.0
-  BuildingRegistry.Api.BackOffice.pdb => lib\net6.0
-  BuildingRegistry.Api.BackOffice.xml => lib\net6.0
+  BuildingRegistry.Api.BackOffice.dll => lib\net8.0
+  BuildingRegistry.Api.BackOffice.pdb => lib\net8.0
+  BuildingRegistry.Api.BackOffice.xml => lib\net8.0
   BuildingRegistry.Api.BackOffice.xml => content
 
-  BuildingRegistry.dll => lib\net6.0
-  BuildingRegistry.pdb => lib\net6.0
+  BuildingRegistry.dll => lib\net8.0
+  BuildingRegistry.pdb => lib\net8.0

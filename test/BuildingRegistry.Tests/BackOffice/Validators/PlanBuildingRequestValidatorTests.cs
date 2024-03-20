@@ -1,8 +1,8 @@
 namespace BuildingRegistry.Tests.BackOffice.Validators
 {
+    using System.Threading.Tasks;
     using BuildingRegistry.Api.BackOffice.Abstractions.Building.Requests;
     using BuildingRegistry.Api.BackOffice.Abstractions.Building.Validators;
-    using BuildingRegistry.Api.BackOffice.Abstractions.Validation;
     using FluentValidation.TestHelper;
     using Xunit;
 
@@ -16,9 +16,9 @@ namespace BuildingRegistry.Tests.BackOffice.Validators
         }
 
         [Fact]
-        public void GivenInvalidGeometry_ThenReturnsExpectedFailure()
+        public async Task GivenInvalidGeometry_ThenReturnsExpectedFailure()
         {
-            var result = _validator.TestValidate(new PlanBuildingRequest
+            var result = await _validator.TestValidateAsync(new PlanBuildingRequest
             {
                 GeometriePolygoon = ""
             });

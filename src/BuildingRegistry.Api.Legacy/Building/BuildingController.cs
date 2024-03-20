@@ -7,6 +7,7 @@ namespace BuildingRegistry.Api.Legacy.Building
     using System.Threading;
     using System.Threading.Tasks;
     using System.Xml;
+    using Asp.Versioning;
     using Be.Vlaanderen.Basisregisters.Api;
     using Be.Vlaanderen.Basisregisters.Api.ETag;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;

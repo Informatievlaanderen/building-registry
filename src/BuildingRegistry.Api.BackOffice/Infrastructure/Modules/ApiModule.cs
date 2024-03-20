@@ -7,19 +7,18 @@ namespace BuildingRegistry.Api.BackOffice.Infrastructure.Modules
     using Autofac;
     using Autofac.Extensions.DependencyInjection;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
+    using Be.Vlaanderen.Basisregisters.Auth.AcmIdm;
     using Be.Vlaanderen.Basisregisters.CommandHandling.Idempotency;
-    using Be.Vlaanderen.Basisregisters.DataDog.Tracing.Microsoft;
-    using Be.Vlaanderen.Basisregisters.DependencyInjection;
+    using Be.Vlaanderen.Basisregisters.DataDog.Tracing.Autofac;
+    using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
+    using Be.Vlaanderen.Basisregisters.GrAr.Provenance.AcmIdm;
     using BuildingRegistry.Infrastructure;
+    using BuildingRegistry.Infrastructure.Modules;
+    using Consumer.Address;
+    using Microsoft.AspNetCore.Mvc.Infrastructure;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Logging;
-    using Consumer.Address;
-    using Be.Vlaanderen.Basisregisters.Auth.AcmIdm;
-    using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
-    using Be.Vlaanderen.Basisregisters.GrAr.Provenance.AcmIdm;
-    using BuildingRegistry.Infrastructure.Modules;
-    using Microsoft.AspNetCore.Mvc.Infrastructure;
 
     public class ApiModule : Module
     {
@@ -41,7 +40,7 @@ namespace BuildingRegistry.Api.BackOffice.Infrastructure.Modules
 
         protected override void Load(ContainerBuilder builder)
         {
-            _services.RegisterModule(new DataDogModule(_configuration));
+            builder.RegisterModule(new DataDogModule(_configuration));
 
             builder
                 .RegisterType<ProblemDetailsHelper>()
@@ -77,6 +76,7 @@ namespace BuildingRegistry.Api.BackOffice.Infrastructure.Modules
             builder
                 .RegisterModule(new BackOfficeModule(_configuration, _services, _loggerFactory))
                 .RegisterModule(new MediatRModule())
+                .RegisterModule(new FluentValidationModule())
                 .RegisterModule(new AggregateSourceModule(_configuration))
                 .RegisterModule(new SequenceModule(_configuration, _services, _loggerFactory))
                 .RegisterModule(new SqsHandlersModule(_configuration[SqsQueueUrlConfigKey]))

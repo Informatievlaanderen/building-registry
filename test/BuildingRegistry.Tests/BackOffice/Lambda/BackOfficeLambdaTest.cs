@@ -4,8 +4,8 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda
     using System.Collections.Generic;
     using System.Threading;
     using AutoFixture;
+    using Be.Vlaanderen.Basisregisters.CommandHandling.Idempotency;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
-    using Be.Vlaanderen.Basisregisters.Sqs.Lambda.Handlers;
     using Be.Vlaanderen.Basisregisters.Sqs.Responses;
     using BuildingRegistry.Building;
     using BuildingRegistry.Building.Commands;

@@ -1,10 +1,10 @@
 namespace BuildingRegistry.Projector.Projections
 {
+    using Asp.Versioning;
     using Be.Vlaanderen.Basisregisters.Api;
     using Be.Vlaanderen.Basisregisters.Projector.ConnectedProjections;
     using Be.Vlaanderen.Basisregisters.Projector.Controllers;
     using BuildingRegistry.Infrastructure;
-    using Microsoft.AspNetCore.Mvc;
     using Microsoft.Extensions.Configuration;
 
     [ApiVersion("1.0")]

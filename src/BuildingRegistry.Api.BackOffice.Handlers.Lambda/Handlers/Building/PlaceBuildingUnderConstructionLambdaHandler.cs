@@ -1,14 +1,10 @@
 namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.Building
 {
-    using System.Threading;
-    using System.Threading.Tasks;
     using Abstractions.Validation;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
-    using Be.Vlaanderen.Basisregisters.Sqs.Exceptions;
-    using Be.Vlaanderen.Basisregisters.Sqs.Lambda.Handlers;
+    using Be.Vlaanderen.Basisregisters.CommandHandling.Idempotency;
     using Be.Vlaanderen.Basisregisters.Sqs.Lambda.Infrastructure;
     using Be.Vlaanderen.Basisregisters.Sqs.Responses;
-    using BuildingRegistry.Api.BackOffice.Abstractions.Building.Validators;
     using BuildingRegistry.Building;
     using BuildingRegistry.Building.Exceptions;
     using Microsoft.Extensions.Configuration;
@@ -31,7 +27,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.Building
                 buildings)
         { }
 
-        protected override async Task<ETagResponse> InnerHandle(PlaceBuildingUnderConstructionLambdaRequest request, CancellationToken cancellationToken)
+        protected override async Task<object> InnerHandle(PlaceBuildingUnderConstructionLambdaRequest request, CancellationToken cancellationToken)
         {
             var cmd = request.ToCommand();
 

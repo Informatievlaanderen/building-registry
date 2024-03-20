@@ -1,9 +1,10 @@
 namespace BuildingRegistry.Api.Legacy.Infrastructure
 {
+    using System.Reflection;
+    using Asp.Versioning;
+    using Be.Vlaanderen.Basisregisters.Api;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.Net.Http.Headers;
-    using System.Reflection;
-    using Be.Vlaanderen.Basisregisters.Api;
 
     [ApiVersionNeutral]
     [Route("")]
@@ -13,7 +14,7 @@ namespace BuildingRegistry.Api.Legacy.Infrastructure
         [ApiExplorerSettings(IgnoreApi = true)]
         public IActionResult Get()
             => Request.Headers[HeaderNames.Accept].ToString().Contains("text/html")
-                ? (IActionResult)new RedirectResult("/docs")
+                ? new RedirectResult("/docs")
                 : new OkObjectResult($"Welcome to the Basisregisters Vlaanderen Building Legacy Api {Assembly.GetEntryAssembly().GetVersionText()}.");
     }
 }
