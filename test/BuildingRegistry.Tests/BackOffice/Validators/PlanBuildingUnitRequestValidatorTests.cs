@@ -1,9 +1,9 @@
 namespace BuildingRegistry.Tests.BackOffice.Validators
 {
+    using System.Threading.Tasks;
     using BuildingRegistry.Api.BackOffice.Abstractions.Building.Validators;
     using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Requests;
     using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Validators;
-    using BuildingRegistry.Api.BackOffice.Abstractions.Validation;
     using FluentValidation.TestHelper;
     using Moq;
     using SqlStreamStore;
@@ -26,9 +26,9 @@ namespace BuildingRegistry.Tests.BackOffice.Validators
         [InlineData(null)]
         [InlineData("http://bla/a")]
         [InlineData("http://bla/1")]
-        public void GivenInvalidBuildingId_ThenReturnsExpectedFailure(string buildingId)
+        public async Task GivenInvalidBuildingId_ThenReturnsExpectedFailure(string buildingId)
         {
-            var result = _validator.TestValidate(new PlanBuildingUnitRequest
+            var result = await _validator.TestValidateAsync(new PlanBuildingUnitRequest
             {
                 GebouwId = buildingId
             });

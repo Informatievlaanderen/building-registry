@@ -6,7 +6,6 @@ namespace BuildingRegistry.Consumer.Address
     using System.Linq;
     using System.Reflection;
     using System.Threading.Tasks;
-    using Be.Vlaanderen.Basisregisters.EntityFrameworkCore.EntityTypeConfiguration;
     using Be.Vlaanderen.Basisregisters.MessageHandling.Kafka.Consumer.SqlServer;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.Runner.SqlServer.MigrationExtensions;
     using Building;
@@ -82,7 +81,7 @@ namespace BuildingRegistry.Consumer.Address
         {
             base.OnModelCreating(modelBuilder);
 
-            modelBuilder.AddEntityConfigurationsFromAssembly(typeof(ConsumerAddressContext).GetTypeInfo().Assembly);
+            modelBuilder.ApplyConfigurationsFromAssembly(typeof(ConsumerAddressContext).GetTypeInfo().Assembly);
         }
     }
 

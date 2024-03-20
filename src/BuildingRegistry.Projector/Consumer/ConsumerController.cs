@@ -3,10 +3,10 @@
     using System;
     using System.Threading;
     using System.Threading.Tasks;
+    using Asp.Versioning;
     using Be.Vlaanderen.Basisregisters.Api;
     using Be.Vlaanderen.Basisregisters.MessageHandling.Kafka.Consumer;
     using BuildingRegistry.Consumer.Address;
-    using BuildingRegistry.Consumer.Read.Parcel;
     using BuildingRegistry.Infrastructure;
     using Dapper;
     using Microsoft.AspNetCore.Mvc;

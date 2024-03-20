@@ -101,17 +101,31 @@ namespace BuildingRegistry.Tests.Legacy.Cases
         protected TestCaseData _ { get; }
 
         [Fact]
-        public int BufferSubaddress1Status()
+        public void BufferSubaddress1Status()
         {
             var skip = 1;
 
+            var importSubaddressStatusFromCrab = ImportSubaddress1();
+
+            _building.GetChanges()
+                .Skip(skip)
+                .Should()
+                .BeEquivalentTo(new List<object>
+                {
+                    importSubaddressStatusFromCrab.ToLegacyEvent()
+                });
+
+            // return _building.GetChanges().Count();
+        }
+
+        private ImportSubaddressStatusFromCrab ImportSubaddress1()
+        {
             var importSubaddressStatusFromCrab = Fixture.Create<ImportSubaddressStatusFromCrab>()
                 .WithSubaddressId(_.SubaddressNr16Bus1Id)
                 .WithTerrainObjectHouseNumberId(_.HuisNr16KoppelingId)
                 .WithStatus(CrabAddressStatus.InUse);
 
             _building.ImportSubaddressStatusFromCrab(importSubaddressStatusFromCrab.TerrainObjectId,
-
                 importSubaddressStatusFromCrab.TerrainObjectHouseNumberId,
                 importSubaddressStatusFromCrab.SubaddressStatusId,
                 importSubaddressStatusFromCrab.SubaddressId,
@@ -121,6 +135,17 @@ namespace BuildingRegistry.Tests.Legacy.Cases
                 importSubaddressStatusFromCrab.Operator,
                 importSubaddressStatusFromCrab.Modification,
                 importSubaddressStatusFromCrab.Organisation);
+            return importSubaddressStatusFromCrab;
+        }
+
+        [Fact]
+        public void BufferSubaddress2Status()
+        {
+            ImportSubaddress1();
+
+            var skip = _building.GetChanges().Count();
+
+            var importSubaddressStatusFromCrab = ImportSubaddress2();
 
             _building.GetChanges()
                 .Skip(skip)
@@ -129,22 +154,16 @@ namespace BuildingRegistry.Tests.Legacy.Cases
                 {
                     importSubaddressStatusFromCrab.ToLegacyEvent()
                 });
-
-            return _building.GetChanges().Count();
         }
 
-        [Fact]
-        public int BufferSubaddress2Status()
+        private ImportSubaddressStatusFromCrab ImportSubaddress2()
         {
-            var skip = BufferSubaddress1Status();
-
             var importSubaddressStatusFromCrab = Fixture.Create<ImportSubaddressStatusFromCrab>()
                 .WithSubaddressId(_.SubaddressNr16Bus2Id)
                 .WithTerrainObjectHouseNumberId(_.HuisNr16KoppelingId)
                 .WithStatus(CrabAddressStatus.Proposed);
 
             _building.ImportSubaddressStatusFromCrab(importSubaddressStatusFromCrab.TerrainObjectId,
-
                 importSubaddressStatusFromCrab.TerrainObjectHouseNumberId,
                 importSubaddressStatusFromCrab.SubaddressStatusId,
                 importSubaddressStatusFromCrab.SubaddressId,
@@ -154,23 +173,29 @@ namespace BuildingRegistry.Tests.Legacy.Cases
                 importSubaddressStatusFromCrab.Operator,
                 importSubaddressStatusFromCrab.Modification,
                 importSubaddressStatusFromCrab.Organisation);
+            return importSubaddressStatusFromCrab;
+        }
+
+        [Fact]
+        public void AddNonRetiredSubaddress()
+        {
+            ImportSubaddress1();
+            ImportSubaddress2();
+
+            var skip = _building.GetChanges().Count();
+
+            ImportNonRetiredSubaddress();
+
+            var expected = _importSubaddressFromCrab.ToLegacyEvent();
 
             _building.GetChanges()
                 .Skip(skip)
                 .Should()
-                .BeEquivalentTo(new List<object>
-                {
-                    importSubaddressStatusFromCrab.ToLegacyEvent()
-                });
-
-            return _building.GetChanges().Count();
+                .BeEquivalentTo(new List<object> { expected });
         }
 
-        [Fact]
-        public int AddNonRetiredSubaddress()
+        private void ImportNonRetiredSubaddress()
         {
-            var skip = BufferSubaddress2Status();
-
             _importSubaddressFromCrab = Fixture.Create<ImportSubaddressFromCrab>()
                 .WithSubaddressId(_.SubaddressNr16Bus1Id)
                 .WithTerrainObjectHouseNumberId(_.HuisNr16KoppelingId);
@@ -186,23 +211,30 @@ namespace BuildingRegistry.Tests.Legacy.Cases
                 _importSubaddressFromCrab.Operator,
                 _importSubaddressFromCrab.Modification,
                 _importSubaddressFromCrab.Organisation);
-
-            var expected = _importSubaddressFromCrab.ToLegacyEvent();
-
-            _building.GetChanges()
-                .Skip(skip)
-                .Should()
-                .BeEquivalentTo(new List<object> { expected });
-
-            return _building.GetChanges().Count();
         }
 
 
         [Fact]
-        public int AddRetiredSubaddress()
+        public void AddRetiredSubaddress()
         {
-            var skip = AddNonRetiredSubaddress();
+            ImportSubaddress1();
+            ImportSubaddress2();
+            ImportNonRetiredSubaddress();
 
+            var skip = _building.GetChanges().Count();
+
+            ImportRetiredSubaddress();
+
+            var expected = _importSubaddress2FromCrab.ToLegacyEvent();
+
+            _building.GetChanges()
+                .Skip(skip)
+                .Should()
+                .BeEquivalentTo(new List<object>{expected});
+        }
+
+        private void ImportRetiredSubaddress()
+        {
             _importSubaddress2FromCrab = Fixture.Create<ImportSubaddressFromCrab>()
                 .WithSubaddressId(_.SubaddressNr16Bus2Id)
                 .WithLifetime(new CrabLifetime(Fixture.Create<LocalDateTime>(), Fixture.Create<LocalDateTime>()))
@@ -219,21 +251,17 @@ namespace BuildingRegistry.Tests.Legacy.Cases
                 _importSubaddress2FromCrab.Operator,
                 _importSubaddress2FromCrab.Modification,
                 _importSubaddress2FromCrab.Organisation);
-
-            var expected = _importSubaddress2FromCrab.ToLegacyEvent();
-
-            _building.GetChanges()
-                .Skip(skip)
-                .Should()
-                .BeEquivalentTo(new List<object>{expected});
-
-            return _building.GetChanges().Count();
         }
 
         [Fact]
-        public int AddHouseNumber()
+        public void AddHouseNumber()
         {
-            var skip = AddRetiredSubaddress();
+            ImportSubaddress1();
+            ImportSubaddress2();
+            ImportNonRetiredSubaddress();
+            ImportRetiredSubaddress();
+
+            var skip = _building.GetChanges().Count();
 
             var importTerrainObjectHouseNumberFromCrab = Fixture.Create<ImportTerrainObjectHouseNumberFromCrab>()
                 .WithHouseNumberId(_.HuisNr16Id)
@@ -267,8 +295,6 @@ namespace BuildingRegistry.Tests.Legacy.Cases
 
                     importTerrainObjectHouseNumberFromCrab.ToLegacyEvent()
                 });
-
-            return _building.GetChanges().Count();
         }
     }
 }

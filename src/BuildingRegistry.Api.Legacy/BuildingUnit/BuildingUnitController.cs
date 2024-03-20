@@ -2,6 +2,7 @@ namespace BuildingRegistry.Api.Legacy.BuildingUnit
 {
     using System.Threading;
     using System.Threading.Tasks;
+    using Asp.Versioning;
     using Be.Vlaanderen.Basisregisters.Api;
     using Be.Vlaanderen.Basisregisters.Api.ETag;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;

@@ -3,10 +3,9 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.Building
     using Abstractions.Building.SqsRequests;
     using Abstractions.Validation;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
+    using Be.Vlaanderen.Basisregisters.CommandHandling.Idempotency;
     using Be.Vlaanderen.Basisregisters.MessageHandling.AwsSqs.Simple;
     using Be.Vlaanderen.Basisregisters.Sqs;
-    using Be.Vlaanderen.Basisregisters.Sqs.Exceptions;
-    using Be.Vlaanderen.Basisregisters.Sqs.Lambda.Handlers;
     using Be.Vlaanderen.Basisregisters.Sqs.Lambda.Infrastructure;
     using Be.Vlaanderen.Basisregisters.Sqs.Responses;
     using BuildingRegistry.Building;
@@ -38,7 +37,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.Building
             _toggleAnoApiEnabled = configuration.GetValue<bool>("AnoApiToggle", false);
         }
 
-        protected override async Task<ETagResponse> InnerHandle(RealizeBuildingLambdaRequest request, CancellationToken cancellationToken)
+        protected override async Task<object> InnerHandle(RealizeBuildingLambdaRequest request, CancellationToken cancellationToken)
         {
             var cmd = request.ToCommand();
 

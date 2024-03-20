@@ -10,16 +10,6 @@
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile>bin\Debug\net6.0\BuildingRegistry.Projector.xml</DocumentationFile>
-    <NoWarn>1701;1702;1705;1591</NoWarn>
-    <DefineConstants>TRACE;DEBUG;NETCOREAPP;NET6_0</DefineConstants>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DocumentationFile>bin\Release\net6.0\BuildingRegistry.Projector.xml</DocumentationFile>
-    <NoWarn>1701;1702;1705;1591</NoWarn>
-  </PropertyGroup>
-
   <ItemGroup>
     <Content Include="Dockerfile" CopyToOutputDirectory="Always" />
     <Content Include="appsettings.json" CopyToOutputDirectory="Always" />
@@ -37,10 +27,6 @@
     <ProjectReference Include="..\BuildingRegistry.Projections.Legacy\BuildingRegistry.Projections.Legacy.csproj" />
     <ProjectReference Include="..\BuildingRegistry.Projections.Wfs\BuildingRegistry.Projections.Wfs.csproj" />
     <ProjectReference Include="..\BuildingRegistry.Projections.Wms\BuildingRegistry.Projections.Wms.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Include="..\..\SolutionInfo.cs" Link="Properties\SolutionInfo.cs" />
   </ItemGroup>
 
   <Import Project="..\..\.paket\Paket.Restore.targets" />

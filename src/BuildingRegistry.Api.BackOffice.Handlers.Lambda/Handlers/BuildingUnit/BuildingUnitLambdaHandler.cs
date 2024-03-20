@@ -1,10 +1,10 @@
 namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.BuildingUnit
 {
     using System.Configuration;
-    using Abstractions.Building.Validators;
     using Abstractions.Validation;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
     using Be.Vlaanderen.Basisregisters.Api.ETag;
+    using Be.Vlaanderen.Basisregisters.CommandHandling.Idempotency;
     using Be.Vlaanderen.Basisregisters.Sqs.Exceptions;
     using Be.Vlaanderen.Basisregisters.Sqs.Lambda.Handlers;
     using Be.Vlaanderen.Basisregisters.Sqs.Lambda.Infrastructure;
@@ -13,6 +13,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.BuildingUnit
     using Microsoft.Extensions.Configuration;
     using Requests.BuildingUnit;
     using TicketingService.Abstractions;
+    using IHasBuildingUnitPersistentLocalId = Abstractions.IHasBuildingUnitPersistentLocalId;
 
     public abstract class BuildingUnitLambdaHandler<TSqsLambdaRequest> : SqsLambdaHandlerBase<TSqsLambdaRequest>
         where TSqsLambdaRequest : BuildingUnitLambdaRequest
@@ -40,7 +41,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.BuildingUnit
 
         protected override async Task ValidateIfMatchHeaderValue(TSqsLambdaRequest request, CancellationToken cancellationToken)
         {
-            if (string.IsNullOrWhiteSpace(request.IfMatchHeaderValue) || request is not Abstractions.IHasBuildingUnitPersistentLocalId id)
+            if (string.IsNullOrWhiteSpace(request.IfMatchHeaderValue) || request is not IHasBuildingUnitPersistentLocalId id)
             {
                 return;
             }

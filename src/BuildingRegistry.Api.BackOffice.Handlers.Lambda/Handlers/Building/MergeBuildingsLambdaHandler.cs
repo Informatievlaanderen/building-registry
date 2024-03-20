@@ -43,7 +43,7 @@
 //             _lifetimeScope = lifetimeScope;
 //         }
 //
-//         protected override async Task<ETagResponse> InnerHandle(MergeBuildingsLambdaRequest request, CancellationToken cancellationToken)
+//         protected override async Task<object> InnerHandle(MergeBuildingsLambdaRequest request, CancellationToken cancellationToken)
 //         {
 //             var cmd = request.ToCommand();
 //

@@ -15,16 +15,16 @@ licenseUrl https://opensource.org/licenses/EUPL-1.2
 description Building Registry.
 
 files
-  BuildingRegistry.Api.Oslo.dll => lib\net6.0
-  BuildingRegistry.Api.Oslo.pdb => lib\net6.0
-  BuildingRegistry.Api.Oslo.xml => lib\net6.0
+  BuildingRegistry.Api.Oslo.dll => lib\net8.0
+  BuildingRegistry.Api.Oslo.pdb => lib\net8.0
+  BuildingRegistry.Api.Oslo.xml => lib\net8.0
   BuildingRegistry.Api.Oslo.xml => content
 
-  BuildingRegistry.Projections.Legacy.dll => lib\net6.0
-  BuildingRegistry.Projections.Legacy.pdb => lib\net6.0
+  BuildingRegistry.Projections.Legacy.dll => lib\net8.0
+  BuildingRegistry.Projections.Legacy.pdb => lib\net8.0
 
-  BuildingRegistry.Projections.Syndication.dll => lib\net6.0
-  BuildingRegistry.Projections.Syndication.pdb => lib\net6.0
+  BuildingRegistry.Projections.Syndication.dll => lib\net8.0
+  BuildingRegistry.Projections.Syndication.pdb => lib\net8.0
 
-  BuildingRegistry.dll => lib\net6.0
-  BuildingRegistry.pdb => lib\net6.0
+  BuildingRegistry.dll => lib\net8.0
+  BuildingRegistry.pdb => lib\net8.0

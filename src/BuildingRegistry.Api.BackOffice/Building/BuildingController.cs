@@ -1,5 +1,6 @@
 namespace BuildingRegistry.Api.BackOffice.Building
 {
+    using Asp.Versioning;
     using Be.Vlaanderen.Basisregisters.Api;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Infrastructure.Options;

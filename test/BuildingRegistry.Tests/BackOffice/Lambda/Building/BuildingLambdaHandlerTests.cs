@@ -7,8 +7,8 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
     using Autofac;
     using AutoFixture;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
+    using Be.Vlaanderen.Basisregisters.CommandHandling.Idempotency;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
-    using Be.Vlaanderen.Basisregisters.Sqs.Lambda.Handlers;
     using Be.Vlaanderen.Basisregisters.Sqs.Lambda.Infrastructure;
     using Be.Vlaanderen.Basisregisters.Sqs.Responses;
     using BuildingRegistry.Api.BackOffice.Abstractions.Building.Requests;
@@ -164,7 +164,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
                 buildings)
         { }
 
-        protected override Task<ETagResponse> InnerHandle(
+        protected override Task<object> InnerHandle(
             RealizeBuildingLambdaRequest request,
             CancellationToken cancellationToken)
         {
@@ -174,7 +174,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
                 new Dictionary<string, object>(),
                 cancellationToken);
 
-            return Task.FromResult(new ETagResponse("location", "etag"));
+            return Task.FromResult((object)new ETagResponse("location", "etag"));
         }
 
         protected override TicketError? InnerMapDomainException(DomainException exception, RealizeBuildingLambdaRequest request)

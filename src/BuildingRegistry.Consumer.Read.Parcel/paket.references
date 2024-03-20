@@ -3,7 +3,6 @@ Polly
 Be.Vlaanderen.Basisregisters.Aws.DistributedMutex
 Be.Vlaanderen.Basisregisters.DataDog.Tracing.Autofac
 Be.Vlaanderen.Basisregisters.DataDog.Tracing.Sql
-Be.Vlaanderen.Basisregisters.EntityFrameworkCore.EntityTypeConfiguration
 Be.Vlaanderen.Basisregisters.GrAr.Contracts
 
 Be.Vlaanderen.Basisregisters.MessageHandling.Kafka.Consumer

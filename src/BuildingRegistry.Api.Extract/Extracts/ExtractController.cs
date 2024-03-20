@@ -1,16 +1,17 @@
 namespace BuildingRegistry.Api.Extract.Extracts
 {
+    using System.Threading;
+    using System.Threading.Tasks;
+    using Asp.Versioning;
     using Be.Vlaanderen.Basisregisters.Api;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
+    using MediatR;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
     using Projections.Extract;
-    using Swashbuckle.AspNetCore.Filters;
-    using System.Threading;
-    using System.Threading.Tasks;
-    using MediatR;
     using Requests;
     using Responses;
+    using Swashbuckle.AspNetCore.Filters;
 
     [ApiVersion("1.0")]
     [AdvertiseApiVersions("1.0")]

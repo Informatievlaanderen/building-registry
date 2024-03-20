@@ -15,14 +15,14 @@ licenseUrl https://opensource.org/licenses/EUPL-1.2
 description Building Registry.
 
 dependencies
-  framework: net6.0
-    Be.Vlaanderen.Basisregisters.Shaperon >= LOCKEDVERSION
+  framework: net8.0
+    Be.Vlaanderen.Basisregisters.GrAr.Extracts >= LOCKEDVERSION
 
 files
-  BuildingRegistry.Api.Extract.dll => lib\net6.0
-  BuildingRegistry.Api.Extract.pdb => lib\net6.0
-  BuildingRegistry.Api.Extract.xml => lib\net6.0
+  BuildingRegistry.Api.Extract.dll => lib\net8.0
+  BuildingRegistry.Api.Extract.pdb => lib\net8.0
+  BuildingRegistry.Api.Extract.xml => lib\net8.0
   BuildingRegistry.Api.Extract.xml => content
 
-  BuildingRegistry.Projections.Extract.dll => lib\net6.0
-  BuildingRegistry.Projections.Extract.pdb => lib\net6.0
+  BuildingRegistry.Projections.Extract.dll => lib\net8.0
+  BuildingRegistry.Projections.Extract.pdb => lib\net8.0
