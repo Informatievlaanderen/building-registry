@@ -172,6 +172,8 @@ namespace BuildingRegistry.Building
                 throw new BuildingHasInvalidGeometryMethodException();
             }
 
+            GuardPolygon(WKBReaderFactory.Create().Read(extendedWkbGeometry));
+
             if (BuildingGeometry.Geometry == extendedWkbGeometry)
             {
                 return;

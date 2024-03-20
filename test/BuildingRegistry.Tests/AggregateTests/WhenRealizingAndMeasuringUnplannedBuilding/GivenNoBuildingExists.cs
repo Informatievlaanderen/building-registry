@@ -1,5 +1,7 @@
 namespace BuildingRegistry.Tests.AggregateTests.WhenRealizingAndMeasuringUnplannedBuilding
 {
+    using System;
+    using Api.BackOffice.Abstractions.Building;
     using AutoFixture;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
     using Be.Vlaanderen.Basisregisters.AggregateSource.Snapshotting;
@@ -7,10 +9,12 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRealizingAndMeasuringUnplann
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Building;
     using Building.Commands;
+    using Building.Datastructures;
     using Building.Events;
     using Building.Exceptions;
     using Fixtures;
     using FluentAssertions;
+    using NetTopologySuite.IO;
     using Xunit;
     using Xunit.Abstractions;
 
@@ -28,9 +32,9 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRealizingAndMeasuringUnplann
                 .GivenNone()
                 .When(command)
                 .Then(new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
-                    new UnplannedBuildingWasRealizedAndMeasured(
-                        command.BuildingPersistentLocalId,
-                        command.Geometry)),
+                        new UnplannedBuildingWasRealizedAndMeasured(
+                            command.BuildingPersistentLocalId,
+                            command.Geometry)),
                     new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
                         new BuildingGeometryWasImportedFromGrb(command.BuildingPersistentLocalId,
                             command.BuildingGrbData))));
@@ -63,10 +67,38 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRealizingAndMeasuringUnplann
             });
 
             // Assert
-            building.BuildingPersistentLocalId.Should().Be(new BuildingPersistentLocalId(unplannedBuildingWasRealizedAndMeasured.BuildingPersistentLocalId));
+            building.BuildingPersistentLocalId.Should()
+                .Be(new BuildingPersistentLocalId(unplannedBuildingWasRealizedAndMeasured.BuildingPersistentLocalId));
             building.BuildingStatus.Should().Be(BuildingStatus.Realized);
             building.BuildingGeometry.Geometry.Should().Be(new ExtendedWkbGeometry(unplannedBuildingWasRealizedAndMeasured.ExtendedWkbGeometry));
             building.BuildingGeometry.Method.Should().Be(BuildingGeometryMethod.MeasuredByGrb);
+        }
+
+        [Fact]
+        public void WithSelfTouchingRing_ThenBuildingWasRealized()
+        {
+            var extendedWkbGeometry = new ExtendedWkbGeometry(GeometryHelper.SelfTouchingPolygon.AsBinary());
+
+            var command = new RealizeAndMeasureUnplannedBuilding(
+                Fixture.Create<BuildingPersistentLocalId>(),
+                extendedWkbGeometry,
+                Fixture.Create<BuildingGrbData>(),
+                Fixture.Create<Provenance>()
+                );
+
+            Assert(new Scenario()
+                .Given(
+                    new BuildingStreamId(Fixture.Create<BuildingPersistentLocalId>()))
+                .When(command)
+                .Then(
+                    new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
+                        new UnplannedBuildingWasRealizedAndMeasured(
+                            command.BuildingPersistentLocalId,
+                            extendedWkbGeometry)),
+                    new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
+                        new BuildingGeometryWasImportedFromGrb(
+                            command.BuildingPersistentLocalId,
+                            command.BuildingGrbData))));
         }
     }
 }

@@ -15,6 +15,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenMeasuringBuilding
     using Extensions;
     using Fixtures;
     using FluentAssertions;
+    using NetTopologySuite.IO;
     using Xunit;
     using Xunit.Abstractions;
     using BuildingUnit = Building.Commands.BuildingUnit;
@@ -282,6 +283,57 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenMeasuringBuilding
                         buildingUnitsExtendedWkbGeometry,
                         BuildingRegistry.Building.BuildingUnitPositionGeometryMethod.DerivedFromObject));
             }
+        }
+
+        [Fact]
+        public void WithSelfTouchingRing_ThenBuildingWasMeasured()
+        {
+            var extendedWkbGeometry = new ExtendedWkbGeometry(GeometryHelper.SelfTouchingPolygon.AsBinary());
+
+            var command = new MeasureBuilding(
+                Fixture.Create<BuildingPersistentLocalId>(),
+                extendedWkbGeometry,
+                Fixture.Create<BuildingGrbData>(),
+                Fixture.Create<Provenance>()
+            );
+
+           var plannedBuildingUnitPersistentLocalId = new BuildingUnitPersistentLocalId(100);
+
+            var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
+                .WithBuildingGeometry(
+                    new BuildingGeometry(Fixture.Create<ExtendedWkbGeometry>(),
+                        BuildingGeometryMethod.Outlined))
+                .WithBuildingStatus(BuildingStatus.Planned)
+                .WithBuildingUnit(
+                    BuildingUnitStatus.Planned,
+                    plannedBuildingUnitPersistentLocalId,
+                    positionGeometryMethod: BuildingUnitPositionGeometryMethod.DerivedFromObject)
+                .Build();
+
+            Assert(new Scenario()
+                .Given(
+                    new BuildingStreamId(Fixture.Create<BuildingPersistentLocalId>()),
+                    buildingWasMigrated)
+                .When(command)
+                .Then(
+                    new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
+                        new BuildingWasRealizedV2(
+                            command.BuildingPersistentLocalId)),
+                    new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
+                        new BuildingUnitWasRealizedBecauseBuildingWasRealized(
+                            command.BuildingPersistentLocalId,
+                            plannedBuildingUnitPersistentLocalId)),
+                    new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
+                        new BuildingWasMeasured(
+                            command.BuildingPersistentLocalId,
+                            new[] { plannedBuildingUnitPersistentLocalId },
+                            Array.Empty<BuildingUnitPersistentLocalId>(),
+                            command.Geometry,
+                            new BuildingGeometry(extendedWkbGeometry, BuildingGeometryMethod.MeasuredByGrb).Center)),
+                    new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
+                        new BuildingGeometryWasImportedFromGrb(
+                            command.BuildingPersistentLocalId,
+                            command.BuildingGrbData))));
         }
     }
 }
