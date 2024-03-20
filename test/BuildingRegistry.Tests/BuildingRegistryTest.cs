@@ -92,6 +92,8 @@ namespace BuildingRegistry.Tests
                 .AddInMemoryCollection(new Dictionary<string, string> { { "ConnectionStrings:Snapshots", "x" } })
                 .AddInMemoryCollection(new Dictionary<string, string> { { "BuildingDetailUrl", ConfigDetailUrl } })
                 .AddInMemoryCollection(new Dictionary<string, string> { { "BuildingUnitDetailUrl", ConfigDetailUrl } })
+                .AddInMemoryCollection(new Dictionary<string, string> { { "AnoApiToggle", "true" } })
+                .AddInMemoryCollection(new Dictionary<string, string> { { "AutomaticBuildingUnitCreationToggle", "true" } })
                 .Build();
 
             builder.Register(a => (IConfiguration)configuration);

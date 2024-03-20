@@ -18,6 +18,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.Building
     public sealed class RealizeBuildingLambdaHandler : BuildingLambdaHandler<RealizeBuildingLambdaRequest>
     {
         private readonly ISqsQueue _sqsQueue;
+        private readonly bool _toggleAnoApiEnabled;
 
         public RealizeBuildingLambdaHandler(
             IConfiguration configuration,
@@ -34,6 +35,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.Building
                 buildings)
         {
             _sqsQueue = sqsQueue;
+            _toggleAnoApiEnabled = configuration.GetValue<bool>("AnoApiToggle", false);
         }
 
         protected override async Task<ETagResponse> InnerHandle(RealizeBuildingLambdaRequest request, CancellationToken cancellationToken)
@@ -48,7 +50,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.Building
                     request.Metadata,
                     cancellationToken);
 
-                if (streamPositionIncrements > 0)
+                if (streamPositionIncrements > 0 && _toggleAnoApiEnabled)
                 {
                     var building =
                         await Buildings.GetAsync(new BuildingStreamId(cmd.BuildingPersistentLocalId), cancellationToken);
