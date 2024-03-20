@@ -29,6 +29,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.Building
         private readonly BackOfficeContext _backOfficeContext;
         private readonly IPersistentLocalIdGenerator _persistentLocalIdGenerator;
         private readonly ILifetimeScope _lifetimeScope;
+        private readonly bool _toggleAutomaticBuildingUnitCreationEnabled;
 
         public RealizeAndMeasureUnplannedBuildingLambdaHandler(
             IConfiguration configuration,
@@ -53,6 +54,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.Building
             _backOfficeContext = backOfficeContext;
             _persistentLocalIdGenerator = persistentLocalIdGenerator;
             _lifetimeScope = lifetimeScope;
+            _toggleAutomaticBuildingUnitCreationEnabled = configuration.GetValue<bool>("AutomaticBuildingUnitCreationToggle", false);
         }
 
         protected override async Task<ETagResponse> InnerHandle(RealizeAndMeasureUnplannedBuildingLambdaRequest request,
@@ -73,7 +75,8 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.Building
                 // Idempotent: Do Nothing return last etag
             }
 
-            await RealizeUnplannedBuildingUnit(request, cancellationToken);
+            if(_toggleAutomaticBuildingUnitCreationEnabled)
+                await RealizeUnplannedBuildingUnit(request, cancellationToken);
 
             var lastHash = await GetHash(new BuildingPersistentLocalId(request.BuildingPersistentLocalId), cancellationToken);
             return new ETagResponse(string.Format(DetailUrlFormat, request.BuildingPersistentLocalId), lastHash);
