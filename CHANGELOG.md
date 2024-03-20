@@ -1,3 +1,15 @@
+# [3.108.0](https://github.com/informatievlaanderen/building-registry/compare/v3.107.0...v3.108.0) (2024-03-20)
+
+
+### Bug Fixes
+
+* selftouching polygon ([e2d42ea](https://github.com/informatievlaanderen/building-registry/commit/e2d42ea6b51c6e6a76b2e03c92746288afc786a8))
+
+
+### Features
+
+* add toggles for anoapi + auto buildingunit creation ([4d0c6aa](https://github.com/informatievlaanderen/building-registry/commit/4d0c6aad9834c6d5897fcb61cb07f740cc1df806))
+
 # [3.107.0](https://github.com/informatievlaanderen/building-registry/compare/v3.106.5...v3.107.0) (2024-03-18)
 
 
