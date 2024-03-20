@@ -13,6 +13,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingMeasuremen
     using Extensions;
     using Fixtures;
     using FluentAssertions;
+    using NetTopologySuite.IO;
     using Xunit;
     using Xunit.Abstractions;
     using BuildingUnitPositionGeometryMethod = BuildingRegistry.Legacy.BuildingUnitPositionGeometryMethod;
@@ -232,5 +233,61 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingMeasuremen
                         BuildingRegistry.Building.BuildingUnitPositionGeometryMethod.DerivedFromObject));
             }
         }
+
+        [Fact]
+        public void WithSelfTouchingRing_ThenBuildingMeasurementWasCorrected()
+        {
+            var extendedWkbGeometry = new ExtendedWkbGeometry(GeometryHelper.SelfTouchingPolygon.AsBinary());
+
+            var command = new CorrectBuildingMeasurement(
+                Fixture.Create<BuildingPersistentLocalId>(),
+                extendedWkbGeometry,
+                Fixture.Create<BuildingGrbData>(),
+                Fixture.Create<Provenance>()
+            );
+
+            var plannedBuildingUnitPersistentLocalId = new BuildingUnitPersistentLocalId(100);
+            var realizedBuildingUnitPersistentLocalId = new BuildingUnitPersistentLocalId(200);
+            var notRealizedBuildingUnitPersistentLocalId = new BuildingUnitPersistentLocalId(300);
+            var removedBuildingUnitPersistentLocalId = new BuildingUnitPersistentLocalId(400);
+
+            var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
+                .WithBuildingGeometry(
+                    new BuildingGeometry(
+                        new ExtendedWkbGeometry(GeometryHelper.ValidPolygon.AsBinary()),
+                        BuildingGeometryMethod.MeasuredByGrb))
+                .WithBuildingStatus(BuildingStatus.Realized)
+                .WithBuildingUnit(
+                    BuildingUnitStatus.Planned,
+                    plannedBuildingUnitPersistentLocalId,
+                    positionGeometryMethod: BuildingUnitPositionGeometryMethod.DerivedFromObject)
+                .WithBuildingUnit(
+                    BuildingUnitStatus.Realized,
+                    realizedBuildingUnitPersistentLocalId,
+                    extendedWkbGeometry: new BuildingRegistry.Legacy.ExtendedWkbGeometry(GeometryHelper.PointNotInPolygon.AsBinary()),
+                    positionGeometryMethod: BuildingUnitPositionGeometryMethod.AppointedByAdministrator)
+                .WithBuildingUnit(BuildingUnitStatus.NotRealized, notRealizedBuildingUnitPersistentLocalId)
+                .WithBuildingUnit(BuildingUnitStatus.Planned, removedBuildingUnitPersistentLocalId, isRemoved: true)
+                .Build();
+
+            Assert(new Scenario()
+                .Given(
+                    new BuildingStreamId(Fixture.Create<BuildingPersistentLocalId>()),
+                    buildingWasMigrated)
+                .When(command)
+                .Then(
+                    new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
+                        new BuildingMeasurementWasCorrected(
+                            command.BuildingPersistentLocalId,
+                            new []{ plannedBuildingUnitPersistentLocalId },
+                            new []{ realizedBuildingUnitPersistentLocalId },
+                            command.Geometry,
+                            new BuildingGeometry(extendedWkbGeometry, BuildingGeometryMethod.MeasuredByGrb).Center)),
+                    new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
+                        new BuildingGeometryWasImportedFromGrb(
+                            command.BuildingPersistentLocalId,
+                            command.BuildingGrbData))));
+        }
+
     }
 }

@@ -4,12 +4,15 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuilding
     using Be.Vlaanderen.Basisregisters.AggregateSource;
     using Be.Vlaanderen.Basisregisters.AggregateSource.Snapshotting;
     using Be.Vlaanderen.Basisregisters.AggregateSource.Testing;
+    using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Building;
     using Building.Commands;
+    using Building.Datastructures;
     using Building.Events;
     using Building.Exceptions;
     using Fixtures;
     using FluentAssertions;
+    using NetTopologySuite.IO;
     using Xunit;
     using Xunit.Abstractions;
 

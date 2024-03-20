@@ -30,5 +30,19 @@ namespace BuildingRegistry.Tests.BackOffice.Validators
                 .WithErrorCode("GebouwPolygoonValidatie")
                 .WithErrorMessage("Ongeldig formaat geometriePolygoon.");
         }
+
+        [Fact]
+        public void WithSelfTouchingRing_ThenReturnsExpectedFailure()
+        {
+            var result = _validator.TestValidate(new ChangeBuildingMeasurementRequest
+            {
+                GrbData = new GrbData()
+                {
+                    GeometriePolygoon = GeometryHelper.selfTouchingGml
+                }
+            });
+
+            result.ShouldNotHaveValidationErrorFor($"{nameof(GrbData)}.{nameof(GrbData.GeometriePolygoon)}");
+        }
     }
 }
