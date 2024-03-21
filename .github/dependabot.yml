@@ -21,7 +21,7 @@ updates:
   rebase-strategy: "disabled"
 
 - package-ecosystem: docker
-  directory: "/src/BuildingRegistry.Api.CrabImport"
+  directory: "/src/BuildingRegistry.Api.Oslo"
   schedule:
     interval: weekly
   rebase-strategy: "disabled"
@@ -40,6 +40,18 @@ updates:
 
 - package-ecosystem: docker
   directory: "/src/BuildingRegistry.Projections.Syndication"
+  schedule:
+    interval: weekly
+  rebase-strategy: "disabled"
+
+- package-ecosystem: docker
+  directory: "/src/BuildingRegistry.Api.Backoffice"
+  schedule:
+    interval: weekly
+  rebase-strategy: "disabled"
+
+- package-ecosystem: docker
+  directory: "/src/BuildingRegistry.Consumer.*"
   schedule:
     interval: weekly
   rebase-strategy: "disabled"
