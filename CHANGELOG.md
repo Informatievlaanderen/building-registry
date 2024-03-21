@@ -1,3 +1,15 @@
+# [4.0.0](https://github.com/informatievlaanderen/building-registry/compare/v3.108.0...v4.0.0) (2024-03-21)
+
+
+### Features
+
+* move to dotnet 8.0.2 ([8887980](https://github.com/informatievlaanderen/building-registry/commit/888798044e55886ce587832191a835dbe2f0d68f))
+
+
+### BREAKING CHANGES
+
+* move to dotnet 8.0.2
+
 # [3.108.0](https://github.com/informatievlaanderen/building-registry/compare/v3.107.0...v3.108.0) (2024-03-20)
 
 
