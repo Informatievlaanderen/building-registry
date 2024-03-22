@@ -54,5 +54,10 @@ namespace BuildingRegistry.Tests
             var geometry = new WKTReader { DefaultSRID = WkbGeometry.SridLambert72 }.Read(wkt);
             return new WkbGeometry(WkbWriter.Write(geometry));
         }
+
+        public static Geometry CreateGeometryFromWkt(string wkt)
+        {
+            return new WKTReader { DefaultSRID = WkbGeometry.SridLambert72 }.Read(wkt);
+        }
     }
 }
