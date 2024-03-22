@@ -1,3 +1,15 @@
+# [4.1.0](https://github.com/informatievlaanderen/building-registry/compare/v4.0.0...v4.1.0) (2024-03-22)
+
+
+### Bug Fixes
+
+* sqs registration in lambda ([a24f926](https://github.com/informatievlaanderen/building-registry/commit/a24f92673ad7102f6d1ca65b6e16f52652f9879b))
+
+
+### Features
+
+* add idempotencekey ksql ([6edfa12](https://github.com/informatievlaanderen/building-registry/commit/6edfa1295422780a1acb4b7e5b888dc49fb91526))
+
 # [4.0.0](https://github.com/informatievlaanderen/building-registry/compare/v3.108.0...v4.0.0) (2024-03-21)
 
 
