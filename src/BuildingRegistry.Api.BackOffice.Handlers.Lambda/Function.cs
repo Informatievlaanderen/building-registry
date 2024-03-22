@@ -2,19 +2,20 @@ using Amazon.Lambda.Core;
 using Amazon.Lambda.Serialization.Json;
 
 [assembly: LambdaSerializer(typeof(JsonSerializer))]
-
 namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda
 {
     using System.Reflection;
     using Abstractions;
     using Abstractions.Building.SqsRequests;
+    using Amazon;
     using Autofac;
     using Autofac.Extensions.DependencyInjection;
     using Be.Vlaanderen.Basisregisters.Aws.Lambda;
     using Be.Vlaanderen.Basisregisters.CommandHandling.Idempotency;
     using Be.Vlaanderen.Basisregisters.DataDog.Tracing.Autofac;
     using Be.Vlaanderen.Basisregisters.EventHandling;
-    using Be.Vlaanderen.Basisregisters.Sqs.Lambda.Handlers;
+    using Be.Vlaanderen.Basisregisters.MessageHandling.AwsSqs.Simple;
+    using Be.Vlaanderen.Basisregisters.Sqs;
     using Be.Vlaanderen.Basisregisters.Sqs.Lambda.Infrastructure;
     using Consumer.Address;
     using Consumer.Read.Parcel.Infrastructure.Modules;
@@ -28,6 +29,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda
     using Newtonsoft.Json;
     using OrWegwijsApi;
     using TicketingService.Proxy.HttpProxy;
+    using SqsQueue = Be.Vlaanderen.Basisregisters.Sqs.SqsQueue;
 
     public class Function : FunctionBase
     {
@@ -116,9 +118,20 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda
                 new IdempotencyTableInfo(Schema.Import),
                 loggerFactory);
 
+            builder
+                .Register(_ => new SqsOptions(RegionEndpoint.EUWest1, EventsJsonSerializerSettingsProvider.CreateSerializerSettings()))
+                .SingleInstance();
+
+            builder.Register(c => new SqsQueue(c.Resolve<SqsOptions>(), configuration.GetSection("AnoApi").GetValue<string>("SqsUrl") ?? throw new ArgumentNullException("SqsUrl")))
+                .As<ISqsQueue>()
+                .AsSelf()
+                .SingleInstance();
+
             builder.Populate(services);
 
             return new AutofacServiceProvider(builder.Build());
         }
     }
+
+
 }
