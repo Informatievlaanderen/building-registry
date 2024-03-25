@@ -15,7 +15,6 @@ namespace BuildingRegistry.Migrator.Building.Projections
             When<Envelope<BuildingWasMigrated>>(async (_, message, ct) =>
             {
                 await using var dbContext = await backOfficeContextFactory.CreateDbContextAsync(ct);
-
                 foreach (var buildingUnit in message.Message.BuildingUnits)
                 {
                     foreach (var addressPersistentLocalId in buildingUnit.AddressPersistentLocalIds)
