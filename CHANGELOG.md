@@ -1,3 +1,10 @@
+## [4.1.1](https://github.com/informatievlaanderen/building-registry/compare/v4.1.0...v4.1.1) (2024-03-25)
+
+
+### Bug Fixes
+
+* style to trigger build ([6b1a205](https://github.com/informatievlaanderen/building-registry/commit/6b1a205a42d62641dd7429d5ff9f71f38fb8982b))
+
 # [4.1.0](https://github.com/informatievlaanderen/building-registry/compare/v4.0.0...v4.1.0) (2024-03-22)
 
 
