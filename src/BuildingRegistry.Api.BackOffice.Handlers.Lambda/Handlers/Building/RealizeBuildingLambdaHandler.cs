@@ -56,7 +56,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.Building
 
                     var sqsRequest = new NotifyOutlinedRealizedBuildingSqsRequest(
                         cmd.BuildingPersistentLocalId,
-                        request.Provenance.Organisation.ToString(),
+                        request.Provenance.Operator,
                         DateTimeOffset.UtcNow,
                         building.BuildingGeometry.Geometry.ToString());
                     await _sqsQueue.Copy(sqsRequest, new SqsQueueOptions { MessageGroupId = "GRB-ANO-API" }, cancellationToken);
