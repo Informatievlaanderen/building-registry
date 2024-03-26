@@ -1,3 +1,10 @@
+## [4.1.4](https://github.com/informatievlaanderen/building-registry/compare/v4.1.3...v4.1.4) (2024-03-26)
+
+
+### Bug Fixes
+
+* registration of httpclient in lambda handlers ([cfa22bc](https://github.com/informatievlaanderen/building-registry/commit/cfa22bc85f0bbcedbc41cc52cfd4b6d0d9a7be76))
+
 ## [4.1.3](https://github.com/informatievlaanderen/building-registry/compare/v4.1.2...v4.1.3) (2024-03-26)
 
 
