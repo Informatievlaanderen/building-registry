@@ -10,20 +10,18 @@
 
     public class WegwijsApiProxy : IWegwijsApiProxy
     {
-        private readonly IHttpClientFactory _httpClientFactory;
+        private readonly HttpClient _httpClient;
 
-        public WegwijsApiProxy(IHttpClientFactory httpClientFactory)
+        public WegwijsApiProxy(HttpClient httpClient)
         {
-            _httpClientFactory = httpClientFactory;
+            _httpClient = httpClient;
         }
 
         public async Task<string> GetOrganisationName(string ovoCode)
         {
-            using var httpClient = _httpClientFactory.CreateClient();
-
             var uri = $"https://api.wegwijs.vlaanderen.be/v1/search/organisations?q=ovoNumber:{ovoCode}&sort=changeId&fields=name";
 
-            var response = await httpClient.GetFromJsonAsync<WegWijsResponseItem[]>(
+            var response = await _httpClient.GetFromJsonAsync<WegWijsResponseItem[]>(
                 uri,
                 new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
 

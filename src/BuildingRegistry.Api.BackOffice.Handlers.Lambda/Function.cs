@@ -51,18 +51,16 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda
             var tempProvider = services.BuildServiceProvider();
             var loggerFactory = tempProvider.GetRequiredService<ILoggerFactory>();
 
-            services.AddHttpClient<IAnoApiProxy, AnoApiProxy>();
+            services.AddHttpClient<AnoApiProxy>();
             services.Configure<AnoApiOptions>(configuration.GetSection("AnoApi"));
             builder.RegisterType<AnoApiProxy>()
                 .As<IAnoApiProxy>()
-                .AsSelf()
-                .SingleInstance();
+                .AsSelf();
 
-            services.AddHttpClient<IWegwijsApiProxy, WegwijsApiProxy>();
+            services.AddHttpClient<WegwijsApiProxy>();
             builder.RegisterType<WegwijsApiProxy>()
                 .As<IWegwijsApiProxy>()
-                .AsSelf()
-                .SingleInstance();
+                .AsSelf();
 
             builder
                 .RegisterType<Mediator>()
