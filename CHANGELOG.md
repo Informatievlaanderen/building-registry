@@ -1,3 +1,10 @@
+## [4.1.3](https://github.com/informatievlaanderen/building-registry/compare/v4.1.2...v4.1.3) (2024-03-26)
+
+
+### Bug Fixes
+
+* set message group id ([003ad1d](https://github.com/informatievlaanderen/building-registry/commit/003ad1dc1c605c49abddd8d988b852e48804ff31))
+
 ## [4.1.2](https://github.com/informatievlaanderen/building-registry/compare/v4.1.1...v4.1.2) (2024-03-25)
 
 
