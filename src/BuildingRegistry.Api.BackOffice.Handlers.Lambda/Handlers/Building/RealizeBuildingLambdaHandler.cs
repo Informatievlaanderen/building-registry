@@ -59,7 +59,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.Building
                         request.Provenance.Organisation.ToString(),
                         DateTimeOffset.UtcNow,
                         building.BuildingGeometry.Geometry.ToString());
-                    await _sqsQueue.Copy(sqsRequest, new SqsQueueOptions(), cancellationToken);
+                    await _sqsQueue.Copy(sqsRequest, new SqsQueueOptions { MessageGroupId = "GRB-ANO-API" }, cancellationToken);
                 }
             }
             catch (IdempotencyException)
