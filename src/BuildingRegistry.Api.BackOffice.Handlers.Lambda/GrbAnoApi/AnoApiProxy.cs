@@ -23,14 +23,14 @@
 
     public class AnoApiProxy : IAnoApiProxy
     {
-        private readonly IHttpClientFactory _httpClientFactory;
+        private readonly HttpClient _httpClient;
         private readonly AnoApiOptions _options;
 
         public AnoApiProxy(
-            IHttpClientFactory httpClientFactory,
+            HttpClient httpClient,
             IOptions<AnoApiOptions> options)
         {
-            _httpClientFactory = httpClientFactory;
+            _httpClient = httpClient;
             _options = options.Value;
         }
 
@@ -41,8 +41,7 @@
             ExtendedWkbGeometry geometry,
             CancellationToken ct)
         {
-            using var httpClient = _httpClientFactory.CreateClient();
-            httpClient.DefaultRequestHeaders.Authorization =
+            _httpClient.DefaultRequestHeaders.Authorization =
                 new AuthenticationHeaderValue("Bearer", await GetAccessToken(ct));
 
             var request = new AnoRequest(
@@ -51,7 +50,7 @@
                 dateTimeStatusChange,
                 geometry);
 
-            var response = await httpClient.PostAsJsonAsync(
+            var response = await _httpClient.PostAsJsonAsync(
                 new Uri(_options.BaseUrl + "/api/processing/anomalies"),
                 request,
                 new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase },
@@ -63,7 +62,7 @@
         private async Task<string> GetAccessToken(CancellationToken cancellationToken)
         {
             var tokenClient = new TokenClient(
-                () => _httpClientFactory.CreateClient(),
+                () => _httpClient,
                 new TokenClientOptions
                 {
                     Address = _options.TokenUrl,
