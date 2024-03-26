@@ -1,3 +1,10 @@
+## [4.1.5](https://github.com/informatievlaanderen/building-registry/compare/v4.1.4...v4.1.5) (2024-03-26)
+
+
+### Bug Fixes
+
+* ano organisation ([6989117](https://github.com/informatievlaanderen/building-registry/commit/69891172ebe702a3b4067372f00c96b8f538fa78))
+
 ## [4.1.4](https://github.com/informatievlaanderen/building-registry/compare/v4.1.3...v4.1.4) (2024-03-26)
 
 
