@@ -46,12 +46,17 @@ namespace BuildingRegistry.Consumer.Address
 
         public async Task<List<AddressData>> GetAddresses(List<AddressPersistentLocalId> addressPersistentLocalIds)
         {
+            var ids = addressPersistentLocalIds.Select(x => (int)x).ToList();
+
             var items = AddressConsumerItems
                 .AsNoTracking()
-                .Where(x => addressPersistentLocalIds.Contains(new AddressPersistentLocalId(x.AddressPersistentLocalId)));
+                .Where(x => ids.Contains(x.AddressPersistentLocalId));
 
             return await items
-                .Select(x => new AddressData(new AddressPersistentLocalId(x.AddressPersistentLocalId), Map(x.Status), x.IsRemoved))
+                .Select(x => new AddressData(
+                    new AddressPersistentLocalId(x.AddressPersistentLocalId),
+                    Map(x.Status),
+                    x.IsRemoved))
                 .ToListAsync();
         }
 
