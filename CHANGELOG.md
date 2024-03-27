@@ -1,3 +1,10 @@
+## [4.1.7](https://github.com/informatievlaanderen/building-registry/compare/v4.1.6...v4.1.7) (2024-03-27)
+
+
+### Bug Fixes
+
+* lambda parcel config ([3565186](https://github.com/informatievlaanderen/building-registry/commit/35651867692ebbdbf517e66058acfb3365f31067))
+
 ## [4.1.6](https://github.com/informatievlaanderen/building-registry/compare/v4.1.5...v4.1.6) (2024-03-27)
 
 
