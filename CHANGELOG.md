@@ -1,3 +1,10 @@
+## [4.1.9](https://github.com/informatievlaanderen/building-registry/compare/v4.1.8...v4.1.9) (2024-03-27)
+
+
+### Bug Fixes
+
+* consumeraddresscontext get addresses ([5995753](https://github.com/informatievlaanderen/building-registry/commit/5995753c13412e528bb4ee047d688d2e3da99d41))
+
 ## [4.1.8](https://github.com/informatievlaanderen/building-registry/compare/v4.1.7...v4.1.8) (2024-03-27)
 
 
