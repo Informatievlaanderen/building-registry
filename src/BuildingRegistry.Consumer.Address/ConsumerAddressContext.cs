@@ -52,12 +52,19 @@ namespace BuildingRegistry.Consumer.Address
                 .AsNoTracking()
                 .Where(x => ids.Contains(x.AddressPersistentLocalId));
 
-            return await items
+            return (await items
+                .Select(x =>
+                    new {
+                        x.AddressPersistentLocalId,
+                        x.Status,
+                        x.IsRemoved
+                    })
+                .ToListAsync())
                 .Select(x => new AddressData(
                     new AddressPersistentLocalId(x.AddressPersistentLocalId),
                     Map(x.Status),
                     x.IsRemoved))
-                .ToListAsync();
+                .ToList();
         }
 
         public BuildingRegistry.Building.Datastructures.AddressStatus Map(AddressStatus status)
