@@ -14,6 +14,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.Building
     using BuildingRegistry.Building.Exceptions;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Configuration;
+    using Microsoft.Extensions.Logging;
     using Requests.Building;
     using TicketingService.Abstractions;
 
@@ -27,6 +28,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.Building
         private readonly IPersistentLocalIdGenerator _persistentLocalIdGenerator;
         private readonly ILifetimeScope _lifetimeScope;
         private readonly bool _toggleAutomaticBuildingUnitCreationEnabled;
+        private ILogger<RealizeAndMeasureUnplannedBuildingLambdaHandler> _logger;
 
         public RealizeAndMeasureUnplannedBuildingLambdaHandler(
             IConfiguration configuration,
@@ -38,7 +40,8 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.Building
             IAddresses addresses,
             BackOfficeContext backOfficeContext,
             IPersistentLocalIdGenerator persistentLocalIdGenerator,
-            ILifetimeScope lifetimeScope)
+            ILifetimeScope lifetimeScope,
+            ILoggerFactory loggerFactory)
             : base(
                 configuration,
                 retryPolicy,
@@ -52,6 +55,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.Building
             _persistentLocalIdGenerator = persistentLocalIdGenerator;
             _lifetimeScope = lifetimeScope;
             _toggleAutomaticBuildingUnitCreationEnabled = configuration.GetValue<bool>("AutomaticBuildingUnitCreationToggle", false);
+            _logger = loggerFactory.CreateLogger<RealizeAndMeasureUnplannedBuildingLambdaHandler>();
         }
 
         protected override async Task<object> InnerHandle(RealizeAndMeasureUnplannedBuildingLambdaRequest request,
@@ -81,6 +85,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.Building
 
         private async Task RealizeUnplannedBuildingUnit(RealizeAndMeasureUnplannedBuildingLambdaRequest request, CancellationToken cancellationToken)
         {
+            _logger.LogInformation("RealizeUnplannedBuildingUnit started.");
             if (request.Request.GrbData.GrbObjectType != MainBuildingGrbObjectType)
             {
                 return;
@@ -93,12 +98,15 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.Building
                 .SelectMany(x => x.Addresses)
                 .ToList();
 
+            _logger.LogInformation($"Found {addresses.Count} addresses.");
+
             var activeAddresses = addresses.Any()
                 ? await GetActiveAddresses(addresses)
                 : new List<AddressData>();
 
             if (activeAddresses.Count != 1)
             {
+                _logger.LogInformation($"Found more than one active address");
                 return;
             }
 
@@ -111,6 +119,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.Building
 
             if (buildingUnitAddressRelations.Any())
             {
+                _logger.LogInformation("Address already has a building unit.");
                 return;
             }
 
@@ -124,6 +133,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.Building
 
             try
             {
+                _logger.LogInformation("Dispatching RealizeUnplannedBuildingUnit command.");
                 await using var scope = _lifetimeScope.BeginLifetimeScope();
                 await scope.Resolve<IIdempotentCommandHandler>().Dispatch(
                     buildingUnitCommand.CreateCommandId(),
