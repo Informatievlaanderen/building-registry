@@ -1,3 +1,10 @@
+## [4.1.8](https://github.com/informatievlaanderen/building-registry/compare/v4.1.7...v4.1.8) (2024-03-27)
+
+
+### Bug Fixes
+
+* retrieve addresses ([cce0a08](https://github.com/informatievlaanderen/building-registry/commit/cce0a0865d95bb7103fd1287d9bd7d76f79fbd2e))
+
 ## [4.1.7](https://github.com/informatievlaanderen/building-registry/compare/v4.1.6...v4.1.7) (2024-03-27)
 
 
