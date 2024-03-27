@@ -1,3 +1,11 @@
+## [4.1.6](https://github.com/informatievlaanderen/building-registry/compare/v4.1.5...v4.1.6) (2024-03-27)
+
+
+### Bug Fixes
+
+* add logging for realizeunplannedbuildingunit ([2783f12](https://github.com/informatievlaanderen/building-registry/commit/2783f12d91f5cd719b10913c8c59402ebc048083))
+* mainbuildingtype realizeunplannedbuildingunit ([836e789](https://github.com/informatievlaanderen/building-registry/commit/836e7897a21ce7c5d7fcd8ab6ce6c5ff47e64f36))
+
 ## [4.1.5](https://github.com/informatievlaanderen/building-registry/compare/v4.1.4...v4.1.5) (2024-03-26)
 
 
