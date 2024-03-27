@@ -22,6 +22,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
     using BuildingRegistry.Building.Events;
     using FluentAssertions;
     using Microsoft.Extensions.Configuration;
+    using Microsoft.Extensions.Logging.Abstractions;
     using Moq;
     using NetTopologySuite.Geometries;
     using NodaTime;
@@ -77,7 +78,8 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
                 addresses.Object,
                 _backOfficeContext,
                 _persistentLocalIdGenerator.Object,
-                Container);
+                Container,
+                NullLoggerFactory.Instance);
 
             //Act
             var buildingPersistentLocalId = Fixture.Create<BuildingPersistentLocalId>();
@@ -95,7 +97,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
                         {
                             GrbData = new GrbData
                             {
-                                GrbObjectType = "1",
+                                GrbObjectType = MainBuildingObjectType,
                                 VersionDate = SystemClock.Instance.GetCurrentInstant().ToString(),
                                 GeometriePolygoon =
                                     "<gml:Polygon srsName=\"https://www.opengis.net/def/crs/EPSG/0/31370\" xmlns:gml=\"http://www.opengis.net/gml/3.2\"><gml:exterior><gml:LinearRing><gml:posList>140284.15277253836 186724.74131567031 140291.06016454101 186726.38355567306 140288.22675654292 186738.25798767805 140281.19098053873 186736.57913967967 140284.15277253836 186724.74131567031</gml:posList></gml:LinearRing></gml:exterior></gml:Polygon>",
@@ -159,7 +161,8 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
                 addresses.Object,
                 _backOfficeContext,
                 _persistentLocalIdGenerator.Object,
-                Container);
+                Container,
+                NullLoggerFactory.Instance);
 
             //Act
             var buildingPersistentLocalId = Fixture.Create<BuildingPersistentLocalId>();
@@ -177,7 +180,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
                         {
                             GrbData = new GrbData
                             {
-                                GrbObjectType = "1",
+                                GrbObjectType = MainBuildingObjectType,
                                 VersionDate = SystemClock.Instance.GetCurrentInstant().ToString(),
                                 GeometriePolygoon =
                                     "<gml:Polygon srsName=\"https://www.opengis.net/def/crs/EPSG/0/31370\" xmlns:gml=\"http://www.opengis.net/gml/3.2\"><gml:exterior><gml:LinearRing><gml:posList>140284.15277253836 186724.74131567031 140291.06016454101 186726.38355567306 140288.22675654292 186738.25798767805 140281.19098053873 186736.57913967967 140284.15277253836 186724.74131567031</gml:posList></gml:LinearRing></gml:exterior></gml:Polygon>",
@@ -246,7 +249,8 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
                 addresses.Object,
                 _backOfficeContext,
                 _persistentLocalIdGenerator.Object,
-                Container);
+                Container,
+                NullLoggerFactory.Instance);
 
             //Act
             var buildingPersistentLocalId = Fixture.Create<BuildingPersistentLocalId>();
@@ -264,7 +268,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
                         {
                             GrbData = new GrbData
                             {
-                                GrbObjectType = "1",
+                                GrbObjectType = MainBuildingObjectType,
                                 VersionDate = SystemClock.Instance.GetCurrentInstant().ToString(),
                                 GeometriePolygoon =
                                     "<gml:Polygon srsName=\"https://www.opengis.net/def/crs/EPSG/0/31370\" xmlns:gml=\"http://www.opengis.net/gml/3.2\"><gml:exterior><gml:LinearRing><gml:posList>140284.15277253836 186724.74131567031 140291.06016454101 186726.38355567306 140288.22675654292 186738.25798767805 140281.19098053873 186736.57913967967 140284.15277253836 186724.74131567031</gml:posList></gml:LinearRing></gml:exterior></gml:Polygon>",
@@ -337,7 +341,8 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
                 addresses.Object,
                 _backOfficeContext,
                 _persistentLocalIdGenerator.Object,
-                Container);
+                Container,
+                NullLoggerFactory.Instance);
 
             //Act
             var buildingPersistentLocalId = Fixture.Create<BuildingPersistentLocalId>();
@@ -355,7 +360,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
                         {
                             GrbData = new GrbData
                             {
-                                GrbObjectType = "1",
+                                GrbObjectType = MainBuildingObjectType,
                                 VersionDate = SystemClock.Instance.GetCurrentInstant().ToString(),
                                 GeometriePolygoon =
                                     "<gml:Polygon srsName=\"https://www.opengis.net/def/crs/EPSG/0/31370\" xmlns:gml=\"http://www.opengis.net/gml/3.2\"><gml:exterior><gml:LinearRing><gml:posList>140284.15277253836 186724.74131567031 140291.06016454101 186726.38355567306 140288.22675654292 186738.25798767805 140281.19098053873 186736.57913967967 140284.15277253836 186724.74131567031</gml:posList></gml:LinearRing></gml:exterior></gml:Polygon>",
@@ -417,7 +422,8 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
                 addresses.Object,
                 _backOfficeContext,
                 _persistentLocalIdGenerator.Object,
-                Container);
+                Container,
+                NullLoggerFactory.Instance);
 
             //Act
             var buildingPersistentLocalId = Fixture.Create<BuildingPersistentLocalId>();
@@ -435,7 +441,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
                         {
                             GrbData = new GrbData
                             {
-                                GrbObjectType = "1",
+                                GrbObjectType = MainBuildingObjectType,
                                 VersionDate = SystemClock.Instance.GetCurrentInstant().ToString(),
                                 GeometriePolygoon =
                                     "<gml:Polygon srsName=\"https://www.opengis.net/def/crs/EPSG/0/31370\" xmlns:gml=\"http://www.opengis.net/gml/3.2\"><gml:exterior><gml:LinearRing><gml:posList>140284.15277253836 186724.74131567031 140291.06016454101 186726.38355567306 140288.22675654292 186738.25798767805 140281.19098053873 186736.57913967967 140284.15277253836 186724.74131567031</gml:posList></gml:LinearRing></gml:exterior></gml:Polygon>",
@@ -496,7 +502,8 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
                 addresses.Object,
                 _backOfficeContext,
                 _persistentLocalIdGenerator.Object,
-                Container);
+                Container,
+                NullLoggerFactory.Instance);
 
             //Act
             var buildingPersistentLocalId = Fixture.Create<BuildingPersistentLocalId>();
@@ -514,7 +521,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
                         {
                             GrbData = new GrbData
                             {
-                                GrbObjectType = "1",
+                                GrbObjectType = MainBuildingObjectType,
                                 VersionDate = SystemClock.Instance.GetCurrentInstant().ToString(),
                                 GeometriePolygoon =
                                     "<gml:Polygon srsName=\"https://www.opengis.net/def/crs/EPSG/0/31370\" xmlns:gml=\"http://www.opengis.net/gml/3.2\"><gml:exterior><gml:LinearRing><gml:posList>140284.15277253836 186724.74131567031 140291.06016454101 186726.38355567306 140288.22675654292 186738.25798767805 140281.19098053873 186736.57913967967 140284.15277253836 186724.74131567031</gml:posList></gml:LinearRing></gml:exterior></gml:Polygon>",
@@ -573,7 +580,8 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
                 addresses.Object,
                 _backOfficeContext,
                 _persistentLocalIdGenerator.Object,
-                Container);
+                Container,
+                NullLoggerFactory.Instance);
 
             //Act
             var buildingPersistentLocalId = Fixture.Create<BuildingPersistentLocalId>();
@@ -592,7 +600,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
                     {
                         GrbData = new GrbData
                         {
-                            GrbObjectType = "1",
+                            GrbObjectType = MainBuildingObjectType,
                             VersionDate = SystemClock.Instance.GetCurrentInstant().ToString(),
                             GeometriePolygoon =
                                 "<gml:Polygon srsName=\"https://www.opengis.net/def/crs/EPSG/0/31370\" xmlns:gml=\"http://www.opengis.net/gml/3.2\"><gml:exterior><gml:LinearRing><gml:posList>140284.15277253836 186724.74131567031 140291.06016454101 186726.38355567306 140288.22675654292 186738.25798767805 140281.19098053873 186736.57913967967 140284.15277253836 186724.74131567031</gml:posList></gml:LinearRing></gml:exterior></gml:Polygon>",
@@ -654,7 +662,8 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
                 Mock.Of<IAddresses>(),
                 _backOfficeContext,
                 _persistentLocalIdGenerator.Object,
-                Container);
+                Container,
+                NullLoggerFactory.Instance);
 
             //Act
             var buildingPersistentLocalId = Fixture.Create<BuildingPersistentLocalId>();

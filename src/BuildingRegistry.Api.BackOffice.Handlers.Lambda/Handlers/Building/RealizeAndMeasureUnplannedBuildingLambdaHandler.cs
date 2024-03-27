@@ -20,7 +20,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.Building
 
     public sealed class RealizeAndMeasureUnplannedBuildingLambdaHandler : BuildingLambdaHandler<RealizeAndMeasureUnplannedBuildingLambdaRequest>
     {
-        private const string MainBuildingGrbObjectType = "1";
+        private const string MainBuildingGrbObjectType = "MainBuilding";
 
         private readonly IParcelMatching _parcelMatching;
         private readonly IAddresses _addresses;

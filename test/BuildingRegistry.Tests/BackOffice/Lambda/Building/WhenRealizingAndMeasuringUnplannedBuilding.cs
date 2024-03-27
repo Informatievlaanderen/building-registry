@@ -23,6 +23,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
     using Fixtures;
     using FluentAssertions;
     using Microsoft.Extensions.Configuration;
+    using Microsoft.Extensions.Logging.Abstractions;
     using Moq;
     using NodaTime;
     using SqlStreamStore;
@@ -33,6 +34,8 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
 
     public partial class WhenRealizingAndMeasuringUnplannedBuilding : BackOfficeLambdaTest
     {
+        private const string MainBuildingObjectType = "MainBuilding";
+
         private readonly IdempotencyContext _idempotencyContext;
         private readonly BackOfficeContext _backOfficeContext;
         private readonly Mock<IPersistentLocalIdGenerator> _persistentLocalIdGenerator;
@@ -63,7 +66,8 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
                 Mock.Of<IAddresses>(),
                 _backOfficeContext,
                 _persistentLocalIdGenerator.Object,
-                Container);
+                Container,
+                NullLoggerFactory.Instance);
 
             //Act
             await handler.Handle(
@@ -119,7 +123,8 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
                 Mock.Of<IAddresses>(),
                 _backOfficeContext,
                 _persistentLocalIdGenerator.Object,
-                Container);
+                Container,
+                NullLoggerFactory.Instance);
 
             //Act
             await handler.Handle(
@@ -172,7 +177,8 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
                 Mock.Of<IAddresses>(),
                 _backOfficeContext,
                 _persistentLocalIdGenerator.Object,
-                Container);
+                Container,
+                NullLoggerFactory.Instance);
 
             var request = new RealizeAndMeasureUnplannedBuildingLambdaRequest(
                 buildingPersistentLocalId,
