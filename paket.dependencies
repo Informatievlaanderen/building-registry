@@ -1,5 +1,4 @@
 framework: net8.0
-strategy: min
 source https://api.nuget.org/v3/index.json
 
 // PRODUCTION STUFF
