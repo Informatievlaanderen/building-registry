@@ -8,8 +8,6 @@ namespace BuildingRegistry.Consumer.Read.Parcel.Infrastructure
     using Autofac;
     using Autofac.Extensions.DependencyInjection;
     using Be.Vlaanderen.Basisregisters.Aws.DistributedMutex;
-    using Be.Vlaanderen.Basisregisters.DataDog.Tracing.Autofac;
-    using Be.Vlaanderen.Basisregisters.DataDog.Tracing.Sql.EntityFrameworkCore;
     using Be.Vlaanderen.Basisregisters.EventHandling;
     using Be.Vlaanderen.Basisregisters.MessageHandling.Kafka;
     using Be.Vlaanderen.Basisregisters.MessageHandling.Kafka.Consumer;
@@ -74,12 +72,9 @@ namespace BuildingRegistry.Consumer.Read.Parcel.Infrastructure
                     var loggerFactory = new SerilogLoggerFactory(Log.Logger);
 
                     services
-                        .AddScoped(_ => new TraceDbConnection<ConsumerParcelContext>(
-                            new SqlConnection(hostContext.Configuration.GetConnectionString("ConsumerParcel")),
-                            hostContext.Configuration["DataDog:ServiceName"]))
-                        .AddDbContextFactory<ConsumerParcelContext>((provider, options) => options
+                        .AddDbContextFactory<ConsumerParcelContext>((_, options) => options
                             .UseLoggerFactory(loggerFactory)
-                            .UseSqlServer(provider.GetRequiredService<TraceDbConnection<ConsumerParcelContext>>(), sqlServerOptions =>
+                            .UseSqlServer(hostContext.Configuration.GetConnectionString("ConsumerParcel"), sqlServerOptions =>
                             {
                                 sqlServerOptions.EnableRetryOnFailure();
                                 sqlServerOptions.MigrationsHistoryTable(MigrationTables.ConsumerReadParcel, Schema.ConsumerReadParcel);
@@ -131,9 +126,6 @@ namespace BuildingRegistry.Consumer.Read.Parcel.Infrastructure
                         })
                         .As<IConsumer>()
                         .SingleInstance();
-
-                    builder
-                        .RegisterModule(new DataDogModule(hostContext.Configuration));
 
                     builder
                         .RegisterType<ConsumerParcel>()

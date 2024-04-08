@@ -3,7 +3,6 @@ namespace BuildingRegistry.Api.Oslo.Infrastructure.Modules
     using Autofac;
     using Autofac.Extensions.DependencyInjection;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
-    using Be.Vlaanderen.Basisregisters.DataDog.Tracing.Autofac;
     using Consumer.Read.Parcel.Infrastructure.Modules;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
@@ -36,8 +35,6 @@ namespace BuildingRegistry.Api.Oslo.Infrastructure.Modules
             {
                 useProjectionsV2 = bool.Parse(useProjectionsV2ConfigValue);
             }
-
-            builder.RegisterModule(new DataDogModule(_configuration));
 
             builder
                 .RegisterModule(new MediatRModule())

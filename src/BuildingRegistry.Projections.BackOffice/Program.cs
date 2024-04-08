@@ -4,21 +4,19 @@
     using System.IO;
     using System.Threading;
     using System.Threading.Tasks;
+    using Api.BackOffice.Abstractions;
     using Autofac;
     using Autofac.Extensions.DependencyInjection;
     using Be.Vlaanderen.Basisregisters.Aws.DistributedMutex;
-    using Be.Vlaanderen.Basisregisters.DataDog.Tracing.Sql.EntityFrameworkCore;
     using Be.Vlaanderen.Basisregisters.EventHandling;
     using Be.Vlaanderen.Basisregisters.EventHandling.Autofac;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Autofac;
     using Be.Vlaanderen.Basisregisters.Projector;
     using Be.Vlaanderen.Basisregisters.Projector.ConnectedProjections;
     using Be.Vlaanderen.Basisregisters.Projector.Modules;
-    using BuildingRegistry.Api.BackOffice.Abstractions;
     using BuildingRegistry.Infrastructure;
     using Destructurama;
     using Infrastructure;
-    using Microsoft.Data.SqlClient;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
@@ -80,12 +78,9 @@
 
                     services
                         .ConfigureBackOfficeProjectionsContext(hostContext.Configuration, loggerFactory)
-                        .AddTransient(_ => new TraceDbConnection<BackOfficeContext>(
-                            new SqlConnection(hostContext.Configuration.GetConnectionString("BackOffice")),
-                            hostContext.Configuration["DataDog:ServiceName"]))
-                        .AddDbContextFactory<BackOfficeContext>((provider, options) => options
+                        .AddDbContextFactory<BackOfficeContext>((_, options) => options
                             .UseLoggerFactory(loggerFactory)
-                            .UseSqlServer(provider.GetRequiredService<TraceDbConnection<BackOfficeContext>>(),
+                            .UseSqlServer(hostContext.Configuration.GetConnectionString("BackOffice"),
                                 sqlServerOptions => sqlServerOptions
                                     .EnableRetryOnFailure()
                                     .MigrationsHistoryTable(MigrationTables.BackOffice, Schema.BackOffice)

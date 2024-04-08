@@ -1,7 +1,6 @@
 Be.Vlaanderen.Basisregisters.AggregateSource
 Be.Vlaanderen.Basisregisters.Api
 Be.Vlaanderen.Basisregisters.EventHandling.Autofac
-Be.Vlaanderen.Basisregisters.DataDog.Tracing.Autofac
 Be.Vlaanderen.Basisregisters.Projector
 
 Npgsql
@@ -10,6 +9,8 @@ Npgsql.EntityFrameworkCore.PostgreSQL.NetTopologySuite
 
 AspNetCore.HealthChecks.SqlServer
 AspNetCore.HealthChecks.NpgSql
+
+Datadog.Trace.Bundle
 
 SourceLink.Embed.AllSourceFiles
 SourceLink.Copy.PdbFiles
