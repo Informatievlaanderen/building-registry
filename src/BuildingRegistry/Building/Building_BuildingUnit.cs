@@ -263,8 +263,7 @@ namespace BuildingRegistry.Building
 
             var status =
                 buildingUnit.Status == BuildingStatus.Realized
-                && (sourceBuilding.BuildingStatus == BuildingStatus.UnderConstruction
-                    || sourceBuilding.BuildingStatus == BuildingStatus.Planned)
+                && (BuildingStatus == BuildingStatus.Planned || BuildingStatus == BuildingStatus.UnderConstruction)
                     ? BuildingUnitStatus.Planned
                     : buildingUnit.Status;
 
@@ -284,7 +283,7 @@ namespace BuildingRegistry.Building
                 buildingUnit.HasDeviation,
                 buildingUnit.AddressPersistentLocalIds
             ));
-            
+
             EnsureCommonBuildingUnit(addCommonBuildingUnit);
         }
 
