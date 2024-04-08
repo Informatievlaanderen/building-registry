@@ -4,8 +4,6 @@ namespace BuildingRegistry.Producer.Infrastructure.Modules
     using Autofac;
     using Autofac.Extensions.DependencyInjection;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
-    using Be.Vlaanderen.Basisregisters.DataDog.Tracing.Autofac;
-    using Be.Vlaanderen.Basisregisters.DataDog.Tracing.Sql.EntityFrameworkCore;
     using Be.Vlaanderen.Basisregisters.EventHandling;
     using Be.Vlaanderen.Basisregisters.EventHandling.Autofac;
     using Be.Vlaanderen.Basisregisters.MessageHandling.Kafka;
@@ -16,7 +14,6 @@ namespace BuildingRegistry.Producer.Infrastructure.Modules
     using Be.Vlaanderen.Basisregisters.Projector.ConnectedProjections;
     using Be.Vlaanderen.Basisregisters.Projector.Modules;
     using BuildingRegistry.Infrastructure;
-    using Microsoft.Data.SqlClient;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
@@ -40,8 +37,6 @@ namespace BuildingRegistry.Producer.Infrastructure.Modules
 
         protected override void Load(ContainerBuilder builder)
         {
-            builder.RegisterModule(new DataDogModule(_configuration));
-
             RegisterProjectionSetup(builder);
 
             builder
@@ -73,7 +68,7 @@ namespace BuildingRegistry.Producer.Infrastructure.Modules
             var hasConnectionString = !string.IsNullOrWhiteSpace(connectionString);
             if (hasConnectionString)
             {
-                RunOnSqlServer(_configuration, _services, _loggerFactory, connectionString);
+                RunOnSqlServer(_services, _loggerFactory, connectionString);
             }
             else
             {
@@ -145,18 +140,14 @@ namespace BuildingRegistry.Producer.Infrastructure.Modules
         }
 
         private static void RunOnSqlServer(
-            IConfiguration configuration,
             IServiceCollection services,
             ILoggerFactory loggerFactory,
-            string backofficeProjectionsConnectionString)
+            string producerConnectionString)
         {
             services
-                .AddScoped(_ => new TraceDbConnection<ProducerContext>(
-                    new SqlConnection(backofficeProjectionsConnectionString),
-                    configuration["DataDog:ServiceName"]))
-                .AddDbContext<ProducerContext>((provider, options) => options
+                .AddDbContext<ProducerContext>((_, options) => options
                     .UseLoggerFactory(loggerFactory)
-                    .UseSqlServer(provider.GetRequiredService<TraceDbConnection<ProducerContext>>(), sqlServerOptions =>
+                    .UseSqlServer(producerConnectionString, sqlServerOptions =>
                     {
                         sqlServerOptions.EnableRetryOnFailure();
                         sqlServerOptions.MigrationsHistoryTable(MigrationTables.Producer, Schema.Producer);

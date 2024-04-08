@@ -2,7 +2,6 @@ namespace BuildingRegistry.Infrastructure
 {
     using System;
     using Be.Vlaanderen.Basisregisters.AggregateSource.SqlStreamStore.Autofac;
-    using Be.Vlaanderen.Basisregisters.DataDog.Tracing.SqlStreamStore;
     using Autofac;
     using Autofac.Core.Registration;
     using Microsoft.Extensions.Configuration;
@@ -21,8 +20,7 @@ namespace BuildingRegistry.Infrastructure
             }
 
             builder
-                .RegisterModule(new SqlStreamStoreModule(connectionString, Schema.Default))
-                .RegisterModule(new TraceSqlStreamStoreModule(configuration["DataDog:ServiceName"]));
+                .RegisterModule(new SqlStreamStoreModule(connectionString, Schema.Default));
 
             return builder;
         }
@@ -39,8 +37,7 @@ namespace BuildingRegistry.Infrastructure
             }
 
             return builder
-                .RegisterModule(new SqlStreamStoreModule(connectionString, Schema.Default))
-                .RegisterModule(new TraceSqlStreamStoreModule(configuration["DataDog:ServiceName"]));
+                .RegisterModule(new SqlStreamStoreModule(connectionString, Schema.Default));
         }
 
         public static void RegisterSnapshotModule(this ContainerBuilder builder, IConfiguration configuration)

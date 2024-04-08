@@ -2,9 +2,7 @@ namespace BuildingRegistry.Migrator.Building.Projections
 {
     using System;
     using Autofac;
-    using Be.Vlaanderen.Basisregisters.DataDog.Tracing.Sql.EntityFrameworkCore;
     using BuildingRegistry.Infrastructure;
-    using Microsoft.Data.SqlClient;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
@@ -24,7 +22,7 @@ namespace BuildingRegistry.Migrator.Building.Projections
             var hasConnectionString = !string.IsNullOrWhiteSpace(connectionString);
             if (hasConnectionString)
             {
-                RunOnSqlServer(configuration, services, serviceLifetime, loggerFactory, connectionString);
+                RunOnSqlServer(services, serviceLifetime, loggerFactory, connectionString);
             }
             else
             {
@@ -33,19 +31,15 @@ namespace BuildingRegistry.Migrator.Building.Projections
         }
 
         private static void RunOnSqlServer(
-            IConfiguration configuration,
             IServiceCollection services,
             ServiceLifetime serviceLifetime,
             ILoggerFactory loggerFactory,
-            string consumerProjectionsConnectionString)
+            string eventsConnectionString)
         {
             services
-                .AddScoped(s => new TraceDbConnection<MigratorProjectionContext>(
-                    new SqlConnection(consumerProjectionsConnectionString),
-                    configuration["DataDog:ServiceName"]))
-                .AddDbContext<MigratorProjectionContext>((provider, options) => options
+                .AddDbContext<MigratorProjectionContext>((_, options) => options
                     .UseLoggerFactory(loggerFactory)
-                    .UseSqlServer(provider.GetRequiredService<TraceDbConnection<MigratorProjectionContext>>(), sqlServerOptions =>
+                    .UseSqlServer(eventsConnectionString, sqlServerOptions =>
                     {
                         sqlServerOptions.EnableRetryOnFailure();
                         sqlServerOptions.MigrationsHistoryTable(MigrationTables.MigratorProjection, Schema.MigrateBuilding);

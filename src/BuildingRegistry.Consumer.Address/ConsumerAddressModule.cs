@@ -2,10 +2,8 @@ namespace BuildingRegistry.Consumer.Address
 {
     using System;
     using Autofac;
-    using Be.Vlaanderen.Basisregisters.DataDog.Tracing.Sql.EntityFrameworkCore;
-    using BuildingRegistry.Building;
+    using Building;
     using BuildingRegistry.Infrastructure;
-    using Microsoft.Data.SqlClient;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
@@ -25,7 +23,7 @@ namespace BuildingRegistry.Consumer.Address
             var hasConnectionString = !string.IsNullOrWhiteSpace(connectionString);
             if (hasConnectionString)
             {
-                RunOnSqlServer(configuration, services, serviceLifetime, loggerFactory, connectionString);
+                RunOnSqlServer(services, serviceLifetime, loggerFactory, connectionString);
             }
             else
             {
@@ -36,19 +34,15 @@ namespace BuildingRegistry.Consumer.Address
         }
 
         private static void RunOnSqlServer(
-            IConfiguration configuration,
             IServiceCollection services,
             ServiceLifetime serviceLifetime,
             ILoggerFactory loggerFactory,
             string consumerProjectionsConnectionString)
         {
             services
-                .AddScoped(s => new TraceDbConnection<ConsumerAddressContext>(
-                    new SqlConnection(consumerProjectionsConnectionString),
-                    configuration["DataDog:ServiceName"]))
                 .AddDbContext<ConsumerAddressContext>((provider, options) => options
                     .UseLoggerFactory(loggerFactory)
-                    .UseSqlServer(provider.GetRequiredService<TraceDbConnection<ConsumerAddressContext>>(), sqlServerOptions =>
+                    .UseSqlServer(consumerProjectionsConnectionString, sqlServerOptions =>
                     {
                         sqlServerOptions.EnableRetryOnFailure();
                         sqlServerOptions.MigrationsHistoryTable(MigrationTables.ConsumerAddress, Schema.ConsumerAddress);

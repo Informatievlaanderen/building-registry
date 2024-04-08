@@ -2,10 +2,8 @@ namespace BuildingRegistry.Projections.Legacy
 {
     using System;
     using Autofac;
-    using Be.Vlaanderen.Basisregisters.DataDog.Tracing.Sql.EntityFrameworkCore;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.Runner.SqlServer.MigrationExtensions;
     using Infrastructure;
-    using Microsoft.Data.SqlClient;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
@@ -23,7 +21,7 @@ namespace BuildingRegistry.Projections.Legacy
 
             var hasConnectionString = !string.IsNullOrWhiteSpace(connectionString);
             if (hasConnectionString)
-                RunOnSqlServer(configuration, services, loggerFactory, connectionString);
+                RunOnSqlServer(services, loggerFactory, connectionString);
             else
                 RunInMemoryDb(services, loggerFactory, logger);
 
@@ -37,18 +35,14 @@ namespace BuildingRegistry.Projections.Legacy
         }
 
         private static void RunOnSqlServer(
-            IConfiguration configuration,
             IServiceCollection services,
             ILoggerFactory loggerFactory,
-            string backofficeProjectionsConnectionString)
+            string legacyConnectionString)
         {
             services
-                .AddScoped(s => new TraceDbConnection<LegacyContext>(
-                    new SqlConnection(backofficeProjectionsConnectionString),
-                    configuration["DataDog:ServiceName"]))
-                .AddDbContext<LegacyContext>((provider, options) => options
+                .AddDbContext<LegacyContext>((_, options) => options
                     .UseLoggerFactory(loggerFactory)
-                    .UseSqlServer(provider.GetRequiredService<TraceDbConnection<LegacyContext>>(), sqlServerOptions =>
+                    .UseSqlServer(legacyConnectionString, sqlServerOptions =>
                     {
                         sqlServerOptions.EnableRetryOnFailure();
                         sqlServerOptions.MigrationsHistoryTable(MigrationTables.Extract, Schema.Extract);
