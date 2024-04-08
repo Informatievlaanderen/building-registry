@@ -6,12 +6,12 @@ namespace BuildingRegistry.Tests.Extensions
 
     public static class BuildingUnitWasPlannedV2Extensions
     {
-        public static BuildingUnitWasPlannedV2 WithBuildingUnitPersistentLocalId(this BuildingUnitWasPlannedV2 @event,
-            BuildingUnitPersistentLocalId buildingUnitPersistentLocalId)
+        public static BuildingUnitWasPlannedV2 WithBuildingPersistentLocalId(this BuildingUnitWasPlannedV2 @event,
+            int buildingPersistentLocalId)
         {
             var updatedEvent = new BuildingUnitWasPlannedV2(
-                new BuildingPersistentLocalId(@event.BuildingPersistentLocalId),
-                buildingUnitPersistentLocalId,
+                new BuildingPersistentLocalId(buildingPersistentLocalId),
+                new BuildingUnitPersistentLocalId(@event.BuildingUnitPersistentLocalId),
                 BuildingUnitPositionGeometryMethod.Parse(@event.GeometryMethod),
                 new ExtendedWkbGeometry(@event.ExtendedWkbGeometry),
                 BuildingUnitFunction.Parse(@event.Function),
@@ -127,6 +127,21 @@ namespace BuildingRegistry.Tests.Extensions
 
     public static class CommonBuildingUnitWasAddedV2Extensions
     {
+        public static CommonBuildingUnitWasAddedV2 WithBuildingPersistentLocalId(this CommonBuildingUnitWasAddedV2 @event,
+            int buildingPersistentLocalId)
+        {
+            var updatedEvent = new CommonBuildingUnitWasAddedV2(
+                new BuildingPersistentLocalId(buildingPersistentLocalId),
+                new BuildingUnitPersistentLocalId(@event.BuildingUnitPersistentLocalId),
+                BuildingUnitStatus.Parse(@event.BuildingUnitStatus),
+                BuildingUnitPositionGeometryMethod.Parse(@event.GeometryMethod),
+                new ExtendedWkbGeometry(@event.ExtendedWkbGeometry),
+                @event.HasDeviation);
+            ((ISetProvenance)updatedEvent).SetProvenance(@event.Provenance.ToProvenance());
+
+            return updatedEvent;
+        }
+
         public static CommonBuildingUnitWasAddedV2 WithBuildingUnitPersistentLocalId(this CommonBuildingUnitWasAddedV2 @event,
             BuildingUnitPersistentLocalId buildingUnitPersistentLocalId)
         {
@@ -157,21 +172,7 @@ namespace BuildingRegistry.Tests.Extensions
             return updatedEvent;
         }
     }
-
-    public static class BuildingUnitWasRemovedV2Extensions
-    {
-        public static BuildingUnitWasRemovedV2 WithBuildingUnitPersistentLocalId(this BuildingUnitWasRemovedV2 @event,
-            BuildingUnitPersistentLocalId buildingUnitPersistentLocalId)
-        {
-            var updatedEvent = new BuildingUnitWasRemovedV2(
-                new BuildingPersistentLocalId(@event.BuildingPersistentLocalId),
-                buildingUnitPersistentLocalId);
-            ((ISetProvenance)updatedEvent).SetProvenance(@event.Provenance.ToProvenance());
-
-            return updatedEvent;
-        }
-    }
-
+    
     public static class BuildingUnitWasRegularizedExtensions
     {
         public static BuildingUnitWasRegularized WithBuildingUnitPersistentLocalId(this BuildingUnitWasRegularized @event,

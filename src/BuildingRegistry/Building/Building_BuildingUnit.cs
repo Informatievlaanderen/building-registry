@@ -254,13 +254,37 @@ namespace BuildingRegistry.Building
             BuildingUnitPersistentLocalId buildingUnitPersistentLocalId,
             IAddCommonBuildingUnit addCommonBuildingUnit)
         {
+            sourceBuilding.GuardRemovedBuilding();
+            var buildingUnit = sourceBuilding._buildingUnits.GetNotRemovedByPersistentLocalId(buildingUnitPersistentLocalId);
+            buildingUnit.GuardCommonUnit();
+
             GuardRemovedBuilding();
             GuardBuildingValidStatuses(BuildingStatus.Planned, BuildingStatus.UnderConstruction, BuildingStatus.Realized);
 
-            var buildingUnit = sourceBuilding._buildingUnits.GetNotRemovedByPersistentLocalId(buildingUnitPersistentLocalId);
-            var @event = BuildingUnit.CreateBuildingUnitMovedIntoBuildingEvent(buildingUnit, sourceBuilding, this);
-            ApplyChange(@event);
+            var status =
+                buildingUnit.Status == BuildingStatus.Realized
+                && (sourceBuilding.BuildingStatus == BuildingStatus.UnderConstruction
+                    || sourceBuilding.BuildingStatus == BuildingStatus.Planned)
+                    ? BuildingUnitStatus.Planned
+                    : buildingUnit.Status;
 
+            var position = buildingUnit.BuildingUnitPosition.GeometryMethod == BuildingUnitPositionGeometryMethod.AppointedByAdministrator
+                           && BuildingGeometry.Contains(buildingUnit.BuildingUnitPosition.Geometry)
+                ? buildingUnit.BuildingUnitPosition
+                : new BuildingUnitPosition(BuildingGeometry.Center, BuildingUnitPositionGeometryMethod.DerivedFromObject);
+
+            ApplyChange(new BuildingUnitMovedIntoBuilding(
+                BuildingPersistentLocalId,
+                sourceBuilding.BuildingPersistentLocalId,
+                buildingUnit.BuildingUnitPersistentLocalId,
+                status,
+                position.GeometryMethod,
+                position.Geometry,
+                buildingUnit.Function,
+                buildingUnit.HasDeviation,
+                buildingUnit.AddressPersistentLocalIds
+            ));
+            
             EnsureCommonBuildingUnit(addCommonBuildingUnit);
         }
 

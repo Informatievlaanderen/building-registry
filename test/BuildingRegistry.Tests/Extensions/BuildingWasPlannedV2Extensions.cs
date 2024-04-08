@@ -1,4 +1,4 @@
-﻿namespace BuildingRegistry.Tests.Extensions
+namespace BuildingRegistry.Tests.Extensions
 {
     using AutoFixture;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
