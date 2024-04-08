@@ -251,26 +251,17 @@ namespace BuildingRegistry.Building
 
         public void MoveBuildingUnitInto(
             Building sourceBuilding,
-            BuildingUnitPersistentLocalId buildingUnitPersistentLocalId)
+            BuildingUnitPersistentLocalId buildingUnitPersistentLocalId,
+            IAddCommonBuildingUnit addCommonBuildingUnit)
         {
             GuardRemovedBuilding();
-
             GuardBuildingValidStatuses(BuildingStatus.Planned, BuildingStatus.UnderConstruction, BuildingStatus.Realized);
 
             var buildingUnit = sourceBuilding._buildingUnits.GetNotRemovedByPersistentLocalId(buildingUnitPersistentLocalId);
-            
+            var @event = BuildingUnit.CreateBuildingUnitMovedIntoBuildingEvent(buildingUnit, sourceBuilding, this);
+            ApplyChange(@event);
 
-            /*Doelgebouw
-               De regels van status gebouweenheid vs gebouw blijven behouden.
-               Een gerealiseerd gebouweenheid kan niet bestaan in een gepland gebouw.
-               Een gehistoreerd gebouweenheid kan bestaan in een een gerealiseerd gebouw, maar niet in een gepland of in aanbouw zijnde gebouw
-
-            Brongebouw
-               Een gebouweenheid kan verplaatst worden vanuit een gepland, in aanbouw, gerealiseerd of gehistoreerd gebouw.
-               Opm. bij een gehistoreerd gebouw zal het gebouweenheid ook gehistoreerd zijn en dus ook geen adreskoppelingen meer hebben.
-            */
-
-
+            EnsureCommonBuildingUnit(addCommonBuildingUnit);
         }
 
         public void MoveBuildingUnitOutOf(BuildingPersistentLocalId destinationBuildingPersistentLocalId, BuildingUnitPersistentLocalId buildingUnitPersistentLocalId)

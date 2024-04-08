@@ -63,6 +63,7 @@ namespace BuildingRegistry.Building
             Register<BuildingUnitWasNotRealizedBecauseBuildingWasDemolished>(When);
             Register<BuildingUnitWasRetiredBecauseBuildingWasDemolished>(When);
             Register<BuildingMeasurementWasChanged>(When);
+            Register<BuildingUnitMovedIntoBuilding>(When);
 
             // Register<BuildingUnitWasTransferred>(When);
         }
@@ -326,6 +327,21 @@ namespace BuildingRegistry.Building
             BuildingUnitPosition = new BuildingUnitPosition(
                 new ExtendedWkbGeometry(@event.ExtendedWkbGeometryBuildingUnits),
                 BuildingUnitPositionGeometryMethod.DerivedFromObject);
+
+            _lastEvent = @event;
+        }
+
+        private void When(BuildingUnitMovedIntoBuilding @event)
+        {
+            _buildingPersistentLocalId = new BuildingPersistentLocalId(@event.BuildingPersistentLocalId);
+            BuildingUnitPersistentLocalId = new BuildingUnitPersistentLocalId(@event.BuildingUnitPersistentLocalId);
+            Function = BuildingUnitFunction.Parse(@event.Function);
+            Status = BuildingUnitStatus.Parse(@event.BuildingUnitStatus);
+            BuildingUnitPosition = new BuildingUnitPosition(
+                new ExtendedWkbGeometry(@event.ExtendedWkbGeometry),
+                BuildingUnitPositionGeometryMethod.Parse(@event.GeometryMethod));
+
+            HasDeviation = @event.HasDeviation;
 
             _lastEvent = @event;
         }

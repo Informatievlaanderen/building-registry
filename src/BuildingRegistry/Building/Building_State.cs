@@ -79,6 +79,7 @@ namespace BuildingRegistry.Building
             Register<BuildingUnitWasNotRealizedBecauseBuildingWasDemolished>(When);
             Register<BuildingUnitWasRetiredBecauseBuildingWasDemolished>(When);
             Register<BuildingMeasurementWasChanged>(When);
+            Register<BuildingUnitMovedIntoBuilding>(When);
 
             // Register<BuildingMergerWasRealized>(When);
             // Register<BuildingUnitWasTransferred>(When);
@@ -391,6 +392,15 @@ namespace BuildingRegistry.Building
 
                 buildingUnit.Route(@event);
             }
+
+            _lastEvent = @event;
+        }
+
+        private void When(BuildingUnitMovedIntoBuilding @event)
+        {
+            var newBuildingUnit = new BuildingUnit(ApplyChange);
+            newBuildingUnit.Route(@event);
+            _buildingUnits.Add(newBuildingUnit);
 
             _lastEvent = @event;
         }

@@ -21,6 +21,19 @@ namespace BuildingRegistry.Building.Events
         public int SourceBuildingPersistentLocalId { get; }
         [EventPropertyDescription("Objectidentificator van de gebouweenheid.")]
         public int BuildingUnitPersistentLocalId { get; }
+        [EventPropertyDescription("De status van de gebouweenheid. Mogelijkheden: Planned of Realized.")]
+        public string BuildingUnitStatus { get; set; }
+        [EventPropertyDescription("Geometriemethode van de gebouweenheidpositie. Mogelijkheden: Outlined of MeasuredByGrb.")]
+        public string GeometryMethod { get; }
+
+        [EventPropertyDescription("Extended WKB-voorstelling van de gebouweenheidpositie (Hexadecimale notatie).")]
+        public string ExtendedWkbGeometry { get; }
+
+        [EventPropertyDescription("Functie van de gebouweenheid.")]
+        public string Function { get; }
+
+        [EventPropertyDescription("Gebouweenheid afwijking.")]
+        public bool HasDeviation { get; }
 
         [EventPropertyDescription("Metadata bij het event.")]
         public ProvenanceData Provenance { get; private set; }
@@ -28,11 +41,21 @@ namespace BuildingRegistry.Building.Events
         public BuildingUnitMovedIntoBuilding(
             BuildingPersistentLocalId buildingPersistentLocalId,
             BuildingPersistentLocalId sourceBuildingPersistentLocalId,
-            BuildingUnitPersistentLocalId buildingUnitPersistentLocalId)
+            BuildingUnitPersistentLocalId buildingUnitPersistentLocalId,
+            BuildingUnitStatus buildingUnitStatus,
+            BuildingUnitPositionGeometryMethod geometryMethod,
+            ExtendedWkbGeometry extendedWkbGeometry,
+            BuildingUnitFunction function,
+            bool hasDeviation)
         {
             BuildingPersistentLocalId = buildingPersistentLocalId;
             SourceBuildingPersistentLocalId = sourceBuildingPersistentLocalId;
             BuildingUnitPersistentLocalId = buildingUnitPersistentLocalId;
+            BuildingUnitStatus = buildingUnitStatus;
+            GeometryMethod = geometryMethod;
+            ExtendedWkbGeometry = extendedWkbGeometry;
+            Function = function;
+            HasDeviation = hasDeviation;
         }
 
         [JsonConstructor]
@@ -40,11 +63,21 @@ namespace BuildingRegistry.Building.Events
             int buildingPersistentLocalId,
             int sourceBuildingPersistentLocalId,
             int buildingUnitPersistentLocalId,
+            string buildingUnitStatus,
+            string geometryMethod,
+            string extendedWkbGeometry,
+            string function,
+            bool hasDeviation,
             ProvenanceData provenance)
             : this(
                 new BuildingPersistentLocalId(buildingPersistentLocalId),
                 new BuildingPersistentLocalId(sourceBuildingPersistentLocalId),
-                new BuildingUnitPersistentLocalId(buildingUnitPersistentLocalId))
+                new BuildingUnitPersistentLocalId(buildingUnitPersistentLocalId),
+                BuildingRegistry.Building.BuildingUnitStatus.Parse(buildingUnitStatus),
+                BuildingUnitPositionGeometryMethod.Parse(geometryMethod),
+                new ExtendedWkbGeometry(extendedWkbGeometry),
+                BuildingUnitFunction.Parse(function),
+                hasDeviation)
             => ((ISetProvenance)this).SetProvenance(provenance.ToProvenance());
 
         void ISetProvenance.SetProvenance(Provenance provenance) => Provenance = new ProvenanceData(provenance);
@@ -55,6 +88,11 @@ namespace BuildingRegistry.Building.Events
             fields.Add(BuildingPersistentLocalId.ToString(CultureInfo.InvariantCulture));
             fields.Add(SourceBuildingPersistentLocalId.ToString(CultureInfo.InvariantCulture));
             fields.Add(BuildingUnitPersistentLocalId.ToString(CultureInfo.InvariantCulture));
+            fields.Add(BuildingUnitStatus);
+            fields.Add(GeometryMethod);
+            fields.Add(ExtendedWkbGeometry);
+            fields.Add(Function);
+            fields.Add(HasDeviation.ToString());
             return fields;
         }
 

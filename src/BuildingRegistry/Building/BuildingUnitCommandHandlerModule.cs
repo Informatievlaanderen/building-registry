@@ -290,7 +290,8 @@ namespace BuildingRegistry.Building
                     var sourceBuilding = await buildings.GetAsync(sourceStreamId, ct);
 
                     building.MoveBuildingUnitInto(sourceBuilding,
-                        message.Command.BuildingUnitPersistentLocalId);
+                        message.Command.BuildingUnitPersistentLocalId,
+                        addCommonBuildingUnit);
                 });
 
             For<MoveBuildingUnitOutOfBuilding>()

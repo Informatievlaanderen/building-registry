@@ -61,6 +61,45 @@ namespace BuildingRegistry.Building
             return unit;
         }
 
+        public static BuildingUnitMovedIntoBuilding CreateBuildingUnitMovedIntoBuildingEvent(
+            BuildingUnit buildingUnit,
+            Building sourceBuilding,
+            Building destinationBuilding)
+        {
+            buildingUnit.GuardCommonUnit();
+
+            var newStatus =
+                buildingUnit.Status == BuildingStatus.Realized
+                && (sourceBuilding.BuildingStatus == BuildingStatus.UnderConstruction
+                    || sourceBuilding.BuildingStatus == BuildingStatus.Planned)
+                    ? BuildingUnitStatus.Planned
+                    : buildingUnit.Status;
+
+            var position = DetermineBuildingUnitPosition();
+            
+            return new BuildingUnitMovedIntoBuilding(
+                destinationBuilding.BuildingPersistentLocalId,
+                sourceBuilding.BuildingPersistentLocalId,
+                buildingUnit.BuildingUnitPersistentLocalId,
+                newStatus,
+                position.GeometryMethod,
+                position.Geometry,
+                buildingUnit.Function,
+                buildingUnit.HasDeviation
+            );
+
+            BuildingUnitPosition DetermineBuildingUnitPosition()
+            {
+                if (buildingUnit.BuildingUnitPosition.GeometryMethod == BuildingUnitPositionGeometryMethod.AppointedByAdministrator
+                    && destinationBuilding.BuildingGeometry.Contains(buildingUnit.BuildingUnitPosition.Geometry))
+                {
+                    return buildingUnit.BuildingUnitPosition;
+                }
+
+                return new BuildingUnitPosition(destinationBuilding.BuildingGeometry.Center, BuildingUnitPositionGeometryMethod.DerivedFromObject);
+            }
+        }
+
         public void Realize()
         {
             GuardRemoved();
