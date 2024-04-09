@@ -287,14 +287,17 @@ namespace BuildingRegistry.Building
             EnsureCommonBuildingUnit(addCommonBuildingUnit);
         }
 
-        public void MoveBuildingUnitOutOf(BuildingPersistentLocalId destinationBuildingPersistentLocalId, BuildingUnitPersistentLocalId buildingUnitPersistentLocalId)
+        public void MoveBuildingUnitOutOf(
+            BuildingPersistentLocalId destinationBuildingPersistentLocalId,
+            BuildingUnitPersistentLocalId buildingUnitPersistentLocalId)
         {
-            //GuardRemovedBuilding();
-            //GuardBuildingValidStatuses(BuildingStatus.Realized);
+            ApplyChange(new BuildingUnitWasMovedOutOfBuilding(
+                BuildingPersistentLocalId,
+                destinationBuildingPersistentLocalId,
+                buildingUnitPersistentLocalId
+            ));
 
-            //_buildingUnits
-            //    .GetNotRemovedByPersistentLocalId(buildingUnitPersistentLocalId)
-            //    .Realize();
+            NotRealizeOrRetireCommonBuildingUnit();
         }
 
         private void GuardBuildingValidStatuses(params BuildingStatus[] validStatuses)

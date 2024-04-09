@@ -303,7 +303,9 @@ namespace BuildingRegistry.Building
                     var streamId = new BuildingStreamId(message.Command.SourceBuildingPersistentLocalId);
                     var building = await buildingRepository().GetAsync(streamId, ct);
 
-                    building.MoveBuildingUnitOutOf(message.Command.DestinationBuildingPersistentLocalId, message.Command.BuildingUnitPersistentLocalId);
+                    building.MoveBuildingUnitOutOf(
+                        message.Command.DestinationBuildingPersistentLocalId,
+                        message.Command.BuildingUnitPersistentLocalId);
                 });
         }
     }

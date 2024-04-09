@@ -11,8 +11,5 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Requests
         [DataMember(Name = "DoelgebouwId", Order = 0)]
         [JsonProperty(Required = Required.Always)]
         public string DoelgebouwId { get; set; }
-
-        //[JsonIgnore]
-        //public int BuildingUnitPersistentLocalId { get; set; }
     }
 }
