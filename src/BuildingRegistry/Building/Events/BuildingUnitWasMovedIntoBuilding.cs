@@ -11,9 +11,9 @@ namespace BuildingRegistry.Building.Events
     [EventTags(EventTag.For.Sync, EventTag.For.Edit, Tag.Building)]
     [EventName(EventName)]
     [EventDescription("Het gebouweenheid werd verplaatst naar het gebouw.")]
-    public sealed class BuildingUnitMovedIntoBuilding : IBuildingEvent, IHasBuildingUnitPersistentLocalId
+    public sealed class BuildingUnitWasMovedIntoBuilding : IBuildingEvent, IHasBuildingUnitPersistentLocalId
     {
-        public const string EventName = "BuildingUnitMovedIntoBuilding"; // BE CAREFUL CHANGING THIS!!
+        public const string EventName = "BuildingUnitWasMovedIntoBuilding"; // BE CAREFUL CHANGING THIS!!
 
         [EventPropertyDescription("Objectidentificator van het gebouw.")]
         public int BuildingPersistentLocalId { get; }
@@ -22,7 +22,7 @@ namespace BuildingRegistry.Building.Events
         [EventPropertyDescription("Objectidentificator van de gebouweenheid.")]
         public int BuildingUnitPersistentLocalId { get; }
         [EventPropertyDescription("De status van de gebouweenheid. Mogelijkheden: Planned of Realized.")]
-        public string BuildingUnitStatus { get; set; }
+        public string BuildingUnitStatus { get; }
         [EventPropertyDescription("Geometriemethode van de gebouweenheidpositie. Mogelijkheden: Outlined of MeasuredByGrb.")]
         public string GeometryMethod { get; }
 
@@ -41,7 +41,7 @@ namespace BuildingRegistry.Building.Events
         [EventPropertyDescription("Metadata bij het event.")]
         public ProvenanceData Provenance { get; private set; }
 
-        public BuildingUnitMovedIntoBuilding(
+        public BuildingUnitWasMovedIntoBuilding(
             BuildingPersistentLocalId buildingPersistentLocalId,
             BuildingPersistentLocalId sourceBuildingPersistentLocalId,
             BuildingUnitPersistentLocalId buildingUnitPersistentLocalId,
@@ -65,7 +65,7 @@ namespace BuildingRegistry.Building.Events
         }
 
         [JsonConstructor]
-        private BuildingUnitMovedIntoBuilding(
+        private BuildingUnitWasMovedIntoBuilding(
             int buildingPersistentLocalId,
             int sourceBuildingPersistentLocalId,
             int buildingUnitPersistentLocalId,

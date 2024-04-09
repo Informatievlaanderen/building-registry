@@ -2,6 +2,7 @@ namespace BuildingRegistry.Building
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Events;
 
@@ -63,7 +64,7 @@ namespace BuildingRegistry.Building
             Register<BuildingUnitWasNotRealizedBecauseBuildingWasDemolished>(When);
             Register<BuildingUnitWasRetiredBecauseBuildingWasDemolished>(When);
             Register<BuildingMeasurementWasChanged>(When);
-            Register<BuildingUnitMovedIntoBuilding>(When);
+            Register<BuildingUnitWasMovedIntoBuilding>(When);
 
             // Register<BuildingUnitWasTransferred>(When);
         }
@@ -331,7 +332,7 @@ namespace BuildingRegistry.Building
             _lastEvent = @event;
         }
 
-        private void When(BuildingUnitMovedIntoBuilding @event)
+        private void When(BuildingUnitWasMovedIntoBuilding @event)
         {
             _buildingPersistentLocalId = new BuildingPersistentLocalId(@event.BuildingPersistentLocalId);
             BuildingUnitPersistentLocalId = new BuildingUnitPersistentLocalId(@event.BuildingUnitPersistentLocalId);
@@ -340,6 +341,7 @@ namespace BuildingRegistry.Building
             BuildingUnitPosition = new BuildingUnitPosition(
                 new ExtendedWkbGeometry(@event.ExtendedWkbGeometry),
                 BuildingUnitPositionGeometryMethod.Parse(@event.GeometryMethod));
+            _addressPersistentLocalIds.AddRange(@event.AddressPersistentLocalIds.Select(x => new AddressPersistentLocalId(x)));
 
             HasDeviation = @event.HasDeviation;
 

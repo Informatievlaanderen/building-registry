@@ -272,7 +272,7 @@ namespace BuildingRegistry.Building
                 ? buildingUnit.BuildingUnitPosition
                 : new BuildingUnitPosition(BuildingGeometry.Center, BuildingUnitPositionGeometryMethod.DerivedFromObject);
 
-            ApplyChange(new BuildingUnitMovedIntoBuilding(
+            ApplyChange(new BuildingUnitWasMovedIntoBuilding(
                 BuildingPersistentLocalId,
                 sourceBuilding.BuildingPersistentLocalId,
                 buildingUnit.BuildingUnitPersistentLocalId,

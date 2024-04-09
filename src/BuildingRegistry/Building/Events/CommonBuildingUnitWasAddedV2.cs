@@ -22,7 +22,7 @@ namespace BuildingRegistry.Building.Events
         public int BuildingUnitPersistentLocalId { get; }
 
         [EventPropertyDescription("De status van de gebouweenheid. Mogelijkheden: Planned of Realized.")]
-        public string BuildingUnitStatus { get; set; }
+        public string BuildingUnitStatus { get; }
 
         [EventPropertyDescription("Geometriemethode van de gebouweenheidpositie. Mogelijkheden: Outlined.")]
         public string GeometryMethod { get; }

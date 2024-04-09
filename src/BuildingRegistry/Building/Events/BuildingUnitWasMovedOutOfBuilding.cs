@@ -11,9 +11,9 @@ namespace BuildingRegistry.Building.Events
     [EventTags(EventTag.For.Sync, EventTag.For.Edit, Tag.Building)]
     [EventName(EventName)]
     [EventDescription("Het gebouweenheid werd verplaatst uit het gebouw.")]
-    public sealed class BuildingUnitMovedOutOfBuilding : IBuildingEvent, IHasBuildingUnitPersistentLocalId
+    public sealed class BuildingUnitWasMovedOutOfBuilding : IBuildingEvent, IHasBuildingUnitPersistentLocalId
     {
-        public const string EventName = "BuildingUnitMovedOutOfBuilding"; // BE CAREFUL CHANGING THIS!!
+        public const string EventName = "BuildingUnitWasMovedOutOfBuilding"; // BE CAREFUL CHANGING THIS!!
 
         [EventPropertyDescription("Objectidentificator van het gebouw.")]
         public int BuildingPersistentLocalId { get; }
@@ -25,7 +25,7 @@ namespace BuildingRegistry.Building.Events
         [EventPropertyDescription("Metadata bij het event.")]
         public ProvenanceData Provenance { get; private set; }
 
-        public BuildingUnitMovedOutOfBuilding(
+        public BuildingUnitWasMovedOutOfBuilding(
             BuildingPersistentLocalId buildingPersistentLocalId,
             BuildingPersistentLocalId destinationBuildingPersistentLocalId,
             BuildingUnitPersistentLocalId buildingUnitPersistentLocalId)
@@ -36,7 +36,7 @@ namespace BuildingRegistry.Building.Events
         }
 
         [JsonConstructor]
-        private BuildingUnitMovedOutOfBuilding(
+        private BuildingUnitWasMovedOutOfBuilding(
             int buildingPersistentLocalId,
             int destinationBuildingPersistentLocalId,
             int buildingUnitPersistentLocalId,

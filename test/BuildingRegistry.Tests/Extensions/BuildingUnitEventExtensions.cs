@@ -171,6 +171,36 @@ namespace BuildingRegistry.Tests.Extensions
 
             return updatedEvent;
         }
+
+        public static CommonBuildingUnitWasAddedV2 WithGeometry(this CommonBuildingUnitWasAddedV2 @event,
+            ExtendedWkbGeometry geometry)
+        {
+            var updatedEvent = new CommonBuildingUnitWasAddedV2(
+                new BuildingPersistentLocalId(@event.BuildingPersistentLocalId),
+                new BuildingUnitPersistentLocalId(@event.BuildingUnitPersistentLocalId),
+                BuildingUnitStatus.Parse(@event.BuildingUnitStatus),
+                BuildingUnitPositionGeometryMethod.Parse(@event.GeometryMethod),
+                geometry,
+                @event.HasDeviation);
+            ((ISetProvenance)updatedEvent).SetProvenance(@event.Provenance.ToProvenance());
+
+            return updatedEvent;
+        }
+
+        public static CommonBuildingUnitWasAddedV2 WithHasDeviation(this CommonBuildingUnitWasAddedV2 @event,
+            bool hasDeviation)
+        {
+            var updatedEvent = new CommonBuildingUnitWasAddedV2(
+                new BuildingPersistentLocalId(@event.BuildingPersistentLocalId),
+                new BuildingUnitPersistentLocalId(@event.BuildingUnitPersistentLocalId),
+                BuildingUnitStatus.Parse(@event.BuildingUnitStatus),
+                BuildingUnitPositionGeometryMethod.Parse(@event.GeometryMethod),
+                new ExtendedWkbGeometry(@event.ExtendedWkbGeometry),
+                hasDeviation);
+            ((ISetProvenance)updatedEvent).SetProvenance(@event.Provenance.ToProvenance());
+
+            return updatedEvent;
+        }
     }
     
     public static class BuildingUnitWasRegularizedExtensions

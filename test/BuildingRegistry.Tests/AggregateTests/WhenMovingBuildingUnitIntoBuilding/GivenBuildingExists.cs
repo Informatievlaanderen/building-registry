@@ -1,14 +1,18 @@
 namespace BuildingRegistry.Tests.AggregateTests.WhenMovingBuildingUnitIntoBuilding
 {
+    using System.Collections.Generic;
     using System.Linq;
     using AutoFixture;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
+    using Be.Vlaanderen.Basisregisters.AggregateSource.Snapshotting;
     using Be.Vlaanderen.Basisregisters.AggregateSource.Testing;
+    using Be.Vlaanderen.Basisregisters.GrAr.Contracts.BuildingRegistry;
     using Building;
     using Building.Commands;
     using Building.Events;
     using Building.Exceptions;
     using Extensions;
+    using FluentAssertions;
     using Xunit;
     using Xunit.Abstractions;
     using BuildingGeometry = Building.BuildingGeometry;
@@ -16,6 +20,11 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenMovingBuildingUnitIntoBuildi
     using BuildingUnitFunction = Building.BuildingUnitFunction;
     using BuildingUnitPositionGeometryMethod = Building.BuildingUnitPositionGeometryMethod;
     using BuildingUnitStatus = Building.BuildingUnitStatus;
+    using BuildingUnitWasPlannedV2 = Building.Events.BuildingUnitWasPlannedV2;
+    using BuildingUnitWasRemovedV2 = Building.Events.BuildingUnitWasRemovedV2;
+    using BuildingWasPlannedV2 = Building.Events.BuildingWasPlannedV2;
+    using BuildingWasRemovedV2 = Building.Events.BuildingWasRemovedV2;
+    using CommonBuildingUnitWasAddedV2 = Building.Events.CommonBuildingUnitWasAddedV2;
     using ExtendedWkbGeometry = Building.ExtendedWkbGeometry;
 
     public class GivenBuildingExists : BuildingRegistryTest
@@ -86,8 +95,6 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenMovingBuildingUnitIntoBuildi
         {
             var command = Fixture.Create<MoveBuildingUnitIntoBuilding>();
 
-            //TODO-rik customize CommonBuildingUnitWasAddedV2 voor geldige status
-
             Assert(new Scenario()
                 .Given(
                     new Fact(new BuildingStreamId(command.SourceBuildingPersistentLocalId),
@@ -96,7 +103,6 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenMovingBuildingUnitIntoBuildi
                         Fixture.Create<BuildingWasPlannedV2>().WithBuildingPersistentLocalId(command.DestinationBuildingPersistentLocalId)),
                     new Fact(new BuildingStreamId(command.SourceBuildingPersistentLocalId),
                         Fixture.Create<CommonBuildingUnitWasAddedV2>()
-                            .WithBuildingUnitStatus(BuildingUnitStatus.Planned)
                             .WithBuildingPersistentLocalId(command.SourceBuildingPersistentLocalId)
                             .WithBuildingUnitPersistentLocalId(command.BuildingUnitPersistentLocalId))
                 )
@@ -170,7 +176,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenMovingBuildingUnitIntoBuildi
                 .When(command)
                 .Then(
                     new BuildingStreamId(command.DestinationBuildingPersistentLocalId),
-                    new BuildingUnitMovedIntoBuilding(
+                    new BuildingUnitWasMovedIntoBuilding(
                         new BuildingPersistentLocalId(command.DestinationBuildingPersistentLocalId),
                         new BuildingPersistentLocalId(command.SourceBuildingPersistentLocalId),
                         new BuildingUnitPersistentLocalId(command.BuildingUnitPersistentLocalId),
@@ -225,7 +231,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenMovingBuildingUnitIntoBuildi
                 .When(command)
                 .Then(
                     new BuildingStreamId(command.DestinationBuildingPersistentLocalId),
-                    new BuildingUnitMovedIntoBuilding(
+                    new BuildingUnitWasMovedIntoBuilding(
                         new BuildingPersistentLocalId(command.DestinationBuildingPersistentLocalId),
                         new BuildingPersistentLocalId(command.SourceBuildingPersistentLocalId),
                         new BuildingUnitPersistentLocalId(command.BuildingUnitPersistentLocalId),
@@ -283,7 +289,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenMovingBuildingUnitIntoBuildi
                 .When(command)
                 .Then(
                     new BuildingStreamId(command.DestinationBuildingPersistentLocalId),
-                    new BuildingUnitMovedIntoBuilding(
+                    new BuildingUnitWasMovedIntoBuilding(
                         new BuildingPersistentLocalId(command.DestinationBuildingPersistentLocalId),
                         new BuildingPersistentLocalId(command.SourceBuildingPersistentLocalId),
                         new BuildingUnitPersistentLocalId(command.BuildingUnitPersistentLocalId),
@@ -297,87 +303,190 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenMovingBuildingUnitIntoBuildi
             );
         }
 
-        //TODO-rik unit tests scenarios:
-        /*
-        - als buildingunit.position.method == DerivedFromObject -> position moet center van destinationbuilding zijn + methode DerivedFromObject
-        - als buildingunit.position.method == AppointedByAdministrator && geometry ligt buiten destinationbuilding geometry -> position moet center van destinationbuilding zijn + methode DerivedFromObject
-        - als buildingunit.position.method == AppointedByAdministrator && geometry ligt binnen destinationbuilding geometry -> position behouden
+        [Fact]
+        public void WithBuildingUnitPositionDerivedFromObject_ThenBuildingUnitMovedIntoBuilding()
+        {
+            var command = Fixture.Create<MoveBuildingUnitIntoBuilding>();
+            var deviation = Fixture.Create<bool>();
 
-        - happy flow: AddressPersistentLocalIds worden behouden*/
+            var destinationBuildingGeometry = new BuildingGeometry(
+                new ExtendedWkbGeometry(GeometryHelper.SecondValidPolygon.AsBinary()),
+                BuildingGeometryMethod.MeasuredByGrb);
+
+            var expectedGeometryMethod = BuildingUnitPositionGeometryMethod.DerivedFromObject;
+            var expectedGeometry = destinationBuildingGeometry.Center;
+
+            Assert(new Scenario()
+                .Given(
+                    new Fact(new BuildingStreamId(command.SourceBuildingPersistentLocalId),
+                        Fixture.Create<BuildingWasPlannedV2>()
+                            .WithBuildingPersistentLocalId(command.SourceBuildingPersistentLocalId)
+                        ),
+                    new Fact(new BuildingStreamId(command.SourceBuildingPersistentLocalId),
+                        Fixture.Create<BuildingUnitWasPlannedV2>()
+                            .WithBuildingPersistentLocalId(command.SourceBuildingPersistentLocalId)
+                            .WithBuildingUnitPersistentLocalId(command.BuildingUnitPersistentLocalId)
+                            .WithGeometryMethod(BuildingUnitPositionGeometryMethod.DerivedFromObject)
+                            .WithDeviation(deviation)
+                        ),
+                    new Fact(new BuildingStreamId(command.DestinationBuildingPersistentLocalId),
+                        Fixture.Create<BuildingWasPlannedV2>()
+                            .WithBuildingPersistentLocalId(command.DestinationBuildingPersistentLocalId)
+                            .WithGeometry(destinationBuildingGeometry.Geometry)
+                        )
+                )
+                .When(command)
+                .Then(
+                    new BuildingStreamId(command.DestinationBuildingPersistentLocalId),
+                    new BuildingUnitWasMovedIntoBuilding(
+                        new BuildingPersistentLocalId(command.DestinationBuildingPersistentLocalId),
+                        new BuildingPersistentLocalId(command.SourceBuildingPersistentLocalId),
+                        new BuildingUnitPersistentLocalId(command.BuildingUnitPersistentLocalId),
+                        BuildingUnitStatus.Planned,
+                        expectedGeometryMethod,
+                        expectedGeometry,
+                        BuildingUnitFunction.Unknown,
+                        deviation,
+                        new List<AddressPersistentLocalId>()
+                ))
+            );
+        }
+
+        [Fact]
+        public void WithBuildingUnitPositionAppointedByAdministratorGeometryOutsideOfDestination_ThenBuildingUnitMovedIntoBuildingWithDerivedGeometryMethod()
+        {
+            var command = Fixture.Create<MoveBuildingUnitIntoBuilding>();
+            var deviation = Fixture.Create<bool>();
+
+            var buildingUnitPosition = new BuildingUnitPosition(
+                new ExtendedWkbGeometry(GeometryHelper.PointNotInPolygon.AsBinary()),
+                BuildingUnitPositionGeometryMethod.AppointedByAdministrator);
+
+            var destinationBuildingGeometry = new BuildingGeometry(
+                new ExtendedWkbGeometry(GeometryHelper.SecondValidPolygon.AsBinary()),
+                BuildingGeometryMethod.MeasuredByGrb);
+
+            var expectedGeometryMethod = BuildingUnitPositionGeometryMethod.DerivedFromObject;
+            var expectedGeometry = destinationBuildingGeometry.Center;
+            
+            Assert(new Scenario()
+                .Given(
+                    new Fact(new BuildingStreamId(command.SourceBuildingPersistentLocalId),
+                        Fixture.Create<BuildingWasPlannedV2>()
+                            .WithBuildingPersistentLocalId(command.SourceBuildingPersistentLocalId)
+                        ),
+                    new Fact(new BuildingStreamId(command.SourceBuildingPersistentLocalId),
+                        Fixture.Create<BuildingUnitWasPlannedV2>()
+                            .WithBuildingPersistentLocalId(command.SourceBuildingPersistentLocalId)
+                            .WithBuildingUnitPersistentLocalId(command.BuildingUnitPersistentLocalId)
+                            .WithPosition(buildingUnitPosition)
+                            .WithDeviation(deviation)
+                        ),
+                    new Fact(new BuildingStreamId(command.DestinationBuildingPersistentLocalId),
+                        Fixture.Create<BuildingWasPlannedV2>()
+                            .WithBuildingPersistentLocalId(command.DestinationBuildingPersistentLocalId)
+                            .WithGeometry(destinationBuildingGeometry.Geometry)
+                        )
+                )
+                .When(command)
+                .Then(
+                    new BuildingStreamId(command.DestinationBuildingPersistentLocalId),
+                    new BuildingUnitWasMovedIntoBuilding(
+                        new BuildingPersistentLocalId(command.DestinationBuildingPersistentLocalId),
+                        new BuildingPersistentLocalId(command.SourceBuildingPersistentLocalId),
+                        new BuildingUnitPersistentLocalId(command.BuildingUnitPersistentLocalId),
+                        BuildingUnitStatus.Planned,
+                        expectedGeometryMethod,
+                        expectedGeometry,
+                        BuildingUnitFunction.Unknown,
+                        deviation,
+                        new List<AddressPersistentLocalId>()
+                ))
+            );
+        }
+
+        [Fact]
+        public void WithBuildingUnitPositionAppointedByAdministratorGeometryInsideOfDestination_ThenBuildingUnitMovedIntoBuilding()
+        {
+            var command = Fixture.Create<MoveBuildingUnitIntoBuilding>();
+            var deviation = Fixture.Create<bool>();
+
+            var buildingUnitPosition = new BuildingUnitPosition(
+                new ExtendedWkbGeometry(GeometryHelper.OtherValidPointInPolygon.AsBinary()),
+                BuildingUnitPositionGeometryMethod.AppointedByAdministrator);
+
+            var destinationBuildingGeometry = new BuildingGeometry(
+                new ExtendedWkbGeometry(GeometryHelper.SecondValidPolygon.AsBinary()),
+                BuildingGeometryMethod.MeasuredByGrb);
+
+            var expectedGeometryMethod = BuildingUnitPositionGeometryMethod.AppointedByAdministrator;
+            var expectedGeometry = buildingUnitPosition.Geometry;
+            
+            Assert(new Scenario()
+                .Given(
+                    new Fact(new BuildingStreamId(command.SourceBuildingPersistentLocalId),
+                        Fixture.Create<BuildingWasPlannedV2>()
+                            .WithBuildingPersistentLocalId(command.SourceBuildingPersistentLocalId)
+                        ),
+                    new Fact(new BuildingStreamId(command.SourceBuildingPersistentLocalId),
+                        Fixture.Create<BuildingUnitWasPlannedV2>()
+                            .WithBuildingPersistentLocalId(command.SourceBuildingPersistentLocalId)
+                            .WithBuildingUnitPersistentLocalId(command.BuildingUnitPersistentLocalId)
+                            .WithPosition(buildingUnitPosition)
+                            .WithDeviation(deviation)
+                        ),
+                    new Fact(new BuildingStreamId(command.DestinationBuildingPersistentLocalId),
+                        Fixture.Create<BuildingWasPlannedV2>()
+                            .WithBuildingPersistentLocalId(command.DestinationBuildingPersistentLocalId)
+                            .WithGeometry(destinationBuildingGeometry.Geometry)
+                        )
+                )
+                .When(command)
+                .Then(
+                    new BuildingStreamId(command.DestinationBuildingPersistentLocalId),
+                    new BuildingUnitWasMovedIntoBuilding(
+                        new BuildingPersistentLocalId(command.DestinationBuildingPersistentLocalId),
+                        new BuildingPersistentLocalId(command.SourceBuildingPersistentLocalId),
+                        new BuildingUnitPersistentLocalId(command.BuildingUnitPersistentLocalId),
+                        BuildingUnitStatus.Planned,
+                        expectedGeometryMethod,
+                        expectedGeometry,
+                        BuildingUnitFunction.Unknown,
+                        deviation,
+                        new List<AddressPersistentLocalId>()
+                ))
+            );
+        }
 
         [Fact]
         public void StateCheck()
         {
-            //var plannedBuildingUnitPersistentLocalId = new PersistentLocalId(123);
-            //var retiredBuildingUnitPersistentLocalId = new PersistentLocalId(456);
-            //var realizedBuildingUnitPersistentLocalId = new PersistentLocalId(789);
-            //var removedBuildingUnitPersistentLocalId = new PersistentLocalId(101);
+            var buildingUnitWasMovedIntoBuilding = Fixture.Create<BuildingUnitWasMovedIntoBuilding>();
+            var buildingWasPlanned = Fixture.Create<BuildingWasPlannedV2>()
+                .WithBuildingPersistentLocalId(buildingUnitWasMovedIntoBuilding.BuildingPersistentLocalId);
+            
+            // Act
+            var sut = new BuildingFactory(NoSnapshotStrategy.Instance).Create();
+            sut.Initialize(new List<object>
+            {
+                buildingWasPlanned,
+                buildingUnitWasMovedIntoBuilding
+            });
 
-            //var plannedBuildingUnit = new BuildingUnitBuilder(Fixture)
-            //    .WithPersistentLocalId(plannedBuildingUnitPersistentLocalId)
-            //    .WithFunction(BuildingUnitFunction.Unknown)
-            //    .WithStatus(BuildingUnitStatus.Planned)
-            //    .WithAddress(5)
-            //    .Build();
-
-            //var retiredBuildingUnit = new BuildingUnitBuilder(Fixture)
-            //    .WithPersistentLocalId(retiredBuildingUnitPersistentLocalId)
-            //    .WithFunction(BuildingUnitFunction.Unknown)
-            //    .WithStatus(BuildingUnitStatus.Retired)
-            //    .Build();
-
-            //var realizedBuildingUnit = new BuildingUnitBuilder(Fixture)
-            //    .WithPersistentLocalId(realizedBuildingUnitPersistentLocalId)
-            //    .WithFunction(BuildingUnitFunction.Unknown)
-            //    .WithStatus(BuildingUnitStatus.Realized)
-            //    .Build();
-
-            //var removedBuildingUnit = new BuildingUnitBuilder(Fixture)
-            //    .WithPersistentLocalId(removedBuildingUnitPersistentLocalId)
-            //    .WithStatus(BuildingUnitStatus.Planned)
-            //    .WithIsRemoved()
-            //    .Build();
-
-            //var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
-            //    .WithBuildingStatus(BuildingStatus.UnderConstruction)
-            //    .WithBuildingUnit(plannedBuildingUnit)
-            //    .WithBuildingUnit(retiredBuildingUnit)
-            //    .WithBuildingUnit(realizedBuildingUnit)
-            //    .WithBuildingUnit(removedBuildingUnit)
-            //    .Build();
-
-            //var sut = new BuildingFactory(NoSnapshotStrategy.Instance).Create();
-            //sut.Initialize(new List<object>
-            //{
-            //    buildingWasMigrated
-            //});
-
-            //// Act
-            //sut.NotRealizeConstruction();
-
-            //// Assert
-            //sut.BuildingStatus.Should().Be(BuildingStatus.NotRealized);
-
-            //var plannedUnit = sut.BuildingUnits
-            //    .First(x => x.BuildingUnitPersistentLocalId == new BuildingUnitPersistentLocalId(plannedBuildingUnitPersistentLocalId));
-
-            //plannedUnit.Status.Should().Be(BuildingRegistry.Building.BuildingUnitStatus.NotRealized);
-            //plannedUnit.AddressPersistentLocalIds.Should().BeEmpty();
-
-            //var retiredUnit = sut.BuildingUnits
-            //    .First(x => x.BuildingUnitPersistentLocalId == new BuildingUnitPersistentLocalId(retiredBuildingUnitPersistentLocalId));
-
-            //retiredUnit.Status.Should().Be(BuildingRegistry.Building.BuildingUnitStatus.Retired);
-
-            //var realizedUnit = sut.BuildingUnits
-            //    .First(x => x.BuildingUnitPersistentLocalId == new BuildingUnitPersistentLocalId(realizedBuildingUnitPersistentLocalId));
-
-            //realizedUnit.Status.Should().Be(BuildingRegistry.Building.BuildingUnitStatus.Realized);
-
-            //var removedUnit = sut.BuildingUnits
-            //    .First(x => x.BuildingUnitPersistentLocalId == new BuildingUnitPersistentLocalId(removedBuildingUnitPersistentLocalId));
-
-            //removedUnit.Status.Should().Be(BuildingRegistry.Building.BuildingUnitStatus.Planned);
+            // Assert
+            sut.BuildingUnits.Should().ContainSingle();
+            var buildingUnit = sut.BuildingUnits.Single();
+            buildingUnit.BuildingUnitPersistentLocalId.Should().Be(
+                new BuildingUnitPersistentLocalId(buildingUnitWasMovedIntoBuilding.BuildingUnitPersistentLocalId));
+            buildingUnit.BuildingUnitPosition.Should().Be(
+                new BuildingUnitPosition(new ExtendedWkbGeometry(buildingUnitWasMovedIntoBuilding.ExtendedWkbGeometry),
+                    BuildingUnitPositionGeometryMethod.Parse(buildingUnitWasMovedIntoBuilding.GeometryMethod)));
+            buildingUnit.Function.Should().Be(BuildingUnitFunction.Parse(buildingUnitWasMovedIntoBuilding.Function));
+            buildingUnit.HasDeviation.Should().Be(buildingUnitWasMovedIntoBuilding.HasDeviation);
+            buildingUnit.Status.Should().Be(BuildingUnitStatus.Parse(buildingUnitWasMovedIntoBuilding.BuildingUnitStatus));
+            buildingUnit.IsRemoved.Should().BeFalse();
+            buildingUnit.AddressPersistentLocalIds.Should().BeEquivalentTo(
+                buildingUnitWasMovedIntoBuilding.AddressPersistentLocalIds.Select(x => new AddressPersistentLocalId(x)).ToList());
         }
     }
 }
