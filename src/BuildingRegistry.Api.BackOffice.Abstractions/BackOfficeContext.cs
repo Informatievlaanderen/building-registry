@@ -153,6 +153,21 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions
             await SaveChangesAsync(cancellationToken);
         }
 
+        public async Task MoveBuildingUnitAddressRelations(
+            BuildingUnitPersistentLocalId buildingUnitPersistentLocalId,
+            BuildingPersistentLocalId destinationBuildingPersistentLocalId,
+            CancellationToken cancellationToken)
+        {
+            var buildingUnitAddressRelations = await FindAllBuildingUnitAddressRelations(buildingUnitPersistentLocalId, cancellationToken);
+
+            foreach (var buildingUnitAddressRelation in buildingUnitAddressRelations)
+            {
+                buildingUnitAddressRelation.BuildingPersistentLocalId = destinationBuildingPersistentLocalId;
+            }
+
+            await SaveChangesAsync(cancellationToken);
+        }
+
         public async Task<List<BuildingUnitAddressRelation>> FindAllBuildingUnitAddressRelations(
             BuildingUnitPersistentLocalId buildingUnitPersistentLocalId,
             CancellationToken cancellationToken)

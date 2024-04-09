@@ -2,6 +2,7 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Requests
 {
     using System.Runtime.Serialization;
     using Be.Vlaanderen.Basisregisters.GrAr.Edit.Contracts;
+    using Microsoft.AspNetCore.Mvc;
     using Newtonsoft.Json;
     using Swashbuckle.AspNetCore.Filters;
 

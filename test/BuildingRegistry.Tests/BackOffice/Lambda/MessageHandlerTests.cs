@@ -887,6 +887,39 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda
                 ), It.IsAny<CancellationToken>()), Times.Once);
         }
 
+        [Fact]
+        public async Task WhenProcessingMoveBuildingUnitSqsRequest_ThenLambdaRequestIsSent()
+        {
+            // Arrange
+            var mediator = new Mock<IMediator>();
+            var containerBuilder = new ContainerBuilder();
+            containerBuilder.Register(_ => mediator.Object);
+            var container = containerBuilder.Build();
+
+            var sqsRequest = Fixture.Create<MoveBuildingUnitSqsRequest>();
+            var messageMetadata = new MessageMetadata { MessageGroupId = Fixture.Create<int>().ToString() };
+
+            var sut = new MessageHandler(container);
+
+            // Act
+            await sut.HandleMessage(
+                sqsRequest,
+                messageMetadata,
+                It.IsAny<CancellationToken>());
+
+            // Assert
+            mediator
+                .Verify(x => x.Send(It.Is<MoveBuildingUnitLambdaRequest>(request =>
+                    request.TicketId == sqsRequest.TicketId &&
+                    request.MessageGroupId == messageMetadata.MessageGroupId &&
+                    request.Request == sqsRequest.Request &&
+                    request.BuildingUnitPersistentLocalId == sqsRequest.BuildingUnitPersistentLocalId &&
+                    request.IfMatchHeaderValue == sqsRequest.IfMatchHeaderValue &&
+                    request.Provenance == sqsRequest.ProvenanceData.ToProvenance() &&
+                    request.Metadata == sqsRequest.Metadata
+                ), It.IsAny<CancellationToken>()), Times.Once);
+        }
+
         // [Fact]
         // public async Task WhenProcessingCMergeBuildingsSqsRequest_ThenLambdaRequestIsSent()
         // {

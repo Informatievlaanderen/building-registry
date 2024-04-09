@@ -6,7 +6,6 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenMovingBuildingUnitIntoBuildi
     using Be.Vlaanderen.Basisregisters.AggregateSource;
     using Be.Vlaanderen.Basisregisters.AggregateSource.Snapshotting;
     using Be.Vlaanderen.Basisregisters.AggregateSource.Testing;
-    using Be.Vlaanderen.Basisregisters.GrAr.Contracts.BuildingRegistry;
     using Building;
     using Building.Commands;
     using Building.Events;
