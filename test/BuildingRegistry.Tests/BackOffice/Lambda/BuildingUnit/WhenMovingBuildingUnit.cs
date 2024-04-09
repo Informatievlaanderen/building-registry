@@ -23,6 +23,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
+    using BuildingRegistry.Building.Events;
     using TicketingService.Abstractions;
     using Xunit;
     using Xunit.Abstractions;
@@ -61,19 +62,22 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
                 MockTicketing(response => { eTagResponse = response; }).Object,
                 new IdempotentCommandHandler(Container.Resolve<ICommandHandlerResolver>(), _idempotencyContext),
                 Container.Resolve<IBuildings>(),
-                _backOfficeContext);
+                _backOfficeContext,
+                Container);
             
             //Act
             await handler.Handle(CreateMoveBuildingUnitLambdaRequest(sourceBuildingPersistentLocalId, destinationBuildingPersistentLocalId),
                 CancellationToken.None);
 
             //Assert
-            var stream = await Container.Resolve<IStreamStore>()
+            var destinationStream = await Container.Resolve<IStreamStore>()
                 .ReadStreamBackwards(new StreamId(new BuildingStreamId(destinationBuildingPersistentLocalId)), 1, 1);
-            stream.Messages.First().JsonMetadata.Should().Contain(eTagResponse.ETag);
+            destinationStream.Messages.First().JsonMetadata.Should().Contain(eTagResponse.ETag);
 
-            //TODO-rik add 2nd command testing
-
+            var sourceStream = await Container.Resolve<IStreamStore>()
+                .ReadStreamBackwards(new StreamId(new BuildingStreamId(sourceBuildingPersistentLocalId)), 2, 1);
+            sourceStream.Messages.First().Type.Should().Be("BuildingUnitWasMovedOutOfBuilding");
+            
             var buildingRelation = await _backOfficeContext.FindBuildingUnitBuildingRelation(buildingUnitPersistentLocalId, CancellationToken.None);
             buildingRelation.Should().NotBeNull();
             buildingRelation!.BuildingPersistentLocalId.Should().Be(destinationBuildingPersistentLocalId);
@@ -92,7 +96,9 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
             var buildingUnitPersistentLocalId = Fixture.Create<BuildingUnitPersistentLocalId>();
             var destinationBuildingPersistentLocalId = Fixture.Create<BuildingPersistentLocalId>();
 
+            PlanBuilding(sourceBuildingPersistentLocalId);
             PlanBuilding(destinationBuildingPersistentLocalId);
+            PlanBuildingUnit(sourceBuildingPersistentLocalId, buildingUnitPersistentLocalId);
             PlanBuildingUnit(destinationBuildingPersistentLocalId, buildingUnitPersistentLocalId);
             await _backOfficeContext.AddIdempotentBuildingUnitBuilding(sourceBuildingPersistentLocalId, buildingUnitPersistentLocalId, CancellationToken.None);
             await _backOfficeContext.AddIdempotentBuildingUnitAddressRelation(sourceBuildingPersistentLocalId, buildingUnitPersistentLocalId, Fixture.Create<AddressPersistentLocalId>(), CancellationToken.None);
@@ -104,7 +110,8 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
                 ticketing.Object,
                 MockExceptionIdempotentCommandHandler(() => new IdempotencyException(string.Empty)).Object,
                 Container.Resolve<IBuildings>(),
-                _backOfficeContext);
+                _backOfficeContext,
+                Container);
 
             var destinationBuilding =
                 await buildings.GetAsync(new BuildingStreamId(destinationBuildingPersistentLocalId), CancellationToken.None);
@@ -122,7 +129,6 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
                             string.Format(ConfigDetailUrl, buildingUnitPersistentLocalId),
                             destinationBuilding.LastEventHash)),
                     CancellationToken.None));
-            //TODO-rik add 2nd command testing
 
             var buildingRelation = await _backOfficeContext.FindBuildingUnitBuildingRelation(buildingUnitPersistentLocalId, CancellationToken.None);
             buildingRelation.Should().NotBeNull();
@@ -150,7 +156,8 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
                 ticketing.Object,
                 MockExceptionIdempotentCommandHandler<BuildingUnitHasInvalidStatusException>().Object,
                 Container.Resolve<IBuildings>(),
-                _backOfficeContext);
+                _backOfficeContext,
+                Container);
 
             // Act
             await handler.Handle(CreateMoveBuildingUnitLambdaRequest(), CancellationToken.None);
@@ -183,7 +190,8 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
                 ticketing.Object,
                 MockExceptionIdempotentCommandHandler<BuildingHasInvalidStatusException>().Object,
                 Container.Resolve<IBuildings>(),
-                _backOfficeContext);
+                _backOfficeContext,
+                Container);
 
             // Act
             await handler.Handle(CreateMoveBuildingUnitLambdaRequest(), CancellationToken.None);
@@ -216,7 +224,8 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
                 ticketing.Object,
                 MockExceptionIdempotentCommandHandler<BuildingUnitHasInvalidFunctionException>().Object,
                 Container.Resolve<IBuildings>(),
-                _backOfficeContext);
+                _backOfficeContext,
+                Container);
 
             // Act
             await handler.Handle(CreateMoveBuildingUnitLambdaRequest(), CancellationToken.None);

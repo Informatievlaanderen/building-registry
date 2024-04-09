@@ -30,5 +30,14 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Requests.BuildingUnit
                 new BuildingUnitPersistentLocalId(BuildingUnitPersistentLocalId),
                 Provenance);
         }
+
+        public MoveBuildingUnitOutOfBuilding ToMoveBuildingUnitOutOfBuildingCommand()
+        {
+            return new MoveBuildingUnitOutOfBuilding(
+                BuildingPersistentLocalId,
+                new BuildingPersistentLocalId(Convert.ToInt32(Request.DoelgebouwId.AsIdentifier().Map(x => x).Value)),
+                new BuildingUnitPersistentLocalId(BuildingUnitPersistentLocalId),
+                Provenance);
+        }
     }
 }
