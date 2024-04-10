@@ -591,6 +591,26 @@ namespace BuildingRegistry.Producer.Extensions
                 message.ExtendedWkbGeometryBuildingUnits,
                 message.Provenance.ToContract());
 
+        public static Contracts.BuildingUnitWasMovedIntoBuilding ToContract(this BuildingUnitWasMovedIntoBuilding message)
+            => new Contracts.BuildingUnitWasMovedIntoBuilding(
+                message.BuildingPersistentLocalId,
+                message.SourceBuildingPersistentLocalId,
+                message.BuildingUnitPersistentLocalId,
+                message.BuildingUnitStatus,
+                message.GeometryMethod,
+                message.ExtendedWkbGeometry,
+                message.Function,
+                message.HasDeviation,
+                message.AddressPersistentLocalIds,
+                message.Provenance.ToContract());
+
+        public static Contracts.BuildingUnitWasMovedOutOfBuilding ToContract(this BuildingUnitWasMovedOutOfBuilding message)
+            => new Contracts.BuildingUnitWasMovedOutOfBuilding(
+                message.BuildingPersistentLocalId,
+                message.DestinationBuildingPersistentLocalId,
+                message.BuildingUnitPersistentLocalId,
+                message.Provenance.ToContract());
+
         // public static Contracts.BuildingMergerWasRealized ToContract(this BuildingMergerWasRealized message)
         //     => new Contracts.BuildingMergerWasRealized(
         //         message.BuildingPersistentLocalId,
