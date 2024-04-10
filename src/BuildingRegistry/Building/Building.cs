@@ -52,87 +52,6 @@ namespace BuildingRegistry.Building
             return newBuilding;
         }
 
-        // public static Building MergeBuildings(
-        //     IBuildingFactory buildingFactory,
-        //     IAddCommonBuildingUnit addCommonBuildingUnit,
-        //     BuildingPersistentLocalId buildingPersistentLocalId,
-        //     ExtendedWkbGeometry extendedWkbGeometry,
-        //     List<Building> buildingsToMerge)
-        // {
-        //     if (buildingsToMerge.Count <= 1)
-        //         throw new BuildingMergerNeedsMoreThanOneBuildingException();
-        //
-        //     if (buildingsToMerge.Count > BuildingMergerHasTooManyBuildingsException.MaxNumberOfBuildingsToMerge)
-        //         throw new BuildingMergerHasTooManyBuildingsException();
-        //
-        //     foreach (var building in buildingsToMerge)
-        //     {
-        //         if (building.BuildingStatus != BuildingStatus.Realized)
-        //             throw new BuildingToMergeHasInvalidStatusException();
-        //
-        //         if (building.BuildingGeometry.Method != BuildingGeometryMethod.MeasuredByGrb)
-        //             throw new BuildingToMergeHasInvalidGeometryMethodException();
-        //     }
-        //
-        //     var buildingGeometry = WKBReaderFactory.Create().Read(extendedWkbGeometry);
-        //     GuardPolygon(buildingGeometry);
-        //
-        //     var newBuilding = buildingFactory.Create();
-        //     newBuilding.ApplyChange(
-        //         new BuildingMergerWasRealized(
-        //             buildingPersistentLocalId,
-        //             extendedWkbGeometry,
-        //             buildingsToMerge.Select(x => x.BuildingPersistentLocalId)));
-        //
-        //     foreach (var buildingToMerge in buildingsToMerge)
-        //     {
-        //         var buildingUnitsToTransfer =
-        //             buildingToMerge._buildingUnits.PlannedBuildingUnits().Concat(buildingToMerge._buildingUnits.RealizedBuildingUnits());
-        //
-        //         foreach (var buildingUnit in buildingUnitsToTransfer.Where(x => x.Function != BuildingUnitFunction.Common))
-        //         {
-        //             var geometryMethod = buildingUnit.BuildingUnitPosition.GeometryMethod;
-        //
-        //             if (!newBuilding.BuildingGeometry.Contains(buildingUnit.BuildingUnitPosition.Geometry))
-        //             {
-        //                 geometryMethod = BuildingUnitPositionGeometryMethod.DerivedFromObject;
-        //             }
-        //
-        //             var geometryPosition = buildingUnit.BuildingUnitPosition.Geometry;
-        //
-        //             if (geometryMethod == BuildingUnitPositionGeometryMethod.DerivedFromObject)
-        //             {
-        //                 geometryPosition = newBuilding.BuildingGeometry.Center;
-        //             }
-        //
-        //             newBuilding.ApplyChange(new BuildingUnitWasTransferred(
-        //                 buildingPersistentLocalId,
-        //                 buildingUnit,
-        //                 buildingToMerge.BuildingPersistentLocalId,
-        //                 new BuildingUnitPosition(geometryPosition, geometryMethod)));
-        //
-        //             newBuilding.EnsureCommonBuildingUnit(addCommonBuildingUnit);
-        //         }
-        //
-        //         if (buildingToMerge._buildingUnits.HasCommonBuildingUnit())
-        //         {
-        //             var commonBuildingUnitToMerge = buildingToMerge._buildingUnits.CommonBuildingUnit();
-        //             var newCommonBuildingUnit = newBuilding._buildingUnits.CommonBuildingUnit();
-        //
-        //             foreach (var addressToTransfer in commonBuildingUnitToMerge.AddressPersistentLocalIds)
-        //             {
-        //                 newBuilding.ApplyChange(new BuildingUnitAddressWasAttachedV2(
-        //                     buildingPersistentLocalId,
-        //                     newCommonBuildingUnit.BuildingUnitPersistentLocalId,
-        //                     addressToTransfer
-        //                 ));
-        //             }
-        //         }
-        //     }
-        //
-        //     return newBuilding;
-        // }
-
         public void PlaceUnderConstruction()
         {
             GuardRemovedBuilding();
@@ -317,26 +236,6 @@ namespace BuildingRegistry.Building
                 extendedWkbGeometry,
                 buildingUnitsPosition));
         }
-
-        // public void MarkAsMerged(BuildingPersistentLocalId destinationBuildingPersistentLocalId)
-        // {
-        //     foreach (var buildingUnit in _buildingUnits.PlannedBuildingUnits()
-        //                  .Concat(_buildingUnits.RealizedBuildingUnits())
-        //                  .Where(x => x.Function != BuildingUnitFunction.Common)
-        //                  .ToList())
-        //     {
-        //         ApplyChange(new BuildingUnitWasMoved(
-        //             BuildingPersistentLocalId,
-        //             buildingUnit.BuildingUnitPersistentLocalId,
-        //             destinationBuildingPersistentLocalId));
-        //
-        //         NotRealizeOrRetireCommonBuildingUnit();
-        //     }
-        //
-        //     ApplyChange(new BuildingWasMerged(
-        //         BuildingPersistentLocalId,
-        //         destinationBuildingPersistentLocalId));
-        // }
 
         private void GuardRemovedBuilding()
         {

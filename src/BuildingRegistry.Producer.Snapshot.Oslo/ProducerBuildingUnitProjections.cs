@@ -528,34 +528,6 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo
                 message.Position,
                 ct);
             });
-
-            // When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingUnitWasTransferred>>(async (_, message, ct) =>
-            // {
-            //     await FindAndProduce(async () =>
-            //             await snapshotManager.FindMatchingSnapshot(
-            //                 message.Message.BuildingUnitPersistentLocalId.ToString(),
-            //                 message.Message.Provenance.Timestamp,
-            //                 message.Message.GetHash(),
-            //                 message.Position,
-            //                 throwStaleWhenGone: false,
-            //                 ct),
-            //         message.Position,
-            //         ct);
-            // });
-            //
-            // When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingUnitWasMoved>>(async (_, message, ct) =>
-            // {
-            //     await FindAndProduce(async () =>
-            //             await snapshotManager.FindMatchingSnapshot(
-            //                 message.Message.BuildingUnitPersistentLocalId.ToString(),
-            //                 message.Message.Provenance.Timestamp,
-            //                 message.Message.GetHash(),
-            //                 message.Position,
-            //                 throwStaleWhenGone: false,
-            //                 ct),
-            //         message.Position,
-            //         ct);
-            // });
         }
 
         private async Task FindAndProduce(Func<Task<OsloResult?>> findMatchingSnapshot, long storePosition, CancellationToken ct)

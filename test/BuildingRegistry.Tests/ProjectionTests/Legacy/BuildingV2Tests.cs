@@ -613,60 +613,6 @@ namespace BuildingRegistry.Tests.ProjectionTests.Legacy
                 });
         }
 
-        // [Fact]
-        // public async Task WhenBuildingMergerWasRealized()
-        // {
-        //     var @event = _fixture.Create<BuildingMergerWasRealized>();
-        //
-        //     await Sut
-        //         .Given(
-        //             new Envelope<BuildingMergerWasRealized>(
-        //                 new Envelope(
-        //                     @event,
-        //                     new Dictionary<string, object> { { AddEventHashPipe.HashMetadataKey, @event.GetHash() } })))
-        //         .Then(async ct =>
-        //         {
-        //             var item = await ct.BuildingDetailsV2.FindAsync(@event.BuildingPersistentLocalId);
-        //             item.Should().NotBeNull();
-        //
-        //             item!.PersistentLocalId.Should().Be(@event.BuildingPersistentLocalId);
-        //             item.Status.Should().Be(BuildingStatus.Realized);
-        //             item.Geometry.Should().BeEquivalentTo(@event.ExtendedWkbGeometry.ToByteArray());
-        //             item.GeometryMethod.Should().Be(BuildingGeometryMethod.MeasuredByGrb);
-        //             item.Version.Should().Be(@event.Provenance.Timestamp);
-        //             item.LastEventHash.Should().Be(@event.GetHash());
-        //         });
-        // }
-        //
-        // [Fact]
-        // public async Task WhenBuildingWasMerged()
-        // {
-        //     _fixture.Customize(new WithFixedBuildingPersistentLocalId());
-        //
-        //     var buildingWasPlanned = _fixture.Create<BuildingWasPlannedV2>();
-        //     var @event = _fixture.Create<BuildingWasMerged>();
-        //
-        //     await Sut
-        //         .Given(
-        //             new Envelope<BuildingWasPlannedV2>(
-        //                 new Envelope(
-        //                     buildingWasPlanned,
-        //                     new Dictionary<string, object> { { AddEventHashPipe.HashMetadataKey, buildingWasPlanned.GetHash() } })),
-        //             new Envelope<BuildingWasMerged>(
-        //                 new Envelope(
-        //                     @event,
-        //                     new Dictionary<string, object> { { AddEventHashPipe.HashMetadataKey, @event.GetHash() } })))
-        //         .Then(async ct =>
-        //         {
-        //             var item = await ct.BuildingDetailsV2.FindAsync(@event.BuildingPersistentLocalId);
-        //             item.Should().NotBeNull();
-        //
-        //             item.Status.Should().Be(BuildingStatus.Retired);
-        //             item.Version.Should().Be(@event.Provenance.Timestamp);
-        //             item.LastEventHash.Should().Be(@event.GetHash());
-        //         });
-        // }
-
         protected override BuildingDetailV2Projections CreateProjection() => new BuildingDetailV2Projections();
     }
 }

@@ -110,36 +110,6 @@ namespace BuildingRegistry.Projections.BackOffice
 
                 await transaction.CommitAsync(cancellationToken);
             });
-
-            // When<Envelope<BuildingUnitWasTransferred>>(async (_, message, cancellationToken) =>
-            // {
-            //     await using var backOfficeContext = await backOfficeContextFactory.CreateDbContextAsync(cancellationToken);
-            //
-            //     var buildingUnitPersistentLocalId = new BuildingUnitPersistentLocalId(message.Message.BuildingUnitPersistentLocalId);
-            //     var buildingPersistentLocalId = new BuildingPersistentLocalId(message.Message.BuildingPersistentLocalId);
-            //
-            //     await backOfficeContext.RemoveIdempotentBuildingUnitBuildingRelation(
-            //         buildingUnitPersistentLocalId,
-            //         cancellationToken);
-            //
-            //     await backOfficeContext.AddIdempotentBuildingUnitBuilding(
-            //         buildingPersistentLocalId,
-            //         buildingUnitPersistentLocalId,
-            //         cancellationToken);
-            //
-            //     await backOfficeContext.RemoveBuildingUnitAddressRelations(
-            //         buildingUnitPersistentLocalId,
-            //         cancellationToken);
-            //
-            //     foreach (var addressPersistentLocalId in message.Message.AddressPersistentLocalIds)
-            //     {
-            //         await backOfficeContext.AddIdempotentBuildingUnitAddressRelation(
-            //             buildingPersistentLocalId,
-            //             buildingUnitPersistentLocalId,
-            //             new AddressPersistentLocalId(addressPersistentLocalId),
-            //             cancellationToken);
-            //     }
-            // });
         }
     }
 }

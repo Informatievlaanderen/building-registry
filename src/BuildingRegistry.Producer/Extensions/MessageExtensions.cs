@@ -610,40 +610,7 @@ namespace BuildingRegistry.Producer.Extensions
                 message.DestinationBuildingPersistentLocalId,
                 message.BuildingUnitPersistentLocalId,
                 message.Provenance.ToContract());
-
-        // public static Contracts.BuildingMergerWasRealized ToContract(this BuildingMergerWasRealized message)
-        //     => new Contracts.BuildingMergerWasRealized(
-        //         message.BuildingPersistentLocalId,
-        //         message.ExtendedWkbGeometry,
-        //         message.MergedBuildingPersistentLocalIds.ToList(),
-        //         message.Provenance.ToContract());
-        //
-        // public static Contracts.BuildingUnitWasTransferred ToContract(this BuildingUnitWasTransferred message)
-        //     => new Contracts.BuildingUnitWasTransferred(
-        //         message.BuildingPersistentLocalId,
-        //         message.BuildingUnitPersistentLocalId,
-        //         message.SourceBuildingPersistentLocalId,
-        //         message.Function,
-        //         message.Status,
-        //         message.AddressPersistentLocalIds.ToList(),
-        //         message.GeometryMethod,
-        //         message.ExtendedWkbGeometry,
-        //         message.HasDeviation,
-        //         message.Provenance.ToContract());
-
-        // public static Contracts.BuildingUnitWasMoved ToContract(this BuildingUnitWasMoved message)
-        //     => new Contracts.BuildingUnitWasMoved(
-        //         message.BuildingPersistentLocalId,
-        //         message.BuildingUnitPersistentLocalId,
-        //         message.DestinationBuildingPersistentLocalId,
-        //         message.Provenance.ToContract());
-        //
-        // public static Contracts.BuildingWasMerged ToContract(this BuildingWasMerged message)
-        //     => new Contracts.BuildingWasMerged(
-        //         message.BuildingPersistentLocalId,
-        //         message.DestinationBuildingPersistentLocalId,
-        //         message.Provenance.ToContract());
-
+        
         private static Provenance ToContract(this ProvenanceData provenance)
         => new Provenance(
             provenance.Timestamp.ToString(),

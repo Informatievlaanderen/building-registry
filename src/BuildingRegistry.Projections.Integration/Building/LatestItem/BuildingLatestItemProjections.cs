@@ -332,62 +332,6 @@ namespace BuildingRegistry.Projections.Integration.Building.LatestItem
                     building => { UpdateVersionTimestamp(building, message.Message); },
                     ct);
             });
-
-            // When<Envelope<BuildingMergerWasRealized>>(async (context, message, ct) =>
-            // {
-            //     var geometryAsBinary = message.Message.ExtendedWkbGeometry.ToByteArray();
-            //     var sysGeometry = wkbReader.Read(geometryAsBinary);
-            //
-            //     var nisCode = await context.FindMostIntersectingNisCodeBy(sysGeometry, ct);
-            //
-            //     var building = new BuildingLatestItem
-            //     {
-            //         BuildingPersistentLocalId = message.Message.BuildingPersistentLocalId,
-            //         OsloStatus = BuildingStatus.Realized.Map(),
-            //         Status = BuildingStatus.Realized.Value,
-            //         OsloGeometryMethod = BuildingGeometryMethod.MeasuredByGrb.Map(),
-            //         GeometryMethod = BuildingGeometryMethod.MeasuredByGrb.Value,
-            //         Geometry = sysGeometry,
-            //         NisCode = nisCode,
-            //         IsRemoved = false,
-            //         VersionTimestamp = message.Message.Provenance.Timestamp,
-            //         Namespace = options.Value.BuildingNamespace,
-            //         Puri = $"{options.Value.BuildingNamespace}/{message.Message.BuildingPersistentLocalId}"
-            //     };
-            //
-            //     await context
-            //         .BuildingLatestItems
-            //         .AddAsync(building, ct);
-            // });
-            //
-            // When<Envelope<BuildingUnitWasTransferred>>(async (context, message, ct) =>
-            // {
-            //     await context.FindAndUpdateBuilding(
-            //         message.Message.BuildingPersistentLocalId,
-            //         building => { UpdateVersionTimestamp(building, message.Message); },
-            //         ct);
-            // });
-            //
-            // When<Envelope<BuildingUnitWasMoved>>(async (context, message, ct) =>
-            // {
-            //     await context.FindAndUpdateBuilding(
-            //         message.Message.BuildingPersistentLocalId,
-            //         building => { UpdateVersionTimestamp(building, message.Message); },
-            //         ct);
-            // });
-            //
-            // When<Envelope<BuildingWasMerged>>(async (context, message, ct) =>
-            // {
-            //     await context.FindAndUpdateBuilding(
-            //         message.Message.BuildingPersistentLocalId,
-            //         building =>
-            //         {
-            //             building.OsloStatus = BuildingStatus.Retired.Map();
-            //             building.Status = BuildingStatus.Retired.Value;
-            //             UpdateVersionTimestamp(building, message.Message);
-            //         },
-            //         ct);
-            // });
         }
 
         private static void UpdateVersionTimestamp(BuildingLatestItem building, IHasProvenance message)
