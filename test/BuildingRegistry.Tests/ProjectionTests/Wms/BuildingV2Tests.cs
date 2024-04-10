@@ -505,6 +505,56 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wms
                 });
         }
 
+        [Fact]
+        public async Task WhenBuildingUnitWasMovedIntoBuilding()
+        {
+            var buildingWasPlanned = _fixture.Create<BuildingWasPlannedV2>();
+            var @event = _fixture.Create<BuildingUnitWasMovedIntoBuilding>();
+
+            await Sut
+                .Given(
+                    new Envelope<BuildingWasPlannedV2>(
+                        new Envelope(
+                            buildingWasPlanned,
+                            new Dictionary<string, object> { { AddEventHashPipe.HashMetadataKey, buildingWasPlanned.GetHash() } })),
+                    new Envelope<BuildingUnitWasMovedIntoBuilding>(
+                        new Envelope(
+                            @event,
+                            new Dictionary<string, object> { { AddEventHashPipe.HashMetadataKey, @event.GetHash() } })))
+                .Then(async ct =>
+                {
+                    var item = await ct.BuildingsV2.FindAsync(@event.BuildingPersistentLocalId);
+                    item.Should().NotBeNull();
+
+                    item!.Version.Should().Be(@event.Provenance.Timestamp);
+                });
+        }
+
+        [Fact]
+        public async Task WhenBuildingUnitWasMovedOutOfBuilding()
+        {
+            var buildingWasPlanned = _fixture.Create<BuildingWasPlannedV2>();
+            var @event = _fixture.Create<BuildingUnitWasMovedOutOfBuilding>();
+
+            await Sut
+                .Given(
+                    new Envelope<BuildingWasPlannedV2>(
+                        new Envelope(
+                            buildingWasPlanned,
+                            new Dictionary<string, object> { { AddEventHashPipe.HashMetadataKey, buildingWasPlanned.GetHash() } })),
+                    new Envelope<BuildingUnitWasMovedOutOfBuilding>(
+                        new Envelope(
+                            @event,
+                            new Dictionary<string, object> { { AddEventHashPipe.HashMetadataKey, @event.GetHash() } })))
+                .Then(async ct =>
+                {
+                    var item = await ct.BuildingsV2.FindAsync(@event.BuildingPersistentLocalId);
+                    item.Should().NotBeNull();
+
+                    item!.Version.Should().Be(@event.Provenance.Timestamp);
+                });
+        }
+
         // [Fact]
         // public async Task WhenBuildingMergerWasRealized()
         // {

@@ -346,15 +346,29 @@ namespace BuildingRegistry.Projections.Wfs.BuildingUnitV2
             When<Envelope<BuildingUnitWasRetiredBecauseBuildingWasDemolished>>(async (context, message, ct) =>
             {
                 var unit = await context.BuildingUnitsV2.FindAsync(message.Message.BuildingUnitPersistentLocalId);
-                unit.Status = RetiredStatus;
-                SetVersion(unit!, message.Message.Provenance.Timestamp);
+                unit!.Status = RetiredStatus;
+                SetVersion(unit, message.Message.Provenance.Timestamp);
             });
 
             When<Envelope<BuildingUnitWasNotRealizedBecauseBuildingWasDemolished>>(async (context, message, ct) =>
             {
                 var unit = await context.BuildingUnitsV2.FindAsync(message.Message.BuildingUnitPersistentLocalId);
-                unit.Status = NotRealizedStatus;
-                SetVersion(unit!, message.Message.Provenance.Timestamp);
+                unit!.Status = NotRealizedStatus;
+                SetVersion(unit, message.Message.Provenance.Timestamp);
+            });
+
+            When<Envelope<BuildingUnitWasMovedIntoBuilding>>(async (context, message, ct) =>
+            {
+                var unit = await context.BuildingUnitsV2.FindAsync(message.Message.BuildingUnitPersistentLocalId);
+
+                unit!.BuildingPersistentLocalId = message.Message.BuildingPersistentLocalId;
+                unit.Status = MapStatus(BuildingUnitStatus.Parse(message.Message.BuildingUnitStatus));
+                unit.Position = (Point)_wkbReader.Read(message.Message.ExtendedWkbGeometry.ToByteArray());
+                unit.PositionMethod = MapGeometryMethod(BuildingUnitPositionGeometryMethod.Parse(message.Message.GeometryMethod));
+                unit.Function = MapFunction(BuildingUnitFunction.Parse(message.Message.Function));
+                unit.HasDeviation = message.Message.HasDeviation;
+                unit.IsRemoved = false;
+                SetVersion(unit, message.Message.Provenance.Timestamp);
             });
 
             // When<Envelope<BuildingUnitWasTransferred>>(async (context, message, ct) =>

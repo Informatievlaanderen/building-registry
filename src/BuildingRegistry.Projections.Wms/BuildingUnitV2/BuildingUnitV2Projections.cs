@@ -361,6 +361,18 @@ namespace BuildingRegistry.Projections.Wms.BuildingUnitV2
                 SetVersion(unit!, message.Message.Provenance.Timestamp);
             });
 
+            When<Envelope<BuildingUnitWasMovedIntoBuilding>>(async (context, message, ct) =>
+            {
+                var unit = await context.BuildingUnitsV2.FindAsync(message.Message.BuildingUnitPersistentLocalId);
+                unit!.BuildingPersistentLocalId = message.Message.BuildingPersistentLocalId;
+                unit.Position = message.Message.ExtendedWkbGeometry.ToByteArray();
+                unit.PositionMethod = BuildingUnitPositionGeometryMethod.Parse(message.Message.GeometryMethod);
+                unit.Function = BuildingUnitFunction.Parse(message.Message.Function);
+                unit.Status = BuildingUnitStatus.Parse(message.Message.BuildingUnitStatus);
+                unit.HasDeviation = message.Message.HasDeviation;
+                SetVersion(unit, message.Message.Provenance.Timestamp);
+            });
+
             // When<Envelope<BuildingUnitWasTransferred>>(async (context, message, ct) =>
             // {
             //     var unit = await context.BuildingUnitsV2.FindAsync(message.Message.BuildingUnitPersistentLocalId);

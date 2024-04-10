@@ -5,6 +5,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wms
     using System.Threading.Tasks;
     using AutoFixture;
     using Be.Vlaanderen.Basisregisters.GrAr.Common.Pipes;
+    using Be.Vlaanderen.Basisregisters.GrAr.Legacy.Gebouweenheid;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore;
     using Be.Vlaanderen.Basisregisters.Utilities.HexByteConvertor;
@@ -13,9 +14,11 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wms
     using Extensions;
     using Fixtures;
     using FluentAssertions;
+    using NetTopologySuite.Geometries;
     using Projections.Wms.BuildingUnitV2;
     using Tests.Legacy.Autofixture;
     using Xunit;
+    using Envelope = Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope;
 
     public class BuildingUnitV2Tests : BuildingWmsProjectionTest<BuildingUnitV2Projections>
     {
@@ -1102,6 +1105,40 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wms
                     item.Should().NotBeNull();
 
                     item!.Status.Should().Be(BuildingUnitStatus.NotRealized);
+                });
+        }
+
+        [Fact]
+        public async Task WhenBuildingUnitWasMovedIntoBuilding()
+        {
+            _fixture.Customize(new WithFixedBuildingPersistentLocalId());
+            _fixture.Customize(new WithFixedBuildingUnitPersistentLocalId());
+
+            var plannedBuildingUnit = _fixture.Create<BuildingUnitWasPlannedV2>();
+            var @event = _fixture.Create<BuildingUnitWasMovedIntoBuilding>();
+
+            await Sut
+                .Given(
+                    new Envelope<BuildingUnitWasPlannedV2>(
+                        new Envelope(
+                            plannedBuildingUnit,
+                            new Dictionary<string, object> { { AddEventHashPipe.HashMetadataKey, plannedBuildingUnit.GetHash() } })),
+                    new Envelope<BuildingUnitWasMovedIntoBuilding>(
+                        new Envelope(
+                            @event,
+                            new Dictionary<string, object> { { AddEventHashPipe.HashMetadataKey, @event.GetHash() } })))
+                .Then(async ct =>
+                {
+                    var item = await ct.BuildingUnitsV2.FindAsync(plannedBuildingUnit.BuildingUnitPersistentLocalId);
+                    item.Should().NotBeNull();
+
+                    item!.BuildingPersistentLocalId.Should().Be(@event.BuildingPersistentLocalId);
+                    item.PositionMethod.Should().Be(BuildingUnitPositionGeometryMethod.Parse(@event.GeometryMethod));
+                    item.Position.Should().BeEquivalentTo(@event.ExtendedWkbGeometry.ToByteArray());
+                    item.Status.Should().Be(BuildingUnitStatus.Parse(@event.BuildingUnitStatus));
+                    item.Function.Should().Be(BuildingUnitFunction.Parse(@event.Function));
+                    item.HasDeviation.Should().Be(@event.HasDeviation);
+                    item.Version.Should().Be(@event.Provenance.Timestamp);
                 });
         }
 
