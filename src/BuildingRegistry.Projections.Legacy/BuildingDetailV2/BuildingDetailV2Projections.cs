@@ -222,6 +222,20 @@ namespace BuildingRegistry.Projections.Legacy.BuildingDetailV2
                 UpdateHash(item, message);
             });
 
+            When<Envelope<BuildingUnitWasMovedIntoBuilding>>(async (context, message, ct) =>
+            {
+                var item = await context.BuildingDetailsV2.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);
+                item.Version = message.Message.Provenance.Timestamp;
+                UpdateHash(item, message);
+            });
+
+            When<Envelope<BuildingUnitWasMovedOutOfBuilding>>(async (context, message, ct) =>
+            {
+                var item = await context.BuildingDetailsV2.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);
+                item.Version = message.Message.Provenance.Timestamp;
+                UpdateHash(item, message);
+            });
+
             // When<Envelope<BuildingMergerWasRealized>>(async (context, message, ct) =>
             // {
             //     var geometryAsBinary = message.Message.ExtendedWkbGeometry.ToByteArray();

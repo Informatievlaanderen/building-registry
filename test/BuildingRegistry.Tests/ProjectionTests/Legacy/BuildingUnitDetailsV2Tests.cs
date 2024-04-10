@@ -1171,6 +1171,43 @@ namespace BuildingRegistry.Tests.ProjectionTests.Legacy
                 });
         }
 
+        [Fact]
+        public async Task WhenBuildingUnitWasMovedIntoBuilding()
+        {
+            _fixture.Customize(new WithFixedBuildingPersistentLocalId());
+            _fixture.Customize(new WithFixedBuildingUnitPersistentLocalId());
+
+            var buildingUnitWasPlannedV2 = _fixture.Create<BuildingUnitWasPlannedV2>()
+                .WithFunction(BuildingUnitFunction.Unknown);
+            var buildingUnitWasMovedIntoBuilding = _fixture.Create<BuildingUnitWasMovedIntoBuilding>();
+            
+            await Sut
+                .Given(
+                    new Envelope<BuildingUnitWasPlannedV2>(
+                        new Envelope(buildingUnitWasPlannedV2,
+                            new Dictionary<string, object> { { AddEventHashPipe.HashMetadataKey, buildingUnitWasPlannedV2.GetHash() } })),
+                    new Envelope<BuildingUnitWasMovedIntoBuilding>(
+                        new Envelope(buildingUnitWasMovedIntoBuilding,
+                            new Dictionary<string, object> { { AddEventHashPipe.HashMetadataKey, buildingUnitWasMovedIntoBuilding.GetHash() } }))
+                )
+                .Then(async ct =>
+                {
+                    var item = await ct.BuildingUnitDetailsV2.FindAsync(buildingUnitWasMovedIntoBuilding
+                        .BuildingUnitPersistentLocalId);
+                    item.Should().NotBeNull();
+                    item!.BuildingPersistentLocalId.Should().Be(buildingUnitWasMovedIntoBuilding.BuildingPersistentLocalId);
+                    item.Position.Should()
+                        .BeEquivalentTo(buildingUnitWasMovedIntoBuilding.ExtendedWkbGeometry.ToByteArray());
+                    item.PositionMethod.Should()
+                        .Be(BuildingUnitPositionGeometryMethod.Parse(buildingUnitWasMovedIntoBuilding.GeometryMethod));
+                    item.Function.Should().Be(BuildingUnitFunction.Parse(buildingUnitWasMovedIntoBuilding.Function));
+                    item.Version.Should().Be(buildingUnitWasMovedIntoBuilding.Provenance.Timestamp);
+                    item.IsRemoved.Should().BeFalse();
+                    item.Status.Should().Be(BuildingUnitStatus.Parse(buildingUnitWasMovedIntoBuilding.BuildingUnitStatus));
+                    item.HasDeviation.Should().Be(buildingUnitWasMovedIntoBuilding.HasDeviation);
+                });
+        }
+
         // [Fact]
         // public async Task WhenBuildingUnitWasTransferred()
         // {

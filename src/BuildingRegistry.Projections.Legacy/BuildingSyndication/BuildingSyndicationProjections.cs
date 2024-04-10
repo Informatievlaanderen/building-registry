@@ -1432,6 +1432,50 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
                 }, ct);
             });
 
+            When<Envelope<BuildingUnitWasMovedIntoBuilding>>(async (context, message, ct) =>
+            {
+                await context.CreateNewBuildingSyndicationItem(
+                    message.Message.BuildingPersistentLocalId,
+                    message,
+                    x =>
+                    {
+                        var buildingUnitSyndicationItem = new BuildingUnitSyndicationItemV2
+                        {
+                            Position = message.Position,
+                            PersistentLocalId = message.Message.BuildingUnitPersistentLocalId,
+                            Status = BuildingRegistry.Building.BuildingUnitStatus.Parse(message.Message.BuildingUnitStatus),
+                            HasDeviation = message.Message.HasDeviation,
+                            Function = BuildingRegistry.Building.BuildingUnitFunction.Parse(message.Message.Function),
+                            PointPosition = message.Message.ExtendedWkbGeometry.ToByteArray(),
+                            PositionMethod = BuildingRegistry.Building.BuildingUnitPositionGeometryMethod.Parse(message.Message.GeometryMethod),
+                            Version = message.Message.Provenance.Timestamp,
+                            Addresses = new Collection<BuildingUnitAddressSyndicationItemV2>(message.Message.AddressPersistentLocalIds.Select(
+                                    addressPersistentLocalId =>
+                                        new BuildingUnitAddressSyndicationItemV2(
+                                            message.Position,
+                                            message.Message.BuildingUnitPersistentLocalId,
+                                            addressPersistentLocalId))
+                                .ToList())
+                        };
+
+                        x.BuildingUnitsV2.Add(buildingUnitSyndicationItem);
+                    },
+                    ct);
+            });
+
+            When<Envelope<BuildingUnitWasMovedOutOfBuilding>>(async (context, message, ct) =>
+            {
+                await context.CreateNewBuildingSyndicationItem(
+                    message.Message.BuildingPersistentLocalId,
+                    message,
+                    x =>
+                    {
+                        var unit = x.BuildingUnitsV2.Single(y => y.PersistentLocalId == message.Message.BuildingUnitPersistentLocalId);
+                        x.BuildingUnitsV2.Remove(unit);
+                    },
+                    ct);
+            });
+
             // When<Envelope<BuildingUnitWasTransferred>>(async (context, message, ct) =>
             // {
             //     await context.CreateNewBuildingSyndicationItem(

@@ -13,7 +13,6 @@ namespace BuildingRegistry.Tests.ProjectionTests.Legacy
     using Projections.Legacy.BuildingDetailV2;
     using Tests.Legacy.Autofixture;
     using Xunit;
-    using WithFixedBuildingId = Fixtures.WithFixedBuildingId;
 
     public class BuildingV2Tests : BuildingLegacyProjectionTest<BuildingDetailV2Projections>
     {
@@ -559,6 +558,58 @@ namespace BuildingRegistry.Tests.ProjectionTests.Legacy
                     item.Should().NotBeNull();
 
                     item!.Status.Should().Be(BuildingStatus.Retired);
+                });
+        }
+
+        [Fact]
+        public async Task WhenBuildingUnitWasMovedIntoBuilding()
+        {
+            var buildingWasPlannedV2 = _fixture.Create<BuildingWasPlannedV2>();
+
+            var buildingUnitWasMovedIntoBuilding = _fixture.Create<BuildingUnitWasMovedIntoBuilding>();
+            var metadata = new Dictionary<string, object>
+            {
+                { AddEventHashPipe.HashMetadataKey, buildingUnitWasMovedIntoBuilding.GetHash() }
+            };
+
+            await Sut
+                .Given(new Envelope<BuildingWasPlannedV2>(new Envelope(buildingWasPlannedV2, new Dictionary<string, object>
+                    {
+                        { AddEventHashPipe.HashMetadataKey, buildingWasPlannedV2.GetHash() }
+                    })),
+                    new Envelope<BuildingUnitWasMovedIntoBuilding>(new Envelope(buildingUnitWasMovedIntoBuilding, metadata)))
+                .Then(async ct =>
+                {
+                    var buildingDetailItemV2 = await ct.BuildingDetailsV2.FindAsync(buildingUnitWasMovedIntoBuilding.BuildingPersistentLocalId);
+                    buildingDetailItemV2.Should().NotBeNull();
+                    buildingDetailItemV2.Version.Should().Be(buildingUnitWasMovedIntoBuilding.Provenance.Timestamp);
+                    buildingDetailItemV2.LastEventHash.Should().Be(buildingUnitWasMovedIntoBuilding.GetHash());
+                });
+        }
+
+        [Fact]
+        public async Task WhenBuildingUnitWasMovedOutOfBuilding()
+        {
+            var buildingWasPlannedV2 = _fixture.Create<BuildingWasPlannedV2>();
+
+            var buildingUnitWasMovedOutOfBuilding = _fixture.Create<BuildingUnitWasMovedOutOfBuilding>();
+            var metadata = new Dictionary<string, object>
+            {
+                { AddEventHashPipe.HashMetadataKey, buildingUnitWasMovedOutOfBuilding.GetHash() }
+            };
+
+            await Sut
+                .Given(new Envelope<BuildingWasPlannedV2>(new Envelope(buildingWasPlannedV2, new Dictionary<string, object>
+                    {
+                        { AddEventHashPipe.HashMetadataKey, buildingWasPlannedV2.GetHash() }
+                    })),
+                    new Envelope<BuildingUnitWasMovedOutOfBuilding>(new Envelope(buildingUnitWasMovedOutOfBuilding, metadata)))
+                .Then(async ct =>
+                {
+                    var buildingDetailItemV2 = await ct.BuildingDetailsV2.FindAsync(buildingUnitWasMovedOutOfBuilding.BuildingPersistentLocalId);
+                    buildingDetailItemV2.Should().NotBeNull();
+                    buildingDetailItemV2.Version.Should().Be(buildingUnitWasMovedOutOfBuilding.Provenance.Timestamp);
+                    buildingDetailItemV2.LastEventHash.Should().Be(buildingUnitWasMovedOutOfBuilding.GetHash());
                 });
         }
 
