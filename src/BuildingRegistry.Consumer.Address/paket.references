@@ -1,8 +1,5 @@
 Be.Vlaanderen.Basisregisters.AggregateSource
 Be.Vlaanderen.Basisregisters.Aws.DistributedMutex
-Be.Vlaanderen.Basisregisters.DataDog.Tracing.Autofac
-Be.Vlaanderen.Basisregisters.DataDog.Tracing.Sql
-Be.Vlaanderen.Basisregisters.DataDog.Tracing.SqlStreamStore
 Be.Vlaanderen.Basisregisters.GrAr.Contracts
 
 Be.Vlaanderen.Basisregisters.MessageHandling.Kafka.Producer
@@ -21,14 +18,10 @@ Serilog.Enrichers.Thread
 Serilog.Enrichers.Environment
 Serilog.Formatting.Compact
 
+Datadog.Trace.Bundle
+
 Microsoft.EntityFrameworkCore.SqlServer
 Microsoft.EntityFrameworkCore.InMemory
-
-Microsoft.Extensions.Configuration
-Microsoft.Extensions.Configuration.CommandLine
-Microsoft.Extensions.Configuration.FileExtensions
-Microsoft.Extensions.Configuration.EnvironmentVariables
-Microsoft.Extensions.Configuration.Json
 
 SourceLink.Embed.AllSourceFiles
 SourceLink.Copy.PdbFiles

@@ -3,16 +3,13 @@ namespace BuildingRegistry.Migrator.Building.Infrastructure.Modules
     using Api.BackOffice.Abstractions;
     using Autofac;
     using Autofac.Extensions.DependencyInjection;
-    using Be.Vlaanderen.Basisregisters.DataDog.Tracing.Autofac;
-    using Be.Vlaanderen.Basisregisters.EventHandling;
-    using Be.Vlaanderen.Basisregisters.EventHandling.Autofac;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Autofac;
     using Be.Vlaanderen.Basisregisters.Projector;
     using Be.Vlaanderen.Basisregisters.Projector.ConnectedProjections;
     using Be.Vlaanderen.Basisregisters.Projector.Modules;
     using BuildingRegistry.Infrastructure;
     using BuildingRegistry.Infrastructure.Modules;
-    using BuildingRegistry.Migrator.Building.Projections;
+    using Projections;
     using Consumer.Address;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Configuration;
@@ -47,7 +44,6 @@ namespace BuildingRegistry.Migrator.Building.Infrastructure.Modules
                     , ServiceLifetime.Transient);
 
             builder
-                .RegisterModule(new DataDogModule(_configuration))
                 .RegisterModule<EnvelopeModule>()
                 .RegisterModule(new SequenceModule(_configuration, _services, _loggerFactory))
                 .RegisterModule(new CommandHandlingModule(_configuration))

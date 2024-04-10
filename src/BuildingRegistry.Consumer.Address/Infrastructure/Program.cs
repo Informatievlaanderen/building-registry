@@ -5,22 +5,17 @@ namespace BuildingRegistry.Consumer.Address.Infrastructure
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
-    using Address;
     using Api.BackOffice.Abstractions;
     using Autofac;
     using Autofac.Extensions.DependencyInjection;
     using Be.Vlaanderen.Basisregisters.Aws.DistributedMutex;
-    using Be.Vlaanderen.Basisregisters.DataDog.Tracing.Autofac;
-    using Be.Vlaanderen.Basisregisters.DataDog.Tracing.Sql.EntityFrameworkCore;
     using Be.Vlaanderen.Basisregisters.EventHandling;
-    using Be.Vlaanderen.Basisregisters.EventHandling.Autofac;
     using Be.Vlaanderen.Basisregisters.MessageHandling.Kafka;
     using Be.Vlaanderen.Basisregisters.MessageHandling.Kafka.Consumer;
     using Building;
     using BuildingRegistry.Infrastructure;
     using BuildingRegistry.Infrastructure.Modules;
     using Destructurama;
-    using Microsoft.Data.SqlClient;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
@@ -79,23 +74,17 @@ namespace BuildingRegistry.Consumer.Address.Infrastructure
                     var loggerFactory = new SerilogLoggerFactory(Log.Logger);
 
                     services
-                        .AddScoped(s => new TraceDbConnection<BackOfficeContext>(
-                            new SqlConnection(hostContext.Configuration.GetConnectionString("BackOffice")),
-                            hostContext.Configuration["DataDog:ServiceName"]))
                         .AddDbContextFactory<BackOfficeContext>((provider, options) => options
                             .UseLoggerFactory(loggerFactory)
-                            .UseSqlServer(provider.GetRequiredService<TraceDbConnection<BackOfficeContext>>(), sqlServerOptions => sqlServerOptions
+                            .UseSqlServer(hostContext.Configuration.GetConnectionString("BackOffice"), sqlServerOptions => sqlServerOptions
                                 .EnableRetryOnFailure()
                                 .MigrationsHistoryTable(MigrationTables.BackOffice, Schema.BackOffice)
                             ));
 
                     services
-                        .AddScoped(s => new TraceDbConnection<ConsumerAddressContext>(
-                            new SqlConnection(hostContext.Configuration.GetConnectionString("ConsumerAddress")),
-                            hostContext.Configuration["DataDog:ServiceName"]))
                         .AddDbContextFactory<ConsumerAddressContext>((provider, options) => options
                             .UseLoggerFactory(loggerFactory)
-                            .UseSqlServer(provider.GetRequiredService<TraceDbConnection<ConsumerAddressContext>>(), sqlServerOptions =>
+                            .UseSqlServer(hostContext.Configuration.GetConnectionString("ConsumerAddress"), sqlServerOptions =>
                             {
                                 sqlServerOptions.EnableRetryOnFailure();
                                 sqlServerOptions.MigrationsHistoryTable(MigrationTables.ConsumerAddress, Schema.ConsumerAddress);
@@ -154,7 +143,6 @@ namespace BuildingRegistry.Consumer.Address.Infrastructure
                         .SingleInstance();
 
                     builder
-                        .RegisterModule(new DataDogModule(hostContext.Configuration))
                         .RegisterModule(new CommandHandlingModule(hostContext.Configuration))
                         .RegisterModule(new BackOfficeModule(hostContext.Configuration, services, loggerFactory))
                         .RegisterModule(new SequenceModule(hostContext.Configuration, services, loggerFactory));

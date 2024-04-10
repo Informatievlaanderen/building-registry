@@ -9,7 +9,6 @@ namespace BuildingRegistry.Projector.Infrastructure
     using Autofac;
     using Autofac.Extensions.DependencyInjection;
     using Be.Vlaanderen.Basisregisters.Api;
-    using Be.Vlaanderen.Basisregisters.DataDog.Tracing.Autofac;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.LastChangedList;
     using Be.Vlaanderen.Basisregisters.Projector.ConnectedProjections;
     using BuildingRegistry.Projections.Extract;
@@ -25,7 +24,6 @@ namespace BuildingRegistry.Projector.Infrastructure
     using Microsoft.Extensions.Diagnostics.HealthChecks;
     using Microsoft.Extensions.Hosting;
     using Microsoft.Extensions.Logging;
-    using Microsoft.Extensions.Options;
     using Microsoft.OpenApi.Models;
     using Modules;
 
@@ -86,7 +84,7 @@ namespace BuildingRegistry.Projector.Infrastructure
                                 Url = new Uri("https://legacy.basisregisters.vlaanderen")
                             }
                         },
-                        XmlCommentPaths = new[] {typeof(Startup).GetTypeInfo().Assembly.GetName().Name}
+                        XmlCommentPaths = new[] { typeof(Startup).GetTypeInfo().Assembly.GetName().Name }
                     },
                     MiddlewareHooks =
                     {
@@ -112,7 +110,7 @@ namespace BuildingRegistry.Projector.Infrastructure
                                 health.AddSqlServer(
                                     connectionString.Value,
                                     name: $"sqlserver-{connectionString.Key.ToLowerInvariant()}",
-                                    tags: new[] {DatabaseTag, "sql", "sqlserver"});
+                                    tags: new[] { DatabaseTag, "sql", "sqlserver" });
                             }
 
                             foreach (var connectionString in connectionStrings
@@ -121,35 +119,33 @@ namespace BuildingRegistry.Projector.Infrastructure
                                 health.AddNpgSql(
                                     connectionString.Value,
                                     name: $"npgsql-{connectionString.Key.ToLowerInvariant()}",
-                                    tags: new[] {DatabaseTag, "sql", "npgsql"});
+                                    tags: new[] { DatabaseTag, "sql", "npgsql" });
                             }
 
                             health.AddDbContextCheck<ExtractContext>(
                                 $"dbcontext-{nameof(ExtractContext).ToLowerInvariant()}",
-                                tags: new[] {DatabaseTag, "sql", "sqlserver"});
+                                tags: new[] { DatabaseTag, "sql", "sqlserver" });
 
                             health.AddDbContextCheck<LastChangedListContext>(
                                 $"dbcontext-{nameof(LastChangedListContext).ToLowerInvariant()}",
-                                tags: new[] {DatabaseTag, "sql", "sqlserver"});
+                                tags: new[] { DatabaseTag, "sql", "sqlserver" });
 
                             health.AddDbContextCheck<LegacyContext>(
                                 $"dbcontext-{nameof(LegacyContext).ToLowerInvariant()}",
-                                tags: new[] {DatabaseTag, "sql", "sqlserver"});
+                                tags: new[] { DatabaseTag, "sql", "sqlserver" });
 
                             health.AddDbContextCheck<WmsContext>(
                                 $"dbcontext-{nameof(WmsContext).ToLowerInvariant()}",
-                                tags: new[] {DatabaseTag, "sql", "sqlserver"});
+                                tags: new[] { DatabaseTag, "sql", "sqlserver" });
 
                             health.AddDbContextCheck<WfsContext>(
                                 $"dbcontext-{nameof(WfsContext).ToLowerInvariant()}",
-                                tags: new[] {DatabaseTag, "sql", "sqlserver"});
+                                tags: new[] { DatabaseTag, "sql", "sqlserver" });
                         }
                     }
                 })
                 .Configure<ExtractConfig>(_configuration.GetSection("Extract"))
-                .Configure<IntegrationOptions>(_configuration.GetSection("Integration"))
-                .Configure<FeatureToggleOptions>(_configuration.GetSection(FeatureToggleOptions.ConfigurationKey))
-                .AddSingleton(c => new UseProjectionsV2Toggle(c.GetRequiredService<IOptions<FeatureToggleOptions>>().Value.UseProjectionsV2));
+                .Configure<IntegrationOptions>(_configuration.GetSection("Integration"));
 
             var containerBuilder = new ContainerBuilder();
             containerBuilder.RegisterModule(new LoggingModule(_configuration, services));
@@ -166,30 +162,11 @@ namespace BuildingRegistry.Projector.Infrastructure
             IHostApplicationLifetime appLifetime,
             ILoggerFactory loggerFactory,
             IApiVersionDescriptionProvider apiVersionProvider,
-            ApiDataDogToggle datadogToggle,
-            ApiDebugDataDogToggle debugDataDogToggle,
             HealthCheckService healthCheckService)
         {
             StartupHelpers.CheckDatabases(healthCheckService, DatabaseTag, loggerFactory).GetAwaiter().GetResult();
 
             app
-                .UseDataDog<Startup>(new DataDogOptions
-                {
-                    Common =
-                    {
-                        ServiceProvider = serviceProvider,
-                        LoggerFactory = loggerFactory
-                    },
-                    Toggles =
-                    {
-                        Enable = datadogToggle,
-                        Debug = debugDataDogToggle
-                    },
-                    Tracing =
-                    {
-                        ServiceName = _configuration["DataDog:ServiceName"],
-                    }
-                })
                 .UseDefaultForApi(new StartupUseOptions
                 {
                     Common =
