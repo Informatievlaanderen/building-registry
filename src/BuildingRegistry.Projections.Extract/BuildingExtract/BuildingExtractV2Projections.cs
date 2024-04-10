@@ -266,6 +266,20 @@ namespace BuildingRegistry.Projections.Extract.BuildingExtract
                 UpdateVersie(item, message.Message.Provenance.Timestamp);
             });
 
+            When<Envelope<BuildingUnitWasMovedIntoBuilding>>(async (context, message, ct) =>
+            {
+                var item = await context.BuildingExtractV2.FindAsync(message.Message.BuildingPersistentLocalId,
+                    cancellationToken: ct);
+                UpdateVersie(item, message.Message.Provenance.Timestamp);
+            });
+
+            When<Envelope<BuildingUnitWasMovedOutOfBuilding>>(async (context, message, ct) =>
+            {
+                var item = await context.BuildingExtractV2.FindAsync(message.Message.BuildingPersistentLocalId,
+                    cancellationToken: ct);
+                UpdateVersie(item, message.Message.Provenance.Timestamp);
+            });
+
             // When<Envelope<BuildingMergerWasRealized>>(async (context, message, ct) =>
             // {
             //     var buildingExtractItemV2 = new BuildingExtractItemV2

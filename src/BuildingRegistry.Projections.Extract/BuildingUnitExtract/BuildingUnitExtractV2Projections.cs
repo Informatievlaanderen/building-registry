@@ -89,7 +89,7 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
                             var geometry = wkbReader.Read(message.Message.ExtendedWkbGeometryBuildingUnits!.ToByteArray());
                             UpdateGeometry(itemV2, geometry);
                             var geometryMethod = MapGeometryMethod(BuildingUnitPositionGeometryMethod.DerivedFromObject);
-                            UpdatePosition(itemV2, geometryMethod);
+                            UpdateGeometryMethod(itemV2, geometryMethod);
                             UpdateVersie(itemV2, message.Message.Provenance.Timestamp);
                         }, ct);
                 }
@@ -105,7 +105,7 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
                             var geometry = wkbReader.Read(message.Message.ExtendedWkbGeometryBuildingUnits!.ToByteArray());
                             UpdateGeometry(itemV2, geometry);
                             var geometryMethod = MapGeometryMethod(BuildingUnitPositionGeometryMethod.DerivedFromObject);
-                            UpdatePosition(itemV2, geometryMethod);
+                            UpdateGeometryMethod(itemV2, geometryMethod);
                             UpdateVersie(itemV2, message.Message.Provenance.Timestamp);
                         }, ct);
                 }
@@ -122,7 +122,7 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
                             var geometry = wkbReader.Read(message.Message.ExtendedWkbGeometryBuildingUnits!.ToByteArray());
                             UpdateGeometry(itemV2, geometry);
                             var geometryMethod = MapGeometryMethod(BuildingUnitPositionGeometryMethod.DerivedFromObject);
-                            UpdatePosition(itemV2, geometryMethod);
+                            UpdateGeometryMethod(itemV2, geometryMethod);
                             UpdateVersie(itemV2, message.Message.Provenance.Timestamp);
                         }, ct);
                 }
@@ -139,7 +139,7 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
                             var geometry = wkbReader.Read(message.Message.ExtendedWkbGeometryBuildingUnits!.ToByteArray());
                             UpdateGeometry(itemV2, geometry);
                             var geometryMethod = MapGeometryMethod(BuildingUnitPositionGeometryMethod.DerivedFromObject);
-                            UpdatePosition(itemV2, geometryMethod);
+                            UpdateGeometryMethod(itemV2, geometryMethod);
                             UpdateVersie(itemV2, message.Message.Provenance.Timestamp);
                         }, ct);
                 }
@@ -378,7 +378,7 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
                 await context.FindAndUpdateBuildingUnitExtract(message.Message.BuildingUnitPersistentLocalId,
                     itemV2 =>
                     {
-                        UpdatePosition(itemV2, geometryMethod);
+                        UpdateGeometryMethod(itemV2, geometryMethod);
                         UpdateGeometry(itemV2, geometry);
                         UpdateVersie(itemV2, message.Message.Provenance.Timestamp);
                     }, ct);
@@ -454,6 +454,23 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
                     itemV2 =>
                     {
                         UpdateStatus(itemV2, NotRealized);
+                        UpdateVersie(itemV2, message.Message.Provenance.Timestamp);
+                    }, ct);
+            });
+
+            When<Envelope<BuildingUnitWasMovedIntoBuilding>>(async (context, message, ct) =>
+            {
+                var geometryMethod = MapGeometryMethod(BuildingUnitPositionGeometryMethod.Parse(message.Message.GeometryMethod));
+                var geometry = wkbReader.Read(message.Message.ExtendedWkbGeometry.ToByteArray());
+                var status = MapStatus(BuildingUnitStatus.Parse(message.Message.BuildingUnitStatus));
+
+                await context.FindAndUpdateBuildingUnitExtract(message.Message.BuildingUnitPersistentLocalId,
+                    itemV2 =>
+                    {
+                        itemV2.BuildingPersistentLocalId = message.Message.BuildingPersistentLocalId;
+                        UpdateStatus(itemV2, status);
+                        UpdateGeometryMethod(itemV2, geometryMethod);
+                        UpdateGeometry(itemV2, geometry);
                         UpdateVersie(itemV2, message.Message.Provenance.Timestamp);
                     }, ct);
             });
@@ -559,7 +576,7 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
             buildingUnit.DbaseRecord = record.ToBytes(_encoding);
         }
 
-        private void UpdatePosition(BuildingUnitExtractItemV2 buildingUnit, string? posgeommet)
+        private void UpdateGeometryMethod(BuildingUnitExtractItemV2 buildingUnit, string? posgeommet)
             => UpdateRecord(buildingUnit, record => record.posgeommet.Value = posgeommet);
     }
 }
