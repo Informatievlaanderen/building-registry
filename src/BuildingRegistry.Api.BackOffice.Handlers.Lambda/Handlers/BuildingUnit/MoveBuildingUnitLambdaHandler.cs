@@ -36,7 +36,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.BuildingUnit
             _backOfficeContext = backOfficeContext;
             _lifetimeScope = lifetimeScope;
         }
-
+        
         protected override async Task<object> InnerHandle(MoveBuildingUnitLambdaRequest request, CancellationToken cancellationToken)
         {
             var moveIntoBuildingCommand = request.ToMoveBuildingUnitIntoBuildingCommand();

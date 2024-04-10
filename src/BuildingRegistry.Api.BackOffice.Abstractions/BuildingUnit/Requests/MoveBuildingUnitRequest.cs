@@ -1,6 +1,7 @@
 namespace BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Requests
 {
     using Newtonsoft.Json;
+    using Swashbuckle.AspNetCore.Filters;
     using System.Runtime.Serialization;
 
     public sealed class MoveBuildingUnitRequest
@@ -11,5 +12,16 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Requests
         [DataMember(Name = "DoelgebouwId", Order = 0)]
         [JsonProperty(Required = Required.Always)]
         public string DoelgebouwId { get; set; }
+    }
+
+    public class MoveBuildingUnitRequestExamples : IExamplesProvider<MoveBuildingUnitRequest>
+    {
+        public MoveBuildingUnitRequest GetExamples()
+        {
+            return new MoveBuildingUnitRequest
+            {
+                DoelgebouwId = "https://data.vlaanderen.be/id/gebouw/6447380"
+            };
+        }
     }
 }

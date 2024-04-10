@@ -1,16 +1,12 @@
-namespace BuildingRegistry.Tests.BackOffice.Api.BuildingUnit.WhenCorrectingBuildingUnitPosition
+namespace BuildingRegistry.Tests.BackOffice.Api.BuildingUnit.WhenMovingBuildingUnit
 {
-    using System;
-    using System.Linq;
-    using System.Threading;
-    using System.Threading.Tasks;
     using AutoFixture;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
-    using Be.Vlaanderen.Basisregisters.GrAr.Edit.Contracts;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Be.Vlaanderen.Basisregisters.Sqs.Exceptions;
     using Be.Vlaanderen.Basisregisters.Sqs.Requests;
+    using BuildingRegistry.Api.BackOffice.Abstractions.Building.Validators;
     using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Requests;
     using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.SqsRequests;
     using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Validators;
@@ -24,6 +20,9 @@ namespace BuildingRegistry.Tests.BackOffice.Api.BuildingUnit.WhenCorrectingBuild
     using Moq;
     using NodaTime;
     using SqlStreamStore;
+    using System;
+    using System.Threading;
+    using System.Threading.Tasks;
     using Xunit;
     using Xunit.Abstractions;
 
@@ -40,55 +39,21 @@ namespace BuildingRegistry.Tests.BackOffice.Api.BuildingUnit.WhenCorrectingBuild
             _controller = CreateBuildingUnitControllerWithUser<BuildingUnitController>();
         }
 
-        [Theory]
-        [InlineData("")]
-        [InlineData(null)]
-        public void WithPositionGeometryMethodAppointedByAdministratorAndMissingPosition_ThenValidationExceptionIsThrown(string? position)
-        {
-            var request = new CorrectBuildingUnitPositionRequest
-            {
-                PositieGeometrieMethode = PositieGeometrieMethode.AangeduidDoorBeheerder,
-                Positie = position
-            };
-
-            var streamStoreMock = new Mock<IStreamStore>();
-            streamStoreMock.SetStreamFound();
-
-            //Act
-            Func<Task> act = async () => await _controller.CorrectPosition(
-                MockIfMatchValidator(true),
-                new CorrectBuildingUnitPositionRequestValidator(),
-                0,
-                request,
-                null,
-                CancellationToken.None);
-
-            //Assert
-            act
-                .Should()
-                .ThrowAsync<ValidationException>()
-                .Result
-                .Where(x => x.Errors.Any(e =>
-                    e.ErrorCode == "GebouweendheidPositieValidatie"
-                    && e.ErrorMessage == "De verplichte parameter 'positie' ontbreekt."));
-        }
-
         [Fact]
-        public void WithPositionHavingInvalidFormat_ThenValidationExceptionIsThrown()
+        public void WithInvalidRequest_ThenValidationExceptionIsThrown()
         {
-            var request = new CorrectBuildingUnitPositionRequest
+            var request = new MoveBuildingUnitRequest
             {
-                PositieGeometrieMethode = PositieGeometrieMethode.AangeduidDoorBeheerder,
-                Positie = "<gml:Point srsName=\"https://www.opengis.net/def/crs/EPSG/0/31370\"><gml:pos>103671.37 192046.71</gml:pos></gml:Point>"
+                DoelgebouwId = ""
             };
 
             var streamStoreMock = new Mock<IStreamStore>();
             streamStoreMock.SetStreamFound();
 
             //Act
-            Func<Task> act = async () => await _controller.CorrectPosition(
+            Func<Task> act = async () => await _controller.Move(
                 MockIfMatchValidator(true),
-                new CorrectBuildingUnitPositionRequestValidator(),
+                new MoveBuildingUnitRequestValidator(new BuildingExistsValidator(streamStoreMock.Object)),
                 0,
                 request,
                 null,
@@ -97,11 +62,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.BuildingUnit.WhenCorrectingBuild
             //Assert
             act
                 .Should()
-                .ThrowAsync<ValidationException>()
-                .Result
-                .Where(x => x.Errors.Any(e =>
-                    e.ErrorCode == "GebouweenheidPositieformaatValidatie"
-                    && e.ErrorMessage == "De positie is geen geldige gml-puntgeometrie."));
+                .ThrowAsync<ValidationException>();
         }
 
         [Fact]
@@ -111,17 +72,17 @@ namespace BuildingRegistry.Tests.BackOffice.Api.BuildingUnit.WhenCorrectingBuild
             var expectedLocationResult = new LocationResult(CreateTicketUri(ticketId));
 
             MockMediator
-                .Setup(x => x.Send(It.IsAny<CorrectBuildingUnitPositionSqsRequest>(), CancellationToken.None))
+                .Setup(x => x.Send(It.IsAny<MoveBuildingUnitSqsRequest>(), CancellationToken.None))
                 .Returns(Task.FromResult(expectedLocationResult));
 
             _streamStore.SetStreamFound();
 
-            var request = Fixture.Create<CorrectBuildingUnitPositionRequest>();
+            var request = Fixture.Create<MoveBuildingUnitRequest>();
             var expectedIfMatchHeader = Fixture.Create<string>();
 
-            var result = (AcceptedResult)await _controller.CorrectPosition(
+            var result = (AcceptedResult)await _controller.Move(
                 MockIfMatchValidator(true),
-                MockValidRequestValidator<CorrectBuildingUnitPositionRequest>(),
+                MockValidRequestValidator<MoveBuildingUnitRequest>(),
                 0,
                 request,
                 expectedIfMatchHeader,
@@ -132,7 +93,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.BuildingUnit.WhenCorrectingBuild
 
             MockMediator.Verify(x =>
                 x.Send(
-                    It.Is<CorrectBuildingUnitPositionSqsRequest>(sqsRequest =>
+                    It.Is<MoveBuildingUnitSqsRequest>(sqsRequest =>
                         sqsRequest.Request == request
                         && sqsRequest.ProvenanceData.Timestamp != Instant.MinValue
                         && sqsRequest.ProvenanceData.Application == Application.BuildingRegistry
@@ -146,19 +107,19 @@ namespace BuildingRegistry.Tests.BackOffice.Api.BuildingUnit.WhenCorrectingBuild
         public void WithAggregateIdNotFound_ThenValidationErrorIsThrown()
         {
             MockMediator
-                .Setup(x => x.Send(It.IsAny<CorrectBuildingUnitPositionSqsRequest>(), CancellationToken.None))
+                .Setup(x => x.Send(It.IsAny<MoveBuildingUnitSqsRequest>(), CancellationToken.None))
                 .Throws(new AggregateIdIsNotFoundException());
 
             _streamStore.SetStreamNotFound();
 
-            var request = Fixture.Create<CorrectBuildingUnitPositionRequest>();
+            var request = Fixture.Create<MoveBuildingUnitRequest>();
 
             Func<Task> act = async () =>
             {
-                await _controller.CorrectPosition(
+                await _controller.Move(
 
                     MockIfMatchValidator(true),
-                    MockValidRequestValidator<CorrectBuildingUnitPositionRequest>(),
+                    MockValidRequestValidator<MoveBuildingUnitRequest>(),
                     0,
                     request,
                     string.Empty);
@@ -177,15 +138,15 @@ namespace BuildingRegistry.Tests.BackOffice.Api.BuildingUnit.WhenCorrectingBuild
         [Fact]
         public void WhenAggregateNotFoundException_ThenThrowValidationException()
         {
-            MockMediator.Setup<object?>(x => x.Send(It.IsAny<CorrectBuildingUnitPositionSqsRequest>(), CancellationToken.None).Result)
+            MockMediator.Setup<object?>(x => x.Send(It.IsAny<MoveBuildingUnitSqsRequest>(), CancellationToken.None).Result)
                 .Throws(new AggregateNotFoundException("", typeof(Building)));
 
-            var request = Fixture.Create<CorrectBuildingUnitPositionRequest>();
+            var request = Fixture.Create<MoveBuildingUnitRequest>();
 
             //Act
-            Func<Task> act = async () => await _controller.CorrectPosition(
+            Func<Task> act = async () => await _controller.Move(
                 MockIfMatchValidator(true),
-                MockValidRequestValidator<CorrectBuildingUnitPositionRequest>(),
+                MockValidRequestValidator<MoveBuildingUnitRequest>(),
                 0,
                 request,
                 null,

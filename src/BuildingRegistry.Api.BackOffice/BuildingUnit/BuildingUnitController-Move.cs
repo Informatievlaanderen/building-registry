@@ -23,7 +23,7 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
     public partial class BuildingUnitController
     {
         /// <summary>
-        /// Corrigeer de positie van een gebouweenheid.
+        /// Het gebouweenheid zal verplaatst worden naar het doelgebouw en verwijderd worden uit het brongebouw.
         /// </summary>
         /// <param name="ifMatchHeaderValidator"></param>
         /// <param name="validator"></param>
@@ -32,20 +32,21 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
         /// <param name="ifMatchHeaderValue"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        [HttpPost("{buildingUnitPersistentLocalId}/acties/corrigeren/positie")]
+        [HttpPost("{buildingUnitPersistentLocalId}/acties/verplaatsen")]
         [ProducesResponseType(StatusCodes.Status202Accepted)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-        [SwaggerRequestExample(typeof(CorrectBuildingUnitPositionRequest), typeof(CorrectBuildingUnitPositionRequestExamples))]
+        [SwaggerRequestExample(typeof(MoveBuildingUnitRequest), typeof(MoveBuildingUnitRequestExamples))]
         [SwaggerResponseHeader(StatusCodes.Status202Accepted, "location", "string", "De url van de gebouweenheid.")]
         [SwaggerResponseExample(StatusCodes.Status400BadRequest, typeof(BadRequestResponseExamples))]
         [SwaggerResponseExample(StatusCodes.Status500InternalServerError, typeof(InternalServerErrorResponseExamples))]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = PolicyNames.GeschetstGebouw.DecentraleBijwerker)]
-        public async Task<IActionResult> CorrectPosition(
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = PolicyNames.GeschetstGebouw.InterneBijwerker)]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = PolicyNames.IngemetenGebouw.InterneBijwerker)]
+        public async Task<IActionResult> Move(
             [FromServices] IIfMatchHeaderValidator ifMatchHeaderValidator,
-            [FromServices] IValidator<CorrectBuildingUnitPositionRequest> validator,
+            [FromServices] IValidator<MoveBuildingUnitRequest> validator,
             [FromRoute] int buildingUnitPersistentLocalId,
-            [FromBody] CorrectBuildingUnitPositionRequest request,
+            [FromBody] MoveBuildingUnitRequest request,
             [FromHeader(Name = "If-Match")] string? ifMatchHeaderValue,
             CancellationToken ct = default)
         {
@@ -58,9 +59,9 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
                 {
                     return new PreconditionFailedResult();
                 }
-
+                
                 var result = await Mediator.Send(
-                    new CorrectBuildingUnitPositionSqsRequest
+                    new MoveBuildingUnitSqsRequest
                     {
                         BuildingUnitPersistentLocalId = buildingUnitPersistentLocalId,
                         Request = request,
