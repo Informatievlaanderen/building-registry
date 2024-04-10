@@ -15,16 +15,8 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.Validation
 
             public static class BuildingInvalidStatus
             {
-                public const string Code = "TODO-rik";
-                public const string Message = "Deze actie is enkel toegestaan binnen een gepland, inAanbouw of gerealiseerd gebouw.";
-
-                public static TicketError ToTicketError() => new(Message, Code);
-            }
-
-            public static class BuildingUnitInvalidStatus
-            {
-                public const string Code = "TODO-rik";
-                public const string Message = "Deze actie is enkel toegestaan op gebouweenheden met status 'gepland' of 'gerealiseerd'.";
+                public const string Code = "GebouwGehistoreerdOfNietGerealiseerd";
+                public const string Message = "Deze actie is enkel toegestaan op gebouwen met status 'gepland', 'inAanbouw' of 'gerealiseerd'.";
 
                 public static TicketError ToTicketError() => new(Message, Code);
             }

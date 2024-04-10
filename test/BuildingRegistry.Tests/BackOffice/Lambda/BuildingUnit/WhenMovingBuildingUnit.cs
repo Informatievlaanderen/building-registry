@@ -139,40 +139,6 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
         }
 
         [Fact]
-        public async Task WithInvalidBuildingUnitStatus_ThenTicketingErrorIsExpected()
-        {
-            // Arrange
-            var ticketing = new Mock<ITicketing>();
-            var buildingPersistentLocalId = Fixture.Create<BuildingPersistentLocalId>();
-            var buildingUnitPersistentLocalId = Fixture.Create<BuildingUnitPersistentLocalId>();
-
-            PlanBuilding(buildingPersistentLocalId);
-            PlanBuildingUnit(buildingPersistentLocalId, buildingUnitPersistentLocalId);
-
-            var handler = new MoveBuildingUnitLambdaHandler(
-                Container.Resolve<IConfiguration>(),
-                new FakeRetryPolicy(),
-                ticketing.Object,
-                MockExceptionIdempotentCommandHandler<BuildingUnitHasInvalidStatusException>().Object,
-                Container.Resolve<IBuildings>(),
-                _backOfficeContext,
-                Container);
-
-            // Act
-            await handler.Handle(CreateMoveBuildingUnitLambdaRequest(), CancellationToken.None);
-
-            //Assert
-            //TODO-rik confirm strings
-            ticketing.Verify(x =>
-                x.Error(
-                    It.IsAny<Guid>(),
-                    new TicketError(
-                        "Deze actie is enkel toegestaan op gebouweenheden met status 'gepland' of 'gerealiseerd'.",
-                        "TODO-rik"),
-                    CancellationToken.None));
-        }
-
-        [Fact]
         public async Task WithInvalidBuildingStatus_ThenTicketingErrorIsExpected()
         {
             // Arrange
@@ -196,13 +162,12 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
             await handler.Handle(CreateMoveBuildingUnitLambdaRequest(), CancellationToken.None);
 
             //Assert
-            //TODO-rik confirm strings
             ticketing.Verify(x =>
                 x.Error(
                     It.IsAny<Guid>(),
                     new TicketError(
-                        "Deze actie is enkel toegestaan binnen een gepland, inAanbouw of gerealiseerd gebouw.",
-                        "TODO-rik"),
+                        "Deze actie is enkel toegestaan op gebouwen met status 'gepland', 'inAanbouw' of 'gerealiseerd'.",
+                        "GebouwGehistoreerdOfNietGerealiseerd"),
                     CancellationToken.None));
         }
 
@@ -230,7 +195,6 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
             await handler.Handle(CreateMoveBuildingUnitLambdaRequest(), CancellationToken.None);
 
             //Assert
-            //TODO-rik confirm strings
             ticketing.Verify(x =>
                 x.Error(
                     It.IsAny<Guid>(),

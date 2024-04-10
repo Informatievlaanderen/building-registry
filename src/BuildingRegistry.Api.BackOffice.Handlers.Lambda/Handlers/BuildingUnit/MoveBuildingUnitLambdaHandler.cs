@@ -93,7 +93,6 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.BuildingUnit
             {
                 BuildingHasInvalidStatusException => ValidationErrors.MoveBuildingUnit.BuildingInvalidStatus.ToTicketError(),
                 BuildingUnitHasInvalidFunctionException => ValidationErrors.Common.BuildingUnitHasInvalidFunction.ToTicketError(),
-                BuildingUnitHasInvalidStatusException => ValidationErrors.MoveBuildingUnit.BuildingUnitInvalidStatus.ToTicketError(),
                 _ => null
             };
         }
