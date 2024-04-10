@@ -1,4 +1,4 @@
-﻿namespace BuildingRegistry.Projections.Integration.BuildingUnit.LatestItem
+namespace BuildingRegistry.Projections.Integration.BuildingUnit.LatestItem
 {
     using System.Linq;
     using System.Threading.Tasks;
@@ -569,6 +569,31 @@
                         buildingUnit.OsloStatus = BuildingUnitStatus.NotRealized.Map();
                         buildingUnit.Status = BuildingUnitStatus.NotRealized.Status;
                         UpdateVersionTimestamp(buildingUnit, message.Message);
+                        return Task.CompletedTask;
+                    },
+                    ct);
+            });
+
+            When<Envelope<BuildingUnitWasMovedIntoBuilding>>(async (context, message, ct) =>
+            {
+                await context.FindAndUpdateBuildingUnit(
+                    message.Message.BuildingUnitPersistentLocalId,
+                    buildingUnit =>
+                    {
+                        var geometryAsBinary = message.Message.ExtendedWkbGeometry.ToByteArray();
+                        var sysGeometry = wkbReader.Read(geometryAsBinary);
+
+                        buildingUnit.BuildingPersistentLocalId = message.Message.BuildingPersistentLocalId;
+                        buildingUnit.OsloStatus = BuildingUnitStatus.Parse(message.Message.BuildingUnitStatus).Map();
+                        buildingUnit.Status = message.Message.BuildingUnitStatus;
+                        buildingUnit.OsloFunction = BuildingUnitFunction.Parse(message.Message.Function).Map();
+                        buildingUnit.Function = message.Message.Function;
+                        buildingUnit.Geometry = sysGeometry;
+                        buildingUnit.OsloGeometryMethod = BuildingUnitPositionGeometryMethod.Parse(message.Message.GeometryMethod).Map();
+                        buildingUnit.GeometryMethod = message.Message.GeometryMethod;
+                        buildingUnit.HasDeviation = message.Message.HasDeviation;
+                        UpdateVersionTimestamp(buildingUnit, message.Message);
+
                         return Task.CompletedTask;
                     },
                     ct);

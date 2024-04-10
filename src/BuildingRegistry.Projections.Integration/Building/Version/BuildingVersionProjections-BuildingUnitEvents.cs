@@ -1,4 +1,4 @@
-﻿namespace BuildingRegistry.Projections.Integration.Building.Version
+namespace BuildingRegistry.Projections.Integration.Building.Version
 {
     using System.Collections.ObjectModel;
     using System.Linq;
@@ -557,6 +557,74 @@
                         buildingUnit.Status = BuildingUnitStatus.NotRealized.Status;
                         buildingUnit.OsloStatus = BuildingUnitStatus.NotRealized.Map();
                         buildingUnit.VersionTimestamp = message.Message.Provenance.Timestamp;
+                    },
+                    ct);
+            });
+
+            When<Envelope<BuildingUnitWasMovedIntoBuilding>>(async (context, message, ct) =>
+            {
+                await context.CreateNewBuildingVersion(
+                    message.Message.BuildingPersistentLocalId,
+                    message,
+                    building =>
+                    {
+                        var geometryAsBinary = message.Message.ExtendedWkbGeometry.ToByteArray();
+                        var sysGeometry = wkbReader.Read(geometryAsBinary);
+                        var status = BuildingUnitStatus.Parse(message.Message.BuildingUnitStatus);
+                        var function = BuildingUnitFunction.Parse(message.Message.Function);
+                        var geometryMethod = BuildingUnitPositionGeometryMethod.Parse(message.Message.GeometryMethod);
+
+                        var buildingUnitVersion = new BuildingUnitVersion
+                        {
+                            Position = message.Position,
+                            BuildingUnitPersistentLocalId = message.Message.BuildingUnitPersistentLocalId,
+                            BuildingPersistentLocalId = message.Message.BuildingPersistentLocalId,
+                            Status = status.Status,
+                            OsloStatus = status.Map(),
+                            Function = function.Function,
+                            OsloFunction = function.Map(),
+                            Geometry = sysGeometry,
+                            GeometryMethod = geometryMethod.GeometryMethod,
+                            OsloGeometryMethod = geometryMethod.Map(),
+                            HasDeviation = message.Message.HasDeviation,
+                            IsRemoved = false,
+                            VersionTimestamp = message.Message.Provenance.Timestamp,
+                            CreatedOnTimestamp = message.Message.Provenance.Timestamp,
+                            Namespace = options.BuildingUnitNamespace,
+                            PuriId = $"{options.BuildingUnitNamespace}/{message.Message.BuildingUnitPersistentLocalId}",
+                            Type = message.EventName
+                        };
+                        
+                        var addresses = message.Message.AddressPersistentLocalIds
+                            .Distinct()
+                            .Select(x => new BuildingUnitAddressVersion
+                            {
+                                Position = message.Position,
+                                BuildingUnitPersistentLocalId = buildingUnitVersion.BuildingUnitPersistentLocalId,
+                                AddressPersistentLocalId = x,
+                            })
+                            .ToList();
+
+                        buildingUnitVersion.Addresses = new Collection<BuildingUnitAddressVersion>(addresses);
+
+                        building.BuildingUnits.Add(buildingUnitVersion);
+                        building.VersionTimestamp = message.Message.Provenance.Timestamp;
+                    },
+                    ct);
+            });
+
+            When<Envelope<BuildingUnitWasMovedOutOfBuilding>>(async (context, message, ct) =>
+            {
+                await context.CreateNewBuildingVersion(
+                    message.Message.BuildingPersistentLocalId,
+                    message,
+                    building =>
+                    {
+                        var buildingUnit = building.BuildingUnits.Single(x =>
+                            x.BuildingUnitPersistentLocalId == message.Message.BuildingUnitPersistentLocalId);
+
+                        building.BuildingUnits.Remove(buildingUnit);
+                        building.VersionTimestamp = message.Message.Provenance.Timestamp;
                     },
                     ct);
             });

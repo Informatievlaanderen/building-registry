@@ -768,6 +768,86 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
                 });
         }
 
+        [Fact]
+        public async Task WhenBuildingUnitWasMovedIntoBuilding()
+        {
+            _fixture.Customize(new WithFixedBuildingPersistentLocalId());
+
+            var buildingWasPlanned = _fixture.Create<BuildingWasPlannedV2>();
+            var buildingUnitWasMovedIntoBuilding = _fixture.Create<BuildingUnitWasMovedIntoBuilding>();
+
+            var position = _fixture.Create<long>();
+
+            var buildingWasPlannedMetadata = new Dictionary<string, object>
+             {
+                 { AddEventHashPipe.HashMetadataKey, buildingWasPlanned.GetHash() },
+                 { Envelope.PositionMetadataKey, position }
+             };
+            var buildingUnitWasMovedIntoBuildingMetadata = new Dictionary<string, object>
+             {
+                 { AddEventHashPipe.HashMetadataKey, buildingUnitWasMovedIntoBuilding.GetHash() },
+                 { Envelope.PositionMetadataKey, position + 1 }
+             };
+
+            await Sut
+                .Given(
+                    new Envelope<BuildingWasPlannedV2>(
+                        new Envelope(
+                            buildingWasPlanned,
+                            buildingWasPlannedMetadata)),
+                    new Envelope<BuildingUnitWasMovedIntoBuilding>(
+                        new Envelope(
+                            buildingUnitWasMovedIntoBuilding,
+                            buildingUnitWasMovedIntoBuildingMetadata)))
+                .Then(async ct =>
+                {
+                    var buildingLatestItem = await ct.BuildingLatestItems.FindAsync(buildingUnitWasMovedIntoBuilding.BuildingPersistentLocalId);
+                    buildingLatestItem.Should().NotBeNull();
+
+                    buildingLatestItem.VersionTimestamp.Should().Be(buildingUnitWasMovedIntoBuilding.Provenance.Timestamp);
+                });
+        }
+
+        [Fact]
+        public async Task WhenBuildingUnitWasMovedOutOfBuilding()
+        {
+            _fixture.Customize(new WithFixedBuildingPersistentLocalId());
+
+            var buildingWasPlanned = _fixture.Create<BuildingWasPlannedV2>();
+            var buildingUnitWasMovedOutOfBuilding = _fixture.Create<BuildingUnitWasMovedOutOfBuilding>();
+
+            var position = _fixture.Create<long>();
+
+            var buildingWasPlannedMetadata = new Dictionary<string, object>
+             {
+                 { AddEventHashPipe.HashMetadataKey, buildingWasPlanned.GetHash() },
+                 { Envelope.PositionMetadataKey, position }
+             };
+            var buildingUnitWasMovedOutOfBuildingMetadata = new Dictionary<string, object>
+             {
+                 { AddEventHashPipe.HashMetadataKey, buildingUnitWasMovedOutOfBuilding.GetHash() },
+                 { Envelope.PositionMetadataKey, position + 1 }
+             };
+
+            await Sut
+                .Given(
+                    new Envelope<BuildingWasPlannedV2>(
+                        new Envelope(
+                            buildingWasPlanned,
+                            buildingWasPlannedMetadata)),
+                    new Envelope<BuildingUnitWasMovedIntoBuilding>(
+                        new Envelope(
+                            buildingUnitWasMovedOutOfBuilding,
+                            buildingUnitWasMovedOutOfBuildingMetadata)))
+                .Then(async ct =>
+                {
+                    var buildingLatestItem = await ct.BuildingLatestItems.FindAsync(buildingUnitWasMovedOutOfBuilding.BuildingPersistentLocalId);
+                    buildingLatestItem.Should().NotBeNull();
+
+                    buildingLatestItem.VersionTimestamp.Should().Be(buildingUnitWasMovedOutOfBuilding.Provenance.Timestamp);
+                });
+        }
+
         // [Fact]
         // public async Task WhenBuildingMergerWasRealized()
         // {

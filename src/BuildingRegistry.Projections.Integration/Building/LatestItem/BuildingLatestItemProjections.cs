@@ -1,4 +1,4 @@
-﻿namespace BuildingRegistry.Projections.Integration.Building.LatestItem
+namespace BuildingRegistry.Projections.Integration.Building.LatestItem
 {
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.Connector;
@@ -310,6 +310,22 @@
             });
 
             When<Envelope<BuildingUnitRemovalWasCorrected>>(async (context, message, ct) =>
+            {
+                await context.FindAndUpdateBuilding(
+                    message.Message.BuildingPersistentLocalId,
+                    building => { UpdateVersionTimestamp(building, message.Message); },
+                    ct);
+            });
+
+            When<Envelope<BuildingUnitWasMovedIntoBuilding>>(async (context, message, ct) =>
+            {
+                await context.FindAndUpdateBuilding(
+                    message.Message.BuildingPersistentLocalId,
+                    building => { UpdateVersionTimestamp(building, message.Message); },
+                    ct);
+            });
+
+            When<Envelope<BuildingUnitWasMovedOutOfBuilding>>(async (context, message, ct) =>
             {
                 await context.FindAndUpdateBuilding(
                     message.Message.BuildingPersistentLocalId,
