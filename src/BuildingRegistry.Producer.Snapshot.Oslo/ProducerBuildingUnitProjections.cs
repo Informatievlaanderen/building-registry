@@ -9,7 +9,6 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo
     using Be.Vlaanderen.Basisregisters.MessageHandling.Kafka;
     using Be.Vlaanderen.Basisregisters.MessageHandling.Kafka.Producer;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.Connector;
-    using Be.Vlaanderen.Basisregisters.Utilities;
     using Building.Events;
 
     [ConnectedProjectionName("Kafka producer snapshot oslo gebouweenheden")]
@@ -514,6 +513,20 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo
                         message.Position,
                         ct);
                 }
+            });
+
+            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingUnitWasMovedIntoBuilding>>(async (_, message, ct) =>
+            {
+                await FindAndProduce(async () =>
+                    await snapshotManager.FindMatchingSnapshot(
+                        message.Message.BuildingUnitPersistentLocalId.ToString(),
+                        message.Message.Provenance.Timestamp,
+                        message.Message.GetHash(),
+                        message.Position,
+                        throwStaleWhenGone: false,
+                        ct),
+                message.Position,
+                ct);
             });
 
             // When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingUnitWasTransferred>>(async (_, message, ct) =>

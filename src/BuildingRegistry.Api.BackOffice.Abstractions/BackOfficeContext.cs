@@ -24,8 +24,8 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions
         public DbSet<BuildingUnitAddressRelation> BuildingUnitAddressRelation { get; set; }
 
         public async Task<BuildingUnitBuilding> AddIdempotentBuildingUnitBuilding(
-            int buildingPersistentLocalId,
-            int buildingUnitPersistentLocalId,
+            BuildingPersistentLocalId buildingPersistentLocalId,
+            BuildingUnitPersistentLocalId buildingUnitPersistentLocalId,
             CancellationToken cancellationToken)
         {
             var relation = await FindBuildingUnitBuildingRelation(

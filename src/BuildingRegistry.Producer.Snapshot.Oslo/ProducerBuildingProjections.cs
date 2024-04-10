@@ -286,6 +286,34 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo
                     ct);
             });
 
+            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingUnitWasMovedIntoBuilding>>(async (_, message, ct) =>
+            {
+                await FindAndProduce(async () =>
+                        await snapshotManager.FindMatchingSnapshot(
+                            message.Message.BuildingPersistentLocalId.ToString(),
+                            message.Message.Provenance.Timestamp,
+                            message.Message.GetHash(),
+                            message.Position,
+                            throwStaleWhenGone: false,
+                            ct),
+                    message.Position,
+                    ct);
+            });
+
+            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingUnitWasMovedOutOfBuilding>>(async (_, message, ct) =>
+            {
+                await FindAndProduce(async () =>
+                        await snapshotManager.FindMatchingSnapshot(
+                            message.Message.BuildingPersistentLocalId.ToString(),
+                            message.Message.Provenance.Timestamp,
+                            message.Message.GetHash(),
+                            message.Position,
+                            throwStaleWhenGone: false,
+                            ct),
+                    message.Position,
+                    ct);
+            });
+
             // When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingMergerWasRealized>>(async (_, message, ct) =>
             // {
             //     await FindAndProduce(async () =>

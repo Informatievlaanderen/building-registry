@@ -1,16 +1,16 @@
-﻿namespace BuildingRegistry.Tests.ProjectionTests.BackOffice
+namespace BuildingRegistry.Tests.ProjectionTests.BackOffice
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Threading;
-    using System.Threading.Tasks;
     using AutoFixture;
-    using Be.Vlaanderen.Basisregisters.Utilities.HexByteConvertor;
     using Building;
     using Building.Events;
+    using BuildingRegistry.Api.BackOffice.Abstractions;
     using Fixtures;
     using FluentAssertions;
     using Moq;
+    using System;
+    using System.Linq;
+    using System.Threading;
+    using System.Threading.Tasks;
     using Tests.BackOffice;
     using Tests.Legacy.Autofixture;
     using Xunit;
@@ -59,8 +59,8 @@
             var buildingUnitWasPlannedV2 = _fixture.Create<BuildingUnitWasPlannedV2>();
 
             var expectedRelation = await _fakeBackOfficeContext.AddIdempotentBuildingUnitBuilding(
-                buildingUnitWasPlannedV2.BuildingPersistentLocalId,
-                buildingUnitWasPlannedV2.BuildingUnitPersistentLocalId,
+                new BuildingPersistentLocalId(buildingUnitWasPlannedV2.BuildingPersistentLocalId),
+                new BuildingUnitPersistentLocalId(buildingUnitWasPlannedV2.BuildingUnitPersistentLocalId),
                 CancellationToken.None);
 
             await Sut
@@ -101,8 +101,8 @@
             var commonBuildingUnitWasAddedV2 = _fixture.Create<CommonBuildingUnitWasAddedV2>();
 
             var expectedRelation = await _fakeBackOfficeContext.AddIdempotentBuildingUnitBuilding(
-                commonBuildingUnitWasAddedV2.BuildingPersistentLocalId,
-                commonBuildingUnitWasAddedV2.BuildingUnitPersistentLocalId,
+                new BuildingPersistentLocalId(commonBuildingUnitWasAddedV2.BuildingPersistentLocalId),
+                new BuildingUnitPersistentLocalId(commonBuildingUnitWasAddedV2.BuildingUnitPersistentLocalId),
                 CancellationToken.None);
 
             await Sut
@@ -289,6 +289,38 @@
                     var sourceRelation = await _fakeBackOfficeContext.BuildingUnitAddressRelation.FindAsync(
                         @event.BuildingUnitPersistentLocalId, @event.PreviousAddressPersistentLocalId);
                     sourceRelation.Should().BeNull();
+                });
+        }
+
+        [Fact]
+        public async Task GivenBuildingUnitWasMovedOutOfBuilding_ThenRelationsAreUpdated()
+        {
+            var @event = _fixture.Create<BuildingUnitWasMovedOutOfBuilding>();
+
+            var sourceBuildingPersistentLocalId = new BuildingPersistentLocalId(@event.BuildingPersistentLocalId);
+            var destinationBuildingPersistentLocalId = new BuildingPersistentLocalId(@event.DestinationBuildingPersistentLocalId);
+            var buildingUnitPersistentLocalId = new BuildingUnitPersistentLocalId(@event.BuildingUnitPersistentLocalId);
+
+            await _fakeBackOfficeContext.AddIdempotentBuildingUnitBuilding(
+                sourceBuildingPersistentLocalId,
+                buildingUnitPersistentLocalId,
+                CancellationToken.None);
+            await _fakeBackOfficeContext.AddIdempotentBuildingUnitAddressRelation(
+                sourceBuildingPersistentLocalId,
+                buildingUnitPersistentLocalId,
+                _fixture.Create<AddressPersistentLocalId>(), CancellationToken.None);
+            
+            await Sut
+                .Given(@event)
+                .Then(async _ =>
+                {
+                    var buildingRelation = await _fakeBackOfficeContext.FindBuildingUnitBuildingRelation(buildingUnitPersistentLocalId, CancellationToken.None);
+                    buildingRelation.Should().NotBeNull();
+                    buildingRelation!.BuildingPersistentLocalId.Should().Be(destinationBuildingPersistentLocalId);
+
+                    var destinationAddressRelations = await _fakeBackOfficeContext.FindAllBuildingUnitAddressRelations(buildingUnitPersistentLocalId, CancellationToken.None);
+                    destinationAddressRelations.Should().ContainSingle();
+                    destinationAddressRelations.Single().BuildingPersistentLocalId.Should().Be(destinationBuildingPersistentLocalId);
                 });
         }
 

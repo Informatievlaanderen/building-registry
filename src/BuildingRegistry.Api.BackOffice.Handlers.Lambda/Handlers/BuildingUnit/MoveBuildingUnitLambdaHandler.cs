@@ -74,7 +74,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.BuildingUnit
             {
                 await _backOfficeContext.RemoveIdempotentBuildingUnitBuildingRelation(moveIntoBuildingCommand.BuildingUnitPersistentLocalId, cancellationToken);
                 await _backOfficeContext.AddIdempotentBuildingUnitBuilding(moveIntoBuildingCommand.DestinationBuildingPersistentLocalId, moveIntoBuildingCommand.BuildingUnitPersistentLocalId, cancellationToken);
-                await _backOfficeContext.MoveBuildingUnitAddressRelations(moveIntoBuildingCommand.BuildingUnitPersistentLocalId, moveIntoBuildingCommand.DestinationBuildingPersistentLocalId, CancellationToken.None);
+                await _backOfficeContext.MoveBuildingUnitAddressRelations(moveIntoBuildingCommand.BuildingUnitPersistentLocalId, moveIntoBuildingCommand.DestinationBuildingPersistentLocalId, cancellationToken);
 
                 await transaction.CommitAsync(cancellationToken);
             }

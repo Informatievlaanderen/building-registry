@@ -23,7 +23,6 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
-    using BuildingRegistry.Building.Events;
     using TicketingService.Abstractions;
     using Xunit;
     using Xunit.Abstractions;
