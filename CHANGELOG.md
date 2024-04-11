@@ -1,3 +1,10 @@
+# [4.2.0](https://github.com/informatievlaanderen/building-registry/compare/v4.1.10...v4.2.0) (2024-04-11)
+
+
+### Features
+
+* move BuildingUnit GAWR-5487 ([86295f9](https://github.com/informatievlaanderen/building-registry/commit/86295f96807d47f1c827c2e471c17e817d08bbbe))
+
 ## [4.1.10](https://github.com/informatievlaanderen/building-registry/compare/v4.1.9...v4.1.10) (2024-04-09)
 
 ## [4.1.9](https://github.com/informatievlaanderen/building-registry/compare/v4.1.8...v4.1.9) (2024-03-27)
