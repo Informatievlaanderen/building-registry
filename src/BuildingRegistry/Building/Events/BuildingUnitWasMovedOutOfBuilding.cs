@@ -10,7 +10,7 @@ namespace BuildingRegistry.Building.Events
 
     [EventTags(EventTag.For.Sync, EventTag.For.Edit, Tag.Building)]
     [EventName(EventName)]
-    [EventDescription("Het gebouweenheid werd verplaatst uit het gebouw.")]
+    [EventDescription("De gebouweenheid werd verplaatst uit het gebouw.")]
     public sealed class BuildingUnitWasMovedOutOfBuilding : IBuildingEvent, IHasBuildingUnitPersistentLocalId
     {
         public const string EventName = "BuildingUnitWasMovedOutOfBuilding"; // BE CAREFUL CHANGING THIS!!

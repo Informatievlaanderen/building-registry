@@ -10,7 +10,7 @@ namespace BuildingRegistry.Building.Events
 
     [EventTags(EventTag.For.Sync, EventTag.For.Edit, Tag.Building)]
     [EventName(EventName)]
-    [EventDescription("Het gebouweenheid werd verplaatst naar het gebouw.")]
+    [EventDescription("De gebouweenheid werd verplaatst naar het gebouw.")]
     public sealed class BuildingUnitWasMovedIntoBuilding : IBuildingEvent, IHasBuildingUnitPersistentLocalId
     {
         public const string EventName = "BuildingUnitWasMovedIntoBuilding"; // BE CAREFUL CHANGING THIS!!
@@ -21,7 +21,7 @@ namespace BuildingRegistry.Building.Events
         public int SourceBuildingPersistentLocalId { get; }
         [EventPropertyDescription("Objectidentificator van de gebouweenheid.")]
         public int BuildingUnitPersistentLocalId { get; }
-        [EventPropertyDescription("De status van de gebouweenheid. Mogelijkheden: Planned of Realized.")]
+        [EventPropertyDescription("De status van de gebouweenheid.")]
         public string BuildingUnitStatus { get; }
         [EventPropertyDescription("Geometriemethode van de gebouweenheidpositie. Mogelijkheden: Outlined of MeasuredByGrb.")]
         public string GeometryMethod { get; }

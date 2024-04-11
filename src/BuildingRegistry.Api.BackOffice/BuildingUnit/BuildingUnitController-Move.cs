@@ -23,7 +23,7 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
     public partial class BuildingUnitController
     {
         /// <summary>
-        /// Het gebouweenheid zal verplaatst worden naar het doelgebouw en verwijderd worden uit het brongebouw.
+        /// De gebouweenheid zal verplaatst worden naar het doelgebouw en verwijderd worden uit het brongebouw.
         /// </summary>
         /// <param name="ifMatchHeaderValidator"></param>
         /// <param name="validator"></param>
