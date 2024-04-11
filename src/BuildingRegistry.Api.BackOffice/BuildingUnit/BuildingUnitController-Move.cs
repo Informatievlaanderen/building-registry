@@ -2,6 +2,8 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
 {
     using System.Threading;
     using System.Threading.Tasks;
+    using Abstractions;
+    using Abstractions.Building.Validators;
     using Abstractions.BuildingUnit.Requests;
     using Abstractions.BuildingUnit.SqsRequests;
     using Abstractions.Validation;
@@ -19,11 +21,14 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
     using Swashbuckle.AspNetCore.Filters;
+    using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Validators;
+    using Be.Vlaanderen.Basisregisters.GrAr.Edit.Validators;
+    using System;
 
     public partial class BuildingUnitController
     {
         /// <summary>
-        /// De gebouweenheid zal verplaatst worden naar het doelgebouw en verwijderd worden uit het brongebouw.
+        /// Verplaats een gebouweenheid.
         /// </summary>
         /// <param name="ifMatchHeaderValidator"></param>
         /// <param name="validator"></param>
@@ -59,7 +64,7 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
                 {
                     return new PreconditionFailedResult();
                 }
-                
+
                 var result = await Mediator.Send(
                     new MoveBuildingUnitSqsRequest
                     {
@@ -79,6 +84,47 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
             catch (AggregateNotFoundException)
             {
                 throw new ApiException(ValidationErrors.Common.BuildingUnitNotFound.Message, StatusCodes.Status404NotFound);
+            }
+        }
+
+        public class MoveBuildingUnitExtendedRequest
+        {
+            public MoveBuildingUnitRequest Request { get; init; }
+            public int BuildingUnitPersistentLocalId { get; init; }
+        }
+
+        public class MoveBuildingUnitExtendedRequestValidator : AbstractValidator<MoveBuildingUnitExtendedRequest>
+        {
+            public MoveBuildingUnitExtendedRequestValidator(
+                BuildingExistsValidator buildingExistsValidator,
+                BackOfficeContext backOfficeContext,
+                MoveBuildingUnitRequestValidator moveBuildingUnitRequestValidator)
+            {
+                RuleFor(x => x.Request)
+                    .SetValidator(moveBuildingUnitRequestValidator);
+
+                RuleFor(x => x.BuildingUnitPersistentLocalId)
+                    .MustAsync(async (request, buildingUnitPersistentLocalId, ct) =>
+                    {
+                        var relation = await backOfficeContext
+                            .FindBuildingUnitBuildingRelation(new BuildingUnitPersistentLocalId(buildingUnitPersistentLocalId), ct);
+                        if (relation is null)
+                        {
+                            return false;
+                        }
+
+                        if (OsloPuriValidator.TryParseIdentifier(request.Request.DoelgebouwId, out var id)
+                            && int.TryParse(id, out var destinationBuildingPersistentLocalId)
+                            && destinationBuildingPersistentLocalId == relation.BuildingPersistentLocalId)
+                        {
+                            return false;
+                        }
+                        
+                        return await buildingExistsValidator.Exists(new BuildingPersistentLocalId(relation.BuildingPersistentLocalId), ct);
+                    })
+                    .WithErrorCode(ValidationErrors.MoveBuildingUnit.BuildingUnitIdInvalid.Code)
+                    .WithMessage(ValidationErrors.MoveBuildingUnit.BuildingUnitIdInvalid.Message);
+                    ;
             }
         }
     }

@@ -65,7 +65,7 @@ namespace BuildingRegistry.Api.BackOffice
             );
         }
 
-        public IActionResult Accepted(LocationResult locationResult)
+        protected IActionResult Accepted(LocationResult locationResult)
         {
             return Accepted(locationResult
                 .Location
