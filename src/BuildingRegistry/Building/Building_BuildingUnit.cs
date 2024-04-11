@@ -262,7 +262,7 @@ namespace BuildingRegistry.Building
             GuardBuildingValidStatuses(BuildingStatus.Planned, BuildingStatus.UnderConstruction, BuildingStatus.Realized);
 
             var status =
-                buildingUnit.Status == BuildingStatus.Realized
+                buildingUnit.Status == BuildingUnitStatus.Realized
                 && (BuildingStatus == BuildingStatus.Planned || BuildingStatus == BuildingStatus.UnderConstruction)
                     ? BuildingUnitStatus.Planned
                     : buildingUnit.Status;

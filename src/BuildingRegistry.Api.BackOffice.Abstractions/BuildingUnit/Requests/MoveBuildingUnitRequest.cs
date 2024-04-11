@@ -4,6 +4,7 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Requests
     using Swashbuckle.AspNetCore.Filters;
     using System.Runtime.Serialization;
 
+    [DataContract(Name = "VerplaatsGebouweenheid", Namespace = "")]
     public sealed class MoveBuildingUnitRequest
     {
         /// <summary>
