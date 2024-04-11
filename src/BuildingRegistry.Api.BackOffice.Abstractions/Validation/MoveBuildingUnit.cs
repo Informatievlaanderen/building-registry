@@ -20,6 +20,14 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.Validation
 
                 public static TicketError ToTicketError() => new(Message, Code);
             }
+
+            public static class SourceAndDestinationBuildingAreTheSame
+            {
+                public const string Code = "BrongebouwIdHetzelfdeAlsDoelgebouwId";
+                public static string Message(string doelgebouwId) => $"Het brongebouwId is hetzelfde als het doelgebouwId: {doelgebouwId}.";
+
+                public static TicketError ToTicketError(string doelgebouwId) => new TicketError(Message(doelgebouwId), Code);
+            }
         }
     }
 }

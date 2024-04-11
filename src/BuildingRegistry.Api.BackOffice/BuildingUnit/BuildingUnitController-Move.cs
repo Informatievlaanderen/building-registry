@@ -2,15 +2,14 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
 {
     using System.Threading;
     using System.Threading.Tasks;
-    using Abstractions;
-    using Abstractions.Building.Validators;
     using Abstractions.BuildingUnit.Requests;
     using Abstractions.BuildingUnit.SqsRequests;
+    using Abstractions.BuildingUnit.Validators;
     using Abstractions.Validation;
-    using Be.Vlaanderen.Basisregisters.Auth.AcmIdm;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
     using Be.Vlaanderen.Basisregisters.Api.ETag;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
+    using Be.Vlaanderen.Basisregisters.Auth.AcmIdm;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Be.Vlaanderen.Basisregisters.Sqs.Exceptions;
     using BuildingRegistry.Building;
@@ -21,9 +20,6 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
     using Swashbuckle.AspNetCore.Filters;
-    using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Validators;
-    using Be.Vlaanderen.Basisregisters.GrAr.Edit.Validators;
-    using System;
 
     public partial class BuildingUnitController
     {
@@ -49,16 +45,17 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = PolicyNames.IngemetenGebouw.InterneBijwerker)]
         public async Task<IActionResult> Move(
             [FromServices] IIfMatchHeaderValidator ifMatchHeaderValidator,
-            [FromServices] IValidator<MoveBuildingUnitRequest> validator,
+            [FromServices] IValidator<MoveBuildingUnitExtendedRequest> validator,
             [FromRoute] int buildingUnitPersistentLocalId,
             [FromBody] MoveBuildingUnitRequest request,
             [FromHeader(Name = "If-Match")] string? ifMatchHeaderValue,
             CancellationToken ct = default)
         {
-            await validator.ValidateAndThrowAsync(request, ct);
+            await validator.ValidateAndThrowAsync(new MoveBuildingUnitExtendedRequest(request, buildingUnitPersistentLocalId), ct);
 
             try
             {
+
                 if (!await ifMatchHeaderValidator
                         .IsValidForBuildingUnit(ifMatchHeaderValue, new BuildingUnitPersistentLocalId(buildingUnitPersistentLocalId), ct))
                 {
@@ -84,47 +81,6 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
             catch (AggregateNotFoundException)
             {
                 throw new ApiException(ValidationErrors.Common.BuildingUnitNotFound.Message, StatusCodes.Status404NotFound);
-            }
-        }
-
-        public class MoveBuildingUnitExtendedRequest
-        {
-            public MoveBuildingUnitRequest Request { get; init; }
-            public int BuildingUnitPersistentLocalId { get; init; }
-        }
-
-        public class MoveBuildingUnitExtendedRequestValidator : AbstractValidator<MoveBuildingUnitExtendedRequest>
-        {
-            public MoveBuildingUnitExtendedRequestValidator(
-                BuildingExistsValidator buildingExistsValidator,
-                BackOfficeContext backOfficeContext,
-                MoveBuildingUnitRequestValidator moveBuildingUnitRequestValidator)
-            {
-                RuleFor(x => x.Request)
-                    .SetValidator(moveBuildingUnitRequestValidator);
-
-                RuleFor(x => x.BuildingUnitPersistentLocalId)
-                    .MustAsync(async (request, buildingUnitPersistentLocalId, ct) =>
-                    {
-                        var relation = await backOfficeContext
-                            .FindBuildingUnitBuildingRelation(new BuildingUnitPersistentLocalId(buildingUnitPersistentLocalId), ct);
-                        if (relation is null)
-                        {
-                            return false;
-                        }
-
-                        if (OsloPuriValidator.TryParseIdentifier(request.Request.DoelgebouwId, out var id)
-                            && int.TryParse(id, out var destinationBuildingPersistentLocalId)
-                            && destinationBuildingPersistentLocalId == relation.BuildingPersistentLocalId)
-                        {
-                            return false;
-                        }
-                        
-                        return await buildingExistsValidator.Exists(new BuildingPersistentLocalId(relation.BuildingPersistentLocalId), ct);
-                    })
-                    .WithErrorCode(ValidationErrors.MoveBuildingUnit.BuildingUnitIdInvalid.Code)
-                    .WithMessage(ValidationErrors.MoveBuildingUnit.BuildingUnitIdInvalid.Message);
-                    ;
             }
         }
     }

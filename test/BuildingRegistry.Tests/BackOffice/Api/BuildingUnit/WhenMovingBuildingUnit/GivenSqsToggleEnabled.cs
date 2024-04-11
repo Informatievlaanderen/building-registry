@@ -1,5 +1,8 @@
 namespace BuildingRegistry.Tests.BackOffice.Api.BuildingUnit.WhenMovingBuildingUnit
 {
+    using System;
+    using System.Threading;
+    using System.Threading.Tasks;
     using AutoFixture;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
@@ -20,9 +23,6 @@ namespace BuildingRegistry.Tests.BackOffice.Api.BuildingUnit.WhenMovingBuildingU
     using Moq;
     using NodaTime;
     using SqlStreamStore;
-    using System;
-    using System.Threading;
-    using System.Threading.Tasks;
     using Xunit;
     using Xunit.Abstractions;
 
@@ -37,32 +37,6 @@ namespace BuildingRegistry.Tests.BackOffice.Api.BuildingUnit.WhenMovingBuildingU
 
             _streamStore = new Mock<IStreamStore>();
             _controller = CreateBuildingUnitControllerWithUser<BuildingUnitController>();
-        }
-
-        [Fact]
-        public void WithInvalidRequest_ThenValidationExceptionIsThrown()
-        {
-            var request = new MoveBuildingUnitRequest
-            {
-                DoelgebouwId = ""
-            };
-
-            var streamStoreMock = new Mock<IStreamStore>();
-            streamStoreMock.SetStreamFound();
-
-            //Act
-            Func<Task> act = async () => await _controller.Move(
-                MockIfMatchValidator(true),
-                new MoveBuildingUnitRequestValidator(new BuildingExistsValidator(streamStoreMock.Object)),
-                0,
-                request,
-                null,
-                CancellationToken.None);
-
-            //Assert
-            act
-                .Should()
-                .ThrowAsync<ValidationException>();
         }
 
         [Fact]
@@ -82,7 +56,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.BuildingUnit.WhenMovingBuildingU
 
             var result = (AcceptedResult)await _controller.Move(
                 MockIfMatchValidator(true),
-                MockValidRequestValidator<MoveBuildingUnitRequest>(),
+                MockValidRequestValidator<MoveBuildingUnitExtendedRequest>(),
                 0,
                 request,
                 expectedIfMatchHeader,
@@ -104,6 +78,34 @@ namespace BuildingRegistry.Tests.BackOffice.Api.BuildingUnit.WhenMovingBuildingU
         }
 
         [Fact]
+        public void WithInvalidRequest_ThenValidationExceptionIsThrown()
+        {
+            var request = new MoveBuildingUnitRequest
+            {
+                DoelgebouwId = ""
+            };
+
+            var streamStoreMock = new Mock<IStreamStore>();
+            streamStoreMock.SetStreamFound();
+
+            //Act
+            Func<Task> act = async () => await _controller.Move(
+                MockIfMatchValidator(true),
+                new MoveBuildingUnitExtendedRequestValidator(
+                    new BuildingExistsValidator(streamStoreMock.Object),
+                    new FakeBackOfficeContextFactory().CreateDbContext([])),
+                0,
+                request,
+                null,
+                CancellationToken.None);
+
+            //Assert
+            act
+                .Should()
+                .ThrowAsync<ValidationException>();
+        }
+
+        [Fact]
         public void WithAggregateIdNotFound_ThenValidationErrorIsThrown()
         {
             MockMediator
@@ -114,12 +116,12 @@ namespace BuildingRegistry.Tests.BackOffice.Api.BuildingUnit.WhenMovingBuildingU
 
             var request = Fixture.Create<MoveBuildingUnitRequest>();
 
-            Func<Task> act = async () =>
+            var act = async () =>
             {
                 await _controller.Move(
 
                     MockIfMatchValidator(true),
-                    MockValidRequestValidator<MoveBuildingUnitRequest>(),
+                    MockValidRequestValidator<MoveBuildingUnitExtendedRequest>(),
                     0,
                     request,
                     string.Empty);
@@ -129,7 +131,6 @@ namespace BuildingRegistry.Tests.BackOffice.Api.BuildingUnit.WhenMovingBuildingU
             act
                 .Should()
                 .ThrowAsync<ApiException>()
-                .Result
                 .Where(x =>
                     x.Message.Contains("Onbestaande gebouweenheid.")
                     && x.StatusCode == StatusCodes.Status404NotFound);
@@ -146,7 +147,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.BuildingUnit.WhenMovingBuildingU
             //Act
             Func<Task> act = async () => await _controller.Move(
                 MockIfMatchValidator(true),
-                MockValidRequestValidator<MoveBuildingUnitRequest>(),
+                MockValidRequestValidator<MoveBuildingUnitExtendedRequest>(),
                 0,
                 request,
                 null,
@@ -156,7 +157,6 @@ namespace BuildingRegistry.Tests.BackOffice.Api.BuildingUnit.WhenMovingBuildingU
             act
                 .Should()
                 .ThrowAsync<ApiException>()
-                .Result
                 .Where(x =>
                     x.Message.Contains("Onbestaande gebouweenheid.")
                     && x.StatusCode == StatusCodes.Status404NotFound);
