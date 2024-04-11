@@ -43,6 +43,7 @@ namespace BuildingRegistry.Api.BackOffice.IntegrationTests
         [InlineData("/v2/gebouweenheden/1/acties/adresontkoppelen", "dv_gr_geschetstgebouw_beheer")]
         [InlineData("/v2/gebouweenheden/1/acties/corrigeren/positie", "dv_gr_geschetstgebouw_beheer")]
         [InlineData("/v2/gebouweenheden/1/acties/verwijderen", "dv_gr_geschetstgebouw_beheer dv_gr_geschetstgebouw_uitzonderingen")]
+        [InlineData("/v2/gebouweenheden/1/acties/verplaatsen", "dv_gr_geschetstgebouw_uitzonderingen dv_gr_ingemetengebouw_uitzonderingen")]
         public async Task ReturnsSuccess(string endpoint, string requiredScopes)
         {
             var client = _fixture.TestServer.CreateClient();
@@ -83,6 +84,7 @@ namespace BuildingRegistry.Api.BackOffice.IntegrationTests
         [InlineData("/v2/gebouweenheden/1/acties/adresontkoppelen")]
         [InlineData("/v2/gebouweenheden/1/acties/corrigeren/positie")]
         [InlineData("/v2/gebouweenheden/1/acties/verwijderen")]
+        [InlineData("/v2/gebouweenheden/1/acties/verplaatsen")]
         public async Task ReturnsUnauthorized(string endpoint)
         {
             var client = _fixture.TestServer.CreateClient();
@@ -123,6 +125,7 @@ namespace BuildingRegistry.Api.BackOffice.IntegrationTests
         [InlineData("/v2/gebouweenheden/1/acties/verwijderen")]
         [InlineData("/v2/gebouweenheden/1/acties/verwijderen", "dv_gr_geschetstgebouw_beheer")]
         [InlineData("/v2/gebouweenheden/1/acties/verwijderen", "dv_gr_geschetstgebouw_uitzonderingen")]
+        [InlineData("/v2/gebouweenheden/1/acties/verplaatsen", "dv_gr_geschetstgebouw_beheer")]
         public async Task ReturnsForbidden(string endpoint, string scope = "")
         {
             var client = _fixture.TestServer.CreateClient();

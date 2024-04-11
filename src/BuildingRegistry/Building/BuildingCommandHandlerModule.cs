@@ -241,53 +241,6 @@ namespace BuildingRegistry.Building
 
                     building.ChangeMeasurement(message.Command.Geometry, message.Command.GrbData);
                 });
-
-            // For<MergeBuildings>()
-            //     .AddSqlStreamStore(getStreamStore, getUnitOfWork, eventMapping, eventSerializer, getSnapshotStore)
-            //     .AddEventHash<MergeBuildings, Building>(getUnitOfWork)
-            //     .AddProvenance(getUnitOfWork, provenanceFactory)
-            //     .Handle(async (message, ct) =>
-            //     {
-            //         var buildingsToMerge = new List<Building>();
-            //         foreach (var buildingPersistentLocalId in message.Command.BuildingPersistentLocalIdsToMerge)
-            //         {
-            //             var streamId = new BuildingStreamId(buildingPersistentLocalId);
-            //             var buildingToMerge = await buildingRepository().GetOptionalAsync(streamId, ct);
-            //             if (!buildingToMerge.HasValue)
-            //             {
-            //                 throw new BuildingToMergeNotFoundException(buildingPersistentLocalId);
-            //             }
-            //
-            //             buildingsToMerge.Add(buildingToMerge.Value);
-            //         }
-            //
-            //         var newBuildingStreamId = new BuildingStreamId(message.Command.NewBuildingPersistentLocalId);
-            //         if((await buildingRepository().GetOptionalAsync(newBuildingStreamId, ct)).HasValue)
-            //         {
-            //             throw new AggregateSourceException($"Building with id {message.Command.NewBuildingPersistentLocalId} already exists");
-            //         }
-            //
-            //         var newBuilding = Building.MergeBuildings(
-            //             buildingFactory,
-            //             addCommonBuildingUnit,
-            //             message.Command.NewBuildingPersistentLocalId,
-            //             message.Command.NewExtendedWkbGeometry,
-            //             buildingsToMerge);
-            //
-            //         buildingRepository().Add(newBuildingStreamId, newBuilding);
-            //     });
-            //
-            // For<MarkBuildingAsMerged>()
-            //     .AddSqlStreamStore(getStreamStore, getUnitOfWork, eventMapping, eventSerializer, getSnapshotStore)
-            //     .AddEventHash<MarkBuildingAsMerged, Building>(getUnitOfWork)
-            //     .AddProvenance(getUnitOfWork, provenanceFactory)
-            //     .Handle(async (message, ct) =>
-            //     {
-            //         var streamId = new BuildingStreamId(message.Command.BuildingPersistentLocalId);
-            //         var building = await buildingRepository().GetAsync(streamId, ct);
-            //
-            //         building.MarkAsMerged(message.Command.DestinationBuildingPersistentLocalId);
-            //     });
         }
     }
 }

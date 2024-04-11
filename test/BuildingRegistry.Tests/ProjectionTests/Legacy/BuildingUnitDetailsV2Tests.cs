@@ -1171,79 +1171,42 @@ namespace BuildingRegistry.Tests.ProjectionTests.Legacy
                 });
         }
 
-        // [Fact]
-        // public async Task WhenBuildingUnitWasTransferred()
-        // {
-        //     _fixture.Customize(new WithFixedBuildingUnitPersistentLocalId());
-        //
-        //     var buildingUnitWasPlannedV2 = _fixture.Create<BuildingUnitWasPlannedV2>();
-        //     var @event = new BuildingUnitWasTransferredBuilder(_fixture)
-        //         .WithBuildingUnitPersistentLocalId(buildingUnitWasPlannedV2.BuildingUnitPersistentLocalId)
-        //         .WithSourceBuildingPersistentLocalId(buildingUnitWasPlannedV2.BuildingPersistentLocalId)
-        //         .Build();
-        //
-        //     await Sut
-        //         .Given(
-        //             new Envelope<BuildingUnitWasPlannedV2>(
-        //                 new Envelope(
-        //                     buildingUnitWasPlannedV2,
-        //                     new Dictionary<string, object> {{AddEventHashPipe.HashMetadataKey, buildingUnitWasPlannedV2.GetHash()}})),
-        //             new Envelope<BuildingUnitWasTransferred>(
-        //                 new Envelope(
-        //                     @event,
-        //                     new Dictionary<string, object> {{AddEventHashPipe.HashMetadataKey, @event.GetHash()}})))
-        //         .Then(async ct =>
-        //         {
-        //             var item = await ct.BuildingUnitDetailsV2.FindAsync(@event.BuildingUnitPersistentLocalId);
-        //             item.Should().NotBeNull();
-        //
-        //             item!.BuildingPersistentLocalId.Should().Be(@event.BuildingPersistentLocalId);
-        //             item.PositionMethod.GeometryMethod.Should().Be(@event.GeometryMethod);
-        //             item.Position.Should().BeEquivalentTo(@event.ExtendedWkbGeometry.ToByteArray());
-        //             item.Addresses.Should().NotBeEmpty();
-        //             item.Addresses.Should().BeEquivalentTo(@event.AddressPersistentLocalIds.Select(x =>
-        //                 new BuildingUnitDetailAddressItemV2
-        //                 (
-        //                     @event.BuildingUnitPersistentLocalId,
-        //                     x
-        //                 )));
-        //
-        //             item.Status.Status.Should().Be(@event.Status);
-        //             item.Function.Function.Should().Be(@event.Function);
-        //             item.HasDeviation.Should().BeFalse();
-        //             item.Version.Should().Be(@event.Provenance.Timestamp);
-        //             item.LastEventHash.Should().Be(@event.GetHash());
-        //         });
-        // }
-        //
-        // [Fact]
-        // public async Task WhenBuildingUnitWasMoved()
-        // {
-        //     _fixture.Customize(new WithFixedBuildingUnitPersistentLocalId());
-        //
-        //     var buildingUnitWasPlannedV2 = _fixture.Create<BuildingUnitWasPlannedV2>();
-        //     var @event = _fixture.Create<BuildingUnitWasMoved>();
-        //
-        //     await Sut
-        //         .Given(
-        //             new Envelope<BuildingUnitWasPlannedV2>(
-        //                 new Envelope(
-        //                     buildingUnitWasPlannedV2,
-        //                     new Dictionary<string, object> {{AddEventHashPipe.HashMetadataKey, buildingUnitWasPlannedV2.GetHash()}})),
-        //             new Envelope<BuildingUnitWasMoved>(
-        //                 new Envelope(
-        //                     @event,
-        //                     new Dictionary<string, object> {{AddEventHashPipe.HashMetadataKey, @event.GetHash()}})))
-        //         .Then(async ct =>
-        //         {
-        //             var item = await ct.BuildingUnitDetailsV2.FindAsync(@event.BuildingUnitPersistentLocalId);
-        //             item.Should().NotBeNull();
-        //
-        //             // We're not doing anything for this event.
-        //             item!.Version.Should().Be(buildingUnitWasPlannedV2.Provenance.Timestamp);
-        //             item.LastEventHash.Should().Be(buildingUnitWasPlannedV2.GetHash());
-        //         });
-        // }
+        [Fact]
+        public async Task WhenBuildingUnitWasMovedIntoBuilding()
+        {
+            _fixture.Customize(new WithFixedBuildingPersistentLocalId());
+            _fixture.Customize(new WithFixedBuildingUnitPersistentLocalId());
+
+            var buildingUnitWasPlannedV2 = _fixture.Create<BuildingUnitWasPlannedV2>()
+                .WithFunction(BuildingUnitFunction.Unknown);
+            var buildingUnitWasMovedIntoBuilding = _fixture.Create<BuildingUnitWasMovedIntoBuilding>();
+            
+            await Sut
+                .Given(
+                    new Envelope<BuildingUnitWasPlannedV2>(
+                        new Envelope(buildingUnitWasPlannedV2,
+                            new Dictionary<string, object> { { AddEventHashPipe.HashMetadataKey, buildingUnitWasPlannedV2.GetHash() } })),
+                    new Envelope<BuildingUnitWasMovedIntoBuilding>(
+                        new Envelope(buildingUnitWasMovedIntoBuilding,
+                            new Dictionary<string, object> { { AddEventHashPipe.HashMetadataKey, buildingUnitWasMovedIntoBuilding.GetHash() } }))
+                )
+                .Then(async ct =>
+                {
+                    var item = await ct.BuildingUnitDetailsV2.FindAsync(buildingUnitWasMovedIntoBuilding
+                        .BuildingUnitPersistentLocalId);
+                    item.Should().NotBeNull();
+                    item!.BuildingPersistentLocalId.Should().Be(buildingUnitWasMovedIntoBuilding.BuildingPersistentLocalId);
+                    item.Position.Should()
+                        .BeEquivalentTo(buildingUnitWasMovedIntoBuilding.ExtendedWkbGeometry.ToByteArray());
+                    item.PositionMethod.Should()
+                        .Be(BuildingUnitPositionGeometryMethod.Parse(buildingUnitWasMovedIntoBuilding.GeometryMethod));
+                    item.Function.Should().Be(BuildingUnitFunction.Parse(buildingUnitWasMovedIntoBuilding.Function));
+                    item.Version.Should().Be(buildingUnitWasMovedIntoBuilding.Provenance.Timestamp);
+                    item.IsRemoved.Should().BeFalse();
+                    item.Status.Should().Be(BuildingUnitStatus.Parse(buildingUnitWasMovedIntoBuilding.BuildingUnitStatus));
+                    item.HasDeviation.Should().Be(buildingUnitWasMovedIntoBuilding.HasDeviation);
+                });
+        }
 
         protected override BuildingUnitDetailV2Projections CreateProjection() => new BuildingUnitDetailV2Projections();
     }

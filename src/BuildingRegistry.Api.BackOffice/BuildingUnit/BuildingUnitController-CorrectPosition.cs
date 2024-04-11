@@ -49,14 +49,12 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
             [FromHeader(Name = "If-Match")] string? ifMatchHeaderValue,
             CancellationToken ct = default)
         {
-            request.BuildingUnitPersistentLocalId = buildingUnitPersistentLocalId;
-
             await validator.ValidateAndThrowAsync(request, ct);
 
             try
             {
                 if (!await ifMatchHeaderValidator
-                        .IsValidForBuildingUnit(ifMatchHeaderValue, new BuildingUnitPersistentLocalId(request.BuildingUnitPersistentLocalId), ct))
+                        .IsValidForBuildingUnit(ifMatchHeaderValue, new BuildingUnitPersistentLocalId(buildingUnitPersistentLocalId), ct))
                 {
                     return new PreconditionFailedResult();
                 }
@@ -64,7 +62,7 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
                 var result = await Mediator.Send(
                     new CorrectBuildingUnitPositionSqsRequest
                     {
-                        BuildingUnitPersistentLocalId = request.BuildingUnitPersistentLocalId,
+                        BuildingUnitPersistentLocalId = buildingUnitPersistentLocalId,
                         Request = request,
                         Metadata = GetMetadata(),
                         ProvenanceData = new ProvenanceData(CreateProvenance(Modification.Update)),

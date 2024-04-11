@@ -157,10 +157,10 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda
                     await mediator.Send(new ChangeBuildingMeasurementLambdaRequest(messageMetadata.MessageGroupId!, request), cancellationToken);
                     break;
 
-                // case MergeBuildingsSqsRequest request:
-                //     await mediator.Send(new MergeBuildingsLambdaRequest(messageMetadata.MessageGroupId!, request), cancellationToken);
-                //     break;
-
+                case MoveBuildingUnitSqsRequest request:
+                    await mediator.Send(new MoveBuildingUnitLambdaRequest(messageMetadata.MessageGroupId!, request), cancellationToken);
+                    break;
+                    
                 case NotifyOutlinedRealizedBuildingSqsRequest request:
                     await mediator.Send(new NotifyOutlinedRealizedBuildingLambdaRequest(
                         request.BuildingPersistentLocalId,

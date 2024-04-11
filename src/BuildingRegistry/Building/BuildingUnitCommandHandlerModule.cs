@@ -274,6 +274,39 @@ namespace BuildingRegistry.Building
                         message.Command.BuildingUnitPersistentLocalId,
                         message.Command.AddressPersistentLocalId);
                 });
+
+            For<MoveBuildingUnitIntoBuilding>()
+                .AddSqlStreamStore(getStreamStore, getUnitOfWork, eventMapping, eventSerializer, getSnapshotStore)
+                .AddEventHash<MoveBuildingUnitIntoBuilding, Building>(getUnitOfWork)
+                .AddProvenance(getUnitOfWork, provenanceFactory)
+                .Handle(async (message, ct) =>
+                {
+                    var buildings = buildingRepository();
+
+                    var destinationStreamId = new BuildingStreamId(message.Command.DestinationBuildingPersistentLocalId);
+                    var building = await buildings.GetAsync(destinationStreamId, ct);
+
+                    var sourceStreamId = new BuildingStreamId(message.Command.SourceBuildingPersistentLocalId);
+                    var sourceBuilding = await buildings.GetAsync(sourceStreamId, ct);
+
+                    building.MoveBuildingUnitInto(sourceBuilding,
+                        message.Command.BuildingUnitPersistentLocalId,
+                        addCommonBuildingUnit);
+                });
+
+            For<MoveBuildingUnitOutOfBuilding>()
+                .AddSqlStreamStore(getStreamStore, getUnitOfWork, eventMapping, eventSerializer, getSnapshotStore)
+                .AddEventHash<MoveBuildingUnitOutOfBuilding, Building>(getUnitOfWork)
+                .AddProvenance(getUnitOfWork, provenanceFactory)
+                .Handle(async (message, ct) =>
+                {
+                    var streamId = new BuildingStreamId(message.Command.SourceBuildingPersistentLocalId);
+                    var building = await buildingRepository().GetAsync(streamId, ct);
+
+                    building.MoveBuildingUnitOutOf(
+                        message.Command.DestinationBuildingPersistentLocalId,
+                        message.Command.BuildingUnitPersistentLocalId);
+                });
         }
     }
 }

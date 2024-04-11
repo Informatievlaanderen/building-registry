@@ -5,6 +5,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wms
     using System.Threading.Tasks;
     using AutoFixture;
     using Be.Vlaanderen.Basisregisters.GrAr.Common.Pipes;
+    using Be.Vlaanderen.Basisregisters.GrAr.Legacy.Gebouweenheid;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore;
     using Be.Vlaanderen.Basisregisters.Utilities.HexByteConvertor;
@@ -13,9 +14,11 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wms
     using Extensions;
     using Fixtures;
     using FluentAssertions;
+    using NetTopologySuite.Geometries;
     using Projections.Wms.BuildingUnitV2;
     using Tests.Legacy.Autofixture;
     using Xunit;
+    using Envelope = Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope;
 
     public class BuildingUnitV2Tests : BuildingWmsProjectionTest<BuildingUnitV2Projections>
     {
@@ -1105,89 +1108,39 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wms
                 });
         }
 
-        // [Fact]
-        // public async Task WhenBuildingUnitWasTransferred()
-        // {
-        //     var plannedBuildingUnit = _fixture.Create<BuildingUnitWasPlannedV2>();
-        //
-        //     var buildingPersistentLocalId = new BuildingPersistentLocalId(1);
-        //     var oldBuildingPersistentLocalId = new BuildingPersistentLocalId(plannedBuildingUnit.BuildingPersistentLocalId);
-        //     var buildingUnitPersistentLocalId = new BuildingUnitPersistentLocalId(plannedBuildingUnit.BuildingUnitPersistentLocalId);
-        //
-        //
-        //     var @event = new BuildingUnitWasTransferred(
-        //         buildingPersistentLocalId,
-        //         BuildingUnit.Transfer(
-        //             _ => { },
-        //             buildingPersistentLocalId,
-        //             buildingUnitPersistentLocalId,
-        //             BuildingUnitFunction.Unknown,
-        //             BuildingUnitStatus.Realized,
-        //             new List<AddressPersistentLocalId>(),
-        //             new BuildingUnitPosition(new ExtendedWkbGeometry(GeometryHelper.ValidPointInPolygon.AsBinary()), BuildingUnitPositionGeometryMethod.AppointedByAdministrator),
-        //             false), oldBuildingPersistentLocalId,
-        //         new BuildingUnitPosition(new ExtendedWkbGeometry(GeometryHelper.ValidPointInPolygon.AsBinary()), BuildingUnitPositionGeometryMethod.AppointedByAdministrator));
-        //     @event.SetFixtureProvenance(_fixture);
-        //
-        //     await Sut
-        //         .Given(
-        //             new Envelope<BuildingUnitWasPlannedV2>(
-        //                 new Envelope(
-        //                     plannedBuildingUnit,
-        //                     new Dictionary<string, object> { { AddEventHashPipe.HashMetadataKey, plannedBuildingUnit.GetHash() } })),
-        //             new Envelope<BuildingUnitWasTransferred>(
-        //                 new Envelope(
-        //                     @event,
-        //                     new Dictionary<string, object> { { AddEventHashPipe.HashMetadataKey, @event.GetHash() } })))
-        //         .Then(async ct =>
-        //         {
-        //             var item = await ct.BuildingUnitsV2.FindAsync((int)buildingUnitPersistentLocalId);
-        //             item.Should().NotBeNull();
-        //
-        //             item!.BuildingPersistentLocalId.Should().Be(@event.BuildingPersistentLocalId);
-        //             item.PositionMethod.Should().Be(@event.GeometryMethod);
-        //             item.Position.Should().BeEquivalentTo(@event.ExtendedWkbGeometry.ToByteArray());
-        //             item.Status.Should().Be(BuildingUnitStatus.Parse(@event.Status));
-        //             item.Function.Should().Be(BuildingUnitFunction.Unknown);
-        //             item.HasDeviation.Should().BeFalse();
-        //             item.Version.Should().Be(@event.Provenance.Timestamp);
-        //         });
-        // }
-        //
-        // [Fact]
-        // public async Task WhenBuildingUnitWasMoved()
-        // {
-        //     var buildingPersistentLocalId = new BuildingPersistentLocalId(1);
-        //     var destinationBuildingPersistentLocalId = new BuildingPersistentLocalId(2);
-        //
-        //     var buildingUnitWasPlanned = _fixture.Create<BuildingUnitWasPlannedV2>();
-        //     var buildingUnitPersistentLocalId = new BuildingUnitPersistentLocalId(buildingUnitWasPlanned.BuildingUnitPersistentLocalId);
-        //
-        //     var @event = new BuildingUnitWasMoved(
-        //         buildingPersistentLocalId,
-        //         buildingUnitPersistentLocalId,
-        //         destinationBuildingPersistentLocalId);
-        //     @event.SetFixtureProvenance(_fixture);
-        //
-        //     await Sut
-        //         .Given(
-        //             new Envelope<BuildingUnitWasPlannedV2>(new Envelope(buildingUnitWasPlanned, new Dictionary<string, object>
-        //             {
-        //                 { AddEventHashPipe.HashMetadataKey, buildingUnitWasPlanned.GetHash() }
-        //             })),
-        //             new Envelope<BuildingUnitWasMoved>(
-        //                 new Envelope(
-        //                     @event,
-        //                     new Dictionary<string, object> { { AddEventHashPipe.HashMetadataKey, @event.GetHash() } })))
-        //         .Then(async ct =>
-        //         {
-        //             var item = await ct.BuildingUnitsV2.FindAsync(@event.BuildingUnitPersistentLocalId);
-        //             item.Should().NotBeNull();
-        //
-        //             // We're not doing anything for this event.
-        //             item!.Version.Should().Be(buildingUnitWasPlanned.Provenance.Timestamp);
-        //         });
-        // }
+        [Fact]
+        public async Task WhenBuildingUnitWasMovedIntoBuilding()
+        {
+            _fixture.Customize(new WithFixedBuildingPersistentLocalId());
+            _fixture.Customize(new WithFixedBuildingUnitPersistentLocalId());
+
+            var plannedBuildingUnit = _fixture.Create<BuildingUnitWasPlannedV2>();
+            var @event = _fixture.Create<BuildingUnitWasMovedIntoBuilding>();
+
+            await Sut
+                .Given(
+                    new Envelope<BuildingUnitWasPlannedV2>(
+                        new Envelope(
+                            plannedBuildingUnit,
+                            new Dictionary<string, object> { { AddEventHashPipe.HashMetadataKey, plannedBuildingUnit.GetHash() } })),
+                    new Envelope<BuildingUnitWasMovedIntoBuilding>(
+                        new Envelope(
+                            @event,
+                            new Dictionary<string, object> { { AddEventHashPipe.HashMetadataKey, @event.GetHash() } })))
+                .Then(async ct =>
+                {
+                    var item = await ct.BuildingUnitsV2.FindAsync(plannedBuildingUnit.BuildingUnitPersistentLocalId);
+                    item.Should().NotBeNull();
+
+                    item!.BuildingPersistentLocalId.Should().Be(@event.BuildingPersistentLocalId);
+                    item.PositionMethod.Should().Be(BuildingUnitPositionGeometryMethod.Parse(@event.GeometryMethod));
+                    item.Position.Should().BeEquivalentTo(@event.ExtendedWkbGeometry.ToByteArray());
+                    item.Status.Should().Be(BuildingUnitStatus.Parse(@event.BuildingUnitStatus));
+                    item.Function.Should().Be(BuildingUnitFunction.Parse(@event.Function));
+                    item.HasDeviation.Should().Be(@event.HasDeviation);
+                    item.Version.Should().Be(@event.Provenance.Timestamp);
+                });
+        }
 
         protected override BuildingUnitV2Projections CreateProjection() => new BuildingUnitV2Projections(WKBReaderFactory.Create());
     }

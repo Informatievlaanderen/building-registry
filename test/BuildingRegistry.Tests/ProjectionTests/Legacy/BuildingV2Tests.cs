@@ -13,7 +13,6 @@ namespace BuildingRegistry.Tests.ProjectionTests.Legacy
     using Projections.Legacy.BuildingDetailV2;
     using Tests.Legacy.Autofixture;
     using Xunit;
-    using WithFixedBuildingId = Fixtures.WithFixedBuildingId;
 
     public class BuildingV2Tests : BuildingLegacyProjectionTest<BuildingDetailV2Projections>
     {
@@ -562,59 +561,57 @@ namespace BuildingRegistry.Tests.ProjectionTests.Legacy
                 });
         }
 
-        // [Fact]
-        // public async Task WhenBuildingMergerWasRealized()
-        // {
-        //     var @event = _fixture.Create<BuildingMergerWasRealized>();
-        //
-        //     await Sut
-        //         .Given(
-        //             new Envelope<BuildingMergerWasRealized>(
-        //                 new Envelope(
-        //                     @event,
-        //                     new Dictionary<string, object> { { AddEventHashPipe.HashMetadataKey, @event.GetHash() } })))
-        //         .Then(async ct =>
-        //         {
-        //             var item = await ct.BuildingDetailsV2.FindAsync(@event.BuildingPersistentLocalId);
-        //             item.Should().NotBeNull();
-        //
-        //             item!.PersistentLocalId.Should().Be(@event.BuildingPersistentLocalId);
-        //             item.Status.Should().Be(BuildingStatus.Realized);
-        //             item.Geometry.Should().BeEquivalentTo(@event.ExtendedWkbGeometry.ToByteArray());
-        //             item.GeometryMethod.Should().Be(BuildingGeometryMethod.MeasuredByGrb);
-        //             item.Version.Should().Be(@event.Provenance.Timestamp);
-        //             item.LastEventHash.Should().Be(@event.GetHash());
-        //         });
-        // }
-        //
-        // [Fact]
-        // public async Task WhenBuildingWasMerged()
-        // {
-        //     _fixture.Customize(new WithFixedBuildingPersistentLocalId());
-        //
-        //     var buildingWasPlanned = _fixture.Create<BuildingWasPlannedV2>();
-        //     var @event = _fixture.Create<BuildingWasMerged>();
-        //
-        //     await Sut
-        //         .Given(
-        //             new Envelope<BuildingWasPlannedV2>(
-        //                 new Envelope(
-        //                     buildingWasPlanned,
-        //                     new Dictionary<string, object> { { AddEventHashPipe.HashMetadataKey, buildingWasPlanned.GetHash() } })),
-        //             new Envelope<BuildingWasMerged>(
-        //                 new Envelope(
-        //                     @event,
-        //                     new Dictionary<string, object> { { AddEventHashPipe.HashMetadataKey, @event.GetHash() } })))
-        //         .Then(async ct =>
-        //         {
-        //             var item = await ct.BuildingDetailsV2.FindAsync(@event.BuildingPersistentLocalId);
-        //             item.Should().NotBeNull();
-        //
-        //             item.Status.Should().Be(BuildingStatus.Retired);
-        //             item.Version.Should().Be(@event.Provenance.Timestamp);
-        //             item.LastEventHash.Should().Be(@event.GetHash());
-        //         });
-        // }
+        [Fact]
+        public async Task WhenBuildingUnitWasMovedIntoBuilding()
+        {
+            var buildingWasPlannedV2 = _fixture.Create<BuildingWasPlannedV2>();
+
+            var buildingUnitWasMovedIntoBuilding = _fixture.Create<BuildingUnitWasMovedIntoBuilding>();
+            var metadata = new Dictionary<string, object>
+            {
+                { AddEventHashPipe.HashMetadataKey, buildingUnitWasMovedIntoBuilding.GetHash() }
+            };
+
+            await Sut
+                .Given(new Envelope<BuildingWasPlannedV2>(new Envelope(buildingWasPlannedV2, new Dictionary<string, object>
+                    {
+                        { AddEventHashPipe.HashMetadataKey, buildingWasPlannedV2.GetHash() }
+                    })),
+                    new Envelope<BuildingUnitWasMovedIntoBuilding>(new Envelope(buildingUnitWasMovedIntoBuilding, metadata)))
+                .Then(async ct =>
+                {
+                    var buildingDetailItemV2 = await ct.BuildingDetailsV2.FindAsync(buildingUnitWasMovedIntoBuilding.BuildingPersistentLocalId);
+                    buildingDetailItemV2.Should().NotBeNull();
+                    buildingDetailItemV2.Version.Should().Be(buildingUnitWasMovedIntoBuilding.Provenance.Timestamp);
+                    buildingDetailItemV2.LastEventHash.Should().Be(buildingUnitWasMovedIntoBuilding.GetHash());
+                });
+        }
+
+        [Fact]
+        public async Task WhenBuildingUnitWasMovedOutOfBuilding()
+        {
+            var buildingWasPlannedV2 = _fixture.Create<BuildingWasPlannedV2>();
+
+            var buildingUnitWasMovedOutOfBuilding = _fixture.Create<BuildingUnitWasMovedOutOfBuilding>();
+            var metadata = new Dictionary<string, object>
+            {
+                { AddEventHashPipe.HashMetadataKey, buildingUnitWasMovedOutOfBuilding.GetHash() }
+            };
+
+            await Sut
+                .Given(new Envelope<BuildingWasPlannedV2>(new Envelope(buildingWasPlannedV2, new Dictionary<string, object>
+                    {
+                        { AddEventHashPipe.HashMetadataKey, buildingWasPlannedV2.GetHash() }
+                    })),
+                    new Envelope<BuildingUnitWasMovedOutOfBuilding>(new Envelope(buildingUnitWasMovedOutOfBuilding, metadata)))
+                .Then(async ct =>
+                {
+                    var buildingDetailItemV2 = await ct.BuildingDetailsV2.FindAsync(buildingUnitWasMovedOutOfBuilding.BuildingPersistentLocalId);
+                    buildingDetailItemV2.Should().NotBeNull();
+                    buildingDetailItemV2.Version.Should().Be(buildingUnitWasMovedOutOfBuilding.Provenance.Timestamp);
+                    buildingDetailItemV2.LastEventHash.Should().Be(buildingUnitWasMovedOutOfBuilding.GetHash());
+                });
+        }
 
         protected override BuildingDetailV2Projections CreateProjection() => new BuildingDetailV2Projections();
     }

@@ -1,11 +1,8 @@
 namespace BuildingRegistry.Tests
 {
-    using Api.BackOffice.Abstractions.Building;
     using BuildingRegistry.Legacy;
     using NetTopologySuite.Geometries;
-    using NetTopologySuite.Geometries.Implementation;
     using NetTopologySuite.IO;
-    using NetTopologySuite.IO.GML2;
 
     public static class GeometryHelper
     {

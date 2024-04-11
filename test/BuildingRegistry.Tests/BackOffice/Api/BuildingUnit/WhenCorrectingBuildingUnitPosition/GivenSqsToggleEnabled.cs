@@ -47,7 +47,6 @@ namespace BuildingRegistry.Tests.BackOffice.Api.BuildingUnit.WhenCorrectingBuild
         {
             var request = new CorrectBuildingUnitPositionRequest
             {
-                BuildingUnitPersistentLocalId = new BuildingUnitPersistentLocalId(456),
                 PositieGeometrieMethode = PositieGeometrieMethode.AangeduidDoorBeheerder,
                 Positie = position
             };

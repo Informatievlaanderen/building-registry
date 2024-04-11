@@ -249,6 +249,57 @@ namespace BuildingRegistry.Building
                 .ReplaceAddressAttachmentFromBuildingUnitBecauseStreetNameWasReaddressed(previousAddressPersistentLocalId, newAddressPersistentLocalId);
         }
 
+        public void MoveBuildingUnitInto(
+            Building sourceBuilding,
+            BuildingUnitPersistentLocalId buildingUnitPersistentLocalId,
+            IAddCommonBuildingUnit addCommonBuildingUnit)
+        {
+            sourceBuilding.GuardRemovedBuilding();
+            var buildingUnit = sourceBuilding._buildingUnits.GetNotRemovedByPersistentLocalId(buildingUnitPersistentLocalId);
+            buildingUnit.GuardCommonUnit();
+
+            GuardRemovedBuilding();
+            GuardBuildingValidStatuses(BuildingStatus.Planned, BuildingStatus.UnderConstruction, BuildingStatus.Realized);
+
+            var status =
+                buildingUnit.Status == BuildingUnitStatus.Realized
+                && (BuildingStatus == BuildingStatus.Planned || BuildingStatus == BuildingStatus.UnderConstruction)
+                    ? BuildingUnitStatus.Planned
+                    : buildingUnit.Status;
+
+            var position = buildingUnit.BuildingUnitPosition.GeometryMethod == BuildingUnitPositionGeometryMethod.AppointedByAdministrator
+                           && BuildingGeometry.Contains(buildingUnit.BuildingUnitPosition.Geometry)
+                ? buildingUnit.BuildingUnitPosition
+                : new BuildingUnitPosition(BuildingGeometry.Center, BuildingUnitPositionGeometryMethod.DerivedFromObject);
+
+            ApplyChange(new BuildingUnitWasMovedIntoBuilding(
+                BuildingPersistentLocalId,
+                sourceBuilding.BuildingPersistentLocalId,
+                buildingUnit.BuildingUnitPersistentLocalId,
+                status,
+                position.GeometryMethod,
+                position.Geometry,
+                buildingUnit.Function,
+                buildingUnit.HasDeviation,
+                buildingUnit.AddressPersistentLocalIds
+            ));
+
+            EnsureCommonBuildingUnit(addCommonBuildingUnit);
+        }
+
+        public void MoveBuildingUnitOutOf(
+            BuildingPersistentLocalId destinationBuildingPersistentLocalId,
+            BuildingUnitPersistentLocalId buildingUnitPersistentLocalId)
+        {
+            ApplyChange(new BuildingUnitWasMovedOutOfBuilding(
+                BuildingPersistentLocalId,
+                destinationBuildingPersistentLocalId,
+                buildingUnitPersistentLocalId
+            ));
+
+            NotRealizeOrRetireCommonBuildingUnit();
+        }
+
         private void GuardBuildingValidStatuses(params BuildingStatus[] validStatuses)
         {
             if (!validStatuses.Contains(BuildingStatus))

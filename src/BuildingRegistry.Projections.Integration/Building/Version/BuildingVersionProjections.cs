@@ -1,4 +1,4 @@
-﻿namespace BuildingRegistry.Projections.Integration.Building.Version
+namespace BuildingRegistry.Projections.Integration.Building.Version
 {
     using System.Collections.ObjectModel;
     using System.Linq;
@@ -10,7 +10,7 @@
     using Converters;
     using Infrastructure;
     using Microsoft.Extensions.Options;
-
+    
     [ConnectedProjectionName("Integratie gebouw versie")]
     [ConnectedProjectionDescription("Projectie die de versie gebouw data voor de integratie database bijhoudt.")]
     public sealed partial class BuildingVersionProjections : ConnectedProjection<IntegrationContext>
@@ -411,47 +411,6 @@
                     },
                     ct);
             });
-
-            // When<Envelope<BuildingMergerWasRealized>>(async (context, message, ct) =>
-            // {
-            //     var geometryAsBinary = message.Message.ExtendedWkbGeometry.ToByteArray();
-            //     var sysGeometry = wkbReader.Read(geometryAsBinary);
-            //
-            //     var building = new BuildingVersion
-            //     {
-            //         Position = message.Position,
-            //         BuildingPersistentLocalId = message.Message.BuildingPersistentLocalId,
-            //         Status = BuildingStatus.Realized.Value,
-            //         OsloStatus = BuildingStatus.Realized.Map(),
-            //         GeometryMethod = BuildingGeometryMethod.MeasuredByGrb.Value,
-            //         OsloGeometryMethod = BuildingGeometryMethod.MeasuredByGrb.Map(),
-            //         Geometry = sysGeometry,
-            //         IsRemoved = false,
-            //         VersionTimestamp = message.Message.Provenance.Timestamp,
-            //         CreatedOnTimestamp = message.Message.Provenance.Timestamp,
-            //         LastChangedOnTimestamp = message.Message.Provenance.Timestamp,
-            //         Namespace = options.Value.BuildingNamespace,
-            //         PuriId = $"{options.Value.BuildingNamespace}/{message.Message.BuildingPersistentLocalId}"
-            //     };
-            //
-            //     await context
-            //         .BuildingVersions
-            //         .AddAsync(building, ct);
-            // });
-            //
-            // When<Envelope<BuildingWasMerged>>(async (context, message, ct) =>
-            // {
-            //     await context.CreateNewBuildingVersion(
-            //         message.Message.BuildingPersistentLocalId,
-            //         message,
-            //         building =>
-            //         {
-            //             building.Status = BuildingStatus.Retired.Value;
-            //             building.OsloStatus = BuildingStatus.Retired.Map();
-            //             building.VersionTimestamp = message.Message.Provenance.Timestamp;
-            //         },
-            //         ct);
-            // });
         }
     }
 }

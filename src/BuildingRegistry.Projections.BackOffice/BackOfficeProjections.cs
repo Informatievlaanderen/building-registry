@@ -1,4 +1,4 @@
-﻿namespace BuildingRegistry.Projections.BackOffice
+namespace BuildingRegistry.Projections.BackOffice
 {
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.Connector;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore;
@@ -6,6 +6,7 @@
     using Building;
     using Building.Events;
     using Microsoft.EntityFrameworkCore;
+    using System.Threading;
 
     public class BackOfficeProjections : ConnectedProjection<BackOfficeProjectionsContext>
     {
@@ -15,14 +16,14 @@
             {
                 await using var backOfficeContext = await backOfficeContextFactory.CreateDbContextAsync(cancellationToken);
                 await backOfficeContext.AddIdempotentBuildingUnitBuilding(
-                    message.Message.BuildingPersistentLocalId, message.Message.BuildingUnitPersistentLocalId, cancellationToken);
+                    new BuildingPersistentLocalId(message.Message.BuildingPersistentLocalId), new BuildingUnitPersistentLocalId(message.Message.BuildingUnitPersistentLocalId), cancellationToken);
             });
 
             When<Envelope<CommonBuildingUnitWasAddedV2>>(async (_, message, cancellationToken) =>
             {
                 await using var backOfficeContext = await backOfficeContextFactory.CreateDbContextAsync(cancellationToken);
                 await backOfficeContext.AddIdempotentBuildingUnitBuilding(
-                    message.Message.BuildingPersistentLocalId, message.Message.BuildingUnitPersistentLocalId, cancellationToken);
+                    new BuildingPersistentLocalId(message.Message.BuildingPersistentLocalId), new BuildingUnitPersistentLocalId(message.Message.BuildingUnitPersistentLocalId), cancellationToken);
             });
 
             When<Envelope<BuildingUnitAddressWasAttachedV2>>(async (_, message, cancellationToken) =>
@@ -87,35 +88,28 @@
                     cancellationToken);
             });
 
-            // When<Envelope<BuildingUnitWasTransferred>>(async (_, message, cancellationToken) =>
-            // {
-            //     await using var backOfficeContext = await backOfficeContextFactory.CreateDbContextAsync(cancellationToken);
-            //
-            //     var buildingUnitPersistentLocalId = new BuildingUnitPersistentLocalId(message.Message.BuildingUnitPersistentLocalId);
-            //     var buildingPersistentLocalId = new BuildingPersistentLocalId(message.Message.BuildingPersistentLocalId);
-            //
-            //     await backOfficeContext.RemoveIdempotentBuildingUnitBuildingRelation(
-            //         buildingUnitPersistentLocalId,
-            //         cancellationToken);
-            //
-            //     await backOfficeContext.AddIdempotentBuildingUnitBuilding(
-            //         buildingPersistentLocalId,
-            //         buildingUnitPersistentLocalId,
-            //         cancellationToken);
-            //
-            //     await backOfficeContext.RemoveBuildingUnitAddressRelations(
-            //         buildingUnitPersistentLocalId,
-            //         cancellationToken);
-            //
-            //     foreach (var addressPersistentLocalId in message.Message.AddressPersistentLocalIds)
-            //     {
-            //         await backOfficeContext.AddIdempotentBuildingUnitAddressRelation(
-            //             buildingPersistentLocalId,
-            //             buildingUnitPersistentLocalId,
-            //             new AddressPersistentLocalId(addressPersistentLocalId),
-            //             cancellationToken);
-            //     }
-            // });
+            When<Envelope<BuildingUnitWasMovedOutOfBuilding>>(async (_, message, cancellationToken) =>
+            {
+                await using var backOfficeContext = await backOfficeContextFactory.CreateDbContextAsync(cancellationToken);
+                await using var transaction = await backOfficeContext.Database.BeginTransactionAsync(cancellationToken);
+
+                var buildingUnitPersistentLocalId = new BuildingUnitPersistentLocalId(message.Message.BuildingUnitPersistentLocalId);
+                var destinationBuildingPersistentLocalId = new BuildingPersistentLocalId(message.Message.DestinationBuildingPersistentLocalId);
+
+                await backOfficeContext.RemoveIdempotentBuildingUnitBuildingRelation(
+                    buildingUnitPersistentLocalId,
+                    cancellationToken);
+                await backOfficeContext.AddIdempotentBuildingUnitBuilding(
+                    destinationBuildingPersistentLocalId,
+                    buildingUnitPersistentLocalId,
+                    cancellationToken);
+                await backOfficeContext.MoveBuildingUnitAddressRelations(
+                    buildingUnitPersistentLocalId,
+                    destinationBuildingPersistentLocalId,
+                    cancellationToken);
+
+                await transaction.CommitAsync(cancellationToken);
+            });
         }
     }
 }

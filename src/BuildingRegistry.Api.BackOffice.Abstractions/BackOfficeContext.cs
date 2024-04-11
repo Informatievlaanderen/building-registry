@@ -24,8 +24,8 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions
         public DbSet<BuildingUnitAddressRelation> BuildingUnitAddressRelation { get; set; }
 
         public async Task<BuildingUnitBuilding> AddIdempotentBuildingUnitBuilding(
-            int buildingPersistentLocalId,
-            int buildingUnitPersistentLocalId,
+            BuildingPersistentLocalId buildingPersistentLocalId,
+            BuildingUnitPersistentLocalId buildingUnitPersistentLocalId,
             CancellationToken cancellationToken)
         {
             var relation = await FindBuildingUnitBuildingRelation(
@@ -148,6 +148,21 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions
             foreach (var buildingUnitAddressRelation in buildingUnitAddressRelations)
             {
                 BuildingUnitAddressRelation.Remove(buildingUnitAddressRelation);
+            }
+
+            await SaveChangesAsync(cancellationToken);
+        }
+
+        public async Task MoveBuildingUnitAddressRelations(
+            BuildingUnitPersistentLocalId buildingUnitPersistentLocalId,
+            BuildingPersistentLocalId destinationBuildingPersistentLocalId,
+            CancellationToken cancellationToken)
+        {
+            var buildingUnitAddressRelations = await FindAllBuildingUnitAddressRelations(buildingUnitPersistentLocalId, cancellationToken);
+
+            foreach (var buildingUnitAddressRelation in buildingUnitAddressRelations)
+            {
+                buildingUnitAddressRelation.BuildingPersistentLocalId = destinationBuildingPersistentLocalId;
             }
 
             await SaveChangesAsync(cancellationToken);

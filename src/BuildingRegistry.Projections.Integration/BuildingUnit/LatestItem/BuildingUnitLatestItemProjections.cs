@@ -1,4 +1,4 @@
-﻿namespace BuildingRegistry.Projections.Integration.BuildingUnit.LatestItem
+namespace BuildingRegistry.Projections.Integration.BuildingUnit.LatestItem
 {
     using System.Linq;
     using System.Threading.Tasks;
@@ -574,37 +574,30 @@
                     ct);
             });
 
-            // When<Envelope<BuildingUnitWasTransferred>>(async (context, message, ct) =>
-            // {
-            //     await context.FindAndUpdateBuildingUnit(
-            //         message.Message.BuildingUnitPersistentLocalId,
-            //         async buildingUnit =>
-            //         {
-            //             var geometryAsBinary = message.Message.ExtendedWkbGeometry.ToByteArray();
-            //             var sysGeometry = wkbReader.Read(geometryAsBinary);
-            //
-            //             buildingUnit.BuildingPersistentLocalId = message.Message.BuildingPersistentLocalId;
-            //             buildingUnit.OsloStatus = BuildingUnitStatus.Parse(message.Message.Status).Map();
-            //             buildingUnit.Status = message.Message.Status;
-            //             buildingUnit.OsloFunction = BuildingUnitFunction.Parse(message.Message.Function).Map();
-            //             buildingUnit.Function = message.Message.Function;
-            //             buildingUnit.Geometry = sysGeometry;
-            //             buildingUnit.OsloGeometryMethod = BuildingUnitPositionGeometryMethod.Parse(message.Message.GeometryMethod).Map();
-            //             buildingUnit.GeometryMethod = message.Message.GeometryMethod;
-            //             buildingUnit.HasDeviation = message.Message.HasDeviation;
-            //             UpdateVersionTimestamp(buildingUnit, message.Message);
-            //
-            //             var addressPersistentLocalIds = message.Message.AddressPersistentLocalIds.Distinct();
-            //             foreach (var addressPersistentLocalId in addressPersistentLocalIds)
-            //             {
-            //                 await context.AddIdempotentBuildingUnitAddress(buildingUnit, addressPersistentLocalId, ct);
-            //             }
-            //         },
-            //         ct);
-            // });
-            //
-            // // BuildingUnitWasTransferred couples the unit to another building and BuildingUnitMoved is an event applicable on the old building.
-            // When<Envelope<BuildingUnitWasMoved>>((_, _, _) => Task.CompletedTask);
+            When<Envelope<BuildingUnitWasMovedIntoBuilding>>(async (context, message, ct) =>
+            {
+                await context.FindAndUpdateBuildingUnit(
+                    message.Message.BuildingUnitPersistentLocalId,
+                    buildingUnit =>
+                    {
+                        var geometryAsBinary = message.Message.ExtendedWkbGeometry.ToByteArray();
+                        var sysGeometry = wkbReader.Read(geometryAsBinary);
+
+                        buildingUnit.BuildingPersistentLocalId = message.Message.BuildingPersistentLocalId;
+                        buildingUnit.OsloStatus = BuildingUnitStatus.Parse(message.Message.BuildingUnitStatus).Map();
+                        buildingUnit.Status = message.Message.BuildingUnitStatus;
+                        buildingUnit.OsloFunction = BuildingUnitFunction.Parse(message.Message.Function).Map();
+                        buildingUnit.Function = message.Message.Function;
+                        buildingUnit.Geometry = sysGeometry;
+                        buildingUnit.OsloGeometryMethod = BuildingUnitPositionGeometryMethod.Parse(message.Message.GeometryMethod).Map();
+                        buildingUnit.GeometryMethod = message.Message.GeometryMethod;
+                        buildingUnit.HasDeviation = message.Message.HasDeviation;
+                        UpdateVersionTimestamp(buildingUnit, message.Message);
+
+                        return Task.CompletedTask;
+                    },
+                    ct);
+            });
         }
 
         private static void UpdateVersionTimestamp(BuildingUnitLatestItem building, IHasProvenance message)

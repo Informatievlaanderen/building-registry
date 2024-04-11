@@ -1,9 +1,9 @@
 namespace BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Requests
 {
-    using System.Runtime.Serialization;
     using Be.Vlaanderen.Basisregisters.GrAr.Edit.Contracts;
     using Newtonsoft.Json;
     using Swashbuckle.AspNetCore.Filters;
+    using System.Runtime.Serialization;
 
     [DataContract(Name = "CorrigeerGebouweenheidPositie", Namespace = "")]
     public sealed class CorrectBuildingUnitPositionRequest
@@ -21,9 +21,6 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Requests
         [DataMember(Name = "Positie", Order = 2)]
         [JsonProperty(Required = Required.Default)]
         public string? Positie { get; set; }
-
-        [JsonIgnore]
-        public int BuildingUnitPersistentLocalId { get; set; }
     }
 
     public class CorrectBuildingUnitPositionRequestExamples : IExamplesProvider<CorrectBuildingUnitPositionRequest>

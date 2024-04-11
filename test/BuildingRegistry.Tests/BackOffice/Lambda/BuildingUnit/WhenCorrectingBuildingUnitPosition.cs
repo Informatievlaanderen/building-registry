@@ -243,7 +243,6 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
                     ProvenanceData = Fixture.Create<ProvenanceData>(),
                     Request = new CorrectBuildingUnitPositionRequest
                     {
-                        BuildingUnitPersistentLocalId = Fixture.Create<BuildingUnitPersistentLocalId>(),
                         PositieGeometrieMethode = PositieGeometrieMethode.AfgeleidVanObject
                     },
                     TicketId = Guid.NewGuid()

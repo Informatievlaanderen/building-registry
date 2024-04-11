@@ -3,8 +3,6 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Validators
     using Be.Vlaanderen.Basisregisters.GrAr.Edit.Contracts;
     using Be.Vlaanderen.Basisregisters.GrAr.Edit.Validators;
     using Building;
-    using Building.Validators;
-    using BuildingRegistry.Building;
     using FluentValidation;
     using Requests;
     using Validation;
