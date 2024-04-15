@@ -1,3 +1,10 @@
+## [4.2.1](https://github.com/informatievlaanderen/building-registry/compare/v4.2.0...v4.2.1) (2024-04-15)
+
+
+### Bug Fixes
+
+* to trigger build add default setting in projector ([831745f](https://github.com/informatievlaanderen/building-registry/commit/831745f2a9b833f42319b1641979546ec0e92413))
+
 # [4.2.0](https://github.com/informatievlaanderen/building-registry/compare/v4.1.10...v4.2.0) (2024-04-11)
 
 
