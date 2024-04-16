@@ -1,3 +1,10 @@
+## [4.2.2](https://github.com/informatievlaanderen/building-registry/compare/v4.2.1...v4.2.2) (2024-04-16)
+
+
+### Bug Fixes
+
+* contract movebuildingunit ([d3189f1](https://github.com/informatievlaanderen/building-registry/commit/d3189f1e20b006ff47d597ed55dceb7cf726a9c8))
+
 ## [4.2.1](https://github.com/informatievlaanderen/building-registry/compare/v4.2.0...v4.2.1) (2024-04-15)
 
 
