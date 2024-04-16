@@ -10,7 +10,7 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Requests
         /// <summary>
         /// De unieke en persistente identificator van het doelgebouw.
         /// </summary>
-        [DataMember(Name = "DoelgebouwId", Order = 0)]
+        [DataMember(Name = "DoelGebouwId", Order = 0)]
         [JsonProperty(Required = Required.Always)]
         public string DoelgebouwId { get; set; }
     }
