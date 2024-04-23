@@ -22,6 +22,10 @@
                 .HasKey(x => x.BuildingPersistentLocalId);
 
             modelBuilder.Entity<BuildingGeometryData>()
+                .Property(x => x.BuildingPersistentLocalId)
+                .HasColumnName("PersistentLocalId");
+
+            modelBuilder.Entity<BuildingGeometryData>()
                 .Property(x => x.GeometryMethod)
                 .HasConversion(
                     x => x.Value,
