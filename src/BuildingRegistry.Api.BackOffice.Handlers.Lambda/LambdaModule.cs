@@ -55,10 +55,6 @@
         protected override void Load(ContainerBuilder builder)
         {
             builder
-                .RegisterType<SqlPersistentLocalIdGenerator>()
-                .As<IPersistentLocalIdGenerator>();
-
-            builder
                 .RegisterType<Mediator>()
                 .As<IMediator>()
                 .InstancePerLifetimeScope();
