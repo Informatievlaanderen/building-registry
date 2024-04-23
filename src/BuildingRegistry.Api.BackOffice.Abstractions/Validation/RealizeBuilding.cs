@@ -17,7 +17,7 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.Validation
             public static class OverlappingMeasuredBuilding
             {
                 public const string Code = "GebouwIngemetenGeometrieAanwezig";
-                public const string Message = "Er is nog een onderliggend ingemeten geometrie aanwezig.";
+                public const string Message = "Er is nog een onderliggend gebouw met ingemeten geometrie aanwezig.";
 
                 public static TicketError ToTicketError() => new(Message, Code);
             }
@@ -25,7 +25,7 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.Validation
             public static class OverlappingOutlinedBuilding
             {
                 public const string Code = "GebouwGeschetsteGeometrieAanwezig";
-                public const string Message = "Er is nog een onderliggend geschetste geometrie aanwezig.";
+                public const string Message = "Er is nog een onderliggend gebouw met geschetste geometrie aanwezig.";
 
                 public static TicketError ToTicketError() => new(Message, Code);
             }

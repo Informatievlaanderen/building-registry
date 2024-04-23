@@ -211,7 +211,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
                 x.Error(
                     It.IsAny<Guid>(),
                     new TicketError(
-                        "Er is nog een onderliggend ingemeten geometrie aanwezig.",
+                        "Er is nog een onderliggend gebouw met ingemeten geometrie aanwezig.",
                         "GebouwIngemetenGeometrieAanwezig"),
                     CancellationToken.None));
         }
@@ -238,7 +238,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
                 x.Error(
                     It.IsAny<Guid>(),
                     new TicketError(
-                        "Er is nog een onderliggend geschetste geometrie aanwezig.",
+                        "Er is nog een onderliggend gebouw met geschetste geometrie aanwezig.",
                         "GebouwGeschetsteGeometrieAanwezig"),
                     CancellationToken.None));
         }
