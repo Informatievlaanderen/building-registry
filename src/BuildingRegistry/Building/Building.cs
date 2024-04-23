@@ -66,7 +66,7 @@ namespace BuildingRegistry.Building
             ApplyChange(new BuildingBecameUnderConstructionV2(BuildingPersistentLocalId));
         }
 
-        public void RealizeConstruction()
+        public void RealizeConstruction(IBuildingGeometries buildingGeometries)
         {
             GuardRemovedBuilding();
 
@@ -76,6 +76,20 @@ namespace BuildingRegistry.Building
             }
 
             GuardValidStatusses(BuildingStatus.UnderConstruction);
+
+            var overlappingBuildings = buildingGeometries.GetOverlappingBuildings(
+                BuildingPersistentLocalId,
+                BuildingGeometry.Geometry);
+
+            if (overlappingBuildings.Any(x => x.GeometryMethod == BuildingGeometryMethod.MeasuredByGrb))
+            {
+                throw new BuildingGeometryOverlapsWithMeasuredBuildingException();
+            }
+
+            if (overlappingBuildings.Any())
+            {
+                throw new BuildingGeometryOverlapsWithOutlinedBuildingException();
+            }
 
             ApplyChange(new BuildingWasRealizedV2(BuildingPersistentLocalId));
 

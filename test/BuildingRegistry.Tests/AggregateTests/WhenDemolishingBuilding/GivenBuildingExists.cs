@@ -2,6 +2,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenDemolishingBuilding
 {
     using System.Collections.Generic;
     using System.Linq;
+    using Api.BackOffice.Handlers.Lambda;
     using AutoFixture;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
     using Be.Vlaanderen.Basisregisters.AggregateSource.Snapshotting;
@@ -296,7 +297,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenDemolishingBuilding
             sut.Initialize(new List<object> { buildingWasMigrated });
 
             // Act
-            sut.RealizeConstruction();
+            sut.RealizeConstruction(new NoOverlappingBuildingGeometries());
 
             // Assert
             sut.BuildingStatus.Should().Be(BuildingStatus.Realized);

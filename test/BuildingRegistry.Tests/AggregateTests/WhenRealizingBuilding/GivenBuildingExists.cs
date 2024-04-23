@@ -2,6 +2,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRealizingBuilding
 {
     using System.Collections.Generic;
     using System.Linq;
+    using Api.BackOffice.Handlers.Lambda;
     using AutoFixture;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
     using Be.Vlaanderen.Basisregisters.AggregateSource.Snapshotting;
@@ -14,11 +15,14 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRealizingBuilding
     using Extensions;
     using Fixtures;
     using FluentAssertions;
+    using Moq;
     using Xunit;
     using Xunit.Abstractions;
+    using BuildingGeometryMethod = Building.BuildingGeometryMethod;
     using BuildingStatus = Building.BuildingStatus;
     using BuildingUnitFunction = BuildingRegistry.Legacy.BuildingUnitFunction;
     using BuildingUnitStatus = BuildingRegistry.Legacy.BuildingUnitStatus;
+    using ExtendedWkbGeometry = Building.ExtendedWkbGeometry;
 
     public class GivenBuildingExists : BuildingRegistryTest
     {
@@ -130,6 +134,52 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRealizingBuilding
         }
 
         [Fact]
+        public void WithOverlappingMeasuredBuilding_ThenThrowsBuildingGeometryOverlapsWithMeasuredBuildingException()
+        {
+            var command = Fixture.Create<RealizeBuilding>();
+
+            FakeBuildingGeometries
+                .Setup(x => x.GetOverlappingBuildings(
+                    Fixture.Create<BuildingPersistentLocalId>(),
+                    It.IsAny<ExtendedWkbGeometry>()))
+                .Returns(new[] { new BuildingGeometryData(1, BuildingGeometryMethod.MeasuredByGrb, GeometryHelper.ValidPolygon) });
+
+            var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
+                .WithBuildingStatus(BuildingStatus.UnderConstruction)
+                .Build();
+
+            Assert(new Scenario()
+                .Given(
+                    new BuildingStreamId(Fixture.Create<BuildingPersistentLocalId>()),
+                    buildingWasMigrated)
+                .When(command)
+                .Throws(new BuildingGeometryOverlapsWithMeasuredBuildingException()));
+        }
+
+        [Fact]
+        public void WithOverlappingOutlinedBuilding_ThenThrowsBuildingGeometryOverlapsWithOutlinedBuildingException()
+        {
+            var command = Fixture.Create<RealizeBuilding>();
+
+            FakeBuildingGeometries
+                .Setup(x => x.GetOverlappingBuildings(
+                    It.IsAny<BuildingPersistentLocalId>(),
+                    It.IsAny<ExtendedWkbGeometry>()))
+                .Returns(new[] { new BuildingGeometryData(1, BuildingGeometryMethod.Outlined, GeometryHelper.ValidPolygon) });
+
+            var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
+                .WithBuildingStatus(BuildingStatus.UnderConstruction)
+                .Build();
+
+            Assert(new Scenario()
+                .Given(
+                    new BuildingStreamId(Fixture.Create<BuildingPersistentLocalId>()),
+                    buildingWasMigrated)
+                .When(command)
+                .Throws(new BuildingGeometryOverlapsWithOutlinedBuildingException()));
+        }
+
+        [Fact]
         public void StateCheck()
         {
             var plannedBuildingUnitPersistentLocalId = new PersistentLocalId(123);
@@ -166,7 +216,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRealizingBuilding
             sut.Initialize(new List<object> { buildingWasMigrated });
 
             // Act
-            sut.RealizeConstruction();
+            sut.RealizeConstruction(new NoOverlappingBuildingGeometries());
 
             // Assert
             sut.BuildingStatus.Should().Be(BuildingStatus.Realized);

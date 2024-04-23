@@ -2,6 +2,7 @@ namespace BuildingRegistry.Tests
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using Autofac;
     using AutoFixture;
     using BackOffice;
@@ -14,8 +15,8 @@ namespace BuildingRegistry.Tests
     using Building;
     using Fixtures;
     using Infrastructure.Modules;
-    using MediatR;
     using Microsoft.Extensions.Configuration;
+    using Moq;
     using Newtonsoft.Json;
     using Xunit.Abstractions;
     using BuildingUnitFunction = BuildingRegistry.Legacy.BuildingUnitFunction;
@@ -25,6 +26,8 @@ namespace BuildingRegistry.Tests
     public class BuildingRegistryTest : AutofacBasedTest
     {
         protected FakeConsumerAddressContext FakeConsumerAddressContext;
+        protected Mock<IBuildingGeometries> FakeBuildingGeometries = new Mock<IBuildingGeometries>();
+
         protected Fixture Fixture { get; }
         protected string ConfigDetailUrl => "http://base/{0}";
         protected JsonSerializerSettings EventSerializerSettings { get; } = EventsJsonSerializerSettingsProvider.CreateSerializerSettings();
@@ -110,6 +113,21 @@ namespace BuildingRegistry.Tests
                 .Register(_ => FakeConsumerAddressContext)
                 .SingleInstance()
                 .As<IAddresses>()
+                .AsSelf();
+
+            if (!FakeBuildingGeometries.Setups.Any())
+            {
+                FakeBuildingGeometries
+                    .Setup(x => x.GetOverlappingBuildings(
+                        It.IsAny<BuildingPersistentLocalId>(),
+                        It.IsAny<ExtendedWkbGeometry>()))
+                    .Returns(new List<BuildingGeometryData>());
+            }
+
+            builder
+                .Register(_ => FakeBuildingGeometries.Object)
+                .SingleInstance()
+                .As<IBuildingGeometries>()
                 .AsSelf();
 
             builder

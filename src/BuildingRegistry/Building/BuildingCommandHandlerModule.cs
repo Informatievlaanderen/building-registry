@@ -1,7 +1,6 @@
 namespace BuildingRegistry.Building
 {
     using System;
-    using System.Collections.Generic;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
     using Be.Vlaanderen.Basisregisters.AggregateSource.Snapshotting;
     using Be.Vlaanderen.Basisregisters.CommandHandling;
@@ -10,7 +9,6 @@ namespace BuildingRegistry.Building
     using Be.Vlaanderen.Basisregisters.GrAr.Common.Pipes;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Commands;
-    using Exceptions;
     using SqlStreamStore;
 
     public sealed class BuildingCommandHandlerModule : CommandHandlerModule
@@ -23,8 +21,8 @@ namespace BuildingRegistry.Building
             Func<ISnapshotStore> getSnapshotStore,
             EventMapping eventMapping,
             EventSerializer eventSerializer,
-            IAddCommonBuildingUnit addCommonBuildingUnit,
-            IProvenanceFactory<Building> provenanceFactory)
+            IProvenanceFactory<Building> provenanceFactory,
+            IBuildingGeometries buildingGeometries)
         {
             For<MigrateBuilding>()
                 .AddSqlStreamStore(getStreamStore, getUnitOfWork, eventMapping, eventSerializer, getSnapshotStore)
@@ -96,7 +94,7 @@ namespace BuildingRegistry.Building
                     var streamId = new BuildingStreamId(message.Command.BuildingPersistentLocalId);
                     var building = await buildingRepository().GetAsync(streamId, ct);
 
-                    building.RealizeConstruction();
+                    building.RealizeConstruction(buildingGeometries);
                 });
 
             For<NotRealizeBuilding>()
