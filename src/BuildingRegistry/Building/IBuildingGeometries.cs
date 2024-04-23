@@ -21,7 +21,8 @@
 
         public BuildingGeometryData(
             int buildingPersistentLocalId,
-            BuildingGeometryMethod geometryMethod, Geometry sysGeometry)
+            BuildingGeometryMethod geometryMethod,
+            Geometry sysGeometry)
         {
             BuildingPersistentLocalId = buildingPersistentLocalId;
             GeometryMethod = geometryMethod;

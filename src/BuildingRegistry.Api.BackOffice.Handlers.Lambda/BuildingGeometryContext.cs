@@ -26,6 +26,10 @@
                 .HasConversion(
                     x => x.Value,
                     x => BuildingGeometryMethod.Parse(x));
+
+            modelBuilder.Entity<BuildingGeometryData>()
+                .Property(x => x.SysGeometry)
+                .HasColumnType("sys.geometry");
         }
 
         public ICollection<BuildingGeometryData> GetOverlappingBuildings(
@@ -37,6 +41,11 @@
             var fixedGeometry = NetTopologySuite.Geometries.Utilities.GeometryFixer.Fix(geometry);
 
             var boundingBox = fixedGeometry.Factory.ToGeometry(fixedGeometry.EnvelopeInternal);
+            //check if bounding box is not clockwise otherwise reverse => must be counter clockwise oriented
+            if (boundingBox.Coordinates[0].X > boundingBox.Coordinates[1].X)
+            {
+                boundingBox = boundingBox.Reverse();
+            }
 
             var overlappingBuildings = BuildingGeometries
                 .Where(building =>
