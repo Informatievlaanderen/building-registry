@@ -76,6 +76,8 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.Building
             return exception switch
             {
                 BuildingHasInvalidStatusException => ValidationErrors.RealizeBuilding.BuildingInvalidStatus.ToTicketError(),
+                BuildingGeometryOverlapsWithMeasuredBuildingException => ValidationErrors.RealizeBuilding.OverlappingMeasuredBuilding.ToTicketError(),
+                BuildingGeometryOverlapsWithOutlinedBuildingException => ValidationErrors.RealizeBuilding.OverlappingOutlinedBuilding.ToTicketError(),
                 _ => null
             };
         }

@@ -7,28 +7,22 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda
     using System.Reflection;
     using Abstractions;
     using Abstractions.Building.SqsRequests;
-    using Amazon;
     using Autofac;
     using Autofac.Extensions.DependencyInjection;
     using Be.Vlaanderen.Basisregisters.Aws.Lambda;
     using Be.Vlaanderen.Basisregisters.CommandHandling.Idempotency;
     using Be.Vlaanderen.Basisregisters.EventHandling;
-    using Be.Vlaanderen.Basisregisters.MessageHandling.AwsSqs.Simple;
-    using Be.Vlaanderen.Basisregisters.Sqs;
-    using Be.Vlaanderen.Basisregisters.Sqs.Lambda.Infrastructure;
     using Consumer.Address;
     using Consumer.Read.Parcel.Infrastructure.Modules;
     using GrbAnoApi;
     using Infrastructure;
     using Infrastructure.Modules;
-    using MediatR;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Logging;
     using Newtonsoft.Json;
     using OrWegwijsApi;
     using TicketingService.Proxy.HttpProxy;
-    using SqsQueue = Be.Vlaanderen.Basisregisters.Sqs.SqsQueue;
 
     public class Function : FunctionBase
     {
@@ -61,28 +55,12 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda
                 .As<IWegwijsApiProxy>()
                 .AsSelf();
 
-            builder
-                .RegisterType<Mediator>()
-                .As<IMediator>()
-                .InstancePerLifetimeScope();
-
-            builder.RegisterAssemblyTypes(typeof(MessageHandler).GetTypeInfo().Assembly).AsImplementedInterfaces();
-
             builder.Register(_ => configuration)
                 .AsSelf()
                 .As<IConfiguration>()
                 .SingleInstance();
 
-            services.AddHttpProxyTicketing(configuration.GetSection("TicketingService")["InternalBaseUrl"]);
-
-            // RETRY POLICY
-            var maxRetryCount = int.Parse(configuration.GetSection("RetryPolicy")["MaxRetryCount"]);
-            var startingDelaySeconds = int.Parse(configuration.GetSection("RetryPolicy")["StartingRetryDelaySeconds"]);
-
-            builder.Register(_ => new LambdaHandlerRetryPolicy(maxRetryCount, startingDelaySeconds))
-                .As<ICustomRetryPolicy>()
-                .AsSelf()
-                .SingleInstance();
+            services.AddHttpProxyTicketing(configuration.GetSection("TicketingService")["InternalBaseUrl"]!);
 
             var eventSerializerSettings = EventsJsonSerializerSettingsProvider.CreateSerializerSettings();
 
@@ -93,35 +71,17 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda
                 .RegisterModule(new CommandHandlingModule(configuration))
                 .RegisterModule(new BackOfficeModule(configuration, services, loggerFactory))
                 .RegisterModule(new ConsumerAddressModule(configuration, services, loggerFactory))
-                .RegisterModule(new ConsumerParcelModule(configuration, services, loggerFactory));
-
-            builder.RegisterType<IdempotentCommandHandler>()
-                .As<IIdempotentCommandHandler>()
-                .AsSelf()
-                .InstancePerLifetimeScope();
-
-            builder
-                .RegisterType<ParcelMatching>()
-                .As<IParcelMatching>()
-                .InstancePerLifetimeScope();
+                .RegisterModule(new ConsumerParcelModule(configuration, services, loggerFactory))
+                .RegisterModule(new LambdaModule(configuration, services));
 
             services.ConfigureIdempotency(
                 configuration
                     .GetSection(IdempotencyConfiguration.Section)
-                    .Get<IdempotencyConfiguration>()
+                    .Get<IdempotencyConfiguration>()!
                     .ConnectionString!,
                 new IdempotencyMigrationsTableInfo(Schema.Import),
                 new IdempotencyTableInfo(Schema.Import),
                 loggerFactory);
-
-            builder
-                .Register(_ => new SqsOptions(RegionEndpoint.EUWest1, EventsJsonSerializerSettingsProvider.CreateSerializerSettings()))
-                .SingleInstance();
-
-            builder.Register(c => new SqsQueue(c.Resolve<SqsOptions>(), configuration.GetSection("AnoApi").GetValue<string>("SqsUrl") ?? throw new ArgumentNullException("SqsUrl")))
-                .As<ISqsQueue>()
-                .AsSelf()
-                .SingleInstance();
 
             builder.Populate(services);
 

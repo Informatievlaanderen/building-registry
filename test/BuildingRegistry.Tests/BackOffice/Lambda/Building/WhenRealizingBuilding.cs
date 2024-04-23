@@ -12,8 +12,6 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Be.Vlaanderen.Basisregisters.MessageHandling.AwsSqs.Simple;
     using Be.Vlaanderen.Basisregisters.Sqs;
-    using Be.Vlaanderen.Basisregisters.Sqs.Exceptions;
-    using Be.Vlaanderen.Basisregisters.Sqs.Lambda.Handlers;
     using Be.Vlaanderen.Basisregisters.Sqs.Responses;
     using BuildingRegistry.Api.BackOffice.Abstractions.Building.Requests;
     using BuildingRegistry.Api.BackOffice.Abstractions.Building.SqsRequests;
@@ -188,6 +186,60 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
                     new TicketError(
                         "Deze actie is enkel toegestaan op gebouwen met status 'inAanbouw'.",
                         "GebouwGehistoreerdGeplandOfNietGerealiseerd"),
+                    CancellationToken.None));
+        }
+
+        [Fact]
+        public async Task WhenThereIsAnOverlappingMeasuredBuilding_ThenTicketingErrorIsExpected()
+        {
+            // Arrange
+            var ticketing = new Mock<ITicketing>();
+
+            var handler = new RealizeBuildingLambdaHandler(
+                Container.Resolve<IConfiguration>(),
+                new FakeRetryPolicy(),
+                ticketing.Object,
+                MockExceptionIdempotentCommandHandler<BuildingGeometryOverlapsWithMeasuredBuildingException>().Object,
+                Container.Resolve<IBuildings>(),
+                Mock.Of<ISqsQueue>());
+
+            // Act
+            await handler.Handle(CreateRealizeBuildingLambdaRequest(), CancellationToken.None);
+
+            //Assert
+            ticketing.Verify(x =>
+                x.Error(
+                    It.IsAny<Guid>(),
+                    new TicketError(
+                        "Er is nog een onderliggend ingemeten geometrie aanwezig.",
+                        "GebouwIngemetenGeometrieAanwezig"),
+                    CancellationToken.None));
+        }
+
+        [Fact]
+        public async Task WhenThereIsAnOverlappingOutlinedBuilding_ThenTicketingErrorIsExpected()
+        {
+            // Arrange
+            var ticketing = new Mock<ITicketing>();
+
+            var handler = new RealizeBuildingLambdaHandler(
+                Container.Resolve<IConfiguration>(),
+                new FakeRetryPolicy(),
+                ticketing.Object,
+                MockExceptionIdempotentCommandHandler<BuildingGeometryOverlapsWithOutlinedBuildingException>().Object,
+                Container.Resolve<IBuildings>(),
+                Mock.Of<ISqsQueue>());
+
+            // Act
+            await handler.Handle(CreateRealizeBuildingLambdaRequest(), CancellationToken.None);
+
+            //Assert
+            ticketing.Verify(x =>
+                x.Error(
+                    It.IsAny<Guid>(),
+                    new TicketError(
+                        "Er is nog een onderliggend geschetste geometrie aanwezig.",
+                        "GebouwGeschetsteGeometrieAanwezig"),
                     CancellationToken.None));
         }
 
