@@ -1,3 +1,11 @@
+# [4.3.0](https://github.com/informatievlaanderen/building-registry/compare/v4.2.2...v4.3.0) (2024-04-23)
+
+
+### Features
+
+* add deviation to buildingunit WFS GAWR-5319 ([d9f2936](https://github.com/informatievlaanderen/building-registry/commit/d9f2936a07c9a69a096803b14a6a7439927c5a39))
+* realize building validate overlapping building geometry GAWR-4815 ([aea4197](https://github.com/informatievlaanderen/building-registry/commit/aea4197eadb731c451de95f6744e72ca3ab563a5))
+
 ## [4.2.2](https://github.com/informatievlaanderen/building-registry/compare/v4.2.1...v4.2.2) (2024-04-16)
 
 
