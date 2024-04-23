@@ -1,3 +1,10 @@
+## [4.3.1](https://github.com/informatievlaanderen/building-registry/compare/v4.3.0...v4.3.1) (2024-04-23)
+
+
+### Bug Fixes
+
+* check overlap must be CCW oriented ([9278432](https://github.com/informatievlaanderen/building-registry/commit/9278432a5b9a45e9836aa905c6dcd5b3c61a9c78))
+
 # [4.3.0](https://github.com/informatievlaanderen/building-registry/compare/v4.2.2...v4.3.0) (2024-04-23)
 
 
