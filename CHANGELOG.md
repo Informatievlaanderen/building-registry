@@ -1,3 +1,10 @@
+## [4.3.2](https://github.com/informatievlaanderen/building-registry/compare/v4.3.1...v4.3.2) (2024-04-23)
+
+
+### Bug Fixes
+
+* geometries context persistent local id name ([0ea828e](https://github.com/informatievlaanderen/building-registry/commit/0ea828e43b374b12840be0c28026333edd484ba4))
+
 ## [4.3.1](https://github.com/informatievlaanderen/building-registry/compare/v4.3.0...v4.3.1) (2024-04-23)
 
 
