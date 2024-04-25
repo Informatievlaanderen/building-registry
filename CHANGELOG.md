@@ -1,3 +1,10 @@
+## [4.3.3](https://github.com/informatievlaanderen/building-registry/compare/v4.3.2...v4.3.3) (2024-04-25)
+
+
+### Bug Fixes
+
+* only validate on active, overlapping buildings ([a80a7f8](https://github.com/informatievlaanderen/building-registry/commit/a80a7f81cd0688f09bd080521823bf0cee3fc97a))
+
 ## [4.3.2](https://github.com/informatievlaanderen/building-registry/compare/v4.3.1...v4.3.2) (2024-04-23)
 
 
