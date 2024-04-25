@@ -142,7 +142,15 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRealizingBuilding
                 .Setup(x => x.GetOverlappingBuildings(
                     Fixture.Create<BuildingPersistentLocalId>(),
                     It.IsAny<ExtendedWkbGeometry>()))
-                .Returns(new[] { new BuildingGeometryData(1, BuildingGeometryMethod.MeasuredByGrb, GeometryHelper.ValidPolygon) });
+                .Returns(new[]
+                {
+                    new BuildingGeometryData(
+                        1,
+                        BuildingStatus.Planned,
+                        BuildingGeometryMethod.MeasuredByGrb,
+                        GeometryHelper.ValidPolygon,
+                        false)
+                });
 
             var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
                 .WithBuildingStatus(BuildingStatus.UnderConstruction)
@@ -165,7 +173,15 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRealizingBuilding
                 .Setup(x => x.GetOverlappingBuildings(
                     It.IsAny<BuildingPersistentLocalId>(),
                     It.IsAny<ExtendedWkbGeometry>()))
-                .Returns(new[] { new BuildingGeometryData(1, BuildingGeometryMethod.Outlined, GeometryHelper.ValidPolygon) });
+                .Returns(new[]
+                {
+                    new BuildingGeometryData(
+                        1,
+                        BuildingStatus.Planned,
+                        BuildingGeometryMethod.Outlined,
+                        GeometryHelper.ValidPolygon,
+                        false)
+                });
 
             var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
                 .WithBuildingStatus(BuildingStatus.UnderConstruction)
