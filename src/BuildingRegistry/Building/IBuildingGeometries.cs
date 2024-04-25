@@ -13,20 +13,26 @@
     public sealed class BuildingGeometryData
     {
         public int BuildingPersistentLocalId { get; init; }
+        public string StatusAsString { get; init; }
         public BuildingGeometryMethod GeometryMethod { get; init; }
         public Geometry SysGeometry { get; init; }
+        public bool IsRemoved { get; init; }
 
         private BuildingGeometryData()
         { }
 
         public BuildingGeometryData(
             int buildingPersistentLocalId,
+            BuildingStatus status,
             BuildingGeometryMethod geometryMethod,
-            Geometry sysGeometry)
+            Geometry sysGeometry,
+            bool isRemoved)
         {
             BuildingPersistentLocalId = buildingPersistentLocalId;
+            StatusAsString = status;
             GeometryMethod = geometryMethod;
             SysGeometry = sysGeometry;
+            IsRemoved = isRemoved;
         }
     }
 }

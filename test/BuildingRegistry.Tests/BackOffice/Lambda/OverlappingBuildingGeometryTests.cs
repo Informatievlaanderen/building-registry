@@ -1,9 +1,7 @@
 namespace BuildingRegistry.Tests.BackOffice.Lambda
 {
-    using System;
     using BuildingRegistry.Api.BackOffice.Abstractions.Building;
     using BuildingRegistry.Building;
-    using BuildingRegistry.Tests.BackOffice;
     using FluentAssertions;
     using NetTopologySuite.Geometries;
     using Xunit;
@@ -14,8 +12,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda
 
         public OverlappingBuildingGeometryTests()
         {
-            _buildingGeometryContext = new FakeBuildingGeometryContextFactory()
-                .CreateDbContext(Array.Empty<string>());
+            _buildingGeometryContext = new FakeBuildingGeometryContextFactory().CreateDbContext([]);
         }
 
         [Fact]
@@ -25,9 +22,12 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda
             var buildingGeometryOutsideOfBuildingGeometryButInsideBoundingBox = CreateGeometry("100 200 101 200 101 199 100 199 100 200");
 
             _buildingGeometryContext.BuildingGeometries
-                .Add(new BuildingGeometryData(1,
+                .Add(new BuildingGeometryData(
+                    1,
+                    BuildingStatus.Planned,
                     BuildingGeometryMethod.MeasuredByGrb,
-                    buildingGeometryOutsideOfBuildingGeometryButInsideBoundingBox));
+                    buildingGeometryOutsideOfBuildingGeometryButInsideBoundingBox,
+                    false));
 
             _buildingGeometryContext.SaveChanges();
 
@@ -38,15 +38,21 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda
             result.Should().BeEmpty();
         }
 
-        [Fact]
-        public void WithBuildingOverlappingGeometry_ShouldReturnSingle()
+        [Theory]
+        [InlineData("Planned")]
+        [InlineData("UnderConstruction")]
+        [InlineData("Realized")]
+        public void WithActiveBuildingHasOverlappingGeometry_ShouldReturnSingle(string status)
         {
             var buildingGeometry = CreateGeometry("100 100 150 200 200 200 200 100 100 100");
 
             _buildingGeometryContext.BuildingGeometries
-                .Add(new BuildingGeometryData(1,
+                .Add(new BuildingGeometryData(
+                    1,
+                    BuildingStatus.Parse(status),
                     BuildingGeometryMethod.MeasuredByGrb,
-                    buildingGeometry));
+                    buildingGeometry,
+                    false));
 
             _buildingGeometryContext.SaveChanges();
 
@@ -57,15 +63,67 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda
             result.Should().ContainSingle();
         }
 
-        [Fact]
-        public void WithBuildingOverlappingGeometryAndIdenticalId_ShouldReturnNone()
+        [Theory]
+        [InlineData("NotRealized")]
+        [InlineData("Retired")]
+        public void WithBuildingHasOverlappingGeometryButStatusIsInActive_ShouldReturnNothing(string status)
         {
             var buildingGeometry = CreateGeometry("100 100 150 200 200 200 200 100 100 100");
 
             _buildingGeometryContext.BuildingGeometries
-                .Add(new BuildingGeometryData(1,
+                .Add(new BuildingGeometryData(
+                    1,
+                    BuildingStatus.Parse(status),
                     BuildingGeometryMethod.MeasuredByGrb,
-                    buildingGeometry));
+                    buildingGeometry,
+                    false));
+
+            _buildingGeometryContext.SaveChanges();
+
+            var result = _buildingGeometryContext.GetOverlappingBuildings(
+                new BuildingPersistentLocalId(2),
+                ExtendedWkbGeometry.CreateEWkb(buildingGeometry.AsBinary())!);
+
+            result.Should().BeEmpty();
+        }
+
+        [Theory]
+        [InlineData("Planned")]
+        [InlineData("UnderConstruction")]
+        [InlineData("Realized")]
+        public void WithRemovedBuildingHasOverlappingGeometry_ShouldReturnNothing(string status)
+        {
+            var buildingGeometry = CreateGeometry("100 100 150 200 200 200 200 100 100 100");
+
+            _buildingGeometryContext.BuildingGeometries
+                .Add(new BuildingGeometryData(
+                    1,
+                    BuildingStatus.Parse(status),
+                    BuildingGeometryMethod.MeasuredByGrb,
+                    buildingGeometry,
+                    true));
+
+            _buildingGeometryContext.SaveChanges();
+
+            var result = _buildingGeometryContext.GetOverlappingBuildings(
+                new BuildingPersistentLocalId(2),
+                ExtendedWkbGeometry.CreateEWkb(buildingGeometry.AsBinary())!);
+
+            result.Should().BeEmpty();
+        }
+
+        [Fact]
+        public void WithBuildingOverlappingGeometryAndIdenticalId_ShouldReturnNothing()
+        {
+            var buildingGeometry = CreateGeometry("100 100 150 200 200 200 200 100 100 100");
+
+            _buildingGeometryContext.BuildingGeometries
+                .Add(new BuildingGeometryData(
+                    1,
+                    BuildingStatus.Planned,
+                    BuildingGeometryMethod.MeasuredByGrb,
+                    buildingGeometry,
+                    false));
 
             _buildingGeometryContext.SaveChanges();
 
@@ -75,7 +133,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda
 
             result.Should().BeEmpty();
         }
-        
+
         private static Geometry CreateGeometry(string coordinates)
             => GmlHelpers.CreateGmlReader().Read(
                 "<gml:Polygon srsName=\"https://www.opengis.net/def/crs/EPSG/0/31370\" xmlns:gml=\"http://www.opengis.net/gml/3.2\">" +

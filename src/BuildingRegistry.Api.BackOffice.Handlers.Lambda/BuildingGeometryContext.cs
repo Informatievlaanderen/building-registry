@@ -26,6 +26,9 @@
                 .HasColumnName("PersistentLocalId");
 
             modelBuilder.Entity<BuildingGeometryData>()
+                .Property(x => x.StatusAsString).HasColumnName("Status");
+
+            modelBuilder.Entity<BuildingGeometryData>()
                 .Property(x => x.GeometryMethod)
                 .HasConversion(
                     x => x.Value,
@@ -54,6 +57,10 @@
             var overlappingBuildings = BuildingGeometries
                 .Where(building =>
                     building.BuildingPersistentLocalId != buildingPersistentLocalId
+                    && (building.StatusAsString == BuildingStatus.Planned.Value
+                        || building.StatusAsString == BuildingStatus.UnderConstruction.Value
+                        || building.StatusAsString == BuildingStatus.Realized.Value)
+                    && !building.IsRemoved
                     && boundingBox.Intersects(building.SysGeometry))
                 .ToList()
                 .Where(building => geometry.Intersects(building.SysGeometry))
