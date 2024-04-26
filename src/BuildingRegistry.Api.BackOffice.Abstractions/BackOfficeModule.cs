@@ -1,6 +1,7 @@
 namespace BuildingRegistry.Api.BackOffice.Abstractions
 {
     using Autofac;
+    using BuildingRegistry.Building;
     using Infrastructure;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Configuration;
@@ -30,6 +31,10 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions
             builder
                 .RegisterType<AddCommonBuildingUnit>()
                 .As<IAddCommonBuildingUnit>();
+
+            builder
+                .RegisterType<NoOverlappingBuildingGeometries>()
+                .As<IBuildingGeometries>();
 
             base.Load(builder);
         }
