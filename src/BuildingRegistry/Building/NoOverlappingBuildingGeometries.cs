@@ -1,6 +1,6 @@
-﻿namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda
+﻿namespace BuildingRegistry.Building
 {
-    using Building;
+    using System.Collections.Generic;
 
     public class NoOverlappingBuildingGeometries : IBuildingGeometries
     {
