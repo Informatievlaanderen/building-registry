@@ -22,7 +22,7 @@ namespace BuildingRegistry.Building
             EventMapping eventMapping,
             EventSerializer eventSerializer,
             IProvenanceFactory<Building> provenanceFactory,
-            IBuildingGeometries buildingGeometries)
+            IBuildingGeometries? buildingGeometries = null)
         {
             For<MigrateBuilding>()
                 .AddSqlStreamStore(getStreamStore, getUnitOfWork, eventMapping, eventSerializer, getSnapshotStore)
@@ -94,7 +94,7 @@ namespace BuildingRegistry.Building
                     var streamId = new BuildingStreamId(message.Command.BuildingPersistentLocalId);
                     var building = await buildingRepository().GetAsync(streamId, ct);
 
-                    building.RealizeConstruction(buildingGeometries);
+                    building.RealizeConstruction(buildingGeometries!);
                 });
 
             For<NotRealizeBuilding>()
