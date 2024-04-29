@@ -32,10 +32,6 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions
                 .RegisterType<AddCommonBuildingUnit>()
                 .As<IAddCommonBuildingUnit>();
 
-            builder
-                .RegisterType<NoOverlappingBuildingGeometries>()
-                .As<IBuildingGeometries>();
-
             base.Load(builder);
         }
     }

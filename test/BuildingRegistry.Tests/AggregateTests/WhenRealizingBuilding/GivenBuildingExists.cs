@@ -2,6 +2,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRealizingBuilding
 {
     using System.Collections.Generic;
     using System.Linq;
+    using Api.BackOffice.Abstractions;
     using Api.BackOffice.Handlers.Lambda;
     using AutoFixture;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
