@@ -76,6 +76,7 @@
             builder.HasIndex(x => x.Status);
             builder.HasIndex(x => x.OsloStatus);
             builder.HasIndex(x => x.IsRemoved);
+            builder.HasIndex(x => new { x.IsRemoved, x.Status });
             builder.HasIndex(x => x.Geometry).HasMethod("GIST");
         }
     }
