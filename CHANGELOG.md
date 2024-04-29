@@ -1,3 +1,10 @@
+# [4.4.0](https://github.com/informatievlaanderen/building-registry/compare/v4.3.4...v4.4.0) (2024-04-29)
+
+
+### Features
+
+* add combined index isremoved and status on integration projections ([6d8696a](https://github.com/informatievlaanderen/building-registry/commit/6d8696afae8f58013c6737907135718ce405bfc0))
+
 ## [4.3.4](https://github.com/informatievlaanderen/building-registry/compare/v4.3.3...v4.3.4) (2024-04-29)
 
 
