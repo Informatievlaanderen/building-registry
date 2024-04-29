@@ -1,3 +1,10 @@
+## [4.3.4](https://github.com/informatievlaanderen/building-registry/compare/v4.3.3...v4.3.4) (2024-04-29)
+
+
+### Bug Fixes
+
+* registry IBuildingGeometries implementation for Consumer.Address ([7784566](https://github.com/informatievlaanderen/building-registry/commit/77845669ac73c6965fcb8b12998459e7d691b183))
+
 ## [4.3.3](https://github.com/informatievlaanderen/building-registry/compare/v4.3.2...v4.3.3) (2024-04-25)
 
 
