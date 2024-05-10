@@ -1,5 +1,6 @@
 namespace BuildingRegistry.Tests.AggregateTests.WhenRemovingBuildingUnit
 {
+    using System.Collections.Generic;
     using System.Linq;
     using AutoFixture;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
@@ -15,6 +16,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRemovingBuildingUnit
     using FluentAssertions;
     using Xunit;
     using Xunit.Abstractions;
+    using BuildingUnit = Building.Commands.BuildingUnit;
     using BuildingUnitFunction = BuildingRegistry.Legacy.BuildingUnitFunction;
     using BuildingUnitStatus = BuildingRegistry.Legacy.BuildingUnitStatus;
 
@@ -106,6 +108,38 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRemovingBuildingUnit
                     buildingWasMigrated)
                 .When(command)
                 .Throws(new BuildingUnitHasInvalidFunctionException()));
+        }
+
+        [Fact]
+        public void WithUnusedCommonBuildingAndAddress_ThenBuildingUnitWasRemovedAndAddressesWereDetached()
+        {
+            var command = Fixture.Create<RemoveBuildingUnit>();
+
+            var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
+                .WithBuildingStatus(BuildingStatus.Realized)
+                .WithBuildingUnit(
+                    BuildingUnitStatus.Realized,
+                    new BuildingUnitPersistentLocalId(command.BuildingUnitPersistentLocalId + 1),
+                    function: BuildingUnitFunction.Common,
+                    isRemoved: false)
+                .WithBuildingUnit(
+                    BuildingUnitStatus.Retired,
+                    command.BuildingUnitPersistentLocalId,
+                    attachedAddresses: new List<AddressPersistentLocalId> { new AddressPersistentLocalId(123) },
+                    function: BuildingUnitFunction.Common,
+                    isRemoved: false)
+                .Build();
+
+            Assert(new Scenario()
+                .Given(
+                    new BuildingStreamId(Fixture.Create<BuildingPersistentLocalId>()),
+                    buildingWasMigrated)
+                .When(command)
+                .Then(
+                    new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
+                        new BuildingUnitAddressWasDetachedV2(command.BuildingPersistentLocalId, command.BuildingUnitPersistentLocalId, new AddressPersistentLocalId(123))),
+                    new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
+                        new BuildingUnitWasRemovedV2(command.BuildingPersistentLocalId, command.BuildingUnitPersistentLocalId))));
         }
 
         [Fact]

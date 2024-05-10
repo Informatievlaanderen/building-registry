@@ -15,6 +15,7 @@ namespace BuildingRegistry.Building
         private ProvenanceData _lastSnapshotProvenance;
 
         private readonly BuildingUnits _buildingUnits = new BuildingUnits();
+        private readonly List<BuildingUnit> _unusedCommonUnits = new ();
 
         public BuildingPersistentLocalId BuildingPersistentLocalId { get; private set; }
         public BuildingStatus BuildingStatus { get; private set; }
@@ -124,16 +125,12 @@ namespace BuildingRegistry.Building
                             .Where(x =>!activeBuildingUnitStatuses.Contains(BuildingStatus.Parse(x.Status)))
                             .ToList();
 
-                        commonBuildingUnit = notRealizedOrRetiredCommonBuildingUnits
-                            .OrderByDescending(x => x.BuildingUnitPersistentLocalId)
-                            .FirstOrDefault();
+                        commonBuildingUnit = notRealizedOrRetiredCommonBuildingUnits.MaxBy(x => x.BuildingUnitPersistentLocalId);
                     }
                 }
                 else if (commonBuildingUnit is null)
                 {
-                    commonBuildingUnit = commonBuildingUnits
-                        .OrderByDescending(x => x.BuildingUnitPersistentLocalId)
-                        .FirstOrDefault();
+                    commonBuildingUnit = commonBuildingUnits.MaxBy(x => x.BuildingUnitPersistentLocalId);
                 }
             }
 
@@ -160,6 +157,27 @@ namespace BuildingRegistry.Building
 
                 newBuildingUnit.Route(@event);
                 _buildingUnits.Add(newBuildingUnit);
+            }
+
+            foreach (var buildingUnit in commonBuildingUnits.Where(x => x != commonBuildingUnit))
+            {
+                var newBuildingUnit = BuildingUnit.Migrate(
+                    ApplyChange,
+                    BuildingPersistentLocalId,
+                    new BuildingUnitPersistentLocalId(buildingUnit.BuildingUnitPersistentLocalId),
+                    BuildingUnitFunction.Parse(buildingUnit.Function),
+                    BuildingUnitStatus.Parse(buildingUnit.Status),
+                    buildingUnit.AddressPersistentLocalIds
+                        .Distinct()
+                        .ToList()
+                        .ConvertAll(x => new AddressPersistentLocalId(x)),
+                    new BuildingUnitPosition(
+                        new ExtendedWkbGeometry(buildingUnit.ExtendedWkbGeometry),
+                        BuildingUnitPositionGeometryMethod.Parse(buildingUnit.GeometryMethod)),
+                    buildingUnit.IsRemoved);
+
+                newBuildingUnit.Route(@event);
+                _unusedCommonUnits.Add(newBuildingUnit);
             }
 
             _lastEvent = @event;
@@ -318,7 +336,7 @@ namespace BuildingRegistry.Building
 
         private void When(BuildingUnitWasRemovedV2 @event)
         {
-            RouteToBuildingUnit(@event);
+            RouteWithUnusedCommonUnits(@event);
 
             _lastEvent = @event;
         }
@@ -352,13 +370,13 @@ namespace BuildingRegistry.Building
 
         private void When(BuildingUnitAddressWasAttachedV2 @event) => RouteToBuildingUnit(@event);
 
-        private void When(BuildingUnitAddressWasDetachedV2 @event) => RouteToBuildingUnit(@event);
+        private void When(BuildingUnitAddressWasDetachedV2 @event) => RouteWithUnusedCommonUnits(@event);
 
-        private void When(BuildingUnitAddressWasDetachedBecauseAddressWasRejected @event) => RouteToBuildingUnit(@event);
+        private void When(BuildingUnitAddressWasDetachedBecauseAddressWasRejected @event) => RouteWithUnusedCommonUnits(@event);
 
-        private void When(BuildingUnitAddressWasDetachedBecauseAddressWasRetired @event) => RouteToBuildingUnit(@event);
+        private void When(BuildingUnitAddressWasDetachedBecauseAddressWasRetired @event) => RouteWithUnusedCommonUnits(@event);
 
-        private void When(BuildingUnitAddressWasDetachedBecauseAddressWasRemoved @event) => RouteToBuildingUnit(@event);
+        private void When(BuildingUnitAddressWasDetachedBecauseAddressWasRemoved @event) => RouteWithUnusedCommonUnits(@event);
 
         private void When(BuildingUnitAddressWasReplacedBecauseAddressWasReaddressed @event) => RouteToBuildingUnit(@event);
 
@@ -406,6 +424,21 @@ namespace BuildingRegistry.Building
             _buildingUnits.Remove(buildingUnit);
 
             _lastEvent = @event;
+        }
+
+        private void RouteWithUnusedCommonUnits<TEvent>(TEvent @event)
+            where TEvent : IBuildingEvent, IHasBuildingUnitPersistentLocalId
+        {
+            var unusedCommonUnit = _unusedCommonUnits.SingleOrDefault(
+                x => x.BuildingUnitPersistentLocalId == new BuildingUnitPersistentLocalId(@event.BuildingUnitPersistentLocalId));
+            if (unusedCommonUnit is not null)
+            {
+                unusedCommonUnit.Route(@event);
+            }
+            else
+            {
+                RouteToBuildingUnit(@event);
+            }
         }
 
         private void RouteToBuildingUnit<TEvent>(TEvent @event)

@@ -36,7 +36,7 @@ namespace BuildingRegistry.Building
 
             return unit;
         }
-        
+
         public void Realize()
         {
             GuardRemoved();
@@ -370,7 +370,7 @@ namespace BuildingRegistry.Building
             Apply(new BuildingUnitAddressWasAttachedV2(_buildingPersistentLocalId, BuildingUnitPersistentLocalId, addressPersistentLocalId));
         }
 
-        public void DetachAddress(AddressPersistentLocalId addressPersistentLocalId, IAddresses addresses)
+        public void DetachAddress(AddressPersistentLocalId addressPersistentLocalId)
         {
             GuardRemoved();
 
@@ -378,10 +378,6 @@ namespace BuildingRegistry.Building
             {
                 return;
             }
-
-            var address = addresses.GetOptional(addressPersistentLocalId);
-
-            GuardRemovedAddress(address);
 
             Apply(new BuildingUnitAddressWasDetachedV2(_buildingPersistentLocalId, BuildingUnitPersistentLocalId, addressPersistentLocalId));
         }

@@ -207,7 +207,7 @@ namespace BuildingRegistry.Building
                     var streamId = new BuildingStreamId(message.Command.BuildingPersistentLocalId);
                     var building = await buildingRepository().GetAsync(streamId, ct);
 
-                    building.DetachAddressFromBuildingUnit(addresses, message.Command.BuildingUnitPersistentLocalId, message.Command.AddressPersistentLocalId);
+                    building.DetachAddressFromBuildingUnit(message.Command.BuildingUnitPersistentLocalId, message.Command.AddressPersistentLocalId);
                 });
 
             For<DetachAddressFromBuildingUnitBecauseAddressWasRejected>()
