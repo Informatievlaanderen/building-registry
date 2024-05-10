@@ -1,3 +1,10 @@
+# [4.5.0](https://github.com/informatievlaanderen/building-registry/compare/v4.4.0...v4.5.0) (2024-05-10)
+
+
+### Features
+
+* allow unused common units to remove or detach address ([6ed8c05](https://github.com/informatievlaanderen/building-registry/commit/6ed8c0581548ce7e2b4802bbcbc55c79136cac64))
+
 # [4.4.0](https://github.com/informatievlaanderen/building-registry/compare/v4.3.4...v4.4.0) (2024-04-29)
 
 
