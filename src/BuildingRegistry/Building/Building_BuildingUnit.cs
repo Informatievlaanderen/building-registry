@@ -78,6 +78,27 @@ namespace BuildingRegistry.Building
 
         public void RemoveBuildingUnit(BuildingUnitPersistentLocalId buildingUnitPersistentLocalId)
         {
+            var unusedCommonUnit = _unusedCommonUnits.SingleOrDefault(x => x.BuildingUnitPersistentLocalId == buildingUnitPersistentLocalId);
+            if (unusedCommonUnit is not null)
+            {
+                if(!unusedCommonUnit.IsRemoved)
+                {
+                    foreach (var addressPersistentLocalId in unusedCommonUnit.AddressPersistentLocalIds.ToList())
+                    {
+                        ApplyChange(new BuildingUnitAddressWasDetachedV2(
+                            BuildingPersistentLocalId,
+                            buildingUnitPersistentLocalId,
+                            addressPersistentLocalId));
+                    }
+
+                    ApplyChange(new BuildingUnitWasRemovedV2(
+                        BuildingPersistentLocalId,
+                        unusedCommonUnit.BuildingUnitPersistentLocalId));
+                }
+
+                return;
+            }
+
             _buildingUnits
                 .GetByPersistentLocalId(buildingUnitPersistentLocalId)
                 .Remove();
@@ -204,18 +225,34 @@ namespace BuildingRegistry.Building
         }
 
         public void DetachAddressFromBuildingUnit(
-            IAddresses addresses,
             BuildingUnitPersistentLocalId buildingUnitPersistentLocalId,
             AddressPersistentLocalId addressPersistentLocalId)
         {
+            var unusedCommonUnit = _unusedCommonUnits.SingleOrDefault(x => x.BuildingUnitPersistentLocalId == buildingUnitPersistentLocalId);
+            if (unusedCommonUnit is not null)
+            {
+                if(unusedCommonUnit.AddressPersistentLocalIds.Contains(addressPersistentLocalId))
+                    ApplyChange(new BuildingUnitAddressWasDetachedV2(BuildingPersistentLocalId, buildingUnitPersistentLocalId, addressPersistentLocalId));
+
+                return;
+            }
             _buildingUnits
                 .GetNotRemovedByPersistentLocalId(buildingUnitPersistentLocalId)
-                .DetachAddress(addressPersistentLocalId, addresses);
+                .DetachAddress(addressPersistentLocalId);
         }
+
         public void DetachAddressFromBuildingUnitBecauseAddressWasRejected(
             BuildingUnitPersistentLocalId buildingUnitPersistentLocalId,
             AddressPersistentLocalId addressPersistentLocalId)
         {
+            var unusedCommonUnit = _unusedCommonUnits.SingleOrDefault(x => x.BuildingUnitPersistentLocalId == buildingUnitPersistentLocalId);
+            if (unusedCommonUnit is not null)
+            {
+                if(unusedCommonUnit.AddressPersistentLocalIds.Contains(addressPersistentLocalId))
+                    ApplyChange(new BuildingUnitAddressWasDetachedBecauseAddressWasRejected(BuildingPersistentLocalId, buildingUnitPersistentLocalId, addressPersistentLocalId));
+
+                return;
+            }
             _buildingUnits
                 .GetNotRemovedByPersistentLocalId(buildingUnitPersistentLocalId)
                 .DetachAddressBecauseAddressWasRejected(addressPersistentLocalId);
@@ -225,6 +262,14 @@ namespace BuildingRegistry.Building
             BuildingUnitPersistentLocalId buildingUnitPersistentLocalId,
             AddressPersistentLocalId addressPersistentLocalId)
         {
+            var unusedCommonUnit = _unusedCommonUnits.SingleOrDefault(x => x.BuildingUnitPersistentLocalId == buildingUnitPersistentLocalId);
+            if (unusedCommonUnit is not null)
+            {
+                if(unusedCommonUnit.AddressPersistentLocalIds.Contains(addressPersistentLocalId))
+                    ApplyChange(new BuildingUnitAddressWasDetachedBecauseAddressWasRetired(BuildingPersistentLocalId, buildingUnitPersistentLocalId, addressPersistentLocalId));
+
+                return;
+            }
             _buildingUnits
                 .GetNotRemovedByPersistentLocalId(buildingUnitPersistentLocalId)
                 .DetachAddressBecauseAddressWasRetired(addressPersistentLocalId);
@@ -234,6 +279,14 @@ namespace BuildingRegistry.Building
             BuildingUnitPersistentLocalId buildingUnitPersistentLocalId,
             AddressPersistentLocalId addressPersistentLocalId)
         {
+            var unusedCommonUnit = _unusedCommonUnits.SingleOrDefault(x => x.BuildingUnitPersistentLocalId == buildingUnitPersistentLocalId);
+            if (unusedCommonUnit is not null)
+            {
+                if(unusedCommonUnit.AddressPersistentLocalIds.Contains(addressPersistentLocalId))
+                    ApplyChange(new BuildingUnitAddressWasDetachedBecauseAddressWasRemoved(BuildingPersistentLocalId, buildingUnitPersistentLocalId, addressPersistentLocalId));
+
+                return;
+            }
             _buildingUnits
                 .GetNotRemovedByPersistentLocalId(buildingUnitPersistentLocalId)
                 .DetachAddressBecauseAddressWasRemoved(addressPersistentLocalId);
@@ -246,7 +299,8 @@ namespace BuildingRegistry.Building
         {
             _buildingUnits
                 .GetByPersistentLocalId(buildingUnitPersistentLocalId)
-                .ReplaceAddressAttachmentFromBuildingUnitBecauseStreetNameWasReaddressed(previousAddressPersistentLocalId, newAddressPersistentLocalId);
+                .ReplaceAddressAttachmentFromBuildingUnitBecauseStreetNameWasReaddressed(previousAddressPersistentLocalId,
+                    newAddressPersistentLocalId);
         }
 
         public void MoveBuildingUnitInto(

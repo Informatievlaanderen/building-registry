@@ -17,6 +17,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenDetachingAddressFromBuilding
     using FluentAssertions;
     using Xunit;
     using Xunit.Abstractions;
+    using BuildingUnitFunction = BuildingRegistry.Legacy.BuildingUnitFunction;
     using BuildingUnitStatus = BuildingRegistry.Legacy.BuildingUnitStatus;
 
     public class GivenBuildingWithBuildingUnit : BuildingRegistryTest
@@ -86,6 +87,40 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenDetachingAddressFromBuilding
 
             sut.BuildingUnits.First().AddressPersistentLocalIds.Should().BeEquivalentTo(
                 new List<AddressPersistentLocalId>{ new AddressPersistentLocalId(expectedPersistentLocalId) });
+        }
+
+        [Fact]
+        public void WithUnusedCommonUnit_ThenApplyBuildingUnitAddressWasDetachedV2()
+        {
+            var command = Fixture.Create<DetachAddressFromBuildingUnit>();
+
+            var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
+                .WithBuildingPersistentLocalId(command.BuildingPersistentLocalId)
+                .WithBuildingUnit(
+                    BuildingUnitStatus.Realized,
+                    new BuildingUnitPersistentLocalId(command.BuildingUnitPersistentLocalId + 1),
+                    attachedAddresses: new List<AddressPersistentLocalId> { command.AddressPersistentLocalId },
+                    function: BuildingUnitFunction.Common,
+                    isRemoved: false)
+                .WithBuildingUnit(
+                    BuildingUnitStatus.Retired,
+                    command.BuildingUnitPersistentLocalId,
+                    attachedAddresses: new List<AddressPersistentLocalId> { command.AddressPersistentLocalId },
+                    function: BuildingUnitFunction.Common,
+                    isRemoved: false)
+                .Build();
+
+            Assert(new Scenario()
+                .Given(
+                    new BuildingStreamId(command.BuildingPersistentLocalId),
+                    buildingWasMigrated)
+                .When(command)
+                .Then(new Fact(
+                    new BuildingStreamId(command.BuildingPersistentLocalId),
+                    new BuildingUnitAddressWasDetachedV2(
+                        command.BuildingPersistentLocalId,
+                        command.BuildingUnitPersistentLocalId,
+                        command.AddressPersistentLocalId))));
         }
     }
 }
