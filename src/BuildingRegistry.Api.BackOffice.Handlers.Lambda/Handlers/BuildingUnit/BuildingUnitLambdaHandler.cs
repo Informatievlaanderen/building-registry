@@ -67,8 +67,11 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.BuildingUnit
             var aggregate =
                 await _buildings.GetAsync(new BuildingStreamId(new BuildingPersistentLocalId(buildingPersistentLocalId)), cancellationToken);
 
-            var buildingUnit = aggregate.BuildingUnits.Single(
+            var buildingUnit = aggregate.UnusedCommonUnits.SingleOrDefault(
                 x => x.BuildingUnitPersistentLocalId == buildingUnitPersistentLocalId);
+
+            if(buildingUnit is null)
+                buildingUnit = aggregate.BuildingUnits.Single(x => x.BuildingUnitPersistentLocalId == buildingUnitPersistentLocalId);
 
             return buildingUnit.LastEventHash;
         }

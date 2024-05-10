@@ -23,6 +23,7 @@ namespace BuildingRegistry.Building
         public bool IsRemoved { get; private set; }
 
         public IReadOnlyList<BuildingUnit> BuildingUnits => _buildingUnits;
+        public IReadOnlyList<BuildingUnit> UnusedCommonUnits => _unusedCommonUnits;
 
         public string LastEventHash => _lastEvent is null ? _lastSnapshotEventHash : _lastEvent.GetHash();
 
