@@ -1,3 +1,10 @@
+## [4.5.1](https://github.com/informatievlaanderen/building-registry/compare/v4.5.0...v4.5.1) (2024-05-10)
+
+
+### Bug Fixes
+
+* get hash from unused common units ([4617b92](https://github.com/informatievlaanderen/building-registry/commit/4617b92b66d7304dda52904af80c2e07ec7cb3bf))
+
 # [4.5.0](https://github.com/informatievlaanderen/building-registry/compare/v4.4.0...v4.5.0) (2024-05-10)
 
 
