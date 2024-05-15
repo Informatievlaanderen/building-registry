@@ -1,12 +1,13 @@
 namespace BuildingRegistry.Projections.BackOffice
 {
+    using System;
+    using System.Threading.Tasks;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.Connector;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore;
     using BuildingRegistry.Api.BackOffice.Abstractions;
     using Building;
     using Building.Events;
     using Microsoft.EntityFrameworkCore;
-    using System.Threading;
 
     public class BackOfficeProjections : ConnectedProjection<BackOfficeProjectionsContext>
     {
@@ -16,14 +17,18 @@ namespace BuildingRegistry.Projections.BackOffice
             {
                 await using var backOfficeContext = await backOfficeContextFactory.CreateDbContextAsync(cancellationToken);
                 await backOfficeContext.AddIdempotentBuildingUnitBuilding(
-                    new BuildingPersistentLocalId(message.Message.BuildingPersistentLocalId), new BuildingUnitPersistentLocalId(message.Message.BuildingUnitPersistentLocalId), cancellationToken);
+                    new BuildingPersistentLocalId(message.Message.BuildingPersistentLocalId),
+                    new BuildingUnitPersistentLocalId(message.Message.BuildingUnitPersistentLocalId),
+                    cancellationToken);
             });
 
             When<Envelope<CommonBuildingUnitWasAddedV2>>(async (_, message, cancellationToken) =>
             {
                 await using var backOfficeContext = await backOfficeContextFactory.CreateDbContextAsync(cancellationToken);
                 await backOfficeContext.AddIdempotentBuildingUnitBuilding(
-                    new BuildingPersistentLocalId(message.Message.BuildingPersistentLocalId), new BuildingUnitPersistentLocalId(message.Message.BuildingUnitPersistentLocalId), cancellationToken);
+                    new BuildingPersistentLocalId(message.Message.BuildingPersistentLocalId),
+                    new BuildingUnitPersistentLocalId(message.Message.BuildingUnitPersistentLocalId),
+                    cancellationToken);
             });
 
             When<Envelope<BuildingUnitAddressWasAttachedV2>>(async (_, message, cancellationToken) =>
