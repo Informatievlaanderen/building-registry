@@ -1,10 +1,12 @@
 namespace BuildingRegistry.Consumer.Address.Projections
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
     using Api.BackOffice.Abstractions;
+    using Be.Vlaanderen.Basisregisters.CommandHandling.Idempotency;
     using Be.Vlaanderen.Basisregisters.GrAr.Contracts.AddressRegistry;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.Connector;
@@ -159,28 +161,90 @@ namespace BuildingRegistry.Consumer.Address.Projections
                     ct);
             });
 
-            When<AddressHouseNumberWasReaddressed>(async (commandHandler, message, ct) =>
-            {
+            // When<AddressHouseNumberWasReaddressed>(async (commandHandler, message, ct) =>
+            // {
+            //     await using var backOfficeContext = await _backOfficeContextFactory.CreateDbContextAsync(ct);
+            //
+            //     await DetachAttachReaddressedAddress(
+            //         backOfficeContext,
+            //         commandHandler,
+            //         message.ReaddressedHouseNumber.SourceAddressPersistentLocalId,
+            //         message.ReaddressedHouseNumber.DestinationAddressPersistentLocalId,
+            //         message.Provenance,
+            //         ct);
+            //
+            //     foreach (var readdressedBoxNumber in message.ReaddressedBoxNumbers)
+            //     {
+            //         await DetachAttachReaddressedAddress(
+            //             backOfficeContext,
+            //             commandHandler,
+            //             readdressedBoxNumber.SourceAddressPersistentLocalId,
+            //             readdressedBoxNumber.DestinationAddressPersistentLocalId,
+            //             message.Provenance,
+            //             ct);
+            //     }
+            // });
 
+            When<StreetNameWasReaddressed>(async (commandHandler, message, ct) =>
+            {
                 await using var backOfficeContext = await _backOfficeContextFactory.CreateDbContextAsync(ct);
 
-                await DetachAttachReaddressedAddress(
-                    backOfficeContext,
-                    commandHandler,
-                    message.ReaddressedHouseNumber.SourceAddressPersistentLocalId,
-                    message.ReaddressedHouseNumber.DestinationAddressPersistentLocalId,
-                    message.Provenance,
-                    ct);
+                var readdresses = message.ReaddressedHouseNumbers
+                    .Select(x => new ReaddressData(
+                        new AddressPersistentLocalId(x.ReaddressedHouseNumber.SourceAddressPersistentLocalId),
+                        new AddressPersistentLocalId(x.ReaddressedHouseNumber.DestinationAddressPersistentLocalId)))
+                    .Concat(
+                        message.ReaddressedHouseNumbers
+                            .SelectMany(x => x.ReaddressedBoxNumbers)
+                            .Select(boxNumberAddress => new ReaddressData(
+                                new AddressPersistentLocalId(boxNumberAddress.SourceAddressPersistentLocalId),
+                                new AddressPersistentLocalId(boxNumberAddress.DestinationAddressPersistentLocalId))))
+                    .ToList();
 
-                foreach (var readdressedBoxNumber in message.ReaddressedBoxNumbers)
+                var sourceAddressPersistentLocalIds = readdresses
+                    .Select(x => (int)x.SourceAddressPersistentLocalId)
+                    .ToList();
+
+                var buildingUnitAddressRelations = await backOfficeContext.BuildingUnitAddressRelation
+                    .AsNoTracking()
+                    .Where(x => sourceAddressPersistentLocalIds.Contains(x.AddressPersistentLocalId))
+                    .ToListAsync(cancellationToken: ct);
+
+                var commandByBuildings = new Dictionary<BuildingPersistentLocalId, ReaddressAddresses>();
+                foreach (var addressRelationsByBuilding in buildingUnitAddressRelations.GroupBy(x => x.BuildingPersistentLocalId))
                 {
-                    await DetachAttachReaddressedAddress(
-                        backOfficeContext,
-                        commandHandler,
-                        readdressedBoxNumber.SourceAddressPersistentLocalId,
-                        readdressedBoxNumber.DestinationAddressPersistentLocalId,
-                        message.Provenance,
-                        ct);
+                    var addressesByBuildingUnit = new Dictionary<BuildingUnitPersistentLocalId, IEnumerable<ReaddressData>>();
+                    foreach (var buildingUnitAddressRelation in buildingUnitAddressRelations)
+                    {
+                        var readdressData = readdresses
+                            .Where(x => x.SourceAddressPersistentLocalId == buildingUnitAddressRelation.AddressPersistentLocalId)
+                            .ToList();
+
+                        if (readdressData.Any())
+                        {
+                            addressesByBuildingUnit.Add(
+                                new BuildingUnitPersistentLocalId(buildingUnitAddressRelation.BuildingUnitPersistentLocalId),
+                                readdressData);
+                        }
+                    }
+
+                    var buildingPersistentLocalId = new BuildingPersistentLocalId(addressRelationsByBuilding.Key);
+                    commandByBuildings.Add(
+                        buildingPersistentLocalId,
+                        new ReaddressAddresses(buildingPersistentLocalId, addressesByBuildingUnit, FromProvenance(message.Provenance)));
+                }
+
+                foreach (var command in commandByBuildings.Values)
+                {
+                    try
+                    {
+                        await commandHandler.HandleIdempotent(command, ct);
+                        //TODO: add backoffice context
+                    }
+                    catch (IdempotencyException)
+                    {
+                        continue;
+                    }
                 }
             });
 

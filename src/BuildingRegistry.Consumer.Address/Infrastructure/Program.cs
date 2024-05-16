@@ -9,6 +9,7 @@ namespace BuildingRegistry.Consumer.Address.Infrastructure
     using Autofac;
     using Autofac.Extensions.DependencyInjection;
     using Be.Vlaanderen.Basisregisters.Aws.DistributedMutex;
+    using Be.Vlaanderen.Basisregisters.CommandHandling.Idempotency;
     using Be.Vlaanderen.Basisregisters.EventHandling;
     using Be.Vlaanderen.Basisregisters.MessageHandling.Kafka;
     using Be.Vlaanderen.Basisregisters.MessageHandling.Kafka.Consumer;
@@ -151,6 +152,11 @@ namespace BuildingRegistry.Consumer.Address.Infrastructure
                         .RegisterType<ConsumerAddress>()
                         .As<IHostedService>()
                         .SingleInstance();
+
+                    builder.RegisterType<IdempotentCommandHandler>()
+                        .As<IIdempotentCommandHandler>()
+                        .AsSelf()
+                        .InstancePerLifetimeScope();
 
                     builder.Populate(services);
                 })
