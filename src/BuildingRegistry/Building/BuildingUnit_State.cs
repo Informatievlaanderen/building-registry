@@ -61,6 +61,7 @@ namespace BuildingRegistry.Building
             Register<BuildingUnitAddressWasDetachedBecauseAddressWasRetired>(When);
             Register<BuildingUnitAddressWasDetachedBecauseAddressWasRemoved>(When);
             Register<BuildingUnitAddressWasReplacedBecauseAddressWasReaddressed>(When);
+            Register<BuildingBuildingUnitsAddressesWereReaddressed>(When);
             Register<BuildingUnitWasNotRealizedBecauseBuildingWasDemolished>(When);
             Register<BuildingUnitWasRetiredBecauseBuildingWasDemolished>(When);
             Register<BuildingMeasurementWasChanged>(When);
@@ -304,6 +305,24 @@ namespace BuildingRegistry.Building
                 _addressPersistentLocalIds.Add(new AddressPersistentLocalId(@event.NewAddressPersistentLocalId));
             }
 
+            _lastEvent = @event;
+        }
+
+        private void When(BuildingBuildingUnitsAddressesWereReaddressed @event)
+        {
+            var buildingUnitReaddress = @event.BuildingUnitsReaddresses
+                .Single(x => x.BuildingUnitPersistentLocalId == BuildingUnitPersistentLocalId);
+
+            foreach (var addressPersistentLocalId in buildingUnitReaddress.DetachedAddressPersistentLocalIds)
+            {
+                _addressPersistentLocalIds.Remove(new AddressPersistentLocalId(addressPersistentLocalId));
+            }
+
+            foreach (var addressPersistentLocalId in buildingUnitReaddress.AttachedAddressPersistentLocalIds)
+            {
+                _addressPersistentLocalIds.Add(new AddressPersistentLocalId(addressPersistentLocalId));
+            }
+            
             _lastEvent = @event;
         }
 

@@ -4,6 +4,8 @@ namespace BuildingRegistry.Building
     using System.Linq;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
     using Be.Vlaanderen.Basisregisters.AggregateSource.Snapshotting;
+    using Be.Vlaanderen.Basisregisters.GrAr.Common;
+    using BuildingRegistry.Building.Commands;
     using Events;
     using Exceptions;
     using NetTopologySuite.Geometries;
@@ -249,6 +251,30 @@ namespace BuildingRegistry.Building
                 buildingUnitsWithPositionDerivedFromBuilding,
                 extendedWkbGeometry,
                 buildingUnitsPosition));
+        }
+
+        public void ReaddressAddresses(IReadOnlyDictionary<BuildingUnitPersistentLocalId, IReadOnlyList<ReaddressData>> readdresses)
+        {
+            var buildingUnitReaddresses = readdresses
+                .Select(readdressesEntry =>
+                {
+                    var buildingUnit = _buildingUnits.GetByPersistentLocalId(readdressesEntry.Key);
+                    return buildingUnit.BuildBuildingUnitAddressesWereReaddressed(readdressesEntry.Value);
+                })
+                .Where(x => x is not null)
+                .Select(x => x!)
+                .ToList();
+
+            if (!buildingUnitReaddresses.Any())
+            {
+                return;
+            }
+
+            ApplyChange(new BuildingBuildingUnitsAddressesWereReaddressed(
+                BuildingPersistentLocalId,
+                buildingUnitReaddresses,
+                readdresses.SelectMany(x => x.Value).Select(x => new AddressRegistryReaddress(x))
+            ));
         }
 
         private void GuardRemovedBuilding()

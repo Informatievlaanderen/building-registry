@@ -1,4 +1,4 @@
-﻿namespace BuildingRegistry.Building.Commands
+namespace BuildingRegistry.Building.Commands
 {
     using System;
     using System.Collections.Generic;
@@ -8,17 +8,16 @@
 
     public class ReaddressAddresses : IHasCommandProvenance
     {
-        private static readonly Guid Namespace = new Guid("646d3ef7-6cbc-4b33-b75f-e5d72e48c356");
+        private static readonly Guid Namespace = new Guid("444c245f-b4ab-463d-bbe2-c88769953481");
         public BuildingPersistentLocalId BuildingPersistentLocalId { get; }
-        public Dictionary<BuildingUnitPersistentLocalId, IEnumerable<ReaddressData>> Readdresses { get; }
+        public IReadOnlyDictionary<BuildingUnitPersistentLocalId, IReadOnlyList<ReaddressData>> Readdresses { get; }
         public Provenance Provenance { get; }
 
         public ReaddressAddresses(
             BuildingPersistentLocalId buildingPersistentLocalId,
-            Dictionary<BuildingUnitPersistentLocalId, IEnumerable<ReaddressData>> readdresses,
+            IReadOnlyDictionary<BuildingUnitPersistentLocalId, IReadOnlyList<ReaddressData>> readdresses,
             Provenance provenance)
         {
-
             BuildingPersistentLocalId = buildingPersistentLocalId;
             Readdresses = readdresses;
             Provenance = provenance;

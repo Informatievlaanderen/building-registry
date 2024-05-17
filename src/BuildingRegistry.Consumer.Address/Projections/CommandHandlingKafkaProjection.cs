@@ -213,7 +213,7 @@ namespace BuildingRegistry.Consumer.Address.Projections
                 var commandByBuildings = new Dictionary<BuildingPersistentLocalId, ReaddressAddresses>();
                 foreach (var addressRelationsByBuilding in buildingUnitAddressRelations.GroupBy(x => x.BuildingPersistentLocalId))
                 {
-                    var addressesByBuildingUnit = new Dictionary<BuildingUnitPersistentLocalId, IEnumerable<ReaddressData>>();
+                    var addressesByBuildingUnit = new Dictionary<BuildingUnitPersistentLocalId, IReadOnlyList<ReaddressData>>();
                     foreach (var buildingUnitAddressRelation in buildingUnitAddressRelations)
                     {
                         var readdressData = readdresses
@@ -239,13 +239,14 @@ namespace BuildingRegistry.Consumer.Address.Projections
                     try
                     {
                         await commandHandler.HandleIdempotent(command, ct);
-                        //TODO: add backoffice context
                     }
                     catch (IdempotencyException)
                     {
                         continue;
                     }
                 }
+
+                //TODO: add backoffice context
             });
 
             When<AddressWasRejectedBecauseOfReaddress>(async (commandHandler, message, ct) =>
@@ -267,41 +268,41 @@ namespace BuildingRegistry.Consumer.Address.Projections
             });
         }
 
-        private static async Task DetachAttachReaddressedAddress(
-            BackOfficeContext backOfficeContext,
-            CommandHandler commandHandler,
-            int sourceAddressPersistentLocalId,
-            int destinationAddressPersistentLocalId,
-            Contracts.Provenance provenance,
-            CancellationToken ct)
-        {
-            var relations = backOfficeContext.BuildingUnitAddressRelation
-                .AsNoTracking()
-                .Where(x => x.AddressPersistentLocalId == new AddressPersistentLocalId(sourceAddressPersistentLocalId))
-                .ToList();
+        //private static async Task DetachAttachReaddressedAddress(
+        //    BackOfficeContext backOfficeContext,
+        //    CommandHandler commandHandler,
+        //    int sourceAddressPersistentLocalId,
+        //    int destinationAddressPersistentLocalId,
+        //    Contracts.Provenance provenance,
+        //    CancellationToken ct)
+        //{
+        //    var relations = backOfficeContext.BuildingUnitAddressRelation
+        //        .AsNoTracking()
+        //        .Where(x => x.AddressPersistentLocalId == new AddressPersistentLocalId(sourceAddressPersistentLocalId))
+        //        .ToList();
 
-            foreach (var relation in relations)
-            {
-                var command = new ReplaceAddressAttachmentFromBuildingUnitBecauseAddressWasReaddressed(
-                    new BuildingPersistentLocalId(relation.BuildingPersistentLocalId),
-                    new BuildingUnitPersistentLocalId(relation.BuildingUnitPersistentLocalId),
-                    previousAddressPersistentLocalId: new AddressPersistentLocalId(relation.AddressPersistentLocalId),
-                    newAddressPersistentLocalId: new AddressPersistentLocalId(destinationAddressPersistentLocalId),
-                    FromProvenance(provenance));
-                await commandHandler.Handle(command, ct);
+        //    foreach (var relation in relations)
+        //    {
+        //        var command = new ReplaceAddressAttachmentFromBuildingUnitBecauseAddressWasReaddressed(
+        //            new BuildingPersistentLocalId(relation.BuildingPersistentLocalId),
+        //            new BuildingUnitPersistentLocalId(relation.BuildingUnitPersistentLocalId),
+        //            previousAddressPersistentLocalId: new AddressPersistentLocalId(relation.AddressPersistentLocalId),
+        //            newAddressPersistentLocalId: new AddressPersistentLocalId(destinationAddressPersistentLocalId),
+        //            FromProvenance(provenance));
+        //        await commandHandler.Handle(command, ct);
 
-                await backOfficeContext.RemoveIdempotentBuildingUnitAddressRelation(
-                    command.BuildingUnitPersistentLocalId,
-                    command.PreviousAddressPersistentLocalId,
-                    ct);
+        //        await backOfficeContext.RemoveIdempotentBuildingUnitAddressRelation(
+        //            command.BuildingUnitPersistentLocalId,
+        //            command.PreviousAddressPersistentLocalId,
+        //            ct);
 
-                await backOfficeContext.AddIdempotentBuildingUnitAddressRelation(
-                    command.BuildingPersistentLocalId,
-                    command.BuildingUnitPersistentLocalId,
-                    command.NewAddressPersistentLocalId,
-                    ct);
-            }
-        }
+        //        await backOfficeContext.AddIdempotentBuildingUnitAddressRelation(
+        //            command.BuildingPersistentLocalId,
+        //            command.BuildingUnitPersistentLocalId,
+        //            command.NewAddressPersistentLocalId,
+        //            ct);
+        //    }
+        //}
 
         private async Task DetachBecauseRemoved(
             CommandHandler commandHandler,

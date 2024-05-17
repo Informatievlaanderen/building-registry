@@ -5,6 +5,7 @@ namespace BuildingRegistry.Tests
     using System.Linq;
     using System.Reflection;
     using System.Runtime.CompilerServices;
+    using BuildingRegistry.Building.Commands;
     using FluentAssertions;
     using Xunit;
     public class InfrastructureCommandsTests
@@ -27,7 +28,12 @@ namespace BuildingRegistry.Tests
 
             _commandTypes = domainAssembly
                 .GetTypes()
-                .Where(t => t.IsClass && t.Namespace != null && IsEventNamespace(t) && IsNotCompilerGenerated(t));
+                .Where(t => t.IsClass && t.Namespace != null && IsEventNamespace(t) && IsNotCompilerGenerated(t))
+                .Except(new[]
+                {
+                    typeof(ReaddressData)
+                })
+                ;
         }
 
         [Fact]

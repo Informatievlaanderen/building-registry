@@ -15,10 +15,6 @@ namespace BuildingRegistry.Projections.BackOffice
         {
             When<Envelope<BuildingUnitWasPlannedV2>>(async (_, message, cancellationToken) =>
             {
-                var timeToWait = 5 - DateTime.UtcNow.Subtract(message.CreatedUtc).TotalSeconds;
-                if (timeToWait > 0)
-                    await Task.Delay(TimeSpan.FromSeconds(timeToWait), cancellationToken);
-
                 await using var backOfficeContext = await backOfficeContextFactory.CreateDbContextAsync(cancellationToken);
                 await backOfficeContext.AddIdempotentBuildingUnitBuilding(
                     new BuildingPersistentLocalId(message.Message.BuildingPersistentLocalId),

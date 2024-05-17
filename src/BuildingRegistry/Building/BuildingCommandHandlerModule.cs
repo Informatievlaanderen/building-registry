@@ -239,6 +239,18 @@ namespace BuildingRegistry.Building
 
                     building.ChangeMeasurement(message.Command.Geometry, message.Command.GrbData);
                 });
+
+            For<ReaddressAddresses>()
+                .AddSqlStreamStore(getStreamStore, getUnitOfWork, eventMapping, eventSerializer, getSnapshotStore)
+                .AddEventHash<ReaddressAddresses, Building>(getUnitOfWork)
+                .AddProvenance(getUnitOfWork, provenanceFactory)
+                .Handle(async (message, ct) =>
+                {
+                    var streamId = new BuildingStreamId(message.Command.BuildingPersistentLocalId);
+                    var building = await buildingRepository().GetAsync(streamId, ct);
+                    
+                    building.ReaddressAddresses(message.Command.Readdresses);
+                });
         }
     }
 }

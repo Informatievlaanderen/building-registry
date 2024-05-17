@@ -291,18 +291,7 @@ namespace BuildingRegistry.Building
                 .GetNotRemovedByPersistentLocalId(buildingUnitPersistentLocalId)
                 .DetachAddressBecauseAddressWasRemoved(addressPersistentLocalId);
         }
-
-        public void ReplaceAddressAttachmentFromBuildingUnitBecauseStreetNameWasReaddressed(
-            BuildingUnitPersistentLocalId buildingUnitPersistentLocalId,
-            AddressPersistentLocalId previousAddressPersistentLocalId,
-            AddressPersistentLocalId newAddressPersistentLocalId)
-        {
-            _buildingUnits
-                .GetByPersistentLocalId(buildingUnitPersistentLocalId)
-                .ReplaceAddressAttachmentFromBuildingUnitBecauseStreetNameWasReaddressed(previousAddressPersistentLocalId,
-                    newAddressPersistentLocalId);
-        }
-
+        
         public void MoveBuildingUnitInto(
             Building sourceBuilding,
             BuildingUnitPersistentLocalId buildingUnitPersistentLocalId,

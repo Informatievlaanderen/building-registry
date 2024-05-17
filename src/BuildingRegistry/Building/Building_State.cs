@@ -78,6 +78,7 @@ namespace BuildingRegistry.Building
             Register<BuildingUnitAddressWasDetachedBecauseAddressWasRetired>(When);
             Register<BuildingUnitAddressWasDetachedBecauseAddressWasRemoved>(When);
             Register<BuildingUnitAddressWasReplacedBecauseAddressWasReaddressed>(When);
+            Register<BuildingBuildingUnitsAddressesWereReaddressed>(When);
             Register<BuildingUnitWasNotRealizedBecauseBuildingWasDemolished>(When);
             Register<BuildingUnitWasRetiredBecauseBuildingWasDemolished>(When);
             Register<BuildingMeasurementWasChanged>(When);
@@ -380,6 +381,16 @@ namespace BuildingRegistry.Building
         private void When(BuildingUnitAddressWasDetachedBecauseAddressWasRemoved @event) => RouteWithUnusedCommonUnits(@event);
 
         private void When(BuildingUnitAddressWasReplacedBecauseAddressWasReaddressed @event) => RouteToBuildingUnit(@event);
+
+        private void When(BuildingBuildingUnitsAddressesWereReaddressed @event)
+        {
+            foreach (var buildingUnitReaddress in @event.BuildingUnitsReaddresses)
+            {
+                var buildingUnit = BuildingUnits.Single(x => x.BuildingUnitPersistentLocalId == buildingUnitReaddress.BuildingUnitPersistentLocalId);
+
+                buildingUnit.Route(@event);
+            }
+        }
 
         private void When(BuildingWasDemolished @event)
         {
