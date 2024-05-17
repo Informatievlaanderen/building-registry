@@ -1,13 +1,17 @@
 namespace BuildingRegistry.Tests.AggregateTests.WhenReaddressingAddresses
 {
+    using System.Collections.Generic;
     using System.Linq;
     using AutoFixture;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
+    using Be.Vlaanderen.Basisregisters.AggregateSource.Snapshotting;
     using Be.Vlaanderen.Basisregisters.AggregateSource.Testing;
     using Building;
     using Building.Events;
+    using BuildingRegistry.Building.Commands;
     using Extensions;
     using Fixtures;
+    using FluentAssertions;
     using Xunit;
     using Xunit.Abstractions;
 
@@ -17,71 +21,67 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenReaddressingAddresses
         {
             Fixture.Customize(new WithFixedBuildingPersistentLocalId());
         }
-
-        //[Fact]
-        //public void ThenBuildingUnitAddressAttachmentWasReplacedBecauseAddressWasReaddressed()
-        //{
-        //    var command = Fixture.Create<ReaddressAddresses>();
-
-        //    var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
-        //        .WithBuildingPersistentLocalId(command.BuildingPersistentLocalId)
-        //        .WithBuildingUnit(
-        //            BuildingRegistry.Legacy.BuildingUnitStatus.Realized,
-        //            command.BuildingUnitPersistentLocalId,
-        //            attachedAddresses: new List<AddressPersistentLocalId>(){ command.PreviousAddressPersistentLocalId },
-        //            isRemoved: false)
-        //        .Build();
-
-        //    var consumerAddress = Container.Resolve<FakeConsumerAddressContext>();
-        //    consumerAddress.AddAddress(command.PreviousAddressPersistentLocalId, Consumer.Address.AddressStatus.Current, isRemoved: false);
-        //    consumerAddress.AddAddress(command.NewAddressPersistentLocalId, Consumer.Address.AddressStatus.Current, isRemoved: false);
-
-        //    var buildingUnit = buildingWasMigrated.BuildingUnits.First();
-        //    Assert(new Scenario()
-        //        .Given(
-        //            new BuildingStreamId(command.BuildingPersistentLocalId),
-        //            buildingWasMigrated)
-        //        .When(command)
-        //        .Then(new Fact(
-        //            new BuildingStreamId(command.BuildingPersistentLocalId),
-        //           new BuildingUnitAddressWasReplacedBecauseAddressWasReaddressed(
-        //               new BuildingPersistentLocalId(buildingWasMigrated.BuildingPersistentLocalId),
-        //               new BuildingUnitPersistentLocalId(buildingUnit.BuildingUnitPersistentLocalId),
-        //               new AddressPersistentLocalId(command.PreviousAddressPersistentLocalId),
-        //               new AddressPersistentLocalId(command.NewAddressPersistentLocalId)
-        //               ))));
-        //}
-
-        //[Fact]
-        //public void WithAlreadyReplacedAttachment_ThenBuildingUnitAddressAttachmentWasReplacedBecauseAddressWasReaddressed()
-        //{
-        //    var command = Fixture.Create<ReplaceAddressAttachmentFromBuildingUnitBecauseAddressWasReaddressed>();
-
-        //    var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
-        //        .WithBuildingPersistentLocalId(command.BuildingPersistentLocalId)
-        //        .WithBuildingUnit(
-        //            BuildingRegistry.Legacy.BuildingUnitStatus.Realized,
-        //            command.BuildingUnitPersistentLocalId,
-        //            attachedAddresses: new List<AddressPersistentLocalId>(){ command.NewAddressPersistentLocalId },
-        //            isRemoved: false)
-        //        .Build();
-
-        //    var consumerAddress = Container.Resolve<FakeConsumerAddressContext>();
-        //    consumerAddress.AddAddress(command.PreviousAddressPersistentLocalId, Consumer.Address.AddressStatus.Current, isRemoved: false);
-        //    consumerAddress.AddAddress(command.NewAddressPersistentLocalId, Consumer.Address.AddressStatus.Current, isRemoved: false);
-
-
-        //    var buildingUnit = buildingWasMigrated.BuildingUnits.First();
-        //    Assert(new Scenario()
-        //        .Given(
-        //            new BuildingStreamId(command.BuildingPersistentLocalId),
-        //            buildingWasMigrated)
-        //        .When(command)
-        //        .ThenNone());
-        //}
-
+        
         [Fact]
         public void WithSourceAddressAttachedAndDestinationAddressNotAttached_ThenAttachAndDetach()
+        {
+            var firstBuildingUnitPersistentLocalId = new BuildingUnitPersistentLocalId(1);
+            var secondBuildingUnitPersistentLocalId = new BuildingUnitPersistentLocalId(2);
+            var sourceAddressPersistentLocalId = new AddressPersistentLocalId(1);
+            var destinationAddressPersistentLocalId = new AddressPersistentLocalId(3);
+
+            var command = new ReaddressAddressesBuilder(Fixture)
+                .WithReaddress(firstBuildingUnitPersistentLocalId, sourceAddressPersistentLocalId, destinationAddressPersistentLocalId)
+                .WithReaddress(secondBuildingUnitPersistentLocalId, sourceAddressPersistentLocalId, destinationAddressPersistentLocalId)
+                .Build();
+
+            var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
+                .WithBuildingUnit(new BuildingUnitBuilder(Fixture)
+                    .WithPersistentLocalId(firstBuildingUnitPersistentLocalId)
+                    .WithAddress(sourceAddressPersistentLocalId)
+                    .WithAddress(2)
+                    .Build())
+                .WithBuildingUnit(new BuildingUnitBuilder(Fixture)
+                    .WithPersistentLocalId(secondBuildingUnitPersistentLocalId)
+                    .WithAddress(sourceAddressPersistentLocalId)
+                    .Build())
+                .WithBuildingUnit(new BuildingUnitBuilder(Fixture)
+                    .WithPersistentLocalId(3)
+                    .WithAddress(3)
+                    .Build())
+                .Build();
+
+            Assert(new Scenario()
+                .Given(
+                    new BuildingStreamId(command.BuildingPersistentLocalId),
+                    buildingWasMigrated)
+                .When(command)
+                .Then(
+                    new BuildingStreamId(command.BuildingPersistentLocalId),
+                    new BuildingBuildingUnitsAddressesWereReaddressed(
+                        command.BuildingPersistentLocalId,
+                        new[]
+                        {
+                            new BuildingUnitAddressesWereReaddressed(
+                                firstBuildingUnitPersistentLocalId,
+                                new[] { destinationAddressPersistentLocalId },
+                                new[] { sourceAddressPersistentLocalId }
+                            ),
+                            new BuildingUnitAddressesWereReaddressed(
+                                secondBuildingUnitPersistentLocalId,
+                                new[] { destinationAddressPersistentLocalId },
+                                new[] { sourceAddressPersistentLocalId }
+                            )
+                        },
+                        command.Readdresses
+                            .SelectMany(x => x.Value)
+                            .Select(x => new AddressRegistryReaddress(x)).ToList()
+                    )
+                ));
+        }
+
+        [Fact]
+        public void WithSourceAddressAttachedAndDestinationAddressAlreadyAttached_ThenOnlyDetach()
         {
             var buildingUnitPersistentLocalId = new BuildingUnitPersistentLocalId(1);
             var sourceAddressPersistentLocalId = new AddressPersistentLocalId(1);
@@ -94,7 +94,48 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenReaddressingAddresses
             var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
                 .WithBuildingUnit(new BuildingUnitBuilder(Fixture)
                     .WithPersistentLocalId(buildingUnitPersistentLocalId)
+                    .WithAddress(2)
                     .WithAddress(sourceAddressPersistentLocalId)
+                    .WithAddress(destinationAddressPersistentLocalId)
+                    .Build())
+                .Build();
+
+            Assert(new Scenario()
+                .Given(
+                    new BuildingStreamId(command.BuildingPersistentLocalId),
+                    buildingWasMigrated)
+                .When(command)
+                .Then(
+                    new BuildingStreamId(command.BuildingPersistentLocalId),
+                    new BuildingBuildingUnitsAddressesWereReaddressed(
+                        command.BuildingPersistentLocalId,
+                        new[]
+                        {
+                            new BuildingUnitAddressesWereReaddressed(
+                                buildingUnitPersistentLocalId,
+                                [],
+                                new[] { sourceAddressPersistentLocalId }
+                            )
+                        },
+                        command.Readdresses.SelectMany(x => x.Value).Select(x => new AddressRegistryReaddress(x)).ToList()
+                    )
+                ));
+        }
+
+        [Fact]
+        public void WithSourceAddressNotAttachedAndDestinationNotAttached_ThenOnlyAttach()
+        {
+            var buildingUnitPersistentLocalId = new BuildingUnitPersistentLocalId(1);
+            var sourceAddressPersistentLocalId = new AddressPersistentLocalId(1);
+            var destinationAddressPersistentLocalId = new AddressPersistentLocalId(3);
+
+            var command = new ReaddressAddressesBuilder(Fixture)
+                .WithReaddress(buildingUnitPersistentLocalId, sourceAddressPersistentLocalId, destinationAddressPersistentLocalId)
+                .Build();
+
+            var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
+                .WithBuildingUnit(new BuildingUnitBuilder(Fixture)
+                    .WithPersistentLocalId(buildingUnitPersistentLocalId)
                     .WithAddress(2)
                     .Build())
                 .Build();
@@ -113,173 +154,125 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenReaddressingAddresses
                             new BuildingUnitAddressesWereReaddressed(
                                 buildingUnitPersistentLocalId,
                                 new[] { destinationAddressPersistentLocalId },
-                                new[] { sourceAddressPersistentLocalId }
+                                []
                             )
                         },
-                        command.Readdresses
-                            .SelectMany(x => x.Value)
-                            .Select(x => new AddressRegistryReaddress(x)).ToList()
+                        command.Readdresses.SelectMany(x => x.Value).Select(x => new AddressRegistryReaddress(x)).ToList()
                     )
                 ));
         }
 
-        //[Fact]
-        //public void WithSourceAddressAttachedAndDestinationAddressAlreadyAttached_ThenOnlyDetach()
-        //{
-        //    var sourceAddressPersistentLocalId = new AddressPersistentLocalId(1);
-        //    var destinationAddressPersistentLocalId = new AddressPersistentLocalId(3);
+        [Fact]
+        public void WithSourceAddressNotAttachedAndDestinationAddressAlreadyAttached_ThenNothing()
+        {
+            var buildingUnitPersistentLocalId = new BuildingUnitPersistentLocalId(1);
+            var sourceAddressPersistentLocalId = new AddressPersistentLocalId(1);
+            var destinationAddressPersistentLocalId = new AddressPersistentLocalId(3);
 
-        //    var command = new ReaddressAddressesBuilder(Fixture)
-        //        .WithReaddress(sourceAddressPersistentLocalId, destinationAddressPersistentLocalId)
-        //        .Build();
+            var command = new ReaddressAddressesBuilder(Fixture)
+                .WithReaddress(buildingUnitPersistentLocalId, sourceAddressPersistentLocalId, destinationAddressPersistentLocalId)
+                .Build();
 
-        //    var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
-        //        .WithStatus(ParcelStatus.Realized)
-        //        .WithAddress(2)
-        //        .WithAddress(sourceAddressPersistentLocalId)
-        //        .WithAddress(destinationAddressPersistentLocalId)
-        //        .Build();
+            var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
+                .WithBuildingUnit(new BuildingUnitBuilder(Fixture)
+                    .WithPersistentLocalId(buildingUnitPersistentLocalId)
+                    .WithAddress(2)
+                    .WithAddress(destinationAddressPersistentLocalId)
+                    .Build())
+                .Build();
 
-        //    Assert(new Scenario()
-        //        .Given(
-        //            new BuildingStreamId(command.BuildingPersistentLocalId),
-        //            buildingWasMigrated)
-        //        .When(command)
-        //        .Then(
-        //            new BuildingStreamId(command.BuildingPersistentLocalId),
-        //            new BuildingBuildingUnitsAddressesWereReaddressed(
-        //                command.BuildingPersistentLocalId,
-        //                new VbrCaPaKey(buildingWasMigrated.CaPaKey),
-        //                Array.Empty<AddressPersistentLocalId>(),
-        //                new[] { sourceAddressPersistentLocalId },
-        //                command.Readdresses.Select(x => new AddressRegistryReaddress(x)).ToList()
-        //            )
-        //        ));
-        //}
+            Assert(new Scenario()
+                .Given(
+                    new BuildingStreamId(command.BuildingPersistentLocalId),
+                    buildingWasMigrated)
+                .When(command)
+                .ThenNone());
+        }
 
-        //[Fact]
-        //public void WithSourceAddressNotAttachedAndDestinationNotAttached_ThenOnlyAttach()
-        //{
-        //    var sourceAddressPersistentLocalId = new AddressPersistentLocalId(1);
-        //    var destinationAddressPersistentLocalId = new AddressPersistentLocalId(3);
+        [Fact]
+        public void WithTwoReaddressesAndAddressIsBothSourceAndDestination_ThenOneAttachAndOneDetach()
+        {
+            var buildingUnitPersistentLocalId = new BuildingUnitPersistentLocalId(1);
+            var sourceAddressPersistentLocalId = new AddressPersistentLocalId(1);
+            var firstAddressPersistentLocalId = new AddressPersistentLocalId(3);
+            var secondAddressPersistentLocalId = new AddressPersistentLocalId(5);
 
-        //    var command = new ReaddressAddressesBuilder(Fixture)
-        //        .WithReaddress(sourceAddressPersistentLocalId, destinationAddressPersistentLocalId)
-        //        .Build();
+            var command = new ReaddressAddressesBuilder(Fixture)
+                .WithReaddress(buildingUnitPersistentLocalId, sourceAddressPersistentLocalId, firstAddressPersistentLocalId)
+                .WithReaddress(buildingUnitPersistentLocalId, secondAddressPersistentLocalId, sourceAddressPersistentLocalId)
+                .Build();
 
-        //    var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
-        //        .WithStatus(ParcelStatus.Realized)
-        //        .WithAddress(2)
-        //        .Build();
+            var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
+                .WithBuildingUnit(new BuildingUnitBuilder(Fixture)
+                    .WithPersistentLocalId(buildingUnitPersistentLocalId)
+                    .WithAddress(secondAddressPersistentLocalId)
+                    .WithAddress(sourceAddressPersistentLocalId)
+                    .Build())
+                .Build();
 
-        //    Assert(new Scenario()
-        //        .Given(
-        //            new BuildingStreamId(command.BuildingPersistentLocalId),
-        //            buildingWasMigrated)
-        //        .When(command)
-        //        .Then(
-        //            new BuildingStreamId(command.BuildingPersistentLocalId),
-        //            new BuildingBuildingUnitsAddressesWereReaddressed(
-        //                command.BuildingPersistentLocalId,
-        //                new VbrCaPaKey(buildingWasMigrated.CaPaKey),
-        //                new[] { destinationAddressPersistentLocalId },
-        //                Array.Empty<AddressPersistentLocalId>(),
-        //                command.Readdresses.Select(x => new AddressRegistryReaddress(x)).ToList()
-        //            )
-        //        ));
-        //}
+            Assert(new Scenario()
+                .Given(
+                    new BuildingStreamId(command.BuildingPersistentLocalId),
+                    buildingWasMigrated)
+                .When(command)
+                .Then(
+                    new BuildingStreamId(command.BuildingPersistentLocalId),
+                    new BuildingBuildingUnitsAddressesWereReaddressed(
+                        command.BuildingPersistentLocalId,
+                        new[]
+                        {
+                            new BuildingUnitAddressesWereReaddressed(
+                                buildingUnitPersistentLocalId,
+                                new[] { firstAddressPersistentLocalId },
+                                new[] { secondAddressPersistentLocalId }
+                            )
+                        },
+                        command.Readdresses.SelectMany(x => x.Value).Select(x => new AddressRegistryReaddress(x)).ToList()
+                    )
+                ));
+        }
 
-        //[Fact]
-        //public void WithSourceAddressNotAttachedAndDestinationAddressAlreadyAttached_ThenNothing()
-        //{
-        //    var sourceAddressPersistentLocalId = new AddressPersistentLocalId(1);
-        //    var destinationAddressPersistentLocalId = new AddressPersistentLocalId(3);
+        [Fact]
+        public void StateCheck()
+        {
+            var buildingUnitPersistentLocalId = new BuildingUnitPersistentLocalId(1);
+            var sourceAddressPersistentLocalId = new AddressPersistentLocalId(1);
+            var destinationAddressPersistentLocalId = new AddressPersistentLocalId(2);
+            var otherAddressPersistentLocalId = new AddressPersistentLocalId(3);
 
-        //    var command = new ReaddressAddressesBuilder(Fixture)
-        //        .WithReaddress(sourceAddressPersistentLocalId, destinationAddressPersistentLocalId)
-        //        .Build();
+            var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
+                .WithBuildingUnit(new BuildingUnitBuilder(Fixture)
+                    .WithPersistentLocalId(buildingUnitPersistentLocalId)
+                    .WithAddress(sourceAddressPersistentLocalId)
+                    .WithAddress(otherAddressPersistentLocalId)
+                    .Build())
+                .Build();
 
-        //    var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
-        //        .WithStatus(ParcelStatus.Realized)
-        //        .WithAddress(2)
-        //        .WithAddress(destinationAddressPersistentLocalId)
-        //        .Build();
+            var @event = new BuildingBuildingUnitsAddressesWereReaddressed(
+                Fixture.Create<BuildingPersistentLocalId>(),
+                new[]
+                {
+                    new BuildingUnitAddressesWereReaddressed(
+                        buildingUnitPersistentLocalId,
+                        new[] { destinationAddressPersistentLocalId },
+                        new[] { sourceAddressPersistentLocalId }
+                    )
+                },
+                new[] { new AddressRegistryReaddress(new ReaddressData(sourceAddressPersistentLocalId, destinationAddressPersistentLocalId)) }
+            );
+            @event.SetFixtureProvenance(Fixture);
 
-        //    Assert(new Scenario()
-        //        .Given(
-        //            new BuildingStreamId(command.BuildingPersistentLocalId),
-        //            buildingWasMigrated)
-        //        .When(command)
-        //        .ThenNone());
-        //}
+            // Act
+            var sut = new BuildingFactory(NoSnapshotStrategy.Instance).Create();
+            sut.Initialize(new List<object> { buildingWasMigrated, @event });
 
-        //[Fact]
-        //public void WithTwoReaddressesAndAddressIsBothSourceAndDestination_ThenOneAttachAndOneDetach()
-        //{
-        //    var sourceAddressPersistentLocalId = new AddressPersistentLocalId(1);
-        //    var firstAddressPersistentLocalId = new AddressPersistentLocalId(3);
-        //    var secondAddressPersistentLocalId = new AddressPersistentLocalId(5);
-
-        //    var command = new ReaddressAddressesBuilder(Fixture)
-        //        .WithReaddress(sourceAddressPersistentLocalId, firstAddressPersistentLocalId)
-        //        .WithReaddress(secondAddressPersistentLocalId, sourceAddressPersistentLocalId)
-        //        .Build();
-
-        //    var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
-        //        .WithStatus(ParcelStatus.Realized)
-        //        .WithAddress(secondAddressPersistentLocalId)
-        //        .WithAddress(sourceAddressPersistentLocalId)
-        //        .Build();
-
-        //    Assert(new Scenario()
-        //        .Given(
-        //            new BuildingStreamId(command.BuildingPersistentLocalId),
-        //            buildingWasMigrated)
-        //        .When(command)
-        //        .Then(
-        //            new BuildingStreamId(command.BuildingPersistentLocalId),
-        //            new BuildingBuildingUnitsAddressesWereReaddressed(
-        //                command.BuildingPersistentLocalId,
-        //                new VbrCaPaKey(buildingWasMigrated.CaPaKey),
-        //                new[] { firstAddressPersistentLocalId },
-        //                new[] { secondAddressPersistentLocalId },
-        //                command.Readdresses.Select(x => new AddressRegistryReaddress(x)).ToList()
-        //            )
-        //        ));
-        //}
-
-        //[Fact]
-        //public void StateCheck()
-        //{
-        //    var sourceAddressPersistentLocalId = new AddressPersistentLocalId(1);
-        //    var destinationAddressPersistentLocalId = new AddressPersistentLocalId(2);
-        //    var otherAddressPersistentLocalId = new AddressPersistentLocalId(3);
-
-        //    var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
-        //        .WithStatus(ParcelStatus.Realized)
-        //        .WithAddress(sourceAddressPersistentLocalId)
-        //        .WithAddress(otherAddressPersistentLocalId)
-        //        .Build();
-
-        //    var @event = new BuildingBuildingUnitsAddressesWereReaddressed(
-        //        Fixture.Create<ParcelId>(),
-        //        Fixture.Create<VbrCaPaKey>(),
-        //        new[] { destinationAddressPersistentLocalId },
-        //        new[] { sourceAddressPersistentLocalId },
-        //        new[] { new AddressRegistryReaddress(new ReaddressData(sourceAddressPersistentLocalId, destinationAddressPersistentLocalId)) }
-        //    );
-        //    @event.SetFixtureProvenance(Fixture);
-
-        //    // Act
-        //    var sut = new ParcelFactory(NoSnapshotStrategy.Instance, Container.Resolve<IAddresses>()).Create();
-        //    sut.Initialize(new List<object> { buildingWasMigrated, @event });
-
-        //    // Assert
-        //    sut.AddressPersistentLocalIds.Should().HaveCount(2);
-        //    sut.AddressPersistentLocalIds.Should().Contain(destinationAddressPersistentLocalId);
-        //    sut.AddressPersistentLocalIds.Should().Contain(otherAddressPersistentLocalId);
-        //    sut.AddressPersistentLocalIds.Should().NotContain(sourceAddressPersistentLocalId);
-        //    sut.LastEventHash.Should().Be(@event.GetHash());
-        //}
+            // Assert
+            sut.BuildingUnits.First().AddressPersistentLocalIds.Should().HaveCount(2);
+            sut.BuildingUnits.First().AddressPersistentLocalIds.Should().Contain(destinationAddressPersistentLocalId);
+            sut.BuildingUnits.First().AddressPersistentLocalIds.Should().Contain(otherAddressPersistentLocalId);
+            sut.BuildingUnits.First().AddressPersistentLocalIds.Should().NotContain(sourceAddressPersistentLocalId);
+            sut.BuildingUnits.First().LastEventHash.Should().Be(@event.GetHash());
+            sut.LastEventHash.Should().NotBe(@event.GetHash());
+        }
     }
 }
