@@ -21,7 +21,8 @@ namespace BuildingRegistry.Consumer.Address.Projections
     {
         private readonly IDbContextFactory<BackOfficeContext> _backOfficeContextFactory;
 
-        public CommandHandlingKafkaProjection(IDbContextFactory<BackOfficeContext> backOfficeContextFactory)
+        public CommandHandlingKafkaProjection(IDbContextFactory<BackOfficeContext> backOfficeContextFactory,
+            IBuildings buildings)
         {
             _backOfficeContextFactory = backOfficeContextFactory;
 
@@ -246,7 +247,46 @@ namespace BuildingRegistry.Consumer.Address.Projections
                     }
                 }
 
-                //TODO: add backoffice context
+                await backOfficeContext.Database.BeginTransactionAsync();
+                //TODO-jonas add unit test
+                var commandBuildingPersistentLocalIds = commandByBuildings.Values.Select(x => (int)x.BuildingPersistentLocalId).ToList();
+                var allBackOfficeBuildingUnitAddressRelations = (await backOfficeContext.BuildingUnitAddressRelation
+                        .AsNoTracking()
+                        .Where(x => commandBuildingPersistentLocalIds.Contains(x.BuildingPersistentLocalId))
+                        .ToListAsync(cancellationToken: ct))
+                    .ToList();
+
+                foreach (var readdressAddressedCommand in commandByBuildings.Values)
+                {
+                    var buildingPersistentLocalId = readdressAddressedCommand.BuildingPersistentLocalId;
+
+                    var building = await buildings.GetAsync(new BuildingStreamId(buildingPersistentLocalId), ct);
+
+                    foreach (var buildingUnitReaddress in readdressAddressedCommand.Readdresses)
+                    {
+                        var buildingUnitPersistentLocalId = buildingUnitReaddress.Key;
+                        var buildingUnit = building.BuildingUnits.Single(x => x.BuildingUnitPersistentLocalId == buildingUnitPersistentLocalId);
+
+                        var buildingUnitBackOfficeAddresses = allBackOfficeBuildingUnitAddressRelations
+                            .Where(x => x.BuildingUnitPersistentLocalId == buildingUnitPersistentLocalId)
+                            .Select(x => new AddressPersistentLocalId(x.AddressPersistentLocalId))
+                            .ToList();
+                        var addressesToRemove = buildingUnitBackOfficeAddresses.Except(buildingUnit.AddressPersistentLocalIds).ToList();
+                        var addressesToAdd = buildingUnit.AddressPersistentLocalIds.Except(buildingUnitBackOfficeAddresses).ToList();
+
+                        foreach (var addressPersistentLocalId in addressesToRemove)
+                        {
+                            await backOfficeContext.RemoveIdempotentBuildingUnitAddressRelation(buildingUnitPersistentLocalId, addressPersistentLocalId, ct);
+                        }
+
+                        foreach (var addressPersistentLocalId in addressesToAdd)
+                        {
+                            await backOfficeContext.AddIdempotentBuildingUnitAddressRelation(buildingPersistentLocalId, buildingUnitPersistentLocalId, addressPersistentLocalId, ct);
+                        }
+                    }
+                }
+
+                await backOfficeContext.Database.CommitTransactionAsync();
             });
 
             When<AddressWasRejectedBecauseOfReaddress>(async (commandHandler, message, ct) =>
