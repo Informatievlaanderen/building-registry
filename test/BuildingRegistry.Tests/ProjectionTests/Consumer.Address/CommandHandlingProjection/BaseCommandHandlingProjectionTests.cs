@@ -1,9 +1,10 @@
-﻿namespace BuildingRegistry.Tests.ProjectionTests.Consumer.Address.CommandHandlingProjection
+namespace BuildingRegistry.Tests.ProjectionTests.Consumer.Address.CommandHandlingProjection
 {
     using System;
     using System.Threading;
     using System.Threading.Tasks;
     using Api.BackOffice.Abstractions;
+    using Building;
     using BuildingRegistry.Consumer.Address.Projections;
     using Microsoft.EntityFrameworkCore;
     using Moq;
@@ -32,10 +33,11 @@
         protected override CommandHandlingKafkaProjection CreateProjection()
         {
             var factoryMock = new Mock<IDbContextFactory<BackOfficeContext>>();
+            var buildingsMock = new Mock<IBuildings>();
             factoryMock
                 .Setup(x => x.CreateDbContextAsync(CancellationToken.None))
                 .Returns(Task.FromResult<BackOfficeContext>(FakeBackOfficeContext));
-            return new CommandHandlingKafkaProjection(factoryMock.Object);
+            return new CommandHandlingKafkaProjection(factoryMock.Object, buildingsMock.Object);
         }
     }
 }

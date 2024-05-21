@@ -2,15 +2,13 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenReplacingAddressAttachmentFr
 {
     using System.Collections.Generic;
     using System.Linq;
-    using Autofac;
     using AutoFixture;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
-    using Be.Vlaanderen.Basisregisters.AggregateSource.Testing;
+    using Be.Vlaanderen.Basisregisters.AggregateSource.Snapshotting;
     using Building;
-    using Building.Commands;
     using Building.Events;
-    using BackOffice;
     using Extensions;
+    using FluentAssertions;
     using Xunit;
     using Xunit.Abstractions;
 
@@ -19,6 +17,41 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenReplacingAddressAttachmentFr
         public GivenAddressReaddressed(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
         { }
 
-        //TODO-jonas add missing State test for BuildingUnitAddressWasReplacedBecauseAddressWasReaddressed
+        [Fact]
+        public void StateCheck()
+        {
+            var buildingUnitPersistentLocalId = new BuildingUnitPersistentLocalId(1);
+            var previousAddressPersistentLocalId = new AddressPersistentLocalId(1);
+            var newAddressPersistentLocalId = new AddressPersistentLocalId(2);
+            var otherAddressPersistentLocalId = new AddressPersistentLocalId(3);
+
+            var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
+                .WithBuildingUnit(new BuildingUnitBuilder(Fixture)
+                    .WithPersistentLocalId(buildingUnitPersistentLocalId)
+                    .WithAddress(previousAddressPersistentLocalId)
+                    .WithAddress(otherAddressPersistentLocalId)
+                    .Build())
+                .Build();
+
+            var @event = new BuildingUnitAddressWasReplacedBecauseAddressWasReaddressed(
+                Fixture.Create<BuildingPersistentLocalId>(),
+                buildingUnitPersistentLocalId,
+                previousAddressPersistentLocalId,
+                newAddressPersistentLocalId
+            );
+            @event.SetFixtureProvenance(Fixture);
+
+            // Act
+            var sut = new BuildingFactory(NoSnapshotStrategy.Instance).Create();
+            sut.Initialize(new List<object> { buildingWasMigrated, @event });
+
+            // Assert
+            sut.BuildingUnits.First().AddressPersistentLocalIds.Should().HaveCount(2);
+            sut.BuildingUnits.First().AddressPersistentLocalIds.Should().Contain(newAddressPersistentLocalId);
+            sut.BuildingUnits.First().AddressPersistentLocalIds.Should().Contain(otherAddressPersistentLocalId);
+            sut.BuildingUnits.First().AddressPersistentLocalIds.Should().NotContain(previousAddressPersistentLocalId);
+            sut.BuildingUnits.First().LastEventHash.Should().Be(@event.GetHash());
+            sut.LastEventHash.Should().NotBe(@event.GetHash());
+        }
     }
 }
