@@ -1,4 +1,4 @@
-﻿namespace BuildingRegistry.Projections.Integration.BuildingUnit.LatestItem
+namespace BuildingRegistry.Projections.Integration.BuildingUnit.LatestItem
 {
     using BuildingRegistry.Infrastructure;
     using Microsoft.EntityFrameworkCore;
@@ -11,7 +11,9 @@
         public int Count { get; set; }
 
         public BuildingUnitAddress()
-        { }
+        {
+            Count = 1;
+        }
     }
 
     public sealed class BuildingUnitAddressConfiguration : IEntityTypeConfiguration<BuildingUnitAddress>
