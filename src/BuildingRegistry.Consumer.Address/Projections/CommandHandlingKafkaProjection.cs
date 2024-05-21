@@ -162,31 +162,7 @@ namespace BuildingRegistry.Consumer.Address.Projections
                     message.Provenance,
                     ct);
             });
-
-            // When<AddressHouseNumberWasReaddressed>(async (commandHandler, message, ct) =>
-            // {
-            //     await using var backOfficeContext = await _backOfficeContextFactory.CreateDbContextAsync(ct);
-            //
-            //     await DetachAttachReaddressedAddress(
-            //         backOfficeContext,
-            //         commandHandler,
-            //         message.ReaddressedHouseNumber.SourceAddressPersistentLocalId,
-            //         message.ReaddressedHouseNumber.DestinationAddressPersistentLocalId,
-            //         message.Provenance,
-            //         ct);
-            //
-            //     foreach (var readdressedBoxNumber in message.ReaddressedBoxNumbers)
-            //     {
-            //         await DetachAttachReaddressedAddress(
-            //             backOfficeContext,
-            //             commandHandler,
-            //             readdressedBoxNumber.SourceAddressPersistentLocalId,
-            //             readdressedBoxNumber.DestinationAddressPersistentLocalId,
-            //             message.Provenance,
-            //             ct);
-            //     }
-            // });
-
+            
             When<StreetNameWasReaddressed>(async (commandHandler, message, ct) =>
             {
                 await using var backOfficeContext = await _backOfficeContextFactory.CreateDbContextAsync(ct);
@@ -246,7 +222,7 @@ namespace BuildingRegistry.Consumer.Address.Projections
                     }
                     catch (IdempotencyException)
                     {
-                        continue;
+                        // Do nothing
                     }
                 }
 
@@ -310,43 +286,7 @@ namespace BuildingRegistry.Consumer.Address.Projections
                     ct);
             });
         }
-
-        //private static async Task DetachAttachReaddressedAddress(
-        //    BackOfficeContext backOfficeContext,
-        //    CommandHandler commandHandler,
-        //    int sourceAddressPersistentLocalId,
-        //    int destinationAddressPersistentLocalId,
-        //    Contracts.Provenance provenance,
-        //    CancellationToken ct)
-        //{
-        //    var relations = backOfficeContext.BuildingUnitAddressRelation
-        //        .AsNoTracking()
-        //        .Where(x => x.AddressPersistentLocalId == new AddressPersistentLocalId(sourceAddressPersistentLocalId))
-        //        .ToList();
-
-        //    foreach (var relation in relations)
-        //    {
-        //        var command = new ReplaceAddressAttachmentFromBuildingUnitBecauseAddressWasReaddressed(
-        //            new BuildingPersistentLocalId(relation.BuildingPersistentLocalId),
-        //            new BuildingUnitPersistentLocalId(relation.BuildingUnitPersistentLocalId),
-        //            previousAddressPersistentLocalId: new AddressPersistentLocalId(relation.AddressPersistentLocalId),
-        //            newAddressPersistentLocalId: new AddressPersistentLocalId(destinationAddressPersistentLocalId),
-        //            FromProvenance(provenance));
-        //        await commandHandler.Handle(command, ct);
-
-        //        await backOfficeContext.RemoveIdempotentBuildingUnitAddressRelation(
-        //            command.BuildingUnitPersistentLocalId,
-        //            command.PreviousAddressPersistentLocalId,
-        //            ct);
-
-        //        await backOfficeContext.AddIdempotentBuildingUnitAddressRelation(
-        //            command.BuildingPersistentLocalId,
-        //            command.BuildingUnitPersistentLocalId,
-        //            command.NewAddressPersistentLocalId,
-        //            ct);
-        //    }
-        //}
-
+        
         private async Task DetachBecauseRemoved(
             CommandHandler commandHandler,
             AddressPersistentLocalId addressPersistentLocalId,
@@ -423,7 +363,7 @@ namespace BuildingRegistry.Consumer.Address.Projections
         }
 
         private static Provenance FromProvenance(Contracts.Provenance provenance) =>
-            new Provenance(
+            new(
                 SystemClock.Instance.GetCurrentInstant(),
                 Enum.Parse<Application>(Application.AddressRegistry.ToString()),
                 new Reason(provenance.Reason),
