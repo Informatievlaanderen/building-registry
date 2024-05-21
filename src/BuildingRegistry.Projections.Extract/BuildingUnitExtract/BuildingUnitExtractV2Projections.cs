@@ -438,6 +438,18 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
                     }, ct);
             });
 
+            When<Envelope<BuildingBuildingUnitsAddressesWereReaddressed>>(async (context, message, ct) =>
+            {
+                foreach (var buildingUnitReaddresses in message.Message.BuildingUnitsReaddresses)
+                {
+                    await context.FindAndUpdateBuildingUnitExtract(buildingUnitReaddresses.BuildingUnitPersistentLocalId,
+                        itemV2 =>
+                        {
+                            UpdateVersie(itemV2, message.Message.Provenance.Timestamp);
+                        }, ct);
+                }
+            });
+
             When<Envelope<BuildingUnitWasRetiredBecauseBuildingWasDemolished>>(async (context, message, ct) =>
             {
                 await context.FindAndUpdateBuildingUnitExtract(message.Message.BuildingUnitPersistentLocalId,

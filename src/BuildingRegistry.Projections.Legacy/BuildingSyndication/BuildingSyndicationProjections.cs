@@ -1367,6 +1367,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
             // source not attached && destination not attached => event applied
             When<Envelope<BuildingUnitAddressWasReplacedBecauseAddressWasReaddressed>>(async (context, message, ct) =>
             {
+                //TODO-rik fix met count zoals bij parcelregistry
                 await context.CreateNewBuildingSyndicationItem(message.Message.BuildingPersistentLocalId, message, item =>
                 {
                     var unit = item.BuildingUnitsV2.Single(y => y.PersistentLocalId == message.Message.BuildingUnitPersistentLocalId);
@@ -1378,106 +1379,129 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
                 }, ct);
             });
 
+            When<Envelope<BuildingBuildingUnitsAddressesWereReaddressed>>(async (context, message, ct) =>
+            {
+                await context.CreateNewBuildingSyndicationItem(message.Message.BuildingPersistentLocalId, message, item =>
+                {
+                    foreach (var buildingUnitReaddresses in message.Message.BuildingUnitsReaddresses)
+                    {
+                        var unit = item.BuildingUnitsV2.Single(y => y.PersistentLocalId == buildingUnitReaddresses.BuildingUnitPersistentLocalId);
+
+                        foreach (var addressPersistentLocalId in buildingUnitReaddresses.DetachedAddressPersistentLocalIds)
+                        {
+                            RemoveIdempotentAddress(unit, new AddressPersistentLocalId(addressPersistentLocalId));
+                        }
+
+                        foreach (var addressPersistentLocalId in buildingUnitReaddresses.AttachedAddressPersistentLocalIds)
+                        {
+                            AddIdempotentAddress(unit, new BuildingUnitAddressSyndicationItemV2(message.Position, unit.PersistentLocalId, addressPersistentLocalId));
+                        }
+
+                        unit.Version = message.Message.Provenance.Timestamp;
+                    }
+                }, ct);
+            });
+
             When<Envelope<BuildingUnitWasRetiredBecauseBuildingWasDemolished>>(async (context, message, ct) =>
             {
                 await context.CreateNewBuildingSyndicationItem(message.Message.BuildingPersistentLocalId, message, item =>
                 {
-                    var unit = item.BuildingUnitsV2.Single(y => y.PersistentLocalId == message.Message.BuildingUnitPersistentLocalId);
-                    unit.Status = BuildingRegistry.Building.BuildingUnitStatus.Retired;
-                    unit.Version = message.Message.Provenance.Timestamp;
-                }, ct);
+            var unit = item.BuildingUnitsV2.Single(y => y.PersistentLocalId == message.Message.BuildingUnitPersistentLocalId);
+            unit.Status = BuildingRegistry.Building.BuildingUnitStatus.Retired;
+            unit.Version = message.Message.Provenance.Timestamp;
+        }, ct);
             });
 
             When<Envelope<BuildingUnitWasNotRealizedBecauseBuildingWasDemolished>>(async (context, message, ct) =>
             {
                 await context.CreateNewBuildingSyndicationItem(message.Message.BuildingPersistentLocalId, message, item =>
                 {
-                    var unit = item.BuildingUnitsV2.Single(y => y.PersistentLocalId == message.Message.BuildingUnitPersistentLocalId);
-                    unit.Status = BuildingRegistry.Building.BuildingUnitStatus.NotRealized;
-                    unit.Version = message.Message.Provenance.Timestamp;
-                }, ct);
+        var unit = item.BuildingUnitsV2.Single(y => y.PersistentLocalId == message.Message.BuildingUnitPersistentLocalId);
+        unit.Status = BuildingRegistry.Building.BuildingUnitStatus.NotRealized;
+        unit.Version = message.Message.Provenance.Timestamp;
+    }, ct);
             });
 
-            When<Envelope<BuildingUnitWasMovedIntoBuilding>>(async (context, message, ct) =>
+When<Envelope<BuildingUnitWasMovedIntoBuilding>>(async (context, message, ct) =>
+{
+    await context.CreateNewBuildingSyndicationItem(
+        message.Message.BuildingPersistentLocalId,
+        message,
+        x =>
+        {
+            var buildingUnitSyndicationItem = new BuildingUnitSyndicationItemV2
             {
-                await context.CreateNewBuildingSyndicationItem(
-                    message.Message.BuildingPersistentLocalId,
-                    message,
-                    x =>
-                    {
-                        var buildingUnitSyndicationItem = new BuildingUnitSyndicationItemV2
-                        {
-                            Position = message.Position,
-                            PersistentLocalId = message.Message.BuildingUnitPersistentLocalId,
-                            Status = BuildingRegistry.Building.BuildingUnitStatus.Parse(message.Message.BuildingUnitStatus),
-                            HasDeviation = message.Message.HasDeviation,
-                            Function = BuildingRegistry.Building.BuildingUnitFunction.Parse(message.Message.Function),
-                            PointPosition = message.Message.ExtendedWkbGeometry.ToByteArray(),
-                            PositionMethod = BuildingRegistry.Building.BuildingUnitPositionGeometryMethod.Parse(message.Message.GeometryMethod),
-                            Version = message.Message.Provenance.Timestamp,
-                            Addresses = new Collection<BuildingUnitAddressSyndicationItemV2>(message.Message.AddressPersistentLocalIds.Select(
-                                    addressPersistentLocalId =>
-                                        new BuildingUnitAddressSyndicationItemV2(
-                                            message.Position,
-                                            message.Message.BuildingUnitPersistentLocalId,
-                                            addressPersistentLocalId))
-                                .ToList())
-                        };
+                Position = message.Position,
+                PersistentLocalId = message.Message.BuildingUnitPersistentLocalId,
+                Status = BuildingRegistry.Building.BuildingUnitStatus.Parse(message.Message.BuildingUnitStatus),
+                HasDeviation = message.Message.HasDeviation,
+                Function = BuildingRegistry.Building.BuildingUnitFunction.Parse(message.Message.Function),
+                PointPosition = message.Message.ExtendedWkbGeometry.ToByteArray(),
+                PositionMethod = BuildingRegistry.Building.BuildingUnitPositionGeometryMethod.Parse(message.Message.GeometryMethod),
+                Version = message.Message.Provenance.Timestamp,
+                Addresses = new Collection<BuildingUnitAddressSyndicationItemV2>(message.Message.AddressPersistentLocalIds.Select(
+                        addressPersistentLocalId =>
+                            new BuildingUnitAddressSyndicationItemV2(
+                                message.Position,
+                                message.Message.BuildingUnitPersistentLocalId,
+                                addressPersistentLocalId))
+                    .ToList())
+            };
 
-                        x.BuildingUnitsV2.Add(buildingUnitSyndicationItem);
-                    },
-                    ct);
-            });
+            x.BuildingUnitsV2.Add(buildingUnitSyndicationItem);
+        },
+        ct);
+});
 
-            When<Envelope<BuildingUnitWasMovedOutOfBuilding>>(async (context, message, ct) =>
-            {
-                await context.CreateNewBuildingSyndicationItem(
-                    message.Message.BuildingPersistentLocalId,
-                    message,
-                    x =>
-                    {
-                        var unit = x.BuildingUnitsV2.Single(y => y.PersistentLocalId == message.Message.BuildingUnitPersistentLocalId);
-                        x.BuildingUnitsV2.Remove(unit);
-                    },
-                    ct);
-            });
+When<Envelope<BuildingUnitWasMovedOutOfBuilding>>(async (context, message, ct) =>
+{
+    await context.CreateNewBuildingSyndicationItem(
+        message.Message.BuildingPersistentLocalId,
+        message,
+        x =>
+        {
+            var unit = x.BuildingUnitsV2.Single(y => y.PersistentLocalId == message.Message.BuildingUnitPersistentLocalId);
+            x.BuildingUnitsV2.Remove(unit);
+        },
+        ct);
+});
             #endregion
         }
 
         private static void RemoveIdempotentAddress(BuildingUnitSyndicationItemV2 buildingUnit, AddressPersistentLocalId addressPersistentLocalId)
-        {
-            var address = buildingUnit.Addresses.FirstOrDefault(x => x.AddressPersistentLocalId == addressPersistentLocalId);
+{
+    var address = buildingUnit.Addresses.FirstOrDefault(x => x.AddressPersistentLocalId == addressPersistentLocalId);
 
-            if (address is not null)
-            {
-                buildingUnit.Addresses.Remove(address);
-            }
-        }
+    if (address is not null)
+    {
+        buildingUnit.Addresses.Remove(address);
+    }
+}
 
-        private static void AddIdempotentAddress(BuildingUnitSyndicationItemV2 buildingUnit, BuildingUnitAddressSyndicationItemV2 syndicationItemAddress)
-        {
-            var address = buildingUnit.Addresses.FirstOrDefault(x => x.AddressPersistentLocalId == syndicationItemAddress.AddressPersistentLocalId);
+private static void AddIdempotentAddress(BuildingUnitSyndicationItemV2 buildingUnit, BuildingUnitAddressSyndicationItemV2 syndicationItemAddress)
+{
+    var address = buildingUnit.Addresses.FirstOrDefault(x => x.AddressPersistentLocalId == syndicationItemAddress.AddressPersistentLocalId);
 
-            if (address is null)
-            {
-                buildingUnit.Addresses.Add(syndicationItemAddress);
-            }
-        }
+    if (address is null)
+    {
+        buildingUnit.Addresses.Add(syndicationItemAddress);
+    }
+}
 
-        private static BuildingGeometryMethod MapBuildingGeometryMethod(BuildingRegistry.Building.BuildingGeometryMethod buildingGeometryMethod)
-        {
-            var dictionary = new Dictionary<BuildingRegistry.Building.BuildingGeometryMethod, BuildingGeometryMethod>
+private static BuildingGeometryMethod MapBuildingGeometryMethod(BuildingRegistry.Building.BuildingGeometryMethod buildingGeometryMethod)
+{
+    var dictionary = new Dictionary<BuildingRegistry.Building.BuildingGeometryMethod, BuildingGeometryMethod>
             {
                 { BuildingRegistry.Building.BuildingGeometryMethod.MeasuredByGrb, BuildingGeometryMethod.MeasuredByGrb },
                 { BuildingRegistry.Building.BuildingGeometryMethod.Outlined, BuildingGeometryMethod.Outlined }
             };
 
-            return dictionary[buildingGeometryMethod];
-        }
+    return dictionary[buildingGeometryMethod];
+}
 
-        private static BuildingStatus MapBuildingStatus(BuildingRegistry.Building.BuildingStatus buildingStatus)
-        {
-            var dictionary = new Dictionary<BuildingRegistry.Building.BuildingStatus, BuildingStatus>
+private static BuildingStatus MapBuildingStatus(BuildingRegistry.Building.BuildingStatus buildingStatus)
+{
+    var dictionary = new Dictionary<BuildingRegistry.Building.BuildingStatus, BuildingStatus>
             {
                 { BuildingRegistry.Building.BuildingStatus.Planned, BuildingStatus.Planned },
                 { BuildingRegistry.Building.BuildingStatus.UnderConstruction, BuildingStatus.UnderConstruction },
@@ -1486,37 +1510,37 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
                 { BuildingRegistry.Building.BuildingStatus.Retired, BuildingStatus.Retired }
             };
 
-            return dictionary[buildingStatus];
-        }
+    return dictionary[buildingStatus];
+}
 
-        private static void ApplyUnitVersion(BuildingUnitSyndicationItem item, Instant version)
+private static void ApplyUnitVersion(BuildingUnitSyndicationItem item, Instant version)
+{
+    item.Version = version;
+}
+
+private static void RetireUnitsByBuilding(
+    IEnumerable<BuildingUnitSyndicationItem> buildingUnits,
+    ICollection<Guid> buildingUnitIdsToNotRealize,
+    ICollection<Guid> buildingUnitIdsToRetire,
+    Instant version)
+{
+    foreach (var buildingUnitDetailItem in buildingUnits)
+    {
+        if (buildingUnitIdsToNotRealize.Contains(buildingUnitDetailItem.BuildingUnitId))
         {
-            item.Version = version;
+            buildingUnitDetailItem.Status = BuildingUnitStatus.NotRealized;
         }
-
-        private static void RetireUnitsByBuilding(
-            IEnumerable<BuildingUnitSyndicationItem> buildingUnits,
-            ICollection<Guid> buildingUnitIdsToNotRealize,
-            ICollection<Guid> buildingUnitIdsToRetire,
-            Instant version)
+        else if (buildingUnitIdsToRetire.Contains(buildingUnitDetailItem.BuildingUnitId))
         {
-            foreach (var buildingUnitDetailItem in buildingUnits)
-            {
-                if (buildingUnitIdsToNotRealize.Contains(buildingUnitDetailItem.BuildingUnitId))
-                {
-                    buildingUnitDetailItem.Status = BuildingUnitStatus.NotRealized;
-                }
-                else if (buildingUnitIdsToRetire.Contains(buildingUnitDetailItem.BuildingUnitId))
-                {
-                    buildingUnitDetailItem.Status = BuildingUnitStatus.Retired;
-                }
-
-                buildingUnitDetailItem.Addresses.Clear();
-
-                ApplyUnitVersion(buildingUnitDetailItem, version);
-            }
+            buildingUnitDetailItem.Status = BuildingUnitStatus.Retired;
         }
 
-        private static Task DoNothing<T>(LegacyContext _, Envelope<T> __) where T : IMessage => Task.CompletedTask;
+        buildingUnitDetailItem.Addresses.Clear();
+
+        ApplyUnitVersion(buildingUnitDetailItem, version);
+    }
+}
+
+private static Task DoNothing<T>(LegacyContext _, Envelope<T> __) where T : IMessage => Task.CompletedTask;
     }
 }

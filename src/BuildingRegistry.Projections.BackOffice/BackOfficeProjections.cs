@@ -77,6 +77,7 @@ namespace BuildingRegistry.Projections.BackOffice
 
             When<Envelope<BuildingUnitAddressWasReplacedBecauseAddressWasReaddressed>>(async (_, message, cancellationToken) =>
             {
+                //TODO-rik fix met count zoals bij parcelregistry
                 await using var backOfficeContext = await backOfficeContextFactory.CreateDbContextAsync(cancellationToken);
 
                 await backOfficeContext.RemoveIdempotentBuildingUnitAddressRelation(
@@ -89,6 +90,12 @@ namespace BuildingRegistry.Projections.BackOffice
                     new BuildingUnitPersistentLocalId(message.Message.BuildingUnitPersistentLocalId),
                     new AddressPersistentLocalId(message.Message.NewAddressPersistentLocalId),
                     cancellationToken);
+            });
+
+            When<Envelope<BuildingBuildingUnitsAddressesWereReaddressed>>((_, message, cancellationToken) =>
+            {
+                // Do nothing
+                return Task.CompletedTask;
             });
 
             When<Envelope<BuildingUnitWasMovedOutOfBuilding>>(async (_, message, cancellationToken) =>

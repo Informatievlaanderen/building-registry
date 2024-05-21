@@ -535,6 +535,7 @@ namespace BuildingRegistry.Projections.Integration.BuildingUnit.LatestItem
 
             When<Envelope<BuildingUnitAddressWasReplacedBecauseAddressWasReaddressed>>(async (context, message, ct) =>
             {
+                //TODO-rik fix met count zoals bij parcelregistry
                 await context.FindAndUpdateBuildingUnit(
                     message.Message.BuildingUnitPersistentLocalId,
                     async buildingUnit =>
@@ -544,6 +545,30 @@ namespace BuildingRegistry.Projections.Integration.BuildingUnit.LatestItem
                         UpdateVersionTimestamp(buildingUnit, message.Message);
                     },
                     ct);
+            });
+
+            When<Envelope<BuildingBuildingUnitsAddressesWereReaddressed>>(async (context, message, ct) =>
+            {
+                foreach (var buildingUnitReaddresses in message.Message.BuildingUnitsReaddresses)
+                {
+                    await context.FindAndUpdateBuildingUnit(
+                        buildingUnitReaddresses.BuildingUnitPersistentLocalId,
+                        async buildingUnit =>
+                        {
+                            foreach (var addressPersistentLocalId in buildingUnitReaddresses.DetachedAddressPersistentLocalIds)
+                            {
+                                await context.RemoveIdempotentBuildingUnitAddress(buildingUnit, addressPersistentLocalId, ct);
+                            }
+
+                            foreach (var addressPersistentLocalId in buildingUnitReaddresses.AttachedAddressPersistentLocalIds)
+                            {
+                                await context.AddIdempotentBuildingUnitAddress(buildingUnit, addressPersistentLocalId, ct);
+                            }
+
+                            UpdateVersionTimestamp(buildingUnit, message.Message);
+                        },
+                        ct);
+                }
             });
 
             When<Envelope<BuildingUnitWasRetiredBecauseBuildingWasDemolished>>(async (context, message, ct) =>
