@@ -4,6 +4,7 @@ using BuildingRegistry.Projections.Legacy;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NetTopologySuite.Geometries;
 
@@ -12,9 +13,11 @@ using NetTopologySuite.Geometries;
 namespace BuildingRegistry.Projections.Legacy.Migrations
 {
     [DbContext(typeof(LegacyContext))]
-    partial class LegacyContextModelSnapshot : ModelSnapshot
+    [Migration("20240521132459_AddCountOnParcelAddress")]
+    partial class AddCountOnParcelAddress
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
