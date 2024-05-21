@@ -1,10 +1,9 @@
 namespace BuildingRegistry.Projections.BackOffice
 {
-    using System;
     using System.Threading.Tasks;
+    using Api.BackOffice.Abstractions;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.Connector;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore;
-    using BuildingRegistry.Api.BackOffice.Abstractions;
     using Building;
     using Building.Events;
     using Microsoft.EntityFrameworkCore;
@@ -77,19 +76,41 @@ namespace BuildingRegistry.Projections.BackOffice
 
             When<Envelope<BuildingUnitAddressWasReplacedBecauseAddressWasReaddressed>>(async (_, message, cancellationToken) =>
             {
-                //TODO-rik fix met count zoals bij parcelregistry
                 await using var backOfficeContext = await backOfficeContextFactory.CreateDbContextAsync(cancellationToken);
 
-                await backOfficeContext.RemoveIdempotentBuildingUnitAddressRelation(
+                var previousAddress = await backOfficeContext.FindBuildingUnitAddressRelation(
                     new BuildingUnitPersistentLocalId(message.Message.BuildingUnitPersistentLocalId),
                     new AddressPersistentLocalId(message.Message.PreviousAddressPersistentLocalId),
-                    cancellationToken);
+                    cancellationToken
+                );
 
-                await backOfficeContext.AddIdempotentBuildingUnitAddressRelation(
-                    new BuildingPersistentLocalId(message.Message.BuildingPersistentLocalId),
+                if (previousAddress is not null && previousAddress.Count == 1)
+                {
+                    backOfficeContext.BuildingUnitAddressRelation.Remove(previousAddress);
+                }
+                else if (previousAddress is not null)
+                {
+                    previousAddress.Count -= 1;
+                }
+
+                var newAddress = await backOfficeContext.FindBuildingUnitAddressRelation(
                     new BuildingUnitPersistentLocalId(message.Message.BuildingUnitPersistentLocalId),
                     new AddressPersistentLocalId(message.Message.NewAddressPersistentLocalId),
-                    cancellationToken);
+                    cancellationToken
+                );
+
+                if (newAddress is null)
+                {
+                    newAddress = new BuildingUnitAddressRelation(
+                        message.Message.BuildingPersistentLocalId,
+                        message.Message.BuildingUnitPersistentLocalId,
+                        message.Message.NewAddressPersistentLocalId);
+                    await backOfficeContext.BuildingUnitAddressRelation.AddAsync(newAddress, cancellationToken);
+                }
+                else
+                {
+                    newAddress.Count += 1;
+                }
             });
 
             When<Envelope<BuildingBuildingUnitsAddressesWereReaddressed>>((_, message, cancellationToken) =>

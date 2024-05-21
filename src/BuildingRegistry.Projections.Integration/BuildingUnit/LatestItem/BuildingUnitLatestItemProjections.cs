@@ -535,13 +535,41 @@ namespace BuildingRegistry.Projections.Integration.BuildingUnit.LatestItem
 
             When<Envelope<BuildingUnitAddressWasReplacedBecauseAddressWasReaddressed>>(async (context, message, ct) =>
             {
-                //TODO-rik fix met count zoals bij parcelregistry
                 await context.FindAndUpdateBuildingUnit(
                     message.Message.BuildingUnitPersistentLocalId,
                     async buildingUnit =>
                     {
-                        await context.RemoveIdempotentBuildingUnitAddress(buildingUnit, message.Message.PreviousAddressPersistentLocalId, ct);
-                        await context.AddIdempotentBuildingUnitAddress(buildingUnit, message.Message.NewAddressPersistentLocalId, ct);
+                        var previousAddress = await context.BuildingUnitAddresses.FindAsync(
+                            [buildingUnit.BuildingUnitPersistentLocalId, message.Message.PreviousAddressPersistentLocalId], ct);
+
+                        if (previousAddress is not null && previousAddress.Count == 1)
+                        {
+                            context.BuildingUnitAddresses.Remove(previousAddress);
+                        }
+                        else if (previousAddress is not null)
+                        {
+                            previousAddress.Count -= 1;
+                        }
+
+                        var newAddress = await context.BuildingUnitAddresses.FindAsync(
+                            [buildingUnit.BuildingUnitPersistentLocalId, message.Message.NewAddressPersistentLocalId], ct);
+
+                        if (newAddress is null)
+                        {
+                            await context
+                                .BuildingUnitAddresses
+                                .AddAsync(new BuildingUnitAddress
+                                {
+                                    BuildingUnitPersistentLocalId = message.Message.BuildingUnitPersistentLocalId,
+                                    AddressPersistentLocalId = message.Message.NewAddressPersistentLocalId,
+                                    Count = 1
+                                }, ct);
+                        }
+                        else
+                        {
+                            newAddress.Count += 1;
+                        }
+
                         UpdateVersionTimestamp(buildingUnit, message.Message);
                     },
                     ct);

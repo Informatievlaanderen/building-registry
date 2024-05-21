@@ -13,6 +13,8 @@ namespace BuildingRegistry.Projections.Legacy
     using BuildingUnitDetailAddressItem = BuildingUnitDetail.BuildingUnitDetailAddressItem;
     using BuildingUnitDetailItem = BuildingUnitDetail.BuildingUnitDetailItem;
     using BuildingUnitDetailListCountView = BuildingUnitDetail.BuildingUnitDetailListCountView;
+    using BuildingUnitDetailItemV2WithCount = BuildingUnitDetailV2WithCount.BuildingUnitDetailItemV2;
+    using BuildingSyndicationItemWithCount = BuildingSyndicationWithCount.BuildingSyndicationItem;
 
     public class LegacyContext : RunnerDbContext<LegacyContext>
     {
@@ -24,13 +26,16 @@ namespace BuildingRegistry.Projections.Legacy
 
         public DbSet<BuildingDetailItem> BuildingDetails { get; set; }
         public DbSet<BuildingDetailItemV2> BuildingDetailsV2 { get; set; }
+
         public DbSet<BuildingSyndicationItem> BuildingSyndication { get; set; }
+        public DbSet<BuildingSyndicationItemWithCount> BuildingSyndicationWithCount { get; set; }
 
         public DbSet<BuildingUnitDetailItem> BuildingUnitDetails { get; set; }
         public DbSet<BuildingUnitBuildingItem> BuildingUnitBuildings { get; set; }
         public DbSet<BuildingUnitDetailAddressItem> BuildingUnitAddresses { get; set; }
+
         public DbSet<BuildingUnitDetailItemV2> BuildingUnitDetailsV2 { get; set; }
-        public DbSet<BuildingUnitDetailAddressItemV2> BuildingUnitAddressesV2 { get; set; }
+        public DbSet<BuildingUnitDetailItemV2WithCount> BuildingUnitDetailsV2WithCount { get; set; }
 
         public DbSet<RemovedPersistentLocalId> RemovedPersistentLocalIds { get; set; }
         public DbSet<DuplicatedPersistentLocalId> DuplicatedPersistentLocalIds { get; set; }

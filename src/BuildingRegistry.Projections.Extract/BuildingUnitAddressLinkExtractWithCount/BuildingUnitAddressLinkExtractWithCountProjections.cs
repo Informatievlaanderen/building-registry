@@ -1,4 +1,4 @@
-namespace BuildingRegistry.Projections.Extract.BuildingUnitAddressLinkExtract
+namespace BuildingRegistry.Projections.Extract.BuildingUnitAddressLinkExtractWithCount
 {
     using System;
     using System.Linq;
@@ -31,7 +31,7 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitAddressLinkExtract
                     foreach (var addressPersistentLocalId in buildingUnit.AddressPersistentLocalIds)
                     {
                         await context
-                            .BuildingUnitAddressLinkExtract
+                            .BuildingUnitAddressLinkExtractWithCount
                             .AddAsync(new BuildingUnitAddressLinkExtractItem
                             {
                                 BuildingPersistentLocalId = message.Message.BuildingPersistentLocalId,
@@ -51,7 +51,7 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitAddressLinkExtract
             When<Envelope<BuildingUnitAddressWasAttachedV2>>(async (context, message, ct) =>
             {
                 await context
-                    .BuildingUnitAddressLinkExtract
+                    .BuildingUnitAddressLinkExtractWithCount
                     .AddAsync(new BuildingUnitAddressLinkExtractItem
                     {
                         BuildingPersistentLocalId = message.Message.BuildingPersistentLocalId,
@@ -96,22 +96,44 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitAddressLinkExtract
 
             When<Envelope<BuildingUnitAddressWasReplacedBecauseAddressWasReaddressed>>(async (context, message, ct) =>
             {
-                await RemoveIdempotentLink(context,
-                    new BuildingUnitPersistentLocalId(message.Message.BuildingUnitPersistentLocalId),
-                    new AddressPersistentLocalId(message.Message.PreviousAddressPersistentLocalId), ct);
+                var previousAddress =  await context.BuildingUnitAddressLinkExtractWithCount.FindAsync(
+                    [message.Message.BuildingUnitPersistentLocalId, message.Message.PreviousAddressPersistentLocalId],
+                    ct);
 
-                await AddIdempotentLink(context, new BuildingUnitAddressLinkExtractItem
+                if (previousAddress is not null && previousAddress.Count == 1)
                 {
-                    BuildingPersistentLocalId = message.Message.BuildingPersistentLocalId,
-                    BuildingUnitPersistentLocalId = message.Message.BuildingUnitPersistentLocalId,
-                    AddressPersistentLocalId = message.Message.NewAddressPersistentLocalId,
-                    DbaseRecord = new BuildingUnitAddressLinkDbaseRecord()
-                    {
-                        objecttype = { Value = ObjectType },
-                        adresobjid = { Value = message.Message.BuildingUnitPersistentLocalId.ToString() },
-                        adresid = { Value = message.Message.NewAddressPersistentLocalId }
-                    }.ToBytes(_encoding)
-                }, ct);
+                    context.Remove(previousAddress);
+                }
+                else if (previousAddress is not null)
+                {
+                    previousAddress.Count -= 1;
+                }
+
+                var newAddress =  await context.BuildingUnitAddressLinkExtractWithCount.FindAsync(
+                    [message.Message.BuildingUnitPersistentLocalId, message.Message.NewAddressPersistentLocalId],
+                    ct);
+
+                if (newAddress is null)
+                {
+                    await context.BuildingUnitAddressLinkExtractWithCount.AddAsync(
+                        new BuildingUnitAddressLinkExtractItem
+                        {
+                            BuildingPersistentLocalId = message.Message.BuildingPersistentLocalId,
+                            BuildingUnitPersistentLocalId = message.Message.BuildingUnitPersistentLocalId,
+                            AddressPersistentLocalId = message.Message.NewAddressPersistentLocalId,
+                            DbaseRecord = new BuildingUnitAddressLinkDbaseRecord
+                            {
+                                objecttype = { Value = ObjectType },
+                                adresobjid = { Value = message.Message.BuildingUnitPersistentLocalId.ToString() },
+                                adresid = { Value = message.Message.NewAddressPersistentLocalId }
+                            }.ToBytes(_encoding)
+                        },
+                        ct);
+                }
+                else
+                {
+                    newAddress.Count += 1;
+                }
             });
 
             When<Envelope<BuildingBuildingUnitsAddressesWereReaddressed>>(async (context, message, ct) =>
@@ -149,13 +171,13 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitAddressLinkExtract
             BuildingUnitAddressLinkExtractItem linkItem,
             CancellationToken ct)
         {
-            var extractItem = await context.FindBuildingUnitAddressExtractItem(
-                linkItem.BuildingUnitPersistentLocalId,
-                linkItem.AddressPersistentLocalId, ct);
+            var extractItem =  await context.BuildingUnitAddressLinkExtractWithCount.FindAsync(
+                [linkItem.BuildingUnitPersistentLocalId, linkItem.AddressPersistentLocalId],
+                ct);
 
             if (extractItem is null)
             {
-                await context.BuildingUnitAddressLinkExtract.AddAsync(linkItem, ct);
+                await context.BuildingUnitAddressLinkExtractWithCount.AddAsync(linkItem, ct);
             }
         }
 
@@ -165,9 +187,9 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitAddressLinkExtract
             int addressPersistentLocalId,
             CancellationToken ct)
         {
-            var linkExtractItem = await context.FindBuildingUnitAddressExtractItem(
-                buildingUnitPersistentLocalId,
-                addressPersistentLocalId, ct);
+            var linkExtractItem =  await context.BuildingUnitAddressLinkExtractWithCount.FindAsync(
+                [buildingUnitPersistentLocalId, addressPersistentLocalId],
+                ct);
 
             if (linkExtractItem is not null)
             {

@@ -8,6 +8,7 @@
     {
         public int BuildingUnitPersistentLocalId { get; set; }
         public int AddressPersistentLocalId { get; set; }
+        public int Count { get; set; }
 
         public BuildingUnitAddress()
         { }
@@ -25,6 +26,7 @@
 
             builder.Property(x => x.BuildingUnitPersistentLocalId).HasColumnName("building_unit_persistent_local_id");
             builder.Property(x => x.AddressPersistentLocalId).HasColumnName("address_persistent_local_id");
+            builder.Property(e => e.Count).HasDefaultValue(1);
 
             builder.HasIndex(x => x.BuildingUnitPersistentLocalId);
             builder.HasIndex(x => x.AddressPersistentLocalId);

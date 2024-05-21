@@ -3,12 +3,12 @@ namespace BuildingRegistry.Projections.Extract
     using System.Threading;
     using System.Threading.Tasks;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.Runner;
-    using Building;
     using BuildingExtract;
     using BuildingUnitAddressLinkExtract;
     using BuildingUnitExtract;
     using Infrastructure;
     using Microsoft.EntityFrameworkCore;
+    using BuildingUnitAddressLinkExtractItemWithCount = BuildingUnitAddressLinkExtractWithCount.BuildingUnitAddressLinkExtractItem;
 
     public class ExtractContext : RunnerDbContext<ExtractContext>
     {
@@ -21,6 +21,7 @@ namespace BuildingRegistry.Projections.Extract
         public DbSet<BuildingUnitExtractItemV2> BuildingUnitExtractV2 { get; set; }
         public DbSet<BuildingUnitBuildingItem> BuildingUnitBuildings { get; set; }
         public DbSet<BuildingUnitAddressLinkExtractItem> BuildingUnitAddressLinkExtract { get; set; }
+        public DbSet<BuildingUnitAddressLinkExtractItemWithCount> BuildingUnitAddressLinkExtractWithCount { get; set; }
 
         // This needs to be here to please EF
         public ExtractContext() { }

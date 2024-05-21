@@ -221,6 +221,9 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions
             modelBuilder.Entity<BuildingUnitAddressRelation>()
                 .Property(x => x.BuildingUnitPersistentLocalId)
                 .ValueGeneratedNever();
+            modelBuilder.Entity<BuildingUnitAddressRelation>()
+                .Property(x => x.Count)
+                .HasDefaultValue(1);
 
             modelBuilder.Entity<BuildingUnitAddressRelation>()
                 .HasIndex(x => x.AddressPersistentLocalId);
@@ -251,6 +254,7 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions
         public int BuildingPersistentLocalId { get; set; }
         public int BuildingUnitPersistentLocalId { get; set; }
         public int AddressPersistentLocalId { get; set; }
+        public int Count { get; set; }
 
         private BuildingUnitAddressRelation()
         { }
@@ -260,6 +264,7 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions
             BuildingPersistentLocalId = buildingPersistentLocalId;
             BuildingUnitPersistentLocalId = buildingUnitPersistentLocal;
             AddressPersistentLocalId = addressPersistentLocalId;
+            Count = 1;
         }
     }
 

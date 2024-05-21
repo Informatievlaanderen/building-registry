@@ -501,7 +501,6 @@ namespace BuildingRegistry.Projections.Integration.Building.Version
 
             When<Envelope<BuildingUnitAddressWasReplacedBecauseAddressWasReaddressed>>(async (context, message, ct) =>
             {
-                //TODO-rik fix met count zoals bij parcelregistry
                 await context.CreateNewBuildingVersion(
                     message.Message.BuildingPersistentLocalId,
                     message,
@@ -510,18 +509,34 @@ namespace BuildingRegistry.Projections.Integration.Building.Version
                         var buildingUnit = building.BuildingUnits.Single(x =>
                             x.BuildingUnitPersistentLocalId == message.Message.BuildingUnitPersistentLocalId);
 
-                        var address = buildingUnit.Addresses.SingleOrDefault(x => x.AddressPersistentLocalId == message.Message.PreviousAddressPersistentLocalId);
-                        if (address is not null)
+                        var previousAddress = buildingUnit.Addresses
+                            .SingleOrDefault(x => x.AddressPersistentLocalId == message.Message.PreviousAddressPersistentLocalId);
+                        if (previousAddress is not null && previousAddress.Count == 1)
                         {
-                            buildingUnit.Addresses.Remove(address);
+                            buildingUnit.Addresses.Remove(previousAddress);
+                        }
+                        else if (previousAddress is not null)
+                        {
+                            previousAddress.Count -= 1;
                         }
 
-                        buildingUnit.Addresses.Add(new BuildingUnitAddressVersion
+                        var newAddress = buildingUnit.Addresses
+                            .SingleOrDefault(x => x.AddressPersistentLocalId == message.Message.NewAddressPersistentLocalId);
+
+                        if (newAddress is null)
                         {
-                            AddressPersistentLocalId = message.Message.NewAddressPersistentLocalId,
-                            BuildingUnitPersistentLocalId = message.Message.BuildingPersistentLocalId,
-                            Position = message.Position
-                        });
+                            buildingUnit.Addresses.Add(new BuildingUnitAddressVersion
+                            {
+                                AddressPersistentLocalId = message.Message.NewAddressPersistentLocalId,
+                                BuildingUnitPersistentLocalId = message.Message.BuildingPersistentLocalId,
+                                Position = message.Position,
+                                Count = 1
+                            });
+                        }
+                        else
+                        {
+                            newAddress.Count += 1;
+                        }
 
                         buildingUnit.VersionTimestamp = message.Message.Provenance.Timestamp;
                     },
