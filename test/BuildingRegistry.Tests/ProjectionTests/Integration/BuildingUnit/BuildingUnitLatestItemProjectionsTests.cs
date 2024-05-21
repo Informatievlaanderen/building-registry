@@ -21,7 +21,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.BuildingUnit
     using Tests.Legacy.Autofixture;
     using Xunit;
 
-    public class BuildingUnitLatestItemProjectionsTests : IntegrationProjectionTest<BuildingUnitLatestItemProjections>
+    public partial class BuildingUnitLatestItemProjectionsTests : IntegrationProjectionTest<BuildingUnitLatestItemProjections>
     {
         private const string BuildingNamespace = "https://data.vlaanderen.be/id/gebouw";
         private const string BuildingUnitNamespace = "https://data.vlaanderen.be/id/gebouweenheid";
@@ -1292,6 +1292,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.BuildingUnit
         [Fact]
         public async Task WhenBuildingUnitAddressWasReplacedBecauseAddressWasReaddressed()
         {
+            //TODO-rik extract test + add situations for Count logic
             _fixture.Customize(new WithFixedBuildingPersistentLocalId());
             _fixture.Customize(new WithFixedBuildingUnitPersistentLocalId());
             _fixture.Customize(new WithFixedAddressPersistentLocalId());

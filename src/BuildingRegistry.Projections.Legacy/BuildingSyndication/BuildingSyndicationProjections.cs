@@ -1367,7 +1367,6 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndication
             // source not attached && destination not attached => event applied
             When<Envelope<BuildingUnitAddressWasReplacedBecauseAddressWasReaddressed>>(async (context, message, ct) =>
             {
-                //TODO-rik fix met count zoals bij parcelregistry
                 await context.CreateNewBuildingSyndicationItem(message.Message.BuildingPersistentLocalId, message, item =>
                 {
                     var unit = item.BuildingUnitsV2.Single(y => y.PersistentLocalId == message.Message.BuildingUnitPersistentLocalId);

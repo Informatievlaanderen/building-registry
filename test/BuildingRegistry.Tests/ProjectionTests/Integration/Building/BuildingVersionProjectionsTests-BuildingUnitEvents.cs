@@ -1437,7 +1437,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
 
                     buildingUnitVersion!.VersionTimestamp.Should().Be(buildingUnitAddressWasReplacedBecauseAddressWasReaddressed.Provenance.Timestamp);
                     buildingUnitVersion.Type.Should().Be("EventName");
-
+                    
                     var newAddress = buildingUnitVersion.Addresses.SingleOrDefault(x =>
                         x.AddressPersistentLocalId == buildingUnitAddressWasReplacedBecauseAddressWasReaddressed.NewAddressPersistentLocalId);
                     newAddress.Should().NotBeNull();
@@ -1446,6 +1446,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
                         x.AddressPersistentLocalId == buildingUnitAddressWasReplacedBecauseAddressWasReaddressed.PreviousAddressPersistentLocalId);
                     oldAddress.Should().BeNull();
                 });
+            //TODO-rik extract test + add situations for Count logic
         }
 
         [Fact]

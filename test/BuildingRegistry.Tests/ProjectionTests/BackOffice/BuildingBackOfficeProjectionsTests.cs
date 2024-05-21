@@ -14,7 +14,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.BackOffice
     using Tests.Legacy.Autofixture;
     using Xunit;
 
-    public class BuildingBackOfficeProjectionsTests : BuildingBackOfficeProjectionsTest
+    public partial class BuildingBackOfficeProjectionsTests : BuildingBackOfficeProjectionsTest
     {
         private readonly Fixture _fixture;
         private readonly FakeBackOfficeContext _fakeBackOfficeContext;
@@ -263,32 +263,6 @@ namespace BuildingRegistry.Tests.ProjectionTests.BackOffice
                         @event.BuildingUnitPersistentLocalId, @event.AddressPersistentLocalId);
 
                     result.Should().BeNull();
-                });
-        }
-
-        [Fact]
-        public async Task GivenBuildingUnitAddressWasReplacedBecauseAddressWasReaddressed_ThenRelationIsReplaced()
-        {
-            //TODO-rik fix met count zoals bij parcelregistry
-            var @event = _fixture.Create<BuildingUnitAddressWasReplacedBecauseAddressWasReaddressed>();
-
-            await _fakeBackOfficeContext.AddBuildingUnitAddressRelation(
-                new BuildingPersistentLocalId(@event.BuildingPersistentLocalId),
-                new BuildingUnitPersistentLocalId(@event.BuildingUnitPersistentLocalId),
-                new AddressPersistentLocalId(@event.PreviousAddressPersistentLocalId));
-
-            await Sut
-                .Given(@event)
-                .Then(async _ =>
-                {
-                    var result = await _fakeBackOfficeContext.BuildingUnitAddressRelation.FindAsync(
-                        @event.BuildingUnitPersistentLocalId, @event.NewAddressPersistentLocalId);
-
-                    result.Should().NotBeNull();
-
-                    var sourceRelation = await _fakeBackOfficeContext.BuildingUnitAddressRelation.FindAsync(
-                        @event.BuildingUnitPersistentLocalId, @event.PreviousAddressPersistentLocalId);
-                    sourceRelation.Should().BeNull();
                 });
         }
 

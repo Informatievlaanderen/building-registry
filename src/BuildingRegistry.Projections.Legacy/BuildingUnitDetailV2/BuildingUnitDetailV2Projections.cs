@@ -397,7 +397,6 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetailV2
 
             When<Envelope<BuildingUnitAddressWasReplacedBecauseAddressWasReaddressed>>(async (context, message, ct) =>
             {
-                //TODO-rik fix met count zoals bij parcelregistry
                 await Update(context, message.Message.BuildingUnitPersistentLocalId, item =>
                 {
                     context.Entry(item).Collection(x => x.Addresses).Load();

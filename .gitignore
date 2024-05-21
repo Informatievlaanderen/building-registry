@@ -45,3 +45,4 @@ Thumbs.db
 
 crabimport-request-*.json
 structurizr-*.json
+/BuildingRegistry.sln.startup.json

@@ -113,11 +113,7 @@ namespace BuildingRegistry.Projections.BackOffice
                 }
             });
 
-            When<Envelope<BuildingBuildingUnitsAddressesWereReaddressed>>((_, message, cancellationToken) =>
-            {
-                // Do nothing
-                return Task.CompletedTask;
-            });
+            When<Envelope<BuildingBuildingUnitsAddressesWereReaddressed>>((_, _, _) => Task.CompletedTask);
 
             When<Envelope<BuildingUnitWasMovedOutOfBuilding>>(async (_, message, cancellationToken) =>
             {
