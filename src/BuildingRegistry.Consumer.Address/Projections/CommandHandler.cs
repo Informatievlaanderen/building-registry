@@ -33,7 +33,7 @@ namespace BuildingRegistry.Consumer.Address.Projections
             _logger.LogDebug($"Handled {command.GetType().FullName}");
         }
 
-        public async Task HandleIdempotent<T>(T command, CancellationToken cancellationToken)
+        public virtual async Task HandleIdempotent<T>(T command, CancellationToken cancellationToken)
             where T : class, IHasCommandProvenance
         {
             _logger.LogDebug($"Handling {command.GetType().FullName}");

@@ -3,20 +3,20 @@ namespace BuildingRegistry.Tests.ProjectionTests.Consumer.Address.CommandHandlin
     using System;
     using System.Threading;
     using System.Threading.Tasks;
+    using Api.BackOffice.Abstractions;
     using AutoFixture;
     using Be.Vlaanderen.Basisregisters.GrAr.Contracts.AddressRegistry;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
-    using BuildingRegistry.Api.BackOffice.Abstractions;
-    using BuildingRegistry.Building;
-    using BuildingRegistry.Building.Commands;
+    using Building;
+    using Building.Commands;
     using BuildingRegistry.Consumer.Address;
     using BuildingRegistry.Consumer.Address.Projections;
-    using BuildingRegistry.Tests.BackOffice;
-    using BuildingRegistry.Tests.Legacy.Autofixture;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Logging.Abstractions;
     using Moq;
     using NodaTime;
+    using Tests.BackOffice;
+    using Tests.Legacy.Autofixture;
     using Xunit;
     using Xunit.Abstractions;
     using Provenance = Be.Vlaanderen.Basisregisters.GrAr.Contracts.Common.Provenance;
@@ -25,13 +25,15 @@ namespace BuildingRegistry.Tests.ProjectionTests.Consumer.Address.CommandHandlin
     {
         private readonly FakeBackOfficeContext _fakeBackOfficeContext;
         private readonly Mock<FakeCommandHandler> _mockCommandHandler;
+        private readonly Mock<IBuildings> _buildings;
 
         public CommandHandlingKafkaProjectionTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
         {
             Fixture.Customize(new InfrastructureCustomization());
 
             _mockCommandHandler = new Mock<FakeCommandHandler>();
-            _fakeBackOfficeContext = new FakeBackOfficeContextFactory(true).CreateDbContext(Array.Empty<string>());
+            _fakeBackOfficeContext = new FakeBackOfficeContextFactory(true).CreateDbContext([]);
+            _buildings = new Mock<IBuildings>();
         }
 
         [Fact]
@@ -564,11 +566,10 @@ namespace BuildingRegistry.Tests.ProjectionTests.Consumer.Address.CommandHandlin
         protected override CommandHandlingKafkaProjection CreateProjection()
         {
             var factoryMock = new Mock<IDbContextFactory<BackOfficeContext>>();
-            var buildingsMock = new Mock<IBuildings>();
             factoryMock
                 .Setup(x => x.CreateDbContextAsync(CancellationToken.None))
                 .Returns(Task.FromResult<BackOfficeContext>(_fakeBackOfficeContext));
-            return new CommandHandlingKafkaProjection(factoryMock.Object, buildingsMock.Object);
+            return new CommandHandlingKafkaProjection(factoryMock.Object, _buildings.Object);
         }
     }
 

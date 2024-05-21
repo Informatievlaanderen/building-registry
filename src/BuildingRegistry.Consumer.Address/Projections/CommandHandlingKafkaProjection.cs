@@ -21,7 +21,8 @@ namespace BuildingRegistry.Consumer.Address.Projections
     {
         private readonly IDbContextFactory<BackOfficeContext> _backOfficeContextFactory;
 
-        public CommandHandlingKafkaProjection(IDbContextFactory<BackOfficeContext> backOfficeContextFactory,
+        public CommandHandlingKafkaProjection(
+            IDbContextFactory<BackOfficeContext> backOfficeContextFactory,
             IBuildings buildings)
         {
             _backOfficeContextFactory = backOfficeContextFactory;
