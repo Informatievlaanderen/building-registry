@@ -21,7 +21,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Consumer.Address.CommandHandlin
     using Xunit.Abstractions;
     using Provenance = Be.Vlaanderen.Basisregisters.GrAr.Contracts.Common.Provenance;
 
-    public sealed class CommandHandlingKafkaProjectionTests : KafkaProjectionTest<CommandHandler, CommandHandlingKafkaProjection>
+    public partial class CommandHandlingKafkaProjectionTests : KafkaProjectionTest<CommandHandler, CommandHandlingKafkaProjection>
     {
         private readonly FakeBackOfficeContext _fakeBackOfficeContext;
         private readonly Mock<FakeCommandHandler> _mockCommandHandler;

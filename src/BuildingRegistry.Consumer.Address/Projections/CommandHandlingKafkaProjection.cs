@@ -214,7 +214,7 @@ namespace BuildingRegistry.Consumer.Address.Projections
                 var commandByBuildings = new Dictionary<BuildingPersistentLocalId, ReaddressAddresses>();
                 foreach (var addressRelationsByBuilding in buildingUnitAddressRelations.GroupBy(x => x.BuildingPersistentLocalId))
                 {
-                    var addressesByBuildingUnit = new Dictionary<BuildingUnitPersistentLocalId, IReadOnlyList<ReaddressData>>();
+                    var addressesByBuildingUnit = new Dictionary<BuildingUnitPersistentLocalId, List<ReaddressData>>();
                     foreach (var buildingUnitAddressRelation in buildingUnitAddressRelations)
                     {
                         var readdressData = readdresses
@@ -223,16 +223,18 @@ namespace BuildingRegistry.Consumer.Address.Projections
 
                         if (readdressData.Any())
                         {
-                            addressesByBuildingUnit.Add(
-                                new BuildingUnitPersistentLocalId(buildingUnitAddressRelation.BuildingUnitPersistentLocalId),
-                                readdressData);
+                            var buildingUnitPersistentLocalId = new BuildingUnitPersistentLocalId(buildingUnitAddressRelation.BuildingUnitPersistentLocalId);
+                            addressesByBuildingUnit.TryAdd(buildingUnitPersistentLocalId, []);
+                            addressesByBuildingUnit[buildingUnitPersistentLocalId].AddRange(readdressData);
                         }
                     }
 
                     var buildingPersistentLocalId = new BuildingPersistentLocalId(addressRelationsByBuilding.Key);
                     commandByBuildings.Add(
                         buildingPersistentLocalId,
-                        new ReaddressAddresses(buildingPersistentLocalId, addressesByBuildingUnit, FromProvenance(message.Provenance)));
+                        new ReaddressAddresses(buildingPersistentLocalId, addressesByBuildingUnit
+                            .ToDictionary(x => x.Key, x => (IReadOnlyList<ReaddressData>)x.Value),
+                            FromProvenance(message.Provenance)));
                 }
 
                 foreach (var command in commandByBuildings.Values)
@@ -248,7 +250,7 @@ namespace BuildingRegistry.Consumer.Address.Projections
                 }
 
                 await backOfficeContext.Database.BeginTransactionAsync();
-                //TODO-jonas add unit test
+                //TODO-jonas add unit test voor backofficecontext logica, waar GEEN projectie van is/mag bestaan
                 var commandBuildingPersistentLocalIds = commandByBuildings.Values.Select(x => (int)x.BuildingPersistentLocalId).ToList();
                 var allBackOfficeBuildingUnitAddressRelations = (await backOfficeContext.BuildingUnitAddressRelation
                         .AsNoTracking()
