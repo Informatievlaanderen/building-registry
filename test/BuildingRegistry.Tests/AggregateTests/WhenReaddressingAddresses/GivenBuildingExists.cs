@@ -272,7 +272,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenReaddressingAddresses
             sut.BuildingUnits.First().AddressPersistentLocalIds.Should().Contain(otherAddressPersistentLocalId);
             sut.BuildingUnits.First().AddressPersistentLocalIds.Should().NotContain(sourceAddressPersistentLocalId);
             sut.BuildingUnits.First().LastEventHash.Should().Be(@event.GetHash());
-            sut.LastEventHash.Should().NotBe(@event.GetHash());
+            sut.LastEventHash.Should().Be(buildingWasMigrated.GetHash());
         }
     }
 }

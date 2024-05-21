@@ -295,15 +295,8 @@ namespace BuildingRegistry.Building
 
         private void When(BuildingUnitAddressWasReplacedBecauseAddressWasReaddressed @event)
         {
-            if (_addressPersistentLocalIds.Contains(new AddressPersistentLocalId(@event.PreviousAddressPersistentLocalId)))
-            {
-                _addressPersistentLocalIds.Remove(new AddressPersistentLocalId(@event.PreviousAddressPersistentLocalId));
-            }
-
-            if (!_addressPersistentLocalIds.Contains(new AddressPersistentLocalId(@event.NewAddressPersistentLocalId)))
-            {
-                _addressPersistentLocalIds.Add(new AddressPersistentLocalId(@event.NewAddressPersistentLocalId));
-            }
+            _addressPersistentLocalIds.Remove(new AddressPersistentLocalId(@event.PreviousAddressPersistentLocalId));
+            _addressPersistentLocalIds.Add(new AddressPersistentLocalId(@event.NewAddressPersistentLocalId));
 
             _lastEvent = @event;
         }
