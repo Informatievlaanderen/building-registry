@@ -251,7 +251,7 @@ namespace BuildingRegistry.Consumer.Address.Projections
                 }
 
                 await backOfficeContext.Database.BeginTransactionAsync();
-                //TODO-jonas add unit test voor backofficecontext logica, waar GEEN projectie van is/mag bestaan
+                
                 var commandBuildingPersistentLocalIds = commandByBuildings.Values.Select(x => (int)x.BuildingPersistentLocalId).ToList();
                 var allBackOfficeBuildingUnitAddressRelations = (await backOfficeContext.BuildingUnitAddressRelation
                         .AsNoTracking()

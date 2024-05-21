@@ -1,4 +1,3 @@
-//TODO-jonas implement
 namespace BuildingRegistry.Tests.ProjectionTests.Consumer.Address.CommandHandlingProjection
 {
     using System;
