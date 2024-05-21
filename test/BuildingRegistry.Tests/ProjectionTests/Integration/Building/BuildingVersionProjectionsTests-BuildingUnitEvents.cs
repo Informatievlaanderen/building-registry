@@ -11,6 +11,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore;
     using Be.Vlaanderen.Basisregisters.Utilities.HexByteConvertor;
     using BuildingRegistry.Building;
+    using BuildingRegistry.Building.Commands;
     using BuildingRegistry.Building.Events;
     using Extensions;
     using Fixtures;
@@ -1444,6 +1445,76 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
                     var oldAddress = buildingUnitVersion.Addresses.SingleOrDefault(x =>
                         x.AddressPersistentLocalId == buildingUnitAddressWasReplacedBecauseAddressWasReaddressed.PreviousAddressPersistentLocalId);
                     oldAddress.Should().BeNull();
+                });
+        }
+
+        [Fact]
+        public async Task WhenBuildingBuildingUnitsAddressesWereReaddressed()
+        {
+            _fixture.Customize(new WithFixedBuildingPersistentLocalId());
+            _fixture.Customize(new WithFixedBuildingUnitPersistentLocalId());
+
+            var position = _fixture.Create<long>();
+            var buildingUnitPersistentLocalId = _fixture.Create<BuildingUnitPersistentLocalId>();
+            var sourceAddressPersistentLocalId = _fixture.Create<AddressPersistentLocalId>();
+            var destinationAddressPersistentLocalId = _fixture.Create<AddressPersistentLocalId>();
+
+            var buildingWasMigrated = new BuildingWasMigratedBuilder(_fixture)
+                .WithBuildingUnit(new BuildingUnitBuilder(_fixture)
+                    .WithAddress(sourceAddressPersistentLocalId)
+                    .Build()
+                ).Build();
+            
+            var buildingBuildingUnitsAddressesWereReaddressed = new BuildingBuildingUnitsAddressesWereReaddressed(
+                _fixture.Create<BuildingPersistentLocalId>(),
+                [
+                    new BuildingUnitAddressesWereReaddressed(
+                        _fixture.Create<BuildingUnitPersistentLocalId>(),
+                        [new AddressPersistentLocalId(destinationAddressPersistentLocalId)],
+                        [new AddressPersistentLocalId(sourceAddressPersistentLocalId)]
+                    )
+                ],
+                []);
+            ((ISetProvenance)buildingBuildingUnitsAddressesWereReaddressed).SetProvenance(_fixture.Create<Provenance>());
+
+            var buildingWasMigratedMetadata = new Dictionary<string, object>
+            {
+                { AddEventHashPipe.HashMetadataKey, buildingWasMigrated.GetHash() },
+                { Envelope.PositionMetadataKey, position },
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
+            };
+            var buildingBuildingUnitsAddressesWereReaddressedMetadata = new Dictionary<string, object>
+            {
+                { AddEventHashPipe.HashMetadataKey, buildingBuildingUnitsAddressesWereReaddressed.GetHash() },
+                { Envelope.PositionMetadataKey, ++position },
+                { Envelope.EventNameMetadataKey, "EventName"}
+            };
+
+            await Sut
+                .Given(
+                    new Envelope<BuildingWasMigrated>(new Envelope(buildingWasMigrated, buildingWasMigratedMetadata)),
+                    new Envelope<BuildingBuildingUnitsAddressesWereReaddressed>(
+                        new Envelope(
+                            buildingBuildingUnitsAddressesWereReaddressed,
+                            buildingBuildingUnitsAddressesWereReaddressedMetadata)))
+                .Then(async context =>
+                {
+                    var buildingVersion = await context.BuildingVersions.FindAsync(position);
+                    buildingVersion.Should().NotBeNull();
+                    var buildingUnitVersion = buildingVersion!.BuildingUnits.SingleOrDefault(x =>
+                        x.BuildingUnitPersistentLocalId == buildingUnitPersistentLocalId);
+                    buildingUnitVersion.Should().NotBeNull();
+
+                    buildingUnitVersion!.VersionTimestamp.Should().Be(buildingBuildingUnitsAddressesWereReaddressed.Provenance.Timestamp);
+                    buildingUnitVersion.Type.Should().Be("EventName");
+
+                    var destinationAddress = buildingUnitVersion.Addresses.SingleOrDefault(x =>
+                        x.AddressPersistentLocalId == destinationAddressPersistentLocalId);
+                    destinationAddress.Should().NotBeNull();
+
+                    var sourceAddress = buildingUnitVersion.Addresses.SingleOrDefault(x =>
+                        x.AddressPersistentLocalId == sourceAddressPersistentLocalId);
+                    sourceAddress.Should().BeNull();
                 });
         }
 

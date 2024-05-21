@@ -1349,6 +1349,70 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.BuildingUnit
         }
 
         [Fact]
+        public async Task WhenBuildingBuildingUnitsAddressesWereReaddressed()
+        {
+            _fixture.Customize(new WithFixedBuildingPersistentLocalId());
+            _fixture.Customize(new WithFixedBuildingUnitPersistentLocalId());
+
+            var position = _fixture.Create<long>();
+            var buildingUnitPersistentLocalId = _fixture.Create<BuildingUnitPersistentLocalId>();
+            var sourceAddressPersistentLocalId = _fixture.Create<AddressPersistentLocalId>();
+            var destinationAddressPersistentLocalId = _fixture.Create<AddressPersistentLocalId>();
+
+            var buildingWasMigrated = new BuildingWasMigratedBuilder(_fixture)
+                .WithBuildingUnit(new BuildingUnitBuilder(_fixture)
+                    .WithAddress(sourceAddressPersistentLocalId)
+                    .Build()
+                ).Build();
+
+            var buildingBuildingUnitsAddressesWereReaddressed = new BuildingBuildingUnitsAddressesWereReaddressed(
+                _fixture.Create<BuildingPersistentLocalId>(),
+                [
+                    new BuildingUnitAddressesWereReaddressed(
+                        _fixture.Create<BuildingUnitPersistentLocalId>(),
+                        [new AddressPersistentLocalId(destinationAddressPersistentLocalId)],
+                        [new AddressPersistentLocalId(sourceAddressPersistentLocalId)]
+                    )
+                ],
+                []);
+            ((ISetProvenance)buildingBuildingUnitsAddressesWereReaddressed).SetProvenance(_fixture.Create<Provenance>());
+
+            var buildingWasMigratedMetadata = new Dictionary<string, object>
+            {
+                { AddEventHashPipe.HashMetadataKey, buildingWasMigrated.GetHash() },
+                { Envelope.PositionMetadataKey, position },
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
+            };
+            var buildingBuildingUnitsAddressesWereReaddressedMetadata = new Dictionary<string, object>
+            {
+                { AddEventHashPipe.HashMetadataKey, buildingBuildingUnitsAddressesWereReaddressed.GetHash() },
+                { Envelope.PositionMetadataKey, ++position }
+            };
+            await Sut
+                .Given(
+                    new Envelope<BuildingWasMigrated>(new Envelope(buildingWasMigrated, buildingWasMigratedMetadata)),
+                    new Envelope<BuildingBuildingUnitsAddressesWereReaddressed>(
+                        new Envelope(
+                            buildingBuildingUnitsAddressesWereReaddressed,
+                            buildingBuildingUnitsAddressesWereReaddressedMetadata)))
+                .Then(async context =>
+                {
+                    var buildingUnitLatestItem = await context.BuildingUnitLatestItems.FindAsync((int)buildingUnitPersistentLocalId);
+                    buildingUnitLatestItem.Should().NotBeNull();
+
+                    buildingUnitLatestItem!.VersionTimestamp.Should().Be(buildingBuildingUnitsAddressesWereReaddressed.Provenance.Timestamp);
+
+                    var destinationAddress = context.BuildingUnitAddresses.SingleOrDefault(x =>
+                        x.AddressPersistentLocalId == destinationAddressPersistentLocalId);
+                    destinationAddress.Should().NotBeNull();
+
+                    var sourceAddress = context.BuildingUnitAddresses.SingleOrDefault(x =>
+                        x.AddressPersistentLocalId == sourceAddressPersistentLocalId);
+                    sourceAddress.Should().BeNull();
+                });
+        }
+
+        [Fact]
         public async Task WhenBuildingUnitWasRetiredBecauseBuildingWasDemolished()
         {
             _fixture.Customize(new WithFixedBuildingPersistentLocalId());
