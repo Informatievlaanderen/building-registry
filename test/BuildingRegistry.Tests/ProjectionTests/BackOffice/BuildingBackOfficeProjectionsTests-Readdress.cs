@@ -25,8 +25,6 @@ namespace BuildingRegistry.Tests.ProjectionTests.BackOffice
                 .Given(@event)
                 .Then(async _ =>
                 {
-                    await _fakeBackOfficeContext.SaveChangesAsync(CancellationToken.None); //TODO-rik discuss
-
                     var previousAddressRelation = await _fakeBackOfficeContext.BuildingUnitAddressRelation.FindAsync(
                         @event.BuildingUnitPersistentLocalId, @event.PreviousAddressPersistentLocalId);
                     previousAddressRelation.Should().BeNull();
@@ -57,8 +55,6 @@ namespace BuildingRegistry.Tests.ProjectionTests.BackOffice
                 .Given(@event)
                 .Then(async _ =>
                 {
-                    await _fakeBackOfficeContext.SaveChangesAsync(CancellationToken.None); //TODO-rik discuss
-
                     var previousAddressRelation = await _fakeBackOfficeContext.BuildingUnitAddressRelation.FindAsync(
                         @event.BuildingUnitPersistentLocalId, @event.PreviousAddressPersistentLocalId);
                     previousAddressRelation.Should().NotBeNull();
@@ -89,8 +85,6 @@ namespace BuildingRegistry.Tests.ProjectionTests.BackOffice
                 .Given(@event)
                 .Then(async _ =>
                 {
-                    await _fakeBackOfficeContext.SaveChangesAsync(CancellationToken.None); //TODO-rik discuss
-
                     var previousAddressRelation = await _fakeBackOfficeContext.BuildingUnitAddressRelation.FindAsync(
                         @event.BuildingUnitPersistentLocalId, @event.PreviousAddressPersistentLocalId);
                     previousAddressRelation.Should().BeNull();

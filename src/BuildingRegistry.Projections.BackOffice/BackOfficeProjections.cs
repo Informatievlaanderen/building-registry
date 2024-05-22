@@ -19,6 +19,7 @@ namespace BuildingRegistry.Projections.BackOffice
                 await backOfficeContext.AddIdempotentBuildingUnitBuilding(
                     new BuildingPersistentLocalId(message.Message.BuildingPersistentLocalId),
                     new BuildingUnitPersistentLocalId(message.Message.BuildingUnitPersistentLocalId), cancellationToken);
+                await backOfficeContext.SaveChangesAsync(cancellationToken);
             });
 
             When<Envelope<CommonBuildingUnitWasAddedV2>>(async (_, message, cancellationToken) =>
@@ -27,6 +28,7 @@ namespace BuildingRegistry.Projections.BackOffice
                 await backOfficeContext.AddIdempotentBuildingUnitBuilding(
                     new BuildingPersistentLocalId(message.Message.BuildingPersistentLocalId),
                     new BuildingUnitPersistentLocalId(message.Message.BuildingUnitPersistentLocalId), cancellationToken);
+                await backOfficeContext.SaveChangesAsync(cancellationToken);
             });
 
             When<Envelope<BuildingUnitAddressWasAttachedV2>>(async (_, message, cancellationToken) =>
@@ -37,6 +39,7 @@ namespace BuildingRegistry.Projections.BackOffice
                     new BuildingUnitPersistentLocalId(message.Message.BuildingUnitPersistentLocalId),
                     new AddressPersistentLocalId(message.Message.AddressPersistentLocalId),
                     cancellationToken);
+                await backOfficeContext.SaveChangesAsync(cancellationToken);
             });
 
             When<Envelope<BuildingUnitAddressWasDetachedV2>>(async (_, message, cancellationToken) =>
@@ -46,6 +49,7 @@ namespace BuildingRegistry.Projections.BackOffice
                     new BuildingUnitPersistentLocalId(message.Message.BuildingUnitPersistentLocalId),
                     new AddressPersistentLocalId(message.Message.AddressPersistentLocalId),
                     cancellationToken);
+                await backOfficeContext.SaveChangesAsync(cancellationToken);
             });
 
             When<Envelope<BuildingUnitAddressWasDetachedBecauseAddressWasRejected>>(async (_, message, cancellationToken) =>
@@ -55,6 +59,7 @@ namespace BuildingRegistry.Projections.BackOffice
                     new BuildingUnitPersistentLocalId(message.Message.BuildingUnitPersistentLocalId),
                     new AddressPersistentLocalId(message.Message.AddressPersistentLocalId),
                     cancellationToken);
+                await backOfficeContext.SaveChangesAsync(cancellationToken);
             });
 
             When<Envelope<BuildingUnitAddressWasDetachedBecauseAddressWasRetired>>(async (_, message, cancellationToken) =>
@@ -64,6 +69,7 @@ namespace BuildingRegistry.Projections.BackOffice
                     new BuildingUnitPersistentLocalId(message.Message.BuildingUnitPersistentLocalId),
                     new AddressPersistentLocalId(message.Message.AddressPersistentLocalId),
                     cancellationToken);
+                await backOfficeContext.SaveChangesAsync(cancellationToken);
             });
 
             When<Envelope<BuildingUnitAddressWasDetachedBecauseAddressWasRemoved>>(async (_, message, cancellationToken) =>
@@ -73,6 +79,7 @@ namespace BuildingRegistry.Projections.BackOffice
                     new BuildingUnitPersistentLocalId(message.Message.BuildingUnitPersistentLocalId),
                     new AddressPersistentLocalId(message.Message.AddressPersistentLocalId),
                     cancellationToken);
+                await backOfficeContext.SaveChangesAsync(cancellationToken);
             });
 
             When<Envelope<BuildingUnitAddressWasReplacedBecauseAddressWasReaddressed>>(async (_, message, cancellationToken) =>
@@ -112,6 +119,8 @@ namespace BuildingRegistry.Projections.BackOffice
                 {
                     newAddress.Count += 1;
                 }
+
+                await backOfficeContext.SaveChangesAsync(cancellationToken);
             });
 
             When<Envelope<BuildingBuildingUnitsAddressesWereReaddressed>>((_, _, _) => Task.CompletedTask);
@@ -136,6 +145,7 @@ namespace BuildingRegistry.Projections.BackOffice
                     destinationBuildingPersistentLocalId,
                     cancellationToken);
 
+                await backOfficeContext.SaveChangesAsync(cancellationToken);
                 await transaction.CommitAsync(cancellationToken);
             });
         }
