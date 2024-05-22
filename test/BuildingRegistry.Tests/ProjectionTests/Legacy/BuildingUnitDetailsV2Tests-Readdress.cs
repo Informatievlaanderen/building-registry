@@ -1,21 +1,20 @@
-namespace BuildingRegistry.Tests.ProjectionTests.Integration.BuildingUnit
+namespace BuildingRegistry.Tests.ProjectionTests.Legacy
 {
     using System.Collections.Generic;
     using System.Linq;
-    using System.Threading;
     using System.Threading.Tasks;
     using AutoFixture;
     using Be.Vlaanderen.Basisregisters.GrAr.Common.Pipes;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore;
-    using BuildingRegistry.Building;
-    using BuildingRegistry.Building.Events;
+    using Building;
+    using Building.Events;
     using Extensions;
     using Fixtures;
     using FluentAssertions;
     using Xunit;
 
-    public partial class BuildingUnitLatestItemProjectionsTests
+    public partial class BuildingUnitDetailsV2Tests
     {
         [Fact]
         public async Task GivenOnlyPreviousBuildingUnitAddressRelationExistsWithCountOne_ThenRelationIsReplaced()
@@ -24,31 +23,26 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.BuildingUnit
             _fixture.Customize(new WithFixedBuildingUnitPersistentLocalId());
             _fixture.Customize(new WithFixedAddressPersistentLocalId());
 
-            var position = _fixture.Create<long>();
-
             var buildingUnitWasPlannedV2 = _fixture.Create<BuildingUnitWasPlannedV2>();
             var buildingUnitAddressWasAttached = _fixture.Create<BuildingUnitAddressWasAttachedV2>();
             var @event = new BuildingUnitAddressWasReplacedBecauseAddressWasReaddressed(
                 _fixture.Create<BuildingPersistentLocalId>(),
                 _fixture.Create<BuildingUnitPersistentLocalId>(),
                 new AddressPersistentLocalId(buildingUnitAddressWasAttached.AddressPersistentLocalId),
-                new AddressPersistentLocalId(buildingUnitAddressWasAttached.AddressPersistentLocalId + 1));
+                new AddressPersistentLocalId(1234));
             ((ISetProvenance)@event).SetProvenance(_fixture.Create<Provenance>());
 
             var buildingUnitWasPlannedMetadata = new Dictionary<string, object>
             {
-                { AddEventHashPipe.HashMetadataKey, buildingUnitWasPlannedV2.GetHash() },
-                { Envelope.PositionMetadataKey, position }
+                { AddEventHashPipe.HashMetadataKey, buildingUnitWasPlannedV2.GetHash() }
             };
             var buildingUnitAddressWasAttachedMetadata = new Dictionary<string, object>
             {
-                { AddEventHashPipe.HashMetadataKey, buildingUnitAddressWasAttached.GetHash() },
-                { Envelope.PositionMetadataKey, ++position }
+                { AddEventHashPipe.HashMetadataKey, buildingUnitAddressWasAttached.GetHash() }
             };
             var eventMetadata = new Dictionary<string, object>
             {
-                { AddEventHashPipe.HashMetadataKey, @event.GetHash() },
-                { Envelope.PositionMetadataKey, ++position }
+                { AddEventHashPipe.HashMetadataKey, @event.GetHash() }
             };
 
             await Sut
@@ -60,18 +54,18 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.BuildingUnit
                     new Envelope<BuildingUnitAddressWasReplacedBecauseAddressWasReaddressed>(
                         new Envelope(@event, eventMetadata))
                 )
-                .Then(async context =>
+                .Then(async ct =>
                 {
-                    var buildingUnitLatestItem =
-                        await context.BuildingUnitLatestItems.FindAsync(@event.BuildingUnitPersistentLocalId);
-                    buildingUnitLatestItem.Should().NotBeNull();
-                    buildingUnitLatestItem!.VersionTimestamp.Should().Be(@event.Provenance.Timestamp);
+                    var item = await ct.BuildingUnitDetailsV2WithCount.FindAsync(@event.BuildingUnitPersistentLocalId);
+                    item.Should().NotBeNull();
+                    item!.Version.Should().Be(@event.Provenance.Timestamp);
+                    item.LastEventHash.Should().Be(@event.GetHash());
 
-                    var previousRelation = context.BuildingUnitAddresses.SingleOrDefault(x =>
+                    var previousRelation = item.Addresses.FirstOrDefault(x =>
                         x.AddressPersistentLocalId == @event.PreviousAddressPersistentLocalId);
                     previousRelation.Should().BeNull();
 
-                    var newRelation = context.BuildingUnitAddresses.SingleOrDefault(x =>
+                    var newRelation = item!.Addresses.FirstOrDefault(x =>
                         x.AddressPersistentLocalId == @event.NewAddressPersistentLocalId);
                     newRelation.Should().NotBeNull();
                     newRelation!.Count.Should().Be(1);
@@ -84,8 +78,6 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.BuildingUnit
             _fixture.Customize(new WithFixedBuildingPersistentLocalId());
             _fixture.Customize(new WithFixedBuildingUnitPersistentLocalId());
             _fixture.Customize(new WithFixedAddressPersistentLocalId());
-
-            var position = _fixture.Create<long>();
 
             var buildingUnitWasPlannedV2 = _fixture.Create<BuildingUnitWasPlannedV2>();
             var buildingUnitAddressWasAttached = _fixture.Create<BuildingUnitAddressWasAttachedV2>();
@@ -101,29 +93,24 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.BuildingUnit
                 _fixture.Create<BuildingPersistentLocalId>(),
                 _fixture.Create<BuildingUnitPersistentLocalId>(),
                 new AddressPersistentLocalId(buildingUnitAddressWasAttached.AddressPersistentLocalId),
-                new AddressPersistentLocalId(buildingUnitAddressWasAttached.AddressPersistentLocalId + 101));
+                new AddressPersistentLocalId(1234));
             ((ISetProvenance)@event).SetProvenance(_fixture.Create<Provenance>());
 
             var buildingUnitWasPlannedMetadata = new Dictionary<string, object>
             {
-                { AddEventHashPipe.HashMetadataKey, buildingUnitWasPlannedV2.GetHash() },
-                { Envelope.PositionMetadataKey, position }
+                { AddEventHashPipe.HashMetadataKey, buildingUnitWasPlannedV2.GetHash() }
             };
             var buildingUnitAddressWasAttachedMetadata = new Dictionary<string, object>
             {
-                { AddEventHashPipe.HashMetadataKey, buildingUnitAddressWasAttached.GetHash() },
-                { Envelope.PositionMetadataKey, ++position }
+                { AddEventHashPipe.HashMetadataKey, buildingUnitAddressWasAttached.GetHash() }
             };
             var eventToAddPreviousRelationASecondTimeMetadata = new Dictionary<string, object>
             {
-                { AddEventHashPipe.HashMetadataKey, @event.GetHash() },
-                { Envelope.PositionMetadataKey, ++position },
-                { Envelope.EventNameMetadataKey, "EventName"}
+                { AddEventHashPipe.HashMetadataKey, @event.GetHash() }
             };
             var eventMetadata = new Dictionary<string, object>
             {
-                { AddEventHashPipe.HashMetadataKey, @event.GetHash() },
-                { Envelope.PositionMetadataKey, ++position }
+                { AddEventHashPipe.HashMetadataKey, @event.GetHash() }
             };
 
             await Sut
@@ -137,19 +124,19 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.BuildingUnit
                     new Envelope<BuildingUnitAddressWasReplacedBecauseAddressWasReaddressed>(
                         new Envelope(@event, eventMetadata))
                 )
-                .Then(async context =>
+                .Then(async ct =>
                 {
-                    var buildingUnitLatestItem =
-                        await context.BuildingUnitLatestItems.FindAsync(@event.BuildingUnitPersistentLocalId);
-                    buildingUnitLatestItem.Should().NotBeNull();
-                    buildingUnitLatestItem!.VersionTimestamp.Should().Be(@event.Provenance.Timestamp);
+                    var item = await ct.BuildingUnitDetailsV2WithCount.FindAsync(@event.BuildingUnitPersistentLocalId);
+                    item.Should().NotBeNull();
+                    item!.Version.Should().Be(@event.Provenance.Timestamp);
+                    item.LastEventHash.Should().Be(@event.GetHash());
 
-                    var previousRelation = context.BuildingUnitAddresses.SingleOrDefault(x =>
+                    var previousRelation = item.Addresses.FirstOrDefault(x =>
                         x.AddressPersistentLocalId == @event.PreviousAddressPersistentLocalId);
                     previousRelation.Should().NotBeNull();
                     previousRelation!.Count.Should().Be(1);
 
-                    var newRelation = context.BuildingUnitAddresses.SingleOrDefault(x =>
+                    var newRelation = item!.Addresses.FirstOrDefault(x =>
                         x.AddressPersistentLocalId == @event.NewAddressPersistentLocalId);
                     newRelation.Should().NotBeNull();
                     newRelation!.Count.Should().Be(1);
@@ -207,19 +194,18 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.BuildingUnit
                     new Envelope<BuildingUnitAddressWasReplacedBecauseAddressWasReaddressed>(
                         new Envelope(@event, eventMetadata))
                 )
-                .Then(async context =>
+                .Then(async ct =>
                 {
-                    var buildingUnitLatestItem =
-                        await context.BuildingUnitLatestItems.FindAsync(@event.BuildingUnitPersistentLocalId);
-                    buildingUnitLatestItem.Should().NotBeNull();
+                    var item = await ct.BuildingUnitDetailsV2WithCount.FindAsync(@event.BuildingUnitPersistentLocalId);
+                    item.Should().NotBeNull();
+                    item!.Version.Should().Be(@event.Provenance.Timestamp);
+                    item.LastEventHash.Should().Be(@event.GetHash());
 
-                    buildingUnitLatestItem!.VersionTimestamp.Should().Be(@event.Provenance.Timestamp);
-
-                    var previousRelation = context.BuildingUnitAddresses.SingleOrDefault(x =>
+                    var previousRelation = item.Addresses.FirstOrDefault(x =>
                         x.AddressPersistentLocalId == @event.PreviousAddressPersistentLocalId);
                     previousRelation.Should().BeNull();
 
-                    var newRelation = context.BuildingUnitAddresses.SingleOrDefault(x =>
+                    var newRelation = item!.Addresses.FirstOrDefault(x =>
                         x.AddressPersistentLocalId == @event.NewAddressPersistentLocalId);
                     newRelation.Should().NotBeNull();
                     newRelation!.Count.Should().Be(2);
@@ -232,7 +218,6 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.BuildingUnit
             _fixture.Customize(new WithFixedBuildingPersistentLocalId());
             _fixture.Customize(new WithFixedBuildingUnitPersistentLocalId());
 
-            var position = _fixture.Create<long>();
             var buildingUnitPersistentLocalId = _fixture.Create<BuildingUnitPersistentLocalId>();
             var sourceAddressPersistentLocalId = _fixture.Create<AddressPersistentLocalId>();
             var destinationAddressPersistentLocalId = _fixture.Create<AddressPersistentLocalId>();
@@ -258,33 +243,35 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.BuildingUnit
             var buildingWasMigratedMetadata = new Dictionary<string, object>
             {
                 { AddEventHashPipe.HashMetadataKey, buildingWasMigrated.GetHash() },
-                { Envelope.PositionMetadataKey, position },
                 { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
             };
             var buildingBuildingUnitsAddressesWereReaddressedMetadata = new Dictionary<string, object>
             {
-                { AddEventHashPipe.HashMetadataKey, buildingBuildingUnitsAddressesWereReaddressed.GetHash() },
-                { Envelope.PositionMetadataKey, ++position }
+                { AddEventHashPipe.HashMetadataKey, buildingBuildingUnitsAddressesWereReaddressed.GetHash() }
             };
+
             await Sut
                 .Given(
-                    new Envelope<BuildingWasMigrated>(new Envelope(buildingWasMigrated, buildingWasMigratedMetadata)),
+                    new Envelope<BuildingWasMigrated>(
+                        new Envelope(
+                            buildingWasMigrated,
+                            buildingWasMigratedMetadata)),
                     new Envelope<BuildingBuildingUnitsAddressesWereReaddressed>(
                         new Envelope(
                             buildingBuildingUnitsAddressesWereReaddressed,
                             buildingBuildingUnitsAddressesWereReaddressedMetadata)))
-                .Then(async context =>
+                .Then(async ct =>
                 {
-                    var buildingUnitLatestItem = await context.BuildingUnitLatestItems.FindAsync((int)buildingUnitPersistentLocalId);
-                    buildingUnitLatestItem.Should().NotBeNull();
+                    var item = await ct.BuildingUnitDetailsV2WithCount.FindAsync((int)buildingUnitPersistentLocalId);
+                    item.Should().NotBeNull();
+                    item!.Version.Should().Be(buildingBuildingUnitsAddressesWereReaddressed.Provenance.Timestamp);
+                    item.LastEventHash.Should().Be(buildingBuildingUnitsAddressesWereReaddressed.GetHash());
 
-                    buildingUnitLatestItem!.VersionTimestamp.Should().Be(buildingBuildingUnitsAddressesWereReaddressed.Provenance.Timestamp);
-
-                    var destinationAddress = context.BuildingUnitAddresses.SingleOrDefault(x =>
+                    var destinationAddress = item.Addresses.FirstOrDefault(x =>
                         x.AddressPersistentLocalId == destinationAddressPersistentLocalId);
                     destinationAddress.Should().NotBeNull();
 
-                    var sourceAddress = context.BuildingUnitAddresses.SingleOrDefault(x =>
+                    var sourceAddress = item.Addresses.FirstOrDefault(x =>
                         x.AddressPersistentLocalId == sourceAddressPersistentLocalId);
                     sourceAddress.Should().BeNull();
                 });
