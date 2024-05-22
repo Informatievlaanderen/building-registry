@@ -37,7 +37,8 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitAddressLinkExtractWit
                                 BuildingPersistentLocalId = message.Message.BuildingPersistentLocalId,
                                 BuildingUnitPersistentLocalId = buildingUnit.BuildingUnitPersistentLocalId,
                                 AddressPersistentLocalId = addressPersistentLocalId,
-                                DbaseRecord = new BuildingUnitAddressLinkDbaseRecord()
+                                Count = 1,
+                                DbaseRecord = new BuildingUnitAddressLinkDbaseRecord
                                 {
                                     objecttype = { Value = ObjectType },
                                     adresobjid = { Value = buildingUnit.BuildingUnitPersistentLocalId.ToString() },
@@ -57,7 +58,8 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitAddressLinkExtractWit
                         BuildingPersistentLocalId = message.Message.BuildingPersistentLocalId,
                         BuildingUnitPersistentLocalId = message.Message.BuildingUnitPersistentLocalId,
                         AddressPersistentLocalId = message.Message.AddressPersistentLocalId,
-                        DbaseRecord = new BuildingUnitAddressLinkDbaseRecord()
+                        Count = 1,
+                        DbaseRecord = new BuildingUnitAddressLinkDbaseRecord
                         {
                             objecttype = { Value = ObjectType },
                             adresobjid = { Value = message.Message.BuildingUnitPersistentLocalId.ToString() },
@@ -121,6 +123,7 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitAddressLinkExtractWit
                             BuildingPersistentLocalId = message.Message.BuildingPersistentLocalId,
                             BuildingUnitPersistentLocalId = message.Message.BuildingUnitPersistentLocalId,
                             AddressPersistentLocalId = message.Message.NewAddressPersistentLocalId,
+                            Count = 1,
                             DbaseRecord = new BuildingUnitAddressLinkDbaseRecord
                             {
                                 objecttype = { Value = ObjectType },
@@ -154,6 +157,7 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitAddressLinkExtractWit
                             BuildingPersistentLocalId = message.Message.BuildingPersistentLocalId,
                             BuildingUnitPersistentLocalId = buildingUnitReaddresses.BuildingUnitPersistentLocalId,
                             AddressPersistentLocalId = addressPersistentLocalId,
+                            Count = 1,
                             DbaseRecord = new BuildingUnitAddressLinkDbaseRecord
                             {
                                 objecttype = { Value = ObjectType },

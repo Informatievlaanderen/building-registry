@@ -1,4 +1,4 @@
-﻿namespace BuildingRegistry.Projections.Extract.BuildingUnitAddressLinkExtractWithCount
+namespace BuildingRegistry.Projections.Extract.BuildingUnitAddressLinkExtractWithCount
 {
     using Infrastructure;
     using Microsoft.EntityFrameworkCore;
