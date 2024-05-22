@@ -1,7 +1,7 @@
 namespace BuildingRegistry.Projections.BackOffice
 {
+    using System;
     using System.Threading.Tasks;
-    using Api.BackOffice.Abstractions;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.Connector;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore;
     using Building;
