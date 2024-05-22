@@ -22,7 +22,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.BackOffice
                 new AddressPersistentLocalId(@event.PreviousAddressPersistentLocalId));
 
             await Sut
-                .Given(@event)
+                .Given(BuildEnvelope(@event))
                 .Then(async _ =>
                 {
                     var previousAddressRelation = await _fakeBackOfficeContext.BuildingUnitAddressRelation.FindAsync(
@@ -52,7 +52,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.BackOffice
             await _fakeBackOfficeContext.SaveChangesAsync(CancellationToken.None);
 
             await Sut
-                .Given(@event)
+                .Given(BuildEnvelope(@event))
                 .Then(async _ =>
                 {
                     var previousAddressRelation = await _fakeBackOfficeContext.BuildingUnitAddressRelation.FindAsync(
@@ -82,7 +82,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.BackOffice
                 new AddressPersistentLocalId(@event.NewAddressPersistentLocalId));
 
             await Sut
-                .Given(@event)
+                .Given(BuildEnvelope(@event))
                 .Then(async _ =>
                 {
                     var previousAddressRelation = await _fakeBackOfficeContext.BuildingUnitAddressRelation.FindAsync(
