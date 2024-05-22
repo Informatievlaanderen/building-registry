@@ -143,6 +143,13 @@ namespace BuildingRegistry.Consumer.Address.Infrastructure
                         .As<IIdempotentConsumer<ConsumerAddressContext>>()
                         .SingleInstance();
 
+                    services.ConfigureIdempotency(
+                        hostContext.Configuration.GetSection(IdempotencyConfiguration.Section)
+                            .Get<IdempotencyConfiguration>()!.ConnectionString!,
+                        new IdempotencyMigrationsTableInfo(Schema.Import),
+                        new IdempotencyTableInfo(Schema.Import),
+                        loggerFactory);
+
                     builder
                         .RegisterModule(new CommandHandlingModule(hostContext.Configuration))
                         .RegisterModule(new BackOfficeModule(hostContext.Configuration, services, loggerFactory))
