@@ -33,10 +33,10 @@ namespace BuildingRegistry.Building.Commands
         {
             yield return BuildingPersistentLocalId;
 
-            foreach (var address in Readdresses)
+            foreach (var buildingUnitReaddress in Readdresses)
             {
-                yield return address.Key;
-                foreach (var readdressData in address.Value)
+                yield return buildingUnitReaddress.Key;
+                foreach (var readdressData in buildingUnitReaddress.Value)
                 {
                     yield return readdressData.SourceAddressPersistentLocalId;
                     yield return readdressData.DestinationAddressPersistentLocalId;
