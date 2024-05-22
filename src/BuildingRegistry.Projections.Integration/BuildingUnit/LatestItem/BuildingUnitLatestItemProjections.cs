@@ -561,8 +561,7 @@ namespace BuildingRegistry.Projections.Integration.BuildingUnit.LatestItem
                                 .AddAsync(new BuildingUnitAddress
                                 {
                                     BuildingUnitPersistentLocalId = message.Message.BuildingUnitPersistentLocalId,
-                                    AddressPersistentLocalId = message.Message.NewAddressPersistentLocalId,
-                                    Count = 1
+                                    AddressPersistentLocalId = message.Message.NewAddressPersistentLocalId
                                 }, ct);
                         }
                         else

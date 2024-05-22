@@ -11,6 +11,11 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitAddressLinkExtractWit
         public int AddressPersistentLocalId { get; set; }
         public int Count { get; set; }
         public byte[] DbaseRecord { get; set; }
+
+        public BuildingUnitAddressLinkExtractItem()
+        {
+            Count = 1;
+        }
     }
 
     public sealed class ParcelLinkExtractItemConfiguration : IEntityTypeConfiguration<BuildingUnitAddressLinkExtractItem>

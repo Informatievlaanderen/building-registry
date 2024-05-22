@@ -529,8 +529,7 @@ namespace BuildingRegistry.Projections.Integration.Building.Version
                             {
                                 AddressPersistentLocalId = message.Message.NewAddressPersistentLocalId,
                                 BuildingUnitPersistentLocalId = message.Message.BuildingPersistentLocalId,
-                                Position = message.Position,
-                                Count = 1
+                                Position = message.Position
                             });
                         }
                         else
