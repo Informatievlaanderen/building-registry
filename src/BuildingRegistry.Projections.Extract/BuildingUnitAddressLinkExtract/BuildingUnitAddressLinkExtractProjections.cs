@@ -39,9 +39,9 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitAddressLinkExtract
                                 AddressPersistentLocalId = addressPersistentLocalId,
                                 DbaseRecord = new BuildingUnitAddressLinkDbaseRecord()
                                 {
-                                    objecttype = {Value = ObjectType},
-                                    adresobjid = {Value = buildingUnit.BuildingUnitPersistentLocalId.ToString()},
-                                    adresid = {Value = addressPersistentLocalId}
+                                    objecttype = { Value = ObjectType },
+                                    adresobjid = { Value = buildingUnit.BuildingUnitPersistentLocalId.ToString() },
+                                    adresid = { Value = addressPersistentLocalId }
                                 }.ToBytes(_encoding)
                             }, ct);
                     }
@@ -59,9 +59,9 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitAddressLinkExtract
                         AddressPersistentLocalId = message.Message.AddressPersistentLocalId,
                         DbaseRecord = new BuildingUnitAddressLinkDbaseRecord()
                         {
-                            objecttype = {Value = ObjectType},
-                            adresobjid = {Value = message.Message.BuildingUnitPersistentLocalId.ToString()},
-                            adresid = {Value = message.Message.AddressPersistentLocalId}
+                            objecttype = { Value = ObjectType },
+                            adresobjid = { Value = message.Message.BuildingUnitPersistentLocalId.ToString() },
+                            adresid = { Value = message.Message.AddressPersistentLocalId }
                         }.ToBytes(_encoding)
                     }, ct);
             });
@@ -107,11 +107,40 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitAddressLinkExtract
                     AddressPersistentLocalId = message.Message.NewAddressPersistentLocalId,
                     DbaseRecord = new BuildingUnitAddressLinkDbaseRecord()
                     {
-                        objecttype = {Value = ObjectType},
-                        adresobjid = {Value = message.Message.BuildingUnitPersistentLocalId.ToString()},
-                        adresid = {Value = message.Message.NewAddressPersistentLocalId}
+                        objecttype = { Value = ObjectType },
+                        adresobjid = { Value = message.Message.BuildingUnitPersistentLocalId.ToString() },
+                        adresid = { Value = message.Message.NewAddressPersistentLocalId }
                     }.ToBytes(_encoding)
                 }, ct);
+            });
+
+            When<Envelope<BuildingBuildingUnitsAddressesWereReaddressed>>(async (context, message, ct) =>
+            {
+                foreach (var buildingUnitReaddresses in message.Message.BuildingUnitsReaddresses)
+                {
+                    foreach (var addressPersistentLocalId in buildingUnitReaddresses.DetachedAddressPersistentLocalIds)
+                    {
+                        await RemoveIdempotentLink(context,
+                            new BuildingUnitPersistentLocalId(buildingUnitReaddresses.BuildingUnitPersistentLocalId),
+                            new AddressPersistentLocalId(addressPersistentLocalId), ct);
+                    }
+
+                    foreach (var addressPersistentLocalId in buildingUnitReaddresses.AttachedAddressPersistentLocalIds)
+                    {
+                        await AddIdempotentLink(context, new BuildingUnitAddressLinkExtractItem
+                        {
+                            BuildingPersistentLocalId = message.Message.BuildingPersistentLocalId,
+                            BuildingUnitPersistentLocalId = buildingUnitReaddresses.BuildingUnitPersistentLocalId,
+                            AddressPersistentLocalId = addressPersistentLocalId,
+                            DbaseRecord = new BuildingUnitAddressLinkDbaseRecord
+                            {
+                                objecttype = { Value = ObjectType },
+                                adresobjid = { Value = buildingUnitReaddresses.BuildingUnitPersistentLocalId.ToString() },
+                                adresid = { Value = addressPersistentLocalId }
+                            }.ToBytes(_encoding)
+                        }, ct);
+                    }
+                }
             });
         }
 

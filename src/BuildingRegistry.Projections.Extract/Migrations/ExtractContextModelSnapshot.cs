@@ -17,10 +17,10 @@ namespace BuildingRegistry.Projections.Extract.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "6.0.3")
+                .HasAnnotation("ProductVersion", "8.0.3")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
-            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
+            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
             modelBuilder.Entity("Be.Vlaanderen.Basisregisters.ProjectionHandling.Runner.ProjectionStates.ProjectionStateItem", b =>
                 {
@@ -203,6 +203,37 @@ namespace BuildingRegistry.Projections.Extract.Migrations
                     b.HasIndex("BuildingPersistentLocalId");
 
                     b.ToTable("BuildingUnitAddressLinks", "BuildingRegistryExtract");
+                });
+
+            modelBuilder.Entity("BuildingRegistry.Projections.Extract.BuildingUnitAddressLinkExtractWithCount.BuildingUnitAddressLinkExtractItem", b =>
+                {
+                    b.Property<int>("BuildingUnitPersistentLocalId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("AddressPersistentLocalId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("BuildingPersistentLocalId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Count")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(1);
+
+                    b.Property<byte[]>("DbaseRecord")
+                        .IsRequired()
+                        .HasColumnType("varbinary(max)");
+
+                    b.HasKey("BuildingUnitPersistentLocalId", "AddressPersistentLocalId");
+
+                    SqlServerKeyBuilderExtensions.IsClustered(b.HasKey("BuildingUnitPersistentLocalId", "AddressPersistentLocalId"), false);
+
+                    b.HasIndex("AddressPersistentLocalId");
+
+                    b.HasIndex("BuildingPersistentLocalId");
+
+                    b.ToTable("BuildingUnitAddressLinksWithCount", "BuildingRegistryExtract");
                 });
 
             modelBuilder.Entity("BuildingRegistry.Projections.Extract.BuildingUnitExtract.BuildingUnitBuildingItem", b =>

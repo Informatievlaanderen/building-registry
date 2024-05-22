@@ -7,9 +7,11 @@ namespace BuildingRegistry.Tests
     using System.Runtime.CompilerServices;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
     using Be.Vlaanderen.Basisregisters.EventHandling;
+    using BuildingRegistry.Building.Events;
     using FluentAssertions;
     using Newtonsoft.Json;
     using Xunit;
+    using static BuildingRegistry.Building.Events.BuildingSnapshot;
 
     /// <summary>
     /// This class was generated using a nuget package called Aiv.Vbr.Testing.Infrastructure.Events.
@@ -36,10 +38,17 @@ namespace BuildingRegistry.Tests
 
             _eventTypes = domainAssembly
                 .GetTypes()
-                .Where(t => t.IsClass && t.Namespace != null && IsEventNamespace(t) && IsNotCompilerGenerated(t));
+                .Where(t => t.IsClass && t.Namespace != null && IsEventNamespace(t) && IsNotCompilerGenerated(t))
+                .Except(new[]
+                {
+                    typeof(BuildingUnitAddressesWereReaddressed),
+                    typeof(AddressRegistryReaddress),
+                    typeof(BuildingUnitData),
+                    typeof(BuildingWasMigrated.BuildingUnit)
+                });
         }
 
-        [Fact(Skip = "BuildingWasMigrated.BuildingUnit is not an event.")]
+        [Fact]
         public void HasEventNameAttribute()
         {
             foreach (var type in _eventTypes)
@@ -49,7 +58,7 @@ namespace BuildingRegistry.Tests
                     .NotBeEmpty($"Forgot EventName attribute on {type.FullName}");
         }
 
-        [Fact(Skip = "BuildingWasMigrated.BuildingUnit is not an event.")]
+        [Fact]
         public void HasEventDescriptionAttributes()
         {
             foreach (var type in _eventTypes)

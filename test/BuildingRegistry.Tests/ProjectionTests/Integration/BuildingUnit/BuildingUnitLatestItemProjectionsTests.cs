@@ -21,7 +21,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.BuildingUnit
     using Tests.Legacy.Autofixture;
     using Xunit;
 
-    public class BuildingUnitLatestItemProjectionsTests : IntegrationProjectionTest<BuildingUnitLatestItemProjections>
+    public partial class BuildingUnitLatestItemProjectionsTests : IntegrationProjectionTest<BuildingUnitLatestItemProjections>
     {
         private const string BuildingNamespace = "https://data.vlaanderen.be/id/gebouw";
         private const string BuildingUnitNamespace = "https://data.vlaanderen.be/id/gebouweenheid";
@@ -1286,65 +1286,6 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.BuildingUnit
                         .Where(x => x.BuildingUnitPersistentLocalId == buildingUnitLatestItem.BuildingUnitPersistentLocalId)
                         .ToList();
                     buildingUnitAddresses.Should().BeEmpty();
-                });
-        }
-
-        [Fact]
-        public async Task WhenBuildingUnitAddressWasReplacedBecauseAddressWasReaddressed()
-        {
-            _fixture.Customize(new WithFixedBuildingPersistentLocalId());
-            _fixture.Customize(new WithFixedBuildingUnitPersistentLocalId());
-            _fixture.Customize(new WithFixedAddressPersistentLocalId());
-
-            var position = _fixture.Create<long>();
-
-            var buildingUnitWasPlannedV2 = _fixture.Create<BuildingUnitWasPlannedV2>();
-            var buildingUnitAddressWasAttached = _fixture.Create<BuildingUnitAddressWasAttachedV2>();
-            var buildingUnitAddressWasReplacedBecauseAddressWasReaddressed = new BuildingUnitAddressWasReplacedBecauseAddressWasReaddressed(
-                _fixture.Create<BuildingPersistentLocalId>(),
-                _fixture.Create<BuildingUnitPersistentLocalId>(),
-                new AddressPersistentLocalId(buildingUnitAddressWasAttached.AddressPersistentLocalId),
-                new AddressPersistentLocalId(buildingUnitAddressWasAttached.AddressPersistentLocalId + 1));
-            ((ISetProvenance)buildingUnitAddressWasReplacedBecauseAddressWasReaddressed).SetProvenance(_fixture.Create<Provenance>());
-
-            var buildingUnitWasPlannedMetadata = new Dictionary<string, object>
-            {
-                { AddEventHashPipe.HashMetadataKey, buildingUnitWasPlannedV2.GetHash() },
-                { Envelope.PositionMetadataKey, position }
-            };
-            var buildingUnitAddressWasAttachedMetadata = new Dictionary<string, object>
-            {
-                { AddEventHashPipe.HashMetadataKey, buildingUnitAddressWasAttached.GetHash() },
-                { Envelope.PositionMetadataKey, position + 1 }
-            };
-            var buildingUnitAddressWasReplacedBecauseAddressWasReaddressedMetadata = new Dictionary<string, object>
-            {
-                { AddEventHashPipe.HashMetadataKey, buildingUnitAddressWasReplacedBecauseAddressWasReaddressed.GetHash() },
-                { Envelope.PositionMetadataKey, position + 2 }
-            };
-            await Sut
-                .Given(
-                    new Envelope<BuildingUnitWasPlannedV2>(new Envelope(buildingUnitWasPlannedV2, buildingUnitWasPlannedMetadata)),
-                    new Envelope<BuildingUnitAddressWasAttachedV2>(new Envelope(buildingUnitAddressWasAttached, buildingUnitAddressWasAttachedMetadata)),
-                    new Envelope<BuildingUnitAddressWasReplacedBecauseAddressWasReaddressed>(
-                        new Envelope(
-                            buildingUnitAddressWasReplacedBecauseAddressWasReaddressed,
-                            buildingUnitAddressWasReplacedBecauseAddressWasReaddressedMetadata)))
-                .Then(async context =>
-                {
-                    var buildingUnitLatestItem =
-                        await context.BuildingUnitLatestItems.FindAsync(buildingUnitAddressWasReplacedBecauseAddressWasReaddressed.BuildingUnitPersistentLocalId);
-                    buildingUnitLatestItem.Should().NotBeNull();
-
-                    buildingUnitLatestItem!.VersionTimestamp.Should().Be(buildingUnitAddressWasReplacedBecauseAddressWasReaddressed.Provenance.Timestamp);
-
-                    var newAddress = context.BuildingUnitAddresses.SingleOrDefault(x =>
-                        x.AddressPersistentLocalId == buildingUnitAddressWasReplacedBecauseAddressWasReaddressed.NewAddressPersistentLocalId);
-                    newAddress.Should().NotBeNull();
-
-                    var oldAddress = context.BuildingUnitAddresses.SingleOrDefault(x =>
-                        x.AddressPersistentLocalId == buildingUnitAddressWasReplacedBecauseAddressWasReaddressed.PreviousAddressPersistentLocalId);
-                    oldAddress.Should().BeNull();
                 });
         }
 

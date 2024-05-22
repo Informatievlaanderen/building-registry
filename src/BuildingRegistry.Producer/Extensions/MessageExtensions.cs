@@ -3,6 +3,7 @@ namespace BuildingRegistry.Producer.Extensions
     using System.Linq;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Building.Events;
+    using AddressRegistryReaddress = Be.Vlaanderen.Basisregisters.GrAr.Contracts.Common.AddressRegistryReaddress;
     using Contracts = Be.Vlaanderen.Basisregisters.GrAr.Contracts.BuildingRegistry;
     using Legacy = Legacy.Events;
     using Provenance = Be.Vlaanderen.Basisregisters.GrAr.Contracts.Common.Provenance;
@@ -530,6 +531,20 @@ namespace BuildingRegistry.Producer.Extensions
                 message.BuildingUnitPersistentLocalId,
                 message.NewAddressPersistentLocalId,
                 message.PreviousAddressPersistentLocalId,
+                message.Provenance.ToContract());
+
+        public static Contracts.BuildingBuildingUnitsAddressesWereReaddressed ToContract(this BuildingBuildingUnitsAddressesWereReaddressed message)
+            => new Contracts.BuildingBuildingUnitsAddressesWereReaddressed(
+                message.BuildingPersistentLocalId,
+                message.BuildingUnitsReaddresses.Select(x =>
+                    new Contracts.BuildingUnitAddressesWereReaddressed(
+                        x.BuildingUnitPersistentLocalId,
+                        x.AttachedAddressPersistentLocalIds,
+                        x.DetachedAddressPersistentLocalIds)),
+                message.AddressRegistryReaddresses.Select(x =>
+                    new AddressRegistryReaddress(
+                        x.SourceAddressPersistentLocalId,
+                        x.DestinationAddressPersistentLocalId)),
                 message.Provenance.ToContract());
 
         public static Contracts.BuildingWasMeasured ToContract(this BuildingWasMeasured message)

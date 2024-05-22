@@ -230,6 +230,14 @@ namespace BuildingRegistry.Projections.LastChangedList
                 await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingUnitPersistentLocalId.ToString(), message.Position, context, ct);
             });
 
+            When<Envelope<BuildingBuildingUnitsAddressesWereReaddressed>>(async (context, message, ct) =>
+            {
+                foreach (var buildingUnitReaddresses in message.Message.BuildingUnitsReaddresses)
+                {
+                    await GetLastChangedRecordsAndUpdatePosition(buildingUnitReaddresses.BuildingUnitPersistentLocalId.ToString(), message.Position, context, ct);
+                }
+            });
+
             When<Envelope<BuildingUnitDeregulationWasCorrected>>(async (context, message, ct) =>
             {
                 await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingUnitPersistentLocalId.ToString(), message.Position, context, ct);
@@ -274,7 +282,7 @@ namespace BuildingRegistry.Projections.LastChangedList
             {
                 await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingUnitPersistentLocalId.ToString(), message.Position, context, ct);
             });
-            
+
             When<Envelope<BuildingUnitWasNotRealizedBecauseBuildingWasDemolished>>(async (context, message, ct) =>
             {
                 await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingUnitPersistentLocalId.ToString(), message.Position, context, ct);

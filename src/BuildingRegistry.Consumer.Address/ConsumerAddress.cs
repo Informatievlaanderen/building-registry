@@ -7,6 +7,7 @@ namespace BuildingRegistry.Consumer.Address
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.Connector;
     using Api.BackOffice.Abstractions;
     using Be.Vlaanderen.Basisregisters.MessageHandling.Kafka.Consumer;
+    using Building;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Hosting;
     using Microsoft.Extensions.Logging;
@@ -17,6 +18,7 @@ namespace BuildingRegistry.Consumer.Address
         private readonly ILifetimeScope _lifetimeScope;
         private readonly IHostApplicationLifetime _hostApplicationLifetime;
         private readonly IDbContextFactory<BackOfficeContext> _backOfficeContextFactory;
+        private readonly IBuildings _buildings;
         private readonly ILoggerFactory _loggerFactory;
         private readonly IIdempotentConsumer<ConsumerAddressContext> _kafkaIdemIdempotencyConsumer;
         private readonly ILogger<ConsumerAddress> _logger;
@@ -25,12 +27,14 @@ namespace BuildingRegistry.Consumer.Address
             ILifetimeScope lifetimeScope,
             IHostApplicationLifetime hostApplicationLifetime,
             IDbContextFactory<BackOfficeContext> backOfficeContextFactory,
+            IBuildings buildings,
             ILoggerFactory loggerFactory,
             IIdempotentConsumer<ConsumerAddressContext> kafkaIdemIdempotencyConsumer)
         {
             _lifetimeScope = lifetimeScope;
             _hostApplicationLifetime = hostApplicationLifetime;
             _backOfficeContextFactory = backOfficeContextFactory;
+            _buildings = buildings;
             _loggerFactory = loggerFactory;
             _kafkaIdemIdempotencyConsumer = kafkaIdemIdempotencyConsumer;
 
@@ -42,10 +46,10 @@ namespace BuildingRegistry.Consumer.Address
             var addressKafkaProjection =
                 new ConnectedProjector<ConsumerAddressContext>(
                     Resolve.WhenEqualToHandlerMessageType(new AddressKafkaProjection().Handlers));
-
+            
             var commandHandlingProjector = new ConnectedProjector<CommandHandler>(
                 Resolve.WhenEqualToHandlerMessageType(
-                    new CommandHandlingKafkaProjection(_backOfficeContextFactory).Handlers));
+                    new CommandHandlingKafkaProjection(_backOfficeContextFactory, _buildings).Handlers));
 
             var commandHandler = new CommandHandler(_lifetimeScope, _loggerFactory);
 

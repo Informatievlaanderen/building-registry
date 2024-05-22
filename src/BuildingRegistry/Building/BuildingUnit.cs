@@ -4,6 +4,8 @@ namespace BuildingRegistry.Building
     using System.Collections.Generic;
     using System.Linq;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
+    using Be.Vlaanderen.Basisregisters.GrAr.Common;
+    using BuildingRegistry.Building.Commands;
     using Datastructures;
     using Events;
     using Exceptions;
@@ -412,20 +414,30 @@ namespace BuildingRegistry.Building
             Apply(new BuildingUnitAddressWasDetachedBecauseAddressWasRemoved(_buildingPersistentLocalId, BuildingUnitPersistentLocalId, addressPersistentLocalId));
         }
 
-        public void ReplaceAddressAttachmentFromBuildingUnitBecauseStreetNameWasReaddressed(
-            AddressPersistentLocalId previousAddressPersistentLocalId,
-            AddressPersistentLocalId newAddressPersistentLocalId)
+        public BuildingUnitAddressesWereReaddressed? BuildBuildingUnitAddressesWereReaddressed(IReadOnlyList<ReaddressData> readdresses)
         {
-            if (!AddressPersistentLocalIds.Contains(previousAddressPersistentLocalId) && AddressPersistentLocalIds.Contains(newAddressPersistentLocalId))
+            var addressPersistentLocalIdsToAttach = readdresses
+                .Select(x => x.DestinationAddressPersistentLocalId)
+                .Except(readdresses.Select(x => x.SourceAddressPersistentLocalId))
+                .Except(AddressPersistentLocalIds)
+                .ToList();
+
+            var addressPersistentLocalIdsToDetach = readdresses
+                .Select(x => x.SourceAddressPersistentLocalId)
+                .Except(readdresses.Select(x => x.DestinationAddressPersistentLocalId))
+                .Where(AddressPersistentLocalIds.Contains)
+                .ToList();
+
+            if (!addressPersistentLocalIdsToAttach.Any() && !addressPersistentLocalIdsToDetach.Any())
             {
-                return;
+                return null;
             }
 
-            Apply(new BuildingUnitAddressWasReplacedBecauseAddressWasReaddressed(
-                _buildingPersistentLocalId,
+            return new BuildingUnitAddressesWereReaddressed(
                 BuildingUnitPersistentLocalId,
-                previousAddressPersistentLocalId,
-                newAddressPersistentLocalId));
+                addressPersistentLocalIdsToAttach,
+                addressPersistentLocalIdsToDetach
+            );
         }
 
         private ExtendedWkbGeometry? CorrectedBuildingUnitPosition(BuildingGeometry buildingGeometry)

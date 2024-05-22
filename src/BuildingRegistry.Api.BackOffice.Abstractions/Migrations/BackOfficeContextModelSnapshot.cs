@@ -16,10 +16,10 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "6.0.3")
+                .HasAnnotation("ProductVersion", "8.0.3")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
-            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
+            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
             modelBuilder.Entity("BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnitAddressRelation", b =>
                 {
@@ -31,6 +31,11 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.Migrations
 
                     b.Property<int>("BuildingPersistentLocalId")
                         .HasColumnType("int");
+
+                    b.Property<int>("Count")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(1);
 
                     b.HasKey("BuildingUnitPersistentLocalId", "AddressPersistentLocalId");
 

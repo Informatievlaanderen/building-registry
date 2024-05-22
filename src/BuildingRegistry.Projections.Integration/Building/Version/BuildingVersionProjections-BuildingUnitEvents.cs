@@ -350,8 +350,8 @@ namespace BuildingRegistry.Projections.Integration.Building.Version
                             Position = message.Position,
                             BuildingUnitPersistentLocalId = message.Message.BuildingUnitPersistentLocalId,
                             BuildingPersistentLocalId = message.Message.BuildingPersistentLocalId,
-                            Status =  BuildingUnitStatus.Parse(message.Message.BuildingUnitStatus).Status,
-                            OsloStatus =  BuildingUnitStatus.Parse(message.Message.BuildingUnitStatus).Map(),
+                            Status = BuildingUnitStatus.Parse(message.Message.BuildingUnitStatus).Status,
+                            OsloStatus = BuildingUnitStatus.Parse(message.Message.BuildingUnitStatus).Map(),
                             Function = BuildingUnitFunction.Common.Function,
                             OsloFunction = BuildingUnitFunction.Common.Map(),
                             GeometryMethod = BuildingUnitPositionGeometryMethod.Parse(message.Message.GeometryMethod).GeometryMethod,
@@ -509,22 +509,75 @@ namespace BuildingRegistry.Projections.Integration.Building.Version
                         var buildingUnit = building.BuildingUnits.Single(x =>
                             x.BuildingUnitPersistentLocalId == message.Message.BuildingUnitPersistentLocalId);
 
-                        var address = buildingUnit.Addresses.SingleOrDefault(x => x.AddressPersistentLocalId == message.Message.PreviousAddressPersistentLocalId);
-                        if (address is not null)
+                        var previousAddress = buildingUnit.Addresses
+                            .SingleOrDefault(x => x.AddressPersistentLocalId == message.Message.PreviousAddressPersistentLocalId);
+                        if (previousAddress is not null && previousAddress.Count == 1)
                         {
-                            buildingUnit.Addresses.Remove(address);
+                            buildingUnit.Addresses.Remove(previousAddress);
+                        }
+                        else if (previousAddress is not null)
+                        {
+                            previousAddress.Count -= 1;
                         }
 
-                        buildingUnit.Addresses.Add(new BuildingUnitAddressVersion
+                        var newAddress = buildingUnit.Addresses
+                            .SingleOrDefault(x => x.AddressPersistentLocalId == message.Message.NewAddressPersistentLocalId);
+
+                        if (newAddress is null)
                         {
-                            AddressPersistentLocalId = message.Message.NewAddressPersistentLocalId,
-                            BuildingUnitPersistentLocalId = message.Message.BuildingPersistentLocalId,
-                            Position = message.Position
-                        });
+                            buildingUnit.Addresses.Add(new BuildingUnitAddressVersion
+                            {
+                                AddressPersistentLocalId = message.Message.NewAddressPersistentLocalId,
+                                BuildingUnitPersistentLocalId = message.Message.BuildingPersistentLocalId,
+                                Position = message.Position
+                            });
+                        }
+                        else
+                        {
+                            newAddress.Count += 1;
+                        }
 
                         buildingUnit.VersionTimestamp = message.Message.Provenance.Timestamp;
                     },
                     ct);
+            });
+
+            When<Envelope<BuildingBuildingUnitsAddressesWereReaddressed>>(async (context, message, ct) =>
+            {
+                foreach (var buildingUnitReaddresses in message.Message.BuildingUnitsReaddresses)
+                {
+                    await context.CreateNewBuildingVersion(
+                        message.Message.BuildingPersistentLocalId,
+                        message,
+                        building =>
+                        {
+                            var buildingUnit = building.BuildingUnits.Single(x =>
+                                x.BuildingUnitPersistentLocalId == buildingUnitReaddresses.BuildingUnitPersistentLocalId);
+
+                            foreach (var addressPersistentLocalId in buildingUnitReaddresses.DetachedAddressPersistentLocalIds)
+                            {
+                                var address = buildingUnit.Addresses.SingleOrDefault(x =>
+                                    x.AddressPersistentLocalId == addressPersistentLocalId);
+                                if (address is not null)
+                                {
+                                    buildingUnit.Addresses.Remove(address);
+                                }
+                            }
+
+                            foreach (var addressPersistentLocalId in buildingUnitReaddresses.AttachedAddressPersistentLocalIds)
+                            {
+                                buildingUnit.Addresses.Add(new BuildingUnitAddressVersion
+                                {
+                                    AddressPersistentLocalId = addressPersistentLocalId,
+                                    BuildingUnitPersistentLocalId = message.Message.BuildingPersistentLocalId,
+                                    Position = message.Position
+                                });
+                            }
+
+                            buildingUnit.VersionTimestamp = message.Message.Provenance.Timestamp;
+                        },
+                        ct);
+                }
             });
 
             When<Envelope<BuildingUnitWasRetiredBecauseBuildingWasDemolished>>(async (context, message, ct) =>
@@ -594,7 +647,7 @@ namespace BuildingRegistry.Projections.Integration.Building.Version
                             PuriId = $"{options.BuildingUnitNamespace}/{message.Message.BuildingUnitPersistentLocalId}",
                             Type = message.EventName
                         };
-                        
+
                         var addresses = message.Message.AddressPersistentLocalIds
                             .Distinct()
                             .Select(x => new BuildingUnitAddressVersion

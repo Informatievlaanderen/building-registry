@@ -408,6 +408,11 @@ namespace BuildingRegistry.Projections.Integration.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("address_persistent_local_id");
 
+                    b.Property<int>("Count")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(1);
+
                     b.HasKey("BuildingUnitPersistentLocalId", "AddressPersistentLocalId");
 
                     b.HasIndex("AddressPersistentLocalId");

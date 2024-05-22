@@ -9,7 +9,6 @@
         public long Position { get; set; }
         public int BuildingUnitPersistentLocalId { get; set; }
         public int AddressPersistentLocalId { get; set; }
-
         public int Count { get; set; }
 
         public BuildingUnitAddressVersion()

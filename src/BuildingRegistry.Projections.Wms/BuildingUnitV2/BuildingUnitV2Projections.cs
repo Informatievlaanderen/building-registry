@@ -347,6 +347,16 @@ namespace BuildingRegistry.Projections.Wms.BuildingUnitV2
                 SetVersion(unit!, message.Message.Provenance.Timestamp);
             });
 
+            When<Envelope<BuildingBuildingUnitsAddressesWereReaddressed>>(async (context, message, ct) =>
+            {
+                foreach (var buildingUnitReaddresses in message.Message.BuildingUnitsReaddresses)
+                {
+                    var unit = await context.BuildingUnitsV2.FindAsync(buildingUnitReaddresses.BuildingUnitPersistentLocalId);
+
+                    SetVersion(unit!, message.Message.Provenance.Timestamp);
+                }
+            });
+
             When<Envelope<BuildingUnitWasRetiredBecauseBuildingWasDemolished>>(async (context, message, ct) =>
             {
                 var unit = await context.BuildingUnitsV2.FindAsync(message.Message.BuildingUnitPersistentLocalId);

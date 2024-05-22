@@ -411,6 +411,33 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetailV2
                 }, ct);
             });
 
+            When<Envelope<BuildingBuildingUnitsAddressesWereReaddressed>>(async (context, message, ct) =>
+            {
+                foreach (var buildingUnitReaddresses in message.Message.BuildingUnitsReaddresses)
+                {
+                    await Update(context, buildingUnitReaddresses.BuildingUnitPersistentLocalId, item =>
+                    {
+                        context.Entry(item).Collection(x => x.Addresses).Load();
+
+                        foreach (var addressPersistentLocalId in buildingUnitReaddresses.DetachedAddressPersistentLocalIds)
+                        {
+                            RemoveIdempotentAddress(item, addressPersistentLocalId);
+                        }
+
+                        foreach (var addressPersistentLocalId in buildingUnitReaddresses.AttachedAddressPersistentLocalIds)
+                        {
+                            AddIdempotentAddress(item,
+                                new BuildingUnitDetailAddressItemV2(
+                                    buildingUnitReaddresses.BuildingUnitPersistentLocalId,
+                                    addressPersistentLocalId));
+                        }
+
+                        item.Version = message.Message.Provenance.Timestamp;
+                        UpdateHash(item, message);
+                    }, ct);
+                }
+            });
+
             When<Envelope<BuildingUnitWasRetiredBecauseBuildingWasDemolished>>(async (context, message, ct) =>
             {
                 await Update(context, message.Message.BuildingUnitPersistentLocalId, item =>

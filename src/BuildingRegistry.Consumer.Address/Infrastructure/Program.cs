@@ -9,6 +9,7 @@ namespace BuildingRegistry.Consumer.Address.Infrastructure
     using Autofac;
     using Autofac.Extensions.DependencyInjection;
     using Be.Vlaanderen.Basisregisters.Aws.DistributedMutex;
+    using Be.Vlaanderen.Basisregisters.CommandHandling.Idempotency;
     using Be.Vlaanderen.Basisregisters.EventHandling;
     using Be.Vlaanderen.Basisregisters.MessageHandling.Kafka;
     using Be.Vlaanderen.Basisregisters.MessageHandling.Kafka.Consumer;
@@ -142,6 +143,13 @@ namespace BuildingRegistry.Consumer.Address.Infrastructure
                         .As<IIdempotentConsumer<ConsumerAddressContext>>()
                         .SingleInstance();
 
+                    services.ConfigureIdempotency(
+                        hostContext.Configuration.GetSection(IdempotencyConfiguration.Section)
+                            .Get<IdempotencyConfiguration>()!.ConnectionString!,
+                        new IdempotencyMigrationsTableInfo(Schema.Import),
+                        new IdempotencyTableInfo(Schema.Import),
+                        loggerFactory);
+
                     builder
                         .RegisterModule(new CommandHandlingModule(hostContext.Configuration))
                         .RegisterModule(new BackOfficeModule(hostContext.Configuration, services, loggerFactory))
@@ -151,6 +159,11 @@ namespace BuildingRegistry.Consumer.Address.Infrastructure
                         .RegisterType<ConsumerAddress>()
                         .As<IHostedService>()
                         .SingleInstance();
+
+                    builder.RegisterType<IdempotentCommandHandler>()
+                        .As<IIdempotentCommandHandler>()
+                        .AsSelf()
+                        .InstancePerLifetimeScope();
 
                     builder.Populate(services);
                 })
