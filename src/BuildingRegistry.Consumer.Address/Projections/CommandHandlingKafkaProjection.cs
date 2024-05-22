@@ -189,10 +189,11 @@ namespace BuildingRegistry.Consumer.Address.Projections
                     .ToListAsync(cancellationToken: ct);
 
                 var commandByBuildings = new Dictionary<BuildingPersistentLocalId, ReaddressAddresses>();
-                foreach (var addressRelationsByBuilding in buildingUnitAddressRelations.GroupBy(x => x.BuildingPersistentLocalId))
+                foreach (var addressRelationsByBuilding in buildingUnitAddressRelations
+                             .GroupBy(x => x.BuildingPersistentLocalId))
                 {
                     var addressesByBuildingUnit = new Dictionary<BuildingUnitPersistentLocalId, List<ReaddressData>>();
-                    foreach (var buildingUnitAddressRelation in buildingUnitAddressRelations)
+                    foreach (var buildingUnitAddressRelation in addressRelationsByBuilding)
                     {
                         var readdressData = readdresses
                             .Where(x => x.SourceAddressPersistentLocalId == buildingUnitAddressRelation.AddressPersistentLocalId)
