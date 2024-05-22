@@ -23,22 +23,24 @@ namespace BuildingRegistry.Tests.ProjectionTests.Legacy
             _fixture.Customize(new WithFixedBuildingUnitPersistentLocalId());
             _fixture.Customize(new WithFixedAddressPersistentLocalId());
 
-            var buildingUnitWasPlannedV2 = _fixture.Create<BuildingUnitWasPlannedV2>();
-            var buildingUnitAddressWasAttached = _fixture.Create<BuildingUnitAddressWasAttachedV2>();
+            var addressPersistentLocalId = _fixture.Create<AddressPersistentLocalId>();
+
+            var buildingWasMigrated = new BuildingWasMigratedBuilder(_fixture)
+                .WithBuildingUnit(new BuildingUnitBuilder(_fixture)
+                    .WithAddress(addressPersistentLocalId)
+                    .Build())
+                .Build();
+
             var @event = new BuildingUnitAddressWasReplacedBecauseAddressWasReaddressed(
                 _fixture.Create<BuildingPersistentLocalId>(),
                 _fixture.Create<BuildingUnitPersistentLocalId>(),
-                new AddressPersistentLocalId(buildingUnitAddressWasAttached.AddressPersistentLocalId),
+                new AddressPersistentLocalId(addressPersistentLocalId),
                 new AddressPersistentLocalId(1234));
             ((ISetProvenance)@event).SetProvenance(_fixture.Create<Provenance>());
 
-            var buildingUnitWasPlannedMetadata = new Dictionary<string, object>
+            var buildingWasMigratedMetadata = new Dictionary<string, object>
             {
-                { AddEventHashPipe.HashMetadataKey, buildingUnitWasPlannedV2.GetHash() }
-            };
-            var buildingUnitAddressWasAttachedMetadata = new Dictionary<string, object>
-            {
-                { AddEventHashPipe.HashMetadataKey, buildingUnitAddressWasAttached.GetHash() }
+                { AddEventHashPipe.HashMetadataKey, buildingWasMigrated.GetHash() }
             };
             var eventMetadata = new Dictionary<string, object>
             {
@@ -47,10 +49,8 @@ namespace BuildingRegistry.Tests.ProjectionTests.Legacy
 
             await Sut
                 .Given(
-                    new Envelope<BuildingUnitWasPlannedV2>(
-                        new Envelope(buildingUnitWasPlannedV2, buildingUnitWasPlannedMetadata)),
-                    new Envelope<BuildingUnitAddressWasAttachedV2>(
-                        new Envelope(buildingUnitAddressWasAttached, buildingUnitAddressWasAttachedMetadata)),
+                    new Envelope<BuildingWasMigrated>(
+                        new Envelope(buildingWasMigrated, buildingWasMigratedMetadata)),
                     new Envelope<BuildingUnitAddressWasReplacedBecauseAddressWasReaddressed>(
                         new Envelope(@event, eventMetadata))
                 )
@@ -79,30 +79,31 @@ namespace BuildingRegistry.Tests.ProjectionTests.Legacy
             _fixture.Customize(new WithFixedBuildingUnitPersistentLocalId());
             _fixture.Customize(new WithFixedAddressPersistentLocalId());
 
-            var buildingUnitWasPlannedV2 = _fixture.Create<BuildingUnitWasPlannedV2>();
-            var buildingUnitAddressWasAttached = _fixture.Create<BuildingUnitAddressWasAttachedV2>();
+            var addressPersistentLocalId = _fixture.Create<AddressPersistentLocalId>();
 
+            var buildingWasMigrated = new BuildingWasMigratedBuilder(_fixture)
+                .WithBuildingUnit(new BuildingUnitBuilder(_fixture)
+                    .WithAddress(addressPersistentLocalId)
+                    .Build())
+                .Build();
+            
             var eventToAddPreviousRelationASecondTime = new BuildingUnitAddressWasReplacedBecauseAddressWasReaddressed(
                 _fixture.Create<BuildingPersistentLocalId>(),
                 _fixture.Create<BuildingUnitPersistentLocalId>(),
-                new AddressPersistentLocalId(buildingUnitAddressWasAttached.AddressPersistentLocalId + 100),
-                new AddressPersistentLocalId(buildingUnitAddressWasAttached.AddressPersistentLocalId));
+                new AddressPersistentLocalId(addressPersistentLocalId + 100),
+                new AddressPersistentLocalId(addressPersistentLocalId));
             ((ISetProvenance)eventToAddPreviousRelationASecondTime).SetProvenance(_fixture.Create<Provenance>());
 
             var @event = new BuildingUnitAddressWasReplacedBecauseAddressWasReaddressed(
                 _fixture.Create<BuildingPersistentLocalId>(),
                 _fixture.Create<BuildingUnitPersistentLocalId>(),
-                new AddressPersistentLocalId(buildingUnitAddressWasAttached.AddressPersistentLocalId),
+                new AddressPersistentLocalId(addressPersistentLocalId),
                 new AddressPersistentLocalId(1234));
             ((ISetProvenance)@event).SetProvenance(_fixture.Create<Provenance>());
 
-            var buildingUnitWasPlannedMetadata = new Dictionary<string, object>
+            var buildingWasMigratedMetadata = new Dictionary<string, object>
             {
-                { AddEventHashPipe.HashMetadataKey, buildingUnitWasPlannedV2.GetHash() }
-            };
-            var buildingUnitAddressWasAttachedMetadata = new Dictionary<string, object>
-            {
-                { AddEventHashPipe.HashMetadataKey, buildingUnitAddressWasAttached.GetHash() }
+                { AddEventHashPipe.HashMetadataKey, buildingWasMigrated.GetHash() }
             };
             var eventToAddPreviousRelationASecondTimeMetadata = new Dictionary<string, object>
             {
@@ -115,10 +116,8 @@ namespace BuildingRegistry.Tests.ProjectionTests.Legacy
 
             await Sut
                 .Given(
-                    new Envelope<BuildingUnitWasPlannedV2>(
-                        new Envelope(buildingUnitWasPlannedV2, buildingUnitWasPlannedMetadata)),
-                    new Envelope<BuildingUnitAddressWasAttachedV2>(
-                        new Envelope(buildingUnitAddressWasAttached, buildingUnitAddressWasAttachedMetadata)),
+                    new Envelope<BuildingWasMigrated>(
+                        new Envelope(buildingWasMigrated, buildingWasMigratedMetadata)),
                     new Envelope<BuildingUnitAddressWasReplacedBecauseAddressWasReaddressed>(
                         new Envelope(eventToAddPreviousRelationASecondTime, eventToAddPreviousRelationASecondTimeMetadata)),
                     new Envelope<BuildingUnitAddressWasReplacedBecauseAddressWasReaddressed>(
@@ -150,31 +149,26 @@ namespace BuildingRegistry.Tests.ProjectionTests.Legacy
             _fixture.Customize(new WithFixedBuildingUnitPersistentLocalId());
 
             var position = _fixture.Create<long>();
+            var previousAddressPersistentLocalId = _fixture.Create<AddressPersistentLocalId>();
+            var newAddressPersistentLocalId = new AddressPersistentLocalId(previousAddressPersistentLocalId + 1);
 
-            var buildingUnitWasPlannedV2 = _fixture.Create<BuildingUnitWasPlannedV2>();
-            var previousBuildingUnitAddressWasAttached = _fixture.Create<BuildingUnitAddressWasAttachedV2>();
-            var newBuildingUnitAddressWasAttached = _fixture.Create<BuildingUnitAddressWasAttachedV2>();
+            var buildingWasMigrated = new BuildingWasMigratedBuilder(_fixture)
+                .WithBuildingUnit(new BuildingUnitBuilder(_fixture)
+                    .WithAddress(previousAddressPersistentLocalId)
+                    .WithAddress(newAddressPersistentLocalId)
+                    .Build())
+                .Build();
 
             var @event = new BuildingUnitAddressWasReplacedBecauseAddressWasReaddressed(
                 _fixture.Create<BuildingPersistentLocalId>(),
                 _fixture.Create<BuildingUnitPersistentLocalId>(),
-                new AddressPersistentLocalId(previousBuildingUnitAddressWasAttached.AddressPersistentLocalId),
-                new AddressPersistentLocalId(newBuildingUnitAddressWasAttached.AddressPersistentLocalId));
+                new AddressPersistentLocalId(previousAddressPersistentLocalId),
+                new AddressPersistentLocalId(newAddressPersistentLocalId));
             ((ISetProvenance)@event).SetProvenance(_fixture.Create<Provenance>());
 
-            var buildingUnitWasPlannedMetadata = new Dictionary<string, object>
+            var buildingWasMigratedMetadata = new Dictionary<string, object>
             {
-                { AddEventHashPipe.HashMetadataKey, buildingUnitWasPlannedV2.GetHash() },
-                { Envelope.PositionMetadataKey, ++position }
-            };
-            var previousBuildingUnitAddressWasAttachedMetadata = new Dictionary<string, object>
-            {
-                { AddEventHashPipe.HashMetadataKey, previousBuildingUnitAddressWasAttached.GetHash() },
-                { Envelope.PositionMetadataKey, ++position }
-            };
-            var newBuildingUnitAddressWasAttachedMetadata = new Dictionary<string, object>
-            {
-                { AddEventHashPipe.HashMetadataKey, newBuildingUnitAddressWasAttached.GetHash() },
+                { AddEventHashPipe.HashMetadataKey, buildingWasMigrated.GetHash() },
                 { Envelope.PositionMetadataKey, ++position }
             };
             var eventMetadata = new Dictionary<string, object>
@@ -185,12 +179,8 @@ namespace BuildingRegistry.Tests.ProjectionTests.Legacy
 
             await Sut
                 .Given(
-                    new Envelope<BuildingUnitWasPlannedV2>(
-                        new Envelope(buildingUnitWasPlannedV2, buildingUnitWasPlannedMetadata)),
-                    new Envelope<BuildingUnitAddressWasAttachedV2>(
-                        new Envelope(previousBuildingUnitAddressWasAttached, previousBuildingUnitAddressWasAttachedMetadata)),
-                    new Envelope<BuildingUnitAddressWasAttachedV2>(
-                        new Envelope(newBuildingUnitAddressWasAttached, newBuildingUnitAddressWasAttachedMetadata)),
+                    new Envelope<BuildingWasMigrated>(
+                        new Envelope(buildingWasMigrated, buildingWasMigratedMetadata)),
                     new Envelope<BuildingUnitAddressWasReplacedBecauseAddressWasReaddressed>(
                         new Envelope(@event, eventMetadata))
                 )
