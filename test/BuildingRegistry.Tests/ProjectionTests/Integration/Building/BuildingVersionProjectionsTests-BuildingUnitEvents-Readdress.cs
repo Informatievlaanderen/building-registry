@@ -137,7 +137,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
 
             await Sut
                 .Given(
-                    new Envelope<BuildingWasPlannedV2>(
+                    new Envelope<BuildingWasMigrated>(
                         new Envelope(buildingWasMigrated, buildingWasMigratedMetadata)),
                     new Envelope<BuildingUnitAddressWasReplacedBecauseAddressWasReaddressed>(
                         new Envelope(eventToAddPreviousRelationASecondTime, eventToAddPreviousRelationASecondTimeMetadata)),
