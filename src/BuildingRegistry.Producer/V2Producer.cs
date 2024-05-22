@@ -193,7 +193,11 @@ namespace BuildingRegistry.Producer
             {
                 await Produce(message.Message.BuildingPersistentLocalId, message.Message.ToContract(), message.Position, ct);
             });
-            //TODO-rik implement BuildingBuildingUnitsAddressesWereReaddressed
+
+            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingBuildingUnitsAddressesWereReaddressed>>(async (_, message, ct) =>
+            {
+                await Produce(message.Message.BuildingPersistentLocalId, message.Message.ToContract(), message.Position, ct);
+            });
 
             When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingWasMeasured>>(async (_, message, ct) =>
             {
