@@ -1,3 +1,15 @@
+# [4.6.0](https://github.com/informatievlaanderen/building-registry/compare/v4.5.1...v4.6.0) (2024-05-23)
+
+
+### Bug Fixes
+
+* **ci:** add newstg pipeline ([ceeda26](https://github.com/informatievlaanderen/building-registry/commit/ceeda26db1363770e1a47aeff7139449037c9b5a))
+
+
+### Features
+
+* GAWR-6428 add readdress streetname ([8729c1c](https://github.com/informatievlaanderen/building-registry/commit/8729c1cf4d0806247a03579e09b005a41d1ca6cb))
+
 ## [4.5.1](https://github.com/informatievlaanderen/building-registry/compare/v4.5.0...v4.5.1) (2024-05-10)
 
 
