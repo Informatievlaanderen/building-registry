@@ -59,8 +59,8 @@ namespace BuildingRegistry.Api.Oslo.Building.Query
 
             if (!string.IsNullOrEmpty(filtering.Filter.CaPaKey))
             {
-                var parcel = _consumerParcelContext.ParcelConsumerItems.FirstOrDefault(x => x.CaPaKey == filtering.Filter.CaPaKey );
-                if(parcel is not null && parcel.Status == ParcelStatus.Realized)
+                var parcel = _consumerParcelContext.ParcelConsumerItems.FirstOrDefault(x => x.CaPaKey == filtering.Filter.CaPaKey);
+                if (parcel is not null && parcel.Status == ParcelStatus.Realized)
                 {
                     var underlyingBuildings = _parcelMatching.GetUnderlyingBuildings(parcel.Geometry);
                     buildings = buildings.Where(x => underlyingBuildings.Contains(x.PersistentLocalId));
@@ -78,5 +78,21 @@ namespace BuildingRegistry.Api.Oslo.Building.Query
                 VersionTimestampAsDateTimeOffset = x.VersionTimestampAsDateTimeOffset
             });
         }
+    }
+
+    public class BuildingSorting : ISorting
+    {
+        public IEnumerable<string> SortableFields { get; } = new[]
+        {
+            nameof(BuildingDetailItemV2.PersistentLocalId)
+        };
+
+        public SortingHeader DefaultSortingHeader { get; } = new SortingHeader(nameof(BuildingDetailItemV2.PersistentLocalId), SortOrder.Ascending);
+    }
+
+    public class BuildingFilter
+    {
+        public string Status { get; set; }
+        public string? CaPaKey { get; set; }
     }
 }

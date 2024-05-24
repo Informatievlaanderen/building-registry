@@ -14,35 +14,35 @@ namespace BuildingRegistry.Projections.Legacy.Migrations
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            DropListCountView(migrationBuilder, LegacyContext.BuildingDetailListCountViewName);
-            DropListCountView(migrationBuilder, LegacyContext.BuildingUnitDetailListCountViewName);
+            DropListCountView(migrationBuilder, "vw_BuildingDetailListCountView");
+            DropListCountView(migrationBuilder, "vw_BuildingUnitDetailListCountView");
         }
 
         private static void CreateBuildingListCountView(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.Sql($@"
-            CREATE VIEW [{ViewSchema}].[{LegacyContext.BuildingDetailListCountViewName}]
+            CREATE VIEW [{ViewSchema}].[vw_BuildingDetailListCountView]
             WITH SCHEMABINDING
             AS
             SELECT COUNT_BIG(*) as Count
-            FROM [{Infrastructure.Schema.Legacy}].[{BuildingDetail.BuildingDetailItemConfiguration.TableName}]
+            FROM [{Infrastructure.Schema.Legacy}].[BuildingDetails]
             WHERE [IsComplete] = 1
                 AND [IsRemoved] = 0
                 AND [PersistentLocalId] IS NOT NULL");
 
             migrationBuilder.Sql($@"
-            CREATE UNIQUE CLUSTERED INDEX IX_{LegacyContext.BuildingDetailListCountViewName}
-                ON [{ViewSchema}].[{LegacyContext.BuildingDetailListCountViewName}] (Count)");
+            CREATE UNIQUE CLUSTERED INDEX IX_vw_BuildingDetailListCountView
+                ON [{ViewSchema}].[vw_BuildingDetailListCountView] (Count)");
         }
 
         private static void CreateBuildingUnitListCountView(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.Sql($@"
-            CREATE VIEW [{ViewSchema}].[{LegacyContext.BuildingUnitDetailListCountViewName}]
+            CREATE VIEW [{ViewSchema}].[vw_BuildingUnitDetailListCountView]
             WITH SCHEMABINDING
             AS
             SELECT COUNT_BIG(*) as Count
-            FROM [{Infrastructure.Schema.Legacy}].[{BuildingUnitDetail.BuildingUnitDetailItemConfiguration.TableName}]
+            FROM [{Infrastructure.Schema.Legacy}].[BuildingUnitDetails]
             WHERE [IsComplete] = 1
                 AND [IsRemoved] = 0
                 AND [PersistentLocalId] IS NOT NULL
@@ -50,8 +50,8 @@ namespace BuildingRegistry.Projections.Legacy.Migrations
                 AND [BuildingPersistentLocalId] IS NOT NULL");
 
             migrationBuilder.Sql($@"
-            CREATE UNIQUE CLUSTERED INDEX IX_{LegacyContext.BuildingUnitDetailListCountViewName}
-                ON [{ViewSchema}].[{LegacyContext.BuildingUnitDetailListCountViewName}] (Count)");
+            CREATE UNIQUE CLUSTERED INDEX IX_vw_BuildingUnitDetailListCountView
+                ON [{ViewSchema}].[vw_BuildingUnitDetailListCountView] (Count)");
         }
         private static void DropListCountView(MigrationBuilder migrationBuilder, string viewName)
         {
