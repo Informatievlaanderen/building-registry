@@ -18,7 +18,6 @@ namespace BuildingRegistry.Api.Legacy.Building
     using Be.Vlaanderen.Basisregisters.GrAr.Common;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy;
     using Count;
-    using Crab;
     using Detail;
     using Infrastructure;
     using Infrastructure.Options;
@@ -81,33 +80,6 @@ namespace BuildingRegistry.Api.Legacy.Building
         }
 
         /// <summary>
-        /// Vraag de referenties van een gebouw op.
-        /// </summary>
-        /// <param name="persistentLocalId"></param>
-        /// <param name="cancellationToken"></param>
-        /// <response code="200">De referenties van het gebouw.</response>
-        /// <response code="404">Als het gebouw niet gevonden kan worden.</response>
-        /// <response code="410">Als het gebouw verwijderd werd.</response>
-        /// <response code="500">Als er een interne fout is opgetreden.</response>
-        [HttpGet("{persistentLocalId}/referenties")]
-        [ProducesResponseType(typeof(BuildingDetailReferencesResponse), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status410Gone)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-        [SwaggerResponseExample(StatusCodes.Status200OK, typeof(BuildingReferencesResponseExamples))]
-        [SwaggerResponseExample(StatusCodes.Status404NotFound, typeof(BuildingNotFoundResponseExamples))]
-        [SwaggerResponseExample(StatusCodes.Status410Gone, typeof(BuildingGoneResponseExamples))]
-        [SwaggerResponseExample(StatusCodes.Status500InternalServerError, typeof(InternalServerErrorResponseExamples))]
-        public async Task<IActionResult> GetReferences(
-            [FromRoute] int persistentLocalId,
-            CancellationToken cancellationToken = default)
-        {
-            var response = await _mediator.Send(new GetReferencesRequest(persistentLocalId),
-                cancellationToken);
-            return Ok(response);
-        }
-
-        /// <summary>
         /// Vraag een lijst met actieve gebouwn op.
         /// </summary>
         /// <param name="context"></param>
@@ -158,32 +130,6 @@ namespace BuildingRegistry.Api.Legacy.Building
                 cancellationToken);
 
             return Ok(response);
-        }
-
-        /// <summary>
-        /// Vraag de koppeling tussen CRAB/GRB-gebouwen en GR-gebouwen
-        /// </summary>
-        /// <param name="cancellationToken"></param>
-        /// <response code="200">Als de opvraging van de CRAB/GRB-gebouwen gelukt is.</response>
-        /// <response code="400">Als er geen parameters zijn opgegeven.</response>
-        /// <response code="500">Als er een interne fout is opgetreden.</response>
-        [HttpGet("crabgebouwen")]
-        [ProducesResponseType(typeof(BuildingCrabMappingResponse), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-        [SwaggerResponseExample(StatusCodes.Status200OK, typeof(BuildingCrabMappingResponseExamples))]
-        [SwaggerResponseExample(StatusCodes.Status400BadRequest, typeof(BadRequestResponseExamples))]
-        [SwaggerResponseExample(StatusCodes.Status500InternalServerError, typeof(InternalServerErrorResponseExamples))]
-        public async Task<IActionResult> CrabGebouwen(CancellationToken cancellationToken = default)
-        {
-            var response = await _mediator.Send(new CrabGebouwenRequest(
-                    Request.ExtractFilteringRequest<BuildingCrabMappingFilter>(),
-                    Request.ExtractSortingRequest()),
-                cancellationToken);
-
-            return response is null
-                ? BadRequest("Filter is required")
-                : Ok(response);
         }
 
         /// <summary>
