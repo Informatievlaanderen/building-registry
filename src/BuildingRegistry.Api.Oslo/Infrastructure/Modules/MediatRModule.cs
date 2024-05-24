@@ -12,9 +12,6 @@ namespace BuildingRegistry.Api.Oslo.Infrastructure.Modules
 
     public class MediatRModule : Module
     {
-        public MediatRModule()
-        { }
-
         protected override void Load(ContainerBuilder builder)
         {
             builder

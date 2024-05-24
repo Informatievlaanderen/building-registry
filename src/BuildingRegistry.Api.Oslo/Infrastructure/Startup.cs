@@ -7,7 +7,6 @@ namespace BuildingRegistry.Api.Oslo.Infrastructure
     using Autofac;
     using Autofac.Extensions.DependencyInjection;
     using Be.Vlaanderen.Basisregisters.Api;
-    using Be.Vlaanderen.Basisregisters.Api.Exceptions;
     using Configuration;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
@@ -19,7 +18,6 @@ namespace BuildingRegistry.Api.Oslo.Infrastructure
     using Microsoft.OpenApi.Models;
     using Modules;
     using Options;
-    using ParcelMatching.Wfs;
 
     /// <summary>Represents the startup process for the application.</summary>
     public class Startup
@@ -140,8 +138,7 @@ namespace BuildingRegistry.Api.Oslo.Infrastructure
                         TypeScriptClientOptions =
                         {
                             ClassName = "BuildingRegistry"
-                        },
-                        CustomExceptionHandlers = new IExceptionHandler[] { new GrbWfsExceptionHandler() }
+                        }
                     },
                     Server =
                     {
