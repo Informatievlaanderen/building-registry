@@ -20,7 +20,6 @@ namespace BuildingRegistry.Api.Oslo.BuildingUnit
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.Extensions.Options;
     using Projections.Legacy;
-    using Projections.Syndication;
     using Query;
     using Swashbuckle.AspNetCore.Filters;
 
@@ -41,7 +40,6 @@ namespace BuildingRegistry.Api.Oslo.BuildingUnit
         /// Vraag een lijst met actieve gebouweenheden op.
         /// </summary>
         /// <param name="context"></param>
-        /// <param name="syndicationContext"></param>
         /// <param name="responseOptions"></param>
         /// <param name="cancellationToken"></param>
         /// <response code="200">Als de opvraging van een lijst met gebouweenheden gelukt is.</response>
@@ -55,7 +53,6 @@ namespace BuildingRegistry.Api.Oslo.BuildingUnit
         [SwaggerResponseExample(StatusCodes.Status500InternalServerError, typeof(InternalServerErrorResponseExamples))]
         public async Task<IActionResult> List(
             [FromServices] LegacyContext context,
-            [FromServices] SyndicationContext syndicationContext,
             [FromServices] IOptions<ResponseOptions> responseOptions,
             CancellationToken cancellationToken = default)
         {

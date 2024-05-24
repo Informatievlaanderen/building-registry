@@ -8,7 +8,6 @@ namespace BuildingRegistry.Api.Legacy.Infrastructure.Modules
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Logging;
     using Projections.Legacy;
-    using Projections.Syndication;
 
     public class ApiModule : Module
     {
@@ -40,7 +39,6 @@ namespace BuildingRegistry.Api.Legacy.Infrastructure.Modules
                 .RegisterModule(new MediatRModule())
                 .RegisterModule(new ParcelMatchingModule(_configuration, useProjectionsV2))
                 .RegisterModule(new LegacyModule(_configuration, _services, _loggerFactory))
-                .RegisterModule(new SyndicationModule(_configuration, _services, _loggerFactory))
                 .RegisterModule(new ConsumerParcelModule(_configuration, _services, _loggerFactory));
 
             builder
