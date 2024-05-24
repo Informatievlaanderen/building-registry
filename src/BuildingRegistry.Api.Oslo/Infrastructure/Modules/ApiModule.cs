@@ -27,17 +27,9 @@ namespace BuildingRegistry.Api.Oslo.Infrastructure.Modules
 
         protected override void Load(ContainerBuilder builder)
         {
-            var useProjectionsV2ConfigValue = _configuration.GetSection("FeatureToggles")["UseProjectionsV2"];
-            var useProjectionsV2 = false;
-
-            if (!string.IsNullOrEmpty(useProjectionsV2ConfigValue))
-            {
-                useProjectionsV2 = bool.Parse(useProjectionsV2ConfigValue);
-            }
-
             builder
                 .RegisterModule(new MediatRModule())
-                .RegisterModule(new ParcelMatchingModule(_configuration, useProjectionsV2))
+                .RegisterModule(new ParcelMatchingModule())
                 .RegisterModule(new LegacyModule(_configuration, _services, _loggerFactory))
                 .RegisterModule(new ConsumerParcelModule(_configuration, _services, _loggerFactory));
 
