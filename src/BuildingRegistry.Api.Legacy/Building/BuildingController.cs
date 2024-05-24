@@ -29,7 +29,6 @@ namespace BuildingRegistry.Api.Legacy.Building
     using Microsoft.Extensions.Options;
     using Microsoft.SyndicationFeed;
     using Microsoft.SyndicationFeed.Atom;
-    using Projections.Legacy;
     using Query;
     using Swashbuckle.AspNetCore.Filters;
     using Sync;
@@ -82,8 +81,6 @@ namespace BuildingRegistry.Api.Legacy.Building
         /// <summary>
         /// Vraag een lijst met actieve gebouwn op.
         /// </summary>
-        /// <param name="context"></param>
-        /// <param name="responseOptions"></param>
         /// <param name="cancellationToken"></param>
         /// <response code="200">Als de opvraging van een lijst met gebouwn gelukt is.</response>
         /// <response code="500">Als er een interne fout is opgetreden.</response>
@@ -94,8 +91,6 @@ namespace BuildingRegistry.Api.Legacy.Building
         [SwaggerResponseExample(StatusCodes.Status200OK, typeof(BuildingListResponseExamples))]
         [SwaggerResponseExample(StatusCodes.Status500InternalServerError, typeof(InternalServerErrorResponseExamples))]
         public async Task<IActionResult> List(
-            [FromServices] LegacyContext context,
-            [FromServices] IOptions<ResponseOptions> responseOptions,
             CancellationToken cancellationToken = default)
         {
             var listResponse = await _mediator.Send(
@@ -122,7 +117,8 @@ namespace BuildingRegistry.Api.Legacy.Building
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
         [SwaggerResponseExample(StatusCodes.Status200OK, typeof(TotalCountResponseExample))]
         [SwaggerResponseExample(StatusCodes.Status500InternalServerError, typeof(InternalServerErrorResponseExamples))]
-        public async Task<IActionResult> Count(CancellationToken cancellationToken = default)
+        public async Task<IActionResult> Count(
+            CancellationToken cancellationToken = default)
         {
             var response = await _mediator.Send(new CountRequest(
                     Request.ExtractFilteringRequest<BuildingFilter>(),
@@ -191,7 +187,7 @@ namespace BuildingRegistry.Api.Legacy.Building
                     : (long?) null;
 
                 var nextUri = BuildNextSyncUri(pagedBuildings.PaginationInfo.Limit, nextFrom,
-                    syndicationConfiguration["NextUri"]);
+                    syndicationConfiguration["NextUri"]!);
                 if (nextUri is not null)
                 {
                     await writer.Write(new SyndicationLink(nextUri, "next"));
@@ -202,8 +198,8 @@ namespace BuildingRegistry.Api.Legacy.Building
                     await writer.WriteBuilding(
                         responseOptions,
                         formatter,
-                        syndicationConfiguration["Category1"],
-                        syndicationConfiguration["Category2"],
+                        syndicationConfiguration["Category1"]!,
+                        syndicationConfiguration["Category2"]!,
                         building);
                 }
 

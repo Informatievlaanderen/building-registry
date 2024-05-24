@@ -13,13 +13,10 @@ namespace BuildingRegistry.Api.Oslo.BuildingUnit
     using Count;
     using Detail;
     using Infrastructure;
-    using Infrastructure.Options;
     using List;
     using MediatR;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
-    using Microsoft.Extensions.Options;
-    using Projections.Legacy;
     using Query;
     using Swashbuckle.AspNetCore.Filters;
 
@@ -39,8 +36,6 @@ namespace BuildingRegistry.Api.Oslo.BuildingUnit
         /// <summary>
         /// Vraag een lijst met actieve gebouweenheden op.
         /// </summary>
-        /// <param name="context"></param>
-        /// <param name="responseOptions"></param>
         /// <param name="cancellationToken"></param>
         /// <response code="200">Als de opvraging van een lijst met gebouweenheden gelukt is.</response>
         /// <response code="500">Als er een interne fout is opgetreden.</response>
@@ -52,8 +47,6 @@ namespace BuildingRegistry.Api.Oslo.BuildingUnit
         [SwaggerResponseExample(StatusCodes.Status200OK, typeof(BuildingUnitListOsloResponseExamples))]
         [SwaggerResponseExample(StatusCodes.Status500InternalServerError, typeof(InternalServerErrorResponseExamples))]
         public async Task<IActionResult> List(
-            [FromServices] LegacyContext context,
-            [FromServices] IOptions<ResponseOptions> responseOptions,
             CancellationToken cancellationToken = default)
         {
             var filtering = Request.ExtractFilteringRequest<BuildingUnitFilter>();
@@ -80,7 +73,8 @@ namespace BuildingRegistry.Api.Oslo.BuildingUnit
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
         [SwaggerResponseExample(StatusCodes.Status200OK, typeof(TotalCountOsloResponseExample))]
         [SwaggerResponseExample(StatusCodes.Status500InternalServerError, typeof(InternalServerErrorResponseExamples))]
-        public async Task<IActionResult> Count(CancellationToken cancellationToken = default)
+        public async Task<IActionResult> Count(
+            CancellationToken cancellationToken = default)
         {
             var filtering = Request.ExtractFilteringRequest<BuildingUnitFilter>();
             var sorting = Request.ExtractSortingRequest();
