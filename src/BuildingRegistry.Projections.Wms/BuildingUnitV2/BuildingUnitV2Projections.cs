@@ -365,8 +365,12 @@ namespace BuildingRegistry.Projections.Wms.BuildingUnitV2
             {
                 var unit = await context.BuildingUnitsV2.FindAsync(message.Message.BuildingUnitPersistentLocalId);
                 unit!.BuildingPersistentLocalId = message.Message.BuildingPersistentLocalId;
-                unit.Position = message.Message.ExtendedWkbGeometry.ToByteArray();
-                unit.PositionMethod = BuildingUnitPositionGeometryMethod.Parse(message.Message.GeometryMethod);
+
+                SetPosition(
+                    unit,
+                    message.Message.ExtendedWkbGeometry,
+                    MapGeometryMethod(BuildingUnitPositionGeometryMethod.Parse(message.Message.GeometryMethod)));
+
                 unit.Function = BuildingUnitFunction.Parse(message.Message.Function);
                 unit.Status = BuildingUnitStatus.Parse(message.Message.BuildingUnitStatus);
                 unit.HasDeviation = message.Message.HasDeviation;
