@@ -39,12 +39,6 @@ updates:
   rebase-strategy: "disabled"
 
 - package-ecosystem: docker
-  directory: "/src/BuildingRegistry.Projections.Syndication"
-  schedule:
-    interval: weekly
-  rebase-strategy: "disabled"
-
-- package-ecosystem: docker
   directory: "/src/BuildingRegistry.Api.BackOffice"
   schedule:
     interval: weekly
