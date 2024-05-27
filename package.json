@@ -117,6 +117,12 @@
         }
       }
     ],
+    "addChannel": [
+      {
+        "path": "@semantic-release/npm",
+        "npmPublish": false
+      }
+    ],
     "prepare": [
       {
         "path": "@semantic-release/changelog",
@@ -144,10 +150,6 @@
             "path": "dist/**/*.nupkg"
           }
         ]
-      },
-      {
-        "path": "@semantic-release/npm",
-        "npmPublish": false
       }
     ],
     "success": [
