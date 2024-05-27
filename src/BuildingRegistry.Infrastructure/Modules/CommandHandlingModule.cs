@@ -2,7 +2,6 @@ namespace BuildingRegistry.Infrastructure.Modules
 {
     using Autofac;
     using Be.Vlaanderen.Basisregisters.CommandHandling;
-    using Building;
     using Microsoft.Extensions.Configuration;
 
     public class CommandHandlingModule : Module
@@ -16,7 +15,8 @@ namespace BuildingRegistry.Infrastructure.Modules
         {
             builder.RegisterModule(new AggregateSourceModule(_configuration));
 
-            CommandHandlerModules.Register(builder);
+            Building.CommandHandlerModules.Register(builder);
+            AllStream.CommandHandlerModules.Register(builder);
 
             builder
                 .RegisterType<CommandHandlerResolver>()

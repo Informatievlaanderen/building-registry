@@ -1,4 +1,4 @@
-﻿namespace BuildingRegistry.Infrastructure.Modules
+namespace BuildingRegistry.Infrastructure.Modules
 {
     using System;
     using Autofac;
@@ -6,6 +6,7 @@
     using Be.Vlaanderen.Basisregisters.AggregateSource.Snapshotting;
     using Be.Vlaanderen.Basisregisters.EventHandling;
     using Be.Vlaanderen.Basisregisters.EventHandling.Autofac;
+    using BuildingRegistry.AllStream;
     using BuildingRegistry.Building;
     using BuildingRegistry.Infrastructure;
     using BuildingRegistry.Infrastructure.Repositories;
@@ -44,6 +45,10 @@
             builder
                 .RegisterType<Buildings>()
                 .As<IBuildings>();
+
+            builder
+                .RegisterType<AllStreamRepository>()
+                .As<IAllStreamRepository>();
 
             builder
                 .RegisterModule(new EventHandlingModule(typeof(DomainAssemblyMarker).Assembly, eventSerializerSettings));
