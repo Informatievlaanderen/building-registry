@@ -1,3 +1,10 @@
+## [4.7.1](https://github.com/informatievlaanderen/building-registry/compare/v4.7.0...v4.7.1) (2024-05-27)
+
+
+### Bug Fixes
+
+* drop ListCountViews ([5b2009e](https://github.com/informatievlaanderen/building-registry/commit/5b2009ea827453b4fc69747bb71256ec02715415))
+
 # [4.7.0](https://github.com/informatievlaanderen/building-registry/compare/v4.6.0...v4.7.0) (2024-05-27)
 
 
