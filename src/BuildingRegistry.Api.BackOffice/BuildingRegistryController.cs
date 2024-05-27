@@ -22,7 +22,7 @@ namespace BuildingRegistry.Api.BackOffice
 
         private readonly TicketingOptions _ticketingOptions;
         private readonly IActionContextAccessor _actionContextAccessor;
-        private readonly IProvenanceFactory _provenanceFactory;
+        protected readonly IProvenanceFactory _provenanceFactory;
 
         public BuildingRegistryController(
             IMediator mediator,
