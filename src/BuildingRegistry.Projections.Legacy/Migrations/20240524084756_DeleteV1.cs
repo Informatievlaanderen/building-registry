@@ -11,6 +11,9 @@ namespace BuildingRegistry.Projections.Legacy.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.Sql($@"DROP VIEW [{Infrastructure.Schema.Legacy}].[vw_BuildingDetailListCountView]");
+            migrationBuilder.Sql($@"DROP VIEW [{Infrastructure.Schema.Legacy}].[vw_BuildingUnitDetailListCountView]");
+
             migrationBuilder.DropTable(
                 name: "BuildingDetails",
                 schema: "BuildingRegistryLegacy");
