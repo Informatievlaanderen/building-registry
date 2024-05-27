@@ -23,8 +23,5 @@ files
   BuildingRegistry.Projections.Legacy.dll => lib\net8.0
   BuildingRegistry.Projections.Legacy.pdb => lib\net8.0
 
-  BuildingRegistry.Projections.Syndication.dll => lib\net8.0
-  BuildingRegistry.Projections.Syndication.pdb => lib\net8.0
-
   BuildingRegistry.dll => lib\net8.0
   BuildingRegistry.pdb => lib\net8.0
