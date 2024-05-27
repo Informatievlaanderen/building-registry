@@ -1,3 +1,10 @@
+## [4.5.2](https://github.com/informatievlaanderen/building-registry/compare/v4.5.1...v4.5.2) (2024-05-27)
+
+
+### Bug Fixes
+
+* project BuildingUnitWasMovedIntoBuilding in wms ([#1219](https://github.com/informatievlaanderen/building-registry/issues/1219)) ([0ef03c7](https://github.com/informatievlaanderen/building-registry/commit/0ef03c7d3d6efe268c12e4c2efa08b186c299961))
+
 ## [4.5.1](https://github.com/informatievlaanderen/building-registry/compare/v4.5.0...v4.5.1) (2024-05-10)
 
 
