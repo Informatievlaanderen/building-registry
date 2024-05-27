@@ -1,3 +1,10 @@
+# [4.7.0](https://github.com/informatievlaanderen/building-registry/compare/v4.6.0...v4.7.0) (2024-05-27)
+
+
+### Features
+
+* delete syndication project ([9a712cf](https://github.com/informatievlaanderen/building-registry/commit/9a712cf8762c21c7bea9487aaf547d69cd1ea223))
+
 # [4.6.0](https://github.com/informatievlaanderen/building-registry/compare/v4.5.1...v4.6.0) (2024-05-23)
 
 
