@@ -1166,7 +1166,8 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wms
                     item.Should().NotBeNull();
 
                     item!.BuildingPersistentLocalId.Should().Be(@event.BuildingPersistentLocalId);
-                    item.PositionMethod.Should().Be(BuildingUnitPositionGeometryMethod.Parse(@event.GeometryMethod));
+                    item.PositionMethod.Should().Be(
+                        BuildingUnitV2Projections.MapGeometryMethod(BuildingUnitPositionGeometryMethod.Parse(@event.GeometryMethod)));
                     item.Position.Should().BeEquivalentTo(@event.ExtendedWkbGeometry.ToByteArray());
                     item.Status.Should().Be(BuildingUnitStatus.Parse(@event.BuildingUnitStatus));
                     item.Function.Should().Be(BuildingUnitFunction.Parse(@event.Function));
