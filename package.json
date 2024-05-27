@@ -144,6 +144,10 @@
             "path": "dist/**/*.nupkg"
           }
         ]
+      },
+      {
+        "path": "@semantic-release/npm",
+        "npmPublish": false
       }
     ],
     "success": [
