@@ -10,7 +10,6 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Requests.BuildingUnit
     {
         public CreateOsloSnapshotsRequest Request { get; }
 
-
         public CreateOsloSnapshotsLambdaRequest(
             string messageGroupId,
             CreateOsloSnapshotsSqsRequest sqsRequest)
