@@ -23,7 +23,7 @@ namespace BuildingRegistry.Consumer.Read.Parcel.Infrastructure.Modules
             var hasConnectionString = !string.IsNullOrWhiteSpace(connectionString);
             if (hasConnectionString)
             {
-                RunOnSqlServer(services, serviceLifetime, loggerFactory, connectionString);
+                RunOnSqlServer(services, serviceLifetime, loggerFactory, connectionString!);
             }
             else
             {
@@ -58,7 +58,7 @@ namespace BuildingRegistry.Consumer.Read.Parcel.Infrastructure.Modules
             services
                 .AddDbContext<ConsumerParcelContext>(options => options
                     .UseLoggerFactory(loggerFactory)
-                    .UseInMemoryDatabase(Guid.NewGuid().ToString(), sqlServerOptions => { }));
+                    .UseInMemoryDatabase(Guid.NewGuid().ToString(), _ => { }));
 
             logger.LogWarning("Running InMemory for {Context}!", nameof(ConsumerParcelContext));
         }

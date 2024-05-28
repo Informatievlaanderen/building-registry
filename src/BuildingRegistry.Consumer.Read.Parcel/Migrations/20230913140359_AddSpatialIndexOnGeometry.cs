@@ -5,6 +5,7 @@
 namespace BuildingRegistry.Consumer.Read.Parcel.Migrations
 {
     using BuildingRegistry.Infrastructure;
+    using Parcel;
 
     public partial class AddSpatialIndexOnGeometry : Migration
     {
