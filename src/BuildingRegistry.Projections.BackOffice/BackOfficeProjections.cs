@@ -151,25 +151,26 @@ namespace BuildingRegistry.Projections.BackOffice
                 await DelayProjection(message, delayInSeconds, cancellationToken);
 
                 await using var backOfficeContext = await backOfficeContextFactory.CreateDbContextAsync(cancellationToken);
-                await using var transaction = await backOfficeContext.Database.BeginTransactionAsync(cancellationToken);
 
                 var buildingUnitPersistentLocalId = new BuildingUnitPersistentLocalId(message.Message.BuildingUnitPersistentLocalId);
                 var destinationBuildingPersistentLocalId = new BuildingPersistentLocalId(message.Message.DestinationBuildingPersistentLocalId);
 
-                await backOfficeContext.RemoveIdempotentBuildingUnitBuildingRelation(
-                    buildingUnitPersistentLocalId,
-                    cancellationToken);
-                await backOfficeContext.AddIdempotentBuildingUnitBuilding(
-                    destinationBuildingPersistentLocalId,
-                    buildingUnitPersistentLocalId,
-                    cancellationToken);
+                var buildingBuildingUnit = await backOfficeContext
+                    .FindBuildingUnitBuildingRelation(buildingUnitPersistentLocalId, cancellationToken);
+
+                if (buildingBuildingUnit is not null
+                    && buildingBuildingUnit!.BuildingPersistentLocalId == message.Message.BuildingPersistentLocalId)
+                {
+                    buildingBuildingUnit!.BuildingPersistentLocalId = destinationBuildingPersistentLocalId;
+                }
+
                 await backOfficeContext.MoveBuildingUnitAddressRelations(
                     buildingUnitPersistentLocalId,
                     destinationBuildingPersistentLocalId,
-                    cancellationToken);
+                    cancellationToken,
+                    saveChanges: false);
 
                 await backOfficeContext.SaveChangesAsync(cancellationToken);
-                await transaction.CommitAsync(cancellationToken);
             });
         }
 
