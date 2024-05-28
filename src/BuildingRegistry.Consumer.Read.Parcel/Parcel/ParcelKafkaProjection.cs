@@ -1,4 +1,4 @@
-namespace BuildingRegistry.Consumer.Read.Parcel.Projections
+namespace BuildingRegistry.Consumer.Read.Parcel.Parcel
 {
     using System;
     using Be.Vlaanderen.Basisregisters.GrAr.Contracts.ParcelRegistry;

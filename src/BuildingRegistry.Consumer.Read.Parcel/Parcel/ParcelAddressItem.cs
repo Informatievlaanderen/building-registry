@@ -1,4 +1,4 @@
-﻿namespace BuildingRegistry.Consumer.Read.Parcel
+﻿namespace BuildingRegistry.Consumer.Read.Parcel.Parcel
 {
     using System;
     using BuildingRegistry.Infrastructure;

@@ -19,6 +19,7 @@ namespace BuildingRegistry.Consumer.Read.Parcel.Infrastructure
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Hosting;
     using Microsoft.Extensions.Logging;
+    using Parcel;
     using Serilog;
     using Serilog.Debugging;
     using Serilog.Extensions.Logging;

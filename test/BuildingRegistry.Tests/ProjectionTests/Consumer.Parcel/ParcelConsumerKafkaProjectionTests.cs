@@ -8,7 +8,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Consumer.Parcel
     using Be.Vlaanderen.Basisregisters.GrAr.Contracts.ParcelRegistry;
     using Be.Vlaanderen.Basisregisters.Utilities.HexByteConvertor;
     using BuildingRegistry.Consumer.Read.Parcel;
-    using BuildingRegistry.Consumer.Read.Parcel.Projections;
+    using BuildingRegistry.Consumer.Read.Parcel.Parcel;
     using Fixtures;
     using FluentAssertions;
     using Microsoft.EntityFrameworkCore;

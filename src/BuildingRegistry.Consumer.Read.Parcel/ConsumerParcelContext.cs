@@ -14,6 +14,8 @@ namespace BuildingRegistry.Consumer.Read.Parcel
     using Microsoft.EntityFrameworkCore.Design;
     using Microsoft.Extensions.Configuration;
     using NetTopologySuite.Geometries;
+    using Parcel;
+
     public class ConsumerParcelContext : RunnerDbContext<ConsumerParcelContext>, IParcels
     {
         public DbSet<ParcelConsumerItem> ParcelConsumerItems { get; set; }

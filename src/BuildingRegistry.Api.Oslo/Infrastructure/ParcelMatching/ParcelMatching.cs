@@ -4,6 +4,7 @@
     using System.Collections.Generic;
     using System.Linq;
     using Consumer.Read.Parcel;
+    using Consumer.Read.Parcel.Parcel;
     using NetTopologySuite.Geometries;
     using Projections.Legacy;
     using Projections.Legacy.BuildingDetailV2;
