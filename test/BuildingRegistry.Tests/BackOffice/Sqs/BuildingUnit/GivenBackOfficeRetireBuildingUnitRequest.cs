@@ -71,8 +71,7 @@ namespace BuildingRegistry.Tests.BackOffice.Sqs.BuildingUnit
                 CancellationToken.None));
             result.Location.Should().Be(ticketingUrl.For(ticketId));
         }
-
-
+        
         [Fact]
         public void WithNoBuildingFoundByBuildingUnitPersistentLocalId_ThenThrowsAggregateIdNotFound()
         {

@@ -19,10 +19,10 @@ namespace BuildingRegistry.Api.BackOffice
     public class BuildingRegistryController : ApiController
     {
         protected IMediator Mediator { get; }
+        protected IProvenanceFactory ProvenanceFactory { get; }
 
         private readonly TicketingOptions _ticketingOptions;
         private readonly IActionContextAccessor _actionContextAccessor;
-        private readonly IProvenanceFactory _provenanceFactory;
 
         public BuildingRegistryController(
             IMediator mediator,
@@ -31,9 +31,9 @@ namespace BuildingRegistry.Api.BackOffice
             IProvenanceFactory provenanceFactory)
         {
             Mediator = mediator;
-            _actionContextAccessor = actionContextAccessor;
-            _provenanceFactory = provenanceFactory;
             _ticketingOptions = ticketingOptions.Value;
+            _actionContextAccessor = actionContextAccessor;
+            ProvenanceFactory = provenanceFactory;
         }
 
         protected IDictionary<string, object?> GetMetadata()
@@ -51,7 +51,7 @@ namespace BuildingRegistry.Api.BackOffice
         }
 
         protected Provenance CreateProvenance(Modification modification)
-            => _provenanceFactory.Create(new Reason(""), modification);
+            => ProvenanceFactory.Create(new Reason(""), modification);
 
         protected Provenance CreateFakeProvenance()
         {

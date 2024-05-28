@@ -141,18 +141,21 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo.Infrastructure.Modules
                             saslPassword));
                     }
 
+                    var osloProxy = new OsloProxy(new HttpClient
+                    {
+                        BaseAddress = new Uri(_configuration["BuildingUnitOsloApiUrl"].TrimEnd('/')),
+                    });
+
                     return new ProducerBuildingUnitProjections(
                         new Producer(producerOptions),
                         new SnapshotManager(
                             c.Resolve<ILoggerFactory>(),
-                            new OsloProxy(new HttpClient
-                            {
-                                BaseAddress = new Uri(_configuration["BuildingUnitOsloApiUrl"].TrimEnd('/')),
-                            }),
+                            osloProxy,
                             SnapshotManagerOptions.Create(
                                 maxRetryWaitIntervalSeconds,
                                 retryBackoffFactor)),
-                        osloNamespace);
+                        osloNamespace,
+                        osloProxy);
                 },
                     connectedProjectionSettings);
         }

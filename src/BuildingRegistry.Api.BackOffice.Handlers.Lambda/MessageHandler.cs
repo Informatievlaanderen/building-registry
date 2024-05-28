@@ -169,6 +169,12 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda
                         new ExtendedWkbGeometry(request.ExtendedWkbGeometry)), cancellationToken);
                     break;
 
+                case CreateOsloSnapshotsSqsRequest request:
+                    await mediator.Send(
+                        new CreateOsloSnapshotsLambdaRequest(messageMetadata.MessageGroupId!, request),
+                        cancellationToken);
+                    break;
+
                 default:
                     throw new NotImplementedException(
                         $"{messageData.GetType().Name} has no corresponding SqsLambdaRequest defined.");
