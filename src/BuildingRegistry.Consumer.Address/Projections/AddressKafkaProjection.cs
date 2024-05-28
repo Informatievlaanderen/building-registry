@@ -1,10 +1,8 @@
 namespace BuildingRegistry.Consumer.Address.Projections
 {
     using System;
-    using Address;
     using Be.Vlaanderen.Basisregisters.GrAr.Contracts.AddressRegistry;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.Connector;
-    using Building.Commands;
 
     public class AddressKafkaProjection : ConnectedProjection<ConsumerAddressContext>
     {
@@ -35,120 +33,128 @@ namespace BuildingRegistry.Consumer.Address.Projections
             When<AddressWasApproved>(async (context, message, ct) =>
             {
                 var address = await context.AddressConsumerItems.FindAsync(message.AddressPersistentLocalId, cancellationToken: ct);
-                address.Status = AddressStatus.Current;
+                address!.Status = AddressStatus.Current;
             });
 
             When<AddressWasRejected>(async (context, message, ct) =>
             {
                 var address = await context.AddressConsumerItems.FindAsync(message.AddressPersistentLocalId, cancellationToken: ct);
-                address.Status = AddressStatus.Rejected;
+                address!.Status = AddressStatus.Rejected;
             });
 
             When<AddressWasRejectedBecauseHouseNumberWasRejected>(async (context, message, ct) =>
             {
                 var address = await context.AddressConsumerItems.FindAsync(message.AddressPersistentLocalId, cancellationToken: ct);
-                address.Status = AddressStatus.Rejected;
+                address!.Status = AddressStatus.Rejected;
             });
 
             When<AddressWasRejectedBecauseHouseNumberWasRetired>(async (context, message, ct) =>
             {
                 var address = await context.AddressConsumerItems.FindAsync(message.AddressPersistentLocalId, cancellationToken: ct);
-                address.Status = AddressStatus.Rejected;
+                address!.Status = AddressStatus.Rejected;
             });
 
             When<AddressWasRejectedBecauseStreetNameWasRejected>(async (context, message, ct) =>
             {
                 var address = await context.AddressConsumerItems.FindAsync(message.AddressPersistentLocalId, cancellationToken: ct);
-                address.Status = AddressStatus.Rejected;
+                address!.Status = AddressStatus.Rejected;
             });
 
             When<AddressWasRejectedBecauseStreetNameWasRetired>(async (context, message, ct) =>
             {
                 var address = await context.AddressConsumerItems.FindAsync(message.AddressPersistentLocalId, cancellationToken: ct);
-                address.Status = AddressStatus.Rejected;
+                address!.Status = AddressStatus.Rejected;
             });
 
             When<AddressWasRetiredV2>(async (context, message, ct) =>
             {
                 var address = await context.AddressConsumerItems.FindAsync(message.AddressPersistentLocalId, cancellationToken: ct);
-                address.Status = AddressStatus.Retired;
+                address!.Status = AddressStatus.Retired;
             });
 
             When<AddressWasRetiredBecauseHouseNumberWasRetired>(async (context, message, ct) =>
             {
                 var address = await context.AddressConsumerItems.FindAsync(message.AddressPersistentLocalId, cancellationToken: ct);
-                address.Status = AddressStatus.Retired;
+                address!.Status = AddressStatus.Retired;
             });
 
             When<AddressWasRetiredBecauseStreetNameWasRejected>(async (context, message, ct) =>
             {
                 var address = await context.AddressConsumerItems.FindAsync(message.AddressPersistentLocalId, cancellationToken: ct);
-                address.Status = AddressStatus.Retired;
+                address!.Status = AddressStatus.Retired;
             });
 
             When<AddressWasRetiredBecauseStreetNameWasRetired>(async (context, message, ct) =>
             {
                 var address = await context.AddressConsumerItems.FindAsync(message.AddressPersistentLocalId, cancellationToken: ct);
-                address.Status = AddressStatus.Retired;
+                address!.Status = AddressStatus.Retired;
             });
 
             When<AddressWasRemovedBecauseStreetNameWasRemoved>(async (context, message, ct) =>
             {
                 var address = await context.AddressConsumerItems.FindAsync(message.AddressPersistentLocalId, cancellationToken: ct);
-                address.IsRemoved = true;
+                address!.IsRemoved = true;
             });
 
             When<AddressWasRemovedV2>(async (context, message, ct) =>
             {
                 var address = await context.AddressConsumerItems.FindAsync(message.AddressPersistentLocalId, cancellationToken: ct);
-                address.IsRemoved = true;
+                address!.IsRemoved = true;
+            });
+
+            When<AddressRemovalWasCorrected>(async (context, message, ct) =>
+            {
+                var address = await context.AddressConsumerItems.FindAsync(message.AddressPersistentLocalId, cancellationToken: ct);
+
+                address!.Status = AddressStatus.Parse(message.Status);
+                address.IsRemoved = false;
             });
 
             When<AddressWasRemovedBecauseHouseNumberWasRemoved>(async (context, message, ct) =>
             {
                 var address = await context.AddressConsumerItems.FindAsync(message.AddressPersistentLocalId, cancellationToken: ct);
-                address.IsRemoved = true;
+                address!.IsRemoved = true;
             });
 
             When<AddressWasDeregulated>(async (context, message, ct) =>
             {
                 var address = await context.AddressConsumerItems.FindAsync(message.AddressPersistentLocalId, cancellationToken: ct);
-                address.Status = AddressStatus.Current;
+                address!.Status = AddressStatus.Current;
             });
 
             When<AddressWasCorrectedFromApprovedToProposed>(async (context, message, ct) =>
             {
                 var address = await context.AddressConsumerItems.FindAsync(message.AddressPersistentLocalId, cancellationToken: ct);
-                address.Status = AddressStatus.Proposed;
+                address!.Status = AddressStatus.Proposed;
             });
 
             When<AddressWasCorrectedFromApprovedToProposedBecauseHouseNumberWasCorrected>(async (context, message, ct) =>
             {
                 var address = await context.AddressConsumerItems.FindAsync(message.AddressPersistentLocalId, cancellationToken: ct);
-                address.Status = AddressStatus.Proposed;
+                address!.Status = AddressStatus.Proposed;
             });
 
             When<AddressWasCorrectedFromRejectedToProposed>(async (context, message, ct) =>
             {
                 var address = await context.AddressConsumerItems.FindAsync(message.AddressPersistentLocalId, cancellationToken: ct);
-                address.Status = AddressStatus.Proposed;
+                address!.Status = AddressStatus.Proposed;
             });
 
             When<AddressWasCorrectedFromRetiredToCurrent>(async (context, message, ct) =>
             {
                 var address = await context.AddressConsumerItems.FindAsync(message.AddressPersistentLocalId, cancellationToken: ct);
-                address.Status = AddressStatus.Current;
+                address!.Status = AddressStatus.Current;
             });
 
-            When<AddressHouseNumberWasReaddressed>(async (context, message, ct) =>
+            When<AddressHouseNumberWasReaddressed>(async (context, message, _) =>
             {
                 var houseNumberAddress = await context.AddressConsumerItems.FindAsync(message.ReaddressedHouseNumber.DestinationAddressPersistentLocalId);
-                houseNumberAddress.Status = AddressStatus.Parse(message.ReaddressedHouseNumber.SourceStatus);
+                houseNumberAddress!.Status = AddressStatus.Parse(message.ReaddressedHouseNumber.SourceStatus);
 
                 foreach (var boxNumber in message.ReaddressedBoxNumbers)
                 {
                     var boxNumberAddress = await context.AddressConsumerItems.FindAsync(boxNumber.DestinationAddressPersistentLocalId);
-                    boxNumberAddress.Status = AddressStatus.Parse(boxNumber.SourceStatus);
+                    boxNumberAddress!.Status = AddressStatus.Parse(boxNumber.SourceStatus);
                 }
             });
 
@@ -165,13 +171,13 @@ namespace BuildingRegistry.Consumer.Address.Projections
             When<AddressWasRejectedBecauseOfReaddress>(async (context, message, ct) =>
             {
                 var address = await context.AddressConsumerItems.FindAsync(message.AddressPersistentLocalId, cancellationToken: ct);
-                address.Status = AddressStatus.Rejected;
+                address!.Status = AddressStatus.Rejected;
             });
 
             When<AddressWasRetiredBecauseOfReaddress>(async (context, message, ct) =>
             {
                 var address = await context.AddressConsumerItems.FindAsync(message.AddressPersistentLocalId, cancellationToken: ct);
-                address.Status = AddressStatus.Retired;
+                address!.Status = AddressStatus.Retired;
             });
         }
     }
