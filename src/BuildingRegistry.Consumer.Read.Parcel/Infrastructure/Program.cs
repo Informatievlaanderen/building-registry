@@ -13,7 +13,6 @@ namespace BuildingRegistry.Consumer.Read.Parcel.Infrastructure
     using Be.Vlaanderen.Basisregisters.MessageHandling.Kafka.Consumer;
     using BuildingRegistry.Infrastructure;
     using Destructurama;
-    using Microsoft.Data.SqlClient;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
@@ -90,7 +89,7 @@ namespace BuildingRegistry.Consumer.Read.Parcel.Infrastructure
                     builder
                         .Register(c =>
                         {
-                            var bootstrapServers = hostContext.Configuration["Kafka:BootstrapServers"];
+                            var bootstrapServers = hostContext.Configuration["Kafka:BootstrapServers"]!;
                             var topic = $"{hostContext.Configuration["Topic"]}" ?? throw new ArgumentException("Configuration has no Topic.");
                             var suffix = hostContext.Configuration["GroupSuffix"];
                             var consumerGroupId = $"BuildingRegistry.ConsumerParcelItem.{topic}{suffix}";
@@ -102,13 +101,13 @@ namespace BuildingRegistry.Consumer.Read.Parcel.Infrastructure
                                 EventsJsonSerializerSettingsProvider.CreateSerializerSettings());
 
                             consumerOptions.ConfigureSaslAuthentication(new SaslAuthentication(
-                                hostContext.Configuration["Kafka:SaslUserName"],
-                                hostContext.Configuration["Kafka:SaslPassword"]));
+                                hostContext.Configuration["Kafka:SaslUserName"]!,
+                                hostContext.Configuration["Kafka:SaslPassword"]!));
 
                             var offsetStr = hostContext.Configuration["TopicOffset"];
                             if (!string.IsNullOrEmpty(offsetStr) && long.TryParse(offsetStr, out var offset))
                             {
-                                var ignoreDataCheck = hostContext.Configuration.GetValue<bool>("IgnoreTopicOffsetDataCheck", false);
+                                var ignoreDataCheck = hostContext.Configuration.GetValue("IgnoreTopicOffsetDataCheck", false);
                                 if (!ignoreDataCheck)
                                 {
                                     using var ctx = c.Resolve<ConsumerParcelContext>();
@@ -133,6 +132,53 @@ namespace BuildingRegistry.Consumer.Read.Parcel.Infrastructure
                         .As<IHostedService>()
                         .SingleInstance();
 
+                    builder
+                        .Register(c =>
+                        {
+                            var bootstrapServers = hostContext.Configuration["Kafka:BootstrapServers"]!;
+                            var topic = $"{hostContext.Configuration["Topic"]}" ?? throw new ArgumentException("Configuration has no Topic.");
+                            var suffix = hostContext.Configuration["GroupSuffixWithCount"];
+                            var consumerGroupId = $"BuildingRegistry.ConsumerParcelItemWithCount.{topic}{suffix}";
+
+                            var consumerOptions = new ConsumerOptions(
+                                new BootstrapServers(bootstrapServers),
+                                new Topic(topic),
+                                new ConsumerGroupId(consumerGroupId),
+                                EventsJsonSerializerSettingsProvider.CreateSerializerSettings());
+
+                            consumerOptions.ConfigureSaslAuthentication(new SaslAuthentication(
+                                hostContext.Configuration["Kafka:SaslUserName"]!,
+                                hostContext.Configuration["Kafka:SaslPassword"]!));
+
+                            var offsetStr = hostContext.Configuration["TopicWithCountOffset"];
+                            if (!string.IsNullOrEmpty(offsetStr) && long.TryParse(offsetStr, out var offset))
+                            {
+                                var ignoreDataCheck = hostContext.Configuration.GetValue("IgnoreTopicOffsetDataCheck", false);
+                                if (!ignoreDataCheck)
+                                {
+                                    using var ctx = c.Resolve<ConsumerParcelContext>();
+
+                                    if (ctx.ParcelConsumerItemsWithCount.Any())
+                                    {
+                                        throw new InvalidOperationException(
+                                            $"Cannot set Kafka offset to {offset} because {nameof(ctx.ParcelConsumerItemsWithCount)} has data.");
+                                    }
+                                }
+
+                                consumerOptions.ConfigureOffset(new Offset(offset));
+                            }
+
+                            var consumer = new Consumer(consumerOptions, c.Resolve<ILoggerFactory>());
+
+                            return new ParcelWithCount.ConsumerParcel(
+                                c.Resolve<IHostApplicationLifetime>(),
+                                c.Resolve<IDbContextFactory<ConsumerParcelContext>>(),
+                                consumer,
+                                c.Resolve<ILoggerFactory>());
+                        })
+                        .As<IHostedService>()
+                        .SingleInstance();
+
                     builder.Populate(services);
                 })
                 .UseConsoleLifetime()
@@ -150,7 +196,7 @@ namespace BuildingRegistry.Consumer.Read.Parcel.Infrastructure
                     async () =>
                     {
                         await MigrationsHelper.RunAsync(
-                            configuration.GetConnectionString("ConsumerParcelAdmin"),
+                            configuration.GetConnectionString("ConsumerParcelAdmin")!,
                             loggerFactory,
                             CancellationToken.None);
 
