@@ -12,8 +12,8 @@ namespace BuildingRegistry.AllStream.Events
     public sealed class BuildingUnitOsloSnapshotsWereRequested : IHasProvenance, ISetProvenance, IMessage
     {
         public const string EventName = "BuildingUnitOsloSnapshotsWereRequested"; // BE CAREFUL CHANGING THIS!!
-
-        [EventPropertyDescription("Interne GUID's van de percelen met de bijhorende CaPaKey.")]
+        
+        [EventPropertyDescription("Objectidentificatoren van de gebouweenheden.")]
         public IEnumerable<int> BuildingUnitPersistentLocalIds { get; }
 
         [EventPropertyDescription("Metadata bij het event.")]
