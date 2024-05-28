@@ -1,21 +1,20 @@
 namespace BuildingRegistry.Tests.ProjectionTests.BackOffice
 {
-    using AutoFixture;
-    using Building;
-    using Building.Events;
-    using BuildingRegistry.Api.BackOffice.Abstractions;
-    using Fixtures;
-    using FluentAssertions;
-    using Moq;
     using System;
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
+    using AutoFixture;
+    using Building;
+    using Building.Events;
+    using Fixtures;
+    using FluentAssertions;
+    using Moq;
     using Tests.BackOffice;
     using Tests.Legacy.Autofixture;
     using Xunit;
 
-    public class BuildingBackOfficeProjectionsTests : BuildingBackOfficeProjectionsTest
+    public partial class BuildingBackOfficeProjectionsTests : BuildingBackOfficeProjectionsTest
     {
         private readonly Fixture _fixture;
         private readonly FakeBackOfficeContext _fakeBackOfficeContext;
@@ -41,7 +40,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.BackOffice
             var buildingUnitWasPlannedV2 = _fixture.Create<BuildingUnitWasPlannedV2>();
 
             await Sut
-                .Given(buildingUnitWasPlannedV2)
+                .Given(BuildEnvelope(buildingUnitWasPlannedV2))
                 .Then(async _ =>
                 {
                     var result =
@@ -64,7 +63,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.BackOffice
                 CancellationToken.None);
 
             await Sut
-                .Given(buildingUnitWasPlannedV2)
+                .Given(BuildEnvelope(buildingUnitWasPlannedV2))
                 .Then(async _ =>
                 {
                     var result =
@@ -82,7 +81,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.BackOffice
             var commonBuildingUnitWasAddedV2 = _fixture.Create<CommonBuildingUnitWasAddedV2>();
 
             await Sut
-                .Given(commonBuildingUnitWasAddedV2)
+                .Given(BuildEnvelope(commonBuildingUnitWasAddedV2))
                 .Then(async _ =>
                 {
                     var result =
@@ -106,7 +105,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.BackOffice
                 CancellationToken.None);
 
             await Sut
-                .Given(commonBuildingUnitWasAddedV2)
+                .Given(BuildEnvelope(commonBuildingUnitWasAddedV2))
                 .Then(async _ =>
                 {
                     var result =
@@ -124,7 +123,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.BackOffice
             var buildingUnitAddressWasAttachedV2 = _fixture.Create<BuildingUnitAddressWasAttachedV2>();
 
             await Sut
-                .Given(buildingUnitAddressWasAttachedV2)
+                .Given(BuildEnvelope(buildingUnitAddressWasAttachedV2))
                 .Then(async _ =>
                 {
                     var result = await _fakeBackOfficeContext.BuildingUnitAddressRelation.FindAsync(
@@ -149,7 +148,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.BackOffice
                 CancellationToken.None);
 
             await Sut
-                .Given(buildingUnitAddressWasAttachedV2)
+                .Given(BuildEnvelope(buildingUnitAddressWasAttachedV2))
                 .Then(async _ =>
                 {
                     var result = await _fakeBackOfficeContext.BuildingUnitAddressRelation.FindAsync(
@@ -173,7 +172,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.BackOffice
                 CancellationToken.None);
 
             await Sut
-                .Given(buildingUnitAddressWasDetachedV2)
+                .Given(BuildEnvelope(buildingUnitAddressWasDetachedV2))
                 .Then(async _ =>
                 {
                     var result = await _fakeBackOfficeContext.BuildingUnitAddressRelation.FindAsync(
@@ -190,7 +189,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.BackOffice
             var buildingUnitAddressWasDetachedV2 = _fixture.Create<BuildingUnitAddressWasDetachedV2>();
 
             await Sut
-                .Given(buildingUnitAddressWasDetachedV2)
+                .Given(BuildEnvelope(buildingUnitAddressWasDetachedV2))
                 .Then(async _ =>
                 {
                     var result = await _fakeBackOfficeContext.BuildingUnitAddressRelation.FindAsync(
@@ -213,7 +212,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.BackOffice
                 CancellationToken.None);
 
             await Sut
-                .Given(@event)
+                .Given(BuildEnvelope(@event))
                 .Then(async _ =>
                 {
                     var result = await _fakeBackOfficeContext.BuildingUnitAddressRelation.FindAsync(
@@ -235,7 +234,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.BackOffice
                 CancellationToken.None);
 
             await Sut
-                .Given(@event)
+                .Given(BuildEnvelope(@event))
                 .Then(async _ =>
                 {
                     var result = await _fakeBackOfficeContext.BuildingUnitAddressRelation.FindAsync(
@@ -257,7 +256,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.BackOffice
                 CancellationToken.None);
 
             await Sut
-                .Given(@event)
+                .Given(BuildEnvelope(@event))
                 .Then(async _ =>
                 {
                     var result = await _fakeBackOfficeContext.BuildingUnitAddressRelation.FindAsync(
@@ -278,7 +277,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.BackOffice
                 new AddressPersistentLocalId(@event.PreviousAddressPersistentLocalId));
 
             await Sut
-                .Given(@event)
+                .Given(BuildEnvelope(@event))
                 .Then(async _ =>
                 {
                     var result = await _fakeBackOfficeContext.BuildingUnitAddressRelation.FindAsync(
@@ -308,10 +307,11 @@ namespace BuildingRegistry.Tests.ProjectionTests.BackOffice
             await _fakeBackOfficeContext.AddIdempotentBuildingUnitAddressRelation(
                 sourceBuildingPersistentLocalId,
                 buildingUnitPersistentLocalId,
-                _fixture.Create<AddressPersistentLocalId>(), CancellationToken.None);
-            
+                _fixture.Create<AddressPersistentLocalId>(),
+                CancellationToken.None);
+
             await Sut
-                .Given(@event)
+                .Given(BuildEnvelope(@event))
                 .Then(async _ =>
                 {
                     var buildingRelation = await _fakeBackOfficeContext.FindBuildingUnitBuildingRelation(buildingUnitPersistentLocalId, CancellationToken.None);

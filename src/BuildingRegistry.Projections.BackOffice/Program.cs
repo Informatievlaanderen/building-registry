@@ -102,7 +102,9 @@
                     builder.RegisterModule(new ProjectorModule(hostContext.Configuration));
 
                     builder.RegisterProjections<BackOfficeProjections, BackOfficeProjectionsContext>(
-                        c => new BackOfficeProjections(c.Resolve<IDbContextFactory<BackOfficeContext>>()),
+                        c => new BackOfficeProjections(
+                            c.Resolve<IDbContextFactory<BackOfficeContext>>(),
+                            hostContext.Configuration),
                         ConnectedProjectionSettings.Default);
                 })
                 .UseConsoleLifetime()
