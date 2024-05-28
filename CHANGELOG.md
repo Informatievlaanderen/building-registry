@@ -1,3 +1,16 @@
+# [4.8.0](https://github.com/informatievlaanderen/building-registry/compare/v4.7.1...v4.8.0) (2024-05-28)
+
+
+### Bug Fixes
+
+* project BuildingUnitWasMovedIntoBuilding in wms ([#1219](https://github.com/informatievlaanderen/building-registry/issues/1219)) ([85422d2](https://github.com/informatievlaanderen/building-registry/commit/85422d220141322677833e0d0131911d1056f197))
+
+
+### Features
+
+* consume AddressRemovalWasCorrected + ParcelAddressesWereReaddressed ([d711301](https://github.com/informatievlaanderen/building-registry/commit/d711301308d18c68c9b37ae15d726f9ea25eb097))
+* create oslo snapshots ([f95f934](https://github.com/informatievlaanderen/building-registry/commit/f95f9345d40966428b0cd6bbf218c5e16b58dd88))
+
 ## [4.7.1](https://github.com/informatievlaanderen/building-registry/compare/v4.7.0...v4.7.1) (2024-05-27)
 
 
