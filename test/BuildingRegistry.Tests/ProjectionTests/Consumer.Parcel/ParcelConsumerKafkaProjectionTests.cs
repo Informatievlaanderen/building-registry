@@ -20,6 +20,22 @@ namespace BuildingRegistry.Tests.ProjectionTests.Consumer.Parcel
     {
         private readonly ParcelWasMigrated _parcelWasMigrated;
 
+        private readonly int _addressPersistentLocalId;
+        private static ParcelAddressWasDetachedV2 _parcelAddressWasDetachedV2 = null!;
+        private static ParcelAddressWasDetachedBecauseAddressWasRejected _parcelAddressWasDetachedBecauseAddressWasRejected = null!;
+        private static ParcelAddressWasDetachedBecauseAddressWasRemoved _parcelAddressWasDetachedBecauseAddressWasRemoved = null!;
+        private static ParcelAddressWasDetachedBecauseAddressWasRetired _parcelAddressWasDetachedBecauseAddressWasRetired = null!;
+        public static IEnumerable<object[]> DetachedEvents
+        {
+            get
+            {
+                yield return [new Func<object>(() => _parcelAddressWasDetachedV2)];
+                yield return [new Func<object>(() => _parcelAddressWasDetachedBecauseAddressWasRejected)];
+                yield return [new Func<object>(() => _parcelAddressWasDetachedBecauseAddressWasRemoved)];
+                yield return [new Func<object>(() => _parcelAddressWasDetachedBecauseAddressWasRetired)];
+            }
+        }
+
         public ParcelConsumerKafkaProjectionTests(ITestOutputHelper outputHelper) : base(outputHelper)
         {
             Fixture.Customize(new InfrastructureCustomization());
@@ -154,34 +170,6 @@ namespace BuildingRegistry.Tests.ProjectionTests.Consumer.Parcel
             });
         }
 
-        private readonly int _addressPersistentLocalId;
-        private static ParcelAddressWasDetachedV2 _parcelAddressWasDetachedV2;
-        private static ParcelAddressWasDetachedBecauseAddressWasRejected _parcelAddressWasDetachedBecauseAddressWasRejected;
-        private static ParcelAddressWasDetachedBecauseAddressWasRemoved _parcelAddressWasDetachedBecauseAddressWasRemoved;
-        private static ParcelAddressWasDetachedBecauseAddressWasRetired _parcelAddressWasDetachedBecauseAddressWasRetired;
-        public static IEnumerable<object[]> DetachedEvents
-        {
-            get
-            {
-                yield return new object[]
-                {
-                    new Func<object>(() => _parcelAddressWasDetachedV2)
-                };
-                yield return new object[]
-                {
-                    new Func<object>(() => _parcelAddressWasDetachedBecauseAddressWasRejected)
-                };
-                yield return new object[]
-                {
-                    new Func<object>(() => _parcelAddressWasDetachedBecauseAddressWasRemoved)
-                };
-                yield return new object[]
-                {
-                    new Func<object>(() => _parcelAddressWasDetachedBecauseAddressWasRetired)
-                };
-            }
-        }
-
         [Fact]
         public async Task ParcelAddressWasReplacedBecauseAddressWasReaddressed_ReplacesParcelAddress()
         {
@@ -225,6 +213,53 @@ namespace BuildingRegistry.Tests.ProjectionTests.Consumer.Parcel
                         parcelAddressWasReplacedBecauseAddressWasReaddressed.NewAddressPersistentLocalId);
 
                 newParcelAddressItem.Should().NotBeNull();
+            });
+        }
+
+        [Fact]
+        public async Task ParcelAddressesWereReaddressed_ReplacesParcelAddresses()
+        {
+            var parcelAddressWasAttachedV2 = Fixture
+                .Build<ParcelAddressWasAttachedV2>()
+                .FromFactory(() => new ParcelAddressWasAttachedV2(
+                    _parcelWasMigrated.ParcelId,
+                    _parcelWasMigrated.CaPaKey,
+                    Fixture.Create<int>(),
+                    Fixture.Create<Provenance>()))
+                .Create();
+
+            var parcelAddressesWereReaddressed = Fixture
+                .Build<ParcelAddressesWereReaddressed>()
+                .FromFactory(() => new ParcelAddressesWereReaddressed(
+                    _parcelWasMigrated.ParcelId,
+                    _parcelWasMigrated.CaPaKey,
+                    [parcelAddressWasAttachedV2.AddressPersistentLocalId],
+                    [parcelAddressWasAttachedV2.AddressPersistentLocalId + 1],
+                    Fixture.CreateMany<AddressRegistryReaddress>(),
+                    Fixture.Create<Provenance>()))
+                .Create();
+
+            Given(_parcelWasMigrated, parcelAddressesWereReaddressed);
+
+            await Then(async context =>
+            {
+                var parcelId = Guid.Parse(_parcelWasMigrated.ParcelId);
+                var parcel =
+                    await context.ParcelConsumerItems.FindAsync(parcelId);
+
+                parcel.Should().NotBeNull();
+
+                foreach (var addressPersistentLocalId in parcelAddressesWereReaddressed.AttachedAddressPersistentLocalIds)
+                {
+                    var parcelAddressItem = await context.ParcelAddressItems.FindAsync(parcelId, addressPersistentLocalId);
+                    parcelAddressItem.Should().NotBeNull();
+                }
+
+                foreach (var addressPersistentLocalId in parcelAddressesWereReaddressed.DetachedAddressPersistentLocalIds)
+                {
+                    var parcelAddressItem = await context.ParcelAddressItems.FindAsync(parcelId, addressPersistentLocalId);
+                    parcelAddressItem.Should().BeNull();
+                }
             });
         }
 

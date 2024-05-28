@@ -80,8 +80,7 @@ namespace BuildingRegistry.Consumer.Read.Parcel.Projections
                                 message.CaPaKey,
                                 ParcelStatus.Realized,
                                 extendedWkbGeometry,
-                                wkbReader.Read(extendedWkbGeometry),
-                                false)
+                                wkbReader.Read(extendedWkbGeometry))
                             , ct);
                 }
             });
@@ -115,6 +114,19 @@ namespace BuildingRegistry.Consumer.Read.Parcel.Projections
             {
                 await context.RemoveIdempotentParcelAddress(Guid.Parse(message.ParcelId), message.PreviousAddressPersistentLocalId, ct);
                 await context.AddIdempotentParcelAddress(Guid.Parse(message.ParcelId), message.NewAddressPersistentLocalId, ct);
+            });
+
+            When<ParcelAddressesWereReaddressed>(async (context, message, ct) =>
+            {
+                foreach (var addressPersistentLocalId in message.DetachedAddressPersistentLocalIds)
+                {
+                    await context.RemoveIdempotentParcelAddress(Guid.Parse(message.ParcelId), addressPersistentLocalId, ct);
+                }
+
+                foreach (var addressPersistentLocalId in message.AttachedAddressPersistentLocalIds)
+                {
+                    await context.AddIdempotentParcelAddress(Guid.Parse(message.ParcelId), addressPersistentLocalId, ct);
+                }
             });
         }
     }
