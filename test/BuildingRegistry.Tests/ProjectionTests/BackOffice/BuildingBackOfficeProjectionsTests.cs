@@ -282,7 +282,8 @@ namespace BuildingRegistry.Tests.ProjectionTests.BackOffice
             await _fakeBackOfficeContext.AddIdempotentBuildingUnitAddressRelation(
                 sourceBuildingPersistentLocalId,
                 buildingUnitPersistentLocalId,
-                _fixture.Create<AddressPersistentLocalId>(), CancellationToken.None);
+                _fixture.Create<AddressPersistentLocalId>(),
+                CancellationToken.None);
 
             await Sut
                 .Given(BuildEnvelope(@event))

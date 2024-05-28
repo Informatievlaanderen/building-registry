@@ -26,7 +26,8 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions
         public async Task<BuildingUnitBuilding> AddIdempotentBuildingUnitBuilding(
             BuildingPersistentLocalId buildingPersistentLocalId,
             BuildingUnitPersistentLocalId buildingUnitPersistentLocalId,
-            CancellationToken cancellationToken)
+            CancellationToken cancellationToken,
+            bool saveChanges = true)
         {
             var relation = await FindBuildingUnitBuildingRelation(
                 new BuildingUnitPersistentLocalId(buildingUnitPersistentLocalId), cancellationToken);
@@ -40,7 +41,11 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions
             {
                 relation = new BuildingUnitBuilding(buildingUnitPersistentLocalId, buildingPersistentLocalId);
                 await BuildingUnitBuildings.AddAsync(relation, cancellationToken);
-                await SaveChangesAsync(cancellationToken);
+
+                if (saveChanges)
+                {
+                    await SaveChangesAsync(cancellationToken);
+                }
             }
             catch (DbUpdateException exception)
             {
@@ -62,7 +67,8 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions
 
         public async Task RemoveIdempotentBuildingUnitBuildingRelation(
             BuildingUnitPersistentLocalId buildingUnitPersistentLocalId,
-            CancellationToken cancellationToken)
+            CancellationToken cancellationToken,
+            bool saveChanges = true)
         {
             var relation = await FindBuildingUnitBuildingRelation(buildingUnitPersistentLocalId, cancellationToken);
 
@@ -72,7 +78,11 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions
             }
 
             BuildingUnitBuildings.Remove(relation);
-            await SaveChangesAsync(cancellationToken);
+
+            if (saveChanges)
+            {
+                await SaveChangesAsync(cancellationToken);
+            }
         }
 
         public async Task<BuildingUnitBuilding?> FindBuildingUnitBuildingRelation(
@@ -156,7 +166,8 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions
         public async Task MoveBuildingUnitAddressRelations(
             BuildingUnitPersistentLocalId buildingUnitPersistentLocalId,
             BuildingPersistentLocalId destinationBuildingPersistentLocalId,
-            CancellationToken cancellationToken)
+            CancellationToken cancellationToken,
+            bool saveChanges = true)
         {
             var buildingUnitAddressRelations = await FindAllBuildingUnitAddressRelations(buildingUnitPersistentLocalId, cancellationToken);
 
@@ -165,7 +176,10 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions
                 buildingUnitAddressRelation.BuildingPersistentLocalId = destinationBuildingPersistentLocalId;
             }
 
-            await SaveChangesAsync(cancellationToken);
+            if (saveChanges)
+            {
+                await SaveChangesAsync(cancellationToken);
+            }
         }
 
         public async Task<List<BuildingUnitAddressRelation>> FindAllBuildingUnitAddressRelations(
