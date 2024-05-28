@@ -10,6 +10,7 @@ namespace BuildingRegistry.Projections.Integration
     using BuildingUnit.LatestItem;
     using Microsoft.EntityFrameworkCore;
     using NetTopologySuite.Geometries;
+    using BuildingVersionFromMigration = Building.VersionFromMigration.BuildingVersion;
 
     public class IntegrationContext : RunnerDbContext<IntegrationContext>
     {
@@ -21,6 +22,7 @@ namespace BuildingRegistry.Projections.Integration
         public DbSet<BuildingUnitAddress> BuildingUnitAddresses => Set<BuildingUnitAddress>();
 
         public DbSet<BuildingVersion> BuildingVersions => Set<BuildingVersion>();
+        public DbSet<BuildingVersionFromMigration> BuildingVersionsFromMigration => Set<BuildingVersionFromMigration>();
 
         private DbSet<MunicipalityGeometry> MunicipalityGeometries => Set<MunicipalityGeometry>();
 
