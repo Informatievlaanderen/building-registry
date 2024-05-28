@@ -15,11 +15,16 @@ namespace BuildingRegistry.Consumer.Read.Parcel
     using Microsoft.Extensions.Configuration;
     using NetTopologySuite.Geometries;
     using Parcel;
+    using ParcelConsumerItemWithCount = ParcelWithCount.ParcelConsumerItem;
+    using ParcelAddressItemWithCount = ParcelWithCount.ParcelAddressItem;
 
     public class ConsumerParcelContext : RunnerDbContext<ConsumerParcelContext>, IParcels
     {
         public DbSet<ParcelConsumerItem> ParcelConsumerItems { get; set; }
         public DbSet<ParcelAddressItem> ParcelAddressItems { get; set; }
+
+        public DbSet<ParcelConsumerItemWithCount> ParcelConsumerItemsWithCount { get; set; }
+        public DbSet<ParcelAddressItemWithCount> ParcelAddressItemsWithCount { get; set; }
 
         // This needs to be here to please EF
         public ConsumerParcelContext()
@@ -33,7 +38,7 @@ namespace BuildingRegistry.Consumer.Read.Parcel
         public async Task AddIdempotentParcelAddress(Guid parcelId, int addressPersistentLocalId, CancellationToken ct)
         {
             var parcelAddressItem =
-                await ParcelAddressItems.FindAsync(new object?[] { parcelId, addressPersistentLocalId }, cancellationToken: ct);
+                await ParcelAddressItems.FindAsync([parcelId, addressPersistentLocalId], cancellationToken: ct);
 
             if (parcelAddressItem is null)
             {
@@ -41,14 +46,36 @@ namespace BuildingRegistry.Consumer.Read.Parcel
             }
         }
 
+        public async Task AddIdempotentParcelAddressWithCount(Guid parcelId, int addressPersistentLocalId, CancellationToken ct)
+        {
+            var parcelAddressItem =
+                await ParcelAddressItemsWithCount.FindAsync([parcelId, addressPersistentLocalId], cancellationToken: ct);
+
+            if (parcelAddressItem is null)
+            {
+                ParcelAddressItemsWithCount.Add(new ParcelAddressItemWithCount(parcelId, addressPersistentLocalId));
+            }
+        }
+
         public async Task RemoveIdempotentParcelAddress(Guid parcelId, int addressPersistentLocalId, CancellationToken ct)
         {
             var parcelAddressItem =
-                await ParcelAddressItems.FindAsync(new object?[] { parcelId, addressPersistentLocalId }, cancellationToken: ct);
+                await ParcelAddressItems.FindAsync([parcelId, addressPersistentLocalId], cancellationToken: ct);
 
             if (parcelAddressItem is not null)
             {
                 ParcelAddressItems.Remove(parcelAddressItem);
+            }
+        }
+
+        public async Task RemoveIdempotentParcelAddressWithCount(Guid parcelId, int addressPersistentLocalId, CancellationToken ct)
+        {
+            var parcelAddressItem =
+                await ParcelAddressItemsWithCount.FindAsync([parcelId, addressPersistentLocalId], cancellationToken: ct);
+
+            if (parcelAddressItem is not null)
+            {
+                ParcelAddressItemsWithCount.Remove(parcelAddressItem);
             }
         }
 
