@@ -24,7 +24,7 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
             [FromBody] CreateOsloSnapshotsRequest request,
             CancellationToken cancellationToken = default)
         {
-            var provenance = _provenanceFactory.Create(new Reason(request.Reden), Modification.Unknown);
+            var provenance = ProvenanceFactory.Create(new Reason(request.Reden), Modification.Unknown);
 
             var sqsRequest = new CreateOsloSnapshotsSqsRequest
             {
