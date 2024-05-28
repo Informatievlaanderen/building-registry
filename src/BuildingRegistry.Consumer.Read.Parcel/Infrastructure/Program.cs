@@ -137,7 +137,7 @@ namespace BuildingRegistry.Consumer.Read.Parcel.Infrastructure
                         {
                             var bootstrapServers = hostContext.Configuration["Kafka:BootstrapServers"]!;
                             var topic = $"{hostContext.Configuration["Topic"]}" ?? throw new ArgumentException("Configuration has no Topic.");
-                            var suffix = hostContext.Configuration["GroupSuffixWithCount"];
+                            var suffix = hostContext.Configuration["GroupSuffix"];
                             var consumerGroupId = $"BuildingRegistry.ConsumerParcelItemWithCount.{topic}{suffix}";
 
                             var consumerOptions = new ConsumerOptions(
@@ -150,7 +150,7 @@ namespace BuildingRegistry.Consumer.Read.Parcel.Infrastructure
                                 hostContext.Configuration["Kafka:SaslUserName"]!,
                                 hostContext.Configuration["Kafka:SaslPassword"]!));
 
-                            var offsetStr = hostContext.Configuration["TopicWithCountOffset"];
+                            var offsetStr = hostContext.Configuration["TopicOffset"];
                             if (!string.IsNullOrEmpty(offsetStr) && long.TryParse(offsetStr, out var offset))
                             {
                                 var ignoreDataCheck = hostContext.Configuration.GetValue("IgnoreTopicOffsetDataCheck", false);
