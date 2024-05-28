@@ -8,7 +8,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Consumer.Parcel
     using Be.Vlaanderen.Basisregisters.GrAr.Contracts.ParcelRegistry;
     using Be.Vlaanderen.Basisregisters.Utilities.HexByteConvertor;
     using BuildingRegistry.Consumer.Read.Parcel;
-    using BuildingRegistry.Consumer.Read.Parcel.Projections;
+    using BuildingRegistry.Consumer.Read.Parcel.ParcelWithCount;
     using Fixtures;
     using FluentAssertions;
     using Microsoft.EntityFrameworkCore;
@@ -19,6 +19,22 @@ namespace BuildingRegistry.Tests.ProjectionTests.Consumer.Parcel
     public class ParcelConsumerKafkaProjectionTests : KafkaProjectionTest<ConsumerParcelContext, ParcelKafkaProjection>
     {
         private readonly ParcelWasMigrated _parcelWasMigrated;
+
+        private readonly int _addressPersistentLocalId;
+        private static ParcelAddressWasDetachedV2 _parcelAddressWasDetachedV2 = null!;
+        private static ParcelAddressWasDetachedBecauseAddressWasRejected _parcelAddressWasDetachedBecauseAddressWasRejected = null!;
+        private static ParcelAddressWasDetachedBecauseAddressWasRemoved _parcelAddressWasDetachedBecauseAddressWasRemoved = null!;
+        private static ParcelAddressWasDetachedBecauseAddressWasRetired _parcelAddressWasDetachedBecauseAddressWasRetired = null!;
+        public static IEnumerable<object[]> DetachedEvents
+        {
+            get
+            {
+                yield return [new Func<object>(() => _parcelAddressWasDetachedV2)];
+                yield return [new Func<object>(() => _parcelAddressWasDetachedBecauseAddressWasRejected)];
+                yield return [new Func<object>(() => _parcelAddressWasDetachedBecauseAddressWasRemoved)];
+                yield return [new Func<object>(() => _parcelAddressWasDetachedBecauseAddressWasRetired)];
+            }
+        }
 
         public ParcelConsumerKafkaProjectionTests(ITestOutputHelper outputHelper) : base(outputHelper)
         {
@@ -81,7 +97,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Consumer.Parcel
             {
                 var parcelId = Guid.Parse(_parcelWasMigrated.ParcelId);
                 var parcel =
-                    await context.ParcelConsumerItems.FindAsync(parcelId);
+                    await context.ParcelConsumerItemsWithCount.FindAsync(parcelId);
 
                 parcel.Should().NotBeNull();
                 parcel!.CaPaKey.Should().Be(_parcelWasMigrated.CaPaKey);
@@ -91,7 +107,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Consumer.Parcel
                 foreach (var addressPersistentLocalId in _parcelWasMigrated.AddressPersistentLocalIds)
                 {
                     var parcelAddressItem =
-                        await context.ParcelAddressItems.FindAsync(parcelId, addressPersistentLocalId);
+                        await context.ParcelAddressItemsWithCount.FindAsync(parcelId, addressPersistentLocalId);
 
                     parcelAddressItem.Should().NotBeNull();
                 }
@@ -116,12 +132,12 @@ namespace BuildingRegistry.Tests.ProjectionTests.Consumer.Parcel
             {
                 var parcelId = Guid.Parse(_parcelWasMigrated.ParcelId);
                 var parcel =
-                    await context.ParcelConsumerItems.FindAsync(parcelId);
+                    await context.ParcelConsumerItemsWithCount.FindAsync(parcelId);
 
                 parcel.Should().NotBeNull();
 
                 var parcelAddressItem =
-                    await context.ParcelAddressItems.FindAsync(parcelId, parcelAddressWasAttachedV2.AddressPersistentLocalId);
+                    await context.ParcelAddressItemsWithCount.FindAsync(parcelId, parcelAddressWasAttachedV2.AddressPersistentLocalId);
 
                 parcelAddressItem.Should().NotBeNull();
             });
@@ -145,41 +161,13 @@ namespace BuildingRegistry.Tests.ProjectionTests.Consumer.Parcel
             await Then(async context =>
             {
                 var parcelId = Guid.Parse(_parcelWasMigrated.ParcelId);
-                var parcel = await context.ParcelConsumerItems.FindAsync(parcelId);
+                var parcel = await context.ParcelConsumerItemsWithCount.FindAsync(parcelId);
 
                 parcel.Should().NotBeNull();
 
-                var parcelAddressItem = await context.ParcelAddressItems.FindAsync(parcelId, _addressPersistentLocalId);
+                var parcelAddressItem = await context.ParcelAddressItemsWithCount.FindAsync(parcelId, _addressPersistentLocalId);
                 parcelAddressItem.Should().BeNull();
             });
-        }
-
-        private readonly int _addressPersistentLocalId;
-        private static ParcelAddressWasDetachedV2 _parcelAddressWasDetachedV2;
-        private static ParcelAddressWasDetachedBecauseAddressWasRejected _parcelAddressWasDetachedBecauseAddressWasRejected;
-        private static ParcelAddressWasDetachedBecauseAddressWasRemoved _parcelAddressWasDetachedBecauseAddressWasRemoved;
-        private static ParcelAddressWasDetachedBecauseAddressWasRetired _parcelAddressWasDetachedBecauseAddressWasRetired;
-        public static IEnumerable<object[]> DetachedEvents
-        {
-            get
-            {
-                yield return new object[]
-                {
-                    new Func<object>(() => _parcelAddressWasDetachedV2)
-                };
-                yield return new object[]
-                {
-                    new Func<object>(() => _parcelAddressWasDetachedBecauseAddressWasRejected)
-                };
-                yield return new object[]
-                {
-                    new Func<object>(() => _parcelAddressWasDetachedBecauseAddressWasRemoved)
-                };
-                yield return new object[]
-                {
-                    new Func<object>(() => _parcelAddressWasDetachedBecauseAddressWasRetired)
-                };
-            }
         }
 
         [Fact]
@@ -194,37 +182,97 @@ namespace BuildingRegistry.Tests.ProjectionTests.Consumer.Parcel
                     Fixture.Create<Provenance>()))
                 .Create();
 
+            var secondParcelAddressWasAttachedV2 = Fixture
+                .Build<ParcelAddressWasAttachedV2>()
+                .FromFactory(() => new ParcelAddressWasAttachedV2(
+                    _parcelWasMigrated.ParcelId,
+                    _parcelWasMigrated.CaPaKey,
+                    Fixture.Create<int>(),
+                    Fixture.Create<Provenance>()))
+                .Create();
+
             var parcelAddressWasReplacedBecauseAddressWasReaddressed = Fixture
                 .Build<ParcelAddressWasReplacedBecauseAddressWasReaddressed>()
                 .FromFactory(() => new ParcelAddressWasReplacedBecauseAddressWasReaddressed(
                     _parcelWasMigrated.ParcelId,
                     _parcelWasMigrated.CaPaKey,
-                    parcelAddressWasAttachedV2.AddressPersistentLocalId + 1,
+                    secondParcelAddressWasAttachedV2.AddressPersistentLocalId,
                     parcelAddressWasAttachedV2.AddressPersistentLocalId,
                     Fixture.Create<Provenance>()))
                 .Create();
 
-            Given(_parcelWasMigrated, parcelAddressWasReplacedBecauseAddressWasReaddressed);
+            Given(_parcelWasMigrated,
+                parcelAddressWasAttachedV2,
+                secondParcelAddressWasAttachedV2,
+                parcelAddressWasReplacedBecauseAddressWasReaddressed);
 
             await Then(async context =>
             {
                 var parcelId = Guid.Parse(_parcelWasMigrated.ParcelId);
                 var parcel =
-                    await context.ParcelConsumerItems.FindAsync(parcelId);
+                    await context.ParcelConsumerItemsWithCount.FindAsync(parcelId);
 
                 parcel.Should().NotBeNull();
 
                 var previousParcelAddressItem =
-                    await context.ParcelAddressItems.FindAsync(parcelId,
+                    await context.ParcelAddressItemsWithCount.FindAsync(parcelId,
                         parcelAddressWasReplacedBecauseAddressWasReaddressed.PreviousAddressPersistentLocalId);
 
                 previousParcelAddressItem.Should().BeNull();
 
                 var newParcelAddressItem =
-                    await context.ParcelAddressItems.FindAsync(parcelId,
+                    await context.ParcelAddressItemsWithCount.FindAsync(parcelId,
                         parcelAddressWasReplacedBecauseAddressWasReaddressed.NewAddressPersistentLocalId);
 
                 newParcelAddressItem.Should().NotBeNull();
+                newParcelAddressItem!.Count.Should().Be(2);
+            });
+        }
+
+        [Fact]
+        public async Task ParcelAddressesWereReaddressed_ReplacesParcelAddresses()
+        {
+            var parcelAddressWasAttachedV2 = Fixture
+                .Build<ParcelAddressWasAttachedV2>()
+                .FromFactory(() => new ParcelAddressWasAttachedV2(
+                    _parcelWasMigrated.ParcelId,
+                    _parcelWasMigrated.CaPaKey,
+                    Fixture.Create<int>(),
+                    Fixture.Create<Provenance>()))
+                .Create();
+
+            var parcelAddressesWereReaddressed = Fixture
+                .Build<ParcelAddressesWereReaddressed>()
+                .FromFactory(() => new ParcelAddressesWereReaddressed(
+                    _parcelWasMigrated.ParcelId,
+                    _parcelWasMigrated.CaPaKey,
+                    [parcelAddressWasAttachedV2.AddressPersistentLocalId],
+                    [parcelAddressWasAttachedV2.AddressPersistentLocalId + 1],
+                    Fixture.CreateMany<AddressRegistryReaddress>(),
+                    Fixture.Create<Provenance>()))
+                .Create();
+
+            Given(_parcelWasMigrated, parcelAddressesWereReaddressed);
+
+            await Then(async context =>
+            {
+                var parcelId = Guid.Parse(_parcelWasMigrated.ParcelId);
+                var parcel =
+                    await context.ParcelConsumerItemsWithCount.FindAsync(parcelId);
+
+                parcel.Should().NotBeNull();
+
+                foreach (var addressPersistentLocalId in parcelAddressesWereReaddressed.AttachedAddressPersistentLocalIds)
+                {
+                    var parcelAddressItem = await context.ParcelAddressItemsWithCount.FindAsync(parcelId, addressPersistentLocalId);
+                    parcelAddressItem.Should().NotBeNull();
+                }
+
+                foreach (var addressPersistentLocalId in parcelAddressesWereReaddressed.DetachedAddressPersistentLocalIds)
+                {
+                    var parcelAddressItem = await context.ParcelAddressItemsWithCount.FindAsync(parcelId, addressPersistentLocalId);
+                    parcelAddressItem.Should().BeNull();
+                }
             });
         }
 
@@ -258,7 +306,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Consumer.Parcel
             await Then(async context =>
             {
                 var parcel =
-                    await context.ParcelConsumerItems.FindAsync(Guid.Parse(parcelWasRetiredV2.ParcelId));
+                    await context.ParcelConsumerItemsWithCount.FindAsync(Guid.Parse(parcelWasRetiredV2.ParcelId));
 
                 parcel.Should().NotBeNull();
                 parcel!.CaPaKey.Should().Be(parcelWasRetiredV2.CaPaKey);
@@ -306,7 +354,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Consumer.Parcel
             await Then(async context =>
             {
                 var parcel =
-                    await context.ParcelConsumerItems.FindAsync(Guid.Parse(parcelWasCorrectedFromRetiredToRealized.ParcelId));
+                    await context.ParcelConsumerItemsWithCount.FindAsync(Guid.Parse(parcelWasCorrectedFromRetiredToRealized.ParcelId));
 
                 parcel.Should().NotBeNull();
                 parcel!.CaPaKey.Should().Be(parcelWasCorrectedFromRetiredToRealized.CaPaKey);
@@ -333,7 +381,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Consumer.Parcel
             await Then(async context =>
             {
                 var parcel =
-                    await context.ParcelConsumerItems.FindAsync(Guid.Parse(parcelWasImported.ParcelId));
+                    await context.ParcelConsumerItemsWithCount.FindAsync(Guid.Parse(parcelWasImported.ParcelId));
 
                 parcel.Should().NotBeNull();
                 parcel!.CaPaKey.Should().Be(parcelWasImported.CaPaKey);

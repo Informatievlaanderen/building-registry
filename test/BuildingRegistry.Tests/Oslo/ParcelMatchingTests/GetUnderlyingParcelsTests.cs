@@ -6,6 +6,7 @@
     using Api.Oslo.Infrastructure.ParcelMatching;
     using BackOffice;
     using Consumer.Read.Parcel;
+    using Consumer.Read.Parcel.Parcel;
     using FluentAssertions;
     using NetTopologySuite.Geometries;
     using Xunit;

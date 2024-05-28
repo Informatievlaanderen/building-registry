@@ -6,6 +6,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Consumer.Address
     using AutoFixture;
     using Be.Vlaanderen.Basisregisters.GrAr.Contracts.AddressRegistry;
     using Be.Vlaanderen.Basisregisters.GrAr.Contracts.Common;
+    using Building;
     using BuildingRegistry.Consumer.Address;
     using BuildingRegistry.Consumer.Address.Projections;
     using FluentAssertions;
@@ -24,18 +25,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Consumer.Address
         [Fact]
         public async Task AddressMigratedToStreetName_AddsAddress()
         {
-            var addressStatus = Fixture
-                .Build<AddressStatus>()
-                .FromFactory(() =>
-                {
-                    var statuses = new List<AddressStatus>
-                    {
-                        AddressStatus.Current, AddressStatus.Proposed, AddressStatus.Rejected, AddressStatus.Retired
-                    };
-
-                    return statuses[new Random(Fixture.Create<int>()).Next(0, statuses.Count - 1)];
-                })
-                .Create();
+            var addressStatus = GetRandomAddressStatus();
 
             var addressWasMigratedToStreetName = Fixture
                 .Build<AddressWasMigratedToStreetName>()
@@ -500,7 +490,46 @@ namespace BuildingRegistry.Tests.ProjectionTests.Consumer.Address
                         addressWasProposedV2.AddressPersistentLocalId);
 
                 address.Should().NotBeNull();
-                address.IsRemoved.Should().BeTrue();
+                address!.IsRemoved.Should().BeTrue();
+            });
+        }
+
+        [Fact]
+        public async Task AddressRemovalWasCorrected_UpdatesStatusAddressAndIsRemoved()
+        {
+            var addressWasProposedV2 = Fixture.Create<AddressWasProposedV2>();
+            var addressWasRemovedV2 = Fixture.Build<AddressWasRemovedV2>()
+                .FromFactory(() => new AddressWasRemovedV2(
+                    addressWasProposedV2.StreetNamePersistentLocalId, addressWasProposedV2.AddressPersistentLocalId, Fixture.Create<Provenance>()))
+                .Create();
+            var addressRemovalWasCorrected = Fixture.Build<AddressRemovalWasCorrected>()
+                .FromFactory(() => new AddressRemovalWasCorrected(
+                    addressWasProposedV2.StreetNamePersistentLocalId,
+                    addressWasProposedV2.AddressPersistentLocalId,
+                    GetRandomAddressStatus(),
+                    Fixture.Create<string>(),
+                    Fixture.Create<string>(),
+                    Fixture.Create<string>(),
+                    Fixture.Create<string>(),
+                    Fixture.Create<ExtendedWkbGeometry>().ToString(),
+                    Fixture.Create<bool>(),
+                    Fixture.Create<string>(),
+                    Fixture.Create<int?>(),
+                    Fixture.Create<Provenance>()
+                ))
+                .Create();
+
+            Given(addressWasProposedV2, addressWasRemovedV2, addressRemovalWasCorrected);
+
+            await Then(async context =>
+            {
+                var address =
+                    await context.AddressConsumerItems.FindAsync(
+                        addressWasProposedV2.AddressPersistentLocalId);
+
+                address.Should().NotBeNull();
+                address!.Status.Should().Be(AddressStatus.Parse(addressRemovalWasCorrected.Status));
+                address.IsRemoved.Should().BeFalse();
             });
         }
 
@@ -645,6 +674,23 @@ namespace BuildingRegistry.Tests.ProjectionTests.Consumer.Address
                 address.Should().NotBeNull();
                 address!.Status.Should().Be(AddressStatus.Retired);
             });
+        }
+
+        private AddressStatus GetRandomAddressStatus()
+        {
+            var addressStatus = Fixture
+                .Build<AddressStatus>()
+                .FromFactory(() =>
+                {
+                    var statuses = new List<AddressStatus>
+                    {
+                        AddressStatus.Current, AddressStatus.Proposed, AddressStatus.Rejected, AddressStatus.Retired
+                    };
+
+                    return statuses[new Random(Fixture.Create<int>()).Next(0, statuses.Count - 1)];
+                })
+                .Create();
+            return addressStatus;
         }
 
         protected override ConsumerAddressContext CreateContext()

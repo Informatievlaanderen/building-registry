@@ -1,4 +1,4 @@
-namespace BuildingRegistry.Consumer.Read.Parcel
+namespace BuildingRegistry.Consumer.Read.Parcel.ParcelWithCount
 {
     using System;
     using BuildingRegistry.Infrastructure;
@@ -67,7 +67,7 @@ namespace BuildingRegistry.Consumer.Read.Parcel
 
     public class ParcelConsumerItemConfiguration : IEntityTypeConfiguration<ParcelConsumerItem>
     {
-        public const string TableName = "ParcelItems";
+        public const string TableName = "ParcelItemsWithCount";
 
         public void Configure(EntityTypeBuilder<ParcelConsumerItem> builder)
         {

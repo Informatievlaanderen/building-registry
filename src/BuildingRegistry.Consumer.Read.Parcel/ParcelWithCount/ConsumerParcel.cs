@@ -1,4 +1,4 @@
-namespace BuildingRegistry.Consumer.Read.Parcel
+namespace BuildingRegistry.Consumer.Read.Parcel.ParcelWithCount
 {
     using System;
     using System.Threading;
@@ -8,7 +8,6 @@ namespace BuildingRegistry.Consumer.Read.Parcel
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Hosting;
     using Microsoft.Extensions.Logging;
-    using Projections;
 
     public class ConsumerParcel : BackgroundService
     {
