@@ -13,6 +13,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenDetachingRejectedAddressFrom
     using FluentAssertions;
     using Xunit;
     using Xunit.Abstractions;
+    using BuildingUnitFunction = BuildingRegistry.Legacy.BuildingUnitFunction;
     using BuildingUnitStatus = BuildingRegistry.Legacy.BuildingUnitStatus;
 
     public class GivenBuildingWithBuildingUnit : BuildingRegistryTest
@@ -86,11 +87,18 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenDetachingRejectedAddressFrom
                     },
                     isRemoved: false)
                 .Build();
+            // Below event is used to add the address persistent local id twice.
+            var buildingUnitAddressWasReplacedBecauseAddressWasReaddressed = new BuildingUnitAddressWasReplacedBecauseAddressWasReaddressed(
+                new BuildingPersistentLocalId(buildingUnitAddressWasDetachedBecauseAddressWasRejected.BuildingPersistentLocalId),
+                new BuildingUnitPersistentLocalId(buildingUnitAddressWasDetachedBecauseAddressWasRejected.BuildingUnitPersistentLocalId),
+                new AddressPersistentLocalId(expectedPersistentLocalId + 1),
+                new AddressPersistentLocalId(buildingUnitAddressWasDetachedBecauseAddressWasRejected.AddressPersistentLocalId));
 
             var building = new BuildingFactory(NoSnapshotStrategy.Instance).Create();
             building.Initialize(new List<object>
             {
                 buildingWasMigrated,
+                buildingUnitAddressWasReplacedBecauseAddressWasReaddressed,
                 buildingUnitAddressWasDetachedBecauseAddressWasRejected
             });
 
@@ -109,13 +117,13 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenDetachingRejectedAddressFrom
                     BuildingUnitStatus.Realized,
                     new BuildingUnitPersistentLocalId(command.BuildingUnitPersistentLocalId + 1),
                     attachedAddresses: new List<AddressPersistentLocalId> { command.AddressPersistentLocalId },
-                    function: BuildingRegistry.Legacy.BuildingUnitFunction.Common,
+                    function: BuildingUnitFunction.Common,
                     isRemoved: false)
                 .WithBuildingUnit(
                     BuildingUnitStatus.Retired,
                     command.BuildingUnitPersistentLocalId,
                     attachedAddresses: new List<AddressPersistentLocalId> { command.AddressPersistentLocalId },
-                    function: BuildingRegistry.Legacy.BuildingUnitFunction.Common,
+                    function: BuildingUnitFunction.Common,
                     isRemoved: false)
                 .Build();
 
@@ -143,13 +151,13 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenDetachingRejectedAddressFrom
                     BuildingUnitStatus.Realized,
                     new BuildingUnitPersistentLocalId(command.BuildingUnitPersistentLocalId + 1),
                     attachedAddresses: new List<AddressPersistentLocalId> { command.AddressPersistentLocalId },
-                    function: BuildingRegistry.Legacy.BuildingUnitFunction.Common,
+                    function: BuildingUnitFunction.Common,
                     isRemoved: false)
                 .WithBuildingUnit(
                     BuildingUnitStatus.Retired,
                     command.BuildingUnitPersistentLocalId,
                     attachedAddresses: new List<AddressPersistentLocalId> { },
-                    function: BuildingRegistry.Legacy.BuildingUnitFunction.Common,
+                    function: BuildingUnitFunction.Common,
                     isRemoved: false)
                 .Build();
 

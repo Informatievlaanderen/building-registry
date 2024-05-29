@@ -76,6 +76,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenDetachingRetiredAddressFromB
                 Fixture.Create<BuildingPersistentLocalId>(),
                 Fixture.Create<BuildingUnitPersistentLocalId>(),
                 new AddressPersistentLocalId(456));
+            var expectedPersistentLocalId = buildingUnitAddressWasDetachedBecauseAddressWasRetired.AddressPersistentLocalId + 1;
             var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
                 .WithBuildingPersistentLocalId(new BuildingPersistentLocalId(buildingUnitAddressWasDetachedBecauseAddressWasRetired.BuildingPersistentLocalId))
                 .WithBuildingUnit(
@@ -88,11 +89,18 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenDetachingRetiredAddressFromB
                     },
                     isRemoved: false)
                 .Build();
+            // Below event is used to add the address persistent local id twice.
+            var buildingUnitAddressWasReplacedBecauseAddressWasReaddressed = new BuildingUnitAddressWasReplacedBecauseAddressWasReaddressed(
+                new BuildingPersistentLocalId(buildingUnitAddressWasDetachedBecauseAddressWasRetired.BuildingPersistentLocalId),
+                new BuildingUnitPersistentLocalId(buildingUnitAddressWasDetachedBecauseAddressWasRetired.BuildingUnitPersistentLocalId),
+                new AddressPersistentLocalId(expectedPersistentLocalId + 1),
+                new AddressPersistentLocalId(buildingUnitAddressWasDetachedBecauseAddressWasRetired.AddressPersistentLocalId));
 
             var building = new BuildingFactory(NoSnapshotStrategy.Instance).Create();
             building.Initialize(new List<object>
             {
                 buildingWasMigrated,
+                buildingUnitAddressWasReplacedBecauseAddressWasReaddressed,
                 buildingUnitAddressWasDetachedBecauseAddressWasRetired
             });
 
