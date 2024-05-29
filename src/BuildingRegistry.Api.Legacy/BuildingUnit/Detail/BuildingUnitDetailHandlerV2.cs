@@ -29,7 +29,7 @@ namespace BuildingRegistry.Api.Legacy.BuildingUnit.Detail
         public async Task<BuildingUnitResponseWithEtag> Handle(GetBuildingUnitDetailRequest buildingUnitDetailRequest, CancellationToken cancellationToken)
         {
             var buildingUnit = await _context
-                .BuildingUnitDetailsV2
+                .BuildingUnitDetailsV2WithCount
                 .Include(x => x.Addresses)
                 .AsNoTracking()
                 .SingleOrDefaultAsync(item => item.BuildingUnitPersistentLocalId == buildingUnitDetailRequest.PersistentLocalId, cancellationToken);

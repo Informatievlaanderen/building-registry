@@ -8,7 +8,7 @@ namespace BuildingRegistry.Api.Legacy.Building.Query
     using Be.Vlaanderen.Basisregisters.Api.Search.Filtering;
     using Be.Vlaanderen.Basisregisters.Api.Search.Sorting;
     using BuildingRegistry.Projections.Legacy;
-    using BuildingRegistry.Projections.Legacy.BuildingSyndication;
+    using BuildingRegistry.Projections.Legacy.BuildingSyndicationWithCount;
     using Microsoft.EntityFrameworkCore;
 
     public class BuildingSyndicationQuery : Query<BuildingSyndicationItem, BuildingSyndicationFilter, BuildingSyndicationQueryResult>
@@ -137,7 +137,7 @@ namespace BuildingRegistry.Api.Legacy.Building.Query
 
         protected override IQueryable<BuildingSyndicationItem> Filter(FilteringHeader<BuildingSyndicationFilter> filtering)
         {
-            var buildings = _context.BuildingSyndication.AsQueryable();
+            var buildings = _context.BuildingSyndicationWithCount.AsQueryable();
 
             if (_embedObject)
                 buildings = buildings

@@ -53,7 +53,7 @@ namespace BuildingRegistry.Api.Legacy.Building.Detail
             }
 
             var buildingUnitPersistentLocalIdsTask = _context
-                .BuildingUnitDetailsV2
+                .BuildingUnitDetailsV2WithCount
                 .Where(x => x.BuildingPersistentLocalId == building.PersistentLocalId)
                 .Where(x => !x.IsRemoved)
                 .Select(x => new { x.BuildingUnitPersistentLocalId, x.Status })

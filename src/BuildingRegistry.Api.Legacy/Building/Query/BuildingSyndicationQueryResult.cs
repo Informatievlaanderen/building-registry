@@ -5,7 +5,7 @@ namespace BuildingRegistry.Api.Legacy.Building.Query
     using Be.Vlaanderen.Basisregisters.GrAr.Common;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using BuildingRegistry.Legacy;
-    using BuildingRegistry.Projections.Legacy.BuildingSyndication;
+    using BuildingRegistry.Projections.Legacy.BuildingSyndicationWithCount;
     using NodaTime;
 
     public class BuildingSyndicationQueryResult

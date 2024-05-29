@@ -39,7 +39,7 @@ namespace BuildingRegistry.Api.Oslo.BuildingUnit.Detail
         public async Task<BuildingUnitOsloResponseWithEtag> Handle(GetRequest request, CancellationToken cancellationToken)
         {
             var buildingUnit = await _context
-                .BuildingUnitDetailsV2
+                .BuildingUnitDetailsV2WithCount
                 .Include(x => x.Addresses)
                 .AsNoTracking()
                 .SingleOrDefaultAsync(item => item.BuildingUnitPersistentLocalId == request.PersistentLocalId, cancellationToken);

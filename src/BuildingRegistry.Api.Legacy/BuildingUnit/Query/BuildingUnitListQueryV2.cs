@@ -8,7 +8,7 @@ namespace BuildingRegistry.Api.Legacy.BuildingUnit.Query
     using Be.Vlaanderen.Basisregisters.Api.Search.Sorting;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy.Gebouweenheid;
     using BuildingRegistry.Projections.Legacy;
-    using BuildingRegistry.Projections.Legacy.BuildingUnitDetailV2;
+    using BuildingRegistry.Projections.Legacy.BuildingUnitDetailV2WithCount;
     using Microsoft.EntityFrameworkCore;
 
     public class BuildingUnitListQueryV2 : Query<BuildingUnitDetailItemV2, BuildingUnitFilter>
@@ -25,7 +25,7 @@ namespace BuildingRegistry.Api.Legacy.BuildingUnit.Query
         protected override IQueryable<BuildingUnitDetailItemV2> Filter(FilteringHeader<BuildingUnitFilter> filtering)
         {
             var buildingUnits = _context
-                .BuildingUnitDetailsV2
+                .BuildingUnitDetailsV2WithCount
                 .Where(x => !x.IsRemoved)
                 .OrderBy(x => x.BuildingUnitPersistentLocalId)
                 .AsNoTracking();
