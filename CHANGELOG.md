@@ -1,3 +1,10 @@
+## [4.5.3](https://github.com/informatievlaanderen/building-registry/compare/v4.5.2...v4.5.3) (2024-05-29)
+
+
+### Bug Fixes
+
+* don't use db transaction in the backoffice projections ([1e940bf](https://github.com/informatievlaanderen/building-registry/commit/1e940bfea02f697688ebcd243f3a3970c6366861))
+
 ## [4.5.2](https://github.com/informatievlaanderen/building-registry/compare/v4.5.1...v4.5.2) (2024-05-27)
 
 
