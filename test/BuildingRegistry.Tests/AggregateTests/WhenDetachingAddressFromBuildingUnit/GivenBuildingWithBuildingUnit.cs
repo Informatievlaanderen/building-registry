@@ -77,11 +77,18 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenDetachingAddressFromBuilding
                     },
                     isRemoved: false)
                 .Build();
+            // Below event is used to add the address persistent local id twice.
+            var buildingUnitAddressWasReplacedBecauseAddressWasReaddressed = new BuildingUnitAddressWasReplacedBecauseAddressWasReaddressed(
+                new BuildingPersistentLocalId(buildingUnitAddressWasDetachedV2.BuildingPersistentLocalId),
+                new BuildingUnitPersistentLocalId(buildingUnitAddressWasDetachedV2.BuildingUnitPersistentLocalId),
+                new AddressPersistentLocalId(expectedPersistentLocalId + 1),
+                new AddressPersistentLocalId(buildingUnitAddressWasDetachedV2.AddressPersistentLocalId));
 
             var sut = new BuildingFactory(NoSnapshotStrategy.Instance).Create();
             sut.Initialize(new List<object>
             {
                 buildingWasMigrated,
+                buildingUnitAddressWasReplacedBecauseAddressWasReaddressed,
                 buildingUnitAddressWasDetachedV2
             });
 

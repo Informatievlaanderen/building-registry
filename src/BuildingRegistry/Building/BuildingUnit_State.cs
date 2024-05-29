@@ -267,28 +267,28 @@ namespace BuildingRegistry.Building
 
         private void When(BuildingUnitAddressWasDetachedV2 @event)
         {
-            _addressPersistentLocalIds.Remove(new AddressPersistentLocalId(@event.AddressPersistentLocalId));
+            _addressPersistentLocalIds.RemoveAll(x => x == new AddressPersistentLocalId(@event.AddressPersistentLocalId));
 
             _lastEvent = @event;
         }
 
         private void When(BuildingUnitAddressWasDetachedBecauseAddressWasRejected @event)
         {
-            _addressPersistentLocalIds.Remove(new AddressPersistentLocalId(@event.AddressPersistentLocalId));
+            _addressPersistentLocalIds.RemoveAll(x => x == new AddressPersistentLocalId(@event.AddressPersistentLocalId));
 
             _lastEvent = @event;
         }
 
         private void When(BuildingUnitAddressWasDetachedBecauseAddressWasRetired @event)
         {
-            _addressPersistentLocalIds.Remove(new AddressPersistentLocalId(@event.AddressPersistentLocalId));
+            _addressPersistentLocalIds.RemoveAll(x => x == new AddressPersistentLocalId(@event.AddressPersistentLocalId));
 
             _lastEvent = @event;
         }
 
         private void When(BuildingUnitAddressWasDetachedBecauseAddressWasRemoved @event)
         {
-            _addressPersistentLocalIds.Remove(new AddressPersistentLocalId(@event.AddressPersistentLocalId));
+            _addressPersistentLocalIds.RemoveAll(x => x == new AddressPersistentLocalId(@event.AddressPersistentLocalId));
 
             _lastEvent = @event;
         }
@@ -308,14 +308,14 @@ namespace BuildingRegistry.Building
 
             foreach (var addressPersistentLocalId in buildingUnitReaddress.DetachedAddressPersistentLocalIds)
             {
-                _addressPersistentLocalIds.Remove(new AddressPersistentLocalId(addressPersistentLocalId));
+                _addressPersistentLocalIds.RemoveAll(x => x == new AddressPersistentLocalId(addressPersistentLocalId));
             }
 
             foreach (var addressPersistentLocalId in buildingUnitReaddress.AttachedAddressPersistentLocalIds)
             {
                 _addressPersistentLocalIds.Add(new AddressPersistentLocalId(addressPersistentLocalId));
             }
-            
+
             _lastEvent = @event;
         }
 

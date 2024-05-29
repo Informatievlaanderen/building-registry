@@ -73,6 +73,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenDetachingRemovedAddressFromB
         public void StateCheck()
         {
             var buildingUnitAddressWasDetachedBecauseAddressWasRemoved = Fixture.Create<BuildingUnitAddressWasDetachedBecauseAddressWasRemoved>();
+            var expectedPersistentLocalId = buildingUnitAddressWasDetachedBecauseAddressWasRemoved.AddressPersistentLocalId + 1;
             var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
                 .WithBuildingPersistentLocalId(new BuildingPersistentLocalId(buildingUnitAddressWasDetachedBecauseAddressWasRemoved.BuildingPersistentLocalId))
                 .WithBuildingUnit(
@@ -81,20 +82,27 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenDetachingRemovedAddressFromB
                     attachedAddresses: new List<AddressPersistentLocalId>
                     {
                         new AddressPersistentLocalId(buildingUnitAddressWasDetachedBecauseAddressWasRemoved.AddressPersistentLocalId),
-                        new AddressPersistentLocalId(123),
+                        new AddressPersistentLocalId(expectedPersistentLocalId),
                     },
                     isRemoved: false)
                 .Build();
+            // Below event is used to add the address persistent local id twice.
+            var buildingUnitAddressWasReplacedBecauseAddressWasReaddressed = new BuildingUnitAddressWasReplacedBecauseAddressWasReaddressed(
+                new BuildingPersistentLocalId(buildingUnitAddressWasDetachedBecauseAddressWasRemoved.BuildingPersistentLocalId),
+                new BuildingUnitPersistentLocalId(buildingUnitAddressWasDetachedBecauseAddressWasRemoved.BuildingUnitPersistentLocalId),
+                new AddressPersistentLocalId(expectedPersistentLocalId + 1),
+                new AddressPersistentLocalId(buildingUnitAddressWasDetachedBecauseAddressWasRemoved.AddressPersistentLocalId));
 
             var building = new BuildingFactory(NoSnapshotStrategy.Instance).Create();
             building.Initialize(new List<object>
             {
                 buildingWasMigrated,
+                buildingUnitAddressWasReplacedBecauseAddressWasReaddressed,
                 buildingUnitAddressWasDetachedBecauseAddressWasRemoved
             });
 
             building.BuildingUnits.First().AddressPersistentLocalIds.Should().BeEquivalentTo(
-                new List<AddressPersistentLocalId>{ new AddressPersistentLocalId(123) });
+                new List<AddressPersistentLocalId>{ new AddressPersistentLocalId(expectedPersistentLocalId) });
         }
 
         [Fact]
