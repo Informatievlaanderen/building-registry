@@ -1,3 +1,15 @@
+# [4.9.0](https://github.com/informatievlaanderen/building-registry/compare/v4.8.0...v4.9.0) (2024-05-29)
+
+
+### Bug Fixes
+
+* don't use db transaction in the backoffice projections ([b1d97cd](https://github.com/informatievlaanderen/building-registry/commit/b1d97cd037fb6026aee1a9a1fd128e83e446d063))
+
+
+### Features
+
+* add integration version projections from migration ([63f0577](https://github.com/informatievlaanderen/building-registry/commit/63f057743338f7f89b47b6390027e51e96c40222))
+
 # [4.8.0](https://github.com/informatievlaanderen/building-registry/compare/v4.7.1...v4.8.0) (2024-05-28)
 
 
