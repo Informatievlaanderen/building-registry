@@ -1,3 +1,10 @@
+## [4.9.1](https://github.com/informatievlaanderen/building-registry/compare/v4.9.0...v4.9.1) (2024-05-29)
+
+
+### Bug Fixes
+
+* remove all duplicate address links when detaching ([#1224](https://github.com/informatievlaanderen/building-registry/issues/1224)) ([b7f009d](https://github.com/informatievlaanderen/building-registry/commit/b7f009dcd40ee3618dfd8552af81e7066cd8c91c))
+
 # [4.9.0](https://github.com/informatievlaanderen/building-registry/compare/v4.8.0...v4.9.0) (2024-05-29)
 
 
