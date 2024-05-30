@@ -3,11 +3,14 @@
     using Building;
     using Infrastructure;
     using Microsoft.EntityFrameworkCore;
+    using NetTopologySuite.Geometries;
+    using NetTopologySuite.Operation.Buffer;
 
     public class BuildingGeometryContext : DbContext, IBuildingGeometries
     {
-        public DbSet<BuildingGeometryData> BuildingGeometries => Set<BuildingGeometryData>();
+        private const double AllowedOverlapPercentage = 0.05;
 
+        public DbSet<BuildingGeometryData> BuildingGeometries => Set<BuildingGeometryData>();
         public BuildingGeometryContext() { }
 
         // This needs to be DbContextOptions<T> for Autofac!
@@ -63,10 +66,37 @@
                     && !building.IsRemoved
                     && boundingBox.Intersects(building.SysGeometry))
                 .ToList()
-                .Where(building => geometry.Intersects(building.SysGeometry))
+                .Where(building => HasTooMuchOverlap(geometry, building.SysGeometry))
                 .ToList();
 
             return overlappingBuildings;
+        }
+
+        private static bool HasTooMuchOverlap(Geometry newBuildingGeometry, Geometry? existingBuildingGeometry)
+        {
+            if (existingBuildingGeometry is null)
+            {
+                return false;
+            }
+
+            try
+            {
+                var overlapArea = newBuildingGeometry.Intersection(existingBuildingGeometry).Area;
+                var newBuildingGeometryOverlapPercentage = overlapArea / newBuildingGeometry.Area;
+                var existingBuildingGeometryOverlapPercentage = overlapArea / existingBuildingGeometry.Area;
+
+                return newBuildingGeometryOverlapPercentage > AllowedOverlapPercentage
+                    || existingBuildingGeometryOverlapPercentage > AllowedOverlapPercentage;
+            }
+            catch (TopologyException topologyException)
+            {
+                // Consider buildings that Intersect, but fail with "found non-noded intersection" on calculating, to have an overlap value of 0
+                if (topologyException.Message.Contains("found non-noded intersection", StringComparison.InvariantCultureIgnoreCase))
+                    return false;
+
+                // any other TopologyException should be treated normally
+                throw;
+            }
         }
     }
 }
