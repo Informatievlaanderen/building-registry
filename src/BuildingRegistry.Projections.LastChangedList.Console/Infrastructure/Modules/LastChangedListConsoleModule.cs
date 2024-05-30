@@ -12,6 +12,7 @@ namespace BuildingRegistry.Projections.LastChangedList.Console.Infrastructure.Mo
     using Be.Vlaanderen.Basisregisters.Projector.ConnectedProjections;
     using Be.Vlaanderen.Basisregisters.Projector.Modules;
     using BuildingRegistry.Infrastructure;
+    using BuildingRegistry.Projections.Legacy.BuildingUnitDetailV2WithCount;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Logging;
@@ -76,7 +77,7 @@ namespace BuildingRegistry.Projections.LastChangedList.Console.Infrastructure.Mo
             builder.Register(c =>
                     new LastChangedListBuildingUnitCacheValidator(
                         _configuration.GetConnectionString("LegacyProjections"),
-                        "BuildingRegistry.Projections.Legacy.BuildingUnitDetailV2.BuildingUnitDetailV2Projections"))
+                        BuildingUnitDetailItemConfiguration.ProjectionStateName))
                 .AsSelf();
 
             builder

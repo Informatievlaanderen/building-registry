@@ -91,6 +91,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetailV2WithCount
     public class BuildingUnitDetailItemConfiguration : IEntityTypeConfiguration<BuildingUnitDetailItemV2>
     {
         internal const string TableName = "BuildingUnitDetailsV2WithCount";
+        public static readonly string ProjectionStateName = typeof(BuildingUnitDetailV2Projections).FullName!;
 
         public void Configure(EntityTypeBuilder<BuildingUnitDetailItemV2> b)
         {
