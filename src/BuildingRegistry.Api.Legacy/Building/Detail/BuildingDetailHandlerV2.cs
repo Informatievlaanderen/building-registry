@@ -65,7 +65,7 @@ namespace BuildingRegistry.Api.Legacy.Building.Detail
                 .Distinct();
 
             var caPaKeysTask = _consumerParcelContext
-                .ParcelConsumerItems
+                .ParcelConsumerItemsWithCount
                 .Where(x => !x.IsRemoved && parcels.Contains(x.CaPaKey))
                 .Select(x => x.CaPaKey)
                 .ToListAsync(cancellationToken);

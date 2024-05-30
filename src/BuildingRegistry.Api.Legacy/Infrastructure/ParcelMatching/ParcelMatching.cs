@@ -1,4 +1,4 @@
-﻿namespace BuildingRegistry.Api.Legacy.Infrastructure.ParcelMatching
+namespace BuildingRegistry.Api.Legacy.Infrastructure.ParcelMatching
 {
     using System;
     using System.Collections.Generic;
@@ -22,7 +22,7 @@
             var boundingBox = buildingGeometry.Factory.ToGeometry(buildingGeometry.EnvelopeInternal);
 
             var underlyingParcels = _context
-                .ParcelConsumerItems
+                .ParcelConsumerItemsWithCount
                 .Where(parcel => boundingBox.Intersects(parcel.Geometry))
                 .ToList()
                 .Where(parcel => buildingGeometry.Intersects(parcel.Geometry) && parcel.Status == ParcelStatus.Realized)
