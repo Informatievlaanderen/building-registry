@@ -1,3 +1,10 @@
+## [4.5.4](https://github.com/informatievlaanderen/building-registry/compare/v4.5.3...v4.5.4) (2024-05-30)
+
+
+### Bug Fixes
+
+* use a buffer to calculate if building overlaps ([969bf13](https://github.com/informatievlaanderen/building-registry/commit/969bf137762a5499e8972616d27be2455877b822))
+
 ## [4.5.3](https://github.com/informatievlaanderen/building-registry/compare/v4.5.2...v4.5.3) (2024-05-29)
 
 
