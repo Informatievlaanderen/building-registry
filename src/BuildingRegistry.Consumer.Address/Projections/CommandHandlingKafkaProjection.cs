@@ -14,6 +14,7 @@ namespace BuildingRegistry.Consumer.Address.Projections
     using Building.Commands;
     using Microsoft.EntityFrameworkCore;
     using NodaTime;
+    using NodaTime.Text;
     using Contracts = Be.Vlaanderen.Basisregisters.GrAr.Contracts.Common;
     using Provenance = Be.Vlaanderen.Basisregisters.GrAr.Provenance.Provenance;
 
@@ -365,7 +366,7 @@ namespace BuildingRegistry.Consumer.Address.Projections
 
         private static Provenance FromProvenance(Contracts.Provenance provenance) =>
             new(
-                SystemClock.Instance.GetCurrentInstant(),
+                InstantPattern.General.Parse(provenance.Timestamp).Value,
                 Enum.Parse<Application>(Application.AddressRegistry.ToString()),
                 new Reason(provenance.Reason),
                 new Operator(string.Empty),

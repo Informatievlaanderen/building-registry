@@ -107,6 +107,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Consumer.Address.CommandHandlin
                                 readdressAddresses.BuildingPersistentLocalId == buildingPersistentLocalId
                                 && readdressAddresses.Readdresses.Count == 1
                                 && readdressAddresses.Readdresses[new BuildingUnitPersistentLocalId(buildingUnitPersistentLocalId)].Count == 2
+                                && readdressAddresses.Provenance.Timestamp.ToString() == @event.Provenance.Timestamp
                             ),
                             CancellationToken.None),
                     Times.Exactly(1));
