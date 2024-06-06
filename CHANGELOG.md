@@ -1,3 +1,12 @@
+## [4.9.2](https://github.com/informatievlaanderen/building-registry/compare/v4.9.1...v4.9.2) (2024-06-06)
+
+
+### Bug Fixes
+
+* add buildingwasmigrated to backoffice projections ([3041dfb](https://github.com/informatievlaanderen/building-registry/commit/3041dfb0ea3f48e631711864bba6538fbb873283))
+* keep event provenance timestamp for new commands ([fbcfbbf](https://github.com/informatievlaanderen/building-registry/commit/fbcfbbf12c0acc08045a17c6fb42546e4213669a))
+* use a buffer to calculate if building overlaps ([bf96a0e](https://github.com/informatievlaanderen/building-registry/commit/bf96a0e8a02bc04aa80e24d51b8f139af380b9e2))
+
 ## [4.9.1](https://github.com/informatievlaanderen/building-registry/compare/v4.9.0...v4.9.1) (2024-05-29)
 
 
