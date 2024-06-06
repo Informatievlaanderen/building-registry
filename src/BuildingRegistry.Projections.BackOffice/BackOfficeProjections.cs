@@ -18,6 +18,29 @@ namespace BuildingRegistry.Projections.BackOffice
         {
             var delayInSeconds = configuration.GetValue("DelayInSeconds", 10);
 
+            When<Envelope<BuildingWasMigrated>>(async (_, message, ct) =>
+            {
+                await using var dbContext = await backOfficeContextFactory.CreateDbContextAsync(ct);
+                foreach (var buildingUnit in message.Message.BuildingUnits)
+                {
+                    foreach (var addressPersistentLocalId in buildingUnit.AddressPersistentLocalIds)
+                    {
+                        var relation = await dbContext.FindBuildingUnitAddressRelation(
+                            new BuildingUnitPersistentLocalId(buildingUnit.BuildingUnitPersistentLocalId),
+                            new AddressPersistentLocalId(addressPersistentLocalId),
+                            ct);
+
+                        if (relation is null)
+                        {
+                            relation = new BuildingUnitAddressRelation(message.Message.BuildingPersistentLocalId, buildingUnit.BuildingUnitPersistentLocalId, addressPersistentLocalId);
+                            await dbContext.BuildingUnitAddressRelation.AddAsync(relation, ct);
+                        }
+                    }
+                }
+
+                await dbContext.SaveChangesAsync(ct);
+            });
+
             When<Envelope<BuildingUnitWasPlannedV2>>(async (_, message, cancellationToken) =>
             {
                 await DelayProjection(message, delayInSeconds, cancellationToken);
