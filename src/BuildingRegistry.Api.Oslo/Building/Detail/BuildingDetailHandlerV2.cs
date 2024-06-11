@@ -63,7 +63,7 @@ namespace BuildingRegistry.Api.Oslo.Building.Detail
             }
 
             var buildingUnitsTask = _context
-                .BuildingUnitDetailsV2
+                .BuildingUnitDetailsV2WithCount
                 .Where(x => x.BuildingPersistentLocalId == building.PersistentLocalId)
                 .Where(x => !x.IsRemoved)
                 .Select(x => new {x.BuildingUnitPersistentLocalId, x.Status})
@@ -75,7 +75,7 @@ namespace BuildingRegistry.Api.Oslo.Building.Detail
                 .Distinct();
 
             var caPaKeysTask = _consumerParcelContext
-                .ParcelConsumerItems
+                .ParcelConsumerItemsWithCount
                 .Where(x => !x.IsRemoved && parcels.Contains(x.CaPaKey))
                 .Select(x => x.CaPaKey)
                 .ToListAsync(cancellationToken);

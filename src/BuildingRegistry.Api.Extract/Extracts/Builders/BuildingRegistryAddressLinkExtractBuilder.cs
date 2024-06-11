@@ -13,7 +13,7 @@ namespace BuildingRegistry.Api.Extract.Extracts.Builders
         public static IEnumerable<ExtractFile> CreateBuildingUnitFiles(ExtractContext context)
         {
             var extractItems = context
-                .BuildingUnitAddressLinkExtract
+                .BuildingUnitAddressLinkExtractWithCount
                 .AsNoTracking();
 
             var projectionState = context

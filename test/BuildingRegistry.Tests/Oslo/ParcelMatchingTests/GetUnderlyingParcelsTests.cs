@@ -1,12 +1,11 @@
-﻿namespace BuildingRegistry.Tests.Oslo.ParcelMatchingTests
+namespace BuildingRegistry.Tests.Oslo.ParcelMatchingTests
 {
     using System;
     using System.Linq;
     using Api.BackOffice.Abstractions.Building;
     using Api.Oslo.Infrastructure.ParcelMatching;
     using BackOffice;
-    using Consumer.Read.Parcel;
-    using Consumer.Read.Parcel.Parcel;
+    using Consumer.Read.Parcel.ParcelWithCount;
     using FluentAssertions;
     using NetTopologySuite.Geometries;
     using Xunit;
@@ -30,7 +29,7 @@
             var parcelGeometry = CreateGeometry("100 100 100 200 200 200 200 100 100 100");
             var buildingGeometry100PercentOverlap = parcelGeometry;
 
-            _consumerParcelContext.ParcelConsumerItems.Add(
+            _consumerParcelContext.ParcelConsumerItemsWithCount.Add(
                 new ParcelConsumerItem(
                     Guid.NewGuid(),
                     Guid.NewGuid().ToString(),
@@ -53,7 +52,7 @@
             var parcelGeometry = CreateGeometry("100 100 100 200 200 200 200 100 100 100");
             var buildingGeometry100PercentOverlap = parcelGeometry;
 
-            _consumerParcelContext.ParcelConsumerItems.Add(
+            _consumerParcelContext.ParcelConsumerItemsWithCount.Add(
                 new ParcelConsumerItem(
                     Guid.NewGuid(),
                     Guid.NewGuid().ToString(),
@@ -76,7 +75,7 @@
             var parcelGeometry = CreateGeometry("100 100 100 200 200 200 200 100 100 100");
             var buildingGeometry = CreateGeometry("140 100 140 200 240 200 240 100 140 100");
 
-            _consumerParcelContext.ParcelConsumerItems.Add(
+            _consumerParcelContext.ParcelConsumerItemsWithCount.Add(
                 new ParcelConsumerItem(
                     Guid.NewGuid(),
                     Guid.NewGuid().ToString(),
@@ -99,7 +98,7 @@
             var buildingGeometry50PercentOverlap = CreateGeometry("50 100 50 200 140 200 140 100 50 100");
             var parcelGeometry = CreateGeometry("100 100 100 200 200 200 200 100 100 100");
 
-            _consumerParcelContext.ParcelConsumerItems.Add(
+            _consumerParcelContext.ParcelConsumerItemsWithCount.Add(
                 new ParcelConsumerItem(
                     Guid.NewGuid(),
                     Guid.NewGuid().ToString(),
@@ -107,7 +106,7 @@
                     parcelGeometry.AsBinary(),
                     parcelGeometry));
 
-            _consumerParcelContext.ParcelConsumerItems.Add(
+            _consumerParcelContext.ParcelConsumerItemsWithCount.Add(
                 new ParcelConsumerItem(
                     Guid.NewGuid(),
                     Guid.NewGuid().ToString(),
@@ -132,7 +131,7 @@
             var parcelRight = CreateGeometry("200 100 200 200 300 200 300 100 200 100");
             var building = CreateGeometry("139 100 139 200 239 200 239 100 139 100");
 
-            _consumerParcelContext.ParcelConsumerItems.Add(
+            _consumerParcelContext.ParcelConsumerItemsWithCount.Add(
                 new ParcelConsumerItem(
                     Guid.NewGuid(),
                     parcelLeftCaPaKey,
@@ -140,7 +139,7 @@
                     parcelLeft.AsBinary(),
                     parcelLeft));
 
-            _consumerParcelContext.ParcelConsumerItems.Add(
+            _consumerParcelContext.ParcelConsumerItemsWithCount.Add(
                 new ParcelConsumerItem(
                     Guid.NewGuid(),
                     Guid.NewGuid().ToString(),

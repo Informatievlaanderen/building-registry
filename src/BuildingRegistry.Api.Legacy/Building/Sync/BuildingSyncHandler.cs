@@ -22,7 +22,7 @@ namespace BuildingRegistry.Api.Legacy.Building.Sync
         public async Task<SyncResponse> Handle(SyncRequest request, CancellationToken cancellationToken)
         {
             var lastFeedUpdate = await _context
-                .BuildingSyndication
+                .BuildingSyndicationWithCount
                 .AsNoTracking()
                 .OrderByDescending(item => item.Position)
                 .Select(item => item.SyndicationItemCreatedAt)

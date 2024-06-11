@@ -60,7 +60,7 @@ namespace BuildingRegistry.Api.Oslo.Building.Query
 
             if (!string.IsNullOrEmpty(filtering.Filter.CaPaKey))
             {
-                var parcel = _consumerParcelContext.ParcelConsumerItems.FirstOrDefault(x => x.CaPaKey == filtering.Filter.CaPaKey);
+                var parcel = _consumerParcelContext.ParcelConsumerItemsWithCount.FirstOrDefault(x => x.CaPaKey == filtering.Filter.CaPaKey);
                 if (parcel is not null && parcel.Status == ParcelStatus.Realized)
                 {
                     var underlyingBuildings = _parcelMatching.GetUnderlyingBuildings(parcel.Geometry);

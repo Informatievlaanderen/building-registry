@@ -10,7 +10,7 @@ namespace BuildingRegistry.Api.Oslo.BuildingUnit.Query
     using Converters;
     using Microsoft.EntityFrameworkCore;
     using Projections.Legacy;
-    using Projections.Legacy.BuildingUnitDetailV2;
+    using Projections.Legacy.BuildingUnitDetailV2WithCount;
 
     public class BuildingUnitListOsloQueryV2 : Query<BuildingUnitQueryItem, BuildingUnitFilter>
     {
@@ -26,7 +26,7 @@ namespace BuildingRegistry.Api.Oslo.BuildingUnit.Query
         protected override IQueryable<BuildingUnitQueryItem> Filter(FilteringHeader<BuildingUnitFilter> filtering)
         {
             var buildingUnits = _context
-                .BuildingUnitDetailsV2
+                .BuildingUnitDetailsV2WithCount
                 .Where(x => !x.IsRemoved)
                 .OrderBy(x => x.BuildingPersistentLocalId)
                 .AsNoTracking();

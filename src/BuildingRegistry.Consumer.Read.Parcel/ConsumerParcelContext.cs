@@ -85,14 +85,14 @@ namespace BuildingRegistry.Consumer.Read.Parcel
         {
             var boundingBox = buildingGeometry.Factory.ToGeometry(buildingGeometry.EnvelopeInternal);
 
-            return await ParcelConsumerItems
+            return await ParcelConsumerItemsWithCount
                 .Where(parcel => boundingBox.Intersects(parcel.Geometry))
                 .Select(x => new ParcelData(
                     x.ParcelId,
                     x.CaPaKey,
                     x.Geometry,
                     x.Status,
-                    ParcelAddressItems
+                    ParcelAddressItemsWithCount
                         .Where(y => y.ParcelId == x.ParcelId)
                         .Select(y => new AddressPersistentLocalId(y.AddressPersistentLocalId))
                         .ToList()))
