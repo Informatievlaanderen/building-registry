@@ -3,8 +3,6 @@ namespace BuildingRegistry.Projections.Legacy
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.Runner;
     using BuildingDetailV2;
     using BuildingPersistentIdCrabIdMapping;
-    using BuildingSyndication;
-    using BuildingUnitDetailV2;
     using Infrastructure;
     using Microsoft.EntityFrameworkCore;
     using PersistentLocalIdMigration;
@@ -18,11 +16,7 @@ namespace BuildingRegistry.Projections.Legacy
         internal const string BuildingUnitDetailV2ListCountViewName = "vw_BuildingUnitDetailV2ListCountView";
 
         public DbSet<BuildingDetailItemV2> BuildingDetailsV2 { get; set; }
-
-        public DbSet<BuildingSyndicationItem> BuildingSyndication { get; set; }
         public DbSet<BuildingSyndicationItemWithCount> BuildingSyndicationWithCount { get; set; }
-
-        public DbSet<BuildingUnitDetailItemV2> BuildingUnitDetailsV2 { get; set; }
         public DbSet<BuildingUnitDetailItemV2WithCount> BuildingUnitDetailsV2WithCount { get; set; }
 
         public DbSet<RemovedPersistentLocalId> RemovedPersistentLocalIds { get; set; }

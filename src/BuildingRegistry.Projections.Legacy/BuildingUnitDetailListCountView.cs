@@ -1,4 +1,4 @@
-namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetailV2
+namespace BuildingRegistry.Projections.Legacy
 {
     public class BuildingUnitDetailV2ListCountView
     {

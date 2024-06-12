@@ -7,7 +7,7 @@ namespace BuildingRegistry.Tests.Legacy
     using BuildingRegistry.Legacy.Events;
     using FluentAssertions;
     using NodaTime;
-    using Projections.Legacy.BuildingSyndication;
+    using Projections.Legacy.BuildingSyndicationWithCount;
     using Xunit;
 
     public class XmlSerializationTests
