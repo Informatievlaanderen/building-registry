@@ -6,6 +6,9 @@ using NetTopologySuite.Geometries;
 
 namespace BuildingRegistry.Consumer.Read.Parcel.Migrations
 {
+    using BuildingRegistry.Infrastructure;
+    using ParcelWithCount;
+
     /// <inheritdoc />
     public partial class AddWithCount : Migration
     {
@@ -57,11 +60,25 @@ namespace BuildingRegistry.Consumer.Read.Parcel.Migrations
                 schema: "BuildingRegistryConsumerReadParcel",
                 table: "ParcelItemsWithCount",
                 column: "CaPaKey");
+
+            migrationBuilder.Sql(@$"CREATE SPATIAL INDEX [SPATIAL_ParcelItems_Geometry] ON [{Schema.ConsumerReadParcel}].[{ParcelConsumerItemConfiguration.TableName}] ([Geometry])
+         USING GEOMETRY_GRID
+         WITH (
+          BOUNDING_BOX =(22279.17, 153050.23, 258873.3, 244022.31),
+          GRIDS =(
+           LEVEL_1 = MEDIUM,
+           LEVEL_2 = MEDIUM,
+           LEVEL_3 = MEDIUM,
+           LEVEL_4 = MEDIUM),
+         CELLS_PER_OBJECT = 5)");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.Sql(@$"
+            DROP INDEX [SPATIAL_ParcelItems_Geometry] ON [{Schema.ConsumerReadParcel}].[{ParcelConsumerItemConfiguration.TableName}]");
+
             migrationBuilder.DropTable(
                 name: "ParcelAddressItemsWithCount",
                 schema: "BuildingRegistryConsumerReadParcel");
