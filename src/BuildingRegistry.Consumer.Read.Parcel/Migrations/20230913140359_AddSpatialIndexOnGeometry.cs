@@ -11,7 +11,7 @@ namespace BuildingRegistry.Consumer.Read.Parcel.Migrations
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.Sql(@$"CREATE SPATIAL INDEX [SPATIAL_ParcelItems_Geometry] ON [{Schema.ConsumerReadParcel}].[{ParcelConsumerItemConfiguration.TableName}] ([Geometry])
+            migrationBuilder.Sql(@$"CREATE SPATIAL INDEX [SPATIAL_ParcelItems_Geometry] ON [{Schema.ConsumerReadParcel}].[ParcelItems] ([Geometry])
          USING GEOMETRY_GRID
          WITH (
           BOUNDING_BOX =(22279.17, 153050.23, 258873.3, 244022.31),
@@ -26,7 +26,7 @@ namespace BuildingRegistry.Consumer.Read.Parcel.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.Sql(@$"
-            DROP INDEX [SPATIAL_ParcelItems_Geometry] ON [{Schema.ConsumerReadParcel}].[{ParcelConsumerItemConfiguration.TableName}]");
+            DROP INDEX [SPATIAL_ParcelItems_Geometry] ON [{Schema.ConsumerReadParcel}].[ParcelItems]");
         }
     }
 }

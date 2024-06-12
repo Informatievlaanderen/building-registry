@@ -18,7 +18,7 @@ namespace BuildingRegistry.Consumer.Read.Parcel.Infrastructure
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Hosting;
     using Microsoft.Extensions.Logging;
-    using Parcel;
+    using ParcelWithCount;
     using Serilog;
     using Serilog.Debugging;
     using Serilog.Extensions.Logging;
@@ -92,52 +92,6 @@ namespace BuildingRegistry.Consumer.Read.Parcel.Infrastructure
                             var bootstrapServers = hostContext.Configuration["Kafka:BootstrapServers"]!;
                             var topic = $"{hostContext.Configuration["Topic"]}" ?? throw new ArgumentException("Configuration has no Topic.");
                             var suffix = hostContext.Configuration["GroupSuffix"];
-                            var consumerGroupId = $"BuildingRegistry.ConsumerParcelItem.{topic}{suffix}";
-
-                            var consumerOptions = new ConsumerOptions(
-                                new BootstrapServers(bootstrapServers),
-                                new Topic(topic),
-                                new ConsumerGroupId(consumerGroupId),
-                                EventsJsonSerializerSettingsProvider.CreateSerializerSettings());
-
-                            consumerOptions.ConfigureSaslAuthentication(new SaslAuthentication(
-                                hostContext.Configuration["Kafka:SaslUserName"]!,
-                                hostContext.Configuration["Kafka:SaslPassword"]!));
-
-                            var offsetStr = hostContext.Configuration["TopicOffset"];
-                            if (!string.IsNullOrEmpty(offsetStr) && long.TryParse(offsetStr, out var offset))
-                            {
-                                var ignoreDataCheck = hostContext.Configuration.GetValue("IgnoreTopicOffsetDataCheck", false);
-                                if (!ignoreDataCheck)
-                                {
-                                    using var ctx = c.Resolve<ConsumerParcelContext>();
-
-                                    if (ctx.ParcelConsumerItems.Any())
-                                    {
-                                        throw new InvalidOperationException(
-                                            $"Cannot set Kafka offset to {offset} because {nameof(ctx.ParcelConsumerItems)} has data.");
-                                    }
-                                }
-
-                                consumerOptions.ConfigureOffset(new Offset(offset));
-                            }
-
-                            return new Consumer(consumerOptions, c.Resolve<ILoggerFactory>());
-                        })
-                        .As<IConsumer>()
-                        .SingleInstance();
-
-                    builder
-                        .RegisterType<ConsumerParcel>()
-                        .As<IHostedService>()
-                        .SingleInstance();
-
-                    builder
-                        .Register(c =>
-                        {
-                            var bootstrapServers = hostContext.Configuration["Kafka:BootstrapServers"]!;
-                            var topic = $"{hostContext.Configuration["Topic"]}" ?? throw new ArgumentException("Configuration has no Topic.");
-                            var suffix = hostContext.Configuration["GroupSuffix"];
                             var consumerGroupId = $"BuildingRegistry.ConsumerParcelItemWithCount.{topic}{suffix}";
 
                             var consumerOptions = new ConsumerOptions(
@@ -168,14 +122,13 @@ namespace BuildingRegistry.Consumer.Read.Parcel.Infrastructure
                                 consumerOptions.ConfigureOffset(new Offset(offset));
                             }
 
-                            var consumer = new Consumer(consumerOptions, c.Resolve<ILoggerFactory>());
-
-                            return new ParcelWithCount.ConsumerParcel(
-                                c.Resolve<IHostApplicationLifetime>(),
-                                c.Resolve<IDbContextFactory<ConsumerParcelContext>>(),
-                                consumer,
-                                c.Resolve<ILoggerFactory>());
+                            return new Consumer(consumerOptions, c.Resolve<ILoggerFactory>());
                         })
+                        .As<IConsumer>()
+                        .SingleInstance();
+
+                    builder
+                        .RegisterType<ConsumerParcel>()
                         .As<IHostedService>()
                         .SingleInstance();
 

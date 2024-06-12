@@ -4,10 +4,9 @@ namespace BuildingRegistry.Api.Oslo.Infrastructure.ParcelMatching
     using System.Collections.Generic;
     using System.Linq;
     using Consumer.Read.Parcel;
-    using Consumer.Read.Parcel.Parcel;
+    using Consumer.Read.Parcel.ParcelWithCount;
     using NetTopologySuite.Geometries;
     using Projections.Legacy;
-    using Projections.Legacy.BuildingDetailV2;
 
     public class ParcelMatching : IParcelMatching
     {
