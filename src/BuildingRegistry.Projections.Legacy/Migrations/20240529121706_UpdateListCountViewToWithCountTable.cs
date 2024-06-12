@@ -39,7 +39,7 @@ namespace BuildingRegistry.Projections.Legacy.Migrations
             WITH SCHEMABINDING
             AS
             SELECT COUNT_BIG(*) as Count
-            FROM [{Infrastructure.Schema.Legacy}].[{BuildingUnitDetailV2.BuildingUnitDetailItemConfiguration.TableName}]
+            FROM [{Infrastructure.Schema.Legacy}].[BuildingUnitDetailsV2]
             WHERE [IsRemoved] = 0");
 
             migrationBuilder.Sql($@"

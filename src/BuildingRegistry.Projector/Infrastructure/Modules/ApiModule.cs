@@ -122,11 +122,6 @@ namespace BuildingRegistry.Projector.Infrastructure.Modules
                             DbaseCodePage.Western_European_ANSI.ToEncoding(),
                             WKBReaderFactory.Create()),
                     ConnectedProjectionSettings.Default)
-                .RegisterProjections<BuildingRegistry.Projections.Extract.BuildingUnitAddressLinkExtract.BuildingUnitAddressLinkExtractProjections, ExtractContext>(
-                    context => new BuildingRegistry.Projections.Extract.BuildingUnitAddressLinkExtract.BuildingUnitAddressLinkExtractProjections(
-                        context.Resolve<IOptions<ExtractConfig>>(),
-                        DbaseCodePage.Western_European_ANSI.ToEncoding()),
-                    ConnectedProjectionSettings.Default)
                 .RegisterProjections<BuildingUnitAddressLinkExtractProjections, ExtractContext>(
                     context => new BuildingUnitAddressLinkExtractProjections(
                         context.Resolve<IOptions<ExtractConfig>>(),
@@ -140,7 +135,7 @@ namespace BuildingRegistry.Projector.Infrastructure.Modules
             builder
                 .RegisterModule(
                     new BuildingUnitLastChangedListModule(
-                        _configuration.GetConnectionString("LastChangedList"),
+                        _configuration.GetConnectionString("LastChangedList")!,
                         _services,
                         _loggerFactory));
         }
@@ -164,12 +159,6 @@ namespace BuildingRegistry.Projector.Infrastructure.Modules
                     _loggerFactory)
                 .RegisterProjections<BuildingDetailV2Projections, LegacyContext>(
                     () => new BuildingDetailV2Projections(),
-                    ConnectedProjectionSettings.Default)
-                .RegisterProjections<BuildingRegistry.Projections.Legacy.BuildingSyndication.BuildingSyndicationProjections, LegacyContext>(
-                    () => new BuildingRegistry.Projections.Legacy.BuildingSyndication.BuildingSyndicationProjections(),
-                    syndicationProjectionSettings)
-                .RegisterProjections<BuildingRegistry.Projections.Legacy.BuildingUnitDetailV2.BuildingUnitDetailV2Projections, LegacyContext>(
-                    () => new BuildingRegistry.Projections.Legacy.BuildingUnitDetailV2.BuildingUnitDetailV2Projections(),
                     ConnectedProjectionSettings.Default)
                 .RegisterProjections<BuildingSyndicationProjections, LegacyContext>(
                     () => new BuildingSyndicationProjections(),

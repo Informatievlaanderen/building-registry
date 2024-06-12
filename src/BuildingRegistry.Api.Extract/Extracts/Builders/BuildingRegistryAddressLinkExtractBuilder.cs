@@ -6,7 +6,7 @@ namespace BuildingRegistry.Api.Extract.Extracts.Builders
     using Be.Vlaanderen.Basisregisters.GrAr.Extracts;
     using Microsoft.EntityFrameworkCore;
     using Projections.Extract;
-    using Projections.Extract.BuildingUnitAddressLinkExtract;
+    using Projections.Extract.BuildingUnitAddressLinkExtractWithCount;
 
     public static class BuildingRegistryAddressLinkExtractBuilder
     {
