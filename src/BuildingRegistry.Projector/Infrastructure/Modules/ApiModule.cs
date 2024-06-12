@@ -34,6 +34,7 @@ namespace BuildingRegistry.Projector.Infrastructure.Modules
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Logging;
     using Microsoft.Extensions.Options;
+    using BuildingVersionFromMigration = BuildingRegistry.Projections.Integration.Building.VersionFromMigration.BuildingVersionProjections;
 
     public class ApiModule : Module
     {
@@ -247,7 +248,18 @@ namespace BuildingRegistry.Projector.Infrastructure.Modules
                         context.Resolve<IOptions<IntegrationOptions>>(),
                         context.Resolve<IPersistentLocalIdFinder>(),
                         context.Resolve<IAddresses>()),
-                    buildingProjectionSettings);
+                    buildingProjectionSettings)
+                .RegisterProjections<BuildingVersionProjections, IntegrationContext>(
+                    context => new BuildingVersionProjections(
+                        context.Resolve<IOptions<IntegrationOptions>>(),
+                        context.Resolve<IPersistentLocalIdFinder>(),
+                        context.Resolve<IAddresses>()),
+                    buildingProjectionSettings)
+                .RegisterProjections<BuildingVersionFromMigration, IntegrationContext>(
+                    context => new BuildingVersionFromMigration(
+                        context.Resolve<IOptions<IntegrationOptions>>()),
+                    buildingProjectionSettings)
+                ;
         }
     }
 }
