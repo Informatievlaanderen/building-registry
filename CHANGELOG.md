@@ -1,3 +1,10 @@
+## [4.9.4](https://github.com/informatievlaanderen/building-registry/compare/v4.9.3...v4.9.4) (2024-06-12)
+
+
+### Bug Fixes
+
+* add missing spatial index to existing migration ([d86494e](https://github.com/informatievlaanderen/building-registry/commit/d86494e922ffbb808621f8458cd7b16b0ad4e081))
+
 ## [4.9.3](https://github.com/informatievlaanderen/building-registry/compare/v4.9.2...v4.9.3) (2024-06-12)
 
 ## [4.9.2](https://github.com/informatievlaanderen/building-registry/compare/v4.9.1...v4.9.2) (2024-06-06)
