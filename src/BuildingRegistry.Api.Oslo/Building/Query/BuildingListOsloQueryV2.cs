@@ -8,7 +8,7 @@ namespace BuildingRegistry.Api.Oslo.Building.Query
     using Be.Vlaanderen.Basisregisters.Api.Search.Sorting;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy.Gebouw;
     using Consumer.Read.Parcel;
-    using Consumer.Read.Parcel.Parcel;
+    using Consumer.Read.Parcel.ParcelWithCount;
     using Converters;
     using Infrastructure.ParcelMatching;
     using Microsoft.EntityFrameworkCore;

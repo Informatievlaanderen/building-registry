@@ -33,7 +33,7 @@ namespace BuildingRegistry.Consumer.Read.Parcel.ParcelWithCount
 
                     foreach (var addressPersistentLocalId in message.AddressPersistentLocalIds)
                     {
-                        await context.AddIdempotentParcelAddressWithCount(parcelId, addressPersistentLocalId, ct);
+                        await context.AddIdempotentParcelAddress(parcelId, addressPersistentLocalId, ct);
                     }
                 }
             });
@@ -87,27 +87,27 @@ namespace BuildingRegistry.Consumer.Read.Parcel.ParcelWithCount
 
             When<ParcelAddressWasAttachedV2>(async (context, message, ct) =>
             {
-                await context.AddIdempotentParcelAddressWithCount(Guid.Parse(message.ParcelId), message.AddressPersistentLocalId, ct);
+                await context.AddIdempotentParcelAddress(Guid.Parse(message.ParcelId), message.AddressPersistentLocalId, ct);
             });
 
             When<ParcelAddressWasDetachedBecauseAddressWasRejected>(async (context, message, ct) =>
             {
-                await context.RemoveIdempotentParcelAddressWithCount(Guid.Parse(message.ParcelId), message.AddressPersistentLocalId, ct);
+                await context.RemoveIdempotentParcelAddress(Guid.Parse(message.ParcelId), message.AddressPersistentLocalId, ct);
             });
 
             When<ParcelAddressWasDetachedBecauseAddressWasRemoved>(async (context, message, ct) =>
             {
-                await context.RemoveIdempotentParcelAddressWithCount(Guid.Parse(message.ParcelId), message.AddressPersistentLocalId, ct);
+                await context.RemoveIdempotentParcelAddress(Guid.Parse(message.ParcelId), message.AddressPersistentLocalId, ct);
             });
 
             When<ParcelAddressWasDetachedBecauseAddressWasRetired>(async (context, message, ct) =>
             {
-                await context.RemoveIdempotentParcelAddressWithCount(Guid.Parse(message.ParcelId), message.AddressPersistentLocalId, ct);
+                await context.RemoveIdempotentParcelAddress(Guid.Parse(message.ParcelId), message.AddressPersistentLocalId, ct);
             });
 
             When<ParcelAddressWasDetachedV2>(async (context, message, ct) =>
             {
-                await context.RemoveIdempotentParcelAddressWithCount(Guid.Parse(message.ParcelId), message.AddressPersistentLocalId, ct);
+                await context.RemoveIdempotentParcelAddress(Guid.Parse(message.ParcelId), message.AddressPersistentLocalId, ct);
             });
 
             When<ParcelAddressWasReplacedBecauseAddressWasReaddressed>(async (context, message, ct) =>
@@ -146,12 +146,12 @@ namespace BuildingRegistry.Consumer.Read.Parcel.ParcelWithCount
             {
                 foreach (var addressPersistentLocalId in message.DetachedAddressPersistentLocalIds)
                 {
-                    await context.RemoveIdempotentParcelAddressWithCount(Guid.Parse(message.ParcelId), addressPersistentLocalId, ct);
+                    await context.RemoveIdempotentParcelAddress(Guid.Parse(message.ParcelId), addressPersistentLocalId, ct);
                 }
 
                 foreach (var addressPersistentLocalId in message.AttachedAddressPersistentLocalIds)
                 {
-                    await context.AddIdempotentParcelAddressWithCount(Guid.Parse(message.ParcelId), addressPersistentLocalId, ct);
+                    await context.AddIdempotentParcelAddress(Guid.Parse(message.ParcelId), addressPersistentLocalId, ct);
                 }
             });
         }
