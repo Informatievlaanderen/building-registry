@@ -10,6 +10,7 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitAddressLinkExtractWit
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore;
     using Building;
     using Building.Events;
+    using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Options;
 
     [ConnectedProjectionName("Extract gebouweenheidkoppelingen met adres")]
@@ -113,7 +114,7 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitAddressLinkExtractWit
                     [message.Message.BuildingUnitPersistentLocalId, message.Message.NewAddressPersistentLocalId],
                     ct);
 
-                if (newAddress is null)
+                if (newAddress is null || context.Entry(newAddress).State == EntityState.Deleted)
                 {
                     await context.BuildingUnitAddressLinkExtractWithCount.AddAsync(
                         new BuildingUnitAddressLinkExtractItem
