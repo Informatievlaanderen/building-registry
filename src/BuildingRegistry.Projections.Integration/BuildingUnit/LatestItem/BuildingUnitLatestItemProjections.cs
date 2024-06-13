@@ -10,6 +10,7 @@ namespace BuildingRegistry.Projections.Integration.BuildingUnit.LatestItem
     using BuildingRegistry.Building.Events;
     using Converters;
     using Infrastructure;
+    using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Options;
 
     [ConnectedProjectionName("Integratie gebouweenheid latest item")]
@@ -554,7 +555,7 @@ namespace BuildingRegistry.Projections.Integration.BuildingUnit.LatestItem
                         var newAddress = await context.BuildingUnitAddresses.FindAsync(
                             [buildingUnit.BuildingUnitPersistentLocalId, message.Message.NewAddressPersistentLocalId], ct);
 
-                        if (newAddress is null)
+                        if (newAddress is null || context.Entry(newAddress).State == EntityState.Deleted)
                         {
                             await context
                                 .BuildingUnitAddresses
