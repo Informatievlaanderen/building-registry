@@ -1,3 +1,10 @@
+## [4.9.5](https://github.com/informatievlaanderen/building-registry/compare/v4.9.4...v4.9.5) (2024-06-14)
+
+
+### Bug Fixes
+
+* check if entity is marked as deleted ([f666f67](https://github.com/informatievlaanderen/building-registry/commit/f666f67f78af1b9975577307cdd511fbb9c794ab))
+
 ## [4.9.4](https://github.com/informatievlaanderen/building-registry/compare/v4.9.3...v4.9.4) (2024-06-12)
 
 
