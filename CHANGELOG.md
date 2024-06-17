@@ -1,3 +1,10 @@
+## [4.9.6](https://github.com/informatievlaanderen/building-registry/compare/v4.9.5...v4.9.6) (2024-06-17)
+
+
+### Bug Fixes
+
+* include navigation properties when loading building version ([e30897e](https://github.com/informatievlaanderen/building-registry/commit/e30897e7d817e7aa0d2c6e5d7c3edfad9cc494f3))
+
 ## [4.9.5](https://github.com/informatievlaanderen/building-registry/compare/v4.9.4...v4.9.5) (2024-06-14)
 
 
