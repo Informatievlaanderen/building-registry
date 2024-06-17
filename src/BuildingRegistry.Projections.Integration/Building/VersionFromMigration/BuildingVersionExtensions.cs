@@ -50,7 +50,9 @@
                    .MaxBy(x => x.Position)
                ?? await context
                    .BuildingVersionsFromMigration
+                   .AsNoTracking()
                    .Where(x => x.BuildingPersistentLocalId == buildingPersistentLocalId)
+                   .Include(x => x.BuildingUnits).ThenInclude(y => y.Addresses)
                    .OrderByDescending(x => x.Position)
                    .FirstOrDefaultAsync(ct);
 

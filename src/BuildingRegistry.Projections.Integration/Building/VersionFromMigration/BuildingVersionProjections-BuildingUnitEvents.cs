@@ -6,8 +6,8 @@ namespace BuildingRegistry.Projections.Integration.Building.VersionFromMigration
     using Be.Vlaanderen.Basisregisters.Utilities.HexByteConvertor;
     using BuildingRegistry.Building;
     using BuildingRegistry.Building.Events;
-    using BuildingRegistry.Projections.Integration.Converters;
-    using BuildingRegistry.Projections.Integration.Infrastructure;
+    using Converters;
+    using Infrastructure;
 
     public sealed partial class BuildingVersionProjections
     {
