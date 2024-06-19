@@ -1,3 +1,10 @@
+## [4.9.7](https://github.com/informatievlaanderen/building-registry/compare/v4.9.6...v4.9.7) (2024-06-19)
+
+
+### Bug Fixes
+
+* **ci:** new deploy lambda tst+stg ([c88e309](https://github.com/informatievlaanderen/building-registry/commit/c88e309c21b128e9d623e351fa18f85af3bbe1ba))
+
 ## [4.9.6](https://github.com/informatievlaanderen/building-registry/compare/v4.9.5...v4.9.6) (2024-06-17)
 
 
