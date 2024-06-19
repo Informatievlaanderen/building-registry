@@ -934,7 +934,7 @@ jobs:
 
   deploy_lambda_to_new_staging:
     if: github.repository_owner == 'Informatievlaanderen'
-    needs: [ deploy_to_new_staging_start_slack, release ]
+    needs: [ deploy_tasks_to_new_staging, deploy_services_to_new_staging, release ]
     name: Deploy lambda to new staging
     runs-on: ubuntu-latest
 
