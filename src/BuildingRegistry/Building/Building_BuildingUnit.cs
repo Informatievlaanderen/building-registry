@@ -81,7 +81,7 @@ namespace BuildingRegistry.Building
             var unusedCommonUnit = _unusedCommonUnits.SingleOrDefault(x => x.BuildingUnitPersistentLocalId == buildingUnitPersistentLocalId);
             if (unusedCommonUnit is not null)
             {
-                if(!unusedCommonUnit.IsRemoved)
+                if (!unusedCommonUnit.IsRemoved)
                 {
                     foreach (var addressPersistentLocalId in unusedCommonUnit.AddressPersistentLocalIds.ToList())
                     {
@@ -231,7 +231,7 @@ namespace BuildingRegistry.Building
             var unusedCommonUnit = _unusedCommonUnits.SingleOrDefault(x => x.BuildingUnitPersistentLocalId == buildingUnitPersistentLocalId);
             if (unusedCommonUnit is not null)
             {
-                if(unusedCommonUnit.AddressPersistentLocalIds.Contains(addressPersistentLocalId))
+                if (unusedCommonUnit.AddressPersistentLocalIds.Contains(addressPersistentLocalId))
                     ApplyChange(new BuildingUnitAddressWasDetachedV2(BuildingPersistentLocalId, buildingUnitPersistentLocalId, addressPersistentLocalId));
 
                 return;
@@ -248,7 +248,7 @@ namespace BuildingRegistry.Building
             var unusedCommonUnit = _unusedCommonUnits.SingleOrDefault(x => x.BuildingUnitPersistentLocalId == buildingUnitPersistentLocalId);
             if (unusedCommonUnit is not null)
             {
-                if(unusedCommonUnit.AddressPersistentLocalIds.Contains(addressPersistentLocalId))
+                if (unusedCommonUnit.AddressPersistentLocalIds.Contains(addressPersistentLocalId))
                     ApplyChange(new BuildingUnitAddressWasDetachedBecauseAddressWasRejected(BuildingPersistentLocalId, buildingUnitPersistentLocalId, addressPersistentLocalId));
 
                 return;
@@ -265,7 +265,7 @@ namespace BuildingRegistry.Building
             var unusedCommonUnit = _unusedCommonUnits.SingleOrDefault(x => x.BuildingUnitPersistentLocalId == buildingUnitPersistentLocalId);
             if (unusedCommonUnit is not null)
             {
-                if(unusedCommonUnit.AddressPersistentLocalIds.Contains(addressPersistentLocalId))
+                if (unusedCommonUnit.AddressPersistentLocalIds.Contains(addressPersistentLocalId))
                     ApplyChange(new BuildingUnitAddressWasDetachedBecauseAddressWasRetired(BuildingPersistentLocalId, buildingUnitPersistentLocalId, addressPersistentLocalId));
 
                 return;
@@ -282,7 +282,7 @@ namespace BuildingRegistry.Building
             var unusedCommonUnit = _unusedCommonUnits.SingleOrDefault(x => x.BuildingUnitPersistentLocalId == buildingUnitPersistentLocalId);
             if (unusedCommonUnit is not null)
             {
-                if(unusedCommonUnit.AddressPersistentLocalIds.Contains(addressPersistentLocalId))
+                if (unusedCommonUnit.AddressPersistentLocalIds.Contains(addressPersistentLocalId))
                     ApplyChange(new BuildingUnitAddressWasDetachedBecauseAddressWasRemoved(BuildingPersistentLocalId, buildingUnitPersistentLocalId, addressPersistentLocalId));
 
                 return;
@@ -291,7 +291,7 @@ namespace BuildingRegistry.Building
                 .GetNotRemovedByPersistentLocalId(buildingUnitPersistentLocalId)
                 .DetachAddressBecauseAddressWasRemoved(addressPersistentLocalId);
         }
-        
+
         public void MoveBuildingUnitInto(
             Building sourceBuilding,
             BuildingUnitPersistentLocalId buildingUnitPersistentLocalId,
@@ -422,31 +422,30 @@ namespace BuildingRegistry.Building
         {
             var commonBuildingUnit = _buildingUnits.CommonBuildingUnit();
 
-            if ((BuildingStatus == BuildingStatus.Planned || BuildingStatus == BuildingStatus.UnderConstruction)
-                && commonBuildingUnit.Status == BuildingUnitStatus.NotRealized)
-            {
-                CorrectBuildingPosition();
+            CorrectBuildingPosition();
 
+            if (commonBuildingUnit.Status == BuildingUnitStatus.NotRealized)
+            {
                 ApplyChange(new BuildingUnitWasCorrectedFromNotRealizedToPlanned(
                     BuildingPersistentLocalId,
                     commonBuildingUnit.BuildingUnitPersistentLocalId));
             }
-            else if (BuildingStatus == BuildingStatus.Realized && commonBuildingUnit.Status == BuildingUnitStatus.NotRealized)
+            else if (commonBuildingUnit.Status == BuildingUnitStatus.Retired)
             {
-                CorrectBuildingPosition();
-
-                ApplyChange(new BuildingUnitWasCorrectedFromNotRealizedToPlanned(
+                ApplyChange(new BuildingUnitWasCorrectedFromRetiredToRealized(
                     BuildingPersistentLocalId,
                     commonBuildingUnit.BuildingUnitPersistentLocalId));
+            }
+
+            if (BuildingStatus == BuildingStatus.Realized && commonBuildingUnit.Status == BuildingUnitStatus.Planned)
+            {
                 ApplyChange(new BuildingUnitWasRealizedV2(
                     BuildingPersistentLocalId,
                     commonBuildingUnit.BuildingUnitPersistentLocalId));
             }
-            else if (BuildingStatus == BuildingStatus.Realized && commonBuildingUnit.Status == BuildingUnitStatus.Retired)
+            else if (BuildingStatus == BuildingStatus.Planned && commonBuildingUnit.Status != BuildingUnitStatus.Planned)
             {
-                CorrectBuildingPosition();
-
-                ApplyChange(new BuildingUnitWasCorrectedFromRetiredToRealized(
+                ApplyChange(new BuildingUnitWasCorrectedFromRealizedToPlanned(
                     BuildingPersistentLocalId,
                     commonBuildingUnit.BuildingUnitPersistentLocalId));
             }
