@@ -205,5 +205,57 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuildingUnit
                             command.BuildingPersistentLocalId,
                             retiredBuildingUnitPersistentLocalId))));
         }
+
+        [Fact]
+        public void WithRetiredCommonBuildingUnitAndPlannedBuilding_ThenCommonBuildingUnitIsPlanned()
+        {
+            var command = Fixture.Create<PlanBuildingUnit>()
+                .WithPersistentLocalId(new BuildingUnitPersistentLocalId(3))
+                .WithoutPosition()
+                .WithDeviation(false);
+
+            var buildingGeometry = new BuildingGeometry(
+                new ExtendedWkbGeometry(GeometryHelper.ValidPolygon.AsBinary()),
+                BuildingGeometryMethod.Outlined);
+
+            var retiredBuildingUnitPersistentLocalId = new BuildingUnitPersistentLocalId(2);
+            var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
+                .WithBuildingPersistentLocalId(command.BuildingPersistentLocalId)
+                .WithBuildingStatus(BuildingStatus.Planned)
+                .WithBuildingGeometry(buildingGeometry)
+                .WithBuildingUnit(
+                    BuildingRegistry.Legacy.BuildingUnitStatus.Planned,
+                    new BuildingUnitPersistentLocalId(1),
+                    positionGeometryMethod: BuildingRegistry.Legacy.BuildingUnitPositionGeometryMethod.AppointedByAdministrator,
+                    extendedWkbGeometry: new BuildingRegistry.Legacy.ExtendedWkbGeometry(buildingGeometry.Center.ToString()))
+                .WithBuildingUnit(
+                    BuildingRegistry.Legacy.BuildingUnitStatus.Retired,
+                    retiredBuildingUnitPersistentLocalId,
+                    BuildingRegistry.Legacy.BuildingUnitFunction.Common)
+                .Build();
+
+            Assert(new Scenario()
+                .Given(
+                    new BuildingStreamId(Fixture.Create<BuildingPersistentLocalId>()),
+                    buildingWasMigrated)
+                .When(command)
+                .Then(
+                    new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
+                        new BuildingUnitWasPlannedV2(
+                            command.BuildingPersistentLocalId,
+                            command.BuildingUnitPersistentLocalId,
+                            command.PositionGeometryMethod,
+                            buildingGeometry.Center,
+                            command.Function,
+                            false)),
+                    new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
+                        new BuildingUnitWasCorrectedFromRetiredToRealized(
+                            command.BuildingPersistentLocalId,
+                            retiredBuildingUnitPersistentLocalId)),
+                    new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
+                        new BuildingUnitWasCorrectedFromRealizedToPlanned(
+                            command.BuildingPersistentLocalId,
+                            retiredBuildingUnitPersistentLocalId))));
+        }
     }
 }
