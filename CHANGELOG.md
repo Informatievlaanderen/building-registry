@@ -1,3 +1,10 @@
+## [4.9.8](https://github.com/informatievlaanderen/building-registry/compare/v4.9.7...v4.9.8) (2024-06-24)
+
+
+### Bug Fixes
+
+* EnsureCommonBuildingUnit when common building unit is retired ([adfc5fa](https://github.com/informatievlaanderen/building-registry/commit/adfc5fad88cb16f9170fba9a38f128ab9c826bf7))
+
 ## [4.9.7](https://github.com/informatievlaanderen/building-registry/compare/v4.9.6...v4.9.7) (2024-06-19)
 
 
