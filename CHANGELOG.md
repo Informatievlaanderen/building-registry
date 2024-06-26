@@ -1,3 +1,10 @@
+## [4.9.9](https://github.com/informatievlaanderen/building-registry/compare/v4.9.8...v4.9.9) (2024-06-26)
+
+
+### Bug Fixes
+
+* limit sync response to max 100 items ([9764617](https://github.com/informatievlaanderen/building-registry/commit/9764617a14cf0af31ea46e4e22d7c9e39675a406))
+
 ## [4.9.8](https://github.com/informatievlaanderen/building-registry/compare/v4.9.7...v4.9.8) (2024-06-24)
 
 
