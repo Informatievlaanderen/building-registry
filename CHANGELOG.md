@@ -1,3 +1,10 @@
+## [4.9.10](https://github.com/informatievlaanderen/building-registry/compare/v4.9.9...v4.9.10) (2024-06-26)
+
+
+### Bug Fixes
+
+* correct previous fix for limit on sync ([5768306](https://github.com/informatievlaanderen/building-registry/commit/5768306bf7afdd461e1ca70860446c275041b66b))
+
 ## [4.9.9](https://github.com/informatievlaanderen/building-registry/compare/v4.9.8...v4.9.9) (2024-06-26)
 
 
