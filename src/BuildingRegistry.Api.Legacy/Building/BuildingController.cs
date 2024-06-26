@@ -82,7 +82,7 @@ namespace BuildingRegistry.Api.Legacy.Building
         /// Vraag een lijst met actieve gebouwn op.
         /// </summary>
         /// <param name="cancellationToken"></param>
-        /// <response code="200">Als de opvraging van een lijst met gebouwn gelukt is.</response>
+        /// <response code="200">Als de opvraging van een lijst met gebouwen gelukt is.</response>
         /// <response code="500">Als er een interne fout is opgetreden.</response>
         [HttpGet]
         [ProducesResponseType(typeof(BuildingListResponse), StatusCodes.Status200OK)]
@@ -97,7 +97,7 @@ namespace BuildingRegistry.Api.Legacy.Building
                 new ListRequest(
                     Request.ExtractFilteringRequest<BuildingFilter>(),
                     Request.ExtractSortingRequest(),
-                    Request.ExtractPaginationRequest()),
+                    Request.ExtractPaginationRequest(maxLimit:100)),
                 cancellationToken);
 
             Response.AddPaginationResponse(listResponse.Pagination);
