@@ -97,7 +97,7 @@ namespace BuildingRegistry.Api.Legacy.Building
                 new ListRequest(
                     Request.ExtractFilteringRequest<BuildingFilter>(),
                     Request.ExtractSortingRequest(),
-                    Request.ExtractPaginationRequest(maxLimit:100)),
+                    Request.ExtractPaginationRequest()),
                 cancellationToken);
 
             Response.AddPaginationResponse(listResponse.Pagination);
@@ -151,7 +151,7 @@ namespace BuildingRegistry.Api.Legacy.Building
             var response = await _mediator.Send(new SyncRequest(
                 Request.ExtractFilteringRequest<BuildingSyndicationFilter>(),
                 Request.ExtractSortingRequest(),
-                Request.ExtractPaginationRequest()
+                Request.ExtractPaginationRequest(maxLimit:100)
             ), cancellationToken);
 
             return new ContentResult
