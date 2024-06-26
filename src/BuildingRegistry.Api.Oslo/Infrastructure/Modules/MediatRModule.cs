@@ -4,6 +4,7 @@ namespace BuildingRegistry.Api.Oslo.Infrastructure.Modules
     using Building.Count;
     using Building.Detail;
     using Building.List;
+    using Building.Sync;
     using BuildingUnit.Count;
     using BuildingUnit.Detail;
     using BuildingUnit.List;
@@ -26,6 +27,8 @@ namespace BuildingRegistry.Api.Oslo.Infrastructure.Modules
             builder.RegisterType<BuildingUnitCountHandlerV2>().AsImplementedInterfaces();
             builder.RegisterType<BuildingUnitDetailHandlerV2>().AsImplementedInterfaces();
             builder.RegisterType<BuildingUnitListHandlerV2>().AsImplementedInterfaces();
+
+            builder.RegisterType<BuildingSyncHandler>().AsImplementedInterfaces();
         }
     }
 }
