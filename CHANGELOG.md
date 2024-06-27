@@ -1,3 +1,10 @@
+## [4.9.11](https://github.com/informatievlaanderen/building-registry/compare/v4.9.10...v4.9.11) (2024-06-27)
+
+
+### Bug Fixes
+
+* **integration:** add more efficient method retrievingpersistentlocalid ([c42cd8d](https://github.com/informatievlaanderen/building-registry/commit/c42cd8da9ef16723d2ba2e788c64697b45660aef))
+
 ## [4.9.10](https://github.com/informatievlaanderen/building-registry/compare/v4.9.9...v4.9.10) (2024-06-26)
 
 
