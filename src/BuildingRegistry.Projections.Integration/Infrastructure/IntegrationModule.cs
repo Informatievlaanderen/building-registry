@@ -17,7 +17,7 @@ namespace BuildingRegistry.Projections.Integration.Infrastructure
         {
             var logger = loggerFactory.CreateLogger<IntegrationModule>();
             services.AddScoped<IPersistentLocalIdFinder, PersistentLocalIdFinder>(_ =>
-                new PersistentLocalIdFinder(configuration.GetConnectionString("Events")));
+                new PersistentLocalIdFinder(configuration.GetConnectionString("Events"), configuration.GetConnectionString("LegacyProjections")));
             var connectionString = configuration.GetConnectionString("IntegrationProjections");
 
             services.AddScoped<IAddresses, Addresses>(_ => new Addresses(connectionString));

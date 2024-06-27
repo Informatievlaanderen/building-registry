@@ -15,14 +15,29 @@
     public class PersistentLocalIdFinder : IPersistentLocalIdFinder
     {
         private readonly string _eventsConnectionString;
+        private readonly string _legacyProjectionsConnectionString;
 
-        public PersistentLocalIdFinder(string eventsConnectionString)
+        public PersistentLocalIdFinder(string eventsConnectionString, string legacyProjectionsConnectionString)
         {
             _eventsConnectionString = eventsConnectionString;
+            _legacyProjectionsConnectionString = legacyProjectionsConnectionString;
         }
 
         public async Task<int?> FindBuildingPersistentLocalId(Guid buildingId)
         {
+            await using var projectionsConnection = new SqlConnection(_legacyProjectionsConnectionString);
+
+            var sqlProjections = @"
+SELECT TOP 1 PersistentLocalId
+FROM [building-registry].[BuildingRegistryLegacy].[BuildingSyndicationWithCount]
+WHERE BuildingId = @BuildingId AND PersistentLocalId IS NOT NULL";
+
+            var buildingPersistentLocalIdByProjection = await projectionsConnection.QuerySingleOrDefaultAsync<int?>(
+                sqlProjections, new { BuildingId = buildingId });
+
+            if(buildingPersistentLocalIdByProjection.HasValue)
+                return buildingPersistentLocalIdByProjection;
+
             await using var connection = new SqlConnection(_eventsConnectionString);
 
             var sql = @"
@@ -40,6 +55,21 @@ WHERE s.Id = @BuildingId";
 
         public async Task<int?> FindBuildingUnitPersistentLocalId(Guid buildingId, Guid buildingUnitId)
         {
+            await using var projectionsConnection = new SqlConnection(_legacyProjectionsConnectionString);
+
+            var sqlProjections = @"
+SELECT TOP 1 bu.PersistentLocalId
+FROM [building-registry].[BuildingRegistryLegacy].[BuildingUnitSyndicationWithCount] bu
+INNER JOIN [building-registry].[BuildingRegistryLegacy].[BuildingSyndicationWithCount] b
+    on b.Position = bu.Position and b.BuildingId = @BuildingId
+WHERE bu.BuildingUnitId = @BuildingUnitId AND bu.PersistentLocalId IS NOT NULL";
+
+            var buildingUnitPersistentLocalIdByProjection = await projectionsConnection.QuerySingleOrDefaultAsync<int?>(
+                sqlProjections, new { BuildingId = buildingId, BuildingUnitId = buildingUnitId });
+
+            if(buildingUnitPersistentLocalIdByProjection.HasValue)
+                return buildingUnitPersistentLocalIdByProjection;
+
             await using var connection = new SqlConnection(_eventsConnectionString);
 
             var sql = @"
