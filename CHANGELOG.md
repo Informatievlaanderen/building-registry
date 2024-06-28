@@ -1,3 +1,15 @@
+# [4.10.0](https://github.com/informatievlaanderen/building-registry/compare/v4.9.11...v4.10.0) (2024-06-28)
+
+
+### Bug Fixes
+
+* don't use user transaction, but use ef savechanges instead ([fdcbefd](https://github.com/informatievlaanderen/building-registry/commit/fdcbefd3600589a819de25ee9a549d7cd5b6c93a))
+
+
+### Features
+
+* add syndication to oslo api ([b03a7f3](https://github.com/informatievlaanderen/building-registry/commit/b03a7f31a1bd9ab08804cb6a9011df5ca941375f))
+
 ## [4.9.11](https://github.com/informatievlaanderen/building-registry/compare/v4.9.10...v4.9.11) (2024-06-27)
 
 
