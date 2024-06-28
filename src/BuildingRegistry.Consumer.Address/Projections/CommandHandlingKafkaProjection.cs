@@ -13,7 +13,6 @@ namespace BuildingRegistry.Consumer.Address.Projections
     using Building;
     using Building.Commands;
     using Microsoft.EntityFrameworkCore;
-    using NodaTime;
     using NodaTime.Text;
     using Contracts = Be.Vlaanderen.Basisregisters.GrAr.Contracts.Common;
     using Provenance = Be.Vlaanderen.Basisregisters.GrAr.Provenance.Provenance;
