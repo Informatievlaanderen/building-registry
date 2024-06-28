@@ -1,3 +1,10 @@
+## [4.10.1](https://github.com/informatievlaanderen/building-registry/compare/v4.10.0...v4.10.1) (2024-06-28)
+
+
+### Bug Fixes
+
+* conditionally save changes ([95af855](https://github.com/informatievlaanderen/building-registry/commit/95af8557d0dbcce4a6a3fba33b3f5051fef154ae))
+
 # [4.10.0](https://github.com/informatievlaanderen/building-registry/compare/v4.9.11...v4.10.0) (2024-06-28)
 
 
