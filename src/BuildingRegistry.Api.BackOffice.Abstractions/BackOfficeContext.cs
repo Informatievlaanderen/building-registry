@@ -110,7 +110,12 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions
                 relation = new BuildingUnitAddressRelation(buildingPersistentLocalId, buildingUnitPersistentLocalId,
                     addressPersistentLocalId);
                 await BuildingUnitAddressRelation.AddAsync(relation, cancellationToken);
-                await SaveChangesAsync(cancellationToken);
+
+                if (saveChanges)
+                {
+                    await SaveChangesAsync(cancellationToken);
+                }
+
             }
             catch (DbUpdateException exception)
             {
@@ -144,7 +149,11 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions
             }
 
             BuildingUnitAddressRelation.Remove(relation);
-            await SaveChangesAsync(cancellationToken);
+
+            if (saveChanges)
+            {
+                await SaveChangesAsync(cancellationToken);
+            }
         }
 
         public async Task<BuildingUnitAddressRelation?> FindBuildingUnitAddressRelation(
