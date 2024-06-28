@@ -163,7 +163,7 @@ namespace BuildingRegistry.Consumer.Address.Projections
                     message.Provenance,
                     ct);
             });
-            
+
             When<StreetNameWasReaddressed>(async (commandHandler, message, ct) =>
             {
                 await using var backOfficeContext = await _backOfficeContextFactory.CreateDbContextAsync(ct);
@@ -228,8 +228,6 @@ namespace BuildingRegistry.Consumer.Address.Projections
                     }
                 }
 
-                await backOfficeContext.Database.BeginTransactionAsync();
-                
                 var commandBuildingPersistentLocalIds = commandByBuildings.Values.Select(x => (int)x.BuildingPersistentLocalId).ToList();
                 var allBackOfficeBuildingUnitAddressRelations = (await backOfficeContext.BuildingUnitAddressRelation
                         .AsNoTracking()
@@ -257,17 +255,19 @@ namespace BuildingRegistry.Consumer.Address.Projections
 
                         foreach (var addressPersistentLocalId in addressesToRemove)
                         {
-                            await backOfficeContext.RemoveIdempotentBuildingUnitAddressRelation(buildingUnitPersistentLocalId, addressPersistentLocalId, ct);
+                            await backOfficeContext.RemoveIdempotentBuildingUnitAddressRelation(
+                                buildingUnitPersistentLocalId, addressPersistentLocalId, ct, saveChanges: false);
                         }
 
                         foreach (var addressPersistentLocalId in addressesToAdd)
                         {
-                            await backOfficeContext.AddIdempotentBuildingUnitAddressRelation(buildingPersistentLocalId, buildingUnitPersistentLocalId, addressPersistentLocalId, ct);
+                            await backOfficeContext.AddIdempotentBuildingUnitAddressRelation(
+                                buildingPersistentLocalId, buildingUnitPersistentLocalId, addressPersistentLocalId, ct, saveChanges: false);
                         }
                     }
-                }
 
-                await backOfficeContext.Database.CommitTransactionAsync();
+                    await backOfficeContext.SaveChangesAsync(ct);
+                }
             });
 
             When<AddressWasRejectedBecauseOfReaddress>(async (commandHandler, message, ct) =>
@@ -288,7 +288,7 @@ namespace BuildingRegistry.Consumer.Address.Projections
                     ct);
             });
         }
-        
+
         private async Task DetachBecauseRemoved(
             CommandHandler commandHandler,
             AddressPersistentLocalId addressPersistentLocalId,

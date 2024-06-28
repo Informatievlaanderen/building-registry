@@ -96,7 +96,8 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions
             BuildingPersistentLocalId buildingPersistentLocalId,
             BuildingUnitPersistentLocalId buildingUnitPersistentLocalId,
             AddressPersistentLocalId addressPersistentLocalId,
-            CancellationToken cancellationToken)
+            CancellationToken cancellationToken,
+            bool saveChanges = true)
         {
             var relation = await FindBuildingUnitAddressRelation(buildingUnitPersistentLocalId, addressPersistentLocalId, cancellationToken);
             if (relation is not null)
@@ -132,7 +133,8 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions
         public async Task RemoveIdempotentBuildingUnitAddressRelation(
             BuildingUnitPersistentLocalId buildingUnitPersistentLocalId,
             AddressPersistentLocalId addressPersistentLocalId,
-            CancellationToken cancellationToken)
+            CancellationToken cancellationToken,
+            bool saveChanges = true)
         {
             var relation = await FindBuildingUnitAddressRelation(buildingUnitPersistentLocalId, addressPersistentLocalId, cancellationToken);
 
