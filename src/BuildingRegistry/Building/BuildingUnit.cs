@@ -301,6 +301,36 @@ namespace BuildingRegistry.Building
                 BuildingUnitPersistentLocalId));
         }
 
+        public void CorrectRemoval(BuildingGeometry buildingGeometry)
+        {
+            GuardCommonUnit();
+
+            if (!IsRemoved)
+            {
+                return;
+            }
+
+            var correctedBuildingUnitPosition = CorrectedBuildingUnitPosition(buildingGeometry);
+
+            if (correctedBuildingUnitPosition is not null)
+            {
+                Apply(new BuildingUnitPositionWasCorrected(
+                    _buildingPersistentLocalId,
+                    BuildingUnitPersistentLocalId,
+                    BuildingUnitPositionGeometryMethod.DerivedFromObject,
+                    correctedBuildingUnitPosition));
+            }
+
+            Apply(new BuildingUnitRemovalWasCorrected(
+                _buildingPersistentLocalId,
+                BuildingUnitPersistentLocalId,
+                Status,
+                Function,
+                BuildingUnitPosition.GeometryMethod,
+                BuildingUnitPosition.Geometry,
+                HasDeviation));
+        }
+
         public void CorrectPosition(BuildingUnitPositionGeometryMethod positionGeometryMethod, ExtendedWkbGeometry finalPosition)
         {
             GuardRemoved();

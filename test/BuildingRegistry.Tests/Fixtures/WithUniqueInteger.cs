@@ -7,6 +7,12 @@
     {
         private int _lastInt;
 
+        public WithUniqueInteger(int? startPosition = null)
+        {
+            if (startPosition.HasValue)
+                _lastInt = startPosition.Value;
+        }
+
         public object Create(object request, ISpecimenContext context)
         {
             if (request is not Type type || type != typeof(int))

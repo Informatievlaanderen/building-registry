@@ -123,7 +123,7 @@ namespace BuildingRegistry.Building
                     var streamId = new BuildingStreamId(message.Command.BuildingPersistentLocalId);
                     var building = await buildingRepository().GetAsync(streamId, ct);
 
-                    building.CorrectRealizeBuildingUnit(message.Command.BuildingUnitPersistentLocalId);
+                    building.CorrectBuildingUnitRealization(message.Command.BuildingUnitPersistentLocalId);
                 });
 
             For<CorrectBuildingUnitNotRealization>()
@@ -135,7 +135,7 @@ namespace BuildingRegistry.Building
                     var streamId = new BuildingStreamId(message.Command.BuildingPersistentLocalId);
                     var building = await buildingRepository().GetAsync(streamId, ct);
 
-                    building.CorrectNotRealizeBuildingUnit(addCommonBuildingUnit, message.Command.BuildingUnitPersistentLocalId);
+                    building.CorrectBuildingUnitNotRealization(addCommonBuildingUnit, message.Command.BuildingUnitPersistentLocalId);
                 });
 
             For<CorrectBuildingUnitRetirement>()
@@ -147,7 +147,19 @@ namespace BuildingRegistry.Building
                     var streamId = new BuildingStreamId(message.Command.BuildingPersistentLocalId);
                     var building = await buildingRepository().GetAsync(streamId, ct);
 
-                    building.CorrectRetiredBuildingUnit(addCommonBuildingUnit, message.Command.BuildingUnitPersistentLocalId);
+                    building.CorrectBuildingUnitRetirement(addCommonBuildingUnit, message.Command.BuildingUnitPersistentLocalId);
+                });
+
+            For<CorrectBuildingUnitRemoval>()
+                .AddSqlStreamStore(getStreamStore, getUnitOfWork, eventMapping, eventSerializer, getSnapshotStore)
+                .AddEventHash<CorrectBuildingUnitRemoval, Building>(getUnitOfWork)
+                .AddProvenance(getUnitOfWork, provenanceFactory)
+                .Handle(async (message, ct) =>
+                {
+                    var streamId = new BuildingStreamId(message.Command.BuildingPersistentLocalId);
+                    var building = await buildingRepository().GetAsync(streamId, ct);
+
+                    building.CorrectBuildingUnitRemoval(addCommonBuildingUnit, message.Command.BuildingUnitPersistentLocalId);
                 });
 
             For<CorrectBuildingUnitPosition>()
@@ -159,7 +171,7 @@ namespace BuildingRegistry.Building
                     var streamId = new BuildingStreamId(message.Command.BuildingPersistentLocalId);
                     var building = await buildingRepository().GetAsync(streamId, ct);
 
-                    building.CorrectPositionBuildingUnit(message.Command.BuildingUnitPersistentLocalId, message.Command.PositionGeometryMethod, message.Command.Position);
+                    building.CorrectBuildingUnitPosition(message.Command.BuildingUnitPersistentLocalId, message.Command.PositionGeometryMethod, message.Command.Position);
                 });
 
             For<CorrectBuildingUnitRegularization>()
@@ -171,7 +183,7 @@ namespace BuildingRegistry.Building
                     var streamId = new BuildingStreamId(message.Command.BuildingPersistentLocalId);
                     var building = await buildingRepository().GetAsync(streamId, ct);
 
-                    building.CorrectRegularizationBuildingUnit(message.Command.BuildingUnitPersistentLocalId);
+                    building.CorrectBuildingUnitRegularization(message.Command.BuildingUnitPersistentLocalId);
                 });
 
             For<CorrectBuildingUnitDeregulation>()
@@ -183,7 +195,7 @@ namespace BuildingRegistry.Building
                     var streamId = new BuildingStreamId(message.Command.BuildingPersistentLocalId);
                     var building = await buildingRepository().GetAsync(streamId, ct);
 
-                    building.CorrectDeregulationBuildingUnit(message.Command.BuildingUnitPersistentLocalId);
+                    building.CorrectBuildingUnitDeregulation(message.Command.BuildingUnitPersistentLocalId);
                 });
 
             For<AttachAddressToBuildingUnit>()
@@ -245,7 +257,7 @@ namespace BuildingRegistry.Building
 
                     building.DetachAddressFromBuildingUnitBecauseAddressWasRemoved(message.Command.BuildingUnitPersistentLocalId, message.Command.AddressPersistentLocalId);
                 });
-            
+
             For<RealizeUnplannedBuildingUnit>()
                 .AddSqlStreamStore(getStreamStore, getUnitOfWork, eventMapping, eventSerializer, getSnapshotStore)
                 .AddEventHash<RealizeUnplannedBuildingUnit, Building>(getUnitOfWork)
