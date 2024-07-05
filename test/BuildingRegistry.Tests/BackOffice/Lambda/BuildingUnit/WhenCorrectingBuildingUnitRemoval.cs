@@ -136,33 +136,6 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
         }
 
         [Fact]
-        public async Task WithInvalidBuildingUnitStatus_ThenTicketingErrorIsExpected()
-        {
-            // Arrange
-            var ticketing = new Mock<ITicketing>();
-
-            var handler = new CorrectBuildingUnitRemovalLambdaHandler(
-                Container.Resolve<IConfiguration>(),
-                new FakeRetryPolicy(),
-                ticketing.Object,
-                MockExceptionIdempotentCommandHandler<BuildingUnitHasInvalidStatusException>().Object,
-                Container.Resolve<IBuildings>(),
-                new FakeBackOfficeContextFactory().CreateDbContext());
-
-            // Act
-            await handler.Handle(CreateCorrectBuildingUnitRemovalLambdaRequest(), CancellationToken.None);
-
-            //Assert
-            ticketing.Verify(x =>
-                x.Error(
-                    It.IsAny<Guid>(),
-                    new TicketError(
-                        "InvalidBuildingUnitStatusMessage",
-                        "InvalidBuildingUnitStatusCode"),
-                    CancellationToken.None));
-        }
-
-        [Fact]
         public async Task WithInvalidBuildingUnitFunction_ThenTicketingErrorIsExpected()
         {
             // Arrange

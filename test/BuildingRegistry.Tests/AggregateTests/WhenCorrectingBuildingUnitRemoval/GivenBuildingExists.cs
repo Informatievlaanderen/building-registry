@@ -98,13 +98,6 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitRemova
                 .Then(
                     new Fact(
                         new BuildingStreamId(command.BuildingPersistentLocalId),
-                        new BuildingUnitPositionWasCorrected(
-                            command.BuildingPersistentLocalId,
-                            command.BuildingUnitPersistentLocalId,
-                            BuildingRegistry.Building.BuildingUnitPositionGeometryMethod.DerivedFromObject,
-                            buildingGeometry.Center)),
-                    new Fact(
-                        new BuildingStreamId(command.BuildingPersistentLocalId),
                         new BuildingUnitRemovalWasCorrected(
                             command.BuildingPersistentLocalId,
                             command.BuildingUnitPersistentLocalId,
@@ -173,15 +166,22 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitRemova
         [Theory]
         [InlineData("Planned")]
         [InlineData("UnderConstruction")]
-        public void WithInvalidBuildingUnitStatus_ThenThrowsBuildingUnitHasInvalidStatusException(string buildingStatus)
+        public void WithBuildingUnitStatusBehindBuildingUnitStatus_ThenCorrectBuildingUnitStatusException(string buildingStatus)
         {
             var command = Fixture.Create<CorrectBuildingUnitRemoval>();
 
+            var buildingGeometry = new BuildingGeometry(
+                new ExtendedWkbGeometry(GeometryHelper.ValidPolygon.AsBinary()),
+                BuildingGeometryMethod.Outlined);
+
             var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
                 .WithBuildingStatus(BuildingStatus.Parse(buildingStatus))
+                .WithBuildingGeometry(buildingGeometry)
                 .WithBuildingUnit(
                     buildingUnitPersistentLocalId: command.BuildingUnitPersistentLocalId,
-                    status: BuildingUnitStatus.Realized)
+                    status: BuildingUnitStatus.Realized,
+                    positionGeometryMethod: BuildingUnitPositionGeometryMethod.DerivedFromObject,
+                    isRemoved: true)
                 .Build();
 
             Assert(new Scenario()
@@ -189,7 +189,17 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitRemova
                     new BuildingStreamId(Fixture.Create<BuildingPersistentLocalId>()),
                     buildingWasMigrated)
                 .When(command)
-                .Throws(new BuildingUnitHasInvalidStatusException()));
+                .Then(
+                    new Fact(
+                        new BuildingStreamId(command.BuildingPersistentLocalId),
+                        new BuildingUnitRemovalWasCorrected(
+                            command.BuildingPersistentLocalId,
+                            command.BuildingUnitPersistentLocalId,
+                            BuildingRegistry.Building.BuildingUnitStatus.Planned,
+                            BuildingRegistry.Building.BuildingUnitFunction.Unknown,
+                            BuildingRegistry.Building.BuildingUnitPositionGeometryMethod.DerivedFromObject,
+                            buildingGeometry.Center,
+                            false))));
         }
 
         [Fact]

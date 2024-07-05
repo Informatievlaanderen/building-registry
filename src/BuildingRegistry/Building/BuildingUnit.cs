@@ -301,7 +301,9 @@ namespace BuildingRegistry.Building
                 BuildingUnitPersistentLocalId));
         }
 
-        public void CorrectRemoval(BuildingGeometry buildingGeometry)
+        public void CorrectRemoval(
+            BuildingGeometry buildingGeometry,
+            BuildingStatus buildingStatus)
         {
             GuardCommonUnit();
 
@@ -310,24 +312,30 @@ namespace BuildingRegistry.Building
                 return;
             }
 
-            var correctedBuildingUnitPosition = CorrectedBuildingUnitPosition(buildingGeometry);
+            var position = BuildingUnitPosition.Geometry;
+            var positionMethod = BuildingUnitPosition.GeometryMethod;
 
+            var correctedBuildingUnitPosition = CorrectedBuildingUnitPosition(buildingGeometry);
             if (correctedBuildingUnitPosition is not null)
             {
-                Apply(new BuildingUnitPositionWasCorrected(
-                    _buildingPersistentLocalId,
-                    BuildingUnitPersistentLocalId,
-                    BuildingUnitPositionGeometryMethod.DerivedFromObject,
-                    correctedBuildingUnitPosition));
+                position = correctedBuildingUnitPosition;
+                positionMethod = BuildingUnitPositionGeometryMethod.DerivedFromObject;
+            }
+
+            var status = Status;
+            if ((buildingStatus == BuildingStatus.Planned || buildingStatus == BuildingStatus.UnderConstruction)
+                && Status == BuildingUnitStatus.Realized)
+            {
+                status = BuildingUnitStatus.Planned;
             }
 
             Apply(new BuildingUnitRemovalWasCorrected(
                 _buildingPersistentLocalId,
                 BuildingUnitPersistentLocalId,
-                Status,
+                status,
                 Function,
-                BuildingUnitPosition.GeometryMethod,
-                BuildingUnitPosition.Geometry,
+                positionMethod,
+                position,
                 HasDeviation));
         }
 

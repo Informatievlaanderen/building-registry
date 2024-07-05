@@ -71,10 +71,6 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.BuildingUnit
                     ValidationErrors.CorrectBuildingUnitRemoval.InvalidBuildingStatus.Message,
                     ValidationErrors.CorrectBuildingUnitRemoval.InvalidBuildingStatus.Code),
 
-                BuildingUnitHasInvalidStatusException => new TicketError(
-                    ValidationErrors.CorrectBuildingUnitRemoval.InvalidBuildingUnitStatus.Message,
-                    ValidationErrors.CorrectBuildingUnitRemoval.InvalidBuildingUnitStatus.Code),
-
                 BuildingUnitHasInvalidFunctionException => new TicketError(
                     ValidationErrors.Common.CommonBuildingUnit.InvalidFunction.Message,
                     ValidationErrors.Common.CommonBuildingUnit.InvalidFunction.Code),

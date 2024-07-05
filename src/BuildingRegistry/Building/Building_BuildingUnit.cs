@@ -181,13 +181,7 @@ namespace BuildingRegistry.Building
             var buildingUnit = _buildingUnits
                 .GetByPersistentLocalId(buildingUnitPersistentLocalId);
 
-            if ((BuildingStatus == BuildingStatus.Planned || BuildingStatus == BuildingStatus.UnderConstruction)
-                && buildingUnit.Status == BuildingUnitStatus.Realized)
-            {
-                throw new BuildingUnitHasInvalidStatusException();
-            }
-
-            buildingUnit.CorrectRemoval(BuildingGeometry);
+            buildingUnit.CorrectRemoval(BuildingGeometry, BuildingStatus);
 
             EnsureCommonBuildingUnit(addCommonBuildingUnit);
         }
