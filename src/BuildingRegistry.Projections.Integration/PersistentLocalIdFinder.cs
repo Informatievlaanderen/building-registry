@@ -2,9 +2,9 @@
 {
     using System;
     using System.Threading.Tasks;
-    using Be.Vlaanderen.Basisregisters.Utilities;
     using Dapper;
     using Microsoft.Data.SqlClient;
+    using Npgsql;
 
     public interface IPersistentLocalIdFinder
     {
@@ -16,11 +16,16 @@
     {
         private readonly string _eventsConnectionString;
         private readonly string _legacyProjectionsConnectionString;
+        private readonly string _integrationConnectionString;
 
-        public PersistentLocalIdFinder(string eventsConnectionString, string legacyProjectionsConnectionString)
+        public PersistentLocalIdFinder(
+            string eventsConnectionString,
+            string legacyProjectionsConnectionString,
+            string integrationConnectionString)
         {
             _eventsConnectionString = eventsConnectionString;
             _legacyProjectionsConnectionString = legacyProjectionsConnectionString;
+            _integrationConnectionString = integrationConnectionString;
         }
 
         public async Task<int?> FindBuildingPersistentLocalId(Guid buildingId)
@@ -55,6 +60,14 @@ WHERE s.Id = @BuildingId";
 
         public async Task<int?> FindBuildingUnitPersistentLocalId(Guid buildingId, Guid buildingUnitId)
         {
+            await using var integrationConnection = new NpgsqlConnection(_integrationConnectionString);
+            var buildingUnitPersistentLocalIdByIntegration = await integrationConnection.QuerySingleOrDefaultAsync<int?>(
+                "SELECT building_unit_persistent_local_id FROM integration_building.building_unit_ids WHERE building_unit_id = @BuildingUnitId",
+                new { BuildingUnitId = buildingUnitId });
+
+            if(buildingUnitPersistentLocalIdByIntegration.HasValue)
+                return buildingUnitPersistentLocalIdByIntegration;
+
             await using var projectionsConnection = new SqlConnection(_legacyProjectionsConnectionString);
 
             var sqlProjections = @"
