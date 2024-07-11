@@ -32,7 +32,7 @@ namespace BuildingRegistry.Tests.Legacy
 
         protected override void RunTestCases(IEnumerable<IXunitTestCase> testCases, IMessageSink executionMessageSink, ITestFrameworkExecutionOptions executionOptions)
         {
-            var filteredTestCases = testCases.Where(tc => !tc.TestMethod.TestClass.Class.Name.Contains(".Legacy."));
+            var filteredTestCases = testCases.Where(tc => !tc.TestMethod.TestClass.Class.Name.StartsWith("BuildingRegistry.Tests.Legacy."));
             base.RunTestCases(filteredTestCases, executionMessageSink, executionOptions);
         }
     }

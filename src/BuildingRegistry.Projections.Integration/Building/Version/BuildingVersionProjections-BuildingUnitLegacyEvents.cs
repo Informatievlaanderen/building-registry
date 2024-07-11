@@ -15,6 +15,8 @@ namespace BuildingRegistry.Projections.Integration.Building.Version
 
     public sealed partial class BuildingVersionProjections
     {
+        private const int InvalidAddressPersistentLocalId = -1;
+
         private void RegisterLegacyBuildingUnitEvents(
             IntegrationOptions options,
             IPersistentLocalIdFinder persistentLocalIdFinder,
@@ -35,7 +37,9 @@ namespace BuildingRegistry.Projections.Integration.Building.Version
 
                 if (addressPersistentLocalId is null)
                 {
-                    throw new InvalidOperationException($"No address persistent local id found for {message.Message.AddressId}");
+                    await addresses.AddAddressPersistentLocalId(message.Message.AddressId, InvalidAddressPersistentLocalId);
+                    addressPersistentLocalId = InvalidAddressPersistentLocalId;
+                    //throw new InvalidOperationException($"No address persistent local id found for {message.Message.AddressId}");
                 }
 
                 await context.CreateNewBuildingVersion(
@@ -106,7 +110,9 @@ namespace BuildingRegistry.Projections.Integration.Building.Version
 
                 if (addressPersistentLocalId is null)
                 {
-                    throw new InvalidOperationException($"No address persistent local id found for {message.Message.AddressId}");
+                    await addresses.AddAddressPersistentLocalId(message.Message.AddressId, InvalidAddressPersistentLocalId);
+                    addressPersistentLocalId = InvalidAddressPersistentLocalId;
+                    //throw new InvalidOperationException($"No address persistent local id found for {message.Message.AddressId}");
                 }
 
                 await context.CreateNewBuildingVersion(
@@ -247,7 +253,9 @@ namespace BuildingRegistry.Projections.Integration.Building.Version
 
                 if (addressPersistentLocalId is null)
                 {
-                    throw new InvalidOperationException($"No address persistent local id found for {message.Message.AddressId}");
+                    await addresses.AddAddressPersistentLocalId(message.Message.AddressId, InvalidAddressPersistentLocalId);
+                    addressPersistentLocalId = InvalidAddressPersistentLocalId;
+                    //throw new InvalidOperationException($"No address persistent local id found for {message.Message.AddressId}");
                 }
 
                 await context.CreateNewBuildingVersion(
@@ -284,8 +292,7 @@ namespace BuildingRegistry.Projections.Integration.Building.Version
             {
                 await context.CreateNewBuildingVersion(
                     message.Message.BuildingId,
-                    message,
-                    building =>
+                    message, building =>
                     {
                         var buildingUnitVersion =
                             building.BuildingUnits.Single(x => x.BuildingUnitId == message.Message.From);
@@ -297,7 +304,9 @@ namespace BuildingRegistry.Projections.Integration.Building.Version
 
                             if (addressPersistentLocalId is null)
                             {
-                                throw new InvalidOperationException($"No address persistent local id found for {addressId}");
+                                addresses.AddAddressPersistentLocalId(addressId, InvalidAddressPersistentLocalId).GetAwaiter().GetResult();
+                                addressPersistentLocalId = InvalidAddressPersistentLocalId;
+                                //throw new InvalidOperationException($"No address persistent local id found for {addressId}");
                             }
 
                             var address = buildingUnitVersion.Addresses
