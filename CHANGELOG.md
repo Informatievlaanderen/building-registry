@@ -1,3 +1,10 @@
+## [4.10.3](https://github.com/informatievlaanderen/building-registry/compare/v4.10.2...v4.10.3) (2024-07-11)
+
+
+### Bug Fixes
+
+* **integration:** insert invalid pers id for addressid not found ([b6854bf](https://github.com/informatievlaanderen/building-registry/commit/b6854bf42c289fa8a72d39ff00d2e0350673f16b))
+
 ## [4.10.2](https://github.com/informatievlaanderen/building-registry/compare/v4.10.1...v4.10.2) (2024-07-05)
 
 ## [4.10.1](https://github.com/informatievlaanderen/building-registry/compare/v4.10.0...v4.10.1) (2024-06-28)
