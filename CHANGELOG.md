@@ -1,3 +1,10 @@
+## [4.10.4](https://github.com/informatievlaanderen/building-registry/compare/v4.10.3...v4.10.4) (2024-07-17)
+
+
+### Bug Fixes
+
+* add unused common building units in snapshot ([2cdc5f8](https://github.com/informatievlaanderen/building-registry/commit/2cdc5f84f49c1649f3c6e751ad87cff9089ce955))
+
 ## [4.10.3](https://github.com/informatievlaanderen/building-registry/compare/v4.10.2...v4.10.3) (2024-07-11)
 
 
