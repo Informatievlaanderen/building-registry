@@ -128,6 +128,7 @@ namespace BuildingRegistry.Tests.AggregateTests.SnapshotTests
                 return mock.Object;
             });
 
+            var provenance = Fixture.Create<Provenance>();
             var buildingPersistentLocalId = Fixture.Create<BuildingPersistentLocalId>();
             var buildingGeometry = Fixture.Create<BuildingGeometry>();
 
@@ -151,9 +152,11 @@ namespace BuildingRegistry.Tests.AggregateTests.SnapshotTests
                 .Build();
 
             var expectedEvent = Fixture.Create<BuildingBecameUnderConstructionV2>();
+            ((ISetProvenance)expectedEvent).SetProvenance(provenance);
+
             Assert(new Scenario()
                 .Given(_streamId, buildingWasMigrated)
-                .When(Fixture.Create<PlaceBuildingUnderConstruction>())
+                .When(new PlaceBuildingUnderConstruction(Fixture.Create<BuildingPersistentLocalId>(), provenance))
                 .Then(new Fact(_streamId, expectedEvent)));
 
             var plannedBuildingUnit = BuildingUnit.Migrate(
@@ -193,7 +196,7 @@ namespace BuildingRegistry.Tests.AggregateTests.SnapshotTests
                     buildingGeometry.Center,
                     BuildingUnitPositionGeometryMethod.DerivedFromObject),
                 false);
-            commonBuildingUnit.Route(buildingWasMigrated);
+            unusedCommonBuildingUnit.Route(buildingWasMigrated);
 
             var expectedSnapshot = new BuildingSnapshot(
                 buildingPersistentLocalId,
