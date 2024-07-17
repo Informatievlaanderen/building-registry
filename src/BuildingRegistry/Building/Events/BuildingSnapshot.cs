@@ -22,6 +22,7 @@ namespace BuildingRegistry.Building.Events
         public ProvenanceData LastProvenanceData { get; }
 
         public IEnumerable<BuildingUnitData> BuildingUnits { get; }
+        public IEnumerable<BuildingUnitData> UnusedCommonBuildingUnits { get; }
 
         public BuildingSnapshot(
             BuildingPersistentLocalId buildingPersistentLocalId,
@@ -30,7 +31,8 @@ namespace BuildingRegistry.Building.Events
             bool isRemoved,
             string lastEventHash,
             ProvenanceData lastProvenanceData,
-            IEnumerable<BuildingUnit> buildingUnits)
+            IEnumerable<BuildingUnit> buildingUnits,
+            IEnumerable<BuildingUnit> unusedCommonBuildingUnits)
         {
             BuildingPersistentLocalId = buildingPersistentLocalId;
             BuildingStatus = buildingStatus.Value;
@@ -40,6 +42,7 @@ namespace BuildingRegistry.Building.Events
             LastEventHash = lastEventHash;
             LastProvenanceData = lastProvenanceData;
             BuildingUnits = buildingUnits.Select(x => new BuildingUnitData(x)).ToList();
+            UnusedCommonBuildingUnits = unusedCommonBuildingUnits.Select(x => new BuildingUnitData(x)).ToList();
         }
 
         [JsonConstructor]
@@ -51,7 +54,8 @@ namespace BuildingRegistry.Building.Events
             bool isRemoved,
             string lastEventHash,
             ProvenanceData lastProvenanceData,
-            IEnumerable<BuildingUnitData> buildingUnits)
+            IEnumerable<BuildingUnitData> buildingUnits,
+            IEnumerable<BuildingUnitData>? unusedCommonBuildingUnits)
             : this(
                 new BuildingPersistentLocalId(buildingPersistentLocalId),
                 BuildingRegistry.Building.BuildingStatus.Parse(buildingStatus),
@@ -60,9 +64,11 @@ namespace BuildingRegistry.Building.Events
                 isRemoved,
                 lastEventHash,
                 lastProvenanceData,
-                new List<BuildingUnit>())
+                [],
+                [])
         {
             BuildingUnits = buildingUnits;
+            UnusedCommonBuildingUnits = unusedCommonBuildingUnits ?? [];
         }
 
         public sealed class BuildingUnitData
