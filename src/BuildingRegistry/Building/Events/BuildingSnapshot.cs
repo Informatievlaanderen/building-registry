@@ -55,7 +55,7 @@ namespace BuildingRegistry.Building.Events
             string lastEventHash,
             ProvenanceData lastProvenanceData,
             IEnumerable<BuildingUnitData> buildingUnits,
-            IEnumerable<BuildingUnitData> unusedCommonBuildingUnits)
+            IEnumerable<BuildingUnitData>? unusedCommonBuildingUnits)
             : this(
                 new BuildingPersistentLocalId(buildingPersistentLocalId),
                 BuildingRegistry.Building.BuildingStatus.Parse(buildingStatus),
@@ -64,11 +64,11 @@ namespace BuildingRegistry.Building.Events
                 isRemoved,
                 lastEventHash,
                 lastProvenanceData,
-                new List<BuildingUnit>(),
-                new List<BuildingUnit>())
+                [],
+                [])
         {
             BuildingUnits = buildingUnits;
-            UnusedCommonBuildingUnits = unusedCommonBuildingUnits;
+            UnusedCommonBuildingUnits = unusedCommonBuildingUnits ?? [];
         }
 
         public sealed class BuildingUnitData

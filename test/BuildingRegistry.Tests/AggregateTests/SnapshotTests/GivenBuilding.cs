@@ -133,7 +133,7 @@ namespace BuildingRegistry.Tests.AggregateTests.SnapshotTests
             var buildingGeometry = Fixture.Create<BuildingGeometry>();
 
             var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
-                .WithBuildingPersistentLocalId(buildingPersistentLocalId)
+                // .WithBuildingPersistentLocalId(buildingPersistentLocalId)
                 .WithBuildingStatus(BuildingStatus.Planned)
                 .WithBuildingGeometry(buildingGeometry)
                 .WithBuildingUnit(
