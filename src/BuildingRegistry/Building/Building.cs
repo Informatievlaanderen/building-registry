@@ -325,7 +325,8 @@ namespace BuildingRegistry.Building
                 IsRemoved,
                 LastEventHash,
                 LastProvenanceData,
-                BuildingUnits);
+                BuildingUnits,
+                UnusedCommonUnits);
         }
 
         public ISnapshotStrategy Strategy { get; }

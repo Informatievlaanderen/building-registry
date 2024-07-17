@@ -478,6 +478,14 @@ namespace BuildingRegistry.Building
                 _buildingUnits.Add(buildingUnit);
             }
 
+            foreach (var buildingUnitData in @event.UnusedCommonBuildingUnits)
+            {
+                var buildingUnit = new BuildingUnit(ApplyChange);
+                buildingUnit.RestoreSnapshot(BuildingPersistentLocalId, buildingUnitData);
+
+                _unusedCommonUnits.Add(buildingUnit);
+            }
+
             _lastSnapshotEventHash = @event.LastEventHash;
             _lastSnapshotProvenance = @event.LastProvenanceData;
         }
