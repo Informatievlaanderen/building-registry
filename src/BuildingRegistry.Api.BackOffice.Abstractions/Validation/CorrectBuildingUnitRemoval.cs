@@ -6,8 +6,8 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.Validation
         {
             public static class InvalidBuildingStatus
             {
-                public const string Code = "InvalidBuildingStatusCode";
-                public const string Message = "InvalidBuildingStatusMessage";
+                public const string Code = "GebouweenheidVerwijderingOngedaanmakenGebouwIdNietGerealiseerdofGehistoreerd";
+                public const string Message = "Verwijdering van gebouweenheid kan niet ongedaan gemaakt worden omdat gebouw status nietGerealiseerd of gehistoreerd heeft. Gebouw dient status gepland, inAanbouw of gerealiseerd te hebben.";
             }
         }
     }

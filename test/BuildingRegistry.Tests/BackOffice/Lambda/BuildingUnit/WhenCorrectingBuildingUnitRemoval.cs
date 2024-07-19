@@ -130,8 +130,8 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
                 x.Error(
                     It.IsAny<Guid>(),
                     new TicketError(
-                        "InvalidBuildingStatusMessage",
-                        "InvalidBuildingStatusCode"),
+                        "Verwijdering van gebouweenheid kan niet ongedaan gemaakt worden omdat gebouw status nietGerealiseerd of gehistoreerd heeft. Gebouw dient status gepland, inAanbouw of gerealiseerd te hebben.",
+                        "GebouweenheidVerwijderingOngedaanmakenGebouwIdNietGerealiseerdofGehistoreerd"),
                     CancellationToken.None));
         }
 
