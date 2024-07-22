@@ -1,3 +1,10 @@
+# [4.11.0](https://github.com/informatievlaanderen/building-registry/compare/v4.10.4...v4.11.0) (2024-07-22)
+
+
+### Features
+
+* correct removal building unit GAWR-4186 ([0cc9a96](https://github.com/informatievlaanderen/building-registry/commit/0cc9a9665ebf3345fb6fea3e4ddf212075f2e9e4))
+
 ## [4.10.4](https://github.com/informatievlaanderen/building-registry/compare/v4.10.3...v4.10.4) (2024-07-17)
 
 
