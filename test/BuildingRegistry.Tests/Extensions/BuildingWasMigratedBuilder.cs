@@ -1,3 +1,4 @@
+#pragma warning disable CS0618 // Type or member is obsolete
 namespace BuildingRegistry.Tests.Extensions
 {
     using System;
@@ -77,6 +78,8 @@ namespace BuildingRegistry.Tests.Extensions
             List<AddressPersistentLocalId>? attachedAddresses = null,
             bool isRemoved = false)
         {
+            var buildingUnitFunction = function ?? BuildingUnitFunction.Unknown;
+
             var buildingGeometry = _buildingGeometry is not null
                 ? new BuildingGeometry(
                     new ExtendedWkbGeometry(_buildingGeometry.Geometry.ToString()),
@@ -86,12 +89,7 @@ namespace BuildingRegistry.Tests.Extensions
                 : _fixture.Create<BuildingGeometry>();
 
             var buildingUnitPosition =
-                function == BuildingUnitFunction.Common
-                || positionGeometryMethod is null || positionGeometryMethod == BuildingUnitPositionGeometryMethod.DerivedFromObject
-                    ? new BuildingUnitPosition(buildingGeometry.Center, BuildingUnitPositionGeometryMethod.DerivedFromObject)
-                    : extendedWkbGeometry is not null
-                        ? new BuildingUnitPosition(extendedWkbGeometry, BuildingUnitPositionGeometryMethod.AppointedByAdministrator)
-                        : _fixture.Create<BuildingUnitPosition>();
+                DetermineBuildingUnitPosition(buildingUnitFunction, positionGeometryMethod, extendedWkbGeometry, buildingGeometry);
 
             _buildingUnits.Add(
                 new BuildingUnit(
@@ -99,7 +97,7 @@ namespace BuildingRegistry.Tests.Extensions
                     buildingUnitPersistentLocalId is not null
                         ? new PersistentLocalId(buildingUnitPersistentLocalId)
                         : new PersistentLocalId(_fixture.Create<int>()),
-                    function ?? BuildingUnitFunction.Unknown,
+                    buildingUnitFunction,
                     status,
                     attachedAddresses ?? new List<AddressPersistentLocalId>(),
                     buildingUnitPosition,
@@ -107,6 +105,38 @@ namespace BuildingRegistry.Tests.Extensions
                     isRemoved));
 
             return this;
+        }
+
+        private BuildingUnitPosition DetermineBuildingUnitPosition(
+            BuildingUnitFunction function,
+            BuildingUnitPositionGeometryMethod? positionGeometryMethod,
+            ExtendedWkbGeometry? extendedWkbGeometry,
+            BuildingGeometry buildingGeometry)
+        {
+            if (function == BuildingUnitFunction.Common)
+            {
+                return new BuildingUnitPosition(
+                    extendedWkbGeometry ?? buildingGeometry.Center, BuildingUnitPositionGeometryMethod.DerivedFromObject);
+            }
+
+            if (positionGeometryMethod == BuildingUnitPositionGeometryMethod.DerivedFromObject)
+            {
+                return new BuildingUnitPosition(buildingGeometry.Center, BuildingUnitPositionGeometryMethod.DerivedFromObject);
+            }
+
+            if (positionGeometryMethod == BuildingUnitPositionGeometryMethod.AppointedByAdministrator)
+            {
+                return new BuildingUnitPosition(
+                    extendedWkbGeometry ?? buildingGeometry.Center, BuildingUnitPositionGeometryMethod.AppointedByAdministrator);
+            }
+
+            if (extendedWkbGeometry is not null)
+            {
+                return new BuildingUnitPosition(
+                    extendedWkbGeometry, BuildingUnitPositionGeometryMethod.AppointedByAdministrator);
+            }
+
+            return _fixture.Create<BuildingUnitPosition>();
         }
 
         public BuildingWasMigratedBuilder WithBuildingUnit(BuildingUnit buildingUnit)

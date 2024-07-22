@@ -32,7 +32,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.BuildingUnit
         {
             _buildings = buildings;
 
-            DetailUrlFormat = configuration["BuildingUnitDetailUrl"];
+            DetailUrlFormat = configuration["BuildingUnitDetailUrl"]!;
             if (string.IsNullOrEmpty(DetailUrlFormat))
             {
                 throw new ConfigurationErrorsException("'BuildingUnitDetailUrl' cannot be found in the configuration");

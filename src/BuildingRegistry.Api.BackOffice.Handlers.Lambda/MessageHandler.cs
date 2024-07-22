@@ -101,6 +101,10 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda
                     await mediator.Send(new CorrectBuildingUnitRetirementLambdaRequest(messageMetadata.MessageGroupId!, request), cancellationToken);
                     break;
 
+                case CorrectBuildingUnitRemovalSqsRequest request:
+                    await mediator.Send(new CorrectBuildingUnitRemovalLambdaRequest(messageMetadata.MessageGroupId!, request), cancellationToken);
+                    break;
+
                 case CorrectBuildingUnitPositionSqsRequest request:
                     await mediator.Send(new CorrectBuildingUnitPositionLambdaRequest(messageMetadata.MessageGroupId!, request), cancellationToken);
                     break;
@@ -160,7 +164,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda
                 case MoveBuildingUnitSqsRequest request:
                     await mediator.Send(new MoveBuildingUnitLambdaRequest(messageMetadata.MessageGroupId!, request), cancellationToken);
                     break;
-                    
+
                 case NotifyOutlinedRealizedBuildingSqsRequest request:
                     await mediator.Send(new NotifyOutlinedRealizedBuildingLambdaRequest(
                         request.BuildingPersistentLocalId,
