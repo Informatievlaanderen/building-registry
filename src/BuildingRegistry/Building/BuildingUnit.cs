@@ -451,6 +451,22 @@ namespace BuildingRegistry.Building
             Apply(new BuildingUnitAddressWasDetachedBecauseAddressWasRemoved(_buildingPersistentLocalId, BuildingUnitPersistentLocalId, addressPersistentLocalId));
         }
 
+        public void ReplaceBuildingUnitAddressBecauseOfMunicipalityMerger(
+            AddressPersistentLocalId oldAddressPersistentLocalId,
+            AddressPersistentLocalId newAddressPersistentLocalId)
+        {
+            if (!AddressPersistentLocalIds.Contains(oldAddressPersistentLocalId))
+            {
+                return;
+            }
+
+            Apply(new BuildingUnitAddressWasReplacedBecauseOfMunicipalityMerger(
+                _buildingPersistentLocalId,
+                BuildingUnitPersistentLocalId,
+                oldAddressPersistentLocalId,
+                newAddressPersistentLocalId));
+        }
+
         public BuildingUnitAddressesWereReaddressed? BuildBuildingUnitAddressesWereReaddressed(IReadOnlyList<ReaddressData> readdresses)
         {
             var addressPersistentLocalIdsToAttach = readdresses
