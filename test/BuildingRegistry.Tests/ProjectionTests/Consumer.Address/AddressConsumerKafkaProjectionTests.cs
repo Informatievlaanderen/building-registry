@@ -84,6 +84,25 @@ namespace BuildingRegistry.Tests.ProjectionTests.Consumer.Address
         }
 
         [Fact]
+        public async Task AddressWasProposedForMunicipalityMerger_AddsAddress()
+        {
+            var addressWasProposed = Fixture.Create<AddressWasProposedForMunicipalityMerger>();
+            Given(addressWasProposed);
+
+            await Then(async context =>
+            {
+                var address =
+                    await context.AddressConsumerItems.FindAsync(
+                        addressWasProposed.AddressPersistentLocalId);
+
+                address.Should().NotBeNull();
+                address!.AddressId.Should().BeNull();
+                address.IsRemoved.Should().Be(false);
+                address.Status.Should().Be(AddressStatus.Proposed);
+            });
+        }
+
+        [Fact]
         public async Task AddressWasApproved_UpdatesStatusAddress()
         {
             var addressWasProposedV2 = Fixture.Create<AddressWasProposedV2>();
@@ -290,6 +309,29 @@ namespace BuildingRegistry.Tests.ProjectionTests.Consumer.Address
         }
 
         [Fact]
+        public async Task AddressWasRejectedBecauseOfMunicipalityMerger_UpdatesStatusAddress()
+        {
+            var addressWasProposedV2 = Fixture.Create<AddressWasProposedV2>();
+            var addressWasRejected = Fixture.Build<AddressWasRejectedBecauseOfMunicipalityMerger>()
+                .FromFactory(() => new AddressWasRejectedBecauseOfMunicipalityMerger(
+                    addressWasProposedV2.StreetNamePersistentLocalId,
+                    addressWasProposedV2.AddressPersistentLocalId,
+                    Fixture.Create<AddressPersistentLocalId>(),
+                    Fixture.Create<Provenance>()))
+                .Create();
+
+            Given(addressWasProposedV2, addressWasRejected);
+
+            await Then(async context =>
+            {
+                var address = await context.AddressConsumerItems.FindAsync(addressWasProposedV2.AddressPersistentLocalId);
+
+                address.Should().NotBeNull();
+                address!.Status.Should().Be(AddressStatus.Rejected);
+            });
+        }
+
+        [Fact]
         public async Task AddressWasCorrectedFromRejectedToProposed_UpdatesStatusAddress()
         {
             var addressWasProposedV2 = Fixture.Create<AddressWasProposedV2>();
@@ -404,6 +446,35 @@ namespace BuildingRegistry.Tests.ProjectionTests.Consumer.Address
             var addressWasRetired = Fixture.Build<AddressWasRetiredBecauseStreetNameWasRetired>()
                 .FromFactory(() => new AddressWasRetiredBecauseStreetNameWasRetired(
                     addressWasProposedV2.StreetNamePersistentLocalId, addressWasProposedV2.AddressPersistentLocalId, Fixture.Create<Provenance>()))
+                .Create();
+
+            Given(addressWasProposedV2, addressWasApproved, addressWasRetired);
+
+            await Then(async context =>
+            {
+                var address =
+                    await context.AddressConsumerItems.FindAsync(
+                        addressWasProposedV2.AddressPersistentLocalId);
+
+                address.Should().NotBeNull();
+                address!.Status.Should().Be(AddressStatus.Retired);
+            });
+        }
+
+        [Fact]
+        public async Task AddressWasRetiredBecauseOfMunicipalityMerger_UpdatesStatusAddress()
+        {
+            var addressWasProposedV2 = Fixture.Create<AddressWasProposedV2>();
+            var addressWasApproved = Fixture.Build<AddressWasApproved>()
+                .FromFactory(() => new AddressWasApproved(
+                    addressWasProposedV2.StreetNamePersistentLocalId, addressWasProposedV2.AddressPersistentLocalId, Fixture.Create<Provenance>()))
+                .Create();
+            var addressWasRetired = Fixture.Build<AddressWasRetiredBecauseOfMunicipalityMerger>()
+                .FromFactory(() => new AddressWasRetiredBecauseOfMunicipalityMerger(
+                    addressWasProposedV2.StreetNamePersistentLocalId,
+                    addressWasProposedV2.AddressPersistentLocalId,
+                    Fixture.Create<AddressPersistentLocalId>(),
+                    Fixture.Create<Provenance>()))
                 .Create();
 
             Given(addressWasProposedV2, addressWasApproved, addressWasRetired);
