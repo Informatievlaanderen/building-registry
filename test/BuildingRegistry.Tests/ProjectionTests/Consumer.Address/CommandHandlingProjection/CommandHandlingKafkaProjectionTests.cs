@@ -61,7 +61,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Consumer.Address.CommandHandlin
                 parentPersistentLocalId: null,
                 new Provenance(
                     Instant.FromDateTimeOffset(DateTimeOffset.Now).ToString(),
-                    Application.ParcelRegistry.ToString(),
+                    Application.BuildingRegistry.ToString(),
                     Modification.Update.ToString(),
                     Organisation.Aiv.ToString(),
                     "test"));
@@ -99,7 +99,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Consumer.Address.CommandHandlin
                 parentPersistentLocalId: null,
                 new Provenance(
                     Instant.FromDateTimeOffset(DateTimeOffset.Now).ToString(),
-                    Application.ParcelRegistry.ToString(),
+                    Application.BuildingRegistry.ToString(),
                     Modification.Update.ToString(),
                     Organisation.Aiv.ToString(),
                     "test"));
@@ -137,7 +137,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Consumer.Address.CommandHandlin
                 parentPersistentLocalId: null,
                 new Provenance(
                     Instant.FromDateTimeOffset(DateTimeOffset.Now).ToString(),
-                    Application.ParcelRegistry.ToString(),
+                    Application.BuildingRegistry.ToString(),
                     Modification.Update.ToString(),
                     Organisation.Aiv.ToString(),
                     "test"));
@@ -177,7 +177,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Consumer.Address.CommandHandlin
                 parentPersistentLocalId: null,
                 new Provenance(
                     Instant.FromDateTimeOffset(DateTimeOffset.Now).ToString(),
-                    Application.ParcelRegistry.ToString(),
+                    Application.BuildingRegistry.ToString(),
                     Modification.Update.ToString(),
                     Organisation.Aiv.ToString(),
                     "test"));
@@ -207,7 +207,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Consumer.Address.CommandHandlin
                 addressIntId,
                 new Provenance(
                     Instant.FromDateTimeOffset(DateTimeOffset.Now).ToString(),
-                    Application.ParcelRegistry.ToString(),
+                    Application.BuildingRegistry.ToString(),
                     Modification.Update.ToString(),
                     Organisation.Aiv.ToString(),
                     "test"));
@@ -232,7 +232,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Consumer.Address.CommandHandlin
                 addressIntId,
                 new Provenance(
                     Instant.FromDateTimeOffset(DateTimeOffset.Now).ToString(),
-                    Application.ParcelRegistry.ToString(),
+                    Application.BuildingRegistry.ToString(),
                     Modification.Update.ToString(),
                     Organisation.Aiv.ToString(),
                     "test"));
@@ -257,7 +257,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Consumer.Address.CommandHandlin
                 addressIntId,
                 new Provenance(
                     Instant.FromDateTimeOffset(DateTimeOffset.Now).ToString(),
-                    Application.ParcelRegistry.ToString(),
+                    Application.BuildingRegistry.ToString(),
                     Modification.Update.ToString(),
                     Organisation.Aiv.ToString(),
                     "test"));
@@ -282,7 +282,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Consumer.Address.CommandHandlin
                 addressIntId,
                 new Provenance(
                     Instant.FromDateTimeOffset(DateTimeOffset.Now).ToString(),
-                    Application.ParcelRegistry.ToString(),
+                    Application.BuildingRegistry.ToString(),
                     Modification.Update.ToString(),
                     Organisation.Aiv.ToString(),
                     "test"));
@@ -307,7 +307,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Consumer.Address.CommandHandlin
                 addressIntId,
                 new Provenance(
                     Instant.FromDateTimeOffset(DateTimeOffset.Now).ToString(),
-                    Application.ParcelRegistry.ToString(),
+                    Application.BuildingRegistry.ToString(),
                     Modification.Update.ToString(),
                     Organisation.Aiv.ToString(),
                     "test"));
@@ -332,7 +332,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Consumer.Address.CommandHandlin
                 addressIntId,
                 new Provenance(
                     Instant.FromDateTimeOffset(DateTimeOffset.Now).ToString(),
-                    Application.ParcelRegistry.ToString(),
+                    Application.BuildingRegistry.ToString(),
                     Modification.Update.ToString(),
                     Organisation.Aiv.ToString(),
                     "test"));
@@ -359,7 +359,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Consumer.Address.CommandHandlin
                 newAddressPersistentLocalId,
                 new Provenance(
                     Instant.FromDateTimeOffset(DateTimeOffset.Now).ToString(),
-                    Application.ParcelRegistry.ToString(),
+                    Application.BuildingRegistry.ToString(),
                     Modification.Update.ToString(),
                     Organisation.Aiv.ToString(),
                     "test"));
@@ -397,7 +397,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Consumer.Address.CommandHandlin
                 addressIntId,
                 new Provenance(
                     Instant.FromDateTimeOffset(DateTimeOffset.Now).ToString(),
-                    Application.ParcelRegistry.ToString(),
+                    Application.BuildingRegistry.ToString(),
                     Modification.Update.ToString(),
                     Organisation.Aiv.ToString(),
                     "test"));
@@ -422,7 +422,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Consumer.Address.CommandHandlin
                 addressIntId,
                 new Provenance(
                     Instant.FromDateTimeOffset(DateTimeOffset.Now).ToString(),
-                    Application.ParcelRegistry.ToString(),
+                    Application.BuildingRegistry.ToString(),
                     Modification.Update.ToString(),
                     Organisation.Aiv.ToString(),
                     "test"));
@@ -447,7 +447,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Consumer.Address.CommandHandlin
                 addressIntId,
                 new Provenance(
                     Instant.FromDateTimeOffset(DateTimeOffset.Now).ToString(),
-                    Application.ParcelRegistry.ToString(),
+                    Application.BuildingRegistry.ToString(),
                     Modification.Update.ToString(),
                     Organisation.Aiv.ToString(),
                     "test"));
@@ -472,7 +472,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Consumer.Address.CommandHandlin
                 addressIntId,
                 new Provenance(
                     Instant.FromDateTimeOffset(DateTimeOffset.Now).ToString(),
-                    Application.ParcelRegistry.ToString(),
+                    Application.BuildingRegistry.ToString(),
                     Modification.Update.ToString(),
                     Organisation.Aiv.ToString(),
                     "test"));
@@ -497,7 +497,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Consumer.Address.CommandHandlin
                 addressIntId,
                 new Provenance(
                     Instant.FromDateTimeOffset(DateTimeOffset.Now).ToString(),
-                    Application.ParcelRegistry.ToString(),
+                    Application.BuildingRegistry.ToString(),
                     Modification.Update.ToString(),
                     Organisation.Aiv.ToString(),
                     "test"));
@@ -524,7 +524,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Consumer.Address.CommandHandlin
                 newAddressPersistentLocalId,
                 new Provenance(
                     Instant.FromDateTimeOffset(DateTimeOffset.Now).ToString(),
-                    Application.ParcelRegistry.ToString(),
+                    Application.BuildingRegistry.ToString(),
                     Modification.Update.ToString(),
                     Organisation.Aiv.ToString(),
                     "test"));
@@ -562,7 +562,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Consumer.Address.CommandHandlin
                 addressIntId,
                 new Provenance(
                     Instant.FromDateTimeOffset(DateTimeOffset.Now).ToString(),
-                    Application.ParcelRegistry.ToString(),
+                    Application.BuildingRegistry.ToString(),
                     Modification.Update.ToString(),
                     Organisation.Aiv.ToString(),
                     "test"));
@@ -587,7 +587,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Consumer.Address.CommandHandlin
                 addressIntId,
                 new Provenance(
                     Instant.FromDateTimeOffset(DateTimeOffset.Now).ToString(),
-                    Application.ParcelRegistry.ToString(),
+                    Application.BuildingRegistry.ToString(),
                     Modification.Update.ToString(),
                     Organisation.Aiv.ToString(),
                     "test"));
@@ -612,7 +612,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Consumer.Address.CommandHandlin
                 addressIntId,
                 new Provenance(
                     Instant.FromDateTimeOffset(DateTimeOffset.Now).ToString(),
-                    Application.ParcelRegistry.ToString(),
+                    Application.BuildingRegistry.ToString(),
                     Modification.Update.ToString(),
                     Organisation.Aiv.ToString(),
                     "test"));
