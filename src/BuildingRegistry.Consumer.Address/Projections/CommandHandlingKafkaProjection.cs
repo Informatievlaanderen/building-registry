@@ -100,6 +100,38 @@ namespace BuildingRegistry.Consumer.Address.Projections
                     ct);
             });
 
+            When<AddressWasRejectedBecauseOfMunicipalityMerger>(async (commandHandler, message, ct) =>
+            {
+                await using var backOfficeContext = await _backOfficeContextFactory.CreateDbContextAsync(ct);
+                var relations = backOfficeContext.BuildingUnitAddressRelation
+                    .AsNoTracking()
+                    .Where(x => x.AddressPersistentLocalId == new AddressPersistentLocalId(message.AddressPersistentLocalId))
+                    .ToList();
+
+                foreach (var relation in relations)
+                {
+                    var command = new ReplaceBuildingUnitAddressBecauseOfMunicipalityMerger(
+                        new BuildingPersistentLocalId(relation.BuildingPersistentLocalId),
+                        new BuildingUnitPersistentLocalId(relation.BuildingUnitPersistentLocalId),
+                        new AddressPersistentLocalId(message.NewAddressPersistentLocalId),
+                        new AddressPersistentLocalId(message.AddressPersistentLocalId),
+                        FromProvenance(message.Provenance));
+
+                    await commandHandler.Handle(command, ct);
+
+                    await backOfficeContext.RemoveIdempotentBuildingUnitAddressRelation(
+                        command.BuildingUnitPersistentLocalId,
+                        command.PreviousAddressPersistentLocalId,
+                        ct);
+
+                    await backOfficeContext.AddIdempotentBuildingUnitAddressRelation(
+                        command.BuildingPersistentLocalId,
+                        command.BuildingUnitPersistentLocalId,
+                        command.NewAddressPersistentLocalId,
+                        ct);
+                }
+            });
+
             When<AddressWasRetiredV2>(async (commandHandler, message, ct) =>
             {
                 await DetachBecauseRetired(
@@ -134,6 +166,38 @@ namespace BuildingRegistry.Consumer.Address.Projections
                     new AddressPersistentLocalId(message.AddressPersistentLocalId),
                     message.Provenance,
                     ct);
+            });
+
+            When<AddressWasRetiredBecauseOfMunicipalityMerger>(async (commandHandler, message, ct) =>
+            {
+                await using var backOfficeContext = await _backOfficeContextFactory.CreateDbContextAsync(ct);
+                var relations = backOfficeContext.BuildingUnitAddressRelation
+                    .AsNoTracking()
+                    .Where(x => x.AddressPersistentLocalId == new AddressPersistentLocalId(message.AddressPersistentLocalId))
+                    .ToList();
+
+                foreach (var relation in relations)
+                {
+                    var command = new ReplaceBuildingUnitAddressBecauseOfMunicipalityMerger(
+                        new BuildingPersistentLocalId(relation.BuildingPersistentLocalId),
+                        new BuildingUnitPersistentLocalId(relation.BuildingUnitPersistentLocalId),
+                        new AddressPersistentLocalId(message.NewAddressPersistentLocalId),
+                        new AddressPersistentLocalId(message.AddressPersistentLocalId),
+                        FromProvenance(message.Provenance));
+
+                    await commandHandler.Handle(command, ct);
+
+                    await backOfficeContext.RemoveIdempotentBuildingUnitAddressRelation(
+                        command.BuildingUnitPersistentLocalId,
+                        command.PreviousAddressPersistentLocalId,
+                        ct);
+
+                    await backOfficeContext.AddIdempotentBuildingUnitAddressRelation(
+                        command.BuildingPersistentLocalId,
+                        command.BuildingUnitPersistentLocalId,
+                        command.NewAddressPersistentLocalId,
+                        ct);
+                }
             });
 
             When<AddressWasRemovedBecauseStreetNameWasRemoved>(async (commandHandler, message, ct) =>
