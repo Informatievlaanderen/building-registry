@@ -12,20 +12,20 @@ namespace BuildingRegistry.Building.Commands
 
         public BuildingPersistentLocalId BuildingPersistentLocalId { get; }
         public BuildingUnitPersistentLocalId BuildingUnitPersistentLocalId { get; }
-        public AddressPersistentLocalId OldAddressPersistentLocalId { get; }
         public AddressPersistentLocalId NewAddressPersistentLocalId { get; }
+        public AddressPersistentLocalId PreviousAddressPersistentLocalId { get; }
         public Provenance Provenance { get; }
 
         public ReplaceBuildingUnitAddressBecauseOfMunicipalityMerger(
             BuildingPersistentLocalId buildingPersistentLocalId,
             BuildingUnitPersistentLocalId buildingUnitPersistentLocalId,
-            AddressPersistentLocalId oldAddressPersistentLocalId,
             AddressPersistentLocalId newAddressPersistentLocalId,
+            AddressPersistentLocalId previousAddressPersistentLocalId,
             Provenance provenance)
         {
             BuildingPersistentLocalId = buildingPersistentLocalId;
             BuildingUnitPersistentLocalId = buildingUnitPersistentLocalId;
-            OldAddressPersistentLocalId = oldAddressPersistentLocalId;
+            PreviousAddressPersistentLocalId = previousAddressPersistentLocalId;
             NewAddressPersistentLocalId = newAddressPersistentLocalId;
             Provenance = provenance;
         }
@@ -40,8 +40,8 @@ namespace BuildingRegistry.Building.Commands
         {
             yield return BuildingPersistentLocalId;
             yield return BuildingUnitPersistentLocalId;
-            yield return OldAddressPersistentLocalId;
             yield return NewAddressPersistentLocalId;
+            yield return PreviousAddressPersistentLocalId;
 
             foreach (var field in Provenance.GetIdentityFields())
             {

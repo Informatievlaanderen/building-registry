@@ -267,6 +267,35 @@ namespace BuildingRegistry.Tests.ProjectionTests.BackOffice
         }
 
         [Fact]
+        public async Task GivenBuildingUnitAddressWasReplacedBecauseOfMunicipalityMerger_ThenRelationIsReplaced()
+        {
+            var @event = _fixture.Create<BuildingUnitAddressWasReplacedBecauseOfMunicipalityMerger>();
+
+            await _fakeBackOfficeContext.AddIdempotentBuildingUnitAddressRelation(
+                new BuildingPersistentLocalId(@event.BuildingPersistentLocalId),
+                new BuildingUnitPersistentLocalId(@event.BuildingUnitPersistentLocalId),
+                new AddressPersistentLocalId(@event.PreviousAddressPersistentLocalId),
+                CancellationToken.None);
+
+            await Sut
+                .Given(BuildEnvelope(@event))
+                .Then(async _ =>
+                {
+                    var previousAddress = await _fakeBackOfficeContext.BuildingUnitAddressRelation.FindAsync(
+                        @event.BuildingUnitPersistentLocalId,
+                        @event.PreviousAddressPersistentLocalId);
+
+                    previousAddress.Should().BeNull();
+
+                    var newAddress = await _fakeBackOfficeContext.BuildingUnitAddressRelation.FindAsync(
+                        @event.BuildingUnitPersistentLocalId,
+                        @event.NewAddressPersistentLocalId);
+
+                    newAddress.Should().NotBeNull();
+                });
+        }
+
+        [Fact]
         public async Task GivenBuildingUnitWasMovedOutOfBuilding_ThenRelationsAreUpdated()
         {
             var @event = _fixture.Create<BuildingUnitWasMovedOutOfBuilding>();

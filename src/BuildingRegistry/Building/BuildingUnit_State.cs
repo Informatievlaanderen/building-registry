@@ -322,7 +322,7 @@ namespace BuildingRegistry.Building
 
         private void When(BuildingUnitAddressWasReplacedBecauseOfMunicipalityMerger @event)
         {
-            _addressPersistentLocalIds.Remove(new AddressPersistentLocalId(@event.OldAddressPersistentLocalId));
+            _addressPersistentLocalIds.Remove(new AddressPersistentLocalId(@event.PreviousAddressPersistentLocalId));
 
             var newAddressPersistentLocalId = new AddressPersistentLocalId(@event.NewAddressPersistentLocalId);
             if (!_addressPersistentLocalIds.Contains(newAddressPersistentLocalId))

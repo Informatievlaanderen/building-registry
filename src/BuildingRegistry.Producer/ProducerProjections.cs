@@ -9,15 +9,12 @@ namespace BuildingRegistry.Producer
     using Be.Vlaanderen.Basisregisters.MessageHandling.Kafka.Producer;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.Connector;
     using Extensions;
-    using BuildingDomain = Building.Events;
     using Legacy = Legacy.Events;
 
     [ConnectedProjectionName("Kafka producer")]
     [ConnectedProjectionDescription("Projectie die berichten naar de kafka broker stuurt.")]
     public class ProducerProjections : V2Producer
     {
-        public const string TopicKey = "Topic";
-
         private readonly IProducer _producer;
 
         public ProducerProjections(IProducer producer)

@@ -269,8 +269,8 @@ namespace BuildingRegistry.Building
 
                     building.ReplaceBuildingUnitAddressBecauseOfMunicipalityMerger(
                         message.Command.BuildingUnitPersistentLocalId,
-                        message.Command.OldAddressPersistentLocalId,
-                        message.Command.NewAddressPersistentLocalId);
+                        message.Command.NewAddressPersistentLocalId,
+                        message.Command.PreviousAddressPersistentLocalId);
                 });
 
             For<RealizeUnplannedBuildingUnit>()

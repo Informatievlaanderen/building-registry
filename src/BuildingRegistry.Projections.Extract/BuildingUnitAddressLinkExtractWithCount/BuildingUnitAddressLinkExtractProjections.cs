@@ -165,6 +165,42 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitAddressLinkExtractWit
                     }
                 }
             });
+
+
+
+            When<Envelope<BuildingUnitAddressWasReplacedBecauseOfMunicipalityMerger>>(async (context, message, ct) =>
+            {
+                var previousAddress =  await context.BuildingUnitAddressLinkExtractWithCount.FindAsync(
+                    [message.Message.BuildingUnitPersistentLocalId, message.Message.PreviousAddressPersistentLocalId],
+                    ct);
+
+                if (previousAddress is not null)
+                {
+                    context.Remove(previousAddress);
+                }
+
+                var newAddress =  await context.BuildingUnitAddressLinkExtractWithCount.FindAsync(
+                    [message.Message.BuildingUnitPersistentLocalId, message.Message.NewAddressPersistentLocalId],
+                    ct);
+
+                if (newAddress is null || context.Entry(newAddress).State == EntityState.Deleted)
+                {
+                    await context.BuildingUnitAddressLinkExtractWithCount.AddAsync(
+                        new BuildingUnitAddressLinkExtractItem
+                        {
+                            BuildingPersistentLocalId = message.Message.BuildingPersistentLocalId,
+                            BuildingUnitPersistentLocalId = message.Message.BuildingUnitPersistentLocalId,
+                            AddressPersistentLocalId = message.Message.NewAddressPersistentLocalId,
+                            DbaseRecord = new BuildingUnitAddressLinkDbaseRecord
+                            {
+                                objecttype = { Value = ObjectType },
+                                adresobjid = { Value = message.Message.BuildingUnitPersistentLocalId.ToString() },
+                                adresid = { Value = message.Message.NewAddressPersistentLocalId }
+                            }.ToBytes(_encoding)
+                        },
+                        ct);
+                }
+            });
         }
 
         private static async Task AddIdempotentLink(

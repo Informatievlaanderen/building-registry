@@ -317,8 +317,8 @@ namespace BuildingRegistry.Building
 
         public void ReplaceBuildingUnitAddressBecauseOfMunicipalityMerger(
             BuildingUnitPersistentLocalId buildingUnitPersistentLocalId,
-            AddressPersistentLocalId oldAddressPersistentLocalId,
-            AddressPersistentLocalId newAddressPersistentLocalId)
+            AddressPersistentLocalId newAddressPersistentLocalId,
+            AddressPersistentLocalId oldAddressPersistentLocalId)
         {
             var unusedCommonUnit = _unusedCommonUnits
                 .SingleOrDefault(x => x.BuildingUnitPersistentLocalId == buildingUnitPersistentLocalId);
@@ -336,7 +336,7 @@ namespace BuildingRegistry.Building
 
             _buildingUnits
                 .GetByPersistentLocalId(buildingUnitPersistentLocalId)
-                .ReplaceBuildingUnitAddressBecauseOfMunicipalityMerger(oldAddressPersistentLocalId, newAddressPersistentLocalId);
+                .ReplaceBuildingUnitAddressBecauseOfMunicipalityMerger(newAddressPersistentLocalId, oldAddressPersistentLocalId);
         }
 
         public void MoveBuildingUnitInto(

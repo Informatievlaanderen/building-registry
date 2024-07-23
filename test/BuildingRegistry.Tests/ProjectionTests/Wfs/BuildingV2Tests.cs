@@ -9,7 +9,6 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wfs
     using Be.Vlaanderen.Basisregisters.Utilities.HexByteConvertor;
     using Building;
     using Building.Events;
-    using Extensions;
     using Fixtures;
     using FluentAssertions;
     using Infrastructure;

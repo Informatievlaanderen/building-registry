@@ -19,10 +19,10 @@ namespace BuildingRegistry.Building.Events
         public int BuildingPersistentLocalId { get; }
         [EventPropertyDescription("Objectidentificator van de gebouweenheid.")]
         public int BuildingUnitPersistentLocalId { get; }
-        [EventPropertyDescription("Objectidentificator van het oude gekoppelde adres.")]
-        public int OldAddressPersistentLocalId { get; }
         [EventPropertyDescription("Objectidentificator van het nieuwe gekoppelde adres.")]
         public int NewAddressPersistentLocalId { get; }
+        [EventPropertyDescription("Objectidentificator van het oude gekoppelde adres.")]
+        public int PreviousAddressPersistentLocalId { get; }
 
         [EventPropertyDescription("Metadata bij het event.")]
         public ProvenanceData Provenance { get; private set; }
@@ -30,27 +30,27 @@ namespace BuildingRegistry.Building.Events
         public BuildingUnitAddressWasReplacedBecauseOfMunicipalityMerger(
             BuildingPersistentLocalId buildingPersistentLocalId,
             BuildingUnitPersistentLocalId buildingUnitPersistentLocalId,
-            AddressPersistentLocalId oldAddressPersistentLocalId,
-            AddressPersistentLocalId newAddressPersistentLocalId)
+            AddressPersistentLocalId newAddressPersistentLocalId,
+            AddressPersistentLocalId previousAddressPersistentLocalId)
         {
             BuildingPersistentLocalId = buildingPersistentLocalId;
             BuildingUnitPersistentLocalId = buildingUnitPersistentLocalId;
-            OldAddressPersistentLocalId = oldAddressPersistentLocalId;
             NewAddressPersistentLocalId = newAddressPersistentLocalId;
+            PreviousAddressPersistentLocalId = previousAddressPersistentLocalId;
         }
 
         [JsonConstructor]
         private BuildingUnitAddressWasReplacedBecauseOfMunicipalityMerger(
             int buildingPersistentLocalId,
             int buildingUnitPersistentLocalId,
-            int oldAddressPersistentLocalId,
             int newAddressPersistentLocalId,
+            int previousAddressPersistentLocalId,
             ProvenanceData provenance)
             : this(
                 new BuildingPersistentLocalId(buildingPersistentLocalId),
                 new BuildingUnitPersistentLocalId(buildingUnitPersistentLocalId),
-                new AddressPersistentLocalId(oldAddressPersistentLocalId),
-                new AddressPersistentLocalId(newAddressPersistentLocalId))
+                new AddressPersistentLocalId(newAddressPersistentLocalId),
+                new AddressPersistentLocalId(previousAddressPersistentLocalId))
             => ((ISetProvenance)this).SetProvenance(provenance.ToProvenance());
 
         void ISetProvenance.SetProvenance(Provenance provenance) => Provenance = new ProvenanceData(provenance);
@@ -60,8 +60,8 @@ namespace BuildingRegistry.Building.Events
             var fields = Provenance.GetHashFields().ToList();
             fields.Add(BuildingPersistentLocalId.ToString(CultureInfo.InvariantCulture));
             fields.Add(BuildingUnitPersistentLocalId.ToString(CultureInfo.InvariantCulture));
-            fields.Add(OldAddressPersistentLocalId.ToString(CultureInfo.InvariantCulture));
             fields.Add(NewAddressPersistentLocalId.ToString(CultureInfo.InvariantCulture));
+            fields.Add(PreviousAddressPersistentLocalId.ToString(CultureInfo.InvariantCulture));
             return fields;
         }
 

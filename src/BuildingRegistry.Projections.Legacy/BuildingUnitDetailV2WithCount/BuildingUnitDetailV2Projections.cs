@@ -459,6 +459,35 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetailV2WithCount
                 }
             });
 
+            When<Envelope<BuildingUnitAddressWasReplacedBecauseOfMunicipalityMerger>>(async (context, message, ct) =>
+            {
+                await Update(context, message.Message.BuildingUnitPersistentLocalId, item =>
+                {
+                    context.Entry(item).Collection(x => x.Addresses).Load();
+
+                    var previousAddress = item.Addresses.SingleOrDefault(parcelAddress =>
+                        parcelAddress.AddressPersistentLocalId == message.Message.PreviousAddressPersistentLocalId);
+
+                    if (previousAddress is not null)
+                    {
+                        item.Addresses.Remove(previousAddress);
+                    }
+
+                    var newAddress = item.Addresses.SingleOrDefault(parcelAddress =>
+                        parcelAddress.AddressPersistentLocalId == message.Message.NewAddressPersistentLocalId);
+
+                    if (newAddress is null)
+                    {
+                        item.Addresses.Add(new BuildingUnitDetailAddressItemV2(
+                            message.Message.BuildingUnitPersistentLocalId,
+                            message.Message.NewAddressPersistentLocalId));
+                    }
+
+                    item.Version = message.Message.Provenance.Timestamp;
+                    UpdateHash(item, message);
+                }, ct);
+            });
+
             When<Envelope<BuildingUnitWasRetiredBecauseBuildingWasDemolished>>(async (context, message, ct) =>
             {
                 await Update(context, message.Message.BuildingUnitPersistentLocalId, item =>

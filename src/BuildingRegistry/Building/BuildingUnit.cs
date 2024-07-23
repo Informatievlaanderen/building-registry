@@ -452,8 +452,8 @@ namespace BuildingRegistry.Building
         }
 
         public void ReplaceBuildingUnitAddressBecauseOfMunicipalityMerger(
-            AddressPersistentLocalId oldAddressPersistentLocalId,
-            AddressPersistentLocalId newAddressPersistentLocalId)
+            AddressPersistentLocalId newAddressPersistentLocalId,
+            AddressPersistentLocalId oldAddressPersistentLocalId)
         {
             if (!AddressPersistentLocalIds.Contains(oldAddressPersistentLocalId))
             {
@@ -463,8 +463,8 @@ namespace BuildingRegistry.Building
             Apply(new BuildingUnitAddressWasReplacedBecauseOfMunicipalityMerger(
                 _buildingPersistentLocalId,
                 BuildingUnitPersistentLocalId,
-                oldAddressPersistentLocalId,
-                newAddressPersistentLocalId));
+                newAddressPersistentLocalId,
+                oldAddressPersistentLocalId));
         }
 
         public BuildingUnitAddressesWereReaddressed? BuildBuildingUnitAddressesWereReaddressed(IReadOnlyList<ReaddressData> readdresses)

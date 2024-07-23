@@ -34,7 +34,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenReplacingBuildingUnitAddress
                 .WithBuildingUnit(
                     BuildingUnitStatus.Realized,
                     command.BuildingUnitPersistentLocalId,
-                    attachedAddresses: new List<AddressPersistentLocalId> { command.OldAddressPersistentLocalId },
+                    attachedAddresses: new List<AddressPersistentLocalId> { command.PreviousAddressPersistentLocalId },
                     isRemoved: false)
                 .Build();
 
@@ -46,8 +46,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenReplacingBuildingUnitAddress
                     new BuildingUnitAddressWasReplacedBecauseOfMunicipalityMerger(
                         command.BuildingPersistentLocalId,
                         command.BuildingUnitPersistentLocalId,
-                        command.OldAddressPersistentLocalId,
-                        command.NewAddressPersistentLocalId))));
+                        command.NewAddressPersistentLocalId, command.PreviousAddressPersistentLocalId))));
         }
 
         [Fact]
@@ -86,7 +85,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenReplacingBuildingUnitAddress
                 .WithBuildingUnit(
                     BuildingUnitStatus.Realized,
                     new BuildingUnitPersistentLocalId(command.BuildingUnitPersistentLocalId),
-                    attachedAddresses: [command.OldAddressPersistentLocalId],
+                    attachedAddresses: [command.PreviousAddressPersistentLocalId],
                     function: BuildingRegistry.Legacy.BuildingUnitFunction.Common,
                     isRemoved: true)
                 .Build();
@@ -101,7 +100,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenReplacingBuildingUnitAddress
                     new BuildingUnitAddressWasDetachedV2(
                         command.BuildingPersistentLocalId,
                         command.BuildingUnitPersistentLocalId,
-                        command.OldAddressPersistentLocalId))));
+                        command.PreviousAddressPersistentLocalId))));
         }
 
         [Fact]
@@ -143,8 +142,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenReplacingBuildingUnitAddress
             var buildingUnitAddressWasReplacedBecauseOfMunicipalityMerger = new BuildingUnitAddressWasReplacedBecauseOfMunicipalityMerger(
                 Fixture.Create<BuildingPersistentLocalId>(),
                 buildingUnitPersistentLocalId,
-                oldAddressPersistentLocalId,
-                newAddressPersistentLocalId);
+                newAddressPersistentLocalId, oldAddressPersistentLocalId);
 
             var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
                 .WithBuildingUnit(
