@@ -11,7 +11,6 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitAddressLinkExtractWit
     using Building;
     using Building.Events;
     using Microsoft.EntityFrameworkCore;
-    using Microsoft.Extensions.Options;
 
     [ConnectedProjectionName("Extract gebouweenheidkoppelingen met adres")]
     [ConnectedProjectionDescription("Projectie die een extract voorziet voor gebouweenheid en adres koppelingen.")]
@@ -21,7 +20,7 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitAddressLinkExtractWit
 
         private readonly Encoding _encoding;
 
-        public BuildingUnitAddressLinkExtractProjections(IOptions<ExtractConfig> extractConfig, Encoding encoding)
+        public BuildingUnitAddressLinkExtractProjections(Encoding encoding)
         {
             _encoding = encoding ?? throw new ArgumentNullException(nameof(encoding));
 
@@ -170,36 +169,24 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitAddressLinkExtractWit
 
             When<Envelope<BuildingUnitAddressWasReplacedBecauseOfMunicipalityMerger>>(async (context, message, ct) =>
             {
-                var previousAddress =  await context.BuildingUnitAddressLinkExtractWithCount.FindAsync(
-                    [message.Message.BuildingUnitPersistentLocalId, message.Message.PreviousAddressPersistentLocalId],
+                await RemoveIdempotentLink(
+                    context,
+                    message.Message.BuildingUnitPersistentLocalId,
+                    message.Message.PreviousAddressPersistentLocalId,
                     ct);
 
-                if (previousAddress is not null)
+                await AddIdempotentLink(context, new BuildingUnitAddressLinkExtractItem
                 {
-                    context.Remove(previousAddress);
-                }
-
-                var newAddress =  await context.BuildingUnitAddressLinkExtractWithCount.FindAsync(
-                    [message.Message.BuildingUnitPersistentLocalId, message.Message.NewAddressPersistentLocalId],
-                    ct);
-
-                if (newAddress is null || context.Entry(newAddress).State == EntityState.Deleted)
-                {
-                    await context.BuildingUnitAddressLinkExtractWithCount.AddAsync(
-                        new BuildingUnitAddressLinkExtractItem
-                        {
-                            BuildingPersistentLocalId = message.Message.BuildingPersistentLocalId,
-                            BuildingUnitPersistentLocalId = message.Message.BuildingUnitPersistentLocalId,
-                            AddressPersistentLocalId = message.Message.NewAddressPersistentLocalId,
-                            DbaseRecord = new BuildingUnitAddressLinkDbaseRecord
-                            {
-                                objecttype = { Value = ObjectType },
-                                adresobjid = { Value = message.Message.BuildingUnitPersistentLocalId.ToString() },
-                                adresid = { Value = message.Message.NewAddressPersistentLocalId }
-                            }.ToBytes(_encoding)
-                        },
-                        ct);
-                }
+                    BuildingPersistentLocalId = message.Message.BuildingPersistentLocalId,
+                    BuildingUnitPersistentLocalId = message.Message.BuildingUnitPersistentLocalId,
+                    AddressPersistentLocalId = message.Message.NewAddressPersistentLocalId,
+                    DbaseRecord = new BuildingUnitAddressLinkDbaseRecord
+                    {
+                        objecttype = { Value = ObjectType },
+                        adresobjid = { Value = message.Message.BuildingUnitPersistentLocalId.ToString() },
+                        adresid = { Value = message.Message.NewAddressPersistentLocalId }
+                    }.ToBytes(_encoding)
+                }, ct);
             });
         }
 
@@ -212,7 +199,7 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitAddressLinkExtractWit
                 [linkItem.BuildingUnitPersistentLocalId, linkItem.AddressPersistentLocalId],
                 ct);
 
-            if (extractItem is null)
+            if (extractItem is null || context.Entry(extractItem).State == EntityState.Deleted)
             {
                 await context.BuildingUnitAddressLinkExtractWithCount.AddAsync(linkItem, ct);
             }
