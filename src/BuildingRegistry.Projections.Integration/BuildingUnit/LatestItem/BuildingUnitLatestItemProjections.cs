@@ -599,6 +599,39 @@ namespace BuildingRegistry.Projections.Integration.BuildingUnit.LatestItem
                 }
             });
 
+            When<Envelope<BuildingUnitAddressWasReplacedBecauseOfMunicipalityMerger>>(async (context, message, ct) =>
+            {
+                await context.FindAndUpdateBuildingUnit(
+                    message.Message.BuildingUnitPersistentLocalId,
+                    async buildingUnit =>
+                    {
+                        var previousAddress = await context.BuildingUnitAddresses.FindAsync(
+                            [buildingUnit.BuildingUnitPersistentLocalId, message.Message.PreviousAddressPersistentLocalId], ct);
+
+                        if (previousAddress is not null)
+                        {
+                            context.BuildingUnitAddresses.Remove(previousAddress);
+                        }
+
+                        var newAddress = await context.BuildingUnitAddresses.FindAsync(
+                            [buildingUnit.BuildingUnitPersistentLocalId, message.Message.NewAddressPersistentLocalId], ct);
+
+                        if (newAddress is null || context.Entry(newAddress).State == EntityState.Deleted)
+                        {
+                            await context
+                                .BuildingUnitAddresses
+                                .AddAsync(new BuildingUnitAddress
+                                {
+                                    BuildingUnitPersistentLocalId = message.Message.BuildingUnitPersistentLocalId,
+                                    AddressPersistentLocalId = message.Message.NewAddressPersistentLocalId
+                                }, ct);
+                        }
+
+                        UpdateVersionTimestamp(buildingUnit, message.Message);
+                    },
+                    ct);
+            });
+
             When<Envelope<BuildingUnitWasRetiredBecauseBuildingWasDemolished>>(async (context, message, ct) =>
             {
                 await context.FindAndUpdateBuildingUnit(

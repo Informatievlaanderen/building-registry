@@ -547,6 +547,14 @@ namespace BuildingRegistry.Producer.Extensions
                         x.DestinationAddressPersistentLocalId)),
                 message.Provenance.ToContract());
 
+        public static Contracts.BuildingUnitAddressWasReplacedBecauseOfMunicipalityMerger ToContract(this BuildingUnitAddressWasReplacedBecauseOfMunicipalityMerger message)
+            => new Contracts.BuildingUnitAddressWasReplacedBecauseOfMunicipalityMerger(
+                message.BuildingPersistentLocalId,
+                message.BuildingUnitPersistentLocalId,
+                message.NewAddressPersistentLocalId,
+                message.PreviousAddressPersistentLocalId,
+                message.Provenance.ToContract());
+
         public static Contracts.BuildingWasMeasured ToContract(this BuildingWasMeasured message)
             => new Contracts.BuildingWasMeasured(
                 message.BuildingPersistentLocalId,
@@ -625,7 +633,7 @@ namespace BuildingRegistry.Producer.Extensions
                 message.DestinationBuildingPersistentLocalId,
                 message.BuildingUnitPersistentLocalId,
                 message.Provenance.ToContract());
-        
+
         private static Provenance ToContract(this ProvenanceData provenance)
         => new Provenance(
             provenance.Timestamp.ToString(),

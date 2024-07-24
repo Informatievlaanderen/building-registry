@@ -580,6 +580,41 @@ namespace BuildingRegistry.Projections.Integration.Building.VersionFromMigration
                 }
             });
 
+            When<Envelope<BuildingUnitAddressWasReplacedBecauseOfMunicipalityMerger>>(async (context, message, ct) =>
+            {
+                await context.CreateNewBuildingVersion(
+                    message.Message.BuildingPersistentLocalId,
+                    message,
+                    building =>
+                    {
+                        var buildingUnit = building.BuildingUnits.Single(x =>
+                            x.BuildingUnitPersistentLocalId == message.Message.BuildingUnitPersistentLocalId);
+
+                        var previousAddress = buildingUnit.Addresses
+                            .SingleOrDefault(x => x.AddressPersistentLocalId == message.Message.PreviousAddressPersistentLocalId);
+                        if (previousAddress is not null)
+                        {
+                            buildingUnit.Addresses.Remove(previousAddress);
+                        }
+
+                        var newAddress = buildingUnit.Addresses
+                            .SingleOrDefault(x => x.AddressPersistentLocalId == message.Message.NewAddressPersistentLocalId);
+
+                        if (newAddress is null)
+                        {
+                            buildingUnit.Addresses.Add(new BuildingUnitAddressVersion
+                            {
+                                AddressPersistentLocalId = message.Message.NewAddressPersistentLocalId,
+                                BuildingUnitPersistentLocalId = message.Message.BuildingPersistentLocalId,
+                                Position = message.Position
+                            });
+                        }
+
+                        buildingUnit.VersionTimestamp = message.Message.Provenance.Timestamp;
+                    },
+                    ct);
+            });
+
             When<Envelope<BuildingUnitWasRetiredBecauseBuildingWasDemolished>>(async (context, message, ct) =>
             {
                 await context.CreateNewBuildingVersion(

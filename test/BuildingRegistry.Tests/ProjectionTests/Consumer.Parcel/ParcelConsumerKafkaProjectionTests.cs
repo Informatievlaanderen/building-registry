@@ -7,6 +7,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Consumer.Parcel
     using Be.Vlaanderen.Basisregisters.GrAr.Contracts.Common;
     using Be.Vlaanderen.Basisregisters.GrAr.Contracts.ParcelRegistry;
     using Be.Vlaanderen.Basisregisters.Utilities.HexByteConvertor;
+    using Building;
     using BuildingRegistry.Consumer.Read.Parcel;
     using BuildingRegistry.Consumer.Read.Parcel.ParcelWithCount;
     using Fixtures;
@@ -387,6 +388,54 @@ namespace BuildingRegistry.Tests.ProjectionTests.Consumer.Parcel
                 parcel!.CaPaKey.Should().Be(parcelWasImported.CaPaKey);
                 parcel.Status.Should().Be(ParcelStatus.Realized);
                 parcel.IsRemoved.Should().Be(parcel.IsRemoved);
+            });
+        }
+
+        [Fact]
+        public async Task ParcelAddressWasReplacedBecauseOfMunicipalityMerger_ReplacesParcelAddress()
+        {
+            var parcelAddressWasAttachedV2 = Fixture
+                .Build<ParcelAddressWasAttachedV2>()
+                .FromFactory(() => new ParcelAddressWasAttachedV2(
+                    _parcelWasMigrated.ParcelId,
+                    _parcelWasMigrated.CaPaKey,
+                    Fixture.Create<int>(),
+                    Fixture.Create<Provenance>()))
+                .Create();
+
+            var parcelAddressWasReplacedBecauseAddressWasReaddressed = Fixture
+                .Build<ParcelAddressWasReplacedBecauseOfMunicipalityMerger>()
+                .FromFactory(() => new ParcelAddressWasReplacedBecauseOfMunicipalityMerger(
+                    _parcelWasMigrated.ParcelId,
+                    _parcelWasMigrated.CaPaKey,
+                    Fixture.Create<AddressPersistentLocalId>(),
+                    parcelAddressWasAttachedV2.AddressPersistentLocalId,
+                    Fixture.Create<Provenance>()))
+                .Create();
+
+            Given(_parcelWasMigrated,
+                parcelAddressWasAttachedV2,
+                parcelAddressWasReplacedBecauseAddressWasReaddressed);
+
+            await Then(async context =>
+            {
+                var parcelId = Guid.Parse(_parcelWasMigrated.ParcelId);
+                var parcel = await context.ParcelConsumerItemsWithCount.FindAsync(parcelId);
+
+                parcel.Should().NotBeNull();
+
+                var previousParcelAddressItem =
+                    await context.ParcelAddressItemsWithCount.FindAsync(parcelId,
+                        parcelAddressWasReplacedBecauseAddressWasReaddressed.PreviousAddressPersistentLocalId);
+
+                previousParcelAddressItem.Should().BeNull();
+
+                var newParcelAddressItem =
+                    await context.ParcelAddressItemsWithCount.FindAsync(parcelId,
+                        parcelAddressWasReplacedBecauseAddressWasReaddressed.NewAddressPersistentLocalId);
+
+                newParcelAddressItem.Should().NotBeNull();
+                newParcelAddressItem!.Count.Should().Be(1);
             });
         }
 

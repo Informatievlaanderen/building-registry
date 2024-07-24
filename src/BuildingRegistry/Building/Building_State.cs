@@ -79,6 +79,7 @@ namespace BuildingRegistry.Building
             Register<BuildingUnitAddressWasDetachedBecauseAddressWasRemoved>(When);
             Register<BuildingUnitAddressWasReplacedBecauseAddressWasReaddressed>(When);
             Register<BuildingBuildingUnitsAddressesWereReaddressed>(When);
+            Register<BuildingUnitAddressWasReplacedBecauseOfMunicipalityMerger>(When);
             Register<BuildingUnitWasNotRealizedBecauseBuildingWasDemolished>(When);
             Register<BuildingUnitWasRetiredBecauseBuildingWasDemolished>(When);
             Register<BuildingMeasurementWasChanged>(When);
@@ -391,6 +392,8 @@ namespace BuildingRegistry.Building
                 buildingUnit.Route(@event);
             }
         }
+
+        private void When(BuildingUnitAddressWasReplacedBecauseOfMunicipalityMerger @event) => RouteToBuildingUnit(@event);
 
         private void When(BuildingWasDemolished @event)
         {

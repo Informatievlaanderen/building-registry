@@ -142,6 +142,30 @@ namespace BuildingRegistry.Consumer.Read.Parcel.ParcelWithCount
                 }
             });
 
+            When<ParcelAddressWasReplacedBecauseOfMunicipalityMerger>(async (context, message, ct) =>
+            {
+                var previousRelation =
+                    await context.ParcelAddressItemsWithCount.FindAsync(
+                        [Guid.Parse(message.ParcelId), message.PreviousAddressPersistentLocalId],
+                        cancellationToken: ct);
+
+                if (previousRelation is not null)
+                {
+                    context.ParcelAddressItemsWithCount.Remove(previousRelation);
+                }
+
+                var newRelation =
+                    await context.ParcelAddressItemsWithCount.FindAsync(
+                        [Guid.Parse(message.ParcelId), message.NewAddressPersistentLocalId],
+                        cancellationToken: ct);
+
+                if (newRelation is null)
+                {
+                    context.ParcelAddressItemsWithCount.Add(new ParcelAddressItem(
+                        Guid.Parse(message.ParcelId), message.NewAddressPersistentLocalId));
+                }
+            });
+
             When<ParcelAddressesWereReaddressed>(async (context, message, ct) =>
             {
                 foreach (var addressPersistentLocalId in message.DetachedAddressPersistentLocalIds)

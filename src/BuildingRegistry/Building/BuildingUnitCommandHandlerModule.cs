@@ -258,6 +258,21 @@ namespace BuildingRegistry.Building
                     building.DetachAddressFromBuildingUnitBecauseAddressWasRemoved(message.Command.BuildingUnitPersistentLocalId, message.Command.AddressPersistentLocalId);
                 });
 
+            For<ReplaceBuildingUnitAddressBecauseOfMunicipalityMerger>()
+                .AddSqlStreamStore(getStreamStore, getUnitOfWork, eventMapping, eventSerializer, getSnapshotStore)
+                .AddEventHash<ReplaceBuildingUnitAddressBecauseOfMunicipalityMerger, Building>(getUnitOfWork)
+                .AddProvenance(getUnitOfWork, provenanceFactory)
+                .Handle(async (message, ct) =>
+                {
+                    var streamId = new BuildingStreamId(message.Command.BuildingPersistentLocalId);
+                    var building = await buildingRepository().GetAsync(streamId, ct);
+
+                    building.ReplaceBuildingUnitAddressBecauseOfMunicipalityMerger(
+                        message.Command.BuildingUnitPersistentLocalId,
+                        message.Command.NewAddressPersistentLocalId,
+                        message.Command.PreviousAddressPersistentLocalId);
+                });
+
             For<RealizeUnplannedBuildingUnit>()
                 .AddSqlStreamStore(getStreamStore, getUnitOfWork, eventMapping, eventSerializer, getSnapshotStore)
                 .AddEventHash<RealizeUnplannedBuildingUnit, Building>(getUnitOfWork)

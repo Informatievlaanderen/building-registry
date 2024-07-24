@@ -1290,6 +1290,58 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.BuildingUnit
         }
 
         [Fact]
+        public async Task WhenBuildingUnitAddressWasReplacedBecauseOfMunicipalityMerger()
+        {
+            _fixture.Customize(new WithFixedBuildingPersistentLocalId());
+            _fixture.Customize(new WithFixedBuildingUnitPersistentLocalId());
+            _fixture.Customizations.Add(new WithUniqueInteger());
+
+            var buildingUnitWasPlannedV2 = _fixture.Create<BuildingUnitWasPlannedV2>();
+            var buildingUnitAddressWasAttachedV2 = _fixture.Create<BuildingUnitAddressWasAttachedV2>();
+            var @event = new BuildingUnitAddressWasReplacedBecauseOfMunicipalityMergerBuilder(_fixture)
+                .WithPreviousAddressPersistentLocalId(buildingUnitAddressWasAttachedV2.AddressPersistentLocalId)
+                .Build();
+
+            var position = _fixture.Create<long>();
+
+            var buildingUnitWasPlannedMetadata = new Dictionary<string, object>
+            {
+                { AddEventHashPipe.HashMetadataKey, buildingUnitWasPlannedV2.GetHash() },
+                { Envelope.PositionMetadataKey, position }
+            };
+            var buildingUnitAddressWasAttachedV2Metadata = new Dictionary<string, object>
+            {
+                { AddEventHashPipe.HashMetadataKey, buildingUnitAddressWasAttachedV2.GetHash() },
+                { Envelope.PositionMetadataKey, ++position }
+            };
+            var eventMetadata = new Dictionary<string, object>
+            {
+                { Envelope.PositionMetadataKey, ++position },
+                { Envelope.EventNameMetadataKey, "EventName" }
+            };
+
+            await Sut
+                .Given(
+                    new Envelope<BuildingUnitWasPlannedV2>(new Envelope(buildingUnitWasPlannedV2, buildingUnitWasPlannedMetadata)),
+                    new Envelope<BuildingUnitAddressWasAttachedV2>(new Envelope(buildingUnitAddressWasAttachedV2, buildingUnitAddressWasAttachedV2Metadata)),
+                    new Envelope<BuildingUnitAddressWasReplacedBecauseOfMunicipalityMerger>(new Envelope(@event, eventMetadata)))
+                .Then(async context =>
+                {
+                    var buildingUnitLatestItem =
+                        await context.BuildingUnitLatestItems.FindAsync(@event.BuildingUnitPersistentLocalId);
+                    buildingUnitLatestItem.Should().NotBeNull();
+
+                    buildingUnitLatestItem!.VersionTimestamp.Should().Be(@event.Provenance.Timestamp);
+
+                    var buildingUnitAddresses = context.BuildingUnitAddresses
+                        .Where(x => x.BuildingUnitPersistentLocalId == buildingUnitLatestItem.BuildingUnitPersistentLocalId)
+                        .ToList();
+                    buildingUnitAddresses.Should().ContainSingle();
+                    buildingUnitAddresses.Single().AddressPersistentLocalId.Should().Be(@event.NewAddressPersistentLocalId);
+                });
+        }
+
+        [Fact]
         public async Task WhenBuildingUnitWasRetiredBecauseBuildingWasDemolished()
         {
             _fixture.Customize(new WithFixedBuildingPersistentLocalId());
@@ -1375,7 +1427,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.BuildingUnit
             var buildingUnitAddressWasAttachedV2 = _fixture.Create<BuildingUnitAddressWasAttachedV2>();
             var buildingUnitWasMovedIntoBuilding = _fixture.Create<BuildingUnitWasMovedIntoBuilding>()
                 .WithAddressPersistentLocalIds(new[] { new AddressPersistentLocalId(buildingUnitAddressWasAttachedV2.AddressPersistentLocalId) });
-            
+
             var position = _fixture.Create<long>();
 
             await Sut
@@ -1414,7 +1466,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.BuildingUnit
                         _wkbReader.Read(buildingUnitWasMovedIntoBuilding.ExtendedWkbGeometry.ToByteArray()));
                     buildingUnitLatestItem.HasDeviation.Should().BeFalse();
                     buildingUnitLatestItem.VersionTimestamp.Should().Be(buildingUnitWasMovedIntoBuilding.Provenance.Timestamp);
-                    
+
                     var buildingUnitAddresses = context.BuildingUnitAddresses
                         .Where(x => x.BuildingUnitPersistentLocalId == buildingUnitLatestItem.BuildingUnitPersistentLocalId)
                         .ToList();

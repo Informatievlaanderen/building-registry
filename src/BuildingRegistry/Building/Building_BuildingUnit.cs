@@ -315,6 +315,30 @@ namespace BuildingRegistry.Building
                 .DetachAddressBecauseAddressWasRemoved(addressPersistentLocalId);
         }
 
+        public void ReplaceBuildingUnitAddressBecauseOfMunicipalityMerger(
+            BuildingUnitPersistentLocalId buildingUnitPersistentLocalId,
+            AddressPersistentLocalId newAddressPersistentLocalId,
+            AddressPersistentLocalId oldAddressPersistentLocalId)
+        {
+            var unusedCommonUnit = _unusedCommonUnits
+                .SingleOrDefault(x => x.BuildingUnitPersistentLocalId == buildingUnitPersistentLocalId);
+            if (unusedCommonUnit is not null)
+            {
+                if (unusedCommonUnit.AddressPersistentLocalIds.Contains(oldAddressPersistentLocalId))
+                {
+                    ApplyChange(new BuildingUnitAddressWasDetachedV2(
+                        BuildingPersistentLocalId,
+                        unusedCommonUnit.BuildingUnitPersistentLocalId,
+                        oldAddressPersistentLocalId));
+                }
+                return;
+            }
+
+            _buildingUnits
+                .GetByPersistentLocalId(buildingUnitPersistentLocalId)
+                .ReplaceBuildingUnitAddressBecauseOfMunicipalityMerger(newAddressPersistentLocalId, oldAddressPersistentLocalId);
+        }
+
         public void MoveBuildingUnitInto(
             Building sourceBuilding,
             BuildingUnitPersistentLocalId buildingUnitPersistentLocalId,

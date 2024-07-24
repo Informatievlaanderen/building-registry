@@ -169,6 +169,41 @@ namespace BuildingRegistry.Projections.BackOffice
 
             When<Envelope<BuildingBuildingUnitsAddressesWereReaddressed>>((_, _, _) => Task.CompletedTask);
 
+            When<Envelope<BuildingUnitAddressWasReplacedBecauseOfMunicipalityMerger>>(async (_, message, cancellationToken) =>
+            {
+                await DelayProjection(message, delayInSeconds, cancellationToken);
+
+                await using var backOfficeContext = await backOfficeContextFactory.CreateDbContextAsync(cancellationToken);
+
+                var previousAddress = await backOfficeContext.FindBuildingUnitAddressRelation(
+                    new BuildingUnitPersistentLocalId(message.Message.BuildingUnitPersistentLocalId),
+                    new AddressPersistentLocalId(message.Message.PreviousAddressPersistentLocalId),
+                    cancellationToken
+                );
+
+                if (previousAddress is not null)
+                {
+                    backOfficeContext.BuildingUnitAddressRelation.Remove(previousAddress);
+                }
+
+                var newAddress = await backOfficeContext.FindBuildingUnitAddressRelation(
+                    new BuildingUnitPersistentLocalId(message.Message.BuildingUnitPersistentLocalId),
+                    new AddressPersistentLocalId(message.Message.NewAddressPersistentLocalId),
+                    cancellationToken
+                );
+
+                if (newAddress is null)
+                {
+                    newAddress = new BuildingUnitAddressRelation(
+                        message.Message.BuildingPersistentLocalId,
+                        message.Message.BuildingUnitPersistentLocalId,
+                        message.Message.NewAddressPersistentLocalId);
+                    await backOfficeContext.BuildingUnitAddressRelation.AddAsync(newAddress, cancellationToken);
+                }
+
+                await backOfficeContext.SaveChangesAsync(cancellationToken);
+            });
+
             When<Envelope<BuildingUnitWasMovedOutOfBuilding>>(async (_, message, cancellationToken) =>
             {
                 await DelayProjection(message, delayInSeconds, cancellationToken);

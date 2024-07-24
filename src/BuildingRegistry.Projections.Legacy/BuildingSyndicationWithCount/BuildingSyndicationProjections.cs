@@ -1393,7 +1393,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndicationWithCount
                     else
                     {
                         newAddress.Count += 1;
-                    };
+                    }
 
                     unit.Version = message.Message.Provenance.Timestamp;
                 }, ct);
@@ -1420,6 +1420,35 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndicationWithCount
 
                         unit.Version = message.Message.Provenance.Timestamp;
                     }
+                }, ct);
+            });
+            When<Envelope<BuildingUnitAddressWasReplacedBecauseOfMunicipalityMerger>>(async (context, message, ct) =>
+            {
+                await context.CreateNewBuildingSyndicationItem(message.Message.BuildingPersistentLocalId, message, item =>
+                {
+                    var unit = item.BuildingUnitsV2
+                        .Single(y => y.PersistentLocalId == message.Message.BuildingUnitPersistentLocalId);
+
+                    var previousAddress = unit.Addresses.FirstOrDefault(x =>
+                        x.AddressPersistentLocalId == message.Message.PreviousAddressPersistentLocalId);
+
+                    if (previousAddress is not null)
+                    {
+                        unit.Addresses.Remove(previousAddress);
+                    }
+
+                    var newAddress = unit.Addresses.FirstOrDefault(x =>
+                        x.AddressPersistentLocalId == message.Message.NewAddressPersistentLocalId);
+
+                    if (newAddress is null)
+                    {
+                        unit.Addresses.Add(new BuildingUnitAddressSyndicationItemV2(
+                            message.Position,
+                            unit.PersistentLocalId,
+                            message.Message.NewAddressPersistentLocalId));
+                    }
+
+                    unit.Version = message.Message.Provenance.Timestamp;
                 }, ct);
             });
 

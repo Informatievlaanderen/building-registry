@@ -124,9 +124,7 @@ namespace BuildingRegistry.Projector.Infrastructure.Modules
                             WKBReaderFactory.Create()),
                     ConnectedProjectionSettings.Default)
                 .RegisterProjections<BuildingUnitAddressLinkExtractProjections, ExtractContext>(
-                    context => new BuildingUnitAddressLinkExtractProjections(
-                        context.Resolve<IOptions<ExtractConfig>>(),
-                        DbaseCodePage.Western_European_ANSI.ToEncoding()),
+                    context => new BuildingUnitAddressLinkExtractProjections(DbaseCodePage.Western_European_ANSI.ToEncoding()),
                     ConnectedProjectionSettings.Default)
                 ;
         }

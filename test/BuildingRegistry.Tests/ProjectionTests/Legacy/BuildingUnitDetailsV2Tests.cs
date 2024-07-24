@@ -1065,6 +1065,39 @@ namespace BuildingRegistry.Tests.ProjectionTests.Legacy
         }
 
         [Fact]
+        public async Task WhenBuildingUnitAddressWasReplacedBecauseOfMunicipalityMerger()
+        {
+            _fixture.Customize(new WithFixedBuildingPersistentLocalId());
+            _fixture.Customize(new WithFixedBuildingUnitPersistentLocalId());
+            _fixture.Customizations.Add(new WithUniqueInteger());
+
+            var buildingUnitWasPlannedV2 = _fixture.Create<BuildingUnitWasPlannedV2>();
+            var buildingUnitAddressWasAttachedV2 = _fixture.Create<BuildingUnitAddressWasAttachedV2>();
+            var @event = new BuildingUnitAddressWasReplacedBecauseOfMunicipalityMergerBuilder(_fixture)
+                .WithPreviousAddressPersistentLocalId(buildingUnitAddressWasAttachedV2.AddressPersistentLocalId)
+                .Build();
+
+            await Sut
+                .Given(
+                    new Envelope<BuildingUnitWasPlannedV2>(
+                        new Envelope(buildingUnitWasPlannedV2, new Dictionary<string, object> {{AddEventHashPipe.HashMetadataKey, buildingUnitWasPlannedV2.GetHash()}})),
+                    new Envelope<BuildingUnitAddressWasAttachedV2>(
+                        new Envelope(buildingUnitAddressWasAttachedV2, new Dictionary<string, object> {{AddEventHashPipe.HashMetadataKey, buildingUnitAddressWasAttachedV2.GetHash()}})),
+                    new Envelope<BuildingUnitAddressWasReplacedBecauseOfMunicipalityMerger>(
+                        new Envelope(@event, new Dictionary<string, object> {{AddEventHashPipe.HashMetadataKey, @event.GetHash()}})))
+                .Then(async ct =>
+                {
+                    var item = await ct.BuildingUnitDetailsV2WithCount.FindAsync(@event.BuildingUnitPersistentLocalId);
+                    item.Should().NotBeNull();
+
+                    item!.Addresses.Should().ContainSingle();
+                    item.Addresses.Single().AddressPersistentLocalId.Should().Be(@event.NewAddressPersistentLocalId);
+                    item.Version.Should().Be(@event.Provenance.Timestamp);
+                    item.LastEventHash.Should().Be(@event.GetHash());
+                });
+        }
+
+        [Fact]
         public async Task WhenBuildingUnitWasRetiredBecauseBuildingWasDemolished()
         {
             _fixture.Customize(new WithFixedBuildingPersistentLocalId());
@@ -1131,7 +1164,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Legacy
             var buildingUnitWasPlannedV2 = _fixture.Create<BuildingUnitWasPlannedV2>()
                 .WithFunction(BuildingUnitFunction.Unknown);
             var buildingUnitWasMovedIntoBuilding = _fixture.Create<BuildingUnitWasMovedIntoBuilding>();
-            
+
             await Sut
                 .Given(
                     new Envelope<BuildingUnitWasPlannedV2>(
