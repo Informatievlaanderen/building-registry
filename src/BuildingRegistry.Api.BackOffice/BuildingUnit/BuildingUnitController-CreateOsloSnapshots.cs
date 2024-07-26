@@ -19,7 +19,7 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         [HttpPost("acties/oslosnapshots")]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = PolicyNames.Adres.InterneBijwerker)]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = PolicyNames.GeschetstGebouw.InterneBijwerker)]
         public async Task<IActionResult> CreateOsloSnapshots(
             [FromBody] CreateOsloSnapshotsRequest request,
             CancellationToken cancellationToken = default)
