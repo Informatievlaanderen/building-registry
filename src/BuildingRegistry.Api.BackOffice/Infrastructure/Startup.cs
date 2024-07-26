@@ -52,7 +52,7 @@ namespace BuildingRegistry.Api.BackOffice.Infrastructure
                 .Get<OAuth2IntrospectionOptions>();
 
             var baseUrl = _configuration.GetValue<string>("BaseUrl");
-            var baseUrlForExceptions = baseUrl.EndsWith("/")
+            var baseUrlForExceptions = baseUrl!.EndsWith("/")
                 ? baseUrl.Substring(0, baseUrl.Length - 1)
                 : baseUrl;
 
@@ -74,7 +74,7 @@ namespace BuildingRegistry.Api.BackOffice.Infrastructure
                         },
                         Swagger =
                         {
-                            ApiInfo = (provider, description) => new OpenApiInfo
+                            ApiInfo = (_, description) => new OpenApiInfo
                             {
                                 Version = description.ApiVersion.ToString(),
                                 Title = "Basisregisters Vlaanderen Building Registry API",
@@ -86,7 +86,7 @@ namespace BuildingRegistry.Api.BackOffice.Infrastructure
                                     Url = new Uri("https://backoffice.basisregisters.vlaanderen")
                                 }
                             },
-                            XmlCommentPaths = new[] { typeof(Startup).GetTypeInfo().Assembly.GetName().Name }
+                            XmlCommentPaths = [typeof(Startup).GetTypeInfo().Assembly.GetName().Name!]
                         },
                         MiddlewareHooks =
                         {
@@ -100,13 +100,18 @@ namespace BuildingRegistry.Api.BackOffice.Infrastructure
 
                                 foreach (var connectionString in connectionStrings)
                                     health.AddSqlServer(
-                                        connectionString.Value,
+                                        connectionString.Value!,
                                         name: $"sqlserver-{connectionString.Key.ToLowerInvariant()}",
                                         tags: new[] { DatabaseTag, "sql", "sqlserver" });
                             },
                             Authorization = options =>
                             {
-                                options.AddAcmIdmAuthorization();
+                                var blacklistedOvoCodes =  _configuration
+                                    .GetSection("BlacklistedOvoCodes")
+                                    .GetChildren()
+                                    .Select(c => c.Value!)
+                                    .ToArray();
+                                options.AddBuildingPolicies(blacklistedOvoCodes);
                             }
                         }
                     }
@@ -177,8 +182,8 @@ namespace BuildingRegistry.Api.BackOffice.Infrastructure
             app.UseIdempotencyDatabaseMigrations();
 
             MigrationsHelper.Run(
-                _configuration.GetConnectionString("Sequences"),
-                _configuration.GetConnectionString("BackOffice"),
+                _configuration.GetConnectionString("Sequences")!,
+                _configuration.GetConnectionString("BackOffice")!,
                 serviceProvider.GetService<ILoggerFactory>());
 
             StartupHelpers.CheckDatabases(healthCheckService, DatabaseTag, loggerFactory).GetAwaiter().GetResult();
