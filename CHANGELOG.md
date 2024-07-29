@@ -1,3 +1,12 @@
+# [4.12.0](https://github.com/informatievlaanderen/building-registry/compare/v4.11.0...v4.12.0) (2024-07-29)
+
+
+### Features
+
+* add snapshot status endpoint ([8055d1f](https://github.com/informatievlaanderen/building-registry/commit/8055d1f27dfa9e2445b366839328af67537ba1d5))
+* blacklist ovocodes ([#1249](https://github.com/informatievlaanderen/building-registry/issues/1249)) ([b71d013](https://github.com/informatievlaanderen/building-registry/commit/b71d0135255cee00879fe5e40544bc9db53f6ff4))
+* replace building unit address because of municipality merger ([bdb2507](https://github.com/informatievlaanderen/building-registry/commit/bdb2507d29db2c5c1cebe70c2b5535cf447c1a2d))
+
 # [4.11.0](https://github.com/informatievlaanderen/building-registry/compare/v4.10.4...v4.11.0) (2024-07-22)
 
 
