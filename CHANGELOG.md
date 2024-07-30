@@ -1,3 +1,10 @@
+## [4.12.1](https://github.com/informatievlaanderen/building-registry/compare/v4.12.0...v4.12.1) (2024-07-30)
+
+
+### Bug Fixes
+
+* new address can be null for rejected or retired address because of municipality merger ([ac8e90c](https://github.com/informatievlaanderen/building-registry/commit/ac8e90cd27251642cc658a3f06f730bb6b648ae1))
+
 # [4.12.0](https://github.com/informatievlaanderen/building-registry/compare/v4.11.0...v4.12.0) (2024-07-29)
 
 
