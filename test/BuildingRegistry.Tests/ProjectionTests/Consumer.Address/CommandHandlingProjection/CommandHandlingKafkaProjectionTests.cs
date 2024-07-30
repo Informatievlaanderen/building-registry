@@ -388,6 +388,40 @@ namespace BuildingRegistry.Tests.ProjectionTests.Consumer.Address.CommandHandlin
         }
 
         [Fact]
+        public async Task DetachBuildingUnitAddressBecauseOfMunicipalityMergerWhenNoNewAddress_AddressWasRejectedBecauseOfMunicipalityMerger()
+        {
+            var oldAddressPersistentLocalId = 1;
+
+            var @event = new AddressWasRejectedBecauseOfMunicipalityMerger(
+                Fixture.Create<int>(),
+                oldAddressPersistentLocalId,
+                null,
+                new Provenance(
+                    Instant.FromDateTimeOffset(DateTimeOffset.Now).ToString(),
+                    Application.BuildingRegistry.ToString(),
+                    Modification.Update.ToString(),
+                    Organisation.Aiv.ToString(),
+                    "test"));
+
+            AddRelations(oldAddressPersistentLocalId, oldAddressPersistentLocalId);
+
+            Given(@event);
+            await Then(async _ =>
+            {
+                _mockCommandHandler.Verify(x => x.Handle(
+                    It.IsAny<DetachAddressFromBuildingUnitBecauseAddressWasRejected>(), CancellationToken.None),
+                    Times.Exactly(2));
+
+                var oldAddressRelations = _fakeBackOfficeContext.BuildingUnitAddressRelation
+                    .Where(x => x.AddressPersistentLocalId == oldAddressPersistentLocalId)
+                    .ToList();
+
+                oldAddressRelations.Should().BeEmpty();
+                await Task.CompletedTask;
+            });
+        }
+
+        [Fact]
         public async Task DetachAddressFromBuildingUnitBecause_AddressWasRejectedBecauseStreetNameWasRetired()
         {
             var addressIntId = 456;
@@ -548,6 +582,40 @@ namespace BuildingRegistry.Tests.ProjectionTests.Consumer.Address.CommandHandlin
 
                 oldAddressRelations.Should().BeEmpty();
                 newAddressRelations.Should().HaveCount(2);
+                await Task.CompletedTask;
+            });
+        }
+
+        [Fact]
+        public async Task DetachBuildingUnitAddressBecauseOfMunicipalityMergerWhenNoNewAddress_AddressWasRetiredBecauseOfMunicipalityMerger()
+        {
+            var oldAddressPersistentLocalId = 1;
+
+            var @event = new AddressWasRetiredBecauseOfMunicipalityMerger(
+                Fixture.Create<int>(),
+                oldAddressPersistentLocalId,
+                null,
+                new Provenance(
+                    Instant.FromDateTimeOffset(DateTimeOffset.Now).ToString(),
+                    Application.BuildingRegistry.ToString(),
+                    Modification.Update.ToString(),
+                    Organisation.Aiv.ToString(),
+                    "test"));
+
+            AddRelations(oldAddressPersistentLocalId, oldAddressPersistentLocalId);
+
+            Given(@event);
+            await Then(async _ =>
+            {
+                _mockCommandHandler.Verify(x => x.Handle(
+                        It.IsAny<DetachAddressFromBuildingUnitBecauseAddressWasRetired>(), CancellationToken.None),
+                    Times.Exactly(2));
+
+                var oldAddressRelations = _fakeBackOfficeContext.BuildingUnitAddressRelation
+                    .Where(x => x.AddressPersistentLocalId == oldAddressPersistentLocalId)
+                    .ToList();
+
+                oldAddressRelations.Should().BeEmpty();
                 await Task.CompletedTask;
             });
         }
