@@ -1,3 +1,11 @@
+## [4.12.2](https://github.com/informatievlaanderen/building-registry/compare/v4.12.1...v4.12.2) (2024-08-06)
+
+
+### Bug Fixes
+
+* add index for BuildingVersion.BuildingId ([8f7971a](https://github.com/informatievlaanderen/building-registry/commit/8f7971a8465c5669256ea20bba41031435aee147))
+* add migration ([d1a5ab7](https://github.com/informatievlaanderen/building-registry/commit/d1a5ab71df260ce5335786cf3149987462a66c89))
+
 ## [4.12.1](https://github.com/informatievlaanderen/building-registry/compare/v4.12.0...v4.12.1) (2024-07-30)
 
 
