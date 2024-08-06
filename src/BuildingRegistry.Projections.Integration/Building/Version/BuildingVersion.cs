@@ -156,6 +156,7 @@
             builder.Ignore(x => x.CreatedOnTimestamp);
             builder.Ignore(x => x.LastChangedOnTimestamp);
 
+            builder.HasIndex(x => x.BuildingId);
             builder.HasIndex(x => x.BuildingPersistentLocalId);
             builder.HasIndex(x => x.Status);
             builder.HasIndex(x => x.OsloStatus);
