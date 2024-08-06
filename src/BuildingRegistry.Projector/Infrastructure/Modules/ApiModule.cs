@@ -247,12 +247,6 @@ namespace BuildingRegistry.Projector.Infrastructure.Modules
                         context.Resolve<IPersistentLocalIdFinder>(),
                         context.Resolve<IAddresses>()),
                     buildingProjectionSettings)
-                .RegisterProjections<BuildingVersionProjections, IntegrationContext>(
-                    context => new BuildingVersionProjections(
-                        context.Resolve<IOptions<IntegrationOptions>>(),
-                        context.Resolve<IPersistentLocalIdFinder>(),
-                        context.Resolve<IAddresses>()),
-                    buildingProjectionSettings)
                 .RegisterProjections<BuildingVersionFromMigration, IntegrationContext>(
                     context => new BuildingVersionFromMigration(
                         context.Resolve<IOptions<IntegrationOptions>>()),
