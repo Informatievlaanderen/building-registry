@@ -54,6 +54,12 @@ namespace BuildingRegistry.Projections.Integration
 
         // This needs to be DbContextOptions<T> for Autofac!
         public IntegrationContext(DbContextOptions<IntegrationContext> options)
-            : base(options) { }
+            : base(options)
+        {
+            if(!Database.IsInMemory())
+            {
+                Database.SetCommandTimeout(10 * 60);
+            }
+        }
     }
 }
