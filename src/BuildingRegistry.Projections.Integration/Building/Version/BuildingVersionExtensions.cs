@@ -81,6 +81,7 @@
                    .Where(x => x.BuildingId == buildingId)
                    .Include(x => x.BuildingUnits).ThenInclude(y => y.Addresses)
                    .Include(x => x.BuildingUnits).ThenInclude(y => y.Readdresses)
+                   .AsSplitQuery()
                    .OrderByDescending(x => x.Position)
                    .FirstOrDefaultAsync(ct);
 
