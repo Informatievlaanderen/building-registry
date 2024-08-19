@@ -1,3 +1,10 @@
+## [4.12.4](https://github.com/informatievlaanderen/building-registry/compare/v4.12.3...v4.12.4) (2024-08-19)
+
+
+### Performance Improvements
+
+* **integration:** try using split query for versions ([7856795](https://github.com/informatievlaanderen/building-registry/commit/78567951deb6579194dfb2c5e8806d765c94dc0a))
+
 ## [4.12.3](https://github.com/informatievlaanderen/building-registry/compare/v4.12.2...v4.12.3) (2024-08-19)
 
 
