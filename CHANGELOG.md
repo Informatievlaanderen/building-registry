@@ -1,3 +1,12 @@
+## [4.12.3](https://github.com/informatievlaanderen/building-registry/compare/v4.12.2...v4.12.3) (2024-08-19)
+
+
+### Bug Fixes
+
+* add longer timeout for integration db ([7e67d07](https://github.com/informatievlaanderen/building-registry/commit/7e67d07733b799081dd7f3b755e1a2e95a952674))
+* revert "fix: add index for BuildingVersion.BuildingId" ([133b4cc](https://github.com/informatievlaanderen/building-registry/commit/133b4cc89d9f7f6a5ea13a13ec27c30b8c7e51fb))
+* revert "fix: add migration" ([0e3190e](https://github.com/informatievlaanderen/building-registry/commit/0e3190ed51803b7f4ae4aa92da80e923fdf0bdee))
+
 ## [4.12.2](https://github.com/informatievlaanderen/building-registry/compare/v4.12.1...v4.12.2) (2024-08-06)
 
 
