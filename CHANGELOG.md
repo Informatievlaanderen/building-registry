@@ -1,3 +1,10 @@
+## [4.12.5](https://github.com/informatievlaanderen/building-registry/compare/v4.12.4...v4.12.5) (2024-08-19)
+
+
+### Performance Improvements
+
+* **integration:** add position composite indexes ([306cbda](https://github.com/informatievlaanderen/building-registry/commit/306cbdad096820ff60f004323ea8d0e74669c6df))
+
 ## [4.12.4](https://github.com/informatievlaanderen/building-registry/compare/v4.12.3...v4.12.4) (2024-08-19)
 
 
