@@ -379,8 +379,6 @@ namespace BuildingRegistry.Projections.Integration.Migrations
 
                     b.HasKey("Position");
 
-                    b.HasIndex("BuildingId");
-
                     b.HasIndex("BuildingPersistentLocalId");
 
                     b.HasIndex("Geometry");
