@@ -72,6 +72,101 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenNotRealizingBuilding
         }
 
         [Fact]
+        public void WithPlannedBuildingUnitsAndCommonPlanned_ThenBuildingUnitsWereNotRealized()
+        {
+            var command = Fixture.Create<NotRealizeBuilding>();
+
+            var buildingUnitWasPlannedV2 = Fixture.Create<BuildingUnitWasPlannedV2>();
+            var buildingUnitAddressWasAttachedV2 = Fixture.Create<BuildingUnitAddressWasAttachedV2>();
+            var buildingUnitWasPlannedV2Two = Fixture.Create<BuildingUnitWasPlannedV2>()
+                .WithBuildingUnitPersistentLocalId(buildingUnitWasPlannedV2.BuildingUnitPersistentLocalId + 1);
+            var commonBuildingUnitWasPlanned = new BuildingUnitWasPlannedV2Builder(Fixture)
+                .WithBuildingUnitPersistentLocalId(buildingUnitWasPlannedV2.BuildingUnitPersistentLocalId + 2)
+                .WithFunction(BuildingRegistry.Building.BuildingUnitFunction.Common)
+                .Build();
+
+            Assert(new Scenario()
+                .Given(
+                    new BuildingStreamId(Fixture.Create<BuildingPersistentLocalId>()),
+                    Fixture.Create<BuildingWasPlannedV2>(),
+                    buildingUnitWasPlannedV2,
+                    buildingUnitAddressWasAttachedV2,
+                    buildingUnitWasPlannedV2Two,
+                    commonBuildingUnitWasPlanned)
+                .When(command)
+                .Then(
+                    new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
+                        new BuildingUnitAddressWasDetachedV2(
+                            command.BuildingPersistentLocalId,
+                            new BuildingUnitPersistentLocalId(buildingUnitAddressWasAttachedV2.BuildingUnitPersistentLocalId),
+                            new AddressPersistentLocalId(buildingUnitAddressWasAttachedV2.AddressPersistentLocalId))),
+                    new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
+                        new BuildingUnitWasNotRealizedBecauseBuildingWasNotRealized(
+                            command.BuildingPersistentLocalId,
+                            new BuildingUnitPersistentLocalId(buildingUnitWasPlannedV2.BuildingUnitPersistentLocalId))),
+                    new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
+                        new BuildingUnitWasNotRealizedBecauseBuildingWasNotRealized(
+                            command.BuildingPersistentLocalId,
+                            new BuildingUnitPersistentLocalId(buildingUnitWasPlannedV2Two.BuildingUnitPersistentLocalId))),
+                    new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
+                        new BuildingUnitWasNotRealizedBecauseBuildingWasNotRealized(
+                            command.BuildingPersistentLocalId,
+                            new BuildingUnitPersistentLocalId(commonBuildingUnitWasPlanned.BuildingUnitPersistentLocalId))),
+                    new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
+                        new BuildingWasNotRealizedV2(command.BuildingPersistentLocalId))));
+        }
+
+        [Fact]
+        public void WithPlannedBuildingUnitsAndCommonRealized_ThenBuildingUnitsWereNotRealized()
+        {
+            var command = Fixture.Create<NotRealizeBuilding>();
+
+            var buildingUnitWasPlannedV2 = Fixture.Create<BuildingUnitWasPlannedV2>();
+            var buildingUnitAddressWasAttachedV2 = Fixture.Create<BuildingUnitAddressWasAttachedV2>();
+            var buildingUnitWasPlannedV2Two = Fixture.Create<BuildingUnitWasPlannedV2>()
+                .WithBuildingUnitPersistentLocalId(buildingUnitWasPlannedV2.BuildingUnitPersistentLocalId + 1);
+            var commonBuildingUnitWasPlanned = new BuildingUnitWasPlannedV2Builder(Fixture)
+                .WithBuildingUnitPersistentLocalId(buildingUnitWasPlannedV2.BuildingUnitPersistentLocalId + 2)
+                .WithFunction(BuildingRegistry.Building.BuildingUnitFunction.Common)
+                .Build();
+            var commonBuildingUnitWasRealized = Fixture.Create<BuildingUnitWasRealizedV2>()
+                .WithBuildingUnitPersistentLocalId(new BuildingUnitPersistentLocalId(commonBuildingUnitWasPlanned.BuildingUnitPersistentLocalId));
+
+            Assert(new Scenario()
+                .Given(
+                    new BuildingStreamId(Fixture.Create<BuildingPersistentLocalId>()),
+                    Fixture.Create<BuildingWasPlannedV2>(),
+                    buildingUnitWasPlannedV2,
+                    buildingUnitAddressWasAttachedV2,
+                    buildingUnitWasPlannedV2Two,
+                    commonBuildingUnitWasPlanned,
+                    commonBuildingUnitWasRealized)
+                .When(command)
+                .Then(
+                    new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
+                        new BuildingUnitAddressWasDetachedV2(
+                            command.BuildingPersistentLocalId,
+                            new BuildingUnitPersistentLocalId(buildingUnitAddressWasAttachedV2.BuildingUnitPersistentLocalId),
+                            new AddressPersistentLocalId(buildingUnitAddressWasAttachedV2.AddressPersistentLocalId))),
+                    new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
+                        new BuildingUnitWasNotRealizedBecauseBuildingWasNotRealized(
+                            command.BuildingPersistentLocalId,
+                            new BuildingUnitPersistentLocalId(buildingUnitWasPlannedV2.BuildingUnitPersistentLocalId))),
+                    new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
+                        new BuildingUnitWasNotRealizedBecauseBuildingWasNotRealized(
+                            command.BuildingPersistentLocalId,
+                            new BuildingUnitPersistentLocalId(buildingUnitWasPlannedV2Two.BuildingUnitPersistentLocalId))),
+                    new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
+                        new BuildingUnitWasRetiredV2(
+                            command.BuildingPersistentLocalId,
+                            new BuildingUnitPersistentLocalId(commonBuildingUnitWasPlanned.BuildingUnitPersistentLocalId))),
+                    new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
+                        new BuildingWasNotRealizedV2(command.BuildingPersistentLocalId))
+                   )
+            );
+        }
+
+        [Fact]
         public void WithStatusNotRealized_ThenDoNothing()
         {
             var command = Fixture.Create<NotRealizeBuilding>();
