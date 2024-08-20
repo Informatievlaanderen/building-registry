@@ -116,6 +116,8 @@ namespace BuildingRegistry.Building
                 unit.NotRealizeBecauseBuildingWasNotRealized();
             }
 
+            NotRealizeOrRetireCommonBuildingUnit();
+
             ApplyChange(new BuildingWasNotRealizedV2(BuildingPersistentLocalId));
         }
 
