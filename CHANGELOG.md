@@ -1,3 +1,10 @@
+## [4.12.6](https://github.com/informatievlaanderen/building-registry/compare/v4.12.5...v4.12.6) (2024-08-20)
+
+
+### Bug Fixes
+
+* currently realized common units need to be retired when notrealizing building GAWR-3426 ([4142c6d](https://github.com/informatievlaanderen/building-registry/commit/4142c6d586653269c8014f5ef6fef6b80244a087))
+
 ## [4.12.5](https://github.com/informatievlaanderen/building-registry/compare/v4.12.4...v4.12.5) (2024-08-19)
 
 
