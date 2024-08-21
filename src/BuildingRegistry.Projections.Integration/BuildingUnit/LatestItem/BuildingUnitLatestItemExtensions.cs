@@ -4,6 +4,7 @@
     using System.Threading;
     using System.Threading.Tasks;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.Connector;
+    using Microsoft.EntityFrameworkCore;
 
     public static class BuildingUnitLatestItemExtensions
     {
@@ -32,7 +33,7 @@
                 var buildingUnitAddress = await context.BuildingUnitAddresses.FindAsync(
                     new object[] { buildingUnit.BuildingUnitPersistentLocalId, addressPersistentLocalId }, ct);
 
-                if (buildingUnitAddress is null)
+                if (buildingUnitAddress is null  || context.Entry(buildingUnitAddress).State == EntityState.Deleted)
                 {
                     context.BuildingUnitAddresses.Add(new BuildingUnitAddress
                     {
