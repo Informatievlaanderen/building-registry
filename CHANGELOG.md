@@ -1,3 +1,10 @@
+# [4.13.0](https://github.com/informatievlaanderen/building-registry/compare/v4.12.7...v4.13.0) (2024-08-22)
+
+
+### Features
+
+* cleanup legacy api ([3a8084f](https://github.com/informatievlaanderen/building-registry/commit/3a8084fff55f6f992a6e8e65260e11df4ea62d52))
+
 ## [4.12.7](https://github.com/informatievlaanderen/building-registry/compare/v4.12.6...v4.12.7) (2024-08-22)
 
 
