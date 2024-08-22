@@ -1,3 +1,10 @@
+## [4.12.7](https://github.com/informatievlaanderen/building-registry/compare/v4.12.6...v4.12.7) (2024-08-22)
+
+
+### Bug Fixes
+
+* **integration:** idempotent link needs to check deleted state GAWR-6562 ([b83e830](https://github.com/informatievlaanderen/building-registry/commit/b83e830f333651190804bfcf70372b332b849adf))
+
 ## [4.12.6](https://github.com/informatievlaanderen/building-registry/compare/v4.12.5...v4.12.6) (2024-08-20)
 
 
