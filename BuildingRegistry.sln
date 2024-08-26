@@ -9,8 +9,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{1A034126-3
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BuildingRegistry", "src\BuildingRegistry\BuildingRegistry.csproj", "{3B47D06E-CA62-47F4-8271-B83A89235F3A}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BuildingRegistry.Api.Legacy", "src\BuildingRegistry.Api.Legacy\BuildingRegistry.Api.Legacy.csproj", "{C73C3645-D607-40F9-8EBA-AF9AE197AAE0}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BuildingRegistry.Infrastructure", "src\BuildingRegistry.Infrastructure\BuildingRegistry.Infrastructure.csproj", "{570E432B-8C42-45A3-9725-09EDDE9B54DB}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BuildingRegistry.Projections.Legacy", "src\BuildingRegistry.Projections.Legacy\BuildingRegistry.Projections.Legacy.csproj", "{84D96654-6101-4483-86E1-F1A2C4A62F32}"
@@ -88,10 +86,6 @@ Global
 		{3B47D06E-CA62-47F4-8271-B83A89235F3A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3B47D06E-CA62-47F4-8271-B83A89235F3A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3B47D06E-CA62-47F4-8271-B83A89235F3A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C73C3645-D607-40F9-8EBA-AF9AE197AAE0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C73C3645-D607-40F9-8EBA-AF9AE197AAE0}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C73C3645-D607-40F9-8EBA-AF9AE197AAE0}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C73C3645-D607-40F9-8EBA-AF9AE197AAE0}.Release|Any CPU.Build.0 = Release|Any CPU
 		{570E432B-8C42-45A3-9725-09EDDE9B54DB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{570E432B-8C42-45A3-9725-09EDDE9B54DB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{570E432B-8C42-45A3-9725-09EDDE9B54DB}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -194,7 +188,6 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{3B47D06E-CA62-47F4-8271-B83A89235F3A} = {24B47154-C5F0-4356-B059-49A1E72C38A6}
-		{C73C3645-D607-40F9-8EBA-AF9AE197AAE0} = {24B47154-C5F0-4356-B059-49A1E72C38A6}
 		{570E432B-8C42-45A3-9725-09EDDE9B54DB} = {24B47154-C5F0-4356-B059-49A1E72C38A6}
 		{84D96654-6101-4483-86E1-F1A2C4A62F32} = {24B47154-C5F0-4356-B059-49A1E72C38A6}
 		{EEB4C34C-F22F-4397-9148-2DB97C58A704} = {1A034126-30E6-416B-BB2E-F5786E07B178}
