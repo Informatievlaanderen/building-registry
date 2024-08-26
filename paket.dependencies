@@ -54,10 +54,10 @@ nuget Be.Vlaanderen.Basisregisters.Aws.Lambda 4.0.0
 nuget Be.Vlaanderen.Basisregisters.EventHandling 5.0.0
 nuget Be.Vlaanderen.Basisregisters.EventHandling.Autofac 5.0.0
 
-nuget Be.Vlaanderen.Basisregisters.MessageHandling.AwsSqs.Simple 5.0.1
-nuget Be.Vlaanderen.Basisregisters.MessageHandling.Kafka.Producer 5.0.1
-nuget Be.Vlaanderen.Basisregisters.MessageHandling.Kafka.Consumer 5.0.1
-nuget Be.Vlaanderen.Basisregisters.MessageHandling.Kafka.Consumer.SqlServer 5.0.1
+nuget Be.Vlaanderen.Basisregisters.MessageHandling.AwsSqs.Simple 5.1.0
+nuget Be.Vlaanderen.Basisregisters.MessageHandling.Kafka.Producer 5.1.0
+nuget Be.Vlaanderen.Basisregisters.MessageHandling.Kafka.Consumer 5.1.0
+nuget Be.Vlaanderen.Basisregisters.MessageHandling.Kafka.Consumer.SqlServer 5.1.0
 
 nuget Be.Vlaanderen.Basisregisters.ProjectionHandling.LastChangedList 14.0.0
 nuget Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore 14.0.0

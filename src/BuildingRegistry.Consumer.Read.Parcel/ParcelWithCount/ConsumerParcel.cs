@@ -36,7 +36,7 @@ namespace BuildingRegistry.Consumer.Read.Parcel.ParcelWithCount
 
             try
             {
-                await _consumer.ConsumeContinuously(async message =>
+                await _consumer.ConsumeContinuously(async (message, messageContext) =>
                 {
                     _logger.LogInformation("Handling next message");
 
@@ -44,6 +44,7 @@ namespace BuildingRegistry.Consumer.Read.Parcel.ParcelWithCount
                     await projector.ProjectAsync(context, message, stoppingToken).ConfigureAwait(false);
 
                     //CancellationToken.None to prevent halfway consumption
+                    await context.UpdateProjectionState(typeof(ConsumerParcel).FullName, messageContext.Offset, stoppingToken);
                     await context.SaveChangesAsync(CancellationToken.None);
 
                 }, stoppingToken);
