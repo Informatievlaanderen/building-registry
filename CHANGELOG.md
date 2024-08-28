@@ -1,3 +1,10 @@
+# [4.14.0](https://github.com/informatievlaanderen/building-registry/compare/v4.13.0...v4.14.0) (2024-08-28)
+
+
+### Features
+
+* **consumer:** add offset as projection state to read consumer ([#1259](https://github.com/informatievlaanderen/building-registry/issues/1259)) ([376c624](https://github.com/informatievlaanderen/building-registry/commit/376c624e367961f77d4e137480fa63135c9c43d5))
+
 # [4.13.0](https://github.com/informatievlaanderen/building-registry/compare/v4.12.7...v4.13.0) (2024-08-22)
 
 
