@@ -34,7 +34,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
                     .WithAddress(addressPersistentLocalId)
                     .Build())
                 .Build();
-            
+
             var buildingUnitAddressWasReplacedBecauseAddressWasReaddressed = new BuildingUnitAddressWasReplacedBecauseAddressWasReaddressed(
                 _fixture.Create<BuildingPersistentLocalId>(),
                 buildingUnitPersistentLocalId,
@@ -242,15 +242,24 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
 
             var position = _fixture.Create<long>();
             var buildingUnitPersistentLocalId = _fixture.Create<BuildingUnitPersistentLocalId>();
+            var buildingUnitPersistentLocalId2 = new BuildingUnitPersistentLocalId(buildingUnitPersistentLocalId + 1);
             var sourceAddressPersistentLocalId = _fixture.Create<AddressPersistentLocalId>();
-            var destinationAddressPersistentLocalId = _fixture.Create<AddressPersistentLocalId>();
+            var sourceAddressPersistentLocalId2 = sourceAddressPersistentLocalId + 1;
+            var destinationAddressPersistentLocalId = sourceAddressPersistentLocalId2 + 10;
+            var destinationAddressPersistentLocalId2 = destinationAddressPersistentLocalId + 1;
 
             var buildingWasMigrated = new BuildingWasMigratedBuilder(_fixture)
                 .WithBuildingUnit(new BuildingUnitBuilder(_fixture)
                     .WithAddress(sourceAddressPersistentLocalId)
                     .Build()
-                ).Build();
-            
+                )
+                .WithBuildingUnit(new BuildingUnitBuilder(_fixture)
+                    .WithPersistentLocalId(buildingUnitPersistentLocalId2)
+                    .WithAddress(sourceAddressPersistentLocalId2)
+                    .Build()
+                )
+                .Build();
+
             var buildingBuildingUnitsAddressesWereReaddressed = new BuildingBuildingUnitsAddressesWereReaddressed(
                 _fixture.Create<BuildingPersistentLocalId>(),
                 [
@@ -258,6 +267,11 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
                         _fixture.Create<BuildingUnitPersistentLocalId>(),
                         [new AddressPersistentLocalId(destinationAddressPersistentLocalId)],
                         [new AddressPersistentLocalId(sourceAddressPersistentLocalId)]
+                    ),
+                    new BuildingUnitAddressesWereReaddressed(
+                        buildingUnitPersistentLocalId2,
+                        [new AddressPersistentLocalId(destinationAddressPersistentLocalId2)],
+                        [new AddressPersistentLocalId(sourceAddressPersistentLocalId2)]
                     )
                 ],
                 []);
@@ -301,6 +315,21 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
                     var sourceAddress = buildingUnitVersion.Addresses.SingleOrDefault(x =>
                         x.AddressPersistentLocalId == sourceAddressPersistentLocalId);
                     sourceAddress.Should().BeNull();
+
+                    var buildingUnitVersion2 = buildingVersion!.BuildingUnits.SingleOrDefault(x =>
+                        x.BuildingUnitPersistentLocalId == buildingUnitPersistentLocalId2);
+                    buildingUnitVersion2.Should().NotBeNull();
+
+                    buildingUnitVersion2!.VersionTimestamp.Should().Be(buildingBuildingUnitsAddressesWereReaddressed.Provenance.Timestamp);
+                    buildingUnitVersion2.Type.Should().Be("EventName");
+
+                    var destinationAddress2 = buildingUnitVersion2.Addresses.SingleOrDefault(x =>
+                        x.AddressPersistentLocalId == destinationAddressPersistentLocalId2);
+                    destinationAddress2.Should().NotBeNull();
+
+                    var sourceAddress2 = buildingUnitVersion2.Addresses.SingleOrDefault(x =>
+                        x.AddressPersistentLocalId == sourceAddressPersistentLocalId2);
+                    sourceAddress2.Should().BeNull();
                 });
         }
     }

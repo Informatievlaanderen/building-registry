@@ -544,12 +544,12 @@ namespace BuildingRegistry.Projections.Integration.Building.Version
 
             When<Envelope<BuildingBuildingUnitsAddressesWereReaddressed>>(async (context, message, ct) =>
             {
-                foreach (var buildingUnitReaddresses in message.Message.BuildingUnitsReaddresses)
-                {
-                    await context.CreateNewBuildingVersion(
-                        message.Message.BuildingPersistentLocalId,
-                        message,
-                        building =>
+                await context.CreateNewBuildingVersion(
+                    message.Message.BuildingPersistentLocalId,
+                    message,
+                    building =>
+                    {
+                        foreach (var buildingUnitReaddresses in message.Message.BuildingUnitsReaddresses)
                         {
                             var buildingUnit = building.BuildingUnits.Single(x =>
                                 x.BuildingUnitPersistentLocalId == buildingUnitReaddresses.BuildingUnitPersistentLocalId);
@@ -575,9 +575,9 @@ namespace BuildingRegistry.Projections.Integration.Building.Version
                             }
 
                             buildingUnit.VersionTimestamp = message.Message.Provenance.Timestamp;
-                        },
-                        ct);
-                }
+                        }
+                    },
+                    ct);
             });
 
             When<Envelope<BuildingUnitAddressWasReplacedBecauseOfMunicipalityMerger>>(async (context, message, ct) =>
