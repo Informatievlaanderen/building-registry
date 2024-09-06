@@ -1,3 +1,10 @@
+## [4.14.1](https://github.com/informatievlaanderen/building-registry/compare/v4.14.0...v4.14.1) (2024-09-06)
+
+
+### Bug Fixes
+
+* **integration:** correct readdress projection ([6460075](https://github.com/informatievlaanderen/building-registry/commit/6460075e08a918b5c5e4e471ede127d5b54ecf7c))
+
 # [4.14.0](https://github.com/informatievlaanderen/building-registry/compare/v4.13.0...v4.14.0) (2024-08-28)
 
 
