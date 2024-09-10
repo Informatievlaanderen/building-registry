@@ -689,8 +689,8 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building.FromMigrat
                     buildingVersion.Should().NotBeNull();
                     var buildingUnitVersion = buildingVersion!.BuildingUnits.SingleOrDefault(x =>
                         x.BuildingUnitPersistentLocalId == buildingUnitWasPlannedV2.BuildingUnitPersistentLocalId);
-                    buildingUnitVersion.Should().NotBeNull();
 
+                    buildingUnitVersion.Should().NotBeNull();
                     buildingUnitVersion!.IsRemoved.Should().BeTrue();
                     buildingUnitVersion.VersionTimestamp.Should().Be(buildingUnitWasRemovedV2.Provenance.Timestamp);
                     buildingUnitVersion.Type.Should().Be("EventName");

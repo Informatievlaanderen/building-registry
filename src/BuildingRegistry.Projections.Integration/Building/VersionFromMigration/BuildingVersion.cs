@@ -83,7 +83,9 @@
             Action<BuildingVersion> editFunc)
         {
             var buildingUnits =
-                BuildingUnits.Select(x => x.CloneAndApplyEventInfo(newPosition, eventName));
+                BuildingUnits
+                    .Where(x => !x.IsRemoved)
+                    .Select(x => x.CloneAndApplyEventInfo(newPosition, eventName));
 
             var newItem = new BuildingVersion
             {
