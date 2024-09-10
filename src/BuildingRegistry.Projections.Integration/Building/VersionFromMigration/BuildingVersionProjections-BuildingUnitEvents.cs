@@ -249,22 +249,50 @@ namespace BuildingRegistry.Projections.Integration.Building.VersionFromMigration
                     message,
                     building =>
                     {
-                        var buildingUnit = building.BuildingUnits.Single(x =>
+                        var buildingUnit = building.BuildingUnits.SingleOrDefault(x =>
                             x.BuildingUnitPersistentLocalId == message.Message.BuildingUnitPersistentLocalId);
 
                         var geometryAsBinary = message.Message.ExtendedWkbGeometry.ToByteArray();
                         var sysGeometry = wkbReader.Read(geometryAsBinary);
 
-                        buildingUnit.Status = BuildingUnitStatus.Parse(message.Message.BuildingUnitStatus).Status;
-                        buildingUnit.OsloStatus = BuildingUnitStatus.Parse(message.Message.BuildingUnitStatus).Map();
-                        buildingUnit.Function = BuildingUnitFunction.Parse(message.Message.Function).Function;
-                        buildingUnit.OsloFunction = BuildingUnitFunction.Parse(message.Message.Function).Map();
-                        buildingUnit.Geometry = sysGeometry;
-                        buildingUnit.GeometryMethod = BuildingUnitPositionGeometryMethod.Parse(message.Message.GeometryMethod).GeometryMethod;
-                        buildingUnit.OsloGeometryMethod = BuildingUnitPositionGeometryMethod.Parse(message.Message.GeometryMethod).Map();
-                        buildingUnit.HasDeviation = message.Message.HasDeviation;
-                        buildingUnit.IsRemoved = false;
-                        buildingUnit.VersionTimestamp = message.Message.Provenance.Timestamp;
+                        if (buildingUnit is not null)
+                        {
+                            buildingUnit.Status = BuildingUnitStatus.Parse(message.Message.BuildingUnitStatus).Status;
+                            buildingUnit.OsloStatus = BuildingUnitStatus.Parse(message.Message.BuildingUnitStatus).Map();
+                            buildingUnit.Function = BuildingUnitFunction.Parse(message.Message.Function).Function;
+                            buildingUnit.OsloFunction = BuildingUnitFunction.Parse(message.Message.Function).Map();
+                            buildingUnit.Geometry = sysGeometry;
+                            buildingUnit.GeometryMethod = BuildingUnitPositionGeometryMethod.Parse(message.Message.GeometryMethod).GeometryMethod;
+                            buildingUnit.OsloGeometryMethod = BuildingUnitPositionGeometryMethod.Parse(message.Message.GeometryMethod).Map();
+                            buildingUnit.HasDeviation = message.Message.HasDeviation;
+                            buildingUnit.IsRemoved = false;
+                            buildingUnit.VersionTimestamp = message.Message.Provenance.Timestamp;
+                        }
+                        else
+                        {
+                            var buildingUnitVersion = new BuildingUnitVersion
+                            {
+                                Position = message.Position,
+                                BuildingUnitPersistentLocalId = message.Message.BuildingUnitPersistentLocalId,
+                                BuildingPersistentLocalId = message.Message.BuildingPersistentLocalId,
+                                Status = BuildingUnitStatus.Parse(message.Message.BuildingUnitStatus).Status,
+                                OsloStatus = BuildingUnitStatus.Parse(message.Message.BuildingUnitStatus).Map(),
+                                Function = BuildingUnitFunction.Parse(message.Message.Function).Function,
+                                OsloFunction = BuildingUnitFunction.Parse(message.Message.Function).Map(),
+                                GeometryMethod = BuildingUnitPositionGeometryMethod.Parse(message.Message.GeometryMethod).GeometryMethod,
+                                OsloGeometryMethod = BuildingUnitPositionGeometryMethod.Parse(message.Message.GeometryMethod).Map(),
+                                Geometry = sysGeometry,
+                                HasDeviation = message.Message.HasDeviation,
+                                IsRemoved = false,
+                                VersionTimestamp = message.Message.Provenance.Timestamp,
+                                CreatedOnTimestamp = message.Message.Provenance.Timestamp,
+                                Namespace = options.BuildingUnitNamespace,
+                                PuriId = $"{options.BuildingUnitNamespace}/{message.Message.BuildingUnitPersistentLocalId}",
+                                Type = message.EventName
+                            };
+
+                            building.BuildingUnits.Add(buildingUnitVersion);
+                        }
 
                         building.VersionTimestamp = message.Message.Provenance.Timestamp;
                     },
