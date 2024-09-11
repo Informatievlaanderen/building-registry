@@ -1,3 +1,10 @@
+# [4.15.0](https://github.com/informatievlaanderen/building-registry/compare/v4.14.1...v4.15.0) (2024-09-11)
+
+
+### Features
+
+* **integration:** remove buildingunit from version projection when removed ([9e7c94e](https://github.com/informatievlaanderen/building-registry/commit/9e7c94e86cc3828d0f3fe50f18a6eafb5d20655e))
+
 ## [4.14.1](https://github.com/informatievlaanderen/building-registry/compare/v4.14.0...v4.14.1) (2024-09-06)
 
 
