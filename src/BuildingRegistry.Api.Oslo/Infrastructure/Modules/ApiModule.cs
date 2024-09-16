@@ -29,7 +29,7 @@ namespace BuildingRegistry.Api.Oslo.Infrastructure.Modules
         {
             builder
                 .RegisterModule(new MediatRModule())
-                .RegisterModule(new ParcelMatchingModule())
+                .RegisterModule(new ParcelBuildingMatchingModule())
                 .RegisterModule(new LegacyModule(_configuration, _services, _loggerFactory))
                 .RegisterModule(new ConsumerParcelModule(_configuration, _services, _loggerFactory));
 

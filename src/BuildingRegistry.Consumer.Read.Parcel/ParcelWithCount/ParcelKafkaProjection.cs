@@ -1,13 +1,16 @@
 namespace BuildingRegistry.Consumer.Read.Parcel.ParcelWithCount
 {
     using System;
+    using System.Linq;
+    using Autofac;
     using Be.Vlaanderen.Basisregisters.GrAr.Contracts.ParcelRegistry;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.Connector;
     using Be.Vlaanderen.Basisregisters.Utilities.HexByteConvertor;
+    using Projections.Legacy;
 
     public class ParcelKafkaProjection : ConnectedProjection<ConsumerParcelContext>
     {
-        public ParcelKafkaProjection()
+        public ParcelKafkaProjection(ILifetimeScope lifetimeScope)
         {
             var wkbReader = WKBReaderFactory.Create();
 
@@ -20,6 +23,8 @@ namespace BuildingRegistry.Consumer.Read.Parcel.ParcelWithCount
                 if (parcel is null)
                 {
                     var extendedWkbGeometry = message.ExtendedWkbGeometry.ToByteArray();
+                    var geometry = wkbReader.Read(extendedWkbGeometry);
+
                     await context
                         .ParcelConsumerItemsWithCount
                         .AddAsync(new ParcelConsumerItem(
@@ -27,7 +32,7 @@ namespace BuildingRegistry.Consumer.Read.Parcel.ParcelWithCount
                                 message.CaPaKey,
                                 ParcelStatus.Parse(message.ParcelStatus),
                                 extendedWkbGeometry,
-                                wkbReader.Read(extendedWkbGeometry),
+                                geometry,
                                 message.IsRemoved)
                             , ct);
 
@@ -35,6 +40,15 @@ namespace BuildingRegistry.Consumer.Read.Parcel.ParcelWithCount
                     {
                         await context.AddIdempotentParcelAddress(parcelId, addressPersistentLocalId, ct);
                     }
+
+                    await using var scope = lifetimeScope.BeginLifetimeScope();
+                    var buildingMatching = scope.Resolve<IBuildingMatching>();
+
+                    var buildingPersistentLocalIds = buildingMatching.GetUnderlyingBuildings(geometry);
+                    context.BuildingsToInvalidate.AddRange(buildingPersistentLocalIds.Select(x => new BuildingToInvalidate
+                    {
+                        BuildingPersistentLocalId = x
+                    }));
                 }
             });
 
@@ -44,6 +58,15 @@ namespace BuildingRegistry.Consumer.Read.Parcel.ParcelWithCount
                     .ParcelConsumerItemsWithCount.FindAsync([Guid.Parse(message.ParcelId)], cancellationToken: ct);
 
                 parcel!.Status = ParcelStatus.Retired;
+
+                await using var scope = lifetimeScope.BeginLifetimeScope();
+                var buildingMatching = scope.Resolve<IBuildingMatching>();
+
+                var buildingPersistentLocalIds = buildingMatching.GetUnderlyingBuildings(parcel.Geometry);
+                context.BuildingsToInvalidate.AddRange(buildingPersistentLocalIds.Select(x => new BuildingToInvalidate
+                {
+                    BuildingPersistentLocalId = x
+                }));
             });
 
             When<ParcelWasCorrectedFromRetiredToRealized>(async (context, message, ct) =>
@@ -52,16 +75,41 @@ namespace BuildingRegistry.Consumer.Read.Parcel.ParcelWithCount
                     .ParcelConsumerItemsWithCount.FindAsync([Guid.Parse(message.ParcelId)], cancellationToken: ct);
 
                 parcel!.Status = ParcelStatus.Realized;
+
+                await using var scope = lifetimeScope.BeginLifetimeScope();
+                var buildingMatching = scope.Resolve<IBuildingMatching>();
+
+                var buildingPersistentLocalIds = buildingMatching.GetUnderlyingBuildings(parcel.Geometry);
+                context.BuildingsToInvalidate.AddRange(buildingPersistentLocalIds.Select(x => new BuildingToInvalidate
+                {
+                    BuildingPersistentLocalId = x
+                }));
             });
 
             When<ParcelGeometryWasChanged>(async (context, message, ct) =>
             {
+                await using var scope = lifetimeScope.BeginLifetimeScope();
+                var buildingMatching = scope.Resolve<IBuildingMatching>();
+
                 var parcel = await context
                     .ParcelConsumerItemsWithCount.FindAsync([Guid.Parse(message.ParcelId)], cancellationToken: ct);
 
+                var previousBuildingPersistentLocalIds = buildingMatching.GetUnderlyingBuildings(parcel!.Geometry).ToArray();
+
                 var extendedWkbGeometry = message.ExtendedWkbGeometry.ToByteArray();
-                parcel!.ExtendedWkbGeometry = extendedWkbGeometry;
+                parcel.ExtendedWkbGeometry = extendedWkbGeometry;
                 parcel.SetGeometry(wkbReader.Read(extendedWkbGeometry));
+
+                var currentBuildingPersistentLocalIds = buildingMatching.GetUnderlyingBuildings(parcel.Geometry).ToArray();
+
+                var buildingPersistentLocalIds = previousBuildingPersistentLocalIds
+                    .Except(currentBuildingPersistentLocalIds)
+                    .Concat(currentBuildingPersistentLocalIds.Except(previousBuildingPersistentLocalIds));
+
+                context.BuildingsToInvalidate.AddRange(buildingPersistentLocalIds.Select(x => new BuildingToInvalidate
+                {
+                    BuildingPersistentLocalId = x
+                }));
             });
 
             When<ParcelWasImported>(async (context, message, ct) =>
@@ -72,6 +120,7 @@ namespace BuildingRegistry.Consumer.Read.Parcel.ParcelWithCount
                 if (parcel is null)
                 {
                     var extendedWkbGeometry = message.ExtendedWkbGeometry.ToByteArray();
+                    var geometry = wkbReader.Read(extendedWkbGeometry);
 
                     await context
                         .ParcelConsumerItemsWithCount
@@ -80,8 +129,17 @@ namespace BuildingRegistry.Consumer.Read.Parcel.ParcelWithCount
                                 message.CaPaKey,
                                 ParcelStatus.Realized,
                                 extendedWkbGeometry,
-                                wkbReader.Read(extendedWkbGeometry))
+                                geometry)
                             , ct);
+
+                    await using var scope = lifetimeScope.BeginLifetimeScope();
+                    var buildingMatching = scope.Resolve<IBuildingMatching>();
+
+                    var buildingPersistentLocalIds = buildingMatching.GetUnderlyingBuildings(geometry);
+                    context.BuildingsToInvalidate.AddRange(buildingPersistentLocalIds.Select(x => new BuildingToInvalidate
+                    {
+                        BuildingPersistentLocalId = x
+                    }));
                 }
             });
 

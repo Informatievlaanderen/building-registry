@@ -1,44 +1,17 @@
-namespace BuildingRegistry.Api.Oslo.Infrastructure.ParcelMatching
+﻿namespace BuildingRegistry.Projections.Legacy
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using Consumer.Read.Parcel;
-    using Consumer.Read.Parcel.ParcelWithCount;
     using NetTopologySuite.Geometries;
-    using Projections.Legacy;
 
-    public class ParcelMatching : IParcelMatching
+    public class BuildingMatching : IBuildingMatching
     {
-        private readonly ConsumerParcelContext _consumerParcelContext;
         private readonly LegacyContext _legacyContext;
 
-        public ParcelMatching(ConsumerParcelContext consumerParcelContext, LegacyContext legacyContext)
+        public BuildingMatching(LegacyContext legacyContext)
         {
-            _consumerParcelContext = consumerParcelContext;
             _legacyContext = legacyContext;
-        }
-
-        public IEnumerable<string> GetUnderlyingParcels(byte[] buildingGeometryBytes)
-        {
-            var buildingGeometry = WKBReaderFactory.Create().Read(buildingGeometryBytes);
-            var boundingBox = buildingGeometry.Factory.ToGeometry(buildingGeometry.EnvelopeInternal);
-
-            var underlyingParcels = _consumerParcelContext
-                .ParcelConsumerItemsWithCount
-                .Where(parcel => boundingBox.Intersects(parcel.Geometry))
-                .ToList()
-                .Where(parcel => buildingGeometry.Intersects(parcel.Geometry) && parcel.Status == ParcelStatus.Realized)
-                .Select(parcel =>
-                    new {
-                        parcel.CaPaKey,
-                        Overlap = CalculateOverlap(buildingGeometry, parcel.Geometry)
-                    })
-                .ToList();
-
-            return underlyingParcels
-                .Where(parcel => parcel.Overlap >= 0.8 / underlyingParcels.Count)
-                .Select(parcel => parcel.CaPaKey);
         }
 
         public IEnumerable<int> GetUnderlyingBuildings(Geometry parcelGeometry)

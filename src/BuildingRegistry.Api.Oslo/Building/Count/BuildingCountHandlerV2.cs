@@ -7,7 +7,6 @@ namespace BuildingRegistry.Api.Oslo.Building.Count
     using Be.Vlaanderen.Basisregisters.Api.Search.Pagination;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy;
     using Consumer.Read.Parcel;
-    using Infrastructure.ParcelMatching;
     using MediatR;
     using Microsoft.EntityFrameworkCore;
     using Projections.Legacy;
@@ -17,14 +16,14 @@ namespace BuildingRegistry.Api.Oslo.Building.Count
     {
         private readonly LegacyContext _legacyContext;
         private readonly ConsumerParcelContext _consumerParcelContext;
-        private readonly IParcelMatching _parcelMatching;
+        private readonly IBuildingMatching _buildingMatching;
 
         public BuildingCountHandlerV2(
-            LegacyContext legacyContext, ConsumerParcelContext consumerParcelContext, IParcelMatching parcelMatching)
+            LegacyContext legacyContext, ConsumerParcelContext consumerParcelContext, IBuildingMatching buildingMatching)
         {
             _legacyContext = legacyContext;
             _consumerParcelContext = consumerParcelContext;
-            _parcelMatching = parcelMatching;
+            _buildingMatching = buildingMatching;
         }
 
         public async Task<TotaalAantalResponse> Handle(BuildingCountRequest request, CancellationToken cancellationToken)
@@ -32,7 +31,7 @@ namespace BuildingRegistry.Api.Oslo.Building.Count
             return new TotaalAantalResponse
             {
                 Aantal = request.FilteringHeader.ShouldFilter
-                    ? await new BuildingListOsloQueryV2(_legacyContext, _consumerParcelContext, _parcelMatching)
+                    ? await new BuildingListOsloQueryV2(_legacyContext, _consumerParcelContext, _buildingMatching)
                         .Fetch(request.FilteringHeader, request.SortingHeader, new NoPaginationRequest())
                         .Items
                         .CountAsync(cancellationToken)

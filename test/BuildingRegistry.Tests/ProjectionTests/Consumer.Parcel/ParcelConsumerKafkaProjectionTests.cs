@@ -448,6 +448,6 @@ namespace BuildingRegistry.Tests.ProjectionTests.Consumer.Parcel
             return new ConsumerParcelContext(options);
         }
 
-        protected override ParcelKafkaProjection CreateProjection() => new ParcelKafkaProjection();
+        protected override ParcelKafkaProjection CreateProjection() => new ParcelKafkaProjection(Container);
     }
 }

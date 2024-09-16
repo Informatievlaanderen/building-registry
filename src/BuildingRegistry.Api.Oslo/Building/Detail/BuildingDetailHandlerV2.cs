@@ -15,7 +15,6 @@ namespace BuildingRegistry.Api.Oslo.Building.Detail
     using Consumer.Read.Parcel;
     using Converters;
     using Infrastructure.Options;
-    using Infrastructure.ParcelMatching;
     using MediatR;
     using Microsoft.AspNetCore.Http;
     using Microsoft.EntityFrameworkCore;
