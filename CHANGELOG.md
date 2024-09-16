@@ -1,3 +1,10 @@
+## [4.15.1](https://github.com/informatievlaanderen/building-registry/compare/v4.15.0...v4.15.1) (2024-09-16)
+
+
+### Bug Fixes
+
+* remove measured buildings temporarily ([9dcea49](https://github.com/informatievlaanderen/building-registry/commit/9dcea490f3372f28f7dc18fd7a08d3429a9cde56))
+
 # [4.15.0](https://github.com/informatievlaanderen/building-registry/compare/v4.14.1...v4.15.0) (2024-09-11)
 
 
