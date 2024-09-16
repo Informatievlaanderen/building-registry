@@ -193,10 +193,10 @@ namespace BuildingRegistry.Building
                 return;
             }
 
-            if (BuildingGeometry.Method != BuildingGeometryMethod.Outlined)
-            {
-                throw new BuildingHasInvalidGeometryMethodException();
-            }
+            // if (BuildingGeometry.Method != BuildingGeometryMethod.Outlined)
+            // {
+            //     throw new BuildingHasInvalidGeometryMethodException();
+            // }
 
             foreach (var buildingUnit in _buildingUnits.GetNotRemovedUnits())
             {
