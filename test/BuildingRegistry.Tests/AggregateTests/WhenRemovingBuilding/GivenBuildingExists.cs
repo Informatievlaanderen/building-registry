@@ -95,24 +95,24 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRemovingBuilding
                 .ThenNone());
         }
 
-        //[Fact]
-        // public void WithGeometryMethodOtherThanOutlined_ThenThrowsBuildingHasInvalidBuildingGeometryMethodException()
-        // {
-        //     var command = Fixture.Create<RemoveBuilding>();
-        //
-        //     var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
-        //         .WithBuildingGeometry(new BuildingGeometry(
-        //             new ExtendedWkbGeometry(GeometryHelper.ValidPolygon.AsBinary()),
-        //             BuildingGeometryMethod.MeasuredByGrb))
-        //         .Build();
-        //
-        //     Assert(new Scenario()
-        //         .Given(
-        //             new BuildingStreamId(Fixture.Create<BuildingPersistentLocalId>()),
-        //             buildingWasMigrated)
-        //         .When(command)
-        //         .Throws(new BuildingHasInvalidGeometryMethodException()));
-        // }
+        [Fact]
+        public void WithGeometryMethodOtherThanOutlined_ThenThrowsBuildingHasInvalidBuildingGeometryMethodException()
+        {
+            var command = Fixture.Create<RemoveBuilding>();
+
+            var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
+                .WithBuildingGeometry(new BuildingGeometry(
+                    new ExtendedWkbGeometry(GeometryHelper.ValidPolygon.AsBinary()),
+                    BuildingGeometryMethod.MeasuredByGrb))
+                .Build();
+
+            Assert(new Scenario()
+                .Given(
+                    new BuildingStreamId(Fixture.Create<BuildingPersistentLocalId>()),
+                    buildingWasMigrated)
+                .When(command)
+                .Throws(new BuildingHasInvalidGeometryMethodException()));
+        }
 
         [Fact]
         public void StateCheck()
