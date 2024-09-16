@@ -8,7 +8,6 @@ namespace BuildingRegistry.Api.Oslo.Building.List
     using Converters;
     using Infrastructure;
     using Infrastructure.Options;
-    using Infrastructure.ParcelMatching;
     using MediatR;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Options;
@@ -19,24 +18,24 @@ namespace BuildingRegistry.Api.Oslo.Building.List
     {
         private readonly LegacyContext _legacyContext;
         private readonly ConsumerParcelContext _consumerParcelContext;
-        private readonly IParcelMatching _parcelMatching;
+        private readonly IBuildingMatching _buildingMatching;
         private readonly IOptions<ResponseOptions> _responseOptions;
 
         public BuildingListHandlerV2(
             LegacyContext legacyContext,
             IOptions<ResponseOptions> responseOptions,
             ConsumerParcelContext consumerParcelContext,
-            IParcelMatching parcelMatching)
+            IBuildingMatching buildingMatching)
         {
             _legacyContext = legacyContext;
             _responseOptions = responseOptions;
             _consumerParcelContext = consumerParcelContext;
-            _parcelMatching = parcelMatching;
+            _buildingMatching = buildingMatching;
         }
 
         public async Task<BuildingListOsloResponse> Handle(BuildingListRequest request, CancellationToken cancellationToken)
         {
-            var pagedBuildings = new BuildingListOsloQueryV2(_legacyContext, _consumerParcelContext, _parcelMatching)
+            var pagedBuildings = new BuildingListOsloQueryV2(_legacyContext, _consumerParcelContext, _buildingMatching)
                 .Fetch(request.FilteringHeader, request.SortingHeader, request.PaginationRequest);
 
             var buildings = await pagedBuildings.Items.ToListAsync(cancellationToken);

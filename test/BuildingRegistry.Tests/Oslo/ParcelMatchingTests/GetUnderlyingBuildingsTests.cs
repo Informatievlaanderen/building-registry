@@ -1,28 +1,24 @@
 ﻿namespace BuildingRegistry.Tests.Oslo.ParcelMatchingTests
 {
-    using System;
     using System.Linq;
     using Api.BackOffice.Abstractions.Building;
-    using Api.Oslo.Infrastructure.ParcelMatching;
     using BackOffice;
     using Building;
     using FluentAssertions;
     using NetTopologySuite.Geometries;
     using NodaTime;
+    using Projections.Legacy;
     using Projections.Legacy.BuildingDetailV2;
     using Xunit;
 
     public class GetUnderlyingBuildingsTests
     {
-        private readonly FakeConsumerParcelContext _consumerParcelContext;
         private readonly FakeLegacyContext _legacyContext;
 
         public GetUnderlyingBuildingsTests()
         {
-            _consumerParcelContext = new FakeConsumerParcelContextFactory()
-                .CreateDbContext(Array.Empty<string>());
             _legacyContext = new FakeLegacyContextFactory()
-                .CreateDbContext(Array.Empty<string>());
+                .CreateDbContext([]);
         }
 
         [Fact]
@@ -42,9 +38,9 @@
                     new Instant()));
             _legacyContext.SaveChanges();
 
-            var parcelMatching = new ParcelMatching(_consumerParcelContext, _legacyContext);
+            var buildingMatching = new BuildingMatching(_legacyContext);
 
-            var result = parcelMatching.GetUnderlyingBuildings(parcelGeometry100PercentOverlap);
+            var result = buildingMatching.GetUnderlyingBuildings(parcelGeometry100PercentOverlap);
 
             result.Should().ContainSingle();
         }
@@ -66,9 +62,9 @@
                     new Instant()));
             _legacyContext.SaveChanges();
 
-            var parcelMatching = new ParcelMatching(_consumerParcelContext, _legacyContext);
+            var buildingMatching = new BuildingMatching(_legacyContext);
 
-            var result = parcelMatching.GetUnderlyingBuildings(parcelGeometry);
+            var result = buildingMatching.GetUnderlyingBuildings(parcelGeometry);
 
             result.Should().BeEmpty();
         }
@@ -99,9 +95,9 @@
                     new Instant()));
             _legacyContext.SaveChanges();
 
-            var parcelMatching = new ParcelMatching(_consumerParcelContext, _legacyContext);
+            var buildingMatching = new BuildingMatching(_legacyContext);
 
-            var result = parcelMatching.GetUnderlyingBuildings(parcelGeometry);
+            var result = buildingMatching.GetUnderlyingBuildings(parcelGeometry);
 
             result.Count().Should().Be(2);
         }
@@ -134,9 +130,9 @@
                     new Instant()));
             _legacyContext.SaveChanges();
 
-            var parcelMatching = new ParcelMatching(_consumerParcelContext, _legacyContext);
+            var buildingMatching = new BuildingMatching(_legacyContext);
 
-            var result = parcelMatching.GetUnderlyingBuildings(parcelGeometry).ToList();
+            var result = buildingMatching.GetUnderlyingBuildings(parcelGeometry).ToList();
 
             result.Count().Should().Be(1);
             result.First().Should().Be(buildingAbove40PercentPersistentLocalId);
