@@ -146,7 +146,7 @@ jobs:
     secrets: inherit
 
   build-cache-invalidator:
-    name: Build Consumer Address
+    name: Build Cache Invalidator
     uses: Informatievlaanderen/build-pipeline/.github/workflows/build-image.yml@main
     needs: [ set-release-version ]
     if: ${{ (github.repository_owner == 'Informatievlaanderen') && (needs.set-release-version.outputs.version != 'none') }}
