@@ -1,7 +1,7 @@
 using System.Reflection;
 using System.Runtime.InteropServices;
 
-[assembly: AssemblyDescription("BuildingRegistry Consumer Read Parcel")]
+[assembly: AssemblyDescription("BuildingRegistry Cache Invalidator")]
 
 [assembly: AssemblyProduct("Basisregisters Vlaanderen")]
 [assembly: AssemblyCopyright("Copyright (c) Vlaamse overheid")]
