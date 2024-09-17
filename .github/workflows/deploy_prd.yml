@@ -41,6 +41,7 @@ jobs:
         services: [
           'building-api',
           'building-backoffice-api',
+          #'building-cache-invalidator',
           'building-consumer-address',
           'building-consumer-parcel',
           'building-producer',
