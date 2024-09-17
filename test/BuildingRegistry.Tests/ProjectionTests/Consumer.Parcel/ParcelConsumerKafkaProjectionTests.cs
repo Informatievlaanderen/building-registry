@@ -2,7 +2,9 @@ namespace BuildingRegistry.Tests.ProjectionTests.Consumer.Parcel
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Threading.Tasks;
+    using Autofac;
     using AutoFixture;
     using Be.Vlaanderen.Basisregisters.GrAr.Contracts.Common;
     using Be.Vlaanderen.Basisregisters.GrAr.Contracts.ParcelRegistry;
@@ -13,6 +15,10 @@ namespace BuildingRegistry.Tests.ProjectionTests.Consumer.Parcel
     using Fixtures;
     using FluentAssertions;
     using Microsoft.EntityFrameworkCore;
+    using Moq;
+    using NetTopologySuite.Geometries;
+    using NetTopologySuite.IO;
+    using Projections.Legacy;
     using Tests.Legacy.Autofixture;
     using Xunit;
     using Xunit.Abstractions;
@@ -20,6 +26,8 @@ namespace BuildingRegistry.Tests.ProjectionTests.Consumer.Parcel
     public class ParcelConsumerKafkaProjectionTests : KafkaProjectionTest<ConsumerParcelContext, ParcelKafkaProjection>
     {
         private readonly ParcelWasMigrated _parcelWasMigrated;
+
+        private readonly Mock<IBuildingMatching> _buildingMatchingMock = new();
 
         private readonly int _addressPersistentLocalId;
         private static ParcelAddressWasDetachedV2 _parcelAddressWasDetachedV2 = null!;
@@ -92,6 +100,12 @@ namespace BuildingRegistry.Tests.ProjectionTests.Consumer.Parcel
         [Fact]
         public async Task ParcelWasMigrated_AddsParcel()
         {
+            var underlyingBuildingId = (int)Fixture.Create<BuildingPersistentLocalId>();
+
+            _buildingMatchingMock
+                .Setup(x => x.GetUnderlyingBuildings(It.IsAny<Geometry>()))
+                .Returns(new[] { underlyingBuildingId });
+
             Given(_parcelWasMigrated);
 
             await Then(async context =>
@@ -112,6 +126,10 @@ namespace BuildingRegistry.Tests.ProjectionTests.Consumer.Parcel
 
                     parcelAddressItem.Should().NotBeNull();
                 }
+
+                var buildingsToInvalidate = context.BuildingsToInvalidate.Local.ToList();
+                buildingsToInvalidate.Should().HaveCount(1);
+                buildingsToInvalidate.Single().BuildingPersistentLocalId.Should().Be(underlyingBuildingId);
             });
         }
 
@@ -282,6 +300,12 @@ namespace BuildingRegistry.Tests.ProjectionTests.Consumer.Parcel
         {
             var parcelId = Fixture.Create<Guid>().ToString("D");
             var capakey = Fixture.Create<Guid>().ToString("D");
+            var underlyingBuildingId = (int)Fixture.Create<BuildingPersistentLocalId>();
+
+            _buildingMatchingMock
+                .SetupSequence(x => x.GetUnderlyingBuildings(It.IsAny<Geometry>()))
+                .Returns(Array.Empty<int>())
+                .Returns(new[] { underlyingBuildingId });
 
             var parcelWasImported = Fixture
                 .Build<ParcelWasImported>()
@@ -313,6 +337,10 @@ namespace BuildingRegistry.Tests.ProjectionTests.Consumer.Parcel
                 parcel!.CaPaKey.Should().Be(parcelWasRetiredV2.CaPaKey);
                 parcel.Status.Should().Be(ParcelStatus.Retired);
                 parcel.IsRemoved.Should().Be(parcel.IsRemoved);
+
+                var buildingsToInvalidate = context.BuildingsToInvalidate.Local.ToList();
+                buildingsToInvalidate.Should().HaveCount(1);
+                buildingsToInvalidate.Single().BuildingPersistentLocalId.Should().Be(underlyingBuildingId);
             });
         }
 
@@ -350,6 +378,14 @@ namespace BuildingRegistry.Tests.ProjectionTests.Consumer.Parcel
                 ))
                 .Create();
 
+            var underlyingBuildingId = (int)Fixture.Create<BuildingPersistentLocalId>();
+
+            _buildingMatchingMock
+                .SetupSequence(x => x.GetUnderlyingBuildings(It.IsAny<Geometry>()))
+                .Returns(Array.Empty<int>())
+                .Returns(Array.Empty<int>())
+                .Returns(new[] { underlyingBuildingId });
+
             Given(parcelWasImported, parcelWasRetiredV2, parcelWasCorrectedFromRetiredToRealized);
 
             await Then(async context =>
@@ -361,7 +397,64 @@ namespace BuildingRegistry.Tests.ProjectionTests.Consumer.Parcel
                 parcel!.CaPaKey.Should().Be(parcelWasCorrectedFromRetiredToRealized.CaPaKey);
                 parcel.Status.Should().Be(ParcelStatus.Realized);
                 parcel.IsRemoved.Should().Be(parcel.IsRemoved);
+
+                var buildingsToInvalidate = context.BuildingsToInvalidate.Local.ToList();
+                buildingsToInvalidate.Should().HaveCount(1);
+                buildingsToInvalidate.Single().BuildingPersistentLocalId.Should().Be(underlyingBuildingId);
             });
+        }
+
+        [Fact]
+        public async Task ParcelGeometryWasChanged_SetsParcelStatusToRealized()
+        {
+             var parcelId = Fixture.Create<Guid>().ToString("D");
+             var capakey = Fixture.Create<Guid>().ToString("D");
+             var parcelWasImported = Fixture
+                 .Build<ParcelWasImported>()
+                 .FromFactory(() => new ParcelWasImported(
+                     parcelId,
+                     capakey,
+                     GeometryHelper.ValidPolygon.AsBinary().ToHexString(),
+                     Fixture.Create<Provenance>()
+                 ))
+                 .Create();
+
+             var newGeometry = new WKTReader().Read("POLYGON ((30 10, 10 20, 20 40, 40 40, 30 10))");
+             var parcelGeometryWasChanged = Fixture
+                 .Build<ParcelGeometryWasChanged>()
+                 .FromFactory(() => new ParcelGeometryWasChanged(
+                     parcelId,
+                     capakey,
+                     newGeometry.AsBinary().ToHexString(),
+                     Fixture.Create<Provenance>()
+                 ))
+                 .Create();
+
+             var previousUnderlyingBuildingId = 1;
+             var newUnderlyingBuildingId = 2;
+             var commonUnderlyingBuildingId = 3;
+
+             _buildingMatchingMock
+                 .SetupSequence(x => x.GetUnderlyingBuildings(It.IsAny<Geometry>()))
+                 .Returns(Array.Empty<int>())
+                 .Returns(new[] { previousUnderlyingBuildingId, commonUnderlyingBuildingId })
+                 .Returns(new[] { newUnderlyingBuildingId, commonUnderlyingBuildingId });
+
+             Given(parcelWasImported, parcelGeometryWasChanged);
+
+             await Then(async context =>
+             {
+                 var parcel =
+                     await context.ParcelConsumerItemsWithCount.FindAsync(Guid.Parse(parcelGeometryWasChanged.ParcelId));
+
+                 parcel.Should().NotBeNull();
+                 parcel!.Geometry.Should().BeEquivalentTo(newGeometry);
+
+                 var buildingsToInvalidate = context.BuildingsToInvalidate.Local.ToList();
+                 buildingsToInvalidate.Should().HaveCount(2);
+                 buildingsToInvalidate[0].BuildingPersistentLocalId.Should().Be(previousUnderlyingBuildingId);
+                 buildingsToInvalidate[1].BuildingPersistentLocalId.Should().Be(newUnderlyingBuildingId);
+             });
         }
 
         [Fact]
@@ -377,6 +470,12 @@ namespace BuildingRegistry.Tests.ProjectionTests.Consumer.Parcel
                 ))
                 .Create();
 
+            var underlyingBuildingId = (int)Fixture.Create<BuildingPersistentLocalId>();
+
+            _buildingMatchingMock
+                .Setup(x => x.GetUnderlyingBuildings(It.IsAny<Geometry>()))
+                .Returns(new[] { underlyingBuildingId });
+
             Given(parcelWasImported);
 
             await Then(async context =>
@@ -388,6 +487,10 @@ namespace BuildingRegistry.Tests.ProjectionTests.Consumer.Parcel
                 parcel!.CaPaKey.Should().Be(parcelWasImported.CaPaKey);
                 parcel.Status.Should().Be(ParcelStatus.Realized);
                 parcel.IsRemoved.Should().Be(parcel.IsRemoved);
+
+                var buildingsToInvalidate = context.BuildingsToInvalidate.Local.ToList();
+                buildingsToInvalidate.Should().HaveCount(1);
+                buildingsToInvalidate.Single().BuildingPersistentLocalId.Should().Be(underlyingBuildingId);
             });
         }
 
@@ -449,5 +552,12 @@ namespace BuildingRegistry.Tests.ProjectionTests.Consumer.Parcel
         }
 
         protected override ParcelKafkaProjection CreateProjection() => new ParcelKafkaProjection(Container);
+
+        protected override void ConfigureCommandHandling(ContainerBuilder builder)
+        {
+            base.ConfigureCommandHandling(builder);
+
+            builder.Register(c => _buildingMatchingMock.Object);
+        }
     }
 }
