@@ -5,6 +5,7 @@
     <ProjectReference Include="..\..\src\BuildingRegistry.Api.BackOffice.Handlers.Lambda\BuildingRegistry.Api.BackOffice.Handlers.Lambda.csproj" />
     <ProjectReference Include="..\..\src\BuildingRegistry.Api.BackOffice\BuildingRegistry.Api.BackOffice.csproj" />
     <ProjectReference Include="..\..\src\BuildingRegistry.Api.Oslo\BuildingRegistry.Api.Oslo.csproj" />
+    <ProjectReference Include="..\..\src\BuildingRegistry.Cache.Invalidator\BuildingRegistry.Cache.Invalidator.csproj" />
     <ProjectReference Include="..\..\src\BuildingRegistry.Consumer.Address\BuildingRegistry.Consumer.Address.csproj" />
     <ProjectReference Include="..\..\src\BuildingRegistry.Consumer.Read.Parcel\BuildingRegistry.Consumer.Read.Parcel.csproj" />
     <ProjectReference Include="..\..\src\BuildingRegistry.Migrator.Building\BuildingRegistry.Migrator.Building.csproj" />
