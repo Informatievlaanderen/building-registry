@@ -1,159 +1,139 @@
-//Buildings should not be cached while we do not have control over the parcel link
+namespace BuildingRegistry.Projections.LastChangedList
+{
+    using System;
+    using Be.Vlaanderen.Basisregisters.ProjectionHandling.Connector;
+    using Be.Vlaanderen.Basisregisters.ProjectionHandling.LastChangedList;
+    using Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore;
+    using Building.Events;
 
-//namespace BuildingRegistry.Projections.LastChangedList
-//{
-//    using Be.Vlaanderen.Basisregisters.ProjectionHandling.LastChangedList;
-//    using Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore;
-//    using Building.Events;
-//    using Building.Events.Crab;
+    [ConnectedProjectionName(ProjectionName)]
+    [ConnectedProjectionDescription("Projectie die markeert voor hoeveel gebouwen de gecachte data nog geüpdated moeten worden.")]
+    public class BuildingProjections : LastChangedListConnectedProjection
+    {
+        public const string ProjectionName = "Cache markering gebouwen";
+        private static readonly AcceptType[] SupportedAcceptTypes = [AcceptType.JsonLd];
 
-//    public class BuildingProjections : LastChangedListConnectedProjection
-//    {
-//        protected override string CacheKeyFormat => "legacy/building:{{0}}.{1}";
-//        protected override string UriFormat => "/v1/gebouwen/{{0}}";
+        public BuildingProjections(ICacheValidator cacheValidator)
+            : base(SupportedAcceptTypes, cacheValidator)
+        {
+            When<Envelope<BuildingWasMigrated>>(async (context, message, ct) =>
+                await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingPersistentLocalId.ToString(), message.Position, context, ct));
 
-//        private static readonly AcceptType[] SupportedAcceptTypes = { AcceptType.Json, AcceptType.Xml };
+            When<Envelope<BuildingWasPlannedV2>>(async (context, message, ct) =>
+                await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingPersistentLocalId.ToString(), message.Position, context, ct));
 
-//        public BuildingProjections()
-//            : base(SupportedAcceptTypes)
-//        {
-//            When<Envelope<BuildingPersistentLocalIdWasAssigned>>(async (context, message, ct) =>
-//            {
-//                var attachedRecords = await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingId.ToString(), message.Position, context, ct);
+            When<Envelope<UnplannedBuildingWasRealizedAndMeasured>>(async (context, message, ct) =>
+                await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingPersistentLocalId.ToString(), message.Position, context, ct));
 
-//                foreach (var record in attachedRecords)
-//                {
-//                    record.CacheKey = string.Format(record.CacheKey, message.Message.PersistentLocalId);
-//                    record.Uri = string.Format(record.Uri, message.Message.PersistentLocalId);
-//                }
-//            });
+            When<Envelope<BuildingOutlineWasChanged>>(async (context, message, ct) =>
+                await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingPersistentLocalId.ToString(), message.Position, context, ct));
 
-//            When<Envelope<BuildingBecameComplete>>(async (context, message, ct) =>
-//                await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingId.ToString(), message.Position, context, ct));
+            When<Envelope<BuildingMeasurementWasChanged>>(async (context, message, ct) =>
+                await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingPersistentLocalId.ToString(), message.Position, context, ct));
 
-//            When<Envelope<BuildingBecameIncomplete>>(async (context, message, ct) =>
-//                await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingId.ToString(), message.Position, context, ct));
+            When<Envelope<BuildingBecameUnderConstructionV2>>(async (context, message, ct) =>
+                await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingPersistentLocalId.ToString(), message.Position, context, ct));
 
-//            When<Envelope<BuildingBecameUnderConstruction>>(async (context, message, ct) =>
-//                await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingId.ToString(), message.Position, context, ct));
+            When<Envelope<BuildingWasCorrectedFromUnderConstructionToPlanned>>(async (context, message, ct) =>
+                await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingPersistentLocalId.ToString(), message.Position, context, ct));
 
-//            When<Envelope<BuildingGeometryWasRemoved>>(async (context, message, ct) =>
-//                await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingId.ToString(), message.Position, context, ct));
+            When<Envelope<BuildingWasRealizedV2>>(async (context, message, ct) =>
+                await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingPersistentLocalId.ToString(), message.Position, context, ct));
 
-//            When<Envelope<BuildingMeasurementByGrbWasCorrected>>(async (context, message, ct) =>
-//                await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingId.ToString(), message.Position, context, ct));
+            When<Envelope<BuildingWasCorrectedFromRealizedToUnderConstruction>>(async (context, message, ct) =>
+                await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingPersistentLocalId.ToString(), message.Position, context, ct));
 
-//            When<Envelope<BuildingOutlineWasCorrected>>(async (context, message, ct) =>
-//                await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingId.ToString(), message.Position, context, ct));
+            When<Envelope<BuildingWasNotRealizedV2>>(async (context, message, ct) =>
+                await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingPersistentLocalId.ToString(), message.Position, context, ct));
 
-//            When<Envelope<BuildingStatusWasCorrectedToRemoved>>(async (context, message, ct) =>
-//                await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingId.ToString(), message.Position, context, ct));
+            When<Envelope<BuildingWasCorrectedFromNotRealizedToPlanned>>(async (context, message, ct) =>
+                await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingPersistentLocalId.ToString(), message.Position, context, ct));
 
-//            When<Envelope<BuildingStatusWasRemoved>>(async (context, message, ct) =>
-//                await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingId.ToString(), message.Position, context, ct));
+            When<Envelope<BuildingWasMeasured>>(async (context, message, ct) =>
+                await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingPersistentLocalId.ToString(), message.Position, context, ct));
 
-//            When<Envelope<BuildingWasCorrectedToNotRealized>>(async (context, message, ct) =>
-//                await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingId.ToString(), message.Position, context, ct));
+            When<Envelope<BuildingMeasurementWasCorrected>>(async (context, message, ct) =>
+                await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingPersistentLocalId.ToString(), message.Position, context, ct));
 
-//            When<Envelope<BuildingWasCorrectedToPlanned>>(async (context, message, ct) =>
-//                await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingId.ToString(), message.Position, context, ct));
+            When<Envelope<BuildingWasDemolished>>(async (context, message, ct) =>
+                await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingPersistentLocalId.ToString(), message.Position, context, ct));
 
-//            When<Envelope<BuildingWasCorrectedToRealized>>(async (context, message, ct) =>
-//                await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingId.ToString(), message.Position, context, ct));
+            When<Envelope<BuildingWasRemovedV2>>(async (context, message, ct) =>
+                await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingPersistentLocalId.ToString(), message.Position, context, ct));
 
-//            When<Envelope<BuildingWasCorrectedToRetired>>(async (context, message, ct) =>
-//                await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingId.ToString(), message.Position, context, ct));
+            // Building Units
+            When<Envelope<BuildingUnitWasPlannedV2>>(async (context, message, ct) =>
+                await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingPersistentLocalId.ToString(), message.Position, context, ct));
 
-//            When<Envelope<BuildingWasCorrectedToUnderConstruction>>(async (context, message, ct) =>
-//                await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingId.ToString(), message.Position, context, ct));
+            When<Envelope<CommonBuildingUnitWasAddedV2>>(async (context, message, ct) =>
+                await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingPersistentLocalId.ToString(), message.Position, context, ct));
 
-//            When<Envelope<BuildingWasMeasuredByGrb>>(async (context, message, ct) =>
-//                await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingId.ToString(), message.Position, context, ct));
+            When<Envelope<BuildingUnitWasRemovedV2>>(async (context, message, ct) =>
+                await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingPersistentLocalId.ToString(), message.Position, context, ct));
 
-//            When<Envelope<BuildingWasNotRealized>>(async (context, message, ct) =>
-//                await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingId.ToString(), message.Position, context, ct));
+            When<Envelope<BuildingUnitRemovalWasCorrected>>(async (context, message, ct) =>
+                await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingPersistentLocalId.ToString(), message.Position, context, ct));
 
-//            When<Envelope<BuildingWasOutlined>>(async (context, message, ct) =>
-//                await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingId.ToString(), message.Position, context, ct));
+            When<Envelope<BuildingUnitWasMovedIntoBuilding>>(async (context, message, ct) =>
+                await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingPersistentLocalId.ToString(), message.Position, context, ct));
 
-//            When<Envelope<BuildingWasPlanned>>(async (context, message, ct) =>
-//                await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingId.ToString(), message.Position, context, ct));
+            When<Envelope<BuildingUnitWasMovedOutOfBuilding>>(async (context, message, ct) =>
+                await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingPersistentLocalId.ToString(), message.Position, context, ct));
 
-//            When<Envelope<BuildingWasRealized>>(async (context, message, ct) =>
-//                await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingId.ToString(), message.Position, context, ct));
+            When<Envelope<BuildingUnitWasCorrectedFromNotRealizedToPlanned>>(async (context, message, ct) =>
+                await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingPersistentLocalId.ToString(), message.Position, context, ct));
 
-//            When<Envelope<BuildingWasRegistered>>(async (context, message, ct) =>
-//                await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingId.ToString(), message.Position, context, ct));
+            When<Envelope<BuildingUnitWasCorrectedFromRealizedToPlanned>>(async (context, message, ct) =>
+                await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingPersistentLocalId.ToString(), message.Position, context, ct));
 
-//            When<Envelope<BuildingWasRemoved>>(async (context, message, ct) =>
-//                await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingId.ToString(), message.Position, context, ct));
+            When<Envelope<BuildingUnitWasCorrectedFromRealizedToPlannedBecauseBuildingWasCorrected>>(async (context, message, ct) =>
+                await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingPersistentLocalId.ToString(), message.Position, context, ct));
 
-//            When<Envelope<BuildingWasRetired>>(async (context, message, ct) =>
-//                await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingId.ToString(), message.Position, context, ct));
+            When<Envelope<BuildingUnitWasCorrectedFromRetiredToRealized>>(async (context, message, ct) =>
+                await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingPersistentLocalId.ToString(), message.Position, context, ct));
 
-//            //Units
+            When<Envelope<BuildingUnitWasNotRealizedBecauseBuildingWasDemolished>>(async (context, message, ct) =>
+                await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingPersistentLocalId.ToString(), message.Position, context, ct));
 
-//            When<Envelope<BuildingUnitBecameComplete>>(async (context, message, ct) =>
-//                await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingId.ToString(), message.Position, context, ct));
+            When<Envelope<BuildingUnitWasNotRealizedBecauseBuildingWasNotRealized>>(async (context, message, ct) =>
+                await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingPersistentLocalId.ToString(), message.Position, context, ct));
 
-//            When<Envelope<BuildingUnitBecameIncomplete>>(async (context, message, ct) =>
-//                await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingId.ToString(), message.Position, context, ct));
+            When<Envelope<BuildingUnitWasNotRealizedV2>>(async (context, message, ct) =>
+                await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingPersistentLocalId.ToString(), message.Position, context, ct));
 
-//            When<Envelope<BuildingUnitPersistentLocalIdWasAssigned>>(async (context, message, ct) =>
-//                await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingId.ToString(), message.Position, context, ct));
+            When<Envelope<BuildingUnitWasRealizedBecauseBuildingWasRealized>>(async (context, message, ct) =>
+                await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingPersistentLocalId.ToString(), message.Position, context, ct));
 
-//            When<Envelope<BuildingUnitWasAdded>>(async (context, message, ct) =>
-//                await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingId.ToString(), message.Position, context, ct));
+            When<Envelope<BuildingUnitWasRealizedV2>>(async (context, message, ct) =>
+                await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingPersistentLocalId.ToString(), message.Position, context, ct));
 
-//            When<Envelope<BuildingUnitWasAddedToRetiredBuilding>>(async (context, message, ct) =>
-//                await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingId.ToString(), message.Position, context, ct));
+            When<Envelope<BuildingUnitWasRemovedBecauseBuildingWasRemoved>>(async (context, message, ct) =>
+                await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingPersistentLocalId.ToString(), message.Position, context, ct));
 
-//            When<Envelope<BuildingUnitWasReaddedByOtherUnitRemoval>>(async (context, message, ct) =>
-//                await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingId.ToString(), message.Position, context, ct));
+            When<Envelope<BuildingUnitWasRetiredBecauseBuildingWasDemolished>>(async (context, message, ct) =>
+                await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingPersistentLocalId.ToString(), message.Position, context, ct));
 
-//            When<Envelope<BuildingUnitWasRemoved>>(async (context, message, ct) =>
-//                await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingId.ToString(), message.Position, context, ct));
+            When<Envelope<BuildingUnitWasRetiredV2>>(async (context, message, ct) =>
+                await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingPersistentLocalId.ToString(), message.Position, context, ct));
+        }
 
-//            When<Envelope<CommonBuildingUnitWasAdded>>(async (context, message, ct) =>
-//                await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingId.ToString(), message.Position, context, ct));
+        protected override string BuildCacheKey(AcceptType acceptType, string identifier)
+        {
+            var shortenedAcceptType = acceptType.ToString().ToLowerInvariant();
+            return acceptType switch
+            {
+                AcceptType.JsonLd => $"oslo/building:{{0}}.{shortenedAcceptType}",
+                _ => throw new NotImplementedException($"Cannot build CacheKey for type {typeof(AcceptType)}")
+            };
+        }
 
-//            When<Envelope<BuildingUnitAddressWasAttached>>(async (context, message, ct) => DoNothing());
-//            When<Envelope<BuildingUnitAddressWasDetached>>(async (context, message, ct) => DoNothing());
-//            When<Envelope<BuildingUnitPersistentLocalIdWasDuplicated>>(async (context, message, ct) => DoNothing());
-//            When<Envelope<BuildingUnitPersistentLocalIdWasRemoved>>(async (context, message, ct) => DoNothing());
-//            When<Envelope<BuildingUnitPositionWasAppointedByAdministrator>>(async (context, message, ct) => DoNothing());
-//            When<Envelope<BuildingUnitPositionWasCorrectedToAppointedByAdministrator>>(async (context, message, ct) => DoNothing());
-//            When<Envelope<BuildingUnitPositionWasCorrectedToDerivedFromObject>>(async (context, message, ct) => DoNothing());
-//            When<Envelope<BuildingUnitPositionWasDerivedFromObject>>(async (context, message, ct) => DoNothing());
-//            When<Envelope<BuildingUnitStatusWasRemoved>>(async (context, message, ct) => DoNothing());
-//            When<Envelope<BuildingUnitWasCorrectedToNotRealized>>(async (context, message, ct) => DoNothing());
-//            When<Envelope<BuildingUnitWasCorrectedToPlanned>>(async (context, message, ct) => DoNothing());
-//            When<Envelope<BuildingUnitWasCorrectedToRealized>>(async (context, message, ct) => DoNothing());
-//            When<Envelope<BuildingUnitWasCorrectedToRetired>>(async (context, message, ct) => DoNothing());
-//            When<Envelope<BuildingUnitWasNotRealized>>(async (context, message, ct) => DoNothing());
-//            When<Envelope<BuildingUnitWasNotRealizedByParent>>(async (context, message, ct) => DoNothing());
-//            When<Envelope<BuildingUnitWasPlanned>>(async (context, message, ct) => DoNothing());
-//            When<Envelope<BuildingUnitWasReaddressed>>(async (context, message, ct) => DoNothing());
-//            When<Envelope<BuildingUnitWasRealized>>(async (context, message, ct) => DoNothing());
-//            When<Envelope<BuildingUnitWasRetired>>(async (context, message, ct) => DoNothing());
-//            When<Envelope<BuildingUnitWasRetiredByParent>>(async (context, message, ct) => DoNothing());
-
-//            //CRAB
-
-//            When<Envelope<AddressHouseNumberPositionWasImportedFromCrab>>(async (context, message, ct) => DoNothing());
-//            When<Envelope<AddressHouseNumberStatusWasImportedFromCrab>>(async (context, message, ct) => DoNothing());
-//            When<Envelope<AddressHouseNumberWasImportedFromCrab>>(async (context, message, ct) => DoNothing());
-//            When<Envelope<AddressSubaddressPositionWasImportedFromCrab>>(async (context, message, ct) => DoNothing());
-//            When<Envelope<AddressSubaddressStatusWasImportedFromCrab>>(async (context, message, ct) => DoNothing());
-//            When<Envelope<AddressSubaddressWasImportedFromCrab>>(async (context, message, ct) => DoNothing());
-//            When<Envelope<BuildingGeometryWasImportedFromCrab>>(async (context, message, ct) => DoNothing());
-//            When<Envelope<BuildingStatusWasImportedFromCrab>>(async (context, message, ct) => DoNothing());
-//            When<Envelope<HouseNumberWasReaddressedFromCrab>>(async (context, message, ct) => DoNothing());
-//            When<Envelope<SubaddressWasReaddressedFromCrab>>(async (context, message, ct) => DoNothing());
-//            When<Envelope<TerrainObjectHouseNumberWasImportedFromCrab>>(async (context, message, ct) => DoNothing());
-//            When<Envelope<TerrainObjectWasImportedFromCrab>>(async (context, message, ct) => DoNothing());
-//        }
-
-//        private static void DoNothing() { }
-//    }
-//}
+        protected override string BuildUri(AcceptType acceptType, string identifier)
+        {
+            return acceptType switch
+            {
+                AcceptType.JsonLd => "/v2/gebouwen/{0}",
+                _ => throw new NotImplementedException($"Cannot build Uri for type {typeof(AcceptType)}")
+            };
+        }
+    }
+}

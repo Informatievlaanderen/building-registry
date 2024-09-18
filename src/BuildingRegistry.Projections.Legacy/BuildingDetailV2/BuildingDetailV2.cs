@@ -71,6 +71,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingDetailV2
     public class BuildingDetailItemConfiguration : IEntityTypeConfiguration<BuildingDetailItemV2>
     {
         internal const string TableName = "BuildingDetailsV2";
+        public static readonly string ProjectionStateName = typeof(BuildingDetailV2Projections).FullName!;
 
         public void Configure(EntityTypeBuilder<BuildingDetailItemV2> b)
         {
