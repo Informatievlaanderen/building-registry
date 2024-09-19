@@ -1,3 +1,15 @@
+# [4.16.0](https://github.com/informatievlaanderen/building-registry/compare/v4.15.1...v4.16.0) (2024-09-19)
+
+
+### Bug Fixes
+
+* revert remove measured buildings temporarily ([51867dd](https://github.com/informatievlaanderen/building-registry/commit/51867dda42e029c1d5b39b13c56b6f722900c67b))
+
+
+### Features
+
+* add building cache + invalidation by parcel ([d895aec](https://github.com/informatievlaanderen/building-registry/commit/d895aecaa0de43034b477c13c386984a55be5ecf))
+
 ## [4.15.1](https://github.com/informatievlaanderen/building-registry/compare/v4.15.0...v4.15.1) (2024-09-16)
 
 
