@@ -1,3 +1,10 @@
+## [4.16.1](https://github.com/informatievlaanderen/building-registry/compare/v4.16.0...v4.16.1) (2024-09-19)
+
+
+### Bug Fixes
+
+* **cache:** building cachekey ([ba81de3](https://github.com/informatievlaanderen/building-registry/commit/ba81de3d8b3964e5781c1beef80c71bc678276a1))
+
 # [4.16.0](https://github.com/informatievlaanderen/building-registry/compare/v4.15.1...v4.16.0) (2024-09-19)
 
 
