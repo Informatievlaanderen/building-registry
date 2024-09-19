@@ -122,7 +122,7 @@ namespace BuildingRegistry.Projections.LastChangedList
             var shortenedAcceptType = acceptType.ToString().ToLowerInvariant();
             return acceptType switch
             {
-                AcceptType.JsonLd => $"oslo/building:{{0}}.{shortenedAcceptType}",
+                AcceptType.JsonLd => $"oslo/building:{0}.{shortenedAcceptType}",
                 _ => throw new NotImplementedException($"Cannot build CacheKey for type {typeof(AcceptType)}")
             };
         }
