@@ -18,8 +18,10 @@ namespace BuildingRegistry.Consumer.Read.Parcel
 
     public class ConsumerParcelContext : RunnerDbContext<ConsumerParcelContext>, IParcels
     {
-        public DbSet<ParcelConsumerItem> ParcelConsumerItemsWithCount { get; set; }
-        public DbSet<ParcelAddressItem> ParcelAddressItemsWithCount { get; set; }
+        public DbSet<ParcelConsumerItem> ParcelConsumerItemsWithCount => Set<ParcelConsumerItem>();
+        public DbSet<ParcelAddressItem> ParcelAddressItemsWithCount => Set<ParcelAddressItem>();
+
+        public DbSet<BuildingToInvalidate> BuildingsToInvalidate => Set<BuildingToInvalidate>();
 
         // This needs to be here to please EF
         public ConsumerParcelContext()

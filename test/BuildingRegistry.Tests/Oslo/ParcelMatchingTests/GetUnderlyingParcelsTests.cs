@@ -3,8 +3,8 @@ namespace BuildingRegistry.Tests.Oslo.ParcelMatchingTests
     using System;
     using System.Linq;
     using Api.BackOffice.Abstractions.Building;
-    using Api.Oslo.Infrastructure.ParcelMatching;
     using BackOffice;
+    using Consumer.Read.Parcel;
     using Consumer.Read.Parcel.ParcelWithCount;
     using FluentAssertions;
     using NetTopologySuite.Geometries;
@@ -13,14 +13,11 @@ namespace BuildingRegistry.Tests.Oslo.ParcelMatchingTests
     public class GetUnderlyingParcelsTests
     {
         private readonly FakeConsumerParcelContext _consumerParcelContext;
-        private readonly FakeLegacyContext _legacyContext;
 
         public GetUnderlyingParcelsTests()
         {
             _consumerParcelContext = new FakeConsumerParcelContextFactory()
-                .CreateDbContext(Array.Empty<string>());
-            _legacyContext = new FakeLegacyContextFactory()
-                .CreateDbContext(Array.Empty<string>());
+                .CreateDbContext([]);
         }
 
         [Fact]
@@ -39,7 +36,7 @@ namespace BuildingRegistry.Tests.Oslo.ParcelMatchingTests
 
             _consumerParcelContext.SaveChanges();
 
-            var parcelMatching = new ParcelMatching(_consumerParcelContext, _legacyContext);
+            var parcelMatching = new ParcelMatching(_consumerParcelContext);
 
             var result = parcelMatching.GetUnderlyingParcels(buildingGeometry100PercentOverlap.AsBinary());
 
@@ -62,7 +59,7 @@ namespace BuildingRegistry.Tests.Oslo.ParcelMatchingTests
 
             _consumerParcelContext.SaveChanges();
 
-            var parcelMatching = new ParcelMatching(_consumerParcelContext, _legacyContext);
+            var parcelMatching = new ParcelMatching(_consumerParcelContext);
 
             var result = parcelMatching.GetUnderlyingParcels(buildingGeometry100PercentOverlap.AsBinary());
 
@@ -85,7 +82,7 @@ namespace BuildingRegistry.Tests.Oslo.ParcelMatchingTests
 
             _consumerParcelContext.SaveChanges();
 
-            var parcelMatching = new ParcelMatching(_consumerParcelContext, _legacyContext);
+            var parcelMatching = new ParcelMatching(_consumerParcelContext);
 
             var result = parcelMatching.GetUnderlyingParcels(buildingGeometry.AsBinary());
 
@@ -116,7 +113,7 @@ namespace BuildingRegistry.Tests.Oslo.ParcelMatchingTests
 
             _consumerParcelContext.SaveChanges();
 
-            var parcelMatching = new ParcelMatching(_consumerParcelContext, _legacyContext);
+            var parcelMatching = new ParcelMatching(_consumerParcelContext);
 
             var result = parcelMatching.GetUnderlyingParcels(buildingGeometry50PercentOverlap.AsBinary());
 
@@ -149,7 +146,7 @@ namespace BuildingRegistry.Tests.Oslo.ParcelMatchingTests
 
             _consumerParcelContext.SaveChanges();
 
-            var parcelMatching = new ParcelMatching(_consumerParcelContext, _legacyContext);
+            var parcelMatching = new ParcelMatching(_consumerParcelContext);
 
             var result = parcelMatching.GetUnderlyingParcels(building.AsBinary()).ToList();
 

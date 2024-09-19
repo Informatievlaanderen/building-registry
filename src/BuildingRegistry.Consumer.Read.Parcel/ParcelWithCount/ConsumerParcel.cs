@@ -3,6 +3,7 @@ namespace BuildingRegistry.Consumer.Read.Parcel.ParcelWithCount
     using System;
     using System.Threading;
     using System.Threading.Tasks;
+    using Autofac;
     using Be.Vlaanderen.Basisregisters.MessageHandling.Kafka.Consumer;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.Connector;
     using Microsoft.EntityFrameworkCore;
@@ -12,17 +13,20 @@ namespace BuildingRegistry.Consumer.Read.Parcel.ParcelWithCount
     public class ConsumerParcel : BackgroundService
     {
         private readonly IHostApplicationLifetime _hostApplicationLifetime;
+        private readonly ILifetimeScope _lifetimeScope;
         private readonly IDbContextFactory<ConsumerParcelContext> _consumerParcelDbContextFactory;
         private readonly IConsumer _consumer;
         private readonly ILogger<ConsumerParcel> _logger;
 
         public ConsumerParcel(
             IHostApplicationLifetime hostApplicationLifetime,
+            ILifetimeScope lifetimeScope,
             IDbContextFactory<ConsumerParcelContext> consumerParcelDbContextFactory,
             IConsumer consumer,
             ILoggerFactory loggerFactory)
         {
             _hostApplicationLifetime = hostApplicationLifetime;
+            _lifetimeScope = lifetimeScope;
             _consumerParcelDbContextFactory = consumerParcelDbContextFactory;
             _consumer = consumer;
             _logger = loggerFactory.CreateLogger<ConsumerParcel>();
@@ -32,7 +36,7 @@ namespace BuildingRegistry.Consumer.Read.Parcel.ParcelWithCount
         {
             var projector =
                 new ConnectedProjector<ConsumerParcelContext>(
-                    Resolve.WhenEqualToHandlerMessageType(new ParcelKafkaProjection().Handlers));
+                    Resolve.WhenEqualToHandlerMessageType(new ParcelKafkaProjection(_lifetimeScope).Handlers));
 
             try
             {

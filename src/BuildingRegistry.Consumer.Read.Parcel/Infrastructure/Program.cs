@@ -19,6 +19,7 @@ namespace BuildingRegistry.Consumer.Read.Parcel.Infrastructure
     using Microsoft.Extensions.Hosting;
     using Microsoft.Extensions.Logging;
     using ParcelWithCount;
+    using Projections.Legacy;
     using Serilog;
     using Serilog.Debugging;
     using Serilog.Extensions.Logging;
@@ -80,6 +81,16 @@ namespace BuildingRegistry.Consumer.Read.Parcel.Infrastructure
                                 sqlServerOptions.MigrationsHistoryTable(MigrationTables.ConsumerReadParcel, Schema.ConsumerReadParcel);
                                 sqlServerOptions.UseNetTopologySuite();
                             }));
+
+                    services
+                        .AddDbContext<LegacyContext>((_, options) => options
+                            .UseLoggerFactory(loggerFactory)
+                            .UseSqlServer(hostContext.Configuration.GetConnectionString("LegacyProjections"), sqlServerOptions =>
+                            {
+                                sqlServerOptions.EnableRetryOnFailure();
+                                sqlServerOptions.MigrationsHistoryTable(MigrationTables.Legacy, Schema.Legacy);
+                                sqlServerOptions.UseNetTopologySuite();
+                            }));
                 })
                 .UseServiceProviderFactory(new AutofacServiceProviderFactory())
                 .ConfigureContainer<ContainerBuilder>((hostContext, builder) =>
@@ -126,6 +137,11 @@ namespace BuildingRegistry.Consumer.Read.Parcel.Infrastructure
                         })
                         .As<IConsumer>()
                         .SingleInstance();
+
+                    builder
+                        .RegisterType<BuildingMatching>()
+                        .AsImplementedInterfaces()
+                        .InstancePerLifetimeScope();
 
                     builder
                         .RegisterType<ConsumerParcel>()

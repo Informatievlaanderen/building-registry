@@ -10,7 +10,6 @@ namespace BuildingRegistry.Api.Oslo.Building.Query
     using Consumer.Read.Parcel;
     using Consumer.Read.Parcel.ParcelWithCount;
     using Converters;
-    using Infrastructure.ParcelMatching;
     using Microsoft.EntityFrameworkCore;
     using Projections.Legacy;
     using Projections.Legacy.BuildingDetailV2;
@@ -19,14 +18,17 @@ namespace BuildingRegistry.Api.Oslo.Building.Query
     {
         private readonly LegacyContext _context;
         private readonly ConsumerParcelContext _consumerParcelContext;
-        private readonly IParcelMatching _parcelMatching;
+        private readonly IBuildingMatching _buildingMatching;
         protected override ISorting Sorting => new BuildingSorting();
 
-        public BuildingListOsloQueryV2(LegacyContext context, ConsumerParcelContext consumerParcelContext, IParcelMatching parcelMatching)
+        public BuildingListOsloQueryV2(
+            LegacyContext context,
+            ConsumerParcelContext consumerParcelContext,
+            IBuildingMatching buildingMatching)
         {
             _context = context;
             _consumerParcelContext = consumerParcelContext;
-            _parcelMatching = parcelMatching;
+            _buildingMatching = buildingMatching;
         }
 
         protected override IQueryable<BuildingQueryItem> Filter(FilteringHeader<BuildingFilter> filtering)
@@ -63,7 +65,7 @@ namespace BuildingRegistry.Api.Oslo.Building.Query
                 var parcel = _consumerParcelContext.ParcelConsumerItemsWithCount.FirstOrDefault(x => x.CaPaKey == filtering.Filter.CaPaKey);
                 if (parcel is not null && parcel.Status == ParcelStatus.Realized)
                 {
-                    var underlyingBuildings = _parcelMatching.GetUnderlyingBuildings(parcel.Geometry);
+                    var underlyingBuildings = _buildingMatching.GetUnderlyingBuildings(parcel.Geometry);
                     buildings = buildings.Where(x => underlyingBuildings.Contains(x.PersistentLocalId));
                 }
                 else

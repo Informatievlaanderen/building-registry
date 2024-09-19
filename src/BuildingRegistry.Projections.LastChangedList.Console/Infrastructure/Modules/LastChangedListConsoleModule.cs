@@ -13,6 +13,7 @@ namespace BuildingRegistry.Projections.LastChangedList.Console.Infrastructure.Mo
     using Be.Vlaanderen.Basisregisters.Projector.Modules;
     using BuildingRegistry.Infrastructure;
     using BuildingRegistry.Projections.Legacy.BuildingUnitDetailV2WithCount;
+    using Legacy.BuildingDetailV2;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Logging;
@@ -74,7 +75,14 @@ namespace BuildingRegistry.Projections.LastChangedList.Console.Infrastructure.Mo
                 "\tTableName: {TableName}",
                 nameof(LastChangedListContext), LastChangedListContext.Schema, LastChangedListContext.MigrationsHistoryTable);
 
-            builder.Register(c =>
+            builder
+                .Register(c =>
+                    new LastChangedListBuildingCacheValidator(
+                        _configuration.GetConnectionString("LegacyProjections"),
+                        BuildingDetailItemConfiguration.ProjectionStateName))
+                .AsSelf();
+            builder
+                .Register(c =>
                     new LastChangedListBuildingUnitCacheValidator(
                         _configuration.GetConnectionString("LegacyProjections"),
                         BuildingUnitDetailItemConfiguration.ProjectionStateName))
@@ -87,6 +95,9 @@ namespace BuildingRegistry.Projections.LastChangedList.Console.Infrastructure.Mo
                 .RegisterProjectionMigrator<DataMigrationContextMigrationFactory>(
                     _configuration,
                     _loggerFactory)
+                .RegisterProjections<BuildingProjections, LastChangedListContext>(
+                    context => new BuildingProjections(context.Resolve<LastChangedListBuildingCacheValidator>()),
+                    ConnectedProjectionSettings.Default)
                 .RegisterProjections<BuildingUnitProjections, LastChangedListContext>(
                     context => new BuildingUnitProjections(context.Resolve<LastChangedListBuildingUnitCacheValidator>()),
                     ConnectedProjectionSettings.Default);

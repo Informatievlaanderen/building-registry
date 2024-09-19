@@ -13,11 +13,11 @@ namespace BuildingRegistry.Projections.LastChangedList
     using Legacy.Events.Crab;
 
     [ConnectedProjectionName(ProjectionName)]
-    [ConnectedProjectionDescription("Projectie die markeert voor hoeveel gebouwen en gebouweenheden de gecachte data nog geüpdated moeten worden.")]
+    [ConnectedProjectionDescription("Projectie die markeert voor hoeveel gebouweenheden de gecachte data nog geüpdated moeten worden.")]
     public class BuildingUnitProjections : LastChangedListConnectedProjection
     {
         public const string ProjectionName = "Cache markering gebouweenheden";
-        private static readonly AcceptType[] SupportedAcceptTypes = { AcceptType.JsonLd };
+        private static readonly AcceptType[] SupportedAcceptTypes = [AcceptType.JsonLd];
 
         public BuildingUnitProjections(ICacheValidator cacheValidator)
             : base(SupportedAcceptTypes, cacheValidator)
@@ -192,6 +192,14 @@ namespace BuildingRegistry.Projections.LastChangedList
                 }
             });
 
+            When<Envelope<BuildingWasMeasured>>(async (context, message, ct) =>
+            {
+                foreach (var buildingUnitPersistentLocalId in message.Message.BuildingUnitPersistentLocalIds)
+                {
+                    await GetLastChangedRecordsAndUpdatePosition(buildingUnitPersistentLocalId.ToString(), message.Position, context, ct);
+                }
+            });
+
             When<Envelope<BuildingOutlineWasChanged>>(async (context, message, ct) =>
             {
                 foreach (var buildingUnitPersistentLocalId in message.Message.BuildingUnitPersistentLocalIds)
@@ -342,14 +350,6 @@ namespace BuildingRegistry.Projections.LastChangedList
             When<Envelope<BuildingUnitWasRetiredV2>>(async (context, message, ct) =>
             {
                 await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingUnitPersistentLocalId.ToString(), message.Position, context, ct);
-            });
-
-            When<Envelope<BuildingWasMeasured>>(async (context, message, ct) =>
-            {
-                foreach (var buildingUnitPersistentLocalId in message.Message.BuildingUnitPersistentLocalIds)
-                {
-                    await GetLastChangedRecordsAndUpdatePosition(buildingUnitPersistentLocalId.ToString(), message.Position, context, ct);
-                }
             });
 
             When<Envelope<CommonBuildingUnitWasAddedV2>>(async (context, message, ct) =>
