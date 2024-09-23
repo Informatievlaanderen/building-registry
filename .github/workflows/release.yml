@@ -684,7 +684,6 @@ jobs:
         services: [
           'building-api',
           'building-backoffice-api',
-          'building-cache-invalidator',
           'building-consumer-address',
           'building-consumer-parcel',
           'building-producer',
@@ -726,7 +725,8 @@ jobs:
     strategy:
       matrix:
         services: [
-          'building-snapshot-verifier'
+          'building-snapshot-verifier',
+          'building-cache-invalidator'
           ]
 
     steps:
@@ -835,7 +835,6 @@ jobs:
         services: [
           'building-api',
           'building-backoffice-api',
-          'building-cache-invalidator',
           'building-consumer-address',
           'building-consumer-parcel',
           'building-producer',
@@ -877,6 +876,7 @@ jobs:
     strategy:
       matrix:
         services: [
+          'building-cache-invalidator',
           'building-snapshot-verifier'
           ]
 
