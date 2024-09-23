@@ -1,3 +1,10 @@
+## [4.16.2](https://github.com/informatievlaanderen/building-registry/compare/v4.16.1...v4.16.2) (2024-09-23)
+
+
+### Bug Fixes
+
+* ci to bump + set cache invalidator as task ([d3d6cb1](https://github.com/informatievlaanderen/building-registry/commit/d3d6cb17a5ef632ee089caee4f346f83a642972b))
+
 ## [4.16.1](https://github.com/informatievlaanderen/building-registry/compare/v4.16.0...v4.16.1) (2024-09-19)
 
 
