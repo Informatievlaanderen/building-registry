@@ -1,3 +1,10 @@
+## [4.16.4](https://github.com/informatievlaanderen/building-registry/compare/v4.16.3...v4.16.4) (2024-09-23)
+
+
+### Bug Fixes
+
+* style to trigger bump ([0c23087](https://github.com/informatievlaanderen/building-registry/commit/0c230876eb6814a0472d4871cd9064802aba558d))
+
 ## [4.16.3](https://github.com/informatievlaanderen/building-registry/compare/v4.16.2...v4.16.3) (2024-09-23)
 
 
