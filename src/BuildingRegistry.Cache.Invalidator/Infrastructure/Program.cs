@@ -104,6 +104,7 @@ namespace BuildingRegistry.Cache.Invalidator.Infrastructure
                 {
                     var distributedLockTableName = configuration.GetValue<string>("DistributedLock:LockName")
                         ?? throw new Exception("No 'LockName' configuration found");
+
                     var distributedLockOptions = DistributedLockOptions.LoadFromConfiguration(configuration);
                     var distributedLock = new DistributedLock<Program>(distributedLockOptions, distributedLockTableName, loggerFactory.CreateLogger<Program>());
 
