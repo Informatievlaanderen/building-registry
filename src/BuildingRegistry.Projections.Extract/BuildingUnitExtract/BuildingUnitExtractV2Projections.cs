@@ -40,7 +40,6 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
             _encoding = encoding ?? throw new ArgumentNullException(nameof(encoding));
 
             #region Building
-
             When<Envelope<BuildingWasMigrated>>(async (context, message, ct) =>
             {
                 if (message.Message.IsRemoved)
