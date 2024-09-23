@@ -41,7 +41,6 @@ jobs:
         services: [
           'building-api',
           'building-backoffice-api',
-          #'building-cache-invalidator',
           'building-consumer-address',
           'building-consumer-parcel',
           'building-producer',
@@ -82,8 +81,8 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        services: [
-          #'building-migrator-building',
+        services: [          
+          #'building-cache-invalidator',
           'building-snapshot-verifier'
         ]
 
