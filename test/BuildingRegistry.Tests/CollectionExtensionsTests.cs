@@ -8,11 +8,11 @@
     public class CollectionExtensionsTests
     {
         [Theory]
-        [MemberData(nameof(SplitIntoBatchesCases))]
-        public void SplitIntoBatches(int collectionCount, int batchCount, int[] expectedBatchSizes)
+        [MemberData(nameof(SplitBySizeCases))]
+        public void SplitBySize(int collectionCount, int batchSize, int[] expectedBatchSizes)
         {
             var collection = Enumerable.Range(1, collectionCount).ToArray();
-            var batches = collection.SplitIntoBatches(batchCount).ToArray();
+            var batches = collection.SplitBySize(batchSize).ToArray();
             Assert.Equal(expectedBatchSizes.Length, batches.Length);
             for (var i = 0; i < batches.Length; i++)
             {
@@ -20,13 +20,13 @@
             }
         }
 
-        public static IEnumerable<object[]> SplitIntoBatchesCases()
+        public static IEnumerable<object[]> SplitBySizeCases()
         {
-            yield return new object[] { 1, 1, new[] { 1 } };
-            yield return new object[] { 2, 1, new[] { 2 } };
-            yield return new object[] { 1, 2, new[] { 1, 0 } };
-            yield return new object[] { 2, 2, new[] { 1, 1 } };
-            yield return new object[] { 3, 2, new[] { 2, 1 } };
+             yield return [1, 1, new[] { 1 }];
+             yield return [2, 1, new[] { 1, 1 }];
+             yield return [1, 2, new[] { 1 }];
+             yield return [2, 2, new[] { 2 }];
+             yield return [3, 2, new[] { 2, 1 }];
         }
     }
 }

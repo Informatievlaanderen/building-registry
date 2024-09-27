@@ -41,7 +41,7 @@
 
         public async Task Invalidate(ICollection<BuildingPersistentLocalId> buildingPersistentLocalIds)
         {
-            _logger.LogInformation("Invalidating cache for {BuildingPersistentLocalIds}", buildingPersistentLocalIds.Count());
+            _logger.LogInformation("Invalidating cache for {BuildingPersistentLocalIds}", buildingPersistentLocalIds.Count);
 
             await using var connection = new SqlConnection(_connectionString);
             connection.Open();
@@ -51,7 +51,7 @@
                 .Distinct()
                 .ToList();
 
-            var batches = cacheKeys.SplitIntoBatches(200);
+            var batches = cacheKeys.SplitBySize(200);
             foreach(var batchedCacheKeys in batches)
             {
                 var query = $"""

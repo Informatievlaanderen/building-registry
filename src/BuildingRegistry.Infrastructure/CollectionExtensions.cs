@@ -6,15 +6,18 @@
 
     public static class CollectionExtensions
     {
-        public static IEnumerable<ICollection<T>> SplitIntoBatches<T>(this ICollection<T> collection, int batchCount)
+        public static IEnumerable<ICollection<T>> SplitBySize<T>(this ICollection<T> collection, int batchSize)
         {
-            var batchSize = (double)collection.Count / batchCount;
-            var batchSizeRounded = (int)Math.Floor(batchSize);
-            if (batchSize != batchSizeRounded)
+            var batchCount = (double)collection.Count / batchSize;
+
+            var batchCountRounded = (int)Math.Floor(batchCount);
+            if (batchCount != batchCountRounded)
             {
-                batchSizeRounded++;
+                batchCountRounded++;
             }
-            return Enumerable.Range(0, batchCount).Select(batchIndex => collection.Skip(batchSizeRounded * batchIndex).Take(batchSizeRounded).ToArray());
+
+            return Enumerable.Range(0, batchCountRounded)
+                .Select(batchIndex => collection.Skip(batchSize * batchIndex).Take(batchSize).ToArray());
         }
     }
 }
