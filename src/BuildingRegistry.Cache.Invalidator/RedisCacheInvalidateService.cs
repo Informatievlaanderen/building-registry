@@ -22,8 +22,16 @@
 
         public RedisCacheInvalidateService(IConfiguration configuration)
         {
-            _cacheKeyFormats = configuration.GetValue<string[]>("RedisCacheKeyFormats")
-                ?? throw new ArgumentException("No 'RedisCacheKeyFormats' configuration found");
+            _cacheKeyFormats = configuration.GetSection("RedisCacheKeyFormats")
+                    .GetChildren()
+                    .Select(c => c.Value!)
+                    .ToArray();
+
+            if (_cacheKeyFormats.Length == 0)
+            {
+                throw new ArgumentException("No 'RedisCacheKeyFormats' configuration found");
+            }
+
             _connectionString = configuration.GetConnectionString("LastChangedList")
                 ?? throw new ArgumentException("No connectionstring 'LastChangedList' found");
         }
