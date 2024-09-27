@@ -1,3 +1,10 @@
+## [4.16.6](https://github.com/informatievlaanderen/building-registry/compare/v4.16.5...v4.16.6) (2024-09-27)
+
+
+### Bug Fixes
+
+* add logging to cache invalidator ([1af3e49](https://github.com/informatievlaanderen/building-registry/commit/1af3e498f4f16ac67206fd9514e8bfbebc45129b))
+
 ## [4.16.5](https://github.com/informatievlaanderen/building-registry/compare/v4.16.4...v4.16.5) (2024-09-27)
 
 
