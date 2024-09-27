@@ -1,3 +1,11 @@
+## [4.16.5](https://github.com/informatievlaanderen/building-registry/compare/v4.16.4...v4.16.5) (2024-09-27)
+
+
+### Bug Fixes
+
+* ci deploy lambda ([46e3806](https://github.com/informatievlaanderen/building-registry/commit/46e3806cbc0772fc3edfd7cbd91341a20789201e))
+* retrieve RedisCacheKeyFormats ([b85cd53](https://github.com/informatievlaanderen/building-registry/commit/b85cd53a5209cbadb45e6ea329042557e02c27db))
+
 ## [4.16.4](https://github.com/informatievlaanderen/building-registry/compare/v4.16.3...v4.16.4) (2024-09-23)
 
 
