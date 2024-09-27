@@ -1,3 +1,10 @@
+## [4.16.7](https://github.com/informatievlaanderen/building-registry/compare/v4.16.6...v4.16.7) (2024-09-27)
+
+
+### Bug Fixes
+
+* batches in RedisCacheInvalidateService ([9c0114f](https://github.com/informatievlaanderen/building-registry/commit/9c0114f33fd636fd6c7f3d7d1130e3f0a52d9d93))
+
 ## [4.16.6](https://github.com/informatievlaanderen/building-registry/compare/v4.16.5...v4.16.6) (2024-09-27)
 
 
