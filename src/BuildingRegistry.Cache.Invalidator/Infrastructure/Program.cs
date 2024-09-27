@@ -3,20 +3,19 @@ namespace BuildingRegistry.Cache.Invalidator.Infrastructure
     using System;
     using System.IO;
     using System.Linq;
+    using System.Threading;
     using System.Threading.Tasks;
-    using System.Timers;
     using Autofac;
     using Autofac.Extensions.DependencyInjection;
     using Be.Vlaanderen.Basisregisters.Aws.DistributedMutex;
-    using BuildingRegistry.Infrastructure;
     using Consumer.Read.Parcel;
     using Consumer.Read.Parcel.Infrastructure.Modules;
     using Destructurama;
-    using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Hosting;
     using Microsoft.Extensions.Logging;
+    using Polly;
     using Serilog;
     using Serilog.Debugging;
     using Serilog.Extensions.Logging;
@@ -65,9 +64,7 @@ namespace BuildingRegistry.Cache.Invalidator.Infrastructure
                     builder.ClearProviders();
                     builder.AddSerilog(Log.Logger);
                 })
-                .ConfigureServices((hostContext, services) =>
-                {
-                })
+                .ConfigureServices((hostContext, services) => { })
                 .UseServiceProviderFactory(new AutofacServiceProviderFactory())
                 .ConfigureContainer<ContainerBuilder>((hostContext, builder) =>
                 {
@@ -103,17 +100,27 @@ namespace BuildingRegistry.Cache.Invalidator.Infrastructure
                 if (consumerParcelContext.BuildingsToInvalidate.Any())
                 {
                     var distributedLockTableName = configuration.GetValue<string>("DistributedLock:LockName")
-                        ?? throw new Exception("No 'LockName' configuration found");
+                                                   ?? throw new Exception("No 'LockName' configuration found");
 
                     var distributedLockOptions = DistributedLockOptions.LoadFromConfiguration(configuration);
-                    var distributedLock = new DistributedLock<Program>(distributedLockOptions, distributedLockTableName, loggerFactory.CreateLogger<Program>());
+                    var distributedLock = new DistributedLock<Program>(
+                        distributedLockOptions,
+                        distributedLockTableName,
+                        loggerFactory.CreateLogger<Program>());
 
-                    await distributedLock.RunAsync(
-                            async () =>
-                            {
-                                await host.RunAsync().ConfigureAwait(false);
-                            })
-                        .ConfigureAwait(false);
+                    await Policy
+                        .Handle<AcquireLockFailedException>()
+                        .WaitAndRetryAsync(5, _ =>
+                        {
+                            Log.Information("Failed to acquire lock. Trying again within 1 minute.");
+                            return TimeSpan.FromMinutes(1);
+                        })
+                        .ExecuteAsync(async ct =>
+                        {
+                            await distributedLock.RunAsync(
+                                    async () => { await host.RunAsync(token: ct).ConfigureAwait(false); })
+                                .ConfigureAwait(false);
+                        }, CancellationToken.None);
                 }
             }
             catch (AggregateException aggregateException)
