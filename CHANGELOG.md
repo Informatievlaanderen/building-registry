@@ -1,3 +1,10 @@
+## [4.16.8](https://github.com/informatievlaanderen/building-registry/compare/v4.16.7...v4.16.8) (2024-09-30)
+
+
+### Bug Fixes
+
+* keep trying to acquire lock in cache invalidator ([bc6a423](https://github.com/informatievlaanderen/building-registry/commit/bc6a423152352db6665663b174bf5cdd73e093e7))
+
 ## [4.16.7](https://github.com/informatievlaanderen/building-registry/compare/v4.16.6...v4.16.7) (2024-09-27)
 
 
