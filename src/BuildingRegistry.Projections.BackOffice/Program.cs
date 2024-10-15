@@ -20,6 +20,7 @@ namespace BuildingRegistry.Projections.BackOffice
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
+    using Microsoft.Extensions.Diagnostics.HealthChecks;
     using Microsoft.Extensions.Hosting;
     using Microsoft.Extensions.Logging;
     using Serilog;
@@ -86,7 +87,22 @@ namespace BuildingRegistry.Projections.BackOffice
                                     .MigrationsHistoryTable(MigrationTables.BackOffice, Schema.BackOffice)
                             ))
                         .AddHostedService<ProjectorRunner>()
-                        .AddHostedService<ProjectionsHealthCheckRunner>();
+                        .AddHostedService<HealthCheckRunner>();
+
+                    foreach (var connectionString in hostContext.Configuration.GetSection("ConnectionStrings").GetChildren())
+                    {
+                        services.AddHealthChecks()
+                            .AddSqlServer(
+                                connectionString.Value,
+                                name: $"sqlserver-{connectionString.Key.ToLowerInvariant()}",
+                                tags: ["db", "sql", "sqlserver"]);
+                    }
+
+                    services.AddHealthChecks()
+                        .AddDbContextCheck<BackOfficeContext>(
+                            $"dbcontext-{nameof(BackOfficeContext).ToLowerInvariant()}",
+                            tags: ["db", "sql", "sqlserver"])
+                        .AddCheck<ProjectionsHealthCheck>("projections", failureStatus: HealthStatus.Unhealthy, tags: ["projections"]);
                 })
                 .UseServiceProviderFactory(new AutofacServiceProviderFactory())
                 .ConfigureContainer<ContainerBuilder>((hostContext, builder) =>
