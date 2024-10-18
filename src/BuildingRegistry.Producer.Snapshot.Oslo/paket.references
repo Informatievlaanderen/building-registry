@@ -11,6 +11,9 @@ Microsoft.Extensions.DependencyInjection
 
 AspNetCore.HealthChecks.SqlServer
 
+Npgsql.EntityFrameworkCore.PostgreSQL
+Dapper
+
 Datadog.Trace.Bundle
 
 SourceLink.Embed.AllSourceFiles
