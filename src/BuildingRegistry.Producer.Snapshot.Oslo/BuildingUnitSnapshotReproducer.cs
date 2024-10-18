@@ -10,11 +10,11 @@
     using NodaTime;
     using Npgsql;
 
-    public class BuildingSnapshotReproducer : SnapshotReproducer
+    public class BuildingUnitSnapshotReproducer : SnapshotReproducer
     {
         private readonly string _integrationConnectionString;
 
-        public BuildingSnapshotReproducer(
+        public BuildingUnitSnapshotReproducer(
             string integrationConnectionString,
             IOsloProxy osloProxy,
             IProducer producer,
@@ -32,17 +32,19 @@
             var todayMidnight = utcNow.Date;
             var yesterdayMidnight = todayMidnight.AddDays(-1);
 
-            var records = connection.Query<BuildingPosition>(
+            var records = connection.Query<BuildingUnitPosition>(
                 $"""
-                SELECT building_persistent_local_id, position, version_timestamp
-                FROM integration_building.building_versions
-                where version_timestamp >= '{yesterdayMidnight:yyyy-MM-dd}' and version_timestamp < '{todayMidnight:yyyy-MM-dd}'
+                SELECT building_unit_persistent_local_id, position, version_timestamp
+                FROM integration_building.building_unit_versions
+                where
+                    version_timestamp >= '{yesterdayMidnight:yyyy-MM-dd}'
+                    and version_timestamp < '{todayMidnight:yyyy-MM-dd}'
                 """);
 
             var duplicateEvents = records
                 .GroupBy(x => new
                 {
-                    BuildingPersistentLocalId = x.building_persistent_local_id,
+                    BuildingUnitPersistentLocalId = x.building_unit_persistent_local_id,
                     TimeStamp = x.version_timestamp.ToString("yyyyMMddHHmmss")
                 })
                 .Where(x => x.Count() > 1)
@@ -50,13 +52,13 @@
                 .ToList();
 
             return duplicateEvents
-                .Select(x => (x.building_persistent_local_id, x.position))
+                .Select(x => (x.building_unit_persistent_local_id, x.position))
                 .ToList();
         }
 
-        private sealed class BuildingPosition
+        private sealed class BuildingUnitPosition
         {
-            public int building_persistent_local_id { get; init; }
+            public int building_unit_persistent_local_id { get; init; }
             public long position { get; init; }
             public DateTimeOffset version_timestamp { get; init; }
         }

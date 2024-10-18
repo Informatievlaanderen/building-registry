@@ -81,12 +81,8 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo.Infrastructure.Modules
                 x.ConfigureCatchUpUpdatePositionMessageInterval(Convert.ToInt32(_configuration["CatchUpSaveInterval"]));
             });
 
-            var bootstrapServers = _configuration["Kafka:BootstrapServers"];
-            var saslUsername = _configuration["Kafka:SaslUserName"];
-            var saslPassword = _configuration["Kafka:SaslPassword"];
-
-            var maxRetryWaitIntervalSeconds = _configuration["RetryPolicy:MaxRetryWaitIntervalSeconds"];
-            var retryBackoffFactor = _configuration["RetryPolicy:RetryBackoffFactor"];
+            var maxRetryWaitIntervalSeconds = _configuration["RetryPolicy:MaxRetryWaitIntervalSeconds"]!;
+            var retryBackoffFactor = _configuration["RetryPolicy:RetryBackoffFactor"]!;
 
             builder
                 .RegisterProjectionMigrator<ProducerContextMigrationFactory>(
@@ -103,7 +99,7 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo.Infrastructure.Modules
                                 c.Resolve<ILoggerFactory>(),
                                 new OsloProxy(new HttpClient
                                 {
-                                    BaseAddress = new Uri(_configuration["BuildingOsloApiUrl"].TrimEnd('/')),
+                                    BaseAddress = new Uri(_configuration["BuildingOsloApiUrl"]!.TrimEnd('/')),
                                 }),
                                 SnapshotManagerOptions.Create(
                                     maxRetryWaitIntervalSeconds,
@@ -113,27 +109,12 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo.Infrastructure.Modules
                     connectedProjectionSettings)
                 .RegisterProjections<ProducerBuildingUnitProjections, ProducerContext>(c =>
                     {
-                        var osloNamespace = _configuration["BuildingUnitOsloNamespace"].TrimEnd('/');
-
-                        var topic = $"{_configuration[ProducerBuildingUnitProjections.TopicKey]}" ??
-                                    throw new ArgumentException($"Configuration has no value for {ProducerBuildingProjections.TopicKey}");
-                        var producerOptions = new ProducerOptions(
-                                new BootstrapServers(bootstrapServers!),
-                                new Topic(topic),
-                                true,
-                                EventsJsonSerializerSettingsProvider.CreateSerializerSettings())
-                            .ConfigureEnableIdempotence();
-                        if (!string.IsNullOrEmpty(saslUsername)
-                            && !string.IsNullOrEmpty(saslPassword))
-                        {
-                            producerOptions.ConfigureSaslAuthentication(new SaslAuthentication(
-                                saslUsername,
-                                saslPassword));
-                        }
+                        var osloNamespace = _configuration["BuildingUnitOsloNamespace"]!.TrimEnd('/');
+                        var producerOptions = CreateBuildingUnitProducerOptions();
 
                         var osloProxy = new OsloProxy(new HttpClient
                         {
-                            BaseAddress = new Uri(_configuration["BuildingUnitOsloApiUrl"].TrimEnd('/')),
+                            BaseAddress = new Uri(_configuration["BuildingUnitOsloApiUrl"]!.TrimEnd('/')),
                         });
 
                         return new ProducerBuildingUnitProjections(
@@ -148,6 +129,40 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo.Infrastructure.Modules
                             osloProxy);
                     },
                     connectedProjectionSettings);
+        }
+
+        private void RegisterReproducers()
+        {
+            var connectionString = _configuration.GetConnectionString("Integration");
+            _services.AddHostedService<BuildingSnapshotReproducer>(provider =>
+            {
+                var producerOptions = CreateBuildingProducerOptions();
+
+                return new BuildingSnapshotReproducer(
+                    connectionString!,
+                    new OsloProxy(new HttpClient
+                    {
+                        BaseAddress = new Uri(_configuration["BuildingOsloApiUrl"]!.TrimEnd('/')),
+                    }),
+                    new Producer(producerOptions),
+                    provider.GetRequiredService<IClock>(),
+                    _loggerFactory);
+            });
+
+            _services.AddHostedService<BuildingUnitSnapshotReproducer>(provider =>
+            {
+                var producerOptions = CreateBuildingProducerOptions();
+
+                return new BuildingUnitSnapshotReproducer(
+                    connectionString!,
+                    new OsloProxy(new HttpClient
+                    {
+                        BaseAddress = new Uri(_configuration["BuildingUnitOsloApiUrl"]!.TrimEnd('/')),
+                    }),
+                    new Producer(producerOptions),
+                    provider.GetRequiredService<IClock>(),
+                    _loggerFactory);
+            });
         }
 
         private ProducerOptions CreateBuildingProducerOptions()
@@ -176,23 +191,29 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo.Infrastructure.Modules
             return producerOptions;
         }
 
-        private void RegisterReproducers()
+        private ProducerOptions CreateBuildingUnitProducerOptions()
         {
-            _services.AddHostedService<BuildingSnapshotReproducer>(provider =>
-            {
-                var connectionString = _configuration.GetConnectionString("Integration");
-                var producerOptions = CreateBuildingProducerOptions();
+            var bootstrapServers = _configuration["Kafka:BootstrapServers"];
+            var saslUsername = _configuration["Kafka:SaslUserName"];
+            var saslPassword = _configuration["Kafka:SaslPassword"];
 
-                return new BuildingSnapshotReproducer(
-                    connectionString!,
-                    new OsloProxy(new HttpClient
-                    {
-                        BaseAddress = new Uri(_configuration["BuildingOsloApiUrl"]!.TrimEnd('/')),
-                    }),
-                    new Producer(producerOptions),
-                    provider.GetRequiredService<IClock>(),
-                    _loggerFactory);
-            });
+            var topic = $"{_configuration[ProducerBuildingUnitProjections.TopicKey]}" ??
+                        throw new ArgumentException($"Configuration has no value for {ProducerBuildingProjections.TopicKey}");
+            var producerOptions = new ProducerOptions(
+                    new BootstrapServers(bootstrapServers!),
+                    new Topic(topic),
+                    true,
+                    EventsJsonSerializerSettingsProvider.CreateSerializerSettings())
+                .ConfigureEnableIdempotence();
+            if (!string.IsNullOrEmpty(saslUsername)
+                && !string.IsNullOrEmpty(saslPassword))
+            {
+                producerOptions.ConfigureSaslAuthentication(new SaslAuthentication(
+                    saslUsername,
+                    saslPassword));
+            }
+
+            return producerOptions;
         }
     }
 }
