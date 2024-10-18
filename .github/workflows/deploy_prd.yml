@@ -81,8 +81,8 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        services: [          
-          #'building-cache-invalidator',
+        services: [
+          'building-cache-invalidator',
           'building-snapshot-verifier'
         ]
 
