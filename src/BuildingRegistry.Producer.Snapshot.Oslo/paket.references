@@ -10,6 +10,7 @@ Be.Vlaanderen.Basisregisters.Projector
 Microsoft.Extensions.DependencyInjection
 
 AspNetCore.HealthChecks.SqlServer
+AspNetCore.HealthChecks.NpgSql
 
 Npgsql.EntityFrameworkCore.PostgreSQL
 Dapper
