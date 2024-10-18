@@ -61,6 +61,7 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo.Infrastructure.Modules
                 .RegisterModule(new ProjectorModule(_configuration));
 
             RegisterProjections(builder);
+            RegisterReproducers(builder);
         }
 
         private void RegisterProjections(ContainerBuilder builder)
@@ -158,6 +159,11 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo.Infrastructure.Modules
                         osloProxy);
                 },
                     connectedProjectionSettings);
+        }
+
+        private void RegisterReproducers(ContainerBuilder builder)
+        {
+
         }
     }
 }
