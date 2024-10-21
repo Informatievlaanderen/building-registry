@@ -138,7 +138,7 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo.Infrastructure.Modules
             _services.AddAWSService<IAmazonSimpleNotificationService>();
             _services.AddSingleton<INotificationService>(sp =>
                 new NotificationService(sp.GetRequiredService<IAmazonSimpleNotificationService>(),
-                    _configuration.GetValue<string>("TopicArn")!));
+                    _configuration.GetValue<string>("NotificationTopicArn")!));
 
             var connectionString = _configuration.GetConnectionString("Integration");
 
