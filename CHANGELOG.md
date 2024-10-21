@@ -1,3 +1,10 @@
+# [4.17.0](https://github.com/informatievlaanderen/building-registry/compare/v4.16.10...v4.17.0) (2024-10-21)
+
+
+### Features
+
+* add snapshot reproducer ([dc9be4d](https://github.com/informatievlaanderen/building-registry/commit/dc9be4d1aaa7d2b3c5a32af2efbeb8fb240cac1e))
+
 ## [4.16.10](https://github.com/informatievlaanderen/building-registry/compare/v4.16.9...v4.16.10) (2024-10-21)
 
 
