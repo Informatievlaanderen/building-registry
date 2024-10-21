@@ -4,6 +4,7 @@
     using System.Collections.Generic;
     using System.Threading;
     using System.Threading.Tasks;
+    using Be.Vlaanderen.Basisregisters.GrAr.Notifications;
     using Be.Vlaanderen.Basisregisters.GrAr.Oslo.SnapshotProducer;
     using Be.Vlaanderen.Basisregisters.MessageHandling.Kafka;
     using Be.Vlaanderen.Basisregisters.MessageHandling.Kafka.Producer;
@@ -16,16 +17,19 @@
         private readonly IOsloProxy _osloProxy;
         private readonly IProducer _producer;
         private readonly IClock _clock;
+        private readonly INotificationService _notificationService;
         private readonly ILogger<SnapshotReproducer> _logger;
 
         public SnapshotReproducer(
             IOsloProxy osloProxy,
             IProducer producer,
             IClock clock,
+            INotificationService notificationService,
             ILoggerFactory loggerFactory)
         {
             _osloProxy = osloProxy;
             _producer = producer;
+            _notificationService = notificationService;
             _clock = clock;
 
             _logger = loggerFactory.CreateLogger<SnapshotReproducer>();
@@ -36,7 +40,7 @@
             while (!stoppingToken.IsCancellationRequested)
             {
                 var now = _clock.GetCurrentInstant().ToDateTimeUtc();
-                if (now.Hour == 10)
+                if (now.Hour == 1)
                 {
                     try
                     {
@@ -44,11 +48,11 @@
                         var idsToProcess = GetIdsToProcess(now);
 
                         //reproduce
-                        foreach (var building in idsToProcess)
+                        foreach (var id in idsToProcess)
                         {
                             await FindAndProduce(async () =>
-                                    await _osloProxy.GetSnapshot(building.PersistentLocalId.ToString(), stoppingToken),
-                                building.Position,
+                                    await _osloProxy.GetSnapshot(id.PersistentLocalId.ToString(), stoppingToken),
+                                id.Position,
                                 stoppingToken);
                         }
 
@@ -58,7 +62,11 @@
                     {
                         _logger.LogError(ex, ex.Message);
 
-                        //TODO-rik notification
+                        await _notificationService.PublishToTopicAsync(new NotificationMessage(
+                            GetType().Name,
+                            $"Reproducing snapshot failed: {ex}",
+                            GetType().Name,
+                            NotificationSeverity.Danger));
                     }
                 }
 

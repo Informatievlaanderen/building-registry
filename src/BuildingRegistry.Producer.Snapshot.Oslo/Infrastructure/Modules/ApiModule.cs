@@ -2,11 +2,13 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo.Infrastructure.Modules
 {
     using System;
     using System.Net.Http;
+    using Amazon.SimpleNotificationService;
     using Autofac;
     using Autofac.Extensions.DependencyInjection;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
     using Be.Vlaanderen.Basisregisters.EventHandling;
     using Be.Vlaanderen.Basisregisters.EventHandling.Autofac;
+    using Be.Vlaanderen.Basisregisters.GrAr.Notifications;
     using Be.Vlaanderen.Basisregisters.GrAr.Oslo.SnapshotProducer;
     using Be.Vlaanderen.Basisregisters.MessageHandling.Kafka;
     using Be.Vlaanderen.Basisregisters.MessageHandling.Kafka.Producer;
@@ -133,6 +135,11 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo.Infrastructure.Modules
 
         private void RegisterReproducers()
         {
+            _services.AddAWSService<IAmazonSimpleNotificationService>();
+            _services.AddSingleton<INotificationService>(sp =>
+                new NotificationService(sp.GetRequiredService<IAmazonSimpleNotificationService>(),
+                    _configuration.GetValue<string>("TopicArn")!));
+
             var connectionString = _configuration.GetConnectionString("Integration");
 
             _services.AddHostedService<BuildingSnapshotReproducer>(provider =>
@@ -147,6 +154,7 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo.Infrastructure.Modules
                     }),
                     new Producer(producerOptions),
                     provider.GetRequiredService<IClock>(),
+                    provider.GetRequiredService<INotificationService>(),
                     _loggerFactory);
             });
 
@@ -162,6 +170,7 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo.Infrastructure.Modules
                     }),
                     new Producer(producerOptions),
                     provider.GetRequiredService<IClock>(),
+                    provider.GetRequiredService<INotificationService>(),
                     _loggerFactory);
             });
         }

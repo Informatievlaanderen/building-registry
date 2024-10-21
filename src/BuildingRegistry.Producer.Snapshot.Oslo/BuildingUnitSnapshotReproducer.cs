@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using Be.Vlaanderen.Basisregisters.GrAr.Notifications;
     using Be.Vlaanderen.Basisregisters.GrAr.Oslo.SnapshotProducer;
     using Be.Vlaanderen.Basisregisters.MessageHandling.Kafka.Producer;
     using Dapper;
@@ -19,8 +20,9 @@
             IOsloProxy osloProxy,
             IProducer producer,
             IClock clock,
+            INotificationService notificationService,
             ILoggerFactory loggerFactory)
-            : base(osloProxy, producer, clock, loggerFactory)
+            : base(osloProxy, producer, clock, notificationService, loggerFactory)
         {
             _integrationConnectionString = integrationConnectionString;
         }
