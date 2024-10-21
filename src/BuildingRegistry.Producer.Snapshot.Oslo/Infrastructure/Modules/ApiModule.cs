@@ -134,6 +134,7 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo.Infrastructure.Modules
         private void RegisterReproducers()
         {
             var connectionString = _configuration.GetConnectionString("Integration");
+
             _services.AddHostedService<BuildingSnapshotReproducer>(provider =>
             {
                 var producerOptions = CreateBuildingProducerOptions();

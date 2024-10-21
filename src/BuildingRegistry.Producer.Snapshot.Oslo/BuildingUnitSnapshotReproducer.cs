@@ -45,15 +45,17 @@
                 .GroupBy(x => new
                 {
                     BuildingUnitPersistentLocalId = x.building_unit_persistent_local_id,
-                    TimeStamp = x.version_timestamp.ToString("yyyyMMddHHmmss")
+                    TimeStamp = x.version_timestamp.ToString("yyyyMMddHHmmss") // Format the timestamp to seconds as OSLO API doesn't return the milliseconds of the timestamp
                 })
                 .Where(x => x.Count() > 1)
-                .SelectMany(x => x)
+                .Select(x =>
+                {
+                    var latest = x.MaxBy(y => y.position)!;
+                    return (latest.building_unit_persistent_local_id, latest.position);
+                })
                 .ToList();
 
-            return duplicateEvents
-                .Select(x => (x.building_unit_persistent_local_id, x.position))
-                .ToList();
+            return duplicateEvents;
         }
 
         private sealed class BuildingUnitPosition
