@@ -141,6 +141,7 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo.Infrastructure.Modules
                     _configuration.GetValue<string>("NotificationTopicArn")!));
 
             var connectionString = _configuration.GetConnectionString("Integration");
+            var utcHourToRunWithin = _configuration.GetValue<int>("SnapshotReproducerUtcHour");
 
             _services.AddHostedService<BuildingSnapshotReproducer>(provider =>
             {
@@ -155,12 +156,13 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo.Infrastructure.Modules
                     new Producer(producerOptions),
                     provider.GetRequiredService<IClock>(),
                     provider.GetRequiredService<INotificationService>(),
+                    utcHourToRunWithin,
                     _loggerFactory);
             });
 
             _services.AddHostedService<BuildingUnitSnapshotReproducer>(provider =>
             {
-                var producerOptions = CreateBuildingProducerOptions();
+                var producerOptions = CreateBuildingUnitProducerOptions();
 
                 return new BuildingUnitSnapshotReproducer(
                     connectionString!,
@@ -171,6 +173,7 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo.Infrastructure.Modules
                     new Producer(producerOptions),
                     provider.GetRequiredService<IClock>(),
                     provider.GetRequiredService<INotificationService>(),
+                    utcHourToRunWithin,
                     _loggerFactory);
             });
         }

@@ -18,6 +18,7 @@
         private readonly IProducer _producer;
         private readonly IClock _clock;
         private readonly INotificationService _notificationService;
+        private readonly int _utcHourToRunWithin;
         private readonly ILogger<SnapshotReproducer> _logger;
 
         public SnapshotReproducer(
@@ -25,11 +26,13 @@
             IProducer producer,
             IClock clock,
             INotificationService notificationService,
+            int utcHourToRunWithin,
             ILoggerFactory loggerFactory)
         {
             _osloProxy = osloProxy;
             _producer = producer;
             _notificationService = notificationService;
+            _utcHourToRunWithin = utcHourToRunWithin;
             _clock = clock;
 
             _logger = loggerFactory.CreateLogger<SnapshotReproducer>();
@@ -40,8 +43,10 @@
             while (!stoppingToken.IsCancellationRequested)
             {
                 var now = _clock.GetCurrentInstant().ToDateTimeUtc();
-                if (now.Hour == 1)
+                if (now.Hour == _utcHourToRunWithin)
                 {
+                    _logger.LogInformation($"Starting {GetType().Name}");
+
                     try
                     {
                         //execute query

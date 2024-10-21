@@ -21,8 +21,9 @@
             IProducer producer,
             IClock clock,
             INotificationService notificationService,
+            int utcHourToRunWithin,
             ILoggerFactory loggerFactory)
-            : base(osloProxy, producer, clock, notificationService, loggerFactory)
+            : base(osloProxy, producer, clock, notificationService, utcHourToRunWithin, loggerFactory)
         {
             _integrationConnectionString = integrationConnectionString;
         }
