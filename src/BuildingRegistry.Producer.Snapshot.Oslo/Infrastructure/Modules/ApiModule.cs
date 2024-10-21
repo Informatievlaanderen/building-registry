@@ -2,11 +2,13 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo.Infrastructure.Modules
 {
     using System;
     using System.Net.Http;
+    using Amazon.SimpleNotificationService;
     using Autofac;
     using Autofac.Extensions.DependencyInjection;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
     using Be.Vlaanderen.Basisregisters.EventHandling;
     using Be.Vlaanderen.Basisregisters.EventHandling.Autofac;
+    using Be.Vlaanderen.Basisregisters.GrAr.Notifications;
     using Be.Vlaanderen.Basisregisters.GrAr.Oslo.SnapshotProducer;
     using Be.Vlaanderen.Basisregisters.MessageHandling.Kafka;
     using Be.Vlaanderen.Basisregisters.MessageHandling.Kafka.Producer;
@@ -18,6 +20,7 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo.Infrastructure.Modules
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Logging;
+    using NodaTime;
 
     public class ApiModule : Module
     {
@@ -37,6 +40,10 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo.Infrastructure.Modules
 
         protected override void Load(ContainerBuilder builder)
         {
+            builder.Register(_ => SystemClock.Instance)
+                .As<IClock>()
+                .SingleInstance();
+
             RegisterProjectionSetup(builder);
 
             builder
@@ -53,14 +60,12 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo.Infrastructure.Modules
                     new EventHandlingModule(
                         typeof(DomainAssemblyMarker).Assembly,
                         EventsJsonSerializerSettingsProvider.CreateSerializerSettings()))
-
                 .RegisterModule<EnvelopeModule>()
-
                 .RegisterEventstreamModule(_configuration)
-
                 .RegisterModule(new ProjectorModule(_configuration));
 
             RegisterProjections(builder);
+            RegisterReproducers();
         }
 
         private void RegisterProjections(ContainerBuilder builder)
@@ -78,35 +83,17 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo.Infrastructure.Modules
                 x.ConfigureCatchUpUpdatePositionMessageInterval(Convert.ToInt32(_configuration["CatchUpSaveInterval"]));
             });
 
-            var bootstrapServers = _configuration["Kafka:BootstrapServers"];
-            var saslUsername = _configuration["Kafka:SaslUserName"];
-            var saslPassword = _configuration["Kafka:SaslPassword"];
-
-            var maxRetryWaitIntervalSeconds = _configuration["RetryPolicy:MaxRetryWaitIntervalSeconds"];
-            var retryBackoffFactor = _configuration["RetryPolicy:RetryBackoffFactor"];
+            var maxRetryWaitIntervalSeconds = _configuration["RetryPolicy:MaxRetryWaitIntervalSeconds"]!;
+            var retryBackoffFactor = _configuration["RetryPolicy:RetryBackoffFactor"]!;
 
             builder
                 .RegisterProjectionMigrator<ProducerContextMigrationFactory>(
                     _configuration,
                     _loggerFactory)
                 .RegisterProjections<ProducerBuildingProjections, ProducerContext>(c =>
-                {
-                    var osloNamespace = _configuration["BuildingOsloNamespace"].TrimEnd('/');
-
-                        var topic = $"{_configuration[ProducerBuildingProjections.TopicKey]}" ?? throw new ArgumentException($"Configuration has no value for {ProducerBuildingProjections.TopicKey}");
-                        var producerOptions = new ProducerOptions(
-                                new BootstrapServers(bootstrapServers),
-                                new Topic(topic),
-                                true,
-                                EventsJsonSerializerSettingsProvider.CreateSerializerSettings())
-                            .ConfigureEnableIdempotence();
-                        if (!string.IsNullOrEmpty(saslUsername)
-                            && !string.IsNullOrEmpty(saslPassword))
-                        {
-                            producerOptions.ConfigureSaslAuthentication(new SaslAuthentication(
-                                saslUsername,
-                                saslPassword));
-                        }
+                    {
+                        var osloNamespace = _configuration["BuildingOsloNamespace"]!.TrimEnd('/');
+                        var producerOptions = CreateBuildingProducerOptions();
 
                         return new ProducerBuildingProjections(
                             new Producer(producerOptions),
@@ -114,7 +101,7 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo.Infrastructure.Modules
                                 c.Resolve<ILoggerFactory>(),
                                 new OsloProxy(new HttpClient
                                 {
-                                    BaseAddress = new Uri(_configuration["BuildingOsloApiUrl"].TrimEnd('/')),
+                                    BaseAddress = new Uri(_configuration["BuildingOsloApiUrl"]!.TrimEnd('/')),
                                 }),
                                 SnapshotManagerOptions.Create(
                                     maxRetryWaitIntervalSeconds,
@@ -123,41 +110,123 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo.Infrastructure.Modules
                     },
                     connectedProjectionSettings)
                 .RegisterProjections<ProducerBuildingUnitProjections, ProducerContext>(c =>
-                {
-                    var osloNamespace = _configuration["BuildingUnitOsloNamespace"].TrimEnd('/');
-
-                    var topic = $"{_configuration[ProducerBuildingUnitProjections.TopicKey]}" ?? throw new ArgumentException($"Configuration has no value for {ProducerBuildingProjections.TopicKey}");
-                    var producerOptions = new ProducerOptions(
-                            new BootstrapServers(bootstrapServers),
-                            new Topic(topic),
-                            true,
-                            EventsJsonSerializerSettingsProvider.CreateSerializerSettings())
-                        .ConfigureEnableIdempotence();
-                    if (!string.IsNullOrEmpty(saslUsername)
-                        && !string.IsNullOrEmpty(saslPassword))
                     {
-                        producerOptions.ConfigureSaslAuthentication(new SaslAuthentication(
-                            saslUsername,
-                            saslPassword));
-                    }
+                        var osloNamespace = _configuration["BuildingUnitOsloNamespace"]!.TrimEnd('/');
+                        var producerOptions = CreateBuildingUnitProducerOptions();
 
-                    var osloProxy = new OsloProxy(new HttpClient
-                    {
-                        BaseAddress = new Uri(_configuration["BuildingUnitOsloApiUrl"].TrimEnd('/')),
-                    });
+                        var osloProxy = new OsloProxy(new HttpClient
+                        {
+                            BaseAddress = new Uri(_configuration["BuildingUnitOsloApiUrl"]!.TrimEnd('/')),
+                        });
 
-                    return new ProducerBuildingUnitProjections(
-                        new Producer(producerOptions),
-                        new SnapshotManager(
-                            c.Resolve<ILoggerFactory>(),
-                            osloProxy,
-                            SnapshotManagerOptions.Create(
-                                maxRetryWaitIntervalSeconds,
-                                retryBackoffFactor)),
-                        osloNamespace,
-                        osloProxy);
-                },
+                        return new ProducerBuildingUnitProjections(
+                            new Producer(producerOptions),
+                            new SnapshotManager(
+                                c.Resolve<ILoggerFactory>(),
+                                osloProxy,
+                                SnapshotManagerOptions.Create(
+                                    maxRetryWaitIntervalSeconds,
+                                    retryBackoffFactor)),
+                            osloNamespace,
+                            osloProxy);
+                    },
                     connectedProjectionSettings);
+        }
+
+        private void RegisterReproducers()
+        {
+            _services.AddAWSService<IAmazonSimpleNotificationService>();
+            _services.AddSingleton<INotificationService>(sp =>
+                new NotificationService(sp.GetRequiredService<IAmazonSimpleNotificationService>(),
+                    _configuration.GetValue<string>("NotificationTopicArn")!));
+
+            var connectionString = _configuration.GetConnectionString("Integration");
+            var utcHourToRunWithin = _configuration.GetValue<int>("SnapshotReproducerUtcHour");
+
+            _services.AddHostedService<BuildingSnapshotReproducer>(provider =>
+            {
+                var producerOptions = CreateBuildingProducerOptions();
+
+                return new BuildingSnapshotReproducer(
+                    connectionString!,
+                    new OsloProxy(new HttpClient
+                    {
+                        BaseAddress = new Uri(_configuration["BuildingOsloApiUrl"]!.TrimEnd('/')),
+                    }),
+                    new Producer(producerOptions),
+                    provider.GetRequiredService<IClock>(),
+                    provider.GetRequiredService<INotificationService>(),
+                    utcHourToRunWithin,
+                    _loggerFactory);
+            });
+
+            _services.AddHostedService<BuildingUnitSnapshotReproducer>(provider =>
+            {
+                var producerOptions = CreateBuildingUnitProducerOptions();
+
+                return new BuildingUnitSnapshotReproducer(
+                    connectionString!,
+                    new OsloProxy(new HttpClient
+                    {
+                        BaseAddress = new Uri(_configuration["BuildingUnitOsloApiUrl"]!.TrimEnd('/')),
+                    }),
+                    new Producer(producerOptions),
+                    provider.GetRequiredService<IClock>(),
+                    provider.GetRequiredService<INotificationService>(),
+                    utcHourToRunWithin,
+                    _loggerFactory);
+            });
+        }
+
+        private ProducerOptions CreateBuildingProducerOptions()
+        {
+            var bootstrapServers = _configuration["Kafka:BootstrapServers"];
+            var saslUsername = _configuration["Kafka:SaslUserName"];
+            var saslPassword = _configuration["Kafka:SaslPassword"];
+
+            var topic = $"{_configuration[ProducerBuildingProjections.TopicKey]}" ??
+                        throw new ArgumentException($"Configuration has no value for {ProducerBuildingProjections.TopicKey}");
+            var producerOptions = new ProducerOptions(
+                    new BootstrapServers(bootstrapServers!),
+                    new Topic(topic),
+                    true,
+                    EventsJsonSerializerSettingsProvider.CreateSerializerSettings())
+                .ConfigureEnableIdempotence();
+
+            if (!string.IsNullOrEmpty(saslUsername)
+                && !string.IsNullOrEmpty(saslPassword))
+            {
+                producerOptions.ConfigureSaslAuthentication(new SaslAuthentication(
+                    saslUsername,
+                    saslPassword));
+            }
+
+            return producerOptions;
+        }
+
+        private ProducerOptions CreateBuildingUnitProducerOptions()
+        {
+            var bootstrapServers = _configuration["Kafka:BootstrapServers"];
+            var saslUsername = _configuration["Kafka:SaslUserName"];
+            var saslPassword = _configuration["Kafka:SaslPassword"];
+
+            var topic = $"{_configuration[ProducerBuildingUnitProjections.TopicKey]}" ??
+                        throw new ArgumentException($"Configuration has no value for {ProducerBuildingProjections.TopicKey}");
+            var producerOptions = new ProducerOptions(
+                    new BootstrapServers(bootstrapServers!),
+                    new Topic(topic),
+                    true,
+                    EventsJsonSerializerSettingsProvider.CreateSerializerSettings())
+                .ConfigureEnableIdempotence();
+            if (!string.IsNullOrEmpty(saslUsername)
+                && !string.IsNullOrEmpty(saslPassword))
+            {
+                producerOptions.ConfigureSaslAuthentication(new SaslAuthentication(
+                    saslUsername,
+                    saslPassword));
+            }
+
+            return producerOptions;
         }
     }
 }
