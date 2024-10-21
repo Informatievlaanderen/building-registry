@@ -1,3 +1,10 @@
+## [4.16.10](https://github.com/informatievlaanderen/building-registry/compare/v4.16.9...v4.16.10) (2024-10-21)
+
+
+### Bug Fixes
+
+* building snapshot producer buildingunit status  events ([e515e97](https://github.com/informatievlaanderen/building-registry/commit/e515e9764ca510051732b3dc1b42326fbbdd4151))
+
 ## [4.16.9](https://github.com/informatievlaanderen/building-registry/compare/v4.16.8...v4.16.9) (2024-10-18)
 
 ## [4.16.8](https://github.com/informatievlaanderen/building-registry/compare/v4.16.7...v4.16.8) (2024-09-30)
