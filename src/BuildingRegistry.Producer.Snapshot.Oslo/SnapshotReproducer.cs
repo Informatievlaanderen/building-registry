@@ -2,6 +2,8 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Net;
+    using System.Net.Http;
     using System.Threading;
     using System.Threading.Tasks;
     using Be.Vlaanderen.Basisregisters.GrAr.Notifications;
@@ -55,10 +57,22 @@
                         //reproduce
                         foreach (var id in idsToProcess)
                         {
-                            await FindAndProduce(async () =>
-                                    await _osloProxy.GetSnapshot(id.PersistentLocalId.ToString(), stoppingToken),
-                                id.Position,
-                                stoppingToken);
+                            try
+                            {
+                                await FindAndProduce(async () =>
+                                        await _osloProxy.GetSnapshot(id.PersistentLocalId.ToString(), stoppingToken),
+                                    id.Position,
+                                    stoppingToken);
+                            }
+                            catch (HttpRequestException e) when (e.StatusCode == HttpStatusCode.Gone)
+                            {
+                                _logger.LogInformation($"Snapshot '{id}' gone");
+                            }
+                            catch (Exception ex)
+                            {
+                                _logger.LogError($"Error while reproducing snapshot {id}", ex);
+                                throw;
+                            }
                         }
 
                         await Task.Delay(TimeSpan.FromHours(1), stoppingToken);
