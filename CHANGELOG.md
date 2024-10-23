@@ -1,3 +1,10 @@
+## [4.17.1](https://github.com/informatievlaanderen/building-registry/compare/v4.17.0...v4.17.1) (2024-10-23)
+
+
+### Bug Fixes
+
+* **producer:** add logging + catch gone when reproducing ([f8bc7c6](https://github.com/informatievlaanderen/building-registry/commit/f8bc7c63b5227aef00da561595895a4b4a3e984c))
+
 # [4.17.0](https://github.com/informatievlaanderen/building-registry/compare/v4.16.10...v4.17.0) (2024-10-21)
 
 
