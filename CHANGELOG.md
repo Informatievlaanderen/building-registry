@@ -1,3 +1,10 @@
+# [4.18.0](https://github.com/informatievlaanderen/building-registry/compare/v4.17.1...v4.18.0) (2024-10-29)
+
+
+### Features
+
+* add create building oslo snapshots ([a014af2](https://github.com/informatievlaanderen/building-registry/commit/a014af2349fdec0fb791920915b22fb28b9f3055))
+
 ## [4.17.1](https://github.com/informatievlaanderen/building-registry/compare/v4.17.0...v4.17.1) (2024-10-23)
 
 
