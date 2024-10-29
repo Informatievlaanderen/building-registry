@@ -35,8 +35,15 @@ namespace BuildingRegistry.AllStream.Commands
 
         private IEnumerable<object> IdentityFields()
         {
-            yield return BuildingPersistentLocalIds;
-            yield return BuildingUnitPersistentLocalIds;
+            foreach (var id in BuildingPersistentLocalIds)
+            {
+                yield return id;
+            }
+
+            foreach (var id in BuildingUnitPersistentLocalIds)
+            {
+                yield return id;
+            }
 
             foreach (var field in Provenance.GetIdentityFields())
             {
