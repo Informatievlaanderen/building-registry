@@ -20,9 +20,9 @@ namespace BuildingRegistry.Tests.BackOffice.Sqs.BuildingUnit
     using Xunit;
     using Xunit.Abstractions;
 
-    public class GivenCreateOsloSnapshotsBackOfficeRequest : BuildingRegistryTest
+    public class GivenCreateBuildingUnitOsloSnapshotsBackOfficeRequest : BuildingRegistryTest
     {
-        public GivenCreateOsloSnapshotsBackOfficeRequest(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
+        public GivenCreateBuildingUnitOsloSnapshotsBackOfficeRequest(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
         {
             Fixture.Customize(new WithFixedBuildingPersistentLocalId());
             Fixture.Customize(new WithFixedBuildingUnitPersistentLocalId());
@@ -42,14 +42,14 @@ namespace BuildingRegistry.Tests.BackOffice.Sqs.BuildingUnit
 
             var sqsQueue = new Mock<ISqsQueue>();
 
-            var sut = new CreateOsloSnapshotsSqsHandler(
+            var sut = new CreateBuildingUnitOsloSnapshotsSqsHandler(
                 sqsQueue.Object,
                 ticketingMock.Object,
                 ticketingUrl);
 
-            var sqsRequest = new CreateOsloSnapshotsSqsRequest
+            var sqsRequest = new CreateBuildingUnitOsloSnapshotsSqsRequest
             {
-                Request = new CreateOsloSnapshotsRequest
+                Request = new CreateBuildingUnitOsloSnapshotsRequest
                 {
                     BuildingUnitPersistentLocalIds = Fixture.CreateMany<BuildingUnitPersistentLocalId>().Select(x => (int)x).ToList()
                 }

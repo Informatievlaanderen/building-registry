@@ -95,18 +95,21 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo.Infrastructure.Modules
                         var osloNamespace = _configuration["BuildingOsloNamespace"]!.TrimEnd('/');
                         var producerOptions = CreateBuildingProducerOptions();
 
+                        var osloProxy = new OsloProxy(new HttpClient
+                        {
+                            BaseAddress = new Uri(_configuration["BuildingOsloApiUrl"]!.TrimEnd('/')),
+                        });
+
                         return new ProducerBuildingProjections(
                             new Producer(producerOptions),
                             new SnapshotManager(
                                 c.Resolve<ILoggerFactory>(),
-                                new OsloProxy(new HttpClient
-                                {
-                                    BaseAddress = new Uri(_configuration["BuildingOsloApiUrl"]!.TrimEnd('/')),
-                                }),
+                                osloProxy,
                                 SnapshotManagerOptions.Create(
                                     maxRetryWaitIntervalSeconds,
                                     retryBackoffFactor)),
-                            osloNamespace);
+                            osloNamespace,
+                            osloProxy);
                     },
                     connectedProjectionSettings)
                 .RegisterProjections<ProducerBuildingUnitProjections, ProducerContext>(c =>

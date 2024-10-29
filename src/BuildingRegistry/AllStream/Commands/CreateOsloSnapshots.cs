@@ -12,14 +12,17 @@ namespace BuildingRegistry.AllStream.Commands
     {
         private static readonly Guid Namespace = new Guid("2626bb06-4602-4864-a7c5-71f3a884af69");
 
+        public IReadOnlyList<BuildingPersistentLocalId> BuildingPersistentLocalIds { get; }
         public IReadOnlyList<BuildingUnitPersistentLocalId> BuildingUnitPersistentLocalIds { get; }
 
         public Provenance Provenance { get; }
 
         public CreateOsloSnapshots(
+            IEnumerable<BuildingPersistentLocalId> buildingPersistentLocalIds,
             IEnumerable<BuildingUnitPersistentLocalId> buildingUnitPersistentLocalIds,
             Provenance provenance)
         {
+            BuildingPersistentLocalIds = buildingPersistentLocalIds.ToList();
             BuildingUnitPersistentLocalIds = buildingUnitPersistentLocalIds.ToList();
             Provenance = provenance;
         }
@@ -32,6 +35,7 @@ namespace BuildingRegistry.AllStream.Commands
 
         private IEnumerable<object> IdentityFields()
         {
+            yield return BuildingPersistentLocalIds;
             yield return BuildingUnitPersistentLocalIds;
 
             foreach (var field in Provenance.GetIdentityFields())

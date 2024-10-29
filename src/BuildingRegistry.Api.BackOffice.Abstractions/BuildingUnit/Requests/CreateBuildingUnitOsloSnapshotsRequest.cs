@@ -2,7 +2,7 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Requests
 {
     using System.Collections.Generic;
 
-    public class CreateOsloSnapshotsRequest
+    public class CreateBuildingUnitOsloSnapshotsRequest
     {
         public List<int> BuildingUnitPersistentLocalIds { get; set; }
 

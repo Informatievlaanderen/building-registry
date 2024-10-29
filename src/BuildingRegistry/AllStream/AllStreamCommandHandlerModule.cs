@@ -29,7 +29,7 @@ namespace BuildingRegistry.AllStream
 
                     var allStream = optionalAllStream.HasValue ? optionalAllStream.Value : new AllStream();
 
-                    allStream.CreateOsloSnapshots(message.Command.BuildingUnitPersistentLocalIds);
+                    allStream.CreateOsloSnapshots(message.Command.BuildingPersistentLocalIds, message.Command.BuildingUnitPersistentLocalIds);
 
                     if (!optionalAllStream.HasValue)
                     {

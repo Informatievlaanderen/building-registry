@@ -7,9 +7,9 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.BuildingUnit
     using Requests.BuildingUnit;
     using TicketingService.Abstractions;
 
-    public sealed class CreateOsloSnapshotsLambdaHandler : SqsLambdaHandlerBase<CreateOsloSnapshotsLambdaRequest>
+    public sealed class CreateBuildingUnitOsloSnapshotsLambdaHandler : SqsLambdaHandlerBase<CreateBuildingUnitOsloSnapshotsLambdaRequest>
     {
-        public CreateOsloSnapshotsLambdaHandler(
+        public CreateBuildingUnitOsloSnapshotsLambdaHandler(
             ICustomRetryPolicy retryPolicy,
             ITicketing ticketing,
             IIdempotentCommandHandler idempotentCommandHandler)
@@ -17,7 +17,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.BuildingUnit
         {
         }
 
-        protected override async Task<object> InnerHandle(CreateOsloSnapshotsLambdaRequest request, CancellationToken cancellationToken)
+        protected override async Task<object> InnerHandle(CreateBuildingUnitOsloSnapshotsLambdaRequest request, CancellationToken cancellationToken)
         {
             var cmd = request.ToCommand();
 
@@ -37,14 +37,14 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.BuildingUnit
             return "done";
         }
 
-        protected override TicketError? MapDomainException(DomainException exception, CreateOsloSnapshotsLambdaRequest request) => null;
+        protected override TicketError? MapDomainException(DomainException exception, CreateBuildingUnitOsloSnapshotsLambdaRequest request) => null;
 
-        protected override Task HandleAggregateIdIsNotFoundException(CreateOsloSnapshotsLambdaRequest request, CancellationToken cancellationToken)
+        protected override Task HandleAggregateIdIsNotFoundException(CreateBuildingUnitOsloSnapshotsLambdaRequest request, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
         }
 
-        protected override Task ValidateIfMatchHeaderValue(CreateOsloSnapshotsLambdaRequest request, CancellationToken cancellationToken)
+        protected override Task ValidateIfMatchHeaderValue(CreateBuildingUnitOsloSnapshotsLambdaRequest request, CancellationToken cancellationToken)
         {
             return Task.CompletedTask;
         }

@@ -20,6 +20,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRequestingCreateOsloSnapshot
         public void ThenBuildingUnitOsloSnapshotsWereRequested()
         {
             var command = new CreateOsloSnapshots(
+                [],
                 [new BuildingUnitPersistentLocalId(1)],
                 Fixture.Create<Provenance>());
 

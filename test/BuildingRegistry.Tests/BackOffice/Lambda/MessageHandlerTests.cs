@@ -989,7 +989,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda
         }
 
         [Fact]
-        public async Task WhenProcessingCreateOsloSnapshotsSqsRequest_ThenCreateOsloSnapshotsLambdaRequestIsSent()
+        public async Task WhenProcessingCreateBuildingOsloSnapshotsSqsRequest_ThenCreateBuildingOsloSnapshotsLambdaRequestIsSent()
         {
             // Arrange
             var mediator = new Mock<IMediator>();
@@ -997,7 +997,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda
             containerBuilder.Register(_ => mediator.Object);
             var container = containerBuilder.Build();
 
-            var messageData = Fixture.Create<CreateOsloSnapshotsSqsRequest>();
+            var messageData = Fixture.Create<CreateBuildingOsloSnapshotsSqsRequest>();
             var messageMetadata = new MessageMetadata { MessageGroupId = Fixture.Create<string>() };
 
             var sut = new MessageHandler(container);
@@ -1010,7 +1010,39 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda
 
             // Assert
             mediator
-                .Verify(x => x.Send(It.Is<CreateOsloSnapshotsLambdaRequest>(request =>
+                .Verify(x => x.Send(It.Is<CreateBuildingOsloSnapshotsLambdaRequest>(request =>
+                    request.TicketId == messageData.TicketId &&
+                    request.MessageGroupId == messageMetadata.MessageGroupId &&
+                    request.Request == messageData.Request &&
+                    string.IsNullOrEmpty(request.IfMatchHeaderValue) &&
+                    request.Provenance == messageData.ProvenanceData.ToProvenance() &&
+                    request.Metadata == messageData.Metadata
+                ), It.IsAny<CancellationToken>()), Times.Once);
+        }
+
+        [Fact]
+        public async Task WhenProcessingCreateBuildingUnitOsloSnapshotsSqsRequest_ThenCreateBuildingUnitOsloSnapshotsLambdaRequestIsSent()
+        {
+            // Arrange
+            var mediator = new Mock<IMediator>();
+            var containerBuilder = new ContainerBuilder();
+            containerBuilder.Register(_ => mediator.Object);
+            var container = containerBuilder.Build();
+
+            var messageData = Fixture.Create<CreateBuildingUnitOsloSnapshotsSqsRequest>();
+            var messageMetadata = new MessageMetadata { MessageGroupId = Fixture.Create<string>() };
+
+            var sut = new MessageHandler(container);
+
+            // Act
+            await sut.HandleMessage(
+                messageData,
+                messageMetadata,
+                CancellationToken.None);
+
+            // Assert
+            mediator
+                .Verify(x => x.Send(It.Is<CreateBuildingUnitOsloSnapshotsLambdaRequest>(request =>
                     request.TicketId == messageData.TicketId &&
                     request.MessageGroupId == messageMetadata.MessageGroupId &&
                     request.Request == messageData.Request &&

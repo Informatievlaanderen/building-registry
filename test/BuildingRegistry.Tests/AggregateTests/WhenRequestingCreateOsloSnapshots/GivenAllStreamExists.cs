@@ -10,16 +10,32 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRequestingCreateOsloSnapshot
     using Xunit;
     using Xunit.Abstractions;
 
-    public class GivenParcelsExist : BuildingRegistryTest
+    public class GivenAllStreamExists : BuildingRegistryTest
     {
-        public GivenParcelsExist(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
+        public GivenAllStreamExists(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
+        { }
+
+        [Fact]
+        public void ThenBuildingOsloSnapshotsAndBuildingUnitSnapshotsWereRequested()
         {
+            var command = new CreateOsloSnapshots(
+                [new BuildingPersistentLocalId(1)],
+                [new BuildingUnitPersistentLocalId(2)],
+                Fixture.Create<Provenance>());
+
+            Assert(new Scenario()
+                .Given(AllStreamId.Instance)
+                .When(command)
+                .Then(AllStreamId.Instance,
+                    new BuildingOsloSnapshotsWereRequested(command.BuildingPersistentLocalIds),
+                    new BuildingUnitOsloSnapshotsWereRequested(command.BuildingUnitPersistentLocalIds)));
         }
 
         [Fact]
-        public void ThenParcelOsloSnapshotsWereRequested()
+        public void WithOnlyBuildingUnits_ThenBuildingUnitOsloSnapshotsWereRequested()
         {
             var command = new CreateOsloSnapshots(
+                [],
                 [new BuildingUnitPersistentLocalId(1)],
                 Fixture.Create<Provenance>());
 
@@ -29,6 +45,22 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRequestingCreateOsloSnapshot
                 .Then(AllStreamId.Instance,
                     new BuildingUnitOsloSnapshotsWereRequested(
                         command.BuildingUnitPersistentLocalIds)));
+        }
+
+        [Fact]
+        public void WithOnlyBuildings_ThenBuildingOsloSnapshotsWereRequested()
+        {
+            var command = new CreateOsloSnapshots(
+                [new BuildingPersistentLocalId(1)],
+                [],
+                Fixture.Create<Provenance>());
+
+            Assert(new Scenario()
+                .Given(AllStreamId.Instance)
+                .When(command)
+                .Then(AllStreamId.Instance,
+                    new BuildingOsloSnapshotsWereRequested(
+                        command.BuildingPersistentLocalIds)));
         }
     }
 }

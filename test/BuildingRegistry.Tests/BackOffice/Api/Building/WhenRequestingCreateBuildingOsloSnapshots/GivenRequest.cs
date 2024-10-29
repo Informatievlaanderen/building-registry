@@ -1,4 +1,4 @@
-namespace BuildingRegistry.Tests.BackOffice.Api.BuildingUnit.WhenRequestingCreateOsloSnapshots
+namespace BuildingRegistry.Tests.BackOffice.Api.Building.WhenRequestingCreateOsloSnapshots
 {
     using System;
     using System.Linq;
@@ -7,12 +7,12 @@ namespace BuildingRegistry.Tests.BackOffice.Api.BuildingUnit.WhenRequestingCreat
     using AutoFixture;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Be.Vlaanderen.Basisregisters.Sqs.Requests;
-    using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Requests;
-    using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.SqsRequests;
-    using BuildingRegistry.Api.BackOffice.BuildingUnit;
+    using BuildingRegistry.Api.BackOffice.Abstractions.Building.Requests;
+    using BuildingRegistry.Api.BackOffice.Abstractions.Building.SqsRequests;
+    using BuildingRegistry.Api.BackOffice.Building;
     using BuildingRegistry.Building;
-    using BuildingRegistry.Tests.BackOffice.Api;
-    using BuildingRegistry.Tests.Fixtures;
+    using Api;
+    using Fixtures;
     using FluentAssertions;
     using Microsoft.AspNetCore.Mvc;
     using Moq;
@@ -22,33 +22,33 @@ namespace BuildingRegistry.Tests.BackOffice.Api.BuildingUnit.WhenRequestingCreat
 
     public class GivenRequest : BackOfficeApiTest
     {
-        private readonly BuildingUnitController _controller;
+        private readonly BuildingController _controller;
 
         public GivenRequest(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
         {
             Fixture.Customize(new WithFixedBuildingPersistentLocalId());
 
-            _controller = CreateBuildingUnitControllerWithUser<BuildingUnitController>();
+            _controller = CreateBuildingControllerWithUser<BuildingController>();
         }
 
         [Fact]
         public async Task ThenTicketLocationIsReturned()
         {
-            var buildingUnitPersistentLocalIds = Fixture.CreateMany<BuildingUnitPersistentLocalId>();
+            var buildingPersistentLocalIds = Fixture.CreateMany<BuildingPersistentLocalId>();
 
             var ticketId = Fixture.Create<Guid>();
             var expectedLocationResult = new LocationResult(CreateTicketUri(ticketId));
 
             MockMediator
                 .Setup(x => x.Send(
-                    It.IsAny<CreateOsloSnapshotsSqsRequest>(),
+                    It.IsAny<CreateBuildingOsloSnapshotsSqsRequest>(),
                     CancellationToken.None))
                 .Returns(Task.FromResult(expectedLocationResult));
 
-            var request = new CreateOsloSnapshotsRequest
+            var request = new CreateBuildingOsloSnapshotsRequest
             {
-                BuildingUnitPersistentLocalIds = buildingUnitPersistentLocalIds.Select(x => (int)x).ToList(),
-                Reden = "UnitTest"
+                BuildingPersistentLocalIds = buildingPersistentLocalIds.Select(x => (int)x).ToList(),
+                Reden = "Test"
             };
 
             var result = (AcceptedResult)await _controller.CreateOsloSnapshots(request);
@@ -58,7 +58,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.BuildingUnit.WhenRequestingCreat
 
             MockMediator.Verify(x =>
                 x.Send(
-                    It.Is<CreateOsloSnapshotsSqsRequest>(sqsRequest =>
+                    It.Is<CreateBuildingOsloSnapshotsSqsRequest>(sqsRequest =>
                         sqsRequest.Request == request
                         && sqsRequest.ProvenanceData.Timestamp != Instant.MinValue
                         && sqsRequest.ProvenanceData.Application == Application.BuildingRegistry

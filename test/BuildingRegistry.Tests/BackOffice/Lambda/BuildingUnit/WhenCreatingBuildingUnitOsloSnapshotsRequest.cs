@@ -24,11 +24,11 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
     using Xunit;
     using Xunit.Abstractions;
 
-    public class WhenCreatingOsloSnapshotsRequest : BackOfficeLambdaTest
+    public class WhenCreatingBuildingUnitOsloSnapshotsRequest : BackOfficeLambdaTest
     {
         private readonly IdempotencyContext _idempotencyContext;
 
-        public WhenCreatingOsloSnapshotsRequest(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
+        public WhenCreatingBuildingUnitOsloSnapshotsRequest(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
         {
             _idempotencyContext = new FakeIdempotencyContextFactory().CreateDbContext([]);
         }
@@ -39,7 +39,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
             // Arrange
             var ticketing = new Mock<ITicketing>();
 
-            var handler = new CreateOsloSnapshotsLambdaHandler(
+            var handler = new CreateBuildingUnitOsloSnapshotsLambdaHandler(
                 new FakeRetryPolicy(),
                 ticketing.Object,
                 new IdempotentCommandHandler(Container.Resolve<ICommandHandlerResolver>(), _idempotencyContext));
@@ -47,12 +47,12 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
             // Act
             var ticketId = Guid.NewGuid();
             await handler.Handle(
-                new CreateOsloSnapshotsLambdaRequest(
+                new CreateBuildingUnitOsloSnapshotsLambdaRequest(
                     AllStreamId.Instance,
-                    new CreateOsloSnapshotsSqsRequest
+                    new CreateBuildingUnitOsloSnapshotsSqsRequest
                     {
                         TicketId = ticketId,
-                        Request = new CreateOsloSnapshotsRequest
+                        Request = new CreateBuildingUnitOsloSnapshotsRequest
                         {
                             BuildingUnitPersistentLocalIds = [1]
                         },
@@ -79,7 +79,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
             // Arrange
             var ticketing = new Mock<ITicketing>();
 
-            var handler = new CreateOsloSnapshotsLambdaHandler(
+            var handler = new CreateBuildingUnitOsloSnapshotsLambdaHandler(
                 new FakeRetryPolicy(),
                 ticketing.Object,
                 MockExceptionIdempotentCommandHandler(() => new IdempotencyException(string.Empty)).Object);
@@ -87,12 +87,12 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
             // Act
             var ticketId = Guid.NewGuid();
             await handler.Handle(
-                new CreateOsloSnapshotsLambdaRequest(
+                new CreateBuildingUnitOsloSnapshotsLambdaRequest(
                     AllStreamId.Instance,
-                    new CreateOsloSnapshotsSqsRequest
+                    new CreateBuildingUnitOsloSnapshotsSqsRequest
                     {
                         TicketId = ticketId,
-                        Request = new CreateOsloSnapshotsRequest
+                        Request = new CreateBuildingUnitOsloSnapshotsRequest
                         {
                             BuildingUnitPersistentLocalIds = [1]
                         },
