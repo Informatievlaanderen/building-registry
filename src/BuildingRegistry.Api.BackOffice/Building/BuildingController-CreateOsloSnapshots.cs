@@ -1,16 +1,16 @@
-namespace BuildingRegistry.Api.BackOffice.BuildingUnit
+namespace BuildingRegistry.Api.BackOffice.Building
 {
     using System.Threading;
     using System.Threading.Tasks;
     using Be.Vlaanderen.Basisregisters.Auth.AcmIdm;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
-    using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Requests;
-    using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.SqsRequests;
+    using BuildingRegistry.Api.BackOffice.Abstractions.Building.Requests;
+    using BuildingRegistry.Api.BackOffice.Abstractions.Building.SqsRequests;
     using Microsoft.AspNetCore.Authentication.JwtBearer;
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
 
-    public partial class BuildingUnitController
+    public partial class BuildingController
     {
         /// <summary>
         /// Creëer nieuwe OSLO snapshots.
@@ -21,12 +21,12 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
         [HttpPost("acties/oslosnapshots")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = PolicyNames.GeschetstGebouw.InterneBijwerker)]
         public async Task<IActionResult> CreateOsloSnapshots(
-            [FromBody] CreateBuildingUnitOsloSnapshotsRequest request,
+            [FromBody] CreateBuildingOsloSnapshotsRequest request,
             CancellationToken cancellationToken = default)
         {
             var provenance = ProvenanceFactory.Create(new Reason(request.Reden), Modification.Unknown);
 
-            var sqsRequest = new CreateBuildingUnitOsloSnapshotsSqsRequest
+            var sqsRequest = new CreateBuildingOsloSnapshotsSqsRequest
             {
                 Request = request,
                 Metadata = GetMetadata(),

@@ -173,9 +173,15 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda
                         new ExtendedWkbGeometry(request.ExtendedWkbGeometry)), cancellationToken);
                     break;
 
-                case CreateOsloSnapshotsSqsRequest request:
+                case CreateBuildingOsloSnapshotsSqsRequest request:
                     await mediator.Send(
-                        new CreateOsloSnapshotsLambdaRequest(messageMetadata.MessageGroupId!, request),
+                        new CreateBuildingOsloSnapshotsLambdaRequest(messageMetadata.MessageGroupId!, request),
+                        cancellationToken);
+                    break;
+
+                case CreateBuildingUnitOsloSnapshotsSqsRequest request:
+                    await mediator.Send(
+                        new CreateBuildingUnitOsloSnapshotsLambdaRequest(messageMetadata.MessageGroupId!, request),
                         cancellationToken);
                     break;
 

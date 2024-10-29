@@ -2,8 +2,11 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo
 {
     using System;
     using System.Collections.Generic;
+    using System.Net;
+    using System.Net.Http;
     using System.Threading;
     using System.Threading.Tasks;
+    using AllStream.Events;
     using Be.Vlaanderen.Basisregisters.GrAr.Oslo.SnapshotProducer;
     using Be.Vlaanderen.Basisregisters.MessageHandling.Kafka;
     using Be.Vlaanderen.Basisregisters.MessageHandling.Kafka.Producer;
@@ -19,9 +22,34 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo
 
         private readonly IProducer _producer;
 
-        public ProducerBuildingProjections(IProducer producer, ISnapshotManager snapshotManager, string osloNamespace)
+        public ProducerBuildingProjections(
+            IProducer producer,
+            ISnapshotManager snapshotManager,
+            string osloNamespace,
+            IOsloProxy osloProxy)
         {
             _producer = producer;
+
+            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingOsloSnapshotsWereRequested>>(async (_, message, ct) =>
+            {
+                foreach (var buildingPersistentLocalId in message.Message.BuildingPersistentLocalIds)
+                {
+                    if (ct.IsCancellationRequested)
+                    {
+                        break;
+                    }
+
+                    try
+                    {
+                        await FindAndProduce(async () =>
+                                await osloProxy.GetSnapshot(buildingPersistentLocalId.ToString(), ct),
+                            message.Position,
+                            ct);
+                    }
+                    catch (HttpRequestException e) when (e.StatusCode == HttpStatusCode.Gone)
+                    { }
+                }
+            });
 
             When<Store.Envelope<BuildingWasMigrated>>(async (_, message, ct) =>
             {

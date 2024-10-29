@@ -3,6 +3,8 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Net;
+    using System.Net.Http;
     using System.Threading;
     using System.Threading.Tasks;
     using AllStream.Events;
@@ -37,10 +39,15 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo
                         break;
                     }
 
-                    await FindAndProduce(async () =>
-                            await osloProxy.GetSnapshot(buildingUnitPersistentLocalId.ToString(), ct),
-                        message.Position,
-                        ct);
+                    try
+                    {
+                        await FindAndProduce(async () =>
+                                await osloProxy.GetSnapshot(buildingUnitPersistentLocalId.ToString(), ct),
+                            message.Position,
+                            ct);
+                    }
+                    catch (HttpRequestException e) when (e.StatusCode == HttpStatusCode.Gone)
+                    { }
                 }
             });
 
