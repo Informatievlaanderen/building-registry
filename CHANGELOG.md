@@ -1,3 +1,10 @@
+## [4.18.1](https://github.com/informatievlaanderen/building-registry/compare/v4.18.0...v4.18.1) (2024-10-29)
+
+
+### Bug Fixes
+
+* snapshot command idempotency ([b48f525](https://github.com/informatievlaanderen/building-registry/commit/b48f5259743344e83cdfcbc8b349b113778957e0))
+
 # [4.18.0](https://github.com/informatievlaanderen/building-registry/compare/v4.17.1...v4.18.0) (2024-10-29)
 
 
