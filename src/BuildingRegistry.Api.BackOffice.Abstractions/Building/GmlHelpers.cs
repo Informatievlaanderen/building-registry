@@ -4,15 +4,12 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.Building
     using NetTopologySuite.Geometries.Implementation;
     using NetTopologySuite.IO.GML2;
     using ExtendedWkbGeometry = BuildingRegistry.Building.ExtendedWkbGeometry;
+    using GeometryFactory = BuildingRegistry.GeometryFactory;
 
     public static class GmlHelpers
     {
         public static GMLReader CreateGmlReader() =>
-            new GMLReader(
-                new GeometryFactory(
-                    new PrecisionModel(PrecisionModels.Floating),
-                    ExtendedWkbGeometry.SridLambert72,
-                    new DotSpatialAffineCoordinateSequenceFactory(Ordinates.XY)));
+            new GMLReader(GeometryFactory.CreateGeometryFactory());
 
         public static ExtendedWkbGeometry ToExtendedWkbGeometry(this string gml)
         {

@@ -4,7 +4,10 @@ namespace BuildingRegistry.Consumer.Read.Parcel
     using System.Collections.Generic;
     using System.Linq;
     using NetTopologySuite.Geometries;
+    using NetTopologySuite.Operation.Overlay;
+    using NetTopologySuite.Operation.OverlayNG;
     using ParcelWithCount;
+    using GeometryFactory = BuildingRegistry.GeometryFactory;
 
     public class ParcelMatching : IParcelMatching
     {
@@ -24,7 +27,7 @@ namespace BuildingRegistry.Consumer.Read.Parcel
                 .ParcelConsumerItemsWithCount
                 .Where(parcel => boundingBox.Intersects(parcel.Geometry))
                 .ToList()
-                .Where(parcel => buildingGeometry.Intersects(parcel.Geometry) && parcel.Status == ParcelStatus.Realized)
+                .Where(parcel => !OverlayNGRobust.Overlay(buildingGeometry, parcel.Geometry, SpatialFunction.Intersection).IsEmpty && parcel.Status == ParcelStatus.Realized)
                 .Select(parcel =>
                     new {
                         parcel.CaPaKey,
