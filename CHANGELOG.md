@@ -1,3 +1,10 @@
+## [4.18.2](https://github.com/informatievlaanderen/building-registry/compare/v4.18.1...v4.18.2) (2024-10-30)
+
+
+### Bug Fixes
+
+* **api:** parcelmatching now uses robustoverlay instead of intersects ([635c643](https://github.com/informatievlaanderen/building-registry/commit/635c64389766bad5f1165da700665527db1ff101))
+
 ## [4.18.1](https://github.com/informatievlaanderen/building-registry/compare/v4.18.0...v4.18.1) (2024-10-29)
 
 
