@@ -10,6 +10,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda
     using Requests.BuildingUnit;
     using System.Threading;
     using System.Threading.Tasks;
+    using Abstractions.Building.Requests;
     using Building;
 
     public class MessageHandler : IMessageHandler
@@ -182,6 +183,12 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda
                 case CreateBuildingUnitOsloSnapshotsSqsRequest request:
                     await mediator.Send(
                         new CreateBuildingUnitOsloSnapshotsLambdaRequest(messageMetadata.MessageGroupId!, request),
+                        cancellationToken);
+                    break;
+
+                case CreateBuildingSnapshotSqsRequest request:
+                    await mediator.Send(
+                        new CreateBuildingSnapshotLambdaRequest(messageMetadata.MessageGroupId!, request),
                         cancellationToken);
                     break;
 

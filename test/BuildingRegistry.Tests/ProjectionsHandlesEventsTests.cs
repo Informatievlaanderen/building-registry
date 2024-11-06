@@ -45,7 +45,7 @@ namespace BuildingRegistry.Tests
 
     public sealed class ProjectionsHandlesEventsTests
     {
-        private readonly IEnumerable<Type> _eventsToExclude = [typeof(BuildingSnapshot)];
+        private readonly IEnumerable<Type> _eventsToExclude = [typeof(BuildingSnapshot), typeof(BuildingSnapshotWasRequested)];
         private readonly IList<Type> _eventTypes;
 
         public ProjectionsHandlesEventsTests()

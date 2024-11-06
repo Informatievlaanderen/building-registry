@@ -117,6 +117,60 @@ namespace BuildingRegistry.Tests.AggregateTests.SnapshotTests
         }
 
         [Fact]
+        public async Task WithAfterBuildingSnapshotWasRequested_ThenSnapshotWasCreated()
+        {
+            Fixture.Register(ISnapshotStrategy () => new AfterEventTypeStrategy(typeof(BuildingSnapshotWasRequested)));
+
+            var provenance = Fixture.Create<Provenance>();
+            var buildingWasPlanned = Fixture.Create<BuildingWasPlannedV2>();
+
+            var buildingUnitWasPlanned = Fixture.Create<BuildingUnitWasPlannedV2>();
+
+            var buildingGeometry = new BuildingGeometry(new ExtendedWkbGeometry(buildingWasPlanned.ExtendedWkbGeometry),
+                BuildingGeometryMethod.Outlined);
+
+            var expectedEvent = new BuildingSnapshotWasRequested(new BuildingPersistentLocalId(buildingWasPlanned.BuildingPersistentLocalId));
+            ((ISetProvenance)expectedEvent).SetProvenance(provenance);
+
+            Assert(new Scenario()
+                .Given(_streamId,
+                    buildingWasPlanned,
+                    buildingUnitWasPlanned)
+                .When(new CreateSnapshot(new BuildingPersistentLocalId(buildingWasPlanned.BuildingPersistentLocalId), Fixture.Create<Provenance>()))
+                .Then(
+                    new Fact(_streamId, expectedEvent)));
+
+            var plannedBuildingUnit = new BuildingUnit(o => { });
+            plannedBuildingUnit.Route(buildingUnitWasPlanned);
+
+            var expectedSnapshot = new BuildingSnapshot(
+                Fixture.Create<BuildingPersistentLocalId>(),
+                BuildingStatus.Planned,
+                buildingGeometry,
+                false,
+                buildingUnitWasPlanned.GetHash(),
+                buildingUnitWasPlanned.Provenance,
+                new List<BuildingUnit>
+                {
+                    plannedBuildingUnit,
+                },
+                new List<BuildingUnit>());
+
+            var snapshotStore = (ISnapshotStore)Container.Resolve(typeof(ISnapshotStore));
+            var latestSnapshot = await snapshotStore.FindLatestSnapshotAsync(_streamId, CancellationToken.None);
+
+            latestSnapshot.Should().NotBeNull();
+            var snapshot = JsonConvert.DeserializeObject<BuildingSnapshot>(latestSnapshot!.Data, EventSerializerSettings);
+
+            snapshot.Should().BeEquivalentTo(expectedSnapshot, options =>
+            {
+                options.Excluding(x => x.Path.EndsWith("LastEventHash"));
+                options.Excluding(x => x.Type == typeof(Instant));
+                return options;
+            });
+        }
+
+        [Fact]
         public async Task WithMigratedBuildingAndUnusedCommonBuildingUnits_ThenSnapshotWasCreated()
         {
             Fixture.Register(() =>

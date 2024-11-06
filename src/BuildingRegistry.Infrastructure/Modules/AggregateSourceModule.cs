@@ -6,6 +6,7 @@ namespace BuildingRegistry.Infrastructure.Modules
     using Be.Vlaanderen.Basisregisters.AggregateSource.Snapshotting;
     using Be.Vlaanderen.Basisregisters.EventHandling;
     using Be.Vlaanderen.Basisregisters.EventHandling.Autofac;
+    using Building.Events;
     using BuildingRegistry.AllStream;
     using BuildingRegistry.Building;
     using BuildingRegistry.Infrastructure;
@@ -36,10 +37,12 @@ namespace BuildingRegistry.Infrastructure.Modules
                 snapshotStrategy = IntervalStrategy.SnapshotEvery(snapshotInterval);
             }
 
+            var anySnapshot = new AnySnapshotStrategy([snapshotStrategy, new AfterEventTypeStrategy(typeof(BuildingSnapshotWasRequested))]);
+
             builder.RegisterSnapshotModule(_configuration);
 
             builder
-                .Register(c => new BuildingFactory(snapshotStrategy))
+                .Register(c => new BuildingFactory(anySnapshot))
                 .As<IBuildingFactory>();
 
             builder

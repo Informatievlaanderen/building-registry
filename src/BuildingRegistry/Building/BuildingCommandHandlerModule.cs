@@ -24,6 +24,18 @@ namespace BuildingRegistry.Building
             IProvenanceFactory<Building> provenanceFactory,
             IBuildingGeometries? buildingGeometries = null)
         {
+            For<CreateSnapshot>()
+                .AddSqlStreamStore(getStreamStore, getUnitOfWork, eventMapping, eventSerializer, getSnapshotStore)
+                .AddEventHash<CreateSnapshot, Building>(getUnitOfWork)
+                .AddProvenance(getUnitOfWork, provenanceFactory)
+                .Handle(async (message, ct) =>
+                {
+                    var streamId = new BuildingStreamId(message.Command.BuildingPersistentLocalId);
+                    var building = await buildingRepository().GetAsync(streamId, ct);
+
+                    building.RequestSnapshot();
+                });
+
             For<MigrateBuilding>()
                 .AddSqlStreamStore(getStreamStore, getUnitOfWork, eventMapping, eventSerializer, getSnapshotStore)
                 .AddEventHash<MigrateBuilding, Building>(getUnitOfWork)
@@ -248,7 +260,7 @@ namespace BuildingRegistry.Building
                 {
                     var streamId = new BuildingStreamId(message.Command.BuildingPersistentLocalId);
                     var building = await buildingRepository().GetAsync(streamId, ct);
-                    
+
                     building.ReaddressAddresses(message.Command.Readdresses);
                 });
         }
