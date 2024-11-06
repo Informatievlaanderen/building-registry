@@ -317,6 +317,11 @@ namespace BuildingRegistry.Building
 
         #region Snapshot
 
+        public void RequestSnapshot()
+        {
+            ApplyChange(new BuildingSnapshotWasRequested(BuildingPersistentLocalId));
+        }
+
         public object TakeSnapshot()
         {
             return new BuildingSnapshot(

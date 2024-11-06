@@ -34,18 +34,18 @@ nuget Npgsql.EntityFrameworkCore.PostgreSQL.Design 2.0.0-preview1
 nuget Be.Vlaanderen.Basisregisters.Build.Pipeline 7.2.5
 nuget Be.Vlaanderen.Basisregisters.Testing.Infrastructure.Events 4.0.0 content: true, copy_content_to_output_dir: always, copy_local: true
 
-nuget Be.Vlaanderen.Basisregisters.AggregateSource 9.0.1
-nuget Be.Vlaanderen.Basisregisters.AggregateSource.ExplicitRouting 9.0.1
-nuget Be.Vlaanderen.Basisregisters.AggregateSource.SqlStreamStore.Autofac 9.0.1
-nuget Be.Vlaanderen.Basisregisters.AggregateSource.Testing 9.0.1
-nuget Be.Vlaanderen.Basisregisters.AggregateSource.Testing.SqlStreamStore.Autofac 9.0.1
-nuget Be.Vlaanderen.Basisregisters.AggregateSource.Testing.Xunit 9.0.1
+nuget Be.Vlaanderen.Basisregisters.AggregateSource 9.1.1
+nuget Be.Vlaanderen.Basisregisters.AggregateSource.ExplicitRouting 9.1.1
+nuget Be.Vlaanderen.Basisregisters.AggregateSource.SqlStreamStore.Autofac 9.1.1
+nuget Be.Vlaanderen.Basisregisters.AggregateSource.Testing 9.1.1
+nuget Be.Vlaanderen.Basisregisters.AggregateSource.Testing.SqlStreamStore.Autofac 9.1.1
+nuget Be.Vlaanderen.Basisregisters.AggregateSource.Testing.Xunit 9.1.1
 
-nuget Be.Vlaanderen.Basisregisters.CommandHandling 9.0.1
-nuget Be.Vlaanderen.Basisregisters.CommandHandling.Idempotency 9.0.1
-nuget Be.Vlaanderen.Basisregisters.CommandHandling.SqlStreamStore 9.0.1
+nuget Be.Vlaanderen.Basisregisters.CommandHandling 9.1.1
+nuget Be.Vlaanderen.Basisregisters.CommandHandling.Idempotency 9.1.1
+nuget Be.Vlaanderen.Basisregisters.CommandHandling.SqlStreamStore 9.1.1
 
-nuget Be.Vlaanderen.Basisregisters.Snapshotverifier 9.0.1
+nuget Be.Vlaanderen.Basisregisters.Snapshotverifier 9.1.1
 
 nuget Be.Vlaanderen.Basisregisters.Api 23.1.0
 
