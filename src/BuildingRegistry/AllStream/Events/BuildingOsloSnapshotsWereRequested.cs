@@ -7,6 +7,7 @@ namespace BuildingRegistry.AllStream.Events
     using BuildingRegistry.Building;
     using Newtonsoft.Json;
 
+    [HideEvent]
     [EventName(EventName)]
     [EventDescription("Nieuwe OSLO snapshots werd aangevraagd voor de gebouwen.")]
     public sealed class BuildingOsloSnapshotsWereRequested : IHasProvenance, ISetProvenance, IMessage

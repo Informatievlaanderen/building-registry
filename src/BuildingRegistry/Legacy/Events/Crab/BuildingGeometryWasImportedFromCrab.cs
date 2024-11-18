@@ -7,6 +7,7 @@ namespace BuildingRegistry.Legacy.Events.Crab
     using Newtonsoft.Json;
     using NodaTime;
 
+    [HideEvent]
     [Obsolete("CRAB events are obsolete.")]
     [EventName("BuildingGeometryWasImportedFromCrab")]
     [EventDescription("Legacy event om tblgebouwgeometrie en tblgebouwgeometrie_hist te importeren.")]

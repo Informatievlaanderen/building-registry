@@ -10,6 +10,7 @@ namespace BuildingRegistry.Building.Events
     using Newtonsoft.Json;
     using NodaTime;
 
+    [HideEvent]
     [EventTags(Tag.Building)]
     [EventName(EventName)]
     [EventDescription("Het gebouw werd geïmporteerd door GRB.")]

@@ -7,6 +7,7 @@ namespace BuildingRegistry.Building.Events
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Newtonsoft.Json;
 
+    [HideEvent]
     [EventName("BuildingSnapshot")]
     [EventSnapshot(nameof(SnapshotContainer) + "<BuildingSnapshot>", typeof(SnapshotContainer))]
     [EventDescription("Snapshot of Building with BuildingUnits")]

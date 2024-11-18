@@ -7,6 +7,7 @@ namespace BuildingRegistry.Legacy.Events.Crab
     using Newtonsoft.Json;
     using NodaTime;
 
+    [HideEvent]
     [Obsolete("CRAB events are obsolete.")]
     [EventName("TerrainObjectWasImportedFromCrab")]
     [EventDescription("Legacy event om tblterreinobject en tblterreinobject_hist te importeren voor gemGebouwen.")]

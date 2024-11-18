@@ -7,6 +7,7 @@ namespace BuildingRegistry.Legacy.Events.Crab
     using Newtonsoft.Json;
     using NodaTime;
 
+    [HideEvent]
     [Obsolete("CRAB events are obsolete.")]
     [EventName("AddressSubaddressStatusWasImportedFromCrab")]
     [EventDescription("Legacy event om tblSubadresStatus en tblSubadresStatus_hist te importeren.")]
