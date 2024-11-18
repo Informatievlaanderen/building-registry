@@ -54,8 +54,8 @@ nuget Be.Vlaanderen.Basisregisters.Auth.AcmIdm 3.0.0
 nuget Be.Vlaanderen.Basisregisters.Aws.DistributedMutex 4.0.1
 nuget Be.Vlaanderen.Basisregisters.Aws.Lambda 4.0.0
 
-nuget Be.Vlaanderen.Basisregisters.EventHandling 5.0.0
-nuget Be.Vlaanderen.Basisregisters.EventHandling.Autofac 5.0.0
+nuget Be.Vlaanderen.Basisregisters.EventHandling 6.0.0
+nuget Be.Vlaanderen.Basisregisters.EventHandling.Autofac 6.0.0
 
 nuget Be.Vlaanderen.Basisregisters.MessageHandling.AwsSqs.Simple 5.1.0
 nuget Be.Vlaanderen.Basisregisters.MessageHandling.Kafka.Producer 5.1.0

@@ -7,6 +7,7 @@ namespace BuildingRegistry.Legacy.Events.Crab
     using Newtonsoft.Json;
     using NodaTime;
 
+    [HideEvent]
     [Obsolete("CRAB events are obsolete.")]
     [EventName("HouseNumberWasReaddressedFromCrab")]
     [EventDescription("Legacy event om heradressing van huisnummers te importeren.")]

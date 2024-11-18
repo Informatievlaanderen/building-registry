@@ -7,12 +7,13 @@ namespace BuildingRegistry.AllStream.Events
     using BuildingRegistry.Building;
     using Newtonsoft.Json;
 
+    [HideEvent]
     [EventName(EventName)]
     [EventDescription("Nieuwe OSLO snapshots werd aangevraagd voor de gebouweenheden.")]
     public sealed class BuildingUnitOsloSnapshotsWereRequested : IHasProvenance, ISetProvenance, IMessage
     {
         public const string EventName = "BuildingUnitOsloSnapshotsWereRequested"; // BE CAREFUL CHANGING THIS!!
-        
+
         [EventPropertyDescription("Objectidentificatoren van de gebouweenheden.")]
         public IEnumerable<int> BuildingUnitPersistentLocalIds { get; }
 
