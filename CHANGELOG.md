@@ -1,3 +1,10 @@
+## [4.19.1](https://github.com/informatievlaanderen/building-registry/compare/v4.19.0...v4.19.1) (2024-11-19)
+
+
+### Bug Fixes
+
+* **docs:** hide legacy event markedasmigrated ([ca6c41f](https://github.com/informatievlaanderen/building-registry/commit/ca6c41f20fbae359e2746e6f179bc5731e8aed9a))
+
 # [4.19.0](https://github.com/informatievlaanderen/building-registry/compare/v4.18.2...v4.19.0) (2024-11-19)
 
 
