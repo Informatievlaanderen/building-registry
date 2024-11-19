@@ -1,3 +1,10 @@
+# [4.19.0](https://github.com/informatievlaanderen/building-registry/compare/v4.18.2...v4.19.0) (2024-11-19)
+
+
+### Features
+
+* bump event-handling + hide events ([aaa2600](https://github.com/informatievlaanderen/building-registry/commit/aaa2600c6e18ecd0931f5edc5f8dc69f9c4ba147))
+
 ## [4.18.2](https://github.com/informatievlaanderen/building-registry/compare/v4.18.1...v4.18.2) (2024-10-30)
 
 
