@@ -5,6 +5,7 @@ namespace BuildingRegistry.Legacy.Events
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Newtonsoft.Json;
 
+    [HideEvent]
     [Obsolete("CRAB events are obsolete.")]
     [EventName("BuildingWasMarkedAsMigrated")]
     [EventDescription("Het gebouw werd gemarkeerd als gemigreerd.")]
