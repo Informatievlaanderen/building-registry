@@ -7,11 +7,7 @@ namespace BuildingRegistry.Projections.Wfs
     public class WfsContext : RunnerDbContext<WfsContext>
     {
         public override string ProjectionStateSchema => Schema.Wfs;
-
-        public DbSet<Building.Building> Buildings { get; set; }
         public DbSet<BuildingV2.BuildingV2> BuildingsV2 { get; set; }
-        public DbSet<BuildingUnit.BuildingUnit> BuildingUnits { get; set; }
-        public DbSet<BuildingUnit.BuildingUnitBuildingItem> BuildingUnitsBuildings { get; set; }
         public DbSet<BuildingUnitV2.BuildingUnitV2> BuildingUnitsV2 { get; set; }
 
         public WfsContext() { }
