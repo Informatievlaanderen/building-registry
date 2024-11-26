@@ -17,10 +17,10 @@ namespace BuildingRegistry.Projections.Wms.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "6.0.3")
+                .HasAnnotation("ProductVersion", "8.0.3")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
-            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
+            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
             modelBuilder.Entity("Be.Vlaanderen.Basisregisters.ProjectionHandling.Runner.ProjectionStates.ProjectionStateItem", b =>
                 {
@@ -41,141 +41,7 @@ namespace BuildingRegistry.Projections.Wms.Migrations
 
                     b.HasKey("Name");
 
-                    SqlServerKeyBuilderExtensions.IsClustered(b.HasKey("Name"));
-
                     b.ToTable("ProjectionStates", "wms");
-                });
-
-            modelBuilder.Entity("BuildingRegistry.Projections.Wms.Building.Building", b =>
-                {
-                    b.Property<Guid>("BuildingId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<byte[]>("Geometry")
-                        .HasColumnType("varbinary(max)");
-
-                    b.Property<string>("GeometryMethod")
-                        .HasMaxLength(12)
-                        .HasColumnType("varchar(12)");
-
-                    b.Property<string>("Id")
-                        .HasMaxLength(46)
-                        .HasColumnType("varchar(46)");
-
-                    b.Property<bool>("IsComplete")
-                        .HasColumnType("bit");
-
-                    b.Property<int?>("PersistentLocalId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("StatusAsText")
-                        .HasColumnType("nvarchar(450)")
-                        .HasColumnName("Status");
-
-                    b.Property<string>("VersionAsString")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTimeOffset>("VersionTimestampAsDateTimeOffset")
-                        .HasColumnType("datetimeoffset")
-                        .HasColumnName("Version");
-
-                    b.HasKey("BuildingId");
-
-                    SqlServerKeyBuilderExtensions.IsClustered(b.HasKey("BuildingId"));
-
-                    b.HasIndex("IsComplete");
-
-                    b.HasIndex("StatusAsText");
-
-                    b.ToTable("Buildings", "wms");
-                });
-
-            modelBuilder.Entity("BuildingRegistry.Projections.Wms.BuildingUnit.BuildingUnit", b =>
-                {
-                    b.Property<Guid>("BuildingUnitId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("BuildingId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int?>("BuildingPersistentLocalId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("BuildingUnitPersistentLocalId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Function")
-                        .HasMaxLength(21)
-                        .HasColumnType("varchar(21)");
-
-                    b.Property<string>("Id")
-                        .HasMaxLength(53)
-                        .HasColumnType("varchar(53)");
-
-                    b.Property<bool>("IsBuildingComplete")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsComplete")
-                        .HasColumnType("bit");
-
-                    b.Property<byte[]>("Position")
-                        .HasColumnType("varbinary(max)");
-
-                    b.Property<string>("PositionMethod")
-                        .HasMaxLength(22)
-                        .HasColumnType("varchar(22)");
-
-                    b.Property<string>("StatusAsText")
-                        .HasColumnType("nvarchar(450)")
-                        .HasColumnName("Status");
-
-                    b.Property<string>("VersionAsString")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTimeOffset>("VersionTimestampAsDateTimeOffset")
-                        .HasColumnType("datetimeoffset")
-                        .HasColumnName("Version");
-
-                    b.HasKey("BuildingUnitId");
-
-                    SqlServerKeyBuilderExtensions.IsClustered(b.HasKey("BuildingUnitId"));
-
-                    b.HasIndex("BuildingId");
-
-                    b.HasIndex("StatusAsText");
-
-                    b.HasIndex("IsComplete", "IsBuildingComplete");
-
-                    b.ToTable("BuildingUnits", "wms");
-                });
-
-            modelBuilder.Entity("BuildingRegistry.Projections.Wms.BuildingUnit.BuildingUnitBuildingItem", b =>
-                {
-                    b.Property<Guid>("BuildingId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int?>("BuildingPersistentLocalId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("BuildingRetiredStatus")
-                        .HasColumnType("int");
-
-                    b.Property<bool?>("IsComplete")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsRemoved")
-                        .HasColumnType("bit");
-
-                    b.HasKey("BuildingId");
-
-                    SqlServerKeyBuilderExtensions.IsClustered(b.HasKey("BuildingId"), false);
-
-                    b.HasIndex("BuildingPersistentLocalId");
-
-                    b.ToTable("BuildingUnit_Buildings", "wms");
                 });
 
             modelBuilder.Entity("BuildingRegistry.Projections.Wms.BuildingUnitV2.BuildingUnitV2", b =>

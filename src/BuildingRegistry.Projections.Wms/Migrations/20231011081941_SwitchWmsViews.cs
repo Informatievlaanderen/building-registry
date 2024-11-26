@@ -102,8 +102,8 @@ namespace BuildingRegistry.Projections.Wms.Migrations
             migrationBuilder.Sql("DROP VIEW [wms].[GebouwNietGerealiseerd]");
             migrationBuilder.Sql("DROP VIEW [wms].[GebouwView]");
 
-            CreateBuildingViews(migrationBuilder, _buildingDownViews, Building.BuildingConfiguration.TableName);
-            CreateBuildingUnitViews(migrationBuilder, _buildingUnitDownViews, BuildingUnit.BuildingUnitConfiguration.TableName);
+            CreateBuildingViews(migrationBuilder, _buildingDownViews, "Buildings");
+            CreateBuildingUnitViews(migrationBuilder, _buildingUnitDownViews, "BuildingUnits");
 
             CreateBuildingViews(migrationBuilder, _buildingDownViewsV2, BuildingV2.BuildingConfiguration.TableName);
             CreateBuildingUnitViews(migrationBuilder, _buildingUnitDownViewsV2, BuildingUnitV2.BuildingUnitConfiguration.TableName);
