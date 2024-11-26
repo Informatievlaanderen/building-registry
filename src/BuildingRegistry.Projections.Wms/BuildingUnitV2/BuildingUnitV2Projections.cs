@@ -2,6 +2,9 @@ namespace BuildingRegistry.Projections.Wms.BuildingUnitV2
 {
     using System.Collections.Generic;
     using System.Linq;
+    using System.Threading;
+    using System.Threading.Tasks;
+    using Be.Vlaanderen.Basisregisters.EventHandling;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.Connector;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore;
@@ -113,6 +116,18 @@ namespace BuildingRegistry.Projections.Wms.BuildingUnitV2
                     SetVersion(unit!, message.Message.Provenance.Timestamp);
                 }
             });
+
+            When<Envelope<BuildingWasPlannedV2>>(DoNothing);
+            When<Envelope<BuildingBecameUnderConstructionV2>>(DoNothing);
+            When<Envelope<BuildingWasRealizedV2>>(DoNothing);
+            When<Envelope<BuildingWasNotRealizedV2>>(DoNothing);
+            When<Envelope<BuildingWasDemolished>>(DoNothing);
+            When<Envelope<BuildingWasCorrectedFromNotRealizedToPlanned>>(DoNothing);
+            When<Envelope<BuildingWasCorrectedFromRealizedToUnderConstruction>>(DoNothing);
+            When<Envelope<BuildingWasCorrectedFromUnderConstructionToPlanned>>(DoNothing);
+            When<Envelope<BuildingGeometryWasImportedFromGrb>>(DoNothing);
+            When<Envelope<BuildingWasRemovedV2>>(DoNothing);
+            When<Envelope<UnplannedBuildingWasRealizedAndMeasured>>(DoNothing);
 
             #endregion
 
@@ -393,6 +408,8 @@ namespace BuildingRegistry.Projections.Wms.BuildingUnitV2
                 unit.HasDeviation = message.Message.HasDeviation;
                 SetVersion(unit, message.Message.Provenance.Timestamp);
             });
+
+            When<Envelope<BuildingUnitWasMovedOutOfBuilding>>(DoNothing);
         }
 
         private static void SetVersion(BuildingUnitV2 unit, Instant timestamp)
@@ -426,5 +443,7 @@ namespace BuildingRegistry.Projections.Wms.BuildingUnitV2
             buildingStatus == BuildingStatus.NotRealized || buildingStatus == BuildingStatus.Retired
                 ? buildingStatus
                 : null;
+
+        private static Task DoNothing<T>(WmsContext context, Envelope<T> envelope, CancellationToken ct) where T: IMessage => Task.CompletedTask;
     }
 }

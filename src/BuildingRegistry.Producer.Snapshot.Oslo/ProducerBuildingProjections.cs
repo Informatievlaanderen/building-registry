@@ -7,6 +7,7 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo
     using System.Threading;
     using System.Threading.Tasks;
     using AllStream.Events;
+    using Be.Vlaanderen.Basisregisters.EventHandling;
     using Be.Vlaanderen.Basisregisters.GrAr.Oslo.SnapshotProducer;
     using Be.Vlaanderen.Basisregisters.MessageHandling.Kafka;
     using Be.Vlaanderen.Basisregisters.MessageHandling.Kafka.Producer;
@@ -259,7 +260,10 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo
                     ct);
             });
 
-            // Building Units
+            When<Store.Envelope<BuildingGeometryWasImportedFromGrb>>(DoNothing);
+
+            #region BuildingUnits
+
             When<Store.Envelope<CommonBuildingUnitWasAddedV2>>(async (_, message, ct) =>
             {
                 await FindAndProduce(async () =>
@@ -344,173 +348,37 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo
                     ct);
             });
 
-            // When<Store.Envelope<BuildingUnitWasCorrectedFromNotRealizedToPlanned>>(async (_, message, ct) =>
-            // {
-            //     await FindAndProduce(async () =>
-            //             await snapshotManager.FindMatchingSnapshot(
-            //                 message.Message.BuildingPersistentLocalId.ToString(),
-            //                 message.Message.Provenance.Timestamp,
-            //                 message.Message.GetHash(),
-            //                 message.Position,
-            //                 throwStaleWhenGone: false,
-            //                 ct),
-            //         message.Position,
-            //         ct);
-            // });
+            //Normally we should update the snapshot for status changes of buildingunits because they are shown in the api call
+            //but then we conflict with the change (timestamp) of the building and the projection will get stuck
+            //to fix if we continue with this projection
 
-            // When<Store.Envelope<BuildingUnitWasCorrectedFromRealizedToPlanned>>(async (_, message, ct) =>
-            // {
-            //     await FindAndProduce(async () =>
-            //             await snapshotManager.FindMatchingSnapshot(
-            //                 message.Message.BuildingPersistentLocalId.ToString(),
-            //                 message.Message.Provenance.Timestamp,
-            //                 message.Message.GetHash(),
-            //                 message.Position,
-            //                 throwStaleWhenGone: false,
-            //                 ct),
-            //         message.Position,
-            //         ct);
-            // });
-            //
-            // When<Store.Envelope<BuildingUnitWasCorrectedFromRealizedToPlannedBecauseBuildingWasCorrected>>(async (_, message, ct) =>
-            // {
-            //     await FindAndProduce(async () =>
-            //             await snapshotManager.FindMatchingSnapshot(
-            //                 message.Message.BuildingPersistentLocalId.ToString(),
-            //                 message.Message.Provenance.Timestamp,
-            //                 message.Message.GetHash(),
-            //                 message.Position,
-            //                 throwStaleWhenGone: false,
-            //                 ct),
-            //         message.Position,
-            //         ct);
-            // });
-            //
-            // When<Store.Envelope<BuildingUnitWasCorrectedFromRetiredToRealized>>(async (_, message, ct) =>
-            // {
-            //     await FindAndProduce(async () =>
-            //             await snapshotManager.FindMatchingSnapshot(
-            //                 message.Message.BuildingPersistentLocalId.ToString(),
-            //                 message.Message.Provenance.Timestamp,
-            //                 message.Message.GetHash(),
-            //                 message.Position,
-            //                 throwStaleWhenGone: false,
-            //                 ct),
-            //         message.Position,
-            //         ct);
-            // });
-            //
-            // When<Store.Envelope<BuildingUnitWasNotRealizedBecauseBuildingWasDemolished>>(async (_, message, ct) =>
-            // {
-            //     await FindAndProduce(async () =>
-            //             await snapshotManager.FindMatchingSnapshot(
-            //                 message.Message.BuildingPersistentLocalId.ToString(),
-            //                 message.Message.Provenance.Timestamp,
-            //                 message.Message.GetHash(),
-            //                 message.Position,
-            //                 throwStaleWhenGone: false,
-            //                 ct),
-            //         message.Position,
-            //         ct);
-            // });
+            When<Store.Envelope<BuildingBuildingUnitsAddressesWereReaddressed>>(DoNothing);
+            When<Store.Envelope<BuildingUnitWasRegularized>>(DoNothing);
+            When<Store.Envelope<BuildingUnitRegularizationWasCorrected>>(DoNothing);
+            When<Store.Envelope<BuildingUnitWasDeregulated>>(DoNothing);
+            When<Store.Envelope<BuildingUnitDeregulationWasCorrected>>(DoNothing);
+            When<Store.Envelope<BuildingUnitWasRetiredV2>>(DoNothing);
+            When<Store.Envelope<BuildingUnitWasRetiredBecauseBuildingWasDemolished>>(DoNothing);
+            When<Store.Envelope<BuildingUnitPositionWasCorrected>>(DoNothing);
+            When<Store.Envelope<BuildingUnitWasCorrectedFromNotRealizedToPlanned>>(DoNothing);
+            When<Store.Envelope<BuildingUnitWasCorrectedFromRealizedToPlannedBecauseBuildingWasCorrected>>(DoNothing);
+            When<Store.Envelope<BuildingUnitWasCorrectedFromRealizedToPlanned>>(DoNothing);
+            When<Store.Envelope<BuildingUnitWasCorrectedFromRetiredToRealized>>(DoNothing);
+            When<Store.Envelope<BuildingUnitWasRealizedV2>>(DoNothing);
+            When<Store.Envelope<BuildingUnitWasRealizedBecauseBuildingWasRealized>>(DoNothing);
+            When<Store.Envelope<BuildingUnitWasNotRealizedV2>>(DoNothing);
+            When<Store.Envelope<BuildingUnitWasNotRealizedBecauseBuildingWasNotRealized>>(DoNothing);
+            When<Store.Envelope<BuildingUnitWasNotRealizedBecauseBuildingWasDemolished>>(DoNothing);
+            When<Store.Envelope<BuildingUnitAddressWasAttachedV2>>(DoNothing);
+            When<Store.Envelope<BuildingUnitAddressWasDetachedV2>>(DoNothing);
+            When<Store.Envelope<BuildingUnitAddressWasDetachedBecauseAddressWasRejected>>(DoNothing);
+            When<Store.Envelope<BuildingUnitAddressWasDetachedBecauseAddressWasRemoved>>(DoNothing);
+            When<Store.Envelope<BuildingUnitAddressWasDetachedBecauseAddressWasRetired>>(DoNothing);
+            When<Store.Envelope<BuildingUnitAddressWasReplacedBecauseAddressWasReaddressed>>(DoNothing);
+            When<Store.Envelope<BuildingUnitAddressWasReplacedBecauseOfMunicipalityMerger>>(DoNothing);
+            When<Store.Envelope<BuildingUnitWasRemovedBecauseBuildingWasRemoved>>(DoNothing);
 
-            // When<Store.Envelope<BuildingUnitWasNotRealizedBecauseBuildingWasNotRealized>>(async (_, message, ct) =>
-            // {
-            //     await FindAndProduce(async () =>
-            //             await snapshotManager.FindMatchingSnapshot(
-            //                 message.Message.BuildingPersistentLocalId.ToString(),
-            //                 message.Message.Provenance.Timestamp,
-            //                 message.Message.GetHash(),
-            //                 message.Position,
-            //                 throwStaleWhenGone: false,
-            //                 ct),
-            //         message.Position,
-            //         ct);
-            // });
-            //
-            // When<Store.Envelope<BuildingUnitWasNotRealizedV2>>(async (_, message, ct) =>
-            // {
-            //     await FindAndProduce(async () =>
-            //             await snapshotManager.FindMatchingSnapshot(
-            //                 message.Message.BuildingPersistentLocalId.ToString(),
-            //                 message.Message.Provenance.Timestamp,
-            //                 message.Message.GetHash(),
-            //                 message.Position,
-            //                 throwStaleWhenGone: false,
-            //                 ct),
-            //         message.Position,
-            //         ct);
-            // });
-
-            // When<Store.Envelope<BuildingUnitWasRealizedBecauseBuildingWasRealized>>(async (_, message, ct) =>
-            // {
-            //     await FindAndProduce(async () =>
-            //             await snapshotManager.FindMatchingSnapshot(
-            //                 message.Message.BuildingPersistentLocalId.ToString(),
-            //                 message.Message.Provenance.Timestamp,
-            //                 message.Message.GetHash(),
-            //                 message.Position,
-            //                 throwStaleWhenGone: false,
-            //                 ct),
-            //         message.Position,
-            //         ct);
-            // });
-
-            // When<Store.Envelope<BuildingUnitWasRealizedV2>>(async (_, message, ct) =>
-            // {
-            //     await FindAndProduce(async () =>
-            //             await snapshotManager.FindMatchingSnapshot(
-            //                 message.Message.BuildingPersistentLocalId.ToString(),
-            //                 message.Message.Provenance.Timestamp,
-            //                 message.Message.GetHash(),
-            //                 message.Position,
-            //                 throwStaleWhenGone: false,
-            //                 ct),
-            //         message.Position,
-            //         ct);
-            // });
-            //
-            // When<Store.Envelope<BuildingUnitWasRemovedBecauseBuildingWasRemoved>>(async (_, message, ct) =>
-            // {
-            //     await FindAndProduce(async () =>
-            //             await snapshotManager.FindMatchingSnapshot(
-            //                 message.Message.BuildingPersistentLocalId.ToString(),
-            //                 message.Message.Provenance.Timestamp,
-            //                 message.Message.GetHash(),
-            //                 message.Position,
-            //                 throwStaleWhenGone: false,
-            //                 ct),
-            //         message.Position,
-            //         ct);
-            // });
-
-            // When<Store.Envelope<BuildingUnitWasRetiredBecauseBuildingWasDemolished>>(async (_, message, ct) =>
-            // {
-            //     await FindAndProduce(async () =>
-            //             await snapshotManager.FindMatchingSnapshot(
-            //                 message.Message.BuildingPersistentLocalId.ToString(),
-            //                 message.Message.Provenance.Timestamp,
-            //                 message.Message.GetHash(),
-            //                 message.Position,
-            //                 throwStaleWhenGone: false,
-            //                 ct),
-            //         message.Position,
-            //         ct);
-            // });
-            //
-            // When<Store.Envelope<BuildingUnitWasRetiredV2>>(async (_, message, ct) =>
-            // {
-            //     await FindAndProduce(async () =>
-            //             await snapshotManager.FindMatchingSnapshot(
-            //                 message.Message.BuildingPersistentLocalId.ToString(),
-            //                 message.Message.Provenance.Timestamp,
-            //                 message.Message.GetHash(),
-            //                 message.Position,
-            //                 throwStaleWhenGone: false,
-            //                 ct),
-            //         message.Position,
-            //         ct);
-            // });
+            #endregion
         }
 
         private async Task FindAndProduce(Func<Task<OsloResult?>> findMatchingSnapshot, long storePosition, CancellationToken ct)
@@ -536,5 +404,7 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo
                 throw new InvalidOperationException(result.Error + Environment.NewLine + result.ErrorReason); //TODO: create custom exception
             }
         }
+
+        private static Task DoNothing<T>(ProducerContext context, Store.Envelope<T> envelope, CancellationToken ct) where T: IMessage => Task.CompletedTask;
     }
 }

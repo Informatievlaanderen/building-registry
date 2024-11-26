@@ -3,7 +3,9 @@ namespace BuildingRegistry.Projections.LastChangedList
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Threading;
     using System.Threading.Tasks;
+    using Be.Vlaanderen.Basisregisters.EventHandling;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.Connector;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.LastChangedList;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.LastChangedList.Model;
@@ -116,48 +118,50 @@ namespace BuildingRegistry.Projections.LastChangedList
             When<Envelope<CommonBuildingUnitWasAdded>>(async (context, message, ct) =>
                 await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingUnitId.ToString(), message.Position, context, ct));
 
-            When<Envelope<BuildingUnitPersistentLocalIdWasDuplicated>>(async (context, message, ct) => await DoNothing());
-            When<Envelope<BuildingUnitPersistentLocalIdWasRemoved>>(async (context, message, ct) => await DoNothing());
+            When<Envelope<BuildingUnitPersistentLocalIdWasDuplicated>>(DoNothing);
+            When<Envelope<BuildingUnitPersistentLocalIdWasRemoved>>(DoNothing);
 
             // Building
-            When<Envelope<BuildingPersistentLocalIdWasAssigned>>(async (context, message, ct) => await DoNothing());
-            When<Envelope<BuildingBecameComplete>>(async (context, message, ct) => await DoNothing());
-            When<Envelope<BuildingBecameIncomplete>>(async (context, message, ct) => await DoNothing());
-            When<Envelope<BuildingBecameUnderConstruction>>(async (context, message, ct) => await DoNothing());
-            When<Envelope<BuildingGeometryWasRemoved>>(async (context, message, ct) => await DoNothing());
-            When<Envelope<BuildingMeasurementByGrbWasCorrected>>(async (context, message, ct) => await DoNothing());
-            When<Envelope<BuildingOutlineWasCorrected>>(async (context, message, ct) => await DoNothing());
-            When<Envelope<BuildingStatusWasCorrectedToRemoved>>(async (context, message, ct) => await DoNothing());
-            When<Envelope<BuildingStatusWasRemoved>>(async (context, message, ct) => await DoNothing());
-            When<Envelope<BuildingWasCorrectedToNotRealized>>(async (context, message, ct) => await DoNothing());
-            When<Envelope<BuildingWasCorrectedToPlanned>>(async (context, message, ct) => await DoNothing());
-            When<Envelope<BuildingWasCorrectedToRealized>>(async (context, message, ct) => await DoNothing());
-            When<Envelope<BuildingWasCorrectedToRetired>>(async (context, message, ct) => await DoNothing());
-            When<Envelope<BuildingWasCorrectedToUnderConstruction>>(async (context, message, ct) => await DoNothing());
-            When<Envelope<BuildingWasMeasuredByGrb>>(async (context, message, ct) => await DoNothing());
-            When<Envelope<BuildingWasNotRealized>>(async (context, message, ct) => await DoNothing());
-            When<Envelope<BuildingWasOutlined>>(async (context, message, ct) => await DoNothing());
-            When<Envelope<BuildingWasPlanned>>(async (context, message, ct) => await DoNothing());
-            When<Envelope<BuildingWasRealized>>(async (context, message, ct) => await DoNothing());
-            When<Envelope<BuildingWasRegistered>>(async (context, message, ct) => await DoNothing());
-            When<Envelope<BuildingWasRemoved>>(async (context, message, ct) => await DoNothing());
-            When<Envelope<BuildingWasRetired>>(async (context, message, ct) => await DoNothing());
+            When<Envelope<BuildingPersistentLocalIdWasAssigned>>(DoNothing);
+            When<Envelope<BuildingBecameComplete>>(DoNothing);
+            When<Envelope<BuildingBecameIncomplete>>(DoNothing);
+            When<Envelope<BuildingBecameUnderConstruction>>(DoNothing);
+            When<Envelope<BuildingGeometryWasRemoved>>(DoNothing);
+            When<Envelope<BuildingMeasurementByGrbWasCorrected>>(DoNothing);
+            When<Envelope<BuildingOutlineWasCorrected>>(DoNothing);
+            When<Envelope<BuildingStatusWasCorrectedToRemoved>>(DoNothing);
+            When<Envelope<BuildingStatusWasRemoved>>(DoNothing);
+            When<Envelope<BuildingWasCorrectedToNotRealized>>(DoNothing);
+            When<Envelope<BuildingWasCorrectedToPlanned>>(DoNothing);
+            When<Envelope<BuildingWasCorrectedToRealized>>(DoNothing);
+            When<Envelope<BuildingWasCorrectedToRetired>>(DoNothing);
+            When<Envelope<BuildingWasCorrectedToUnderConstruction>>(DoNothing);
+            When<Envelope<BuildingWasMeasuredByGrb>>(DoNothing);
+            When<Envelope<BuildingWasNotRealized>>(DoNothing);
+            When<Envelope<BuildingWasOutlined>>(DoNothing);
+            When<Envelope<BuildingWasPlanned>>(DoNothing);
+            When<Envelope<BuildingWasRealized>>(DoNothing);
+            When<Envelope<BuildingWasRegistered>>(DoNothing);
+            When<Envelope<BuildingWasRemoved>>(DoNothing);
+            When<Envelope<BuildingWasRetired>>(DoNothing);
 
 
             // CRAB
-            When<Envelope<AddressHouseNumberPositionWasImportedFromCrab>>(async (context, message, ct) => await DoNothing());
-            When<Envelope<AddressHouseNumberStatusWasImportedFromCrab>>(async (context, message, ct) => await DoNothing());
-            When<Envelope<AddressHouseNumberWasImportedFromCrab>>(async (context, message, ct) => await DoNothing());
-            When<Envelope<AddressSubaddressPositionWasImportedFromCrab>>(async (context, message, ct) => await DoNothing());
-            When<Envelope<AddressSubaddressStatusWasImportedFromCrab>>(async (context, message, ct) => await DoNothing());
-            When<Envelope<AddressSubaddressWasImportedFromCrab>>(async (context, message, ct) => await DoNothing());
-            When<Envelope<BuildingGeometryWasImportedFromCrab>>(async (context, message, ct) => await DoNothing());
-            When<Envelope<BuildingStatusWasImportedFromCrab>>(async (context, message, ct) => await DoNothing());
-            When<Envelope<HouseNumberWasReaddressedFromCrab>>(async (context, message, ct) => await DoNothing());
-            When<Envelope<SubaddressWasReaddressedFromCrab>>(async (context, message, ct) => await DoNothing());
-            When<Envelope<TerrainObjectHouseNumberWasImportedFromCrab>>(async (context, message, ct) => await DoNothing());
-            When<Envelope<TerrainObjectWasImportedFromCrab>>(async (context, message, ct) => await DoNothing());
+            When<Envelope<AddressHouseNumberPositionWasImportedFromCrab>>(DoNothing);
+            When<Envelope<AddressHouseNumberStatusWasImportedFromCrab>>(DoNothing);
+            When<Envelope<AddressHouseNumberWasImportedFromCrab>>(DoNothing);
+            When<Envelope<AddressSubaddressPositionWasImportedFromCrab>>(DoNothing);
+            When<Envelope<AddressSubaddressStatusWasImportedFromCrab>>(DoNothing);
+            When<Envelope<AddressSubaddressWasImportedFromCrab>>(DoNothing);
+            When<Envelope<BuildingGeometryWasImportedFromCrab>>(DoNothing);
+            When<Envelope<BuildingStatusWasImportedFromCrab>>(DoNothing);
+            When<Envelope<HouseNumberWasReaddressedFromCrab>>(DoNothing);
+            When<Envelope<SubaddressWasReaddressedFromCrab>>(DoNothing);
+            When<Envelope<TerrainObjectHouseNumberWasImportedFromCrab>>(DoNothing);
+            When<Envelope<TerrainObjectWasImportedFromCrab>>(DoNothing);
             #endregion Legacy
+
+            #region Building
 
             When<Envelope<BuildingWasMigrated>>(async (context, message, ct) =>
             {
@@ -207,6 +211,19 @@ namespace BuildingRegistry.Projections.LastChangedList
                     await GetLastChangedRecordsAndUpdatePosition(buildingUnitPersistentLocalId.ToString(), message.Position, context, ct);
                 }
             });
+
+            When<Envelope<BuildingWasPlannedV2>>(DoNothing);
+            When<Envelope<BuildingBecameUnderConstructionV2>>(DoNothing);
+            When<Envelope<BuildingWasRealizedV2>>(DoNothing);
+            When<Envelope<BuildingWasNotRealizedV2>>(DoNothing);
+            When<Envelope<BuildingWasDemolished>>(DoNothing);
+            When<Envelope<BuildingWasCorrectedFromNotRealizedToPlanned>>(DoNothing);
+            When<Envelope<BuildingWasCorrectedFromRealizedToUnderConstruction>>(DoNothing);
+            When<Envelope<BuildingWasCorrectedFromUnderConstructionToPlanned>>(DoNothing);
+            When<Envelope<BuildingGeometryWasImportedFromGrb>>(DoNothing);
+            When<Envelope<BuildingWasRemovedV2>>(DoNothing);
+            When<Envelope<UnplannedBuildingWasRealizedAndMeasured>>(DoNothing);
+            #endregion Building
 
             When<Envelope<BuildingUnitAddressWasAttachedV2>>(async (context, message, ct) =>
             {
@@ -362,6 +379,8 @@ namespace BuildingRegistry.Projections.LastChangedList
             {
                 await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingUnitPersistentLocalId.ToString(), message.Position, context, ct);
             });
+
+            When<Envelope<BuildingUnitWasMovedOutOfBuilding>>(DoNothing);
         }
 
         private static void RebuildKeyAndUri(IEnumerable<LastChangedRecord>? attachedRecords, int persistentLocalId)
@@ -404,9 +423,6 @@ namespace BuildingRegistry.Projections.LastChangedList
             };
         }
 
-        private static async Task DoNothing()
-        {
-            await Task.Yield();
-        }
+        private static Task DoNothing<T>(LastChangedListContext context, Envelope<T> envelope, CancellationToken ct) where T: IMessage => Task.CompletedTask;
     }
 }

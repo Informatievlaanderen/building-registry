@@ -1,5 +1,8 @@
 namespace BuildingRegistry.Projections.Integration.Building.LatestItem
 {
+    using System.Threading;
+    using System.Threading.Tasks;
+    using Be.Vlaanderen.Basisregisters.EventHandling;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.Connector;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore;
@@ -282,6 +285,10 @@ namespace BuildingRegistry.Projections.Integration.Building.LatestItem
                     ct);
             });
 
+            When<Envelope<BuildingGeometryWasImportedFromGrb>>(DoNothing);
+
+            #region BuildingUnit
+
             When<Envelope<BuildingUnitWasPlannedV2>>(async (context, message, ct) =>
             {
                 await context.FindAndUpdateBuilding(
@@ -332,9 +339,40 @@ namespace BuildingRegistry.Projections.Integration.Building.LatestItem
                     building => { UpdateVersionTimestamp(building, message.Message); },
                     ct);
             });
+
+            When<Envelope<BuildingBuildingUnitsAddressesWereReaddressed>>(DoNothing);
+            When<Envelope<BuildingUnitWasRegularized>>(DoNothing);
+            When<Envelope<BuildingUnitRegularizationWasCorrected>>(DoNothing);
+            When<Envelope<BuildingUnitWasDeregulated>>(DoNothing);
+            When<Envelope<BuildingUnitDeregulationWasCorrected>>(DoNothing);
+            When<Envelope<BuildingUnitWasRetiredV2>>(DoNothing);
+            When<Envelope<BuildingUnitWasRetiredBecauseBuildingWasDemolished>>(DoNothing);
+            When<Envelope<BuildingUnitPositionWasCorrected>>(DoNothing);
+            When<Envelope<BuildingUnitWasCorrectedFromNotRealizedToPlanned>>(DoNothing);
+            When<Envelope<BuildingUnitWasCorrectedFromRealizedToPlannedBecauseBuildingWasCorrected>>(DoNothing);
+            When<Envelope<BuildingUnitWasCorrectedFromRealizedToPlanned>>(DoNothing);
+            When<Envelope<BuildingUnitWasCorrectedFromRetiredToRealized>>(DoNothing);
+            When<Envelope<BuildingUnitWasRealizedV2>>(DoNothing);
+            When<Envelope<BuildingUnitWasRealizedBecauseBuildingWasRealized>>(DoNothing);
+            When<Envelope<BuildingUnitWasNotRealizedV2>>(DoNothing);
+            When<Envelope<BuildingUnitWasNotRealizedBecauseBuildingWasNotRealized>>(DoNothing);
+            When<Envelope<BuildingUnitWasNotRealizedBecauseBuildingWasDemolished>>(DoNothing);
+            When<Envelope<BuildingUnitAddressWasAttachedV2>>(DoNothing);
+            When<Envelope<BuildingUnitAddressWasDetachedV2>>(DoNothing);
+            When<Envelope<BuildingUnitAddressWasDetachedBecauseAddressWasRejected>>(DoNothing);
+            When<Envelope<BuildingUnitAddressWasDetachedBecauseAddressWasRemoved>>(DoNothing);
+            When<Envelope<BuildingUnitAddressWasDetachedBecauseAddressWasRetired>>(DoNothing);
+            When<Envelope<BuildingUnitAddressWasReplacedBecauseAddressWasReaddressed>>(DoNothing);
+            When<Envelope<BuildingUnitAddressWasReplacedBecauseOfMunicipalityMerger>>(DoNothing);
+            When<Envelope<BuildingUnitWasRemovedBecauseBuildingWasRemoved>>(DoNothing);
+            #endregion
+
+
         }
 
         private static void UpdateVersionTimestamp(BuildingLatestItem building, IHasProvenance message)
             => building.VersionTimestamp = message.Provenance.Timestamp;
+
+        private static Task DoNothing<T>(IntegrationContext context, Envelope<T> envelope, CancellationToken ct) where T: IMessage => Task.CompletedTask;
     }
 }

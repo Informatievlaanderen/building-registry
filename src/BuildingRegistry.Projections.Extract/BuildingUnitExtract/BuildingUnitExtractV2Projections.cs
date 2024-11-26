@@ -4,6 +4,9 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
     using System.Collections.Generic;
     using System.Linq;
     using System.Text;
+    using System.Threading;
+    using System.Threading.Tasks;
+    using Be.Vlaanderen.Basisregisters.EventHandling;
     using Be.Vlaanderen.Basisregisters.GrAr.Common;
     using Be.Vlaanderen.Basisregisters.GrAr.Extracts;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.Connector;
@@ -144,6 +147,17 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
                 }
             });
 
+            When<Envelope<BuildingWasPlannedV2>>(DoNothing);
+            When<Envelope<BuildingBecameUnderConstructionV2>>(DoNothing);
+            When<Envelope<BuildingWasRealizedV2>>(DoNothing);
+            When<Envelope<BuildingWasNotRealizedV2>>(DoNothing);
+            When<Envelope<BuildingWasDemolished>>(DoNothing);
+            When<Envelope<BuildingWasCorrectedFromNotRealizedToPlanned>>(DoNothing);
+            When<Envelope<BuildingWasCorrectedFromRealizedToUnderConstruction>>(DoNothing);
+            When<Envelope<BuildingWasCorrectedFromUnderConstructionToPlanned>>(DoNothing);
+            When<Envelope<BuildingGeometryWasImportedFromGrb>>(DoNothing);
+            When<Envelope<BuildingWasRemovedV2>>(DoNothing);
+            When<Envelope<UnplannedBuildingWasRealizedAndMeasured>>(DoNothing);
             #endregion Building
 
             When<Envelope<BuildingUnitWasPlannedV2>>(async (context, message, ct) =>
@@ -469,6 +483,15 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
                     }, ct);
             });
 
+            When<Envelope<BuildingUnitAddressWasReplacedBecauseOfMunicipalityMerger>>(async (context, message, ct) =>
+            {
+                await context.FindAndUpdateBuildingUnitExtract(message.Message.BuildingUnitPersistentLocalId,
+                    itemV2 =>
+                    {
+                        UpdateVersie(itemV2, message.Message.Provenance.Timestamp);
+                    }, ct);
+            });
+
             When<Envelope<BuildingUnitWasMovedIntoBuilding>>(async (context, message, ct) =>
             {
                 var geometryMethod = MapGeometryMethod(BuildingUnitPositionGeometryMethod.Parse(message.Message.GeometryMethod));
@@ -485,6 +508,8 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
                         UpdateVersie(itemV2, message.Message.Provenance.Timestamp);
                     }, ct);
             });
+
+            When<Envelope<BuildingUnitWasMovedOutOfBuilding>>(DoNothing);
         }
 
         private static string MapFunction(BuildingUnitFunction function)
@@ -563,5 +588,7 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
 
         private void UpdateGeometryMethod(BuildingUnitExtractItemV2 buildingUnit, string? posgeommet)
             => UpdateRecord(buildingUnit, record => record.posgeommet.Value = posgeommet);
+
+        private static Task DoNothing<T>(ExtractContext context, Envelope<T> envelope, CancellationToken ct) where T: IMessage => Task.CompletedTask;
     }
 }

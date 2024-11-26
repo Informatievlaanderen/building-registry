@@ -1064,6 +1064,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndicationWithCount
                 }, ct);
             });
 
+            When<Envelope<BuildingGeometryWasImportedFromGrb>>(DoNothing);
             #endregion Building
 
             #region BuildingUnit
