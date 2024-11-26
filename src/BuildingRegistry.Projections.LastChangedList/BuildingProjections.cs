@@ -1,6 +1,9 @@
 namespace BuildingRegistry.Projections.LastChangedList
 {
     using System;
+    using System.Threading;
+    using System.Threading.Tasks;
+    using Be.Vlaanderen.Basisregisters.EventHandling;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.Connector;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.LastChangedList;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore;
@@ -61,6 +64,8 @@ namespace BuildingRegistry.Projections.LastChangedList
             When<Envelope<BuildingWasRemovedV2>>(async (context, message, ct) =>
                 await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingPersistentLocalId.ToString(), message.Position, context, ct));
 
+            When<Envelope<BuildingGeometryWasImportedFromGrb>>(DoNothing);
+
             // Building Units
             When<Envelope<BuildingUnitWasPlannedV2>>(async (context, message, ct) =>
                 await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingPersistentLocalId.ToString(), message.Position, context, ct));
@@ -115,6 +120,21 @@ namespace BuildingRegistry.Projections.LastChangedList
 
             When<Envelope<BuildingUnitWasRetiredV2>>(async (context, message, ct) =>
                 await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingPersistentLocalId.ToString(), message.Position, context, ct));
+
+            When<Envelope<BuildingBuildingUnitsAddressesWereReaddressed>>(DoNothing);
+            When<Envelope<BuildingUnitWasRegularized>>(DoNothing);
+            When<Envelope<BuildingUnitRegularizationWasCorrected>>(DoNothing);
+            When<Envelope<BuildingUnitWasDeregulated>>(DoNothing);
+            When<Envelope<BuildingUnitDeregulationWasCorrected>>(DoNothing);
+            When<Envelope<BuildingUnitPositionWasCorrected>>(DoNothing);
+            When<Envelope<BuildingUnitAddressWasAttachedV2>>(DoNothing);
+            When<Envelope<BuildingUnitAddressWasDetachedV2>>(DoNothing);
+            When<Envelope<BuildingUnitAddressWasDetachedBecauseAddressWasRejected>>(DoNothing);
+            When<Envelope<BuildingUnitAddressWasDetachedBecauseAddressWasRemoved>>(DoNothing);
+            When<Envelope<BuildingUnitAddressWasDetachedBecauseAddressWasRetired>>(DoNothing);
+            When<Envelope<BuildingUnitAddressWasReplacedBecauseAddressWasReaddressed>>(DoNothing);
+            When<Envelope<BuildingUnitAddressWasReplacedBecauseOfMunicipalityMerger>>(DoNothing);
+            When<Envelope<BuildingUnitWasRemovedBecauseBuildingWasRemoved>>(DoNothing);
         }
 
         protected override string BuildCacheKey(AcceptType acceptType, string identifier)
@@ -135,5 +155,7 @@ namespace BuildingRegistry.Projections.LastChangedList
                 _ => throw new NotImplementedException($"Cannot build Uri for type {typeof(AcceptType)}")
             };
         }
+
+        private static Task DoNothing<T>(LastChangedListContext context, Envelope<T> envelope, CancellationToken ct) where T: IMessage => Task.CompletedTask;
     }
 }

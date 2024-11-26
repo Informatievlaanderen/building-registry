@@ -3,6 +3,9 @@ namespace BuildingRegistry.Projections.Extract.BuildingExtract
     using System;
     using System.Collections.Generic;
     using System.Text;
+    using System.Threading;
+    using System.Threading.Tasks;
+    using Be.Vlaanderen.Basisregisters.EventHandling;
     using Be.Vlaanderen.Basisregisters.GrAr.Common;
     using Be.Vlaanderen.Basisregisters.GrAr.Extracts;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.Connector;
@@ -239,6 +242,9 @@ namespace BuildingRegistry.Projections.Extract.BuildingExtract
                 context.BuildingExtractV2Esri.Remove(item);
             });
 
+            When<Envelope<BuildingGeometryWasImportedFromGrb>>(DoNothing);
+
+            #region BuildingUnit
             When<Envelope<BuildingUnitWasPlannedV2>>(async (context, message, ct) =>
             {
                 var item = await context.BuildingExtractV2Esri.FindAsync(message.Message.BuildingPersistentLocalId,
@@ -280,6 +286,33 @@ namespace BuildingRegistry.Projections.Extract.BuildingExtract
                     cancellationToken: ct);
                 UpdateVersie(item, message.Message.Provenance.Timestamp);
             });
+
+            When<Envelope<BuildingBuildingUnitsAddressesWereReaddressed>>(DoNothing);
+            When<Envelope<BuildingUnitWasRegularized>>(DoNothing);
+            When<Envelope<BuildingUnitRegularizationWasCorrected>>(DoNothing);
+            When<Envelope<BuildingUnitWasDeregulated>>(DoNothing);
+            When<Envelope<BuildingUnitDeregulationWasCorrected>>(DoNothing);
+            When<Envelope<BuildingUnitWasRetiredV2>>(DoNothing);
+            When<Envelope<BuildingUnitWasRetiredBecauseBuildingWasDemolished>>(DoNothing);
+            When<Envelope<BuildingUnitPositionWasCorrected>>(DoNothing);
+            When<Envelope<BuildingUnitWasCorrectedFromNotRealizedToPlanned>>(DoNothing);
+            When<Envelope<BuildingUnitWasCorrectedFromRealizedToPlannedBecauseBuildingWasCorrected>>(DoNothing);
+            When<Envelope<BuildingUnitWasCorrectedFromRealizedToPlanned>>(DoNothing);
+            When<Envelope<BuildingUnitWasCorrectedFromRetiredToRealized>>(DoNothing);
+            When<Envelope<BuildingUnitWasRealizedV2>>(DoNothing);
+            When<Envelope<BuildingUnitWasRealizedBecauseBuildingWasRealized>>(DoNothing);
+            When<Envelope<BuildingUnitWasNotRealizedV2>>(DoNothing);
+            When<Envelope<BuildingUnitWasNotRealizedBecauseBuildingWasNotRealized>>(DoNothing);
+            When<Envelope<BuildingUnitWasNotRealizedBecauseBuildingWasDemolished>>(DoNothing);
+            When<Envelope<BuildingUnitAddressWasAttachedV2>>(DoNothing);
+            When<Envelope<BuildingUnitAddressWasDetachedV2>>(DoNothing);
+            When<Envelope<BuildingUnitAddressWasDetachedBecauseAddressWasRejected>>(DoNothing);
+            When<Envelope<BuildingUnitAddressWasDetachedBecauseAddressWasRemoved>>(DoNothing);
+            When<Envelope<BuildingUnitAddressWasDetachedBecauseAddressWasRetired>>(DoNothing);
+            When<Envelope<BuildingUnitAddressWasReplacedBecauseAddressWasReaddressed>>(DoNothing);
+            When<Envelope<BuildingUnitAddressWasReplacedBecauseOfMunicipalityMerger>>(DoNothing);
+            When<Envelope<BuildingUnitWasRemovedBecauseBuildingWasRemoved>>(DoNothing);
+            #endregion
         }
 
         private static string MapGeometryMethod(BuildingGeometryMethod buildingGeometryMethod)
@@ -348,5 +381,7 @@ namespace BuildingRegistry.Projections.Extract.BuildingExtract
 
             building.DbaseRecord = record.ToBytes(_encoding);
         }
+
+        private static Task DoNothing<T>(ExtractContext context, Envelope<T> envelope, CancellationToken ct) where T: IMessage => Task.CompletedTask;
     }
 }

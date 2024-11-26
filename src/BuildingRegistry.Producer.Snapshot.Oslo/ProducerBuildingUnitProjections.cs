@@ -8,10 +8,12 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo
     using System.Threading;
     using System.Threading.Tasks;
     using AllStream.Events;
+    using Be.Vlaanderen.Basisregisters.EventHandling;
     using Be.Vlaanderen.Basisregisters.GrAr.Oslo.SnapshotProducer;
     using Be.Vlaanderen.Basisregisters.MessageHandling.Kafka;
     using Be.Vlaanderen.Basisregisters.MessageHandling.Kafka.Producer;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.Connector;
+    using Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore;
     using Building.Events;
 
     [ConnectedProjectionName("Kafka producer snapshot oslo gebouweenheden")]
@@ -30,7 +32,7 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo
         {
             _producer = producer;
 
-            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingUnitOsloSnapshotsWereRequested>>(async (_, message, ct) =>
+            When<Envelope<BuildingUnitOsloSnapshotsWereRequested>>(async (_, message, ct) =>
             {
                 foreach (var buildingUnitPersistentLocalId in message.Message.BuildingUnitPersistentLocalIds)
                 {
@@ -51,7 +53,9 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo
                 }
             });
 
-            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingWasMigrated>>(async (_, message, ct) =>
+            #region Building
+
+            When<Envelope<BuildingWasMigrated>>(async (_, message, ct) =>
             {
                 foreach (var buildingUnit in message.Message.BuildingUnits)
                 {
@@ -75,7 +79,7 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo
                 }
             });
 
-            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingOutlineWasChanged>>(async (_, message, ct) =>
+            When<Envelope<BuildingOutlineWasChanged>>(async (_, message, ct) =>
             {
                 foreach (var buildingUnitPersistentLocalId in message.Message.BuildingUnitPersistentLocalIds)
                 {
@@ -92,7 +96,7 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo
                 }
             });
 
-            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingWasMeasured>>(async (_, message, ct) =>
+            When<Envelope<BuildingWasMeasured>>(async (_, message, ct) =>
             {
                 foreach (var buildingUnitPersistentLocalId in message.Message.BuildingUnitPersistentLocalIds.Concat(message.Message
                              .BuildingUnitPersistentLocalIdsWhichBecameDerived))
@@ -110,7 +114,7 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo
                 }
             });
 
-            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingMeasurementWasCorrected>>(async (_, message, ct) =>
+            When<Envelope<BuildingMeasurementWasCorrected>>(async (_, message, ct) =>
             {
                 foreach (var buildingUnitPersistentLocalId in
                          message.Message.BuildingUnitPersistentLocalIds.Concat(message.Message.BuildingUnitPersistentLocalIdsWhichBecameDerived))
@@ -128,7 +132,21 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo
                 }
             });
 
-            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingUnitAddressWasAttachedV2>>(async (_, message, ct) =>
+            When<Envelope<BuildingWasPlannedV2>>(DoNothing);
+            When<Envelope<BuildingBecameUnderConstructionV2>>(DoNothing);
+            When<Envelope<BuildingWasRealizedV2>>(DoNothing);
+            When<Envelope<BuildingWasNotRealizedV2>>(DoNothing);
+            When<Envelope<BuildingWasDemolished>>(DoNothing);
+            When<Envelope<BuildingWasCorrectedFromNotRealizedToPlanned>>(DoNothing);
+            When<Envelope<BuildingWasCorrectedFromRealizedToUnderConstruction>>(DoNothing);
+            When<Envelope<BuildingWasCorrectedFromUnderConstructionToPlanned>>(DoNothing);
+            When<Envelope<BuildingGeometryWasImportedFromGrb>>(DoNothing);
+            When<Envelope<BuildingWasRemovedV2>>(DoNothing);
+            When<Envelope<UnplannedBuildingWasRealizedAndMeasured>>(DoNothing);
+
+            #endregion Building
+
+            When<Envelope<BuildingUnitAddressWasAttachedV2>>(async (_, message, ct) =>
             {
                 await FindAndProduce(async () =>
                         await snapshotManager.FindMatchingSnapshot(
@@ -142,7 +160,7 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo
                     ct);
             });
 
-            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingUnitAddressWasDetachedV2>>(async (_, message, ct) =>
+            When<Envelope<BuildingUnitAddressWasDetachedV2>>(async (_, message, ct) =>
             {
                 await FindAndProduce(async () =>
                         await snapshotManager.FindMatchingSnapshot(
@@ -156,7 +174,7 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo
                     ct);
             });
 
-            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingUnitAddressWasDetachedBecauseAddressWasRemoved>>(
+            When<Envelope<BuildingUnitAddressWasDetachedBecauseAddressWasRemoved>>(
                 async (_, message, ct) =>
                 {
                     await FindAndProduce(async () =>
@@ -171,7 +189,7 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo
                         ct);
                 });
 
-            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingUnitAddressWasDetachedBecauseAddressWasRejected>>(
+            When<Envelope<BuildingUnitAddressWasDetachedBecauseAddressWasRejected>>(
                 async (_, message, ct) =>
                 {
                     await FindAndProduce(async () =>
@@ -186,7 +204,7 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo
                         ct);
                 });
 
-            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingUnitAddressWasDetachedBecauseAddressWasRetired>>(
+            When<Envelope<BuildingUnitAddressWasDetachedBecauseAddressWasRetired>>(
                 async (_, message, ct) =>
                 {
                     await FindAndProduce(async () =>
@@ -201,7 +219,7 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo
                         ct);
                 });
 
-            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingUnitAddressWasReplacedBecauseOfMunicipalityMerger>>(
+            When<Envelope<BuildingUnitAddressWasReplacedBecauseOfMunicipalityMerger>>(
                 async (_, message, ct) =>
                 {
                     await FindAndProduce(async () =>
@@ -216,7 +234,7 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo
                         ct);
                 });
 
-            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingUnitPositionWasCorrected>>(async (_, message, ct) =>
+            When<Envelope<BuildingUnitPositionWasCorrected>>(async (_, message, ct) =>
             {
                 await FindAndProduce(async () =>
                         await snapshotManager.FindMatchingSnapshot(
@@ -230,7 +248,7 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo
                     ct);
             });
 
-            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingUnitRemovalWasCorrected>>(async (_, message, ct) =>
+            When<Envelope<BuildingUnitRemovalWasCorrected>>(async (_, message, ct) =>
             {
                 await FindAndProduce(async () =>
                         await snapshotManager.FindMatchingSnapshot(
@@ -244,7 +262,7 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo
                     ct);
             });
 
-            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingUnitWasCorrectedFromNotRealizedToPlanned>>(
+            When<Envelope<BuildingUnitWasCorrectedFromNotRealizedToPlanned>>(
                 async (_, message, ct) =>
                 {
                     await FindAndProduce(async () =>
@@ -259,7 +277,7 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo
                         ct);
                 });
 
-            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingUnitWasCorrectedFromRealizedToPlanned>>(
+            When<Envelope<BuildingUnitWasCorrectedFromRealizedToPlanned>>(
                 async (_, message, ct) =>
                 {
                     await FindAndProduce(async () =>
@@ -274,7 +292,7 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo
                         ct);
                 });
 
-            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<
+            When<Envelope<
                 BuildingUnitWasCorrectedFromRealizedToPlannedBecauseBuildingWasCorrected>>(async (_, message, ct) =>
             {
                 await FindAndProduce(async () =>
@@ -289,7 +307,7 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo
                     ct);
             });
 
-            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingUnitWasCorrectedFromRetiredToRealized>>(
+            When<Envelope<BuildingUnitWasCorrectedFromRetiredToRealized>>(
                 async (_, message, ct) =>
                 {
                     await FindAndProduce(async () =>
@@ -304,7 +322,7 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo
                         ct);
                 });
 
-            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingUnitWasDeregulated>>(async (_, message, ct) =>
+            When<Envelope<BuildingUnitWasDeregulated>>(async (_, message, ct) =>
             {
                 await FindAndProduce(async () =>
                         await snapshotManager.FindMatchingSnapshot(
@@ -318,7 +336,7 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo
                     ct);
             });
 
-            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingUnitDeregulationWasCorrected>>(
+            When<Envelope<BuildingUnitDeregulationWasCorrected>>(
                 async (_, message, ct) =>
                 {
                     await FindAndProduce(async () =>
@@ -333,7 +351,7 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo
                         ct);
                 });
 
-            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingUnitWasNotRealizedBecauseBuildingWasNotRealized>>(
+            When<Envelope<BuildingUnitWasNotRealizedBecauseBuildingWasNotRealized>>(
                 async (_, message, ct) =>
                 {
                     await FindAndProduce(async () =>
@@ -348,7 +366,7 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo
                         ct);
                 });
 
-            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingUnitWasNotRealizedV2>>(async (_, message, ct) =>
+            When<Envelope<BuildingUnitWasNotRealizedV2>>(async (_, message, ct) =>
             {
                 await FindAndProduce(async () =>
                         await snapshotManager.FindMatchingSnapshot(
@@ -362,7 +380,7 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo
                     ct);
             });
 
-            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingUnitWasPlannedV2>>(async (_, message, ct) =>
+            When<Envelope<BuildingUnitWasPlannedV2>>(async (_, message, ct) =>
             {
                 await FindAndProduce(async () =>
                         await snapshotManager.FindMatchingSnapshot(
@@ -376,7 +394,7 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo
                     ct);
             });
 
-            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingUnitWasRealizedBecauseBuildingWasRealized>>(
+            When<Envelope<BuildingUnitWasRealizedBecauseBuildingWasRealized>>(
                 async (_, message, ct) =>
                 {
                     await FindAndProduce(async () =>
@@ -391,7 +409,7 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo
                         ct);
                 });
 
-            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingUnitWasRealizedV2>>(async (_, message, ct) =>
+            When<Envelope<BuildingUnitWasRealizedV2>>(async (_, message, ct) =>
             {
                 await FindAndProduce(async () =>
                         await snapshotManager.FindMatchingSnapshot(
@@ -405,7 +423,7 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo
                     ct);
             });
 
-            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingUnitWasRegularized>>(async (_, message, ct) =>
+            When<Envelope<BuildingUnitWasRegularized>>(async (_, message, ct) =>
             {
                 await FindAndProduce(async () =>
                         await snapshotManager.FindMatchingSnapshot(
@@ -419,7 +437,7 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo
                     ct);
             });
 
-            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingUnitRegularizationWasCorrected>>(
+            When<Envelope<BuildingUnitRegularizationWasCorrected>>(
                 async (_, message, ct) =>
                 {
                     await FindAndProduce(async () =>
@@ -434,7 +452,7 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo
                         ct);
                 });
 
-            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingUnitWasRetiredV2>>(async (_, message, ct) =>
+            When<Envelope<BuildingUnitWasRetiredV2>>(async (_, message, ct) =>
             {
                 await FindAndProduce(async () =>
                         await snapshotManager.FindMatchingSnapshot(
@@ -448,29 +466,29 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo
                     ct);
             });
 
-            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingWasCorrectedFromNotRealizedToPlanned>>(async (_,
+            When<Envelope<BuildingWasCorrectedFromNotRealizedToPlanned>>(async (_,
                     message, ct) =>
                 { });
 
-            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingWasCorrectedFromRealizedToUnderConstruction>>(
+            When<Envelope<BuildingWasCorrectedFromRealizedToUnderConstruction>>(
                 async (_, message, ct) => { });
 
-            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingWasCorrectedFromUnderConstructionToPlanned>>(
+            When<Envelope<BuildingWasCorrectedFromUnderConstructionToPlanned>>(
                 async (_, message, ct) => { });
 
-            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingWasNotRealizedV2>>(async (_, message, ct) => { });
+            When<Envelope<BuildingWasNotRealizedV2>>(async (_, message, ct) => { });
 
-            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingWasPlannedV2>>(async (_, message, ct) => { });
+            When<Envelope<BuildingWasPlannedV2>>(async (_, message, ct) => { });
 
-            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<UnplannedBuildingWasRealizedAndMeasured>>(async (_, message,
+            When<Envelope<UnplannedBuildingWasRealizedAndMeasured>>(async (_, message,
                     ct) =>
                 { });
 
-            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingWasRealizedV2>>(async (_, message, ct) => { });
+            When<Envelope<BuildingWasRealizedV2>>(async (_, message, ct) => { });
 
-            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingWasRemovedV2>>(async (_, message, ct) => { });
+            When<Envelope<BuildingWasRemovedV2>>(async (_, message, ct) => { });
 
-            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<CommonBuildingUnitWasAddedV2>>(async (_, message, ct) =>
+            When<Envelope<CommonBuildingUnitWasAddedV2>>(async (_, message, ct) =>
             {
                 await FindAndProduce(async () =>
                         await snapshotManager.FindMatchingSnapshot(
@@ -484,18 +502,18 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo
                     ct);
             });
 
-            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingUnitWasRemovedV2>>(async (_, message, ct) =>
+            When<Envelope<BuildingUnitWasRemovedV2>>(async (_, message, ct) =>
             {
                 await Produce($"{osloNamespace}/{message.Message.BuildingUnitPersistentLocalId}", message.Message.BuildingUnitPersistentLocalId.ToString(), "{}", message.Position, ct);
             });
 
-            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingUnitWasRemovedBecauseBuildingWasRemoved>>(
+            When<Envelope<BuildingUnitWasRemovedBecauseBuildingWasRemoved>>(
                 async (_, message, ct) =>
                 {
                     await Produce($"{osloNamespace}/{message.Message.BuildingUnitPersistentLocalId}", message.Message.BuildingUnitPersistentLocalId.ToString(), "{}", message.Position, ct);
                 });
 
-            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingUnitAddressWasReplacedBecauseAddressWasReaddressed>>(
+            When<Envelope<BuildingUnitAddressWasReplacedBecauseAddressWasReaddressed>>(
                 async (_, message, ct) =>
                 {
                     await FindAndProduce(async () =>
@@ -510,7 +528,7 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo
                         ct);
                 });
 
-            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingBuildingUnitsAddressesWereReaddressed>>(
+            When<Envelope<BuildingBuildingUnitsAddressesWereReaddressed>>(
                 async (_, message, ct) =>
                 {
                     foreach (var buildingUnitReaddresses in message.Message.BuildingUnitsReaddresses)
@@ -528,7 +546,7 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo
                     }
                 });
 
-            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingUnitWasNotRealizedBecauseBuildingWasDemolished>>(
+            When<Envelope<BuildingUnitWasNotRealizedBecauseBuildingWasDemolished>>(
                 async (_, message, ct) =>
                 {
                     await FindAndProduce(async () =>
@@ -543,7 +561,7 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo
                         ct);
                 });
 
-            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingUnitWasRetiredBecauseBuildingWasDemolished>>(
+            When<Envelope<BuildingUnitWasRetiredBecauseBuildingWasDemolished>>(
                 async (_, message, ct) =>
                 {
                     await FindAndProduce(async () =>
@@ -558,7 +576,7 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo
                         ct);
                 });
 
-            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingMeasurementWasChanged>>(async (_, message, ct) =>
+            When<Envelope<BuildingMeasurementWasChanged>>(async (_, message, ct) =>
             {
                 foreach (var buildingUnitPersistentLocalId in
                          message.Message.BuildingUnitPersistentLocalIds.Concat(message.Message.BuildingUnitPersistentLocalIdsWhichBecameDerived))
@@ -576,7 +594,7 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo
                 }
             });
 
-            When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingUnitWasMovedIntoBuilding>>(async (_, message, ct) =>
+            When<Envelope<BuildingUnitWasMovedIntoBuilding>>(async (_, message, ct) =>
             {
                 await FindAndProduce(async () =>
                     await snapshotManager.FindMatchingSnapshot(
@@ -589,6 +607,8 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo
                 message.Position,
                 ct);
             });
+
+            When<Envelope<BuildingUnitWasMovedOutOfBuilding>>(DoNothing);
         }
 
         private async Task FindAndProduce(Func<Task<OsloResult?>> findMatchingSnapshot, long storePosition, CancellationToken ct)
@@ -614,5 +634,7 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo
                 throw new InvalidOperationException(result.Error + Environment.NewLine + result.ErrorReason); //TODO: create custom exception
             }
         }
+
+        private static Task DoNothing<T>(ProducerContext context, Envelope<T> envelope, CancellationToken ct) where T: IMessage => Task.CompletedTask;
     }
 }

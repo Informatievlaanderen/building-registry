@@ -1,7 +1,9 @@
 namespace BuildingRegistry.Projections.Integration.BuildingUnit.LatestItem
 {
     using System.Linq;
+    using System.Threading;
     using System.Threading.Tasks;
+    using Be.Vlaanderen.Basisregisters.EventHandling;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.Connector;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore;
@@ -169,6 +171,18 @@ namespace BuildingRegistry.Projections.Integration.BuildingUnit.LatestItem
                         ct);
                 }
             });
+
+            When<Envelope<BuildingWasPlannedV2>>(DoNothing);
+            When<Envelope<BuildingBecameUnderConstructionV2>>(DoNothing);
+            When<Envelope<BuildingWasRealizedV2>>(DoNothing);
+            When<Envelope<BuildingWasNotRealizedV2>>(DoNothing);
+            When<Envelope<BuildingWasDemolished>>(DoNothing);
+            When<Envelope<BuildingWasCorrectedFromNotRealizedToPlanned>>(DoNothing);
+            When<Envelope<BuildingWasCorrectedFromRealizedToUnderConstruction>>(DoNothing);
+            When<Envelope<BuildingWasCorrectedFromUnderConstructionToPlanned>>(DoNothing);
+            When<Envelope<BuildingGeometryWasImportedFromGrb>>(DoNothing);
+            When<Envelope<BuildingWasRemovedV2>>(DoNothing);
+            When<Envelope<UnplannedBuildingWasRealizedAndMeasured>>(DoNothing);
 
             #endregion
 
@@ -684,9 +698,13 @@ namespace BuildingRegistry.Projections.Integration.BuildingUnit.LatestItem
                     },
                     ct);
             });
+
+            When<Envelope<BuildingUnitWasMovedOutOfBuilding>>(DoNothing);
         }
 
         private static void UpdateVersionTimestamp(BuildingUnitLatestItem building, IHasProvenance message)
             => building.VersionTimestamp = message.Provenance.Timestamp;
+
+        private static Task DoNothing<T>(IntegrationContext context, Envelope<T> envelope, CancellationToken ct) where T: IMessage => Task.CompletedTask;
     }
 }

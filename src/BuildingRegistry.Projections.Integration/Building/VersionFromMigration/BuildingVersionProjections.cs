@@ -2,6 +2,9 @@ namespace BuildingRegistry.Projections.Integration.Building.VersionFromMigration
 {
     using System.Collections.ObjectModel;
     using System.Linq;
+    using System.Threading;
+    using System.Threading.Tasks;
+    using Be.Vlaanderen.Basisregisters.EventHandling;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.Connector;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore;
     using Be.Vlaanderen.Basisregisters.Utilities.HexByteConvertor;
@@ -407,6 +410,10 @@ namespace BuildingRegistry.Projections.Integration.Building.VersionFromMigration
                     },
                     ct);
             });
+
+            When<Envelope<BuildingGeometryWasImportedFromGrb>>(DoNothing);
         }
+
+        private static Task DoNothing<T>(IntegrationContext context, Envelope<T> envelope, CancellationToken ct) where T: IMessage => Task.CompletedTask;
     }
 }

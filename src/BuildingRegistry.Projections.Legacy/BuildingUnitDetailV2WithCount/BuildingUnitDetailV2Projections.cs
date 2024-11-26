@@ -111,6 +111,18 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetailV2WithCount
                 }
             });
 
+            When<Envelope<BuildingWasPlannedV2>>(DoNothing);
+            When<Envelope<BuildingBecameUnderConstructionV2>>(DoNothing);
+            When<Envelope<BuildingWasRealizedV2>>(DoNothing);
+            When<Envelope<BuildingWasNotRealizedV2>>(DoNothing);
+            When<Envelope<BuildingWasDemolished>>(DoNothing);
+            When<Envelope<BuildingWasCorrectedFromNotRealizedToPlanned>>(DoNothing);
+            When<Envelope<BuildingWasCorrectedFromRealizedToUnderConstruction>>(DoNothing);
+            When<Envelope<BuildingWasCorrectedFromUnderConstructionToPlanned>>(DoNothing);
+            When<Envelope<BuildingGeometryWasImportedFromGrb>>(DoNothing);
+            When<Envelope<BuildingWasRemovedV2>>(DoNothing);
+            When<Envelope<UnplannedBuildingWasRealizedAndMeasured>>(DoNothing);
+
             #endregion
 
             When<Envelope<BuildingUnitWasPlannedV2>>(async (context, message, ct) =>
@@ -524,6 +536,8 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetailV2WithCount
                     UpdateHash(item, message);
                 }, ct);
             });
+
+            When<Envelope<BuildingUnitWasMovedOutOfBuilding>>(DoNothing);
         }
 
         private static void RemoveIdempotentAddress(BuildingUnitDetailItemV2 buildingUnit, int addressPersistentLocalId)
@@ -567,5 +581,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetailV2WithCount
 
             entity.LastEventHash = wrappedEvent.Metadata[AddEventHashPipe.HashMetadataKey].ToString()!;
         }
+
+        private static Task DoNothing<T>(LegacyContext context, Envelope<T> envelope, CancellationToken ct) where T: IMessage => Task.CompletedTask;
     }
 }

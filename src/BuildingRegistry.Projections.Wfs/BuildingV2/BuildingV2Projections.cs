@@ -1,6 +1,9 @@
 namespace BuildingRegistry.Projections.Wfs.BuildingV2
 {
     using System.Collections.Generic;
+    using System.Threading;
+    using System.Threading.Tasks;
+    using Be.Vlaanderen.Basisregisters.EventHandling;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy.Gebouw;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.Connector;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore;
@@ -208,6 +211,45 @@ namespace BuildingRegistry.Projections.Wfs.BuildingV2
                 var item = await context.BuildingsV2.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);
                 item.Version = message.Message.Provenance.Timestamp;
             });
+
+            When<Envelope<BuildingUnitWasRemovedV2>>(async (context, message, ct) =>
+            {
+                var item = await context.BuildingsV2.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);
+                item.Version = message.Message.Provenance.Timestamp;
+            });
+
+            When<Envelope<BuildingUnitRemovalWasCorrected>>(async (context, message, ct) =>
+            {
+                var item = await context.BuildingsV2.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);
+                item.Version = message.Message.Provenance.Timestamp;
+            });
+
+            When<Envelope<BuildingBuildingUnitsAddressesWereReaddressed>>(DoNothing);
+            When<Envelope<BuildingUnitWasRegularized>>(DoNothing);
+            When<Envelope<BuildingUnitRegularizationWasCorrected>>(DoNothing);
+            When<Envelope<BuildingUnitWasDeregulated>>(DoNothing);
+            When<Envelope<BuildingUnitDeregulationWasCorrected>>(DoNothing);
+            When<Envelope<BuildingUnitWasRetiredV2>>(DoNothing);
+            When<Envelope<BuildingUnitWasRetiredBecauseBuildingWasDemolished>>(DoNothing);
+            When<Envelope<BuildingUnitPositionWasCorrected>>(DoNothing);
+            When<Envelope<BuildingUnitWasCorrectedFromNotRealizedToPlanned>>(DoNothing);
+            When<Envelope<BuildingUnitWasCorrectedFromRealizedToPlannedBecauseBuildingWasCorrected>>(DoNothing);
+            When<Envelope<BuildingUnitWasCorrectedFromRealizedToPlanned>>(DoNothing);
+            When<Envelope<BuildingUnitWasCorrectedFromRetiredToRealized>>(DoNothing);
+            When<Envelope<BuildingUnitWasRealizedV2>>(DoNothing);
+            When<Envelope<BuildingUnitWasRealizedBecauseBuildingWasRealized>>(DoNothing);
+            When<Envelope<BuildingUnitWasNotRealizedV2>>(DoNothing);
+            When<Envelope<BuildingUnitWasNotRealizedBecauseBuildingWasNotRealized>>(DoNothing);
+            When<Envelope<BuildingUnitWasNotRealizedBecauseBuildingWasDemolished>>(DoNothing);
+            When<Envelope<BuildingUnitAddressWasAttachedV2>>(DoNothing);
+            When<Envelope<BuildingUnitAddressWasDetachedV2>>(DoNothing);
+            When<Envelope<BuildingUnitAddressWasDetachedBecauseAddressWasRejected>>(DoNothing);
+            When<Envelope<BuildingUnitAddressWasDetachedBecauseAddressWasRemoved>>(DoNothing);
+            When<Envelope<BuildingUnitAddressWasDetachedBecauseAddressWasRetired>>(DoNothing);
+            When<Envelope<BuildingGeometryWasImportedFromGrb>>(DoNothing);
+            When<Envelope<BuildingUnitAddressWasReplacedBecauseAddressWasReaddressed>>(DoNothing);
+            When<Envelope<BuildingUnitAddressWasReplacedBecauseOfMunicipalityMerger>>(DoNothing);
+            When<Envelope<BuildingUnitWasRemovedBecauseBuildingWasRemoved>>(DoNothing);
         }
 
         private void SetGeometry(BuildingV2 building, string extendedWkbGeometry, string method)
@@ -243,5 +285,7 @@ namespace BuildingRegistry.Projections.Wfs.BuildingV2
 
             return dictionary[buildingStatus];
         }
+
+        private static Task DoNothing<T>(WfsContext context, Envelope<T> envelope, CancellationToken ct) where T: IMessage => Task.CompletedTask;
     }
 }

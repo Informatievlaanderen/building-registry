@@ -2,6 +2,9 @@ namespace BuildingRegistry.Projections.Integration.Building.Version
 {
     using System.Collections.ObjectModel;
     using System.Linq;
+    using System.Threading;
+    using System.Threading.Tasks;
+    using Be.Vlaanderen.Basisregisters.EventHandling;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.Connector;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore;
     using Be.Vlaanderen.Basisregisters.Utilities.HexByteConvertor;
@@ -10,7 +13,7 @@ namespace BuildingRegistry.Projections.Integration.Building.Version
     using Converters;
     using Infrastructure;
     using Microsoft.Extensions.Options;
-    
+
     [ConnectedProjectionName("Integratie gebouw versie")]
     [ConnectedProjectionDescription("Projectie die de versie gebouw data voor de integratie database bijhoudt.")]
     public sealed partial class BuildingVersionProjections : ConnectedProjection<IntegrationContext>
@@ -411,6 +414,10 @@ namespace BuildingRegistry.Projections.Integration.Building.Version
                     },
                     ct);
             });
+
+            When<Envelope<BuildingGeometryWasImportedFromGrb>>(DoNothing);
         }
+
+        private static Task DoNothing<T>(IntegrationContext context, Envelope<T> envelope, CancellationToken ct) where T: IMessage => Task.CompletedTask;
     }
 }

@@ -1,6 +1,9 @@
 namespace BuildingRegistry.Projections.Wms.BuildingV2
 {
     using System.Collections.Generic;
+    using System.Threading;
+    using System.Threading.Tasks;
+    using Be.Vlaanderen.Basisregisters.EventHandling;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.Connector;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore;
     using Be.Vlaanderen.Basisregisters.Utilities.HexByteConvertor;
@@ -157,6 +160,10 @@ namespace BuildingRegistry.Projections.Wms.BuildingV2
                 context.BuildingsV2.Remove(item);
             });
 
+            When<Envelope<BuildingGeometryWasImportedFromGrb>>(DoNothing);
+
+            #region BuildingUnit
+
             When<Envelope<BuildingUnitWasPlannedV2>>(async (context, message, ct) =>
             {
                 var item = await context.BuildingsV2.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);
@@ -180,6 +187,47 @@ namespace BuildingRegistry.Projections.Wms.BuildingV2
                 var item = await context.BuildingsV2.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);
                 item.Version = message.Message.Provenance.Timestamp;
             });
+
+            When<Envelope<BuildingUnitWasRemovedV2>>(async (context, message, ct) =>
+            {
+                var item = await context.BuildingsV2.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);
+                item.Version = message.Message.Provenance.Timestamp;
+            });
+
+            When<Envelope<BuildingUnitRemovalWasCorrected>>(async (context, message, ct) =>
+            {
+                var item = await context.BuildingsV2.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);
+                item.Version = message.Message.Provenance.Timestamp;
+            });
+
+            When<Envelope<BuildingBuildingUnitsAddressesWereReaddressed>>(DoNothing);
+            When<Envelope<BuildingUnitWasRegularized>>(DoNothing);
+            When<Envelope<BuildingUnitRegularizationWasCorrected>>(DoNothing);
+            When<Envelope<BuildingUnitWasDeregulated>>(DoNothing);
+            When<Envelope<BuildingUnitDeregulationWasCorrected>>(DoNothing);
+            When<Envelope<BuildingUnitWasRetiredV2>>(DoNothing);
+            When<Envelope<BuildingUnitWasRetiredBecauseBuildingWasDemolished>>(DoNothing);
+            When<Envelope<BuildingUnitPositionWasCorrected>>(DoNothing);
+            When<Envelope<BuildingUnitWasCorrectedFromNotRealizedToPlanned>>(DoNothing);
+            When<Envelope<BuildingUnitWasCorrectedFromRealizedToPlannedBecauseBuildingWasCorrected>>(DoNothing);
+            When<Envelope<BuildingUnitWasCorrectedFromRealizedToPlanned>>(DoNothing);
+            When<Envelope<BuildingUnitWasCorrectedFromRetiredToRealized>>(DoNothing);
+            When<Envelope<BuildingUnitWasRealizedV2>>(DoNothing);
+            When<Envelope<BuildingUnitWasRealizedBecauseBuildingWasRealized>>(DoNothing);
+            When<Envelope<BuildingUnitWasNotRealizedV2>>(DoNothing);
+            When<Envelope<BuildingUnitWasNotRealizedBecauseBuildingWasNotRealized>>(DoNothing);
+            When<Envelope<BuildingUnitWasNotRealizedBecauseBuildingWasDemolished>>(DoNothing);
+            When<Envelope<BuildingUnitAddressWasAttachedV2>>(DoNothing);
+            When<Envelope<BuildingUnitAddressWasDetachedV2>>(DoNothing);
+            When<Envelope<BuildingUnitAddressWasDetachedBecauseAddressWasRejected>>(DoNothing);
+            When<Envelope<BuildingUnitAddressWasDetachedBecauseAddressWasRemoved>>(DoNothing);
+            When<Envelope<BuildingUnitAddressWasDetachedBecauseAddressWasRetired>>(DoNothing);
+            When<Envelope<BuildingGeometryWasImportedFromGrb>>(DoNothing);
+            When<Envelope<BuildingUnitAddressWasReplacedBecauseAddressWasReaddressed>>(DoNothing);
+            When<Envelope<BuildingUnitAddressWasReplacedBecauseOfMunicipalityMerger>>(DoNothing);
+            When<Envelope<BuildingUnitWasRemovedBecauseBuildingWasRemoved>>(DoNothing);
+
+            #endregion
         }
 
         public static string MapMethod(BuildingGeometryMethod method)
@@ -200,5 +248,7 @@ namespace BuildingRegistry.Projections.Wms.BuildingV2
             building.GeometryMethod = method;
             building.Geometry = geometry?.AsBinary();
         }
+
+        private static Task DoNothing<T>(WmsContext context, Envelope<T> envelope, CancellationToken ct) where T: IMessage => Task.CompletedTask;
     }
 }
