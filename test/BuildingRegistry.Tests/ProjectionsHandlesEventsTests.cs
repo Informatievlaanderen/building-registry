@@ -40,6 +40,7 @@ namespace BuildingRegistry.Tests
     using Projections.Wms;
     using Projections.Wms.BuildingUnitV2;
     using Projections.Wms.BuildingV2;
+    using Projections.Wms.BuildingV3;
     using Xunit;
 
     public sealed class ProjectionsHandlesEventsTests
@@ -151,12 +152,14 @@ namespace BuildingRegistry.Tests
             yield return [new List<ConnectedProjection<WmsContext>>
             {
                new BuildingV2Projections(new WKBReader()),
+               new BuildingV3Projections(new WKBReader()),
                new BuildingUnitV2Projections(new WKBReader())
             }];
 
             yield return [new List<ConnectedProjection<WfsContext>>
             {
                 new Projections.Wfs.BuildingV2.BuildingV2Projections(new WKBReader()),
+                new Projections.Wfs.BuildingV3.BuildingV3Projections(new WKBReader()),
                 new Projections.Wfs.BuildingUnitV2.BuildingUnitV2Projections(new WKBReader())
             }];
 

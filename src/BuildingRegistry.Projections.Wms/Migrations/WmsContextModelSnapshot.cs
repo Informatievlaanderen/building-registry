@@ -132,6 +132,43 @@ namespace BuildingRegistry.Projections.Wms.Migrations
 
                     b.ToTable("BuildingsV2", "wms");
                 });
+
+            modelBuilder.Entity("BuildingRegistry.Projections.Wms.BuildingV3.BuildingV3", b =>
+                {
+                    b.Property<int>("PersistentLocalId")
+                        .HasColumnType("int");
+
+                    b.Property<byte[]>("Geometry")
+                        .HasColumnType("varbinary(max)");
+
+                    b.Property<string>("GeometryMethod")
+                        .IsRequired()
+                        .HasMaxLength(12)
+                        .HasColumnType("varchar(12)");
+
+                    b.Property<string>("Id")
+                        .HasMaxLength(46)
+                        .HasColumnType("varchar(46)");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("VersionAsString")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTimeOffset>("VersionTimestampAsDateTimeOffset")
+                        .HasColumnType("datetimeoffset")
+                        .HasColumnName("Version");
+
+                    b.HasKey("PersistentLocalId");
+
+                    SqlServerKeyBuilderExtensions.IsClustered(b.HasKey("PersistentLocalId"));
+
+                    b.HasIndex("Status");
+
+                    b.ToTable("BuildingsV3", "wms");
+                });
 #pragma warning restore 612, 618
         }
     }
