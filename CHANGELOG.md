@@ -1,3 +1,16 @@
+# [4.20.0](https://github.com/informatievlaanderen/building-registry/compare/v4.19.1...v4.20.0) (2024-11-27)
+
+
+### Bug Fixes
+
+* add event-handlers + tests ([093c0ff](https://github.com/informatievlaanderen/building-registry/commit/093c0ff0fd8a0088b2ed5aaa9255ba6d247045b7))
+
+
+### Features
+
+* add buildingV3 for wms/wfs rebuild GAWR-6685 ([8f0cc9f](https://github.com/informatievlaanderen/building-registry/commit/8f0cc9f84a2f87d812e177f629d558ce91e46a9c))
+* remove V1 tables of wms/wfs GAWR-6684 ([ceb4ba5](https://github.com/informatievlaanderen/building-registry/commit/ceb4ba5ac01551c137c99502a12426163e91c65a))
+
 ## [4.19.1](https://github.com/informatievlaanderen/building-registry/compare/v4.19.0...v4.19.1) (2024-11-19)
 
 
