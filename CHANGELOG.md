@@ -1,3 +1,10 @@
+# [4.21.0](https://github.com/informatievlaanderen/building-registry/compare/v4.20.0...v4.21.0) (2024-11-29)
+
+
+### Features
+
+* add snapshot on request ([4ffb970](https://github.com/informatievlaanderen/building-registry/commit/4ffb97024f31add59cb85d74a6c292580c5afd42))
+
 # [4.20.0](https://github.com/informatievlaanderen/building-registry/compare/v4.19.1...v4.20.0) (2024-11-27)
 
 
