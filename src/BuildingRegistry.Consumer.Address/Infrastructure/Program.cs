@@ -2,7 +2,6 @@ namespace BuildingRegistry.Consumer.Address.Infrastructure
 {
     using System;
     using System.IO;
-    using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
     using Api.BackOffice.Abstractions;
@@ -13,6 +12,7 @@ namespace BuildingRegistry.Consumer.Address.Infrastructure
     using Be.Vlaanderen.Basisregisters.EventHandling;
     using Be.Vlaanderen.Basisregisters.MessageHandling.Kafka;
     using Be.Vlaanderen.Basisregisters.MessageHandling.Kafka.Consumer;
+    using Be.Vlaanderen.Basisregisters.MessageHandling.Kafka.Consumer.Extensions;
     using Building;
     using BuildingRegistry.Infrastructure;
     using BuildingRegistry.Infrastructure.Modules;
@@ -117,14 +117,7 @@ namespace BuildingRegistry.Consumer.Address.Infrastructure
                             hostContext.Configuration["Kafka:SaslPassword"]!));
 
                         using var ctx = c.Resolve<ConsumerAddressContext>();
-                        var offsetOverride = ctx.GetOffsetOverride(consumerGroupId);
-
-                        if (offsetOverride is not null)
-                        {
-                            consumerOptions.ConfigureOffset(new Offset(offsetOverride.Offset));
-                            offsetOverride.Configured = true;
-                            ctx.SaveChanges();
-                        }
+                        ctx.OverrideConfigureOffset(consumerOptions);
 
                         return consumerOptions;
                     });

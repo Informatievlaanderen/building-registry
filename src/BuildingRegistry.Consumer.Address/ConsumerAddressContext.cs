@@ -6,6 +6,7 @@ namespace BuildingRegistry.Consumer.Address
     using System.Linq;
     using System.Reflection;
     using System.Threading.Tasks;
+    using Be.Vlaanderen.Basisregisters.MessageHandling.Kafka.Consumer;
     using Be.Vlaanderen.Basisregisters.MessageHandling.Kafka.Consumer.SqlServer;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.Runner.SqlServer.MigrationExtensions;
     using Building;
@@ -15,7 +16,7 @@ namespace BuildingRegistry.Consumer.Address
     using Microsoft.EntityFrameworkCore.Design;
     using Microsoft.Extensions.Configuration;
 
-    public class ConsumerAddressContext : SqlServerConsumerDbContext<ConsumerAddressContext>, IAddresses
+    public class ConsumerAddressContext : SqlServerConsumerDbContext<ConsumerAddressContext>, IAddresses, IOffsetOverrideDbSet
     {
         public DbSet<AddressConsumerItem> AddressConsumerItems => Set<AddressConsumerItem>();
         public DbSet<OffsetOverride> OffsetOverrides => Set<OffsetOverride>();
@@ -101,6 +102,7 @@ namespace BuildingRegistry.Consumer.Address
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(ConsumerAddressContext).GetTypeInfo().Assembly);
+            modelBuilder.ApplyConfiguration(new OffsetOverrideConfiguration(Schema.ConsumerAddress));
         }
     }
 
