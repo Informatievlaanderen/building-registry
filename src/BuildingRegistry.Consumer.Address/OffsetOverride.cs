@@ -9,10 +9,6 @@ namespace BuildingRegistry.Consumer.Address
         public string ConsumerGroupId { get; set; }
         public long Offset { get; set; }
         public bool Configured { get; set; }
-
-        //Needed for EF
-        private OffsetOverride()
-        { }
     }
 
     public class OffsetOverrideConfiguration : IEntityTypeConfiguration<OffsetOverride>
