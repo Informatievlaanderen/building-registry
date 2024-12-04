@@ -1,3 +1,11 @@
+# [4.22.0](https://github.com/informatievlaanderen/building-registry/compare/v4.21.0...v4.22.0) (2024-12-04)
+
+
+### Features
+
+* configure consumer offset without deploy ([21b9669](https://github.com/informatievlaanderen/building-registry/commit/21b966946614b6fc19b902bbbecc52c13c083e36))
+* switch wms/wfs views V3 GAWR-6685 ([892c5c1](https://github.com/informatievlaanderen/building-registry/commit/892c5c179f2356149aede5c32472c4d1ddafb90a))
+
 # [4.21.0](https://github.com/informatievlaanderen/building-registry/compare/v4.20.0...v4.21.0) (2024-11-29)
 
 
