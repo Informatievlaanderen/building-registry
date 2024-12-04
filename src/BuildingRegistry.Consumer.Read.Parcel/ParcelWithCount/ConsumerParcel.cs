@@ -4,6 +4,7 @@ namespace BuildingRegistry.Consumer.Read.Parcel.ParcelWithCount
     using System.Threading;
     using System.Threading.Tasks;
     using Autofac;
+    using Be.Vlaanderen.Basisregisters.MessageHandling.Kafka;
     using Be.Vlaanderen.Basisregisters.MessageHandling.Kafka.Consumer;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.Connector;
     using Microsoft.EntityFrameworkCore;
@@ -42,15 +43,7 @@ namespace BuildingRegistry.Consumer.Read.Parcel.ParcelWithCount
             {
                 await _consumer.ConsumeContinuously(async (message, messageContext) =>
                 {
-                    _logger.LogInformation("Handling next message");
-
-                    await using var context = await _consumerParcelDbContextFactory.CreateDbContextAsync(stoppingToken);
-                    await projector.ProjectAsync(context, message, stoppingToken).ConfigureAwait(false);
-
-                    //CancellationToken.None to prevent halfway consumption
-                    await context.UpdateProjectionState(typeof(ConsumerParcel).FullName, messageContext.Offset, stoppingToken);
-                    await context.SaveChangesAsync(CancellationToken.None);
-
+                    await ConsumeHandler(projector, message, messageContext);
                 }, stoppingToken);
             }
             catch (Exception exception)
@@ -59,6 +52,20 @@ namespace BuildingRegistry.Consumer.Read.Parcel.ParcelWithCount
                 _hostApplicationLifetime.StopApplication();
                 throw;
             }
+        }
+
+        private async Task ConsumeHandler(
+            ConnectedProjector<ConsumerParcelContext> projector,
+            object message,
+            MessageContext messageContext)
+        {
+            _logger.LogInformation("Handling next message");
+
+            await using var context = await _consumerParcelDbContextFactory.CreateDbContextAsync(CancellationToken.None);
+            await projector.ProjectAsync(context, message, CancellationToken.None).ConfigureAwait(false);
+
+            await context.UpdateProjectionState(typeof(ConsumerParcel).FullName, messageContext.Offset, CancellationToken.None);
+            await context.SaveChangesAsync(CancellationToken.None);
         }
     }
 }
