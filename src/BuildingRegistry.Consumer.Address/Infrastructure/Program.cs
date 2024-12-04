@@ -101,7 +101,7 @@ namespace BuildingRegistry.Consumer.Address.Infrastructure
 
                     builder.Register(c =>
                     {
-                        var bootstrapServers = hostContext.Configuration["Kafka:BootstrapServers"];
+                        var bootstrapServers = hostContext.Configuration["Kafka:BootstrapServers"]!;
                         var topic = $"{hostContext.Configuration["AddressTopic"]}" ?? throw new ArgumentException("Configuration has no AddressTopic.");
                         var suffix = hostContext.Configuration["GroupSuffix"];
                         var consumerGroupId = $"BuildingRegistry.ConsumerAddress.{topic}{suffix}";
@@ -113,26 +113,17 @@ namespace BuildingRegistry.Consumer.Address.Infrastructure
                             EventsJsonSerializerSettingsProvider.CreateSerializerSettings());
 
                         consumerOptions.ConfigureSaslAuthentication(new SaslAuthentication(
-                            hostContext.Configuration["Kafka:SaslUserName"],
-                            hostContext.Configuration["Kafka:SaslPassword"]));
+                            hostContext.Configuration["Kafka:SaslUserName"]!,
+                            hostContext.Configuration["Kafka:SaslPassword"]!));
 
-                        var offsetStr = hostContext.Configuration["AddressTopicOffset"];
-                        if (!string.IsNullOrEmpty(offsetStr) && long.TryParse(offsetStr, out var offset))
+                        using var ctx = c.Resolve<ConsumerAddressContext>();
+                        var offsetOverride = ctx.GetOffsetOverride(consumerGroupId);
+
+                        if (offsetOverride is not null)
                         {
-                            var ignoreDataCheck = hostContext.Configuration.GetValue<bool>("IgnoreAddressTopicOffsetDataCheck", false);
-
-                            if (!ignoreDataCheck)
-                            {
-                                using var ctx = c.Resolve<ConsumerAddressContext>();
-
-                                if (ctx.AddressConsumerItems.Any())
-                                {
-                                    throw new InvalidOperationException(
-                                        $"Cannot set Kafka offset to {offset} because {nameof(ctx.AddressConsumerItems)} has data.");
-                                }
-                            }
-
-                            consumerOptions.ConfigureOffset(new Offset(offset));
+                            consumerOptions.ConfigureOffset(new Offset(offsetOverride.Offset));
+                            offsetOverride.Configured = true;
+                            ctx.SaveChanges();
                         }
 
                         return consumerOptions;
