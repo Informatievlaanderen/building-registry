@@ -17,7 +17,8 @@ namespace BuildingRegistry.Consumer.Address
 
     public class ConsumerAddressContext : SqlServerConsumerDbContext<ConsumerAddressContext>, IAddresses
     {
-        public DbSet<AddressConsumerItem> AddressConsumerItems { get; set; }
+        public DbSet<AddressConsumerItem> AddressConsumerItems => Set<AddressConsumerItem>();
+        public DbSet<OffsetOverride> OffsetOverrides => Set<OffsetOverride>();
 
         // This needs to be here to please EF
         public ConsumerAddressContext()
@@ -29,6 +30,12 @@ namespace BuildingRegistry.Consumer.Address
         { }
 
         public override string ProcessedMessagesSchema => Schema.ConsumerAddress;
+
+        public OffsetOverride? GetOffsetOverride(string consumerGroupId)
+        {
+            return OffsetOverrides
+                .SingleOrDefault(x => x.ConsumerGroupId == consumerGroupId && x.Configured == false);
+        }
 
         public AddressData? GetOptional(AddressPersistentLocalId addressPersistentLocalId)
         {
