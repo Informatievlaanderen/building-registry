@@ -43,10 +43,10 @@ namespace BuildingRegistry.Consumer.Address
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            var addressKafkaProjection =
+            var addressProjection =
                 new ConnectedProjector<ConsumerAddressContext>(
                     Resolve.WhenEqualToHandlerMessageType(new AddressKafkaProjection().Handlers));
-            
+
             var commandHandlingProjector = new ConnectedProjector<CommandHandler>(
                 Resolve.WhenEqualToHandlerMessageType(
                     new CommandHandlingKafkaProjection(_backOfficeContextFactory, _buildings).Handlers));
@@ -55,16 +55,14 @@ namespace BuildingRegistry.Consumer.Address
 
             try
             {
-                await _kafkaIdemIdempotencyConsumer.ConsumeContinuously(async (message, context) =>
+                await _kafkaIdemIdempotencyConsumer.ConsumeContinuously(async (message, consumerContext) =>
                 {
-                    _logger.LogInformation("Handling next message");
-
-                    await commandHandlingProjector.ProjectAsync(commandHandler, message, stoppingToken).ConfigureAwait(false);
-                    await addressKafkaProjection.ProjectAsync(context, message, stoppingToken).ConfigureAwait(false);
-
-                    //CancellationToken.None to prevent halfway consumption
-                    await context.SaveChangesAsync(CancellationToken.None);
-
+                    await ConsumeHandler(
+                        commandHandlingProjector,
+                        addressProjection,
+                        commandHandler,
+                        message,
+                        consumerContext);
                 }, stoppingToken);
             }
             catch (Exception)
@@ -72,6 +70,21 @@ namespace BuildingRegistry.Consumer.Address
                 _hostApplicationLifetime.StopApplication();
                 throw;
             }
+        }
+
+        private async Task ConsumeHandler(
+            ConnectedProjector<CommandHandler> commandHandlingProjector,
+            ConnectedProjector<ConsumerAddressContext> addressKafkaProjection,
+            CommandHandler commandHandler,
+            object message,
+            ConsumerAddressContext context)
+        {
+            _logger.LogInformation("Handling next message");
+
+            await commandHandlingProjector.ProjectAsync(commandHandler, message, CancellationToken.None).ConfigureAwait(false);
+            await addressKafkaProjection.ProjectAsync(context, message, CancellationToken.None).ConfigureAwait(false);
+
+            await context.SaveChangesAsync(CancellationToken.None);
         }
     }
 }
