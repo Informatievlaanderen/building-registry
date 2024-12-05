@@ -1,3 +1,10 @@
+## [4.22.1](https://github.com/informatievlaanderen/building-registry/compare/v4.22.0...v4.22.1) (2024-12-05)
+
+
+### Bug Fixes
+
+* don't use CancellationToken for kafka message handler ([f6aa187](https://github.com/informatievlaanderen/building-registry/commit/f6aa1874dc6784da24f7c51bcd03a37791617295))
+
 # [4.22.0](https://github.com/informatievlaanderen/building-registry/compare/v4.21.0...v4.22.0) (2024-12-04)
 
 
