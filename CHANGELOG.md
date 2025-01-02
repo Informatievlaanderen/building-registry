@@ -1,3 +1,10 @@
+# [4.23.0](https://github.com/informatievlaanderen/building-registry/compare/v4.22.1...v4.23.0) (2025-01-02)
+
+
+### Features
+
+* add cache introspection ([a1e92c2](https://github.com/informatievlaanderen/building-registry/commit/a1e92c240426781cb51e861036bfff04efbfedc4))
+
 ## [4.22.1](https://github.com/informatievlaanderen/building-registry/compare/v4.22.0...v4.22.1) (2024-12-05)
 
 
