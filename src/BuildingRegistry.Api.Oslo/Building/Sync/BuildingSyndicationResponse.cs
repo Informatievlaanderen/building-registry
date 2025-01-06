@@ -360,6 +360,178 @@ namespace BuildingRegistry.Api.Oslo.Building.Sync
   </Object></Content>]]>
 </content>
 </entry>
+<entry>
+  <id>254204954</id>
+  <title>BuildingWasMigrated-254204954</title>
+  <updated>2023-11-02T07:24:43+01:00</updated>
+  <published>2023-11-02T07:24:43+01:00</published>
+  <link href=""https://data.vlaanderen.be/id/gebouw/6355606"" rel=""related"" />
+  <author>
+    <name>Digitaal Vlaanderen</name>
+  </author>
+  <category term=""gebouwen"" />
+  <category term=""gebouweenheden"" />
+  <content><![CDATA[<Content xmlns:i=""http://www.w3.org/2001/XMLSchema-instance"">
+    <Event>
+      <BuildingWasMigrated>
+        <BuildingId>f974f3ba-abac-5162-8ed9-6a1154dc0c08</BuildingId>
+        <BuildingPersistentLocalId>6355606</BuildingPersistentLocalId>
+        <BuildingPersistentLocalIdAssignmentDate>2017-09-30T12:09:07Z</BuildingPersistentLocalIdAssignmentDate>
+        <BuildingStatus>Realized</BuildingStatus>
+        <GeometryMethod>MeasuredByGrb</GeometryMethod>
+        <ExtendedWkbGeometry>01030000208A7A0000010000000900000000A0C7B467A0014180F1AA0069A00841003E7A4F56A0014100AA59997AA008410095297239A001418086D5515FA00841007E53E441A001410086F40D56A0084100E3E57545A0014100C8A52352A00841001DC97148A0014180BE92DD4EA0084100E9863285A00141801E3A360CA008410038C745A6A001410011988029A0084100A0C7B467A0014180F1AA0069A00841</ExtendedWkbGeometry>
+        <IsRemoved>false</IsRemoved>
+        <BuildingUnits>
+          <BuildingUnits_0>
+            <BuildingUnitId>d0ec85d4-d4ba-50e3-80f0-35f5fd44383f</BuildingUnitId>
+            <BuildingUnitPersistentLocalId>6356866</BuildingUnitPersistentLocalId>
+            <Function>Unknown</Function>
+            <Status>Realized</Status>
+            <AddressPersistentLocalIds>
+              <AddressPersistentLocalIds_0>2434522</AddressPersistentLocalIds_0>
+            </AddressPersistentLocalIds>
+            <GeometryMethod>AppointedByAdministrator</GeometryMethod>
+            <ExtendedWkbGeometry>01010000208A7A00005C8FC2F588A001417B14AE471FA00841</ExtendedWkbGeometry>
+            <IsRemoved>false</IsRemoved>
+          </BuildingUnits_0>
+        </BuildingUnits>
+        <Provenance>
+          <Timestamp>2023-11-02T06:24:43Z</Timestamp>
+          <Organisation>DigitaalVlaanderen</Organisation>
+          <Reason>Migrate Building aggregate.</Reason>
+        </Provenance>
+      </BuildingWasMigrated>
+    </Event>
+    <Object>
+      <Id>6355606</Id>
+      <Identificator>
+        <Id>https://data.vlaanderen.be/id/gebouw/6355606</Id>
+        <Naamruimte>https://data.vlaanderen.be/id/gebouw</Naamruimte>
+        <ObjectId>6355606</ObjectId>
+        <VersieId>2023-11-02T07:24:43+01:00</VersieId>
+      </Identificator>
+      <GebouwStatus>Gerealiseerd</GebouwStatus>
+      <GeometrieMethode>IngemetenGRB</GeometrieMethode>
+      <GeometriePolygoon>
+        <polygon>
+          <exterior>
+            <LinearRing>
+              <posList>144396.96327137947 201741.12532604858 144394.78880737722 201743.32487805188 144391.18074337393 201739.91495804861 144392.23648737371 201738.75681404769 144392.68256738037 201738.26740604639 144393.05555937439 201737.85819004849 144400.64967138320 201729.52647804096 144404.78407138586 201733.18779004365 144396.96327137947 201741.12532604858</posList>
+            </LinearRing>
+          </exterior>
+        </polygon>
+      </GeometriePolygoon>
+      <Gebouweenheden>
+        <Gebouweenheid>
+          <Id>6356866</Id>
+          <Identificator>
+            <Id>https://data.vlaanderen.be/id/gebouweenheid/6356866</Id>
+            <Naamruimte>https://data.vlaanderen.be/id/gebouweenheid</Naamruimte>
+            <ObjectId>6356866</ObjectId>
+            <VersieId>2023-11-02T07:24:43+01:00</VersieId>
+          </Identificator>
+          <GebouweenheidStatus>Gerealiseerd</GebouweenheidStatus>
+          <PositieGeometrieMethode>AangeduidDoorBeheerder</PositieGeometrieMethode>
+          <GeometriePunt>
+            <point>
+              <pos>144401.12 201731.91</pos>
+            </point>
+          </GeometriePunt>
+          <Functie>NietGekend</Functie>
+          <AdressenIds xmlns:d5p1=""http://schemas.microsoft.com/2003/10/Serialization/Arrays"">
+            <d5p1:string>2434522</d5p1:string>
+          </AdressenIds>
+          <AfwijkingVastgesteld>false</AfwijkingVastgesteld>
+          <IsCompleet>true</IsCompleet>
+        </Gebouweenheid>
+      </Gebouweenheden>
+      <IsCompleet>true</IsCompleet>
+      <Creatie>
+        <Tijdstip>2023-11-02T07:24:43+01:00</Tijdstip>
+        <Organisatie>Digitaal Vlaanderen</Organisatie>
+        <Reden>Migrate Building aggregate.</Reden>
+      </Creatie>
+    </Object>
+  </Content>]]></content>
+</entry>
+<entry>
+  <id>267204947</id>
+  <title>BuildingUnitWasPlannedV2-267204947</title>
+  <updated>2024-11-14T15:22:57+01:00</updated>
+  <published>2023-11-04T02:05:53+01:00</published>
+  <link href=""https://data.vlaanderen.be/id/gebouw/31255209"" rel=""related"" />
+  <author>
+    <name>Andere</name>
+  </author>
+  <category term=""gebouwen"" />
+  <category term=""gebouweenheden"" />
+  <content><![CDATA[<Content xmlns:i=""http://www.w3.org/2001/XMLSchema-instance"">
+    <Event>
+      <BuildingUnitWasPlannedV2>
+        <BuildingPersistentLocalId>31255209</BuildingPersistentLocalId>
+        <BuildingUnitPersistentLocalId>31710876</BuildingUnitPersistentLocalId>
+        <GeometryMethod>DerivedFromObject</GeometryMethod>
+        <ExtendedWkbGeometry>01010000208A7A000022DDEACFBB97FE40BF69B43057150641</ExtendedWkbGeometry>
+        <Function>Unknown</Function>
+        <HasDeviation>false</HasDeviation>
+        <Provenance>
+          <Timestamp>2024-11-14T14:22:57Z</Timestamp>
+          <Organisation>Other</Organisation>
+          <Reason>
+          </Reason>
+        </Provenance>
+      </BuildingUnitWasPlannedV2>
+    </Event>
+    <Object>
+      <Id>31255209</Id>
+      <Identificator>
+        <Id>https://data.vlaanderen.be/id/gebouw/31255209</Id>
+        <Naamruimte>https://data.vlaanderen.be/id/gebouw</Naamruimte>
+        <ObjectId>31255209</ObjectId>
+        <VersieId>2024-11-14T15:22:57+01:00</VersieId>
+      </Identificator>
+      <GebouwStatus>Gerealiseerd</GebouwStatus>
+      <GeometrieMethode>IngemetenGRB</GeometrieMethode>
+      <GeometriePolygoon>
+        <polygon>
+          <exterior>
+            <LinearRing>
+              <posList>125301.87781818211 180907.61657565087 125304.34297018498 180902.05222364515 125313.58802618831 180906.14803164825 125311.15698618442 180911.68403165415 125311.12178618461 180911.76390365139 125301.87781818211 180907.61657565087</posList>
+            </LinearRing>
+          </exterior>
+        </polygon>
+      </GeometriePolygoon>
+      <Gebouweenheden>
+        <Gebouweenheid>
+          <Id>31710876</Id>
+          <Identificator>
+            <Id>https://data.vlaanderen.be/id/gebouweenheid/31710876</Id>
+            <Naamruimte>https://data.vlaanderen.be/id/gebouweenheid</Naamruimte>
+            <ObjectId>31710876</ObjectId>
+            <VersieId>2024-11-14T15:22:57+01:00</VersieId>
+          </Identificator>
+          <GebouweenheidStatus>Gepland</GebouweenheidStatus>
+          <PositieGeometrieMethode>AfgeleidVanObject</PositieGeometrieMethode>
+          <GeometriePunt>
+            <point>
+              <pos>125307.74 180906.90</pos>
+            </point>
+          </GeometriePunt>
+          <Functie>NietGekend</Functie>
+          <AdressenIds xmlns:d5p1=""http://schemas.microsoft.com/2003/10/Serialization/Arrays"" />
+          <AfwijkingVastgesteld>false</AfwijkingVastgesteld>
+          <IsCompleet>true</IsCompleet>
+        </Gebouweenheid>
+      </Gebouweenheden>
+      <IsCompleet>true</IsCompleet>
+      <Creatie>
+        <Tijdstip>2024-11-14T15:22:57+01:00</Tijdstip>
+        <Organisatie>Andere</Organisatie>
+        <Reden />
+      </Creatie>
+    </Object>
+  </Content>]]></content>
+</entry>
 </feed>";
 
         public XmlElement GetExamples()
