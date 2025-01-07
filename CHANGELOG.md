@@ -1,3 +1,10 @@
+# [4.24.0](https://github.com/informatievlaanderen/building-registry/compare/v4.23.0...v4.24.0) (2025-01-07)
+
+
+### Features
+
+* **api:** add docs to feed GAWR-5321 ([4e48ab5](https://github.com/informatievlaanderen/building-registry/commit/4e48ab5c51b0296a2fd2992af6be55e8f59a9214))
+
 # [4.23.0](https://github.com/informatievlaanderen/building-registry/compare/v4.22.1...v4.23.0) (2025-01-02)
 
 
