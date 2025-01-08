@@ -22,13 +22,13 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo.Infrastructure.Modules
     using Microsoft.Extensions.Logging;
     using NodaTime;
 
-    public class ApiModule : Module
+    public class ProducerModule : Module
     {
         private readonly IConfiguration _configuration;
         private readonly IServiceCollection _services;
         private readonly ILoggerFactory _loggerFactory;
 
-        public ApiModule(
+        public ProducerModule(
             IConfiguration configuration,
             IServiceCollection services,
             ILoggerFactory loggerFactory)
