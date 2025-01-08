@@ -1,181 +1,154 @@
-namespace BuildingRegistry.Producer.Snapshot.Oslo.Infrastructure
+﻿namespace BuildingRegistry.Producer.Snapshot.Oslo.Infrastructure
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
-    using System.Reflection;
-    using Asp.Versioning.ApiExplorer;
-    using Autofac;
-    using Autofac.Extensions.DependencyInjection;
-    using Be.Vlaanderen.Basisregisters.Api;
-    using Be.Vlaanderen.Basisregisters.Projector;
-    using BuildingRegistry.Infrastructure.Modules;
-    using Configuration;
+    using System.Net.Mime;
+    using System.Threading;
+    using System.Threading.Tasks;
+    using Be.Vlaanderen.Basisregisters.AspNetCore.Mvc.Formatters.Json;
+    using Be.Vlaanderen.Basisregisters.Projector.ConnectedProjections;
+    using Be.Vlaanderen.Basisregisters.Projector.Controllers;
     using Microsoft.AspNetCore.Builder;
-    using Microsoft.AspNetCore.Hosting;
+    using Microsoft.AspNetCore.Http;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
-    using Microsoft.Extensions.Diagnostics.HealthChecks;
-    using Microsoft.Extensions.Hosting;
-    using Microsoft.Extensions.Logging;
-    using Microsoft.OpenApi.Models;
-    using Modules;
+    using Newtonsoft.Json;
+    using SqlStreamStore;
 
-    /// <summary>Represents the startup process for the application.</summary>
-    public class Startup
+    /// <summary>
+    /// Extract to Library when working correctly
+    /// </summary>
+    public static class ApplicationBuilderProjectorExtensions
     {
-        private const string DatabaseTag = "db";
-
-        private IContainer _applicationContainer;
-
-        private readonly IConfiguration _configuration;
-        private readonly ILoggerFactory _loggerFactory;
-
-        public Startup(
-            IConfiguration configuration,
-            ILoggerFactory loggerFactory)
+        public static IApplicationBuilder UseProjectorEndpoints(
+            this IApplicationBuilder builder,
+            string baseUrl,
+            JsonSerializerSettings? jsonSerializerSettings)
         {
-            _configuration = configuration;
-            _loggerFactory = loggerFactory;
+            ArgumentNullException.ThrowIfNull(baseUrl);
+
+            builder.UseEndpoints(endpoints =>
+            {
+                endpoints.MapGet("/v1/projections", async context => { await GetProjections(builder, context, baseUrl, jsonSerializerSettings); });
+                endpoints.MapGet("/projections", async context => { await GetProjections(builder, context, baseUrl, jsonSerializerSettings); });
+
+                endpoints.MapPost("/projections/start/all", async context => { await StartAll(builder, context); });
+                endpoints.MapPost("/v1/projections/start/all", async context => { await StartAll(builder, context); });
+
+                endpoints.MapPost("/projections/start/{projectionId}", async context
+                    => await StartProjection(builder, context.Request.RouteValues["projectionId"].ToString(), context));
+                endpoints.MapPost("/v1/projections/start/{projectionId}", async context
+                    => await StartProjection(builder, context.Request.RouteValues["projectionId"].ToString(), context));
+
+                endpoints.MapPost("/projections/stop/all", async context => { await StopAll(builder, context); });
+                endpoints.MapPost("/v1/projections/stop/all", async context => { await StopAll(builder, context); });
+
+                endpoints.MapPost("/projections/stop/{projectionId}", async context
+                    => await StopProjection(builder, context.Request.RouteValues["projectionId"].ToString(), context));
+                endpoints.MapPost("/v1/projections/stop/{projectionId}", async context
+                    => await StopProjection(builder, context.Request.RouteValues["projectionId"].ToString(), context));
+            });
+
+            return builder;
         }
 
-        /// <summary>Configures services for the application.</summary>
-        /// <param name="services">The collection of services to configure the application with.</param>
-        public IServiceProvider ConfigureServices(IServiceCollection services)
+        private static async Task StopProjection(IApplicationBuilder app, string? projectionId, HttpContext context)
         {
-            var baseUrl = _configuration.GetValue<string>("BaseUrl");
-            var baseUrlForExceptions = baseUrl.EndsWith("/")
-                ? baseUrl.Substring(0, baseUrl.Length - 1)
-                : baseUrl;
+            var manager = app.ApplicationServices.GetRequiredService<IConnectedProjectionsManager>();
+            if (!manager.Exists(projectionId))
+            {
+                context.Response.StatusCode = StatusCodes.Status400BadRequest;
+                await context.Response.WriteAsync("Invalid projection Id.");
+                return;
+            }
 
-            services
-                .ConfigureDefaultForApi<Startup>(
-                    new StartupConfigureOptions
-                    {
-                        Cors =
-                        {
-                            Origins = _configuration
-                                .GetSection("Cors")
-                                .GetChildren()
-                                .Select(c => c.Value)
-                                .ToArray()!
-                        },
-                        Server =
-                        {
-                            BaseUrl = baseUrlForExceptions
-                        },
-                        Swagger =
-                        {
-                            ApiInfo = (provider, description) => new OpenApiInfo
-                            {
-                                Version = description.ApiVersion.ToString(),
-                                Title = "Basisregisters Vlaanderen Building Registry API",
-                                Description = GetApiLeadingText(description),
-                                Contact = new OpenApiContact
-                                {
-                                    Name = "Digitaal Vlaanderen",
-                                    Email = "digitaal.vlaanderen@vlaanderen.be",
-                                    Url = new Uri("https://legacy.basisregisters.vlaanderen")
-                                }
-                            },
-                            XmlCommentPaths = [typeof(Startup).GetTypeInfo().Assembly.GetName().Name!]
-                        },
-                        MiddlewareHooks =
-                        {
-                            FluentValidation = fv => fv.RegisterValidatorsFromAssemblyContaining<Startup>(),
-
-                            AfterHealthChecks = health =>
-                            {
-                                var connectionStrings = _configuration
-                                    .GetSection("ConnectionStrings")
-                                    .GetChildren()
-                                    .ToArray();
-
-                                foreach (var connectionString in connectionStrings
-                                             .Where(x => !x.Value!.Contains("host", StringComparison.OrdinalIgnoreCase)))
-                                {
-                                    health.AddSqlServer(
-                                        connectionString.Value!,
-                                        name: $"sqlserver-{connectionString.Key.ToLowerInvariant()}",
-                                        tags: [ DatabaseTag, "sql", "sqlserver" ]);
-                                }
-
-                                foreach (var connectionString in connectionStrings
-                                             .Where(x => x.Value!.Contains("host", StringComparison.OrdinalIgnoreCase)))
-                                {
-                                    health.AddNpgSql(
-                                        connectionString.Value!,
-                                        name: $"npgsql-{connectionString.Key.ToLowerInvariant()}",
-                                        tags: [ DatabaseTag, "sql", "npgsql" ]);
-                                }
-
-                                health.AddDbContextCheck<ProducerContext>(
-                                    $"dbcontext-{nameof(ProducerContext).ToLowerInvariant()}",
-                                    tags: new[] {DatabaseTag, "sql", "sqlserver"});
-                            }
-                        }
-                    });
-
-            var containerBuilder = new ContainerBuilder();
-            containerBuilder.RegisterModule(new LoggingModule(_configuration, services));
-            containerBuilder.RegisterModule(new ApiModule(_configuration, services, _loggerFactory));
-            _applicationContainer = containerBuilder.Build();
-
-            return new AutofacServiceProvider(_applicationContainer);
+            await manager.Stop(projectionId, CancellationToken.None);
+            context.Response.StatusCode = StatusCodes.Status202Accepted;
         }
 
-        public void Configure(
-            IServiceProvider serviceProvider,
+        private static async Task StopAll(IApplicationBuilder app, HttpContext context)
+        {
+            var manager = app.ApplicationServices.GetRequiredService<IConnectedProjectionsManager>();
+            await manager.Stop(CancellationToken.None);
+
+            context.Response.StatusCode = StatusCodes.Status202Accepted;
+        }
+
+        private static async Task StartProjection(IApplicationBuilder app, string? projectionId, HttpContext context)
+        {
+            var manager = app.ApplicationServices.GetRequiredService<IConnectedProjectionsManager>();
+
+            if (!manager.Exists(projectionId))
+            {
+                context.Response.StatusCode = StatusCodes.Status400BadRequest;
+                await context.Response.WriteAsync("Invalid projection Id.");
+                return;
+            }
+
+            await manager.Start(projectionId, CancellationToken.None);
+            context.Response.StatusCode = StatusCodes.Status202Accepted;
+        }
+
+        private static async Task StartAll(IApplicationBuilder app, HttpContext context)
+        {
+            var manager = app.ApplicationServices.GetRequiredService<IConnectedProjectionsManager>();
+            await manager.Start(CancellationToken.None);
+
+            context.Response.StatusCode = StatusCodes.Status202Accepted;
+        }
+
+        private static async Task GetProjections(
             IApplicationBuilder app,
-            IWebHostEnvironment env,
-            IHostApplicationLifetime appLifetime,
-            ILoggerFactory loggerFactory,
-            IApiVersionDescriptionProvider apiVersionProvider,
-            HealthCheckService healthCheckService)
+            HttpContext context,
+            string baseUrl,
+            JsonSerializerSettings? jsonSerializerSettings = null)
         {
-            StartupHelpers.CheckDatabases(healthCheckService, DatabaseTag, loggerFactory).GetAwaiter().GetResult();
+            var manager = app.ApplicationServices.GetRequiredService<IConnectedProjectionsManager>();
+            var streamStore = app.ApplicationServices.GetRequiredService<IStreamStore>();
 
-            app
-                .UseDefaultForApi(new StartupUseOptions
+            var registeredConnectedProjections = manager
+                .GetRegisteredProjections()
+                .ToList();
+            var projectionStates = await manager.GetProjectionStates(CancellationToken.None);
+            var responses = registeredConnectedProjections.Aggregate(
+                new List<ProjectionResponse>(),
+                (list, projection) =>
                 {
-                    Common =
-                    {
-                        ApplicationContainer = _applicationContainer,
-                        ServiceProvider = serviceProvider,
-                        HostingEnvironment = env,
-                        ApplicationLifetime = appLifetime,
-                        LoggerFactory = loggerFactory
-                    },
-                    Api =
-                    {
-                        VersionProvider = apiVersionProvider,
-                        Info = groupName => $"Basisregisters Vlaanderen - Building Registry API {groupName}",
-                        CSharpClientOptions =
-                        {
-                            ClassName = "BuildingRegistryProducer",
-                            Namespace = "Be.Vlaanderen.Basisregisters"
-                        },
-                        TypeScriptClientOptions =
-                        {
-                            ClassName = "BuildingRegistryProducer"
-                        }
-                    },
-                    MiddlewareHooks =
-                    {
-                        AfterMiddleware = x => x.UseMiddleware<AddNoCacheHeadersMiddleware>()
-                    }
-                })
-
-                .UseProjectionsManager(new ProjectionsManagerOptions
-                {
-                    Common =
-                    {
-                        ServiceProvider = serviceProvider,
-                        ApplicationLifetime = appLifetime
-                    }
+                    var projectionState = projectionStates.SingleOrDefault(x => x.Name == projection.Id);
+                    list.Add(new ProjectionResponse(
+                        projection,
+                        projectionState,
+                        baseUrl));
+                    return list;
                 });
-        }
 
-        private static string GetApiLeadingText(ApiVersionDescription description)
-            => $"Momenteel leest u de documentatie voor versie {description.ApiVersion} van de Basisregisters Vlaanderen Building Registry Producer Snapshot Oslo API{string.Format(description.IsDeprecated ? ", **deze API versie is niet meer ondersteund * *." : ".")}";
+            var streamPosition = await streamStore.ReadHeadPosition();
+
+            var projectionResponseList = new ProjectionResponseList(responses, baseUrl)
+            {
+                StreamPosition = streamPosition
+            };
+
+            var json = JsonConvert.SerializeObject(projectionResponseList, jsonSerializerSettings ?? new JsonSerializerSettings());
+
+            context.Response.Headers.ContentType = MediaTypeNames.Application.Json;
+            await context.Response.WriteAsync(json);
+        }
+    }
+
+    public sealed class Startup
+    {
+        public void Configure(IApplicationBuilder app)
+        {
+            app.UseRouting();
+            app.UseCors();
+
+            app.UseHealthChecks("/health");
+
+            var configuration = app.ApplicationServices.GetRequiredService<IConfiguration>();
+            var baseUri = configuration.GetValue<string>("BaseUrl").TrimEnd('/');
+            app.UseProjectorEndpoints(baseUri, new JsonSerializerSettings().ConfigureDefaultForApi());
+        }
     }
 }
