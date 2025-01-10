@@ -65,7 +65,7 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo.Infrastructure.Modules
                 .RegisterModule(new ProjectorModule(_configuration));
 
             RegisterProjections(builder);
-            RegisterReproducers();
+            //RegisterReproducers();
         }
 
         private void RegisterProjections(ContainerBuilder builder)
