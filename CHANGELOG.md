@@ -1,3 +1,10 @@
+## [4.24.2](https://github.com/informatievlaanderen/building-registry/compare/v4.24.1...v4.24.2) (2025-01-10)
+
+
+### Bug Fixes
+
+* **snapshot:** disable reproducers ([09edc32](https://github.com/informatievlaanderen/building-registry/commit/09edc321f9cb2dda8bc89d003f94f678a74d66fb))
+
 ## [4.24.1](https://github.com/informatievlaanderen/building-registry/compare/v4.24.0...v4.24.1) (2025-01-10)
 
 # [4.24.0](https://github.com/informatievlaanderen/building-registry/compare/v4.23.0...v4.24.0) (2025-01-07)
