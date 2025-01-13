@@ -1,3 +1,10 @@
+## [4.24.5](https://github.com/informatievlaanderen/building-registry/compare/v4.24.4...v4.24.5) (2025-01-13)
+
+
+### Bug Fixes
+
+* **snapshot:** reenable reproducers ([6511334](https://github.com/informatievlaanderen/building-registry/commit/6511334c7f5f603e977aea66f4b801b6644f9a14))
+
 ## [4.24.4](https://github.com/informatievlaanderen/building-registry/compare/v4.24.3...v4.24.4) (2025-01-13)
 
 ## [4.24.3](https://github.com/informatievlaanderen/building-registry/compare/v4.24.2...v4.24.3) (2025-01-13)
