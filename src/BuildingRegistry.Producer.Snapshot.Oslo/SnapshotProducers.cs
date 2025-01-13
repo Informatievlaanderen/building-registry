@@ -27,6 +27,7 @@
         {
             try
             {
+                _logger.LogInformation("Starting snapshot projections");
                 await _projectionsManager.Start(stoppingToken);
             }
             catch (Exception exception)
