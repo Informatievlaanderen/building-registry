@@ -1,3 +1,10 @@
+## [4.24.3](https://github.com/informatievlaanderen/building-registry/compare/v4.24.2...v4.24.3) (2025-01-13)
+
+
+### Bug Fixes
+
+* **snapshot:** cleanup csproj ([71b8f0c](https://github.com/informatievlaanderen/building-registry/commit/71b8f0c1d4397634bee6c957e24325dcf9f5da58))
+
 ## [4.24.2](https://github.com/informatievlaanderen/building-registry/compare/v4.24.1...v4.24.2) (2025-01-10)
 
 
