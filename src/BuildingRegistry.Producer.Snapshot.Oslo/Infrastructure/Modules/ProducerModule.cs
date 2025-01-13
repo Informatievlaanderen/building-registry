@@ -88,7 +88,7 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo.Infrastructure.Modules
                 nameof(ProducerContext), Schema.ProducerSnapshotOslo, MigrationTables.ProducerSnapshotOslo);
 
             RegisterProjections(builder);
-            //RegisterReproducers();
+            RegisterReproducers();
         }
 
         private void RegisterProjections(ContainerBuilder builder)
