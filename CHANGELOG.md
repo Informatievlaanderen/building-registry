@@ -1,3 +1,5 @@
+## [4.24.6](https://github.com/informatievlaanderen/building-registry/compare/v4.24.5...v4.24.6) (2025-01-20)
+
 ## [4.24.5](https://github.com/informatievlaanderen/building-registry/compare/v4.24.4...v4.24.5) (2025-01-13)
 
 
