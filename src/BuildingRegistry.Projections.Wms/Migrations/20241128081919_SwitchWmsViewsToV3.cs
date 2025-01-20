@@ -90,7 +90,7 @@ namespace BuildingRegistry.Projections.Wms.Migrations
                     [GeometryMethod] AS [GeometrieMethode],
                     [Status],
                     [Version] AS RawVersion
-                FROM [wms].[{BuildingV2.BuildingConfiguration.TableName}]
+                FROM [wms].[BuildingsV2]
                 WHERE ([CalculatedGeometry] IS NOT NULL)
                 GO");
 

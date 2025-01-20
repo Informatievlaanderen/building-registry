@@ -39,9 +39,9 @@ namespace BuildingRegistry.Tests
     using Projections.Wfs;
     using Projections.Wms;
     using Projections.Wms.BuildingUnitV2;
-    using Projections.Wms.BuildingV2;
     using Projections.Wms.BuildingV3;
     using Xunit;
+    using ProducerContext = Producer.Snapshot.Oslo.ProducerContext;
 
     public sealed class ProjectionsHandlesEventsTests
     {
@@ -151,14 +151,12 @@ namespace BuildingRegistry.Tests
 
             yield return [new List<ConnectedProjection<WmsContext>>
             {
-               new BuildingV2Projections(new WKBReader()),
                new BuildingV3Projections(new WKBReader()),
                new BuildingUnitV2Projections(new WKBReader())
             }];
 
             yield return [new List<ConnectedProjection<WfsContext>>
             {
-                new Projections.Wfs.BuildingV2.BuildingV2Projections(new WKBReader()),
                 new Projections.Wfs.BuildingV3.BuildingV3Projections(new WKBReader()),
                 new Projections.Wfs.BuildingUnitV2.BuildingUnitV2Projections(new WKBReader())
             }];
@@ -174,7 +172,7 @@ namespace BuildingRegistry.Tests
                 new BuildingLatestItemProjections(Mock.Of<IOptions<IntegrationOptions>>()),
                 new BuildingUnitLatestItemProjections(Mock.Of<IOptions<IntegrationOptions>>()),
                 new BuildingVersionProjections(Mock.Of<IOptions<IntegrationOptions>>(), Mock.Of<IPersistentLocalIdFinder>(), Mock.Of<IAddresses>()),
-                new BuildingRegistry.Projections.Integration.Building.VersionFromMigration.BuildingVersionProjections(Mock.Of<IOptions<IntegrationOptions>>())
+                new Projections.Integration.Building.VersionFromMigration.BuildingVersionProjections(Mock.Of<IOptions<IntegrationOptions>>())
             }];
 
             yield return [new List<ConnectedProjection<ExtractContext>>
@@ -184,7 +182,7 @@ namespace BuildingRegistry.Tests
                 new BuildingUnitAddressLinkExtractProjections(Encoding.UTF8),
             }];
 
-            yield return [new List<ConnectedProjection<BuildingRegistry.Producer.Snapshot.Oslo.ProducerContext>>
+            yield return [new List<ConnectedProjection<ProducerContext>>
             {
                 new ProducerBuildingProjections(Mock.Of<IProducer>(), Mock.Of<ISnapshotManager>(), "", Mock.Of<IOsloProxy>()),
                 new ProducerBuildingUnitProjections(Mock.Of<IProducer>(), Mock.Of<ISnapshotManager>(), "", Mock.Of<IOsloProxy>())

@@ -83,7 +83,7 @@ namespace BuildingRegistry.Projections.Wms.Migrations
             migrationBuilder.Sql("DROP VIEW [wms].[GebouwView]");
             migrationBuilder.Sql("DROP VIEW [wms].[GebouwViewV2]");
 
-            CreateBuildingViews(migrationBuilder, _buildingUpViews, BuildingV2.BuildingConfiguration.TableName);
+            CreateBuildingViews(migrationBuilder, _buildingUpViews, "BuildingsV2");
             CreateBuildingUnitViews(migrationBuilder, _buildingUpUnitViews, BuildingUnitV2.BuildingUnitConfiguration.TableName);
         }
 
@@ -105,7 +105,7 @@ namespace BuildingRegistry.Projections.Wms.Migrations
             CreateBuildingViews(migrationBuilder, _buildingDownViews, "Buildings");
             CreateBuildingUnitViews(migrationBuilder, _buildingUnitDownViews, "BuildingUnits");
 
-            CreateBuildingViews(migrationBuilder, _buildingDownViewsV2, BuildingV2.BuildingConfiguration.TableName);
+            CreateBuildingViews(migrationBuilder, _buildingDownViewsV2, "BuildingsV2");
             CreateBuildingUnitViews(migrationBuilder, _buildingUnitDownViewsV2, BuildingUnitV2.BuildingUnitConfiguration.TableName);
         }
 

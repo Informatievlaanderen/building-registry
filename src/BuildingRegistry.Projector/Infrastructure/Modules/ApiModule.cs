@@ -28,7 +28,6 @@ namespace BuildingRegistry.Projector.Infrastructure.Modules
     using BuildingRegistry.Projections.Wfs;
     using BuildingRegistry.Projections.Wms;
     using BuildingRegistry.Projections.Wms.BuildingUnitV2;
-    using BuildingRegistry.Projections.Wms.BuildingV2;
     using BuildingRegistry.Projections.Wms.BuildingV3;
     using Microsoft.Data.SqlClient;
     using Microsoft.Extensions.Configuration;
@@ -186,9 +185,6 @@ namespace BuildingRegistry.Projector.Infrastructure.Modules
                 .RegisterProjectionMigrator<WmsContextMigrationFactory>(
                     _configuration,
                     _loggerFactory)
-                .RegisterProjections<BuildingV2Projections, WmsContext>(() =>
-                        new BuildingV2Projections(WKBReaderFactory.Create()),
-                    wmsProjectionSettings)
                 .RegisterProjections<BuildingV3Projections, WmsContext>(() =>
                         new BuildingV3Projections(WKBReaderFactory.Create()),
                     wmsProjectionSettings)
@@ -214,9 +210,6 @@ namespace BuildingRegistry.Projector.Infrastructure.Modules
                 .RegisterProjectionMigrator<WfsContextMigrationFactory>(
                     _configuration,
                     _loggerFactory)
-                .RegisterProjections<BuildingRegistry.Projections.Wfs.BuildingV2.BuildingV2Projections, WfsContext>(() =>
-                        new BuildingRegistry.Projections.Wfs.BuildingV2.BuildingV2Projections(WKBReaderFactory.Create()),
-                    wfsProjectionSettings)
                 .RegisterProjections<BuildingRegistry.Projections.Wfs.BuildingV3.BuildingV3Projections, WfsContext>(() =>
                         new BuildingRegistry.Projections.Wfs.BuildingV3.BuildingV3Projections(WKBReaderFactory.Create()),
                     wfsProjectionSettings)

@@ -25,7 +25,7 @@ namespace BuildingRegistry.Projections.Wfs.Migrations
                     [Geometry] AS [Geometrie],
                     [GeometryMethod] AS [GeometrieMethode],
                     [Status] AS [GebouwStatus]
-                FROM [{Schema.Wfs}].[{BuildingV2.BuildingConfiguration.TableName}]
+                FROM [{Schema.Wfs}].[BuildingsV2]
                 WHERE [IsRemoved] = 0 and Geometry is not null");
 
             migrationBuilder.Sql($@"
