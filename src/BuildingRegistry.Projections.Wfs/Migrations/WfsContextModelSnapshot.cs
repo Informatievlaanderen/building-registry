@@ -110,55 +110,6 @@ namespace BuildingRegistry.Projections.Wfs.Migrations
                     b.ToTable("BuildingUnitsV2", "wfs");
                 });
 
-            modelBuilder.Entity("BuildingRegistry.Projections.Wfs.BuildingV2.BuildingV2", b =>
-                {
-                    b.Property<int>("PersistentLocalId")
-                        .HasColumnType("int");
-
-                    b.Property<Geometry>("Geometry")
-                        .HasColumnType("sys.geometry");
-
-                    b.Property<string>("GeometryMethod")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<bool>("IsRemoved")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("VersionAsString")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<DateTimeOffset>("VersionTimestampAsDateTimeOffset")
-                        .HasColumnType("datetimeoffset")
-                        .HasColumnName("Version");
-
-                    b.HasKey("PersistentLocalId");
-
-                    SqlServerKeyBuilderExtensions.IsClustered(b.HasKey("PersistentLocalId"));
-
-                    b.HasIndex("GeometryMethod");
-
-                    b.HasIndex("Id");
-
-                    b.HasIndex("IsRemoved");
-
-                    b.HasIndex("PersistentLocalId");
-
-                    b.HasIndex("Status");
-
-                    b.HasIndex("VersionAsString");
-
-                    b.ToTable("BuildingsV2", "wfs");
-                });
-
             modelBuilder.Entity("BuildingRegistry.Projections.Wfs.BuildingV3.BuildingV3", b =>
                 {
                     b.Property<int>("PersistentLocalId")
