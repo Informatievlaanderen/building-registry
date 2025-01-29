@@ -1,3 +1,10 @@
+## [4.24.7](https://github.com/informatievlaanderen/building-registry/compare/v4.24.6...v4.24.7) (2025-01-29)
+
+
+### Bug Fixes
+
+* **wfswms:** remove buildingsv2 ([0a11d6c](https://github.com/informatievlaanderen/building-registry/commit/0a11d6c818212118b3d32118ed07874a59a8df1e))
+
 ## [4.24.6](https://github.com/informatievlaanderen/building-registry/compare/v4.24.5...v4.24.6) (2025-01-20)
 
 ## [4.24.5](https://github.com/informatievlaanderen/building-registry/compare/v4.24.4...v4.24.5) (2025-01-13)
