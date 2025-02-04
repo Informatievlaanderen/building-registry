@@ -1,3 +1,10 @@
+## [4.24.8](https://github.com/informatievlaanderen/building-registry/compare/v4.24.7...v4.24.8) (2025-02-04)
+
+
+### Bug Fixes
+
+* **ci:** change to lambda v4 pipeline ([6a1e9d2](https://github.com/informatievlaanderen/building-registry/commit/6a1e9d2ca2034c87d52509c1cc24de5598a3f951))
+
 ## [4.24.7](https://github.com/informatievlaanderen/building-registry/compare/v4.24.6...v4.24.7) (2025-01-29)
 
 
