@@ -14,7 +14,7 @@ namespace BuildingRegistry.Projections.Integration.Building.VersionFromMigration
     using Infrastructure;
     using Microsoft.Extensions.Options;
 
-    [ConnectedProjectionName("Integratie gebouw versie")]
+    [ConnectedProjectionName("Integratie gebouw versie (vanaf migratie)")]
     [ConnectedProjectionDescription("Projectie die de versie gebouw data voor de integratie database bijhoudt.")]
     public sealed partial class BuildingVersionProjections : ConnectedProjection<IntegrationContext>
     {
