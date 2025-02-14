@@ -345,7 +345,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Consumer.Parcel
         }
 
         [Fact]
-        public async Task ParcelWasCorrectedFromRetiredToRealized_SetsParcelStatusToRealized()
+        public async Task ParcelWasCorrectedFromRetiredToRealized_SetsParcelStatusToRealizedAndUpdatesGeometry()
         {
             var parcelId = Fixture.Create<Guid>().ToString("D");
             var capakey = Fixture.Create<Guid>().ToString("D");
@@ -368,12 +368,13 @@ namespace BuildingRegistry.Tests.ProjectionTests.Consumer.Parcel
                 ))
                 .Create();
 
+            var expectedGeometry = GeometryHelper.SecondValidPolygon.AsBinary();
             var parcelWasCorrectedFromRetiredToRealized = Fixture
                 .Build<ParcelWasCorrectedFromRetiredToRealized>()
                 .FromFactory(() => new ParcelWasCorrectedFromRetiredToRealized(
                     parcelId,
                     capakey,
-                    GeometryHelper.ValidPolygon.AsBinary().ToHexString(),
+                    expectedGeometry.ToHexString(),
                     Fixture.Create<Provenance>()
                 ))
                 .Create();
@@ -384,7 +385,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Consumer.Parcel
                 .SetupSequence(x => x.GetUnderlyingBuildings(It.IsAny<Geometry>()))
                 .Returns(Array.Empty<int>())
                 .Returns(Array.Empty<int>())
-                .Returns(new[] { underlyingBuildingId });
+                .Returns([underlyingBuildingId]);
 
             Given(parcelWasImported, parcelWasRetiredV2, parcelWasCorrectedFromRetiredToRealized);
 
@@ -396,6 +397,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Consumer.Parcel
                 parcel.Should().NotBeNull();
                 parcel!.CaPaKey.Should().Be(parcelWasCorrectedFromRetiredToRealized.CaPaKey);
                 parcel.Status.Should().Be(ParcelStatus.Realized);
+                parcel.ExtendedWkbGeometry.Should().BeEquivalentTo(expectedGeometry);
                 parcel.IsRemoved.Should().Be(parcel.IsRemoved);
 
                 var buildingsToInvalidate = context.BuildingsToInvalidate.Local.ToList();
