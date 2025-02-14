@@ -75,8 +75,12 @@ namespace BuildingRegistry.Consumer.Read.Parcel.ParcelWithCount
                     .ParcelConsumerItemsWithCount.FindAsync([Guid.Parse(message.ParcelId)], cancellationToken: ct);
 
                 parcel!.Status = ParcelStatus.Realized;
+                var extendedWkbGeometry = message.ExtendedWkbGeometry.ToByteArray();
+                parcel.ExtendedWkbGeometry = extendedWkbGeometry;
+                parcel.SetGeometry(wkbReader.Read(extendedWkbGeometry));
 
                 var buildingPersistentLocalIds = await GetBuildingPersistentLocalIdsToInvalidate(parcel.Geometry);
+
                 context.BuildingsToInvalidate.AddRange(buildingPersistentLocalIds.Select(x => new BuildingToInvalidate
                 {
                     BuildingPersistentLocalId = x
