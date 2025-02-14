@@ -1,3 +1,10 @@
+## [4.24.9](https://github.com/informatievlaanderen/building-registry/compare/v4.24.8...v4.24.9) (2025-02-14)
+
+
+### Bug Fixes
+
+* update parcel geometry when ParcelWasCorrectedFromRetiredToRealized ([07b380d](https://github.com/informatievlaanderen/building-registry/commit/07b380d00c91e05eab146b10c2595f1fae3dcfa7))
+
 ## [4.24.8](https://github.com/informatievlaanderen/building-registry/compare/v4.24.7...v4.24.8) (2025-02-04)
 
 
