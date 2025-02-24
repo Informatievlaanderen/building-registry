@@ -34,7 +34,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.Building
                 buildings)
         {
             _sqsQueue = sqsQueue;
-            _toggleAnoApiEnabled = configuration.GetValue<bool>("AnoApiToggle", false);
+            _toggleAnoApiEnabled = configuration.GetValue("AnoApiToggle", false);
         }
 
         protected override async Task<object> InnerHandle(RealizeBuildingLambdaRequest request, CancellationToken cancellationToken)
@@ -46,7 +46,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.Building
                 var streamPositionIncrements = await IdempotentCommandHandler.Dispatch(
                     cmd.CreateCommandId(),
                     cmd,
-                    request.Metadata,
+                    request.Metadata!,
                     cancellationToken);
 
                 if (streamPositionIncrements > 0 && _toggleAnoApiEnabled)
@@ -64,7 +64,18 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.Building
             }
             catch (IdempotencyException)
             {
-                // Idempotent: Do Nothing return last etag
+                if (_toggleAnoApiEnabled)
+                {
+                    var building =
+                        await Buildings.GetAsync(new BuildingStreamId(cmd.BuildingPersistentLocalId), cancellationToken);
+
+                    var sqsRequest = new NotifyOutlinedRealizedBuildingSqsRequest(
+                        cmd.BuildingPersistentLocalId,
+                        request.Provenance.Operator,
+                        DateTimeOffset.UtcNow,
+                        building.BuildingGeometry.Geometry.ToString());
+                    await _sqsQueue.Copy(sqsRequest, new SqsQueueOptions { MessageGroupId = "GRB-ANO-API" }, cancellationToken);
+                }
             }
 
             var lastHash = await GetHash(new BuildingPersistentLocalId(request.BuildingPersistentLocalId), cancellationToken);
