@@ -68,7 +68,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
         }
 
         [Fact]
-        public async Task ThenNotificationShouldBeSend()
+        public async Task ThenNotificationIsSent()
         {
             // Arrange
             var buildingPersistentLocalId = Fixture.Create<BuildingPersistentLocalId>();
@@ -97,7 +97,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
         }
 
         [Fact]
-        public async Task WhenAlreadyRealized_ThenNotificationShouldNotBeSend()
+        public async Task WhenAlreadyRealized_ThenNotificationIsNotSent()
         {
             // Arrange
             var buildingPersistentLocalId = Fixture.Create<BuildingPersistentLocalId>();
@@ -127,7 +127,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
         }
 
         [Fact]
-        public async Task WithIdempotentRequest_ThenTicketingCompleteIsExpected()
+        public async Task WithIdempotentRequest_ThenNotificationsIsSent()
         {
             // Arrange
             var ticketing = new Mock<ITicketing>();
@@ -137,13 +137,14 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
             PlaceBuildingUnderConstruction(buildingPersistentLocalId);
 
             var buildings = Container.Resolve<IBuildings>();
+            var sqsQueue = new Mock<ISqsQueue>();
             var handler = new RealizeBuildingLambdaHandler(
                 Container.Resolve<IConfiguration>(),
                 new FakeRetryPolicy(),
                 ticketing.Object,
                 MockExceptionIdempotentCommandHandler(() => new IdempotencyException(string.Empty)).Object,
                 Container.Resolve<IBuildings>(),
-                Mock.Of<ISqsQueue>());
+                sqsQueue.Object);
 
             var building =
                 await buildings.GetAsync(new BuildingStreamId(buildingPersistentLocalId), CancellationToken.None);
@@ -152,6 +153,12 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
             await handler.Handle(CreateRealizeBuildingLambdaRequest(), CancellationToken.None);
 
             //Assert
+            sqsQueue.Verify(x => x.Copy(
+                    It.IsAny<NotifyOutlinedRealizedBuildingSqsRequest>(),
+                    It.IsAny<SqsQueueOptions>(),
+                    It.IsAny<CancellationToken>()),
+                Times.Once);
+
             ticketing.Verify(x =>
                 x.Complete(
                     It.IsAny<Guid>(),
