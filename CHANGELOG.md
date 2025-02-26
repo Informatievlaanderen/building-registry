@@ -1,3 +1,10 @@
+## [4.24.10](https://github.com/informatievlaanderen/building-registry/compare/v4.24.9...v4.24.10) (2025-02-26)
+
+
+### Bug Fixes
+
+* create grb ano upon idempotency exception ([5a64b75](https://github.com/informatievlaanderen/building-registry/commit/5a64b75de9eed6f0bec2f5d4436c3a2a0dd363f0))
+
 ## [4.24.9](https://github.com/informatievlaanderen/building-registry/compare/v4.24.8...v4.24.9) (2025-02-14)
 
 
