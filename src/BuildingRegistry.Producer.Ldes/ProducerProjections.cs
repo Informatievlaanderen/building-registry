@@ -13,25 +13,30 @@ namespace BuildingRegistry.Producer.Ldes
     using Be.Vlaanderen.Basisregisters.Utilities.HexByteConvertor;
     using Building;
     using Building.Events;
+    using Microsoft.EntityFrameworkCore;
     using Newtonsoft.Json;
 
     [ConnectedProjectionName("Kafka producer ldes gebouwen")]
     [ConnectedProjectionDescription("Projectie die berichten naar de kafka broker stuurt.")]
     public sealed class ProducerProjections : ConnectedProjection<ProducerContext>
     {
-        public const string TopicKey = "BuildingTopic";
-
-        private readonly IProducer _producer;
-        private readonly string _osloNamespace;
+        private readonly IProducer _buildingProducer;
+        private readonly IProducer _buildingUnitProducer;
+        private readonly string _buildingOsloNamespace;
+        private readonly string _buildingUnitOsloNamespace;
         private readonly JsonSerializerSettings _jsonSerializerSettings;
 
         public ProducerProjections(
-            IProducer producer,
-            string osloNamespace,
+            IProducer buildingProducer,
+            IProducer buildingUnitProducer,
+            string buildingOsloNamespace,
+            string buildingUnitOsloNamespace,
             JsonSerializerSettings jsonSerializerSettings)
         {
-            _producer = producer;
-            _osloNamespace = osloNamespace;
+            _buildingProducer = buildingProducer;
+            _buildingUnitProducer = buildingUnitProducer;
+            _buildingOsloNamespace = buildingOsloNamespace;
+            _buildingUnitOsloNamespace = buildingUnitOsloNamespace;
             _jsonSerializerSettings = jsonSerializerSettings;
 
             var wkbReader = WKBReaderFactory.Create();
@@ -827,10 +832,70 @@ namespace BuildingRegistry.Producer.Ldes
             }
         }
 
-        private async Task Produce(string puri, string objectId, string jsonContent, long storePosition,
+        private async Task ProduceBuilding(
+            ProducerContext context,
+            int buildingPersistentLocalId,
+            long storePosition,
             CancellationToken cancellationToken = default)
         {
-            var result = await _producer.Produce(
+            var building = await context.Buildings.FindAsync(buildingPersistentLocalId, cancellationToken: cancellationToken)
+                         ?? throw new ProjectionItemNotFoundException<ProducerProjections>(buildingPersistentLocalId.ToString());
+
+            var buildingUnitPersistentLocalIds = await context.BuildingUnits
+                .Where(x => x.BuildingPersistentLocalId == buildingPersistentLocalId)
+                .Select(x => x.BuildingUnitPersistentLocalId)
+                .ToListAsync(cancellationToken);
+
+            var buildingLdes = new BuildingLdes(building, buildingUnitPersistentLocalIds, _buildingOsloNamespace);
+
+            await ProduceBuilding(
+                $"{_buildingOsloNamespace}/{building.PersistentLocalId}",
+                building.PersistentLocalId.ToString(),
+                JsonConvert.SerializeObject(buildingLdes, _jsonSerializerSettings),
+                storePosition,
+                cancellationToken);
+        }
+
+        private async Task ProduceBuilding(string puri, string objectId, string jsonContent, long storePosition,
+            CancellationToken cancellationToken = default)
+        {
+            var result = await _buildingProducer.Produce(
+                new MessageKey(puri),
+                jsonContent,
+                new List<MessageHeader> { new MessageHeader(MessageHeader.IdempotenceKey, $"{objectId}-{storePosition.ToString()}") },
+                cancellationToken);
+
+            if (!result.IsSuccess)
+            {
+                throw new InvalidOperationException(result.Error + Environment.NewLine + result.ErrorReason); //TODO: create custom exception
+            }
+        }
+
+        private async Task ProduceBuildingUnit(
+            ProducerContext context,
+            int buildingUnitPersistentLocalId,
+            long storePosition,
+            CancellationToken cancellationToken = default)
+        {
+            var buildingUnit = await context.BuildingUnits
+                                   .Include(x => x.Addresses)
+                                   .SingleOrDefaultAsync(x => x.BuildingUnitPersistentLocalId == buildingUnitPersistentLocalId, cancellationToken)
+                           ?? throw new ProjectionItemNotFoundException<ProducerProjections>(buildingUnitPersistentLocalId.ToString());
+
+            var buildingUnitLdes = new BuildingUnitLdes(buildingUnit, _buildingUnitOsloNamespace);
+
+            await ProduceBuilding(
+                $"{_buildingUnitOsloNamespace}/{buildingUnit.BuildingUnitPersistentLocalId}",
+                buildingUnit.BuildingUnitPersistentLocalId.ToString(),
+                JsonConvert.SerializeObject(buildingUnitLdes, _jsonSerializerSettings),
+                storePosition,
+                cancellationToken);
+        }
+
+        private async Task ProduceBuildingUnit(string puri, string objectId, string jsonContent, long storePosition,
+            CancellationToken cancellationToken = default)
+        {
+            var result = await _buildingUnitProducer.Produce(
                 new MessageKey(puri),
                 jsonContent,
                 new List<MessageHeader> { new MessageHeader(MessageHeader.IdempotenceKey, $"{objectId}-{storePosition.ToString()}") },

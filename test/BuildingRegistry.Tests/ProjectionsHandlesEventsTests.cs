@@ -191,8 +191,7 @@ namespace BuildingRegistry.Tests
 
             yield return [new List<ConnectedProjection<BuildingRegistry.Producer.Ldes.ProducerContext>>
             {
-                new BuildingRegistry.Producer.Ldes.ProducerProjections(Mock.Of<IProducer>(), "", new JsonSerializerSettings()),
-                new BuildingRegistry.Producer.Ldes.ProducerBuildingUnitProjections(Mock.Of<IProducer>(), "", new JsonSerializerSettings())
+                new BuildingRegistry.Producer.Ldes.ProducerProjections(Mock.Of<IProducer>(), Mock.Of<IProducer>(), "", "", new JsonSerializerSettings())
             }];
 
             yield return [new List<ConnectedProjection<BuildingRegistry.Producer.ProducerContext>>

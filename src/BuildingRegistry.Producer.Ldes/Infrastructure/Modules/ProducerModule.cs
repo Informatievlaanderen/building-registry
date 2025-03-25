@@ -94,38 +94,31 @@ namespace BuildingRegistry.Producer.Ldes.Infrastructure.Modules
                 .RegisterProjectionMigrator<ProducerContextMigrationFactory>(
                     _configuration,
                     _loggerFactory)
-                .RegisterProjections<ProducerProjections, ProducerContext>(c =>
+                .RegisterProjections<ProducerProjections, ProducerContext>(_ =>
                     {
-                        var osloNamespace = _configuration["BuildingOsloNamespace"]!.TrimEnd('/');
-                        var producerOptions = CreateBuildingProducerOptions();
+                        var buildingOsloNamespace = _configuration["BuildingOsloNamespace"]!.TrimEnd('/');
+                        var buildingUnitOsloNamespace = _configuration["BuildingUnitOsloNamespace"]!.TrimEnd('/');
+                        var buildingProducerOptions = CreateProducerOptions("BuildingTopic");
+                        var buildingUnitProducerOptions = CreateProducerOptions("BuildingUnitTopic");
 
                         return new ProducerProjections(
-                            new Producer(producerOptions),
-                            osloNamespace,
-                            new JsonSerializerSettings().ConfigureDefaultForApi());
-                    },
-                    connectedProjectionSettings)
-                .RegisterProjections<ProducerBuildingUnitProjections, ProducerContext>(c =>
-                    {
-                        var osloNamespace = _configuration["BuildingUnitOsloNamespace"]!.TrimEnd('/');
-                        var producerOptions = CreateBuildingUnitProducerOptions();
-
-                        return new ProducerBuildingUnitProjections(
-                            new Producer(producerOptions),
-                            osloNamespace,
+                            buildingProducer: new Producer(buildingProducerOptions),
+                            buildingUnitProducer: new Producer(buildingUnitProducerOptions),
+                            buildingOsloNamespace: buildingOsloNamespace,
+                            buildingUnitOsloNamespace: buildingUnitOsloNamespace,
                             new JsonSerializerSettings().ConfigureDefaultForApi());
                     },
                     connectedProjectionSettings);
         }
 
-        private ProducerOptions CreateBuildingProducerOptions()
+        private ProducerOptions CreateProducerOptions(string topicConfigurationKey)
         {
             var bootstrapServers = _configuration["Kafka:BootstrapServers"];
             var saslUsername = _configuration["Kafka:SaslUserName"];
             var saslPassword = _configuration["Kafka:SaslPassword"];
 
-            var topic = _configuration[ProducerProjections.TopicKey]
-                        ?? throw new ArgumentException($"Configuration has no value for {ProducerProjections.TopicKey}");
+            var topic = _configuration[topicConfigurationKey]
+                        ?? throw new ArgumentException($"Configuration has no value for {topicConfigurationKey}");
             var producerOptions = new ProducerOptions(
                     new BootstrapServers(bootstrapServers!),
                     new Topic(topic),
@@ -133,31 +126,6 @@ namespace BuildingRegistry.Producer.Ldes.Infrastructure.Modules
                     EventsJsonSerializerSettingsProvider.CreateSerializerSettings())
                 .ConfigureEnableIdempotence();
 
-            if (!string.IsNullOrEmpty(saslUsername)
-                && !string.IsNullOrEmpty(saslPassword))
-            {
-                producerOptions.ConfigureSaslAuthentication(new SaslAuthentication(
-                    saslUsername,
-                    saslPassword));
-            }
-
-            return producerOptions;
-        }
-
-        private ProducerOptions CreateBuildingUnitProducerOptions()
-        {
-            var bootstrapServers = _configuration["Kafka:BootstrapServers"];
-            var saslUsername = _configuration["Kafka:SaslUserName"];
-            var saslPassword = _configuration["Kafka:SaslPassword"];
-
-            var topic = _configuration[ProducerBuildingUnitProjections.TopicKey]
-                        ?? throw new ArgumentException($"Configuration has no value for {ProducerProjections.TopicKey}");
-            var producerOptions = new ProducerOptions(
-                    new BootstrapServers(bootstrapServers!),
-                    new Topic(topic),
-                    useSinglePartition: false,
-                    EventsJsonSerializerSettingsProvider.CreateSerializerSettings())
-                .ConfigureEnableIdempotence();
             if (!string.IsNullOrEmpty(saslUsername)
                 && !string.IsNullOrEmpty(saslPassword))
             {

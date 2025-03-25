@@ -125,7 +125,7 @@
         [JsonProperty("AfwijkingVastgesteld", Order = 9)]
         public bool AfwijkingVastgesteld { get; private set; }
 
-        public BuildingUnitLdes(BuildingUnitDetail buildingUnit, IEnumerable<int> addressPersistentLocalIds, string osloNamespace)
+        public BuildingUnitLdes(BuildingUnitDetail buildingUnit, string osloNamespace)
         {
             Identificator = new GebouweenheidIdentificator(osloNamespace, buildingUnit.BuildingUnitPersistentLocalId.ToString(), buildingUnit.Version.ToBelgianDateTimeOffset());
             GebouweenheidPositie = GetBuildingUnitPoint(buildingUnit.Position, buildingUnit.PositionMethod);
@@ -133,7 +133,7 @@
             Functie = buildingUnit.Function.Map();
             IsVerwijderd = buildingUnit.IsRemoved;
             GebouwId = buildingUnit.BuildingPersistentLocalId.ToString();
-            Adressen = addressPersistentLocalIds.Select(x => x.ToString()).ToList();
+            Adressen = buildingUnit.Addresses.Select(x => x.AddressPersistentLocalId.ToString()).ToList();
             AfwijkingVastgesteld = buildingUnit.HasDeviation;
         }
 
