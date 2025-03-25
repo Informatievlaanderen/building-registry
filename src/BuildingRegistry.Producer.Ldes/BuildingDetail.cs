@@ -42,7 +42,6 @@ namespace BuildingRegistry.Producer.Ldes
             int persistentLocalId,
             BuildingGeometryMethod buildingGeometryMethod,
             byte[] geometry,
-            Geometry sysGeometry,
             BuildingStatus status,
             bool isRemoved,
             Instant version)

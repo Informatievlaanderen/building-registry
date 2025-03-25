@@ -94,12 +94,12 @@ namespace BuildingRegistry.Producer.Ldes.Infrastructure.Modules
                 .RegisterProjectionMigrator<ProducerContextMigrationFactory>(
                     _configuration,
                     _loggerFactory)
-                .RegisterProjections<ProducerBuildingProjections, ProducerContext>(c =>
+                .RegisterProjections<ProducerProjections, ProducerContext>(c =>
                     {
                         var osloNamespace = _configuration["BuildingOsloNamespace"]!.TrimEnd('/');
                         var producerOptions = CreateBuildingProducerOptions();
 
-                        return new ProducerBuildingProjections(
+                        return new ProducerProjections(
                             new Producer(producerOptions),
                             osloNamespace,
                             new JsonSerializerSettings().ConfigureDefaultForApi());
@@ -124,8 +124,8 @@ namespace BuildingRegistry.Producer.Ldes.Infrastructure.Modules
             var saslUsername = _configuration["Kafka:SaslUserName"];
             var saslPassword = _configuration["Kafka:SaslPassword"];
 
-            var topic = _configuration[ProducerBuildingProjections.TopicKey]
-                        ?? throw new ArgumentException($"Configuration has no value for {ProducerBuildingProjections.TopicKey}");
+            var topic = _configuration[ProducerProjections.TopicKey]
+                        ?? throw new ArgumentException($"Configuration has no value for {ProducerProjections.TopicKey}");
             var producerOptions = new ProducerOptions(
                     new BootstrapServers(bootstrapServers!),
                     new Topic(topic),
@@ -151,7 +151,7 @@ namespace BuildingRegistry.Producer.Ldes.Infrastructure.Modules
             var saslPassword = _configuration["Kafka:SaslPassword"];
 
             var topic = _configuration[ProducerBuildingUnitProjections.TopicKey]
-                        ?? throw new ArgumentException($"Configuration has no value for {ProducerBuildingProjections.TopicKey}");
+                        ?? throw new ArgumentException($"Configuration has no value for {ProducerProjections.TopicKey}");
             var producerOptions = new ProducerOptions(
                     new BootstrapServers(bootstrapServers!),
                     new Topic(topic),

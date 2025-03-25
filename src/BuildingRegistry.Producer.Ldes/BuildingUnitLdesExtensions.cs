@@ -1,8 +1,11 @@
 namespace BuildingRegistry.Producer.Ldes
 {
     using System;
+    using System.Threading;
+    using System.Threading.Tasks;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy.Gebouweenheid;
+    using Be.Vlaanderen.Basisregisters.ProjectionHandling.Connector;
     using Building;
 
     public static class BuildingUnitStatusExtensions
@@ -66,6 +69,27 @@ namespace BuildingRegistry.Producer.Ldes
             }
 
             throw new ArgumentOutOfRangeException(nameof(geometryMethod), geometryMethod, null);
+        }
+    }
+
+    public static class BuildingUnitDetailExtensions
+    {
+        public static async Task FindAndUpdateBuildingUnit(
+            this ProducerContext context,
+            int persistentLocalId,
+            Action<BuildingUnitDetail> updateFunc,
+            CancellationToken ct)
+        {
+            var buildingUnit = await context
+                .BuildingUnits
+                .FindAsync(persistentLocalId, cancellationToken: ct);
+
+            if (buildingUnit is null)
+            {
+                throw new ProjectionItemNotFoundException<ProducerProjections>(persistentLocalId.ToString());
+            }
+
+            updateFunc(buildingUnit);
         }
     }
 }

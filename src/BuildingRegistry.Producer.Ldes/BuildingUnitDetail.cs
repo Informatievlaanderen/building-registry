@@ -1,7 +1,7 @@
 namespace BuildingRegistry.Producer.Ldes
 {
     using System;
-    using System.Collections.ObjectModel;
+    using System.Collections.Generic;
     using Be.Vlaanderen.Basisregisters.Utilities.HexByteConvertor;
     using Building;
     using BuildingRegistry.Infrastructure;
@@ -35,7 +35,7 @@ namespace BuildingRegistry.Producer.Ldes
 
         public bool HasDeviation { get; set; }
 
-        public virtual Collection<BuildingUnitDetailAddress> Addresses { get; set; }
+        public virtual ICollection<BuildingUnitDetailAddress> Addresses { get; set; }
 
         public bool IsRemoved { get; set; }
 
@@ -49,7 +49,7 @@ namespace BuildingRegistry.Producer.Ldes
 
         private BuildingUnitDetail()
         {
-            Addresses = new Collection<BuildingUnitDetailAddress>();
+            Addresses = [];
             Position = [];
         }
 
@@ -61,7 +61,7 @@ namespace BuildingRegistry.Producer.Ldes
             BuildingUnitFunction function,
             BuildingUnitStatus status,
             bool hasDeviation,
-            Collection<BuildingUnitDetailAddress> addresses,
+            ICollection<BuildingUnitDetailAddress> addresses,
             bool isRemoved,
             Instant version)
         {
