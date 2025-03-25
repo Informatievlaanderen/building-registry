@@ -25,8 +25,6 @@ namespace BuildingRegistry.Producer.Ldes
         private readonly string _osloNamespace;
         private readonly JsonSerializerSettings _jsonSerializerSettings;
 
-        // todo-pr BuildingDetailV2Projections buildunit events
-
         public ProducerProjections(
             IProducer producer,
             string osloNamespace,
@@ -310,6 +308,10 @@ namespace BuildingRegistry.Producer.Ldes
             When<Envelope<BuildingUnitWasPlannedV2>>(async (context, message, ct) =>
             {
                 // todo-pr produce building
+                await context.FindAndUpdateBuilding(message.Message.BuildingPersistentLocalId, building =>
+                {
+                    building.Version = message.Message.Provenance.Timestamp;
+                }, ct);
 
                 var buildingUnitDetailItemV2 = new BuildingUnitDetail(
                     message.Message.BuildingUnitPersistentLocalId,
@@ -437,6 +439,11 @@ namespace BuildingRegistry.Producer.Ldes
 
             When<Envelope<BuildingUnitWasRemovedV2>>(async (context, message, ct) =>
             {
+                await context.FindAndUpdateBuilding(message.Message.BuildingPersistentLocalId, building =>
+                {
+                    building.Version = message.Message.Provenance.Timestamp;
+                }, ct);
+
                 await context.FindAndUpdateBuildingUnit(
                     message.Message.BuildingUnitPersistentLocalId,
                     buildingUnit =>
@@ -461,6 +468,11 @@ namespace BuildingRegistry.Producer.Ldes
 
             When<Envelope<BuildingUnitRemovalWasCorrected>>(async (context, message, ct) =>
             {
+                await context.FindAndUpdateBuilding(message.Message.BuildingPersistentLocalId, building =>
+                {
+                    building.Version = message.Message.Provenance.Timestamp;
+                }, ct);
+
                 await context.FindAndUpdateBuildingUnit(
                     message.Message.BuildingUnitPersistentLocalId,
                     buildingUnit =>
@@ -527,6 +539,11 @@ namespace BuildingRegistry.Producer.Ldes
 
             When<Envelope<CommonBuildingUnitWasAddedV2>>(async (context, message, ct) =>
             {
+                await context.FindAndUpdateBuilding(message.Message.BuildingPersistentLocalId, building =>
+                {
+                    building.Version = message.Message.Provenance.Timestamp;
+                }, ct);
+
                 var buildingUnit = new BuildingUnitDetail(
                     message.Message.BuildingUnitPersistentLocalId,
                     message.Message.BuildingPersistentLocalId,
