@@ -8,6 +8,9 @@ namespace BuildingRegistry.Producer.Ldes
     {
         public override string ProjectionStateSchema => Schema.ProducerLdes;
 
+        public DbSet<BuildingDetail> Buildings => Set<BuildingDetail>();
+        public DbSet<BuildingUnitDetail> BuildingUnits => Set<BuildingUnitDetail>();
+
         // This needs to be here to please EF
         public ProducerContext() { }
 

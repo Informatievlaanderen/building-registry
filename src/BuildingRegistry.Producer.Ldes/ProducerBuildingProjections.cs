@@ -11,7 +11,7 @@ namespace BuildingRegistry.Producer.Ldes
     using Be.Vlaanderen.Basisregisters.MessageHandling.Kafka;
     using Be.Vlaanderen.Basisregisters.MessageHandling.Kafka.Producer;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.Connector;
-    using Building.Events;
+    using BuildingRegistry.Building.Events;
     using Newtonsoft.Json;
     using Store = Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore;
 
