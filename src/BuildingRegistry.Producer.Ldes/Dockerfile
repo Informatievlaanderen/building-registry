@@ -14,8 +14,8 @@ RUN apt-get update && \
     apt-get install curl jq -y && \
     chmod +x ./init.sh
 
-EXPOSE 6016/tcp
-ENV ASPNETCORE_URLS http://*:6016
+EXPOSE 6020/tcp
+ENV ASPNETCORE_URLS http://*:6020
 ENV CORECLR_ENABLE_PROFILING=1
 ENV CORECLR_PROFILER={846F5F1C-F9AE-4B07-969E-05C26BC060D8}
 ENV CORECLR_PROFILER_PATH=/app/datadog/linux-x64/Datadog.Trace.ClrProfiler.Native.so

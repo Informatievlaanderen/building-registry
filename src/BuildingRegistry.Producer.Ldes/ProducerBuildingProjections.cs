@@ -8,11 +8,11 @@ namespace BuildingRegistry.Producer.Ldes
     using System.Threading.Tasks;
     using AllStream.Events;
     using Be.Vlaanderen.Basisregisters.EventHandling;
-    using Be.Vlaanderen.Basisregisters.GrAr.Oslo.SnapshotProducer;
     using Be.Vlaanderen.Basisregisters.MessageHandling.Kafka;
     using Be.Vlaanderen.Basisregisters.MessageHandling.Kafka.Producer;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.Connector;
     using Building.Events;
+    using Newtonsoft.Json;
     using Store = Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore;
 
     [ConnectedProjectionName("Kafka producer ldes gebouwen")]
@@ -22,14 +22,17 @@ namespace BuildingRegistry.Producer.Ldes
         public const string TopicKey = "BuildingTopic";
 
         private readonly IProducer _producer;
+        private readonly string _osloNamespace;
+        private readonly JsonSerializerSettings _jsonSerializerSettings;
 
         public ProducerBuildingProjections(
             IProducer producer,
-            ISnapshotManager snapshotManager,
             string osloNamespace,
-            IOsloProxy osloProxy)
+            JsonSerializerSettings jsonSerializerSettings)
         {
             _producer = producer;
+            _osloNamespace = osloNamespace;
+            _jsonSerializerSettings = jsonSerializerSettings;
 
             When<Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<BuildingOsloSnapshotsWereRequested>>(async (_, message, ct) =>
             {

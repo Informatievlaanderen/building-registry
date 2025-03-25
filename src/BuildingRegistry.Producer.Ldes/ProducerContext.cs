@@ -6,7 +6,7 @@ namespace BuildingRegistry.Producer.Ldes
 
     public class ProducerContext : RunnerDbContext<ProducerContext>
     {
-        public override string ProjectionStateSchema => Schema.ProducerSnapshotOslo;
+        public override string ProjectionStateSchema => Schema.ProducerLdes;
 
         // This needs to be here to please EF
         public ProducerContext() { }

@@ -7,4 +7,4 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyCopyright("Copyright (c) Vlaamse overheid")]
 [assembly: AssemblyCompany("Vlaamse overheid")]
 [assembly: ComVisible(false)]
-[assembly: Guid("ab85d667-f79b-4d4a-b7b2-166b83fcf64d")]
+[assembly: Guid("948f9507-4c25-4048-8bed-008781a5ac65")]
