@@ -1,3 +1,10 @@
+# [4.25.0](https://github.com/informatievlaanderen/building-registry/compare/v4.24.10...v4.25.0) (2025-03-26)
+
+
+### Features
+
+* add ldes producer GAWR-6786 ([917274c](https://github.com/informatievlaanderen/building-registry/commit/917274ce123313dde56885545afa89638fc5d064))
+
 ## [4.24.10](https://github.com/informatievlaanderen/building-registry/compare/v4.24.9...v4.24.10) (2025-02-26)
 
 
