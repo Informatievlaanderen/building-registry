@@ -79,11 +79,6 @@ namespace BuildingRegistry.Producer.Ldes.Infrastructure.Modules
                 "\tTableName: {TableName}",
                 nameof(ProducerContext), Schema.ProducerLdes, MigrationTables.ProducerLdes);
 
-            RegisterProjections(builder);
-        }
-
-        private void RegisterProjections(ContainerBuilder builder)
-        {
             var connectedProjectionSettings = ConnectedProjectionSettings.Configure(x =>
             {
                 x.ConfigureCatchUpPageSize(ConnectedProjectionSettings.Default.CatchUpPageSize);
@@ -140,12 +135,12 @@ namespace BuildingRegistry.Producer.Ldes.Infrastructure.Modules
         private static void RunOnSqlServer(
             IServiceCollection services,
             ILoggerFactory loggerFactory,
-            string producerSnapshotConnectionString)
+            string producerConnectionString)
         {
             services
                 .AddDbContext<ProducerContext>((_, options) => options
                     .UseLoggerFactory(loggerFactory)
-                    .UseSqlServer(producerSnapshotConnectionString, sqlServerOptions =>
+                    .UseSqlServer(producerConnectionString, sqlServerOptions =>
                     {
                         sqlServerOptions.EnableRetryOnFailure();
                         sqlServerOptions.MigrationsHistoryTable(MigrationTables.ProducerLdes, Schema.ProducerLdes);
