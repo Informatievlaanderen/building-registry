@@ -289,7 +289,7 @@ namespace BuildingRegistry.Producer
 
             if (!result.IsSuccess)
             {
-                throw new InvalidOperationException(result.Error + Environment.NewLine + result.ErrorReason); //TODO: create custom exception
+                throw new InvalidOperationException(result.Error + Environment.NewLine + result.ErrorReason);
             }
         }
 

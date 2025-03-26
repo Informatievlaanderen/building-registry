@@ -39,6 +39,7 @@ namespace BuildingRegistry.Producer.Ldes
             _buildingUnitOsloNamespace = buildingUnitOsloNamespace;
             _jsonSerializerSettings = jsonSerializerSettings;
 
+            #region Building
             When<Envelope<BuildingWasMigrated>>(async (context, message, ct) =>
             {
                 var building = new BuildingDetail(
@@ -74,6 +75,10 @@ namespace BuildingRegistry.Producer.Ldes
                 await context
                     .Buildings
                     .AddAsync(building, ct);
+
+                await ProduceBuilding(context, message.Message.BuildingPersistentLocalId, message.Position, ct);
+                foreach (var buildingUnit in message.Message.BuildingUnits)
+                    await ProduceBuildingUnit(context, buildingUnit.BuildingUnitPersistentLocalId, message.Position, ct);
             });
 
             When<Envelope<BuildingWasPlannedV2>>(async (context, message, ct) =>
@@ -89,6 +94,8 @@ namespace BuildingRegistry.Producer.Ldes
                 await context
                     .Buildings
                     .AddAsync(building, ct);
+
+                await ProduceBuilding(context, message.Message.BuildingPersistentLocalId, message.Position, ct);
             });
 
             When<Envelope<UnplannedBuildingWasRealizedAndMeasured>>(async (context, message, ct) =>
@@ -104,6 +111,8 @@ namespace BuildingRegistry.Producer.Ldes
                 await context
                     .Buildings
                     .AddAsync(building, ct);
+
+                await ProduceBuilding(context, message.Message.BuildingPersistentLocalId, message.Position, ct);
             });
 
             When<Envelope<BuildingOutlineWasChanged>>(async (context, message, ct) =>
@@ -129,6 +138,10 @@ namespace BuildingRegistry.Producer.Ldes
                         },
                         ct);
                 }
+
+                await ProduceBuilding(context, message.Message.BuildingPersistentLocalId, message.Position, ct);
+                foreach (var buildingUnitPersistentLocalId in message.Message.BuildingUnitPersistentLocalIds)
+                    await ProduceBuildingUnit(context, buildingUnitPersistentLocalId, message.Position, ct);
             });
 
             When<Envelope<BuildingMeasurementWasChanged>>(async (context, message, ct) =>
@@ -142,8 +155,11 @@ namespace BuildingRegistry.Producer.Ldes
                     },
                     ct);
 
-                foreach (var buildingUnitPersistentLocalId in message.Message.BuildingUnitPersistentLocalIds
-                             .Concat(message.Message.BuildingUnitPersistentLocalIdsWhichBecameDerived))
+                var buildingUnitPersistentLocalIds = message.Message.BuildingUnitPersistentLocalIds
+                    .Concat(message.Message.BuildingUnitPersistentLocalIdsWhichBecameDerived)
+                    .ToList();
+
+                foreach (var buildingUnitPersistentLocalId in buildingUnitPersistentLocalIds)
                 {
                     await context.FindAndUpdateBuildingUnit(
                         buildingUnitPersistentLocalId,
@@ -155,6 +171,10 @@ namespace BuildingRegistry.Producer.Ldes
                         },
                         ct);
                 }
+
+                await ProduceBuilding(context, message.Message.BuildingPersistentLocalId, message.Position, ct);
+                foreach (var buildingUnitPersistentLocalId in buildingUnitPersistentLocalIds)
+                    await ProduceBuildingUnit(context, buildingUnitPersistentLocalId, message.Position, ct);
             });
 
             When<Envelope<BuildingBecameUnderConstructionV2>>(async (context, message, ct) =>
@@ -167,6 +187,8 @@ namespace BuildingRegistry.Producer.Ldes
                         building.Version = message.Message.Provenance.Timestamp;
                     },
                     ct);
+
+                await ProduceBuilding(context, message.Message.BuildingPersistentLocalId, message.Position, ct);
             });
 
             When<Envelope<BuildingWasCorrectedFromUnderConstructionToPlanned>>(async (context, message, ct) =>
@@ -179,6 +201,8 @@ namespace BuildingRegistry.Producer.Ldes
                         building.Version = message.Message.Provenance.Timestamp;
                     },
                     ct);
+
+                await ProduceBuilding(context, message.Message.BuildingPersistentLocalId, message.Position, ct);
             });
 
             When<Envelope<BuildingWasRealizedV2>>(async (context, message, ct) =>
@@ -191,6 +215,8 @@ namespace BuildingRegistry.Producer.Ldes
                         building.Version = message.Message.Provenance.Timestamp;
                     },
                     ct);
+
+                await ProduceBuilding(context, message.Message.BuildingPersistentLocalId, message.Position, ct);
             });
 
             When<Envelope<BuildingWasCorrectedFromRealizedToUnderConstruction>>(async (context, message, ct) =>
@@ -203,6 +229,8 @@ namespace BuildingRegistry.Producer.Ldes
                         building.Version = message.Message.Provenance.Timestamp;
                     },
                     ct);
+
+                await ProduceBuilding(context, message.Message.BuildingPersistentLocalId, message.Position, ct);
             });
 
             When<Envelope<BuildingWasNotRealizedV2>>(async (context, message, ct) =>
@@ -215,6 +243,8 @@ namespace BuildingRegistry.Producer.Ldes
                         building.Version = message.Message.Provenance.Timestamp;
                     },
                     ct);
+
+                await ProduceBuilding(context, message.Message.BuildingPersistentLocalId, message.Position, ct);
             });
 
             When<Envelope<BuildingWasCorrectedFromNotRealizedToPlanned>>(async (context, message, ct) =>
@@ -227,6 +257,8 @@ namespace BuildingRegistry.Producer.Ldes
                         building.Version = message.Message.Provenance.Timestamp;
                     },
                     ct);
+
+                await ProduceBuilding(context, message.Message.BuildingPersistentLocalId, message.Position, ct);
             });
 
             When<Envelope<BuildingWasMeasured>>(async (context, message, ct) =>
@@ -241,8 +273,11 @@ namespace BuildingRegistry.Producer.Ldes
                     },
                     ct);
 
-                foreach (var buildingUnitPersistentLocalId in message.Message.BuildingUnitPersistentLocalIds
-                             .Concat(message.Message.BuildingUnitPersistentLocalIdsWhichBecameDerived))
+                var buildingUnitPersistentLocalIds = message.Message.BuildingUnitPersistentLocalIds
+                    .Concat(message.Message.BuildingUnitPersistentLocalIdsWhichBecameDerived)
+                    .ToList();
+
+                foreach (var buildingUnitPersistentLocalId in buildingUnitPersistentLocalIds)
                 {
                     await context.FindAndUpdateBuildingUnit(
                         buildingUnitPersistentLocalId,
@@ -254,6 +289,10 @@ namespace BuildingRegistry.Producer.Ldes
                         },
                         ct);
                 }
+
+                await ProduceBuilding(context, message.Message.BuildingPersistentLocalId, message.Position, ct);
+                foreach (var buildingUnitPersistentLocalId in buildingUnitPersistentLocalIds)
+                    await ProduceBuildingUnit(context, buildingUnitPersistentLocalId, message.Position, ct);
             });
 
             When<Envelope<BuildingMeasurementWasCorrected>>(async (context, message, ct) =>
@@ -267,8 +306,11 @@ namespace BuildingRegistry.Producer.Ldes
                     },
                     ct);
 
-                foreach (var buildingUnitPersistentLocalId in message.Message.BuildingUnitPersistentLocalIds
-                             .Concat(message.Message.BuildingUnitPersistentLocalIdsWhichBecameDerived))
+                var buildingUnitPersistentLocalIds = message.Message.BuildingUnitPersistentLocalIds
+                    .Concat(message.Message.BuildingUnitPersistentLocalIdsWhichBecameDerived)
+                    .ToList();
+
+                foreach (var buildingUnitPersistentLocalId in buildingUnitPersistentLocalIds)
                 {
                     await context.FindAndUpdateBuildingUnit(
                         buildingUnitPersistentLocalId,
@@ -280,6 +322,10 @@ namespace BuildingRegistry.Producer.Ldes
                         },
                         ct);
                 }
+
+                await ProduceBuilding(context, message.Message.BuildingPersistentLocalId, message.Position, ct);
+                foreach (var buildingUnitPersistentLocalId in buildingUnitPersistentLocalIds)
+                    await ProduceBuildingUnit(context, buildingUnitPersistentLocalId, message.Position, ct);
             });
 
             When<Envelope<BuildingWasDemolished>>(async (context, message, ct) =>
@@ -292,6 +338,8 @@ namespace BuildingRegistry.Producer.Ldes
                         building.Version = message.Message.Provenance.Timestamp;
                     },
                     ct);
+
+                await ProduceBuilding(context, message.Message.BuildingPersistentLocalId, message.Position, ct);
             });
 
             When<Envelope<BuildingWasRemovedV2>>(async (context, message, ct) =>
@@ -304,7 +352,10 @@ namespace BuildingRegistry.Producer.Ldes
                         building.Version = message.Message.Provenance.Timestamp;
                     },
                     ct);
+
+                await ProduceBuilding(context, message.Message.BuildingPersistentLocalId, message.Position, ct);
             });
+            #endregion Building
 
             #region BuildingUnit
 
@@ -328,6 +379,9 @@ namespace BuildingRegistry.Producer.Ldes
                     message.Message.Provenance.Timestamp);
 
                 await context.BuildingUnits.AddAsync(buildingUnitDetailItemV2, ct);
+
+                await ProduceBuilding(context, message.Message.BuildingPersistentLocalId, message.Position, ct);
+                await ProduceBuildingUnit(context, message.Message.BuildingUnitPersistentLocalId, message.Position, ct);
             });
 
             When<Envelope<BuildingUnitWasRealizedV2>>(async (context, message, ct) =>
@@ -340,6 +394,8 @@ namespace BuildingRegistry.Producer.Ldes
                         buildingUnit.Version = message.Message.Provenance.Timestamp;
                     },
                     ct);
+
+                await ProduceBuildingUnit(context, message.Message.BuildingUnitPersistentLocalId, message.Position, ct);
             });
 
             When<Envelope<BuildingUnitWasRealizedBecauseBuildingWasRealized>>(async (context, message, ct) =>
@@ -352,6 +408,8 @@ namespace BuildingRegistry.Producer.Ldes
                         buildingUnit.Version = message.Message.Provenance.Timestamp;
                     },
                     ct);
+
+                await ProduceBuildingUnit(context, message.Message.BuildingUnitPersistentLocalId, message.Position, ct);
             });
 
             When<Envelope<BuildingUnitWasCorrectedFromRealizedToPlanned>>(async (context, message, ct) =>
@@ -364,6 +422,8 @@ namespace BuildingRegistry.Producer.Ldes
                         buildingUnit.Version = message.Message.Provenance.Timestamp;
                     },
                     ct);
+
+                await ProduceBuildingUnit(context, message.Message.BuildingUnitPersistentLocalId, message.Position, ct);
             });
 
             When<Envelope<BuildingUnitWasCorrectedFromRealizedToPlannedBecauseBuildingWasCorrected>>(async (context, message, ct) =>
@@ -376,6 +436,8 @@ namespace BuildingRegistry.Producer.Ldes
                         buildingUnit.Version = message.Message.Provenance.Timestamp;
                     },
                     ct);
+
+                await ProduceBuildingUnit(context, message.Message.BuildingUnitPersistentLocalId, message.Position, ct);
             });
 
             When<Envelope<BuildingUnitWasNotRealizedV2>>(async (context, message, ct) =>
@@ -388,7 +450,8 @@ namespace BuildingRegistry.Producer.Ldes
                         buildingUnit.Version = message.Message.Provenance.Timestamp;
                     },
                     ct);
-                ;
+
+                await ProduceBuildingUnit(context, message.Message.BuildingUnitPersistentLocalId, message.Position, ct);
             });
 
             When<Envelope<BuildingUnitWasNotRealizedBecauseBuildingWasNotRealized>>(async (context, message, ct) =>
@@ -401,6 +464,8 @@ namespace BuildingRegistry.Producer.Ldes
                         buildingUnit.Version = message.Message.Provenance.Timestamp;
                     },
                     ct);
+
+                await ProduceBuildingUnit(context, message.Message.BuildingUnitPersistentLocalId, message.Position, ct);
             });
 
             When<Envelope<BuildingUnitWasCorrectedFromNotRealizedToPlanned>>(async (context, message, ct) =>
@@ -413,6 +478,8 @@ namespace BuildingRegistry.Producer.Ldes
                         buildingUnit.Version = message.Message.Provenance.Timestamp;
                     },
                     ct);
+
+                await ProduceBuildingUnit(context, message.Message.BuildingUnitPersistentLocalId, message.Position, ct);
             });
 
             When<Envelope<BuildingUnitWasRetiredV2>>(async (context, message, ct) =>
@@ -425,6 +492,8 @@ namespace BuildingRegistry.Producer.Ldes
                         buildingUnit.Version = message.Message.Provenance.Timestamp;
                     },
                     ct);
+
+                await ProduceBuildingUnit(context, message.Message.BuildingUnitPersistentLocalId, message.Position, ct);
             });
 
             When<Envelope<BuildingUnitWasCorrectedFromRetiredToRealized>>(async (context, message, ct) =>
@@ -437,6 +506,8 @@ namespace BuildingRegistry.Producer.Ldes
                         buildingUnit.Version = message.Message.Provenance.Timestamp;
                     },
                     ct);
+
+                await ProduceBuildingUnit(context, message.Message.BuildingUnitPersistentLocalId, message.Position, ct);
             });
 
             When<Envelope<BuildingUnitWasRemovedV2>>(async (context, message, ct) =>
@@ -454,6 +525,9 @@ namespace BuildingRegistry.Producer.Ldes
                         buildingUnit.Version = message.Message.Provenance.Timestamp;
                     },
                     ct);
+
+                await ProduceBuilding(context, message.Message.BuildingPersistentLocalId, message.Position, ct);
+                await ProduceBuildingUnit(context, message.Message.BuildingUnitPersistentLocalId, message.Position, ct);
             });
 
             When<Envelope<BuildingUnitWasRemovedBecauseBuildingWasRemoved>>(async (context, message, ct) =>
@@ -466,6 +540,8 @@ namespace BuildingRegistry.Producer.Ldes
                         buildingUnit.Version = message.Message.Provenance.Timestamp;
                     },
                     ct);
+
+                await ProduceBuildingUnit(context, message.Message.BuildingUnitPersistentLocalId, message.Position, ct);
             });
 
             When<Envelope<BuildingUnitRemovalWasCorrected>>(async (context, message, ct) =>
@@ -489,6 +565,9 @@ namespace BuildingRegistry.Producer.Ldes
                         buildingUnit.Version = message.Message.Provenance.Timestamp;
                     },
                     ct);
+
+                await ProduceBuilding(context, message.Message.BuildingPersistentLocalId, message.Position, ct);
+                await ProduceBuildingUnit(context, message.Message.BuildingUnitPersistentLocalId, message.Position, ct);
             });
 
             When<Envelope<BuildingUnitWasRegularized>>(async (context, message, ct) =>
@@ -501,6 +580,8 @@ namespace BuildingRegistry.Producer.Ldes
                         buildingUnit.Version = message.Message.Provenance.Timestamp;
                     },
                     ct);
+
+                await ProduceBuildingUnit(context, message.Message.BuildingUnitPersistentLocalId, message.Position, ct);
             });
 
             When<Envelope<BuildingUnitRegularizationWasCorrected>>(async (context, message, ct) =>
@@ -513,6 +594,8 @@ namespace BuildingRegistry.Producer.Ldes
                         buildingUnit.Version = message.Message.Provenance.Timestamp;
                     },
                     ct);
+
+                await ProduceBuildingUnit(context, message.Message.BuildingUnitPersistentLocalId, message.Position, ct);
             });
 
             When<Envelope<BuildingUnitWasDeregulated>>(async (context, message, ct) =>
@@ -525,6 +608,8 @@ namespace BuildingRegistry.Producer.Ldes
                         buildingUnit.Version = message.Message.Provenance.Timestamp;
                     },
                     ct);
+
+                await ProduceBuildingUnit(context, message.Message.BuildingUnitPersistentLocalId, message.Position, ct);
             });
 
             When<Envelope<BuildingUnitDeregulationWasCorrected>>(async (context, message, ct) =>
@@ -537,6 +622,8 @@ namespace BuildingRegistry.Producer.Ldes
                         buildingUnit.Version = message.Message.Provenance.Timestamp;
                     },
                     ct);
+
+                await ProduceBuildingUnit(context, message.Message.BuildingUnitPersistentLocalId, message.Position, ct);
             });
 
             When<Envelope<CommonBuildingUnitWasAddedV2>>(async (context, message, ct) =>
@@ -559,6 +646,9 @@ namespace BuildingRegistry.Producer.Ldes
                     message.Message.Provenance.Timestamp);
 
                 await context.BuildingUnits.AddAsync(buildingUnit, ct);
+
+                await ProduceBuilding(context, message.Message.BuildingPersistentLocalId, message.Position, ct);
+                await ProduceBuildingUnit(context, message.Message.BuildingUnitPersistentLocalId, message.Position, ct);
             });
 
             When<Envelope<BuildingUnitPositionWasCorrected>>(async (context, message, ct) =>
@@ -572,6 +662,8 @@ namespace BuildingRegistry.Producer.Ldes
                         buildingUnit.Version = message.Message.Provenance.Timestamp;
                     },
                     ct);
+
+                await ProduceBuildingUnit(context, message.Message.BuildingUnitPersistentLocalId, message.Position, ct);
             });
 
             When<Envelope<BuildingUnitAddressWasAttachedV2>>(async (context, message, ct) =>
@@ -587,6 +679,8 @@ namespace BuildingRegistry.Producer.Ldes
                         buildingUnit.Version = message.Message.Provenance.Timestamp;
                     },
                     ct);
+
+                await ProduceBuildingUnit(context, message.Message.BuildingUnitPersistentLocalId, message.Position, ct);
             });
 
             When<Envelope<BuildingUnitAddressWasDetachedV2>>(async (context, message, ct) =>
@@ -603,6 +697,8 @@ namespace BuildingRegistry.Producer.Ldes
                         buildingUnit.Version = message.Message.Provenance.Timestamp;
                     },
                     ct);
+
+                await ProduceBuildingUnit(context, message.Message.BuildingUnitPersistentLocalId, message.Position, ct);
             });
 
             When<Envelope<BuildingUnitAddressWasDetachedBecauseAddressWasRejected>>(async (context, message, ct) =>
@@ -619,6 +715,8 @@ namespace BuildingRegistry.Producer.Ldes
                         buildingUnit.Version = message.Message.Provenance.Timestamp;
                     },
                     ct);
+
+                await ProduceBuildingUnit(context, message.Message.BuildingUnitPersistentLocalId, message.Position, ct);
             });
 
             When<Envelope<BuildingUnitAddressWasDetachedBecauseAddressWasRetired>>(async (context, message, ct) =>
@@ -635,6 +733,8 @@ namespace BuildingRegistry.Producer.Ldes
                         buildingUnit.Version = message.Message.Provenance.Timestamp;
                     },
                     ct);
+
+                await ProduceBuildingUnit(context, message.Message.BuildingUnitPersistentLocalId, message.Position, ct);
             });
 
             When<Envelope<BuildingUnitAddressWasDetachedBecauseAddressWasRemoved>>(async (context, message, ct) =>
@@ -651,6 +751,8 @@ namespace BuildingRegistry.Producer.Ldes
                         buildingUnit.Version = message.Message.Provenance.Timestamp;
                     },
                     ct);
+
+                await ProduceBuildingUnit(context, message.Message.BuildingUnitPersistentLocalId, message.Position, ct);
             });
 
             When<Envelope<BuildingUnitAddressWasReplacedBecauseAddressWasReaddressed>>(async (context, message, ct) =>
@@ -690,6 +792,8 @@ namespace BuildingRegistry.Producer.Ldes
                         buildingUnit.Version = message.Message.Provenance.Timestamp;
                     },
                     ct);
+
+                await ProduceBuildingUnit(context, message.Message.BuildingUnitPersistentLocalId, message.Position, ct);
             });
 
             When<Envelope<BuildingBuildingUnitsAddressesWereReaddressed>>(async (context, message, ct) =>
@@ -719,6 +823,9 @@ namespace BuildingRegistry.Producer.Ldes
                         },
                         ct);
                 }
+
+                foreach (var buildingUnitsReaddress in message.Message.BuildingUnitsReaddresses)
+                    await ProduceBuildingUnit(context, buildingUnitsReaddress.BuildingUnitPersistentLocalId, message.Position, ct);
             });
 
             When<Envelope<BuildingUnitAddressWasReplacedBecauseOfMunicipalityMerger>>(async (context, message, ct) =>
@@ -739,6 +846,8 @@ namespace BuildingRegistry.Producer.Ldes
                         buildingUnit.Version = message.Message.Provenance.Timestamp;
                     },
                     ct);
+
+                await ProduceBuildingUnit(context, message.Message.BuildingUnitPersistentLocalId, message.Position, ct);
             });
 
             When<Envelope<BuildingUnitWasRetiredBecauseBuildingWasDemolished>>(async (context, message, ct) =>
@@ -751,6 +860,8 @@ namespace BuildingRegistry.Producer.Ldes
                         buildingUnit.Version = message.Message.Provenance.Timestamp;
                     },
                     ct);
+
+                await ProduceBuildingUnit(context, message.Message.BuildingUnitPersistentLocalId, message.Position, ct);
             });
 
             When<Envelope<BuildingUnitWasNotRealizedBecauseBuildingWasDemolished>>(async (context, message, ct) =>
@@ -763,6 +874,8 @@ namespace BuildingRegistry.Producer.Ldes
                         buildingUnit.Version = message.Message.Provenance.Timestamp;
                     },
                     ct);
+
+                await ProduceBuildingUnit(context, message.Message.BuildingUnitPersistentLocalId, message.Position, ct);
             });
 
             When<Envelope<BuildingUnitWasMovedIntoBuilding>>(async (context, message, ct) =>
@@ -790,6 +903,9 @@ namespace BuildingRegistry.Producer.Ldes
                         buildingUnit.Version = message.Message.Provenance.Timestamp;
                     },
                     ct);
+
+                await ProduceBuilding(context, message.Message.BuildingPersistentLocalId, message.Position, ct);
+                await ProduceBuildingUnit(context, message.Message.BuildingUnitPersistentLocalId, message.Position, ct);
             });
 
             When<Envelope<BuildingUnitWasMovedOutOfBuilding>>(async (context, message, ct) =>
@@ -801,6 +917,8 @@ namespace BuildingRegistry.Producer.Ldes
                         building.Version = message.Message.Provenance.Timestamp;
                     },
                     ct);
+
+                await ProduceBuilding(context, message.Message.BuildingPersistentLocalId, message.Position, ct);
             });
 
             #endregion
@@ -866,7 +984,7 @@ namespace BuildingRegistry.Producer.Ldes
 
             if (!result.IsSuccess)
             {
-                throw new InvalidOperationException(result.Error + Environment.NewLine + result.ErrorReason); //TODO: create custom exception
+                throw new InvalidOperationException(result.Error + Environment.NewLine + result.ErrorReason);
             }
         }
 
@@ -883,7 +1001,7 @@ namespace BuildingRegistry.Producer.Ldes
 
             var buildingUnitLdes = new BuildingUnitLdes(buildingUnit, _buildingUnitOsloNamespace);
 
-            await ProduceBuilding(
+            await ProduceBuildingUnit(
                 $"{_buildingUnitOsloNamespace}/{buildingUnit.BuildingUnitPersistentLocalId}",
                 buildingUnit.BuildingUnitPersistentLocalId.ToString(),
                 JsonConvert.SerializeObject(buildingUnitLdes, _jsonSerializerSettings),
@@ -902,7 +1020,7 @@ namespace BuildingRegistry.Producer.Ldes
 
             if (!result.IsSuccess)
             {
-                throw new InvalidOperationException(result.Error + Environment.NewLine + result.ErrorReason); //TODO: create custom exception
+                throw new InvalidOperationException(result.Error + Environment.NewLine + result.ErrorReason);
             }
         }
 
