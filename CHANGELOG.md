@@ -1,3 +1,10 @@
+## [4.25.2](https://github.com/informatievlaanderen/building-registry/compare/v4.25.1...v4.25.2) (2025-03-26)
+
+
+### Bug Fixes
+
+* **ldes:** ef queries take cache into account ([47b2a13](https://github.com/informatievlaanderen/building-registry/commit/47b2a13776bd38e62fa9ce3358cc841685181bfc))
+
 ## [4.25.1](https://github.com/informatievlaanderen/building-registry/compare/v4.25.0...v4.25.1) (2025-03-26)
 
 
