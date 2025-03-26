@@ -1,3 +1,10 @@
+## [4.25.1](https://github.com/informatievlaanderen/building-registry/compare/v4.25.0...v4.25.1) (2025-03-26)
+
+
+### Bug Fixes
+
+* **ldes:** add migrations ([b11d899](https://github.com/informatievlaanderen/building-registry/commit/b11d8990d2f999798d488c508a8313c426d079ed))
+
 # [4.25.0](https://github.com/informatievlaanderen/building-registry/compare/v4.24.10...v4.25.0) (2025-03-26)
 
 
