@@ -222,7 +222,6 @@ namespace BuildingRegistry.Projections.Wms.BuildingV3
             When<Envelope<BuildingUnitAddressWasDetachedBecauseAddressWasRejected>>(DoNothing);
             When<Envelope<BuildingUnitAddressWasDetachedBecauseAddressWasRemoved>>(DoNothing);
             When<Envelope<BuildingUnitAddressWasDetachedBecauseAddressWasRetired>>(DoNothing);
-            When<Envelope<BuildingGeometryWasImportedFromGrb>>(DoNothing);
             When<Envelope<BuildingUnitAddressWasReplacedBecauseAddressWasReaddressed>>(DoNothing);
             When<Envelope<BuildingUnitAddressWasReplacedBecauseOfMunicipalityMerger>>(DoNothing);
             When<Envelope<BuildingUnitWasRemovedBecauseBuildingWasRemoved>>(DoNothing);

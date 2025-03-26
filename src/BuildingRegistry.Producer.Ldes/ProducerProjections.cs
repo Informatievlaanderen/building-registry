@@ -39,8 +39,6 @@ namespace BuildingRegistry.Producer.Ldes
             _buildingUnitOsloNamespace = buildingUnitOsloNamespace;
             _jsonSerializerSettings = jsonSerializerSettings;
 
-            var wkbReader = WKBReaderFactory.Create();
-
             When<Envelope<BuildingWasMigrated>>(async (context, message, ct) =>
             {
                 var building = new BuildingDetail(
@@ -312,7 +310,6 @@ namespace BuildingRegistry.Producer.Ldes
 
             When<Envelope<BuildingUnitWasPlannedV2>>(async (context, message, ct) =>
             {
-                // todo-pr produce building
                 await context.FindAndUpdateBuilding(message.Message.BuildingPersistentLocalId, building =>
                 {
                     building.Version = message.Message.Provenance.Timestamp;
@@ -807,6 +804,8 @@ namespace BuildingRegistry.Producer.Ldes
             });
 
             #endregion
+
+            When<Envelope<BuildingGeometryWasImportedFromGrb>>(DoNothing);
         }
 
         private static void RemoveIdempotentAddress(BuildingUnitDetail buildingUnit, int addressPersistentLocalId)
