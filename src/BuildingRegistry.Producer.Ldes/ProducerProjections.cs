@@ -958,10 +958,15 @@ namespace BuildingRegistry.Producer.Ldes
             var building = await context.Buildings.FindAsync(buildingPersistentLocalId, cancellationToken: cancellationToken)
                          ?? throw new ProjectionItemNotFoundException<ProducerProjections>(buildingPersistentLocalId.ToString());
 
-            var buildingUnitPersistentLocalIds = await context.BuildingUnits
+            var buildingUnitPersistentLocalIds = (await context.BuildingUnits
                 .Where(x => x.BuildingPersistentLocalId == buildingPersistentLocalId)
                 .Select(x => x.BuildingUnitPersistentLocalId)
-                .ToListAsync(cancellationToken);
+                .ToListAsync(cancellationToken))
+                .Concat(context.BuildingUnits.Local
+                    .Where(x => x.BuildingPersistentLocalId == buildingPersistentLocalId)
+                    .Select(x => x.BuildingUnitPersistentLocalId)
+                    .ToList())
+                .Distinct();
 
             var buildingLdes = new BuildingLdes(building, buildingUnitPersistentLocalIds, _buildingOsloNamespace);
 
@@ -995,9 +1000,10 @@ namespace BuildingRegistry.Producer.Ldes
             CancellationToken cancellationToken = default)
         {
             var buildingUnit = await context.BuildingUnits
-                                   .Include(x => x.Addresses)
-                                   .SingleOrDefaultAsync(x => x.BuildingUnitPersistentLocalId == buildingUnitPersistentLocalId, cancellationToken)
+                                   .FindAsync(buildingUnitPersistentLocalId, cancellationToken: cancellationToken)
                            ?? throw new ProjectionItemNotFoundException<ProducerProjections>(buildingUnitPersistentLocalId.ToString());
+
+            await context.Entry(buildingUnit).Collection(x => x.Addresses).LoadAsync(cancellationToken);
 
             var buildingUnitLdes = new BuildingUnitLdes(buildingUnit, _buildingUnitOsloNamespace);
 
