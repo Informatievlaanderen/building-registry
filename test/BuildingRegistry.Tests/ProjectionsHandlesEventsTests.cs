@@ -19,6 +19,7 @@ namespace BuildingRegistry.Tests
     using Microsoft.Extensions.Options;
     using Moq;
     using NetTopologySuite.IO;
+    using Newtonsoft.Json;
     using Producer;
     using Producer.Snapshot.Oslo;
     using Projections.BackOffice;
@@ -188,6 +189,11 @@ namespace BuildingRegistry.Tests
                 new ProducerBuildingUnitProjections(Mock.Of<IProducer>(), Mock.Of<ISnapshotManager>(), "", Mock.Of<IOsloProxy>())
             }];
 
+            yield return [new List<ConnectedProjection<BuildingRegistry.Producer.Ldes.ProducerContext>>
+            {
+                new BuildingRegistry.Producer.Ldes.ProducerProjections(Mock.Of<IProducer>(), Mock.Of<IProducer>(), "", "", new JsonSerializerSettings())
+            }];
+
             yield return [new List<ConnectedProjection<BuildingRegistry.Producer.ProducerContext>>
             {
                 new ProducerMigrateProjections(Mock.Of<IProducer>())
@@ -202,8 +208,9 @@ namespace BuildingRegistry.Tests
                 projection.Handlers.Should().NotBeEmpty();
                 foreach (var eventType in eventsToCheck)
                 {
-                    var messageType = projection.Handlers.Any(x => x.Message.GetGenericArguments().First() == eventType);
-                    messageType.Should().BeTrue($"The event {eventType.Name} is not handled by the projection {projection.GetType().Name}");
+                    var eventHandlersCount = projection.Handlers.Count(x => x.Message.GetGenericArguments().First() == eventType);
+                    eventHandlersCount.Should().BeGreaterThan(0, $"The event {eventType.Name} is not handled by the projection {projection.GetType().Name}");
+                    eventHandlersCount.Should().BeLessOrEqualTo(1, $"The event {eventType.Name} has multiple handlers in the projection {projection.GetType().Name}");
                 }
             }
         }

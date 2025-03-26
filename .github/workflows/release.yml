@@ -219,6 +219,21 @@ jobs:
       dotnet-version: ${{ vars.VBR_DOTNET_VERSION_8 }}
     secrets: inherit
 
+  build-producer-ldes:
+    name: Build Producer Ldes
+    uses: Informatievlaanderen/build-pipeline/.github/workflows/build-image.yml@main
+    needs: [ set-release-version ]
+    if: ${{ (github.repository_owner == 'Informatievlaanderen') && (needs.set-release-version.outputs.version != 'none') }}
+    with:
+      registry: ${{ vars.VBR_DEVOPS_DOCKER_REGISTRY }}/building-registry
+      image-file: br-producer-ldes-image.tar
+      image-name: producer-ldes
+      test-project: BuildingRegistry.Tests
+      build-project: BuildingRegistry.Producer.Ldes
+      semver: ${{ needs.set-release-version.outputs.version }}
+      dotnet-version: ${{ vars.VBR_DOTNET_VERSION_8 }}
+    secrets: inherit
+
   build-snapshot-verifier:
     name: Build Snapshot Verifier
     uses: Informatievlaanderen/build-pipeline/.github/workflows/build-image.yml@main
@@ -320,6 +335,7 @@ jobs:
       build-consumer-read-parcel,
       build-producer,
       build-producer-snapshot-oslo,
+      build-producer-ldes,
       build-lambda-backoffice,
       build-snapshot-verifier
       ]
@@ -611,6 +627,7 @@ jobs:
           'consumer-read-parcel',
           'producer',
           'producer-snapshot-oslo',
+          'producer-ldes',
           'snapshot-verifier'
           ]
     steps:
@@ -688,6 +705,7 @@ jobs:
           'building-consumer-parcel',
           'building-producer',
           'building-producer-snapshot-oslo',
+          'building-producer-ldes',
           'building-projections',
           'building-projections-backoffice'
           ]
@@ -836,6 +854,7 @@ jobs:
           'building-consumer-parcel',
           'building-producer',
           'building-producer-snapshot-oslo',
+          'building-producer-ldes',
           'building-projections',
           'building-projections-backoffice'
           ]

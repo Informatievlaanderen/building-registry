@@ -8,8 +8,8 @@ namespace BuildingRegistry.Projections.Wfs.BuildingV3
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.Connector;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore;
     using Be.Vlaanderen.Basisregisters.Utilities.HexByteConvertor;
-    using BuildingRegistry.Building;
-    using BuildingRegistry.Building.Events;
+    using Building;
+    using Building.Events;
     using Infrastructure;
     using NetTopologySuite.Geometries;
     using NetTopologySuite.IO;
@@ -146,15 +146,6 @@ namespace BuildingRegistry.Projections.Wfs.BuildingV3
             {
                 var item = await context.BuildingsV3.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);
                 item.Status = PlannedStatus;
-                item.Version = message.Message.Provenance.Timestamp;
-            });
-
-            When<Envelope<BuildingWasMeasured>>(async (context, message, ct) =>
-            {
-                var item = await context.BuildingsV3.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);
-                SetGeometry(
-                    item, message.Message.ExtendedWkbGeometryBuilding,
-                    MapGeometryMethod(BuildingGeometryMethod.MeasuredByGrb));
                 item.Version = message.Message.Provenance.Timestamp;
             });
 

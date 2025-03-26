@@ -6,7 +6,6 @@ namespace BuildingRegistry.Infrastructure
         public const string Import = "BuildingRegistryImport";
         public const string Legacy = "BuildingRegistryLegacy";
         public const string Extract = "BuildingRegistryExtract";
-        public const string Syndication = "BuildingRegistrySyndication";
         public const string Wms = "wms";
         public const string Wfs = "wfs";
         public const string ConsumerAddress = "BuildingRegistryConsumerAddress";
@@ -17,6 +16,7 @@ namespace BuildingRegistry.Infrastructure
         public const string BackOfficeProjections = "BuildingRegistryBackOfficeProjections";
         public const string Producer = "BuildingRegistryProducer";
         public const string ProducerSnapshotOslo = "BuildingRegistryProducerSnapshotOslo";
+        public const string ProducerLdes = "BuildingRegistryProducerLdes";
         public const string Integration = "integration_building";
     }
 
@@ -26,7 +26,6 @@ namespace BuildingRegistry.Infrastructure
         public const string Wms = "__EFMigrationsHistoryWmsBuilding";
         public const string Wfs = "__EFMigrationsHistoryWfsBuilding";
         public const string Extract = "__EFMigrationsHistoryExtract";
-        public const string Syndication = "__EFMigrationsHistorySyndication";
         public const string RedisDataMigration = "__EFMigrationsHistoryDataMigration";
         public const string Sequence = "__EFMigrationsHistorySequence";
         public const string ConsumerAddress = "__EFMigrationsHistoryConsumerAddress";
@@ -36,6 +35,7 @@ namespace BuildingRegistry.Infrastructure
         public const string MigratorProjection = "__EFMigrationsHistoryMigrationProjection";
         public const string Producer = "__EFMigrationsHistoryProducer";
         public const string ProducerSnapshotOslo = "__EFMigrationsHistoryProducerSnapshotOslo";
+        public const string ProducerLdes = "__EFMigrationsHistoryProducerLdes";
         public const string Integration = "__EFMigrationsHistory";
     }
 }

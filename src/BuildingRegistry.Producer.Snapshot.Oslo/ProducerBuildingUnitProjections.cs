@@ -466,28 +466,6 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo
                     ct);
             });
 
-            When<Envelope<BuildingWasCorrectedFromNotRealizedToPlanned>>(async (_,
-                    message, ct) =>
-                { });
-
-            When<Envelope<BuildingWasCorrectedFromRealizedToUnderConstruction>>(
-                async (_, message, ct) => { });
-
-            When<Envelope<BuildingWasCorrectedFromUnderConstructionToPlanned>>(
-                async (_, message, ct) => { });
-
-            When<Envelope<BuildingWasNotRealizedV2>>(async (_, message, ct) => { });
-
-            When<Envelope<BuildingWasPlannedV2>>(async (_, message, ct) => { });
-
-            When<Envelope<UnplannedBuildingWasRealizedAndMeasured>>(async (_, message,
-                    ct) =>
-                { });
-
-            When<Envelope<BuildingWasRealizedV2>>(async (_, message, ct) => { });
-
-            When<Envelope<BuildingWasRemovedV2>>(async (_, message, ct) => { });
-
             When<Envelope<CommonBuildingUnitWasAddedV2>>(async (_, message, ct) =>
             {
                 await FindAndProduce(async () =>
