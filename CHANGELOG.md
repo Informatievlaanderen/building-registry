@@ -1,3 +1,10 @@
+## [4.25.3](https://github.com/informatievlaanderen/building-registry/compare/v4.25.2...v4.25.3) (2025-04-11)
+
+
+### Bug Fixes
+
+* **ldes:** change https to http for srsname ([addaba1](https://github.com/informatievlaanderen/building-registry/commit/addaba1fc56e343e6a139483a689c90f8c828655))
+
 ## [4.25.2](https://github.com/informatievlaanderen/building-registry/compare/v4.25.1...v4.25.2) (2025-03-26)
 
 
