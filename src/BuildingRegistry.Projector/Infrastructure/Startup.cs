@@ -10,6 +10,7 @@ namespace BuildingRegistry.Projector.Infrastructure
     using Autofac.Extensions.DependencyInjection;
     using Be.Vlaanderen.Basisregisters.Api;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.LastChangedList;
+    using Be.Vlaanderen.Basisregisters.Projector;
     using Be.Vlaanderen.Basisregisters.Projector.ConnectedProjections;
     using BuildingRegistry.Projections.Extract;
     using BuildingRegistry.Projections.Integration.Infrastructure;
@@ -141,11 +142,21 @@ namespace BuildingRegistry.Projector.Infrastructure
                             health.AddDbContextCheck<WfsContext>(
                                 $"dbcontext-{nameof(WfsContext).ToLowerInvariant()}",
                                 tags: new[] { DatabaseTag, "sql", "sqlserver" });
+
+                            health.AddCheck<ProjectionsHealthCheck>(
+                                "projections",
+                                failureStatus: HealthStatus.Unhealthy,
+                                tags: ["projections"]);
                         }
                     }
                 })
                 .Configure<ExtractConfig>(_configuration.GetSection("Extract"))
                 .Configure<IntegrationOptions>(_configuration.GetSection("Integration"));
+
+            services.AddSingleton<ProjectionsHealthCheck>(
+                c => new ProjectionsHealthCheck(
+                    new AllUnhealthyProjectionsHealthCheckStrategy
+                        (c.GetRequiredService<IConnectedProjectionsManager>()), _loggerFactory));
 
             var containerBuilder = new ContainerBuilder();
             containerBuilder.RegisterModule(new LoggingModule(_configuration, services));

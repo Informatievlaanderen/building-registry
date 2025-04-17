@@ -72,7 +72,7 @@ jobs:
     - name: Install DotCover
       shell: bash
       run: |
-        dotnet tool install --global JetBrains.dotCover.GlobalTool
+        dotnet tool install --global JetBrains.dotCover.CommandLineTools
         
     - name: Install SonarCloud scanner
       if: steps.cache-sonar-scanner.outputs.cache-hit != 'true'
@@ -97,7 +97,7 @@ jobs:
 
     - name: Test
       shell: bash
-      run: dotnet dotcover test --dcReportType=HTML --nologo --no-build --filter 'FullyQualifiedName!~IntegrationTests' BuildingRegistry.sln
+      run: dotCover cover-dotnet --ReportType=HTML --Output=dotCover.Output.html -- test --nologo --no-build --filter 'FullyQualifiedName!~IntegrationTests' BuildingRegistry.sln
 
     - name: Sonar end build & analyze
       env:
