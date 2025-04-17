@@ -1,3 +1,10 @@
+# [4.26.0](https://github.com/informatievlaanderen/building-registry/compare/v4.25.3...v4.26.0) (2025-04-17)
+
+
+### Features
+
+* update projector and add new health check ([9bf8b37](https://github.com/informatievlaanderen/building-registry/commit/9bf8b37090ac6fc5ddd27ba11d0177da6e5488ae))
+
 ## [4.25.3](https://github.com/informatievlaanderen/building-registry/compare/v4.25.2...v4.25.3) (2025-04-11)
 
 
