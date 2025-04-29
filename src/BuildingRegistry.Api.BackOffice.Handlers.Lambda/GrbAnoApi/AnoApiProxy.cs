@@ -6,8 +6,8 @@
     using System.Text.Json.Serialization;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy.SpatialTools;
     using Building;
-    using IdentityModel;
-    using IdentityModel.Client;
+    using Duende.IdentityModel;
+    using Duende.IdentityModel.Client;
     using Microsoft.Extensions.Options;
     using Polygon = NetTopologySuite.Geometries.Polygon;
 
