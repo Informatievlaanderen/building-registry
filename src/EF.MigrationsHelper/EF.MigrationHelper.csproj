@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net9.0</TargetFramework>
     <LangVersion>latest</LangVersion>
 
-    <RuntimeFrameworkVersion>8.0.2</RuntimeFrameworkVersion>
+    <RuntimeFrameworkVersion>9.0.4</RuntimeFrameworkVersion>
     <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
     <OutputType>Exe</OutputType>
 
@@ -36,8 +36,13 @@
 	  <ProjectReference Include="..\BuildingRegistry.Api.BackOffice.Abstractions\BuildingRegistry.Api.BackOffice.Abstractions.csproj" />
   	<ProjectReference Include="..\BuildingRegistry.Migrator.Building\BuildingRegistry.Migrator.Building.csproj" />
     <ProjectReference Include="..\BuildingRegistry.Projections.BackOffice\BuildingRegistry.Projections.BackOffice.csproj" />
+    <ProjectReference Include="..\BuildingRegistry.Producer\BuildingRegistry.Producer.csproj" />
     <ProjectReference Include="..\BuildingRegistry.Producer.Ldes\BuildingRegistry.Producer.Ldes.csproj" />
+    <ProjectReference Include="..\BuildingRegistry.Producer.Snapshot.Oslo\BuildingRegistry.Producer.Snapshot.Oslo.csproj" />
   </ItemGroup>
 
-  <Import Project="..\..\.paket\Paket.Restore.targets" />
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
+  </ItemGroup>
 </Project>
