@@ -1,3 +1,15 @@
+# [5.0.0](https://github.com/informatievlaanderen/building-registry/compare/v4.26.0...v5.0.0) (2025-04-29)
+
+
+### Code Refactoring
+
+* use renovate and nuget + update pipeline ([cbc047f](https://github.com/informatievlaanderen/building-registry/commit/cbc047fd1f8ce5aa83e8d2e1315e8028bf3b4abf))
+
+
+### BREAKING CHANGES
+
+* update to dotnet 9
+
 # [4.26.0](https://github.com/informatievlaanderen/building-registry/compare/v4.25.3...v4.26.0) (2025-04-17)
 
 
