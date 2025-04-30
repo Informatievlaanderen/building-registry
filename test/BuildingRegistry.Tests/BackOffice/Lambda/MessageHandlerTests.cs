@@ -788,6 +788,39 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda
         }
 
         [Fact]
+        public async Task WhenProcessingRemoveMeasuredBuildingSqsRequest_ThenRemoveMeasuredBuildingLambdaRequestIsSent()
+        {
+            // Arrange
+            var mediator = new Mock<IMediator>();
+            var containerBuilder = new ContainerBuilder();
+            containerBuilder.Register(_ => mediator.Object);
+            var container = containerBuilder.Build();
+
+            var messageData = Fixture.Create<RemoveMeasuredBuildingSqsRequest>();
+            var messageMetadata = new MessageMetadata { MessageGroupId = Fixture.Create<int>().ToString() };
+
+            var sut = new MessageHandler(container);
+
+            // Act
+            await sut.HandleMessage(
+                messageData,
+                messageMetadata,
+                It.IsAny<CancellationToken>());
+
+            // Assert
+            mediator
+                .Verify(x => x.Send(It.Is<RemoveMeasuredBuildingLambdaRequest>(request =>
+                    request.TicketId == messageData.TicketId &&
+                    request.MessageGroupId == messageMetadata.MessageGroupId &&
+                    request.Request == messageData.Request &&
+                    request.BuildingPersistentLocalId == messageData.Request.PersistentLocalId &&
+                    request.IfMatchHeaderValue == messageData.IfMatchHeaderValue &&
+                    request.Provenance == messageData.ProvenanceData!.ToProvenance() &&
+                    request.Metadata == messageData.Metadata
+                ), It.IsAny<CancellationToken>()), Times.Once);
+        }
+
+        [Fact]
         public async Task WhenProcessingRealizingAndMeasuringUnplannedBuildingSqsRequest_ThenLambdaRequestIsSent()
         {
             // Arrange

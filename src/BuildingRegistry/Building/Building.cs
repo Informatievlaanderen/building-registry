@@ -206,6 +206,26 @@ namespace BuildingRegistry.Building
             ApplyChange(new BuildingWasRemovedV2(BuildingPersistentLocalId));
         }
 
+        public void RemoveMeasuredBuilding()
+        {
+            if (IsRemoved)
+            {
+                return;
+            }
+
+            if (BuildingGeometry.Method != BuildingGeometryMethod.MeasuredByGrb)
+            {
+                throw new BuildingHasInvalidGeometryMethodException();
+            }
+
+            if(_buildingUnits.GetNotRemovedUnits().Any())
+            {
+                throw new BuildingHasBuildingUnitsException();
+            }
+
+            ApplyChange(new BuildingWasRemovedV2(BuildingPersistentLocalId));
+        }
+
         public void ChangeOutliningConstruction(ExtendedWkbGeometry extendedWkbGeometry)
         {
             GuardRemovedBuilding();
