@@ -32,6 +32,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "adr", "adr", "{AA7D4C33-B0AA-4BAA-BC72-94FFF7803B27}"
 	ProjectSection(SolutionItems) = preProject
 		docs\adr\0001-record-architecture-decisions.md = docs\adr\0001-record-architecture-decisions.md
+		docs\adr\0002-ldes-buildingunit-without-building.md = docs\adr\0002-ldes-buildingunit-without-building.md
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{48B284E6-5A28-4ECB-BDE2-CBB2FFC61EF0}"

@@ -17,6 +17,14 @@
 
     public class BuildingUnitLdes
     {
+        // Removed this part because the LDES server can't handle reverse properties
+        // ""gebouw"": {
+        //   ""@reverse"": ""https://data.vlaanderen.be/ns/gebouw#bestaatUit"",
+        //   ""@type"": ""@id"",
+        //   ""@context"": {
+        //     ""@base"": ""https://data.vlaanderen.be/id/gebouw/""
+        //   }
+        // },
         private static readonly JObject Context = JObject.Parse(@"
 {
   ""@version"": 1.1,
@@ -53,13 +61,6 @@
   ""afwijkingvastgesteld"": {
     ""@id"": ""https://basisregisters.vlaanderen.be/implementatiemodel/gebouwenregister#afwijkingvastgesteld"",
     ""@type"": ""http://www.w3.org/2001/XMLSchema#boolean""
-  },
-  ""gebouw"": {
-    ""@reverse"": ""https://data.vlaanderen.be/ns/gebouw#bestaatUit"",
-    ""@type"": ""@id"",
-    ""@context"": {
-      ""@base"": ""https://data.vlaanderen.be/id/gebouw/""
-    }
   },
   ""adressen"": {
     ""@id"": ""https://data.vlaanderen.be/ns/gebouw#Gebouweenheid.adres"",
@@ -116,8 +117,8 @@
         [JsonProperty("IsVerwijderd", Order = 6)]
         public bool IsVerwijderd { get; private set; }
 
-        [JsonProperty("Gebouw", Order = 7)]
-        public string GebouwId { get; private set; }
+        // [JsonProperty("Gebouw", Order = 7)]
+        // public string GebouwId { get; private set; }
 
         [JsonProperty("Adressen", Order = 8)]
         public List<string> Adressen { get; private set; }
@@ -132,7 +133,7 @@
             Status = buildingUnit.Status.Map();
             Functie = buildingUnit.Function.Map();
             IsVerwijderd = buildingUnit.IsRemoved;
-            GebouwId = buildingUnit.BuildingPersistentLocalId.ToString();
+            //GebouwId = buildingUnit.BuildingPersistentLocalId.ToString();
             Adressen = buildingUnit.Addresses.Select(x => x.AddressPersistentLocalId.ToString()).ToList();
             AfwijkingVastgesteld = buildingUnit.HasDeviation;
         }
