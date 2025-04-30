@@ -1,3 +1,10 @@
+## [5.0.1](https://github.com/informatievlaanderen/building-registry/compare/v5.0.0...v5.0.1) (2025-04-30)
+
+
+### Bug Fixes
+
+* **ldes:** remove gebouw from buildingunit GAWR-6786 ([f7e54f9](https://github.com/informatievlaanderen/building-registry/commit/f7e54f9a47bc13da4b245ab3ab06ed4266b931ad))
+
 # [5.0.0](https://github.com/informatievlaanderen/building-registry/compare/v4.26.0...v5.0.0) (2025-04-29)
 
 
