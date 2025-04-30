@@ -169,6 +169,18 @@ namespace BuildingRegistry.Building
                     building.RemoveConstruction();
                 });
 
+            For<RemoveMeasuredBuilding>()
+                .AddSqlStreamStore(getStreamStore, getUnitOfWork, eventMapping, eventSerializer, getSnapshotStore)
+                .AddEventHash<RemoveMeasuredBuilding, Building>(getUnitOfWork)
+                .AddProvenance(getUnitOfWork, provenanceFactory)
+                .Handle(async (message, ct) =>
+                {
+                    var streamId = new BuildingStreamId(message.Command.BuildingPersistentLocalId);
+                    var building = await buildingRepository().GetAsync(streamId, ct);
+
+                    building.RemoveMeasuredBuilding();
+                });
+
             For<ChangeBuildingOutline>()
                 .AddSqlStreamStore(getStreamStore, getUnitOfWork, eventMapping, eventSerializer, getSnapshotStore)
                 .AddEventHash<ChangeBuildingOutline, Building>(getUnitOfWork)
