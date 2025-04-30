@@ -58,11 +58,11 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda
                 Fixture.Create<Provenance>()));
         }
 
-        protected void MeasureBuilding(BuildingPersistentLocalId buildingPersistentLocalId, ExtendedWkbGeometry extendedWkbGeometry)
+        protected void MeasureBuilding(BuildingPersistentLocalId buildingPersistentLocalId, ExtendedWkbGeometry? extendedWkbGeometry = null)
         {
             DispatchArrangeCommand(new MeasureBuilding(
                 buildingPersistentLocalId,
-                extendedWkbGeometry,
+                extendedWkbGeometry ?? new ExtendedWkbGeometry(GeometryHelper.ValidPolygon.AsBinary()),
                 Fixture.Create<BuildingGrbData>(),
                 Fixture.Create<Provenance>()));
         }

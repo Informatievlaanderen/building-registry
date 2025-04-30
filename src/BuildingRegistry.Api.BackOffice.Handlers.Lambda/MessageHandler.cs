@@ -114,6 +114,10 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda
                     await mediator.Send(new RemoveBuildingUnitLambdaRequest(messageMetadata.MessageGroupId!, request), cancellationToken);
                     break;
 
+                case RemoveMeasuredBuildingSqsRequest request:
+                    await mediator.Send(new RemoveMeasuredBuildingLambdaRequest(messageMetadata.MessageGroupId!, request), cancellationToken);
+                    break;
+
                 case DeregulateBuildingUnitSqsRequest request:
                     await mediator.Send(new DeregulateBuildingUnitLambdaRequest(messageMetadata.MessageGroupId!, request), cancellationToken);
                     break;
