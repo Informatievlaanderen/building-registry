@@ -1,3 +1,10 @@
+## [5.0.2](https://github.com/informatievlaanderen/building-registry/compare/v5.0.1...v5.0.2) (2025-05-05)
+
+
+### Bug Fixes
+
+* **consumer:** bump message-handling to 6.0.3 ([5efd9bd](https://github.com/informatievlaanderen/building-registry/commit/5efd9bdc9c3dcde756b39e4d38a5ace1a151876e))
+
 ## [5.0.1](https://github.com/informatievlaanderen/building-registry/compare/v5.0.0...v5.0.1) (2025-04-30)
 
 
