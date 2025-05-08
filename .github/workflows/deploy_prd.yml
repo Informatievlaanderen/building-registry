@@ -40,7 +40,7 @@ jobs:
           'building-consumer-parcel',
           'building-producer',
           'building-producer-snapshot-oslo',
-          #'building-producer-ldes',
+          'building-producer-ldes',
           'building-projections',
           'building-projections-backoffice'
           ]
