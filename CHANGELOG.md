@@ -1,3 +1,10 @@
+# [5.1.0](https://github.com/informatievlaanderen/building-registry/compare/v5.0.2...v5.1.0) (2025-05-14)
+
+
+### Features
+
+* add remove measured building ([ce3fd80](https://github.com/informatievlaanderen/building-registry/commit/ce3fd80d493f3bf402f5d5c43e0402c23d5aa115))
+
 ## [5.0.2](https://github.com/informatievlaanderen/building-registry/compare/v5.0.1...v5.0.2) (2025-05-05)
 
 
