@@ -42,7 +42,8 @@ jobs:
           'building-producer-snapshot-oslo',
           'building-producer-ldes',
           'building-projections',
-          'building-projections-backoffice'
+          'building-projections-backoffice',
+          'building-last-changed-list'
           ]
 
     steps:
