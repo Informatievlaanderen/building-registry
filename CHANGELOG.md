@@ -1,3 +1,10 @@
+## [5.1.1](https://github.com/informatievlaanderen/building-registry/compare/v5.1.0...v5.1.1) (2025-06-10)
+
+
+### Bug Fixes
+
+* **ci:** separate lastchangedlist ([65fd989](https://github.com/informatievlaanderen/building-registry/commit/65fd989887ba6ce84bfca80e2f69196ba1692d68))
+
 # [5.1.0](https://github.com/informatievlaanderen/building-registry/compare/v5.0.2...v5.1.0) (2025-05-14)
 
 
