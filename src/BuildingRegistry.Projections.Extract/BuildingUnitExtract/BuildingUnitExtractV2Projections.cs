@@ -502,6 +502,7 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
                     itemV2 =>
                     {
                         itemV2.BuildingPersistentLocalId = message.Message.BuildingPersistentLocalId;
+                        UpdateRecord(itemV2, record => { record.gebouwid.Value = message.Message.BuildingPersistentLocalId.ToString(); });
                         UpdateStatus(itemV2, status);
                         UpdateGeometryMethod(itemV2, geometryMethod);
                         UpdateGeometry(itemV2, geometry);
