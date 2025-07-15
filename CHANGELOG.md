@@ -1,3 +1,10 @@
+## [5.1.2](https://github.com/informatievlaanderen/building-registry/compare/v5.1.1...v5.1.2) (2025-07-15)
+
+
+### Bug Fixes
+
+* **extract:** correct buildingid when buildingunitmoved GAWR-7007 ([1154d3b](https://github.com/informatievlaanderen/building-registry/commit/1154d3b2d4c00925bc487bdcd184b73cf25f6eb9))
+
 ## [5.1.1](https://github.com/informatievlaanderen/building-registry/compare/v5.1.0...v5.1.1) (2025-06-10)
 
 
