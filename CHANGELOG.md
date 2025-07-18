@@ -1,3 +1,10 @@
+# [5.2.0](https://github.com/informatievlaanderen/building-registry/compare/v5.1.2...v5.2.0) (2025-07-18)
+
+
+### Features
+
+* cleanup old building extract ([c3d2d08](https://github.com/informatievlaanderen/building-registry/commit/c3d2d083f305d03fe08452f9b1f5dff1d0f30811))
+
 ## [5.1.2](https://github.com/informatievlaanderen/building-registry/compare/v5.1.1...v5.1.2) (2025-07-15)
 
 
