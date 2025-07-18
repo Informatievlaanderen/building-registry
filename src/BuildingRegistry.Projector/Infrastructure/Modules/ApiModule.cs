@@ -102,13 +102,6 @@ namespace BuildingRegistry.Projector.Infrastructure.Modules
                 .RegisterProjectionMigrator<ExtractContextMigrationFactory>(
                     _configuration,
                     _loggerFactory)
-                .RegisterProjections<BuildingExtractV2Projections, ExtractContext>(
-                    context =>
-                        new BuildingExtractV2Projections(
-                            context.Resolve<IOptions<ExtractConfig>>(),
-                            DbaseCodePage.Western_European_ANSI.ToEncoding(),
-                            WKBReaderFactory.Create()),
-                    ConnectedProjectionSettings.Default)
                 .RegisterProjections<BuildingExtractV2EsriProjections, ExtractContext>(
                     context =>
                         new BuildingExtractV2EsriProjections(
