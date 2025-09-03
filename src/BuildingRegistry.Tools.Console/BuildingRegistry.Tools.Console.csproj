@@ -19,13 +19,19 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="AWSSDK.Extensions.NETCore.Setup" />
+    
     <PackageReference Include="Be.Vlaanderen.Basisregisters.Aws.DistributedMutex" />
     <PackageReference Include="Be.Vlaanderen.Basisregisters.GrAr.Notifications" />
     <PackageReference Include="Be.Vlaanderen.Basisregisters.Sqs" />
+    <PackageReference Include="Be.Vlaanderen.Basisregisters.TicketingService.Abstractions" />
+    <PackageReference Include="Be.Vlaanderen.Basisregisters.TicketingService.Proxy.HttpProxy" />
 
     <PackageReference Include="Datadog.Trace.Bundle" />
     <PackageReference Include="Dapper" />
     <PackageReference Include="Destructurama.JsonNet" />
+    
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
 
     <PackageReference Include="Serilog" />
     <PackageReference Include="Serilog.Settings.Configuration" />

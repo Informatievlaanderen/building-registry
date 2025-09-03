@@ -1,9 +1,9 @@
-﻿namespace BuildingRegistry.Tools.Console.CorrectUnitPosition
+﻿namespace BuildingRegistry.Tools.Console.RepairBuilding
 {
     using System.Collections.Generic;
-    using Api.BackOffice.Abstractions.Building.SqsRequests;
     using Be.Vlaanderen.Basisregisters.Sqs;
     using Be.Vlaanderen.Basisregisters.Sqs.Handlers;
+    using BuildingRegistry.Api.BackOffice.Abstractions.Building.SqsRequests;
     using TicketingService.Abstractions;
 
     public class RepairBuildingSqsHandler : SqsHandler<RepairBuildingSqsRequest>
