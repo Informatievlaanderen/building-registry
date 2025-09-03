@@ -1084,6 +1084,37 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda
                     request.Metadata == messageData.Metadata
                 ), It.IsAny<CancellationToken>()), Times.Once);
         }
+
+        [Fact]
+        public async Task WhenRepairBuildingSqsRequest_ThenRepairBuildingLambdaRequestIsSent()
+        {
+            // Arrange
+            var mediator = new Mock<IMediator>();
+            var containerBuilder = new ContainerBuilder();
+            containerBuilder.Register(_ => mediator.Object);
+            var container = containerBuilder.Build();
+
+            var messageData = Fixture.Create<RepairBuildingSqsRequest>();
+            var messageMetadata = new MessageMetadata { MessageGroupId = Fixture.Create<string>() };
+
+            var sut = new MessageHandler(container);
+
+            // Act
+            await sut.HandleMessage(
+                messageData,
+                messageMetadata,
+                CancellationToken.None);
+
+            // Assert
+            mediator
+                .Verify(x => x.Send(It.Is<RepairBuildingLambdaRequest>(request =>
+                    request.TicketId == messageData.TicketId &&
+                    request.MessageGroupId == messageMetadata.MessageGroupId &&
+                    request.BuildingPersistentLocalId == messageData.BuildingPersistentLocalId &&
+                    request.Provenance == messageData.ProvenanceData.ToProvenance() &&
+                    request.Metadata == messageData.Metadata
+                ), It.IsAny<CancellationToken>()), Times.Once);
+        }
     }
 
     internal class TestSqsRequest : SqsRequest

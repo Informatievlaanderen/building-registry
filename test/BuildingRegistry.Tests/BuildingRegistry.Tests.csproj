@@ -20,6 +20,7 @@
     <ProjectReference Include="..\..\src\BuildingRegistry.Projections.Wfs\BuildingRegistry.Projections.Wfs.csproj" />
     <ProjectReference Include="..\..\src\BuildingRegistry.Projections.Wms\BuildingRegistry.Projections.Wms.csproj" />
     <ProjectReference Include="..\..\src\BuildingRegistry.Snapshot.Verifier\BuildingRegistry.Snapshot.Verifier.csproj" />
+    <ProjectReference Include="..\..\src\BuildingRegistry.Tools.Console\BuildingRegistry.Tools.Console.csproj" />
     <ProjectReference Include="..\..\src\BuildingRegistry\BuildingRegistry.csproj" />
   </ItemGroup>
 
