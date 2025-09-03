@@ -196,6 +196,11 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda
                         cancellationToken);
                     break;
 
+                case RepairBuildingSqsRequest request:
+                    await mediator.Send(new RepairBuildingLambdaRequest(messageMetadata.MessageGroupId!, request),
+                        cancellationToken);
+                    break;
+
                 default:
                     throw new NotImplementedException(
                         $"{messageData.GetType().Name} has no corresponding SqsLambdaRequest defined.");

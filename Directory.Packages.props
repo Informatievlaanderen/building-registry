@@ -57,8 +57,8 @@
         <PackageVersion Include="Be.Vlaanderen.Basisregisters.MessageHandling.Kafka.Consumer" Version="6.0.3" />
         <PackageVersion Include="Be.Vlaanderen.Basisregisters.MessageHandling.Kafka.Consumer.SqlServer" Version="6.0.3" />
         <PackageVersion Include="Be.Vlaanderen.Basisregisters.MessageHandling.AwsSqs.Simple" Version="6.0.3" />
-        <PackageVersion Include="Be.Vlaanderen.Basisregisters.Sqs" Version="4.0.1" />
-        <PackageVersion Include="Be.Vlaanderen.Basisregisters.Sqs.Lambda" Version="4.0.1" />
+        <PackageVersion Include="Be.Vlaanderen.Basisregisters.Sqs" Version="4.1.1" />
+        <PackageVersion Include="Be.Vlaanderen.Basisregisters.Sqs.Lambda" Version="4.1.1" />
         <PackageVersion Include="Be.Vlaanderen.Basisregisters.ProjectionHandling.LastChangedList" Version="15.0.1" />
         <PackageVersion Include="Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore" Version="15.0.1" />
         <PackageVersion Include="Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Autofac" Version="15.0.1" />

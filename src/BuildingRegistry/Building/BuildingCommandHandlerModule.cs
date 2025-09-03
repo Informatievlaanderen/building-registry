@@ -275,6 +275,18 @@ namespace BuildingRegistry.Building
 
                     building.ReaddressAddresses(message.Command.Readdresses);
                 });
+
+            For<RepairBuilding>()
+                .AddSqlStreamStore(getStreamStore, getUnitOfWork, eventMapping, eventSerializer, getSnapshotStore)
+                .AddEventHash<RepairBuilding, Building>(getUnitOfWork)
+                .AddProvenance(getUnitOfWork, provenanceFactory)
+                .Handle(async (message, ct) =>
+                {
+                    var streamId = new BuildingStreamId(message.Command.BuildingPersistentLocalId);
+                    var building = await buildingRepository().GetAsync(streamId, ct);
+
+                    building.RepairBuilding();
+                });
         }
     }
 }

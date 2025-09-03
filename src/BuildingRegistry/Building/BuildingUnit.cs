@@ -493,6 +493,20 @@ namespace BuildingRegistry.Building
             );
         }
 
+        public void RepairPosition(BuildingGeometry buildingGeometry)
+        {
+            var correctedGeometry = CorrectedBuildingUnitPosition(buildingGeometry);
+
+            if (correctedGeometry is not null)
+            {
+                Apply(new BuildingUnitPositionWasCorrected(
+                    _buildingPersistentLocalId,
+                    BuildingUnitPersistentLocalId,
+                    BuildingUnitPositionGeometryMethod.DerivedFromObject,
+                    correctedGeometry));
+            }
+        }
+
         private ExtendedWkbGeometry? CorrectedBuildingUnitPosition(BuildingGeometry buildingGeometry)
         {
             var correctedBuildingUnitPosition =

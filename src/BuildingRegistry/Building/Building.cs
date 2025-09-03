@@ -298,6 +298,20 @@ namespace BuildingRegistry.Building
             ));
         }
 
+        public void RepairBuilding()
+        {
+            if (BuildingStatus == BuildingStatus.Planned
+               || BuildingStatus == BuildingStatus.UnderConstruction
+               || BuildingStatus == BuildingStatus.Realized)
+            {
+                foreach (var buildingUnit in _buildingUnits.PlannedBuildingUnits())
+                    buildingUnit.RepairPosition(BuildingGeometry);
+
+                foreach (var buildingUnit in _buildingUnits.RealizedBuildingUnits())
+                    buildingUnit.RepairPosition(BuildingGeometry);
+            }
+        }
+
         private void GuardRemovedBuilding()
         {
             if (IsRemoved)
