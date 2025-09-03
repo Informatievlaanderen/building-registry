@@ -17,7 +17,7 @@ namespace BuildingRegistry.Tests.BackOffice.Sqs.Building
     using FluentAssertions;
     using Moq;
     using TicketingService.Abstractions;
-    using Tools.Console.CorrectUnitPosition;
+    using Tools.Console.RepairBuilding;
     using Xunit;
     using Xunit.Abstractions;
 

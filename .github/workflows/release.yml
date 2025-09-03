@@ -260,6 +260,22 @@ jobs:
       prerestore-script: ./pre-restore.sh
     secrets: inherit
 
+  build-tools-console:
+    name: Build Tools Console
+    uses: Informatievlaanderen/build-pipeline/.github/workflows/build-image-v2.yml@main
+    needs: [ set-release-version ]
+    if: ${{ (github.repository_owner == 'Informatievlaanderen') && (needs.set-release-version.outputs.version != 'none') }}
+    with:
+      registry: ${{ vars.VBR_DEVOPS_DOCKER_REGISTRY }}/building-registry
+      image-file: br-tools-console-image.tar
+      image-name: tools-console
+      test-project: BuildingRegistry.Tests
+      build-project: BuildingRegistry.Tools.Console
+      semver: ${{ needs.set-release-version.outputs.version }}
+      dotnet-version: ${{ vars.VBR_DOTNET_VERSION_9 }}
+      prerestore-script: ./pre-restore.sh
+    secrets: inherit
+
   pack-api-backoffice-abstractions:
     name: Pack Api BackOffice Abstractions
     uses: Informatievlaanderen/build-pipeline/.github/workflows/pack-v2.yml@main
@@ -324,7 +340,8 @@ jobs:
       build-producer-snapshot-oslo,
       build-producer-ldes,
       build-lambda-backoffice,
-      build-snapshot-verifier
+      build-snapshot-verifier,
+      build-tools-console
       ]
     outputs:
       version: ${{ steps.set-version.outputs.version }}
@@ -535,6 +552,7 @@ jobs:
           'producer-snapshot-oslo',
           'producer-ldes',
           'snapshot-verifier',
+          'tools-console',
           'lambda-sqsbackofficefunction'
           ]
     steps:
@@ -647,7 +665,8 @@ jobs:
       matrix:
         services: [
           'building-snapshot-verifier',
-          'building-cache-invalidator'
+          'building-cache-invalidator',
+          'building-tools-console'
           ]
 
     steps:
@@ -750,7 +769,7 @@ jobs:
           'building-producer-ldes',
           'building-projections',
           'building-projections-backoffice',
-          'building-last-changed-list'
+          'building-last-changed-list',
           ]
 
     steps:
@@ -787,7 +806,8 @@ jobs:
       matrix:
         services: [
           'building-cache-invalidator',
-          'building-snapshot-verifier'
+          'building-snapshot-verifier',
+          'building-tools-console'
           ]
 
     steps:

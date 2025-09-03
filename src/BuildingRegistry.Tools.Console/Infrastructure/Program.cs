@@ -3,16 +3,18 @@ namespace BuildingRegistry.Tools.Console.Infrastructure
     using System;
     using System.IO;
     using System.Threading.Tasks;
+    using Amazon.SimpleNotificationService;
     using Autofac;
     using Autofac.Extensions.DependencyInjection;
     using Be.Vlaanderen.Basisregisters.Aws.DistributedMutex;
-    using CorrectUnitPosition;
+    using Be.Vlaanderen.Basisregisters.GrAr.Notifications;
     using Destructurama;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Hosting;
     using Microsoft.Extensions.Logging;
     using Modules;
+    using RepairBuilding;
     using Serilog;
     using Serilog.Debugging;
     using Serilog.Extensions.Logging;
@@ -63,10 +65,10 @@ namespace BuildingRegistry.Tools.Console.Infrastructure
                 })
                 .ConfigureServices((hostContext, services) =>
                 {
-                    // var healthChecksBuilder = services.AddHealthChecks();
-                    // var connectionStrings = hostContext.Configuration
-                    //     .GetSection("ConnectionStrings")
-                    //     .GetChildren();
+                    services.AddAWSService<IAmazonSimpleNotificationService>();
+                    services.AddSingleton<INotificationService>(sp =>
+                        new NotificationService(sp.GetRequiredService<IAmazonSimpleNotificationService>(),
+                            hostContext.Configuration.GetValue<string>("NotificationTopicArn")!));
                 })
                 .UseServiceProviderFactory(new AutofacServiceProviderFactory())
                 .ConfigureContainer<ContainerBuilder>((hostContext, builder) =>
@@ -74,12 +76,16 @@ namespace BuildingRegistry.Tools.Console.Infrastructure
                     var services = new ServiceCollection();
                     var loggerFactory = new SerilogLoggerFactory(Log.Logger);
 
-                    builder.RegisterModule(new ProducerModule(hostContext.Configuration, services, loggerFactory));
+                    builder.RegisterModule(new ToolsModule(hostContext.Configuration, services));
 
-                    builder
-                        .RegisterType<CorrectUnitPositionService>()
-                        .As<IHostedService>()
-                        .SingleInstance();
+                    var toolsSection = hostContext.Configuration.GetSection("Tools");
+                    if (toolsSection.GetValue<bool>("EnableRepairBuilding", false))
+                    {
+                        builder
+                            .RegisterType<RepairBuildingService>()
+                            .As<IHostedService>()
+                            .SingleInstance();
+                    }
 
                     builder.Populate(services);
                 })
