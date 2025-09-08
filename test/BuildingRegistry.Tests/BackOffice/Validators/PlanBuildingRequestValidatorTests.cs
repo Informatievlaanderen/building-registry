@@ -40,5 +40,19 @@ namespace BuildingRegistry.Tests.BackOffice.Validators
                 .WithErrorCode("GebouwPolygoonValidatie")
                 .WithErrorMessage("Ongeldig formaat geometriePolygoon.");
         }
+
+        [Fact]
+        public void WithSmallBuilding_ThenReturnsExpectedFailure()
+        {
+            var smallGmlPolygon = "<gml:Polygon srsName=\"https://www.opengis.net/def/crs/EPSG/0/31370\" xmlns:gml=\"http://www.opengis.net/gml/3.2\"><gml:exterior><gml:LinearRing><gml:posList>0 0 0 0.5 0.5 0.5 0.5 0 0 0</gml:posList></gml:LinearRing></gml:exterior></gml:Polygon>";
+            var result = _validator.TestValidate(new PlanBuildingRequest
+            {
+                GeometriePolygoon = smallGmlPolygon
+            });
+
+            result.ShouldHaveValidationErrorFor(nameof(PlanBuildingRequest.GeometriePolygoon))
+                .WithErrorCode("GebouwTeKlein")
+                .WithErrorMessage("De aangeleverde polygoon voor het gebouw heeft een oppervlakte van minder dan 1m².");
+        }
     }
 }

@@ -42,7 +42,7 @@ namespace BuildingRegistry.Building
         {
             var geometry = WKBReaderFactory.Create().Read(extendedWkbGeometry);
 
-            GuardPolygon(geometry);
+            GuardOutline(geometry);
 
             var newBuilding = buildingFactory.Create();
             newBuilding.ApplyChange(
@@ -242,6 +242,9 @@ namespace BuildingRegistry.Building
                 return;
             }
 
+            var geometry = WKBReaderFactory.Create().Read(extendedWkbGeometry);
+            GuardOutline(geometry);
+
             var newBuildingGeometry = new BuildingGeometry(extendedWkbGeometry, BuildingGeometryMethod.Outlined);
             var plannedOrRealizedBuildingUnits = _buildingUnits.PlannedBuildingUnits()
                 .Concat(_buildingUnits.RealizedBuildingUnits())
@@ -336,6 +339,15 @@ namespace BuildingRegistry.Building
                 || !GeometryValidator.IsValid(geometry))
             {
                 throw new PolygonIsInvalidException();
+            }
+        }
+
+        private static void GuardOutline(Geometry? geometry)
+        {
+            GuardPolygon(geometry);
+            if (geometry!.Area < 1)
+            {
+                throw new BuildingOutlineIsTooSmallException();
             }
         }
 

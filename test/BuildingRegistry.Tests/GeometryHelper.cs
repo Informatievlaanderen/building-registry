@@ -35,6 +35,9 @@ namespace BuildingRegistry.Tests
         public static string selfTouchingGml =
             "<gml:Polygon srsName=\"https://www.opengis.net/def/crs/EPSG/0/31370\" xmlns:gml=\"http://www.opengis.net/gml/3.2\"><gml:exterior><gml:LinearRing><gml:posList>30359.924344554543 197007.54170677811 30359.446008555591 197010.21338678151 30371.943992562592 197013.23297078162 30373.701176568866 197006.42113077641 30363.939512558281 197004.00340277702 30364.205112561584 197002.85997877643 30357.719608552754 197001.36161077395 30356.638264551759 197006.90023477748 30359.924344554543 197007.54170677811 30360.468344554305 197004.48564277589 30362.562808558345 197004.85844277591 30362.018680557609 197007.91457077861 30359.924344554543 197007.54170677811</gml:posList></gml:LinearRing></gml:exterior></gml:Polygon>";
 
+        public static Geometry TooSmallPolygon =
+            new WKTReader().Read(
+                "POLYGON ((0 0, 0.5 0, 0.5 0.5, 0 0.5, 0 0))");
 
         private static readonly WKBWriter WkbWriter = new WKBWriter { Strict = false, HandleSRID = true };
 

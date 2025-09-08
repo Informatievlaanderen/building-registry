@@ -53,6 +53,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.Building
             return exception switch
             {
                 PolygonIsInvalidException => ValidationErrors.Common.InvalidBuildingPolygonGeometry.ToTicketError(),
+                BuildingOutlineIsTooSmallException => ValidationErrors.Common.BuildingTooSmallGeometry.ToTicketError(),
                 _ => null
             };
         }

@@ -50,6 +50,18 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuilding
         }
 
         [Fact]
+        public void WithGeometryTooSmall_ThenBuildingTooSmallExceptionWasThrown()
+        {
+            Fixture.Customize(new WithTooSmallBuilding());
+            var command = Fixture.Create<PlanBuilding>();
+
+            Assert(new Scenario()
+                .GivenNone()
+                .When(command)
+                .Throws(new BuildingOutlineIsTooSmallException()));
+        }
+
+        [Fact]
         public void ThenBuildingStateWasCorrectlySet()
         {
             var command = Fixture.Create<PlanBuilding>();

@@ -91,6 +91,14 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.Validation
                 public static TicketError ToTicketError() => new(Message, Code);
             }
 
+            public static class BuildingTooSmallGeometry
+            {
+                public const string Code = "GebouwTeKlein";
+                public const string Message = "De aangeleverde polygoon voor het gebouw heeft een oppervlakte van minder dan 1m².";
+
+                public static TicketError ToTicketError() => new(Message, Code);
+            }
+
             public static class InvalidBuildingUnitPosition
             {
                 public const string Code = "GebouweenheidPositieformaatValidatie";
