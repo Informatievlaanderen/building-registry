@@ -20,4 +20,12 @@ namespace BuildingRegistry.Tests.Fixtures
             fixture.Customize<ExtendedWkbGeometry>(c => c.FromFactory(() => new ExtendedWkbGeometry(GeometryHelper.ValidPointInPolygon.AsBinary())));
         }
     }
+
+    public class WithTooSmallBuilding : ICustomization
+    {
+        public void Customize(IFixture fixture)
+        {
+            fixture.Customize<ExtendedWkbGeometry>(c => c.FromFactory(() => new ExtendedWkbGeometry(GeometryHelper.TooSmallPolygon.AsBinary())));
+        }
+    }
 }

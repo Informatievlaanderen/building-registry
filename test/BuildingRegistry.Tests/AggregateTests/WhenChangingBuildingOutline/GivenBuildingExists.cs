@@ -279,6 +279,52 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenChangingBuildingOutline
         }
 
         [Fact]
+        public void WithPointAsGeometry_ThenInvalidPolygonExceptionWasThrown()
+        {
+            var command = new ChangeBuildingOutline(
+                Fixture.Create<BuildingPersistentLocalId>(),
+                new ExtendedWkbGeometry(GeometryHelper.PointNotInPolygon.AsBinary()),
+                Fixture.Create<Provenance>());
+
+            var initialBuildingGeometry = new BuildingGeometry(
+                new ExtendedWkbGeometry(GeometryHelper.ValidPolygon.AsBinary()),
+                BuildingGeometryMethod.Outlined);
+
+            var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
+                .WithBuildingGeometry(initialBuildingGeometry)
+                .Build();
+
+            Assert(new Scenario()
+                .Given(new BuildingStreamId(Fixture.Create<BuildingPersistentLocalId>()),
+                    buildingWasMigrated)
+                .When(command)
+                .Throws(new PolygonIsInvalidException()));
+        }
+
+        [Fact]
+        public void WithGeometryTooSmall_ThenBuildingTooSmallExceptionWasThrown()
+        {
+            var command = new ChangeBuildingOutline(
+                Fixture.Create<BuildingPersistentLocalId>(),
+                new ExtendedWkbGeometry(GeometryHelper.TooSmallPolygon.AsBinary()),
+                Fixture.Create<Provenance>());
+
+            var initialBuildingGeometry = new BuildingGeometry(
+                new ExtendedWkbGeometry(GeometryHelper.ValidPolygon.AsBinary()),
+                BuildingGeometryMethod.Outlined);
+
+            var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
+                .WithBuildingGeometry(initialBuildingGeometry)
+                .Build();
+
+            Assert(new Scenario()
+                .Given(new BuildingStreamId(Fixture.Create<BuildingPersistentLocalId>()),
+                    buildingWasMigrated)
+                .When(command)
+                .Throws(new BuildingOutlineIsTooSmallException()));
+        }
+
+        [Fact]
         public void StateCheck()
         {
             var changedBuildingGeometry = new ExtendedWkbGeometry(GeometryHelper.SecondValidPolygon.AsBinary());
