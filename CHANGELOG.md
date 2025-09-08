@@ -1,3 +1,11 @@
+# [5.3.0](https://github.com/informatievlaanderen/building-registry/compare/v5.2.0...v5.3.0) (2025-09-08)
+
+
+### Features
+
+* add processor with ratelimiting to publish sqs requests ([8abf228](https://github.com/informatievlaanderen/building-registry/commit/8abf228755b5cf94a6425190ceccf33006f3e176))
+* add repair building + tools console skeleton ([fbb85e9](https://github.com/informatievlaanderen/building-registry/commit/fbb85e90e3b0e3dfe55482d5d4d922602b715ff6))
+
 # [5.2.0](https://github.com/informatievlaanderen/building-registry/compare/v5.1.2...v5.2.0) (2025-07-18)
 
 
