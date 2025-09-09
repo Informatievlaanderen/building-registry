@@ -54,6 +54,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.Building
             {
                 PolygonIsInvalidException => ValidationErrors.Common.InvalidBuildingPolygonGeometry.ToTicketError(),
                 BuildingOutlineIsTooSmallException => ValidationErrors.Common.BuildingTooSmallGeometry.ToTicketError(),
+                BuildingGeometryOverlapsWithOutlinedBuildingException => ValidationErrors.RealizeBuilding.OverlappingOutlinedBuilding.ToTicketError(),
                 _ => null
             };
         }

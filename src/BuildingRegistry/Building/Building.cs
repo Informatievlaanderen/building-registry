@@ -38,11 +38,14 @@ namespace BuildingRegistry.Building
         public static Building Plan(
             IBuildingFactory buildingFactory,
             BuildingPersistentLocalId buildingPersistentLocalId,
-            ExtendedWkbGeometry extendedWkbGeometry)
+            ExtendedWkbGeometry extendedWkbGeometry,
+            IBuildingGeometries buildingGeometries)
         {
             var geometry = WKBReaderFactory.Create().Read(extendedWkbGeometry);
 
             GuardOutline(geometry);
+            if (buildingGeometries.GetOverlappingBuildingOutlines(buildingPersistentLocalId, extendedWkbGeometry).Any())
+                throw new BuildingGeometryOverlapsWithOutlinedBuildingException();
 
             var newBuilding = buildingFactory.Create();
             newBuilding.ApplyChange(
@@ -226,7 +229,9 @@ namespace BuildingRegistry.Building
             ApplyChange(new BuildingWasRemovedV2(BuildingPersistentLocalId));
         }
 
-        public void ChangeOutliningConstruction(ExtendedWkbGeometry extendedWkbGeometry)
+        public void ChangeOutliningConstruction(
+            ExtendedWkbGeometry extendedWkbGeometry,
+            IBuildingGeometries buildingGeometries)
         {
             GuardRemovedBuilding();
 
@@ -244,6 +249,9 @@ namespace BuildingRegistry.Building
 
             var geometry = WKBReaderFactory.Create().Read(extendedWkbGeometry);
             GuardOutline(geometry);
+
+            if(buildingGeometries.GetOverlappingBuildingOutlines(BuildingPersistentLocalId, extendedWkbGeometry).Any())
+                throw new BuildingGeometryOverlapsWithOutlinedBuildingException();
 
             var newBuildingGeometry = new BuildingGeometry(extendedWkbGeometry, BuildingGeometryMethod.Outlined);
             var plannedOrRealizedBuildingUnits = _buildingUnits.PlannedBuildingUnits()

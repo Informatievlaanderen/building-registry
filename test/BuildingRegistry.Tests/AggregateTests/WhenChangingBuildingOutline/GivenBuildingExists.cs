@@ -3,6 +3,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenChangingBuildingOutline
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using Api.BackOffice.Handlers.Lambda;
     using AutoFixture;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
     using Be.Vlaanderen.Basisregisters.AggregateSource.Snapshotting;
@@ -15,6 +16,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenChangingBuildingOutline
     using Extensions;
     using Fixtures;
     using FluentAssertions;
+    using Moq;
     using Xunit;
     using Xunit.Abstractions;
     using BuildingUnitFunction = BuildingRegistry.Legacy.BuildingUnitFunction;
@@ -325,6 +327,38 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenChangingBuildingOutline
         }
 
         [Fact]
+        public void WithOverlappingOutlinedBuilding_ThenThrowsBuildingGeometryOverlapsWithOutlinedBuildingException()
+        {
+            var command = Fixture.Create<ChangeBuildingOutline>();
+
+            FakeBuildingGeometries
+                .Setup(x => x.GetOverlappingBuildingOutlines(
+                    It.IsAny<BuildingPersistentLocalId>(),
+                    It.IsAny<ExtendedWkbGeometry>()))
+                .Returns(new[]
+                {
+                    new BuildingGeometryData(
+                        1,
+                        BuildingStatus.Planned,
+                        BuildingGeometryMethod.Outlined,
+                        GeometryHelper.ValidPolygon,
+                        false)
+                });
+
+            var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
+                .WithBuildingStatus(BuildingStatus.UnderConstruction)
+                .WithBuildingGeometry(new BuildingGeometry(ExtendedWkbGeometry.CreateEWkb(GeometryHelper.ValidPolygon.AsBinary()), BuildingGeometryMethod.Outlined))
+                .Build();
+
+            Assert(new Scenario()
+                .Given(
+                    new BuildingStreamId(Fixture.Create<BuildingPersistentLocalId>()),
+                    buildingWasMigrated)
+                .When(command)
+                .Throws(new BuildingGeometryOverlapsWithOutlinedBuildingException()));
+        }
+
+        [Fact]
         public void StateCheck()
         {
             var changedBuildingGeometry = new ExtendedWkbGeometry(GeometryHelper.SecondValidPolygon.AsBinary());
@@ -360,7 +394,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenChangingBuildingOutline
             sut.Initialize(new List<object> { buildingWasMigrated });
 
             // Act
-            sut.ChangeOutliningConstruction(changedBuildingGeometry);
+            sut.ChangeOutliningConstruction(changedBuildingGeometry, new NoOverlappingBuildingGeometries());
 
             // Assert
             sut.BuildingGeometry.Should()
