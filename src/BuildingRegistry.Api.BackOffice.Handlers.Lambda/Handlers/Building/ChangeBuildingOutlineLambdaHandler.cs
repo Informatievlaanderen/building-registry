@@ -57,6 +57,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.Building
                 BuildingHasBuildingUnitsOutsideBuildingGeometryException => ValidationErrors.ChangeBuildingOutline.BuildingHasBuildingUnitsOutsideChangedGeometry.ToTicketError(),
                 PolygonIsInvalidException => ValidationErrors.Common.InvalidBuildingPolygonGeometry.ToTicketError(),
                 BuildingOutlineIsTooSmallException => ValidationErrors.Common.BuildingTooSmallGeometry.ToTicketError(),
+                BuildingGeometryOverlapsWithOutlinedBuildingException => ValidationErrors.RealizeBuilding.OverlappingOutlinedBuilding.ToTicketError(),
                 _ => null
             };
         }

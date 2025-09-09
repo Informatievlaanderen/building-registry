@@ -1,18 +1,17 @@
 namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuilding
 {
+    using Api.BackOffice.Handlers.Lambda;
     using AutoFixture;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
     using Be.Vlaanderen.Basisregisters.AggregateSource.Snapshotting;
     using Be.Vlaanderen.Basisregisters.AggregateSource.Testing;
-    using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Building;
     using Building.Commands;
-    using Building.Datastructures;
     using Building.Events;
     using Building.Exceptions;
     using Fixtures;
     using FluentAssertions;
-    using NetTopologySuite.IO;
+    using Moq;
     using Xunit;
     using Xunit.Abstractions;
 
@@ -62,6 +61,30 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuilding
         }
 
         [Fact]
+        public void WithOverlappingOutlinedBuilding_ThenThrowsBuildingGeometryOverlapsWithMeasuredBuildingException()
+        {
+            var command = Fixture.Create<PlanBuilding>();
+
+            FakeBuildingGeometries
+                .Setup(x => x.GetOverlappingBuildingOutlines(
+                    command.BuildingPersistentLocalId,
+                    It.IsAny<ExtendedWkbGeometry>()))
+                .Returns([
+                    new BuildingGeometryData(
+                        command.BuildingPersistentLocalId + 1,
+                        BuildingStatus.Planned,
+                        BuildingGeometryMethod.Outlined,
+                        GeometryHelper.ValidPolygon,
+                        false)
+                ]);
+
+            Assert(new Scenario()
+                .GivenNone()
+                .When(command)
+                .Throws(new BuildingGeometryOverlapsWithOutlinedBuildingException()));
+        }
+
+        [Fact]
         public void ThenBuildingStateWasCorrectlySet()
         {
             var command = Fixture.Create<PlanBuilding>();
@@ -70,7 +93,8 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuilding
             var result = Building.Plan(
                 new BuildingFactory(NoSnapshotStrategy.Instance),
                 command.BuildingPersistentLocalId,
-                command.Geometry);
+                command.Geometry,
+                new NoOverlappingBuildingGeometries());
 
             // Assert
             result.Should().NotBeNull();
