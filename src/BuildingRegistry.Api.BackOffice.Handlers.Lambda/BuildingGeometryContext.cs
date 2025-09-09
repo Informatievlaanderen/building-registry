@@ -65,7 +65,35 @@
                         || building.StatusAsString == BuildingStatus.Realized.Value)
                     && !building.IsRemoved
                     && boundingBox.Intersects(building.SysGeometry))
-                .ToList()
+                .AsEnumerable()
+                .Where(building => HasTooMuchOverlap(geometry, building.SysGeometry))
+                .ToList();
+
+            return overlappingBuildings;
+        }
+
+        public ICollection<BuildingGeometryData> GetOverlappingBuildingOutlines(
+            BuildingPersistentLocalId buildingPersistentLocalId,
+            ExtendedWkbGeometry extendedWkbGeometry)
+        {
+            var wkbReader = WKBReaderFactory.Create();
+            var geometry = wkbReader.Read(extendedWkbGeometry);
+            var fixedGeometry = NetTopologySuite.Geometries.Utilities.GeometryFixer.Fix(geometry);
+
+            var boundingBox = fixedGeometry.Factory.ToGeometry(fixedGeometry.EnvelopeInternal);
+            //check if bounding box is not clockwise otherwise reverse => must be counter clockwise oriented
+            if (boundingBox.Coordinates[0].X > boundingBox.Coordinates[1].X)
+            {
+                boundingBox = boundingBox.Reverse();
+            }
+
+            var overlappingBuildings = BuildingGeometries
+                .Where(building =>
+                    building.BuildingPersistentLocalId != buildingPersistentLocalId
+                    && building.GeometryMethod == BuildingGeometryMethod.Outlined
+                    && !building.IsRemoved
+                    && boundingBox.Intersects(building.SysGeometry))
+                .AsEnumerable()
                 .Where(building => HasTooMuchOverlap(geometry, building.SysGeometry))
                 .ToList();
 

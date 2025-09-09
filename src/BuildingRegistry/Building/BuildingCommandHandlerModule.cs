@@ -80,7 +80,8 @@ namespace BuildingRegistry.Building
                     var newBuilding = Building.Plan(
                         buildingFactory,
                         message.Command.BuildingPersistentLocalId,
-                        message.Command.Geometry);
+                        message.Command.Geometry,
+                        buildingGeometries);
 
                     buildingRepository().Add(streamId, newBuilding);
                 });
@@ -190,7 +191,7 @@ namespace BuildingRegistry.Building
                     var streamId = new BuildingStreamId(message.Command.BuildingPersistentLocalId);
                     var building = await buildingRepository().GetAsync(streamId, ct);
 
-                    building.ChangeOutliningConstruction(message.Command.Geometry);
+                    building.ChangeOutliningConstruction(message.Command.Geometry, buildingGeometries);
                 });
 
             For<RealizeAndMeasureUnplannedBuilding>()

@@ -8,6 +8,10 @@
         ICollection<BuildingGeometryData> GetOverlappingBuildings(
             BuildingPersistentLocalId buildingPersistentLocalId,
             ExtendedWkbGeometry extendedWkbGeometry);
+
+        ICollection<BuildingGeometryData> GetOverlappingBuildingOutlines(
+            BuildingPersistentLocalId buildingPersistentLocalId,
+            ExtendedWkbGeometry extendedWkbGeometry);
     }
 
     public sealed class BuildingGeometryData

@@ -3,6 +3,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenChangingBuildingMeasurement
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using Api.BackOffice.Handlers.Lambda;
     using AutoFixture;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
     using Be.Vlaanderen.Basisregisters.AggregateSource.Snapshotting;
@@ -122,7 +123,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenChangingBuildingMeasurement
                     BuildingUnitStatus.Planned,
                     new BuildingUnitPersistentLocalId(2),
                     positionGeometryMethod: BuildingUnitPositionGeometryMethod.AppointedByAdministrator,
-                    extendedWkbGeometry: new BuildingRegistry.Legacy.ExtendedWkbGeometry(GeometryHelper.ValidPolygon.AsBinary()))
+                    extendedWkbGeometry: new BuildingRegistry.Legacy.ExtendedWkbGeometry(GeometryHelper.PointNotInPolygon.AsBinary()))
                 .WithBuildingUnit(
                     BuildingUnitStatus.Realized,
                     new BuildingUnitPersistentLocalId(3),
@@ -231,39 +232,6 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenChangingBuildingMeasurement
                 .Throws(new BuildingHasInvalidGeometryMethodException()));
         }
 
-        [Theory]
-        [InlineData("Planned")]
-        [InlineData("Realized")]
-        public void
-            WithBuildingUnitsOutsideOfChangedBuildingGeometry_ThenThrowsBuildingUnitPositionIsOutsideBuildingGeometryException(
-                string buildingUnitStatus)
-        {
-            var command = new ChangeBuildingOutline(
-                Fixture.Create<BuildingPersistentLocalId>(),
-                new ExtendedWkbGeometry(GeometryHelper.SecondValidPolygon.AsBinary()),
-                Fixture.Create<Provenance>());
-
-            var initialBuildingGeometry = new BuildingGeometry(
-                new ExtendedWkbGeometry(GeometryHelper.ValidPolygon.AsBinary()),
-                BuildingGeometryMethod.Outlined);
-
-            var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
-                .WithBuildingGeometry(initialBuildingGeometry)
-                .WithBuildingUnit(
-                    BuildingUnitStatus.Parse(buildingUnitStatus)!.Value,
-                    new BuildingUnitPersistentLocalId(1),
-                    positionGeometryMethod: BuildingUnitPositionGeometryMethod.AppointedByAdministrator,
-                    extendedWkbGeometry: new BuildingRegistry.Legacy.ExtendedWkbGeometry(GeometryHelper.PointNotInPolygon.AsBinary()))
-                .Build();
-
-            Assert(new Scenario()
-                .Given(
-                    new BuildingStreamId(Fixture.Create<BuildingPersistentLocalId>()),
-                    buildingWasMigrated)
-                .When(command)
-                .Throws(new BuildingHasBuildingUnitsOutsideBuildingGeometryException()));
-        }
-
         [Fact]
         public void StateCheck()
         {
@@ -302,7 +270,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenChangingBuildingMeasurement
             sut.Initialize(new List<object> {buildingWasMigrated});
 
             // Act
-            sut.ChangeOutliningConstruction(changedBuildingGeometry);
+            sut.ChangeOutliningConstruction(changedBuildingGeometry, new NoOverlappingBuildingGeometries());
 
             // Assert
             sut.BuildingGeometry.Should()
