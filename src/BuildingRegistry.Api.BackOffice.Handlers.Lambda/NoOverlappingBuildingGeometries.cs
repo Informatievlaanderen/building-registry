@@ -10,5 +10,10 @@
         {
             return new List<BuildingGeometryData>();
         }
+
+        public ICollection<BuildingGeometryData> GetOverlappingBuildingOutlines(BuildingPersistentLocalId buildingPersistentLocalId, ExtendedWkbGeometry extendedWkbGeometry)
+        {
+            return new List<BuildingGeometryData>();
+        }
     }
 }

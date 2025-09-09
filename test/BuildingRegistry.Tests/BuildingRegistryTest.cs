@@ -122,6 +122,12 @@ namespace BuildingRegistry.Tests
                         It.IsAny<BuildingPersistentLocalId>(),
                         It.IsAny<ExtendedWkbGeometry>()))
                     .Returns(new List<BuildingGeometryData>());
+
+                FakeBuildingGeometries
+                    .Setup(x => x.GetOverlappingBuildingOutlines(
+                        It.IsAny<BuildingPersistentLocalId>(),
+                        It.IsAny<ExtendedWkbGeometry>()))
+                    .Returns(new List<BuildingGeometryData>());
             }
 
             builder
