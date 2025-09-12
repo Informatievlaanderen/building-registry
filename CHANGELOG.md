@@ -1,3 +1,10 @@
+# [5.4.0](https://github.com/informatievlaanderen/building-registry/compare/v5.3.0...v5.4.0) (2025-09-12)
+
+
+### Features
+
+* add small outline buiding validator GAWR-7028 ([3b8e25e](https://github.com/informatievlaanderen/building-registry/commit/3b8e25e458060f12c4642509904d7c408e4c7a60))
+
 # [5.3.0](https://github.com/informatievlaanderen/building-registry/compare/v5.2.0...v5.3.0) (2025-09-08)
 
 
