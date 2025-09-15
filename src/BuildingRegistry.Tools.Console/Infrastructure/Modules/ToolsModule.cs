@@ -15,6 +15,7 @@ namespace BuildingRegistry.Tools.Console.Infrastructure.Modules
     using NodaTime;
     using RepairBuilding;
     using SqlStreamStore;
+    using TicketingService.Abstractions;
     using TicketingService.Proxy.HttpProxy;
     using SqsQueue = Be.Vlaanderen.Basisregisters.Sqs.SqsQueue;
 
@@ -70,7 +71,13 @@ namespace BuildingRegistry.Tools.Console.Infrastructure.Modules
 
             builder.RegisterType<SqsRateLimiter<RepairBuildingSqsHandler, RepairBuildingSqsRequest>>();
 
-            _services.AddHttpProxyTicketing(_configuration["TicketingUrl"]!);
+            var ticketingUrl = _configuration["TicketingUrl"]!;
+            _services.AddHttpProxyTicketing(ticketingUrl);
+
+            builder
+                .Register(_ => new TicketingUrl(ticketingUrl))
+                .As<ITicketingUrl>()
+                .SingleInstance();
 
             builder.Populate(_services);
         }
