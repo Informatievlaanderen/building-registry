@@ -18,7 +18,7 @@ namespace BuildingRegistry.Infrastructure
         public const string ProducerSnapshotOslo = "BuildingRegistryProducerSnapshotOslo";
         public const string ProducerLdes = "BuildingRegistryProducerLdes";
         public const string Integration = "integration_building";
-        public const string Tools = "BuildingRegistry.Tools";
+        public const string Tools = "BuildingRegistryTools";
     }
 
     public static class MigrationTables
