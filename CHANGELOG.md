@@ -1,3 +1,10 @@
+## [5.4.1](https://github.com/informatievlaanderen/building-registry/compare/v5.4.0...v5.4.1) (2025-09-15)
+
+
+### Bug Fixes
+
+* **tools:** add ticketingurl to container ([7d327ee](https://github.com/informatievlaanderen/building-registry/commit/7d327eef7caf1375da1aab217f8a5c41a9d2b95f))
+
 # [5.4.0](https://github.com/informatievlaanderen/building-registry/compare/v5.3.0...v5.4.0) (2025-09-12)
 
 
