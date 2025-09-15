@@ -1,3 +1,10 @@
+## [5.4.2](https://github.com/informatievlaanderen/building-registry/compare/v5.4.1...v5.4.2) (2025-09-15)
+
+
+### Bug Fixes
+
+* **tools:** correct schema ([f11157d](https://github.com/informatievlaanderen/building-registry/commit/f11157ddb83ba994399d24ebff833d36270c85b8))
+
 ## [5.4.1](https://github.com/informatievlaanderen/building-registry/compare/v5.4.0...v5.4.1) (2025-09-15)
 
 
