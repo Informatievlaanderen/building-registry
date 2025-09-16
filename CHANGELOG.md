@@ -1,3 +1,10 @@
+## [5.4.3](https://github.com/informatievlaanderen/building-registry/compare/v5.4.2...v5.4.3) (2025-09-16)
+
+
+### Bug Fixes
+
+* **tools:** correct sql queries ([ef01741](https://github.com/informatievlaanderen/building-registry/commit/ef0174189b4a2af84253c5113dcbea16ae30dcd9))
+
 ## [5.4.2](https://github.com/informatievlaanderen/building-registry/compare/v5.4.1...v5.4.2) (2025-09-15)
 
 
