@@ -27,13 +27,13 @@
         public async Task<int> GetCount()
         {
             await using var sql = new SqlConnection(_connectionString);
-            return await sql.ExecuteScalarAsync<int>("SELECT Count(*) FROM {Schema.Tools}.ProcessedBuildings");
+            return await sql.ExecuteScalarAsync<int>($"SELECT Count(*) FROM {Schema.Tools}.ProcessedBuildings");
         }
 
         public async Task<IEnumerable<int>> GetBuildingsToProcess()
         {
             await using var sql = new SqlConnection(_connectionString);
-            return await sql.QueryAsync<int>("SELECT BuildingId FROM {Schema.Tools}.ProcessedBuildings");
+            return await sql.QueryAsync<int>($"SELECT BuildingId FROM {Schema.Tools}.ProcessedBuildings");
         }
 
         public async Task FillBuildingToProcess()
