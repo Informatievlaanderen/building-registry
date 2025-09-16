@@ -1,3 +1,10 @@
+## [5.4.4](https://github.com/informatievlaanderen/building-registry/compare/v5.4.3...v5.4.4) (2025-09-16)
+
+
+### Bug Fixes
+
+* **tools:** defensive ensureschemaandtable exists ([deaa2da](https://github.com/informatievlaanderen/building-registry/commit/deaa2da140f504a1ac8f393920b86d35d404a1d2))
+
 ## [5.4.3](https://github.com/informatievlaanderen/building-registry/compare/v5.4.2...v5.4.3) (2025-09-16)
 
 
