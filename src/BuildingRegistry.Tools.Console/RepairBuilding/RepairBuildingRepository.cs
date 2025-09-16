@@ -57,7 +57,7 @@
 
             await sql.ExecuteAsync($@"
                 INSERT INTO {Schema.Tools}.ProcessedBuildings (BuildingId)
-                SELECT DISTINCT b.BuildingPersistentLocalId
+                SELECT DISTINCT BuildingPersistentLocalId
                 FROM {Schema.BackOffice}.BuildingUnitBuilding");
         }
 

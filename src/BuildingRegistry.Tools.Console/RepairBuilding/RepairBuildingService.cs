@@ -42,7 +42,7 @@
             await _repairBuildingRepository.FillBuildingToProcess();
             var idsToProcess = await _repairBuildingRepository.GetBuildingsToProcess();
 
-            await ScheduleBuildingRepairUpdates(stoppingToken);
+            _ = ScheduleBuildingRepairUpdates(stoppingToken);
             var ticketId = await _ticketing.CreateTicket(null, stoppingToken);
 
             await _sqsRateLimiter.Handle<int>(
@@ -51,9 +51,12 @@
                 async processedId =>
                 {
                     await _repairBuildingRepository.DeleteBuilding(processedId);
-                    await WaitIfProducerProjectionBehindAsync(stoppingToken);
+                    if(processedId % 100 == 0)
+                        await WaitIfProducerProjectionBehindAsync(stoppingToken);
                 },
                 stoppingToken);
+
+            _logger.LogInformation("Building repair processing completed.");
         }
 
         private async Task WaitIfProducerProjectionBehindAsync(CancellationToken cancellationToken)
