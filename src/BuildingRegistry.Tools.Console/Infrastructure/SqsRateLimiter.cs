@@ -58,17 +58,17 @@
         {
             var now = _clock.GetCurrentInstant().InZone(DateTimeZoneProviders.Tzdb.GetSystemDefault());
             var hour = now.Hour;
-            var isOfficeHours = hour >= _config.OfficeHoursStart && hour < _config.OfficeHoursEnd;
+            var isOfficeHours = hour >= _config.OfficeHoursStartHour && hour < _config.OfficeHoursEndHour;
             var isWeekend = now.DayOfWeek == IsoDayOfWeek.Saturday || now.DayOfWeek == IsoDayOfWeek.Sunday;
-            return isOfficeHours && !isWeekend ? _config.MaxRequestsPerSecondOfficeHours : _config.MaxRequestsPerSecondOutsideOfficeHours;
+            return isOfficeHours && !isWeekend ? _config.MaxMessagesPerSecondOfficeHours : _config.MaxMessagesPerSecondOutsideOfficeHours;
         }
     }
 
     public sealed class SqsRateLimiterConfig
     {
-        public int OfficeHoursStart { get; set; }
-        public int OfficeHoursEnd { get; set; }
-        public int MaxRequestsPerSecondOfficeHours { get; set; }
-        public int MaxRequestsPerSecondOutsideOfficeHours { get; set; }
+        public int OfficeHoursStartHour { get; set; }
+        public int OfficeHoursEndHour { get; set; }
+        public int MaxMessagesPerSecondOfficeHours { get; set; }
+        public int MaxMessagesPerSecondOutsideOfficeHours { get; set; }
     }
 }
