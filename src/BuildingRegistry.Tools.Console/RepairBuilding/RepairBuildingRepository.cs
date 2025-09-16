@@ -19,9 +19,20 @@
         {
             await using var sql = new SqlConnection(_connectionString);
 
-            await sql.ExecuteAsync($"CREATE SCHEMA {Schema.Tools}");
+            await sql.ExecuteAsync($@"
+                IF NOT EXISTS (SELECT * FROM sys.schemas WHERE name = '{Schema.Tools}')
+                BEGIN
+                    EXEC('CREATE SCHEMA {Schema.Tools}')
+                END");
 
-            await sql.ExecuteAsync($"CREATE TABLE {Schema.Tools}.ProcessedBuildings (Id INT NOT NULL PRIMARY KEY IDENTITY, BuildingId INT NOT NULL)");
+            await sql.ExecuteAsync($@"
+                IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'ProcessedBuildings' AND schema_id = SCHEMA_ID('{Schema.Tools}'))
+                BEGIN
+                    CREATE TABLE {Schema.Tools}.ProcessedBuildings (
+                        Id INT NOT NULL PRIMARY KEY IDENTITY,
+                        BuildingId INT NOT NULL
+                    )
+                END");
         }
 
         public async Task<int> GetCount()
