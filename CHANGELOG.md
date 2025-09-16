@@ -1,3 +1,10 @@
+## [5.4.5](https://github.com/informatievlaanderen/building-registry/compare/v5.4.4...v5.4.5) (2025-09-16)
+
+
+### Bug Fixes
+
+* **tools:** extra logging + sql fix ([88f4035](https://github.com/informatievlaanderen/building-registry/commit/88f4035da9000b93d4da80ad0409ef18aa501e97))
+
 ## [5.4.4](https://github.com/informatievlaanderen/building-registry/compare/v5.4.3...v5.4.4) (2025-09-16)
 
 
