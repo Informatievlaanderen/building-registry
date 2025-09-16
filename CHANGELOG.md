@@ -1,3 +1,10 @@
+## [5.4.6](https://github.com/informatievlaanderen/building-registry/compare/v5.4.5...v5.4.6) (2025-09-16)
+
+
+### Bug Fixes
+
+* **tools:** match config naming ([3bbc18f](https://github.com/informatievlaanderen/building-registry/commit/3bbc18f54c2ddf68528b7113b8465338078f7402))
+
 ## [5.4.5](https://github.com/informatievlaanderen/building-registry/compare/v5.4.4...v5.4.5) (2025-09-16)
 
 
