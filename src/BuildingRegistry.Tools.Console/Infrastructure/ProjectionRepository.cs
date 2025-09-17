@@ -23,7 +23,7 @@ namespace BuildingRegistry.Tools.Console.Infrastructure
         {
             await using var sql = new Microsoft.Data.SqlClient.SqlConnection(_eventsConnectionString);
             return await sql.ExecuteScalarAsync<long>($@"
-                SELECT TOP 1 COALESCE(MAX([Position]), 0)
+                SELECT TOP 1 COALESCE([Position], 0)
                 FROM [{Schema.Producer}].[ProjectionStates]
                 ORDER BY [Position] ASC");
         }
