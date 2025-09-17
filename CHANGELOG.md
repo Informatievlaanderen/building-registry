@@ -1,3 +1,10 @@
+## [5.4.7](https://github.com/informatievlaanderen/building-registry/compare/v5.4.6...v5.4.7) (2025-09-17)
+
+
+### Bug Fixes
+
+* **tools:** correct projection state query ([8cc6ffe](https://github.com/informatievlaanderen/building-registry/commit/8cc6ffefd58dbc4bacf5104b7745a0efffff7343))
+
 ## [5.4.6](https://github.com/informatievlaanderen/building-registry/compare/v5.4.5...v5.4.6) (2025-09-16)
 
 
