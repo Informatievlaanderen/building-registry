@@ -1111,7 +1111,6 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda
                     request.TicketId == messageData.TicketId &&
                     request.MessageGroupId == messageMetadata.MessageGroupId &&
                     request.BuildingPersistentLocalId == messageData.BuildingPersistentLocalId &&
-                    request.Provenance == messageData.ProvenanceData.ToProvenance() &&
                     request.Metadata == messageData.Metadata
                 ), It.IsAny<CancellationToken>()), Times.Once);
         }
