@@ -1,3 +1,10 @@
+## [5.4.9](https://github.com/informatievlaanderen/building-registry/compare/v5.4.8...v5.4.9) (2025-09-17)
+
+
+### Bug Fixes
+
+* **lambda:** dump properties for debugging ([206f3aa](https://github.com/informatievlaanderen/building-registry/commit/206f3aa060f471fc36956af0f3a18a6419f1f989))
+
 ## [5.4.8](https://github.com/informatievlaanderen/building-registry/compare/v5.4.7...v5.4.8) (2025-09-17)
 
 
