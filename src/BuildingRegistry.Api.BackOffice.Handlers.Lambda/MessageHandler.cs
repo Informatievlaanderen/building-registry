@@ -197,6 +197,13 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda
                     break;
 
                 case RepairBuildingSqsRequest request:
+                    var props = request.GetType().GetProperties();
+                    foreach (var prop in props)
+                    {
+                        var value = prop.GetValue(request);
+                        messageMetadata.Logger?.LogInformation($"Request property: {prop.Name} = {value}");
+                    }
+
                     await mediator.Send(new RepairBuildingLambdaRequest(messageMetadata.MessageGroupId!, request),
                         cancellationToken);
                     break;
