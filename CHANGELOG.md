@@ -1,3 +1,10 @@
+## [5.4.8](https://github.com/informatievlaanderen/building-registry/compare/v5.4.7...v5.4.8) (2025-09-17)
+
+
+### Bug Fixes
+
+* **lambda:** repair building add provenance ([da4df09](https://github.com/informatievlaanderen/building-registry/commit/da4df09bd1bb982e997f491c035cb89c4069b3d3))
+
 ## [5.4.7](https://github.com/informatievlaanderen/building-registry/compare/v5.4.6...v5.4.7) (2025-09-17)
 
 
