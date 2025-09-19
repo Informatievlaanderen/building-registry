@@ -1,3 +1,10 @@
+## [5.4.10](https://github.com/informatievlaanderen/building-registry/compare/v5.4.9...v5.4.10) (2025-09-19)
+
+
+### Bug Fixes
+
+* **tools.console:** include snapshot oslo projection when waiting to process + add activity logging ([e893530](https://github.com/informatievlaanderen/building-registry/commit/e8935300d66d6f217877cbac4d39a223d23fd846))
+
 ## [5.4.9](https://github.com/informatievlaanderen/building-registry/compare/v5.4.8...v5.4.9) (2025-09-17)
 
 
