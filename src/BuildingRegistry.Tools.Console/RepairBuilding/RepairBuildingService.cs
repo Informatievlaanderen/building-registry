@@ -40,19 +40,24 @@
         {
             await _repairBuildingRepository.EnsureSchemaAndTablesExist();
             await _repairBuildingRepository.FillBuildingToProcess();
-            var idsToProcess = await _repairBuildingRepository.GetBuildingsToProcess();
+            var idsToProcess = (await _repairBuildingRepository.GetBuildingsToProcess()).ToList();
+            _logger.LogInformation("Found {idsToProcess} buildings to process.", idsToProcess.Count);
 
             _ = ScheduleBuildingRepairUpdates(stoppingToken);
             var ticketId = await _ticketing.CreateTicket(null, stoppingToken);
 
             await _sqsRateLimiter.Handle<int>(
-                idsToProcess.ToList(),
+                idsToProcess,
                 id => new RepairBuildingSqsRequest { BuildingPersistentLocalId = id, TicketId = ticketId },
                 async processedId =>
                 {
                     await _repairBuildingRepository.DeleteBuilding(processedId);
-                    if(processedId % 100 == 0)
+                    _logger.LogInformation("Processed building {processedId}", processedId);
+
+                    if (processedId % 100 == 0)
+                    {
                         await WaitIfProducerProjectionBehindAsync(stoppingToken);
+                    }
                 },
                 stoppingToken);
 
@@ -68,7 +73,10 @@
 
                 var lag = headPosition - producerPosition;
                 if (lag <= 100)
+                {
+                    _logger.LogInformation("Resume processing, lag is {Lag} messages.", lag);
                     break;
+                }
 
                 _logger.LogInformation("Producer projection is behind by {Lag} messages, waiting 3 seconds...", lag);
                 await Task.Delay(3000, cancellationToken);
