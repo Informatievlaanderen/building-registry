@@ -1,3 +1,10 @@
+# [5.5.0](https://github.com/informatievlaanderen/building-registry/compare/v5.4.10...v5.5.0) (2025-09-30)
+
+
+### Features
+
+* add overlapping outline validation GAWR-7047 ([cf88c33](https://github.com/informatievlaanderen/building-registry/commit/cf88c334890e2cc8e10a8b21b18bb8901db0c1a2))
+
 ## [5.4.10](https://github.com/informatievlaanderen/building-registry/compare/v5.4.9...v5.4.10) (2025-09-19)
 
 
