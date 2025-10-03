@@ -18,6 +18,7 @@
         private readonly ITicketing _ticketing;
         private readonly ProjectionRepository _projectionRepository;
         private readonly INotificationService _notificationService;
+        private readonly IHostApplicationLifetime _hostApplicationLifetime;
         private readonly ILogger<RepairBuildingService> _logger;
 
         public RepairBuildingService(
@@ -26,6 +27,7 @@
             ITicketing ticketing,
             ProjectionRepository projectionRepository,
             INotificationService notificationService,
+            IHostApplicationLifetime hostApplicationLifetime,
             ILoggerFactory loggerFactory)
         {
             _sqsRateLimiter = sqsRateLimiter;
@@ -33,6 +35,7 @@
             _ticketing = ticketing;
             _projectionRepository = projectionRepository;
             _notificationService = notificationService;
+            _hostApplicationLifetime = hostApplicationLifetime;
             _logger = loggerFactory.CreateLogger<RepairBuildingService>();
         }
 
@@ -62,11 +65,13 @@
                 stoppingToken);
 
             _logger.LogInformation("Building repair processing completed.");
+
+            _hostApplicationLifetime.StopApplication();
         }
 
         private async Task WaitIfProducerProjectionBehindAsync(CancellationToken cancellationToken)
         {
-            while (true)
+            while (!cancellationToken.IsCancellationRequested)
             {
                 var producerPosition = await _projectionRepository.GetProducerPosition();
                 var headPosition = await _projectionRepository.GetMaxAllStreamPosition();
