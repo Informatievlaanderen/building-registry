@@ -1,3 +1,10 @@
+## [5.5.1](https://github.com/informatievlaanderen/building-registry/compare/v5.5.0...v5.5.1) (2025-10-06)
+
+
+### Bug Fixes
+
+* **tools:** stop console when service is done ([6179862](https://github.com/informatievlaanderen/building-registry/commit/61798624985f9cef785f2975395c27596882f999))
+
 # [5.5.0](https://github.com/informatievlaanderen/building-registry/compare/v5.4.10...v5.5.0) (2025-09-30)
 
 
