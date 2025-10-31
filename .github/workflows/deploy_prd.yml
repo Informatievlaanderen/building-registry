@@ -80,7 +80,8 @@ jobs:
       matrix:
         services: [
           'building-cache-invalidator',
-          'building-snapshot-verifier'
+          'building-snapshot-verifier',
+          'building-tools-console'
         ]
 
     steps:
