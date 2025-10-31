@@ -499,11 +499,17 @@ namespace BuildingRegistry.Building
 
             if (correctedGeometry is not null)
             {
-                Apply(new BuildingUnitPositionWasCorrected(
-                    _buildingPersistentLocalId,
-                    BuildingUnitPersistentLocalId,
-                    BuildingUnitPositionGeometryMethod.DerivedFromObject,
-                    correctedGeometry));
+                var currentPosition = buildingGeometry.GetGeometry(BuildingUnitPosition.Geometry);
+                var newPosition = buildingGeometry.GetGeometry(correctedGeometry);
+
+                if (currentPosition.Distance(newPosition) > 0.01)
+                {
+                    Apply(new BuildingUnitPositionWasCorrected(
+                        _buildingPersistentLocalId,
+                        BuildingUnitPersistentLocalId,
+                        BuildingUnitPositionGeometryMethod.DerivedFromObject,
+                        correctedGeometry));
+                }
             }
         }
 

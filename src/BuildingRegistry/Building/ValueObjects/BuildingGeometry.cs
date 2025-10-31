@@ -43,6 +43,9 @@ namespace BuildingRegistry.Building
         public ExtendedWkbGeometry Center =>
             ExtendedWkbGeometry.CreateEWkb(_wkbReader.Read(Geometry).CentroidWithinArea().AsBinary())!;
 
+        public Geometry GetGeometry() => _wkbReader.Read(Geometry);
+        public Geometry GetGeometry(ExtendedWkbGeometry geometry) => _wkbReader.Read(geometry);
+
         protected override IEnumerable<object> Reflect()
         {
             yield return Geometry;

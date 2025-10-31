@@ -11,6 +11,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRepairingBuilding
     using BuildingRegistry.Legacy;
     using Extensions;
     using Fixtures;
+    using NetTopologySuite.Geometries;
     using Xunit;
     using Xunit.Abstractions;
     using BuildingGeometry = BuildingRegistry.Legacy.BuildingGeometry;
@@ -23,6 +24,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRepairingBuilding
     using BuildingUnitPositionGeometryMethod = BuildingRegistry.Legacy.BuildingUnitPositionGeometryMethod;
     using BuildingUnitStatus = BuildingRegistry.Legacy.BuildingUnitStatus;
     using ExtendedWkbGeometry = BuildingRegistry.Legacy.ExtendedWkbGeometry;
+    using GeometryFactory = BuildingRegistry.GeometryFactory;
 
     public class GivenBuildingExists : BuildingRegistryTest
     {
@@ -62,6 +64,39 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRepairingBuilding
                         new BuildingUnitPersistentLocalId(migrated.BuildingUnits[0].BuildingUnitPersistentLocalId),
                         BuildingRegistry.Building.BuildingUnitPositionGeometryMethod.DerivedFromObject,
                         new BuildingRegistry.Building.BuildingGeometry(BuildingRegistry.Building.ExtendedWkbGeometry.CreateEWkb(migrated.ExtendedWkbGeometry.ToByteArray()), BuildingGeometryMethod.MeasuredByGrb).Center))));
+        }
+
+        [Fact]
+        public void WithUnitsDerivedButCloseToCenter_ThenBuildingAndUnitsWereRepaired()
+        {
+            var command = Fixture.Create<RepairBuilding>();
+
+            var migrated = new BuildingWasMigratedBuilder(Fixture)
+                .WithBuildingStatus(BuildingStatus.Realized)
+                .Build();
+
+            var reader = WKBReaderFactory.Create();
+            reader.HandleSRID = true;
+
+            var centroid = reader.Read(migrated.ExtendedWkbGeometry.ToByteArray()).Centroid;
+            var closePosition = new Point(centroid.X - 0.001, centroid.Y + 0.001) { SRID = GeometryFactory.CreateGeometryFactory().SRID };
+
+            migrated.BuildingUnits.Add(new BuildingWasMigrated.BuildingUnit(new BuildingUnit(
+                new BuildingUnitId(Fixture.Create<Guid>()),
+                new PersistentLocalId(Fixture.Create<int>()),
+                BuildingUnitFunction.Unknown,
+                BuildingUnitStatus.Realized,
+                [],
+                new BuildingUnitPosition(ExtendedWkbGeometry.CreateEWkb(closePosition.AsBinary()), BuildingUnitPositionGeometryMethod.DerivedFromObject),
+                new BuildingGeometry(new ExtendedWkbGeometry(migrated.ExtendedWkbGeometry.ToByteArray()), BuildingRegistry.Legacy.BuildingGeometryMethod.MeasuredByGrb),
+                false)));
+
+            Assert(new Scenario()
+                .Given(
+                    new BuildingStreamId(Fixture.Create<BuildingPersistentLocalId>())!,
+                    migrated)
+                .When(command)
+                .ThenNone());
         }
     }
 }
