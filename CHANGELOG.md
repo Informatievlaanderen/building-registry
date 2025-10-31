@@ -1,3 +1,10 @@
+## [5.5.2](https://github.com/informatievlaanderen/building-registry/compare/v5.5.1...v5.5.2) (2025-10-31)
+
+
+### Bug Fixes
+
+* repair BU position larger than 1cm GAWR-5443 ([0bcd9c7](https://github.com/informatievlaanderen/building-registry/commit/0bcd9c76181dd11c437ba2a80a96e8418e775a6a))
+
 ## [5.5.1](https://github.com/informatievlaanderen/building-registry/compare/v5.5.0...v5.5.1) (2025-10-06)
 
 
