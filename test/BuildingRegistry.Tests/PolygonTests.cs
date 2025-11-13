@@ -4,6 +4,7 @@ namespace BuildingRegistry.Tests
     using BuildingRegistry.Legacy;
     using FluentAssertions;
     using NetTopologySuite.Geometries;
+    using NetTopologySuite.Geometries.Utilities;
     using Xunit;
 
     public class PolygonTests
@@ -72,6 +73,63 @@ namespace BuildingRegistry.Tests
             grbPolygon.IsValid.Should().BeTrue();
 
 
+        }
+
+        /// <summary>
+        /// DATE: 1/10/2025 (polygon could be changed afterwards)
+        /// https://api.basisregisters.vlaanderen.be/v2/gebouwen/31912514
+        ///
+        /// Claim from GRB that this polygon is invalid, but MS SQL + NTS says it's valid.
+        ///
+        /// select geometry::STGeomFromText('POLYGON ((76334.58333778383 169985.72249904636, 76337.76829408009 169985.05009705175,  76336.27953694883 169977.99832380182,  76331.71906681615 169978.96112169552,  76332.89316427232 169984.52245125046,  76334.94298703629 169985.64657057129,  76334.58333778383 169985.72249904636))', '31370').STIsValid()
+        /// select geometry::STGeomFromText('POLYGON ((76334.58333778383 169985.72249904636, 76337.76829408009 169985.05009705175,  76336.27953694883 169977.99832380182,  76331.71906681615 169978.96112169552,  76332.89316427232 169984.52245125046,  76334.94298703629 169985.64657057129,  76334.58333778383 169985.72249904636))', '31370').IsValidDetailed()
+        /// Both return 1 (true) / Valid
+        ///
+        /// AI Feedback:
+        /// I re-checked the coordinates carefully:
+        /// (1) 76334.58333778383 169985.72249904636
+        /// (2) 76337.76829408009 169985.05009705175
+        /// (3) 76336.27953694883 169977.99832380182
+        /// (4) 76331.71906681615 169978.96112169552
+        /// (5) 76332.89316427232 169984.52245125046
+        /// (6) 76334.94298703629 169985.64657057129
+        /// (1) 76334.58333778383 169985.72249904636 (closed)
+        ///
+        /// If you check all non-adjacent segment pairs, none of them actually cross. What does happen is:
+        ///
+        ///  - Point (6) lies on the straight line between points (1) and (2) — it’s an extra vertex on an otherwise straight edge.
+        ///  - That’s a collinear extra vertex, not a self-intersection (no “bow-tie” / figure-8).
+        ///
+        /// This is perfectly fine for a polygon boundary: it just has a redundant vertex along an edge. In OGC / NetTopologySuite terms:
+        ///
+        ///   - The ring is closed.
+        ///   - The area is non-zero.
+        ///   - The edges do not intersect each other except at shared endpoints.
+        ///   - So the polygon is valid and simple, which is why IsValid returns true.
+        ///
+        /// So: ✅ NetTopologySuite is right, ❌ my earlier “self-intersecting bow-tie” claim was incorrect — thanks for catching that.
+        ///
+        /// More feedback and issue: https://vlaamseoverheid.atlassian.net/browse/GAWR-7149
+        /// </summary>
+        [Fact]
+        public void GivenSelfIntersectsReportedPolygon31912514()
+        {
+            // It's NOT self-intersecting, see explanation in summary
+            // But it's been reported as such
+            var wkt = @"POLYGON ((
+  76334.58333778383 169985.72249904636,
+  76337.76829408009 169985.05009705175,
+  76336.27953694883 169977.99832380182,
+  76331.71906681615 169978.96112169552,
+  76332.89316427232 169984.52245125046,
+  76334.94298703629 169985.64657057129,
+  76334.58333778383 169985.72249904636
+))";
+            var geometry = GeometryHelper.CreateGeometryFromWkt(wkt);
+            GeometryValidator.IsValid(geometry).Should().BeTrue();
+
+            GeometryFixer.Fix(geometry);
+            geometry.AsText().Split(",").Length.Should().Be(7); // still 7 points, no change
         }
     }
 }
