@@ -189,11 +189,6 @@ namespace BuildingRegistry.Tests
                 new ProducerBuildingUnitProjections(Mock.Of<IProducer>(), Mock.Of<ISnapshotManager>(), "", Mock.Of<IOsloProxy>())
             }];
 
-            yield return [new List<ConnectedProjection<BuildingRegistry.Producer.Ldes.ProducerContext>>
-            {
-                new BuildingRegistry.Producer.Ldes.ProducerProjections(Mock.Of<IProducer>(), Mock.Of<IProducer>(), "", "", new JsonSerializerSettings())
-            }];
-
             yield return [new List<ConnectedProjection<BuildingRegistry.Producer.ProducerContext>>
             {
                 new ProducerMigrateProjections(Mock.Of<IProducer>())
