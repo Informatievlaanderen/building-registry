@@ -16,7 +16,6 @@ namespace BuildingRegistry.Infrastructure
         public const string BackOfficeProjections = "BuildingRegistryBackOfficeProjections";
         public const string Producer = "BuildingRegistryProducer";
         public const string ProducerSnapshotOslo = "BuildingRegistryProducerSnapshotOslo";
-        public const string ProducerLdes = "BuildingRegistryProducerLdes";
         public const string Integration = "integration_building";
         public const string Tools = "BuildingRegistryTools";
     }
@@ -36,7 +35,6 @@ namespace BuildingRegistry.Infrastructure
         public const string MigratorProjection = "__EFMigrationsHistoryMigrationProjection";
         public const string Producer = "__EFMigrationsHistoryProducer";
         public const string ProducerSnapshotOslo = "__EFMigrationsHistoryProducerSnapshotOslo";
-        public const string ProducerLdes = "__EFMigrationsHistoryProducerLdes";
         public const string Integration = "__EFMigrationsHistory";
     }
 }

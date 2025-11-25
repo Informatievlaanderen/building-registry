@@ -37,7 +37,6 @@
   	<ProjectReference Include="..\BuildingRegistry.Migrator.Building\BuildingRegistry.Migrator.Building.csproj" />
     <ProjectReference Include="..\BuildingRegistry.Projections.BackOffice\BuildingRegistry.Projections.BackOffice.csproj" />
     <ProjectReference Include="..\BuildingRegistry.Producer\BuildingRegistry.Producer.csproj" />
-    <ProjectReference Include="..\BuildingRegistry.Producer.Ldes\BuildingRegistry.Producer.Ldes.csproj" />
     <ProjectReference Include="..\BuildingRegistry.Producer.Snapshot.Oslo\BuildingRegistry.Producer.Snapshot.Oslo.csproj" />
   </ItemGroup>
 

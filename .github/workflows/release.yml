@@ -228,22 +228,6 @@ jobs:
       prerestore-script: ./pre-restore.sh
     secrets: inherit
 
-  build-producer-ldes:
-    name: Build Producer Ldes
-    uses: Informatievlaanderen/build-pipeline/.github/workflows/build-image-v2.yml@main
-    needs: [ set-release-version ]
-    if: ${{ (github.repository_owner == 'Informatievlaanderen') && (needs.set-release-version.outputs.version != 'none') }}
-    with:
-      registry: ${{ vars.VBR_DEVOPS_DOCKER_REGISTRY }}/building-registry
-      image-file: br-producer-ldes-image.tar
-      image-name: producer-ldes
-      test-project: BuildingRegistry.Tests
-      build-project: BuildingRegistry.Producer.Ldes
-      semver: ${{ needs.set-release-version.outputs.version }}
-      dotnet-version: ${{ vars.VBR_DOTNET_VERSION_9 }}
-      prerestore-script: ./pre-restore.sh
-    secrets: inherit
-
   build-snapshot-verifier:
     name: Build Snapshot Verifier
     uses: Informatievlaanderen/build-pipeline/.github/workflows/build-image-v2.yml@main
@@ -338,7 +322,6 @@ jobs:
       build-consumer-read-parcel,
       build-producer,
       build-producer-snapshot-oslo,
-      build-producer-ldes,
       build-lambda-backoffice,
       build-snapshot-verifier,
       build-tools-console
@@ -550,7 +533,6 @@ jobs:
           'consumer-read-parcel',
           'producer',
           'producer-snapshot-oslo',
-          'producer-ldes',
           'snapshot-verifier',
           'tools-console',
           'lambda-sqsbackofficefunction'
@@ -625,7 +607,6 @@ jobs:
           'building-consumer-parcel',
           'building-producer',
           'building-producer-snapshot-oslo',
-          'building-producer-ldes',
           'building-projections',
           'building-projections-backoffice',
           'building-last-changed-list'
@@ -766,7 +747,6 @@ jobs:
           'building-consumer-parcel',
           'building-producer',
           'building-producer-snapshot-oslo',
-          'building-producer-ldes',
           'building-projections',
           'building-projections-backoffice',
           'building-last-changed-list',

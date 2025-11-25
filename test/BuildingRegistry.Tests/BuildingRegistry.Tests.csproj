@@ -10,7 +10,6 @@
     <ProjectReference Include="..\..\src\BuildingRegistry.Consumer.Read.Parcel\BuildingRegistry.Consumer.Read.Parcel.csproj" />
     <ProjectReference Include="..\..\src\BuildingRegistry.Migrator.Building\BuildingRegistry.Migrator.Building.csproj" />
     <ProjectReference Include="..\..\src\BuildingRegistry.Producer.Snapshot.Oslo\BuildingRegistry.Producer.Snapshot.Oslo.csproj" />
-    <ProjectReference Include="..\..\src\BuildingRegistry.Producer.Ldes\BuildingRegistry.Producer.Ldes.csproj" />
     <ProjectReference Include="..\..\src\BuildingRegistry.Producer\BuildingRegistry.Producer.csproj" />
     <ProjectReference Include="..\..\src\BuildingRegistry.Projections.BackOffice\BuildingRegistry.Projections.BackOffice.csproj" />
     <ProjectReference Include="..\..\src\BuildingRegistry.Projections.Extract\BuildingRegistry.Projections.Extract.csproj" />
