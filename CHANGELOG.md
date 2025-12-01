@@ -1,3 +1,10 @@
+# [5.6.0](https://github.com/informatievlaanderen/building-registry/compare/v5.5.2...v5.6.0) (2025-12-01)
+
+
+### Features
+
+* remove ldes producers GAWR-7170 ([25ad835](https://github.com/informatievlaanderen/building-registry/commit/25ad8358ac118f454b6b63baeabe37c2af2e1a60))
+
 ## [5.5.2](https://github.com/informatievlaanderen/building-registry/compare/v5.5.1...v5.5.2) (2025-10-31)
 
 
