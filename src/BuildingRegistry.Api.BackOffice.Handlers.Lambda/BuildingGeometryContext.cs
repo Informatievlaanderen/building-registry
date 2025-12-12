@@ -91,6 +91,8 @@
                 .Where(building =>
                     building.BuildingPersistentLocalId != buildingPersistentLocalId
                     && building.GeometryMethod == BuildingGeometryMethod.Outlined
+                    && building.StatusAsString != BuildingStatus.NotRealized.Value
+                    && building.StatusAsString != BuildingStatus.Retired.Value
                     && !building.IsRemoved
                     && boundingBox.Intersects(building.SysGeometry))
                 .AsEnumerable()
