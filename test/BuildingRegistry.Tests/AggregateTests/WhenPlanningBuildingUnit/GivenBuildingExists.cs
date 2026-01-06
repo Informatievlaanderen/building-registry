@@ -34,7 +34,8 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuildingUnit
             var buildingWasPlannedV2 = Fixture.Create<BuildingWasPlannedV2>();
             ((ISetProvenance)buildingWasPlannedV2).SetProvenance(Fixture.Create<Provenance>());
 
-            var buildingUnitWasPlannedV2 = Fixture.Create<BuildingUnitWasPlannedV2>();
+            var buildingUnitWasPlannedV2 = Fixture.Create<BuildingUnitWasPlannedV2>()
+                .WithDeviation(false);
             ((ISetProvenance)buildingUnitWasPlannedV2).SetProvenance(Fixture.Create<Provenance>());
 
             building.Initialize(new object[]
