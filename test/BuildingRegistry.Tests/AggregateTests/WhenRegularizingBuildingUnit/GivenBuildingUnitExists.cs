@@ -30,12 +30,15 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRegularizingBuildingUnit
         {
             var command = Fixture.Create<RegularizeBuildingUnit>();
 
+            var buildingUnitWasPlannedV2 = Fixture.Create<BuildingUnitWasPlannedV2>()
+                .WithDeviation(true);
+
             Assert(new Scenario()
                 .Given(
                     new BuildingStreamId(Fixture.Create<BuildingPersistentLocalId>()),
                     Fixture.Create<BuildingWasPlannedV2>(),
                     Fixture.Create<BuildingWasRealizedV2>(),
-                    Fixture.Create<BuildingUnitWasPlannedV2>())
+                    buildingUnitWasPlannedV2)
                 .When(command)
                 .Then(new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
                     new BuildingUnitWasRegularized(command.BuildingPersistentLocalId, command.BuildingUnitPersistentLocalId))));
