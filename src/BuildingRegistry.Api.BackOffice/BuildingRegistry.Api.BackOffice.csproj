@@ -45,6 +45,7 @@
 
     <PackageReference Include="Be.Vlaanderen.Basisregisters.MessageHandling.AwsSqs.Simple" />
     <PackageReference Include="Be.Vlaanderen.Basisregisters.Sqs" />
+    <PackageReference Include="Be.Vlaanderen.Basisregisters.GrAr.Oslo" />
     <PackageReference Include="Be.Vlaanderen.Basisregisters.TicketingService.Abstractions" />
     <PackageReference Include="Be.Vlaanderen.Basisregisters.TicketingService.Proxy.HttpProxy" />
 
