@@ -6,6 +6,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.Building.WhenChangingBuildingOut
     using AutoFixture;
     using Be.Vlaanderen.Basisregisters.Api.ETag;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
+    using Be.Vlaanderen.Basisregisters.GrAr.Oslo;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Be.Vlaanderen.Basisregisters.Sqs.Requests;
     using BuildingRegistry.Api.BackOffice.Abstractions.Building.Requests;
@@ -49,6 +50,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.Building.WhenChangingBuildingOut
             _streamStore.SetStreamFound();
 
             var request = Fixture.Create<ChangeBuildingOutlineRequest>();
+            request.GeometriePolygoon = GeometryHelper.ValidPolygon.ToGmlJsonPolygon().Gml;
             var expectedIfMatchHeader = Fixture.Create<string>();
 
             var result = (AcceptedResult) await _controller.ChangeOutline(
@@ -79,17 +81,76 @@ namespace BuildingRegistry.Tests.BackOffice.Api.Building.WhenChangingBuildingOut
         {
             _streamStore.SetStreamFound();
 
+            var changeBuildingOutlineRequest = Fixture.Create<ChangeBuildingOutlineRequest>();
+            changeBuildingOutlineRequest.GeometriePolygoon = GeometryHelper.ValidPolygon.ToGmlJsonPolygon().Gml;
+
             //Act
             var result = await _controller.ChangeOutline(
                 MockValidRequestValidator<ChangeBuildingOutlineRequest>(),
                 new BuildingExistsValidator(_streamStore.Object),
                 MockIfMatchValidator(false),
                 Fixture.Create<BuildingPersistentLocalId>(),
-                Fixture.Create<ChangeBuildingOutlineRequest>(),
+                changeBuildingOutlineRequest,
                 "IncorrectIfMatchHeader");
 
             //Assert
             result.Should().BeOfType<PreconditionFailedResult>();
+        }
+
+        [Fact]
+        public async Task WithPolygonDoublePoints_ThenTicketLocationIsReturnedWithCleanedUpPolygon()
+        {
+            var polygonWithDoublePoints =
+                "<gml:Polygon srsName=\"https://www.opengis.net/def/crs/EPSG/0/31370\" xmlns:gml=\"http://www.opengis.net/gml/3.2\"><gml:exterior><gml:LinearRing><gml:posList>" +
+                "232276.31667640081 185653.07371366365 " +
+                "232278.52847587419 185660.05582659596 " +
+                "232278.52847587419 185660.05582659596 " +
+                "232289.95809909908 185656.54085878414 " +
+                "232289.95809909908 185656.54085878414 " +
+                "232287.80607798981 185649.53483450611 " +
+                "232287.80607798981 185649.53483450611 " +
+                "232276.31667640081 185653.07371366365 " +
+                "232276.31667640081 185653.07371366365</gml:posList></gml:LinearRing></gml:exterior></gml:Polygon>";
+
+            var ticketId = Fixture.Create<Guid>();
+            var expectedLocationResult = new LocationResult(CreateTicketUri(ticketId));
+
+            MockMediator
+                .Setup(x => x.Send(It.IsAny<ChangeBuildingOutlineSqsRequest>(), CancellationToken.None))
+                .Returns(Task.FromResult(expectedLocationResult));
+
+            _streamStore.SetStreamFound();
+
+            var expectedIfMatchHeader = Fixture.Create<string>();
+            var request = Fixture.Create<ChangeBuildingOutlineRequest>();
+            request.GeometriePolygoon = polygonWithDoublePoints;
+
+            var result = (AcceptedResult)await _controller.ChangeOutline(
+                MockValidRequestValidator<ChangeBuildingOutlineRequest>(),
+                new BuildingExistsValidator(_streamStore.Object),
+                MockIfMatchValidator(true),
+                Fixture.Create<BuildingPersistentLocalId>(),
+                request,
+                expectedIfMatchHeader);
+
+            result.Should().NotBeNull();
+            AssertLocation(result.Location, ticketId);
+
+            MockMediator.Verify(x =>
+                x.Send(
+                    It.Is<ChangeBuildingOutlineSqsRequest>(sqsRequest =>
+                        sqsRequest.Request.GeometriePolygoon == "<gml:Polygon srsName=\"https://www.opengis.net/def/crs/EPSG/0/31370\" xmlns:gml=\"http://www.opengis.net/gml/3.2\"><gml:exterior><gml:LinearRing><gml:posList>" +
+                        "232276.31667640081 185653.07371366365 " +
+                        "232278.52847587419 185660.05582659596 " +
+                        "232289.95809909908 185656.54085878414 " +
+                        "232287.80607798981 185649.53483450611 " +
+                        "232276.31667640081 185653.07371366365</gml:posList></gml:LinearRing></gml:exterior></gml:Polygon>"
+                        && sqsRequest.ProvenanceData.Timestamp != Instant.MinValue
+                        && sqsRequest.ProvenanceData.Application == Application.BuildingRegistry
+                        && sqsRequest.ProvenanceData.Modification == Modification.Update
+                        && sqsRequest.IfMatchHeaderValue == expectedIfMatchHeader
+                    ),
+                    CancellationToken.None));
         }
 
         [Fact]
@@ -99,14 +160,20 @@ namespace BuildingRegistry.Tests.BackOffice.Api.Building.WhenChangingBuildingOut
             _streamStore.SetStreamNotFound();
 
             //Act
-            var act = async () => await _controller.ChangeOutline(
-                MockValidRequestValidator<ChangeBuildingOutlineRequest>(),
-                new BuildingExistsValidator(_streamStore.Object),
-                MockIfMatchValidator(true),
-                Fixture.Create<BuildingPersistentLocalId>(),
-                Fixture.Create<ChangeBuildingOutlineRequest>(),
-                null,
-                CancellationToken.None);
+            var act = async () =>
+            {
+                var changeBuildingOutlineRequest = Fixture.Create<ChangeBuildingOutlineRequest>();
+                changeBuildingOutlineRequest.GeometriePolygoon = GeometryHelper.ValidPolygon.ToGmlJsonPolygon().Gml;
+
+                return await _controller.ChangeOutline(
+                    MockValidRequestValidator<ChangeBuildingOutlineRequest>(),
+                    new BuildingExistsValidator(_streamStore.Object),
+                    MockIfMatchValidator(true),
+                    Fixture.Create<BuildingPersistentLocalId>(),
+                    changeBuildingOutlineRequest,
+                    null,
+                    CancellationToken.None);
+            };
 
             //Assert
             act

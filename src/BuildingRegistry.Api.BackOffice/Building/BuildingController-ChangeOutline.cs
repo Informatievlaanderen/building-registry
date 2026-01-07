@@ -56,7 +56,8 @@ namespace BuildingRegistry.Api.BackOffice.Building
             CancellationToken cancellationToken = default)
         {
             request.PersistentLocalId = persistentLocalId;
-
+            await validator.ValidateAndThrowAsync(request, cancellationToken);
+            request.GeometriePolygoon = request.GeometriePolygoon.ToCleanPolygon();
             await validator.ValidateAndThrowAsync(request, cancellationToken);
 
             if (!await buildingExistsValidator.Exists(new BuildingPersistentLocalId(request.PersistentLocalId),

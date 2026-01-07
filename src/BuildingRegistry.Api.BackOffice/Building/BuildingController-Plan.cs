@@ -42,6 +42,8 @@ namespace BuildingRegistry.Api.BackOffice.Building
             CancellationToken cancellationToken = default)
         {
             await validator.ValidateAndThrowAsync(planBuildingRequest, cancellationToken);
+            planBuildingRequest.GeometriePolygoon = planBuildingRequest.GeometriePolygoon.ToCleanPolygon();
+            await validator.ValidateAndThrowAsync(planBuildingRequest, cancellationToken);
 
             var result = await Mediator.Send(
                 planBuildingSqsRequestFactory.Create(planBuildingRequest, GetMetadata(), new ProvenanceData(CreateProvenance(Modification.Insert))),

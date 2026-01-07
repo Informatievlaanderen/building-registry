@@ -95,12 +95,10 @@ namespace BuildingRegistry.Tests.BackOffice.Api.Building.WhenCorrectingPlaceBuil
             _streamStore.SetStreamNotFound();
 
             //Act
-            var act = async () => await _controller.ChangeOutline(
-                MockValidRequestValidator<ChangeBuildingOutlineRequest>(),
+            var act = async () => await _controller.CorrectPlaceUnderConstruction(
                 new BuildingExistsValidator(_streamStore.Object),
                 MockIfMatchValidator(true),
-                Fixture.Create<BuildingPersistentLocalId>(),
-                Fixture.Create<ChangeBuildingOutlineRequest>(),
+                Fixture.Create<CorrectPlaceBuildingUnderConstructionRequest>(),
                 null,
                 CancellationToken.None);
 
