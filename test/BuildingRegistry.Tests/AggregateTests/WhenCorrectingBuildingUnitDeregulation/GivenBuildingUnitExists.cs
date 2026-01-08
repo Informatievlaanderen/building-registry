@@ -35,7 +35,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitDeregu
                     new BuildingStreamId(Fixture.Create<BuildingPersistentLocalId>()),
                     Fixture.Create<BuildingWasPlannedV2>(),
                     Fixture.Create<BuildingWasRealizedV2>(),
-                    Fixture.Create<BuildingUnitWasPlannedV2>())
+                    Fixture.Create<BuildingUnitWasPlannedV2>().WithDeviation(true))
                 .When(command)
                 .Then(new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
                     new BuildingUnitDeregulationWasCorrected(command.BuildingPersistentLocalId, command.BuildingUnitPersistentLocalId))));
