@@ -1,3 +1,15 @@
+# [5.7.0](https://github.com/informatievlaanderen/building-registry/compare/v5.6.0...v5.7.0) (2026-01-08)
+
+
+### Bug Fixes
+
+* **backoffice:** remove duplicate points in outlines GAWR-7220 ([53b6c35](https://github.com/informatievlaanderen/building-registry/commit/53b6c35af8aa4ed4ab4156a815d95a151e87467d))
+
+
+### Features
+
+* exclude notrealized buildings from overlap check GAWR-7211 ([1e543af](https://github.com/informatievlaanderen/building-registry/commit/1e543af5c4e1623d48d6fd2c1ca89fdb2c9e8865))
+
 # [5.6.0](https://github.com/informatievlaanderen/building-registry/compare/v5.5.2...v5.6.0) (2025-12-01)
 
 
