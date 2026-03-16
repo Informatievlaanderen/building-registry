@@ -34,7 +34,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitRetire
                 Fixture.Create<Provenance>());
 
             var buildingGeometry = new BuildingGeometry(
-                new ExtendedWkbGeometry(GeometryHelper.ValidPolygon.AsBinary()),
+                new ExtendedWkbGeometry(WkbWriter.Instance.Write(GeometryHelper.ValidPolygon)),
                 BuildingGeometryMethod.Outlined);
 
             var commonBuildingUnitPersistentLocalId = new BuildingUnitPersistentLocalId(2);
@@ -85,7 +85,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitRetire
             var commonBuildingUnitPersistentLocalId = Fixture.Create<BuildingUnitPersistentLocalId>();
 
             var buildingGeometry = new BuildingGeometry(
-                new ExtendedWkbGeometry(GeometryHelper.ValidPolygon.AsBinary()),
+                new ExtendedWkbGeometry(WkbWriter.Instance.Write(GeometryHelper.ValidPolygon)),
                 BuildingGeometryMethod.Outlined);
 
             var migrateScenario = new BuildingWasMigratedBuilder(Fixture)
@@ -153,7 +153,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitRetire
             );
 
             var buildingGeometry = new BuildingGeometry(
-                new ExtendedWkbGeometry(GeometryHelper.ValidPolygon.AsBinary()),
+                new ExtendedWkbGeometry(WkbWriter.Instance.Write(GeometryHelper.ValidPolygon)),
                 BuildingGeometryMethod.Outlined);
 
             var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)

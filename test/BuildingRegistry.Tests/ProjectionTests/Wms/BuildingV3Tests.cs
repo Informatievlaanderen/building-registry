@@ -54,7 +54,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wms
                     buildingDetailItem.Status.Should().Be(BuildingStatus.Parse(buildingWasMigrated.BuildingStatus));
                     buildingDetailItem.Version.Should().Be(buildingWasMigrated.Provenance.Timestamp);
 
-                    buildingDetailItem.Geometry.Should().BeEquivalentTo(buildingWasMigrated.ExtendedWkbGeometry.ToByteArray());
+                    buildingDetailItem.Geometry.Should().BeEquivalentTo(GeometryHelper.ValidPolygon.AsBinary());
                     buildingDetailItem.GeometryMethod.Should().Be(BuildingV3Projections.MapMethod(BuildingGeometryMethod.Parse(buildingWasMigrated.GeometryMethod)));
                 });
         }

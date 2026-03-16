@@ -245,7 +245,7 @@ namespace BuildingRegistry.Projections.Wms.BuildingV3
             var geometry = _wkbReader.Read(extendedWkbGeometry.ToByteArray()) as Polygon;
 
             building.GeometryMethod = method;
-            building.Geometry = geometry?.AsBinary();
+            building.Geometry = geometry?.AsBinary(); //asbinary is a must here since we are using a WKB and not EWKB
         }
 
         private static Task DoNothing<T>(WmsContext context, Envelope<T> envelope, CancellationToken ct) where T: IMessage => Task.CompletedTask;

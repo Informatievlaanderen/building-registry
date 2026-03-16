@@ -93,7 +93,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenMovingBuildingUnitIntoBuildi
                 .Build();
 
             var buildingGeometry = new BuildingGeometry(
-                new ExtendedWkbGeometry(GeometryHelper.ValidPolygon.AsBinary()), BuildingGeometryMethod.Outlined);
+                new ExtendedWkbGeometry(WkbWriter.Instance.Write(GeometryHelper.ValidPolygon)), BuildingGeometryMethod.Outlined);
 
             var destinationBuildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
                 .WithBuildingPersistentLocalId(command.DestinationBuildingPersistentLocalId)

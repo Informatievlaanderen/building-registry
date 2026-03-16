@@ -10,6 +10,7 @@ namespace BuildingRegistry.Building
     public sealed class BuildingGeometry : ValueObject<BuildingGeometry>
     {
         private readonly WKBReader _wkbReader = new WKBReader { HandleSRID = true };
+        private readonly WKBWriter _wkbWriter = new WKBWriter { Strict = false, HandleSRID = true };
 
         public ExtendedWkbGeometry Geometry { get; }
         public BuildingGeometryMethod Method { get; }
@@ -34,14 +35,14 @@ namespace BuildingRegistry.Building
             if (buildingGeometry is GeometryCollection gc && buildingGeometry.OgcGeometryType != OgcGeometryType.MultiPolygon)
             {
                 var polygon = gc.Single(x => x is Polygon);
-                return new ExtendedWkbGeometry(polygon.AsBinary());
+                return new ExtendedWkbGeometry(_wkbWriter.Write(polygon));
             }
 
             return geometry;
         }
 
         public ExtendedWkbGeometry Center =>
-            ExtendedWkbGeometry.CreateEWkb(_wkbReader.Read(Geometry).CentroidWithinArea().AsBinary())!;
+            ExtendedWkbGeometry.CreateEWkb(_wkbWriter.Write(_wkbReader.Read(Geometry).CentroidWithinArea()))!;
 
         public Geometry GetGeometry() => _wkbReader.Read(Geometry);
         public Geometry GetGeometry(ExtendedWkbGeometry geometry) => _wkbReader.Read(geometry);

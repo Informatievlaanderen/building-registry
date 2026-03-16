@@ -4,17 +4,13 @@ namespace BuildingRegistry.Tests.Oslo.ParcelMatchingTests
     using System.Linq;
     using Api.BackOffice.Abstractions.Building;
     using BackOffice;
-    using BuildingRegistry.Legacy;
+    using Be.Vlaanderen.Basisregisters.GrAr.Common.NetTopology;
     using Consumer.Read.Parcel;
     using Consumer.Read.Parcel.ParcelWithCount;
     using FluentAssertions;
-    using NetTopologySuite;
     using NetTopologySuite.Geometries;
-    using NetTopologySuite.Geometries.Implementation;
     using NetTopologySuite.IO;
     using Xunit;
-    using ExtendedWkbGeometry = Building.ExtendedWkbGeometry;
-    using GeometryFactory = BuildingRegistry.GeometryFactory;
 
     public class GetUnderlyingParcelsTests
     {
@@ -37,14 +33,14 @@ namespace BuildingRegistry.Tests.Oslo.ParcelMatchingTests
                     Guid.NewGuid(),
                     Guid.NewGuid().ToString(),
                     ParcelStatus.Realized,
-                    parcelGeometry.AsBinary(),
+                    WkbWriter.Instance.Write(parcelGeometry),
                     parcelGeometry));
 
             _consumerParcelContext.SaveChanges();
 
             var parcelMatching = new ParcelMatching(_consumerParcelContext);
 
-            var result = parcelMatching.GetUnderlyingParcels(buildingGeometry100PercentOverlap.AsBinary());
+            var result = parcelMatching.GetUnderlyingParcels(WkbWriter.Instance.Write(buildingGeometry100PercentOverlap));
 
             result.Should().ContainSingle();
         }
@@ -60,14 +56,14 @@ namespace BuildingRegistry.Tests.Oslo.ParcelMatchingTests
                     Guid.NewGuid(),
                     Guid.NewGuid().ToString(),
                     ParcelStatus.Retired,
-                    parcelGeometry.AsBinary(),
+                    WkbWriter.Instance.Write(parcelGeometry),
                     parcelGeometry));
 
             _consumerParcelContext.SaveChanges();
 
             var parcelMatching = new ParcelMatching(_consumerParcelContext);
 
-            var result = parcelMatching.GetUnderlyingParcels(buildingGeometry100PercentOverlap.AsBinary());
+            var result = parcelMatching.GetUnderlyingParcels(WkbWriter.Instance.Write(buildingGeometry100PercentOverlap));
 
             result.Should().BeEmpty();
         }
@@ -83,14 +79,14 @@ namespace BuildingRegistry.Tests.Oslo.ParcelMatchingTests
                     Guid.NewGuid(),
                     Guid.NewGuid().ToString(),
                     ParcelStatus.Realized,
-                    parcelGeometry.AsBinary(),
+                    WkbWriter.Instance.Write(parcelGeometry),
                     parcelGeometry));
 
             _consumerParcelContext.SaveChanges();
 
             var parcelMatching = new ParcelMatching(_consumerParcelContext);
 
-            var result = parcelMatching.GetUnderlyingParcels(buildingGeometry.AsBinary());
+            var result = parcelMatching.GetUnderlyingParcels(WkbWriter.Instance.Write(buildingGeometry));
 
             result.Should().BeEmpty();
         }
@@ -106,7 +102,7 @@ namespace BuildingRegistry.Tests.Oslo.ParcelMatchingTests
                     Guid.NewGuid(),
                     Guid.NewGuid().ToString(),
                     ParcelStatus.Realized,
-                    parcelGeometry.AsBinary(),
+                    WkbWriter.Instance.Write(parcelGeometry),
                     parcelGeometry));
 
             _consumerParcelContext.ParcelConsumerItemsWithCount.Add(
@@ -114,14 +110,14 @@ namespace BuildingRegistry.Tests.Oslo.ParcelMatchingTests
                     Guid.NewGuid(),
                     Guid.NewGuid().ToString(),
                     ParcelStatus.Realized,
-                    parcelGeometry.AsBinary(),
+                    WkbWriter.Instance.Write(parcelGeometry),
                     parcelGeometry));
 
             _consumerParcelContext.SaveChanges();
 
             var parcelMatching = new ParcelMatching(_consumerParcelContext);
 
-            var result = parcelMatching.GetUnderlyingParcels(buildingGeometry50PercentOverlap.AsBinary());
+            var result = parcelMatching.GetUnderlyingParcels(WkbWriter.Instance.Write(buildingGeometry50PercentOverlap));
 
             result.Count().Should().Be(2);
         }
@@ -139,7 +135,7 @@ namespace BuildingRegistry.Tests.Oslo.ParcelMatchingTests
                     Guid.NewGuid(),
                     parcelLeftCaPaKey,
                     ParcelStatus.Realized,
-                    parcelLeft.AsBinary(),
+                    WkbWriter.Instance.Write(parcelLeft),
                     parcelLeft));
 
             _consumerParcelContext.ParcelConsumerItemsWithCount.Add(
@@ -147,14 +143,14 @@ namespace BuildingRegistry.Tests.Oslo.ParcelMatchingTests
                     Guid.NewGuid(),
                     Guid.NewGuid().ToString(),
                     ParcelStatus.Realized,
-                    parcelRight.AsBinary(),
+                    WkbWriter.Instance.Write(parcelRight),
                     parcelRight));
 
             _consumerParcelContext.SaveChanges();
 
             var parcelMatching = new ParcelMatching(_consumerParcelContext);
 
-            var result = parcelMatching.GetUnderlyingParcels(building.AsBinary()).ToList();
+            var result = parcelMatching.GetUnderlyingParcels(WkbWriter.Instance.Write(building)).ToList();
 
             result.Count.Should().Be(1);
             result.First().Should().Be(parcelLeftCaPaKey);
@@ -180,7 +176,7 @@ namespace BuildingRegistry.Tests.Oslo.ParcelMatchingTests
 
             foreach (var parcelGeometry in parcelGeometriesWkt)
             {
-                var geometry = new WKTReader(GeometryFactory.CreateNtsGeometryServices())
+                var geometry = new WKTReader(NtsGeometryFactory.CreateGeometryFactoryLambert72())
                     .Read(parcelGeometry);
 
                 _consumerParcelContext.ParcelConsumerItemsWithCount.Add(
@@ -188,7 +184,7 @@ namespace BuildingRegistry.Tests.Oslo.ParcelMatchingTests
                         Guid.NewGuid(),
                         Guid.NewGuid().ToString(),
                         ParcelStatus.Realized,
-                        geometry.AsBinary(),
+                        WkbWriter.Instance.Write(geometry),
                         geometry));
             }
 
@@ -196,7 +192,7 @@ namespace BuildingRegistry.Tests.Oslo.ParcelMatchingTests
 
             var parcelMatching = new ParcelMatching(_consumerParcelContext);
 
-            var result = parcelMatching.GetUnderlyingParcels(buildingGeometry.AsBinary());
+            var result = parcelMatching.GetUnderlyingParcels(WkbWriter.Instance.Write(buildingGeometry));
 
             result.Should().ContainSingle();
         }

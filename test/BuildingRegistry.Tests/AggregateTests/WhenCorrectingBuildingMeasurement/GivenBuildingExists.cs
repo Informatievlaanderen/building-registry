@@ -30,7 +30,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingMeasuremen
         [Fact]
         public void WithBuildingStatusRealized_ThenBuildingWasMeasured()
         {
-            var correctedExtendedWkbGeometry = new ExtendedWkbGeometry(GeometryHelper.SecondValidPolygon.AsBinary());
+            var correctedExtendedWkbGeometry = new ExtendedWkbGeometry(WkbWriter.Instance.Write(GeometryHelper.SecondValidPolygon));
             var command = new CorrectBuildingMeasurement(
                 Fixture.Create<BuildingPersistentLocalId>(),
                 correctedExtendedWkbGeometry,
@@ -45,7 +45,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingMeasuremen
             var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
                 .WithBuildingGeometry(
                     new BuildingGeometry(
-                        new ExtendedWkbGeometry(GeometryHelper.ValidPolygon.AsBinary()),
+                        new ExtendedWkbGeometry(WkbWriter.Instance.Write(GeometryHelper.ValidPolygon)),
                         BuildingGeometryMethod.MeasuredByGrb))
                 .WithBuildingStatus(BuildingStatus.Realized)
                 .WithBuildingUnit(
@@ -55,7 +55,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingMeasuremen
                 .WithBuildingUnit(
                     BuildingUnitStatus.Realized,
                     realizedBuildingUnitPersistentLocalId,
-                    extendedWkbGeometry: new BuildingRegistry.Legacy.ExtendedWkbGeometry(GeometryHelper.PointNotInPolygon.AsBinary()),
+                    extendedWkbGeometry: new BuildingRegistry.Legacy.ExtendedWkbGeometry(WkbWriter.Instance.Write(GeometryHelper.PointNotInPolygon)),
                     positionGeometryMethod: BuildingUnitPositionGeometryMethod.AppointedByAdministrator)
                 .WithBuildingUnit(BuildingUnitStatus.NotRealized, notRealizedBuildingUnitPersistentLocalId)
                 .WithBuildingUnit(BuildingUnitStatus.Planned, removedBuildingUnitPersistentLocalId, isRemoved: true)
@@ -83,7 +83,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingMeasuremen
         [Fact]
         public void AndMeasurementUnchanged_ThenNothing()
         {
-            var extendedWkbGeometry = new ExtendedWkbGeometry(GeometryHelper.ValidPolygon.AsBinary());
+            var extendedWkbGeometry = new ExtendedWkbGeometry(WkbWriter.Instance.Write(GeometryHelper.ValidPolygon));
             var command = new CorrectBuildingMeasurement(
                 Fixture.Create<BuildingPersistentLocalId>(),
                 extendedWkbGeometry,
@@ -192,7 +192,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingMeasuremen
             var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
                 .WithBuildingGeometry(
                     new BuildingGeometry(
-                        new ExtendedWkbGeometry(GeometryHelper.ValidPolygon.AsBinary()),
+                        new ExtendedWkbGeometry(WkbWriter.Instance.Write(GeometryHelper.ValidPolygon)),
                         BuildingGeometryMethod.Outlined))
                 .WithBuildingStatus(BuildingStatus.Realized)
                 .WithBuildingUnit(
@@ -202,11 +202,11 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingMeasuremen
                 .WithBuildingUnit(
                     BuildingUnitStatus.Realized,
                     realizedBuildingUnitPersistentLocalId,
-                    extendedWkbGeometry: new BuildingRegistry.Legacy.ExtendedWkbGeometry(GeometryHelper.PointNotInPolygon.AsBinary()),
+                    extendedWkbGeometry: new BuildingRegistry.Legacy.ExtendedWkbGeometry(WkbWriter.Instance.Write(GeometryHelper.PointNotInPolygon)),
                     positionGeometryMethod: BuildingUnitPositionGeometryMethod.AppointedByAdministrator)
                 .Build();
 
-            var measuredExtendedWkbGeometry = new ExtendedWkbGeometry(GeometryHelper.SecondValidPolygon.AsBinary());
+            var measuredExtendedWkbGeometry = new ExtendedWkbGeometry(WkbWriter.Instance.Write(GeometryHelper.SecondValidPolygon));
             var buildingUnitsExtendedWkbGeometry = new BuildingGeometry(measuredExtendedWkbGeometry, BuildingGeometryMethod.MeasuredByGrb).Center;
             var buildingMeasurementWasCorrected = new BuildingMeasurementWasCorrected(
                     Fixture.Create<BuildingPersistentLocalId>(),
@@ -237,7 +237,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingMeasuremen
         [Fact]
         public void WithSelfTouchingRing_ThenBuildingMeasurementWasCorrected()
         {
-            var extendedWkbGeometry = new ExtendedWkbGeometry(GeometryHelper.SelfTouchingPolygon.AsBinary());
+            var extendedWkbGeometry = new ExtendedWkbGeometry(WkbWriter.Instance.Write(GeometryHelper.SelfTouchingPolygon));
 
             var command = new CorrectBuildingMeasurement(
                 Fixture.Create<BuildingPersistentLocalId>(),
@@ -254,7 +254,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingMeasuremen
             var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
                 .WithBuildingGeometry(
                     new BuildingGeometry(
-                        new ExtendedWkbGeometry(GeometryHelper.ValidPolygon.AsBinary()),
+                        new ExtendedWkbGeometry(WkbWriter.Instance.Write(GeometryHelper.ValidPolygon)),
                         BuildingGeometryMethod.MeasuredByGrb))
                 .WithBuildingStatus(BuildingStatus.Realized)
                 .WithBuildingUnit(
@@ -264,7 +264,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingMeasuremen
                 .WithBuildingUnit(
                     BuildingUnitStatus.Realized,
                     realizedBuildingUnitPersistentLocalId,
-                    extendedWkbGeometry: new BuildingRegistry.Legacy.ExtendedWkbGeometry(GeometryHelper.PointNotInPolygon.AsBinary()),
+                    extendedWkbGeometry: new BuildingRegistry.Legacy.ExtendedWkbGeometry(WkbWriter.Instance.Write(GeometryHelper.PointNotInPolygon)),
                     positionGeometryMethod: BuildingUnitPositionGeometryMethod.AppointedByAdministrator)
                 .WithBuildingUnit(BuildingUnitStatus.NotRealized, notRealizedBuildingUnitPersistentLocalId)
                 .WithBuildingUnit(BuildingUnitStatus.Planned, removedBuildingUnitPersistentLocalId, isRemoved: true)

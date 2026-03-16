@@ -88,7 +88,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wfs
 
                     var wkbReader = WKBReaderFactory.Create();
                     var polygon = wkbReader.Read(buildingWasPlannedV2.ExtendedWkbGeometry.ToByteArray());
-                    buildingDetailItem.Geometry!.AsBinary().Should().BeEquivalentTo(polygon.AsBinary());
+                    WkbWriter.Instance.Write(buildingDetailItem.Geometry!).Should().BeEquivalentTo(WkbWriter.Instance.Write(polygon));
                     buildingDetailItem.GeometryMethod.Should().Be(BuildingV3Projections.MapGeometryMethod(BuildingGeometryMethod.Outlined));
                 });
         }
@@ -117,7 +117,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wfs
 
                     var wkbReader = WKBReaderFactory.Create();
                     var polygon = wkbReader.Read(@event.ExtendedWkbGeometry.ToByteArray());
-                    buildingDetailItem.Geometry!.AsBinary().Should().BeEquivalentTo(polygon.AsBinary());
+                    WkbWriter.Instance.Write(buildingDetailItem.Geometry!).Should().BeEquivalentTo(WkbWriter.Instance.Write(polygon));
                 });
         }
 
@@ -190,7 +190,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wfs
 
                     var wkbReader = WKBReaderFactory.Create();
                     var polygon = wkbReader.Read(buildingOutlineWasChanged.ExtendedWkbGeometryBuilding.ToByteArray());
-                    buildingDetailItem.Geometry!.AsBinary().Should().BeEquivalentTo(polygon.AsBinary());
+                    WkbWriter.Instance.Write(buildingDetailItem.Geometry!).Should().BeEquivalentTo(WkbWriter.Instance.Write(polygon));
                 });
         }
 
@@ -218,7 +218,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wfs
 
                     var wkbReader = WKBReaderFactory.Create();
                     var polygon = wkbReader.Read(buildingMeasurementWasChanged.ExtendedWkbGeometryBuilding.ToByteArray());
-                    buildingDetailItem.Geometry!.AsBinary().Should().BeEquivalentTo(polygon.AsBinary());
+                    WkbWriter.Instance.Write(buildingDetailItem.Geometry!).Should().BeEquivalentTo(WkbWriter.Instance.Write(polygon));
                 });
         }
 
@@ -431,7 +431,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wfs
 
                     var wkbReader = WKBReaderFactory.Create();
                     var polygon = wkbReader.Read(@event.ExtendedWkbGeometryBuilding.ToByteArray());
-                    buildingDetailItem.Geometry!.AsBinary().Should().BeEquivalentTo(polygon.AsBinary());
+                    WkbWriter.Instance.Write(buildingDetailItem.Geometry!).Should().BeEquivalentTo(WkbWriter.Instance.Write(polygon));
                     buildingDetailItem.GeometryMethod.Should().Be(GeometrieMethode.IngemetenGRB.ToString());
                 });
         }
@@ -464,7 +464,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wfs
 
                     var wkbReader = WKBReaderFactory.Create();
                     var polygon = wkbReader.Read(@event.ExtendedWkbGeometryBuilding.ToByteArray());
-                    buildingDetailItem.Geometry!.AsBinary().Should().BeEquivalentTo(polygon.AsBinary());
+                    WkbWriter.Instance.Write(buildingDetailItem.Geometry!).Should().BeEquivalentTo(WkbWriter.Instance.Write(polygon));
                     buildingDetailItem.GeometryMethod.Should().Be(GeometrieMethode.IngemetenGRB.ToString());
                 });
         }

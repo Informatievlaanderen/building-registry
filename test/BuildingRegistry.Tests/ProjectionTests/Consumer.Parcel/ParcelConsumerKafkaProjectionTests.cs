@@ -70,7 +70,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Consumer.Parcel
                 parcelStatus.Status,
                 Fixture.Create<bool>(),
                 Fixture.Create<IEnumerable<int>>(),
-                GeometryHelper.ValidPolygon.AsBinary().ToHexString(),
+                WkbWriter.Instance.Write(GeometryHelper.ValidPolygon).ToHexString(),
                 Fixture.Create<Provenance>());
 
             _addressPersistentLocalId = Fixture.Create<int>();
@@ -312,7 +312,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Consumer.Parcel
                 .FromFactory(() => new ParcelWasImported(
                     parcelId,
                     capakey,
-                    GeometryHelper.ValidPolygon.AsBinary().ToHexString(),
+                    WkbWriter.Instance.Write(GeometryHelper.ValidPolygon).ToHexString(),
                     Fixture.Create<Provenance>()
                 ))
                 .Create();
@@ -354,7 +354,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Consumer.Parcel
                 .FromFactory(() => new ParcelWasImported(
                     parcelId,
                     capakey,
-                    GeometryHelper.ValidPolygon.AsBinary().ToHexString(),
+                    WkbWriter.Instance.Write(GeometryHelper.ValidPolygon).ToHexString(),
                     Fixture.Create<Provenance>()
                 ))
                 .Create();
@@ -368,7 +368,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Consumer.Parcel
                 ))
                 .Create();
 
-            var expectedGeometry = GeometryHelper.SecondValidPolygon.AsBinary();
+            var expectedGeometry = WkbWriter.Instance.Write(GeometryHelper.SecondValidPolygon);
             var parcelWasCorrectedFromRetiredToRealized = Fixture
                 .Build<ParcelWasCorrectedFromRetiredToRealized>()
                 .FromFactory(() => new ParcelWasCorrectedFromRetiredToRealized(
@@ -416,7 +416,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Consumer.Parcel
                  .FromFactory(() => new ParcelWasImported(
                      parcelId,
                      capakey,
-                     GeometryHelper.ValidPolygon.AsBinary().ToHexString(),
+                     WkbWriter.Instance.Write(GeometryHelper.ValidPolygon).ToHexString(),
                      Fixture.Create<Provenance>()
                  ))
                  .Create();
@@ -427,7 +427,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Consumer.Parcel
                  .FromFactory(() => new ParcelGeometryWasChanged(
                      parcelId,
                      capakey,
-                     newGeometry.AsBinary().ToHexString(),
+                     WkbWriter.Instance.Write(newGeometry).ToHexString(),
                      Fixture.Create<Provenance>()
                  ))
                  .Create();
@@ -467,7 +467,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Consumer.Parcel
                 .FromFactory(() => new ParcelWasImported(
                     Fixture.Create<Guid>().ToString("D"),
                     Fixture.Create<Guid>().ToString("D"),
-                    GeometryHelper.ValidPolygon.AsBinary().ToHexString(),
+                    WkbWriter.Instance.Write(GeometryHelper.ValidPolygon).ToHexString(),
                     Fixture.Create<Provenance>()
                 ))
                 .Create();

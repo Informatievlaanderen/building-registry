@@ -1,6 +1,7 @@
 namespace BuildingRegistry.Tests.Fixtures
 {
     using AutoFixture;
+    using Be.Vlaanderen.Basisregisters.GrAr.Common.NetTopology;
     using Building;
 
     public class WithValidExtendedWkbPolygon : ICustomization
@@ -8,8 +9,9 @@ namespace BuildingRegistry.Tests.Fixtures
         public void Customize(IFixture fixture)
         {
             var validPolygon = GeometryHelper.ValidPolygon;
-            fixture.Customize<ExtendedWkbGeometry>(c => c.FromFactory(() => new ExtendedWkbGeometry(validPolygon.AsBinary())));
-            fixture.Customize<BuildingRegistry.Legacy.ExtendedWkbGeometry>(c => c.FromFactory(() => new BuildingRegistry.Legacy.ExtendedWkbGeometry(validPolygon.AsBinary())));
+            validPolygon.WithSrid(ExtendedWkbGeometry.SridLambert72);
+            fixture.Customize<ExtendedWkbGeometry>(c => c.FromFactory(() => new ExtendedWkbGeometry(WkbWriter.Instance.Write(validPolygon))));
+            fixture.Customize<BuildingRegistry.Legacy.ExtendedWkbGeometry>(c => c.FromFactory(() => new BuildingRegistry.Legacy.ExtendedWkbGeometry(WkbWriter.Instance.Write(validPolygon))));
         }
     }
 
@@ -17,7 +19,10 @@ namespace BuildingRegistry.Tests.Fixtures
     {
         public void Customize(IFixture fixture)
         {
-            fixture.Customize<ExtendedWkbGeometry>(c => c.FromFactory(() => new ExtendedWkbGeometry(GeometryHelper.ValidPointInPolygon.AsBinary())));
+            var point = GeometryHelper.ValidPointInPolygon;
+            point.WithSrid(ExtendedWkbGeometry.SridLambert72);
+
+            fixture.Customize<ExtendedWkbGeometry>(c => c.FromFactory(() => new ExtendedWkbGeometry(WkbWriter.Instance.Write(point))));
         }
     }
 
@@ -25,7 +30,10 @@ namespace BuildingRegistry.Tests.Fixtures
     {
         public void Customize(IFixture fixture)
         {
-            fixture.Customize<ExtendedWkbGeometry>(c => c.FromFactory(() => new ExtendedWkbGeometry(GeometryHelper.TooSmallPolygon.AsBinary())));
+            var smallPolygon = GeometryHelper.TooSmallPolygon;
+            smallPolygon.WithSrid(ExtendedWkbGeometry.SridLambert72);
+
+            fixture.Customize<ExtendedWkbGeometry>(c => c.FromFactory(() => new ExtendedWkbGeometry(WkbWriter.Instance.Write(smallPolygon))));
         }
     }
 }

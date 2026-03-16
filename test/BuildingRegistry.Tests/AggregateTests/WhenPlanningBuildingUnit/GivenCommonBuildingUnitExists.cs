@@ -75,7 +75,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuildingUnit
                 .WithDeviation(false);
 
             var buildingGeometry = new BuildingGeometry(
-                new ExtendedWkbGeometry(GeometryHelper.ValidPolygon.AsBinary()),
+                new ExtendedWkbGeometry(WkbWriter.Instance.Write(GeometryHelper.ValidPolygon)),
                 BuildingGeometryMethod.Outlined);
 
             var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
@@ -120,7 +120,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuildingUnit
                 .WithDeviation(false);
 
             var buildingGeometry = new BuildingGeometry(
-                new ExtendedWkbGeometry(GeometryHelper.ValidPolygon.AsBinary()),
+                new ExtendedWkbGeometry(WkbWriter.Instance.Write(GeometryHelper.ValidPolygon)),
                 BuildingGeometryMethod.Outlined);
 
             var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
@@ -167,7 +167,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuildingUnit
                 .WithDeviation(false);
 
             var buildingGeometry = new BuildingGeometry(
-                new ExtendedWkbGeometry(GeometryHelper.ValidPolygon.AsBinary()),
+                new ExtendedWkbGeometry(WkbWriter.Instance.Write(GeometryHelper.ValidPolygon)),
                 BuildingGeometryMethod.Outlined);
 
             var retiredBuildingUnitPersistentLocalId = new BuildingUnitPersistentLocalId(2);
@@ -215,7 +215,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuildingUnit
                 .WithDeviation(false);
 
             var buildingGeometry = new BuildingGeometry(
-                new ExtendedWkbGeometry(GeometryHelper.ValidPolygon.AsBinary()),
+                new ExtendedWkbGeometry(WkbWriter.Instance.Write(GeometryHelper.ValidPolygon)),
                 BuildingGeometryMethod.Outlined);
 
             var retiredBuildingUnitPersistentLocalId = new BuildingUnitPersistentLocalId(2);

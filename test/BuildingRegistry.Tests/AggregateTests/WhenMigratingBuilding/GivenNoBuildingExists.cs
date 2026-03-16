@@ -84,7 +84,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenMigratingBuilding
             var command = Fixture.Create<MigrateBuilding>();
             var buildingUnitWithInvalidPositionToMigrate = new BuildingUnitBuilder(Fixture)
                 .WithPosition(new BuildingUnitPosition(
-                    new ExtendedWkbGeometry(GeometryHelper.PointNotInPolygon.AsBinary()),
+                    new ExtendedWkbGeometry(WkbWriter.Instance.Write(GeometryHelper.PointNotInPolygon)),
                     BuildingUnitPositionGeometryMethod.DerivedFromObject))
                 .Build();
 

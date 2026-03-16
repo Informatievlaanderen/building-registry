@@ -529,7 +529,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wfs
                 new BuildingPersistentLocalId(buildingUnitWasPlannedV2.BuildingPersistentLocalId),
                 new BuildingUnitPersistentLocalId(buildingUnitWasPlannedV2.BuildingUnitPersistentLocalId),
                 BuildingUnitPositionGeometryMethod.Parse("AppointedByAdministrator"),
-                new ExtendedWkbGeometry(GeometryHelper.ValidPointInPolygon.AsBinary()));
+                new ExtendedWkbGeometry(WkbWriter.Instance.Write(GeometryHelper.ValidPointInPolygon)));
             ((ISetProvenance)@event).SetProvenance(_fixture.Create<Provenance>());
 
             await Sut

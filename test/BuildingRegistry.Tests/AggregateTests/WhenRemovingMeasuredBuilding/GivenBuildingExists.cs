@@ -58,7 +58,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRemovingMeasuredBuilding
             var buildingUnitPersistentLocalId = Fixture.Create<BuildingUnitPersistentLocalId>();
             var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
                 .WithBuildingGeometry(new BuildingGeometry(
-                    new ExtendedWkbGeometry(GeometryHelper.ValidPolygon.AsBinary()),
+                    new ExtendedWkbGeometry(WkbWriter.Instance.Write(GeometryHelper.ValidPolygon)),
                     BuildingGeometryMethod.MeasuredByGrb))
                 .WithBuildingUnit(
                     BuildingUnitStatus.Planned,
@@ -103,7 +103,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRemovingMeasuredBuilding
 
             var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
                 .WithBuildingGeometry(new BuildingGeometry(
-                    new ExtendedWkbGeometry(GeometryHelper.ValidPolygon.AsBinary()),
+                    new ExtendedWkbGeometry(WkbWriter.Instance.Write(GeometryHelper.ValidPolygon)),
                     BuildingGeometryMethod.Outlined))
                 .Build();
 
@@ -121,7 +121,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRemovingMeasuredBuilding
             var buildingUnitPersistentLocalId = Fixture.Create<BuildingUnitPersistentLocalId>();
             var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
                 .WithBuildingGeometry(new BuildingGeometry(
-                    new ExtendedWkbGeometry(GeometryHelper.ValidPolygon.AsBinary()),
+                    new ExtendedWkbGeometry(WkbWriter.Instance.Write(GeometryHelper.ValidPolygon)),
                     BuildingGeometryMethod.MeasuredByGrb))
                 .WithBuildingUnit(
                     BuildingUnitStatus.Planned,
