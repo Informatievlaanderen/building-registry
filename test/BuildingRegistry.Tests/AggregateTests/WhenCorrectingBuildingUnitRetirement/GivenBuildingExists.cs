@@ -48,10 +48,10 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitRetire
             ((ISetProvenance)buildingUnitWasPlanned).SetProvenance(Fixture.Create<Provenance>());
 
             var buildingGeometry = new BuildingGeometry(
-                new ExtendedWkbGeometry(GeometryHelper.ValidPolygon.AsBinary()),
+                new ExtendedWkbGeometry(WkbWriter.Instance.Write(GeometryHelper.ValidPolygon)),
                 BuildingGeometryMethod.Outlined);
 
-            var validPointInPolygon = new BuildingRegistry.Legacy.ExtendedWkbGeometry(GeometryHelper.ValidPointInPolygon.AsBinary());
+            var validPointInPolygon = new BuildingRegistry.Legacy.ExtendedWkbGeometry(WkbWriter.Instance.Write(GeometryHelper.ValidPointInPolygon));
 
             var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
                 .WithBuildingPersistentLocalId(command.BuildingPersistentLocalId)
@@ -197,11 +197,11 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitRetire
             var command = Fixture.Create<CorrectBuildingUnitRetirement>();
 
             var buildingGeometry = new BuildingGeometry(
-                new ExtendedWkbGeometry(GeometryHelper.ValidPolygon.AsBinary()),
+                new ExtendedWkbGeometry(WkbWriter.Instance.Write(GeometryHelper.ValidPolygon)),
                 BuildingGeometryMethod.Outlined);
 
             var validPointInBuildingGeometry =
-                new BuildingRegistry.Legacy.ExtendedWkbGeometry(GeometryHelper.ValidPointInPolygon.AsBinary());
+                new BuildingRegistry.Legacy.ExtendedWkbGeometry(WkbWriter.Instance.Write(GeometryHelper.ValidPointInPolygon));
 
             var migrateScenario = new BuildingWasMigratedBuilder(Fixture)
                 .WithBuildingPersistentLocalId(command.BuildingPersistentLocalId)
@@ -230,7 +230,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitRetire
             var buildingUnit = building.BuildingUnits.First();
 
             buildingUnit.Status.Should().Be(BuildingRegistry.Building.BuildingUnitStatus.Realized);
-            buildingUnit.BuildingUnitPosition.Geometry.Should().Be(new ExtendedWkbGeometry(GeometryHelper.ValidPointInPolygon.AsBinary()));
+            buildingUnit.BuildingUnitPosition.Geometry.Should().Be(new ExtendedWkbGeometry(WkbWriter.Instance.Write(GeometryHelper.ValidPointInPolygon)));
             buildingUnit.BuildingUnitPosition.GeometryMethod.Should().Be(BuildingRegistry.Building.BuildingUnitPositionGeometryMethod.AppointedByAdministrator);
 
             buildingUnit.LastEventHash.Should().NotBe(building.LastEventHash);

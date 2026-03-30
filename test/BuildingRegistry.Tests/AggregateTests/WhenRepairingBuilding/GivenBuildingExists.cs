@@ -4,6 +4,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRepairingBuilding
     using AutoFixture;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
     using Be.Vlaanderen.Basisregisters.AggregateSource.Testing;
+    using Be.Vlaanderen.Basisregisters.GrAr.Common.NetTopology;
     using Be.Vlaanderen.Basisregisters.Utilities.HexByteConvertor;
     using Building;
     using Building.Commands;
@@ -24,7 +25,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRepairingBuilding
     using BuildingUnitPositionGeometryMethod = BuildingRegistry.Legacy.BuildingUnitPositionGeometryMethod;
     using BuildingUnitStatus = BuildingRegistry.Legacy.BuildingUnitStatus;
     using ExtendedWkbGeometry = BuildingRegistry.Legacy.ExtendedWkbGeometry;
-    using GeometryFactory = BuildingRegistry.GeometryFactory;
+    using WKBReaderFactory = BuildingRegistry.WKBReaderFactory;
 
     public class GivenBuildingExists : BuildingRegistryTest
     {
@@ -48,7 +49,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRepairingBuilding
                 BuildingUnitFunction.Unknown,
                 BuildingUnitStatus.Realized,
                 [],
-                new BuildingUnitPosition(ExtendedWkbGeometry.CreateEWkb(GeometryHelper.OtherValidPointInPolygon.AsBinary()), BuildingUnitPositionGeometryMethod.DerivedFromObject),
+                new BuildingUnitPosition(ExtendedWkbGeometry.CreateEWkb(WkbWriter.Instance.Write(GeometryHelper.OtherValidPointInPolygon)), BuildingUnitPositionGeometryMethod.DerivedFromObject),
                 new BuildingGeometry(new ExtendedWkbGeometry(migrated.ExtendedWkbGeometry.ToByteArray()), BuildingRegistry.Legacy.BuildingGeometryMethod.MeasuredByGrb),
                 false)));
 
@@ -79,7 +80,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRepairingBuilding
             reader.HandleSRID = true;
 
             var centroid = reader.Read(migrated.ExtendedWkbGeometry.ToByteArray()).Centroid;
-            var closePosition = new Point(centroid.X - 0.001, centroid.Y + 0.001) { SRID = GeometryFactory.CreateGeometryFactory().SRID };
+            var closePosition = new Point(centroid.X - 0.001, centroid.Y + 0.001) { SRID = SystemReferenceId.SridLambert72 };
 
             migrated.BuildingUnits.Add(new BuildingWasMigrated.BuildingUnit(new BuildingUnit(
                 new BuildingUnitId(Fixture.Create<Guid>()),
@@ -87,7 +88,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRepairingBuilding
                 BuildingUnitFunction.Unknown,
                 BuildingUnitStatus.Realized,
                 [],
-                new BuildingUnitPosition(ExtendedWkbGeometry.CreateEWkb(closePosition.AsBinary()), BuildingUnitPositionGeometryMethod.DerivedFromObject),
+                new BuildingUnitPosition(ExtendedWkbGeometry.CreateEWkb(WkbWriter.Instance.Write(closePosition)), BuildingUnitPositionGeometryMethod.DerivedFromObject),
                 new BuildingGeometry(new ExtendedWkbGeometry(migrated.ExtendedWkbGeometry.ToByteArray()), BuildingRegistry.Legacy.BuildingGeometryMethod.MeasuredByGrb),
                 false)));
 

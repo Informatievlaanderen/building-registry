@@ -35,7 +35,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenChangingBuildingMeasurement
         public void ThenBuildingGeometryWasChanged()
         {
             var extendedWkbGeometryBuilding =
-                new ExtendedWkbGeometry(GeometryHelper.SecondValidPolygon.AsBinary());
+                new ExtendedWkbGeometry(WkbWriter.Instance.Write(GeometryHelper.SecondValidPolygon));
 
             var command = new ChangeBuildingMeasurement(
                 Fixture.Create<BuildingPersistentLocalId>(),
@@ -45,7 +45,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenChangingBuildingMeasurement
 
             var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
                 .WithBuildingGeometry(new BuildingGeometry(
-                    new ExtendedWkbGeometry(GeometryHelper.ValidPolygon.AsBinary()),
+                    new ExtendedWkbGeometry(WkbWriter.Instance.Write(GeometryHelper.ValidPolygon)),
                     BuildingGeometryMethod.MeasuredByGrb))
                 .WithBuildingStatus(BuildingStatus.Realized)
                 .Build();
@@ -73,7 +73,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenChangingBuildingMeasurement
         public void WithSameGeometry_ThenNothing()
         {
             var extendedWkbGeometry =
-                new ExtendedWkbGeometry(GeometryHelper.ValidPolygon.AsBinary());
+                new ExtendedWkbGeometry(WkbWriter.Instance.Write(GeometryHelper.ValidPolygon));
 
             var command = new ChangeBuildingMeasurement(
                 Fixture.Create<BuildingPersistentLocalId>(),
@@ -100,7 +100,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenChangingBuildingMeasurement
             WithPlannedOrRealizedBuildingUnitsForWhichThePositionIsDerived_ThenBuildingUnitsPositionWasAlsoChanged()
         {
             var changedBuildingGeometry =
-                new ExtendedWkbGeometry(GeometryHelper.SecondValidPolygon.AsBinary());
+                new ExtendedWkbGeometry(WkbWriter.Instance.Write(GeometryHelper.SecondValidPolygon));
             var changedBuildingUnitGeometry =
                 new BuildingGeometry(changedBuildingGeometry, BuildingGeometryMethod.MeasuredByGrb).Center;
 
@@ -112,7 +112,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenChangingBuildingMeasurement
 
             var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
                 .WithBuildingGeometry(new BuildingGeometry(
-                    new ExtendedWkbGeometry(GeometryHelper.ValidPolygon.AsBinary()),
+                    new ExtendedWkbGeometry(WkbWriter.Instance.Write(GeometryHelper.ValidPolygon)),
                     BuildingGeometryMethod.MeasuredByGrb))
                 .WithBuildingStatus(BuildingStatus.Realized)
                 .WithBuildingUnit(
@@ -123,7 +123,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenChangingBuildingMeasurement
                     BuildingUnitStatus.Planned,
                     new BuildingUnitPersistentLocalId(2),
                     positionGeometryMethod: BuildingUnitPositionGeometryMethod.AppointedByAdministrator,
-                    extendedWkbGeometry: new BuildingRegistry.Legacy.ExtendedWkbGeometry(GeometryHelper.PointNotInPolygon.AsBinary()))
+                    extendedWkbGeometry: new BuildingRegistry.Legacy.ExtendedWkbGeometry(WkbWriter.Instance.Write(GeometryHelper.PointNotInPolygon)))
                 .WithBuildingUnit(
                     BuildingUnitStatus.Realized,
                     new BuildingUnitPersistentLocalId(3),
@@ -160,14 +160,14 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenChangingBuildingMeasurement
         {
             var command = new ChangeBuildingMeasurement(
                 Fixture.Create<BuildingPersistentLocalId>(),
-                new ExtendedWkbGeometry(GeometryHelper.SecondValidPolygon.AsBinary()),
+                new ExtendedWkbGeometry(WkbWriter.Instance.Write(GeometryHelper.SecondValidPolygon)),
                 Fixture.Create<BuildingGrbData>(),
                 Fixture.Create<Provenance>());
 
             var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
                 .WithIsRemoved()
                 .WithBuildingGeometry(new BuildingGeometry(
-                    new ExtendedWkbGeometry(GeometryHelper.ValidPolygon.AsBinary()),
+                    new ExtendedWkbGeometry(WkbWriter.Instance.Write(GeometryHelper.ValidPolygon)),
                     BuildingGeometryMethod.MeasuredByGrb))
                 .Build();
 
@@ -189,14 +189,14 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenChangingBuildingMeasurement
         {
             var command = new ChangeBuildingMeasurement(
                 Fixture.Create<BuildingPersistentLocalId>(),
-                new ExtendedWkbGeometry(GeometryHelper.SecondValidPolygon.AsBinary()),
+                new ExtendedWkbGeometry(WkbWriter.Instance.Write(GeometryHelper.SecondValidPolygon)),
                 Fixture.Create<BuildingGrbData>(),
                 Fixture.Create<Provenance>());
 
             var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
                 .WithBuildingStatus(invalidBuildingStatus)
                 .WithBuildingGeometry(new BuildingGeometry(
-                    new ExtendedWkbGeometry(GeometryHelper.ValidPolygon.AsBinary()),
+                    new ExtendedWkbGeometry(WkbWriter.Instance.Write(GeometryHelper.ValidPolygon)),
                     BuildingGeometryMethod.MeasuredByGrb))
                 .Build();
 
@@ -213,13 +213,13 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenChangingBuildingMeasurement
         {
             var command = new ChangeBuildingMeasurement(
                 Fixture.Create<BuildingPersistentLocalId>(),
-                new ExtendedWkbGeometry(GeometryHelper.SecondValidPolygon.AsBinary()),
+                new ExtendedWkbGeometry(WkbWriter.Instance.Write(GeometryHelper.SecondValidPolygon)),
                 Fixture.Create<BuildingGrbData>(),
                 Fixture.Create<Provenance>());
 
             var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
                 .WithBuildingGeometry(new BuildingGeometry(
-                    new ExtendedWkbGeometry(GeometryHelper.ValidPolygon.AsBinary()),
+                    new ExtendedWkbGeometry(WkbWriter.Instance.Write(GeometryHelper.ValidPolygon)),
                     BuildingGeometryMethod.Outlined))
                 .WithBuildingStatus(BuildingStatus.Realized)
                 .Build();
@@ -236,12 +236,12 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenChangingBuildingMeasurement
         public void StateCheck()
         {
             var changedBuildingGeometry =
-                new ExtendedWkbGeometry(GeometryHelper.SecondValidPolygon.AsBinary());
+                new ExtendedWkbGeometry(WkbWriter.Instance.Write(GeometryHelper.SecondValidPolygon));
             var changedBuildingUnitGeometry =
                 new BuildingGeometry(changedBuildingGeometry, BuildingGeometryMethod.Outlined).Center;
 
             var initialBuildingGeometry = new BuildingGeometry(
-                new ExtendedWkbGeometry(GeometryHelper.ValidPolygon.AsBinary()),
+                new ExtendedWkbGeometry(WkbWriter.Instance.Write(GeometryHelper.ValidPolygon)),
                 BuildingGeometryMethod.Outlined);
 
             var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
@@ -294,7 +294,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenChangingBuildingMeasurement
         [Fact]
         public void WithSelfTouchingRing_ThenBuildingMeasurementWasChanged()
         {
-            var extendedWkbGeometry = new ExtendedWkbGeometry(GeometryHelper.SelfTouchingPolygon.AsBinary());
+            var extendedWkbGeometry = new ExtendedWkbGeometry(WkbWriter.Instance.Write(GeometryHelper.SelfTouchingPolygon));
 
             var command = new ChangeBuildingMeasurement(
                 Fixture.Create<BuildingPersistentLocalId>(),
@@ -305,7 +305,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenChangingBuildingMeasurement
 
             var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
                 .WithBuildingGeometry(new BuildingGeometry(
-                    new ExtendedWkbGeometry(GeometryHelper.ValidPolygon.AsBinary()),
+                    new ExtendedWkbGeometry(WkbWriter.Instance.Write(GeometryHelper.ValidPolygon)),
                     BuildingGeometryMethod.MeasuredByGrb))
                 .WithBuildingStatus(BuildingStatus.Realized)
                 .Build();

@@ -24,7 +24,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda
         {
             DispatchArrangeCommand(new PlanBuilding(
                 buildingPersistentLocalId,
-                wkbGeometry ?? new ExtendedWkbGeometry(GeometryHelper.ValidPolygon.AsBinary()),
+                wkbGeometry ?? new ExtendedWkbGeometry(WkbWriter.Instance.Write(GeometryHelper.ValidPolygon)),
                 Fixture.Create<Provenance>()));
         }
 
@@ -32,7 +32,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda
         {
             DispatchArrangeCommand(new RealizeAndMeasureUnplannedBuilding(
                 buildingPersistentLocalId,
-                wkbGeometry ?? new ExtendedWkbGeometry(GeometryHelper.ValidPolygon.AsBinary()),
+                wkbGeometry ?? new ExtendedWkbGeometry(WkbWriter.Instance.Write(GeometryHelper.ValidPolygon)),
                 Fixture.Create<BuildingGrbData>(),
                 Fixture.Create<Provenance>()));
         }
@@ -62,7 +62,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda
         {
             DispatchArrangeCommand(new MeasureBuilding(
                 buildingPersistentLocalId,
-                extendedWkbGeometry ?? new ExtendedWkbGeometry(GeometryHelper.ValidPolygon.AsBinary()),
+                extendedWkbGeometry ?? new ExtendedWkbGeometry(WkbWriter.Instance.Write(GeometryHelper.ValidPolygon)),
                 Fixture.Create<BuildingGrbData>(),
                 Fixture.Create<Provenance>()));
         }

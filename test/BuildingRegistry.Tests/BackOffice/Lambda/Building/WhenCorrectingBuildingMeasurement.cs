@@ -51,7 +51,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
             PlanBuilding(buildingPersistentLocalId);
             PlaceBuildingUnderConstruction(buildingPersistentLocalId);
             RealizeBuilding(buildingPersistentLocalId);
-            MeasureBuilding(buildingPersistentLocalId, new ExtendedWkbGeometry(GeometryHelper.ValidPolygon.AsBinary()));
+            MeasureBuilding(buildingPersistentLocalId, new ExtendedWkbGeometry(WkbWriter.Instance.Write(GeometryHelper.ValidPolygon)));
 
             var eTagResponse = new ETagResponse(string.Empty, Fixture.Create<string>());
 
@@ -158,7 +158,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
             PlanBuilding(buildingPersistentLocalId);
             PlaceBuildingUnderConstruction(buildingPersistentLocalId);
             RealizeBuilding(buildingPersistentLocalId);
-            MeasureBuilding(buildingPersistentLocalId, new ExtendedWkbGeometry(GeometryHelper.ValidPolygon.AsBinary()));
+            MeasureBuilding(buildingPersistentLocalId, new ExtendedWkbGeometry(WkbWriter.Instance.Write(GeometryHelper.ValidPolygon)));
 
             var handler = new CorrectBuildingMeasurementLambdaHandler(
                 Container.Resolve<IConfiguration>(),

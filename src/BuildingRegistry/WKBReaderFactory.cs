@@ -1,25 +1,17 @@
 namespace BuildingRegistry
 {
-    using Building;
-    using NetTopologySuite;
-    using NetTopologySuite.Geometries;
-    using NetTopologySuite.Geometries.Implementation;
     using NetTopologySuite.IO;
 
     // ReSharper disable once InconsistentNaming
     public static class WKBReaderFactory
     {
-        public static WKBReader Create() => new WKBReader(GeometryFactory.CreateNtsGeometryServices());
-    }
+        public static WKBReader CreateForLegacy() =>
+            Be.Vlaanderen.Basisregisters.GrAr.Common.NetTopology.WKBReaderFactory.CreateForLambert72();
 
-    public static class GeometryFactory
-    {
-        public static NtsGeometryServices CreateNtsGeometryServices() =>
-            new NtsGeometryServices(
-                new DotSpatialAffineCoordinateSequenceFactory(Ordinates.XY),
-                new PrecisionModel(PrecisionModels.Floating),
-                ExtendedWkbGeometry.SridLambert72);
+        public static WKBReader Create() =>
+            Be.Vlaanderen.Basisregisters.GrAr.Common.NetTopology.WKBReaderFactory.CreateForLambert72();
 
-        public static NetTopologySuite.Geometries.GeometryFactory CreateGeometryFactory() => CreateNtsGeometryServices().CreateGeometryFactory();
+        public static WKBReader CreateForLambert2008() =>
+            Be.Vlaanderen.Basisregisters.GrAr.Common.NetTopology.WKBReaderFactory.CreateForLambert2008();
     }
 }

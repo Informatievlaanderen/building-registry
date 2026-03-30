@@ -7,7 +7,6 @@ namespace BuildingRegistry.Consumer.Read.Parcel
     using NetTopologySuite.Operation.Overlay;
     using NetTopologySuite.Operation.OverlayNG;
     using ParcelWithCount;
-    using GeometryFactory = BuildingRegistry.GeometryFactory;
 
     public class ParcelMatching : IParcelMatching
     {

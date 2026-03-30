@@ -38,7 +38,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
             //Act
             var buildingPersistentLocalId = 100000;
             var dateTimeStatusChange = DateTimeOffset.UtcNow;
-            var extendedWkbGeometry = new ExtendedWkbGeometry(GeometryHelper.ValidPolygon.AsBinary());
+            var extendedWkbGeometry = new ExtendedWkbGeometry(WkbWriter.Instance.Write(GeometryHelper.ValidPolygon));
 
             await handler.Handle(
                 new NotifyOutlinedRealizedBuildingLambdaRequest(
@@ -75,7 +75,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
             //Act
             var buildingPersistentLocalId = 100000;
             var dateTimeStatusChange = DateTimeOffset.UtcNow;
-            var extendedWkbGeometry = new ExtendedWkbGeometry(GeometryHelper.ValidPolygon.AsBinary());
+            var extendedWkbGeometry = new ExtendedWkbGeometry(WkbWriter.Instance.Write(GeometryHelper.ValidPolygon));
 
             await handler.Handle(
                 new NotifyOutlinedRealizedBuildingLambdaRequest(

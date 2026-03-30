@@ -1,15 +1,16 @@
 namespace BuildingRegistry.Api.BackOffice.Abstractions.Building
 {
-    using NetTopologySuite.Geometries;
-    using NetTopologySuite.Geometries.Implementation;
+    using Be.Vlaanderen.Basisregisters.GrAr.Common.NetTopology;
+    using NetTopologySuite.IO;
     using NetTopologySuite.IO.GML2;
     using ExtendedWkbGeometry = BuildingRegistry.Building.ExtendedWkbGeometry;
-    using GeometryFactory = BuildingRegistry.GeometryFactory;
 
     public static class GmlHelpers
     {
+        private static readonly WKBWriter WkbWriter = new WKBWriter() { Strict = false, HandleSRID = true };
+
         public static GMLReader CreateGmlReader() =>
-            new GMLReader(GeometryFactory.CreateGeometryFactory());
+            new GMLReader(NtsGeometryFactory.CreateGeometryFactoryLambert72());
 
         public static ExtendedWkbGeometry ToExtendedWkbGeometry(this string gml)
         {
@@ -18,7 +19,7 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.Building
 
             geometry.SRID = ExtendedWkbGeometry.SridLambert72;
 
-            return ExtendedWkbGeometry.CreateEWkb(geometry.AsBinary());
+            return ExtendedWkbGeometry.CreateEWkb(WkbWriter.Write(geometry));
         }
     }
 }

@@ -31,7 +31,7 @@
                 .Add(new BuildingDetailItemV2(
                     1,
                     BuildingGeometryMethod.MeasuredByGrb,
-                    buildingGeometry.AsBinary(),
+                    WkbWriter.Instance.Write(buildingGeometry),
                     buildingGeometry,
                     BuildingStatus.Realized,
                     false,
@@ -55,7 +55,7 @@
                 .Add(new BuildingDetailItemV2(
                     1,
                     BuildingGeometryMethod.MeasuredByGrb,
-                    buildingGeometry.AsBinary(),
+                    WkbWriter.Instance.Write(buildingGeometry),
                     buildingGeometry,
                     BuildingStatus.Realized,
                     false,
@@ -79,7 +79,7 @@
                 .Add(new BuildingDetailItemV2(
                     1,
                     BuildingGeometryMethod.MeasuredByGrb,
-                    buildingGeometry50PercentOverlap.AsBinary(),
+                    WkbWriter.Instance.Write(buildingGeometry50PercentOverlap),
                     buildingGeometry50PercentOverlap,
                     BuildingStatus.Realized,
                     false,
@@ -88,7 +88,7 @@
                 .Add(new BuildingDetailItemV2(
                     2,
                     BuildingGeometryMethod.MeasuredByGrb,
-                    buildingGeometry50PercentOverlap.AsBinary(),
+                    WkbWriter.Instance.Write(buildingGeometry50PercentOverlap),
                     buildingGeometry50PercentOverlap,
                     BuildingStatus.Realized,
                     false,
@@ -114,7 +114,7 @@
                 .Add(new BuildingDetailItemV2(
                     buildingAbove40PercentPersistentLocalId,
                     BuildingGeometryMethod.MeasuredByGrb,
-                    buildingAbove40Percent.AsBinary(),
+                    WkbWriter.Instance.Write(buildingAbove40Percent),
                     buildingAbove40Percent,
                     BuildingStatus.Realized,
                     false,
@@ -123,7 +123,7 @@
                 .Add(new BuildingDetailItemV2(
                     2,
                     BuildingGeometryMethod.MeasuredByGrb,
-                    buildingUnder40Percent.AsBinary(),
+                    WkbWriter.Instance.Write(buildingUnder40Percent),
                     buildingUnder40Percent,
                     BuildingStatus.Realized,
                     false,

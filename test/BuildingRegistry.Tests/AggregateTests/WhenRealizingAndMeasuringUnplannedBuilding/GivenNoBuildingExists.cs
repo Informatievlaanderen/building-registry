@@ -77,7 +77,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRealizingAndMeasuringUnplann
         [Fact]
         public void WithSelfTouchingRing_ThenBuildingWasRealized()
         {
-            var extendedWkbGeometry = new ExtendedWkbGeometry(GeometryHelper.SelfTouchingPolygon.AsBinary());
+            var extendedWkbGeometry = new ExtendedWkbGeometry(WkbWriter.Instance.Write(GeometryHelper.SelfTouchingPolygon));
 
             var command = new RealizeAndMeasureUnplannedBuilding(
                 Fixture.Create<BuildingPersistentLocalId>(),

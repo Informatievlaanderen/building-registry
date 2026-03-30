@@ -436,7 +436,7 @@ namespace BuildingRegistry.Projections.Wms.BuildingUnitV2
             var geometry = (Point) _wkbReader.Read(extendedWkbPosition.ToByteArray());
 
             buildingUnit.PositionMethod = method;
-            buildingUnit.Position = geometry.AsBinary();
+            buildingUnit.Position = geometry.AsBinary(); //asbinary is a must here since we are using a WKB and not EWKB
         }
 
         private static BuildingStatus? MapBuildingRetiredStatus(BuildingStatus buildingStatus) =>

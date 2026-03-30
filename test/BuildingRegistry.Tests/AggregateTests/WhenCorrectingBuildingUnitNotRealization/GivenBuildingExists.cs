@@ -30,7 +30,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitNotRea
         {
             var command = Fixture.Create<CorrectBuildingUnitNotRealization>();
 
-            var buildingExtendedWkbGeometry = new ExtendedWkbGeometry(GeometryHelper.ValidPolygon.AsBinary());
+            var buildingExtendedWkbGeometry = new ExtendedWkbGeometry(WkbWriter.Instance.Write(GeometryHelper.ValidPolygon));
             var buildingGeometry = new BuildingGeometry(
                 buildingExtendedWkbGeometry,
                 BuildingGeometryMethod.Outlined);
@@ -60,7 +60,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitNotRea
         {
             var command = Fixture.Create<CorrectBuildingUnitNotRealization>();
 
-            var buildingGeometry = new ExtendedWkbGeometry(GeometryHelper.SecondValidPolygon.AsBinary());
+            var buildingGeometry = new ExtendedWkbGeometry(WkbWriter.Instance.Write(GeometryHelper.SecondValidPolygon));
             var expectedPosition = new BuildingGeometry(buildingGeometry, BuildingGeometryMethod.Outlined).Center;
 
             Assert(new Scenario()
@@ -73,7 +73,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitNotRea
                         .WithFunction(BuildingUnitFunction.Unknown)
                         .WithPosition(
                             new BuildingUnitPosition(
-                                new ExtendedWkbGeometry(GeometryHelper.PointNotInPolygon.AsBinary()),
+                                new ExtendedWkbGeometry(WkbWriter.Instance.Write(GeometryHelper.PointNotInPolygon)),
                                 BuildingUnitPositionGeometryMethod.DerivedFromObject)),
                     Fixture.Create<BuildingUnitWasNotRealizedV2>())
                 .When(command)
@@ -96,20 +96,20 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitNotRea
             var command = Fixture.Create<CorrectBuildingUnitNotRealization>();
 
             var buildingGeometry = new BuildingGeometry(
-                new ExtendedWkbGeometry(GeometryHelper.SecondValidPolygon.AsBinary()),
+                new ExtendedWkbGeometry(WkbWriter.Instance.Write(GeometryHelper.SecondValidPolygon)),
                 BuildingGeometryMethod.Outlined);
 
             Assert(new Scenario()
                 .Given(
                     new BuildingStreamId(Fixture.Create<BuildingPersistentLocalId>()),
                     Fixture.Create<BuildingWasPlannedV2>()
-                        .WithGeometry(new ExtendedWkbGeometry(GeometryHelper.SecondValidPolygon.AsBinary())),
+                        .WithGeometry(new ExtendedWkbGeometry(WkbWriter.Instance.Write(GeometryHelper.SecondValidPolygon))),
                     Fixture.Create<BuildingWasRealizedV2>(),
                     Fixture.Create<BuildingUnitWasPlannedV2>()
                         .WithFunction(BuildingUnitFunction.Unknown)
                         .WithPosition(
                             new BuildingUnitPosition(
-                                new ExtendedWkbGeometry(GeometryHelper.PointNotInPolygon.AsBinary()),
+                                new ExtendedWkbGeometry(WkbWriter.Instance.Write(GeometryHelper.PointNotInPolygon)),
                                 BuildingUnitPositionGeometryMethod.AppointedByAdministrator)),
                     Fixture.Create<BuildingUnitWasNotRealizedV2>())
                 .When(command)

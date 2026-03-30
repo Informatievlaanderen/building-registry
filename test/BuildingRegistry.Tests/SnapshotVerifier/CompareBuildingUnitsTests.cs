@@ -31,7 +31,7 @@
                     new(1)
                 },
                 new BuildingUnitPosition(
-                    new ExtendedWkbGeometry(GeometryHelper.ValidPointInPolygon.AsBinary()),
+                    new ExtendedWkbGeometry(WkbWriter.Instance.Write(GeometryHelper.ValidPointInPolygon)),
                     BuildingUnitPositionGeometryMethod.AppointedByAdministrator),
                 false);
 

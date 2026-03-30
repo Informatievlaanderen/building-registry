@@ -33,7 +33,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenMeasuringBuilding
         [Fact]
         public void WithBuildingStatusRealized_ThenBuildingWasMeasured()
         {
-            var measuredExtendedWkbGeometry = new ExtendedWkbGeometry(GeometryHelper.SecondValidPolygon.AsBinary());
+            var measuredExtendedWkbGeometry = new ExtendedWkbGeometry(WkbWriter.Instance.Write(GeometryHelper.SecondValidPolygon));
             var command = new MeasureBuilding(
                 Fixture.Create<BuildingPersistentLocalId>(),
                 measuredExtendedWkbGeometry,
@@ -48,7 +48,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenMeasuringBuilding
             var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
                 .WithBuildingGeometry(
                     new BuildingGeometry(
-                        new ExtendedWkbGeometry(GeometryHelper.ValidPolygon.AsBinary()),
+                        new ExtendedWkbGeometry(WkbWriter.Instance.Write(GeometryHelper.ValidPolygon)),
                         BuildingGeometryMethod.Outlined))
                 .WithBuildingStatus(BuildingStatus.Realized)
                 .WithBuildingUnit(
@@ -58,7 +58,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenMeasuringBuilding
                 .WithBuildingUnit(
                     BuildingUnitStatus.Planned,
                     secondPlannedBuildingUnitPersistentLocalId,
-                    extendedWkbGeometry: new BuildingRegistry.Legacy.ExtendedWkbGeometry(GeometryHelper.PointNotInPolygon.AsBinary()),
+                    extendedWkbGeometry: new BuildingRegistry.Legacy.ExtendedWkbGeometry(WkbWriter.Instance.Write(GeometryHelper.PointNotInPolygon)),
                     positionGeometryMethod: BuildingUnitPositionGeometryMethod.AppointedByAdministrator)
                 .WithBuildingUnit(BuildingUnitStatus.NotRealized, notRealizedBuildingUnitPersistentLocalId)
                 .WithBuildingUnit(BuildingUnitStatus.Planned, removedBuildingUnitPersistentLocalId, isRemoved: true)
@@ -97,7 +97,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenMeasuringBuilding
         [InlineData("UnderConstruction")]
         public void WithBuildingStatus_ThenBuildingWasRealizedAndMeasured(string buildingStatus)
         {
-            var measuredExtendedWkbGeometry = new ExtendedWkbGeometry(GeometryHelper.SecondValidPolygon.AsBinary());
+            var measuredExtendedWkbGeometry = new ExtendedWkbGeometry(WkbWriter.Instance.Write(GeometryHelper.SecondValidPolygon));
             var command = new MeasureBuilding(
                 Fixture.Create<BuildingPersistentLocalId>(),
                 measuredExtendedWkbGeometry,
@@ -151,7 +151,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenMeasuringBuilding
             var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
                 .WithBuildingGeometry(
                     new BuildingGeometry(
-                        new ExtendedWkbGeometry(GeometryHelper.ValidPolygon.AsBinary()),
+                        new ExtendedWkbGeometry(WkbWriter.Instance.Write(GeometryHelper.ValidPolygon)),
                         BuildingGeometryMethod.MeasuredByGrb))
                 .WithBuildingStatus(BuildingStatus.Realized)
                 .Build();
@@ -230,7 +230,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenMeasuringBuilding
             var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
                 .WithBuildingGeometry(
                     new BuildingGeometry(
-                        new ExtendedWkbGeometry(GeometryHelper.ValidPolygon.AsBinary()),
+                        new ExtendedWkbGeometry(WkbWriter.Instance.Write(GeometryHelper.ValidPolygon)),
                         BuildingGeometryMethod.Outlined))
                 .WithBuildingStatus(BuildingStatus.Realized)
                 .WithBuildingUnit(
@@ -240,7 +240,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenMeasuringBuilding
                 .WithBuildingUnit(
                     BuildingUnitStatus.Planned,
                     secondPlannedBuildingUnitPersistentLocalId,
-                    extendedWkbGeometry: new BuildingRegistry.Legacy.ExtendedWkbGeometry(GeometryHelper.PointNotInPolygon.AsBinary()),
+                    extendedWkbGeometry: new BuildingRegistry.Legacy.ExtendedWkbGeometry(WkbWriter.Instance.Write(GeometryHelper.PointNotInPolygon)),
                     positionGeometryMethod: BuildingUnitPositionGeometryMethod.AppointedByAdministrator)
                 .Build();
 
@@ -252,7 +252,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenMeasuringBuilding
                 Fixture.Create<BuildingPersistentLocalId>(),
                 secondPlannedBuildingUnitPersistentLocalId);
 
-            var measuredExtendedWkbGeometry = new ExtendedWkbGeometry(GeometryHelper.SecondValidPolygon.AsBinary());
+            var measuredExtendedWkbGeometry = new ExtendedWkbGeometry(WkbWriter.Instance.Write(GeometryHelper.SecondValidPolygon));
             var buildingUnitsExtendedWkbGeometry = new BuildingGeometry(measuredExtendedWkbGeometry, BuildingGeometryMethod.MeasuredByGrb).Center;
             var buildingWasMeasured = new BuildingWasMeasured(
                 Fixture.Create<BuildingPersistentLocalId>(),
@@ -288,7 +288,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenMeasuringBuilding
         [Fact]
         public void WithSelfTouchingRing_ThenBuildingWasMeasured()
         {
-            var extendedWkbGeometry = new ExtendedWkbGeometry(GeometryHelper.SelfTouchingPolygon.AsBinary());
+            var extendedWkbGeometry = new ExtendedWkbGeometry(WkbWriter.Instance.Write(GeometryHelper.SelfTouchingPolygon));
 
             var command = new MeasureBuilding(
                 Fixture.Create<BuildingPersistentLocalId>(),

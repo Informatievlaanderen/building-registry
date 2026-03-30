@@ -33,7 +33,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda
 
             var result = _buildingGeometryContext.GetOverlappingBuildings(
                 new BuildingPersistentLocalId(2),
-                ExtendedWkbGeometry.CreateEWkb(buildingGeometry.AsBinary())!);
+                ExtendedWkbGeometry.CreateEWkb(WkbWriter.Instance.Write(buildingGeometry))!);
 
             result.Should().BeEmpty();
         }
@@ -58,7 +58,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda
 
             var result = _buildingGeometryContext.GetOverlappingBuildings(
                 new BuildingPersistentLocalId(2),
-                ExtendedWkbGeometry.CreateEWkb(buildingGeometry.AsBinary())!);
+                ExtendedWkbGeometry.CreateEWkb(WkbWriter.Instance.Write(buildingGeometry))!);
 
             result.Should().ContainSingle();
         }
@@ -82,7 +82,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda
 
             var result = _buildingGeometryContext.GetOverlappingBuildings(
                 new BuildingPersistentLocalId(2),
-                ExtendedWkbGeometry.CreateEWkb(buildingGeometry.AsBinary())!);
+                ExtendedWkbGeometry.CreateEWkb(WkbWriter.Instance.Write(buildingGeometry))!);
 
             result.Should().BeEmpty();
         }
@@ -107,7 +107,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda
 
             var result = _buildingGeometryContext.GetOverlappingBuildings(
                 new BuildingPersistentLocalId(2),
-                ExtendedWkbGeometry.CreateEWkb(buildingGeometry.AsBinary())!);
+                ExtendedWkbGeometry.CreateEWkb(WkbWriter.Instance.Write(buildingGeometry))!);
 
             result.Should().BeEmpty();
         }
@@ -129,7 +129,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda
 
             var result = _buildingGeometryContext.GetOverlappingBuildings(
                 new BuildingPersistentLocalId(1),
-                ExtendedWkbGeometry.CreateEWkb(buildingGeometry.AsBinary())!);
+                ExtendedWkbGeometry.CreateEWkb(WkbWriter.Instance.Write(buildingGeometry))!);
 
             result.Should().BeEmpty();
         }
@@ -152,13 +152,14 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda
 
             var result = _buildingGeometryContext.GetOverlappingBuildings(
                 new BuildingPersistentLocalId(1),
-                ExtendedWkbGeometry.CreateEWkb(polygon1.AsBinary())!);
+                ExtendedWkbGeometry.CreateEWkb(WkbWriter.Instance.Write(polygon1))!);
 
             result.Should().BeEmpty();
         }
 
         private static Geometry CreateGeometry(string coordinates)
-            => GmlHelpers.CreateGmlReader().Read(
+        {
+            return GmlHelpers.CreateGmlReader().Read(
                 "<gml:Polygon srsName=\"https://www.opengis.net/def/crs/EPSG/0/31370\" xmlns:gml=\"http://www.opengis.net/gml/3.2\">" +
                 "<gml:exterior>" +
                 "<gml:LinearRing>" +
@@ -168,5 +169,6 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda
                 "</gml:LinearRing>" +
                 "</gml:exterior>" +
                 "</gml:Polygon>");
+        }
     }
 }

@@ -143,8 +143,8 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenMovingBuildingUnitIntoBuildi
         {
             var command = Fixture.Create<MoveBuildingUnitIntoBuilding>();
 
-            var sourceBuildingGeometry = new BuildingGeometry(new ExtendedWkbGeometry(GeometryHelper.ValidPolygon.AsBinary()), BuildingGeometryMethod.MeasuredByGrb);
-            var destinationBuildingGeometry = new BuildingGeometry(new ExtendedWkbGeometry(GeometryHelper.SecondValidPolygon.AsBinary()), BuildingGeometryMethod.MeasuredByGrb);
+            var sourceBuildingGeometry = new BuildingGeometry(new ExtendedWkbGeometry(WkbWriter.Instance.Write(GeometryHelper.ValidPolygon)), BuildingGeometryMethod.MeasuredByGrb);
+            var destinationBuildingGeometry = new BuildingGeometry(new ExtendedWkbGeometry(WkbWriter.Instance.Write(GeometryHelper.SecondValidPolygon)), BuildingGeometryMethod.MeasuredByGrb);
 
             var buildingUnitAddressPersistentLocalIds = Fixture.CreateMany<AddressPersistentLocalId>(5).ToList();
 
@@ -199,8 +199,8 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenMovingBuildingUnitIntoBuildi
         {
             var command = Fixture.Create<MoveBuildingUnitIntoBuilding>();
 
-            var sourceBuildingGeometry = new BuildingGeometry(new ExtendedWkbGeometry(GeometryHelper.ValidPolygon.AsBinary()), BuildingGeometryMethod.MeasuredByGrb);
-            var destinationBuildingGeometry = new BuildingGeometry(new ExtendedWkbGeometry(GeometryHelper.SecondValidPolygon.AsBinary()), BuildingGeometryMethod.MeasuredByGrb);
+            var sourceBuildingGeometry = new BuildingGeometry(new ExtendedWkbGeometry(WkbWriter.Instance.Write(GeometryHelper.ValidPolygon)), BuildingGeometryMethod.MeasuredByGrb);
+            var destinationBuildingGeometry = new BuildingGeometry(new ExtendedWkbGeometry(WkbWriter.Instance.Write(GeometryHelper.SecondValidPolygon)), BuildingGeometryMethod.MeasuredByGrb);
 
             var buildingUnitAddressPersistentLocalIds = Fixture.CreateMany<AddressPersistentLocalId>(5).ToList();
 
@@ -254,10 +254,10 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenMovingBuildingUnitIntoBuildi
             var command = Fixture.Create<MoveBuildingUnitIntoBuilding>();
 
             var sourceBuildingGeometry = new BuildingGeometry(
-                new ExtendedWkbGeometry(GeometryHelper.ValidPolygon.AsBinary()),
+                new ExtendedWkbGeometry(WkbWriter.Instance.Write(GeometryHelper.ValidPolygon)),
                 BuildingGeometryMethod.MeasuredByGrb);
             var destinationBuildingGeometry = new BuildingGeometry(
-                new ExtendedWkbGeometry(GeometryHelper.SecondValidPolygon.AsBinary()),
+                new ExtendedWkbGeometry(WkbWriter.Instance.Write(GeometryHelper.SecondValidPolygon)),
                 BuildingGeometryMethod.MeasuredByGrb);
 
             var buildingUnitAddressPersistentLocalIds = Fixture.CreateMany<AddressPersistentLocalId>(5).ToList();
@@ -309,7 +309,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenMovingBuildingUnitIntoBuildi
             var deviation = Fixture.Create<bool>();
 
             var destinationBuildingGeometry = new BuildingGeometry(
-                new ExtendedWkbGeometry(GeometryHelper.SecondValidPolygon.AsBinary()),
+                new ExtendedWkbGeometry(WkbWriter.Instance.Write(GeometryHelper.SecondValidPolygon)),
                 BuildingGeometryMethod.MeasuredByGrb);
 
             var expectedGeometryMethod = BuildingUnitPositionGeometryMethod.DerivedFromObject;
@@ -358,11 +358,11 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenMovingBuildingUnitIntoBuildi
             var deviation = Fixture.Create<bool>();
 
             var buildingUnitPosition = new BuildingUnitPosition(
-                new ExtendedWkbGeometry(GeometryHelper.PointNotInPolygon.AsBinary()),
+                new ExtendedWkbGeometry(WkbWriter.Instance.Write(GeometryHelper.PointNotInPolygon)),
                 BuildingUnitPositionGeometryMethod.AppointedByAdministrator);
 
             var destinationBuildingGeometry = new BuildingGeometry(
-                new ExtendedWkbGeometry(GeometryHelper.SecondValidPolygon.AsBinary()),
+                new ExtendedWkbGeometry(WkbWriter.Instance.Write(GeometryHelper.SecondValidPolygon)),
                 BuildingGeometryMethod.MeasuredByGrb);
 
             var expectedGeometryMethod = BuildingUnitPositionGeometryMethod.DerivedFromObject;
@@ -411,11 +411,11 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenMovingBuildingUnitIntoBuildi
             var deviation = Fixture.Create<bool>();
 
             var buildingUnitPosition = new BuildingUnitPosition(
-                new ExtendedWkbGeometry(GeometryHelper.OtherValidPointInPolygon.AsBinary()),
+                new ExtendedWkbGeometry(WkbWriter.Instance.Write(GeometryHelper.OtherValidPointInPolygon)),
                 BuildingUnitPositionGeometryMethod.AppointedByAdministrator);
 
             var destinationBuildingGeometry = new BuildingGeometry(
-                new ExtendedWkbGeometry(GeometryHelper.SecondValidPolygon.AsBinary()),
+                new ExtendedWkbGeometry(WkbWriter.Instance.Write(GeometryHelper.SecondValidPolygon)),
                 BuildingGeometryMethod.MeasuredByGrb);
 
             var expectedGeometryMethod = BuildingUnitPositionGeometryMethod.AppointedByAdministrator;

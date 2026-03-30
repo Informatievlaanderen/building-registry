@@ -6,6 +6,7 @@ namespace BuildingRegistry.Building.Commands
     using Be.Vlaanderen.Basisregisters.GrAr.Common.NetTopology;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Be.Vlaanderen.Basisregisters.Utilities;
+    using NetTopologySuite.IO;
 
     public sealed class MigrateBuilding : IHasCommandProvenance
     {
@@ -62,6 +63,8 @@ namespace BuildingRegistry.Building.Commands
 
     public readonly struct BuildingUnit
     {
+        private static readonly WKBWriter WkbWriter = new WKBWriter { Strict = false, HandleSRID = true };
+
         public BuildingUnitId BuildingUnitId { get; }
         public BuildingUnitPersistentLocalId BuildingUnitPersistentLocalId { get; }
         public BuildingUnitFunction Function { get; }
@@ -90,7 +93,7 @@ namespace BuildingRegistry.Building.Commands
                 && !buildingGeometry.Contains(buildingUnitPosition.Geometry))
             {
                 BuildingUnitPosition = new BuildingUnitPosition(
-                    ExtendedWkbGeometry.CreateEWkb(buildingGeometry.Geometry.ToGeometry().CentroidWithinArea().AsBinary())!,
+                    ExtendedWkbGeometry.CreateEWkb(WkbWriter.Write(buildingGeometry.Geometry.ToGeometry().CentroidWithinArea()))!,
                     BuildingUnitPositionGeometryMethod.Parse(buildingUnitPosition.GeometryMethod));
             }
             else
