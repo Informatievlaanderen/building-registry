@@ -1,3 +1,10 @@
+# [5.8.0](https://github.com/informatievlaanderen/building-registry/compare/v5.7.0...v5.8.0) (2026-03-31)
+
+
+### Features
+
+* add lambert08 support ([572786a](https://github.com/informatievlaanderen/building-registry/commit/572786a386dce6c343e08cf57750535219999a83))
+
 # [5.7.0](https://github.com/informatievlaanderen/building-registry/compare/v5.6.0...v5.7.0) (2026-01-08)
 
 
