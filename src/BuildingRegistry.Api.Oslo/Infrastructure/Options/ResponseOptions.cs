@@ -1,5 +1,7 @@
 namespace BuildingRegistry.Api.Oslo.Infrastructure.Options
 {
+    using Be.Vlaanderen.Basisregisters.GrAr.ChangeFeed;
+
     public class ResponseOptions
     {
         public string GebouwNaamruimte { get; set; }
@@ -14,5 +16,6 @@ namespace BuildingRegistry.Api.Oslo.Infrastructure.Options
         public string ContextUrlDetail { get; set; }
         public string ContextUrlUnitList { get; set; }
         public string ContextUrlUnitDetail { get; set; }
+        public ChangeFeedConfig BuildingFeed { get; set; }
     }
 }
