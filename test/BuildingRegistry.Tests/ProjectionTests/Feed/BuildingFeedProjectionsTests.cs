@@ -8,9 +8,8 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
     using Be.Vlaanderen.Basisregisters.EventHandling;
     using Be.Vlaanderen.Basisregisters.GrAr.ChangeFeed;
     using Be.Vlaanderen.Basisregisters.GrAr.Common;
-    using Be.Vlaanderen.Basisregisters.GrAr.Common.NetTopology;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy.Gebouw;
-    using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
+    using Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.Testing;
     using Building;
     using Building.Events;
@@ -20,6 +19,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
     using Microsoft.EntityFrameworkCore;
     using Moq;
     using Newtonsoft.Json;
+    using NodaTime;
     using Projections.Feed;
     using Projections.Feed.BuildingFeed;
     using Projections.Feed.Contract;
@@ -98,8 +98,12 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
                             buildingWasMigrated.Provenance.Timestamp.ToBelgianDateTimeOffset(),
                             It.Is<List<string>>(nisCodes => nisCodes.Contains(NisCode)),
                             It.Is<List<BaseRegistriesCloudEventAttribute>>(attrs =>
-                                attrs.Any(a => a.Name == BuildingAttributeNames.StatusName)
-                                && attrs.Any(a => a.Name == BuildingAttributeNames.GeometryMethod)
+                                attrs.Any(a => a.Name == BuildingAttributeNames.StatusName
+                                               && a.OldValue == null
+                                               && a.NewValue!.ToString() == nameof(GebouwStatus.Gepland))
+                                && attrs.Any(a => a.Name == BuildingAttributeNames.GeometryMethod
+                                                  && a.OldValue == null
+                                                  && a.NewValue!.ToString() == nameof(GeometrieMethode.Ingeschetst))
                                 && attrs.Any(a => a.Name == BuildingAttributeNames.Geometry)),
                             BuildingWasMigrated.EventName,
                             It.IsAny<string>()),
@@ -190,8 +194,12 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
                             It.IsAny<DateTimeOffset>(),
                             It.Is<List<string>>(nisCodes => nisCodes.Contains(NisCode)),
                             It.Is<List<BaseRegistriesCloudEventAttribute>>(attrs =>
-                                attrs.Any(a => a.Name == BuildingAttributeNames.StatusName)
-                                && attrs.Any(a => a.Name == BuildingAttributeNames.GeometryMethod)
+                                attrs.Any(a => a.Name == BuildingAttributeNames.StatusName
+                                               && a.OldValue == null
+                                               && a.NewValue!.ToString() == nameof(GebouwStatus.Gerealiseerd))
+                                && attrs.Any(a => a.Name == BuildingAttributeNames.GeometryMethod
+                                                  && a.OldValue == null
+                                                  && a.NewValue!.ToString() == nameof(GeometrieMethode.IngemetenGRB))
                                 && attrs.Any(a => a.Name == BuildingAttributeNames.Geometry)),
                             UnplannedBuildingWasRealizedAndMeasured.EventName,
                             It.IsAny<string>()),
@@ -289,6 +297,21 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
                     document.Should().NotBeNull();
                     document!.Document.Status.Should().Be(GebouwStatus.Gepland);
                     document.LastChangedOn.Should().Be(buildingWasCorrected.Provenance.Timestamp);
+
+                    ChangeFeedServiceMock.Verify(x => x.CreateCloudEventWithData(
+                            It.IsAny<long>(),
+                            buildingWasCorrected.Provenance.Timestamp.ToBelgianDateTimeOffset(),
+                            BuildingEventTypes.UpdateV1,
+                            buildingWasCorrected.BuildingPersistentLocalId.ToString(),
+                            It.IsAny<DateTimeOffset>(),
+                            It.Is<List<string>>(nisCodes => nisCodes.Contains(NisCode)),
+                            It.Is<List<BaseRegistriesCloudEventAttribute>>(attrs =>
+                                attrs.Any(a => a.Name == BuildingAttributeNames.StatusName
+                                               && a.OldValue!.ToString() == nameof(GebouwStatus.InAanbouw)
+                                               && a.NewValue!.ToString() == nameof(GebouwStatus.Gepland))),
+                            BuildingWasCorrectedFromUnderConstructionToPlanned.EventName,
+                            It.IsAny<string>()),
+                        Times.Once);
                 });
         }
 
@@ -313,6 +336,21 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
                     document!.Document.Status.Should().Be(GebouwStatus.InAanbouw);
                     document.LastChangedOn.Should().Be(buildingWasCorrected.Provenance.Timestamp);
                 });
+
+            ChangeFeedServiceMock.Verify(x => x.CreateCloudEventWithData(
+                    It.IsAny<long>(),
+                    buildingWasCorrected.Provenance.Timestamp.ToBelgianDateTimeOffset(),
+                    BuildingEventTypes.UpdateV1,
+                    buildingWasCorrected.BuildingPersistentLocalId.ToString(),
+                    It.IsAny<DateTimeOffset>(),
+                    It.Is<List<string>>(nisCodes => nisCodes.Contains(NisCode)),
+                    It.Is<List<BaseRegistriesCloudEventAttribute>>(attrs =>
+                        attrs.Any(a => a.Name == BuildingAttributeNames.StatusName
+                                       && a.OldValue!.ToString() == nameof(GebouwStatus.Gerealiseerd)
+                                       && a.NewValue!.ToString() == nameof(GebouwStatus.InAanbouw))),
+                    BuildingWasCorrectedFromRealizedToUnderConstruction.EventName,
+                    It.IsAny<string>()),
+                Times.Once);
         }
 
         [Fact]
@@ -331,6 +369,21 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
                     document.Should().NotBeNull();
                     document!.Document.Status.Should().Be(GebouwStatus.NietGerealiseerd);
                     document.LastChangedOn.Should().Be(buildingWasNotRealized.Provenance.Timestamp);
+
+                    ChangeFeedServiceMock.Verify(x => x.CreateCloudEventWithData(
+                            It.IsAny<long>(),
+                            buildingWasNotRealized.Provenance.Timestamp.ToBelgianDateTimeOffset(),
+                            BuildingEventTypes.UpdateV1,
+                            buildingWasNotRealized.BuildingPersistentLocalId.ToString(),
+                            It.IsAny<DateTimeOffset>(),
+                            It.Is<List<string>>(nisCodes => nisCodes.Contains(NisCode)),
+                            It.Is<List<BaseRegistriesCloudEventAttribute>>(attrs =>
+                                attrs.Any(a => a.Name == BuildingAttributeNames.StatusName
+                                               && a.OldValue!.ToString() == nameof(GebouwStatus.Gepland)
+                                               && a.NewValue!.ToString() == nameof(GebouwStatus.NietGerealiseerd))),
+                            BuildingWasNotRealizedV2.EventName,
+                            It.IsAny<string>()),
+                        Times.Once);
                 });
         }
 
@@ -352,6 +405,21 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
                     document.Should().NotBeNull();
                     document!.Document.Status.Should().Be(GebouwStatus.Gepland);
                     document.LastChangedOn.Should().Be(buildingWasCorrected.Provenance.Timestamp);
+
+                    ChangeFeedServiceMock.Verify(x => x.CreateCloudEventWithData(
+                            It.IsAny<long>(),
+                            buildingWasCorrected.Provenance.Timestamp.ToBelgianDateTimeOffset(),
+                            BuildingEventTypes.UpdateV1,
+                            buildingWasCorrected.BuildingPersistentLocalId.ToString(),
+                            It.IsAny<DateTimeOffset>(),
+                            It.Is<List<string>>(nisCodes => nisCodes.Contains(NisCode)),
+                            It.Is<List<BaseRegistriesCloudEventAttribute>>(attrs =>
+                                attrs.Any(a => a.Name == BuildingAttributeNames.StatusName
+                                               && a.OldValue!.ToString() == nameof(GebouwStatus.NietGerealiseerd)
+                                               && a.NewValue!.ToString() == nameof(GebouwStatus.Gepland))),
+                            BuildingWasCorrectedFromNotRealizedToPlanned.EventName,
+                            It.IsAny<string>()),
+                        Times.Once);
                 });
         }
 
@@ -375,6 +443,21 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
                     document.Should().NotBeNull();
                     document!.Document.Status.Should().Be(GebouwStatus.Gehistoreerd);
                     document.LastChangedOn.Should().Be(buildingWasDemolished.Provenance.Timestamp);
+
+                    ChangeFeedServiceMock.Verify(x => x.CreateCloudEventWithData(
+                            It.IsAny<long>(),
+                            buildingWasDemolished.Provenance.Timestamp.ToBelgianDateTimeOffset(),
+                            BuildingEventTypes.UpdateV1,
+                            buildingWasDemolished.BuildingPersistentLocalId.ToString(),
+                            It.IsAny<DateTimeOffset>(),
+                            It.Is<List<string>>(nisCodes => nisCodes.Contains(NisCode)),
+                            It.Is<List<BaseRegistriesCloudEventAttribute>>(attrs =>
+                                attrs.Any(a => a.Name == BuildingAttributeNames.StatusName
+                                               && a.OldValue!.ToString() == nameof(GebouwStatus.Gerealiseerd)
+                                               && a.NewValue!.ToString() == nameof(GebouwStatus.Gehistoreerd))),
+                            BuildingWasDemolished.EventName,
+                            It.IsAny<string>()),
+                        Times.Once);
                 });
         }
 
@@ -461,6 +544,21 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
                     document!.Document.ExtendedWkbGeometry.Should().Be(buildingMeasurementWasChanged.ExtendedWkbGeometryBuilding);
                     document.Document.GeometryAsGml.Should().NotBeNullOrEmpty();
                     document.LastChangedOn.Should().Be(buildingMeasurementWasChanged.Provenance.Timestamp);
+
+                    ChangeFeedServiceMock.Verify(x => x.CreateCloudEventWithData(
+                            It.IsAny<long>(),
+                            buildingMeasurementWasChanged.Provenance.Timestamp.ToBelgianDateTimeOffset(),
+                            BuildingEventTypes.UpdateV1,
+                            buildingMeasurementWasChanged.BuildingPersistentLocalId.ToString(),
+                            It.IsAny<DateTimeOffset>(),
+                            It.Is<List<string>>(nisCodes => nisCodes.Contains(NisCode)),
+                            It.Is<List<BaseRegistriesCloudEventAttribute>>(attrs =>
+                                attrs.Any(a => a.Name == BuildingAttributeNames.Geometry
+                                               && a.OldValue != null
+                                               && a.NewValue != null)),
+                            BuildingMeasurementWasChanged.EventName,
+                            It.IsAny<string>()),
+                        Times.Once);
                 });
         }
 
@@ -518,6 +616,21 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
                     document!.Document.ExtendedWkbGeometry.Should().Be(buildingMeasurementWasCorrected.ExtendedWkbGeometryBuilding);
                     document.Document.GeometryAsGml.Should().NotBeNullOrEmpty();
                     document.LastChangedOn.Should().Be(buildingMeasurementWasCorrected.Provenance.Timestamp);
+
+                    ChangeFeedServiceMock.Verify(x => x.CreateCloudEventWithData(
+                            It.IsAny<long>(),
+                            buildingMeasurementWasCorrected.Provenance.Timestamp.ToBelgianDateTimeOffset(),
+                            BuildingEventTypes.UpdateV1,
+                            buildingMeasurementWasCorrected.BuildingPersistentLocalId.ToString(),
+                            It.IsAny<DateTimeOffset>(),
+                            It.Is<List<string>>(nisCodes => nisCodes.Contains(NisCode)),
+                            It.Is<List<BaseRegistriesCloudEventAttribute>>(attrs =>
+                                attrs.Any(a => a.Name == BuildingAttributeNames.Geometry
+                                               && a.OldValue != null
+                                               && a.NewValue != null)),
+                            BuildingMeasurementWasCorrected.EventName,
+                            It.IsAny<string>()),
+                        Times.Once);
                 });
         }
 
@@ -538,6 +651,18 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
                     var document = await context.BuildingDocuments.FindAsync(buildingUnitWasPlannedV2.BuildingPersistentLocalId);
                     document.Should().NotBeNull();
                     document!.LastChangedOn.Should().Be(buildingUnitWasPlannedV2.Provenance.Timestamp);
+
+                    ChangeFeedServiceMock.Verify(x => x.CreateCloudEventWithData(
+                            It.IsAny<long>(),
+                            buildingUnitWasPlannedV2.Provenance.Timestamp.ToBelgianDateTimeOffset(),
+                            BuildingEventTypes.UpdateV1,
+                            buildingUnitWasPlannedV2.BuildingPersistentLocalId.ToString(),
+                            It.IsAny<DateTimeOffset>(),
+                            It.Is<List<string>>(nisCodes => nisCodes.Contains(NisCode)),
+                            It.Is<List<BaseRegistriesCloudEventAttribute>>(attrs => !attrs.Any()),
+                            BuildingUnitWasPlannedV2.EventName,
+                            It.IsAny<string>()),
+                        Times.Once);
                 });
         }
 
@@ -556,6 +681,18 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
                     var document = await context.BuildingDocuments.FindAsync(commonBuildingUnitWasAddedV2.BuildingPersistentLocalId);
                     document.Should().NotBeNull();
                     document!.LastChangedOn.Should().Be(commonBuildingUnitWasAddedV2.Provenance.Timestamp);
+
+                    ChangeFeedServiceMock.Verify(x => x.CreateCloudEventWithData(
+                            It.IsAny<long>(),
+                            commonBuildingUnitWasAddedV2.Provenance.Timestamp.ToBelgianDateTimeOffset(),
+                            BuildingEventTypes.UpdateV1,
+                            commonBuildingUnitWasAddedV2.BuildingPersistentLocalId.ToString(),
+                            It.IsAny<DateTimeOffset>(),
+                            It.Is<List<string>>(nisCodes => nisCodes.Contains(NisCode)),
+                            It.Is<List<BaseRegistriesCloudEventAttribute>>(attrs => !attrs.Any()),
+                            CommonBuildingUnitWasAddedV2.EventName,
+                            It.IsAny<string>()),
+                        Times.Once);
                 });
         }
 
@@ -576,6 +713,18 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
                     var document = await context.BuildingDocuments.FindAsync(buildingUnitWasRemovedV2.BuildingPersistentLocalId);
                     document.Should().NotBeNull();
                     document!.LastChangedOn.Should().Be(buildingUnitWasRemovedV2.Provenance.Timestamp);
+
+                    ChangeFeedServiceMock.Verify(x => x.CreateCloudEventWithData(
+                            It.IsAny<long>(),
+                            buildingUnitWasRemovedV2.Provenance.Timestamp.ToBelgianDateTimeOffset(),
+                            BuildingEventTypes.UpdateV1,
+                            buildingUnitWasRemovedV2.BuildingPersistentLocalId.ToString(),
+                            It.IsAny<DateTimeOffset>(),
+                            It.Is<List<string>>(nisCodes => nisCodes.Contains(NisCode)),
+                            It.Is<List<BaseRegistriesCloudEventAttribute>>(attrs => !attrs.Any()),
+                            BuildingUnitWasRemovedV2.EventName,
+                            It.IsAny<string>()),
+                        Times.Once);
                 });
         }
 
@@ -598,6 +747,18 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
                     var document = await context.BuildingDocuments.FindAsync(buildingUnitRemovalWasCorrected.BuildingPersistentLocalId);
                     document.Should().NotBeNull();
                     document!.LastChangedOn.Should().Be(buildingUnitRemovalWasCorrected.Provenance.Timestamp);
+
+                    ChangeFeedServiceMock.Verify(x => x.CreateCloudEventWithData(
+                            It.IsAny<long>(),
+                            buildingUnitRemovalWasCorrected.Provenance.Timestamp.ToBelgianDateTimeOffset(),
+                            BuildingEventTypes.UpdateV1,
+                            buildingUnitRemovalWasCorrected.BuildingPersistentLocalId.ToString(),
+                            It.IsAny<DateTimeOffset>(),
+                            It.Is<List<string>>(nisCodes => nisCodes.Contains(NisCode)),
+                            It.Is<List<BaseRegistriesCloudEventAttribute>>(attrs => !attrs.Any()),
+                            BuildingUnitRemovalWasCorrected.EventName,
+                            It.IsAny<string>()),
+                        Times.Once);
                 });
         }
 
@@ -616,6 +777,18 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
                     var document = await context.BuildingDocuments.FindAsync(buildingUnitWasMovedIntoBuilding.BuildingPersistentLocalId);
                     document.Should().NotBeNull();
                     document!.LastChangedOn.Should().Be(buildingUnitWasMovedIntoBuilding.Provenance.Timestamp);
+
+                    ChangeFeedServiceMock.Verify(x => x.CreateCloudEventWithData(
+                            It.IsAny<long>(),
+                            buildingUnitWasMovedIntoBuilding.Provenance.Timestamp.ToBelgianDateTimeOffset(),
+                            BuildingEventTypes.UpdateV1,
+                            buildingUnitWasMovedIntoBuilding.BuildingPersistentLocalId.ToString(),
+                            It.IsAny<DateTimeOffset>(),
+                            It.Is<List<string>>(nisCodes => nisCodes.Contains(NisCode)),
+                            It.Is<List<BaseRegistriesCloudEventAttribute>>(attrs => !attrs.Any()),
+                            BuildingUnitWasMovedIntoBuilding.EventName,
+                            It.IsAny<string>()),
+                        Times.Once);
                 });
         }
 
@@ -634,6 +807,18 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
                     var document = await context.BuildingDocuments.FindAsync(buildingUnitWasMovedOutOfBuilding.BuildingPersistentLocalId);
                     document.Should().NotBeNull();
                     document!.LastChangedOn.Should().Be(buildingUnitWasMovedOutOfBuilding.Provenance.Timestamp);
+
+                    ChangeFeedServiceMock.Verify(x => x.CreateCloudEventWithData(
+                            It.IsAny<long>(),
+                            buildingUnitWasMovedOutOfBuilding.Provenance.Timestamp.ToBelgianDateTimeOffset(),
+                            BuildingEventTypes.UpdateV1,
+                            buildingUnitWasMovedOutOfBuilding.BuildingPersistentLocalId.ToString(),
+                            It.IsAny<DateTimeOffset>(),
+                            It.Is<List<string>>(nisCodes => nisCodes.Contains(NisCode)),
+                            It.Is<List<BaseRegistriesCloudEventAttribute>>(attrs => !attrs.Any()),
+                            BuildingUnitWasMovedOutOfBuilding.EventName,
+                            It.IsAny<string>()),
+                        Times.Once);
                 });
         }
 
@@ -664,7 +849,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
                 .FirstOrDefaultAsync();
         }
 
-        private Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<T> CreateEnvelope<T>(T @event, long position) where T : IMessage
+        private Envelope<T> CreateEnvelope<T>(T @event, long position) where T : IMessage
         {
             var metadata = new Dictionary<string, object>
             {
@@ -672,8 +857,8 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
                 { "EventName", @event.GetType().Name },
                 { "CommandId", Guid.NewGuid().ToString() }
             };
-            return new Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<T>(
-                new Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope(@event, metadata));
+            return new Envelope<T>(
+                new Envelope(@event, metadata));
         }
 
         private void SetupChangeFeedServiceMock()
@@ -701,7 +886,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
         private void SetupMunicipalityGeometryRepositoryMock(List<string>? nisCodes = null)
         {
             MunicipalityGeometryRepositoryMock
-                .Setup(x => x.GetOverlappingNisCodes(It.IsAny<string>(), It.IsAny<NodaTime.Instant>()))
+                .Setup(x => x.GetOverlappingNisCodes(It.IsAny<string>(), It.IsAny<Instant>()))
                 .Returns(nisCodes ?? new List<string> { NisCode });
         }
 

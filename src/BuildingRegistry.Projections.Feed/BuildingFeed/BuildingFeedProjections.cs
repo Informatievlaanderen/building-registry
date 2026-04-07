@@ -22,7 +22,7 @@ namespace BuildingRegistry.Projections.Feed.BuildingFeed
     using NodaTime;
     using Envelope = Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope;
 
-    [ConnectedProjectionName("Feed endpoint gebouw")]
+    [ConnectedProjectionName("Feed endpoint gebouw (cloudevents)")]
     [ConnectedProjectionDescription("Projectie die de gebouw data voor de gebouw cloudevent feed voorziet.")]
     public class BuildingFeedProjections : ConnectedProjection<FeedContext>
     {
