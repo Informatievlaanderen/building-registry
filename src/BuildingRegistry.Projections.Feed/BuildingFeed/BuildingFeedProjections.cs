@@ -27,10 +27,12 @@ namespace BuildingRegistry.Projections.Feed.BuildingFeed
     public class BuildingFeedProjections : ConnectedProjection<FeedContext>
     {
         private readonly IChangeFeedService _changeFeedService;
+        private readonly IMunicipalityGeometryRepository _municipalityGeometryRepository;
 
-        public BuildingFeedProjections(IChangeFeedService changeFeedService)
+        public BuildingFeedProjections(IChangeFeedService changeFeedService, IMunicipalityGeometryRepository municipalityGeometryRepository)
         {
             _changeFeedService = changeFeedService;
+            _municipalityGeometryRepository = municipalityGeometryRepository;
 
             #region Building
 
@@ -382,10 +384,13 @@ namespace BuildingRegistry.Projections.Feed.BuildingFeed
         {
             context.Entry(document).Property(x => x.Document).IsModified = true;
 
+            var nisCodes = GetNisCodes(document.Document.ExtendedWkbGeometry, message.Message.Provenance.Timestamp);
+
             var page = await context.CalculatePage();
             var buildingFeedItem = new BuildingFeedItem(
                 position: message.Position,
-                page: page)
+                page: page,
+                buildingPersistentLocalId: document.PersistentLocalId)
             {
                 Application = message.Message.Provenance.Application,
                 Modification = message.Message.Provenance.Modification,
@@ -394,8 +399,6 @@ namespace BuildingRegistry.Projections.Feed.BuildingFeed
                 Reason = message.Message.Provenance.Reason
             };
             await context.BuildingFeed.AddAsync(buildingFeedItem);
-            await context.BuildingFeedItemBuildings.AddAsync(
-                new BuildingFeedItemBuilding(buildingFeedItem.Id, document.PersistentLocalId));
 
             var cloudEvent = _changeFeedService.CreateCloudEventWithData(
                 buildingFeedItem.Id,
@@ -403,13 +406,21 @@ namespace BuildingRegistry.Projections.Feed.BuildingFeed
                 eventType,
                 document.PersistentLocalId.ToString(),
                 document.LastChangedOnAsDateTimeOffset,
-                [],
+                nisCodes,
                 attributes,
                 message.EventName,
                 message.Metadata["CommandId"].ToString()!);
 
             buildingFeedItem.CloudEventAsString = _changeFeedService.SerializeCloudEvent(cloudEvent);
             await CheckToUpdateCache(page, context);
+        }
+
+        private List<string> GetNisCodes(string? extendedWkbGeometry, Instant eventTimestamp)
+        {
+            if (string.IsNullOrEmpty(extendedWkbGeometry))
+                return new List<string>();
+
+            return _municipalityGeometryRepository.GetOverlappingNisCodes(extendedWkbGeometry, eventTimestamp);
         }
 
         private async Task CheckToUpdateCache(int page, FeedContext context)

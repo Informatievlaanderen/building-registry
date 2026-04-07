@@ -140,11 +140,23 @@ namespace BuildingRegistry.Projector.Infrastructure.Modules
                         jsonSerializerSettings));
 
             builder
+                .Register(_ =>
+                {
+                    var connectionString = _configuration.GetConnectionString("IntegrationProjections")
+                                           ?? _configuration.GetConnectionString("FeedProjections")!;
+                    return new MunicipalityGeometryRepository(connectionString);
+                })
+                .As<IMunicipalityGeometryRepository>()
+                .SingleInstance();
+
+            builder
                 .RegisterProjectionMigrator<FeedContextMigrationFactory>(
                     _configuration,
                     _loggerFactory)
                 .RegisterProjections<BuildingFeedProjections, FeedContext>(
-                    context => new BuildingFeedProjections(context.Resolve<IChangeFeedService>()),
+                    context => new BuildingFeedProjections(
+                        context.Resolve<IChangeFeedService>(),
+                        context.Resolve<IMunicipalityGeometryRepository>()),
                     ConnectedProjectionSettings.Default);
         }
 

@@ -28,20 +28,24 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
 
     public sealed class BuildingFeedProjectionsTests
     {
+        private const string NisCode = "11001";
+
         private readonly Fixture _fixture;
         private readonly FeedContext _feedContext;
 
         private ConnectedProjectionTest<FeedContext, BuildingFeedProjections> Sut { get; }
         private Mock<IChangeFeedService> ChangeFeedServiceMock { get; }
+        private Mock<IMunicipalityGeometryRepository> MunicipalityGeometryRepositoryMock { get; }
 
         public BuildingFeedProjectionsTests()
         {
             ChangeFeedServiceMock = new Mock<IChangeFeedService>();
+            MunicipalityGeometryRepositoryMock = new Mock<IMunicipalityGeometryRepository>();
             _feedContext = CreateContext();
 
             Sut = new ConnectedProjectionTest<FeedContext, BuildingFeedProjections>(
                 () => _feedContext,
-                () => new BuildingFeedProjections(ChangeFeedServiceMock.Object));
+                () => new BuildingFeedProjections(ChangeFeedServiceMock.Object, MunicipalityGeometryRepositoryMock.Object));
 
             _fixture = new Fixture();
             _fixture.Customize(new InfrastructureCustomization());
@@ -54,6 +58,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
             _fixture.Customize(new WithFixedBuildingPersistentLocalId());
 
             SetupChangeFeedServiceMock();
+            SetupMunicipalityGeometryRepositoryMock();
         }
 
         [Fact]
@@ -91,7 +96,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
                             BuildingEventTypes.CreateV1,
                             buildingWasMigrated.BuildingPersistentLocalId.ToString(),
                             buildingWasMigrated.Provenance.Timestamp.ToBelgianDateTimeOffset(),
-                            It.IsAny<List<string>>(),
+                            It.Is<List<string>>(nisCodes => nisCodes.Contains(NisCode)),
                             It.Is<List<BaseRegistriesCloudEventAttribute>>(attrs =>
                                 attrs.Any(a => a.Name == BuildingAttributeNames.StatusName)
                                 && attrs.Any(a => a.Name == BuildingAttributeNames.GeometryMethod)
@@ -137,7 +142,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
                             BuildingEventTypes.CreateV1,
                             buildingWasPlannedV2.BuildingPersistentLocalId.ToString(),
                             buildingWasPlannedV2.Provenance.Timestamp.ToBelgianDateTimeOffset(),
-                            It.IsAny<List<string>>(),
+                            It.Is<List<string>>(nisCodes => nisCodes.Contains(NisCode)),
                             It.Is<List<BaseRegistriesCloudEventAttribute>>(attrs =>
                                 attrs.Any(a => a.Name == BuildingAttributeNames.StatusName
                                                && a.OldValue == null
@@ -183,7 +188,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
                             BuildingEventTypes.CreateV1,
                             @event.BuildingPersistentLocalId.ToString(),
                             It.IsAny<DateTimeOffset>(),
-                            It.IsAny<List<string>>(),
+                            It.Is<List<string>>(nisCodes => nisCodes.Contains(NisCode)),
                             It.Is<List<BaseRegistriesCloudEventAttribute>>(attrs =>
                                 attrs.Any(a => a.Name == BuildingAttributeNames.StatusName)
                                 && attrs.Any(a => a.Name == BuildingAttributeNames.GeometryMethod)
@@ -217,7 +222,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
                             BuildingEventTypes.UpdateV1,
                             buildingBecameUnderConstruction.BuildingPersistentLocalId.ToString(),
                             It.IsAny<DateTimeOffset>(),
-                            It.IsAny<List<string>>(),
+                            It.Is<List<string>>(nisCodes => nisCodes.Contains(NisCode)),
                             It.Is<List<BaseRegistriesCloudEventAttribute>>(attrs =>
                                 attrs.Any(a => a.Name == BuildingAttributeNames.StatusName
                                                && a.OldValue!.ToString() == nameof(GebouwStatus.Gepland)
@@ -255,7 +260,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
                             BuildingEventTypes.UpdateV1,
                             buildingWasRealized.BuildingPersistentLocalId.ToString(),
                             It.IsAny<DateTimeOffset>(),
-                            It.IsAny<List<string>>(),
+                            It.Is<List<string>>(nisCodes => nisCodes.Contains(NisCode)),
                             It.Is<List<BaseRegistriesCloudEventAttribute>>(attrs =>
                                 attrs.Any(a => a.Name == BuildingAttributeNames.StatusName
                                                && a.OldValue!.ToString() == nameof(GebouwStatus.InAanbouw)
@@ -396,7 +401,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
                             BuildingEventTypes.DeleteV1,
                             buildingWasRemoved.BuildingPersistentLocalId.ToString(),
                             It.IsAny<DateTimeOffset>(),
-                            It.IsAny<List<string>>(),
+                            It.Is<List<string>>(nisCodes => nisCodes.Contains(NisCode)),
                             It.Is<List<BaseRegistriesCloudEventAttribute>>(attrs => !attrs.Any()),
                             BuildingWasRemovedV2.EventName,
                             It.IsAny<string>()),
@@ -428,7 +433,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
                             BuildingEventTypes.UpdateV1,
                             buildingOutlineWasChanged.BuildingPersistentLocalId.ToString(),
                             It.IsAny<DateTimeOffset>(),
-                            It.IsAny<List<string>>(),
+                            It.Is<List<string>>(nisCodes => nisCodes.Contains(NisCode)),
                             It.Is<List<BaseRegistriesCloudEventAttribute>>(attrs =>
                                 attrs.Any(a => a.Name == BuildingAttributeNames.Geometry
                                                && a.OldValue != null
@@ -484,7 +489,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
                             BuildingEventTypes.UpdateV1,
                             buildingWasMeasured.BuildingPersistentLocalId.ToString(),
                             It.IsAny<DateTimeOffset>(),
-                            It.IsAny<List<string>>(),
+                            It.Is<List<string>>(nisCodes => nisCodes.Contains(NisCode)),
                             It.Is<List<BaseRegistriesCloudEventAttribute>>(attrs =>
                                 attrs.Any(a => a.Name == BuildingAttributeNames.Geometry)
                                 && attrs.Any(a => a.Name == BuildingAttributeNames.GeometryMethod
@@ -654,14 +659,9 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
 
         private static async Task<BuildingFeedItem?> FindFeedItemByBuildingPersistentLocalId(FeedContext context, int buildingPersistentLocalId)
         {
-            var feedItemBuilding = await context.BuildingFeedItemBuildings
+            return await context.BuildingFeed
                 .Where(x => x.BuildingPersistentLocalId == buildingPersistentLocalId)
                 .FirstOrDefaultAsync();
-
-            if (feedItemBuilding is null)
-                return null;
-
-            return await context.BuildingFeed.SingleOrDefaultAsync(x => x.Id == feedItemBuilding.FeedItemId);
         }
 
         private Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope<T> CreateEnvelope<T>(T @event, long position) where T : IMessage
@@ -696,6 +696,13 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
                 It.IsAny<int>(),
                 It.IsAny<FeedContext>(),
                 It.IsAny<Func<int, Task<int>>>()));
+        }
+
+        private void SetupMunicipalityGeometryRepositoryMock(List<string>? nisCodes = null)
+        {
+            MunicipalityGeometryRepositoryMock
+                .Setup(x => x.GetOverlappingNisCodes(It.IsAny<string>(), It.IsAny<NodaTime.Instant>()))
+                .Returns(nisCodes ?? new List<string> { NisCode });
         }
 
         private FeedContext CreateContext()

@@ -11,6 +11,8 @@ namespace BuildingRegistry.Projections.Feed.BuildingFeed
         public int Page { get; set; }
         public long Position { get; set; }
 
+        public int BuildingPersistentLocalId { get; set; }
+
         public Application? Application { get; set; }
         public Modification? Modification { get; set; }
         public string? Operator { get; set; }
@@ -20,23 +22,10 @@ namespace BuildingRegistry.Projections.Feed.BuildingFeed
 
         private BuildingFeedItem() { }
 
-        public BuildingFeedItem(long position, int page) : this()
+        public BuildingFeedItem(long position, int page, int buildingPersistentLocalId) : this()
         {
             Page = page;
             Position = position;
-        }
-    }
-
-    public class BuildingFeedItemBuilding
-    {
-        public long FeedItemId { get; set; }
-        public int BuildingPersistentLocalId { get; set; }
-
-        private BuildingFeedItemBuilding() { }
-
-        public BuildingFeedItemBuilding(long feedItemId, int buildingPersistentLocalId) : this()
-        {
-            FeedItemId = feedItemId;
             BuildingPersistentLocalId = buildingPersistentLocalId;
         }
     }
@@ -54,6 +43,9 @@ namespace BuildingRegistry.Projections.Feed.BuildingFeed
             b.Property(x => x.Id)
                 .UseHiLo("BuildingFeedSequence", Schema.Feed);
 
+            b.Property(x => x.BuildingPersistentLocalId)
+                .IsRequired();
+
             b.Property(x => x.CloudEventAsString)
                 .HasColumnName("CloudEvent")
                 .IsRequired();
@@ -66,19 +58,6 @@ namespace BuildingRegistry.Projections.Feed.BuildingFeed
 
             b.HasIndex(x => x.Position);
             b.HasIndex(x => x.Page);
-        }
-    }
-
-    public class BuildingFeedItemBuildingConfiguration : IEntityTypeConfiguration<BuildingFeedItemBuilding>
-    {
-        private const string TableName = "BuildingFeedItemBuildings";
-
-        public void Configure(EntityTypeBuilder<BuildingFeedItemBuilding> b)
-        {
-            b.ToTable(TableName, Schema.Feed)
-                .HasKey(x => new { x.FeedItemId, x.BuildingPersistentLocalId });
-
-            b.HasIndex(x => x.FeedItemId);
             b.HasIndex(x => x.BuildingPersistentLocalId);
         }
     }

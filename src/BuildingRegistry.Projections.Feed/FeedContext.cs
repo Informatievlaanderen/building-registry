@@ -14,8 +14,6 @@ namespace BuildingRegistry.Projections.Feed
 
         public DbSet<BuildingFeedItem> BuildingFeed => Set<BuildingFeedItem>();
 
-        public DbSet<BuildingFeedItemBuilding> BuildingFeedItemBuildings => Set<BuildingFeedItemBuilding>();
-
         public DbSet<BuildingDocument> BuildingDocuments => Set<BuildingDocument>();
 
         // This needs to be here to please EF
@@ -38,7 +36,6 @@ namespace BuildingRegistry.Projections.Feed
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.ApplyConfiguration(new BuildingFeedConfiguration());
-            modelBuilder.ApplyConfiguration(new BuildingFeedItemBuildingConfiguration());
             modelBuilder.ApplyConfiguration(new BuildingDocumentConfiguration(_jsonSerializerSettings));
         }
     }
