@@ -11,6 +11,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
     using Be.Vlaanderen.Basisregisters.GrAr.Common.NetTopology;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy.Gebouweenheid;
+    using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.Testing;
     using Building;
@@ -112,7 +113,8 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
                                 attrs.Any(a => a.Name == BuildingUnitAttributeNames.StatusName && a.OldValue == null)
                                 && attrs.Any(a => a.Name == BuildingUnitAttributeNames.Function && a.OldValue == null)
                                 && attrs.Any(a => a.Name == BuildingUnitAttributeNames.GeometryMethod && a.OldValue == null)
-                                && attrs.Any(a => a.Name == BuildingUnitAttributeNames.Position && a.OldValue == null && a.NewValue != null)),
+                                && attrs.Any(a => a.Name == BuildingUnitAttributeNames.Position && a.OldValue == null && a.NewValue != null)
+                                && attrs.Any(a => a.Name == BuildingUnitAttributeNames.AdresIds && a.OldValue == null)),
                             BuildingWasMigrated.EventName,
                             It.IsAny<string>()),
                         Times.AtLeastOnce);
@@ -200,7 +202,9 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
                                                   && a.OldValue == null)
                                 && attrs.Any(a => a.Name == BuildingUnitAttributeNames.Position
                                                   && a.OldValue == null
-                                                  && a.NewValue != null && AssertPointList((List<BuildingUnitPositionCloudEventValue>)a.NewValue, document.Document.PositionAsGml))),
+                                                  && a.NewValue != null && AssertPointList((List<BuildingUnitPositionCloudEventValue>)a.NewValue, document.Document.PositionAsGml))
+                                && attrs.Any(a => a.Name == BuildingUnitAttributeNames.AdresIds
+                                                  && a.OldValue == null)),
                             BuildingUnitWasPlannedV2.EventName,
                             It.IsAny<string>()),
                         Times.Once);
@@ -453,7 +457,9 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
                                                   && a.NewValue!.ToString() == nameof(PositieGeometrieMethode.AangeduidDoorBeheerder))
                                 && attrs.Any(a => a.Name == BuildingUnitAttributeNames.Position
                                                   && a.OldValue == null
-                                                  && a.NewValue != null && AssertPointList((List<BuildingUnitPositionCloudEventValue>)a.NewValue, document.Document.PositionAsGml))),
+                                                  && a.NewValue != null && AssertPointList((List<BuildingUnitPositionCloudEventValue>)a.NewValue, document.Document.PositionAsGml))
+                                && attrs.Any(a => a.Name == BuildingUnitAttributeNames.AdresIds
+                                                  && a.OldValue == null)),
                             BuildingUnitRemovalWasCorrected.EventName,
                             It.IsAny<string>()),
                         Times.Once);
@@ -510,12 +516,144 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
                                                   && a.OldValue == null)
                                 && attrs.Any(a => a.Name == BuildingUnitAttributeNames.Position
                                                   && a.OldValue == null
-                                                  && a.NewValue != null && AssertPointList((List<BuildingUnitPositionCloudEventValue>)a.NewValue, document.Document.PositionAsGml))),
+                                                  && a.NewValue != null && AssertPointList((List<BuildingUnitPositionCloudEventValue>)a.NewValue, document.Document.PositionAsGml))
+                                && attrs.Any(a => a.Name == BuildingUnitAttributeNames.AdresIds
+                                                  && a.OldValue == null)),
                             CommonBuildingUnitWasAddedV2.EventName,
                             It.IsAny<string>()),
                         Times.Once);
 
                     ChangeFeedServiceMock.Verify(x => x.SerializeCloudEvent(It.IsAny<CloudEvent>()), Times.AtLeastOnce);
+                });
+        }
+
+        [Fact]
+        public async Task WhenBuildingUnitAddressWasAttachedV2_ThenAddressesAreUpdated()
+        {
+            _fixture.Customize(new WithFixedBuildingUnitPersistentLocalId());
+            _fixture.Customize(new WithValidExtendedWkbPoint());
+            var buildingWasPlannedV2 = _fixture.Create<BuildingWasPlannedV2>();
+            var buildingUnitWasPlannedV2 = _fixture.Create<BuildingUnitWasPlannedV2>();
+            var buildingUnitAddressWasAttached = _fixture.Create<BuildingUnitAddressWasAttachedV2>();
+            var position = 1L;
+
+            await Sut
+                .Given(CreateEnvelope(buildingWasPlannedV2, position),
+                    CreateEnvelope(buildingUnitWasPlannedV2, position + 1),
+                    CreateEnvelope(buildingUnitAddressWasAttached, position + 2))
+                .Then(async context =>
+                {
+                    var document = await context.BuildingUnitDocuments.FindAsync(buildingUnitAddressWasAttached.BuildingUnitPersistentLocalId);
+                    document.Should().NotBeNull();
+                    document!.Document.AddressPersistentLocalIds.Should().Contain(buildingUnitAddressWasAttached.AddressPersistentLocalId);
+                    document.LastChangedOn.Should().Be(buildingUnitAddressWasAttached.Provenance.Timestamp);
+
+                    ChangeFeedServiceMock.Verify(x => x.CreateCloudEventWithData(
+                            It.IsAny<long>(),
+                            buildingUnitAddressWasAttached.Provenance.Timestamp.ToBelgianDateTimeOffset(),
+                            BuildingUnitEventTypes.UpdateV1,
+                            buildingUnitAddressWasAttached.BuildingUnitPersistentLocalId.ToString(),
+                            It.IsAny<DateTimeOffset>(),
+                            It.Is<List<string>>(nisCodes => nisCodes.Contains(NisCode)),
+                            It.Is<List<BaseRegistriesCloudEventAttribute>>(attrs =>
+                                attrs.Any(a => a.Name == BuildingUnitAttributeNames.AdresIds
+                                               && a.OldValue != null
+                                               && a.NewValue != null)),
+                            BuildingUnitAddressWasAttachedV2.EventName,
+                            It.IsAny<string>()),
+                        Times.Once);
+                });
+        }
+
+        [Fact]
+        public async Task WhenBuildingUnitAddressWasDetachedV2_ThenAddressesAreUpdated()
+        {
+            _fixture.Customize(new WithFixedBuildingUnitPersistentLocalId());
+            _fixture.Customize(new WithValidExtendedWkbPoint());
+            var buildingWasPlannedV2 = _fixture.Create<BuildingWasPlannedV2>();
+            var buildingUnitWasPlannedV2 = _fixture.Create<BuildingUnitWasPlannedV2>();
+            var buildingUnitAddressWasAttached = _fixture.Create<BuildingUnitAddressWasAttachedV2>();
+            var buildingUnitAddressWasDetached = new BuildingUnitAddressWasDetachedV2(
+                new BuildingPersistentLocalId(buildingUnitWasPlannedV2.BuildingPersistentLocalId),
+                new BuildingUnitPersistentLocalId(buildingUnitWasPlannedV2.BuildingUnitPersistentLocalId),
+                new AddressPersistentLocalId(buildingUnitAddressWasAttached.AddressPersistentLocalId));
+            ((ISetProvenance)buildingUnitAddressWasDetached).SetProvenance(_fixture.Create<Provenance>());
+            var position = 1L;
+
+            await Sut
+                .Given(CreateEnvelope(buildingWasPlannedV2, position),
+                    CreateEnvelope(buildingUnitWasPlannedV2, position + 1),
+                    CreateEnvelope(buildingUnitAddressWasAttached, position + 2),
+                    CreateEnvelope(buildingUnitAddressWasDetached, position + 3))
+                .Then(async context =>
+                {
+                    var document = await context.BuildingUnitDocuments.FindAsync(buildingUnitAddressWasDetached.BuildingUnitPersistentLocalId);
+                    document.Should().NotBeNull();
+                    document!.Document.AddressPersistentLocalIds.Should().NotContain(buildingUnitAddressWasDetached.AddressPersistentLocalId);
+                    document.LastChangedOn.Should().Be(buildingUnitAddressWasDetached.Provenance.Timestamp);
+
+                    ChangeFeedServiceMock.Verify(x => x.CreateCloudEventWithData(
+                            It.IsAny<long>(),
+                            buildingUnitAddressWasDetached.Provenance.Timestamp.ToBelgianDateTimeOffset(),
+                            BuildingUnitEventTypes.UpdateV1,
+                            buildingUnitAddressWasDetached.BuildingUnitPersistentLocalId.ToString(),
+                            It.IsAny<DateTimeOffset>(),
+                            It.Is<List<string>>(nisCodes => nisCodes.Contains(NisCode)),
+                            It.Is<List<BaseRegistriesCloudEventAttribute>>(attrs =>
+                                attrs.Any(a => a.Name == BuildingUnitAttributeNames.AdresIds
+                                               && a.OldValue != null
+                                               && a.NewValue != null)),
+                            BuildingUnitAddressWasDetachedV2.EventName,
+                            It.IsAny<string>()),
+                        Times.Once);
+                });
+        }
+
+        [Fact]
+        public async Task WhenBuildingUnitAddressWasReplacedBecauseOfMunicipalityMerger_ThenAddressesAreUpdated()
+        {
+            _fixture.Customize(new WithFixedBuildingUnitPersistentLocalId());
+            _fixture.Customize(new WithValidExtendedWkbPoint());
+            var buildingWasPlannedV2 = _fixture.Create<BuildingWasPlannedV2>();
+            var buildingUnitWasPlannedV2 = _fixture.Create<BuildingUnitWasPlannedV2>();
+            var buildingUnitAddressWasAttached = _fixture.Create<BuildingUnitAddressWasAttachedV2>();
+
+            var newAddressId = _fixture.Create<int>();
+            var buildingUnitAddressWasReplaced = new BuildingUnitAddressWasReplacedBecauseOfMunicipalityMerger(
+                new BuildingPersistentLocalId(buildingUnitWasPlannedV2.BuildingPersistentLocalId),
+                new BuildingUnitPersistentLocalId(buildingUnitWasPlannedV2.BuildingUnitPersistentLocalId),
+                new AddressPersistentLocalId(newAddressId),
+                new AddressPersistentLocalId(buildingUnitAddressWasAttached.AddressPersistentLocalId));
+            ((ISetProvenance)buildingUnitAddressWasReplaced).SetProvenance(_fixture.Create<Provenance>());
+            var position = 1L;
+
+            await Sut
+                .Given(CreateEnvelope(buildingWasPlannedV2, position),
+                    CreateEnvelope(buildingUnitWasPlannedV2, position + 1),
+                    CreateEnvelope(buildingUnitAddressWasAttached, position + 2),
+                    CreateEnvelope(buildingUnitAddressWasReplaced, position + 3))
+                .Then(async context =>
+                {
+                    var document = await context.BuildingUnitDocuments.FindAsync(buildingUnitAddressWasReplaced.BuildingUnitPersistentLocalId);
+                    document.Should().NotBeNull();
+                    document!.Document.AddressPersistentLocalIds.Should().Contain(newAddressId);
+                    document.Document.AddressPersistentLocalIds.Should().NotContain(buildingUnitAddressWasAttached.AddressPersistentLocalId);
+                    document.LastChangedOn.Should().Be(buildingUnitAddressWasReplaced.Provenance.Timestamp);
+
+                    ChangeFeedServiceMock.Verify(x => x.CreateCloudEventWithData(
+                            It.IsAny<long>(),
+                            buildingUnitAddressWasReplaced.Provenance.Timestamp.ToBelgianDateTimeOffset(),
+                            BuildingUnitEventTypes.UpdateV1,
+                            buildingUnitAddressWasReplaced.BuildingUnitPersistentLocalId.ToString(),
+                            It.IsAny<DateTimeOffset>(),
+                            It.Is<List<string>>(nisCodes => nisCodes.Contains(NisCode)),
+                            It.Is<List<BaseRegistriesCloudEventAttribute>>(attrs =>
+                                attrs.Any(a => a.Name == BuildingUnitAttributeNames.AdresIds
+                                               && a.OldValue != null
+                                               && a.NewValue != null)),
+                            BuildingUnitAddressWasReplacedBecauseOfMunicipalityMerger.EventName,
+                            It.IsAny<string>()),
+                        Times.Once);
                 });
         }
 

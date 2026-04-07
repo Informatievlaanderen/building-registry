@@ -12,6 +12,7 @@ namespace BuildingRegistry.Projections.Feed.BuildingUnitFeed
     using Be.Vlaanderen.Basisregisters.GrAr.CrsTransform;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy.Gebouweenheid;
+    using Be.Vlaanderen.Basisregisters.GrAr.Oslo;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.Connector;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore;
@@ -50,6 +51,7 @@ namespace BuildingRegistry.Projections.Feed.BuildingUnitFeed
                     var status = MapBuildingUnitStatus(BuildingUnitStatus.Parse(buildingUnit.Status));
                     var function = MapBuildingUnitFunction(BuildingUnitFunction.Parse(buildingUnit.Function));
                     var geometryMethod = MapBuildingUnitGeometryMethod(BuildingUnitPositionGeometryMethod.Parse(buildingUnit.GeometryMethod));
+                    var addressPersistentLocalIds = buildingUnit.AddressPersistentLocalIds.ToList();
 
                     var document = new BuildingUnitDocument(
                         buildingUnit.BuildingUnitPersistentLocalId,
@@ -60,6 +62,7 @@ namespace BuildingRegistry.Projections.Feed.BuildingUnitFeed
                         message.Message.Provenance.Timestamp);
 
                     document.IsRemoved = buildingUnit.IsRemoved;
+                    document.Document.AddressPersistentLocalIds = addressPersistentLocalIds;
 
                     var geometry = GmlHelpers.ParseGeometry(buildingUnit.ExtendedWkbGeometry);
                     document.Document.ExtendedWkbGeometry = buildingUnit.ExtendedWkbGeometry;
@@ -72,7 +75,8 @@ namespace BuildingRegistry.Projections.Feed.BuildingUnitFeed
                         new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.StatusName, null, document.Document.Status),
                         new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.Function, null, document.Document.Function),
                         new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.GeometryMethod, null, document.Document.GeometryMethod),
-                        new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.Position, null, CreatePositionValues(geometry))
+                        new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.Position, null, CreatePositionValues(geometry)),
+                        new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.AdresIds, null, BuildAddressPuris(addressPersistentLocalIds))
                     ];
 
                     await AddCloudEvent(message, document, context, attributes, BuildingUnitEventTypes.CreateV1);
@@ -157,7 +161,8 @@ namespace BuildingRegistry.Projections.Feed.BuildingUnitFeed
                     new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.StatusName, null, GebouweenheidStatus.Gepland),
                     new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.Function, null, function),
                     new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.GeometryMethod, null, geometryMethod),
-                    new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.Position, null, CreatePositionValues(geometry))
+                    new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.Position, null, CreatePositionValues(geometry)),
+                    new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.AdresIds, null, new List<string>())
                 ];
 
                 await AddCloudEvent(message, document, context, attributes, BuildingUnitEventTypes.CreateV1);
@@ -187,7 +192,8 @@ namespace BuildingRegistry.Projections.Feed.BuildingUnitFeed
                     new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.StatusName, null, status),
                     new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.Function, null, GebouweenheidFunctie.GemeenschappelijkDeel),
                     new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.GeometryMethod, null, geometryMethod),
-                    new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.Position, null, CreatePositionValues(geometry))
+                    new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.Position, null, CreatePositionValues(geometry)),
+                    new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.AdresIds, null, new List<string>())
                 ];
 
                 await AddCloudEvent(message, document, context, attributes, BuildingUnitEventTypes.CreateV1);
@@ -198,6 +204,7 @@ namespace BuildingRegistry.Projections.Feed.BuildingUnitFeed
                 var status = MapBuildingUnitStatus(BuildingUnitStatus.Parse(message.Message.BuildingUnitStatus));
                 var function = MapBuildingUnitFunction(BuildingUnitFunction.Parse(message.Message.Function));
                 var geometryMethod = MapBuildingUnitGeometryMethod(BuildingUnitPositionGeometryMethod.Parse(message.Message.GeometryMethod));
+                var addressPersistentLocalIds = message.Message.AddressPersistentLocalIds.ToList();
 
                 var document = new BuildingUnitDocument(
                     message.Message.BuildingUnitPersistentLocalId,
@@ -206,6 +213,8 @@ namespace BuildingRegistry.Projections.Feed.BuildingUnitFeed
                     function,
                     geometryMethod,
                     message.Message.Provenance.Timestamp);
+
+                document.Document.AddressPersistentLocalIds = addressPersistentLocalIds;
 
                 var geometry = GmlHelpers.ParseGeometry(message.Message.ExtendedWkbGeometry);
                 document.Document.ExtendedWkbGeometry = message.Message.ExtendedWkbGeometry;
@@ -218,7 +227,8 @@ namespace BuildingRegistry.Projections.Feed.BuildingUnitFeed
                     new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.StatusName, null, status),
                     new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.Function, null, function),
                     new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.GeometryMethod, null, geometryMethod),
-                    new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.Position, null, CreatePositionValues(geometry))
+                    new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.Position, null, CreatePositionValues(geometry)),
+                    new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.AdresIds, null, BuildAddressPuris(addressPersistentLocalIds))
                 ];
 
                 await AddCloudEvent(message, document, context, attributes, BuildingUnitEventTypes.CreateV1);
@@ -430,6 +440,7 @@ namespace BuildingRegistry.Projections.Feed.BuildingUnitFeed
                 document.Document.Status = status;
                 document.Document.Function = function;
                 document.Document.GeometryMethod = geometryMethod;
+                document.Document.AddressPersistentLocalIds = new List<int>();
 
                 var geometry = GmlHelpers.ParseGeometry(message.Message.ExtendedWkbGeometry);
                 document.Document.ExtendedWkbGeometry = message.Message.ExtendedWkbGeometry;
@@ -441,7 +452,8 @@ namespace BuildingRegistry.Projections.Feed.BuildingUnitFeed
                     new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.StatusName, null, status),
                     new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.Function, null, function),
                     new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.GeometryMethod, null, geometryMethod),
-                    new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.Position, null, CreatePositionValues(geometry))
+                    new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.Position, null, CreatePositionValues(geometry)),
+                    new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.AdresIds, null, new List<string>())
                 ];
 
                 await AddCloudEvent(message, document, context, attributes, BuildingUnitEventTypes.CreateV1);
@@ -451,14 +463,143 @@ namespace BuildingRegistry.Projections.Feed.BuildingUnitFeed
             When<Envelope<BuildingUnitRegularizationWasCorrected>>(DoNothing);
             When<Envelope<BuildingUnitWasDeregulated>>(DoNothing);
             When<Envelope<BuildingUnitDeregulationWasCorrected>>(DoNothing);
-            When<Envelope<BuildingUnitAddressWasAttachedV2>>(DoNothing);
-            When<Envelope<BuildingUnitAddressWasDetachedV2>>(DoNothing);
-            When<Envelope<BuildingUnitAddressWasDetachedBecauseAddressWasRejected>>(DoNothing);
-            When<Envelope<BuildingUnitAddressWasDetachedBecauseAddressWasRemoved>>(DoNothing);
-            When<Envelope<BuildingUnitAddressWasDetachedBecauseAddressWasRetired>>(DoNothing);
-            When<Envelope<BuildingUnitAddressWasReplacedBecauseAddressWasReaddressed>>(DoNothing);
-            When<Envelope<BuildingUnitAddressWasReplacedBecauseOfMunicipalityMerger>>(DoNothing);
-            When<Envelope<BuildingBuildingUnitsAddressesWereReaddressed>>(DoNothing);
+
+            When<Envelope<BuildingUnitAddressWasAttachedV2>>(async (context, message, ct) =>
+            {
+                var document = await FindDocument(context, message.Message.BuildingUnitPersistentLocalId, ct);
+                var oldAddressPuris = BuildAddressPuris(document.Document.AddressPersistentLocalIds);
+                document.Document.AddressPersistentLocalIds.Add(message.Message.AddressPersistentLocalId);
+                var newAddressPuris = BuildAddressPuris(document.Document.AddressPersistentLocalIds);
+                document.LastChangedOn = message.Message.Provenance.Timestamp;
+
+                await AddCloudEvent(message, document, context,
+                [
+                    new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.AdresIds, oldAddressPuris, newAddressPuris)
+                ]);
+            });
+
+            When<Envelope<BuildingUnitAddressWasDetachedV2>>(async (context, message, ct) =>
+            {
+                var document = await FindDocument(context, message.Message.BuildingUnitPersistentLocalId, ct);
+                var oldAddressPuris = BuildAddressPuris(document.Document.AddressPersistentLocalIds);
+                document.Document.AddressPersistentLocalIds.Remove(message.Message.AddressPersistentLocalId);
+                var newAddressPuris = BuildAddressPuris(document.Document.AddressPersistentLocalIds);
+                document.LastChangedOn = message.Message.Provenance.Timestamp;
+
+                await AddCloudEvent(message, document, context,
+                [
+                    new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.AdresIds, oldAddressPuris, newAddressPuris)
+                ]);
+            });
+
+            When<Envelope<BuildingUnitAddressWasDetachedBecauseAddressWasRejected>>(async (context, message, ct) =>
+            {
+                var document = await FindDocument(context, message.Message.BuildingUnitPersistentLocalId, ct);
+                var oldAddressPuris = BuildAddressPuris(document.Document.AddressPersistentLocalIds);
+                document.Document.AddressPersistentLocalIds.Remove(message.Message.AddressPersistentLocalId);
+                var newAddressPuris = BuildAddressPuris(document.Document.AddressPersistentLocalIds);
+                document.LastChangedOn = message.Message.Provenance.Timestamp;
+
+                await AddCloudEvent(message, document, context,
+                [
+                    new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.AdresIds, oldAddressPuris, newAddressPuris)
+                ]);
+            });
+
+            When<Envelope<BuildingUnitAddressWasDetachedBecauseAddressWasRemoved>>(async (context, message, ct) =>
+            {
+                var document = await FindDocument(context, message.Message.BuildingUnitPersistentLocalId, ct);
+                var oldAddressPuris = BuildAddressPuris(document.Document.AddressPersistentLocalIds);
+                document.Document.AddressPersistentLocalIds.Remove(message.Message.AddressPersistentLocalId);
+                var newAddressPuris = BuildAddressPuris(document.Document.AddressPersistentLocalIds);
+                document.LastChangedOn = message.Message.Provenance.Timestamp;
+
+                await AddCloudEvent(message, document, context,
+                [
+                    new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.AdresIds, oldAddressPuris, newAddressPuris)
+                ]);
+            });
+
+            When<Envelope<BuildingUnitAddressWasDetachedBecauseAddressWasRetired>>(async (context, message, ct) =>
+            {
+                var document = await FindDocument(context, message.Message.BuildingUnitPersistentLocalId, ct);
+                var oldAddressPuris = BuildAddressPuris(document.Document.AddressPersistentLocalIds);
+                document.Document.AddressPersistentLocalIds.Remove(message.Message.AddressPersistentLocalId);
+                var newAddressPuris = BuildAddressPuris(document.Document.AddressPersistentLocalIds);
+                document.LastChangedOn = message.Message.Provenance.Timestamp;
+
+                await AddCloudEvent(message, document, context,
+                [
+                    new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.AdresIds, oldAddressPuris, newAddressPuris)
+                ]);
+            });
+
+            When<Envelope<BuildingUnitAddressWasReplacedBecauseAddressWasReaddressed>>(async (context, message, ct) =>
+            {
+                var document = await FindDocument(context, message.Message.BuildingUnitPersistentLocalId, ct);
+                var oldAddressPuris = BuildAddressPuris(document.Document.AddressPersistentLocalIds);
+
+                document.Document.AddressPersistentLocalIds.Remove(message.Message.PreviousAddressPersistentLocalId);
+                document.Document.AddressPersistentLocalIds.Add(message.Message.NewAddressPersistentLocalId); //this can cause doubles, but we'll build the uri's unique
+
+                var newAddressPuris = BuildAddressPuris(document.Document.AddressPersistentLocalIds);
+                document.LastChangedOn = message.Message.Provenance.Timestamp;
+
+                await AddCloudEvent(message, document, context,
+                [
+                    new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.AdresIds, oldAddressPuris, newAddressPuris)
+                ]);
+            });
+
+            When<Envelope<BuildingUnitAddressWasReplacedBecauseOfMunicipalityMerger>>(async (context, message, ct) =>
+            {
+                var document = await FindDocument(context, message.Message.BuildingUnitPersistentLocalId, ct);
+                var oldAddressPuris = BuildAddressPuris(document.Document.AddressPersistentLocalIds);
+
+                document.Document.AddressPersistentLocalIds.Remove(message.Message.PreviousAddressPersistentLocalId);
+                if (!document.Document.AddressPersistentLocalIds.Contains(message.Message.NewAddressPersistentLocalId))
+                {
+                    document.Document.AddressPersistentLocalIds.Add(message.Message.NewAddressPersistentLocalId);
+                }
+
+                var newAddressPuris = BuildAddressPuris(document.Document.AddressPersistentLocalIds);
+                document.LastChangedOn = message.Message.Provenance.Timestamp;
+
+                await AddCloudEvent(message, document, context,
+                [
+                    new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.AdresIds, oldAddressPuris, newAddressPuris)
+                ]);
+            });
+
+            When<Envelope<BuildingBuildingUnitsAddressesWereReaddressed>>(async (context, message, ct) =>
+            {
+                foreach (var buildingUnitReaddress in message.Message.BuildingUnitsReaddresses)
+                {
+                    var document = await FindDocument(context, buildingUnitReaddress.BuildingUnitPersistentLocalId, ct);
+                    var oldAddressPuris = BuildAddressPuris(document.Document.AddressPersistentLocalIds);
+
+                    foreach (var addressPersistentLocalId in buildingUnitReaddress.DetachedAddressPersistentLocalIds)
+                    {
+                        document.Document.AddressPersistentLocalIds.Remove(addressPersistentLocalId);
+                    }
+
+                    foreach (var addressPersistentLocalId in buildingUnitReaddress.AttachedAddressPersistentLocalIds)
+                    {
+                        if (!document.Document.AddressPersistentLocalIds.Contains(addressPersistentLocalId))
+                        {
+                            document.Document.AddressPersistentLocalIds.Add(addressPersistentLocalId);
+                        }
+                    }
+
+                    var newAddressPuris = BuildAddressPuris(document.Document.AddressPersistentLocalIds);
+                    document.LastChangedOn = message.Message.Provenance.Timestamp;
+
+                    await AddCloudEvent(message, document, context,
+                    [
+                        new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.AdresIds, oldAddressPuris, newAddressPuris)
+                    ]);
+                }
+            });
 
             #endregion
         }
@@ -607,6 +748,14 @@ namespace BuildingRegistry.Projections.Feed.BuildingUnitFeed
             }
 
             return list;
+        }
+
+        private static List<string> BuildAddressPuris(IEnumerable<int> addressPersistentLocalIds)
+        {
+            return addressPersistentLocalIds
+                .Select(id => OsloNamespaces.Adres.ToPuri(id.ToString()))
+                .Distinct()
+                .ToList();
         }
 
         private static Task DoNothing<T>(FeedContext context, Envelope<T> envelope, CancellationToken ct) where T : IMessage => Task.CompletedTask;

@@ -1,6 +1,7 @@
 namespace BuildingRegistry.Projections.Feed.BuildingUnitFeed
 {
     using System;
+    using System.Collections.Generic;
     using Be.Vlaanderen.Basisregisters.GrAr.Common;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy.Gebouweenheid;
@@ -75,6 +76,7 @@ namespace BuildingRegistry.Projections.Feed.BuildingUnitFeed
         public PositieGeometrieMethode GeometryMethod { get; set; }
         public string PositionAsGml { get; set; } = string.Empty;
         public string ExtendedWkbGeometry { get; set; } = string.Empty;
+        public List<int> AddressPersistentLocalIds { get; set; } = new();
 
         public DateTimeOffset VersionId { get; set; }
     }
@@ -112,6 +114,8 @@ namespace BuildingRegistry.Projections.Feed.BuildingUnitFeed
 
             b.Ignore(x => x.LastChangedOn);
             b.Ignore(x => x.RecordCreatedAt);
+
+            b.HasIndex(x => x.BuildingPersistentLocalId);
         }
     }
 }

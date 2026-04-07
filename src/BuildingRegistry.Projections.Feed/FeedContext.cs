@@ -35,12 +35,12 @@ namespace BuildingRegistry.Projections.Feed
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.HasSequence<long>("BuildingFeedSequence", Schema.Feed)
+            modelBuilder.HasSequence<long>(BuildingFeedConfiguration.SequenceName, Schema.Feed)
                 .StartsAt(1)
                 .IncrementsBy(1)
                 .IsCyclic(false);
 
-            modelBuilder.HasSequence<long>("BuildingUnitFeedSequence", Schema.Feed)
+            modelBuilder.HasSequence<long>(BuildingUnitFeedConfiguration.SequenceName, Schema.Feed)
                 .StartsAt(1)
                 .IncrementsBy(1)
                 .IsCyclic(false);

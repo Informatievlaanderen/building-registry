@@ -33,6 +33,7 @@ namespace BuildingRegistry.Projections.Feed.BuildingFeed
     public class BuildingFeedConfiguration : IEntityTypeConfiguration<BuildingFeedItem>
     {
         private const string TableName = "BuildingFeed";
+        public const string SequenceName = "BuildingFeedSequence";
 
         public void Configure(EntityTypeBuilder<BuildingFeedItem> b)
         {
@@ -41,7 +42,7 @@ namespace BuildingRegistry.Projections.Feed.BuildingFeed
                 .IsClustered();
 
             b.Property(x => x.Id)
-                .UseHiLo("BuildingFeedSequence", Schema.Feed);
+                .UseHiLo(SequenceName, Schema.Feed);
 
             b.Property(x => x.BuildingPersistentLocalId)
                 .IsRequired();
