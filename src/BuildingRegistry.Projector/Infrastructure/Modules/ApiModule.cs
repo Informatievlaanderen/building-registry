@@ -8,6 +8,7 @@ namespace BuildingRegistry.Projector.Infrastructure.Modules
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Autofac;
     using Be.Vlaanderen.Basisregisters.Projector;
     using Be.Vlaanderen.Basisregisters.Projector.ConnectedProjections;
+    using Be.Vlaanderen.Basisregisters.GrAr.ChangeFeed;
     using Be.Vlaanderen.Basisregisters.Projector.Modules;
     using Be.Vlaanderen.Basisregisters.Shaperon;
     using BuildingRegistry.Infrastructure;
@@ -15,6 +16,8 @@ namespace BuildingRegistry.Projector.Infrastructure.Modules
     using BuildingRegistry.Projections.Extract.BuildingExtract;
     using BuildingRegistry.Projections.Extract.BuildingUnitAddressLinkExtractWithCount;
     using BuildingRegistry.Projections.Extract.BuildingUnitExtract;
+    using BuildingRegistry.Projections.Feed;
+    using BuildingRegistry.Projections.Feed.BuildingFeed;
     using BuildingRegistry.Projections.Integration;
     using BuildingRegistry.Projections.Integration.Building.LatestItem;
     using BuildingRegistry.Projections.Integration.Building.Version;
@@ -34,6 +37,7 @@ namespace BuildingRegistry.Projector.Infrastructure.Modules
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Logging;
     using Microsoft.Extensions.Options;
+    using Newtonsoft.Json;
     using BuildingVersionFromMigration = BuildingRegistry.Projections.Integration.Building.VersionFromMigration.BuildingVersionProjections;
 
     public class ApiModule : Module
@@ -79,6 +83,7 @@ namespace BuildingRegistry.Projector.Infrastructure.Modules
             RegisterLastChangedProjections(builder);
 
             RegisterExtractProjectionsV2(builder);
+            RegisterFeedProjections(builder);
             RegisterLegacyProjectionsV2(builder);
             RegisterWmsProjectionsV2(builder);
             RegisterWfsProjectionsV2(builder);
@@ -120,6 +125,39 @@ namespace BuildingRegistry.Projector.Infrastructure.Modules
                     context => new BuildingUnitAddressLinkExtractProjections(DbaseCodePage.Western_European_ANSI.ToEncoding()),
                     ConnectedProjectionSettings.Default)
                 ;
+        }
+
+        private void RegisterFeedProjections(ContainerBuilder builder)
+        {
+            var jsonSerializerSettings = EventsJsonSerializerSettingsProvider.CreateSerializerSettings();
+
+            builder
+                .RegisterModule(
+                    new FeedModule(
+                        _configuration,
+                        _services,
+                        _loggerFactory,
+                        jsonSerializerSettings));
+
+            builder
+                .Register(_ =>
+                {
+                    var connectionString = _configuration.GetConnectionString("IntegrationProjections")
+                                           ?? _configuration.GetConnectionString("FeedProjections")!;
+                    return new MunicipalityGeometryRepository(connectionString);
+                })
+                .As<IMunicipalityGeometryRepository>()
+                .SingleInstance();
+
+            builder
+                .RegisterProjectionMigrator<FeedContextMigrationFactory>(
+                    _configuration,
+                    _loggerFactory)
+                .RegisterProjections<BuildingFeedProjections, FeedContext>(
+                    context => new BuildingFeedProjections(
+                        context.Resolve<IChangeFeedService>(),
+                        context.Resolve<IMunicipalityGeometryRepository>()),
+                    ConnectedProjectionSettings.Default);
         }
 
         private void RegisterLastChangedProjections(ContainerBuilder builder)

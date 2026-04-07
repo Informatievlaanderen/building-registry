@@ -20,6 +20,7 @@ namespace BuildingRegistry.Projector.Projections
         {
             RegisterConnectionString(Schema.Legacy, configuration.GetConnectionString("LegacyProjections"));
             RegisterConnectionString(Schema.Extract, configuration.GetConnectionString("ExtractProjections"));
+            RegisterConnectionString(Schema.Feed, configuration.GetConnectionString("FeedProjections"));
             RegisterConnectionString(Schema.Wms, configuration.GetConnectionString("WmsProjections"));
             RegisterConnectionString(Schema.Integration, configuration.GetConnectionString("IntegrationProjections"));
         }
