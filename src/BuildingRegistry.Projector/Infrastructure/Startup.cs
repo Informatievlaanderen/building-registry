@@ -12,7 +12,9 @@ namespace BuildingRegistry.Projector.Infrastructure
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.LastChangedList;
     using Be.Vlaanderen.Basisregisters.Projector;
     using Be.Vlaanderen.Basisregisters.Projector.ConnectedProjections;
+    using Be.Vlaanderen.Basisregisters.GrAr.ChangeFeed;
     using BuildingRegistry.Projections.Extract;
+    using BuildingRegistry.Projections.Feed;
     using BuildingRegistry.Projections.Integration.Infrastructure;
     using BuildingRegistry.Projections.Legacy;
     using BuildingRegistry.Projections.Wfs;
@@ -143,6 +145,10 @@ namespace BuildingRegistry.Projector.Infrastructure
                                 $"dbcontext-{nameof(WfsContext).ToLowerInvariant()}",
                                 tags: new[] { DatabaseTag, "sql", "sqlserver" });
 
+                            health.AddDbContextCheck<FeedContext>(
+                                $"dbcontext-{nameof(FeedContext).ToLowerInvariant()}",
+                                tags: new[] { DatabaseTag, "sql", "sqlserver" });
+
                             health.AddCheck<ProjectionsHealthCheck>(
                                 "projections",
                                 failureStatus: HealthStatus.Unhealthy,
@@ -151,7 +157,8 @@ namespace BuildingRegistry.Projector.Infrastructure
                     }
                 })
                 .Configure<ExtractConfig>(_configuration.GetSection("Extract"))
-                .Configure<IntegrationOptions>(_configuration.GetSection("Integration"));
+                .Configure<IntegrationOptions>(_configuration.GetSection("Integration"))
+                .Configure<ChangeFeedConfig>(_configuration.GetSection("BuildingFeed"));
 
             services.AddSingleton<ProjectionsHealthCheck>(
                 c => new ProjectionsHealthCheck(

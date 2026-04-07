@@ -8,6 +8,7 @@ namespace BuildingRegistry.Tests
     using System.Text;
     using Api.BackOffice.Abstractions;
     using Be.Vlaanderen.Basisregisters.EventHandling;
+    using Be.Vlaanderen.Basisregisters.GrAr.ChangeFeed;
     using Be.Vlaanderen.Basisregisters.GrAr.Oslo.SnapshotProducer;
     using Be.Vlaanderen.Basisregisters.MessageHandling.Kafka.Producer;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.Connector;
@@ -19,7 +20,6 @@ namespace BuildingRegistry.Tests
     using Microsoft.Extensions.Options;
     using Moq;
     using NetTopologySuite.IO;
-    using Newtonsoft.Json;
     using Producer;
     using Producer.Snapshot.Oslo;
     using Projections.BackOffice;
@@ -27,6 +27,8 @@ namespace BuildingRegistry.Tests
     using Projections.Extract.BuildingExtract;
     using Projections.Extract.BuildingUnitAddressLinkExtractWithCount;
     using Projections.Extract.BuildingUnitExtract;
+    using Projections.Feed;
+    using Projections.Feed.BuildingFeed;
     using Projections.Integration;
     using Projections.Integration.Building.LatestItem;
     using Projections.Integration.Building.Version;
@@ -148,6 +150,11 @@ namespace BuildingRegistry.Tests
                 new BuildingDetailV2Projections(),
                 new BuildingUnitDetailV2Projections(),
                 new BuildingSyndicationProjections()
+            }];
+
+            yield return [new List<ConnectedProjection<FeedContext>>
+            {
+                new BuildingFeedProjections(Mock.Of<IChangeFeedService>(), Mock.Of<IMunicipalityGeometryRepository>()),
             }];
 
             yield return [new List<ConnectedProjection<WmsContext>>
