@@ -1,6 +1,7 @@
 namespace BuildingRegistry.Projections.Feed
 {
     using BuildingFeed;
+    using BuildingUnitFeed;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.Runner;
     using Infrastructure;
     using Microsoft.EntityFrameworkCore;
@@ -15,6 +16,12 @@ namespace BuildingRegistry.Projections.Feed
         public DbSet<BuildingFeedItem> BuildingFeed => Set<BuildingFeedItem>();
 
         public DbSet<BuildingDocument> BuildingDocuments => Set<BuildingDocument>();
+
+        public DbSet<BuildingUnitFeedItem> BuildingUnitFeed => Set<BuildingUnitFeedItem>();
+
+        public DbSet<BuildingUnitDocument> BuildingUnitDocuments => Set<BuildingUnitDocument>();
+
+        public DbSet<BuildingGeometryForBuildingUnit> BuildingGeometryForBuildingUnit => Set<BuildingGeometryForBuildingUnit>();
 
         // This needs to be here to please EF
         public FeedContext() { }
@@ -33,10 +40,18 @@ namespace BuildingRegistry.Projections.Feed
                 .IncrementsBy(1)
                 .IsCyclic(false);
 
+            modelBuilder.HasSequence<long>("BuildingUnitFeedSequence", Schema.Feed)
+                .StartsAt(1)
+                .IncrementsBy(1)
+                .IsCyclic(false);
+
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.ApplyConfiguration(new BuildingFeedConfiguration());
             modelBuilder.ApplyConfiguration(new BuildingDocumentConfiguration(_jsonSerializerSettings));
+            modelBuilder.ApplyConfiguration(new BuildingUnitFeedConfiguration());
+            modelBuilder.ApplyConfiguration(new BuildingUnitDocumentConfiguration(_jsonSerializerSettings));
+            modelBuilder.ApplyConfiguration(new BuildingGeometryForBuildingUnitConfiguration());
         }
     }
 }

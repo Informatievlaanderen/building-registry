@@ -59,6 +59,17 @@
           "Be.Vlaanderen.Basisregisters.Shaperon": "11.0.0"
         }
       },
+      "Be.Vlaanderen.Basisregisters.GrAr.Legacy": {
+        "type": "Direct",
+        "requested": "[22.10.0, )",
+        "resolved": "22.10.0",
+        "contentHash": "u8giUwDCPxtwtqARPZMOcacbM/sEwFnZCdb8Vqq9wo2hiRphyu2W6E1zXC5AsWxQSQjJrkyzFat4l/wWplKDRQ==",
+        "dependencies": {
+          "Be.Vlaanderen.Basisregisters.GrAr.Common": "22.10.0",
+          "Be.Vlaanderen.Basisregisters.Utilities.Rfc3339DateTimeOffset": "5.0.0",
+          "Newtonsoft.Json": "13.0.3"
+        }
+      },
       "Be.Vlaanderen.Basisregisters.GrAr.Oslo": {
         "type": "Direct",
         "requested": "[22.10.0, )",
@@ -1860,17 +1871,6 @@
         "requested": "[5.0.0, )",
         "resolved": "5.0.0",
         "contentHash": "YlSC0DHwE0vHgVmEOUQDF/6muu8Q+uv3gZWkS+0lKg6UocSUWa9VpBCciLnwLoSW7oIA+viSuBm4bGMWKrchDg=="
-      },
-      "Be.Vlaanderen.Basisregisters.GrAr.Legacy": {
-        "type": "CentralTransitive",
-        "requested": "[22.10.0, )",
-        "resolved": "22.10.0",
-        "contentHash": "u8giUwDCPxtwtqARPZMOcacbM/sEwFnZCdb8Vqq9wo2hiRphyu2W6E1zXC5AsWxQSQjJrkyzFat4l/wWplKDRQ==",
-        "dependencies": {
-          "Be.Vlaanderen.Basisregisters.GrAr.Common": "22.10.0",
-          "Be.Vlaanderen.Basisregisters.Utilities.Rfc3339DateTimeOffset": "5.0.0",
-          "Newtonsoft.Json": "13.0.3"
-        }
       },
       "Be.Vlaanderen.Basisregisters.GrAr.Provenance": {
         "type": "CentralTransitive",
