@@ -3,8 +3,10 @@ namespace BuildingRegistry.Projector.Infrastructure.Modules
     using Autofac;
     using Autofac.Extensions.DependencyInjection;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
+    using Be.Vlaanderen.Basisregisters.AspNetCore.Mvc.Formatters.Json;
     using Be.Vlaanderen.Basisregisters.EventHandling;
     using Be.Vlaanderen.Basisregisters.EventHandling.Autofac;
+    using Be.Vlaanderen.Basisregisters.ProjectionHandling.LastChangedList;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Autofac;
     using Be.Vlaanderen.Basisregisters.Projector;
     using Be.Vlaanderen.Basisregisters.Projector.ConnectedProjections;
@@ -139,6 +141,14 @@ namespace BuildingRegistry.Projector.Infrastructure.Modules
                         _loggerFactory,
                         jsonSerializerSettings));
 
+            builder.Register(c => new ChangeFeedService(
+                    c.Resolve<IOptions<ChangeFeedConfig>>().Value,
+                    c.Resolve<LastChangedListContext>(),
+                    new JsonSerializerSettings().ConfigureDefaultForApi()))
+                .AsImplementedInterfaces()
+                .AsSelf()
+                .InstancePerLifetimeScope();
+
             builder
                 .Register(_ =>
                 {
@@ -157,7 +167,11 @@ namespace BuildingRegistry.Projector.Infrastructure.Modules
                     context => new BuildingFeedProjections(
                         context.Resolve<IChangeFeedService>(),
                         context.Resolve<IMunicipalityGeometryRepository>()),
-                    ConnectedProjectionSettings.Default);
+                    ConnectedProjectionSettings.Configure(c =>
+                    {
+                        c.ConfigureCatchUpPageSize(1);
+                        c.ConfigureCatchUpUpdatePositionMessageInterval(1);
+                    }));
         }
 
         private void RegisterLastChangedProjections(ContainerBuilder builder)

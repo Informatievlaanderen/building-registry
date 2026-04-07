@@ -29,6 +29,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\BuildingRegistry.Consumer.Read.Parcel\BuildingRegistry.Consumer.Read.Parcel.csproj" PrivateAssets="All" />
+    <ProjectReference Include="..\BuildingRegistry.Projections.Feed\BuildingRegistry.Projections.Feed.csproj" PrivateAssets="All" />
     <ProjectReference Include="..\BuildingRegistry.Projections.Legacy\BuildingRegistry.Projections.Legacy.csproj" PrivateAssets="All" />
     <ProjectReference Include="..\BuildingRegistry\BuildingRegistry.csproj" PrivateAssets="All" />
   </ItemGroup>
@@ -59,6 +60,9 @@
     <ItemGroup>
       <BuildOutputInPackage Include="$(MSBuildProjectDirectory)\$(OutputPath)BuildingRegistry.Projections.Legacy.dll" />
       <BuildOutputInPackage Include="$(MSBuildProjectDirectory)\$(OutputPath)BuildingRegistry.Projections.Legacy.pdb" />
+
+      <BuildOutputInPackage Include="$(MSBuildProjectDirectory)\$(OutputPath)BuildingRegistry.Projections.Feed.dll" />
+      <BuildOutputInPackage Include="$(MSBuildProjectDirectory)\$(OutputPath)BuildingRegistry.Projections.Feed.pdb" />
 
       <BuildOutputInPackage Include="$(MSBuildProjectDirectory)\$(OutputPath)BuildingRegistry.dll" />
       <BuildOutputInPackage Include="$(MSBuildProjectDirectory)\$(OutputPath)BuildingRegistry.pdb" />
