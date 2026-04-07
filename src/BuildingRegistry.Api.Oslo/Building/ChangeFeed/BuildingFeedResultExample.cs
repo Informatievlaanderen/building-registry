@@ -21,20 +21,20 @@ namespace BuildingRegistry.Api.Oslo.Building.ChangeFeed
                             {
                                 "specversion": "1.0",
                                  "id": "2",
-                                 "time": "2023-11-02T07:37:09.2309729+01:00",
+                                 "time": "2023-11-02T07:24:43.9174449+01:00",
                                  "type": "basisregisters.building.create.v1",
                                  "source": "{{_responseOptions.BuildingFeed.FeedUrl}}",
                                  "datacontenttype": "application/json",
                                  "dataschema": "{{_responseOptions.BuildingFeed.DataSchemaUrl}}",
                                  "basisregisterseventtype": "BuildingWasMigrated",
-                                 "basisregisterscausationid": "0870f9b0-bba0-5444-9f76-4316e9f8cc0f",
+                                 "basisregisterscausationid": "e675177c-b243-550d-acff-1a4891bbf669",
                                  "data": {
-                                     "@id": "https://data.vlaanderen.be/id/gebouw/200001",
-                                     "objectId": "200001",
+                                     "@id": "https://data.vlaanderen.be/id/gebouw/6763967",
+                                     "objectId": "6763967",
                                      "naamruimte": "https://data.vlaanderen.be/id/gebouw",
-                                     "versieId": "2023-11-02T07:37:09+01:00",
+                                     "versieId": "2023-11-02T07:24:43+01:00",
                                      "nisCodes": [
-                                         "34042"
+                                         "23052"
                                      ],
                                      "attributen": [
                                          {
@@ -43,7 +43,7 @@ namespace BuildingRegistry.Api.Oslo.Building.ChangeFeed
                                              "nieuweWaarde": "gerealiseerd"
                                          },
                                          {
-                                             "naam": "gebouwMethode",
+                                             "naam": "geometrieMethode",
                                              "oudeWaarde": null,
                                              "nieuweWaarde": "ingemetenGRB"
                                          },
