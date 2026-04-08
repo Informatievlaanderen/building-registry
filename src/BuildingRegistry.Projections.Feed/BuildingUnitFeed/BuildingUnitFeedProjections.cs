@@ -686,9 +686,9 @@ namespace BuildingRegistry.Projections.Feed.BuildingUnitFeed
                         new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.AdresIds, oldAddressPuris, newAddressPuris)
                     ]);
                 }
-
-                When<Envelope<BuildingUnitWasMovedOutOfBuilding>>(DoNothing);
             });
+
+            When<Envelope<BuildingUnitWasMovedOutOfBuilding>>(DoNothing);
 
             #endregion
         }
