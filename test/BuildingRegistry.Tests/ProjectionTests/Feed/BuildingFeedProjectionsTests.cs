@@ -120,7 +120,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
                     document.LastChangedOn.Should().Be(buildingWasMigrated.Provenance.Timestamp);
                     document.Document.VersionId.Should().Be(buildingWasMigrated.Provenance.Timestamp.ToBelgianDateTimeOffset());
 
-                    document.Document.PersistentLocalId.Should().Be(buildingWasMigrated.BuildingPersistentLocalId);
+                    document.Document.BuildingPersistentLocalId.Should().Be(buildingWasMigrated.BuildingPersistentLocalId);
                     document.Document.Status.Should().Be(GebouwStatus.Gepland);
                     document.Document.GeometryMethod.Should().Be(GeometrieMethode.Ingeschetst);
                     document.Document.GeometryAsGml.Should().NotBeNullOrEmpty();
@@ -172,7 +172,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
                     document.LastChangedOn.Should().Be(buildingWasPlannedV2.Provenance.Timestamp);
                     document.Document.VersionId.Should().Be(buildingWasPlannedV2.Provenance.Timestamp.ToBelgianDateTimeOffset());
 
-                    document.Document.PersistentLocalId.Should().Be(buildingWasPlannedV2.BuildingPersistentLocalId);
+                    document.Document.BuildingPersistentLocalId.Should().Be(buildingWasPlannedV2.BuildingPersistentLocalId);
                     document.Document.Status.Should().Be(GebouwStatus.Gepland);
                     document.Document.GeometryMethod.Should().Be(GeometrieMethode.Ingeschetst);
                     document.Document.GeometryAsGml.Should().NotBeNullOrEmpty();

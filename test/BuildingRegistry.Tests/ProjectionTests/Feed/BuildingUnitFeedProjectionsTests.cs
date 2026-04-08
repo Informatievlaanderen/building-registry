@@ -99,7 +99,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
                         document.BuildingPersistentLocalId.Should().Be(buildingWasMigrated.BuildingPersistentLocalId);
                         document.RecordCreatedAt.Should().Be(buildingWasMigrated.Provenance.Timestamp);
                         document.LastChangedOn.Should().Be(buildingWasMigrated.Provenance.Timestamp);
-                        document.Document.PersistentLocalId.Should().Be(buildingUnit.BuildingUnitPersistentLocalId);
+                        document.Document.BuildingUnitPersistentLocalId.Should().Be(buildingUnit.BuildingUnitPersistentLocalId);
                         document.Document.PositionAsGml.Should().NotBeNullOrEmpty();
                         document.Document.ExtendedWkbGeometry.Should().Be(buildingUnit.ExtendedWkbGeometry);
                         document.Document.AddressPersistentLocalIds.Should().BeEquivalentTo(buildingUnit.AddressPersistentLocalIds);
@@ -203,7 +203,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
                     document.LastChangedOn.Should().Be(buildingUnitWasPlannedV2.Provenance.Timestamp);
                     document.Document.VersionId.Should().Be(buildingUnitWasPlannedV2.Provenance.Timestamp.ToBelgianDateTimeOffset());
 
-                    document.Document.PersistentLocalId.Should().Be(buildingUnitWasPlannedV2.BuildingUnitPersistentLocalId);
+                    document.Document.BuildingUnitPersistentLocalId.Should().Be(buildingUnitWasPlannedV2.BuildingUnitPersistentLocalId);
                     document.Document.Status.Should().Be(GebouweenheidStatus.Gepland);
                     document.Document.Function.Should().Be(GebouweenheidFunctie.NietGekend);
                     document.Document.GeometryMethod.Should().Be(PositieGeometrieMethode.AangeduidDoorBeheerder);
@@ -595,7 +595,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
                     document.LastChangedOn.Should().Be(commonBuildingUnitWasAddedV2.Provenance.Timestamp);
                     document.Document.VersionId.Should().Be(commonBuildingUnitWasAddedV2.Provenance.Timestamp.ToBelgianDateTimeOffset());
 
-                    document.Document.PersistentLocalId.Should().Be(commonBuildingUnitWasAddedV2.BuildingUnitPersistentLocalId);
+                    document.Document.BuildingUnitPersistentLocalId.Should().Be(commonBuildingUnitWasAddedV2.BuildingUnitPersistentLocalId);
                     document.Document.Function.Should().Be(GebouweenheidFunctie.GemeenschappelijkDeel);
                     document.Document.Status.Should().Be(GebouweenheidStatus.Gepland);
                     document.Document.GeometryMethod.Should().Be(PositieGeometrieMethode.AfgeleidVanObject);

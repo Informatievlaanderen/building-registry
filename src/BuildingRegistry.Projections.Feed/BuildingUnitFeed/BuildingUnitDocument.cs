@@ -13,7 +13,7 @@ namespace BuildingRegistry.Projections.Feed.BuildingUnitFeed
 
     public sealed class BuildingUnitDocument
     {
-        public int PersistentLocalId { get; set; }
+        public int BuildingUnitPersistentLocalId { get; set; }
         public int BuildingPersistentLocalId { get; set; }
         public bool IsRemoved { get; set; }
         public BuildingUnitDocumentContent Document { get; set; }
@@ -45,7 +45,7 @@ namespace BuildingRegistry.Projections.Feed.BuildingUnitFeed
         }
 
         public BuildingUnitDocument(
-            int persistentLocalId,
+            int buildingUnitPersistentLocalId,
             int buildingPersistentLocalId,
             GebouweenheidStatus status,
             GebouweenheidFunctie function,
@@ -53,13 +53,13 @@ namespace BuildingRegistry.Projections.Feed.BuildingUnitFeed
             bool hasDeviation,
             Instant createdTimestamp)
         {
-            PersistentLocalId = persistentLocalId;
+            BuildingUnitPersistentLocalId = buildingUnitPersistentLocalId;
             BuildingPersistentLocalId = buildingPersistentLocalId;
             RecordCreatedAt = createdTimestamp;
 
             Document = new BuildingUnitDocumentContent
             {
-                PersistentLocalId = persistentLocalId,
+                BuildingUnitPersistentLocalId = buildingUnitPersistentLocalId,
                 Status = status,
                 Function = function,
                 GeometryMethod = geometryMethod,
@@ -72,7 +72,7 @@ namespace BuildingRegistry.Projections.Feed.BuildingUnitFeed
 
     public sealed class BuildingUnitDocumentContent
     {
-        public int PersistentLocalId { get; set; }
+        public int BuildingUnitPersistentLocalId { get; set; }
         public GebouweenheidStatus Status { get; set; }
         public GebouweenheidFunctie Function { get; set; }
         public PositieGeometrieMethode GeometryMethod { get; set; }
@@ -96,10 +96,10 @@ namespace BuildingRegistry.Projections.Feed.BuildingUnitFeed
         public void Configure(EntityTypeBuilder<BuildingUnitDocument> b)
         {
             b.ToTable("BuildingUnitDocuments", Schema.Feed)
-                .HasKey(x => x.PersistentLocalId)
+                .HasKey(x => x.BuildingUnitPersistentLocalId)
                 .IsClustered();
 
-            b.Property(x => x.PersistentLocalId)
+            b.Property(x => x.BuildingUnitPersistentLocalId)
                 .ValueGeneratedNever();
 
             b.Property(x => x.BuildingPersistentLocalId);

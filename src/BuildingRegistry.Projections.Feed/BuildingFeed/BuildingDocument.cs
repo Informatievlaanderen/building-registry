@@ -11,7 +11,7 @@ namespace BuildingRegistry.Projections.Feed.BuildingFeed
 
     public sealed class BuildingDocument
     {
-        public int PersistentLocalId { get; set; }
+        public int BuildingPersistentLocalId { get; set; }
         public bool IsRemoved { get; set; }
         public BuildingDocumentContent Document { get; set; }
 
@@ -42,17 +42,17 @@ namespace BuildingRegistry.Projections.Feed.BuildingFeed
         }
 
         public BuildingDocument(
-            int persistentLocalId,
+            int buildingPersistentLocalId,
             GebouwStatus status,
             GeometrieMethode geometryMethod,
             Instant createdTimestamp)
         {
-            PersistentLocalId = persistentLocalId;
+            BuildingPersistentLocalId = buildingPersistentLocalId;
             RecordCreatedAt = createdTimestamp;
 
             Document = new BuildingDocumentContent
             {
-                PersistentLocalId = persistentLocalId,
+                BuildingPersistentLocalId = buildingPersistentLocalId,
                 Status = status,
                 GeometryMethod = geometryMethod,
             };
@@ -63,7 +63,7 @@ namespace BuildingRegistry.Projections.Feed.BuildingFeed
 
     public sealed class BuildingDocumentContent
     {
-        public int PersistentLocalId { get; set; }
+        public int BuildingPersistentLocalId { get; set; }
         public GebouwStatus Status { get; set; }
         public GeometrieMethode GeometryMethod { get; set; }
         public string GeometryAsGml { get; set; } = string.Empty;
@@ -84,10 +84,10 @@ namespace BuildingRegistry.Projections.Feed.BuildingFeed
         public void Configure(EntityTypeBuilder<BuildingDocument> b)
         {
             b.ToTable("BuildingDocuments", Schema.Feed)
-                .HasKey(x => x.PersistentLocalId)
+                .HasKey(x => x.BuildingPersistentLocalId)
                 .IsClustered();
 
-            b.Property(x => x.PersistentLocalId)
+            b.Property(x => x.BuildingPersistentLocalId)
                 .ValueGeneratedNever();
 
             b.Property(x => x.LastChangedOnAsDateTimeOffset)

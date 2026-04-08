@@ -725,7 +725,7 @@ namespace BuildingRegistry.Projections.Feed.BuildingUnitFeed
             var feedItem = new BuildingUnitFeedItem(
                 position: message.Position,
                 page: page,
-                buildingUnitPersistentLocalId: document.PersistentLocalId)
+                buildingUnitPersistentLocalId: document.BuildingUnitPersistentLocalId)
             {
                 Application = message.Message.Provenance.Application,
                 Modification = message.Message.Provenance.Modification,
@@ -739,7 +739,7 @@ namespace BuildingRegistry.Projections.Feed.BuildingUnitFeed
                 feedItem.Id,
                 message.Message.Provenance.Timestamp.ToBelgianDateTimeOffset(),
                 eventType,
-                document.PersistentLocalId.ToString(),
+                document.BuildingUnitPersistentLocalId.ToString(),
                 document.LastChangedOnAsDateTimeOffset,
                 nisCodes,
                 attributes,
