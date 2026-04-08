@@ -11,10 +11,12 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
     using Be.Vlaanderen.Basisregisters.GrAr.Common.NetTopology;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy.Gebouweenheid;
+    using Be.Vlaanderen.Basisregisters.GrAr.Oslo;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.Testing;
     using Building;
+    using Building.Commands;
     using Building.Events;
     using CloudNative.CloudEvents;
     using Fixtures;
@@ -33,6 +35,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
     public sealed class BuildingUnitFeedProjectionsTests
     {
         private const string NisCode = "11001";
+        private static readonly string AddressNamespace = OsloNamespaces.Adres;
 
         private readonly Fixture _fixture;
         private readonly FeedContext _feedContext;
@@ -97,28 +100,37 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
                         document.Document.PersistentLocalId.Should().Be(buildingUnit.BuildingUnitPersistentLocalId);
                         document.Document.PositionAsGml.Should().NotBeNullOrEmpty();
                         document.Document.ExtendedWkbGeometry.Should().Be(buildingUnit.ExtendedWkbGeometry);
+                        document.Document.AddressPersistentLocalIds.Should().BeEquivalentTo(buildingUnit.AddressPersistentLocalIds);
 
                         var feedItem = await FindFeedItemByBuildingUnitPersistentLocalId(context, buildingUnit.BuildingUnitPersistentLocalId);
                         feedItem.Should().NotBeNull();
                         feedItem!.CloudEventAsString.Should().NotBeNullOrEmpty();
-                    }
 
-                    ChangeFeedServiceMock.Verify(x => x.CreateCloudEventWithData(
-                            It.IsAny<long>(),
-                            buildingWasMigrated.Provenance.Timestamp.ToBelgianDateTimeOffset(),
-                            BuildingUnitEventTypes.CreateV1,
-                            It.IsAny<string>(),
-                            buildingWasMigrated.Provenance.Timestamp.ToBelgianDateTimeOffset(),
-                            It.Is<List<string>>(nisCodes => nisCodes.Contains(NisCode)),
-                            It.Is<List<BaseRegistriesCloudEventAttribute>>(attrs =>
-                                attrs.Any(a => a.Name == BuildingUnitAttributeNames.StatusName && a.OldValue == null)
-                                && attrs.Any(a => a.Name == BuildingUnitAttributeNames.Function && a.OldValue == null)
-                                && attrs.Any(a => a.Name == BuildingUnitAttributeNames.GeometryMethod && a.OldValue == null)
-                                && attrs.Any(a => a.Name == BuildingUnitAttributeNames.Position && a.OldValue == null && a.NewValue != null)
-                                && attrs.Any(a => a.Name == BuildingUnitAttributeNames.AdresIds && a.OldValue == null)),
-                            BuildingWasMigrated.EventName,
-                            It.IsAny<string>()),
-                        Times.AtLeastOnce);
+                        var expectedAddressPuris = buildingUnit.AddressPersistentLocalIds
+                            .Select(id => $"{AddressNamespace}/{id}")
+                            .Distinct()
+                            .ToList();
+
+                        ChangeFeedServiceMock.Verify(x => x.CreateCloudEventWithData(
+                                It.IsAny<long>(),
+                                buildingWasMigrated.Provenance.Timestamp.ToBelgianDateTimeOffset(),
+                                BuildingUnitEventTypes.CreateV1,
+                                buildingUnit.BuildingUnitPersistentLocalId.ToString(),
+                                buildingWasMigrated.Provenance.Timestamp.ToBelgianDateTimeOffset(),
+                                It.Is<List<string>>(nisCodes => nisCodes.Contains(NisCode)),
+                                It.Is<List<BaseRegistriesCloudEventAttribute>>(attrs =>
+                                    attrs.Any(a => a.Name == BuildingUnitAttributeNames.StatusName && a.OldValue == null)
+                                    && attrs.Any(a => a.Name == BuildingUnitAttributeNames.Function && a.OldValue == null)
+                                    && attrs.Any(a => a.Name == BuildingUnitAttributeNames.GeometryMethod && a.OldValue == null)
+                                    && attrs.Any(a => a.Name == BuildingUnitAttributeNames.Position && a.OldValue == null && a.NewValue != null)
+                                    && attrs.Any(a => a.Name == BuildingUnitAttributeNames.AdresIds
+                                                   && a.OldValue == null
+                                                   && a.NewValue != null
+                                                   && ((List<string>)a.NewValue).SequenceEqual(expectedAddressPuris))),
+                                BuildingWasMigrated.EventName,
+                                It.IsAny<string>()),
+                            Times.Once);
+                    }
 
                     ChangeFeedServiceMock.Verify(x => x.SerializeCloudEvent(It.IsAny<CloudEvent>()), Times.AtLeastOnce);
                 });
@@ -182,6 +194,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
                     document.Document.Status.Should().Be(GebouweenheidStatus.Gepland);
                     document.Document.PositionAsGml.Should().NotBeNullOrEmpty();
                     document.Document.ExtendedWkbGeometry.Should().Be(buildingUnitWasPlannedV2.ExtendedWkbGeometry);
+                    document.Document.AddressPersistentLocalIds.Should().BeEmpty();
 
                     var feedItem = await FindFeedItemByBuildingUnitPersistentLocalId(context, buildingUnitWasPlannedV2.BuildingUnitPersistentLocalId);
                     AssertFeedItem(feedItem, position + 1, buildingUnitWasPlannedV2);
@@ -205,7 +218,9 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
                                                   && a.OldValue == null
                                                   && a.NewValue != null && AssertPointList((List<BuildingUnitPositionCloudEventValue>)a.NewValue, document.Document.PositionAsGml))
                                 && attrs.Any(a => a.Name == BuildingUnitAttributeNames.AdresIds
-                                                  && a.OldValue == null)),
+                                                  && a.OldValue == null
+                                                  && a.NewValue != null
+                                                  && !((List<string>)a.NewValue).Any())),
                             BuildingUnitWasPlannedV2.EventName,
                             It.IsAny<string>()),
                         Times.Once);
@@ -437,6 +452,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
                     document.Document.GeometryMethod.Should().Be(PositieGeometrieMethode.AangeduidDoorBeheerder);
                     document.Document.PositionAsGml.Should().NotBeNullOrEmpty();
                     document.Document.ExtendedWkbGeometry.Should().Be(buildingUnitRemovalWasCorrected.ExtendedWkbGeometry);
+                    document.Document.AddressPersistentLocalIds.Should().BeEmpty();
                     document.LastChangedOn.Should().Be(buildingUnitRemovalWasCorrected.Provenance.Timestamp);
 
                     ChangeFeedServiceMock.Verify(x => x.CreateCloudEventWithData(
@@ -460,7 +476,9 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
                                                   && a.OldValue == null
                                                   && a.NewValue != null && AssertPointList((List<BuildingUnitPositionCloudEventValue>)a.NewValue, document.Document.PositionAsGml))
                                 && attrs.Any(a => a.Name == BuildingUnitAttributeNames.AdresIds
-                                                  && a.OldValue == null)),
+                                                  && a.OldValue == null
+                                                  && a.NewValue != null
+                                                  && !((List<string>)a.NewValue).Any())),
                             BuildingUnitRemovalWasCorrected.EventName,
                             It.IsAny<string>()),
                         Times.Once);
@@ -496,6 +514,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
                     document.Document.Function.Should().Be(GebouweenheidFunctie.GemeenschappelijkDeel);
                     document.Document.PositionAsGml.Should().NotBeNullOrEmpty();
                     document.Document.ExtendedWkbGeometry.Should().Be(commonBuildingUnitWasAddedV2.ExtendedWkbGeometry);
+                    document.Document.AddressPersistentLocalIds.Should().BeEmpty();
 
                     var feedItem = await FindFeedItemByBuildingUnitPersistentLocalId(context, commonBuildingUnitWasAddedV2.BuildingUnitPersistentLocalId);
                     AssertFeedItem(feedItem, position + 1, commonBuildingUnitWasAddedV2);
@@ -519,7 +538,9 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
                                                   && a.OldValue == null
                                                   && a.NewValue != null && AssertPointList((List<BuildingUnitPositionCloudEventValue>)a.NewValue, document.Document.PositionAsGml))
                                 && attrs.Any(a => a.Name == BuildingUnitAttributeNames.AdresIds
-                                                  && a.OldValue == null)),
+                                                  && a.OldValue == null
+                                                  && a.NewValue != null
+                                                  && !((List<string>)a.NewValue).Any())),
                             CommonBuildingUnitWasAddedV2.EventName,
                             It.IsAny<string>()),
                         Times.Once);
@@ -549,6 +570,13 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
                     document!.Document.AddressPersistentLocalIds.Should().Contain(buildingUnitAddressWasAttached.AddressPersistentLocalId);
                     document.LastChangedOn.Should().Be(buildingUnitAddressWasAttached.Provenance.Timestamp);
 
+                    var oldAddressPuris = new List<string>();
+
+                    var expectedAddressPuris = oldAddressPuris
+                        .Concat([$"{AddressNamespace}/{buildingUnitAddressWasAttached.AddressPersistentLocalId}"])
+                        .Distinct()
+                        .ToList();
+
                     ChangeFeedServiceMock.Verify(x => x.CreateCloudEventWithData(
                             It.IsAny<long>(),
                             buildingUnitAddressWasAttached.Provenance.Timestamp.ToBelgianDateTimeOffset(),
@@ -558,8 +586,8 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
                             It.Is<List<string>>(nisCodes => nisCodes.Contains(NisCode)),
                             It.Is<List<BaseRegistriesCloudEventAttribute>>(attrs =>
                                 attrs.Any(a => a.Name == BuildingUnitAttributeNames.AdresIds
-                                               && a.OldValue != null
-                                               && a.NewValue != null)),
+                                               && ((List<string>)a.OldValue!).SequenceEqual(oldAddressPuris)
+                                               && ((List<string>)a.NewValue!).SequenceEqual(expectedAddressPuris))),
                             BuildingUnitAddressWasAttachedV2.EventName,
                             It.IsAny<string>()),
                         Times.Once);
@@ -593,6 +621,16 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
                     document!.Document.AddressPersistentLocalIds.Should().NotContain(buildingUnitAddressWasDetached.AddressPersistentLocalId);
                     document.LastChangedOn.Should().Be(buildingUnitAddressWasDetached.Provenance.Timestamp);
 
+                    var oldAddressPuris = new List<string>
+                    {
+                        $"{AddressNamespace}/{buildingUnitAddressWasAttached.AddressPersistentLocalId}"
+                    };
+
+                    var expectedAddressPuris = oldAddressPuris
+                        .Except([$"{AddressNamespace}/{buildingUnitAddressWasDetached.AddressPersistentLocalId}"])
+                        .Distinct()
+                        .ToList();
+
                     ChangeFeedServiceMock.Verify(x => x.CreateCloudEventWithData(
                             It.IsAny<long>(),
                             buildingUnitAddressWasDetached.Provenance.Timestamp.ToBelgianDateTimeOffset(),
@@ -602,9 +640,230 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
                             It.Is<List<string>>(nisCodes => nisCodes.Contains(NisCode)),
                             It.Is<List<BaseRegistriesCloudEventAttribute>>(attrs =>
                                 attrs.Any(a => a.Name == BuildingUnitAttributeNames.AdresIds
-                                               && a.OldValue != null
-                                               && a.NewValue != null)),
+                                               && ((List<string>)a.OldValue!).SequenceEqual(oldAddressPuris)
+                                               && ((List<string>)a.NewValue!).SequenceEqual(expectedAddressPuris))),
                             BuildingUnitAddressWasDetachedV2.EventName,
+                            It.IsAny<string>()),
+                        Times.Once);
+                });
+        }
+
+        [Fact]
+        public async Task WhenBuildingUnitAddressWasDetachedBecauseAddressWasRejected_ThenAddressesAreUpdated()
+        {
+            _fixture.Customize(new WithFixedBuildingUnitPersistentLocalId());
+            _fixture.Customize(new WithValidExtendedWkbPoint());
+            var buildingWasPlannedV2 = _fixture.Create<BuildingWasPlannedV2>();
+            var buildingUnitWasPlannedV2 = _fixture.Create<BuildingUnitWasPlannedV2>();
+            var buildingUnitAddressWasAttached = _fixture.Create<BuildingUnitAddressWasAttachedV2>();
+            var buildingUnitAddressWasDetached = new BuildingUnitAddressWasDetachedBecauseAddressWasRejected(
+                new BuildingPersistentLocalId(buildingUnitWasPlannedV2.BuildingPersistentLocalId),
+                new BuildingUnitPersistentLocalId(buildingUnitWasPlannedV2.BuildingUnitPersistentLocalId),
+                new AddressPersistentLocalId(buildingUnitAddressWasAttached.AddressPersistentLocalId));
+            ((ISetProvenance)buildingUnitAddressWasDetached).SetProvenance(_fixture.Create<Provenance>());
+            var position = 1L;
+
+            await Sut
+                .Given(CreateEnvelope(buildingWasPlannedV2, position),
+                    CreateEnvelope(buildingUnitWasPlannedV2, position + 1),
+                    CreateEnvelope(buildingUnitAddressWasAttached, position + 2),
+                    CreateEnvelope(buildingUnitAddressWasDetached, position + 3))
+                .Then(async context =>
+                {
+                    var document = await context.BuildingUnitDocuments.FindAsync(buildingUnitAddressWasDetached.BuildingUnitPersistentLocalId);
+                    document.Should().NotBeNull();
+                    document!.Document.AddressPersistentLocalIds.Should().NotContain(buildingUnitAddressWasDetached.AddressPersistentLocalId);
+                    document.LastChangedOn.Should().Be(buildingUnitAddressWasDetached.Provenance.Timestamp);
+
+                    var oldAddressPuris = new List<string>
+                    {
+                        $"{AddressNamespace}/{buildingUnitAddressWasAttached.AddressPersistentLocalId}"
+                    };
+
+                    var expectedAddressPuris = oldAddressPuris
+                        .Except([$"{AddressNamespace}/{buildingUnitAddressWasDetached.AddressPersistentLocalId}"])
+                        .Distinct()
+                        .ToList();
+
+                    ChangeFeedServiceMock.Verify(x => x.CreateCloudEventWithData(
+                            It.IsAny<long>(),
+                            buildingUnitAddressWasDetached.Provenance.Timestamp.ToBelgianDateTimeOffset(),
+                            BuildingUnitEventTypes.UpdateV1,
+                            buildingUnitAddressWasDetached.BuildingUnitPersistentLocalId.ToString(),
+                            It.IsAny<DateTimeOffset>(),
+                            It.Is<List<string>>(nisCodes => nisCodes.Contains(NisCode)),
+                            It.Is<List<BaseRegistriesCloudEventAttribute>>(attrs =>
+                                attrs.Any(a => a.Name == BuildingUnitAttributeNames.AdresIds
+                                               && ((List<string>)a.OldValue!).SequenceEqual(oldAddressPuris)
+                                               && ((List<string>)a.NewValue!).SequenceEqual(expectedAddressPuris))),
+                            BuildingUnitAddressWasDetachedBecauseAddressWasRejected.EventName,
+                            It.IsAny<string>()),
+                        Times.Once);
+                });
+        }
+
+        [Fact]
+        public async Task WhenBuildingUnitAddressWasDetachedBecauseAddressWasRemoved_ThenAddressesAreUpdated()
+        {
+            _fixture.Customize(new WithFixedBuildingUnitPersistentLocalId());
+            _fixture.Customize(new WithValidExtendedWkbPoint());
+            var buildingWasPlannedV2 = _fixture.Create<BuildingWasPlannedV2>();
+            var buildingUnitWasPlannedV2 = _fixture.Create<BuildingUnitWasPlannedV2>();
+            var buildingUnitAddressWasAttached = _fixture.Create<BuildingUnitAddressWasAttachedV2>();
+            var buildingUnitAddressWasDetached = new BuildingUnitAddressWasDetachedBecauseAddressWasRemoved(
+                new BuildingPersistentLocalId(buildingUnitWasPlannedV2.BuildingPersistentLocalId),
+                new BuildingUnitPersistentLocalId(buildingUnitWasPlannedV2.BuildingUnitPersistentLocalId),
+                new AddressPersistentLocalId(buildingUnitAddressWasAttached.AddressPersistentLocalId));
+            ((ISetProvenance)buildingUnitAddressWasDetached).SetProvenance(_fixture.Create<Provenance>());
+            var position = 1L;
+
+            await Sut
+                .Given(CreateEnvelope(buildingWasPlannedV2, position),
+                    CreateEnvelope(buildingUnitWasPlannedV2, position + 1),
+                    CreateEnvelope(buildingUnitAddressWasAttached, position + 2),
+                    CreateEnvelope(buildingUnitAddressWasDetached, position + 3))
+                .Then(async context =>
+                {
+                    var document = await context.BuildingUnitDocuments.FindAsync(buildingUnitAddressWasDetached.BuildingUnitPersistentLocalId);
+                    document.Should().NotBeNull();
+                    document!.Document.AddressPersistentLocalIds.Should().NotContain(buildingUnitAddressWasDetached.AddressPersistentLocalId);
+                    document.LastChangedOn.Should().Be(buildingUnitAddressWasDetached.Provenance.Timestamp);
+
+                    var oldAddressPuris = new List<string>
+                    {
+                        $"{AddressNamespace}/{buildingUnitAddressWasAttached.AddressPersistentLocalId}"
+                    };
+
+                    var expectedAddressPuris = oldAddressPuris
+                        .Except([$"{AddressNamespace}/{buildingUnitAddressWasDetached.AddressPersistentLocalId}"])
+                        .Distinct()
+                        .ToList();
+
+                    ChangeFeedServiceMock.Verify(x => x.CreateCloudEventWithData(
+                            It.IsAny<long>(),
+                            buildingUnitAddressWasDetached.Provenance.Timestamp.ToBelgianDateTimeOffset(),
+                            BuildingUnitEventTypes.UpdateV1,
+                            buildingUnitAddressWasDetached.BuildingUnitPersistentLocalId.ToString(),
+                            It.IsAny<DateTimeOffset>(),
+                            It.Is<List<string>>(nisCodes => nisCodes.Contains(NisCode)),
+                            It.Is<List<BaseRegistriesCloudEventAttribute>>(attrs =>
+                                attrs.Any(a => a.Name == BuildingUnitAttributeNames.AdresIds
+                                               && ((List<string>)a.OldValue!).SequenceEqual(oldAddressPuris)
+                                               && ((List<string>)a.NewValue!).SequenceEqual(expectedAddressPuris))),
+                            BuildingUnitAddressWasDetachedBecauseAddressWasRemoved.EventName,
+                            It.IsAny<string>()),
+                        Times.Once);
+                });
+        }
+
+        [Fact]
+        public async Task WhenBuildingUnitAddressWasDetachedBecauseAddressWasRetired_ThenAddressesAreUpdated()
+        {
+            _fixture.Customize(new WithFixedBuildingUnitPersistentLocalId());
+            _fixture.Customize(new WithValidExtendedWkbPoint());
+            var buildingWasPlannedV2 = _fixture.Create<BuildingWasPlannedV2>();
+            var buildingUnitWasPlannedV2 = _fixture.Create<BuildingUnitWasPlannedV2>();
+            var buildingUnitAddressWasAttached = _fixture.Create<BuildingUnitAddressWasAttachedV2>();
+            var buildingUnitAddressWasDetached = new BuildingUnitAddressWasDetachedBecauseAddressWasRetired(
+                new BuildingPersistentLocalId(buildingUnitWasPlannedV2.BuildingPersistentLocalId),
+                new BuildingUnitPersistentLocalId(buildingUnitWasPlannedV2.BuildingUnitPersistentLocalId),
+                new AddressPersistentLocalId(buildingUnitAddressWasAttached.AddressPersistentLocalId));
+            ((ISetProvenance)buildingUnitAddressWasDetached).SetProvenance(_fixture.Create<Provenance>());
+            var position = 1L;
+
+            await Sut
+                .Given(CreateEnvelope(buildingWasPlannedV2, position),
+                    CreateEnvelope(buildingUnitWasPlannedV2, position + 1),
+                    CreateEnvelope(buildingUnitAddressWasAttached, position + 2),
+                    CreateEnvelope(buildingUnitAddressWasDetached, position + 3))
+                .Then(async context =>
+                {
+                    var document = await context.BuildingUnitDocuments.FindAsync(buildingUnitAddressWasDetached.BuildingUnitPersistentLocalId);
+                    document.Should().NotBeNull();
+                    document!.Document.AddressPersistentLocalIds.Should().NotContain(buildingUnitAddressWasDetached.AddressPersistentLocalId);
+                    document.LastChangedOn.Should().Be(buildingUnitAddressWasDetached.Provenance.Timestamp);
+
+                    var oldAddressPuris = new List<string>
+                    {
+                        $"{AddressNamespace}/{buildingUnitAddressWasAttached.AddressPersistentLocalId}"
+                    };
+
+                    var expectedAddressPuris = oldAddressPuris
+                        .Except([$"{AddressNamespace}/{buildingUnitAddressWasDetached.AddressPersistentLocalId}"])
+                        .Distinct()
+                        .ToList();
+
+                    ChangeFeedServiceMock.Verify(x => x.CreateCloudEventWithData(
+                            It.IsAny<long>(),
+                            buildingUnitAddressWasDetached.Provenance.Timestamp.ToBelgianDateTimeOffset(),
+                            BuildingUnitEventTypes.UpdateV1,
+                            buildingUnitAddressWasDetached.BuildingUnitPersistentLocalId.ToString(),
+                            It.IsAny<DateTimeOffset>(),
+                            It.Is<List<string>>(nisCodes => nisCodes.Contains(NisCode)),
+                            It.Is<List<BaseRegistriesCloudEventAttribute>>(attrs =>
+                                attrs.Any(a => a.Name == BuildingUnitAttributeNames.AdresIds
+                                               && ((List<string>)a.OldValue!).SequenceEqual(oldAddressPuris)
+                                               && ((List<string>)a.NewValue!).SequenceEqual(expectedAddressPuris))),
+                            BuildingUnitAddressWasDetachedBecauseAddressWasRetired.EventName,
+                            It.IsAny<string>()),
+                        Times.Once);
+                });
+        }
+
+        [Fact]
+        public async Task WhenBuildingUnitAddressWasReplacedBecauseAddressWasReaddressed_ThenAddressesAreUpdated()
+        {
+            _fixture.Customize(new WithFixedBuildingUnitPersistentLocalId());
+            _fixture.Customize(new WithValidExtendedWkbPoint());
+            var buildingWasPlannedV2 = _fixture.Create<BuildingWasPlannedV2>();
+            var buildingUnitWasPlannedV2 = _fixture.Create<BuildingUnitWasPlannedV2>();
+            var buildingUnitAddressWasAttached = _fixture.Create<BuildingUnitAddressWasAttachedV2>();
+
+            var newAddressId = _fixture.Create<int>();
+            var buildingUnitAddressWasReplaced = new BuildingUnitAddressWasReplacedBecauseAddressWasReaddressed(
+                new BuildingPersistentLocalId(buildingUnitWasPlannedV2.BuildingPersistentLocalId),
+                new BuildingUnitPersistentLocalId(buildingUnitWasPlannedV2.BuildingUnitPersistentLocalId),
+                new AddressPersistentLocalId(buildingUnitAddressWasAttached.AddressPersistentLocalId),
+                new AddressPersistentLocalId(newAddressId));
+            ((ISetProvenance)buildingUnitAddressWasReplaced).SetProvenance(_fixture.Create<Provenance>());
+            var position = 1L;
+
+            await Sut
+                .Given(CreateEnvelope(buildingWasPlannedV2, position),
+                    CreateEnvelope(buildingUnitWasPlannedV2, position + 1),
+                    CreateEnvelope(buildingUnitAddressWasAttached, position + 2),
+                    CreateEnvelope(buildingUnitAddressWasReplaced, position + 3))
+                .Then(async context =>
+                {
+                    var document = await context.BuildingUnitDocuments.FindAsync(buildingUnitAddressWasReplaced.BuildingUnitPersistentLocalId);
+                    document.Should().NotBeNull();
+                    document!.Document.AddressPersistentLocalIds.Should().Contain(newAddressId);
+                    document.Document.AddressPersistentLocalIds.Should().NotContain(buildingUnitAddressWasAttached.AddressPersistentLocalId);
+                    document.LastChangedOn.Should().Be(buildingUnitAddressWasReplaced.Provenance.Timestamp);
+
+                    var oldAddressPuris = new List<string>
+                    {
+                        $"{AddressNamespace}/{buildingUnitAddressWasAttached.AddressPersistentLocalId}"
+                    };
+
+                    var expectedAddressPuris = oldAddressPuris
+                        .Except([$"{AddressNamespace}/{buildingUnitAddressWasReplaced.PreviousAddressPersistentLocalId}"])
+                        .Concat([$"{AddressNamespace}/{buildingUnitAddressWasReplaced.NewAddressPersistentLocalId}"])
+                        .Distinct()
+                        .ToList();
+
+                    ChangeFeedServiceMock.Verify(x => x.CreateCloudEventWithData(
+                            It.IsAny<long>(),
+                            buildingUnitAddressWasReplaced.Provenance.Timestamp.ToBelgianDateTimeOffset(),
+                            BuildingUnitEventTypes.UpdateV1,
+                            buildingUnitAddressWasReplaced.BuildingUnitPersistentLocalId.ToString(),
+                            It.IsAny<DateTimeOffset>(),
+                            It.Is<List<string>>(nisCodes => nisCodes.Contains(NisCode)),
+                            It.Is<List<BaseRegistriesCloudEventAttribute>>(attrs =>
+                                attrs.Any(a => a.Name == BuildingUnitAttributeNames.AdresIds
+                                               && ((List<string>)a.OldValue!).SequenceEqual(oldAddressPuris)
+                                               && ((List<string>)a.NewValue!).SequenceEqual(expectedAddressPuris))),
+                            BuildingUnitAddressWasReplacedBecauseAddressWasReaddressed.EventName,
                             It.IsAny<string>()),
                         Times.Once);
                 });
@@ -641,6 +900,17 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
                     document.Document.AddressPersistentLocalIds.Should().NotContain(buildingUnitAddressWasAttached.AddressPersistentLocalId);
                     document.LastChangedOn.Should().Be(buildingUnitAddressWasReplaced.Provenance.Timestamp);
 
+                    var oldAddressPuris = new List<string>
+                    {
+                        $"{AddressNamespace}/{buildingUnitAddressWasAttached.AddressPersistentLocalId}"
+                    };
+
+                    var expectedAddressPuris = oldAddressPuris
+                        .Except([$"{AddressNamespace}/{buildingUnitAddressWasReplaced.PreviousAddressPersistentLocalId}"])
+                        .Concat([$"{AddressNamespace}/{buildingUnitAddressWasReplaced.NewAddressPersistentLocalId}"])
+                        .Distinct()
+                        .ToList();
+
                     ChangeFeedServiceMock.Verify(x => x.CreateCloudEventWithData(
                             It.IsAny<long>(),
                             buildingUnitAddressWasReplaced.Provenance.Timestamp.ToBelgianDateTimeOffset(),
@@ -650,9 +920,79 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
                             It.Is<List<string>>(nisCodes => nisCodes.Contains(NisCode)),
                             It.Is<List<BaseRegistriesCloudEventAttribute>>(attrs =>
                                 attrs.Any(a => a.Name == BuildingUnitAttributeNames.AdresIds
-                                               && a.OldValue != null
-                                               && a.NewValue != null)),
+                                               && ((List<string>)a.OldValue!).SequenceEqual(oldAddressPuris)
+                                               && ((List<string>)a.NewValue!).SequenceEqual(expectedAddressPuris))),
                             BuildingUnitAddressWasReplacedBecauseOfMunicipalityMerger.EventName,
+                            It.IsAny<string>()),
+                        Times.Once);
+                });
+        }
+
+        [Fact]
+        public async Task WhenBuildingBuildingUnitsAddressesWereReaddressed_ThenAddressesAreUpdated()
+        {
+            _fixture.Customize(new WithFixedBuildingUnitPersistentLocalId());
+            _fixture.Customize(new WithValidExtendedWkbPoint());
+            var buildingWasPlannedV2 = _fixture.Create<BuildingWasPlannedV2>();
+            var buildingUnitWasPlannedV2 = _fixture.Create<BuildingUnitWasPlannedV2>();
+            var buildingUnitAddressWasAttached = _fixture.Create<BuildingUnitAddressWasAttachedV2>();
+
+            var newAddressId = _fixture.Create<int>();
+            var buildingUnitsAddressesWereReaddressed = new BuildingBuildingUnitsAddressesWereReaddressed(
+                new BuildingPersistentLocalId(buildingUnitWasPlannedV2.BuildingPersistentLocalId),
+                new[]
+                {
+                    new BuildingUnitAddressesWereReaddressed(
+                        new BuildingUnitPersistentLocalId(buildingUnitWasPlannedV2.BuildingUnitPersistentLocalId),
+                        new[] { new AddressPersistentLocalId(newAddressId) },
+                        new[] { new AddressPersistentLocalId(buildingUnitAddressWasAttached.AddressPersistentLocalId) })
+                },
+                new[]
+                {
+                    new AddressRegistryReaddress(
+                        new ReaddressData(
+                            new AddressPersistentLocalId(buildingUnitAddressWasAttached.AddressPersistentLocalId),
+                            new AddressPersistentLocalId(newAddressId)))
+                });
+            ((ISetProvenance)buildingUnitsAddressesWereReaddressed).SetProvenance(_fixture.Create<Provenance>());
+            var position = 1L;
+
+            await Sut
+                .Given(CreateEnvelope(buildingWasPlannedV2, position),
+                    CreateEnvelope(buildingUnitWasPlannedV2, position + 1),
+                    CreateEnvelope(buildingUnitAddressWasAttached, position + 2),
+                    CreateEnvelope(buildingUnitsAddressesWereReaddressed, position + 3))
+                .Then(async context =>
+                {
+                    var document = await context.BuildingUnitDocuments.FindAsync(buildingUnitWasPlannedV2.BuildingUnitPersistentLocalId);
+                    document.Should().NotBeNull();
+                    document!.Document.AddressPersistentLocalIds.Should().Contain(newAddressId);
+                    document.Document.AddressPersistentLocalIds.Should().NotContain(buildingUnitAddressWasAttached.AddressPersistentLocalId);
+                    document.LastChangedOn.Should().Be(buildingUnitsAddressesWereReaddressed.Provenance.Timestamp);
+
+                    var oldAddressPuris = new List<string>
+                    {
+                        $"{AddressNamespace}/{buildingUnitAddressWasAttached.AddressPersistentLocalId}"
+                    };
+
+                    var expectedAddressPuris = oldAddressPuris
+                        .Except([$"{AddressNamespace}/{buildingUnitAddressWasAttached.AddressPersistentLocalId}"])
+                        .Concat([$"{AddressNamespace}/{newAddressId}"])
+                        .Distinct()
+                        .ToList();
+
+                    ChangeFeedServiceMock.Verify(x => x.CreateCloudEventWithData(
+                            It.IsAny<long>(),
+                            buildingUnitsAddressesWereReaddressed.Provenance.Timestamp.ToBelgianDateTimeOffset(),
+                            BuildingUnitEventTypes.UpdateV1,
+                            buildingUnitWasPlannedV2.BuildingUnitPersistentLocalId.ToString(),
+                            It.IsAny<DateTimeOffset>(),
+                            It.Is<List<string>>(nisCodes => nisCodes.Contains(NisCode)),
+                            It.Is<List<BaseRegistriesCloudEventAttribute>>(attrs =>
+                                attrs.Any(a => a.Name == BuildingUnitAttributeNames.AdresIds
+                                               && ((List<string>)a.OldValue!).SequenceEqual(oldAddressPuris)
+                                               && ((List<string>)a.NewValue!).SequenceEqual(expectedAddressPuris))),
+                            BuildingBuildingUnitsAddressesWereReaddressed.EventName,
                             It.IsAny<string>()),
                         Times.Once);
                 });
