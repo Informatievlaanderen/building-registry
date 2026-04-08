@@ -237,7 +237,7 @@ namespace BuildingRegistry.Projections.Feed.BuildingUnitFeed
                 var oldStatus = document.Document.Status;
                 var oldFunction = document.Document.Function;
                 var oldGeometryMethod = document.Document.GeometryMethod;
-                var oldPositionValues = CreatePositionValues(GmlHelpers.ParseGeometry(document.Document.ExtendedWkbGeometry));
+                var oldExtendedWkbGeometry = document.Document.ExtendedWkbGeometry;
                 var oldHasDeviation = document.Document.HasDeviation;
 
                 document.Document.Status = status;
@@ -254,16 +254,29 @@ namespace BuildingRegistry.Projections.Feed.BuildingUnitFeed
 
                 var newAddressPuris = BuildAddressPuris(addressPersistentLocalIds);
 
-                List<BaseRegistriesCloudEventAttribute> attributes =
-                [
-                    new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.StatusName, oldStatus, status),
-                    new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.Function, oldFunction, function),
-                    new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.GeometryMethod, oldGeometryMethod, geometryMethod),
-                    new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.Position, oldPositionValues, CreatePositionValues(geometry)),
-                    new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.AdresIds, oldAddressPuris, newAddressPuris),
-                    new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.GebouwId, oldBuildingPuri, newBuildingPuri),
-                    new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.HasDeviation, oldHasDeviation, message.Message.HasDeviation)
-                ];
+                var attributes = new List<BaseRegistriesCloudEventAttribute>();
+
+                if (oldStatus != status)
+                    attributes.Add(new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.StatusName, oldStatus, status));
+
+                if (oldFunction != function)
+                    attributes.Add(new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.Function, oldFunction, function));
+
+                if (oldGeometryMethod != geometryMethod)
+                    attributes.Add(new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.GeometryMethod, oldGeometryMethod, geometryMethod));
+
+                if (oldExtendedWkbGeometry != message.Message.ExtendedWkbGeometry)
+                    attributes.Add(new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.Position,
+                        CreatePositionValues(GmlHelpers.ParseGeometry(oldExtendedWkbGeometry)), CreatePositionValues(geometry)));
+
+                if (!oldAddressPuris.SequenceEqual(newAddressPuris))
+                    attributes.Add(new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.AdresIds, oldAddressPuris, newAddressPuris));
+
+                if (oldBuildingPuri != newBuildingPuri)
+                    attributes.Add(new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.GebouwId, oldBuildingPuri, newBuildingPuri));
+
+                if (oldHasDeviation != message.Message.HasDeviation)
+                    attributes.Add(new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.HasDeviation, oldHasDeviation, message.Message.HasDeviation));
 
                 await AddCloudEvent(message, document, context, attributes);
             });

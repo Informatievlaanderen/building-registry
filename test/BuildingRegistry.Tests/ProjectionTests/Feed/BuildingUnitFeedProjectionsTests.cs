@@ -1040,7 +1040,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
         }
 
         [Fact]
-        public async Task WhenBuildingUnitWasMovedIntoBuilding_ThenBuildingIdIsUpdated()
+        public async Task WhenBuildingUnitWasMovedIntoBuilding_ThenOnlyChangedAttributesAreOutput()
         {
             _fixture.Customize(new WithFixedBuildingUnitPersistentLocalId());
             _fixture.Customize(new WithValidExtendedWkbPoint());
@@ -1048,15 +1048,16 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
             var buildingUnitWasPlannedV2 = _fixture.Create<BuildingUnitWasPlannedV2>();
 
             var newBuildingPersistentLocalId = _fixture.Create<int>();
+            // Use the exact same values from the planned event so nothing but building changes
             var buildingUnitWasMovedIntoBuilding = new BuildingUnitWasMovedIntoBuilding(
                 new BuildingPersistentLocalId(newBuildingPersistentLocalId),
                 new BuildingPersistentLocalId(buildingUnitWasPlannedV2.BuildingPersistentLocalId),
                 new BuildingUnitPersistentLocalId(buildingUnitWasPlannedV2.BuildingUnitPersistentLocalId),
                 BuildingUnitStatus.Planned,
-                BuildingUnitPositionGeometryMethod.AppointedByAdministrator,
+                BuildingUnitPositionGeometryMethod.Parse(buildingUnitWasPlannedV2.GeometryMethod),
                 new ExtendedWkbGeometry(buildingUnitWasPlannedV2.ExtendedWkbGeometry),
-                BuildingUnitFunction.Unknown,
-                false,
+                BuildingUnitFunction.Parse(buildingUnitWasPlannedV2.Function),
+                buildingUnitWasPlannedV2.HasDeviation,
                 Enumerable.Empty<AddressPersistentLocalId>());
             ((ISetProvenance)buildingUnitWasMovedIntoBuilding).SetProvenance(_fixture.Create<Provenance>());
 
@@ -1079,12 +1080,12 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
                     document.Should().NotBeNull();
                     document!.IsRemoved.Should().BeFalse();
                     document.BuildingPersistentLocalId.Should().Be(newBuildingPersistentLocalId);
-                    document.Document.HasDeviation.Should().BeFalse();
                     document.LastChangedOn.Should().Be(buildingUnitWasMovedIntoBuilding.Provenance.Timestamp);
 
                     var oldBuildingPuri = $"{BuildingNamespace}/{buildingUnitWasPlannedV2.BuildingPersistentLocalId}";
                     var newBuildingPuri = $"{BuildingNamespace}/{newBuildingPersistentLocalId}";
 
+                    // Only gebouwId should be in attributes since nothing else changed
                     ChangeFeedServiceMock.Verify(x => x.CreateCloudEventWithData(
                             It.IsAny<long>(),
                             buildingUnitWasMovedIntoBuilding.Provenance.Timestamp.ToBelgianDateTimeOffset(),
@@ -1093,13 +1094,93 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
                             It.IsAny<DateTimeOffset>(),
                             It.Is<List<string>>(nisCodes => nisCodes.Contains(NisCode)),
                             It.Is<List<BaseRegistriesCloudEventAttribute>>(attrs =>
-                                attrs.Any(a => a.Name == BuildingUnitAttributeNames.GebouwId
+                                attrs.Count == 1
+                                && attrs.Any(a => a.Name == BuildingUnitAttributeNames.GebouwId
+                                               && a.OldValue != null
+                                               && a.OldValue.ToString() == oldBuildingPuri
+                                               && a.NewValue != null
+                                               && a.NewValue.ToString() == newBuildingPuri)),
+                            BuildingUnitWasMovedIntoBuilding.EventName,
+                            It.IsAny<string>()),
+                        Times.Once);
+                });
+        }
+
+        [Fact]
+        public async Task WhenBuildingUnitWasMovedIntoBuilding_WithMultipleChanges_ThenOnlyChangedAttributesAreOutput()
+        {
+            _fixture.Customize(new WithFixedBuildingUnitPersistentLocalId());
+            _fixture.Customize(new WithValidExtendedWkbPoint());
+            _fixture.Register(() => false); // ensure initial HasDeviation is false
+            var buildingWasPlannedV2 = _fixture.Create<BuildingWasPlannedV2>();
+            var buildingUnitWasPlannedV2 = _fixture.Create<BuildingUnitWasPlannedV2>();
+
+            var newBuildingPersistentLocalId = _fixture.Create<int>();
+            var addressId = _fixture.Create<int>();
+            // Building changes, hasDeviation changes (false->true), addresses change (empty -> one address)
+            // Keep same status, function, geometry, geometryMethod from planned event
+            var buildingUnitWasMovedIntoBuilding = new BuildingUnitWasMovedIntoBuilding(
+                new BuildingPersistentLocalId(newBuildingPersistentLocalId),
+                new BuildingPersistentLocalId(buildingUnitWasPlannedV2.BuildingPersistentLocalId),
+                new BuildingUnitPersistentLocalId(buildingUnitWasPlannedV2.BuildingUnitPersistentLocalId),
+                BuildingUnitStatus.Planned,
+                BuildingUnitPositionGeometryMethod.Parse(buildingUnitWasPlannedV2.GeometryMethod),
+                new ExtendedWkbGeometry(buildingUnitWasPlannedV2.ExtendedWkbGeometry),
+                BuildingUnitFunction.Parse(buildingUnitWasPlannedV2.Function),
+                true,
+                new List<AddressPersistentLocalId> { new AddressPersistentLocalId(addressId) });
+            ((ISetProvenance)buildingUnitWasMovedIntoBuilding).SetProvenance(_fixture.Create<Provenance>());
+
+            // Register a new building geometry for the target building
+            var newBuildingWasPlanned = new BuildingWasPlannedV2(
+                new BuildingPersistentLocalId(newBuildingPersistentLocalId),
+                new ExtendedWkbGeometry(buildingWasPlannedV2.ExtendedWkbGeometry));
+            ((ISetProvenance)newBuildingWasPlanned).SetProvenance(_fixture.Create<Provenance>());
+
+            var position = 1L;
+
+            await Sut
+                .Given(CreateEnvelope(buildingWasPlannedV2, position),
+                    CreateEnvelope(buildingUnitWasPlannedV2, position + 1),
+                    CreateEnvelope(newBuildingWasPlanned, position + 2),
+                    CreateEnvelope(buildingUnitWasMovedIntoBuilding, position + 3))
+                .Then(async context =>
+                {
+                    var document = await context.BuildingUnitDocuments.FindAsync(buildingUnitWasMovedIntoBuilding.BuildingUnitPersistentLocalId);
+                    document.Should().NotBeNull();
+                    document!.IsRemoved.Should().BeFalse();
+                    document.BuildingPersistentLocalId.Should().Be(newBuildingPersistentLocalId);
+                    document.Document.HasDeviation.Should().BeTrue();
+                    document.Document.AddressPersistentLocalIds.Should().Contain(addressId);
+                    document.LastChangedOn.Should().Be(buildingUnitWasMovedIntoBuilding.Provenance.Timestamp);
+
+                    var oldBuildingPuri = $"{BuildingNamespace}/{buildingUnitWasPlannedV2.BuildingPersistentLocalId}";
+                    var newBuildingPuri = $"{BuildingNamespace}/{newBuildingPersistentLocalId}";
+                    var expectedNewAddressPuris = new List<string> { $"{AddressNamespace}/{addressId}" };
+
+                    // GebouwId, HasDeviation, and AdresIds changed
+                    ChangeFeedServiceMock.Verify(x => x.CreateCloudEventWithData(
+                            It.IsAny<long>(),
+                            buildingUnitWasMovedIntoBuilding.Provenance.Timestamp.ToBelgianDateTimeOffset(),
+                            BuildingUnitEventTypes.UpdateV1,
+                            buildingUnitWasMovedIntoBuilding.BuildingUnitPersistentLocalId.ToString(),
+                            It.IsAny<DateTimeOffset>(),
+                            It.Is<List<string>>(nisCodes => nisCodes.Contains(NisCode)),
+                            It.Is<List<BaseRegistriesCloudEventAttribute>>(attrs =>
+                                attrs.Count == 3
+                                && attrs.Any(a => a.Name == BuildingUnitAttributeNames.GebouwId
                                                && a.OldValue != null
                                                && a.OldValue.ToString() == oldBuildingPuri
                                                && a.NewValue != null
                                                && a.NewValue.ToString() == newBuildingPuri)
                                 && attrs.Any(a => a.Name == BuildingUnitAttributeNames.HasDeviation
-                                                  && a.NewValue != null && a.NewValue.Equals(false))),
+                                               && a.OldValue != null && a.OldValue.Equals(false)
+                                               && a.NewValue != null && a.NewValue.Equals(true))
+                                && attrs.Any(a => a.Name == BuildingUnitAttributeNames.AdresIds
+                                               && a.OldValue != null
+                                               && !((List<string>)a.OldValue).Any()
+                                               && a.NewValue != null
+                                               && ((List<string>)a.NewValue).SequenceEqual(expectedNewAddressPuris))),
                             BuildingUnitWasMovedIntoBuilding.EventName,
                             It.IsAny<string>()),
                         Times.Once);
