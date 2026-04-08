@@ -143,11 +143,17 @@ namespace BuildingRegistry.Projector.Infrastructure.Modules
                         jsonSerializerSettings));
 
             builder.Register(c => new ChangeFeedService(
-                    c.Resolve<IOptions<ChangeFeedConfig>>().Value,
+                    _configuration.GetSection("BuildingFeed").Get<ChangeFeedConfig>()!,
                     c.Resolve<LastChangedListContext>(),
                     new JsonSerializerSettings().ConfigureDefaultForApi()))
-                .AsImplementedInterfaces()
-                .AsSelf()
+                .Keyed<IChangeFeedService>("building")
+                .InstancePerLifetimeScope();
+
+            builder.Register(c => new ChangeFeedService(
+                    _configuration.GetSection("BuildingUnitFeed").Get<ChangeFeedConfig>()!,
+                    c.Resolve<LastChangedListContext>(),
+                    new JsonSerializerSettings().ConfigureDefaultForApi()))
+                .Keyed<IChangeFeedService>("buildingUnit")
                 .InstancePerLifetimeScope();
 
             builder
@@ -166,7 +172,7 @@ namespace BuildingRegistry.Projector.Infrastructure.Modules
                     _loggerFactory)
                 .RegisterProjections<BuildingFeedProjections, FeedContext>(
                     context => new BuildingFeedProjections(
-                        context.Resolve<IChangeFeedService>(),
+                        context.ResolveKeyed<IChangeFeedService>("building"),
                         context.Resolve<IMunicipalityGeometryRepository>()),
                     ConnectedProjectionSettings.Configure(c =>
                     {
@@ -175,7 +181,7 @@ namespace BuildingRegistry.Projector.Infrastructure.Modules
                     }))
                 .RegisterProjections<BuildingUnitFeedProjections, FeedContext>(
                     context => new BuildingUnitFeedProjections(
-                        context.Resolve<IChangeFeedService>(),
+                        context.ResolveKeyed<IChangeFeedService>("buildingUnit"),
                         context.Resolve<IMunicipalityGeometryRepository>()),
                     ConnectedProjectionSettings.Configure(c =>
                     {

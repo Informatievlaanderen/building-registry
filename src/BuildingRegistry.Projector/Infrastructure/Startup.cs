@@ -12,7 +12,6 @@ namespace BuildingRegistry.Projector.Infrastructure
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.LastChangedList;
     using Be.Vlaanderen.Basisregisters.Projector;
     using Be.Vlaanderen.Basisregisters.Projector.ConnectedProjections;
-    using Be.Vlaanderen.Basisregisters.GrAr.ChangeFeed;
     using BuildingRegistry.Projections.Extract;
     using BuildingRegistry.Projections.Feed;
     using BuildingRegistry.Projections.Integration.Infrastructure;
@@ -157,8 +156,7 @@ namespace BuildingRegistry.Projector.Infrastructure
                     }
                 })
                 .Configure<ExtractConfig>(_configuration.GetSection("Extract"))
-                .Configure<IntegrationOptions>(_configuration.GetSection("Integration"))
-                .Configure<ChangeFeedConfig>(_configuration.GetSection("BuildingFeed"));
+                .Configure<IntegrationOptions>(_configuration.GetSection("Integration"));
 
             services.AddSingleton<ProjectionsHealthCheck>(
                 c => new ProjectionsHealthCheck(
