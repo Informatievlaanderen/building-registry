@@ -20,27 +20,27 @@ namespace BuildingRegistry.Api.Oslo.BuildingUnit.ChangeFeed
                          [
                             {
                                 "specversion": "1.0",
-                                 "id": "2",
-                                 "time": "2023-11-02T07:24:43.9174449+01:00",
+                                 "id": "1",
+                                 "time": "2023-11-02T07:24:43.9121352+01:00",
                                  "type": "basisregisters.buildingunit.create.v1",
                                  "source": "{{_responseOptions.BuildingUnitFeed?.FeedUrl}}",
                                  "datacontenttype": "application/json",
                                  "dataschema": "{{_responseOptions.BuildingUnitFeed?.DataSchemaUrl}}",
-                                 "basisregisterseventtype": "BuildingUnitWasPlannedV2",
-                                 "basisregisterscausationid": "e675177c-b243-550d-acff-1a4891bbf669",
+                                 "basisregisterseventtype": "BuildingWasMigrated",
+                                 "basisregisterscausationid": "1af00df5-93ff-5319-a073-ca4bcc6b28f0",
                                  "data": {
-                                     "@id": "https://data.vlaanderen.be/id/gebouweenheid/6763967",
-                                     "objectId": "6763967",
+                                     "@id": "https://data.vlaanderen.be/id/gebouweenheid/6356866",
+                                     "objectId": "6356866",
                                      "naamruimte": "https://data.vlaanderen.be/id/gebouweenheid",
                                      "versieId": "2023-11-02T07:24:43+01:00",
                                      "nisCodes": [
-                                         "23052"
+                                         "46013"
                                      ],
                                      "attributen": [
                                          {
                                              "naam": "gebouweenheidStatus",
                                              "oudeWaarde": null,
-                                             "nieuweWaarde": "gepland"
+                                             "nieuweWaarde": "gerealiseerd"
                                          },
                                          {
                                              "naam": "gebouweenheidFunctie",
@@ -59,14 +59,31 @@ namespace BuildingRegistry.Api.Oslo.BuildingUnit.ChangeFeed
                                                  {
                                                      "type": "Point",
                                                      "projectie": "http://www.opengis.net/def/crs/EPSG/0/31370",
-                                                     "gml": "<gml:Point srsName=\"http://www.opengis.net/def/crs/EPSG/0/31370\" xmlns:gml=\"http://www.opengis.net/gml/3.2\"><gml:pos>140284.15277253836 186724.74131567031</gml:pos></gml:Point>"
+                                                     "gml": "<gml:Point srsName=\"http://www.opengis.net/def/crs/EPSG/0/31370\" xmlns:gml=\"http://www.opengis.net/gml/3.2\"><gml:pos>144401.12 201731.91</gml:pos></gml:Point>"
                                                  },
                                                  {
                                                      "type": "Point",
                                                      "projectie": "http://www.opengis.net/def/crs/EPSG/0/3812",
-                                                     "gml": "<gml:Point srsName=\"http://www.opengis.net/def/crs/EPSG/0/3812\" xmlns:gml=\"http://www.opengis.net/gml/3.2\"><gml:pos>640279.35 686715.64</gml:pos></gml:Point>"
+                                                     "gml": "<gml:Point srsName=\"http://www.opengis.net/def/crs/EPSG/0/3812\" xmlns:gml=\"http://www.opengis.net/gml/3.2\"><gml:pos>644397.11 701731.49</gml:pos></gml:Point>"
                                                  }
                                              ]
+                                         },
+                                         {
+                                             "naam": "adresIds",
+                                             "oudeWaarde": null,
+                                             "nieuweWaarde": [
+                                                 "https://data.vlaanderen.be/id/adres/2434522"
+                                             ]
+                                         },
+                                         {
+                                             "naam": "gebouwId",
+                                             "oudeWaarde": null,
+                                             "nieuweWaarde": "https://data.vlaanderen.be/id/gebouw/6355606"
+                                         },
+                                         {
+                                             "naam": "afwijkingVastgesteld",
+                                             "oudeWaarde": null,
+                                             "nieuweWaarde": false
                                          }
                                      ]
                                  }
