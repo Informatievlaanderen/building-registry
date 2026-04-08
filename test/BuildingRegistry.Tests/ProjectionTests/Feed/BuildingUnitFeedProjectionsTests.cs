@@ -70,6 +70,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
         {
             _fixture.Register(() => BuildingStatus.Planned);
             _fixture.Register(() => BuildingGeometryMethod.Outlined);
+            _fixture.Register(() => false);
             _fixture.Customize(new WithValidExtendedWkbPoint());
             _fixture.RepeatCount = 1;
 

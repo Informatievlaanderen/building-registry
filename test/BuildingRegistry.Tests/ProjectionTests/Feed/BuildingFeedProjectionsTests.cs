@@ -63,10 +63,48 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
         }
 
         [Fact]
+        public async Task WhenRemovedBuildingWasMigrated_ThenFeedItemAndDocumentAreNotAdded()
+        {
+            _fixture.Register(() => BuildingStatus.Planned);
+            _fixture.Register(() => BuildingGeometryMethod.Outlined);
+            _fixture.Register(() => true);
+
+            var buildingWasMigrated = _fixture.Create<BuildingWasMigrated>();
+            var position = 1L;
+
+            await Sut
+                .Given(CreateEnvelope(buildingWasMigrated, position))
+                .Then(async context =>
+                {
+                    var document = await context.BuildingDocuments.FindAsync(buildingWasMigrated.BuildingPersistentLocalId);
+                    document.Should().BeNull();
+
+                    var feedItem = await FindFeedItemByBuildingPersistentLocalId(context, buildingWasMigrated.BuildingPersistentLocalId);
+                    feedItem.Should().BeNull();
+
+                    ChangeFeedServiceMock.Verify(x => x.CreateCloudEventWithData(
+                            It.IsAny<long>(),
+                            It.IsAny<DateTimeOffset>(),
+                            It.IsAny<string>(),
+                            It.IsAny<string>(),
+                            It.IsAny<DateTimeOffset>(),
+                            It.IsAny<List<string>>(),
+                            It.IsAny<List<BaseRegistriesCloudEventAttribute>>(),
+                            It.IsAny<string>(),
+                            It.IsAny<string>()),
+                        Times.Never);
+
+                    ChangeFeedServiceMock.Verify(x => x.SerializeCloudEvent(It.IsAny<CloudEvent>()), Times.Never);
+                    ChangeFeedServiceMock.Verify(x => x.CheckToUpdateCacheAsync(It.IsAny<int>(), It.IsAny<FeedContext>(), It.IsAny<Func<int, Task<int>>>()), Times.Never);
+                });
+        }
+
+        [Fact]
         public async Task WhenBuildingWasMigrated_ThenFeedItemAndDocumentAreAdded()
         {
             _fixture.Register(() => BuildingStatus.Planned);
             _fixture.Register(() => BuildingGeometryMethod.Outlined);
+            _fixture.Register(() => false);
 
             var buildingWasMigrated = _fixture.Create<BuildingWasMigrated>();
             var position = 1L;

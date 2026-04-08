@@ -38,6 +38,9 @@ namespace BuildingRegistry.Projections.Feed.BuildingFeed
 
             When<Envelope<BuildingWasMigrated>>(async (context, message, ct) =>
             {
+                if(message.Message.IsRemoved)
+                    return;
+
                 var buildingStatus = MapStatus(BuildingStatus.Parse(message.Message.BuildingStatus));
                 var geometryMethod = MapGeometryMethod(BuildingGeometryMethod.Parse(message.Message.GeometryMethod));
 

@@ -41,6 +41,9 @@ namespace BuildingRegistry.Projections.Feed.BuildingUnitFeed
 
             When<Envelope<BuildingWasMigrated>>(async (context, message, ct) =>
             {
+                if(message.Message.IsRemoved)
+                    return;
+
                 await context.BuildingGeometryForBuildingUnit.AddAsync(
                     new BuildingGeometryForBuildingUnit(
                         message.Message.BuildingPersistentLocalId,
@@ -670,7 +673,7 @@ namespace BuildingRegistry.Projections.Feed.BuildingUnitFeed
                     .SingleOrDefault(x => x.BuildingPersistentLocalId == buildingPersistentLocalId);
 
             if (buildingGeometry is null || string.IsNullOrEmpty(buildingGeometry.ExtendedWkbGeometry))
-                return new List<string>();
+                throw new InvalidOperationException($"Could not find building geometry for building {buildingPersistentLocalId}");
 
             return _municipalityGeometryRepository.GetOverlappingNisCodes(buildingGeometry.ExtendedWkbGeometry, eventTimestamp);
         }
