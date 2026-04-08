@@ -19,6 +19,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
     using Building.Commands;
     using Building.Events;
     using CloudNative.CloudEvents;
+    using Extensions;
     using Fixtures;
     using FluentAssertions;
     using Microsoft.EntityFrameworkCore;
@@ -185,7 +186,8 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
             _fixture.Customize(new WithFixedBuildingUnitPersistentLocalId());
             _fixture.Customize(new WithValidExtendedWkbPoint());
             var buildingWasPlannedV2 = _fixture.Create<BuildingWasPlannedV2>();
-            var buildingUnitWasPlannedV2 = _fixture.Create<BuildingUnitWasPlannedV2>();
+            var buildingUnitWasPlannedV2 = _fixture.Create<BuildingUnitWasPlannedV2>()
+                .WithGeometryMethod(BuildingUnitPositionGeometryMethod.AppointedByAdministrator);
             var position = 1L;
 
             await Sut
@@ -203,6 +205,8 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
 
                     document.Document.PersistentLocalId.Should().Be(buildingUnitWasPlannedV2.BuildingUnitPersistentLocalId);
                     document.Document.Status.Should().Be(GebouweenheidStatus.Gepland);
+                    document.Document.Function.Should().Be(GebouweenheidFunctie.NietGekend);
+                    document.Document.GeometryMethod.Should().Be(PositieGeometrieMethode.AangeduidDoorBeheerder);
                     document.Document.PositionAsGml.Should().NotBeNullOrEmpty();
                     document.Document.ExtendedWkbGeometry.Should().Be(buildingUnitWasPlannedV2.ExtendedWkbGeometry);
                     document.Document.AddressPersistentLocalIds.Should().BeEmpty();
@@ -225,9 +229,11 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
                                                && a.OldValue == null
                                                && a.NewValue!.ToString() == nameof(GebouweenheidStatus.Gepland))
                                 && attrs.Any(a => a.Name == BuildingUnitAttributeNames.Function
-                                                  && a.OldValue == null)
+                                                  && a.OldValue == null
+                                                  && a.NewValue!.ToString() == nameof(GebouweenheidFunctie.NietGekend))
                                 && attrs.Any(a => a.Name == BuildingUnitAttributeNames.GeometryMethod
-                                                  && a.OldValue == null)
+                                                  && a.OldValue == null
+                                                  && a.NewValue!.ToString() == nameof(PositieGeometrieMethode.AangeduidDoorBeheerder))
                                 && attrs.Any(a => a.Name == BuildingUnitAttributeNames.Position
                                                   && a.OldValue == null
                                                   && a.NewValue != null && AssertPointList((List<BuildingUnitPositionCloudEventValue>)a.NewValue, document.Document.PositionAsGml))
@@ -370,12 +376,14 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
         }
 
         [Fact]
-        public async Task WhenBuildingUnitPositionWasCorrected_ThenPositionIsUpdated()
+        public async Task WhenBuildingUnitPositionAndMethodWereCorrected_ThenPositionIsUpdated()
         {
             _fixture.Customize(new WithFixedBuildingUnitPersistentLocalId());
             _fixture.Customize(new WithValidExtendedWkbPoint());
             var buildingWasPlannedV2 = _fixture.Create<BuildingWasPlannedV2>();
-            var buildingUnitWasPlannedV2 = _fixture.Create<BuildingUnitWasPlannedV2>();
+            var buildingUnitWasPlannedV2 = _fixture.Create<BuildingUnitWasPlannedV2>()
+                .WithGeometryMethod(BuildingUnitPositionGeometryMethod.AppointedByAdministrator);
+            _fixture.Register(() => BuildingUnitPositionGeometryMethod.DerivedFromObject);
             var buildingUnitPositionWasCorrected = _fixture.Create<BuildingUnitPositionWasCorrected>();
             var position = 1L;
 
@@ -388,6 +396,52 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
                     var document = await context.BuildingUnitDocuments.FindAsync(buildingUnitPositionWasCorrected.BuildingUnitPersistentLocalId);
                     document.Should().NotBeNull();
                     document!.Document.ExtendedWkbGeometry.Should().Be(buildingUnitPositionWasCorrected.ExtendedWkbGeometry);
+                    document.Document.GeometryMethod.Should().Be(PositieGeometrieMethode.AfgeleidVanObject);
+                    document.Document.PositionAsGml.Should().NotBeNullOrEmpty();
+                    document.LastChangedOn.Should().Be(buildingUnitPositionWasCorrected.Provenance.Timestamp);
+
+                    ChangeFeedServiceMock.Verify(x => x.CreateCloudEventWithData(
+                            It.IsAny<long>(),
+                            buildingUnitPositionWasCorrected.Provenance.Timestamp.ToBelgianDateTimeOffset(),
+                            BuildingUnitEventTypes.UpdateV1,
+                            buildingUnitPositionWasCorrected.BuildingUnitPersistentLocalId.ToString(),
+                            It.IsAny<DateTimeOffset>(),
+                            It.Is<List<string>>(nisCodes => nisCodes.Contains(NisCode)),
+                            It.Is<List<BaseRegistriesCloudEventAttribute>>(attrs =>
+                                attrs.Any(a => a.Name == BuildingUnitAttributeNames.Position
+                                               && a.OldValue != null && ((List<BuildingUnitPositionCloudEventValue>)a.OldValue).Count == 2
+                                               && a.NewValue != null && AssertPointList((List<BuildingUnitPositionCloudEventValue>)a.NewValue, document.Document.PositionAsGml))
+                                && attrs.Any(a => a.Name == BuildingUnitAttributeNames.GeometryMethod
+                                               && a.OldValue!.ToString() == nameof(PositieGeometrieMethode.AangeduidDoorBeheerder)
+                                               && a.NewValue!.ToString() == nameof(PositieGeometrieMethode.AfgeleidVanObject))),
+                            BuildingUnitPositionWasCorrected.EventName,
+                            It.IsAny<string>()),
+                        Times.Once);
+                });
+        }
+
+        [Fact]
+        public async Task WhenBuildingUnitPositionWasCorrected_ThenPositionIsUpdated()
+        {
+            _fixture.Customize(new WithFixedBuildingUnitPersistentLocalId());
+            _fixture.Customize(new WithValidExtendedWkbPoint());
+            var buildingWasPlannedV2 = _fixture.Create<BuildingWasPlannedV2>();
+            var buildingUnitWasPlannedV2 = _fixture.Create<BuildingUnitWasPlannedV2>()
+                .WithGeometryMethod(BuildingUnitPositionGeometryMethod.AppointedByAdministrator);
+            _fixture.Register(() => BuildingUnitPositionGeometryMethod.AppointedByAdministrator);
+            var buildingUnitPositionWasCorrected = _fixture.Create<BuildingUnitPositionWasCorrected>();
+            var position = 1L;
+
+            await Sut
+                .Given(CreateEnvelope(buildingWasPlannedV2, position),
+                    CreateEnvelope(buildingUnitWasPlannedV2, position + 1),
+                    CreateEnvelope(buildingUnitPositionWasCorrected, position + 2))
+                .Then(async context =>
+                {
+                    var document = await context.BuildingUnitDocuments.FindAsync(buildingUnitPositionWasCorrected.BuildingUnitPersistentLocalId);
+                    document.Should().NotBeNull();
+                    document!.Document.ExtendedWkbGeometry.Should().Be(buildingUnitPositionWasCorrected.ExtendedWkbGeometry);
+                    document.Document.GeometryMethod.Should().Be(PositieGeometrieMethode.AangeduidDoorBeheerder);
                     document.Document.PositionAsGml.Should().NotBeNullOrEmpty();
                     document.LastChangedOn.Should().Be(buildingUnitPositionWasCorrected.Provenance.Timestamp);
 
@@ -543,6 +597,8 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
 
                     document.Document.PersistentLocalId.Should().Be(commonBuildingUnitWasAddedV2.BuildingUnitPersistentLocalId);
                     document.Document.Function.Should().Be(GebouweenheidFunctie.GemeenschappelijkDeel);
+                    document.Document.Status.Should().Be(GebouweenheidStatus.Gepland);
+                    document.Document.GeometryMethod.Should().Be(PositieGeometrieMethode.AfgeleidVanObject);
                     document.Document.PositionAsGml.Should().NotBeNullOrEmpty();
                     document.Document.ExtendedWkbGeometry.Should().Be(commonBuildingUnitWasAddedV2.ExtendedWkbGeometry);
                     document.Document.AddressPersistentLocalIds.Should().BeEmpty();
@@ -567,7 +623,8 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
                                                   && a.OldValue == null
                                                   && a.NewValue!.ToString() == nameof(GebouweenheidFunctie.GemeenschappelijkDeel))
                                 && attrs.Any(a => a.Name == BuildingUnitAttributeNames.GeometryMethod
-                                                  && a.OldValue == null)
+                                                  && a.OldValue == null
+                                                  && a.NewValue!.ToString() == nameof(PositieGeometrieMethode.AfgeleidVanObject))
                                 && attrs.Any(a => a.Name == BuildingUnitAttributeNames.Position
                                                   && a.OldValue == null
                                                   && a.NewValue != null && AssertPointList((List<BuildingUnitPositionCloudEventValue>)a.NewValue, document.Document.PositionAsGml))

@@ -23,7 +23,6 @@ namespace BuildingRegistry.Projections.Feed.BuildingUnitFeed
     using Microsoft.EntityFrameworkCore;
     using NetTopologySuite.Geometries;
     using NodaTime;
-    using Envelope = Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope;
 
     [ConnectedProjectionName("Feed endpoint gebouweenheid (cloudevents)")]
     [ConnectedProjectionDescription("Projectie die de gebouweenheid data voor de gebouweenheid cloudevent feed voorziet.")]
@@ -62,6 +61,7 @@ namespace BuildingRegistry.Projections.Feed.BuildingUnitFeed
                         status,
                         function,
                         geometryMethod,
+                        hasDeviation: false,
                         message.Message.Provenance.Timestamp);
 
                     document.IsRemoved = buildingUnit.IsRemoved;
@@ -156,9 +156,8 @@ namespace BuildingRegistry.Projections.Feed.BuildingUnitFeed
                     GebouweenheidStatus.Gepland,
                     function,
                     geometryMethod,
+                    message.Message.HasDeviation,
                     message.Message.Provenance.Timestamp);
-
-                document.Document.HasDeviation = message.Message.HasDeviation;
 
                 var geometry = GmlHelpers.ParseGeometry(message.Message.ExtendedWkbGeometry);
                 document.Document.ExtendedWkbGeometry = message.Message.ExtendedWkbGeometry;
@@ -193,9 +192,8 @@ namespace BuildingRegistry.Projections.Feed.BuildingUnitFeed
                     status,
                     GebouweenheidFunctie.GemeenschappelijkDeel,
                     geometryMethod,
+                    message.Message.HasDeviation,
                     message.Message.Provenance.Timestamp);
-
-                document.Document.HasDeviation = message.Message.HasDeviation;
 
                 var geometry = GmlHelpers.ParseGeometry(message.Message.ExtendedWkbGeometry);
                 document.Document.ExtendedWkbGeometry = message.Message.ExtendedWkbGeometry;
@@ -272,8 +270,7 @@ namespace BuildingRegistry.Projections.Feed.BuildingUnitFeed
                 if (!oldAddressPuris.SequenceEqual(newAddressPuris))
                     attributes.Add(new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.AdresIds, oldAddressPuris, newAddressPuris));
 
-                if (oldBuildingPuri != newBuildingPuri)
-                    attributes.Add(new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.GebouwId, oldBuildingPuri, newBuildingPuri));
+                attributes.Add(new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.GebouwId, oldBuildingPuri, newBuildingPuri));
 
                 if (oldHasDeviation != message.Message.HasDeviation)
                     attributes.Add(new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.HasDeviation, oldHasDeviation, message.Message.HasDeviation));
@@ -465,8 +462,6 @@ namespace BuildingRegistry.Projections.Feed.BuildingUnitFeed
 
                 await AddCloudEvent(message, document, context, [], BuildingUnitEventTypes.DeleteV1);
             });
-
-            When<Envelope<BuildingUnitWasMovedOutOfBuilding>>(DoNothing);
 
             When<Envelope<BuildingUnitRemovalWasCorrected>>(async (context, message, ct) =>
             {
@@ -691,6 +686,8 @@ namespace BuildingRegistry.Projections.Feed.BuildingUnitFeed
                         new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.AdresIds, oldAddressPuris, newAddressPuris)
                     ]);
                 }
+
+                When<Envelope<BuildingUnitWasMovedOutOfBuilding>>(DoNothing);
             });
 
             #endregion

@@ -50,6 +50,7 @@ namespace BuildingRegistry.Projections.Feed.BuildingUnitFeed
             GebouweenheidStatus status,
             GebouweenheidFunctie function,
             PositieGeometrieMethode geometryMethod,
+            bool hasDeviation,
             Instant createdTimestamp)
         {
             PersistentLocalId = persistentLocalId;
@@ -62,6 +63,7 @@ namespace BuildingRegistry.Projections.Feed.BuildingUnitFeed
                 Status = status,
                 Function = function,
                 GeometryMethod = geometryMethod,
+                HasDeviation = hasDeviation,
             };
 
             LastChangedOn = createdTimestamp;
