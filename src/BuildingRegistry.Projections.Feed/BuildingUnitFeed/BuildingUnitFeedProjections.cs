@@ -66,6 +66,7 @@ namespace BuildingRegistry.Projections.Feed.BuildingUnitFeed
 
                     document.IsRemoved = buildingUnit.IsRemoved;
                     document.Document.AddressPersistentLocalIds = addressPersistentLocalIds;
+                    document.Document.HasDeviation = false;
 
                     var geometry = GmlHelpers.ParseGeometry(buildingUnit.ExtendedWkbGeometry);
                     document.Document.ExtendedWkbGeometry = buildingUnit.ExtendedWkbGeometry;
@@ -73,13 +74,17 @@ namespace BuildingRegistry.Projections.Feed.BuildingUnitFeed
 
                     await context.BuildingUnitDocuments.AddAsync(document, ct);
 
+                    var buildingPuri = BuildBuildingPuri(message.Message.BuildingPersistentLocalId);
+
                     List<BaseRegistriesCloudEventAttribute> attributes =
                     [
                         new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.StatusName, null, document.Document.Status),
                         new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.Function, null, document.Document.Function),
                         new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.GeometryMethod, null, document.Document.GeometryMethod),
                         new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.Position, null, CreatePositionValues(geometry)),
-                        new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.AdresIds, null, BuildAddressPuris(addressPersistentLocalIds))
+                        new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.AdresIds, null, BuildAddressPuris(addressPersistentLocalIds)),
+                        new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.GebouwId, null, buildingPuri),
+                        new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.HasDeviation, null, false)
                     ];
 
                     await AddCloudEvent(message, document, context, attributes, BuildingUnitEventTypes.CreateV1);
@@ -153,11 +158,15 @@ namespace BuildingRegistry.Projections.Feed.BuildingUnitFeed
                     geometryMethod,
                     message.Message.Provenance.Timestamp);
 
+                document.Document.HasDeviation = message.Message.HasDeviation;
+
                 var geometry = GmlHelpers.ParseGeometry(message.Message.ExtendedWkbGeometry);
                 document.Document.ExtendedWkbGeometry = message.Message.ExtendedWkbGeometry;
                 document.Document.PositionAsGml = geometry.ConvertToGml(false);
 
                 await context.BuildingUnitDocuments.AddAsync(document, ct);
+
+                var buildingPuri = BuildBuildingPuri(message.Message.BuildingPersistentLocalId);
 
                 List<BaseRegistriesCloudEventAttribute> attributes =
                 [
@@ -165,7 +174,9 @@ namespace BuildingRegistry.Projections.Feed.BuildingUnitFeed
                     new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.Function, null, function),
                     new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.GeometryMethod, null, geometryMethod),
                     new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.Position, null, CreatePositionValues(geometry)),
-                    new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.AdresIds, null, new List<string>())
+                    new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.AdresIds, null, new List<string>()),
+                    new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.GebouwId, null, buildingPuri),
+                    new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.HasDeviation, null, message.Message.HasDeviation)
                 ];
 
                 await AddCloudEvent(message, document, context, attributes, BuildingUnitEventTypes.CreateV1);
@@ -184,11 +195,15 @@ namespace BuildingRegistry.Projections.Feed.BuildingUnitFeed
                     geometryMethod,
                     message.Message.Provenance.Timestamp);
 
+                document.Document.HasDeviation = message.Message.HasDeviation;
+
                 var geometry = GmlHelpers.ParseGeometry(message.Message.ExtendedWkbGeometry);
                 document.Document.ExtendedWkbGeometry = message.Message.ExtendedWkbGeometry;
                 document.Document.PositionAsGml = geometry.ConvertToGml(false);
 
                 await context.BuildingUnitDocuments.AddAsync(document, ct);
+
+                var buildingPuri = BuildBuildingPuri(message.Message.BuildingPersistentLocalId);
 
                 List<BaseRegistriesCloudEventAttribute> attributes =
                 [
@@ -196,7 +211,9 @@ namespace BuildingRegistry.Projections.Feed.BuildingUnitFeed
                     new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.Function, null, GebouweenheidFunctie.GemeenschappelijkDeel),
                     new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.GeometryMethod, null, geometryMethod),
                     new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.Position, null, CreatePositionValues(geometry)),
-                    new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.AdresIds, null, new List<string>())
+                    new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.AdresIds, null, new List<string>()),
+                    new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.GebouwId, null, buildingPuri),
+                    new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.HasDeviation, null, message.Message.HasDeviation)
                 ];
 
                 await AddCloudEvent(message, document, context, attributes, BuildingUnitEventTypes.CreateV1);
@@ -204,37 +221,51 @@ namespace BuildingRegistry.Projections.Feed.BuildingUnitFeed
 
             When<Envelope<BuildingUnitWasMovedIntoBuilding>>(async (context, message, ct) =>
             {
+                var document = await FindDocument(context, message.Message.BuildingUnitPersistentLocalId, ct);
+
+                var oldBuildingPuri = BuildBuildingPuri(document.BuildingPersistentLocalId);
+                var newBuildingPuri = BuildBuildingPuri(message.Message.BuildingPersistentLocalId);
+
+                document.BuildingPersistentLocalId = message.Message.BuildingPersistentLocalId;
+
                 var status = MapBuildingUnitStatus(BuildingUnitStatus.Parse(message.Message.BuildingUnitStatus));
                 var function = MapBuildingUnitFunction(BuildingUnitFunction.Parse(message.Message.Function));
                 var geometryMethod = MapBuildingUnitGeometryMethod(BuildingUnitPositionGeometryMethod.Parse(message.Message.GeometryMethod));
                 var addressPersistentLocalIds = message.Message.AddressPersistentLocalIds.ToList();
 
-                var document = new BuildingUnitDocument(
-                    message.Message.BuildingUnitPersistentLocalId,
-                    message.Message.BuildingPersistentLocalId,
-                    status,
-                    function,
-                    geometryMethod,
-                    message.Message.Provenance.Timestamp);
+                var oldAddressPuris = BuildAddressPuris(document.Document.AddressPersistentLocalIds);
+                var oldStatus = document.Document.Status;
+                var oldFunction = document.Document.Function;
+                var oldGeometryMethod = document.Document.GeometryMethod;
+                var oldPositionValues = CreatePositionValues(GmlHelpers.ParseGeometry(document.Document.ExtendedWkbGeometry));
+                var oldHasDeviation = document.Document.HasDeviation;
 
+                document.Document.Status = status;
+                document.Document.Function = function;
+                document.Document.GeometryMethod = geometryMethod;
                 document.Document.AddressPersistentLocalIds = addressPersistentLocalIds;
+                document.Document.HasDeviation = message.Message.HasDeviation;
+                document.IsRemoved = false;
 
                 var geometry = GmlHelpers.ParseGeometry(message.Message.ExtendedWkbGeometry);
                 document.Document.ExtendedWkbGeometry = message.Message.ExtendedWkbGeometry;
                 document.Document.PositionAsGml = geometry.ConvertToGml(false);
+                document.LastChangedOn = message.Message.Provenance.Timestamp;
 
-                await context.BuildingUnitDocuments.AddAsync(document, ct);
+                var newAddressPuris = BuildAddressPuris(addressPersistentLocalIds);
 
                 List<BaseRegistriesCloudEventAttribute> attributes =
                 [
-                    new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.StatusName, null, status),
-                    new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.Function, null, function),
-                    new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.GeometryMethod, null, geometryMethod),
-                    new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.Position, null, CreatePositionValues(geometry)),
-                    new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.AdresIds, null, BuildAddressPuris(addressPersistentLocalIds))
+                    new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.StatusName, oldStatus, status),
+                    new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.Function, oldFunction, function),
+                    new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.GeometryMethod, oldGeometryMethod, geometryMethod),
+                    new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.Position, oldPositionValues, CreatePositionValues(geometry)),
+                    new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.AdresIds, oldAddressPuris, newAddressPuris),
+                    new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.GebouwId, oldBuildingPuri, newBuildingPuri),
+                    new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.HasDeviation, oldHasDeviation, message.Message.HasDeviation)
                 ];
 
-                await AddCloudEvent(message, document, context, attributes, BuildingUnitEventTypes.CreateV1);
+                await AddCloudEvent(message, document, context, attributes);
             });
 
             When<Envelope<BuildingUnitWasRealizedV2>>(async (context, message, ct) =>
@@ -422,14 +453,7 @@ namespace BuildingRegistry.Projections.Feed.BuildingUnitFeed
                 await AddCloudEvent(message, document, context, [], BuildingUnitEventTypes.DeleteV1);
             });
 
-            When<Envelope<BuildingUnitWasMovedOutOfBuilding>>(async (context, message, ct) =>
-            {
-                var document = await FindDocument(context, message.Message.BuildingUnitPersistentLocalId, ct);
-                document.IsRemoved = true;
-                document.LastChangedOn = message.Message.Provenance.Timestamp;
-
-                await AddCloudEvent(message, document, context, [], BuildingUnitEventTypes.DeleteV1);
-            });
+            When<Envelope<BuildingUnitWasMovedOutOfBuilding>>(DoNothing);
 
             When<Envelope<BuildingUnitRemovalWasCorrected>>(async (context, message, ct) =>
             {
@@ -444,11 +468,14 @@ namespace BuildingRegistry.Projections.Feed.BuildingUnitFeed
                 document.Document.Function = function;
                 document.Document.GeometryMethod = geometryMethod;
                 document.Document.AddressPersistentLocalIds = new List<int>();
+                document.Document.HasDeviation = message.Message.HasDeviation;
 
                 var geometry = GmlHelpers.ParseGeometry(message.Message.ExtendedWkbGeometry);
                 document.Document.ExtendedWkbGeometry = message.Message.ExtendedWkbGeometry;
                 document.Document.PositionAsGml = geometry.ConvertToGml(false);
                 document.LastChangedOn = message.Message.Provenance.Timestamp;
+
+                var buildingPuri = BuildBuildingPuri(document.BuildingPersistentLocalId);
 
                 List<BaseRegistriesCloudEventAttribute> attributes =
                 [
@@ -456,16 +483,65 @@ namespace BuildingRegistry.Projections.Feed.BuildingUnitFeed
                     new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.Function, null, function),
                     new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.GeometryMethod, null, geometryMethod),
                     new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.Position, null, CreatePositionValues(geometry)),
-                    new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.AdresIds, null, new List<string>())
+                    new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.AdresIds, null, new List<string>()),
+                    new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.GebouwId, null, buildingPuri),
+                    new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.HasDeviation, null, message.Message.HasDeviation)
                 ];
 
                 await AddCloudEvent(message, document, context, attributes, BuildingUnitEventTypes.CreateV1);
             });
 
-            When<Envelope<BuildingUnitWasRegularized>>(DoNothing);
-            When<Envelope<BuildingUnitRegularizationWasCorrected>>(DoNothing);
-            When<Envelope<BuildingUnitWasDeregulated>>(DoNothing);
-            When<Envelope<BuildingUnitDeregulationWasCorrected>>(DoNothing);
+            When<Envelope<BuildingUnitWasRegularized>>(async (context, message, ct) =>
+            {
+                var document = await FindDocument(context, message.Message.BuildingUnitPersistentLocalId, ct);
+                var oldHasDeviation = document.Document.HasDeviation;
+                document.Document.HasDeviation = false;
+                document.LastChangedOn = message.Message.Provenance.Timestamp;
+
+                await AddCloudEvent(message, document, context,
+                [
+                    new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.HasDeviation, oldHasDeviation, false)
+                ]);
+            });
+
+            When<Envelope<BuildingUnitRegularizationWasCorrected>>(async (context, message, ct) =>
+            {
+                var document = await FindDocument(context, message.Message.BuildingUnitPersistentLocalId, ct);
+                var oldHasDeviation = document.Document.HasDeviation;
+                document.Document.HasDeviation = true;
+                document.LastChangedOn = message.Message.Provenance.Timestamp;
+
+                await AddCloudEvent(message, document, context,
+                [
+                    new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.HasDeviation, oldHasDeviation, true)
+                ]);
+            });
+
+            When<Envelope<BuildingUnitWasDeregulated>>(async (context, message, ct) =>
+            {
+                var document = await FindDocument(context, message.Message.BuildingUnitPersistentLocalId, ct);
+                var oldHasDeviation = document.Document.HasDeviation;
+                document.Document.HasDeviation = true;
+                document.LastChangedOn = message.Message.Provenance.Timestamp;
+
+                await AddCloudEvent(message, document, context,
+                [
+                    new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.HasDeviation, oldHasDeviation, true)
+                ]);
+            });
+
+            When<Envelope<BuildingUnitDeregulationWasCorrected>>(async (context, message, ct) =>
+            {
+                var document = await FindDocument(context, message.Message.BuildingUnitPersistentLocalId, ct);
+                var oldHasDeviation = document.Document.HasDeviation;
+                document.Document.HasDeviation = false;
+                document.LastChangedOn = message.Message.Provenance.Timestamp;
+
+                await AddCloudEvent(message, document, context,
+                [
+                    new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.HasDeviation, oldHasDeviation, false)
+                ]);
+            });
 
             When<Envelope<BuildingUnitAddressWasAttachedV2>>(async (context, message, ct) =>
             {
@@ -759,6 +835,11 @@ namespace BuildingRegistry.Projections.Feed.BuildingUnitFeed
                 .Select(id => OsloNamespaces.Adres.ToPuri(id.ToString()))
                 .Distinct()
                 .ToList();
+        }
+
+        private static string BuildBuildingPuri(int buildingPersistentLocalId)
+        {
+            return OsloNamespaces.Gebouw.ToPuri(buildingPersistentLocalId.ToString());
         }
 
         private static Task DoNothing<T>(FeedContext context, Envelope<T> envelope, CancellationToken ct) where T : IMessage => Task.CompletedTask;

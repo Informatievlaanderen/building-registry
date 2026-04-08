@@ -77,6 +77,7 @@ namespace BuildingRegistry.Projections.Feed.BuildingUnitFeed
         public string PositionAsGml { get; set; } = string.Empty;
         public string ExtendedWkbGeometry { get; set; } = string.Empty;
         public List<int> AddressPersistentLocalIds { get; set; } = new();
+        public bool HasDeviation { get; set; }
 
         public DateTimeOffset VersionId { get; set; }
     }

@@ -17,6 +17,8 @@ namespace BuildingRegistry.Projections.Feed.Contract
         public const string GeometryMethod = "positieGeometrieMethode";
         public const string Position = "gebouweenheidPositie";
         public const string AdresIds = "adresIds";
+        public const string GebouwId = "gebouwId";
+        public const string HasDeviation = "afwijkingVastgesteld";
     }
 
     public sealed class BuildingUnitPositionCloudEventValue
