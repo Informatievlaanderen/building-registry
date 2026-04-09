@@ -1,3 +1,11 @@
+# [5.9.0](https://github.com/informatievlaanderen/building-registry/compare/v5.8.0...v5.9.0) (2026-04-09)
+
+
+### Features
+
+* **feed:** add building feed projection ([504964d](https://github.com/informatievlaanderen/building-registry/commit/504964d3ec17317ce9263818d196572832c6e422))
+* **feed:** add BuildingUnitFeedProjections ([f35bb96](https://github.com/informatievlaanderen/building-registry/commit/f35bb96180c33b3bac68252fb069d7bf6b0420cb))
+
 # [5.8.0](https://github.com/informatievlaanderen/building-registry/compare/v5.7.0...v5.8.0) (2026-03-31)
 
 
