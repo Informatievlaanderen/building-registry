@@ -76,7 +76,7 @@ namespace BuildingRegistry.Api.Oslo.BuildingUnit.ChangeFeed
                                              ]
                                          },
                                          {
-                                             "naam": "gebouwId",
+                                             "naam": "gebouw.id",
                                              "oudeWaarde": null,
                                              "nieuweWaarde": "https://data.vlaanderen.be/id/gebouw/6355606"
                                          },
