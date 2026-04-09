@@ -142,18 +142,21 @@ namespace BuildingRegistry.Projector.Infrastructure.Modules
                         _loggerFactory,
                         jsonSerializerSettings));
 
+            var buildingServiceKey = "building";
+            var buildingUnitServiceKey = "buildingUnit";
+
             builder.Register(c => new ChangeFeedService(
                     _configuration.GetSection("BuildingFeed").Get<ChangeFeedConfig>()!,
                     c.Resolve<LastChangedListContext>(),
                     new JsonSerializerSettings().ConfigureDefaultForApi()))
-                .Keyed<IChangeFeedService>("building")
+                .Keyed<IChangeFeedService>(buildingServiceKey)
                 .InstancePerLifetimeScope();
 
             builder.Register(c => new ChangeFeedService(
                     _configuration.GetSection("BuildingUnitFeed").Get<ChangeFeedConfig>()!,
                     c.Resolve<LastChangedListContext>(),
                     new JsonSerializerSettings().ConfigureDefaultForApi()))
-                .Keyed<IChangeFeedService>("buildingUnit")
+                .Keyed<IChangeFeedService>(buildingUnitServiceKey)
                 .InstancePerLifetimeScope();
 
             builder
@@ -172,7 +175,7 @@ namespace BuildingRegistry.Projector.Infrastructure.Modules
                     _loggerFactory)
                 .RegisterProjections<BuildingFeedProjections, FeedContext>(
                     context => new BuildingFeedProjections(
-                        context.ResolveKeyed<IChangeFeedService>("building"),
+                        context.ResolveKeyed<IChangeFeedService>(buildingServiceKey),
                         context.Resolve<IMunicipalityGeometryRepository>()),
                     ConnectedProjectionSettings.Configure(c =>
                     {
@@ -181,7 +184,7 @@ namespace BuildingRegistry.Projector.Infrastructure.Modules
                     }))
                 .RegisterProjections<BuildingUnitFeedProjections, FeedContext>(
                     context => new BuildingUnitFeedProjections(
-                        context.ResolveKeyed<IChangeFeedService>("buildingUnit"),
+                        context.ResolveKeyed<IChangeFeedService>(buildingUnitServiceKey),
                         context.Resolve<IMunicipalityGeometryRepository>()),
                     ConnectedProjectionSettings.Configure(c =>
                     {

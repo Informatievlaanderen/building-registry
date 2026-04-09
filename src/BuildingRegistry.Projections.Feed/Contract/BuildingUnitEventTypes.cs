@@ -30,7 +30,7 @@ namespace BuildingRegistry.Projections.Feed.Contract
         public string Projection { get; set; }
 
         [JsonProperty("gml")]
-        public string Gml { get; set; } = string.Empty;
+        public string Gml { get; set; }
 
         public BuildingUnitPositionCloudEventValue(string gml, string projection)
         {
