@@ -17,5 +17,6 @@ namespace BuildingRegistry.Api.Oslo.Infrastructure.Options
         public string ContextUrlUnitList { get; set; }
         public string ContextUrlUnitDetail { get; set; }
         public ChangeFeedConfig BuildingFeed { get; set; }
+        public ChangeFeedConfig BuildingUnitFeed { get; set; }
     }
 }

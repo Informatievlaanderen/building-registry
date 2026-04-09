@@ -1,17 +1,17 @@
-namespace BuildingRegistry.Projections.Feed.BuildingFeed
+namespace BuildingRegistry.Projections.Feed.BuildingUnitFeed
 {
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Infrastructure;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-    public class BuildingFeedItem
+    public class BuildingUnitFeedItem
     {
         public long Id { get; set; }
         public int Page { get; set; }
         public long Position { get; set; }
 
-        public int BuildingPersistentLocalId { get; set; }
+        public int BuildingUnitPersistentLocalId { get; set; }
 
         public Application? Application { get; set; }
         public Modification? Modification { get; set; }
@@ -20,22 +20,22 @@ namespace BuildingRegistry.Projections.Feed.BuildingFeed
         public string? Reason { get; set; }
         public string CloudEventAsString { get; set; } = null!;
 
-        private BuildingFeedItem() { }
+        private BuildingUnitFeedItem() { }
 
-        public BuildingFeedItem(long position, int page, int buildingPersistentLocalId) : this()
+        public BuildingUnitFeedItem(long position, int page, int buildingUnitPersistentLocalId) : this()
         {
             Page = page;
             Position = position;
-            BuildingPersistentLocalId = buildingPersistentLocalId;
+            BuildingUnitPersistentLocalId = buildingUnitPersistentLocalId;
         }
     }
 
-    public class BuildingFeedConfiguration : IEntityTypeConfiguration<BuildingFeedItem>
+    public class BuildingUnitFeedConfiguration : IEntityTypeConfiguration<BuildingUnitFeedItem>
     {
-        private const string TableName = "BuildingFeed";
-        public const string SequenceName = "BuildingFeedSequence";
+        private const string TableName = "BuildingUnitFeed";
+        public const string SequenceName = "BuildingUnitFeedSequence";
 
-        public void Configure(EntityTypeBuilder<BuildingFeedItem> b)
+        public void Configure(EntityTypeBuilder<BuildingUnitFeedItem> b)
         {
             b.ToTable(TableName, Schema.Feed)
                 .HasKey(x => x.Id)
@@ -44,7 +44,7 @@ namespace BuildingRegistry.Projections.Feed.BuildingFeed
             b.Property(x => x.Id)
                 .UseHiLo(SequenceName, Schema.Feed);
 
-            b.Property(x => x.BuildingPersistentLocalId)
+            b.Property(x => x.BuildingUnitPersistentLocalId)
                 .IsRequired();
 
             b.Property(x => x.CloudEventAsString)
@@ -59,7 +59,7 @@ namespace BuildingRegistry.Projections.Feed.BuildingFeed
 
             b.HasIndex(x => x.Position);
             b.HasIndex(x => x.Page);
-            b.HasIndex(x => x.BuildingPersistentLocalId);
+            b.HasIndex(x => x.BuildingUnitPersistentLocalId);
         }
     }
 }

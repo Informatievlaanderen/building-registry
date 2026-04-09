@@ -63,10 +63,11 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
         }
 
         [Fact]
-        public async Task WhenBuildingWasMigrated_ThenFeedItemAndDocumentAreAdded()
+        public async Task WhenRemovedBuildingWasMigrated_ThenFeedItemIsNotAddedAndDocumentAreIsAdded()
         {
             _fixture.Register(() => BuildingStatus.Planned);
             _fixture.Register(() => BuildingGeometryMethod.Outlined);
+            _fixture.Register(() => true);
 
             var buildingWasMigrated = _fixture.Create<BuildingWasMigrated>();
             var position = 1L;
@@ -77,12 +78,59 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
                 {
                     var document = await context.BuildingDocuments.FindAsync(buildingWasMigrated.BuildingPersistentLocalId);
                     document.Should().NotBeNull();
-                    document!.IsRemoved.Should().Be(buildingWasMigrated.IsRemoved);
+                    document!.IsRemoved.Should().BeTrue();
                     document.RecordCreatedAt.Should().Be(buildingWasMigrated.Provenance.Timestamp);
                     document.LastChangedOn.Should().Be(buildingWasMigrated.Provenance.Timestamp);
                     document.Document.VersionId.Should().Be(buildingWasMigrated.Provenance.Timestamp.ToBelgianDateTimeOffset());
 
-                    document.Document.PersistentLocalId.Should().Be(buildingWasMigrated.BuildingPersistentLocalId);
+                    document.Document.BuildingPersistentLocalId.Should().Be(buildingWasMigrated.BuildingPersistentLocalId);
+                    document.Document.Status.Should().Be(GebouwStatus.Gepland);
+                    document.Document.GeometryMethod.Should().Be(GeometrieMethode.Ingeschetst);
+                    document.Document.GeometryAsGml.Should().NotBeNullOrEmpty();
+                    document.Document.ExtendedWkbGeometry.Should().Be(buildingWasMigrated.ExtendedWkbGeometry);
+
+                    var feedItem = await FindFeedItemByBuildingPersistentLocalId(context, buildingWasMigrated.BuildingPersistentLocalId);
+                    feedItem.Should().BeNull();
+
+                    ChangeFeedServiceMock.Verify(x => x.CreateCloudEventWithData(
+                            It.IsAny<long>(),
+                            It.IsAny<DateTimeOffset>(),
+                            It.IsAny<string>(),
+                            It.IsAny<string>(),
+                            It.IsAny<DateTimeOffset>(),
+                            It.IsAny<List<string>>(),
+                            It.IsAny<List<BaseRegistriesCloudEventAttribute>>(),
+                            It.IsAny<string>(),
+                            It.IsAny<string>()),
+                        Times.Never);
+
+                    ChangeFeedServiceMock.Verify(x => x.SerializeCloudEvent(It.IsAny<CloudEvent>()), Times.Never);
+                    ChangeFeedServiceMock.Verify(x => x.CheckToUpdateCacheAsync(It.IsAny<int>(), It.IsAny<FeedContext>(), It.IsAny<Func<int, Task<int>>>()), Times.Never);
+                });
+        }
+
+        [Fact]
+        public async Task WhenBuildingWasMigrated_ThenFeedItemAndDocumentAreAdded()
+        {
+            _fixture.Register(() => BuildingStatus.Planned);
+            _fixture.Register(() => BuildingGeometryMethod.Outlined);
+            _fixture.Register(() => false);
+
+            var buildingWasMigrated = _fixture.Create<BuildingWasMigrated>();
+            var position = 1L;
+
+            await Sut
+                .Given(CreateEnvelope(buildingWasMigrated, position))
+                .Then(async context =>
+                {
+                    var document = await context.BuildingDocuments.FindAsync(buildingWasMigrated.BuildingPersistentLocalId);
+                    document.Should().NotBeNull();
+                    document!.IsRemoved.Should().BeFalse();
+                    document.RecordCreatedAt.Should().Be(buildingWasMigrated.Provenance.Timestamp);
+                    document.LastChangedOn.Should().Be(buildingWasMigrated.Provenance.Timestamp);
+                    document.Document.VersionId.Should().Be(buildingWasMigrated.Provenance.Timestamp.ToBelgianDateTimeOffset());
+
+                    document.Document.BuildingPersistentLocalId.Should().Be(buildingWasMigrated.BuildingPersistentLocalId);
                     document.Document.Status.Should().Be(GebouwStatus.Gepland);
                     document.Document.GeometryMethod.Should().Be(GeometrieMethode.Ingeschetst);
                     document.Document.GeometryAsGml.Should().NotBeNullOrEmpty();
@@ -134,7 +182,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
                     document.LastChangedOn.Should().Be(buildingWasPlannedV2.Provenance.Timestamp);
                     document.Document.VersionId.Should().Be(buildingWasPlannedV2.Provenance.Timestamp.ToBelgianDateTimeOffset());
 
-                    document.Document.PersistentLocalId.Should().Be(buildingWasPlannedV2.BuildingPersistentLocalId);
+                    document.Document.BuildingPersistentLocalId.Should().Be(buildingWasPlannedV2.BuildingPersistentLocalId);
                     document.Document.Status.Should().Be(GebouwStatus.Gepland);
                     document.Document.GeometryMethod.Should().Be(GeometrieMethode.Ingeschetst);
                     document.Document.GeometryAsGml.Should().NotBeNullOrEmpty();

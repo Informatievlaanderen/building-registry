@@ -55,6 +55,9 @@ namespace BuildingRegistry.Projections.Feed.BuildingFeed
 
                 await context.BuildingDocuments.AddAsync(document, ct);
 
+                if (document.IsRemoved)
+                    return;
+
                 List<BaseRegistriesCloudEventAttribute> attributes =
                 [
                     new BaseRegistriesCloudEventAttribute(BuildingAttributeNames.StatusName, null, document.Document.Status),
@@ -390,7 +393,7 @@ namespace BuildingRegistry.Projections.Feed.BuildingFeed
             var buildingFeedItem = new BuildingFeedItem(
                 position: message.Position,
                 page: page,
-                buildingPersistentLocalId: document.PersistentLocalId)
+                buildingPersistentLocalId: document.BuildingPersistentLocalId)
             {
                 Application = message.Message.Provenance.Application,
                 Modification = message.Message.Provenance.Modification,
@@ -404,7 +407,7 @@ namespace BuildingRegistry.Projections.Feed.BuildingFeed
                 buildingFeedItem.Id,
                 message.Message.Provenance.Timestamp.ToBelgianDateTimeOffset(),
                 eventType,
-                document.PersistentLocalId.ToString(),
+                document.BuildingPersistentLocalId.ToString(),
                 document.LastChangedOnAsDateTimeOffset,
                 nisCodes,
                 attributes,

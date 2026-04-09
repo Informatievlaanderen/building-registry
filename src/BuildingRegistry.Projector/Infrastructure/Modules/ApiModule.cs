@@ -20,6 +20,7 @@ namespace BuildingRegistry.Projector.Infrastructure.Modules
     using BuildingRegistry.Projections.Extract.BuildingUnitExtract;
     using BuildingRegistry.Projections.Feed;
     using BuildingRegistry.Projections.Feed.BuildingFeed;
+    using BuildingRegistry.Projections.Feed.BuildingUnitFeed;
     using BuildingRegistry.Projections.Integration;
     using BuildingRegistry.Projections.Integration.Building.LatestItem;
     using BuildingRegistry.Projections.Integration.Building.Version;
@@ -141,12 +142,21 @@ namespace BuildingRegistry.Projector.Infrastructure.Modules
                         _loggerFactory,
                         jsonSerializerSettings));
 
+            var buildingServiceKey = "building";
+            var buildingUnitServiceKey = "buildingUnit";
+
             builder.Register(c => new ChangeFeedService(
-                    c.Resolve<IOptions<ChangeFeedConfig>>().Value,
+                    _configuration.GetSection("BuildingFeed").Get<ChangeFeedConfig>()!,
                     c.Resolve<LastChangedListContext>(),
                     new JsonSerializerSettings().ConfigureDefaultForApi()))
-                .AsImplementedInterfaces()
-                .AsSelf()
+                .Keyed<IChangeFeedService>(buildingServiceKey)
+                .InstancePerLifetimeScope();
+
+            builder.Register(c => new ChangeFeedService(
+                    _configuration.GetSection("BuildingUnitFeed").Get<ChangeFeedConfig>()!,
+                    c.Resolve<LastChangedListContext>(),
+                    new JsonSerializerSettings().ConfigureDefaultForApi()))
+                .Keyed<IChangeFeedService>(buildingUnitServiceKey)
                 .InstancePerLifetimeScope();
 
             builder
@@ -165,7 +175,16 @@ namespace BuildingRegistry.Projector.Infrastructure.Modules
                     _loggerFactory)
                 .RegisterProjections<BuildingFeedProjections, FeedContext>(
                     context => new BuildingFeedProjections(
-                        context.Resolve<IChangeFeedService>(),
+                        context.ResolveKeyed<IChangeFeedService>(buildingServiceKey),
+                        context.Resolve<IMunicipalityGeometryRepository>()),
+                    ConnectedProjectionSettings.Configure(c =>
+                    {
+                        c.ConfigureCatchUpPageSize(1);
+                        c.ConfigureCatchUpUpdatePositionMessageInterval(1);
+                    }))
+                .RegisterProjections<BuildingUnitFeedProjections, FeedContext>(
+                    context => new BuildingUnitFeedProjections(
+                        context.ResolveKeyed<IChangeFeedService>(buildingUnitServiceKey),
                         context.Resolve<IMunicipalityGeometryRepository>()),
                     ConnectedProjectionSettings.Configure(c =>
                     {

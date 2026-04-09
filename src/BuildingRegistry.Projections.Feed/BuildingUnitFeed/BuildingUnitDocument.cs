@@ -1,19 +1,22 @@
-namespace BuildingRegistry.Projections.Feed.BuildingFeed
+namespace BuildingRegistry.Projections.Feed.BuildingUnitFeed
 {
     using System;
+    using System.Collections.Generic;
     using Be.Vlaanderen.Basisregisters.GrAr.Common;
-    using Be.Vlaanderen.Basisregisters.GrAr.Legacy.Gebouw;
+    using Be.Vlaanderen.Basisregisters.GrAr.Legacy;
+    using Be.Vlaanderen.Basisregisters.GrAr.Legacy.Gebouweenheid;
     using Infrastructure;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.EntityFrameworkCore.Metadata.Builders;
     using Newtonsoft.Json;
     using NodaTime;
 
-    public sealed class BuildingDocument
+    public sealed class BuildingUnitDocument
     {
+        public int BuildingUnitPersistentLocalId { get; set; }
         public int BuildingPersistentLocalId { get; set; }
         public bool IsRemoved { get; set; }
-        public BuildingDocumentContent Document { get; set; }
+        public BuildingUnitDocumentContent Document { get; set; }
 
         public DateTimeOffset LastChangedOnAsDateTimeOffset { get; set; }
         public DateTimeOffset RecordCreatedAtAsDateTimeOffset { get; set; }
@@ -35,60 +38,71 @@ namespace BuildingRegistry.Projections.Feed.BuildingFeed
             }
         }
 
-        private BuildingDocument()
+        private BuildingUnitDocument()
         {
-            Document = new BuildingDocumentContent();
+            Document = new BuildingUnitDocumentContent();
             IsRemoved = false;
         }
 
-        public BuildingDocument(
+        public BuildingUnitDocument(
+            int buildingUnitPersistentLocalId,
             int buildingPersistentLocalId,
-            GebouwStatus status,
-            GeometrieMethode geometryMethod,
+            GebouweenheidStatus status,
+            GebouweenheidFunctie function,
+            PositieGeometrieMethode geometryMethod,
+            bool hasDeviation,
             Instant createdTimestamp)
         {
+            BuildingUnitPersistentLocalId = buildingUnitPersistentLocalId;
             BuildingPersistentLocalId = buildingPersistentLocalId;
             RecordCreatedAt = createdTimestamp;
 
-            Document = new BuildingDocumentContent
+            Document = new BuildingUnitDocumentContent
             {
-                BuildingPersistentLocalId = buildingPersistentLocalId,
+                BuildingUnitPersistentLocalId = buildingUnitPersistentLocalId,
                 Status = status,
+                Function = function,
                 GeometryMethod = geometryMethod,
+                HasDeviation = hasDeviation,
             };
 
             LastChangedOn = createdTimestamp;
         }
     }
 
-    public sealed class BuildingDocumentContent
+    public sealed class BuildingUnitDocumentContent
     {
-        public int BuildingPersistentLocalId { get; set; }
-        public GebouwStatus Status { get; set; }
-        public GeometrieMethode GeometryMethod { get; set; }
-        public string GeometryAsGml { get; set; } = string.Empty;
+        public int BuildingUnitPersistentLocalId { get; set; }
+        public GebouweenheidStatus Status { get; set; }
+        public GebouweenheidFunctie Function { get; set; }
+        public PositieGeometrieMethode GeometryMethod { get; set; }
+        public string PositionAsGml { get; set; } = string.Empty;
         public string ExtendedWkbGeometry { get; set; } = string.Empty;
+        public List<int> AddressPersistentLocalIds { get; set; } = new();
+        public bool HasDeviation { get; set; }
 
         public DateTimeOffset VersionId { get; set; }
     }
 
-    public sealed class BuildingDocumentConfiguration : IEntityTypeConfiguration<BuildingDocument>
+    public sealed class BuildingUnitDocumentConfiguration : IEntityTypeConfiguration<BuildingUnitDocument>
     {
         private readonly JsonSerializerSettings _serializerSettings;
 
-        public BuildingDocumentConfiguration(JsonSerializerSettings serializerSettings)
+        public BuildingUnitDocumentConfiguration(JsonSerializerSettings serializerSettings)
         {
             _serializerSettings = serializerSettings;
         }
 
-        public void Configure(EntityTypeBuilder<BuildingDocument> b)
+        public void Configure(EntityTypeBuilder<BuildingUnitDocument> b)
         {
-            b.ToTable("BuildingDocuments", Schema.Feed)
-                .HasKey(x => x.BuildingPersistentLocalId)
+            b.ToTable("BuildingUnitDocuments", Schema.Feed)
+                .HasKey(x => x.BuildingUnitPersistentLocalId)
                 .IsClustered();
 
-            b.Property(x => x.BuildingPersistentLocalId)
+            b.Property(x => x.BuildingUnitPersistentLocalId)
                 .ValueGeneratedNever();
+
+            b.Property(x => x.BuildingPersistentLocalId);
 
             b.Property(x => x.LastChangedOnAsDateTimeOffset)
                 .HasColumnName("LastChangedOn");
@@ -99,10 +113,12 @@ namespace BuildingRegistry.Projections.Feed.BuildingFeed
             b.Property(x => x.Document)
                 .HasConversion(
                     v => JsonConvert.SerializeObject(v, _serializerSettings),
-                    v => JsonConvert.DeserializeObject<BuildingDocumentContent>(v, _serializerSettings)!);
+                    v => JsonConvert.DeserializeObject<BuildingUnitDocumentContent>(v, _serializerSettings)!);
 
             b.Ignore(x => x.LastChangedOn);
             b.Ignore(x => x.RecordCreatedAt);
+
+            b.HasIndex(x => x.BuildingPersistentLocalId);
         }
     }
 }

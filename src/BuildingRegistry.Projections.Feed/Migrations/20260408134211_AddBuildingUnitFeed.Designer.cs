@@ -4,6 +4,7 @@ using BuildingRegistry.Projections.Feed;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BuildingRegistry.Projections.Feed.Migrations
 {
     [DbContext(typeof(FeedContext))]
-    partial class FeedContextModelSnapshot : ModelSnapshot
+    [Migration("20260408134211_AddBuildingUnitFeed")]
+    partial class AddBuildingUnitFeed
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -50,7 +53,7 @@ namespace BuildingRegistry.Projections.Feed.Migrations
 
             modelBuilder.Entity("BuildingRegistry.Projections.Feed.BuildingFeed.BuildingDocument", b =>
                 {
-                    b.Property<int>("BuildingPersistentLocalId")
+                    b.Property<int>("PersistentLocalId")
                         .HasColumnType("int");
 
                     b.Property<string>("Document")
@@ -68,9 +71,9 @@ namespace BuildingRegistry.Projections.Feed.Migrations
                         .HasColumnType("datetimeoffset")
                         .HasColumnName("RecordCreatedAt");
 
-                    b.HasKey("BuildingPersistentLocalId");
+                    b.HasKey("PersistentLocalId");
 
-                    SqlServerKeyBuilderExtensions.IsClustered(b.HasKey("BuildingPersistentLocalId"));
+                    SqlServerKeyBuilderExtensions.IsClustered(b.HasKey("PersistentLocalId"));
 
                     b.ToTable("BuildingDocuments", "BuildingRegistryFeed");
                 });
@@ -143,7 +146,7 @@ namespace BuildingRegistry.Projections.Feed.Migrations
 
             modelBuilder.Entity("BuildingRegistry.Projections.Feed.BuildingUnitFeed.BuildingUnitDocument", b =>
                 {
-                    b.Property<int>("BuildingUnitPersistentLocalId")
+                    b.Property<int>("PersistentLocalId")
                         .HasColumnType("int");
 
                     b.Property<int>("BuildingPersistentLocalId")
@@ -164,9 +167,9 @@ namespace BuildingRegistry.Projections.Feed.Migrations
                         .HasColumnType("datetimeoffset")
                         .HasColumnName("RecordCreatedAt");
 
-                    b.HasKey("BuildingUnitPersistentLocalId");
+                    b.HasKey("PersistentLocalId");
 
-                    SqlServerKeyBuilderExtensions.IsClustered(b.HasKey("BuildingUnitPersistentLocalId"));
+                    SqlServerKeyBuilderExtensions.IsClustered(b.HasKey("PersistentLocalId"));
 
                     b.HasIndex("BuildingPersistentLocalId");
 

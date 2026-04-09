@@ -29,6 +29,7 @@ namespace BuildingRegistry.Tests
     using Projections.Extract.BuildingUnitExtract;
     using Projections.Feed;
     using Projections.Feed.BuildingFeed;
+    using Projections.Feed.BuildingUnitFeed;
     using Projections.Integration;
     using Projections.Integration.Building.LatestItem;
     using Projections.Integration.Building.Version;
@@ -155,6 +156,7 @@ namespace BuildingRegistry.Tests
             yield return [new List<ConnectedProjection<FeedContext>>
             {
                 new BuildingFeedProjections(Mock.Of<IChangeFeedService>(), Mock.Of<IMunicipalityGeometryRepository>()),
+                new BuildingUnitFeedProjections(Mock.Of<IChangeFeedService>(), Mock.Of<IMunicipalityGeometryRepository>())
             }];
 
             yield return [new List<ConnectedProjection<WmsContext>>

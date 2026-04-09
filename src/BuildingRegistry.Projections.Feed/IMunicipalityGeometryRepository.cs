@@ -1,4 +1,4 @@
-namespace BuildingRegistry.Projections.Feed.BuildingFeed
+namespace BuildingRegistry.Projections.Feed
 {
     using System.Collections.Generic;
     using NodaTime;
