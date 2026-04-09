@@ -1,3 +1,10 @@
+## [5.9.1](https://github.com/informatievlaanderen/building-registry/compare/v5.9.0...v5.9.1) (2026-04-09)
+
+
+### Bug Fixes
+
+* **feed:** buildingunit link to gebouw.id ([7b47d97](https://github.com/informatievlaanderen/building-registry/commit/7b47d9788c94d4a9e3391da2ff983129456ac0ad))
+
 # [5.9.0](https://github.com/informatievlaanderen/building-registry/compare/v5.8.0...v5.9.0) (2026-04-09)
 
 
