@@ -63,7 +63,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
         }
 
         [Fact]
-        public async Task WhenRemovedBuildingWasMigrated_ThenFeedItemAndDocumentAreNotAdded()
+        public async Task WhenRemovedBuildingWasMigrated_ThenFeedItemIsNotAddedAndDocumentAreIsAdded()
         {
             _fixture.Register(() => BuildingStatus.Planned);
             _fixture.Register(() => BuildingGeometryMethod.Outlined);
@@ -77,7 +77,17 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
                 .Then(async context =>
                 {
                     var document = await context.BuildingDocuments.FindAsync(buildingWasMigrated.BuildingPersistentLocalId);
-                    document.Should().BeNull();
+                    document.Should().NotBeNull();
+                    document!.IsRemoved.Should().BeTrue();
+                    document.RecordCreatedAt.Should().Be(buildingWasMigrated.Provenance.Timestamp);
+                    document.LastChangedOn.Should().Be(buildingWasMigrated.Provenance.Timestamp);
+                    document.Document.VersionId.Should().Be(buildingWasMigrated.Provenance.Timestamp.ToBelgianDateTimeOffset());
+
+                    document.Document.BuildingPersistentLocalId.Should().Be(buildingWasMigrated.BuildingPersistentLocalId);
+                    document.Document.Status.Should().Be(GebouwStatus.Gepland);
+                    document.Document.GeometryMethod.Should().Be(GeometrieMethode.Ingeschetst);
+                    document.Document.GeometryAsGml.Should().NotBeNullOrEmpty();
+                    document.Document.ExtendedWkbGeometry.Should().Be(buildingWasMigrated.ExtendedWkbGeometry);
 
                     var feedItem = await FindFeedItemByBuildingPersistentLocalId(context, buildingWasMigrated.BuildingPersistentLocalId);
                     feedItem.Should().BeNull();
@@ -115,7 +125,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
                 {
                     var document = await context.BuildingDocuments.FindAsync(buildingWasMigrated.BuildingPersistentLocalId);
                     document.Should().NotBeNull();
-                    document!.IsRemoved.Should().Be(buildingWasMigrated.IsRemoved);
+                    document!.IsRemoved.Should().BeFalse();
                     document.RecordCreatedAt.Should().Be(buildingWasMigrated.Provenance.Timestamp);
                     document.LastChangedOn.Should().Be(buildingWasMigrated.Provenance.Timestamp);
                     document.Document.VersionId.Should().Be(buildingWasMigrated.Provenance.Timestamp.ToBelgianDateTimeOffset());

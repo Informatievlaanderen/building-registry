@@ -71,6 +71,107 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
         }
 
         [Fact]
+        public async Task WhenBuildingWasMigratedWithRemovedBuildingUnits_ThenBuildingGeometryIsStoredAndBuildingUnitDocumentsCreated()
+        {
+            _fixture.Register(() => BuildingStatus.Planned);
+            _fixture.Register(() => BuildingGeometryMethod.Outlined);
+            _fixture.Register(() => false);
+            _fixture.Customize(new WithValidExtendedWkbPoint());
+            _fixture.RepeatCount = 1;
+
+            var builder = new BuildingWasMigratedBuilder(_fixture)
+                .WithBuildingUnit(status: BuildingRegistry.Legacy.BuildingUnitStatus.Realized, isRemoved: true)
+                .WithBuildingUnit(status: BuildingRegistry.Legacy.BuildingUnitStatus.Realized, isRemoved: false);
+            var buildingWasMigrated = builder.Build();
+            var position = 1L;
+
+            await Sut
+                .Given(CreateEnvelope(buildingWasMigrated, position))
+                .Then(async context =>
+                {
+                    var buildingGeometry = await context.BuildingGeometryForBuildingUnit
+                        .FindAsync(buildingWasMigrated.BuildingPersistentLocalId);
+                    buildingGeometry.Should().NotBeNull();
+                    buildingGeometry!.ExtendedWkbGeometry.Should().Be(buildingWasMigrated.ExtendedWkbGeometry);
+
+                    foreach (var buildingUnit in buildingWasMigrated.BuildingUnits)
+                    {
+                        var document = await context.BuildingUnitDocuments.FindAsync(buildingUnit.BuildingUnitPersistentLocalId);
+                        document.Should().NotBeNull();
+                        document!.IsRemoved.Should().Be(buildingUnit.IsRemoved);
+                        document.BuildingPersistentLocalId.Should().Be(buildingWasMigrated.BuildingPersistentLocalId);
+                        document.RecordCreatedAt.Should().Be(buildingWasMigrated.Provenance.Timestamp);
+                        document.LastChangedOn.Should().Be(buildingWasMigrated.Provenance.Timestamp);
+                        document.Document.BuildingUnitPersistentLocalId.Should().Be(buildingUnit.BuildingUnitPersistentLocalId);
+                        document.Document.PositionAsGml.Should().NotBeNullOrEmpty();
+                        document.Document.ExtendedWkbGeometry.Should().Be(buildingUnit.ExtendedWkbGeometry);
+                        document.Document.AddressPersistentLocalIds.Should().BeEquivalentTo(buildingUnit.AddressPersistentLocalIds);
+                        document.Document.HasDeviation.Should().BeFalse();
+
+                        var feedItem = await FindFeedItemByBuildingUnitPersistentLocalId(context, buildingUnit.BuildingUnitPersistentLocalId);
+                        var expectedBuildingPuri = $"{BuildingNamespace}/{buildingWasMigrated.BuildingPersistentLocalId}";
+
+                        if (buildingUnit.IsRemoved)
+                        {
+                            feedItem.Should().BeNull();
+
+                            ChangeFeedServiceMock.Verify(x => x.CreateCloudEventWithData(
+                                    It.IsAny<long>(),
+                                    It.IsAny<DateTimeOffset>(),
+                                    It.IsAny<string>(),
+                                    It.IsAny<string>(),
+                                    It.IsAny<DateTimeOffset>(),
+                                    It.IsAny<List<string>>(),
+                                    It.IsAny<List<BaseRegistriesCloudEventAttribute>>(),
+                                    It.IsAny<string>(),
+                                    It.IsAny<string>()),
+                                Times.Once);
+                        }
+                        else
+                        {
+                            feedItem.Should().NotBeNull();
+                            feedItem!.CloudEventAsString.Should().NotBeNullOrEmpty();
+
+                            var expectedAddressPuris = buildingUnit.AddressPersistentLocalIds
+                                .Select(id => $"{AddressNamespace}/{id}")
+                                .Distinct()
+                                .ToList();
+
+                            ChangeFeedServiceMock.Verify(x => x.CreateCloudEventWithData(
+                                    It.IsAny<long>(),
+                                    buildingWasMigrated.Provenance.Timestamp.ToBelgianDateTimeOffset(),
+                                    BuildingUnitEventTypes.CreateV1,
+                                    buildingUnit.BuildingUnitPersistentLocalId.ToString(),
+                                    buildingWasMigrated.Provenance.Timestamp.ToBelgianDateTimeOffset(),
+                                    It.Is<List<string>>(nisCodes => nisCodes.Contains(NisCode)),
+                                    It.Is<List<BaseRegistriesCloudEventAttribute>>(attrs =>
+                                        attrs.Any(a => a.Name == BuildingUnitAttributeNames.StatusName && a.OldValue == null)
+                                        && attrs.Any(a => a.Name == BuildingUnitAttributeNames.Function && a.OldValue == null)
+                                        && attrs.Any(a => a.Name == BuildingUnitAttributeNames.GeometryMethod && a.OldValue == null)
+                                        && attrs.Any(a => a.Name == BuildingUnitAttributeNames.Position && a.OldValue == null && a.NewValue != null)
+                                        && attrs.Any(a => a.Name == BuildingUnitAttributeNames.AdresIds
+                                                          && a.OldValue == null
+                                                          && a.NewValue != null
+                                                          && ((List<string>)a.NewValue).SequenceEqual(expectedAddressPuris))
+                                        && attrs.Any(a => a.Name == BuildingUnitAttributeNames.GebouwId
+                                                          && a.OldValue == null
+                                                          && a.NewValue != null
+                                                          && a.NewValue.ToString() == expectedBuildingPuri)
+                                        && attrs.Any(a => a.Name == BuildingUnitAttributeNames.HasDeviation
+                                                          && a.OldValue == null
+                                                          && a.NewValue != null && a.NewValue.Equals(false))),
+                                    BuildingWasMigrated.EventName,
+                                    It.IsAny<string>()),
+                                Times.Once);
+                        }
+                    }
+
+                    ChangeFeedServiceMock.Verify(x => x.SerializeCloudEvent(It.IsAny<CloudEvent>()), Times.Once);
+                    ChangeFeedServiceMock.Verify(x => x.CheckToUpdateCacheAsync(1, context, It.IsAny<Func<int, Task<int>>>()), Times.Once);
+                });
+        }
+
+        [Fact]
         public async Task WhenBuildingWasMigrated_ThenBuildingGeometryIsStoredAndBuildingUnitDocumentsCreated()
         {
             _fixture.Register(() => BuildingStatus.Planned);
@@ -145,6 +246,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
                     }
 
                     ChangeFeedServiceMock.Verify(x => x.SerializeCloudEvent(It.IsAny<CloudEvent>()), Times.AtLeastOnce);
+                    ChangeFeedServiceMock.Verify(x => x.CheckToUpdateCacheAsync(1, context, It.IsAny<Func<int, Task<int>>>()), Times.AtLeastOnce);
                 });
         }
 
@@ -177,6 +279,9 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
                             It.IsAny<string>(),
                             It.IsAny<string>()),
                         Times.Never);
+
+                    ChangeFeedServiceMock.Verify(x => x.SerializeCloudEvent(It.IsAny<CloudEvent>()), Times.Never);
+                    ChangeFeedServiceMock.Verify(x => x.CheckToUpdateCacheAsync(It.IsAny<int>(), It.IsAny<FeedContext>(), It.IsAny<Func<int, Task<int>>>()), Times.Never);
                 });
         }
 
@@ -253,6 +358,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
                         Times.Once);
 
                     ChangeFeedServiceMock.Verify(x => x.SerializeCloudEvent(It.IsAny<CloudEvent>()), Times.AtLeastOnce);
+                    ChangeFeedServiceMock.Verify(x => x.CheckToUpdateCacheAsync(1, context, It.IsAny<Func<int, Task<int>>>()), Times.Once);
                 });
         }
 
@@ -293,6 +399,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
                         Times.Once);
 
                     ChangeFeedServiceMock.Verify(x => x.SerializeCloudEvent(It.IsAny<CloudEvent>()), Times.AtLeastOnce);
+                    ChangeFeedServiceMock.Verify(x => x.CheckToUpdateCacheAsync(1, context, It.IsAny<Func<int, Task<int>>>()), Times.Exactly(2));
                 });
         }
 
@@ -334,6 +441,8 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
                             BuildingUnitWasRetiredV2.EventName,
                             It.IsAny<string>()),
                         Times.Once);
+
+                    ChangeFeedServiceMock.Verify(x => x.CheckToUpdateCacheAsync(1, context, It.IsAny<Func<int, Task<int>>>()), Times.Exactly(3));
                 });
         }
 
@@ -372,6 +481,8 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
                             BuildingUnitWasNotRealizedV2.EventName,
                             It.IsAny<string>()),
                         Times.Once);
+
+                    ChangeFeedServiceMock.Verify(x => x.CheckToUpdateCacheAsync(1, context, It.IsAny<Func<int, Task<int>>>()), Times.Exactly(2));
                 });
         }
 
@@ -417,6 +528,8 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
                             BuildingUnitPositionWasCorrected.EventName,
                             It.IsAny<string>()),
                         Times.Once);
+
+                    ChangeFeedServiceMock.Verify(x => x.CheckToUpdateCacheAsync(1, context, It.IsAny<Func<int, Task<int>>>()), Times.Exactly(2));
                 });
         }
 
@@ -459,6 +572,8 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
                             BuildingUnitPositionWasCorrected.EventName,
                             It.IsAny<string>()),
                         Times.Once);
+
+                    ChangeFeedServiceMock.Verify(x => x.CheckToUpdateCacheAsync(1, context, It.IsAny<Func<int, Task<int>>>()), Times.Exactly(2));
                 });
         }
 
@@ -494,6 +609,8 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
                             BuildingUnitWasRemovedV2.EventName,
                             It.IsAny<string>()),
                         Times.Once);
+
+                    ChangeFeedServiceMock.Verify(x => x.CheckToUpdateCacheAsync(1, context, It.IsAny<Func<int, Task<int>>>()), Times.Exactly(2));
                 });
         }
 
@@ -567,6 +684,8 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
                             BuildingUnitRemovalWasCorrected.EventName,
                             It.IsAny<string>()),
                         Times.Once);
+
+                    ChangeFeedServiceMock.Verify(x => x.CheckToUpdateCacheAsync(1, context, It.IsAny<Func<int, Task<int>>>()), Times.Exactly(3));
                 });
         }
 
@@ -644,6 +763,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
                         Times.Once);
 
                     ChangeFeedServiceMock.Verify(x => x.SerializeCloudEvent(It.IsAny<CloudEvent>()), Times.AtLeastOnce);
+                    ChangeFeedServiceMock.Verify(x => x.CheckToUpdateCacheAsync(1, context, It.IsAny<Func<int, Task<int>>>()), Times.Once);
                 });
         }
 
@@ -689,6 +809,8 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
                             BuildingUnitAddressWasAttachedV2.EventName,
                             It.IsAny<string>()),
                         Times.Once);
+
+                    ChangeFeedServiceMock.Verify(x => x.CheckToUpdateCacheAsync(1, context, It.IsAny<Func<int, Task<int>>>()), Times.Exactly(2));
                 });
         }
 
@@ -743,6 +865,8 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
                             BuildingUnitAddressWasDetachedV2.EventName,
                             It.IsAny<string>()),
                         Times.Once);
+
+                    ChangeFeedServiceMock.Verify(x => x.CheckToUpdateCacheAsync(1, context, It.IsAny<Func<int, Task<int>>>()), Times.Exactly(3));
                 });
         }
 
@@ -797,6 +921,8 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
                             BuildingUnitAddressWasDetachedBecauseAddressWasRejected.EventName,
                             It.IsAny<string>()),
                         Times.Once);
+
+                    ChangeFeedServiceMock.Verify(x => x.CheckToUpdateCacheAsync(1, context, It.IsAny<Func<int, Task<int>>>()), Times.Exactly(3));
                 });
         }
 
@@ -851,6 +977,8 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
                             BuildingUnitAddressWasDetachedBecauseAddressWasRemoved.EventName,
                             It.IsAny<string>()),
                         Times.Once);
+
+                    ChangeFeedServiceMock.Verify(x => x.CheckToUpdateCacheAsync(1, context, It.IsAny<Func<int, Task<int>>>()), Times.Exactly(3));
                 });
         }
 
@@ -905,6 +1033,8 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
                             BuildingUnitAddressWasDetachedBecauseAddressWasRetired.EventName,
                             It.IsAny<string>()),
                         Times.Once);
+
+                    ChangeFeedServiceMock.Verify(x => x.CheckToUpdateCacheAsync(1, context, It.IsAny<Func<int, Task<int>>>()), Times.Exactly(3));
                 });
         }
 
@@ -964,6 +1094,8 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
                             BuildingUnitAddressWasReplacedBecauseAddressWasReaddressed.EventName,
                             It.IsAny<string>()),
                         Times.Once);
+
+                    ChangeFeedServiceMock.Verify(x => x.CheckToUpdateCacheAsync(1, context, It.IsAny<Func<int, Task<int>>>()), Times.Exactly(3));
                 });
         }
 
@@ -1023,6 +1155,8 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
                             BuildingUnitAddressWasReplacedBecauseOfMunicipalityMerger.EventName,
                             It.IsAny<string>()),
                         Times.Once);
+
+                    ChangeFeedServiceMock.Verify(x => x.CheckToUpdateCacheAsync(1, context, It.IsAny<Func<int, Task<int>>>()), Times.Exactly(3));
                 });
         }
 
@@ -1093,6 +1227,8 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
                             BuildingBuildingUnitsAddressesWereReaddressed.EventName,
                             It.IsAny<string>()),
                         Times.Once);
+
+                    ChangeFeedServiceMock.Verify(x => x.CheckToUpdateCacheAsync(1, context, It.IsAny<Func<int, Task<int>>>()), Times.Exactly(3));
                 });
         }
 
@@ -1160,6 +1296,8 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
                             BuildingUnitWasMovedIntoBuilding.EventName,
                             It.IsAny<string>()),
                         Times.Once);
+
+                    ChangeFeedServiceMock.Verify(x => x.CheckToUpdateCacheAsync(1, context, It.IsAny<Func<int, Task<int>>>()), Times.Exactly(2));
                 });
         }
 
@@ -1241,6 +1379,8 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
                             BuildingUnitWasMovedIntoBuilding.EventName,
                             It.IsAny<string>()),
                         Times.Once);
+
+                    ChangeFeedServiceMock.Verify(x => x.CheckToUpdateCacheAsync(1, context, It.IsAny<Func<int, Task<int>>>()), Times.Exactly(2));
                 });
         }
 
@@ -1276,6 +1416,8 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
                             BuildingUnitWasMovedOutOfBuilding.EventName,
                             It.IsAny<string>()),
                         Times.Never);
+
+                    ChangeFeedServiceMock.Verify(x => x.CheckToUpdateCacheAsync(1, context, It.IsAny<Func<int, Task<int>>>()), Times.Once);
                 });
         }
 
@@ -1313,6 +1455,8 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
                             BuildingUnitWasRegularized.EventName,
                             It.IsAny<string>()),
                         Times.Once);
+
+                    ChangeFeedServiceMock.Verify(x => x.CheckToUpdateCacheAsync(1, context, It.IsAny<Func<int, Task<int>>>()), Times.Exactly(2));
                 });
         }
 
@@ -1350,6 +1494,8 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
                             BuildingUnitRegularizationWasCorrected.EventName,
                             It.IsAny<string>()),
                         Times.Once);
+
+                    ChangeFeedServiceMock.Verify(x => x.CheckToUpdateCacheAsync(1, context, It.IsAny<Func<int, Task<int>>>()), Times.Exactly(2));
                 });
         }
 
@@ -1387,6 +1533,8 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
                             BuildingUnitWasDeregulated.EventName,
                             It.IsAny<string>()),
                         Times.Once);
+
+                    ChangeFeedServiceMock.Verify(x => x.CheckToUpdateCacheAsync(1, context, It.IsAny<Func<int, Task<int>>>()), Times.Exactly(2));
                 });
         }
 
@@ -1424,6 +1572,8 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
                             BuildingUnitDeregulationWasCorrected.EventName,
                             It.IsAny<string>()),
                         Times.Once);
+
+                    ChangeFeedServiceMock.Verify(x => x.CheckToUpdateCacheAsync(1, context, It.IsAny<Func<int, Task<int>>>()), Times.Exactly(2));
                 });
         }
 

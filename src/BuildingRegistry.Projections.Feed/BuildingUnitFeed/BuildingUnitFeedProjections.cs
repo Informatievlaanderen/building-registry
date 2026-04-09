@@ -40,9 +40,6 @@ namespace BuildingRegistry.Projections.Feed.BuildingUnitFeed
 
             When<Envelope<BuildingWasMigrated>>(async (context, message, ct) =>
             {
-                if(message.Message.IsRemoved)
-                    return;
-
                 await context.BuildingGeometryForBuildingUnit.AddAsync(
                     new BuildingGeometryForBuildingUnit(
                         message.Message.BuildingPersistentLocalId,
@@ -73,6 +70,9 @@ namespace BuildingRegistry.Projections.Feed.BuildingUnitFeed
                     document.Document.PositionAsGml = geometry.ConvertToGml(false);
 
                     await context.BuildingUnitDocuments.AddAsync(document, ct);
+
+                    if(buildingUnit.IsRemoved)
+                        continue;
 
                     var buildingPuri = BuildBuildingPuri(message.Message.BuildingPersistentLocalId);
 

@@ -38,9 +38,6 @@ namespace BuildingRegistry.Projections.Feed.BuildingFeed
 
             When<Envelope<BuildingWasMigrated>>(async (context, message, ct) =>
             {
-                if(message.Message.IsRemoved)
-                    return;
-
                 var buildingStatus = MapStatus(BuildingStatus.Parse(message.Message.BuildingStatus));
                 var geometryMethod = MapGeometryMethod(BuildingGeometryMethod.Parse(message.Message.GeometryMethod));
 
@@ -57,6 +54,9 @@ namespace BuildingRegistry.Projections.Feed.BuildingFeed
                 document.Document.GeometryAsGml = geometry.ConvertToGml(false);
 
                 await context.BuildingDocuments.AddAsync(document, ct);
+
+                if (document.IsRemoved)
+                    return;
 
                 List<BaseRegistriesCloudEventAttribute> attributes =
                 [
