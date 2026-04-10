@@ -115,11 +115,11 @@
       },
       "Datadog.Trace.Bundle": {
         "type": "Direct",
-        "requested": "[3.15.0, )",
-        "resolved": "3.15.0",
-        "contentHash": "mzCLTCiA1Lzlj3dRbE9G84aePo7S+7ekFdl5r3ujm8hmoeKkW0MBayhKIg2+ZvTbIbrA5oHMDcwIscLR125cVg==",
+        "requested": "[3.41.0, )",
+        "resolved": "3.41.0",
+        "contentHash": "YAR4jm4jem6FWtOUoGEjc0FAFABcYYTeLXqQRBuQ2DuLBIpW/sri0kQH7d66XcYRn2R1V2BL9juiICXFX0O+vA==",
         "dependencies": {
-          "Datadog.Trace": "3.15.0"
+          "Datadog.Trace": "3.41.0"
         }
       },
       "Npgsql.EntityFrameworkCore.PostgreSQL.NetTopologySuite": {
@@ -467,8 +467,8 @@
       },
       "Datadog.Trace": {
         "type": "Transitive",
-        "resolved": "3.15.0",
-        "contentHash": "xDdce/RLnXEoyyySKoY+MEp586Yj5x9lNIhN3I2NbZhS7wnaXXHJ/1ieFxdgU2dfY5m6RlEGWKG5auzgKd9rzA==",
+        "resolved": "3.41.0",
+        "contentHash": "3LagC2xYBasWIiVsYNpqNo9ZrkAGKuQP36gTB1s+LP/blPpizL+sUFNtAkWywSzO+aS8FWUeFHtQzT/SpUZjqA==",
         "dependencies": {
           "System.Diagnostics.DiagnosticSource": "4.4.1"
         }
@@ -1861,7 +1861,7 @@
           "Be.Vlaanderen.Basisregisters.MessageHandling.Kafka.Consumer.SqlServer": "[6.0.3, )",
           "Be.Vlaanderen.Basisregisters.ProjectionHandling.Runner.SqlServer": "[15.0.1, )",
           "BuildingRegistry.Infrastructure": "[1.0.0, )",
-          "Datadog.Trace.Bundle": "[3.15.0, )",
+          "Datadog.Trace.Bundle": "[3.41.0, )",
           "Destructurama.JsonNet": "[4.0.2, )",
           "Microsoft.EntityFrameworkCore.SqlServer.NetTopologySuite": "[9.0.4, )",
           "Serilog": "[4.2.0, )",
@@ -1884,7 +1884,7 @@
           "Be.Vlaanderen.Basisregisters.ProjectionHandling.Runner.SqlServer": "[15.0.1, )",
           "BuildingRegistry.Infrastructure": "[1.0.0, )",
           "BuildingRegistry.Projections.Legacy": "[1.0.0, )",
-          "Datadog.Trace.Bundle": "[3.15.0, )",
+          "Datadog.Trace.Bundle": "[3.41.0, )",
           "Destructurama.JsonNet": "[4.0.2, )",
           "Microsoft.EntityFrameworkCore.SqlServer.NetTopologySuite": "[9.0.4, )",
           "Microsoft.Extensions.Hosting": "[9.0.4, )",
