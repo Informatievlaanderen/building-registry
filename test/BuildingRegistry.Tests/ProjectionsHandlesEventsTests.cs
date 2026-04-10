@@ -155,8 +155,8 @@ namespace BuildingRegistry.Tests
 
             yield return [new List<ConnectedProjection<FeedContext>>
             {
-                new BuildingFeedProjections(Mock.Of<IChangeFeedService>(), Mock.Of<IMunicipalityGeometryRepository>()),
-                new BuildingUnitFeedProjections(Mock.Of<IChangeFeedService>(), Mock.Of<IMunicipalityGeometryRepository>())
+                new BuildingFeedProjections(() => Mock.Of<IChangeFeedService>(), Mock.Of<IMunicipalityGeometryRepository>()),
+                new BuildingUnitFeedProjections(() => Mock.Of<IChangeFeedService>(), Mock.Of<IMunicipalityGeometryRepository>())
             }];
 
             yield return [new List<ConnectedProjection<WmsContext>>

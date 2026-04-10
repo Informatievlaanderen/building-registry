@@ -36,6 +36,7 @@ namespace BuildingRegistry.Projector.Infrastructure.Modules
     using BuildingRegistry.Projections.Wms.BuildingUnitV2;
     using BuildingRegistry.Projections.Wms.BuildingV3;
     using Microsoft.Data.SqlClient;
+    using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Logging;
@@ -142,22 +143,9 @@ namespace BuildingRegistry.Projector.Infrastructure.Modules
                         _loggerFactory,
                         jsonSerializerSettings));
 
-            var buildingServiceKey = "building";
-            var buildingUnitServiceKey = "buildingUnit";
-
-            builder.Register(c => new ChangeFeedService(
-                    _configuration.GetSection("BuildingFeed").Get<ChangeFeedConfig>()!,
-                    c.Resolve<LastChangedListContext>(),
-                    new JsonSerializerSettings().ConfigureDefaultForApi()))
-                .Keyed<IChangeFeedService>(buildingServiceKey)
-                .InstancePerLifetimeScope();
-
-            builder.Register(c => new ChangeFeedService(
-                    _configuration.GetSection("BuildingUnitFeed").Get<ChangeFeedConfig>()!,
-                    c.Resolve<LastChangedListContext>(),
-                    new JsonSerializerSettings().ConfigureDefaultForApi()))
-                .Keyed<IChangeFeedService>(buildingUnitServiceKey)
-                .InstancePerLifetimeScope();
+            var buildingFeedConfig = _configuration.GetSection("BuildingFeed").Get<ChangeFeedConfig>()!;
+            var buildingUnitFeedConfig = _configuration.GetSection("BuildingUnitFeed").Get<ChangeFeedConfig>()!;
+            var apiJsonSettings = new JsonSerializerSettings().ConfigureDefaultForApi();
 
             builder
                 .Register(_ =>
@@ -174,18 +162,32 @@ namespace BuildingRegistry.Projector.Infrastructure.Modules
                     _configuration,
                     _loggerFactory)
                 .RegisterProjections<BuildingFeedProjections, FeedContext>(
-                    context => new BuildingFeedProjections(
-                        context.ResolveKeyed<IChangeFeedService>(buildingServiceKey),
-                        context.Resolve<IMunicipalityGeometryRepository>()),
+                    context =>
+                    {
+                        var lastChangedListContextOptions = context.Resolve<DbContextOptions<LastChangedListContext>>();
+                        return new BuildingFeedProjections(
+                            () => new ChangeFeedService(
+                                buildingFeedConfig,
+                                new LastChangedListContext(lastChangedListContextOptions),
+                                apiJsonSettings),
+                            context.Resolve<IMunicipalityGeometryRepository>());
+                    },
                     ConnectedProjectionSettings.Configure(c =>
                     {
                         c.ConfigureCatchUpPageSize(1);
                         c.ConfigureCatchUpUpdatePositionMessageInterval(1);
                     }))
                 .RegisterProjections<BuildingUnitFeedProjections, FeedContext>(
-                    context => new BuildingUnitFeedProjections(
-                        context.ResolveKeyed<IChangeFeedService>(buildingUnitServiceKey),
-                        context.Resolve<IMunicipalityGeometryRepository>()),
+                    context =>
+                    {
+                        var lastChangedListContextOptions = context.Resolve<DbContextOptions<LastChangedListContext>>();
+                        return new BuildingUnitFeedProjections(
+                            () => new ChangeFeedService(
+                                buildingUnitFeedConfig,
+                                new LastChangedListContext(lastChangedListContextOptions),
+                                apiJsonSettings),
+                            context.Resolve<IMunicipalityGeometryRepository>());
+                    },
                     ConnectedProjectionSettings.Configure(c =>
                     {
                         c.ConfigureCatchUpPageSize(1);
