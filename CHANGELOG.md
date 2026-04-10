@@ -1,3 +1,10 @@
+## [5.9.2](https://github.com/informatievlaanderen/building-registry/compare/v5.9.1...v5.9.2) (2026-04-10)
+
+
+### Bug Fixes
+
+* **feed:** give each ChangeFeedService its own dedicated LastChangedListContext ([fec52a5](https://github.com/informatievlaanderen/building-registry/commit/fec52a5e4816052d20e07cdbc10197a482af03f8))
+
 ## [5.9.1](https://github.com/informatievlaanderen/building-registry/compare/v5.9.0...v5.9.1) (2026-04-09)
 
 
