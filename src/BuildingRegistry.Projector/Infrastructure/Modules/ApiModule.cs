@@ -36,6 +36,7 @@ namespace BuildingRegistry.Projector.Infrastructure.Modules
     using BuildingRegistry.Projections.Wms.BuildingUnitV2;
     using BuildingRegistry.Projections.Wms.BuildingV3;
     using Microsoft.Data.SqlClient;
+    using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Logging;
@@ -145,19 +146,31 @@ namespace BuildingRegistry.Projector.Infrastructure.Modules
             var buildingServiceKey = "building";
             var buildingUnitServiceKey = "buildingUnit";
 
-            builder.Register(c => new ChangeFeedService(
-                    _configuration.GetSection("BuildingFeed").Get<ChangeFeedConfig>()!,
-                    c.Resolve<LastChangedListContext>(),
-                    new JsonSerializerSettings().ConfigureDefaultForApi()))
-                .Keyed<IChangeFeedService>(buildingServiceKey)
-                .InstancePerLifetimeScope();
+            var lastChangedListConnectionString = _configuration.GetConnectionString("LastChangedList")!;
 
-            builder.Register(c => new ChangeFeedService(
-                    _configuration.GetSection("BuildingUnitFeed").Get<ChangeFeedConfig>()!,
-                    c.Resolve<LastChangedListContext>(),
-                    new JsonSerializerSettings().ConfigureDefaultForApi()))
+            builder.Register(_ =>
+                {
+                    var optionsBuilder = new DbContextOptionsBuilder<LastChangedListContext>()
+                        .UseSqlServer(lastChangedListConnectionString, sqlServerOptions => sqlServerOptions.EnableRetryOnFailure());
+                    return new ChangeFeedService(
+                        _configuration.GetSection("BuildingFeed").Get<ChangeFeedConfig>()!,
+                        new LastChangedListContext(optionsBuilder.Options),
+                        new JsonSerializerSettings().ConfigureDefaultForApi());
+                })
+                .Keyed<IChangeFeedService>(buildingServiceKey)
+                .SingleInstance();
+
+            builder.Register(_ =>
+                {
+                    var optionsBuilder = new DbContextOptionsBuilder<LastChangedListContext>()
+                        .UseSqlServer(lastChangedListConnectionString, sqlServerOptions => sqlServerOptions.EnableRetryOnFailure());
+                    return new ChangeFeedService(
+                        _configuration.GetSection("BuildingUnitFeed").Get<ChangeFeedConfig>()!,
+                        new LastChangedListContext(optionsBuilder.Options),
+                        new JsonSerializerSettings().ConfigureDefaultForApi());
+                })
                 .Keyed<IChangeFeedService>(buildingUnitServiceKey)
-                .InstancePerLifetimeScope();
+                .SingleInstance();
 
             builder
                 .Register(_ =>
