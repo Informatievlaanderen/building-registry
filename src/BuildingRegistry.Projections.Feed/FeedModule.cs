@@ -50,6 +50,7 @@ namespace BuildingRegistry.Projections.Feed
                         sqlServerOptions.EnableRetryOnFailure();
                         sqlServerOptions.MigrationsHistoryTable(MigrationTables.Feed, Schema.Feed);
                     })
+                    .EnableThreadSafetyChecks(false)
                     .UseExtendedSqlServerMigrations());
 
             services.AddScoped(provider =>
