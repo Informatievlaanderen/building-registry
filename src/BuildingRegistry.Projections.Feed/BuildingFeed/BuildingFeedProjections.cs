@@ -26,12 +26,12 @@ namespace BuildingRegistry.Projections.Feed.BuildingFeed
     [ConnectedProjectionDescription("Projectie die de gebouw data voor de gebouw cloudevent feed voorziet.")]
     public class BuildingFeedProjections : ConnectedProjection<FeedContext>
     {
-        private readonly Func<IChangeFeedService> _changeFeedServiceFactory;
+        private readonly IChangeFeedService _changeFeedService;
         private readonly IMunicipalityGeometryRepository _municipalityGeometryRepository;
 
-        public BuildingFeedProjections(Func<IChangeFeedService> changeFeedServiceFactory, IMunicipalityGeometryRepository municipalityGeometryRepository)
+        public BuildingFeedProjections(IChangeFeedService changeFeedService, IMunicipalityGeometryRepository municipalityGeometryRepository)
         {
-            _changeFeedServiceFactory = changeFeedServiceFactory;
+            _changeFeedService = changeFeedService;
             _municipalityGeometryRepository = municipalityGeometryRepository;
 
             #region Building
@@ -387,8 +387,6 @@ namespace BuildingRegistry.Projections.Feed.BuildingFeed
         {
             context.Entry(document).Property(x => x.Document).IsModified = true;
 
-            var changeFeedService = _changeFeedServiceFactory();
-
             var nisCodes = GetNisCodes(document.Document.ExtendedWkbGeometry, message.Message.Provenance.Timestamp);
 
             var page = await context.CalculatePage();
@@ -405,7 +403,7 @@ namespace BuildingRegistry.Projections.Feed.BuildingFeed
             };
             await context.BuildingFeed.AddAsync(buildingFeedItem);
 
-            var cloudEvent = changeFeedService.CreateCloudEventWithData(
+            var cloudEvent = _changeFeedService.CreateCloudEventWithData(
                 buildingFeedItem.Id,
                 message.Message.Provenance.Timestamp.ToBelgianDateTimeOffset(),
                 eventType,
@@ -416,8 +414,8 @@ namespace BuildingRegistry.Projections.Feed.BuildingFeed
                 message.EventName,
                 message.Metadata["CommandId"].ToString()!);
 
-            buildingFeedItem.CloudEventAsString = changeFeedService.SerializeCloudEvent(cloudEvent);
-            await CheckToUpdateCache(changeFeedService, page, context);
+            buildingFeedItem.CloudEventAsString = _changeFeedService.SerializeCloudEvent(cloudEvent);
+            await CheckToUpdateCache(page, context);
         }
 
         private List<string> GetNisCodes(string? extendedWkbGeometry, Instant eventTimestamp)
@@ -428,9 +426,9 @@ namespace BuildingRegistry.Projections.Feed.BuildingFeed
             return _municipalityGeometryRepository.GetOverlappingNisCodes(extendedWkbGeometry, eventTimestamp);
         }
 
-        private async Task CheckToUpdateCache(IChangeFeedService changeFeedService, int page, FeedContext context)
+        private async Task CheckToUpdateCache(int page, FeedContext context)
         {
-            await changeFeedService.CheckToUpdateCacheAsync(
+            await _changeFeedService.CheckToUpdateCacheAsync(
                 page,
                 context,
                 async p =>

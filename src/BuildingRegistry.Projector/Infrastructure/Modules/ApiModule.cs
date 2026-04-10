@@ -166,7 +166,7 @@ namespace BuildingRegistry.Projector.Infrastructure.Modules
                     {
                         var lastChangedListContextOptions = context.Resolve<DbContextOptions<LastChangedListContext>>();
                         return new BuildingFeedProjections(
-                            () => new ChangeFeedService(
+                            new ChangeFeedService(
                                 buildingFeedConfig,
                                 new LastChangedListContext(lastChangedListContextOptions),
                                 apiJsonSettings),
@@ -182,7 +182,7 @@ namespace BuildingRegistry.Projector.Infrastructure.Modules
                     {
                         var lastChangedListContextOptions = context.Resolve<DbContextOptions<LastChangedListContext>>();
                         return new BuildingUnitFeedProjections(
-                            () => new ChangeFeedService(
+                            new ChangeFeedService(
                                 buildingUnitFeedConfig,
                                 new LastChangedListContext(lastChangedListContextOptions),
                                 apiJsonSettings),

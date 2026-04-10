@@ -54,7 +54,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
 
             Sut = new ConnectedProjectionTest<FeedContext, BuildingUnitFeedProjections>(
                 () => _feedContext,
-                () => new BuildingUnitFeedProjections(() => ChangeFeedServiceMock.Object, MunicipalityGeometryRepositoryMock.Object));
+                () => new BuildingUnitFeedProjections(ChangeFeedServiceMock.Object, MunicipalityGeometryRepositoryMock.Object));
 
             _fixture = new Fixture();
             _fixture.Customize(new InfrastructureCustomization());
