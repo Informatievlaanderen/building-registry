@@ -56,11 +56,11 @@
       },
       "Datadog.Trace.Bundle": {
         "type": "Direct",
-        "requested": "[3.15.0, )",
-        "resolved": "3.15.0",
-        "contentHash": "mzCLTCiA1Lzlj3dRbE9G84aePo7S+7ekFdl5r3ujm8hmoeKkW0MBayhKIg2+ZvTbIbrA5oHMDcwIscLR125cVg==",
+        "requested": "[3.42.0, )",
+        "resolved": "3.42.0",
+        "contentHash": "EynbKFLao7rI4PekgKgPrcUNezg+t1dngbDE0kKc0iWHzECnON5eqjdDEaR705RaeFSQpEpkiXzBgZ86ACOOQQ==",
         "dependencies": {
-          "Datadog.Trace": "3.15.0"
+          "Datadog.Trace": "3.42.0"
         }
       },
       "Destructurama.JsonNet": {
@@ -367,8 +367,8 @@
       },
       "Datadog.Trace": {
         "type": "Transitive",
-        "resolved": "3.15.0",
-        "contentHash": "xDdce/RLnXEoyyySKoY+MEp586Yj5x9lNIhN3I2NbZhS7wnaXXHJ/1ieFxdgU2dfY5m6RlEGWKG5auzgKd9rzA==",
+        "resolved": "3.42.0",
+        "contentHash": "ukWwgI9IqSOupPlF0zG0dgle5FMkHMGqUS2HTuBhmZz7yFrd1/IPqog0OAYJDmBSBFmmkTNT0fqlKtfVdrE9cA==",
         "dependencies": {
           "System.Diagnostics.DiagnosticSource": "4.4.1"
         }
