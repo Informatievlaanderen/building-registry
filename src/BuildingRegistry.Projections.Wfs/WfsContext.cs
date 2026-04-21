@@ -8,7 +8,8 @@ namespace BuildingRegistry.Projections.Wfs
     {
         public override string ProjectionStateSchema => Schema.Wfs;
         public DbSet<BuildingV3.BuildingV3> BuildingsV3 => Set<BuildingV3.BuildingV3>();
-        public DbSet<BuildingUnitV2.BuildingUnitV2> BuildingUnitsV2 { get; set; }
+        public DbSet<BuildingUnitV2.BuildingUnitV2> BuildingUnitsV2 => Set<BuildingUnitV2.BuildingUnitV2>();
+        public DbSet<BuildingUnitAddress.BuildingUnitAddress> BuildingUnitAddresses => Set<BuildingUnitAddress.BuildingUnitAddress>();
 
         public WfsContext() { }
 

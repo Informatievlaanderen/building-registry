@@ -168,7 +168,8 @@ namespace BuildingRegistry.Tests
             yield return [new List<ConnectedProjection<WfsContext>>
             {
                 new Projections.Wfs.BuildingV3.BuildingV3Projections(new WKBReader()),
-                new Projections.Wfs.BuildingUnitV2.BuildingUnitV2Projections(new WKBReader())
+                new Projections.Wfs.BuildingUnitV2.BuildingUnitV2Projections(new WKBReader()),
+                new Projections.Wfs.BuildingUnitAddress.BuildingUnitAddressProjections()
             }];
 
             yield return [new List<ConnectedProjection<LastChangedListContext>>

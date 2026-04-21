@@ -292,6 +292,9 @@ namespace BuildingRegistry.Projector.Infrastructure.Modules
                     wfsProjectionSettings)
                 .RegisterProjections<BuildingRegistry.Projections.Wfs.BuildingUnitV2.BuildingUnitV2Projections, WfsContext>(() =>
                         new BuildingRegistry.Projections.Wfs.BuildingUnitV2.BuildingUnitV2Projections(WKBReaderFactory.Create()),
+                    wfsProjectionSettings)
+                .RegisterProjections<BuildingRegistry.Projections.Wfs.BuildingUnitAddress.BuildingUnitAddressProjections, WfsContext>(() =>
+                        new BuildingRegistry.Projections.Wfs.BuildingUnitAddress.BuildingUnitAddressProjections(),
                     wfsProjectionSettings);
         }
 
