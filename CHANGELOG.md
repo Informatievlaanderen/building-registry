@@ -1,3 +1,10 @@
+# [5.10.0](https://github.com/informatievlaanderen/building-registry/compare/v5.9.2...v5.10.0) (2026-04-21)
+
+
+### Features
+
+* **wfs:** add buildingunit addresses ([fb2e185](https://github.com/informatievlaanderen/building-registry/commit/fb2e185f4a443f5cc361bf5ca0d4802da0d2cb4d))
+
 ## [5.9.2](https://github.com/informatievlaanderen/building-registry/compare/v5.9.1...v5.9.2) (2026-04-10)
 
 
