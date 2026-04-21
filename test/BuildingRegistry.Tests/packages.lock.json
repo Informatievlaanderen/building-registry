@@ -2514,8 +2514,8 @@
       },
       "System.Text.Json": {
         "type": "Transitive",
-        "resolved": "9.0.4",
-        "contentHash": "pYtmpcO6R3Ef1XilZEHgXP2xBPVORbYEzRP7dl0IAAbN8Dm+kfwio8aCKle97rAWXOExr292MuxWYurIuwN62g=="
+        "resolved": "9.0.5",
+        "contentHash": "rnP61ZfloTgPQPe7ecr36loNiGX3g1PocxlKHdY/FUpDSsExKkTxpMAlB4X35wNEPr1X7mkYZuQvW3Lhxmu7KA=="
       },
       "System.Text.RegularExpressions": {
         "type": "Transitive",
@@ -2661,7 +2661,7 @@
           "Be.Vlaanderen.Basisregisters.Api": "[24.3.0, )",
           "Be.Vlaanderen.Basisregisters.GrAr.Edit": "[22.10.0, )",
           "Be.Vlaanderen.Basisregisters.Sqs": "[4.1.1, )",
-          "Be.Vlaanderen.Basisregisters.TicketingService.Abstractions": "[3.0.0, )",
+          "Be.Vlaanderen.Basisregisters.TicketingService.Abstractions": "[3.3.1, )",
           "MediatR.Contracts": "[2.0.1, )",
           "Microsoft.EntityFrameworkCore.SqlServer": "[9.0.4, )"
         }
@@ -2722,7 +2722,7 @@
           "Be.Vlaanderen.Basisregisters.GrAr.Provenance.AcmIdm": "[22.10.0, )",
           "Be.Vlaanderen.Basisregisters.MessageHandling.AwsSqs.Simple": "[6.0.3, )",
           "Be.Vlaanderen.Basisregisters.Sqs": "[4.1.1, )",
-          "Be.Vlaanderen.Basisregisters.TicketingService.Abstractions": "[3.0.0, )",
+          "Be.Vlaanderen.Basisregisters.TicketingService.Abstractions": "[3.3.1, )",
           "Be.Vlaanderen.Basisregisters.TicketingService.Proxy.HttpProxy": "[3.0.0, )",
           "BuildingRegistry.Consumer.Address": "[1.0.0, )",
           "BuildingRegistry.Infrastructure": "[1.0.0, )",
@@ -2737,7 +2737,7 @@
           "Be.Vlaanderen.Basisregisters.BuildingRegistry.Api.BackOffice.Abstractions": "[1.0.0, )",
           "Be.Vlaanderen.Basisregisters.GrAr.Legacy": "[22.10.0, )",
           "Be.Vlaanderen.Basisregisters.Sqs.Lambda": "[4.1.1, )",
-          "Be.Vlaanderen.Basisregisters.TicketingService.Abstractions": "[3.0.0, )",
+          "Be.Vlaanderen.Basisregisters.TicketingService.Abstractions": "[3.3.1, )",
           "Be.Vlaanderen.Basisregisters.TicketingService.Proxy.HttpProxy": "[3.0.0, )",
           "BuildingRegistry.Consumer.Address": "[1.0.0, )",
           "BuildingRegistry.Consumer.Read.Parcel": "[1.0.0, )",
@@ -2876,6 +2876,7 @@
           "Be.Vlaanderen.Basisregisters.GrAr.Common": "[22.10.0, )",
           "Be.Vlaanderen.Basisregisters.GrAr.CrsTransform": "[22.10.0, )",
           "Be.Vlaanderen.Basisregisters.GrAr.Extracts": "[22.10.0, )",
+          "Be.Vlaanderen.Basisregisters.GrAr.Legacy": "[22.10.0, )",
           "Be.Vlaanderen.Basisregisters.GrAr.Oslo": "[22.10.0, )",
           "Be.Vlaanderen.Basisregisters.ProjectionHandling.Runner.SqlServer": "[15.0.1, )",
           "Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Autofac": "[15.0.1, )",
@@ -2971,7 +2972,7 @@
           "Be.Vlaanderen.Basisregisters.BuildingRegistry.Api.BackOffice.Abstractions": "[1.0.0, )",
           "Be.Vlaanderen.Basisregisters.GrAr.Notifications": "[22.10.0, )",
           "Be.Vlaanderen.Basisregisters.Sqs": "[4.1.1, )",
-          "Be.Vlaanderen.Basisregisters.TicketingService.Abstractions": "[3.0.0, )",
+          "Be.Vlaanderen.Basisregisters.TicketingService.Abstractions": "[3.3.1, )",
           "Be.Vlaanderen.Basisregisters.TicketingService.Proxy.HttpProxy": "[3.0.0, )",
           "BuildingRegistry.Infrastructure": "[1.0.0, )",
           "Dapper": "[2.1.66, )",
@@ -3527,11 +3528,11 @@
       },
       "Be.Vlaanderen.Basisregisters.TicketingService.Abstractions": {
         "type": "CentralTransitive",
-        "requested": "[3.0.0, )",
-        "resolved": "3.0.0",
-        "contentHash": "c5WHaHXwXnJeZ9AvnBxJA1EMGjnVgFz3qnJF5KZ9hZt3m9yKKmDDX59iD7C/DgzjL1quUMy1F2GEGXJjZxjRZg==",
+        "requested": "[3.3.1, )",
+        "resolved": "3.3.1",
+        "contentHash": "YcBJ6Ce6dkuIQ+jgf33/4f2/NI7UEB0KwN2eVtbKvUpqf2wDKRmQmpYe1Za1OGGMHzU4lpSJl/xfatpvbspUOg==",
         "dependencies": {
-          "System.Text.Json": "9.0.3"
+          "System.Text.Json": "9.0.5"
         }
       },
       "Be.Vlaanderen.Basisregisters.TicketingService.Proxy.HttpProxy": {
