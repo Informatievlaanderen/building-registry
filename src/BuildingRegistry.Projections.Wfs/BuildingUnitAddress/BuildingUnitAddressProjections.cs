@@ -8,6 +8,8 @@
     using Building.Events;
     using Microsoft.EntityFrameworkCore;
 
+    [ConnectedProjectionName("WFS gebouweenheden-adressen")]
+    [ConnectedProjectionDescription("Projectie die de gebouweenheden-adressen data voor het WFS gebouwenregister voorziet.")]
     public sealed class BuildingUnitAddressProjections : ConnectedProjection<WfsContext>
     {
         public BuildingUnitAddressProjections()
@@ -18,48 +20,50 @@
                 {
                     foreach (var buildingUnitAddressPersistentLocalId in buildingUnit.AddressPersistentLocalIds)
                     {
-                        var buildingUnitV2 = new BuildingUnitAddress(buildingUnit.BuildingUnitPersistentLocalId, buildingUnitAddressPersistentLocalId);
+                        var buildingUnitAddress = new BuildingUnitAddress(buildingUnit.BuildingUnitPersistentLocalId, buildingUnitAddressPersistentLocalId);
 
-                        await context.BuildingUnitAddresses.AddAsync(buildingUnitV2, ct);
+                        await context.BuildingUnitAddresses.AddAsync(buildingUnitAddress, ct);
                     }
                 }
             });
 
             When<Envelope<BuildingUnitAddressWasAttachedV2>>(async (context, message, ct) =>
             {
-                context.BuildingUnitAddresses.Add(new BuildingUnitAddress(message.Message.BuildingUnitPersistentLocalId, message.Message.AddressPersistentLocalId));
+                await context.BuildingUnitAddresses.AddAsync(
+                    new BuildingUnitAddress(message.Message.BuildingUnitPersistentLocalId, message.Message.AddressPersistentLocalId),
+                    ct);
             });
 
             When<Envelope<BuildingUnitAddressWasDetachedV2>>(async (context, message, ct) =>
             {
-                var buAddress =
+                var buildingUnitAddress =
                     await context.BuildingUnitAddresses.FindAsync(
                         [message.Message.BuildingUnitPersistentLocalId, message.Message.AddressPersistentLocalId], ct);
-                context.BuildingUnitAddresses.Remove(buAddress!);
+                context.BuildingUnitAddresses.Remove(buildingUnitAddress!);
             });
 
             When<Envelope<BuildingUnitAddressWasDetachedBecauseAddressWasRejected>>(async (context, message, ct) =>
             {
-                var buAddress =
+                var buildingUnitAddress =
                     await context.BuildingUnitAddresses.FindAsync(
                         [message.Message.BuildingUnitPersistentLocalId, message.Message.AddressPersistentLocalId], ct);
-                context.BuildingUnitAddresses.Remove(buAddress!);
+                context.BuildingUnitAddresses.Remove(buildingUnitAddress!);
             });
 
             When<Envelope<BuildingUnitAddressWasDetachedBecauseAddressWasRetired>>(async (context, message, ct) =>
             {
-                var buAddress =
+                var buildingUnitAddress =
                     await context.BuildingUnitAddresses.FindAsync(
                         [message.Message.BuildingUnitPersistentLocalId, message.Message.AddressPersistentLocalId], ct);
-                context.BuildingUnitAddresses.Remove(buAddress!);
+                context.BuildingUnitAddresses.Remove(buildingUnitAddress!);
             });
 
             When<Envelope<BuildingUnitAddressWasDetachedBecauseAddressWasRemoved>>(async (context, message, ct) =>
             {
-                var buAddress =
+                var buildingUnitAddress =
                     await context.BuildingUnitAddresses.FindAsync(
                         [message.Message.BuildingUnitPersistentLocalId, message.Message.AddressPersistentLocalId], ct);
-                context.BuildingUnitAddresses.Remove(buAddress!);
+                context.BuildingUnitAddresses.Remove(buildingUnitAddress!);
             });
 
             When<Envelope<BuildingUnitAddressWasReplacedBecauseAddressWasReaddressed>>(async (context, message, ct) =>
