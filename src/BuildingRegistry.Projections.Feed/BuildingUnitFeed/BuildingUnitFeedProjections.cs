@@ -821,7 +821,7 @@ namespace BuildingRegistry.Projections.Feed.BuildingUnitFeed
                 {
                     list.Add(new BuildingUnitPositionCloudEventValue(gml, SystemReferenceId.SrsNameLambert72));
 
-                    var lambert08Geometry = geometry.TransformFromLambert72To08();
+                    var lambert08Geometry = geometry.TransformFromLambert72To08(roundingPrecision: 2);
                     list.Add(new BuildingUnitPositionCloudEventValue(lambert08Geometry.ConvertToGml(false), SystemReferenceId.SrsNameLambert2008));
                     break;
                 }
