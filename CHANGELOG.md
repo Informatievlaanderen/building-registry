@@ -1,3 +1,10 @@
+## [5.10.1](https://github.com/informatievlaanderen/building-registry/compare/v5.10.0...v5.10.1) (2026-05-04)
+
+
+### Bug Fixes
+
+* **feed:** add rounding to lambert08 ([6109e5a](https://github.com/informatievlaanderen/building-registry/commit/6109e5af84f4c8b74a4bc5124c5da8bfb9e78dc7))
+
 # [5.10.0](https://github.com/informatievlaanderen/building-registry/compare/v5.9.2...v5.10.0) (2026-04-21)
 
 
