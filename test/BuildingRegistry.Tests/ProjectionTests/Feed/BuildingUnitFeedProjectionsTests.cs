@@ -15,7 +15,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.Testing;
-    using BuildingExtendedWkbGeometry = global::BuildingRegistry.Building.ExtendedWkbGeometry;
+    using BuildingDomainExtendedWkbGeometry = global::BuildingRegistry.Building.ExtendedWkbGeometry;
     using Building;
     using Building.Commands;
     using Building.Events;
@@ -34,11 +34,12 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
     using Tests.Legacy.Autofixture;
     using Xunit;
 
-    public sealed class BuildingUnitFeedProjectionsTests
-    {
-        private const string NisCode = "11001";
-        private static readonly string AddressNamespace = OsloNamespaces.Adres;
-        private static readonly string BuildingNamespace = OsloNamespaces.Gebouw;
+        public sealed class BuildingUnitFeedProjectionsTests
+        {
+            private const string NisCode = "11001";
+            private const int ExpectedPositionProjectionCount = 2;
+            private static readonly string AddressNamespace = OsloNamespaces.Adres;
+            private static readonly string BuildingNamespace = OsloNamespaces.Gebouw;
 
         private readonly Fixture _fixture;
         private readonly FeedContext _feedContext;
@@ -660,7 +661,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
                             It.Is<List<string>>(nisCodes => nisCodes.Contains(NisCode)),
                             It.Is<List<BaseRegistriesCloudEventAttribute>>(attrs =>
                                 attrs.Any(a => a.Name == BuildingUnitAttributeNames.Position
-                                               && a.OldValue != null && ((List<BuildingUnitPositionCloudEventValue>)a.OldValue).Count == 2
+                                               && a.OldValue != null && ((List<BuildingUnitPositionCloudEventValue>)a.OldValue).Count == ExpectedPositionProjectionCount
                                                && a.NewValue != null && AssertPointList((List<BuildingUnitPositionCloudEventValue>)a.NewValue, document.Document.PositionAsGml))
                                 && attrs.Any(a => a.Name == BuildingUnitAttributeNames.GeometryMethod
                                                && a.OldValue!.ToString() == nameof(PositieGeometrieMethode.AangeduidDoorBeheerder)
@@ -707,7 +708,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
                             It.Is<List<string>>(nisCodes => nisCodes.Contains(NisCode)),
                             It.Is<List<BaseRegistriesCloudEventAttribute>>(attrs =>
                                 attrs.Any(a => a.Name == BuildingUnitAttributeNames.Position
-                                               && a.OldValue != null && ((List<BuildingUnitPositionCloudEventValue>)a.OldValue).Count == 2
+                                               && a.OldValue != null && ((List<BuildingUnitPositionCloudEventValue>)a.OldValue).Count == ExpectedPositionProjectionCount
                                                && a.NewValue != null && AssertPointList((List<BuildingUnitPositionCloudEventValue>)a.NewValue, document.Document.PositionAsGml))),
                             BuildingUnitPositionWasCorrected.EventName,
                             It.IsAny<string>()),
@@ -1799,7 +1800,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
                         attrs.Count == expectedAttributeCount
                         && attrs.Any(a => a.Name == BuildingUnitAttributeNames.Position
                                        && a.OldValue != null
-                                       && ((List<BuildingUnitPositionCloudEventValue>)a.OldValue).Count == 2
+                                       && ((List<BuildingUnitPositionCloudEventValue>)a.OldValue).Count == ExpectedPositionProjectionCount
                                        && a.NewValue != null
                                        && AssertPointList((List<BuildingUnitPositionCloudEventValue>)a.NewValue, document.Document.PositionAsGml))
                         && (!expectGeometryMethodChange
@@ -1817,8 +1818,8 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
         private static BuildingOutlineWasChanged CreateBuildingOutlineWasChanged(
             BuildingWasPlannedV2 buildingWasPlannedV2,
             BuildingUnitWasPlannedV2 buildingUnitWasPlannedV2,
-            BuildingExtendedWkbGeometry buildingGeometry,
-            BuildingExtendedWkbGeometry buildingUnitGeometry,
+            BuildingDomainExtendedWkbGeometry buildingGeometry,
+            BuildingDomainExtendedWkbGeometry buildingUnitGeometry,
             Provenance provenance)
         {
             var buildingOutlineWasChanged = new BuildingOutlineWasChanged(
@@ -1834,8 +1835,8 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
         private static BuildingMeasurementWasChanged CreateBuildingMeasurementWasChanged(
             BuildingWasPlannedV2 buildingWasPlannedV2,
             BuildingUnitWasPlannedV2 buildingUnitWasPlannedV2,
-            BuildingExtendedWkbGeometry buildingGeometry,
-            BuildingExtendedWkbGeometry buildingUnitGeometry,
+            BuildingDomainExtendedWkbGeometry buildingGeometry,
+            BuildingDomainExtendedWkbGeometry buildingUnitGeometry,
             Provenance provenance,
             bool buildingUnitBecameDerived)
         {
@@ -1856,8 +1857,8 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
         private static BuildingWasMeasured CreateBuildingWasMeasured(
             BuildingWasPlannedV2 buildingWasPlannedV2,
             BuildingUnitWasPlannedV2 buildingUnitWasPlannedV2,
-            BuildingExtendedWkbGeometry buildingGeometry,
-            BuildingExtendedWkbGeometry buildingUnitGeometry,
+            BuildingDomainExtendedWkbGeometry buildingGeometry,
+            BuildingDomainExtendedWkbGeometry buildingUnitGeometry,
             Provenance provenance,
             bool buildingUnitBecameDerived)
         {
@@ -1878,8 +1879,8 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
         private static BuildingMeasurementWasCorrected CreateBuildingMeasurementWasCorrected(
             BuildingWasPlannedV2 buildingWasPlannedV2,
             BuildingUnitWasPlannedV2 buildingUnitWasPlannedV2,
-            BuildingExtendedWkbGeometry buildingGeometry,
-            BuildingExtendedWkbGeometry buildingUnitGeometry,
+            BuildingDomainExtendedWkbGeometry buildingGeometry,
+            BuildingDomainExtendedWkbGeometry buildingUnitGeometry,
             Provenance provenance,
             bool buildingUnitBecameDerived)
         {
@@ -1908,10 +1909,10 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
                 : ([buildingUnitPersistentLocalId], Array.Empty<BuildingUnitPersistentLocalId>());
         }
 
-        private static BuildingExtendedWkbGeometry CreateUpdatedBuildingGeometry()
+        private static BuildingDomainExtendedWkbGeometry CreateUpdatedBuildingGeometry()
             => new(WkbWriter.Instance.Write(GeometryHelper.SecondValidPolygon));
 
-        private static BuildingExtendedWkbGeometry CreateUpdatedBuildingUnitGeometry()
+        private static BuildingDomainExtendedWkbGeometry CreateUpdatedBuildingUnitGeometry()
             => new(WkbWriter.Instance.Write(GeometryHelper.OtherValidPointInPolygon));
 
         private Envelope<T> CreateEnvelope<T>(T @event, long position) where T : IMessage
