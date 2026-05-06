@@ -15,6 +15,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.Testing;
+    using BuildingExtendedWkbGeometry = global::BuildingRegistry.Building.ExtendedWkbGeometry;
     using Building;
     using Building.Commands;
     using Building.Events;
@@ -1781,7 +1782,10 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
             document.Document.PositionAsGml.Should().NotBeNullOrEmpty();
             document.LastChangedOn.Should().Be(buildingEvent.Provenance.Timestamp);
 
-            var feedItem = await FindFeedItemByBuildingUnitPersistentLocalId(context, buildingUnitWasPlannedV2.BuildingUnitPersistentLocalId);
+            var feedItem = await context.BuildingUnitFeed
+                .Where(x => x.BuildingUnitPersistentLocalId == buildingUnitWasPlannedV2.BuildingUnitPersistentLocalId)
+                .OrderByDescending(x => x.Position)
+                .FirstOrDefaultAsync();
             AssertFeedItem(feedItem, position, buildingEvent);
 
             ChangeFeedServiceMock.Verify(x => x.CreateCloudEventWithData(
@@ -1813,8 +1817,8 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
         private static BuildingOutlineWasChanged CreateBuildingOutlineWasChanged(
             BuildingWasPlannedV2 buildingWasPlannedV2,
             BuildingUnitWasPlannedV2 buildingUnitWasPlannedV2,
-            Building.ExtendedWkbGeometry buildingGeometry,
-            Building.ExtendedWkbGeometry buildingUnitGeometry,
+            BuildingExtendedWkbGeometry buildingGeometry,
+            BuildingExtendedWkbGeometry buildingUnitGeometry,
             Provenance provenance)
         {
             var buildingOutlineWasChanged = new BuildingOutlineWasChanged(
@@ -1830,8 +1834,8 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
         private static BuildingMeasurementWasChanged CreateBuildingMeasurementWasChanged(
             BuildingWasPlannedV2 buildingWasPlannedV2,
             BuildingUnitWasPlannedV2 buildingUnitWasPlannedV2,
-            Building.ExtendedWkbGeometry buildingGeometry,
-            Building.ExtendedWkbGeometry buildingUnitGeometry,
+            BuildingExtendedWkbGeometry buildingGeometry,
+            BuildingExtendedWkbGeometry buildingUnitGeometry,
             Provenance provenance,
             bool buildingUnitBecameDerived)
         {
@@ -1852,8 +1856,8 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
         private static BuildingWasMeasured CreateBuildingWasMeasured(
             BuildingWasPlannedV2 buildingWasPlannedV2,
             BuildingUnitWasPlannedV2 buildingUnitWasPlannedV2,
-            Building.ExtendedWkbGeometry buildingGeometry,
-            Building.ExtendedWkbGeometry buildingUnitGeometry,
+            BuildingExtendedWkbGeometry buildingGeometry,
+            BuildingExtendedWkbGeometry buildingUnitGeometry,
             Provenance provenance,
             bool buildingUnitBecameDerived)
         {
@@ -1874,8 +1878,8 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
         private static BuildingMeasurementWasCorrected CreateBuildingMeasurementWasCorrected(
             BuildingWasPlannedV2 buildingWasPlannedV2,
             BuildingUnitWasPlannedV2 buildingUnitWasPlannedV2,
-            Building.ExtendedWkbGeometry buildingGeometry,
-            Building.ExtendedWkbGeometry buildingUnitGeometry,
+            BuildingExtendedWkbGeometry buildingGeometry,
+            BuildingExtendedWkbGeometry buildingUnitGeometry,
             Provenance provenance,
             bool buildingUnitBecameDerived)
         {
@@ -1904,10 +1908,10 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
                 : ([buildingUnitPersistentLocalId], Array.Empty<BuildingUnitPersistentLocalId>());
         }
 
-        private static Building.ExtendedWkbGeometry CreateUpdatedBuildingGeometry()
+        private static BuildingExtendedWkbGeometry CreateUpdatedBuildingGeometry()
             => new(WkbWriter.Instance.Write(GeometryHelper.SecondValidPolygon));
 
-        private static Building.ExtendedWkbGeometry CreateUpdatedBuildingUnitGeometry()
+        private static BuildingExtendedWkbGeometry CreateUpdatedBuildingUnitGeometry()
             => new(WkbWriter.Instance.Write(GeometryHelper.OtherValidPointInPolygon));
 
         private Envelope<T> CreateEnvelope<T>(T @event, long position) where T : IMessage
