@@ -1,3 +1,10 @@
+## [5.10.2](https://github.com/informatievlaanderen/building-registry/compare/v5.10.1...v5.10.2) (2026-05-06)
+
+
+### Bug Fixes
+
+* **feed:** update building unit feed geometry events ([2e51910](https://github.com/informatievlaanderen/building-registry/commit/2e51910bc6993344a66d89e6310ae9a343836776))
+
 ## [5.10.1](https://github.com/informatievlaanderen/building-registry/compare/v5.10.0...v5.10.1) (2026-05-04)
 
 
