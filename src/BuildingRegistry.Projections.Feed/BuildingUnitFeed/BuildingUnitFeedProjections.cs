@@ -111,24 +111,52 @@ namespace BuildingRegistry.Projections.Feed.BuildingUnitFeed
             {
                 var buildingGeometry = await FindBuildingGeometry(context, message.Message.BuildingPersistentLocalId, ct);
                 buildingGeometry.ExtendedWkbGeometry = message.Message.ExtendedWkbGeometryBuilding;
+
+                await UpdateBuildingUnitsFromBuildingGeometryEvent(
+                    context,
+                    message,
+                    message.Message.BuildingUnitPersistentLocalIds,
+                    message.Message.ExtendedWkbGeometryBuildingUnits,
+                    ct);
             });
 
             When<Envelope<BuildingMeasurementWasChanged>>(async (context, message, ct) =>
             {
                 var buildingGeometry = await FindBuildingGeometry(context, message.Message.BuildingPersistentLocalId, ct);
                 buildingGeometry.ExtendedWkbGeometry = message.Message.ExtendedWkbGeometryBuilding;
+
+                await UpdateBuildingUnitsFromBuildingGeometryEvent(
+                    context,
+                    message,
+                    message.Message.BuildingUnitPersistentLocalIds.Concat(message.Message.BuildingUnitPersistentLocalIdsWhichBecameDerived),
+                    message.Message.ExtendedWkbGeometryBuildingUnits,
+                    ct);
             });
 
             When<Envelope<BuildingWasMeasured>>(async (context, message, ct) =>
             {
                 var buildingGeometry = await FindBuildingGeometry(context, message.Message.BuildingPersistentLocalId, ct);
                 buildingGeometry.ExtendedWkbGeometry = message.Message.ExtendedWkbGeometryBuilding;
+
+                await UpdateBuildingUnitsFromBuildingGeometryEvent(
+                    context,
+                    message,
+                    message.Message.BuildingUnitPersistentLocalIds.Concat(message.Message.BuildingUnitPersistentLocalIdsWhichBecameDerived),
+                    message.Message.ExtendedWkbGeometryBuildingUnits,
+                    ct);
             });
 
             When<Envelope<BuildingMeasurementWasCorrected>>(async (context, message, ct) =>
             {
                 var buildingGeometry = await FindBuildingGeometry(context, message.Message.BuildingPersistentLocalId, ct);
                 buildingGeometry.ExtendedWkbGeometry = message.Message.ExtendedWkbGeometryBuilding;
+
+                await UpdateBuildingUnitsFromBuildingGeometryEvent(
+                    context,
+                    message,
+                    message.Message.BuildingUnitPersistentLocalIds.Concat(message.Message.BuildingUnitPersistentLocalIdsWhichBecameDerived),
+                    message.Message.ExtendedWkbGeometryBuildingUnits,
+                    ct);
             });
 
             When<Envelope<BuildingWasRemovedV2>>(DoNothing);
@@ -707,6 +735,45 @@ namespace BuildingRegistry.Projections.Feed.BuildingUnitFeed
             if (geometry is null)
                 throw new InvalidOperationException($"Could not find building geometry for building {buildingPersistentLocalId}");
             return geometry;
+        }
+
+        private async Task UpdateBuildingUnitsFromBuildingGeometryEvent<T>(
+            FeedContext context,
+            Envelope<T> message,
+            IEnumerable<int> buildingUnitPersistentLocalIds,
+            string? extendedWkbGeometryBuildingUnits,
+            CancellationToken ct)
+            where T : IHasProvenance, IMessage
+        {
+            var buildingUnitIds = buildingUnitPersistentLocalIds.ToList();
+            if (!buildingUnitIds.Any() || string.IsNullOrWhiteSpace(extendedWkbGeometryBuildingUnits))
+                return;
+
+            var geometry = GmlHelpers.ParseGeometry(extendedWkbGeometryBuildingUnits);
+            var newPositionValues = CreatePositionValues(geometry);
+            var newGeometryMethod = PositieGeometrieMethode.AfgeleidVanObject;
+
+            foreach (var buildingUnitPersistentLocalId in buildingUnitIds)
+            {
+                var document = await FindDocument(context, buildingUnitPersistentLocalId, ct);
+                var oldGeometryMethod = document.Document.GeometryMethod;
+                var oldPositionValues = CreatePositionValues(GmlHelpers.ParseGeometry(document.Document.ExtendedWkbGeometry));
+
+                document.Document.ExtendedWkbGeometry = extendedWkbGeometryBuildingUnits;
+                document.Document.PositionAsGml = geometry.ConvertToGml(false);
+                document.Document.GeometryMethod = newGeometryMethod;
+                document.LastChangedOn = message.Message.Provenance.Timestamp;
+
+                var attributes = new List<BaseRegistriesCloudEventAttribute>
+                {
+                    new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.Position, oldPositionValues, newPositionValues)
+                };
+
+                if (oldGeometryMethod != newGeometryMethod)
+                    attributes.Add(new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.GeometryMethod, oldGeometryMethod, newGeometryMethod));
+
+                await AddCloudEvent(message, document, context, attributes);
+            }
         }
 
         private async Task AddCloudEvent<T>(
