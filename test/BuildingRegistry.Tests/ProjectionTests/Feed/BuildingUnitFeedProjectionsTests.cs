@@ -15,6 +15,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.Testing;
+    using BuildingDomainExtendedWkbGeometry = global::BuildingRegistry.Building.ExtendedWkbGeometry;
     using Building;
     using Building.Commands;
     using Building.Events;
@@ -33,11 +34,12 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
     using Tests.Legacy.Autofixture;
     using Xunit;
 
-    public sealed class BuildingUnitFeedProjectionsTests
-    {
-        private const string NisCode = "11001";
-        private static readonly string AddressNamespace = OsloNamespaces.Adres;
-        private static readonly string BuildingNamespace = OsloNamespaces.Gebouw;
+        public sealed class BuildingUnitFeedProjectionsTests
+        {
+            private const string NisCode = "11001";
+            private const int ExpectedPositionProjectionCount = 2;
+            private static readonly string AddressNamespace = OsloNamespaces.Adres;
+            private static readonly string BuildingNamespace = OsloNamespaces.Gebouw;
 
         private readonly Fixture _fixture;
         private readonly FeedContext _feedContext;
@@ -286,6 +288,145 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
         }
 
         [Fact]
+        public async Task WhenBuildingOutlineWasChanged_ThenAffectedBuildingUnitPositionIsUpdated()
+        {
+            _fixture.Customize(new WithFixedBuildingUnitPersistentLocalId());
+            _fixture.Customize(new WithValidExtendedWkbPoint());
+
+            var buildingWasPlannedV2 = _fixture.Create<BuildingWasPlannedV2>();
+            var buildingUnitWasPlannedV2 = _fixture.Create<BuildingUnitWasPlannedV2>()
+                .WithGeometryMethod(BuildingUnitPositionGeometryMethod.DerivedFromObject);
+            var buildingOutlineWasChanged = CreateBuildingOutlineWasChanged(
+                buildingWasPlannedV2,
+                buildingUnitWasPlannedV2,
+                CreateUpdatedBuildingGeometry(),
+                CreateUpdatedBuildingUnitGeometry(),
+                _fixture.Create<BuildingOutlineWasChanged>().Provenance.ToProvenance());
+            var position = 1L;
+
+            await Sut
+                .Given(CreateEnvelope(buildingWasPlannedV2, position),
+                    CreateEnvelope(buildingUnitWasPlannedV2, position + 1),
+                    CreateEnvelope(buildingOutlineWasChanged, position + 2))
+                .Then(context => AssertBuildingGeometryEventUpdatesBuildingUnit(
+                    context,
+                    buildingUnitWasPlannedV2,
+                    buildingOutlineWasChanged,
+                    position + 2,
+                    expectedAttributeCount: 1,
+                    expectGeometryMethodChange: false,
+                    e => e.BuildingPersistentLocalId,
+                    e => e.ExtendedWkbGeometryBuilding,
+                    e => e.ExtendedWkbGeometryBuildingUnits,
+                    BuildingOutlineWasChanged.EventName));
+        }
+
+        [Fact]
+        public async Task WhenBuildingMeasurementWasChanged_ThenAffectedBuildingUnitPositionAndMethodAreUpdated()
+        {
+            _fixture.Customize(new WithFixedBuildingUnitPersistentLocalId());
+            _fixture.Customize(new WithValidExtendedWkbPoint());
+
+            var buildingWasPlannedV2 = _fixture.Create<BuildingWasPlannedV2>();
+            var buildingUnitWasPlannedV2 = _fixture.Create<BuildingUnitWasPlannedV2>()
+                .WithGeometryMethod(BuildingUnitPositionGeometryMethod.AppointedByAdministrator);
+            var buildingMeasurementWasChanged = CreateBuildingMeasurementWasChanged(
+                buildingWasPlannedV2,
+                buildingUnitWasPlannedV2,
+                CreateUpdatedBuildingGeometry(),
+                CreateUpdatedBuildingUnitGeometry(),
+                _fixture.Create<BuildingMeasurementWasChanged>().Provenance.ToProvenance(),
+                buildingUnitBecameDerived: true);
+            var position = 1L;
+
+            await Sut
+                .Given(CreateEnvelope(buildingWasPlannedV2, position),
+                    CreateEnvelope(buildingUnitWasPlannedV2, position + 1),
+                    CreateEnvelope(buildingMeasurementWasChanged, position + 2))
+                .Then(context => AssertBuildingGeometryEventUpdatesBuildingUnit(
+                    context,
+                    buildingUnitWasPlannedV2,
+                    buildingMeasurementWasChanged,
+                    position + 2,
+                    expectedAttributeCount: 2,
+                    expectGeometryMethodChange: true,
+                    e => e.BuildingPersistentLocalId,
+                    e => e.ExtendedWkbGeometryBuilding,
+                    e => e.ExtendedWkbGeometryBuildingUnits,
+                    BuildingMeasurementWasChanged.EventName));
+        }
+
+        [Fact]
+        public async Task WhenBuildingWasMeasured_ThenAffectedBuildingUnitPositionAndMethodAreUpdated()
+        {
+            _fixture.Customize(new WithFixedBuildingUnitPersistentLocalId());
+            _fixture.Customize(new WithValidExtendedWkbPoint());
+
+            var buildingWasPlannedV2 = _fixture.Create<BuildingWasPlannedV2>();
+            var buildingUnitWasPlannedV2 = _fixture.Create<BuildingUnitWasPlannedV2>()
+                .WithGeometryMethod(BuildingUnitPositionGeometryMethod.AppointedByAdministrator);
+            var buildingWasMeasured = CreateBuildingWasMeasured(
+                buildingWasPlannedV2,
+                buildingUnitWasPlannedV2,
+                CreateUpdatedBuildingGeometry(),
+                CreateUpdatedBuildingUnitGeometry(),
+                _fixture.Create<BuildingWasMeasured>().Provenance.ToProvenance(),
+                buildingUnitBecameDerived: true);
+            var position = 1L;
+
+            await Sut
+                .Given(CreateEnvelope(buildingWasPlannedV2, position),
+                    CreateEnvelope(buildingUnitWasPlannedV2, position + 1),
+                    CreateEnvelope(buildingWasMeasured, position + 2))
+                .Then(context => AssertBuildingGeometryEventUpdatesBuildingUnit(
+                    context,
+                    buildingUnitWasPlannedV2,
+                    buildingWasMeasured,
+                    position + 2,
+                    expectedAttributeCount: 2,
+                    expectGeometryMethodChange: true,
+                    e => e.BuildingPersistentLocalId,
+                    e => e.ExtendedWkbGeometryBuilding,
+                    e => e.ExtendedWkbGeometryBuildingUnits,
+                    BuildingWasMeasured.EventName));
+        }
+
+        [Fact]
+        public async Task WhenBuildingMeasurementWasCorrected_ThenAffectedBuildingUnitPositionIsUpdated()
+        {
+            _fixture.Customize(new WithFixedBuildingUnitPersistentLocalId());
+            _fixture.Customize(new WithValidExtendedWkbPoint());
+
+            var buildingWasPlannedV2 = _fixture.Create<BuildingWasPlannedV2>();
+            var buildingUnitWasPlannedV2 = _fixture.Create<BuildingUnitWasPlannedV2>()
+                .WithGeometryMethod(BuildingUnitPositionGeometryMethod.DerivedFromObject);
+            var buildingMeasurementWasCorrected = CreateBuildingMeasurementWasCorrected(
+                buildingWasPlannedV2,
+                buildingUnitWasPlannedV2,
+                CreateUpdatedBuildingGeometry(),
+                CreateUpdatedBuildingUnitGeometry(),
+                _fixture.Create<BuildingMeasurementWasCorrected>().Provenance.ToProvenance(),
+                buildingUnitBecameDerived: false);
+            var position = 1L;
+
+            await Sut
+                .Given(CreateEnvelope(buildingWasPlannedV2, position),
+                    CreateEnvelope(buildingUnitWasPlannedV2, position + 1),
+                    CreateEnvelope(buildingMeasurementWasCorrected, position + 2))
+                .Then(context => AssertBuildingGeometryEventUpdatesBuildingUnit(
+                    context,
+                    buildingUnitWasPlannedV2,
+                    buildingMeasurementWasCorrected,
+                    position + 2,
+                    expectedAttributeCount: 1,
+                    expectGeometryMethodChange: false,
+                    e => e.BuildingPersistentLocalId,
+                    e => e.ExtendedWkbGeometryBuilding,
+                    e => e.ExtendedWkbGeometryBuildingUnits,
+                    BuildingMeasurementWasCorrected.EventName));
+        }
+
+        [Fact]
         public async Task WhenBuildingUnitWasPlannedV2_ThenDocumentAndFeedItemCreated()
         {
             _fixture.Customize(new WithFixedBuildingUnitPersistentLocalId());
@@ -520,7 +661,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
                             It.Is<List<string>>(nisCodes => nisCodes.Contains(NisCode)),
                             It.Is<List<BaseRegistriesCloudEventAttribute>>(attrs =>
                                 attrs.Any(a => a.Name == BuildingUnitAttributeNames.Position
-                                               && a.OldValue != null && ((List<BuildingUnitPositionCloudEventValue>)a.OldValue).Count == 2
+                                               && a.OldValue != null && ((List<BuildingUnitPositionCloudEventValue>)a.OldValue).Count == ExpectedPositionProjectionCount
                                                && a.NewValue != null && AssertPointList((List<BuildingUnitPositionCloudEventValue>)a.NewValue, document.Document.PositionAsGml))
                                 && attrs.Any(a => a.Name == BuildingUnitAttributeNames.GeometryMethod
                                                && a.OldValue!.ToString() == nameof(PositieGeometrieMethode.AangeduidDoorBeheerder)
@@ -567,7 +708,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
                             It.Is<List<string>>(nisCodes => nisCodes.Contains(NisCode)),
                             It.Is<List<BaseRegistriesCloudEventAttribute>>(attrs =>
                                 attrs.Any(a => a.Name == BuildingUnitAttributeNames.Position
-                                               && a.OldValue != null && ((List<BuildingUnitPositionCloudEventValue>)a.OldValue).Count == 2
+                                               && a.OldValue != null && ((List<BuildingUnitPositionCloudEventValue>)a.OldValue).Count == ExpectedPositionProjectionCount
                                                && a.NewValue != null && AssertPointList((List<BuildingUnitPositionCloudEventValue>)a.NewValue, document.Document.PositionAsGml))),
                             BuildingUnitPositionWasCorrected.EventName,
                             It.IsAny<string>()),
@@ -1617,6 +1758,162 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
 
             return true;
         }
+
+        private async Task AssertBuildingGeometryEventUpdatesBuildingUnit<T>(
+            FeedContext context,
+            BuildingUnitWasPlannedV2 buildingUnitWasPlannedV2,
+            T buildingEvent,
+            long position,
+            int expectedAttributeCount,
+            bool expectGeometryMethodChange,
+            Func<T, int> getBuildingPersistentLocalId,
+            Func<T, string> getBuildingGeometry,
+            Func<T, string?> getBuildingUnitGeometry,
+            string eventName)
+            where T : class, IBuildingEvent, IMessage
+        {
+            var buildingGeometry = await context.BuildingGeometryForBuildingUnit.FindAsync(getBuildingPersistentLocalId(buildingEvent));
+            buildingGeometry.Should().NotBeNull();
+            buildingGeometry!.ExtendedWkbGeometry.Should().Be(getBuildingGeometry(buildingEvent));
+
+            var document = await context.BuildingUnitDocuments.FindAsync(buildingUnitWasPlannedV2.BuildingUnitPersistentLocalId);
+            document.Should().NotBeNull();
+            document!.Document.ExtendedWkbGeometry.Should().Be(getBuildingUnitGeometry(buildingEvent));
+            document.Document.GeometryMethod.Should().Be(PositieGeometrieMethode.AfgeleidVanObject);
+            document.Document.PositionAsGml.Should().NotBeNullOrEmpty();
+            document.LastChangedOn.Should().Be(buildingEvent.Provenance.Timestamp);
+
+            var feedItem = await context.BuildingUnitFeed
+                .Where(x => x.BuildingUnitPersistentLocalId == buildingUnitWasPlannedV2.BuildingUnitPersistentLocalId)
+                .OrderByDescending(x => x.Position)
+                .FirstOrDefaultAsync();
+            AssertFeedItem(feedItem, position, buildingEvent);
+
+            ChangeFeedServiceMock.Verify(x => x.CreateCloudEventWithData(
+                    It.IsAny<long>(),
+                    buildingEvent.Provenance.Timestamp.ToBelgianDateTimeOffset(),
+                    BuildingUnitEventTypes.UpdateV1,
+                    buildingUnitWasPlannedV2.BuildingUnitPersistentLocalId.ToString(),
+                    It.IsAny<DateTimeOffset>(),
+                    It.Is<List<string>>(nisCodes => nisCodes.Contains(NisCode)),
+                    It.Is<List<BaseRegistriesCloudEventAttribute>>(attrs =>
+                        attrs.Count == expectedAttributeCount
+                        && attrs.Any(a => a.Name == BuildingUnitAttributeNames.Position
+                                       && a.OldValue != null
+                                       && ((List<BuildingUnitPositionCloudEventValue>)a.OldValue).Count == ExpectedPositionProjectionCount
+                                       && a.NewValue != null
+                                       && AssertPointList((List<BuildingUnitPositionCloudEventValue>)a.NewValue, document.Document.PositionAsGml))
+                        && (!expectGeometryMethodChange
+                            ? !attrs.Any(a => a.Name == BuildingUnitAttributeNames.GeometryMethod)
+                            : attrs.Any(a => a.Name == BuildingUnitAttributeNames.GeometryMethod
+                                          && a.OldValue!.ToString() == nameof(PositieGeometrieMethode.AangeduidDoorBeheerder)
+                                          && a.NewValue!.ToString() == nameof(PositieGeometrieMethode.AfgeleidVanObject)))),
+                    eventName,
+                    It.IsAny<string>()),
+                Times.Once);
+
+            ChangeFeedServiceMock.Verify(x => x.CheckToUpdateCacheAsync(1, context, It.IsAny<Func<int, Task<int>>>()), Times.Exactly(2));
+        }
+
+        private static BuildingOutlineWasChanged CreateBuildingOutlineWasChanged(
+            BuildingWasPlannedV2 buildingWasPlannedV2,
+            BuildingUnitWasPlannedV2 buildingUnitWasPlannedV2,
+            BuildingDomainExtendedWkbGeometry buildingGeometry,
+            BuildingDomainExtendedWkbGeometry buildingUnitGeometry,
+            Provenance provenance)
+        {
+            var buildingOutlineWasChanged = new BuildingOutlineWasChanged(
+                new BuildingPersistentLocalId(buildingWasPlannedV2.BuildingPersistentLocalId),
+                [new BuildingUnitPersistentLocalId(buildingUnitWasPlannedV2.BuildingUnitPersistentLocalId)],
+                buildingGeometry,
+                buildingUnitGeometry);
+            ((ISetProvenance)buildingOutlineWasChanged).SetProvenance(provenance);
+
+            return buildingOutlineWasChanged;
+        }
+
+        private static BuildingMeasurementWasChanged CreateBuildingMeasurementWasChanged(
+            BuildingWasPlannedV2 buildingWasPlannedV2,
+            BuildingUnitWasPlannedV2 buildingUnitWasPlannedV2,
+            BuildingDomainExtendedWkbGeometry buildingGeometry,
+            BuildingDomainExtendedWkbGeometry buildingUnitGeometry,
+            Provenance provenance,
+            bool buildingUnitBecameDerived)
+        {
+            var (buildingUnitPersistentLocalIds, buildingUnitPersistentLocalIdsWhichBecameDerived) =
+                CreateBuildingUnitPersistentLocalIds(buildingUnitWasPlannedV2, buildingUnitBecameDerived);
+
+            var buildingMeasurementWasChanged = new BuildingMeasurementWasChanged(
+                new BuildingPersistentLocalId(buildingWasPlannedV2.BuildingPersistentLocalId),
+                buildingUnitPersistentLocalIds,
+                buildingUnitPersistentLocalIdsWhichBecameDerived,
+                buildingGeometry,
+                buildingUnitGeometry);
+            ((ISetProvenance)buildingMeasurementWasChanged).SetProvenance(provenance);
+
+            return buildingMeasurementWasChanged;
+        }
+
+        private static BuildingWasMeasured CreateBuildingWasMeasured(
+            BuildingWasPlannedV2 buildingWasPlannedV2,
+            BuildingUnitWasPlannedV2 buildingUnitWasPlannedV2,
+            BuildingDomainExtendedWkbGeometry buildingGeometry,
+            BuildingDomainExtendedWkbGeometry buildingUnitGeometry,
+            Provenance provenance,
+            bool buildingUnitBecameDerived)
+        {
+            var (buildingUnitPersistentLocalIds, buildingUnitPersistentLocalIdsWhichBecameDerived) =
+                CreateBuildingUnitPersistentLocalIds(buildingUnitWasPlannedV2, buildingUnitBecameDerived);
+
+            var buildingWasMeasured = new BuildingWasMeasured(
+                new BuildingPersistentLocalId(buildingWasPlannedV2.BuildingPersistentLocalId),
+                buildingUnitPersistentLocalIds,
+                buildingUnitPersistentLocalIdsWhichBecameDerived,
+                buildingGeometry,
+                buildingUnitGeometry);
+            ((ISetProvenance)buildingWasMeasured).SetProvenance(provenance);
+
+            return buildingWasMeasured;
+        }
+
+        private static BuildingMeasurementWasCorrected CreateBuildingMeasurementWasCorrected(
+            BuildingWasPlannedV2 buildingWasPlannedV2,
+            BuildingUnitWasPlannedV2 buildingUnitWasPlannedV2,
+            BuildingDomainExtendedWkbGeometry buildingGeometry,
+            BuildingDomainExtendedWkbGeometry buildingUnitGeometry,
+            Provenance provenance,
+            bool buildingUnitBecameDerived)
+        {
+            var (buildingUnitPersistentLocalIds, buildingUnitPersistentLocalIdsWhichBecameDerived) =
+                CreateBuildingUnitPersistentLocalIds(buildingUnitWasPlannedV2, buildingUnitBecameDerived);
+
+            var buildingMeasurementWasCorrected = new BuildingMeasurementWasCorrected(
+                new BuildingPersistentLocalId(buildingWasPlannedV2.BuildingPersistentLocalId),
+                buildingUnitPersistentLocalIds,
+                buildingUnitPersistentLocalIdsWhichBecameDerived,
+                buildingGeometry,
+                buildingUnitGeometry);
+            ((ISetProvenance)buildingMeasurementWasCorrected).SetProvenance(provenance);
+
+            return buildingMeasurementWasCorrected;
+        }
+
+        private static (IEnumerable<BuildingUnitPersistentLocalId> BuildingUnitPersistentLocalIds, IEnumerable<BuildingUnitPersistentLocalId> BuildingUnitPersistentLocalIdsWhichBecameDerived) CreateBuildingUnitPersistentLocalIds(
+            BuildingUnitWasPlannedV2 buildingUnitWasPlannedV2,
+            bool buildingUnitBecameDerived)
+        {
+            var buildingUnitPersistentLocalId = new BuildingUnitPersistentLocalId(buildingUnitWasPlannedV2.BuildingUnitPersistentLocalId);
+
+            return buildingUnitBecameDerived
+                ? (Array.Empty<BuildingUnitPersistentLocalId>(), [buildingUnitPersistentLocalId])
+                : ([buildingUnitPersistentLocalId], Array.Empty<BuildingUnitPersistentLocalId>());
+        }
+
+        private static BuildingDomainExtendedWkbGeometry CreateUpdatedBuildingGeometry()
+            => new(WkbWriter.Instance.Write(GeometryHelper.SecondValidPolygon));
+
+        private static BuildingDomainExtendedWkbGeometry CreateUpdatedBuildingUnitGeometry()
+            => new(WkbWriter.Instance.Write(GeometryHelper.OtherValidPointInPolygon));
 
         private Envelope<T> CreateEnvelope<T>(T @event, long position) where T : IMessage
         {
