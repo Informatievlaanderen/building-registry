@@ -597,7 +597,7 @@ namespace BuildingRegistry.Projections.Feed.BuildingUnitFeed
             {
                 var document = await FindDocument(context, message.Message.BuildingUnitPersistentLocalId, ct);
                 var oldAddressPuris = BuildAddressPuris(document.Document.AddressPersistentLocalIds);
-                document.Document.AddressPersistentLocalIds.Remove(message.Message.AddressPersistentLocalId);
+                document.Document.AddressPersistentLocalIds.RemoveAll(id => id == message.Message.AddressPersistentLocalId);
                 var newAddressPuris = BuildAddressPuris(document.Document.AddressPersistentLocalIds);
                 document.LastChangedOn = message.Message.Provenance.Timestamp;
 
@@ -611,7 +611,7 @@ namespace BuildingRegistry.Projections.Feed.BuildingUnitFeed
             {
                 var document = await FindDocument(context, message.Message.BuildingUnitPersistentLocalId, ct);
                 var oldAddressPuris = BuildAddressPuris(document.Document.AddressPersistentLocalIds);
-                document.Document.AddressPersistentLocalIds.Remove(message.Message.AddressPersistentLocalId);
+                document.Document.AddressPersistentLocalIds.RemoveAll(id => id == message.Message.AddressPersistentLocalId);
                 var newAddressPuris = BuildAddressPuris(document.Document.AddressPersistentLocalIds);
                 document.LastChangedOn = message.Message.Provenance.Timestamp;
 
@@ -625,7 +625,7 @@ namespace BuildingRegistry.Projections.Feed.BuildingUnitFeed
             {
                 var document = await FindDocument(context, message.Message.BuildingUnitPersistentLocalId, ct);
                 var oldAddressPuris = BuildAddressPuris(document.Document.AddressPersistentLocalIds);
-                document.Document.AddressPersistentLocalIds.Remove(message.Message.AddressPersistentLocalId);
+                document.Document.AddressPersistentLocalIds.RemoveAll(id => id == message.Message.AddressPersistentLocalId);
                 var newAddressPuris = BuildAddressPuris(document.Document.AddressPersistentLocalIds);
                 document.LastChangedOn = message.Message.Provenance.Timestamp;
 
@@ -639,7 +639,7 @@ namespace BuildingRegistry.Projections.Feed.BuildingUnitFeed
             {
                 var document = await FindDocument(context, message.Message.BuildingUnitPersistentLocalId, ct);
                 var oldAddressPuris = BuildAddressPuris(document.Document.AddressPersistentLocalIds);
-                document.Document.AddressPersistentLocalIds.Remove(message.Message.AddressPersistentLocalId);
+                document.Document.AddressPersistentLocalIds.RemoveAll(id => id == message.Message.AddressPersistentLocalId);
                 var newAddressPuris = BuildAddressPuris(document.Document.AddressPersistentLocalIds);
                 document.LastChangedOn = message.Message.Provenance.Timestamp;
 
@@ -671,7 +671,7 @@ namespace BuildingRegistry.Projections.Feed.BuildingUnitFeed
                 var document = await FindDocument(context, message.Message.BuildingUnitPersistentLocalId, ct);
                 var oldAddressPuris = BuildAddressPuris(document.Document.AddressPersistentLocalIds);
 
-                document.Document.AddressPersistentLocalIds.Remove(message.Message.PreviousAddressPersistentLocalId);
+                document.Document.AddressPersistentLocalIds.RemoveAll(id => id == message.Message.PreviousAddressPersistentLocalId);
                 if (!document.Document.AddressPersistentLocalIds.Contains(message.Message.NewAddressPersistentLocalId))
                 {
                     document.Document.AddressPersistentLocalIds.Add(message.Message.NewAddressPersistentLocalId);
@@ -695,7 +695,7 @@ namespace BuildingRegistry.Projections.Feed.BuildingUnitFeed
 
                     foreach (var addressPersistentLocalId in buildingUnitReaddress.DetachedAddressPersistentLocalIds)
                     {
-                        document.Document.AddressPersistentLocalIds.Remove(addressPersistentLocalId);
+                        document.Document.AddressPersistentLocalIds.RemoveAll(id => id == addressPersistentLocalId);
                     }
 
                     foreach (var addressPersistentLocalId in buildingUnitReaddress.AttachedAddressPersistentLocalIds)
