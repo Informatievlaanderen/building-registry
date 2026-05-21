@@ -1,3 +1,10 @@
+## [5.10.3](https://github.com/informatievlaanderen/building-registry/compare/v5.10.2...v5.10.3) (2026-05-21)
+
+
+### Bug Fixes
+
+* **feed:** remove detach address duplicates ([c721120](https://github.com/informatievlaanderen/building-registry/commit/c721120341a0b3666758147097ccf03e270919bb))
+
 ## [5.10.2](https://github.com/informatievlaanderen/building-registry/compare/v5.10.1...v5.10.2) (2026-05-06)
 
 
