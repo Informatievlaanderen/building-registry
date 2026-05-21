@@ -22,11 +22,11 @@
       },
       "Datadog.Trace.Bundle": {
         "type": "Direct",
-        "requested": "[3.15.0, )",
-        "resolved": "3.15.0",
-        "contentHash": "mzCLTCiA1Lzlj3dRbE9G84aePo7S+7ekFdl5r3ujm8hmoeKkW0MBayhKIg2+ZvTbIbrA5oHMDcwIscLR125cVg==",
+        "requested": "[3.44.0, )",
+        "resolved": "3.44.0",
+        "contentHash": "w45DPBOyLaHs4cWkV/1n8cERPfedt5SlnKqnZTrKdk+dhTuUz7nMc/F5GlXJjHCW2ogRdXKOqE/iZqQ6tvf0rg==",
         "dependencies": {
-          "Datadog.Trace": "3.15.0"
+          "Datadog.Trace": "3.44.0"
         }
       },
       "Microsoft.Extensions.Hosting": {
@@ -306,8 +306,8 @@
       },
       "Datadog.Trace": {
         "type": "Transitive",
-        "resolved": "3.15.0",
-        "contentHash": "xDdce/RLnXEoyyySKoY+MEp586Yj5x9lNIhN3I2NbZhS7wnaXXHJ/1ieFxdgU2dfY5m6RlEGWKG5auzgKd9rzA==",
+        "resolved": "3.44.0",
+        "contentHash": "euvgXVCmaRwwTTdDpduu2kKNFIOU1Y+JBrkRJkH105aFBEnewU1z0k8KchbX+qKC1eGm9BoE+RQ4DhbWQ1AwgA==",
         "dependencies": {
           "System.Diagnostics.DiagnosticSource": "4.4.1"
         }
@@ -868,7 +868,7 @@
           "Be.Vlaanderen.Basisregisters.ProjectionHandling.Runner.SqlServer": "[15.0.1, )",
           "BuildingRegistry.Infrastructure": "[1.0.0, )",
           "BuildingRegistry.Projections.Legacy": "[1.0.0, )",
-          "Datadog.Trace.Bundle": "[3.15.0, )",
+          "Datadog.Trace.Bundle": "[3.44.0, )",
           "Destructurama.JsonNet": "[4.0.2, )",
           "Microsoft.EntityFrameworkCore.SqlServer.NetTopologySuite": "[9.0.4, )",
           "Microsoft.Extensions.Hosting": "[9.0.4, )",
