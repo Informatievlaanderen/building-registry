@@ -5,6 +5,9 @@ on:
 
 concurrency: Release
 
+permissions:
+  id-token: write
+
 jobs:
   set-release-version:
     if: github.repository_owner == 'Informatievlaanderen'
@@ -60,9 +63,9 @@ jobs:
     needs: [ set-release-version ]
     if: ${{ (github.repository_owner == 'Informatievlaanderen') && (needs.set-release-version.outputs.version != 'none') }}
     with:
-      registry: ${{ vars.VBR_DEVOPS_DOCKER_REGISTRY }}/building-registry
-      image-file: br-api-backoffice-image.tar
-      image-name: api-backoffice
+      registry: ${{ vars.VBR_DEVOPS_DOCKER_REGISTRY }}/building
+      image-file: br-backoffice-api-image.tar
+      image-name: backoffice-api
       test-project: BuildingRegistry.Tests
       build-project: BuildingRegistry.Api.BackOffice
       semver: ${{ needs.set-release-version.outputs.version }}
@@ -76,7 +79,7 @@ jobs:
     needs: [ set-release-version ]
     if: ${{ (github.repository_owner == 'Informatievlaanderen') && (needs.set-release-version.outputs.version != 'none') }}
     with:
-      registry: ${{ vars.VBR_DEVOPS_DOCKER_REGISTRY }}/building-registry
+      registry: ${{ vars.VBR_DEVOPS_DOCKER_REGISTRY }}/building
       image-file: br-api-oslo-image.tar
       image-name: api-oslo
       test-project: BuildingRegistry.Tests
@@ -92,7 +95,7 @@ jobs:
     needs: [ set-release-version ]
     if: ${{ (github.repository_owner == 'Informatievlaanderen') && (needs.set-release-version.outputs.version != 'none') }}
     with:
-      registry: ${{ vars.VBR_DEVOPS_DOCKER_REGISTRY }}/building-registry
+      registry: ${{ vars.VBR_DEVOPS_DOCKER_REGISTRY }}/building
       image-file: br-api-extract-image.tar
       image-name: api-extract
       test-project: BuildingRegistry.Tests
@@ -108,7 +111,7 @@ jobs:
     needs: [ set-release-version ]
     if: ${{ (github.repository_owner == 'Informatievlaanderen') && (needs.set-release-version.outputs.version != 'none') }}
     with:
-      registry: ${{ vars.VBR_DEVOPS_DOCKER_REGISTRY }}/building-registry
+      registry: ${{ vars.VBR_DEVOPS_DOCKER_REGISTRY }}/building
       image-file: br-projector-image.tar
       image-name: projector
       test-project: BuildingRegistry.Tests
@@ -124,9 +127,9 @@ jobs:
     needs: [ set-release-version ]
     if: ${{ (github.repository_owner == 'Informatievlaanderen') && (needs.set-release-version.outputs.version != 'none') }}
     with:
-      registry: ${{ vars.VBR_DEVOPS_DOCKER_REGISTRY }}/building-registry
-      image-file: br-projections-last-changed-list-console-image.tar
-      image-name: projections-last-changed-list-console
+      registry: ${{ vars.VBR_DEVOPS_DOCKER_REGISTRY }}/building
+      image-file: br-last-changed-list-image.tar
+      image-name: last-changed-list
       test-project: BuildingRegistry.Tests
       build-project: BuildingRegistry.Projections.LastChangedList.Console
       semver: ${{ needs.set-release-version.outputs.version }}
@@ -140,7 +143,7 @@ jobs:
     needs: [ set-release-version ]
     if: ${{ (github.repository_owner == 'Informatievlaanderen') && (needs.set-release-version.outputs.version != 'none') }}
     with:
-      registry: ${{ vars.VBR_DEVOPS_DOCKER_REGISTRY }}/building-registry
+      registry: ${{ vars.VBR_DEVOPS_DOCKER_REGISTRY }}/building
       image-file: br-projections-backoffice-image.tar
       image-name: projections-backoffice
       test-project: BuildingRegistry.Tests
@@ -156,7 +159,7 @@ jobs:
     needs: [ set-release-version ]
     if: ${{ (github.repository_owner == 'Informatievlaanderen') && (needs.set-release-version.outputs.version != 'none') }}
     with:
-      registry: ${{ vars.VBR_DEVOPS_DOCKER_REGISTRY }}/building-registry
+      registry: ${{ vars.VBR_DEVOPS_DOCKER_REGISTRY }}/building
       image-file: br-cache-invalidator-image.tar
       image-name: cache-invalidator
       test-project: BuildingRegistry.Tests
@@ -170,7 +173,7 @@ jobs:
     needs: [ set-release-version ]
     if: ${{ (github.repository_owner == 'Informatievlaanderen') && (needs.set-release-version.outputs.version != 'none') }}
     with:
-      registry: ${{ vars.VBR_DEVOPS_DOCKER_REGISTRY }}/building-registry
+      registry: ${{ vars.VBR_DEVOPS_DOCKER_REGISTRY }}/building
       image-file: br-consumer-address-image.tar
       image-name: consumer-address
       test-project: BuildingRegistry.Tests
@@ -186,7 +189,7 @@ jobs:
     needs: [ set-release-version ]
     if: ${{ (github.repository_owner == 'Informatievlaanderen') && (needs.set-release-version.outputs.version != 'none') }}
     with:
-      registry: ${{ vars.VBR_DEVOPS_DOCKER_REGISTRY }}/building-registry
+      registry: ${{ vars.VBR_DEVOPS_DOCKER_REGISTRY }}/building
       image-file: br-consumer-read-parcel-image.tar
       image-name: consumer-read-parcel
       test-project: BuildingRegistry.Tests
@@ -202,7 +205,7 @@ jobs:
     needs: [ set-release-version ]
     if: ${{ (github.repository_owner == 'Informatievlaanderen') && (needs.set-release-version.outputs.version != 'none') }}
     with:
-      registry: ${{ vars.VBR_DEVOPS_DOCKER_REGISTRY }}/building-registry
+      registry: ${{ vars.VBR_DEVOPS_DOCKER_REGISTRY }}/building
       image-file: br-producer-image.tar
       image-name: producer
       test-project: BuildingRegistry.Tests
@@ -218,7 +221,7 @@ jobs:
     needs: [ set-release-version ]
     if: ${{ (github.repository_owner == 'Informatievlaanderen') && (needs.set-release-version.outputs.version != 'none') }}
     with:
-      registry: ${{ vars.VBR_DEVOPS_DOCKER_REGISTRY }}/building-registry
+      registry: ${{ vars.VBR_DEVOPS_DOCKER_REGISTRY }}/building
       image-file: br-producer-snapshot-oslo-image.tar
       image-name: producer-snapshot-oslo
       test-project: BuildingRegistry.Tests
@@ -234,7 +237,7 @@ jobs:
     needs: [ set-release-version ]
     if: ${{ (github.repository_owner == 'Informatievlaanderen') && (needs.set-release-version.outputs.version != 'none') }}
     with:
-      registry: ${{ vars.VBR_DEVOPS_DOCKER_REGISTRY }}/building-registry
+      registry: ${{ vars.VBR_DEVOPS_DOCKER_REGISTRY }}/building
       image-file: br-snapshot-verifier-image.tar
       image-name: snapshot-verifier
       test-project: BuildingRegistry.Tests
@@ -250,7 +253,7 @@ jobs:
     needs: [ set-release-version ]
     if: ${{ (github.repository_owner == 'Informatievlaanderen') && (needs.set-release-version.outputs.version != 'none') }}
     with:
-      registry: ${{ vars.VBR_DEVOPS_DOCKER_REGISTRY }}/building-registry
+      registry: ${{ vars.VBR_DEVOPS_DOCKER_REGISTRY }}/building
       image-file: br-tools-console-image.tar
       image-name: tools-console
       test-project: BuildingRegistry.Tests
@@ -294,7 +297,7 @@ jobs:
     needs: [ set-release-version ]
     if: ${{ (github.repository_owner == 'Informatievlaanderen') && (needs.set-release-version.outputs.version != 'none') }}
     with:
-      registry: ${{ vars.VBR_DEVOPS_DOCKER_REGISTRY }}/building-registry
+      registry: ${{ vars.VBR_DEVOPS_DOCKER_REGISTRY }}/building
       image-file: br-lambda-sqsbackofficefunction-image.tar
       image-name: lambda-sqsbackofficefunction
       test-project: BuildingRegistry.Tests
@@ -468,12 +471,12 @@ jobs:
     strategy:
       matrix:
         image: [
-          'api-backoffice',
+          'backoffice-api',
           'api-oslo',
           'api-extract',
           'projector',
           'projections-backoffice',
-          'projections-last-changed-list-console',
+          'last-changed-list',
           'cache-invalidator',
           'consumer-address',
           'consumer-read-parcel',
@@ -515,7 +518,7 @@ jobs:
         shell: bash
         run: |
           echo $IMAGE:$SEMVER
-          docker push $BUILD_DOCKER_REGISTRY/building-registry/$IMAGE:$SEMVER
+          docker push $BUILD_DOCKER_REGISTRY/building/$IMAGE:$SEMVER
         env:
           BUILD_DOCKER_REGISTRY: ${{ secrets.VBR_DEVOPS_DOCKER_REGISTRY }}
           IMAGE: ${{ matrix.image }}
@@ -542,113 +545,57 @@ jobs:
   deploy_services_to_test:
     if: github.repository_owner == 'Informatievlaanderen'
     needs: [ deploy_to_test_start_slack, release ]
-    name: Deploy to services test
-    runs-on: ubuntu-latest
+    name: Deploy to test
+    uses: informatievlaanderen/build-pipeline/.github/workflows/deploy-v4.1.yml@main
     strategy:
       matrix:
         services: [
-          'building-api',
-          'building-backoffice-api',
-          'building-consumer-address',
-          'building-consumer-parcel',
-          'building-producer',
-          'building-producer-snapshot-oslo',
-          'building-projections',
-          'building-projections-backoffice',
-          'building-last-changed-list'
+          'api',
+          'backoffice-api',
+          'consumer-address',
+          'consumer-parcel',
+          'producer',
+          'producer-snapshot-oslo',
+          'projector',
+          'projections-backoffice',
+          'last-changed-list',
+          'snapshot-verifier',
+          'cache-invalidator',
+          'tools-console'
           ]
-
-    steps:
-    - name: Deploy services
-      env:
-        BUILD_URL: ${{ vars.VBR_AWS_BUILD_API_DEVOPS }}/${{matrix.services}}
-        STATUS_URL: ${{ vars.VBR_AWS_BUILD_STATUS_API_DEVOPS  }}/${{matrix.services}}
-      uses: informatievlaanderen/awscurl-polling-action/polling-action@main
-      with:
-          environment: tst
-          version: ${{ needs.release.outputs.version }}
-          status-url: $STATUS_URL
-          deploy-url: $BUILD_URL
-          access-key: ${{ secrets.VBR_AWS_ACCESS_KEY_ID_DEVOPS  }}
-          secret-key: ${{ secrets.VBR_AWS_SECRET_ACCESS_KEY_DEVOPS  }}
-          deploy-target: 'agb_ecs_service'
-          interval: 2
-          domain: 'basisregisters'
-          project: 'basisregisters'
-
-    - name: Deploy services output
-      shell: bash
-      run: |
-        echo build-uuid: ${{ steps.awscurl-polling-action.outputs.build-uuid }}
-        echo Status: ${{ steps.awscurl-polling-action.outputs.status }}
-        echo ${{ steps.awscurl-polling-action.outputs.final-message }}
-
-  deploy_tasks_to_test:
-    if: github.repository_owner == 'Informatievlaanderen'
-    needs: [ deploy_to_test_start_slack, release ]
-    name: Deploy to tasks test
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        services: [
-          'building-snapshot-verifier',
-          'building-cache-invalidator',
-          'building-tools-console'
-          ]
-
-    steps:
-    - name: Deploy tasks
-      env:
-        BUILD_URL: ${{ vars.VBR_AWS_BUILD_API_DEVOPS }}/${{matrix.services}}
-        STATUS_URL: ${{ vars.VBR_AWS_BUILD_STATUS_API_DEVOPS  }}/${{matrix.services}}
-      uses: informatievlaanderen/awscurl-polling-action/polling-action@main
-      with:
-          environment: tst
-          version: ${{ needs.release.outputs.version }}
-          status-url: $STATUS_URL
-          deploy-url: $BUILD_URL
-          access-key: ${{ secrets.VBR_AWS_ACCESS_KEY_ID_DEVOPS  }}
-          secret-key: ${{ secrets.VBR_AWS_SECRET_ACCESS_KEY_DEVOPS  }}
-          deploy-target: 'ecs_scheduled_task'
-          interval: 2
-          domain: 'basisregisters'
-          project: 'basisregisters'
-
-    - name: Deploy tasks output
-      shell: bash
-      run: |
-        echo build-uuid: ${{ steps.awscurl-polling-action.outputs.build-uuid }}
-        echo Status: ${{ steps.awscurl-polling-action.outputs.status }}
-        echo ${{ steps.awscurl-polling-action.outputs.final-message }}
+    with:
+      environment: 'test'
+      service-name: ${{ matrix.services }}
+      application: ${{ matrix.services }}
+      version: ${{ needs.release.outputs.version }}
+      domain: 'building'
+      project: 'grawr'
+      use-subfolder: true
+    secrets: inherit
 
   deploy_lambda_to_test:
     if: github.repository_owner == 'Informatievlaanderen'
     needs: [ deploy_to_test_start_slack, release ]
     name: Deploy lambda to test
-    runs-on: ubuntu-latest
-
-    steps:
-    - name: CD Lambda(s) Configure credentials
-      uses: aws-actions/configure-aws-credentials@v4.1.0
-      with:
-        aws-access-key-id: ${{ secrets.VBR_AWS_ACCESS_KEY_ID_DEVOPS }}
-        aws-secret-access-key: ${{ secrets.VBR_AWS_SECRET_ACCESS_KEY_DEVOPS }}
-        aws-region: ${{ secrets.VBR_AWS_REGION_PRD }}
-
-    - name: Promote Lambda(s)
-      uses: Informatievlaanderen/build-pipeline/.github/actions/deploy-lambda-v4@main
-      with:
-        function-name: br-sqsbackofficefunction
-        deploy-url: ${{ vars.VBR_AWS_DEPLOY_LAMBDA_DEVOPS_BASEURL }}
-        access-key-id: ${{ secrets.VBR_AWS_ACCESS_KEY_ID_DEVOPS }}
-        secret-access-key-id: ${{ secrets.VBR_AWS_SECRET_ACCESS_KEY_DEVOPS }}
-        region: ${{ secrets.VBR_AWS_REGION_PRD }}
-        version: ${{ needs.release.outputs.version }}
-        environment: tst
+    uses: informatievlaanderen/build-pipeline/.github/workflows/deploy-v4.1.yml@main
+    strategy:
+      matrix:
+        functions:
+          ["lambda-sqsbackofficefunction"]
+    with:
+      deploy-target: "lambda"
+      environment: 'test'
+      service-name: ${{ matrix.functions }}
+      application: "lambda"
+      version: ${{ needs.release.outputs.version }}
+      domain: "building"
+      project: "grawr"
+      use-subfolder: true
+    secrets: inherit
 
   deploy_to_test_finish_slack:
     if: github.repository_owner == 'Informatievlaanderen'
-    needs: [ deploy_lambda_to_test, deploy_services_to_test, deploy_tasks_to_test ]
+    needs: [ deploy_lambda_to_test, deploy_services_to_test ]
     name: Deploy to test finished
     runs-on: ubuntu-latest
 
@@ -662,10 +609,10 @@ jobs:
           channel: '#team-dinosaur-dev'
           text: 'Deployment of building-registry to test has finished'
 
-  deploy_to_new_staging_start_slack:
+  deploy_to_staging_start_slack:
     if: github.repository_owner == 'Informatievlaanderen'
     needs: [ deploy_to_test_finish_slack ]
-    name: Deploy to new staging started
+    name: Deploy to staging started
     environment: stg
     runs-on: ubuntu-latest
 
@@ -679,117 +626,61 @@ jobs:
           channel: '#team-dinosaur-dev'
           text: 'Deployment of building-registry to staging has started'
 
-  deploy_services_to_new_staging:
+  deploy_services_to_staging:
     if: github.repository_owner == 'Informatievlaanderen'
-    needs: [ deploy_to_new_staging_start_slack, release ]
-    name: Deploy to services new staging
-    runs-on: ubuntu-latest
+    needs: [ deploy_to_staging_start_slack, release ]
+    name: Deploy to staging
+    uses: informatievlaanderen/build-pipeline/.github/workflows/deploy-v4.1.yml@main
     strategy:
       matrix:
         services: [
-          'building-api',
-          'building-backoffice-api',
-          'building-consumer-address',
-          'building-consumer-parcel',
-          'building-producer',
-          'building-producer-snapshot-oslo',
-          'building-projections',
-          'building-projections-backoffice',
-          'building-last-changed-list',
+          'api',
+          'backoffice-api',
+          'consumer-address',
+          'consumer-parcel',
+          'producer',
+          'producer-snapshot-oslo',
+          'projector',
+          'projections-backoffice',
+          'last-changed-list',
+          'snapshot-verifier',
+          'cache-invalidator',
+          'tools-console'
           ]
+    with:
+      environment: 'stg'
+      service-name: ${{ matrix.services }}
+      application: ${{ matrix.services }}
+      version: ${{ needs.release.outputs.version }}
+      domain: 'building'
+      project: 'grawr'
+      use-subfolder: true
+    secrets: inherit
 
-    steps:
-    - name: Deploy services
-      env:
-        BUILD_URL: ${{ vars.VBR_AWS_BUILD_API_DEVOPS }}/${{matrix.services}}
-        STATUS_URL: ${{ vars.VBR_AWS_BUILD_STATUS_API_DEVOPS  }}/${{matrix.services}}
-      uses: informatievlaanderen/awscurl-polling-action/polling-action@main
-      with:
-          environment: stg
-          version: ${{ needs.release.outputs.version }}
-          status-url: $STATUS_URL
-          deploy-url: $BUILD_URL
-          access-key: ${{ secrets.VBR_AWS_ACCESS_KEY_ID_DEVOPS  }}
-          secret-key: ${{ secrets.VBR_AWS_SECRET_ACCESS_KEY_DEVOPS  }}
-          deploy-target: 'agb_ecs_service'
-          interval: 2
-          domain: 'basisregisters'
-          project: 'basisregisters'
-
-    - name: Deploy services output
-      shell: bash
-      run: |
-        echo build-uuid: ${{ steps.awscurl-polling-action.outputs.build-uuid }}
-        echo Status: ${{ steps.awscurl-polling-action.outputs.status }}
-        echo ${{ steps.awscurl-polling-action.outputs.final-message }}
-
-  deploy_tasks_to_new_staging:
+  deploy_lambda_to_staging:
     if: github.repository_owner == 'Informatievlaanderen'
-    needs: [ deploy_to_new_staging_start_slack, release ]
-    name: Deploy to tasks new staging
-    runs-on: ubuntu-latest
+    needs: [ deploy_services_to_staging, release ]
+    name: Deploy lambda to staging
+    uses: informatievlaanderen/build-pipeline/.github/workflows/deploy-v4.1.yml@main
     strategy:
       matrix:
-        services: [
-          'building-cache-invalidator',
-          'building-snapshot-verifier',
-          'building-tools-console'
-          ]
+        functions:
+          ["lambda-sqsbackofficefunction"]
+    with:
+      deploy-target: "lambda"
+      environment: 'stg'
+      service-name: ${{ matrix.functions }}
+      application: "lambda"
+      version: ${{ needs.release.outputs.version }}
+      domain: "building"
+      project: "grawr"
+      use-subfolder: true
+    secrets: inherit
 
-    steps:
-    - name: Deploy tasks
-      env:
-        BUILD_URL: ${{ vars.VBR_AWS_BUILD_API_DEVOPS }}/${{matrix.services}}
-        STATUS_URL: ${{ vars.VBR_AWS_BUILD_STATUS_API_DEVOPS  }}/${{matrix.services}}
-      uses: informatievlaanderen/awscurl-polling-action/polling-action@main
-      with:
-          environment: stg
-          version: ${{ needs.release.outputs.version }}
-          status-url: $STATUS_URL
-          deploy-url: $BUILD_URL
-          access-key: ${{ secrets.VBR_AWS_ACCESS_KEY_ID_DEVOPS  }}
-          secret-key: ${{ secrets.VBR_AWS_SECRET_ACCESS_KEY_DEVOPS  }}
-          deploy-target: 'ecs_scheduled_task'
-          interval: 2
-          domain: 'basisregisters'
-          project: 'basisregisters'
-
-    - name: Deploy tasks output
-      shell: bash
-      run: |
-        echo build-uuid: ${{ steps.awscurl-polling-action.outputs.build-uuid }}
-        echo Status: ${{ steps.awscurl-polling-action.outputs.status }}
-        echo ${{ steps.awscurl-polling-action.outputs.final-message }}
-
-  deploy_lambda_to_new_staging:
+  deploy_to_staging_finish_slack:
     if: github.repository_owner == 'Informatievlaanderen'
-    needs: [ deploy_tasks_to_new_staging, deploy_services_to_new_staging, release ]
-    name: Deploy lambda to new staging
-    runs-on: ubuntu-latest
-
-    steps:
-    - name: CD Lambda(s) Configure credentials
-      uses: aws-actions/configure-aws-credentials@v4.1.0
-      with:
-        aws-access-key-id: ${{ secrets.VBR_AWS_ACCESS_KEY_ID_DEVOPS }}
-        aws-secret-access-key: ${{ secrets.VBR_AWS_SECRET_ACCESS_KEY_DEVOPS }}
-        aws-region: ${{ secrets.VBR_AWS_REGION_PRD }}
-
-    - name: Promote Lambda(s)
-      uses: Informatievlaanderen/build-pipeline/.github/actions/deploy-lambda-v4@main
-      with:
-        function-name: br-sqsbackofficefunction
-        deploy-url: ${{ vars.VBR_AWS_DEPLOY_LAMBDA_DEVOPS_BASEURL }}
-        access-key-id: ${{ secrets.VBR_AWS_ACCESS_KEY_ID_DEVOPS }}
-        secret-access-key-id: ${{ secrets.VBR_AWS_SECRET_ACCESS_KEY_DEVOPS }}
-        region: ${{ secrets.VBR_AWS_REGION_PRD }}
-        version: ${{ needs.release.outputs.version }}
-        environment: stg
-
-  deploy_to_new_staging_finish_slack:
-    if: github.repository_owner == 'Informatievlaanderen'
-    needs: [ deploy_lambda_to_new_staging ]
-    name: Deploy to new staging finished
+    needs: [ deploy_lambda_to_staging, deploy_services_to_staging ]
+    name: Deploy to staging finished
     runs-on: ubuntu-latest
 
     steps:
@@ -800,4 +691,4 @@ jobs:
         token: ${{ secrets.VBR_SLACK_BOT_TOKEN }}
         payload: |
           channel: '#team-dinosaur-dev'
-          text: 'Deployment of building-registry to new staging has finished'
+          text: 'Deployment of building-registry to staging has finished'
