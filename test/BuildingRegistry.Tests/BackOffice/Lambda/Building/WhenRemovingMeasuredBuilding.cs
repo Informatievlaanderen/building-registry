@@ -201,7 +201,7 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.Building
                 Container.Resolve<IConfiguration>(),
                 new FakeRetryPolicy(),
                 ticketing.Object,
-                MockExceptionIdempotentCommandHandler<BuildingHasBuildingUnitsException>().Object,
+                MockExceptionIdempotentCommandHandler<BuildingHasActiveBuildingUnitsException>().Object,
                 Container.Resolve<IBuildings>(),
                 _backOfficeContext);
 
