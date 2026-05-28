@@ -50,8 +50,10 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRemovingMeasuredBuilding
                     new BuildingWasRemovedV2(command.BuildingPersistentLocalId))));
         }
 
-        [Fact]
-        public void WithBuildingUnits_ThenBuildingHasBuildingUnitsIsThrown()
+        [Theory]
+        [InlineData("Planned")]
+        [InlineData("Realized")]
+        public void WithActiveBuildingUnits_ThenBuildingHasBuildingUnitsIsThrown(string buildingUnitStatus)
         {
             var command = Fixture.Create<RemoveMeasuredBuilding>();
 
@@ -61,7 +63,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRemovingMeasuredBuilding
                     new ExtendedWkbGeometry(WkbWriter.Instance.Write(GeometryHelper.ValidPolygon)),
                     BuildingGeometryMethod.MeasuredByGrb))
                 .WithBuildingUnit(
-                    BuildingUnitStatus.Planned,
+                    BuildingUnitStatus.Parse(buildingUnitStatus).Value,
                     buildingUnitPersistentLocalId,
                     attachedAddresses: new List<AddressPersistentLocalId>() { new AddressPersistentLocalId(1) },
                     isRemoved: false)
@@ -76,7 +78,42 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRemovingMeasuredBuilding
                     new BuildingStreamId(Fixture.Create<BuildingPersistentLocalId>()),
                     buildingWasMigrated)
                 .When(command)
-                .Throws(new BuildingHasBuildingUnitsException()));
+                .Throws(new BuildingHasActiveBuildingUnitsException()));
+        }
+
+        [Theory]
+        [InlineData("NotRealized")]
+        [InlineData("Retired")]
+        public void WithRetiredNotRealizedBuildingUnits_ThenBuildingUnitsAndBuildingAreRemoved(string buildingUnitStatus)
+        {
+            var command = Fixture.Create<RemoveMeasuredBuilding>();
+
+            var buildingUnitPersistentLocalId = Fixture.Create<BuildingUnitPersistentLocalId>();
+            var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
+                .WithBuildingGeometry(new BuildingGeometry(
+                    new ExtendedWkbGeometry(WkbWriter.Instance.Write(GeometryHelper.ValidPolygon)),
+                    BuildingGeometryMethod.MeasuredByGrb))
+                .WithBuildingUnit(
+                    BuildingUnitStatus.Parse(buildingUnitStatus).Value,
+                    buildingUnitPersistentLocalId,
+                    attachedAddresses: new List<AddressPersistentLocalId>() { new AddressPersistentLocalId(1) },
+                    isRemoved: false)
+                .WithBuildingUnit(
+                    BuildingUnitStatus.Planned,
+                    Fixture.Create<BuildingUnitPersistentLocalId>(),
+                    isRemoved: true)
+                .Build();
+
+            Assert(new Scenario()
+                .Given(
+                    new BuildingStreamId(Fixture.Create<BuildingPersistentLocalId>()),
+                    buildingWasMigrated)
+                .When(command)
+                .Then([
+                    new Fact(new BuildingStreamId(command.BuildingPersistentLocalId)!, new BuildingUnitAddressWasDetachedV2(command.BuildingPersistentLocalId, buildingUnitPersistentLocalId, new AddressPersistentLocalId(1))),
+                    new Fact(new BuildingStreamId(command.BuildingPersistentLocalId)!, new BuildingUnitWasRemovedBecauseBuildingWasRemoved(command.BuildingPersistentLocalId, buildingUnitPersistentLocalId)),
+                    new Fact(new BuildingStreamId(command.BuildingPersistentLocalId)!, new BuildingWasRemovedV2(command.BuildingPersistentLocalId))
+                ]));
         }
 
         [Fact]

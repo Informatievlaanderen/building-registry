@@ -221,9 +221,16 @@ namespace BuildingRegistry.Building
                 throw new BuildingHasInvalidGeometryMethodException();
             }
 
-            if(_buildingUnits.GetNotRemovedUnits().Any())
+            var notRemovedUnits = _buildingUnits.GetNotRemovedUnits().ToList();
+            if(notRemovedUnits
+               .Any(x => x.Status == BuildingUnitStatus.Realized || x.Status == BuildingUnitStatus.Planned))
             {
-                throw new BuildingHasBuildingUnitsException();
+                throw new BuildingHasActiveBuildingUnitsException();
+            }
+
+            foreach (var notRemovedUnit in notRemovedUnits)
+            {
+                notRemovedUnit.RemoveBecauseBuildingWasRemoved();
             }
 
             ApplyChange(new BuildingWasRemovedV2(BuildingPersistentLocalId));
