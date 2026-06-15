@@ -4,17 +4,16 @@ namespace BuildingRegistry.Api.BackOffice
     using System.Collections.Generic;
     using System.Linq;
     using Be.Vlaanderen.Basisregisters.Api;
-    using Be.Vlaanderen.Basisregisters.AspNetCore.Mvc.Middleware;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Be.Vlaanderen.Basisregisters.Sqs.Requests;
-    using BuildingRegistry.Building;
     using FluentValidation;
     using FluentValidation.Results;
     using Infrastructure.Options;
     using MediatR;
+    using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
-    using Microsoft.AspNetCore.Mvc.Infrastructure;
     using Microsoft.Extensions.Options;
+    using NodaTime;
 
     public class BuildingRegistryController : ApiController
     {
@@ -22,25 +21,24 @@ namespace BuildingRegistry.Api.BackOffice
         protected IProvenanceFactory ProvenanceFactory { get; }
 
         private readonly TicketingOptions _ticketingOptions;
-        private readonly IActionContextAccessor _actionContextAccessor;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
         public BuildingRegistryController(
             IMediator mediator,
             IOptions<TicketingOptions> ticketingOptions,
-            IActionContextAccessor actionContextAccessor,
+            IHttpContextAccessor httpContextAccessor,
             IProvenanceFactory provenanceFactory)
         {
             Mediator = mediator;
             _ticketingOptions = ticketingOptions.Value;
-            _actionContextAccessor = actionContextAccessor;
+            _httpContextAccessor = httpContextAccessor;
             ProvenanceFactory = provenanceFactory;
         }
 
         protected IDictionary<string, object?> GetMetadata()
         {
-            var correlationId = _actionContextAccessor
-                .ActionContext?
-                .HttpContext
+            var correlationId = _httpContextAccessor
+                .HttpContext?
                 .Request
                 .Headers["x-correlation-id"].FirstOrDefault() ?? Guid.NewGuid().ToString("D");
 
@@ -56,7 +54,7 @@ namespace BuildingRegistry.Api.BackOffice
         protected Provenance CreateFakeProvenance()
         {
             return new Provenance(
-                NodaTime.SystemClock.Instance.GetCurrentInstant(),
+                SystemClock.Instance.GetCurrentInstant(),
                 Application.BuildingRegistry,
                 new Reason(""), // TODO: TBD
                 new Operator(""), // TODO: from claims

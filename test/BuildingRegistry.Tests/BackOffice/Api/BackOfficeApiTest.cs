@@ -17,8 +17,6 @@ namespace BuildingRegistry.Tests.BackOffice.Api
     using FluentValidation.Results;
     using MediatR;
     using Microsoft.AspNetCore.Http;
-    using Microsoft.AspNetCore.Mvc;
-    using Microsoft.AspNetCore.Mvc.Infrastructure;
     using Microsoft.Extensions.Options;
     using Moq;
     using Xunit.Abstractions;
@@ -34,7 +32,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api
         protected IOptions<ResponseOptions> ResponseOptions { get; }
         private IOptions<TicketingOptions> TicketingOptions { get; }
         protected Mock<IMediator> MockMediator { get; }
-        protected Mock<IActionContextAccessor> MockActionContext { get; set; }
+        protected Mock<IHttpContextAccessor> MockHttpContext { get; set; }
 
         private const string Username = "John Doe";
 
@@ -48,8 +46,8 @@ namespace BuildingRegistry.Tests.BackOffice.Api
             TicketingOptions.Value.PublicBaseUrl = PublicTicketUrl;
             TicketingOptions.Value.InternalBaseUrl = InternalTicketUrl;
 
-            MockActionContext = new Mock<IActionContextAccessor>();
-            MockActionContext.SetupProperty(x => x.ActionContext, new ActionContext{ HttpContext = new DefaultHttpContext()});
+            MockHttpContext = new Mock<IHttpContextAccessor>();
+            MockHttpContext.SetupProperty(x => x.HttpContext, new DefaultHttpContext());
 
             MockMediator = new Mock<IMediator>();
         }
@@ -99,8 +97,8 @@ namespace BuildingRegistry.Tests.BackOffice.Api
             var controller = Activator.CreateInstance(typeof(T),
                 MockMediator.Object,
                 TicketingOptions,
-                MockActionContext.Object,
-                new AcmIdmProvenanceFactory(Application.BuildingRegistry, MockActionContext.Object)) as T;
+                MockHttpContext.Object,
+                new AcmIdmProvenanceFactory(Application.BuildingRegistry, MockHttpContext.Object)) as T;
 
             var claims = new List<Claim>
             {
@@ -125,8 +123,8 @@ namespace BuildingRegistry.Tests.BackOffice.Api
             var controller = Activator.CreateInstance(typeof(T),
                 MockMediator.Object,
                 TicketingOptions,
-                MockActionContext.Object,
-                new AcmIdmProvenanceFactory(Application.BuildingRegistry, MockActionContext.Object)) as T;
+                MockHttpContext.Object,
+                new AcmIdmProvenanceFactory(Application.BuildingRegistry, MockHttpContext.Object)) as T;
 
             var claims = new List<Claim>
             {

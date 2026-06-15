@@ -12,6 +12,7 @@ namespace BuildingRegistry.Api.BackOffice.Building
     using FluentValidation;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
+    using Microsoft.OpenApi;
     using NodaTime;
     using Swashbuckle.AspNetCore.Filters;
 
@@ -31,7 +32,7 @@ namespace BuildingRegistry.Api.BackOffice.Building
         [ProducesResponseType(StatusCodes.Status202Accepted)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-        [SwaggerResponseHeader(StatusCodes.Status202Accepted, "location", "string", "De URL van het aangemaakte ticket.")]
+        [SwaggerResponseHeader(StatusCodes.Status202Accepted, "location", JsonSchemaType.String, "De URL van het aangemaakte ticket.")]
         [SwaggerResponseExample(StatusCodes.Status400BadRequest, typeof(BadRequestResponseExamples))]
         [SwaggerResponseExample(StatusCodes.Status500InternalServerError, typeof(InternalServerErrorResponseExamples))]
         public async Task<IActionResult> Measure(

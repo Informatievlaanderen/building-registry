@@ -18,14 +18,14 @@ jobs:
 
     steps:
     - name: Checkout Code
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
       with:
           persist-credentials: false
 
     - name: Setup Node.js
-      uses: actions/setup-node@v4
+      uses: actions/setup-node@v6
       with:
-        node-version: '22.x'
+        node-version: '24.x'
 
     - name: Node version
       shell: bash
@@ -69,7 +69,7 @@ jobs:
       test-project: BuildingRegistry.Tests
       build-project: BuildingRegistry.Api.BackOffice
       semver: ${{ needs.set-release-version.outputs.version }}
-      dotnet-version: ${{ vars.VBR_DOTNET_VERSION_9 }}
+      dotnet-version: ${{ vars.VBR_DOTNET_VERSION_10 }}
       prerestore-script: ./pre-restore.sh
     secrets: inherit
 
@@ -85,7 +85,7 @@ jobs:
       test-project: BuildingRegistry.Tests
       build-project: BuildingRegistry.Api.Oslo
       semver: ${{ needs.set-release-version.outputs.version }}
-      dotnet-version: ${{ vars.VBR_DOTNET_VERSION_9 }}
+      dotnet-version: ${{ vars.VBR_DOTNET_VERSION_10 }}
       prerestore-script: ./pre-restore.sh
     secrets: inherit
 
@@ -101,7 +101,7 @@ jobs:
       test-project: BuildingRegistry.Tests
       build-project: BuildingRegistry.Api.Extract
       semver: ${{ needs.set-release-version.outputs.version }}
-      dotnet-version: ${{ vars.VBR_DOTNET_VERSION_9 }}
+      dotnet-version: ${{ vars.VBR_DOTNET_VERSION_10 }}
       prerestore-script: ./pre-restore.sh
     secrets: inherit
   
@@ -117,7 +117,7 @@ jobs:
       test-project: BuildingRegistry.Tests
       build-project: BuildingRegistry.Projector
       semver: ${{ needs.set-release-version.outputs.version }}
-      dotnet-version: ${{ vars.VBR_DOTNET_VERSION_9 }}
+      dotnet-version: ${{ vars.VBR_DOTNET_VERSION_10 }}
       prerestore-script: ./pre-restore.sh
     secrets: inherit
 
@@ -133,7 +133,7 @@ jobs:
       test-project: BuildingRegistry.Tests
       build-project: BuildingRegistry.Projections.LastChangedList.Console
       semver: ${{ needs.set-release-version.outputs.version }}
-      dotnet-version: ${{ vars.VBR_DOTNET_VERSION_9 }}
+      dotnet-version: ${{ vars.VBR_DOTNET_VERSION_10 }}
       prerestore-script: ./pre-restore.sh
     secrets: inherit
 
@@ -149,7 +149,7 @@ jobs:
       test-project: BuildingRegistry.Tests
       build-project: BuildingRegistry.Projections.BackOffice
       semver: ${{ needs.set-release-version.outputs.version }}
-      dotnet-version: ${{ vars.VBR_DOTNET_VERSION_9 }}
+      dotnet-version: ${{ vars.VBR_DOTNET_VERSION_10 }}
       prerestore-script: ./pre-restore.sh
     secrets: inherit
 
@@ -165,7 +165,7 @@ jobs:
       test-project: BuildingRegistry.Tests
       build-project: BuildingRegistry.Cache.Invalidator
       semver: ${{ needs.set-release-version.outputs.version }}
-      dotnet-version: ${{ vars.VBR_DOTNET_VERSION_9 }}
+      dotnet-version: ${{ vars.VBR_DOTNET_VERSION_10 }}
 
   build-consumer-address:
     name: Build Consumer Address
@@ -179,7 +179,7 @@ jobs:
       test-project: BuildingRegistry.Tests
       build-project: BuildingRegistry.Consumer.Address
       semver: ${{ needs.set-release-version.outputs.version }}
-      dotnet-version: ${{ vars.VBR_DOTNET_VERSION_9 }}
+      dotnet-version: ${{ vars.VBR_DOTNET_VERSION_10 }}
       prerestore-script: ./pre-restore.sh
     secrets: inherit
 
@@ -195,7 +195,7 @@ jobs:
       test-project: BuildingRegistry.Tests
       build-project: BuildingRegistry.Consumer.Read.Parcel
       semver: ${{ needs.set-release-version.outputs.version }}
-      dotnet-version: ${{ vars.VBR_DOTNET_VERSION_9 }}
+      dotnet-version: ${{ vars.VBR_DOTNET_VERSION_10 }}
       prerestore-script: ./pre-restore.sh
     secrets: inherit
 
@@ -211,7 +211,7 @@ jobs:
       test-project: BuildingRegistry.Tests
       build-project: BuildingRegistry.Producer
       semver: ${{ needs.set-release-version.outputs.version }}
-      dotnet-version: ${{ vars.VBR_DOTNET_VERSION_9 }}
+      dotnet-version: ${{ vars.VBR_DOTNET_VERSION_10 }}
       prerestore-script: ./pre-restore.sh
     secrets: inherit
 
@@ -227,7 +227,7 @@ jobs:
       test-project: BuildingRegistry.Tests
       build-project: BuildingRegistry.Producer.Snapshot.Oslo
       semver: ${{ needs.set-release-version.outputs.version }}
-      dotnet-version: ${{ vars.VBR_DOTNET_VERSION_9 }}
+      dotnet-version: ${{ vars.VBR_DOTNET_VERSION_10 }}
       prerestore-script: ./pre-restore.sh
     secrets: inherit
 
@@ -243,7 +243,7 @@ jobs:
       test-project: BuildingRegistry.Tests
       build-project: BuildingRegistry.Snapshot.Verifier
       semver: ${{ needs.set-release-version.outputs.version }}
-      dotnet-version: ${{ vars.VBR_DOTNET_VERSION_9 }}
+      dotnet-version: ${{ vars.VBR_DOTNET_VERSION_10 }}
       prerestore-script: ./pre-restore.sh
     secrets: inherit
 
@@ -259,7 +259,7 @@ jobs:
       test-project: BuildingRegistry.Tests
       build-project: BuildingRegistry.Tools.Console
       semver: ${{ needs.set-release-version.outputs.version }}
-      dotnet-version: ${{ vars.VBR_DOTNET_VERSION_9 }}
+      dotnet-version: ${{ vars.VBR_DOTNET_VERSION_10 }}
       prerestore-script: ./pre-restore.sh
     secrets: inherit
 
@@ -273,7 +273,7 @@ jobs:
       test-project: BuildingRegistry.Tests
       build-project: BuildingRegistry.Api.BackOffice.Abstractions
       semver: ${{ needs.set-release-version.outputs.version }}
-      dotnet-version: ${{ vars.VBR_DOTNET_VERSION_9 }}
+      dotnet-version: ${{ vars.VBR_DOTNET_VERSION_10 }}
       prerestore-script: ./pre-restore.sh
     secrets: inherit
 
@@ -287,7 +287,7 @@ jobs:
       test-project: BuildingRegistry.Tests
       build-project: BuildingRegistry.Api.Oslo
       semver: ${{ needs.set-release-version.outputs.version }}
-      dotnet-version: ${{ vars.VBR_DOTNET_VERSION_9 }}
+      dotnet-version: ${{ vars.VBR_DOTNET_VERSION_10 }}
       prerestore-script: ./pre-restore.sh
     secrets: inherit
 
@@ -303,7 +303,7 @@ jobs:
       test-project: BuildingRegistry.Tests
       build-project: BuildingRegistry.Api.BackOffice.Handlers.Lambda
       semver: ${{ needs.set-release-version.outputs.version }}
-      dotnet-version: ${{ vars.VBR_DOTNET_VERSION_9 }}
+      dotnet-version: ${{ vars.VBR_DOTNET_VERSION_10 }}
       prerestore-script: ./pre-restore.sh
     secrets: inherit
 
@@ -333,12 +333,12 @@ jobs:
       version: ${{ steps.set-version.outputs.version }}
     steps:
     - name: Checkout Code
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
       with:
           persist-credentials: false
 
     - name: Cache NPM
-      uses: actions/cache@v4
+      uses: actions/cache@v5
       env:
         cache-name: cache-npm
       with:
@@ -352,12 +352,12 @@ jobs:
       shell: bash
 
     - name: Setup Node.js
-      uses: actions/setup-node@v4
+      uses: actions/setup-node@v6
       with:
-        node-version: '22.x'
+        node-version: '24.x'
 
     - name: Setup Python
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@v6
       with:
         python-version: '3.x'
 
@@ -384,14 +384,14 @@ jobs:
         pip install requests markdown argparse
 
     - name: Download NuGet Api BackOffice Abstractions
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@v8
       continue-on-error: false
       with:
         name: nuget-Be.Vlaanderen.Basisregisters.BuildingRegistry.Api.BackOffice.Abstractions-${{ needs.set-release-version.outputs.version }}
         path: dist/nuget/
 
     - name: Download NuGet Api Oslo
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@v8
       continue-on-error: false
       with:
         name: nuget-Be.Vlaanderen.Basisregisters.BuildingRegistry.Api.Oslo-${{ needs.set-release-version.outputs.version }}
@@ -427,12 +427,12 @@ jobs:
 
     steps:
     - name: Checkout Code
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
 
     - name: Setup .NET Core
-      uses: actions/setup-dotnet@v4
+      uses: actions/setup-dotnet@v5
       with:
-        dotnet-version: ${{ vars.VBR_DOTNET_VERSION_9 }}
+        dotnet-version: ${{ vars.VBR_DOTNET_VERSION_10 }}
         cache: true
         cache-dependency-path: "**/packages.lock.json"
 
@@ -441,13 +441,13 @@ jobs:
       run: dotnet --info
 
     - name: Download NuGet package api-backoffice-abstractions
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@v8
       with:
         name: nuget-Be.Vlaanderen.Basisregisters.BuildingRegistry.Api.BackOffice.Abstractions-${{ needs.release.outputs.version }}
         path: ~/
 
     - name: Download NuGet package api-oslo
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@v8
       with:
         name: nuget-Be.Vlaanderen.Basisregisters.BuildingRegistry.Api.Oslo-${{ needs.release.outputs.version }}
         path: ~/
@@ -488,7 +488,7 @@ jobs:
           ]
     steps:
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4.1.0
+        uses: aws-actions/configure-aws-credentials@v6
         with:
           aws-access-key-id: ${{ secrets.VBR_AWS_ACCESS_KEY_ID_DEVOPS }}
           aws-secret-access-key: ${{ secrets.VBR_AWS_SECRET_ACCESS_KEY_DEVOPS }}
@@ -499,7 +499,7 @@ jobs:
 
       # Download artifact
       - name: Download artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         continue-on-error: false
         with:
           name: ${{ matrix.image }}-${{ needs.release.outputs.version }}
@@ -534,7 +534,7 @@ jobs:
 
     steps:
     - name: Notify deployment started
-      uses: slackapi/slack-github-action@v2
+      uses: slackapi/slack-github-action@v3
       with:
         method: chat.postMessage
         token: ${{ secrets.VBR_SLACK_BOT_TOKEN }}
@@ -601,7 +601,7 @@ jobs:
 
     steps:
     - name: Notify deployment finished
-      uses: slackapi/slack-github-action@v2
+      uses: slackapi/slack-github-action@v3
       with:
         method: chat.postMessage
         token: ${{ secrets.VBR_SLACK_BOT_TOKEN }}
@@ -618,7 +618,7 @@ jobs:
 
     steps:
     - name: Notify deployment started
-      uses: slackapi/slack-github-action@v2
+      uses: slackapi/slack-github-action@v3
       with:
         method: chat.postMessage
         token: ${{ secrets.VBR_SLACK_BOT_TOKEN }}
@@ -685,7 +685,7 @@ jobs:
 
     steps:
     - name: Notify deployment finished
-      uses: slackapi/slack-github-action@v2
+      uses: slackapi/slack-github-action@v3
       with:
         method: chat.postMessage
         token: ${{ secrets.VBR_SLACK_BOT_TOKEN }}

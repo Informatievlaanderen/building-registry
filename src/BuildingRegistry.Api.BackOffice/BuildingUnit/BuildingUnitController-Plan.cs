@@ -16,6 +16,7 @@ using Be.Vlaanderen.Basisregisters.Auth.AcmIdm;
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
+    using Microsoft.OpenApi;
     using Swashbuckle.AspNetCore.Filters;
 
     public partial class BuildingUnitController
@@ -32,7 +33,7 @@ using Be.Vlaanderen.Basisregisters.Auth.AcmIdm;
         [ProducesResponseType(StatusCodes.Status202Accepted)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-        [SwaggerResponseHeader(StatusCodes.Status202Accepted, "location", "string", "De url van de geplande gebouweenheid.")]
+        [SwaggerResponseHeader(StatusCodes.Status202Accepted, "location", JsonSchemaType.String, "De url van de geplande gebouweenheid.")]
         [SwaggerRequestExample(typeof(PlanBuildingUnitRequest), typeof(PlanBuildingUnitRequestExamples))]
         [SwaggerResponseExample(StatusCodes.Status400BadRequest, typeof(BadRequestResponseExamples))]
         [SwaggerResponseExample(StatusCodes.Status500InternalServerError, typeof(InternalServerErrorResponseExamples))]

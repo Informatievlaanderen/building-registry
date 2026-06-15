@@ -5,6 +5,7 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Infrastructure.Options;
     using MediatR;
+    using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.Infrastructure;
     using Microsoft.Extensions.Options;
@@ -18,9 +19,9 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
         public BuildingUnitController(
             IMediator mediator,
             IOptions<TicketingOptions> ticketingOptions,
-            IActionContextAccessor actionContextAccessor,
+            IHttpContextAccessor httpContextAccessor,
             IProvenanceFactory provenanceFactory)
-            : base(mediator, ticketingOptions, actionContextAccessor, provenanceFactory)
+            : base(mediator, ticketingOptions, httpContextAccessor, provenanceFactory)
         { }
     }
 }
