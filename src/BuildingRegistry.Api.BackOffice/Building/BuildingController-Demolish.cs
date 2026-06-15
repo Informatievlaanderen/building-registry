@@ -11,6 +11,7 @@ namespace BuildingRegistry.Api.BackOffice.Building
     using BuildingRegistry.Building;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
+    using Microsoft.OpenApi;
     using NodaTime;
     using Swashbuckle.AspNetCore.Filters;
 
@@ -27,7 +28,7 @@ namespace BuildingRegistry.Api.BackOffice.Building
         [ProducesResponseType(StatusCodes.Status202Accepted)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-        [SwaggerResponseHeader(StatusCodes.Status202Accepted, "location", "string", "De url van het gebouw.")]
+        [SwaggerResponseHeader(StatusCodes.Status202Accepted, "location", JsonSchemaType.String, "De url van het gebouw.")]
         [SwaggerResponseExample(StatusCodes.Status400BadRequest, typeof(BadRequestResponseExamples))]
         [SwaggerResponseExample(StatusCodes.Status500InternalServerError, typeof(InternalServerErrorResponseExamples))]
         public async Task<IActionResult> Demolish(

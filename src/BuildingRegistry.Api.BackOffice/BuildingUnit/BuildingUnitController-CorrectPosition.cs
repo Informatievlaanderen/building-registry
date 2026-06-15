@@ -18,6 +18,7 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
+    using Microsoft.OpenApi;
     using Swashbuckle.AspNetCore.Filters;
 
     public partial class BuildingUnitController
@@ -37,7 +38,7 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
         [SwaggerRequestExample(typeof(CorrectBuildingUnitPositionRequest), typeof(CorrectBuildingUnitPositionRequestExamples))]
-        [SwaggerResponseHeader(StatusCodes.Status202Accepted, "location", "string", "De url van de gebouweenheid.")]
+        [SwaggerResponseHeader(StatusCodes.Status202Accepted, "location", JsonSchemaType.String, "De url van de gebouweenheid.")]
         [SwaggerResponseExample(StatusCodes.Status400BadRequest, typeof(BadRequestResponseExamples))]
         [SwaggerResponseExample(StatusCodes.Status500InternalServerError, typeof(InternalServerErrorResponseExamples))]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = PolicyNames.GeschetstGebouw.DecentraleBijwerker)]

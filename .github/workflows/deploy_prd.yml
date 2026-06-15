@@ -18,7 +18,7 @@ jobs:
 
     steps:
     - name: Notify deployment started
-      uses: slackapi/slack-github-action@v2
+      uses: slackapi/slack-github-action@v3
       with:
         method: chat.postMessage
         token: ${{ secrets.VBR_SLACK_BOT_TOKEN }}
@@ -116,7 +116,7 @@ jobs:
 
     steps:
     - name: CD Lambda(s) Configure credentials
-      uses: aws-actions/configure-aws-credentials@v4.1.0
+      uses: aws-actions/configure-aws-credentials@v6
       with:
         aws-access-key-id: ${{ secrets.VBR_AWS_ACCESS_KEY_ID_DEVOPS }}
         aws-secret-access-key: ${{ secrets.VBR_AWS_SECRET_ACCESS_KEY_DEVOPS }}
@@ -141,7 +141,7 @@ jobs:
 
     steps:
     - name: Notify deployment finished
-      uses: slackapi/slack-github-action@v2
+      uses: slackapi/slack-github-action@v3
       with:
         method: chat.postMessage
         token: ${{ secrets.VBR_SLACK_BOT_TOKEN }}

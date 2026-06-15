@@ -34,6 +34,7 @@
             // Act
             var service = new CacheInvalidator(hostApplicationLifeTimeMock.Object, consumerParcelContext, redisCacheInvalidateService.Object);
             await service.StartAsync(CancellationToken.None);
+            await service.ExecuteTask!;
 
             // Assert
             consumerParcelContext.BuildingsToInvalidate.Should().BeEmpty();

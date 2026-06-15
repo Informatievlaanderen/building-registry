@@ -18,6 +18,7 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
+    using Microsoft.OpenApi;
     using Swashbuckle.AspNetCore.Filters;
 
     public partial class BuildingUnitController
@@ -36,7 +37,7 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
         [ProducesResponseType(StatusCodes.Status202Accepted)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-        [SwaggerResponseHeader(StatusCodes.Status202Accepted, "location", "string", "De URL van het aangemaakte ticket.")]
+        [SwaggerResponseHeader(StatusCodes.Status202Accepted, "location", JsonSchemaType.String, "De URL van het aangemaakte ticket.")]
         [SwaggerResponseExample(StatusCodes.Status400BadRequest, typeof(BadRequestResponseExamples))]
         [SwaggerResponseExample(StatusCodes.Status500InternalServerError, typeof(InternalServerErrorResponseExamples))]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = PolicyNames.GeschetstGebouw.DecentraleBijwerker)]

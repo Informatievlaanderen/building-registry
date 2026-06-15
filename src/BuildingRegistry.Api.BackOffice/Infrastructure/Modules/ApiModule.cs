@@ -14,6 +14,7 @@ namespace BuildingRegistry.Api.BackOffice.Infrastructure.Modules
     using BuildingRegistry.Infrastructure;
     using BuildingRegistry.Infrastructure.Modules;
     using Consumer.Address;
+    using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc.Infrastructure;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
@@ -53,7 +54,7 @@ namespace BuildingRegistry.Api.BackOffice.Infrastructure.Modules
                 .AsSelf()
                 .InstancePerLifetimeScope();
 
-            builder.Register(c => new AcmIdmProvenanceFactory(Application.BuildingRegistry, c.Resolve<IActionContextAccessor>()))
+            builder.Register(c => new AcmIdmProvenanceFactory(Application.BuildingRegistry, c.Resolve<IHttpContextAccessor>()))
                 .As<IProvenanceFactory>()
                 .InstancePerLifetimeScope()
                 .AsSelf();
