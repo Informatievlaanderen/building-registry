@@ -1,3 +1,10 @@
+## [5.10.4](https://github.com/informatievlaanderen/building-registry/compare/v5.10.3...v5.10.4) (2026-06-15)
+
+
+### Bug Fixes
+
+* **ci:** update pipelines to trigger build ([09afa5d](https://github.com/informatievlaanderen/building-registry/commit/09afa5d89034aeec9871463fb24b8c038b07ffda))
+
 ## [5.10.3](https://github.com/informatievlaanderen/building-registry/compare/v5.10.2...v5.10.3) (2026-05-21)
 
 
