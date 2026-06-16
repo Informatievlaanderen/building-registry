@@ -1761,7 +1761,7 @@
       },
       "Duende.IdentityModel": {
         "type": "CentralTransitive",
-        "requested": "[7.0.0, )",
+        "requested": "[8.1.0, )",
         "resolved": "8.0.1",
         "contentHash": "P3bNPAiyYh15VuDZP/xE7Y8ohhQloiW2KdiBzzJh3m26sPQJ3Wuxj4ur6X+A9m0qhdwx2kLeh4so0a2nEslHmw=="
       },

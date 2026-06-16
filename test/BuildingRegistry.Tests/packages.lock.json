@@ -208,8 +208,8 @@
       },
       "AWSSDK.Core": {
         "type": "Transitive",
-        "resolved": "4.0.9.2",
-        "contentHash": "BW8nJkdjRFWMqk1ufvqUMqF+Axx+lJX/HTst6eKQw//PQf2wUx8i9xf5MSItazHZeatOVLLhZhwyALIlsiQD7g=="
+        "resolved": "4.0.9.3",
+        "contentHash": "FR+RQZQL+V6M2DdWkQaFFKaerULX6JUeT6Em5DYgcEMsenH9kiABrLRBBJqb1L+JUHC4svPGYu7biJb1a/7BYw=="
       },
       "AWSSDK.DynamoDBv2": {
         "type": "Transitive",
@@ -1724,7 +1724,7 @@
           "Be.Vlaanderen.Basisregisters.TicketingService.Proxy.HttpProxy": "[4.0.0, )",
           "BuildingRegistry.Consumer.Address": "[1.0.0, )",
           "BuildingRegistry.Consumer.Read.Parcel": "[1.0.0, )",
-          "Duende.IdentityModel": "[7.0.0, )",
+          "Duende.IdentityModel": "[8.1.0, )",
           "MediatR": "[12.5.0, 13.0.0)"
         }
       },
@@ -1805,7 +1805,7 @@
       "buildingregistry.producer.snapshot.oslo": {
         "type": "Project",
         "dependencies": {
-          "AWSSDK.Extensions.NETCore.Setup": "[4.0.4.7, )",
+          "AWSSDK.Extensions.NETCore.Setup": "[4.0.4.8, )",
           "AspNetCore.HealthChecks.NpgSql": "[9.0.0, )",
           "AspNetCore.HealthChecks.SqlServer": "[9.0.0, )",
           "Be.Vlaanderen.Basisregisters.Api": "[27.0.0, )",
@@ -1950,7 +1950,7 @@
       "buildingregistry.tools.console": {
         "type": "Project",
         "dependencies": {
-          "AWSSDK.Extensions.NETCore.Setup": "[4.0.4.7, )",
+          "AWSSDK.Extensions.NETCore.Setup": "[4.0.4.8, )",
           "Be.Vlaanderen.Basisregisters.Aws.DistributedMutex": "[5.1.0, )",
           "Be.Vlaanderen.Basisregisters.BuildingRegistry.Api.BackOffice.Abstractions": "[1.0.0, )",
           "Be.Vlaanderen.Basisregisters.GrAr.Notifications": "[24.1.0, )",
@@ -1999,11 +1999,11 @@
       },
       "AWSSDK.Extensions.NETCore.Setup": {
         "type": "CentralTransitive",
-        "requested": "[4.0.4.7, )",
-        "resolved": "4.0.4.7",
-        "contentHash": "XlcB1qL1eP5dtW+PAWWYFXWPXDz4wAzWrA5fQSpn9gb3QEvDIzhfWMo6kyQIyK2zABJmGPezv7Mt9+SOZTFltQ==",
+        "requested": "[4.0.4.8, )",
+        "resolved": "4.0.4.8",
+        "contentHash": "GAfNNysynIjMKJiV5tTletuJIdOV3E9+ziDJzFDrAEg1YR3amD/nZJaiZE6C9gllTJgB76Si6W5OZ/LnKdUCrg==",
         "dependencies": {
-          "AWSSDK.Core": "4.0.9.2",
+          "AWSSDK.Core": "4.0.9.3",
           "Microsoft.Extensions.Configuration.Abstractions": "2.0.0",
           "Microsoft.Extensions.DependencyInjection.Abstractions": "8.0.0",
           "Microsoft.Extensions.Logging.Abstractions": "2.0.0"
@@ -2540,9 +2540,9 @@
       },
       "Duende.IdentityModel": {
         "type": "CentralTransitive",
-        "requested": "[7.0.0, )",
-        "resolved": "8.0.1",
-        "contentHash": "P3bNPAiyYh15VuDZP/xE7Y8ohhQloiW2KdiBzzJh3m26sPQJ3Wuxj4ur6X+A9m0qhdwx2kLeh4so0a2nEslHmw=="
+        "requested": "[8.1.0, )",
+        "resolved": "8.1.0",
+        "contentHash": "ncmC2ISg0efTqY74xI6gaLKlv4mErT5ruYK262dkSnAv07g9qYC2++q7AWWs1FyP2c0YZ6LvUtcoJmxZqYyVrA=="
       },
       "MediatR": {
         "type": "CentralTransitive",
