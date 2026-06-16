@@ -1,3 +1,20 @@
+# [6.0.0](https://github.com/informatievlaanderen/building-registry/compare/v5.10.4...v6.0.0) (2026-06-16)
+
+
+### Bug Fixes
+
+* update packages ([3f2f0e1](https://github.com/informatievlaanderen/building-registry/commit/3f2f0e135d2b02851a5c2f2a5c668c6b5bcb7d65))
+
+
+### Features
+
+* update packages + upgrade to dotnet 10 ([67af48c](https://github.com/informatievlaanderen/building-registry/commit/67af48c5b670c95df0aa22307160c0399c36c9d2))
+
+
+### BREAKING CHANGES
+
+* update to dotnet 10
+
 ## [5.10.4](https://github.com/informatievlaanderen/building-registry/compare/v5.10.3...v5.10.4) (2026-06-15)
 
 
