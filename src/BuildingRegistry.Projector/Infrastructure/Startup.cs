@@ -210,7 +210,7 @@ namespace BuildingRegistry.Projector.Infrastructure
             appLifetime.ApplicationStopping.Register(() => _projectionsCancellationTokenSource.Cancel());
             appLifetime.ApplicationStarted.Register(() =>
             {
-                var projectionsManager = serviceProvider.GetRequiredService<IConnectedProjectionsManager>();
+                var projectionsManager = app.ApplicationServices.GetRequiredService<IConnectedProjectionsManager>();
                 Task.Run(async () =>
                     await projectionsManager.Resume(_projectionsCancellationTokenSource.Token).ConfigureAwait(false)
                 ).ConfigureAwait(false);
