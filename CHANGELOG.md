@@ -1,3 +1,10 @@
+## [6.0.1](https://github.com/informatievlaanderen/building-registry/compare/v6.0.0...v6.0.1) (2026-06-22)
+
+
+### Bug Fixes
+
+* **projector:** resume projections ([7b128c2](https://github.com/informatievlaanderen/building-registry/commit/7b128c20afdf384c57aa7774610690fc156d952a))
+
 # [6.0.0](https://github.com/informatievlaanderen/building-registry/compare/v5.10.4...v6.0.0) (2026-06-16)
 
 
