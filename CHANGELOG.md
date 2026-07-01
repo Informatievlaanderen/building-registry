@@ -1,3 +1,5 @@
+## [6.0.2](https://github.com/informatievlaanderen/building-registry/compare/v6.0.1...v6.0.2) (2026-07-01)
+
 ## [6.0.1](https://github.com/informatievlaanderen/building-registry/compare/v6.0.0...v6.0.1) (2026-06-22)
 
 
