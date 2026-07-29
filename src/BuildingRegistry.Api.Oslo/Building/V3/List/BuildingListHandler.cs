@@ -1,0 +1,59 @@
+namespace BuildingRegistry.Api.Oslo.Building.V3.List
+{
+    using System.Linq;
+    using System.Threading;
+    using System.Threading.Tasks;
+    using Be.Vlaanderen.Basisregisters.GrAr.Common;
+    using Consumer.Read.Parcel;
+    using Converters;
+    using Infrastructure;
+    using Infrastructure.Options;
+    using MediatR;
+    using Microsoft.EntityFrameworkCore;
+    using Microsoft.Extensions.Options;
+    using Projections.Legacy;
+    using Query;
+
+    public class BuildingListHandler : IRequestHandler<BuildingListRequest, BuildingListOsloV3Response>
+    {
+        private readonly LegacyContext _legacyContext;
+        private readonly ConsumerParcelContext _consumerParcelContext;
+        private readonly IBuildingMatching _buildingMatching;
+        private readonly IOptions<ResponseOptionsV3> _responseOptions;
+
+        public BuildingListHandler(
+            LegacyContext legacyContext,
+            IOptions<ResponseOptionsV3> responseOptions,
+            ConsumerParcelContext consumerParcelContext,
+            IBuildingMatching buildingMatching)
+        {
+            _legacyContext = legacyContext;
+            _responseOptions = responseOptions;
+            _consumerParcelContext = consumerParcelContext;
+            _buildingMatching = buildingMatching;
+        }
+
+        public async Task<BuildingListOsloV3Response> Handle(BuildingListRequest request, CancellationToken cancellationToken)
+        {
+            var pagedBuildings = new BuildingListOsloQuery(_legacyContext, _consumerParcelContext, _buildingMatching)
+                .Fetch(request.FilteringHeader, request.SortingHeader, request.PaginationRequest);
+
+            var buildings = await pagedBuildings.Items.ToListAsync(cancellationToken);
+
+            return new BuildingListOsloV3Response
+            {
+                Gebouwen = buildings
+                    .Select(x => new GebouwCollectieItemOsloV3(
+                        x.PersistentLocalId,
+                        _responseOptions.Value.GebouwDetailUrl,
+                        x.Status.MapOslo(),
+                        x.Version.ToBelgianDateTimeOffset()))
+                    .ToList(),
+                Volgende = pagedBuildings.PaginationInfo.BuildNextUri(buildings.Count, _responseOptions.Value.GebouwVolgendeUrl)!,
+                Context = _responseOptions.Value.ContextUrlList,
+                Sorting = pagedBuildings.Sorting,
+                Pagination = pagedBuildings.PaginationInfo
+            };
+        }
+    }
+}

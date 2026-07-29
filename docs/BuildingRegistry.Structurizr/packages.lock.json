@@ -224,7 +224,7 @@
           "Be.Vlaanderen.Basisregisters.Crab": "[5.1.0, )",
           "Be.Vlaanderen.Basisregisters.EventHandling": "[7.1.0, )",
           "Be.Vlaanderen.Basisregisters.Generators.Guid.Deterministic": "[5.1.0, )",
-          "Be.Vlaanderen.Basisregisters.GrAr.Provenance": "[25.8.0, )",
+          "Be.Vlaanderen.Basisregisters.GrAr.Provenance": "[25.9.4, )",
           "Be.Vlaanderen.Basisregisters.Utilities.HexByteConvertor": "[5.1.0, )",
           "NetTopologySuite": "[2.6.0, )",
           "NodaTime": "[3.3.2, )"
@@ -290,9 +290,9 @@
       },
       "Be.Vlaanderen.Basisregisters.GrAr.Common": {
         "type": "CentralTransitive",
-        "requested": "[25.8.0, )",
-        "resolved": "25.8.0",
-        "contentHash": "xonMMePWImwME6EofcaqtUOIJC12Q2lep+fPOoIjG/hk3iyD0E+Brb47jirxI9Bvz9j1acTcW+cj7HpkwYXaeA==",
+        "requested": "[25.9.4, )",
+        "resolved": "25.9.4",
+        "contentHash": "s65A3BQ8Co85wAGV9+MihAJvA0NpB8t1Fpmr47A3VG74F2vVHt0VRK1W3UCMXyd/fOCojo6ATpw8Me8KKXGafw==",
         "dependencies": {
           "Be.Vlaanderen.Basisregisters.AggregateSource": "11.0.0",
           "Be.Vlaanderen.Basisregisters.CommandHandling": "11.0.0",
@@ -302,13 +302,13 @@
       },
       "Be.Vlaanderen.Basisregisters.GrAr.Provenance": {
         "type": "CentralTransitive",
-        "requested": "[25.8.0, )",
-        "resolved": "25.8.0",
-        "contentHash": "uutB5M9azwaJT0w8jCMhHDAhPjZ6J4IUwWF7B65DoNw9yGGXcrFDZmy5oBUuaFNUF6UGffGXh041p+D3CB0mSg==",
+        "requested": "[25.9.4, )",
+        "resolved": "25.9.4",
+        "contentHash": "D+QQk/4/+fdsABLKhZ5MvQ/TzvvY50jNvaGlZdhkodJ5E6dO84IlGVtWFMyi1vpP3SJE5ol1aZnoAnTWaTJYBQ==",
         "dependencies": {
           "Be.Vlaanderen.Basisregisters.CommandHandling": "11.0.0",
           "Be.Vlaanderen.Basisregisters.Crab": "5.1.0",
-          "Be.Vlaanderen.Basisregisters.GrAr.Common": "25.8.0",
+          "Be.Vlaanderen.Basisregisters.GrAr.Common": "25.9.4",
           "Be.Vlaanderen.Basisregisters.Utilities.Rfc3339DateTimeOffset": "5.1.0",
           "CompareNETObjects": "4.84.0"
         }

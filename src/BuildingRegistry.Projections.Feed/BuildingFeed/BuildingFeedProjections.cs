@@ -10,7 +10,9 @@ namespace BuildingRegistry.Projections.Feed.BuildingFeed
     using Be.Vlaanderen.Basisregisters.GrAr.Common;
     using Be.Vlaanderen.Basisregisters.GrAr.Common.NetTopology;
     using Be.Vlaanderen.Basisregisters.GrAr.CrsTransform;
-    using Be.Vlaanderen.Basisregisters.GrAr.Legacy.Gebouw;
+    using Be.Vlaanderen.Basisregisters.GrAr.Oslo;
+    using Be.Vlaanderen.Basisregisters.GrAr.Oslo.Gebouw;
+    using Be.Vlaanderen.Basisregisters.GrAr.Oslo.Gml;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.Connector;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore;
@@ -19,13 +21,15 @@ namespace BuildingRegistry.Projections.Feed.BuildingFeed
     using Contract;
     using Microsoft.EntityFrameworkCore;
     using NetTopologySuite.Geometries;
+    using Newtonsoft.Json.Serialization;
     using NodaTime;
-    using Envelope = Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope;
 
     [ConnectedProjectionName("Feed endpoint gebouw (cloudevents)")]
     [ConnectedProjectionDescription("Projectie die de gebouw data voor de gebouw cloudevent feed voorziet.")]
     public class BuildingFeedProjections : ConnectedProjection<FeedContext>
     {
+        private static readonly CamelCaseNamingStrategy NamingStrategy = new();
+
         private readonly IChangeFeedService _changeFeedService;
         private readonly IMunicipalityGeometryRepository _municipalityGeometryRepository;
 
@@ -60,8 +64,8 @@ namespace BuildingRegistry.Projections.Feed.BuildingFeed
 
                 List<BaseRegistriesCloudEventAttribute> attributes =
                 [
-                    new BaseRegistriesCloudEventAttribute(BuildingAttributeNames.StatusName, null, document.Document.Status),
-                    new BaseRegistriesCloudEventAttribute(BuildingAttributeNames.GeometryMethod, null, document.Document.GeometryMethod),
+                    new BaseRegistriesCloudEventAttribute(BuildingAttributeNames.StatusName, null, document.Document.Status.Id),
+                    new BaseRegistriesCloudEventAttribute(BuildingAttributeNames.GeometryMethod, null, ToGeometrieMethodePuri(document.Document.GeometryMethod)),
                     new BaseRegistriesCloudEventAttribute(BuildingAttributeNames.Geometry, null, CreateGeometryValues(geometry))
                 ];
 
@@ -72,8 +76,8 @@ namespace BuildingRegistry.Projections.Feed.BuildingFeed
             {
                 var document = new BuildingDocument(
                     message.Message.BuildingPersistentLocalId,
-                    GebouwStatus.Gepland,
-                    GeometrieMethode.Ingeschetst,
+                    new GebouwStatus(GebouwStatusValue.Gepland),
+                    GebouwGeometrieMethode.Ingeschetst,
                     message.Message.Provenance.Timestamp);
 
                 var geometry = GmlHelpers.ParseGeometry(message.Message.ExtendedWkbGeometry);
@@ -84,8 +88,8 @@ namespace BuildingRegistry.Projections.Feed.BuildingFeed
 
                 List<BaseRegistriesCloudEventAttribute> attributes =
                 [
-                    new BaseRegistriesCloudEventAttribute(BuildingAttributeNames.StatusName, null, GebouwStatus.Gepland),
-                    new BaseRegistriesCloudEventAttribute(BuildingAttributeNames.GeometryMethod, null, GeometrieMethode.Ingeschetst),
+                    new BaseRegistriesCloudEventAttribute(BuildingAttributeNames.StatusName, null, document.Document.Status.Id),
+                    new BaseRegistriesCloudEventAttribute(BuildingAttributeNames.GeometryMethod, null, ToGeometrieMethodePuri(document.Document.GeometryMethod)),
                     new BaseRegistriesCloudEventAttribute(BuildingAttributeNames.Geometry, null, CreateGeometryValues(geometry))
                 ];
 
@@ -96,8 +100,8 @@ namespace BuildingRegistry.Projections.Feed.BuildingFeed
             {
                 var document = new BuildingDocument(
                     message.Message.BuildingPersistentLocalId,
-                    GebouwStatus.Gerealiseerd,
-                    GeometrieMethode.IngemetenGRB,
+                    new GebouwStatus(GebouwStatusValue.Gerealiseerd),
+                    GebouwGeometrieMethode.IngemetenGRB,
                     message.Message.Provenance.Timestamp);
 
                 var geometry = GmlHelpers.ParseGeometry(message.Message.ExtendedWkbGeometry);
@@ -108,8 +112,8 @@ namespace BuildingRegistry.Projections.Feed.BuildingFeed
 
                 List<BaseRegistriesCloudEventAttribute> attributes =
                 [
-                    new BaseRegistriesCloudEventAttribute(BuildingAttributeNames.StatusName, null, GebouwStatus.Gerealiseerd),
-                    new BaseRegistriesCloudEventAttribute(BuildingAttributeNames.GeometryMethod, null, GeometrieMethode.IngemetenGRB),
+                    new BaseRegistriesCloudEventAttribute(BuildingAttributeNames.StatusName, null, document.Document.Status.Id),
+                    new BaseRegistriesCloudEventAttribute(BuildingAttributeNames.GeometryMethod, null, ToGeometrieMethodePuri(document.Document.GeometryMethod)),
                     new BaseRegistriesCloudEventAttribute(BuildingAttributeNames.Geometry, null, CreateGeometryValues(geometry))
                 ];
 
@@ -152,12 +156,12 @@ namespace BuildingRegistry.Projections.Feed.BuildingFeed
             {
                 var document = await FindDocument(context, message.Message.BuildingPersistentLocalId, ct);
                 var oldStatus = document.Document.Status;
-                document.Document.Status = GebouwStatus.InAanbouw;
+                document.Document.Status = new GebouwStatus(GebouwStatusValue.InAanbouw);
                 document.LastChangedOn = message.Message.Provenance.Timestamp;
 
                 await AddCloudEvent(message, document, context,
                 [
-                    new BaseRegistriesCloudEventAttribute(BuildingAttributeNames.StatusName, oldStatus, GebouwStatus.InAanbouw)
+                    new BaseRegistriesCloudEventAttribute(BuildingAttributeNames.StatusName, oldStatus.Id, document.Document.Status.Id)
                 ]);
             });
 
@@ -165,12 +169,12 @@ namespace BuildingRegistry.Projections.Feed.BuildingFeed
             {
                 var document = await FindDocument(context, message.Message.BuildingPersistentLocalId, ct);
                 var oldStatus = document.Document.Status;
-                document.Document.Status = GebouwStatus.Gepland;
+                document.Document.Status = new GebouwStatus(GebouwStatusValue.Gepland);
                 document.LastChangedOn = message.Message.Provenance.Timestamp;
 
                 await AddCloudEvent(message, document, context,
                 [
-                    new BaseRegistriesCloudEventAttribute(BuildingAttributeNames.StatusName, oldStatus, GebouwStatus.Gepland)
+                    new BaseRegistriesCloudEventAttribute(BuildingAttributeNames.StatusName, oldStatus.Id, document.Document.Status.Id)
                 ]);
             });
 
@@ -178,12 +182,12 @@ namespace BuildingRegistry.Projections.Feed.BuildingFeed
             {
                 var document = await FindDocument(context, message.Message.BuildingPersistentLocalId, ct);
                 var oldStatus = document.Document.Status;
-                document.Document.Status = GebouwStatus.Gerealiseerd;
+                document.Document.Status = new GebouwStatus(GebouwStatusValue.Gerealiseerd);
                 document.LastChangedOn = message.Message.Provenance.Timestamp;
 
                 await AddCloudEvent(message, document, context,
                 [
-                    new BaseRegistriesCloudEventAttribute(BuildingAttributeNames.StatusName, oldStatus, GebouwStatus.Gerealiseerd)
+                    new BaseRegistriesCloudEventAttribute(BuildingAttributeNames.StatusName, oldStatus.Id, document.Document.Status.Id)
                 ]);
             });
 
@@ -191,12 +195,12 @@ namespace BuildingRegistry.Projections.Feed.BuildingFeed
             {
                 var document = await FindDocument(context, message.Message.BuildingPersistentLocalId, ct);
                 var oldStatus = document.Document.Status;
-                document.Document.Status = GebouwStatus.InAanbouw;
+                document.Document.Status = new GebouwStatus(GebouwStatusValue.InAanbouw);
                 document.LastChangedOn = message.Message.Provenance.Timestamp;
 
                 await AddCloudEvent(message, document, context,
                 [
-                    new BaseRegistriesCloudEventAttribute(BuildingAttributeNames.StatusName, oldStatus, GebouwStatus.InAanbouw)
+                    new BaseRegistriesCloudEventAttribute(BuildingAttributeNames.StatusName, oldStatus.Id, document.Document.Status.Id)
                 ]);
             });
 
@@ -204,12 +208,12 @@ namespace BuildingRegistry.Projections.Feed.BuildingFeed
             {
                 var document = await FindDocument(context, message.Message.BuildingPersistentLocalId, ct);
                 var oldStatus = document.Document.Status;
-                document.Document.Status = GebouwStatus.NietGerealiseerd;
+                document.Document.Status = new GebouwStatus(GebouwStatusValue.NietGerealiseerd);
                 document.LastChangedOn = message.Message.Provenance.Timestamp;
 
                 await AddCloudEvent(message, document, context,
                 [
-                    new BaseRegistriesCloudEventAttribute(BuildingAttributeNames.StatusName, oldStatus, GebouwStatus.NietGerealiseerd)
+                    new BaseRegistriesCloudEventAttribute(BuildingAttributeNames.StatusName, oldStatus.Id, document.Document.Status.Id)
                 ]);
             });
 
@@ -217,12 +221,12 @@ namespace BuildingRegistry.Projections.Feed.BuildingFeed
             {
                 var document = await FindDocument(context, message.Message.BuildingPersistentLocalId, ct);
                 var oldStatus = document.Document.Status;
-                document.Document.Status = GebouwStatus.Gepland;
+                document.Document.Status = new GebouwStatus(GebouwStatusValue.Gepland);
                 document.LastChangedOn = message.Message.Provenance.Timestamp;
 
                 await AddCloudEvent(message, document, context,
                 [
-                    new BaseRegistriesCloudEventAttribute(BuildingAttributeNames.StatusName, oldStatus, GebouwStatus.Gepland)
+                    new BaseRegistriesCloudEventAttribute(BuildingAttributeNames.StatusName, oldStatus.Id, document.Document.Status.Id)
                 ]);
             });
 
@@ -235,7 +239,7 @@ namespace BuildingRegistry.Projections.Feed.BuildingFeed
                 var geometry = GmlHelpers.ParseGeometry(message.Message.ExtendedWkbGeometryBuilding);
                 document.Document.ExtendedWkbGeometry = message.Message.ExtendedWkbGeometryBuilding;
                 document.Document.GeometryAsGml = geometry.ConvertToGml(false);
-                document.Document.GeometryMethod = GeometrieMethode.IngemetenGRB;
+                document.Document.GeometryMethod = GebouwGeometrieMethode.IngemetenGRB;
                 document.LastChangedOn = message.Message.Provenance.Timestamp;
 
                 var attributes = new List<BaseRegistriesCloudEventAttribute>
@@ -243,8 +247,8 @@ namespace BuildingRegistry.Projections.Feed.BuildingFeed
                     new BaseRegistriesCloudEventAttribute(BuildingAttributeNames.Geometry, oldGeometryValues, CreateGeometryValues(geometry))
                 };
 
-                if (oldGeometryMethod != GeometrieMethode.IngemetenGRB)
-                    attributes.Add(new BaseRegistriesCloudEventAttribute(BuildingAttributeNames.GeometryMethod, oldGeometryMethod, GeometrieMethode.IngemetenGRB));
+                if (oldGeometryMethod != GebouwGeometrieMethode.IngemetenGRB)
+                    attributes.Add(new BaseRegistriesCloudEventAttribute(BuildingAttributeNames.GeometryMethod, ToGeometrieMethodePuri(oldGeometryMethod), ToGeometrieMethodePuri(GebouwGeometrieMethode.IngemetenGRB)));
 
                 await AddCloudEvent(message, document, context, attributes);
             });
@@ -269,12 +273,12 @@ namespace BuildingRegistry.Projections.Feed.BuildingFeed
             {
                 var document = await FindDocument(context, message.Message.BuildingPersistentLocalId, ct);
                 var oldStatus = document.Document.Status;
-                document.Document.Status = GebouwStatus.Gehistoreerd;
+                document.Document.Status = new GebouwStatus(GebouwStatusValue.Gehistoreerd);
                 document.LastChangedOn = message.Message.Provenance.Timestamp;
 
                 await AddCloudEvent(message, document, context,
                 [
-                    new BaseRegistriesCloudEventAttribute(BuildingAttributeNames.StatusName, oldStatus, GebouwStatus.Gehistoreerd)
+                    new BaseRegistriesCloudEventAttribute(BuildingAttributeNames.StatusName, oldStatus.Id, document.Document.Status.Id)
                 ]);
             });
 
@@ -442,48 +446,51 @@ namespace BuildingRegistry.Projections.Feed.BuildingFeed
         private static GebouwStatus MapStatus(BuildingStatus status)
         {
             if (status == BuildingStatus.Planned)
-                return GebouwStatus.Gepland;
+                return new GebouwStatus(GebouwStatusValue.Gepland);
             if (status == BuildingStatus.UnderConstruction)
-                return GebouwStatus.InAanbouw;
+                return new GebouwStatus(GebouwStatusValue.InAanbouw);
             if (status == BuildingStatus.Realized)
-                return GebouwStatus.Gerealiseerd;
+                return new GebouwStatus(GebouwStatusValue.Gerealiseerd);
             if (status == BuildingStatus.Retired)
-                return GebouwStatus.Gehistoreerd;
+                return new GebouwStatus(GebouwStatusValue.Gehistoreerd);
             if (status == BuildingStatus.NotRealized)
-                return GebouwStatus.NietGerealiseerd;
+                return new GebouwStatus(GebouwStatusValue.NietGerealiseerd);
 
             throw new ArgumentOutOfRangeException(nameof(status), status, null);
         }
 
-        private static GeometrieMethode MapGeometryMethod(BuildingGeometryMethod geometryMethod)
+        private static GebouwGeometrieMethode MapGeometryMethod(BuildingGeometryMethod geometryMethod)
         {
             if (geometryMethod == BuildingGeometryMethod.Outlined)
-                return GeometrieMethode.Ingeschetst;
+                return GebouwGeometrieMethode.Ingeschetst;
             if (geometryMethod == BuildingGeometryMethod.MeasuredByGrb)
-                return GeometrieMethode.IngemetenGRB;
+                return GebouwGeometrieMethode.IngemetenGRB;
 
             throw new ArgumentOutOfRangeException(nameof(geometryMethod), geometryMethod, null);
         }
 
-        private static List<BuildingGeometryCloudEventValue> CreateGeometryValues(Geometry geometry)
+        private static string ToGeometrieMethodePuri(GebouwGeometrieMethode geometrieMethode)
+            => OsloNamespaces.GebouwGeometrieMethode.ToPuri(NamingStrategy.GetPropertyName(geometrieMethode.ToString(), false));
+
+        private static List<PolygonGeometrie> CreateGeometryValues(Geometry geometry)
         {
-            var list = new List<BuildingGeometryCloudEventValue>();
+            var list = new List<PolygonGeometrie>();
             var gml = geometry.ConvertToGml(false);
             switch (geometry.SRID)
             {
                 case SystemReferenceId.SridLambert72:
                 {
-                    list.Add(new BuildingGeometryCloudEventValue(gml, SystemReferenceId.SrsNameLambert72));
+                    list.Add(new PolygonGeometrie(gml));
 
                     var lambert08Geometry = geometry.TransformFromLambert72To08();
-                    list.Add(new BuildingGeometryCloudEventValue(lambert08Geometry.ConvertToGml(false), SystemReferenceId.SrsNameLambert2008));
+                    list.Add(new PolygonGeometrie(lambert08Geometry.ConvertToGml(false)));
                     break;
                 }
                 case SystemReferenceId.SridLambert2008:
                 {
                     var lambert72Geometry = geometry.TransformFromLambert08To72();
-                    list.Add(new BuildingGeometryCloudEventValue(lambert72Geometry.ConvertToGml(false), SystemReferenceId.SrsNameLambert72));
-                    list.Add(new BuildingGeometryCloudEventValue(gml, SystemReferenceId.SrsNameLambert2008));
+                    list.Add(new PolygonGeometrie(lambert72Geometry.ConvertToGml(false)));
+                    list.Add(new PolygonGeometrie(gml));
                     break;
                 }
                 default:
