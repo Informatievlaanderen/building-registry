@@ -1,0 +1,10 @@
+﻿namespace BuildingRegistry.Api.Oslo.BuildingUnit.V2.Query
+{
+    public class BuildingUnitFilter
+    {
+        public int? BuildingPersistentLocalId { get; set; }
+        public string AddressPersistentLocalId { get; set; }
+        public string Status { get; set; }
+        public string? Functie { get; set; }
+    }
+}

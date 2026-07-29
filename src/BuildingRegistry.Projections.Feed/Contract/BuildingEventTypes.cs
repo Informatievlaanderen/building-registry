@@ -12,26 +12,8 @@ namespace BuildingRegistry.Projections.Feed.Contract
 
     public static class BuildingAttributeNames
     {
-        public const string StatusName = "gebouwStatus";
-        public const string GeometryMethod = "geometrieMethode";
-        public const string Geometry = "gebouwGeometrie";
-    }
-
-    public sealed class BuildingGeometryCloudEventValue
-    {
-        [JsonProperty("type")]
-        public string Type { get; set; } = "Polygon";
-
-        [JsonProperty("projectie")]
-        public string Projection { get; set; }
-
-        [JsonProperty("gml")]
-        public string Gml { get; set; } = string.Empty;
-
-        public BuildingGeometryCloudEventValue(string gml, string projection)
-        {
-            Gml = gml;
-            Projection = projection;
-        }
+        public const string StatusName = "status";
+        public const string GeometryMethod = "geometrie.methode";
+        public const string Geometry = "geometrie.geometrie";
     }
 }

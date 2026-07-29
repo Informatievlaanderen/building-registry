@@ -12,30 +12,12 @@ namespace BuildingRegistry.Projections.Feed.Contract
 
     public static class BuildingUnitAttributeNames
     {
-        public const string StatusName = "gebouweenheidStatus";
-        public const string Function = "gebouweenheidFunctie";
-        public const string GeometryMethod = "positieGeometrieMethode";
-        public const string Position = "gebouweenheidPositie";
-        public const string AdresIds = "adresIds";
-        public const string GebouwId = "gebouw.id";
+        public const string StatusName = "status";
+        public const string Function = "functie";
+        public const string GeometryMethod = "positie.methode";
+        public const string Position = "positie.geometrie";
+        public const string AdresIds = "toegekendAdres";
+        public const string GebouwId = "isDeelVan";
         public const string HasDeviation = "afwijkingVastgesteld";
-    }
-
-    public sealed class BuildingUnitPositionCloudEventValue
-    {
-        [JsonProperty("type")]
-        public string Type { get; set; } = "Point";
-
-        [JsonProperty("projectie")]
-        public string Projection { get; set; }
-
-        [JsonProperty("gml")]
-        public string Gml { get; set; }
-
-        public BuildingUnitPositionCloudEventValue(string gml, string projection)
-        {
-            Gml = gml;
-            Projection = projection;
-        }
     }
 }

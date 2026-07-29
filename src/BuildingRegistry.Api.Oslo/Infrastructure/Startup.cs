@@ -89,7 +89,8 @@ namespace BuildingRegistry.Api.Oslo.Infrastructure
                     }
                 })
                 .AddValidatorsFromAssemblyContaining<Startup>()
-                .Configure<ResponseOptions>(_configuration);
+                .Configure<ResponseOptionsV2>(_configuration.GetSection("V2"))
+                .Configure<ResponseOptionsV3>(_configuration.GetSection("V3"));
         }
 
         public void Configure(

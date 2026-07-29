@@ -2,7 +2,7 @@ namespace BuildingRegistry.Projections.Feed.BuildingFeed
 {
     using System;
     using Be.Vlaanderen.Basisregisters.GrAr.Common;
-    using Be.Vlaanderen.Basisregisters.GrAr.Legacy.Gebouw;
+    using Be.Vlaanderen.Basisregisters.GrAr.Oslo.Gebouw;
     using Infrastructure;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -44,7 +44,7 @@ namespace BuildingRegistry.Projections.Feed.BuildingFeed
         public BuildingDocument(
             int buildingPersistentLocalId,
             GebouwStatus status,
-            GeometrieMethode geometryMethod,
+            GebouwGeometrieMethode geometryMethod,
             Instant createdTimestamp)
         {
             BuildingPersistentLocalId = buildingPersistentLocalId;
@@ -65,7 +65,7 @@ namespace BuildingRegistry.Projections.Feed.BuildingFeed
     {
         public int BuildingPersistentLocalId { get; set; }
         public GebouwStatus Status { get; set; }
-        public GeometrieMethode GeometryMethod { get; set; }
+        public GebouwGeometrieMethode GeometryMethod { get; set; }
         public string GeometryAsGml { get; set; } = string.Empty;
         public string ExtendedWkbGeometry { get; set; } = string.Empty;
 

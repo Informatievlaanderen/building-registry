@@ -1,0 +1,20 @@
+namespace BuildingRegistry.Api.Oslo.Infrastructure.Options
+{
+    using Be.Vlaanderen.Basisregisters.GrAr.ChangeFeed;
+
+    public class ResponseOptionsV3
+    {
+        public string GebouwVolgendeUrl { get; set; }
+        public string GebouwDetailUrl { get; set; }
+        public string GebouweenheidDetailUrl { get; set; }
+        public string GebouweenheidVolgendeUrl { get; set; }
+        public string AdresUrl { get; set; }
+        public string PerceelUrl { get; set; }
+        public string ContextUrlList { get; set; }
+        public string ContextUrlDetail { get; set; }
+        public string ContextUrlUnitList { get; set; }
+        public string ContextUrlUnitDetail { get; set; }
+        public ChangeFeedConfig BuildingFeed { get; set; }
+        public ChangeFeedConfig BuildingUnitFeed { get; set; }
+    }
+}
