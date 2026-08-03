@@ -64,6 +64,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.BuildingUnit.WhenPlanningBuildin
 
                 new PlanBuildingUnitRequestValidator(new BuildingExistsValidator(streamStoreMock.Object)),
                 new PlanBuildingUnitSqsRequestFactory(new Mock<IPersistentLocalIdGenerator>().Object),
+                Normalizer(),
                 request,
                 CancellationToken.None);
 
@@ -99,6 +100,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.BuildingUnit.WhenPlanningBuildin
 
                 new PlanBuildingUnitRequestValidator(new BuildingExistsValidator(streamStoreMock.Object)),
                 new PlanBuildingUnitSqsRequestFactory(new Mock<IPersistentLocalIdGenerator>().Object),
+                Normalizer(),
                 request,
                 CancellationToken.None);
 
@@ -110,6 +112,18 @@ namespace BuildingRegistry.Tests.BackOffice.Api.BuildingUnit.WhenPlanningBuildin
                 .Where(x => x.Errors.Any(e =>
                     e.ErrorCode == "GebouweenheidPositieformaatValidatie"
                     && e.ErrorMessage == "De positie is geen geldige gml-puntgeometrie."));
+        }
+
+        /// <summary>
+        /// The geometry normalizer runs on a request that has already passed validation, so it always gets a valid
+        /// GML point.
+        /// </summary>
+        private PlanBuildingUnitRequest CreateRequest(string position = GeometryHelper.GmlPointGeometry)
+        {
+            var request = Fixture.Create<PlanBuildingUnitRequest>();
+            request.GebouwId = "https://bla/1";
+            request.Positie = position;
+            return request;
         }
 
         [Fact]
@@ -124,12 +138,12 @@ namespace BuildingRegistry.Tests.BackOffice.Api.BuildingUnit.WhenPlanningBuildin
 
             _streamStore.SetStreamFound();
 
-            var request = Fixture.Create<PlanBuildingUnitRequest>();
-            request.GebouwId = "https://bla/1";
+            var request = CreateRequest();
 
             var result = (AcceptedResult)await _controller.Plan(
                 MockValidRequestValidator<PlanBuildingUnitRequest>(),
                 new PlanBuildingUnitSqsRequestFactory(new Mock<IPersistentLocalIdGenerator>().Object),
+                Normalizer(),
                 request);
 
             result.Should().NotBeNull();
@@ -143,6 +157,64 @@ namespace BuildingRegistry.Tests.BackOffice.Api.BuildingUnit.WhenPlanningBuildin
                         && sqsRequest.ProvenanceData.Application == Application.BuildingRegistry
                         && sqsRequest.ProvenanceData.Modification == Modification.Insert
                     ),
+                    CancellationToken.None));
+        }
+
+        [Theory]
+        [InlineData(false, GeometryHelper.GmlPointGeometry, GeometryHelper.GmlPointGeometry)]
+        [InlineData(false, GeometryHelper.GmlPointGeometryLambert2008, GeometryHelper.NormalizedGmlPointGeometry)]
+        [InlineData(true, GeometryHelper.GmlPointGeometry, GeometryHelper.NormalizedGmlPointGeometryLambert2008)]
+        [InlineData(true, GeometryHelper.GmlPointGeometryLambert2008, GeometryHelper.GmlPointGeometryLambert2008)]
+        public async Task ThenPositionIsSentInTheEventStoreReferenceSystem(
+            bool useLambert2008EventStore,
+            string requestedPosition,
+            string expectedPosition)
+        {
+            MockMediator
+                .Setup(x => x.Send(It.IsAny<PlanBuildingUnitSqsRequest>(), CancellationToken.None))
+                .Returns(Task.FromResult(new LocationResult(CreateTicketUri(Fixture.Create<Guid>()))));
+
+            _streamStore.SetStreamFound();
+
+            await _controller.Plan(
+                MockValidRequestValidator<PlanBuildingUnitRequest>(),
+                new PlanBuildingUnitSqsRequestFactory(new Mock<IPersistentLocalIdGenerator>().Object),
+                Normalizer(useLambert2008EventStore),
+                CreateRequest(requestedPosition));
+
+            MockMediator.Verify(x =>
+                x.Send(
+                    It.Is<PlanBuildingUnitSqsRequest>(sqsRequest => sqsRequest.Request.Positie == expectedPosition),
+                    CancellationToken.None));
+        }
+
+        /// <summary>
+        /// A building unit without a position is planned without one; the normalizer has nothing to convert.
+        /// </summary>
+        [Theory]
+        [InlineData(false)]
+        [InlineData(true)]
+        public async Task WithoutPosition_ThenNoPositionIsSent(bool useLambert2008EventStore)
+        {
+            MockMediator
+                .Setup(x => x.Send(It.IsAny<PlanBuildingUnitSqsRequest>(), CancellationToken.None))
+                .Returns(Task.FromResult(new LocationResult(CreateTicketUri(Fixture.Create<Guid>()))));
+
+            _streamStore.SetStreamFound();
+
+            var request = CreateRequest();
+            request.PositieGeometrieMethode = PositieGeometrieMethode.AfgeleidVanObject;
+            request.Positie = null;
+
+            await _controller.Plan(
+                MockValidRequestValidator<PlanBuildingUnitRequest>(),
+                new PlanBuildingUnitSqsRequestFactory(new Mock<IPersistentLocalIdGenerator>().Object),
+                Normalizer(useLambert2008EventStore),
+                request);
+
+            MockMediator.Verify(x =>
+                x.Send(
+                    It.Is<PlanBuildingUnitSqsRequest>(sqsRequest => sqsRequest.Request.Positie == null),
                     CancellationToken.None));
         }
 
@@ -160,6 +232,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.BuildingUnit.WhenPlanningBuildin
 
                 new PlanBuildingUnitRequestValidator(new BuildingExistsValidator(_streamStore.Object)),
                 new PlanBuildingUnitSqsRequestFactory(new Mock<IPersistentLocalIdGenerator>().Object),
+                Normalizer(),
                 planBuildingUnitRequest,
                 CancellationToken.None);
 
@@ -193,6 +266,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.BuildingUnit.WhenPlanningBuildin
 
                 MockValidRequestValidator<PlanBuildingUnitRequest>(),
                 new PlanBuildingUnitSqsRequestFactory(new Mock<IPersistentLocalIdGenerator>().Object),
+                Normalizer(),
                 request,
                 CancellationToken.None);
 

@@ -57,6 +57,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.Building.WhenChangingBuildingOut
                 MockValidRequestValidator<ChangeBuildingOutlineRequest>(),
                 new BuildingExistsValidator(_streamStore.Object),
                 MockIfMatchValidator(true),
+                Normalizer(),
                 Fixture.Create<BuildingPersistentLocalId>(),
                 request,
                 expectedIfMatchHeader);
@@ -89,6 +90,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.Building.WhenChangingBuildingOut
                 MockValidRequestValidator<ChangeBuildingOutlineRequest>(),
                 new BuildingExistsValidator(_streamStore.Object),
                 MockIfMatchValidator(false),
+                Normalizer(),
                 Fixture.Create<BuildingPersistentLocalId>(),
                 changeBuildingOutlineRequest,
                 "IncorrectIfMatchHeader");
@@ -129,6 +131,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.Building.WhenChangingBuildingOut
                 MockValidRequestValidator<ChangeBuildingOutlineRequest>(),
                 new BuildingExistsValidator(_streamStore.Object),
                 MockIfMatchValidator(true),
+                Normalizer(),
                 Fixture.Create<BuildingPersistentLocalId>(),
                 request,
                 expectedIfMatchHeader);
@@ -153,6 +156,45 @@ namespace BuildingRegistry.Tests.BackOffice.Api.Building.WhenChangingBuildingOut
                     CancellationToken.None));
         }
 
+        /// <remarks>
+        /// The expected values are the normalized polygon after <c>ToCleanPolygon()</c>, which runs on it and puts the
+        /// srsName back to the https form.
+        /// </remarks>
+        [Theory]
+        [InlineData(false, GeometryHelper.GmlPolygonGeometry, GeometryHelper.GmlPolygonGeometry)]
+        [InlineData(false, GeometryHelper.GmlPolygonGeometryLambert2008, GeometryHelper.CleanedNormalizedGmlPolygonGeometry)]
+        [InlineData(true, GeometryHelper.GmlPolygonGeometry, GeometryHelper.GmlPolygonGeometryLambert2008)]
+        [InlineData(true, GeometryHelper.GmlPolygonGeometryLambert2008, GeometryHelper.GmlPolygonGeometryLambert2008)]
+        public async Task ThenPolygonIsSentInTheEventStoreReferenceSystem(
+            bool useLambert2008EventStore,
+            string requestedPolygon,
+            string expectedPolygon)
+        {
+            MockMediator
+                .Setup(x => x.Send(It.IsAny<ChangeBuildingOutlineSqsRequest>(), CancellationToken.None))
+                .Returns(Task.FromResult(new LocationResult(CreateTicketUri(Fixture.Create<Guid>()))));
+
+            _streamStore.SetStreamFound();
+
+            var request = Fixture.Create<ChangeBuildingOutlineRequest>();
+            request.GeometriePolygoon = requestedPolygon;
+
+            await _controller.ChangeOutline(
+                MockValidRequestValidator<ChangeBuildingOutlineRequest>(),
+                new BuildingExistsValidator(_streamStore.Object),
+                MockIfMatchValidator(true),
+                Normalizer(useLambert2008EventStore),
+                Fixture.Create<BuildingPersistentLocalId>(),
+                request,
+                ifMatchHeaderValue: null);
+
+            MockMediator.Verify(x =>
+                x.Send(
+                    It.Is<ChangeBuildingOutlineSqsRequest>(sqsRequest =>
+                        GmlAssertions.IsEquivalentGml(sqsRequest.Request.GeometriePolygoon, expectedPolygon)),
+                    CancellationToken.None));
+        }
+
         [Fact]
         public void WithNonExistingBuildingPersistentLocalId_ThenThrowsApiException()
         {
@@ -169,6 +211,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.Building.WhenChangingBuildingOut
                     MockValidRequestValidator<ChangeBuildingOutlineRequest>(),
                     new BuildingExistsValidator(_streamStore.Object),
                     MockIfMatchValidator(true),
+                    Normalizer(),
                     Fixture.Create<BuildingPersistentLocalId>(),
                     changeBuildingOutlineRequest,
                     null,

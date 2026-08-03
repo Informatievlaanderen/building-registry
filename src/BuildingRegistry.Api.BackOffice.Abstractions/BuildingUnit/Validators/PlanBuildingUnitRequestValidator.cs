@@ -2,7 +2,6 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Validators
 {
     using Be.Vlaanderen.Basisregisters.GrAr.Edit.Contracts;
     using Be.Vlaanderen.Basisregisters.GrAr.Edit.Validators;
-    using Building;
     using Building.Validators;
     using BuildingRegistry.Building;
     using FluentValidation;
@@ -28,7 +27,7 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Validators
                 .WithMessage(ValidationErrors.Common.BuildingUnitRequiredPosition.Message);
 
             RuleFor(x => x.Positie)
-                .Must(gml => GmlPointValidator.IsValid(gml, GmlHelpers.CreateGmlReader()))
+                .Must(GmlPointValidator.IsValidPoint)
                 .When(x => !string.IsNullOrEmpty(x.Positie))
                 .WithErrorCode(ValidationErrors.Common.InvalidBuildingUnitPosition.Code)
                 .WithMessage(ValidationErrors.Common.InvalidBuildingUnitPosition.Message);

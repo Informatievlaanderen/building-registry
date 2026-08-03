@@ -58,6 +58,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.Building.WhenPlanningBuilding
             var result = (AcceptedResult)await _controller.Plan(
                 MockValidRequestValidator<PlanBuildingRequest>(),
                 new PlanBuildingSqsRequestFactory(new Mock<IPersistentLocalIdGenerator>().Object),
+                Normalizer(),
                 request);
 
             result.Should().NotBeNull();
@@ -95,6 +96,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.Building.WhenPlanningBuilding
             var result = (AcceptedResult)await _controller.Plan(
                 MockValidRequestValidator<PlanBuildingRequest>(),
                 new PlanBuildingSqsRequestFactory(new Mock<IPersistentLocalIdGenerator>().Object),
+                Normalizer(),
                 request);
 
             result.Should().NotBeNull();

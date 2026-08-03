@@ -28,6 +28,7 @@ namespace BuildingRegistry.Api.BackOffice.Building
         /// <param name="validator"></param>
         /// <param name="buildingExistsValidator"></param>
         /// <param name="ifMatchHeaderValidator"></param>
+        /// <param name="gmlGeometryNormalizer"></param>
         /// <param name="persistentLocalId"></param>
         /// <param name="request"></param>
         /// <param name="ifMatchHeaderValue"></param>
@@ -50,6 +51,7 @@ namespace BuildingRegistry.Api.BackOffice.Building
             [FromServices] IValidator<ChangeBuildingOutlineRequest> validator,
             [FromServices] BuildingExistsValidator buildingExistsValidator,
             [FromServices] IIfMatchHeaderValidator ifMatchHeaderValidator,
+            [FromServices] GmlGeometryNormalizer gmlGeometryNormalizer,
             [FromRoute] int persistentLocalId,
             [FromBody] ChangeBuildingOutlineRequest request,
             [FromHeader(Name = "If-Match")] string? ifMatchHeaderValue,
@@ -57,7 +59,11 @@ namespace BuildingRegistry.Api.BackOffice.Building
         {
             request.PersistentLocalId = persistentLocalId;
             await validator.ValidateAndThrowAsync(request, cancellationToken);
-            request.GeometriePolygoon = request.GeometriePolygoon.ToCleanPolygon();
+
+            request.GeometriePolygoon = gmlGeometryNormalizer
+                .ToEventStoreSrs(request.GeometriePolygoon)
+                .ToCleanPolygon();
+
             await validator.ValidateAndThrowAsync(request, cancellationToken);
 
             if (!await buildingExistsValidator.Exists(new BuildingPersistentLocalId(request.PersistentLocalId),

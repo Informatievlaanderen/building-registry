@@ -12,6 +12,7 @@ using Be.Vlaanderen.Basisregisters.Auth.AcmIdm;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Be.Vlaanderen.Basisregisters.Sqs.Exceptions;
     using FluentValidation;
+    using Infrastructure;
     using Microsoft.AspNetCore.Authentication.JwtBearer;
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Http;
@@ -25,6 +26,7 @@ using Be.Vlaanderen.Basisregisters.Auth.AcmIdm;
         /// Plan een gebouweenheid in.
         /// </summary>
         /// <param name="planBuildingUnitSqsRequestFactory"></param>
+        /// <param name="gmlGeometryNormalizer"></param>
         /// <param name="request"></param>
         /// <param name="validator"></param>
         /// <param name="cancellationToken"></param>
@@ -41,10 +43,13 @@ using Be.Vlaanderen.Basisregisters.Auth.AcmIdm;
         public async Task<IActionResult> Plan(
             [FromServices] IValidator<PlanBuildingUnitRequest> validator,
             [FromServices] PlanBuildingUnitSqsRequestFactory planBuildingUnitSqsRequestFactory,
+            [FromServices] GmlGeometryNormalizer gmlGeometryNormalizer,
             [FromBody] PlanBuildingUnitRequest request,
             CancellationToken cancellationToken = default)
         {
             await validator.ValidateAndThrowAsync(request, cancellationToken);
+
+            request.Positie = gmlGeometryNormalizer.ToEventStoreSrsWhenPresent(request.Positie);
 
             try
             {

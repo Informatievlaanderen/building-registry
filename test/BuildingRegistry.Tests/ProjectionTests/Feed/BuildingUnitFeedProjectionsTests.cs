@@ -27,6 +27,8 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
     using Moq;
     using Newtonsoft.Json;
     using NodaTime;
+    // GrAr.Oslo declares a PositieGeometrieMethode of its own; the feed documents use the legacy one.
+    using PositieGeometrieMethode = Be.Vlaanderen.Basisregisters.GrAr.Legacy.PositieGeometrieMethode;
     using Projections.Feed;
     using Projections.Feed.BuildingFeed;
     using Projections.Feed.BuildingUnitFeed;

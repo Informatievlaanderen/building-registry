@@ -37,10 +37,12 @@ namespace BuildingRegistry.Tests.BackOffice.Api.Building.WhenRealizingAndMeasuri
                 .Returns(Task.FromResult(expectedLocationResult));
 
             var request = Fixture.Create<RealizeAndMeasureUnplannedBuildingRequest>();
+            request.GrbData.GeometriePolygoon = GeometryHelper.GmlPolygonGeometry;
 
             await _controller.RealizeAndMeasureUnplannedBuilding(
                 MockValidRequestValidator<RealizeAndMeasureUnplannedBuildingRequest>(),
                 new RealizeAndMeasureUnplannedBuildingSqsRequestFactory(new Mock<IPersistentLocalIdGenerator>().Object),
+                Normalizer(),
                 request);
 
             MockMediator.Verify(x =>

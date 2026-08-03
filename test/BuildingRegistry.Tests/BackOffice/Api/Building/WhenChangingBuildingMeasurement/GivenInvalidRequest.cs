@@ -42,6 +42,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.Building.WhenChangingBuildingMea
             Func<Task> act = async () => await _controller.ChangeMeasurement(
                 new ChangeBuildingMeasurementRequestValidator(),
                 null,
+                Normalizer(),
                 buildingPersistentLocalId,
                 new ChangeBuildingMeasurementRequest { GrbData = new GrbData{ GeometriePolygoon = polygon } },
                 CancellationToken.None);

@@ -32,11 +32,15 @@ namespace BuildingRegistry.Tests.BackOffice.Api.Building.WhenMeasuringBuilding
         {
             _streamStore.SetStreamNotFound();
 
+            var request = Fixture.Create<MeasureBuildingRequest>();
+            request.GrbData.GeometriePolygoon = GeometryHelper.GmlPolygonGeometry;
+
             var act = async () => await _controller.Measure(
                 MockValidRequestValidator<MeasureBuildingRequest>(),
                 new BuildingExistsValidator(_streamStore.Object),
+                Normalizer(),
                 Fixture.Create<BuildingPersistentLocalId>(),
-                Fixture.Create<MeasureBuildingRequest>());
+                request);
 
             act
                 .Should()

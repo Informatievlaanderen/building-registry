@@ -9,6 +9,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api
     using Be.Vlaanderen.Basisregisters.Api;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance.AcmIdm;
+    using BuildingRegistry.Api.BackOffice.Abstractions;
     using BuildingRegistry.Api.BackOffice.Infrastructure;
     using BuildingRegistry.Api.BackOffice.Infrastructure.Options;
     using BuildingRegistry.Building;
@@ -51,6 +52,12 @@ namespace BuildingRegistry.Tests.BackOffice.Api
 
             MockMediator = new Mock<IMediator>();
         }
+
+        /// <summary>
+        /// The geometry normalizer runs on a request that has already passed validation, so it always gets valid GML.
+        /// </summary>
+        protected static GmlGeometryNormalizer Normalizer(bool useLambert2008EventStore = false)
+            => new GmlGeometryNormalizer(new UseLambert2008EventStoreToggle(useLambert2008EventStore));
 
         protected IIfMatchHeaderValidator MockIfMatchValidator(bool expectedResult)
         {

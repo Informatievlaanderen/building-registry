@@ -23,7 +23,7 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Requests
         public PositieGeometrieMethode PositieGeometrieMethode { get; set; }
 
         /// <summary>
-        /// Puntgeometrie van de gebouweenheid binnen het gebouw in GML-3 formaat met Lambert 72 referentie systeem.
+        /// Puntgeometrie van de gebouweenheid binnen het gebouw in GML-3 formaat met Lambert 72 (EPSG 31370) of Lambert 2008 (EPSG 3812) referentie systeem.
         /// </summary>
         [DataMember(Name = "Positie", Order = 2)]
         [JsonProperty(Required = Required.Default)]

@@ -35,6 +35,13 @@ namespace BuildingRegistry.Tests.BackOffice.Api.Building.WhenMeasuringBuilding
             _streamStore = new Mock<IStreamStore>();
         }
 
+        private MeasureBuildingRequest CreateRequest(string polygon = GeometryHelper.GmlPolygonGeometry)
+        {
+            var request = Fixture.Create<MeasureBuildingRequest>();
+            request.GrbData.GeometriePolygoon = polygon;
+            return request;
+        }
+
         [Fact]
         public async Task ThenTicketLocationIsReturned()
         {
@@ -48,11 +55,12 @@ namespace BuildingRegistry.Tests.BackOffice.Api.Building.WhenMeasuringBuilding
             _streamStore.SetStreamFound();
 
             var buildingPersistentLocalId = Fixture.Create<BuildingPersistentLocalId>();
-            var request = Fixture.Create<MeasureBuildingRequest>();
+            var request = CreateRequest();
 
             var result = (AcceptedResult)await _controller.Measure(
                 MockValidRequestValidator<MeasureBuildingRequest>(),
                 new BuildingExistsValidator(_streamStore.Object),
+                Normalizer(),
                 buildingPersistentLocalId,
                 request);
 
@@ -78,6 +86,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.Building.WhenMeasuringBuilding
             var act = async () => await _controller.Measure(
                 new MeasureBuildingRequestValidator(),
                 new BuildingExistsValidator(_streamStore.Object),
+                Normalizer(),
                 Fixture.Create<BuildingPersistentLocalId>(),
                 Fixture.Create<MeasureBuildingRequest>());
 

@@ -10,6 +10,7 @@ namespace BuildingRegistry.Api.BackOffice.Building
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using BuildingRegistry.Building;
     using FluentValidation;
+    using Infrastructure;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.OpenApi;
@@ -23,6 +24,7 @@ namespace BuildingRegistry.Api.BackOffice.Building
         /// </summary>
         /// <param name="validator"></param>
         /// <param name="buildingExistsValidator"></param>
+        /// <param name="gmlGeometryNormalizer"></param>
         /// <param name="persistentLocalId"></param>
         /// <param name="request"></param>
         /// <param name="cancellationToken"></param>
@@ -38,11 +40,14 @@ namespace BuildingRegistry.Api.BackOffice.Building
         public async Task<IActionResult> CorrectMeasurement(
             [FromServices] IValidator<CorrectBuildingMeasurementRequest> validator,
             [FromServices] BuildingExistsValidator buildingExistsValidator,
+            [FromServices] GmlGeometryNormalizer gmlGeometryNormalizer,
             [FromRoute] int persistentLocalId,
             [FromBody] CorrectBuildingMeasurementRequest request,
             CancellationToken cancellationToken = default)
         {
             await validator.ValidateAndThrowAsync(request, cancellationToken);
+
+            request.GrbData.GeometriePolygoon = gmlGeometryNormalizer.ToEventStoreSrs(request.GrbData.GeometriePolygoon);
 
             if (!await buildingExistsValidator.Exists(
                     new BuildingPersistentLocalId(persistentLocalId), cancellationToken))
