@@ -49,10 +49,12 @@ namespace BuildingRegistry.Tests.BackOffice.Api.Building.WhenCorrectingBuildingM
 
             var buildingPersistentLocalId = Fixture.Create<BuildingPersistentLocalId>();
             var request = Fixture.Create<CorrectBuildingMeasurementRequest>();
+            request.GrbData.GeometriePolygoon = GeometryHelper.GmlPolygonGeometry;
 
             var result = (AcceptedResult)await _controller.CorrectMeasurement(
                 MockValidRequestValidator<CorrectBuildingMeasurementRequest>(),
                 new BuildingExistsValidator(_streamStore.Object),
+                Normalizer(),
                 buildingPersistentLocalId,
                 request);
 
@@ -78,6 +80,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.Building.WhenCorrectingBuildingM
             var act = async () => await _controller.CorrectMeasurement(
                 new CorrectBuildingMeasurementRequestValidator(),
                 new BuildingExistsValidator(_streamStore.Object),
+                Normalizer(),
                 Fixture.Create<BuildingPersistentLocalId>(),
                 Fixture.Create<CorrectBuildingMeasurementRequest>());
 

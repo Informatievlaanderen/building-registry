@@ -23,6 +23,8 @@ namespace BuildingRegistry.Projections.Feed.BuildingUnitFeed
     using Microsoft.EntityFrameworkCore;
     using NetTopologySuite.Geometries;
     using NodaTime;
+    // GrAr.Oslo declares a PositieGeometrieMethode of its own; the feed documents use the legacy one.
+    using PositieGeometrieMethode = Be.Vlaanderen.Basisregisters.GrAr.Legacy.PositieGeometrieMethode;
 
     [ConnectedProjectionName("Feed endpoint gebouweenheid (cloudevents)")]
     [ConnectedProjectionDescription("Projectie die de gebouweenheid data voor de gebouweenheid cloudevent feed voorziet.")]

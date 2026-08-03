@@ -42,6 +42,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.Building.WhenChangingBuildingOut
                 new ChangeBuildingOutlineRequestValidator(),
                 null,
                 MockIfMatchValidator(true),
+                Normalizer(),
                 buildingPersistentLocalId,
                 new ChangeBuildingOutlineRequest { GeometriePolygoon = polygon },
                 null,

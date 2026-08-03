@@ -1,4 +1,4 @@
-namespace BuildingRegistry.Tests.BackOffice.Api.BuildingUnit.WhenCorrectingBuildingUnitPosition
+﻿namespace BuildingRegistry.Tests.BackOffice.Api.BuildingUnit.WhenCorrectingBuildingUnitPosition
 {
     using System;
     using System.Linq;
@@ -40,6 +40,17 @@ namespace BuildingRegistry.Tests.BackOffice.Api.BuildingUnit.WhenCorrectingBuild
             _controller = CreateBuildingUnitControllerWithUser<BuildingUnitController>();
         }
 
+        /// <summary>
+        /// The geometry normalizer runs on a request that has already passed validation, so it always gets a valid
+        /// GML point.
+        /// </summary>
+        private CorrectBuildingUnitPositionRequest CreateRequest(string position = GeometryHelper.GmlPointGeometry)
+        {
+            var request = Fixture.Create<CorrectBuildingUnitPositionRequest>();
+            request.Positie = position;
+            return request;
+        }
+
         [Theory]
         [InlineData("")]
         [InlineData(null)]
@@ -58,6 +69,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.BuildingUnit.WhenCorrectingBuild
             Func<Task> act = async () => await _controller.CorrectPosition(
                 MockIfMatchValidator(true),
                 new CorrectBuildingUnitPositionRequestValidator(),
+                Normalizer(),
                 0,
                 request,
                 null,
@@ -89,6 +101,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.BuildingUnit.WhenCorrectingBuild
             Func<Task> act = async () => await _controller.CorrectPosition(
                 MockIfMatchValidator(true),
                 new CorrectBuildingUnitPositionRequestValidator(),
+                Normalizer(),
                 0,
                 request,
                 null,
@@ -116,12 +129,13 @@ namespace BuildingRegistry.Tests.BackOffice.Api.BuildingUnit.WhenCorrectingBuild
 
             _streamStore.SetStreamFound();
 
-            var request = Fixture.Create<CorrectBuildingUnitPositionRequest>();
+            var request = CreateRequest();
             var expectedIfMatchHeader = Fixture.Create<string>();
 
             var result = (AcceptedResult)await _controller.CorrectPosition(
                 MockIfMatchValidator(true),
                 MockValidRequestValidator<CorrectBuildingUnitPositionRequest>(),
+                Normalizer(),
                 0,
                 request,
                 expectedIfMatchHeader,
@@ -142,6 +156,37 @@ namespace BuildingRegistry.Tests.BackOffice.Api.BuildingUnit.WhenCorrectingBuild
                     CancellationToken.None));
         }
 
+        [Theory]
+        [InlineData(false, GeometryHelper.GmlPointGeometry, GeometryHelper.GmlPointGeometry)]
+        [InlineData(false, GeometryHelper.GmlPointGeometryLambert2008, GeometryHelper.NormalizedGmlPointGeometry)]
+        [InlineData(true, GeometryHelper.GmlPointGeometry, GeometryHelper.NormalizedGmlPointGeometryLambert2008)]
+        [InlineData(true, GeometryHelper.GmlPointGeometryLambert2008, GeometryHelper.GmlPointGeometryLambert2008)]
+        public async Task ThenPositionIsSentInTheEventStoreReferenceSystem(
+            bool useLambert2008EventStore,
+            string requestedPosition,
+            string expectedPosition)
+        {
+            MockMediator
+                .Setup(x => x.Send(It.IsAny<CorrectBuildingUnitPositionSqsRequest>(), CancellationToken.None))
+                .Returns(Task.FromResult(new LocationResult(CreateTicketUri(Fixture.Create<Guid>()))));
+
+            _streamStore.SetStreamFound();
+
+            await _controller.CorrectPosition(
+                MockIfMatchValidator(true),
+                MockValidRequestValidator<CorrectBuildingUnitPositionRequest>(),
+                Normalizer(useLambert2008EventStore),
+                0,
+                CreateRequest(requestedPosition),
+                ifMatchHeaderValue: null);
+
+            MockMediator.Verify(x =>
+                x.Send(
+                    It.Is<CorrectBuildingUnitPositionSqsRequest>(sqsRequest =>
+                        sqsRequest.Request.Positie == expectedPosition),
+                    CancellationToken.None));
+        }
+
         [Fact]
         public void WithAggregateIdNotFound_ThenValidationErrorIsThrown()
         {
@@ -151,7 +196,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.BuildingUnit.WhenCorrectingBuild
 
             _streamStore.SetStreamNotFound();
 
-            var request = Fixture.Create<CorrectBuildingUnitPositionRequest>();
+            var request = CreateRequest();
 
             Func<Task> act = async () =>
             {
@@ -159,6 +204,7 @@ namespace BuildingRegistry.Tests.BackOffice.Api.BuildingUnit.WhenCorrectingBuild
 
                     MockIfMatchValidator(true),
                     MockValidRequestValidator<CorrectBuildingUnitPositionRequest>(),
+                    Normalizer(),
                     0,
                     request,
                     string.Empty);
@@ -180,12 +226,13 @@ namespace BuildingRegistry.Tests.BackOffice.Api.BuildingUnit.WhenCorrectingBuild
             MockMediator.Setup<object?>(x => x.Send(It.IsAny<CorrectBuildingUnitPositionSqsRequest>(), CancellationToken.None).Result)
                 .Throws(new AggregateNotFoundException("", typeof(Building)));
 
-            var request = Fixture.Create<CorrectBuildingUnitPositionRequest>();
+            var request = CreateRequest();
 
             //Act
             Func<Task> act = async () => await _controller.CorrectPosition(
                 MockIfMatchValidator(true),
                 MockValidRequestValidator<CorrectBuildingUnitPositionRequest>(),
+                Normalizer(),
                 0,
                 request,
                 null,

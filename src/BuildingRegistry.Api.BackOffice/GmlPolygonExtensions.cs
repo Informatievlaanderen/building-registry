@@ -9,8 +9,7 @@
     {
         public static string ToCleanPolygon(this string gmlPolygon)
         {
-            var gmlReader = GmlHelpers.CreateGmlReader();
-            var polygon = gmlReader.Read(gmlPolygon);
+            var polygon = gmlPolygon.ReadGeometry();
 
             var cleanedPolygon = RemoveConsecutiveDuplicatePoints(polygon);
             return cleanedPolygon.ToGmlJsonPolygon()!.Gml;

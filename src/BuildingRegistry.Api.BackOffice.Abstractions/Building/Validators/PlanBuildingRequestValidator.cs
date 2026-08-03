@@ -12,7 +12,7 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.Building.Validators
         {
             Polygon? polygon = null;
             RuleFor(x => x.GeometriePolygoon)
-                .Must(gml => GmlPolygonValidator.IsValid(gml, GmlHelpers.CreateGmlReader(), null, out polygon))
+                .Must(gml => GmlPolygonValidator.IsValidPolygon(gml, null, out polygon))
                 .WithErrorCode(ValidationErrors.Common.InvalidBuildingPolygonGeometry.Code)
                 .WithMessage(ValidationErrors.Common.InvalidBuildingPolygonGeometry.Message);
 

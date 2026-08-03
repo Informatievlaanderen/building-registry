@@ -1,6 +1,7 @@
 namespace BuildingRegistry.Tests.BackOffice.Validators
 {
     using System.Threading.Tasks;
+    using Be.Vlaanderen.Basisregisters.GrAr.Edit.Contracts;
     using BuildingRegistry.Api.BackOffice.Abstractions.Building.Validators;
     using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Requests;
     using BuildingRegistry.Api.BackOffice.Abstractions.BuildingUnit.Validators;
@@ -36,6 +37,41 @@ namespace BuildingRegistry.Tests.BackOffice.Validators
             result.ShouldHaveValidationErrorFor(nameof(PlanBuildingUnitRequest.GebouwId))
                 .WithErrorCode("GebouweenheidGebouwIdNietGekendValidatie")
                 .WithErrorMessage($"De gebouwId '{buildingId}' is niet gekend in het gebouwenregister.");
+        }
+
+        [Theory]
+        [InlineData(GeometryHelper.GmlPointGeometry)]
+        [InlineData(GeometryHelper.GmlPointGeometryLambert2008)]
+        [InlineData(GeometryHelper.NormalizedGmlPointGeometry)]
+        [InlineData(GeometryHelper.NormalizedGmlPointGeometryLambert2008)]
+        public async Task GivenSupportedPositionReferenceSystem_ThenNoValidationErrorForPosition(string position)
+        {
+            var result = await _validator.TestValidateAsync(new PlanBuildingUnitRequest
+            {
+                GebouwId = "https://data.vlaanderen.be/id/gebouw/1",
+                PositieGeometrieMethode = PositieGeometrieMethode.AangeduidDoorBeheerder,
+                Positie = position
+            });
+
+            result.ShouldNotHaveValidationErrorFor(nameof(PlanBuildingUnitRequest.Positie));
+        }
+
+        [Theory]
+        [InlineData("<gml:Point srsName=\"https://www.opengis.net/def/crs/EPSG/0/4326\" xmlns:gml=\"http://www.opengis.net/gml/3.2\"><gml:pos>4.35 50.85</gml:pos></gml:Point>")]
+        [InlineData("<gml:Point srsName=\"https://INVALIDURL\" xmlns:gml=\"http://www.opengis.net/gml/3.2\"><gml:pos>141299.00 185188.00</gml:pos></gml:Point>")]
+        [InlineData("<gml:Point missingSrSNameAttribute=\"https://www.opengis.net/def/crs/EPSG/0/31370\" xmlns:gml=\"http://www.opengis.net/gml/3.2\"><gml:pos>141299.00 185188.00</gml:pos></gml:Point>")]
+        public async Task GivenUnsupportedPositionReferenceSystem_ThenReturnsExpectedFailure(string position)
+        {
+            var result = await _validator.TestValidateAsync(new PlanBuildingUnitRequest
+            {
+                GebouwId = "https://data.vlaanderen.be/id/gebouw/1",
+                PositieGeometrieMethode = PositieGeometrieMethode.AangeduidDoorBeheerder,
+                Positie = position
+            });
+
+            result.ShouldHaveValidationErrorFor(nameof(PlanBuildingUnitRequest.Positie))
+                .WithErrorCode("GebouweenheidPositieformaatValidatie")
+                .WithErrorMessage("De positie is geen geldige gml-puntgeometrie.");
         }
     }
 }

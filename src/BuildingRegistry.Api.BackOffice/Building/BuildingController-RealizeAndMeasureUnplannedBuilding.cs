@@ -7,6 +7,7 @@ namespace BuildingRegistry.Api.BackOffice.Building
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using FluentValidation;
+    using Infrastructure;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
     using NodaTime;
@@ -19,6 +20,7 @@ namespace BuildingRegistry.Api.BackOffice.Building
         /// </summary>
         /// <param name="validator"></param>
         /// <param name="sqsRequestFactory"></param>
+        /// <param name="gmlGeometryNormalizer"></param>
         /// <param name="request"></param>
         /// <param name="cancellationToken"></param>
         [HttpPost("acties/vaststellen")]
@@ -31,10 +33,13 @@ namespace BuildingRegistry.Api.BackOffice.Building
         public async Task<IActionResult> RealizeAndMeasureUnplannedBuilding(
             [FromServices] IValidator<RealizeAndMeasureUnplannedBuildingRequest> validator,
             [FromServices] RealizeAndMeasureUnplannedBuildingSqsRequestFactory sqsRequestFactory,
+            [FromServices] GmlGeometryNormalizer gmlGeometryNormalizer,
             [FromBody] RealizeAndMeasureUnplannedBuildingRequest request,
             CancellationToken cancellationToken = default)
         {
             await validator.ValidateAndThrowAsync(request, cancellationToken);
+
+            request.GrbData.GeometriePolygoon = gmlGeometryNormalizer.ToEventStoreSrs(request.GrbData.GeometriePolygoon);
 
             var result = await Mediator.Send(
                 sqsRequestFactory.Create(request, GetMetadata(), new ProvenanceData(new Provenance(

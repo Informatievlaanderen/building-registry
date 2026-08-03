@@ -28,6 +28,7 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
         /// </summary>
         /// <param name="ifMatchHeaderValidator"></param>
         /// <param name="validator"></param>
+        /// <param name="gmlGeometryNormalizer"></param>
         /// <param name="buildingUnitPersistentLocalId"></param>
         /// <param name="request"></param>
         /// <param name="ifMatchHeaderValue"></param>
@@ -45,12 +46,15 @@ namespace BuildingRegistry.Api.BackOffice.BuildingUnit
         public async Task<IActionResult> CorrectPosition(
             [FromServices] IIfMatchHeaderValidator ifMatchHeaderValidator,
             [FromServices] IValidator<CorrectBuildingUnitPositionRequest> validator,
+            [FromServices] GmlGeometryNormalizer gmlGeometryNormalizer,
             [FromRoute] int buildingUnitPersistentLocalId,
             [FromBody] CorrectBuildingUnitPositionRequest request,
             [FromHeader(Name = "If-Match")] string? ifMatchHeaderValue,
             CancellationToken ct = default)
         {
             await validator.ValidateAndThrowAsync(request, ct);
+
+            request.Positie = gmlGeometryNormalizer.ToEventStoreSrsWhenPresent(request.Positie);
 
             try
             {

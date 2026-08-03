@@ -35,6 +35,13 @@ namespace BuildingRegistry.Tests.BackOffice.Api.Building.WhenChangingBuildingMea
             _controller = CreateBuildingControllerWithUser<BuildingController>();
         }
 
+        private ChangeBuildingMeasurementRequest CreateRequest(string polygon = GeometryHelper.GmlPolygonGeometry)
+        {
+            var request = Fixture.Create<ChangeBuildingMeasurementRequest>();
+            request.GrbData.GeometriePolygoon = polygon;
+            return request;
+        }
+
         [Fact]
         public async Task ThenTicketLocationIsReturned()
         {
@@ -47,11 +54,12 @@ namespace BuildingRegistry.Tests.BackOffice.Api.Building.WhenChangingBuildingMea
 
             _streamStore.SetStreamFound();
 
-            var request = Fixture.Create<ChangeBuildingMeasurementRequest>();
+            var request = CreateRequest();
 
             var result = (AcceptedResult) await _controller.ChangeMeasurement(
                 MockValidRequestValidator<ChangeBuildingMeasurementRequest>(),
                 new BuildingExistsValidator(_streamStore.Object),
+                Normalizer(),
                 Fixture.Create<BuildingPersistentLocalId>(),
                 request);
 
@@ -69,6 +77,36 @@ namespace BuildingRegistry.Tests.BackOffice.Api.Building.WhenChangingBuildingMea
                     CancellationToken.None));
         }
 
+        [Theory]
+        [InlineData(false, GeometryHelper.GmlPolygonGeometry, GeometryHelper.GmlPolygonGeometry)]
+        [InlineData(false, GeometryHelper.GmlPolygonGeometryLambert2008, GeometryHelper.NormalizedGmlPolygonGeometry)]
+        [InlineData(true, GeometryHelper.GmlPolygonGeometry, GeometryHelper.NormalizedGmlPolygonGeometryLambert2008)]
+        [InlineData(true, GeometryHelper.GmlPolygonGeometryLambert2008, GeometryHelper.GmlPolygonGeometryLambert2008)]
+        public async Task ThenPolygonIsSentInTheEventStoreReferenceSystem(
+            bool useLambert2008EventStore,
+            string requestedPolygon,
+            string expectedPolygon)
+        {
+            MockMediator
+                .Setup(x => x.Send(It.IsAny<ChangeBuildingMeasurementSqsRequest>(), CancellationToken.None))
+                .Returns(Task.FromResult(new LocationResult(CreateTicketUri(Fixture.Create<Guid>()))));
+
+            _streamStore.SetStreamFound();
+
+            await _controller.ChangeMeasurement(
+                MockValidRequestValidator<ChangeBuildingMeasurementRequest>(),
+                new BuildingExistsValidator(_streamStore.Object),
+                Normalizer(useLambert2008EventStore),
+                Fixture.Create<BuildingPersistentLocalId>(),
+                CreateRequest(requestedPolygon));
+
+            MockMediator.Verify(x =>
+                x.Send(
+                    It.Is<ChangeBuildingMeasurementSqsRequest>(sqsRequest =>
+                        GmlAssertions.IsEquivalentGml(sqsRequest.Request.GrbData.GeometriePolygoon, expectedPolygon)),
+                    CancellationToken.None));
+        }
+
         [Fact]
         public void WithNonExistingBuildingPersistentLocalId_ThenThrowsApiException()
         {
@@ -79,8 +117,9 @@ namespace BuildingRegistry.Tests.BackOffice.Api.Building.WhenChangingBuildingMea
             var act = async () => await _controller.ChangeMeasurement(
                 MockValidRequestValidator<ChangeBuildingMeasurementRequest>(),
                 new BuildingExistsValidator(_streamStore.Object),
+                Normalizer(),
                 Fixture.Create<BuildingPersistentLocalId>(),
-                Fixture.Create<ChangeBuildingMeasurementRequest>(),
+                CreateRequest(),
                 CancellationToken.None);
 
             //Assert

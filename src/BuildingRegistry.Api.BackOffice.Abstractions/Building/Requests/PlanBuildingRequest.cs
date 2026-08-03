@@ -8,7 +8,7 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.Building.Requests
     public sealed class PlanBuildingRequest
     {
         /// <summary>
-        /// De schets van het gebouw in GML-3 formaat met Lambert 72 referentie systeem.
+        /// De schets van het gebouw in GML-3 formaat met Lambert 72 (EPSG 31370) of Lambert 2008 (EPSG 3812) referentie systeem.
         /// </summary>
         [DataMember(Name = "GeometriePolygoon", Order = 0)]
         [JsonProperty(Required = Required.Always)]

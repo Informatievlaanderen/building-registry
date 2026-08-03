@@ -8,6 +8,7 @@ namespace BuildingRegistry.Api.BackOffice.Building
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using FluentValidation;
+    using Infrastructure;
     using Microsoft.AspNetCore.Authentication.JwtBearer;
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Http;
@@ -21,6 +22,7 @@ namespace BuildingRegistry.Api.BackOffice.Building
         /// Plan een gebouw met schets in.
         /// </summary>
         /// <param name="planBuildingSqsRequestFactory"></param>
+        /// <param name="gmlGeometryNormalizer"></param>
         /// <param name="planBuildingRequest"></param>
         /// <param name="validator"></param>
         /// <param name="cancellationToken"></param>
@@ -39,11 +41,16 @@ namespace BuildingRegistry.Api.BackOffice.Building
         public async Task<IActionResult> Plan(
             [FromServices] IValidator<PlanBuildingRequest> validator,
             [FromServices] PlanBuildingSqsRequestFactory planBuildingSqsRequestFactory,
+            [FromServices] GmlGeometryNormalizer gmlGeometryNormalizer,
             [FromBody] PlanBuildingRequest planBuildingRequest,
             CancellationToken cancellationToken = default)
         {
             await validator.ValidateAndThrowAsync(planBuildingRequest, cancellationToken);
-            planBuildingRequest.GeometriePolygoon = planBuildingRequest.GeometriePolygoon.ToCleanPolygon();
+
+            planBuildingRequest.GeometriePolygoon = gmlGeometryNormalizer
+                .ToEventStoreSrs(planBuildingRequest.GeometriePolygoon)
+                .ToCleanPolygon();
+
             await validator.ValidateAndThrowAsync(planBuildingRequest, cancellationToken);
 
             var result = await Mediator.Send(

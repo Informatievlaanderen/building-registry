@@ -13,6 +13,7 @@ namespace BuildingRegistry.Api.BackOffice.Infrastructure.Modules
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance.AcmIdm;
     using BuildingRegistry.Infrastructure;
     using BuildingRegistry.Infrastructure.Modules;
+    using Configuration;
     using Consumer.Address;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc.Infrastructure;
@@ -70,6 +71,16 @@ namespace BuildingRegistry.Api.BackOffice.Infrastructure.Modules
             builder
                 .RegisterType<RealizeAndMeasureUnplannedBuildingSqsRequestFactory>()
                 .AsSelf();
+
+            builder
+                .RegisterInstance(new UseLambert2008EventStoreToggle(
+                    _configuration.GetValue<bool>($"{FeatureToggleOptions.ConfigurationKey}:{nameof(FeatureToggleOptions.UseLambert2008EventStore)}")))
+                .AsSelf();
+
+            builder
+                .RegisterType<GmlGeometryNormalizer>()
+                .AsSelf()
+                .SingleInstance();
 
             builder
                 .RegisterModule(new BackOfficeModule(_configuration, _services, _loggerFactory))
