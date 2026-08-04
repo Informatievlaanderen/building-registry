@@ -1,3 +1,10 @@
+# [6.1.0](https://github.com/informatievlaanderen/building-registry/compare/v6.0.2...v6.1.0) (2026-08-04)
+
+
+### Features
+
+* **backoffice:** add lambert2008 support for backoffice ([0b0cc46](https://github.com/informatievlaanderen/building-registry/commit/0b0cc46e2a9355f2872e3ed25d007431bd8e0b10))
+
 ## [6.0.2](https://github.com/informatievlaanderen/building-registry/compare/v6.0.1...v6.0.2) (2026-07-01)
 
 ## [6.0.1](https://github.com/informatievlaanderen/building-registry/compare/v6.0.0...v6.0.1) (2026-06-22)
