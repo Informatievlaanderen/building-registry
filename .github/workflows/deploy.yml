@@ -48,7 +48,6 @@ jobs:
         services: [
           'api',
           'backoffice-api',
-          'consumer',
           'consumer-address',
           'consumer-parcel',
           'producer',
@@ -56,9 +55,9 @@ jobs:
           'projector',
           'projections-backoffice',
           'last-changed-list',
+          'snapshot-verifier',
           'cache-invalidator',
-          'tools-console',
-          'snapshot-verifier'
+          'tools-console'
         ]
     with:
       environment: ${{ github.event.inputs.environment }}
