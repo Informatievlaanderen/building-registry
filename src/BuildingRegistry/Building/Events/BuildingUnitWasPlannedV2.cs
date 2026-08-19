@@ -21,7 +21,7 @@ namespace BuildingRegistry.Building.Events
         [EventPropertyDescription("Objectidentificator van de gebouweenheid.")]
         public int BuildingUnitPersistentLocalId { get; }
 
-        [EventPropertyDescription("Geometriemethode van de gebouweenheidpositie. Mogelijkheden: Outlined of MeasuredByGrb.")]
+        [EventPropertyDescription("Geometriemethode van de gebouweenheidpositie. Mogelijkheden: DerivedFromObject of AppointedByAdministrator.")]
         public string GeometryMethod { get; }
 
         [EventPropertyDescription("Extended WKB-voorstelling van de gebouweenheidpositie (Hexadecimale notatie).")]

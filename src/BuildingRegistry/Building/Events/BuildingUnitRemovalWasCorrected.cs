@@ -27,7 +27,7 @@ namespace BuildingRegistry.Building.Events
         [EventPropertyDescription("Functie van de gebouweenheid.")]
         public string Function { get; }
 
-        [EventPropertyDescription("Geometriemethode van de gebouweenheidpositie. Mogelijkheden: Outlined of MeasuredByGrb.")]
+        [EventPropertyDescription("Geometriemethode van de gebouweenheidpositie. Mogelijkheden: DerivedFromObject of AppointedByAdministrator.")]
         public string GeometryMethod { get; }
 
         [EventPropertyDescription("Extended WKB-voorstelling van de gebouweenheidpositie (Hexadecimale notatie).")]
