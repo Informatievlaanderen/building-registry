@@ -1,3 +1,15 @@
+# [6.2.0](https://github.com/informatievlaanderen/building-registry/compare/v6.1.0...v6.2.0) (2026-08-19)
+
+
+### Bug Fixes
+
+* BU event descriptions for position method ([7c6e5fb](https://github.com/informatievlaanderen/building-registry/commit/7c6e5fbc6363f19a5e28c340ba5840f9f09d8ac4))
+
+
+### Features
+
+* **oslo:** add v3 endpoints + refactor changefeed oslo ([979c114](https://github.com/informatievlaanderen/building-registry/commit/979c1147cc5b29f655fe5a781c5bc0df324e1644))
+
 # [6.1.0](https://github.com/informatievlaanderen/building-registry/compare/v6.0.2...v6.1.0) (2026-08-04)
 
 
