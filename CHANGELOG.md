@@ -1,3 +1,12 @@
+## [6.2.2](https://github.com/informatievlaanderen/building-registry/compare/v6.2.1...v6.2.2) (2026-08-20)
+
+
+### Bug Fixes
+
+* add lastchanged list for v3 ([c39573e](https://github.com/informatievlaanderen/building-registry/commit/c39573e5e2e41777ab0d7fc309b243ed0ff5b2c6))
+* **feed:** race condition in getting the muni geometries ([44b74e2](https://github.com/informatievlaanderen/building-registry/commit/44b74e290a08206cfa89f3bb1301914c342384c1))
+* **feed:** update examples ([165bf20](https://github.com/informatievlaanderen/building-registry/commit/165bf2004be457775e178ba854e38496d3820972))
+
 ## [6.2.1](https://github.com/informatievlaanderen/building-registry/compare/v6.2.0...v6.2.1) (2026-08-20)
 
 
