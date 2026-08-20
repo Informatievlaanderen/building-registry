@@ -100,6 +100,12 @@ namespace BuildingRegistry.Projections.LastChangedList.Console.Infrastructure.Mo
                     ConnectedProjectionSettings.Default)
                 .RegisterProjections<BuildingUnitProjections, LastChangedListContext>(
                     context => new BuildingUnitProjections(context.Resolve<LastChangedListBuildingUnitCacheValidator>()),
+                    ConnectedProjectionSettings.Default)
+                .RegisterProjections<BuildingProjectionsV3, LastChangedListContext>(
+                    context => new BuildingProjectionsV3(context.Resolve<LastChangedListBuildingCacheValidator>()),
+                    ConnectedProjectionSettings.Default)
+                .RegisterProjections<BuildingUnitProjectionsV3, LastChangedListContext>(
+                    context => new BuildingUnitProjectionsV3(context.Resolve<LastChangedListBuildingUnitCacheValidator>()),
                     ConnectedProjectionSettings.Default);
         }
     }

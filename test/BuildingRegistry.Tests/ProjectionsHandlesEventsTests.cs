@@ -175,7 +175,9 @@ namespace BuildingRegistry.Tests
             yield return [new List<ConnectedProjection<LastChangedListContext>>
             {
                 new BuildingProjections(Mock.Of<ICacheValidator>()),
-                new BuildingUnitProjections(Mock.Of<ICacheValidator>())
+                new BuildingProjectionsV3(Mock.Of<ICacheValidator>()),
+                new BuildingUnitProjections(Mock.Of<ICacheValidator>()),
+                new BuildingUnitProjectionsV3(Mock.Of<ICacheValidator>()),
             }];
 
             yield return [new List<ConnectedProjection<IntegrationContext>>

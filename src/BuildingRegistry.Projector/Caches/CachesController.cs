@@ -21,7 +21,9 @@ namespace BuildingRegistry.Projector.Caches
         private static Dictionary<string, string> _projectionNameMapper = new Dictionary<string, string>()
         {
             {"BuildingRegistry.Projections.LastChangedList.BuildingProjections", BuildingProjections.ProjectionName},
-            {"BuildingRegistry.Projections.LastChangedList.BuildingUnitProjections", BuildingUnitProjections.ProjectionName}
+            {"BuildingRegistry.Projections.LastChangedList.BuildingProjectionsV3", BuildingProjectionsV3.ProjectionName},
+            {"BuildingRegistry.Projections.LastChangedList.BuildingUnitProjections", BuildingUnitProjections.ProjectionName},
+            {"BuildingRegistry.Projections.LastChangedList.BuildingUnitProjectionsV3", BuildingUnitProjectionsV3.ProjectionName}
         };
 
         [HttpGet]
