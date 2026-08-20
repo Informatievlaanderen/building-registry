@@ -28,8 +28,8 @@ namespace BuildingRegistry.Api.Oslo.Building.V3.ChangeFeed
                                  "dataschema": "{{_responseOptions.BuildingFeed.DataSchemaUrl}}",
                                  "basisregisterseventtype": "BuildingWasMigrated",
                                  "basisregisterscausationid": "e675177c-b243-550d-acff-1a4891bbf669",
+                                 "subject": "https://data.vlaanderen.be/id/gebouw/6763967",
                                  "data": {
-                                     "@id": "https://data.vlaanderen.be/id/gebouw/6763967",
                                      "objectId": "6763967",
                                      "naamruimte": "https://data.vlaanderen.be/id/gebouw",
                                      "versieId": "2023-11-02T07:24:43+01:00",
@@ -38,27 +38,25 @@ namespace BuildingRegistry.Api.Oslo.Building.V3.ChangeFeed
                                      ],
                                      "attributen": [
                                          {
-                                             "naam": "gebouwStatus",
+                                             "naam": "status",
                                              "oudeWaarde": null,
-                                             "nieuweWaarde": "gerealiseerd"
+                                             "nieuweWaarde": "https://data.vlaanderen.be/id/concept/gebouwstatus/gerealiseerd"
                                          },
                                          {
-                                             "naam": "geometrieMethode",
+                                             "naam": "geometrie.methode",
                                              "oudeWaarde": null,
-                                             "nieuweWaarde": "ingemetenGRB"
+                                             "nieuweWaarde": "https://data.vlaanderen.be/id/concept/2Dgeometriemethode/ingemetenGRB"
                                          },
                                          {
-                                             "naam": "gebouwGeometrie",
+                                             "naam": "geometrie.geometrie",
                                              "oudeWaarde": null,
                                              "nieuweWaarde": [
                                                  {
-                                                     "type": "Polygon",
-                                                     "projectie": "http://www.opengis.net/def/crs/EPSG/0/31370",
+                                                     "type": "Polygoon",
                                                      "gml": "<gml:Polygon srsName=\"http://www.opengis.net/def/crs/EPSG/0/31370\" xmlns:gml=\"http://www.opengis.net/gml/3.2\"><gml:exterior><gml:LinearRing><gml:posList>140284.15277253836 186724.74131567031 140291.06016454101 186726.38355567306 140288.22675654292 186738.25055567548 140281.19098aborl54014 186736.57090367282 140284.15277253836 186724.74131567031</gml:posList></gml:LinearRing></gml:exterior></gml:Polygon>"
                                                  },
                                                  {
-                                                     "type": "Polygon",
-                                                     "projectie": "http://www.opengis.net/def/crs/EPSG/0/3812",
+                                                     "type": "Polygoon",
                                                      "gml": "<gml:Polygon srsName=\"http://www.opengis.net/def/crs/EPSG/0/3812\" xmlns:gml=\"http://www.opengis.net/gml/3.2\"><gml:exterior><gml:LinearRing><gml:posList>640279.35 686715.64 640286.26 686717.28 640283.43 686729.15 640276.39 686727.47 640279.35 686715.64</gml:posList></gml:LinearRing></gml:exterior></gml:Polygon>"
                                                  }
                                              ]

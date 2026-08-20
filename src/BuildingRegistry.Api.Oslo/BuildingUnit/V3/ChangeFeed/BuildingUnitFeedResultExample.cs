@@ -28,8 +28,8 @@ namespace BuildingRegistry.Api.Oslo.BuildingUnit.V3.ChangeFeed
                                  "dataschema": "{{_responseOptions.BuildingUnitFeed?.DataSchemaUrl}}",
                                  "basisregisterseventtype": "BuildingWasMigrated",
                                  "basisregisterscausationid": "1af00df5-93ff-5319-a073-ca4bcc6b28f0",
+                                 "subject": "https://data.vlaanderen.be/id/gebouweenheid/6356866",
                                  "data": {
-                                     "@id": "https://data.vlaanderen.be/id/gebouweenheid/6356866",
                                      "objectId": "6356866",
                                      "naamruimte": "https://data.vlaanderen.be/id/gebouweenheid",
                                      "versieId": "2023-11-02T07:24:43+01:00",
@@ -38,45 +38,43 @@ namespace BuildingRegistry.Api.Oslo.BuildingUnit.V3.ChangeFeed
                                      ],
                                      "attributen": [
                                          {
-                                             "naam": "gebouweenheidStatus",
+                                             "naam": "status",
                                              "oudeWaarde": null,
-                                             "nieuweWaarde": "gerealiseerd"
+                                             "nieuweWaarde": "https://data.vlaanderen.be/id/concept/gebouweenheidstatus/gerealiseerd"
                                          },
                                          {
-                                             "naam": "gebouweenheidFunctie",
+                                             "naam": "functie",
                                              "oudeWaarde": null,
-                                             "nieuweWaarde": "nietGekend"
+                                             "nieuweWaarde": "https://data.vlaanderen.be/id/concept/gebouweenheidfunctie/nietGekend"
                                          },
                                          {
-                                             "naam": "positieGeometrieMethode",
+                                             "naam": "positie.methode",
                                              "oudeWaarde": null,
-                                             "nieuweWaarde": "aangeduidDoorBeheerder"
+                                             "nieuweWaarde": "https://data.vlaanderen.be/id/concept/geometriemethode/aangeduidDoorBeheerder"
                                          },
                                          {
-                                             "naam": "gebouweenheidPositie",
+                                             "naam": "positie.geometrie",
                                              "oudeWaarde": null,
                                              "nieuweWaarde": [
                                                  {
-                                                     "type": "Point",
-                                                     "projectie": "http://www.opengis.net/def/crs/EPSG/0/31370",
+                                                     "type": "Punt",
                                                      "gml": "<gml:Point srsName=\"http://www.opengis.net/def/crs/EPSG/0/31370\" xmlns:gml=\"http://www.opengis.net/gml/3.2\"><gml:pos>144401.12 201731.91</gml:pos></gml:Point>"
                                                  },
                                                  {
-                                                     "type": "Point",
-                                                     "projectie": "http://www.opengis.net/def/crs/EPSG/0/3812",
+                                                     "type": "Punt",
                                                      "gml": "<gml:Point srsName=\"http://www.opengis.net/def/crs/EPSG/0/3812\" xmlns:gml=\"http://www.opengis.net/gml/3.2\"><gml:pos>644397.11 701731.49</gml:pos></gml:Point>"
                                                  }
                                              ]
                                          },
                                          {
-                                             "naam": "adresIds",
+                                             "naam": "toegekendAdres",
                                              "oudeWaarde": null,
                                              "nieuweWaarde": [
                                                  "https://data.vlaanderen.be/id/adres/2434522"
                                              ]
                                          },
                                          {
-                                             "naam": "gebouw.id",
+                                             "naam": "isDeelVan",
                                              "oudeWaarde": null,
                                              "nieuweWaarde": "https://data.vlaanderen.be/id/gebouw/6355606"
                                          },
