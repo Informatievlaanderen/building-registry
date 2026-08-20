@@ -11,8 +11,6 @@ namespace BuildingRegistry.Projections.LastChangedList
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.LastChangedList.Model;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore;
     using Building.Events;
-    using Legacy.Events;
-    using Legacy.Events.Crab;
 
     [ConnectedProjectionName(ProjectionName)]
     [ConnectedProjectionDescription("Projectie die markeert voor hoeveel gebouweenheden de gecachte data nog geüpdated moeten worden.")]

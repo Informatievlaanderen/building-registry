@@ -1,5 +1,6 @@
 namespace BuildingRegistry.Projections.Feed
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading;
@@ -17,19 +18,17 @@ namespace BuildingRegistry.Projections.Feed
         private static readonly Instant CutoffDate = Instant.FromUtc(2025, 1, 1, 0, 0);
 
         private readonly string _connectionString;
-        private readonly Lock _lock = new();
-
-        private List<MunicipalityGeometryItem>? _cachedGeometries;
-        private List<MunicipalityGeometryItem>? _cachedGeometries2019;
+        private readonly Lazy<MunicipalityGeometryCache> _cache;
 
         public MunicipalityGeometryRepository(string connectionString)
         {
             _connectionString = connectionString;
+            _cache = new Lazy<MunicipalityGeometryCache>(LoadCache, LazyThreadSafetyMode.ExecutionAndPublication);
         }
 
         public List<string> GetOverlappingNisCodes(string extendedWkbGeometryAsHex, Instant eventTimestamp)
         {
-            EnsureCacheLoaded();
+            var cache = _cache.Value;
 
             var ewkbBytes = extendedWkbGeometryAsHex.ToByteArray();
             WKBReader? wkbReader = null;
@@ -45,8 +44,8 @@ namespace BuildingRegistry.Projections.Feed
             var buildingGeometry = wkbReader.Read(ewkbBytes);
 
             var geometries = eventTimestamp >= CutoffDate
-                ? _cachedGeometries!
-                : _cachedGeometries2019!;
+                ? cache.Geometries
+                : cache.Geometries2019;
 
             return geometries
                 .Where(m => m.Srid == srid && m.Geometry.Intersects(buildingGeometry))
@@ -55,19 +54,11 @@ namespace BuildingRegistry.Projections.Feed
                 .ToList();
         }
 
-        private void EnsureCacheLoaded()
+        private MunicipalityGeometryCache LoadCache()
         {
-            if (_cachedGeometries is not null)
-                return;
-
-            lock (_lock)
-            {
-                if (_cachedGeometries is not null)
-                    return;
-
-                _cachedGeometries = LoadMunicipalityGeometries("integration_municipality.municipality_geometries");
-                _cachedGeometries2019 = LoadMunicipalityGeometries("integration_municipality.municipality_geometries_2019");
-            }
+            return new MunicipalityGeometryCache(
+                LoadMunicipalityGeometries("integration_municipality.municipality_geometries"),
+                LoadMunicipalityGeometries("integration_municipality.municipality_geometries_2019"));
         }
 
         private List<MunicipalityGeometryItem> LoadMunicipalityGeometries(string tableName)
@@ -108,5 +99,9 @@ namespace BuildingRegistry.Projections.Feed
         }
 
         private sealed record MunicipalityGeometryItem(string NisCode, int Srid, Geometry Geometry);
+
+        private sealed record MunicipalityGeometryCache(
+            List<MunicipalityGeometryItem> Geometries,
+            List<MunicipalityGeometryItem> Geometries2019);
     }
 }
