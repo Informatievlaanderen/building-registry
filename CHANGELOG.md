@@ -1,3 +1,10 @@
+## [6.2.1](https://github.com/informatievlaanderen/building-registry/compare/v6.2.0...v6.2.1) (2026-08-20)
+
+
+### Bug Fixes
+
+* **oslo:** buildingunit geometriemethod to structured obj ([ca96c4a](https://github.com/informatievlaanderen/building-registry/commit/ca96c4ab1f7e8304737031b9f0b5e4508284dd6f))
+
 # [6.2.0](https://github.com/informatievlaanderen/building-registry/compare/v6.1.0...v6.2.0) (2026-08-19)
 
 
