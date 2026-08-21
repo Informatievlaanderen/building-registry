@@ -1,3 +1,10 @@
+## [6.2.3](https://github.com/informatievlaanderen/building-registry/compare/v6.2.2...v6.2.3) (2026-08-21)
+
+
+### Bug Fixes
+
+* **feed:** concurrency when saving to lastchanged + feed ([3b8ac17](https://github.com/informatievlaanderen/building-registry/commit/3b8ac170d3298110d6fedd6138b048dce0d040a8))
+
 ## [6.2.2](https://github.com/informatievlaanderen/building-registry/compare/v6.2.1...v6.2.2) (2026-08-20)
 
 
