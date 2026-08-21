@@ -2,7 +2,6 @@ namespace BuildingRegistry.Projections.Feed.BuildingFeed
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
     using Be.Vlaanderen.Basisregisters.EventHandling;
@@ -419,7 +418,7 @@ namespace BuildingRegistry.Projections.Feed.BuildingFeed
                 message.Metadata["CommandId"].ToString()!);
 
             buildingFeedItem.CloudEventAsString = _changeFeedService.SerializeCloudEvent(cloudEvent);
-            await CheckToUpdateCache(page, context);
+            await MarkCompletedPage(page, context);
         }
 
         private List<string> GetNisCodes(string? extendedWkbGeometry, Instant eventTimestamp)
@@ -430,17 +429,14 @@ namespace BuildingRegistry.Projections.Feed.BuildingFeed
             return _municipalityGeometryRepository.GetOverlappingNisCodes(extendedWkbGeometry, eventTimestamp);
         }
 
-        private async Task CheckToUpdateCache(int page, FeedContext context)
+        private async Task MarkCompletedPage(int page, FeedContext context)
         {
-            await _changeFeedService.CheckToUpdateCacheAsync(
+            await _changeFeedService.MarkCompletedPageAsync(
                 page,
-                context,
-                async p =>
-                {
-                    var localCount = context.BuildingFeed.Local
-                        .Count(x => x.Page == page && context.Entry(x).State == EntityState.Added);
-                    return await context.BuildingFeed.CountAsync(x => x.Page == p) + localCount - 1;
-                });
+                // Committed rows only. Rows that are merely tracked as added on the context must not be
+                // counted here, or the cache record can be published for a page that is not yet complete
+                // in the database.
+                async p => await context.BuildingFeed.CountAsync(x => x.Page == p));
         }
 
         private static GebouwStatus MapStatus(BuildingStatus status)
