@@ -8,9 +8,13 @@ namespace BuildingRegistry.Api.Oslo.Building.V2.Sync
 
     public static class BuildingHelpers
     {
-        public static Polygon GetBuildingPolygon(byte[] polygon)
+        /// <summary>
+        /// The syndication object's GML carries no <c>srsName</c> — <see cref="GmlPolygon"/> has no such member
+        /// — so the caller picks its reference system through <c>objectCrs</c>. See ADR 0004.
+        /// </summary>
+        public static Polygon GetBuildingPolygon(byte[] polygon, int objectSrid)
         {
-            var geometry = WKBReaderFactory.Create().Read(polygon) as NetTopologySuite.Geometries.Polygon;
+            var geometry = SyncGeometry.ToRequestedCrs(polygon, objectSrid) as NetTopologySuite.Geometries.Polygon;
 
             if (geometry == null) //some buildings have multi polygons (imported) which are incorrect.
             {

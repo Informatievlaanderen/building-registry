@@ -5,9 +5,14 @@ namespace BuildingRegistry.Api.Oslo.Building.V2.Sync
 
     public static class BuildingUnitHelpers
     {
-        public static Point GetBuildingUnitPoint(byte[] point)
+        /// <summary>
+        /// The unit is part of the building's syndication object, and its <see cref="GmlPoint"/> carries no
+        /// <c>srsName</c> either, so it follows the same <c>objectCrs</c> as the building it sits in.
+        /// See ADR 0004.
+        /// </summary>
+        public static Point GetBuildingUnitPoint(byte[] point, int objectSrid)
         {
-            var geometry = WKBReaderFactory.Create().Read(point);
+            var geometry = SyncGeometry.ToRequestedCrs(point, objectSrid);
             return new Point
             {
                 XmlPoint = new GmlPoint { Pos = $"{geometry.Coordinate.X.ToPointGeometryCoordinateValueFormat()} {geometry.Coordinate.Y.ToPointGeometryCoordinateValueFormat()}" },

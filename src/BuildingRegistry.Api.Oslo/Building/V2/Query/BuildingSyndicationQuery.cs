@@ -173,5 +173,12 @@ namespace BuildingRegistry.Api.Oslo.Building.V2.Query
     {
         public long? Position { get; set; }
         public SyncEmbedValue Embed { get; set; }
+
+        /// <summary>
+        /// The reference system for the embedded object's geometry: <c>3812</c> for Lambert 2008, anything
+        /// else (or absent) for Lambert 72. Does not affect the embedded event.
+        /// See <see cref="Sync.ObjectCrs"/>.
+        /// </summary>
+        public string? ObjectCrs { get; set; }
     }
 }
