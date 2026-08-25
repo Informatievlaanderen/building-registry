@@ -31,7 +31,8 @@ namespace BuildingRegistry.Api.Oslo.Building.V2.Sync
             AtomFormatter formatter,
             string category1,
             string category2,
-            BuildingSyndicationQueryResult building)
+            BuildingSyndicationQueryResult building,
+            int objectSrid)
         {
             var item = new SyndicationItem
             {
@@ -42,7 +43,8 @@ namespace BuildingRegistry.Api.Oslo.Building.V2.Sync
                 Description = BuildDescription(
                     building,
                     responseOptions.Value.GebouwNaamruimte,
-                    responseOptions.Value.GebouweenheidNaamruimte)
+                    responseOptions.Value.GebouweenheidNaamruimte,
+                    objectSrid)
             };
 
             if (building.PersistentLocalId.HasValue)
@@ -88,7 +90,8 @@ namespace BuildingRegistry.Api.Oslo.Building.V2.Sync
         private static string BuildDescription(
             BuildingSyndicationQueryResult building,
             string naamruimte,
-            string gebouweenheidNaamruimte)
+            string gebouweenheidNaamruimte,
+            int objectSrid)
         {
             if (!building.ContainsEvent && !building.ContainsObject)
                 return "No data embedded";
@@ -104,7 +107,7 @@ namespace BuildingRegistry.Api.Oslo.Building.V2.Sync
                     building.GeometryMethod?.ConvertFromBuildingGeometryMethod(),
                     building.Geometry == null
                         ? null
-                        : BuildingHelpers.GetBuildingPolygon(building.Geometry)?.XmlPolygon,
+                        : BuildingHelpers.GetBuildingPolygon(building.Geometry, objectSrid)?.XmlPolygon,
                     building.LastChangedOn.ToBelgianDateTimeOffset(),
                     building.IsComplete,
                     building.Organisation,
@@ -119,7 +122,7 @@ namespace BuildingRegistry.Api.Oslo.Building.V2.Sync
                             unit.GeometryMethod?.ConvertFromBuildingUnitGeometryMethod(),
                             unit.Geometry == null
                                 ? null
-                                : BuildingUnitHelpers.GetBuildingUnitPoint(unit.Geometry)?.XmlPoint,
+                                : BuildingUnitHelpers.GetBuildingUnitPoint(unit.Geometry, objectSrid)?.XmlPoint,
                             unit.Function.ConvertFromBuildingUnitFunction(),
                             unit.AddressIds.ToList(),
                             unit.Version.ToBelgianDateTimeOffset(),

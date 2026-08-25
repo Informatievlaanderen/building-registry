@@ -150,15 +150,19 @@ namespace BuildingRegistry.Api.Oslo.Building.V2
             [FromServices] IOptions<ResponseOptionsV2> responseOptions,
             CancellationToken cancellationToken = default)
         {
+            var filtering = Request.ExtractFilteringRequest<BuildingSyndicationFilter>();
+
             var response = await _mediator.Send(new SyncRequest(
-                Request.ExtractFilteringRequest<BuildingSyndicationFilter>(),
+                filtering,
                 Request.ExtractSortingRequest(),
                 Request.ExtractPaginationRequest(maxLimit:100)
             ), cancellationToken);
 
+            var objectSrid = ObjectCrs.ToSrid(filtering.Filter?.ObjectCrs);
+
             return new ContentResult
             {
-                Content = await BuildAtomFeed(response.LastFeedUpdate, response.PagedBuildings, responseOptions, configuration),
+                Content = await BuildAtomFeed(response.LastFeedUpdate, response.PagedBuildings, responseOptions, configuration, objectSrid),
                 ContentType = MediaTypeNames.Text.Xml,
                 StatusCode = StatusCodes.Status200OK
             };
@@ -168,7 +172,8 @@ namespace BuildingRegistry.Api.Oslo.Building.V2
             DateTimeOffset lastUpdate,
             PagedQueryable<BuildingSyndicationQueryResult> pagedBuildings,
             IOptions<ResponseOptionsV2> responseOptions,
-            IConfiguration configuration)
+            IConfiguration configuration,
+            int objectSrid)
         {
             var sw = new StringWriterWithEncoding(Encoding.UTF8);
 
@@ -202,7 +207,8 @@ namespace BuildingRegistry.Api.Oslo.Building.V2
                         formatter,
                         syndicationConfiguration["Category1"]!,
                         syndicationConfiguration["Category2"]!,
-                        building);
+                        building,
+                        objectSrid);
                 }
 
                 await xmlWriter.FlushAsync();
