@@ -1,3 +1,10 @@
+# [6.3.0](https://github.com/informatievlaanderen/building-registry/compare/v6.2.3...v6.3.0) (2026-08-25)
+
+
+### Features
+
+* add objectcrs to syndication ([83289c3](https://github.com/informatievlaanderen/building-registry/commit/83289c3335e05c367575a4f681c56e146891101f))
+
 ## [6.2.3](https://github.com/informatievlaanderen/building-registry/compare/v6.2.2...v6.2.3) (2026-08-21)
 
 
