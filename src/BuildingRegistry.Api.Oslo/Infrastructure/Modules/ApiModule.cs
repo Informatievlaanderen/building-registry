@@ -1,4 +1,4 @@
-namespace BuildingRegistry.Api.Oslo.Infrastructure.Modules
+﻿namespace BuildingRegistry.Api.Oslo.Infrastructure.Modules
 {
     using Autofac;
     using Autofac.Extensions.DependencyInjection;
@@ -32,7 +32,7 @@ namespace BuildingRegistry.Api.Oslo.Infrastructure.Modules
         {
             builder
                 .RegisterModule(new MediatRModule())
-                .RegisterModule(new ParcelBuildingMatchingModule())
+                .RegisterModule(new ParcelBuildingMatchingModule(_configuration))
                 .RegisterModule(new LegacyModule(_configuration, _services, _loggerFactory))
                 .RegisterModule(new FeedModule(_configuration, _services, _loggerFactory, new JsonSerializerSettings().ConfigureDefaultForApi()))
                 .RegisterModule(new ConsumerParcelModule(_configuration, _services, _loggerFactory));

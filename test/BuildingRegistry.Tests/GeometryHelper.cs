@@ -1,4 +1,4 @@
-namespace BuildingRegistry.Tests
+﻿namespace BuildingRegistry.Tests
 {
     using Be.Vlaanderen.Basisregisters.GrAr.Common.NetTopology;
     using BuildingRegistry.Legacy;
@@ -19,6 +19,14 @@ namespace BuildingRegistry.Tests
         public static Geometry ValidPolygonWithNoValidPoints =>
             new WKTReader(NtsGeometryFactory.CreateGeometryFactoryLambert72()).Read(
                 "POLYGON ((30 10, 10 20, 20 40, 40 40, 30 10))");
+
+        /// <summary>
+        /// <see cref="ValidPolygon"/> expressed in Lambert 2008 (EPSG 3812): the genuine transform of the
+        /// same physical parcel, rounded to centimetres. See ADR 0006.
+        /// </summary>
+        public static Geometry ValidPolygonLambert2008 =>
+            new WKTReader(NtsGeometryFactory.CreateGeometryFactoryLambert2008()).Read(
+                "POLYGON ((641296.80 685195.40, 641292.77 685189.57, 641294.78 685188.14, 641293.21 685185.89, 641294.25 685185.09, 641292.85 685183.18, 641294.82 685181.70, 641296.24 685183.67, 641296.45 685183.55, 641302.02 685191.48, 641296.80 685195.40))");
 
         public static Geometry ValidPointInPolygon =>
             new WKTReader(NtsGeometryFactory.CreateGeometryFactoryLambert72()).Read("POINT (141299 185188)");

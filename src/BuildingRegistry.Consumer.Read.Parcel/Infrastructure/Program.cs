@@ -1,4 +1,4 @@
-namespace BuildingRegistry.Consumer.Read.Parcel.Infrastructure
+﻿namespace BuildingRegistry.Consumer.Read.Parcel.Infrastructure
 {
     using System;
     using System.IO;
@@ -136,6 +136,15 @@ namespace BuildingRegistry.Consumer.Read.Parcel.Infrastructure
                             return new Consumer(consumerOptions, c.Resolve<ILoggerFactory>());
                         })
                         .As<IConsumer>()
+                        .SingleInstance();
+
+                    builder
+                        .RegisterInstance(new Lambert2008ConversionCompletedToggle(
+                            hostContext.Configuration.GetValue<bool>("FeatureToggles:Lambert2008ConversionCompleted")))
+                        .SingleInstance();
+
+                    builder
+                        .RegisterInstance(new Lambert2008MatchingReadiness())
                         .SingleInstance();
 
                     builder

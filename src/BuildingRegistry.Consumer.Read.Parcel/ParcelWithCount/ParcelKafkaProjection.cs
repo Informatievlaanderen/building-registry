@@ -1,4 +1,4 @@
-namespace BuildingRegistry.Consumer.Read.Parcel.ParcelWithCount
+﻿namespace BuildingRegistry.Consumer.Read.Parcel.ParcelWithCount
 {
     using System;
     using System.Collections.Generic;
@@ -14,11 +14,14 @@ namespace BuildingRegistry.Consumer.Read.Parcel.ParcelWithCount
     public class ParcelKafkaProjection : ConnectedProjection<ConsumerParcelContext>
     {
         private readonly ILifetimeScope _lifetimeScope;
+        private readonly Lambert2008ConversionCompletedToggle _conversionCompleted;
 
-        public ParcelKafkaProjection(ILifetimeScope lifetimeScope)
+        public ParcelKafkaProjection(
+            ILifetimeScope lifetimeScope,
+            Lambert2008ConversionCompletedToggle conversionCompleted)
         {
             _lifetimeScope = lifetimeScope;
-            var wkbReader = WKBReaderFactory.Create();
+            _conversionCompleted = conversionCompleted;
 
             When<ParcelWasMigrated>(async (context, message, ct) =>
             {
@@ -29,7 +32,7 @@ namespace BuildingRegistry.Consumer.Read.Parcel.ParcelWithCount
                 if (parcel is null)
                 {
                     var extendedWkbGeometry = message.ExtendedWkbGeometry.ToByteArray();
-                    var geometry = wkbReader.Read(extendedWkbGeometry);
+                    var geometry = ReadGeometry(extendedWkbGeometry);
 
                     await context
                         .ParcelConsumerItemsWithCount
@@ -62,7 +65,7 @@ namespace BuildingRegistry.Consumer.Read.Parcel.ParcelWithCount
 
                 parcel!.Status = ParcelStatus.Retired;
 
-                var buildingPersistentLocalIds = await GetBuildingPersistentLocalIdsToInvalidate(parcel.Geometry);
+                var buildingPersistentLocalIds = await GetBuildingPersistentLocalIdsToInvalidate(parcel.GeometryIn(_conversionCompleted.MatchingSrid)!);
                 context.BuildingsToInvalidate.AddRange(buildingPersistentLocalIds.Select(x => new BuildingToInvalidate
                 {
                     BuildingPersistentLocalId = x
@@ -77,9 +80,9 @@ namespace BuildingRegistry.Consumer.Read.Parcel.ParcelWithCount
                 parcel!.Status = ParcelStatus.Realized;
                 var extendedWkbGeometry = message.ExtendedWkbGeometry.ToByteArray();
                 parcel.ExtendedWkbGeometry = extendedWkbGeometry;
-                parcel.SetGeometry(wkbReader.Read(extendedWkbGeometry));
+                parcel.SetGeometry(ReadGeometry(extendedWkbGeometry));
 
-                var buildingPersistentLocalIds = await GetBuildingPersistentLocalIdsToInvalidate(parcel.Geometry);
+                var buildingPersistentLocalIds = await GetBuildingPersistentLocalIdsToInvalidate(parcel.GeometryIn(_conversionCompleted.MatchingSrid)!);
 
                 context.BuildingsToInvalidate.AddRange(buildingPersistentLocalIds.Select(x => new BuildingToInvalidate
                 {
@@ -95,13 +98,13 @@ namespace BuildingRegistry.Consumer.Read.Parcel.ParcelWithCount
                 var parcel = await context
                     .ParcelConsumerItemsWithCount.FindAsync([Guid.Parse(message.ParcelId)], cancellationToken: ct);
 
-                var previousBuildingPersistentLocalIds = buildingMatching.GetUnderlyingBuildings(parcel!.Geometry).ToArray();
+                var previousBuildingPersistentLocalIds = buildingMatching.GetUnderlyingBuildings(parcel!.GeometryIn(_conversionCompleted.MatchingSrid)!).ToArray();
 
                 var extendedWkbGeometry = message.ExtendedWkbGeometry.ToByteArray();
                 parcel.ExtendedWkbGeometry = extendedWkbGeometry;
-                parcel.SetGeometry(wkbReader.Read(extendedWkbGeometry));
+                parcel.SetGeometry(ReadGeometry(extendedWkbGeometry));
 
-                var currentBuildingPersistentLocalIds = buildingMatching.GetUnderlyingBuildings(parcel.Geometry).ToArray();
+                var currentBuildingPersistentLocalIds = buildingMatching.GetUnderlyingBuildings(parcel.GeometryIn(_conversionCompleted.MatchingSrid)!).ToArray();
 
                 var buildingPersistentLocalIds = previousBuildingPersistentLocalIds
                     .Except(currentBuildingPersistentLocalIds)
@@ -113,6 +116,20 @@ namespace BuildingRegistry.Consumer.Read.Parcel.ParcelWithCount
                 }));
             });
 
+            // The parcel register's conversion to Lambert 2008. It re-expresses the geometry rather than
+            // moving it, so Geometry keeps its exact Lambert 72 value and only the Lambert 2008 column is
+            // written. Because nothing moves, no building's parcel membership changes and nothing is
+            // invalidated. See ADR 0006.
+            When<ParcelGeometryCrsWasChanged>(async (context, message, ct) =>
+            {
+                var parcel = await context
+                    .ParcelConsumerItemsWithCount.FindAsync([Guid.Parse(message.ParcelId)], cancellationToken: ct);
+
+                var extendedWkbGeometry = message.ExtendedWkbGeometry.ToByteArray();
+                parcel!.ExtendedWkbGeometry = extendedWkbGeometry;
+                parcel.SetGeometryFromCrsConversion(ReadGeometry(extendedWkbGeometry));
+            });
+
             When<ParcelWasImported>(async (context, message, ct) =>
             {
                 var parcel = await context
@@ -121,7 +138,7 @@ namespace BuildingRegistry.Consumer.Read.Parcel.ParcelWithCount
                 if (parcel is null)
                 {
                     var extendedWkbGeometry = message.ExtendedWkbGeometry.ToByteArray();
-                    var geometry = wkbReader.Read(extendedWkbGeometry);
+                    var geometry = ReadGeometry(extendedWkbGeometry);
 
                     await context
                         .ParcelConsumerItemsWithCount
@@ -235,6 +252,13 @@ namespace BuildingRegistry.Consumer.Read.Parcel.ParcelWithCount
                 }
             });
         }
+
+        /// <summary>
+        /// Reads a geometry in whatever reference system the EWKB carries, rather than assuming one.
+        /// Geometries persisted before the event store wrote EWKB carry no SRID and are read as Lambert 72.
+        /// </summary>
+        private static Geometry ReadGeometry(byte[] extendedWkbGeometry)
+            => WKBReaderFactory.CreateForEwkb(extendedWkbGeometry).Read(extendedWkbGeometry);
 
         private async Task<IEnumerable<int>> GetBuildingPersistentLocalIdsToInvalidate(Geometry geometry)
         {

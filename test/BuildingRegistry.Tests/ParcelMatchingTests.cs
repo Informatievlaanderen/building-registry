@@ -38,7 +38,7 @@
                 "POLYGON ((30369.9705525637 197020.970058788, 30371.0035125613 197016.919882786, 30371.9439925626 197013.232970782, 30359.4460085556 197010.213386782, 30359.9243445545 197007.541706778, 30356.6382645518 197006.900234777, 30357.7194805518 197001.361546773, 30346.2433845475 196998.867338773, 30347.8442165479 196993.40410677, 30334.0098485351 196989.266250767, 30331.0075445399 196999.638474774, 30326.6319285333 197014.755978782, 30332.6787765399 197016.530698784, 30336.4549685419 197017.638986785, 30337.4389685392 197014.234186783, 30348.4625845477 197017.037578784, 30356.1769525558 197018.999370787, 30356.4889525548 197017.560394786, 30369.9705525637 197020.970058788))");
 
             var mock = new Mock<IParcels>();
-            mock.Setup(x => x.GetUnderlyingParcelsUnderBoundingBox(It.IsAny<Geometry>()))
+            mock.Setup(x => x.GetUnderlyingParcelsUnderBoundingBox(It.IsAny<Geometry>(), It.IsAny<int>()))
                 .ReturnsAsync(new List<ParcelData>
                 {
                     new ParcelData(
@@ -64,7 +64,7 @@
                     )
                 });
 
-            var parcelMatching = new ParcelMatching(mock.Object);
+            var parcelMatching = new ParcelMatching(mock.Object, new Lambert2008ConversionCompletedToggle(false), new Lambert2008MatchingReadiness());
             var result = await parcelMatching.GetUnderlyingParcels(buildingPolygon);
 
             result.Count().Should().Be(1);
