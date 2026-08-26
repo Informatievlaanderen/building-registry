@@ -76,6 +76,15 @@
                 .InstancePerLifetimeScope();
 
             builder
+                .RegisterInstance(new Lambert2008ConversionCompletedToggle(
+                    _configuration.GetValue<bool>("FeatureToggles:Lambert2008ConversionCompleted")))
+                .SingleInstance();
+
+            builder
+                .RegisterInstance(new Lambert2008MatchingReadiness())
+                .SingleInstance();
+
+            builder
                 .RegisterType<ParcelMatching>()
                 .As<IParcelMatching>()
                 .InstancePerLifetimeScope();

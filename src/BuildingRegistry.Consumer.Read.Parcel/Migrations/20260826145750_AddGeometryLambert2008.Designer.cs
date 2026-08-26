@@ -4,6 +4,7 @@ using BuildingRegistry.Consumer.Read.Parcel;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NetTopologySuite.Geometries;
 
@@ -12,9 +13,11 @@ using NetTopologySuite.Geometries;
 namespace BuildingRegistry.Consumer.Read.Parcel.Migrations
 {
     [DbContext(typeof(ConsumerParcelContext))]
-    partial class ConsumerParcelContextModelSnapshot : ModelSnapshot
+    [Migration("20260826145750_AddGeometryLambert2008")]
+    partial class AddGeometryLambert2008
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
