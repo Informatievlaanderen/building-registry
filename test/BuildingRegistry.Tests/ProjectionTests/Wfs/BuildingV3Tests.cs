@@ -598,6 +598,6 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wfs
                 });
         }
 
-        protected override BuildingV3Projections CreateProjection() => new BuildingV3Projections(WKBReaderFactory.Create());
+        protected override BuildingV3Projections CreateProjection() => new BuildingV3Projections();
     }
 }

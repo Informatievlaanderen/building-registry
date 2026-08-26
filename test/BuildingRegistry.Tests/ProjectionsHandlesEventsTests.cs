@@ -43,7 +43,9 @@ namespace BuildingRegistry.Tests
     using Projections.Wfs;
     using Projections.Wms;
     using Projections.Wms.BuildingUnitV2;
+    using Projections.Wms.BuildingUnitV3;
     using Projections.Wms.BuildingV3;
+    using Projections.Wms.BuildingV4;
     using Xunit;
     using ProducerContext = Producer.Snapshot.Oslo.ProducerContext;
 
@@ -161,14 +163,18 @@ namespace BuildingRegistry.Tests
 
             yield return [new List<ConnectedProjection<WmsContext>>
             {
-               new BuildingV3Projections(new WKBReader()),
-               new BuildingUnitV2Projections(new WKBReader())
+               new BuildingV3Projections(),
+               new BuildingUnitV2Projections(),
+               new BuildingV4Projections(),
+               new BuildingUnitV3Projections()
             }];
 
             yield return [new List<ConnectedProjection<WfsContext>>
             {
-                new Projections.Wfs.BuildingV3.BuildingV3Projections(new WKBReader()),
-                new Projections.Wfs.BuildingUnitV2.BuildingUnitV2Projections(new WKBReader()),
+                new Projections.Wfs.BuildingV3.BuildingV3Projections(),
+                new Projections.Wfs.BuildingUnitV2.BuildingUnitV2Projections(),
+                new Projections.Wfs.BuildingV4.BuildingV4Projections(),
+                new Projections.Wfs.BuildingUnitV3.BuildingUnitV3Projections(),
                 new Projections.Wfs.BuildingUnitAddress.BuildingUnitAddressProjections()
             }];
 

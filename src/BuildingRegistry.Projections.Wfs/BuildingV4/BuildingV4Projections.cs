@@ -1,4 +1,4 @@
-namespace BuildingRegistry.Projections.Wfs.BuildingV3
+namespace BuildingRegistry.Projections.Wfs.BuildingV4
 {
     using System.Collections.Generic;
     using System.Threading;
@@ -15,11 +15,12 @@ namespace BuildingRegistry.Projections.Wfs.BuildingV3
     using NetTopologySuite.Geometries;
 
     /// <summary>
-    /// Fixes the projection of building version concerning buildingunit removal and removal correction.
+    /// The Lambert 2008 (EPSG 3812) counterpart of <see cref="BuildingV3.BuildingV3Projections"/>, produced
+    /// mechanically from it so the two stay identical apart from the reference system. See ADR 0005.
     /// </summary>
-    [ConnectedProjectionName("WFS gebouwen")]
-    [ConnectedProjectionDescription("Projectie die de gebouwen data voor het WFS gebouwenregister voorziet.")]
-    public class BuildingV3Projections : ConnectedProjection<WfsContext>
+    [ConnectedProjectionName("WFS gebouwen (v4, Lambert 2008)")]
+    [ConnectedProjectionDescription("Projectie die de gebouwen data in Lambert 2008 voor het WFS gebouwenregister voorziet.")]
+    public class BuildingV4Projections : ConnectedProjection<WfsContext>
     {
         private static readonly string RealizedStatus = GebouwStatus.Gerealiseerd.ToString();
         private static readonly string PlannedStatus = GebouwStatus.Gepland.ToString();
@@ -35,11 +36,11 @@ namespace BuildingRegistry.Projections.Wfs.BuildingV3
         /// </summary>
         private const int GeometryCoordinateDecimals = 2;
 
-        public BuildingV3Projections()
+        public BuildingV4Projections()
         {
             When<Envelope<BuildingWasMigrated>>(async (context, message, ct) =>
             {
-                var buildingV3 = new BuildingV3
+                var buildingV4 = new BuildingV4
                 {
                     PersistentLocalId = message.Message.BuildingPersistentLocalId,
                     Id = PersistentLocalIdHelper.CreateBuildingId(message.Message.BuildingPersistentLocalId),
@@ -49,15 +50,15 @@ namespace BuildingRegistry.Projections.Wfs.BuildingV3
                 };
 
                 SetGeometry(
-                    buildingV3, message.Message.ExtendedWkbGeometry,
+                    buildingV4, message.Message.ExtendedWkbGeometry,
                     MapGeometryMethod(BuildingGeometryMethod.Parse(message.Message.GeometryMethod)));
 
-                await context.BuildingsV3.AddAsync(buildingV3, ct);
+                await context.BuildingsV4.AddAsync(buildingV4, ct);
             });
 
             When<Envelope<BuildingWasPlannedV2>>(async (context, message, ct) =>
             {
-                var buildingV3 = new BuildingV3
+                var buildingV4 = new BuildingV4
                 {
                     PersistentLocalId = message.Message.BuildingPersistentLocalId,
                     Id = PersistentLocalIdHelper.CreateBuildingId(message.Message.BuildingPersistentLocalId),
@@ -67,15 +68,15 @@ namespace BuildingRegistry.Projections.Wfs.BuildingV3
                 };
 
                 SetGeometry(
-                    buildingV3, message.Message.ExtendedWkbGeometry,
+                    buildingV4, message.Message.ExtendedWkbGeometry,
                     MapGeometryMethod(BuildingGeometryMethod.Outlined));
 
-                await context.BuildingsV3.AddAsync(buildingV3, ct);
+                await context.BuildingsV4.AddAsync(buildingV4, ct);
             });
 
             When<Envelope<UnplannedBuildingWasRealizedAndMeasured>>(async (context, message, ct) =>
             {
-                var buildingV3 = new BuildingV3
+                var buildingV4 = new BuildingV4
                 {
                     PersistentLocalId = message.Message.BuildingPersistentLocalId,
                     Id = PersistentLocalIdHelper.CreateBuildingId(message.Message.BuildingPersistentLocalId),
@@ -85,15 +86,15 @@ namespace BuildingRegistry.Projections.Wfs.BuildingV3
                 };
 
                 SetGeometry(
-                    buildingV3, message.Message.ExtendedWkbGeometry,
+                    buildingV4, message.Message.ExtendedWkbGeometry,
                     MapGeometryMethod(BuildingGeometryMethod.MeasuredByGrb));
 
-                await context.BuildingsV3.AddAsync(buildingV3, ct);
+                await context.BuildingsV4.AddAsync(buildingV4, ct);
             });
 
             When<Envelope<BuildingOutlineWasChanged>>(async (context, message, ct) =>
             {
-                var item = await context.BuildingsV3.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);
+                var item = await context.BuildingsV4.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);
                 SetGeometry(
                     item, message.Message.ExtendedWkbGeometryBuilding,
                     MapGeometryMethod(BuildingGeometryMethod.Outlined));
@@ -102,7 +103,7 @@ namespace BuildingRegistry.Projections.Wfs.BuildingV3
 
             When<Envelope<BuildingMeasurementWasChanged>>(async (context, message, ct) =>
             {
-                var item = await context.BuildingsV3.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);
+                var item = await context.BuildingsV4.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);
                 SetGeometry(
                     item, message.Message.ExtendedWkbGeometryBuilding,
                     MapGeometryMethod(BuildingGeometryMethod.MeasuredByGrb));
@@ -111,49 +112,49 @@ namespace BuildingRegistry.Projections.Wfs.BuildingV3
 
             When<Envelope<BuildingBecameUnderConstructionV2>>(async (context, message, ct) =>
             {
-                var item = await context.BuildingsV3.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);
+                var item = await context.BuildingsV4.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);
                 item.Status = UnderConstructionStatus;
                 item.Version = message.Message.Provenance.Timestamp;
             });
 
             When<Envelope<BuildingWasCorrectedFromUnderConstructionToPlanned>>(async (context, message, ct) =>
             {
-                var item = await context.BuildingsV3.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);
+                var item = await context.BuildingsV4.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);
                 item.Status = PlannedStatus;
                 item.Version = message.Message.Provenance.Timestamp;
             });
 
             When<Envelope<BuildingWasRealizedV2>>(async (context, message, ct) =>
             {
-                var item = await context.BuildingsV3.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);
+                var item = await context.BuildingsV4.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);
                 item.Status = RealizedStatus;
                 item.Version = message.Message.Provenance.Timestamp;
             });
 
             When<Envelope<BuildingWasCorrectedFromRealizedToUnderConstruction>>(async (context, message, ct) =>
             {
-                var item = await context.BuildingsV3.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);
+                var item = await context.BuildingsV4.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);
                 item.Status = UnderConstructionStatus;
                 item.Version = message.Message.Provenance.Timestamp;
             });
 
             When<Envelope<BuildingWasNotRealizedV2>>(async (context, message, ct) =>
             {
-                var item = await context.BuildingsV3.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);
+                var item = await context.BuildingsV4.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);
                 item.Status = NotRealizedStatus;
                 item.Version = message.Message.Provenance.Timestamp;
             });
 
             When<Envelope<BuildingWasCorrectedFromNotRealizedToPlanned>>(async (context, message, ct) =>
             {
-                var item = await context.BuildingsV3.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);
+                var item = await context.BuildingsV4.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);
                 item.Status = PlannedStatus;
                 item.Version = message.Message.Provenance.Timestamp;
             });
 
             When<Envelope<BuildingWasMeasured>>(async (context, message, ct) =>
             {
-                var item = await context.BuildingsV3.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);
+                var item = await context.BuildingsV4.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);
                 SetGeometry(
                     item, message.Message.ExtendedWkbGeometryBuilding,
                     MapGeometryMethod(BuildingGeometryMethod.MeasuredByGrb));
@@ -162,7 +163,7 @@ namespace BuildingRegistry.Projections.Wfs.BuildingV3
 
             When<Envelope<BuildingMeasurementWasCorrected>>(async (context, message, ct) =>
             {
-                var item = await context.BuildingsV3.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);
+                var item = await context.BuildingsV4.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);
                 SetGeometry(
                     item,
                     message.Message.ExtendedWkbGeometryBuilding,
@@ -172,51 +173,51 @@ namespace BuildingRegistry.Projections.Wfs.BuildingV3
 
             When<Envelope<BuildingWasDemolished>>(async (context, message, ct) =>
             {
-                var item = await context.BuildingsV3.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);
+                var item = await context.BuildingsV4.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);
                 item.Status = RetiredStatus;
                 item.Version = message.Message.Provenance.Timestamp;
             });
 
             When<Envelope<BuildingWasRemovedV2>>(async (context, message, ct) =>
             {
-                var item = await context.BuildingsV3.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);
+                var item = await context.BuildingsV4.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);
                 item.IsRemoved = true;
                 item.Version = message.Message.Provenance.Timestamp;
             });
 
             When<Envelope<BuildingUnitWasPlannedV2>>(async (context, message, ct) =>
             {
-                var item = await context.BuildingsV3.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);
+                var item = await context.BuildingsV4.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);
                 item.Version = message.Message.Provenance.Timestamp;
             });
 
             When<Envelope<CommonBuildingUnitWasAddedV2>>(async (context, message, ct) =>
             {
-                var item = await context.BuildingsV3.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);
+                var item = await context.BuildingsV4.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);
                 item.Version = message.Message.Provenance.Timestamp;
             });
 
             When<Envelope<BuildingUnitWasMovedIntoBuilding>>(async (context, message, ct) =>
             {
-                var item = await context.BuildingsV3.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);
+                var item = await context.BuildingsV4.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);
                 item.Version = message.Message.Provenance.Timestamp;
             });
 
             When<Envelope<BuildingUnitWasMovedOutOfBuilding>>(async (context, message, ct) =>
             {
-                var item = await context.BuildingsV3.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);
+                var item = await context.BuildingsV4.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);
                 item.Version = message.Message.Provenance.Timestamp;
             });
 
             When<Envelope<BuildingUnitWasRemovedV2>>(async (context, message, ct) =>
             {
-                var item = await context.BuildingsV3.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);
+                var item = await context.BuildingsV4.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);
                 item.Version = message.Message.Provenance.Timestamp;
             });
 
             When<Envelope<BuildingUnitRemovalWasCorrected>>(async (context, message, ct) =>
             {
-                var item = await context.BuildingsV3.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);
+                var item = await context.BuildingsV4.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);
                 item.Version = message.Message.Provenance.Timestamp;
             });
 
@@ -248,16 +249,16 @@ namespace BuildingRegistry.Projections.Wfs.BuildingV3
             When<Envelope<BuildingUnitWasRemovedBecauseBuildingWasRemoved>>(DoNothing);
         }
 
-        private static void SetGeometry(BuildingV3 building, string extendedWkbGeometry, string method)
+        private static void SetGeometry(BuildingV4 building, string extendedWkbGeometry, string method)
         {
             building.GeometryMethod = method;
             building.Geometry = ParseGeometry(extendedWkbGeometry);
         }
 
         /// <summary>
-        /// Version 3 stores Lambert 72 (EPSG 31370) and nothing else, whichever reference system the
+        /// Version 4 stores Lambert 2008 (EPSG 3812) and nothing else, whichever reference system the
         /// event store persists, so the table, its spatial index and the views over it stay single-SRID.
-        /// See ADR 0005.
+        /// Once the event store holds Lambert 2008 this becomes a pass-through. See ADR 0005.
         /// </summary>
         private static Polygon? ParseGeometry(string extendedWkbGeometry)
         {
@@ -268,14 +269,12 @@ namespace BuildingRegistry.Projections.Wfs.BuildingV3
                 return null;
             }
 
-            // Rounding only on the transformed path, so a geometry that was already Lambert 72 is stored
+            // Rounds only when it actually transforms, so a geometry already in Lambert 2008 is stored
             // exactly as persisted. The transform is accurate to the centimetre geometries are kept at.
-            if (!geometry.IsLambert72())
-            {
-                geometry = (Polygon)geometry.EnsureLambert72().RoundCoordinates(GeometryCoordinateDecimals);
-            }
-
-            return new GrbPolygon(geometry);
+            return
+                geometry.IsLambert08()
+                    ? new GrbPolygon(geometry)
+                    : new GrbPolygon((Polygon)geometry.EnsureLambert08(GeometryCoordinateDecimals));
         }
 
         public static string MapGeometryMethod(BuildingGeometryMethod buildingGeometryMethod)

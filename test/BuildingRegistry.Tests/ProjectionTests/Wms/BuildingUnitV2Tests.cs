@@ -24,7 +24,6 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wms
     public class BuildingUnitV2Tests : BuildingWmsProjectionTest<BuildingUnitV2Projections>
     {
         private readonly Fixture _fixture = new();
-        private readonly WKBReader _wkbReader = WKBReaderFactory.Create();
 
         public BuildingUnitV2Tests()
         {
@@ -73,7 +72,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wms
                         expectedUnit.Function.Should().Be(BuildingUnitV2Projections.MapFunction(BuildingUnitFunction.Parse(unit.Function)));
                         expectedUnit.PositionMethod.Should().Be(BuildingUnitV2Projections.MapGeometryMethod(BuildingUnitPositionGeometryMethod.Parse(unit.GeometryMethod)));
                         expectedUnit.Version.Should().Be(buildingWasMigrated.Provenance.Timestamp);
-                        var position = _wkbReader.Read(unit.ExtendedWkbGeometry.ToByteArray());
+                        var position = WKBReaderFactory.Create().Read(unit.ExtendedWkbGeometry.ToByteArray());
                         expectedUnit.Position.Should().BeEquivalentTo(position.AsBinary());
                     }
                 });
@@ -140,7 +139,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wms
                             expectedUnit.PositionMethod.Should()
                                 .Be(BuildingUnitV2Projections.MapGeometryMethod(BuildingUnitPositionGeometryMethod.Parse(unit.GeometryMethod)));
                             expectedUnit.Version.Should().Be(buildingWasMigrated.Provenance.Timestamp);
-                            var position = _wkbReader.Read(unit.ExtendedWkbGeometry.ToByteArray());
+                            var position = WKBReaderFactory.Create().Read(unit.ExtendedWkbGeometry.ToByteArray());
                             expectedUnit.Position.Should().BeEquivalentTo(position.AsBinary());
                         }
                     }
@@ -174,8 +173,8 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wms
                     item.Should().NotBeNull();
 
                     item!.PositionMethod.Should().Be(BuildingUnitV2Projections.MapGeometryMethod(BuildingUnitPositionGeometryMethod.DerivedFromObject));
-                    var position = _wkbReader.Read(@event.ExtendedWkbGeometryBuildingUnits.ToByteArray());
-                    item.Position.Should().BeEquivalentTo(WKBReaderFactory.Create().Read(position.AsBinary()).AsBinary());
+                    var position = WKBReaderFactory.Create().Read(@event.ExtendedWkbGeometryBuildingUnits.ToByteArray());
+                    item.Position.Should().BeEquivalentTo(position.AsBinary());
                 });
         }
 
@@ -206,8 +205,8 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wms
                     item.Should().NotBeNull();
 
                     item!.PositionMethod.Should().Be(BuildingUnitV2Projections.MapGeometryMethod(BuildingUnitPositionGeometryMethod.DerivedFromObject));
-                    var position = _wkbReader.Read(@event.ExtendedWkbGeometryBuildingUnits.ToByteArray());
-                    item.Position.Should().BeEquivalentTo(WKBReaderFactory.Create().Read(position.AsBinary()).AsBinary());
+                    var position = WKBReaderFactory.Create().Read(@event.ExtendedWkbGeometryBuildingUnits.ToByteArray());
+                    item.Position.Should().BeEquivalentTo(position.AsBinary());
                 });
         }
 
@@ -237,8 +236,8 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wms
                     item.Should().NotBeNull();
 
                     item!.PositionMethod.Should().Be(BuildingUnitV2Projections.MapGeometryMethod(BuildingUnitPositionGeometryMethod.DerivedFromObject));
-                    var position = _wkbReader.Read(@event.ExtendedWkbGeometryBuildingUnits.ToByteArray());
-                    item.Position.Should().BeEquivalentTo(WKBReaderFactory.Create().Read(position.AsBinary()).AsBinary());
+                    var position = WKBReaderFactory.Create().Read(@event.ExtendedWkbGeometryBuildingUnits.ToByteArray());
+                    item.Position.Should().BeEquivalentTo(position.AsBinary());
                 });
         }
 
@@ -268,8 +267,8 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wms
                     item.Should().NotBeNull();
 
                     item!.PositionMethod.Should().Be(BuildingUnitV2Projections.MapGeometryMethod(BuildingUnitPositionGeometryMethod.DerivedFromObject));
-                    var position = _wkbReader.Read(@event.ExtendedWkbGeometryBuildingUnits.ToByteArray());
-                    item.Position.Should().BeEquivalentTo(WKBReaderFactory.Create().Read(position.AsBinary()).AsBinary());
+                    var position = WKBReaderFactory.Create().Read(@event.ExtendedWkbGeometryBuildingUnits.ToByteArray());
+                    item.Position.Should().BeEquivalentTo(position.AsBinary());
                 });
         }
 
@@ -292,8 +291,8 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wms
                     var item = await ct.BuildingUnitsV2.FindAsync(buildingUnitWasPlannedV2.BuildingUnitPersistentLocalId);
                     item.Should().NotBeNull();
                     item!.BuildingPersistentLocalId.Should().Be(buildingUnitWasPlannedV2.BuildingPersistentLocalId);
-                    var position = _wkbReader.Read(buildingUnitWasPlannedV2.ExtendedWkbGeometry.ToByteArray());
-                    item.Position.Should().BeEquivalentTo(WKBReaderFactory.Create().Read(position.AsBinary()).AsBinary());
+                    var position = WKBReaderFactory.Create().Read(buildingUnitWasPlannedV2.ExtendedWkbGeometry.ToByteArray());
+                    item.Position.Should().BeEquivalentTo(position.AsBinary());
                     item.PositionMethod.Should().Be(BuildingUnitV2Projections.MapGeometryMethod(BuildingUnitPositionGeometryMethod.Parse(buildingUnitWasPlannedV2.GeometryMethod)));
                     item.Function.Should().Be(BuildingUnitV2Projections.MapFunction(BuildingUnitFunction.Parse(buildingUnitWasPlannedV2.Function)));
                     item.Version.Should().Be(buildingUnitWasPlannedV2.Provenance.Timestamp);
@@ -718,8 +717,8 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wms
                     item.Status.Should().Be(BuildingUnitStatus.Parse(@event.BuildingUnitStatus));
                     item.HasDeviation.Should().Be(@event.HasDeviation);
                     item.Function.Should().Be(BuildingUnitV2Projections.MapFunction(BuildingUnitFunction.Parse(@event.Function)));
-                    var position = _wkbReader.Read(@event.ExtendedWkbGeometry.ToByteArray());
-                    item.Position.Should().BeEquivalentTo(WKBReaderFactory.Create().Read(position.AsBinary()).AsBinary());
+                    var position = WKBReaderFactory.Create().Read(@event.ExtendedWkbGeometry.ToByteArray());
+                    item.Position.Should().BeEquivalentTo(position.AsBinary());
                     item.PositionMethod.Should().Be(BuildingUnitV2Projections.MapGeometryMethod(BuildingUnitPositionGeometryMethod.Parse(@event.GeometryMethod)));
                     item.Version.Should().Be(@event.Provenance.Timestamp);
                 });
@@ -884,8 +883,8 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wms
                     var item = await ct.BuildingUnitsV2.FindAsync(commonBuildingUnitWasAddedV2.BuildingUnitPersistentLocalId);
                     item.Should().NotBeNull();
                     item!.BuildingPersistentLocalId.Should().Be(commonBuildingUnitWasAddedV2.BuildingPersistentLocalId);
-                    var position = _wkbReader.Read(commonBuildingUnitWasAddedV2.ExtendedWkbGeometry.ToByteArray());
-                    item.Position.Should().BeEquivalentTo(WKBReaderFactory.Create().Read(position.AsBinary()).AsBinary());
+                    var position = WKBReaderFactory.Create().Read(commonBuildingUnitWasAddedV2.ExtendedWkbGeometry.ToByteArray());
+                    item.Position.Should().BeEquivalentTo(position.AsBinary());
                     item.PositionMethod.Should().Be(BuildingUnitV2Projections.MapGeometryMethod(BuildingUnitPositionGeometryMethod.Parse(commonBuildingUnitWasAddedV2.GeometryMethod)));
                     item.Function.Should().Be(BuildingUnitV2Projections.MapFunction(BuildingUnitFunction.Common));
                     item.Version.Should().Be(commonBuildingUnitWasAddedV2.Provenance.Timestamp);
@@ -1208,8 +1207,8 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wms
                     item!.BuildingPersistentLocalId.Should().Be(@event.BuildingPersistentLocalId);
                     item.PositionMethod.Should().Be(
                         BuildingUnitV2Projections.MapGeometryMethod(BuildingUnitPositionGeometryMethod.Parse(@event.GeometryMethod)));
-                    var position = _wkbReader.Read(@event.ExtendedWkbGeometry.ToByteArray());
-                    item.Position.Should().BeEquivalentTo(WKBReaderFactory.Create().Read(position.AsBinary()).AsBinary());
+                    var position = WKBReaderFactory.Create().Read(@event.ExtendedWkbGeometry.ToByteArray());
+                    item.Position.Should().BeEquivalentTo(position.AsBinary());
                     item.Status.Should().Be(BuildingUnitStatus.Parse(@event.BuildingUnitStatus));
                     item.Function.Should().Be(BuildingUnitFunction.Parse(@event.Function));
                     item.HasDeviation.Should().Be(@event.HasDeviation);
@@ -1217,6 +1216,6 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wms
                 });
         }
 
-        protected override BuildingUnitV2Projections CreateProjection() => new BuildingUnitV2Projections(WKBReaderFactory.Create());
+        protected override BuildingUnitV2Projections CreateProjection() => new BuildingUnitV2Projections();
     }
 }
