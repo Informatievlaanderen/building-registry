@@ -1,3 +1,10 @@
+# [6.4.0](https://github.com/informatievlaanderen/building-registry/compare/v6.3.0...v6.4.0) (2026-08-26)
+
+
+### Features
+
+* add WMS/WFS tables and views lambert2008 ([ec2eb84](https://github.com/informatievlaanderen/building-registry/commit/ec2eb8482b319b1e99a49c0fc529d7580d8642ba))
+
 # [6.3.0](https://github.com/informatievlaanderen/building-registry/compare/v6.2.3...v6.3.0) (2026-08-25)
 
 
