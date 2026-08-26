@@ -7,7 +7,18 @@
 
     public interface IParcels
     {
-        Task<IEnumerable<ParcelData>> GetUnderlyingParcelsUnderBoundingBox(Geometry buildingGeometry);
+        /// <summary>
+        /// Parcels whose geometry, in <paramref name="matchingSrid"/>, intersects the building's bounding
+        /// box. <see cref="ParcelData.Geometry"/> is returned in that same system, so the caller can compare
+        /// it directly against a building geometry it has brought to it. See ADR 0006.
+        /// </summary>
+        Task<IEnumerable<ParcelData>> GetUnderlyingParcelsUnderBoundingBox(Geometry buildingGeometry, int matchingSrid);
+
+        /// <summary>
+        /// Whether any parcel is still missing its Lambert 2008 geometry, which would make it invisible to
+        /// matching done in that system. Backs <see cref="Lambert2008MatchingReadiness"/>.
+        /// </summary>
+        Task<bool> HasIncompleteLambert2008Geometry();
     }
 
     public class ParcelData

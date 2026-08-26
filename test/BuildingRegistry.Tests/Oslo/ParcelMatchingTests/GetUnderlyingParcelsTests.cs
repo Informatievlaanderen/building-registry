@@ -1,4 +1,4 @@
-namespace BuildingRegistry.Tests.Oslo.ParcelMatchingTests
+﻿namespace BuildingRegistry.Tests.Oslo.ParcelMatchingTests
 {
     using System;
     using System.Linq;
@@ -14,6 +14,9 @@ namespace BuildingRegistry.Tests.Oslo.ParcelMatchingTests
 
     public class GetUnderlyingParcelsTests
     {
+
+        /// <summary>Matching in Lambert 72, the pre-conversion default. See ADR 0006.</summary>
+        private static readonly Lambert2008ConversionCompletedToggle Lambert72Matching = new(false);
         private readonly FakeConsumerParcelContext _consumerParcelContext;
 
         public GetUnderlyingParcelsTests()
@@ -25,7 +28,7 @@ namespace BuildingRegistry.Tests.Oslo.ParcelMatchingTests
         [Fact]
         public void WithParcelOverlapping100Percent_ThenReturnsTheUnderlyingParcel()
         {
-            var parcelGeometry = CreateGeometry("100 100 100 200 200 200 200 100 100 100");
+            var parcelGeometry = CreateGeometry("140100 186100 140100 186200 140200 186200 140200 186100 140100 186100");
             var buildingGeometry100PercentOverlap = parcelGeometry;
 
             _consumerParcelContext.ParcelConsumerItemsWithCount.Add(
@@ -38,7 +41,7 @@ namespace BuildingRegistry.Tests.Oslo.ParcelMatchingTests
 
             _consumerParcelContext.SaveChanges();
 
-            var parcelMatching = new ParcelMatching(_consumerParcelContext);
+            var parcelMatching = new ParcelMatching(_consumerParcelContext, Lambert72Matching, new Lambert2008MatchingReadiness());
 
             var result = parcelMatching.GetUnderlyingParcels(WkbWriter.Instance.Write(buildingGeometry100PercentOverlap));
 
@@ -48,7 +51,7 @@ namespace BuildingRegistry.Tests.Oslo.ParcelMatchingTests
         [Fact]
         public void WithRetiredParcelOverlapping100Percent_ThenReturnsNothing()
         {
-            var parcelGeometry = CreateGeometry("100 100 100 200 200 200 200 100 100 100");
+            var parcelGeometry = CreateGeometry("140100 186100 140100 186200 140200 186200 140200 186100 140100 186100");
             var buildingGeometry100PercentOverlap = parcelGeometry;
 
             _consumerParcelContext.ParcelConsumerItemsWithCount.Add(
@@ -61,7 +64,7 @@ namespace BuildingRegistry.Tests.Oslo.ParcelMatchingTests
 
             _consumerParcelContext.SaveChanges();
 
-            var parcelMatching = new ParcelMatching(_consumerParcelContext);
+            var parcelMatching = new ParcelMatching(_consumerParcelContext, Lambert72Matching, new Lambert2008MatchingReadiness());
 
             var result = parcelMatching.GetUnderlyingParcels(WkbWriter.Instance.Write(buildingGeometry100PercentOverlap));
 
@@ -71,8 +74,8 @@ namespace BuildingRegistry.Tests.Oslo.ParcelMatchingTests
         [Fact]
         public void WithParcelLessThan80PercentOverlap_ThenReturnsNothing()
         {
-            var parcelGeometry = CreateGeometry("100 100 100 200 200 200 200 100 100 100");
-            var buildingGeometry = CreateGeometry("140 100 140 200 240 200 240 100 140 100");
+            var parcelGeometry = CreateGeometry("140100 186100 140100 186200 140200 186200 140200 186100 140100 186100");
+            var buildingGeometry = CreateGeometry("140140 186100 140140 186200 140240 186200 140240 186100 140140 186100");
 
             _consumerParcelContext.ParcelConsumerItemsWithCount.Add(
                 new ParcelConsumerItem(
@@ -84,7 +87,7 @@ namespace BuildingRegistry.Tests.Oslo.ParcelMatchingTests
 
             _consumerParcelContext.SaveChanges();
 
-            var parcelMatching = new ParcelMatching(_consumerParcelContext);
+            var parcelMatching = new ParcelMatching(_consumerParcelContext, Lambert72Matching, new Lambert2008MatchingReadiness());
 
             var result = parcelMatching.GetUnderlyingParcels(WkbWriter.Instance.Write(buildingGeometry));
 
@@ -94,8 +97,8 @@ namespace BuildingRegistry.Tests.Oslo.ParcelMatchingTests
         [Fact]
         public void With2ParcelsAbove40PercentOverlap_ThenReturnsThe2Parcels()
         {
-            var buildingGeometry50PercentOverlap = CreateGeometry("50 100 50 200 140 200 140 100 50 100");
-            var parcelGeometry = CreateGeometry("100 100 100 200 200 200 200 100 100 100");
+            var buildingGeometry50PercentOverlap = CreateGeometry("140050 186100 140050 186200 140140 186200 140140 186100 140050 186100");
+            var parcelGeometry = CreateGeometry("140100 186100 140100 186200 140200 186200 140200 186100 140100 186100");
 
             _consumerParcelContext.ParcelConsumerItemsWithCount.Add(
                 new ParcelConsumerItem(
@@ -115,7 +118,7 @@ namespace BuildingRegistry.Tests.Oslo.ParcelMatchingTests
 
             _consumerParcelContext.SaveChanges();
 
-            var parcelMatching = new ParcelMatching(_consumerParcelContext);
+            var parcelMatching = new ParcelMatching(_consumerParcelContext, Lambert72Matching, new Lambert2008MatchingReadiness());
 
             var result = parcelMatching.GetUnderlyingParcels(WkbWriter.Instance.Write(buildingGeometry50PercentOverlap));
 
@@ -125,10 +128,10 @@ namespace BuildingRegistry.Tests.Oslo.ParcelMatchingTests
         [Fact]
         public void With2Parcels_1Above40Percent_1Under40Percent_ThenReturns1Parcel()
         {
-            var parcelLeft = CreateGeometry("100 100 100 200 200 200 200 100 100 100");
+            var parcelLeft = CreateGeometry("140100 186100 140100 186200 140200 186200 140200 186100 140100 186100");
             var parcelLeftCaPaKey = Guid.NewGuid().ToString();
-            var parcelRight = CreateGeometry("200 100 200 200 300 200 300 100 200 100");
-            var building = CreateGeometry("139 100 139 200 239 200 239 100 139 100");
+            var parcelRight = CreateGeometry("140200 186100 140200 186200 140300 186200 140300 186100 140200 186100");
+            var building = CreateGeometry("140139 186100 140139 186200 140239 186200 140239 186100 140139 186100");
 
             _consumerParcelContext.ParcelConsumerItemsWithCount.Add(
                 new ParcelConsumerItem(
@@ -148,7 +151,7 @@ namespace BuildingRegistry.Tests.Oslo.ParcelMatchingTests
 
             _consumerParcelContext.SaveChanges();
 
-            var parcelMatching = new ParcelMatching(_consumerParcelContext);
+            var parcelMatching = new ParcelMatching(_consumerParcelContext, Lambert72Matching, new Lambert2008MatchingReadiness());
 
             var result = parcelMatching.GetUnderlyingParcels(WkbWriter.Instance.Write(building)).ToList();
 
@@ -190,7 +193,7 @@ namespace BuildingRegistry.Tests.Oslo.ParcelMatchingTests
 
             _consumerParcelContext.SaveChanges();
 
-            var parcelMatching = new ParcelMatching(_consumerParcelContext);
+            var parcelMatching = new ParcelMatching(_consumerParcelContext, Lambert72Matching, new Lambert2008MatchingReadiness());
 
             var result = parcelMatching.GetUnderlyingParcels(WkbWriter.Instance.Write(buildingGeometry));
 
