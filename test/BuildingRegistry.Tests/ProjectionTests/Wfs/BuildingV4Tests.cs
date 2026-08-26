@@ -1,9 +1,11 @@
-namespace BuildingRegistry.Tests.ProjectionTests.Wms
+namespace BuildingRegistry.Tests.ProjectionTests.Wfs
 {
     using System.Collections.Generic;
     using System.Threading.Tasks;
     using AutoFixture;
     using Be.Vlaanderen.Basisregisters.GrAr.Common.Pipes;
+    using Be.Vlaanderen.Basisregisters.GrAr.CrsTransform;
+    using Be.Vlaanderen.Basisregisters.GrAr.Legacy.Gebouw;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore;
     using Be.Vlaanderen.Basisregisters.Utilities.HexByteConvertor;
     using Building;
@@ -11,15 +13,17 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wms
     using Fixtures;
     using FluentAssertions;
     using Infrastructure;
-    using Projections.Wms.BuildingV3;
+    using NetTopologySuite.Geometries;
+    using Projections.Wfs.BuildingV4;
     using Tests.Legacy.Autofixture;
     using Xunit;
+    using Envelope = Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope;
 
-    public class BuildingV3Tests : BuildingWmsProjectionTest<BuildingV3Projections>
+    public class BuildingV4Tests : BuildingWfsProjectionTest<BuildingV4Projections>
     {
         private readonly Fixture _fixture;
 
-        public BuildingV3Tests()
+        public BuildingV4Tests()
         {
             _fixture = new Fixture();
             _fixture.Customize(new InfrastructureCustomization());
@@ -33,11 +37,9 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wms
         }
 
         [Fact]
-        public async Task WhenNonRemovedBuildingWasMigrated()
+        public async Task WhenBuildingWasMigrated()
         {
-            _fixture.Register(() => false);
             var buildingWasMigrated = _fixture.Create<BuildingWasMigrated>();
-
             var metadata = new Dictionary<string, object>
             {
                 { AddEventHashPipe.HashMetadataKey, buildingWasMigrated.GetHash() }
@@ -47,35 +49,19 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wms
                 .Given(new Envelope<BuildingWasMigrated>(new Envelope(buildingWasMigrated, metadata)))
                 .Then(async ct =>
                 {
-                    var buildingDetailItem = await ct.BuildingsV3.FindAsync(buildingWasMigrated.BuildingPersistentLocalId);
+                    var buildingDetailItem = await ct.BuildingsV4.FindAsync(buildingWasMigrated.BuildingPersistentLocalId);
                     buildingDetailItem.Should().NotBeNull();
 
                     buildingDetailItem!.Id.Should().Be(PersistentLocalIdHelper.CreateBuildingId(buildingWasMigrated.BuildingPersistentLocalId));
-                    buildingDetailItem.Status.Should().Be(BuildingStatus.Parse(buildingWasMigrated.BuildingStatus));
+                    buildingDetailItem.IsRemoved.Should().Be(buildingWasMigrated.IsRemoved);
+                    buildingDetailItem.Status.Should()
+                        .Be(BuildingV4Projections.MapStatus(BuildingStatus.Parse(buildingWasMigrated.BuildingStatus)));
                     buildingDetailItem.Version.Should().Be(buildingWasMigrated.Provenance.Timestamp);
 
-                    buildingDetailItem.Geometry.Should().BeEquivalentTo(GeometryHelper.ValidPolygon.AsBinary());
-                    buildingDetailItem.GeometryMethod.Should().Be(BuildingV3Projections.MapMethod(BuildingGeometryMethod.Parse(buildingWasMigrated.GeometryMethod)));
-                });
-        }
-
-        [Fact]
-        public async Task WhenRemovedBuildingWasMigrated()
-        {
-            _fixture.Register(() => true);
-            var buildingWasMigrated = _fixture.Create<BuildingWasMigrated>();
-
-            var metadata = new Dictionary<string, object>
-            {
-                { AddEventHashPipe.HashMetadataKey, buildingWasMigrated.GetHash() }
-            };
-
-            await Sut
-                .Given(new Envelope<BuildingWasMigrated>(new Envelope(buildingWasMigrated, metadata)))
-                .Then(async ct =>
-                {
-                    var buildingDetailItem = await ct.BuildingsV3.FindAsync(buildingWasMigrated.BuildingPersistentLocalId);
-                    buildingDetailItem.Should().BeNull();
+                    var polygon = ExpectedGeometry(buildingWasMigrated.ExtendedWkbGeometry);
+                    buildingDetailItem.Geometry.Should().Be(new GrbPolygon(polygon!));
+                    buildingDetailItem.GeometryMethod.Should()
+                        .Be(BuildingV4Projections.MapGeometryMethod(BuildingGeometryMethod.Parse(buildingWasMigrated.GeometryMethod)));
                 });
         }
 
@@ -92,17 +78,17 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wms
                 .Given(new Envelope<BuildingWasPlannedV2>(new Envelope(buildingWasPlannedV2, metadata)))
                 .Then(async ct =>
                 {
-                    var buildingDetailItem = await ct.BuildingsV3.FindAsync(buildingWasPlannedV2.BuildingPersistentLocalId);
+                    var buildingDetailItem = await ct.BuildingsV4.FindAsync(buildingWasPlannedV2.BuildingPersistentLocalId);
                     buildingDetailItem.Should().NotBeNull();
 
                     buildingDetailItem!.Id.Should().Be(PersistentLocalIdHelper.CreateBuildingId(buildingWasPlannedV2.BuildingPersistentLocalId));
-                    buildingDetailItem.Status.Should().Be(BuildingStatus.Planned);
+                    buildingDetailItem.IsRemoved.Should().BeFalse();
+                    buildingDetailItem.Status.Should().Be(BuildingV4Projections.MapStatus(BuildingStatus.Planned));
                     buildingDetailItem.Version.Should().Be(buildingWasPlannedV2.Provenance.Timestamp);
 
-                    var wkbReader = WKBReaderFactory.Create();
-                    var polygon = wkbReader.Read(buildingWasPlannedV2.ExtendedWkbGeometry.ToByteArray());
-                    buildingDetailItem.Geometry.Should().BeEquivalentTo(polygon.AsBinary());
-                    buildingDetailItem.GeometryMethod.Should().Be("Ingeschetst");
+                    var polygon = ExpectedGeometry(buildingWasPlannedV2.ExtendedWkbGeometry);
+                    WkbWriter.Instance.Write(buildingDetailItem.Geometry!).Should().BeEquivalentTo(WkbWriter.Instance.Write(polygon));
+                    buildingDetailItem.GeometryMethod.Should().Be(BuildingV4Projections.MapGeometryMethod(BuildingGeometryMethod.Outlined));
                 });
         }
 
@@ -119,17 +105,17 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wms
                 .Given(new Envelope<UnplannedBuildingWasRealizedAndMeasured>(new Envelope(@event, metadata)))
                 .Then(async ct =>
                 {
-                    var buildingDetailItem = await ct.BuildingsV3.FindAsync(@event.BuildingPersistentLocalId);
+                    var buildingDetailItem = await ct.BuildingsV4.FindAsync(@event.BuildingPersistentLocalId);
                     buildingDetailItem.Should().NotBeNull();
 
                     buildingDetailItem!.Id.Should().Be(PersistentLocalIdHelper.CreateBuildingId(@event.BuildingPersistentLocalId));
-                    buildingDetailItem.Status.Should().Be(BuildingStatus.Realized);
-                    buildingDetailItem.GeometryMethod.Should().Be("IngemetenGRB");
+                    buildingDetailItem.Status.Should().Be(BuildingV4Projections.MapStatus(BuildingStatus.Realized));
+                    buildingDetailItem.GeometryMethod.Should().Be(BuildingV4Projections.MapGeometryMethod(BuildingGeometryMethod.MeasuredByGrb));
+                    buildingDetailItem.IsRemoved.Should().BeFalse();
                     buildingDetailItem.Version.Should().Be(@event.Provenance.Timestamp);
 
-                    var wkbReader = WKBReaderFactory.Create();
-                    var polygon = wkbReader.Read(@event.ExtendedWkbGeometry.ToByteArray());
-                    buildingDetailItem.Geometry.Should().BeEquivalentTo(polygon.AsBinary());
+                    var polygon = ExpectedGeometry(@event.ExtendedWkbGeometry);
+                    WkbWriter.Instance.Write(buildingDetailItem.Geometry!).Should().BeEquivalentTo(WkbWriter.Instance.Write(polygon));
                 });
         }
 
@@ -150,7 +136,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wms
                     })))
                 .Then(async ct =>
                 {
-                    var buildingDetailItem = await ct.BuildingsV3.FindAsync(buildingUnitWasPlannedV2.BuildingPersistentLocalId);
+                    var buildingDetailItem = await ct.BuildingsV4.FindAsync(buildingUnitWasPlannedV2.BuildingPersistentLocalId);
                     buildingDetailItem.Should().NotBeNull();
                     buildingDetailItem!.Version.Should().Be(buildingUnitWasPlannedV2.Provenance.Timestamp);
                 });
@@ -173,7 +159,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wms
                     })))
                 .Then(async ct =>
                 {
-                    var buildingDetailItem = await ct.BuildingsV3.FindAsync(commonBuildingUnitWasAddedV2.BuildingPersistentLocalId);
+                    var buildingDetailItem = await ct.BuildingsV4.FindAsync(commonBuildingUnitWasAddedV2.BuildingPersistentLocalId);
                     buildingDetailItem.Should().NotBeNull();
                     buildingDetailItem!.Version.Should().Be(commonBuildingUnitWasAddedV2.Provenance.Timestamp);
                 });
@@ -196,13 +182,12 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wms
                             new Dictionary<string, object> { { AddEventHashPipe.HashMetadataKey, buildingOutlineWasChanged.GetHash() } })))
                 .Then(async ct =>
                 {
-                    var buildingDetailItem = await ct.BuildingsV3.FindAsync(buildingOutlineWasChanged.BuildingPersistentLocalId);
+                    var buildingDetailItem = await ct.BuildingsV4.FindAsync(buildingOutlineWasChanged.BuildingPersistentLocalId);
                     buildingDetailItem.Should().NotBeNull();
                     buildingDetailItem!.Version.Should().Be(buildingOutlineWasChanged.Provenance.Timestamp);
 
-                    var wkbReader = WKBReaderFactory.Create();
-                    var polygon = wkbReader.Read(buildingOutlineWasChanged.ExtendedWkbGeometryBuilding.ToByteArray());
-                    buildingDetailItem.Geometry.Should().BeEquivalentTo(polygon.AsBinary());
+                    var polygon = ExpectedGeometry(buildingOutlineWasChanged.ExtendedWkbGeometryBuilding);
+                    WkbWriter.Instance.Write(buildingDetailItem.Geometry!).Should().BeEquivalentTo(WkbWriter.Instance.Write(polygon));
                 });
         }
 
@@ -223,14 +208,13 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wms
                             new Dictionary<string, object> { { AddEventHashPipe.HashMetadataKey, buildingMeasurementWasChanged.GetHash() } })))
                 .Then(async ct =>
                 {
-                    var buildingDetailItem = await ct.BuildingsV3.FindAsync(buildingMeasurementWasChanged.BuildingPersistentLocalId);
+                    var buildingDetailItem = await ct.BuildingsV4.FindAsync(buildingMeasurementWasChanged.BuildingPersistentLocalId);
                     buildingDetailItem.Should().NotBeNull();
                     buildingDetailItem!.Version.Should().Be(buildingMeasurementWasChanged.Provenance.Timestamp);
-                    buildingDetailItem.GeometryMethod.Should().Be(BuildingV3Projections.MeasuredByGrbMethod);
+                    buildingDetailItem.GeometryMethod.Should().Be(BuildingV4Projections.MeasuredMethod);
 
-                    var wkbReader = WKBReaderFactory.Create();
-                    var polygon = wkbReader.Read(buildingMeasurementWasChanged.ExtendedWkbGeometryBuilding.ToByteArray());
-                    buildingDetailItem.Geometry.Should().BeEquivalentTo(polygon.AsBinary());
+                    var polygon = ExpectedGeometry(buildingMeasurementWasChanged.ExtendedWkbGeometryBuilding);
+                    WkbWriter.Instance.Write(buildingDetailItem.Geometry!).Should().BeEquivalentTo(WkbWriter.Instance.Write(polygon));
                 });
         }
 
@@ -251,10 +235,10 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wms
                     })))
                 .Then(async ct =>
                 {
-                    var buildingDetailItem = await ct.BuildingsV3.FindAsync(buildingBecameUnderConstructionV2.BuildingPersistentLocalId);
+                    var buildingDetailItem = await ct.BuildingsV4.FindAsync(buildingBecameUnderConstructionV2.BuildingPersistentLocalId);
                     buildingDetailItem.Should().NotBeNull();
                     buildingDetailItem!.Version.Should().Be(buildingBecameUnderConstructionV2.Provenance.Timestamp);
-                    buildingDetailItem.Status.Should().Be(BuildingStatus.UnderConstruction);
+                    buildingDetailItem.Status.Should().Be(BuildingV4Projections.MapStatus(BuildingStatus.UnderConstruction));
                 });
         }
 
@@ -269,16 +253,18 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wms
                     {
                         { AddEventHashPipe.HashMetadataKey, buildingWasPlannedV2.GetHash() }
                     })),
-                    new Envelope<BuildingWasCorrectedFromUnderConstructionToPlanned>(new Envelope(buildingWasCorrectedFromUnderConstructionToPlanned, new Dictionary<string, object>
-                    {
-                        { AddEventHashPipe.HashMetadataKey, buildingWasCorrectedFromUnderConstructionToPlanned.GetHash() }
-                    })))
+                    new Envelope<BuildingWasCorrectedFromUnderConstructionToPlanned>(new Envelope(buildingWasCorrectedFromUnderConstructionToPlanned,
+                        new Dictionary<string, object>
+                        {
+                            { AddEventHashPipe.HashMetadataKey, buildingWasCorrectedFromUnderConstructionToPlanned.GetHash() }
+                        })))
                 .Then(async ct =>
                 {
-                    var buildingDetailItem = await ct.BuildingsV3.FindAsync(buildingWasCorrectedFromUnderConstructionToPlanned.BuildingPersistentLocalId);
+                    var buildingDetailItem =
+                        await ct.BuildingsV4.FindAsync(buildingWasCorrectedFromUnderConstructionToPlanned.BuildingPersistentLocalId);
                     buildingDetailItem.Should().NotBeNull();
                     buildingDetailItem!.Version.Should().Be(buildingWasCorrectedFromUnderConstructionToPlanned.Provenance.Timestamp);
-                    buildingDetailItem.Status.Should().Be(BuildingStatus.Planned);
+                    buildingDetailItem.Status.Should().Be(BuildingV4Projections.MapStatus(BuildingStatus.Planned));
                 });
         }
 
@@ -300,9 +286,9 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wms
                             new Dictionary<string, object> { { AddEventHashPipe.HashMetadataKey, buildingWasRealizedV2.GetHash() } })))
                 .Then(async ct =>
                 {
-                    var buildingDetailItem = await ct.BuildingsV3.FindAsync(buildingWasRealizedV2.BuildingPersistentLocalId);
+                    var buildingDetailItem = await ct.BuildingsV4.FindAsync(buildingWasRealizedV2.BuildingPersistentLocalId);
                     buildingDetailItem.Should().NotBeNull();
-                    buildingDetailItem!.Status.Should().Be(BuildingStatus.Realized);
+                    buildingDetailItem!.Status.Should().Be(BuildingV4Projections.MapStatus(BuildingStatus.Realized));
                     buildingDetailItem.Version.Should().Be(buildingWasRealizedV2.Provenance.Timestamp);
                 });
         }
@@ -327,12 +313,13 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wms
                     new Envelope<BuildingWasCorrectedFromRealizedToUnderConstruction>(
                         new Envelope(
                             buildingWasCorrectedFromRealizedToUnderConstruction,
-                            new Dictionary<string, object> { { AddEventHashPipe.HashMetadataKey, buildingWasCorrectedFromRealizedToUnderConstruction.GetHash() } })))
+                            new Dictionary<string, object>
+                                { { AddEventHashPipe.HashMetadataKey, buildingWasCorrectedFromRealizedToUnderConstruction.GetHash() } })))
                 .Then(async ct =>
                 {
-                    var buildingDetailItem = await ct.BuildingsV3.FindAsync(buildingWasRealizedV2.BuildingPersistentLocalId);
+                    var buildingDetailItem = await ct.BuildingsV4.FindAsync(buildingWasRealizedV2.BuildingPersistentLocalId);
                     buildingDetailItem.Should().NotBeNull();
-                    buildingDetailItem!.Status.Should().Be(BuildingStatus.UnderConstruction);
+                    buildingDetailItem!.Status.Should().Be(BuildingV4Projections.MapStatus(BuildingStatus.UnderConstruction));
                     buildingDetailItem.Version.Should().Be(buildingWasCorrectedFromRealizedToUnderConstruction.Provenance.Timestamp);
                 });
         }
@@ -354,10 +341,10 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wms
                     })))
                 .Then(async ct =>
                 {
-                    var buildingDetailItem = await ct.BuildingsV3.FindAsync(buildingWasNotRealizedV2.BuildingPersistentLocalId);
+                    var buildingDetailItem = await ct.BuildingsV4.FindAsync(buildingWasNotRealizedV2.BuildingPersistentLocalId);
                     buildingDetailItem.Should().NotBeNull();
                     buildingDetailItem!.Version.Should().Be(buildingWasNotRealizedV2.Provenance.Timestamp);
-                    buildingDetailItem.Status.Should().Be(BuildingStatus.NotRealized);
+                    buildingDetailItem.Status.Should().Be(BuildingV4Projections.MapStatus(BuildingStatus.NotRealized));
                 });
         }
 
@@ -381,12 +368,13 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wms
                     new Envelope<BuildingWasCorrectedFromNotRealizedToPlanned>(
                         new Envelope(
                             buildingWasCorrectedFromNotRealizedToPlanned,
-                            new Dictionary<string, object> { { AddEventHashPipe.HashMetadataKey, buildingWasCorrectedFromNotRealizedToPlanned.GetHash() } })))
+                            new Dictionary<string, object>
+                                { { AddEventHashPipe.HashMetadataKey, buildingWasCorrectedFromNotRealizedToPlanned.GetHash() } })))
                 .Then(async ct =>
                 {
-                    var buildingDetailItem = await ct.BuildingsV3.FindAsync(buildingWasNotRealizedV2.BuildingPersistentLocalId);
+                    var buildingDetailItem = await ct.BuildingsV4.FindAsync(buildingWasNotRealizedV2.BuildingPersistentLocalId);
                     buildingDetailItem.Should().NotBeNull();
-                    buildingDetailItem!.Status.Should().Be(BuildingStatus.Planned);
+                    buildingDetailItem!.Status.Should().Be(BuildingV4Projections.MapStatus(BuildingStatus.Planned));
                     buildingDetailItem.Version.Should().Be(buildingWasCorrectedFromNotRealizedToPlanned.Provenance.Timestamp);
                 });
         }
@@ -409,8 +397,10 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wms
                             new Dictionary<string, object> { { AddEventHashPipe.HashMetadataKey, buildingWasRemovedV2.GetHash() } })))
                 .Then(async ct =>
                 {
-                    var buildingDetailItem = await ct.BuildingsV3.FindAsync(buildingWasRemovedV2.BuildingPersistentLocalId);
-                    buildingDetailItem.Should().BeNull();
+                    var buildingDetailItem = await ct.BuildingsV4.FindAsync(buildingWasRemovedV2.BuildingPersistentLocalId);
+                    buildingDetailItem.Should().NotBeNull();
+                    buildingDetailItem!.IsRemoved.Should().BeTrue();
+                    buildingDetailItem.Version.Should().Be(buildingWasRemovedV2.Provenance.Timestamp);
                 });
         }
 
@@ -431,14 +421,13 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wms
                             new Dictionary<string, object> { { AddEventHashPipe.HashMetadataKey, @event.GetHash() } })))
                 .Then(async ct =>
                 {
-                    var buildingDetailItem = await ct.BuildingsV3.FindAsync(@event.BuildingPersistentLocalId);
+                    var buildingDetailItem = await ct.BuildingsV4.FindAsync(@event.BuildingPersistentLocalId);
                     buildingDetailItem.Should().NotBeNull();
                     buildingDetailItem!.Version.Should().Be(@event.Provenance.Timestamp);
 
-                    var wkbReader = WKBReaderFactory.Create();
-                    var polygon = wkbReader.Read(@event.ExtendedWkbGeometryBuilding.ToByteArray());
-                    buildingDetailItem.Geometry.Should().BeEquivalentTo(polygon.AsBinary());
-                    buildingDetailItem.GeometryMethod.Should().Be(BuildingV3Projections.MeasuredByGrbMethod);
+                    var polygon = ExpectedGeometry(@event.ExtendedWkbGeometryBuilding);
+                    WkbWriter.Instance.Write(buildingDetailItem.Geometry!).Should().BeEquivalentTo(WkbWriter.Instance.Write(polygon));
+                    buildingDetailItem.GeometryMethod.Should().Be(GeometrieMethode.IngemetenGRB.ToString());
                 });
         }
 
@@ -464,14 +453,13 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wms
                             new Dictionary<string, object> { { AddEventHashPipe.HashMetadataKey, @event.GetHash() } })))
                 .Then(async ct =>
                 {
-                    var buildingDetailItem = await ct.BuildingsV3.FindAsync(@event.BuildingPersistentLocalId);
+                    var buildingDetailItem = await ct.BuildingsV4.FindAsync(@event.BuildingPersistentLocalId);
                     buildingDetailItem.Should().NotBeNull();
                     buildingDetailItem!.Version.Should().Be(@event.Provenance.Timestamp);
 
-                    var wkbReader = WKBReaderFactory.Create();
-                    var polygon = wkbReader.Read(@event.ExtendedWkbGeometryBuilding.ToByteArray());
-                    buildingDetailItem.Geometry.Should().BeEquivalentTo(polygon.AsBinary());
-                    buildingDetailItem.GeometryMethod.Should().Be(BuildingV3Projections.MeasuredByGrbMethod);
+                    var polygon = ExpectedGeometry(@event.ExtendedWkbGeometryBuilding);
+                    WkbWriter.Instance.Write(buildingDetailItem.Geometry!).Should().BeEquivalentTo(WkbWriter.Instance.Write(polygon));
+                    buildingDetailItem.GeometryMethod.Should().Be(GeometrieMethode.IngemetenGRB.ToString());
                 });
         }
 
@@ -497,10 +485,10 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wms
                             new Dictionary<string, object> { { AddEventHashPipe.HashMetadataKey, buildingWasDemolished.GetHash() } })))
                 .Then(async ct =>
                 {
-                    var item = await ct.BuildingsV3.FindAsync(buildingWasDemolished.BuildingPersistentLocalId);
+                    var item = await ct.BuildingsV4.FindAsync(buildingWasDemolished.BuildingPersistentLocalId);
                     item.Should().NotBeNull();
 
-                    item!.Status.Should().Be(BuildingStatus.Retired);
+                    item!.Status.Should().Be("Gehistoreerd");
                 });
         }
 
@@ -522,32 +510,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wms
                             new Dictionary<string, object> { { AddEventHashPipe.HashMetadataKey, @event.GetHash() } })))
                 .Then(async ct =>
                 {
-                    var item = await ct.BuildingsV3.FindAsync(@event.BuildingPersistentLocalId);
-                    item.Should().NotBeNull();
-
-                    item!.Version.Should().Be(@event.Provenance.Timestamp);
-                });
-        }
-
-        [Fact]
-        public async Task WhenBuildingUnitWasMovedOutOfBuilding()
-        {
-            var buildingWasPlanned = _fixture.Create<BuildingWasPlannedV2>();
-            var @event = _fixture.Create<BuildingUnitWasMovedOutOfBuilding>();
-
-            await Sut
-                .Given(
-                    new Envelope<BuildingWasPlannedV2>(
-                        new Envelope(
-                            buildingWasPlanned,
-                            new Dictionary<string, object> { { AddEventHashPipe.HashMetadataKey, buildingWasPlanned.GetHash() } })),
-                    new Envelope<BuildingUnitWasMovedOutOfBuilding>(
-                        new Envelope(
-                            @event,
-                            new Dictionary<string, object> { { AddEventHashPipe.HashMetadataKey, @event.GetHash() } })))
-                .Then(async ct =>
-                {
-                    var item = await ct.BuildingsV3.FindAsync(@event.BuildingPersistentLocalId);
+                    var item = await ct.BuildingsV4.FindAsync(@event.BuildingPersistentLocalId);
                     item.Should().NotBeNull();
 
                     item!.Version.Should().Be(@event.Provenance.Timestamp);
@@ -572,7 +535,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wms
                             new Dictionary<string, object> { { AddEventHashPipe.HashMetadataKey, @event.GetHash() } })))
                 .Then(async ct =>
                 {
-                    var item = await ct.BuildingsV3.FindAsync(@event.BuildingPersistentLocalId);
+                    var item = await ct.BuildingsV4.FindAsync(@event.BuildingPersistentLocalId);
                     item.Should().NotBeNull();
 
                     item!.Version.Should().Be(@event.Provenance.Timestamp);
@@ -597,13 +560,51 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wms
                             new Dictionary<string, object> { { AddEventHashPipe.HashMetadataKey, @event.GetHash() } })))
                 .Then(async ct =>
                 {
-                    var item = await ct.BuildingsV3.FindAsync(@event.BuildingPersistentLocalId);
+                    var item = await ct.BuildingsV4.FindAsync(@event.BuildingPersistentLocalId);
                     item.Should().NotBeNull();
 
                     item!.Version.Should().Be(@event.Provenance.Timestamp);
                 });
         }
 
-        protected override BuildingV3Projections CreateProjection() => new BuildingV3Projections();
+        [Fact]
+        public async Task WhenBuildingUnitWasMovedOutOfBuilding()
+        {
+            var buildingWasPlanned = _fixture.Create<BuildingWasPlannedV2>();
+            var @event = _fixture.Create<BuildingUnitWasMovedOutOfBuilding>();
+
+            await Sut
+                .Given(
+                    new Envelope<BuildingWasPlannedV2>(
+                        new Envelope(
+                            buildingWasPlanned,
+                            new Dictionary<string, object> { { AddEventHashPipe.HashMetadataKey, buildingWasPlanned.GetHash() } })),
+                    new Envelope<BuildingUnitWasMovedOutOfBuilding>(
+                        new Envelope(
+                            @event,
+                            new Dictionary<string, object> { { AddEventHashPipe.HashMetadataKey, @event.GetHash() } })))
+                .Then(async ct =>
+                {
+                    var item = await ct.BuildingsV4.FindAsync(@event.BuildingPersistentLocalId);
+                    item.Should().NotBeNull();
+
+                    item!.Version.Should().Be(@event.Provenance.Timestamp);
+                });
+        }
+
+        /// <summary>
+        /// What version 4 is expected to store: the event's geometry in Lambert 2008, the same way
+        /// <see cref="BuildingV4Projections"/> puts it there. The reference system itself is asserted
+        /// against fixed coordinates in <c>GivenBuildingGeometryInEitherReferenceSystem</c>. See ADR 0005.
+        /// </summary>
+        private static Polygon ExpectedGeometry(string extendedWkbGeometry)
+        {
+            var extendedWkb = extendedWkbGeometry.ToByteArray();
+            var geometry = (Polygon)WKBReaderFactory.CreateForEwkb(extendedWkb).Read(extendedWkb);
+
+            return new GrbPolygon((Polygon)geometry.EnsureLambert08(2));
+        }
+
+        protected override BuildingV4Projections CreateProjection() => new BuildingV4Projections();
     }
 }

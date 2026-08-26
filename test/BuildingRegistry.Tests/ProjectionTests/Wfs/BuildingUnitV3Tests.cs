@@ -5,6 +5,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wfs
     using System.Threading.Tasks;
     using AutoFixture;
     using Be.Vlaanderen.Basisregisters.GrAr.Common.Pipes;
+    using Be.Vlaanderen.Basisregisters.GrAr.CrsTransform;
     using Be.Vlaanderen.Basisregisters.GrAr.Legacy.Gebouweenheid;
     using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore;
@@ -15,20 +16,17 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wfs
     using Fixtures;
     using FluentAssertions;
     using NetTopologySuite.Geometries;
-    using NetTopologySuite.IO;
-    using Projections.Wfs.BuildingUnitV2;
+    using Projections.Wfs.BuildingUnitV3;
     using Tests.Legacy.Autofixture;
     using Xunit;
     using Envelope = Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Envelope;
 
-    public class BuildingUnitV2Tests : BuildingWfsProjectionTest<BuildingUnitV2Projections>
+    public class BuildingUnitV3Tests : BuildingWfsProjectionTest<BuildingUnitV3Projections>
     {
-        private readonly WKBReader _wkbReader;
         private readonly Fixture _fixture = new();
 
-        public BuildingUnitV2Tests()
+        public BuildingUnitV3Tests()
         {
-            _wkbReader = WKBReaderFactory.Create();
             _fixture.Customize(new InfrastructureCustomization());
             _fixture.Customize(new WithBuildingStatus());
             _fixture.Customize(new WithBuildingGeometryMethod());
@@ -58,7 +56,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wfs
                 .Given(new Envelope<BuildingWasMigrated>(new Envelope(buildingWasMigrated, metadata)))
                 .Then(async ct =>
                 {
-                    var buildingUnits = ct.BuildingUnitsV2
+                    var buildingUnits = ct.BuildingUnitsV3
                         .Where(unit => unit.BuildingPersistentLocalId == buildingWasMigrated.BuildingPersistentLocalId)
                         .ToList();
 
@@ -69,13 +67,13 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wfs
 
                         expectedUnit.BuildingPersistentLocalId.Should().Be(buildingWasMigrated.BuildingPersistentLocalId);
                         expectedUnit.IsRemoved.Should().Be(unit.IsRemoved);
-                        expectedUnit.Status.Should().Be(BuildingUnitV2Projections.MapStatus(BuildingUnitStatus.Parse(unit.Status)));
+                        expectedUnit.Status.Should().Be(BuildingUnitV3Projections.MapStatus(BuildingUnitStatus.Parse(unit.Status)));
                         expectedUnit.HasDeviation.Should().BeFalse();
-                        expectedUnit.Function.Should().Be(BuildingUnitV2Projections.MapFunction(BuildingUnitFunction.Parse(unit.Function)));
-                        expectedUnit.PositionMethod.Should().Be(BuildingUnitV2Projections.MapGeometryMethod(BuildingUnitPositionGeometryMethod.Parse(unit.GeometryMethod)));
+                        expectedUnit.Function.Should().Be(BuildingUnitV3Projections.MapFunction(BuildingUnitFunction.Parse(unit.Function)));
+                        expectedUnit.PositionMethod.Should().Be(BuildingUnitV3Projections.MapGeometryMethod(BuildingUnitPositionGeometryMethod.Parse(unit.GeometryMethod)));
                         expectedUnit.Version.Should().Be(buildingWasMigrated.Provenance.Timestamp);
 
-                        var point = WKBReaderFactory.Create().Read(unit.ExtendedWkbGeometry.ToByteArray()) as Point;
+                        var point = ExpectedPosition(unit.ExtendedWkbGeometry);
                         expectedUnit.Position.Should().Be(point);
                     }
                 });
@@ -104,11 +102,11 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wfs
                             })))
                 .Then(async ct =>
                 {
-                    var item = await ct.BuildingUnitsV2.FindAsync(buildingUnitWasPlannedV2.BuildingUnitPersistentLocalId);
+                    var item = await ct.BuildingUnitsV3.FindAsync(buildingUnitWasPlannedV2.BuildingUnitPersistentLocalId);
                     item.Should().NotBeNull();
 
-                    item!.PositionMethod.Should().Be(BuildingUnitV2Projections.MapGeometryMethod(BuildingUnitPositionGeometryMethod.DerivedFromObject));
-                    item.Position.Should().BeEquivalentTo((Point)_wkbReader.Read(@event.ExtendedWkbGeometryBuildingUnits!.ToByteArray()));
+                    item!.PositionMethod.Should().Be(BuildingUnitV3Projections.MapGeometryMethod(BuildingUnitPositionGeometryMethod.DerivedFromObject));
+                    item.Position.Should().BeEquivalentTo(ExpectedPosition(@event.ExtendedWkbGeometryBuildingUnits!));
                 });
         }
 
@@ -135,11 +133,11 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wfs
                             })))
                 .Then(async ct =>
                 {
-                    var item = await ct.BuildingUnitsV2.FindAsync(buildingUnitWasPlannedV2.BuildingUnitPersistentLocalId);
+                    var item = await ct.BuildingUnitsV3.FindAsync(buildingUnitWasPlannedV2.BuildingUnitPersistentLocalId);
                     item.Should().NotBeNull();
 
-                    item!.PositionMethod.Should().Be(BuildingUnitV2Projections.MapGeometryMethod(BuildingUnitPositionGeometryMethod.DerivedFromObject));
-                    item.Position.Should().BeEquivalentTo((Point)_wkbReader.Read(@event.ExtendedWkbGeometryBuildingUnits!.ToByteArray()));
+                    item!.PositionMethod.Should().Be(BuildingUnitV3Projections.MapGeometryMethod(BuildingUnitPositionGeometryMethod.DerivedFromObject));
+                    item.Position.Should().BeEquivalentTo(ExpectedPosition(@event.ExtendedWkbGeometryBuildingUnits!));
                 });
         }
 
@@ -165,11 +163,11 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wfs
                             new Dictionary<string, object> { { AddEventHashPipe.HashMetadataKey, @event.GetHash() } })))
                 .Then(async ct =>
                 {
-                    var item = await ct.BuildingUnitsV2.FindAsync(buildingUnitWasPlannedV2.BuildingUnitPersistentLocalId);
+                    var item = await ct.BuildingUnitsV3.FindAsync(buildingUnitWasPlannedV2.BuildingUnitPersistentLocalId);
                     item.Should().NotBeNull();
 
-                    item!.PositionMethod.Should().Be(BuildingUnitV2Projections.MapGeometryMethod(BuildingUnitPositionGeometryMethod.DerivedFromObject));
-                    item.Position.Should().BeEquivalentTo((Point)_wkbReader.Read(@event.ExtendedWkbGeometryBuildingUnits!.ToByteArray()));
+                    item!.PositionMethod.Should().Be(BuildingUnitV3Projections.MapGeometryMethod(BuildingUnitPositionGeometryMethod.DerivedFromObject));
+                    item.Position.Should().BeEquivalentTo(ExpectedPosition(@event.ExtendedWkbGeometryBuildingUnits!));
                 });
         }
 
@@ -195,11 +193,11 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wfs
                             new Dictionary<string, object> { { AddEventHashPipe.HashMetadataKey, @event.GetHash() } })))
                 .Then(async ct =>
                 {
-                    var item = await ct.BuildingUnitsV2.FindAsync(buildingUnitWasPlannedV2.BuildingUnitPersistentLocalId);
+                    var item = await ct.BuildingUnitsV3.FindAsync(buildingUnitWasPlannedV2.BuildingUnitPersistentLocalId);
                     item.Should().NotBeNull();
 
-                    item!.PositionMethod.Should().Be(BuildingUnitV2Projections.MapGeometryMethod(BuildingUnitPositionGeometryMethod.DerivedFromObject));
-                    item.Position.Should().BeEquivalentTo((Point)_wkbReader.Read(@event.ExtendedWkbGeometryBuildingUnits!.ToByteArray()));
+                    item!.PositionMethod.Should().Be(BuildingUnitV3Projections.MapGeometryMethod(BuildingUnitPositionGeometryMethod.DerivedFromObject));
+                    item.Position.Should().BeEquivalentTo(ExpectedPosition(@event.ExtendedWkbGeometryBuildingUnits!));
                 });
         }
 
@@ -216,13 +214,13 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wfs
                 .Given(new Envelope<BuildingUnitWasPlannedV2>(new Envelope(buildingUnitWasPlannedV2, metadata)))
                 .Then(async ct =>
                 {
-                    var item = await ct.BuildingUnitsV2.FindAsync(buildingUnitWasPlannedV2.BuildingUnitPersistentLocalId);
+                    var item = await ct.BuildingUnitsV3.FindAsync(buildingUnitWasPlannedV2.BuildingUnitPersistentLocalId);
                     item.Should().NotBeNull();
                     item!.BuildingPersistentLocalId.Should().Be(buildingUnitWasPlannedV2.BuildingPersistentLocalId);
-                    item.Position.Should().BeEquivalentTo((Point)_wkbReader.Read(buildingUnitWasPlannedV2.ExtendedWkbGeometry.ToByteArray()));
-                    item.PositionMethod.Should().Be(BuildingUnitV2Projections.MapGeometryMethod(BuildingUnitPositionGeometryMethod.Parse(buildingUnitWasPlannedV2.GeometryMethod)));
+                    item.Position.Should().BeEquivalentTo(ExpectedPosition(buildingUnitWasPlannedV2.ExtendedWkbGeometry));
+                    item.PositionMethod.Should().Be(BuildingUnitV3Projections.MapGeometryMethod(BuildingUnitPositionGeometryMethod.Parse(buildingUnitWasPlannedV2.GeometryMethod)));
                     item.Function.Should()
-                        .Be(BuildingUnitV2Projections.MapFunction(
+                        .Be(BuildingUnitV3Projections.MapFunction(
                             BuildingUnitFunction.Parse(buildingUnitWasPlannedV2.Function)));
                     item.Version.Should().Be(buildingUnitWasPlannedV2.Provenance.Timestamp);
                     item.IsRemoved.Should().BeFalse();
@@ -253,7 +251,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wfs
                             new Dictionary<string, object> { {AddEventHashPipe.HashMetadataKey, @event.GetHash()} })))
                 .Then(async ct =>
                 {
-                    var item = await ct.BuildingUnitsV2.FindAsync(@event.BuildingUnitPersistentLocalId);
+                    var item = await ct.BuildingUnitsV3.FindAsync(@event.BuildingUnitPersistentLocalId);
                     item.Should().NotBeNull();
 
                     item!.Status.Should().Be("Gerealiseerd");
@@ -282,7 +280,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wfs
                             new Dictionary<string, object> { {AddEventHashPipe.HashMetadataKey, @event.GetHash()} })))
                 .Then(async ct =>
                 {
-                    var item = await ct.BuildingUnitsV2.FindAsync(@event.BuildingUnitPersistentLocalId);
+                    var item = await ct.BuildingUnitsV3.FindAsync(@event.BuildingUnitPersistentLocalId);
                     item.Should().NotBeNull();
 
                     item!.Status.Should().Be("Gerealiseerd");
@@ -316,7 +314,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wfs
                     })))
                 .Then(async ct =>
                 {
-                    var item = await ct.BuildingUnitsV2.FindAsync(@event.BuildingUnitPersistentLocalId);
+                    var item = await ct.BuildingUnitsV3.FindAsync(@event.BuildingUnitPersistentLocalId);
                     item.Should().NotBeNull();
 
                     item.IsRemoved.Should().BeFalse();
@@ -350,7 +348,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wfs
                             new Dictionary<string, object> { {AddEventHashPipe.HashMetadataKey, @event.GetHash()} })))
                 .Then(async ct =>
                 {
-                    var item = await ct.BuildingUnitsV2.FindAsync(@event.BuildingUnitPersistentLocalId);
+                    var item = await ct.BuildingUnitsV3.FindAsync(@event.BuildingUnitPersistentLocalId);
                     item.Should().NotBeNull();
 
                     item!.Status.Should().Be("Gepland");
@@ -379,7 +377,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wfs
                             new Dictionary<string, object> { {AddEventHashPipe.HashMetadataKey, @event.GetHash()} })))
                 .Then(async ct =>
                 {
-                    var item = await ct.BuildingUnitsV2.FindAsync(@event.BuildingUnitPersistentLocalId);
+                    var item = await ct.BuildingUnitsV3.FindAsync(@event.BuildingUnitPersistentLocalId);
                     item.Should().NotBeNull();
 
                     item!.Status.Should().Be("NietGerealiseerd");
@@ -408,7 +406,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wfs
                             new Dictionary<string, object> { {AddEventHashPipe.HashMetadataKey, @event.GetHash()} })))
                 .Then(async ct =>
                 {
-                    var item = await ct.BuildingUnitsV2.FindAsync(@event.BuildingUnitPersistentLocalId);
+                    var item = await ct.BuildingUnitsV3.FindAsync(@event.BuildingUnitPersistentLocalId);
                     item.Should().NotBeNull();
 
                     item!.Status.Should().Be("NietGerealiseerd");
@@ -441,7 +439,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wfs
                             new Dictionary<string, object> { { AddEventHashPipe.HashMetadataKey, @event.GetHash() } })))
                 .Then(async ct =>
                 {
-                    var item = await ct.BuildingUnitsV2.FindAsync(@event.BuildingUnitPersistentLocalId);
+                    var item = await ct.BuildingUnitsV3.FindAsync(@event.BuildingUnitPersistentLocalId);
                     item.Should().NotBeNull();
 
                     item!.Status.Should().Be("Gepland");
@@ -474,7 +472,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wfs
                             new Dictionary<string, object> { { AddEventHashPipe.HashMetadataKey, @event.GetHash() } })))
                 .Then(async ct =>
                 {
-                    var item = await ct.BuildingUnitsV2.FindAsync(@event.BuildingUnitPersistentLocalId);
+                    var item = await ct.BuildingUnitsV3.FindAsync(@event.BuildingUnitPersistentLocalId);
                     item.Should().NotBeNull();
 
                     item!.Status.Should().Be("Gehistoreerd");
@@ -507,7 +505,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wfs
                             new Dictionary<string, object> { { AddEventHashPipe.HashMetadataKey, @event.GetHash() } })))
                 .Then(async ct =>
                 {
-                    var item = await ct.BuildingUnitsV2.FindAsync(@event.BuildingUnitPersistentLocalId);
+                    var item = await ct.BuildingUnitsV3.FindAsync(@event.BuildingUnitPersistentLocalId);
                     item.Should().NotBeNull();
 
                     item!.Status.Should().Be("Gerealiseerd");
@@ -544,13 +542,13 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wfs
                             new Dictionary<string, object> { { AddEventHashPipe.HashMetadataKey, @event.GetHash() } })))
                 .Then(async ct =>
                 {
-                    var item = await ct.BuildingUnitsV2.FindAsync(@event.BuildingUnitPersistentLocalId);
+                    var item = await ct.BuildingUnitsV3.FindAsync(@event.BuildingUnitPersistentLocalId);
                     item.Should().NotBeNull();
                     item!.BuildingPersistentLocalId.Should().Be(@event.BuildingPersistentLocalId);
-                    item.Position.Should().BeEquivalentTo((Point)_wkbReader.Read(@event.ExtendedWkbGeometry.ToByteArray()));
-                    item.PositionMethod.Should().Be(BuildingUnitV2Projections.MapGeometryMethod(BuildingUnitPositionGeometryMethod.Parse(@event.GeometryMethod)));
+                    item.Position.Should().BeEquivalentTo(ExpectedPosition(@event.ExtendedWkbGeometry));
+                    item.PositionMethod.Should().Be(BuildingUnitV3Projections.MapGeometryMethod(BuildingUnitPositionGeometryMethod.Parse(@event.GeometryMethod)));
                     item.Function.Should()
-                        .Be(BuildingUnitV2Projections.MapFunction(
+                        .Be(BuildingUnitV3Projections.MapFunction(
                             BuildingUnitFunction.Parse(buildingUnitWasPlannedV2.Function)));
                     item.Version.Should().Be(@event.Provenance.Timestamp);
                     item.IsRemoved.Should().BeFalse();
@@ -586,7 +584,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wfs
                             new Dictionary<string, object> { { AddEventHashPipe.HashMetadataKey, @event.GetHash() } })))
                 .Then(async ct =>
                 {
-                    var item = await ct.BuildingUnitsV2.FindAsync(@event.BuildingUnitPersistentLocalId);
+                    var item = await ct.BuildingUnitsV3.FindAsync(@event.BuildingUnitPersistentLocalId);
                     item.Should().NotBeNull();
                     item!.Version.Should().Be(@event.Provenance.Timestamp);
                     item.IsRemoved.Should().BeTrue();
@@ -617,7 +615,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wfs
                             new Dictionary<string, object> { { AddEventHashPipe.HashMetadataKey, @event.GetHash() } })))
                 .Then(async ct =>
                 {
-                    var item = await ct.BuildingUnitsV2.FindAsync(@event.BuildingUnitPersistentLocalId);
+                    var item = await ct.BuildingUnitsV3.FindAsync(@event.BuildingUnitPersistentLocalId);
                     item.Should().NotBeNull();
                     item!.Version.Should().Be(@event.Provenance.Timestamp);
                     item.IsRemoved.Should().BeTrue();
@@ -650,13 +648,13 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wfs
                             new Dictionary<string, object> { { AddEventHashPipe.HashMetadataKey, @event.GetHash() } })))
                 .Then(async ct =>
                 {
-                    var item = await ct.BuildingUnitsV2.FindAsync(buildingUnitWasRemovedV2.BuildingUnitPersistentLocalId);
+                    var item = await ct.BuildingUnitsV3.FindAsync(buildingUnitWasRemovedV2.BuildingUnitPersistentLocalId);
                     item.Should().NotBeNull();
-                    item!.Status.Should().Be(BuildingUnitV2Projections.MapStatus(BuildingUnitStatus.Parse(@event.BuildingUnitStatus)));
+                    item!.Status.Should().Be(BuildingUnitV3Projections.MapStatus(BuildingUnitStatus.Parse(@event.BuildingUnitStatus)));
                     item.HasDeviation.Should().Be(@event.HasDeviation);
-                    item.Function.Should().Be(BuildingUnitV2Projections.MapFunction(BuildingUnitFunction.Parse(@event.Function)));
-                    item.Position.Should().BeEquivalentTo((Point)_wkbReader.Read(@event.ExtendedWkbGeometry.ToByteArray()));
-                    item.PositionMethod.Should().Be(BuildingUnitV2Projections.MapGeometryMethod(BuildingUnitPositionGeometryMethod.Parse(@event.GeometryMethod)));
+                    item.Function.Should().Be(BuildingUnitV3Projections.MapFunction(BuildingUnitFunction.Parse(@event.Function)));
+                    item.Position.Should().BeEquivalentTo(ExpectedPosition(@event.ExtendedWkbGeometry));
+                    item.PositionMethod.Should().Be(BuildingUnitV3Projections.MapGeometryMethod(BuildingUnitPositionGeometryMethod.Parse(@event.GeometryMethod)));
                     item.IsRemoved.Should().BeFalse();
                     item.Version.Should().Be(@event.Provenance.Timestamp);
                 });
@@ -688,7 +686,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wfs
                             new Dictionary<string, object> { { AddEventHashPipe.HashMetadataKey, @event.GetHash() } })))
                 .Then(async ct =>
                 {
-                    var item = await ct.BuildingUnitsV2.FindAsync(@event.BuildingUnitPersistentLocalId);
+                    var item = await ct.BuildingUnitsV3.FindAsync(@event.BuildingUnitPersistentLocalId);
                     item.Should().NotBeNull();
                     item!.HasDeviation.Should().BeFalse();
                     item.Version.Should().Be(@event.Provenance.Timestamp);
@@ -721,7 +719,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wfs
                             new Dictionary<string, object> { { AddEventHashPipe.HashMetadataKey, @event.GetHash() } })))
                 .Then(async ct =>
                 {
-                    var item = await ct.BuildingUnitsV2.FindAsync(@event.BuildingUnitPersistentLocalId);
+                    var item = await ct.BuildingUnitsV3.FindAsync(@event.BuildingUnitPersistentLocalId);
                     item.Should().NotBeNull();
                     item!.HasDeviation.Should().BeTrue();
                     item.Version.Should().Be(@event.Provenance.Timestamp);
@@ -754,7 +752,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wfs
                             new Dictionary<string, object> { { AddEventHashPipe.HashMetadataKey, @event.GetHash() } })))
                 .Then(async ct =>
                 {
-                    var item = await ct.BuildingUnitsV2.FindAsync(@event.BuildingUnitPersistentLocalId);
+                    var item = await ct.BuildingUnitsV3.FindAsync(@event.BuildingUnitPersistentLocalId);
                     item.Should().NotBeNull();
                     item!.HasDeviation.Should().BeFalse();
                     item.Version.Should().Be(@event.Provenance.Timestamp);
@@ -787,7 +785,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wfs
                             new Dictionary<string, object> { { AddEventHashPipe.HashMetadataKey, @event.GetHash() } })))
                 .Then(async ct =>
                 {
-                    var item = await ct.BuildingUnitsV2.FindAsync(@event.BuildingUnitPersistentLocalId);
+                    var item = await ct.BuildingUnitsV3.FindAsync(@event.BuildingUnitPersistentLocalId);
                     item.Should().NotBeNull();
                     item!.HasDeviation.Should().BeTrue();
                     item.Version.Should().Be(@event.Provenance.Timestamp);
@@ -815,11 +813,11 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wfs
                 .Given(new Envelope<CommonBuildingUnitWasAddedV2>(new Envelope(commonBuildingUnitWasAddedV2, metadata)))
                 .Then(async ct =>
                 {
-                    var item = await ct.BuildingUnitsV2.FindAsync(commonBuildingUnitWasAddedV2.BuildingUnitPersistentLocalId);
+                    var item = await ct.BuildingUnitsV3.FindAsync(commonBuildingUnitWasAddedV2.BuildingUnitPersistentLocalId);
                     item.Should().NotBeNull();
                     item!.BuildingPersistentLocalId.Should().Be(commonBuildingUnitWasAddedV2.BuildingPersistentLocalId);
-                    item.Position.Should().BeEquivalentTo((Point)_wkbReader.Read(commonBuildingUnitWasAddedV2.ExtendedWkbGeometry.ToByteArray()));
-                    item.PositionMethod.Should().Be(BuildingUnitV2Projections.MapGeometryMethod(BuildingUnitPositionGeometryMethod.Parse(commonBuildingUnitWasAddedV2.GeometryMethod)));
+                    item.Position.Should().BeEquivalentTo(ExpectedPosition(commonBuildingUnitWasAddedV2.ExtendedWkbGeometry));
+                    item.PositionMethod.Should().Be(BuildingUnitV3Projections.MapGeometryMethod(BuildingUnitPositionGeometryMethod.Parse(commonBuildingUnitWasAddedV2.GeometryMethod)));
                     item.Function.Should().Be(GebouweenheidFunctie.GemeenschappelijkDeel.ToString());
                     item.Version.Should().Be(commonBuildingUnitWasAddedV2.Provenance.Timestamp);
                     item.IsRemoved.Should().BeFalse();
@@ -849,7 +847,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wfs
                             new Dictionary<string, object> { { AddEventHashPipe.HashMetadataKey, @event.GetHash() } })))
                 .Then(async ct =>
                 {
-                    var item = await ct.BuildingUnitsV2.FindAsync(@event.BuildingUnitPersistentLocalId);
+                    var item = await ct.BuildingUnitsV3.FindAsync(@event.BuildingUnitPersistentLocalId);
                     item.Should().NotBeNull();
 
                     item!.Version.Should().Be(@event.Provenance.Timestamp);
@@ -877,7 +875,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wfs
                             new Dictionary<string, object> { { AddEventHashPipe.HashMetadataKey, @event.GetHash() } })))
                 .Then(async ct =>
                 {
-                    var item = await ct.BuildingUnitsV2.FindAsync(@event.BuildingUnitPersistentLocalId);
+                    var item = await ct.BuildingUnitsV3.FindAsync(@event.BuildingUnitPersistentLocalId);
                     item.Should().NotBeNull();
 
                     item!.Version.Should().Be(@event.Provenance.Timestamp);
@@ -905,7 +903,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wfs
                             new Dictionary<string, object> { { AddEventHashPipe.HashMetadataKey, @event.GetHash() } })))
                 .Then(async ct =>
                 {
-                    var item = await ct.BuildingUnitsV2.FindAsync(@event.BuildingUnitPersistentLocalId);
+                    var item = await ct.BuildingUnitsV3.FindAsync(@event.BuildingUnitPersistentLocalId);
                     item.Should().NotBeNull();
 
                     item!.Version.Should().Be(@event.Provenance.Timestamp);
@@ -933,7 +931,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wfs
                             new Dictionary<string, object> { { AddEventHashPipe.HashMetadataKey, @event.GetHash() } })))
                 .Then(async ct =>
                 {
-                    var item = await ct.BuildingUnitsV2.FindAsync(@event.BuildingUnitPersistentLocalId);
+                    var item = await ct.BuildingUnitsV3.FindAsync(@event.BuildingUnitPersistentLocalId);
                     item.Should().NotBeNull();
 
                     item!.Version.Should().Be(@event.Provenance.Timestamp);
@@ -961,7 +959,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wfs
                             new Dictionary<string, object> { { AddEventHashPipe.HashMetadataKey, @event.GetHash() } })))
                 .Then(async ct =>
                 {
-                    var item = await ct.BuildingUnitsV2.FindAsync(@event.BuildingUnitPersistentLocalId);
+                    var item = await ct.BuildingUnitsV3.FindAsync(@event.BuildingUnitPersistentLocalId);
                     item.Should().NotBeNull();
 
                     item!.Version.Should().Be(@event.Provenance.Timestamp);
@@ -989,7 +987,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wfs
                             new Dictionary<string, object> { { AddEventHashPipe.HashMetadataKey, @event.GetHash() } })))
                 .Then(async ct =>
                 {
-                    var item = await ct.BuildingUnitsV2.FindAsync(@event.BuildingUnitPersistentLocalId);
+                    var item = await ct.BuildingUnitsV3.FindAsync(@event.BuildingUnitPersistentLocalId);
                     item.Should().NotBeNull();
 
                     item!.Version.Should().Be(@event.Provenance.Timestamp);
@@ -1021,7 +1019,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wfs
                 {
                     foreach (var buildingUnitReaddress in @event.BuildingUnitsReaddresses)
                     {
-                        var item = await ct.BuildingUnitsV2.FindAsync(buildingUnitReaddress.BuildingUnitPersistentLocalId);
+                        var item = await ct.BuildingUnitsV3.FindAsync(buildingUnitReaddress.BuildingUnitPersistentLocalId);
                         item.Should().NotBeNull();
 
                         item!.Version.Should().Be(@event.Provenance.Timestamp);
@@ -1050,7 +1048,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wfs
                             new Dictionary<string, object> { { AddEventHashPipe.HashMetadataKey, @event.GetHash() } })))
                 .Then(async ct =>
                 {
-                    var item = await ct.BuildingUnitsV2.FindAsync(@event.BuildingUnitPersistentLocalId);
+                    var item = await ct.BuildingUnitsV3.FindAsync(@event.BuildingUnitPersistentLocalId);
                     item.Should().NotBeNull();
 
                     item!.Version.Should().Be(@event.Provenance.Timestamp);
@@ -1079,7 +1077,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wfs
                             new Dictionary<string, object> {{AddEventHashPipe.HashMetadataKey, @event.GetHash()}})))
                 .Then(async ct =>
                 {
-                    var item = await ct.BuildingUnitsV2.FindAsync(@event.BuildingUnitPersistentLocalId);
+                    var item = await ct.BuildingUnitsV3.FindAsync(@event.BuildingUnitPersistentLocalId);
                     item.Should().NotBeNull();
 
                     item!.Status.Should().Be("Gehistoreerd");
@@ -1108,7 +1106,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wfs
                             new Dictionary<string, object> {{AddEventHashPipe.HashMetadataKey, @event.GetHash()}})))
                 .Then(async ct =>
                 {
-                    var item = await ct.BuildingUnitsV2.FindAsync(@event.BuildingUnitPersistentLocalId);
+                    var item = await ct.BuildingUnitsV3.FindAsync(@event.BuildingUnitPersistentLocalId);
                     item.Should().NotBeNull();
 
                     item!.Status.Should().Be("NietGerealiseerd");
@@ -1136,20 +1134,33 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wfs
                             new Dictionary<string, object> { { AddEventHashPipe.HashMetadataKey, @event.GetHash() } })))
                 .Then(async ct =>
                 {
-                    var item = await ct.BuildingUnitsV2.FindAsync(plannedBuildingUnit.BuildingUnitPersistentLocalId);
+                    var item = await ct.BuildingUnitsV3.FindAsync(plannedBuildingUnit.BuildingUnitPersistentLocalId);
                     item.Should().NotBeNull();
 
                     item!.BuildingPersistentLocalId.Should().Be(@event.BuildingPersistentLocalId);
-                    item.PositionMethod.Should().Be(BuildingUnitV2Projections.MapGeometryMethod(BuildingUnitPositionGeometryMethod.Parse(@event.GeometryMethod)));
-                    item.Position.Should().BeEquivalentTo((Point)_wkbReader.Read(@event.ExtendedWkbGeometry.ToByteArray()));
-                    item.Status.Should().Be(BuildingUnitV2Projections.MapStatus(BuildingUnitStatus.Parse(@event.BuildingUnitStatus)));
-                    item.Function.Should().Be(BuildingUnitV2Projections.MapFunction(BuildingUnitFunction.Parse(@event.Function)));
+                    item.PositionMethod.Should().Be(BuildingUnitV3Projections.MapGeometryMethod(BuildingUnitPositionGeometryMethod.Parse(@event.GeometryMethod)));
+                    item.Position.Should().BeEquivalentTo(ExpectedPosition(@event.ExtendedWkbGeometry));
+                    item.Status.Should().Be(BuildingUnitV3Projections.MapStatus(BuildingUnitStatus.Parse(@event.BuildingUnitStatus)));
+                    item.Function.Should().Be(BuildingUnitV3Projections.MapFunction(BuildingUnitFunction.Parse(@event.Function)));
                     item.HasDeviation.Should().Be(@event.HasDeviation);
                     item.IsRemoved.Should().BeFalse();
                     item.Version.Should().Be(@event.Provenance.Timestamp);
                 });
         }
 
-        protected override BuildingUnitV2Projections CreateProjection() => new BuildingUnitV2Projections();
+        /// <summary>
+        /// What version 3 is expected to store: the event's position in Lambert 2008, the same way
+        /// <see cref="BuildingUnitV3Projections"/> puts it there. The reference system itself is asserted
+        /// against fixed coordinates in <c>GivenBuildingUnitPositionInEitherReferenceSystem</c>. See ADR 0005.
+        /// </summary>
+        private static Point ExpectedPosition(string extendedWkbPosition)
+        {
+            var extendedWkb = extendedWkbPosition.ToByteArray();
+            var position = (Point)WKBReaderFactory.CreateForEwkb(extendedWkb).Read(extendedWkb);
+
+            return (Point)position.EnsureLambert08(2);
+        }
+
+        protected override BuildingUnitV3Projections CreateProjection() => new BuildingUnitV3Projections();
     }
 }

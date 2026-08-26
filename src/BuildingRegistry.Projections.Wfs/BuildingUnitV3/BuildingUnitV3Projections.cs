@@ -1,4 +1,4 @@
-namespace BuildingRegistry.Projections.Wfs.BuildingUnitV2
+namespace BuildingRegistry.Projections.Wfs.BuildingUnitV3
 {
     using System.Collections.Generic;
     using System.Linq;
@@ -17,9 +17,13 @@ namespace BuildingRegistry.Projections.Wfs.BuildingUnitV2
     using NetTopologySuite.Geometries;
     using NodaTime;
 
-    [ConnectedProjectionName("WFS gebouweenheden")]
-    [ConnectedProjectionDescription("Projectie die de gebouweenheden data voor het WFS gebouwenregister voorziet.")]
-    public class BuildingUnitV2Projections : ConnectedProjection<WfsContext>
+    /// <summary>
+    /// The Lambert 2008 (EPSG 3812) counterpart of <see cref="BuildingUnitV2.BuildingUnitV2Projections"/>,
+    /// produced mechanically from it so the two stay identical apart from the reference system. See ADR 0005.
+    /// </summary>
+    [ConnectedProjectionName("WFS gebouweenheden (v3, Lambert 2008)")]
+    [ConnectedProjectionDescription("Projectie die de gebouweenheden data in Lambert 2008 voor het WFS gebouwenregister voorziet.")]
+    public class BuildingUnitV3Projections : ConnectedProjection<WfsContext>
     {
         /// <summary>
         /// Positions are persisted at centimetre precision, which is what the Lambert transform is
@@ -34,7 +38,7 @@ namespace BuildingRegistry.Projections.Wfs.BuildingUnitV2
         private static readonly string AppointedByAdministratorMethod = PositieGeometrieMethode.AangeduidDoorBeheerder.ToString();
         private static readonly string DerivedFromObjectMethod = PositieGeometrieMethode.AfgeleidVanObject.ToString();
 
-        public BuildingUnitV2Projections()
+        public BuildingUnitV3Projections()
         {
             #region Building
 
@@ -42,7 +46,7 @@ namespace BuildingRegistry.Projections.Wfs.BuildingUnitV2
             {
                 foreach (var buildingUnit in message.Message.BuildingUnits)
                 {
-                    var buildingUnitV2 = new BuildingUnitV2
+                    var buildingUnitV3 = new BuildingUnitV3
                     {
                         Id = PersistentLocalIdHelper.CreateBuildingUnitId(buildingUnit.BuildingUnitPersistentLocalId),
                         BuildingPersistentLocalId = message.Message.BuildingPersistentLocalId,
@@ -54,9 +58,9 @@ namespace BuildingRegistry.Projections.Wfs.BuildingUnitV2
                         HasDeviation = false
                     };
 
-                    SetPosition(buildingUnitV2, buildingUnit.ExtendedWkbGeometry, MapGeometryMethod(BuildingUnitPositionGeometryMethod.Parse(buildingUnit.GeometryMethod)));
+                    SetPosition(buildingUnitV3, buildingUnit.ExtendedWkbGeometry, MapGeometryMethod(BuildingUnitPositionGeometryMethod.Parse(buildingUnit.GeometryMethod)));
 
-                    await context.BuildingUnitsV2.AddAsync(buildingUnitV2, ct);
+                    await context.BuildingUnitsV3.AddAsync(buildingUnitV3, ct);
                 }
             });
 
@@ -64,7 +68,7 @@ namespace BuildingRegistry.Projections.Wfs.BuildingUnitV2
             {
                 foreach (var buildingUnitPersistentLocalId in message.Message.BuildingUnitPersistentLocalIds)
                 {
-                    var unit = await context.BuildingUnitsV2.FindAsync(buildingUnitPersistentLocalId);
+                    var unit = await context.BuildingUnitsV3.FindAsync(buildingUnitPersistentLocalId);
                     unit!.Position = ParsePosition(message.Message.ExtendedWkbGeometryBuildingUnits!);
                     unit.PositionMethod = MapGeometryMethod(BuildingUnitPositionGeometryMethod.DerivedFromObject);
 
@@ -76,7 +80,7 @@ namespace BuildingRegistry.Projections.Wfs.BuildingUnitV2
             {
                 foreach (var buildingUnitPersistentLocalId in message.Message.BuildingUnitPersistentLocalIds.Concat(message.Message.BuildingUnitPersistentLocalIdsWhichBecameDerived))
                 {
-                    var unit = await context.BuildingUnitsV2.FindAsync(buildingUnitPersistentLocalId);
+                    var unit = await context.BuildingUnitsV3.FindAsync(buildingUnitPersistentLocalId);
                     unit!.Position = ParsePosition(message.Message.ExtendedWkbGeometryBuildingUnits!);
                     unit.PositionMethod = MapGeometryMethod(BuildingUnitPositionGeometryMethod.DerivedFromObject);
 
@@ -89,7 +93,7 @@ namespace BuildingRegistry.Projections.Wfs.BuildingUnitV2
                 foreach (var buildingUnitPersistentLocalId in
                          message.Message.BuildingUnitPersistentLocalIds.Concat(message.Message.BuildingUnitPersistentLocalIdsWhichBecameDerived))
                 {
-                    var unit = await context.BuildingUnitsV2.FindAsync(buildingUnitPersistentLocalId);
+                    var unit = await context.BuildingUnitsV3.FindAsync(buildingUnitPersistentLocalId);
                     unit!.Position = ParsePosition(message.Message.ExtendedWkbGeometryBuildingUnits!);
                     unit.PositionMethod = MapGeometryMethod(BuildingUnitPositionGeometryMethod.DerivedFromObject);
 
@@ -102,7 +106,7 @@ namespace BuildingRegistry.Projections.Wfs.BuildingUnitV2
                 foreach (var buildingUnitPersistentLocalId in
                          message.Message.BuildingUnitPersistentLocalIds.Concat(message.Message.BuildingUnitPersistentLocalIdsWhichBecameDerived))
                 {
-                    var unit = await context.BuildingUnitsV2.FindAsync(buildingUnitPersistentLocalId);
+                    var unit = await context.BuildingUnitsV3.FindAsync(buildingUnitPersistentLocalId);
                     unit!.Position = ParsePosition(message.Message.ExtendedWkbGeometryBuildingUnits!);
                     unit.PositionMethod = MapGeometryMethod(BuildingUnitPositionGeometryMethod.DerivedFromObject);
 
@@ -125,7 +129,7 @@ namespace BuildingRegistry.Projections.Wfs.BuildingUnitV2
 
             When<Envelope<BuildingUnitWasPlannedV2>>(async (context, message, ct) =>
             {
-                var buildingUnitV2 = new BuildingUnitV2
+                var buildingUnitV3 = new BuildingUnitV3
                 {
                     Id = PersistentLocalIdHelper.CreateBuildingUnitId(message.Message.BuildingUnitPersistentLocalId),
                     BuildingPersistentLocalId = message.Message.BuildingPersistentLocalId,
@@ -140,16 +144,16 @@ namespace BuildingRegistry.Projections.Wfs.BuildingUnitV2
                 };
 
                 SetPosition(
-                    buildingUnitV2,
+                    buildingUnitV3,
                     message.Message.ExtendedWkbGeometry,
                     MapGeometryMethod(BuildingUnitPositionGeometryMethod.Parse(message.Message.GeometryMethod)));
 
-                await context.BuildingUnitsV2.AddAsync(buildingUnitV2, ct);
+                await context.BuildingUnitsV3.AddAsync(buildingUnitV3, ct);
             });
 
             When<Envelope<BuildingUnitWasRealizedV2>>(async (context, message, _) =>
             {
-                var unit = await context.BuildingUnitsV2.FindAsync(message.Message.BuildingUnitPersistentLocalId);
+                var unit = await context.BuildingUnitsV3.FindAsync(message.Message.BuildingUnitPersistentLocalId);
                 unit!.Status = RealizedStatus;
 
                 SetVersion(unit, message.Message.Provenance.Timestamp);
@@ -157,7 +161,7 @@ namespace BuildingRegistry.Projections.Wfs.BuildingUnitV2
 
             When<Envelope<BuildingUnitWasRealizedBecauseBuildingWasRealized>>(async (context, message, _) =>
             {
-                var unit = await context.BuildingUnitsV2.FindAsync(message.Message.BuildingUnitPersistentLocalId);
+                var unit = await context.BuildingUnitsV3.FindAsync(message.Message.BuildingUnitPersistentLocalId);
                 unit!.Status = RealizedStatus;
 
                 SetVersion(unit, message.Message.Provenance.Timestamp);
@@ -165,7 +169,7 @@ namespace BuildingRegistry.Projections.Wfs.BuildingUnitV2
 
             When<Envelope<BuildingUnitWasCorrectedFromRealizedToPlanned>>(async (context, message, _) =>
            {
-               var unit = await context.BuildingUnitsV2.FindAsync(message.Message.BuildingUnitPersistentLocalId);
+               var unit = await context.BuildingUnitsV3.FindAsync(message.Message.BuildingUnitPersistentLocalId);
                unit!.Status = PlannedStatus;
 
                SetVersion(unit, message.Message.Provenance.Timestamp);
@@ -173,7 +177,7 @@ namespace BuildingRegistry.Projections.Wfs.BuildingUnitV2
 
             When<Envelope<BuildingUnitWasCorrectedFromRealizedToPlannedBecauseBuildingWasCorrected>>(async (context, message, _) =>
             {
-                var unit = await context.BuildingUnitsV2.FindAsync(message.Message.BuildingUnitPersistentLocalId);
+                var unit = await context.BuildingUnitsV3.FindAsync(message.Message.BuildingUnitPersistentLocalId);
                 unit!.Status = PlannedStatus;
 
                 SetVersion(unit, message.Message.Provenance.Timestamp);
@@ -181,7 +185,7 @@ namespace BuildingRegistry.Projections.Wfs.BuildingUnitV2
 
             When<Envelope<BuildingUnitWasNotRealizedV2>>(async (context, message, _) =>
             {
-                var unit = await context.BuildingUnitsV2.FindAsync(message.Message.BuildingUnitPersistentLocalId);
+                var unit = await context.BuildingUnitsV3.FindAsync(message.Message.BuildingUnitPersistentLocalId);
                 unit!.Status = NotRealizedStatus;
 
                 SetVersion(unit, message.Message.Provenance.Timestamp);
@@ -190,7 +194,7 @@ namespace BuildingRegistry.Projections.Wfs.BuildingUnitV2
 
             When<Envelope<BuildingUnitWasNotRealizedBecauseBuildingWasNotRealized>>(async (context, message, _) =>
             {
-                var unit = await context.BuildingUnitsV2.FindAsync(message.Message.BuildingUnitPersistentLocalId);
+                var unit = await context.BuildingUnitsV3.FindAsync(message.Message.BuildingUnitPersistentLocalId);
                 unit!.Status = NotRealizedStatus;
 
                 SetVersion(unit, message.Message.Provenance.Timestamp);
@@ -198,7 +202,7 @@ namespace BuildingRegistry.Projections.Wfs.BuildingUnitV2
 
             When<Envelope<BuildingUnitWasCorrectedFromNotRealizedToPlanned>>(async (context, message, _) =>
             {
-                var unit = await context.BuildingUnitsV2.FindAsync(message.Message.BuildingUnitPersistentLocalId);
+                var unit = await context.BuildingUnitsV3.FindAsync(message.Message.BuildingUnitPersistentLocalId);
                 unit!.Status = PlannedStatus;
 
                 SetVersion(unit, message.Message.Provenance.Timestamp);
@@ -206,7 +210,7 @@ namespace BuildingRegistry.Projections.Wfs.BuildingUnitV2
 
             When<Envelope<BuildingUnitWasRetiredV2>>(async (context, message, _) =>
             {
-                var unit = await context.BuildingUnitsV2.FindAsync(message.Message.BuildingUnitPersistentLocalId);
+                var unit = await context.BuildingUnitsV3.FindAsync(message.Message.BuildingUnitPersistentLocalId);
                 unit!.Status = RetiredStatus;
 
                 SetVersion(unit, message.Message.Provenance.Timestamp);
@@ -214,7 +218,7 @@ namespace BuildingRegistry.Projections.Wfs.BuildingUnitV2
 
             When<Envelope<BuildingUnitWasCorrectedFromRetiredToRealized>>(async (context, message, _) =>
             {
-                var unit = await context.BuildingUnitsV2.FindAsync(message.Message.BuildingUnitPersistentLocalId);
+                var unit = await context.BuildingUnitsV3.FindAsync(message.Message.BuildingUnitPersistentLocalId);
                 unit!.Status = RealizedStatus;
 
                 SetVersion(unit, message.Message.Provenance.Timestamp);
@@ -222,7 +226,7 @@ namespace BuildingRegistry.Projections.Wfs.BuildingUnitV2
 
             When<Envelope<BuildingUnitWasRemovedV2>>(async (context, message, _) =>
             {
-                var unit = await context.BuildingUnitsV2.FindAsync(message.Message.BuildingUnitPersistentLocalId);
+                var unit = await context.BuildingUnitsV3.FindAsync(message.Message.BuildingUnitPersistentLocalId);
                 unit!.IsRemoved = true;
 
                 SetVersion(unit, message.Message.Provenance.Timestamp);
@@ -230,7 +234,7 @@ namespace BuildingRegistry.Projections.Wfs.BuildingUnitV2
 
             When<Envelope<BuildingUnitWasRemovedBecauseBuildingWasRemoved>>(async (context, message, _) =>
             {
-                var unit = await context.BuildingUnitsV2.FindAsync(message.Message.BuildingUnitPersistentLocalId);
+                var unit = await context.BuildingUnitsV3.FindAsync(message.Message.BuildingUnitPersistentLocalId);
                 unit!.IsRemoved = true;
 
                 SetVersion(unit, message.Message.Provenance.Timestamp);
@@ -238,7 +242,7 @@ namespace BuildingRegistry.Projections.Wfs.BuildingUnitV2
 
             When<Envelope<BuildingUnitRemovalWasCorrected>>(async (context, message, _) =>
             {
-                var unit = await context.BuildingUnitsV2.FindAsync(message.Message.BuildingUnitPersistentLocalId);
+                var unit = await context.BuildingUnitsV3.FindAsync(message.Message.BuildingUnitPersistentLocalId);
 
                 unit!.Status = MapStatus(BuildingUnitStatus.Parse(message.Message.BuildingUnitStatus));
                 unit.HasDeviation = message.Message.HasDeviation;
@@ -252,7 +256,7 @@ namespace BuildingRegistry.Projections.Wfs.BuildingUnitV2
 
             When<Envelope<BuildingUnitWasRegularized>>(async (context, message, _) =>
             {
-                var unit = await context.BuildingUnitsV2.FindAsync(message.Message.BuildingUnitPersistentLocalId);
+                var unit = await context.BuildingUnitsV3.FindAsync(message.Message.BuildingUnitPersistentLocalId);
                 unit!.HasDeviation = false;
 
                 SetVersion(unit, message.Message.Provenance.Timestamp);
@@ -260,7 +264,7 @@ namespace BuildingRegistry.Projections.Wfs.BuildingUnitV2
 
             When<Envelope<BuildingUnitRegularizationWasCorrected>>(async (context, message, _) =>
             {
-                var unit = await context.BuildingUnitsV2.FindAsync(message.Message.BuildingUnitPersistentLocalId);
+                var unit = await context.BuildingUnitsV3.FindAsync(message.Message.BuildingUnitPersistentLocalId);
                 unit!.HasDeviation = true;
 
                 SetVersion(unit, message.Message.Provenance.Timestamp);
@@ -268,7 +272,7 @@ namespace BuildingRegistry.Projections.Wfs.BuildingUnitV2
 
             When<Envelope<BuildingUnitWasDeregulated>>(async (context, message, _) =>
             {
-                var unit = await context.BuildingUnitsV2.FindAsync(message.Message.BuildingUnitPersistentLocalId);
+                var unit = await context.BuildingUnitsV3.FindAsync(message.Message.BuildingUnitPersistentLocalId);
                 unit!.HasDeviation = true;
 
                 SetVersion(unit, message.Message.Provenance.Timestamp);
@@ -276,7 +280,7 @@ namespace BuildingRegistry.Projections.Wfs.BuildingUnitV2
 
             When<Envelope<BuildingUnitDeregulationWasCorrected>>(async (context, message, _) =>
             {
-                var unit = await context.BuildingUnitsV2.FindAsync(message.Message.BuildingUnitPersistentLocalId);
+                var unit = await context.BuildingUnitsV3.FindAsync(message.Message.BuildingUnitPersistentLocalId);
                 unit!.HasDeviation = false;
 
                 SetVersion(unit, message.Message.Provenance.Timestamp);
@@ -284,7 +288,7 @@ namespace BuildingRegistry.Projections.Wfs.BuildingUnitV2
 
             When<Envelope<CommonBuildingUnitWasAddedV2>>(async (context, message, ct) =>
             {
-                var commonBuildingUnitV2 = new BuildingUnitV2
+                var commonBuildingUnitV3 = new BuildingUnitV3
                 {
                     Id = PersistentLocalIdHelper.CreateBuildingUnitId(message.Message.BuildingUnitPersistentLocalId),
                     BuildingPersistentLocalId = message.Message.BuildingPersistentLocalId,
@@ -299,16 +303,16 @@ namespace BuildingRegistry.Projections.Wfs.BuildingUnitV2
                 };
 
                 SetPosition(
-                    commonBuildingUnitV2,
+                    commonBuildingUnitV3,
                     message.Message.ExtendedWkbGeometry,
                     MapGeometryMethod(BuildingUnitPositionGeometryMethod.Parse(message.Message.GeometryMethod)));
 
-                await context.BuildingUnitsV2.AddAsync(commonBuildingUnitV2, ct);
+                await context.BuildingUnitsV3.AddAsync(commonBuildingUnitV3, ct);
             });
 
             When<Envelope<BuildingUnitPositionWasCorrected>>(async (context, message, ct) =>
             {
-                var unit = await context.BuildingUnitsV2.FindAsync(message.Message.BuildingUnitPersistentLocalId);
+                var unit = await context.BuildingUnitsV3.FindAsync(message.Message.BuildingUnitPersistentLocalId);
 
                 SetPosition(
                     unit,
@@ -320,42 +324,42 @@ namespace BuildingRegistry.Projections.Wfs.BuildingUnitV2
 
             When<Envelope<BuildingUnitAddressWasAttachedV2>>(async (context, message, ct) =>
             {
-                var unit = await context.BuildingUnitsV2.FindAsync(message.Message.BuildingUnitPersistentLocalId);
+                var unit = await context.BuildingUnitsV3.FindAsync(message.Message.BuildingUnitPersistentLocalId);
 
                 SetVersion(unit!, message.Message.Provenance.Timestamp);
             });
 
             When<Envelope<BuildingUnitAddressWasDetachedV2>>(async (context, message, ct) =>
             {
-                var unit = await context.BuildingUnitsV2.FindAsync(message.Message.BuildingUnitPersistentLocalId);
+                var unit = await context.BuildingUnitsV3.FindAsync(message.Message.BuildingUnitPersistentLocalId);
 
                 SetVersion(unit!, message.Message.Provenance.Timestamp);
             });
 
             When<Envelope<BuildingUnitAddressWasDetachedBecauseAddressWasRejected>>(async (context, message, ct) =>
             {
-                var unit = await context.BuildingUnitsV2.FindAsync(message.Message.BuildingUnitPersistentLocalId);
+                var unit = await context.BuildingUnitsV3.FindAsync(message.Message.BuildingUnitPersistentLocalId);
 
                 SetVersion(unit!, message.Message.Provenance.Timestamp);
             });
 
             When<Envelope<BuildingUnitAddressWasDetachedBecauseAddressWasRetired>>(async (context, message, ct) =>
             {
-                var unit = await context.BuildingUnitsV2.FindAsync(message.Message.BuildingUnitPersistentLocalId);
+                var unit = await context.BuildingUnitsV3.FindAsync(message.Message.BuildingUnitPersistentLocalId);
 
                 SetVersion(unit!, message.Message.Provenance.Timestamp);
             });
 
             When<Envelope<BuildingUnitAddressWasDetachedBecauseAddressWasRemoved>>(async (context, message, ct) =>
             {
-                var unit = await context.BuildingUnitsV2.FindAsync(message.Message.BuildingUnitPersistentLocalId);
+                var unit = await context.BuildingUnitsV3.FindAsync(message.Message.BuildingUnitPersistentLocalId);
 
                 SetVersion(unit!, message.Message.Provenance.Timestamp);
             });
 
             When<Envelope<BuildingUnitAddressWasReplacedBecauseAddressWasReaddressed>>(async (context, message, ct) =>
             {
-                var unit = await context.BuildingUnitsV2.FindAsync(message.Message.BuildingUnitPersistentLocalId);
+                var unit = await context.BuildingUnitsV3.FindAsync(message.Message.BuildingUnitPersistentLocalId);
 
                 SetVersion(unit!, message.Message.Provenance.Timestamp);
             });
@@ -364,7 +368,7 @@ namespace BuildingRegistry.Projections.Wfs.BuildingUnitV2
             {
                 foreach (var buildingUnitReaddresses in message.Message.BuildingUnitsReaddresses)
                 {
-                    var unit = await context.BuildingUnitsV2.FindAsync(buildingUnitReaddresses.BuildingUnitPersistentLocalId);
+                    var unit = await context.BuildingUnitsV3.FindAsync(buildingUnitReaddresses.BuildingUnitPersistentLocalId);
 
                     SetVersion(unit!, message.Message.Provenance.Timestamp);
                 }
@@ -372,28 +376,28 @@ namespace BuildingRegistry.Projections.Wfs.BuildingUnitV2
 
             When<Envelope<BuildingUnitAddressWasReplacedBecauseOfMunicipalityMerger>>(async (context, message, ct) =>
             {
-                var unit = await context.BuildingUnitsV2.FindAsync(message.Message.BuildingUnitPersistentLocalId);
+                var unit = await context.BuildingUnitsV3.FindAsync(message.Message.BuildingUnitPersistentLocalId);
 
                 SetVersion(unit!, message.Message.Provenance.Timestamp);
             });
 
             When<Envelope<BuildingUnitWasRetiredBecauseBuildingWasDemolished>>(async (context, message, ct) =>
             {
-                var unit = await context.BuildingUnitsV2.FindAsync(message.Message.BuildingUnitPersistentLocalId);
+                var unit = await context.BuildingUnitsV3.FindAsync(message.Message.BuildingUnitPersistentLocalId);
                 unit!.Status = RetiredStatus;
                 SetVersion(unit, message.Message.Provenance.Timestamp);
             });
 
             When<Envelope<BuildingUnitWasNotRealizedBecauseBuildingWasDemolished>>(async (context, message, ct) =>
             {
-                var unit = await context.BuildingUnitsV2.FindAsync(message.Message.BuildingUnitPersistentLocalId);
+                var unit = await context.BuildingUnitsV3.FindAsync(message.Message.BuildingUnitPersistentLocalId);
                 unit!.Status = NotRealizedStatus;
                 SetVersion(unit, message.Message.Provenance.Timestamp);
             });
 
             When<Envelope<BuildingUnitWasMovedIntoBuilding>>(async (context, message, ct) =>
             {
-                var unit = await context.BuildingUnitsV2.FindAsync(message.Message.BuildingUnitPersistentLocalId);
+                var unit = await context.BuildingUnitsV3.FindAsync(message.Message.BuildingUnitPersistentLocalId);
 
                 unit!.BuildingPersistentLocalId = message.Message.BuildingPersistentLocalId;
                 unit.Status = MapStatus(BuildingUnitStatus.Parse(message.Message.BuildingUnitStatus));
@@ -412,39 +416,34 @@ namespace BuildingRegistry.Projections.Wfs.BuildingUnitV2
             When<Envelope<BuildingUnitWasMovedOutOfBuilding>>(DoNothing);
         }
 
-        private static void SetVersion(BuildingUnitV2 unit, Instant timestamp) => unit.Version = timestamp;
+        private static void SetVersion(BuildingUnitV3 unit, Instant timestamp) => unit.Version = timestamp;
 
         public static string MapFunction(BuildingUnitFunction function)
             => function == BuildingUnitFunction.Common
                 ? GebouweenheidFunctie.GemeenschappelijkDeel.ToString()
                 : GebouweenheidFunctie.NietGekend.ToString();
 
-        private static void SetPosition(BuildingUnitV2 buildingUnit, string extendedWkbPosition, string method)
+        private static void SetPosition(BuildingUnitV3 buildingUnit, string extendedWkbPosition, string method)
         {
             buildingUnit.PositionMethod = method;
             buildingUnit.Position = ParsePosition(extendedWkbPosition);
         }
 
         /// <summary>
-        /// Version 2 stores Lambert 72 (EPSG 31370) and nothing else, whichever reference system the
+        /// Version 3 stores Lambert 2008 (EPSG 3812) and nothing else, whichever reference system the
         /// event store persists, so the table, its spatial index and the views over it stay single-SRID.
-        /// See ADR 0005.
+        /// Once the event store holds Lambert 2008 this becomes a pass-through. See ADR 0005.
         /// </summary>
         private static Point ParsePosition(string extendedWkbPosition)
         {
             var extendedWkb = extendedWkbPosition.ToByteArray();
             var position = (Point)WKBReaderFactory.CreateForEwkb(extendedWkb).Read(extendedWkb);
 
-            if (position.IsLambert72())
-            {
-                return position;
-            }
-
-            // Rounding only on the transformed path, so a position that was already Lambert 72 is stored
+            // Rounds only when it actually transforms, so a position already in Lambert 2008 is stored
             // exactly as persisted. The transform is accurate to the centimetre positions are kept at.
-            return (Point)position
-                .EnsureLambert72()
-                .RoundCoordinates(PositionCoordinateDecimals);
+            return position.IsLambert08()
+                ? position
+                : (Point)position.EnsureLambert08(PositionCoordinateDecimals);
         }
 
         public static string MapGeometryMethod(BuildingUnitPositionGeometryMethod geometryMethod)
@@ -470,11 +469,6 @@ namespace BuildingRegistry.Projections.Wfs.BuildingUnitV2
 
             return dictionary[buildingUnitStatus];
         }
-
-        private static BuildingStatus? MapBuildingRetiredStatus(BuildingStatus buildingStatus) =>
-            buildingStatus == BuildingStatus.NotRealized || buildingStatus == BuildingStatus.Retired
-                ? buildingStatus
-                : null;
 
         private static Task DoNothing<T>(WfsContext context, Envelope<T> envelope, CancellationToken ct) where T: IMessage => Task.CompletedTask;
     }

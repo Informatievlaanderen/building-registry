@@ -34,7 +34,9 @@ namespace BuildingRegistry.Projector.Infrastructure.Modules
     using BuildingRegistry.Projections.Wfs;
     using BuildingRegistry.Projections.Wms;
     using BuildingRegistry.Projections.Wms.BuildingUnitV2;
+    using BuildingRegistry.Projections.Wms.BuildingUnitV3;
     using BuildingRegistry.Projections.Wms.BuildingV3;
+    using BuildingRegistry.Projections.Wms.BuildingV4;
     using Microsoft.Data.SqlClient;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Configuration;
@@ -263,10 +265,16 @@ namespace BuildingRegistry.Projector.Infrastructure.Modules
                     _configuration,
                     _loggerFactory)
                 .RegisterProjections<BuildingV3Projections, WmsContext>(() =>
-                        new BuildingV3Projections(WKBReaderFactory.Create()),
+                        new BuildingV3Projections(),
                     wmsProjectionSettings)
                 .RegisterProjections<BuildingUnitV2Projections, WmsContext>(() =>
-                        new BuildingUnitV2Projections(WKBReaderFactory.Create()),
+                        new BuildingUnitV2Projections(),
+                    wmsProjectionSettings)
+                .RegisterProjections<BuildingV4Projections, WmsContext>(() =>
+                        new BuildingV4Projections(),
+                    wmsProjectionSettings)
+                .RegisterProjections<BuildingUnitV3Projections, WmsContext>(() =>
+                        new BuildingUnitV3Projections(),
                     wmsProjectionSettings);
         }
 
@@ -288,10 +296,16 @@ namespace BuildingRegistry.Projector.Infrastructure.Modules
                     _configuration,
                     _loggerFactory)
                 .RegisterProjections<BuildingRegistry.Projections.Wfs.BuildingV3.BuildingV3Projections, WfsContext>(() =>
-                        new BuildingRegistry.Projections.Wfs.BuildingV3.BuildingV3Projections(WKBReaderFactory.Create()),
+                        new BuildingRegistry.Projections.Wfs.BuildingV3.BuildingV3Projections(),
                     wfsProjectionSettings)
                 .RegisterProjections<BuildingRegistry.Projections.Wfs.BuildingUnitV2.BuildingUnitV2Projections, WfsContext>(() =>
-                        new BuildingRegistry.Projections.Wfs.BuildingUnitV2.BuildingUnitV2Projections(WKBReaderFactory.Create()),
+                        new BuildingRegistry.Projections.Wfs.BuildingUnitV2.BuildingUnitV2Projections(),
+                    wfsProjectionSettings)
+                .RegisterProjections<BuildingRegistry.Projections.Wfs.BuildingV4.BuildingV4Projections, WfsContext>(() =>
+                        new BuildingRegistry.Projections.Wfs.BuildingV4.BuildingV4Projections(),
+                    wfsProjectionSettings)
+                .RegisterProjections<BuildingRegistry.Projections.Wfs.BuildingUnitV3.BuildingUnitV3Projections, WfsContext>(() =>
+                        new BuildingRegistry.Projections.Wfs.BuildingUnitV3.BuildingUnitV3Projections(),
                     wfsProjectionSettings)
                 .RegisterProjections<BuildingRegistry.Projections.Wfs.BuildingUnitAddress.BuildingUnitAddressProjections, WfsContext>(() =>
                         new BuildingRegistry.Projections.Wfs.BuildingUnitAddress.BuildingUnitAddressProjections(),

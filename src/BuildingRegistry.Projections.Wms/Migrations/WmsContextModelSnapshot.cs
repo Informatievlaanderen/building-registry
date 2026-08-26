@@ -17,7 +17,7 @@ namespace BuildingRegistry.Projections.Wms.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.3")
+                .HasAnnotation("ProductVersion", "10.0.9")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -96,6 +96,58 @@ namespace BuildingRegistry.Projections.Wms.Migrations
                     b.ToTable("BuildingUnitsV2", "wms");
                 });
 
+            modelBuilder.Entity("BuildingRegistry.Projections.Wms.BuildingUnitV3.BuildingUnitV3", b =>
+                {
+                    b.Property<int>("BuildingUnitPersistentLocalId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("BuildingPersistentLocalId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Function")
+                        .IsRequired()
+                        .HasMaxLength(21)
+                        .HasColumnType("varchar(21)");
+
+                    b.Property<bool>("HasDeviation")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<string>("Id")
+                        .HasMaxLength(53)
+                        .HasColumnType("varchar(53)");
+
+                    b.Property<byte[]>("Position")
+                        .HasColumnType("varbinary(max)");
+
+                    b.Property<string>("PositionMethod")
+                        .IsRequired()
+                        .HasMaxLength(22)
+                        .HasColumnType("varchar(22)");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("VersionAsString")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTimeOffset>("VersionTimestampAsDateTimeOffset")
+                        .HasColumnType("datetimeoffset")
+                        .HasColumnName("Version");
+
+                    b.HasKey("BuildingUnitPersistentLocalId");
+
+                    SqlServerKeyBuilderExtensions.IsClustered(b.HasKey("BuildingUnitPersistentLocalId"));
+
+                    b.HasIndex("BuildingPersistentLocalId");
+
+                    b.HasIndex("Status");
+
+                    b.ToTable("BuildingUnitsV3", "wms");
+                });
+
             modelBuilder.Entity("BuildingRegistry.Projections.Wms.BuildingV3.BuildingV3", b =>
                 {
                     b.Property<int>("PersistentLocalId")
@@ -131,6 +183,43 @@ namespace BuildingRegistry.Projections.Wms.Migrations
                     b.HasIndex("Status");
 
                     b.ToTable("BuildingsV3", "wms");
+                });
+
+            modelBuilder.Entity("BuildingRegistry.Projections.Wms.BuildingV4.BuildingV4", b =>
+                {
+                    b.Property<int>("PersistentLocalId")
+                        .HasColumnType("int");
+
+                    b.Property<byte[]>("Geometry")
+                        .HasColumnType("varbinary(max)");
+
+                    b.Property<string>("GeometryMethod")
+                        .IsRequired()
+                        .HasMaxLength(12)
+                        .HasColumnType("varchar(12)");
+
+                    b.Property<string>("Id")
+                        .HasMaxLength(46)
+                        .HasColumnType("varchar(46)");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("VersionAsString")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTimeOffset>("VersionTimestampAsDateTimeOffset")
+                        .HasColumnType("datetimeoffset")
+                        .HasColumnName("Version");
+
+                    b.HasKey("PersistentLocalId");
+
+                    SqlServerKeyBuilderExtensions.IsClustered(b.HasKey("PersistentLocalId"));
+
+                    b.HasIndex("Status");
+
+                    b.ToTable("BuildingsV4", "wms");
                 });
 #pragma warning restore 612, 618
         }

@@ -119,6 +119,19 @@ namespace BuildingRegistry.Tests
             return new WkbGeometry(WkbWriter.Instance.Write(geometry));
         }
 
+        /// <summary>
+        /// EWKB for <paramref name="wkt"/> in <paramref name="srid"/>, so a test can hand a projection an
+        /// event geometry in either reference system. The SRID is written into the bytes, which is what
+        /// <c>WKBReaderFactory.CreateForEwkb</c> reads it back from. See ADR 0005.
+        /// </summary>
+        public static BuildingRegistry.Building.ExtendedWkbGeometry CreateEwkbFromWkt(string wkt, int srid)
+        {
+            var geometry = new WKTReader { DefaultSRID = srid }.Read(wkt);
+            geometry.SRID = srid;
+
+            return new BuildingRegistry.Building.ExtendedWkbGeometry(WkbWriter.Instance.Write(geometry));
+        }
+
         public static Geometry CreateGeometryFromWkt(string wkt)
         {
             return new WKTReader { DefaultSRID = WkbGeometry.SridLambert72 }.Read(wkt);
