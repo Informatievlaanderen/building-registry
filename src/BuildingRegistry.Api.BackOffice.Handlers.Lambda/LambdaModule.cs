@@ -42,6 +42,14 @@
                         })
                     .UseExtendedSqlServerMigrations());
 
+            // In the service collection rather than the container: BuildingGeometryContext is built by EF's
+            // AddDbContext factory, which resolves a DbContext's remaining constructor parameters from the
+            // service provider. Function.cs populates these into Autofac afterwards, so ParcelMatching and
+            // BuildingMatching share the very same readiness instance - two would each pay for the probe.
+            services.AddSingleton(new Lambert2008ConversionCompletedToggle(
+                configuration.GetValue<bool>("FeatureToggles:Lambert2008ConversionCompleted")));
+            services.AddSingleton(new Lambert2008MatchingReadiness());
+
             services.AddScoped<IBuildingGeometries>(serviceProvider =>
             {
                 var enabled = serviceProvider.GetRequiredService<IConfiguration>().GetValue("OverlapValidationToggle", true);
@@ -74,15 +82,6 @@
                 .As<IIdempotentCommandHandler>()
                 .AsSelf()
                 .InstancePerLifetimeScope();
-
-            builder
-                .RegisterInstance(new Lambert2008ConversionCompletedToggle(
-                    _configuration.GetValue<bool>("FeatureToggles:Lambert2008ConversionCompleted")))
-                .SingleInstance();
-
-            builder
-                .RegisterInstance(new Lambert2008MatchingReadiness())
-                .SingleInstance();
 
             builder
                 .RegisterType<ParcelMatching>()

@@ -65,7 +65,7 @@
 
                 parcel!.Status = ParcelStatus.Retired;
 
-                var buildingPersistentLocalIds = await GetBuildingPersistentLocalIdsToInvalidate(parcel.GeometryIn(_conversionCompleted.MatchingSrid)!);
+                var buildingPersistentLocalIds = await GetBuildingPersistentLocalIdsToInvalidate(parcel.GeometryIn(_conversionCompleted.MatchingSrid));
                 context.BuildingsToInvalidate.AddRange(buildingPersistentLocalIds.Select(x => new BuildingToInvalidate
                 {
                     BuildingPersistentLocalId = x
@@ -82,7 +82,7 @@
                 parcel.ExtendedWkbGeometry = extendedWkbGeometry;
                 parcel.SetGeometry(ReadGeometry(extendedWkbGeometry));
 
-                var buildingPersistentLocalIds = await GetBuildingPersistentLocalIdsToInvalidate(parcel.GeometryIn(_conversionCompleted.MatchingSrid)!);
+                var buildingPersistentLocalIds = await GetBuildingPersistentLocalIdsToInvalidate(parcel.GeometryIn(_conversionCompleted.MatchingSrid));
 
                 context.BuildingsToInvalidate.AddRange(buildingPersistentLocalIds.Select(x => new BuildingToInvalidate
                 {
@@ -98,13 +98,13 @@
                 var parcel = await context
                     .ParcelConsumerItemsWithCount.FindAsync([Guid.Parse(message.ParcelId)], cancellationToken: ct);
 
-                var previousBuildingPersistentLocalIds = buildingMatching.GetUnderlyingBuildings(parcel!.GeometryIn(_conversionCompleted.MatchingSrid)!).ToArray();
+                var previousBuildingPersistentLocalIds = buildingMatching.GetUnderlyingBuildings(parcel!.GeometryIn(_conversionCompleted.MatchingSrid)).ToArray();
 
                 var extendedWkbGeometry = message.ExtendedWkbGeometry.ToByteArray();
                 parcel.ExtendedWkbGeometry = extendedWkbGeometry;
                 parcel.SetGeometry(ReadGeometry(extendedWkbGeometry));
 
-                var currentBuildingPersistentLocalIds = buildingMatching.GetUnderlyingBuildings(parcel.GeometryIn(_conversionCompleted.MatchingSrid)!).ToArray();
+                var currentBuildingPersistentLocalIds = buildingMatching.GetUnderlyingBuildings(parcel.GeometryIn(_conversionCompleted.MatchingSrid)).ToArray();
 
                 var buildingPersistentLocalIds = previousBuildingPersistentLocalIds
                     .Except(currentBuildingPersistentLocalIds)

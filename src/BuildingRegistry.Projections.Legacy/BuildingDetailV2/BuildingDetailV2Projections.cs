@@ -90,7 +90,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingDetailV2
                 var fixedGeometry = NetTopologySuite.Geometries.Utilities.GeometryFixer.Fix(sysGeometry);
                 var item = await context.BuildingDetailsV2.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);
                 item.Geometry = geometryAsBinary;
-                item.SysGeometry = fixedGeometry;
+                item.SetSysGeometry(fixedGeometry);
                 item.Version = message.Message.Provenance.Timestamp;
                 UpdateHash(item, message);
             });
@@ -102,7 +102,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingDetailV2
                 var fixedGeometry = NetTopologySuite.Geometries.Utilities.GeometryFixer.Fix(sysGeometry);
                 var item = await context.BuildingDetailsV2.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);
                 item.Geometry = geometryAsBinary;
-                item.SysGeometry = fixedGeometry;
+                item.SetSysGeometry(fixedGeometry);
                 item.Version = message.Message.Provenance.Timestamp;
                 UpdateHash(item, message);
             });
@@ -162,7 +162,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingDetailV2
                 var fixedGeometry = NetTopologySuite.Geometries.Utilities.GeometryFixer.Fix(sysGeometry);
                 var item = await context.BuildingDetailsV2.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);
                 item.Geometry = geometryAsBinary;
-                item.SysGeometry = fixedGeometry;
+                item.SetSysGeometry(fixedGeometry);
                 item.GeometryMethod = BuildingGeometryMethod.MeasuredByGrb;
                 item.Version = message.Message.Provenance.Timestamp;
                 UpdateHash(item, message);
@@ -175,7 +175,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingDetailV2
                 var fixedGeometry = NetTopologySuite.Geometries.Utilities.GeometryFixer.Fix(sysGeometry);
                 var item = await context.BuildingDetailsV2.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);
                 item.Geometry = geometryAsBinary;
-                item.SysGeometry = fixedGeometry;
+                item.SetSysGeometry(fixedGeometry);
                 item.Version = message.Message.Provenance.Timestamp;
                 UpdateHash(item, message);
             });

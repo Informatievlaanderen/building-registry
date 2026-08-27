@@ -42,7 +42,8 @@
             if (useLambert2008)
             {
                 _readiness.EnsureVerified(
-                    () => _consumerParcelContext.HasIncompleteLambert2008Geometry().GetAwaiter().GetResult());
+                    Lambert2008MatchingReadiness.Parcels,
+                    _consumerParcelContext.HasIncompleteLambert2008GeometrySynchronously);
             }
 
             var buildingGeometry = ToMatchingCrs(
@@ -60,7 +61,7 @@
                     .ToList();
 
             var underlyingParcels = candidates
-                .Select(parcel => new { parcel.CaPaKey, parcel.Status, Geometry = parcel.GeometryIn(matchingSrid)! })
+                .Select(parcel => new { parcel.CaPaKey, parcel.Status, Geometry = parcel.GeometryIn(matchingSrid) })
                 .Where(parcel => !OverlayNGRobust.Overlay(buildingGeometry, parcel.Geometry, SpatialFunction.Intersection).IsEmpty && parcel.Status == ParcelStatus.Realized)
                 .Select(parcel =>
                     new {
@@ -76,8 +77,8 @@
 
         private static Geometry ToMatchingCrs(Geometry geometry, int matchingSrid)
             => matchingSrid == SystemReferenceId.SridLambert2008
-                ? geometry.IsLambert08() ? geometry : geometry.EnsureLambert08(2)
-                : geometry.IsLambert72() ? geometry : geometry.EnsureLambert72().RoundCoordinates(2);
+                ? geometry.IsLambert08() ? geometry : geometry.EnsureLambert08()
+                : geometry.IsLambert72() ? geometry : geometry.EnsureLambert72();
 
         private static double CalculateOverlap(Geometry? buildingGeometry, Geometry parcel)
         {

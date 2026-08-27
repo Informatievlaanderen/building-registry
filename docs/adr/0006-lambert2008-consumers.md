@@ -4,7 +4,7 @@ Date: 2026-08-26
 
 ## Status
 
-Proposed
+Accepted
 
 ## Context
 
@@ -171,10 +171,14 @@ the Lambda. Each picks its column and normalizes to match; a service left behind
 - `ParcelKafkaProjection` drops the cached `WKBReaderFactory.Create()` for `CreateForEwkb` per geometry, so
   the reference system comes from the bytes rather than from a reader chosen at construction.
 - `ParcelConsumerItem.SetGeometry` fixes **then** transforms, in that order:
-  `GeometryFixer.Fix` first, then `EnsureLambert72()` and `EnsureLambert08(2)` from the fixed geometry.
+  `GeometryFixer.Fix` first, then `EnsureLambert72()` and `EnsureLambert08()` from the fixed geometry.
   `LambertTransformation.EnsureCoordinatesAreInCoordinateSystem` returns a geometry that is not `IsValid`
   untouched, so transforming first would stamp an SRID on unmoved coordinates. The fixer is already there
   and a fixed geometry is valid by construction.
+- **A transformed geometry is not rounded.** The rounding overloads exist for the address registry, whose
+  positions are points: rounding a point moves it by at most half a unit and nothing downstream measures it.
+  Everything on this path is a polygon — a building outline or a parcel — where rounding moves every vertex
+  and so changes the area. Matching compares areas, so the transform is taken at the precision it produces.
 - Each of the four comparison points brings its incoming building geometry to `MatchingSrid` before
   comparing — reading through `WKBReaderFactory.CreateForEwkb` where it starts as bytes. **For comparison
   only:** what a command persists is never the transformed copy.
@@ -183,19 +187,19 @@ the Lambda. Each picks its column and normalizes to match; a service left behind
 
 `ParcelGeometryCrsWasChanged` is handled, and writes `GeometryLambert2008` and `ExtendedWkbGeometry` but not
 `Geometry`. The parcel does not move there, it is re-expressed, so the stored Lambert 72 geometry is already
-what it should be and transforming the payload back would replace it with a rounded round trip of itself.
+what it should be and transforming the payload back would replace it with a round trip of itself.
 
-The stakes are lower than in the parcel-registry counterpart, which matches on `Touches` where a centimetre
-decides the answer; here the comparison is an area ratio against a `0.8 / count` threshold, which centimetres
-do not move. The rule is kept anyway, because it follows from what each column means: `Geometry` and
-`GeometryLambert2008` are working copies that should not be degraded, `ExtendedWkbGeometry` is whatever was
-last published.
+The rule follows from what each column means: `Geometry` and `GeometryLambert2008` are working copies that
+should not be degraded, `ExtendedWkbGeometry` is whatever was last published.
 
 ### Two guards, because both failures are silent
 
 - **Matching against a column that still has NULLs fails loudly.** This is the one real hazard of a manually
   thrown flag: `Lambert2008ConversionCompleted` enabled before `GeometryLambert2008` is fully populated would
   silently return empty parcel lists. Checked once and memoized — it only ever goes from false to true.
+  The Kafka projection does not go through matching, so it does not reach that check; there
+  `ParcelConsumerItem.GeometryIn` refuses the read itself rather than returning a null that would surface as
+  a `NullReferenceException` further on.
 - **A geometry outside both Flanders envelopes fails loudly on the write path.** `LambertTransformation`
   decides by envelope, so a geometry outside both is not transformed at all; it just has an SRID stamped on
   unmoved coordinates.
@@ -219,30 +223,74 @@ parcel when parcel-registry converts, but until then it fills only for parcels t
 fine — the toggle stays off, `Geometry` serves every comparison, and the guard refuses the flip until the
 column is complete.
 
-### Direction B depends on Projections.Legacy being uniform
+### Projections.Legacy gets the same two columns
 
-`BuildingMatching.GetUnderlyingBuildings` brings the incoming parcel geometry to `MatchingSrid` like every
-other comparison point, and is implemented that way rather than deferred.
+An earlier draft of this ADR left `BuildingDetailV2.SysGeometry` as an assumption — direction B was correct
+"so long as `SysGeometry` is uniformly in `MatchingSrid`" — and recorded it as a constraint on whatever
+succeeded ADR 0005. The assumption does not hold, and it fails earlier than that framing suggests.
 
-That is correct **so long as `Projections.Legacy.BuildingDetailV2.SysGeometry` is uniformly in
-`MatchingSrid`** — Lambert 72 while the toggle is off, Lambert 2008 once it is on. The toggle's meaning
-already carries that: it asserts every register has finished converting, and Legacy follows the building
-event store.
+`BuildingDetailV2Projections` reads through `WKBReaderFactory.Create()`, a Lambert 72 reader. That reader
+**honours an SRID embedded in the EWKB**; the Lambert 72 factory only supplies the fallback for SRID-less
+bytes. So `SysGeometry` takes whatever system the event carried, and the column goes mixed the moment
+`UseLambert2008EventStore` goes on — the toggle that *starts* the conversion, not
+`Lambert2008ConversionCompleted`, which ends it. The whole conversion window is affected, not the moment
+after it.
 
-What it does not survive is `SysGeometry` being allowed to hold *both*, which is a live option for
-`Projections.Legacy` because ADR 0005 left its reference system undecided. A mixed `SysGeometry` cannot be
-matched against in any single system, and no normalization here would fix it.
+Mixed is worse here than merely inconvenient:
 
-**So this is a constraint on the Legacy decision, not a blocker on this one:** whatever ADR 0005's successor
-decides for `SysGeometry`, it has to be a single system at a time. If it goes mixed, direction B needs
-revisiting and the toggle is not enough.
+- **Silently wrong.** SQL Server returns NULL rather than erroring when `Intersects` gets mismatched SRIDs,
+  so those rows drop out of the result with nothing logged.
+- **Unindexed.** `SPATIAL_BuildingDetailsV2_Geometry` has `BOUNDING_BOX = (22279.17, 153050.23, 258873.3,
+  244022.31)`, the Lambert 72 extent. Lambert 2008 coordinates fall entirely outside it, so a converted row
+  gets no useful coverage from that index however the query is written.
+
+So `BuildingDetailsV2` takes the same shape `ParcelItemsWithCount` does: `SysGeometry` pinned to Lambert 72,
+a new nullable `SysGeometryLambert2008` beside it, and `SPATIAL_BuildingDetailsV2_GeometryLambert2008` over
+the second with the Lambert 2008 bounding box `(522200, 653000, 758900, 744100)` — the numbers ADR 0005
+derived, reused a third time rather than re-derived. `BuildingDetailItemV2.SetSysGeometry` writes both on
+every geometry write.
+
+**Three read sites, not one.** Alongside `BuildingMatching.GetUnderlyingBuildings`, the BackOffice's
+`BuildingGeometryContext.GetOverlappingBuildings` and `GetOverlappingBuildingOutlines` read the same column.
+Those are validation: an SRID mismatch there does not lose a result, it finds no overlap — which is the
+answer that lets an invalid building through. All three now pick the column `MatchingSrid` names.
+
+#### The guard is per column, not per process
+
+`Lambert2008MatchingReadiness` memoizes per subject (`Parcels`, `Buildings`). The two columns fill on
+independent schedules — parcel-registry's conversion against this repository's — so a single flag would let
+whichever probe passed first wave the other through, which is the silent pass the guard exists to prevent.
+
+The building probe also has to ignore rows whose `SysGeometry` is itself null. Buildings whose geometry is
+not a polygon — imported multipolygons — have stored null there all along and are matchable in neither
+system; counting them as "not converted yet" would leave the guard tripped for good.
+
+#### Ensure* mutates a geometry it cannot transform
+
+`EnsureLambert08` does not transform a geometry outside the Flanders envelope. It returns **the same
+instance** with the SRID overwritten and the coordinates unmoved — so writing both columns from one input
+would leave them aliasing a single, wrongly labelled object. `ParcelConsumerItem.SetGeometry` is safe only
+because it throws before reaching that path; `SetSysGeometry` now refuses the same way, for the same reason.
+
+#### What is not built yet
+
+`BuildingGeometryCrsWasChanged` exists in `GrAr.Contracts` as a Kafka contract but not as a domain event in
+this repository, and Legacy projects off domain events. Until the building event store's conversion emits
+one, `SysGeometryLambert2008` fills only for buildings whose geometry happens to change.
+
+`BuildingDetailItemV2.SetSysGeometryFromCrsConversion` is in place for it: it writes only the Lambert 2008
+column, because the conversion re-expresses a building rather than moving it, so `SysGeometry` is already
+what it should be. Wiring the handler is a two-line change once the event lands. Until then the readiness
+guard is what makes flipping `Lambert2008ConversionCompleted` early fail loudly rather than quietly return
+nothing.
 
 ### End state
 
 Once the toggle has been on long enough to trust, a second migration drops `Geometry` and
-`SPATIAL_ParcelItems_Geometry`, the matching collapses to one column, and the toggle and the Lambert 72 write
-path go with it. Whether `GeometryLambert2008` is then renamed to `Geometry` costs a further migration and is
-left open here so that it is decided rather than defaulted into.
+`SPATIAL_ParcelItems_Geometry` — and, in the same move, `SysGeometry` and
+`SPATIAL_BuildingDetailsV2_Geometry` — the matching collapses to one column per table, and the toggle and the
+Lambert 72 write paths go with them. Whether the surviving columns are then renamed back costs a further
+migration and is left open here so that it is decided rather than defaulted into.
 
 ## Considered and rejected
 
@@ -274,9 +322,14 @@ made SRID-aware, the in-memory NTS overlay would still silently return empty int
 - While parcel-registry holds Lambert 72 and the toggle is off, every comparison is exactly what it is today,
   and `Geometry` is byte-for-byte what it is today. All new behaviour is on the Lambert 2008 path, which no
   production data reaches yet.
-- `ParcelItemsWithCount` carries two spatial indexes until Lambert 72 is dropped. Both are maintained only
-  when their column changes, so parcel-address events cost nothing extra; the peak is parcel-registry's
-  conversion, which is a geometry change on every row and so rebuilds both.
+- `ParcelItemsWithCount` and `BuildingDetailsV2` each carry two spatial indexes until Lambert 72 is dropped.
+  Both are maintained only when their column changes, so parcel-address and status-only building events cost
+  nothing extra; the peak is each register's conversion, which is a geometry change on every row and so
+  rebuilds both.
+- `BuildingDetailsV2.SysGeometryLambert2008` is empty at deploy and, unlike the parcel column, has no
+  conversion event filling it yet. Matching and overlap validation keep using `SysGeometry` until
+  `Lambert2008ConversionCompleted` is thrown, and the readiness guard refuses that flip while the column is
+  incomplete.
 - Moving to Lambert 2008 becomes a configuration change per host, reversible, with no downtime and no
   rebuild. That is the entire return on the second column and index.
 - The four comparison points must all resolve `MatchingSrid` from the same toggle. A call site that forgets
