@@ -77,10 +77,12 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wms
 
                     geometry.SRID.Should().Be(SystemReferenceId.SridLambert72);
 
-                    // Rounded back to the centimetre geometries are persisted at, so an outline that came
-                    // in as Lambert 2008 is indistinguishable from one that came in as Lambert 72.
-                    geometry.Coordinates[0].X.Should().Be(141298.83);
-                    geometry.Coordinates[0].Y.Should().Be(185196.04);
+                    // The same physical outline whichever system it arrived in. Approximately, not exactly:
+                    // a transformed polygon is stored at the precision the transform produces rather than
+                    // rounded, so an outline that came in as Lambert 2008 lands within the transform's
+                    // accuracy of one that came in as Lambert 72.
+                    geometry.Coordinates[0].X.Should().BeApproximately(141298.83, 0.01);
+                    geometry.Coordinates[0].Y.Should().BeApproximately(185196.04, 0.01);
                 });
         }
 
@@ -109,8 +111,8 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wms
 
                     geometry.SRID.Should().Be(SystemReferenceId.SridLambert2008);
 
-                    geometry.Coordinates[0].X.Should().Be(641296.8);
-                    geometry.Coordinates[0].Y.Should().Be(685195.4);
+                    geometry.Coordinates[0].X.Should().BeApproximately(641296.8, 0.01);
+                    geometry.Coordinates[0].Y.Should().BeApproximately(685195.4, 0.01);
                 });
         }
 

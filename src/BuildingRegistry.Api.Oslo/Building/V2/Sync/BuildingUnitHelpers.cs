@@ -12,7 +12,7 @@ namespace BuildingRegistry.Api.Oslo.Building.V2.Sync
         /// </summary>
         public static Point GetBuildingUnitPoint(byte[] point, int objectSrid)
         {
-            var geometry = SyncGeometry.ToRequestedCrs(point, objectSrid);
+            var geometry = SyncGeometry.PositionToRequestedCrs(point, objectSrid);
             return new Point
             {
                 XmlPoint = new GmlPoint { Pos = $"{geometry.Coordinate.X.ToPointGeometryCoordinateValueFormat()} {geometry.Coordinate.Y.ToPointGeometryCoordinateValueFormat()}" },

@@ -1,5 +1,6 @@
 namespace BuildingRegistry.Projections.Legacy
 {
+    using System.Linq;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.Runner;
     using BuildingDetailV2;
     using BuildingPersistentIdCrabIdMapping;
@@ -32,6 +33,22 @@ namespace BuildingRegistry.Projections.Legacy
         // This needs to be DbContextOptions<T> for Autofac!
         public LegacyContext(DbContextOptions<LegacyContext> options)
             : base(options) { }
+
+        /// <summary>
+        /// Whether any building is still missing its Lambert 2008 outline, which would make it invisible to
+        /// matching done in that system. Backs <see cref="Lambert2008MatchingReadiness"/>.
+        ///
+        /// A building whose geometry is not a polygon has no <c>SysGeometry</c> either and is matchable in
+        /// neither system, so it is not what this is asking about — counting it would leave the guard
+        /// permanently tripped.
+        ///
+        /// Synchronous because the matching path that calls it is synchronous end to end; blocking on an
+        /// asynchronous version from there would be sync-over-async for no gain.
+        /// </summary>
+        public bool HasIncompleteLambert2008Geometry()
+            => BuildingDetailsV2
+                .AsNoTracking()
+                .Any(x => !x.IsRemoved && x.SysGeometry != null && x.SysGeometryLambert2008 == null);
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

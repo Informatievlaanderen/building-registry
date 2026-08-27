@@ -11,42 +11,60 @@
     {
         private readonly LegacyContext _legacyContext;
         private readonly Lambert2008ConversionCompletedToggle _conversionCompleted;
+        private readonly Lambert2008MatchingReadiness _readiness;
 
         public BuildingMatching(
             LegacyContext legacyContext,
-            Lambert2008ConversionCompletedToggle conversionCompleted)
+            Lambert2008ConversionCompletedToggle conversionCompleted,
+            Lambert2008MatchingReadiness readiness)
         {
             _legacyContext = legacyContext;
             _conversionCompleted = conversionCompleted;
+            _readiness = readiness;
         }
 
         /// <summary>
         /// Finds the buildings under a parcel.
         ///
-        /// The incoming parcel geometry is brought to the reference system matching is done in before
-        /// anything is compared. Both layers below need that: SQL Server returns NULL rather than erroring
-        /// when SRIDs disagree, and NTS ignores SRID entirely — it would compare a Lambert 72 polygon
-        /// against a Lambert 2008 one, find them ~500 km apart, and return an empty intersection with no
-        /// exception at all. See ADR 0006.
-        ///
-        /// This assumes <c>BuildingDetailV2.SysGeometry</c> is uniformly in that system. That is a property
-        /// of Projections.Legacy, whose reference system ADR 0005 left undecided; ADR 0006 records the
-        /// dependency.
+        /// The incoming parcel geometry is brought to the reference system matching is done in, and the
+        /// column held in that same system is compared against, so both sides agree. Neither layer below
+        /// would say otherwise if they did not: SQL Server returns NULL rather than erroring when SRIDs
+        /// disagree, and NTS ignores SRID entirely — it would compare a Lambert 72 polygon against a
+        /// Lambert 2008 one, find them ~500 km apart, and return an empty intersection with no exception at
+        /// all. See ADR 0006.
         /// </summary>
         public IEnumerable<int> GetUnderlyingBuildings(Geometry parcelGeometry)
         {
-            var matchingGeometry = ToMatchingCrs(parcelGeometry);
+            var matchingSrid = _conversionCompleted.MatchingSrid;
+            var useLambert2008 = matchingSrid == SystemReferenceId.SridLambert2008;
+
+            if (useLambert2008)
+            {
+                _readiness.EnsureVerified(
+                    Lambert2008MatchingReadiness.Buildings,
+                    _legacyContext.HasIncompleteLambert2008Geometry);
+            }
+
+            var matchingGeometry = ToMatchingCrs(parcelGeometry, matchingSrid);
             var boundingBox = matchingGeometry.Factory.ToGeometry(matchingGeometry.EnvelopeInternal);
 
-            var underlyingBuildings = _legacyContext
-                .BuildingDetailsV2
-                .Where(building => boundingBox.Intersects(building.SysGeometry))
-                .ToList()
-                .Where(building => matchingGeometry.Intersects(building.SysGeometry))
+            // Two near-identical queries rather than one with a conditional predicate: EF has to translate
+            // the column into SQL, so which one is compared cannot be chosen inside it.
+            var candidates = useLambert2008
+                ? _legacyContext.BuildingDetailsV2
+                    .Where(building => boundingBox.Intersects(building.SysGeometryLambert2008))
+                    .ToList()
+                : _legacyContext.BuildingDetailsV2
+                    .Where(building => boundingBox.Intersects(building.SysGeometry))
+                    .ToList();
+
+            var underlyingBuildings = candidates
+                .Select(building => new { building.PersistentLocalId, Geometry = building.SysGeometryIn(matchingSrid) })
+                .Where(building => building.Geometry is not null && matchingGeometry.Intersects(building.Geometry))
                 .Select(building =>
                     new {
                         building.PersistentLocalId,
-                        Overlap = CalculateOverlap(building.SysGeometry, matchingGeometry)
+                        Overlap = CalculateOverlap(building.Geometry, matchingGeometry)
                     })
                 .ToList();
 
@@ -55,10 +73,10 @@
                 .Select(building => building.PersistentLocalId);
         }
 
-        private Geometry ToMatchingCrs(Geometry geometry)
-            => _conversionCompleted.MatchingSrid == SystemReferenceId.SridLambert2008
-                ? geometry.IsLambert08() ? geometry : geometry.EnsureLambert08(2)
-                : geometry.IsLambert72() ? geometry : geometry.EnsureLambert72().RoundCoordinates(2);
+        private static Geometry ToMatchingCrs(Geometry geometry, int matchingSrid)
+            => matchingSrid == SystemReferenceId.SridLambert2008
+                ? geometry.IsLambert08() ? geometry : geometry.EnsureLambert08()
+                : geometry.IsLambert72() ? geometry : geometry.EnsureLambert72();
 
         private static double CalculateOverlap(Geometry? buildingGeometry, Geometry parcel)
         {

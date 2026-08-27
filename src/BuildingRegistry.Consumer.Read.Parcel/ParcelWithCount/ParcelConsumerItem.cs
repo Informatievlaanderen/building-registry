@@ -10,13 +10,6 @@
 
     public class ParcelConsumerItem
     {
-        /// <summary>
-        /// The decimals a transformed geometry is rounded to. Geometries are persisted at centimetre
-        /// precision and the transform is accurate to it. Only a transformed geometry is rounded; one that
-        /// needs no transform is stored exactly as the event store holds it.
-        /// </summary>
-        private const int TransformedCoordinateDecimals = 2;
-
         public Guid ParcelId { get; set; }
         public string CaPaKey { get; set; }
         public ParcelStatus Status { get; set; }
@@ -58,7 +51,10 @@
         /// <summary>
         /// Fixes first, then transforms. <c>EnsureCoordinatesAreInCoordinateSystem</c> returns a geometry
         /// that is not <c>IsValid</c> untouched, so transforming an invalid parcel first would stamp an SRID
-        /// onto unmoved coordinates. A fixed geometry is valid by construction. See ADR 0006.
+        /// onto unmoved coordinates. A fixed geometry is valid by construction.
+        ///
+        /// A transformed geometry is not rounded: a parcel is a polygon, and rounding one moves its vertices
+        /// and so its area, which is what matching compares. See ADR 0006.
         /// </summary>
         public void SetGeometry(Geometry geometry)
         {
@@ -73,11 +69,11 @@
 
             Geometry = fixedGeometry.IsLambert72()
                 ? fixedGeometry
-                : fixedGeometry.EnsureLambert72().RoundCoordinates(TransformedCoordinateDecimals);
+                : fixedGeometry.EnsureLambert72();
 
             GeometryLambert2008 = fixedGeometry.IsLambert08()
                 ? fixedGeometry
-                : fixedGeometry.EnsureLambert08(TransformedCoordinateDecimals);
+                : fixedGeometry.EnsureLambert08();
         }
 
         /// <summary>
@@ -91,12 +87,28 @@
 
             GeometryLambert2008 = fixedGeometry.IsLambert08()
                 ? fixedGeometry
-                : fixedGeometry.EnsureLambert08(TransformedCoordinateDecimals);
+                : fixedGeometry.EnsureLambert08();
         }
 
-        /// <summary>The geometry in the reference system matching is done in.</summary>
-        public Geometry? GeometryIn(int matchingSrid)
-            => matchingSrid == SystemReferenceId.SridLambert2008 ? GeometryLambert2008 : Geometry;
+        /// <summary>
+        /// The geometry in the reference system matching is done in.
+        ///
+        /// Throws rather than handing back null when the Lambert 2008 column has not been backfilled for
+        /// this parcel yet: that means the toggle went on before the parcel register's conversion finished,
+        /// and saying so beats a NullReferenceException several frames further on. See ADR 0006.
+        /// </summary>
+        public Geometry GeometryIn(int matchingSrid)
+        {
+            if (matchingSrid != SystemReferenceId.SridLambert2008)
+            {
+                return Geometry;
+            }
+
+            return GeometryLambert2008 ?? throw new InvalidOperationException(
+                $"Parcel {CaPaKey} has no Lambert 2008 geometry, so it cannot be matched in Lambert 2008. "
+                + "FeatureToggles:Lambert2008ConversionCompleted must not be enabled before the parcel "
+                + "register's conversion has filled the column.");
+        }
     }
 
     public struct ParcelStatus

@@ -94,9 +94,20 @@
         }
 
         public async Task<bool> HasIncompleteLambert2008Geometry()
-            => await ParcelConsumerItemsWithCount
+            => await ParcelsMissingLambert2008Geometry.AnyAsync();
+
+        /// <summary>
+        /// <see cref="HasIncompleteLambert2008Geometry"/> for the matching path that is synchronous end to
+        /// end. Blocking on the asynchronous one from there would be sync-over-async for no gain: that path
+        /// already runs its queries synchronously.
+        /// </summary>
+        public bool HasIncompleteLambert2008GeometrySynchronously()
+            => ParcelsMissingLambert2008Geometry.Any();
+
+        private IQueryable<ParcelConsumerItem> ParcelsMissingLambert2008Geometry
+            => ParcelConsumerItemsWithCount
                 .AsNoTracking()
-                .AnyAsync(x => !x.IsRemoved && x.GeometryLambert2008 == null);
+                .Where(x => !x.IsRemoved && x.GeometryLambert2008 == null);
     }
 
     public class ConsumerContextFactory : IDesignTimeDbContextFactory<ConsumerParcelContext>

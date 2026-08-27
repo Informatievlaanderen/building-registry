@@ -76,6 +76,28 @@ namespace BuildingRegistry.Tests.Oslo.ParcelMatchingTests
             parcel.GeometryIn(SystemReferenceId.SridLambert2008).Should().BeSameAs(parcel.GeometryLambert2008);
         }
 
+        /// <summary>
+        /// Only matching runs behind <see cref="Lambert2008MatchingReadiness"/>; the Kafka projection asks a
+        /// parcel for its geometry directly. So the parcel itself has to refuse a Lambert 2008 read it cannot
+        /// answer, rather than hand back a null that surfaces as a NullReferenceException elsewhere.
+        /// </summary>
+        [Fact]
+        public void WhenAParcelHasNoLambert2008GeometryYet_ThenAskingForItIsRefused()
+        {
+            var parcel = AddParcel(GeometryHelper.ValidPolygon);
+
+            // A row as it would be before the parcel register's conversion reached it.
+            _context.Entry(parcel).Property(nameof(ParcelConsumerItem.GeometryLambert2008)).CurrentValue = null;
+            _context.SaveChanges();
+
+            parcel.GeometryIn(SystemReferenceId.SridLambert72).Should().BeSameAs(parcel.Geometry);
+
+            var act = () => parcel.GeometryIn(SystemReferenceId.SridLambert2008);
+
+            act.Should().Throw<InvalidOperationException>()
+                .WithMessage("*no Lambert 2008 geometry*");
+        }
+
         [Fact]
         public void WhenAParcelArrivesInLambert2008_ThenItIsStoredVerbatimAndLambert72IsDerived()
         {
@@ -84,7 +106,7 @@ namespace BuildingRegistry.Tests.Oslo.ParcelMatchingTests
             parcel.GeometryLambert2008!.SRID.Should().Be(SystemReferenceId.SridLambert2008);
             parcel.Geometry.SRID.Should().Be(SystemReferenceId.SridLambert72);
 
-            // The same physical parcel, to within the centimetre a transformed geometry is rounded to.
+            // The same physical parcel, to within what the Lambert transform is accurate to.
             parcel.Geometry.Centroid.Distance(GeometryHelper.ValidPolygon.Centroid).Should().BeLessThan(0.05);
         }
 
