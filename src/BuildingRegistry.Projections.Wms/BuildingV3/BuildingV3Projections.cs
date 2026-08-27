@@ -20,12 +20,6 @@ namespace BuildingRegistry.Projections.Wms.BuildingV3
         public const string MeasuredByGrbMethod = "IngemetenGRB";
         public const string OutlinedMethod = "Ingeschetst";
 
-        /// <summary>
-        /// Geometries are persisted at centimetre precision, which is what the Lambert transform is
-        /// accurate to. See ADR 0005.
-        /// </summary>
-        private const int GeometryCoordinateDecimals = 2;
-
         public BuildingV3Projections()
         {
             When<Envelope<BuildingWasMigrated>>(async (context, message, ct) =>
@@ -263,11 +257,12 @@ namespace BuildingRegistry.Projections.Wms.BuildingV3
                 return null;
             }
 
-            // Rounding only on the transformed path, so a geometry that was already Lambert 72 is stored
-            // exactly as persisted. The transform is accurate to the centimetre geometries are kept at.
+            // A geometry that was already Lambert 72 is stored exactly as persisted; a transformed one is
+            // stored at the precision the transform produces. A building outline is a polygon, and rounding
+            // one moves every vertex and so its area, so it is not rounded. See ADR 0005.
             if (!geometry.IsLambert72())
             {
-                geometry = (Polygon)geometry.EnsureLambert72().RoundCoordinates(GeometryCoordinateDecimals);
+                geometry = (Polygon)geometry.EnsureLambert72();
             }
 
             return geometry.AsBinary(); //asbinary is a must here since we are using a WKB and not EWKB

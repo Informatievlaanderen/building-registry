@@ -41,7 +41,7 @@
                     new Instant()));
             _legacyContext.SaveChanges();
 
-            var buildingMatching = new BuildingMatching(_legacyContext, Lambert72Matching);
+            var buildingMatching = new BuildingMatching(_legacyContext, Lambert72Matching, new Lambert2008MatchingReadiness());
 
             var result = buildingMatching.GetUnderlyingBuildings(parcelGeometry100PercentOverlap);
 
@@ -65,7 +65,7 @@
                     new Instant()));
             _legacyContext.SaveChanges();
 
-            var buildingMatching = new BuildingMatching(_legacyContext, Lambert72Matching);
+            var buildingMatching = new BuildingMatching(_legacyContext, Lambert72Matching, new Lambert2008MatchingReadiness());
 
             var result = buildingMatching.GetUnderlyingBuildings(parcelGeometry);
 
@@ -98,7 +98,7 @@
                     new Instant()));
             _legacyContext.SaveChanges();
 
-            var buildingMatching = new BuildingMatching(_legacyContext, Lambert72Matching);
+            var buildingMatching = new BuildingMatching(_legacyContext, Lambert72Matching, new Lambert2008MatchingReadiness());
 
             var result = buildingMatching.GetUnderlyingBuildings(parcelGeometry);
 
@@ -133,7 +133,7 @@
                     new Instant()));
             _legacyContext.SaveChanges();
 
-            var buildingMatching = new BuildingMatching(_legacyContext, Lambert72Matching);
+            var buildingMatching = new BuildingMatching(_legacyContext, Lambert72Matching, new Lambert2008MatchingReadiness());
 
             var result = buildingMatching.GetUnderlyingBuildings(parcelGeometry).ToList();
 

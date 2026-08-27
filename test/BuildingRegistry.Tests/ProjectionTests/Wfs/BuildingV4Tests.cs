@@ -602,7 +602,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Wfs
             var extendedWkb = extendedWkbGeometry.ToByteArray();
             var geometry = (Polygon)WKBReaderFactory.CreateForEwkb(extendedWkb).Read(extendedWkb);
 
-            return new GrbPolygon((Polygon)geometry.EnsureLambert08(2));
+            return new GrbPolygon((Polygon)geometry.EnsureLambert08());
         }
 
         protected override BuildingV4Projections CreateProjection() => new BuildingV4Projections();

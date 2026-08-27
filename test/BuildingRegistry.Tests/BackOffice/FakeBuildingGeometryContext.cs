@@ -15,8 +15,15 @@ namespace BuildingRegistry.Tests.BackOffice
         public FakeBuildingGeometryContext() { }
 
         // This needs to be DbContextOptions<T> for Autofac!
-        public FakeBuildingGeometryContext(DbContextOptions<BuildingGeometryContext> options, bool dontDispose = false)
-            : base(options)
+        public FakeBuildingGeometryContext(
+            DbContextOptions<BuildingGeometryContext> options,
+            bool dontDispose = false,
+            Lambert2008ConversionCompletedToggle? conversionCompleted = null,
+            Lambert2008MatchingReadiness? readiness = null)
+            : base(
+                options,
+                conversionCompleted ?? new Lambert2008ConversionCompletedToggle(false),
+                readiness ?? new Lambert2008MatchingReadiness())
         {
             _dontDispose = dontDispose;
         }
@@ -42,17 +49,21 @@ namespace BuildingRegistry.Tests.BackOffice
     public class FakeBuildingGeometryContextFactory : IDesignTimeDbContextFactory<FakeBuildingGeometryContext>
     {
         private readonly bool _dontDispose;
+        private readonly Lambert2008ConversionCompletedToggle _conversionCompleted;
 
-        public FakeBuildingGeometryContextFactory(bool dontDispose = false)
+        public FakeBuildingGeometryContextFactory(
+            bool dontDispose = false,
+            Lambert2008ConversionCompletedToggle? conversionCompleted = null)
         {
             _dontDispose = dontDispose;
+            _conversionCompleted = conversionCompleted ?? new Lambert2008ConversionCompletedToggle(false);
         }
 
         public FakeBuildingGeometryContext CreateDbContext(params string[] args)
         {
             var builder = new DbContextOptionsBuilder<BuildingGeometryContext>().UseInMemoryDatabase(Guid.NewGuid().ToString());
 
-            return new FakeBuildingGeometryContext(builder.Options, _dontDispose);
+            return new FakeBuildingGeometryContext(builder.Options, _dontDispose, _conversionCompleted);
         }
     }
 }

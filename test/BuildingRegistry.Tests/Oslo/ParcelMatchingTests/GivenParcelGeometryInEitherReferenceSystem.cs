@@ -15,8 +15,9 @@
     /// schedule, queried against building geometry that follows this repository's. It has to find the same
     /// buildings whichever system it turns up in, and nothing beneath would report a mismatch. See ADR 0006.
     ///
-    /// This assumes <c>BuildingDetailV2.SysGeometry</c> is uniformly in the system matching is done in.
-    /// That is a property of Projections.Legacy, which ADR 0005 left undecided.
+    /// The building side of that is held in two columns, one per system, so this no longer assumes anything
+    /// about which one <c>BuildingDetailsV2</c> happens to be in — see
+    /// <see cref="GivenBuildingGeometryInEitherReferenceSystem"/>.
     /// </summary>
     public class GivenParcelGeometryInEitherReferenceSystem
     {
@@ -35,7 +36,7 @@
         {
             AddBuilding(GeometryHelper.ValidPolygon);
 
-            var matching = new BuildingMatching(_legacyContext, Lambert72Matching);
+            var matching = new BuildingMatching(_legacyContext, Lambert72Matching, new Lambert2008MatchingReadiness());
 
             var result = matching.GetUnderlyingBuildings(GeometryHelper.ValidPolygonLambert2008).ToList();
 
@@ -47,7 +48,7 @@
         {
             AddBuilding(GeometryHelper.ValidPolygonLambert2008);
 
-            var matching = new BuildingMatching(_legacyContext, Lambert2008Matching);
+            var matching = new BuildingMatching(_legacyContext, Lambert2008Matching, new Lambert2008MatchingReadiness());
 
             var result = matching.GetUnderlyingBuildings(GeometryHelper.ValidPolygon).ToList();
 

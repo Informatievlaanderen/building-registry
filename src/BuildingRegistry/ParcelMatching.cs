@@ -39,7 +39,9 @@
         {
             if (_conversionCompleted.FeatureEnabled)
             {
-                _readiness.EnsureVerified(() => _parcels.HasIncompleteLambert2008Geometry().GetAwaiter().GetResult());
+                await _readiness.EnsureVerified(
+                    Lambert2008MatchingReadiness.Parcels,
+                    () => _parcels.HasIncompleteLambert2008Geometry());
             }
 
             var matchingSrid = _conversionCompleted.MatchingSrid;
@@ -64,8 +66,8 @@
 
         private static Geometry ToMatchingCrs(Geometry geometry, int matchingSrid)
             => matchingSrid == SystemReferenceId.SridLambert2008
-                ? geometry.IsLambert08() ? geometry : geometry.EnsureLambert08(2)
-                : geometry.IsLambert72() ? geometry : geometry.EnsureLambert72().RoundCoordinates(2);
+                ? geometry.IsLambert08() ? geometry : geometry.EnsureLambert08()
+                : geometry.IsLambert72() ? geometry : geometry.EnsureLambert72();
 
         private static double CalculateOverlap(Geometry building, Geometry parcel)
         {

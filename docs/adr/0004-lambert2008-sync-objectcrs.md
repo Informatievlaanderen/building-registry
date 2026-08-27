@@ -77,20 +77,23 @@ Lambert 2008 beside positions in Lambert 72 would be incoherent. So `BuildingUni
 takes the same `objectSrid` as `BuildingHelpers.GetBuildingPolygon`, and one object is wholly in one reference
 system.
 
-### `SyncGeometry.ToRequestedCrs`
+### `SyncGeometry`
 
-Both helpers read through one method, which reads the EWKB in the reference system the bytes carry and puts
-it in the requested one. Two properties worth stating:
+Both helpers read through it: `BuildingHelpers` through `OutlineToRequestedCrs` and `BuildingUnitHelpers`
+through `PositionToRequestedCrs`, over one private core that reads the EWKB in the reference system the bytes
+carry and puts it in the requested one. Three properties worth stating:
 
 - **Only the object is reprojected.** The embedded `event` is the event store's own payload, emitted verbatim
   at every position, whatever `objectCrs` says. A feed replayed for auditing therefore still shows what was
   actually stored, including the conversion event itself.
 - **Only a geometry that has to move is touched.** One already in the requested system is passed through, so
-  no rounding is applied to it and today's output is byte-for-byte unchanged.
-  `WhenNotRequested_ThenLambert72SourceIsUnchanged` asserts the posList at its full 11 decimals for exactly
-  that reason. A transformed geometry *is* rounded, to 2 decimals — the centimetre precision coordinates are
-  persisted at and the transform is accurate to — rather than carrying floating point noise into an 11-decimal
-  `posList`.
+  today's output is byte-for-byte unchanged. `WhenNotRequested_ThenLambert72SourceIsUnchanged` asserts the
+  posList at its full 11 decimals for exactly that reason.
+- **An outline is not rounded, a position is.** The feed emits both: the building's polygon and, inside it,
+  each unit's point. Rounding a point moves it by at most half a centimetre and nothing downstream measures
+  it — that is the case the address registry rounds for, and `PositionToRequestedCrs` keeps it. Rounding a
+  polygon moves every vertex and so its area, so `OutlineToRequestedCrs` takes the transform at the precision
+  it produces. The two share one private core, so the pass-through rule above is stated once.
 
 ### `BuildingRegistry.WKBReaderFactory.CreateForEwkb`
 
