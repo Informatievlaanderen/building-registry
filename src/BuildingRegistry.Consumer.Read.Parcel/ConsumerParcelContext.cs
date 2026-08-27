@@ -1,4 +1,4 @@
-namespace BuildingRegistry.Consumer.Read.Parcel
+﻿namespace BuildingRegistry.Consumer.Read.Parcel
 {
     using System;
     using System.Collections.Generic;
@@ -6,6 +6,7 @@ namespace BuildingRegistry.Consumer.Read.Parcel
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
+    using Be.Vlaanderen.Basisregisters.GrAr.Common.NetTopology;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.Runner;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.Runner.SqlServer.MigrationExtensions;
     using Building;
@@ -56,9 +57,27 @@ namespace BuildingRegistry.Consumer.Read.Parcel
 
         public override string ProjectionStateSchema => Schema.ConsumerReadParcel;
 
-        public async Task<IEnumerable<ParcelData>> GetUnderlyingParcelsUnderBoundingBox(Geometry buildingGeometry)
+        public async Task<IEnumerable<ParcelData>> GetUnderlyingParcelsUnderBoundingBox(Geometry buildingGeometry, int matchingSrid)
         {
             var boundingBox = buildingGeometry.Factory.ToGeometry(buildingGeometry.EnvelopeInternal);
+
+            // Two near-identical queries rather than one with a conditional projection: EF has to translate
+            // the column into the SQL predicate, so which column is compared cannot be chosen inside it.
+            if (matchingSrid == SystemReferenceId.SridLambert2008)
+            {
+                return await ParcelConsumerItemsWithCount
+                    .Where(parcel => boundingBox.Intersects(parcel.GeometryLambert2008))
+                    .Select(x => new ParcelData(
+                        x.ParcelId,
+                        x.CaPaKey,
+                        x.GeometryLambert2008!,
+                        x.Status,
+                        ParcelAddressItemsWithCount
+                            .Where(y => y.ParcelId == x.ParcelId)
+                            .Select(y => new AddressPersistentLocalId(y.AddressPersistentLocalId))
+                            .ToList()))
+                    .ToListAsync();
+            }
 
             return await ParcelConsumerItemsWithCount
                 .Where(parcel => boundingBox.Intersects(parcel.Geometry))
@@ -73,6 +92,22 @@ namespace BuildingRegistry.Consumer.Read.Parcel
                         .ToList()))
                 .ToListAsync();
         }
+
+        public async Task<bool> HasIncompleteLambert2008Geometry()
+            => await ParcelsMissingLambert2008Geometry.AnyAsync();
+
+        /// <summary>
+        /// <see cref="HasIncompleteLambert2008Geometry"/> for the matching path that is synchronous end to
+        /// end. Blocking on the asynchronous one from there would be sync-over-async for no gain: that path
+        /// already runs its queries synchronously.
+        /// </summary>
+        public bool HasIncompleteLambert2008GeometrySynchronously()
+            => ParcelsMissingLambert2008Geometry.Any();
+
+        private IQueryable<ParcelConsumerItem> ParcelsMissingLambert2008Geometry
+            => ParcelConsumerItemsWithCount
+                .AsNoTracking()
+                .Where(x => !x.IsRemoved && x.GeometryLambert2008 == null);
     }
 
     public class ConsumerContextFactory : IDesignTimeDbContextFactory<ConsumerParcelContext>

@@ -1,4 +1,4 @@
-namespace BuildingRegistry.Tests.ProjectionTests.Consumer.Parcel
+﻿namespace BuildingRegistry.Tests.ProjectionTests.Consumer.Parcel
 {
     using System;
     using System.Collections.Generic;
@@ -7,6 +7,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Consumer.Parcel
     using Autofac;
     using AutoFixture;
     using Be.Vlaanderen.Basisregisters.GrAr.Contracts.Common;
+    using Be.Vlaanderen.Basisregisters.GrAr.Common.NetTopology;
     using Be.Vlaanderen.Basisregisters.GrAr.Contracts.ParcelRegistry;
     using Be.Vlaanderen.Basisregisters.Utilities.HexByteConvertor;
     using Building;
@@ -421,7 +422,9 @@ namespace BuildingRegistry.Tests.ProjectionTests.Consumer.Parcel
                  ))
                  .Create();
 
-             var newGeometry = new WKTReader().Read("POLYGON ((30 10, 10 20, 20 40, 40 40, 30 10))");
+             // A real Lambert 72 polygon: the consumer reads the reference system from the EWKB and refuses
+             // geometry it cannot transform, so an SRID-less shape outside Flanders is not valid input.
+             var newGeometry = GeometryHelper.SecondValidPolygon;
              var parcelGeometryWasChanged = Fixture
                  .Build<ParcelGeometryWasChanged>()
                  .FromFactory(() => new ParcelGeometryWasChanged(
@@ -450,7 +453,14 @@ namespace BuildingRegistry.Tests.ProjectionTests.Consumer.Parcel
                      await context.ParcelConsumerItemsWithCount.FindAsync(Guid.Parse(parcelGeometryWasChanged.ParcelId));
 
                  parcel.Should().NotBeNull();
-                 parcel!.Geometry.Should().BeEquivalentTo(newGeometry);
+
+                 // Compared topologically rather than coordinate-for-coordinate: SetGeometry runs
+                 // GeometryFixer.Fix, which normalizes ring orientation, so the stored ring can be wound the
+                 // other way round while describing the same parcel.
+                 parcel!.Geometry.EqualsTopologically(newGeometry).Should().BeTrue();
+                 parcel.Geometry.SRID.Should().Be(SystemReferenceId.SridLambert72);
+                 parcel.GeometryLambert2008.Should().NotBeNull();
+                 parcel.GeometryLambert2008!.SRID.Should().Be(SystemReferenceId.SridLambert2008);
 
                  var buildingsToInvalidate = context.BuildingsToInvalidate.Local.ToList();
                  buildingsToInvalidate.Should().HaveCount(2);
@@ -553,7 +563,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Consumer.Parcel
             return new ConsumerParcelContext(options);
         }
 
-        protected override ParcelKafkaProjection CreateProjection() => new ParcelKafkaProjection(Container);
+        protected override ParcelKafkaProjection CreateProjection() => new ParcelKafkaProjection(Container, new Lambert2008ConversionCompletedToggle(false));
 
         protected override void ConfigureCommandHandling(ContainerBuilder builder)
         {

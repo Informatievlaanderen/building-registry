@@ -13,6 +13,9 @@
 
     public class GetUnderlyingBuildingsTests
     {
+
+        /// <summary>Matching in Lambert 72, the pre-conversion default. See ADR 0006.</summary>
+        private static readonly Lambert2008ConversionCompletedToggle Lambert72Matching = new(false);
         private readonly FakeLegacyContext _legacyContext;
 
         public GetUnderlyingBuildingsTests()
@@ -24,7 +27,7 @@
         [Fact]
         public void WithBuildingOverlapping100Percent_ThenReturnsTheUnderlyingBuilding()
         {
-            var buildingGeometry = CreateGeometry("100 100 100 200 200 200 200 100 100 100");
+            var buildingGeometry = CreateGeometry("140100 186100 140100 186200 140200 186200 140200 186100 140100 186100");
             var parcelGeometry100PercentOverlap = buildingGeometry;
 
             _legacyContext.BuildingDetailsV2
@@ -38,7 +41,7 @@
                     new Instant()));
             _legacyContext.SaveChanges();
 
-            var buildingMatching = new BuildingMatching(_legacyContext);
+            var buildingMatching = new BuildingMatching(_legacyContext, Lambert72Matching, new Lambert2008MatchingReadiness());
 
             var result = buildingMatching.GetUnderlyingBuildings(parcelGeometry100PercentOverlap);
 
@@ -48,8 +51,8 @@
         [Fact]
         public void WithBuildingLessThan80PercentOverlap_ThenReturnsNothing()
         {
-            var buildingGeometry = CreateGeometry("100 100 100 200 200 200 200 100 100 100");
-            var parcelGeometry = CreateGeometry("140 100 140 200 240 200 240 100 140 100");
+            var buildingGeometry = CreateGeometry("140100 186100 140100 186200 140200 186200 140200 186100 140100 186100");
+            var parcelGeometry = CreateGeometry("140140 186100 140140 186200 140240 186200 140240 186100 140140 186100");
 
             _legacyContext.BuildingDetailsV2
                 .Add(new BuildingDetailItemV2(
@@ -62,7 +65,7 @@
                     new Instant()));
             _legacyContext.SaveChanges();
 
-            var buildingMatching = new BuildingMatching(_legacyContext);
+            var buildingMatching = new BuildingMatching(_legacyContext, Lambert72Matching, new Lambert2008MatchingReadiness());
 
             var result = buildingMatching.GetUnderlyingBuildings(parcelGeometry);
 
@@ -72,8 +75,8 @@
         [Fact]
         public void With2BuildingsAbove40PercentOverlap_ThenReturnsThe2Buildings()
         {
-            var buildingGeometry50PercentOverlap = CreateGeometry("50 100 50 200 140 200 140 100 50 100");
-            var parcelGeometry = CreateGeometry("100 100 100 200 200 200 200 100 100 100");
+            var buildingGeometry50PercentOverlap = CreateGeometry("140050 186100 140050 186200 140140 186200 140140 186100 140050 186100");
+            var parcelGeometry = CreateGeometry("140100 186100 140100 186200 140200 186200 140200 186100 140100 186100");
 
             _legacyContext.BuildingDetailsV2
                 .Add(new BuildingDetailItemV2(
@@ -95,7 +98,7 @@
                     new Instant()));
             _legacyContext.SaveChanges();
 
-            var buildingMatching = new BuildingMatching(_legacyContext);
+            var buildingMatching = new BuildingMatching(_legacyContext, Lambert72Matching, new Lambert2008MatchingReadiness());
 
             var result = buildingMatching.GetUnderlyingBuildings(parcelGeometry);
 
@@ -105,10 +108,10 @@
         [Fact]
         public void With2Buildings_1Above40Percent_1Under40Percent_ThenReturns1Building()
         {
-            var buildingAbove40Percent = CreateGeometry("100 100 100 200 200 200 200 100 100 100");
+            var buildingAbove40Percent = CreateGeometry("140100 186100 140100 186200 140200 186200 140200 186100 140100 186100");
             var buildingAbove40PercentPersistentLocalId = 1;
-            var buildingUnder40Percent = CreateGeometry("200 100 200 200 300 200 300 100 200 100");
-            var parcelGeometry = CreateGeometry("139 100 139 200 239 200 239 100 139 100");
+            var buildingUnder40Percent = CreateGeometry("140200 186100 140200 186200 140300 186200 140300 186100 140200 186100");
+            var parcelGeometry = CreateGeometry("140139 186100 140139 186200 140239 186200 140239 186100 140139 186100");
 
             _legacyContext.BuildingDetailsV2
                 .Add(new BuildingDetailItemV2(
@@ -130,7 +133,7 @@
                     new Instant()));
             _legacyContext.SaveChanges();
 
-            var buildingMatching = new BuildingMatching(_legacyContext);
+            var buildingMatching = new BuildingMatching(_legacyContext, Lambert72Matching, new Lambert2008MatchingReadiness());
 
             var result = buildingMatching.GetUnderlyingBuildings(parcelGeometry).ToList();
 

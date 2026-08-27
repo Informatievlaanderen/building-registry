@@ -1,4 +1,4 @@
-namespace BuildingRegistry.Consumer.Read.Parcel.ParcelWithCount
+﻿namespace BuildingRegistry.Consumer.Read.Parcel.ParcelWithCount
 {
     using System;
     using System.Threading;
@@ -17,6 +17,7 @@ namespace BuildingRegistry.Consumer.Read.Parcel.ParcelWithCount
         private readonly ILifetimeScope _lifetimeScope;
         private readonly IDbContextFactory<ConsumerParcelContext> _consumerParcelDbContextFactory;
         private readonly IConsumer _consumer;
+        private readonly Lambert2008ConversionCompletedToggle _conversionCompleted;
         private readonly ILogger<ConsumerParcel> _logger;
 
         public ConsumerParcel(
@@ -24,8 +25,10 @@ namespace BuildingRegistry.Consumer.Read.Parcel.ParcelWithCount
             ILifetimeScope lifetimeScope,
             IDbContextFactory<ConsumerParcelContext> consumerParcelDbContextFactory,
             IConsumer consumer,
+            Lambert2008ConversionCompletedToggle conversionCompleted,
             ILoggerFactory loggerFactory)
         {
+            _conversionCompleted = conversionCompleted;
             _hostApplicationLifetime = hostApplicationLifetime;
             _lifetimeScope = lifetimeScope;
             _consumerParcelDbContextFactory = consumerParcelDbContextFactory;
@@ -37,7 +40,7 @@ namespace BuildingRegistry.Consumer.Read.Parcel.ParcelWithCount
         {
             var projector =
                 new ConnectedProjector<ConsumerParcelContext>(
-                    Resolve.WhenEqualToHandlerMessageType(new ParcelKafkaProjection(_lifetimeScope).Handlers));
+                    Resolve.WhenEqualToHandlerMessageType(new ParcelKafkaProjection(_lifetimeScope, _conversionCompleted).Handlers));
 
             try
             {

@@ -14,7 +14,7 @@ namespace BuildingRegistry.Api.Oslo.Building.V2.Sync
         /// </summary>
         public static Polygon GetBuildingPolygon(byte[] polygon, int objectSrid)
         {
-            var geometry = SyncGeometry.ToRequestedCrs(polygon, objectSrid) as NetTopologySuite.Geometries.Polygon;
+            var geometry = SyncGeometry.OutlineToRequestedCrs(polygon, objectSrid) as NetTopologySuite.Geometries.Polygon;
 
             if (geometry == null) //some buildings have multi polygons (imported) which are incorrect.
             {

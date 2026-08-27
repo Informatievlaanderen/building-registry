@@ -53,10 +53,13 @@ So instead of tables that change meaning, there are twice as many tables that do
 through `BuildingRegistry.WKBReaderFactory.CreateForEwkb` and then call `EnsureLambert72()`. A geometry that
 is already Lambert 72 is returned untouched; a Lambert 2008 one is transformed.
 
-Rounding to 2 decimals happens **only on the transformed path**. Geometries are persisted at centimetre
-precision and the transform is accurate to that, so rounding drops floating point noise and makes an 08 to 72
-geometry read identically to how the same geometry reads while the event store still holds Lambert 72. A
-geometry that was already Lambert 72 is not rounded, so today's stored bytes are unchanged, byte for byte.
+A transformed geometry is **not rounded**. The rounding overloads exist for the address registry, whose
+positions are points: rounding a point moves it by at most half a unit and nothing downstream measures it.
+A building outline is a polygon, where rounding moves every vertex and so changes the area, so the transform
+is taken at the precision it produces. A geometry that was already Lambert 72 is not touched at all, so
+today's stored bytes are unchanged, byte for byte.
+
+Building *unit* positions are points, and those are still rounded — that is the address case, not this one.
 
 Once the event store holds Lambert 2008 these projections start transforming, and their tables, spatial
 indexes and views carry on unchanged. Consumers of the existing views see nothing at all.
@@ -68,8 +71,9 @@ indexes and views carry on unchanged. Consumers of the existing views see nothin
 | Building | `[wfs].[BuildingsV4]`, from `BuildingV4Projections` | `[wms].[BuildingsV4]`, from `BuildingV4Projections` |
 | Building unit | `[wfs].[BuildingUnitsV3]`, from `BuildingUnitV3Projections` | `[wms].[BuildingUnitsV3]`, from `BuildingUnitV3Projections` |
 
-Their `ParseGeometry` and `ParsePosition` are `EnsureLambert08(2)`, which transforms and rounds today and
-becomes a pass-through once the event store is converted.
+Their `ParseGeometry` is `EnsureLambert08()` and their `ParsePosition` `EnsureLambert08(2)` — a polygon is
+transformed unrounded, a point transformed and rounded — and both become a pass-through once the event store
+is converted.
 
 The four new projections, their entity configurations and `BuildingUnitV3ProjectionsExtensions` were produced
 **mechanically** from their predecessors — a rename of `BuildingV3` to `BuildingV4` and of `BuildingUnitV2`

@@ -1,8 +1,10 @@
-namespace BuildingRegistry.Consumer.Read.Parcel
+﻿namespace BuildingRegistry.Consumer.Read.Parcel
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using Be.Vlaanderen.Basisregisters.GrAr.Common.NetTopology;
+    using Be.Vlaanderen.Basisregisters.GrAr.CrsTransform;
     using NetTopologySuite.Geometries;
     using NetTopologySuite.Operation.Overlay;
     using NetTopologySuite.Operation.OverlayNG;
@@ -11,21 +13,55 @@ namespace BuildingRegistry.Consumer.Read.Parcel
     public class ParcelMatching : IParcelMatching
     {
         private readonly ConsumerParcelContext _consumerParcelContext;
+        private readonly Lambert2008ConversionCompletedToggle _conversionCompleted;
+        private readonly Lambert2008MatchingReadiness _readiness;
 
-        public ParcelMatching(ConsumerParcelContext consumerParcelContext)
+        public ParcelMatching(
+            ConsumerParcelContext consumerParcelContext,
+            Lambert2008ConversionCompletedToggle conversionCompleted,
+            Lambert2008MatchingReadiness readiness)
         {
             _consumerParcelContext = consumerParcelContext;
+            _conversionCompleted = conversionCompleted;
+            _readiness = readiness;
         }
 
+        /// <summary>
+        /// Finds the CaPaKeys of the parcels a building overlaps.
+        ///
+        /// The building bytes are read in whatever reference system they carry and then brought to the one
+        /// matching is done in, so the SQL bounding-box filter and the in-memory NTS overlay below compare
+        /// like with like. Neither reports a mismatch: SQL Server returns NULL, and NTS ignores SRID and
+        /// simply finds an empty intersection ~500 km away. See ADR 0006.
+        /// </summary>
         public IEnumerable<string> GetUnderlyingParcels(byte[] buildingGeometryBytes)
         {
-            var buildingGeometry = WKBReaderFactory.Create().Read(buildingGeometryBytes);
+            var matchingSrid = _conversionCompleted.MatchingSrid;
+            var useLambert2008 = matchingSrid == SystemReferenceId.SridLambert2008;
+
+            if (useLambert2008)
+            {
+                _readiness.EnsureVerified(
+                    Lambert2008MatchingReadiness.Parcels,
+                    _consumerParcelContext.HasIncompleteLambert2008GeometrySynchronously);
+            }
+
+            var buildingGeometry = ToMatchingCrs(
+                WKBReaderFactory.CreateForEwkb(buildingGeometryBytes).Read(buildingGeometryBytes),
+                matchingSrid);
+
             var boundingBox = buildingGeometry.Factory.ToGeometry(buildingGeometry.EnvelopeInternal);
 
-            var underlyingParcels = _consumerParcelContext
-                .ParcelConsumerItemsWithCount
-                .Where(parcel => boundingBox.Intersects(parcel.Geometry))
-                .ToList()
+            var candidates = useLambert2008
+                ? _consumerParcelContext.ParcelConsumerItemsWithCount
+                    .Where(parcel => boundingBox.Intersects(parcel.GeometryLambert2008))
+                    .ToList()
+                : _consumerParcelContext.ParcelConsumerItemsWithCount
+                    .Where(parcel => boundingBox.Intersects(parcel.Geometry))
+                    .ToList();
+
+            var underlyingParcels = candidates
+                .Select(parcel => new { parcel.CaPaKey, parcel.Status, Geometry = parcel.GeometryIn(matchingSrid) })
                 .Where(parcel => !OverlayNGRobust.Overlay(buildingGeometry, parcel.Geometry, SpatialFunction.Intersection).IsEmpty && parcel.Status == ParcelStatus.Realized)
                 .Select(parcel =>
                     new {
@@ -38,6 +74,11 @@ namespace BuildingRegistry.Consumer.Read.Parcel
                 .Where(parcel => parcel.Overlap >= 0.8 / underlyingParcels.Count)
                 .Select(parcel => parcel.CaPaKey);
         }
+
+        private static Geometry ToMatchingCrs(Geometry geometry, int matchingSrid)
+            => matchingSrid == SystemReferenceId.SridLambert2008
+                ? geometry.IsLambert08() ? geometry : geometry.EnsureLambert08()
+                : geometry.IsLambert72() ? geometry : geometry.EnsureLambert72();
 
         private static double CalculateOverlap(Geometry? buildingGeometry, Geometry parcel)
         {
