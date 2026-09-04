@@ -351,8 +351,8 @@
       },
       "Datadog.Trace": {
         "type": "Transitive",
-        "resolved": "3.45.0",
-        "contentHash": "X9pNQFNLdElEAvJv/rNDnqjivFIChAAdMbq13QqdPVIy9eykkRYEpP/MZus21WxW1XhxG/h/735F/UVDWbi3+w=="
+        "resolved": "3.52.0",
+        "contentHash": "G8WuCz0zvOglQLsBVYX8rpjDrkjBjhB5Yr5L+Cls/F+3GbQOiKZFd/l5EGh65Reysl7odEHUIBDSCYLbiU7Acg=="
       },
       "Ductus.FluentDocker": {
         "type": "Transitive",
@@ -1362,7 +1362,7 @@
           "Be.Vlaanderen.Basisregisters.TicketingService.Proxy.HttpProxy": "[4.0.0, )",
           "BuildingRegistry.Consumer.Address": "[1.0.0, )",
           "BuildingRegistry.Infrastructure": "[1.0.0, )",
-          "Datadog.Trace.Bundle": "[3.45.0, )",
+          "Datadog.Trace.Bundle": "[3.52.0, )",
           "MediatR": "[12.5.0, 13.0.0)"
         }
       },
@@ -1375,7 +1375,7 @@
           "Be.Vlaanderen.Basisregisters.MessageHandling.Kafka.Consumer.SqlServer": "[7.1.0, )",
           "Be.Vlaanderen.Basisregisters.ProjectionHandling.Runner.SqlServer": "[16.0.0, )",
           "BuildingRegistry.Infrastructure": "[1.0.0, )",
-          "Datadog.Trace.Bundle": "[3.45.0, )",
+          "Datadog.Trace.Bundle": "[3.52.0, )",
           "Destructurama.JsonNet": "[4.0.2, )",
           "Microsoft.EntityFrameworkCore.SqlServer.NetTopologySuite": "[10.0.9, )",
           "Serilog": "[4.3.1, )",
@@ -1761,11 +1761,11 @@
       },
       "Datadog.Trace.Bundle": {
         "type": "CentralTransitive",
-        "requested": "[3.45.0, )",
-        "resolved": "3.45.0",
-        "contentHash": "ax3lAy2poa1SRgxkMXUpQaCe2vl/Kf0DnopfIltXyRw6o6TSkChFB4Rj9JO3K41Od6A5oMLuf4tMhrCdRRUdfg==",
+        "requested": "[3.52.0, )",
+        "resolved": "3.52.0",
+        "contentHash": "NIuILn+uGzxlXfsLIRNlVJRDISlnn7r6uhFwykWO2JBYcLaEv12B3xqchtBP1/AfeG/jFV416mEWB2+JK9aP5Q==",
         "dependencies": {
-          "Datadog.Trace": "3.45.0"
+          "Datadog.Trace": "3.52.0"
         }
       },
       "Destructurama.JsonNet": {
