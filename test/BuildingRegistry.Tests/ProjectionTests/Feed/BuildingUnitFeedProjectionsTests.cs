@@ -153,10 +153,10 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
                                         && attrs.Any(a => a.Name == BuildingUnitAttributeNames.Function && a.OldValue == null)
                                         && attrs.Any(a => a.Name == BuildingUnitAttributeNames.GeometryMethod && a.OldValue == null)
                                         && attrs.Any(a => a.Name == BuildingUnitAttributeNames.Position && a.OldValue == null && a.NewValue != null)
-                                        && attrs.Any(a => a.Name == BuildingUnitAttributeNames.AdresIds
+                                        && (!expectedAddressPuris.Any() || attrs.Any(a => a.Name == BuildingUnitAttributeNames.AdresIds
                                                           && a.OldValue == null
                                                           && a.NewValue != null
-                                                          && ((List<string>)a.NewValue).SequenceEqual(expectedAddressPuris))
+                                                          && ((List<string>)a.NewValue).SequenceEqual(expectedAddressPuris)))
                                         && attrs.Any(a => a.Name == BuildingUnitAttributeNames.GebouwId
                                                           && a.OldValue == null
                                                           && a.NewValue != null
@@ -485,10 +485,6 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
                                 && attrs.Any(a => a.Name == BuildingUnitAttributeNames.Position
                                                   && a.OldValue == null
                                                   && a.NewValue != null && AssertPointList((List<PointGeometrie>)a.NewValue, document.Document.PositionAsGml))
-                                && attrs.Any(a => a.Name == BuildingUnitAttributeNames.AdresIds
-                                                  && a.OldValue == null
-                                                  && a.NewValue != null
-                                                  && !((List<string>)a.NewValue).Any())
                                 && attrs.Any(a => a.Name == BuildingUnitAttributeNames.GebouwId
                                                   && a.OldValue == null
                                                   && a.NewValue != null
@@ -813,10 +809,6 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
                                 && attrs.Any(a => a.Name == BuildingUnitAttributeNames.Position
                                                   && a.OldValue == null
                                                   && a.NewValue != null && AssertPointList((List<PointGeometrie>)a.NewValue, document.Document.PositionAsGml))
-                                && attrs.Any(a => a.Name == BuildingUnitAttributeNames.AdresIds
-                                                  && a.OldValue == null
-                                                  && a.NewValue != null
-                                                  && !((List<string>)a.NewValue).Any())
                                 && attrs.Any(a => a.Name == BuildingUnitAttributeNames.GebouwId
                                                   && a.OldValue == null
                                                   && a.NewValue != null
@@ -890,10 +882,6 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
                                 && attrs.Any(a => a.Name == BuildingUnitAttributeNames.Position
                                                   && a.OldValue == null
                                                   && a.NewValue != null && AssertPointList((List<PointGeometrie>)a.NewValue, document.Document.PositionAsGml))
-                                && attrs.Any(a => a.Name == BuildingUnitAttributeNames.AdresIds
-                                                  && a.OldValue == null
-                                                  && a.NewValue != null
-                                                  && !((List<string>)a.NewValue).Any())
                                 && attrs.Any(a => a.Name == BuildingUnitAttributeNames.GebouwId
                                                   && a.OldValue == null
                                                   && a.NewValue != null

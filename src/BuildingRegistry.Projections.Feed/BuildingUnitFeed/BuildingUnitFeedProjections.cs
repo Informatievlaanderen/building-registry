@@ -85,10 +85,12 @@ namespace BuildingRegistry.Projections.Feed.BuildingUnitFeed
                         new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.Function, null, document.Document.Function.Id),
                         new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.GeometryMethod, null, ToGeometrieMethodePuri(document.Document.GeometryMethod)),
                         new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.Position, null, CreatePositionValues(geometry)),
-                        new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.AdresIds, null, BuildAddressPuris(addressPersistentLocalIds)),
                         new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.GebouwId, null, buildingPuri),
                         new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.HasDeviation, null, false)
                     ];
+
+                    if(addressPersistentLocalIds.Any())
+                        attributes.Add(new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.AdresIds, null, BuildAddressPuris(addressPersistentLocalIds)));
 
                     await AddCloudEvent(message, document, context, attributes, BuildingUnitEventTypes.CreateV1);
                 }
@@ -204,7 +206,6 @@ namespace BuildingRegistry.Projections.Feed.BuildingUnitFeed
                     new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.Function, null, function.Id),
                     new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.GeometryMethod, null, ToGeometrieMethodePuri(geometryMethod)),
                     new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.Position, null, CreatePositionValues(geometry)),
-                    new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.AdresIds, null, new List<string>()),
                     new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.GebouwId, null, buildingPuri),
                     new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.HasDeviation, null, message.Message.HasDeviation)
                 ];
@@ -240,7 +241,6 @@ namespace BuildingRegistry.Projections.Feed.BuildingUnitFeed
                     new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.Function, null, document.Document.Function.Id),
                     new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.GeometryMethod, null, ToGeometrieMethodePuri(geometryMethod)),
                     new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.Position, null, CreatePositionValues(geometry)),
-                    new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.AdresIds, null, new List<string>()),
                     new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.GebouwId, null, buildingPuri),
                     new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.HasDeviation, null, message.Message.HasDeviation)
                 ];
@@ -522,7 +522,6 @@ namespace BuildingRegistry.Projections.Feed.BuildingUnitFeed
                     new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.Function, null, function.Id),
                     new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.GeometryMethod, null, ToGeometrieMethodePuri(geometryMethod)),
                     new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.Position, null, CreatePositionValues(geometry)),
-                    new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.AdresIds, null, new List<string>()),
                     new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.GebouwId, null, buildingPuri),
                     new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.HasDeviation, null, message.Message.HasDeviation)
                 ];
