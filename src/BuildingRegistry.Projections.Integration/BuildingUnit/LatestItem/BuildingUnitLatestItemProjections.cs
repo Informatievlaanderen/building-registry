@@ -191,7 +191,7 @@ namespace BuildingRegistry.Projections.Integration.BuildingUnit.LatestItem
                         buildingUnit =>
                         {
                             // The geometry method is untouched, and the version timestamp is deliberately
-                            // left as it was: the reprojection does not change the unit. See ADR 0006.
+                            // left as it was: the reprojection does not change the unit. See ADR 0007.
                             buildingUnit.Geometry = sysGeometry;
                             return Task.CompletedTask;
                         },
@@ -525,7 +525,7 @@ namespace BuildingRegistry.Projections.Integration.BuildingUnit.LatestItem
                     buildingUnit =>
                     {
                         // The geometry method is untouched, and the version timestamp is deliberately left as
-                        // it was: the reprojection does not change the unit. See ADR 0006.
+                        // it was: the reprojection does not change the unit. See ADR 0007.
                         buildingUnit.Geometry = sysGeometry;
                         return Task.CompletedTask;
                     },

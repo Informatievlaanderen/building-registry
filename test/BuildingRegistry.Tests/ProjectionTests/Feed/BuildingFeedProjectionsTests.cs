@@ -931,7 +931,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
         /// <summary>
         /// The document has to follow the event store, or the feed keeps serving Lambert 72 geometry for
         /// converted buildings - but a reprojection is not a change to the building, so it produces no cloud
-        /// event and LastChangedOn stays where the building's last real change left it. See ADR 0006.
+        /// event and LastChangedOn stays where the building's last real change left it. See ADR 0007.
         /// </summary>
         [Fact]
         public async Task WhenBuildingGeometryCrsWasChanged_ThenGeometryIsUpdatedWithoutCloudEvent()

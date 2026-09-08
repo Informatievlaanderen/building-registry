@@ -153,7 +153,7 @@ namespace BuildingRegistry.Projections.Integration.Building.LatestItem
                     {
                         // The geometry method and the NIS code are untouched - the building has not moved -
                         // and the version timestamp is deliberately left as it was: the reprojection does not
-                        // change the building. See ADR 0006.
+                        // change the building. See ADR 0007.
                         building.Geometry = sysGeometry;
                     },
                     ct);

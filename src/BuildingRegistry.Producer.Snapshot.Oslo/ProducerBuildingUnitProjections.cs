@@ -258,7 +258,7 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo
                             message.Position,
                             throwStaleWhenGone: false,
                             // See ProducerBuildingProjections: the version timestamp does not move for a
-                            // reprojection, so only the hash can be matched on. See ADR 0006.
+                            // reprojection, so only the hash can be matched on. See ADR 0007.
                             matchOnHashOnly: true,
                             ct),
                     message.Position,
@@ -602,7 +602,7 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo
                                 message.Position,
                                 throwStaleWhenGone: false,
                                 // See ProducerBuildingProjections: the version timestamp does not move for a
-                                // reprojection, so only the hash can be matched on. See ADR 0006.
+                                // reprojection, so only the hash can be matched on. See ADR 0007.
                                 matchOnHashOnly: true,
                                 ct),
                         message.Position,

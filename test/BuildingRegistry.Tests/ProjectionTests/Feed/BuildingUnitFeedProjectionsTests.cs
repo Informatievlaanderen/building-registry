@@ -1902,7 +1902,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
 
         /// <summary>
         /// As with BuildingGeometryCrsWasChanged on the building feed: the document follows the event store,
-        /// but the reprojection is not reported as a change. See ADR 0006.
+        /// but the reprojection is not reported as a change. See ADR 0007.
         /// </summary>
         [Fact]
         public async Task WhenBuildingUnitPositionCrsWasChanged_ThenPositionIsUpdatedWithoutCloudEvent()

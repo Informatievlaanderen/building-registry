@@ -21,7 +21,7 @@ namespace BuildingRegistry.Migrator.Lambert2008.Infrastructure
 
     /// <summary>
     /// Walks every building stream once and converts the geometry and the unit positions it holds from
-    /// Lambert 72 (EPSG 31370) to Lambert 2008 (EPSG 3812). See ADR 0006.
+    /// Lambert 72 (EPSG 31370) to Lambert 2008 (EPSG 3812). See ADR 0007.
     /// </summary>
     internal sealed class StreamConverter
     {

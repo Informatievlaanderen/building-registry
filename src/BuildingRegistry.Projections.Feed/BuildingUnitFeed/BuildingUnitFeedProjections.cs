@@ -140,7 +140,7 @@ namespace BuildingRegistry.Projections.Feed.BuildingUnitFeed
 
             // A reprojection does not change the unit: the documents are updated so the feed keeps serving
             // the positions in the reference system the event store holds, but it produces no cloud event and
-            // their LastChangedOn is left as it was. See ADR 0006.
+            // their LastChangedOn is left as it was. See ADR 0007.
             When<Envelope<BuildingGeometryCrsWasChanged>>(async (context, message, ct) =>
             {
                 var buildingGeometry = await FindBuildingGeometry(context, message.Message.BuildingPersistentLocalId, ct);

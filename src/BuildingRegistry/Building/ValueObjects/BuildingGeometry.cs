@@ -50,7 +50,7 @@ namespace BuildingRegistry.Building
         /// geometries persisted before the event store wrote EWKB - which carry no SRID - are Lambert 72 by
         /// definition. Pinning Lambert 72 unconditionally, as this did through
         /// <see cref="ExtendedWkbGeometry.CreateEWkb"/>, throws the moment the event store holds Lambert
-        /// 2008. See ADR 0006.
+        /// 2008. See ADR 0007.
         /// </remarks>
         public ExtendedWkbGeometry Center
         {

@@ -125,7 +125,7 @@ namespace BuildingRegistry.Projections.Wms.BuildingUnitV2
                          message.Message.BuildingUnitPersistentLocalIds.Concat(message.Message.BuildingUnitPersistentLocalIdsWhichBecameDerived))
                 {
                     // Unlike every other position event this one reaches removed units, whose row this
-                    // projection deletes. Nothing to reproject. See ADR 0006.
+                    // projection deletes. Nothing to reproject. See ADR 0007.
                     var unit = await context.BuildingUnitsV2.FindAsync(buildingUnitPersistentLocalId);
 
                     if (unit is null)
@@ -347,7 +347,7 @@ namespace BuildingRegistry.Projections.Wms.BuildingUnitV2
             When<Envelope<BuildingUnitPositionCrsWasChanged>>(async (context, message, ct) =>
             {
                 // Unlike every other position event this one reaches removed units, whose row this
-                // projection deletes. Nothing to reproject. See ADR 0006.
+                // projection deletes. Nothing to reproject. See ADR 0007.
                 var unit = await context.BuildingUnitsV2.FindAsync(message.Message.BuildingUnitPersistentLocalId);
 
                 if (unit is null)

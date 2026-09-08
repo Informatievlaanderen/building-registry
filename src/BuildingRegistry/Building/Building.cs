@@ -332,7 +332,7 @@ namespace BuildingRegistry.Building
 
         /// <summary>
         /// Re-expresses the building geometry and every building unit position in Lambert 2008 (EPSG 3812)
-        /// for the one-off event store transformation, see ADR 0006.
+        /// for the one-off event store transformation, see ADR 0007.
         /// </summary>
         /// <remarks>
         /// Deliberately unguarded: unlike <see cref="ChangeOutline"/> this is not an edit of the building
@@ -356,7 +356,7 @@ namespace BuildingRegistry.Building
             var newBuildingGeometry = geometryHasToBeTransformed
                 ? new BuildingGeometry(
                     // Unrounded: a building outline or GRB measurement is a boundary whose vertices carry far
-                    // more decimals than a centimetre, and rounding them would move it. See ADR 0006.
+                    // more decimals than a centimetre, and rounding them would move it. See ADR 0007.
                     ExtendedWkbGeometry.Create(currentGeometry.ToReferenceSystem(ExtendedWkbGeometry.SridLambert2008)),
                     // Carried over: the transformation re-expresses the geometry, it does not turn an
                     // outlined building into a measured one.
@@ -427,7 +427,7 @@ namespace BuildingRegistry.Building
         /// <remarks>
         /// Qualified: <c>Be.Vlaanderen.Basisregisters.GrAr.Common.NetTopology</c> declares a
         /// <c>WKBReaderFactory</c> of its own, and importing that namespace in this file would bind the
-        /// simple name to it. GrAr's version throws on SRID-less bytes instead of falling back. See ADR 0006.
+        /// simple name to it. GrAr's version throws on SRID-less bytes instead of falling back. See ADR 0007.
         /// </remarks>
         private static Geometry ReadGeometry(ExtendedWkbGeometry extendedWkbGeometry)
         {
@@ -462,7 +462,7 @@ namespace BuildingRegistry.Building
         /// Which of the two the event store holds is decided by <c>UseLambert2008EventStoreToggle</c> at the
         /// write boundary, where <c>GmlGeometryNormalizer</c> converts every incoming geometry to it
         /// (ADR 0003). Pinning Lambert 72 here would reject everything the moment that toggle flips, and
-        /// would reject every geometry the migrator has already converted. See ADR 0006.
+        /// would reject every geometry the migrator has already converted. See ADR 0007.
         /// </remarks>
         private static void GuardPolygon(Geometry? geometry)
         {

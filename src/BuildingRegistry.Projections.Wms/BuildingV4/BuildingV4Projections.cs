@@ -100,7 +100,7 @@ namespace BuildingRegistry.Projections.Wms.BuildingV4
             When<Envelope<BuildingGeometryCrsWasChanged>>(async (context, message, ct) =>
             {
                 // Unlike every other geometry event this one reaches removed buildings, whose row this
-                // projection deletes. Nothing to reproject. See ADR 0006.
+                // projection deletes. Nothing to reproject. See ADR 0007.
                 var item = await context.BuildingsV4.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);
 
                 if (item is null)

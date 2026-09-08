@@ -153,7 +153,7 @@ namespace BuildingRegistry.Projections.Feed.BuildingFeed
 
             // A reprojection does not change the building: the document is updated so the feed keeps serving
             // the geometry in the reference system the event store holds, but it produces no cloud event and
-            // the document's LastChangedOn is left as it was. See ADR 0006.
+            // the document's LastChangedOn is left as it was. See ADR 0007.
             When<Envelope<BuildingGeometryCrsWasChanged>>(async (context, message, ct) =>
             {
                 var document = await FindDocument(context, message.Message.BuildingPersistentLocalId, ct);

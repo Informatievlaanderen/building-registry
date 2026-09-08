@@ -8,7 +8,7 @@ namespace BuildingRegistry.Building.Commands
 
     /// <summary>
     /// Transforms the geometry and every building unit position the building holds to Lambert 2008
-    /// (EPSG 3812), see ADR 0006. It takes a <see cref="BuildingPersistentLocalId"/> and nothing else: the
+    /// (EPSG 3812), see ADR 0007. It takes a <see cref="BuildingPersistentLocalId"/> and nothing else: the
     /// transformation has nothing to decide per building.
     /// </summary>
     public sealed class TransformToLambert2008 : IHasCommandProvenance

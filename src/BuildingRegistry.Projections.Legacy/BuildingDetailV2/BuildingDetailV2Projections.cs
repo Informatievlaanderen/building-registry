@@ -114,10 +114,14 @@ namespace BuildingRegistry.Projections.Legacy.BuildingDetailV2
                 var fixedGeometry = NetTopologySuite.Geometries.Utilities.GeometryFixer.Fix(sysGeometry);
                 var item = await context.BuildingDetailsV2.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);
                 item.Geometry = geometryAsBinary;
-                item.SysGeometry = fixedGeometry;
+
+                // Only the Lambert 2008 column: the building does not move here, it is re-expressed, so
+                // SysGeometry is already what it should be and transforming the payload back would replace
+                // it with a round trip of itself. See ADR 0006.
+                item.SetSysGeometryFromCrsConversion(fixedGeometry);
 
                 // The version is deliberately left as it was: the reprojection does not change the
-                // building. The hash does follow the aggregate, which appended an event. See ADR 0006.
+                // building. The hash does follow the aggregate, which appended an event. See ADR 0007.
                 UpdateHash(item, message);
             });
 

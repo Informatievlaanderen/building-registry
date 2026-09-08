@@ -515,7 +515,7 @@ namespace BuildingRegistry.Building
 
         /// <summary>
         /// Re-expresses the unit's own position in Lambert 2008 (EPSG 3812) for the one-off event store
-        /// transformation, see ADR 0006. The position is transformed by
+        /// transformation, see ADR 0007. The position is transformed by
         /// <see cref="Building.TransformToLambert2008"/>, which decides against the transformed building
         /// geometry whether the unit keeps its own position at all.
         /// </summary>

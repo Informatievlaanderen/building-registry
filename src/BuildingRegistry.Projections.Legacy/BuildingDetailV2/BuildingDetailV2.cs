@@ -120,7 +120,6 @@ namespace BuildingRegistry.Projections.Legacy.BuildingDetailV2
         /// does not move there, it is re-expressed, so <see cref="SysGeometry"/> is already what it should be
         /// and transforming the payload back would replace it with a round trip of itself. See ADR 0006.
         /// </summary>
-        // TODO: Use method when implementing CrsWasChanged event
         public void SetSysGeometryFromCrsConversion(Geometry? geometry)
         {
             if (geometry is not Polygon)

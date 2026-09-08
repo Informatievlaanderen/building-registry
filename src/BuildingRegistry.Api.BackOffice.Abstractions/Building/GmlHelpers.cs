@@ -43,7 +43,7 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.Building
         /// What it must not do is what it did before - force-set the SRID to Lambert 72 - which silently
         /// relabelled a Lambert 2008 geometry rather than rejecting it, persisting coordinates ~500 km from
         /// where the building is. An unsupported or missing srsName throws in <see cref="ReadGeometry"/>.
-        /// See ADR 0006.
+        /// See ADR 0007.
         /// </remarks>
         public static ExtendedWkbGeometry ToExtendedWkbGeometry(this string gml)
             => ExtendedWkbGeometry.Create(gml.ReadGeometry());

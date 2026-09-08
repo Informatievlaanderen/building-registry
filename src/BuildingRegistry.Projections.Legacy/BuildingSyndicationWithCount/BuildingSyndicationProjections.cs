@@ -968,7 +968,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndicationWithCount
 
             // The event is published in the feed, carrying the geometry the event store now holds, but the
             // transformation is not a change to the building: LastChangedOn and the unit versions keep the
-            // values the building's last real change gave them. See ADR 0006.
+            // values the building's last real change gave them. See ADR 0007.
             When<Envelope<BuildingGeometryCrsWasChanged>>(async (context, message, ct) =>
             {
                 await context.CreateNewBuildingSyndicationItem(

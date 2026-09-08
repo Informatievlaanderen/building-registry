@@ -155,7 +155,7 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
                     // Unlike every other position event this one reaches removed units, which have no
                     // extract record - BuildingUnitWasRemovedV2 deletes it. Nothing to reproject, so the row
                     // is looked up here rather than through FindAndUpdateBuildingUnitExtract, which assumes
-                    // one exists. See ADR 0006.
+                    // one exists. See ADR 0007.
                     var itemV2 = await context
                         .BuildingUnitExtractV2
                         .FindAsync(buildingUnitPersistentLocalId, cancellationToken: ct);

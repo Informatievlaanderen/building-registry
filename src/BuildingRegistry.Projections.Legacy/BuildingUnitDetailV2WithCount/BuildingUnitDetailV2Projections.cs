@@ -122,7 +122,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetailV2WithCount
                         item.PositionMethod = BuildingUnitPositionGeometryMethod.DerivedFromObject;
 
                         // The version is deliberately left as it was: the reprojection does not change the
-                        // unit. The hash does follow the aggregate, which appended an event. See ADR 0006.
+                        // unit. The hash does follow the aggregate, which appended an event. See ADR 0007.
                         UpdateHash(item, message);
                     }, ct);
                 }
@@ -367,7 +367,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetailV2WithCount
                     item.PositionMethod = BuildingUnitPositionGeometryMethod.Parse(message.Message.GeometryMethod);
 
                     // The version is deliberately left as it was: the reprojection does not change the
-                    // unit. The hash does follow the aggregate, which appended an event. See ADR 0006.
+                    // unit. The hash does follow the aggregate, which appended an event. See ADR 0007.
                     UpdateHash(item, message);
                 }, ct);
             });

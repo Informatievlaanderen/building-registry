@@ -1,4 +1,4 @@
-# 6. Transform the event store to Lambert 2008
+# 7. Transform the event store to Lambert 2008
 
 Date: 2026-09-08
 
@@ -12,8 +12,11 @@ Accepted
 (EPSG 3812) input while normalizing everything to the event store's reference system.
 [ADR 0004](0004-lambert2008-sync-objectcrs.md) put `objectCrs` on the syndication responses.
 [ADR 0005](0005-lambert2008-wfs-wms-projections.md) duplicated the WFS and WMS projections so their
-tables stay single-SRID whichever system the event store holds. All three deliberately left the
-transformation of the event store itself, and the write side, out of scope.
+tables stay single-SRID whichever system the event store holds.
+[ADR 0006](0006-lambert2008-consumers.md) gave the consumed parcel geometry, and
+`BuildingDetailsV2.SysGeometry`, a second column in the other reference system, and put the choice of
+which one matching compares behind `Lambert2008ConversionCompletedToggle`. All four deliberately left
+the transformation of the event store itself, and the write side, out of scope.
 
 This ADR covers that transformation: the domain change that expresses it, what each projection does
 with it, the write side that has to stop undoing it, and the one-shot job that drives it. It mirrors
@@ -142,6 +145,28 @@ The condition is deliberately narrow: **inside before and outside after**. A pos
 outside its building beforehand is not something this transformation caused, and re-deriving it here
 would be an edit rather than a reprojection, so it is left classified as it is.
 
+### This is what fills the second column ADR 0006 added
+
+`BuildingDetailsV2` holds the outline twice: `SysGeometry` pinned to Lambert 72, and a nullable
+`SysGeometryLambert2008` beside it (ADR 0006). The second column is empty at deploy and fills only as
+buildings change — which, before this transformation, meant "eventually, for the ones that happen to be
+edited".
+
+`BuildingGeometryCrsWasChanged` is what fills it for **every** building, so it is what makes
+`Lambert2008ConversionCompleted` flippable at all: `Lambert2008MatchingReadiness.Buildings` refuses the
+flip while any non-removed building with a `SysGeometry` still has a null `SysGeometryLambert2008`.
+
+The handler calls `SetSysGeometryFromCrsConversion`, not `SetSysGeometry`, which ADR 0006 introduced for
+exactly this event. It writes only the Lambert 2008 column: the building does not move here, it is
+re-expressed, so the stored Lambert 72 outline is already what it should be and transforming the payload
+back would replace it with a round trip of itself.
+
+The ordering that follows is worth stating: **the migrator must not run ahead of the projector.** The
+overlap checks in `BuildingGeometryContext` and `BuildingMatching` compare a geometry from the aggregate
+against those rows, and both sides have to have moved. Since the toggle is a preference rather than a
+correctness switch (ADR 0006) the window is not dangerous — every comparison stays in one reference
+system throughout — but the readiness guard is what makes it visible.
+
 ### The projections do not report it as a change
 
 Every projection updates the geometry it holds — the whole point is that readers see the reference
@@ -236,8 +261,9 @@ the copy-the-counterpart rule honest.
   version feed and the syndication feed grow accordingly; the change feed does not.
 - Consumers of the Kafka topic see `BuildingGeometryCrsWasChanged` and
   `BuildingUnitPositionCrsWasChanged` for every building.
-- The overlap checks in `BuildingGeometryContext` read `[BuildingRegistryLegacy].[BuildingDetailsV2]`,
-  which `BuildingDetailV2Projections` now moves along with the event store. They compare a geometry
-  from the aggregate against those rows, so the conversion and that projection have to stay in step:
-  running the migrator ahead of the projector would make every overlap check compare Lambert 2008
-  against Lambert 72 and find nothing.
+- `BuildingDetailsV2.SysGeometryLambert2008` goes from "fills as buildings happen to change" to fully
+  populated, which is what `Lambert2008MatchingReadiness.Buildings` waits for and therefore what
+  unblocks `FeatureToggles:Lambert2008ConversionCompleted` (ADR 0006).
+- The migrator and the projector have to run in that order. Nothing is silently wrong in between — the
+  matching toggle keeps both sides of every comparison in one reference system — but a building whose
+  stream is converted and whose row is not has a stale `SysGeometryLambert2008`.

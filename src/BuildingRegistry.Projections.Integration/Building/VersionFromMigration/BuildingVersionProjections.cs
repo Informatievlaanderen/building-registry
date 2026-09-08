@@ -226,7 +226,7 @@ namespace BuildingRegistry.Projections.Integration.Building.VersionFromMigration
 
             // A new version row like any other event - CreateNewBuildingVersion stamps it - but the geometry
             // methods and the per-unit version timestamps are untouched: the reprojection does not change the
-            // building. See ADR 0006.
+            // building. See ADR 0007.
             When<Envelope<BuildingGeometryCrsWasChanged>>(async (context, message, ct) =>
             {
                 var geometryAsBinary = message.Message.ExtendedWkbGeometryBuilding.ToByteArray();

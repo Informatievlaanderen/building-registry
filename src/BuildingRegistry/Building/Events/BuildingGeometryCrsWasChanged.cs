@@ -11,7 +11,7 @@ namespace BuildingRegistry.Building.Events
 
     /// <summary>
     /// The building geometry was re-expressed in another coordinate reference system without moving: the
-    /// one-off transformation of the event store to Lambert 2008 (EPSG 3812), see ADR 0006. Mirrors the
+    /// one-off transformation of the event store to Lambert 2008 (EPSG 3812), see ADR 0007. Mirrors the
     /// <c>BuildingGeometryCrsWasChanged</c> contract in GrAr.Contracts, which is why it restates the
     /// derived building unit positions like <see cref="BuildingMeasurementWasChanged"/> — the transformation
     /// does not change the geometry method, and nothing ever "becomes derived" because the building moved.

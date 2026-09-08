@@ -80,7 +80,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenTransformingToLambert2008
         /// <summary>
         /// Geometries written before the event store wrote EWKB carry no SRID at all. They are Lambert 72 by
         /// definition, so they transform like any other - and come out carrying SRID 3812, which means the
-        /// transformation also fixes the missing label. See ADR 0006.
+        /// transformation also fixes the missing label. See ADR 0007.
         /// </summary>
         [Fact]
         public void WithGeometryWithoutSrid_ThenItIsTransformedAsLambert72()
@@ -182,7 +182,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenTransformingToLambert2008
         /// <summary>
         /// A derived unit follows the building, and takes the centroid of the transformed geometry rather
         /// than the transform of the old centroid, so a later geometry change or RepairBuilding does not
-        /// immediately correct it again. See ADR 0006.
+        /// immediately correct it again. See ADR 0007.
         /// </summary>
         [Fact]
         public void WithDerivedBuildingUnit_ThenPositionIsTheTransformedCenter()
@@ -251,7 +251,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenTransformingToLambert2008
         }
 
         /// <summary>
-        /// Positions are rounded to centimetres, the building geometry is not. See ADR 0006.
+        /// Positions are rounded to centimetres, the building geometry is not. See ADR 0007.
         /// </summary>
         [Fact]
         public void ThenPositionsAreRoundedToCentimetresAndTheGeometryIsNot()
@@ -341,7 +341,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenTransformingToLambert2008
 
         /// <summary>
         /// A position that ends up outside its building after the transformation - a rounding artifact -
-        /// is re-derived rather than left outside, exactly as a geometry change does. See ADR 0006.
+        /// is re-derived rather than left outside, exactly as a geometry change does. See ADR 0007.
         /// </summary>
         [Fact]
         public void WithPositionPushedOutsideByTheTransformation_ThenItBecomesDerived()
@@ -387,7 +387,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenTransformingToLambert2008
 
         /// <summary>
         /// A position that was already outside its building before the transformation is not something this
-        /// caused, so it is left classified as it is. See ADR 0006.
+        /// caused, so it is left classified as it is. See ADR 0007.
         /// </summary>
         [Fact]
         public void WithPositionAlreadyOutside_ThenItKeepsItsOwnPosition()

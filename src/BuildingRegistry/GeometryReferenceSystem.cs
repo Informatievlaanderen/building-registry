@@ -9,7 +9,7 @@ namespace BuildingRegistry
     /// Moves a geometry between the two reference systems this registry supports, Lambert 72 (EPSG 31370)
     /// and Lambert 2008 (EPSG 3812). The single place that decides how that transformation is done, so a
     /// geometry the migrator transformed and the same geometry normalized on the way in by
-    /// <c>GmlGeometryNormalizer</c> come out the same. See ADR 0006.
+    /// <c>GmlGeometryNormalizer</c> come out the same. See ADR 0007.
     /// </summary>
     public static class GeometryReferenceSystem
     {
@@ -45,7 +45,7 @@ namespace BuildingRegistry
         /// to the Lambert 72 reader, whose geometry factory stamps 31370, but a plain
         /// <c>WKBReader</c> on the default geometry services - which is what <c>BuildingGeometry</c> reads
         /// with - leaves the SRID at -1. So the SRID cannot be taken at face value without this.
-        /// See ADR 0006.
+        /// See ADR 0007.
         /// </remarks>
         public static int ReferenceSystem(this Geometry geometry)
             => geometry.SRID <= 0 ? SystemReferenceId.SridLambert72 : geometry.SRID;
@@ -64,7 +64,7 @@ namespace BuildingRegistry
         /// <remarks>
         /// The explicit transform rather than <c>EnsureLambert08</c> / <c>EnsureLambert72</c>: those relabel
         /// whatever falls outside their envelope instead of transforming it, which for something that is
-        /// about to be persisted would mean coordinates ~500 km from where the building is. See ADR 0006.
+        /// about to be persisted would mean coordinates ~500 km from where the building is. See ADR 0007.
         ///
         /// Which system the geometry is in is read from its SRID, exactly as <c>GmlGeometryNormalizer</c>
         /// does (ADR 0003) — through <see cref="ReferenceSystem"/>, so a geometry read without a label is

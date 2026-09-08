@@ -163,7 +163,7 @@ namespace BuildingRegistry.Projections.Extract.BuildingExtract
             When<Envelope<BuildingGeometryCrsWasChanged>>(async (context, message, ct) =>
             {
                 // Unlike every other geometry event this one reaches removed buildings, which have no
-                // extract record - BuildingWasRemovedV2 deletes it. Nothing to reproject. See ADR 0006.
+                // extract record - BuildingWasRemovedV2 deletes it. Nothing to reproject. See ADR 0007.
                 var item = await context.BuildingExtractV2Esri.FindAsync(message.Message.BuildingPersistentLocalId,
                     cancellationToken: ct);
 
