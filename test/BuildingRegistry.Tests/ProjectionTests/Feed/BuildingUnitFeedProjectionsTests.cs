@@ -1899,6 +1899,52 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
         private static BuildingDomainExtendedWkbGeometry CreateUpdatedBuildingUnitGeometry()
             => new(WkbWriter.Instance.Write(GeometryHelper.OtherValidPointInPolygon));
 
+
+        /// <summary>
+        /// As with BuildingGeometryCrsWasChanged on the building feed: the document follows the event store,
+        /// but the reprojection is not reported as a change. See ADR 0006.
+        /// </summary>
+        [Fact]
+        public async Task WhenBuildingUnitPositionCrsWasChanged_ThenPositionIsUpdatedWithoutCloudEvent()
+        {
+            var buildingWasPlannedV2 = _fixture.Create<BuildingWasPlannedV2>();
+            var buildingUnitWasPlannedV2 = _fixture.Create<BuildingUnitWasPlannedV2>();
+
+            var buildingUnitPositionCrsWasChanged = new BuildingUnitPositionCrsWasChanged(
+                new BuildingPersistentLocalId(buildingUnitWasPlannedV2.BuildingPersistentLocalId),
+                new BuildingUnitPersistentLocalId(buildingUnitWasPlannedV2.BuildingUnitPersistentLocalId),
+                BuildingUnitPositionGeometryMethod.Parse(buildingUnitWasPlannedV2.GeometryMethod),
+                _fixture.Create<ExtendedWkbGeometry>());
+            ((ISetProvenance)buildingUnitPositionCrsWasChanged).SetProvenance(_fixture.Create<Provenance>());
+
+            var position = 1L;
+
+            await Sut
+                .Given(CreateEnvelope(buildingWasPlannedV2, position),
+                    CreateEnvelope(buildingUnitWasPlannedV2, position + 1),
+                    CreateEnvelope(buildingUnitPositionCrsWasChanged, position + 2))
+                .Then(async context =>
+                {
+                    var document = await context.BuildingUnitDocuments.FindAsync(buildingUnitPositionCrsWasChanged.BuildingUnitPersistentLocalId);
+                    document.Should().NotBeNull();
+                    document!.Document.ExtendedWkbGeometry.Should().Be(buildingUnitPositionCrsWasChanged.ExtendedWkbGeometry);
+                    document.Document.PositionAsGml.Should().NotBeNullOrEmpty();
+                    document.LastChangedOn.Should().Be(buildingUnitWasPlannedV2.Provenance.Timestamp);
+
+                    ChangeFeedServiceMock.Verify(x => x.CreateCloudEventWithData(
+                            It.IsAny<long>(),
+                            It.IsAny<DateTimeOffset>(),
+                            It.IsAny<string>(),
+                            It.IsAny<string>(),
+                            It.IsAny<DateTimeOffset>(),
+                            It.IsAny<List<string>>(),
+                            It.IsAny<List<BaseRegistriesCloudEventAttribute>>(),
+                            BuildingUnitPositionCrsWasChanged.EventName,
+                            It.IsAny<string>()),
+                        Times.Never);
+                });
+        }
+
         private Envelope<T> CreateEnvelope<T>(T @event, long position) where T : IMessage
         {
             var metadata = new Dictionary<string, object>

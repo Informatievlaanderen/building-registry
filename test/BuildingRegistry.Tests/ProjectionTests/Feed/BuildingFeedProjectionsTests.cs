@@ -10,6 +10,7 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
     using Be.Vlaanderen.Basisregisters.GrAr.Common;
     using Be.Vlaanderen.Basisregisters.GrAr.Common.NetTopology;
     using Be.Vlaanderen.Basisregisters.GrAr.Oslo;
+    using Be.Vlaanderen.Basisregisters.GrAr.Provenance;
     using Be.Vlaanderen.Basisregisters.GrAr.Oslo.Gebouw;
     using Be.Vlaanderen.Basisregisters.GrAr.Oslo.Gml;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore;
@@ -924,6 +925,52 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
             gml.Should().ContainAny(SystemReferenceId.SrsNameLambert72, SystemReferenceId.SrsNameLambert2008);
 
             return true;
+        }
+
+
+        /// <summary>
+        /// The document has to follow the event store, or the feed keeps serving Lambert 72 geometry for
+        /// converted buildings - but a reprojection is not a change to the building, so it produces no cloud
+        /// event and LastChangedOn stays where the building's last real change left it. See ADR 0006.
+        /// </summary>
+        [Fact]
+        public async Task WhenBuildingGeometryCrsWasChanged_ThenGeometryIsUpdatedWithoutCloudEvent()
+        {
+            var buildingWasPlannedV2 = _fixture.Create<BuildingWasPlannedV2>();
+
+            var buildingGeometryCrsWasChanged = new BuildingGeometryCrsWasChanged(
+                new BuildingPersistentLocalId(buildingWasPlannedV2.BuildingPersistentLocalId),
+                [],
+                [],
+                _fixture.Create<ExtendedWkbGeometry>(),
+                null);
+            ((ISetProvenance)buildingGeometryCrsWasChanged).SetProvenance(_fixture.Create<Provenance>());
+
+            var position = 1L;
+
+            await Sut
+                .Given(CreateEnvelope(buildingWasPlannedV2, position),
+                    CreateEnvelope(buildingGeometryCrsWasChanged, position + 1))
+                .Then(async context =>
+                {
+                    var document = await context.BuildingDocuments.FindAsync(buildingGeometryCrsWasChanged.BuildingPersistentLocalId);
+                    document.Should().NotBeNull();
+                    document!.Document.ExtendedWkbGeometry.Should().Be(buildingGeometryCrsWasChanged.ExtendedWkbGeometryBuilding);
+                    document.Document.GeometryAsGml.Should().NotBeNullOrEmpty();
+                    document.LastChangedOn.Should().Be(buildingWasPlannedV2.Provenance.Timestamp);
+
+                    ChangeFeedServiceMock.Verify(x => x.CreateCloudEventWithData(
+                            It.IsAny<long>(),
+                            It.IsAny<DateTimeOffset>(),
+                            It.IsAny<string>(),
+                            It.IsAny<string>(),
+                            It.IsAny<DateTimeOffset>(),
+                            It.IsAny<List<string>>(),
+                            It.IsAny<List<BaseRegistriesCloudEventAttribute>>(),
+                            BuildingGeometryCrsWasChanged.EventName,
+                            It.IsAny<string>()),
+                        Times.Never);
+                });
         }
 
         private Envelope<T> CreateEnvelope<T>(T @event, long position) where T : IMessage

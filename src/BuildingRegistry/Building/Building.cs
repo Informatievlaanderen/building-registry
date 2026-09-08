@@ -351,14 +351,17 @@ namespace BuildingRegistry.Building
         public void TransformToLambert2008()
         {
             var currentGeometry = ReadGeometry(BuildingGeometry.Geometry);
+            var geometryHasToBeTransformed = !IsLambert2008(currentGeometry);
 
-            var newBuildingGeometry = IsLambert2008(currentGeometry)
-                ? BuildingGeometry
-                : new BuildingGeometry(
+            var newBuildingGeometry = geometryHasToBeTransformed
+                ? new BuildingGeometry(
                     // Unrounded: a building outline or GRB measurement is a boundary whose vertices carry far
                     // more decimals than a centimetre, and rounding them would move it. See ADR 0006.
                     ExtendedWkbGeometry.Create(currentGeometry.ToReferenceSystem(ExtendedWkbGeometry.SridLambert2008)),
-                    BuildingGeometry.Method);
+                    // Carried over: the transformation re-expresses the geometry, it does not turn an
+                    // outlined building into a measured one.
+                    BuildingGeometry.Method)
+                : BuildingGeometry;
 
             var derivedBuildingUnits = new List<BuildingUnitPersistentLocalId>();
             var buildingUnitsWhichBecameDerived = new List<BuildingUnitPersistentLocalId>();
@@ -399,7 +402,9 @@ namespace BuildingRegistry.Building
 
             var hasDerivedBuildingUnits = derivedBuildingUnits.Count != 0 || buildingUnitsWhichBecameDerived.Count != 0;
 
-            if (!ReferenceEquals(newBuildingGeometry, BuildingGeometry) || hasDerivedBuildingUnits)
+            // Also when the geometry itself is already Lambert 2008: a derived unit takes its position from
+            // this event, so leaving it out would strand any that is still Lambert 72.
+            if (geometryHasToBeTransformed || hasDerivedBuildingUnits)
             {
                 ApplyChange(new BuildingGeometryCrsWasChanged(
                     BuildingPersistentLocalId,
