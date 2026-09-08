@@ -108,7 +108,8 @@
 
         public Feature(int buildingPersistentLocalId, string organisation, DateTimeOffset dateTimeStatusChange, ExtendedWkbGeometry geometry)
         {
-            Geometry = MapToGeoJsonPolygon((Polygon)WKBReaderFactory.Create().Read(geometry));
+            var extendedWkb = geometry.ToByteArray();
+            Geometry = MapToGeoJsonPolygon((Polygon)WKBReaderFactory.CreateForEwkb(extendedWkb).Read(extendedWkb));
             Properties = new Properties(buildingPersistentLocalId, organisation, dateTimeStatusChange);
         }
 

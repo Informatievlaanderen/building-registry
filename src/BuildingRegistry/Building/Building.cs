@@ -41,7 +41,7 @@ namespace BuildingRegistry.Building
             ExtendedWkbGeometry extendedWkbGeometry,
             IBuildingGeometries buildingGeometries)
         {
-            var geometry = WKBReaderFactory.Create().Read(extendedWkbGeometry);
+            var geometry = ReadGeometry(extendedWkbGeometry);
 
             GuardOutline(geometry);
             if (buildingGeometries.GetOverlappingBuildingOutlines(buildingPersistentLocalId, extendedWkbGeometry).Any())
@@ -254,7 +254,7 @@ namespace BuildingRegistry.Building
                 return;
             }
 
-            var geometry = WKBReaderFactory.Create().Read(extendedWkbGeometry);
+            var geometry = ReadGeometry(extendedWkbGeometry);
             GuardOutline(geometry);
 
             if(buildingGeometries.GetOverlappingBuildingOutlines(BuildingPersistentLocalId, extendedWkbGeometry).Any())
@@ -449,11 +449,21 @@ namespace BuildingRegistry.Building
             }
         }
 
+        /// <summary>
+        /// Guards the shape, and that the geometry is in one of the two reference systems this registry
+        /// supports - not in a particular one of them.
+        /// </summary>
+        /// <remarks>
+        /// Which of the two the event store holds is decided by <c>UseLambert2008EventStoreToggle</c> at the
+        /// write boundary, where <c>GmlGeometryNormalizer</c> converts every incoming geometry to it
+        /// (ADR 0003). Pinning Lambert 72 here would reject everything the moment that toggle flips, and
+        /// would reject every geometry the migrator has already converted. See ADR 0006.
+        /// </remarks>
         private static void GuardPolygon(Geometry? geometry)
         {
             if (
                 geometry is not Polygon
-                || geometry.SRID != ExtendedWkbGeometry.SridLambert72
+                || !GeometryReferenceSystem.IsSupported(geometry.SRID)
                 || !GeometryValidator.IsValid(geometry))
             {
                 throw new PolygonIsInvalidException();

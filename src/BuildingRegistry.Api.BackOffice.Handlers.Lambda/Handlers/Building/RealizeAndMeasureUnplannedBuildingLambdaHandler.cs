@@ -1,4 +1,4 @@
-namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.Building
+﻿namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.Building
 {
     using Abstractions;
     using Abstractions.Building;
@@ -91,7 +91,8 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Handlers.Building
                 return;
             }
 
-            var buildingGeometry = WKBReaderFactory.Create().Read(request.Request.GrbData.GeometriePolygoon.ToExtendedWkbGeometry());
+            var extendedWkb = request.Request.GrbData.GeometriePolygoon.ToExtendedWkbGeometry().ToByteArray();
+            var buildingGeometry = WKBReaderFactory.CreateForEwkb(extendedWkb).Read(extendedWkb);
             var overlappingParcels = await _parcelMatching.GetUnderlyingParcels(buildingGeometry);
 
             var addresses = overlappingParcels
