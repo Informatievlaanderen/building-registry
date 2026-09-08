@@ -1,4 +1,4 @@
-namespace BuildingRegistry.Building
+﻿namespace BuildingRegistry.Building
 {
     using System;
     using System.Collections.Generic;
@@ -53,6 +53,7 @@ namespace BuildingRegistry.Building
             Register<BuildingUnitWasCorrectedFromRetiredToRealized>(When);
             Register<BuildingUnitRemovalWasCorrected>(When);
             Register<BuildingUnitPositionWasCorrected>(When);
+            Register<BuildingUnitPositionCrsWasChanged>(When);
             Register<BuildingUnitRegularizationWasCorrected>(When);
             Register<BuildingUnitDeregulationWasCorrected>(When);
             Register<BuildingUnitAddressWasAttachedV2>(When);
@@ -66,6 +67,7 @@ namespace BuildingRegistry.Building
             Register<BuildingUnitWasNotRealizedBecauseBuildingWasDemolished>(When);
             Register<BuildingUnitWasRetiredBecauseBuildingWasDemolished>(When);
             Register<BuildingMeasurementWasChanged>(When);
+            Register<BuildingGeometryCrsWasChanged>(When);
             Register<BuildingUnitWasMovedIntoBuilding>(When);
         }
 
@@ -245,6 +247,15 @@ namespace BuildingRegistry.Building
             _lastEvent = @event;
         }
 
+        private void When(BuildingUnitPositionCrsWasChanged @event)
+        {
+            BuildingUnitPosition = new BuildingUnitPosition(
+                new ExtendedWkbGeometry(@event.ExtendedWkbGeometry),
+                BuildingUnitPositionGeometryMethod.Parse(@event.GeometryMethod));
+
+            _lastEvent = @event;
+        }
+
         private void When(BuildingUnitRegularizationWasCorrected @event)
         {
             HasDeviation = true;
@@ -351,6 +362,19 @@ namespace BuildingRegistry.Building
         {
             BuildingUnitPosition = new BuildingUnitPosition(
                 new ExtendedWkbGeometry(@event.ExtendedWkbGeometryBuildingUnits),
+                BuildingUnitPositionGeometryMethod.DerivedFromObject);
+
+            _lastEvent = @event;
+        }
+
+        /// <summary>
+        /// Only units the building routes this to: the ones that were already derived, and the ones the
+        /// transformation pushed out of the building geometry and that therefore became derived.
+        /// </summary>
+        private void When(BuildingGeometryCrsWasChanged @event)
+        {
+            BuildingUnitPosition = new BuildingUnitPosition(
+                new ExtendedWkbGeometry(@event.ExtendedWkbGeometryBuildingUnits!),
                 BuildingUnitPositionGeometryMethod.DerivedFromObject);
 
             _lastEvent = @event;

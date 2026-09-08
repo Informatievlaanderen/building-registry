@@ -41,8 +41,27 @@ namespace BuildingRegistry.Building
             return geometry;
         }
 
-        public ExtendedWkbGeometry Center =>
-            ExtendedWkbGeometry.CreateEWkb(_wkbWriter.Write(_wkbReader.Read(Geometry).CentroidWithinArea()))!;
+        /// <summary>
+        /// The position building units with geometry method DerivedFromObject take, in the reference system
+        /// the building geometry itself is in.
+        /// </summary>
+        /// <remarks>
+        /// The SRID is carried over explicitly rather than left to the reader's geometry factory, and
+        /// geometries persisted before the event store wrote EWKB - which carry no SRID - are Lambert 72 by
+        /// definition. Pinning Lambert 72 unconditionally, as this did through
+        /// <see cref="ExtendedWkbGeometry.CreateEWkb"/>, throws the moment the event store holds Lambert
+        /// 2008. See ADR 0006.
+        /// </remarks>
+        public ExtendedWkbGeometry Center
+        {
+            get
+            {
+                var geometry = _wkbReader.Read(Geometry);
+                var srid = geometry.SRID > 0 ? geometry.SRID : ExtendedWkbGeometry.SridLambert72;
+
+                return ExtendedWkbGeometry.Create(geometry.CentroidWithinArea().WithSrid(srid));
+            }
+        }
 
         public Geometry GetGeometry() => _wkbReader.Read(Geometry);
         public Geometry GetGeometry(ExtendedWkbGeometry geometry) => _wkbReader.Read(geometry);

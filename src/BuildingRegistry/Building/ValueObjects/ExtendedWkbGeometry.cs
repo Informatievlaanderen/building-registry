@@ -1,10 +1,11 @@
-namespace BuildingRegistry.Building
+﻿namespace BuildingRegistry.Building
 {
     using System;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
     using Be.Vlaanderen.Basisregisters.GrAr.Common;
     using Be.Vlaanderen.Basisregisters.GrAr.Common.NetTopology;
     using Be.Vlaanderen.Basisregisters.Utilities.HexByteConvertor;
+    using NetTopologySuite.Geometries;
     using NetTopologySuite.IO;
     using Newtonsoft.Json;
 
@@ -13,6 +14,7 @@ namespace BuildingRegistry.Building
         private static readonly WKBWriter WkbWriter = new WKBWriter { Strict = false, HandleSRID = true };
 
         public const int SridLambert72 = SystemReferenceId.SridLambert72;
+        public const int SridLambert2008 = SystemReferenceId.SridLambert2008;
 
         [JsonConstructor]
         public ExtendedWkbGeometry(byte[] ewkbBytes) : base(ewkbBytes) { }
@@ -26,6 +28,13 @@ namespace BuildingRegistry.Building
         /// <see cref="ToString"/> would allocate a hex string per geometry and parse it straight back.
         /// </summary>
         public byte[] ToByteArray() => Value;
+
+        /// <summary>
+        /// Wraps a geometry that has already been read and transformed, keeping the SRID it carries. The
+        /// EWKB writer lives here, so this is the only place that decides how a geometry is serialized.
+        /// </summary>
+        public static ExtendedWkbGeometry Create(Geometry geometry)
+            => new ExtendedWkbGeometry(WkbWriter.Write(geometry));
 
         public static ExtendedWkbGeometry? CreateEWkb(byte[]? wkb, int useSrid = SridLambert72)
         {
