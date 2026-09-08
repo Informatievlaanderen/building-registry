@@ -21,6 +21,12 @@ namespace BuildingRegistry.Building
 
         public override string ToString() => Value.ToHexString();
 
+        /// <summary>
+        /// The EWKB as persisted. Readers take bytes, so this is what they get: going through
+        /// <see cref="ToString"/> would allocate a hex string per geometry and parse it straight back.
+        /// </summary>
+        public byte[] ToByteArray() => Value;
+
         public static ExtendedWkbGeometry? CreateEWkb(byte[]? wkb, int useSrid = SridLambert72)
         {
             if (wkb == null)
