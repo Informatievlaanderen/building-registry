@@ -34,6 +34,9 @@ namespace BuildingRegistry.Projections.LastChangedList
             When<Envelope<BuildingMeasurementWasChanged>>(async (context, message, ct) =>
                 await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingPersistentLocalId.ToString(), message.Position, context, ct));
 
+            When<Envelope<BuildingGeometryCrsWasChanged>>(async (context, message, ct) =>
+                await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingPersistentLocalId.ToString(), message.Position, context, ct));
+
             When<Envelope<BuildingBecameUnderConstructionV2>>(async (context, message, ct) =>
                 await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingPersistentLocalId.ToString(), message.Position, context, ct));
 
@@ -127,6 +130,7 @@ namespace BuildingRegistry.Projections.LastChangedList
             When<Envelope<BuildingUnitWasDeregulated>>(DoNothing);
             When<Envelope<BuildingUnitDeregulationWasCorrected>>(DoNothing);
             When<Envelope<BuildingUnitPositionWasCorrected>>(DoNothing);
+            When<Envelope<BuildingUnitPositionCrsWasChanged>>(DoNothing);
             When<Envelope<BuildingUnitAddressWasAttachedV2>>(DoNothing);
             When<Envelope<BuildingUnitAddressWasDetachedV2>>(DoNothing);
             When<Envelope<BuildingUnitAddressWasDetachedBecauseAddressWasRejected>>(DoNothing);

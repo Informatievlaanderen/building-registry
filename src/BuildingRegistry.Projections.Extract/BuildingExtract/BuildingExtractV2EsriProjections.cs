@@ -160,6 +160,23 @@ namespace BuildingRegistry.Projections.Extract.BuildingExtract
                 UpdateVersie(item, message.Message.Provenance.Timestamp);
             });
 
+            When<Envelope<BuildingGeometryCrsWasChanged>>(async (context, message, ct) =>
+            {
+                // Unlike every other geometry event this one reaches removed buildings, which have no
+                // extract record - BuildingWasRemovedV2 deletes it. Nothing to reproject. See ADR 0006.
+                var item = await context.BuildingExtractV2Esri.FindAsync(message.Message.BuildingPersistentLocalId,
+                    cancellationToken: ct);
+
+                if (item is null)
+                {
+                    return;
+                }
+
+                // The version is deliberately left as it was: the reprojection does not change the building.
+                var geometry = wkbReader.Read(message.Message.ExtendedWkbGeometryBuilding.ToByteArray()) as Polygon;
+                UpdateGeometry(geometry, item);
+            });
+
             When<Envelope<BuildingBecameUnderConstructionV2>>(async (context, message, ct) =>
             {
                 var item = await context.BuildingExtractV2Esri.FindAsync(message.Message.BuildingPersistentLocalId,
@@ -295,6 +312,7 @@ namespace BuildingRegistry.Projections.Extract.BuildingExtract
             When<Envelope<BuildingUnitWasRetiredV2>>(DoNothing);
             When<Envelope<BuildingUnitWasRetiredBecauseBuildingWasDemolished>>(DoNothing);
             When<Envelope<BuildingUnitPositionWasCorrected>>(DoNothing);
+            When<Envelope<BuildingUnitPositionCrsWasChanged>>(DoNothing);
             When<Envelope<BuildingUnitWasCorrectedFromNotRealizedToPlanned>>(DoNothing);
             When<Envelope<BuildingUnitWasCorrectedFromRealizedToPlannedBecauseBuildingWasCorrected>>(DoNothing);
             When<Envelope<BuildingUnitWasCorrectedFromRealizedToPlanned>>(DoNothing);

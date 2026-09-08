@@ -138,6 +138,39 @@ namespace BuildingRegistry.Projections.Feed.BuildingUnitFeed
                     ct);
             });
 
+            // A reprojection does not change the unit: the documents are updated so the feed keeps serving
+            // the positions in the reference system the event store holds, but it produces no cloud event and
+            // their LastChangedOn is left as it was. See ADR 0006.
+            When<Envelope<BuildingGeometryCrsWasChanged>>(async (context, message, ct) =>
+            {
+                var buildingGeometry = await FindBuildingGeometry(context, message.Message.BuildingPersistentLocalId, ct);
+                buildingGeometry.ExtendedWkbGeometry = message.Message.ExtendedWkbGeometryBuilding;
+
+                var buildingUnitPersistentLocalIds = message.Message.BuildingUnitPersistentLocalIds
+                    .Concat(message.Message.BuildingUnitPersistentLocalIdsWhichBecameDerived)
+                    .ToList();
+
+                if (!buildingUnitPersistentLocalIds.Any()
+                    || string.IsNullOrWhiteSpace(message.Message.ExtendedWkbGeometryBuildingUnits))
+                {
+                    return;
+                }
+
+                var geometry = GmlHelpers.ParseGeometry(message.Message.ExtendedWkbGeometryBuildingUnits!);
+
+                foreach (var buildingUnitPersistentLocalId in buildingUnitPersistentLocalIds)
+                {
+                    var document = await FindDocument(context, buildingUnitPersistentLocalId, ct);
+
+                    document.Document.ExtendedWkbGeometry = message.Message.ExtendedWkbGeometryBuildingUnits!;
+                    document.Document.PositionAsGml = geometry.ConvertToGml(false);
+
+                    // AddCloudEvent does this for every other handler; the Document column is not
+                    // change-tracked, so without it the update would be silently dropped.
+                    context.Entry(document).Property(x => x.Document).IsModified = true;
+                }
+            });
+
             When<Envelope<BuildingWasMeasured>>(async (context, message, ct) =>
             {
                 var buildingGeometry = await FindBuildingGeometry(context, message.Message.BuildingPersistentLocalId, ct);
@@ -474,6 +507,21 @@ namespace BuildingRegistry.Projections.Feed.BuildingUnitFeed
                     attributes.Add(new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.GeometryMethod, ToGeometrieMethodePuri(oldGeometryMethod), ToGeometrieMethodePuri(newGeometryMethod)));
 
                 await AddCloudEvent(message, document, context, attributes);
+            });
+
+            // As with BuildingGeometryCrsWasChanged: the document is updated, no cloud event is produced and
+            // LastChangedOn is left as it was.
+            When<Envelope<BuildingUnitPositionCrsWasChanged>>(async (context, message, ct) =>
+            {
+                var document = await FindDocument(context, message.Message.BuildingUnitPersistentLocalId, ct);
+
+                var geometry = GmlHelpers.ParseGeometry(message.Message.ExtendedWkbGeometry);
+                document.Document.ExtendedWkbGeometry = message.Message.ExtendedWkbGeometry;
+                document.Document.PositionAsGml = geometry.ConvertToGml(false);
+
+                // AddCloudEvent does this for every other handler; the Document column is not change-tracked,
+                // so without it the update would be silently dropped.
+                context.Entry(document).Property(x => x.Document).IsModified = true;
             });
 
             When<Envelope<BuildingUnitWasRemovedV2>>(async (context, message, ct) =>

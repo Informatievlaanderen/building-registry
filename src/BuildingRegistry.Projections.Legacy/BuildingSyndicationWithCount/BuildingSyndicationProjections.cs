@@ -966,6 +966,47 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndicationWithCount
                 }, ct);
             });
 
+            // The event is published in the feed, carrying the geometry the event store now holds, but the
+            // transformation is not a change to the building: LastChangedOn and the unit versions keep the
+            // values the building's last real change gave them. See ADR 0006.
+            When<Envelope<BuildingGeometryCrsWasChanged>>(async (context, message, ct) =>
+            {
+                await context.CreateNewBuildingSyndicationItem(
+                    message.Message.BuildingPersistentLocalId,
+                    message,
+                    (previous, item) =>
+                    {
+                        // CloneAndApplyEventInfo sets LastChangedOn to the event's timestamp; this puts it back.
+                        item.LastChangedOn = previous.LastChangedOn;
+                        item.Geometry = message.Message.ExtendedWkbGeometryBuilding.ToByteArray();
+
+                        if (string.IsNullOrWhiteSpace(message.Message.ExtendedWkbGeometryBuildingUnits))
+                        {
+                            return;
+                        }
+
+                        var buildingUnitPointPosition = message.Message.ExtendedWkbGeometryBuildingUnits!.ToByteArray();
+
+                        foreach (var buildingUnitId in
+                                 message.Message.BuildingUnitPersistentLocalIds.Concat(message.Message
+                                     .BuildingUnitPersistentLocalIdsWhichBecameDerived))
+                        {
+                            // Unlike every other position event this one reaches removed units, which this
+                            // projection drops from the item. Nothing to reproject.
+                            var buildingUnit = item.BuildingUnitsV2.SingleOrDefault(x => x.PersistentLocalId == buildingUnitId);
+
+                            if (buildingUnit is null)
+                            {
+                                continue;
+                            }
+
+                            buildingUnit.PointPosition = buildingUnitPointPosition;
+                            buildingUnit.PositionMethod = BuildingRegistry.Building.BuildingUnitPositionGeometryMethod.DerivedFromObject;
+                        }
+                    },
+                    ct);
+            });
+
             When<Envelope<BuildingBecameUnderConstructionV2>>(async (context, message, ct) =>
             {
                 await context.CreateNewBuildingSyndicationItem(message.Message.BuildingPersistentLocalId, message,
@@ -1301,6 +1342,31 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndicationWithCount
                     unit.PositionMethod = BuildingRegistry.Building.BuildingUnitPositionGeometryMethod.Parse(message.Message.GeometryMethod);
                     unit.Version = message.Message.Provenance.Timestamp;
                 }, ct);
+            });
+
+            // As with BuildingGeometryCrsWasChanged: published, but not reported as a change.
+            When<Envelope<BuildingUnitPositionCrsWasChanged>>(async (context, message, ct) =>
+            {
+                await context.CreateNewBuildingSyndicationItem(
+                    message.Message.BuildingPersistentLocalId,
+                    message,
+                    (previous, item) =>
+                    {
+                        item.LastChangedOn = previous.LastChangedOn;
+
+                        // Unlike every other position event this one reaches removed units, which this
+                        // projection drops from the item. Nothing to reproject.
+                        var unit = item.BuildingUnitsV2.SingleOrDefault(y => y.PersistentLocalId == message.Message.BuildingUnitPersistentLocalId);
+
+                        if (unit is null)
+                        {
+                            return;
+                        }
+
+                        unit.PointPosition = message.Message.ExtendedWkbGeometry.ToByteArray();
+                        unit.PositionMethod = BuildingRegistry.Building.BuildingUnitPositionGeometryMethod.Parse(message.Message.GeometryMethod);
+                    },
+                    ct);
             });
 
             When<Envelope<BuildingUnitAddressWasAttachedV2>>(async (context, message, ct) =>

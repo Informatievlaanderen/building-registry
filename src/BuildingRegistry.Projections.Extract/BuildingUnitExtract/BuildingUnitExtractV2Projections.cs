@@ -147,6 +147,31 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
                 }
             });
 
+            When<Envelope<BuildingGeometryCrsWasChanged>>(async (context, message, ct) =>
+            {
+                foreach (var buildingUnitPersistentLocalId in
+                         message.Message.BuildingUnitPersistentLocalIds.Concat(message.Message.BuildingUnitPersistentLocalIdsWhichBecameDerived))
+                {
+                    // Unlike every other position event this one reaches removed units, which have no
+                    // extract record - BuildingUnitWasRemovedV2 deletes it. Nothing to reproject, so the row
+                    // is looked up here rather than through FindAndUpdateBuildingUnitExtract, which assumes
+                    // one exists. See ADR 0006.
+                    var itemV2 = await context
+                        .BuildingUnitExtractV2
+                        .FindAsync(buildingUnitPersistentLocalId, cancellationToken: ct);
+
+                    if (itemV2 is null)
+                    {
+                        continue;
+                    }
+
+                    // The version is deliberately left as it was: the reprojection does not change the unit.
+                    var geometry = wkbReader.Read(message.Message.ExtendedWkbGeometryBuildingUnits!.ToByteArray());
+                    UpdateGeometry(itemV2, geometry);
+                    UpdateGeometryMethod(itemV2, MapGeometryMethod(BuildingUnitPositionGeometryMethod.DerivedFromObject));
+                }
+            });
+
             When<Envelope<BuildingWasPlannedV2>>(DoNothing);
             When<Envelope<BuildingBecameUnderConstructionV2>>(DoNothing);
             When<Envelope<BuildingWasRealizedV2>>(DoNothing);
@@ -395,6 +420,24 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
                         UpdateGeometry(itemV2, geometry);
                         UpdateVersie(itemV2, message.Message.Provenance.Timestamp);
                     }, ct);
+            });
+
+            When<Envelope<BuildingUnitPositionCrsWasChanged>>(async (context, message, ct) =>
+            {
+                // See BuildingGeometryCrsWasChanged: a removed unit has no extract record left.
+                var itemV2 = await context
+                    .BuildingUnitExtractV2
+                    .FindAsync(message.Message.BuildingUnitPersistentLocalId, cancellationToken: ct);
+
+                if (itemV2 is null)
+                {
+                    return;
+                }
+
+                // The version is deliberately left as it was: the reprojection does not change the unit.
+                UpdateGeometryMethod(itemV2,
+                    MapGeometryMethod(BuildingUnitPositionGeometryMethod.Parse(message.Message.GeometryMethod)));
+                UpdateGeometry(itemV2, wkbReader.Read(message.Message.ExtendedWkbGeometry.ToByteArray()));
             });
 
             When<Envelope<BuildingUnitAddressWasAttachedV2>>(async (context, message, ct) =>

@@ -111,6 +111,23 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetailV2WithCount
                 }
             });
 
+            When<Envelope<BuildingGeometryCrsWasChanged>>(async (context, message, ct) =>
+            {
+                foreach (var buildingUnitPersistentLocalId in
+                         message.Message.BuildingUnitPersistentLocalIds.Concat(message.Message.BuildingUnitPersistentLocalIdsWhichBecameDerived))
+                {
+                    await Update(context, buildingUnitPersistentLocalId, item =>
+                    {
+                        item.Position = message.Message.ExtendedWkbGeometryBuildingUnits!.ToByteArray();
+                        item.PositionMethod = BuildingUnitPositionGeometryMethod.DerivedFromObject;
+
+                        // The version is deliberately left as it was: the reprojection does not change the
+                        // unit. The hash does follow the aggregate, which appended an event. See ADR 0006.
+                        UpdateHash(item, message);
+                    }, ct);
+                }
+            });
+
             When<Envelope<BuildingWasPlannedV2>>(DoNothing);
             When<Envelope<BuildingBecameUnderConstructionV2>>(DoNothing);
             When<Envelope<BuildingWasRealizedV2>>(DoNothing);
@@ -338,6 +355,19 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetailV2WithCount
                     item.Position = message.Message.ExtendedWkbGeometry.ToByteArray();
                     item.PositionMethod = BuildingUnitPositionGeometryMethod.Parse(message.Message.GeometryMethod);
                     item.Version = message.Message.Provenance.Timestamp;
+                    UpdateHash(item, message);
+                }, ct);
+            });
+
+            When<Envelope<BuildingUnitPositionCrsWasChanged>>(async (context, message, ct) =>
+            {
+                await Update(context, message.Message.BuildingUnitPersistentLocalId, item =>
+                {
+                    item.Position = message.Message.ExtendedWkbGeometry.ToByteArray();
+                    item.PositionMethod = BuildingUnitPositionGeometryMethod.Parse(message.Message.GeometryMethod);
+
+                    // The version is deliberately left as it was: the reprojection does not change the
+                    // unit. The hash does follow the aggregate, which appended an event. See ADR 0006.
                     UpdateHash(item, message);
                 }, ct);
             });

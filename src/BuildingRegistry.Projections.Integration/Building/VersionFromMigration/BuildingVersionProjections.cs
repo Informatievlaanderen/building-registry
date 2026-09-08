@@ -224,6 +224,41 @@ namespace BuildingRegistry.Projections.Integration.Building.VersionFromMigration
                     ct);
             });
 
+            // A new version row like any other event - CreateNewBuildingVersion stamps it - but the geometry
+            // methods and the per-unit version timestamps are untouched: the reprojection does not change the
+            // building. See ADR 0006.
+            When<Envelope<BuildingGeometryCrsWasChanged>>(async (context, message, ct) =>
+            {
+                var geometryAsBinary = message.Message.ExtendedWkbGeometryBuilding.ToByteArray();
+                var sysGeometry = wkbReader.Read(geometryAsBinary);
+
+                await context.CreateNewBuildingVersion(
+                    message.Message.BuildingPersistentLocalId,
+                    message,
+                    building =>
+                    {
+                        building.Geometry = sysGeometry;
+
+                        if (!message.Message.BuildingUnitPersistentLocalIds.Any()
+                            && !message.Message.BuildingUnitPersistentLocalIdsWhichBecameDerived.Any())
+                        {
+                            return;
+                        }
+
+                        var sysBuildingUnitGeometry = wkbReader.Read(message.Message.ExtendedWkbGeometryBuildingUnits!.ToByteArray());
+
+                        foreach (var buildingUnitPersistentLocalId in message.Message.BuildingUnitPersistentLocalIds
+                                     .Concat(message.Message.BuildingUnitPersistentLocalIdsWhichBecameDerived))
+                        {
+                            var buildingUnit = building.BuildingUnits
+                                .Single(x => x.BuildingUnitPersistentLocalId == buildingUnitPersistentLocalId);
+
+                            buildingUnit.Geometry = sysBuildingUnitGeometry;
+                        }
+                    },
+                    ct);
+            });
+
             When<Envelope<BuildingBecameUnderConstructionV2>>(async (context, message, ct) =>
             {
                 await context.CreateNewBuildingVersion(

@@ -260,6 +260,24 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo
                     ct);
             });
 
+            When<Store.Envelope<BuildingGeometryCrsWasChanged>>(async (_, message, ct) =>
+            {
+                await FindAndProduce(async () =>
+                        await snapshotManager.FindMatchingSnapshot(
+                            message.Message.BuildingPersistentLocalId.ToString(),
+                            message.Message.Provenance.Timestamp,
+                            message.Message.GetHash(),
+                            message.Position,
+                            throwStaleWhenGone: false,
+                            // The projections deliberately leave the version timestamp as it was - a
+                            // reprojection does not change the building - so the snapshot this waits for
+                            // never carries the event's timestamp. Only the hash moves. See ADR 0006.
+                            matchOnHashOnly: true,
+                            ct),
+                    message.Position,
+                    ct);
+            });
+
             When<Store.Envelope<BuildingGeometryWasImportedFromGrb>>(DoNothing);
 
             #region BuildingUnits
@@ -360,6 +378,7 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo
             When<Store.Envelope<BuildingUnitWasRetiredV2>>(DoNothing);
             When<Store.Envelope<BuildingUnitWasRetiredBecauseBuildingWasDemolished>>(DoNothing);
             When<Store.Envelope<BuildingUnitPositionWasCorrected>>(DoNothing);
+            When<Store.Envelope<BuildingUnitPositionCrsWasChanged>>(DoNothing);
             When<Store.Envelope<BuildingUnitWasCorrectedFromNotRealizedToPlanned>>(DoNothing);
             When<Store.Envelope<BuildingUnitWasCorrectedFromRealizedToPlannedBecauseBuildingWasCorrected>>(DoNothing);
             When<Store.Envelope<BuildingUnitWasCorrectedFromRealizedToPlanned>>(DoNothing);

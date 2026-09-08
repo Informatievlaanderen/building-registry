@@ -103,11 +103,13 @@ namespace BuildingRegistry.Tests
             AssertHandleEvents(projectionsToTest, [
                 typeof(BuildingBecameUnderConstructionV2),
                 typeof(BuildingGeometryWasImportedFromGrb),
+                typeof(BuildingGeometryCrsWasChanged),
                 typeof(BuildingMeasurementWasChanged),
                 typeof(BuildingMeasurementWasCorrected),
                 typeof(BuildingOutlineWasChanged),
                 typeof(BuildingUnitDeregulationWasCorrected),
                 typeof(BuildingUnitPositionWasCorrected),
+                typeof(BuildingUnitPositionCrsWasChanged),
                 typeof(BuildingUnitRegularizationWasCorrected),
                 typeof(BuildingUnitRemovalWasCorrected),
                 typeof(BuildingUnitWasCorrectedFromNotRealizedToPlanned),

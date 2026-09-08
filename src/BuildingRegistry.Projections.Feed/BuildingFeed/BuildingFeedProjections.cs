@@ -151,6 +151,22 @@ namespace BuildingRegistry.Projections.Feed.BuildingFeed
                 ]);
             });
 
+            // A reprojection does not change the building: the document is updated so the feed keeps serving
+            // the geometry in the reference system the event store holds, but it produces no cloud event and
+            // the document's LastChangedOn is left as it was. See ADR 0006.
+            When<Envelope<BuildingGeometryCrsWasChanged>>(async (context, message, ct) =>
+            {
+                var document = await FindDocument(context, message.Message.BuildingPersistentLocalId, ct);
+
+                var geometry = GmlHelpers.ParseGeometry(message.Message.ExtendedWkbGeometryBuilding);
+                document.Document.ExtendedWkbGeometry = message.Message.ExtendedWkbGeometryBuilding;
+                document.Document.GeometryAsGml = geometry.ConvertToGml(false);
+
+                // AddCloudEvent does this for every other handler; the Document column is not change-tracked,
+                // so without it the update would be silently dropped.
+                context.Entry(document).Property(x => x.Document).IsModified = true;
+            });
+
             When<Envelope<BuildingBecameUnderConstructionV2>>(async (context, message, ct) =>
             {
                 var document = await FindDocument(context, message.Message.BuildingPersistentLocalId, ct);
@@ -350,6 +366,7 @@ namespace BuildingRegistry.Projections.Feed.BuildingFeed
             When<Envelope<BuildingUnitWasRetiredV2>>(DoNothing);
             When<Envelope<BuildingUnitWasRetiredBecauseBuildingWasDemolished>>(DoNothing);
             When<Envelope<BuildingUnitPositionWasCorrected>>(DoNothing);
+            When<Envelope<BuildingUnitPositionCrsWasChanged>>(DoNothing);
             When<Envelope<BuildingUnitWasCorrectedFromNotRealizedToPlanned>>(DoNothing);
             When<Envelope<BuildingUnitWasCorrectedFromRealizedToPlannedBecauseBuildingWasCorrected>>(DoNothing);
             When<Envelope<BuildingUnitWasCorrectedFromRealizedToPlanned>>(DoNothing);

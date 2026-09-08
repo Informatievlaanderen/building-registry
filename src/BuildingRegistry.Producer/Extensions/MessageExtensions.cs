@@ -341,6 +341,14 @@ namespace BuildingRegistry.Producer.Extensions
                 message.ExtendedWkbGeometry,
                 message.Provenance.ToContract());
 
+        public static Contracts.BuildingUnitPositionCrsWasChanged ToContract(this BuildingUnitPositionCrsWasChanged message)
+            => new Contracts.BuildingUnitPositionCrsWasChanged(
+                message.BuildingPersistentLocalId,
+                message.BuildingUnitPersistentLocalId,
+                message.GeometryMethod,
+                message.ExtendedWkbGeometry,
+                message.Provenance.ToContract());
+
         public static Contracts.BuildingUnitRemovalWasCorrected ToContract(this BuildingUnitRemovalWasCorrected message)
             => new Contracts.BuildingUnitRemovalWasCorrected(
                 message.BuildingPersistentLocalId,
@@ -607,6 +615,15 @@ namespace BuildingRegistry.Producer.Extensions
 
         public static Contracts.BuildingMeasurementWasChanged ToContract(this BuildingMeasurementWasChanged message)
             => new Contracts.BuildingMeasurementWasChanged(
+                message.BuildingPersistentLocalId,
+                message.BuildingUnitPersistentLocalIds,
+                message.BuildingUnitPersistentLocalIdsWhichBecameDerived,
+                message.ExtendedWkbGeometryBuilding,
+                message.ExtendedWkbGeometryBuildingUnits,
+                message.Provenance.ToContract());
+
+        public static Contracts.BuildingGeometryCrsWasChanged ToContract(this BuildingGeometryCrsWasChanged message)
+            => new Contracts.BuildingGeometryCrsWasChanged(
                 message.BuildingPersistentLocalId,
                 message.BuildingUnitPersistentLocalIds,
                 message.BuildingUnitPersistentLocalIdsWhichBecameDerived,

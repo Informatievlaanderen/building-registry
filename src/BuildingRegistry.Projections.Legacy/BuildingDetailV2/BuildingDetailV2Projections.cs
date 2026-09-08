@@ -107,6 +107,20 @@ namespace BuildingRegistry.Projections.Legacy.BuildingDetailV2
                 UpdateHash(item, message);
             });
 
+            When<Envelope<BuildingGeometryCrsWasChanged>>(async (context, message, ct) =>
+            {
+                var geometryAsBinary = message.Message.ExtendedWkbGeometryBuilding.ToByteArray();
+                var sysGeometry = wkbReader.Read(geometryAsBinary);
+                var fixedGeometry = NetTopologySuite.Geometries.Utilities.GeometryFixer.Fix(sysGeometry);
+                var item = await context.BuildingDetailsV2.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);
+                item.Geometry = geometryAsBinary;
+                item.SysGeometry = fixedGeometry;
+
+                // The version is deliberately left as it was: the reprojection does not change the
+                // building. The hash does follow the aggregate, which appended an event. See ADR 0006.
+                UpdateHash(item, message);
+            });
+
             When<Envelope<BuildingBecameUnderConstructionV2>>(async (context, message, ct) =>
             {
                 var item = await context.BuildingDetailsV2.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);
@@ -247,6 +261,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingDetailV2
             When<Envelope<BuildingUnitWasRetiredV2>>(DoNothing);
             When<Envelope<BuildingUnitWasRetiredBecauseBuildingWasDemolished>>(DoNothing);
             When<Envelope<BuildingUnitPositionWasCorrected>>(DoNothing);
+            When<Envelope<BuildingUnitPositionCrsWasChanged>>(DoNothing);
             When<Envelope<BuildingUnitWasCorrectedFromNotRealizedToPlanned>>(DoNothing);
             When<Envelope<BuildingUnitWasCorrectedFromRealizedToPlannedBecauseBuildingWasCorrected>>(DoNothing);
             When<Envelope<BuildingUnitWasCorrectedFromRealizedToPlanned>>(DoNothing);

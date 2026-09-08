@@ -172,6 +172,33 @@ namespace BuildingRegistry.Projections.Integration.BuildingUnit.LatestItem
                 }
             });
 
+            When<Envelope<BuildingGeometryCrsWasChanged>>(async (context, message, ct) =>
+            {
+                if (!message.Message.BuildingUnitPersistentLocalIds.Any()
+                    && !message.Message.BuildingUnitPersistentLocalIdsWhichBecameDerived.Any())
+                {
+                    return;
+                }
+
+                var geometryAsBinary = message.Message.ExtendedWkbGeometryBuildingUnits!.ToByteArray();
+                var sysGeometry = wkbReader.Read(geometryAsBinary);
+
+                foreach (var buildingUnitPersistentLocalId in message.Message.BuildingUnitPersistentLocalIds
+                             .Concat(message.Message.BuildingUnitPersistentLocalIdsWhichBecameDerived))
+                {
+                    await context.FindAndUpdateBuildingUnit(
+                        buildingUnitPersistentLocalId,
+                        buildingUnit =>
+                        {
+                            // The geometry method is untouched, and the version timestamp is deliberately
+                            // left as it was: the reprojection does not change the unit. See ADR 0006.
+                            buildingUnit.Geometry = sysGeometry;
+                            return Task.CompletedTask;
+                        },
+                        ct);
+                }
+            });
+
             When<Envelope<BuildingWasPlannedV2>>(DoNothing);
             When<Envelope<BuildingBecameUnderConstructionV2>>(DoNothing);
             When<Envelope<BuildingWasRealizedV2>>(DoNothing);
@@ -483,6 +510,23 @@ namespace BuildingRegistry.Projections.Integration.BuildingUnit.LatestItem
                         buildingUnit.OsloGeometryMethod = BuildingUnitPositionGeometryMethod.Parse(message.Message.GeometryMethod).Map();
                         buildingUnit.GeometryMethod = message.Message.GeometryMethod;
                         UpdateVersionTimestamp(buildingUnit, message.Message);
+                        return Task.CompletedTask;
+                    },
+                    ct);
+            });
+
+            When<Envelope<BuildingUnitPositionCrsWasChanged>>(async (context, message, ct) =>
+            {
+                var geometryAsBinary = message.Message.ExtendedWkbGeometry.ToByteArray();
+                var sysGeometry = wkbReader.Read(geometryAsBinary);
+
+                await context.FindAndUpdateBuildingUnit(
+                    message.Message.BuildingUnitPersistentLocalId,
+                    buildingUnit =>
+                    {
+                        // The geometry method is untouched, and the version timestamp is deliberately left as
+                        // it was: the reprojection does not change the unit. See ADR 0006.
+                        buildingUnit.Geometry = sysGeometry;
                         return Task.CompletedTask;
                     },
                     ct);

@@ -200,6 +200,7 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitAddressLinkExtractWit
             When<Envelope<BuildingWasRemovedV2>>(DoNothing);
             When<Envelope<UnplannedBuildingWasRealizedAndMeasured>>(DoNothing);
             When<Envelope<BuildingMeasurementWasChanged>>(DoNothing);
+            When<Envelope<BuildingGeometryCrsWasChanged>>(DoNothing);
             When<Envelope<BuildingMeasurementWasCorrected>>(DoNothing);
             When<Envelope<BuildingOutlineWasChanged>>(DoNothing);
             When<Envelope<BuildingWasMeasured>>(DoNothing);
@@ -213,6 +214,7 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitAddressLinkExtractWit
             When<Envelope<BuildingUnitWasRetiredV2>>(DoNothing);
             When<Envelope<BuildingUnitWasRetiredBecauseBuildingWasDemolished>>(DoNothing);
             When<Envelope<BuildingUnitPositionWasCorrected>>(DoNothing);
+            When<Envelope<BuildingUnitPositionCrsWasChanged>>(DoNothing);
             When<Envelope<BuildingUnitWasRemovedV2>>(DoNothing);
             When<Envelope<BuildingUnitWasRemovedBecauseBuildingWasRemoved>>(DoNothing);
             When<Envelope<BuildingUnitRemovalWasCorrected>>(DoNothing);
