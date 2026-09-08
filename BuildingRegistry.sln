@@ -37,6 +37,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "adr", "adr", "{AA7D4C33-B0A
 		docs\adr\0004-lambert2008-sync-objectcrs.md = docs\adr\0004-lambert2008-sync-objectcrs.md
 		docs\adr\0005-lambert2008-wfs-wms-projections.md = docs\adr\0005-lambert2008-wfs-wms-projections.md
 		docs\adr\0006-lambert2008-consumers.md = docs\adr\0006-lambert2008-consumers.md
+		docs\adr\0007-lambert2008-event-store-transformation.md = docs\adr\0007-lambert2008-event-store-transformation.md
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{48B284E6-5A28-4ECB-BDE2-CBB2FFC61EF0}"

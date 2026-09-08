@@ -161,11 +161,37 @@ exactly this event. It writes only the Lambert 2008 column: the building does no
 re-expressed, so the stored Lambert 72 outline is already what it should be and transforming the payload
 back would replace it with a round trip of itself.
 
-The ordering that follows is worth stating: **the migrator must not run ahead of the projector.** The
-overlap checks in `BuildingGeometryContext` and `BuildingMatching` compare a geometry from the aggregate
-against those rows, and both sides have to have moved. Since the toggle is a preference rather than a
-correctness switch (ADR 0006) the window is not dangerous — every comparison stays in one reference
-system throughout — but the readiness guard is what makes it visible.
+#### What the migrator being ahead of the projector does and does not mean
+
+The migrator appends to the event store and the projector catches up, so the migrator is always ahead.
+That lag is not something to arrange around, and it is harmless here for a specific reason:
+`SetSysGeometryFromCrsConversion` never writes `SysGeometry`. The conversion does not invalidate the
+Lambert 72 column, so a building whose stream is converted and whose row is not yet projected still has,
+in that column, exactly what it will have afterwards. `Lambert2008ConversionCompleted` defaults to false
+in all three hosts that read these columns, so that is the column every comparison is using.
+
+The only stale thing during the window is `SysGeometryLambert2008`, and nothing reads it while the
+toggle is off. `BuildingDetailsV2.Geometry` is stale too — still the Lambert 72 bytes — but its one
+reader, `Api.Oslo` through `ParcelMatching.GetUnderlyingParcels(byte[])`, reads it through
+`CreateForEwkb` and normalizes to `MatchingSrid`, so it is right either way.
+
+The ordering that actually matters is therefore not about the migrator at all:
+
+1. `UseLambert2008EventStore` on **before** the migrator runs, or an edit to a converted building writes
+   it straight back to Lambert 72 and the conversion unwinds building by building.
+2. The projector caught up **before** `Lambert2008ConversionCompleted` goes on. Flipping it while the
+   column still has NULLs makes `boundingBox.Intersects(building.SysGeometryLambert2008)` NULL for those
+   rows, so they drop out of matching with nothing logged. `Lambert2008MatchingReadiness` turns that into
+   a loud failure on the first Lambert 2008 match in each process.
+
+Two limits of that guard are worth knowing. It checks `BuildingDetailsV2` and nothing else, so green
+means "this column has no NULLs", not "the conversion is done" — the event store and the other
+projections are not covered. And it excludes removed buildings, because one removed before the column
+existed receives no further geometry events and would otherwise pin the guard red forever. That
+exclusion leaves a gap in `BuildingMatching.GetUnderlyingBuildings`, which does not filter removed rows:
+a removed building with a NULL Lambert 2008 column would be skipped silently. This transformation closes
+it — the aggregate method is unguarded and the projection handler does not skip removed rows, so removed
+buildings get the column filled like any other.
 
 ### The projections do not report it as a change
 
@@ -264,6 +290,7 @@ the copy-the-counterpart rule honest.
 - `BuildingDetailsV2.SysGeometryLambert2008` goes from "fills as buildings happen to change" to fully
   populated, which is what `Lambert2008MatchingReadiness.Buildings` waits for and therefore what
   unblocks `FeatureToggles:Lambert2008ConversionCompleted` (ADR 0006).
-- The migrator and the projector have to run in that order. Nothing is silently wrong in between — the
-  matching toggle keeps both sides of every comparison in one reference system — but a building whose
-  stream is converted and whose row is not has a stale `SysGeometryLambert2008`.
+- The rollout has two ordering constraints, and neither is between the migrator and the projector:
+  `UseLambert2008EventStore` goes on before the migrator runs, and `Lambert2008ConversionCompleted` only
+  after the projector has caught up. The projector lagging the migrator is normal and unobservable,
+  because the conversion never touches the Lambert 72 column the toggle-off path compares against.
