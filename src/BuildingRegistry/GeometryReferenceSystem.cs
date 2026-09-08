@@ -29,8 +29,26 @@ namespace BuildingRegistry
         /// </remarks>
         public const int PositionRoundingPrecision = 2;
 
+        /// <summary>
+        /// Whether an SRID <em>label</em> is one of the two this registry supports. Strict: an absent label
+        /// is not one of them - see <see cref="ReferenceSystem"/> for reading a geometry's actual system.
+        /// </summary>
         public static bool IsSupported(int srid)
             => srid is SystemReferenceId.SridLambert72 or SystemReferenceId.SridLambert2008;
+
+        /// <summary>
+        /// The reference system a geometry is in, reading the ones written before the event store wrote
+        /// EWKB - which carry no SRID at all - as Lambert 72, which is what they are.
+        /// </summary>
+        /// <remarks>
+        /// A reader does not necessarily label them: <see cref="WKBReaderFactory.CreateForEwkb"/> falls back
+        /// to the Lambert 72 reader, whose geometry factory stamps 31370, but a plain
+        /// <c>WKBReader</c> on the default geometry services - which is what <c>BuildingGeometry</c> reads
+        /// with - leaves the SRID at -1. So the SRID cannot be taken at face value without this.
+        /// See ADR 0006.
+        /// </remarks>
+        public static int ReferenceSystem(this Geometry geometry)
+            => geometry.SRID <= 0 ? SystemReferenceId.SridLambert72 : geometry.SRID;
 
         /// <summary>Puts a geometry in <paramref name="srid"/>, transforming it when it is in the other system.</summary>
         public static Geometry ToReferenceSystem(this Geometry geometry, int srid)
@@ -49,11 +67,11 @@ namespace BuildingRegistry
         /// about to be persisted would mean coordinates ~500 km from where the building is. See ADR 0006.
         ///
         /// Which system the geometry is in is read from its SRID, exactly as <c>GmlGeometryNormalizer</c>
-        /// does (ADR 0003). Every geometry reaching this point has been read either from GML carrying its own
-        /// <c>srsName</c> or from persisted EWKB through <see cref="WKBReaderFactory.CreateForEwkb"/>, which
-        /// falls back to Lambert 72 for the SRID-less bytes written before the event store wrote EWKB — so
-        /// the label is not a guess. Parcel-registry decides this from the coordinates instead, because its
-        /// GRB reader labels every polygon 31370 by construction; building-registry has no such path.
+        /// does (ADR 0003) — through <see cref="ReferenceSystem"/>, so a geometry read without a label is
+        /// Lambert 72 rather than an error. Every geometry reaching this point came either from GML carrying
+        /// its own <c>srsName</c> or from persisted EWKB, so the system is not a guess. Parcel-registry
+        /// decides this from the coordinates instead, because its GRB reader labels every polygon 31370 by
+        /// construction; building-registry has no such path.
         /// </remarks>
         private static Geometry ToReferenceSystem(Geometry geometry, int srid, int? roundingPrecision)
         {
@@ -63,18 +81,32 @@ namespace BuildingRegistry
                     nameof(srid), srid, "Only Lambert 72 (31370) and Lambert 2008 (3812) are supported.");
             }
 
-            if (!IsSupported(geometry.SRID))
+            var sourceSrid = geometry.ReferenceSystem();
+
+            if (!IsSupported(sourceSrid))
             {
                 throw new ArgumentOutOfRangeException(
                     nameof(geometry), geometry.SRID, "Geometry is not in Lambert 72 (31370) or Lambert 2008 (3812).");
             }
 
-            if (geometry.SRID == srid)
+            if (sourceSrid == srid)
             {
-                // RoundCoordinates mutates in place, so it never gets the caller's geometry.
+                if (geometry.SRID == srid && !roundingPrecision.HasValue)
+                {
+                    return geometry;
+                }
+
+                // A geometry that carries no SRID gets one here: it is already in this reference system, so
+                // there is nothing to transform, but putting the missing label on is the other half of what
+                // the transformation is for.
+                // The copy is also what keeps RoundCoordinates, which mutates in place, off the caller's
+                // geometry.
+                var relabelled = geometry.Copy();
+                relabelled.SRID = srid;
+
                 return roundingPrecision.HasValue
-                    ? geometry.Copy().RoundCoordinates(roundingPrecision.Value)
-                    : geometry;
+                    ? relabelled.RoundCoordinates(roundingPrecision.Value)
+                    : relabelled;
             }
 
             if (srid == SystemReferenceId.SridLambert2008)

@@ -15,6 +15,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenTransformingToLambert2008
     using Fixtures;
     using FluentAssertions;
     using NetTopologySuite.Geometries;
+    using NetTopologySuite.IO;
     using Xunit;
     using Xunit.Abstractions;
     using BuildingUnitFunction = BuildingRegistry.Legacy.BuildingUnitFunction;
@@ -74,6 +75,66 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenTransformingToLambert2008
 
             building.BuildingGeometry.Method.Should().Be(method);
             ReadGeometry(building.BuildingGeometry.Geometry).SRID.Should().Be(ExtendedWkbGeometry.SridLambert2008);
+        }
+
+        /// <summary>
+        /// Geometries written before the event store wrote EWKB carry no SRID at all. They are Lambert 72 by
+        /// definition, so they transform like any other - and come out carrying SRID 3812, which means the
+        /// transformation also fixes the missing label. See ADR 0006.
+        /// </summary>
+        [Fact]
+        public void WithGeometryWithoutSrid_ThenItIsTransformedAsLambert72()
+        {
+            // Plain WKB, no SRID flag: what the pre-EWKB streams hold.
+            var withoutSrid = new ExtendedWkbGeometry(
+                new WKBWriter { Strict = false, HandleSRID = false }.Write(GeometryHelper.ValidPolygon));
+
+            var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
+                .WithBuildingGeometry(new BuildingGeometry(withoutSrid, BuildingGeometryMethod.Outlined))
+                .WithBuildingUnit(
+                    BuildingUnitStatus.Realized,
+                    Fixture.Create<BuildingUnitPersistentLocalId>(),
+                    positionGeometryMethod: LegacyBuildingUnitPositionGeometryMethod.AppointedByAdministrator,
+                    extendedWkbGeometry: Legacy(new ExtendedWkbGeometry(
+                        new WKBWriter { Strict = false, HandleSRID = false }.Write(GeometryHelper.ValidPointInPolygon))))
+                .Build();
+
+            var building = new BuildingFactory(NoSnapshotStrategy.Instance).Create();
+            building.Initialize([buildingWasMigrated]);
+
+            building.TransformToLambert2008();
+
+            // The same result as if the bytes had carried SRID 31370 all along.
+            building.BuildingGeometry.Geometry.Should().Be(ToLambert2008(Lambert72Polygon()));
+            building.BuildingUnits.Single().BuildingUnitPosition.Geometry
+                .Should().Be(ToLambert2008(Lambert72Point(), GeometryReferenceSystem.PositionRoundingPrecision));
+
+            ReadGeometry(building.BuildingGeometry.Geometry).SRID.Should().Be(ExtendedWkbGeometry.SridLambert2008);
+        }
+
+        /// <summary>
+        /// A geometry read without a label is Lambert 72, not an error - which is what
+        /// <c>BuildingGeometry.GetGeometry()</c> hands out for those legacy geometries, because it reads
+        /// through a WKBReader on the default geometry services rather than through
+        /// <c>WKBReaderFactory.CreateForEwkb</c>.
+        /// </summary>
+        [Fact]
+        public void WithGeometryReadWithoutASrid_ThenItIsTreatedAsLambert72()
+        {
+            var sridless = new WKBReader { HandleSRID = true }.Read(
+                new WKBWriter { Strict = false, HandleSRID = false }.Write(GeometryHelper.ValidPolygon));
+
+            sridless.SRID.Should().BeLessOrEqualTo(0);
+            sridless.ReferenceSystem().Should().Be(ExtendedWkbGeometry.SridLambert72);
+
+            // Transformed, not rejected, and the same result as the labelled geometry gives.
+            var transformed = sridless.ToReferenceSystem(ExtendedWkbGeometry.SridLambert2008);
+            transformed.SRID.Should().Be(ExtendedWkbGeometry.SridLambert2008);
+            ExtendedWkbGeometry.Create(transformed).Should().Be(ToLambert2008(Lambert72Polygon()));
+
+            // Asking for the system it is already in relabels it rather than leaving it unlabelled.
+            sridless.ToReferenceSystem(ExtendedWkbGeometry.SridLambert72).SRID
+                .Should().Be(ExtendedWkbGeometry.SridLambert72);
         }
 
         [Fact]

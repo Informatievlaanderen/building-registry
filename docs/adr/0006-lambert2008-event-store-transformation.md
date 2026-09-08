@@ -79,10 +79,33 @@ building is. `GeometryReferenceSystem.ToReferenceSystem` therefore transforms un
 
 Which system a geometry is currently in is read from its SRID, exactly as `GmlGeometryNormalizer`
 already does (ADR 0003). Every geometry reaching this point was read either from GML carrying its own
-`srsName` or from persisted EWKB through `WKBReaderFactory.CreateForEwkb`, which falls back to Lambert
-72 for the SRID-less bytes written before the event store wrote EWKB — so the label is not a guess.
-Parcel-registry decides this from the coordinates instead, because its GRB reader labels every polygon
-31370 by construction; building-registry has no such path.
+`srsName` or from persisted EWKB, so the system is not a guess. Parcel-registry decides this from the
+coordinates instead, because its GRB reader labels every polygon 31370 by construction;
+building-registry has no such path.
+
+### An absent SRID is Lambert 72, not an error
+
+The event store holds geometries written before it wrote EWKB, and those carry no SRID at all. They are
+Lambert 72 by definition, and the codebase already reads them that way — `WKBReaderFactory.CreateForEwkb`
+falls back to the Lambert 72 reader for them, and `BuildingGeometry.Center` fills in 31370 when the
+bytes gave it nothing.
+
+`GeometryReferenceSystem.ReferenceSystem()` is that same rule in one place, and `ToReferenceSystem` goes
+through it rather than trusting `Geometry.SRID` directly. The difference is not academic: which SRID an
+unlabelled geometry comes back with depends on the reader. `WKBReaderFactory.CreateForEwkb` hands back
+31370, because the Lambert 72 reader's geometry factory stamps its own SRID — but a plain `WKBReader` on
+the default geometry services, which is what `BuildingGeometry` reads with, returns **-1**. Rejecting
+that would have made the helper throw on exactly the legacy rows the transformation exists for, for any
+caller that did not happen to read through `CreateForEwkb`.
+
+Transforming an unlabelled geometry produces one labelled 3812, so the transformation also fixes the
+missing SRID. Asking for the system it is already in relabels it rather than handing back an unlabelled
+geometry, for the same reason.
+
+`IsSupported`, which `Building.GuardPolygon` uses, stays strict: it is a predicate on a *label*, and at
+the write boundary an unlabelled geometry should be rejected rather than assumed. Nothing reaches that
+guard unlabelled today — every path into it reads through `Building.ReadGeometry` — and this keeps the
+guard's behaviour identical to the Lambert-72-only one it replaced.
 
 ### The building geometry is not rounded, positions are rounded to centimetres
 
