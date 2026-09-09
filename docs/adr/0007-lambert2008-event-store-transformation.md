@@ -329,11 +329,20 @@ It pages the `Streams` table on its own internal id, loads each `building-` stre
 
 `test/BuildingRegistry.Tests/AggregateTests/WhenTransformingToLambert2008` covers outlined and measured
 buildings, derived and appointed units, removed buildings and removed units, idempotency, the
-rounding asymmetry, and both sides of the "pushed outside" rule.
+rounding asymmetry, and every branch of the "pushed outside" rule including the removed one.
+
+`GeometryReferenceSystemTests` covers the transformation helper on its own: which system an SRID names,
+that an absent SRID reads as Lambert 72 and transforms like a labelled one, that the round trip returns
+to where it started, that rounding does not reach the caller's geometry, and that an unsupported
+reference system throws either way round. Keeping it out of the aggregate suite matters — the helper is
+shared with the write side, so its behaviour is not the aggregate's to assert.
 
 `GeometryHelper.PointInPolygonPushedOutsideByLambert2008Rounding` is a concrete point about a
 millimetre inside `ValidPolygon` that the centimetre rounding puts outside the transformed polygon, so
 that test is deterministic rather than dependent on where the fixture geometry happens to fall.
+
+The building unit feed tests cover all four combinations that matter: already derived, became derived,
+became derived while removed, and a plain position reprojection.
 
 `ProjectionsHandlesEventsTests` fails until every projection handles both events, which is what keeps
 the copy-the-counterpart rule honest.
