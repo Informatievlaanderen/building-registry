@@ -147,15 +147,28 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
                 }
             });
 
+            // The extract stays in Lambert 72, so the units that were already derived hold the position
+            // this event is a different spelling of and are left alone. The ones that became derived are
+            // not a re-expression: their method changed and their position moved to the building's centre,
+            // which is a change in Lambert 72 too, and so gets a version like any other. The payload is
+            // brought back to Lambert 72 to be stored. See ADR 0007.
             When<Envelope<BuildingGeometryCrsWasChanged>>(async (context, message, ct) =>
             {
-                foreach (var buildingUnitPersistentLocalId in
-                         message.Message.BuildingUnitPersistentLocalIds.Concat(message.Message.BuildingUnitPersistentLocalIdsWhichBecameDerived))
+                if (!message.Message.BuildingUnitPersistentLocalIdsWhichBecameDerived.Any())
+                {
+                    return;
+                }
+
+                var extendedWkb = message.Message.ExtendedWkbGeometryBuildingUnits!.ToByteArray();
+                var position = WKBReaderFactory.CreateForEwkb(extendedWkb).Read(extendedWkb)
+                    .ToReferenceSystem(ExtendedWkbGeometry.SridLambert72, GeometryReferenceSystem.PositionRoundingPrecision);
+
+                foreach (var buildingUnitPersistentLocalId in message.Message.BuildingUnitPersistentLocalIdsWhichBecameDerived)
                 {
                     // Unlike every other position event this one reaches removed units, which have no
                     // extract record - BuildingUnitWasRemovedV2 deletes it. Nothing to reproject, so the row
                     // is looked up here rather than through FindAndUpdateBuildingUnitExtract, which assumes
-                    // one exists. See ADR 0007.
+                    // one exists.
                     var itemV2 = await context
                         .BuildingUnitExtractV2
                         .FindAsync(buildingUnitPersistentLocalId, cancellationToken: ct);
@@ -165,10 +178,9 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
                         continue;
                     }
 
-                    // The version is deliberately left as it was: the reprojection does not change the unit.
-                    var geometry = wkbReader.Read(message.Message.ExtendedWkbGeometryBuildingUnits!.ToByteArray());
-                    UpdateGeometry(itemV2, geometry);
+                    UpdateGeometry(itemV2, position);
                     UpdateGeometryMethod(itemV2, MapGeometryMethod(BuildingUnitPositionGeometryMethod.DerivedFromObject));
+                    UpdateVersie(itemV2, message.Message.Provenance.Timestamp);
                 }
             });
 
@@ -422,23 +434,9 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
                     }, ct);
             });
 
-            When<Envelope<BuildingUnitPositionCrsWasChanged>>(async (context, message, ct) =>
-            {
-                // See BuildingGeometryCrsWasChanged: a removed unit has no extract record left.
-                var itemV2 = await context
-                    .BuildingUnitExtractV2
-                    .FindAsync(message.Message.BuildingUnitPersistentLocalId, cancellationToken: ct);
-
-                if (itemV2 is null)
-                {
-                    return;
-                }
-
-                // The version is deliberately left as it was: the reprojection does not change the unit.
-                UpdateGeometryMethod(itemV2,
-                    MapGeometryMethod(BuildingUnitPositionGeometryMethod.Parse(message.Message.GeometryMethod)));
-                UpdateGeometry(itemV2, wkbReader.Read(message.Message.ExtendedWkbGeometry.ToByteArray()));
-            });
+            // See BuildingGeometryCrsWasChanged: the extract stays in Lambert 72, and this event only ever
+            // re-expresses a position the extract already holds in that system.
+            When<Envelope<BuildingUnitPositionCrsWasChanged>>(DoNothing);
 
             When<Envelope<BuildingUnitAddressWasAttachedV2>>(async (context, message, ct) =>
             {

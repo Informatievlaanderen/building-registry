@@ -157,17 +157,47 @@ namespace BuildingRegistry.Projections.Feed.BuildingUnitFeed
                 }
 
                 var geometry = GmlHelpers.ParseGeometry(message.Message.ExtendedWkbGeometryBuildingUnits!);
+                var newPositionValues = CreatePositionValues(geometry);
+                var becameDerived = message.Message.BuildingUnitPersistentLocalIdsWhichBecameDerived.ToHashSet();
 
                 foreach (var buildingUnitPersistentLocalId in buildingUnitPersistentLocalIds)
                 {
                     var document = await FindDocument(context, buildingUnitPersistentLocalId, ct);
+                    var oldGeometryMethod = document.Document.GeometryMethod;
+                    var oldPositionValues = CreatePositionValues(GmlHelpers.ParseGeometry(document.Document.ExtendedWkbGeometry));
 
                     document.Document.ExtendedWkbGeometry = message.Message.ExtendedWkbGeometryBuildingUnits!;
                     document.Document.PositionAsGml = geometry.ConvertToGml(false);
 
-                    // AddCloudEvent does this for every other handler; the Document column is not
-                    // change-tracked, so without it the update would be silently dropped.
-                    context.Entry(document).Property(x => x.Document).IsModified = true;
+                    // A unit that was already derived holds the position this event re-expresses: the
+                    // document is updated silently. One that became derived changed both its position and
+                    // its geometry method, which is a change consumers have to see. See ADR 0007.
+                    //
+                    // A removed unit is silent either way: it is not in the feed, so its document is kept
+                    // current without anything being published about it. The aggregate does not re-derive
+                    // removed units, so this is a guard rather than a case that arises.
+                    if (document.IsRemoved || !becameDerived.Contains(buildingUnitPersistentLocalId))
+                    {
+                        // AddCloudEvent does this for every other handler; the Document column is not
+                        // change-tracked, so without it the update would be silently dropped.
+                        context.Entry(document).Property(x => x.Document).IsModified = true;
+
+                        continue;
+                    }
+
+                    var newGeometryMethod = MapBuildingUnitGeometryMethod(BuildingUnitPositionGeometryMethod.DerivedFromObject);
+                    document.Document.GeometryMethod = newGeometryMethod;
+                    document.LastChangedOn = message.Message.Provenance.Timestamp;
+
+                    var attributes = new List<BaseRegistriesCloudEventAttribute>
+                    {
+                        new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.Position, oldPositionValues, newPositionValues)
+                    };
+
+                    if (oldGeometryMethod != newGeometryMethod)
+                        attributes.Add(new BaseRegistriesCloudEventAttribute(BuildingUnitAttributeNames.GeometryMethod, ToGeometrieMethodePuri(oldGeometryMethod), ToGeometrieMethodePuri(newGeometryMethod)));
+
+                    await AddCloudEvent(message, document, context, attributes);
                 }
             });
 

@@ -1945,6 +1945,159 @@ namespace BuildingRegistry.Tests.ProjectionTests.Feed
                 });
         }
 
+        /// <summary>
+        /// The one exception to a reprojection being silent: a unit the transformation pushed out of its
+        /// building becomes derived, which changes both its position and its geometry method. That is a
+        /// change consumers have to see, so it produces a cloud event and moves LastChangedOn. See ADR 0007.
+        /// </summary>
+        [Fact]
+        public async Task WhenBuildingUnitBecameDerived_ThenACloudEventIsProduced()
+        {
+            var buildingWasPlannedV2 = _fixture.Create<BuildingWasPlannedV2>();
+            var buildingUnitWasPlannedV2 = _fixture.Create<BuildingUnitWasPlannedV2>();
+            var buildingUnitPersistentLocalId =
+                new BuildingUnitPersistentLocalId(buildingUnitWasPlannedV2.BuildingUnitPersistentLocalId);
+
+            var buildingGeometryCrsWasChanged = new BuildingGeometryCrsWasChanged(
+                new BuildingPersistentLocalId(buildingWasPlannedV2.BuildingPersistentLocalId),
+                [],
+                [buildingUnitPersistentLocalId],
+                _fixture.Create<ExtendedWkbGeometry>(),
+                _fixture.Create<ExtendedWkbGeometry>());
+            ((ISetProvenance)buildingGeometryCrsWasChanged).SetProvenance(_fixture.Create<Provenance>());
+
+            var position = 1L;
+
+            await Sut
+                .Given(CreateEnvelope(buildingWasPlannedV2, position),
+                    CreateEnvelope(buildingUnitWasPlannedV2, position + 1),
+                    CreateEnvelope(buildingGeometryCrsWasChanged, position + 2))
+                .Then(async context =>
+                {
+                    var document = await context.BuildingUnitDocuments.FindAsync((int)buildingUnitPersistentLocalId);
+                    document.Should().NotBeNull();
+                    document!.Document.ExtendedWkbGeometry.Should().Be(buildingGeometryCrsWasChanged.ExtendedWkbGeometryBuildingUnits);
+                    document.Document.GeometryMethod.Should().Be(PositieGeometrieMethode.AfgeleidVanObject);
+                    document.LastChangedOn.Should().Be(buildingGeometryCrsWasChanged.Provenance.Timestamp);
+
+                    ChangeFeedServiceMock.Verify(x => x.CreateCloudEventWithData(
+                            It.IsAny<long>(),
+                            It.IsAny<DateTimeOffset>(),
+                            It.IsAny<string>(),
+                            It.IsAny<string>(),
+                            It.IsAny<DateTimeOffset>(),
+                            It.IsAny<List<string>>(),
+                            It.Is<List<BaseRegistriesCloudEventAttribute>>(attrs =>
+                                attrs.Any(a => a.Name == BuildingUnitAttributeNames.Position)),
+                            BuildingGeometryCrsWasChanged.EventName,
+                            It.IsAny<string>()),
+                        Times.Once);
+                });
+        }
+
+        /// <summary>
+        /// A unit that was already derived is only re-expressed, so it stays silent even though it rides on
+        /// the same event as one that became derived. See ADR 0007.
+        /// </summary>
+        [Fact]
+        public async Task WhenBuildingUnitWasAlreadyDerived_ThenNoCloudEventIsProduced()
+        {
+            var buildingWasPlannedV2 = _fixture.Create<BuildingWasPlannedV2>();
+            var buildingUnitWasPlannedV2 = _fixture.Create<BuildingUnitWasPlannedV2>();
+            var buildingUnitPersistentLocalId =
+                new BuildingUnitPersistentLocalId(buildingUnitWasPlannedV2.BuildingUnitPersistentLocalId);
+
+            var buildingGeometryCrsWasChanged = new BuildingGeometryCrsWasChanged(
+                new BuildingPersistentLocalId(buildingWasPlannedV2.BuildingPersistentLocalId),
+                [buildingUnitPersistentLocalId],
+                [],
+                _fixture.Create<ExtendedWkbGeometry>(),
+                _fixture.Create<ExtendedWkbGeometry>());
+            ((ISetProvenance)buildingGeometryCrsWasChanged).SetProvenance(_fixture.Create<Provenance>());
+
+            var position = 1L;
+
+            await Sut
+                .Given(CreateEnvelope(buildingWasPlannedV2, position),
+                    CreateEnvelope(buildingUnitWasPlannedV2, position + 1),
+                    CreateEnvelope(buildingGeometryCrsWasChanged, position + 2))
+                .Then(async context =>
+                {
+                    var document = await context.BuildingUnitDocuments.FindAsync((int)buildingUnitPersistentLocalId);
+                    document.Should().NotBeNull();
+                    document!.Document.ExtendedWkbGeometry.Should().Be(buildingGeometryCrsWasChanged.ExtendedWkbGeometryBuildingUnits);
+                    document.LastChangedOn.Should().Be(buildingUnitWasPlannedV2.Provenance.Timestamp);
+
+                    ChangeFeedServiceMock.Verify(x => x.CreateCloudEventWithData(
+                            It.IsAny<long>(),
+                            It.IsAny<DateTimeOffset>(),
+                            It.IsAny<string>(),
+                            It.IsAny<string>(),
+                            It.IsAny<DateTimeOffset>(),
+                            It.IsAny<List<string>>(),
+                            It.IsAny<List<BaseRegistriesCloudEventAttribute>>(),
+                            BuildingGeometryCrsWasChanged.EventName,
+                            It.IsAny<string>()),
+                        Times.Never);
+                });
+        }
+
+        /// <summary>
+        /// A removed unit is not in the feed, so nothing is published about it - its document is still kept
+        /// current. The aggregate does not re-derive removed units, so this covers the projection's guard
+        /// rather than a case the domain produces. See ADR 0007.
+        /// </summary>
+        [Fact]
+        public async Task WhenRemovedBuildingUnitBecameDerived_ThenNoCloudEventIsProduced()
+        {
+            var buildingWasPlannedV2 = _fixture.Create<BuildingWasPlannedV2>();
+            var buildingUnitWasPlannedV2 = _fixture.Create<BuildingUnitWasPlannedV2>();
+            var buildingUnitPersistentLocalId =
+                new BuildingUnitPersistentLocalId(buildingUnitWasPlannedV2.BuildingUnitPersistentLocalId);
+
+            var buildingUnitWasRemoved = new BuildingUnitWasRemovedV2(
+                new BuildingPersistentLocalId(buildingWasPlannedV2.BuildingPersistentLocalId),
+                buildingUnitPersistentLocalId);
+            ((ISetProvenance)buildingUnitWasRemoved).SetProvenance(_fixture.Create<Provenance>());
+
+            var buildingGeometryCrsWasChanged = new BuildingGeometryCrsWasChanged(
+                new BuildingPersistentLocalId(buildingWasPlannedV2.BuildingPersistentLocalId),
+                [],
+                [buildingUnitPersistentLocalId],
+                _fixture.Create<ExtendedWkbGeometry>(),
+                _fixture.Create<ExtendedWkbGeometry>());
+            ((ISetProvenance)buildingGeometryCrsWasChanged).SetProvenance(_fixture.Create<Provenance>());
+
+            var position = 1L;
+
+            await Sut
+                .Given(CreateEnvelope(buildingWasPlannedV2, position),
+                    CreateEnvelope(buildingUnitWasPlannedV2, position + 1),
+                    CreateEnvelope(buildingUnitWasRemoved, position + 2),
+                    CreateEnvelope(buildingGeometryCrsWasChanged, position + 3))
+                .Then(async context =>
+                {
+                    var document = await context.BuildingUnitDocuments.FindAsync((int)buildingUnitPersistentLocalId);
+                    document.Should().NotBeNull();
+                    document!.IsRemoved.Should().BeTrue();
+
+                    // Still brought to the reference system the event store holds.
+                    document.Document.ExtendedWkbGeometry.Should().Be(buildingGeometryCrsWasChanged.ExtendedWkbGeometryBuildingUnits);
+
+                    ChangeFeedServiceMock.Verify(x => x.CreateCloudEventWithData(
+                            It.IsAny<long>(),
+                            It.IsAny<DateTimeOffset>(),
+                            It.IsAny<string>(),
+                            It.IsAny<string>(),
+                            It.IsAny<DateTimeOffset>(),
+                            It.IsAny<List<string>>(),
+                            It.IsAny<List<BaseRegistriesCloudEventAttribute>>(),
+                            BuildingGeometryCrsWasChanged.EventName,
+                            It.IsAny<string>()),
+                        Times.Never);
+                });
+        }
+
         private Envelope<T> CreateEnvelope<T>(T @event, long position) where T : IMessage
         {
             var metadata = new Dictionary<string, object>

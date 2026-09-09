@@ -160,22 +160,10 @@ namespace BuildingRegistry.Projections.Extract.BuildingExtract
                 UpdateVersie(item, message.Message.Provenance.Timestamp);
             });
 
-            When<Envelope<BuildingGeometryCrsWasChanged>>(async (context, message, ct) =>
-            {
-                // Unlike every other geometry event this one reaches removed buildings, which have no
-                // extract record - BuildingWasRemovedV2 deletes it. Nothing to reproject. See ADR 0007.
-                var item = await context.BuildingExtractV2Esri.FindAsync(message.Message.BuildingPersistentLocalId,
-                    cancellationToken: ct);
-
-                if (item is null)
-                {
-                    return;
-                }
-
-                // The version is deliberately left as it was: the reprojection does not change the building.
-                var geometry = wkbReader.Read(message.Message.ExtendedWkbGeometryBuilding.ToByteArray()) as Polygon;
-                UpdateGeometry(geometry, item);
-            });
+            // The extract stays in Lambert 72, so a re-expression of the same outline changes nothing it
+            // holds: the shapefile already has the geometry this event is a different spelling of.
+            // See ADR 0007.
+            When<Envelope<BuildingGeometryCrsWasChanged>>(DoNothing);
 
             When<Envelope<BuildingBecameUnderConstructionV2>>(async (context, message, ct) =>
             {

@@ -271,7 +271,9 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo
                             throwStaleWhenGone: false,
                             // The projections deliberately leave the version timestamp as it was - a
                             // reprojection does not change the building - so the snapshot this waits for
-                            // never carries the event's timestamp. Only the hash moves. See ADR 0007.
+                            // does not carry the event's timestamp; only the hash moves. Matching on the
+                            // hash alone also covers the one case where the timestamp does move, the units
+                            // that became derived. See ADR 0007.
                             matchOnHashOnly: true,
                             ct),
                     message.Position,

@@ -121,8 +121,10 @@ namespace BuildingRegistry.Projections.Wms.BuildingUnitV2
 
             When<Envelope<BuildingGeometryCrsWasChanged>>(async (context, message, ct) =>
             {
+                var becameDerived = message.Message.BuildingUnitPersistentLocalIdsWhichBecameDerived.ToHashSet();
+
                 foreach (var buildingUnitPersistentLocalId in
-                         message.Message.BuildingUnitPersistentLocalIds.Concat(message.Message.BuildingUnitPersistentLocalIdsWhichBecameDerived))
+                         message.Message.BuildingUnitPersistentLocalIds.Concat(becameDerived))
                 {
                     // Unlike every other position event this one reaches removed units, whose row this
                     // projection deletes. Nothing to reproject. See ADR 0007.
@@ -133,11 +135,18 @@ namespace BuildingRegistry.Projections.Wms.BuildingUnitV2
                         continue;
                     }
 
-                    // The version is deliberately left as it was: the reprojection does not change the unit.
                     SetPosition(
                         unit,
                         message.Message.ExtendedWkbGeometryBuildingUnits!,
                         MapGeometryMethod(BuildingUnitPositionGeometryMethod.DerivedFromObject));
+
+                // A unit that was already derived holds the position this event re-expresses, so it gets
+                // no version. One that became derived changed both its method and its position, which is a
+                // change like any other. See ADR 0007.
+                    if (becameDerived.Contains(buildingUnitPersistentLocalId))
+                    {
+                        SetVersion(unit, message.Message.Provenance.Timestamp);
+                    }
                 }
             });
 

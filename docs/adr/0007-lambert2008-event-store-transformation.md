@@ -203,7 +203,7 @@ building, and reporting it as one would wake every consumer for every building i
 Two consequences follow from that:
 
 - The **Oslo snapshot producers** pass `matchOnHashOnly: true` to `FindMatchingSnapshot`. The snapshot
-  they wait for never carries the event's timestamp, precisely because the projections do not write
+  they wait for does not carry the event's timestamp, precisely because the projections do not write
   it, so only the hash can be matched on. This is what the GrAr 26.1.0 bump is for.
 - The **detail projections** do update their hash. It tracks the aggregate's `LastEventHash`, and the
   aggregate did append an event.
@@ -211,10 +211,69 @@ Two consequences follow from that:
 The **syndication feed** does publish an entry, since both events are tagged `EventTag.For.Sync`, but
 it carries over the previous `LastChangedOn` rather than the event's timestamp.
 
-Handlers also have to cope with rows that are not there. The CRS events reach removed buildings and
-removed units, unlike every other geometry event, and several projections delete those rows —
-`Projections.Wms`, `Projections.Wfs` and `Projections.Extract` outright, and the syndication item drops
-removed units from its unit collection. Those handlers guard rather than assume.
+#### The one exception: a unit that became derived
+
+A unit in `BuildingUnitPersistentLocalIdsWhichBecameDerived` is not being re-expressed. Its geometry
+method changed from `AppointedByAdministrator` to `DerivedFromObject` and its position moved to the
+building's centre — a change in either reference system, and one a consumer has to be told about. Those
+units therefore get a version like any other change, and the building unit feed produces a cloud event
+for them carrying the position and geometry method attributes.
+
+Every handler that walks `BuildingUnitPersistentLocalIds.Concat(...WhichBecameDerived)` splits on that
+set for this reason: same position write for both, version and method only for the ones that became
+derived. It stays rare — the aggregate only reclassifies a unit the centimetre rounding pushed outside
+its building — so this does not undo the point of the previous section.
+
+#### Nothing is published about a removed building or unit
+
+The CRS events reach removed buildings and removed units, unlike every other geometry event, and that
+cuts two ways.
+
+Handlers have to cope with rows that are not there: `Projections.Wms`, `Projections.Wfs` and
+`Projections.Extract` delete those rows outright, and the syndication item drops removed units from its
+unit collection. Those handlers guard rather than assume.
+
+And where a row does survive, it must not be published. A removed building or unit is not in the feed
+and not in the syndication feed, and the conversion is not a reason to put it back:
+
+- **Syndication** creates no entry at all for a removed building. The item carries no removed flag, so
+  the guard reads the latest entry's `ChangeType` — reliable here because a building removal has no
+  correction event, so nothing un-removes a building, and every other event that could follow one is
+  guarded against removed buildings in the aggregate. Removed *units* need no guard: the item has
+  already dropped them.
+- **The feed** keeps the document current — it is the register's own copy, and leaving it in Lambert 72
+  would be a lie — but emits no cloud event for a removed unit.
+- **The aggregate does not re-derive a removed unit.** Becoming derived is a real change and gets
+  published as one, so it is not something to do to an object nothing is published about. A removed
+  unit pushed outside its building by the rounding keeps its own position, re-expressed. That makes the
+  feed's guard defensive rather than load-bearing, which is where the rule belongs: in the domain, not
+  repeated across a dozen projections.
+
+### The extract stays in Lambert 72
+
+`Projections.Extract` feeds the published shapefiles, which are Lambert 72 and stay that way. It is
+therefore the one place where the right response to a re-expression of a geometry it already holds is
+to do nothing: the extract's copy is correct before and after.
+
+`BuildingGeometryCrsWasChanged` and `BuildingUnitPositionCrsWasChanged` are handled with `DoNothing`
+for that reason — with one exception, the same one as above. A unit that became derived did move, in
+Lambert 72 as much as in Lambert 2008, so the building unit extract writes it, bringing the payload
+back to Lambert 72 first, and gives it a version.
+
+### GRB is told about a building in the system GRB works in
+
+`AnoApiProxy` sends a realized outlined building to GRB's ANO API as GeoJSON, which carries no SRID at
+all — so what GRB receives is decided entirely by the coordinates written into it, with nothing
+downstream to catch a mismatch on this side.
+
+This register is expected to convert to Lambert 2008 before GRB does, so the geometry is brought to
+`UseLambert2008GrbToggle.GrbSrid` on the way out rather than sent as persisted. Off, and therefore
+Lambert 72, is both the default and the current state.
+
+That is a third toggle rather than a reading of one of the other two, because all three move
+independently: `UseLambert2008EventStore` says what this register persists,
+`Lambert2008ConversionCompleted` says what spatial matching compares in once the registers this one
+compares against have converted, and this one says what GRB expects.
 
 ### The write side: one toggle, normalized on the way in
 

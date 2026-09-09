@@ -386,6 +386,47 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenTransformingToLambert2008
         }
 
         /// <summary>
+        /// Becoming derived is a real change - a new method, a new position - and the projections publish it
+        /// as one. A removed unit is published nowhere, so it is never re-derived: it keeps its own position,
+        /// re-expressed, and the conversion says nothing about it. See ADR 0007.
+        /// </summary>
+        [Fact]
+        public void WithRemovedPositionPushedOutsideByTheTransformation_ThenItDoesNotBecomeDerived()
+        {
+            var lambert72 = Lambert72Polygon();
+            var buildingUnitPersistentLocalId = Fixture.Create<BuildingUnitPersistentLocalId>();
+            var justInside = ExtendedWkbGeometry.Create(GeometryHelper.PointInPolygonPushedOutsideByLambert2008Rounding);
+
+            var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
+                .WithBuildingGeometry(new BuildingGeometry(lambert72, BuildingGeometryMethod.Outlined))
+                .WithBuildingUnit(
+                    BuildingUnitStatus.Realized,
+                    buildingUnitPersistentLocalId,
+                    positionGeometryMethod: LegacyBuildingUnitPositionGeometryMethod.AppointedByAdministrator,
+                    extendedWkbGeometry: Legacy(justInside),
+                    isRemoved: true)
+                .Build();
+
+            var building = new BuildingFactory(NoSnapshotStrategy.Instance).Create();
+            building.Initialize([buildingWasMigrated]);
+
+            building.TransformToLambert2008();
+
+            // The same position that a non-removed unit is re-derived for - see the test above.
+            building.GetChanges().OfType<BuildingGeometryCrsWasChanged>().Single()
+                .BuildingUnitPersistentLocalIdsWhichBecameDerived.Should().BeEmpty();
+
+            building.GetChanges().OfType<BuildingUnitPositionCrsWasChanged>()
+                .Should().ContainSingle(x => x.BuildingUnitPersistentLocalId == buildingUnitPersistentLocalId);
+
+            var buildingUnit = building.BuildingUnits.Single();
+            buildingUnit.BuildingUnitPosition.GeometryMethod
+                .Should().Be(BuildingUnitPositionGeometryMethod.AppointedByAdministrator);
+            buildingUnit.BuildingUnitPosition.Geometry
+                .Should().Be(ToLambert2008(justInside, GeometryReferenceSystem.PositionRoundingPrecision));
+        }
+
+        /// <summary>
         /// A position that was already outside its building before the transformation is not something this
         /// caused, so it is left classified as it is. See ADR 0007.
         /// </summary>

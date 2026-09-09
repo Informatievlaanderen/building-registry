@@ -390,7 +390,13 @@ namespace BuildingRegistry.Building
                 // one - is re-derived rather than left outside, exactly as a geometry change does. A position
                 // that was already outside beforehand is left classified as it is: that is not something this
                 // transformation caused, and correcting it here would be an edit.
-                if (BuildingGeometry.Contains(buildingUnit.BuildingUnitPosition.Geometry)
+                //
+                // A removed unit is never re-derived. Becoming derived is a real change - a new method, a new
+                // position - and the projections publish it as one, but a removed unit is published nowhere:
+                // the syndication item has dropped it and the extract row is gone. It keeps its own position,
+                // re-expressed, so the event store converts without anything being said about it.
+                if (!buildingUnit.IsRemoved
+                    && BuildingGeometry.Contains(buildingUnit.BuildingUnitPosition.Geometry)
                     && !newBuildingGeometry.Contains(newPosition))
                 {
                     buildingUnitsWhichBecameDerived.Add(buildingUnit.BuildingUnitPersistentLocalId);

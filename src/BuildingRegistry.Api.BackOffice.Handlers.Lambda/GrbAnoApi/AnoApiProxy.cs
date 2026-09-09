@@ -1,4 +1,4 @@
-﻿namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.GrbAnoApi
+namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.GrbAnoApi
 {
     using System.Net.Http.Headers;
     using System.Net.Http.Json;
@@ -25,13 +25,16 @@
     {
         private readonly HttpClient _httpClient;
         private readonly AnoApiOptions _options;
+        private readonly UseLambert2008GrbToggle _useLambert2008Grb;
 
         public AnoApiProxy(
             HttpClient httpClient,
-            IOptions<AnoApiOptions> options)
+            IOptions<AnoApiOptions> options,
+            UseLambert2008GrbToggle useLambert2008Grb)
         {
             _httpClient = httpClient;
             _options = options.Value;
+            _useLambert2008Grb = useLambert2008Grb;
         }
 
         public async Task CreateAnomaly(
@@ -48,7 +51,8 @@
                 buildingPersistentLocalId,
                 organisation,
                 dateTimeStatusChange,
-                geometry);
+                geometry,
+                _useLambert2008Grb.GrbSrid);
 
             var response = await _httpClient.PostAsJsonAsync(
                 new Uri(_options.BaseUrl + "/api/processing/anomalies"),
@@ -92,9 +96,10 @@
             int buildingPersistentLocalId,
             string organisation,
             DateTimeOffset dateTimeStatusChange,
-            ExtendedWkbGeometry geometry)
+            ExtendedWkbGeometry geometry,
+            int grbSrid)
         {
-            Features = new[] { new Feature(buildingPersistentLocalId, organisation, dateTimeStatusChange, geometry) };
+            Features = new[] { new Feature(buildingPersistentLocalId, organisation, dateTimeStatusChange, geometry, grbSrid) };
         }
     }
 
@@ -106,10 +111,20 @@
 
         [JsonPropertyName("properties")] public Properties Properties { get; }
 
-        public Feature(int buildingPersistentLocalId, string organisation, DateTimeOffset dateTimeStatusChange, ExtendedWkbGeometry geometry)
+        public Feature(
+            int buildingPersistentLocalId,
+            string organisation,
+            DateTimeOffset dateTimeStatusChange,
+            ExtendedWkbGeometry geometry,
+            int grbSrid)
         {
             var extendedWkb = geometry.ToByteArray();
-            Geometry = MapToGeoJsonPolygon((Polygon)WKBReaderFactory.CreateForEwkb(extendedWkb).Read(extendedWkb));
+            var polygon = WKBReaderFactory.CreateForEwkb(extendedWkb).Read(extendedWkb);
+
+            // GeoJSON coordinates carry no SRID, so what GRB receives is decided entirely here. Brought to
+            // the system GRB works in rather than sent as persisted: this register is expected to convert to
+            // Lambert 2008 first. See ADR 0007.
+            Geometry = MapToGeoJsonPolygon((Polygon)polygon.ToReferenceSystem(grbSrid));
             Properties = new Properties(buildingPersistentLocalId, organisation, dateTimeStatusChange);
         }
 
