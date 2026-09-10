@@ -4,6 +4,7 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndicationWithCount
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Linq;
+    using System.Threading;
     using System.Threading.Tasks;
     using Be.Vlaanderen.Basisregisters.EventHandling;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.Connector;
@@ -966,6 +967,62 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndicationWithCount
                 }, ct);
             });
 
+            // The event is published in the feed, carrying the geometry the event store now holds, but the
+            // transformation is not a change to the building: LastChangedOn and the unit versions keep the
+            // values the building's last real change gave them. See ADR 0007.
+            When<Envelope<BuildingGeometryCrsWasChanged>>(async (context, message, ct) =>
+            {
+                // A removed building is not published, so it gets no entry at all - unlike every other
+                // geometry event, this one reaches it.
+                if (await IsRemovedInFeed(context, message.Message.BuildingPersistentLocalId, ct))
+                {
+                    return;
+                }
+
+                await context.CreateNewBuildingSyndicationItem(
+                    message.Message.BuildingPersistentLocalId,
+                    message,
+                    (previous, item) =>
+                    {
+                        // CloneAndApplyEventInfo sets LastChangedOn to the event's timestamp; this puts it back.
+                        item.LastChangedOn = previous.LastChangedOn;
+                        item.Geometry = message.Message.ExtendedWkbGeometryBuilding.ToByteArray();
+
+                        if (string.IsNullOrWhiteSpace(message.Message.ExtendedWkbGeometryBuildingUnits))
+                        {
+                            return;
+                        }
+
+                        var buildingUnitPointPosition = message.Message.ExtendedWkbGeometryBuildingUnits!.ToByteArray();
+                        var becameDerived = message.Message.BuildingUnitPersistentLocalIdsWhichBecameDerived.ToHashSet();
+
+                        foreach (var buildingUnitId in
+                                 message.Message.BuildingUnitPersistentLocalIds.Concat(becameDerived))
+                        {
+                            // Unlike every other position event this one reaches removed units, which this
+                            // projection drops from the item. Nothing to reproject.
+                            var buildingUnit = item.BuildingUnitsV2.SingleOrDefault(x => x.PersistentLocalId == buildingUnitId);
+
+                            if (buildingUnit is null)
+                            {
+                                continue;
+                            }
+
+                            buildingUnit.PointPosition = buildingUnitPointPosition;
+                            buildingUnit.PositionMethod = BuildingRegistry.Building.BuildingUnitPositionGeometryMethod.DerivedFromObject;
+
+                            // A unit that was already derived holds the position this event re-expresses,
+                            // so it gets no version. One that became derived changed both its method and its
+                            // position, which is a change like any other. See ADR 0007.
+                            if (becameDerived.Contains(buildingUnitId))
+                            {
+                                buildingUnit.Version = message.Message.Provenance.Timestamp;
+                            }
+                        }
+                    },
+                    ct);
+            });
+
             When<Envelope<BuildingBecameUnderConstructionV2>>(async (context, message, ct) =>
             {
                 await context.CreateNewBuildingSyndicationItem(message.Message.BuildingPersistentLocalId, message,
@@ -1303,6 +1360,36 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndicationWithCount
                 }, ct);
             });
 
+            // As with BuildingGeometryCrsWasChanged: published, but not reported as a change.
+            When<Envelope<BuildingUnitPositionCrsWasChanged>>(async (context, message, ct) =>
+            {
+                if (await IsRemovedInFeed(context, message.Message.BuildingPersistentLocalId, ct))
+                {
+                    return;
+                }
+
+                await context.CreateNewBuildingSyndicationItem(
+                    message.Message.BuildingPersistentLocalId,
+                    message,
+                    (previous, item) =>
+                    {
+                        item.LastChangedOn = previous.LastChangedOn;
+
+                        // Unlike every other position event this one reaches removed units, which this
+                        // projection drops from the item. Nothing to reproject.
+                        var unit = item.BuildingUnitsV2.SingleOrDefault(y => y.PersistentLocalId == message.Message.BuildingUnitPersistentLocalId);
+
+                        if (unit is null)
+                        {
+                            return;
+                        }
+
+                        unit.PointPosition = message.Message.ExtendedWkbGeometry.ToByteArray();
+                        unit.PositionMethod = BuildingRegistry.Building.BuildingUnitPositionGeometryMethod.Parse(message.Message.GeometryMethod);
+                    },
+                    ct);
+            });
+
             When<Envelope<BuildingUnitAddressWasAttachedV2>>(async (context, message, ct) =>
             {
                 await context.CreateNewBuildingSyndicationItem(message.Message.BuildingPersistentLocalId, message, item =>
@@ -1592,6 +1679,30 @@ namespace BuildingRegistry.Projections.Legacy.BuildingSyndicationWithCount
 
                 ApplyUnitVersion(buildingUnitDetailItem, version);
             }
+        }
+
+        /// <summary>
+        /// Whether the building's latest entry in the feed says it was removed.
+        /// </summary>
+        /// <remarks>
+        /// The item carries no removed flag, so the entry's own <see cref="BuildingSyndicationItem.ChangeType"/>
+        /// is the signal the table has - and it is a reliable one: a building removal has no correction
+        /// event, so nothing un-removes a building, and every other event that could follow one is guarded
+        /// against removed buildings in the aggregate. The Lambert 2008 transformation is the single
+        /// exception, and it is what this guards, so it cannot mask a removal either.
+        ///
+        /// Deriving it beats adding a column: a new flag would read false for every building removed before
+        /// it was introduced, which is exactly the set this has to recognise, and the feed is far too large
+        /// to rebuild for it. See ADR 0007.
+        /// </remarks>
+        private static async Task<bool> IsRemovedInFeed(
+            LegacyContext context,
+            int buildingPersistentLocalId,
+            CancellationToken ct)
+        {
+            var latest = await context.LatestPosition(buildingPersistentLocalId, ct);
+
+            return latest?.ChangeType is nameof(BuildingWasRemoved) or nameof(BuildingWasRemovedV2);
         }
 
         private static Task DoNothing<T>(LegacyContext _, Envelope<T> __) where T : IMessage => Task.CompletedTask;

@@ -167,6 +167,7 @@
             When<Envelope<BuildingWasMeasured>>(DoNothing);
             When<Envelope<BuildingMeasurementWasCorrected>>(DoNothing);
             When<Envelope<BuildingMeasurementWasChanged>>(DoNothing);
+            When<Envelope<BuildingGeometryCrsWasChanged>>(DoNothing);
             When<Envelope<BuildingWasPlannedV2>>(DoNothing);
             When<Envelope<BuildingBecameUnderConstructionV2>>(DoNothing);
             When<Envelope<BuildingWasRealizedV2>>(DoNothing);
@@ -198,6 +199,7 @@
             When<Envelope<BuildingUnitDeregulationWasCorrected>>(DoNothing);
             When<Envelope<CommonBuildingUnitWasAddedV2>>(DoNothing);
             When<Envelope<BuildingUnitPositionWasCorrected>>(DoNothing);
+            When<Envelope<BuildingUnitPositionCrsWasChanged>>(DoNothing);
             When<Envelope<BuildingUnitWasRetiredBecauseBuildingWasDemolished>>(DoNothing);
             When<Envelope<BuildingUnitWasNotRealizedBecauseBuildingWasDemolished>>(DoNothing);
             When<Envelope<BuildingUnitWasMovedIntoBuilding>>(DoNothing);

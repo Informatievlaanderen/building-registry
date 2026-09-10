@@ -421,6 +421,26 @@ namespace BuildingRegistry.Projections.Integration.Building.VersionFromMigration
                     ct);
             });
 
+            // See BuildingGeometryCrsWasChanged: a new version row, but the geometry method and the unit's
+            // version timestamp are untouched.
+            When<Envelope<BuildingUnitPositionCrsWasChanged>>(async (context, message, ct) =>
+            {
+                var geometryAsBinary = message.Message.ExtendedWkbGeometry.ToByteArray();
+                var sysGeometry = wkbReader.Read(geometryAsBinary);
+
+                await context.CreateNewBuildingVersion(
+                    message.Message.BuildingPersistentLocalId,
+                    message,
+                    building =>
+                    {
+                        var buildingUnit = building.BuildingUnits.Single(x =>
+                            x.BuildingUnitPersistentLocalId == message.Message.BuildingUnitPersistentLocalId);
+
+                        buildingUnit.Geometry = sysGeometry;
+                    },
+                    ct);
+            });
+
             When<Envelope<BuildingUnitAddressWasAttachedV2>>(async (context, message, ct) =>
             {
                 await context.CreateNewBuildingVersion(

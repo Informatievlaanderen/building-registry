@@ -13,7 +13,7 @@ namespace BuildingRegistry.Building
             ExtendedWkbGeometry extendedWkbGeometry,
             BuildingGrbData buildingGrbData)
         {
-            var geometry = WKBReaderFactory.Create().Read(extendedWkbGeometry);
+            var geometry = ReadGeometry(extendedWkbGeometry);
 
             GuardPolygon(geometry);
 
@@ -62,7 +62,7 @@ namespace BuildingRegistry.Building
 
             GuardValidStatusses(BuildingStatus.Planned, BuildingStatus.UnderConstruction, BuildingStatus.Realized, BuildingStatus.NotRealized);
 
-            var geometry = WKBReaderFactory.Create().Read(extendedWkbGeometry);
+            var geometry = ReadGeometry(extendedWkbGeometry);
 
             GuardPolygon(geometry);
 
@@ -123,7 +123,7 @@ namespace BuildingRegistry.Building
                 throw new BuildingHasInvalidGeometryMethodException();
             }
 
-            GuardPolygon(WKBReaderFactory.Create().Read(extendedWkbGeometry));
+            GuardPolygon(ReadGeometry(extendedWkbGeometry));
 
             if (BuildingGeometry.Geometry == extendedWkbGeometry)
             {
@@ -172,7 +172,7 @@ namespace BuildingRegistry.Building
                 throw new BuildingHasInvalidGeometryMethodException();
             }
 
-            GuardPolygon(WKBReaderFactory.Create().Read(extendedWkbGeometry));
+            GuardPolygon(ReadGeometry(extendedWkbGeometry));
 
             if (BuildingGeometry.Geometry == extendedWkbGeometry)
             {

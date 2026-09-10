@@ -111,6 +111,32 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetailV2WithCount
                 }
             });
 
+            When<Envelope<BuildingGeometryCrsWasChanged>>(async (context, message, ct) =>
+            {
+                var becameDerived = message.Message.BuildingUnitPersistentLocalIdsWhichBecameDerived.ToHashSet();
+
+                foreach (var buildingUnitPersistentLocalId in
+                         message.Message.BuildingUnitPersistentLocalIds.Concat(becameDerived))
+                {
+                    await Update(context, buildingUnitPersistentLocalId, item =>
+                    {
+                        item.Position = message.Message.ExtendedWkbGeometryBuildingUnits!.ToByteArray();
+                        item.PositionMethod = BuildingUnitPositionGeometryMethod.DerivedFromObject;
+
+                // A unit that was already derived holds the position this event re-expresses, so it gets
+                // no version. One that became derived changed both its method and its position, which is a
+                // change like any other. See ADR 0007.
+                        // The hash follows the aggregate either way, which appended an event.
+                        if (becameDerived.Contains(buildingUnitPersistentLocalId))
+                        {
+                            item.Version = message.Message.Provenance.Timestamp;
+                        }
+
+                        UpdateHash(item, message);
+                    }, ct);
+                }
+            });
+
             When<Envelope<BuildingWasPlannedV2>>(DoNothing);
             When<Envelope<BuildingBecameUnderConstructionV2>>(DoNothing);
             When<Envelope<BuildingWasRealizedV2>>(DoNothing);
@@ -338,6 +364,19 @@ namespace BuildingRegistry.Projections.Legacy.BuildingUnitDetailV2WithCount
                     item.Position = message.Message.ExtendedWkbGeometry.ToByteArray();
                     item.PositionMethod = BuildingUnitPositionGeometryMethod.Parse(message.Message.GeometryMethod);
                     item.Version = message.Message.Provenance.Timestamp;
+                    UpdateHash(item, message);
+                }, ct);
+            });
+
+            When<Envelope<BuildingUnitPositionCrsWasChanged>>(async (context, message, ct) =>
+            {
+                await Update(context, message.Message.BuildingUnitPersistentLocalId, item =>
+                {
+                    item.Position = message.Message.ExtendedWkbGeometry.ToByteArray();
+                    item.PositionMethod = BuildingUnitPositionGeometryMethod.Parse(message.Message.GeometryMethod);
+
+                    // The version is deliberately left as it was: the reprojection does not change the
+                    // unit. The hash does follow the aggregate, which appended an event. See ADR 0007.
                     UpdateHash(item, message);
                 }, ct);
             });

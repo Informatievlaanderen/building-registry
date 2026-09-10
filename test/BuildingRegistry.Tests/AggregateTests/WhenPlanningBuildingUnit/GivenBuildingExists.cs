@@ -58,7 +58,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuildingUnit
 
         [Theory]
         [InlineData(null)]
-        [InlineData("<gml:Point srsName=\"https://www.opengis.net/def/crs/EPSG/0/3137\" xmlns:gml=\"http://www.opengis.net/gml/3.2\">" +
+        [InlineData("<gml:Point srsName=\"https://www.opengis.net/def/crs/EPSG/0/31370\" xmlns:gml=\"http://www.opengis.net/gml/3.2\">" +
                     "<gml:pos>140285.15277253836 186725.74131567031</gml:pos></gml:Point>")]
         public void WithNotAppointedByAdministrator_ThenPositionIsCenter(string position)
         {
@@ -93,7 +93,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuildingUnit
 
             var command = Fixture.Create<PlanBuildingUnit>()
                 .WithPositionGeometryMethod(BuildingUnitPositionGeometryMethod.AppointedByAdministrator)
-                .WithPointPosition("<gml:Point srsName=\"https://www.opengis.net/def/crs/EPSG/0/3137\" xmlns:gml=\"http://www.opengis.net/gml/3.2\">" +
+                .WithPointPosition("<gml:Point srsName=\"https://www.opengis.net/def/crs/EPSG/0/31370\" xmlns:gml=\"http://www.opengis.net/gml/3.2\">" +
                                    $"<gml:pos>{correctPointCoordinateX} {correctPointCoordinateY}</gml:pos></gml:Point>")
                 .WithDeviation(false);
 
@@ -132,7 +132,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuildingUnit
 
             var command = Fixture.Create<PlanBuildingUnit>()
                 .WithPositionGeometryMethod(BuildingUnitPositionGeometryMethod.AppointedByAdministrator)
-                .WithPointPosition("<gml:Point srsName=\"https://www.opengis.net/def/crs/EPSG/0/3137\" xmlns:gml=\"http://www.opengis.net/gml/3.2\">" +
+                .WithPointPosition("<gml:Point srsName=\"https://www.opengis.net/def/crs/EPSG/0/31370\" xmlns:gml=\"http://www.opengis.net/gml/3.2\">" +
                                    $"<gml:pos>{wrongPointCoordinateX} {wrongPointCoordinateY}</gml:pos></gml:Point>");
 
             var buildingGeometry = "" +
@@ -171,7 +171,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuildingUnit
             var correctPointCoordinateY = "186725.74131567031";
 
             var pointCoordinateInsideBuildingGeometry =
-                "<gml:Point srsName=\"https://www.opengis.net/def/crs/EPSG/0/3137\" xmlns:gml=\"http://www.opengis.net/gml/3.2\">" +
+                "<gml:Point srsName=\"https://www.opengis.net/def/crs/EPSG/0/31370\" xmlns:gml=\"http://www.opengis.net/gml/3.2\">" +
                 $"<gml:pos>{correctPointCoordinateX} {correctPointCoordinateY}</gml:pos></gml:Point>";
 
             var buildingUnitPersistentLocalId = new BuildingUnitPersistentLocalId(456);

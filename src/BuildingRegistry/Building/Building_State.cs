@@ -1,4 +1,4 @@
-namespace BuildingRegistry.Building
+﻿namespace BuildingRegistry.Building
 {
     using System;
     using System.Collections.Generic;
@@ -70,6 +70,7 @@ namespace BuildingRegistry.Building
             Register<BuildingUnitWasCorrectedFromRetiredToRealized>(When);
             Register<BuildingUnitRemovalWasCorrected>(When);
             Register<BuildingUnitPositionWasCorrected>(When);
+            Register<BuildingUnitPositionCrsWasChanged>(When);
             Register<BuildingUnitRegularizationWasCorrected>(When);
             Register<BuildingUnitDeregulationWasCorrected>(When);
             Register<BuildingUnitAddressWasAttachedV2>(When);
@@ -83,6 +84,7 @@ namespace BuildingRegistry.Building
             Register<BuildingUnitWasNotRealizedBecauseBuildingWasDemolished>(When);
             Register<BuildingUnitWasRetiredBecauseBuildingWasDemolished>(When);
             Register<BuildingMeasurementWasChanged>(When);
+            Register<BuildingGeometryCrsWasChanged>(When);
             Register<BuildingUnitWasMovedIntoBuilding>(When);
             Register<BuildingUnitWasMovedOutOfBuilding>(When);
 
@@ -367,6 +369,8 @@ namespace BuildingRegistry.Building
 
         private void When(BuildingUnitPositionWasCorrected @event) => RouteToBuildingUnit(@event);
 
+        private void When(BuildingUnitPositionCrsWasChanged @event) => RouteToBuildingUnit(@event);
+
         private void When(BuildingUnitRegularizationWasCorrected @event) => RouteToBuildingUnit(@event);
 
         private void When(BuildingUnitDeregulationWasCorrected @event) => RouteToBuildingUnit(@event);
@@ -410,6 +414,30 @@ namespace BuildingRegistry.Building
             BuildingGeometry = new BuildingGeometry(
                 new ExtendedWkbGeometry(@event.ExtendedWkbGeometryBuilding),
                 BuildingGeometryMethod.MeasuredByGrb);
+
+            var buildingUnitPersistentLocalIds =
+                @event.BuildingUnitPersistentLocalIds.Concat(@event.BuildingUnitPersistentLocalIdsWhichBecameDerived);
+
+            foreach (var buildingUnitPersistentLocalId in buildingUnitPersistentLocalIds)
+            {
+                var buildingUnit = BuildingUnits.Single(x => x.BuildingUnitPersistentLocalId == buildingUnitPersistentLocalId);
+
+                buildingUnit.Route(@event);
+            }
+
+            _lastEvent = @event;
+        }
+
+        /// <summary>
+        /// The counterpart of <see cref="When(BuildingMeasurementWasChanged)"/>, except that the geometry
+        /// method is carried over: the transformation re-expresses the geometry, it does not turn an
+        /// outlined building into a measured one.
+        /// </summary>
+        private void When(BuildingGeometryCrsWasChanged @event)
+        {
+            BuildingGeometry = new BuildingGeometry(
+                new ExtendedWkbGeometry(@event.ExtendedWkbGeometryBuilding),
+                BuildingGeometry.Method);
 
             var buildingUnitPersistentLocalIds =
                 @event.BuildingUnitPersistentLocalIds.Concat(@event.BuildingUnitPersistentLocalIdsWhichBecameDerived);

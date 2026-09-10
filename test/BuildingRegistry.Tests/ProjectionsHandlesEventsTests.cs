@@ -103,11 +103,13 @@ namespace BuildingRegistry.Tests
             AssertHandleEvents(projectionsToTest, [
                 typeof(BuildingBecameUnderConstructionV2),
                 typeof(BuildingGeometryWasImportedFromGrb),
+                typeof(BuildingGeometryCrsWasChanged),
                 typeof(BuildingMeasurementWasChanged),
                 typeof(BuildingMeasurementWasCorrected),
                 typeof(BuildingOutlineWasChanged),
                 typeof(BuildingUnitDeregulationWasCorrected),
                 typeof(BuildingUnitPositionWasCorrected),
+                typeof(BuildingUnitPositionCrsWasChanged),
                 typeof(BuildingUnitRegularizationWasCorrected),
                 typeof(BuildingUnitRemovalWasCorrected),
                 typeof(BuildingUnitWasCorrectedFromNotRealizedToPlanned),
@@ -196,8 +198,8 @@ namespace BuildingRegistry.Tests
 
             yield return [new List<ConnectedProjection<ExtractContext>>
             {
-                new BuildingExtractV2EsriProjections(new OptionsWrapper<ExtractConfig>(new ExtractConfig()), Encoding.UTF8, new WKBReader()),
-                new BuildingUnitExtractV2Projections(new OptionsWrapper<ExtractConfig>(new ExtractConfig()), Encoding.UTF8, new WKBReader()),
+                new BuildingExtractV2EsriProjections(new OptionsWrapper<ExtractConfig>(new ExtractConfig()), Encoding.UTF8),
+                new BuildingUnitExtractV2Projections(new OptionsWrapper<ExtractConfig>(new ExtractConfig()), Encoding.UTF8),
                 new BuildingUnitAddressLinkExtractProjections(Encoding.UTF8),
             }];
 

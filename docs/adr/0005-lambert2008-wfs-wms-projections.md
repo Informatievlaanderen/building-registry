@@ -26,6 +26,9 @@ version number apart, because building-registry's current tables are `BuildingsV
 
 Explicitly **not** in scope, and still to do: the other Oslo responses, `Projections.Legacy`,
 `Projections.Integration`, `Projections.Extract`, the producers, the consumers, and the write side.
+The consumers were closed by [ADR 0006](0006-lambert2008-consumers.md), the write side by
+[ADR 0007](0007-lambert2008-event-store-transformation.md), and the rest by
+[ADR 0008](0008-lambert2008-read-side.md).
 
 ### Why these two cannot simply follow the event store
 
@@ -98,7 +101,8 @@ All four projections dropped the `WKBReader` from their constructor. It was inje
 assumption being removed. The reader now comes from the EWKB, per geometry.
 
 `Projections.Extract` still resolves `WKBReaderFactory.Create()` in that module. It is out of scope here and
-keeps its Lambert 72 reader.
+keeps its Lambert 72 reader — which turned out to be a defect rather than a deferral, since the extract
+publishes a Lambert 72 `.prj` and nothing was making that true. See [ADR 0008](0008-lambert2008-read-side.md).
 
 ### What the migrations add
 

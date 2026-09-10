@@ -48,6 +48,15 @@ namespace BuildingRegistry.Projections.LastChangedList
                 }
             });
 
+            When<Envelope<BuildingGeometryCrsWasChanged>>(async (context, message, ct) =>
+            {
+                foreach (var buildingUnitPersistentLocalId
+                         in message.Message.BuildingUnitPersistentLocalIds.Concat(message.Message.BuildingUnitPersistentLocalIdsWhichBecameDerived))
+                {
+                    await GetLastChangedRecordsAndUpdatePosition(buildingUnitPersistentLocalId.ToString(), message.Position, context, ct);
+                }
+            });
+
             When<Envelope<BuildingMeasurementWasCorrected>>(async (context, message, ct) =>
             {
                 foreach (var buildingUnitPersistentLocalId
@@ -135,6 +144,11 @@ namespace BuildingRegistry.Projections.LastChangedList
             });
 
             When<Envelope<BuildingUnitPositionWasCorrected>>(async (context, message, ct) =>
+            {
+                await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingUnitPersistentLocalId.ToString(), message.Position, context, ct);
+            });
+
+            When<Envelope<BuildingUnitPositionCrsWasChanged>>(async (context, message, ct) =>
             {
                 await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingUnitPersistentLocalId.ToString(), message.Position, context, ct);
             });

@@ -41,7 +41,7 @@ namespace BuildingRegistry.Building
             ExtendedWkbGeometry extendedWkbGeometry,
             IBuildingGeometries buildingGeometries)
         {
-            var geometry = WKBReaderFactory.Create().Read(extendedWkbGeometry);
+            var geometry = ReadGeometry(extendedWkbGeometry);
 
             GuardOutline(geometry);
             if (buildingGeometries.GetOverlappingBuildingOutlines(buildingPersistentLocalId, extendedWkbGeometry).Any())
@@ -254,7 +254,7 @@ namespace BuildingRegistry.Building
                 return;
             }
 
-            var geometry = WKBReaderFactory.Create().Read(extendedWkbGeometry);
+            var geometry = ReadGeometry(extendedWkbGeometry);
             GuardOutline(geometry);
 
             if(buildingGeometries.GetOverlappingBuildingOutlines(BuildingPersistentLocalId, extendedWkbGeometry).Any())
@@ -330,6 +330,120 @@ namespace BuildingRegistry.Building
             }
         }
 
+        /// <summary>
+        /// Re-expresses the building geometry and every building unit position in Lambert 2008 (EPSG 3812)
+        /// for the one-off event store transformation, see ADR 0007.
+        /// </summary>
+        /// <remarks>
+        /// Deliberately unguarded: unlike <see cref="ChangeOutline"/> this is not an edit of the building
+        /// but a change of the reference system its geometry is expressed in, and it has to reach every
+        /// building the event store holds - removed, not realized and demolished ones included - or the
+        /// event store would be left holding both reference systems forever. <see cref="GuardOutline"/> is
+        /// not run either: this changes nothing about the shape it already accepted.
+        ///
+        /// A building whose geometry and positions are already Lambert 2008 applies nothing, which is what
+        /// makes re-running the transformation over a stream a no-op instead of a double transform.
+        ///
+        /// Unused common units are left alone: they only ever leave <c>BuildingWasMigrated</c>, are never
+        /// added back to <see cref="BuildingUnits"/>, and are not projected, so their positions are not read
+        /// by anything.
+        /// </remarks>
+        public void TransformToLambert2008()
+        {
+            var currentGeometry = ReadGeometry(BuildingGeometry.Geometry);
+            var geometryHasToBeTransformed = !IsLambert2008(currentGeometry);
+
+            var newBuildingGeometry = geometryHasToBeTransformed
+                ? new BuildingGeometry(
+                    // Unrounded: a building outline or GRB measurement is a boundary whose vertices carry far
+                    // more decimals than a centimetre, and rounding them would move it. See ADR 0007.
+                    ExtendedWkbGeometry.Create(currentGeometry.ToReferenceSystem(ExtendedWkbGeometry.SridLambert2008)),
+                    // Carried over: the transformation re-expresses the geometry, it does not turn an
+                    // outlined building into a measured one.
+                    BuildingGeometry.Method)
+                : BuildingGeometry;
+
+            var derivedBuildingUnits = new List<BuildingUnitPersistentLocalId>();
+            var buildingUnitsWhichBecameDerived = new List<BuildingUnitPersistentLocalId>();
+            var buildingUnitsWithOwnPosition = new List<(BuildingUnit BuildingUnit, ExtendedWkbGeometry Position)>();
+
+            foreach (var buildingUnit in _buildingUnits)
+            {
+                var currentPosition = ReadGeometry(buildingUnit.BuildingUnitPosition.Geometry);
+
+                if (IsLambert2008(currentPosition))
+                {
+                    continue;
+                }
+
+                if (buildingUnit.BuildingUnitPosition.GeometryMethod == BuildingUnitPositionGeometryMethod.DerivedFromObject)
+                {
+                    derivedBuildingUnits.Add(buildingUnit.BuildingUnitPersistentLocalId);
+                    continue;
+                }
+
+                var newPosition = ExtendedWkbGeometry.Create(currentPosition.ToReferenceSystem(
+                    ExtendedWkbGeometry.SridLambert2008,
+                    GeometryReferenceSystem.PositionRoundingPrecision));
+
+                // A position the transformation pushed out of its building - a rounding artifact, and a rare
+                // one - is re-derived rather than left outside, exactly as a geometry change does. A position
+                // that was already outside beforehand is left classified as it is: that is not something this
+                // transformation caused, and correcting it here would be an edit.
+                //
+                // A removed unit is never re-derived. Becoming derived is a real change - a new method, a new
+                // position - and the projections publish it as one, but a removed unit is published nowhere:
+                // the syndication item has dropped it and the extract row is gone. It keeps its own position,
+                // re-expressed, so the event store converts without anything being said about it.
+                if (!buildingUnit.IsRemoved
+                    && BuildingGeometry.Contains(buildingUnit.BuildingUnitPosition.Geometry)
+                    && !newBuildingGeometry.Contains(newPosition))
+                {
+                    buildingUnitsWhichBecameDerived.Add(buildingUnit.BuildingUnitPersistentLocalId);
+                    continue;
+                }
+
+                buildingUnitsWithOwnPosition.Add((buildingUnit, newPosition));
+            }
+
+            var hasDerivedBuildingUnits = derivedBuildingUnits.Count != 0 || buildingUnitsWhichBecameDerived.Count != 0;
+
+            // Also when the geometry itself is already Lambert 2008: a derived unit takes its position from
+            // this event, so leaving it out would strand any that is still Lambert 72.
+            if (geometryHasToBeTransformed || hasDerivedBuildingUnits)
+            {
+                ApplyChange(new BuildingGeometryCrsWasChanged(
+                    BuildingPersistentLocalId,
+                    derivedBuildingUnits,
+                    buildingUnitsWhichBecameDerived,
+                    newBuildingGeometry.Geometry,
+                    hasDerivedBuildingUnits ? newBuildingGeometry.Center : null));
+            }
+
+            foreach (var (buildingUnit, position) in buildingUnitsWithOwnPosition)
+            {
+                buildingUnit.TransformPositionToLambert2008(position);
+            }
+        }
+
+        /// <summary>
+        /// Reads a persisted geometry in the reference system its own bytes carry, falling back to Lambert 72
+        /// for the SRID-less ones written before the event store wrote EWKB.
+        /// </summary>
+        /// <remarks>
+        /// Qualified: <c>Be.Vlaanderen.Basisregisters.GrAr.Common.NetTopology</c> declares a
+        /// <c>WKBReaderFactory</c> of its own, and importing that namespace in this file would bind the
+        /// simple name to it. GrAr's version throws on SRID-less bytes instead of falling back. See ADR 0007.
+        /// </remarks>
+        private static Geometry ReadGeometry(ExtendedWkbGeometry extendedWkbGeometry)
+        {
+            var extendedWkb = extendedWkbGeometry.ToByteArray();
+
+            return BuildingRegistry.WKBReaderFactory.CreateForEwkb(extendedWkb).Read(extendedWkb);
+        }
+
+        private static bool IsLambert2008(Geometry geometry) => geometry.SRID == ExtendedWkbGeometry.SridLambert2008;
+
         private void GuardRemovedBuilding()
         {
             if (IsRemoved)
@@ -346,11 +460,21 @@ namespace BuildingRegistry.Building
             }
         }
 
+        /// <summary>
+        /// Guards the shape, and that the geometry is in one of the two reference systems this registry
+        /// supports - not in a particular one of them.
+        /// </summary>
+        /// <remarks>
+        /// Which of the two the event store holds is decided by <c>UseLambert2008EventStoreToggle</c> at the
+        /// write boundary, where <c>GmlGeometryNormalizer</c> converts every incoming geometry to it
+        /// (ADR 0003). Pinning Lambert 72 here would reject everything the moment that toggle flips, and
+        /// would reject every geometry the migrator has already converted. See ADR 0007.
+        /// </remarks>
         private static void GuardPolygon(Geometry? geometry)
         {
             if (
                 geometry is not Polygon
-                || geometry.SRID != ExtendedWkbGeometry.SridLambert72
+                || !GeometryReferenceSystem.IsSupported(geometry.SRID)
                 || !GeometryValidator.IsValid(geometry))
             {
                 throw new PolygonIsInvalidException();

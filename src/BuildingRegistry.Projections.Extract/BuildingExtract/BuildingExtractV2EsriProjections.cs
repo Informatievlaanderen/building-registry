@@ -16,7 +16,6 @@ namespace BuildingRegistry.Projections.Extract.BuildingExtract
     using Building.Events;
     using Microsoft.Extensions.Options;
     using NetTopologySuite.Geometries;
-    using NetTopologySuite.IO;
     using NodaTime;
     using Polygon = NetTopologySuite.Geometries.Polygon;
 
@@ -35,8 +34,7 @@ namespace BuildingRegistry.Projections.Extract.BuildingExtract
 
         private readonly Encoding _encoding;
 
-        public BuildingExtractV2EsriProjections(IOptions<ExtractConfig> extractConfig, Encoding encoding,
-            WKBReader wkbReader)
+        public BuildingExtractV2EsriProjections(IOptions<ExtractConfig> extractConfig, Encoding encoding)
         {
             var extractConfigValue = extractConfig.Value;
             _encoding = encoding ?? throw new ArgumentNullException(nameof(encoding));
@@ -71,7 +69,7 @@ namespace BuildingRegistry.Projections.Extract.BuildingExtract
                     }.ToBytes(_encoding)
                 };
 
-                var geometry = wkbReader.Read(message.Message.ExtendedWkbGeometry.ToByteArray()) as Polygon;
+                var geometry = ParseGeometry(message.Message.ExtendedWkbGeometry) as Polygon;
                 UpdateGeometry(geometry, buildingExtractItemV2);
 
                 await context
@@ -101,7 +99,7 @@ namespace BuildingRegistry.Projections.Extract.BuildingExtract
                     }.ToBytes(_encoding)
                 };
 
-                var geometry = wkbReader.Read(message.Message.ExtendedWkbGeometry.ToByteArray()) as Polygon;
+                var geometry = ParseGeometry(message.Message.ExtendedWkbGeometry) as Polygon;
                 UpdateGeometry(geometry, buildingExtractItemV2);
 
                 await context
@@ -131,7 +129,7 @@ namespace BuildingRegistry.Projections.Extract.BuildingExtract
                     }.ToBytes(_encoding)
                 };
 
-                var geometry = wkbReader.Read(message.Message.ExtendedWkbGeometry.ToByteArray()) as Polygon;
+                var geometry = ParseGeometry(message.Message.ExtendedWkbGeometry) as Polygon;
                 UpdateGeometry(geometry, buildingExtractItemV2);
 
                 await context
@@ -144,7 +142,7 @@ namespace BuildingRegistry.Projections.Extract.BuildingExtract
                 var item = await context.BuildingExtractV2Esri.FindAsync(message.Message.BuildingPersistentLocalId,
                     cancellationToken: ct);
 
-                var geometry = wkbReader.Read(message.Message.ExtendedWkbGeometryBuilding.ToByteArray()) as Polygon;
+                var geometry = ParseGeometry(message.Message.ExtendedWkbGeometryBuilding) as Polygon;
                 UpdateGeometry(geometry, item);
 
                 UpdateVersie(item, message.Message.Provenance.Timestamp);
@@ -155,10 +153,15 @@ namespace BuildingRegistry.Projections.Extract.BuildingExtract
                 var item = await context.BuildingExtractV2Esri.FindAsync(message.Message.BuildingPersistentLocalId,
                     cancellationToken: ct);
 
-                var geometry = wkbReader.Read(message.Message.ExtendedWkbGeometryBuilding.ToByteArray()) as Polygon;
+                var geometry = ParseGeometry(message.Message.ExtendedWkbGeometryBuilding) as Polygon;
                 UpdateGeometry(geometry, item);
                 UpdateVersie(item, message.Message.Provenance.Timestamp);
             });
+
+            // The extract stays in Lambert 72, so a re-expression of the same outline changes nothing it
+            // holds: the shapefile already has the geometry this event is a different spelling of.
+            // See ADR 0007.
+            When<Envelope<BuildingGeometryCrsWasChanged>>(DoNothing);
 
             When<Envelope<BuildingBecameUnderConstructionV2>>(async (context, message, ct) =>
             {
@@ -213,7 +216,7 @@ namespace BuildingRegistry.Projections.Extract.BuildingExtract
             {
                 var item = await context.BuildingExtractV2Esri.FindAsync(message.Message.BuildingPersistentLocalId,
                     cancellationToken: ct);
-                var geometry = wkbReader.Read(message.Message.ExtendedWkbGeometryBuilding.ToByteArray()) as Polygon;
+                var geometry = ParseGeometry(message.Message.ExtendedWkbGeometryBuilding) as Polygon;
 
                 UpdateGeometry(geometry, item);
                 UpdateRecord(item, record => record.geommet.Value = MapGeometryMethod(BuildingGeometryMethod.MeasuredByGrb));
@@ -223,7 +226,7 @@ namespace BuildingRegistry.Projections.Extract.BuildingExtract
             When<Envelope<BuildingMeasurementWasCorrected>>(async (context, message, ct) =>
             {
                 var item = await context.BuildingExtractV2Esri.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);
-                var geometry = wkbReader.Read(message.Message.ExtendedWkbGeometryBuilding.ToByteArray()) as Polygon;
+                var geometry = ParseGeometry(message.Message.ExtendedWkbGeometryBuilding) as Polygon;
 
                 UpdateGeometry(geometry, item);
                 UpdateVersie(item, message.Message.Provenance.Timestamp);
@@ -295,6 +298,7 @@ namespace BuildingRegistry.Projections.Extract.BuildingExtract
             When<Envelope<BuildingUnitWasRetiredV2>>(DoNothing);
             When<Envelope<BuildingUnitWasRetiredBecauseBuildingWasDemolished>>(DoNothing);
             When<Envelope<BuildingUnitPositionWasCorrected>>(DoNothing);
+            When<Envelope<BuildingUnitPositionCrsWasChanged>>(DoNothing);
             When<Envelope<BuildingUnitWasCorrectedFromNotRealizedToPlanned>>(DoNothing);
             When<Envelope<BuildingUnitWasCorrectedFromRealizedToPlannedBecauseBuildingWasCorrected>>(DoNothing);
             When<Envelope<BuildingUnitWasCorrectedFromRealizedToPlanned>>(DoNothing);
@@ -338,6 +342,24 @@ namespace BuildingRegistry.Projections.Extract.BuildingExtract
             };
 
             return dictionary[buildingStatus];
+        }
+
+        /// <summary>
+        /// Reads a persisted geometry in the reference system its EWKB carries and brings it to Lambert 72,
+        /// which is the only system this extract publishes: <c>Api.Extract</c> writes a <c>.prj</c> of
+        /// <c>Belge_Lambert_1972</c> and a shape record carries no SRID of its own, so nothing downstream
+        /// could tell that the coordinates were in the other system. A geometry already in Lambert 72 is
+        /// returned untouched. Building outlines are not rounded — see
+        /// <see cref="GeometryReferenceSystem.PositionRoundingPrecision"/> for why only unit positions are.
+        /// See ADR 0008.
+        /// </summary>
+        private static Geometry ParseGeometry(string extendedWkbGeometryHex)
+        {
+            var extendedWkb = extendedWkbGeometryHex.ToByteArray()!;
+
+            return WKBReaderFactory.CreateForEwkb(extendedWkb)
+                .Read(extendedWkb)
+                .ToReferenceSystem(ExtendedWkbGeometry.SridLambert72);
         }
 
         private static void UpdateGeometry(Polygon? geometry, BuildingExtractItemV2Esri item)

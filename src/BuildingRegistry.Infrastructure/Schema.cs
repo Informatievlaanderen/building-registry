@@ -11,6 +11,7 @@ namespace BuildingRegistry.Infrastructure
         public const string ConsumerAddress = "BuildingRegistryConsumerAddress";
         public const string ConsumerReadParcel = "BuildingRegistryConsumerReadParcel";
         public const string MigrateBuilding = "BuildingRegistryMigration";
+        public const string MigrateLambert2008 = "BuildingRegistryMigrationLambert2008";
         public const string Sequence = "BuildingRegistrySequence";
         public const string BackOffice = "BuildingRegistryBackOffice";
         public const string BackOfficeProjections = "BuildingRegistryBackOfficeProjections";

@@ -117,15 +117,13 @@ namespace BuildingRegistry.Projector.Infrastructure.Modules
                     context =>
                         new BuildingExtractV2EsriProjections(
                             context.Resolve<IOptions<ExtractConfig>>(),
-                            DbaseCodePage.Western_European_ANSI.ToEncoding(),
-                            WKBReaderFactory.Create()),
+                            DbaseCodePage.Western_European_ANSI.ToEncoding()),
                     ConnectedProjectionSettings.Default)
                 .RegisterProjections<BuildingUnitExtractV2Projections, ExtractContext>(
                     context =>
                         new BuildingUnitExtractV2Projections(
                             context.Resolve<IOptions<ExtractConfig>>(),
-                            DbaseCodePage.Western_European_ANSI.ToEncoding(),
-                            WKBReaderFactory.Create()),
+                            DbaseCodePage.Western_European_ANSI.ToEncoding()),
                     ConnectedProjectionSettings.Default)
                 .RegisterProjections<BuildingUnitAddressLinkExtractProjections, ExtractContext>(
                     context => new BuildingUnitAddressLinkExtractProjections(DbaseCodePage.Western_European_ANSI.ToEncoding()),

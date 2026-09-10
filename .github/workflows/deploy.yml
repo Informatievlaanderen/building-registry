@@ -57,7 +57,8 @@ jobs:
           'last-changed-list',
           'snapshot-verifier',
           'cache-invalidator',
-          'tools-console'
+          'tools-console',
+          'migrator-lambert'
         ]
     with:
       environment: ${{ github.event.inputs.environment }}

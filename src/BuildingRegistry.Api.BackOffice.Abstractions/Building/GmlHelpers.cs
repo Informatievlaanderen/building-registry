@@ -30,16 +30,22 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.Building
             return CreateGmlReader(srid).Read(gml);
         }
 
-        // TODO: the lambda still assumes the event store persists Lambert 72. Make this SRID aware
-        // when the event store is migrated to Lambert 2008 (see UseLambert2008EventStoreToggle).
+        /// <summary>
+        /// Reads a GML geometry in the reference system its own srsName declares, and persists it as EWKB
+        /// carrying that SRID - so the event store records which reference system a geometry is in rather
+        /// than leaving every reader to infer it.
+        /// </summary>
+        /// <remarks>
+        /// It deliberately does not consult <c>UseLambert2008EventStoreToggle</c>: the BackOffice API
+        /// normalizes every incoming geometry to the event store's reference system before the SQS message
+        /// is created (ADR 0003), so the srsName arriving here is already the right one.
+        ///
+        /// What it must not do is what it did before - force-set the SRID to Lambert 72 - which silently
+        /// relabelled a Lambert 2008 geometry rather than rejecting it, persisting coordinates ~500 km from
+        /// where the building is. An unsupported or missing srsName throws in <see cref="ReadGeometry"/>.
+        /// See ADR 0007.
+        /// </remarks>
         public static ExtendedWkbGeometry ToExtendedWkbGeometry(this string gml)
-        {
-            var gmlReader = CreateGmlReader();
-            var geometry = gmlReader.Read(gml);
-
-            geometry.SRID = ExtendedWkbGeometry.SridLambert72;
-
-            return ExtendedWkbGeometry.CreateEWkb(WkbWriter.Write(geometry));
-        }
+            => ExtendedWkbGeometry.Create(gml.ReadGeometry());
     }
 }

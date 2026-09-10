@@ -228,6 +228,52 @@ namespace BuildingRegistry.Projections.Integration.Building.Version
                     ct);
             });
 
+            // A new version row like any other event - CreateNewBuildingVersion stamps it - but the geometry
+            // methods and the per-unit version timestamps are untouched: the reprojection does not change the
+            // building. See ADR 0007.
+            When<Envelope<BuildingGeometryCrsWasChanged>>(async (context, message, ct) =>
+            {
+                var geometryAsBinary = message.Message.ExtendedWkbGeometryBuilding.ToByteArray();
+                var sysGeometry = wkbReader.Read(geometryAsBinary);
+
+                await context.CreateNewBuildingVersion(
+                    message.Message.BuildingPersistentLocalId,
+                    message,
+                    building =>
+                    {
+                        building.Geometry = sysGeometry;
+
+                        if (!message.Message.BuildingUnitPersistentLocalIds.Any()
+                            && !message.Message.BuildingUnitPersistentLocalIdsWhichBecameDerived.Any())
+                        {
+                            return;
+                        }
+
+                        var sysBuildingUnitGeometry = wkbReader.Read(message.Message.ExtendedWkbGeometryBuildingUnits!.ToByteArray());
+                        var becameDerived = message.Message.BuildingUnitPersistentLocalIdsWhichBecameDerived.ToHashSet();
+
+                        foreach (var buildingUnitPersistentLocalId in message.Message.BuildingUnitPersistentLocalIds
+                                     .Concat(becameDerived))
+                        {
+                            var buildingUnit = building.BuildingUnits
+                                .Single(x => x.BuildingUnitPersistentLocalId == buildingUnitPersistentLocalId);
+
+                            buildingUnit.Geometry = sysBuildingUnitGeometry;
+
+                            // A unit that was already derived holds the position this event re-expresses,
+                            // so it gets no version. One that became derived changed both its method and its
+                            // position, which is a change like any other. See ADR 0007.
+                            if (becameDerived.Contains(buildingUnitPersistentLocalId))
+                            {
+                                buildingUnit.GeometryMethod = BuildingUnitPositionGeometryMethod.DerivedFromObject.GeometryMethod;
+                                buildingUnit.OsloGeometryMethod = BuildingUnitPositionGeometryMethod.DerivedFromObject.Map();
+                                buildingUnit.VersionTimestamp = message.Message.Provenance.Timestamp;
+                            }
+                        }
+                    },
+                    ct);
+            });
+
             When<Envelope<BuildingBecameUnderConstructionV2>>(async (context, message, ct) =>
             {
                 await context.CreateNewBuildingVersion(

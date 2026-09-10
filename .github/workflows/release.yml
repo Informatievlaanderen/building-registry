@@ -247,6 +247,22 @@ jobs:
       prerestore-script: ./pre-restore.sh
     secrets: inherit
 
+  build-migrator-lambert:
+    name: Build Migrator Lambert
+    uses: Informatievlaanderen/build-pipeline/.github/workflows/build-image-v2.yml@main
+    needs: [ set-release-version ]
+    if: ${{ (github.repository_owner == 'Informatievlaanderen') && (needs.set-release-version.outputs.version != 'none') }}
+    with:
+      registry: ${{ vars.VBR_DEVOPS_DOCKER_REGISTRY }}/building
+      image-file: br-migrator-lambert-image.tar
+      image-name: migrator-lambert
+      test-project: BuildingRegistry.Tests
+      build-project: BuildingRegistry.Migrator.Lambert2008
+      semver: ${{ needs.set-release-version.outputs.version }}
+      dotnet-version: ${{ vars.VBR_DOTNET_VERSION_10 }}
+      prerestore-script: ./pre-restore.sh
+    secrets: inherit
+
   build-tools-console:
     name: Build Tools Console
     uses: Informatievlaanderen/build-pipeline/.github/workflows/build-image-v2.yml@main
@@ -327,7 +343,8 @@ jobs:
       build-producer-snapshot-oslo,
       build-lambda-backoffice,
       build-snapshot-verifier,
-      build-tools-console
+      build-tools-console,
+      build-migrator-lambert
       ]
     outputs:
       version: ${{ steps.set-version.outputs.version }}
@@ -484,6 +501,7 @@ jobs:
           'producer-snapshot-oslo',
           'snapshot-verifier',
           'tools-console',
+          'migrator-lambert',
           'lambda-sqsbackofficefunction'
           ]
     steps:
@@ -561,7 +579,8 @@ jobs:
           'last-changed-list',
           'snapshot-verifier',
           'cache-invalidator',
-          'tools-console'
+          'tools-console',
+          'migrator-lambert'
           ]
     with:
       environment: 'test'
@@ -645,7 +664,8 @@ jobs:
           'last-changed-list',
           'snapshot-verifier',
           'cache-invalidator',
-          'tools-console'
+          'tools-console',
+          'migrator-lambert'
           ]
     with:
       environment: 'stg'

@@ -513,6 +513,27 @@ namespace BuildingRegistry.Building
             }
         }
 
+        /// <summary>
+        /// Re-expresses the unit's own position in Lambert 2008 (EPSG 3812) for the one-off event store
+        /// transformation, see ADR 0007. The position is transformed by
+        /// <see cref="Building.TransformToLambert2008"/>, which decides against the transformed building
+        /// geometry whether the unit keeps its own position at all.
+        /// </summary>
+        /// <remarks>
+        /// Deliberately unguarded, unlike <see cref="CorrectPosition"/>: this is not an edit of the unit but
+        /// a change of the reference system its position is expressed in, and it has to reach every unit the
+        /// building holds - removed, not realized and retired ones included - or the event store would be
+        /// left holding both reference systems forever.
+        /// </remarks>
+        internal void TransformPositionToLambert2008(ExtendedWkbGeometry position)
+        {
+            Apply(new BuildingUnitPositionCrsWasChanged(
+                _buildingPersistentLocalId,
+                BuildingUnitPersistentLocalId,
+                BuildingUnitPosition.GeometryMethod,
+                position));
+        }
+
         private ExtendedWkbGeometry? CorrectedBuildingUnitPosition(BuildingGeometry buildingGeometry)
         {
             var correctedBuildingUnitPosition =

@@ -37,6 +37,16 @@
         public static Geometry PointNotInPolygon =>
             new WKTReader(NtsGeometryFactory.CreateGeometryFactoryLambert72()).Read("POINT (1 1)");
 
+        /// <summary>
+        /// A point just inside <see cref="ValidPolygon"/> - about a millimetre from the edge, on the line
+        /// from the centroid to the polygon's second vertex - that ends up *outside* the Lambert 2008
+        /// polygon once its transform is rounded to centimetres. The rare case
+        /// <c>Building.TransformToLambert2008</c> re-derives rather than leaves outside its building.
+        /// </summary>
+        public static Geometry PointInPolygonPushedOutsideByLambert2008Rounding =>
+            new WKTReader(NtsGeometryFactory.CreateGeometryFactoryLambert72())
+                .Read("POINT (141294.80232260644 185190.20333411425)");
+
         public static Geometry SelfTouchingPolygon =
             new WKTReader(NtsGeometryFactory.CreateGeometryFactoryLambert72()).Read(
                 "POLYGON ((30359.924344554543 197007.54170677811, 30359.446008555591 197010.21338678151, 30371.943992562592 197013.23297078162, 30373.701176568866 197006.42113077641, 30363.939512558281 197004.00340277702, 30364.205112561584 197002.85997877643, 30357.719608552754 197001.36161077395, 30356.638264551759 197006.90023477748, 30359.924344554543 197007.54170677811, 30360.468344554305 197004.48564277589, 30362.562808558345 197004.85844277591, 30362.018680557609 197007.91457077861, 30359.924344554543 197007.54170677811))");

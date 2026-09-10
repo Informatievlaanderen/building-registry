@@ -110,6 +110,35 @@ namespace BuildingRegistry.Projections.Wfs.BuildingUnitV2
                 }
             });
 
+            When<Envelope<BuildingGeometryCrsWasChanged>>(async (context, message, _) =>
+            {
+                var becameDerived = message.Message.BuildingUnitPersistentLocalIdsWhichBecameDerived.ToHashSet();
+
+                foreach (var buildingUnitPersistentLocalId in
+                         message.Message.BuildingUnitPersistentLocalIds.Concat(becameDerived))
+                {
+                    // Unlike every other position event this one reaches removed units, whose row this
+                    // projection deletes. Nothing to reproject. See ADR 0007.
+                    var unit = await context.BuildingUnitsV2.FindAsync(buildingUnitPersistentLocalId);
+
+                    if (unit is null)
+                    {
+                        continue;
+                    }
+
+                    unit.Position = ParsePosition(message.Message.ExtendedWkbGeometryBuildingUnits!);
+                    unit.PositionMethod = MapGeometryMethod(BuildingUnitPositionGeometryMethod.DerivedFromObject);
+
+                // A unit that was already derived holds the position this event re-expresses, so it gets
+                // no version. One that became derived changed both its method and its position, which is a
+                // change like any other. See ADR 0007.
+                    if (becameDerived.Contains(buildingUnitPersistentLocalId))
+                    {
+                        SetVersion(unit, message.Message.Provenance.Timestamp);
+                    }
+                }
+            });
+
             When<Envelope<BuildingWasPlannedV2>>(DoNothing);
             When<Envelope<BuildingBecameUnderConstructionV2>>(DoNothing);
             When<Envelope<BuildingWasRealizedV2>>(DoNothing);
@@ -316,6 +345,25 @@ namespace BuildingRegistry.Projections.Wfs.BuildingUnitV2
                     MapGeometryMethod(BuildingUnitPositionGeometryMethod.Parse(message.Message.GeometryMethod)));
 
                 SetVersion(unit, message.Message.Provenance.Timestamp);
+            });
+
+            When<Envelope<BuildingUnitPositionCrsWasChanged>>(async (context, message, ct) =>
+            {
+                // Unlike every other position event this one reaches removed units, whose row this
+                // projection deletes. Nothing to reproject. See ADR 0007.
+                var unit = await context.BuildingUnitsV2.FindAsync(message.Message.BuildingUnitPersistentLocalId);
+
+                if (unit is null)
+                {
+                    return;
+                }
+
+                // The geometry method is carried over, and the version is deliberately left as it was: the
+                // reprojection does not change the unit.
+                SetPosition(
+                    unit,
+                    message.Message.ExtendedWkbGeometry,
+                    MapGeometryMethod(BuildingUnitPositionGeometryMethod.Parse(message.Message.GeometryMethod)));
             });
 
             When<Envelope<BuildingUnitAddressWasAttachedV2>>(async (context, message, ct) =>

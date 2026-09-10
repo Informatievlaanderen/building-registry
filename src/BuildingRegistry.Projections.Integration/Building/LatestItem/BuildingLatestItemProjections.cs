@@ -142,6 +142,23 @@ namespace BuildingRegistry.Projections.Integration.Building.LatestItem
                     ct);
             });
 
+            When<Envelope<BuildingGeometryCrsWasChanged>>(async (context, message, ct) =>
+            {
+                var geometryAsBinary = message.Message.ExtendedWkbGeometryBuilding.ToByteArray();
+                var sysGeometry = wkbReader.Read(geometryAsBinary);
+
+                await context.FindAndUpdateBuilding(
+                    message.Message.BuildingPersistentLocalId,
+                    building =>
+                    {
+                        // The geometry method and the NIS code are untouched - the building has not moved -
+                        // and the version timestamp is deliberately left as it was: the reprojection does not
+                        // change the building. See ADR 0007.
+                        building.Geometry = sysGeometry;
+                    },
+                    ct);
+            });
+
             When<Envelope<BuildingBecameUnderConstructionV2>>(async (context, message, ct) =>
             {
                 await context.FindAndUpdateBuilding(
@@ -348,6 +365,7 @@ namespace BuildingRegistry.Projections.Integration.Building.LatestItem
             When<Envelope<BuildingUnitWasRetiredV2>>(DoNothing);
             When<Envelope<BuildingUnitWasRetiredBecauseBuildingWasDemolished>>(DoNothing);
             When<Envelope<BuildingUnitPositionWasCorrected>>(DoNothing);
+            When<Envelope<BuildingUnitPositionCrsWasChanged>>(DoNothing);
             When<Envelope<BuildingUnitWasCorrectedFromNotRealizedToPlanned>>(DoNothing);
             When<Envelope<BuildingUnitWasCorrectedFromRealizedToPlannedBecauseBuildingWasCorrected>>(DoNothing);
             When<Envelope<BuildingUnitWasCorrectedFromRealizedToPlanned>>(DoNothing);

@@ -1,4 +1,4 @@
-﻿namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda
+namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda
 {
     using System.Reflection;
     using Amazon;
@@ -49,6 +49,9 @@
             services.AddSingleton(new Lambert2008ConversionCompletedToggle(
                 configuration.GetValue<bool>("FeatureToggles:Lambert2008ConversionCompleted")));
             services.AddSingleton(new Lambert2008MatchingReadiness());
+
+            services.AddSingleton(new UseLambert2008GrbToggle(
+                configuration.GetValue<bool>("FeatureToggles:UseLambert2008Grb")));
 
             services.AddScoped<IBuildingGeometries>(serviceProvider =>
             {

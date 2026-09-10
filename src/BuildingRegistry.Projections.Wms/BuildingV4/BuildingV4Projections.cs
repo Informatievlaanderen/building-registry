@@ -97,6 +97,22 @@ namespace BuildingRegistry.Projections.Wms.BuildingV4
                 item.Version = message.Message.Provenance.Timestamp;
             });
 
+            When<Envelope<BuildingGeometryCrsWasChanged>>(async (context, message, ct) =>
+            {
+                // Unlike every other geometry event this one reaches removed buildings, whose row this
+                // projection deletes. Nothing to reproject. See ADR 0007.
+                var item = await context.BuildingsV4.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);
+
+                if (item is null)
+                {
+                    return;
+                }
+
+                // The geometry method is carried over, and the version is deliberately left as it was: the
+                // reprojection does not change the building.
+                SetGeometry(item, message.Message.ExtendedWkbGeometryBuilding, item.GeometryMethod);
+            });
+
             When<Envelope<BuildingWasCorrectedFromUnderConstructionToPlanned>>(async (context, message, ct) =>
             {
                 var item = await context.BuildingsV4.FindAsync(message.Message.BuildingPersistentLocalId, cancellationToken: ct);
@@ -208,6 +224,7 @@ namespace BuildingRegistry.Projections.Wms.BuildingV4
             When<Envelope<BuildingUnitWasRetiredV2>>(DoNothing);
             When<Envelope<BuildingUnitWasRetiredBecauseBuildingWasDemolished>>(DoNothing);
             When<Envelope<BuildingUnitPositionWasCorrected>>(DoNothing);
+            When<Envelope<BuildingUnitPositionCrsWasChanged>>(DoNothing);
             When<Envelope<BuildingUnitWasCorrectedFromNotRealizedToPlanned>>(DoNothing);
             When<Envelope<BuildingUnitWasCorrectedFromRealizedToPlannedBecauseBuildingWasCorrected>>(DoNothing);
             When<Envelope<BuildingUnitWasCorrectedFromRealizedToPlanned>>(DoNothing);

@@ -30,7 +30,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitPositi
         public void WithNotAppointedByAdministrator_ThenPositionIsCorrectedToCenter()
         {
             var position =
-                "<gml:Point srsName=\"https://www.opengis.net/def/crs/EPSG/0/3137\" xmlns:gml=\"http://www.opengis.net/gml/3.2\"><gml:pos>140285.15277253836 186725.74131567031</gml:pos></gml:Point>";
+                "<gml:Point srsName=\"https://www.opengis.net/def/crs/EPSG/0/31370\" xmlns:gml=\"http://www.opengis.net/gml/3.2\"><gml:pos>140285.15277253836 186725.74131567031</gml:pos></gml:Point>";
 
             var buildingUnitPersistentLocalId = Fixture.Create<BuildingUnitPersistentLocalId>();
 
@@ -124,7 +124,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitPositi
             var command = Fixture.Create<CorrectBuildingUnitPosition>()
                 .WithPositionGeometryMethod(BuildingUnitPositionGeometryMethod.AppointedByAdministrator)
                 .WithPointPosition(
-                    "<gml:Point srsName=\"https://www.opengis.net/def/crs/EPSG/0/3137\" xmlns:gml=\"http://www.opengis.net/gml/3.2\">" +
+                    "<gml:Point srsName=\"https://www.opengis.net/def/crs/EPSG/0/31370\" xmlns:gml=\"http://www.opengis.net/gml/3.2\">" +
                     $"<gml:pos>{correctPointCoordinateX} {correctPointCoordinateY}</gml:pos></gml:Point>")
                 .WithPersistentLocalId(buildingUnitPersistentLocalId);
 
@@ -167,7 +167,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitPositi
             var command = Fixture.Create<CorrectBuildingUnitPosition>()
                 .WithPositionGeometryMethod(BuildingUnitPositionGeometryMethod.AppointedByAdministrator)
                 .WithPointPosition(
-                    "<gml:Point srsName=\"https://www.opengis.net/def/crs/EPSG/0/3137\" xmlns:gml=\"http://www.opengis.net/gml/3.2\">" +
+                    "<gml:Point srsName=\"https://www.opengis.net/def/crs/EPSG/0/31370\" xmlns:gml=\"http://www.opengis.net/gml/3.2\">" +
                     $"<gml:pos>{wrongPointCoordinateX} {wrongPointCoordinateY}</gml:pos></gml:Point>")
                 .WithPersistentLocalId(buildingUnitPersistentLocalId);
 
@@ -226,7 +226,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitPositi
             var command = Fixture.Create<CorrectBuildingUnitPosition>()
                 .WithPositionGeometryMethod(BuildingUnitPositionGeometryMethod.AppointedByAdministrator)
                 .WithPointPosition(
-                    "<gml:Point srsName=\"https://www.opengis.net/def/crs/EPSG/0/3137\" xmlns:gml=\"http://www.opengis.net/gml/3.2\">" +
+                    "<gml:Point srsName=\"https://www.opengis.net/def/crs/EPSG/0/31370\" xmlns:gml=\"http://www.opengis.net/gml/3.2\">" +
                     $"<gml:pos>{correctPointCoordinateX} {correctPointCoordinateY}</gml:pos></gml:Point>")
                 .WithPersistentLocalId(buildingUnitPersistentLocalId);
 

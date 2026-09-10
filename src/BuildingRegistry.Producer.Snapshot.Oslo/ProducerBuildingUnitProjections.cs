@@ -248,6 +248,23 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo
                     ct);
             });
 
+            When<Envelope<BuildingUnitPositionCrsWasChanged>>(async (_, message, ct) =>
+            {
+                await FindAndProduce(async () =>
+                        await snapshotManager.FindMatchingSnapshot(
+                            message.Message.BuildingUnitPersistentLocalId.ToString(),
+                            message.Message.Provenance.Timestamp,
+                            message.Message.GetHash(),
+                            message.Position,
+                            throwStaleWhenGone: false,
+                            // See ProducerBuildingProjections: a reprojection does not move the version
+                            // timestamp, so only the hash can be matched on. See ADR 0007.
+                            matchOnHashOnly: true,
+                            ct),
+                    message.Position,
+                    ct);
+            });
+
             When<Envelope<BuildingUnitRemovalWasCorrected>>(async (_, message, ct) =>
             {
                 await FindAndProduce(async () =>
@@ -566,6 +583,28 @@ namespace BuildingRegistry.Producer.Snapshot.Oslo
                                 message.Message.GetHash(),
                                 message.Position,
                                 throwStaleWhenGone: false,
+                                ct),
+                        message.Position,
+                        ct);
+                }
+            });
+
+            When<Envelope<BuildingGeometryCrsWasChanged>>(async (_, message, ct) =>
+            {
+                foreach (var buildingUnitPersistentLocalId in
+                         message.Message.BuildingUnitPersistentLocalIds.Concat(message.Message.BuildingUnitPersistentLocalIdsWhichBecameDerived))
+                {
+                    await FindAndProduce(async () =>
+                            await snapshotManager.FindMatchingSnapshot(
+                                buildingUnitPersistentLocalId.ToString(),
+                                message.Message.Provenance.Timestamp,
+                                message.Message.GetHash(),
+                                message.Position,
+                                throwStaleWhenGone: false,
+                                // See ProducerBuildingProjections: a reprojection does not move the version
+                                // timestamp - except for a unit that became derived, which the hash covers
+                                // either way - so only the hash can be matched on. See ADR 0007.
+                                matchOnHashOnly: true,
                                 ct),
                         message.Position,
                         ct);
