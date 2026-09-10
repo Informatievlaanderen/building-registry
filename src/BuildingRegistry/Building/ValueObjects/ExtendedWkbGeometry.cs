@@ -27,7 +27,14 @@
         /// The EWKB as persisted. Readers take bytes, so this is what they get: going through
         /// <see cref="ToString"/> would allocate a hex string per geometry and parse it straight back.
         /// </summary>
-        public byte[] ToByteArray() => Value;
+        /// <remarks>
+        /// A copy, not <c>Value</c> itself, which is <c>protected</c> on the base for a reason. This value
+        /// object's equality components are its individual bytes — <c>ByteArrayValueObject.Reflect()</c>
+        /// casts the array to <c>IEnumerable&lt;object&gt;</c> — so handing out the backing array would let
+        /// a caller change what an already-constructed geometry equals and hashes to. The copy still keeps
+        /// what this method exists for: no hex encode and decode per read.
+        /// </remarks>
+        public byte[] ToByteArray() => (byte[])Value.Clone();
 
         /// <summary>
         /// Wraps a geometry that has already been read and transformed, keeping the SRID it carries. The
