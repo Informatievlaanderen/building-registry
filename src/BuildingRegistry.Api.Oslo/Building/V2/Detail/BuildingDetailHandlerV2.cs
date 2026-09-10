@@ -103,16 +103,24 @@ namespace BuildingRegistry.Api.Oslo.Building.V2.Detail
                 building.LastEventHash);
         }
 
-        private static BuildingPolygon GetBuildingPolygon(byte[] polygon, BuildingGeometryMethod geometryMethod)
+        /// <summary>
+        /// Version 2 answers in Lambert 72 and nothing else, so a geometry the event store holds in Lambert
+        /// 2008 is transformed before it reaches <see cref="GetGml"/> — whose <c>srsName</c> is hardcoded on
+        /// EPSG 31370 and would otherwise label Lambert 2008 coordinates as Lambert 72. Version 3 is the one
+        /// that answers in the system the geometry is persisted in. See ADR 0008.
+        /// </summary>
+        internal static BuildingPolygon GetBuildingPolygon(byte[] polygon, BuildingGeometryMethod geometryMethod)
         {
-            var geometry = WKBReaderFactory.Create().Read(polygon) as Polygon;
+            var geometry = WKBReaderFactory.CreateForEwkb(polygon).Read(polygon) as Polygon;
 
             if (geometry == null) //some buildings have multi polygons (imported) which are incorrect.
             {
                 return null;
             }
 
-            var gml = GetGml(geometry);
+            // After the cast rather than before it: transforming a multi polygon that is about to be
+            // thrown away is wasted work.
+            var gml = GetGml(geometry.ToReferenceSystem(ExtendedWkbGeometry.SridLambert72));
 
             return new BuildingPolygon(new GmlJsonPolygon(gml), geometryMethod.Map());
         }

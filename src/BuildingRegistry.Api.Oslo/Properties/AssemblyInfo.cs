@@ -1,7 +1,10 @@
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 [assembly: AssemblyDescription("BuildingRegistry Legacy API")]
+
+[assembly: InternalsVisibleTo("BuildingRegistry.Tests")]
 
 [assembly: AssemblyProduct("Basisregisters Vlaanderen")]
 [assembly: AssemblyCopyright("Copyright (c) Vlaamse overheid")]

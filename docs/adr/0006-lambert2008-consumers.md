@@ -348,6 +348,9 @@ made SRID-aware, the in-memory NTS overlay would still silently return empty int
 - `Projections.Legacy`, still open from ADR 0005. Direction B constrains it: `SysGeometry` must be uniform
   in one reference system at a time, never mixed.
 - The producers and the write side, likewise still open from ADR 0005.
+
+  This list dropped two of ADR 0005's items — the other Oslo responses and `Projections.Extract` — which
+  is how they went unnoticed until [ADR 0008](0008-lambert2008-read-side.md) closed the whole list.
 - `Consumer.Read.Parcel` has no `OffsetOverride`. It is not needed for this change, but its absence is why
   the rebuild-based alternatives were unavailable, and it is worth adding before anything else needs to
   replay that topic.

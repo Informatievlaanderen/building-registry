@@ -17,7 +17,6 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
     using Building.Events;
     using Microsoft.Extensions.Options;
     using NetTopologySuite.Geometries;
-    using NetTopologySuite.IO;
     using NodaTime;
     using Point = Be.Vlaanderen.Basisregisters.Shaperon.Point;
 
@@ -38,7 +37,7 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
 
         private readonly Encoding _encoding;
 
-        public BuildingUnitExtractV2Projections(IOptions<ExtractConfig> extractConfig, Encoding encoding, WKBReader wkbReader)
+        public BuildingUnitExtractV2Projections(IOptions<ExtractConfig> extractConfig, Encoding encoding)
         {
             _encoding = encoding ?? throw new ArgumentNullException(nameof(encoding));
 
@@ -74,7 +73,7 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
                         }.ToBytes(_encoding)
                     };
 
-                    var geometry = wkbReader.Read(buildingUnit.ExtendedWkbGeometry.ToByteArray());
+                    var geometry = ParsePosition(buildingUnit.ExtendedWkbGeometry);
                     UpdateGeometry(buildingUnitItemV2, geometry);
 
                     await context.BuildingUnitExtractV2.AddAsync(buildingUnitItemV2, ct);
@@ -88,7 +87,7 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
                     await context.FindAndUpdateBuildingUnitExtract(buildingUnitPersistentLocalId,
                         itemV2 =>
                         {
-                            var geometry = wkbReader.Read(message.Message.ExtendedWkbGeometryBuildingUnits!.ToByteArray());
+                            var geometry = ParsePosition(message.Message.ExtendedWkbGeometryBuildingUnits!);
                             UpdateGeometry(itemV2, geometry);
                             var geometryMethod = MapGeometryMethod(BuildingUnitPositionGeometryMethod.DerivedFromObject);
                             UpdateGeometryMethod(itemV2, geometryMethod);
@@ -104,7 +103,7 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
                     await context.FindAndUpdateBuildingUnitExtract(buildingUnitPersistentLocalId,
                         itemV2 =>
                         {
-                            var geometry = wkbReader.Read(message.Message.ExtendedWkbGeometryBuildingUnits!.ToByteArray());
+                            var geometry = ParsePosition(message.Message.ExtendedWkbGeometryBuildingUnits!);
                             UpdateGeometry(itemV2, geometry);
                             var geometryMethod = MapGeometryMethod(BuildingUnitPositionGeometryMethod.DerivedFromObject);
                             UpdateGeometryMethod(itemV2, geometryMethod);
@@ -121,7 +120,7 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
                     await context.FindAndUpdateBuildingUnitExtract(buildingUnitPersistentLocalId,
                         itemV2 =>
                         {
-                            var geometry = wkbReader.Read(message.Message.ExtendedWkbGeometryBuildingUnits!.ToByteArray());
+                            var geometry = ParsePosition(message.Message.ExtendedWkbGeometryBuildingUnits!);
                             UpdateGeometry(itemV2, geometry);
                             var geometryMethod = MapGeometryMethod(BuildingUnitPositionGeometryMethod.DerivedFromObject);
                             UpdateGeometryMethod(itemV2, geometryMethod);
@@ -138,7 +137,7 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
                     await context.FindAndUpdateBuildingUnitExtract(buildingUnitPersistentLocalId,
                         itemV2 =>
                         {
-                            var geometry = wkbReader.Read(message.Message.ExtendedWkbGeometryBuildingUnits!.ToByteArray());
+                            var geometry = ParsePosition(message.Message.ExtendedWkbGeometryBuildingUnits!);
                             UpdateGeometry(itemV2, geometry);
                             var geometryMethod = MapGeometryMethod(BuildingUnitPositionGeometryMethod.DerivedFromObject);
                             UpdateGeometryMethod(itemV2, geometryMethod);
@@ -159,9 +158,7 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
                     return;
                 }
 
-                var extendedWkb = message.Message.ExtendedWkbGeometryBuildingUnits!.ToByteArray();
-                var position = WKBReaderFactory.CreateForEwkb(extendedWkb).Read(extendedWkb)
-                    .ToReferenceSystem(ExtendedWkbGeometry.SridLambert72, GeometryReferenceSystem.PositionRoundingPrecision);
+                var position = ParsePosition(message.Message.ExtendedWkbGeometryBuildingUnits!);
 
                 foreach (var buildingUnitPersistentLocalId in message.Message.BuildingUnitPersistentLocalIdsWhichBecameDerived)
                 {
@@ -216,7 +213,7 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
                     }.ToBytes(_encoding)
                 };
 
-                var geometry = wkbReader.Read(message.Message.ExtendedWkbGeometry.ToByteArray());
+                var geometry = ParsePosition(message.Message.ExtendedWkbGeometry);
                 UpdateGeometry(buildingUnitItemV2, geometry);
 
                 await context.BuildingUnitExtractV2.AddAsync(buildingUnitItemV2, ct);
@@ -348,7 +345,7 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
                     }.ToBytes(_encoding)
                 };
 
-                var geometry = wkbReader.Read(message.Message.ExtendedWkbGeometry.ToByteArray());
+                var geometry = ParsePosition(message.Message.ExtendedWkbGeometry);
                 UpdateGeometry(buildingUnitItemV2, geometry);
 
                 await context.BuildingUnitExtractV2.AddAsync(buildingUnitItemV2, ct);
@@ -413,7 +410,7 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
                     }.ToBytes(_encoding)
                 };
 
-                var geometry = wkbReader.Read(message.Message.ExtendedWkbGeometry.ToByteArray());
+                var geometry = ParsePosition(message.Message.ExtendedWkbGeometry);
                 UpdateGeometry(commonBuildingUnitItemV2, geometry);
 
                 await context.BuildingUnitExtractV2.AddAsync(commonBuildingUnitItemV2, ct);
@@ -423,7 +420,7 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
             {
                 var geometryMethod =
                     MapGeometryMethod(BuildingUnitPositionGeometryMethod.Parse(message.Message.GeometryMethod));
-                var geometry = wkbReader.Read(message.Message.ExtendedWkbGeometry.ToByteArray());
+                var geometry = ParsePosition(message.Message.ExtendedWkbGeometry);
 
                 await context.FindAndUpdateBuildingUnitExtract(message.Message.BuildingUnitPersistentLocalId,
                     itemV2 =>
@@ -536,7 +533,7 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
             When<Envelope<BuildingUnitWasMovedIntoBuilding>>(async (context, message, ct) =>
             {
                 var geometryMethod = MapGeometryMethod(BuildingUnitPositionGeometryMethod.Parse(message.Message.GeometryMethod));
-                var geometry = wkbReader.Read(message.Message.ExtendedWkbGeometry.ToByteArray());
+                var geometry = ParsePosition(message.Message.ExtendedWkbGeometry);
                 var status = MapStatus(BuildingUnitStatus.Parse(message.Message.BuildingUnitStatus));
 
                 await context.FindAndUpdateBuildingUnitExtract(message.Message.BuildingUnitPersistentLocalId,
@@ -587,6 +584,23 @@ namespace BuildingRegistry.Projections.Extract.BuildingUnitExtract
             };
 
             return dictionary[geometryMethod];
+        }
+
+        /// <summary>
+        /// Reads a persisted position in the reference system its EWKB carries and brings it to Lambert 72,
+        /// which is the only system this extract publishes: <c>Api.Extract</c> writes a <c>.prj</c> of
+        /// <c>Belge_Lambert_1972</c> and a shape record carries no SRID of its own, so nothing downstream
+        /// could tell that the coordinates were in the other system. A position already in Lambert 72 is
+        /// returned untouched; a transformed one is rounded to centimetres, which is the precision
+        /// positions are persisted at. See ADR 0008.
+        /// </summary>
+        private static Geometry ParsePosition(string extendedWkbGeometryHex)
+        {
+            var extendedWkb = extendedWkbGeometryHex.ToByteArray()!;
+
+            return WKBReaderFactory.CreateForEwkb(extendedWkb)
+                .Read(extendedWkb)
+                .ToReferenceSystem(ExtendedWkbGeometry.SridLambert72, GeometryReferenceSystem.PositionRoundingPrecision);
         }
 
         private static void UpdateGeometry(BuildingUnitExtractItemV2 item, Geometry? geometry)

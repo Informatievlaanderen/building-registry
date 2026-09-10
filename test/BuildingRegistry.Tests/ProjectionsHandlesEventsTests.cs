@@ -198,8 +198,8 @@ namespace BuildingRegistry.Tests
 
             yield return [new List<ConnectedProjection<ExtractContext>>
             {
-                new BuildingExtractV2EsriProjections(new OptionsWrapper<ExtractConfig>(new ExtractConfig()), Encoding.UTF8, new WKBReader()),
-                new BuildingUnitExtractV2Projections(new OptionsWrapper<ExtractConfig>(new ExtractConfig()), Encoding.UTF8, new WKBReader()),
+                new BuildingExtractV2EsriProjections(new OptionsWrapper<ExtractConfig>(new ExtractConfig()), Encoding.UTF8),
+                new BuildingUnitExtractV2Projections(new OptionsWrapper<ExtractConfig>(new ExtractConfig()), Encoding.UTF8),
                 new BuildingUnitAddressLinkExtractProjections(Encoding.UTF8),
             }];
 

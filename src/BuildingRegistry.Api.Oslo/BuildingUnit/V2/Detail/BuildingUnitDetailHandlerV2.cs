@@ -110,9 +110,18 @@ namespace BuildingRegistry.Api.Oslo.BuildingUnit.V2.Detail
             throw new ArgumentOutOfRangeException(nameof(function), function, null);
         }
 
-        private static BuildingUnitPosition GetBuildingUnitPoint(byte[] point, BuildingUnitPositionGeometryMethod geometryMethod)
+        /// <summary>
+        /// Version 2 answers in Lambert 72 and nothing else, so a position the event store holds in Lambert
+        /// 2008 is transformed before it reaches <see cref="GetGml"/> — whose <c>srsName</c> is hardcoded on
+        /// EPSG 31370 and would otherwise label Lambert 2008 coordinates as Lambert 72. Version 3 is the one
+        /// that answers in the system the position is persisted in. See ADR 0008.
+        /// </summary>
+        internal static BuildingUnitPosition GetBuildingUnitPoint(byte[] point, BuildingUnitPositionGeometryMethod geometryMethod)
         {
-            var geometry = WKBReaderFactory.Create().Read(point);
+            var geometry = WKBReaderFactory.CreateForEwkb(point)
+                .Read(point)
+                .ToReferenceSystem(ExtendedWkbGeometry.SridLambert72, GeometryReferenceSystem.PositionRoundingPrecision);
+
             var gml = GetGml(geometry);
             return new BuildingUnitPosition(new GmlJsonPoint(gml), MapBuildingUnitGeometryMethod(geometryMethod));
         }
