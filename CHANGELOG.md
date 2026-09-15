@@ -1,3 +1,17 @@
+# [6.5.0](https://github.com/informatievlaanderen/building-registry/compare/v6.4.0...v6.5.0) (2026-09-15)
+
+
+### Bug Fixes
+
+* change building to no rounding + review fixes ([a15dc5e](https://github.com/informatievlaanderen/building-registry/commit/a15dc5ef2e61a6e1a6f3035c8e5db02761d653ba))
+* **feed:** dont output toegekendAdres when planned ([cafd682](https://github.com/informatievlaanderen/building-registry/commit/cafd6828c407ec294ae2f0bdecbe2fe5518f5c0d))
+
+
+### Features
+
+* add lambert2008 migrator ([08e3acc](https://github.com/informatievlaanderen/building-registry/commit/08e3accdd4df3c200e336cdf8beb7332cb194a04))
+* **consumer:** prepare parcel consumer lambert2008 ([c58721c](https://github.com/informatievlaanderen/building-registry/commit/c58721c8bd39020bcaaff4353e2b69a66a6b6e0b))
+
 # [6.4.0](https://github.com/informatievlaanderen/building-registry/compare/v6.3.0...v6.4.0) (2026-08-26)
 
 
