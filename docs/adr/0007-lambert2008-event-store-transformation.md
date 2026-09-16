@@ -116,11 +116,86 @@ A building outline or GRB measurement is a boundary whose vertices carry far mor
 centimetre. Rounding them would move the boundary rather than tidy it, so the transformation leaves
 them at full precision — as parcel-registry does for its parcel geometries.
 
-A building unit position is a single point, and the BackOffice already persists it at centimetre
-precision: `GeometryExtensions.ConvertToGml(false)`, which `GmlGeometryNormalizer` re-serializes
-through, writes a point with 2 decimals (ADR 0003). Rounding here keeps a transformed position
-identical to the same position normalized on the way in, and drops the transform noise below the
-precision anyone reads it at. Address-registry rounds its address positions for the same reason.
+A building unit position is a single point, and a centimetre is the precision everything reads one back
+at. Rounding here drops the transform noise below that, and keeps a transformed position identical to
+the same position written on the way in. Address-registry rounds its address positions for the same
+reason.
+
+That last part was originally justified by the BackOffice already persisting at centimetre precision —
+`GeometryExtensions.ConvertToGml(false)`, which `GmlGeometryNormalizer` re-serializes through, writes a
+point with 2 decimals (ADR 0003). That only holds when the normalizer actually converts. A position
+already in the event store's reference system is passed through *verbatim*, precision included, so a
+caller could post `641296.9712345 685187.3587654` and have it persisted as sent — finer than anything
+would ever serve it back, and therefore a position that can never be posted back as it was stored.
+
+`ExtendedWkbGeometry.CreatePosition` is what makes the claim true rather than nearly true: it rounds,
+`ExtendedWkbGeometry.Create` does not, and every path that writes a unit position goes through the
+former while every `GeometriePolygoon` path goes through the latter. The split is the asymmetry this
+section describes, made explicit at the writer instead of left to the normalizer.
+
+`BuildingGeometry.Center` is on the rounding side of it. A centroid carries as many decimals as the
+outline it is computed from, so a `DerivedFromObject` position was the one kind the event store held at
+full precision — including the one `BuildingGeometryCrsWasChanged` carries, which this transformation
+takes from `Center` rather than rounding the way it rounds a unit's own position two lines above. The
+building geometry stays unrounded; it is the *position taken from it* that is a position.
+
+That has one consequence worth expecting rather than discovering. `CorrectBuildingPosition` decides
+whether a common unit's position is out of date by byte-comparing it against a freshly computed
+`Center`, and every common unit position written before this — a `BuildingWasMigrated` payload holds
+the *legacy* centroid, which is `Centroid` rather than `CentroidWithinArea` and unrounded either way —
+now differs from it. So `CorrectCommonBuildingUnitToPlannedOrRealized` applies one
+`BuildingUnitPositionWasCorrected` per building the first time it runs, moving the position by under a
+centimetre. It is self-limiting: the correction stores the rounded centre, and a building the
+transformation has already been through has a rounded one too, so the comparison then holds. The
+aggregate tests covering common unit status corrections expect that event.
+
+There is a degenerate case this does not handle, recorded rather than guarded: rounding moves a centre
+by up to 0.7 cm, so a building under about 1.4 cm wide at its centroid could have a centre that rounds
+outside itself, which `BuildingGeometry.Contains` would then reject. `GuardOutline` requires an area of
+at least 1 m², but `GuardPolygon` — the GRB measurement paths — has no minimum, so it is reachable in
+principle. A measurement that thin is a data error, and failing loudly on it is the better of the two
+behaviours available.
+
+`BuildingUnit.CorrectPosition` now has the no-op guard the three building geometry paths always had: a
+correction to the position the unit already has applies nothing, rather than a
+`BuildingUnitPositionWasCorrected` carrying a new version, a syndication entry and a Kafka message for
+an edit that changed nothing. Both halves of `BuildingUnitPosition` count, so appointing the coordinates
+a derived unit already sits on is still a real correction — the unit stops following its building.
+
+The guard sits *after* the status, removal and common-unit guards, and after
+`Building_BuildingUnit.CorrectBuildingUnitPosition`'s `Contains` check: a correction that changes
+nothing is still not something a removed or wrongly-statused unit accepts, and an appointed position
+outside the building is still rejected rather than quietly ignored.
+
+Comparing EWKB bytes is only a sound way to ask "is this the same position?" because every position now
+enters the event store through `CreatePosition` at one precision. That is the dependency worth stating
+plainly: the rounding above is what makes this guard correct, and removing it would turn the guard into
+the address-registry bug this whole line of work started from — an event whose position differs from the
+one before it only in how it was serialized.
+
+#### The same guard on a building outline is not reliable, and that is accepted
+
+The three building geometry paths compare bytes too, and for them the dependency above does not hold,
+because an outline is deliberately unrounded. Once a building's stream is transformed, a caller on
+version 2 — which answers in Lambert 72 whatever the event store holds — sends an unchanged outline
+through 08 → 72 → 08, and it comes back a few bits off:
+
+    stored  (641296.8007576728 685195.3986941837)
+    posted  (641296.8007576726 685195.3986941827)
+
+About 10 nm, and the guard misses it: over a sweep of 300 generated buildings across Flanders it fired
+for 7. Version 3 answers in the stored reference system and round-trips exactly — 300 of 300 — and
+before the transformation the Lambert-72-in, Lambert-72-out round trip is a fixed point, so this starts
+only once a stream is converted.
+
+The decision is to accept it. An outline that re-enters at full precision really is a different polygon,
+so the alternatives are a tolerant comparison or having version 2 compare against a version 2 round trip
+of the stored outline — both of which put a fuzz factor in the aggregate to paper over an edit that a
+caller did make. `GeometryHelper.NormalizedGmlPolygonGeometry` already records that the polygon round
+trip is not bit-exact at the 11th decimal and varies per operating system; what this adds is that the
+aggregate's no-op guard depends on a bit-exactness the round trip does not have. Address-registry accepts
+the equivalent for its addresses (ADR 0005), where the positions *are* rounded and the residual is
+therefore a genuine centimetre rather than nanometres.
 
 ### A derived position is recomputed, not transformed
 

@@ -30,7 +30,7 @@ namespace BuildingRegistry.Api.BackOffice.Handlers.Lambda.Requests.BuildingUnit
                 BuildingPersistentLocalId,
                 BuildingUnitPersistentLocalId,
                 Request.PositieGeometrieMethode.Map(),
-                string.IsNullOrWhiteSpace(Request.Positie) ? null : Request.Positie.ToExtendedWkbGeometry(),
+                string.IsNullOrWhiteSpace(Request.Positie) ? null : Request.Positie.ToExtendedWkbPosition(),
                 Request.Functie.Map(),
                 Request.AfwijkingVastgesteld,
                 Provenance);

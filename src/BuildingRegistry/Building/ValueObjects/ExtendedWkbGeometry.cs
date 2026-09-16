@@ -4,6 +4,7 @@
     using Be.Vlaanderen.Basisregisters.AggregateSource;
     using Be.Vlaanderen.Basisregisters.GrAr.Common;
     using Be.Vlaanderen.Basisregisters.GrAr.Common.NetTopology;
+    using Be.Vlaanderen.Basisregisters.GrAr.CrsTransform;
     using Be.Vlaanderen.Basisregisters.Utilities.HexByteConvertor;
     using NetTopologySuite.Geometries;
     using NetTopologySuite.IO;
@@ -37,11 +38,37 @@
         public byte[] ToByteArray() => (byte[])Value.Clone();
 
         /// <summary>
-        /// Wraps a geometry that has already been read and transformed, keeping the SRID it carries. The
-        /// EWKB writer lives here, so this is the only place that decides how a geometry is serialized.
+        /// Wraps a geometry that has already been read and transformed, keeping the SRID it carries. Every
+        /// path that writes a new or corrected building geometry goes through here, so this is what decides
+        /// how one is serialized. <see cref="CreateEWkb"/> is the exception: it re-serializes a geometry the
+        /// event store already holds, for a projection to read SRID-less legacy hex.
         /// </summary>
+        /// <remarks>
+        /// Deliberately does not round. A building outline or GRB measurement is a boundary whose vertices
+        /// carry far more decimals than a centimetre, and rounding those would move it (ADR 0007). A
+        /// building unit <em>position</em> is the other case and goes through
+        /// <see cref="CreatePosition"/>.
+        /// </remarks>
         public static ExtendedWkbGeometry Create(Geometry geometry)
             => new ExtendedWkbGeometry(WkbWriter.Write(geometry));
+
+        /// <summary>
+        /// A building unit position, rounded to
+        /// <see cref="GeometryReferenceSystem.PositionRoundingPrecision"/> decimals — centimetres, the
+        /// precision the event store holds positions at and the only one anything reads them back at.
+        /// </summary>
+        /// <remarks>
+        /// The rounding belongs on the way in, not only in the Lambert 2008 transformation that already did
+        /// it. Nothing downstream can reproduce a position finer than a centimetre: every reader rounds to
+        /// two decimals, and <c>GmlGeometryNormalizer</c> passes a position already in the event store's
+        /// reference system through verbatim, so without this a caller could persist millimetres that they
+        /// would never be served back. See ADR 0007.
+        ///
+        /// The geometry is copied first: <c>RoundCoordinates</c> rounds in place, and callers hand us
+        /// geometries they still use.
+        /// </remarks>
+        public static ExtendedWkbGeometry CreatePosition(Geometry geometry)
+            => Create(geometry.Copy().RoundCoordinates(GeometryReferenceSystem.PositionRoundingPrecision));
 
         public static ExtendedWkbGeometry? CreateEWkb(byte[]? wkb, int useSrid = SridLambert72)
         {

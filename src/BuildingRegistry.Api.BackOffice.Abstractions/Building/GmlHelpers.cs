@@ -10,8 +10,6 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.Building
 
     public static class GmlHelpers
     {
-        private static readonly WKBWriter WkbWriter = new WKBWriter() { Strict = false, HandleSRID = true };
-
         public static GMLReader CreateGmlReader() => CreateGmlReader(ExtendedWkbGeometry.SridLambert72);
 
         public static GMLReader CreateGmlReader(int srid) => GmlFactory.CreateGmlReader(srid);
@@ -47,5 +45,12 @@ namespace BuildingRegistry.Api.BackOffice.Abstractions.Building
         /// </remarks>
         public static ExtendedWkbGeometry ToExtendedWkbGeometry(this string gml)
             => ExtendedWkbGeometry.Create(gml.ReadGeometry());
+
+        /// <summary>
+        /// <see cref="ToExtendedWkbGeometry"/> for a building unit position, which unlike a building
+        /// geometry is rounded to centimetres. See <see cref="ExtendedWkbGeometry.CreatePosition"/>.
+        /// </summary>
+        public static ExtendedWkbGeometry ToExtendedWkbPosition(this string gml)
+            => ExtendedWkbGeometry.CreatePosition(gml.ReadGeometry());
     }
 }

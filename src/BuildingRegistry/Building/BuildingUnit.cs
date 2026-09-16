@@ -339,11 +339,29 @@ namespace BuildingRegistry.Building
                 HasDeviation));
         }
 
+        /// <summary>
+        /// Corrects the unit's position, applying nothing when it is the position the unit already has.
+        /// </summary>
+        /// <remarks>
+        /// The guards run first and still throw for a removed, common or wrongly-statused unit: a
+        /// correction that changes nothing is still not something those units accept.
+        ///
+        /// Both halves of <see cref="BuildingUnitPosition"/> count, so re-appointing the position a derived
+        /// unit already sits on is a real change - the unit stops following its building - and applies an
+        /// event. The comparison is over the EWKB bytes, which is only a sound way to ask "same position?"
+        /// because every position now enters the event store through
+        /// <see cref="ExtendedWkbGeometry.CreatePosition"/> at centimetre precision. See ADR 0007.
+        /// </remarks>
         public void CorrectPosition(BuildingUnitPositionGeometryMethod positionGeometryMethod, ExtendedWkbGeometry finalPosition)
         {
             GuardRemoved();
             GuardCommonUnit();
             GuardValidBuildingUnitStatuses(BuildingUnitStatus.Planned, BuildingUnitStatus.Realized);
+
+            if (BuildingUnitPosition == new BuildingUnitPosition(finalPosition, positionGeometryMethod))
+            {
+                return;
+            }
 
             Apply(new BuildingUnitPositionWasCorrected(
                 _buildingPersistentLocalId,
