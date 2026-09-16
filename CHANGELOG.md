@@ -1,3 +1,10 @@
+## [6.5.1](https://github.com/informatievlaanderen/building-registry/compare/v6.5.0...v6.5.1) (2026-09-16)
+
+
+### Bug Fixes
+
+* migrator startup ([fd97b1e](https://github.com/informatievlaanderen/building-registry/commit/fd97b1e6399967bbf8a80c70da466b5be7438958))
+
 # [6.5.0](https://github.com/informatievlaanderen/building-registry/compare/v6.4.0...v6.5.0) (2026-09-15)
 
 
