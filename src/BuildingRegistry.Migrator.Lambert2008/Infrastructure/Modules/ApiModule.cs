@@ -2,6 +2,7 @@ namespace BuildingRegistry.Migrator.Lambert2008.Infrastructure.Modules
 {
     using Autofac;
     using Autofac.Extensions.DependencyInjection;
+    using BuildingRegistry.Building;
     using BuildingRegistry.Infrastructure;
     using BuildingRegistry.Infrastructure.Modules;
     using Microsoft.Extensions.Configuration;
@@ -31,6 +32,16 @@ namespace BuildingRegistry.Migrator.Lambert2008.Infrastructure.Modules
                 .RegisterModule(new SequenceModule(_configuration, _services, _loggerFactory));
 
             builder.RegisterSnapshotModule(_configuration);
+
+            // See UnreachableDependencies: registered so BuildingUnitCommandHandlerModule can be
+            // constructed, never actually used by the command this migrator dispatches.
+            builder
+                .RegisterType<UnreachableAddCommonBuildingUnit>()
+                .As<IAddCommonBuildingUnit>();
+
+            builder
+                .RegisterType<UnreachableAddresses>()
+                .As<IAddresses>();
 
             builder.Populate(_services);
         }
