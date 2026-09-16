@@ -1,6 +1,7 @@
 namespace BuildingRegistry.Tests.AggregateTests.SnapshotTests
 {
     using System.Collections.Generic;
+    using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
     using Autofac;
@@ -213,6 +214,14 @@ namespace BuildingRegistry.Tests.AggregateTests.SnapshotTests
                 .When(new PlaceBuildingUnderConstruction(Fixture.Create<BuildingPersistentLocalId>(), provenance))
                 .Then(new Fact(_streamId, expectedEvent)));
 
+            // The positions the migration event actually carried, rather than a freshly derived centre:
+            // a migrated position is the legacy centroid at full precision, and nothing in this scenario
+            // re-derives it, so that is what the snapshot has to hold. See ADR 0007.
+            ExtendedWkbGeometry MigratedPosition(int buildingUnitPersistentLocalId) =>
+                new ExtendedWkbGeometry(buildingWasMigrated.BuildingUnits
+                    .Single(x => x.BuildingUnitPersistentLocalId == buildingUnitPersistentLocalId)
+                    .ExtendedWkbGeometry);
+
             var plannedBuildingUnit = BuildingUnit.Migrate(
                 e => {},
                 buildingPersistentLocalId,
@@ -221,7 +230,7 @@ namespace BuildingRegistry.Tests.AggregateTests.SnapshotTests
                 BuildingUnitStatus.Planned,
                 [],
                 new BuildingUnitPosition(
-                    buildingGeometry.Center,
+                    MigratedPosition(1),
                     BuildingUnitPositionGeometryMethod.DerivedFromObject),
                 false);
             plannedBuildingUnit.Route(buildingWasMigrated);
@@ -234,7 +243,7 @@ namespace BuildingRegistry.Tests.AggregateTests.SnapshotTests
                 BuildingUnitStatus.Planned,
                 [],
                 new BuildingUnitPosition(
-                    buildingGeometry.Center,
+                    MigratedPosition(2),
                     BuildingUnitPositionGeometryMethod.DerivedFromObject),
                 false);
             commonBuildingUnit.Route(buildingWasMigrated);
@@ -247,7 +256,7 @@ namespace BuildingRegistry.Tests.AggregateTests.SnapshotTests
                 BuildingUnitStatus.NotRealized,
                 [],
                 new BuildingUnitPosition(
-                    buildingGeometry.Center,
+                    MigratedPosition(3),
                     BuildingUnitPositionGeometryMethod.DerivedFromObject),
                 false);
             unusedCommonBuildingUnit.Route(buildingWasMigrated);

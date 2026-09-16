@@ -50,7 +50,13 @@ namespace BuildingRegistry.Tests.BackOffice.Lambda.BuildingUnit
             var buildingUnitPersistentLocalId = Fixture.Create<BuildingUnitPersistentLocalId>();
 
             PlanBuilding(buildingPersistentLocalId);
-            PlanBuildingUnit(buildingPersistentLocalId, buildingUnitPersistentLocalId);
+            // Appointed, so that correcting it to derived below is an actual correction. A correction to the
+            // position the unit already has applies nothing, which is what this test used to be doing.
+            PlanBuildingUnit(
+                buildingPersistentLocalId,
+                buildingUnitPersistentLocalId,
+                BuildingUnitPositionGeometryMethod.AppointedByAdministrator,
+                new ExtendedWkbGeometry(WkbWriter.Instance.Write(GeometryHelper.ValidPointInPolygon)));
 
             var eTagResponse = new ETagResponse(string.Empty, Fixture.Create<string>());
             var handler = new CorrectBuildingUnitPositionLambdaHandler(

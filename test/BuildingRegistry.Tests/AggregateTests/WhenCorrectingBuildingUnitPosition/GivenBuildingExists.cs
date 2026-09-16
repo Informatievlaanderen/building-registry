@@ -58,6 +58,113 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenCorrectingBuildingUnitPositi
                         buildingGeometry.Center))));
         }
 
+        /// <summary>
+        /// A correction that corrects nothing applies nothing. Without this the unit got a
+        /// <see cref="BuildingUnitPositionWasCorrected"/> - a new version, a syndication entry, a Kafka
+        /// message - for an edit that changed neither the position nor how it was derived.
+        /// </summary>
+        [Fact]
+        public void WithTheDerivedPositionTheUnitAlreadyHas_ThenNone()
+        {
+            var buildingUnitPersistentLocalId = Fixture.Create<BuildingUnitPersistentLocalId>();
+
+            var buildingWasPlanned = Fixture.Create<BuildingWasPlannedV2>();
+            var buildingGeometry = new BuildingGeometry(
+                new ExtendedWkbGeometry(buildingWasPlanned.ExtendedWkbGeometry),
+                BuildingGeometryMethod.Outlined);
+
+            var buildingUnitWasPlanned = Fixture.Create<BuildingUnitWasPlannedV2>()
+                .WithBuildingUnitPersistentLocalId(buildingUnitPersistentLocalId)
+                .WithPosition(new BuildingUnitPosition(
+                    buildingGeometry.Center,
+                    BuildingUnitPositionGeometryMethod.DerivedFromObject));
+
+            var command = Fixture.Create<CorrectBuildingUnitPosition>()
+                .WithPositionGeometryMethod(BuildingUnitPositionGeometryMethod.DerivedFromObject)
+                .WithPointPosition(null)
+                .WithPersistentLocalId(buildingUnitPersistentLocalId);
+
+            Assert(new Scenario()
+                .Given(new BuildingStreamId(Fixture.Create<BuildingPersistentLocalId>()),
+                    buildingWasPlanned,
+                    buildingUnitWasPlanned)
+                .When(command)
+                .ThenNone());
+        }
+
+        [Fact]
+        public void WithTheAppointedPositionTheUnitAlreadyHas_ThenNone()
+        {
+            // Inside the building, unlike the point the derived tests use: the position is only ignored when
+            // the method is DerivedFromObject, so an appointed one still has to pass the Contains guard that
+            // runs before the no-op check.
+            var position = GeometryHelper.GmlPointGeometry;
+
+            var buildingUnitPersistentLocalId = Fixture.Create<BuildingUnitPersistentLocalId>();
+
+            var buildingUnitWasPlanned = Fixture.Create<BuildingUnitWasPlannedV2>()
+                .WithBuildingUnitPersistentLocalId(buildingUnitPersistentLocalId)
+                .WithPosition(new BuildingUnitPosition(
+                    position.ToExtendedWkbPosition(),
+                    BuildingUnitPositionGeometryMethod.AppointedByAdministrator));
+
+            var command = Fixture.Create<CorrectBuildingUnitPosition>()
+                .WithPositionGeometryMethod(BuildingUnitPositionGeometryMethod.AppointedByAdministrator)
+                .WithPointPosition(position)
+                .WithPersistentLocalId(buildingUnitPersistentLocalId);
+
+            Assert(new Scenario()
+                .Given(new BuildingStreamId(Fixture.Create<BuildingPersistentLocalId>()),
+                    Fixture.Create<BuildingWasPlannedV2>(),
+                    buildingUnitWasPlanned)
+                .When(command)
+                .ThenNone());
+        }
+
+        /// <summary>
+        /// Both halves of the position count. Appointing the coordinates a derived unit already sits on is a
+        /// real correction - the unit stops following its building - so it is not a no-op.
+        /// </summary>
+        [Fact]
+        public void WithTheSameCoordinatesButAppointedInsteadOfDerived_ThenBuildingUnitPositionWasCorrected()
+        {
+            var buildingUnitPersistentLocalId = Fixture.Create<BuildingUnitPersistentLocalId>();
+
+            var buildingWasPlanned = Fixture.Create<BuildingWasPlannedV2>();
+            var buildingGeometry = new BuildingGeometry(
+                new ExtendedWkbGeometry(buildingWasPlanned.ExtendedWkbGeometry),
+                BuildingGeometryMethod.Outlined);
+
+            var buildingUnitWasPlanned = Fixture.Create<BuildingUnitWasPlannedV2>()
+                .WithBuildingUnitPersistentLocalId(buildingUnitPersistentLocalId)
+                .WithPosition(new BuildingUnitPosition(
+                    buildingGeometry.Center,
+                    BuildingUnitPositionGeometryMethod.DerivedFromObject));
+
+            var command = Fixture.Create<CorrectBuildingUnitPosition>()
+                .WithPositionGeometryMethod(BuildingUnitPositionGeometryMethod.AppointedByAdministrator)
+                .WithPointPosition(null)
+                .WithPersistentLocalId(buildingUnitPersistentLocalId);
+            command = new CorrectBuildingUnitPosition(
+                command.BuildingPersistentLocalId,
+                command.BuildingUnitPersistentLocalId,
+                command.PositionGeometryMethod,
+                buildingGeometry.Center,
+                command.Provenance);
+
+            Assert(new Scenario()
+                .Given(new BuildingStreamId(Fixture.Create<BuildingPersistentLocalId>()),
+                    buildingWasPlanned,
+                    buildingUnitWasPlanned)
+                .When(command)
+                .Then(new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
+                    new BuildingUnitPositionWasCorrected(
+                        command.BuildingPersistentLocalId,
+                        command.BuildingUnitPersistentLocalId,
+                        BuildingUnitPositionGeometryMethod.AppointedByAdministrator,
+                        buildingGeometry.Center))));
+        }
+
         [Theory]
         [InlineData("NotRealized")]
         [InlineData("Retired")]

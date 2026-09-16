@@ -106,6 +106,15 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuildingUnit
                             command.Function,
                             false)),
                     new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
+                        // The common unit's migrated position is the legacy centroid, at full precision.
+                        // Correcting it to Planned or Realized re-derives it, which now rounds it to
+                        // centimetres like every other building unit position. See ADR 0007.
+                        new BuildingUnitPositionWasCorrected(
+                            command.BuildingPersistentLocalId,
+                            new BuildingUnitPersistentLocalId(2),
+                            BuildingUnitPositionGeometryMethod.DerivedFromObject,
+                            buildingGeometry.Center)),
+                    new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
                         new BuildingUnitWasCorrectedFromNotRealizedToPlanned(
                             command.BuildingPersistentLocalId,
                             new BuildingUnitPersistentLocalId(2)))));
@@ -148,6 +157,15 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuildingUnit
                             buildingGeometry.Center,
                             command.Function,
                             false)),
+                    new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
+                        // The common unit's migrated position is the legacy centroid, at full precision.
+                        // Correcting it to Planned or Realized re-derives it, which now rounds it to
+                        // centimetres like every other building unit position. See ADR 0007.
+                        new BuildingUnitPositionWasCorrected(
+                            command.BuildingPersistentLocalId,
+                            new BuildingUnitPersistentLocalId(1),
+                            BuildingUnitPositionGeometryMethod.DerivedFromObject,
+                            buildingGeometry.Center)),
                     new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
                         new BuildingUnitWasCorrectedFromNotRealizedToPlanned(
                             command.BuildingPersistentLocalId,
@@ -201,6 +219,15 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuildingUnit
                             command.Function,
                             false)),
                     new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
+                        // The common unit's migrated position is the legacy centroid, at full precision.
+                        // Correcting it to Planned or Realized re-derives it, which now rounds it to
+                        // centimetres like every other building unit position. See ADR 0007.
+                        new BuildingUnitPositionWasCorrected(
+                            command.BuildingPersistentLocalId,
+                            retiredBuildingUnitPersistentLocalId,
+                            BuildingUnitPositionGeometryMethod.DerivedFromObject,
+                            buildingGeometry.Center)),
+                    new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
                         new BuildingUnitWasCorrectedFromRetiredToRealized(
                             command.BuildingPersistentLocalId,
                             retiredBuildingUnitPersistentLocalId))));
@@ -248,6 +275,15 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenPlanningBuildingUnit
                             buildingGeometry.Center,
                             command.Function,
                             false)),
+                    new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
+                        // The common unit's migrated position is the legacy centroid, at full precision.
+                        // Correcting it to Planned or Realized re-derives it, which now rounds it to
+                        // centimetres like every other building unit position. See ADR 0007.
+                        new BuildingUnitPositionWasCorrected(
+                            command.BuildingPersistentLocalId,
+                            retiredBuildingUnitPersistentLocalId,
+                            BuildingUnitPositionGeometryMethod.DerivedFromObject,
+                            buildingGeometry.Center)),
                     new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
                         new BuildingUnitWasCorrectedFromRetiredToRealized(
                             command.BuildingPersistentLocalId,

@@ -17,11 +17,12 @@ namespace BuildingRegistry
         /// Building unit positions are rounded to centimetres, buildings geometries are not.
         /// </summary>
         /// <remarks>
-        /// A unit position is a single point, and the BackOffice already persists it at that precision:
-        /// <c>GeometryExtensions.ConvertToGml(false)</c>, which <c>GmlGeometryNormalizer</c> re-serializes
-        /// through, writes a point with 2 decimals (ADR 0003). Rounding here keeps a transformed position
-        /// identical to the same position normalized on the way in, and drops the transform noise below the
-        /// precision anyone reads it at.
+        /// A unit position is a single point, and a centimetre is the precision everything reads one back
+        /// at. Rounding here drops the transform noise below that, and keeps a transformed position
+        /// identical to the same position written on the way in — which
+        /// <see cref="Building.ExtendedWkbGeometry.CreatePosition"/> is what guarantees: the normalizer
+        /// re-serializes to 2 decimals only when it actually converts, and passes a position already in the
+        /// event store's reference system through at whatever precision it was sent. See ADR 0007.
         ///
         /// A building geometry is an outline or a GRB measurement whose vertices carry far more decimals
         /// than a centimetre; rounding those would move the boundary rather than tidy it, so the

@@ -51,6 +51,13 @@ namespace BuildingRegistry.Building
         /// definition. Pinning Lambert 72 unconditionally, as this did through
         /// <see cref="ExtendedWkbGeometry.CreateEWkb"/>, throws the moment the event store holds Lambert
         /// 2008. See ADR 0007.
+        ///
+        /// Rounded to centimetres through <see cref="ExtendedWkbGeometry.CreatePosition"/>, like every other
+        /// building unit position. A centroid carries as many decimals as the outline it is computed from,
+        /// so without this a derived position is the one kind the event store holds at full precision - and
+        /// the Lambert 2008 transformation inherits it from here rather than rounding it the way it rounds a
+        /// unit's own position. The building geometry itself stays unrounded; it is the position taken from
+        /// it that is a position.
         /// </remarks>
         public ExtendedWkbGeometry Center
         {
@@ -59,7 +66,7 @@ namespace BuildingRegistry.Building
                 var geometry = _wkbReader.Read(Geometry);
                 var srid = geometry.SRID > 0 ? geometry.SRID : ExtendedWkbGeometry.SridLambert72;
 
-                return ExtendedWkbGeometry.Create(geometry.CentroidWithinArea().WithSrid(srid));
+                return ExtendedWkbGeometry.CreatePosition(geometry.CentroidWithinArea().WithSrid(srid));
             }
         }
 
