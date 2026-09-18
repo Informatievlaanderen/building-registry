@@ -197,6 +197,24 @@ aggregate's no-op guard depends on a bit-exactness the round trip does not have.
 the equivalent for its addresses (ADR 0005), where the positions *are* rounded and the residual is
 therefore a genuine centimetre rather than nanometres.
 
+A building unit position has the same residual, in the rounded form rather than the nanometre one. Because
+positions are held at centimetres, an 08 -> 72 -> 08 round trip rounds at each end, and for roughly one
+position in 26 000 the two roundings fall either side of a half-centimetre and it comes back one
+centimetre off. `BuildingUnit.CorrectPosition`'s no-op guard reads that as a change, because it is one.
+Accepted on the same grounds and with the same shape as the outline case above: a version 2 caller who
+edits nothing, at a rate the volume of such edits makes tolerable, and no way to suppress it that does not
+also suppress a real one-centimetre correction.
+
+A tolerance rule was considered for all three residuals — suppress a change under two centimetres — and
+rejected. It works: the drift is bounded at one centimetre per coordinate by construction, since each
+rounding moves at most half a centimetre, and a sweep of 517 536 positions found a maximum of exactly
+that and never on both axes at once. The cost is that a genuine one-centimetre edit becomes
+unexpressible, which for a register held at centimetre precision is the wrong trade for the number of
+events it would save. Worth recording for whoever proposes it next: written as `>= 0.02` it would also
+have reintroduced the boundary problem one centimetre further along, because a one-centimetre delta
+computes as `0.010000000009…` and does not compare equal to `0.01`. A threshold has to sit at the
+midpoint — `> 0.015` — not on a value the data can actually take.
+
 ### A derived position is recomputed, not transformed
 
 A unit with position method `DerivedFromObject` takes `BuildingGeometry.Center` of the **transformed**
@@ -258,6 +276,9 @@ The ordering that actually matters is therefore not about the migrator at all:
    column still has NULLs makes `boundingBox.Intersects(building.SysGeometryLambert2008)` NULL for those
    rows, so they drop out of matching with nothing logged. `Lambert2008MatchingReadiness` turns that into
    a loud failure on the first Lambert 2008 match in each process.
+3. The centimetre rounding — `ExtendedWkbGeometry.CreatePosition`, and `BuildingGeometry.Center` through
+   it — deployed **before** the migrator runs, or every derived and common unit position is written at
+   full precision.
 
 Two limits of that guard are worth knowing. It checks `BuildingDetailsV2` and nothing else, so green
 means "this column has no NULLs", not "the conversion is done" — the event store and the other
