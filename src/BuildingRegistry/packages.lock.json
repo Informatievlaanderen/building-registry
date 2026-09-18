@@ -4,9 +4,9 @@
     "net10.0": {
       "Autofac": {
         "type": "Direct",
-        "requested": "[9.1.0, )",
-        "resolved": "9.1.0",
-        "contentHash": "onT/BcnnfWcQNXiuC7R/0h8ALQzRdsAI20gpB7nfrudXpFMXdVZKz1umdtHXDwjc/bmWEsrCBAxck3+Arnk15g=="
+        "requested": "[9.3.3, )",
+        "resolved": "9.3.3",
+        "contentHash": "ZH0n0RyVm0jiAtGiWNu1bETNL7IwRSHP7jL205MlQ6/FXgJDufCbb6A0Ech8WzdNwue5rO/FcZtMQzmiNHfZkw=="
       },
       "Be.Vlaanderen.Basisregisters.AggregateSource.ExplicitRouting": {
         "type": "Direct",
