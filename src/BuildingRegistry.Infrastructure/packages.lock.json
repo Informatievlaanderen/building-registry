@@ -437,7 +437,7 @@
       "buildingregistry": {
         "type": "Project",
         "dependencies": {
-          "Autofac": "[9.1.0, )",
+          "Autofac": "[9.3.3, )",
           "Be.Vlaanderen.Basisregisters.AggregateSource.ExplicitRouting": "[11.0.0, )",
           "Be.Vlaanderen.Basisregisters.CommandHandling.SqlStreamStore": "[11.0.0, )",
           "Be.Vlaanderen.Basisregisters.Crab": "[5.1.0, )",
@@ -452,9 +452,9 @@
       },
       "Autofac": {
         "type": "CentralTransitive",
-        "requested": "[9.1.0, )",
-        "resolved": "9.1.0",
-        "contentHash": "onT/BcnnfWcQNXiuC7R/0h8ALQzRdsAI20gpB7nfrudXpFMXdVZKz1umdtHXDwjc/bmWEsrCBAxck3+Arnk15g=="
+        "requested": "[9.3.3, )",
+        "resolved": "9.3.3",
+        "contentHash": "ZH0n0RyVm0jiAtGiWNu1bETNL7IwRSHP7jL205MlQ6/FXgJDufCbb6A0Ech8WzdNwue5rO/FcZtMQzmiNHfZkw=="
       },
       "Be.Vlaanderen.Basisregisters.AggregateSource.ExplicitRouting": {
         "type": "CentralTransitive",
