@@ -1,3 +1,10 @@
+## [6.5.2](https://github.com/informatievlaanderen/building-registry/compare/v6.5.1...v6.5.2) (2026-09-18)
+
+
+### Bug Fixes
+
+* round center to 2 decimals + fix input unit positions rounding ([fd3cff3](https://github.com/informatievlaanderen/building-registry/commit/fd3cff315374c6f69380d06b791c595ea5f263ca))
+
 ## [6.5.1](https://github.com/informatievlaanderen/building-registry/compare/v6.5.0...v6.5.1) (2026-09-16)
 
 
