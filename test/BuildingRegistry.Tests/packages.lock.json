@@ -208,8 +208,8 @@
       },
       "AWSSDK.Core": {
         "type": "Transitive",
-        "resolved": "4.0.9.3",
-        "contentHash": "FR+RQZQL+V6M2DdWkQaFFKaerULX6JUeT6Em5DYgcEMsenH9kiABrLRBBJqb1L+JUHC4svPGYu7biJb1a/7BYw=="
+        "resolved": "4.0.102.8",
+        "contentHash": "90B9Skhl+ORbtWNXrrmGdGhGvAfZiPmZafRYrB/xHelZjePIwPvXioqz9UiiF1vo21eDLzTnXh5EC4RjbNWsFQ=="
       },
       "AWSSDK.DynamoDBv2": {
         "type": "Transitive",
@@ -1790,7 +1790,7 @@
       "buildingregistry.producer.snapshot.oslo": {
         "type": "Project",
         "dependencies": {
-          "AWSSDK.Extensions.NETCore.Setup": "[4.0.4.8, )",
+          "AWSSDK.Extensions.NETCore.Setup": "[4.0.102.1, )",
           "AspNetCore.HealthChecks.NpgSql": "[9.0.0, )",
           "AspNetCore.HealthChecks.SqlServer": "[9.0.0, )",
           "Be.Vlaanderen.Basisregisters.Api": "[27.0.0, )",
@@ -1938,7 +1938,7 @@
       "buildingregistry.tools.console": {
         "type": "Project",
         "dependencies": {
-          "AWSSDK.Extensions.NETCore.Setup": "[4.0.4.8, )",
+          "AWSSDK.Extensions.NETCore.Setup": "[4.0.102.1, )",
           "Be.Vlaanderen.Basisregisters.Aws.DistributedMutex": "[5.1.0, )",
           "Be.Vlaanderen.Basisregisters.BuildingRegistry.Api.BackOffice.Abstractions": "[1.0.0, )",
           "Be.Vlaanderen.Basisregisters.GrAr.Notifications": "[26.1.0, )",
@@ -1987,11 +1987,11 @@
       },
       "AWSSDK.Extensions.NETCore.Setup": {
         "type": "CentralTransitive",
-        "requested": "[4.0.4.8, )",
-        "resolved": "4.0.4.8",
-        "contentHash": "GAfNNysynIjMKJiV5tTletuJIdOV3E9+ziDJzFDrAEg1YR3amD/nZJaiZE6C9gllTJgB76Si6W5OZ/LnKdUCrg==",
+        "requested": "[4.0.102.1, )",
+        "resolved": "4.0.102.1",
+        "contentHash": "VVr9WPv7+mmqc3yCiYI4txANzsr6nPejWTSOBRfbYPRsj1s2EY0TUxuhp0JCnK5j6wglQ3s2H+RfmYir3HHfjw==",
         "dependencies": {
-          "AWSSDK.Core": "4.0.9.3",
+          "AWSSDK.Core": "4.0.102.8",
           "Microsoft.Extensions.Configuration.Abstractions": "2.0.0",
           "Microsoft.Extensions.DependencyInjection.Abstractions": "8.0.0",
           "Microsoft.Extensions.Logging.Abstractions": "2.0.0"
