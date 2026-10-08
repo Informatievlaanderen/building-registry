@@ -1,3 +1,10 @@
+## [6.5.3](https://github.com/informatievlaanderen/building-registry/compare/v6.5.2...v6.5.3) (2026-10-08)
+
+
+### Bug Fixes
+
+* add retry in lastchangedlist console ([c3f29c6](https://github.com/informatievlaanderen/building-registry/commit/c3f29c6f9fad709ff7b252089897ded755ad223b))
+
 ## [6.5.2](https://github.com/informatievlaanderen/building-registry/compare/v6.5.1...v6.5.2) (2026-09-18)
 
 
