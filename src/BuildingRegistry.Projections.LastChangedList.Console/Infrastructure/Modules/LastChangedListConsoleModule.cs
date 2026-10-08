@@ -88,6 +88,11 @@ namespace BuildingRegistry.Projections.LastChangedList.Console.Infrastructure.Mo
                         BuildingUnitDetailItemConfiguration.ProjectionStateName))
                 .AsSelf();
 
+            // Retry transient failures (e.g. sql timeouts) before the projection gets stopped.
+            var projectionSettings = ConnectedProjectionSettings
+                .Configure(settings =>
+                    settings.ConfigureLinearBackoff<Exception>(_configuration, "LastChangedList"));
+
             builder
                 .RegisterProjectionMigrator<LastChangedListContextMigrationFactory>(
                     _configuration,
@@ -97,16 +102,16 @@ namespace BuildingRegistry.Projections.LastChangedList.Console.Infrastructure.Mo
                     _loggerFactory)
                 .RegisterProjections<BuildingProjections, LastChangedListContext>(
                     context => new BuildingProjections(context.Resolve<LastChangedListBuildingCacheValidator>()),
-                    ConnectedProjectionSettings.Default)
+                    projectionSettings)
                 .RegisterProjections<BuildingUnitProjections, LastChangedListContext>(
                     context => new BuildingUnitProjections(context.Resolve<LastChangedListBuildingUnitCacheValidator>()),
-                    ConnectedProjectionSettings.Default)
+                    projectionSettings)
                 .RegisterProjections<BuildingProjectionsV3, LastChangedListContext>(
                     context => new BuildingProjectionsV3(context.Resolve<LastChangedListBuildingCacheValidator>()),
-                    ConnectedProjectionSettings.Default)
+                    projectionSettings)
                 .RegisterProjections<BuildingUnitProjectionsV3, LastChangedListContext>(
                     context => new BuildingUnitProjectionsV3(context.Resolve<LastChangedListBuildingUnitCacheValidator>()),
-                    ConnectedProjectionSettings.Default);
+                    projectionSettings);
         }
     }
 }
