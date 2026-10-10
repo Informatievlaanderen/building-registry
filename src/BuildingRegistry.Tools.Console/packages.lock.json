@@ -4,11 +4,11 @@
     "net10.0": {
       "AWSSDK.Extensions.NETCore.Setup": {
         "type": "Direct",
-        "requested": "[4.0.4.8, )",
-        "resolved": "4.0.4.8",
-        "contentHash": "GAfNNysynIjMKJiV5tTletuJIdOV3E9+ziDJzFDrAEg1YR3amD/nZJaiZE6C9gllTJgB76Si6W5OZ/LnKdUCrg==",
+        "requested": "[4.0.102.2, )",
+        "resolved": "4.0.102.2",
+        "contentHash": "Jr56FQ4qd9PvwPr6mnLQ6tMVZRv8TTF/MKyfSS1wDXV2d+lsKLfEi57M8Xug04XvybwQJsaaLByapuN0PoCzDg==",
         "dependencies": {
-          "AWSSDK.Core": "4.0.9.3"
+          "AWSSDK.Core": "4.0.102.9"
         }
       },
       "Be.Vlaanderen.Basisregisters.Aws.DistributedMutex": {
@@ -208,8 +208,8 @@
       },
       "AWSSDK.Core": {
         "type": "Transitive",
-        "resolved": "4.0.9.3",
-        "contentHash": "FR+RQZQL+V6M2DdWkQaFFKaerULX6JUeT6Em5DYgcEMsenH9kiABrLRBBJqb1L+JUHC4svPGYu7biJb1a/7BYw=="
+        "resolved": "4.0.102.9",
+        "contentHash": "VWGkR0QXDTmThusATC6I9IX06YtYeQNF+1/v6vBbfzIC+MaAuNjYn0aSTIyX+abciZvFhuSSi0d6/pC93wROCw=="
       },
       "AWSSDK.DynamoDBv2": {
         "type": "Transitive",
