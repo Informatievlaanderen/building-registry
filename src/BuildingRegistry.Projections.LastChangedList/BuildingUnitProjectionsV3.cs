@@ -29,12 +29,12 @@ namespace BuildingRegistry.Projections.LastChangedList
                 foreach (var buildingUnit in message.Message.BuildingUnits)
                 {
                     var attachedRecords =
-                        await GetLastChangedRecordsAndUpdatePosition(buildingUnit.BuildingUnitId.ToString(), message.Position, context, ct);
+                        await GetLastChangedRecordsAndUpdatePosition(GetIdentifier(buildingUnit.BuildingUnitId.ToString()), message.Position, context, ct);
 
                     context.LastChangedList.RemoveRange(attachedRecords);
 
                     var records =
-                        await GetLastChangedRecordsAndUpdatePosition(buildingUnit.BuildingUnitPersistentLocalId.ToString(), message.Position, context, ct);
+                        await GetLastChangedRecordsAndUpdatePosition(GetIdentifier(buildingUnit.BuildingUnitPersistentLocalId.ToString()), message.Position, context, ct);
                     RebuildKeyAndUri(records, buildingUnit.BuildingUnitPersistentLocalId);
                 }
             });
@@ -44,7 +44,7 @@ namespace BuildingRegistry.Projections.LastChangedList
                 foreach (var buildingUnitPersistentLocalId
                          in message.Message.BuildingUnitPersistentLocalIds.Concat(message.Message.BuildingUnitPersistentLocalIdsWhichBecameDerived))
                 {
-                    await GetLastChangedRecordsAndUpdatePosition(buildingUnitPersistentLocalId.ToString(), message.Position, context, ct);
+                    await GetLastChangedRecordsAndUpdatePosition(GetIdentifier(buildingUnitPersistentLocalId.ToString()), message.Position, context, ct);
                 }
             });
 
@@ -53,7 +53,7 @@ namespace BuildingRegistry.Projections.LastChangedList
                 foreach (var buildingUnitPersistentLocalId
                          in message.Message.BuildingUnitPersistentLocalIds.Concat(message.Message.BuildingUnitPersistentLocalIdsWhichBecameDerived))
                 {
-                    await GetLastChangedRecordsAndUpdatePosition(buildingUnitPersistentLocalId.ToString(), message.Position, context, ct);
+                    await GetLastChangedRecordsAndUpdatePosition(GetIdentifier(buildingUnitPersistentLocalId.ToString()), message.Position, context, ct);
                 }
             });
 
@@ -62,7 +62,7 @@ namespace BuildingRegistry.Projections.LastChangedList
                 foreach (var buildingUnitPersistentLocalId
                          in message.Message.BuildingUnitPersistentLocalIds.Concat(message.Message.BuildingUnitPersistentLocalIdsWhichBecameDerived))
                 {
-                    await GetLastChangedRecordsAndUpdatePosition(buildingUnitPersistentLocalId.ToString(), message.Position, context, ct);
+                    await GetLastChangedRecordsAndUpdatePosition(GetIdentifier(buildingUnitPersistentLocalId.ToString()), message.Position, context, ct);
                 }
             });
 
@@ -70,7 +70,7 @@ namespace BuildingRegistry.Projections.LastChangedList
             {
                 foreach (var buildingUnitPersistentLocalId in message.Message.BuildingUnitPersistentLocalIds)
                 {
-                    await GetLastChangedRecordsAndUpdatePosition(buildingUnitPersistentLocalId.ToString(), message.Position, context, ct);
+                    await GetLastChangedRecordsAndUpdatePosition(GetIdentifier(buildingUnitPersistentLocalId.ToString()), message.Position, context, ct);
                 }
             });
 
@@ -78,7 +78,7 @@ namespace BuildingRegistry.Projections.LastChangedList
             {
                 foreach (var buildingUnitPersistentLocalId in message.Message.BuildingUnitPersistentLocalIds)
                 {
-                    await GetLastChangedRecordsAndUpdatePosition(buildingUnitPersistentLocalId.ToString(), message.Position, context, ct);
+                    await GetLastChangedRecordsAndUpdatePosition(GetIdentifier(buildingUnitPersistentLocalId.ToString()), message.Position, context, ct);
                 }
             });
 
@@ -97,32 +97,32 @@ namespace BuildingRegistry.Projections.LastChangedList
 
             When<Envelope<BuildingUnitAddressWasAttachedV2>>(async (context, message, ct) =>
             {
-                await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingUnitPersistentLocalId.ToString(), message.Position, context, ct);
+                await GetLastChangedRecordsAndUpdatePosition(GetIdentifier(message.Message.BuildingUnitPersistentLocalId.ToString()), message.Position, context, ct);
             });
 
             When<Envelope<BuildingUnitAddressWasDetachedBecauseAddressWasRejected>>(async (context, message, ct) =>
             {
-                await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingUnitPersistentLocalId.ToString(), message.Position, context, ct);
+                await GetLastChangedRecordsAndUpdatePosition(GetIdentifier(message.Message.BuildingUnitPersistentLocalId.ToString()), message.Position, context, ct);
             });
 
             When<Envelope<BuildingUnitAddressWasDetachedBecauseAddressWasRemoved>>(async (context, message, ct) =>
             {
-                await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingUnitPersistentLocalId.ToString(), message.Position, context, ct);
+                await GetLastChangedRecordsAndUpdatePosition(GetIdentifier(message.Message.BuildingUnitPersistentLocalId.ToString()), message.Position, context, ct);
             });
 
             When<Envelope<BuildingUnitAddressWasDetachedBecauseAddressWasRetired>>(async (context, message, ct) =>
             {
-                await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingUnitPersistentLocalId.ToString(), message.Position, context, ct);
+                await GetLastChangedRecordsAndUpdatePosition(GetIdentifier(message.Message.BuildingUnitPersistentLocalId.ToString()), message.Position, context, ct);
             });
 
             When<Envelope<BuildingUnitAddressWasDetachedV2>>(async (context, message, ct) =>
             {
-                await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingUnitPersistentLocalId.ToString(), message.Position, context, ct);
+                await GetLastChangedRecordsAndUpdatePosition(GetIdentifier(message.Message.BuildingUnitPersistentLocalId.ToString()), message.Position, context, ct);
             });
 
             When<Envelope<BuildingUnitAddressWasReplacedBecauseAddressWasReaddressed>>(async (context, message, ct) =>
             {
-                await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingUnitPersistentLocalId.ToString(), message.Position, context, ct);
+                await GetLastChangedRecordsAndUpdatePosition(GetIdentifier(message.Message.BuildingUnitPersistentLocalId.ToString()), message.Position, context, ct);
             });
 
             When<Envelope<BuildingBuildingUnitsAddressesWereReaddressed>>(async (context, message, ct) =>
@@ -135,124 +135,124 @@ namespace BuildingRegistry.Projections.LastChangedList
 
             When<Envelope<BuildingUnitAddressWasReplacedBecauseOfMunicipalityMerger>>(async (context, message, ct) =>
             {
-                await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingUnitPersistentLocalId.ToString(), message.Position, context, ct);
+                await GetLastChangedRecordsAndUpdatePosition(GetIdentifier(message.Message.BuildingUnitPersistentLocalId.ToString()), message.Position, context, ct);
             });
 
             When<Envelope<BuildingUnitDeregulationWasCorrected>>(async (context, message, ct) =>
             {
-                await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingUnitPersistentLocalId.ToString(), message.Position, context, ct);
+                await GetLastChangedRecordsAndUpdatePosition(GetIdentifier(message.Message.BuildingUnitPersistentLocalId.ToString()), message.Position, context, ct);
             });
 
             When<Envelope<BuildingUnitPositionWasCorrected>>(async (context, message, ct) =>
             {
-                await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingUnitPersistentLocalId.ToString(), message.Position, context, ct);
+                await GetLastChangedRecordsAndUpdatePosition(GetIdentifier(message.Message.BuildingUnitPersistentLocalId.ToString()), message.Position, context, ct);
             });
 
             When<Envelope<BuildingUnitPositionCrsWasChanged>>(async (context, message, ct) =>
             {
-                await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingUnitPersistentLocalId.ToString(), message.Position, context, ct);
+                await GetLastChangedRecordsAndUpdatePosition(GetIdentifier(message.Message.BuildingUnitPersistentLocalId.ToString()), message.Position, context, ct);
             });
 
             When<Envelope<BuildingUnitRegularizationWasCorrected>>(async (context, message, ct) =>
             {
-                await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingUnitPersistentLocalId.ToString(), message.Position, context, ct);
+                await GetLastChangedRecordsAndUpdatePosition(GetIdentifier(message.Message.BuildingUnitPersistentLocalId.ToString()), message.Position, context, ct);
             });
 
             When<Envelope<BuildingUnitRemovalWasCorrected>>(async (context, message, ct) =>
             {
-                await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingUnitPersistentLocalId.ToString(), message.Position, context, ct);
+                await GetLastChangedRecordsAndUpdatePosition(GetIdentifier(message.Message.BuildingUnitPersistentLocalId.ToString()), message.Position, context, ct);
             });
 
             When<Envelope<BuildingUnitWasCorrectedFromNotRealizedToPlanned>>(async (context, message, ct) =>
             {
-                await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingUnitPersistentLocalId.ToString(), message.Position, context, ct);
+                await GetLastChangedRecordsAndUpdatePosition(GetIdentifier(message.Message.BuildingUnitPersistentLocalId.ToString()), message.Position, context, ct);
             });
 
             When<Envelope<BuildingUnitWasCorrectedFromRealizedToPlanned>>(async (context, message, ct) =>
             {
-                await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingUnitPersistentLocalId.ToString(), message.Position, context, ct);
+                await GetLastChangedRecordsAndUpdatePosition(GetIdentifier(message.Message.BuildingUnitPersistentLocalId.ToString()), message.Position, context, ct);
             });
 
             When<Envelope<BuildingUnitWasCorrectedFromRealizedToPlannedBecauseBuildingWasCorrected>>(async (context, message, ct) =>
             {
-                await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingUnitPersistentLocalId.ToString(), message.Position, context, ct);
+                await GetLastChangedRecordsAndUpdatePosition(GetIdentifier(message.Message.BuildingUnitPersistentLocalId.ToString()), message.Position, context, ct);
             });
 
             When<Envelope<BuildingUnitWasCorrectedFromRetiredToRealized>>(async (context, message, ct) =>
             {
-                await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingUnitPersistentLocalId.ToString(), message.Position, context, ct);
+                await GetLastChangedRecordsAndUpdatePosition(GetIdentifier(message.Message.BuildingUnitPersistentLocalId.ToString()), message.Position, context, ct);
             });
 
             When<Envelope<BuildingUnitWasDeregulated>>(async (context, message, ct) =>
             {
-                await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingUnitPersistentLocalId.ToString(), message.Position, context, ct);
+                await GetLastChangedRecordsAndUpdatePosition(GetIdentifier(message.Message.BuildingUnitPersistentLocalId.ToString()), message.Position, context, ct);
             });
 
             When<Envelope<BuildingUnitWasNotRealizedBecauseBuildingWasDemolished>>(async (context, message, ct) =>
             {
-                await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingUnitPersistentLocalId.ToString(), message.Position, context, ct);
+                await GetLastChangedRecordsAndUpdatePosition(GetIdentifier(message.Message.BuildingUnitPersistentLocalId.ToString()), message.Position, context, ct);
             });
 
             When<Envelope<BuildingUnitWasNotRealizedBecauseBuildingWasNotRealized>>(async (context, message, ct) =>
             {
-                await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingUnitPersistentLocalId.ToString(), message.Position, context, ct);
+                await GetLastChangedRecordsAndUpdatePosition(GetIdentifier(message.Message.BuildingUnitPersistentLocalId.ToString()), message.Position, context, ct);
             });
 
             When<Envelope<BuildingUnitWasNotRealizedV2>>(async (context, message, ct) =>
             {
-                await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingUnitPersistentLocalId.ToString(), message.Position, context, ct);
+                await GetLastChangedRecordsAndUpdatePosition(GetIdentifier(message.Message.BuildingUnitPersistentLocalId.ToString()), message.Position, context, ct);
             });
 
             When<Envelope<BuildingUnitWasPlannedV2>>(async (context, message, ct) =>
             {
-                var records = await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingUnitPersistentLocalId.ToString(), message.Position, context, ct);
+                var records = await GetLastChangedRecordsAndUpdatePosition(GetIdentifier(message.Message.BuildingUnitPersistentLocalId.ToString()), message.Position, context, ct);
                 RebuildKeyAndUri(records, message.Message.BuildingUnitPersistentLocalId);
             });
 
             When<Envelope<BuildingUnitWasRealizedBecauseBuildingWasRealized>>(async (context, message, ct) =>
             {
-                await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingUnitPersistentLocalId.ToString(), message.Position, context, ct);
+                await GetLastChangedRecordsAndUpdatePosition(GetIdentifier(message.Message.BuildingUnitPersistentLocalId.ToString()), message.Position, context, ct);
             });
 
             When<Envelope<BuildingUnitWasRealizedV2>>(async (context, message, ct) =>
             {
-                await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingUnitPersistentLocalId.ToString(), message.Position, context, ct);
+                await GetLastChangedRecordsAndUpdatePosition(GetIdentifier(message.Message.BuildingUnitPersistentLocalId.ToString()), message.Position, context, ct);
             });
 
             When<Envelope<BuildingUnitWasRegularized>>(async (context, message, ct) =>
             {
-                await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingUnitPersistentLocalId.ToString(), message.Position, context, ct);
+                await GetLastChangedRecordsAndUpdatePosition(GetIdentifier(message.Message.BuildingUnitPersistentLocalId.ToString()), message.Position, context, ct);
             });
 
             When<Envelope<BuildingUnitWasRemovedBecauseBuildingWasRemoved>>(async (context, message, ct) =>
             {
-                await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingUnitPersistentLocalId.ToString(), message.Position, context, ct);
+                await GetLastChangedRecordsAndUpdatePosition(GetIdentifier(message.Message.BuildingUnitPersistentLocalId.ToString()), message.Position, context, ct);
             });
 
             When<Envelope<BuildingUnitWasRemovedV2>>(async (context, message, ct) =>
             {
-                await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingUnitPersistentLocalId.ToString(), message.Position, context, ct);
+                await GetLastChangedRecordsAndUpdatePosition(GetIdentifier(message.Message.BuildingUnitPersistentLocalId.ToString()), message.Position, context, ct);
             });
 
             When<Envelope<BuildingUnitWasRetiredBecauseBuildingWasDemolished>>(async (context, message, ct) =>
             {
-                await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingUnitPersistentLocalId.ToString(), message.Position, context, ct);
+                await GetLastChangedRecordsAndUpdatePosition(GetIdentifier(message.Message.BuildingUnitPersistentLocalId.ToString()), message.Position, context, ct);
             });
 
             When<Envelope<BuildingUnitWasRetiredV2>>(async (context, message, ct) =>
             {
-                await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingUnitPersistentLocalId.ToString(), message.Position, context, ct);
+                await GetLastChangedRecordsAndUpdatePosition(GetIdentifier(message.Message.BuildingUnitPersistentLocalId.ToString()), message.Position, context, ct);
             });
 
             When<Envelope<CommonBuildingUnitWasAddedV2>>(async (context, message, ct) =>
             {
-                var records = await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingUnitPersistentLocalId.ToString(), message.Position, context, ct);
+                var records = await GetLastChangedRecordsAndUpdatePosition(GetIdentifier(message.Message.BuildingUnitPersistentLocalId.ToString()), message.Position, context, ct);
                 RebuildKeyAndUri(records, message.Message.BuildingUnitPersistentLocalId);
             });
 
             When<Envelope<BuildingUnitWasMovedIntoBuilding>>(async (context, message, ct) =>
             {
-                await GetLastChangedRecordsAndUpdatePosition(message.Message.BuildingUnitPersistentLocalId.ToString(), message.Position, context, ct);
+                await GetLastChangedRecordsAndUpdatePosition(GetIdentifier(message.Message.BuildingUnitPersistentLocalId.ToString()), message.Position, context, ct);
             });
 
             When<Envelope<BuildingUnitWasMovedOutOfBuilding>>(DoNothing);
@@ -277,6 +277,11 @@ namespace BuildingRegistry.Projections.LastChangedList
                     record.Uri = string.Format(record.Uri, persistentLocalId);
                 }
             }
+        }
+
+        private static string GetIdentifier(string persistentLocalId)
+        {
+            return $"v3.{persistentLocalId}";
         }
 
         protected override string BuildCacheKey(AcceptType acceptType, string identifier)
