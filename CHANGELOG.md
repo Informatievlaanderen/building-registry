@@ -1,3 +1,10 @@
+## [6.5.4](https://github.com/informatievlaanderen/building-registry/compare/v6.5.3...v6.5.4) (2026-10-14)
+
+
+### Bug Fixes
+
+* **lastchangedlist:** use correct identifier to build cache ([f78b96e](https://github.com/informatievlaanderen/building-registry/commit/f78b96ea614cb0bafabe6cf19b5d7b3209fcf7ce))
+
 ## [6.5.3](https://github.com/informatievlaanderen/building-registry/compare/v6.5.2...v6.5.3) (2026-10-08)
 
 
