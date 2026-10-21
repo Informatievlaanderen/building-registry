@@ -1,3 +1,10 @@
+## [6.5.5](https://github.com/informatievlaanderen/building-registry/compare/v6.5.4...v6.5.5) (2026-10-21)
+
+
+### Bug Fixes
+
+* **lastchanged:** correct identifiers ([2e37326](https://github.com/informatievlaanderen/building-registry/commit/2e37326cb0343f23157c159bd49927a525e8961a))
+
 ## [6.5.4](https://github.com/informatievlaanderen/building-registry/compare/v6.5.3...v6.5.4) (2026-10-14)
 
 
