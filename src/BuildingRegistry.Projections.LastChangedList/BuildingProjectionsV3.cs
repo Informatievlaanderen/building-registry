@@ -1,11 +1,13 @@
 namespace BuildingRegistry.Projections.LastChangedList
 {
     using System;
+    using System.Collections.Generic;
     using System.Threading;
     using System.Threading.Tasks;
     using Be.Vlaanderen.Basisregisters.EventHandling;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.Connector;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.LastChangedList;
+    using Be.Vlaanderen.Basisregisters.ProjectionHandling.LastChangedList.Model;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore;
     using Building.Events;
 
@@ -20,13 +22,23 @@ namespace BuildingRegistry.Projections.LastChangedList
             : base(SupportedAcceptTypes, cacheValidator)
         {
             When<Envelope<BuildingWasMigrated>>(async (context, message, ct) =>
-                await GetLastChangedRecordsAndUpdatePosition(GetIdentifier(message.Message.BuildingPersistentLocalId.ToString()), message.Position, context, ct));
+            {
+                var records = await GetLastChangedRecordsAndUpdatePosition(GetIdentifier(message.Message.BuildingPersistentLocalId.ToString()),
+                    message.Position, context, ct);
+                RebuildKeyAndUri(records, message.Message.BuildingPersistentLocalId);
+            });
 
             When<Envelope<BuildingWasPlannedV2>>(async (context, message, ct) =>
-                await GetLastChangedRecordsAndUpdatePosition(GetIdentifier(message.Message.BuildingPersistentLocalId.ToString()), message.Position, context, ct));
+            {
+                var records = await GetLastChangedRecordsAndUpdatePosition(GetIdentifier(message.Message.BuildingPersistentLocalId.ToString()), message.Position, context, ct);
+                RebuildKeyAndUri(records, message.Message.BuildingPersistentLocalId);
+            });
 
             When<Envelope<UnplannedBuildingWasRealizedAndMeasured>>(async (context, message, ct) =>
-                await GetLastChangedRecordsAndUpdatePosition(GetIdentifier(message.Message.BuildingPersistentLocalId.ToString()), message.Position, context, ct));
+            {
+                var records = await GetLastChangedRecordsAndUpdatePosition(GetIdentifier(message.Message.BuildingPersistentLocalId.ToString()), message.Position, context, ct);
+                RebuildKeyAndUri(records, message.Message.BuildingPersistentLocalId);
+            });
 
             When<Envelope<BuildingOutlineWasChanged>>(async (context, message, ct) =>
                 await GetLastChangedRecordsAndUpdatePosition(GetIdentifier(message.Message.BuildingPersistentLocalId.ToString()), message.Position, context, ct));
@@ -143,6 +155,27 @@ namespace BuildingRegistry.Projections.LastChangedList
         private static string GetIdentifier(string persistentLocalId)
         {
             return $"v3.{persistentLocalId}";
+        }
+
+        private static void RebuildKeyAndUri(IEnumerable<LastChangedRecord>? attachedRecords, int persistentLocalId)
+        {
+            if (attachedRecords == null)
+            {
+                return;
+            }
+
+            foreach (var record in attachedRecords)
+            {
+                if (record.CacheKey != null)
+                {
+                    record.CacheKey = string.Format(record.CacheKey, persistentLocalId);
+                }
+
+                if (record.Uri != null)
+                {
+                    record.Uri = string.Format(record.Uri, persistentLocalId);
+                }
+            }
         }
 
         protected override string BuildCacheKey(AcceptType acceptType, string identifier)

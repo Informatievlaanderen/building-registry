@@ -129,7 +129,7 @@ namespace BuildingRegistry.Projections.LastChangedList
             {
                 foreach (var buildingUnitReaddresses in message.Message.BuildingUnitsReaddresses)
                 {
-                    await GetLastChangedRecordsAndUpdatePosition(buildingUnitReaddresses.BuildingUnitPersistentLocalId.ToString(), message.Position, context, ct);
+                    await GetLastChangedRecordsAndUpdatePosition(GetIdentifier(buildingUnitReaddresses.BuildingUnitPersistentLocalId.ToString()), message.Position, context, ct);
                 }
             });
 
