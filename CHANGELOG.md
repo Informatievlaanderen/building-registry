@@ -1,3 +1,10 @@
+## [6.5.6](https://github.com/informatievlaanderen/building-registry/compare/v6.5.5...v6.5.6) (2026-10-22)
+
+
+### Bug Fixes
+
+* **lastchangedlist:** building v3 cachekey/uri ([c54fb8b](https://github.com/informatievlaanderen/building-registry/commit/c54fb8b34299072891f1187ad3ac9f315744f069))
+
 ## [6.5.5](https://github.com/informatievlaanderen/building-registry/compare/v6.5.4...v6.5.5) (2026-10-21)
 
 
