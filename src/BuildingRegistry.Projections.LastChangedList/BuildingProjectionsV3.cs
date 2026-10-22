@@ -183,7 +183,7 @@ namespace BuildingRegistry.Projections.LastChangedList
             var shortenedAcceptType = acceptType.ToString().ToLowerInvariant();
             return acceptType switch
             {
-                AcceptType.JsonLd => $"oslo-v3/building:{identifier}.{shortenedAcceptType}",
+                AcceptType.JsonLd => $"oslo-v3/building:{{0}}.{shortenedAcceptType}",
                 _ => throw new NotImplementedException($"Cannot build CacheKey for type {typeof(AcceptType)}")
             };
         }
@@ -192,7 +192,7 @@ namespace BuildingRegistry.Projections.LastChangedList
         {
             return acceptType switch
             {
-                AcceptType.JsonLd => $"/v3/gebouwen/{identifier}",
+                AcceptType.JsonLd => "/v3/gebouwen/{0}",
                 _ => throw new NotImplementedException($"Cannot build Uri for type {typeof(AcceptType)}")
             };
         }
