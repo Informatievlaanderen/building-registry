@@ -1648,7 +1648,7 @@
           "BuildingRegistry.Consumer.Read.Parcel": "[1.0.0, )",
           "BuildingRegistry.Infrastructure": "[1.0.0, )",
           "BuildingRegistry.Projections.Legacy": "[1.0.0, )",
-          "Dapper": "[2.1.79, )",
+          "Dapper": "[2.1.89, )",
           "Datadog.Trace.Bundle": "[3.45.0, )",
           "Microsoft.Extensions.Hosting": "[10.0.9, )",
           "Polly": "[8.7.0, )",
@@ -1803,7 +1803,7 @@
           "Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Autofac": "[16.0.0, )",
           "Be.Vlaanderen.Basisregisters.Projector": "[17.0.0, )",
           "BuildingRegistry.Infrastructure": "[1.0.0, )",
-          "Dapper": "[2.1.79, )",
+          "Dapper": "[2.1.89, )",
           "Datadog.Trace.Bundle": "[3.45.0, )",
           "Npgsql.EntityFrameworkCore.PostgreSQL": "[10.0.2, )"
         }
@@ -1850,7 +1850,7 @@
           "Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Autofac": "[16.0.0, )",
           "BuildingRegistry": "[1.0.0, )",
           "BuildingRegistry.Infrastructure": "[1.0.0, )",
-          "Dapper": "[2.1.79, )",
+          "Dapper": "[2.1.89, )",
           "Npgsql": "[10.0.3, )"
         }
       },
@@ -1863,7 +1863,7 @@
           "Be.Vlaanderen.Basisregisters.ProjectionHandling.Runner.Npgsql": "[16.0.0, )",
           "Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Autofac": "[16.0.0, )",
           "BuildingRegistry.Infrastructure": "[1.0.0, )",
-          "Dapper": "[2.1.79, )",
+          "Dapper": "[2.1.89, )",
           "Npgsql.EntityFrameworkCore.PostgreSQL.NetTopologySuite": "[10.0.2, )"
         }
       },
@@ -1946,7 +1946,7 @@
           "Be.Vlaanderen.Basisregisters.TicketingService.Abstractions": "[4.0.0, )",
           "Be.Vlaanderen.Basisregisters.TicketingService.Proxy.HttpProxy": "[4.0.0, )",
           "BuildingRegistry.Infrastructure": "[1.0.0, )",
-          "Dapper": "[2.1.79, )",
+          "Dapper": "[2.1.89, )",
           "Datadog.Trace.Bundle": "[3.45.0, )",
           "Destructurama.JsonNet": "[4.0.2, )",
           "Serilog": "[4.3.1, )",
@@ -2503,9 +2503,9 @@
       },
       "Dapper": {
         "type": "CentralTransitive",
-        "requested": "[2.1.79, )",
-        "resolved": "2.1.79",
-        "contentHash": "8YijbzgTfmqmQOnVNorYM6K++pxqnW3nJ4aC1sRHzxUA2CcuoJ9gsTem3kgBnPRMc38zZHl4Esb6hAezXIEEuw=="
+        "requested": "[2.1.89, )",
+        "resolved": "2.1.89",
+        "contentHash": "1VjFE664wnxvuhlgP8kS4PeFFF4jqD3VkbIHW6Zlc52zuibgcz5ICnIHcQXlTp6pURpPNGLV0ZpNe5x9KePJnA=="
       },
       "Datadog.Trace.Bundle": {
         "type": "CentralTransitive",
