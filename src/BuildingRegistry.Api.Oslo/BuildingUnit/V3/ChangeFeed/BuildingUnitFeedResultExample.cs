@@ -57,11 +57,11 @@ namespace BuildingRegistry.Api.Oslo.BuildingUnit.V3.ChangeFeed
                                              "oudeWaarde": null,
                                              "nieuweWaarde": [
                                                  {
-                                                     "type": "Punt",
+                                                     "@type": "Punt",
                                                      "gml": "<gml:Point srsName=\"http://www.opengis.net/def/crs/EPSG/0/31370\" xmlns:gml=\"http://www.opengis.net/gml/3.2\"><gml:pos>144401.12 201731.91</gml:pos></gml:Point>"
                                                  },
                                                  {
-                                                     "type": "Punt",
+                                                     "@type": "Punt",
                                                      "gml": "<gml:Point srsName=\"http://www.opengis.net/def/crs/EPSG/0/3812\" xmlns:gml=\"http://www.opengis.net/gml/3.2\"><gml:pos>644397.11 701731.49</gml:pos></gml:Point>"
                                                  }
                                              ]
