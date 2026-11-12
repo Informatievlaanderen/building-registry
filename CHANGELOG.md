@@ -1,3 +1,11 @@
+## [6.5.7](https://github.com/informatievlaanderen/building-registry/compare/v6.5.6...v6.5.7) (2026-11-12)
+
+
+### Bug Fixes
+
+* **api:** building changefeed examples ([bcedb85](https://github.com/informatievlaanderen/building-registry/commit/bcedb85247fcda859931a1cbd0931de1e0189c00))
+* **api:** buildingunit changefeed examples ([6a0c8d6](https://github.com/informatievlaanderen/building-registry/commit/6a0c8d69a001eab486048d4786c53706a3edde64))
+
 ## [6.5.6](https://github.com/informatievlaanderen/building-registry/compare/v6.5.5...v6.5.6) (2026-10-22)
 
 
