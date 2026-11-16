@@ -1,3 +1,10 @@
+## [6.5.8](https://github.com/informatievlaanderen/building-registry/compare/v6.5.7...v6.5.8) (2026-11-16)
+
+
+### Bug Fixes
+
+* **integration:** handle removed units building version projections ([0c1069c](https://github.com/informatievlaanderen/building-registry/commit/0c1069cf4d5179d02698d0f7cb7a7cba5b301f7f))
+
 ## [6.5.7](https://github.com/informatievlaanderen/building-registry/compare/v6.5.6...v6.5.7) (2026-11-12)
 
 
