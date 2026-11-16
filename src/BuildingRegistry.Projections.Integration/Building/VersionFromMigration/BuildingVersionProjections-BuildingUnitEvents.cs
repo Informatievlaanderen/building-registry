@@ -433,8 +433,15 @@ namespace BuildingRegistry.Projections.Integration.Building.VersionFromMigration
                     message,
                     building =>
                     {
-                        var buildingUnit = building.BuildingUnits.Single(x =>
+                        // Unlike every other position event this one reaches removed units, which
+                        // CloneAndApplyEventInfo drops from the new version. Nothing to reproject.
+                        var buildingUnit = building.BuildingUnits.SingleOrDefault(x =>
                             x.BuildingUnitPersistentLocalId == message.Message.BuildingUnitPersistentLocalId);
+
+                        if (buildingUnit is null)
+                        {
+                            return;
+                        }
 
                         buildingUnit.Geometry = sysGeometry;
                     },

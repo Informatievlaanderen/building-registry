@@ -693,6 +693,66 @@ namespace BuildingRegistry.Tests.ProjectionTests.Integration.Building
         }
 
         [Fact]
+        public async Task WhenBuildingUnitPositionCrsWasChanged_WithRemovedBuildingUnit()
+        {
+            _fixture.Customize(new WithFixedBuildingPersistentLocalId());
+            _fixture.Customize(new WithFixedBuildingUnitPersistentLocalId());
+
+            var buildingWasPlannedV2 = _fixture.Create<BuildingWasPlannedV2>();
+            var buildingUnitWasPlannedV2 = _fixture.Create<BuildingUnitWasPlannedV2>();
+            var buildingUnitWasRemovedV2 = _fixture.Create<BuildingUnitWasRemovedV2>();
+            var buildingUnitPositionCrsWasChanged = new BuildingUnitPositionCrsWasChanged(
+                _fixture.Create<BuildingPersistentLocalId>(),
+                _fixture.Create<BuildingUnitPersistentLocalId>(),
+                BuildingUnitPositionGeometryMethod.AppointedByAdministrator,
+                _fixture.Create<ExtendedWkbGeometry>());
+            ((ISetProvenance)buildingUnitPositionCrsWasChanged).SetProvenance(_fixture.Create<Provenance>());
+
+            var position = _fixture.Create<long>();
+
+            var buildingWasPlannedV2Metadata = new Dictionary<string, object>
+            {
+                { AddEventHashPipe.HashMetadataKey, buildingWasPlannedV2.GetHash() },
+                { Envelope.PositionMetadataKey, position },
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
+            };
+            var buildingUnitWasPlannedMetadata = new Dictionary<string, object>
+            {
+                { AddEventHashPipe.HashMetadataKey, buildingUnitWasPlannedV2.GetHash() },
+                { Envelope.PositionMetadataKey, ++position },
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
+            };
+            var buildingUnitWasRemovedMetadata = new Dictionary<string, object>
+            {
+                { AddEventHashPipe.HashMetadataKey, buildingUnitWasRemovedV2.GetHash() },
+                { Envelope.PositionMetadataKey, ++position },
+                { Envelope.EventNameMetadataKey, _fixture.Create<string>()}
+            };
+            var buildingUnitPositionCrsWasChangedMetadata = new Dictionary<string, object>
+            {
+                { AddEventHashPipe.HashMetadataKey, buildingUnitPositionCrsWasChanged.GetHash() },
+                { Envelope.PositionMetadataKey, ++position },
+                { Envelope.EventNameMetadataKey, "EventName"}
+            };
+
+            await Sut
+                .Given(
+                    new Envelope<BuildingWasPlannedV2>(new Envelope(buildingWasPlannedV2, buildingWasPlannedV2Metadata)),
+                    new Envelope<BuildingUnitWasPlannedV2>(new Envelope(buildingUnitWasPlannedV2, buildingUnitWasPlannedMetadata)),
+                    new Envelope<BuildingUnitWasRemovedV2>(new Envelope(buildingUnitWasRemovedV2, buildingUnitWasRemovedMetadata)),
+                    new Envelope<BuildingUnitPositionCrsWasChanged>(
+                        new Envelope(buildingUnitPositionCrsWasChanged, buildingUnitPositionCrsWasChangedMetadata)))
+                .Then(async context =>
+                {
+                    var buildingVersion = await context.BuildingVersions.FindAsync(position);
+                    buildingVersion.Should().NotBeNull();
+
+                    buildingVersion!.Type.Should().Be("EventName");
+                    buildingVersion.BuildingUnits.Should().BeEmpty();
+                });
+        }
+
+        [Fact]
         public async Task WhenBuildingUnitWasRemovedBecauseBuildingWasRemoved()
         {
             _fixture.Customize(new WithFixedBuildingPersistentLocalId());
