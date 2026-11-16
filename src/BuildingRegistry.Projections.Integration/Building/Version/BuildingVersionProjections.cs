@@ -255,8 +255,15 @@ namespace BuildingRegistry.Projections.Integration.Building.Version
                         foreach (var buildingUnitPersistentLocalId in message.Message.BuildingUnitPersistentLocalIds
                                      .Concat(becameDerived))
                         {
+                            // Unlike every other position event this one reaches removed units, which
+                            // CloneAndApplyEventInfo drops from the new version. Nothing to reproject.
                             var buildingUnit = building.BuildingUnits
-                                .Single(x => x.BuildingUnitPersistentLocalId == buildingUnitPersistentLocalId);
+                                .SingleOrDefault(x => x.BuildingUnitPersistentLocalId == buildingUnitPersistentLocalId);
+
+                            if (buildingUnit is null)
+                            {
+                                continue;
+                            }
 
                             buildingUnit.Geometry = sysBuildingUnitGeometry;
 
