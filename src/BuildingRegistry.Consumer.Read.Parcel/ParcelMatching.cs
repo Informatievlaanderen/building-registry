@@ -54,10 +54,10 @@
 
             var candidates = useLambert2008
                 ? _consumerParcelContext.ParcelConsumerItemsWithCount
-                    .Where(parcel => boundingBox.Intersects(parcel.GeometryLambert2008))
+                    .Where(parcel => !parcel.IsRemoved && boundingBox.Intersects(parcel.GeometryLambert2008))
                     .ToList()
                 : _consumerParcelContext.ParcelConsumerItemsWithCount
-                    .Where(parcel => boundingBox.Intersects(parcel.Geometry))
+                    .Where(parcel => !parcel.IsRemoved && boundingBox.Intersects(parcel.Geometry))
                     .ToList();
 
             var underlyingParcels = candidates

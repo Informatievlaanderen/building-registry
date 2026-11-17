@@ -2,6 +2,7 @@ namespace BuildingRegistry.Tests.Oslo.ParcelMatchingTests
 {
     using System;
     using System.Linq;
+    using System.Threading.Tasks;
     using BackOffice;
     using Be.Vlaanderen.Basisregisters.GrAr.Common.NetTopology;
     using Consumer.Read.Parcel;
@@ -146,14 +147,76 @@ namespace BuildingRegistry.Tests.Oslo.ParcelMatchingTests
                 .WithMessage("*outside Flanders*");
         }
 
-        private ParcelConsumerItem AddParcel(Geometry geometry)
+        /// <summary>
+        /// A parcel migrated as removed can still be realized, so the status filter alone does not keep it
+        /// out. Neither matching path may return it, whichever system it matches in.
+        /// </summary>
+        [Theory]
+        [InlineData(false)]
+        [InlineData(true)]
+        public void WhenTheParcelIsRemoved_ThenItIsNotMatched(bool matchInLambert2008)
+        {
+            AddParcel(GeometryHelper.ValidPolygon, isRemoved: true);
+
+            var matching = new ParcelMatching(
+                _context,
+                matchInLambert2008 ? Lambert2008Matching : Lambert72Matching,
+                new Lambert2008MatchingReadiness());
+
+            var result = matching
+                .GetUnderlyingParcels(WkbWriter.Instance.Write(GeometryHelper.ValidPolygon))
+                .ToList();
+
+            result.Should().BeEmpty();
+        }
+
+        [Theory]
+        [InlineData(SystemReferenceId.SridLambert72)]
+        [InlineData(SystemReferenceId.SridLambert2008)]
+        public async Task WhenTheParcelIsRemoved_ThenItIsNotUnderTheBoundingBox(int matchingSrid)
+        {
+            AddParcel(GeometryHelper.ValidPolygon, isRemoved: true);
+
+            var buildingGeometry = matchingSrid == SystemReferenceId.SridLambert2008
+                ? GeometryHelper.ValidPolygonLambert2008
+                : GeometryHelper.ValidPolygon;
+
+            var result = await _context.GetUnderlyingParcelsUnderBoundingBox(buildingGeometry, matchingSrid);
+
+            result.Should().BeEmpty();
+        }
+
+        /// <summary>
+        /// The readiness check leaves removed parcels out, so one the conversion never reached must not stop
+        /// matching in Lambert 2008 either.
+        /// </summary>
+        [Fact]
+        public void WhenARemovedParcelHasNoLambert2008Geometry_ThenMatchingInLambert2008StillRuns()
+        {
+            var removedParcel = AddParcel(GeometryHelper.ValidPolygon, isRemoved: true);
+            _context.Entry(removedParcel).Property(nameof(ParcelConsumerItem.GeometryLambert2008)).CurrentValue = null;
+            _context.SaveChanges();
+
+            AddParcel(GeometryHelper.ValidPolygon);
+
+            var matching = new ParcelMatching(_context, Lambert2008Matching, new Lambert2008MatchingReadiness());
+
+            var result = matching
+                .GetUnderlyingParcels(WkbWriter.Instance.Write(GeometryHelper.ValidPolygon))
+                .ToList();
+
+            result.Should().ContainSingle();
+        }
+
+        private ParcelConsumerItem AddParcel(Geometry geometry, bool isRemoved = false)
         {
             var parcel = new ParcelConsumerItem(
                 Guid.NewGuid(),
                 Guid.NewGuid().ToString(),
                 ParcelStatus.Realized,
                 WkbWriter.Instance.Write(geometry),
-                geometry);
+                geometry,
+                isRemoved);
 
             _context.ParcelConsumerItemsWithCount.Add(parcel);
             _context.SaveChanges();

@@ -66,7 +66,7 @@
             if (matchingSrid == SystemReferenceId.SridLambert2008)
             {
                 return await ParcelConsumerItemsWithCount
-                    .Where(parcel => boundingBox.Intersects(parcel.GeometryLambert2008))
+                    .Where(parcel => !parcel.IsRemoved && boundingBox.Intersects(parcel.GeometryLambert2008))
                     .Select(x => new ParcelData(
                         x.ParcelId,
                         x.CaPaKey,
@@ -80,7 +80,7 @@
             }
 
             return await ParcelConsumerItemsWithCount
-                .Where(parcel => boundingBox.Intersects(parcel.Geometry))
+                .Where(parcel => !parcel.IsRemoved && boundingBox.Intersects(parcel.Geometry))
                 .Select(x => new ParcelData(
                     x.ParcelId,
                     x.CaPaKey,
