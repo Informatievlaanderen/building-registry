@@ -1,3 +1,10 @@
+## [6.5.10](https://github.com/informatievlaanderen/building-registry/compare/v6.5.9...v6.5.10) (2026-11-18)
+
+
+### Bug Fixes
+
+* dont match removed parcels ([9e5abdc](https://github.com/informatievlaanderen/building-registry/commit/9e5abdc082652925ba9a0430fd58ca765b7a58a5))
+
 ## [6.5.9](https://github.com/informatievlaanderen/building-registry/compare/v6.5.8...v6.5.9) (2026-11-16)
 
 
