@@ -158,6 +158,10 @@ namespace BuildingRegistry.Projector.Infrastructure
                 c => new ProjectionsHealthCheck(
                     new AllUnhealthyProjectionsHealthCheckStrategy
                         (c.GetRequiredService<IConnectedProjectionsManager>()), _loggerFactory));
+
+            services.AddHostedService(
+                c => new ProjectionAutoRestartBackgroundService(
+                    c.GetRequiredService<IConnectedProjectionsManager>(), _loggerFactory));
         }
 
         public void Configure(
