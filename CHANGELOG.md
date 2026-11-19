@@ -1,3 +1,16 @@
+# [6.6.0](https://github.com/informatievlaanderen/building-registry/compare/v6.5.10...v6.6.0) (2026-11-19)
+
+
+### Bug Fixes
+
+* convert unusedcommon units to lambert2008 ([bcb8e3b](https://github.com/informatievlaanderen/building-registry/commit/bcb8e3b36323f14e41e4e4c1caceb2d036c362f4))
+* remove building takes into account unused common units ([1899c1a](https://github.com/informatievlaanderen/building-registry/commit/1899c1af220302106f2ccca1f00701b148e332d2))
+
+
+### Features
+
+* add auto restart for projector ([04517b3](https://github.com/informatievlaanderen/building-registry/commit/04517b319c90d3dad6223e69fb910b6d7601ca8f))
+
 ## [6.5.10](https://github.com/informatievlaanderen/building-registry/compare/v6.5.9...v6.5.10) (2026-11-18)
 
 
