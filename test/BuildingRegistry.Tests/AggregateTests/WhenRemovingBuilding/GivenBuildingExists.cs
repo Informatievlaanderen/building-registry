@@ -14,6 +14,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRemovingBuilding
     using FluentAssertions;
     using Xunit;
     using Xunit.Abstractions;
+    using BuildingUnitFunction = BuildingRegistry.Legacy.BuildingUnitFunction;
     using BuildingUnitStatus = BuildingRegistry.Legacy.BuildingUnitStatus;
 
     public class GivenBuildingExists : BuildingRegistryTest
@@ -76,6 +77,84 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRemovingBuilding
                             new BuildingUnitPersistentLocalId(buildingUnitPersistentLocalId))),
                     new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
                         new BuildingWasRemovedV2(command.BuildingPersistentLocalId))));
+        }
+
+        [Fact]
+        public void WithUnusedCommonUnits_ThenUnusedCommonUnitsAreRemoved()
+        {
+            var command = Fixture.Create<RemoveBuilding>();
+
+            var usedCommonUnitPersistentLocalId = new BuildingUnitPersistentLocalId(200);
+            var unusedCommonUnitPersistentLocalId = new BuildingUnitPersistentLocalId(100);
+            var removedUnusedCommonUnitPersistentLocalId = new BuildingUnitPersistentLocalId(50);
+
+            // Migrated with three common units: the retired one with the highest id is kept, the others become
+            // unused common units, one of which is already removed.
+            var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
+                .WithBuildingGeometry(new BuildingGeometry(
+                    new ExtendedWkbGeometry(WkbWriter.Instance.Write(GeometryHelper.ValidPolygon)),
+                    BuildingGeometryMethod.Outlined))
+                .WithBuildingUnit(
+                    BuildingUnitStatus.Retired,
+                    usedCommonUnitPersistentLocalId,
+                    function: BuildingUnitFunction.Common,
+                    isRemoved: false)
+                .WithBuildingUnit(
+                    BuildingUnitStatus.NotRealized,
+                    unusedCommonUnitPersistentLocalId,
+                    function: BuildingUnitFunction.Common,
+                    isRemoved: false)
+                .WithBuildingUnit(
+                    BuildingUnitStatus.NotRealized,
+                    removedUnusedCommonUnitPersistentLocalId,
+                    function: BuildingUnitFunction.Common,
+                    isRemoved: true)
+                .Build();
+
+            Assert(new Scenario()
+                .Given(
+                    new BuildingStreamId(Fixture.Create<BuildingPersistentLocalId>()),
+                    buildingWasMigrated)
+                .When(command)
+                .Then(
+                    new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
+                        new BuildingUnitWasRemovedBecauseBuildingWasRemoved(
+                            command.BuildingPersistentLocalId,
+                            usedCommonUnitPersistentLocalId)),
+                    new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
+                        new BuildingUnitWasRemovedBecauseBuildingWasRemoved(
+                            command.BuildingPersistentLocalId,
+                            unusedCommonUnitPersistentLocalId)),
+                    new Fact(new BuildingStreamId(command.BuildingPersistentLocalId),
+                        new BuildingWasRemovedV2(command.BuildingPersistentLocalId))));
+        }
+
+        [Fact]
+        public void WithUnusedCommonUnits_StateCheck()
+        {
+            var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
+                .WithBuildingGeometry(new BuildingGeometry(
+                    new ExtendedWkbGeometry(WkbWriter.Instance.Write(GeometryHelper.ValidPolygon)),
+                    BuildingGeometryMethod.Outlined))
+                .WithBuildingUnit(
+                    BuildingUnitStatus.Retired,
+                    new BuildingUnitPersistentLocalId(200),
+                    function: BuildingUnitFunction.Common,
+                    isRemoved: false)
+                .WithBuildingUnit(
+                    BuildingUnitStatus.NotRealized,
+                    new BuildingUnitPersistentLocalId(100),
+                    function: BuildingUnitFunction.Common,
+                    isRemoved: false)
+                .Build();
+
+            var sut = new BuildingFactory(NoSnapshotStrategy.Instance).Create();
+            sut.Initialize(new List<object> { buildingWasMigrated });
+
+            sut.RemoveConstruction();
+
+            sut.UnusedCommonUnits.Should().ContainSingle();
+            sut.UnusedCommonUnits.Should().OnlyContain(x => x.IsRemoved);
         }
 
         [Fact]

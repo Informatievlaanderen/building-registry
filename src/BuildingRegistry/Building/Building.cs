@@ -206,6 +206,8 @@ namespace BuildingRegistry.Building
                 buildingUnit.RemoveBecauseBuildingWasRemoved();
             }
 
+            RemoveUnusedCommonUnitsBecauseBuildingWasRemoved();
+
             ApplyChange(new BuildingWasRemovedV2(BuildingPersistentLocalId));
         }
 
@@ -233,7 +235,23 @@ namespace BuildingRegistry.Building
                 notRemovedUnit.RemoveBecauseBuildingWasRemoved();
             }
 
+            RemoveUnusedCommonUnitsBecauseBuildingWasRemoved();
+
             ApplyChange(new BuildingWasRemovedV2(BuildingPersistentLocalId));
+        }
+
+        /// <summary>
+        /// Unused common units are left over from <c>BuildingWasMigrated</c> and are not part of
+        /// <see cref="BuildingUnits"/>, but they are projected, so removing the building has to remove them too
+        /// or they stay behind as not removed units of a removed building. They are never planned or realized,
+        /// so they never block <see cref="RemoveMeasuredBuilding"/>.
+        /// </summary>
+        private void RemoveUnusedCommonUnitsBecauseBuildingWasRemoved()
+        {
+            foreach (var unusedCommonUnit in _unusedCommonUnits.Where(x => !x.IsRemoved))
+            {
+                unusedCommonUnit.RemoveBecauseBuildingWasRemoved();
+            }
         }
 
         public void ChangeOutliningConstruction(
