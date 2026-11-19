@@ -32,6 +32,7 @@ namespace BuildingRegistry.Migrator.Lambert2008.Infrastructure
         private readonly ProcessedStreamsTable _processedStreamsTable;
         private readonly SqlStreamsTable _sqlStreamsTable;
         private readonly bool _dryRun;
+        private readonly bool _targetedMode;
         private readonly int _maxDegreeOfParallelism;
         private readonly TimeSpan _slowStreamThreshold;
         private readonly int? _maxPagesPerRun;
@@ -55,6 +56,10 @@ namespace BuildingRegistry.Migrator.Lambert2008.Infrastructure
 
             _dryRun = configuration.GetValue<bool?>("DryRun") ?? true;
 
+            // Reprocesses only the streams flagged with NeedsReprocessing in the processed streams table,
+            // instead of walking every stream. See ProcessTargetedAsync.
+            _targetedMode = configuration.GetValue<bool?>("TargetedMode") ?? false;
+
             _processedStreamsTable = new ProcessedStreamsTable(connectionString, _dryRun, loggerFactory);
             _sqlStreamsTable = new SqlStreamsTable(connectionString, pageSize);
 
@@ -71,6 +76,12 @@ namespace BuildingRegistry.Migrator.Lambert2008.Infrastructure
         public async Task ProcessAsync(CancellationToken ct)
         {
             await _processedStreamsTable.CreateTableIfNotExists(ct);
+
+            if (_targetedMode)
+            {
+                await ProcessTargetedAsync(ct);
+                return;
+            }
 
             // Resume from the last fully completed page, then skip the tail of the page that was interrupted.
             // Streams within a page run in parallel, so a recorded high id says nothing about the ids below it
@@ -179,6 +190,147 @@ namespace BuildingRegistry.Migrator.Lambert2008.Infrastructure
                 stoppedEarly);
         }
 
+        /// <summary>
+        /// Reprocesses only the streams flagged with <c>NeedsReprocessing</c> in the processed streams table,
+        /// for when the full run already completed and a fix to <see cref="Building.TransformToLambert2008"/>
+        /// has to reach a known set of buildings - such as the unused common units the first run left alone.
+        /// </summary>
+        /// <remarks>
+        /// Flag the streams by hand, on the rows of the real run:
+        /// <code>
+        /// UPDATE [MigrateLambert2008].[ProcessedStreams]
+        /// SET NeedsReprocessing = 1
+        /// WHERE IsDryRun = 0 AND BuildingPersistentLocalId IN (...)
+        /// </code>
+        /// Each stream goes through the same <see cref="ConvertStream"/> as a full run, so a building with
+        /// nothing left in Lambert 72 is loaded and skipped, and running this twice is harmless. A real run
+        /// clears the flag of every stream it finished, so a restart picks up the ones that are left; a dry
+        /// run clears nothing. The resume cursor and page bookkeeping of the full run are not touched.
+        /// </remarks>
+        private async Task ProcessTargetedAsync(CancellationToken ct)
+        {
+            var totalStreams = await _processedStreamsTable.GetToReprocessCount(ct);
+
+            _logger.LogInformation(
+                "Starting targeted {Mode} over {TotalStreams} flagged building streams, page size {PageSize}, "
+                + "parallelism {Parallelism}, {PageLimit}.",
+                _dryRun ? "DRY RUN" : "conversion",
+                totalStreams,
+                _sqlStreamsTable.PageSize,
+                _maxDegreeOfParallelism,
+                _maxPagesPerRun is null ? "running to the end" : $"stopping after {_maxPagesPerRun} pages");
+
+            var run = Stopwatch.StartNew();
+            var processedStreams = 0;
+            var convertedBuildings = 0;
+            var pageNumber = 0;
+            var cursor = 0;
+            var stoppedEarly = false;
+
+            var queryStarted = Stopwatch.GetTimestamp();
+            var page = await _processedStreamsTable.ReadNextPageToReprocess(cursor, _sqlStreamsTable.PageSize, ct);
+            var queryDuration = Stopwatch.GetElapsedTime(queryStarted);
+
+            while (page.Count != 0)
+            {
+                pageNumber++;
+
+                var results = new ConcurrentBag<StreamConversionResult>();
+                var pageStarted = Stopwatch.GetTimestamp();
+
+                try
+                {
+                    await Parallel.ForEachAsync(
+                        page,
+                        new ParallelOptions { CancellationToken = ct, MaxDegreeOfParallelism = _maxDegreeOfParallelism },
+                        async (stream, innerCt) =>
+                        {
+                            var (internalId, buildingPersistentLocalId) = stream;
+                            var streamId = $"{StreamIdPrefix}{buildingPersistentLocalId}";
+
+                            try
+                            {
+                                var result = await ConvertStream(buildingPersistentLocalId, innerCt);
+
+                                _loadDurations.Add(result.LoadDuration);
+                                _streamDurations.Add(result.TotalDuration);
+
+                                if (!_dryRun)
+                                {
+                                    _dispatchDurations.Add(result.DispatchDuration);
+                                    await _processedStreamsTable.MarkReprocessed(internalId, result);
+                                }
+
+                                LogStream(streamId, result);
+
+                                results.Add(result);
+                            }
+                            catch (Exception exception) when (exception is not OperationCanceledException)
+                            {
+                                _logger.LogCritical(
+                                    exception,
+                                    "Unexpected exception reprocessing stream '{StreamId}' (internal id {InternalId}).",
+                                    streamId,
+                                    internalId);
+                                throw;
+                            }
+                        });
+                }
+                catch (OperationCanceledException)
+                {
+                    // The streams that did finish have their flag cleared, so the next run only sees the rest.
+                    _logger.LogWarning("Cancelled during page {PageNumber}, stopping.", pageNumber);
+                    stoppedEarly = true;
+                    break;
+                }
+
+                var pageResults = results.ToList();
+                processedStreams += pageResults.Count;
+                convertedBuildings += pageResults.Count(x => x.WasConverted);
+                cursor = page.Max(x => x.internalId);
+
+                LogPage(
+                    pageNumber,
+                    page.Count,
+                    pageResults,
+                    Stopwatch.GetElapsedTime(pageStarted),
+                    queryDuration,
+                    processedStreams,
+                    totalStreams,
+                    processedStreams,
+                    convertedBuildings,
+                    run.Elapsed);
+
+                if (pageNumber == _maxPagesPerRun)
+                {
+                    _logger.LogInformation(
+                        "Reached the configured limit of {MaxPagesPerRun} pages, stopping.",
+                        _maxPagesPerRun);
+                    stoppedEarly = true;
+                    break;
+                }
+
+                queryStarted = Stopwatch.GetTimestamp();
+                page = await _processedStreamsTable.ReadNextPageToReprocess(cursor, _sqlStreamsTable.PageSize, ct);
+                queryDuration = Stopwatch.GetElapsedTime(queryStarted);
+            }
+
+            run.Stop();
+
+            _logger.LogInformation(
+                "Targeted {Outcome} after {Elapsed:g}: {ProcessedThisRun}/{TotalStreams} flagged streams processed, "
+                + "{ConvertedBuildings} buildings {Verb}, {StillFlagged} streams still flagged.",
+                stoppedEarly ? "run stopped" : "run finished",
+                run.Elapsed,
+                processedStreams,
+                totalStreams,
+                convertedBuildings,
+                _dryRun ? "to convert" : "converted",
+                await _processedStreamsTable.GetToReprocessCount(CancellationToken.None));
+
+            LogDurations("Per stream");
+        }
+
         private async Task<List<StreamConversionResult>> ProcessStreams(
             IEnumerable<(int internalId, string streamId)> streams,
             CancellationToken ct)
@@ -248,7 +400,12 @@ namespace BuildingRegistry.Migrator.Lambert2008.Infrastructure
                 new BuildingStreamId(new BuildingPersistentLocalId(buildingPersistentLocalId)),
                 ct);
 
-            var buildingUnits = building.BuildingUnits;
+            // Unused common units included: they are not part of BuildingUnits, but they are projected and
+            // TransformToLambert2008 converts them too, so a building whose other geometries are already
+            // Lambert 2008 still has to be dispatched for them.
+            var buildingUnits = building.BuildingUnits
+                .Concat(building.UnusedCommonUnits)
+                .ToList();
             var geometryToConvert = !IsLambert2008(building.BuildingGeometry.Geometry);
             var buildingUnitsToConvert = buildingUnits
                 .Count(buildingUnit => !IsLambert2008(buildingUnit.BuildingUnitPosition.Geometry));

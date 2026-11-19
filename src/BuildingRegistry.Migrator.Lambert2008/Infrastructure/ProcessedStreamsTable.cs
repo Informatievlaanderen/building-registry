@@ -57,6 +57,19 @@ CREATE TABLE {Table}(
     [ProcessedAt] [datetimeoffset](7) NOT NULL,
     CONSTRAINT [PK_Lambert2008ProcessedStreams] PRIMARY KEY CLUSTERED ([Id] ASC, [IsDryRun] ASC)
 )", cancellationToken: ct));
+
+            // Added after the first full run, so a table created by that run gets them too. A separate batch:
+            // SQL Server compiles a batch as a whole, and the ALTERs must not be compiled against a table the
+            // same batch is still creating.
+            await connection.ExecuteAsync(new CommandDefinition($@"
+IF COL_LENGTH(N'{Table}', N'NeedsReprocessing') IS NULL
+    ALTER TABLE {Table} ADD [NeedsReprocessing] [bit] NOT NULL CONSTRAINT [DF_Lambert2008ProcessedStreams_NeedsReprocessing] DEFAULT 0;
+
+IF COL_LENGTH(N'{Table}', N'ReprocessedAt') IS NULL
+    ALTER TABLE {Table} ADD [ReprocessedAt] [datetimeoffset](7) NULL;
+
+IF COL_LENGTH(N'{Table}', N'ReprocessedBuildingUnitsToConvert') IS NULL
+    ALTER TABLE {Table} ADD [ReprocessedBuildingUnitsToConvert] [int] NULL;", cancellationToken: ct));
         }
 
         /// <summary>
@@ -129,6 +142,67 @@ CREATE TABLE {Table}(
                 $"SELECT MAX(Id) FROM {Table} WHERE IsPageCompleted = 1 AND IsDryRun = @IsDryRun",
                 new { IsDryRun = _dryRun },
                 cancellationToken: ct)) ?? 0;
+        }
+
+        /// <summary>
+        /// The next page of streams flagged for <c>TargetedMode</c>, after <paramref name="cursor"/>.
+        /// </summary>
+        /// <remarks>
+        /// Always read from the rows of the real run, also in a dry run: those are the ones flagged by hand, and
+        /// a targeted dry run is how you check what a targeted run would do. The cursor keeps a dry run, which
+        /// clears no flags, from reading the same page forever.
+        /// </remarks>
+        public async Task<IReadOnlyList<(int internalId, int buildingPersistentLocalId)>> ReadNextPageToReprocess(
+            int cursor,
+            int pageSize,
+            CancellationToken ct)
+        {
+            await using var connection = new SqlConnection(_connectionString);
+            var rows = await connection.QueryAsync<(int, int)>(new CommandDefinition(
+                $@"SELECT TOP (@pageSize) Id, BuildingPersistentLocalId FROM {Table}
+                   WHERE NeedsReprocessing = 1 AND IsDryRun = 0 AND Id > @cursor
+                   ORDER BY Id",
+                new { pageSize, cursor },
+                cancellationToken: ct));
+
+            return rows.ToList();
+        }
+
+        /// <summary>How many streams are still flagged for <c>TargetedMode</c>.</summary>
+        public async Task<int> GetToReprocessCount(CancellationToken ct)
+        {
+            await using var connection = new SqlConnection(_connectionString);
+            return await connection.ExecuteScalarAsync<int>(new CommandDefinition(
+                $"SELECT COUNT(*) FROM {Table} WHERE NeedsReprocessing = 1 AND IsDryRun = 0",
+                cancellationToken: ct));
+        }
+
+        /// <summary>
+        /// Clears the flag of a stream <c>TargetedMode</c> reprocessed. The original run's columns are kept as
+        /// they were, so its timings stay queryable; what the reprocessing found goes in its own columns.
+        /// </summary>
+        /// <remarks>
+        /// Not cancellable, for the same reason as <see cref="Add"/>. Never called in a dry run, which leaves
+        /// the flags for the real run.
+        /// </remarks>
+        public async Task MarkReprocessed(int internalId, StreamConversionResult result)
+        {
+            try
+            {
+                await using var connection = new SqlConnection(_connectionString);
+                await connection.ExecuteAsync(
+                    $@"UPDATE {Table}
+                       SET NeedsReprocessing = 0,
+                           ReprocessedAt = SYSDATETIMEOFFSET(),
+                           ReprocessedBuildingUnitsToConvert = @BuildingUnitsToConvert
+                       WHERE Id = @Id AND IsDryRun = 0",
+                    new { Id = internalId, result.BuildingUnitsToConvert });
+            }
+            catch (Exception exception)
+            {
+                _logger.LogCritical(exception, "Failed to mark id '{InternalId}' as reprocessed in {Table}.", internalId, Table);
+                throw;
+            }
         }
 
         /// <summary>
