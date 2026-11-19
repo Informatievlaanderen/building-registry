@@ -70,8 +70,18 @@ A building whose geometry and unit positions are already Lambert 2008 applies no
 makes re-running the transformation over a stream a no-op rather than a double transform, and it is
 what the migrator's restart-heavy operating model depends on.
 
-Unused common units are left alone. They only ever leave `BuildingWasMigrated`, are never added back
-to `BuildingUnits`, and are not projected, so nothing reads their positions.
+Unused common units are transformed too. They only ever come out of `BuildingWasMigrated` and are
+never added back to `BuildingUnits`, but every projection of `BuildingWasMigrated` holds them like any
+other unit, so leaving them alone would leave Lambert 72 positions in the read models. Each keeps its
+own position, re-expressed through `BuildingUnitPositionCrsWasChanged`, and is never re-derived:
+these units did not follow any outline change or measurement after the migration, so deriving them
+would move them to the building's current centre - an edit, not a change of reference system. The
+migrator counts them when deciding whether a stream still needs converting.
+
+The first full run left them in Lambert 72 (staging). Rather than walking every stream again, the migrator has a
+`TargetedMode`: it reprocesses only the streams flagged with `NeedsReprocessing = 1` on the real run's
+rows of `[MigrateLambert2008].[ProcessedStreams]`, clears the flag of each stream it finishes, and leaves
+the full run's resume cursor alone. A targeted dry run reads the same flags but clears none.
 
 ### `TransformFromLambert72To08`, not `EnsureLambert08`
 

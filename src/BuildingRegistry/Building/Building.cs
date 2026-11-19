@@ -362,9 +362,11 @@ namespace BuildingRegistry.Building
         /// A building whose geometry and positions are already Lambert 2008 applies nothing, which is what
         /// makes re-running the transformation over a stream a no-op instead of a double transform.
         ///
-        /// Unused common units are left alone: they only ever leave <c>BuildingWasMigrated</c>, are never
-        /// added back to <see cref="BuildingUnits"/>, and are not projected, so their positions are not read
-        /// by anything.
+        /// Unused common units are transformed too: they only ever come out of <c>BuildingWasMigrated</c> and
+        /// are never added back to <see cref="BuildingUnits"/>, but the projections hold them like any other
+        /// unit. They keep their own position, re-expressed, and are never re-derived: they did not follow any
+        /// geometry change after the migration, so deriving them now would move them to the current centre of
+        /// the building - an edit, not a change of reference system.
         /// </remarks>
         public void TransformToLambert2008()
         {
@@ -441,6 +443,20 @@ namespace BuildingRegistry.Building
             foreach (var (buildingUnit, position) in buildingUnitsWithOwnPosition)
             {
                 buildingUnit.TransformPositionToLambert2008(position);
+            }
+
+            foreach (var unusedCommonUnit in _unusedCommonUnits)
+            {
+                var currentPosition = ReadGeometry(unusedCommonUnit.BuildingUnitPosition.Geometry);
+
+                if (IsLambert2008(currentPosition))
+                {
+                    continue;
+                }
+
+                unusedCommonUnit.TransformPositionToLambert2008(ExtendedWkbGeometry.Create(currentPosition.ToReferenceSystem(
+                    ExtendedWkbGeometry.SridLambert2008,
+                    GeometryReferenceSystem.PositionRoundingPrecision)));
             }
         }
 

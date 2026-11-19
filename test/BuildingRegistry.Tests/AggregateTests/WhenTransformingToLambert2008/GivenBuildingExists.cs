@@ -473,6 +473,98 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenTransformingToLambert2008
             appointed.BuildingUnitPosition.GeometryMethod.Should().Be(BuildingUnitPositionGeometryMethod.AppointedByAdministrator);
         }
 
+        /// <summary>
+        /// Unused common units are not part of BuildingUnits but they are projected, so they have to be
+        /// transformed too. They keep their own position, re-expressed, and are not re-derived: they did not
+        /// follow any geometry change after the migration, so deriving them would move them.
+        /// </summary>
+        [Theory]
+        [InlineData(false)]
+        [InlineData(true)]
+        public void WithUnusedCommonUnit_ThenItsOwnPositionIsTransformed(bool isRemoved)
+        {
+            var lambert72 = Lambert72Polygon();
+            var position = Lambert72Point();
+            var usedCommonUnit = new BuildingUnitPersistentLocalId(200);
+            var unusedCommonUnit = new BuildingUnitPersistentLocalId(100);
+
+            // Two retired common units: the one with the highest id is kept, the other becomes unused.
+            var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
+                .WithBuildingGeometry(new BuildingGeometry(lambert72, BuildingGeometryMethod.Outlined))
+                .WithBuildingUnit(
+                    BuildingUnitStatus.Retired,
+                    usedCommonUnit,
+                    function: BuildingUnitFunction.Common,
+                    positionGeometryMethod: LegacyBuildingUnitPositionGeometryMethod.DerivedFromObject,
+                    isRemoved: false)
+                .WithBuildingUnit(
+                    BuildingUnitStatus.Retired,
+                    unusedCommonUnit,
+                    function: BuildingUnitFunction.Common,
+                    positionGeometryMethod: LegacyBuildingUnitPositionGeometryMethod.DerivedFromObject,
+                    extendedWkbGeometry: Legacy(position),
+                    isRemoved: isRemoved)
+                .Build();
+
+            var expectedGeometry = new BuildingGeometry(ToLambert2008(lambert72), BuildingGeometryMethod.Outlined);
+
+            Assert(new Scenario()
+                .Given(new BuildingStreamId(Fixture.Create<BuildingPersistentLocalId>()), buildingWasMigrated)
+                .When(Command())
+                .Then(
+                    new Fact(
+                        new BuildingStreamId(Fixture.Create<BuildingPersistentLocalId>()),
+                        new BuildingGeometryCrsWasChanged(
+                            Fixture.Create<BuildingPersistentLocalId>(),
+                            [usedCommonUnit],
+                            [],
+                            expectedGeometry.Geometry,
+                            expectedGeometry.Center)),
+                    new Fact(
+                        new BuildingStreamId(Fixture.Create<BuildingPersistentLocalId>()),
+                        new BuildingUnitPositionCrsWasChanged(
+                            Fixture.Create<BuildingPersistentLocalId>(),
+                            unusedCommonUnit,
+                            BuildingUnitPositionGeometryMethod.DerivedFromObject,
+                            ToLambert2008(position, GeometryReferenceSystem.PositionRoundingPrecision)))));
+        }
+
+        [Fact]
+        public void WithUnusedCommonUnit_StateCheck()
+        {
+            var position = Lambert72Point();
+
+            var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
+                .WithBuildingGeometry(new BuildingGeometry(Lambert72Polygon(), BuildingGeometryMethod.Outlined))
+                .WithBuildingUnit(
+                    BuildingUnitStatus.Retired,
+                    new BuildingUnitPersistentLocalId(200),
+                    function: BuildingUnitFunction.Common,
+                    positionGeometryMethod: LegacyBuildingUnitPositionGeometryMethod.DerivedFromObject)
+                .WithBuildingUnit(
+                    BuildingUnitStatus.Retired,
+                    new BuildingUnitPersistentLocalId(100),
+                    function: BuildingUnitFunction.Common,
+                    positionGeometryMethod: LegacyBuildingUnitPositionGeometryMethod.DerivedFromObject,
+                    extendedWkbGeometry: Legacy(position))
+                .Build();
+
+            var building = new BuildingFactory(NoSnapshotStrategy.Instance).Create();
+            building.Initialize([buildingWasMigrated]);
+
+            building.TransformToLambert2008();
+
+            var unused = building.UnusedCommonUnits.Single();
+            unused.BuildingUnitPosition.Geometry.Should()
+                .Be(ToLambert2008(position, GeometryReferenceSystem.PositionRoundingPrecision));
+            unused.BuildingUnitPosition.GeometryMethod.Should().Be(BuildingUnitPositionGeometryMethod.DerivedFromObject);
+
+            // Re-running is a no-op, unused common units included.
+            var changes = building.GetChanges().Count();
+            building.TransformToLambert2008();
+            building.GetChanges().Count().Should().Be(changes);
+        }
+
         private TransformToLambert2008 Command()
             => new TransformToLambert2008(
                 Fixture.Create<BuildingPersistentLocalId>(),

@@ -369,7 +369,7 @@
 
         private void When(BuildingUnitPositionWasCorrected @event) => RouteToBuildingUnit(@event);
 
-        private void When(BuildingUnitPositionCrsWasChanged @event) => RouteToBuildingUnit(@event);
+        private void When(BuildingUnitPositionCrsWasChanged @event) => RouteWithUnusedCommonUnits(@event);
 
         private void When(BuildingUnitRegularizationWasCorrected @event) => RouteToBuildingUnit(@event);
 
