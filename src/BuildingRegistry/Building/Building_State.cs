@@ -346,7 +346,7 @@
             _lastEvent = @event;
         }
 
-        private void When(BuildingUnitWasRemovedBecauseBuildingWasRemoved @event) => RouteToBuildingUnit(@event);
+        private void When(BuildingUnitWasRemovedBecauseBuildingWasRemoved @event) => RouteWithUnusedCommonUnits(@event);
 
         private void When(BuildingUnitWasRegularized @event) => RouteToBuildingUnit(@event);
 
