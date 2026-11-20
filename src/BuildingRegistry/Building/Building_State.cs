@@ -111,10 +111,10 @@
 
                 if (nonRemovedCommonBuildingUnits.Count > 1)
                 {
-                    var activeBuildingUnitStatuses = new[] { BuildingStatus.Planned, BuildingStatus.Realized };
+                    var activeBuildingUnitStatuses = new[] { BuildingUnitStatus.Planned, BuildingUnitStatus.Realized };
 
                     var plannedOrRealizedCommonBuildingUnits = nonRemovedCommonBuildingUnits
-                        .Where(x => activeBuildingUnitStatuses.Contains(BuildingStatus.Parse(x.Status)))
+                        .Where(x => activeBuildingUnitStatuses.Contains(BuildingUnitStatus.Parse(x.Status)))
                         .ToList();
                     commonBuildingUnit = plannedOrRealizedCommonBuildingUnits.FirstOrDefault();
 
@@ -127,7 +127,7 @@
                     if (commonBuildingUnit is null)
                     {
                         var notRealizedOrRetiredCommonBuildingUnits = nonRemovedCommonBuildingUnits
-                            .Where(x =>!activeBuildingUnitStatuses.Contains(BuildingStatus.Parse(x.Status)))
+                            .Where(x => !activeBuildingUnitStatuses.Contains(BuildingUnitStatus.Parse(x.Status)))
                             .ToList();
 
                         commonBuildingUnit = notRealizedOrRetiredCommonBuildingUnits.MaxBy(x => x.BuildingUnitPersistentLocalId);
