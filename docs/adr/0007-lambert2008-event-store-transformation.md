@@ -236,6 +236,13 @@ derive the position from the geometry they are given, so had the transformation 
 old centroid, the first `RepairBuilding` after the conversion would have emitted a position correction
 for every derived unit in the register.
 
+This only applies to units that still **follow** their building: not removed, and planned or realized.
+Those are the only units a geometry change or `RepairBuilding` re-derives. A retired or not realized
+unit stopped following the building when it left that status, so its derived position can be the centre
+of an older geometry; recentring it would move it, which is an edit rather than a reprojection. Such a
+unit — and a removed one — keeps its own position and method, re-expressed through
+`BuildingUnitPositionCrsWasChanged`, exactly like an unused common unit.
+
 ### A position the rounding pushes out of its building becomes derived
 
 Rounding a position to centimetres can, for a position within a few millimetres of the boundary, put
@@ -246,7 +253,9 @@ events is for — and the transformation does the same, which is why the field i
 
 The condition is deliberately narrow: **inside before and outside after**. A position that was already
 outside its building beforehand is not something this transformation caused, and re-deriving it here
-would be an edit rather than a reprojection, so it is left classified as it is.
+would be an edit rather than a reprojection, so it is left classified as it is. The same goes for a
+retired or not realized unit: no geometry change keeps it inside its building, so the transformation
+does not either.
 
 ### This is what fills the second column ADR 0006 added
 

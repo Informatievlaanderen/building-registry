@@ -396,7 +396,16 @@ namespace BuildingRegistry.Building
                     continue;
                 }
 
-                if (buildingUnit.BuildingUnitPosition.GeometryMethod == BuildingUnitPositionGeometryMethod.DerivedFromObject)
+                // Only units that still follow the building take a position from it: not removed, and planned
+                // or realized - the same units a geometry change re-derives. A retired or not realized unit
+                // stopped following the building when it left that status, so its derived position may well
+                // be the centre of an older geometry; moving it to the current centre would be an edit.
+                var followsBuilding = !buildingUnit.IsRemoved
+                    && (buildingUnit.Status == BuildingUnitStatus.Planned
+                        || buildingUnit.Status == BuildingUnitStatus.Realized);
+
+                if (followsBuilding
+                    && buildingUnit.BuildingUnitPosition.GeometryMethod == BuildingUnitPositionGeometryMethod.DerivedFromObject)
                 {
                     derivedBuildingUnits.Add(buildingUnit.BuildingUnitPersistentLocalId);
                     continue;
@@ -411,11 +420,12 @@ namespace BuildingRegistry.Building
                 // that was already outside beforehand is left classified as it is: that is not something this
                 // transformation caused, and correcting it here would be an edit.
                 //
-                // A removed unit is never re-derived. Becoming derived is a real change - a new method, a new
-                // position - and the projections publish it as one, but a removed unit is published nowhere:
-                // the syndication item has dropped it and the extract row is gone. It keeps its own position,
-                // re-expressed, so the event store converts without anything being said about it.
-                if (!buildingUnit.IsRemoved
+                // Only a unit that follows the building is ever re-derived. Becoming derived is a real change -
+                // a new method, a new position - and the projections publish it as one. A removed unit is
+                // published nowhere, and a retired or not realized one is no longer kept inside its building by
+                // any geometry change. Either keeps its own position and method, re-expressed, so the event
+                // store converts without anything being said about it.
+                if (followsBuilding
                     && BuildingGeometry.Contains(buildingUnit.BuildingUnitPosition.Geometry)
                     && !newBuildingGeometry.Contains(newPosition))
                 {

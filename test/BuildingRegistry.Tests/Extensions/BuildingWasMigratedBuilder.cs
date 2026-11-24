@@ -121,7 +121,10 @@ namespace BuildingRegistry.Tests.Extensions
 
             if (positionGeometryMethod == BuildingUnitPositionGeometryMethod.DerivedFromObject)
             {
-                return new BuildingUnitPosition(buildingGeometry.Center, BuildingUnitPositionGeometryMethod.DerivedFromObject);
+                // A position can be given to model a derived unit that no longer sits on the current centre,
+                // e.g. one that was retired before the building geometry last changed.
+                return new BuildingUnitPosition(
+                    extendedWkbGeometry ?? buildingGeometry.Center, BuildingUnitPositionGeometryMethod.DerivedFromObject);
             }
 
             if (positionGeometryMethod == BuildingUnitPositionGeometryMethod.AppointedByAdministrator)
