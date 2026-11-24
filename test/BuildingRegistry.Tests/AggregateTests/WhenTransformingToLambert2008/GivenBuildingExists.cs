@@ -432,6 +432,126 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenTransformingToLambert2008
                 .Should().Be(BuildingUnitPositionGeometryMethod.AppointedByAdministrator);
         }
 
+        /// <summary>
+        /// A planned unit follows the building just like a realized one, so a derived one takes the centre.
+        /// </summary>
+        [Fact]
+        public void WithPlannedDerivedBuildingUnit_ThenPositionIsTheTransformedCenter()
+        {
+            var lambert72 = Lambert72Polygon();
+            var buildingUnitPersistentLocalId = Fixture.Create<BuildingUnitPersistentLocalId>();
+
+            var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
+                .WithBuildingGeometry(new BuildingGeometry(lambert72, BuildingGeometryMethod.Outlined))
+                .WithBuildingUnit(
+                    BuildingUnitStatus.Planned,
+                    buildingUnitPersistentLocalId,
+                    positionGeometryMethod: LegacyBuildingUnitPositionGeometryMethod.DerivedFromObject)
+                .Build();
+
+            var building = new BuildingFactory(NoSnapshotStrategy.Instance).Create();
+            building.Initialize([buildingWasMigrated]);
+
+            building.TransformToLambert2008();
+
+            building.GetChanges().OfType<BuildingGeometryCrsWasChanged>().Single()
+                .BuildingUnitPersistentLocalIds.Should().Equal((int)buildingUnitPersistentLocalId);
+            building.GetChanges().OfType<BuildingUnitPositionCrsWasChanged>().Should().BeEmpty();
+        }
+
+        /// <summary>
+        /// A retired, not realized or removed unit stopped following the building: a geometry change only
+        /// re-derives planned and realized units. Its derived position can therefore be the centre of an older
+        /// geometry, and moving it to the current centre would be an edit. It keeps its own position and its
+        /// method, re-expressed.
+        /// </summary>
+        [Theory]
+        [InlineData(nameof(BuildingUnitStatus.Retired), false)]
+        [InlineData(nameof(BuildingUnitStatus.NotRealized), false)]
+        [InlineData(nameof(BuildingUnitStatus.Realized), true)]
+        [InlineData(nameof(BuildingUnitStatus.Retired), true)]
+        public void WithDerivedBuildingUnitWhichNoLongerFollowsTheBuilding_ThenItsOwnPositionIsTransformed(
+            string status,
+            bool isRemoved)
+        {
+            var lambert72 = Lambert72Polygon();
+            // Not the centre: the building geometry changed after the unit stopped following it.
+            var offCentre = Lambert72Point();
+            var buildingUnitPersistentLocalId = Fixture.Create<BuildingUnitPersistentLocalId>();
+
+            new BuildingGeometry(lambert72, BuildingGeometryMethod.Outlined).Center.Should().NotBe(offCentre);
+
+            var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
+                .WithBuildingGeometry(new BuildingGeometry(lambert72, BuildingGeometryMethod.Outlined))
+                .WithBuildingUnit(
+                    BuildingUnitStatus.Parse(status)!.Value,
+                    buildingUnitPersistentLocalId,
+                    positionGeometryMethod: LegacyBuildingUnitPositionGeometryMethod.DerivedFromObject,
+                    extendedWkbGeometry: Legacy(offCentre),
+                    isRemoved: isRemoved)
+                .Build();
+
+            var expectedPosition = ToLambert2008(offCentre, GeometryReferenceSystem.PositionRoundingPrecision);
+
+            Assert(new Scenario()
+                .Given(new BuildingStreamId(Fixture.Create<BuildingPersistentLocalId>()), buildingWasMigrated)
+                .When(Command())
+                .Then(
+                    new Fact(
+                        new BuildingStreamId(Fixture.Create<BuildingPersistentLocalId>()),
+                        new BuildingGeometryCrsWasChanged(
+                            Fixture.Create<BuildingPersistentLocalId>(),
+                            [],
+                            [],
+                            ToLambert2008(lambert72),
+                            null)),
+                    new Fact(
+                        new BuildingStreamId(Fixture.Create<BuildingPersistentLocalId>()),
+                        new BuildingUnitPositionCrsWasChanged(
+                            Fixture.Create<BuildingPersistentLocalId>(),
+                            buildingUnitPersistentLocalId,
+                            BuildingUnitPositionGeometryMethod.DerivedFromObject,
+                            expectedPosition))));
+        }
+
+        /// <summary>
+        /// Same reasoning as for a removed unit: a retired or not realized unit is not kept inside its building
+        /// by any geometry change, so the transformation does not re-derive it either.
+        /// </summary>
+        [Theory]
+        [InlineData(nameof(BuildingUnitStatus.Retired))]
+        [InlineData(nameof(BuildingUnitStatus.NotRealized))]
+        public void WithRetiredOrNotRealizedPositionPushedOutsideByTheTransformation_ThenItDoesNotBecomeDerived(
+            string status)
+        {
+            var lambert72 = Lambert72Polygon();
+            var buildingUnitPersistentLocalId = Fixture.Create<BuildingUnitPersistentLocalId>();
+            var justInside = ExtendedWkbGeometry.Create(GeometryHelper.PointInPolygonPushedOutsideByLambert2008Rounding);
+
+            var buildingWasMigrated = new BuildingWasMigratedBuilder(Fixture)
+                .WithBuildingGeometry(new BuildingGeometry(lambert72, BuildingGeometryMethod.Outlined))
+                .WithBuildingUnit(
+                    BuildingUnitStatus.Parse(status)!.Value,
+                    buildingUnitPersistentLocalId,
+                    positionGeometryMethod: LegacyBuildingUnitPositionGeometryMethod.AppointedByAdministrator,
+                    extendedWkbGeometry: Legacy(justInside))
+                .Build();
+
+            var building = new BuildingFactory(NoSnapshotStrategy.Instance).Create();
+            building.Initialize([buildingWasMigrated]);
+
+            building.TransformToLambert2008();
+
+            building.GetChanges().OfType<BuildingGeometryCrsWasChanged>().Single()
+                .BuildingUnitPersistentLocalIdsWhichBecameDerived.Should().BeEmpty();
+
+            var buildingUnit = building.BuildingUnits.Single();
+            buildingUnit.BuildingUnitPosition.GeometryMethod
+                .Should().Be(BuildingUnitPositionGeometryMethod.AppointedByAdministrator);
+            buildingUnit.BuildingUnitPosition.Geometry
+                .Should().Be(ToLambert2008(justInside, GeometryReferenceSystem.PositionRoundingPrecision));
+        }
+
         [Fact]
         public void ThenStateWasCorrectlySet()
         {
@@ -506,8 +626,10 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenTransformingToLambert2008
                     isRemoved: isRemoved)
                 .Build();
 
-            var expectedGeometry = new BuildingGeometry(ToLambert2008(lambert72), BuildingGeometryMethod.Outlined);
+            var usedCommonUnitPosition = new BuildingGeometry(lambert72, BuildingGeometryMethod.Outlined).Center;
 
+            // The used common unit is retired, so it no longer follows the building either: it keeps its own
+            // position, re-expressed, rather than taking the centre of the transformed geometry.
             Assert(new Scenario()
                 .Given(new BuildingStreamId(Fixture.Create<BuildingPersistentLocalId>()), buildingWasMigrated)
                 .When(Command())
@@ -516,10 +638,17 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenTransformingToLambert2008
                         new BuildingStreamId(Fixture.Create<BuildingPersistentLocalId>()),
                         new BuildingGeometryCrsWasChanged(
                             Fixture.Create<BuildingPersistentLocalId>(),
-                            [usedCommonUnit],
                             [],
-                            expectedGeometry.Geometry,
-                            expectedGeometry.Center)),
+                            [],
+                            ToLambert2008(lambert72),
+                            null)),
+                    new Fact(
+                        new BuildingStreamId(Fixture.Create<BuildingPersistentLocalId>()),
+                        new BuildingUnitPositionCrsWasChanged(
+                            Fixture.Create<BuildingPersistentLocalId>(),
+                            usedCommonUnit,
+                            BuildingUnitPositionGeometryMethod.DerivedFromObject,
+                            ToLambert2008(usedCommonUnitPosition, GeometryReferenceSystem.PositionRoundingPrecision))),
                     new Fact(
                         new BuildingStreamId(Fixture.Create<BuildingPersistentLocalId>()),
                         new BuildingUnitPositionCrsWasChanged(
