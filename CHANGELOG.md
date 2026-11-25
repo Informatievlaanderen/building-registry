@@ -1,3 +1,12 @@
+## [6.6.1](https://github.com/informatievlaanderen/building-registry/compare/v6.6.0...v6.6.1) (2026-11-25)
+
+
+### Bug Fixes
+
+* **lambert:** retired units dont follow building when converting lambert ([3105955](https://github.com/informatievlaanderen/building-registry/commit/3105955e4b863d9e6e1f479bdcf3241fbfdc5c9c))
+* **lambert:** rounding building unit position outside building ([7609b33](https://github.com/informatievlaanderen/building-registry/commit/7609b33865768b9455604fa187ad1b4b74287ff7))
+* parse unitstatus in domain migrate ([e720966](https://github.com/informatievlaanderen/building-registry/commit/e720966f4b8539280aaa8b6f91a964e7e3c2064d))
+
 # [6.6.0](https://github.com/informatievlaanderen/building-registry/compare/v6.5.10...v6.6.0) (2026-11-19)
 
 
