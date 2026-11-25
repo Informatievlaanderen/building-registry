@@ -1,5 +1,6 @@
 namespace BuildingRegistry.Building
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
@@ -58,6 +59,12 @@ namespace BuildingRegistry.Building
         /// the Lambert 2008 transformation inherits it from here rather than rounding it the way it rounds a
         /// unit's own position. The building geometry itself stays unrounded; it is the position taken from
         /// it that is a position.
+        ///
+        /// The rounding is checked against the building: <c>CentroidWithinArea</c> decides inside or outside
+        /// on the unrounded point, so a centroid a few millimetres inside the boundary of a concave building
+        /// can round to a point just outside it. The centre then falls back to the nearest centimetre grid
+        /// point that is inside, around the centroid first and around the interior point next. Only a
+        /// building too narrow to hold any grid point keeps the plain rounded centroid.
         /// </remarks>
         public ExtendedWkbGeometry Center
         {
@@ -65,9 +72,35 @@ namespace BuildingRegistry.Building
             {
                 var geometry = _wkbReader.Read(Geometry);
                 var srid = geometry.SRID > 0 ? geometry.SRID : ExtendedWkbGeometry.SridLambert72;
+                var centroidWithinArea = geometry.CentroidWithinArea();
 
-                return ExtendedWkbGeometry.CreatePosition(geometry.CentroidWithinArea().WithSrid(srid));
+                return RoundedPositionWithin(geometry, centroidWithinArea, srid)
+                       ?? RoundedPositionWithin(geometry, geometry.InteriorPoint, srid)
+                       ?? ExtendedWkbGeometry.CreatePosition(centroidWithinArea.WithSrid(srid));
             }
+        }
+
+        private ExtendedWkbGeometry? RoundedPositionWithin(Geometry geometry, Geometry point, int srid)
+        {
+            var rounded = ExtendedWkbGeometry.CreatePosition(point.Copy().WithSrid(srid));
+            if (Contains(rounded))
+            {
+                return rounded;
+            }
+
+            var scale = Math.Pow(10, GeometryReferenceSystem.PositionRoundingPrecision);
+            var x = point.Coordinate.X;
+            var y = point.Coordinate.Y;
+
+            var gridPoints =
+                from gridX in new[] { Math.Floor(x * scale) / scale, Math.Ceiling(x * scale) / scale }
+                from gridY in new[] { Math.Floor(y * scale) / scale, Math.Ceiling(y * scale) / scale }
+                orderby (gridX - x) * (gridX - x) + (gridY - y) * (gridY - y), gridX, gridY
+                select geometry.Factory.CreatePoint(new Coordinate(gridX, gridY));
+
+            return gridPoints
+                .Select(gridPoint => ExtendedWkbGeometry.CreatePosition(gridPoint.WithSrid(srid)))
+                .FirstOrDefault(Contains);
         }
 
         public Geometry GetGeometry() => _wkbReader.Read(Geometry);

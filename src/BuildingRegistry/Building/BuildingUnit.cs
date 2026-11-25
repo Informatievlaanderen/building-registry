@@ -520,7 +520,11 @@ namespace BuildingRegistry.Building
                 var currentPosition = buildingGeometry.GetGeometry(BuildingUnitPosition.Geometry);
                 var newPosition = buildingGeometry.GetGeometry(correctedGeometry);
 
-                if (currentPosition.Distance(newPosition) > 0.01)
+                // The centimetre threshold only skips a derived position that is inside and merely differs
+                // from the centre by rounding. A position outside the building is always repaired, however
+                // close the centre is: the nearest centimetre grid point inside can be exactly 0.01 away.
+                if (!buildingGeometry.Contains(BuildingUnitPosition.Geometry)
+                    || currentPosition.Distance(newPosition) > 0.01)
                 {
                     Apply(new BuildingUnitPositionWasCorrected(
                         _buildingPersistentLocalId,
