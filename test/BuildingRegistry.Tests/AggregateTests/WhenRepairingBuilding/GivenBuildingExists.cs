@@ -112,12 +112,14 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRepairingBuilding
         /// its step is one the threshold alone did skip.
         /// </summary>
         [Theory]
-        [InlineData(RealBuilding, 744478.27, 744478.26)]
-        [InlineData(RealBuildingMovedTwentyCentimetresWest, 744478.07, 744478.06)]
+        [InlineData(RealBuilding, 744478.27, 744478.26, false)]
+        [InlineData(RealBuildingMovedTwentyCentimetresWest, 744478.07, 744478.06, false)]
+        [InlineData(RealBuilding, 744478.27, 744478.26, true)]
         public void WithUnitDerivedButOutsideTheBuildingByLessThanACentimetre_ThenTheUnitWasRepaired(
             string buildingWkt,
             double positionOutsideX,
-            double repairedPositionX)
+            double repairedPositionX,
+            bool isCommonBuildingUnit)
         {
             var command = Fixture.Create<RepairBuilding>();
             var buildingUnitPersistentLocalId = new BuildingUnitPersistentLocalId(Fixture.Create<int>());
@@ -135,6 +137,7 @@ namespace BuildingRegistry.Tests.AggregateTests.WhenRepairingBuilding
                 .WithBuildingUnit(
                     BuildingUnitStatus.Realized,
                     buildingUnitPersistentLocalId,
+                    function: isCommonBuildingUnit ? BuildingUnitFunction.Common : BuildingUnitFunction.Unknown,
                     positionGeometryMethod: BuildingUnitPositionGeometryMethod.DerivedFromObject)
                 .Build();
 
